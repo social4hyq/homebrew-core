@@ -13,6 +13,10 @@ class PortableGit < PortableFormula
     regex(/href=.*?git[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "afc62eab12b28ff1307d0368d0acd11dfc3e76231dd4565f3cb9b7458e0f2347"
+  end
+
   patch do
     url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/portable-git/0001-let-git-portable.patch"
     sha256 "6eb03c44ec8eae2eeee0cea41175f909fe4eff1edfa0e7f840e896ba68c1c25e"
