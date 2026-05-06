@@ -16,6 +16,10 @@ class PortableCurl < PortableFormula
     regex(/href=.*?curl[._-]v?(.*?)\.t/i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ed89ddb5058c2d35f04ba20ccbf21135b1e8b03fadf4fd61757dd6dd6465d4cd"
+  end
+
   head do
     url "https://github.com/curl/curl.git", branch: "master"
 
