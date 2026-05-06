@@ -31,6 +31,10 @@ class Ruby < Formula
 
   no_autobump! because: "this is a critical package so an auto bump might break Homebrew usability."
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4b409ba3dcfb6a96cf16f4f5a3ce45f0c770a79c240d8b5d8f260f686b0335c"
+  end
+
   keg_only :provided_by_macos
 
   depends_on "autoconf" => :build
