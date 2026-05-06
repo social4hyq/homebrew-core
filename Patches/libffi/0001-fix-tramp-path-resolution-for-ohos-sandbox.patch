@@ -1,0 +1,60 @@
+diff --git a/src/tramp.c b/src/tramp.c
+index 76a9dfe..8e733bd 100644
+--- a/src/tramp.c
++++ b/src/tramp.c
+@@ -60,6 +60,10 @@
+ #endif
+ #endif
+ 
++#ifdef __OHOS__
++#include <dlfcn.h>
++#endif
++
+ /*
+  * Each architecture defines static code for a trampoline code table. The
+  * trampoline code table is mapped into the address space of a process.
+@@ -215,6 +219,44 @@ ffi_tramp_get_libffi (void)
+   open_flags |= O_CLOEXEC;
+ #endif
+ 
++#ifdef __OHOS__
++  /*
++  * Use dladdr to resolve libffi path for static trampolines
++  *
++  * In sandboxed environments or virtual filesystems (like HMDFS),
++  * /proc/self/maps may return internal kernel paths that are inaccessible
++  * to the user process, causing open() to fail with ENOENT.
++  *
++  * This prevents the static trampoline from initializing, forcing a
++  * fallback to dynamic code generation which is blocked by strict
++  * W^X (Write XOR Execute) security policies.
++  *
++  * This patch enhances ffi_tramp_get_libffi by:
++  * 1. Attempting to use dladdr() to retrieve the actual load path from
++  *    the dynamic linker as a primary strategy.
++  * 2. Recalculating the trampoline offset using dli_fbase to handle
++  *    static linking or shifted load addresses correctly.
++  * 3. Falling back to the legacy /proc/self/maps parsing if dladdr fails.
++  *
++  * This allows libffi to function correctly in strict environments
++  * without requiring LD_PRELOAD or insecure memory permissions.
++  */
++  Dl_info info;
++  if (dladdr ((void *)ffi_tramp_arch, &info) && info.dli_fname)
++    {
++      tramp_globals.fd = open (info.dli_fname, open_flags);
++      if (tramp_globals.fd != -1)
++        {
++          tramp_globals.offset = (off_t)(addr - (uintptr_t)info.dli_fbase);
++          if (tramp_table_alloc ())
++            return 1;
++
++          close (tramp_globals.fd);
++          tramp_globals.fd = -1;
++        }
++    }
++#endif
++
+   snprintf (file, PATH_MAX, "/proc/%d/maps", getpid());
+   fp = fopen (file, "r");
+   if (fp == NULL)
