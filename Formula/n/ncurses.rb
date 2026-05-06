@@ -10,12 +10,7 @@ class Ncurses < Formula
   compatibility_version 1
 
   bottle do
-    sha256 arm64_tahoe:   "b43443ba3c3c8728e79413c7c3fed4a0eb293bd77c8492c1ec4c5d05233a97f1"
-    sha256 arm64_sequoia: "3fe0a6d4482023f880e9542af63e9229c6fcd7456b46e88b5d2d4703eb2ec943"
-    sha256 arm64_sonoma:  "d4df00300346955c4703c7deecd3affca58a0a27477087d6ff387beb30a3ac9f"
-    sha256 sonoma:        "3981626d4214e14e1d01528b4652e0c9ac470c0a63fc2c995b875cd39efd1976"
-    sha256 arm64_linux:   "02abc7eacf7d1f27c992888494a19a397bd4911fc6a92c34db232714488aec12"
-    sha256 x86_64_linux:  "12c037b176c3300398cc53f0f278ba14195ae525cb6188dc085fd07236e5db48"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f75321941185308e954063e12a19362851b85c5790d66aae10d4c6ba236d26b"
   end
 
   keg_only :provided_by_macos
