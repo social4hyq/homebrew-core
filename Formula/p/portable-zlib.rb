@@ -14,6 +14,10 @@ class PortableZlib < PortableFormula
     formula "zlib"
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "50bb2c38455bf2ed9ee0bae9e9816642887749cef506640864997735a800a29c"
+  end
+
   def install
     system "./configure", "--static", "--prefix=#{prefix}"
     system "make", "install"
