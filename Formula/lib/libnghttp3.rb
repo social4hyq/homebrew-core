@@ -9,12 +9,7 @@ class Libnghttp3 < Formula
   head "https://github.com/ngtcp2/nghttp3.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "97ef00ffe4282cd24334ae030b8d9a822bfac20405fe9f31dae8b4f1e80b2133"
-    sha256 cellar: :any,                 arm64_sequoia: "5b1b255e9791d2c78590f1914194765cbb87cb2a46cd2e52db5d741d0e86f070"
-    sha256 cellar: :any,                 arm64_sonoma:  "379f36c4811ca6f8b170a79695480650720502759d34be52b403a99677fa5f07"
-    sha256 cellar: :any,                 sonoma:        "8deca6fa2c6dc3f7ca526a4c5fa82a5d8bb7bc8b3fb49df1fc1ba03511ae57c1"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e1aa2913d174e7defeccaa8ea7399c291f27bef7587092f5198e5ad81a3605cc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "16f16337f4028ce9c324bd3e9f1379791a1cdfe993e8e0374cfb6c262651d25b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc1a30f5c2a02ea0d43b7d5864b7b07f6743383d9fcfa807f22ed85a6f5b2d75"
   end
 
   depends_on "cmake" => :build
