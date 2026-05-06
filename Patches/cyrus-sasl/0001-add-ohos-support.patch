@@ -1,0 +1,56 @@
+diff --git a/sample/client.c b/sample/client.c
+index e723c6b7..822c2492 100644
+--- a/sample/client.c
++++ b/sample/client.c
+@@ -64,6 +64,10 @@
+ 
+ #include "common.h"
+ 
++#ifdef __OHOS__
++#include "getpass.h"
++#endif
++
+ /* remove \r\n at end of the line */
+ static void chop(char *s)
+ {
+diff --git a/sample/getpass.h b/sample/getpass.h
+new file mode 100644
+index 00000000..d6751aa9
+--- /dev/null
++++ b/sample/getpass.h
+@@ -0,0 +1,20 @@
++#include <termios.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <string.h>
++
++static inline char *getpass(const char *prompt) {
++    static char buf[128];
++    struct termios oldt, newt;
++    fputs(prompt, stdout); fflush(stdout);
++    tcgetattr(STDIN_FILENO, &oldt);
++    newt = oldt; newt.c_lflag &= ~(ECHO);
++    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
++    if(fgets(buf, sizeof(buf), stdin)) {
++        size_t l = strlen(buf);
++        if(l>0 && buf[l-1] == '\n') buf[l-1] = '\0';
++    }
++    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
++    fputc('\n', stdout);
++    return buf;
++}
+diff --git a/sample/http_digest_client.c b/sample/http_digest_client.c
+index 6a2ae596..f779f76e 100644
+--- a/sample/http_digest_client.c
++++ b/sample/http_digest_client.c
+@@ -20,6 +20,10 @@
+ 
+ #include <sasl.h>
+ 
++#ifdef __OHOS__
++#include "getpass.h"
++#endif
++
+ #define SUCCESS 0
+ #define ERROR   1
+ 
