@@ -7,6 +7,10 @@ class Coreutils < Formula
   license "GPL-3.0-or-later"
   compatibility_version 1
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c486ee718b89b8c943bd1f4d2829ba84c3ae8bc44b9797a5aed1579da32f8776"
+  end
+
   head do
     url "https://git.savannah.gnu.org/git/coreutils.git", branch: "master"
 
