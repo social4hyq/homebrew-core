@@ -13,13 +13,7 @@ class Perl < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "11266b9a2528911df242d82ec041ee91a50c3374d03c9401b558e521b5569916"
-    sha256 arm64_sequoia: "055da0dbe11d31788f13154fb01f7b5596e8450705bd4a1e54e799977d7bddaa"
-    sha256 arm64_sonoma:  "e9270cae03ec248b9910b33924cd522773d4494ed1da07a4fbc8bc70c48eeddd"
-    sha256 sonoma:        "78ee0a26f6650a15d49bc1e6586b91f9716981207059d511704d15f30882c63a"
-    sha256 arm64_linux:   "a2adf29ff516a10c5851c1da904cb033cb92f89c5ea8efee5600065d06f3d989"
-    sha256 x86_64_linux:  "036d3e8899b33c3c4f7dd9b69057f5dd522184a72750b212376d8fd5fc7d120f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2aaccc551f17ebc74ee17fb01dc56bcd715c842e306f9599abbcfb900274e02c"
   end
 
   depends_on "gdbm"
