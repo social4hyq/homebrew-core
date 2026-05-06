@@ -11,6 +11,10 @@ class PortableLibxcrypt < PortableFormula
     formula "libxcrypt"
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5bcbd4e0bda96e3e87ce6b0d9a83f97eac5d2eab6a0f8f58b26d8e5248d4b0bb"
+  end
+
   def install
     system "./configure", *portable_configure_args,
                           *std_configure_args,
