@@ -12,12 +12,7 @@ class Gettext < Formula
   compatibility_version 1
 
   bottle do
-    sha256 arm64_tahoe:   "1f98400343132c8e469ed475157f8f4d0f516ea86bd4600552e8b75ab638fcf9"
-    sha256 arm64_sequoia: "982f3a3cc24df4f552efc1b6ed6303d2920b2d5b1c1975fe3d9bd7418b8fa532"
-    sha256 arm64_sonoma:  "f9ea4eed738746ea4150a4f83e8dd11ca21ca3de5bb113995c25eec409bb5749"
-    sha256 sonoma:        "2cc112cce103be3beb13cc8ba67f521d4e972c4082fd69868d34920d63120c09"
-    sha256 arm64_linux:   "0d24ef468ab6683610fb866973cbdf899165be653b42c68689b70743be5ce695"
-    sha256 x86_64_linux:  "ed30be09f5f328a974e51e34966a502496e0623c7ecde0faf7559143cbd02255"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8cd1125ddd96630870b4c63dd49ef63fc3be279b8fc6de92d5829b14f3ac7950"
   end
 
   depends_on "libunistring"
