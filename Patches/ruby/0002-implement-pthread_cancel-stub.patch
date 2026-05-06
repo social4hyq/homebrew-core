@@ -1,0 +1,74 @@
+diff --git a/coroutine/pthread/Context.c b/coroutine/pthread/Context.c
+index 38774cd..08febdf 100644
+--- a/coroutine/pthread/Context.c
++++ b/coroutine/pthread/Context.c
+@@ -31,6 +31,7 @@ int check(const char * message, int result) {
+ }
+ 
+ void coroutine_initialize_main(struct coroutine_context * context) {
++    context->cancelled = 0;
+     context->id = pthread_self();
+ 
+     check("coroutine_initialize_main:pthread_cond_init",
+@@ -89,6 +90,7 @@ void coroutine_initialize(
+     context->start = start;
+     context->stack = stack;
+     context->size = size;
++    context->cancelled = 0;
+ }
+ 
+ static
+@@ -224,6 +226,11 @@ struct coroutine_context * coroutine_transfer(struct coroutine_context * current
+     if (DEBUG) fprintf(stderr, "coroutine_transfer:pthread_cleanup_pop\n");
+     pthread_cleanup_pop(1);
+ 
++    if (current->cancelled) {
++        if (DEBUG) fprintf(stderr, "coroutine_transfer: self-terminating\n");
++        pthread_exit(NULL);
++    }
++
+ #ifdef __FreeBSD__
+     // Apparently required for FreeBSD:
+     pthread_testcancel();
+@@ -236,21 +243,18 @@ struct coroutine_context * coroutine_transfer(struct coroutine_context * current
+ 
+ static
+ void coroutine_join(struct coroutine_context * context) {
+-    if (DEBUG) fprintf(stderr, "coroutine_join:pthread_cancel\n");
+-    int result = pthread_cancel(context->id);
+-    if (result == -1 && errno == ESRCH) {
+-        // The thread may be dead due to fork, so it cannot be joined and this doesn't represent a real error:
+-        return;
+-    }
++    if (DEBUG) fprintf(stderr, "coroutine_join: signaling cancellation\n");
+ 
+-    check("coroutine_join:pthread_cancel", result);
++    context->cancelled = 1;
+ 
+-    if (DEBUG) fprintf(stderr, "coroutine_join:pthread_join\n");
++    pthread_mutex_lock(&context->shared->guard);
++    pthread_cond_signal(&context->schedule);
++    pthread_mutex_unlock(&context->shared->guard);
++
++    if (DEBUG) fprintf(stderr, "coroutine_join: pthread_join\n");
+     check("coroutine_join:pthread_join",
+         pthread_join(context->id, NULL)
+     );
+-
+-    if (DEBUG) fprintf(stderr, "coroutine_join:pthread_join done\n");
+ }
+ 
+ void coroutine_destroy(struct coroutine_context * context)
+diff --git a/coroutine/pthread/Context.h b/coroutine/pthread/Context.h
+index 6d551ee..ea39a47 100644
+--- a/coroutine/pthread/Context.h
++++ b/coroutine/pthread/Context.h
+@@ -47,6 +47,8 @@ struct coroutine_context
+     pthread_t id;
+     pthread_cond_t schedule;
+     struct coroutine_context * from;
++
++    int cancelled;
+ };
+ 
+ void coroutine_initialize_main(struct coroutine_context * context);

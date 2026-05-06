@@ -1,0 +1,59 @@
+diff --git a/configure.ac b/configure.ac
+index 2bbce78fd0..a99248a394 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -589,6 +589,18 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+ ],
+ [AC_MSG_RESULT(no)])
+ 
++AC_MSG_CHECKING([whether it is OpenHarmony])
++AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
++	@%:@ifndef __OHOS__
++	@%:@error Not openharmony
++	@%:@endif
++]], [[]])],
++[
++	AC_MSG_RESULT(yes)
++	target_os=${target_os}-ohos
++],
++[AC_MSG_RESULT(no)])
++
+ AC_SUBST(RM, ['rm -f'])
+ AC_SUBST(CP, ['cp'])
+ RMDIRS='$(top_srcdir)/tool/rmdirs'
+@@ -1092,6 +1104,12 @@ AS_CASE(["$target_os"], [*android*], [
+ 	])
+ ])
+ 
++AS_CASE(["$target_os"], [*ohos*], [
++	AS_CASE(["$target_cpu"], [arm*], [
++		ac_cv_func___builtin_setjmp=no
++	])
++])
++
+ AS_UNSET(ORIG_LIBS)
+ POSTLINK=:
+ AC_SUBST(POSTLINK)
+@@ -3630,6 +3648,12 @@ AS_CASE("$enable_shared", [yes], [
+      ])
+     ])
+ 
++  # Force symbols in libruby.so to be globally visible for OHOS platform
++  AS_CASE(["$target_os"],
++    [*ohos*], [
++      LIBRUBY_DLDFLAGS="$LIBRUBY_DLDFLAGS "'-Wl,-z,global'
++    ])
++
+   relative_libprefix="/../${multiarch+../}${libdir_basename}"
+   AS_CASE(["$target_os"],
+     [sunos4*], [
+@@ -3924,6 +3948,9 @@ AS_IF([test "$cross_compiling" = no],
+         [*android*], [
+             JIT_TARGET_OK=no
+         ],
++        [*ohos*], [
++            JIT_TARGET_OK=no
++        ],
+         [arm64-darwin*|aarch64-darwin*|x86_64-darwin*], [
+             JIT_TARGET_OK=yes
+         ],
