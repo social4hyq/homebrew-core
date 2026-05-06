@@ -12,14 +12,7 @@ class OpensslAT35 < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "209c2aaf66641bb7adb2c7c57e3a55cff8b589981093aa171bf68d45b735818f"
-    sha256 arm64_sequoia: "6421e9c1bae670a03f4e4d445fdc9d1e14007d19819039179aeac1e61707a440"
-    sha256 arm64_sonoma:  "1be6326a589c5c1dfafeacbab32e4baa35f9ce2ff4c4ce4110c4cde67afd9a3f"
-    sha256 tahoe:         "ec6194aa9f3c1d16fa31b39fb0104d5afe3e002fd1318f5774cd880d0be79551"
-    sha256 sequoia:       "505fbacb893def4f89a2806806f2bbb076b5c776cf05baf486eca34e162ec182"
-    sha256 sonoma:        "911a0ae5a539504acabba706674770d36cee3a86c7348695f22d3081f70855db"
-    sha256 arm64_linux:   "117345c10f5d05c5ab7e7f893edb059cb569b493d7da5972668782ab3d89aba7"
-    sha256 x86_64_linux:  "6ad5fa9ac502a8f914241ed47573837aed895325accab61d9f0afb8a35f76738"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f8b3ae9443cce3df30c4583abac403fbfdaf90660867fd7f57614529fa7ede5"
   end
 
   keg_only :versioned_formula
