@@ -8,14 +8,7 @@ class Texinfo < Formula
   compatibility_version 1
 
   bottle do
-    sha256 arm64_tahoe:   "af864341784c9958f6ce991fa0e0bc3b5727dfc7c8f53a90cbf2339e080c2232"
-    sha256 arm64_sequoia: "e26c8c7d0d1f5b68bb7e78e59f701838d45fa73e3ce768ab6b68e1a051ff751c"
-    sha256 arm64_sonoma:  "6edceba78cb173242c77e481aa0adc88e6efbddf4e05239322d72f05b144b2bc"
-    sha256 tahoe:         "0e80a4ba0a2a3a48eebb8078f1c79fe563e374c3c2ed77642901941fc42e015c"
-    sha256 sequoia:       "93f14818e722ccc3152e9d2824095eb4ca79c58b37bc1ce58f0469a6e2735f21"
-    sha256 sonoma:        "cf213ea4a3f93a42c4ad178e602e1eda6cf17dcf3c9fbeb024c4758910dc4878"
-    sha256 arm64_linux:   "ae0c709a08d1e093bddc8c4c4f696592e38faed5c261d020f027dcf195425ddc"
-    sha256 x86_64_linux:  "0dd622bb0151013803cdf5977f76cf78622fcb92478062d6ce2612199f7a049f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "15639ed8b51085217476d80441b9f974d4e4aa9ff07d6ae82b615ad48ef9963a"
   end
 
   uses_from_macos "ncurses"
