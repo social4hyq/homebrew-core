@@ -1,0 +1,16 @@
+diff -r -u a/lib/freadahead.c b/lib/freadahead.c
+--- a/lib/freadahead.c	2025-04-17 23:43:21.000000000 +0800
++++ b/lib/freadahead.c	2025-04-18 00:00:00.000000000 +0800
+@@ -94,6 +94,12 @@
+   if (fp->state == 4 /* WR */ || fp->rp >= fp->wp)
+     return 0;
+   return fp->wp - fp->rp;
++#elif defined __OHOS__
++  struct {
++      unsigned flags;
++      unsigned char *rpos, *rend;
++  } *f = (void *)fp;
++  return f->rend ? f->rend - f->rpos : 0;
+ #elif defined SLOW_BUT_NO_HACKS     /* users can define this */
+   abort ();
+   return 0;
