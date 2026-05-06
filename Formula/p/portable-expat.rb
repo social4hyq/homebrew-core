@@ -15,6 +15,10 @@ class PortableExpat < PortableFormula
     end
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d8fee3c208f3ef744df24b2bba9081da32bf06d2509fff063200117fdfae27f"
+  end
+
   head do
     url "https://github.com/libexpat/libexpat.git", branch: "master"
     depends_on "autoconf" => :build
