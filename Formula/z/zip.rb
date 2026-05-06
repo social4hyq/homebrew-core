@@ -13,12 +13,7 @@ class Zip < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "83ba2b2ec5dae0c7d6b804ee92e433ed035b1350d679592280c7421d15bd5a8a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7cdb35f0192184dbe0c83432f61cb35d2f640925b750bd8d07ea3de8ae1c2a71"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "775099eb3b1a0f85dddef4df4ef0a596bf5224d9d715a5555c5009fdb55f95e8"
-    sha256 cellar: :any_skip_relocation, sonoma:        "be38fc0beefdd3c6f662e57bd31f997ddba8cfbce7bf8137128fe2865b06529c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2e80a18894a12fc1771711c709cc20da6ac1d532d9fb10fbca79eb4165b026da"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "526d0c20fa500e2440569e83d02643be31facbd1e788a2efceca7041a00f24d3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5075a7c8e6ef6ab0c6df5b0022d31f3b94a71c9813a29c6b8a333ac4ea00ae97"
   end
 
   keg_only :provided_by_macos
