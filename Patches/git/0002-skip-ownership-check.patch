@@ -1,0 +1,28 @@
+diff --git a/setup.c b/setup.c
+index b723f8b339..4b8f48073d 100644
+--- a/setup.c
++++ b/setup.c
+@@ -1383,6 +1383,23 @@ static int ensure_valid_ownership(const char *gitfile,
+ {
+ 	struct safe_directory_data data = { 0 };
+ 
++#ifdef __OHOS__
++	/*
++	 * OpenHarmony Application Sandbox Logic:
++	 * In OpenHarmony, application-level isolation and user-specific public
++	 * directory separation are already enforced by the system's sandbox
++	 * environment (via namespaces or bind mounts).
++	 *
++	 * It is essential to skip this check for application UIDs (>= 20000000)
++	 * because an application's UID and the file's st_uid often do not match
++	 * within this architecture. Failure to skip this check would lead to
++	 * incorrect permission denials, even though the sandbox already ensures
++	 * that the application is only accessing its permitted resources.
++	 */
++	if (geteuid() >= 20000000)
++		return 1;
++#endif
++
+ 	if (!git_env_bool("GIT_TEST_ASSUME_DIFFERENT_OWNER", 0) &&
+ 	    (!gitfile || is_path_owned_by_current_user(gitfile, report)) &&
+ 	    (!worktree || is_path_owned_by_current_user(worktree, report)) &&
