@@ -11,6 +11,10 @@ class PortableLibffi < PortableFormula
     formula "libffi"
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "139dc5b1e795be1d4a28a1926f3060ebd78995557edd798c9794fa315f38f099"
+  end
+
   def install
     system "./configure", *portable_configure_args,
                           *std_configure_args,
