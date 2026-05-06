@@ -26,6 +26,10 @@ class PortableOpenssl < PortableFormula
     end
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7dea0493e2a5fcd4db80c2779e74503a70ef88da2ee2f8c21954cf9527469fd"
+  end
+
   resource "cacert" do
     # https://curl.se/docs/caextract.html
     url "https://curl.se/ca/cacert-2026-03-19.pem"
