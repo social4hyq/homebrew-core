@@ -1,0 +1,50 @@
+diff -u -r a/lib/freadahead.c b/lib/freadahead.c
+--- a/lib/freadahead.c	2025-10-30 03:03:06.000000000 +0800
++++ b/lib/freadahead.c	2025-10-31 00:00:00.000000000 +0800
+@@ -94,6 +94,12 @@
+   if (fp->state == 4 /* WR */ || fp->rp >= fp->wp)
+     return 0;
+   return fp->wp - fp->rp;
++#elif defined __OHOS__
++  struct {
++      unsigned flags;
++      unsigned char *rpos, *rend;
++  } *f = (void *)fp;
++  return f->rend ? f->rend - f->rpos : 0;
+ #elif defined SLOW_BUT_NO_HACKS     /* users can define this */
+   abort ();
+   return 0;
+diff -u -r a/lib/freadptr.c b/lib/freadptr.c
+--- a/lib/freadptr.c	2025-10-30 03:03:06.000000000 +0800
++++ b/lib/freadptr.c	2025-10-31 00:00:00.000000000 +0800
+@@ -115,6 +115,14 @@
+     return NULL;
+   *sizep = fp->wp - fp->rp;
+   return fp->rp;
++#elif defined __OHOS__
++  struct {
++      unsigned flags;
++      unsigned char *rpos, *rend;
++  } *f = (void *)fp;
++  if (f->rpos == f->rend) return 0;
++  *sizep = f->rend - f->rpos;
++  return (const char *)f->rpos;
+ #elif defined SLOW_BUT_NO_HACKS     /* users can define this */
+   /* This implementation is correct on any ANSI C platform.  It is just
+      awfully slow.  */
+diff -u -r a/lib/freadseek.c b/lib/freadseek.c
+--- a/lib/freadseek.c	2025-10-30 03:03:06.000000000 +0800
++++ b/lib/freadseek.c	2025-10-31 00:00:00.000000000 +0800
+@@ -64,6 +64,12 @@
+   fp->__bufp += increment;
+ #elif defined EPLAN9                /* Plan9 */
+   fp->rp += increment;
++#elif defined __OHOS__
++  struct {
++      unsigned flags;
++      unsigned char *rpos, *rend;
++  } *f = (void *)fp;
++  f->rpos += increment;
+ #elif defined SLOW_BUT_NO_HACKS     /* users can define this */
+ #else
+  #error "Please port gnulib freadseek.c to your platform! Look at the definition of getc, getc_unlocked on your system, then report this to bug-gnulib."
