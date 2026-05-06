@@ -12,6 +12,10 @@ class PortablePcre2 < PortableFormula
     regex(/^pcre2[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8b2c21252ddb1ca96d10c69b38e9e2715f79a3a40c192a679bd4f855667fcb8"
+  end
+
   head do
     url "https://github.com/PCRE2Project/pcre2.git", branch: "master"
 
