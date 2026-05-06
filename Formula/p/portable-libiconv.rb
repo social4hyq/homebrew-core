@@ -8,6 +8,10 @@ class PortableLibiconv < PortableFormula
   sha256 "88dd96a8c0464eca144fc791ae60cd31cd8ee78321e67397e25fc095c4a19aa6"
   license all_of: ["GPL-3.0-or-later", "LGPL-2.0-or-later"]
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ca0ef5ba87de70cca0d983d795d288e9a9e62f06d699fae6116b04366fa4c0a"
+  end
+
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "gperf" => :build
