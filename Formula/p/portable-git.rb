@@ -3,8 +3,8 @@ require File.expand_path("../../Abstract/portable-formula", __dir__)
 class PortableGit < PortableFormula
   desc "Distributed revision control system"
   homepage "https://git-scm.com"
-  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.53.0.tar.xz"
-  sha256 "5818bd7d80b061bbbdfec8a433d609dc8818a05991f731ffc4a561e2ca18c653"
+  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.54.0.tar.xz"
+  sha256 "f689162364c10de79ef89aa8dbf48731eb057e34edbbd20aca510ce0154681a3"
   license "GPL-2.0-only"
   head "https://github.com/git/git.git", branch: "master"
 
