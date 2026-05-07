@@ -13,13 +13,7 @@ class Pigz < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "042145d01637ec82b2da2e4c2ef05ff1391b39c5aaafdebbe46d43f2b595404a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "3dfeb313ced9d0f068c33679c38a50db0a2a26a9177ffd0d6845d1320cea3879"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "671f18fa88cf17e1eed437f51b85b97ef54b0d650222d3a905d60fe4399a57f0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "1b7fedaf53aad7b5d257fe1789ad82d864979a70dc6b1a2b51ca913b131c1673"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2d4c423ba93d711357705b6f4bd87d39c83ec4d60a94fd0ef08a2c875532eeee"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9daa1d45e359ca4ff5c166c27c17803b3218ca73446e957df017614671ee9690"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c85c25fc9c8af051e194238b2d00cb67b17eb5b80002e41d4bf55a5143160180"
   end
 
   on_linux do
