@@ -11,6 +11,10 @@ class Node < Formula
     regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "75589bcf1224b8bbc606d3bbeeeff21d352a6a85a07f468b787a4e84ec632004"
+  end
+
   # Disable superenv
   env :std
   
