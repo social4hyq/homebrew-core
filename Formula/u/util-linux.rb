@@ -24,6 +24,10 @@ class UtilLinux < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "50b97c49d03426389d3cfebbf6240f39fec89b96fa8a4c6591fd9450d2bce472"
+  end
+
   depends_on "gettext" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
