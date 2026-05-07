@@ -7,12 +7,7 @@ class Libx11 < Formula
   compatibility_version 1
 
   bottle do
-    sha256 arm64_tahoe:   "cddc8c50c6140f0f64724e4f7c508fe7d26676b24cf7ae2b2527bf884a07a5ea"
-    sha256 arm64_sequoia: "1151df800309c229d23b41bdf27973d63619c423ce369164296af84b779482ce"
-    sha256 arm64_sonoma:  "5d5325771c9ba385b0dec12f257cdd8baf43491dd79c55e79d1d600a6ae4d7e7"
-    sha256 sonoma:        "32a48ce69d27f65034e12ecdf7053708dc88f6edc6c8c6c3b10ff471fbd056c5"
-    sha256 arm64_linux:   "affc9d4a098b828773661c5dfecb32f3e32c2f07701ce11e6495c64f189f2aa3"
-    sha256 x86_64_linux:  "d7b4f02a9f494cfe80106d3ec885233e06c1c34bbfdfff06a6548869d6844ab6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd608b496e60bc7dcddd8fea3c7b6f290f8c1cb2abcaf4b117b0cd9938cdaa6e"
   end
 
   depends_on "pkgconf" => :build
