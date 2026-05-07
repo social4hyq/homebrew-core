@@ -19,15 +19,7 @@ class Fontconfig < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "20f30c771e40a924e423a9652080c7097e16782ffb236344c368721c001b78a0"
-    sha256 arm64_sequoia: "357516db5db5eb0cf5936333ef5845e600a0e01fbe80909b994f159b9d18bb22"
-    sha256 arm64_sonoma:  "d3d81ce82b7fafa924ca50adb5199b952f9f6706303d599e6bee0c476ece908b"
-    sha256 arm64_ventura: "8f07f7c568de41b1229cc5d437763739d4f3e892e9aa17b94fe9415c80ea40c0"
-    sha256 sonoma:        "ca0deb10e43960476c8c417e78f14e81bc2d0674c7860db8efb842d206093137"
-    sha256 ventura:       "71ec3020d8de2aebed88452f49748554e318b1dd0054a5d540820586b2488ac0"
-    sha256 arm64_linux:   "e85111ea1b81f0bf5505a3319187b3b2ede73aad67b9142ceb86132bdece1a61"
-    sha256 x86_64_linux:  "2c1073429bebddfa34e272928799517b246e6a44722ac567a1be66692750d99b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5efbc5c0f1c7ee6b387db66e599c414671c6d0aeaed8fb496a5d794f9a2e4501"
   end
 
   depends_on "gettext" => :build
