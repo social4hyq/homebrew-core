@@ -14,12 +14,7 @@ class Openldap < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "a7e2d742e8b2d70ab77446b4a596bb10f7efd2ee0589f2eaeec24a37e4c2744a"
-    sha256 arm64_sequoia: "28c2a98c69c5e64adbbbf2da4f3ff4cdea5169277679e26cb5e721c0d9dca513"
-    sha256 arm64_sonoma:  "d1b5d4cf45357617d67c11d4e8830563cca78fff27436ab39030809ff5facf55"
-    sha256 sonoma:        "e2041deb3ff2c7d88578218c3a414f9b870c0f3d3f8a111909ef1c0bdff3cbaa"
-    sha256 arm64_linux:   "5de6229ea5d0fa4844d49d256ad34664b1b0295f8f3a773b78b2fcd32938c737"
-    sha256 x86_64_linux:  "5a958deb06792794bc4ccbca62276d85998cdde566c517d55c127935927e0bf7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "753cf85da2e2c52cdfa343284b8c6eac51ba9f8af54c92d76169b5bc1927ddd8"
   end
 
   keg_only :provided_by_macos
