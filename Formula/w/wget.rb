@@ -7,13 +7,7 @@ class Wget < Formula
   compatibility_version 1
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "03be72d23a113a3273245b3e071667b611ea5d81dab6f52e995a84420d0ed734"
-    sha256 arm64_sequoia: "d620e085be7df7e93c7a8e6dc98e71b7a2faedbb40e83daae9b823374ee9b09e"
-    sha256 arm64_sonoma:  "0611b16c2d24332fbb48cf1d75717b3ac3fc579a6ddac33ee1acaa791ff12e8e"
-    sha256 sonoma:        "91995d4d44951e981c36879505e8e294d15e46bbd3ef3965caf94d55424e165b"
-    sha256 arm64_linux:   "6c291dba1e71dcfada741192dbf78790c60488d927fa15c82f4bd0901edfa014"
-    sha256 x86_64_linux:  "09603bb2a51e4bdc94a9f4f3e66442ef6e401a2a2d244213066c58cceb686f95"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "39b22b1f1f78bf34a7f3c1677501f8cd4f17877d33e0b013c0ba86f83a28ae4d"
   end
 
   head do
