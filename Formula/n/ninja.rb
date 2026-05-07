@@ -13,14 +13,7 @@ class Ninja < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d311d593a271d255b4fd6337f8ef394f825b73aa77f7ebd51236ff850cf85033"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "700fe3bd75ca15b2778454947a215334a71997dcf92a3b644bfeb06f79c2508e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e137aa475dd45d513d0076971afb5f33314eb992ce27d868793ee5c54555cdcd"
-    sha256 cellar: :any_skip_relocation, tahoe:         "158b6f8679eca7ea16e76aecddd42465e2bdc44512c4d9fdab579b50fe3c7301"
-    sha256 cellar: :any_skip_relocation, sequoia:       "52f936327d0ee780ae639db82cdc96b13a7ed8a4e778b3c3d53e3335899b0b2a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "42222a304bd2a7d74e0af1479932821f4edb8855af4d0a89e2c0841e9a807b7c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "cb6ac675ebb7a42d4dc01de374378df60f83f076211d5d35c0880da3babf40bf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5b3072c3b1944cb010705840243e7590cb1105445dfdcaf90de543b3dc06b545"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "97c2b9df27e935ce18c67f1cfca81da784ada7c49700a29c1042c4e19a20db13"
   end
 
   uses_from_macos "python" => [:build, :test]
