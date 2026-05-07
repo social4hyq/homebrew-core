@@ -11,6 +11,10 @@ class NodeAT24 < Formula
     regex(%r{href=["']?v?(24(?:\.\d+)+)/?["' >]}i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "093caee610c60e65fbf7e90ef984a028ed3b4a8cc2d5e6d98725f6f14bea2bfe"
+  end
+
   keg_only :versioned_formula
 
   # https://github.com/nodejs/release#release-schedule
