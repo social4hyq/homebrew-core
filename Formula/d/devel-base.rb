@@ -5,6 +5,10 @@ class DevelBase < Formula
   version "1.0.0"
   license "BSD-2-Clause"
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d08a9667141634c79884c8d42bfc9a4f834f1faa379ae953feb2a9f1aa300c60"
+  end
+
   depends_on "coreutils"
   depends_on "diffutils"
   depends_on "gawk"
