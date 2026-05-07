@@ -6,6 +6,10 @@ class OhosSdk < Formula
   sha256 "191094c9efcc4c0a6874aadaec5a1bf8b16f09f60c8f34a828d4ab0007356248"
   license "Apache-2.0"
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dc86ede13801f3f16fffe6b14b81e9e1a0773c36942b535101e68ce1526a390"
+  end
+
   depends_on "unzip" => :build
 
   def install
