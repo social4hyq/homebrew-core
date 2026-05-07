@@ -26,12 +26,7 @@ class Vim < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "65c8ed4235f0a5630a97529dc6ff09d14f03b9d9726e32504f10607a194f5f44"
-    sha256 arm64_sequoia: "92576d91b09b37a49019874d141ebed5e56a1c2987304bc0a15113d9646112f0"
-    sha256 arm64_sonoma:  "1467fa6b9c89cebe13f3e1209c85e10aff39874e38f216fb76d762a19a7e6de4"
-    sha256 sonoma:        "8e5fd8f1cbc5a4007ddaf9dd4210443695fa7cdfa3192c8839933de32aaf9327"
-    sha256 arm64_linux:   "d2186cfff725f21c7e2d66b33e3b2158b9102a5d4934c7f498866bbaf7af1e2e"
-    sha256 x86_64_linux:  "5e700683e9519f7b859ebea39af9450570759a48f52d93dcf6eaa77ad25a199c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e13fcdd8f84ecd8da919268b4be584dfb657f7494edb8f734980dfa0efe3904c"
   end
 
   depends_on "gettext" => :build
