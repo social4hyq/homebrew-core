@@ -11,12 +11,7 @@ class Nano < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "0a983eefbaf98e0b9d1fe9fec31c8e573777a080b86521c2d121a9a0e5831890"
-    sha256 arm64_sequoia: "78489eb5b719a880ae4df40db133de2cbbc68f6eb3821b84612ee83b4f172a5f"
-    sha256 arm64_sonoma:  "f3e7bf555bdbf2f76cb746dc35e6e7bf87bbaf0be01ce84cbadf8413674493da"
-    sha256 sonoma:        "f85eabd5621465c91b3e370005d3363ab5738b174b58ebb5123fda6ddc293ab8"
-    sha256 arm64_linux:   "2302672047e0fb5c5ab0ff0cdde437ffff60f030a781e848915fce42ebc16638"
-    sha256 x86_64_linux:  "a3f04be362cea9da1cecebc05035784a8c68cd9224951bdfb6da5953bf15b102"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cb398061dd686a5559abe603675fd646fd685ce123441392f4734c767c4b2eb"
   end
 
   depends_on "pkgconf" => :build
