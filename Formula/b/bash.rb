@@ -83,12 +83,7 @@ class Bash < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 arm64_tahoe:   "075fd682409ff27a9acbbe88a1456b12826634a1669c0c99fe4d76fda574e0ef"
-    sha256 arm64_sequoia: "99ad5486305387ebc826b15f2c8ac0eb5e0c221ee03bc2b8c74902f6478d8627"
-    sha256 arm64_sonoma:  "6de5e01ff6246712ee5f78dbe2828bdffffd4bd91539963dfa6d0eb10b0dcd0f"
-    sha256 sonoma:        "16d2c963e646d30f259382a3b20c6f959b5f9c69dce11e6e62fc7a6648752612"
-    sha256 arm64_linux:   "f1dab753e73b8ba1d4569214f7d47c4e6f34f1e37a4272855143b4ee7346b157"
-    sha256 x86_64_linux:  "7f7a002baad948b82cd8e1e0a89ef8816fb3433fe6e914ac2d0ab4f50c90202f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "de0a0161bd09e14de6c9499026595d7ae8210e0e5d582f1185dea9e599a95e95"
   end
 
   # System ncurses lacks functionality
