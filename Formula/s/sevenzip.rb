@@ -16,12 +16,7 @@ class Sevenzip < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "6f0c24927488f6cff80f71a4127c89c967d70700002df0ae7dd8248bc77167a4"
-    sha256 cellar: :any,                 arm64_sequoia: "3d6255d3267e6614f8353d9acb074ec56da23069fc0730e1faa97b4b147c6b3d"
-    sha256 cellar: :any,                 arm64_sonoma:  "87f99d0cc42d909e43c57b8ed45735a479b27c5e247f3942e86148b51737d94e"
-    sha256 cellar: :any,                 sonoma:        "d846411ffedeef2f643a3aaea33233c6b038d4c166f3f46ee9542f559b1130c7"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b9054ee68ffc6d140ffdfb7f7b665755c74f2cbbe9e109bdeec5ea6640ec0321"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "23143ae518a247b5b5ababcaf4e149c45cf92c4fb98e3019acc06bdd348bf609"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa4905c755214a1e8e0e7e491d733695ae6748e8efe7b3c0ab6dab8c2be87aa0"
   end
 
   def install
