@@ -6,8 +6,7 @@ class UtilMacros < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "1667d87ebab1bae1e48e9ef068534059be1bc7398cea4a39de35cb850109bd79"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "42511c3ea7a4cdc1f6eac363d01083acb52577486b271adef7db045b2b136a5f"
   end
 
   depends_on "pkgconf" => :test
