@@ -14,12 +14,7 @@ class LuaAT54 < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "03d6162ac99acbf2b668ebabea5bdd675bd1a0ec3ce202f915d0e9e017fb1af6"
-    sha256 cellar: :any,                 arm64_sequoia: "374b0714ce6bf851fdf0d82ec0b203268c3fa4443108ad5aea6fface2466799f"
-    sha256 cellar: :any,                 arm64_sonoma:  "b59c0bb19df706992a9216b20753a541ca5888b6b7a365129e5fa1e9d7282dfd"
-    sha256 cellar: :any,                 sonoma:        "e3c4b81999ce73b9b4e0aa771e2deba2502fffe6f55d5f839d09fcd4ab912870"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b16b4a9a0c052ea268f89aaa66c1e5d0b9e0b076c33cafd77a05c3c341332073"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f25322e8dcb660cd7fd50f3511acbacf9b63c5d4bb4ba68a9ebfcf3ddfabf600"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "345e5af8924020cfadbd11aed8603ee235f944b149dd9d71c581b39ebf786152"
   end
 
   keg_only :versioned_formula
