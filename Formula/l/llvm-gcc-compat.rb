@@ -5,6 +5,10 @@ class LlvmGccCompat < Formula
   version "1.0.0"
   license "BSD-2-Clause"
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d39a5f41e265d344ba3a36bb5005f698732c23bb0f1f68f689121b7d9ff0f09"
+  end
+
   depends_on "ohos-sdk"
 
   def install
