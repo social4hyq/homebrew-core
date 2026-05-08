@@ -43,12 +43,11 @@ class Node < Formula
     ENV["CC"] = "#{zig_bin} cc -target aarch64-linux-musl"
     ENV["CXX"] = "#{zig_bin} c++ -target aarch64-linux-musl"
     ENV["AR"] = "#{zig_bin} ar"
-    ENV["GYP_DEFINES"] = "OS=openharmony"
 
     # Disable Thin Archive support, as it is currently incompatible with the Zig linker.
     inreplace "tools/gyp/pylib/gyp/generator/make.py", "crsT", "crs"
 
-    system "./configure", "--prefix=#{prefix}"
+    system "./configure", "--prefix=#{prefix}", "--dest-os=openharmony"
     system "make", "-j#{jobs}"
     system "make", "install"
 
