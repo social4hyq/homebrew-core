@@ -12,7 +12,7 @@ class Node < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "75589bcf1224b8bbc606d3bbeeeff21d352a6a85a07f468b787a4e84ec632004"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8047aecb2bebfb9bc5a770fc11a1c4e8a18fcb345bfd61501682f4e17086f966"
   end
 
   # Disable superenv
