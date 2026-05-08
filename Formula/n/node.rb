@@ -1,8 +1,8 @@
 class Node < Formula
   desc "Open-source, cross-platform JavaScript runtime environment"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v25.9.0/node-v25.9.0.tar.xz"
-  sha256 "8f78af3ee55fb278668b5f801db58bd1a38ea161318eb5ce2128ddbc9cd813aa"
+  url "https://nodejs.org/dist/v26.1.0/node-v26.1.0.tar.xz"
+  sha256 "779a1364889575d44e0215adc381806bbd0d9437557b59893e172f5b9d35a990"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Node < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "75589bcf1224b8bbc606d3bbeeeff21d352a6a85a07f468b787a4e84ec632004"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8047aecb2bebfb9bc5a770fc11a1c4e8a18fcb345bfd61501682f4e17086f966"
   end
 
   # Disable superenv
@@ -43,12 +43,11 @@ class Node < Formula
     ENV["CC"] = "#{zig_bin} cc -target aarch64-linux-musl"
     ENV["CXX"] = "#{zig_bin} c++ -target aarch64-linux-musl"
     ENV["AR"] = "#{zig_bin} ar"
-    ENV["GYP_DEFINES"] = "OS=openharmony"
 
     # Disable Thin Archive support, as it is currently incompatible with the Zig linker.
     inreplace "tools/gyp/pylib/gyp/generator/make.py", "crsT", "crs"
 
-    system "./configure", "--prefix=#{prefix}"
+    system "./configure", "--prefix=#{prefix}", "--dest-os=openharmony"
     system "make", "-j#{jobs}"
     system "make", "install"
 
