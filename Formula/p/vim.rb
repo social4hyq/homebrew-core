@@ -2,8 +2,8 @@ class Vim < Formula
   desc "Vi 'workalike' with many additional features"
   homepage "https://www.vim.org/"
   # vim should only be updated every 50 releases on multiples of 50
-  url "https://github.com/vim/vim/archive/refs/tags/v9.2.0400.tar.gz"
-  sha256 "e99d7d926326103267840feac5a4a8f73bd7546f56cae8dd8dec59e00008cc76"
+  url "https://github.com/vim/vim/archive/refs/tags/v9.2.0450.tar.gz"
+  sha256 "6811815aaa2c40d72837f62dce17d1cbc69def741863ae485d52396695453ad6"
   license "Vim"
   compatibility_version 1
   head "https://github.com/vim/vim.git", branch: "master"
@@ -26,7 +26,7 @@ class Vim < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e13fcdd8f84ecd8da919268b4be584dfb657f7494edb8f734980dfa0efe3904c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9119fb82497ae8c5e640f21d9a21aae271262e431dc47a08b8fa5b341b655f0f"
   end
 
   depends_on "gettext" => :build
