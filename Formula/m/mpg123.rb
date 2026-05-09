@@ -13,12 +13,7 @@ class Mpg123 < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "40a6d592a480065d88ad9cf101b226a9b2080736c58fb2ff03d47ffe1e5ad528"
-    sha256 arm64_sequoia: "c75904baf633b0ef6e96f7d316568a9101ea89c95b47c81792ceb3b4ca78b206"
-    sha256 arm64_sonoma:  "31fc98dc70d800d7b3a3709309d9bacbd44399eb3784f908bcaa4f33cba60d43"
-    sha256 sonoma:        "cfe19c8119f37eb5c2c0b295f1cb26c6de66150590848391a6b4a539ea249ad1"
-    sha256 arm64_linux:   "b07735c1f6b5a3d1a9d0803a048e66cc09fa53407f7b3cdda659ef8f80873de4"
-    sha256 x86_64_linux:  "48f2124f53ae9d385ae30cd94a99ef90085c32f7c8b4f4674528d4db4aaf94f6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "39e906b59cabf4956b7dbebbd268f539674c76c00567d0272afb1fde634cc1fb"
   end
 
   def install
