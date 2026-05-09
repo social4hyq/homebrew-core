@@ -8,14 +8,7 @@ class Nettle < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "f433c0830169086cae47237fc4fe4b8c71021ec9683006db96e066ff0b883030"
-    sha256 cellar: :any,                 arm64_sequoia: "12c88e8d20a6b5161aa759820710b0d793212f46be7d48933e4519198480bd85"
-    sha256 cellar: :any,                 arm64_sonoma:  "57596e345b70dbb3debba5d8ba9b90147963f62e25022c2661a3672f25304753"
-    sha256 cellar: :any,                 arm64_ventura: "a5f3b6f969357a94626cc52f6e5869a77a0c6fe8bc5ab4fc491ea83ae6986e65"
-    sha256 cellar: :any,                 sonoma:        "46f05ed1c965061f176755083b8a14e6f8cfc3543201d95691bc2a4090309152"
-    sha256 cellar: :any,                 ventura:       "d82f1ec725dc230650b93facd5d8b5d7f0c2bd6f76b0aa7c6a9d6c3a154e4e91"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "411e940ef2c87423f8c0ed34427aa5235e0bc702b40943e3564878a62c76d420"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ff4a7452b4dcf2f1ad266f19f5eb5a29e02b5d1215d4bc46f3d4c4ca4b8e6282"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "875ff7292c2f23962497afc8a1fc07fbf6c6ea7c1d76de066a41435feaa97fe8"
   end
 
   depends_on "gmp"
