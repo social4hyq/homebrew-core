@@ -8,13 +8,7 @@ class Help2man < Formula
   revision 4
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "e3d3923d95ff50d31167bb31b79bfb5b5ff04ed958662d6097b87a8e7af80145"
-    sha256 cellar: :any,                 arm64_sequoia: "c32c8674bc6c07b61531fcb0e077a4a3566ef57628257bd258992708ec4c0a61"
-    sha256 cellar: :any,                 arm64_sonoma:  "1c1953fb1180f4ed0bca07f6befadec13ee94d6a3a7e86607e649457de47dc04"
-    sha256 cellar: :any,                 sonoma:        "59d2b48fe6b83c4e94ffda8e2ca12c99825dc11d14042aa4c59033be929f84c9"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0f2a8a07d29e873804a3b89e0f1549813359a0aab0bd5716b66454a1987ded35"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a9b95c2631c19512416b4e912e95517a81c1d9fddffd53e662e90c76511b6412"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ffdf6dc6469293b9aa6fc621f507c5435165c2a211f425859e581bbb5fa1a99"
   end
 
   depends_on "gettext"
