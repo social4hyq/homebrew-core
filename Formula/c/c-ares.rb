@@ -13,12 +13,7 @@ class CAres < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "d161e49ada18225649329b60940692d87a4c9c34a3b4a32332457aaae8a176dc"
-    sha256 cellar: :any,                 arm64_sequoia: "bb20019b663c40dc3662a036f7f951a8f5152b381473417fcc9a9810b5a97ddb"
-    sha256 cellar: :any,                 arm64_sonoma:  "17f44048d8003b88231d69bac0408cf22be2f712ef8588d4933ff0811b92342c"
-    sha256 cellar: :any,                 sonoma:        "841fe91739703803abef71c641ba40486291de060811779e6f6c6bbc79b0e83c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1ca10fb4f9f5160b28c1e2f8edce10eab5bda2ba18ba2ca083d915e65ad9c0ea"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "acd24a61ed9ba623494903e02ebf144d4c87b05e7658013ba3590b8c1cbe234e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0615467fdbdca668718feea110490ff15071c1ff3b87a79eca8c6982998b3b4a"
   end
 
   depends_on "cmake" => :build
