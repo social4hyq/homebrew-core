@@ -8,12 +8,7 @@ class X265 < Formula
   head "https://bitbucket.org/multicoreware/x265_git.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "ee3075f8af9807bdb30a890b22c1e948a5930f6001c7123eb57faa87c4d15c85"
-    sha256 cellar: :any,                 arm64_sequoia: "29300af7c34c7bc5fd84549b2e0173909026c264060d56bf6d35d79da3808506"
-    sha256 cellar: :any,                 arm64_sonoma:  "614fd3ece81d8eaf67d18d2a8fb5d8d04f8004982547bbdaa1743bf621b1bc7e"
-    sha256 cellar: :any,                 sonoma:        "661c9c3a348ce2c6677204fa20bc7751bd5c6e32cffac91b41a01194257ba35d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1cd1acdf8fe735cd2ca65e7f480ff487166aa6c73038fc14d9487e0ece0d597e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "828f429ad04ef1e539d1539de78b84e3c10c295edee9b512ba64e8d029abf0d1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c3836debbc93edab1f082c294a8be032118cebecde2373e331f1f5e1f974984"
   end
 
   depends_on "cmake" => :build
