@@ -21,7 +21,7 @@ class Eigen < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "563e391400dc4eab1a9cf164c14082db589cd39d0546b454a8b4f7ec56237be6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a7b433929b06f5ef43ec2d0da791b805c33aad144c0ceab987735082f5652ca"
   end
 
   depends_on "cmake" => :build
