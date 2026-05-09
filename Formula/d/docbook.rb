@@ -15,7 +15,7 @@ class Docbook < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "ba985d5405421cb25cffc5d94a824817b6a78b8387a20857e7bab0316bb61c6b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac3f20bdee59568ae154c5e4747b6aa29caaa7cd2a3e06e7cbb0a0efe8ac2a25"
   end
 
   uses_from_macos "libxml2"
