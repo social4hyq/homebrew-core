@@ -14,12 +14,7 @@ class Libtiff < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "e93670ed1f7f484d164a8755767cd55741559db7c402d7d55d1bdf6da87d5f67"
-    sha256 cellar: :any,                 arm64_sequoia: "68bf2bc8fa5ce10a32b70b2b402245c89dcc875413ed92981a024c8510d3cb9a"
-    sha256 cellar: :any,                 arm64_sonoma:  "c4458243f3615e82755fdec34041ccef27b13d20df1d867f99d876d34e7a627a"
-    sha256 cellar: :any,                 sonoma:        "9061b4453709aa2144d6c84bad4dbf0846d507eaa52a3016079822855078ba3c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0c1b199256ee763eaf5bbf47376900c08d37480472aa5456294bfb3b1e967bd0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a2548f1c935d423641faded7ab2539f04756dd7765de31e179854d2dcf84093b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e45bc6ff5fe11f6dab6d238da706d964947b079b73eaae9b7d0047855cbb9010"
   end
 
   depends_on "jpeg-turbo"
