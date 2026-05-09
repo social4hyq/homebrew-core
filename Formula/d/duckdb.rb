@@ -7,12 +7,7 @@ class Duckdb < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c84e6cadf80cacb43a7d1c2820d2d8adaddad82d67dcb6aee695f8b3c1e40a2c"
-    sha256 cellar: :any,                 arm64_sequoia: "e470c54cdc0a13db10601189a6a42a1ad1382d8e338da7b153fcc9744b0ac3b1"
-    sha256 cellar: :any,                 arm64_sonoma:  "47422480d92abf39c5ff88a465b7a8c728682dce8e969dd4b0b77c86f8952d20"
-    sha256 cellar: :any,                 sonoma:        "fb9f73daf067a815daed3fea428c7fdf50ea4678b02dbaed0f1539e0d24208c7"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4167492330f96a21b993c53fa7068b2ee2fdde69c8a61cd278a06f9129a3f815"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6fd7088180ef50fdce54cfec42cf9a5cf6c2c70d0aa8d328a7088e9eb80a8e48"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "073e6a15436b3566a6deee044bc24b550c4602cd47094b2648de394f56587028"
   end
 
   depends_on "cmake" => [:build, :test]
