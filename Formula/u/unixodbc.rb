@@ -16,12 +16,7 @@ class Unixodbc < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "16b4c2a9d565749bae947c75a100ec4628e57c427af5b542593f67474077b3cb"
-    sha256 arm64_sequoia: "e1522105d20545743c713e90c17bf6393d7a829ec01137ec0d6942bbc04ea2d2"
-    sha256 arm64_sonoma:  "39f022a55a502b3b1d46769705cc46c4aa9f9206b902558ed56cd47aab3d54d8"
-    sha256 sonoma:        "6fc56b53e2abd5b38ed655c2c32caae95753e6b6f5a9fe0a10c4b760a3974d2e"
-    sha256 arm64_linux:   "8e6e9979f6e88ae812222d215688d5b044e25f3182a70e3fbeec3ca07dd9f3d9"
-    sha256 x86_64_linux:  "3f04884aa241e341fea833df1fcb51ec7b181e5a75ff4a7b86ca87dc4c7a24dd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "12bb6ea3e405e9e12cffac5adce6d613cb160e654f9c0da356396bd13ca51c33"
   end
 
   depends_on "libtool"
