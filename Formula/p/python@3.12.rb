@@ -13,14 +13,7 @@ class PythonAT312 < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "bb198d273ef41a95d48aa16e330864608f103a58ef7c0a6c167e07866e32eeb0"
-    sha256 arm64_sequoia: "c378b0875288fc0490603e4ccece8f289a230c4068c27ea9dfa7a9a69d3c3b12"
-    sha256 arm64_sonoma:  "7becd6da101c7f3f406cac1a3350384618520f5b3fab5d46c57bf62b740d460b"
-    sha256 tahoe:         "3ff89a0955bfece8fe97f17d90f45d92fc87d5391d821294d6409795cd264ebb"
-    sha256 sequoia:       "b41f94ee7704c74be76d1a54fc9e394dd356770d13aa29be023cc1c33387f82a"
-    sha256 sonoma:        "3f2d37fb95ed10cd050222c174d642e04178e1da23538ed5f3a9d142381027b6"
-    sha256 arm64_linux:   "31924f4cc9d1d71638a231185e1c74a9a5e1919198d332b1ccb10f6a2ad31c92"
-    sha256 x86_64_linux:  "1375b78e136989dfbea7b7e6cc8c54a70e2ddcd9bbeab8eb04b7d3b250b8f2d4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6a0470d91ff050d49671aa7365599aef3572a298f92783ed4eb9769d3dce736"
   end
 
   depends_on "pkgconf" => :build
