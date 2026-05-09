@@ -13,6 +13,8 @@ class PortableGit < PortableFormula
     regex(/href=.*?git[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  no_autobump! because: "this is a critical package so an auto bump might break Homebrew usability."
+
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "afc62eab12b28ff1307d0368d0acd11dfc3e76231dd4565f3cb9b7458e0f2347"
   end
