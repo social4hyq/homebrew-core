@@ -8,8 +8,7 @@ class GitFilterRepo < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "774b68744bca239b25b7e82693204f198c6ab1224ded38d8dd33ec1c23c245d8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3dda883ea3ffcbc38ad07fe157be7844f445c7254ca491b36cae04aa42527171"
   end
 
   uses_from_macos "git"
