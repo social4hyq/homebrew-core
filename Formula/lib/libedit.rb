@@ -1,11 +1,10 @@
 class Libedit < Formula
   desc "BSD-style licensed readline alternative"
   homepage "https://thrysoee.dk/editline/"
-  url "https://thrysoee.dk/editline/libedit-20251016-3.1.tar.gz"
-  version "20251016-3.1"
-  sha256 "21362b00653bbfc1c71f71a7578da66b5b5203559d43134d2dd7719e313ce041"
+  url "https://thrysoee.dk/editline/libedit-20260508-3.1.tar.gz"
+  version "20260508-3.1"
+  sha256 "91f42d6571dd8d92faedd1341134ce5abca0c5d0b4b352814186d33f2b11272e"
   license "BSD-3-Clause"
-  revision 1
   compatibility_version 1
 
   livecheck do
@@ -14,7 +13,7 @@ class Libedit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d18c7bff6ed40d310654942ff3e1136b8f465ce6b5eeae832ca4e0a251f04d08"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ddfe49c8fe7aa63b2eb66a8c6f4b63adeef8e4c4a5f8a7238ca5d2d791242b68"
   end
 
   keg_only :provided_by_macos
