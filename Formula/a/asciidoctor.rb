@@ -6,13 +6,7 @@ class Asciidoctor < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "3951c7e0d82ca03dc973d88588c0a13193f043e0d4b5aa0836dba461b9dba9dc"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "3951c7e0d82ca03dc973d88588c0a13193f043e0d4b5aa0836dba461b9dba9dc"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "3951c7e0d82ca03dc973d88588c0a13193f043e0d4b5aa0836dba461b9dba9dc"
-    sha256 cellar: :any_skip_relocation, sonoma:        "3951c7e0d82ca03dc973d88588c0a13193f043e0d4b5aa0836dba461b9dba9dc"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "917225adfd18ac73b16ac74dabba98fa12c8f1ca462c34d73d7790d9ad30b96f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "917225adfd18ac73b16ac74dabba98fa12c8f1ca462c34d73d7790d9ad30b96f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a8ac38113fdf1383f0eaa82666877f056ceddf6719dd71b5cabf8dc697c45f0"
   end
 
   # Some gems require >= ruby 2.7
