@@ -12,12 +12,7 @@ class Dos2unix < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "a477b3382ab9313f2d7633766dd6c569f8cfc106a075490aa066cc78b523832a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d5440cff453f035c62da937754098661bd8cec168b321266db8095419db4c5c2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "fbeca6ca69352db22604724207e1016958ed1fcc4dd7764a588870a3ad9ae2dc"
-    sha256 cellar: :any_skip_relocation, sonoma:        "f3886a2b73c66dbb7022830abed547bbb7cda9bc792a83ffe1063efbb8504401"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c93c6f2b3419d3f36f0bf9db9640e2670a484345e2a505537aac063f6e910ec6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "18a491699d80991dddeaab7f582db01d26287efe6d23e93b259d1cf0685ddb81"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fe71ea628aa13502ea7a5f5781b448a97438242de4015b7521ee36fa9378dfad"
   end
 
   def install
