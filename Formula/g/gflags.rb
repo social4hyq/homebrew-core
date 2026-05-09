@@ -7,12 +7,7 @@ class Gflags < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "8dd2b968003c63083b15c69ecc4902a28fd36c7409c1e88ede63d5faa4e2e2b9"
-    sha256 cellar: :any,                 arm64_sequoia: "150daa47c6677e77d7b4b5ecbf4131757d379810573abfe96a10dba9e325a717"
-    sha256 cellar: :any,                 arm64_sonoma:  "5b8d5d59b8556457857815ef949e672d740f2a6523fe56eaf3601f13a321bfe1"
-    sha256 cellar: :any,                 sonoma:        "8a01f5f757402fdfc436ff278fd1988984ce910a7cc44d7f9d2901e843dfad2a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5c1356150c965da7ffd93842cfaf9d061e1db82fcc289814b5f100272bc42895"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e27d9f2de0ead506066335e1b0c3df598cd1a7a2c1eed7c961763204563f70b0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e08494c7504fa5c7534547ee2a407404b22286f0f5a38cc70704a8771c3229d4"
   end
 
   depends_on "cmake" => [:build, :test]
