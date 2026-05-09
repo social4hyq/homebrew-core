@@ -14,12 +14,7 @@ class GitLfs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "edf7cb5683caadeca2318d455130e4e67ddae8647594760aad039f77c7712df1"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "edf7cb5683caadeca2318d455130e4e67ddae8647594760aad039f77c7712df1"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "edf7cb5683caadeca2318d455130e4e67ddae8647594760aad039f77c7712df1"
-    sha256 cellar: :any_skip_relocation, sonoma:        "97e7aefe5058a1a4d7687c391c18baf20a2d6d387d038597de4d33002348c6eb"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b0c10c6238b6b826c078809c7846b44d44ebed18212d61928dfca369e62c74db"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "93d215d3757e8e3249e22af329ade9d031312820e2e8565638d6c9f1337f4dd9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "088ef307cbd29f21975d60d8971616fd6d9d40bf9c295508ff2b9baa16c1a994"
   end
 
   depends_on "asciidoctor" => :build
