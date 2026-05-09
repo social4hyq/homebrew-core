@@ -7,14 +7,7 @@ class Ftxui < Formula
   head "https://github.com/ArthurSonzogni/FTXUI.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "adf940aea1828f7238f701f4662016c1664347b830bba7463b50a40c2f0e7407"
-    sha256 cellar: :any,                 arm64_sequoia: "5b3e3442ed075b99e3604bea2a515ebb1cbbd9d806386e040d925d38a54692f8"
-    sha256 cellar: :any,                 arm64_sonoma:  "04064b1363f454f0f9cbbbeb16d98d8d5fef2daf3e0bef0c5e168a73e8b54b89"
-    sha256 cellar: :any,                 arm64_ventura: "2ea1f6c02f9a1c4cf135a928a6dd9c4ee0e839b113307f436963558c5acd3007"
-    sha256 cellar: :any,                 sonoma:        "dd41f7868452173504be6f2786966ed4836c1531d06c7f1f9c3b46fb8b587ba9"
-    sha256 cellar: :any,                 ventura:       "798c20dcbe2d7f97f44a52237d58d7097c3b80fb879427fc6be532467277f8f0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "bf56dd804ae10402637a259399706b18d9db65477f5472282181c8beff69f9e8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "26a35edfd086bb2cdc76b5e8d699094882a633285a4a2ead8323bb8bb2fc9b78"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "455e97d566b6c8799efb1341c579f783ccd8137ea186d45a1de1c7957e41a425"
   end
 
   depends_on "cmake" => :build
