@@ -12,8 +12,7 @@ class Libcap < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_linux:  "27e8599bfb9ab65d3448a4ea0cc4a06a5e89aad6978b91cd2ac282357272c08c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "4216b7a75d21bf4e9640630417cda23d055f1aa85298d3b6941f80b12c346cab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1cf1de5f95eedfd085f18745972a152ed3508410368f02554b487c21e22a6c02"
   end
 
   depends_on :linux
