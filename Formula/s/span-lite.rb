@@ -7,7 +7,7 @@ class SpanLite < Formula
   head "https://github.com/martinmoene/span-lite.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "389279742b198d8b61719e3ade77c246d03e44e0b7635a77b5fc6f569162199f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "550dc4754e245d5cb6d0938fae34c8d84e950b1ca264548e9a3fe521453228a4"
   end
 
   depends_on "cmake" => :build
