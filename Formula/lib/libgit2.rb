@@ -13,12 +13,7 @@ class Libgit2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "8a31d29d71ba3b9d95d95b86a65e8fa3f0b922710445c6db3772a6631107d274"
-    sha256 cellar: :any,                 arm64_sequoia: "1928f4183435a7dcd09254519bc42ed6fc5179e4a6262efb2f0c8c945b63c0bf"
-    sha256 cellar: :any,                 arm64_sonoma:  "228a5f0e9c2649ffd69495b10411a2cca6cc34223b16aba152ef18b19aab0b9d"
-    sha256 cellar: :any,                 sonoma:        "939637b7c88674006e36a661b3d954363679457b7e30083eb1fecfa77b6d96a0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d0ac16116eb6f7384716292e2ed62df8e799bcd2cd9a68a18bd1fa0de1b6a76a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "931978e8bd9a7c9f04f79bf0456e99943efa2ebce1a0721b64e88d892aac7ef7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "572a7314124ed173c764f4b9e7ee9e7daedfbd22223d7ef75b0c56fcd95b0726"
   end
 
   depends_on "cmake" => :build
