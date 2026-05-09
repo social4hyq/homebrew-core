@@ -16,7 +16,7 @@ class PortableGit < PortableFormula
   no_autobump! because: "this is a critical package so an auto bump might break Homebrew usability."
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "afc62eab12b28ff1307d0368d0acd11dfc3e76231dd4565f3cb9b7458e0f2347"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0353b1edc267cbc956dfb688c10bff1234ce1ae7f8fec400fa700d5b388c9d2e"
   end
 
   patch do
