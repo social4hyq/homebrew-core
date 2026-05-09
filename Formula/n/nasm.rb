@@ -11,12 +11,7 @@ class Nasm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f5074568719d225be8b29c51a67afb5a4feec97f58736cd18cd1534eefa11df5"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "88f144c41ed757649726c4ed2247cdbc75621bdf57c2b27f17fc784c6e28d3f8"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "eca617b897d2e594511ca59690799341e9600e2e511ee95e057a36b28dde0edd"
-    sha256 cellar: :any_skip_relocation, sonoma:        "56b4849156efbe9ef0a4d615a36a4e58f5d9cc098a4c56e161489490189e6f56"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2653ec1582df302177334313b005f06c6ae4df44194f72742406eaa47e5b6065"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c2bb9cd0b3ae85202e0584e4a088c9bcec70cccbb4f619465fae0210f95151dc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3a89e770f61e72f5b3ed6ecd8caaa641e52c96a8a76dc8ed96909bcdbb58ff3"
   end
 
   on_linux do
