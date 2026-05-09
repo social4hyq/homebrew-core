@@ -1,0 +1,31 @@
+class Ctlptl < Formula
+  desc "Making local Kubernetes clusters fun and easy to set up"
+  homepage "https://github.com/tilt-dev/ctlptl"
+  url "https://github.com/tilt-dev/ctlptl/archive/refs/tags/v0.9.3.tar.gz"
+  sha256 "2d422ccb4f53131a1e847be349ab7e6f74856d3faa6716cdc332e002d72296fd"
+  license "Apache-2.0"
+  head "https://github.com/tilt-dev/ctlptl.git", branch: "main"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "748f621639e9111acb6f6993e63c8966e3624f0cd0d1c7a27e1e5a2350fcace2"
+  end
+
+  depends_on "go" => :build
+
+  def install
+    ldflags = %W[
+      -s -w
+      -X main.version=#{version}
+      -X main.date=#{time.iso8601}
+    ]
+    system "go", "build", *std_go_args(ldflags:), "./cmd/ctlptl"
+
+    generate_completions_from_executable(bin/"ctlptl", shell_parameter_format: :cobra)
+  end
+
+  test do
+    assert_match "v#{version}", shell_output("#{bin}/ctlptl version")
+    assert_empty shell_output("#{bin}/ctlptl get")
+    assert_match "not found", shell_output("#{bin}/ctlptl delete cluster nonexistent 2>&1", 1)
+  end
+end
