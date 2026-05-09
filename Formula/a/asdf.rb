@@ -12,12 +12,7 @@ class Asdf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "4b4f7836d3f8dd1b4b8958612843c0265cec41dd54c61e4e72ddbb7e2f58bf49"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4b4f7836d3f8dd1b4b8958612843c0265cec41dd54c61e4e72ddbb7e2f58bf49"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4b4f7836d3f8dd1b4b8958612843c0265cec41dd54c61e4e72ddbb7e2f58bf49"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d41db2d847be8153637321d3b02f09c683c41f676be9fde04c0b8fe382829055"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "607bac77c488c042954081712d7be3ec8640cd2f6c0e5a241aabd65611f8612c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "20cda6dddd47e19cf89cb107253e3e716333443d885bde1c82ddd0a41c53a620"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "932b2df3396a9d781cbbd38c7dcad4c09aefef1d59730ad7d50b0fa9166d21fe"
   end
 
   depends_on "go" => :build
