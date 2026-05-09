@@ -14,12 +14,7 @@ class Chezmoi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "4446b47397d5b392c8b7a9ddfe4a6c04a41e2fe4dc52aac5110ce9f8b4c45bc4"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "bf4754b55768cdc567ec3724035a0b40fc427a332aa8953ae80aee607030d1b2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4918d3431e1a9eac0a023cca522beae8799b6e5df58724b727325f21a284e3e7"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d8b88aa07b7a48198a9b35e8d73a76afa877da5596853feebcd7c9a365b7e558"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "6fee5d27b8faabcf656dbc8f3d8b5a108b5f79048018e8a8922f3527f9cd44b1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "080dec3d1f0f82827a0f141b9031f35ca3274d7cbefb121689a0e8d33f503dfc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b008959b9d014153571e54cac881b10c1e2a1583392499c12d45bf1d125efbae"
   end
 
   depends_on "go" => :build
