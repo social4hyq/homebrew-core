@@ -12,12 +12,7 @@ class Orc < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "a45340cf95a072f37cb00f9bcb8b1dfe31128fe4a9421957c9a57938a87341a1"
-    sha256 cellar: :any, arm64_sequoia: "7a0d9ba6e8e8279bc1c17502bb2384564ee63b8df3f0db9e2fdbc04084807713"
-    sha256 cellar: :any, arm64_sonoma:  "cdf97de8164961de85d7f7b18b07b725770c767bd8ebd0bb3ec88c0c31381bc6"
-    sha256 cellar: :any, sonoma:        "177f50d05d85775089fab59021fdbc7d483814f42558d170cd8f26d146512262"
-    sha256               arm64_linux:   "f8b2f804f9e7cac847bc8d375976f29d9a6f3a1a78e2bedf91ce677d1801b5a5"
-    sha256               x86_64_linux:  "f61c9e4d2bc4894d65d16c7ccedeba81ffaac9c07cbc337be00cd8d77d353c06"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "477be688e07122d3b56eff5cc0e18df9db37e0909d4afc3fc2a3373a8a375e90"
   end
 
   depends_on "meson" => :build
