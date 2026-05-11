@@ -13,12 +13,7 @@ class Mbedtls < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "afb5b23bad6eb87cd8674539459d29bbdf9faa8d73af0e2ded7b668f240f510e"
-    sha256 cellar: :any,                 arm64_sequoia: "258007b03b55a6921a80ea8866ec93cb7b339c60a39d66c114098e87fe94a69e"
-    sha256 cellar: :any,                 arm64_sonoma:  "d07a25b71b81662643550226f26d111cdde1b3edd270ff2d1e274ac0903309c9"
-    sha256 cellar: :any,                 sonoma:        "835b7a62734a707f1429660356219758f0b0106cfbd48f844050d4456fd7e507"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1d406f785dbdad88c23ada7d185006570c83ca60d6cf6aa48adf196603e1ac6e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "15cac95836fbe3f6cd9ed6252f9651960d8e0d59842e0ac790ee0a87e282533a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "27b0d0b7ff2b2d14be6090bedcd4a512544507063d1f644b27ad1d22b266fe5a"
   end
 
   depends_on "cmake" => :build
