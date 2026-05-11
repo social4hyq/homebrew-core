@@ -6,12 +6,7 @@ class Re2c < Formula
   license :public_domain
 
   bottle do
-    sha256 arm64_tahoe:   "487a30e2e00d20a38b1aac7712f539b66622dea1023ec323457aac77b1fa546a"
-    sha256 arm64_sequoia: "ec48f3992aa27470291114b53b4642a37bdb731812019ee1ac7f74cc52810d1c"
-    sha256 arm64_sonoma:  "32ae2aebfbce16d7aee409fc41fd7fca04a0a6bface9d56a72d6b6428b9fbc09"
-    sha256 sonoma:        "71371b5a39e4f52e044f03e8fad0cd7003592e80c2e7714f83b7797a6ab74ce3"
-    sha256 arm64_linux:   "65b1998210ef8d466401539c0961839ef5e301cb4b2e6463c9d307c5c88711f6"
-    sha256 x86_64_linux:  "ab784e322c45193e3c13283466bd751d55d88f185682b993dd7c3b799b25c65c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4231c4a6d277b6f1133d979be425bbce26698ed7b85ca7a26481664e87764c70"
   end
 
   uses_from_macos "python" => :build
