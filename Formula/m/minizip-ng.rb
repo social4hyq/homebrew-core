@@ -7,12 +7,7 @@ class MinizipNg < Formula
   head "https://github.com/zlib-ng/minizip-ng.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "02c53028eb50485f554371a65e128575b4460e65cae3125a6ae90421847fca6a"
-    sha256 cellar: :any,                 arm64_sequoia: "41d177457fc9fd7af37b608b314c193883b41644390a7179eacc2ff4caa128d1"
-    sha256 cellar: :any,                 arm64_sonoma:  "6ff38323e940b58e79cf732ac4cf7f5b7adec62f73a66aa65f2ca3bf8442a138"
-    sha256 cellar: :any,                 sonoma:        "21baa62cd8c44df28b98c0aa884993847310ee7741ccd7aeb665a779966a4f78"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c5ee8d773e8593260e58169246ddcdd2ed491460fb6b14e2c8fd4937cbdd5eee"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "969fb9fcb3a3729cad28504fc87168f4b2e941ff41a4ea91396b015cc956e414"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d72d470781337785534a0dcee98d9e8ad9fb4f2b7a77a82b822be3783d6a74a"
   end
 
   depends_on "cmake" => :build
