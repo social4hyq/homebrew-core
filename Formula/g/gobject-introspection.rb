@@ -11,12 +11,7 @@ class GobjectIntrospection < Formula
   compatibility_version 1
 
   bottle do
-    sha256 arm64_tahoe:   "d516a1e37d140117bf326b55b50ddd6006d31d9bca3e997677b3c9267e0d0250"
-    sha256 arm64_sequoia: "e64de3819c37536ff15195c82925070993cd5b767e320a82391242293383b0ae"
-    sha256 arm64_sonoma:  "596894b2d43f43863219f67eb964677bd4bda8d50766c0c4dce76a260adf08a5"
-    sha256 sonoma:        "7e1c0048f6f4820438594175eb963c0c01262dbf380802d4801f5455f55e797d"
-    sha256 arm64_linux:   "a06a12d6de94f9ba01ecb93cfb12804ecca66ee4b09e5b82a0a93b5628d70a7d"
-    sha256 x86_64_linux:  "ed82cf5011d87d3c9fb974dc41a33d99ada58fff4c9bbb77621c821692fdeb1a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4872f2071b99b7ed73c76b5775b87fbd1ec1da50fa268e2eeaeaf4c06e6d068"
   end
 
   depends_on "bison" => :build
