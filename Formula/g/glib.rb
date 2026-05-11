@@ -9,12 +9,7 @@ class Glib < Formula
   compatibility_version 1
 
   bottle do
-    sha256 arm64_tahoe:   "19495ddf4fa8bb0ecad0f50d5949c24d77a80444deb8d22678389e33caff56cb"
-    sha256 arm64_sequoia: "01d28ac41525b9a68dda55df84dd160657a87389b39998ae1ea96ca499f5ff59"
-    sha256 arm64_sonoma:  "1082dc2952e68cb2d3331e8c5eb0a15235188a23d052e63410b616f28c41f4cf"
-    sha256 sonoma:        "0d824cf6e238361f7909cb9300724abc07dd7b2909a98515729372a1e53ef180"
-    sha256 arm64_linux:   "bd7f17e78242fa888e11b902becdbf8dac51370c63488f9651f86e8ac03df0f1"
-    sha256 x86_64_linux:  "2fce9dbcffbca3412cc89222c4b4717aca6e8a23edd3ce92cf1b380e53c85b71"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5070d56a24860ebb25c669d66885e0bfaaf3ba11359dd42aaad4fd11049d6934"
   end
 
   depends_on "bison" => :build # for gobject-introspection
