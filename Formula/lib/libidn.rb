@@ -8,14 +8,7 @@ class Libidn < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "16554b492c8460ae8e23e3886bef64a944c2cd3bc4314e7df80971272b6173a3"
-    sha256 cellar: :any, arm64_sequoia: "6a860a721a7e58991f845df9cd497758f193eb531ca2ba3a79e323f65e774dab"
-    sha256 cellar: :any, arm64_sonoma:  "fac2bde8f325428b34f138b6f16b9f58ec0e5092e28a8abb0ac764d54930c98f"
-    sha256 cellar: :any, arm64_ventura: "979bfd799362cbb1449dc2fba0094d6101b9b3744aa3b7d697f0a41e957777f9"
-    sha256 cellar: :any, sonoma:        "2740c8bf1ca703ab181f9f6ebc11830512af175060ba02b85fa679174dc5ed2d"
-    sha256 cellar: :any, ventura:       "3e91193d063ba22fdd1eba3280ce2230729fde70809eb4da4670dd8403eec674"
-    sha256               arm64_linux:   "dc58733f88f4096f5d5119d84a59a691c8eebf66d4ff1942f8b5661a7a9a413d"
-    sha256               x86_64_linux:  "89ab2ccb40a9c74ffbbde3b5ac2841c3200f07694d114175e0beb3b3bc31f31c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c86450199fedc06c2c587ddeabb836ebeb18c4788993b9e2e9b007de16e0f904"
   end
 
   depends_on "pkgconf" => :build
