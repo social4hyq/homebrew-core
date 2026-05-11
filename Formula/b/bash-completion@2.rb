@@ -11,12 +11,7 @@ class BashCompletionAT2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ea80dd75c8d7b48e1ed47b5c1b36c5171ec31640ea290ecc3fb8a6f8941d4fbf"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ea80dd75c8d7b48e1ed47b5c1b36c5171ec31640ea290ecc3fb8a6f8941d4fbf"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ea80dd75c8d7b48e1ed47b5c1b36c5171ec31640ea290ecc3fb8a6f8941d4fbf"
-    sha256 cellar: :any_skip_relocation, sonoma:        "f958af6492d1c86a775cb5fedbbece68ea1853208a4b92fa169c527ca12d0cc2"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ea80dd75c8d7b48e1ed47b5c1b36c5171ec31640ea290ecc3fb8a6f8941d4fbf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ea80dd75c8d7b48e1ed47b5c1b36c5171ec31640ea290ecc3fb8a6f8941d4fbf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d9eacb035a0f7343bba0b8591f271e6df6f06da5c45c812eec066fdcc7cc4b3"
   end
 
   head do
