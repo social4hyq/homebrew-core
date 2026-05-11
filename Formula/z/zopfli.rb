@@ -8,13 +8,7 @@ class Zopfli < Formula
   head "https://github.com/google/zopfli.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "60d92c2dba51adbc2b158013f76e713caf79039176b8fce561d71e64eeb1ab1f"
-    sha256 cellar: :any,                 arm64_sequoia: "05a753407e078eb62cc7763b8aadc6b5c239b961aa5208fa100ffcfacde1074d"
-    sha256 cellar: :any,                 arm64_sonoma:  "abce2f037e1d3678b11116c779de02206b14d49da1388953414bd5f187ff1245"
-    sha256 cellar: :any,                 sonoma:        "0f106e6ca21e768d2cee053ab91204dd59bdf02c2acfe94780d4f344dd32da9c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "73928042ea7ad2aeddbd734193759c045dd8320742be243256ccb12951daecdc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "66ed41c03d5bf67bc664988336d1cde7e330f24cd4b376eeaf1361a330ec02dd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "164bf42fdb2134c50de5b33694a7e95c5f08a83fedffa48cd1ba708c576eda94"
   end
 
   deprecate! date: "2025-11-13", because: :repo_archived
