@@ -6,12 +6,7 @@ class Ugrep < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 arm64_tahoe:   "df1f0fbd4ed2bae86b8d9936c4fe627f8a36f828cb6e04da29748bcf68fadcf8"
-    sha256 arm64_sequoia: "7356dc0b35c377c8b2229769057307397ede2587d8d9a0939b956146455c2397"
-    sha256 arm64_sonoma:  "59952921fd9c00bc0e8b91c675188343688807f7fdb58eba826f72613aea2ea9"
-    sha256 sonoma:        "c359095240ae74fc15b8eed7bc4d1f514bb95e111e4ddca0c066709a41c7c048"
-    sha256 arm64_linux:   "39adc3e4756a29ce10af721b04cc3fbfed41442a6c51a0caa3d08bc1e3bf28da"
-    sha256 x86_64_linux:  "c8cfd737fa13a36bf8471360a358d4739a2fed0b835430c6489b6fa1b286346d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65a0e32b38678b82bf501679d844882db07eb5c80448b9bd445dbf18dbb3848b"
   end
 
   depends_on "brotli"
