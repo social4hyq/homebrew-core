@@ -12,12 +12,7 @@ class Libksba < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c8397a90c3319b01a7a1fb918a744d4955d68ac35014cb6b970fddabcc9a978f"
-    sha256 cellar: :any,                 arm64_sequoia: "40e470b7a2063e44d2be4de5ce729ca055262b9f667bf812fb1cd8617bcf9433"
-    sha256 cellar: :any,                 arm64_sonoma:  "0027e64410b8ca621b56d4fafe55fe8c18f140373740d30d5a5d02138ac807af"
-    sha256 cellar: :any,                 sonoma:        "ed1599c59f472be25bd8ec3260ab28d28b22cee360f0b0209961c3f76ad6b37a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fd3d03f38475edf731137ef9b20dc6bc89de04077fe7f19739e2a8afd62e424b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1aac1e689711348bf81c4837fcd90c76ca80cd3424f6ff639c979e337ec8b081"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9ba80043590c7421618c2af2a11b0ba4bfa1a03eb32f9495249707772bb83f00"
   end
 
   depends_on "libgpg-error"
