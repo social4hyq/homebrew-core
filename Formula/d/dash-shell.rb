@@ -13,12 +13,7 @@ class DashShell < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "65e1f9e282e54b309f98da5b920471b4dde8e1f7a16d30ea97aff9eeaf23003f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a2f9fa078bc85fc0ec14a431572dead40a38e8d43c19f66fd5abfaac6ff8b2ee"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0a570c8f3c3d594ca585cfbe9d1c396463c5095d22fc30b8aec3512e1836ede1"
-    sha256 cellar: :any_skip_relocation, sonoma:        "69d63acdc95189907326ae70aae49b7ead0d9872720f8d91dca0f10e4d58b006"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2aebd91e2ef38afab388ea46a50c25862f4522bdfa3eb1ff94d1bd915644cedb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d4fb8e6d7e162426021414329950aef5dfa0da7de0be5c4d3418e55b11dc0d3f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8833c1cf672190706cb4125ece903672d9241c2809bbfaaae0fa9dd38623ab2f"
   end
 
   depends_on "autoconf" => :build
