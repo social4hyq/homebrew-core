@@ -13,12 +13,7 @@ class Tmux < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "36b24a92e268147bca7ef3e5df3a88affa06512d573e75f1cd1da28e724f4afd"
-    sha256 cellar: :any,                 arm64_sequoia: "9897a0d7b7e0159c1d09818d76e0ab88cc3fcdba8abd2bbbf349f84827ac87df"
-    sha256 cellar: :any,                 arm64_sonoma:  "089dc1f0f166cf72315528890052d4b9bc17cccce023a0449962a11098484300"
-    sha256 cellar: :any,                 sonoma:        "b0ca1f90384e487d2316bdcaef59ba4fdf63cb04fa561d424605f86935599563"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d4d439bc36e2d3814323f14242249fb16b17bef657878ab2d407b3769822f55e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b6b495ea4851f445eb947c60eb0fadaf87f872a0959b49b34303297d654bf81c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "30bafd1df9d9c255d3f4cceb358e63e7d4f9b67ce7873f2b2a18ce1002b97412"
   end
 
   head do
