@@ -7,8 +7,7 @@ class Libpciaccess < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_linux:  "1700b1d65d3a49ac94b93387a02771c27f6b799fdf1dced68a9440bb7731d995"
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "0cce5ea337da65fd2e78188adbfaf895ed72fbef1efe0e3a62680777980ef592"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "478e20d642ddc3b6f4e03e370c030972becf455f14d2d77aad408390549f31f9"
   end
 
   depends_on "meson" => :build
