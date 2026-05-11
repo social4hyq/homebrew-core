@@ -13,14 +13,7 @@ class VulkanHeaders < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "b1c04ae00c5603d90d9dec39386d824bc75239abc3d3b58b1404bfe4ce891cdd"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b1c04ae00c5603d90d9dec39386d824bc75239abc3d3b58b1404bfe4ce891cdd"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b1c04ae00c5603d90d9dec39386d824bc75239abc3d3b58b1404bfe4ce891cdd"
-    sha256 cellar: :any_skip_relocation, tahoe:         "bf673dbeb19b05465c269952cc2a46f6c17210209899c0252162f33bb3b4b633"
-    sha256 cellar: :any_skip_relocation, sequoia:       "bf673dbeb19b05465c269952cc2a46f6c17210209899c0252162f33bb3b4b633"
-    sha256 cellar: :any_skip_relocation, sonoma:        "bf673dbeb19b05465c269952cc2a46f6c17210209899c0252162f33bb3b4b633"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "bf673dbeb19b05465c269952cc2a46f6c17210209899c0252162f33bb3b4b633"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "bf673dbeb19b05465c269952cc2a46f6c17210209899c0252162f33bb3b4b633"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3980abdfa121d61c7371dbfed675921bca14591e43960b759828e981eed51eb8"
   end
 
   depends_on "cmake" => :build
