@@ -9,13 +9,7 @@ class PythonYq < Formula
   revision 1
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any,                 arm64_tahoe:   "78582756df6d73b461cb5d48153aa07693ba9966df4b870d2947c35ba65d96f3"
-    sha256 cellar: :any,                 arm64_sequoia: "6fcc7e5152176d214b6ed0e8c310f1635b2276704b1cad2d2ee58438abe83ba5"
-    sha256 cellar: :any,                 arm64_sonoma:  "18e8c8295b92643e711ffe3ca298dcb0157052a51e62550c24cac2aab67d1aee"
-    sha256 cellar: :any,                 sonoma:        "0f215ad7173ff1309208dd0526c061d50f5b6b7838853b704fb1c9923473bdf4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "524ae6c009837ecb5d6c6dab1d93038040d93dce3864c6de2fa477eb0f285806"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ece36385f46a4d31df2fd58129088085b20ca6a964dfb8b8b02b6ec90361e14c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "abd9c3d4e27668ee5cfcd46752c0fba665b599ae866a691e6ced85fcc80e6bb4"
   end
 
   depends_on "libyaml"
