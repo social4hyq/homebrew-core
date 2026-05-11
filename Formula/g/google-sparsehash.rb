@@ -7,8 +7,7 @@ class GoogleSparsehash < Formula
   head "https://github.com/sparsehash/sparsehash.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "9624c9bf9296d118481a05a3e05f9f1f8774fda3cf2d53cd63e8a4f926fd2ff0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4bd4b1e4cab50757306aa1ba2910a8987c9549e11550f1acd8530790988ed2cb"
   end
 
   def install
