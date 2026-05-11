@@ -14,12 +14,7 @@ class Re2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c3d8133e1af82433fd8491050aafc3cdf81e2728c1d171818e187001f5c5efb1"
-    sha256 cellar: :any,                 arm64_sequoia: "9dfd8e748444eb04b1180dfa861cef831d720588d016051c60bf1b9bc77bea4f"
-    sha256 cellar: :any,                 arm64_sonoma:  "2417787aad7998e86107097674b67fa1f32bed1eadc7a60261f6f1a024a1c55a"
-    sha256 cellar: :any,                 sonoma:        "336269669bfd8cab867b5ea69d99706e2b73dc0fa796ac987f5ad665010735cf"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "74f2417e6840a1af5020085db3513cdc047e5dbe24bf9213871eb388b2af6bcc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5d2b0fa3b0b1954bd06ca343641936d0d0833d0a80a7aa543eaca0a95332c055"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5eaa6c13894d27322f065fce336876d4820def4c32ae1ffea7fae48012113301"
   end
 
   depends_on "cmake" => :build
