@@ -11,7 +11,7 @@ class Fswatch < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ccbc1bd383466769d019405f163a7339175035fc53fa36add2017efdd1392b3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c5f232c4008a49cf6bffede7c998995b79f2e4ca680245bd0df9ca45a1b3d41"
   end
 
   def install
