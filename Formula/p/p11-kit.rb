@@ -8,12 +8,7 @@ class P11Kit < Formula
   head "https://github.com/p11-glue/p11-kit.git", branch: "master"
 
   bottle do
-    sha256 arm64_tahoe:   "c814d01363bc8e35892432f19074e507d16b1bce3f88635478969050250079ba"
-    sha256 arm64_sequoia: "62a02e67a42d05aceb5653bd5d4be971172484fa9def96f066963a6fb4ca3f11"
-    sha256 arm64_sonoma:  "bee65fbab57c03c46620379593e7bc4865cce0bf2db794cf22bdfcc1eb564979"
-    sha256 sonoma:        "e1e808da48ab0eb63ff145b55a3407d0265501e09b4e627f8ba02ecc654c3663"
-    sha256 arm64_linux:   "1924836b8e56a59363d2e294f1c2ee40b62e1b4ffd6600e7c0de78d11b90fbbb"
-    sha256 x86_64_linux:  "52d46084406325d13f58712ee3afbec2f78eb7cab0b57acda36597b607800d85"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f46a0ff2725f7bc77af2055b35ee9fdda9145f1ba8041748da5874db66a2b6b4"
   end
 
   depends_on "meson" => :build
