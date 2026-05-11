@@ -8,14 +8,7 @@ class Libpsl < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "f604c524a1fec0cdec0ff57613bdf371771e520eff91ef51783606e3d61f7922"
-    sha256 cellar: :any,                 arm64_sequoia: "76b3ffcc154821b448e7f091b75a401782b646d15edcfc4cf1e0a22ed43cfa92"
-    sha256 cellar: :any,                 arm64_sonoma:  "8a3705cd2f92fa334a9634983aafca93a208ea50ffcd2e304e1a22ec8673e650"
-    sha256 cellar: :any,                 arm64_ventura: "0514d77bc120f490bf90cf7bbab7513ebab16b34a3ffa1a1c8339d79b295ad38"
-    sha256 cellar: :any,                 sonoma:        "3aa78d021942e4012a59e090a6313445b30026b3b6b227e4e72e889454dd5de8"
-    sha256 cellar: :any,                 ventura:       "c20a154aec0480c5376d926350c1e546e7c35784b2458e8c357134e96ebd72eb"
-    sha256                               arm64_linux:   "2f0ed93187bf7b2611dcc0952220847f0967943bf136b6e839ed28b9e8e2cd23"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8dc10f9acd16c27df7a1ac79ccbd4b16dae4582ab2715266bac49c59fb08923a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f0be0fcd65d43033cdadb524264f5fcbf4ff37826ae532b8e44e33ae34d6354"
   end
 
   depends_on "meson" => :build
