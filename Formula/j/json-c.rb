@@ -15,14 +15,7 @@ class JsonC < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "bb064fc1c259000bed8cc895e41a429a1afec18235e37fc32e9d0711d4d30b80"
-    sha256 cellar: :any,                 arm64_sequoia: "c5514d30b5249b6d2a92e4dff45f56e2b081aa8811d13a20c84a3b911f6604d7"
-    sha256 cellar: :any,                 arm64_sonoma:  "16b53cbbfaa2361f7e68f112f8ce706bc3d59738f377a26a1341c7122956e9b3"
-    sha256 cellar: :any,                 arm64_ventura: "e6da2f2e625b6d6cf141bb4c3fe05ff0d1d42617321da078b48f32c9b01ddb0b"
-    sha256 cellar: :any,                 sonoma:        "9630b473e74aa113e050b6ba4d3760d3f0d7c67c6460855217b312c597253eea"
-    sha256 cellar: :any,                 ventura:       "91286eebfd88f8989056b56dad509e5b42aadda51e29708ef550da8a6b3314ad"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2e3fe7e9e1412e97926ce0716633d5f7ee5f8f22de5f9d59cbb31900b4cd6c46"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6afd63b22756b317e0dd21aa71644f47ec11996366bc60c8d5c9306f87044caa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d73d757384133fdb97ffe3c750f79d0f9d61c5bc14ec0fe71af886bf65ba2766"
   end
 
   depends_on "cmake" => :build
