@@ -14,12 +14,7 @@ class Pnpm < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "49335b05589b5dc792692d70133eb7acb4f93c1f0877395baf2d26a6cafe4a98"
-    sha256 cellar: :any,                 arm64_sequoia: "ade0c12ea24f270dfdd2ca2dc1319b28686a377057bb572b1acccb77cd301489"
-    sha256 cellar: :any,                 arm64_sonoma:  "ade0c12ea24f270dfdd2ca2dc1319b28686a377057bb572b1acccb77cd301489"
-    sha256 cellar: :any,                 sonoma:        "a65079ec3c1980f614106fb4f4549d60bb7b0d96bfbba5b240acfc02ae30c4d1"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3b7c783fa4b1bd4a50a53e0ee412065a367014d36d4fc71ce577779cf54183e3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3b7c783fa4b1bd4a50a53e0ee412065a367014d36d4fc71ce577779cf54183e3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3fe2763f3c768370b466cc0550ff797d8f0084b29e89ad856815a29671811f6"
   end
 
   depends_on "node" => [:build, :test]
