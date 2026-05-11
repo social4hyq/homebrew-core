@@ -13,14 +13,7 @@ class Lemon < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "45cdb02d7658c7f84c860fc7cde813cd39226a5b2d0709278b7ecb13afdb0526"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b7c9fe0b799e4877ab4fba0972ed8d9be061f1485fe006e12efc379ce30a8753"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2be5d897a1a30b4f29f39ffe125e7389a0eae464d31e57a7bbd90eaa4950798a"
-    sha256 cellar: :any_skip_relocation, tahoe:         "623cda095c8a27d1543a8e8f91673b627b071574481753cc9d9ff1bd6e67e936"
-    sha256 cellar: :any_skip_relocation, sequoia:       "784a0ed7a1d388c599cf13bd4fa3216e7d7738fe33f7d58114b077bf4fea38c7"
-    sha256 cellar: :any_skip_relocation, sonoma:        "012c3b108476a50ad3d1c74e2c24588841b64eefa063ae969cb5ca8b0b78cdac"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "aac16aef580240d3fc215a54dc26a27de689483de6686280d4344390e168c1d6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "352442ce0d797edd5dc659162145b27b610a20af10fa458479528e11a0755921"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a366fc47bb58fcbda8aef496fe80fa82b000898a11c1802ff29b6b449f28155a"
   end
 
   # Submitted the patch via email to the upstream
