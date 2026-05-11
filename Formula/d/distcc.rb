@@ -29,13 +29,7 @@ class Distcc < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "09fcd33f368d1daff6716752ee32cf50cbb62f7acb0200a0a07bd676d65cd3f2"
-    sha256 arm64_sequoia: "232f2d8db68393c3f700e16d29d914e19aa565f2e8a6d2e0e3846c8b317fd931"
-    sha256 arm64_sonoma:  "a25d35cebbe97e9bb683c53994a2956e256d4f7dfb1bd024e1a412826ee7c1d1"
-    sha256 sonoma:        "ab7cc55d6cfae2c77316093229ae3668f7e34d2d80713e4eec5f2c41f69983d2"
-    sha256 arm64_linux:   "42071ee608cbbcfcc761fe4a9b18ed90499115dab3108c03ff72a27825a2beef"
-    sha256 x86_64_linux:  "d04aa534933e21b7e469f009c76e5bde6e50ecadecbab3d6de4f134db8f7eef2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2533b67abca77506b4bdd81a9c132104e6996cbb369ca348aa96b107c4695d8e"
   end
 
   head do
