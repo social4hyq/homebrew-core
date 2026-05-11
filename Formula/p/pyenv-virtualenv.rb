@@ -13,12 +13,7 @@ class PyenvVirtualenv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "db1cbb985d132f266721fa18646934134da8937207cae9d6556820549eb99abb"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "db1cbb985d132f266721fa18646934134da8937207cae9d6556820549eb99abb"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "db1cbb985d132f266721fa18646934134da8937207cae9d6556820549eb99abb"
-    sha256 cellar: :any_skip_relocation, sonoma:        "0dfd9c5b2043b4de679a5451881fb073eb11026aed8bbc9c5bafde5f618b0c91"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ab5d01834a7fa0ab1f874a9e9df33d907422b56204ae73da505a159288412f21"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ab5d01834a7fa0ab1f874a9e9df33d907422b56204ae73da505a159288412f21"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7bb94d14277c2967ac49305c9247f93320afe578f01f1bfc228c6be88f150b64"
   end
 
   depends_on "pyenv"
