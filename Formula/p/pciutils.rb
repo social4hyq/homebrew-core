@@ -6,8 +6,7 @@ class Pciutils < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 arm64_linux:  "363c0403500443312c609f1030b16e089f78dd7470ae6446efd4c875d463911d"
-    sha256 x86_64_linux: "7c95c0b0a9eb96b489dd2e772e6fa7e1e195fa5a5b679fdeea457b4b9fa8a583"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "99706f92d052abe2758fea82822b22dff02ba4edcaf64e3d06a04b56e509c6a9"
   end
 
   depends_on :linux # arm64 macOS is not supported: https://github.com/pciutils/pciutils/issues/111
