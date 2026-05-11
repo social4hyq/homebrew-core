@@ -12,12 +12,7 @@ class Libmd < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "724fae7568e4d980d58d5e4dd8b16df1bba6867b1b86b19b051506a5f3c2686f"
-    sha256 cellar: :any,                 arm64_sequoia: "c31c4006f3500e54a24928f78209be6ceeb7cdeb2bce2e09e0c012e2f75e671e"
-    sha256 cellar: :any,                 arm64_sonoma:  "9dff072fc11c4cceba0618e321315414aac84c3079da934e29cd75d4debcc0f2"
-    sha256 cellar: :any,                 sonoma:        "6197fba0dd8a2a9b32bb252e0fefcc2f5d1a981d17ba0e404075c3549d18e8d1"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1df107088db7b9b9c7e8107005899123c9d530605e2de894742094771f850506"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6d1a0983574b60ff431bd4c9e903440ce6e5336ad24e18cbaccb6852b07f332b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c1dee4255859e2ba679847f88d3eb106d96a68fe1cb7de95f87dde3708b1649"
   end
 
   head do
