@@ -1,0 +1,48 @@
+class JsonC < Formula
+  desc "JSON parser for C"
+  homepage "https://github.com/json-c/json-c/wiki"
+  url "https://github.com/json-c/json-c/archive/refs/tags/json-c-0.18-20240915.tar.gz"
+  version "0.18"
+  sha256 "3112c1f25d39eca661fe3fc663431e130cc6e2f900c081738317fba49d29e298"
+  license "MIT"
+  head "https://github.com/json-c/json-c.git", branch: "master"
+
+  livecheck do
+    url :stable
+    regex(/^json-c[._-](\d+(?:\.\d+)+)(?:[._-]\d{6,8})?$/i)
+  end
+
+  no_autobump! because: :incompatible_version_format
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d73d757384133fdb97ffe3c750f79d0f9d61c5bc14ec0fe71af886bf65ba2766"
+  end
+
+  depends_on "cmake" => :build
+
+  def install
+    # We pass `BUILD_APPS=OFF` since any built apps are never installed. See:
+    #   https://github.com/json-c/json-c/blob/master/apps/CMakeLists.txt#L119-L121
+    system "cmake", "-S", ".", "-B", "build", "-DBUILD_APPS=OFF", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+  end
+
+  test do
+    (testpath/"test.c").write <<~'EOS'
+      #include <stdio.h>
+      #include <json-c/json.h>
+
+      int main() {
+        json_object *obj = json_object_new_object();
+        json_object *value = json_object_new_string("value");
+        json_object_object_add(obj, "key", value);
+        printf("%s\n", json_object_to_json_string(obj));
+        return 0;
+      }
+    EOS
+
+    system ENV.cc, "-I#{include}", "test.c", "-L#{lib}", "-ljson-c", "-o", "test"
+    assert_equal '{ "key": "value" }', shell_output("./test").chomp
+  end
+end
