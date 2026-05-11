@@ -4,7 +4,7 @@ class PythonAT314 < Formula
   url "https://www.python.org/ftp/python/3.14.4/Python-3.14.4.tgz"
   sha256 "b4c059d5895f030e7df9663894ce3732bfa1b32cd3ab2883980266a45ce3cb3b"
   license "Python-2.0"
-  revision 1
+  revision 2
   compatibility_version 1
 
   livecheck do
@@ -13,7 +13,7 @@ class PythonAT314 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f21d4f07035307bdca268f1fd0f8d0e406ae8e082ff56957fbb7859446646d4e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03b1d4217ba78c3642af021ebfa0b4f5589262d23526202cb779ef491cf78b2d"
   end
 
   depends_on "pkgconf" => :build
@@ -147,7 +147,7 @@ class PythonAT314 < Formula
     cflags         = []
     cflags_nodist  = ["-I#{HOMEBREW_PREFIX}/include"]
     ldflags        = ["-lintl"]
-    ldflags_nodist = ["-L#{HOMEBREW_PREFIX}/lib", "-Wl,-rpath,#{HOMEBREW_PREFIX}/lib"]
+    ldflags_nodist = ["-L#{HOMEBREW_PREFIX}/lib", "-Wl,-rpath,#{HOMEBREW_PREFIX}/lib", "-Wl,-z,global"]
     cppflags       = ["-I#{HOMEBREW_PREFIX}/include"]
 
     if OS.mac?
@@ -162,6 +162,7 @@ class PythonAT314 < Formula
       # Avoid linking to libgcc https://mail.python.org/pipermail/python-dev/2012-February/116205.html
       args << "MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}"
     else
+      args << "--enable-shared"
       args << "--with-dbmliborder="
     end
 
