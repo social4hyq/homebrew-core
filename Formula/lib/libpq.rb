@@ -12,13 +12,7 @@ class Libpq < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "f96594ae6831348bebbd5ecdd97ed172b483f1790da9d3a034faf5e0eff19827"
-    sha256 arm64_sequoia: "6e25a04f5a7a52d71afac60bffe3d33a0a598946e85f714a7972c76641f80833"
-    sha256 arm64_sonoma:  "606ce0195cff8fd82a137d9d171efd9c92f3be85cccb5efd2fe7c18b5f9f54c1"
-    sha256 sonoma:        "b224f61433551dc0376cbbf36de587764f54f7d3edd7dc2a03c3b1a1e4e96faa"
-    sha256 arm64_linux:   "0522b3a485c9ef1735dc99df1d4e7504905a14453e36bb67969b96a8d3240464"
-    sha256 x86_64_linux:  "73c9af232d61f649aea14aa1153ccb742af9d12bd4f8cd7c4124bc6fd3a1af25"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "192fa4012df58541feb215d6e34546ede09ac02a097388b30b86b907bb1b6895"
   end
 
   keg_only "it conflicts with PostgreSQL"
