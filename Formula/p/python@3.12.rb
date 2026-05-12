@@ -4,7 +4,7 @@ class PythonAT312 < Formula
   url "https://www.python.org/ftp/python/3.12.13/Python-3.12.13.tgz"
   sha256 "0816c4761c97ecdb3f50a3924de0a93fd78cb63ee8e6c04201ddfaedca500b0b"
   license "Python-2.0"
-  revision 3
+  revision 4
   compatibility_version 1
 
   livecheck do
@@ -191,12 +191,6 @@ class PythonAT312 < Formula
     inreplace "Lib/platform.py", "def system():", "def system():\n    return \"Linux\""
     rm_f buildpath/"Misc/platform_triplet.c"
     (buildpath/"Misc/platform_triplet.c").write "PLATFORM_TRIPLET=aarch64-linux-musl\n"
-
-    # Disable features that fail to compile on OpenHarmony
-    args += %w[
-      ac_cv_can_raw_fd_frames=no
-      ac_cv_can_raw_join_filters=no
-    ]
 
     system "./configure", *args
     system "make"
