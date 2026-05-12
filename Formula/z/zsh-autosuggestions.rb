@@ -6,7 +6,7 @@ class ZshAutosuggestions < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "b81edc29e7e71866042bb3e06be7c23ce5501b6cd72be6cd5f3fdfd14b311c71"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "55245fb91fff46775edd07335d527bfd35ed5e67a77c0a8d7c527d61bbd27e01"
   end
 
   uses_from_macos "zsh" => :test
