@@ -12,7 +12,7 @@ class Tfenv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "f28386d9f8bcedb39429c6abf417133cd80a10bd1935c6286bcfe4871b8c0887"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d911a18cbca63a26b81c9b90759481ce45cdcbb04d02abd86bc8bff9b07f1a1"
   end
 
   uses_from_macos "unzip"
