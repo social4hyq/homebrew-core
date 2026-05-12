@@ -14,12 +14,7 @@ class Lmdb < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "ff8ea47014d75d42bf16d283dadd6b342953175fda71ec580cba3751ffbf14c9"
-    sha256 cellar: :any,                 arm64_sequoia: "5fd57c67d053246fc8f47f996feb06226fb6532f7ee474b4e4ed125b4b647b85"
-    sha256 cellar: :any,                 arm64_sonoma:  "7f3c10a0579bd56cc9d0d73ca40c908ab67c9c428e1e4357b3610da9359e46d5"
-    sha256 cellar: :any,                 sonoma:        "74efd6cfd1355ccd8f1ea00232c9a163b939999fb209fc04111f622c9a59231b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "438f6fde81f43d28c4774ab7e5bfcc907c5c2093b5fdf636aa3ef4e4af75adb3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "aedd3488e577959f8e83ad4d26329e3d5c878e3c6be837d5d09ae7e5012756ff"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f670d9c05a3f5c4505be8172fecab1486bf594ea42f5c4ff16858ed45f5f514"
   end
 
   depends_on "pkgconf" => :test
