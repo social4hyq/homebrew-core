@@ -11,12 +11,7 @@ class PostgresqlAT18 < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "581c22f083ae24218d978e0855b5df7649442622c0f4553d5dc0aa5fec0e3c3a"
-    sha256 arm64_sequoia: "d673a799d57ccb106e95487b4ae480721dbbda30732071e9014bc5572420e90b"
-    sha256 arm64_sonoma:  "711c76573500ed2a1d898c1849ebd30c133375a980a612010192a624ff759ba7"
-    sha256 sonoma:        "4183572b950af49fad450c4de3cdd1bbb90d9a7e0eff8bd820126086c0de83b7"
-    sha256 arm64_linux:   "1acb5c6bebfbe288da873de04835cf51cc2e3c335d454d1869b379f636c4e08c"
-    sha256 x86_64_linux:  "044df17562b5237ba19ef9ab4a65656309e8a3a15eaa813a906de47d5572d42a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a03e28f5f952f89cb232b7e4229adc2357a9b811c401ba25dbcf72b4c518aa4"
   end
 
   keg_only :versioned_formula
