@@ -6,12 +6,7 @@ class Scdoc < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c1ba3c08a09b33b58197d9dfde53fda881d4d4444d3396a7e4b63ba1baded7aa"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e01b3bbc592393f2a8114835fe070861cfc0698ba04b8ca2267441bd3f4d5716"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8e0388ac90662f8a9551b4fc945f133390e1822b7f288027e906c3937dd9fab9"
-    sha256 cellar: :any_skip_relocation, sonoma:        "2e981011c1be208d03d97447d9bfd3451d2fe8925d68a4853527c906481868b6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1d8bf46277a5da340b1556cb33cfc56e86564975ff9eccbec7aa3b295861eed3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4f53e0feaf57b9e883533ce5d3ec38beeec40f1073b0fb465abaab100be8132d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd4e456c84b37b107b15c88b9f4698aac14658775f882ed32737880a541d5555"
   end
 
   def install
