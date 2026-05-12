@@ -10,12 +10,7 @@ class Tilt < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9dc5d23b09365bc09f5d25f49356840ed4a945eb1e0c4544dd718f4d3359a15c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8627e737e67ed733102d95162bbdc7d1fe7728cd0a9cf4d4a9304fe56a5c7804"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b2c69759f14dbb59f1819e85726e5d2d482e1cb7d56b86abe666afe8c8f2c795"
-    sha256 cellar: :any_skip_relocation, sonoma:        "13e5c53aceb82ba7b544cec36eba6e449c900f75ccabbf0e6df85f13c4678332"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1d37a612ad21f91ddb54d73039a5867ec4e6d3d68ece37fdb9ca6e28fb2f7112"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3c170e16f00fe62c341a932244461a9f0db1bdd43773eec79bbbd4d25e2a366a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9cac9dbb4361a547879b014daa889a937f7e5ab4fb129a5f12f608c13bf86cd5"
   end
 
   depends_on "go" => :build
