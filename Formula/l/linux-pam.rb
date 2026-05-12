@@ -7,8 +7,7 @@ class LinuxPam < Formula
   head "https://github.com/linux-pam/linux-pam.git", branch: "master"
 
   bottle do
-    sha256 arm64_linux:  "3e541f42f80d3d7f993b99967fb4a148d48bc036d6bcf975969eb102aa26cdd0"
-    sha256 x86_64_linux: "1320fdd62af4198e52f35271742e0b91db573f4429edffad6c44dcc0cf169663"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "64364b70bdbcf86a1793506635a3a98e62b575b32e087c7374308f7a36239f46"
   end
 
   depends_on "meson" => :build
