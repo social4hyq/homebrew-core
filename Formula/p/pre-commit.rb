@@ -9,12 +9,7 @@ class PreCommit < Formula
   head "https://github.com/pre-commit/pre-commit.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "3ae39eb44f94a1f8980715601f0525990ee0d068ca434f2ed2a10e724fd84ad4"
-    sha256 cellar: :any,                 arm64_sequoia: "4561bf99cd4621e05513f3aacf5635b1119653a5fe15ffb1a6b510590df0b01f"
-    sha256 cellar: :any,                 arm64_sonoma:  "292a509cb887e284b210c73d9c7f9c5970a093e99bb0e4d5bbc3ae3676555b0c"
-    sha256 cellar: :any,                 sonoma:        "49efd4f510a3cd2a34d8a1b3c434b338b69aa70b5d3f8f0c237e9e563062793a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a27ff15a419d0133d4ccd91167458a93ce75eb2265171742890f95ccddab97d1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "eb114325919eb9b5e91a34d5a55447dfbfac633d1de630b6f9b1eb8d2d10846a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db8027ca4521cb19e05e4a7c5836179eb9c1205937c0abfd3710157fecae0770"
   end
 
   depends_on "libyaml"
