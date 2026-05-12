@@ -4,7 +4,7 @@ class PythonAT312 < Formula
   url "https://www.python.org/ftp/python/3.12.13/Python-3.12.13.tgz"
   sha256 "0816c4761c97ecdb3f50a3924de0a93fd78cb63ee8e6c04201ddfaedca500b0b"
   license "Python-2.0"
-  revision 4
+  revision 5
   compatibility_version 1
 
   livecheck do
@@ -13,7 +13,7 @@ class PythonAT312 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3c259a9944fd216dbf0bf2c793cd8ea75046e3ba59635624df87e38e2e0b441"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4e46a681b0a4fb782934cbeec594eac8dd640fc16b5170df1ff2a665f129906"
   end
 
   depends_on "pkgconf" => :build
