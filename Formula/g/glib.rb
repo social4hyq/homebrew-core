@@ -10,7 +10,7 @@ class Glib < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5070d56a24860ebb25c669d66885e0bfaaf3ba11359dd42aaad4fd11049d6934"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "82102254d1f9a5a89798a83399efc444c3556cb709238bde2b4ed2b439e8af88"
   end
 
   depends_on "bison" => :build # for gobject-introspection
