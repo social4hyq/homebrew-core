@@ -24,12 +24,7 @@ class Bind < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "fb375ac33749724b2c9be2b869f0a20c5a3c10ebcc970f5dbd05ad55df4a723d"
-    sha256 arm64_sequoia: "d785ddd16c8f41f16d30e2742a1d70698f83aae6ebd38c9f5b26914efabad187"
-    sha256 arm64_sonoma:  "a079b80dc5c7893f097b0ae72a95745a06b7c436fb7e5f2b80419b1b286b781a"
-    sha256 sonoma:        "4e539dcb32fc26442a7ea9b537c99201a78d992bd6d001a34f5c0992aff157b3"
-    sha256 arm64_linux:   "2c3f7cbe44fdcbbfa12a7b94659718d80e0b2ceb9dc216f16898d62d0cc968da"
-    sha256 x86_64_linux:  "d016b1f6e728a085e613a7c14af6b4ffdaddc6c3cb7bb10cff4f0a4af3e45619"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d177816acdcd53f8f397acf4c1416b09abc87d5b1b069f04db64704489801dc"
   end
 
   head do
