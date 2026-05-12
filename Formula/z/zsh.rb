@@ -43,15 +43,7 @@ class Zsh < Formula
   end
 
   bottle do
-    rebuild 3
-    sha256 arm64_tahoe:   "785fbc6814796f131a2a176860c07a0d94f62abcd981952c7bfd3a0337f03053"
-    sha256 arm64_sequoia: "93cacab325d2a9c4ce40a2cebb157b1bf4e062f0d54855d10d2a78f78e2f101f"
-    sha256 arm64_sonoma:  "6fd7134e255c752fca9e8dee3823df44b8ba3303f96bb93c232cd2510edad79d"
-    sha256 arm64_ventura: "e821a4b4e3bb5c3198b1073cc42550b5eda9705c6957bb10a55c524c8d55a8ed"
-    sha256 sonoma:        "73b9003f3f58e116c9af05de333a8d0fe32ef21f4b189ed1503faf5d8f131130"
-    sha256 ventura:       "d671549769838f9a60961866e6f94d4f9eac71678cb930ad69055aa0812c7d52"
-    sha256 arm64_linux:   "658c86a42c9d113e835d68f90e0ef627c98a67b88f7afc47ad7b9706e230804a"
-    sha256 x86_64_linux:  "7203ae875e4d101cfd8288474ba18dabd4b1469f908f3a11a685b5630cc826ab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "56d18b43ad74aa48bc5dac3bbb46b7525b67add4e13aa0e7cc4ff6e7489e4593"
   end
 
   head do
