@@ -6,6 +6,7 @@ class Glib < Formula
   url "https://download.gnome.org/sources/glib/2.88/glib-2.88.1.tar.xz"
   sha256 "51ab804c56f6eab3e5045c774d1290ac5e4c923d4f9a3d8e33123bee45c1840e"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
@@ -60,8 +61,6 @@ class Glib < Formula
   end
 
   def install
-    inreplace "meson.build", "  'linux/netlink.h',", ""
-
     # Avoid the sandbox violation when an empty directory is created outside of the formula prefix.
     inreplace "gio/meson.build", "install_emptydir(glib_giomodulesdir)", ""
 
