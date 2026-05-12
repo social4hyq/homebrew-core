@@ -8,14 +8,7 @@ class Screen < Formula
   head "https://git.savannah.gnu.org/git/screen.git", branch: "master"
 
   bottle do
-    sha256 arm64_tahoe:   "7257e441151c134ddfaa36a4ebdddf11256d8eeca39f89a3f573970e95857dda"
-    sha256 arm64_sequoia: "9430cdd222c4561bdfeee141fa6e334dc0a10d5fe7c4489ec287c9d44cfc6b6e"
-    sha256 arm64_sonoma:  "2e75496e4bed33bafec7fbc33ac0b9ecfedd5afb0c283dbca100dfc5efc57f43"
-    sha256 arm64_ventura: "cfe661d88372ca2f8df595ed7c46a859bf4871c435c3a499b4e2cd4754732dfa"
-    sha256 sonoma:        "5306e70837deb34094054f1264e76455b7484718ee4536b0343351a852a895d1"
-    sha256 ventura:       "d5c01fece1e58f947c7839f9ae8a0d6482925c3e36202ef66fb90d5d039287c1"
-    sha256 arm64_linux:   "a2eaa7bce2a69592916bb6a278142910411a81ed2f091a38fcb6425b6b7ff765"
-    sha256 x86_64_linux:  "a2319a7727c30f53ed3ef157ad24ee761fc542e65ef1ed8c985ed6abcbf4a29c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d563be82779b1f2b93de9311cdf571963ab690b6b634eca7e9c7c255a116405"
   end
 
   depends_on "autoconf" => :build
