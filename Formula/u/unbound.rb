@@ -4,6 +4,7 @@ class Unbound < Formula
   url "https://nlnetlabs.nl/downloads/unbound/unbound-1.25.0.tar.gz"
   sha256 "062a6eda723fe2f041bee4079b76981569f1d12e066bbd74800242fc1ebddec7"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://github.com/NLnetLabs/unbound.git", branch: "master"
 
@@ -37,7 +38,6 @@ class Unbound < Formula
       --with-libexpat=#{expat_prefix}
       --with-libnghttp2=#{Formula["libnghttp2"].opt_prefix}
       --with-ssl=#{Formula["openssl@3"].opt_prefix}
-      ac_cv_header_linux_net_tstamp_h=no
     ]
 
     system "./configure", *args
