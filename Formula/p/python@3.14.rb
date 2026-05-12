@@ -4,7 +4,7 @@ class PythonAT314 < Formula
   url "https://www.python.org/ftp/python/3.14.4/Python-3.14.4.tgz"
   sha256 "b4c059d5895f030e7df9663894ce3732bfa1b32cd3ab2883980266a45ce3cb3b"
   license "Python-2.0"
-  revision 2
+  revision 3
   compatibility_version 1
 
   livecheck do
@@ -195,13 +195,6 @@ class PythonAT314 < Formula
     (buildpath/"Misc/platform_triplet.c").write "PLATFORM_TRIPLET=aarch64-linux-musl\n"
 
     system "./configure", *args
-
-    # Disable features that fail to compile on OpenHarmony
-    inreplace "pyconfig.h" do |s|
-      s.gsub! /^.*HAVE_LINUX_NETFILTER_IPV4_H.*$/, "/* #undef HAVE_LINUX_NETFILTER_IPV4_H */"
-      s.gsub! /^.*HAVE_LINUX_CAN.*$/, "/* #undef HAVE_LINUX_CAN */"
-    end
-
     system "make"
 
     ENV.deparallelize do
