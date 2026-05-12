@@ -4,6 +4,7 @@ class Unbound < Formula
   url "https://nlnetlabs.nl/downloads/unbound/unbound-1.25.0.tar.gz"
   sha256 "062a6eda723fe2f041bee4079b76981569f1d12e066bbd74800242fc1ebddec7"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://github.com/NLnetLabs/unbound.git", branch: "master"
 
@@ -16,7 +17,7 @@ class Unbound < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "95b901fb6280811e2b68454a64727cecb8711ccbac69a3c331383978e3cdd06a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e59a4b4901af391795a49ef0a0df213e5064caaaa665cf24df744cb67a31ef3"
   end
 
   depends_on "libevent"
@@ -37,7 +38,6 @@ class Unbound < Formula
       --with-libexpat=#{expat_prefix}
       --with-libnghttp2=#{Formula["libnghttp2"].opt_prefix}
       --with-ssl=#{Formula["openssl@3"].opt_prefix}
-      ac_cv_header_linux_net_tstamp_h=no
     ]
 
     system "./configure", *args
