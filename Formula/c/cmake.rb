@@ -6,6 +6,7 @@ class Cmake < Formula
   mirror "http://fresh-center.net/linux/misc/legacy/cmake-4.3.2.tar.gz"
   sha256 "b0231eb39b3c3cabdc568c619df78208a7bd95ea10c9b2236d61218bac1b367d"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://gitlab.kitware.com/cmake/cmake.git", branch: "master"
 
@@ -32,11 +33,6 @@ class Cmake < Formula
   patch do
     url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/cmake/0001-disable-cpu-affinity.patch"
     sha256 "3ad83e233362c749d1be929f7868e53399c9e2458831ac4ea6ce4c22dd332675"
-  end
-
-  patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/cmake/0002-disable-linux-tcp-h.patch"
-    sha256 "39ac5b8bb54c4d8af4cb532716e4b7ca335a14b0f84bf4d77839ee8140838767"
   end
 
   def install
