@@ -7,8 +7,7 @@ class ZshSyntaxHighlighting < Formula
   head "https://github.com/zsh-users/zsh-syntax-highlighting.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "3cfaa693dab68d9a576ad1ad0a018e12b250a057963263733f6fcc9b4c4ce8a6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "edaec4ecd558fd28140f20ff7d8747b58315af9cec2b7681a863243bdd922e8e"
   end
 
   uses_from_macos "zsh" => [:build, :test]
