@@ -31,8 +31,7 @@ class Coreutils < Formula
   end
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/coreutils/0001-port-gnulib-to-ohos.patch"
-    sha256 "508da707b81d529df6f9154ad8005d5636499395c2383e20297d14e149612d21"
+    file "Patches/coreutils/0001-port-gnulib-to-ohos.patch"
   end
 
   # https://github.com/Homebrew/homebrew-core/pull/36494
