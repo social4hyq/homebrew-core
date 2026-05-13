@@ -4,6 +4,7 @@ class OpenjdkAT17 < Formula
   url "https://github.com/openjdk/jdk17u/archive/refs/tags/jdk-17.0.19-ga.tar.gz"
   sha256 "b165f0dd120f4455904b76cf87dd9352fd23f88c2e9a33c2532fabacc3cca962"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class OpenjdkAT17 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c0ae50686fed7d979fc3b95c396856fb58965a5c1cf448f48a09a950dfadde0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e259f797abd9a5834838224aefb079abff608e102b387562845096e0148af7cf"
   end
 
   deprecate! date: "2026-09-30", because: :unmaintained
@@ -51,8 +52,7 @@ class OpenjdkAT17 < Formula
   end
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/openjdk@17/0001-support-ohos.patch"
-    sha256 "bce5e3d437b0c8bc2ac2f2c30d5d76a29242780c61054a4439305c917a65a8ea"
+    file "Patches/openjdk@17/0001-support-ohos.patch"
   end
 
   def install
@@ -80,7 +80,6 @@ class OpenjdkAT17 < Formula
       --without-version-opt
       --without-version-pre
       --with-zlib=system
-      --enable-ohos=yes
       --enable-headless-only=yes
       --with-copyright-year=2026
       --with-toolchain-type=clang
