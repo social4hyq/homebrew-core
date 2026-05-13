@@ -12,7 +12,8 @@ class Libffi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "783eb0226ea3e511191f6af597f7cf7f26ccfc1b8d51adfab872c2b25c7a31d9"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "16025358593b00e6b2a8f2077e06843b149892059f855ab3316f8ff42aa82548"
   end
 
   head do
@@ -25,8 +26,7 @@ class Libffi < Formula
   keg_only :provided_by_macos
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/libffi/0001-fix-tramp-path-resolution-for-ohos-sandbox.patch"
-    sha256 "71015ab10d2eef491a71b9ef173dc720fb843eb14b150587a39b38f79c25655b"
+    file "Patches/libffi/0001-fix-tramp-path-resolution-for-ohos-sandbox.patch"
   end
 
   def install
