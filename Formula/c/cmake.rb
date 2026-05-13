@@ -31,8 +31,7 @@ class Cmake < Formula
   conflicts_with cask: "cmake-app"
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/cmake/0001-disable-cpu-affinity.patch"
-    sha256 "3ad83e233362c749d1be929f7868e53399c9e2458831ac4ea6ce4c22dd332675"
+    file "Patches/cmake/0001-disable-cpu-affinity.patch"
   end
 
   def install
