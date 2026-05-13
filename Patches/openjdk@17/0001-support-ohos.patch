@@ -1,19 +1,19 @@
 This patch is based on: https://gitcode.com/OpenHarmonyPCDeveloper/bishengjdk-17
 
 diff --git a/make/autoconf/configure.ac b/make/autoconf/configure.ac
-index 173d53335..7222c0673 100644
+index 173d53335..6531498fa 100644
 --- a/make/autoconf/configure.ac
 +++ b/make/autoconf/configure.ac
-@@ -94,6 +94,7 @@ JDKOPT_SETUP_OPEN_OR_CUSTOM
- # These are needed to be able to create a configuration name (and thus the output directory)
- JDKOPT_SETUP_DEBUG_LEVEL
- HOTSPOT_SETUP_JVM_VARIANTS
-+JDKOPT_SETUP_ENABLE_OHOS
+@@ -186,6 +186,7 @@ TOOLCHAIN_PRE_DETECTION
+ TOOLCHAIN_DETECT_TOOLCHAIN_CORE
+ TOOLCHAIN_DETECT_TOOLCHAIN_EXTRA
+ TOOLCHAIN_POST_DETECTION
++TOOLCHAIN_DETECT_TARGET_OHOS
  
- # With basic setup done, call the custom early hook.
- CUSTOM_EARLY_HOOK
+ # Finally do some processing after the detection phase
+ TOOLCHAIN_SETUP_BUILD_COMPILERS
 diff --git a/make/autoconf/flags-cflags.m4 b/make/autoconf/flags-cflags.m4
-index 05b9a774b..2ff736b66 100644
+index 05b9a774b..f58f47876 100644
 --- a/make/autoconf/flags-cflags.m4
 +++ b/make/autoconf/flags-cflags.m4
 @@ -518,7 +518,11 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_HELPER],
@@ -21,7 +21,7 @@ index 05b9a774b..2ff736b66 100644
      # too big object files and speed the build up a little bit
      # (see http://llvm.org/bugs/show_bug.cgi?id=7554)
 -    TOOLCHAIN_CFLAGS_JVM="$TOOLCHAIN_CFLAGS_JVM -flimit-debug-info"
-+    if test "x$ENABLE_OHOS" = xyes; then
++    if test "x$OPENJDK_TARGET_IS_OHOS" = xyes; then
 +      TOOLCHAIN_CFLAGS_JVM="$TOOLCHAIN_CFLAGS_JVM -flimit-debug-info -fno-emulated-tls"
 +    else
 +      TOOLCHAIN_CFLAGS_JVM="$TOOLCHAIN_CFLAGS_JVM -flimit-debug-info"
@@ -29,35 +29,8 @@ index 05b9a774b..2ff736b66 100644
  
      # In principle the stack alignment below is cpu- and ABI-dependent and
      # should agree with values of StackAlignmentInBytes in various
-diff --git a/make/autoconf/jdk-options.m4 b/make/autoconf/jdk-options.m4
-index c20e8c7e2..39a619cb6 100644
---- a/make/autoconf/jdk-options.m4
-+++ b/make/autoconf/jdk-options.m4
-@@ -37,6 +37,22 @@ AC_DEFUN_ONCE([JDKOPT_SETUP_JDK_VARIANT],
-   UTIL_DEPRECATED_ARG_WITH([jdk-variant])
- ])
- 
-+AC_DEFUN_ONCE([JDKOPT_SETUP_ENABLE_OHOS],
-+[
-+AC_MSG_CHECKING([enable compile ohos])
-+AC_ARG_ENABLE([ohos], [AS_HELP_STRING([--enable-ohos],
-+	[Enable compile ohos @<:@disabled@:>@])],
-+  [enable_ohos=yes])
-+if test "x$enable_ohos" != "xyes"; then
-+  ENABLE_OHOS="no"
-+else
-+  ENABLE_OHOS="$enable_ohos"
-+fi
-+
-+AC_SUBST(ENABLE_OHOS)
-+AC_MSG_RESULT([enable-ohos=$ENABLE_OHOS])
-+])
-+
- ###############################################################################
- # Set the debug level
- #    release: no debug information, all optimizations, no asserts.
 diff --git a/make/autoconf/lib-std.m4 b/make/autoconf/lib-std.m4
-index dc9648890..2fba690aa 100644
+index dc9648890..58f45c527 100644
 --- a/make/autoconf/lib-std.m4
 +++ b/make/autoconf/lib-std.m4
 @@ -47,7 +47,11 @@ AC_DEFUN_ONCE([LIB_SETUP_STD_LIBS],
@@ -65,7 +38,7 @@ index dc9648890..2fba690aa 100644
      # Test if stdc++ can be linked statically.
      AC_MSG_CHECKING([if static link of stdc++ is possible])
 -    STATIC_STDCXX_FLAGS="-static-libstdc++ -static-libgcc"
-+    if test "x$ENABLE_OHOS" = xyes; then
++    if test "x$OPENJDK_TARGET_IS_OHOS" = xyes; then
 +      STATIC_STDCXX_FLAGS=""
 +    else
 +      STATIC_STDCXX_FLAGS="-static-libstdc++ -static-libgcc"
@@ -73,28 +46,39 @@ index dc9648890..2fba690aa 100644
      AC_LANG_PUSH(C++)
      OLD_LIBS="$LIBS"
      LIBS="$STATIC_STDCXX_FLAGS"
-diff --git a/make/autoconf/spec.gmk.in b/make/autoconf/spec.gmk.in
-index 807ba2758..26b093e8c 100644
---- a/make/autoconf/spec.gmk.in
-+++ b/make/autoconf/spec.gmk.in
-@@ -775,6 +775,7 @@ TAR_INCLUDE_PARAM:=@TAR_INCLUDE_PARAM@
- TAR_SUPPORTS_TRANSFORM:=@TAR_SUPPORTS_TRANSFORM@
- 
- # Build setup
-+ENABLE_OHOS:=@ENABLE_OHOS@
- USE_EXTERNAL_LIBJPEG:=@USE_EXTERNAL_LIBJPEG@
- USE_EXTERNAL_LIBGIF:=@USE_EXTERNAL_LIBGIF@
- USE_EXTERNAL_LIBZ:=@USE_EXTERNAL_LIBZ@
 diff --git a/make/autoconf/toolchain.m4 b/make/autoconf/toolchain.m4
-index 98573f965..3260f6667 100644
+index 98573f965..1f756ec9f 100644
 --- a/make/autoconf/toolchain.m4
 +++ b/make/autoconf/toolchain.m4
-@@ -400,7 +400,11 @@ AC_DEFUN([TOOLCHAIN_EXTRACT_COMPILER_VERSION],
+@@ -375,6 +375,22 @@ AC_DEFUN_ONCE([TOOLCHAIN_POST_DETECTION],
+   CXX="$cxx_filtered"
+ ])
+ 
++AC_DEFUN_ONCE([TOOLCHAIN_DETECT_TARGET_OHOS],
++[
++  AC_MSG_CHECKING([if target toolchain defines __OHOS__])
++  AC_LANG_PUSH(C)
++  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
++#ifndef __OHOS__
++#error "__OHOS__ not defined"
++#endif
++    ]], [[]])],
++    [OPENJDK_TARGET_IS_OHOS=yes],
++    [OPENJDK_TARGET_IS_OHOS=no])
++  AC_LANG_POP(C)
++  AC_MSG_RESULT([$OPENJDK_TARGET_IS_OHOS])
++  AC_SUBST(OPENJDK_TARGET_IS_OHOS)
++])
++
+ # Check if a compiler is of the toolchain type we expect, and save the version
+ # information from it. If the compiler does not match the expected type,
+ # this function will abort using AC_MSG_ERROR. If it matches, the version will
+@@ -400,7 +416,11 @@ AC_DEFUN([TOOLCHAIN_EXTRACT_COMPILER_VERSION],
        AC_MSG_NOTICE([The $COMPILER_NAME compiler (located as $COMPILER) does not seem to be the required $TOOLCHAIN_TYPE compiler.])
        AC_MSG_NOTICE([The result from running with -qversion was: "$COMPILER_VERSION_OUTPUT"])
        AC_MSG_NOTICE([The result from running with --version was: "$ALT_VERSION_OUTPUT"])
 -      AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
-+      if test "x$ENABLE_OHOS" = xyes; then
++      if test "x$OPENJDK_TARGET_IS_OHOS" = xyes; then
 +        AC_MSG_NOTICE([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
 +      else
 +        AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
@@ -102,12 +86,12 @@ index 98573f965..3260f6667 100644
      fi
      # Collapse compiler output into a single line
      COMPILER_VERSION_STRING=`$ECHO $COMPILER_VERSION_OUTPUT`
-@@ -417,7 +421,11 @@ AC_DEFUN([TOOLCHAIN_EXTRACT_COMPILER_VERSION],
+@@ -417,7 +437,11 @@ AC_DEFUN([TOOLCHAIN_EXTRACT_COMPILER_VERSION],
      if test $? -ne 0; then
        AC_MSG_NOTICE([The $COMPILER_NAME compiler (located as $COMPILER) does not seem to be the required $TOOLCHAIN_TYPE compiler.])
        AC_MSG_NOTICE([The result from running it was: "$COMPILER_VERSION_OUTPUT"])
 -      AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
-+      if test "x$ENABLE_OHOS" = xyes; then
++      if test "x$OPENJDK_TARGET_IS_OHOS" = xyes; then
 +        AC_MSG_NOTICE([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
 +      else
 +        AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
@@ -115,12 +99,12 @@ index 98573f965..3260f6667 100644
      fi
      # Collapse compiler output into a single line
      COMPILER_VERSION_STRING=`$ECHO $COMPILER_VERSION_OUTPUT`
-@@ -440,7 +448,11 @@ AC_DEFUN([TOOLCHAIN_EXTRACT_COMPILER_VERSION],
+@@ -440,7 +464,11 @@ AC_DEFUN([TOOLCHAIN_EXTRACT_COMPILER_VERSION],
      if test $? -ne 0; then
        AC_MSG_NOTICE([The $COMPILER_NAME compiler (located as $COMPILER) does not seem to be the required $TOOLCHAIN_TYPE compiler.])
        AC_MSG_NOTICE([The result from running with --version was: "$COMPILER_VERSION"])
 -      AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
-+      if test "x$ENABLE_OHOS" = xyes; then
++      if test "x$OPENJDK_TARGET_IS_OHOS" = xyes; then
 +        AC_MSG_NOTICE([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
 +      else
 +        AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
@@ -128,12 +112,12 @@ index 98573f965..3260f6667 100644
      fi
      # Remove Copyright and legalese from version string, and
      # collapse into a single line
-@@ -463,7 +475,11 @@ AC_DEFUN([TOOLCHAIN_EXTRACT_COMPILER_VERSION],
+@@ -463,7 +491,11 @@ AC_DEFUN([TOOLCHAIN_EXTRACT_COMPILER_VERSION],
      if test $? -ne 0; then
        AC_MSG_NOTICE([The $COMPILER_NAME compiler (located as $COMPILER) does not seem to be the required $TOOLCHAIN_TYPE compiler.])
        AC_MSG_NOTICE([The result from running with --version was: "$COMPILER_VERSION_OUTPUT"])
 -      AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
-+      if test "x$ENABLE_OHOS" = xyes; then
++      if test "x$OPENJDK_TARGET_IS_OHOS" = xyes; then
 +        AC_MSG_NOTICE([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
 +      else
 +        AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
@@ -141,11 +125,11 @@ index 98573f965..3260f6667 100644
      fi
      # Collapse compiler output into a single line
      COMPILER_VERSION_STRING=`$ECHO $COMPILER_VERSION_OUTPUT`
-@@ -915,6 +931,9 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_BUILD_COMPILERS],
+@@ -915,6 +947,9 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_BUILD_COMPILERS],
        if test "x$OPENJDK_BUILD_OS" = xmacosx; then
          UTIL_REQUIRE_PROGS(BUILD_CC, clang cc gcc)
          UTIL_REQUIRE_PROGS(BUILD_CXX, clang++ CC g++)
-+      elif test "x$ENABLE_OHOS" = xyes; then
++      elif test "x$OPENJDK_TARGET_IS_OHOS" = xyes; then
 +        UTIL_REQUIRE_PROGS(BUILD_CC, clang cc gcc)
 +        UTIL_REQUIRE_PROGS(BUILD_CXX, clang++ CC g++)
        else
