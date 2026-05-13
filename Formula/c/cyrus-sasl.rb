@@ -7,7 +7,8 @@ class CyrusSasl < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f334d8483ac802c47b914decf7f547570a5b38ae790440b0b00ccae2d57ae1d7"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0e7b5c59c14f9c31a25c46492f22f4161c3d06575f263648fa2b897c1843062"
   end
 
   keg_only :provided_by_macos
