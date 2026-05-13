@@ -32,7 +32,8 @@ class Ruby < Formula
   no_autobump! because: "this is a critical package so an auto bump might break Homebrew usability."
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4b409ba3dcfb6a96cf16f4f5a3ce45f0c770a79c240d8b5d8f260f686b0335c"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5c8b481b0ec5e6ece9e82d4d3d3cfaac8a803c4b9637c40f3c3ee72873b1481"
   end
 
   keg_only :provided_by_macos
@@ -51,13 +52,11 @@ class Ruby < Formula
   end
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/ruby/0001-add-target-os.patch"
-    sha256 "2b52b0acfca336ef5bffc43362ebd25ade6da91b23c967794692c4e57f5bb534"
+    file "Patches/ruby/0001-add-target-os.patch"
   end
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/ruby/0002-implement-pthread_cancel-stub.patch"
-    sha256 "93123e59ed7d713fadc4422c2674f28132768bc1c3845f6ce3dbaf1fdd2178ef"
+    file "Patches/ruby/0002-implement-pthread_cancel-stub.patch"
   end
 
   def determine_api_version
