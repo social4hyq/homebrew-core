@@ -7,7 +7,7 @@ class Caddy < Formula
   head "https://github.com/caddyserver/caddy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "684f9b603b098b4aa0602418e79dddbf885f5813ec901be1b0b5c99014da726d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "36fddbbd725eddcf983a76ec21fce393091fe0235654535b3d37b4c07845181a"
   end
 
   depends_on "go" => :build
