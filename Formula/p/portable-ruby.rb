@@ -16,7 +16,8 @@ class PortableRuby < PortableFormula
   no_autobump! because: "this is a critical package so an auto bump might break Homebrew usability."
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f1d3f78c330ddbaf34b7e1e071cb35d37caedf7fa1b7eeacfc054ff906919bf"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4d6a2f7765ea03474901b1e36fdf7b5638fe8878ba357695ba3edb0fedbf004"
   end
 
   depends_on "autoconf" => :build
@@ -55,13 +56,11 @@ class PortableRuby < PortableFormula
   end
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/ruby/0001-add-target-os.patch"
-    sha256 "2b52b0acfca336ef5bffc43362ebd25ade6da91b23c967794692c4e57f5bb534"
+    file "Patches/ruby/0001-add-target-os.patch"
   end
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/ruby/0002-implement-pthread_cancel-stub.patch"
-    sha256 "93123e59ed7d713fadc4422c2674f28132768bc1c3845f6ce3dbaf1fdd2178ef"
+    file "Patches/ruby/0002-implement-pthread_cancel-stub.patch"
   end
 
   def install
