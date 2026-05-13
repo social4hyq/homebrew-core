@@ -1,8 +1,8 @@
 class Bmake < Formula
   desc "Portable version of NetBSD make(1)"
   homepage "https://www.crufty.net/help/sjg/bmake.html"
-  url "https://www.crufty.net/ftp/pub/sjg/bmake-20260406.tar.gz"
-  sha256 "ed6e5fa0d661ea3c71d12e7481cbbcac6f2bff34051ce36ae7575811766adf26"
+  url "https://www.crufty.net/ftp/pub/sjg/bmake-20260508.tar.gz"
+  sha256 "7b1eea90abc767430cd1a612529d5f301c47fd6a35bee7585778c951e891a82c"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,7 +11,7 @@ class Bmake < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7eead805673f0cc4b4d2f98bb2997f22b586926bfdb21a8b361a7ebe0df8d0d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac4659228030f2cc5a1c97feb2644a78bb2111224aac1d2beef053f60d8d21c3"
   end
 
   uses_from_macos "bc-gh" => :build
