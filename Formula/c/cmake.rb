@@ -19,7 +19,8 @@ class Cmake < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b19c888bd8d45018d6a2e9e670aef153290f8605174cbbe172e25b9c6aa74c63"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b1665d25fb12951c76c4ff9c6e567316d8eb7465446268109e006ba039db02d"
   end
 
   uses_from_macos "ncurses"
