@@ -19,7 +19,8 @@ class Git < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb4e45c608496221d2d3016e258c0f07e4494cede4d456462a67096d4b82ce35"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2717420528f8d5f9a7fc92301550607f1f5fab768c1eb4a42eee75d6369e4de7"
   end
 
   depends_on "gettext" => :build
