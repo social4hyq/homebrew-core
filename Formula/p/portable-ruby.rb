@@ -55,13 +55,11 @@ class PortableRuby < PortableFormula
   end
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/ruby/0001-add-target-os.patch"
-    sha256 "2b52b0acfca336ef5bffc43362ebd25ade6da91b23c967794692c4e57f5bb534"
+    file "Patches/ruby/0001-add-target-os.patch"
   end
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/ruby/0002-implement-pthread_cancel-stub.patch"
-    sha256 "93123e59ed7d713fadc4422c2674f28132768bc1c3845f6ce3dbaf1fdd2178ef"
+    file "Patches/ruby/0002-implement-pthread_cancel-stub.patch"
   end
 
   def install
