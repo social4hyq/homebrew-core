@@ -22,8 +22,7 @@ class Perl < Formula
   skip_clean "lib/perl5/site_perl"
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/perl/0001-add-ohos-support.patch"
-    sha256 "ee18043946dcf6ab99c1ae9dbb89fb829ec5bd3eb1ff07d53ad82ae094ec7a50"
+    file "Patches/perl/0001-add-ohos-support.patch"
   end
 
   def install
