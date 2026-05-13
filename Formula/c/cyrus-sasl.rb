@@ -7,7 +7,8 @@ class CyrusSasl < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f334d8483ac802c47b914decf7f547570a5b38ae790440b0b00ccae2d57ae1d7"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0e7b5c59c14f9c31a25c46492f22f4161c3d06575f263648fa2b897c1843062"
   end
 
   keg_only :provided_by_macos
@@ -18,8 +19,7 @@ class CyrusSasl < Formula
   uses_from_macos "libxcrypt"
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/cyrus-sasl/0001-add-ohos-support.patch"
-    sha256 "d49d45e4df9dd2a9192a5398033ccd4a30a4fa98bd35cf39a7f2ee2d9509edc0"
+    file "Patches/cyrus-sasl/0001-add-ohos-support.patch"
   end
 
   def install
