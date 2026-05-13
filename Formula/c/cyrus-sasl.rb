@@ -18,8 +18,7 @@ class CyrusSasl < Formula
   uses_from_macos "libxcrypt"
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/cyrus-sasl/0001-add-ohos-support.patch"
-    sha256 "d49d45e4df9dd2a9192a5398033ccd4a30a4fa98bd35cf39a7f2ee2d9509edc0"
+    file "Patches/cyrus-sasl/0001-add-ohos-support.patch"
   end
 
   def install
