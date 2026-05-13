@@ -8,14 +8,14 @@ class M4 < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "63ec85c4ec9c74cb4ee80273ace698c66ba0fb047c8a1cba62d356daf5ee058c"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "43e27d06206950e31aac25c1cc4596399dfcf350725fc459d9ff1e20be7d811a"
   end
 
   keg_only :provided_by_macos
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/m4/0001-port-gnulib-to-ohos.patch"
-    sha256 "e5fbc86d46faae6e5458ad03c02f9cceba4db82b39b284fc92548e0a2b87f4fd"
+    file "Patches/m4/0001-port-gnulib-to-ohos.patch"
   end
 
   def install
