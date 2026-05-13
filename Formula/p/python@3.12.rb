@@ -13,7 +13,8 @@ class PythonAT312 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4e46a681b0a4fb782934cbeec594eac8dd640fc16b5170df1ff2a665f129906"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a35553d0d951a633ddc55331812121d94746037763b3e73de0931b5653fbc009"
   end
 
   depends_on "pkgconf" => :build
@@ -61,8 +62,7 @@ class PythonAT312 < Formula
     sha256 "81e13ebcca3ffa8cc85e4deff5c27e1ee26dea0aa7fc2f294a073ac208806ff3"
 
     patch do
-      url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/python@3.14/0001-mock-abi-detection-for-pip.patch"
-      sha256 "f5d966824e7caf5b139189ac6038bb54c195a89009ccc3004ff8948e15daf988"
+      file "Patches/python@3.14/0001-mock-abi-detection-for-pip.patch"
     end
   end
 
