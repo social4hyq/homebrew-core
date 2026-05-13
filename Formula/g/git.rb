@@ -69,13 +69,11 @@ class Git < Formula
   end
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/git/0001-disable-pthread-setcancelstate.patch"
-    sha256 "6fa9c77a7e753939b5fdc31df0c66cf0f49541f128fb12a51b38ef3f76c876aa"
+    file "Patches/git/0001-disable-pthread-setcancelstate.patch"
   end
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/git/0002-skip-ownership-check.patch"
-    sha256 "e8558f417bce4cb8515e5f26fba2a268c8e0bdee8675cfe7cec598052bc1675d"
+    file "Patches/git/0002-skip-ownership-check.patch"
   end
 
   def install
