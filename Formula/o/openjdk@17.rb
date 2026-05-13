@@ -4,7 +4,7 @@ class OpenjdkAT17 < Formula
   url "https://github.com/openjdk/jdk17u/archive/refs/tags/jdk-17.0.19-ga.tar.gz"
   sha256 "b165f0dd120f4455904b76cf87dd9352fd23f88c2e9a33c2532fabacc3cca962"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
-  revision 1
+  revision 2
   compatibility_version 1
 
   livecheck do
@@ -15,6 +15,8 @@ class OpenjdkAT17 < Formula
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "e259f797abd9a5834838224aefb079abff608e102b387562845096e0148af7cf"
   end
+
+  keg_only :versioned_formula
 
   deprecate! date: "2026-09-30", because: :unmaintained
   disable! date: "2029-09-30", because: :unmaintained
