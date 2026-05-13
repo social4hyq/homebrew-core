@@ -13,7 +13,7 @@ class OpenjdkAT17 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c0ae50686fed7d979fc3b95c396856fb58965a5c1cf448f48a09a950dfadde0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e259f797abd9a5834838224aefb079abff608e102b387562845096e0148af7cf"
   end
 
   deprecate! date: "2026-09-30", because: :unmaintained
