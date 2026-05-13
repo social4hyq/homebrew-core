@@ -13,7 +13,8 @@ class Perl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2aaccc551f17ebc74ee17fb01dc56bcd715c842e306f9599abbcfb900274e02c"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "de1f69d4a01becb4f783c984a1ae9bc5e643c6cba912fc4d1471926d06d71b3b"
   end
 
   depends_on "gdbm"
@@ -22,8 +23,7 @@ class Perl < Formula
   skip_clean "lib/perl5/site_perl"
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/perl/0001-add-ohos-support.patch"
-    sha256 "ee18043946dcf6ab99c1ae9dbb89fb829ec5bd3eb1ff07d53ad82ae094ec7a50"
+    file "Patches/perl/0001-add-ohos-support.patch"
   end
 
   def install
