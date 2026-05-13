@@ -19,7 +19,8 @@ class Git < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb4e45c608496221d2d3016e258c0f07e4494cede4d456462a67096d4b82ce35"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2717420528f8d5f9a7fc92301550607f1f5fab768c1eb4a42eee75d6369e4de7"
   end
 
   depends_on "gettext" => :build
@@ -69,13 +70,11 @@ class Git < Formula
   end
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/git/0001-disable-pthread-setcancelstate.patch"
-    sha256 "6fa9c77a7e753939b5fdc31df0c66cf0f49541f128fb12a51b38ef3f76c876aa"
+    file "Patches/git/0001-disable-pthread-setcancelstate.patch"
   end
 
   patch do
-    url "https://raw.gitcode.com/Harmonybrew/homebrew-core/raw/main/Patches/git/0002-skip-ownership-check.patch"
-    sha256 "e8558f417bce4cb8515e5f26fba2a268c8e0bdee8675cfe7cec598052bc1675d"
+    file "Patches/git/0002-skip-ownership-check.patch"
   end
 
   def install
