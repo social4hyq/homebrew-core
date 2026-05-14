@@ -1,0 +1,540 @@
+diff --git a/make/autoconf/configure.ac b/make/autoconf/configure.ac
+index 44f0c15f15d..96b8ad31a0e 100644
+--- a/make/autoconf/configure.ac
++++ b/make/autoconf/configure.ac
+@@ -189,6 +189,7 @@ TOOLCHAIN_PRE_DETECTION
+ TOOLCHAIN_DETECT_TOOLCHAIN_CORE
+ TOOLCHAIN_DETECT_TOOLCHAIN_EXTRA
+ TOOLCHAIN_POST_DETECTION
++TOOLCHAIN_DETECT_TARGET_OHOS
+ 
+ # Finally do some processing after the detection phase
+ TOOLCHAIN_SETUP_BUILD_COMPILERS
+diff --git a/make/autoconf/flags-cflags.m4 b/make/autoconf/flags-cflags.m4
+index ab8c48e16d4..cb583d57795 100644
+--- a/make/autoconf/flags-cflags.m4
++++ b/make/autoconf/flags-cflags.m4
+@@ -599,7 +599,11 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_HELPER],
+     # Restrict the debug information created by Clang to avoid
+     # too big object files and speed the build up a little bit
+     # (see http://llvm.org/bugs/show_bug.cgi?id=7554)
+-    TOOLCHAIN_CFLAGS_JVM="$TOOLCHAIN_CFLAGS_JVM -flimit-debug-info"
++    if test "x$OPENJDK_TARGET_IS_OHOS" = xyes; then
++      TOOLCHAIN_CFLAGS_JVM="$TOOLCHAIN_CFLAGS_JVM -flimit-debug-info -fno-emulated-tls"
++    else
++      TOOLCHAIN_CFLAGS_JVM="$TOOLCHAIN_CFLAGS_JVM -flimit-debug-info"
++    fi
+ 
+     # In principle the stack alignment below is cpu- and ABI-dependent and
+     # should agree with values of StackAlignmentInBytes in various
+diff --git a/make/autoconf/lib-std.m4 b/make/autoconf/lib-std.m4
+index e470cdbe66f..70458c0934a 100644
+--- a/make/autoconf/lib-std.m4
++++ b/make/autoconf/lib-std.m4
+@@ -47,7 +47,11 @@ AC_DEFUN_ONCE([LIB_SETUP_STD_LIBS],
+   if test "x$OPENJDK_TARGET_OS" = xlinux; then
+     # Test if stdc++ can be linked statically.
+     AC_MSG_CHECKING([if static link of stdc++ is possible])
+-    STATIC_STDCXX_FLAGS="-static-libstdc++ -static-libgcc"
++    if test "x$OPENJDK_TARGET_IS_OHOS" = xyes; then
++      STATIC_STDCXX_FLAGS=""
++    else
++      STATIC_STDCXX_FLAGS="-static-libstdc++ -static-libgcc"
++    fi
+     AC_LANG_PUSH(C++)
+     OLD_LIBS="$LIBS"
+     LIBS="$STATIC_STDCXX_FLAGS"
+diff --git a/make/autoconf/toolchain.m4 b/make/autoconf/toolchain.m4
+index a2b576ac1ab..3568f424719 100644
+--- a/make/autoconf/toolchain.m4
++++ b/make/autoconf/toolchain.m4
+@@ -391,6 +391,22 @@ AC_DEFUN_ONCE([TOOLCHAIN_POST_DETECTION],
+   CXXFLAGS="$ORG_CXXFLAGS"
+ ])
+ 
++AC_DEFUN_ONCE([TOOLCHAIN_DETECT_TARGET_OHOS],
++[
++  AC_MSG_CHECKING([if target toolchain defines __OHOS__])
++  AC_LANG_PUSH(C)
++  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
++#ifndef __OHOS__
++#error "__OHOS__ not defined"
++#endif
++    ]], [[]])],
++    [OPENJDK_TARGET_IS_OHOS=yes],
++    [OPENJDK_TARGET_IS_OHOS=no])
++  AC_LANG_POP(C)
++  AC_MSG_RESULT([$OPENJDK_TARGET_IS_OHOS])
++  AC_SUBST(OPENJDK_TARGET_IS_OHOS)
++])
++
+ # Check if a compiler is of the toolchain type we expect, and save the version
+ # information from it. If the compiler does not match the expected type,
+ # this function will abort using AC_MSG_ERROR. If it matches, the version will
+@@ -416,7 +432,12 @@ AC_DEFUN([TOOLCHAIN_EXTRACT_COMPILER_VERSION],
+       AC_MSG_NOTICE([The $COMPILER_NAME compiler (located as $COMPILER) does not seem to be the required $TOOLCHAIN_TYPE compiler.])
+       AC_MSG_NOTICE([The result from running with -qversion was: "$COMPILER_VERSION_OUTPUT"])
+       AC_MSG_NOTICE([The result from running with --version was: "$ALT_VERSION_OUTPUT"])
+-      AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
++      if test "x$OPENJDK_TARGET_IS_OHOS" = xyes; then
++        # OpenHarmony toolchains may use non-standard version banners.
++        AC_MSG_NOTICE([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
++      else
++        AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
++      fi
+     fi
+     # Collapse compiler output into a single line
+     COMPILER_VERSION_STRING=`$ECHO $COMPILER_VERSION_OUTPUT`
+@@ -433,7 +454,12 @@ AC_DEFUN([TOOLCHAIN_EXTRACT_COMPILER_VERSION],
+     if test $? -ne 0; then
+       AC_MSG_NOTICE([The $COMPILER_NAME compiler (located as $COMPILER) does not seem to be the required $TOOLCHAIN_TYPE compiler.])
+       AC_MSG_NOTICE([The result from running it was: "$COMPILER_VERSION_OUTPUT"])
+-      AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
++      if test "x$OPENJDK_TARGET_IS_OHOS" = xyes; then
++        # OpenHarmony toolchains may use non-standard version banners.
++        AC_MSG_NOTICE([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
++      else
++        AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
++      fi
+     fi
+     # Collapse compiler output into a single line
+     COMPILER_VERSION_STRING=`$ECHO $COMPILER_VERSION_OUTPUT`
+@@ -456,7 +482,12 @@ AC_DEFUN([TOOLCHAIN_EXTRACT_COMPILER_VERSION],
+     if test $? -ne 0; then
+       AC_MSG_NOTICE([The $COMPILER_NAME compiler (located as $COMPILER) does not seem to be the required $TOOLCHAIN_TYPE compiler.])
+       AC_MSG_NOTICE([The result from running with --version was: "$COMPILER_VERSION"])
+-      AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
++      if test "x$OPENJDK_TARGET_IS_OHOS" = xyes; then
++        # OpenHarmony toolchains may use non-standard version banners.
++        AC_MSG_NOTICE([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
++      else
++        AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
++      fi
+     fi
+     # Remove Copyright and legalese from version string, and
+     # collapse into a single line
+@@ -479,7 +510,12 @@ AC_DEFUN([TOOLCHAIN_EXTRACT_COMPILER_VERSION],
+     if test $? -ne 0; then
+       AC_MSG_NOTICE([The $COMPILER_NAME compiler (located as $COMPILER) does not seem to be the required $TOOLCHAIN_TYPE compiler.])
+       AC_MSG_NOTICE([The result from running with --version was: "$COMPILER_VERSION_OUTPUT"])
+-      AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
++      if test "x$OPENJDK_TARGET_IS_OHOS" = xyes; then
++        # OpenHarmony toolchains may use non-standard version banners.
++        AC_MSG_NOTICE([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
++      else
++        AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
++      fi
+     fi
+     # Collapse compiler output into a single line
+     COMPILER_VERSION_STRING=`$ECHO $COMPILER_VERSION_OUTPUT`
+@@ -933,6 +969,9 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_BUILD_COMPILERS],
+       if test "x$OPENJDK_BUILD_OS" = xmacosx; then
+         UTIL_REQUIRE_PROGS(BUILD_CC, clang)
+         UTIL_REQUIRE_PROGS(BUILD_CXX, clang++)
++      elif test "x$OPENJDK_TARGET_IS_OHOS" = xyes; then
++        UTIL_REQUIRE_PROGS(BUILD_CC, clang cc gcc)
++        UTIL_REQUIRE_PROGS(BUILD_CXX, clang++ CC g++)
+       else
+         UTIL_REQUIRE_PROGS(BUILD_CC, cc gcc)
+         UTIL_REQUIRE_PROGS(BUILD_CXX, CC g++)
+diff --git a/src/hotspot/cpu/aarch64/vm_version_aarch64.cpp b/src/hotspot/cpu/aarch64/vm_version_aarch64.cpp
+index 6c95dc9c8ff..febe096efe1 100644
+--- a/src/hotspot/cpu/aarch64/vm_version_aarch64.cpp
++++ b/src/hotspot/cpu/aarch64/vm_version_aarch64.cpp
+@@ -429,11 +429,15 @@ void VM_Version::initialize() {
+ 
+   if (VM_Version::supports_sve2()) {
+     if (FLAG_IS_DEFAULT(UseSVE)) {
++#ifndef __OHOS__
+       FLAG_SET_DEFAULT(UseSVE, 2);
++#endif
+     }
+   } else if (VM_Version::supports_sve()) {
+     if (FLAG_IS_DEFAULT(UseSVE)) {
++#ifndef __OHOS__
+       FLAG_SET_DEFAULT(UseSVE, 1);
++#endif
+     } else if (UseSVE > 1) {
+       warning("SVE2 specified, but not supported on current CPU. Using SVE.");
+       FLAG_SET_DEFAULT(UseSVE, 1);
+diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
+index 68761a77679..184c739f952 100644
+--- a/src/hotspot/os/linux/os_linux.cpp
++++ b/src/hotspot/os/linux/os_linux.cpp
+@@ -141,7 +141,7 @@
+ // for timer info max values which include all bits
+ #define ALL_64_BITS CONST64(0xFFFFFFFFFFFFFFFF)
+ 
+-#ifdef MUSL_LIBC
++#if defined(MUSL_LIBC) && !defined(__OHOS__)
+ // dlvsym is not a part of POSIX
+ // and musl libc doesn't implement it.
+ static void *dlvsym(void *handle,
+@@ -1461,7 +1461,22 @@ int os::current_process_id() {
+ 
+ // This must be hard coded because it's the system's temporary
+ // directory not the java application's temp directory, ala java.io.tmpdir.
+-const char* os::get_temp_directory() { return "/tmp"; }
++const char* os::get_temp_directory() {
++#ifdef __OHOS__
++  // OpenHarmony uses /data/storage/el2/base/cache as the per-app default cache directory.
++  static constexpr const char* ohos_default_temp_dir = "/data/storage/el2/base/cache";
++  char* temp_dir = ::getenv("TMPDIR");
++  if (temp_dir != nullptr) {
++    return temp_dir;
++  }
++  if (::access("/tmp", F_OK) == 0) {
++    return "/tmp";
++  }
++  return ohos_default_temp_dir;
++#else
++  return "/tmp";
++#endif
++}
+ 
+ // check if addr is inside libjvm.so
+ bool os::address_is_in_vm(address addr) {
+@@ -1902,7 +1917,12 @@ const char* os::Linux::dll_path(void* lib) {
+   const char* l_path = nullptr;
+   assert(lib != nullptr, "dll_path parameter must not be null");
+ 
++#ifdef __OHOS__
++  // dlinfo(RTLD_DI_LINKMAP) is unavailable in OpenHarmony libc.
++  int res_dli = -1;
++#else
+   int res_dli = ::dlinfo(lib, RTLD_DI_LINKMAP, &lmap);
++#endif
+   if (res_dli == 0) {
+     l_path = lmap->l_name;
+   }
+@@ -3116,17 +3136,25 @@ extern "C" JNIEXPORT void numa_error(char *where) { }
+ // Handle request to load libnuma symbol version 1.1 (API v1). If it fails
+ // load symbol from base version instead.
+ void* os::Linux::libnuma_dlsym(void* handle, const char *name) {
++#ifdef __OHOS__
++  return dlsym(handle, name);
++#else
+   void *f = dlvsym(handle, name, "libnuma_1.1");
+   if (f == nullptr) {
+     f = dlsym(handle, name);
+   }
+   return f;
++#endif
+ }
+ 
+ // Handle request to load libnuma symbol version 1.2 (API v2) only.
+ // Return null if the symbol is not defined in this particular version.
+ void* os::Linux::libnuma_v2_dlsym(void* handle, const char* name) {
++#ifdef __OHOS__
++  return dlsym(handle, name);
++#else
+   return dlvsym(handle, name, "libnuma_1.2");
++#endif
+ }
+ 
+ // Check numa dependent syscalls
+@@ -4815,6 +4843,12 @@ jint os::init_2(void) {
+   // initialize thread priority policy
+   prio_init();
+ 
++#ifdef __OHOS__
++  if (FLAG_IS_DEFAULT(StartAttachListener)) {
++    FLAG_SET_DEFAULT(StartAttachListener, true);
++  }
++#endif
++
+   if (!FLAG_IS_DEFAULT(AllocateHeapAt)) {
+     set_coredump_filter(DAX_SHARED_BIT);
+   }
+diff --git a/src/hotspot/os/posix/os_posix.cpp b/src/hotspot/os/posix/os_posix.cpp
+index 7d139712002..c86a79ebf28 100644
+--- a/src/hotspot/os/posix/os_posix.cpp
++++ b/src/hotspot/os/posix/os_posix.cpp
+@@ -480,6 +480,7 @@ void os::Posix::print_load_average(outputStream* st) {
+ // unfortunately it does not work on macOS and Linux because the utx chain has no entry
+ // for reboot at least on my test machines
+ void os::Posix::print_uptime_info(outputStream* st) {
++#ifndef __OHOS__
+   int bootsec = -1;
+   int currsec = time(nullptr);
+   struct utmpx* ent;
+@@ -494,6 +495,7 @@ void os::Posix::print_uptime_info(outputStream* st) {
+   if (bootsec != -1) {
+     os::print_dhm(st, "OS uptime:", (long) (currsec-bootsec));
+   }
++#endif
+ }
+ 
+ static void print_rlimit(outputStream* st, const char* msg,
+diff --git a/src/hotspot/os/posix/perfMemory_posix.cpp b/src/hotspot/os/posix/perfMemory_posix.cpp
+index 790db31348c..1ef6c1ca578 100644
+--- a/src/hotspot/os/posix/perfMemory_posix.cpp
++++ b/src/hotspot/os/posix/perfMemory_posix.cpp
+@@ -135,18 +135,24 @@ static void save_memory_to_file(char* addr, size_t size) {
+ // return the user specific temporary directory name.
+ // the caller is expected to free the allocated memory.
+ //
+-#define TMP_BUFFER_LEN (4+22)
++#ifdef __OHOS__
++// OpenHarmony fallback username when USER is unavailable.
++static constexpr const char* OHOS_DEFAULT_USER = "100";
++#endif
+ static char* get_user_tmp_dir(const char* user, int vmid, int nspid) {
+   char* tmpdir = (char *)os::get_temp_directory();
+ #if defined(LINUX)
+   // On linux, if containerized process, get dirname of
+   // /proc/{vmid}/root/tmp/{PERFDATA_NAME_user}
+   // otherwise /tmp/{PERFDATA_NAME_user}
+-  char buffer[TMP_BUFFER_LEN];
++  // OpenHarmony temp directories are longer than "/tmp", so use MAXPATHLEN.
++  char buffer[MAXPATHLEN + 1];
++#ifndef __OHOS__
+   assert(strlen(tmpdir) == 4, "No longer using /tmp - update buffer size");
++#endif
+ 
+   if (nspid != -1) {
+-    jio_snprintf(buffer, TMP_BUFFER_LEN, "/proc/%d/root%s", vmid, tmpdir);
++    jio_snprintf(buffer, sizeof(buffer), "/proc/%d/root%s", vmid, tmpdir);
+     tmpdir = buffer;
+   }
+ #endif
+@@ -438,7 +444,15 @@ static bool is_file_secure(int fd, const char *filename) {
+ // the caller is expected to free the allocated memory.
+ //
+ static char* get_user_name(uid_t uid) {
+-
++#ifdef __OHOS__
++  const char* user = getenv("USER");
++  if (user == nullptr || user[0] == '\0') {
++    user = OHOS_DEFAULT_USER;
++  }
++  char* user_name = NEW_C_HEAP_ARRAY(char, strlen(user) + 1, mtInternal);
++  strcpy(user_name, user);
++  return user_name;
++#else
+   struct passwd pwent;
+ 
+   // Determine the max pwbuf size from sysconf, and hardcode
+@@ -487,6 +501,7 @@ static char* get_user_name(uid_t uid) {
+ 
+   FREE_C_HEAP_ARRAY(char, pwbuf);
+   return user_name;
++#endif
+ }
+ 
+ // return the name of the user that owns the process identified by vmid.
+@@ -518,7 +533,9 @@ static char* get_user_name_slow(int vmid, int nspid, TRAPS) {
+   char* tmpdirname = (char *)os::get_temp_directory();
+ #if defined(LINUX)
+   char buffer[MAXPATHLEN + 1];
++#ifndef __OHOS__
+   assert(strlen(tmpdirname) == 4, "No longer using /tmp - update buffer size");
++#endif
+ 
+   // On Linux, if nspid != -1, look in /proc/{vmid}/root/tmp for directories
+   // containing nspid, otherwise just look for vmid in /tmp.
+@@ -639,6 +656,13 @@ static char* get_user_name_slow(int vmid, int nspid, TRAPS) {
+ // return the name of the user that owns the JVM indicated by the given vmid.
+ //
+ static char* get_user_name(int vmid, int *nspid, TRAPS) {
++#ifdef __OHOS__
++  char *result = get_user_name((uid_t)geteuid());
++  if (result == nullptr) {
++    result = get_user_name_slow(vmid, *nspid, CHECK_NULL);
++  }
++  return result;
++#else
+   char *result = get_user_name_slow(vmid, *nspid, CHECK_NULL);
+ 
+ #if defined(LINUX)
+@@ -651,6 +675,7 @@ static char* get_user_name(int vmid, int *nspid, TRAPS) {
+   }
+ #endif
+   return result;
++#endif
+ }
+ 
+ // return the file name of the backing store file for the named
+diff --git a/src/hotspot/share/gc/shenandoah/shenandoahArguments.cpp b/src/hotspot/share/gc/shenandoah/shenandoahArguments.cpp
+index 7d31ff02e1a..fa003032c4e 100644
+--- a/src/hotspot/share/gc/shenandoah/shenandoahArguments.cpp
++++ b/src/hotspot/share/gc/shenandoah/shenandoahArguments.cpp
+@@ -65,9 +65,11 @@ void ShenandoahArguments::initialize() {
+ 
+   // Enable NUMA by default. While Shenandoah is not NUMA-aware, enabling NUMA makes
+   // storage allocation code NUMA-aware.
++#ifndef __OHOS__
+   if (FLAG_IS_DEFAULT(UseNUMA)) {
+     FLAG_SET_DEFAULT(UseNUMA, true);
+   }
++#endif
+ 
+   // Set up default number of concurrent threads. We want to have cycles complete fast
+   // enough, but we also do not want to steal too much CPU from the concurrently running
+diff --git a/src/hotspot/share/gc/z/zArguments.cpp b/src/hotspot/share/gc/z/zArguments.cpp
+index 192cad86e67..fa13317fa20 100644
+--- a/src/hotspot/share/gc/z/zArguments.cpp
++++ b/src/hotspot/share/gc/z/zArguments.cpp
+@@ -128,9 +128,11 @@ void ZArguments::initialize() {
+   }
+ 
+   // Enable NUMA by default
++#ifndef __OHOS__
+   if (FLAG_IS_DEFAULT(UseNUMA)) {
+     FLAG_SET_DEFAULT(UseNUMA, true);
+   }
++#endif
+ 
+   select_max_gc_threads();
+ 
+diff --git a/src/hotspot/share/runtime/globals.hpp b/src/hotspot/share/runtime/globals.hpp
+index bcd6d0291d5..21eb59d9a94 100644
+--- a/src/hotspot/share/runtime/globals.hpp
++++ b/src/hotspot/share/runtime/globals.hpp
+@@ -1992,6 +1992,9 @@ const int ObjectAlignmentInBytes = 8;
+           "(default) disables native heap trimming.")                       \
+           range(0, UINT_MAX)                                                \
+                                                                             \
++  product(bool, DisableDFXSignalHandler, true,                              \
++          "Disable DFX_SigchainHandler and use JVM's signalHandler only")   \
++                                                                            \
+   product(bool, UseThreadsLockThrottleLock, true, DIAGNOSTIC,               \
+           "Use an extra lock during Thread start and exit to alleviate"     \
+           "contention on Threads_lock.")                                    \
+diff --git a/src/java.base/unix/classes/java/lang/ProcessImpl.java b/src/java.base/unix/classes/java/lang/ProcessImpl.java
+index 3b302b23cd3..81c940e7ce7 100644
+--- a/src/java.base/unix/classes/java/lang/ProcessImpl.java
++++ b/src/java.base/unix/classes/java/lang/ProcessImpl.java
+@@ -97,6 +97,9 @@ final class ProcessImpl extends Process {
+     private static LaunchMechanism launchMechanism() {
+         String s = GetPropertyAction.privilegedGetProperty("jdk.lang.Process.launchMechanism");
+         if (s == null) {
++            if ("HarmonyOS".equals(GetPropertyAction.privilegedGetProperty("os.name"))) {
++                return LaunchMechanism.VFORK;
++            }
+             return LaunchMechanism.POSIX_SPAWN;
+         }
+ 
+diff --git a/src/java.base/unix/native/libjava/java_props_md.c b/src/java.base/unix/native/libjava/java_props_md.c
+index fd70cf61816..98468d07849 100644
+--- a/src/java.base/unix/native/libjava/java_props_md.c
++++ b/src/java.base/unix/native/libjava/java_props_md.c
+@@ -56,6 +56,11 @@
+ #include "locale_str.h"
+ #include "java_props.h"
+ 
++#ifdef __OHOS__
++// OpenHarmony uses /data/storage/el2/base/cache as the per-app default cache directory.
++#define OHOS_DEFAULT_TEMP_DIR "/data/storage/el2/base/cache"
++#endif
++
+ #if !defined(_ALLBSD_SOURCE)
+ #ifdef __linux__
+   #ifndef CODESET
+@@ -380,6 +385,17 @@ GetJavaProperties(JNIEnv *env)
+         sprops.tmp_dir = tmp_path;
+     }
+ #endif /* MACOSX */
++#ifdef __OHOS__
++    const char* tmp_path = getenv("TMPDIR");
++    if (tmp_path == NULL || tmp_path[0] == '\0') {
++        if (access("/tmp", F_OK) == 0) {
++            tmp_path = "/tmp";
++        } else {
++            tmp_path = OHOS_DEFAULT_TEMP_DIR;
++        }
++    }
++    sprops.tmp_dir = tmp_path;
++#endif
+ 
+     /* patches/service packs installed */
+     sprops.patch_level = NULL;      // leave it undefined
+diff --git a/src/jdk.attach/linux/classes/sun/tools/attach/VirtualMachineImpl.java b/src/jdk.attach/linux/classes/sun/tools/attach/VirtualMachineImpl.java
+index 3952ccd8d95..5609df18819 100644
+--- a/src/jdk.attach/linux/classes/sun/tools/attach/VirtualMachineImpl.java
++++ b/src/jdk.attach/linux/classes/sun/tools/attach/VirtualMachineImpl.java
+@@ -50,11 +50,20 @@ public class VirtualMachineImpl extends HotSpotVirtualMachine {
+     // location is the same for all processes, otherwise the tools
+     // will not be able to find all Hotspot processes.
+     // Any changes to this needs to be synchronized with HotSpot.
+-    private static final Path TMPDIR = Path.of("/tmp");
++    private static Path tmpdir() {
++        return Path.of(getTemporaryDirectory());
++    }
+ 
+     private static final Path PROC     = Path.of("/proc");
+     private static final Path STATUS   = Path.of("status");
+-    private static final Path ROOT_TMP = Path.of("root/tmp");
++    private static Path rootTmp(long pid) {
++        Path targetTmp = tmpdir();
++        if (targetTmp.isAbsolute() && targetTmp.getRoot() != null) {
++            // /proc/<pid>/root expects a path relative to the target root filesystem.
++            targetTmp = targetTmp.getRoot().relativize(targetTmp);
++        }
++        return PROC.resolve(Long.toString(pid)).resolve(Path.of("root")).resolve(targetTmp);
++    }
+ 
+     String socket_path;
+ 
+@@ -246,7 +255,7 @@ public class VirtualMachineImpl extends HotSpotVirtualMachine {
+     }
+ 
+     private String findTargetProcessTmpDirectory(long pid, long ns_pid) throws AttachNotSupportedException, IOException {
+-        final var procPidRoot = PROC.resolve(Long.toString(pid)).resolve(ROOT_TMP);
++        final var procPidRoot = rootTmp(pid);
+ 
+         /* We need to handle at least 4 different cases:
+          * 1. Caller and target processes share PID namespace and root filesystem (host to host or container to
+@@ -271,7 +280,7 @@ public class VirtualMachineImpl extends HotSpotVirtualMachine {
+          * note that if pid == ns_pid we are in a shared pid ns with the target and may (potentially) share /tmp
+          */
+ 
+-        return (Files.isWritable(procPidRoot) ? procPidRoot : TMPDIR).toString();
++        return (Files.isWritable(procPidRoot) ? procPidRoot : tmpdir()).toString();
+     }
+ 
+     /*
+@@ -405,6 +414,8 @@ public class VirtualMachineImpl extends HotSpotVirtualMachine {
+ 
+     static native void write(int fd, byte buf[], int off, int bufLen) throws IOException;
+ 
++    private static native String getTemporaryDirectory();
++
+     static {
+         System.loadLibrary("attach");
+     }
+diff --git a/src/jdk.attach/linux/native/libattach/VirtualMachineImpl.c b/src/jdk.attach/linux/native/libattach/VirtualMachineImpl.c
+index 52dce9e883c..87419afc5bb 100644
+--- a/src/jdk.attach/linux/native/libattach/VirtualMachineImpl.c
++++ b/src/jdk.attach/linux/native/libattach/VirtualMachineImpl.c
+@@ -24,6 +24,7 @@
+  */
+ 
+ #include "jni_util.h"
++#include "jvm.h"
+ 
+ #include <sys/socket.h>
+ #include <sys/stat.h>
+@@ -262,3 +263,9 @@ JNIEXPORT void JNICALL Java_sun_tools_attach_VirtualMachineImpl_write
+ 
+     } while (remaining > 0);
+ }
++
++JNIEXPORT jstring JNICALL
++Java_sun_tools_attach_VirtualMachineImpl_getTemporaryDirectory(JNIEnv *env, jclass cls)
++{
++    return JVM_GetTemporaryDirectory(env);
++}
+diff --git a/src/jdk.hotspot.agent/share/classes/sun/jvm/hotspot/utilities/PlatformInfo.java b/src/jdk.hotspot.agent/share/classes/sun/jvm/hotspot/utilities/PlatformInfo.java
+index f4cd4873207..9b806faa66a 100644
+--- a/src/jdk.hotspot.agent/share/classes/sun/jvm/hotspot/utilities/PlatformInfo.java
++++ b/src/jdk.hotspot.agent/share/classes/sun/jvm/hotspot/utilities/PlatformInfo.java
+@@ -31,7 +31,7 @@ public class PlatformInfo {
+   /* Returns "win32" if Windows; "linux" if Linux. */
+   public static String getOS() throws UnsupportedPlatformException {
+     String os = System.getProperty("os.name");
+-    if (os.equals("Linux")) {
++    if (os.equals("Linux") || os.equals("HarmonyOS")) {
+       return "linux";
+     } else if (os.equals("FreeBSD")) {
+       return "bsd";
