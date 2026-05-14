@@ -4,7 +4,7 @@ class OpenjdkAT17 < Formula
   url "https://github.com/openjdk/jdk17u/archive/refs/tags/jdk-17.0.19-ga.tar.gz"
   sha256 "b165f0dd120f4455904b76cf87dd9352fd23f88c2e9a33c2532fabacc3cca962"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
-  revision 2
+  revision 3
   compatibility_version 1
 
   livecheck do
@@ -13,7 +13,7 @@ class OpenjdkAT17 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a94eea94190ee8ae1d52fdfeb456c66ec18b7ec15fc372a0585de44e50ca7fba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b6090286c64e3907aedf2d14bd23d5a9d05e899138c4a4751717be8b28ae972d"
   end
 
   keg_only :versioned_formula
@@ -24,6 +24,13 @@ class OpenjdkAT17 < Formula
   depends_on "autoconf" => :build
   depends_on "pkgconf" => :build
   depends_on xcode: :build # for metal
+
+  depends_on "freetype"
+  depends_on "giflib"
+  depends_on "harfbuzz"
+  depends_on "jpeg-turbo"
+  depends_on "libpng"
+  depends_on "little-cms2"
 
   uses_from_macos "cups"
   uses_from_macos "unzip"
@@ -42,13 +49,27 @@ class OpenjdkAT17 < Formula
     depends_on "zlib-ng-compat"
   end
 
-  # From BellSoft
-  # BellSoft is one of the most trusted and mainstream vendors in the OpenJDK community.
+  # From https://jdk.java.net/archive/
   resource "boot-jdk" do
+    on_macos do
+      on_arm do
+        url "https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_macos-aarch64_bin.tar.gz"
+        sha256 "602d7de72526368bb3f80d95c4427696ea639d2e0cc40455f53ff0bbb18c27c8"
+      end
+      on_intel do
+        url "https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_macos-x64_bin.tar.gz"
+        sha256 "b85c4aaf7b141825ad3a0ea34b965e45c15d5963677e9b27235aa05f65c6df06"
+      end
+    end
     on_linux do
       on_arm do
+        # From BellSoft
         url "https://download.bell-sw.com/java/17.0.18+10/bellsoft-jdk17.0.18+10-linux-aarch64-musl.tar.gz"
         sha256 "ed7251cd91a979ed5bb6c6beff3c4fc458eb0efd85c8cf71ec64fb783f15fb38"
+      end
+      on_intel do
+        url "https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz"
+        sha256 "0022753d0cceecacdd3a795dd4cea2bd7ffdf9dc06e22ffd1be98411742fbb44"
       end
     end
   end
@@ -81,9 +102,14 @@ class OpenjdkAT17 < Formula
       --with-version-build=#{revision}
       --without-version-opt
       --without-version-pre
+      --with-freetype=system
+      --with-giflib=system
+      --with-harfbuzz=system
+      --with-lcms=system
+      --with-libjpeg=system
+      --with-libpng=system
       --with-zlib=system
       --enable-headless-only=yes
-      --with-copyright-year=2026
       --with-toolchain-type=clang
       --host=aarch64-unknown-linux-musl
     ]
