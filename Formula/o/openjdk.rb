@@ -4,6 +4,7 @@ class Openjdk < Formula
   url "https://github.com/openjdk/jdk25u/archive/refs/tags/jdk-25.0.2-ga.tar.gz"
   sha256 "e4b935e999a28ee732dfb932dcef4a8591b42f6fcd182099319db68e9d8017ff"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -20,6 +21,12 @@ class Openjdk < Formula
   depends_on "autoconf" => :build
   depends_on "pkgconf" => :build
   depends_on xcode: :build # for metal
+  depends_on "freetype"
+  depends_on "giflib"
+  depends_on "harfbuzz"
+  depends_on "jpeg-turbo"
+  depends_on "libpng"
+  depends_on "little-cms2"
 
   uses_from_macos "cups"
   uses_from_macos "unzip"
@@ -38,13 +45,27 @@ class Openjdk < Formula
     depends_on "zlib-ng-compat"
   end
 
-  # From BellSoft
-  # BellSoft is one of the most trusted and mainstream vendors in the OpenJDK community.
+  # From https://jdk.java.net/archive/
   resource "boot-jdk" do
+    on_macos do
+      on_arm do
+        url "https://download.java.net/java/GA/jdk25.0.1/2fbf10d8c78e40bd87641c434705079d/8/GPL/openjdk-25.0.1_macos-aarch64_bin.tar.gz"
+        sha256 "9175d602f3be2ffa241eb01d24ba4541e29a4dfa2095d4bdc1c9eb4bf4d56705"
+      end
+      on_intel do
+        url "https://download.java.net/java/GA/jdk25.0.1/2fbf10d8c78e40bd87641c434705079d/8/GPL/openjdk-25.0.1_macos-x64_bin.tar.gz"
+        sha256 "906fec42291d1f01b4cbd419eece8ff8872dbde1e74bb22e6a98ee0322a22bcb"
+      end
+    end
     on_linux do
       on_arm do
+        # From BellSoft
         url "https://download.bell-sw.com/java/25.0.3+11/bellsoft-jdk25.0.3+11-linux-aarch64-musl.tar.gz"
         sha256 "7f00976d3ee57be1021a4fa94101ff598f6a4367f330080723301fa71faf2645"
+      end
+      on_intel do
+        url "https://download.java.net/java/GA/jdk25.0.1/2fbf10d8c78e40bd87641c434705079d/8/GPL/openjdk-25.0.1_linux-x64_bin.tar.gz"
+        sha256 "514db33011f2c81fa9c589f7712735b42b9d2575db8f817d3be40a92d2ef7ad8"
       end
     end
   end
@@ -77,9 +98,14 @@ class Openjdk < Formula
       --with-version-build=#{revision}
       --without-version-opt
       --without-version-pre
+      --with-freetype=system
+      --with-giflib=system
+      --with-harfbuzz=system
+      --with-lcms=system
+      --with-libjpeg=system
+      --with-libpng=system
       --with-zlib=system
       --enable-headless-only=yes
-      --with-copyright-year=2026
       --with-toolchain-type=clang
       --host=aarch64-unknown-linux-musl
       --with-extra-cxxflags="-DSIGEV_THREAD_ID=4"
