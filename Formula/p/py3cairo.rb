@@ -7,12 +7,7 @@ class Py3cairo < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "5262a6f83c776ac9a3325488dd92216a9865f271d6de30de4b465ec771ee8968"
-    sha256 cellar: :any, arm64_sequoia: "7cc2d0de913b912639584bfe94d5658cfb82cb7c898b8269ad69c09747a28709"
-    sha256 cellar: :any, arm64_sonoma:  "f614c1cf5e35eaf7726331446258f9d7662182843715149bb316e0cc3f440816"
-    sha256 cellar: :any, sonoma:        "f915d3efc320997a2e05c5948b3eea84f5c7640cc58542fb4d86fe936416a5db"
-    sha256               arm64_linux:   "81629e2f6185689b774840bc69f19b56571f1fa8644545aa645c31fe2e3c61bb"
-    sha256               x86_64_linux:  "5692a6792c7aaf933469acc5ff1c51a6b21e11d8f98439f3baf9e525bd2e18b5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee379d49090df183f9f4ad8d9f3988d54902b75dc500ea0a53695be6c4ee505d"
   end
 
   depends_on "meson" => :build
