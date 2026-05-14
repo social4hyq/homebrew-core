@@ -4,7 +4,7 @@ class PythonAT314 < Formula
   url "https://www.python.org/ftp/python/3.14.4/Python-3.14.4.tgz"
   sha256 "b4c059d5895f030e7df9663894ce3732bfa1b32cd3ab2883980266a45ce3cb3b"
   license "Python-2.0"
-  revision 3
+  revision 4
   compatibility_version 1
 
   livecheck do
@@ -13,8 +13,7 @@ class PythonAT314 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "80b816da287b9dee014cf181341492e3637de0324269004a68f647f44d6c8892"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c2c656ad7bdd85522592383073781920ff5f128c182cb22667576941bfdfcbb2"
   end
 
   depends_on "pkgconf" => :build
@@ -32,12 +31,10 @@ class PythonAT314 < Formula
   uses_from_macos "unzip"
 
   on_linux do
+    depends_on "gettext"
+    depends_on "util-linux"
     depends_on "zlib-ng-compat"
   end
-
-  depends_on "readline"
-  depends_on "gettext"
-  depends_on "util-linux"
 
   link_overwrite "bin/idle3"
   link_overwrite "bin/pip3"
@@ -137,6 +134,7 @@ class PythonAT314 < Formula
       --with-openssl=#{Formula["openssl@3"].opt_prefix}
       --with-system-expat
       --with-system-libmpdec
+      --with-readline=editline
     ]
 
     # Python re-uses flags when building native modules.
