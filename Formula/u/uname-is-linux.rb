@@ -5,6 +5,10 @@ class UnameIsLinux < Formula
   sha256 "e2adc9dedd9d15d45515a1bfce9969c92bb471ec8415ad6f85d292a2ce4fbd3d"
   license "BSD-2-Clause"
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4be05bee0fafd83372348487f3a0f4bb9ecb4945d2772572949fb034757c6c6b"
+  end
+
   keg_only "it is a library for explicit LD_PRELOAD injection and should not be linked globally"
 
   def install
