@@ -7,13 +7,7 @@ class Graphite2 < Formula
   head "https://github.com/silnrsi/graphite.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any,                 arm64_tahoe:   "a5645201ace59a1ee7c24d075adf37ae1965018b41221062e8088b191763334d"
-    sha256 cellar: :any,                 arm64_sequoia: "a805dafe03fc697a0d2157a92d110be687f7136d360a483ca43c8f81cdfe4852"
-    sha256 cellar: :any,                 arm64_sonoma:  "1a57783f066cfb70115517438457ded104ecbb2d908586c58ebe0d6cd6117995"
-    sha256 cellar: :any,                 sonoma:        "1c40aed095158f418a818939a8398afab628147ec2bad529868d3f6fd1990f23"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "acc9b3af3f19b1246163a990bf74bec6b88f44f5c511ac70f0d73d6103b012ed"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5cdf99ed424bacc35f62e84ff807fef46263a543be38c479a7f4a6bd180ab705"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d90591daae237907e472e359aaae8bb0a17192a49024e8875508dae2ba923e2"
   end
 
   depends_on "cmake" => :build
