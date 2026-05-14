@@ -13,15 +13,7 @@ class PythonAT313 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "b9fcf3efe9f2b77cf649bba40c72dc1d216cafc94e7762bc45d99e07041021f6"
-    sha256 arm64_sequoia: "46c2c36ab19c56b360a6f3e05e19fbc5410552bc728a588c045d2a6107a53846"
-    sha256 arm64_sonoma:  "7fc4d080d28686d8d3b54bab9c2a1958d35abdf7d6bdb31ec58974ff55cf77df"
-    sha256 tahoe:         "d938748bf044ce7a50f622fbdfb039bddaeba3d13b6c5eb7536bc4973e806fe0"
-    sha256 sequoia:       "690991fc93c9d8a583be51bc1b8fe7d794fa1e5f8ae3ae8c614acef59a4af9b3"
-    sha256 sonoma:        "356e8604188a1446e4d281975d2c071f7645c4a0794476c50c70b8928567d6f0"
-    sha256 arm64_linux:   "26d1c264e1a631fe80c4349a349b40a6fd0b7fef0d030d014452e9f19ce15c45"
-    sha256 x86_64_linux:  "3066469631b118d7a05ff51e5c9d6e3d9839c0daf1b83c1dab0972a3822f4d89"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8286245bf70a7fa728c6a08285cc49203b15cd6dc06fdf289225653b945481bc"
   end
 
   depends_on "pkgconf" => :build
