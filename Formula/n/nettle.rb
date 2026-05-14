@@ -8,7 +8,7 @@ class Nettle < Formula
   compatibility_version 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "875ff7292c2f23962497afc8a1fc07fbf6c6ea7c1d76de066a41435feaa97fe8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8936c1da0c64c4ca44810cb6ffb1ab015a08f6ffe8e02a25bbd109f947cd2ed7"
   end
 
   depends_on "gmp"
