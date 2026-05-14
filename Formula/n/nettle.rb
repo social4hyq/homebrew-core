@@ -5,7 +5,7 @@ class Nettle < Formula
   mirror "https://ftp.gnu.org/gnu/nettle/nettle-4.0.tar.gz"
   sha256 "3addbc00da01846b232fb3bc453538ea5468da43033f21bb345cb1e9073f5094"
   license any_of: ["GPL-2.0-or-later", "LGPL-3.0-or-later"]
-  compatibility_version 1
+  compatibility_version 2
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "875ff7292c2f23962497afc8a1fc07fbf6c6ea7c1d76de066a41435feaa97fe8"
@@ -35,7 +35,7 @@ class Nettle < Formula
 
         sha1_init(&ctx);
         sha1_update(&ctx, 4, "test");
-        sha1_digest(&ctx, SHA1_DIGEST_SIZE, digest);
+        sha1_digest(&ctx, digest);
 
         printf("SHA1(test)=");
 
