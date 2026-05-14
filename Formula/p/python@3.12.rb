@@ -4,7 +4,7 @@ class PythonAT312 < Formula
   url "https://www.python.org/ftp/python/3.12.13/Python-3.12.13.tgz"
   sha256 "0816c4761c97ecdb3f50a3924de0a93fd78cb63ee8e6c04201ddfaedca500b0b"
   license "Python-2.0"
-  revision 5
+  revision 6
   compatibility_version 1
 
   livecheck do
@@ -25,6 +25,7 @@ class PythonAT312 < Formula
 
   uses_from_macos "bzip2"
   uses_from_macos "expat", since: :sequoia
+  uses_from_macos "libedit"
   uses_from_macos "libffi"
   uses_from_macos "libxcrypt"
   uses_from_macos "ncurses"
@@ -32,14 +33,12 @@ class PythonAT312 < Formula
 
   on_linux do
     depends_on "berkeley-db@5"
+    depends_on "gettext"
     depends_on "libnsl"
     depends_on "libtirpc"
+    depends_on "util-linux"
     depends_on "zlib-ng-compat"
   end
-
-  depends_on "readline"
-  depends_on "gettext"
-  depends_on "util-linux"
 
   link_overwrite "lib/python3.12/site-packages/pip*"
   link_overwrite "lib/python3.12/site-packages/wheel*"
@@ -125,6 +124,7 @@ class PythonAT312 < Formula
       --with-openssl=#{Formula["openssl@3"].opt_prefix}
       --with-system-expat
       --with-system-libmpdec
+      --with-readline=editline
     ]
 
     # Python re-uses flags when building native modules.
