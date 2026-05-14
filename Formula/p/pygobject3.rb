@@ -7,12 +7,7 @@ class Pygobject3 < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "af515b8c8be1f1e224ca0e669d330f9c926e6b9b3b0d5c3106688dc01398e94b"
-    sha256 cellar: :any, arm64_sequoia: "b01dae5887bfcd70d47ae83a8f22fe852e42029d244de447dc045398e3016f63"
-    sha256 cellar: :any, arm64_sonoma:  "dfc6ce7cc1daf8b5ff21fddc076a44f5cd55b27248adc4150f8978b8646215e6"
-    sha256 cellar: :any, sonoma:        "fe7694cb7e11b373bd8f20f7268a9123a87f46b2534b2a1693aa63fbefd65008"
-    sha256               arm64_linux:   "258da626c89c4b0f64c2eb37b63eaf91926c8467dfaacbdb1ab9c054d42abe36"
-    sha256               x86_64_linux:  "5b6e90a45e8c613564b13141b56dd8a0cc79ea4c3b28f1c9d4d4dec462df7f46"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4055cb61591c5486540c7dc98fffedca3b79d554e7fa403c720113517de49f18"
   end
 
   depends_on "meson" => :build
