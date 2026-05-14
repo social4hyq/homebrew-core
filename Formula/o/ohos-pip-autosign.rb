@@ -5,6 +5,10 @@ class OhosPipAutosign < Formula
   sha256 "c19145f6f52585746c0a75c2bdcd140c0ea732b904cce4e3a8d2a6265321381d"
   license "BSD-2-Clause"
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6dd9d0a7e5fd29c04abc1cd09e730166d397a24a689ad888f07434cd7618a3fd"
+  end
+
   depends_on "ohos-sdk"
 
   def install
