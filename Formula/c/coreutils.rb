@@ -8,8 +8,7 @@ class Coreutils < Formula
   compatibility_version 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "025fea56412a9fc9e4ed5bbbcc56b6c13dbeccd6d0b1ab79fa1d7234e6a1282f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd9365b57133febf2724fdb1faa07ceb483a5e2328328acfb7b0c9a71eaca332"
   end
 
   head do
