@@ -1,14 +1,14 @@
 class Nettle < Formula
   desc "Low-level cryptographic library"
   homepage "https://www.lysator.liu.se/~nisse/nettle/"
-  url "https://ftpmirror.gnu.org/gnu/nettle/nettle-3.10.2.tar.gz"
-  mirror "https://ftp.gnu.org/gnu/nettle/nettle-3.10.2.tar.gz"
-  sha256 "fe9ff51cb1f2abb5e65a6b8c10a92da0ab5ab6eaf26e7fc2b675c45f1fb519b5"
+  url "https://ftpmirror.gnu.org/gnu/nettle/nettle-4.0.tar.gz"
+  mirror "https://ftp.gnu.org/gnu/nettle/nettle-4.0.tar.gz"
+  sha256 "3addbc00da01846b232fb3bc453538ea5468da43033f21bb345cb1e9073f5094"
   license any_of: ["GPL-2.0-or-later", "LGPL-3.0-or-later"]
-  compatibility_version 1
+  compatibility_version 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "875ff7292c2f23962497afc8a1fc07fbf6c6ea7c1d76de066a41435feaa97fe8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8936c1da0c64c4ca44810cb6ffb1ab015a08f6ffe8e02a25bbd109f947cd2ed7"
   end
 
   depends_on "gmp"
@@ -35,7 +35,7 @@ class Nettle < Formula
 
         sha1_init(&ctx);
         sha1_update(&ctx, 4, "test");
-        sha1_digest(&ctx, SHA1_DIGEST_SIZE, digest);
+        sha1_digest(&ctx, digest);
 
         printf("SHA1(test)=");
 
