@@ -7,12 +7,7 @@ class Dstask < Formula
   head "https://github.com/naggie/dstask.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "efdbaee9c2da836d8c3d05b93d720bc050fcb6f46877cef12e76f414bf6569a6"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "efdbaee9c2da836d8c3d05b93d720bc050fcb6f46877cef12e76f414bf6569a6"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "efdbaee9c2da836d8c3d05b93d720bc050fcb6f46877cef12e76f414bf6569a6"
-    sha256 cellar: :any_skip_relocation, sonoma:        "a9f4a54b271f2bdf01ee6ab72ec6362c4771c73fb9d8f600411eece08014b354"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7e2fb5c0a8e18d13225127f8456e9c7c8a1420c8428716a05accc2710bf5fb6d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6a6ac3f39000b80965df68e139c59b8b81d9f68bae6146c5f718fede4cfe7a00"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88eac4d398e2273181230863bd292f69a3ca20d73ebd2cd68b815350ceba859c"
   end
 
   depends_on "go" => :build
