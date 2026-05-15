@@ -7,14 +7,7 @@ class Lhasa < Formula
   head "https://github.com/fragglet/lhasa.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c54634d428cfdd0fe31a8d993387e1d4d166e1081b82ab919354805a948ed432"
-    sha256 cellar: :any,                 arm64_sequoia: "d6af1ccf1e48330e1c9b9d7a63187e2a963196cc65b6995ff236ecaa9fd8470b"
-    sha256 cellar: :any,                 arm64_sonoma:  "d6da687747be968b1f452bb2c4f7df58dae56ac8c12bd9a7e22c800cbcd75ad6"
-    sha256 cellar: :any,                 arm64_ventura: "c4a2d8a1b69b741ccc11541fe34c22eaf1ed22497d139f8f82ccc1488922cf38"
-    sha256 cellar: :any,                 sonoma:        "8f514fe7d1d4d3621ceec8d41d130e0a362ceefd0be091e4cce36c01658d426e"
-    sha256 cellar: :any,                 ventura:       "b3cb1bf8712c3b58ad3bb0fbaea6f480969b16c1fcb803db5291f29bf9ea44e2"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8ad64de0374f0f74a9517c25f1641881a1e9fd24c538f500ae54445794831c2b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fdb0cf0122a0acc12b80c409bc0d5e6e5a023909948068eeb2f3753f2ef9008c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "940b19064b86f4e93afe94c3a5b4998b752be635b8f76e7e76424287fb56d10b"
   end
 
   depends_on "autoconf" => :build
