@@ -7,12 +7,7 @@ class Wgcf < Formula
   head "https://github.com/ViRb3/wgcf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "09a2d9d054df9f938a6ba1a2c6e78fef704c042cefa20d624d30814cffb1d659"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "09a2d9d054df9f938a6ba1a2c6e78fef704c042cefa20d624d30814cffb1d659"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "09a2d9d054df9f938a6ba1a2c6e78fef704c042cefa20d624d30814cffb1d659"
-    sha256 cellar: :any_skip_relocation, sonoma:        "abfb16110ebfe84fe340587f1e8f3e674094c468b4b14a6159325667e899dbe0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "11e09aea187b8d8e88cc2c4846cf3c49aab45e900922b56b32cc78f3485e8079"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9ae80ab0bb56632e4a8249c291db64c5143968422ec9548c7f87fe371d52b05b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc4555752610377f8413beda7cc56b6443ea0ba5cd24010ed7829393a64cd7a4"
   end
 
   depends_on "go" => :build
