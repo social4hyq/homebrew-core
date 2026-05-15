@@ -15,12 +15,7 @@ class Spoofdpi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f30aadc2198a830c7afbcf3ae77cee7b1d793a47ed35da022646aae94dc8f94d"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "92154552ed01f86e7826c03e5e719dddf274f47dd01be319be770204d67b7059"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "030dc6f6f158c4fa8fc538c4577ce25a328167804dc389d0ec666eaf65ab20e9"
-    sha256 cellar: :any_skip_relocation, sonoma:        "bf5021038e17b0a4a9d67f7b6377d7ff852187569cc79de7399b266b363ab5e6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "41c04f77ace14af317a2fe5ed09c572e1f9818df474b8498b7591c779a8d0a98"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "92c03771d252a4124caa65a4bc68ee69cc27d91fb4b0414e8cb8845328c0f433"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "059356cfae65979537d57c259abc199debcd37bcde1738b0a7c842f766692d40"
   end
 
   depends_on "go" => :build
