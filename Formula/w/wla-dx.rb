@@ -12,16 +12,7 @@ class WlaDx < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:    "11d1d2d3fdc767d15e21dd37a176fe35438cf438c8ff05e9344e69da674acac2"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "f89cc32f88279298a841ee744557214695dffdc76c35f43f28610715c38b35d1"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "01e0f38cf29c205e76cb0950a41847867d3ee007e877f6607e5e5c352fe222da"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d86083d1dd34ccbb5f8309052d57e9b5ee52de04f7382510f41ba82e19d3b1ff"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "3ca9f57e6ed396fd20774c44c4619e4b9583a772d3d0751ea90751e3ddb06545"
-    sha256 cellar: :any_skip_relocation, sonoma:         "9ff72ea731a055cf23c426ab45fe5e33169ba1a4979c74ac90a9edd84a04730b"
-    sha256 cellar: :any_skip_relocation, ventura:        "db9b75eba0fe4403c2c41faaa0fc7d49bf173e32c8240718d18413aee0609d35"
-    sha256 cellar: :any_skip_relocation, monterey:       "6397fad5d0f3bbdb81022766ca0784206cb611dd7db402fb7eff80bb703860b8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "08c9e8db294a9c53c600dc9ed33dad82e58783710f679c3961dafe5c7f04d41b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3e5860c11c5bbbdb62949e01df2af3d006f8315f5d30a2d4f4c25740a57ef883"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d30d0889f611771598f4a77b46fbc50fee8da581abd6c5159df5a1c1364da4d"
   end
 
   depends_on "cmake" => :build
