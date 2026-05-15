@@ -7,12 +7,7 @@ class Dsvpn < Formula
   head "https://github.com/jedisct1/dsvpn.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "06ad6babce8270f21d7b98ea3e7aaac1b2bcfa4815b39b75561de68193149a9b"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "78343612a40f3a9ba3c70ad6339c69e04c18262d54da9cc22c550fbc63dbe949"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1d45aa8e155e087221a37d22bdb86b86eff6ff721f0a711082c87d2b9d5781a4"
-    sha256 cellar: :any_skip_relocation, sonoma:        "db2467dae361b23cdfc06e2a98a4d64f987b8a314d74eb2a3e54087c0e55e142"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2d67ee9ff361e38d1f7c78f22c110b4f07d7a00568f6327254a3c2fe326f72e1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e4329c90e50ec594f40ba135a486f53781a838491792f72f0e2be6b5997df7af"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "101eb8fb37aa67492c4bf6815a1c81f81c30de8bbe316ec905c3d982d8002343"
   end
 
   def install
