@@ -7,8 +7,7 @@ class BashGitPrompt < Formula
   head "https://github.com/magicmonty/bash-git-prompt.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "5049efb01e5ceb83df920dfe1c5dd23595401e3c700064fee74afbf9949d4f8f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a617b3b44591022e2bac600070a77b5d7e22066b46592b0665aefcda17788015"
   end
 
   def install
