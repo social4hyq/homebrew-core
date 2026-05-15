@@ -7,12 +7,7 @@ class Termsvg < Formula
   head "https://github.com/MrMarble/termsvg.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "363363e29f811eb53cd39e456c15c7c6ccef0f00f84bb0edd67b22151265c42e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "363363e29f811eb53cd39e456c15c7c6ccef0f00f84bb0edd67b22151265c42e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "363363e29f811eb53cd39e456c15c7c6ccef0f00f84bb0edd67b22151265c42e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "6b803686c893179cef6188beb67d6e7c1eb9af8dbea5a0dfc3a3a8931ca16e5e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "bbcb76116d128262297b857a7d6858b717ba81ff742e224d4e5bd7943433d93d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0ea62b9ca79d8a7fd00715bae7f7a76d072a303cc2b6e60aca1dc474773f2d69"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ab55fcde6c50cafe2c208d61b96f4a10b4f7b46bd06162b567a997327e3bfb7"
   end
 
   depends_on "go" => :build
