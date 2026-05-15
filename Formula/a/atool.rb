@@ -11,8 +11,7 @@ class Atool < Formula
   end
 
   bottle do
-    rebuild 4
-    sha256 cellar: :any_skip_relocation, all: "7bdc1cec48daaf7c140aa3ebb5e32ea863e560947ff2ed110339f84bdcea25c4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "93d06032e49aefcdfffc16fab27160aaf69b194940b0debb09e7d57b87586ec8"
   end
 
   def install
