@@ -7,13 +7,7 @@ class Fsql < Formula
   head "https://github.com/kashav/fsql.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "5998a7b21ebfca7e45beb100540c2c03e40b2a46fadd68f411f2d23ce94804d1"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5998a7b21ebfca7e45beb100540c2c03e40b2a46fadd68f411f2d23ce94804d1"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5998a7b21ebfca7e45beb100540c2c03e40b2a46fadd68f411f2d23ce94804d1"
-    sha256 cellar: :any_skip_relocation, sonoma:        "362bd94a4a9c87e587ea8bd66e5eb9343c7db121f9c0484fbcfdae8175f992d8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fef8a76b6a6e113d05e3d2ffbc507da6aab473f01e95b9cdb95bd1ba5e03c5bf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3d3ac241c87450ec9515b9e98fd34a35cc5ebc77779af8575637834f6e9eddd8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c79975bc1496b1fbe6d3613be35eb5b1ed1e15d7426d917b6db92625dd012f8"
   end
 
   depends_on "go" => :build
