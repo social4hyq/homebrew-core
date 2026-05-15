@@ -1,0 +1,42 @@
+class SwaggerCodegen < Formula
+  desc "Generate clients, server stubs, and docs from an OpenAPI spec"
+  homepage "https://swagger.io/tools/swagger-codegen/"
+  url "https://github.com/swagger-api/swagger-codegen/archive/refs/tags/v3.0.80.tar.gz"
+  sha256 "386235163329de6ab7d6d4c5d9532940f3c732ef085d415a92850834706950de"
+  license "Apache-2.0"
+  head "https://github.com/swagger-api/swagger-codegen.git", branch: "master"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f50e2a46533670b2bb923f949ca320ba43c907594307296696542476b8393497"
+  end
+
+  depends_on "maven" => :build
+  depends_on "openjdk"
+
+  def install
+    # Need to set JAVA_HOME manually since maven overrides 1.8 with 1.7+
+    ENV["JAVA_HOME"] = Language::Java.java_home
+
+    system "mvn", "clean", "package"
+    libexec.install "modules/swagger-codegen-cli/target/swagger-codegen-cli.jar"
+    bin.write_jar_script libexec/"swagger-codegen-cli.jar", "swagger-codegen"
+  end
+
+  test do
+    (testpath/"minimal.yaml").write <<~YAML
+      ---
+      openapi: 3.0.0
+      info:
+        version: 0.0.0
+        title: Simple API
+      paths:
+        /:
+          get:
+            responses:
+              200:
+                description: OK
+    YAML
+    system bin/"swagger-codegen", "generate", "-i", "minimal.yaml", "-l", "html"
+    assert_includes File.read(testpath/"index.html"), "<h1>Simple API</h1>"
+  end
+end
