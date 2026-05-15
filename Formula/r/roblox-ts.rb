@@ -6,7 +6,7 @@ class RobloxTs < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "6d98816e699214c5748777941e369d721923661bf31c8ba67e71050aebda82cb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "10471eed43744aa59a088cbc688f6f2dae82f48cf581712cc6878534cf4fd022"
   end
 
   depends_on "node"
