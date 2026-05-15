@@ -12,12 +12,7 @@ class GoCritic < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "36f3b8b5a46c5c69662d86c2ce02536aa8cd0852096f1292f732626b4a147e70"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "36f3b8b5a46c5c69662d86c2ce02536aa8cd0852096f1292f732626b4a147e70"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "36f3b8b5a46c5c69662d86c2ce02536aa8cd0852096f1292f732626b4a147e70"
-    sha256 cellar: :any_skip_relocation, sonoma:        "a362645959022e39c2b229e6159b79dc5b30f218d8fbe58fa53d69ecf3117d76"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f0dd5e70661ab061df20bde3752473eddbc9f45e5f33a1cfcbe6e50d9d688d61"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "69d045cfbb182d91c41e6f11210579be1013377ad00ffb63aea243be86c1dc61"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1428ce88a4716c7f2abbb4505d3f1e2bf3fdd4da2d6d75c0421c9ea7e6d9aac"
   end
 
   depends_on "go"
