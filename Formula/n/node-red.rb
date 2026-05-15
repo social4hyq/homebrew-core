@@ -6,12 +6,7 @@ class NodeRed < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "23594ca739c36c492a890fd518aa9cdb2e53cdb221804c60b671b2b41bad9b00"
-    sha256 cellar: :any,                 arm64_sequoia: "7a2230e23af080f58b7c5beed90013348885f8a20ac9d516be2c8f6c1e3844a6"
-    sha256 cellar: :any,                 arm64_sonoma:  "7a2230e23af080f58b7c5beed90013348885f8a20ac9d516be2c8f6c1e3844a6"
-    sha256 cellar: :any,                 sonoma:        "c8d84c2009b7703d3aa0f089519b0ca1482cc5cfd509526f0fa81f3b9f25b886"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "27420d13d1f053ad225e77af853f62e8b1a68c9557eb90ee87d5c0903641c90e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ffca3b081ef1357cf321577bd9565848b2b83fc6c793afb7386914830938da5e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d68f07eb13a745c78f8aec2ac92965f62dd403c04d45119f2a5aeec1d5735c35"
   end
 
   depends_on "node"
