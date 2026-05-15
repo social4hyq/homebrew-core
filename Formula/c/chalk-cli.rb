@@ -6,7 +6,7 @@ class ChalkCli < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "888e67d06c5fbe66c72de1de9f759ed9f32fd7a88d9f2158c3626b13f9ecbca6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "90af2224fad5c53035063339e0b3b07520624174a32e31a8ac4084e15d1e46a6"
   end
 
   depends_on "node"
