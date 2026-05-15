@@ -7,13 +7,7 @@ class Terrascan < Formula
   head "https://github.com/tenable/terrascan.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "036641e1af3550fa344928b99fdabcb1b11961e3b0812bb15f8f3cddaa259023"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5c5210ca6ec0c8dd636a8e5a154f8ea0b75361beead716efbd83143b4475d986"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "835ec90adf52e9d99a51bdc96789a542529bcdcf21c5e511c2f0ed961c5a1dff"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c48066b69004a0dca1cbc0c5c8071430f9bb61c208a85c43e1814a3d48573614"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ca058cf4a6962757ebe84e7c2c4a910a53a17f26a52f6b7675248c6437613f1c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1da9aea6b543cbb9ffb3716413505ed1ed0ec1ad731a62309b54c39211ab3b51"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eddcadf334e4e49cdf9d52f7c49fc7b53f13cbbb76c3fc086fd5ddba41101c83"
   end
 
   depends_on "go" => :build
