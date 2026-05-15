@@ -6,8 +6,7 @@ class Stepci < Formula
   license "MPL-2.0"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "98104a3592dd43f41522aae67073e1eed4344638c7501aa6617af89ee207d163"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e1d8a5542f242913d2f54fb27b6178aaece3f0a5fd630027994f9098f933f2a"
   end
 
   depends_on "node"
