@@ -7,12 +7,7 @@ class Keploy < Formula
   head "https://github.com/keploy/keploy.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "1d25a2ec127d6c4c99dab4f6a04d95e1b66a877dbeaeaf137dd5da9d1eddda8f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1d25a2ec127d6c4c99dab4f6a04d95e1b66a877dbeaeaf137dd5da9d1eddda8f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1d25a2ec127d6c4c99dab4f6a04d95e1b66a877dbeaeaf137dd5da9d1eddda8f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "624bf3f7e3df3eca1a4b42a10d08634f8ad41f7d0e0bf9c175f7683de2721e53"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4be122e078cda41d567e0d0b0b728e96f883b84fa1581601e776d22c1c70f5db"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "de8b4852b417b56bc829b28f16cdf49c115de40acb6f13589e45a07fe9e612f8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "407f260da7cb770471978da190dfd764d0d48156de540cb17d715ec544663177"
   end
 
   depends_on "go" => :build
