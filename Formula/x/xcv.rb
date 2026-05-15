@@ -7,8 +7,7 @@ class Xcv < Formula
   head "https://github.com/busterc/xcv.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "d9e0dfc790cbc0a90240e2964f439260ea656a826d7688730bd9c304232e733d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cba9e2b01a5c52445d7272b1e5a72697521e760067e1572a8b357ec60c0f4129"
   end
 
   def install
