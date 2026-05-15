@@ -9,7 +9,7 @@ class GitTools < Formula
   head "https://github.com/MestreLion/git-tools.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "ba1a42e203720e6a74dcdfefb2653be957015fbd115415686b119975f111bdb6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "97f0b88ab18bc4a8f4c145d603d2b41a65af30057b1b30a90e2148582b362d59"
   end
 
   uses_from_macos "python"
