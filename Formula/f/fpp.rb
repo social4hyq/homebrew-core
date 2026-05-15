@@ -7,8 +7,7 @@ class Fpp < Formula
   head "https://github.com/facebook/pathpicker.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "3cd7e3e25d729646c8cbb993eaa2c3d517dc128693dcdbc39bd1362c11429390"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be11f277186a7753cd834e34b9a1b28e9bbc054527c6abc2b72f836bdee925cb"
   end
 
   uses_from_macos "python"
