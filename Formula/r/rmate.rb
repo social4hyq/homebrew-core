@@ -7,8 +7,7 @@ class Rmate < Formula
   head "https://github.com/textmate/rmate.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "fb6dd771050399730a0a7592fe0a135705a294b10fd02263bd6cfcbc284cee2a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f62661e8395982c4338e0dec953abc57774d214ea7136aab8b1ac8e17aea620"
   end
 
   uses_from_macos "ruby"
