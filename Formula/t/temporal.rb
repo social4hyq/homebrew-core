@@ -12,12 +12,7 @@ class Temporal < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d1dfe7e4bcc2f8d0386301b45c4d82d5152e948fc450114bc6dc40610da99009"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "14cd88aacac4f829d016c6ba2550d463bacf3e20733b49485cad13f540b9cdc6"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "60f7ade57aad9c906efe5b6be0ad89ae409eae55a96e64c986cfa523c53aeae7"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ebca1bfc24f310d0f2157dea1ff4ce7c2a7daf99e08427557f211eaa46a2ac28"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b93d0f5191e813324e7d639b70ee98ab5460ad0ed39fe852b42aa77506ef37a3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3b4cf42ec2d1c63509f2846dbb5e9bd2c6a38c438ca787beda562ce65920b80e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "60af427ff4f9dcf454a5e09583209a9520c0d5bb0286c00f9b0009133fa5cd02"
   end
 
   depends_on "go" => :build
