@@ -6,12 +6,7 @@ class McpToolbox < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "7e435dc10aa0f144353c9015edff199de682e52498c6fbba33e5983e25c8216f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8f0d581d48353e813d0efc17d2247f2d102c2c2a32cf123916ffa7bb2f388b4c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b8a5566fdc8d5aa6db5304801381516f08c4d18928b08081b70b322d0e64a24e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d9481b10cb2c00b8cf6c88dc9ce7c8b4a811e0708a35129d2f086dd1e8fe0dff"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "69082bcef71341c90abbec1aa0626f3434f088772d9f7fee2bcddf6e4d3ff8ff"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1ac6ded0a1c5c1817aa8eefc49e6db19e79fd5e3bbcefb02445975bc2b66abb5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8fe7e089113f464e00d6c9b0ca09866d9654eb04b23875e3c60252388e49954"
   end
 
   depends_on "go" => :build
