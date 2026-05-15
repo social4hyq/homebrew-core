@@ -6,8 +6,7 @@ class LibpthreadStubs < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "303b8c21fc1b9322b6bd8f24e75a4e53a1c331d09b4f6271f75eba743d119819"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e7b5fdd78fb93db2941b5627a66b5798d7d91a3bcb984861693417c1e0a5a72"
   end
 
   depends_on "pkgconf"
