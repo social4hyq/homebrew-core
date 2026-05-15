@@ -13,12 +13,7 @@ class Lynx < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "b09ddbe33e1e219183d99898e65aad94084ac685657203a1ac1f64a584e45c22"
-    sha256 arm64_sequoia: "6eb6e6941ef97b8a19cb4dbc39c27dbd3accb6a3f8d64f1700f4f32ed2810d57"
-    sha256 arm64_sonoma:  "34ab10d18649a2d01a70358ca8b7e37b6a4f6f5ddf8a35e5d8058914c912ff8c"
-    sha256 sonoma:        "d4647fcb2b60ec32056e395eebf2fece4d20dbce9968e4c8046133be6f701be6"
-    sha256 arm64_linux:   "af87f614a7653a2f5aa891b467721b781ae1e3f8b746f68d1c4eb7a4753c39cf"
-    sha256 x86_64_linux:  "955b23500f5f853d2baf9fe16c82347e078e183f75db73001efcd7705d92a143"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6597ec13ed4ed0b6acc5a5f5bc94fe6ee88bb93bfd6a46c505a0442bc822a5de"
   end
 
   # Move to brew ncurses to fix screen related bugs
