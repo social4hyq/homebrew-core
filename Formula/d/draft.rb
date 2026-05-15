@@ -7,12 +7,7 @@ class Draft < Formula
   head "https://github.com/Azure/draft.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d421ee84bd5e9645501210f787dbab90fb8397488f4886b100cfde2ea76056f7"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "aa70d3160f12bcfcb745032d00f548e965e2c110ab8ea7b920d55d6724412f53"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "08a267d3651f0c9a3cd68b09f4899adbcbe5dc866091da7d5ac1d1ca16014a91"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ad7fa2b985e02b879f9fa933fcf45d247293bab01ddfbd48cbf48ed7b398014b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a69f7663d99a27e99c89e5bf08c40cd0bd48102a4cf9817d298b95eddde7688b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9389136adfb076edbd6f0b449905aaefc9f0ad5905e10fe2e571e37f18c7a925"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "076b8a9b8237af766bb4caac5860f14d8f6d07381741b2e5783029ff0850b9e7"
   end
 
   depends_on "go" => :build
