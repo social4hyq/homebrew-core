@@ -7,14 +7,7 @@ class Cflow < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 arm64_tahoe:   "7677a8663bf8dbc2178670bc1db544f12fbb8c87d644c3863457e40ff6a6ea84"
-    sha256 arm64_sequoia: "6d482293b619d39dba15d8a1956ab25b4434ae53fe93ac269e9ffd2af7f33cdd"
-    sha256 arm64_sonoma:  "e2f7275d45e7808088c8912fb70dca9f5f1bc98e9375ef67fc9ecca3b5f6bba9"
-    sha256 arm64_ventura: "723f38543a7356fd374a9753005605a93d705b6c9723c8ef40ae31176b54e05d"
-    sha256 sonoma:        "8347d85dfa5f30c5e3697842e7130d6ef3b712eb250eb945d312a97040020581"
-    sha256 ventura:       "18555eed054a739c2bf0a562deebc509ab53c96964937b3cbc223d9a1617b2ee"
-    sha256 arm64_linux:   "dbcdfdec9d78e04d94d2ed339ead98ffd3d1c45ff101d5f06d546582bcbc19c0"
-    sha256 x86_64_linux:  "fc739d521aacfc482f787c8843057c122317b3a91434bafd55cf94f182ef4f93"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8939f9f90eca3d4c51f00050aad6f25a5274a757fb302e11e21747e39c3001e"
   end
 
   def install
