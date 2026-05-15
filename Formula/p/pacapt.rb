@@ -6,8 +6,7 @@ class Pacapt < Formula
   license "Fair"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "6691ef309d2ebf4b001358e04a24bf93569f5dfc42c31811cadffd6c3e605444"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c70c6ccace4bac779a7e1828eca4953a621f0f25cd7e27dc43bb2ea3fd63f95"
   end
 
   def install
