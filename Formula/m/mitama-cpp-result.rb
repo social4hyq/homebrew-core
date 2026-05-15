@@ -7,7 +7,7 @@ class MitamaCppResult < Formula
   head "https://github.com/loliGothicK/mitama-cpp-result.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "28440190e9a47c233c1ad311a8adb5d4ecee78b57ee8b790c35a12ae27110419"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1fa24c4f7b9a9a3db1f2ab5b8bfceadc13463038127d7751576868cd7c88c0a8"
   end
 
   depends_on "cmake" => :build
