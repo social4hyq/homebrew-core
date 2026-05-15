@@ -6,8 +6,7 @@ class Mailsy < Formula
   license "MIT"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "458e2530def02e452e870febacbd9fa372d0c504b16b721ab0610fd4e57043f2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f33d229c83c2bb450c2359296e0bc912f0f320014ef88d7443ba1bb285fba6a"
   end
 
   depends_on "node"
