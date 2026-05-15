@@ -6,8 +6,7 @@ class Sloc < Formula
   license "MIT"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "24e858bb8b1a883aa3bff9443299ab2be4b978dbede386c35047ede3958584c5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "988909c31310bd8ec7c8d7df7368a707ae1a87d16483bbc1cd5f54de5e10be1c"
   end
 
   depends_on "node"
