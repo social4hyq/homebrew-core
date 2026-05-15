@@ -1,0 +1,27 @@
+class Buildozer < Formula
+  desc "Rewrite bazel BUILD files using standard commands"
+  homepage "https://github.com/bazelbuild/buildtools"
+  url "https://github.com/bazelbuild/buildtools/archive/refs/tags/v8.5.1.tar.gz"
+  sha256 "f3b800e9f6ca60bdef3709440f393348f7c18a29f30814288a7326285c80aab9"
+  license "Apache-2.0"
+  head "https://github.com/bazelbuild/buildtools.git", branch: "main"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aad771236ecd80e71a876606dff135e898fc9bb25cda486b45db6e1b1c96e5b5"
+  end
+
+  depends_on "go" => :build
+
+  def install
+    system "go", "build", *std_go_args(ldflags: "-s -w"), "./buildozer"
+  end
+
+  test do
+    build_file = testpath/"BUILD"
+
+    touch build_file
+    system bin/"buildozer", "new java_library brewed", "//:__pkg__"
+
+    assert_equal "java_library(name = \"brewed\")\n", build_file.read
+  end
+end
