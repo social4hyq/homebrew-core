@@ -7,13 +7,7 @@ class HdrhistogramC < Formula
   compatibility_version 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "d6176ee0c8f1da767cf07c9bc3f1481de19d9e500cafaa1896065ab2e5961cf9"
-    sha256 cellar: :any,                 arm64_sequoia: "8e2ebaf0b19adeda703f29a398f06a370bfc26e1c491e5485581b897c376180d"
-    sha256 cellar: :any,                 arm64_sonoma:  "4d62d2a9add2e38b3a446786b87a533fa5ffe737d32511cad60cabc60c81df66"
-    sha256 cellar: :any,                 sonoma:        "890f9ac2df4f21715c3e14a8e3cc370004e8959268ef36246494ed4043be85b8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e5af92ae3629352a0e39691af319f65ca20108cf56acb807661408a63f57ef29"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "10d7ecdf95eb22af3ba8e15175e25cf00a88ec7357171f96dfb9cf3d529528c4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ec35d1170cdabb9b9db7dce619d93628a871908ea7b67a5fb68ad58ffaf9b6f"
   end
 
   depends_on "cmake" => :build
