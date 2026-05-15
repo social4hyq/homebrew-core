@@ -16,12 +16,7 @@ class LaceworkCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "2b36a493cdeab10fd0666a6131b8c0815ddf87d4f835ef7a675e2dbca26e5bc2"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2b36a493cdeab10fd0666a6131b8c0815ddf87d4f835ef7a675e2dbca26e5bc2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2b36a493cdeab10fd0666a6131b8c0815ddf87d4f835ef7a675e2dbca26e5bc2"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b19f7a4c7c61530079ee32e6d7b4da383ee58350d656a834377f49b017073e6e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f7e3701019c3f753895d0f09c6d80895da58cb9e163ab657d821f8de9f858184"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b5d8ae313acee94ed9da023e14464420363619c201d959cdd873f65c96fa4464"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "acc1e0882a6bae0707492f740f5b8eceda23ef01fb9e5fdc9bbdd46a560c3102"
   end
 
   depends_on "go" => :build
