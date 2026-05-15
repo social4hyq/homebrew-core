@@ -6,7 +6,7 @@ class DockerComposeLangserver < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "a017c7c6e4396b8f8fdad2e301cd99df373af2dea6a6eb41f3b05213ca50ac93"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc0f311dc47cb15f9f8cc847c589644561b3dad566b44dd707d9f742cf6805ee"
   end
 
   depends_on "node"
