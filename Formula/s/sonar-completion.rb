@@ -7,8 +7,7 @@ class SonarCompletion < Formula
   head "https://github.com/a1dutch/sonarqube-bash-completion.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "26ce38d7913a1a421b3ea7dc99d32b9f3bab8e2bf95c50a1e2fbfca0419dd376"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "774abf8dd4209db810e7e364024aff1065f81800b13037d52131b7ca087044d9"
   end
 
   def install
