@@ -7,13 +7,7 @@ class CloudProviderKind < Formula
   head "https://github.com/kubernetes-sigs/cloud-provider-kind.git", branch: "main"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "4c9a8248d6c8b7b94c81abb21d2595527ec32a8bac75ac5595476bef075feb03"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f71abaa7663200092f8b198f09930bc311b811be957e26adda42b818d069ae4e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "685eb50040567782880926ab4b29337b1f945ff8db7e1532a403eae1b2ed2c74"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d4a72446756aa5a41f10a1ff78861b6630ace289acc0896427557bf8884d80ae"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0380652e2cba6d08efbd5a1f8c0bb8c7134e2fe92627ca67ead13a04189ff66c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6ea290e4546708f40d79a226969f39b33387e7658d6f0f736d375737cba30bdf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "206c2412f9e14d7abeaa7c610be0516f8be9958c5d7ce677623a3023c2091bac"
   end
 
   depends_on "go" => :build
