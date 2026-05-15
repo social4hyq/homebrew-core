@@ -6,13 +6,7 @@ class MarpCli < Formula
   license "MIT"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any,                 arm64_tahoe:   "7184f11832c79e45e0e4fb35e161b11dfc8710043b5d032ad97ccde3745ce41c"
-    sha256 cellar: :any,                 arm64_sequoia: "0becc63a887acace3fb76abddc37a396a916fc617b3709056fb18119f54743d4"
-    sha256 cellar: :any,                 arm64_sonoma:  "0becc63a887acace3fb76abddc37a396a916fc617b3709056fb18119f54743d4"
-    sha256 cellar: :any,                 sonoma:        "93409a22c28dc94865c581b99b72dbda134b2c560565edeaebdb2c681b8b250f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e133b0e595c3d74725c96d3197f1b91f1a050f071eb72d0e68ad0e600b524eff"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "984c8825484b69b885583b5160e83ab24680cea8438ae8d1b2c24ab03611275e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f08b4daace8acfc57040fe633859d9abc687daa43fe7434a1b06dd58fc890f9"
   end
 
   depends_on "node"
