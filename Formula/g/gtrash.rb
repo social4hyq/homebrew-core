@@ -7,13 +7,7 @@ class Gtrash < Formula
   head "https://github.com/umlx5h/gtrash.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "eb3b1bd8138c592581fc7ce7f3258e8cb63f0b249924bc868e73f24d6ddb2738"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "eb3b1bd8138c592581fc7ce7f3258e8cb63f0b249924bc868e73f24d6ddb2738"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "eb3b1bd8138c592581fc7ce7f3258e8cb63f0b249924bc868e73f24d6ddb2738"
-    sha256 cellar: :any_skip_relocation, sonoma:        "3fcca14d1153b9a849fc117ca195c626be58f2466c46684f2cfd38392a6012ad"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4fff31885606b9a3cf5642f91fdb40529488b74ff646913a72577ef156c31d59"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5e639a18c6dd01c500543db61e10c3588abf938d46687d36a14be74aff27cc07"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bfa86bc07bf9a8727d0247b0556441f4e26e5fd43ada791338c328cef104809d"
   end
 
   depends_on "go" => :build
