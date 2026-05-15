@@ -15,14 +15,7 @@ class Ain < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "e0f860b88ce92fc60e45285259aad2671904bfca0d1b929e47204c2a32bddab2"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "470ca30ee09a8e40745f90086841c36f4efe34acdd7c7398089a6a6597314bfa"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "470ca30ee09a8e40745f90086841c36f4efe34acdd7c7398089a6a6597314bfa"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "470ca30ee09a8e40745f90086841c36f4efe34acdd7c7398089a6a6597314bfa"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9299bcb45b88a76fa588d7352925a379b41cc6cfc0d23f4c38b80903b2391bf5"
-    sha256 cellar: :any_skip_relocation, ventura:       "9299bcb45b88a76fa588d7352925a379b41cc6cfc0d23f4c38b80903b2391bf5"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c56fbc38b0d4116a3fff8bfd8dcc8d0ed9860433b03625a7dd4a60c6c628ead7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0b63dff05d2c4e4c322a6f4213271cf5e5a80d9a55d8a0cdca5dcbf3bda87748"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6404ab3370852f9c76e3ddc12750d119a88e7f9fd6976face83d51086daf2d0e"
   end
 
   depends_on "go" => :build
