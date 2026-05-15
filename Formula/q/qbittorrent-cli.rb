@@ -7,13 +7,7 @@ class QbittorrentCli < Formula
   head "https://github.com/ludviglundgren/qbittorrent-cli.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "716525b58fbeb4067f489a3eb10428012b3fa9bcf3210a8054cae07778378e1e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "716525b58fbeb4067f489a3eb10428012b3fa9bcf3210a8054cae07778378e1e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "716525b58fbeb4067f489a3eb10428012b3fa9bcf3210a8054cae07778378e1e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "3e5efce627c5e7478eea9103fb6d7804785d5596b666f00603d7d5ea89ee28dd"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "800339a3ae35a1ce3a8e523a5da78433475910b71186386a212ae4705928d3d5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "beba3400eaf3260e34176efee850cd40f05ccb387156640327aa0495db3b9b7c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5017a5b68886fd90bb9a9ac51b447f7c7be0a567e59880b8f64a952532bf6d39"
   end
 
   depends_on "go" => :build
