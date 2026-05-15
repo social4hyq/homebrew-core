@@ -6,8 +6,7 @@ class Gvp < Formula
   license "MIT"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "7570737e59ef17b2cde9b25b56a9f148a839924b0e0bc9b9a91e30ee95b6a3e6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "09123ffceea3d156a475085b557c21c9db1de1f6fcf937bb2b888a243c078e70"
   end
 
   # Upstream fix for "syntax error near unexpected token `;'"
