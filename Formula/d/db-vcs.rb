@@ -6,8 +6,7 @@ class DbVcs < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "babb3e6342f742d8b4ffa1773605d2c946d01c67829bcaaaa71b701781d99ddf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f45dc7a0cd1605d14c393cd8e678f5573b5d56d3af1e44f41221e1c65a1a329"
   end
 
   def install
