@@ -11,12 +11,7 @@ class Minuit2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "2d54068117e8154f7776195ae733e3e84248b1ce299bce5cf9db862785375313"
-    sha256 cellar: :any,                 arm64_sequoia: "739ca6a23c37bf68510c2aa5f64576e31d93e9f5d4f4bbf7aab17e55c62effb7"
-    sha256 cellar: :any,                 arm64_sonoma:  "5346bd0a6cd0a0cdaee3c96217b67aed8f117ef75a84dd45976034092da28906"
-    sha256 cellar: :any,                 sonoma:        "6a3c7b50bdb7a0378e5c57cf9e4e8529fcdcfbde148c1aab8f9f8317ff6fd831"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "046ee37136a470df335fd6a5601c0c17ebeac20230b40b3e5793c2ef817830c8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9674d3dc7961fdee7ab64a87d54b61ce05c88dbcb5491540f59ce92a9e6af116"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "34388111e3e10455a9cbc514bc794cb27e69a9715135d6bccd69a57cd9011b3a"
   end
 
   depends_on "cmake" => :build
