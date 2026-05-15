@@ -9,12 +9,7 @@ class Mdv < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "7e3f993dff2c2285c95d307052eb788af49064b39416a4af601f1b6c8ccff2ed"
-    sha256 cellar: :any,                 arm64_sequoia: "2b2066297ec9e9fe3a49ebab06160e6a8c40b13e70ae5c2afe1e67a2066923b9"
-    sha256 cellar: :any,                 arm64_sonoma:  "4948a815dfb995aafe81414e4c8ff8cedf80654574d8521bb71c2aff69e9955c"
-    sha256 cellar: :any,                 sonoma:        "182702c80f2feeb950166ccff5f33825d02207948503d3a540c808836b749cd6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "bcae45fe0cd6e612aa92fce775f120a8414c2937005f0d1821712abd29f1820e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6db5f55e163a5bcdfcc3e2cb15ac45717470850c7c980145ba9fc5e0ff54813e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "74bff2178fdbef5fbc033b8e79752a8dac962e0122493719a85c25a4d20c3ed7"
   end
 
   depends_on "libyaml"
