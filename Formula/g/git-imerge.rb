@@ -17,8 +17,7 @@ class GitImerge < Formula
   end
 
   bottle do
-    rebuild 6
-    sha256 cellar: :any_skip_relocation, all: "45eec1f8fc1d680a3148b4d2b6d1e2a87fa6c792be7a8793b9e35d5b82d057f3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "28d1d6bd35099e27ecaea9f69b720ef73317d72416a8c9fc22f44738f9960042"
   end
 
   depends_on "python@3.14"
