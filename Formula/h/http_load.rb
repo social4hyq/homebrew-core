@@ -22,20 +22,7 @@ class HttpLoad < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:    "5b5b959ce2f9aae731f7234d123194dfc5694d31b1dcd505b98546a0bbec14f7"
-    sha256 cellar: :any,                 arm64_sequoia:  "3d19f59b28f7f602e80aef16d2455d98513a6886a58910287ac5845bdcd9733b"
-    sha256 cellar: :any,                 arm64_sonoma:   "185664add7e628ad4614228aef6bf0b18356077ddd71abf3eae39ae12a2e2d03"
-    sha256 cellar: :any,                 arm64_ventura:  "4349eea05cac8aef36a6243f8051208cddfda24966252b1ca079c3a89855b913"
-    sha256 cellar: :any,                 arm64_monterey: "b4a5b7e79f524a59d414c14ff40ea8ad5a0871a6c98606e721c8f83320cdd230"
-    sha256 cellar: :any,                 arm64_big_sur:  "f8ad486c4e8c9eb7f5204584c74de6e366e3e2ab1452682dc9904badec75e4d5"
-    sha256 cellar: :any,                 sonoma:         "27129e350fa06c4e302145c55a83a0b41f4ab96ebf371de001151d537929ccb8"
-    sha256 cellar: :any,                 ventura:        "a6416934e52f12730249f9175afefb89dda92f939aa880961b48613561eeb124"
-    sha256 cellar: :any,                 monterey:       "03949d76fa9a565a4e52e3219a097eef0453bb082a77674a16a66e407f6bba24"
-    sha256 cellar: :any,                 big_sur:        "04650d6cbf5dce7109ed1ce45a1bad45ae6d2706d3b5dd2baf411b198a3c5e27"
-    sha256 cellar: :any,                 catalina:       "6989c80f8d5213ed9e9586707e8ce2ab503b5d7bf6d10fadddd8bc310575f452"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "21d002bd2aa7f0c6f9bb57c13777d961e01a3e149769017c6ed91cb4a1ea0f1c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5172c491fea4e76a68983d8fe6563a97e2ed2bef73b6bb0c95f5290282343116"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db4d791e1dce2eef0f8b7d8e746a9dafe51df1f85bac78c193f01d3d624b10e7"
   end
 
   # Upstream repo url is only available via http.
