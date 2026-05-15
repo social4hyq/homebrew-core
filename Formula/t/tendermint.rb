@@ -12,20 +12,7 @@ class Tendermint < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:    "ddc9b6cc60737cbd10628628ad914d6e1330a2a327eec2795674ae15b7f0c714"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "1511d60c1245cac653fda123d49181a5041a49edfc6c33649161c032035a5d1e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "68ef6b0500008a57a4bd732acfdb8e8952f4de2832742cb8b4979be3bdde5089"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "fa03d9507cc713dc1d85b03a5374f52f0b1fa9a8bdeff7f04fabb0ce54158ac4"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "fa03d9507cc713dc1d85b03a5374f52f0b1fa9a8bdeff7f04fabb0ce54158ac4"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fa03d9507cc713dc1d85b03a5374f52f0b1fa9a8bdeff7f04fabb0ce54158ac4"
-    sha256 cellar: :any_skip_relocation, sonoma:         "b19905fb5656c1f5412b8d669f7eaa43ff73b54825b5379b4964b3561b3b59ae"
-    sha256 cellar: :any_skip_relocation, ventura:        "c764c958d1586a5fcf8a8ba7ede5c8edd7f350dec38689c13fd61d6e00154a3d"
-    sha256 cellar: :any_skip_relocation, monterey:       "c764c958d1586a5fcf8a8ba7ede5c8edd7f350dec38689c13fd61d6e00154a3d"
-    sha256 cellar: :any_skip_relocation, big_sur:        "c764c958d1586a5fcf8a8ba7ede5c8edd7f350dec38689c13fd61d6e00154a3d"
-    sha256 cellar: :any_skip_relocation, catalina:       "c764c958d1586a5fcf8a8ba7ede5c8edd7f350dec38689c13fd61d6e00154a3d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "50a1fe51c2ba29d7b0bda7a8b103a950cad2267f1e859cb525bd51b989bc91f5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fad00242ca40a9571b66d96a4f31268ee81fa317726834d82475630267d9ef13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0257eac608a9e0eea0de204f21c4628c31118fa230e1438c8b822159a276c4e2"
   end
 
   depends_on "go" => :build
