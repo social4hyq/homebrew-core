@@ -7,12 +7,7 @@ class Zix < Formula
   head "https://gitlab.com/drobilla/zix.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "a2caa9a4a3c1d808886349f7e83a4faf142e9bd013b881047ecfcee1ce5b6338"
-    sha256 cellar: :any,                 arm64_sequoia: "c5af8595950f1294f8cec733c452c09742721ec154477103b3e4ad0270afa20e"
-    sha256 cellar: :any,                 arm64_sonoma:  "601886f43ccadbd571d61385ae8487f5bf40563cb1e2aec7b3925d0eb52ed6c6"
-    sha256 cellar: :any,                 sonoma:        "0d3ee7b239f61e53be24ca66fc61b1fa51e64709e855c705e4013c96c46b7e76"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "abb43fca2d5a4418b636b99560f30e051b1d83f57c16b2a171b5d4e9590624fa"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "94d2a4ebb9e9d5f9a1bd1d991ed5da942df3630636b45b5c31db7537bc811e1c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "959756764cef8d42cf6a64edc2a12f03ff07323d7c4484736b9412026ab9591d"
   end
 
   depends_on "meson" => :build
