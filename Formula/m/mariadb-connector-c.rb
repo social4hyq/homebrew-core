@@ -26,12 +26,7 @@ class MariadbConnectorC < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "01d614467287c61b78cb78e9234d1c445dbd79beb4b9c12bf99ed0beb1a01535"
-    sha256 arm64_sequoia: "0970698d342c0c98b3a4efeb408e764d4ca12d6c015d2cd41e0f1700bab34bdc"
-    sha256 arm64_sonoma:  "78e4cc822105fd0699d3913dedb784b5d30596a0ee140932071933afd1b1a338"
-    sha256 sonoma:        "79501ef30e2ab77c3894897428269d33b80a9cb1c7a9ee4df3a119ecc508473a"
-    sha256 arm64_linux:   "b3242cc136211ae92f6559f959e94ff963fa6822900784c0f98c7893e30cf01d"
-    sha256 x86_64_linux:  "9a2b2d89b014881733d2ee25d06a4ce7f0c17bcdb159059036ed068784a6d415"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9148dc844240e2ea43feebd5d17b7a855b3d18cfe269897cac9de7c2152de0c9"
   end
 
   keg_only "it conflicts with mariadb"
