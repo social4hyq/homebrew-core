@@ -12,8 +12,7 @@ class PipesSh < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "339995e9ef29b4952bf61b4fe406d71c4c6ad5fc96e3e8f291d98150c6789cb8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "225be0fa0be3cd0300a5fd3748eb0eac2c8af58dfd7bbdfa8e33baa003fdca47"
   end
 
   on_macos do
