@@ -19,12 +19,7 @@ class LuajitOpenresty < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "11a758f6839bddeb7d4a56ebc1576e05a58c21edd86029cf1281a8e609f23fb8"
-    sha256 cellar: :any,                 arm64_sequoia: "312fc483a58579f33eaf8ac52dd7d8f7e605159e940c18602e89a0c9344242f5"
-    sha256 cellar: :any,                 arm64_sonoma:  "cd00e1aa4f7e0d273dcc5762f7aa514ef657355366cc95e4431e44bf9ed5f151"
-    sha256 cellar: :any,                 sonoma:        "6a417b53dc69a8457de6555936002e0780874186a2aa7cc5de77d866bb84c6cd"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "cf69845307577b7de81a4baeaa193f88828dac58597678b92f2d2fffaf9a441a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8d12ccf03922b3e24e8b7063a641e419ba43f6983ee4967fcd3cd89cbab0b35d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a691e251dade390761103783ce7f11d1fda8baac52acd04600b2239d0c8b4159"
   end
 
   keg_only "it conflicts with the LuaJIT formula"
