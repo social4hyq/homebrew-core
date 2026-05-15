@@ -10,12 +10,7 @@ class MongoOrchestration < Formula
   head "https://github.com/mongodb-labs/mongo-orchestration.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "84d32d45bd081cff62c2cef2caf17c4bd08e5e1b606fcd45855c33c7d80cc547"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "22264bf684f690f3f940361386976d1661f251dbc855b947bf50838f265f9209"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ad28a560526e26b717dec40fee3d8f324fb6033574d99195075d8a59c622af7f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "bcc64537c9412d4bd956c51ae7a4635fa46cfa3860d2dae2fc9c39292a6bf608"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9baf99e15c919df0025e4a97285a7241b64c85d57630e82852cc42575b269178"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "301fcab1e9cea5923d0183c09c92b2bbcbffc1002c2992e34dc210bf7ea220be"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7576e0a1ee2f2253d0db20e3e83ac97901b33a9f61737ea7e2d4063cb0a22c7"
   end
 
   depends_on "certifi" => :no_linkage
