@@ -12,12 +12,7 @@ class Kubetrim < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "a0e95614b8dcd84e2adfcca2d7798ba72c0aa45654e3acc19dbbb4f064164ae0"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a0e95614b8dcd84e2adfcca2d7798ba72c0aa45654e3acc19dbbb4f064164ae0"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "a0e95614b8dcd84e2adfcca2d7798ba72c0aa45654e3acc19dbbb4f064164ae0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "33acd64292aff0e9ccb905d1442ae48275ef8ea314e8d2999340fbbb65f66553"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3c156a2f72625bbd022c028f32d93bda8b61eeb91c50b43924e93ab683a264dd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3e68c9d12f445dfeacb5b7da067f20d7965ae7278b65717eee33d151d45cffdb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "df949108825277885483e5668b28923be37048cb94f2cb008b2479b944d8e889"
   end
 
   depends_on "go" => :build
