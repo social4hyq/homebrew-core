@@ -7,14 +7,7 @@ class Screenfetch < Formula
   head "https://github.com/KittyKatt/screenFetch.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c72a4b90d0fb8ffa29a46c886c26d93470d5a46a447edbe880e736c4223a4e14"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c72a4b90d0fb8ffa29a46c886c26d93470d5a46a447edbe880e736c4223a4e14"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c72a4b90d0fb8ffa29a46c886c26d93470d5a46a447edbe880e736c4223a4e14"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "c72a4b90d0fb8ffa29a46c886c26d93470d5a46a447edbe880e736c4223a4e14"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b68576c5aa125ad2165db21d10aab8d618bf1b39f984d7aba6f9b5ea49024e42"
-    sha256 cellar: :any_skip_relocation, ventura:       "b68576c5aa125ad2165db21d10aab8d618bf1b39f984d7aba6f9b5ea49024e42"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a427038281e7efce1130d08f039d557bf1338d3f12a4ab3d316454496bde26b4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a427038281e7efce1130d08f039d557bf1338d3f12a4ab3d316454496bde26b4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d131ce3f5854a020ee49f17355a2113b3d7b1e85a0d2e65dd3d0020ce8ef9b82"
   end
 
   # `screenfetch` contains references to `/usr/local` that
