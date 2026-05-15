@@ -7,12 +7,7 @@ class Cloc < Formula
   head "https://github.com/AlDanial/cloc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "510402328ad2e7168f94ba8bc210a96cccdb504fa0eb03bec5b5ff8704529c60"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "510402328ad2e7168f94ba8bc210a96cccdb504fa0eb03bec5b5ff8704529c60"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "510402328ad2e7168f94ba8bc210a96cccdb504fa0eb03bec5b5ff8704529c60"
-    sha256 cellar: :any_skip_relocation, sonoma:        "0315d2e9392d3c831b8669f6c960eb31dc86f71d0b4c42e95cba771a0fd913a0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7cb99d35e6037db0b92b9b6887f881499229c09941d8bd431ebdde45c62b9360"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "505c01b326543a8c2841457a793e4213b6069d8f0f568d9f636eeef94663b7e0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f1f7ade6be6981a7ae29a64213476ab89cc7e5ecb562c8dc2eeba04e53f9a15"
   end
 
   uses_from_macos "perl"
