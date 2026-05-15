@@ -7,7 +7,7 @@ class Screenfetch < Formula
   head "https://github.com/KittyKatt/screenFetch.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d131ce3f5854a020ee49f17355a2113b3d7b1e85a0d2e65dd3d0020ce8ef9b82"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bdf782b4bf2865246819c53e2720d6ccd1888ff3425afab92ac0ede6a25f1cf6"
   end
 
   # `screenfetch` contains references to `/usr/local` that
