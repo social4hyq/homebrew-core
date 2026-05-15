@@ -7,13 +7,7 @@ class Ko < Formula
   head "https://github.com/ko-build/ko.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0bde2f0196739939b8d40c71a749f703663511d505757d0c037d47a4452aa3e1"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0bde2f0196739939b8d40c71a749f703663511d505757d0c037d47a4452aa3e1"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0bde2f0196739939b8d40c71a749f703663511d505757d0c037d47a4452aa3e1"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9cbfa0acc43aa64e3f99f16c54fb117bddb6eda078de8b411d8815115b90233f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "6b17a62d65df38d8e704d192a17fa800a56a487427cdbfb0c5b25e3f5f3ee544"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1d92244e21a8a0f4f080d93831ad9f873809aeb50f5308fa9e19667de080978c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1bba599512b8c5bc6f0c1dc5e2c6fccdd952bf742fd03faf5c2920ddd7c16238"
   end
 
   depends_on "go" => :build
