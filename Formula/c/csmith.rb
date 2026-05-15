@@ -12,19 +12,7 @@ class Csmith < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:    "5dd099418eb9b36019dfabac7bad13d6d2c0eb6d01700c57fbb6323b6c8331d2"
-    sha256 cellar: :any,                 arm64_sequoia:  "8da68f418cb134b12223efaea3b1a32c75d51a975458ec0b95ea5cfb90b2810a"
-    sha256 cellar: :any,                 arm64_sonoma:   "52a3fef01ef8a1161d9695787c592c17d405fba995615a6420d5723b8fd49e09"
-    sha256 cellar: :any,                 arm64_ventura:  "289f49509657abe2bebc5f5b18f95df1c27860bb9cb9cfb6c5b740bb7ee77010"
-    sha256 cellar: :any,                 arm64_monterey: "27b069ffcef5994e076353234fed07390d0a2462abc2b851669f619f30f6881c"
-    sha256 cellar: :any,                 arm64_big_sur:  "79b39e5332514e816d46c871b31a283e9d16adc4d39f2b5177c3569ce2508c4a"
-    sha256 cellar: :any,                 sonoma:         "d848b6c49abb0999c8ab6da4ee3ed292cd014338ad26bc5a1e007f58f7cefb03"
-    sha256 cellar: :any,                 ventura:        "4e49e28ba325a522c1fc7581bb550bad3d7e411aad88b2eb13e64e049bfb44fc"
-    sha256 cellar: :any,                 monterey:       "2ea649dec15e5b7387bde10f8c564c168455ab7b0bca454e669aba28413b10d6"
-    sha256 cellar: :any,                 big_sur:        "1194af6247da39f02e322f002dacb9654fb1b614a77ecab2a384bb8715493d01"
-    sha256 cellar: :any,                 catalina:       "fdce1186c77ea774ed5575cd59bc194ab35725d3117c9a57bd54ce351a620965"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "7dcd32413bf5de8028c02d4e648fca8799aa716f58ae19a7df00eada072888da"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "527b8e04eb83e46dd0a24ea321f71bed291f11a158338c1106241365ba3a849b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d0133ec62282908987c90f5bc7dd4157ffc2f0966ee62c4d1d44c86da7340c2"
   end
 
   uses_from_macos "m4" => :build
