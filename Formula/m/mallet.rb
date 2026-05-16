@@ -8,8 +8,7 @@ class Mallet < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "2a79370bb96c6b93c4e5ccea01dfd09deeea7bcd7410c34ebfbd0584e24939e3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "04ae9defa170f73bab699abaeb4279c0e215974f6dfa53eca0dc6e87ce7f8c40"
   end
 
   depends_on "openjdk"
