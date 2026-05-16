@@ -8,8 +8,7 @@ class Serveit < Formula
   head "https://github.com/garybernhardt/serveit.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "3cd9f9b37e4a1bfff7bd9e9731af43ea6c6b9a07698eecc1f53d1725a6d2f9ef"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac6cd73e28d327101b7f2ad63c2dd6ee212bd2dd33f12fcf2be5b69f7d91b074"
   end
 
   depends_on "ruby"
