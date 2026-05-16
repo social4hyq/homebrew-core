@@ -7,12 +7,7 @@ class Libpaper < Formula
   compatibility_version 1
 
   bottle do
-    sha256               arm64_tahoe:   "9237f117ff7639ec37411bc1186b1c857d83460a4c4309ec4cbdce0286c829ff"
-    sha256               arm64_sequoia: "fbbf0d4966874406973fcacb2cd8265b7cc593ad4fb5f65b773f87cfe52dfd9d"
-    sha256               arm64_sonoma:  "55b133377debbd9934e790907be38c291863e9c645d4e50401d8231d471e1580"
-    sha256 cellar: :any, sonoma:        "32b59bfd2d5a0b5e036a90dc63ab5a2b8826d6f3ca863b2c92e999a7df4e53d9"
-    sha256               arm64_linux:   "ae03dd149881ec2ccb3790da8949ad2945b0cc96c02615c6764998ba1ed17342"
-    sha256               x86_64_linux:  "2e5c313c3f87f029c4dc2bd6e6c084ddfbed6ff40e322572b5e806e79a1efaa1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f19bd15561b672b9bc7149495397fb77c75e9e761ecaf343179fd6f4415a53d5"
   end
 
   depends_on "help2man" => :build
