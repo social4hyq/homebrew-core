@@ -8,13 +8,7 @@ class Beanquery < Formula
   license "GPL-2.0-only"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "b0ea637446c2d7eb8930e746b3be679eeae47b1076caf5058db7663c8a58af38"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6ca536f7312cd6167419431e34d58244102d1cdc5baa9423932b3d32bc54b60f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "45ef625aee5f37785cebbaa263bfe2dd164bdea24048c0b18692f4dedc3e8fc4"
-    sha256 cellar: :any_skip_relocation, sonoma:        "40dd1c6d699b8e9ec7ffe963810b8dfe632d6ec400ff2a194f6f2e757af73ce5"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "39e9789b913f6c9cab4d48316faa39cf02c2f4ac679516039dde84136c7d66e2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ed19884643dbf00f34a7ed9765324a7d04d84adf58432bce9281b27629e57290"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e24b872023085fca17078c06e5040497d901db87a955440b0a8d643745b221f"
   end
 
   depends_on "bison" => :build # for beancount
