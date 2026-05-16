@@ -7,14 +7,7 @@ class D2 < Formula
   head "https://github.com/terrastruct/d2.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "61a38ce31638ad307378e0031fce216fbf8e5082132ac4866ab5ca81e7337010"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2a82ceeada44a2e61646f59f749286ee4347ca364fe568007235089844fe473f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2a82ceeada44a2e61646f59f749286ee4347ca364fe568007235089844fe473f"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "2a82ceeada44a2e61646f59f749286ee4347ca364fe568007235089844fe473f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "cfca943125fe7319b8bd9a09256b9e62a6185d378b2394c307273a488567616e"
-    sha256 cellar: :any_skip_relocation, ventura:       "cfca943125fe7319b8bd9a09256b9e62a6185d378b2394c307273a488567616e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "06d2bb3e6e93b2734ef66111772aefb0120938dabfb2697dad37e119e09f0157"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "74e100511019db1329966018c384c0be60853e9e2bb5de50e8d4b092da92552a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "74fabe61f23d6ef991234ee01e3e5520a1831688d02f087293301cc4880fc773"
   end
 
   depends_on "go" => :build
