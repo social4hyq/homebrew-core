@@ -7,8 +7,7 @@ class Zplug < Formula
   head "https://github.com/zplug/zplug.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "c99ea3312515bf7de844cbe43af641afebe319549ff5c8c719ccebff79810999"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "85e622b7f6d1263acf0261ee430cb83da796a3ace6fc56b5bfdf7fbe57be7f1b"
   end
 
   uses_from_macos "zsh"
