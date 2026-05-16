@@ -12,13 +12,7 @@ class Asciiquarium < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "4b32a2ef9eccd44115dbbbf648622b9148932d3846ed842b9091d50fe73d0e85"
-    sha256 cellar: :any,                 arm64_sequoia: "aaa66f4be6401098af1104b81f2e05f870701b9892459c6f2fe4fc29acaf069e"
-    sha256 cellar: :any,                 arm64_sonoma:  "7bfb5f807029ce81b3431b08e2ec86d192caa227ff93a7dedf3ae63e2994f9df"
-    sha256 cellar: :any,                 sonoma:        "a9afe38c263f5370a0bcc6ac41bbaebee22d23bb52ff128cd9a6855fe1fbaafe"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "60b613a92e9ed7968fdc494724884349c644d03a8d763f8ed3abc15f65c42ec7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8b82f3ffd2fd47e88de054aa7d0569bf0a817be6a11017e8739cf7e014eb7681"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b77c6dae782caebcd77e4f7af28beae025dd69b1aa4d8adb7d7c99686398a1c"
   end
 
   depends_on "ncurses"
