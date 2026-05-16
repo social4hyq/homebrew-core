@@ -8,7 +8,7 @@ class PythonTabulate < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "cf5d7aede52290a5bf98484a5d72b5475f88a6cf877a8b2e04a6d284f927bf3d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e48558048b9e50fae9f53b804916b345e5af491f478d5494235b5f329bd385c0"
   end
 
   depends_on "python@3.14"
