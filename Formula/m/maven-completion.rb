@@ -7,8 +7,7 @@ class MavenCompletion < Formula
   head "https://github.com/juven/maven-bash-completion.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "ac7e72e1637a50e24735e49aafdcaab5e1a71ceeff85a1836489f6d12a2de263"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "40e70414a49e6f507a061315b2068f8296b733b845b23ef897087a3d643c3d52"
   end
 
   def install
