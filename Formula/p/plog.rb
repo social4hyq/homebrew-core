@@ -6,7 +6,7 @@ class Plog < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "1128d5665015871186eb36b6ad55699345e184c854f510884bce557207d532fc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "79b25e0e56e09f3349eb9dfab491fcca46e434496551c41e4ace17c77fd21b27"
   end
 
   depends_on "cmake" => [:build, :test]
