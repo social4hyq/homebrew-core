@@ -11,12 +11,7 @@ class AwsConsole < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "872fec19319083eb2b6286dc049dd352b6df61369cd073ed56a059e90eccd6f5"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "872fec19319083eb2b6286dc049dd352b6df61369cd073ed56a059e90eccd6f5"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "872fec19319083eb2b6286dc049dd352b6df61369cd073ed56a059e90eccd6f5"
-    sha256 cellar: :any_skip_relocation, sonoma:        "956810bf81fb976de92e1c9d5fe7c2718b27208138d7b410fdd66e10c1f6e497"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3c66dc436e48b3ba01a87fd7ebab6630d55731442ee25a135d3313a21912a4d7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "893f775b8331703fa7e40f540e39bc066be95dc7790b6a5e5abd44b085600417"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae643f25fa08469c111590c8179196c2505e02e8b667520a9ebf8c61fc706170"
   end
 
   depends_on "go" => :build
