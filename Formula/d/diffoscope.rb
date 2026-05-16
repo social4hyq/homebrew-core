@@ -8,12 +8,7 @@ class Diffoscope < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "1fb56b945ee211e793fdece117a0ebb6355dbdd5437499eace51a3c1749e1ab4"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1fb56b945ee211e793fdece117a0ebb6355dbdd5437499eace51a3c1749e1ab4"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1fb56b945ee211e793fdece117a0ebb6355dbdd5437499eace51a3c1749e1ab4"
-    sha256 cellar: :any_skip_relocation, sonoma:        "0a543e46517cd44cb5eedf98c502ab6558c228bfe651d753a6d05e1c96931470"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "099d47c66ceecd5787edb41d9225041c304404b05689be5f3055f015402abacb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "099d47c66ceecd5787edb41d9225041c304404b05689be5f3055f015402abacb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9afc7e936277fd5932ea7d162325511203d41814787e7b2d24baeb5b3052a288"
   end
 
   depends_on "libarchive"
