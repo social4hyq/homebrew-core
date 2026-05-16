@@ -7,13 +7,7 @@ class Cliam < Formula
   head "https://github.com/securisec/cliam.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "eeafe136193d401e2cc34aa783643bebd6f72c54c77de32f17513f60ef4a5daa"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "eeafe136193d401e2cc34aa783643bebd6f72c54c77de32f17513f60ef4a5daa"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "eeafe136193d401e2cc34aa783643bebd6f72c54c77de32f17513f60ef4a5daa"
-    sha256 cellar: :any_skip_relocation, sonoma:        "5a76db72bbb9a4de727a83f21d7817f8346d35a6fa100726105564c2bffa74ac"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "569e828a0d43a70e5053c8699ad828d821bf9717e9151f55fcb6b553102883fd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dce98c401d6e7ef0ac1d4b76268981cc1bc4dd1fc111b6ed98eb90bc5c782b0d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "23c195100219b7c751cda5511ade9ba20c6f40615f39385db79c31e2b7aa2333"
   end
 
   depends_on "go" => :build
