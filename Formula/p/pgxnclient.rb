@@ -10,8 +10,7 @@ class Pgxnclient < Formula
   head "https://github.com/pgxn/pgxnclient.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "34e47292dc284c01c684578dca761037d87b54c15d33de6d2be31e3f015a0001"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f33b2476d4cf78a7fbee3269926e73596e3d53d4e73ac84478f14ad61cc6d9b0"
   end
 
   depends_on "python@3.14"
