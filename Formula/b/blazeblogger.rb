@@ -6,8 +6,7 @@ class Blazeblogger < Formula
   license "GPL-3.0-only"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "4f76e3eb4cb3ab302fdf746ec68a54f42422913c10916429788affadad93209c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c01dec5abcad1c9f06646697f43a0f48b15b44f7ed49caa0d26b8f09dca20971"
   end
 
   def install
