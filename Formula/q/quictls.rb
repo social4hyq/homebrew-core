@@ -12,14 +12,7 @@ class Quictls < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "7d899abd908cd31282776b93be0a4b8d573d906669496b6b5a2fc7eb73059ae2"
-    sha256 arm64_sequoia: "d23ad26d2efb1dc8f1a9030696fe96ed1f39df568093ef64fa9c264c28da574a"
-    sha256 arm64_sonoma:  "a2b2a74d18ef19a9753296517bd60b9e26c4139238f76f4f252dd8ee4656beca"
-    sha256 arm64_ventura: "b4a00903b3a19f1f486eb724cd41ef1dbc332cbef1961dadf8f08d23007e2b4d"
-    sha256 sonoma:        "d62a944f9b45478aff3b5b1bd14ad7913ac48d23b7a9d037568d04ba539f2449"
-    sha256 ventura:       "0d4335f3009b02faff17bc049ed596dfae00c82455a664dc43b230398bf3574e"
-    sha256 arm64_linux:   "badde66c7078fe9f19a77c7ef6c75f2f3503b502bc6c1b268d962b94cd904773"
-    sha256 x86_64_linux:  "3e1326258525b2d2ea8fb9bf9f84625790136617ca3abf2a2ee8b5912180aaab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "06ef77b6d5425f4ef89f0de20aaf9a57bd67682db2d9460971f5467d21d6e931"
   end
 
   keg_only "it conflicts with OpenSSL"
