@@ -11,8 +11,7 @@ class Swaks < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "c306783b36231b83d1c0935e526206911e61c3e1d58a011ea97b9132113e9f06"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "806b3c8150b62ec905ede4b7333ca42fc7909f456901659a1a12307d42a07dbf"
   end
 
   def install
