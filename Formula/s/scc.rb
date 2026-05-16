@@ -11,13 +11,7 @@ class Scc < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "6770468fcdb16a8f1fcae82285026a84eadd5524fef199c6f56a7213ee195239"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6770468fcdb16a8f1fcae82285026a84eadd5524fef199c6f56a7213ee195239"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6770468fcdb16a8f1fcae82285026a84eadd5524fef199c6f56a7213ee195239"
-    sha256 cellar: :any_skip_relocation, sonoma:        "8a1ad7fa233caf6383633e0180fc9c80b468abe1fb55af63ddbe0fca153efd4c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "6e0d003227e2164092960ac21ddfe9b4429bf8afa04c49f5f65f06689a8e5d76"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8c1ed3b5514ca73c3783e66ce81d563c860ef46585dbdac0a9f7d8c805c4c823"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d083c984fc95d77c572a14835bf5f044c878fca63dc34de95911da232a5b50a"
   end
 
   depends_on "go" => :build
