@@ -6,12 +6,7 @@ class Triton < Formula
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f659094baf39c772a72b10e6c14b525dca623dec1379b659ca83be1671af99dd"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d91ba4e07dc8385bfebe9d5c620c6e0dc60a5c14b839e5b8004e383441aadd19"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6eb63ee8ae2ca6644715482d976f9783884d2f7c5b01be6958f012923ef60aa4"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7b19e16266ab18e6ab90bf3aa3672a0cabb7148df781076edf3ecd68fc14fc59"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7d46ab480b6e9321c5a1fa43791895e852cf7b36a1d29ee173e23a27b0571698"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5815c9642d4141e9bafa0b1439779bc0f42da92f73146ba0348c8d799775e206"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "26148789b49ce4f3c1e32f105a54ef0e4a53c3cbca93517937cd6b2b8c9dc67c"
   end
 
   depends_on "node"
