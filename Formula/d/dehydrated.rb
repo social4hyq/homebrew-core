@@ -6,8 +6,7 @@ class Dehydrated < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "069a4a6c4658ce2051150ae2ee9245b5d40ceb175912ab8428ecd7e1a7519bcd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ebbd7c510bcb132234981569976067192e7e4d8d98112bf4be484c0ede11a131"
   end
 
   def install
