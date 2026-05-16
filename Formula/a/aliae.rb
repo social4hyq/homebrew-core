@@ -7,13 +7,7 @@ class Aliae < Formula
   head "https://github.com/jandedobbeleer/aliae.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d53160d4849356a90a2678dbf28084f59adb0500f7e9afd84878f5f70bd05ec5"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "98d44f2dca6d2b36d623e1b32c314020a7df181556e35b2e958929bd949c500c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2e673fd81753e7e90ea1e6869fe8df79d44030cd4df7fa5081b46c05c73977bd"
-    sha256 cellar: :any_skip_relocation, sonoma:        "2232257f5cb03001eaba175dc4049386f8f93052907e8be1e1563f5635fd2089"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "749bcd42aad96e35d801f5eb1b732c58d2fd5f6e4dc521fbd2459384bde14a33"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1d640083863cad4b03db8646421e518a9a02e9b599fe2344fad201d226db5499"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b585c7d5a78a45f9bee240eed805f331fc4cf4c3db9f3b7b175d3a9ca81d795a"
   end
 
   depends_on "go" => :build
