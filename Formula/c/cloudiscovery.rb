@@ -9,14 +9,7 @@ class Cloudiscovery < Formula
   revision 4
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c32030707c34eeebb3293e6c35c6120584a5ed79e488b74d00c54cc34e95a6e6"
-    sha256 cellar: :any,                 arm64_sequoia: "256b308ecc554b73243bb67c3c915c41803a6412945ee1673e8cfbb0458341ba"
-    sha256 cellar: :any,                 arm64_sonoma:  "ce19aa2a03d018c44b919ecc49c54b3d315a768fb316b28fd8184e3f3af79df4"
-    sha256 cellar: :any,                 arm64_ventura: "d59e08945ea884a6d7afbb865d2dfa337d418d067650992dbd4baacbe580c09e"
-    sha256 cellar: :any,                 sonoma:        "92c2c35b1e56b7ff6155b90ba40ba5c532fb1fbe5c93626864b2c9fc48761dd3"
-    sha256 cellar: :any,                 ventura:       "c052b8e19b166db9e82edb7639de2172aa0957104ecac1f3ecc719ffa6a563e5"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8593099c3de3b948acb078b4081af7be5fcba58c5cbb2f0ea8b808adf26972f3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6f6eb22585831e39b87ea1cf6370d5846ba9aa987633425c803ee14d12ec0349"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9fddb8bd12641201cd74a83e8f8662bf12e6aaa515296ca201146eb925d0c366"
   end
 
   deprecate! date: "2024-10-11", because: :unmaintained
