@@ -12,12 +12,7 @@ class Kics < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "69b651845bef63ef3e63a5def6e8fc0ad5788408ed9efdc3dabe33c83d8b3efd"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d958a4982aa9c912bddb6a60484241f95579cd4e91cf81ed3c288b8c167c62cb"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "925b758d19f6e9ab3a0fa71ce18407e84bbf1a5785dd143ec808dd102b4ce438"
-    sha256 cellar: :any_skip_relocation, sonoma:        "74c888c48f65a012f9b792b6cd9a076f85e1fe9cef2bacf51ffc2be020e2da40"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4e1f16b9d7c4d637ceac3bd28b3441997264a21276c7c40846bc11beb25a0d92"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d255abf15014b2d9a57a42c7f6cd66c33d3ffdfbe64d5079653b3408149af043"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d73bade610da7f2883c1202c28fcaf554a28fab3d9eb85b53396146e1f3aa041"
   end
 
   depends_on "go" => :build
