@@ -16,13 +16,7 @@ class Forego < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0c76f88ef642e7133f7ac7db298cdda3ae5fd17a5c6c49bf5481d8dab5ebedb1"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0c76f88ef642e7133f7ac7db298cdda3ae5fd17a5c6c49bf5481d8dab5ebedb1"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0c76f88ef642e7133f7ac7db298cdda3ae5fd17a5c6c49bf5481d8dab5ebedb1"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9d68b3831d4f0a74ec867a1a094b4358bf7e377a140b378ed326e753579413ed"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f5931db5b7571c1ddccd603345fd8780cb7f9d37f1eefd28dc5853f6fbfea1ce"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9dca3d980006ef9588d0511bfcc5e1c471c786b0705e6b35f51e2f482a942675"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00613f9ce60c500b719d585aa51c6d22b4f39de76421f15a192fd19279afa61f"
   end
 
   depends_on "go" => :build
