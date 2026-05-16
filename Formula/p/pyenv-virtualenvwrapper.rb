@@ -7,8 +7,7 @@ class PyenvVirtualenvwrapper < Formula
   head "https://github.com/pyenv/pyenv-virtualenvwrapper.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "0aeb3455529d63f4cd1ca55acb525e4f38e1fc7b8dca986302f475bc8596a650"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c17a8cc6052183c524857b16f0cbdf2ce49369395c831970c440d7b66ec453c1"
   end
 
   depends_on "pyenv"
