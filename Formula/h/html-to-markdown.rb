@@ -1,0 +1,31 @@
+class HtmlToMarkdown < Formula
+  desc "Transforms HTML (even entire websites) into clean, readable Markdown"
+  homepage "https://html-to-markdown.com"
+  url "https://github.com/JohannesKaufmann/html-to-markdown/archive/refs/tags/v2.5.1.tar.gz"
+  sha256 "9a4d8337f9456fa757ec0e4690ff720a60aef91ee64461ebba15d87def553da0"
+  license "MIT"
+  head "https://github.com/JohannesKaufmann/html-to-markdown.git", branch: "main"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cce5382711e26ed2a0e11dcd0a61b34ca228bf8a108ee7432136d7f87e0c35cd"
+  end
+
+  depends_on "go" => :build
+
+  def install
+    ldflags = %W[
+      -s -w
+      -X main.version=#{version}
+      -X main.commit=#{tap.user}
+      -X main.date=#{time.iso8601}
+    ]
+    system "go", "build", *std_go_args(ldflags:, output: bin/"html2markdown"), "./cli/html2markdown"
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/html2markdown --version")
+
+    output = shell_output("echo \"<strong>important</strong>\" | #{bin}/html2markdown")
+    assert_match "**important**", output
+  end
+end
