@@ -11,8 +11,7 @@ class Txt2man < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "fc8be081e702c9f38869232afb35214fc78bc7765ba03a508f140452ce6fe606"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "553c6a77bd45af9310d6f57de814b63dd4f2647796f668a07c3a994d7771678d"
   end
 
   depends_on "gawk"
