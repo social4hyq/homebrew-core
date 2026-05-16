@@ -13,13 +13,7 @@ class Fail2ban < Formula
   end
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "677ea8041843e75cde2773a39155890cc3612fb584411d85316538caf4193168"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "677ea8041843e75cde2773a39155890cc3612fb584411d85316538caf4193168"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "677ea8041843e75cde2773a39155890cc3612fb584411d85316538caf4193168"
-    sha256 cellar: :any_skip_relocation, sonoma:        "cf820863820ce92f23210ed7a2a390ab1cbe86f67db6f68c911e1d11670dad3e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5684265cee6688d49e34a7bc00c529bad87825df415a613b300cf91735e6e53c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5684265cee6688d49e34a7bc00c529bad87825df415a613b300cf91735e6e53c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8acc5a6931e396eebec3918a40ebd2af0034dea35f8888b524492d72d17ad2d"
   end
 
   depends_on "sphinx-doc" => :build
