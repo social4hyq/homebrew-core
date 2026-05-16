@@ -7,13 +7,7 @@ class Terrahash < Formula
   head "https://github.com/ned1313/terrahash.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "56190ed3f9318c57e6dad7a1f6677d39b0a5e13990594e4bcf73582b98b450f2"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "56190ed3f9318c57e6dad7a1f6677d39b0a5e13990594e4bcf73582b98b450f2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "56190ed3f9318c57e6dad7a1f6677d39b0a5e13990594e4bcf73582b98b450f2"
-    sha256 cellar: :any_skip_relocation, sonoma:        "5b6d7d22b28b3616d5278c4cc98d6ca602426c6837e79103667f7692c8cb6aee"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "31790db6c755801fe40fbeab1859d383e624ef08584612f3e375df48fea56583"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7a23ea4fdea487b4be85ba254b680311c6e0c2d7520d2857c46c22dfd9ef4eb1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bcd1bb3c645f988a62a450b350b6ca01b9719df97be3dd04bcbf510c4f7a6fb"
   end
 
   depends_on "go" => :build
