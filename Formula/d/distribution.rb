@@ -9,8 +9,7 @@ class Distribution < Formula
   head "https://github.com/time-less-ness/distribution.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "51f9e979ccce6ace7efb959a4e7bee9b9db4b6faa7eea4049ff06b98358a02fc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fb7b4189a3838bea063fecfa10367c7e542cc5835aea24eb8d9f22626f17e13"
   end
 
   uses_from_macos "python"
