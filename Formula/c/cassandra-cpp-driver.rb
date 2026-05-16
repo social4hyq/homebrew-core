@@ -12,13 +12,7 @@ class CassandraCppDriver < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "2eac7917c3f056f8a39dbb3d1aa116dfdc801a0d77f707cf2bab60fc1f8ed683"
-    sha256 cellar: :any,                 arm64_sequoia: "256afb7d9c6714eec5a02780209860cc95ece3f567894869e32db6d6d2b8b263"
-    sha256 cellar: :any,                 arm64_sonoma:  "3122c1edeab450972cc0d8def34f9ade786ddc243c45f1e935789c45f010cf43"
-    sha256 cellar: :any,                 sonoma:        "7c8786ed29acf59ef1b011d03f81baf332ce48e5f2e62e4e1a07fe69695b1a9e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "aaa58ca621b780e38766318102c90118144b2e79f2f93caeabb051bf8f96ceff"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b8425e4bf6558162f770e4c9b4c61f153b1d52a79a1e6f8d77d4f5d145399b9b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9492fb087307ba6f32af6dd3eb2521d46fb749faed21e2d246036f6111a5ba7b"
   end
 
   depends_on "cmake" => :build
