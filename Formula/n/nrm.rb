@@ -6,8 +6,7 @@ class Nrm < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "fe1e778553efe4a3562c5a800617a7c112c075961c42f1d7b0cd84f7884c5aa7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e5261346196c1cd777c9d1a8d9d2b8e25de67e1b7916c9a7ccd999bad67b102d"
   end
 
   depends_on "node"
