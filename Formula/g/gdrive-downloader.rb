@@ -7,7 +7,7 @@ class GdriveDownloader < Formula
   head "https://github.com/Akianonymus/gdrive-downloader.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "4bf15846802e9bd0249ea5dda20be4a1f3324fedf7de558ab40d756aa3a1904e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae21900ed20113ac328a5c69337c3f99531e6517015deb84f997f91825093794"
   end
 
   on_macos do
