@@ -7,12 +7,7 @@ class Libxmp < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "88d5d2388523d805708402d5fcadb0f3063e7bf11f2d5fe8ddd035710efb50ee"
-    sha256 cellar: :any,                 arm64_sequoia: "f2e1fef29eb4abc782ab10aa63c6c72e1fefaaa22d9aafa2f466065ae83b3cc5"
-    sha256 cellar: :any,                 arm64_sonoma:  "8b6fc49f02c1f0d33ddf757dc1c6ac79ccb6abb286440458514bf4c7f4958de7"
-    sha256 cellar: :any,                 sonoma:        "08ee2e1f97a46b501c5a8b7d379c91374f52c1e24f988ea02198cb43d5b952d9"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8cd5f291ec22438e9858e6004785557d40091ca60ca69383c39478b687f995fa"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0dcdfe5efc08578f47881a4143f474122ba91a603c001ef0fb3ddedc9dbdcb68"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6631df9724e91ef0ad9a3004c51813a2698a9f748414197711f4ae42e80342b8"
   end
 
   head do
