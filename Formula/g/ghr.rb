@@ -8,12 +8,7 @@ class Ghr < Formula
   head "https://github.com/tcnksm/ghr.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "47ebdfabfeeba56f6c2ca3a9d4c998deba3cef8d28692f9d1ec37e8de4ecf51a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "47ebdfabfeeba56f6c2ca3a9d4c998deba3cef8d28692f9d1ec37e8de4ecf51a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "47ebdfabfeeba56f6c2ca3a9d4c998deba3cef8d28692f9d1ec37e8de4ecf51a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "129a6268818121ee71ad39d941430b27c420678e4ae17d935032f3ad9328abbd"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "23f0a9bc9c07caa53b2076a2234e31b2c76a4b117464e83207b30f2ff47c3708"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "276fafa40c5baca7202e3d451f4fe398fc65fcc136b06b02020f82c3499e8580"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef875a83adf9d3669ca3943258fd79c781f3dd30e3bba089b724e46d0c4f6451"
   end
 
   depends_on "go" => :build
