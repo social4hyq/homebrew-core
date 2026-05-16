@@ -6,7 +6,7 @@ class Claudekit < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "ab214114f730abb2e91457d273f6f067aa29be48fa8541e3e85f002f64e4f8e4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "244a48546b9486fe2d696b4dfc1ac5f8d6a7ce6795c538b297589dfd0b2d2690"
   end
 
   depends_on "node"
