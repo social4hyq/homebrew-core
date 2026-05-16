@@ -6,12 +6,7 @@ class Xmq < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "83aacb3ab6931c777f82fce09adcde72ad04446970fa0eac93f488b074a2a326"
-    sha256 cellar: :any,                 arm64_sequoia: "2bcb7c3d49912a598504b1215f3a7d0a998649ab747de64161d5f64081df00f4"
-    sha256 cellar: :any,                 arm64_sonoma:  "18aa2ebc522fcf2078cbc228bfae9dac262e9e97f7e871e29cd73863c9c988d6"
-    sha256 cellar: :any,                 sonoma:        "631bffb5aee8fbd0c2de142080aae3724a033c30ae0af03b1bd3e20eeebf6e37"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "386b859219e1af64955da7f123b1680fee7a4e2567c53093141e18a378400e47"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "eb5936a16ccc4b624a786c1336e66598b9bba1bf5cacac8927d9cb8844eeafbe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b35e7854ca6fcaa86ad4df86c5b5ce51725d4216448df5555565bc07df382e9"
   end
 
   head do
