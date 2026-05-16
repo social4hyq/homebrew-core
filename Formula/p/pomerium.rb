@@ -8,12 +8,7 @@ class Pomerium < Formula
   head "https://github.com/pomerium/pomerium.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "359351d6d7bbef54208dec2927c040f6c694a3d021430bafb3aedcde528abf21"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e985e0dcac9f8d5e1e3f08e191f2104908858c6a62071edf975e885cea924db2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c9c2ea344a15e126e2aad853ef3b0f075db90051f50708b3ea72562e2b988a5a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "397c02fe28c198df73e787337db66636a9472f2d667f43b062151112837aa0cd"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9d4f2510bfc6e2d755ec0f5a0750abb09860f582fa5c6e351e1f507b32781160"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "56ec9764b51ef67287ba0df71b514192129ce8afdc2f5c0cfb2c231475a7b112"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2cb6697bcaf6de60ca23dfe8200dc84d0c64541599340e96e9d0403532aa56a"
   end
 
   depends_on "go" => :build
