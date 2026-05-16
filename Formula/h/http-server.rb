@@ -7,8 +7,7 @@ class HttpServer < Formula
   head "https://github.com/http-party/http-server.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "255fa4f7d541f2485fc11af34b8d240785fd6b364d7e98eae44800da7dcf87d1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e512d4d0874e056fa2dc78fdf56b860be2e5da27338fc8478cdc077dbd545d6"
   end
 
   depends_on "node"
