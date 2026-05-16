@@ -9,12 +9,7 @@ class Lefthook < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f979581b9f023d29714f2c3aeafd67030bc1dd1f8efcc7b88eb12db8d73dde6c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f979581b9f023d29714f2c3aeafd67030bc1dd1f8efcc7b88eb12db8d73dde6c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f979581b9f023d29714f2c3aeafd67030bc1dd1f8efcc7b88eb12db8d73dde6c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "dff91200de287458e703570f7812871896ef4daa56328d0cabc61e31113248a7"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9c33cb3694207eebdff95740933b5653c785fad86a559444c9795a8dd17aa85a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "09235d7780ed49ca253628ed73db526c5f072c3113216826ccf9a55ce6b5198c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "49c678a4e26fb4a8e5e059e2a4d55bba33c586278a4ad9c9f95e46984931d0b0"
   end
 
   depends_on "go" => :build
