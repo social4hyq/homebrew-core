@@ -6,8 +6,7 @@ class Kuto < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "d0b642c13ec7b23fd229ef06d6ab335cb2cb3eaea4785644006ab84572b0d8bf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f2e9e29a4bd6a5edc0b795e026ac2e3c0b9edd2588b7a0a5aa52a3371328ec9"
   end
 
   depends_on "node"
