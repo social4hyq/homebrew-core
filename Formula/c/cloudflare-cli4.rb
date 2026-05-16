@@ -10,12 +10,7 @@ class CloudflareCli4 < Formula
   head "https://github.com/cloudflare/python-cloudflare-cli4.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "3a23fc2e249eaa2a0fb4638152b803f1409cbf2e99648025c68341917b64ceff"
-    sha256 cellar: :any,                 arm64_sequoia: "48258ecf030e4c00139b5ac8dc97aed27601d4c609ab8986d64476031da1f212"
-    sha256 cellar: :any,                 arm64_sonoma:  "f0a4b16786c373cc1e6d1a85d2cf6e693f961571db6f979f4a8342ee46d7e951"
-    sha256 cellar: :any,                 sonoma:        "1a638581ac45a6217a995f91f018846da7893bc285eb7712efbdf7038c9e9bdf"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a96d2867bb69aed3799f3e72d74ef4eb9e98281f7896940bf16bc685ce97c36f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2fe6800437ccc0e3bcef61a570542c97b50d630491c5d1976758a374c6ce51c3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f03833c22968e49aed669f8d2279286755da5ef46ad4b5cef859d772fcca3342"
   end
 
   depends_on "certifi" => :no_linkage
