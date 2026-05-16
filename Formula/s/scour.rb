@@ -11,8 +11,7 @@ class Scour < Formula
   head "https://github.com/scour-project/scour.git", branch: "master"
 
   bottle do
-    rebuild 7
-    sha256 cellar: :any_skip_relocation, all: "e08d200e5c6c2e52a3b6037e4ef13e9aa8438effa9cabb4e99d4078dca0c9769"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f56c9c1ad9d7a2f971e800c39718df85a405beca630d901e09b15d52ad243620"
   end
 
   depends_on "python@3.14"
