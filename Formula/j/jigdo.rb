@@ -12,13 +12,7 @@ class Jigdo < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "e8dc3605b3abe08d1608a08a2c30309226c58b6497848e43ba3332ecc2d463f7"
-    sha256 arm64_sequoia: "14b9065aa6b5f05bcf7328f85b854a9113ed0ddc3ebb7a704c349d846901cc6a"
-    sha256 arm64_sonoma:  "cdff3664d745bb5b732981366d4781ac9aecc51d3c976e3426cdd7197f7a3ca2"
-    sha256 sonoma:        "a8a6118725052ad1d8c9b861c81aa2353334a40ca569eb81e6ad5a7c5dcd6d04"
-    sha256 arm64_linux:   "8afdb208a290a24a4ac92a58fc25a131fef91d95dd097e73094b7466cef39445"
-    sha256 x86_64_linux:  "0951aa918b28011dec191e3690a024dc14ce93c63112732482d07dabe7c92c06"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "27ebcf3b4c1cfeb132d68214021fa928b172dcc6aba66f0fd678ac173e6d2bb4"
   end
 
   depends_on "gettext" => :build # for msgfmt
