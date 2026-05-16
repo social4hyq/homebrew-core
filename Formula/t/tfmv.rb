@@ -7,12 +7,7 @@ class Tfmv < Formula
   head "https://github.com/suzuki-shunsuke/tfmv.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "8f8c31d6cd0910bdb3dfef1cd3cd24eefbd5ef4c87beb1cee502c6474e6a74c0"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8f8c31d6cd0910bdb3dfef1cd3cd24eefbd5ef4c87beb1cee502c6474e6a74c0"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8f8c31d6cd0910bdb3dfef1cd3cd24eefbd5ef4c87beb1cee502c6474e6a74c0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "dfc830c36d5a0d948315027d6aafc7ef63046cac5c05bf3d5f8bde730d8bf22d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "161f5173d9a7b3ee6942da6d157ad9570054e9b0af6b3e4c137536ea801582e0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "53413e3284046bc4560ccf3405f5e187f744083e5264d2f4c9c75cf064190be8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "197e6dd6805c74d43201ce2ed6a54440c9a1f0c98e7f223e6c34e4b734d87d4e"
   end
 
   depends_on "go" => :build
