@@ -12,14 +12,7 @@ class Kpcli < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "1e53483c46df116c1f9d3a05b932dcd09e5bd1656a3144c0bc83ad210cbb6edd"
-    sha256 cellar: :any,                 arm64_sequoia: "5b1aee92cd03c609b34d0fcd86f97d9ea38696136efeb3e6811c466c929b838b"
-    sha256 cellar: :any,                 arm64_sonoma:  "bf459126cdac64c3193c977998618a49dfa4a6556cfab7781c423894940ada71"
-    sha256 cellar: :any,                 tahoe:         "0a2d315fe00606775c74d73b3ceeff9ad88f5fc29011987417c73951ef4450c4"
-    sha256 cellar: :any,                 sequoia:       "ec63a3956eab847eb1e6678bbef3161b901e3ecc845fbdf4a600b96c8731bbeb"
-    sha256 cellar: :any,                 sonoma:        "f2a646079c617087d3e1b9479297de6022039ff3040f06b1fa65dc34748b7905"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fe8641b4a34aabded3af096c3b1456b6e6c2dce601b3f749d9785e10fcf84466"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "113958b15f87cf17ecbbf2e458da972e19e41dd07247c321441496b3230efc58"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fe29cadc2678b10ec36d60c1ef3338fbbd0c7070fdab8500492594c8ae0b22ac"
   end
 
   depends_on "readline"
