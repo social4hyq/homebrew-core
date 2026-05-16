@@ -7,8 +7,7 @@ class RsyncTimeBackup < Formula
   head "https://github.com/laurent22/rsync-time-backup.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "f5fc0d52255efff1f05d7820ae5c155fc59214934687e00e805911fea20ca6c6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "55d23275f1f186ccb2ab21cd75bdd2ea2839079f7c3876ec06517c56eb96d0ef"
   end
 
   def install
