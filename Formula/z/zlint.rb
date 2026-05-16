@@ -7,12 +7,7 @@ class Zlint < Formula
   head "https://github.com/zmap/zlint.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "22919c9a29772eead8fffb5028d346a8ce755083e398fb08079d8dbd78a26d2a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "22919c9a29772eead8fffb5028d346a8ce755083e398fb08079d8dbd78a26d2a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "22919c9a29772eead8fffb5028d346a8ce755083e398fb08079d8dbd78a26d2a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "82d307c4768a18120a1c9bef27b72b2d451d2740866a2d815f368b3a65532e6d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fed9751aca8b2a99f88eeb4d96afbf9404d994dd351c232a73c637a7445fc663"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9259c2aa524ed1a44f286fe3777bdce95740f819622d584c43a91ccecc99b975"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "018224f29957922ab9c1b055f3b71820f2c4bc949d79143654751fb298987e6d"
   end
 
   depends_on "go" => :build
