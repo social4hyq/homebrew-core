@@ -14,7 +14,7 @@ class HicolorIconTheme < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "76779247990b538d304e98b042fde85677491e428d0381a59383264ce8ef199f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6025e9ada767e88ab5e3ff4b5e75360f2481d948477880d0cd0196f94bac98c0"
   end
 
   depends_on "meson" => :build
