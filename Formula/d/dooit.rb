@@ -10,12 +10,7 @@ class Dooit < Formula
   head "https://github.com/dooit-org/dooit.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "db0b83ac3edc7b87bbd0cbf4caf96e9e31771b5030b025bc59c9fc64059a4329"
-    sha256 cellar: :any,                 arm64_sequoia: "f8f54323ed981fdcd0d5654bd4f99217db0bcdbf454752cf60c6a2ac3617b62a"
-    sha256 cellar: :any,                 arm64_sonoma:  "0dfbf076a23ff15936a642544971bc2619daad5c4d692932142eee24b0ba60cc"
-    sha256 cellar: :any,                 sonoma:        "abaa18b170f25d81355e8989fab6a3423a07fb066d6ac92ae3bad98c6f3c5a08"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "58054e7a4c256cfd41d778052a7042899525b3a5bdaf6c747dacefa1021073ff"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dc3e8abfe180cd8304884f5c96f16564aa676e75d5b5bc388d95135936198ee1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c5fa51a2e3e60c35fafffb3c687d3d122faff7fda00e9c8cde0cdf343255225"
   end
 
   depends_on "cmake" => :build
