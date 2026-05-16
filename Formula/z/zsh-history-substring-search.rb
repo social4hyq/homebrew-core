@@ -6,8 +6,7 @@ class ZshHistorySubstringSearch < Formula
   license "BSD-3-Clause"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "012cdbf6d326089dee2b8fc6bd194439f4d0df13ca3f01f7a3be0eade9b27030"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "82fb36632e43bcfe508b869f332224e476aa91b3026963a4fb5f09e5f19ab303"
   end
 
   uses_from_macos "zsh"
