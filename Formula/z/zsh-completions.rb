@@ -17,7 +17,7 @@ class ZshCompletions < Formula
   head "https://github.com/zsh-users/zsh-completions.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "b049deb74035408154c97b57d9834510d55503c64b172b8a89937b7e6118cca5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "689a15004b955a8fe397afd2cabf813732fbca59004fba0102dafbf351ff6ace"
   end
 
   uses_from_macos "zsh" => :test
