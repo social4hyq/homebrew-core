@@ -7,7 +7,7 @@ class Elfio < Formula
   head "https://github.com/serge1/ELFIO.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "195ef71a662681ff1d1eb3f822c1853680911960d9487d4056493a438694c5e7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72b0953f40376f8f9cac192c3cb1edad503d353a7256aed263c81daa8fb7771c"
   end
 
   depends_on "cmake" => :build
