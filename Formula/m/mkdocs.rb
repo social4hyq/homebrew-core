@@ -9,13 +9,7 @@ class Mkdocs < Formula
   revision 2
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any,                 arm64_tahoe:   "01be89d0831a80d0923aae6b61e491c35c157d58799fc1322f08cbd49eddf4b7"
-    sha256 cellar: :any,                 arm64_sequoia: "fbbd85bbe0bc9e00b24a110d7c63694f7345b5521b4ca3f6315a88d1301ffb81"
-    sha256 cellar: :any,                 arm64_sonoma:  "6f3a4f3c5d027bdd1348f2223ef378d922749e6b013740f72be731e344618a95"
-    sha256 cellar: :any,                 sonoma:        "73ad3704aa4cdf2ac6773e0ec17d31866eaac7d39734b2bf37f1d78f879c8bcf"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "72100f5ccf0b634b67e10aa25f7bd35d1d51001b78c10ccb449aaadd642e6592"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2040d82febb29aed1488dc7dc1a8c5550287e8bb51f54546e26e322b46ea656e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "613ad4d8daf7c6afa2009b9567a370f23b22645e0f743daeb0956c9e32c44457"
   end
 
   depends_on "libyaml"
