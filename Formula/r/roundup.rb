@@ -7,8 +7,7 @@ class Roundup < Formula
   head "https://github.com/bmizerany/roundup.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "8e7150a458867eba0d53eae749b908b7bb9f8f2d8838471025e4570aee54e846"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a1124b51468f19924943506b1abe0a5be5f1095da85a7922447ad21620746a7"
   end
 
   def install
