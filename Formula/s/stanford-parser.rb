@@ -11,8 +11,7 @@ class StanfordParser < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "699a16febb7fd2e483deaa44dee2fafbbe29d00343efe37d31d01d3b0fa14fe1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f47e2103bba75539ab270ed85cb9ab737a35e7c11149d50c48dce5150624a6c1"
   end
 
   depends_on "openjdk"
