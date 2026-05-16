@@ -12,13 +12,7 @@ class Po4a < Formula
   head "https://github.com/mquinson/po4a.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "08b9a793f7b589dc09de4e2a9973fb4a944c2814e87bfbdd42a3b2344ffab49e"
-    sha256 cellar: :any,                 arm64_sequoia: "5ccc2e17840df2c7e6c1296c7d594adec3543b3b230819bf6164b0ea384e8bfb"
-    sha256 cellar: :any,                 arm64_sonoma:  "af2dada6c7c576abb28bfab0db2b74f06f476376c7e75515d72b2d88323ceb7f"
-    sha256 cellar: :any,                 sonoma:        "3a6cc9bd1e076edb447eada1df96fadcd0c4b0f74f23302e548dd8f6f1e6647b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "09e05f340a3e093c01436be844d9c5998ecc5e5740deb3daf8af71d56c80ef8c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5927670f77918b411a03fa7ed9200ae7e9cd07076dbdfea62a414848bff525e9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9e287e90e5f45b382cca500121b04583991dd907c4e4b748fa6f9a22ceabc85"
   end
 
   depends_on "docbook-xsl" => :build
