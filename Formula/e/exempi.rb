@@ -11,13 +11,7 @@ class Exempi < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "f9404d65e273a1db86e861cf3cec91b90d84e6f9cf730b16be039e7e9e9fd9f7"
-    sha256 cellar: :any,                 arm64_sequoia: "119f156a24d54cf6fd5ebfea60608d8adadf7d9631e6b98d32d281279fb75331"
-    sha256 cellar: :any,                 arm64_sonoma:  "241cb93b16ae12e70f8a584a492e8cb3f521fa73187065dc2e66b097d46ff073"
-    sha256 cellar: :any,                 sonoma:        "65bc8dfd34b2c7b532169e0fbb76a26b336a4f1df99047c9ecfb1c2d25807c3f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b1fb6ef14d4db41974af4a667624c9222ac33f7fbb7c046d636fc324da4d2aff"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6abf2c8aca5a4756a7fa4514260d7fbe7efc715550ea806eaf9c1290cde06f73"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61a8533cf430e83607fb04a26fe17b404c7a9fdb3d34707735b2b41761d41198"
   end
 
   uses_from_macos "expat"
