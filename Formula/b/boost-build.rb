@@ -13,12 +13,7 @@ class BoostBuild < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d99b2722089128220de57924c1cc3b92aa9d2aaad47ad94e4653ea4a0e76db3e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "3d3d8735ec4bc96fee878b78bea34d8f4c1f873d661d0128eaf15396eafc36ae"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6887afc5456043b371c0cb301ba7a9cf284483705e6057bc70b1870e606d539a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "0d2954beea42cc8679ac98500ec9d9aee4e2b51797598ee7c68581cea310a82a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7c70e6871a6d978fa90d943e0502639ac738a5dd1ab2428ff84449aacd9cbe6d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b899989a117bc0a5c9779703517038c4e5af07656ffdbf0b8a8c176943ad49f2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "508698b1d596565f4f03dcbf8b3d5a3207081b3df63e8ff63c4a731dc5f4600a"
   end
 
   conflicts_with "b2-tools", because: "both install `b2` binaries"
