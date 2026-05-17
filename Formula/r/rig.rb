@@ -6,13 +6,7 @@ class Rig < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "dad2501e03504d0b5bbb423d2c9ef324aadf56f790f696c0a46ae04c6dab206f"
-    sha256 arm64_sequoia: "2a9e7e9827a5a060ef485b046834ce2c9c8d592079c84c2385e5a68a533b367f"
-    sha256 arm64_sonoma:  "bb02988845e379f76e2e403ff006185b67a490fcf399654a904adab3ea8a4c13"
-    sha256 sonoma:        "23fd05abeb97e297ba941e14570cfcbe0a2c06a4b41b1413d1845fa44215123e"
-    sha256 arm64_linux:   "55d7f3414a507b5c8d884ccb5c5d515bf9741d1190ebc88aba59f1c1ea57c45c"
-    sha256 x86_64_linux:  "562461182b7a6e85a39b6128addfe1cf719486b27504f9b7e61d466cfec400bd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "76deca5b317838015494d37faa88d558835c3909f9e2752ac1331f12f919d8f3"
   end
 
   conflicts_with "r-rig", because: "both install `rig` binary"
