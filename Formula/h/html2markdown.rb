@@ -7,12 +7,7 @@ class Html2markdown < Formula
   head "https://github.com/JohannesKaufmann/html-to-markdown.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "4929bb9b66ced2e9b4ffdb0eb584c0debe2c37cd8f7a9a85ca401f4cb62dc181"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4929bb9b66ced2e9b4ffdb0eb584c0debe2c37cd8f7a9a85ca401f4cb62dc181"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4929bb9b66ced2e9b4ffdb0eb584c0debe2c37cd8f7a9a85ca401f4cb62dc181"
-    sha256 cellar: :any_skip_relocation, sonoma:        "a6f57bfb50954de53f8f28ebfeb200d77add29feba0cbac04d75420c7addaca9"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "413c808befb3fbc511af53c16ff19f4fa5aaae141dde68da70c5649addff9567"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "15802085a9c9844e61a7fcf77fcc581cf533647614413dc20198d3fdbb4730af"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "69df3c5e998c89f652f3a7877a0a10d4ca49118fd838f2f1a07c236580bf8cee"
   end
 
   depends_on "go" => :build
