@@ -9,8 +9,7 @@ class ChromeExport < Formula
   revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "4eb537cddb8040188b19d7e91771f1e85f31760b36b053f57d606e2356110f2a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9943bc14c1a52685b513b030ed76edea2a9857d688b8494ad729196539068830"
   end
 
   uses_from_macos "python"
