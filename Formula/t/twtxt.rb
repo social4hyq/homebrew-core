@@ -9,14 +9,7 @@ class Twtxt < Formula
   revision 8
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "364e25a8df67aaec1cd8df15d64ef8d188b9fb54e278f661e69db778ccd02270"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "aa31d3732dc8659fdb9ff344e0ec8386644c0bd90a118e68f7d4d4b7543a963b"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9bf874e23df826b9a4bbdbd7b07aea82236bfbebb23fd72128d25302082a0e3a"
-    sha256 cellar: :any_skip_relocation, tahoe:         "879788c44f9eae0a0e4b849f2a575b7c7d27a2f655014a13811c62dbf57d534d"
-    sha256 cellar: :any_skip_relocation, sequoia:       "9d1235fdc5ad43c5755eb349cedaab271a39c0c0613bd7832e09335ce2fcc818"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7d6be8158f7fe1ad25ed3406c1239bf50e0817bb2e9d42ac5f8b2f55cf37fe5a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "26d140ebc1070fc659f5eeef9295fa0108c72a5d5b861d7fb0a87fc237453861"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4c484d24b9b7a112aa0fe911080799a15bd311d732587559247b4581e3f40456"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "19ea976ec1d0549bde075f1c3e6261dfa8fa061ac1fd0fe1b7178b489f056da6"
   end
 
   depends_on "python@3.14"
