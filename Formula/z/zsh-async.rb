@@ -6,8 +6,7 @@ class ZshAsync < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "d743c80fa4ea6850e397fc6a987f826dc7ed1503c038c5ef9e799fb0ce620b40"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22f15389c2895a489c45c5102ea3229bfc6324a9acfe47b9b0d60f0dfb8ab5a4"
   end
 
   uses_from_macos "zsh"
