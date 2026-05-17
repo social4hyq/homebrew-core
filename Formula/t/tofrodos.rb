@@ -11,12 +11,7 @@ class Tofrodos < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "bb9bccec0b6facab6deb29e573a58688ca536fc626a495c8dbf14b1bf30aa625"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e1d7e019ae05f7eedc3b6f7eeed1576d3eaed131344ff5341f347d4a7232ac42"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "45523cb29f07d2958725ffee8b52a482ef7cc38a8b733b458d4c23f1ea484950"
-    sha256 cellar: :any_skip_relocation, sonoma:        "bc8b42d53d4c3f5c94aee049393680c0521d4cc8d10e4f08fc036662b8193ab9"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "23e087b1626acd44299d5a4c05bfbf8330824898a59f5e3514db5a94f119eeb7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9736424740fa62707a4cd5061f5bc14958fc8726c69a9cd6f7d8dcadd800090b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "540a2b10e7f48bef0f0f4c067cac6b7b1997f99f04f0b99fbe2d85fa42812ef2"
   end
 
   def install
