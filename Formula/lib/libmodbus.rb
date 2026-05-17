@@ -7,12 +7,7 @@ class Libmodbus < Formula
   head "https://github.com/stephane/libmodbus.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "a19a1e7794e92ff2457f53854efe9f25af59eb226c3e9894434f0bba430af5c5"
-    sha256 cellar: :any,                 arm64_sequoia: "2e81e96a86fc637f9beb11bbc671d2f8ce779232959c21425f4d809532566200"
-    sha256 cellar: :any,                 arm64_sonoma:  "ee16ccee86da68d0902e0d539b4ec259851c5c06751d627a3df3c62e57b97644"
-    sha256 cellar: :any,                 sonoma:        "f95283005a391bc212c9492d0177d7a9532c09c05e9d7c8d17056ab61d456593"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c8bbf29d0d6b2a53ddc10fae268b78d191aafce3788209174754fd037e100bc4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ca28017a4ab526343a25a5f36a5f441fc7512ff6daf7089a7a0e611a6813c095"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2417e99bf6e2f77630706b7c2a272cae43876843a2643c4270a668b94896f64c"
   end
 
   depends_on "autoconf" => :build
