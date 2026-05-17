@@ -15,12 +15,7 @@ class Aqua < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "1932a879ce2b41362079d14c6a55f4c0ed3f5e155541227ea80ce123b5f10fc2"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1932a879ce2b41362079d14c6a55f4c0ed3f5e155541227ea80ce123b5f10fc2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1932a879ce2b41362079d14c6a55f4c0ed3f5e155541227ea80ce123b5f10fc2"
-    sha256 cellar: :any_skip_relocation, sonoma:        "afd55d595f71e48c349b5f424d9b1801985a0d57a97644e68c6c0cacfc909d8a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7ad7ada4ae1c8fe754d92154bac7429aa193cd54922b41df668ec9bbfaf5cd84"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "af56a55cb9f4a6540e717768243a32e0779074a445f373f32e7523764457e957"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22a53053c753b9fa049fe8fb7da55f388bc48106f5188776fd9261f5844ff7b3"
   end
 
   depends_on "go" => :build
