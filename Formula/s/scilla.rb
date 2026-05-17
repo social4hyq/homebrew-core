@@ -7,12 +7,7 @@ class Scilla < Formula
   head "https://github.com/edoardottt/scilla.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "968a6a0a37bf3b81c4fc81e7f9d0efb785804ec0985592df6539928b3cf0611e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "968a6a0a37bf3b81c4fc81e7f9d0efb785804ec0985592df6539928b3cf0611e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "968a6a0a37bf3b81c4fc81e7f9d0efb785804ec0985592df6539928b3cf0611e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "eb32cbea3e5b752249679b19271065d1f162db6e10ed3d134fbbf9755743df2d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "cf1bbd9b3cccf8550bcb1c314a148dda1b345d2c197fb50a18cc7cee65ac2d9b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7f3039444e569c1e56d1db44299961cbe0262f39875faaea24cb804616d33f02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac4afd77dee99e58c4ba38271d4156e92bb0d2341685392db7603960aefa3d1c"
   end
 
   depends_on "go" => :build
