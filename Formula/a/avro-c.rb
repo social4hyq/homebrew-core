@@ -7,13 +7,7 @@ class AvroC < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "abb6d682b6136ad799198b11633ab0a197bae12b256ab0ddd5d7d0ea77bf3f41"
-    sha256 cellar: :any,                 arm64_sequoia: "44c05e639545cf1f19322088a4becef2a6918d55bd531be545af501dfee7b39c"
-    sha256 cellar: :any,                 arm64_sonoma:  "1907a3e4371b719d35b0a56d265d6c7c425d11ec5e4f14ac3a08a9c11ad52580"
-    sha256 cellar: :any,                 sonoma:        "f59a5d3deb7314c5c9c1fbb149e7e74470fc6b160b33e4e10dd0c71adff72658"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0fa921d188143ffc18e81dd7c664593775e6496d921c85b4a63d6e1fde0b1b81"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d1c7c2673ab920322902e435fb6b4c562c90b3c5fbbaf1b2f62d15a5e7db1edc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fbc8bf230400ad8c386be3b1619c8b86f2a75ae5e405ddccf7cc1b0e96ebf268"
   end
 
   depends_on "cmake" => :build
