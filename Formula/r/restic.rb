@@ -7,12 +7,7 @@ class Restic < Formula
   head "https://github.com/restic/restic.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d6fd5d1ca0cacb7629f7bc480c81dfa36c551bb610e5559e9a86a0712b4bc2a9"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d6fd5d1ca0cacb7629f7bc480c81dfa36c551bb610e5559e9a86a0712b4bc2a9"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d6fd5d1ca0cacb7629f7bc480c81dfa36c551bb610e5559e9a86a0712b4bc2a9"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7d6d0d3486f2a8c77bef02e15e860c3ee9ecb2a78c217dffda26c125d4f0b3ff"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "cf1e673d725c5d20dd4829062da1a18710f0ce9780eb8a0f41613d913bd0397e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f787724e226c9f3ee6a6e1a94feb01262102ce1053d1a09ed18f5f8d835a6f96"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00b16fcad709437efa8a62c1c03f03348423024756f42d37f35a6ad91f9c2df0"
   end
 
   depends_on "go" => :build
