@@ -6,8 +6,7 @@ class Mussh < Formula
   license "GPL-1.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "2aef0306d0c39460009d42553effebd0aca77dd7c76489323e13f95ecd76b17e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1fe87f4c41a60deb46f30155ec8fa5f738b75692fdead9aeb1db15fdcc4339a"
   end
 
   def install
