@@ -7,7 +7,7 @@ class Jenv < Formula
   head "https://github.com/jenv/jenv.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "41e433160ef6ac63f3b9d2d07ace490965d38a4125380e65930d8fd5670592c7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6edd74d34ca3f66985eb30a05021dbb2fa978c46cae3c7fa843c17cb91ea1a0"
   end
 
   def install
