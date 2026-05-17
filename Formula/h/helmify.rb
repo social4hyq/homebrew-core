@@ -7,12 +7,7 @@ class Helmify < Formula
   head "https://github.com/arttor/helmify.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c365d7f2c270924290922374c61da69d6728d6c1ba78196220a40b88fe590105"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c365d7f2c270924290922374c61da69d6728d6c1ba78196220a40b88fe590105"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c365d7f2c270924290922374c61da69d6728d6c1ba78196220a40b88fe590105"
-    sha256 cellar: :any_skip_relocation, sonoma:        "bad5b9ca6f9a28f8dcd881cb32b33071c70627659afdbc44ed9d649cc32c58f3"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c8dbcac6adca92486861d58bb289f1f88e551413ef4fe3788eba02756fa06412"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "459f71a7f76dbf6ef0e2459a78299187bc90ce04d63b2bc51af75f54d9303857"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c0e0dcac27eec8cb9fa12a9bf6c184e4a55a193e7a7a3e4cfe07c9c34a08475"
   end
 
   depends_on "go" => :build
