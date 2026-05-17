@@ -7,8 +7,7 @@ class Clitest < Formula
   head "https://github.com/aureliojargas/clitest.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "f1cbfc94748a8712ab8a8845fd800d0009519c4d5ffbbcf03efce267406b91e5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "21d49315035a5a59f5bf15149c6b6b835fad4ea3cdc1116b6abda7b804a80fad"
   end
 
   def install
