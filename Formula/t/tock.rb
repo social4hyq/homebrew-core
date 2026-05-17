@@ -7,12 +7,7 @@ class Tock < Formula
   head "https://github.com/kriuchkov/tock.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "fe7a6021541bc0166fbcc6552f20fffce1ef9f8348b79e257f584c710ac855b0"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "bdf567f409cdd4a7a052fade21576b7d885e0e7d76d916087982facb5b028670"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1733bd03c9178c24f0ab610c81f106dc1388fdd8e2e19870ae991674af75fd8b"
-    sha256 cellar: :any_skip_relocation, sonoma:        "8bce9335b83d1fef81251e4a9e7e38e69506c8f0de56c266e81e50a4929fa291"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "860eadcaefd90098fa4d4f6ce37a2daeef927b01a3e8a5ee9e8e25d2dcf33a53"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "225883961ba0f0ac744110b1c40fbb6a6fe5131ddf8d49d488ad2ea58a62671d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "87acc337129d60e87a9f8884595b6b3d3189b71d6c1b36fb6ba392072f5a29db"
   end
 
   depends_on "go" => :build
