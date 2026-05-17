@@ -11,14 +11,7 @@ class Nng < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "d1c5d69e4cd6874e9fc3a6c7d95e8444c730d7b9d4bddcb74092bf5c53a7b0c4"
-    sha256 cellar: :any,                 arm64_sequoia: "c8b949fcace671131602004d36dd682e84a8f11c294121883780bed5c37207e3"
-    sha256 cellar: :any,                 arm64_sonoma:  "787e01ff6e0b46d61794bb151e18ff2af1dfcb590f2721eb35187c1de60ea3d9"
-    sha256 cellar: :any,                 arm64_ventura: "33847914c92079fae13338b6099d547957a33b9142c50196919080a23196a74d"
-    sha256 cellar: :any,                 sonoma:        "f21583c80dc1ccd84cde614cb8ea7a8b7e7586ecd39aae010583a038e562580d"
-    sha256 cellar: :any,                 ventura:       "5a4c09d6a83310a8117cbeb2df1f292581a7a32eff9f0c0db6a3d9172b47a6d3"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7df32fb58d3135bbeb0b9046534a0fb901dacfddc215546855146b3102c52eeb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "25761374c9d2ca6fedff91630fb23e7fe10ae9f68369f7eaaddc1fa5ffc35e6b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d09e8041c209d12620084689f6a5345891d28fbb9f6e2d6d4adb86bd442bb326"
   end
 
   depends_on "asciidoctor" => :build
