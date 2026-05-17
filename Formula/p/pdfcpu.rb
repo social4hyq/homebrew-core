@@ -11,12 +11,7 @@ class Pdfcpu < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f423e614b6a4d1765e57de61487850b34bf63ac206b2982f4c3a5e5b82f50271"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f423e614b6a4d1765e57de61487850b34bf63ac206b2982f4c3a5e5b82f50271"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f423e614b6a4d1765e57de61487850b34bf63ac206b2982f4c3a5e5b82f50271"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ab3e25520b6c1120fd4e25f2e6da50886760db804eb1a31ac0b9f756957e5dff"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f7165211f222952e921d166198596b8a27086d49dba8638f70b7d48f498ebd9f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "72529330d9aa8c2d205b2763fd6d39e3664e76f2aeea7758d14a74c802db4103"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "28048cedf3cbf1b754115c99d320e536058848d68257d668c62b2c4e90ed9bd4"
   end
 
   depends_on "go" => :build
