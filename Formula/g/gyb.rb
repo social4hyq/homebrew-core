@@ -19,15 +19,7 @@ class Gyb < Formula
   end
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "37fddd7a434ddbc88a53a8e2e43dbcf86d76f59ea9cd749ffb3822209c849bb7"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "008bda79cfd000e69dad69d3235f1a7d72a30d57a5585211213718a47e666478"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f9507c1755aa60cf27d54554da0e656539891de802654b2be87090f6e9bfb918"
-    sha256 cellar: :any_skip_relocation, tahoe:         "2f221e1cba8746c483eed0ec3e8cc66bf733b446554f91e61d68a23e9c86407e"
-    sha256 cellar: :any_skip_relocation, sequoia:       "5e34af589170c41831de80947e701d64e8d1caf6497ed55bb20f6b99160d9c26"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e26fe30655ffbcdbdecf83cc9b87fec6fc5c253de532474a8c393c3aac1ac15c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "26f76bd20d931941941fa60cc98e2b18a5556e050d7d56bcf54fdbd7bc8a0f16"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "232f8f4c3bfea904d5fe76e2118c26373e7d8c6efaea739af13e253d99434d64"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "354963af68f8c86d87f528aee57de0da49aa526335d071cc729a5fb105269f18"
   end
 
   depends_on "certifi"
