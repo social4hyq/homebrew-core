@@ -6,8 +6,7 @@ class Htmlcompressor < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "a8323e2d6001cc0effb3c29900f977118d35fc4a0a86be9cd49d0fa133d04f23"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "76b8a809b52a01a14ddc005ba29592df9e1c322ea5f216af371ee14c750c0d13"
   end
 
   depends_on "openjdk"
