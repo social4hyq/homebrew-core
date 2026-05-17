@@ -8,8 +8,7 @@ class Flamegraph < Formula
   head "https://github.com/brendangregg/FlameGraph.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "97511f43f573d3f64674b4ca16d9e9f2175366d769741f8c49407c8aefdaa4ec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "237ff1ba018290facdea8b0e7020f4cdb35d00a90f841a689d6339700aed028b"
   end
 
   uses_from_macos "perl"
