@@ -7,8 +7,7 @@ class Psgrep < Formula
   head "https://github.com/jvz/psgrep.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "9e809775d826f04be40a2cea6237bddf7447458bd4933e474db09b836b02e69b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "251d3d1c2b9243e7057a63e346c0ce19b29cc6d364ebfeed26963e2fe9dc268a"
   end
 
   def install
