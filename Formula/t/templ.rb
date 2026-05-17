@@ -6,12 +6,7 @@ class Templ < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "1ef351ab22cb0bc67bec76950159a8c5259a5e27acdaf4d21e001527144613a6"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1ef351ab22cb0bc67bec76950159a8c5259a5e27acdaf4d21e001527144613a6"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1ef351ab22cb0bc67bec76950159a8c5259a5e27acdaf4d21e001527144613a6"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d068b9223dcb79e205cb4c01ae9f75be0bf4a49f0457cb496292c3fc745b1104"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b3e65a6a7863819faa7b791383afebaecd8a298ee0937f968fff3c4bab656ddf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d38cf8ffa6099a2b455a9c44f6a7190cd6a46734bb947f28838317eb260c88a3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9751b3f35d6073ed5ab6d39acb01264f24ae52dde39afcea214b03c9bf171e7c"
   end
 
   depends_on "go" => :build
