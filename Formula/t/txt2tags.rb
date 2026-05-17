@@ -8,8 +8,7 @@ class Txt2tags < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    rebuild 4
-    sha256 cellar: :any_skip_relocation, all: "b938a2bda24749153a44deefd623b6551d5b3349e859dc80c22c18323987f62b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "febda11fca13ae260a19a5c72cd5d1966e28c9e60138bdddd4c358eef472f205"
   end
 
   depends_on "python@3.14"
