@@ -8,7 +8,7 @@ class Nox < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "90b2d17b1dbf22ece7070dbb756e79e9b953186e63d18a5d3da1074382ccd033"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "767c2290eea21eb61d9bd9dde1f573c731f1efde7de2fec8ac1c9ccd767f4211"
   end
 
   depends_on "certifi" => :no_linkage
