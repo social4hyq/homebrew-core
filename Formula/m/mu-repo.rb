@@ -8,8 +8,7 @@ class MuRepo < Formula
   license "GPL-3.0-only"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "99a341e92b7abdf36d1088357f8d8abc070151734e2c3b45dec1327c1bf81afe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f72667f2c15026d61a864fbb0a3c30b29fb4d73bcecf27d01ac2a49c92b5c804"
   end
 
   depends_on "python@3.14"
