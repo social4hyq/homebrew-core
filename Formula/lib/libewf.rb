@@ -14,13 +14,7 @@ class Libewf < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "ec8c3c0ffa57df2d43c53a5065ef5f1b40a4623c530a2e29f20fbd99c22df90f"
-    sha256 cellar: :any,                 arm64_sequoia: "6869e95d17a26169a28afe5bf0f53db15a9f845d33353648488cd7f9cf1e0f6e"
-    sha256 cellar: :any,                 arm64_sonoma:  "09be901af33844926f5c24a55652e11288f32dcdc63981de7bdc85dfb183238c"
-    sha256 cellar: :any,                 sonoma:        "1b2e461e480ef015de567fd9f9916601cd5229755c6910b13c856c0ef0676d41"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "841da9d3b3197875feffc6ee142edb398a9389f8675d1fdc38310088bfef67e1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2f52e9116f349a9f1889a7b006dac88b00e54d80cf908afa81d351f3d84951e4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c819e7ccbbfe4e584d0285aae268de5c85945466f38c09389e9fbe47ed6d7257"
   end
 
   head do
