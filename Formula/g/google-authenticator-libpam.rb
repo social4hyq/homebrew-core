@@ -6,14 +6,7 @@ class GoogleAuthenticatorLibpam < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "bd5ef94f8320f6da49f1cfa681d63bb58d9578ced890f6b1c2811b5451755e0f"
-    sha256 cellar: :any,                 arm64_sequoia: "f2452e49e52b39b37fdbbdadc0d18cee36e55b0e75ccec2c46656597a7c839d5"
-    sha256 cellar: :any,                 arm64_sonoma:  "35fe2b51a3349de745e6d29f7debd894b6d2430933b3a39e7b0b32500a3ee945"
-    sha256 cellar: :any,                 arm64_ventura: "a74302d80e616251e9e877a99ec537d7fe8ac1d8054278df74c85bd84cb24436"
-    sha256 cellar: :any,                 sonoma:        "e8b04f1bb3a6d429869277493bde331a2423ebb8d4f79e59b2eda25f6878521d"
-    sha256 cellar: :any,                 ventura:       "31ab70bcbadee31ff695efad9503ad90d0041d0bae0168aaae4dfb72b4613f97"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9a271e3a3354b737df9b52c0d00182d8a129c4bf4785fbcf024bedfaebbe9c60"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "664d3b02168d36aedad5165ad643a50686c1cc673b26333d119ffecc51ab92bc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5995d10be708e10843a6e6f1bc61673f2fc85be265df9f8222d320b5b8588841"
   end
 
   depends_on "autoconf" => :build
