@@ -6,7 +6,7 @@ class EslintD < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "de4a449370367f71334ac97392914b3d6c5b3ffae46b323a2f889dbd1ede44ba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dff63e0c5f538cdded927e210275a2a19470f3ed5aab543456dcb1a4a776e17b"
   end
 
   depends_on "node"
