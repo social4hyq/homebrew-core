@@ -8,12 +8,7 @@ class Krew < Formula
   head "https://github.com/kubernetes-sigs/krew.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ab8a466d076e3a2702ed3eea99459a61e8498f0aa3aaea34c3386081d9476b2a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ab8a466d076e3a2702ed3eea99459a61e8498f0aa3aaea34c3386081d9476b2a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ab8a466d076e3a2702ed3eea99459a61e8498f0aa3aaea34c3386081d9476b2a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "903e7e7ac13fe8decbc25675f5e3351116f2e0721763d916aea7d26b73bc4655"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "35ed7ffed867cf97d5a72d09259298612ecc710854fb7adbcaad2eacddf6905e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "92c4a63ada948ff0efb097f8964f7057aad0dd76c623c09e0fe2f108d3458379"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4becf5af9896372bd4223c80d6411213bf87e395319ac9cc0aa952cca08cdb2c"
   end
 
   depends_on "go" => :build
