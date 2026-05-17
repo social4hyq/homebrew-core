@@ -4,6 +4,7 @@ class NodeAT24 < Formula
   url "https://nodejs.org/dist/v24.15.0/node-v24.15.0.tar.xz"
   sha256 "a4f653d79ed140aaad921e8c22a3b585ca85cfdab80d4030f6309e4663a8a1c8"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class NodeAT24 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "093caee610c60e65fbf7e90ef984a028ed3b4a8cc2d5e6d98725f6f14bea2bfe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1cbcc646ee17861ae1c4570b5595ae7e9ed40a218c6f002abbfb8f6d520027b"
   end
 
   keg_only :versioned_formula
@@ -21,44 +22,67 @@ class NodeAT24 < Formula
   # disable! date: "2028-04-30", because: :unsupported
   deprecate! date: "2027-04-30", because: :unsupported
 
-  # Disable superenv
-  env :std
-
-  depends_on "python@3.14" => :build
-
-  # Use a mirror site for downloading Zig due to the instability of official links.
-  resource "zig" do
-    url "https://pkg.earth/zig/zig-aarch64-linux-0.15.2.tar.xz"
-    sha256 "958ed7d1e00d0ea76590d27666efbf7a932281b3d7ba0c6b01b0ff26498f667f"
+  resource "alpine-rootfs" do
+    url "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/aarch64/alpine-minirootfs-3.23.4-aarch64.tar.gz"
+    sha256 "9250667a8affac8f1e98086392f80f43f086626701e9bce33398eb9b6c0bd64c"
   end
 
   def install
-    # Setup the Zig compiler.
-    resource("zig").stage do
-      (buildpath/"zig-toolchain").install Dir["*"]
+    chroot_dir = buildpath/"alpine-chroot"
+    chroot_dir.mkpath
+
+    resource("alpine-rootfs").stage do
+      system "cp", "-a", ".", chroot_dir.to_s
     end
-    zig_bin = buildpath/"zig-toolchain/zig"
 
-    # Environment reset.
-    # The ohos-sdk compiler (LLVM 15) is outdated and cannot compile newer Node.js versions.
-    # Using Zig (built-in LLVM 20) as the compiler with static linking to its internal musl libc.
-    jobs = ENV.make_jobs
-    ENV.clear
-    ENV["HOME"] = "/root"
-    ENV["PATH"] = "#{buildpath}/zig-toolchain:/usr/bin:/bin:#{HOMEBREW_PREFIX}/bin"
-    ENV["CC"] = "#{zig_bin} cc -target aarch64-linux-musl"
-    ENV["CXX"] = "#{zig_bin} c++ -target aarch64-linux-musl"
-    ENV["AR"] = "#{zig_bin} ar"
-    ENV["GYP_DEFINES"] = "OS=openharmony"
+    if File.exist?("/etc/resolv.conf")
+      chroot_dir.join("etc/resolv.conf").write(File.read("/etc/resolv.conf"))
+    else
+      chroot_dir.join("etc/resolv.conf").write("nameserver 8.8.8.8\n")
+    end
 
-    # Disable Thin Archive support, as it is currently incompatible with the Zig linker.
-    inreplace "tools/gyp/pylib/gyp/generator/make.py", "crsT", "crs"
+    chroot_build_dir = chroot_dir/"build"
+    chroot_build_dir.mkpath
 
-    system "./configure", "--prefix=#{prefix}"
-    system "make", "-j#{jobs}"
-    system "make", "install"
+    Dir.glob("#{buildpath}/*").each do |file|
+      next if file == chroot_dir.to_s
+      FileUtils.mv(file, chroot_build_dir)
+    end
 
-    system "llvm-strip", bin/"node"
+    chroot_script = <<~SH
+      set -e
+      export PATH=/bin:/usr/bin:/usr:sbin
+      export HOME=/root
+
+      apk update
+      apk add build-base python3 linux-headers
+
+      cd /build
+      export CC="gcc"
+      export CXX="g++"
+      ./configure \
+        --prefix=#{prefix} \
+        --dest-os=openharmony \
+        --partly-static
+
+      make -j$(nproc)
+      mkdir -p /dest
+      make install DESTDIR=/dest
+    SH
+
+    chroot_dir.join("build_node.sh").write(chroot_script)
+    system "chmod", "+x", "#{chroot_dir}/build_node.sh"
+
+    system "env", "-i", "chroot", chroot_dir.to_s, "/bin/sh", "/build_node.sh"
+
+    chroot_dest_target = chroot_dir/"dest#{prefix}"
+    cd chroot_dest_target do
+      prefix.install Dir["*"]
+    end
+  end
+
+  def post_install
+    (lib/"node_modules/npm/npmrc").atomic_write("prefix = #{HOMEBREW_PREFIX}\n")
   end
 
   test do
