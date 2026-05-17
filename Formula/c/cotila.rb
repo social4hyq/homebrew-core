@@ -7,7 +7,7 @@ class Cotila < Formula
   head "https://github.com/calebzulawski/cotila.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "8144c977b0567dff23206cbf5e24f7fc4aed78092dd187517e8813ca1e12f495"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cef20bb3b5b7b38940d8c2f25b1e7c240ad697466ced806c0f0c38ea8d2d1aeb"
   end
 
   depends_on "cmake" => :build
