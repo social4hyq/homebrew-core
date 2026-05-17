@@ -7,12 +7,7 @@ class Leetgo < Formula
   head "https://github.com/j178/leetgo.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d513da08f10a465c62eea61bd9cf0c770d3b82a8310ab8c788d2ee4ac88d20ea"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "11a62fd439fe559d59c0de6f4fcc270bd024d897fd33ac804d396869f81a752f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f9c731806de9feb62d6db878df5da632a27980c58274a39c6a92ed740d50653d"
-    sha256 cellar: :any_skip_relocation, sonoma:        "82101eda9995fdd25417518c5ba71ad0180b70d098cf3737bc1d4913a24c80d8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3457c3699d9f33385fa0359a4e809b44287a1fa6f65c1065ac28fe84798b8174"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "510997fbadc32f9759af0046a52029e2a7f02fb74519a67429bc2d68f7e8de28"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "97a3c6e31e781f21eb3c753dec7b0e2430a636da8cb7838057f3e0f1bd7bdd41"
   end
 
   depends_on "go" => :build
