@@ -7,12 +7,7 @@ class JqLsp < Formula
   head "https://github.com/wader/jq-lsp.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "47061ca69bab6c5e7f237e325b3fb2cbc65a0c5ce8c1bbbb23d8be1e360f1522"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "47061ca69bab6c5e7f237e325b3fb2cbc65a0c5ce8c1bbbb23d8be1e360f1522"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "47061ca69bab6c5e7f237e325b3fb2cbc65a0c5ce8c1bbbb23d8be1e360f1522"
-    sha256 cellar: :any_skip_relocation, sonoma:        "767cab6e7d0b1bad5d5123f2349fb6a2d9b11592e8d0df2b7f7694354d007d11"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2e7b0cb9205d7951db329ce637008f3b0dfeeb3b589318d7c0c7670c4ff36869"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "91ad43fb3ff4ebc8e333e0253ffceeedb37b26f9f6da1d31fc1c719dd9a67322"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0109b50bf4c91fc05fdcfabb90055824c170db9f5f0c583c0d36c7c6de2f6c82"
   end
 
   depends_on "go" => :build
