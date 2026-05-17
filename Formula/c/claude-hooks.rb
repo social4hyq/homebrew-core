@@ -6,7 +6,7 @@ class ClaudeHooks < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "a8961c6143bc341ef7586a528fa3d52f32c72463e9ef14b8bf73f3aaeaee273e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "92f9f476e0e0b76b139e09398b7e0fbb64010f1a25be3c265a0b807ba8fff011"
   end
 
   depends_on "node"
