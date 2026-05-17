@@ -16,7 +16,7 @@ class Prestodb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "adbf6e622f4d84fd08c87cf4b8b4e7a58c835d5c5682c6a81e6afdee44038430"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0fc4df878e6201a8f21cfc76e2dd30e310c94018a418e122c40fcc3c4656eb9a"
   end
 
   depends_on "openjdk@17"
