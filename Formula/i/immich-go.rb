@@ -12,13 +12,7 @@ class ImmichGo < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "8cd369ad88194accffa3aaa3b0d3c269daf665470cab90169b9e4f087e9b8354"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8cd369ad88194accffa3aaa3b0d3c269daf665470cab90169b9e4f087e9b8354"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8cd369ad88194accffa3aaa3b0d3c269daf665470cab90169b9e4f087e9b8354"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b1e766326a4a04710cf92ae2272fe40d0a512c56af09551a75efa8bd6afd13b6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7d4ace8aebe26da57ac040fb5d668d9ce20168cabe57b60703ec490e33730acd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "00db9a4e128716bb2d8eb4d0aa8acb5da9d57c95a0900b6c1cfb21b1ddb9ac48"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1941cbdc158b1d341d204f2b7ed4fd2b43a322b79d98db28c372ec56feae0732"
   end
 
   depends_on "go" => :build
