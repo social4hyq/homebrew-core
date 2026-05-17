@@ -6,13 +6,7 @@ class Jimtcl < Formula
   license "BSD-2-Clause"
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "05ae4713f0c3a97e7fe336d63e5d8820f5d0e13db8fc85feb26816941fe5ca8a"
-    sha256 arm64_sequoia: "4750bf34906f2399f5047a2af4b941381f91a87ebf23f702556f1e7f9e65acfe"
-    sha256 arm64_sonoma:  "7f11c06f31cd0079cddced37e014f82f7b3e76eef35416e0027a0d3aa6c42209"
-    sha256 sonoma:        "3f903f30f40421547ff9b2c32cd1846776ceb8ed15a1e528342bfa674f789c35"
-    sha256 arm64_linux:   "44285a821b4033b99b40ee6d7689a24eca229e0b9535d64d074af9f6a61f37f4"
-    sha256 x86_64_linux:  "ec2e913ae07ca6964043a8acd6ae2749ee86aba963284d115c64e58191b88a88"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c63800ffadff75842fdcd9ec428931dad46af6d0c09b3a5b5d5004cdd5383e4c"
   end
 
   depends_on "openssl@3"
