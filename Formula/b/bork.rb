@@ -7,8 +7,7 @@ class Bork < Formula
   head "https://github.com/borksh/bork.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "16ffe8fc8e92fb6b7a8563cf610e9ebef39bb4123b8c092087aba936df7ed44b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22cf6717f8f03c04918872f47b4d85c5be810ffc7b80c8d6c3e8b69f63b645d0"
   end
 
   def install
