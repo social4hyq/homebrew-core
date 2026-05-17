@@ -13,12 +13,7 @@ class Srt < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "f201e850fa33ee027f7e8360ab55474461c6d20c996ed261bf9d17198a9d0e85"
-    sha256 cellar: :any,                 arm64_sequoia: "fc5bbd1fed835b6bbcb15cb62c7297e137ae526250c5ca1b21dc6b4979ed22e2"
-    sha256 cellar: :any,                 arm64_sonoma:  "b69a133af8ac9cf43a298423cd4b08614395b36c0df3c9b7e1ade63b9587a304"
-    sha256 cellar: :any,                 sonoma:        "be1c49b063c22ff0edf2a822e09585ec85649a7845dcd770681217659655ca2e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f4daed54a610f9835b41b63d5dd16027e2d1dfd879aea01c1fc85d65d38a61ff"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0d7d47c199ff8c9e1e6de7b409dc3a81c6573f49be3b02bb37aacdb335a6b623"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d960d48cf0c869c9956e801ad42a09d5841011a83071039491e8e59c40a5e705"
   end
 
   depends_on "cmake" => :build
