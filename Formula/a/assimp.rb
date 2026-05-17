@@ -16,12 +16,7 @@ class Assimp < Formula
   head "https://github.com/assimp/assimp.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "8d2cea4c896625a1772b252a6ef47a6f92170d5cd6d627d4fa02baea0803cb22"
-    sha256 cellar: :any,                 arm64_sequoia: "7ff7d04b3a67e6992992030de224a2edb46ee0f8b71045b8c80d3f11f58a0438"
-    sha256 cellar: :any,                 arm64_sonoma:  "1155bc594827e2d1c810a0c2d67b78beca8aba61a0f037e317f49243060e4465"
-    sha256 cellar: :any,                 sonoma:        "7a60edb6511ace111a3275f7edf765f7c8bfa1f91d0ff86066ccb308d496f4de"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fd7a50450be8428d982ea7cb68d993a9e7d6ea73e1b39850ebf2bdb8d2ace56e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6199347daa14e928216dfade64f4dea018ce360d818bcc37aafb30b805bc46a0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a57143ee1780d665ad47db425118dca8dd71d0bbdb524f0e048bd15b85b55033"
   end
 
   depends_on "cmake" => :build
