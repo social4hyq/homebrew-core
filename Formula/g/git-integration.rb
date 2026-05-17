@@ -7,8 +7,7 @@ class GitIntegration < Formula
   head "https://github.com/johnkeeping/git-integration.git", branch: "master"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "33e61576b92c02c7c8fc37b244cddecd0b1c065ba954e85d5ab860f318636df5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4970df7396af0945e15d1ba30802b027aac6d133db8349b3a789377478b39f65"
   end
 
   def install
