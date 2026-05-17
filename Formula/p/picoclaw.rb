@@ -12,12 +12,7 @@ class Picoclaw < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "41d0a8ce8869d74a4bc31810c4a29bb3eea231df8735517762f73c135d34631c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "41d0a8ce8869d74a4bc31810c4a29bb3eea231df8735517762f73c135d34631c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "41d0a8ce8869d74a4bc31810c4a29bb3eea231df8735517762f73c135d34631c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "61b3968ac4c0dd72d8443797df58516441e7b8f7f625bbf4c2166e67d2b4789f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ad3c043734a262b2b071cf64a742dec1ed5bf34e42a632f2111121ea5abde337"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6997dd9e60973701d091928e4b39931e0851b22c14b4b15850bc47f38643eaa4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c79d208abace6ef234f84485d39d7e17e82d99a0843bcea509d32945021df47"
   end
 
   depends_on "go" => :build
