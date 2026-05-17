@@ -6,13 +6,7 @@ class SofiaSip < Formula
   license "LGPL-2.1-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "6ba4ea78c36c9ed77a42af041593b55c640166be67807d990e92790da85d2873"
-    sha256 cellar: :any,                 arm64_sequoia: "3c841df2ed595da217f0dc91ed1c9cc15b946b4855a1387fe1ce1169197afaff"
-    sha256 cellar: :any,                 arm64_sonoma:  "c53e73fd2cc77275982b7f56d13b3adf31d41c5dc434c2b1f1d53fd134db04e7"
-    sha256 cellar: :any,                 sonoma:        "168570524047f906e3cd945efaf21653f272d5928070dcfd842c126fecc50f6f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3f6c88d7708adaab7ed601daed19702899de571b252a8e0a7a5946523a1555c8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "11f9c56b4460dc17cb0cc252281b2aa6814c1a37f2de26ef51f045c974428a25"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11419a7f5d0fb410b88e237520aa32c9288bd5d8e7714de141cda18843024c14"
   end
 
   depends_on "autoconf" => :build
