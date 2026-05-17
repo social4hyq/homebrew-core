@@ -7,14 +7,7 @@ class Rex < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "108db27f72d9cafd700190736bb8128ee7488afedc3023dd30132dba8a4f395a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "108db27f72d9cafd700190736bb8128ee7488afedc3023dd30132dba8a4f395a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "108db27f72d9cafd700190736bb8128ee7488afedc3023dd30132dba8a4f395a"
-    sha256 cellar: :any_skip_relocation, tahoe:         "752faa83e90ab66d2e21f6e5cbadda2503c84e6238ef79a23895081352e4303b"
-    sha256 cellar: :any_skip_relocation, sequoia:       "752faa83e90ab66d2e21f6e5cbadda2503c84e6238ef79a23895081352e4303b"
-    sha256 cellar: :any_skip_relocation, sonoma:        "752faa83e90ab66d2e21f6e5cbadda2503c84e6238ef79a23895081352e4303b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b1163166f56b4b24e1d3dd451ccf390c956b818097f898f2ccd5089fd0ef613d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b1086daafd3a7f244cb445d43e9ff1bce49e24a7269856e4bcce45bfe2b2777c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a80f5d07466ddaf84ac8d0edd4f1cd205a77ea272b0ecb1682a9864808eb4833"
   end
 
   uses_from_macos "expat"
