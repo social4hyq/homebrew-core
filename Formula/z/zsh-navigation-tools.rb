@@ -6,8 +6,7 @@ class ZshNavigationTools < Formula
   license any_of: ["GPL-3.0-only", "MIT"]
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "7f766c2aecf317bed6dcbbe7e5c2f93dd96789e59831fc19195993fa68258978"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "533afb6416f98d240d3bd5b10f9ba28915173809cd1216735a5e7a33cd68b02e"
   end
 
   uses_from_macos "zsh"
