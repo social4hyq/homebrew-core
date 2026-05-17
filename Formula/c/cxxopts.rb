@@ -7,8 +7,7 @@ class Cxxopts < Formula
   head "https://github.com/jarro2783/cxxopts.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "5c90eb7984473c65039f6dce14c4d9df760f5545777d8901dd5725a87f72a43c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b9512af141e0ea3b45adcf1b5e9f663f6745a94ec42c6f6516d3b4ce7726427"
   end
 
   depends_on "cmake" => :build
