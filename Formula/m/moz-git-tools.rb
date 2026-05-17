@@ -7,8 +7,7 @@ class MozGitTools < Formula
   head "https://github.com/mozilla/moz-git-tools.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "fe6165fdfda101ce38db57eb7352acf2fd00e96edef8eceef8fe30565cc07da1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "91a689f8bdd0fb229b1077a4097ca17c0210c0ccd436c97943927ba58a1b4bbc"
   end
 
   deprecate! date: "2024-08-01", because: :repo_archived
