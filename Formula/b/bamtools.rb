@@ -8,12 +8,7 @@ class Bamtools < Formula
   head "https://github.com/pezmaster31/bamtools.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "e8e8d1b1517af38c77262824988729d08207aa2cbd2b4c4dbabaec811a512081"
-    sha256 cellar: :any,                 arm64_sequoia: "d2d039c52afcc2619c964a259c7ec509f88d91ac86db3be4b60b0e2e214afe18"
-    sha256 cellar: :any,                 arm64_sonoma:  "2e15c688f92ca708cb3c291a9e60003dd8e68e9c6e1becbe6a253098b5292a79"
-    sha256 cellar: :any,                 sonoma:        "4515350fae1a4dc6e96a85e0fbe9aabd09725a6cdeba153958f7ec4a9f8635d0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c76377b22b8eb2db52870a018989b2fd339c2d0e55500238657e7427a5b9c8a5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "542d3eff5a4e76c2c8c00183e5e8d0f1934296c94540a200f923f095ef41549c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "75b0c1f3821f45c99a76162a01243ce8e1f2b682e0589f06c8c0410775e6802d"
   end
 
   depends_on "cmake" => :build
