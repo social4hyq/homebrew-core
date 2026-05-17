@@ -7,12 +7,7 @@ class Gomi < Formula
   head "https://github.com/babarot/gomi.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ded41d13d8a6f36622607150d47235c6e508ce5d9bc2cecaf24519ce828f3506"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ded41d13d8a6f36622607150d47235c6e508ce5d9bc2cecaf24519ce828f3506"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ded41d13d8a6f36622607150d47235c6e508ce5d9bc2cecaf24519ce828f3506"
-    sha256 cellar: :any_skip_relocation, sonoma:        "be76fbedc938009d975403b07195b29d9d7436125e8b7c3a016f4cfeec94d8ce"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2057ca7d2e1c6edc7b0ab4c1092e6af1a3308537637fc77ebb350959d8b44903"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "02e8c178d9bd76dc0267847d3b5570ad1096a0185b370827e7f260bbcef2dad2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd14d5854a3c52e02c3ea797a7dcfa179c906f40389fb96c5b2521195cb1f028"
   end
 
   depends_on "go" => :build
