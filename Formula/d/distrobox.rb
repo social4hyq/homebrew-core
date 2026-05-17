@@ -7,7 +7,7 @@ class Distrobox < Formula
   head "https://github.com/89luca89/distrobox.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "7c51ad4da1192d6346f7099ba55a1c3e18e0c67853833568c86d9bd200f3be6f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "baf69db78dd0734ff575cc57d7b244db91a33fd682bd3afe758c3678059fa3f6"
   end
 
   depends_on :linux
