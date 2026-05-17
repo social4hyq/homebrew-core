@@ -7,12 +7,7 @@ class Minify < Formula
   head "https://github.com/tdewolff/minify.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "91f5d949d5f1657fc5d0069e2c7230c5130839c6cc78086c66b53b4c137e0373"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "91f5d949d5f1657fc5d0069e2c7230c5130839c6cc78086c66b53b4c137e0373"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "91f5d949d5f1657fc5d0069e2c7230c5130839c6cc78086c66b53b4c137e0373"
-    sha256 cellar: :any_skip_relocation, sonoma:        "1c790132610f021f784a48963f15a2400595e6e350bd34bb39f3e299b748baf6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0a31237df21a69ea40b34f01dd7e5e47471bf32b87898b790a5f9347f40a878c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "21baa5fbea3a4819ea59d91d1e54e2c73c0344dea7c2257f230cdbe63e6da7a6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f7c29a2dd4fc533b463c982cf6fad0a9843c62c41dba5931d1c73a1e4593de4"
   end
 
   depends_on "go" => :build
