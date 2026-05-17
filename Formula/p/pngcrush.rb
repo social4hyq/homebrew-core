@@ -13,13 +13,7 @@ class Pngcrush < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any,                 arm64_tahoe:   "d480e8fcafb2cce34d273a2142d1db3513fb094e2e1c6b638b67d2114b75a91f"
-    sha256 cellar: :any,                 arm64_sequoia: "86ee7fe3bb318dd870dfa82ed5e765ef2852723c2dc0a2406cbaf131779bc0fe"
-    sha256 cellar: :any,                 arm64_sonoma:  "e98af00364a8cae0050e46f60c6b7ae0213d43fff7ae59616aacee39e33931b0"
-    sha256 cellar: :any,                 sonoma:        "9e118f22662c43c9d1520be4b73645146939660c600e428aa540df8261ea1843"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b2c169a69b99d3ca7c13d4b8779adfd09568b8b9059c0d510e66008905513f8a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "68503c123cc4886ca3b1e759a7b29e9c9e7abed51d31f78f37f197c4bf66affd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cbe47d3ea88dff640f8236d9861a42621d7c09edcd1254fe7bfa1a7d47628311"
   end
 
   depends_on "libpng"
