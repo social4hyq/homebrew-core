@@ -12,14 +12,7 @@ class Conduit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "118277b357cfc6c3d7f2696c118bb887d70dfed444d7b582da092cdd2108b62b"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c73e20dfa33416ce64040037ca7598f323225b06bf11ff7d9caf0992e7bb0910"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "badd297ac7b2138dbdfcfb4fbe66459a7e5dac5fbeeb6f7d81ddeb919978ad94"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "53d9b586efdc7a2e87004979dc51313c4858388b9d8a3aab4610843cd0a83b82"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c3ca928abb6ada159254a94275ab9e9b7c67f2e310be6278ac24e590b340a724"
-    sha256 cellar: :any_skip_relocation, ventura:       "cfed5653e00116ee2b17fab9b0678514fecef893e04e58de7b46bbbaf69d8338"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8f3a72e785383509d2ea012a2a9502c3de4cebb273300693e38464d4a9dd259d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5ce98054ac53225a6aa027d7b5929a116e13dce0bd82ea35887fb0b6c0913922"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e005cb673eaa9f61905be2ee18c9376537c2bfa9fc54b3a1df2689d964d6b15"
   end
 
   depends_on "go" => :build
