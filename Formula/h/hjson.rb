@@ -7,12 +7,7 @@ class Hjson < Formula
   head "https://github.com/hjson/hjson-go.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "cc9750fd1bca7e7cc3eaa64f7601818a33d663e2b65d7245b62fec5056ee6f6a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "cc9750fd1bca7e7cc3eaa64f7601818a33d663e2b65d7245b62fec5056ee6f6a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cc9750fd1bca7e7cc3eaa64f7601818a33d663e2b65d7245b62fec5056ee6f6a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "acd2ba791152d363026d562d6f35165950fc5fe18e85ed9187a55b6f2ffe10a4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "efafdf6aee5a9a12591cddb5087bd48434f36e93a13be831d70cd98e3a5ba260"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7ebe393b4febcf6fa2248cd911e5d547028e5b9c75877058d03a159dd0cebc2d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7bcb2416407595a1756d3e20d5b05fce87421f4dca30b68b618b2bb824e514f"
   end
 
   depends_on "go" => :build
