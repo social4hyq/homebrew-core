@@ -11,13 +11,7 @@ class Imageworsener < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "2ea02018611e3a89bd678dc6e1daa778ed958dc03d69bdc4a447cd6c43502ff7"
-    sha256 cellar: :any,                 arm64_sequoia: "0631ddddd165edc2731f57d2b3cf01513c202b4fb68a8b8d9eece1c24ce9c487"
-    sha256 cellar: :any,                 arm64_sonoma:  "b68eec2280cf90bec44ef151944a540252118d79233acbcf67e9211a7a4c0a47"
-    sha256 cellar: :any,                 sonoma:        "f3207ea97421c3105dda00945d0382f71fc3c2345b9171c28325cb032094878d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0211d900e4e2ec8d216be3435a9146a811c259add289e0b92e53deca7596f83a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b929b424d3049ee109d5974d83589f92d3f7303b35a597a429334f62bb4e8e4e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db2a0ba15a90e4d51755fabc8acaa20895ff5e601dc0b77d1108b4594806e9a8"
   end
 
   head do
