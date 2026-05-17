@@ -6,12 +6,7 @@ class Recur < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "e4c24b8b4545201201bd84bb0e471463a64e897491dcbe3880cde57c24efa958"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e4c24b8b4545201201bd84bb0e471463a64e897491dcbe3880cde57c24efa958"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e4c24b8b4545201201bd84bb0e471463a64e897491dcbe3880cde57c24efa958"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d02c171c761ce976deb592af90198e5e33ba668ce9628e4307a19b09bfee3f3c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e9317cb24df10674e4ac4c68415fe1fad38d4fb35e6db35cccf8c9e7a1516562"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "531d96ed804cb9e6155ba777873c30ccdfced5f91bc5d5ecfd8a6cb933e2b6a4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2eb78be8c36ec04e3dc4ce07ca64f69e1b4dd4a6393ddd400287fb051421be7"
   end
 
   depends_on "go" => :build
