@@ -7,12 +7,7 @@ class SpiffeHelper < Formula
   head "https://github.com/spiffe/spiffe-helper.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c489a48d0b8d1593f7badfe5b735b7038ec85fdc573027626ade3c005ee04306"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c489a48d0b8d1593f7badfe5b735b7038ec85fdc573027626ade3c005ee04306"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c489a48d0b8d1593f7badfe5b735b7038ec85fdc573027626ade3c005ee04306"
-    sha256 cellar: :any_skip_relocation, sonoma:        "fa6bf56087d81d01a312e2c855fba496e9e3f99d8c526655f6092d783aace956"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "cac2dbc3746b6296cb35a00d1ea90a96fe1ca593f52d72cde19b74b66c35c286"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3f2053bc574698df586253d646f5a5324e556b366b01d04f34c238c1aae6ac73"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d92af06537357c617c98cc39888d735677a93d0fbf3b94355b31bef6fdbd18bb"
   end
 
   depends_on "go" => :build
