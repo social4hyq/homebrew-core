@@ -6,7 +6,7 @@ class Prettyping < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "34b060c257cb158f76339e83dc74f498fce30be734f9d007b203f7f95699d5e2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "465280c078214f9b1bc9c9edc396a1bd99d608fa8e0c0b6ff7674af48b769c8e"
   end
 
   def install
