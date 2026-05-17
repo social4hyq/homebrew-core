@@ -9,12 +9,7 @@ class Doitlive < Formula
   head "https://github.com/sloria/doitlive.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ad9ad788d8f55216c2de2ce98bfc1de2f9f93b6f3705d3c20140c920cad71e61"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a47920e296dce436daebe68c3ae423cdee4807ae552b82aa2c14690ddd609109"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "493a7df97e0c82c5e933302a6dceb656880e0c904b432ed41d65a6381cf50a11"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7a644b8fb2f5b57461fc7c26611898285734c646157f3334a5b4f8d0fed1c30c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "060e55176c3398eeaadec86f02006a74ccc51db74f81391843dfcfca9558fc94"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ed0dcc035ead07431fa4f62a61cc880c3ca4dbb47132fdb6fb8b8f868a13f2cd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9844717171e5e1c3d86de9ce6032aea3c75e6a144caabb7c1bf47801882e95ec"
   end
 
   depends_on "python@3.14"
