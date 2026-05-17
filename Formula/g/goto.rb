@@ -6,8 +6,7 @@ class Goto < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "43777539bca93f8ed079e3c3701cc37128ac7ba6b98006b91c39a0aa2e6b09bc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f5aa87c99f6aeda15b9a8015445c8e95e4229ec889c1338dd80860a10a8f994"
   end
 
   def install
