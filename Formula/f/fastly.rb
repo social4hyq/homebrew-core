@@ -7,12 +7,7 @@ class Fastly < Formula
   head "https://github.com/fastly/cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "e849096453f488c72e5060f4678a8c439a17b5dac83babaa5f42410465fc5314"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e849096453f488c72e5060f4678a8c439a17b5dac83babaa5f42410465fc5314"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e849096453f488c72e5060f4678a8c439a17b5dac83babaa5f42410465fc5314"
-    sha256 cellar: :any_skip_relocation, sonoma:        "4c3325f22e80a1bceafd25d5a4eb821815bb9a38a4bf506e6ca980e61b2d2192"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "725ed5a2aa909dab33ec1c85d329eda866ec96c33cee03d72490d6e7e5a7961e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1b7dc0ba9d8049afa80fbd089e39cd924b9845dbe0bfa79f93ccfb36923ead6a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "39ab2d4af09147cc71ffc92d296fc79d028357ed6884664e57fc3d98b679838c"
   end
 
   depends_on "go" => :build
