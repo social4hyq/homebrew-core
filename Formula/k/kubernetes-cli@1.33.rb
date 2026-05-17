@@ -12,12 +12,7 @@ class KubernetesCliAT133 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0185e586faa1fa31fdd47f71f5aef81201dc8cd728039de6013aa591a460fb76"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8d4cde5b523dc195a95af5b7fbb616fb8299a4367e7839b867074074825206ce"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "360af7b4555792b93c3d686a1677747df8dfb85c88e2b7bec3b1e2b7183da028"
-    sha256 cellar: :any_skip_relocation, sonoma:        "55f64f2fc78b9f19bfeda03a1626621b1870f549549f4dcae66dd5a57c21251f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5418dd0fc27de87347dcf3175cce6c5adf87487d181c98b32c6d1a1e11042491"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8b297528444f4337a329ace2244bade58e8629e9ef21ab11ea81bcaecbd087bd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0beb11d3aecb2fb0a9c55c1f022de91657a08ace25e1aa71c9fb168d1c534b84"
   end
 
   keg_only :versioned_formula
