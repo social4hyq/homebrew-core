@@ -7,12 +7,7 @@ class Blocky < Formula
   head "https://github.com/0xerr0r/blocky.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "aae4b193ea5f8a18fde101faeba0ae14411cca6a47195090bd3a26d8f49afa48"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "320afab4f30f575ee3c2de9c63e0f62e70d0991f835b01adbc02de36666f204b"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "05c608958f383919c38a5a578ba1478f31eaabb8eaba921253e08238959c9705"
-    sha256 cellar: :any_skip_relocation, sonoma:        "cfc14fb077737658e9bcbf37a01780358c3207b4a97382398148829fd420c86d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3395e62f6b3751b066583d61b8fbbf4ef07266529780a3c34920383e77236c06"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8306ee682957dcb06faf9825e3c34b188de22b4a7da043453682da6ceeb76b53"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "09169517e00a0146a9f27012ba591fccb8a3bc90a36835aca1fa0b771cdaac81"
   end
 
   depends_on "go" => :build
