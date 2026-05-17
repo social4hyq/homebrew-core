@@ -7,7 +7,7 @@ class Zug < Formula
   head "https://github.com/arximboldi/zug.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "e3834dddcd9eb7036a9a75ea740f0498c6566cfb6dec6f3d20e488b7f4881f96"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "567f2fb871e8194414c60b616bbd7c255e15c7fad0512e30b4d412ae2331cfe2"
   end
 
   depends_on "cmake" => :build
