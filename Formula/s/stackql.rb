@@ -12,12 +12,7 @@ class Stackql < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "893bbfbbea089ead7086c53bf708312c1b72b5691989d56f4fc10e2a976ad3b0"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "80e1c0dce7887ed1504f27b3ee5d0ae46ad11fdc13a44f534c0567b9f0dcbc48"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "a9bb42486d442e71128300995a61e964b42bebf628da81cf1fcee6463deac9f0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "532403aef29fa9e478de4e5f3df9c5927aaa838302d34fdc772dc87e7d167ba0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "36c3547edde2eec5662185c3bc487c1416742fb897ef33af298eb571c1b6e788"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4908a6672657b93dafd966cab4113871282b2c0c7aeb557fac6cbeb0b6f23316"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a08370c656df93061d262ecf84247b042f5163c98dc4ab7f7fd4e0834c799f3"
   end
 
   depends_on "go" => :build
