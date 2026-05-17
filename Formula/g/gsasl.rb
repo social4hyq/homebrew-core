@@ -8,12 +8,7 @@ class Gsasl < Formula
   compatibility_version 1
 
   bottle do
-    sha256 arm64_tahoe:   "c6f2f819428c67bde23b7c4ab18ac89d5f37f1524dd27d4cc48e96d3305de4ae"
-    sha256 arm64_sequoia: "4bfd53166cf8a715d97a621ec1df48be005f3a71a86b3a21f08514377c4e28b3"
-    sha256 arm64_sonoma:  "b50afd10fccb091ff521420839a9cc137249d4b10b57140f310d86d766344703"
-    sha256 sonoma:        "563601d7eb1811c0655ae6fcf81189dfccdabc650ea5a2d2bc97fae138bd90d3"
-    sha256 arm64_linux:   "afa8aa7a30cc4cf206474b87a9d93a2080c29aa951a70fa129cb7ad8cd37cdaa"
-    sha256 x86_64_linux:  "b4dcd4833df9890718a8ef900ac0d3191f64362c7418eae79bacfa6b1e89626a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "654b7cfbaeaec4882ef7d82cd3936ef486eb9d815d9c30f40f374e941261c779"
   end
 
   depends_on "libgcrypt"
