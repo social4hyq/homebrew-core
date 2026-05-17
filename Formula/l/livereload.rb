@@ -9,12 +9,7 @@ class Livereload < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "116f5fca359f8496313310d42ec7b1dd307d209c463256f7a951d1d0b56294d3"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "651acd218fee0221cf2905deb8fa7a703c24272ffee9696936459741e93214e6"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "60aa96f61ffc238033fe728ffafaa12a8b66a7c1d96c91fa46894416c59ec2d6"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ded998ab1338752e030f905b6806f575a6bb2329741969a837320a582f4c6ca5"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c9825e222b28fa8f334b6bbfb90374f1ec5d8b50778fb6641618ad605cffb0dd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "31fef9050f7a1e6604ba62e5dc09eaaedae232695864d9e8b7d42543d24a01a3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00e17765fb13b27d6832cc9379cadaec59a5187875527d597800e63d998455a6"
   end
 
   depends_on "python@3.14"
