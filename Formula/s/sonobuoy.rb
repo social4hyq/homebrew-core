@@ -6,13 +6,7 @@ class Sonobuoy < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d38eeff7e2714c2a329f9028c96692c2c4997bf2772d530672dc893b70235735"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d38eeff7e2714c2a329f9028c96692c2c4997bf2772d530672dc893b70235735"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d38eeff7e2714c2a329f9028c96692c2c4997bf2772d530672dc893b70235735"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7520b1997a933d60f51a3ac76778969f722c02d006e26640196b4bfc15a4342d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "27202e2a75ff97b252c812426b61c3e16bed22b1e8de258e61c4c222d8056719"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1415146262a80affb1f033a826e071437e651d443da8f6df933fc58fe9d2b043"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "54a76044d10b7122e60801d76c20e30a296e424a7aaa53c46e0938160f896f53"
   end
 
   depends_on "go" => :build
