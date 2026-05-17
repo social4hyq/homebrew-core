@@ -6,8 +6,7 @@ class Jpdfbookmarks < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "bbac7244d29ddb86bb5342e4752fa87479247a239a57663c5a701d2687aafc46"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "692a86165ed11f2cb36310dd5509a839c9dcb268eec1e74791db5d21b207c14f"
   end
 
   depends_on "openjdk"
