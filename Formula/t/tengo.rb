@@ -6,14 +6,7 @@ class Tengo < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c93892d0177b5d0520a654866c4822554a5a06a8599afdee5185166238e2443d"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "10c3e44f039ecd6b7f43ceabf80249654e25a079270b25373066051a08e0bdcc"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "10c3e44f039ecd6b7f43ceabf80249654e25a079270b25373066051a08e0bdcc"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "10c3e44f039ecd6b7f43ceabf80249654e25a079270b25373066051a08e0bdcc"
-    sha256 cellar: :any_skip_relocation, sonoma:        "250e938de1c268bbaa0dcb010df63c3d6427476c2a317e5ee40e4f67dd2d2b85"
-    sha256 cellar: :any_skip_relocation, ventura:       "250e938de1c268bbaa0dcb010df63c3d6427476c2a317e5ee40e4f67dd2d2b85"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "98750059e6eab32be3c593d770fd330c7b5c9be19305cb795151ea4ec0597faf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d4c55cd3c296195d74538e9f8c922f6f3b1e12414733ffac200589d584193858"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7abad40383e487cc673637a45fe54139abd601b0da1c805a86da0172e0380b92"
   end
 
   depends_on "go" => :build
