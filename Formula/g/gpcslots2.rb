@@ -14,8 +14,7 @@ class Gpcslots2 < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "929c7fc634b2f18293d05562d73850df33ac33ff14e1d43bb62ccb42a4ab778b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bbbbb66b3927b43506d11bbbb223aed2020f47395871335b3d029e1837a8d3a"
   end
 
   def install
