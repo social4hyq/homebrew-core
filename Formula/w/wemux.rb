@@ -7,8 +7,7 @@ class Wemux < Formula
   head "https://github.com/zolrath/wemux.git", branch: "master"
 
   bottle do
-    rebuild 4
-    sha256 cellar: :any_skip_relocation, all: "41e9a8eaac236f236653d1867f1b5de10a03d5de49e1764628284742dc27bc24"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6bf9eedc50eff5efbf22cd3922af3dded0d1de12167559115bf80f0e75c6afd"
   end
 
   depends_on "tmux"
