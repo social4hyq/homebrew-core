@@ -5,6 +5,7 @@ class Node < Formula
   sha256 "779a1364889575d44e0215adc381806bbd0d9437557b59893e172f5b9d35a990"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
+  revision 1
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -12,46 +13,101 @@ class Node < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8047aecb2bebfb9bc5a770fc11a1c4e8a18fcb345bfd61501682f4e17086f966"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "602cd95c7698bc953abe8042a951ecd0aad7db0b33434b16b88638c9fa2ed4fc"
   end
 
-  # Disable superenv
-  env :std
-  
-  depends_on "python@3.14" => :build
-
-  # Use a mirror site for downloading Zig due to the instability of official links.
-  resource "zig" do
-    url "https://pkg.earth/zig/zig-aarch64-linux-0.15.2.tar.xz"
-    sha256 "958ed7d1e00d0ea76590d27666efbf7a932281b3d7ba0c6b01b0ff26498f667f"
+  resource "alpine-rootfs" do
+    url "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/aarch64/alpine-minirootfs-3.23.4-aarch64.tar.gz"
+    sha256 "9250667a8affac8f1e98086392f80f43f086626701e9bce33398eb9b6c0bd64c"
   end
 
   def install
-    # Setup the Zig compiler.
-    resource("zig").stage do
-      (buildpath/"zig-toolchain").install Dir["*"]
+    chroot_dir = buildpath/"alpine-chroot"
+    chroot_dir.mkpath
+
+    resource("alpine-rootfs").stage do
+      system "cp", "-a", ".", chroot_dir.to_s
     end
-    zig_bin = buildpath/"zig-toolchain/zig"
 
-    # Environment reset.
-    # The ohos-sdk compiler (LLVM 15) is outdated and cannot compile newer Node.js versions.
-    # Using Zig (built-in LLVM 20) as the compiler with static linking to its internal musl libc.
-    jobs = ENV.make_jobs
-    ENV.clear
-    ENV["HOME"] = "/root"
-    ENV["PATH"] = "#{buildpath}/zig-toolchain:/usr/bin:/bin:#{HOMEBREW_PREFIX}/bin"
-    ENV["CC"] = "#{zig_bin} cc -target aarch64-linux-musl"
-    ENV["CXX"] = "#{zig_bin} c++ -target aarch64-linux-musl"
-    ENV["AR"] = "#{zig_bin} ar"
+    if File.exist?("/etc/resolv.conf")
+      chroot_dir.join("etc/resolv.conf").write(File.read("/etc/resolv.conf"))
+    else
+      chroot_dir.join("etc/resolv.conf").write("nameserver 8.8.8.8\n")
+    end
 
-    # Disable Thin Archive support, as it is currently incompatible with the Zig linker.
-    inreplace "tools/gyp/pylib/gyp/generator/make.py", "crsT", "crs"
+    chroot_build_dir = chroot_dir/"build"
+    chroot_build_dir.mkpath
 
-    system "./configure", "--prefix=#{prefix}", "--dest-os=openharmony"
-    system "make", "-j#{jobs}"
-    system "make", "install"
+    Dir.glob("#{buildpath}/*").each do |file|
+      next if file == chroot_dir.to_s
+      FileUtils.mv(file, chroot_build_dir)
+    end
 
-    system "llvm-strip", bin/"node"
+    chroot_script = <<~SH
+      set -e
+      export PATH=/bin:/usr/bin:/usr:sbin
+      export HOME=/root
+
+      apk update
+      apk add build-base python3 linux-headers
+
+      cd /build
+      export CC="gcc"
+      export CXX="g++"
+      ./configure \
+        --prefix=#{prefix} \
+        --dest-os=openharmony \
+        --partly-static
+
+      make -j$(nproc)
+      mkdir -p /dest
+      make install DESTDIR=/dest
+    SH
+
+    chroot_dir.join("build_node.sh").write(chroot_script)
+    system "chmod", "+x", "#{chroot_dir}/build_node.sh"
+
+    system "env", "-i", "chroot", chroot_dir.to_s, "/bin/sh", "/build_node.sh"
+
+    chroot_dest_target = chroot_dir/"dest#{prefix}"
+    cd chroot_dest_target do
+      prefix.install Dir["*"]
+    end
+
+    mkdir_p libexec/"lib/node_modules"
+    cp_r lib/"node_modules/npm", libexec/"lib/node_modules/npm"
+    rm_f [bin/"npm", bin/"npx"]
+    ln_s libexec/"lib/node_modules/npm/bin/npm-cli.js", bin/"npm"
+    ln_s libexec/"lib/node_modules/npm/bin/npx-cli.js", bin/"npx"
+  end
+
+  def post_install
+    node_modules = HOMEBREW_PREFIX/"lib/node_modules"
+    node_modules.mkpath
+    # Remove npm but preserve all other modules across node updates/upgrades.
+    rm_r node_modules/"npm" if (node_modules/"npm").exist?
+
+    cp_r libexec/"lib/node_modules/npm", node_modules
+    # This symlink doesn't hop into homebrew_prefix/bin automatically so
+    # we make our own. This is a small consequence of our
+    # bottle-npm-and-retain-a-private-copy-in-libexec setup
+    # All other installs **do** symlink to homebrew_prefix/bin correctly.
+    # We ln rather than cp this because doing so mimics npm's normal install.
+    ln_sf node_modules/"npm/bin/npm-cli.js", bin/"npm"
+    ln_sf node_modules/"npm/bin/npx-cli.js", bin/"npx"
+    ln_sf bin/"npm", HOMEBREW_PREFIX/"bin/npm"
+    ln_sf bin/"npx", HOMEBREW_PREFIX/"bin/npx"
+
+    # Create manpage symlinks (or overwrite the old ones)
+    %w[man1 man5 man7].each do |man|
+      # Dirs must exist first: https://github.com/Homebrew/legacy-homebrew/issues/35969
+      mkdir_p HOMEBREW_PREFIX/"share/man/#{man}"
+      # still needed to migrate from copied file manpages to symlink manpages
+      rm(Dir[HOMEBREW_PREFIX/"share/man/#{man}/{npm.,npm-,npmrc.,package.json.,npx.}*"])
+      ln_sf Dir[node_modules/"npm/man/#{man}/{npm,package-,shrinkwrap-,npx}*"], HOMEBREW_PREFIX/"share/man/#{man}"
+    end
+
+    (node_modules/"npm/npmrc").atomic_write("prefix = #{HOMEBREW_PREFIX}\n")
   end
 
   test do
