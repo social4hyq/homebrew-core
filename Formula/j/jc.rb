@@ -9,7 +9,7 @@ class Jc < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "d8b4e6e1d9832668d75f25d26a43235d6dafeb70a2f84786971dac4664415d5d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9bbc062387a5af68f1ff5b1818aa89b2478b5291a73e0a512656b336b08e1594"
   end
 
   depends_on "libyaml"
