@@ -8,12 +8,7 @@ class Kn < Formula
   head "https://github.com/knative/client.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ac3f057f6036fd79548c044946f8366896c949b05cc12d744b7f3a9ea0a38677"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "bbb2653eeff8b307833f05f809bc53b123907789802554a291267dae8f9bb426"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1a3fc043392f32c5ffed0e95759a8e988d1c1c1b31c9d83e613e404a31fc642d"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d30d58a02a16e9de407e820db2c0c471f5ed0710d9d482de83ff6bc3655e70ba"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a1db3d8a6e09976f6b7a948410983eaa911f904f4b33ad69928397ed55b4a67c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f611959fa110d983d07fdfc7c03e7b7bb540d4af4b428bc6b034eaf454e5c641"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "576735341024e4865d7c495eeea05196fb0def767ff16de567a8855d31a3741e"
   end
 
   depends_on "go" => :build
