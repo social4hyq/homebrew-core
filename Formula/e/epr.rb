@@ -9,8 +9,7 @@ class Epr < Formula
   head "https://github.com/wustho/epr.git", branch: "master"
 
   bottle do
-    rebuild 7
-    sha256 cellar: :any_skip_relocation, all: "571401b416ae87c8443cf20db13c2150c564f0a234eacaf903660c2d2dbde706"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ec70e43f114ba1e500ff16f77e6baba82a5d16fd48ac793865d438d318655d7"
   end
 
   depends_on "python@3.14"
