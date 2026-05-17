@@ -7,8 +7,7 @@ class Shpotify < Formula
   head "https://github.com/hnarayanan/shpotify.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "a77b8a65c1e58b6bf20d640d688e62c01332f1663c7da3b37d7e0329280b4892"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "15c0c4868300c5d33102df60446f2a8b669eb9b2b703bfa31b7647c7c1760991"
   end
 
   def install
