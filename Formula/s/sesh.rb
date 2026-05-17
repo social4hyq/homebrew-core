@@ -7,12 +7,7 @@ class Sesh < Formula
   head "https://github.com/joshmedeski/sesh.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c5fb21c1b8c73fe8c5292c00257511469b134ca0b6783523ca20ebf261787bcb"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c5fb21c1b8c73fe8c5292c00257511469b134ca0b6783523ca20ebf261787bcb"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c5fb21c1b8c73fe8c5292c00257511469b134ca0b6783523ca20ebf261787bcb"
-    sha256 cellar: :any_skip_relocation, sonoma:        "624f9a1df204c6fcb47ebe0fb048ee1fb6e96e9932435fb55366135bbe343a69"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "cb0923a26ebc45b7e3a987a7f0dec62583ac02695f98715b7ca93dc539005612"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ac4bd03ef75a2f3f64bf7b08fb7795c091bf76b7301d407033530ad29c3f524a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8495ffa511112e61d050c9b829d5fc9221ab53be21f5c9c72514509bac4b1e6d"
   end
 
   depends_on "go" => :build
