@@ -7,12 +7,7 @@ class Opa < Formula
   head "https://github.com/open-policy-agent/opa.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d2a2b4fb24423379f738c42d71b10652edf11bf0b52df35054c741723cf3ec0b"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b14d143e0422cba404424b1e56c8df34262c7220247e0f53b1cc69679dafbca7"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1404d8d01b637ccddce3e331a8afded950bdbe8c4ff7873d921c578c7398a2fd"
-    sha256 cellar: :any_skip_relocation, sonoma:        "88571975507601815c48563d1a63fd129d25ad6ea3cfb95ea91293ba1d7ee5b5"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "095acb7eb30325e32bddd291144df0f5ce6ac66817a84c539dcf1af708e01d3c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "aac451c805ef30bb90dab07166cd259e50d78c5c94bde2534001d6cd03b87512"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9049a7193bbcc5819a41ddfa505c5cd5a5fa4d922df76d6ed54b3be632a83cb8"
   end
 
   depends_on "go" => :build
