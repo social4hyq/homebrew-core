@@ -6,12 +6,7 @@ class Libxcomposite < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "b9f78b5015dff6cf0f0e3502d5bb1b68554762c5a99c42f42a4df3eb1332993c"
-    sha256 cellar: :any,                 arm64_sequoia: "44930f02849b36b984f59a7f54e7a6e30a0c68bdb161ade3489c85da3add1f92"
-    sha256 cellar: :any,                 arm64_sonoma:  "39186e194080cfaf90cf095df02c8b9e12dfefadc3ae011c536111cbc0b6bf6f"
-    sha256 cellar: :any,                 sonoma:        "bd0f533e1472d808217fe6b8e2eb5e79fcd7304ed0160c18132450aa1dc052f7"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f4abdd9cbed5a4afcadec1d342113f314330492dab6192c68023b2d323d9dde2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8315c74c0801195039af20cb91211b9966bdf7541b895794146ec4d50ac55e46"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8f3d05f5648e119c01e8d339128d4b307d527c41cab36280109ba09c37ad5d2"
   end
 
   depends_on "pkgconf" => :build
