@@ -7,7 +7,7 @@ class GruntCompletion < Formula
   head "https://github.com/gruntjs/grunt-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "4b46d9b78c7353cfdc7dcea3a0009d9799ac6281b32484fca512db71258a23e5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "521d16a13412de256693cd089cdb504ee658f691032620251284d0f02ff07560"
   end
 
   def install
