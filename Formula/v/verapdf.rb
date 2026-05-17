@@ -12,13 +12,7 @@ class Verapdf < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "df7fd4ab31e82d978692ab44aa1a97fed36a0fd264224bc336321a52ec076134"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ecf7bf4a37e1449dc313f2918476a2760270e0ee71d6e8f32be0ff2667b1aa80"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d9ebea276b621b8f0640506c03acf6fff126cb89a2011e0c5cf87a710d7fd24e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "61b3a7dcfa8cae285fc0adb56c66eb634b2ad170dd263bcd57758a3d90310353"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2dc10c3493f038ec1da7b835b546ab2536b065d8230e92de42ef46cdac89557d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1119ddba3e432e6d7538fb0df24305dfcbfd8c97826506b711f212d86c516ce2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e202be163a74f174966e350a47086e60ab4869ec6ba79df2fc4a6e18de4cbdff"
   end
 
   depends_on "maven" => :build
