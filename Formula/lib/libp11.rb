@@ -11,12 +11,7 @@ class Libp11 < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "a94d83844bc1f18b84f86706ebf2c352aca06d25600caf40607abf84a6143754"
-    sha256 cellar: :any,                 arm64_sequoia: "d2bd6f345624a39294440cecbfc059e545a5dc39a7bab8c8e739755721ac5c31"
-    sha256 cellar: :any,                 arm64_sonoma:  "b3cf34f7f345d962fc543d2dba6b9a81a36a8644936dfab1dcc1349b612ebcb8"
-    sha256 cellar: :any,                 sonoma:        "74bc484a52d1b9385a0c63d0adc420f34376286b34a5652c53dc6454ec9f2205"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "230793e71d2b7f3b024ed4ebd9644848c5718fde2002ce92b89635ac5cc1a318"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "31470d470591cdffac76a296ace50dbc0df4a6cbf5210afd2dc40b0e4a0e5f19"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "17ed06987a32ba4921ef7dd98f4c2debe5324a66cdbd30222897d55e5939765b"
   end
 
   head do
