@@ -7,12 +7,7 @@ class Polaris < Formula
   head "https://github.com/FairwindsOps/polaris.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "dacb76f5a75fcb9b81a5182abeabde806aaa8ca6b71078aa03343ec08394ba14"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a25fcc846ad751e25eb2d6e9b6b04f2e1fe8e207f1f9ba8394e4262b31d58cd7"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "542841012d9eb9ffaa9797313f94b6ad06713674ac8fef90fd625d4cc3d50bab"
-    sha256 cellar: :any_skip_relocation, sonoma:        "cb822411f5db4236cfe0f4326dcdbdb9d51a02a406fe663a141b0773fedb7afa"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "bc61b0d93ea9608f5061d9a28a35eb8ac616b10c964a1681ce3d00d059d4029c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9183ca87a269aa8077935a7827cd7752bc22063116eec4f3d3e26b9b9aa43e7d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "692d7bd79c43da5d54ac5625e20170e3a52f96bcc253236aaeac9c33bcdbfbd2"
   end
 
   depends_on "go" => :build
