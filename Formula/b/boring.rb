@@ -9,12 +9,7 @@ class Boring < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "a2384dc6773cf751772120eda88d4560031950d4a1352919543277214c0b008d"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a2384dc6773cf751772120eda88d4560031950d4a1352919543277214c0b008d"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "a2384dc6773cf751772120eda88d4560031950d4a1352919543277214c0b008d"
-    sha256 cellar: :any_skip_relocation, sonoma:        "dea86e35c0c2c6705dc7c95bf7d3030c28dea712ee494d8136083a99ad0edcd4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "42d37ae685cb3c766845846486a22afb63a828d5805d0229b8fa779051f053d1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c1801f7f39c1acb1b5fb941fee2e38eb7e06d465e5e59508768cd0e8d3a03a15"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0eb4aecf5bbc3a16c869da70708d4b8c54725e8c21d742700818105b58d68d9e"
   end
 
   depends_on "go" => :build
