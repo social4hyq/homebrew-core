@@ -7,12 +7,7 @@ class Cloudfox < Formula
   head "https://github.com/BishopFox/cloudfox.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c75363ddac63304760789e897faf0cd5bfbaa13262ffe956cf53e2bfd48ddaef"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c75363ddac63304760789e897faf0cd5bfbaa13262ffe956cf53e2bfd48ddaef"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c75363ddac63304760789e897faf0cd5bfbaa13262ffe956cf53e2bfd48ddaef"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e5f113ef16b0289abf10193b8a704899d2b3510135f5fa10feadcdebb843f719"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "635c0e95df033ac77661c42a343b510ee1821f08e28a9cff75658420f703dd99"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "aa8333744ce6dc5a77ccaf976107230d6def5e7b4672c92ab9858fa7a3d23eb1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11a75edf6c092521a33fc99aa0d8b3d106ecd03c6233ced02b17d67d3bf0e116"
   end
 
   depends_on "go" => :build
