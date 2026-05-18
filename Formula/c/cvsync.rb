@@ -11,12 +11,7 @@ class Cvsync < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "b81c4d24167e797f64465c3060f8a8d28529255c229998c8bb726be119aa1028"
-    sha256 cellar: :any,                 arm64_sequoia: "7309da9877789f2a01a29b5adca987e3d5cca4825ee349042c9211eea0f96774"
-    sha256 cellar: :any,                 arm64_sonoma:  "a7e5a9da3977ccc2c20daa0eeac3ac6069dd5d026bb6d86aa40c4219432c9040"
-    sha256 cellar: :any,                 sonoma:        "5759b950487eb0317d3424292d3ab47866bc408ff81909d731cbda79c80d5954"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fd83b23b9450d46c8c72da4f914d969f359073dceb5b48cbaea6bd464123cc2c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "34a2636df942bc8fabaf8112d319f14b037e04dd3a43c9f8948ca0be77cca8fd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa8734ea0b5df2013f7bb47d61dc6a1fcd5167ffb549a66f82b3e5b088bcad15"
   end
 
   depends_on "openssl@3"
