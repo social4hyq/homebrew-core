@@ -7,12 +7,7 @@ class Falco < Formula
   head "https://github.com/ysugimoto/falco.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "086b2b76fad2f0dd4b8ea6649e83bf0ef92993017af5a54ff8bc99767ce33b31"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "086b2b76fad2f0dd4b8ea6649e83bf0ef92993017af5a54ff8bc99767ce33b31"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "086b2b76fad2f0dd4b8ea6649e83bf0ef92993017af5a54ff8bc99767ce33b31"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d47997207c542444f842cd29eacb1e8640303c7f0567f406f7c4dd0c582d56e6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "38ef3869019f89c1e828e7de5ef9edc49408d22d515c501e6858a4cca998cb1a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "25fb4c8711a5b526df05f7ad4d76f9a439c7fa9229c90c55d1ce6b1a9b0d94bb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "966a29b81ab7806502dd7e14c56ab9553a45d97839946071fa8078e5125213fc"
   end
 
   depends_on "go" => :build
