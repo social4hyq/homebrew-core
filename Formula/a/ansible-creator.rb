@@ -8,12 +8,7 @@ class AnsibleCreator < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "27fe01ad3071ef63436825c0740688e6a7096930889ac89791652b72ca6d4bbe"
-    sha256 cellar: :any,                 arm64_sequoia: "cca13bed50f7b6a587273c4a3ba19f2e03502375cae07ff2ebf98bad5a12dcd4"
-    sha256 cellar: :any,                 arm64_sonoma:  "31a37437fac1a014d6b97eb47cf24bfb35dd8272ff617ce1b8ef4d18284915a2"
-    sha256 cellar: :any,                 sonoma:        "11962a0e6e5d6749d356b52c6ca1526df301ee436b5bace99080a803ea3dcfd2"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9eb26b48f7cd02a6f9faf9b5ce7d4e18eea406d1884a3d6e91febcfaadea3d54"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "319779c6d1dca218828a49adef95a06de4d1a229b5d3e7333ec49047f33926f1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0366664c44140d05436fd9deedc9b3a8010428dd013b8e55bc2f060f1dc4062"
   end
 
   depends_on "libyaml"
