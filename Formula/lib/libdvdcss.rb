@@ -12,12 +12,7 @@ class Libdvdcss < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "a5d4c6891b5f9fb44fe66d4ab1317be59dbf8aa9ceb33c6f05b5952547705d0b"
-    sha256 cellar: :any,                 arm64_sequoia: "1aebedeb3811f84a19a05160321eada6ca39130948428e4e0a8af6d2ca6f7c37"
-    sha256 cellar: :any,                 arm64_sonoma:  "c80a83c521635f153f1fc27bc1dfca7651d49c74bc76f449e325f058b898fa47"
-    sha256 cellar: :any,                 sonoma:        "5223d1869afb3e6d00535d49c83eb5c78eef6173fdd9d15c137d6452d9aa6516"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fd4ba20cd9a543abf5e6fa9780d535c9ad4751b0ee39464cbb73c0c1f00d6877"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "29d4fd7b31ac1726a8778e1c010f6cc0a16c2170263c4932f59b619ec728ca83"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6111059e86978ad3da3788e4f37bb510a4fd98a0fcec71128ec9ca8cc9cc0799"
   end
 
   depends_on "meson" => :build
