@@ -13,8 +13,7 @@ class Rcm < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "bc964820b4e236614e4a76ea1a6913b25abbe68cfa00a106aae40944b3af8d3f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1267afbcfad58dceecfa3cf4b46d02b78c0d15fc3c9ce0d20ab6d8c7158014a"
   end
 
   def install
