@@ -1,8 +1,8 @@
 class Taze < Formula
   desc "Modern cli tool that keeps your deps fresh"
   homepage "https://github.com/antfu-collective/taze"
-  url "https://registry.npmjs.org/taze/-/taze-19.11.0.tgz"
-  sha256 "bb83b0869768e61f4edf0a76c65819496ff411ade275695b6291c4f53b55d217"
+  url "https://registry.npmjs.org/taze/-/taze-19.12.0.tgz"
+  sha256 "67a040fbd82711f656e93579a53d6f2fdcdd4366b03db187146bbf20fbb7b5f2"
   license "MIT"
   head "https://github.com/antfu-collective/taze.git", branch: "main"
 
