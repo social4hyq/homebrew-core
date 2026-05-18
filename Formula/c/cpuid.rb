@@ -7,14 +7,7 @@ class Cpuid < Formula
   head "https://github.com/klauspost/cpuid.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "8db225f084a6723c03356505200ac635cb94bb3ce0204900eb62137ce559eaaa"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8b65f000226c41729001db3a206845dafeaf87d39f5ec12465ee02797718399f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8b65f000226c41729001db3a206845dafeaf87d39f5ec12465ee02797718399f"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "8b65f000226c41729001db3a206845dafeaf87d39f5ec12465ee02797718399f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "3fb55a4d8942c9131a331f392d2b56e4e1515163850a5afcb8e1a17ec100aa61"
-    sha256 cellar: :any_skip_relocation, ventura:       "3fb55a4d8942c9131a331f392d2b56e4e1515163850a5afcb8e1a17ec100aa61"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "555f1ed20e4de1ce5bdc1ea1d5ed9cf01c1bb64f968cf1c1125200d988869acc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "de235784ecef52744cafc99dd9b01aae03ff3763514153d8305ecd4d9b2b0c39"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1cf6816583eeabb441cc497fe6cfa2d2ba5a32560d195b7ddd4ba4272103a53"
   end
 
   depends_on "go" => :build
