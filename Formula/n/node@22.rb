@@ -12,12 +12,7 @@ class NodeAT22 < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "02324491602549ef17b82677db2d4b662d7940c9ff1040400f2ac9826edc0415"
-    sha256 cellar: :any,                 arm64_sequoia: "6caf12083a7b916b4c8d758546eab03e92ab423b621468897d9f462c1d9509ee"
-    sha256 cellar: :any,                 arm64_sonoma:  "b14e0f06928ef072e8a55761cb4e067f1965821f2fa0e65005a850b32785a1d8"
-    sha256 cellar: :any,                 sonoma:        "1d9aec34dfa3fd8ee6fa25a184234524e20537fea71697b9b7b761c38de3b4e1"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "da5c9cdb6cbbea3ccdc77aa3b44869dfbd06618b5cc5bceb650c246f55a30df5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f76e8ef91851f01b80cc5f17b2c9b5b1d12baa2968b468eec72bfaf591d15788"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f9b3085252d4a9f9df70294f07c0e8478f3e43c9457ed6b808bffcc655e842c"
   end
 
   keg_only :versioned_formula
