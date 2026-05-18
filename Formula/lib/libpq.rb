@@ -1,8 +1,8 @@
 class Libpq < Formula
   desc "Postgres C API library"
   homepage "https://www.postgresql.org/docs/current/libpq.html"
-  url "https://ftp.postgresql.org/pub/source/v18.3/postgresql-18.3.tar.bz2"
-  sha256 "d95663fbbf3a80f81a9d98d895266bdcb74ba274bcc04ef6d76630a72dee016f"
+  url "https://ftp.postgresql.org/pub/source/v18.4/postgresql-18.4.tar.bz2"
+  sha256 "81a81ec695fb0c7901407defaa1d2f7973617154cf27ba74e3a7ab8e64436094"
   license "PostgreSQL"
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class Libpq < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "192fa4012df58541feb215d6e34546ede09ac02a097388b30b86b907bb1b6895"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "68fba8c8af29abd31f5e3c7203ec5dff96566756699653d0f231b1861018516d"
   end
 
   keg_only "it conflicts with PostgreSQL"
