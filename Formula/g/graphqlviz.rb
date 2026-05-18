@@ -6,8 +6,7 @@ class Graphqlviz < Formula
   license "MIT"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "4db2299d2acc437a3c3603bd69bca3baceade220abde52ae69b2146c9746cdd9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e19df88b9e6d9397cd4803a1e0b9eb88b050eeb6aefb04712f424035bca50922"
   end
 
   depends_on "node"
