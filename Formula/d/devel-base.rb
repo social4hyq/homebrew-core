@@ -1,7 +1,7 @@
 class DevelBase < Formula
   desc "Essential build tools collection"
-  homepage "https://gitcode.com/Harmonybrew/homebrew-core"
-  url "https://gitcode.com/Harmonybrew/homebrew-core.git", revision: "a8784ea451ad819d27a548411b8853fca6de3124"
+  homepage "https://atomgit.com/Harmonybrew/homebrew-core"
+  url "https://atomgit.com/Harmonybrew/homebrew-core.git", revision: "a8784ea451ad819d27a548411b8853fca6de3124"
   version "1.0.0"
   license "BSD-2-Clause"
 
