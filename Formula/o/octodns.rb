@@ -9,12 +9,7 @@ class Octodns < Formula
   head "https://github.com/octodns/octodns.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "ccab52d471bc7fb2602a691608ae0d19a7b259a65d61f41dfa90825bc42c2988"
-    sha256 cellar: :any,                 arm64_sequoia: "17dccfda6ebf10bcd2a8c0cca3aa173e52152a13c1f8d28454942cc4885d87bd"
-    sha256 cellar: :any,                 arm64_sonoma:  "ad01e802b38f4117c5dd3ff67793ef0022072bb2e80d7dfebb5359e75bd0f0e2"
-    sha256 cellar: :any,                 sonoma:        "330b895361d8ed355c3b91522fd379b6ee7254a229faa46ebe15d7e400014e5e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8c21bad624544e7131c42970f7ef8b23d91c471a3cb69b4beb4abc8cd69d42bc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "da9d52cd9fdaad360f22d450c75cf4f8d9bfd11a306e2bccd536e0ee358c0ac9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88e31a0f39af99ea13a57f338460dbd94454defc55933f80e4155cbe9431e73d"
   end
 
   depends_on "libyaml"
