@@ -15,13 +15,7 @@ class Binkd < Formula
   end
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "98ede139dd485567a090cc5cc53906f6307761c12fa3a045f1e0849e8ad99ca1"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0cebbe4af0138e31dc3dbcd9f345f58deecc65a35d5093f6ba3ac148bd3a938a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "092929f47b8414deb86f31cdad9b6b972b04e8c780780f94c331dc6b3a13c9a0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ed2d0b7abdfd578a93e0c513dfba8eeab4a1b4f078e2c99a42946bc4a7985ec4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3823ed397a9c36d9a3bedaa37a8a6691c41902de71a82528d31c31fa7fe7bb1b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "982860ec2548583dda4b84be1f8efdfc18b34bc4bbc9b665f3d98ce280a6720f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d6ed4fb4a7f1655de41efbec583d8d7aa03d585f808a45ecf76ed4507dbd373"
   end
 
   on_linux do
