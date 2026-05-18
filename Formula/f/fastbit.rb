@@ -10,18 +10,7 @@ class Fastbit < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_sequoia:  "1474f36207d0c52b2b6f37570476043036fc324462ea4e641fc6c42684b69f0b"
-    sha256 cellar: :any,                 arm64_sonoma:   "f7225849b4ad234bdc241a601ac7815c22fef58cc76c2a5a0c2e9efca5ed3db8"
-    sha256 cellar: :any,                 arm64_ventura:  "d4860526007422d2c3f3d2857f4af11daac63b571050b1d60994b24a5170ad5b"
-    sha256 cellar: :any,                 arm64_monterey: "cb5166c40241b15850b828ec9719276cea4931305701458adfe41c74f88cf72d"
-    sha256 cellar: :any,                 arm64_big_sur:  "09dc75c92fa358be93b38636c4e747d0768af669e396b07854975684bdba8494"
-    sha256 cellar: :any,                 sonoma:         "23acbeb6b15b341dc87d2d101bd4b504633554afa754a652c33e4ef86814814b"
-    sha256 cellar: :any,                 ventura:        "93657ebe3a5ba3c353cf57f060771777f9e34334624bb76a5c769c3adf6ea7ca"
-    sha256 cellar: :any,                 monterey:       "99413781b207c1e4c7911cc8eb8f300de0601fdf3c0092fe1f4c0c68f985562e"
-    sha256 cellar: :any,                 big_sur:        "ce5bd1a75d14f7f11b2bdcb9cf63aebc63f3c722dd4a39380e50d2c8489b2347"
-    sha256 cellar: :any,                 catalina:       "31e723c0610621033859357ab2a6dc373cf955847ab5c3dcf32696d260fa0de3"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "dfa19dae8cb7913a539c7940590873ef363462e06b7e68392bfd8e94ebfde0cd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "198c4ca4965a0f5285fe2c887295f34dbd0481ec7eb6898d5cf325688dccfb96"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "747648c44721ca0537c0772e5230ddc350b14eb530bef21f4bb8e1f7e69b8aac"
   end
 
   deprecate! date: "2024-06-18", because: :unmaintained
