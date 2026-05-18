@@ -1,12 +1,13 @@
 class DevelBase < Formula
   desc "Essential build tools collection"
-  homepage "https://gitcode.com/Harmonybrew/homebrew-core"
-  url "https://gitcode.com/Harmonybrew/homebrew-core.git", revision: "a8784ea451ad819d27a548411b8853fca6de3124"
+  homepage "https://atomgit.com/Harmonybrew/homebrew-core"
+  url "https://atomgit.com/Harmonybrew/homebrew-core.git", revision: "a8784ea451ad819d27a548411b8853fca6de3124"
   version "1.0.0"
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d08a9667141634c79884c8d42bfc9a4f834f1faa379ae953feb2a9f1aa300c60"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "720daa85691e5c594015edab9482c0bb37063d8ab42b464c4bee9e29caf600bb"
   end
 
   depends_on "coreutils"
