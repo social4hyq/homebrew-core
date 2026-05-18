@@ -7,12 +7,7 @@ class Subfinder < Formula
   head "https://github.com/projectdiscovery/subfinder.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d2cf43ae09a19190215f3f6ae377f4ba6fb57eaa0ee796c51d761588d34b0eab"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "98d509b4b97a2c362f33ed4f1b1352afa4b03fa4483b8e39b4a1a3b0a8f1f1d8"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f10ee7e3049e217d3f2f0efe8f73ad72d4a3cc84b1a3f57e2b9e082a48fbb3ad"
-    sha256 cellar: :any_skip_relocation, sonoma:        "40f7851e32faf3f0a49019dc081ea0e706f9a2542ef6aa21b2818ccf200e0a6d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5b1adee4386cb4200d5b8422352dae102f050836cd4e923940134c4b875d50cf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "eb7ca83b421bded41d6cb030ad4d43b336dc898925f51ae21455bc7179fd9926"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ca352fc7a85c709329a48556c205f38db88ecb3b1ae21be191faf5b8ceca5b3"
   end
 
   depends_on "go" => :build
