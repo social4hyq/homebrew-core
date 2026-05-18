@@ -7,8 +7,7 @@ class Doubledown < Formula
   head "https://github.com/devstructure/doubledown.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "7e93ea6b6323a89639c314a3f44364e2aa3ab4e5d7017d6b352c8761e5f13fa5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "85cbc0860332ec6e0a5f81b4e268ffc5ef071e3da6e0e13fbf0dafce63554a46"
   end
 
   def install
