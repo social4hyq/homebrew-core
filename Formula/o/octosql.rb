@@ -7,13 +7,7 @@ class Octosql < Formula
   head "https://github.com/cube2222/octosql.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "4c72a70690339c26059914fd99ec9e7ebc9b35b828ee6c07cbdde7af8bc1f7e5"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4c72a70690339c26059914fd99ec9e7ebc9b35b828ee6c07cbdde7af8bc1f7e5"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4c72a70690339c26059914fd99ec9e7ebc9b35b828ee6c07cbdde7af8bc1f7e5"
-    sha256 cellar: :any_skip_relocation, sonoma:        "8aeea6a96ae461bec7631704def7cf422a25fcc2f433ac18e801e1ceac5d67a1"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c9bcc6b096962d539dce6ae887259710127684f4246ecc5136f34fc4027dd263"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c0756a2f3337b46a79897beaf2b080ffd1888c648e87751fedd999c7002c5937"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c11e621d5af3352726dd9bc173ab41c5f7dc2303ac375608606b48643e2e33c"
   end
 
   depends_on "go" => :build
