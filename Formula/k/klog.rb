@@ -7,12 +7,7 @@ class Klog < Formula
   head "https://github.com/jotaen/klog.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9f04bf8b78d72c92f0c708f48d5f9cb11c85b7266fc845874a08ef1d1c566fd3"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "9f04bf8b78d72c92f0c708f48d5f9cb11c85b7266fc845874a08ef1d1c566fd3"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9f04bf8b78d72c92f0c708f48d5f9cb11c85b7266fc845874a08ef1d1c566fd3"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c9685c77feb099c5a57f84e4f7ebbfe675354bd9a53b4680bfc20b280a56117e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "085936825f08a8df46e9be28d676e676000c1035e24dadadcf3c7b1a908d82a0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b6fb17a890a85adbc8829818930bed2aa5910cd8c72b61bc6aebefac7f06817d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "143e619ef6186e5d9c321b07f593ee795260621b3b7c72fbdd3b672d0a072b5c"
   end
 
   depends_on "go" => :build
