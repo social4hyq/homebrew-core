@@ -22,6 +22,9 @@ class Node < Formula
   end
 
   def install
+    # The ohos-sdk compiler (LLVM 15) is outdated and cannot compile Node.js 26.
+    # Use Alpine native GCC and statically link libgcc and libstdc++.
+
     chroot_dir = buildpath/"alpine-chroot"
     chroot_dir.mkpath
 
@@ -74,7 +77,7 @@ class Node < Formula
       prefix.install Dir["*"]
     end
 
-    mkdir_p libexec/"lib/node_modules"
+    (libexec/"lib/node_modules").mkpath
     cp_r lib/"node_modules/npm", libexec/"lib/node_modules/npm"
     rm_f [bin/"npm", bin/"npx"]
     ln_s libexec/"lib/node_modules/npm/bin/npm-cli.js", bin/"npm"
