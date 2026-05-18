@@ -9,8 +9,7 @@ class GitPlus < Formula
   head "https://github.com/tkrajina/git-plus.git", branch: "master"
 
   bottle do
-    rebuild 5
-    sha256 cellar: :any_skip_relocation, all: "8f18e009da2544e32104e81494b96849e9ec4684042c9031c161402297339f42"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9322d5e07b53b0ec922454407337ee68767398f13f37cbed2eee6325cc27e46e"
   end
 
   depends_on "python@3.14"
