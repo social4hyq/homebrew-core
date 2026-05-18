@@ -1,7 +1,7 @@
 class Libvdpau < Formula
   desc "Open source Video Decode and Presentation API library"
   homepage "https://www.freedesktop.org/wiki/Software/VDPAU/"
-  url "https://gitlab.freedesktop.org/vdpau/libvdpau/-/archive/1.5/libvdpau-1.5.tar.bz2"
+  url "https://ftp.debian.org/debian/pool/main/libv/libvdpau/libvdpau_1.5.orig.tar.bz2"
   sha256 "a5d50a42b8c288febc07151ab643ac8de06a18446965c7241f89b4e810821913"
   license "MIT"
 
