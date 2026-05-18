@@ -18,9 +18,7 @@ class Libaio < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_linux:  "f4a891153d9b7a34ea5f63cf64361f78c81c3a56a9cb8af6c94f0911dda3d4ff"
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "16a507765ad5025007d29b1a251ca01567a5e25ca82fe01aa4aae87e324646fc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "46d38a740d1f40e96eed1f8aec7b67f0ce02bbcfeb044f89fae180bf5ef9a1f4"
   end
 
   depends_on :linux
