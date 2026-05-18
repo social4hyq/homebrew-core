@@ -12,12 +12,7 @@ class Apigeecli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0a698c837530a57d10f1056d0b1f7d2d64dfde1992b585ea16ad116238c53f12"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0a698c837530a57d10f1056d0b1f7d2d64dfde1992b585ea16ad116238c53f12"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0a698c837530a57d10f1056d0b1f7d2d64dfde1992b585ea16ad116238c53f12"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b9193afb8ac3b185cd798dccfd4bd8e0f7c4c2e6a9ea1ee0875aa3d04304d0d4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "63c76db440f9ff3f6e9823694f891b44fb08099e10bedbbc1a4470051c20f9dc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ea511dedf463a3f405b822f3cca9ce2f1a70d5420ab06699c58a85a33a13ac16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fef6f7659e13bc26030e1be57ac335ab51dd7c206b66afea1633c43abe7c1e55"
   end
 
   depends_on "go" => :build
