@@ -11,12 +11,7 @@ class Bcpp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "fa74cdc2fb3f1809b90239f1e60363605cb9d5fc76bded0ea406d6e6920e1bdb"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "25716040eca8bdd532b128d8f285d5eaea77d8522a893ede0a59c69515a95b66"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e169551e3a3120dc6966df837814802d00a8a6d1c799b40226ff72c2bfd79b46"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d6d74b99d7963c3f7403a8bd3991cbcccebf0fa2da16672ad912ef6857055a3c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5a1a406681f95c80d946ca3155ea3cea7397a119634746b2d873b7520aa1ba4b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7b501371fb124bd5814589d0e6f3dd850221ccb40e0e4b4d3fc41b72fcec32c6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f082d2ef1b8bf1f013e122b66adbbd58353a4f882460c9c427afc395fad64222"
   end
 
   def install
