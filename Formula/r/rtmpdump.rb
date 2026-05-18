@@ -8,13 +8,7 @@ class Rtmpdump < Formula
   head "https://git.ffmpeg.org/rtmpdump.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "488ebaf2932cd02770654ecaf903c115a2f21606d1e7eb37b87054c08f63486e"
-    sha256 cellar: :any,                 arm64_sequoia: "dbae365bd1a8c9299b123dbb8557042c43332921b7c71496e0dedf554617ab29"
-    sha256 cellar: :any,                 arm64_sonoma:  "717373dde83a7c0140831a1fa33b718dc71600c1d93759ddb10baf7d60afe245"
-    sha256 cellar: :any,                 sonoma:        "89c063d3d0b8bb6d8a63c5cc47a3ace403dee9c99bd3d10e3c1e8efd58ee3bb3"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "18c6bc27daf24689a704d66342892097754843e402d591e5957086d5427a61ec"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f5d37b5e7d3831124a9beea1f7fde55e593ffd12357007671ddb402642a4e009"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "79b94de8cc3f2459e2c51f0a35363c6b37fa834b1b36c1d8749144917ee83bf2"
   end
 
   depends_on "openssl@3"
