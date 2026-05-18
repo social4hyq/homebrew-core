@@ -6,8 +6,7 @@ class WriteGood < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "ce08c97d8a8666ed1721ab835d166e1ff865e2ee2ab23c58018021baf89cf360"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c4e36bd809958d6b67c65cc4a696debb30316855cfc1f28a1140f7698081a454"
   end
 
   depends_on "node"
