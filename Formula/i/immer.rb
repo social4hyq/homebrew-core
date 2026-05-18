@@ -11,7 +11,7 @@ class Immer < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "9e8fb22791b14e5ff097df3c481289d5e87c31f5eb97f54c7e84fac00d93fbf1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7798ff824cf56efa362059cff273c576c89e47a44583db05484f58991cc024f0"
   end
 
   depends_on "cmake" => :build
