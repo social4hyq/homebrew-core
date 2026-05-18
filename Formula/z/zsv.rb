@@ -7,12 +7,7 @@ class Zsv < Formula
   head "https://github.com/liquidaty/zsv.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c90f6560691b4a1ca27521ddf17e87aa997164b6e6f1b7a30addd8394aa1e803"
-    sha256 cellar: :any,                 arm64_sequoia: "a77a59331251d371990949308a013eb7e85f06c31f0996199c480800c312de7c"
-    sha256 cellar: :any,                 arm64_sonoma:  "fd7408fd79d3df8d0384802d338c48e13b19d4ccde72a27987a4369afcf49c13"
-    sha256 cellar: :any,                 sonoma:        "1e1ec0ed873ce304d4917f5a85fc3f6d14c30251863e071df4c3448fcb7732c7"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "62c1e84e7fe7b03618fc2b3f319c8bfa996977122e7cb3c23541262ae1691b26"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ef8444f81b92d9683b17f4db3b845522b245aee24a44538b58ad86a2fac72306"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d03e8ff9f5ec43f49812630ef7fd0d6f712f314b9ca1d4079747359a26b6edc"
   end
 
   depends_on "jq"
