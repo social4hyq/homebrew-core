@@ -6,13 +6,7 @@ class Mergelog < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "5ce8e33c95e90e9caa5bffd174dc681de874f7e20aee45d2c28888586dcd6ee0"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1c9a6f46ecb8eecc32382ed046e0193aedef56b46f6edc613a72277b54af4327"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9fbbc86f5661585c67f04b423a70e962b01f5921a0adebae09d0a6759e1396ed"
-    sha256 cellar: :any_skip_relocation, sonoma:        "27a98e08f04b9753c6bfc68b8d68e356fe40b9673e26084a77f936ccb5ff7696"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1a54a9a0a5fdc8927c2768cacd262c8184b9ec4e818d2f0b1deaf712d296235e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2121f7d6441648a072e935d24746e40c5c9a43e8e29f18e1c40abe103cda25a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e16bdd6d79462af6399d2123630df14827ce9c3c50f68b6988fb1be1d7b1836e"
   end
 
   on_linux do
