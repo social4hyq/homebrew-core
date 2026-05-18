@@ -1,8 +1,8 @@
 class Libscfg < Formula
   desc "C library for scfg"
   homepage "https://codeberg.org/emersion/libscfg"
-  url "https://codeberg.org/emersion/libscfg/archive/v0.2.0.tar.gz"
-  sha256 "cf37ef00ac8efb28821dac1ad49e2c6b23b242d9d961fab6fcda72fc73a7291b"
+  url "https://ftp.debian.org/debian/pool/main/libs/libscfg/libscfg_0.2.0.orig.tar.gz"
+  sha256 "11df0bf3654214ce51c2965819ce741409aa6b5403728669c5a6b8ab55c2e5d3"
   license "MIT"
   head "https://codeberg.org/emersion/libscfg.git", branch: "master"
 
