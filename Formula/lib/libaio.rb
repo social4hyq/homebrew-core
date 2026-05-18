@@ -1,8 +1,8 @@
 class Libaio < Formula
   desc "Linux-native asynchronous I/O access library"
   homepage "https://pagure.io/libaio"
-  url "https://pagure.io/libaio/archive/libaio-0.3.113/libaio-libaio-0.3.113.tar.gz"
-  sha256 "716c7059703247344eb066b54ecbc3ca2134f0103307192e6c2b7dab5f9528ab"
+  url "https://ftp.debian.org/debian/pool/main/liba/libaio/libaio_0.3.113.orig.tar.gz"
+  sha256 "2c44d1c5fd0d43752287c9ae1eb9c023f04ef848ea8d4aafa46e9aedb678200b"
   license "LGPL-2.1-or-later"
   head "https://pagure.io/libaio.git", branch: "master"
 
