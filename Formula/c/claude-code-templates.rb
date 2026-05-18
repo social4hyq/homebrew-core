@@ -6,12 +6,7 @@ class ClaudeCodeTemplates < Formula
   license "MIT"
 
   bottle do
-    sha256                               arm64_tahoe:   "8a5233fa46da736c781c1add9a84b98b8855929d39d4451f562b00a057789ef3"
-    sha256                               arm64_sequoia: "529a95bba1fd34f282409d8134ab61f67161feee1906cc1ae79225d66a3e1efc"
-    sha256                               arm64_sonoma:  "5ccdaadcdd9d6a93aba25224fc94401eb5f8f90b3644dc144b0794768018bc73"
-    sha256                               sonoma:        "1579af31d6e107e28cd363e6362b88812e3fc5ab247dd26ebec6055c330490ea"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1c3d1cc0fe075202851cd7918541dc32310baff4ef2e5b573ccdb16710db3935"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a35f2e3fcdd0cf0f6cab2df75cd75b6d606d44ddd51f462d213b463d9529989a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a1f7f3fbdfa1df72ebfbce7797fa1dde267c5109a84115c83210084535a3bf4"
   end
 
   depends_on "node"
