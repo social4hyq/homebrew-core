@@ -11,7 +11,7 @@ class RakeCompletion < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "5004cd20889962fc9ce3a921f56e27cb5a28e0f88fde57ae1428e28e0dbf89bb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2287ecc3254c1b28a998e14a43aedcd374761eab032d8077c344e02fbe76e75b"
   end
 
   def install
