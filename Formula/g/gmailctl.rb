@@ -7,13 +7,7 @@ class Gmailctl < Formula
   head "https://github.com/mbrt/gmailctl.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "77a704db92814c882fce2b066e26b8fe91545a9a5769047b6d087f5305d78fc3"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "77a704db92814c882fce2b066e26b8fe91545a9a5769047b6d087f5305d78fc3"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "77a704db92814c882fce2b066e26b8fe91545a9a5769047b6d087f5305d78fc3"
-    sha256 cellar: :any_skip_relocation, sonoma:        "73a83c86b05cc2160d9f5ace393e223834eca4246bd8d4e3d3e2c700137f9dff"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5702da40d84a0a374fbcdd6232f1c93654938b0ce81cec90bce2fd2adccb50f7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0ec77775a68bc9a7448687bab9cff015b8bed71079474eac17212bb4b54d8c00"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c042732569f95c36313532be16061a36d6906f6d0fdb0eb6a8a0a6604139f88"
   end
 
   depends_on "go" => :build
