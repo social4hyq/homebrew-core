@@ -1,9 +1,8 @@
 class Rtmpdump < Formula
   desc "Tool for downloading RTMP streaming media"
   homepage "https://rtmpdump.mplayerhq.hu/"
-  url "https://git.ffmpeg.org/rtmpdump.git",
-      tag:      "v2.6",
-      revision: "138fdb258d9fc26f1843fd1b891180416c9dc575"
+  url "https://ftp.debian.org/debian/pool/main/r/rtmpdump/rtmpdump_2.6.orig.tar.xz"
+  sha256 "f88e141ea3e126574dce24dca364f209560e13097fbba9c7f6b2f47a9a167646"
   license all_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"]
   compatibility_version 1
   head "https://git.ffmpeg.org/rtmpdump.git", branch: "master"
