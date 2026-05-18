@@ -6,7 +6,8 @@ class LlvmGccCompat < Formula
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d39a5f41e265d344ba3a36bb5005f698732c23bb0f1f68f689121b7d9ff0f09"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b81a6a3a682849c1788049fecef7650aa4b4b54cdb45cfc376318df31b47d914"
   end
 
   depends_on "ohos-sdk"
