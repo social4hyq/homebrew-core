@@ -7,13 +7,7 @@ class Changie < Formula
   head "https://github.com/miniscruff/changie.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0800de5460f352f9d50f4a134635a3296ba90c037e791ee1dd9f4189a9628c5f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0800de5460f352f9d50f4a134635a3296ba90c037e791ee1dd9f4189a9628c5f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0800de5460f352f9d50f4a134635a3296ba90c037e791ee1dd9f4189a9628c5f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "84bbf15521ced65293af267efc8dde889080afa6cd249609c72b87432830cc8f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "384bad1522349469ae127db07d8c0732d1d0c8f8ec9edd6ccdb3fb624fc4e393"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "75bfa2a6555d4958893187e1fa8029cfbca1a324a3046e535ac6de0ebe9daa02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "098bc1367c7d5de334704c23abe4f2b7ff9f8c350c326afdbb911d2dfd8688f1"
   end
 
   depends_on "go" => :build
