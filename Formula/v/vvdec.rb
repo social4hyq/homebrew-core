@@ -7,12 +7,7 @@ class Vvdec < Formula
   head "https://github.com/fraunhoferhhi/vvdec.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c75e17e8c9fb124b6c6fb2f85a14e594db0fad6c28e3369f532435cb81972db9"
-    sha256 cellar: :any,                 arm64_sequoia: "b7387bb4fb91bee15576802e176c48a98f0057314a88e23ba22a34cda0e698e4"
-    sha256 cellar: :any,                 arm64_sonoma:  "1baa30743fbc7da43f56a1414449fde505d52c5fefbd0f40f708d8234608ebd9"
-    sha256 cellar: :any,                 sonoma:        "4efbd249e28c544c82677e60af0a71e40b58c06d6141532f8b90414383f62ec6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ca300e6bae34c24004cad069751444ea2b7b6747478700261a2ee9518e2ff277"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "293646906147b719adf026300bd74aa3904f8f69451f49571b175a71dddfba1e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1b36265c2ecedbb224943213745be11406df2fdf4f28844ef3c10fcceefb9645"
   end
 
   depends_on "cmake" => :build
