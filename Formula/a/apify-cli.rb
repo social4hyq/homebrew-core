@@ -8,12 +8,7 @@ class ApifyCli < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "bda82e54e016d0a1b32af735dedb8053b6a29e1c7d35b272dea4793a6a8a6260"
-    sha256 cellar: :any,                 arm64_sequoia: "9811c347aa4f71a6efb10980b6e4d44e0de7372fd4c4c5410826dba02f12c8bf"
-    sha256 cellar: :any,                 arm64_sonoma:  "9811c347aa4f71a6efb10980b6e4d44e0de7372fd4c4c5410826dba02f12c8bf"
-    sha256 cellar: :any,                 sonoma:        "13425dc512c7ed91345b23a928814ee68f98b5026a047bbee5e7f20dd5892ac0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "33b6f3fedb3f2a8f524fb9dcd0ae6fc6f56a8ce5bbe0e581ff1d4b614914cdd4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "80fef8d81bf12b26a2a9484ca1c6168cff577eaea6fc0709e3a0068bea122fbf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "411d364d7c85c77420ac29ddc7a58d8b47827b6ca7671cb3e2f8c43911f38948"
   end
 
   depends_on "node"
