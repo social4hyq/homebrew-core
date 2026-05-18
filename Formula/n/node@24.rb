@@ -28,6 +28,9 @@ class NodeAT24 < Formula
   end
 
   def install
+    # The ohos-sdk compiler (LLVM 15) is outdated and cannot compile Node.js 24.
+    # Use Alpine native GCC and statically link libgcc and libstdc++.
+
     chroot_dir = buildpath/"alpine-chroot"
     chroot_dir.mkpath
 
