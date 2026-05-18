@@ -6,12 +6,7 @@ class Libjodycode < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "cbf0084259a113c633054d13f127c2aadb4bb670a1016f020b92c21d9aa17ff2"
-    sha256 cellar: :any,                 arm64_sequoia: "f942693372181f793814c287c4187e2eb8bc44fc02f9ad9c0537693c496af973"
-    sha256 cellar: :any,                 arm64_sonoma:  "1df1a7a4d35139f0e3f1a45261ec1667688a21ebc34c9b00fbbc8866b445a560"
-    sha256 cellar: :any,                 sonoma:        "982e433a5603a6b091b884171edab27a4df399a641c55db26f98bf393593f6cc"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b56b85c6feda4344b3b5609ff88f7391f48b9264dbbfbd3ad6ecc55038393060"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3f0585287d1de468c0e1f3ae89d22e78827f76c527baaed13424629c3d2e5ad0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "febcc8c423d287f790724944b77a38da0074c46bcb027f547e226191e53cce80"
   end
 
   # These files used to be distributed as part of the jdupes formula
