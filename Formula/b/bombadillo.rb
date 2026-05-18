@@ -1,8 +1,8 @@
 class Bombadillo < Formula
   desc "Non-web browser, designed for a growing list of protocols"
   homepage "https://bombadillo.colorfield.space/"
-  url "https://tildegit.org/sloum/bombadillo/archive/2.4.0.tar.gz"
-  sha256 "e0daed1d9d0fe7cbea52bc3e6ecff327749b54e792774e6b985e0d64b7a36437"
+  url "https://ftp.debian.org/debian/pool/main/b/bombadillo/bombadillo_2.4.0.orig.tar.gz"
+  sha256 "d52a753e7a77c5ab486f536a7c488e61c68a8c11a5e455143d281b3d8306afa0"
   license "GPL-3.0-or-later"
   head "https://tildegit.org/sloum/bombadillo.git", branch: "master"
 
