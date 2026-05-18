@@ -7,8 +7,7 @@ class Ditaa < Formula
   revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "4e03eed43d92f5622e98144174fcd5f40dfb2b0bbdcb819aa5b59ec61d5fb632"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "143909143a3c3f4fb26b52362199e64829a05d70d093084c365374e4963e7ede"
   end
 
   depends_on "openjdk"
