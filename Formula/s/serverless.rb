@@ -7,14 +7,7 @@ class Serverless < Formula
   head "https://github.com/serverless/serverless.git", branch: "v3"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "3ecd4d78b6e7743528665c880f1c56d27fe259c4d543bd263e00c38cd785eacf"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "06a1d77422f266cc1d32de082fd88653ff2acba640e4369391749f8308232abf"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4e5580e7acdb2b5a7c4c941d321aac21ccc370b40b8432ff0372b83a33227ef1"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "06a1d77422f266cc1d32de082fd88653ff2acba640e4369391749f8308232abf"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b64fa8af7e98666d443ca3e0df89433fc4613e1c6c4a1e677139f4e9091f8a2d"
-    sha256 cellar: :any_skip_relocation, ventura:       "b64fa8af7e98666d443ca3e0df89433fc4613e1c6c4a1e677139f4e9091f8a2d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "dd7982f62c055d7fe2ac3a8251d9f18a60a37b7211fb42708242fcb7615d6da1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "06a1d77422f266cc1d32de082fd88653ff2acba640e4369391749f8308232abf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa519b2066dd40237c9f948a1ef04f676419f19fcd327df10147f7f4449071f9"
   end
 
   # v3 will be maintained through 2024
