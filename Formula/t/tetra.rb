@@ -11,12 +11,7 @@ class Tetra < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "29aa4d37b1ff8bdd54b6a4039dd292db75b79695565d2cc4ecccf70f89074b11"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "84d872433dac34a4357359cc8d49a15e2327846cbbecc247bac98d7e11a7c6d4"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "de806a15af6d8b30163988588f8dffaa44f0f6f9a2714c7a29fe858b822419f6"
-    sha256 cellar: :any_skip_relocation, sonoma:        "924b2013ada6d0742ae86b7d4b608d6d3113812579b5a78a02fe5372ba5a0dc5"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "30d831fbea91449d536d6b98576640831d9fea9d63893e23028b070da1bd09ac"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d9e1a3632043b8a745a4d9ab97615a5454b45955fb98f043427d1737600ac43f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aae7e8657ca41de0c55da185ab49ba0a01abd51a7d4f436894066b560aabc143"
   end
 
   depends_on "go" => :build
