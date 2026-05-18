@@ -6,8 +6,7 @@ class Ipcalc < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "34f1ac1f3130d85231cf0af66acd5d46b21bbdaa9a32153ae71c7d9977c36c57"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "56eb98fcb3a5e62cead7c856b5fa667176e0167787978ccde19470c78fe5feed"
   end
 
   def install
