@@ -1,7 +1,7 @@
 class Libjodycode < Formula
   desc "Shared code used by several utilities written by Jody Bruchon"
   homepage "https://codeberg.org/jbruchon/libjodycode"
-  url "https://codeberg.org/jbruchon/libjodycode/archive/v4.1.2.tar.gz"
+  url "https://ftp.debian.org/debian/pool/main/libj/libjodycode/libjodycode_4.1.2.orig.tar.gz"
   sha256 "a7085da591e0c314eb3442e7b258a6b6944e6978ecb2764ab33f3cb840f47ff4"
   license "MIT"
 
