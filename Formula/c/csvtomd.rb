@@ -9,8 +9,7 @@ class Csvtomd < Formula
   revision 3
 
   bottle do
-    rebuild 7
-    sha256 cellar: :any_skip_relocation, all: "5ec7258739ce76c3ca9987d824d27efcd6897ba1f75e72fe59dc975f5e4b1246"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae6047b815bd46b0b9686f93f9753dcbce195e09445511c3c1cedad1bc8b8514"
   end
 
   deprecate! date: "2025-01-10", because: :repo_archived
