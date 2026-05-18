@@ -11,12 +11,7 @@ class ImapBackup < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "27032b92ee4a547f2ba88cf4b99934d61a372447eb354e5a3196c753064deb5f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "27032b92ee4a547f2ba88cf4b99934d61a372447eb354e5a3196c753064deb5f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "27032b92ee4a547f2ba88cf4b99934d61a372447eb354e5a3196c753064deb5f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "afeda25fe9409022479da559e368e397e3e08be45510c490ca50fe1d1893d0cd"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "baae0a0eeba4def6d8ee83f0e413d9135602c128a3a737047146604dc3b33771"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5f3c38aafbfc5172824709cb2c4f99d7777597dd05eb3c1a3156b2215e62a577"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3394dc9dc913ef681dd5c780bbe1369b6598159b7151b294d64f2f42614c05ac"
   end
 
   depends_on "ruby"
