@@ -6,12 +6,7 @@ class Libigloo < Formula
   license "LGPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "3d5f68bae027b04b01c5d655f97a468422f9c1c32fe8c82f5402665bad2d0623"
-    sha256 cellar: :any,                 arm64_sequoia: "0013eb663812b10c614a73834810c5395a2ed4b7ad6796a45f26db764133313d"
-    sha256 cellar: :any,                 arm64_sonoma:  "89394c808c6baf3647ae76dc42602759cb334f79c3d1c5a4f739990ad9f16fba"
-    sha256 cellar: :any,                 sonoma:        "418a6e5391b2d4e9f0b11e551225bd87919213d7214cef0d9bb26bc057f99773"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "958f770928e91a64c9110fd6ac6542aedd9077b4fe113f813b32ed787545cbd9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dea224d854e686dcba2b8acb544ed8da6af9a5210cbcbbd8bd75df3c00d83856"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03e47c206f9e0416c51161093f1323f2cfd750de9c64986c0927d9db6df6441e"
   end
 
   head do
