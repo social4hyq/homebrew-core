@@ -6,7 +6,8 @@ class DevelBase < Formula
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d08a9667141634c79884c8d42bfc9a4f834f1faa379ae953feb2a9f1aa300c60"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "720daa85691e5c594015edab9482c0bb37063d8ab42b464c4bee9e29caf600bb"
   end
 
   depends_on "coreutils"
