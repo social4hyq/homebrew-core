@@ -7,12 +7,7 @@ class Nlopt < Formula
   head "https://github.com/stevengj/nlopt.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "895d8e1a5b7257380f335c5992c674660a122c64ee1d67eea566e65cdb1e0b84"
-    sha256 cellar: :any,                 arm64_sequoia: "9773396412cfffe1c6dc4a3c2f1f82d32c8da396ac44733b7e117d20a15166ef"
-    sha256 cellar: :any,                 arm64_sonoma:  "97e616890c809b51cbe8a8efffa8fe3ef6d69a319d7fbd7253d9738064c919f8"
-    sha256 cellar: :any,                 sonoma:        "c468957d29935740a3e7bf6248709d088b7876f944379c3f33bf65c38b7fba47"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ce2cfb1d74dfb5f66022516311d416acacf8beb7186dcc89fbe0f975c1eb6a2a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ca3f9218108faa8cf151c88d784b7af7a090162f2efea0085d358eeb4164b5df"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "94056417721c1840716a520af0b88230f920eb8924ab9c3332a7e9965b7291e4"
   end
 
   depends_on "cmake" => [:build, :test]
