@@ -12,12 +12,7 @@ class Ryelang < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "85dc62bdb8c5011b77183cc81991b6c17e929835a6b866c9d7f10b5094e58f29"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a09c7307c658ae61af79c0bfd7414436e19597bcb44c113cdd3f508ceccd4d61"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f6bb20ce107c0809a92764c8e3108736ec7873cb380a4c43c244beea224b0bac"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e161ea76d58b5118127f6a388539aff7f8443e4f57e800e74f986a1967852efc"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f79684d62b39d4c00773622fc297b6538c89d39f707c994b3e013877d97443f0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8127a592d6c68feebea4355d86b18ab97014e5ab88d6bc49c408c3af5a55bde3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b1cb31015b2e54cafb4ec578e3adfc2730c4e8ce32de69e8759363358a4c5f0"
   end
 
   depends_on "go" => :build
