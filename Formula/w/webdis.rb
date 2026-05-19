@@ -6,7 +6,7 @@ class Webdis < Formula
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e454ca4446a0e1c2d49e4a13875969b0493784060208da4f3cc266bb20d79c0a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8de1bde557eb35cef87bc43e2b9543c05101daf4be40ee7a41733733df306856"
   end
 
   depends_on "libevent"
