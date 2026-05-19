@@ -11,7 +11,8 @@ class JettyRunner < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c12e45326870bf8413c531802e7300c33cc86a7a12a371e6b250a4aca755b0f"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fca77b7a19f0797083b03d88d4ffcfea7d943f500b832ed9adae6c1e3af915b9"
   end
 
   # See: https://github.com/jetty/jetty.project/issues/1905#issuecomment-409662335
