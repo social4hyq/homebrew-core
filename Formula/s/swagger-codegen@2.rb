@@ -11,7 +11,8 @@ class SwaggerCodegenAT2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc7f52f0c1f332e0866c212a2323ecbdf7d2b7b92b75d348c338293000ae888b"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "174e45b30928444673c213111550eb00090949ee14722105a50ccf2c5166f48f"
   end
 
   keg_only :versioned_formula
