@@ -6,6 +6,11 @@ class Jena < Formula
   sha256 "653108a91fd9b309a89bc756258bae0bca01587cef475942d11852e3beba2ae3"
   license "Apache-2.0"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "28dda4954763b880b4777964594db5a2e3e151cab482135392b9ebfd9d33f86b"
+  end
+
   depends_on "openjdk"
 
   conflicts_with "pwntools", because: "both install `update` binaries"
