@@ -11,12 +11,7 @@ class Pmtiles < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "350a039911e8fb1516d1af68a5e124176f4c6db75a0fcccc54a3792fec409308"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "812b3609b9a49da95fc13d4db1097bc9b08483d85fd35a56991a5efa910c1696"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ac143421c13632e067214f86bd057d83139b7c4448209aca0560d63cf1c48829"
-    sha256 cellar: :any_skip_relocation, sonoma:        "95ba84435127974f308aafb87085d46463ebe29a3fd2f25b362fca8f4d63fcc0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fc8b8ae5e57299058b35799b65f362f0353f1acf0bd577a4dcfe697dc6b574d9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7c8b7e05b7235b28ae0aa56533b018b3d77e91b97dc38270151ad03e159fe902"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7f960168c0c4798730f96003efcf9e27d8c069ab41b809398bf7aeebf98289f"
   end
 
   depends_on "go" => :build
