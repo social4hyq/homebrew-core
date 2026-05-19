@@ -6,6 +6,11 @@ class Fpdns < Formula
   license "BSD-3-Clause"
   head "https://github.com/kirei/fpdns.git", branch: "master"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c5c22508b7547c56b240fe9930637486ad3af7a229840a19250ebda17ead01c"
+  end
+
   deprecate! date: "2024-10-02", because: :repo_archived
   disable! date: "2025-10-02", because: :repo_archived
 
