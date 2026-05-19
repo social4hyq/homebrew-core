@@ -23,12 +23,7 @@ class Augeas < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "a08a4025060f11bc910787a5d6b162574eade8ff34e7356993a350ddb1e8513e"
-    sha256 arm64_sequoia: "61ecffdbb3274cba9dadd7dd5ec7228ee5f295657770e51bdd373e10c218649e"
-    sha256 arm64_sonoma:  "0a7c0baf3f14c5d22153f4305a6e0a5bed461ea772531e9a241c730e404b49d4"
-    sha256 sonoma:        "c1783548eb059f6683082c9bafa82feb42e14db5f6898fb226491ab280f37cdd"
-    sha256 arm64_linux:   "df6d3bc86b8c810bd1f1584d6487e119dcf4815e64460ce66785ee6c8e040993"
-    sha256 x86_64_linux:  "1cc2e3a0712c76dd52bf5d15b7c816464539de6d400f6a12e30f8474eda0d87e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5b5aece9572d42876b192b46ac678f97846d26edef774ecf4506bc0408da73fa"
   end
 
   head do
