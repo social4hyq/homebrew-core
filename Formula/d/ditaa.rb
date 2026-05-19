@@ -6,10 +6,6 @@ class Ditaa < Formula
   license "LGPL-3.0-or-later"
   revision 1
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "143909143a3c3f4fb26b52362199e64829a05d70d093084c365374e4963e7ede"
-  end
-
   depends_on "openjdk"
 
   def install
