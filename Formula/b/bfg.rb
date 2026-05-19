@@ -10,6 +10,11 @@ class Bfg < Formula
     regex(%r{<version>v?(\d+(?:\.\d+)+)</version>}i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac070e543b0162396e602b43096638a736680bf0c9bd065b70d38c6e9f166c23"
+  end
+
   depends_on "openjdk"
 
   def install
