@@ -10,6 +10,11 @@ class Dex2jar < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd2a3065a6d7b7b2b991bb8c15db08d03740ea9213cb4df1d9a2639c77322823"
+  end
+
   depends_on "openjdk"
 
   def install
