@@ -9,6 +9,11 @@ class Yarn < Formula
     skip("1.x line is frozen and features/bugfixes only happen on 2+")
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a4615f75f08e361aec64ef02f223c343c7e18f3638b040280bb1aea71993d62"
+  end
+
   depends_on "node" => :test
 
   conflicts_with "corepack", because: "both install `yarn` and `yarnpkg` binaries"
