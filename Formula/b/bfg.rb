@@ -11,7 +11,8 @@ class Bfg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e37d9165e9eed7611b0b4e3b151fcf99196b27b9f98630f56a67dae3b043e54"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac070e543b0162396e602b43096638a736680bf0c9bd065b70d38c6e9f166c23"
   end
 
   depends_on "openjdk"
