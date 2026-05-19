@@ -10,10 +10,6 @@ class Spotbugs < Formula
     regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5ccc2c58610165561d74096f25601c55d55a2081e9082f77639ac5a5ec87ac5"
-  end
-
   head do
     url "https://github.com/spotbugs/spotbugs.git", branch: "master"
 
