@@ -10,6 +10,11 @@ class OpenapiGenerator < Formula
     regex(%r{<version>v?(\d+(?:\.\d+)+)</version>}i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7df7ef8a16709f11d2e7566a4dd38c727462c76589cdaac758b8e6cffcbd87a"
+  end
+
   head do
     url "https://github.com/OpenAPITools/openapi-generator.git", branch: "master"
 
