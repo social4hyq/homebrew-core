@@ -1,12 +1,12 @@
 class Webdis < Formula
   desc "Redis HTTP interface with JSON output"
   homepage "https://webd.is/"
-  url "https://github.com/nicolasff/webdis/archive/refs/tags/0.1.24.tar.gz"
-  sha256 "449ebbfa27c94e942fb2927c5d5a338456cbf8c7bafa00d6f6bd8ec45ad044a2"
+  url "https://github.com/nicolasff/webdis/archive/refs/tags/0.1.25.tar.gz"
+  sha256 "60dc5e876a1df74d83ce5db41f99c61e62f45fa5ea7dbfedde4b1c99530f8032"
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e454ca4446a0e1c2d49e4a13875969b0493784060208da4f3cc266bb20d79c0a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8de1bde557eb35cef87bc43e2b9543c05101daf4be40ee7a41733733df306856"
   end
 
   depends_on "libevent"
