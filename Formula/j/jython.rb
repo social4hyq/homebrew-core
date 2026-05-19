@@ -10,6 +10,11 @@ class Jython < Formula
     regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbf91c52a659a34aeb394f1759796c732ed160f348a81595d27252a007400320"
+  end
+
   depends_on "openjdk"
 
   def install
