@@ -1,8 +1,8 @@
 class Gmailctl < Formula
   desc "Declarative configuration for Gmail filters"
   homepage "https://github.com/mbrt/gmailctl"
-  url "https://github.com/mbrt/gmailctl/archive/refs/tags/v0.11.0.tar.gz"
-  sha256 "6a299e60cfd5e58a327d2768cb9ce791b87d2e8be5293d29a4f4919d00cca2cf"
+  url "https://github.com/mbrt/gmailctl/archive/refs/tags/v0.12.0.tar.gz"
+  sha256 "30cd3e21e8f150081c79a2f656d43b46550a795ccc9cb7775bb7e68da686ee95"
   license "MIT"
   head "https://github.com/mbrt/gmailctl.git", branch: "master"
 
@@ -13,7 +13,11 @@ class Gmailctl < Formula
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args(ldflags: "-s -w -X main.version=#{version}"), "cmd/gmailctl/main.go"
+    ldflags = %W[
+      -s -w
+      -X github.com/mbrt/gmailctl/cmd/gmailctl/cmd.version=#{version}
+    ]
+    system "go", "build", *std_go_args(ldflags:), "cmd/gmailctl/main.go"
 
     generate_completions_from_executable(bin/"gmailctl", shell_parameter_format: :cobra)
   end
