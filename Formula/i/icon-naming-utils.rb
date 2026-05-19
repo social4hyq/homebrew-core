@@ -14,7 +14,8 @@ class IconNamingUtils < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e94ebcfe4e85f02525a25d678d5c1a35e89025880f3e8347a58b6d810a542c5a"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65799eaf25b183613f1690fc532507fa6033eeae9f4d7f6486cf3ff8a0d61467"
   end
 
   depends_on "pkgconf" => :test
