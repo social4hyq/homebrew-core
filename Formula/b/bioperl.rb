@@ -17,12 +17,7 @@ class Bioperl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "b4773adc73c8210df2cfafc04ed53803335c223cf4735eae2de99669cae89923"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2ddd61103b91a51433dd23b4a5d725b515bcac6e8ec2527fdcbb06f22f24d916"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "928051ece9c757d4f4cea5dd03d9bb8a8aeff27e31b71589bfb0ced04a8db952"
-    sha256 cellar: :any_skip_relocation, sonoma:        "a31951bd44a73a07e65bcd8c6d512747796afe5b1cecd36c0a90d681dfac27ec"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2272d3f403e0b53c003b38f1ad904bb104517f5ea0a7e197749a1aaf583b0c46"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "219b56a086c6913e72b9f9958eec9fb14a459bb28fdafc47ea33eea0463241df"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "255f7c359fd6af6ad9eed4bb8f0be6d7353e9ebe89cfe708de217dff97d71e68"
   end
 
   depends_on "pkgconf" => :build
