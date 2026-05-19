@@ -7,7 +7,7 @@ class TerraformModuleVersions < Formula
   head "https://github.com/keilerkonzept/terraform-module-versions.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "19549d5145a412b6e380f296d6c9a44c3676277ee79a7c91b66e4b31574af94b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e84d92c8920644d9940b97fd69c1172703c980ed3a9b70f53928eac86701f2f"
   end
 
   depends_on "go" => :build
