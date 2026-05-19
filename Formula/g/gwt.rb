@@ -10,10 +10,6 @@ class Gwt < Formula
     strategy :github_latest
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b832926b0e530635cb93f8410ea94486d53c5b04869c6f9324f84b791f1c1ebc"
-  end
-
   depends_on "openjdk"
 
   def install
