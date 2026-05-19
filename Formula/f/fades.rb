@@ -8,7 +8,8 @@ class Fades < Formula
   head "https://github.com/PyAr/fades.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "750647a79b5215d2d262f328acb899c6b151d6d17f8ddac7b8eb34a5ab3906ac"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa0542a8cee160bc0902dafaee5af5b8e96693b5eaee89b3bece3310c9537de7"
   end
 
   depends_on "python@3.14"
