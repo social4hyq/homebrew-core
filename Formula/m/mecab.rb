@@ -12,17 +12,7 @@ class Mecab < Formula
   end
 
   bottle do
-    rebuild 4
-    sha256 arm64_tahoe:    "e0bafdf893f0650942b7482f0ae672094f530a37d18cc3047932b90a2a006a16"
-    sha256 arm64_sequoia:  "9a6615d4ecdf87686bcc81e8851929a24661604782f48a0626a2e74762a20fa5"
-    sha256 arm64_sonoma:   "b442dff5851dc2e529a82d84a59b135e6f79ba6af1f295589e776aa2439d71f6"
-    sha256 arm64_ventura:  "b64f24600f7e8cad0dd98a985b72a446db41af35a192261ec489fc059e9a354f"
-    sha256 arm64_monterey: "99d7d453a35685f10cc15e0135d7ec612b9d695e58a2d36032daef5b6dac9a6f"
-    sha256 sonoma:         "d91a5e1bd7fdea15cfc0469705b33a71b02ad5c2ec2a599ab49829d9a6baa916"
-    sha256 ventura:        "361bce3217483e859b5c6d364da2ea098c63058411ed5324af8bf6c018046fef"
-    sha256 monterey:       "754a860b791ac92d825d4ff6b6b1f63e7c31e8983e603e844d1e4675732f343f"
-    sha256 arm64_linux:    "8181ec221a72b26be40c3de033dd8196d70c01d776b912f90ec5effd50731d6c"
-    sha256 x86_64_linux:   "f730abd5e95a325a9e2e012ac01714e9a22e694d91e5bb026d501495d9899ff6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4355729ec8dae03503f755d1a79fedb8e27de3219d85b6a00a10f5643f9778e"
   end
 
   conflicts_with "mecab-ko", because: "both install mecab binaries"
