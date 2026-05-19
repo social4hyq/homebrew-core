@@ -17,12 +17,7 @@ class Mariadb < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "afd8da476bffb54b670b9b630dc8f2b46b14c45dd05ea47a50ac11092fbb8225"
-    sha256 arm64_sequoia: "c2bdee8a6ed64c1d7667f6060533d9ee51d9f4d71142be03a792345a020e743c"
-    sha256 arm64_sonoma:  "046cff026c0843cdfd7a915ec1d40bdccf896b0ac4abf0a7aa72e5ea28e14d89"
-    sha256 sonoma:        "4f563d056354a707d9203b0a1ba4ba1e5a2a08e62e98942b96701a8c04da4bc0"
-    sha256 arm64_linux:   "1978c21f25f9c9e07bdd508aca50c634d74d4eeab4be0d476eca8076080d2ab6"
-    sha256 x86_64_linux:  "4b544b69ed751e1104317e09323ffbebf1edb2de4bc1d800c39da84ad79a8b65"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d4c6f1c8d4e7bfe35e8badf5db68cc8f3cab035e3afbf0586042a076ccbe073"
   end
 
   depends_on "bison" => :build
