@@ -1,13 +1,13 @@
 class Tock < Formula
   desc "Powerful time tracking tool for the command-line"
   homepage "https://github.com/kriuchkov/tock"
-  url "https://github.com/kriuchkov/tock/archive/refs/tags/v1.9.6.tar.gz"
-  sha256 "b7623bee6e48894171e48b44ba27e3a8111e573f954bbfafe153882f926a9d9d"
+  url "https://github.com/kriuchkov/tock/archive/refs/tags/v1.9.8.tar.gz"
+  sha256 "436f536799abbd6d8b35a1bc33e3cd3a616126d2063f37d3a0e115470246a94a"
   license "GPL-3.0-or-later"
   head "https://github.com/kriuchkov/tock.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "87acc337129d60e87a9f8884595b6b3d3189b71d6c1b36fb6ba392072f5a29db"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7ea74217ecf2fd12099fbb50b4adca4df8d086556b99db928c49073ad122e1b"
   end
 
   depends_on "go" => :build
