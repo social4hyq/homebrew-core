@@ -10,10 +10,6 @@ class SwaggerCodegenAT2 < Formula
     regex(/^v?(2(?:\.\d+)+)$/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc7f52f0c1f332e0866c212a2323ecbdf7d2b7b92b75d348c338293000ae888b"
-  end
-
   keg_only :versioned_formula
 
   depends_on "maven" => :build
