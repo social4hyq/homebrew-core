@@ -6,10 +6,6 @@ class GitlabGem < Formula
   license "BSD-2-Clause"
   revision 1
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "25190daef20b2d152587e58b1bb807d5a0413895e2177996144771743622fc76"
-  end
-
   depends_on "ruby"
 
   # List with `gem install --explain gitlab -v #{version}`
