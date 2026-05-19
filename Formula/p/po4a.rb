@@ -11,6 +11,11 @@ class Po4a < Formula
   revision 1
   head "https://github.com/mquinson/po4a.git", branch: "master"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd8c7ba4475065b066d9932b1b9e42c3a9211bddced6f6aaa74aa294b300ce36"
+  end
+
   depends_on "docbook-xsl" => :build
   depends_on "gettext"
 
