@@ -11,8 +11,7 @@ class Cdlabelgen < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "b59e22a5f1b438e89d6ae6cc662a70c09c9fd3aeee92538cf6a049296a0ca2be"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7cbe6c42e0a17f7faf009d6c9b2d9606e2b14a5f622197e2ec969de76149119c"
   end
 
   def install
