@@ -13,12 +13,7 @@ class Groonga < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "fa4e7c569fff51e13e2fe1d78335683e1bd0baba10539172ef5f9d5119b9cc33"
-    sha256 arm64_sequoia: "83792e45b9bc7256d1616af8627699791a904bafc7fe67f626e03f2e763ee3fe"
-    sha256 arm64_sonoma:  "03428dd8b7e3394116dd94ebf409d5770e885c42e99a835ca427916bbc7654dc"
-    sha256 sonoma:        "891468af7fc00888fc84199146675864a355d271846fa1e28ff0fd938f3da8ca"
-    sha256 arm64_linux:   "f72eafa105c6c5067f264b6246738046064694a063a77a314e2528a891c35ce3"
-    sha256 x86_64_linux:  "c15ff28279da67efb9fe1c278f6618d5273d2551fb7ff59d4f02c27f5ef149de"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6bd9cbc47f41637b04a7149f1bfdd94429d7878f3594dec394f5900a43a9a09"
   end
 
   depends_on "cmake" => :build
