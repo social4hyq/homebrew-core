@@ -11,7 +11,8 @@ class Spotbugs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5ccc2c58610165561d74096f25601c55d55a2081e9082f77639ac5a5ec87ac5"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00b79163e37ecb9e816ffc2336edcccbf4143a36ae7e674fde0803df2a834c16"
   end
 
   head do
