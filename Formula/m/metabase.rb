@@ -13,10 +13,6 @@ class Metabase < Formula
     strategy :github_latest
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "321969d492d60430e3b4184fa586b9442327dad493d57087aebc092aaf8fc43a"
-  end
-
   head do
     url "https://github.com/metabase/metabase.git", branch: "master"
 
