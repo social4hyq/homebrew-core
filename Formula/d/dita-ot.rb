@@ -10,6 +10,11 @@ class DitaOt < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d702017a8156418c0c2e57b8a7eceedf8fa7d104af1770505a404b62c48db20a"
+  end
+
   depends_on "openjdk"
 
   def install
