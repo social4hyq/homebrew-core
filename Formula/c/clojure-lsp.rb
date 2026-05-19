@@ -13,10 +13,6 @@ class ClojureLsp < Formula
     regex(/^v?(\d{4}(?:[.-]\d+)+)$/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fff47221ece593604d2e4536a574a7651806588b69497a0683219bc1f5edd68f"
-  end
-
   depends_on "openjdk"
 
   def install
