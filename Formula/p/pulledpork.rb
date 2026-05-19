@@ -7,13 +7,7 @@ class Pulledpork < Formula
   head "https://github.com/shirkdog/pulledpork.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c9b5ab56a40129359db878c82837e328f538a1ef9f6db6d7269a1b279bdccb47"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c9b5ab56a40129359db878c82837e328f538a1ef9f6db6d7269a1b279bdccb47"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c9b5ab56a40129359db878c82837e328f538a1ef9f6db6d7269a1b279bdccb47"
-    sha256 cellar: :any_skip_relocation, sonoma:        "23655c1d44460a5b377d2162d7d5516bced7de1ebf83e61cfa9d1bfdc2a79fa8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "df56b23016f75b71f8b064e0cf205087c6ce4b9c8dbcba306a02253ba873ed81"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1dc454931a54f5f68d256b1f2aea3cac1fe5fba3ed46661ff71a8184ff684a72"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1dfd092974bec5317fb00f52a1b2c6d0505a48bf4e1caa5f8447a498501b97bb"
   end
 
   uses_from_macos "perl"
