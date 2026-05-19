@@ -15,6 +15,11 @@ class Prestodb < Formula
     regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "19b7745afebc2d5ae89ea5e108c5b20465f39337325a35fe243fcd543db42eb8"
+  end
+
   depends_on "openjdk@17"
   depends_on "python@3.14"
 
