@@ -7,7 +7,8 @@ class GitlabGem < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "25190daef20b2d152587e58b1bb807d5a0413895e2177996144771743622fc76"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "673ab5356870f5c5fa9d5d91e904a58aa514e7cc4aeaa02607c61dcf30de872c"
   end
 
   depends_on "ruby"
