@@ -10,10 +10,6 @@ class WiremockStandalone < Formula
     regex(%r{<version>v?(\d+(?:\.\d+)+)</version>}i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4f72fb0a7d6d935041966416286f7af1adfe72d95b7006e4afdd5e256549764"
-  end
-
   depends_on "openjdk"
 
   def install
