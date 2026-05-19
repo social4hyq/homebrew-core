@@ -10,10 +10,6 @@ class Detekt < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5587f07cae620ba28938b6242ee2bdbaa17709e492868d2fc7626f0c6d7d09e"
-  end
-
   depends_on "openjdk@21"
 
   def install
