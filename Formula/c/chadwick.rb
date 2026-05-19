@@ -11,14 +11,7 @@ class Chadwick < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "a25e4a468f0a8202822cbed14f6b357e9bb08d39ac2ab2b6440b76a1a5fbd468"
-    sha256 cellar: :any,                 arm64_sequoia: "7f2f912f0bd0d1e01b9c5c79756c1871ee38ca5db5867eb00a8b329a964c6e4a"
-    sha256 cellar: :any,                 arm64_sonoma:  "b4995539e3c7049d6d714ddcc248caaca634d951bac7276e5c39b3bdb6a5efa7"
-    sha256 cellar: :any,                 arm64_ventura: "47081e4a3818a66fccc361021b5f240dbd8b35dc262a0a952e4d669f8c6963a6"
-    sha256 cellar: :any,                 sonoma:        "674fb89cebb20d3c283cd3ebf3adf86349ceffcb0257aba582ad5f542505fc46"
-    sha256 cellar: :any,                 ventura:       "8065fe16594fa33d3a306ee0ce5fec37b948736f322ee9be2e8ff273db8d0feb"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "98e955a622c79cad9c246dd9889bc67ea5d24175599c788b7f2b510d44aaab5f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "29fda27d9cbc2fbf9caef380fe3d1a950d4586b8826f0ceed226b71cf6fbfaa9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e6fedc54d295ea52056420113177f9e48348872a8aa2e6c63b31874f97d02f5"
   end
 
   def install
