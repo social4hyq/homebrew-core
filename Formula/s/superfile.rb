@@ -14,12 +14,7 @@ class Superfile < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9cfacf24f1198669f8e0ff074c06449b8f96fa6480bd4e42adea6c0f77d8e232"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4b89f425d6a6dedb21dfddc2fd5d47195ee600ec299ad095ee73e84d063d7a62"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8f70aaa2affc93c5b80ef4c667b4fb91c8ef105d95caf076437ca08f0384e80b"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b49784c62f7b740bc1f0b485c901329dd683cc0aa57e312602559d876949ec2d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "396adb5fd8b68a8ff359ca9b7921d8b49d3c396305125eca73eb5a1e21fd19ca"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6f7279a9e28eb740bb19b7b2343dfda02d04f01da0c45bf987ad85906df5bafe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e7e75c756fc8a93fb283fc9cc2e15d10317a937356d1ee0739b54acfb065dc7"
   end
 
   depends_on "go" => :build
