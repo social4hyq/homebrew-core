@@ -10,10 +10,6 @@ class Rhino < Formula
     regex(%r{<version>v?(\d+(?:\.\d+)+)</version>}i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "52d7714742039078b04d630d15cd2a9a53f4f03f1ead0eb7992bba39b1b71423"
-  end
-
   depends_on "openjdk@21"
 
   conflicts_with "nut", because: "both install `rhino` binaries"
