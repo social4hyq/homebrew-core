@@ -1,8 +1,8 @@
 class LibtorrentRakshasa < Formula
   desc "BitTorrent library with a focus on high performance"
   homepage "https://github.com/rakshasa/libtorrent"
-  url "https://github.com/rakshasa/libtorrent/archive/refs/tags/v0.16.11.tar.gz"
-  sha256 "b1ccbc0f2241d840957d6e82cf1ea35fd537220d3f5478fef23994bd292bf184"
+  url "https://github.com/rakshasa/libtorrent/archive/refs/tags/v0.16.12.tar.gz"
+  sha256 "1ecbb5d7802e18e807d3c2f58499e5c189ef81badb2c6c6ebb2399d49c08f5c1"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -38,10 +38,10 @@ class LibtorrentRakshasa < Formula
   test do
     (testpath/"test.cpp").write <<~CPP
       #include <iostream>#{"  "}
-      #include <torrent/torrent.h>
+      #include <torrent/runtime/runtime.h>
       int main(void)
       {
-        std::cout << torrent::version() << std::endl;
+        std::cout << torrent::runtime::version() << std::endl;
         return 0;
       }
     CPP
