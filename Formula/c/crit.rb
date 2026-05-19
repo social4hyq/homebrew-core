@@ -1,13 +1,13 @@
 class Crit < Formula
   desc "Your feedback loop with the agent: review plans and code locally"
   homepage "https://crit.md/"
-  url "https://github.com/tomasz-tomczyk/crit/archive/refs/tags/v0.13.1.tar.gz"
-  sha256 "48f5b4426af65d11b172f03f166bb63302836a1134b3a935f2d2f86f59e27dd2"
+  url "https://github.com/tomasz-tomczyk/crit/archive/refs/tags/v0.15.2.tar.gz"
+  sha256 "bfe57204e200744f5dd869cc07bae90e19253160e52de1f5453ce487e44ffc00"
   license "MIT"
   head "https://github.com/tomasz-tomczyk/crit.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bed8e097b7670950c665fbaefa26bc4c3fff0bf8ca121a696561e20783197161"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "43271ccd762a23d0fb901df8f27e3232580f3708c61af9979881f3b4674e1d35"
   end
 
   depends_on "go" => :build
