@@ -1,0 +1,36 @@
+diff -ruN a/src/setproctitle.c b/src/setproctitle.c
+--- a/src/setproctitle.c	2026-05-05 21:23:21.000000000 +0800
++++ b/src/setproctitle.c	2026-05-20 10:23:54.157644485 +0800
+@@ -232,7 +232,7 @@
+ 	if (!(SPT.arg0 = strdup(argv[0])))
+ 		goto syerr;
+ 
+-#if __linux__
++#if defined(__linux__) && defined(__GLIBC__)
+ 	if (!(tmp = strdup(program_invocation_name)))
+ 		goto syerr;
+ 
+diff -ruN a/src/threads_mngr.c b/src/threads_mngr.c
+--- a/src/threads_mngr.c	2026-05-05 21:23:21.000000000 +0800
++++ b/src/threads_mngr.c	2026-05-20 10:22:37.929582764 +0800
+@@ -20,11 +20,19 @@
+ #include <sys/syscall.h>
+ 
+ #define IN_PROGRESS 1
++
++#ifdef __OHOS__
++#include <pthread.h>
++int pthread_cancel(pthread_t thread) { return 1; }
++int pthread_setcancelstate(int state, int *oldstate) { return 0; }
++int pthread_setcanceltype(int type, int *oldtype) { return 0; }
++#endif
++
+ static const clock_t RUN_ON_THREADS_TIMEOUT = 2;
+ 
+ /*================================= Globals ================================= */
+ 
+-static redisAtomic run_on_thread_cb g_callback = NULL;
++static redisAtomic run_on_thread_cb g_callback;
+ static redisAtomic size_t g_tids_len = 0;
+ static redisAtomic size_t g_num_threads_done = 0;
+ 
