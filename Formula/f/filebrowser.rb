@@ -7,7 +7,7 @@ class Filebrowser < Formula
   head "https://github.com/filebrowser/filebrowser.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c41938ff993ac899424b4ad546da3e64698e4f7d2e4daaceb7bfd4e7bc39feda"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cb10884013f293ab0aa1d1c0f3b1146f11fb9297d24f1779c110a4c379edce9"
   end
 
   depends_on "go" => :build
