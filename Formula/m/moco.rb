@@ -10,10 +10,6 @@ class Moco < Formula
     regex(%r{href=.*?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "188901f2cab6513fe7a0ea1303c674758ef0e51a13eb80e8135c83f5dea74818"
-  end
-
   depends_on "openjdk"
 
   def install
