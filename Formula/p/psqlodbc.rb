@@ -15,12 +15,7 @@ class Psqlodbc < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "8ea1a4ecf8e6a609fdc9b2c38efc6a1f48c905420eee73abc502e466de797328"
-    sha256 cellar: :any,                 arm64_sequoia: "904625a0bf31b2b254a7e6832a98a4e9cd9ac738895564a69ade039223b22b90"
-    sha256 cellar: :any,                 arm64_sonoma:  "85e059770deb50b4132d96040507431fe243470b4273102432ba9b6a84a1f6ba"
-    sha256 cellar: :any,                 sonoma:        "319330d341a6d3bab2fe8f0c197f9f647fb3255cb07e8f539199dcee639014c1"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f0ddc9cac55df470dfe893d2bc17678471f17723acadbcebb82615539c3872f8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f7ef65df1154b69caecb031b91196a70c3c9c2f46561149f5655a2909ee1bdb7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7896b57286ea578743bec353daf7a664d6a2de54be040c4a3e6a2e1e4dd105f7"
   end
 
   depends_on "autoconf" => :build
