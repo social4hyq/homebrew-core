@@ -6,6 +6,11 @@ class Rex < Formula
   license "Apache-2.0"
   revision 1
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1812ed508b2177a3a63cdf907dc9965e678c13924fc33c5616f2b730c78fa97"
+  end
+
   uses_from_macos "expat"
   uses_from_macos "perl"
 
