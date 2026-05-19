@@ -7,7 +7,8 @@ class SwaggerCodegen < Formula
   head "https://github.com/swagger-api/swagger-codegen.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "631a89df30bc098b72d5998ad16340062b0aece3d8beda05a0d3ca654be97516"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e03c7513e0b08d5fd009d9a1102535a48326c7f5a98d2066e13078ae40d5ceee"
   end
 
   depends_on "maven" => :build
