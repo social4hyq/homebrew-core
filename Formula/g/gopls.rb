@@ -13,7 +13,7 @@ class Gopls < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "99b12345cc7b63d89d26a1e6673787f5b05bd179e62bd56ae239835b861027ea"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b67c8142fffb63610078cc4d1046973c83202472601615c66ab0fcf245ced72"
   end
 
   depends_on "go" => :build
