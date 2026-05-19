@@ -6,8 +6,7 @@ class Cqlkit < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "d046672e2ea78accbef7eb841a473b6074a2b42f683d6c9b4e07979f63c60c29"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "073f1c78875a0fc61cffe4e9e0583e78d0c1080d0fac4562b958e6f461d7e496"
   end
 
   depends_on "openjdk"
