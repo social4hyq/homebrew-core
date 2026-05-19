@@ -7,7 +7,7 @@ class Taze < Formula
   head "https://github.com/antfu-collective/taze.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "230fa8f3e82f30a994c93fb5e9cd4f2686b0f01406033ddbc7b9bda9a431c9b8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "af28c5aeb4dcbafdacbdb94cd3f2355a163a19108e2e40fd58c54a155ee2f28a"
   end
 
   depends_on "node"
