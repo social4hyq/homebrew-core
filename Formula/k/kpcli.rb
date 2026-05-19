@@ -12,7 +12,8 @@ class Kpcli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fe29cadc2678b10ec36d60c1ef3338fbbd0c7070fdab8500492594c8ae0b22ac"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b660c24cd0b132b7dd3d8f4a7679ac05b775a1ddc46cec4699fd61eb04610d32"
   end
 
   depends_on "readline"
