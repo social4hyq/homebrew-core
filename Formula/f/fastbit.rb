@@ -10,7 +10,8 @@ class Fastbit < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "747648c44721ca0537c0772e5230ddc350b14eb530bef21f4bb8e1f7e69b8aac"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "21b40c38e3b109039e9c2ee4cbe6d5eb9cefb713f1102108e1e54164d5982b39"
   end
 
   deprecate! date: "2024-06-18", because: :unmaintained
