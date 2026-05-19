@@ -5,10 +5,6 @@ class StructurizrCli < Formula
   sha256 "f5365a463fc44d539ed19bec00c48ba1e1ecda0ccfd1ba40d2e7472d264eb79a"
   license "Apache-2.0"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a034dc4e4106b4b0392c2bda2cdf95a67de23a112bb5be99d16f28fe5b748c0"
-  end
-
   deprecate! date: "2026-02-17", because: :repo_archived
   disable! date: "2027-02-17", because: :repo_archived, replacement_formula: "structurizr"
 
