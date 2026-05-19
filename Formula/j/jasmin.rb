@@ -6,10 +6,6 @@ class Jasmin < Formula
   license "BSD-4-Clause"
   revision 2
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b2fb3e3b16fe04c89fd02ba4787ed34f3314b7b3e416df9e37c1065a7476785"
-  end
-
   depends_on "openjdk"
 
   def install
