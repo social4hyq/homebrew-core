@@ -15,7 +15,7 @@ class Spoofdpi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "059356cfae65979537d57c259abc199debcd37bcde1738b0a7c842f766692d40"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba6dabccf2d4b85c3fcb61b7b3518ca3898090b1f5bf95c02b0b6c01e6b28e25"
   end
 
   depends_on "go" => :build
