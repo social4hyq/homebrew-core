@@ -7,12 +7,7 @@ class Burrow < Formula
   head "https://github.com/linkedin/Burrow.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "243ce0a894c45933fa1c2fe39556babfe07671abfbdcaec3ab14235b3dfda27a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c7ef8b2be08cbdf13d7e9ee11416561152f0febd300210ca820b9aa57dba38b3"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "a4e89ff03e3e70c5f35802ec731ae49c517d5f79395b4518c37f30215f374160"
-    sha256 cellar: :any_skip_relocation, sonoma:        "2a76e2fd9fca492a15588e587519f05ace8ad1868b75f06826cb80e8c0635752"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "041604be36e122097bbfab788ab2ad348b1b47f89568ecae6169e306b44b1667"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3afc1b575e3538fc54e30cba0c8909f5a9dcb9a10e3633d6e22ef693a35d4d51"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3838f21794ba44eaa1c556d95ea68f7dac6f83b90f3921f72be43a7c62575965"
   end
 
   depends_on "go" => :build
