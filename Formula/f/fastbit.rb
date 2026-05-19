@@ -9,6 +9,11 @@ class Fastbit < Formula
   license "BSD-3-Clause"
   revision 1
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "21b40c38e3b109039e9c2ee4cbe6d5eb9cefb713f1102108e1e54164d5982b39"
+  end
+
   deprecate! date: "2024-06-18", because: :unmaintained
   disable! date: "2025-06-21", because: :unmaintained
 
