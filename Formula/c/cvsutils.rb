@@ -11,8 +11,7 @@ class Cvsutils < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "9efd138b85d862065f5a5d36e02a4ec04c40b6f669bfe7feb09a08f233991d50"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "115f3505113f66b12b8413d5b989b3cbaab262d46ff13d9f409fe5e77a67f19f"
   end
 
   uses_from_macos "perl"
