@@ -8,10 +8,6 @@ class H2 < Formula
 
   no_autobump! because: :incompatible_version_format
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e48867b12af92ea57a45df48bb6f91d53659a9ad43f99d5137439ea7f292223c"
-  end
-
   depends_on "openjdk"
 
   def install
