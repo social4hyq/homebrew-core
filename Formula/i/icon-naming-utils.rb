@@ -13,6 +13,11 @@ class IconNamingUtils < Formula
     regex(/Version\s+v?(\d+(?:\.\d+)+)/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65799eaf25b183613f1690fc532507fa6033eeae9f4d7f6486cf3ff8a0d61467"
+  end
+
   depends_on "pkgconf" => :test
 
   uses_from_macos "perl"
