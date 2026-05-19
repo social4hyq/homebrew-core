@@ -6,10 +6,6 @@ class SwaggerCodegen < Formula
   license "Apache-2.0"
   head "https://github.com/swagger-api/swagger-codegen.git", branch: "master"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "631a89df30bc098b72d5998ad16340062b0aece3d8beda05a0d3ca654be97516"
-  end
-
   depends_on "maven" => :build
   depends_on "openjdk"
 
