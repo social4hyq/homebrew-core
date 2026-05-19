@@ -12,10 +12,6 @@ class Maven < Formula
     regex(/href=.*?apache-maven[._-]v?(\d+(?:\.\d+)+)-bin\.t/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e07f37b1e3848bf8bc197b8ac2e1b86f52f8e3596e4e7947f23f1d1d9740adc"
-  end
-
   depends_on "openjdk"
 
   conflicts_with "mvnvm", because: "both install `mvn` executables"
