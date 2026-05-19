@@ -6,7 +6,7 @@ class TfstateLookup < Formula
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ae3d493d7516e44aff3dea2edc1b3638ededc83add0e271bbd46a949fe47536"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "edec617c02eb20d0e2beee592637b7934ffa2350ca529e6952b1c659ee0d46c3"
   end
 
   depends_on "go" => :build
