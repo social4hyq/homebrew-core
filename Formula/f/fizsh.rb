@@ -12,8 +12,7 @@ class Fizsh < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "f893871f51a8542bbc01321935e948a6753e4eb5865885307dbdeed9882e7192"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b1a9f3a64646eb5cd689f0d7998acdf9a2c761774d8038e1546a9ea50c2a041"
   end
 
   depends_on "zsh"
