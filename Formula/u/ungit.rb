@@ -6,7 +6,7 @@ class Ungit < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "2fd45c6ddef5ed4e9766abf5d6098cea756f93fd50156d24cd9c1721d75cd876"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7db76eb4fa54c618ea1b19b50001c4146b6e29efa0a4d769548fd48034136f99"
   end
 
   depends_on "node"
