@@ -6,7 +6,8 @@ class Krane < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21857f530ec3fdb34e75f6823983c7434cb81335250c4dfe14ea5b811c67edcd"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a986e9e24d53bb2e1592a538bfd7aff0f2d259278c7bcae81d7891184be2167e"
   end
 
   depends_on "kubernetes-cli"
