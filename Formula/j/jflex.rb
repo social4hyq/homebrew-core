@@ -10,6 +10,11 @@ class Jflex < Formula
     regex(/href=.*?jflex[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "107aeafb673493e1f6722551cc786d6708e2c66c138f0f691c97bfd0528bc268"
+  end
+
   depends_on "openjdk"
 
   def install
