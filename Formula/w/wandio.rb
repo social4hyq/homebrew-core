@@ -15,13 +15,7 @@ class Wandio < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "5673ce841d6d082afc1432971b3b2e28596c4f931aa409b22f86e74317039ec4"
-    sha256 cellar: :any,                 arm64_sequoia: "ad387944b49303444e1a8216a656e20bed139bc0c6d689310f582077b19d0767"
-    sha256 cellar: :any,                 arm64_sonoma:  "76f48d461a4ddef56aa15f61c6e758d64da0dbd1abc9ee25daff508765ce828f"
-    sha256 cellar: :any,                 sonoma:        "8ee2891b8d44dbcf55985d9b08528b728c097704e5479e8c82b5d863f949246d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e9be468d23893b34c86f3c4f6bb69ec719f82174b8e876d3a6a86f59afa64288"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "89523d49509881d50d6e96f15f1c36127f38ba6b8337c9f0dd7b08dc3075389a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f307da1c0309b1b405b3eb63a8ebc851d26d7b832b84f0b8bbfdea0ab35d4948"
   end
 
   depends_on "autoconf" => :build
