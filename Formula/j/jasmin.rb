@@ -7,7 +7,8 @@ class Jasmin < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b2fb3e3b16fe04c89fd02ba4787ed34f3314b7b3e416df9e37c1065a7476785"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dca6a9e738950c2db90817c42a8afe2e708280f8ca6a4a380541f2e28200de99"
   end
 
   depends_on "openjdk"
