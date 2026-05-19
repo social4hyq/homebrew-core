@@ -11,7 +11,8 @@ class Jflex < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ceb69b0d5279d73ff91646e4e3b624fc6507989ecaf2bd820867f606c392c69a"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "107aeafb673493e1f6722551cc786d6708e2c66c138f0f691c97bfd0528bc268"
   end
 
   depends_on "openjdk"
