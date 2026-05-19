@@ -6,12 +6,7 @@ class RushParallel < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ee11479dc282afbda33efbafb324069938d3472caa592f59a25ec22455247f53"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "173674fadc307344730628de968eff11143ce4c85ef48ef1e3d037e1fca77340"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cd8653c1b7e8e3baf830c08ee7019b112535aab3143d700dffff6afc50ad48a2"
-    sha256 cellar: :any_skip_relocation, sonoma:        "3bc8f88a147545f463b1245413901ce45047e4c0b6424d781bade7342d15bc9c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "88379e8991cfa8f171455f9deec6e4f924274ebda99aae0d83200f2a94986c9b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "449e7441ebc29bbd5d2274bb74746603f8c61c739755824eedf6f7db0ac99601"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dce517e39affc773ca7e4e12d21eed26c82d338a90362ed4fc39f4c4d9635cca"
   end
 
   depends_on "go" => :build
