@@ -14,12 +14,7 @@ class FbClient < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "94836e631e1cebba28bc3327d3cb63a2725af425a34949ea5b3d643b3e88a18b"
-    sha256 cellar: :any,                 arm64_sequoia: "87c40285614876d05e7b8f4274ac5bb5b171d1cdcea2931eefc6d32ccd4f490d"
-    sha256 cellar: :any,                 arm64_sonoma:  "059881236183d0a075ac3059e01eeb9be2546e82bcb8d6daa0e295ffb0d4971c"
-    sha256 cellar: :any,                 sonoma:        "6af4054c808c8f5c3ec176d38dfe8fcedab2516ff410f9bf7d747afbf0520521"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fa64e34d0861774bb7570f22b37fc37ca517d484f9c4d38307bd76d474b0ed44"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7dacaf9c2b823ba207783b95c773e5820ca391393b93cdf0c05f1cb7e993d86c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c21dde35aac37407df8ef15116a60bc7accd460f44384d9bddf76f35506b311"
   end
 
   depends_on "curl"
