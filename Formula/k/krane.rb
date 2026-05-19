@@ -5,6 +5,11 @@ class Krane < Formula
   sha256 "eda88d26175aaf257df71b55b5df9d4868710a28df2b595bebadc1192a65bb8d"
   license "MIT"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a986e9e24d53bb2e1592a538bfd7aff0f2d259278c7bcae81d7891184be2167e"
+  end
+
   depends_on "kubernetes-cli"
   depends_on "ruby"
 
