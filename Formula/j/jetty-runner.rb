@@ -10,10 +10,6 @@ class JettyRunner < Formula
     regex(%r{<version>v?(\d+(?:\.\d+)+(?:[._-]v?\d+)?)</version>}i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c12e45326870bf8413c531802e7300c33cc86a7a12a371e6b250a4aca755b0f"
-  end
-
   # See: https://github.com/jetty/jetty.project/issues/1905#issuecomment-409662335
   deprecate! date: "2018-08-02", because: :deprecated_upstream
 
