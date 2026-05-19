@@ -7,6 +7,11 @@ class Fades < Formula
   revision 2
   head "https://github.com/PyAr/fades.git", branch: "master"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa0542a8cee160bc0902dafaee5af5b8e96693b5eaee89b3bece3310c9537de7"
+  end
+
   depends_on "python@3.14"
 
   def python3
