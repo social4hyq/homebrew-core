@@ -10,6 +10,11 @@ class Checkstyle < Formula
     strategy :github_latest
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4f2264be3a25f59bffd4452a63455e4c585eee3df5f8ade81fe853ab9a124ba9"
+  end
+
   depends_on "openjdk"
 
   def install
