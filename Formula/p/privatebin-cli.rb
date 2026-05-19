@@ -6,13 +6,7 @@ class PrivatebinCli < Formula
   license "ISC"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "bf4f261b7a6b91ce1d1ea15257b2e533dd47b4e9a7d635c2d9985c033698c48a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "bf4f261b7a6b91ce1d1ea15257b2e533dd47b4e9a7d635c2d9985c033698c48a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "bf4f261b7a6b91ce1d1ea15257b2e533dd47b4e9a7d635c2d9985c033698c48a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9ca7892ee44e534bf0e81e50f9a9ea2ab79bb1335aa805d86b67cb68ad40a83b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "97b0c6526605a3ec8bf164a9805bd4e7806c5d78bfe69c7211561abc719f511c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f23a8f66a69a556b63317ad2d4659062601b3518e9c782ce090db5a6486f8a5c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6e2373864138abe76afee4865c6a5cffa25c89331a11300cc5e912bb08cfba0"
   end
 
   depends_on "go" => :build
