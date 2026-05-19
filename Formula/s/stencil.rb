@@ -7,12 +7,7 @@ class Stencil < Formula
   head "https://github.com/rgst-io/stencil.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d995cb764f2787c2bfe7a1d4fc3112a927aa93e26fdc6966e921630705d62f0f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4826a77887eb74c9da947d208592ae897684e102a186c90c5a65bb2f66b9b19b"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9681cf79d866ea2576134fc342a82a0bb2127be4abc21acbd836ce0d392ba54c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "f21acb0dcdfe3c6a2f424a7ee488f614e42d111fa665c4a511348991c8e66294"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4faa9ae8ed5c5ca12bc0be4cc0d1532eaa78d5983c2e17f39ba5c26bf4141ae1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8999d661004865b5218c9737daf5522b0d1e4fdc42b70848a2e2854deaa99149"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c615718b7c3d8970af1a451ff45f0a8a0a1028b4eec590227d06ccd46c2b1dc"
   end
 
   depends_on "go" => :build
