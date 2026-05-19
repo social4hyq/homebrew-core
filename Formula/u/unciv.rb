@@ -12,6 +12,11 @@ class Unciv < Formula
 
   no_autobump! because: :bumped_by_upstream
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "16f4b35048cec3fca763f57991955b6312073cb7d5562b5d9075c559a0b69086"
+  end
+
   depends_on "openjdk"
 
   def install
