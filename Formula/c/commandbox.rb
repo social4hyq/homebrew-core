@@ -10,6 +10,11 @@ class Commandbox < Formula
     regex(/Download CommandBox v?(\d+(?:\.\d+)+)/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b57207a8dc32cdf5b88ba1603db3781ac35ac022c3fdd6fb96effa139ac304e4"
+  end
+
   # Keep pinned to Java 21 until https://ortussolutions.atlassian.net/browse/COMMANDBOX-1685 is resolved
   depends_on "openjdk@21"
 
