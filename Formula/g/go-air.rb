@@ -1,8 +1,8 @@
 class GoAir < Formula
   desc "Live reload for Go apps"
   homepage "https://github.com/air-verse/air"
-  url "https://github.com/air-verse/air/archive/refs/tags/v1.65.1.tar.gz"
-  sha256 "1d10184b57b3fa51ae71e6f444235a0fdf883fa132ca749282c9bcc29534b249"
+  url "https://github.com/air-verse/air/archive/refs/tags/v1.65.2.tar.gz"
+  sha256 "c9a5cd7a4d4c7e07575df15892f7223a0d378e3e3d2f595486ac56dc188841ca"
   license "GPL-3.0-or-later"
   head "https://github.com/air-verse/air.git", branch: "master"
 
