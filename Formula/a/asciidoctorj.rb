@@ -10,6 +10,11 @@ class Asciidoctorj < Formula
     regex(%r{<version>v?(\d+(?:\.\d+)+)</version>}i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "783778336d815fc9893c75dee199141943f914151edb94e27ca356fac4a04dd6"
+  end
+
   depends_on "openjdk"
 
   def install
