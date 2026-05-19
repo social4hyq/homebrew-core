@@ -1,0 +1,30 @@
+class Gsar < Formula
+  desc "General Search And Replace on files"
+  homepage "https://tjaberg.com/"
+  url "https://tjaberg.com/gsar151.zip"
+  version "1.51"
+  sha256 "72908ae302d2293de5218fd4da0b98afa2ce8890a622e709360576e93f5e8cc8"
+  license "GPL-2.0-only"
+
+  # gsar archive file names don't include a version string with dots (e.g., 123
+  # instead of 1.23), so we identify versions from the text of the "Changes"
+  # section.
+  livecheck do
+    url :homepage
+    regex(/gsar v?(\d+(?:\.\d+)+) released/i)
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "510ce2b0aef8ae6e15dd408cabeaa0fa8f0000e87d2e2f32089db2e99469c7e8"
+  end
+
+  def install
+    system "make"
+    bin.install "gsar"
+  end
+
+  test do
+    assert_match "1 occurrence changed",
+      shell_output("#{bin}/gsar -sCourier -rMonaco #{test_fixtures("test.ps")} new.ps")
+  end
+end
