@@ -1,13 +1,13 @@
 class SwaggerCodegen < Formula
   desc "Generate clients, server stubs, and docs from an OpenAPI spec"
   homepage "https://swagger.io/tools/swagger-codegen/"
-  url "https://github.com/swagger-api/swagger-codegen/archive/refs/tags/v3.0.80.tar.gz"
-  sha256 "386235163329de6ab7d6d4c5d9532940f3c732ef085d415a92850834706950de"
+  url "https://github.com/swagger-api/swagger-codegen/archive/refs/tags/v3.0.81.tar.gz"
+  sha256 "b16c7c1bc73cdaa0221d26129eccad32f10c2deecc29ccb90fd6bc79c22b9faf"
   license "Apache-2.0"
   head "https://github.com/swagger-api/swagger-codegen.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f50e2a46533670b2bb923f949ca320ba43c907594307296696542476b8393497"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "631a89df30bc098b72d5998ad16340062b0aece3d8beda05a0d3ca654be97516"
   end
 
   depends_on "maven" => :build
