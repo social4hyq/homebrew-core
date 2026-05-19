@@ -8,13 +8,7 @@ class Periscope < Formula
   head "https://github.com/anishathalye/periscope.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "3189320a2bd3be0f1919621582743539f0af9915a92b26c2d4e95dc43466dc21"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c40e9cc889cfec650492994dbe0e5a9a17a9755f925bc73f904dd0844801fccb"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5f9fa628d7186231bf8115aad5b52202c36849701479b555742c16ff846227ea"
-    sha256 cellar: :any_skip_relocation, sonoma:        "3e3e839701f4e03c35810ccbbdff7a656e0c378bd41aa45bd3043b05c9b24878"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "345da8c73fe8c8f7a7be4162ada3b06ac3c7bb5dcb713e901175867a6ea8b19a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "abf9ca3d7a4b3289def2009de76d1a93969011bdc3dcd344845fe3fbc9ca69ca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a686e5780d16e5641d42a2471201fc5e90d46ead093717213a274d31e057dbad"
   end
 
   depends_on "go" => :build
