@@ -22,10 +22,6 @@ class Frege < Formula
     end
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1eaefbd1606fb030ae144deb02d19f5d5944efc79440e7322feb29ea74667d6"
-  end
-
   depends_on "openjdk"
 
   def install
