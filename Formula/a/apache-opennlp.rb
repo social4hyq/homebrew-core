@@ -6,10 +6,6 @@ class ApacheOpennlp < Formula
   sha256 "de06487900cce46d24f9d38be05ad92777c3e316b56302bff7f47ef09c55fa13"
   license "Apache-2.0"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6c70c325c3fdce1fc2824017b2f2b530ed97c82512ba1434879a9fe385fb249"
-  end
-
   depends_on "openjdk"
 
   def install
