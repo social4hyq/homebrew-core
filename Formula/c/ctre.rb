@@ -11,7 +11,7 @@ class Ctre < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "27bbec85b0afe0bf5ff53c9b1850c7ffaab5d58cd4c7e421c70a954d62526b1c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c718692e5e547c50b3f461f407fe9c911adbe4e6e0c4ffa6bf215c3033bae2c"
   end
 
   depends_on "cmake" => :build
