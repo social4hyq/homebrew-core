@@ -6,12 +6,7 @@ class Taskline < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d576ef1ca2c0ee5e1ced0ad1b08e0222452947519a8bcdf4e21da04c0be262d4"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d576ef1ca2c0ee5e1ced0ad1b08e0222452947519a8bcdf4e21da04c0be262d4"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d576ef1ca2c0ee5e1ced0ad1b08e0222452947519a8bcdf4e21da04c0be262d4"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d576ef1ca2c0ee5e1ced0ad1b08e0222452947519a8bcdf4e21da04c0be262d4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f337709b217bdd3a8e7a82e6f352908a812dec109976faf6ad1fc8eca8e4609f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f337709b217bdd3a8e7a82e6f352908a812dec109976faf6ad1fc8eca8e4609f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e19a0996a42ff6ea0b116d1fef07d0e58a9f2c1351da36e9e89b4444e0a33d74"
   end
 
   depends_on "node"
