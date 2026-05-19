@@ -5,10 +5,6 @@ class Htmlcompressor < Formula
   sha256 "88894e330cdb0e418e805136d424f4c262236b1aa3683e51037cdb66310cb0f9"
   license "Apache-2.0"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "76b8a809b52a01a14ddc005ba29592df9e1c322ea5f216af371ee14c750c0d13"
-  end
-
   depends_on "openjdk"
 
   def install
