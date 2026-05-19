@@ -12,8 +12,7 @@ class NetsurfBuildsystem < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "7698443194711b12a21395fe67c378a2d9cb323ace8f590cfeb79ff730c2ed98"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3fcae6e79e5db48e15d1cdc16585a854f8584b188c1531bc435bc01ebf2dbb9"
   end
 
   def install
