@@ -7,13 +7,7 @@ class Alp < Formula
   head "https://github.com/tkuchiki/alp.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "91314a180a6e144e0fc2e4d6d047c9f25b06143463961b42acf49dc625fa2660"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "91314a180a6e144e0fc2e4d6d047c9f25b06143463961b42acf49dc625fa2660"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "91314a180a6e144e0fc2e4d6d047c9f25b06143463961b42acf49dc625fa2660"
-    sha256 cellar: :any_skip_relocation, sonoma:        "a69566f9d09559ab696fdf61867d6e885a415689684402bad741ff209406c235"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "20a13083c36878ec80447a6a435651f11e3f1a6e135d1ccee55345cf007c16b5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ea456ac8f3f0e0fe5f469436354ab388e558be059021a5e73acef44fcef04821"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "971f0d1c0423dfa2837ccfa32e357f5eb31363c7f6f403130fa6d3160518b7fd"
   end
 
   depends_on "go" => :build
