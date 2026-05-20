@@ -6,8 +6,7 @@ class GitMob < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "e1d543c5bd84b8924a1ca7a6a9e840998f2178e56f76272e4ff39c21ac6e31a6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "60fea6531d7581b842df5754738d93129af088b411e1911ff2cbc344b2bd2138"
   end
 
   depends_on "node"
