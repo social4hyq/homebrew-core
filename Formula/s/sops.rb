@@ -7,7 +7,7 @@ class Sops < Formula
   head "https://github.com/getsops/sops.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d47c1cc20cd1d86888c4e3575ccb0e2659f87a91648b2a8e6f4dc945f8577f8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cee60c283dfa167d55774562bfc128947da760453b53d55e2e7c839e93240c71"
   end
 
   depends_on "go" => :build
