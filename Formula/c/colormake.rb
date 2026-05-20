@@ -7,8 +7,7 @@ class Colormake < Formula
   head "https://github.com/pagekite/Colormake.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "a628cc6cde2a938abc044ae867405b3232bc9c999b10729652fbe3088535da44"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8971da87e196e0ccb34159b50d8e12480314e50aad725041b9b1ae7be9ec5f1"
   end
 
   def install
