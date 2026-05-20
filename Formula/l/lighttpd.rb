@@ -11,13 +11,7 @@ class Lighttpd < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "8e6000d9ebee3364d83babba1271abfb827020f0ac611bd1f137c59229132b84"
-    sha256 arm64_sequoia: "50093f112787c67d9ca3d236eff0441751c453dd59ad065ec2c76b7ddfe47614"
-    sha256 arm64_sonoma:  "d50f7214b9644d56e9a5c2c048fb60b4ba10038e667ec19099abcf82b52287e6"
-    sha256 sonoma:        "cfdb31aa3e83547b1fc22979098f00453307751d367e5407825d1dcddb198123"
-    sha256 arm64_linux:   "84f45685dc6ea785eec1794bf41316bc38c85a3c11980d4d3dafa2b27cdae2ba"
-    sha256 x86_64_linux:  "1895e77ef23228f1640ac369440fecfb78acc4d8ce9fcbd56af8a8fc01947aa6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "218d3e6260b6668b50b556ff89ca2d6c0f8f993e2e17019fd1d1e2f126a126ed"
   end
 
   depends_on "autoconf" => :build
