@@ -6,8 +6,7 @@ class GulpCli < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "240302d96e2d2ded3a74ad80abc51db6c8539e32421a6026a081879c1387dc3c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0fe5eaa5cf4af917f2be685254fb0378709316c664d75d55eef1676627de5ae"
   end
 
   depends_on "node"
