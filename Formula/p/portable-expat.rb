@@ -3,8 +3,8 @@ require File.expand_path("../../Abstract/portable-formula", __dir__)
 class PortableExpat < PortableFormula
   desc "XML 1.0 parser"
   homepage "https://libexpat.github.io/"
-  url "https://github.com/libexpat/libexpat/releases/download/R_2_7_5/expat-2.7.5.tar.lz"
-  sha256 "975e76ab8a5625190bd04a577fa9efc246798c25b8ec665acb6f7951be8b0646"
+  url "https://github.com/libexpat/libexpat/releases/download/R_2_8_1/expat-2.8.1.tar.lz"
+  sha256 "bf63752637cab644ed8a93829e1c8788caf67a1626af7e57d83b7568233a9f89"
   license "MIT"
 
   livecheck do
@@ -16,7 +16,7 @@ class PortableExpat < PortableFormula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d8fee3c208f3ef744df24b2bba9081da32bf06d2509fff063200117fdfae27f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ced939756c4ddd99ac9f908b2d044ec4b4d112c8b9a01ce74208417e8795deda"
   end
 
   head do
