@@ -9,12 +9,7 @@ class MkdocsMaterial < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c1480ecf3646e148ad92b7b6e4ecdc943af85b57bb36a8021f48324937e135bc"
-    sha256 cellar: :any,                 arm64_sequoia: "872d2bf00b00be98c76252a00b5b695fda2008420ede040673ce96904591da66"
-    sha256 cellar: :any,                 arm64_sonoma:  "486c98ddaa6ab26b67b1c1edfd93d8add91987fc95ca8b69512e8cc09bc2038f"
-    sha256 cellar: :any,                 sonoma:        "73bf045506585647b282125736ab4c7efb8c246a09075c407bb9387b5f422f27"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8afa5e3d9d47e49c63103f1b662a54598778abafa3d314ebd7bbbee94266d587"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dc3968c2cb736cb7d98c7876e52c43ac28457149524db211805c6bfad53bf325"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "27e04b8bf03a09eeb11e224f44161ba523a78f5e9899456bcaae4129a9648c28"
   end
 
   depends_on "certifi" => :no_linkage
