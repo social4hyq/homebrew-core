@@ -6,8 +6,7 @@ class GruntCli < Formula
   license "MIT"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "0c39a24d633b89cf96aa864478ab95418b1003408d92ecfa446719ff4751df24"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6417b44dcb50ab44e705ec04835789e49711aec8c67db438a7b6c7fe2c7a2cff"
   end
 
   depends_on "node"
