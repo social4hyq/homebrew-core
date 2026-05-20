@@ -11,13 +11,7 @@ class Sqliteodbc < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "ef7576d687d514cf3e6691537bee8e66eaca106ef598ad5cf07c4e20d520aecb"
-    sha256 cellar: :any,                 arm64_sequoia: "9bc67271da98897902daddd9417ae566a904f20d4b418472b482588a9fb77e17"
-    sha256 cellar: :any,                 arm64_sonoma:  "c26a1c42c2b747053113d927ae7c2e231163b4d9f8c695ecec1dc05bf3e041ac"
-    sha256 cellar: :any,                 sonoma:        "1a219550850f7e7aba34e7695ffd1768141bb8ee469a0ab81f19c66292c33fec"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3f2c84110c49b8b78f0c9cba7c38a4164f42e6d7ec370b8ac7deb83e70d978ce"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9c3e2942b9b3d486a777ca95d5303fc556ae08435e60a2fa0f099a21d3db473b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3707030caa7cc301c3a350a441e6c76ad5ac6522b1aa475fb84c6bedfcdf3b3d"
   end
 
   depends_on "sqlite"
