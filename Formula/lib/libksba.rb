@@ -1,8 +1,8 @@
 class Libksba < Formula
   desc "X.509 and CMS library"
   homepage "https://www.gnupg.org/related_software/libksba/"
-  url "https://gnupg.org/ftp/gcrypt/libksba/libksba-1.7.0.tar.bz2"
-  sha256 "e1d3a5745911f5a663fddecf526541c4241052a9e4cafbc92dc7f4096c7efdac"
+  url "https://gnupg.org/ftp/gcrypt/libksba/libksba-1.8.0.tar.bz2"
+  sha256 "296b9db9095749f2aa104202d7ab7fd09ad10710e00780a709c9754b1a1d9292"
   license any_of: ["LGPL-3.0-or-later", "GPL-2.0-or-later"]
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class Libksba < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9ba80043590c7421618c2af2a11b0ba4bfa1a03eb32f9495249707772bb83f00"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "522b6161947e4e274e3a5502541cf0461d75a7ecdadc1913e87db85119d3c101"
   end
 
   depends_on "libgpg-error"
