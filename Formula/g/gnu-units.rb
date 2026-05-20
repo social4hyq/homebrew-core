@@ -7,12 +7,7 @@ class GnuUnits < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 arm64_tahoe:   "1bfa5b9ccb5932b8517abef2af4e421ad782237868cadf9046ec3368f3a8d61d"
-    sha256 arm64_sequoia: "0f83de7bbcba4d246ff388c2d6ced55bb0a1d129b62e9b550c30c8e92ae10888"
-    sha256 arm64_sonoma:  "0eecf6ffaf5f6b5d7383ac6af26e5d8fb120ff2e21dc15a132401faba5bd069a"
-    sha256 sonoma:        "0d619ebea3a4d427f217f12e073ea693760eb2ed75a0570a00eba5ca4b3cd372"
-    sha256 arm64_linux:   "55e570d4e93da9b3f1703254056a786d56f25f16725e3d8b06a339870e7ac8b8"
-    sha256 x86_64_linux:  "6bef3ad4bb7c1746ba681f0dfaa94c9290072dc1974466c3b8f5ad5e0ee13660"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f02b9f3c578b515d69fcf08e24f0a6d2618836471b3a4d6c8d29d1043eddf8f1"
   end
 
   depends_on "readline"
