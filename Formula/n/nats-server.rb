@@ -12,12 +12,7 @@ class NatsServer < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "bb73fe166cd614101d54b4aa996bd7e115f2763911e4f492b59c62fa03668a6a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "bb73fe166cd614101d54b4aa996bd7e115f2763911e4f492b59c62fa03668a6a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "bb73fe166cd614101d54b4aa996bd7e115f2763911e4f492b59c62fa03668a6a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "a426fc1098ce9e508cc8698cbaca04efa600d4b3fc554c4b4949090487c9d4e1"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9ad2d087092debdc6c7959d6961866a7db9fb5f0d19a5403823e3cc9cc134b14"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "977c1947e88f001da82c1785dbb883a3a9935b509a319abf870e92191db83731"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "851deeb2ba6d94bf64a7dee8c587dcb8f6227f9b3ecc00b5c09067ec17d41bc0"
   end
 
   depends_on "go" => :build
