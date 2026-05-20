@@ -24,6 +24,11 @@ class Libvmaf < Formula
   end
 
   def install
+    # Fix race condition: test_feature_collector.c includes libvmaf.c
+    # which needs vcs_version.h, but meson doesn't declare this dependency.
+    inreplace "libvmaf/test/meson.build",
+              "['test.c', 'test_feature_collector.c', '../src/log.c', '../src/predict.c', '../src/metadata_handler.c'],",
+              "['test.c', 'test_feature_collector.c', '../src/log.c', '../src/predict.c', '../src/metadata_handler.c', rev_target],"
     system "meson", "setup", "build", "libvmaf", *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
