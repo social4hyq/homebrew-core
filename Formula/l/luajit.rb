@@ -31,12 +31,7 @@ class Luajit < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "0cf1bf9dc443912fe1d129c3dafd807f0862c56510a14f371ef4cce1f06cf693"
-    sha256 cellar: :any,                 arm64_sequoia: "ddb4848c243b68cebd8546fb96000fcd57f32760f4de5903ae3bc8734e785a1e"
-    sha256 cellar: :any,                 arm64_sonoma:  "2b9dd489a6f593d18a3ae38311815587217c3a503f5c3601eed1433742298295"
-    sha256 cellar: :any,                 sonoma:        "8cb8f4baf2c5a00aad2044b3de9f0273089e8c32c0522c96c109f3bc6b8bc2ca"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a97af5d4ff135e526da7da8eea141f23fc7600f5824c5545f3097f1cdb427424"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5444e91b64efa53f527302dc914aa5dfd3d08518084b4149f872badc2758c3f3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd3497e4f565fd2ce6a120fc0504e857233c43feacb1ec149c7e64dd6daec8c3"
   end
 
   def install
