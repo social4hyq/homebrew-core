@@ -6,8 +6,7 @@ class Historian < Formula
   license "BSD-2-Clause"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "189a00a7ac7714b8c9c9f5aa6691278538a072629bc6fa24ab99812d37b9e58d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "68111839ee7ae9c29d623bf6c76c36c68ba6a801f5edb42a9c89559e5eb68a6f"
   end
 
   uses_from_macos "sqlite"
