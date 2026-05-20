@@ -19,12 +19,7 @@ class Redis < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "69857547948e7ca8f6324ec169a9d14acccd0d892be8a850e7b4015052f216de"
-    sha256 cellar: :any,                 arm64_sequoia: "a08f94c910880ef852e95c4fbefa30371c3e765e66f6cd76c196b86166bf145a"
-    sha256 cellar: :any,                 arm64_sonoma:  "89ce05fd284686569e992c1d31337aa36686f2ae8e1986076c34e7957d2b5261"
-    sha256 cellar: :any,                 sonoma:        "b84b11b36d00d866b6449f894df3f7dedccc2c274936cd1e5d8e4cc2e9167262"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2c02ead2d7544babd9dd9c29728ce8a3be6af6ddd1c1693f4fd33a588f837e7c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ef817043bed2c5cd27463aa30f6a0e130232891e14527433dddead55366bad60"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61c2a27fcea57c4395d18c71f9f0d92d5995f5696b390c2ea0873d27c03d19d5"
   end
 
   depends_on "openssl@3"
