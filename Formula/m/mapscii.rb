@@ -6,7 +6,7 @@ class Mapscii < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "5f4eaa8d74d98faad1c1423bb6f7c54efe68e47cd932192fdea23cca28cfb831"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf7e87400def36aaf0de54f997a420487051bbcaab9cb65772b5b6e61f9bbcb7"
   end
 
   depends_on "node"
