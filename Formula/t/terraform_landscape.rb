@@ -6,8 +6,7 @@ class TerraformLandscape < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "6e403181c8828200717e99f9c86505f294c787db63060d1a356b4d95bff92f62"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "70f32f8559ec4a575869bbc0e641d0fb3e79afc674da56060a4172f6b6ef1c68"
   end
 
   depends_on "ruby"
