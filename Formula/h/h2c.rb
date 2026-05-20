@@ -6,8 +6,7 @@ class H2c < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "1380fd71175ca3911be9411e849ff6a739dca5b676771a42a6437c629216983e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "19ef0cff67578b81054b227a42d0258fbbf15fd08c8d7f0721ba4fc9e578a6e5"
   end
 
   def install
