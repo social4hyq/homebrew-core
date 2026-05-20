@@ -13,12 +13,7 @@ class GitlabRunner < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f2c3f447053790b4b4c1da8514aee529a2e1e8bedda5757acf05af1e73b71f32"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "927383395bdc73d984e849ae290ad57a4c94372830443e1cb3ebd63d7dc3b034"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "eb7f758dd71174855e389cb26a5c4c3dbc7ca4eb19174fbb766269190b9cd37a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "1dd7369ffff8c906a796d4b8a42e90b1c6a8c2c4790c12af81fa81b4097140c4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "38b09665faeaf9695291e0945d385dee53ca269f31ebeee79d9b0ed48dabfeb8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "53359310857b941b771dd8e2f29a7c4ebcc455e2ccac4a2fe7a11295e3c884d9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9ea50d36733fcdf308ac18d7df5df447d6b47e1a595495ae4301a88c3d8eb40"
   end
 
   depends_on "go" => :build
