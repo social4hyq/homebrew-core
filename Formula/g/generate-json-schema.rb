@@ -7,8 +7,7 @@ class GenerateJsonSchema < Formula
   head "https://github.com/Nijikokun/generate-schema.git", branch: "master"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "455469fbc5354030c4c7e62fcaba25fb9610bd32078ced0b95502195f9b6972a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "134893d88f8e5d59f1e7888eb5b2bf30a77ea81c87c933a7a01e06fcac233138"
   end
 
   depends_on "node"
