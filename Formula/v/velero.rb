@@ -11,7 +11,7 @@ class Velero < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b41b317b252dc52ff28f6ee9ae203871c020149b3d6fe6dcc3806843405110cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e987ff0c76a50d7daf3c1e3f56d75e67c1bf2a78ef6e8b12f868b7ed529dbb8"
   end
 
   depends_on "go" => :build
