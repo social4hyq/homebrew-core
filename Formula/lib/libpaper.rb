@@ -7,7 +7,7 @@ class Libpaper < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f19bd15561b672b9bc7149495397fb77c75e9e761ecaf343179fd6f4415a53d5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b2dbeb6ec0f406c1b51c9b1fd1646fd831836af50d720490d76b9a5e201cce1"
   end
 
   depends_on "help2man" => :build
