@@ -12,12 +12,7 @@ class Incus < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "94313fbc004abbf08eda3e1bc658e1b75000309ca45b9bf1ae297f718c983709"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "94313fbc004abbf08eda3e1bc658e1b75000309ca45b9bf1ae297f718c983709"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "94313fbc004abbf08eda3e1bc658e1b75000309ca45b9bf1ae297f718c983709"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7ae40b9ddc33ad080743fb22caafcc165a5b1d2fe8a1623ce6521cab7cbd6012"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "75cfcedd37b5f050b7c745ec81046f2a328385d1d2f56720d58b2c0cf285ebd9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "63a6fe5f48cc97c730062e14e426d1d14313970256faca0f38ab6600d8260238"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b6db3e82f27a5fec74fd6d0c63999ef7c1b64d6b38c4295cd97c12f4670c323"
   end
 
   depends_on "go" => :build
