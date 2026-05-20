@@ -7,7 +7,7 @@ class Tofuenv < Formula
   head "https://github.com/tofuutils/tofuenv.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "3febcab9a632034fdedf2d4ae0105d4425bcdb12ac73e58b586a1ddf6db36487"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "71420596dd741ecfbcc75f3022120baef7e660b69161224487df0473e35c518c"
   end
 
   uses_from_macos "jq", since: :sequoia
