@@ -6,8 +6,7 @@ class Dupseek < Formula
   license "GPL-2.0-only"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "af5b3ecacae9c0ace4403ba786d09138413571a9dc52d95ed59b289118683ff4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1fe5577bb2552ddad6d14ea00e8584e6e332b047db02fe027dd630536ac36a0b"
   end
 
   deprecate! date: "2026-01-05", because: "is not available via HTTPS"
