@@ -11,12 +11,7 @@ class Libngspice < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "00500b457ce45937b6ed298e71f282e31b88a58f6082940601ac4e1e209228b2"
-    sha256 cellar: :any,                 arm64_sequoia: "e1072848e25406c31fa5bb52ca1779c1ca4b256688c9dd6ce2625fb59e7c03a4"
-    sha256 cellar: :any,                 arm64_sonoma:  "a5822141038096046b13ddb18c8a2c6badd0e765f21374198b6b5a3980c3da37"
-    sha256 cellar: :any,                 sonoma:        "5369ab3a5cea69eefebac3568fcded61d1da1508db5d2748903bf4a23bdd5436"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4c9b5419a1c2e220a96e88fd71a4e80937cd6a66647b2f4151ee9597ad81e11f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1f906342f487dc58e1d53652767a14e6d00181af13096446c4e09a19ed32f24f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "33707a984c44cd6ac33078a5215a2421eaaece753d59b60d1ff6375b20923755"
   end
 
   uses_from_macos "bison" => :build
