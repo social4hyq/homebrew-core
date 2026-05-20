@@ -9,7 +9,7 @@ class Pastebinit < Formula
   head "https://github.com/pastebinit/pastebinit.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "fbe01a73549947404e9ae1a8dda691e7904117ed61af4b72087f41e35c1caa05"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "258d80c9b5a5153852ce60b672f0f5c3164d5e465ad644f957259fac43b46d8b"
   end
 
   depends_on "docbook2x" => :build
