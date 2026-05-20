@@ -7,8 +7,7 @@ class Sendemail < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "113001c5e97ed667b4f8401c335b3a337a7354b1562ca8b40b6499e6cdb68278"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "474d4def87fb7f96366960e534f591d5ecb529bd3ef01e8c93898ad11015dbef"
   end
 
   # Upstream homepage is gone
