@@ -7,12 +7,7 @@ class GsettingsDesktopSchemas < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "898b6804a80dcbdd84c7ce0fc1a2fe8068204bcfda38dcee4e85532aeef0b3c6"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "898b6804a80dcbdd84c7ce0fc1a2fe8068204bcfda38dcee4e85532aeef0b3c6"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "898b6804a80dcbdd84c7ce0fc1a2fe8068204bcfda38dcee4e85532aeef0b3c6"
-    sha256 cellar: :any_skip_relocation, sonoma:        "898b6804a80dcbdd84c7ce0fc1a2fe8068204bcfda38dcee4e85532aeef0b3c6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5b3944c3e35f72d75d9d5fc7117cb81e2629d29471995aa4fd49d6421ac4b817"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5b3944c3e35f72d75d9d5fc7117cb81e2629d29471995aa4fd49d6421ac4b817"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "23c9655d3e7cdc110dffb80064ae651dc6aecd3f3f59f32a5ac27559ac3f5fc6"
   end
 
   depends_on "gettext" => :build
