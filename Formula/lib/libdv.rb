@@ -6,20 +6,7 @@ class Libdv < Formula
   license "LGPL-2.1-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:    "c14359502e9d8c606b0424966181a93c26fec27eb9ca41f2313af62888716c4d"
-    sha256 cellar: :any,                 arm64_sequoia:  "d9ec199c7cbb78a2e15ba681e90f94cb34e7c4e4d4856ebe85553661847a4f3b"
-    sha256 cellar: :any,                 arm64_sonoma:   "b3e7be7a0887586ce1373382cdd83d7537b273fc622cf606ea3e1d425461b594"
-    sha256 cellar: :any,                 arm64_ventura:  "e7c73ec9982ec05267073663395ff00a2a5eb7927a0df172441890d402e11077"
-    sha256 cellar: :any,                 arm64_monterey: "58a4f24c622c38ba33f3c2972dff249e77b891d68e06553a99a71dc42801f08e"
-    sha256 cellar: :any,                 arm64_big_sur:  "a72d9919c11d6950fcd115e6fa0e6cbac86ec6f06d8ade46b642006f652bf53f"
-    sha256 cellar: :any,                 sonoma:         "d67945be1d2aba728715b9f67f68bd91fab88599bb351a179bfa89829bb5ac19"
-    sha256 cellar: :any,                 ventura:        "e9109a663d65ae5085c53d011421cc9cb09821fd42b8002c0d2d241db7ebc180"
-    sha256 cellar: :any,                 monterey:       "95529c6172e3054e8cf7057d6a0da13d20a8f368a4828a4103f5b1f37136b340"
-    sha256 cellar: :any,                 big_sur:        "81db616fc05c65d944af1a500e9d647764e361419040b0007d9efc85ebfe3d31"
-    sha256 cellar: :any,                 catalina:       "ee4a56e9a1462b87632dca0048808d4918b5a72fd943cce8ee600d138c9f67f6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "a7be333d02ace53395d0dcaad23163a9bf3a159aa05cc71a7202ee8eb917adf3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b4e579189286f35409557243fe450e7509536f831777f37ae2f7519913bddcf8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8137d9a3a6cdbef4cf8c0a31a0a36fbcc10d5abaa6f8e2be9a72aa49ef70b1a7"
   end
 
   depends_on "autoconf" => :build
