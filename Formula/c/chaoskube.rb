@@ -12,12 +12,7 @@ class Chaoskube < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d404389a447a45098d2f299a545ae890a1cdd77c91ed5b55861049b9dc505bea"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "519ad2e84a0a72ee268170e9ec0752f6a761066b716eaa8143e23767424cbf1e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c00ec01eb256634fe6e10cfd6e9d303871060208adf01f8c17ccb7acfedaa77f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "567d4ae913059c5244e5bce3460c648ffe17011302214be84af999525e576f3a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "23eb82bb4a90ee62857f338fd688462f9c56a4242af2779d9c59fb404f819ab8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "89bb317cd550675bf0151057430f10593963f428c0d210db21ce7c6f83b4a88e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d0b45ea26e69f0d321a0b2e3fea14b5a97f6c3468fc7a179638bcd2f446ab12"
   end
 
   depends_on "go" => :build
