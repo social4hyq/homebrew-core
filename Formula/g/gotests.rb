@@ -7,12 +7,7 @@ class Gotests < Formula
   head "https://github.com/cweill/gotests.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9df20fdd667942ed0db364896b9d3ec5dea05ba66569cf265319c892bf16922a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "9df20fdd667942ed0db364896b9d3ec5dea05ba66569cf265319c892bf16922a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9df20fdd667942ed0db364896b9d3ec5dea05ba66569cf265319c892bf16922a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "cfa2259d33d113f8a7800ca1ea057cf0aba2025bf27f9c76a298e66bdbc475da"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e0c504b5b5866a465e6ee748d60d33cc96f65af20f7270c8db0c6d4291c948f2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7ac759554a3d2758bc73f3f0fe37bf65cc2f75e02adbc876a01b4378e073a87d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "08d1f49ccd74635cbc4146c689f697937cc1365b8865351d56d7e8191c8c73fa"
   end
 
   depends_on "go" => [:build, :test]
