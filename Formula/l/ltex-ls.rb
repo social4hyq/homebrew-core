@@ -7,13 +7,7 @@ class LtexLs < Formula
   head "https://github.com/valentjn/ltex-ls.git", branch: "develop"
 
   bottle do
-    rebuild 4
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "5d2dc1612c126df0a99920f428ae300efea2ad97902c12246abb3dbb190ab487"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "38ab0f701ab7cfd6103f4dac187e48392fdabea07f476e02aae359c511ceec49"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9d56ab0b8efa1e3209f83961586067573678919cf40f81fa4614f80768112717"
-    sha256 cellar: :any_skip_relocation, sonoma:        "a41867cfd4839ddf272fb8725ebcfd4c4614874dff3b41d4762ff1bd4b179f68"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8f08e498833b5667fd9fb364169d817272f62dca9d1519da4d7c683c9f9cdc72"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fba7ce38f22bf78b00f6c297436db4bf134b1d81c1e9d0fb6352b464dc38fc1f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b141518e39e8620e0c38f2b83b67b0f7b2a741cb32639a55d2b9dfdff450fc99"
   end
 
   depends_on "maven" => :build
