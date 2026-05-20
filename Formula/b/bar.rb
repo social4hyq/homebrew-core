@@ -6,8 +6,7 @@ class Bar < Formula
   license "Zlib"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "0bfd47d83744c345b9d102b66f8f7f580757d90ec821789a76364ad8b1cb13eb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d83753e0cddaa61e580c7c8cbd017fe8e5d407b55fb0df9cb9d1b76a6c7d365a"
   end
 
   deprecate! date: "2026-01-05", because: "is not available via HTTPS"
