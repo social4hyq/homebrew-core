@@ -1,13 +1,13 @@
 class Libxi < Formula
   desc "X.Org: Library for the X Input Extension"
   homepage "https://www.x.org/"
-  url "https://www.x.org/archive/individual/lib/libXi-1.8.2.tar.xz"
-  sha256 "d0e0555e53d6e2114eabfa44226ba162d2708501a25e18d99cfb35c094c6c104"
+  url "https://www.x.org/archive/individual/lib/libXi-1.8.3.tar.xz"
+  sha256 "7ad60056f01af4f786cfe93b3a7707447711626fc8da2637bec71a90409babe5"
   license "MIT"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5caad6f8b02e892021f0a4116cc60acf594b1a19a03abf84190ea3093a0b7749"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "81b3b41e3b7fa4984c8749186fccd4c0c8d5d23a6390e39d09dd05976677da33"
   end
 
   depends_on "pkgconf" => :build
