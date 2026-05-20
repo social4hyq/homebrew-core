@@ -8,8 +8,7 @@ class RbenvVars < Formula
   head "https://github.com/rbenv/rbenv-vars.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "571e19044f1c058d68271c7a8296cccee968ba6e1e0bca75fe8b5167f5888b96"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f62eb64606dd9e94e5272d31a9605201148fc647c5a5e2e6a8021c05af8b192a"
   end
 
   depends_on "rbenv"
