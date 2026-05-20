@@ -12,12 +12,7 @@ class Inframap < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ae31ec0395129162af3fedc9c3adb493f972383c7dac5ae7178e2011a6e05911"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ae31ec0395129162af3fedc9c3adb493f972383c7dac5ae7178e2011a6e05911"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ae31ec0395129162af3fedc9c3adb493f972383c7dac5ae7178e2011a6e05911"
-    sha256 cellar: :any_skip_relocation, sonoma:        "054b764bacd6b64cb5be9f36e6aa476960ac460b06a855931cd6e0c84df7b4b8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "53149571561b0510d710bd714d0cf079523707b114857e9035b635067151741f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e9a3d670fbb4a76b880ebb96533df86e6fce39494e85be60e7ce13f778a7c7ba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7cc1250811abfa508769c9bb5789b63a1837e2173f3af747fc94347231b2f62"
   end
 
   depends_on "go" => :build
