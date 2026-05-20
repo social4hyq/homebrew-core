@@ -10,12 +10,7 @@ class Shub < Formula
   head "https://github.com/scrapinghub/shub.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "3cdd21b6c0297bec0f660371faa42f75657fefdd868cd3543718d4c4d8d691d2"
-    sha256 cellar: :any,                 arm64_sequoia: "3edec73d9e581b9f61855a353ed7dee026588f8cfe26ba8f1b0d42ae3a2ef10b"
-    sha256 cellar: :any,                 arm64_sonoma:  "0fba33e644698090059b6a9a5d48b7408ea61d1405566c12250d85266381bb78"
-    sha256 cellar: :any,                 sonoma:        "698f959bb29277dd3c22a1b5af0eb5feface43f24e00c78e9fc31250fa324af9"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "01b038520658e437aff78e6836507dc15f0db8e7a71d6724a538db3f0def787e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "229e77e34885b9b3a1274c3238e852a90746a0a4ed8856cad444481d33bec3af"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca7d189280f7fcb64877ce149b48e94411f260a105ef78fe3a1200f6874814ee"
   end
 
   depends_on "certifi" => :no_linkage
