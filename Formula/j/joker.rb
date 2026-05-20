@@ -7,12 +7,7 @@ class Joker < Formula
   head "https://github.com/candid82/joker.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "70163d906fe29b259b2d45acd5d2aa4fe9c917b27f6dcaf94d3f246835f3960e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "70163d906fe29b259b2d45acd5d2aa4fe9c917b27f6dcaf94d3f246835f3960e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "70163d906fe29b259b2d45acd5d2aa4fe9c917b27f6dcaf94d3f246835f3960e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "428acc9bb9b254aa39a368b96ea8d92da21d18f9340a0ddd5f40b417f6c5b7ce"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "48198971bd9d127d694a355f982b0d6c7b69af735ce1409ff1c7bacd187a72ef"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fcc6774ce952aafbaee43a147f8099842291b584c8b59cb0f9fd324810aae3de"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ed5b1ffd5f2edebd2ce1a3826cbe0e581fd111815272926cb1f3aced520af9e"
   end
 
   depends_on "go" => :build
