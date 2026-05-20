@@ -7,13 +7,7 @@ class Mcptools < Formula
   head "https://github.com/f/mcptools.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "41935d9845af05cbe0d5845d48d39ba22cd2acaa506a7ef3b8d0236bd6a506c1"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "41935d9845af05cbe0d5845d48d39ba22cd2acaa506a7ef3b8d0236bd6a506c1"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "41935d9845af05cbe0d5845d48d39ba22cd2acaa506a7ef3b8d0236bd6a506c1"
-    sha256 cellar: :any_skip_relocation, sonoma:        "61800bc1654c7d0bd81dcd620ab5807135d2f67644e5adf5b2e12c6441c166d3"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "01fe149647de823687588e4048620c3b8e1db66f3338df6f08fc837cca575a62"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "39ffab019c9f9ada55db8b089ed043c3356f93544dc5a5d58667f22d22f9724a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "79ca2d4c3f8c5bb608c0db8f51bda1c4badaa6e9d7d3c642ec0b48bbd4dfc12f"
   end
 
   depends_on "go" => :build
