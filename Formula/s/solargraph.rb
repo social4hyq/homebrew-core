@@ -8,12 +8,7 @@ class Solargraph < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c1a05afcc44b2f88ccdd47d54368b03e08e86bcfc35924ede456f21ffe5b05d1"
-    sha256 cellar: :any,                 arm64_sequoia: "487d2cdb209548a568fd1898e9fe5c3e026e1296191d660521fe1ffdcacf1646"
-    sha256 cellar: :any,                 arm64_sonoma:  "116c18c41fb3c8e59cd32243bd0e2422c49d242cde7119ffbf0005b74c248827"
-    sha256 cellar: :any,                 sonoma:        "c629c02faba574d880c89f5d3e547542d08cc9b4e263f1b4a34b2a5030dd75a9"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8a543218d1828b6ee0b332a1ee507b753c8d1970d8c5baf219cbdbd8b5ac9e8f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "895b5f7547690c09eee348c5b5dc9cb6c8c89838d713e104a5545de61ee25357"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a96dc9570c9235e4e24deb0d086465e74e70fe3d8200660435925342dad28443"
   end
 
   depends_on "ruby"
