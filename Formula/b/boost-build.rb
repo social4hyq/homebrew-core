@@ -1,8 +1,8 @@
 class BoostBuild < Formula
   desc "C++ build system"
   homepage "https://www.boost.org/build/"
-  url "https://github.com/boostorg/build/archive/refs/tags/boost-1.90.0.tar.gz"
-  sha256 "e7b6a6daf91ecb1ac036d659280b8d7f1b3c50728cb4b205ae33baf6cd9b016a"
+  url "https://github.com/boostorg/build/archive/refs/tags/boost-1.91.0.tar.gz"
+  sha256 "98348affaad8041b940a99fe17211407b9ac6b2f46ca8ae0b8d9901bc8ebd9aa"
   license "BSL-1.0"
   version_scheme 1
   head "https://github.com/boostorg/build.git", branch: "develop"
@@ -13,7 +13,7 @@ class BoostBuild < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "508698b1d596565f4f03dcbf8b3d5a3207081b3df63e8ff63c4a731dc5f4600a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4359340fae126ff0d4eacf2455ed2b6f7835ce8764e49b0f9793bbf5db2a6071"
   end
 
   conflicts_with "b2-tools", because: "both install `b2` binaries"
