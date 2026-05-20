@@ -1,0 +1,125 @@
+diff --git a/src/path/binding.h b/src/path/binding.h
+index b7f8d46..1c24e2a 100644
+--- a/src/path/binding.h
++++ b/src/path/binding.h
+@@ -23,6 +23,10 @@
+ #ifndef BINDING_H
+ #define BINDING_H
+ 
++#if defined(__OHOS__)
++    #include "queue.h"
++#endif
++
+ #include <limits.h> /* PATH_MAX, */
+ #include <stdbool.h>
+ 
+diff --git a/src/path/queue.h b/src/path/queue.h
+new file mode 100644
+index 0000000..1345326
+--- /dev/null
++++ b/src/path/queue.h
+@@ -0,0 +1,91 @@
++/* 
++ * Standard CIRCLEQ macros for compatibility with environments 
++ * missing them in <sys/queue.h> (e.g., Android NDK, OHOS, musl).
++ */
++
++/* Basic structure definitions */
++#define CIRCLEQ_HEAD(name, type) \
++struct name { \
++    struct type *cqh_first; \
++    struct type *cqh_last; \
++}
++
++#define CIRCLEQ_ENTRY(type) \
++struct { \
++    struct type *cqe_next; \
++    struct type *cqe_prev; \
++}
++
++/* Status and Accessor macros */
++#define CIRCLEQ_FIRST(head)     ((head)->cqh_first)
++#define CIRCLEQ_LAST(head)      ((head)->cqh_last)
++#define CIRCLEQ_END(head)       ((void *)(head))
++#define CIRCLEQ_EMPTY(head)     (CIRCLEQ_FIRST(head) == CIRCLEQ_END(head))
++#define CIRCLEQ_NEXT(elm, field) ((elm)->field.cqe_next)
++#define CIRCLEQ_PREV(elm, field) ((elm)->field.cqe_prev)
++
++/* Initialization */
++#define CIRCLEQ_INIT(head) do { \
++    CIRCLEQ_FIRST(head) = CIRCLEQ_END(head); \
++    CIRCLEQ_LAST(head) = CIRCLEQ_END(head); \
++} while (0)
++
++/* Insertion operations */
++#define CIRCLEQ_INSERT_AFTER(head, listelm, elm, field) do {            \
++    CIRCLEQ_NEXT(elm, field) = CIRCLEQ_NEXT(listelm, field);            \
++    CIRCLEQ_PREV(elm, field) = (listelm);                               \
++    if (CIRCLEQ_NEXT(listelm, field) == CIRCLEQ_END(head))              \
++        CIRCLEQ_LAST(head) = (elm);                                     \
++    else                                                                \
++        CIRCLEQ_PREV(CIRCLEQ_NEXT(listelm, field), field) = (elm);      \
++    CIRCLEQ_NEXT(listelm, field) = (elm);                               \
++} while (0)
++
++#define CIRCLEQ_INSERT_BEFORE(head, listelm, elm, field) do {           \
++    CIRCLEQ_PREV(elm, field) = CIRCLEQ_PREV(listelm, field);            \
++    CIRCLEQ_NEXT(elm, field) = (listelm);                               \
++    if (CIRCLEQ_PREV(listelm, field) == CIRCLEQ_END(head))              \
++        CIRCLEQ_FIRST(head) = (elm);                                    \
++    else                                                                \
++        CIRCLEQ_NEXT(CIRCLEQ_PREV(listelm, field), field) = (elm);      \
++    CIRCLEQ_PREV(listelm, field) = (elm);                               \
++} while (0)
++
++#define CIRCLEQ_INSERT_HEAD(head, elm, field) do {                      \
++    CIRCLEQ_NEXT(elm, field) = CIRCLEQ_FIRST(head);                     \
++    CIRCLEQ_PREV(elm, field) = CIRCLEQ_END(head);                       \
++    if (CIRCLEQ_LAST(head) == CIRCLEQ_END(head))                        \
++        CIRCLEQ_LAST(head) = (elm);                                     \
++    else                                                                \
++        CIRCLEQ_PREV(CIRCLEQ_FIRST(head), field) = (elm);               \
++    CIRCLEQ_FIRST(head) = (elm);                                        \
++} while (0)
++
++#define CIRCLEQ_INSERT_TAIL(head, elm, field) do {                      \
++    CIRCLEQ_NEXT(elm, field) = CIRCLEQ_END(head);                       \
++    CIRCLEQ_PREV(elm, field) = CIRCLEQ_LAST(head);                      \
++    if (CIRCLEQ_FIRST(head) == CIRCLEQ_END(head))                       \
++        CIRCLEQ_FIRST(head) = (elm);                                    \
++    else                                                                \
++        CIRCLEQ_NEXT(CIRCLEQ_LAST(head), field) = (elm);                \
++    CIRCLEQ_LAST(head) = (elm);                                         \
++} while (0)
++
++/* Removal and Traversal */
++#define CIRCLEQ_REMOVE(head, elm, field) do {                           \
++    if (CIRCLEQ_NEXT(elm, field) == CIRCLEQ_END(head))                  \
++        CIRCLEQ_LAST(head) = CIRCLEQ_PREV(elm, field);                  \
++    else                                                                \
++        CIRCLEQ_PREV(CIRCLEQ_NEXT(elm, field), field) =                 \
++            CIRCLEQ_PREV(elm, field);                                   \
++    if (CIRCLEQ_PREV(elm, field) == CIRCLEQ_END(head))                  \
++        CIRCLEQ_FIRST(head) = CIRCLEQ_NEXT(elm, field);                 \
++    else                                                                \
++        CIRCLEQ_NEXT(CIRCLEQ_PREV(elm, field), field) =                 \
++            CIRCLEQ_NEXT(elm, field);                                   \
++} while (0)
++
++#define CIRCLEQ_FOREACH(var, head, field)                               \
++    for ((var) = CIRCLEQ_FIRST(head);                                   \
++         (var) != CIRCLEQ_END(head);                                    \
++         (var) = CIRCLEQ_NEXT(var, field))
+diff --git a/src/path/temp.c b/src/path/temp.c
+index 998024f..5813952 100644
+--- a/src/path/temp.c
++++ b/src/path/temp.c
+@@ -198,7 +198,7 @@ static int remove_temp_directory2(const char *path)
+ 	int status;
+ 	char *cwd;
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) || defined(__OHOS__)
+ 	cwd = malloc(PATH_MAX);
+ 	getcwd(cwd, PATH_MAX);
+ #else
