@@ -7,7 +7,7 @@ class Opentofu < Formula
   head "https://github.com/opentofu/opentofu.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "07b737bc195773e0411a96afc58dd1ce2b96f51c959906bc6a5400e9b21bb28b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b86a81fbe32d2ad115ea58fb49a6f8f17e3a3ae6ad14719b4614bd413388f2d6"
   end
 
   depends_on "go" => :build
