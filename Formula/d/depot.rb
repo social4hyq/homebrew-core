@@ -14,7 +14,7 @@ class Depot < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "77cb7f1f376f2995d3297df65842ca8c1732fe0606ad30086b4928eeb1dd72b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "82fcf7133bc6089f794a2e7d14f896ac38ad6dcd99e5d8ba106d63b7daddfe15"
   end
 
   depends_on "go" => :build
