@@ -13,12 +13,7 @@ class Chamber < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0bb60479434b47f196bd4713bfc4920c9440a159db3292d7f49b13f16925061e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0bb60479434b47f196bd4713bfc4920c9440a159db3292d7f49b13f16925061e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0bb60479434b47f196bd4713bfc4920c9440a159db3292d7f49b13f16925061e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "86496b736075f601b3b8fdc1da19a5b7e6475e1ff5403f306b444e073c6ccacc"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "27b4a63228c2a4d1cd0a3e7a685c262e0522a9d4e332fee5dfb9ba4bb4bc6b1b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6f489b3882af86fd29b39b39e4f3d44d3780c1ec20dad9bff964964c7bc91fa3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4706bd0fe788513b755cd561913207d5f2870a2435384d05acad651ad628c365"
   end
 
   depends_on "go" => :build
