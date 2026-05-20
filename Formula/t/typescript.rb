@@ -7,7 +7,7 @@ class Typescript < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "9f8f00c55e68d31d727cd36d42e27022f21935edf23e47e57e04cd04c1470317"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e94f8c47a71813b976ed0a79e410d81088138ef5cabefa55219c567fa074b253"
   end
 
   depends_on "node"
