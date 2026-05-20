@@ -1,8 +1,8 @@
 class Depot < Formula
   desc "Build your Docker images in the cloud"
   homepage "https://depot.dev/"
-  url "https://github.com/depot/cli/archive/refs/tags/v2.101.62.tar.gz"
-  sha256 "acb795125de5238a81804fe31f5404b2f8061704722855c163dbb198f3f7882d"
+  url "https://github.com/depot/cli/archive/refs/tags/v2.101.63.tar.gz"
+  sha256 "1063cacf05eb3ec1739484254ddb6a63ae06c5bcf70e01078b55c6a310cfb694"
   license "MIT"
   head "https://github.com/depot/cli.git", branch: "main"
 
@@ -14,7 +14,7 @@ class Depot < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "77cb7f1f376f2995d3297df65842ca8c1732fe0606ad30086b4928eeb1dd72b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "82fcf7133bc6089f794a2e7d14f896ac38ad6dcd99e5d8ba106d63b7daddfe15"
   end
 
   depends_on "go" => :build
