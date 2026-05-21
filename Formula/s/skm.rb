@@ -1,13 +1,13 @@
 class Skm < Formula
   desc "Simple and powerful SSH keys manager"
   homepage "https://timothyye.github.io/skm"
-  url "https://github.com/TimothyYe/skm/archive/refs/tags/v0.8.9.tar.gz"
-  sha256 "a345e8cc6afd7b7f7723fcc3c19602f57731f7423537a674e381aa53606cb29e"
+  url "https://github.com/TimothyYe/skm/archive/refs/tags/v0.9.0.tar.gz"
+  sha256 "81a4646a244b9ecfb3284be610696df33fd5afd5a25853c83a5902ba92af0478"
   license "MIT"
   head "https://github.com/TimothyYe/skm.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "34eb697fc6b697f051f1236d1f58dc7df95555138e0bd5c4d7b77fa0a0618f43"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "94ac5f25b13e3c784ff634f1f6ff94a77e599b37a15234b196ff6ca3b0bbecdd"
   end
 
   depends_on "go" => :build
