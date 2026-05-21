@@ -14,12 +14,7 @@ class Calicoctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "1f126d674e05fd4e32f30b300d3183b46f2fcdf71502d268913a6a454807cf15"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "19f1ba5bc429e320f7082b76c05dfcce212dbd598fb37c009ed91b5fde785956"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ddd59d61b7a8eade2bfca9818770affcfc368ee4f2d6eb5e2472864fa2838b80"
-    sha256 cellar: :any_skip_relocation, sonoma:        "2ee190f9437f4c75dec66ee9363510882ec49e29792e05ce93237f10efe37f90"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "da185d8ff1752d45d5140ebab3d989a6ef142e72fcd008920d2348a104abb610"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "46a455aff24e4124e1a1b9034595d284eb48778a034cb1139ee665312e5ba6eb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9655fa011585b9fbf77a7f4e9dd33d9068b19d94c84a4f1b30544d1c66b27350"
   end
 
   depends_on "go" => :build
