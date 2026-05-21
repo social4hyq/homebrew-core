@@ -6,12 +6,7 @@ class Md4c < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "32f2359b9c497452dfc897a44bdd10031aa1a2f1d85639844942bd844bf2a42c"
-    sha256 cellar: :any,                 arm64_sequoia: "2d0ec98420dcb79e21758f1cc32043bfbebfbf0e5195f44968507092f30b29a7"
-    sha256 cellar: :any,                 arm64_sonoma:  "d3e2962165abbffe5cf6f50e0c220b4baa9ee453bf64ec92043abfe249f881ba"
-    sha256 cellar: :any,                 sonoma:        "1989ec20fcab62d4fb41a900ad7ab3fe3e35aadc92200c4df8832f4028881708"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "222c0c3879934ca82c72c87568a501bdfe4e68c27d6ed9c0ec9918567e768e21"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "43976f4c7033d21274f1891ee268a129d8680cc3514bd14016b4bf5d7de45bdd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1becbcb6a87b3d1042a5feee588e5dc8fc56dc7a9d8c7fd220675ad7bc7ec30"
   end
 
   depends_on "cmake" => :build
