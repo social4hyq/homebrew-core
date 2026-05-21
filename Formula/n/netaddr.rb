@@ -9,8 +9,7 @@ class Netaddr < Formula
   head "https://github.com/netaddr/netaddr.git", branch: "master"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "cdcc4a712683eb68803860ecb8047079ebe5d8151c3bfa345fa4aab7d3a34177"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ddc2f29192f0928a1da5f3e28137243befd4317d87b0922e9c2ed603bd48b9e"
   end
 
   depends_on "python@3.14"
