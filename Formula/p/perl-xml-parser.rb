@@ -1,13 +1,13 @@
 class PerlXmlParser < Formula
   desc "Perl module for parsing XML documents"
   homepage "https://github.com/cpan-authors/XML-Parser"
-  url "https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.58.tar.gz"
-  sha256 "8e0bd510a6095374aff14e4f0cea62c40df5c434ac703850f20ae8edb2c9b100"
+  url "https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.59.tar.gz"
+  sha256 "a358fd7c49f5e27717a644a9102bd21dc7fc25a415983279c59b1580e2b62a58"
   license "Artistic-2.0"
   head "https://github.com/cpan-authors/XML-Parser.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2f28a74938f34930f421b7225939bbf78853e1613a2eb6c8c745152a6101dc0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bfaccccbaffbec4f6e5b3a4b55a7b9de1eff291a161b0de2e08239ec3f4df9c"
   end
 
   depends_on "perl" # macOS Perl already has the XML::Parser module
