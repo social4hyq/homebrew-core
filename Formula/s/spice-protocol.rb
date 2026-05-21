@@ -11,7 +11,7 @@ class SpiceProtocol < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "b2fc7486dfc635ac1e89eb2f38d7eebeddf5f51d3fcd5e8f52c35c6ecd70ebea"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8bea8d70cd935c7ad10b1d7eca8e2ce7abcbc3621fbdf9644a06b9120b945368"
   end
 
   depends_on "meson" => :build
