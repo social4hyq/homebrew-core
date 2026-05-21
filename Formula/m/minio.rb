@@ -16,12 +16,7 @@ class Minio < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "3e2fa706f5b973ff2927c21538d1e0be160aced2d5f646742f40291a7529d484"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "80b0d45a0099d2077e7b1c6b219c74a243f5a50520aab2973f54a46843ce7f53"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ac206377ae9be883cd86cab99f522898668608614837eee76cc9ac657d3e9233"
-    sha256 cellar: :any_skip_relocation, sonoma:        "54154dcdba031f5a053608848ca767dd7549a1c1a2d7fb419c09d0e7f8c463c0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9111c9baff73c9c8e552b1147114b606fddf35ffb0e4e164085ab5b715b277ef"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4eec0924999ec02512516b58be63a3c29dc75a2d9e46494d4f6197d457d7846a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "191f988cd73c704a0b47705abdd9fee6e2e5e85e2298f24b1c87ff20843638d5"
   end
 
   deprecate! date: "2026-02-17", because: :repo_archived
