@@ -7,14 +7,7 @@ class Golines < Formula
   head "https://github.com/segmentio/golines.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0a9cd3736e5ea0b6729260f8248667baec0c80eea786497407b7fa78d60c8879"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "710c57a0a2617f276e3a28d562681aee915ed9a07df2c26c75dda51f706a76c7"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "710c57a0a2617f276e3a28d562681aee915ed9a07df2c26c75dda51f706a76c7"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "710c57a0a2617f276e3a28d562681aee915ed9a07df2c26c75dda51f706a76c7"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e2ee8ae303535f819313db09acfb54a1cfb649bd9ec3620cf8f9f4a5984fc675"
-    sha256 cellar: :any_skip_relocation, ventura:       "e2ee8ae303535f819313db09acfb54a1cfb649bd9ec3620cf8f9f4a5984fc675"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "de399995aed9ac22003ca96152ebc08604c49482a6034f509dd7e55e0387af91"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e70a09df4e69252b296398c24b6a557c5b16044117eb4d9987ae15c260b7dc57"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce78d21de657d3b2fd38932457ea4ae16c51a453390645f74c98ced3f653811d"
   end
 
   depends_on "go" => :build
