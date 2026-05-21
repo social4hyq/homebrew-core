@@ -8,7 +8,7 @@ class Pawk < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "ac3b1c476a0e40e5eed34672c9d426989456b17907cfeee03c6e6ed88d0d01b9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8911acf751181aa90dcac28de64236c52885453d42f1f6d9bc7c1e9c577fffe"
   end
 
   uses_from_macos "python"
