@@ -6,8 +6,7 @@ class Pacmc < Formula
   license "AGPL-3.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "9d54abfccc300901396d32f398dd0560690dca1f3414ed70a66156924ea8397f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd0ca9918ac9cdf28681420365b6cef5a102e8f322ec16c7ac6bb51aa0f4921c"
   end
 
   depends_on "openjdk"
