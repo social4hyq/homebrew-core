@@ -7,8 +7,7 @@ class GitGerrit < Formula
   head "https://github.com/fbzhong/git-gerrit.git", branch: "master"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "2b2647c6487fc6987733e3ec0d88f6c3cb87013244b69d91027355548868cf35"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a15584d66bd6989bc53edce45047bc9f45b6490bed53a470daeba058c37ff7a8"
   end
 
   conflicts_with "gerrit-tools", because: "both install `gerrit-cherry-pick` binaries"
