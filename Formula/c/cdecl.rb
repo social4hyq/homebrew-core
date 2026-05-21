@@ -10,12 +10,7 @@ class Cdecl < Formula
   ]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0db165b173c52c419fc2c7f763b42e6834ac534b24fc63203c0242e386d6ef7e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4018c09121a627f883e431db8b6c3af88e674945f7b268a3b489e18cb7f8b8e8"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ff0d4d29c2a4f1d227d1253600df72b50a322a1913c791d9e17059036fe98dd5"
-    sha256 cellar: :any_skip_relocation, sonoma:        "22a55bd22e6a8c3b3c787e0c0f3cd60d0abbe11ef199b93399d30aa1bea04753"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b56eddf396e6798959e9e6f408704ca917cfa00b0cca83c67063b1a27578b911"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "aa596153a512c8d1cabffd75ab0f1ac4555dc21efe9a6e11ac4893be66074557"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c51aac40d3d9adb4314e035539dc4210d65c15b73b69b6963df292704908e3b"
   end
 
   uses_from_macos "bison" => :build
