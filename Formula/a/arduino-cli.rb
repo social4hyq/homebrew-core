@@ -12,7 +12,7 @@ class ArduinoCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "51c1f8584b5b54a4585b49d610be3a5881dff41eb50e1ff3294e98af8e21363b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6d278b061877cffd1a3497f12a603ae23736f3cc18a03b5b5462989e66bfada"
   end
 
   depends_on "go" => :build
