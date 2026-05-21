@@ -1,8 +1,8 @@
 class DockerCompose < Formula
   desc "Isolated development environments using Docker"
   homepage "https://docs.docker.com/compose/"
-  url "https://github.com/docker/compose/archive/refs/tags/v5.1.3.tar.gz"
-  sha256 "19c7219c97390473bb96530153e64fce98d4b05ecf6f73016e564201d99512e7"
+  url "https://github.com/docker/compose/archive/refs/tags/v5.1.4.tar.gz"
+  sha256 "363ce6ccca46f836648f5f4ec9ecfdb6f631daa126570cc3fc69140edeed6794"
   license "Apache-2.0"
   head "https://github.com/docker/compose.git", branch: "main"
 
@@ -15,7 +15,7 @@ class DockerCompose < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "53d46d375667b3e8694602b9bf415b6772283b7e782fdf5701d87af73244605a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a0f9e3a3df661637781ea67f8aa66fd01724b39c7e112cf8832cbc9c8466186"
   end
 
   depends_on "go" => :build
