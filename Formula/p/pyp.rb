@@ -8,8 +8,7 @@ class Pyp < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "7cd48c76de3d2b2e5503adab30d97ac87dff691499d9fc10f65dea95b916bf68"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab4922743e168e4e084fe43e6ddefb4bc8e1606d4275e500b879c5c442081402"
   end
 
   depends_on "python@3.14"
