@@ -6,8 +6,7 @@ class Shunit2 < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "b706f44b77486bdf9fc7629b0fed435e9e5592055c847f7d2bda9f4ed84d8cc2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5a6859bd156b00eb8273695131cda0456803b4e47c605d1a9ead9336b6e6201"
   end
 
   def install
