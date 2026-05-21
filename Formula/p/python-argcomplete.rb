@@ -8,7 +8,7 @@ class PythonArgcomplete < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "3cbfebfe5fc664a233aec15fcd7049e5ded3cd8d69b7ba58bce32e084e2a2db7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "531df920e4a175be5bce30c1dd59f9c0661d07b56e74b5deab00983e5283d1ba"
   end
 
   deprecate! date: "2026-02-13", because: "does not meet homebrew/core's requirements for Python library formulae"
