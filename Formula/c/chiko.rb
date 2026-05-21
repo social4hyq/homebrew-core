@@ -7,12 +7,7 @@ class Chiko < Formula
   head "https://github.com/felangga/chiko.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "7e05bc75aa70da03f9440495b32c0959e76115bafa14bd4ad61725d5f9b5eaaf"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7e05bc75aa70da03f9440495b32c0959e76115bafa14bd4ad61725d5f9b5eaaf"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7e05bc75aa70da03f9440495b32c0959e76115bafa14bd4ad61725d5f9b5eaaf"
-    sha256 cellar: :any_skip_relocation, sonoma:        "654357e462c4f2152aa3672da22b83b71ba7df778f6cfcec157851482b48909b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2909a2e1fb8edd2780b365eb47dde35da6025a1e2af3b21119f0f82d0c618a58"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "257de2678cbff663eb7e4c74e4c8e0db3c3726a4a3906d22cd0b8ab2c2560695"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5b7a641d1dfdf1c7e046873405673a4383f4ff2a58a5f4216693a245eb9651a"
   end
 
   depends_on "go" => :build
