@@ -17,8 +17,7 @@ class Speedread < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "84a404d8c1cbdb6d69501b347a9e50f87a34cce2136ebb12f97d4ab9b117443a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "abca3c35e5aadf2f9169d2cc821d796f239dc79643cd2445204e8183667af906"
   end
 
   def install
