@@ -6,8 +6,7 @@ class ReactNativeCli < Formula
   license "BSD-3-Clause"
 
   bottle do
-    rebuild 4
-    sha256 cellar: :any_skip_relocation, all: "405acef03b37460580b26bc0184b0891653cb58f130b25bcf1f454c0968a8e70"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b48bf38f5fb30826990847618ead2d057e951c14c9c42bfccb9b20467d0cd86"
   end
 
   depends_on "node"
