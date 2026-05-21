@@ -16,8 +16,7 @@ class GitSecrets < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "826637bd7920ad23df848a7ffbfadb79a7d7c918b330d80bc7fea4dfb9fed1d5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb2942348ea4c8f252e3724eada84998697a37562279acf59315e3cb6e19b036"
   end
 
   def install
