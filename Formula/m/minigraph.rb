@@ -11,13 +11,7 @@ class Minigraph < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "48bcee41e459f118349bccc93b32a9e721ce9835f293b32ffc168edae3b6f900"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "013ee66a3369941bfc4fdde7418fd2fbb51247646b89db97334d68c1461abd4a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "06d84e9c314550c79a857c908cc7f586cf2972281d0db97e6dd0dd36cbdaa534"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c3bef0a3f41f36ffb586b5c531507f33a2f2b3fc83df47d788a799a596f798a8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "909088318ee79b855fdedb8cb5228a4a5586dc05b8e09b46165b10230032b773"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "777e02e932c650e53510af0b618c5d39db20e675450f6adf19ad49220b659b94"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9bda5b327faeeb0cc988a791e8bf20465d255b82fb51ae741eb8c52959cf18f1"
   end
 
   on_linux do
