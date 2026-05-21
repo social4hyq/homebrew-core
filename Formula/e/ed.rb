@@ -5,6 +5,7 @@ class Ed < Formula
   mirror "https://ftp.gnu.org/gnu/ed/ed-1.22.5.tar.lz"
   sha256 "56e107ddc2f29dad6690376c15bf9751509e1ee3b8241710e44edbe5c3a158cc"
   license "GPL-3.0-or-later"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "5e82298eb58d3058c071269692805dc53484cd822dca49f49e2539008025761c"
@@ -59,7 +60,6 @@ class Ed < Formula
       assert_equal "He word\n", testfile.read
     else
       pipe_output("#{bin}/ed -s #{testfile}", ",s/o//\nw\n", 0)
-      #system "echo ',s/o//\\nw\\n' | #{bin}/ed -s #{testfile}"
       assert_equal "Hell world\n", testfile.read
     end
   end
