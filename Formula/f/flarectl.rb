@@ -13,7 +13,7 @@ class Flarectl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "144a28612d58278d77fa094304d7a6ebf4a57449a73456153add01be9d43cb13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c974ed07bfe97fc6bdfee5b0778cf6401a7b09fb6ac52467baeed758b632e224"
   end
 
   depends_on "go" => :build
