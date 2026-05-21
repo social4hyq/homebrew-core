@@ -6,8 +6,7 @@ class ZshAutopair < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "c9208ef9b9a923475ace7d3c397458eded12a4d8bb3961276d4196cc10329a0d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "951bbc2df7365dd23ecb60f8a62a6837004cb70b404d22f39036489767215f38"
   end
 
   uses_from_macos "zsh" => :test
