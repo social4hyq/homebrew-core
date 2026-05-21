@@ -7,7 +7,7 @@ class PerlXmlParser < Formula
   head "https://github.com/cpan-authors/XML-Parser.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2f28a74938f34930f421b7225939bbf78853e1613a2eb6c8c745152a6101dc0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bfaccccbaffbec4f6e5b3a4b55a7b9de1eff291a161b0de2e08239ec3f4df9c"
   end
 
   depends_on "perl" # macOS Perl already has the XML::Parser module
