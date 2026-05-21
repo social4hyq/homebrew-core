@@ -6,8 +6,7 @@ class SqlLint < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "5003c2e4717f5ae3f32a0bc1656a9fdec5a130cb54cec5dceeef497367a277b6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e6a293e30071c139345acfe2a1751426e465e417fdd59b572e7ee1fa354f468"
   end
 
   depends_on "node"
