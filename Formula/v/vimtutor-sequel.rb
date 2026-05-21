@@ -6,7 +6,7 @@ class VimtutorSequel < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "4861ae2b888e47e777fd3f78ef878aea6b007147ec561ecc430d7abb61a85cb0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "074aeb8e82ff578909852942fe68fb724848e12628188dad991836277438a70e"
   end
 
   depends_on "vim"
