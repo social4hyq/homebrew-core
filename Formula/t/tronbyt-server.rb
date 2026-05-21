@@ -7,12 +7,7 @@ class TronbytServer < Formula
   head "https://github.com/tronbyt/server.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "4162a3f2aad218c61df4f7ee477bb580b71a4a26f42d471cbfeaa65ce02d4624"
-    sha256 cellar: :any,                 arm64_sequoia: "e7367a94106f40a89eda4371fe436a79826ffc820ed97759095fa72febb8d3ec"
-    sha256 cellar: :any,                 arm64_sonoma:  "517113e6be7752ded4d76e9f9737512a1b73ad88589b1dd7485b72dd1fceb086"
-    sha256 cellar: :any,                 sonoma:        "56356219454f35e1179e5be4e97a08eb5d68274876e8672cb89e92efc3832dcc"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "32563c69056092d1066adefee489df97136b4a6397f950f924759af41821dbe7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0341a69d44366a32188cccdac343af056e0a2537c321c3078f8d6a8315f9a84a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1495c14ab1a9e9d0ab17011a1735fe277a51c9c14a9ec6b37746d4f598239b8"
   end
 
   depends_on "go" => :build
