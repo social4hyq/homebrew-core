@@ -7,7 +7,7 @@ class Interface99 < Formula
   head "https://github.com/Hirrolot/interface99.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "cdcd1817a2f31b433c04ed591b2f5de07141a3e783de280b0c7431b68dec2556"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a09392510059ec657132e99951bb4bd8758162c71094ebb2960ed3cc19f3ed1"
   end
 
   depends_on "metalang99"
