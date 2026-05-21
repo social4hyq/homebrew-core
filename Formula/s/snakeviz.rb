@@ -9,12 +9,7 @@ class Snakeviz < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "caa2dfd45227bbabbd439daad82e781b673b9a02fb5843d3272bc67f8f11a580"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1d9691987dfe92ea0ff438c7b6aaab35dadf969046b006b73f059228a8bc57b6"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9297c641fd38cd032da52b8da5c9c2e37d1156ff0f1971c7250e4f7fddc3583b"
-    sha256 cellar: :any_skip_relocation, sonoma:        "279721b138f4b503ef168d7d442e725632d517e4afb800ff3c37a919318df06d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7a880cbf8ea570d83362a6165bf46da66b01a352b6f305408cd87574c89efdc3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b5a31158b1eb517ea39cae27721e1c69059651f881967666947a1c159dec4212"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9ffa1b081eff755240db758ebb23d17f45f2b0e6d5de97cb91d88e9b08d07e20"
   end
 
   depends_on "python@3.14"
