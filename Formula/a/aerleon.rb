@@ -9,12 +9,7 @@ class Aerleon < Formula
   head "https://github.com/aerleon/aerleon.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "3a26808bb88e041a8681a42639932c0791c5600d6d671cc529afee3b73882b34"
-    sha256 cellar: :any,                 arm64_sequoia: "0d5a369ce5f61009c393f94dea67f520e79e6228458cbabb9864c56f6ac96317"
-    sha256 cellar: :any,                 arm64_sonoma:  "59f04ba3720520a3b573037e60c656bd6385bcf43633ed8cdb48dcaf1c754bc4"
-    sha256 cellar: :any,                 sonoma:        "13327dffd80008987d3d62077fd5b19244df2aac25cb3c4d7e7524f26c05aa86"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f1c14613ced8a37ec2302f2b0e11786d15c457cb33dfb0cc0a53d140bbd490dd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "aa49ed0e1471da0aef020b20852871e99ada06d4e01c3030a9885330b3152bb9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdf9a8034f635af34c4d1aef803239228f82fb67ceb7a921dd80c9835c7e34cf"
   end
 
   depends_on "libyaml"
