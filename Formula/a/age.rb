@@ -7,13 +7,7 @@ class Age < Formula
   head "https://github.com/FiloSottile/age.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "772ce6765f7cd9232cb23d1875cbe7617a762644c19acda569fb3770201cf2b9"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "772ce6765f7cd9232cb23d1875cbe7617a762644c19acda569fb3770201cf2b9"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "772ce6765f7cd9232cb23d1875cbe7617a762644c19acda569fb3770201cf2b9"
-    sha256 cellar: :any_skip_relocation, sonoma:        "2bc02da642592314389de73ad5e955ff14c0f66ca7c86dd4a6ab2b1a1dc8d0d3"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8aa780ecbc3ba748964014645045b51f7b2b1c42ec5e8681760030c37f8e6640"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b19b86729fad38f2f4067f2e2205b5b2009b6d2bdfac20065ec66780600cbf5d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7225f9d6257409bfb6905d4a9f0cfb1cb37c9f4d61d91adc94f31311ecc3c5d"
   end
 
   depends_on "go" => :build
