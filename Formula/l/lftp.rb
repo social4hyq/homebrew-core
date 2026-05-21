@@ -6,13 +6,7 @@ class Lftp < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "d18f0124b629090aea7a35fc4a860e63e55c25cf21534acf8293d91ce52112a4"
-    sha256 arm64_sequoia: "8977a9fa5c15417e34d2564d95715064292d65b200c1ad704147ee555c542810"
-    sha256 arm64_sonoma:  "ab4a8500603f5bc678a185a8de4babc442fbbda9efdef3e4ab7bbcd32df5a42c"
-    sha256 sonoma:        "e71c6bca446546bbf15228bbbce5f49294f1180fa36bfdb42afc9309dbbe09fe"
-    sha256 arm64_linux:   "14c4eeb37d1458cb5a2ee7e1bbab6485c598e93ab126155ff773c3da5ab9f05e"
-    sha256 x86_64_linux:  "6ed8ee10b71dbbaa5dfa5d7451840592d30598730a325d749360d7f1e6472f83"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8712f419b0c5828bd6913a056b6481209f5933651713055bbb421ab1a088d90d"
   end
 
   depends_on "libidn2"
