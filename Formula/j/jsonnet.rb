@@ -12,12 +12,7 @@ class Jsonnet < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "66a5ccefe36864188b76ab72a876281e0f84aa043d340763b746ac2affceae86"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1ba072f6520c7d86667c2e69bd4d2aad4c0233d5162fd7c69fdb232d5c821986"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "821dcfaebdfc20b7af5cb518b7a38108abab34987eec98ce741f8eaf1a4eed5f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "468b1b3a4f75fbf73b33033b143f64cb87f53989f7475de2b08968d563b0c1e2"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "017b5d0b4e17d47c2ebad8a34e976eb2e634cef232af744a329aea5c6baa4bfa"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2867f7ad19c7c37f6efc5e53b4695e2b8352bb7d10f6f6cb25bbb80a35964890"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b8b88f2cec228b9f022fb7b8646682bb566a7f5a2ed533cab6988a2d1822a61"
   end
 
   conflicts_with "go-jsonnet", because: "both install binaries with the same name"
