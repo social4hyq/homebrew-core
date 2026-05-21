@@ -1,12 +1,12 @@
 class Libheinz < Formula
   desc "C++ base library of Heinz Maier-Leibnitz Zentrum"
   homepage "https://jugit.fz-juelich.de/mlz/libheinz"
-  url "https://jugit.fz-juelich.de/mlz/libheinz/-/archive/v3.0.0/libheinz-v3.0.0.tar.bz2"
-  sha256 "faf949e2cd336a7db8da3d16eb86757c9106d4fa67abd5bfafd58a9a71bfe31f"
+  url "https://jugit.fz-juelich.de/mlz/libheinz/-/archive/v4.0.0/libheinz-v4.0.0.tar.bz2"
+  sha256 "cc78e7701a70bc4e476f8968d1c15030b26126da578e099994724fb7f1a3a5fa"
   license "0BSD"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "11309b0ff62b6fe004e0a0067230f2f45c2d841e4e24ed09efc850e06f2f8243"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e15e3faed2671cbaee60ee8302a3d9b0cf19244a5b941101422bc186d16cfd68"
   end
 
   depends_on "cmake" => :build
