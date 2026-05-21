@@ -10,8 +10,7 @@ class Woof < Formula
   head "https://github.com/simon-budig/woof.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "fb77732fb7843685c636e191145e82994a84ee7eecad8b7c18cc09308eac8362"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dba22ac52982c33b7c1bac624bc048933fd34f86a9ce0a4f5b0ad2ac72603444"
   end
 
   uses_from_macos "python"
