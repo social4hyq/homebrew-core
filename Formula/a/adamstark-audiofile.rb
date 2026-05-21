@@ -7,7 +7,7 @@ class AdamstarkAudiofile < Formula
   head "https://github.com/adamstark/AudioFile.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "dce0123d95e01e4609051018ea590c2811908a0e75cb97f7c445c491d21de87e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2ad957a666518d82fa812e460367cbdec32e78cd7816a2dcc62e79bfa03612b"
   end
 
   def install
