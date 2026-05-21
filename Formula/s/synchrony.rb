@@ -6,8 +6,7 @@ class Synchrony < Formula
   license "GPL-3.0-only"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "da3ca86b921e8277e72a226e53380a3baa661e6e09c9658231b4ab6a5b53569f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03154c247f4e7ee00603f56610d7d665a8d01870d7d62e9f695f322d44791816"
   end
 
   depends_on "node"
