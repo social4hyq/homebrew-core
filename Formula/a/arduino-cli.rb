@@ -1,8 +1,8 @@
 class ArduinoCli < Formula
   desc "Arduino command-line interface"
   homepage "https://arduino.github.io/arduino-cli/latest/"
-  url "https://github.com/arduino/arduino-cli/archive/refs/tags/v1.4.1.tar.gz"
-  sha256 "5a07d1848a5e2e6fbf49aef0ba6794aa865c8b31d74ffed979eb382810725bdd"
+  url "https://github.com/arduino/arduino-cli/archive/refs/tags/v1.5.0.tar.gz"
+  sha256 "bfb3299c6afc6a40c89a55e7142e67e0b10267348bc225cc2e94589c28076302"
   license "GPL-3.0-only"
   head "https://github.com/arduino/arduino-cli.git", branch: "master"
 
@@ -12,7 +12,7 @@ class ArduinoCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "51c1f8584b5b54a4585b49d610be3a5881dff41eb50e1ff3294e98af8e21363b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6d278b061877cffd1a3497f12a603ae23736f3cc18a03b5b5462989e66bfada"
   end
 
   depends_on "go" => :build
