@@ -1,0 +1,36 @@
+--- a/buffer.c
++++ b/buffer.c
+@@ -386,11 +386,31 @@
+ bool open_sbuf( void )
+   {
+   isbinary_ = false; reset_unterminated_line();
+-  sfp = tmpfile();
++  const char * tmpdir = getenv( "TMPDIR" );
++  if( !tmpdir ) tmpdir = "/tmp";
++  char * name;
++  if( asprintf( &name, "%s/ed-XXXXXX", tmpdir ) < 0 )
++    {
++    show_strerror( 0, errno );
++    set_error_msg( "Cannot open temp file" );
++    return false;
++    }
++  int fd = mkstemp( name );
++  if( fd < 0 )
++    {
++    show_strerror( 0, errno );
++    set_error_msg( "Cannot open temp file" );
++    free( name );
++    return false;
++    }
++  sfp = fdopen( fd, "w+" );
++  unlink( name );
++  free( name );
+   if( !sfp )
+     {
+     show_strerror( 0, errno );
+     set_error_msg( "Cannot open temp file" );
++    close( fd );
+     return false;
+     }
+   return true;
+
