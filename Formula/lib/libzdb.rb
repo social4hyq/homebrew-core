@@ -11,12 +11,7 @@ class Libzdb < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "e823552985e05bb6f5506fa3cead177bc8e2f388342567efb731e53f10f5c9e7"
-    sha256 cellar: :any,                 arm64_sequoia: "fce519ab90a9ed0c1a753df628afed46f7e9079532c87a366b5f1bdd06ae0503"
-    sha256 cellar: :any,                 arm64_sonoma:  "d7f4b9d1ff186e53c0f57201471a3cff895c8006a9a6d3a49c2687590acfb495"
-    sha256 cellar: :any,                 sonoma:        "37fa3aac2e71b2319ffeac999a72baecf86194484e4a663beba0cdc6417cf25f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e309f3c47a01f6cfda5b621e4d358048f22201f973df4615163eacbd3422e47a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e7f359cdb4916f44128b64c324d27915dec76d917d380509ab05ffc11e869ddb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "79937c510f73d2c114c9145cf4ea41cdefd150fbc672f04d1715e9b52a4370a4"
   end
 
   depends_on "libpq"
