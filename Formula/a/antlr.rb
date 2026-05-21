@@ -11,8 +11,7 @@ class Antlr < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "bf1e63a2591afe5116fe381032539b9a7ce76854f99f3976b9a81fa617b2640b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "48c40d4aeedd4d1825abc8175cb1f9fad968af95e7727e39d4d1071ab413df48"
   end
 
   depends_on "openjdk"
