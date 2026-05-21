@@ -8,8 +8,7 @@ class Httpstat < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "4c6ac7e7f5619376d294d7921048b7bfc2745c280518b2ce977f8091d5536ef9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "534ae9246af127d7fddb4c111379a5bd35600151de84fde72d7753228847c309"
   end
 
   uses_from_macos "curl"
