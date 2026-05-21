@@ -7,8 +7,7 @@ class N < Formula
   head "https://github.com/tj/n.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "3c9c7f8da6a1a735450f6e1b7a49483aa878ef6dc4657e68f4d3bb238cade1c2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b27f1a3398d692b29b95ea15a4e6d1b1b4087d1c9c23cfbdb77de985c0aea37"
   end
 
   def install
