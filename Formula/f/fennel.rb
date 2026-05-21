@@ -7,7 +7,7 @@ class Fennel < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "e1101f993a8ab14fc3f1d8dd0a7c9ed61369de54960825471829cb02f92c688b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb54aebc4961e8c6fcb11d976e6af9aa852e8fb05004e2f93df9b280c71d4d4f"
   end
 
   depends_on "luajit" => [:build, :test]
