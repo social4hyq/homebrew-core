@@ -12,7 +12,7 @@ class UtilLinux < Formula
     "LGPL-2.1-or-later",
     :public_domain,
   ]
-  revision 1
+  revision 2
   compatibility_version 1
 
   # The directory listing where the `stable` archive is found uses major/minor
@@ -26,13 +26,13 @@ class UtilLinux < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7bfe10a7323f6ce1677ed66606dd38997068dd656e013dca58683df3534aa0be"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "285a2aa2714f5959a7cc0645ed053132d51ccc5bba96c1693bc1805c34e673c4"
   end
 
-  depends_on "gettext" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "autoconf" => :build
+  depends_on "gettext"
 
   # Fix macOS builds
   # https://github.com/util-linux/util-linux/pull/4173
