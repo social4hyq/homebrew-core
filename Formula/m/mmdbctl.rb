@@ -7,12 +7,7 @@ class Mmdbctl < Formula
   head "https://github.com/ipinfo/mmdbctl.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f7dedc0c03e9c296fab2820798814ad936a3e5f324652ebef365cccc2655cce9"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f7dedc0c03e9c296fab2820798814ad936a3e5f324652ebef365cccc2655cce9"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f7dedc0c03e9c296fab2820798814ad936a3e5f324652ebef365cccc2655cce9"
-    sha256 cellar: :any_skip_relocation, sonoma:        "35fe73d2a1e19b6da5f20c9ff0e85fdbc2e0ad706372e769aea0afdac4eb63cc"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "efae1a85d5e64015e9b17a6d9054f63596b4b4eed2e9dfa999874f42148f82f4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "60f326af4ab45e42920dc85ddbc4693d13f01047d675bdfad0415cccecbd5290"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c10fa7a49b56275e5d35d2125d6e671c80d62c128bde0ba436b199eebe9fbb6d"
   end
 
   depends_on "go" => :build
