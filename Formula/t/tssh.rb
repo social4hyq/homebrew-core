@@ -6,12 +6,7 @@ class Tssh < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ca99f99d0f0ca2952d2ac557b4d51582bcb243f09928b2d5dd0be6eb8e4282f7"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ca99f99d0f0ca2952d2ac557b4d51582bcb243f09928b2d5dd0be6eb8e4282f7"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ca99f99d0f0ca2952d2ac557b4d51582bcb243f09928b2d5dd0be6eb8e4282f7"
-    sha256 cellar: :any_skip_relocation, sonoma:        "48e81a78f08b8edd896366364455ea07235c755c8859c2e97731a66a498b14fb"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7693e8363687cb2fdd94f773632400a71779cee347eea90ec0638d1116c478d3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b757f84ba81c25d8a257c77cd43b2df9961e7f60afaab3a1796787da68c2301f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "de48bc94a74b6919751f07db6ebbf5acdee771835dd523fb0987d440749b8973"
   end
 
   depends_on "go" => :build
