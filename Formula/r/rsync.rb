@@ -1,10 +1,10 @@
 class Rsync < Formula
   desc "Utility that provides fast incremental file transfer"
   homepage "https://rsync.samba.org/"
-  url "https://rsync.samba.org/ftp/rsync/rsync-3.4.2.tar.gz"
-  mirror "https://mirrors.kernel.org/gentoo/distfiles/rsync-3.4.2.tar.gz"
-  mirror "https://www.mirrorservice.org/sites/rsync.samba.org/rsync-3.4.2.tar.gz"
-  sha256 "ff10aa2c151cd4b2dbbe6135126dbc854046113d2dfb49572a348233267eb315"
+  url "https://rsync.samba.org/ftp/rsync/rsync-3.4.3.tar.gz"
+  mirror "https://mirrors.kernel.org/gentoo/distfiles/rsync-3.4.3.tar.gz"
+  mirror "https://www.mirrorservice.org/sites/rsync.samba.org/rsync-3.4.3.tar.gz"
+  sha256 "c72e63ca3021cbc80ba86ec30102773f4c5631fbc492b52e773b3958f82a53d3"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -13,7 +13,7 @@ class Rsync < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "58b13cd7a1a06de48fe33906768b7e17cb46dd8e9961b7bc81cd586f3b4451a9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "39dca37d5734138e36b3a973b2558e2b06c15a14bbeee88d87ff9b37c5d43202"
   end
 
   depends_on "autoconf" => :build
