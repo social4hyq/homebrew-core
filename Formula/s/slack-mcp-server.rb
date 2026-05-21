@@ -7,12 +7,7 @@ class SlackMcpServer < Formula
   head "https://github.com/korotovsky/slack-mcp-server.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "15e366083bce32ec803d35696e78194e86ae63dba5feb887c7f401bce88b50b1"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "15e366083bce32ec803d35696e78194e86ae63dba5feb887c7f401bce88b50b1"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "15e366083bce32ec803d35696e78194e86ae63dba5feb887c7f401bce88b50b1"
-    sha256 cellar: :any_skip_relocation, sonoma:        "793d25b798febe652e174a21738a0ec3e0ee9efe289b0c6eaac415d3ba92ecd8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9f2faa5acbdb0475681164cc2e986b268ee66796c78a7f1c4fc472bcfc6c3257"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e4420b5c9bf2461ad14b153eab81b039f407d1ec97a98db8916aaf3c81233c52"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c296ebc53a47e72abd11d6b26ef9d757def456cc0374416cc44feea0aa610614"
   end
 
   depends_on "go" => :build
