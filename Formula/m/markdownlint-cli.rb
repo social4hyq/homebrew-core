@@ -6,7 +6,7 @@ class MarkdownlintCli < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "7d99e76b57c93e820efd0ed6d0547c863ddff30cabf387fe30e99a9d7fa5d644"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "053ccacf1e2daaee3d8e463198d5a4b0e4b1332b79911f9fb491fabb1e606665"
   end
 
   depends_on "node"
