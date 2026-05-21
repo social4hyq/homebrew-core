@@ -7,18 +7,7 @@ class Karn < Formula
   head "https://github.com/prydonius/karn.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:    "9c83b76119af53f55175126422dc60581a71961a4cec4ae02da465243d0a2fba"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "56a2e364302364891e18fb7856a51e2d9bc3143ad3b98d59367b07e632ddd817"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "95ff52d86e20f7f6a02c095f5ad5de883d40d80dc11b40551d9e9ebc8024a590"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2ddacad3313683762032b2d8eb15463f175ed266c8774618c85950eb05492740"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2ddacad3313683762032b2d8eb15463f175ed266c8774618c85950eb05492740"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2ddacad3313683762032b2d8eb15463f175ed266c8774618c85950eb05492740"
-    sha256 cellar: :any_skip_relocation, sonoma:         "5817038e6b709fd657d220bee3d5d9bf8e8824e21e095e9381ff2e4ac5c09eb2"
-    sha256 cellar: :any_skip_relocation, ventura:        "39702da4deba9720c8e7559835351012e44c5906c7f06d9bff276b845d58c573"
-    sha256 cellar: :any_skip_relocation, monterey:       "39702da4deba9720c8e7559835351012e44c5906c7f06d9bff276b845d58c573"
-    sha256 cellar: :any_skip_relocation, big_sur:        "39702da4deba9720c8e7559835351012e44c5906c7f06d9bff276b845d58c573"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "395f8506a10581db8267170b33441c3728f6f12234905bb64dc60635c4dee024"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8d05d6010fc0025f1200c6cb81deac286e22b1a5633833fb3eb99619cd0c2fc8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dcb76b7927728dd7b25daa039c720ec1b5d061601640a073179bea57a0a6a004"
   end
 
   depends_on "go" => :build
