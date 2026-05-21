@@ -7,12 +7,7 @@ class Ed < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "80b2d6d72abc4010a156e6deba62553dd617df431c09afb1b47716bc8a5b3d7d"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2be3e0854f079a026ce53c25d6071128f3eef8adb8429eac333aa94a1e88b4c7"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9d3c9641f3def99e02c845c46af7bf61dcc6643c8cf3d88116ca7687e6ad8963"
-    sha256 cellar: :any_skip_relocation, sonoma:        "72f5ff75a704c662101223a085c6af24941c68212c64e0ce9a3e675bb710cfbe"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ae82ddc23421a1b75370233b72b5e5ae5cf11814f28d7e7c36cb5161c0968f24"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9aafcf322545be9737d4169d9556998e79b67ba84d0ed77dc10a7ed53149bcb1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e82298eb58d3058c071269692805dc53484cd822dca49f49e2539008025761c"
   end
 
   keg_only :provided_by_macos
