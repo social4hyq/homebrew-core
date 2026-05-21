@@ -11,12 +11,7 @@ class Libcpucycles < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "6d0d624a923f07935e6e91ea524def9d852f5a6916bf501b8661e4c7983fc2af"
-    sha256 cellar: :any,                 arm64_sequoia: "44eda163d6b173499275564c2a96ca7d51e0156875c2b75674b56839e17ca37c"
-    sha256 cellar: :any,                 arm64_sonoma:  "1596cb50ee60f75911e1b4f05949645f055d7a8775c57ede61f478171be0068b"
-    sha256 cellar: :any,                 sonoma:        "05e0ac733b7b0ba78b14dc929bf41901aceedfc293a9b1aa55f767814d45e79f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "79fa7b230fc71e0576f56eaed3ba4656e76844a52e5272efd4dfa55f04605c35"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9a6bac3d0373927187fc0aa235374d1c0e1bc9b4df30bff91f80cb3242996504"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bab2234a5f50b90f8fac6fb8c5e40f9d0570fb6565f0eee0852cdb3816a209f0"
   end
 
   uses_from_macos "python" => :build
