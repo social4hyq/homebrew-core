@@ -7,12 +7,7 @@ class Lxc < Formula
   head "https://github.com/canonical/lxd.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "b09e56a4a38c35a1f0295016048c8fce5b66df9b364c1fae5318b299d308c839"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b09e56a4a38c35a1f0295016048c8fce5b66df9b364c1fae5318b299d308c839"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b09e56a4a38c35a1f0295016048c8fce5b66df9b364c1fae5318b299d308c839"
-    sha256 cellar: :any_skip_relocation, sonoma:        "f777dcfbe9f18e1746a3a9bde14dddc911f48703a9944745e2cce1b0649e5b93"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2720351ec9be3906524c409e64df9968f7a83e8330c453556294ae4077136d3b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3fd80b4478730c1ab76f287a5b1ceb298c86927ee3b841197bd1b8d834bf6810"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22b557964c68ab069bba36896a86c195a25e90ff2c5968488f2a05e1e657e13e"
   end
 
   depends_on "go" => :build
