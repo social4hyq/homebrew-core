@@ -6,7 +6,7 @@ class Pedump < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "ccd29d804ae3bac05e6b7796f812a696feace243c131f3b599dd7f7d86eaa792"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6eaf92ef39b946600b0c03f992da5d5e931d29b880b16b1b0b24910baf106121"
   end
 
   depends_on "ruby"
