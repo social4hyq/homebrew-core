@@ -12,13 +12,7 @@ class Xray < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "bff79bcf360802fa0aef96803a01bb46c4d52500c1b38263929f464b3c0fb907"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "bff79bcf360802fa0aef96803a01bb46c4d52500c1b38263929f464b3c0fb907"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "bff79bcf360802fa0aef96803a01bb46c4d52500c1b38263929f464b3c0fb907"
-    sha256 cellar: :any_skip_relocation, sonoma:        "cd5204044d371e0ca845ca19f986a38e0e8407e37b4a7e90b5b56862eca24f87"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b6d296df37d4a391985efce24056d66f557c60ff98f281691253b57de1aa05c4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "190c1acc90997a981bdd3a7219bbc0b95f9b10e3ac6ede1effd43c8f47ecc347"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d99bb087e1bb55d7ee84909587f881daeda8b6323d0d3e0a982378e6d35453e3"
   end
 
   depends_on "go" => :build
