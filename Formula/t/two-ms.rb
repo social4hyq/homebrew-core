@@ -12,13 +12,7 @@ class TwoMs < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "e7b261e974568daf603b5a53d5ae2a1ffae13e9874f002e2f2e587d941752052"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0ad96916091d4fdbbee79de81f654faba76c1e8bc878ed95e7150419d3ba460d"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "30d1a6c6d052262349dbdfd86b55b7b1402ffab7cad9ad4b3794db7097e81e72"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c4a8f42db758a4b54215f61d4661cebbb0b39b239cf1ddd91996cedc81ffed37"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fd5681714e01e3a7266265054982ac57c71b9e6c5260445953dad3728eeb1168"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "37ab46e55dd59bd36e147c7f5a88c2ca1ab0aa3ae84a017b5282d36fb11bec19"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b173e4de89df1c1e3108ceb54b9b0b88113a7fe1bd92a3033f37c10e135305c4"
   end
 
   depends_on "go" => :build
