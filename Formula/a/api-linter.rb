@@ -7,12 +7,7 @@ class ApiLinter < Formula
   head "https://github.com/googleapis/api-linter.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "328756fe4d2ff20c13a96dad25f9356dbe61aacc55fbeec48f093019d1937c07"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "328756fe4d2ff20c13a96dad25f9356dbe61aacc55fbeec48f093019d1937c07"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "328756fe4d2ff20c13a96dad25f9356dbe61aacc55fbeec48f093019d1937c07"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c42e49f0368dbaa76b0e702555d7e1d78047ceda97e79f4783d218e9a7c37b18"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a339d47c51dd685c3775ffdb657b58a7b801ba3dfd22f48a8f54f3e307193183"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "188b2c1c7081f2b5e6922719847612829f694fca8901c792a6b2edafe5e48689"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be27a848087397931404b0f460bdea0b01a1227bfc806075d8b2d4f4f74ed742"
   end
 
   depends_on "go" => :build
