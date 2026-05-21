@@ -6,12 +6,7 @@ class Libdpp < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "52721d668fe65274b79c71fcba6b77ede190f532b2858ab6bcc72b929db97f78"
-    sha256 cellar: :any,                 arm64_sequoia: "2a34e475d821eee082988e14d8e8f1494018718b5af4804331977ce0062fd2f2"
-    sha256 cellar: :any,                 arm64_sonoma:  "174111ad5af6951d8f57663c55320fff08961394e0701857cc5db2b30d5441d1"
-    sha256 cellar: :any,                 sonoma:        "31178f47a6a9c68dc541b281c3b9cee3873192482338682ad9cfc21f317709dd"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "169f138525e538ae77dd3a5bbaf97b0c80eb2e72b2f4e829df680144ebcfbb9f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4d822ac5d4a864aa85d87f17070cae0e8e1da12668540398648fd6746ad64fa8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a38e45621a455605c18ef132136c2ffc4da9f6c7e5a14a71ca94f59cb9b9629"
   end
 
   depends_on "cmake" => :build
