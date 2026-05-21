@@ -8,12 +8,7 @@ class QuickLintJs < Formula
   head "https://github.com/quick-lint/quick-lint-js.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "1d8abd1efbf3b612f762dd7a9c8f1b4c8cfb5b0540cb80702df22deccbf22686"
-    sha256 cellar: :any,                 arm64_sequoia: "cf53bcaae51537c3ec29e74e1ca8febb506c7ce3abace2c8bc71d79d16c32ba2"
-    sha256 cellar: :any,                 arm64_sonoma:  "3af1fd83465bcaaceb6549b6446d98f6e010a582dc71722eba853a818803bc08"
-    sha256 cellar: :any,                 sonoma:        "65e5cd9ae5a96af133efec956be0935ed231da0cadeca2d7af18875850b68764"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c93598fba05a4402479254731c4879cea0d74ded7d889ea395d102e1d56c06cb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e0a8d29f50545ba7a100653acf8b9afa9195f8ef498a5f055c6a4a2471635347"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "41c5670daefe46d5d83a31fa7dd9d3dbb40d17e8ff9ab6440fe9eb7f63b020ce"
   end
 
   depends_on "cmake" => :build
