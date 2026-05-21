@@ -12,12 +12,7 @@ class Bbtools < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "7ca54b7b60111a5fbc5753b2dfb78d34ab7a0accf41e85f9080dcdd762f41e57"
-    sha256 cellar: :any,                 arm64_sequoia: "5dcb1d9a2433136d7d49b28d127ba116fc5de1a2e7b4bfba8282e7b5611998ab"
-    sha256 cellar: :any,                 arm64_sonoma:  "d12dac30cedfb9ee47759ca0424eb7035d8e3bd5becc62d40879ccdcdfd217a8"
-    sha256 cellar: :any,                 sonoma:        "c0c838f257b589f8e0cfd19500cc5a4aad480775cbfbbfa5a4571d3daaca13f0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "6aab9b7df57e9f15ad5d6466c0215d8ff0aace9e6ed0c19ab1729635def429ce"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ee098fe790cfb5ebbfa4ebb7234956a258777fec24f9a52b7e4b013af5045af5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e9f7133ac32232f675013a807d3c59689d2e5e8bed809452745ebe9781167c6"
   end
 
   depends_on "openjdk"
