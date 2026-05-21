@@ -6,7 +6,7 @@ class BrunoCli < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "1a7cfaa60c1a828477b08ec59f3c37d6ae76f5e0db57caee8225dad0a45f704d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6eeef29941ce83843d168d9616d22ec3f40c41a853c2bbf84c60ee1ec77099fd"
   end
 
   depends_on "node"
