@@ -11,12 +11,7 @@ class Bitwuzla < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "1aefec513dad32a1fa2276294090522577a32bb2423fe07574099d972652488b"
-    sha256 cellar: :any, arm64_sequoia: "56117956505409a4b853ce4d3feda40a26373bfe3ad615da607dbb6e6d79f0dc"
-    sha256 cellar: :any, arm64_sonoma:  "4e5aa34b585af95119fe5e4909efc00abc3cb390dda43d23ba5b81fb2160fb13"
-    sha256 cellar: :any, sonoma:        "f11a33d62af85cd1d026e685466c793bafa7e0610e889e8342963aa9d21493e3"
-    sha256               arm64_linux:   "8347a56e18adc32eef4d53e6ae3f3e7e046ff9aa592fe380c051471f5f6bc56b"
-    sha256               x86_64_linux:  "3de69500d8b2cbc2ee2c85a0a07e4be5aade0bd1b315926d3b83641f620d6c32"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "446dab176a2cb29efdea775b32f17f25404ca782d8f5189b2f65c7fa5a59057e"
   end
 
   depends_on "meson" => :build
