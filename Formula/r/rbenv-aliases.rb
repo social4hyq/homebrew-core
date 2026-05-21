@@ -8,8 +8,7 @@ class RbenvAliases < Formula
   head "https://github.com/tpope/rbenv-aliases.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "1478142388cffd4c60833cdc2b6e7f3bcac3f6e8b15e095167718ceb0cd7c237"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "802ad86183297b36c56aa364c24175c20380cb22e7f540ec1509112fdbcb6978"
   end
 
   depends_on "rbenv"
