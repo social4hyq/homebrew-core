@@ -9,7 +9,7 @@ class Twoping < Formula
   head "https://github.com/rfinnie/2ping.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "dffea297eab0918d416048efafdfb69f32c7d1f56b740a1455d80853b8755550"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "138d67a7750cee6ca2bae16bd7f257401ed440b1d616e1cd6db7a6bbff114a0c"
   end
 
   depends_on "python@3.14"
