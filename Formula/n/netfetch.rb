@@ -12,13 +12,7 @@ class Netfetch < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "52f348ae302224f4718f13a478c19f69d9ed76f4bafeeaaf1eb5225f120874c9"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "52f348ae302224f4718f13a478c19f69d9ed76f4bafeeaaf1eb5225f120874c9"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "52f348ae302224f4718f13a478c19f69d9ed76f4bafeeaaf1eb5225f120874c9"
-    sha256 cellar: :any_skip_relocation, sonoma:        "bed6e81af7eb73ac9f563dc29ec51012f8602fef87ff7d40329282000fae1ef2"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "750307bf8f80020a6332c8dba8acaf373dd34b7cc28dc992724424610c862d97"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2e1457e33294c578c004ca1d16dd8c8f7c5691c7742c7ef1623c2cb7cd05e7fb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8eb0c9cb634ce5fbdb4dbb94222969c99e79d386e4091f8c6f187ba371af614c"
   end
 
   depends_on "go" => :build
