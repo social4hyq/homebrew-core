@@ -26,7 +26,7 @@ class UtilLinux < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "50b97c49d03426389d3cfebbf6240f39fec89b96fa8a4c6591fd9450d2bce472"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7bfe10a7323f6ce1677ed66606dd38997068dd656e013dca58683df3534aa0be"
   end
 
   depends_on "gettext" => :build
