@@ -12,15 +12,7 @@ class Daemontools < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "4d2dc1ed742ae4b8ab911aef610c8315ea79b9dce79a4a9d21028f413352bd6c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1caba2a88c37b416bf48c950f376693b1412a06f54bc62c815a6e8679f30b41d"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4079bdac80d383b3423b5daf190a2abc5583db2d5e33939ccd0e3c637ab57033"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "414c519a3f46d28c74e28d95f882b68dae09dcd9604b8f207c93539d4af34cd3"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b2fbc29b09bf37004b7a31ff2a7f57bd705e757cef0b1970b2b9723f624bc8d9"
-    sha256 cellar: :any_skip_relocation, ventura:       "813c64aa076209409ab420484007a7d43e7bfa86ce26842829d8800501e9b138"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "78eeabb0f8b6f6d678f97dfcf0a84e51c1b0f667e5fba8c6a1ef4707f85a91ce"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2f527c08fac6754686403613d81fe344434ead8477130d596ffa05862b4962fe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c58697fba1c82a2ab0e007637b6c9743b84e57a92c070231c690264a6431b646"
   end
 
   resource "man" do
