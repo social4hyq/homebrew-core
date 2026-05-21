@@ -16,13 +16,7 @@ class Vcluster < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "5e7c4b7acc55784fa6e33eaddf3738c9ea30716e52d2ca81964fb8e6e818ccbd"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a2edfcac630df58604e2fd834aa50c3dedcb75f4520a2c03442c544e7173e516"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "de63237e45d1fe69b4745a386127dd1e029f8a66e73a8cbd008d9f0fcaa32ae3"
-    sha256 cellar: :any_skip_relocation, sonoma:        "5d2116021e7db82c4d1b4dcc145f9505144c12d77207af7aec2adee91b065722"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "962cfa63a65937485bd63ff33b365433c933aa2991ac5b445f2014076b812858"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4d0de573c1f21e9187ca808d1e028464e63988fb297a204f22cd27e8afa11956"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "25f9677f018bb6005030236cdcea54f80fc91c327053a5b3d0c0172061d9b10a"
   end
 
   depends_on "go" => :build
