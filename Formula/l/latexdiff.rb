@@ -6,8 +6,7 @@ class Latexdiff < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "7d747cedc4241a804cc7280b7605d20853ddfdbad574b7ee90fabca194f23152"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "35a2a6845dedc87f82637512528bb023e0fca4859a8f6ecec07316c3291e4d36"
   end
 
   uses_from_macos "perl"
