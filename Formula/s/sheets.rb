@@ -7,12 +7,7 @@ class Sheets < Formula
   head "https://github.com/maaslalani/sheets.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "cb711fb52afd35e5b28695f8600ef9ac1815363a82bbdfb7688bbffe7cd75e82"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "cb711fb52afd35e5b28695f8600ef9ac1815363a82bbdfb7688bbffe7cd75e82"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cb711fb52afd35e5b28695f8600ef9ac1815363a82bbdfb7688bbffe7cd75e82"
-    sha256 cellar: :any_skip_relocation, sonoma:        "24ed5816d010603d66cd4be1b2bf2a565c7f906ed838aef338d153be0d9cc83a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1058fd3f4629b486793774c9b650a459212ac67276e2cb381edc96c3cf702e49"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e6d6801f2dcb174f7c1bd108489ad67ea77599ac47d713b78ef6374179bde86d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8482c4a1700d5b7652f588d75558dcd614456275a1470075564638cee37c5c9"
   end
 
   depends_on "go" => :build
