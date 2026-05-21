@@ -7,12 +7,7 @@ class Execline < Formula
   head "git://git.skarnet.org/execline", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "1821cb1a1f4cb4563107a96a6e4226fbb19f71e2b4f4958ba3072e2320d3cde8"
-    sha256 cellar: :any,                 arm64_sequoia: "7e85921f90d391666a22e1daf7b572164be83fc0bccf6d716afa70eb590ae347"
-    sha256 cellar: :any,                 arm64_sonoma:  "b87efb740ad77909dbcd391cf64b3f258e8de85d88e9222c54a6199e8ec870bb"
-    sha256 cellar: :any,                 sonoma:        "02723eef03476c8dcd5448899b4717e06d9c4c3b94e2d39b4421dc730e27da4e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "49daa9344067f4534f19592352185b0b5a573f2e8420929d65238294770723ef"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7ecaef5ce93cc303329fc01de0290f3b4bd4c7c3b2ef7510eefa5d60b1869ca1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0066b8cb0080bbe07851d143f5ea3c8f3f36f325533368d06ee9e4462f3120a"
   end
 
   depends_on "pkgconf" => :build
