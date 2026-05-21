@@ -7,14 +7,7 @@ class Bc < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0651089dd302a018f373870702769aee045e37420816f31f54d63d61ed92eaa0"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1817f18a3e007d00b9128d225cc1aa8c18ea8673d954bea60e5a4d95fc8b4ff9"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "08dc983bea3e325521a62c8f3eae7e9e414512c740cb99f7f0ea44e11fb1d213"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "205744876113e5f7ecd60bba584731c339386d3defc852d74a82cd01a64dea97"
-    sha256 cellar: :any_skip_relocation, sonoma:        "eee028e2110a7e11ed6e7031617377654d2e3260a8b753d9965d165488b39afb"
-    sha256 cellar: :any_skip_relocation, ventura:       "e2417d6a027f54331bbf1d5290dfaed83c3811c7e88ebb163e8bbbcf46e98f11"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "aaa02a5b2ea9e4fa53a6266398cf51f3deabc3d0ce6a655b9abedcacc300d786"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e08ff27c11d109f803062119b73e680335a27a2229b7c1283c123559aa073f49"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6bfa3f477e5615673071b6d60121de4c00865a0c2d79e1bc530bf32b7191e81"
   end
 
   keg_only :provided_by_macos # before Ventura
