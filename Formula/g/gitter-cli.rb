@@ -6,8 +6,7 @@ class GitterCli < Formula
   license "MIT"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "fc3d9fc87869b22fb03bd8a53405527174c3a9cc910332d8c906dfd79b34ded5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5d787bd64607a3d9b45abe8f2cefa2204938f457a3236bd7c7ae05c503fbe47"
   end
 
   depends_on "node"
