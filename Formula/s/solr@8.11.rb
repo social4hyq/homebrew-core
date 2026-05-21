@@ -7,7 +7,7 @@ class SolrAT811 < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "65d79494d324de0e00931020fc1e1624c7929566a4d66cee0b33052111f6e523"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a50c8b5dfe3475e36d102fef09eb1c05cca86f1742d74092102b79ae4b42d6d8"
   end
 
   keg_only :versioned_formula
