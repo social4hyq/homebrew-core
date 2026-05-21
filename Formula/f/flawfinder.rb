@@ -14,7 +14,7 @@ class Flawfinder < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "67572b363574067724474f17367453dd18f8fc7d20cf78b34fea299cf56435bb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "01858fcd1ebe81f077f1464d9d32a4db625b3e92e400e8ff4102ce84e2418838"
   end
 
   depends_on "python@3.14"
