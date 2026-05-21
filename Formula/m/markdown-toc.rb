@@ -6,8 +6,7 @@ class MarkdownToc < Formula
   license "MIT"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "2817812b6a1d6a1e613ad337524dbd04afcc3ee306c8ddecab56c6835468d11c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "79fc65e1ec8efdafbe0e67594375f57ad803a7b3b2bf6f66c75e17c661d4d9ff"
   end
 
   depends_on "node"
