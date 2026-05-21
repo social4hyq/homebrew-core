@@ -12,7 +12,7 @@ class RailsCompletion < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "c8a61b7b584a29b0be33464a28714a01f798a7fcaceaf1c96f1b447363bc51f3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a3c467512b58cb9689e832bc38413c212e0de4ff76e08e9e152835be15b1037"
   end
 
   def install
