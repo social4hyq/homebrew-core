@@ -2,12 +2,12 @@ class Duckdb < Formula
   desc "Embeddable SQL OLAP Database Management System"
   homepage "https://www.duckdb.org"
   url "https://github.com/duckdb/duckdb.git",
-      tag:      "v1.5.2",
-      revision: "8a5851971fae891f292c2714d86046ee018e9737"
+      tag:      "v1.5.3",
+      revision: "14eca11bd9d4a0de2ea0f078be588a9c1c5b279c"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "073e6a15436b3566a6deee044bc24b550c4602cd47094b2648de394f56587028"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2b866dca99069aa345318fb49d6f14fecd0da80fe3f2fa37317598084417c31"
   end
 
   depends_on "cmake" => [:build, :test]
