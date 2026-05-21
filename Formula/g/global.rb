@@ -10,13 +10,7 @@ class Global < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "b884d740578dfdf370db6be152ac4ff53275510655a410b6c26695fe39a04647"
-    sha256 arm64_sequoia: "5972c7d546969d7d2ee6e0d02577ba94bafbabf2164f1879401253258cff172d"
-    sha256 arm64_sonoma:  "78add68231154b5b542fea243ca477b70f9f463657d8c2160ebc4e2fe6007445"
-    sha256 sonoma:        "27d376cc93ba0f337c9f8d7525e638725e973a6e2cbaaf457429d6fae9534942"
-    sha256 arm64_linux:   "b549bfed30abc349916b71082aed65114fcecb0b29629d8d4791b43290c1162f"
-    sha256 x86_64_linux:  "d88551b141765a2eaa063a2e446036b9530a0b389f02c818669cc0264298a090"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "118bab1ff4ccabe4e542e30f0059db20b036fa0f5b4800107660bf3fb4d814d0"
   end
 
   head do
