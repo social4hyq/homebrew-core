@@ -12,12 +12,7 @@ class Lego < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "cc1b78e1e68f2b082afe96caec276235e2f5563fda5d660cd19f98e1781c9ab2"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "cc1b78e1e68f2b082afe96caec276235e2f5563fda5d660cd19f98e1781c9ab2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cc1b78e1e68f2b082afe96caec276235e2f5563fda5d660cd19f98e1781c9ab2"
-    sha256 cellar: :any_skip_relocation, sonoma:        "5749ad68a7a577f9725cd777f64ac42dc1fe8550ee44fc8fd26ebcc70146b8ad"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e6ea5d7dc1805dcb688c7ad426ccdeb5ded79c0f7da607384ff790375f1f99cc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "70d76d7d07f3929e662c08b220995755357e1e8b34ab2aa02d4fa28af0f92382"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "518614abc022a286140c7b92bd0a86cf3799f9ff49bc78bb8b475a264ba5311e"
   end
 
   depends_on "go" => :build
