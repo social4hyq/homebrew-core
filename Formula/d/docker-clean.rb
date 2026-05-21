@@ -6,8 +6,7 @@ class DockerClean < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "8534cd2757101cb7ea6fc68d2175147769009a5b6bbab15d87bd5b83f46a06d6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6cedd3ffbcc44fbce861f71fe66b46d4fe5d72c6cf5083a80bc6847a280d7f0d"
   end
 
   def install
