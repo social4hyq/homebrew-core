@@ -8,12 +8,7 @@ class Tile38 < Formula
   head "https://github.com/tidwall/tile38.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "cdfe9e42cb4b5cdee808dfca100d20e9f04cf737d63aab45a2e9dc349647a73d"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "461aeac2ab719a07e5764dd88bc99352d36def813fe30c295e00c947deb5d2e2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "bddb54ad65fd35534c8d593a6ede162d91a3dfb924a71e0201928d25083622d8"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9ce1a1638aa31d0f28e1e031937ac48f6e7588cd6542cb3bea43bf8ffbc18d79"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d4a22c1843a3dbca44783a1443386bc513efef0632ff31e2f2368c888c678aea"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a9af0c425459875d1402d52e8c4b3ba93d69c1b733c1554791e9640ca6b012d3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1f3148d26c2b622554bb7b76177ac31a402e45bb369ff03f179c834b9ae0620"
   end
 
   depends_on "go" => :build
