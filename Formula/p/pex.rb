@@ -7,8 +7,7 @@ class Pex < Formula
   revision 4
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "81df4ae64bf5d25705cdb0fbaf1c09ab32bc0aecb2280fea08568ecfb10ac301"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dccf1fbf51f3ed26b3069b3e975bc0c2b56255a16f1ddd92147c58e27c426a08"
   end
 
   depends_on "libpq"
