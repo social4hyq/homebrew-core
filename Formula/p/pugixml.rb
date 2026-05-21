@@ -11,14 +11,7 @@ class Pugixml < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "815d949fe34679a2c3e0df5d253b824ebe69305ae29ce28d03e4e2cd604ce46c"
-    sha256 cellar: :any,                 arm64_sequoia: "1d3349e3cf6dc0d06fffd2c52c62801b3c804e36cabcb01f46682738bb1485c2"
-    sha256 cellar: :any,                 arm64_sonoma:  "d648b349479d6bd41c0ee2e22fb9108abb33a553c5ab21584564a6a36fac04c6"
-    sha256 cellar: :any,                 arm64_ventura: "e6641fb533ddb45418980698aab6b06a02a3c5e763cae6ab7bb513289e5248d3"
-    sha256 cellar: :any,                 sonoma:        "32cc92f8679e9a6d8b0c45140a19f0ac5c330e470bbca5cddcf494c6511beae6"
-    sha256 cellar: :any,                 ventura:       "fc421bf66929e255b8a433eae74d0f32482ce73dea8b8da850f9f6efd1970a92"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "dfd7825a7cb16dab42a7884e8626dc8d7380081f0e163517037e28bd5136491f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2578c1114075b488ec20a5c627d9616af5a6e5f22d9f99e54d0bb6221a861f77"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a22273920e34565839de0499e252c9a1b22255806b79a9754eda3c6c6964376a"
   end
 
   depends_on "cmake" => :build
