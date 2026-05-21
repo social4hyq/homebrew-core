@@ -8,12 +8,7 @@ class Binutils < Formula
   compatibility_version 1
 
   bottle do
-    sha256                               arm64_tahoe:   "274e1e41ddb008e2089fe5faaa832a0383abdda48acf26134ee59510cb8aac63"
-    sha256                               arm64_sequoia: "79e6d99c1d38ad33264131e8a7cc37e897416aeb39a099a62dd92f3c09fc59bd"
-    sha256                               arm64_sonoma:  "b2e3b4aa403f52a721ccd90ec6b71fdb0546280f20dfc117d158e6de527fdfc3"
-    sha256                               sonoma:        "9f4c9c9923a27f2be826e8d20d16ff9c1de50cd87aab5b10a1bd0e2641028d5d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f8ffe8d70c5462a8cd0364aa70ceb484707683e1a87e2f56d8315820ddf5beb5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "016d03201f1fa5f3c65a17a041f176f2e9037ae6a9c888dcad56b4710aa629c1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3575955fcf7ec8ad7aee090af55090fb5e5d38def2731a00a4fdd55f7493f7e0"
   end
 
   keg_only "it shadows the host toolchain"
