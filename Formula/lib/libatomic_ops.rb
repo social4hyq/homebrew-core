@@ -12,12 +12,7 @@ class LibatomicOps < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "2b3dae32f7ff10faaa84a3a5ee3486cf65496feb75519dcaa2cf2d171be73fd7"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4378fe1188ad59424d8f452c9123fd04d117a44644a94ba8cc6376a6dcee2a00"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "81c1175fc0dc5c6c001328997b805cb39be52690b3609df78ccead64b655f694"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ab9bc50267eab633db6d61166db93be0e5bf365b09106e1aeaaf581c093f3c46"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "241c6cae391092c83e9d29d593085476df8ace090d633578d7e387bbbe730765"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "11be1a0fc988f891a83af51dcaa1712b17e4475acf92abf19f4f15a7ae92364e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "53e99790ce73cc73b55b09809d224c2af961e3593e8744fdcdb564ff5324eb9d"
   end
 
   depends_on "cmake" => :build
