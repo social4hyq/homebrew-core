@@ -11,7 +11,7 @@ class Zipkin < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "d51767f8610cbf4a27194873d4629fb034ae7a25ababbf6f675b68566778ce64"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4b47936d64b1215ae70a4d0b1696731b8cd5f4daca33d277ef1a6cda92cfcf3"
   end
 
   depends_on "openjdk"
