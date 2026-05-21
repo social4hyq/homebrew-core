@@ -13,7 +13,7 @@ class Clojurescript < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "df0df68b4ae1cd3cf1bc44201af2b2290e9e82def0afa28da47d37104e359011"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "34ff3823f59dac5802341929830a0c86694c7022cb635ad1384f9d433826bd4f"
   end
 
   depends_on "node" => :test
