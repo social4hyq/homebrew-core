@@ -1,8 +1,8 @@
 class CppGsl < Formula
   desc "Microsoft's C++ Guidelines Support Library"
   homepage "https://github.com/Microsoft/GSL"
-  url "https://github.com/Microsoft/GSL/archive/refs/tags/v4.2.1.tar.gz"
-  sha256 "d959f1cb8bbb9c94f033ae5db60eaf5f416be1baa744493c32585adca066fe1f"
+  url "https://github.com/Microsoft/GSL/archive/refs/tags/v4.2.2.tar.gz"
+  sha256 "59e2a0a0ea22e8bcf9db2dc4d4bd21212ac6595748295fc27a7e02cf75eac4b5"
   license "MIT"
   head "https://github.com/Microsoft/GSL.git", branch: "main"
 
