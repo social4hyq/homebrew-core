@@ -7,12 +7,7 @@ class GitSync < Formula
   head "https://github.com/kubernetes/git-sync.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "33136f82f71d403ea6a970959d8ca21be7a4ab7f3a210c164ccd307b0382c80c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "33136f82f71d403ea6a970959d8ca21be7a4ab7f3a210c164ccd307b0382c80c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "33136f82f71d403ea6a970959d8ca21be7a4ab7f3a210c164ccd307b0382c80c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "f8875c890add3925df8921568bde2fb11787816f6dff076ab999007aaabd30bc"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f4815981f65fd5aee96c003f15d3ceba5a0bf71c3ff846f00bec2622a796121d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8c2ce5c40f72786e09684cc3d1225e182a6165e057fe5474383cf474fe174136"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0b0ae94a9a4aa69501eb1bcd383f242c0452c1362488b14013eccb805bdc07d"
   end
 
   depends_on "go" => :build
