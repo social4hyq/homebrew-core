@@ -6,7 +6,7 @@ class Openskills < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "e2026c6d2ec9ba496ba0be75a24794d328cb23cfd8ede1922f0be3b1a81da9e8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f176f3db4cd5708d52fa7bdbb335ca490cfbcc3604021f3e015e1b12fe8b7297"
   end
 
   depends_on "node"
