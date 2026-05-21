@@ -11,12 +11,7 @@ class Whosthere < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ab03df912ffc5fda16f727e0d4ef4883e274559e136d218a6894990cd5c14b65"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ab03df912ffc5fda16f727e0d4ef4883e274559e136d218a6894990cd5c14b65"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ab03df912ffc5fda16f727e0d4ef4883e274559e136d218a6894990cd5c14b65"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7b8cb6f4bc9bc48b1c5e0f2a95baf8563da073aab61c82f483363c2303ff783b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "498bd3a696fd9833fc95016642082c16db75a176dd1fbed9582bd5e9c28063ad"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f1a14cb7fca6ccd2e0040f881d95bfdd662fec60368e96dddca5502823dcb058"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b1b85db734569f9077c724e66f25600d0f6f3bba805daf3be9412ab05b82b91"
   end
 
   depends_on "go" => :build
