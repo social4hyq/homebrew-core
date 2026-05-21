@@ -7,12 +7,7 @@ class GitPkgs < Formula
   head "https://github.com/git-pkgs/git-pkgs.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "5c854211300ceb517ff5e1a2ebb4b9fd873d8dbde43ac0fbf8f3b8cbed52f7ec"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5c854211300ceb517ff5e1a2ebb4b9fd873d8dbde43ac0fbf8f3b8cbed52f7ec"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5c854211300ceb517ff5e1a2ebb4b9fd873d8dbde43ac0fbf8f3b8cbed52f7ec"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b604f42f062006a4e4036b9444a0ecea8d962511f57a78f4e2de23b28a74d317"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1bda9ca6aeb41ae6baf585a7f92d14f8c8f331bfdaa9745a9abac6cc6ea7fe44"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "26a0eb527dc6893c70cfe1da16407c58384218733ab4b46f84bffb50a504adbb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "86693dbc5a5a3a6adcabdc3b5692d075665c4b757cf4cfe609d712aab20efa4a"
   end
 
   depends_on "go" => :build
