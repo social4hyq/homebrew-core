@@ -17,7 +17,7 @@ class Jdtls < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "4569be5a69d2ec754a4f35e6a9fdb4a82980597c20895efa54cbf228613961b6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "75e814e878133aa72a85ae553bb0129db1ba24e3441e6d6d0276a1cf7bc499ab"
   end
 
   depends_on "openjdk"
