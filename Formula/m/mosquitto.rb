@@ -14,12 +14,7 @@ class Mosquitto < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "dd40843dd4c3abf5f5d2ad89f221fc02439a354857e808d7f9b243f8f39f4671"
-    sha256 cellar: :any,                 arm64_sequoia: "b74d967ddee4b766879377d5105dc7a6d696439a71e7dbb2d81034ce70601336"
-    sha256 cellar: :any,                 arm64_sonoma:  "175bc6e9e6dbfa0b16beeb2c17332db6393fb46c483e4de9d77e54365ceed255"
-    sha256 cellar: :any,                 sonoma:        "ae293e339a16b9f4fe4088a560fc7eda47078030948be656c913d2a19e3270f0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "cfac26df2cee898d81613a7dc486b15d5e00a95470a628b7482b76ffa0a8bec9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "160ad334e165168957eb3adf047fa8fe6e040157920f9c457afbcd44d3b73e82"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "445a9a7a07d6a211a438169df927b449e101b70e359c798150a2e7e209011088"
   end
 
   depends_on "cmake" => :build
