@@ -7,8 +7,7 @@ class BoomCompletion < Formula
   head "https://github.com/holman/boom.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "3804dd1b6ac824126d7b5a3456482ccfa6a84afb568b3528cd9fc9be939b157d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db3a4f99aa57385fc235cec7c440a67299b748c771afbb6b67e0beea6989748c"
   end
 
   def install
