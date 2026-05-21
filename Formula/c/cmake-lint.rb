@@ -8,8 +8,7 @@ class CmakeLint < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "37812acbfd761cf26c9e8f96c3a71a89d458b3e8973f3a9d5b97eb9757236871"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8cf6def7259b6cd6273157067ee920bbc3357ed8378f40d795ac4c800115f2fb"
   end
 
   depends_on "python@3.14"
