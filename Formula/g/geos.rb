@@ -12,12 +12,7 @@ class Geos < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "14dd1aa5cc405dfeae08d1d91447a88324b7695161ae5dab0e8857f7ca483f48"
-    sha256 cellar: :any,                 arm64_sequoia: "d505907854d0d1bf2e7b5759a3e1af38cea682c5ed083a2201cd5e6bc472f4ef"
-    sha256 cellar: :any,                 arm64_sonoma:  "b27c740de141794db4f06ef3f1c07c0d91749eaf101fa68af35e4076eb01fee8"
-    sha256 cellar: :any,                 sonoma:        "931850437a3095cfc4ea651c31ec15c26d3abc5d595690a1dc5550db88e73fe0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "72195e62b8abb9efc31d422cfddf24caf0b99d3a394e3ece252114e14b0dc8d9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "09b8dd1db22e06a341963a5c2c0e6dc4d83153ac7d80afc117fbbaa548569d17"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ab763f7ee48d3429ff4a29bda057146851c17255706d52486477bb51a050daf"
   end
 
   depends_on "cmake" => :build
