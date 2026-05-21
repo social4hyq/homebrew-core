@@ -13,7 +13,7 @@ class Goenv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "3cd517fd086597a2c1439187f5126ee613038ed5b84b291a100f10c1bcada012"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "111ba7564d1e2b42cf373bebf96edbac5fb2ae4d09325a5e0b344149bb7dd3b9"
   end
 
   def install
