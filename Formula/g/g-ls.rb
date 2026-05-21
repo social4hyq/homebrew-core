@@ -7,12 +7,7 @@ class GLs < Formula
   head "https://github.com/Equationzhao/g.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c10dd7d5f17f3f28774bce6f3337fea1448c43c69ce13a2348bc703ba5358d2f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "410ebe35920decbb9a8d33a277e5bba7cf0c539768a84522d035f0983d4a6bf2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "25a7a46ea6ea08bf6bd69a85dfa3ebe6e6193e87e95ee2eb02c113fe1e7f81ee"
-    sha256 cellar: :any_skip_relocation, sonoma:        "a5ae88093499d0e6581b7db2078cc73fdb34e5aee1cc2420b49bf5098b6564c0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "aeb4dbf3c8c017ccfcd4ec77abc39842329e2e793f1bc0a1bb976d7a1e490389"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "67cfa779494f020ecbc18a8342b430829d8b53b3ff31696402e6efa41d4c3d07"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e6d1b1428cc66d5301b4351a87bf23c1a01faa5ef6b64b1bb8363504d6f059c"
   end
 
   depends_on "go" => :build
