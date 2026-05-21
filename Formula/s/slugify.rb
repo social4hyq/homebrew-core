@@ -7,8 +7,7 @@ class Slugify < Formula
   head "https://github.com/benlinton/slugify.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "3b484ae7b5d87f4f148f8c9395960213ed62b4cd1b82567c7bcceede23259942"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8fd6d28cf10ba652e8e2283222d1bf1a1c067520f51b240a9f8d5ac36b82e698"
   end
 
   def install
