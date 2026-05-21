@@ -12,6 +12,7 @@ class UtilLinux < Formula
     "LGPL-2.1-or-later",
     :public_domain,
   ]
+  revision 1
   compatibility_version 1
 
   # The directory listing where the `stable` archive is found uses major/minor
@@ -25,12 +26,13 @@ class UtilLinux < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "50b97c49d03426389d3cfebbf6240f39fec89b96fa8a4c6591fd9450d2bce472"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7bfe10a7323f6ce1677ed66606dd38997068dd656e013dca58683df3534aa0be"
   end
 
   depends_on "gettext" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
+  depends_on "autoconf" => :build
 
   # Fix macOS builds
   # https://github.com/util-linux/util-linux/pull/4173
@@ -40,24 +42,45 @@ class UtilLinux < Formula
   end
 
   def install
+    inreplace "lib/shells.c", '#include <unistd.h>', "#include <unistd.h>\nextern char *getusershell(void);\nextern void setusershell(void);\nextern void endusershell(void);"
+
     # Bypass gtk-doc dependency
     ENV["GTKDOCIZE"] = "/bin/true"
 
     system "autoreconf", "--force", "--install", "--verbose"
 
-    # Only build libuuid (disable all other utilities) to satisfy downstream dependencies
-    args = %W[
-      --disable-all-programs
-      --disable-gtk-doc
-      --disable-nls
-      --enable-libuuid
-    ]
+    # Due to compilation failures in too many programs,
+    # build artifacts are specified via a whitelist only.
 
-    system "./configure", *args, *std_configure_args
+    uuid_args = %W[
+      --disable-silent-rules
+      --disable-liblastlog2
+      --disable-all-programs
+      --enable-libuuid
+      --without-python
+      --without-systemd
+      --without-udev
+    ]
+    system "./configure", *std_configure_args, *uuid_args
+    system "make"
     system "make", "install"
+
+    system "make", "distclean"
+
+    getopt_args = %W[
+      --disable-silent-rules
+      --disable-liblastlog2
+      --enable-getopt
+      --without-python
+      --without-systemd
+      --without-udev
+    ]
+    system "./configure", *std_configure_args, *getopt_args
+    system "make", "getopt"
+    bin.install "getopt"
   end
 
   test do
-    system "true"
+    system bin/"getopt", "--help"
   end
 end
