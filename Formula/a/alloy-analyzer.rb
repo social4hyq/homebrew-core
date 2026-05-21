@@ -11,7 +11,7 @@ class AlloyAnalyzer < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "e6b7ea99c4d94c851e458306d370fcdd49b32426042bc21618972e37f3c5a907"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "850d15f36040379d777fa6fb09b853d83ef98eaa2b9ebfbf02ddab5be350bd7f"
   end
 
   depends_on "openjdk"
