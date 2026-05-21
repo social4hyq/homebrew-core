@@ -16,7 +16,7 @@ class Unbound < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e59a4b4901af391795a49ef0a0df213e5064caaaa665cf24df744cb67a31ef3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "125a9f26e010522f38fae0b63378c37ecd7d49343aaf408aa30b1504876b3bc5"
   end
 
   depends_on "libevent"
