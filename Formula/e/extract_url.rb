@@ -7,14 +7,7 @@ class ExtractUrl < Formula
   revision 4
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "160fbf5e75d447edf2f1769a1d4960906df27652a6849d19ac122689102b47ef"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2a565d71f29f03e9160f187615c545935db2ae098ebb8aff901932d8579500d3"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f2a3eb7fe036307b921324ba71eead19534b37c3bbb47f16481d76c1fdb13b29"
-    sha256 cellar: :any_skip_relocation, tahoe:         "eb0760f5c01a362d6f704fcf1e005d38f3a41228dbc041072bfb6927c0fb74de"
-    sha256 cellar: :any_skip_relocation, sequoia:       "b4726e6215dc76ad8f1cf403618557361379644780e0727feb9e65a241ad3d24"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b1a9b40af8d79f7c0db5d3bcd88ddebf0e2bccf6c7057a189d189af6cd12765f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2fb17c0cf4ed6894006819a6d8df16b1657fd6bda55626bc4201d2350048c3bf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b82abb25a1f169aa7ae9507c37283fd2d0586447b877e1ca5973dd1535fa3152"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "74823747f54c8bfe3f89eb59779682f27acde5735ca02eb9ee949793b8a0da3d"
   end
 
   uses_from_macos "ncurses"
