@@ -12,9 +12,7 @@ class Attr < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 arm64_linux:  "6d22ffeb1ac124b47032e96cfc44264b228f3fcabe9746a426e46a5f7db45c3a"
-    sha256 x86_64_linux: "80c103ddb53c169071d3995ac74c7e4cca59aeed6bea4e5444eac1026d380528"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "37bb0e5e2e233156ae006f0ff7a5b135d2d35ee6c11e389c852bcf9abbc82c54"
   end
 
   depends_on :linux
