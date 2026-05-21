@@ -12,7 +12,7 @@ class TodoTxt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "aa11eb960775585bbb243b4206daeabb25c7d776e24d57726bb7ad359fd6d290"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f75a4eb2402d63851a900bc14dff27120f612e1f2831cea4c4219655b91f4e37"
   end
 
   def install
