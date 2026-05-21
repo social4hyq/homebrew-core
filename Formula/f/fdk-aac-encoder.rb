@@ -6,12 +6,7 @@ class FdkAacEncoder < Formula
   license "Zlib"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "e3d5a36246ed05cf712710c26bcba7d88570d9733386d834c26027b813cf460e"
-    sha256 cellar: :any,                 arm64_sequoia: "7e8347597d693ddc8bd3dfb7d2fad8e3f2a1a454e41a18eeba31ea79a2f9aa80"
-    sha256 cellar: :any,                 arm64_sonoma:  "0cccceea0402d98a415aa93a87420b8c9f4f71393ee1df58b7bcffca62961a24"
-    sha256 cellar: :any,                 sonoma:        "e83a70330bbecdc9ad66cddd891181153b0836edae4d78b52193c948aab787a2"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3d0999a7c5a7ec6ecd3d42625860b83857cac894b7b333bc24bbbf4f5d2f2685"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5c138775cc930815e191b15a0c09a3df618be38832db32eb234c58e0cb1b6085"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c910007af6c0424e943f8325808e531312d895d01171a0c774f85be0a5e1943e"
   end
 
   depends_on "autoconf" => :build
