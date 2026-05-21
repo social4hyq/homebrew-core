@@ -12,12 +12,7 @@ class Dnsmasq < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "4087c3f45434a6029c6ea7ba65d900b5e8cb0710a991f6245d9112dc87dc5c5c"
-    sha256 arm64_sequoia: "f36ffb5abb49ca8e568c9dd1f3b9891bd9e849769966cd1b0155ef85857d5f8b"
-    sha256 arm64_sonoma:  "2c7e0731da8c3568db5298aadfaa29a5e7fab84660440c2e230b789178ddf686"
-    sha256 sonoma:        "89d78775d031b10a8e9a8b9da7566df28984392b0956aead0a0d8f6244c213b6"
-    sha256 arm64_linux:   "1c05bb3e06a434205b8150ecce4f75896b8fcafb29756f40a48e68fd49633df1"
-    sha256 x86_64_linux:  "df026a9ad95a66aafb276bb28fdbbe23809bef4344acee595c072cbe59be9508"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7a0841668a947494732c13d6306fdee28c9fcdc52ad6ff445d779d1e500a298"
   end
 
   depends_on "pkgconf" => :build
