@@ -6,7 +6,7 @@ class Pwned < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "50643c261014d52089137b92323a9b5993a2e1c20b7b4a96617d46e275523cb0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "491aa46f70df647c0aa0cfebcd086f12eeaa7890d7d0ca924b67ae019bb6ecc4"
   end
 
   depends_on "node"
