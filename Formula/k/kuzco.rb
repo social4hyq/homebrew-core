@@ -9,12 +9,7 @@ class Kuzco < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "257b62873665e901e8dd573154e0980b693d16011c5cf67bb6d55c3fe52f5f09"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "257b62873665e901e8dd573154e0980b693d16011c5cf67bb6d55c3fe52f5f09"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "257b62873665e901e8dd573154e0980b693d16011c5cf67bb6d55c3fe52f5f09"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b861e54182109ab679aacffe4a1d891b0749be87836833a1a8b49bbf25357af9"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d4ce2358cd9bb85125b58ee5c767f54cb910d7d956852184766c492eb7153bcd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e2c0c1cf10c9a3a8c0ffa27c4cc977738f6c55b08fd0c5da5def1276c1a449a7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7663ea6780b1b2c63e0da55dc6a0a7265bb75f99d79b9ce5ba995a8458ac4550"
   end
 
   depends_on "go" => :build
