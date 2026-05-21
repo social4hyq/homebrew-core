@@ -9,12 +9,7 @@ class Grip < Formula
   revision 20
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "97a77d3c7644235d22e2824e1566d6dd3544fec8f1ad1e5e59a5d18ca3baade0"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "691b00863679e3ff83778f0d28d49cb39e90e9426a48a01c9275481ab1aac5c9"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8e82f79d3e2f94aa9956154c6af22d92dcd11dc906917957bb8f31e11b7cc735"
-    sha256 cellar: :any_skip_relocation, sonoma:        "a9609a0bfe62057bd2f42426a1aa2bdd73c38bb1bc56ceb692eb2f55e586d993"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "259f95d68c1976acc82605aa3b9e72b1eba9fdaaa38fb5b19628da3a95e9000e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b315cfa9d2ec5288b669aaea8d156fdb88cecb894a44cce941e261c1e6cedc14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d28fe2fc347aeb3f2f48dc1391f15be31b96f6218c43761f82c643dc8789dfcb"
   end
 
   depends_on "certifi"
