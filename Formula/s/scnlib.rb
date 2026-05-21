@@ -8,12 +8,7 @@ class Scnlib < Formula
   head "https://github.com/eliaskosunen/scnlib.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "21cd67cc5c419b781ebb8e1bcfed7f17c78dc0cb3db21be38aa862af5e1e4467"
-    sha256 cellar: :any,                 arm64_sequoia: "134792df5a038f104e822bbe90a3df1e4a4c745c1c914f52375615910a26c5a7"
-    sha256 cellar: :any,                 arm64_sonoma:  "a69e734225cbaf3294f549698798d4e9feab4c3d3e80afa4b90bba060fee12f3"
-    sha256 cellar: :any,                 sonoma:        "3f0fc35c02be751f470426a42e2ff7f0b2ed80d2da7585dc62eb07a5905a6fa2"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2b262e8c4395d69a9ce1c9e0dd08394614a0feeb865217f195c71e42ade0440c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "24fbc7d2c410792aa8499dea07e901694b4dfe712f73fa40e6f09351c75fd6df"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4419d0923fb139d9ca96d7ade817b4ff73eca7d6b5f5e2930f8a878acf8611a2"
   end
 
   depends_on "cmake" => :build
