@@ -6,8 +6,7 @@ class Graphqurl < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "5c7b7760dba8c9c4652d41475697c10e83ea2e22b382e2091c54a9129dff898b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ecc5fb34ca36a8490cc80beb825f460ef26ae0e08fefb3e2655f6e268d061e81"
   end
 
   depends_on "node"
