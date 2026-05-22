@@ -7,13 +7,7 @@ class Zrepl < Formula
   head "https://github.com/zrepl/zrepl.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "5e49cd8656a732120b3372c27730edcdfcd8fd7b27329bf030d31dc41a7c5214"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "335eee4c13bf862fc84af998944929f36435895475ad50f4191d929d83f9d669"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8e8d1a17b44b0c9eba415440cb7e643814a223b5270796e16f2f1b4c9073d95e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "04fa28a458e199055ab473c4e799953708d595f94034f437933fc42fa8300b68"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "06f056a22b705129d9d5aa851bec59bfc2a00f46b0a585b1840dfaf9ac69652a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "60c673e4fbe421ad7d42796f566d7bd7a062882584a3b3505b5757b50952bd24"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00b5b140d62af27105100ad1b0ef6f3cddaed018cabc24f02aa3add2e32e190c"
   end
 
   depends_on "go" => :build
