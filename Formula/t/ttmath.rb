@@ -6,8 +6,7 @@ class Ttmath < Formula
   license "BSD-3-Clause"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "3f53ff4798c67c56be591df93ec2ee2d2d5609ee894d958528ebd2cb65a75ccc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c9c25bfb2e75d3836aea886c4c160c06cfec77e82fac5c66de5201e98736527"
   end
 
   def install
