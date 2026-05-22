@@ -7,12 +7,7 @@ class UmkaLang < Formula
   head "https://github.com/vtereshkov/umka-lang.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "ce9d7f8c1a9b3870eea9dda06784818398d87cb133578c3820ec6658effe167e"
-    sha256 cellar: :any,                 arm64_sequoia: "5f0efe27433aed887a90e1845511bc3fa07034a1969afa4e2d33efffbb652cf1"
-    sha256 cellar: :any,                 arm64_sonoma:  "4315a71b17be81a4c35247621cff8defe46dc9e52db97e31fa1e0e5b03f46437"
-    sha256 cellar: :any,                 sonoma:        "c59889962ffef397dc393568a6faea797c6c3395169a33eef2261ba439aa784e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ad9040267c97b992687c236fad2b5ec18cc10709302cca51abd1c0fca6c23695"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "cd463f7849dcb9b7e59e59d2d81ea80e8dbdc272d3045f9e7b5c70dd84f61cd1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "09c62df78f99a70982e8e21c3a6312ed51fb43370bfc023030c7e8509d461cc2"
   end
 
   def install
