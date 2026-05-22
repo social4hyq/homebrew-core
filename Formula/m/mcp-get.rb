@@ -6,7 +6,7 @@ class McpGet < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "437f1d04f354dfd572a891eb46ee55475be918ac4173e32634cb0017e69213cd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dda506a5dace1bb33259826dd06a55e08280495ddb4b4baf422288a7ae971f2e"
   end
 
   depends_on "node"
