@@ -7,7 +7,7 @@ class Datatype99 < Formula
   head "https://github.com/Hirrolot/datatype99.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "de27c538560d8993175a1c972437f30e9de4d719154b3a4851f154610cb577b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "25d1abe6c0a21fd74a50f925ac17b8fd91107280000fe72c81ed097b6f354bcb"
   end
 
   depends_on "metalang99"
