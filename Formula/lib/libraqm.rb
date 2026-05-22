@@ -7,12 +7,7 @@ class Libraqm < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "2b1117c8508549d57157890bf3acfacbc2d45de6197d188bf83474f30fd0f572"
-    sha256 cellar: :any, arm64_sequoia: "4259ac8ccfb1e30bf67bac2188e12479af6e884a863d33b4c631edb42fa58aa0"
-    sha256 cellar: :any, arm64_sonoma:  "0450f2947a22391458c06eb305ba09679689ad83642f0e9de65dfd99a7d2e414"
-    sha256 cellar: :any, sonoma:        "f2a956bafe35455da4e6fa01f5ca1f65f32357935c731e5ac46ab4b7ff728290"
-    sha256               arm64_linux:   "05ca1326319450ae29ab912a8bb707eb68361212a9f990ed74216007caef6a6c"
-    sha256               x86_64_linux:  "bf1b6e9c25a735b6524a1b54fe5d7ae39c49c28867c774a2ea83d887e51bee3a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4bca6cfa8900b36338000b34287f444944c6b57d78b1827ba40ec8627e0c043c"
   end
 
   depends_on "meson" => :build
