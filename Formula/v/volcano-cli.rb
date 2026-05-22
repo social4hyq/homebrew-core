@@ -7,12 +7,7 @@ class VolcanoCli < Formula
   head "https://github.com/volcano-sh/volcano.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c8a900f5c4b63cce369f4dc51fe56a359e32318e8dca54002171019b27ad6981"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "07c5dc3e120ef08f41c9c5a5a0c77cf36a6227d706d53a40653ab117ad41debd"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0147ad4ab408d7db70758efe67cae909927ad1eb2264d720ac30dd74c6ecff36"
-    sha256 cellar: :any_skip_relocation, sonoma:        "dbca8968eae503bb25c539ae0e2fde49f2f4643140a06175c46a74bc64168b26"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8e483def8d7a92f099b7652c98e40d0e6daa3d3d6e5212b9e1494423fe6c45b5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c0aaa8a0787790154a6a521b4c8d1568bf86a1b5472c86f329ca2a0c34053786"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d98ad0b838f3ddffb21ff1d85a2ea499b14ee2d55ece5aa273efa7d7a6e696ae"
   end
 
   depends_on "go" => :build
