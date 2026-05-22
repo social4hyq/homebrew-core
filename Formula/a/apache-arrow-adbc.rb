@@ -7,12 +7,7 @@ class ApacheArrowAdbc < Formula
   head "https://github.com/apache/arrow-adbc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "dd1d27b0bc5f4d9252f9c0973140e939c4763f7f6b3eac9dbe65078a5e774631"
-    sha256 cellar: :any,                 arm64_sequoia: "8b856b7b61e7f2f14338606792b637da14fed9b38e8f17ab6227807beb46dd77"
-    sha256 cellar: :any,                 arm64_sonoma:  "b3f466098710fdde41f81ddc291aaf8bcdb014ae0a6010120bc1fc0c65ff1a13"
-    sha256 cellar: :any,                 sonoma:        "54e3f5a01f8c5864ade077a775e8ebbba15ede5a62a09c552cfbbb5915cfa860"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2b080062754c2263343ad1a1e8dc295ae248e9841be1e17433e50a729fe4ab95"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "141171b5c5813e34b61840656375cdab38c53bddf6a761dd4178aeb12a34407a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ee6cd6eca3885edf3ff6728a3ed4dc44a358081e849ad798631ed2cbe062026"
   end
 
   depends_on "cmake" => :build
