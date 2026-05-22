@@ -7,12 +7,7 @@ class LivekitCli < Formula
   head "https://github.com/livekit/livekit-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "658fe263e9e8aafe4d5a87c2e5a411621d057ad52b8eb3fb28b508e0fcf2c2f3"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1c72ce9b9c7c6057af3657838afc7bc9b137d5057f41ae4da1234a9649c27dd5"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6739b429214bdfbbc2eeae8d5ee60e6f227c9f7307fcfac6760180b5047d00c0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d7f9682c63fde83afbcb9a7b8c9393c95666bd9753d8ae99263e81e98993d26f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f352e3ba10aa30a7a838ebcbc594e467586e424509988d10beb2779e11096429"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "415d3fb1c90b38262e49bd800f00d617be866132f28fbcd0eb5fc2d2f2a664f1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3c210ad6c12e2cf7bbc7016a0968fea1ee7837a2c4e7e30b4ab02e785275c40"
   end
 
   depends_on "go" => :build
