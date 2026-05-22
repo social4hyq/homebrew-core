@@ -8,7 +8,7 @@ class Ed < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e82298eb58d3058c071269692805dc53484cd822dca49f49e2539008025761c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f24564773f041914732b1098ae12cde11b9ef47cb7f8347f1b8ce555f880ea0"
   end
 
   keg_only :provided_by_macos
