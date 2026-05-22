@@ -13,12 +13,7 @@ class Openbao < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f55d117b1d9e73367b723c95744bad3942756808cda645463713d4fafb0c7dc8"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2361b14f5ba83b5dbdee4dc0928539ca98727d514a60e1f698a86dd3344d6527"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0d68461e234cdac96e498c8c861b9013318fbab7829cfdcccd58475e58f727c3"
-    sha256 cellar: :any_skip_relocation, sonoma:        "bb13b47dabbf506f27c02da1d8cb2e5a71407137cbb781283fe710c0d3ed73bb"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "364141c428a18aa302985d5f2662a7b559b21e1c62670e6c7ffc18f51b7180b7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ed1ae28d6553a5b7dfc1d2041de24e403c742fb914abbd4d9844104413b4b133"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e5c802248b272beabdc24dbafcd9fd741e318321428ee4253e5d1412a0b43d4b"
   end
 
   depends_on "go" => :build
