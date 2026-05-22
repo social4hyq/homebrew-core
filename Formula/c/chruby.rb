@@ -7,8 +7,7 @@ class Chruby < Formula
   head "https://github.com/postmodern/chruby.git", branch: "master"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "a93d7f31af99177bb1884086e94e0c9dcb99ba4ef1ffb1f6fe33bff584c385de"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e274d667266ee6c0b00f513439b3693f58904aa9a5e5cf6c5109cc8af7f2d774"
   end
 
   def install
