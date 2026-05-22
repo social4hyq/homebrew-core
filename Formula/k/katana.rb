@@ -7,12 +7,7 @@ class Katana < Formula
   head "https://github.com/projectdiscovery/katana.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "1bfc078d79780ccac057959f0558f5ddeb24c8a17a86872a2ff9ec581391175c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1bfc078d79780ccac057959f0558f5ddeb24c8a17a86872a2ff9ec581391175c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1bfc078d79780ccac057959f0558f5ddeb24c8a17a86872a2ff9ec581391175c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "09717b46491071ddc0cccc5181c497df3af7819003490fdc66dacaa9332d137c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "bacfb589d573b6287c94dac6bd10e9b76916ea2fbdba38f75e2327ece83b0f90"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "db408c751c35b942a42d54203495eb1cd348e53a0618e181a248afea1add8660"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5e40ee200e2032959fa0271c9f4f7a7bff36185326754de9c0a94a6669d5387"
   end
 
   depends_on "go" => :build
