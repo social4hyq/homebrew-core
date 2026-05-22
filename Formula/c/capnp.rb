@@ -13,12 +13,7 @@ class Capnp < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "e999051c6f5a36c7b626b9f97768554550058d87a8fbd9d57cdd4ba3b1e95a5a"
-    sha256 arm64_sequoia: "838748596b9229739ca78e07515ee3b0dd6e06a92d5952a3a6343c3672b33e94"
-    sha256 arm64_sonoma:  "9706e2380a2f38cfa7793c23a39368ceada6435eab01c19faad152253536c54a"
-    sha256 sonoma:        "77e1fd35cebbacde953d7efe689ea99a815d5a896ed262431c7a3310326e7083"
-    sha256 arm64_linux:   "dbbacfe6f0d69f2daf5af810f78c7e50029bb6f2c93ab48256345df311b9423c"
-    sha256 x86_64_linux:  "28db17788d75c20523d3da4796cc1bd20ba1e2fc5bfe0de09a6cc5fe0ae106b9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2017c4b57912ff362bda3fe7f61a5b31abd9068bb156c05b9820b9eefd51be4"
   end
 
   depends_on "cmake" => :build
