@@ -6,12 +6,7 @@ class Papeer < Formula
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "4de89940d174de2a9f2cf0efdf51bee768c9dac92cd87e19b0bb2b2f23a80bd2"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4de89940d174de2a9f2cf0efdf51bee768c9dac92cd87e19b0bb2b2f23a80bd2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4de89940d174de2a9f2cf0efdf51bee768c9dac92cd87e19b0bb2b2f23a80bd2"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d825a41ef73efeeb45a9eac2fe3f7d9e4a26ca5b960fcaf25e5512ec11929abf"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "923d7f328081850271e2adf57dd7677a025fdf85377eedf0fb4c6b5e142f7572"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e4c0d596b575ae14c957ab4f06dce35d94aec95fd0d0285116fcfcc0a3dcb23f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "89d6aef4573fd22b73e843454ef12c829dd0c4f55dbcb26a1094cb67d0753a2e"
   end
 
   depends_on "go" => :build
