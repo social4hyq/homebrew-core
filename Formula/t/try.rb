@@ -7,12 +7,7 @@ class Try < Formula
   head "https://github.com/tobi/try.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9fe1dd1ecae3168b6cad9674fbe8cdf19bc13ac7443f4ca65f73e22755bffe6c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "9fe1dd1ecae3168b6cad9674fbe8cdf19bc13ac7443f4ca65f73e22755bffe6c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9fe1dd1ecae3168b6cad9674fbe8cdf19bc13ac7443f4ca65f73e22755bffe6c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9fe1dd1ecae3168b6cad9674fbe8cdf19bc13ac7443f4ca65f73e22755bffe6c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "af18cae45334b193b08f409170eb6bd03a59cf3134da82a9341bc5e1f583a748"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "af18cae45334b193b08f409170eb6bd03a59cf3134da82a9341bc5e1f583a748"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "629fc53e283721cd565fc23d8b19882191e518bc55fb1c000df9f2d7583914e3"
   end
 
   depends_on "ruby"
