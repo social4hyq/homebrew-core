@@ -1,8 +1,8 @@
 class Less < Formula
   desc "Pager program similar to more"
   homepage "https://www.greenwoodsoftware.com/less/index.html"
-  url "https://www.greenwoodsoftware.com/less/less-692.tar.gz"
-  sha256 "61300f603798ecf1d7786570789f0ff3f5a1acf075a6fb9f756837d166e37d14"
+  url "https://www.greenwoodsoftware.com/less/less-702.tar.gz"
+  sha256 "242a64c00f02d96f8ee208cf638ae1728b727c7f5fdf82a7d4f4cae32fb084e2"
   license "GPL-3.0-or-later"
   compatibility_version 1
 
