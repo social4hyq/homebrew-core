@@ -7,13 +7,7 @@ class Mods < Formula
   head "https://github.com/charmbracelet/mods.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "cabb69b0f13a40d880de4f499d8858967b59f9eb53dead33c2791991cbaeb533"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "cabb69b0f13a40d880de4f499d8858967b59f9eb53dead33c2791991cbaeb533"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cabb69b0f13a40d880de4f499d8858967b59f9eb53dead33c2791991cbaeb533"
-    sha256 cellar: :any_skip_relocation, sonoma:        "13855735a91fc4ec39118e17e99c3fe874153c1733629a012987709030927045"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4d5d54b0ff3b4722747d5bdc33ff27c985e3c836c31028d0763048a5908a401f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "89100e59be7a746933965396dfbebcab35529ae7559329ac77c5df814d594d53"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb14490fc7944fc701b0fbfc188c8c05f20eb97415ca964ee816da64f8b5d318"
   end
 
   depends_on "go" => :build
