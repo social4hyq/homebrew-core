@@ -10,8 +10,7 @@ class Bagit < Formula
   head "https://github.com/LibraryOfCongress/bagit-python.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "cd75590862c752f2d6fa722470125ef7eb0c50bcace9dff268adfa600a71123d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e81b3df1402208e9603a962ecf05af1aefea1fd515380189b3cf12616abb9af1"
   end
 
   depends_on "python@3.14"
