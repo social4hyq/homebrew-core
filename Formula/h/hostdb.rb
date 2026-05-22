@@ -6,8 +6,7 @@ class Hostdb < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "7f0c8bfe7fe1652daa4aa926d6287ae94e851bd979ca6b53b3c0bc54e85dc208"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "290db351c815c98b549475fbfe2b8b70bfb5ac252be10d86b6f3f7535afdcb4c"
   end
 
   def install
