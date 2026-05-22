@@ -15,13 +15,7 @@ class Rinetd < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "ac09912351ca2587bbea4572cbc2d5101d93b14a1ccf925cff8cfa83aedf5128"
-    sha256 arm64_sequoia: "1bbfcadccec37315d56385b18334084654fa2176c6b8c6f11c4a059be3541acd"
-    sha256 arm64_sonoma:  "1ca5c0b84ac7749459a50478734f32ccc256f092aec9322400963f87d2a1dbdf"
-    sha256 sonoma:        "e6c5ecca7be62f96837669443c191fdfebeb2872f936750814eda3bda0082a51"
-    sha256 arm64_linux:   "385446c42d6820a00d85ca5793a341ebeb20e32390bba72876ea6156056142ba"
-    sha256 x86_64_linux:  "b261f72637835eb98ed1773e236c664160528346a77e65fabef294766809def5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2287041858e4dda1207c11a876bc07e6dc36fe2e86b2ac29769afabcb44c1f19"
   end
 
   def install
