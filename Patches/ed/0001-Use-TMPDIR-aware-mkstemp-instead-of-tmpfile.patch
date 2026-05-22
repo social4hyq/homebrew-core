@@ -1,12 +1,16 @@
 --- a/buffer.c
 +++ b/buffer.c
-@@ -386,11 +386,31 @@
+@@ -386,11 +386,35 @@
  bool open_sbuf( void )
    {
    isbinary_ = false; reset_unterminated_line();
 -  sfp = tmpfile();
 +  const char * tmpdir = getenv( "TMPDIR" );
-+  if( !tmpdir ) tmpdir = "/tmp";
++  if( !tmpdir )
++    {
++    if( access( "/tmp", F_OK ) == 0 ) tmpdir = "/tmp";
++    else tmpdir = "/data/storage/el2/base/cache";
++    }
 +  char * name;
 +  if( asprintf( &name, "%s/ed-XXXXXX", tmpdir ) < 0 )
 +    {
@@ -33,4 +37,3 @@
      return false;
      }
    return true;
-
