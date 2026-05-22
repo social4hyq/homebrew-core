@@ -7,13 +7,7 @@ class Parlay < Formula
   head "https://github.com/snyk/parlay.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9297b5a3bb7c1157e04ff6306b7c32dc5d7ed64993fe4b10cf6d1c75cd2c6896"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "9297b5a3bb7c1157e04ff6306b7c32dc5d7ed64993fe4b10cf6d1c75cd2c6896"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9297b5a3bb7c1157e04ff6306b7c32dc5d7ed64993fe4b10cf6d1c75cd2c6896"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7f42c1f875078675c7cd60c6e70ae9db99b84cf798938d7f01dce436c9737c41"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "849416c24d196e8956172d41d25e1fc874190f374004e60289eae74b1dcf4345"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "33be478a04fc6420f2f23d785293c5a4cf96e4489310750fe11454f2de95b63a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "12d31305539d079d2627f4618de399c0f98fa19e0e5c7ebeeef937a18be87cf6"
   end
 
   depends_on "go" => :build
