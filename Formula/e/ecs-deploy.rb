@@ -9,7 +9,7 @@ class EcsDeploy < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "85f784b6db86fe7f4674c8984d837e9e72ad3704ffcf1c9a52c7b9c837d289f1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "710e24fbf3a07210997c8823793590c62b4d1d20c56959650b1e5cd89a6eadc7"
   end
 
   depends_on "certifi"
