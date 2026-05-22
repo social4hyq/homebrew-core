@@ -9,7 +9,7 @@ class Instaloader < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "5b446124ec757f1676e8ce989315f9735dd35604c0c902371f9b0824f1c9635c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db6b52ca90813a878cab40d475d3ad2f56ea4ef503efb156f63141d31ebc8fa1"
   end
 
   depends_on "certifi" => :no_linkage
