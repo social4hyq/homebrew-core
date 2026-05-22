@@ -6,8 +6,7 @@ class GitOctopus < Formula
   license "LGPL-3.0-only"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "85596e8a14e47ed9ca1982b4ae0fb3c3afd7bc991722d8e19045a406055d13e0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b9e2b538d5240723b7ec447663ee1fb631566e1cce4b080338b1852483f5def"
   end
 
   deprecate! date: "2025-12-14", because: :repo_archived
