@@ -3,10 +3,9 @@ class AivenClient < Formula
 
   desc "Official command-line client for Aiven"
   homepage "https://aiven.io/docs/tools/cli"
-  url "https://files.pythonhosted.org/packages/58/8b/76587c9226a489002e337566b9269d615c0280fbd48127713ad1ffa3b10d/aiven_client-4.14.0.tar.gz"
-  sha256 "926858e95b664b479e709df455872c1787d889cc8ba7fcb50c3ceae337c48fce"
+  url "https://files.pythonhosted.org/packages/4b/c6/26e9c04fa1c959bc4acff5b063d6db4a03a9abab2b0fb0ef72514c537641/aiven_client-4.15.0.tar.gz"
+  sha256 "069a08c035ce05fb8afef5d94baa5b5f79caddb5189115ac2c6eb6d1a201045c"
   license "Apache-2.0"
-  revision 2
   head "https://github.com/aiven/aiven-client.git", branch: "main"
 
   bottle do
