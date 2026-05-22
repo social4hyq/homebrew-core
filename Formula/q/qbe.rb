@@ -12,13 +12,7 @@ class Qbe < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c41fd6b7adfea92b2b90f14ff60a584d471f1b79d343949bcb4e42ff0b55bbc6"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "971805c559bb8ae51a1c900d90f21530bdc47752b53f140c8ba8f4a66c63dc55"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "85df90e1fa6920fb08e7b1a082927d655e7f051cf2078dda1137a032249b80ff"
-    sha256 cellar: :any_skip_relocation, sonoma:        "59e80cb7758faa82c7f4b2541deef61f12fae3186843c869cb2a0856eef4d268"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "45b6dfaf0ead4216cfe8d0f328fc30e5f69f5d827f03c9a18b8e576eb3027ba9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "eab98f6cfc7bc3c366c0aa92f785940bb8de5b2e0384495d6f1752629b4e9acf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e63730e813a88d30cde7ab9aa9d86e0c6d0615fba483b4c90b516107442fb1e3"
   end
 
   def install
