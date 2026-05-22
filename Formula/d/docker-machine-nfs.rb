@@ -6,8 +6,7 @@ class DockerMachineNfs < Formula
   license "MIT"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "7adcced71d07397c241cf4999adf40d17b6f773aa28fc53625df5982484d4c6e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9f07031602f4257aa88d212b7c089121d92daee1d099d6f15c680d3d9e78d69"
   end
 
   deprecate! date: "2025-04-27", because: :repo_archived
