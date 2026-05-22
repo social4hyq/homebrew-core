@@ -14,8 +14,7 @@ class GraphqlCli < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "9acfbbbc98a9212677f8cda3b773d20958ddb1cd5503d2c9894e531e44861832"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f495bb03e7e5b833349e38e19bf86c0874059a0e7f74dd9c619f9bd6dfc3d2c2"
   end
 
   depends_on "node"
