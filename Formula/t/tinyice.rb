@@ -7,12 +7,7 @@ class Tinyice < Formula
   head "https://github.com/DatanoiseTV/tinyice.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "445bec3d63ab9aec24b3fe66e8fb9a24df02f098c764256a2caa29641d3d2005"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "445bec3d63ab9aec24b3fe66e8fb9a24df02f098c764256a2caa29641d3d2005"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "445bec3d63ab9aec24b3fe66e8fb9a24df02f098c764256a2caa29641d3d2005"
-    sha256 cellar: :any_skip_relocation, sonoma:        "28de2be722f39d7ad03587da88b8f962c9cc38dff00ca46ccefdfeb9ad058100"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ed3e13c5bcc440427c3d077b8401828fb8d812f2ec7b213c66b8b71e899be032"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5feef288d107607ab327956c7c178e7e69d02b0190996954edadd785ae43f867"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d23a40c6f0d7bdfa72b603ca6179b354d1bd20950865fc85a8e6c0a2a4f7e16"
   end
 
   depends_on "go" => :build
