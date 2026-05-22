@@ -6,13 +6,7 @@ class Jose < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_tahoe:   "67229f3071c21858f07f5a5f43072531c49e2397d161f8bf505f25ce0c9f2184"
-    sha256 cellar: :any, arm64_sequoia: "55060e0f494136495d66e48db57e1fc04aa2822e5b3777c7fcd44bc34be2302a"
-    sha256 cellar: :any, arm64_sonoma:  "03f0277a4eb033772af00607572e613da16fabaee01c6b7ff9e60dae8581b4da"
-    sha256 cellar: :any, sonoma:        "e381e6924862e4d6184176e9945f51465c25fbb5ec580e0e7d29cfbfab1087df"
-    sha256               arm64_linux:   "859ce789ed3684e96d57e5bf3c3146b63e5ae70fce3fc7d798a3f0af2e084286"
-    sha256               x86_64_linux:  "7cc9ebb45c81fced9dbfece96ad5007a334bff37817cdd93605dcecfe9d67c0f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc78cf8630c3ba50d8e1c9535bff101cb48ca18292ccae463d8094df81229b20"
   end
 
   depends_on "meson" => :build
