@@ -6,20 +6,7 @@ class Yajl < Formula
   license "ISC"
 
   bottle do
-    rebuild 4
-    sha256 cellar: :any,                 arm64_tahoe:    "ee1d81b4f6c8e21b07003ba2057aa1c0edc24acde0aea4f0570295227fb36ae6"
-    sha256 cellar: :any,                 arm64_sequoia:  "dba63b344e3308d17991f4a71f5ac5dcdc12099cd1d64e1d32f2492a44562709"
-    sha256 cellar: :any,                 arm64_sonoma:   "971639e642d5f2531ab6159ee96e86c159a9015fad89cc28eee10a3fc91eb9ef"
-    sha256 cellar: :any,                 arm64_ventura:  "fe07a22a18a3172092b2b2163bceff50f423c142484f9a62687dcf2a8ee6e330"
-    sha256 cellar: :any,                 arm64_monterey: "95735cd614157ed2756dac69c80d81b83d305f0dcb54c3299c00e5f0528ddd0e"
-    sha256 cellar: :any,                 arm64_big_sur:  "baefc7dc955217c4bdefd8dc798a6ad432131f449370a6249e31be6604842942"
-    sha256 cellar: :any,                 sonoma:         "d3669145f9a916ca3c1ec00e787e2bfb9be62f822d69f7cac414355692406d5b"
-    sha256 cellar: :any,                 ventura:        "9a161cb8262cbcfabcd1559498d22ab1a5ba80f037a00149efbcbd88305ba91b"
-    sha256 cellar: :any,                 monterey:       "af69d2c0088d874cbd0fa3fb534fb971943c81a8e49574758d8bfcfa4504ca5c"
-    sha256 cellar: :any,                 big_sur:        "18bd8c54e847441959876cc9580db5ddcb7e3b92f2fc37ca49ce27d17c050df3"
-    sha256 cellar: :any,                 catalina:       "65975afbeddbbd919282c04e53fccda191501eb4fa8992a2b4ab1b2be2e10151"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "8b1df8e59b01fee163b184e36bf7f607c8ff83be33f94361f9bdf67ce5b8e636"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c206281370fe7277f21d17ff50fe9511233aff74501238516918027006c9cbf3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ad53a9839abd4f9a625508c4e43b5f3ac7e44ee32eb1073de80f52234036cf7"
   end
 
   depends_on "cmake" => :build
