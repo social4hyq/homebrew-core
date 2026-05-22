@@ -10,13 +10,7 @@ class PythonGdbmAT314 < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "cf49f66901e213fdf25ce56dfe662f9f33675ef49394ad249af7fa20a392b9f8"
-    sha256 cellar: :any, arm64_sequoia: "853fed0807d3b90d109c7ba8343742c53bbd73e202975031cff80c0ebd902a0e"
-    sha256 cellar: :any, arm64_sonoma:  "12f58903cbcf47f7420ba2023885b7eb59d682d2c941883586c573b12f42a3a2"
-    sha256 cellar: :any, sequoia:       "dc238052db1ae479329d9be9d589c3811cb74c8226063c13d381c3c0f82510b1"
-    sha256 cellar: :any, sonoma:        "511e111f0cc9d8def1b72cbcd1db817bef5b5aa31d9c74a9b9a09ac744968c1b"
-    sha256               arm64_linux:   "92618372f2370c9b570d516573719e81ba008a3880901a26b07a8a400ed38c0d"
-    sha256               x86_64_linux:  "0f8f044aa01ae183d89ec6e6c2ebb29c673b405e76f16a57273c32fd6af63fb8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4b78ebb71355a4cf87952b6582b8d86cb4b084b98264ebcc93df35d8f98c13c"
   end
 
   depends_on "gdbm"
