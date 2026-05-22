@@ -7,12 +7,7 @@ class Jid < Formula
   head "https://github.com/simeji/jid.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "269ee721dfa60af977c18d9cc3af7d4968a08ed66cc658b6aeeed2d93e069435"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "269ee721dfa60af977c18d9cc3af7d4968a08ed66cc658b6aeeed2d93e069435"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "269ee721dfa60af977c18d9cc3af7d4968a08ed66cc658b6aeeed2d93e069435"
-    sha256 cellar: :any_skip_relocation, sonoma:        "32759050183e23d9a98ff3bacc511d4a5105c11f32d6784840a6abd243db95f0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8c31c920d74115f9134182465c159f8e89461e5fd15089e5e008f24edb65ddad"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ed80826920e70cc2b6c4a40bfc3b982e2c289ad90dc62a1dfcd8db317dabc7e7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7f8f4ac3a9c3e5f47967dd74f05a7f725ae1ef37e153b2acf575e62b6f451da"
   end
 
   depends_on "go" => :build
