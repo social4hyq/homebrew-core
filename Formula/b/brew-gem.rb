@@ -15,7 +15,7 @@ class BrewGem < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "cf10941a2ef965ff3165f835fb00bbb52d1aeb446852bf7d32f365ac17dda1a7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a79b53522dba27030a6a104238423d2b330c6d1be39b8e7611c92eaf640f1c9"
   end
 
   uses_from_macos "ruby"
