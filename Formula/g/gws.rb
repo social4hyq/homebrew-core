@@ -6,8 +6,7 @@ class Gws < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "0d31f65a9ff26f5e0d80055636889fe835445ffcdcccb144333e042ae2b771aa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f309ec3c20263ed74b96798c465d01c644a24c07a7c141825c76ea3f387c4363"
   end
 
   on_macos do
