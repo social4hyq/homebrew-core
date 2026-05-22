@@ -6,12 +6,7 @@ class Latexindent < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f509f3706c8ba8bbf6498201633b37bf9e5453dbbf7de0577c8b762c3cde6680"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "fa02c299d3385a7a50d46c154cd8553e14d597ef5bdefe2538bdabfc358dc424"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6f9ca5e3530c75bbb84cb650898e345f449016cfaff95ac5a24bca5f0585c582"
-    sha256 cellar: :any_skip_relocation, sonoma:        "3292e2338c0c2942615f61d507e40f0c5f0f28c78d87bf124723b210f3945fbd"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "bc64f81c87e7fafb450608624b4f8e3c26bc28076fa0a906eb22c8d832acbada"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "35e5a4f592ec7844318a13e9a8a3297453ec65305289ccf0e738c5f4c85ecb6d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e73415b49d70c63aab42555ed55ed50bbbe258c257c0f896d88b86a133007a1"
   end
 
   depends_on "perl"
