@@ -11,12 +11,7 @@ class S2geometry < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "f1e66537c44677c6acc41f697b8209a89573008505724870efdb10a8101fd863"
-    sha256 cellar: :any,                 arm64_sequoia: "2dbce9de0564529e134fc86b1565712feb394280b1963f787b6dcd43b82c6617"
-    sha256 cellar: :any,                 arm64_sonoma:  "c791357599b318746fe242dba401fd149a5b046367fe7e28581886edf7dcbd0c"
-    sha256 cellar: :any,                 sonoma:        "04ac6f0a4272a6d7a425a8c1bde01c4ace478495dc75f41e724648737d50bbd1"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f8ccfdca48aec18b4bf6e5ced582b67942f052fc72f83df492575b0dc500f067"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1d2994885b05afddfd60030c799d240573de7a010588bca9c4f98201b2665fc9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29203f93eab564404920ff96d07a76cf4ec94f75ff404e01ae847bb277e75568"
   end
 
   depends_on "cmake" => [:build, :test]
