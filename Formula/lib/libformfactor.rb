@@ -6,14 +6,7 @@ class Libformfactor < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "9607729d3bafce681cb6678cf675738a1a98f87d613592317a9a96c29085a8d7"
-    sha256 cellar: :any,                 arm64_sequoia: "3ebfbb57a42e68ac20053ee98bb257a6b7670b4c8a1d4719bc2697477e4f8024"
-    sha256 cellar: :any,                 arm64_sonoma:  "e4e54cd941e921522620cd8029646213047f4ca9e10f2371361a2c40617f3c49"
-    sha256 cellar: :any,                 tahoe:         "cebe06822c0a0e5d597b3f076d805f8fd39b72ab73b1f017acabacf8d04e2897"
-    sha256 cellar: :any,                 sequoia:       "52bc4e72d0b86f5cd3b613e9887b0d98e3b4e7c0a050c2bd9b6666b976dcd18f"
-    sha256 cellar: :any,                 sonoma:        "f24757b59a0dd170f63c7726db7b9e8690a30a7331c1cca2a4db5846bbc672a5"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "54bb006639bc9991f2f5ff88f066f4013e1ac4da21b0e482541c9fd526a42213"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8771a938b477f59832c5a62d5e142d20c3ffd3abc101887a38d414d88e173c03"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "10707fa564da11ff8c3e1d02490467cc1a5a2779cfe0abb41aa20ef2d554b787"
   end
 
   depends_on "cmake" => :build
