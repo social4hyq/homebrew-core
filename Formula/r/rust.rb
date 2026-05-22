@@ -7,6 +7,10 @@ class Rust < Formula
   compatibility_version 1
   head "https://github.com/rust-lang/rust.git", branch: "main"
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ebb8096de5e9bd110bad384a7dcab18140cb21e39a85c0fcbc814e7723d56f2b"
+  end
+
   depends_on "patchelf" => :build
   depends_on "openssl@3"
   depends_on "zlib-ng-compat"
