@@ -6,8 +6,7 @@ class Docx2txt < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "9c8866a49e04bb1b2a4797c4c911e5aee4df8c3a86701a6a792e55415ac10a7b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9db0eb3e2f06e4423c9e05f7a3476d8872ffeacaf8ff6b350d385dc3475feed7"
   end
 
   resource "sample_doc" do
