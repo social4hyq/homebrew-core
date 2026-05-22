@@ -12,14 +12,7 @@ class Clipsafe < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "a1e669adb584521510edd954b4e9220d7a597fce06352bc30d992f2dad0b30e4"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b25081afcd8b418a0e5945f90d905f8a96313e9fc0fdc9ff2cab2969d7852cdf"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8cf56744d86571882b25ad7b61675e5246b66ee1305b80e0dd0e0da722279e7c"
-    sha256 cellar: :any_skip_relocation, tahoe:         "2659e4263f3bf6a6278a5f0c368a06586097e5b6d86938ef3f999470078007a4"
-    sha256 cellar: :any_skip_relocation, sequoia:       "92731545c8e8841a56dca54f685edd2fa2e0e48a96d5f1446d0916f38eb59a3b"
-    sha256 cellar: :any_skip_relocation, sonoma:        "95fa5a2b661123e038200a0b67724382f2a5ebba0e35f2f1453b6648cb108c3c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e9e0c9380c893077b1850cd538ab48c5160a114ef7bcb9bc60196b0981b8736d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fd77e7b9fc202db5b34f402485377bffafc3356c771094ba3bc67f02f38d7df9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "40b56b05e64553f605e2b648bd32dee3eb2cc578e4574cef5538a54a78ddb322"
   end
 
   uses_from_macos "perl"
