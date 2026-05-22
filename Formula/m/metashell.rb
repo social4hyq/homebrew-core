@@ -6,13 +6,7 @@ class Metashell < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any,                 arm64_tahoe:   "31ffe3eacbb6ebd7186612d278f5df4fac34eb2d5efe844e7413ada10a59ce3c"
-    sha256 cellar: :any,                 arm64_sequoia: "aec2935132e0d2d67702b10cab3b2e362c3dcd8ad82a27296d71999d1c1e5e24"
-    sha256 cellar: :any,                 arm64_sonoma:  "eb81c0aeccad45137a84692e5190c7ec08d7f08263671ccc0edfd404d3547309"
-    sha256 cellar: :any,                 sonoma:        "2108b65d96f0b6ee0eca068bf5880c7a9e3acdcd341dfb7f3d68fceb7d09cbc8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2109f64273ef097d9a3ea8e1eea326dada552053facdee5075f03f38d418ef8f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "559e19b799f8f41040ba4a770086dccc2dbbb69f72093bf0839fff94066a274b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f75c50a6efb4bfde539bbb96989ac203624016e88cc87a5006f78a7ac987eac3"
   end
 
   depends_on "cmake" => :build
