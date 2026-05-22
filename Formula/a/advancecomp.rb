@@ -6,13 +6,7 @@ class Advancecomp < Formula
   license "GPL-3.0-only"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "645f12c923d703bc3ebe073a81ae42f37f057a80f5be2e47def6e0c42455617e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c3df6813916f0d8c24a7a17b68fc3cf37eaca1d9cd239dd9614541205a1ad5fd"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b1016a9d95dd57c4ea8521b53050211875d11c5b3528bde755c532c22c210d76"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e39bf043068c5ffb9dd0452ea3d6293f9bacd291c4364c05115f8539e2703b74"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0fe07baf766ba36840dbde997efba699f819afca12354bc8ec2f5ccd2c163c1a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e1795b527eb952aaa3e1300a6e76c0af53a612421f05245f207ee8b7bedb5a7f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "94b2e103f7e0ef29d9474bbaf99093d35e879074b9b6a8e7f36755c41e38b040"
   end
 
   depends_on "autoconf" => :build
