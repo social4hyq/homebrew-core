@@ -18,12 +18,7 @@ class Nsd < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "a4394782121330129516d8754a1afc60fcf65021a825f5bb7299b29e19471f46"
-    sha256 arm64_sequoia: "542fa3457af566ece535603d02358889450e0f261ef4e95979066e3dbe3054d8"
-    sha256 arm64_sonoma:  "c6d2bd7ca911de2af6ee07cda601e324d5864c19338fb1e1efa517ed055f9108"
-    sha256 sonoma:        "84be842d16cf6d959917750f4519bae976aba6e3bae3ecd1f7ce865b0b212376"
-    sha256 arm64_linux:   "24005bb47835c5d7df0fcf7cd12671f29c7b807f529b6822f958a64b71366e7f"
-    sha256 x86_64_linux:  "ba65dde178817e42ce9436607b1cb60857dd8848c7ce00e94be9a0e80cd86dfd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ecdf374b0a8243ffea3bee8ca52cb96b3bf602443c14e07014124508ff06990"
   end
 
   depends_on "pkgconf" => :build
