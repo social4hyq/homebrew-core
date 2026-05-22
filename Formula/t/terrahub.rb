@@ -6,17 +6,7 @@ class Terrahub < Formula
   license "MPL-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:    "f55d63174552fd453e84e74afdb9c3d7d76cf070ee8171f84f2a509ae1fb3e39"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "338bea3d5cf73bd46b3c98463c61454328de8bd281762ee4e504408e851622c6"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "c1c3889a86c9e36878ef3e3e9695c1033e06ba5843c58a9dc852684f0ee9911b"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c1c3889a86c9e36878ef3e3e9695c1033e06ba5843c58a9dc852684f0ee9911b"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c1c3889a86c9e36878ef3e3e9695c1033e06ba5843c58a9dc852684f0ee9911b"
-    sha256 cellar: :any_skip_relocation, sonoma:         "bf9b067ad0af2c0b17f573103306810203382430682d497201701f944d4394b8"
-    sha256 cellar: :any_skip_relocation, ventura:        "bf9b067ad0af2c0b17f573103306810203382430682d497201701f944d4394b8"
-    sha256 cellar: :any_skip_relocation, monterey:       "bf9b067ad0af2c0b17f573103306810203382430682d497201701f944d4394b8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "d910829fdd680a735d1683dd502ec0f52720d2b340c9ad435d69ec7f6acf5e22"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4916e5335be420a247d7aa5785bb29ac1e17d3bd55015e3cb8d75e726b73d656"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "30950a9e6cda48764f370b652caa99fbfaa9a08ef1285dfe90a12e27d6b1e094"
   end
 
   deprecate! date: "2025-02-13", because: :unmaintained
