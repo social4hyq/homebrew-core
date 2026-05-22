@@ -17,12 +17,7 @@ class Aspectj < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9c09914feef8da7857dfb8c9be43e7f50c46ca782d7bdb590a1126e95243b91c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "23cd98455d550e53b70e559b2ca3e43bed5d7bff0d9567155e56576d148ef549"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5d62738ef87457eec9bc3476fefa11e7960cf19bf58d6708cda9cfcc5d293a12"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c929a1ab5004dd2627c2735a2074a263be0e6f85b28b2484ff210faee7429e19"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "839fa3722ae5f6fce7105e0920dc3438b491a18bdf61759e4d2ec6e508727f2a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "94eac9e44a68ca55a717ba53ac02745d962d4d5c9d88cca780988bbefb55610d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "77858e2f0758a6b300a0241dea2f59d9dec483b817fa2e6579e18aabfb6ee69a"
   end
 
   depends_on "openjdk"
