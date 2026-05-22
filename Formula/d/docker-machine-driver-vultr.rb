@@ -7,12 +7,7 @@ class DockerMachineDriverVultr < Formula
   head "https://github.com/vultr/docker-machine-driver-vultr.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "3dda2f729047493afd3de8c833bad9a0d2a92ac9cda6756c6518e30ee7f3b865"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "3dda2f729047493afd3de8c833bad9a0d2a92ac9cda6756c6518e30ee7f3b865"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "3dda2f729047493afd3de8c833bad9a0d2a92ac9cda6756c6518e30ee7f3b865"
-    sha256 cellar: :any_skip_relocation, sonoma:        "606c6391582f3353b25bf1c2cb58e7c5a0388c9df9aee77445e1b6e5e959261a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fcbda52b4860cc84ddfefa6b21e9b5a9284324cc5e2c9451bf7ca7eb9747fe1c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fc02dec3304a23cbda77067ae6a1bc315265468eb40cf015ee74e8c04954a03a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d36d91d0833660808fb039b4a74b1fb5ed8266e9b84983d345dddc171646b8ce"
   end
 
   depends_on "go" => :build
