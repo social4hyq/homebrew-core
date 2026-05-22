@@ -7,13 +7,7 @@ class Nali < Formula
   head "https://github.com/zu1k/nali.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "15cbc69776a3b3868d0ec51b308fbeaece9d47ab8e70b782e4eae9bd545fc8df"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "15cbc69776a3b3868d0ec51b308fbeaece9d47ab8e70b782e4eae9bd545fc8df"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "15cbc69776a3b3868d0ec51b308fbeaece9d47ab8e70b782e4eae9bd545fc8df"
-    sha256 cellar: :any_skip_relocation, sonoma:        "91eef6fba03ebf843e79d34efce36156c5516b472639951049405735b87e6bb1"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "421138218ebc31e11b1302c7d0dbf6e2ac4daab394c620606ada5531980cbbb1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a93f1725e116d789e17cd905157e3f0466d41cd3ef105aba1b8f843a74a7a2bf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "49038d568b741dce4ca74b3f8deabe5f3e12bcfd59104e680b7ae8d5f8d748e0"
   end
 
   depends_on "go" => :build
