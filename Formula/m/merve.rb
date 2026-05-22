@@ -7,12 +7,7 @@ class Merve < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "762282750ff31f5f38c273aa346bcaefe71d9f488b222e0e67686eb55a5187fc"
-    sha256 cellar: :any,                 arm64_sequoia: "04998f770171f826772a0db12bc60cda32c83fcddfde1c3143c4a336062d9155"
-    sha256 cellar: :any,                 arm64_sonoma:  "90ae194c060574e94e394da3181cbe98f7077d3ffc3fa0b3470f77651fc510ac"
-    sha256 cellar: :any,                 sonoma:        "2b74b54491f8c2f601a5bf649b9c6a94f0e55bce1b7f6e56451b1c7e8a262037"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2f2e3e038d8c3bf94ec942c72371ddc5d4197aeab478d36f5c5d114053073e9a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ec1ac2932467d47af1c0e9441730f23ff9badf7698695d868bab4ec8738a4ddb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d905d55475248551ce6458a546c3a92d1f6cacac6708b30e31b44175d4db28b8"
   end
 
   depends_on "cmake" => :build
