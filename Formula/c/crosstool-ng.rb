@@ -12,13 +12,7 @@ class CrosstoolNg < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "a8ff126a8c7e5be835e5b9ca34fde60183b12e038a84d6778ceb349d198b3a47"
-    sha256 cellar: :any,                 arm64_sequoia: "19ca62b038fe2d81cca3c0a7e21c3ab649a8d16c948eb779f888138cfc46abaf"
-    sha256 cellar: :any,                 arm64_sonoma:  "360739dd3cd49d742e279f6d2ad2a99db93e3980f3e10b6f150451fe58409276"
-    sha256 cellar: :any,                 sonoma:        "9416e83f34a15f21252eb6d4e91850d62477a5ecad86778ae92322153fed5312"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d4e308a1106873d2467839381200620a02112b77840187989ad730f19b5dc6bb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2cf9a85553d3767dc3f0b1d9c34958e284b5e6c948d46b63d5c81b1c216d422e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c190b44d0c10faf5b34c7df98c578c90ba68a87dc374547fe733db50e4c5bbfd"
   end
 
   depends_on "help2man" => :build
