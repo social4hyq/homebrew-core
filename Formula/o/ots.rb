@@ -7,13 +7,7 @@ class Ots < Formula
   head "https://github.com/sniptt-official/ots.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ffeff2117ae48bf24cec567453628d77214369023b9d937d34d3255246d48d9a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ffeff2117ae48bf24cec567453628d77214369023b9d937d34d3255246d48d9a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ffeff2117ae48bf24cec567453628d77214369023b9d937d34d3255246d48d9a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b10af03d6e1bef384a3cb2a1ea226fe4ea48832134256bf06df70c7042858dae"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fa40dc3ff72b67e6806521e12e4fa957470c2ec0cd3c0d33bf4d16a814c8a421"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c0433350ebc8f91c651b210a959cc05a81ff3f95d98d4ffcc5c0db5807c9dacc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0a13ec864bd90052ad337843790ef9390d713e6aa14e43846323973e6c1f901"
   end
 
   depends_on "go" => :build
