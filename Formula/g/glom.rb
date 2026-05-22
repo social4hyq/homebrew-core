@@ -8,7 +8,7 @@ class Glom < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "ea1f1872cf6c6175a7250406b1c6c9a0fac6d33123fbd797c34fc1e33712a5f1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b6a01db545ef402152b63b885c76adf95b5fb081b8498043f7c2b6ef3628cba0"
   end
 
   depends_on "python@3.14"
