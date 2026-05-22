@@ -8,7 +8,8 @@ class Rust < Formula
   head "https://github.com/rust-lang/rust.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ebb8096de5e9bd110bad384a7dcab18140cb21e39a85c0fcbc814e7723d56f2b"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec5fcc9ca7a8c3bea871cfe91bb27a18c02f1cdf3bb037c1bba608472d687d89"
   end
 
   depends_on "patchelf" => :build
@@ -38,6 +39,15 @@ class Rust < Formula
       lib/"rustlib/uninstall.sh",
     ])
     rm bin.glob("*.old")
+
+    mv bin/"cargo", bin/"cargo.real"
+    (bin/"cargo").write <<~EOS
+      #!/bin/sh
+      export SSL_CERT_FILE="${SSL_CERT_FILE:-#{HOMEBREW_PREFIX}/etc/openssl@3/cert.pem}"
+      exec "#{bin}/cargo.real" "$@"
+    EOS
+
+    chmod 0755, bin/"cargo"
   end
 
   def caveats
