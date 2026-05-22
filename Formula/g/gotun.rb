@@ -6,12 +6,7 @@ class Gotun < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "994495478631ea4b296d2797d3ced7bc84d2f25294250fe9ce9ef45912f0c70c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "994495478631ea4b296d2797d3ced7bc84d2f25294250fe9ce9ef45912f0c70c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "994495478631ea4b296d2797d3ced7bc84d2f25294250fe9ce9ef45912f0c70c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9a32a8eb26bfd2d3025a0dfdc2ce6df04dc14143c8715ca401173584f6800aae"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ab06b3e858284bfd1c55b1f4ec7b60f04e6f52598525bc68bbf6393d26cae2cc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "16a728b8dc09e55b645cb2b34e7815ae184ddd3f6b421631cebf14528118a288"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "305a5256bf421afc0615f3b0532c3262aacea7dde3a20edd37cce1e331a50c0d"
   end
 
   depends_on "go" => :build
