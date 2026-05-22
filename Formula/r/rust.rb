@@ -38,6 +38,15 @@ class Rust < Formula
       lib/"rustlib/uninstall.sh",
     ])
     rm bin.glob("*.old")
+
+    mv bin/"cargo", bin/"cargo.real"
+    (bin/"cargo").write <<~EOS
+      #!/bin/sh
+      export SSL_CERT_FILE="${SSL_CERT_FILE:-#{HOMEBREW_PREFIX}/etc/openssl@3/cert.pem}"
+      exec "#{bin}/cargo.real" "$@"
+    EOS
+
+    chmod 0755, bin/"cargo"
   end
 
   def caveats
