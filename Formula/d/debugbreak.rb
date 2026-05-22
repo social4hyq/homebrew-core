@@ -6,8 +6,7 @@ class Debugbreak < Formula
   license "BSD-2-Clause"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "c3d74ba626694bb1db1d81d3efac9b1a9ca9c71521212bb937bfd897d677272f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "39f1f7feb7861bda4e378143de59c12c71255a3f3d7502318ac0896a1bd14c07"
   end
 
   def install
