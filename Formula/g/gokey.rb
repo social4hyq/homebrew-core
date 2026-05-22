@@ -7,12 +7,7 @@ class Gokey < Formula
   head "https://github.com/cloudflare/gokey.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "39fa37a4675d286bd98d0ccbe73dd401fa1e15cbdcd81c09f639f507121cf96c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "39fa37a4675d286bd98d0ccbe73dd401fa1e15cbdcd81c09f639f507121cf96c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "39fa37a4675d286bd98d0ccbe73dd401fa1e15cbdcd81c09f639f507121cf96c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e4568a3de9d8509a084de977254004036adea7bf78a54246bb750d83950d428b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b087aae267d83a4f2b12521f0d07ddff361e4102f4799d12c4ad24dd77d93b03"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3f5693ea85dd8715215833d03fd95d54cabbdecb1c41242f194109fb59d3882b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f3e61855cbe4b7471f7577961edc6d57d8f60c4bfc72433dc5ddcc414954a88"
   end
 
   depends_on "go" => :build
