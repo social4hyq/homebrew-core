@@ -8,14 +8,7 @@ class Earthly < Formula
   head "https://github.com/earthly/earthly.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "10fb027ed13b35dd1086731fcd7d2cb12576e3cc5ca4e39b9de0b90320108f7e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f4c91d647c2b928deac976cdb3f939bcdf71b8d567de1bc80bc2177d4a91bc51"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f4c91d647c2b928deac976cdb3f939bcdf71b8d567de1bc80bc2177d4a91bc51"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "f4c91d647c2b928deac976cdb3f939bcdf71b8d567de1bc80bc2177d4a91bc51"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e546a6f2586355f34627aeeebed740d22545a0f55341f461297543f4d9435057"
-    sha256 cellar: :any_skip_relocation, ventura:       "e546a6f2586355f34627aeeebed740d22545a0f55341f461297543f4d9435057"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "995dfe4672c78d926733b365c7c6e81f382130eb6db014c855fb9b24eb2c6aa9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ccb67c3da58fe3524320b08fb9ace8779479ff4afd09a77a2a2dd1ae40fee890"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e49fcde1f67cca54917c75fa4e2edf247a5baa237361e0e7e79582e50b847427"
   end
 
   # https://github.com/earthly/earthly/commit/9e553bc2905da5fa4f39ad327b80fefed178f70a
