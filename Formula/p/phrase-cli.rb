@@ -8,12 +8,7 @@ class PhraseCli < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "5cd53f19c0125fcdb997923e8e9f2326fdacd1641f6f1a43f706389e81433c6a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5cd53f19c0125fcdb997923e8e9f2326fdacd1641f6f1a43f706389e81433c6a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5cd53f19c0125fcdb997923e8e9f2326fdacd1641f6f1a43f706389e81433c6a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7b7e66a40c68c0ab5740dfa6a75e52ec6f2456abe2d8ed39e14cdba0374c175a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a2c9271aeb662efdc56a7712e7eb15215f1f98a18eb44b4250e7af62d1262662"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5f24577476496aca5b514bc17ea8d5f92520fde79a3b1e526633ec9ebb3a3b8b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7a201fb3766717a06044b7bb7057600ccdf2cc4f170190777d7505dd29a0a065"
   end
 
   depends_on "go" => :build
