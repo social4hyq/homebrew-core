@@ -12,13 +12,7 @@ class Sproxy < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "2bc3a894dd3aabe0118dfd0af15f13d0fa9279aa28eaab848da92c98380a2ca0"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2bc3a894dd3aabe0118dfd0af15f13d0fa9279aa28eaab848da92c98380a2ca0"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2bc3a894dd3aabe0118dfd0af15f13d0fa9279aa28eaab848da92c98380a2ca0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "2bc3a894dd3aabe0118dfd0af15f13d0fa9279aa28eaab848da92c98380a2ca0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "dbcb7f98b1e9f0c2a4129e262c402e56d1972a1864116107e123debfc8d77a8b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0bf77197199267e3b521e88729b49abcc2341fc460cf017ce16d63473d6cbf63"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ecbd8259fa59d21d2a20d418cb0ea7d2762733a93b3c6b2c388838b798ffc0f"
   end
 
   # Only needed due to the change to "Makefile.am"
