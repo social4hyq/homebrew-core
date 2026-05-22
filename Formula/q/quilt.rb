@@ -12,14 +12,7 @@ class Quilt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "93979fd118d49801525b0d28a8572a055893d3e3169ee9eff1bca64e69d9ccc2"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "93979fd118d49801525b0d28a8572a055893d3e3169ee9eff1bca64e69d9ccc2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "93979fd118d49801525b0d28a8572a055893d3e3169ee9eff1bca64e69d9ccc2"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "93979fd118d49801525b0d28a8572a055893d3e3169ee9eff1bca64e69d9ccc2"
-    sha256 cellar: :any_skip_relocation, sonoma:        "93979fd118d49801525b0d28a8572a055893d3e3169ee9eff1bca64e69d9ccc2"
-    sha256 cellar: :any_skip_relocation, ventura:       "93979fd118d49801525b0d28a8572a055893d3e3169ee9eff1bca64e69d9ccc2"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f0aadd65237093e1356cf63eef91a5ab80f8cba26bc8e034d05de7c3095dd64c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f0aadd65237093e1356cf63eef91a5ab80f8cba26bc8e034d05de7c3095dd64c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "247c82609408083c510df26610d8e687114565d0647984dbf6c13c4315019b15"
   end
 
   depends_on "coreutils"
