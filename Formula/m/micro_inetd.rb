@@ -7,19 +7,7 @@ class MicroInetd < Formula
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:    "420a213af59e22190bbe8acb13f7165b444246ecb3e9e5f3778a93b0a8c039a3"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "9693aed7c6ab1caf581335fefd2eea3fcde0e3b62fbbe1378cd81bba864410a4"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "232b03dbe326168f085f817aa5f54dfbd1d1793e6eced2991fcf5c27c932f3c4"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2571772cdf0c887a13fa608f34a9bd4e866634f72c7df20a04aa6426e8e0f634"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "523ce480e35f50c093ebe4b0ae2c60b6a21007f0543a697b173c562c10a2639f"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8c92f09e894e133f5f3a51c1df7c0a9a540daa8c2b5e028dd37a10afbfebdf40"
-    sha256 cellar: :any_skip_relocation, sonoma:         "a43b8b8fc6ff27a158b7e2bedc62ed709c17c937b76644adfcdc4130902c2669"
-    sha256 cellar: :any_skip_relocation, ventura:        "bae8f59efd2b2847b2b11456aef8219b50a3c60c9217b49219a6370d1bb69030"
-    sha256 cellar: :any_skip_relocation, monterey:       "54355e595c1f260dae362dcea2dad1bd9a382fa37d787ccb9af801d34564f3a2"
-    sha256 cellar: :any_skip_relocation, big_sur:        "61bb8fda68189596e32e2aa86e986b32779d61337498ca2145421b7dce09e40d"
-    sha256 cellar: :any_skip_relocation, catalina:       "04b4028a1fab40575b422ea45b44317dc69170f85bf4fa07b4eb7d2f8df165ee"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "db73408b4adcb3c29579c532ad06896c258f1dbbf13057279df8b2a11e78cc3b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5c12f725a115ea5becccc0b125b34d285af5b5fc2be361cec10ba745ba8b238c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5cd9232667537e99637a4d553d59b0702449e4dda8f76ba13f38a4c656b627f"
   end
 
   # Original URLs are dead and last release from 2014-08-14
