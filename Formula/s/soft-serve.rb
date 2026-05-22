@@ -7,12 +7,7 @@ class SoftServe < Formula
   head "https://github.com/charmbracelet/soft-serve.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d66833542b98d14d3970a45fe85e55d6cc3cee5f924ae29afe877580e3057705"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0e47346041f811a823d1a21caee2564ba20cce6564b98fc92e3fc6e1d2c1b6d7"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "743cd8be41fafbb21bf558191f7fb67fc9a915e712c1301045d86dd5f0ea5777"
-    sha256 cellar: :any_skip_relocation, sonoma:        "00b22a1ad09e68278a70be051fa0081a1a0e64d901c3bdb3a9d3a6ef030aa138"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "91a85d06ec29af35f1a41750ca77475cc16d37d81a12c3113b0e61d4bd465bd3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0e041b4d0dbd0adbd4f4b89217897f62b3cb7b9396de6b0718fe12ed56315485"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b767daf6bb6093e694b7832587965bb671917f708c33c91e348eee8f34548fd"
   end
 
   depends_on "go" => :build
