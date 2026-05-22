@@ -7,12 +7,7 @@ class Baresip < Formula
   revision 1
 
   bottle do
-    sha256 arm64_tahoe:   "fcaadf7d51c19813a01eb597b70c208061bdef07d2017b5c61e925c2dfa4d968"
-    sha256 arm64_sequoia: "0dd1f7f626422be6665b47f713350335049dc404b0f21dc5078e159c99f53e2d"
-    sha256 arm64_sonoma:  "01627d98d6cc77292979386512fa62b8fb4beae86bcc9d21ad28c5636b54943d"
-    sha256 sonoma:        "18eb1ef39e70f577d65e769bc77ecd173d4fae13c1a083b11e229c3be9f2df63"
-    sha256 arm64_linux:   "e9385fbaa34cd996a8c1eefd06ca8dddd41100a4be599240f6d06e9897d2b336"
-    sha256 x86_64_linux:  "68f556d944223eb275470501808eba33c936369a2cec586b04c683f5e9c09537"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f4e3525dff5a729d505d980e687e1cfeffdb9249ce03ada2e506551a2aa9a38"
   end
 
   depends_on "cmake" => :build
