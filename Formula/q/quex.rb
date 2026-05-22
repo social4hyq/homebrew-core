@@ -15,8 +15,7 @@ class Quex < Formula
   end
 
   bottle do
-    rebuild 4
-    sha256 cellar: :any_skip_relocation, all: "f2d44465311851dc3bf25c68adc4d5041315e089d91ba9fce5d34a47f8a26782"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4a4563d1c7ce8c899866c85d69fa94417ce7988f5040574d0f1700d27532857"
   end
 
   uses_from_macos "python"
