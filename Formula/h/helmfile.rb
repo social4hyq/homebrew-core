@@ -8,12 +8,7 @@ class Helmfile < Formula
   head "https://github.com/helmfile/helmfile.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "99b311e3a4dcbbe032275bd3c46a01e8a78b989af359eb403a3ff6991351b352"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "177d46f508b71cd387e1c54db0af09be2935cc3e4b4aa552e09a77d7957b1971"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "37e6b7fb08d182a9824a6f8d54a057dcdfcbe92daa2021d7824882eef4c4d1fe"
-    sha256 cellar: :any_skip_relocation, sonoma:        "eaa9b4d4c0f793edcb132bbe581f05f9582f106644d585be24156f97c04d2689"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a939e71a2bb491bacda13df025d75d8f95a1b973f713f59a3b5de3a7e7f48556"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f944cc3a837a3c240ab1d5dc06dec5433a82cb80506a39355223fd4dd1c32f0c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "57adda82f23b3117bc03449c556a17ea0641172178d55e1dd12a62c9a508ef73"
   end
 
   depends_on "go" => :build
