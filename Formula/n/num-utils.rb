@@ -12,8 +12,7 @@ class NumUtils < Formula
   end
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "9d5185fbab175569c61a97393d00d32ed091c41c2ea6fc16b2d80e1d77b81106"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b799622e8fe28dd5883a0bce706378cbf5a46005c10f5be712c261429bf85b8"
   end
 
   depends_on "pod2man" => :build
