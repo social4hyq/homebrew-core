@@ -7,12 +7,7 @@ class Cli53 < Formula
   head "https://github.com/barnybug/cli53.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "edc75f2077dc433ee2886b10767d869a845424f143336ce03c78bac05e4b1dba"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "edc75f2077dc433ee2886b10767d869a845424f143336ce03c78bac05e4b1dba"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "edc75f2077dc433ee2886b10767d869a845424f143336ce03c78bac05e4b1dba"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c00307f73333ae8ef0ed14d2648eacf4794805c28c19712a4227bf23a7eed4cc"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f7b72b2ce4d48ae96913fbfa2d7449d116aab8a3a1b3423458e9830a570378fb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b4b69d17652cad4fbea72d16035dd14025491c1b2f5c451e6525ed60c620bd49"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8223b8a876fbb0391d4d213aeea52ff94983169019b2e4018e89de08baf37d61"
   end
 
   depends_on "go" => :build
