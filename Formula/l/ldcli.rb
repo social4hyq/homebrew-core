@@ -7,12 +7,7 @@ class Ldcli < Formula
   head "https://github.com/launchdarkly/ldcli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f8c360ff53602d02e7f5649ff6f813b45ef0d820c37cb4e1037525e57a0e54cf"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "da856eef3b51f18541712dfed76fe731cfc115ab2f7867fbae05e457df4098aa"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5de1690f4625d2d842a7c8d67de8ae8d9c1b40f50ae4e7a9d16243b18cc2b8bd"
-    sha256 cellar: :any_skip_relocation, sonoma:        "951e01fa630b3de43dd245a7ac5e03d64070db4e431220e2e862a60e4cde5140"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d06fe9a43c6461b592efeef3c36e4904b99a81e85b15a71b74933df9a9ca9030"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "df74f3d537d35e56bba8dcf7309a2925c3cd7b461951103ff3c0c86b9c2f80f0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "603e2892b4a35a2c8db0a415521851863604a04de80c7fd86fb535dd9592c2f0"
   end
 
   depends_on "go" => :build
