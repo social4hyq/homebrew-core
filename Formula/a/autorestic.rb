@@ -7,13 +7,7 @@ class Autorestic < Formula
   head "https://github.com/cupcakearmy/autorestic.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "1ce7af07dc44415cdfed0f1cfbc5ce1b742cb2d79b22cdebf4598e50baf7f1f3"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1ce7af07dc44415cdfed0f1cfbc5ce1b742cb2d79b22cdebf4598e50baf7f1f3"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1ce7af07dc44415cdfed0f1cfbc5ce1b742cb2d79b22cdebf4598e50baf7f1f3"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d541446d59262d79dc73caddd565430e5e70eb66aeea54d792af7bb516a40dac"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d120e2c17beb148344666f41f7d6cd3f656188e82108dede92b123d54f1f59b0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "39477e9220efcad3687bab295231fab1b5dc1937c78b4b60269fb2df6792d79b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72e29005cb52086fcb4f9c4f9e79677a5adc142dcae52f6a83c0efa69e9c3847"
   end
 
   depends_on "go" => :build
