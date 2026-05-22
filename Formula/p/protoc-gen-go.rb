@@ -7,12 +7,7 @@ class ProtocGenGo < Formula
   head "https://github.com/protocolbuffers/protobuf-go.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "7ffe39568f56c274132445b57eb04377bbb37799611dbbe21bd02c9cc532eaf6"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7ffe39568f56c274132445b57eb04377bbb37799611dbbe21bd02c9cc532eaf6"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7ffe39568f56c274132445b57eb04377bbb37799611dbbe21bd02c9cc532eaf6"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e93a78dd2905297ab4ae984982582673dea8e5a1122a8990e6fd167699475bf4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3c6519f898f2a050cc8bb02b08609a658ab4e01d2166c1d832c8b91d065fba52"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "829e7d23214131c9a84cd91899bb7a6888d6d7938b18bab9a65f52eaf37078e8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ec3e128d5aa283bb6ed1644747579de718335168dd78c369035ec29001d2cfd"
   end
 
   depends_on "go" => :build
