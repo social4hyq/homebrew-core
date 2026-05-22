@@ -10,12 +10,7 @@ class Datasette < Formula
   head "https://github.com/simonw/datasette.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "87de582ded0c6b45db86f69d62d9c7015bb55056a3db5c109db43a2e7ae3b3c8"
-    sha256 cellar: :any,                 arm64_sequoia: "bb040cffbd648a76cc4146853d76c0bee75cc926497b573b0ec1a242f68e6211"
-    sha256 cellar: :any,                 arm64_sonoma:  "29ac84b0c132b092a340b4dcf2358178079b8bbed9db06a72fc4ae44a7efe00e"
-    sha256 cellar: :any,                 sonoma:        "66b67b0dc65748600ef4a0e20e4ac136c338d3f41f087b176907941f7ec4a71d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8a10049d6d4a3c8fa8d4acd21522e12c9c6a74cbf7d72ccefedc58f3300f1bc4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "82807b1848b9fc866c4b5c86c2ecf8b5e9af5e61085cdd5475f66899a0789ac8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "904df52ed9a81c2f1c1afb10903b60b37a56db258ee5a466ac488df1ac5141cd"
   end
 
   depends_on "certifi" => :no_linkage
