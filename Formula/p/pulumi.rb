@@ -10,12 +10,7 @@ class Pulumi < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "91babd4112dbda4ee41be362ecf0f6b41267d082a38fc735553ab7462fb3ac2f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1a941c1664055aa9ebf570da9ef228386a88315153e1963ab7df42dfba3ddd3f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "524ccdcfdc07dfdd60f94183e31bd1471985f0b7971f70bec9e5c2833a0f624a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "f0592c6117151e0d2cef61abca3860bbda90e7447b5c358af8361d8a89e41f90"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8fa8e12d690f439c984d375bc3d2359ae7a5a0e03480be12a770961ef3469451"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f075e8d2303ef84364112cf3dd5e9d62647204915a925a91364b5ff318126305"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "85007c7358d646cd72f31023cd997fb8d98b3d937ebf33155fd3917c13227ed3"
   end
 
   depends_on "go" => :build
