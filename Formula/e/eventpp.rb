@@ -6,7 +6,7 @@ class Eventpp < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "8c9e674ef83f8d4768c4bfd91497f725487973384179be6bd8986ab37c55d7b2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0f86d4a2a1e8c92a979e767914442e01e9ca55b2974a62dad8918527ab18a9d"
   end
 
   depends_on "cmake" => :build
