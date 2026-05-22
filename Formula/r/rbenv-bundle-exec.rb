@@ -8,8 +8,7 @@ class RbenvBundleExec < Formula
   head "https://github.com/maljub01/rbenv-bundle-exec.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "8c0d3d96110c571151ccc1500854047f47bd9f2b372bc65b70b0bde9f7a4465f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "acf0a694c7bb4b020067e450bf680d004b5b878ac81b2bbcd82294d25ae2c854"
   end
 
   depends_on "rbenv"
