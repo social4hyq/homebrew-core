@@ -7,13 +7,7 @@ class Stormlib < Formula
   head "https://github.com/ladislav-zezula/StormLib.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "96e129fd5dd134918fc64ce2a706deb1e7911e7a6ea98bc709e207b797388d75"
-    sha256 cellar: :any,                 arm64_sequoia: "f2e00691eec59dc82510bc91264312663640b906b2f484f209e3d33efb4a813a"
-    sha256 cellar: :any,                 arm64_sonoma:  "4ffca97a33b072d0823035dc6a757c7fbf96041ee7bbf6581dfa6639481bb60d"
-    sha256 cellar: :any,                 sonoma:        "a2e153410331b03506c454ac4240ba49acd06da4e5149cf759f20a6a465d07ca"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "77271d55a05e72595f18e3a611b7994b607e6c8fdb7e181a143f80298228d792"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c22bb47d47efd4d54345ab1c348f4e9d9ab81149a3e59b129fd2e5703d3ace05"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "84ec3c22c074ebd4a4bcaa578e2456ce9908afeb506e132ab5a2c7adfc1cde03"
   end
 
   depends_on "cmake" => :build
