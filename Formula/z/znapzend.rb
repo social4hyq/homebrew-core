@@ -15,15 +15,7 @@ class Znapzend < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0f04b481b943342f0ffe5a58835319c20820041f31311f29547f16e6ef72366e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "405bbba19b8422e333e11f67f73eb0c61a66150e551428f0c04b12aca2c1db99"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "bd97162625dcc01bf084c870bdf6fd3ba45e3e0967c9b5108fec6cef9f11919b"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "d72402cd84c52f88fe2fcd86892efdd79f379ac886ef71fcf4143651d1e190db"
-    sha256 cellar: :any_skip_relocation, sonoma:        "4c9f4aaa841ce75048b37c4c1c54a6860f40903f2e2463c8bbb5f95c1994d3b2"
-    sha256 cellar: :any_skip_relocation, ventura:       "f6273d56bb1e0c20ded2d6f4079cf7548dfd99bbab933ab4fc0b4cffae136869"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e713956866b46b71f518756ae9590023be91a54fa339a80fa05b30b6989ed43c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b66995be03c18d0b108924cc165fc08c19eb6ac27c4810669af9187ef16d7c99"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5fe8cacff8700aefc70bfcde120c856fc0e648d2b2b6786062e887aee286f2ad"
   end
 
   uses_from_macos "perl", since: :big_sur
