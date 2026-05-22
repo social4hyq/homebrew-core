@@ -16,13 +16,7 @@ class Intercept < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d9fa98c582dcb9d81e29e90d3d67aeb93e4840b39a02e7a89d46e8e6e9f6ebf3"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d9fa98c582dcb9d81e29e90d3d67aeb93e4840b39a02e7a89d46e8e6e9f6ebf3"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d9fa98c582dcb9d81e29e90d3d67aeb93e4840b39a02e7a89d46e8e6e9f6ebf3"
-    sha256 cellar: :any_skip_relocation, sonoma:        "72ff55281bb565da50e9811b2bb134ecb570ab3260ea65e85d522555d1846358"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "82047f616d9531969be3c4b0abf4d9694efae66910ee359e691c221af83e71cc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4cfcb330a767bbcac2efc21323d2f929c1a480438e4bf8ef147909f88dcaed47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c5fb7e0ba1deb15be7c305dd01a5f42b0ad3df5fec6e8e73e35e1ea43d4de0a"
   end
 
   depends_on "go" => :build
