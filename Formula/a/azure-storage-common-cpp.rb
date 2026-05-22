@@ -11,12 +11,7 @@ class AzureStorageCommonCpp < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "1432ccb23ee03b84405c1e2c2cc600e6cbf9f99b2a46479eddd14f1fad7d898e"
-    sha256 cellar: :any,                 arm64_sequoia: "812f97440320ac6780635aae9b9b747798cb05332abd2310de14de0f829eaad0"
-    sha256 cellar: :any,                 arm64_sonoma:  "15256f7d0f98e52b3996f0690ea5db3d17e9db7f62c570b41313a2db3a26b65e"
-    sha256 cellar: :any,                 sonoma:        "b66a66afb74c13e9ca95a5bf3be5eda63a78bf6b9068be6b46ecc023af488857"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "99b6081d14cfb9eebdf61c077050a781a1e6b6d01281343b8f7f40a9733c47d3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "89309f6c1ec39b7d2d965965f4d9421e951fe99e386d365eb34b853f54c64a61"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "31f402ea31a68cfb9cbdba8960d0c2c4fb5bfe54571817428473e613e901e10c"
   end
 
   depends_on "cmake" => :build
