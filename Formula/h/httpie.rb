@@ -10,12 +10,7 @@ class Httpie < Formula
   head "https://github.com/httpie/cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "31241b4a5d0d8f82bc7c27b3d1936ffa34e2a4f8416bcf93ed0d220b34d13181"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "17bf32605b35962b8e01ddff9dd9b4e4f12490801cd267b20a017d9316036554"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e1f969c4a64fcb4573d0ee5d7b9336b62023deabe2f7e26155b3fd0019404474"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7c62f93b3fcf287209c2f165939c1b91c969d26c5a07e16a44fbc45bd8208ceb"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4ce759ccb92d4bad22c8ac0646a205c2fecde216995c982a7d44d77be53e9a79"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d1c2a3dd855b5b98084a0b48bc8c2bc810fc5c1c3f674b29bbf95e3d7902ac84"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "701c090b646672afb8b5d0d148e0b42d7b3ec1e0e268bffdd86affa47557c0ab"
   end
 
   depends_on "certifi"
