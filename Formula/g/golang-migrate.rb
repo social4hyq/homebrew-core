@@ -15,12 +15,7 @@ class GolangMigrate < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "756f6f4046cb091c66fb0ec1e4db160d07a7fd3b552aeb1d75adbbc716401332"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5d74478b5173dafc40af24aa1f175766cfc5278cbd81a04f5d83fd03600e27b7"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f6b82e2fe5e03b8130f2363908a34d77b428ce3b7f68f629f9c93c1bd941fe94"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d22e7d26b80ff378d6d1dcac7ddf4e6f745ad60703d8b93068bb5e130fa84259"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "6aeda2e9ddda567c4009f53efde24d8cd80610e55ee159c3c030a41dc80cece2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c67548a520ac1995c4e55700f0eb2ae492d386690c2103c493c903791909abda"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "12d513c643872f37b820809e8231a5caff27f218417eacee17073f64461666a7"
   end
 
   depends_on "go" => :build
