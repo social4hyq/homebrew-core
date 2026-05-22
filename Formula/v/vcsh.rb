@@ -6,8 +6,7 @@ class Vcsh < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "3184a9cba5e9b79532e01e2fa7b24478918585c55bed898b0eaed6886390d456"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "532996d1fcdc5edc56be574784edb98ba7434f7d1215810960785523b0350d46"
   end
 
   depends_on "autoconf" => :build
