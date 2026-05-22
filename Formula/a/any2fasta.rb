@@ -6,7 +6,7 @@ class Any2fasta < Formula
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "bba7ed684a5d3c4472a5c4aa1bac8c7aadc293bf6e6e198a35ca094bfd867d28"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "335eeef54e8537440e726c91bdbd20094ecb2831a2baff4989cbd97693f238a7"
   end
 
   uses_from_macos "perl"
