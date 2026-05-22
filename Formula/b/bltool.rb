@@ -6,8 +6,7 @@ class Bltool < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "38e264bd60bf4b148e995892e1b4e9d24d5285123affa688ee364a1bcb16a6b2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ede7f3a28bafc60105626ecb6820d8b230714baf35e24f8abdd6907332a3d26"
   end
 
   head do
