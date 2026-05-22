@@ -6,8 +6,7 @@ class Json5 < Formula
   license "MIT"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "549882eb4bc333f0952050c2578e929cf4d653d3834467aa364ef0b07f4133d3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a157d87e50ae89c76cf4b4e3bafc86c008db7a2521806ece1c720af0b262b8cf"
   end
 
   depends_on "node"
