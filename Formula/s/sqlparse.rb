@@ -8,7 +8,7 @@ class Sqlparse < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "6fddfa4844bdbb6ea97db76bd54178efaa96f4059a391b192ac81bfbde342af7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7aef59fc09daddabd2163a9bb6511da496ca76a5270fa1823846a4bf0062820"
   end
 
   depends_on "python@3.14"
