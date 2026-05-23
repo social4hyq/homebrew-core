@@ -6,7 +6,7 @@ class H3 < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5484a938e07ea3b9e2b08a6d8c7ecf58cc6a5ae7bec5aca0c76fe08b5e8b68f8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "01ec8903095ce40671b782d555efd0cbb4a42c9db3aca848440f461ca873e717"
   end
 
   depends_on "cmake" => :build
