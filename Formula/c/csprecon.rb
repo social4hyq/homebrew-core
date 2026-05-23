@@ -7,7 +7,7 @@ class Csprecon < Formula
   head "https://github.com/edoardottt/csprecon.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6c49fb0f9773bb40ce14ce8936866097ffe769cccad706655158e58507891ec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f58702f53bb761ba80551469425385f6eb77eb416098120155242cda35c95807"
   end
 
   depends_on "go" => :build
