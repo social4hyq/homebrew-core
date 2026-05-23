@@ -1,13 +1,13 @@
 class ConfigFileValidator < Formula
   desc "CLI tool to validate different configuration file types"
   homepage "https://boeing.github.io/config-file-validator/"
-  url "https://github.com/Boeing/config-file-validator/archive/refs/tags/v2.2.0.tar.gz"
-  sha256 "b1e2082d97f15446cbbd5de47c4614994aba862061acb89f2d49499d2838bfcb"
+  url "https://github.com/Boeing/config-file-validator/archive/refs/tags/v2.2.1.tar.gz"
+  sha256 "157a6bc36df10d6bfa462f3977d1035439dd7b67c50f169543be58496c54e1ee"
   license "Apache-2.0"
   head "https://github.com/Boeing/config-file-validator.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "00330ad716fcdb48d270789ea041d385da829fbae0441a72915b7c59758d0b3b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3ab12801c908473e740c267b686f03df5265b26f8d2103814e759185af2d915"
   end
 
   depends_on "go" => :build
