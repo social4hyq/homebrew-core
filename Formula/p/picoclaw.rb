@@ -12,7 +12,7 @@ class Picoclaw < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c79d208abace6ef234f84485d39d7e17e82d99a0843bcea509d32945021df47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0d783d960e6215d416473de4ccf6e4d975cae5e3e6302f6b4f239f18a1ca69d"
   end
 
   depends_on "go" => :build
