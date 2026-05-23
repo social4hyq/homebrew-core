@@ -12,7 +12,7 @@ class Less < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5aaf129f6dba807bc04227eafc5b82e9ee9cb52064e441fa74b26cd6b7bc9fa3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "080aea366c21b8e0125bf62c3dfc7706b6b37459baa70ffe60de66b839a59973"
   end
 
   head do
