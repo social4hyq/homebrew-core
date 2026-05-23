@@ -1,12 +1,12 @@
 class C4core < Formula
   desc "C++ utilities"
   homepage "https://github.com/biojppm/c4core"
-  url "https://github.com/biojppm/c4core/releases/download/v0.2.12/c4core-0.2.12-src.tgz"
-  sha256 "7b59eafe79a31413b974065d12bab28eaea55a01255c7127e26832d98bccf7be"
+  url "https://github.com/biojppm/c4core/releases/download/v0.3.0/c4core-0.3.0-src.tgz"
+  sha256 "47a5634c785f84a6bef07c04c3cc3c063ff61c5c7554b95c35298712e2f306fd"
   license all_of: ["MIT", "BSL-1.0"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "897ea0dd19ced2c949e085fcb2af6a0ab1352ab37c1266d75af0963c1b32d512"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "047c9cb0367b35692c415255a4c109b1dec59e1f5bd6dcf50d841dd3df9d2f3d"
   end
 
   depends_on "cmake" => [:build, :test]
