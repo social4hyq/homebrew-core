@@ -6,7 +6,7 @@ class Pure < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f99da59800d458aa23404dd7bfc2a5091242fbe41395363c1a70c74312431847"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f427741b58a30596c270d839bc7a1364987bb98302b3eb96a4e896d987775644"
   end
 
   depends_on "zsh" => :test
