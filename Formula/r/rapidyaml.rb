@@ -1,12 +1,12 @@
 class Rapidyaml < Formula
   desc "Library to parse and emit YAML, and do it fast"
   homepage "https://github.com/biojppm/rapidyaml"
-  url "https://github.com/biojppm/rapidyaml/releases/download/v0.12.1/rapidyaml-0.12.1-src.tgz"
-  sha256 "e9efcdd17f86287748793cf21d106e461fcad8d103a3e5a23632afe93828660d"
+  url "https://github.com/biojppm/rapidyaml/releases/download/v0.13.0/rapidyaml-0.13.0-src.tgz"
+  sha256 "b70b484b612152b0dbb2ca61178c9534d80c392fe36d4d54e75d127ec8864d52"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b0a3458ca3b0e75058ab1dcda43f2123467fd2e61fcc5dc657710d0dbf8dfdc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6020dd40fb06b39f7746505744a7ad0d5fc670429180eb153eafb00bde1d2f47"
   end
 
   depends_on "cmake" => :build
