@@ -7,7 +7,7 @@ class Krakend < Formula
   head "https://github.com/krakend/krakend-ce.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b66aa93d0ff972956b5b36ddfbf96b82f2b92e89830c8d8efb32fa2340fdacf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "248b9dcf914bb879767a84f33813dff4c115d081373e1d1bef9e07f26fcf5590"
   end
 
   depends_on "go" => :build
