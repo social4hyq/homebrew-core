@@ -1,12 +1,12 @@
 class Structurizr < Formula
   desc "Software architecture models as code"
   homepage "https://structurizr.com/"
-  url "https://github.com/structurizr/structurizr/archive/refs/tags/v2026.05.16.tar.gz"
-  sha256 "c7230db428187fb0f1c55c33aa6ed09f686657c2bcd33fa51d75c637ec57da33"
+  url "https://github.com/structurizr/structurizr/archive/refs/tags/v2026.05.22.tar.gz"
+  sha256 "5ddef1b90f2495552a6e87c23564ec7ee55fb8cb3ea611346addd7bd5b4d6e32"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba358cb6a3642f8a9c2b94a486b1640d4317d63f2532934100d3fc2debe74013"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1ef8a528ef41bd91b7a44b7ce5adbc84746a4c3383212ee13474531ac1ecfba"
   end
 
   depends_on "maven" => :build
