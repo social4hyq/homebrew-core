@@ -12,7 +12,7 @@ class Crow < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "ea8ea782dc4dfa04e0be6da9cf4755adf6fc93ae84674fde27fa8c049b59ddcb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e82a70cd22fc2a1fbebdb9615079378551ca5faf85af15da6383be2555c263fb"
   end
 
   depends_on "cmake" => :build
