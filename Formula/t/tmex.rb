@@ -6,8 +6,7 @@ class Tmex < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "7962a086b783ba9d0c735495c568e5a2299e8a33891772d70069dd68ea2d408f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22fd1763319e24a1d679ff74894348a00790d893d3689a967a263a8a64810fd0"
   end
 
   depends_on "tmux"
