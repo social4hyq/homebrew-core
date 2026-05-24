@@ -6,12 +6,7 @@ class JxlOxide < Formula
   license any_of: ["MIT", "Apache-2.0"]
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "0a70deb73144f8230c8419e5956efc63c7f6d37a3a8335b91edae15a288f08c0"
-    sha256 cellar: :any,                 arm64_sequoia: "8f876968712d13cbd4f9d99a5b369eb4878f29bf04ba32eeb2b67c08bfd2a146"
-    sha256 cellar: :any,                 arm64_sonoma:  "5669fa61483ea49b2ce40065c268a6789c8ae58f6d5b51ee82d05e426c613a25"
-    sha256 cellar: :any,                 sonoma:        "4c04da909ff3a4bcae66bc39add9bf4ada194de1f69ac2d426673c7adcc868cd"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e61191f5aef0fa9c2c012460d7f8ab06fd80d91095df08fd2f5202070d1a0958"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e2fa84c2b09c8b447c2ee868dccf242ac765e9b9a20a8ac6802bc720dcf7e76f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec3bf0907af3b970dc69f330a631cb4756f3073e8f4758a3fd2c69ac2c31896f"
   end
 
   depends_on "rust" => :build
