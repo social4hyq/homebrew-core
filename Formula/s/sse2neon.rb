@@ -7,7 +7,7 @@ class Sse2neon < Formula
   head "https://github.com/DLTcollab/sse2neon.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "46cf8773ecb867115c8cdef988d4eb9a928e6f0c0e45cb5513b00603cab0bddd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d59d580b35786bc0698ba0e30bf4ff324cc076f1fbe80687bb58f25faacc3530"
   end
 
   depends_on arch: :arm64
