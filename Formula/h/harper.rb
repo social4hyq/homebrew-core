@@ -12,12 +12,7 @@ class Harper < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "b89b7a66de75ad862410a54d349f749b913f8e88fa26df0b7de2f3b9eff94b5d"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e74d360d46c17eeb7b8886d631054dfd35e4774ffb4eef74c69a83588ab4c6a9"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "de91de64cfd317720b77d846c829b7db0b9170cc086e2dd529df6ee4dba59f5d"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7c226fc907fab3ab81cbbc2c08f463529b82ed669e787248c715dc01f28d2858"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9b9d5f9472b1befaf4a8f04611839c8d3d56d37f09a8303e6038ad3a9f321f77"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "984262ec1805e0dfab490ae31efe50d02f309efb4f96cf4a956fcb619d4e66d9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "daaa23ba8f1788b5d1a8e670432be9dfb9b7816af9ee0c97e8b69cd590cc0b0c"
   end
 
   depends_on "rust" => :build
