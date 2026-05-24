@@ -6,13 +6,7 @@ class Aide < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "e84fe8e7cdbd88400214740e38b924ff7bdfe449b2ef2de235d4e9751e3e9225"
-    sha256 cellar: :any,                 arm64_sequoia: "810d048246d7ce9e0ddb19468037f5469af08414ab9fcfa121c0489eb0214958"
-    sha256 cellar: :any,                 arm64_sonoma:  "b65c8a523b64e3895a18a94e79c9edf0ce7190bccd07fed057671c6e3f8ca81e"
-    sha256 cellar: :any,                 sonoma:        "4ea8bb4acbd0926da91bdd8ee2ed6f6adea517aa51a3abce5f62e248425f2a89"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b2f434138bea735edc207d22050845a60d34b494161a7d2f339bad6c11acba8f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "cd4e10567325568eadfb6dcde6da800b5a682212bddc7a878554fccbdb251582"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d126bdc7ac3f66e6ae7a956882585b078b12328d02c58574c3db10a86a78c89"
   end
 
   head do
