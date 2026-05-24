@@ -8,8 +8,7 @@ class RbenvCtags < Formula
   head "https://github.com/tpope/rbenv-ctags.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "b002adad54827245a53792a5da722075e8662e65cde9ce26a628510a6b1b3ee6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "587effd704a6f0f2f25c585ac14186cd0062b1be33b6935cc871d5e3cf04940e"
   end
 
   depends_on "rbenv"
