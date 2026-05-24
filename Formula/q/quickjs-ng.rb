@@ -7,12 +7,7 @@ class QuickjsNg < Formula
   head "https://github.com/quickjs-ng/quickjs.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "8d0326e987b2597ce42a18e90865672e4df9cf019651bc379cabe4da0bf78aec"
-    sha256 cellar: :any,                 arm64_sequoia: "082b95deeb080c8d31cc153f13ec864f3dc64e1c090fc6eb0241df4ffb280942"
-    sha256 cellar: :any,                 arm64_sonoma:  "aafbd22aef82c3f5695e8657f8376e2ca3c1ae9eb399211796e165a249d0dc05"
-    sha256 cellar: :any,                 sonoma:        "f9856e0970b849488d657874038eec532ea3f7adae02aa150529254a5edd05f3"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "25514a8a6d60a97c975d599659648188c9ca23d7f91a86bebd0d41be0c30c650"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "22b9c9023be0f239784dc4259ec89c29096356da036f3b7e19be45d47246b73b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "43b64e06cd944c663df36d152d76ce2b77116bfca5e9233cb0e20cd69daa5c5d"
   end
 
   depends_on "cmake" => :build
