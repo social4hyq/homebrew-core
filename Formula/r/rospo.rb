@@ -6,12 +6,7 @@ class Rospo < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "43494ada262f259f82c05219386a821a57d24053dc7d17f5bf0466509c2a529a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "43494ada262f259f82c05219386a821a57d24053dc7d17f5bf0466509c2a529a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "43494ada262f259f82c05219386a821a57d24053dc7d17f5bf0466509c2a529a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "19405ba3bdc6ee02655fa1ab3eb9b89aedeb4459792b08d313731e5bab9edd69"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3772e1d03c5b37d9a00700c5628c8680fa3ab3d7801145f60a3270d2e2aba275"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2180b3eabb574fdf196c1ec808c62d602637982a7eca1a01dc9d2b0afeea7873"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa376ae753f18fdbaa1bef35b36b09b7e709a5761db76972e1a2779ac3df7a2a"
   end
 
   depends_on "go" => :build
