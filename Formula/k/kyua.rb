@@ -13,12 +13,7 @@ class Kyua < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "df0a26d9a6b340e9503b8fb2f5bd49a1612fafb68a16f2046f0157a3945ba394"
-    sha256 arm64_sequoia: "9b7a4d39f2619978508b4aaca8e298fd2d7b3571ad20616c8742b27e1526f9dc"
-    sha256 arm64_sonoma:  "2960aa79f59cfe291e1d58f60bb7d7d76fc73d076c2167015e1950001e828c70"
-    sha256 sonoma:        "9b8c73b9b4cdf1a3c8c7706e81f598df30944a4b67a28492920a82b14456c92c"
-    sha256 arm64_linux:   "e239437e15b41ff4af492f36a66ff06e7630112d0bb7828a89685cb3c1948273"
-    sha256 x86_64_linux:  "3a8e53115d5afe1d92d1d9db3c3468cc4755c38b869b24530e5d92fae670d5e2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7be010b4d4a4f87e0819786fe234769ac55c3bcd2501e5830ce6daf5f79e9877"
   end
 
   depends_on "pkgconf" => [:build, :test]
