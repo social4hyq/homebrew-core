@@ -14,12 +14,7 @@ class Ldns < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "629f7a51a1a2803dd5416db7237b7c640e72b04614f2012df5fe08cd9639636f"
-    sha256 cellar: :any,                 arm64_sequoia: "714d554e3c767062e77498ba92c0ff91b0871d86197ad91f90da65d9db3ab254"
-    sha256 cellar: :any,                 arm64_sonoma:  "81f4fd69ea66890b1b1db8122b5da93744270950657363ba40c32dec57b0df80"
-    sha256 cellar: :any,                 sonoma:        "190aaba1359ad4d26285d31902e53da00ee506610528baafdc1fbf539fb4f9a7"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5ee79e560ef1f4d78924cf2070eb8dadca89a504f0f5417a99d3bd3730589d70"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4ad62627c746df971912e4cafba581db58e81f0bd90cb93bba6292213467237f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc21e02fe4d21ae5d7b8956d06dcf2cba9e28e1feb0a4ff98e58410e735415fc"
   end
 
   depends_on "swig" => :build
