@@ -7,12 +7,7 @@ class Rhai < Formula
   head "https://github.com/rhaiscript/rhai.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "7dafbfd966e8004e89388a1d6ee629ba86b63564708d91f911ef3209a9fe8ef3"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "900d7908cb5a98e0fdb083865b75c41baf4059c19ababf5b0503dae26938e6ce"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "48286583ce4b1d605a40f5ec820b0594f15e79f7125cbc8ce8351c4e2ff143cc"
-    sha256 cellar: :any_skip_relocation, sonoma:        "81ab902eafe2ba7b81e2e368871934e9a4d0ef3c1265ca6ce39a1c43773d119a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "191e5a097a4cc235ee8d93ebf036b2d3acf70b6f01ffc5ee54def082d4be8bec"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "20670022f9efad3e1004c54b5211335268a2465c53bed7fd00d31fdc39ab1312"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce5a41a7f19ab3fff3f91ab52d6e19b9d751a404b35a98212328b980decb0fa8"
   end
 
   depends_on "rust" => :build
