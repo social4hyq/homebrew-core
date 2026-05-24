@@ -7,12 +7,7 @@ class Mlc < Formula
   head "https://github.com/becheran/mlc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "53f3cbfaf325342b02159254ef76d9662dd1e43ca0306c077d48383e426bbd49"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2bcbbb02edc73eb77b65b210492ee793565303c99f3705a2df88e5b48585289e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "35d38d67b828a4acebdc9cedc31425c865bf87d314aa7c03a1a7182d27cd8652"
-    sha256 cellar: :any_skip_relocation, sonoma:        "735ecd15c43aaef25d4bbf33937057d868011c586652e4525b5ec2d2425fe277"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ec8e9ee4cb303a6f3bb5cd58000e817f6147e40b892920b0e326e2cf11e2f5ee"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "28cd68a8dc923a784360d646cf81244900f0ec03bfd4885063fe395765cc3620"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "457bf1dcefbb2ac0fb89c6f3646a44db2a31f845d3c98154d802e9c631456c24"
   end
 
   depends_on "pkgconf" => :build
