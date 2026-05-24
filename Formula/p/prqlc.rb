@@ -7,12 +7,7 @@ class Prqlc < Formula
   head "https://github.com/prql/prql.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "517b7f9c458526d0a4555ba1b10e9dc36be1ce33b2fbf7414bc3aa0ff07cf6c3"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f48314093f30414363d6de9f4f8d35e415dd81cbc892a9a1fe9e2230dee3d76f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0ee17962c077cd577a494e6fd17643dc0a18ac6bdcca4dc7490b7ff44ad0039b"
-    sha256 cellar: :any_skip_relocation, sonoma:        "dcf69b61205285244a61802cc991c20471f99cb6b08436d6b45a0ec9911a458a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0e10014ba53cdde8d2b708a96692174e57db11cbe4e63cddda755098a6f9b72a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "acb247bfebd86adcc1cb5dc51d045b8ad567a77af4ae69b74935714b8b5339fa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c28bf913c38040052b3edeb591c18b1ef62f4bdfcc86a0cc2c9c5c2e26a36a88"
   end
 
   depends_on "rust" => :build
