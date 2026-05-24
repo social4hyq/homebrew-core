@@ -9,13 +9,7 @@ class Keepassc < Formula
   revision 5
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "01903f453e4afc999a98345cff835cdc781a8cec808fe49aee80d90f0de84171"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "85381b7751afaae1d193207777a06aeef66570058ba7bd9fb60b8fda1227fa77"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "05068b7cbec71870bd259fd31d0fcb779cbee043498cdbd418225dd3113cff5b"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b9e4bd9fa7f24ac7b95b6fd355554430611d0f3b6bf3ac39001fddb000bddc60"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "09e9e115b01e92086c1c1ff02a4f2cb5a0943fbb60adc1a10fbb9483d4647139"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1468f8a2747ba5d8576f0d4263ec8160b68646490c45b5e53287e4e639713139"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ec75fe3a43acaa71161b18eb0f0a779ce660ed9d7f09119d886fa7cf38eb26b"
   end
 
   depends_on "python@3.14"
