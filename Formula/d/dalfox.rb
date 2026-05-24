@@ -7,12 +7,7 @@ class Dalfox < Formula
   head "https://github.com/hahwul/dalfox.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "34fca7de0f1956e6b1ea83df179e5b10e51b340576762c81932a996a10f36cd0"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "34fca7de0f1956e6b1ea83df179e5b10e51b340576762c81932a996a10f36cd0"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "34fca7de0f1956e6b1ea83df179e5b10e51b340576762c81932a996a10f36cd0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "eaf892c3ff3d3323edf801adce6a225d2b539f766e5c232105fd1cd771b815ea"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c347549daf66188211195aeec6be5cd4d3e36718989d71fd85c95f534cb2f57b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "20aa7083e59951a0d9dea3ad948856171b19c8d0c90023b88b361b6d3408da94"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "af7c7f9a1e01743d719caaadcfc838534069463a721d7adc3c25454f90c504e3"
   end
 
   depends_on "go" => :build
