@@ -12,12 +12,7 @@ class Hl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "1669cd48926b1ca8bcfc03c3be2fc3e8955f61401b43c0e375e4f6cc3a9f4d08"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7063c193e091d31e0c918c3d8648540eb14da0c3d179322a463c50311d136a86"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c2f00404f2d92a885b87580bcc0d1984e2f7788d0ead71851a21077342a78729"
-    sha256 cellar: :any_skip_relocation, sonoma:        "27be1863d8d97cf1082825d36c193996f9c7662dfb00e271ed2aa8a9c926cd93"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "66540d776e2cdbe99c5963bfce1807aa69f438d789c46cb63a0aaf1161fb3b9d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7c8ad9ccd7745068dd96794ec53dda36e5c9ddca0a9498c853ba6b1105ebf93e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cded645a2ba10d39e72c5516374c3b21324de3cfd512e4b78547ed42d3173242"
   end
 
   depends_on "rust" => :build
