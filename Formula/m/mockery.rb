@@ -15,12 +15,7 @@ class Mockery < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0522ad647f950503e681bd1b7bb28d146531c7361d8283531134821a72f75ba4"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0522ad647f950503e681bd1b7bb28d146531c7361d8283531134821a72f75ba4"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0522ad647f950503e681bd1b7bb28d146531c7361d8283531134821a72f75ba4"
-    sha256 cellar: :any_skip_relocation, sonoma:        "6a4c20f007d007f8a1697eced63c5a71735b63ada6cccbc0e62d586cca22fba6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "31dc800bfe67ad81dbc4d743dca84449c59630f9a9f83d2be07ad0fd95d5c030"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7c66c8d9dc1db5fcf9c78783c2e23a81f3f09c4620ddd5901ece216b7cc69a71"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1520fdf01c63e824dd045eb7833b450d405bcc561988c7047401b2c6a47f1ecb"
   end
 
   depends_on "go" => :build
