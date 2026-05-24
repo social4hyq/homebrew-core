@@ -7,13 +7,7 @@ class Kconf < Formula
   head "https://github.com/particledecay/kconf.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "716e365025812d14fe17774fc209d18cc8f37aeae47916525f4a1547797e12a0"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "716e365025812d14fe17774fc209d18cc8f37aeae47916525f4a1547797e12a0"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "716e365025812d14fe17774fc209d18cc8f37aeae47916525f4a1547797e12a0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "848797af83206e5beba36e0796a0627a87ebf8821753cfaf11d2f4a916fa8aec"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3f003fc02c549d3c6963af7c0a455bdb796147ddba2d66aa0bf5c2be3458082f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "847f19228e51932af6b6ca5b484c82fc5e5b0baf62d54189333cf5f45e2fa6fd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d7cbe6639c46de46c3679650bbd830e434399f29106a65d96a87d2ca2997871"
   end
 
   depends_on "go" => :build
