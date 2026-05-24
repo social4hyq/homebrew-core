@@ -8,12 +8,7 @@ class Kubevela < Formula
   head "https://github.com/kubevela/kubevela.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "faeb5b0f63de6a37570b340f0ca1ad99107d707f293d8eea9440a535ff4c999f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "faeb5b0f63de6a37570b340f0ca1ad99107d707f293d8eea9440a535ff4c999f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "faeb5b0f63de6a37570b340f0ca1ad99107d707f293d8eea9440a535ff4c999f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "f22a9d471e57c955e094355c0280c9fae796dd411aad8cd91513ef93302963e7"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a1cd09d84da425205b6b930941b5d4f436e5a26468700074744c310d41723160"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f620a6c63e1996a7a5132ac42fa6018eac2c9d80b82bf729e9941e18018415f5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a82935e2c0289c6c8c9db36c97839e24e36aee9c6911abe16dd38b78503464db"
   end
 
   depends_on "go" => :build
