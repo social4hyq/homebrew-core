@@ -8,12 +8,7 @@ class ProtobufC < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "08e2fc52bfa20a51577ace57a76d5529f792c6c7441601eb8264e2b174271a35"
-    sha256 cellar: :any, arm64_sequoia: "6d386d7b7bc044a6eef811765f62d35dd968eaafbc33093bff227bf7d72707b5"
-    sha256 cellar: :any, arm64_sonoma:  "48be422f6f17c7842ebdba69f65f5cd567f50f54891dcaf2fed3fb6d5d2a0ae0"
-    sha256 cellar: :any, sonoma:        "bba3e88a54a8d0bfd56953c7721467dd43bbe487fac8ff9d15f15cc043397359"
-    sha256               arm64_linux:   "1745958c8643bd94e5e8e7321cc6506e5babcdeb87b9a1cd5b084ca8de07083d"
-    sha256               x86_64_linux:  "af081874a015d16cf235afe1de0c5665052b2f98ac5a5bc90b2ea5a2fa8f04ed"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fdf94f73fb4ba8d4466ce66c4bbb06b438a7272c372eb282d29a8369ec2b5ca"
   end
 
   head do
