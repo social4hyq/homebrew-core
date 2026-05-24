@@ -10,7 +10,7 @@ class Tvnamer < Formula
   head "https://github.com/dbr/tvnamer.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "d53deedadb3008ce7ee061df51374c60365b8f9c2deca4dcfc8499458b9b95dd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1a39c18df7024232f81f193191b43ce8c3969069be107a5f9662056278adadd"
   end
 
   depends_on "certifi"
