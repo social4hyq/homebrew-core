@@ -12,16 +12,7 @@ class Libebml < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:    "b0156cbf1955e582256e75bdc14616f47df280ae9aecdf8b0b8fa5f9b5124aaa"
-    sha256 cellar: :any,                 arm64_sequoia:  "2d15f6ce6df5cab89843ca6a7512a601b90ade25bbf7bcae17286664d72e11d0"
-    sha256 cellar: :any,                 arm64_sonoma:   "77cc696e94a5ae2f8a4ccab765ff7adfe84ba6a804479c50d46ede90662d1e81"
-    sha256 cellar: :any,                 arm64_ventura:  "23a888049e631dac6a467f726376aa4a00e5468910d1d37bc7bdc28ce2ad6d4a"
-    sha256 cellar: :any,                 arm64_monterey: "21ced2ff88c6a8962a6fc1daa91c1e947e4090a0dac825968b077fdfa195c14c"
-    sha256 cellar: :any,                 sonoma:         "1239efbef88129a1f69b8e160177912d565f10ac0ff311db0a82861755c24cc1"
-    sha256 cellar: :any,                 ventura:        "d091018498ff6c3e107131187ea17cc489d7544751742eb89ce33b457bddc036"
-    sha256 cellar: :any,                 monterey:       "1ac61d09f0ac6290a4aff9d2eec355ffc28c12499aab5331f355b101dcf3343c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "a84f082ce4f338d50887d393e1b44965bb42daf3df9690f981d3e67de6298c0e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c102b368af523e56e6ebfca14a0e5ff544849992f06d90a0c7768aa8026d4378"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ad20a85751358a0b3be4f4c95f20c317ae4f2b80f2a32e3472619384d4daf49"
   end
 
   depends_on "cmake" => :build
