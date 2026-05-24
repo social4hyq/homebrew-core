@@ -6,13 +6,7 @@ class Jqp < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "aad8b70dd5386d6cd26c7aed40cafb238ba26175ca3592c0ccc9c29720ff82b1"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "aad8b70dd5386d6cd26c7aed40cafb238ba26175ca3592c0ccc9c29720ff82b1"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "aad8b70dd5386d6cd26c7aed40cafb238ba26175ca3592c0ccc9c29720ff82b1"
-    sha256 cellar: :any_skip_relocation, sonoma:        "2a1f293efd1fdbd3ba47f82e3f14a87dbd23c2e06844cf6b856e3ae837bcbea7"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "58a43e2ab2c33c66ce1756830fa2f0f871135f216967ce847bccc61517446c09"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3e402ca44a3bcb9ca8ce67ac679b202c548019b7f57042ba153c5a72fed04ab1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22a996c3652e3b6b2a9ce8bbfb34de81b2cfe0c4a738afa0ae1b793529b35a0c"
   end
 
   depends_on "go" => :build
