@@ -7,13 +7,7 @@ class Dra < Formula
   head "https://github.com/devmatteini/dra.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "4572111b4b26a0b84922ba246f8660798a5334557cde28a699555c6c9cf04ff7"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4ff0c05f5f18abeb5b7ab8a655b44668077b9515d17c4fa7ee1eb3b9c4a8f7c0"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "96afb08befb8c9457942ed1546bf3822379c12719340d6f92dbe269bd0b29db9"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e3c940b7916770ffcb5079ad9822a76f69cbbc34fe35a250fc8f3af8bbba6d3c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "de7e578ac474e67f021ad220181a74ed92f4587d2a3d2fd93387a0ad08fc87ee"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8f43053be9f80c5628fcf732e2612f349c2587d77f2343cd99d2d47fc99f18b8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00ab0872256516efb79a9abf0da44dae413cde5d8a5900383a52cc591cd229e9"
   end
 
   depends_on "rust" => :build
