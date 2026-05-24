@@ -9,12 +9,7 @@ class Offlineimap < Formula
   head "https://github.com/OfflineIMAP/offlineimap3.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "47c364fb81fe40a2118707e9bf9b7761a05733a925167597e2696fd1b98a0f07"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "47c364fb81fe40a2118707e9bf9b7761a05733a925167597e2696fd1b98a0f07"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "47c364fb81fe40a2118707e9bf9b7761a05733a925167597e2696fd1b98a0f07"
-    sha256 cellar: :any_skip_relocation, sonoma:        "01573f83d5463c999e6340dd61caaf870acb6f710aa164f32a718b92e101f89d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "01573f83d5463c999e6340dd61caaf870acb6f710aa164f32a718b92e101f89d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "01573f83d5463c999e6340dd61caaf870acb6f710aa164f32a718b92e101f89d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2371488c9a046c3e7941b4733d0f81e80aa17e4b448684477ded923dfe574d2"
   end
 
   depends_on "certifi"
