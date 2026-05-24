@@ -7,8 +7,7 @@ class SpringLoaded < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "56e262bc88aebe0ac04e149b8ae57d346e60d2c04e4306a53ba57b69947acb01"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8fb379bbe9ae0d6cc6c72aa252f9bd4a0fab45b5417a36f216f5099da1e465c"
   end
 
   depends_on "openjdk" => :test
