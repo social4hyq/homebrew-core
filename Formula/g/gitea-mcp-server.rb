@@ -7,12 +7,7 @@ class GiteaMcpServer < Formula
   head "https://gitea.com/gitea/gitea-mcp.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "a6d116719a95c0850be5ba1b737916378e952997598912ed24a97ce59e1c5611"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a6d116719a95c0850be5ba1b737916378e952997598912ed24a97ce59e1c5611"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "a6d116719a95c0850be5ba1b737916378e952997598912ed24a97ce59e1c5611"
-    sha256 cellar: :any_skip_relocation, sonoma:        "79f36e92e4161ea61c072a16b78eb97bd7d72efe5a5cd8a4197b9c12246cb748"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8a45d828bc58ac263267c3150c31d11adefd93ab80f447aaaf89b1d6881c2da9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6ed0fc48edcc7e6e85bf265ce211803a9d3cccdded97a00f738fdc09d9dff746"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "437ce3f4e9cd2fcc67e3de3a21a7cddfc8808610d56d3eb6c20fda9e8b239a1f"
   end
 
   depends_on "go" => :build
