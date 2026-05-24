@@ -9,8 +9,7 @@ class Pidcat < Formula
   head "https://github.com/JakeWharton/pidcat.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "c340b62825f294103c9e4866ca70e7cc13b85fd6adafcee7d9661bfad1743949"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac0f56b4ebd5a902e072f440e65ff3f24132e3e12dbff150c9345fd817cb98b2"
   end
 
   uses_from_macos "python"
