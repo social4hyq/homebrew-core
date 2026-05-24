@@ -6,12 +6,7 @@ class Grex < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "030f136816a772a582ac3db3b5ec654f2cfc6b5e8c22578f5e9d18c2b01ae4cb"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "bbe575583c67bfca42c2d611667344884f3b920dbefa0ac5c6009932056fe70d"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "92e29f2ea3d5978f6f08a40e68d0f46a620651cefbab8abbb62bac1c53507d40"
-    sha256 cellar: :any_skip_relocation, sonoma:        "3e3e2f535113940e271df53d0d7057ea92f226085e7466e86093a4d2c6597f2a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "816de4349a92fd6750e0b3e788a52299cc06419755664689cf9d9ffd68b2bd93"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "661eb34ec8341b463464dcbc6e4a55b971b6cb7a1c2a6c46e123f4e643cb1cfc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "801ee3e10716ced777eb15e0f0699d05930b9d1f19c4e7556a332cc02c7e7746"
   end
 
   depends_on "rust" => :build
