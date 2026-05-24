@@ -14,14 +14,7 @@ class Reuse < Formula
   head "https://github.com/fsfe/reuse-tool.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "b0c54095d67e082855143d97b642e9912f59182e89d082f6a69cd649afca0d82"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "9648e3d0ae7497eb247f4a461602f1f7f6a876bc18f724eea8d314cc0fc75e1b"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "327e52d1a950d585a5cd0a3def3ddc7f8f5ef87857bc681ac9777dddcc8c260e"
-    sha256 cellar: :any_skip_relocation, tahoe:         "38fdf43c2bb803c2a4ebadada4e3af205d2119f3e17e0c68ff0fbd998586ddc4"
-    sha256 cellar: :any_skip_relocation, sequoia:       "27707a68325827425ec1cdd5f1d48bec63f7a84d2d5f66252b962b72c87b1824"
-    sha256 cellar: :any_skip_relocation, sonoma:        "389a80a6fbc3cfc0c2b610a125af1752cf3e9daf6b4a398c6f46a57b5d03c95c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1eb816b024f2264daffcf5e2cd000c5087ebc15254fa4016538d7a563c9d8d94"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9e41b6ec378751332431d99ae9947c34451c4b82768d7105710f0acce38c0602"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "266c6fa00a6f636d88a41bc1a57d54f0ff67ffcf06cfbe8c7e5689d991d11869"
   end
 
   depends_on "python@3.14"
