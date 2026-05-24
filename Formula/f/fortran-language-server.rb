@@ -9,8 +9,7 @@ class FortranLanguageServer < Formula
   head "https://github.com/hansec/fortran-language-server.git", branch: "master"
 
   bottle do
-    rebuild 6
-    sha256 cellar: :any_skip_relocation, all: "85706cff2dc6e9aa31a471a87a2b387f41d4d0abc306b7c5546a50979f1c5dd7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc52158849355dbd4a962c6b168e41a7cabe1ec28693414a8876b9e9d1dab5c5"
   end
 
   depends_on "python@3.14"
