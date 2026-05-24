@@ -7,12 +7,7 @@ class Berglas < Formula
   head "https://github.com/GoogleCloudPlatform/berglas.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "af290a1925b93b7f5855ea1427806c79fbbf38a0d196d840cde07b7d39efd83f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "af290a1925b93b7f5855ea1427806c79fbbf38a0d196d840cde07b7d39efd83f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "af290a1925b93b7f5855ea1427806c79fbbf38a0d196d840cde07b7d39efd83f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "528b3de430c3438b2a4e95e5a9cc53f141e5378bfcc9c88d9f4dc37bd306d7dd"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5c9105638db80c6da819ec2e0925431ae842164746832db5195d6c099f6aebb7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ac83591bc43ee9f6e9aacedb6ddbe6158d3d6e6093e1928dbafda859df508d13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1fbf92ebae482953b99ab9dee558e203367dc6b228de9ef10aef4fa25e40fcb"
   end
 
   depends_on "go" => :build
