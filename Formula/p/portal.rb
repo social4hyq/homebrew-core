@@ -7,13 +7,7 @@ class Portal < Formula
   head "https://github.com/SpatiumPortae/portal.git", branch: "master"
 
   bottle do
-    rebuild 4
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "8a0fececdc0986916ca99288467480b34e73c7340a73dbf2a6686aa15f2c1e09"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8a0fececdc0986916ca99288467480b34e73c7340a73dbf2a6686aa15f2c1e09"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8a0fececdc0986916ca99288467480b34e73c7340a73dbf2a6686aa15f2c1e09"
-    sha256 cellar: :any_skip_relocation, sonoma:        "6be6e1884a5456ed3f4b00af608eb1f7fe3ae61c24955e849be533e160f8f2d4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "618c8281bf6be5da1a11265d37c59366cf95968f5be4cb83cc1a04bbcb06c038"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c25fecd8c524f41b67e339aeca037e7782f157384c99ec550ccfe3d627f012ef"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c41af489a23db6103aeb324d5e99c012281312df75105730b88df9afa673fb66"
   end
 
   depends_on "go" => :build
