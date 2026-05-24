@@ -12,12 +12,7 @@ class Libgrapheme < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "df5f451622029ee5e1e85d53e9c754527925124250633e0b9df7c13beaae176f"
-    sha256 cellar: :any,                 arm64_sequoia: "fc30d10212e3e2753b9df11ae83516604b0927387a03045434ce4799b32aba1b"
-    sha256 cellar: :any,                 arm64_sonoma:  "c2a97fd45b2768f92820a123be312808815983c1daf4ea5615bfdc6fd4436887"
-    sha256 cellar: :any,                 sonoma:        "433662111557ba36bd9fbcd35147cff1c2f7f0413d3ecedcb4e1460ad7c9f6da"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "98efa088f464cf572e88af5699db2b15a326b4e06a67a072cef4b11814e200aa"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ba1358d8b88e8ce243d39c7eadccbccd14b13b095d6a6be4ff5240cf36e5ac59"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "faf61232e091c735e9240b26227ce072af817e6adfb93bf71b0e479584fd30d0"
   end
 
   def install
