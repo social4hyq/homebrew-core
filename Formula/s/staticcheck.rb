@@ -8,12 +8,7 @@ class Staticcheck < Formula
   head "https://github.com/dominikh/go-tools.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "6bc71600c1105262d91322e597745d92255f01053ca9559d3992e667f7145786"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6bc71600c1105262d91322e597745d92255f01053ca9559d3992e667f7145786"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6bc71600c1105262d91322e597745d92255f01053ca9559d3992e667f7145786"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b3bce61f9a8e23c2f8dd448450bfe1f33d8edbf811021dc5c86487ea9eb9307b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "dad5b5b2228628ec8abfeb47ef5f1f0b1ce42bee27efee86a0d28268d9a5d5a8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f013a6d320712298004c2f8811ef24033d9a6c2de6a6c79e7545fba73b58566d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "46b96e947863624cf648822657c07ed935684daf4ee7ceb20a80f865f6c6767e"
   end
 
   depends_on "go"
