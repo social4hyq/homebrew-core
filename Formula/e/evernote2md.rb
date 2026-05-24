@@ -7,12 +7,7 @@ class Evernote2md < Formula
   head "https://github.com/wormi4ok/evernote2md.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "cc05023d2f533a633f39bdc2b459410d5641f34d25ad36869564cfb1a5588b93"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "cc05023d2f533a633f39bdc2b459410d5641f34d25ad36869564cfb1a5588b93"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cc05023d2f533a633f39bdc2b459410d5641f34d25ad36869564cfb1a5588b93"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b7dbea9edb565c916a6421b4ccca7e02bbc3103717363865a48bcca01988c110"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "355b84e80e8c95f159d6c1323b5765177b4b285139aede2db278ab44dd89577d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ad6aabd701ef98384847b5911bc5740aac59ef85bf9792c52145fec41f344449"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ae33e3ac4c7cb19d4d8658c8c65667ba04b84604e8f772484dd6c3e366b83c4"
   end
 
   depends_on "go" => :build
