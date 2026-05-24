@@ -13,12 +13,7 @@ class Typst < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "2738746c9daf5fb61f4876795e566c5588ff02470c327c0d3f6af4db503499c8"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a1b783df0ce10158ba147e57272e785e396b8fcbb0b3b3de9ac0058c357acbd8"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1e3adc8d6a1705b65e34c942b82124138eea08a64474690e1689fe6c1814248e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "62962c34e2c3f8fc075fa8ca04e88965c2ae2715d09b96607781230eca0a8eac"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ad6687a01c4aa1c72e513d29f57160feea70698a748c6556308d573b091b7603"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2fabd914210b5cd80e65fd8884ef448f4317920ab09dc890b07578947f9da1bb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "84edf904c8333d653ea8acb1cc8f0dbe72604ea851d02d35acb6a42baece8e25"
   end
 
   depends_on "pkgconf" => :build
