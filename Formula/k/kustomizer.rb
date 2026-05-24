@@ -7,13 +7,7 @@ class Kustomizer < Formula
   head "https://github.com/stefanprodan/kustomizer.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "adbdf2f47318e66addd680e6528bb80c8891bc65baa74cbc91223c16587a4339"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "18175918940bf8594cb3bcbcdc1517f32d70d57ef4900ba3ee282543f6f7344f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "eefd823c09b2da2b28e381cab34fd602f0cfac1419f640382a92091a7c20a936"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c04691595c0fc7e67cffa06e89de8c42d4ac72762bf3ccf497778500049a3c89"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "cd7029079ab5ac2601e34ef3f644f84498e392f8e200d0e552997b7a94150d02"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "518b679442ab62cd90e797ac9ede68f336ec9557eae9ff2ce157ebbd1785cb15"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "86cdd71bf7450f49d97e70f416b954b42c25bd5f9d36ab36835ac4d3b14ab652"
   end
 
   depends_on "go" => :build
