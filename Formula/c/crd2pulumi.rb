@@ -7,12 +7,7 @@ class Crd2pulumi < Formula
   head "https://github.com/pulumi/crd2pulumi.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "b7da0ea7695ea0d758899ac82e4587fa4e1ad4833b6ccaec37fde8f2c33109b2"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0b96823b4f6118f679cff33334e2265f8ebe47f9143ee8517b1f4150a5255ee5"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2cd71efb02262c0a13c361877f7c7d72aaf29129ad3e950a8408d980867da47d"
-    sha256 cellar: :any_skip_relocation, sonoma:        "05d07c058146e1ab46573483cdffb215998bc5e45f09216cd87cc40c00298694"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5bc849ec8c4e537395f8848c38b6efaa7596d8465195bee34fea13d2b08a2b15"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "79965c3032a6e4efb67fcc2222bac344808753bdc24e4c777d6c21683c20b5b9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0f70293a4887d13b301fd6b09374cf19375ad8abc8b6072242e259a5a9ac198"
   end
 
   depends_on "go" => :build
