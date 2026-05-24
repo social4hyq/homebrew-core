@@ -6,12 +6,7 @@ class Gurk < Formula
   license "AGPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d51e753ce3f279e3d9dfdfd60deced869c996e8fdc29ec7e6bb769d6e4680d30"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "40b88b0600de65cf507801dd6ec8e4492c12f72bd2c2a90fe787be30672cb681"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1b197dc77ec944a137ec15d2d23e156c83b5a2367ca08adf94a2054ce37dd33b"
-    sha256 cellar: :any_skip_relocation, sonoma:        "fa085cf56a4c1e466e3a17f3d51e788ffccaa7db738d98ebcaa59f689830f20c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5b0aa9ba5d6820e76156328750d5e571d9c82f5af17886b4eabe4ab07eeda9e3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d2cd983ea34ac4c5d7f1ec14e75e12f95426bc1c1e0c4077d05a9226ead44789"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aced43b2c6c955b4acb623257dc746c4d9682280c810b8ce71c9e95587fcf18b"
   end
 
   depends_on "pkgconf" => :build
