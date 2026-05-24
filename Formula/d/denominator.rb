@@ -11,8 +11,7 @@ class Denominator < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "3da7d5704460e94f75bd1241c7d285971b2c22f23633c2cea058cccefc6a65e5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e4d92d2ebdcf993a4569902547f1504a32d70c2458260be3fbcdb8c300b2d49"
   end
 
   depends_on "openjdk"
