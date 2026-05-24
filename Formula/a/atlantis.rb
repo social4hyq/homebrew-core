@@ -12,12 +12,7 @@ class Atlantis < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "936e027e21b93fcbd120e6f0f29f2b4496f0580df067e31d373c46bc5cb61786"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "936e027e21b93fcbd120e6f0f29f2b4496f0580df067e31d373c46bc5cb61786"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "936e027e21b93fcbd120e6f0f29f2b4496f0580df067e31d373c46bc5cb61786"
-    sha256 cellar: :any_skip_relocation, sonoma:        "059fdcea072d170ba82e1bbc2b1a64376ca317c1ab0bde2cf6450c85d9e98443"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3513ea896f10b09ccd8040724441564738911dd5ba577d47a74f1fa63ed06446"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "db686900c112720258fa4c4b20f23b6c6028082777666efb513502ac5c009bba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f57a1aaa1ad14e71fe4edb9cb8e621cc393737e9d0bbc32fcfb9a5dae8cb2b0"
   end
 
   depends_on "go" => :build
