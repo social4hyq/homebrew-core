@@ -12,12 +12,7 @@ class Watchexec < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "b83ea813dd68942f4769d44173d33eba006fbba0450bb64eded1b054a9449f7a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2ce4763255e2632a40464adee002bb35bf37c04a6b5090e736669e264de4fea7"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7d0e3def74eee7315d2aa90cc779ef9115f1a6195ab0e0519c6788d9ed88719a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "85727a8c34d572087640eb7ae96453e35179ea8f0bbece3b138fdd9ef8291c37"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9867ff406d49e1f1d91abf8cb26979b2d7bb158c9d8f3b7a5f48a4b430ad1a2f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "afdfab9e84a51ce17751198df9bdd410ee28fe2ee923dc50cbf1701b2b9fc696"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "beb3325a8d45ccdf5369bc93c3d95dc15c9cd1e3f3f393df632fb3eea189d7ff"
   end
 
   depends_on "rust" => :build
