@@ -6,8 +6,7 @@ class Chunkah < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_linux:  "114636b1afdb3737b00df839b2d60e85720c32cf52447b0dcd529edbdffc25e2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "37c30bfa7e51df8d10ef55ea52f16e2e3f0756af0426ad02feff1dc525ad8e2f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6904688860c897f6b4f234e92388e9638f72d4fe7045d0ee96cca62f2917bbf"
   end
 
   depends_on "pkgconf" => :build
