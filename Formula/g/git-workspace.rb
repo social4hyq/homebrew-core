@@ -9,12 +9,7 @@ class GitWorkspace < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c6ac5f815523a23ed6bd0612293d2221f87d929d94d7789cc3da6d504e47fbcf"
-    sha256 cellar: :any,                 arm64_sequoia: "6bf616927a82d2d116caf1650507e88be477c9d1d8548c4ebcae2adea6e294ec"
-    sha256 cellar: :any,                 arm64_sonoma:  "bbecaf7262599228c1c15472b78d72be552516800ac1a09d89dff83400ba588b"
-    sha256 cellar: :any,                 sonoma:        "8212ca5c8a97fa76305697d8a107dc0c173e07473fa562d6dc810cb570689da9"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c9fd69840b3ef28bb3aa567819a5e81f06e5a49364a43ec03ceef8b73dd5d54a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e3d0bcdf8d607acdee86c6dbf299e84d6991ad6439b372ea2490eb1509f92c85"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88ff72bf6cbbc08b47b3489fc6d9dbb9f9bb203e0d976102b687ffaa0f0e9cf1"
   end
 
   depends_on "pkgconf" => :build
