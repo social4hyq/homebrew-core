@@ -8,8 +8,7 @@ class RbenvBundlerRubyVersion < Formula
   head "https://github.com/aripollak/rbenv-bundler-ruby-version.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "a8b7118dff025b078c5ad1206cc616e5bf436faf1516dbaad4c38a18e31bb0b6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2a1910c08a31e2eb02b4eb3dd2c0df0a7a8328671cea45be6045662c8e091d0"
   end
 
   depends_on "rbenv"
