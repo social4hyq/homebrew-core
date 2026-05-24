@@ -8,8 +8,7 @@ class Ddgr < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "fe1e5b35a67ae65335a46b0cc9fa8d362f9196aa64a527f7f73210d95fd97848"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8308708ee384603cba8e95e88a26b94a1c57b03248d3f328853c788586e8f005"
   end
 
   uses_from_macos "python"
