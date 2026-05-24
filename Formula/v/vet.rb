@@ -6,12 +6,7 @@ class Vet < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "7f9e98ce24241e42b68261a8369158e552fc4cf7d0fd01c83a49438bf282a039"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "dc8bbc5fd249a087d22328b6f1448513b0581e16e9a6e53bb407556dcd074ea9"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5622cd2479bdbc645d060f5d9b62abe57084664a3883dfb5c9a3af0f0e7b2b2a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e1c92b485e2f79c4176f832a6e07a65ca8c7ff24e5fded7e212ce28d3f98610f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2144e9f8d5b062c5884e83ad8cb7904de304fb63cc5806c83d4b0d722daa7979"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8c228497bc19540e0f06c3e735fce94f14399761127435248bce7a201a32c444"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cff67bfa1d480c32dc39604f39ecccd1b825c79f52d830ec72e4518ae303b36e"
   end
 
   depends_on "go"
