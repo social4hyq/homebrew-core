@@ -17,8 +17,7 @@ class V < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "02186023120c9b712a9eb310bf10b090cee1e693c8e4f302880a414d8ea6f3e7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "59e61abf25b0896aea4488a3c2846b9f4e3dfdd77517aed44e59507449028308"
   end
 
   uses_from_macos "vim"
