@@ -8,7 +8,7 @@ class AllRepos < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "9cccdeefabe4b8761ca38ab654c85030fac831d5335984d16cbd9ee93c98c088"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "04168157608ec622bfa23404393308f81bcb9bb6634d1a49a13161f9feedaacc"
   end
 
   depends_on "python@3.14"
