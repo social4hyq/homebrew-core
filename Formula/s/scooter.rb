@@ -6,12 +6,7 @@ class Scooter < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f47f34bfe8e007013325917529dd9e5796895f680c0d642cbc60c51b214df548"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8423bbcbade98ae7779bc685e4e4ed3177a0950bdf88b060b87cf6796ac0ed0f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "034ccdef1d9eb02cc0b150bc12f0b86f98329690637ec7fa95cf69c447123f43"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ed2ed787577555c3aab1ee1863ed99a920d87968101d88718129feb30d6b8897"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "38dc3762428f2ccb996bd0ef307f78e077dda08f51c3d104aefa02c13d659c59"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "81c98cb1300154d955ba91e55128c7c2379648e15e56c82afb95e6dc3dad98f5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "79b2c50a9644e04daa7fedf4be73bd50f8bfaf28d61657116c0a8358398a121d"
   end
 
   depends_on "rust" => :build
