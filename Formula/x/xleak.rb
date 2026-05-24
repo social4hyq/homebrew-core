@@ -7,12 +7,7 @@ class Xleak < Formula
   head "https://github.com/bgreenwell/xleak.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "3bc979de348ff1ec6be5242e9a8463e54e424a97ed7edcfa4c0f94e843708e64"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "893e86d3d5f99517b31573fb0ac0cd2f415a639578105391ab2a2d7bc2b25db2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "a75c0adea7fa0ba82415e90224757ee356e4a0d24e3a27569d9a8fbdd059ed17"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d38c9643c3ec5123ee32e4c7df475882fa9dcdfe70e338571229065f4445cd73"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "508d6a9bf70e935b1b7d6a12fe94a9a240c0529cb00c39673a154725deef1aa9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "18ec2991f6222a7a083d933ead2ba84537da49c1827fbe5498a871a103cade11"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "587d6fca60a18d4d9bf5422cca86352e76d0d57f76fd5c0aa2af1c078d371124"
   end
 
   depends_on "rust" => :build
