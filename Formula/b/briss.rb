@@ -6,8 +6,7 @@ class Briss < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "7e198b253f493cc8b14159aa43e522d82a8ce999959f36a66ae0a1d86a173496"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e3e95c00cd08b3cca1d218558278c4724ccd9ef19f2a48c2f02e1c0fbc6b357"
   end
 
   depends_on "openjdk"
