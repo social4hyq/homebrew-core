@@ -7,12 +7,7 @@ class Termframe < Formula
   head "https://github.com/pamburus/termframe.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "1ddc7b3cd96bdce2b7bdd6c13aa671b49cf67045705ced9a5a01262c3d5548a8"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "97bcbb0f1c9667d34efe500f8e19d09245ac7f505c516f3834bcd1a92cc5a86e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "a9a872033edf2195c52136ba5a38c1f022202429a589e73a7aeb55de6598c9ea"
-    sha256 cellar: :any_skip_relocation, sonoma:        "f6931e26ccf476cadb38029969f80a0e69e5d2e4d2b8379042218033323f95e2"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "742069528599c38f971da5de0d20280e0b0adb84d58f6c29487ba68e9490a7f7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0143c34b297832ffe12b1091c96bee570c1ebc774b502ace875a4a819376c395"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d602de2b066855761f0bb084a4629182ec89a732b075ce116c88d445157177d1"
   end
 
   depends_on "rust" => :build
