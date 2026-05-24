@@ -6,12 +6,7 @@ class FontUtil < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c36ca76580fb353bdfe1380fd2f21bda85acccd1a877a231af3053752e4c48c7"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4e57594b7b9b844d9ca329f6a0a5e579ea4d7ca1f62cd3815d98a3fe19ff2f6f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c409f69f033ad5a336b146d8af4a884c941dc6f02840dfd2f38b63e0b3476bf0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "2ff16d09fbc8f9efdf1ffb3c3cb6dcb1f01c3e39042c75d572a8f7ae3f84b21f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a6dcbba120003015b76776467dc9354131b9889e8feb84be4f24fddb181aa1ff"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b9586086bb39cbbd36fa3e2846e7ac568e435e50e43ac1adda639642ad509e05"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03963ff59dbee1aad3223b32f928283eb9e186d41217bda0b626bc5edb13d90d"
   end
 
   depends_on "pkgconf" => [:build, :test]
