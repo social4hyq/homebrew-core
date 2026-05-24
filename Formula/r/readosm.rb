@@ -11,13 +11,7 @@ class Readosm < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "b9cdc6c5c9194b216fe2df7e303cbd7831365325890ab9567933091b14849b29"
-    sha256 cellar: :any,                 arm64_sequoia: "d4d433f3567a69df0994f2d34b5f99f6dec44c0bb970349a109395ad5b9c5fef"
-    sha256 cellar: :any,                 arm64_sonoma:  "66da664066779580d86bdae1c90b82832266478a6cea81e290fc631ef0e348ff"
-    sha256 cellar: :any,                 sonoma:        "1626ec8c44d88617a959525944a159132195750b514c4f92b3121b48bb0b8a20"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7257fd4fffdead318a4e24add70b3058aa1c3433391b621f2d6ccfbb35ed0745"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9f0db0c6070acbea09714988ab99e87fc6dd8610b8d07e7011a9b599608958b5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a3268a38606bf3c6e0458df1b7ff395e230f745bf227a93bc186fd3a66be2ad"
   end
 
   uses_from_macos "expat"
