@@ -9,8 +9,7 @@ class Csshx < Formula
   head "https://github.com/brockgr/csshx.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "b8bdc972870bbf205b870ecd86251a2975d517f0da679aecdc0299b9472ef338"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "54e3534c5e9c630e932d8a50d4d49dd0aa238f15719df00d6866f08eebfd94bf"
   end
 
   def install
