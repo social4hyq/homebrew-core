@@ -8,12 +8,7 @@ class Jadx < Formula
   head "https://github.com/skylot/jadx.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "056438b2c1a698a28a6989a8ae959b1374c3830a706b46f79ed3e7bee0f12bf0"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "056438b2c1a698a28a6989a8ae959b1374c3830a706b46f79ed3e7bee0f12bf0"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "056438b2c1a698a28a6989a8ae959b1374c3830a706b46f79ed3e7bee0f12bf0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "056438b2c1a698a28a6989a8ae959b1374c3830a706b46f79ed3e7bee0f12bf0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "6a2825b8b309e071bed53f619a343dae20959dd2bcc5fe196d62ff2a80b9799a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6a2825b8b309e071bed53f619a343dae20959dd2bcc5fe196d62ff2a80b9799a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c2cf6d27990c80824f5527469cdb5ff3899547fa1026b63500ff2e8652439cf"
   end
 
   depends_on "gradle" => :build
