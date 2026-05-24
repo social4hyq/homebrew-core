@@ -8,8 +8,7 @@ class FregeRepl < Formula
   revision 2
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "f68a61801c7e99908489f6339d178107252377a08db65607849027d869df9bd0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2983cf8dd83338c2eb933102768e01584b75de0c6a61b6a152d914cacfb50adb"
   end
 
   # Last release on 2015-10-18, last commit on 2019-02-22.
