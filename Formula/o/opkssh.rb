@@ -7,12 +7,7 @@ class Opkssh < Formula
   head "https://github.com/openpubkey/opkssh.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "75cd8f256c04f68eae4887d6cd7c76a6a34f5168f1345c67aadd1a5a286c3675"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "75cd8f256c04f68eae4887d6cd7c76a6a34f5168f1345c67aadd1a5a286c3675"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "75cd8f256c04f68eae4887d6cd7c76a6a34f5168f1345c67aadd1a5a286c3675"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b40cef57eaf2d9796186e37a3314356c1fe3d3e8dafe7927af39ca97f504fe14"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "aeb363eb5be7cd1f301ef7599681c2487138cdbba94c4138f5f763d54a3e4bd0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "cb41ada7d51db8265952374b9624627c1255c12fe152e3d7d4f81f66008085bf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a50fb23ea41df9104da0718528c4813bd90663220a72f1f302ce4416fb87af1a"
   end
 
   depends_on "go" => :build
