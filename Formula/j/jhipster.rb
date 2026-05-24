@@ -6,12 +6,7 @@ class Jhipster < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "ad22b413db1ecfc25d480d6dd863620bfaebafa9521dfee771231facf3e9f078"
-    sha256 cellar: :any,                 arm64_sequoia: "dbeaeebbe81a851ba31a2e77f23610f363248814bb753d805cc957e71bc86520"
-    sha256 cellar: :any,                 arm64_sonoma:  "dbeaeebbe81a851ba31a2e77f23610f363248814bb753d805cc957e71bc86520"
-    sha256 cellar: :any,                 sonoma:        "c296567cda4ebc31a69aafe7039b2982e952ec8b4ef43fdf357f964239b383da"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7d68bd3f1cfcc119ec15b790a978a3c71a11d4125e4236dcde02b693043a4acd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3de941726eedc92628ddea5d8fabc695dc92aea0065129e822edf6d799b9a8ed"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88a31d7839c56826618230a538745bc2986936a5d694a083f258ddcd605ed728"
   end
 
   depends_on "node"
