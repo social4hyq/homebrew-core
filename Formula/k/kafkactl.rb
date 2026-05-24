@@ -7,12 +7,7 @@ class Kafkactl < Formula
   head "https://github.com/deviceinsight/kafkactl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "4d95d7ebf8ff3e1c94f18724d521f17560a3319445452259836b485404869389"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4d95d7ebf8ff3e1c94f18724d521f17560a3319445452259836b485404869389"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4d95d7ebf8ff3e1c94f18724d521f17560a3319445452259836b485404869389"
-    sha256 cellar: :any_skip_relocation, sonoma:        "328ae0ff89cc97beff84ccf0995dd098750d06076b898283311787e066a0bada"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8b788c0ec91c1a3be73f10345bb5f8ba2fb71073d4364b91a8e869b65df34f81"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "bcc25a952ebfc83251847dd091671799a2f857288309f332a3051362b7580c5f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "672364fdf764e6b2b6b3313c770972b771788f977d6dbae22af97878f5bc97e2"
   end
 
   depends_on "go" => :build
