@@ -9,8 +9,7 @@ class Fierce < Formula
   head "https://github.com/mschwager/fierce.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "96b093b0e668c92c6bb46ff8603f42460146ae4cd195978e8cbd502e7ce183f5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a62a896acaeee1ad25f8b6812d804e9d681533864388625134b9945804e9c7e"
   end
 
   depends_on "python@3.14"
