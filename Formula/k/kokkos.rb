@@ -13,12 +13,7 @@ class Kokkos < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "67df6bee45072b72e93fd0558234bff4e761f8205921c7213460c82167ad1f24"
-    sha256 cellar: :any,                 arm64_sequoia: "f95bda78be3db9f757a285a7b83dfa4d562438e9f4d7d388bb0e1fbefa1cd183"
-    sha256 cellar: :any,                 arm64_sonoma:  "45a5269e3b68ef17296a4f02d31e31fac57bac302407692cabb69c57609b6278"
-    sha256 cellar: :any,                 sonoma:        "4ad47a155b302b6c3740cf88273cb000fdd9da93673b90dd1bcdca8fbb06a9ef"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e991ab7077e883453986fdf5b95539c3626abc77da9d3a3cabae7483ebe1150f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7418f122faf85fff6bc17a369cb11f24bbd747fd33570545d42f9eac2f21d68b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b946c4de2f61f41b9089b2516b8904ebef1d81cad6a3797547418c30e006abf6"
   end
 
   depends_on "cmake" => :build
