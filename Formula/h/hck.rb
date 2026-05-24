@@ -12,13 +12,7 @@ class Hck < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d4df79cddcbf021932b7300c9a6cc6cdebc9b9d85a551353456d4f8c8c07538d"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6b3406b0ab689cba7e8d8ffe40033e3b3867ac0527a3c7a903915254532f6a6e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "93ce77bb3b5310079ada1d764f560e692d96b4ca65aeaa90893195aa5d58abb0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "f6a147eff8f1e3e69aeeaa681afd81dd69e19bd865e0b675b21fc680fb752c80"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0b6a6b21c1ecb5cf9da85863fbf8e23e05275e1a6883552199fb697f12f99e05"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0b46f9971e8d64866900c0b57f67903455d7c0dbeebb4a5fa59e093118b150ff"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9678e8c94d085622f9572cd18ade02ebd7d5d68cee61759866812d8dc3db3a4"
   end
 
   depends_on "cmake" => :build
