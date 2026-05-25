@@ -1,13 +1,13 @@
 class Hcloud < Formula
   desc "Command-line interface for Hetzner Cloud"
   homepage "https://github.com/hetznercloud/cli"
-  url "https://github.com/hetznercloud/cli/archive/refs/tags/v1.64.1.tar.gz"
-  sha256 "70bc7d62f4d07b408afa2eb84b0e1e5854a7f32f9defb4899f2e9a24b6846078"
+  url "https://github.com/hetznercloud/cli/archive/refs/tags/v1.65.0.tar.gz"
+  sha256 "85a9d35760c0f694c32a7aa07eac454f48e47b8e826fef8c9d28a720b3d3a17e"
   license "MIT"
   head "https://github.com/hetznercloud/cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "81cb66fcbc2bb227efd97ad4f8d313b28122667aaa0260a08ed1f6fe25cc5544"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a95d9cb3b56468871c724168bf1c157ca130025e11f69da1648a13bf1f3e5e21"
   end
 
   depends_on "go" => :build
