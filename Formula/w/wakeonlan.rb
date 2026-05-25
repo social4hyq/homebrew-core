@@ -6,8 +6,7 @@ class Wakeonlan < Formula
   license "Artistic-1.0-Perl"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "0859c811ae72fce06de1a607d36b0955517c80f5ea73431ee6c1dd38c749a0c6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "58dcd3f02a2f7b3ebdf440b625fbaac455f80519dbcb5e1d2981a1a22f058616"
   end
 
   # Build with Homebrew `perl` to build an `:all` bottle.
