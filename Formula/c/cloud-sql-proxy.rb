@@ -7,7 +7,7 @@ class CloudSqlProxy < Formula
   head "https://github.com/GoogleCloudPlatform/cloud-sql-proxy.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "22b499646177b85339995ae8360ffe37ed2ffa7317914408e26bc81ff30a2d50"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3118be5f3d851fc5facb46df92a191ae93b7cfeec917f69f9a5898bb733dcd4a"
   end
 
   depends_on "go" => :build
