@@ -1,0 +1,53 @@
+class Libxkbcommon < Formula
+  desc "Keyboard handling library"
+  homepage "https://xkbcommon.org/"
+  url "https://github.com/xkbcommon/libxkbcommon/archive/refs/tags/xkbcommon-1.13.1.tar.gz"
+  sha256 "aeb951964c2f7ecc08174cb5517962d157595e9e3f38fc4a130b91dc2f9fec18"
+  license "MIT"
+  compatibility_version 1
+  head "https://github.com/xkbcommon/libxkbcommon.git", branch: "master"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4071780fa15ed8c2fdf067edb49f0d3307adb22d3ba45cce228213170b27792e"
+  end
+
+  depends_on "bison" => :build
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
+  depends_on "pkgconf" => :build
+
+  depends_on "libxcb"
+  depends_on "xkeyboard-config" => :no_linkage
+
+  uses_from_macos "libxml2"
+
+  def install
+    args = %W[
+      -Denable-wayland=false
+      -Denable-x11=true
+      -Denable-docs=false
+      -Dxkb-config-root=#{HOMEBREW_PREFIX}/share/X11/xkb
+      -Dx-locale-root=#{HOMEBREW_PREFIX}/share/X11/locale
+    ]
+
+    system "meson", "setup", "build", *args, *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
+  end
+
+  test do
+    (testpath/"test.c").write <<~C
+      #include <stdlib.h>
+      #include <xkbcommon/xkbcommon.h>
+      int main() {
+        return (xkb_context_new(XKB_CONTEXT_NO_FLAGS) == NULL)
+          ? EXIT_FAILURE
+          : EXIT_SUCCESS;
+      }
+    C
+
+    system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lxkbcommon",
+                   "-o", "test"
+    system "./test"
+  end
+end
