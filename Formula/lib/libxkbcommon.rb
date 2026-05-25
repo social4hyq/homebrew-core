@@ -8,12 +8,7 @@ class Libxkbcommon < Formula
   head "https://github.com/xkbcommon/libxkbcommon.git", branch: "master"
 
   bottle do
-    sha256 arm64_tahoe:   "b3ed10e5f7df8fc19afc02a50ee79ae13417359214bf517b95020af18d0ac8ee"
-    sha256 arm64_sequoia: "460f8264639fdbb80451252d5dc70f731e46f4587b15dccbe487e6248cf5d439"
-    sha256 arm64_sonoma:  "0ff01cd751c19985b6cb9dce8da5a247606f05b403311cd0537389e69ff5d93b"
-    sha256 sonoma:        "fe537a2c8f25c11af6015930b3f9b5145416a15e51dcc4ed7565a02546828bd7"
-    sha256 arm64_linux:   "bce2de8042eb4c07a8b83730d3ed5ac0d8588af1b9efa8046a98f30f3213ec0b"
-    sha256 x86_64_linux:  "f57e780a55d512773318d422adabf4d01e3b312d61c6c8437b50eec034e2b787"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4071780fa15ed8c2fdf067edb49f0d3307adb22d3ba45cce228213170b27792e"
   end
 
   depends_on "bison" => :build
