@@ -7,7 +7,7 @@ class DerAscii < Formula
   head "https://github.com/google/der-ascii.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e027e6792bab63d759493210332d7d2986e680b58eb8beac35855a38ed412798"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e419984b42bcf367fc9014e95c31f2d512542139c28a80f83b53c54a1ce9611a"
   end
 
   depends_on "go" => :build
