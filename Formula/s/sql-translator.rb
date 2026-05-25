@@ -7,14 +7,7 @@ class SqlTranslator < Formula
   revision 4
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "6619655ae2fdbbcc5c2213ab55e2ffd0f45d964cf1f9eb1bef7db81e87e76b4e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6619655ae2fdbbcc5c2213ab55e2ffd0f45d964cf1f9eb1bef7db81e87e76b4e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6619655ae2fdbbcc5c2213ab55e2ffd0f45d964cf1f9eb1bef7db81e87e76b4e"
-    sha256 cellar: :any_skip_relocation, tahoe:         "d66c552719a802570cc86bdbb667d0ec83c215b3e68dc3584e76a98cf0e3f245"
-    sha256 cellar: :any_skip_relocation, sequoia:       "d66c552719a802570cc86bdbb667d0ec83c215b3e68dc3584e76a98cf0e3f245"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d66c552719a802570cc86bdbb667d0ec83c215b3e68dc3584e76a98cf0e3f245"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "df14d63cd54e55fb81d663546e14f38ba6c58a49de115302d9dcd960b21f1ef3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "546f4079d19414f1b7fe9851c12f2b846e44869b6c9d4b44f600eea2a6c92a96"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1803323e09ddc2197c1d97beab3fd3aa063868f9d7091c19e9417675e3a2a71"
   end
 
   uses_from_macos "perl"
