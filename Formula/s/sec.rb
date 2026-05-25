@@ -6,7 +6,7 @@ class Sec < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "7ac5555f3b48c112484a49be8909c19ad5d8a0f81d776cd2f70d165e495b790a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2246e8fb857f92fd4de85cc9e948fb9d3cabb6d17b1f91d697ba1b5eba7415b4"
   end
 
   def install
