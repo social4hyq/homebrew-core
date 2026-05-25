@@ -10,12 +10,7 @@ class Dotdrop < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ad90e5e8d2a1342b8d9a0badc1902effbf85f31473b9cb9327bc261b35a08e23"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4807494d54446c9b631cd0438c45f66915c125687b55e7338c46d01e9e2a9d37"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c22f9655d57e2efdbaa6c922eae2812af3a8d632153c7d8975e4212ee1e5f3a9"
-    sha256 cellar: :any_skip_relocation, sonoma:        "193aa17dd383127ed36b592d7fa945cfc7cf56eebcddb25e8d6a5def3c81edd3"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1ee48678f5099481826972f25939c71ddb329200111dc0feb444ba63cb105ffe"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2f59307a670ec1f722beebb55b6502f2fb6c44e4bd75d96ec954a31c6f344775"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c31eab4ccbbc70e426b6a5f33af89f9ace1ec386d71eaa908627bc73d7b0f43"
   end
 
   depends_on "certifi" => :no_linkage
