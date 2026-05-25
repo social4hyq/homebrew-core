@@ -9,12 +9,7 @@ class Airshare < Formula
   revision 22
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "dbf2a1077eb3da41bfe73de325595ffdd80c2cd7a4aca68c0cb1aa179d007cd1"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "442af51ee61ed59a399fcc40a5bf5eec470f7c07a477a1ed5f87a1c4895b2615"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "a419fd50623dcbe4700f87b0396ef24fb4d1fcf82d55bb1c20e32cc76260f8b7"
-    sha256 cellar: :any_skip_relocation, sonoma:        "22763ef97fb433a8e4324be7ec1104a807734bd76166ccde240645c6a9ebede4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b2d406eaacdeda6051c896026eb6f32bb2782ec1fa5f79ffd0bb2dfbd7c3d9fd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "44f92a021c33f87ac067084abab388d8c6488c4da433b6556e31e7da247f429f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b131dc39054d9671f7ccae32d0359123f66aff3e501a2aa97453c8a28ee61e68"
   end
 
   depends_on "certifi" => :no_linkage
