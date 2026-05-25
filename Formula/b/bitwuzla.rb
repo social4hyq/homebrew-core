@@ -11,7 +11,7 @@ class Bitwuzla < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "446dab176a2cb29efdea775b32f17f25404ca782d8f5189b2f65c7fa5a59057e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "adcb4e2a9c9e6917a8e18abdb9e2ca65f46b6e180a484239666078b4fbaf30bd"
   end
 
   depends_on "meson" => :build
