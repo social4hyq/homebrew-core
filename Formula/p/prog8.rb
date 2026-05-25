@@ -11,12 +11,7 @@ class Prog8 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ba0938701b0d057c9e8e37a0465854cad58077ad0a2ea371d57c49ac6c55118a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "3e31e094f79aef84ef2f706b1a6d65d1f55657e793e83a290021cb92fdd37617"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7d5adf3941983e932c50416ddb34c455bfdea187387915212f057e0cdfcbfa7d"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9ba0760196e702e6b2ce31eb89b30bbc52f2ef9644c34e0bc143a3b427d7301e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "be5491e2071cecbe66a83e4fa5da9b4e3a9ef58f0af25c0eb9b4b5324e83ecf1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7aaaf99528177558c2f1cc6109efd62281810ed8aad6dc307d703dedc763f387"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5af6bb453e498e3b330292439f45787d4a9752a60a121ebd6e01149ee53f6e35"
   end
 
   depends_on "gradle" => :build
