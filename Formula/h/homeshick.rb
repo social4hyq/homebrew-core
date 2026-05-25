@@ -7,8 +7,7 @@ class Homeshick < Formula
   head "https://github.com/andsens/homeshick.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "9a93b6514577c36a3de2d9c6a8c3cf9474a6534cc9547407f49ebc0325b20a8d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d3aea1cfe2cf27ecda2bbf1d2bc1300d3216d4531ce45f88a9ac6d5dcc0dbf3"
   end
 
   def install
