@@ -12,7 +12,7 @@ class Libomp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fcb4e46d2bb5750e2a1bd4f02cb259c952fb95dc534d71e43f4e23d8e54e6215"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "71c79fd988ca3416870630ffa2943af7a9f7013c617b394a7f5a2edc864683c6"
   end
 
   # Ref: https://github.com/Homebrew/homebrew-core/issues/112107
