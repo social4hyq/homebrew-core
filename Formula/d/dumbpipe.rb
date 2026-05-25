@@ -6,12 +6,7 @@ class Dumbpipe < Formula
   license any_of: ["MIT", "Apache-2.0"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0281dadcbc93c52e9ffd424be01a308ef2b675a7bc585aafdf7760f0b328c08b"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b6495a8d44cb03b34f6a1505e56cce332badca8345e1faa108c0b508d39ae14b"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "54cb7aa0115a721ff5b3db1fad4e5d1d8e19f7031fe7312ffd714dc51e413be1"
-    sha256 cellar: :any_skip_relocation, sonoma:        "8d4be7804148d7d6b07b363fd0a0df8c6efe3d56ace9d031e30ed360196958dc"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "62c9949b7a6c1f623eafd404ce78db8e650ea67ed3fb7c6e177009c4fa639da3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "734071f706b56540033c9e4cfbf9be295891224e76637fc0bcd2ec6071cab79e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "741d13f4f7e1032d6f564203a9637d88bb9a66375300bc61f92f24a7c5e9d384"
   end
 
   depends_on "rust" => :build
