@@ -15,7 +15,7 @@ class Mt32emu < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a2df6b9f764cf7a24f3466931a2657b575974c5609d112cb9c8da177d59891d1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad290d24cc69e2df1bfa7af5e881e4f1e8810ebff88f43d15824719649a85699"
   end
 
   depends_on "cmake" => :build
