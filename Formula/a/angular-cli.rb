@@ -6,7 +6,7 @@ class AngularCli < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9aac47e459205442c6eb307e1f32099a10a4698d74e294fdae1979d7e980b69"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a7a4e13ee1d0e10e53307f06be38e4f78011464a09528e6cdecf77f836dec07"
   end
 
   depends_on "node"
