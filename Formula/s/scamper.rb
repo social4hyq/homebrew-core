@@ -11,13 +11,7 @@ class Scamper < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "47f78e73aac0167e695c58314dbe01c277c87247efa0414aead6f2fe56056d84"
-    sha256 cellar: :any,                 arm64_sequoia: "6b25a0324c9f243227b8e28768930dba5880d3fed13a101e307251a69ba8f699"
-    sha256 cellar: :any,                 arm64_sonoma:  "b2812101497a7135f6905b845a16fbf431a709d84abe3246f8065e4d8237d54d"
-    sha256 cellar: :any,                 sonoma:        "6cfe785d536a562df48ecf86eac56c463afa6cbe7af417dde4b477328ca99188"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2deb85f1f1bb77f257d316e2862319ba040c81d729d9a837767f857b739dca97"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5cc8ff5978707ad576fa3cc0cf1d2a202f7053b055c333f5dc61c25c6afc9d81"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "912224b77665f27c9737b72b2463126adc946328fd76d2081ad351b57819e05c"
   end
 
   depends_on "pkgconf" => :build
