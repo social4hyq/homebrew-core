@@ -6,7 +6,7 @@ class Jolie < Formula
   license "LGPL-2.1-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "22d036e00176a261eab692373493d226359f4bd044dfc7ace796c423f3e41a1e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e10594b207a7faf8ca90b092ca75019c4b82e1ea19c33e91f1f6faab600c49bc"
   end
 
   depends_on "openjdk"
