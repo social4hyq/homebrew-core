@@ -10,12 +10,7 @@ class PipAudit < Formula
   version_scheme 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "7095460adf026a458a12c856c39cbbd0b33277c85893036e0a71eecbfa08aa6d"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "bb935db477b6400e1b1f8fe5196f6c6181861d5d59ab4650b3ac8b34bcddc29d"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e83358715dbe8172058b17b7e88454b32add1b97dacdf4e3e3dee9585551feaa"
-    sha256 cellar: :any_skip_relocation, sonoma:        "8c03716b215b1979f3ec07e4f41125339708d9321703941d72b2dfe17bc59665"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2616f81c1da58065fcb4a0c8691732a53d2639f24fedffe6fc27f580660ce0e8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3950d8199bda402bd4f30f467f37988b406839cd86f2eb5b6d2c9d8de2e63b5d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "41e07842aff981692b5892991e172887303c48e01c86cccb18ce041c562eb03e"
   end
 
   depends_on "rust" => :build
