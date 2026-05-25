@@ -1,7 +1,7 @@
 class Mksh < Formula
   desc "MirBSD Korn Shell"
   homepage "https://mbsd.evolvis.org/mksh.htm"
-  url "https://mbsd.evolvis.org/MirOS/dist/mir/mksh/mksh-R59c.tgz"
+  url "http://ftp.debian.org/debian/pool/main/m/mksh/mksh_59c.orig.tar.gz"
   version "59c"
   sha256 "77ae1665a337f1c48c61d6b961db3e52119b38e58884d1c89684af31f87bc506"
   license "MirOS"
