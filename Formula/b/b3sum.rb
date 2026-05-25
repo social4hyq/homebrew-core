@@ -10,12 +10,7 @@ class B3sum < Formula
   ]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "747da6f8ba0c8436f3ac3e66aaf5f58730889f6bc6d238c423b0d4969d52b9c6"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "3d60d374e9261723c3af62cd48d0b115ba044afaed3ff09cde4f2f4693ffca02"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c5d460280c439be2c378f4e3e36fa110d32a29576bd167e7fccf6086a42b8c41"
-    sha256 cellar: :any_skip_relocation, sonoma:        "028850c4a12468176ad60a40f9a141b3450e67ea86e51bfbf4adf4f6cc827d01"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "766e5afe0e8ab29d9e4e3f04a7a33edd0536172f99d0b598886d707e9e29dd9d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "47373f5ebe532f264a177f470452a62ce8c037b6b0f1f3d85bc24b0024608731"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d24ae83fc8b47004d81fb3d2ade40087c9dccf76d1cac5c320c1c4465f0ed2a"
   end
 
   depends_on "rust" => :build
