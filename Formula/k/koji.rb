@@ -7,12 +7,7 @@ class Koji < Formula
   head "https://github.com/cococonscious/koji.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "4cc761a36b277b402f160acd6769d7d87e78a073d1238f70604d31480461e688"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6e1ab07ddde1a07445a7de66e374a75c6f10dcf3e02c1d32d606f10832b8c244"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ea25b8a31acdbc887b187dc57401bc0edaa2ac7268352f18f968d46651926988"
-    sha256 cellar: :any_skip_relocation, sonoma:        "0f307d1adfa82da461d9e6823baed76753e7fe209720451037dfecd66fb99ef6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "43ab9f19dba5cac126033a2b3744090f954e40ba988436350691d5340d703ebf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "830f415428a6b7ae48b18baea0a4c4f0e846f23175712271baefa0353fee8741"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5128df4aa58991f3407bb18097980f5dba588455a87a1086cb347e0576e6f358"
   end
 
   depends_on "pkgconf" => :build
