@@ -1,0 +1,50 @@
+class Flawz < Formula
+  desc "Terminal UI for browsing security vulnerabilities (CVEs)"
+  homepage "https://github.com/orhun/flawz"
+  url "https://github.com/orhun/flawz/archive/refs/tags/v0.3.0.tar.gz"
+  sha256 "c5d30dfa1c07f5e5337f88c8a44c4c22307f5ade7ba117ef6370c39eb3e588b0"
+  license any_of: ["Apache-2.0", "MIT"]
+  head "https://github.com/orhun/flawz.git", branch: "main"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b4eda64233961a087f7c398350370a6c28e4647bddfb43ead26d6dd9ba230b7"
+  end
+
+  depends_on "pkgconf" => :build
+  depends_on "rust" => :build
+
+  uses_from_macos "sqlite"
+
+  on_linux do
+    depends_on "openssl@3"
+  end
+
+  def install
+    system "cargo", "install", *std_cargo_args
+
+    # Setup buildpath for completions and manpage generation
+    ENV["OUT_DIR"] = buildpath
+
+    system bin/"flawz-completions"
+    bash_completion.install "flawz.bash" => "flawz"
+    fish_completion.install "flawz.fish"
+    zsh_completion.install "_flawz"
+
+    system bin/"flawz-mangen"
+    man1.install "flawz.1"
+
+    # no need to ship `flawz-completions` and `flawz-mangen` binaries
+    rm [bin/"flawz-completions", bin/"flawz-mangen"]
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/flawz --version")
+
+    require "pty"
+    PTY.spawn(bin/"flawz", "--url", "https://nvd.nist.gov/feeds/json/cve/1.1") do |r, _w, _pid|
+      assert_match "Syncing CVE Data", r.read
+    rescue Errno::EIO
+      # GNU/Linux raises EIO when read is done on closed pty
+    end
+  end
+end
