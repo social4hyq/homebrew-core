@@ -8,7 +8,7 @@ class JenkinsJobBuilder < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2176fabe88528461242c32a718e0ba41fe3c966116a861b38f498601bb1baee6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9cd4b9c777fbb6c2140849fb2c6d144921e8400d3bd9854645d58b96310893f9"
   end
 
   depends_on "certifi"
