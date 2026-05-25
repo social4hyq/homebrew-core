@@ -8,7 +8,7 @@ class Aom < Formula
   head "https://aomedia.googlesource.com/aom.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b97049e5fe90ca2c0931a831b7e4bb0fc8400858a1027090a3ef46b67e325ea7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a1d3e9d6a14e6d70f694fa93aa9126410554e23bc133dfa1e546e7662cdae5a"
   end
 
   depends_on "cmake" => :build
