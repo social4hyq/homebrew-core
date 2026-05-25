@@ -1,8 +1,8 @@
 class Butane < Formula
   desc "Translates human-readable Butane Configs into machine-readable Ignition Configs"
   homepage "https://github.com/coreos/butane"
-  url "https://github.com/coreos/butane/archive/refs/tags/v0.27.0.tar.gz"
-  sha256 "a13ca441c3b4797e9c78fb7ea8335d889c346e5003f2fa7fb3ffaf6cb6de4c86"
+  url "https://github.com/coreos/butane/archive/refs/tags/v0.28.0.tar.gz"
+  sha256 "ae3a4731bc7da29177936a229a962c701249debdf740e10c08c152ff725ad2f7"
   license "Apache-2.0"
   head "https://github.com/coreos/butane.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Butane < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d799d4d2f00511f999f5e2f138b7839cde9c6b4e01e481e3e0922a2b65f0510"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "113c8f6d766ddbcd1d2808b0db8c663bfdf47ede53d1382b5a312a4e240ac899"
   end
 
   depends_on "go" => :build
