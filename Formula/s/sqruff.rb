@@ -7,12 +7,7 @@ class Sqruff < Formula
   head "https://github.com/quarylabs/sqruff.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "2ab549ab645aabbb14466bddb3eda4374fb12b7de0418b20294f7792a72d9a56"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4694a98ad78b9d36a12c6d58510251f0f46e52161b8cebb171690f2e7c68ce25"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "693e56d035ec4b5bca30bab9b4144dc481ac87f0f87a8c928f8b69a373e37da7"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b400c50db746fc0037469a1306e3dc1d648afb4384100e57e520ce461616a60b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f94e0def5eea781a47f353bc4ee0daa33c238d93786a9cfa66837edcc1eb9709"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fc172f149f628abec76def7e4670d44fb0120d6e73b72c7bfb723592966b5fa8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "64b0b0fe7543d10f2d93c494646e491d31b030e3bfafcf28d7a2cc9800efe1db"
   end
 
   depends_on "rust" => :build
