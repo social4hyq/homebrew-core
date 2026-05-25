@@ -6,12 +6,7 @@ class Mago < Formula
   license any_of: ["Apache-2.0", "MIT"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9551a7a5a22b1083e56845e864faba0753dff5ac82f10380a6d5ec75b311313e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "9b450b1d2d8fed81bedb789e7c2ef36b88f66ef2ed489f183cf20e7570fa53f8"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "59212f5a7d8e6391f925c2abfd34f5549ea5ea7a9c3886afa0aad96cb7d29553"
-    sha256 cellar: :any_skip_relocation, sonoma:        "1ddc95ec034951bb9175c93d5b001a2896db071375f3f0775ed77d24496e1095"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d58c4cf84c8f398118177c9af73082eec5ea2b206903136337cc08a0a45dcf08"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b7b2288ca7e59dd60c00b7f55ece1e889ac66dade29c74bbd1db1ba34c73020a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d403fc5dca0910573c10b3a26ae04f590013a040a8a3e83368a4030bb9d8e40"
   end
 
   depends_on "pkgconf" => :build
