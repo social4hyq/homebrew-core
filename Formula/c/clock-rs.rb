@@ -7,12 +7,7 @@ class ClockRs < Formula
   head "https://github.com/Oughie/clock-rs.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "6ab9169308b9683f0c426f2b909c6f2d7893df39f9c1cb6b6e3a53d9c1cd6791"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "80a2f8797600837578f1eb85e630f3637c6b93107c7a3686b55d1616cfa393e9"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f3ebbb592aad42fbb2b49d04d35f8c49c8a38e20b1dfeef7924e939bf6ed50d2"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9e0c08dde682062f47e8886a68a8e5766b124f267610860998f6986818f3e616"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "bd1d3f61c00011290a1b46c7fb1655a9777c719d13a703476519dbcc6a552de5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fab64b9d9037fa76b782bbde24cb59f80072758807cc227626e61b1dd2358c78"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eec7bfb79bdc2d492c49aefd5e955e09461efa50e918240d01f90b3a18aa4125"
   end
 
   depends_on "rust" => :build
