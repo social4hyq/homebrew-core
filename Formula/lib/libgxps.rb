@@ -13,13 +13,7 @@ class Libgxps < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_tahoe:   "edf7249cfe2f25f697df299831a0cfbd6d4fcf3803b1fcd3cfd7a9767e13e69a"
-    sha256 cellar: :any, arm64_sequoia: "898def3c3d5bca3f781362f31e01f7d70126eb9f6ece12187541f121072ba421"
-    sha256 cellar: :any, arm64_sonoma:  "d9f1805c678422455ef617d40683f16d3d37c235a0431859eeacde2d9a0c429c"
-    sha256 cellar: :any, sonoma:        "df638d411daf2a227a103852f5f1c3c66d13b54b84b88b75e5e3ed9b42832c2e"
-    sha256               arm64_linux:   "385727136943caa3327fca656c0a12f8cb4296c9c50fb785725137922fc4ce23"
-    sha256               x86_64_linux:  "ce46fdac05876dd811e370285bed2d68c3d88e474a6f6adaf00cba6c102a8b16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac06f0be145a70c4393812f6cf5540d5a08ab36f12a826f472f4872fc221f898"
   end
 
   keg_only "it conflicts with `ghostscript`"
