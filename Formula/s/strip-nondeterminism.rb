@@ -12,14 +12,7 @@ class StripNondeterminism < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c74b1e7b349d3122995ac522942d868a2eb8d4d18914a36df9a2f2a4599e986f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c74b1e7b349d3122995ac522942d868a2eb8d4d18914a36df9a2f2a4599e986f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c74b1e7b349d3122995ac522942d868a2eb8d4d18914a36df9a2f2a4599e986f"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "a6bd8260e62ce02f163df584fbfd5335bf0209a2fd90d19c0abbed3a62146281"
-    sha256 cellar: :any_skip_relocation, sonoma:        "8f010fb1fe507739c9e008422a72e7d03b9574da8f3dbf40d361bab0808c028b"
-    sha256 cellar: :any_skip_relocation, ventura:       "ec0acf9bc2af17c5698806d4e4038817eb8b97f80baa4e3e1effe3987549c665"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5ff6a548bec5370e987393aa9edf3fb3a10a41409050327af3d70ae3189375a2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e32a0e8ea3c0201f2e8cc448b4b7acfc759b22f14c5315466da11c6db73e2eb3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e70305551bf0aafdaf1935c23dbc4552aef5b9945dacb09f70a8d80a58872b6"
   end
 
   uses_from_macos "file-formula" => :test
