@@ -1,0 +1,24 @@
+diff -ruN a/Cargo.toml b/Cargo.toml
+--- a/Cargo.toml	2026-03-10 15:32:25.000000000 +0800
++++ b/Cargo.toml	2026-05-25 16:25:32.272653008 +0800
+@@ -67,7 +67,7 @@
+ # Catalina. See https://github.com/sharkdp/fd/issues/498 for details.
+ # This has to be kept in sync with src/main.rs where the allocator for
+ # the program is set.
+-[target.'cfg(all(not(windows), not(target_os = "android"), not(target_os = "macos"), not(target_os = "freebsd"), not(target_os = "openbsd"), not(target_os = "illumos"), not(all(target_env = "musl", target_pointer_width = "32")), not(target_arch = "riscv64")))'.dependencies]
++[target.'cfg(all(not(windows), not(target_os = "android"), not(target_os = "macos"), not(target_os = "freebsd"), not(target_os = "openbsd"), not(target_os = "illumos"), not(target_env = "ohos"), not(all(target_env = "musl", target_pointer_width = "32")), not(target_arch = "riscv64")))'.dependencies]
+ tikv-jemallocator = {version = "0.6.0", optional = true}
+ 
+ [dev-dependencies]
+diff -ruN a/src/main.rs b/src/main.rs
+--- a/src/main.rs	2026-03-10 15:32:25.000000000 +0800
++++ b/src/main.rs	2026-05-25 16:25:42.539635746 +0800
+@@ -45,6 +45,7 @@
+     not(target_os = "freebsd"),
+     not(target_os = "openbsd"),
+     not(target_os = "illumos"),
++    not(target_env = "ohos"),
+     not(all(target_env = "musl", target_pointer_width = "32")),
+     not(target_arch = "riscv64"),
+     feature = "use-jemalloc"
+

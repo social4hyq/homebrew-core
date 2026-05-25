@@ -1,0 +1,35 @@
+class Fd < Formula
+  desc "Simple, fast and user-friendly alternative to find"
+  homepage "https://github.com/sharkdp/fd"
+  url "https://github.com/sharkdp/fd/archive/refs/tags/v10.4.2.tar.gz"
+  sha256 "3a7e027af8c8e91c196ac259c703d78cd55c364706ddafbc66d02c326e57a456"
+  license any_of: ["Apache-2.0", "MIT"]
+  head "https://github.com/sharkdp/fd.git", branch: "master"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e34e02ad5f6c3c90a7a6bfd6e2f665b932eecff14664f3c85c9bbcb377372895"
+  end
+
+  depends_on "rust" => :build
+
+  conflicts_with "fdclone", because: "both install `fd` binaries"
+
+  patch do
+    file "Patches/fd/0001-support-ohos.patch"
+  end
+
+  def install
+    ENV["JEMALLOC_SYS_WITH_LG_PAGE"] = "16" if Hardware::CPU.arm? && OS.linux?
+    system "cargo", "install", *std_cargo_args
+
+    generate_completions_from_executable(bin/"fd", "--gen-completions", shells: [:bash, :fish, :pwsh])
+    zsh_completion.install "contrib/completion/_fd"
+    man1.install "doc/fd.1"
+  end
+
+  test do
+    touch "foo_file"
+    touch "test_file"
+    assert_equal "test_file", shell_output("#{bin}/fd test").chomp
+  end
+end
