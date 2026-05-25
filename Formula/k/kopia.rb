@@ -7,12 +7,7 @@ class Kopia < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "43db487495bc6161a46c200f5cfe67a7f159fc1d55bdcaed7894701ab0166d06"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4ed8838ef2ac718067c6f823e89236cfdbbb12986937829ffdc063ff6bd044b6"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "042ef780cad28391325a72bc4971205647b5290d75f84784ab7bab0c1bece239"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c5171ef803f616db04575391cf811503104327798f95b22374fce59525449094"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5d6382af01fee82328f0da01c18eeb479221b201011382266fcea9b0a80a692a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "89a17a99640f1b71777ed63b380ae591e413cd6e297e97cb3183c719ec83dbcd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f20111414ca98acbb130affc07e9a70a6adc25875a67fddcb437b7f07e87077b"
   end
 
   depends_on "go" => :build
