@@ -1,0 +1,24 @@
+class Httpx < Formula
+  desc "Fast and multi-purpose HTTP toolkit"
+  homepage "https://github.com/projectdiscovery/httpx"
+  url "https://github.com/projectdiscovery/httpx/archive/refs/tags/v1.9.0.tar.gz"
+  sha256 "4e24f4d877d4951525954352a81d9b5a29a6a784b48a9aa66a3c9e1f92b3a1fd"
+  license "MIT"
+  head "https://github.com/projectdiscovery/httpx.git", branch: "dev"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b415b970eb1ee28003e035167529e0e5ac38fb3c98989b0291345b86f7abd71"
+  end
+
+  depends_on "go" => :build
+
+  def install
+    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/httpx"
+  end
+
+  test do
+    output = JSON.parse(shell_output("#{bin}/httpx -silent -title -json -u example.org"))
+    assert_equal 200, output["status_code"]
+    assert_equal "Example Domain", output["title"]
+  end
+end
