@@ -1,13 +1,13 @@
 class DerAscii < Formula
   desc "Reversible DER and BER pretty-printer"
   homepage "https://github.com/google/der-ascii"
-  url "https://github.com/google/der-ascii/archive/refs/tags/v0.7.0.tar.gz"
-  sha256 "e59e795eb12ed7618f8ac6fe3969277145536b1705c205d387f1bbc53c418160"
+  url "https://github.com/google/der-ascii/archive/refs/tags/v0.8.0.tar.gz"
+  sha256 "1ab23597139a6e006efc38e1105b81bf8ca2486c3fab42be7a9ccabb8a1aef2a"
   license "Apache-2.0"
   head "https://github.com/google/der-ascii.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e027e6792bab63d759493210332d7d2986e680b58eb8beac35855a38ed412798"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e419984b42bcf367fc9014e95c31f2d512542139c28a80f83b53c54a1ce9611a"
   end
 
   depends_on "go" => :build
