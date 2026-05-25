@@ -1,8 +1,8 @@
 class Xlsclients < Formula
   desc "List client applications running on a display"
   homepage "https://gitlab.freedesktop.org/xorg/app/xlsclients"
-  url "https://www.x.org/archive/individual/app/xlsclients-1.1.5.tar.xz"
-  sha256 "68baee57e70250ac4a7759fb78221831f97d88bc8e51dcc2e64eb3f8ca56bae3"
+  url "https://www.x.org/archive/individual/app/xlsclients-1.1.6.tar.xz"
+  sha256 "909810a3fdbd01d84747907f2c0cc32ee732e77afc88cb310abb9d155b2a0807"
   license "MIT"
 
   bottle do
