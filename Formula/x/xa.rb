@@ -1,7 +1,7 @@
 class Xa < Formula
   desc "6502 cross assembler"
   homepage "https://www.floodgap.com/retrotech/xa/"
-  url "https://www.floodgap.com/retrotech/xa/dists/xa-2.4.1.tar.gz"
+  url "http://ftp.debian.org/debian/pool/main/x/xa/xa_2.4.1.orig.tar.gz"
   sha256 "63c12a6a32a8e364f34f049d8b2477f4656021418f08b8d6b462be0ed3be3ac3"
   license "GPL-2.0-or-later"
 
