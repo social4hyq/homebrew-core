@@ -7,7 +7,7 @@ class Veccore < Formula
   head "https://github.com/root-project/veccore.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "7cb81dd2bcb91896afae27ce9431387752ef9a6a443da7767a6bef6faa945a4b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ccb3d0e8d346a1455c9f0a1a57f28673f61ba7f0e7c8e25b80368de3d575dca9"
   end
 
   depends_on "cmake" => :build
