@@ -6,7 +6,7 @@ class Kalign < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "114f4402b9769d319d12951949ebe8f6e3c298fb3d8bc933fc2afd23aa51196c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3651e6d9d06a6c3ce8df43edccec80deddf7b99337284b463254d2eba650dfa9"
   end
 
   depends_on "cmake" => :build
