@@ -12,7 +12,7 @@ class LinuxHeadersAT515 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c4d498d1f9f8e769c7884f2f99dd2c5cdb45d28f1d462c75d960be0249e405e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6df2bc630dd41f3afd7f2b174e5c5e76244de6063fad5f58449c14c4f04bf469"
   end
 
   keg_only :versioned_formula
