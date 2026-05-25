@@ -6,12 +6,7 @@ class YuqueDl < Formula
   license "ISC"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "8f37af702e8ddbe1ed3cf1dea132d843b898562e1e467c8aa226ba6809ff2d3b"
-    sha256 cellar: :any,                 arm64_sequoia: "b7ccced3ec9c2678bbf06a19bafb7f59ddbc1f567792ed90bef84bd1460477ad"
-    sha256 cellar: :any,                 arm64_sonoma:  "b7ccced3ec9c2678bbf06a19bafb7f59ddbc1f567792ed90bef84bd1460477ad"
-    sha256 cellar: :any,                 sonoma:        "961c0a80da9238c1e32a7896fa68ac25decbb0f250d1a6c759c1f5d6f5693bf4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3490df9bc7e06c529dc73a42bf5a19583b3b143bea600b6876914f966d7ffe67"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "30a07b2a10ca14a4008880c1cd7e6a7df79c4f2f42d1fec69c10e889eb4cdc07"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f213583b752f7d4d6cc7563c44e4e570e030715d3760a5f719a77d36844c4b45"
   end
 
   depends_on "node"
