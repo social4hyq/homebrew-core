@@ -6,7 +6,7 @@ class Xmq < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b35e7854ca6fcaa86ad4df86c5b5ce51725d4216448df5555565bc07df382e9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "17242995a4dd3d482c348584ad808c53d1eff1402266919748d301b75713fb0d"
   end
 
   head do
