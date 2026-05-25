@@ -1,13 +1,13 @@
 class Execline < Formula
   desc "Interpreter-less scripting language"
   homepage "https://skarnet.org/software/execline/"
-  url "https://skarnet.org/software/execline/execline-2.9.8.1.tar.gz"
-  sha256 "23350d10797909636060522607591cb4a2118328cb58c5e65fb19a2c0d47264e"
+  url "https://skarnet.org/software/execline/execline-2.9.9.1.tar.gz"
+  sha256 "be63533297a93c36fd267195117b4e668687a526f834517a8db47d85b6c7ec6a"
   license "ISC"
   head "git://git.skarnet.org/execline", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0066b8cb0080bbe07851d143f5ea3c8f3f36f325533368d06ee9e4462f3120a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "43f1d05a1a6967d0ec7251e72d8197e467b3d119bd1328add18679c8584f77d1"
   end
 
   depends_on "pkgconf" => :build
