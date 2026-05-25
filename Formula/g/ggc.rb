@@ -7,7 +7,7 @@ class Ggc < Formula
   head "https://github.com/bmf-san/ggc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b45499719664828ddcde00d342e483181218f50276838a349b98e49d1745202f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "820464728e292421b540263a93231299fcd6a970dcce710ac66d5c1d23203855"
   end
 
   depends_on "go" => :build
