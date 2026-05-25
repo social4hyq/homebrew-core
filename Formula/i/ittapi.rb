@@ -7,12 +7,7 @@ class Ittapi < Formula
   head "https://github.com/intel/ittapi.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "4dd7bd8fa76c368fd9e52ee8c272695747a0147a57824fb7319f7992784517e9"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b32def9f68e9e5aa867b5c7d6a499f5005b45c5b1d20736af65defe925c872f7"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b24242972a142aff693f9b3413f5b5f77ad7210f19ae98cf6b00235c62243c05"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d49d0371e4cb794c18b9311194fb7670a583232dd6e35418b0929e73640e38d5"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3a3eea453a1a4b8379d88ba065f87d8c3d26ed22b19c2eb8cc2828aa544dbbbe"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "69a2946b0b087d168abcc89bc1d3d42ca698b2c11d5dfb3164fa86d504f160f4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b77d4e0b1405b4e6a198c3901767220cca78dd7829a42db93be29f7b69c9548"
   end
 
   depends_on "cmake" => :build
