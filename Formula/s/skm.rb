@@ -7,7 +7,7 @@ class Skm < Formula
   head "https://github.com/TimothyYe/skm.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2bfd4d2e2572daf221b2578eb6027da0bca67fdb50834faf87a3462e416a1f04"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab07d69675488cbe976c1d98d8e001fe4dd609d1f7690cceb5b50ed6dd22bbc4"
   end
 
   depends_on "go" => :build
