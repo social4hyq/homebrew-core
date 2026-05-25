@@ -7,7 +7,7 @@ class Frozen < Formula
   head "https://github.com/serge-sans-paille/frozen.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "43eb6ff03102e4345ff6c03cb2169f7152209e377b015120d77493f211a94022"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e812cd7967525efa81fef981f6423daa6730e85e279472c9b7e03f500928007"
   end
 
   depends_on "cmake" => :build
