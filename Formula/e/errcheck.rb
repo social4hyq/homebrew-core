@@ -6,12 +6,7 @@ class Errcheck < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "eebf1a2df5e0cbfd40864621539bbf42fdce0833739eb268b31c4009a29230df"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "eebf1a2df5e0cbfd40864621539bbf42fdce0833739eb268b31c4009a29230df"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "eebf1a2df5e0cbfd40864621539bbf42fdce0833739eb268b31c4009a29230df"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9d4d423b262fe8a36d9eeaca8a1b212f98d7bf4f3cca46fd9605810cf5206fe5"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1b25f2c81557687e35755a4560a5ed50eca5850a87d2ee9c45d3bd868f31ec5c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "282aa6fbb39475568cc1da3f28dadc08dc7612405f339e1607ef58883afc7bfa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d8a695b1b9471441dbe0b341dc6f1e3304eef0a81d3fae52408b0942eeb68a0"
   end
 
   depends_on "go" => [:build, :test]
