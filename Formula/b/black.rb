@@ -9,12 +9,7 @@ class Black < Formula
   head "https://github.com/psf/black.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "7ca80fc051ab3300330e0ad5c7aba239df90dd1a6ac5850eaf0c0e10b583087f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4d48268368ae9b51e4308367a309b3ec8f30b77970a34a2f546c429dd4512b4a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ac03e4ab2abd1de8ae94fe9e60597cfe94debe1127b83fb96d276000a623dbfb"
-    sha256 cellar: :any_skip_relocation, sonoma:        "19c5db7f165a856a878fc7cdaee47fa893741e84ef331e145bebda3506d25d58"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9fd730f931c4aab04435dbcdaca880c3101d1674b13af69fcd9a52bfd6ec1f77"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "26e6f020a6b3ec0c2f1805825759f08f05021ead46536ee1f842dad2951a8180"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "99e5f992936f45109317971a7faa223a533a068eeccb8eb1d193eec473ccdadc"
   end
 
   depends_on "rust" => :build # pytokens -> mypy -> ast-serialize
