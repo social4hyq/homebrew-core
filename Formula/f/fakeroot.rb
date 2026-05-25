@@ -11,7 +11,7 @@ class Fakeroot < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aedd45c769f5af821e5e6feb0228eb79620257e69bc736764e3ff12647288221"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "19627ad7d1f36e132119560c60028fd4298a9ab96041f2e390d1043f89ccfbb9"
   end
 
   on_linux do
