@@ -6,7 +6,7 @@ class Vtsls < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "de419b0bdd589e5c05682892abd17adef45bda4568a150001a326cdcddc0659d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b7322ae7a3f4bcb988dd8514e6c0d7a008b4e044e6ff46208abebd488118795"
   end
 
   depends_on "node"
