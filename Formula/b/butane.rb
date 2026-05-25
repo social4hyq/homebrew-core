@@ -12,7 +12,7 @@ class Butane < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d799d4d2f00511f999f5e2f138b7839cde9c6b4e01e481e3e0922a2b65f0510"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "113c8f6d766ddbcd1d2808b0db8c663bfdf47ede53d1382b5a312a4e240ac899"
   end
 
   depends_on "go" => :build
