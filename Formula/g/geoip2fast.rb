@@ -9,8 +9,7 @@ class Geoip2fast < Formula
   head "https://github.com/rabuchaim/geoip2fast.git", branch: "main"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "b15ac86dd48a66af511f441163d6ac76a9e44f87bbe407f44b926fd7f5836914"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "75a2495871abb819eca791ec25ea57bdf84df965ce7e31b455c8e7dd6d4e8c23"
   end
 
   depends_on "python@3.14"
