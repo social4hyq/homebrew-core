@@ -7,8 +7,7 @@ class Rename < Formula
   head "https://github.com/ap/rename.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "ef28d01adefde7f83ad97aeb21b4af98f66b5594ac7d69bb76f01b3f2ac80145"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b26c494af612350f5641b6ba3d8f408b6c6d74332031d95b088f9690f5431b64"
   end
 
   depends_on "pod2man" => :build
