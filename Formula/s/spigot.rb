@@ -14,12 +14,7 @@ class Spigot < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "641876860f3056dcc0fae3f399488a38fecb508a17d1eafb5aec769148dc30de"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8283d27a1d7467577889d0112e7dade9959456bd57a6f7dce87415958f30a87c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7e9a8b06999a293ee1c9b1c598aed4d35cd16eeb1608fe9f608b2432c478467c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7fa8732180577193bd0acd14e437dc18a7999d6c48f8e71a496c6da43e7347d8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2e3c226a635aa19d24e273c7b552182544aea4cce7a2a8f2a8182549a4a7b0f7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0749f29a956b82d0ee3bbef68f827e272b5c27f737663879c35cda95dad62f57"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae801c1eb0123710fa4c0a8487f53adad6ce81bb92329b8fc1d6c2ee6aed2836"
   end
 
   depends_on "cmake" => :build
