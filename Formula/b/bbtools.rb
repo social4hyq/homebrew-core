@@ -1,8 +1,8 @@
 class Bbtools < Formula
   desc "Brian Bushnell's tools for manipulating reads"
   homepage "https://bbmap.org/"
-  url "https://downloads.sourceforge.net/bbmap/BBMap_39.86.tar.gz"
-  sha256 "b08c23b44adc5d71dfa41ddfbd84f5866906c3d5cf2c16c6615e077a78298024"
+  url "https://downloads.sourceforge.net/bbmap/BBMap_39.87.tar.gz"
+  sha256 "d3f843124a7f6441477964d68c5b2c3abc6171cc364574d148090105b23a5dbf"
   license "BSD-3-Clause"
 
   # Check for the patched versions
@@ -12,7 +12,7 @@ class Bbtools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac34bcf53beb9b385d925b3d4d716d3ba62112c0485b1aa431399156c20d78f4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b4603fe50f1d23933817d4c4f7451634559f27564ec9681ad93e28b704b91a5"
   end
 
   depends_on "openjdk"
