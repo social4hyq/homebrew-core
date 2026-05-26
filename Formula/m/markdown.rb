@@ -11,8 +11,7 @@ class Markdown < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "ba5a95424267c48417d20a1ca2a253366c9741d7d2dcbe71fd7715c1babd1b8a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8f63e55917e1fae6cffb2ea55d12f5a24cbb43fbfc51f1965246f8a3f979146"
   end
 
   conflicts_with "discount", because: "both install `markdown` binaries"
