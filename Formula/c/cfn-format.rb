@@ -11,12 +11,7 @@ class CfnFormat < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "49758cff5c060a914dd2517a7c2d2d5bae834904e76ce7456734de86f94a4d58"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "49758cff5c060a914dd2517a7c2d2d5bae834904e76ce7456734de86f94a4d58"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "49758cff5c060a914dd2517a7c2d2d5bae834904e76ce7456734de86f94a4d58"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e89cd6ac6c334c8d44aa294ab7a7a40951a69faf53e884d1399773ee6b57ac8a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "958f5e75645ea38aff59cc8644513aa0f1d686207936e4e145a94986e567c138"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "38974e3efdb8278453debe03d7b12937024bb972a583ba205d81aeb2526ac959"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "801dbca896a49da72abafc4637cc648f10de6d6386b4c04d64a1f02a1fca43f5"
   end
 
   depends_on "go" => :build
