@@ -6,12 +6,7 @@ class TrzszSsh < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "7d78c3aeb716de54f2eddb73c3299ff4fae02a079f87250a96ef683b8d9f0778"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7d78c3aeb716de54f2eddb73c3299ff4fae02a079f87250a96ef683b8d9f0778"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7d78c3aeb716de54f2eddb73c3299ff4fae02a079f87250a96ef683b8d9f0778"
-    sha256 cellar: :any_skip_relocation, sonoma:        "19c333aaec33670a97e7a1773f9e783c617e46207f7413ebdb8604f7c8b38541"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "df41555cba2702c68478592972f6b589ebb6d1b599cef82d7f13145baf268e12"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a7f91c7455f1af3c84e9b7206c8e49fe97014854ec83b2c2ed44d5b90169559f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7613bc8b5d38c52f56860f89d23cb76deea870c7a7c29263c5458a4782f08048"
   end
 
   depends_on "go" => :build
