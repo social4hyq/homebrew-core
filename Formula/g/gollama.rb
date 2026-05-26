@@ -7,12 +7,7 @@ class Gollama < Formula
   head "https://github.com/sammcj/gollama.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d66391783a4c840bd993e3ac94f801da743950ff88eae5ef924696fb6d0548fc"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "44386323a2b6d10246acdf544b2848666ee8e5adae6a48cf407bf3300bde5a62"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7ae7c58848dcf2623a9d02bb9909d91bf3c5c57ca6424a85e19f517b5f9cc567"
-    sha256 cellar: :any_skip_relocation, sonoma:        "33bc660c2c335927d214b5375c83625b16ebe33e27f295bec16e0c2059926d71"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0bbd9909240697985a1e988c0ca38b6f7eb179c7b6cf0e4264b822cbd923b6d8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4f1f1d18dd85dd323dff7fce82347df8e3dd890bfabbe6f73aede42838b6106c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "facb7c61d7f929e8d3802e1f413d2c93f303db02a54de9ea5c4937fb1e138d30"
   end
 
   depends_on "go" => :build
