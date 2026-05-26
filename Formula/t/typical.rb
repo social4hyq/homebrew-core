@@ -6,12 +6,7 @@ class Typical < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "96a6c3d8757be39a816f834f932c449d4c16bd03a4a995b385f5f5e7b68d8b2e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "963c1fdd423d3979ea8f09fe370f2e38be8bcb1e2b2436ba8280c790c530ac8e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "a47a173204b0f50846a34722a6d2accc2fd71bff40fccf34b549305a5a56902b"
-    sha256 cellar: :any_skip_relocation, sonoma:        "643ddaceba6215b9c64ca6093498eac63a5f3eeb0ad8c59aebec5d1709d7766e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "177f01578c6b31bc28eee6054139bfad1242302ae6ae06fbd32d38820cfa421b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7450e460e45f466523910f331b7f70e71d910e5fdeb9a63914b5cb38a021d757"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c503183e1adaea01dd663d3083ef5709cc14881ce64e7fba70ff4410028e5b77"
   end
 
   depends_on "rust" => :build
