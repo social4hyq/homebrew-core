@@ -7,13 +7,7 @@ class Helmsman < Formula
   head "https://github.com/mkubaczyk/helmsman.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "70b190cca08b6c8bc0131a07817b87830a41d1462e19fd9f91dfa07dc09accb8"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "70b190cca08b6c8bc0131a07817b87830a41d1462e19fd9f91dfa07dc09accb8"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "70b190cca08b6c8bc0131a07817b87830a41d1462e19fd9f91dfa07dc09accb8"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ccd1a566b468c5104da5842724c13f8a493404df38d3726aee445b4953fdf814"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2bb528ab57c7f15aeb7d015589e46f9ba59027a5a7cca3d89fffc7dd09a0366a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "478364859895e1b07a0e3ef573199208e6b83e74abfe9ef15d000c658cef8631"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a65e21eadfd5caf51c16892c77f32343b680d043fa383e54a9f1869c1567321"
   end
 
   depends_on "go" => :build
