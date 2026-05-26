@@ -12,12 +12,7 @@ class Libthai < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "683257ceaae0ebf522c07e2fd39b82863ff54d35ac8a985d9d62597bda8a05b3"
-    sha256 arm64_sequoia: "428726b804e7bb80faef7381ba27b0be1a0087e54746d0f355c0af7575220ac6"
-    sha256 arm64_sonoma:  "e969faf14de2c64bcd89e1e1abea14d12d8695eba54647782e2e841042b3209d"
-    sha256 sonoma:        "151b8c0772dce394bc4c1112d90b45999d18be1b0406abf322be74f5976cf63a"
-    sha256 arm64_linux:   "424e3a5b178a1eaf5cd0c9d56bfd3671c316cd88096e9297d407836c826d5296"
-    sha256 x86_64_linux:  "54551ab441971407573f2f97d085cd26ec3b61eda8fbf6d599ce2a41bfdb5f02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "20d28df8ae4a8f8b9039711709812bcbf0d033e2b18dfc589bf53b1305d34b43"
   end
 
   depends_on "pkgconf" => [:build, :test]
