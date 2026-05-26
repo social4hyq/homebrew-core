@@ -7,13 +7,7 @@ class JpegArchive < Formula
   revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "183d8acbdeec71e01c7848052ebb5e40dc3598dc2c9f86eb663d17e4e055220b"
-    sha256 cellar: :any,                 arm64_sequoia: "0aef93bf72c6efee42cf3329fe9975550d977c51a389bdf5f7bee98e3c9b0cac"
-    sha256 cellar: :any,                 arm64_sonoma:  "ce36b7e4deb24c1e3423cf85b15106bb3a3a2f7d38a112fdfaf6933e3b104cd1"
-    sha256 cellar: :any,                 sonoma:        "18c2404353c92c320a6ce340d4e6b166fe6e9201472e91dae4a29826f59bb446"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "554ec3d5691c16246a42afffb1dfd791e943117810331feacfdf1a87208127df"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d0f07451e909abe52341b47d86aa6fdd8e0693726911322c4633b758c811249d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2041da173fe92b1f6de87f3b4819ddf2aeddc8b6638eac54489e72937c41da0"
   end
 
   depends_on "mozjpeg"
