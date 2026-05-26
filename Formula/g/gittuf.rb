@@ -7,12 +7,7 @@ class Gittuf < Formula
   head "https://github.com/gittuf/gittuf.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "69612a277842fa0f7e81ad6250cc3909df1fa13be0f21aed996460160eee681a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "69612a277842fa0f7e81ad6250cc3909df1fa13be0f21aed996460160eee681a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "69612a277842fa0f7e81ad6250cc3909df1fa13be0f21aed996460160eee681a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e0f99d5fe5bbb44cba8da7650344e90cceb98e857a17cd5bf024187be960195e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8b5a3521f4adb525293e2a5b16ea7563f654030412c435078768801fb8fcd6df"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "deae800e44d61d5231621dabb38900b78c4fd9bf921b087357bec9bbf81da485"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6181cb1d407b775d4bb0b63934d499f0907e9b0c2f962d69ef8fd4115c730ae6"
   end
 
   depends_on "go" => :build
