@@ -6,17 +6,7 @@ class Insect < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:    "eb278d9ceaa0da3c5395e9d08344e843df1ab88ecb69944c0c5af8feb5a910a6"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "29f76c8e217cd55d3cda29df44ef5a8d18b795c72ffb408d2d81385ed7455bb7"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "a246e04de19ce3736e0c839afc375de68b0358dd475676268b30f369caf4c85f"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a246e04de19ce3736e0c839afc375de68b0358dd475676268b30f369caf4c85f"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a246e04de19ce3736e0c839afc375de68b0358dd475676268b30f369caf4c85f"
-    sha256 cellar: :any_skip_relocation, sonoma:         "8077869bde22d8f4f44fb25ba149c47c7b39d80b1f5b0ad0e364a477be7c829b"
-    sha256 cellar: :any_skip_relocation, ventura:        "8077869bde22d8f4f44fb25ba149c47c7b39d80b1f5b0ad0e364a477be7c829b"
-    sha256 cellar: :any_skip_relocation, monterey:       "8077869bde22d8f4f44fb25ba149c47c7b39d80b1f5b0ad0e364a477be7c829b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "fb8ac696b796232cb024ce2bd9186fcafe1e2acf4b46b9c4df803e5a40cd7a1a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8988d5e206cae71f827f36d7085acc298f39c3d30c92abda00610f3e01151dac"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf76cc562504effdae8a54ec76d5f82e2e4ee9b59f1fe8f09191422772cd1c0a"
   end
 
   # deprecated in favor of `numbat` formula, https://github.com/sharkdp/insect/commit/6c7dea10a491b55250acede0bd740e72177d8945
