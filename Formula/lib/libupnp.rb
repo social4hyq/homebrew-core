@@ -11,12 +11,7 @@ class Libupnp < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "30b918b8cd888c12902dbcdd0e319144a9266b8d872ce9b11537cc765aac1128"
-    sha256 cellar: :any,                 arm64_sequoia: "529a307bcde0f98cfb407dc7387946793cd95ff4cee2d8c7def931727f29a0ea"
-    sha256 cellar: :any,                 arm64_sonoma:  "0ee2e57bba5d8ee8470f510acbf6680b8999d932362e97b9e6ee7d5f3134e94c"
-    sha256 cellar: :any,                 sonoma:        "d96216f345b05655855840b6550aed30b122affdfae72ac8f681b19cf9170044"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "945e39e6484fd9e2c0d73091e5e5b61873d9b25712e77e0d1183523b9e32c186"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7b733a51a72820a6d9a3f47b32b4fe718bbfbf43ff3291a38c79e39d1d7e9939"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d95fec013cfbb2e4f8dcae42736f8f8f7762526036466c9ae25c369341063c43"
   end
 
   def install
