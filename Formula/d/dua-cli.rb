@@ -6,12 +6,7 @@ class DuaCli < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "aca8d61ff41e16b5708e4a7a4daf73f369db05fd86734d49ddef87214f12cf62"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "68ca0ea1daea555fef6fde7a1471d8770ba37d9df55af523b36e8fa02cb14db2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7f5cf8aa21369c808764be57be86cfa9153fe5b9029dd8ecf3fc30b8c30268b4"
-    sha256 cellar: :any_skip_relocation, sonoma:        "167298ee7d3642fad5baa3023b1692f02e5e904290c9ea20eb73a744e65ddf1d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4d57e7759ee1184d42909506150937e0f040def676813144e56e800db16a213e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0f043a8e2a70d5deaac4544c9ec784f6f47e79f0be891681b1fdb26fc341417f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "95cb0eb227e1e602b7d87c6ccf57d130d79c9acfdf8858a3a784054cfd799df2"
   end
 
   depends_on "rust" => :build
