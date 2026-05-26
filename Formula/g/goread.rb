@@ -7,13 +7,7 @@ class Goread < Formula
   head "https://github.com/TypicalAM/goread.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c3f2abcbf279010d6288ba9103f6f06e98f06293bd5b175fd047e4529cdfc644"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c3f2abcbf279010d6288ba9103f6f06e98f06293bd5b175fd047e4529cdfc644"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c3f2abcbf279010d6288ba9103f6f06e98f06293bd5b175fd047e4529cdfc644"
-    sha256 cellar: :any_skip_relocation, sonoma:        "872638c548cd01fdfac5d2067ffe292c69f4de26daf2e3082c03be0ce6317341"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8135fd745a08cb6fcc5c594068d20f4473f825f000ab5d3dfb073fd3be9f143a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "aff2dfdb38dc38094eda152368a17a74174e146cb1bd7709ba11ec28ea26550b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f82c4024912e17724445ad8bfadd9e7d8a286e8ee7af38e81e45ba232e9a737"
   end
 
   depends_on "go" => :build
