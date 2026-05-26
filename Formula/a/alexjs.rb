@@ -6,15 +6,7 @@ class Alexjs < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f8e7666f1bbca1055363b542c7937cfcfdcf2ce1667f8e01a3013353a0b32ab8"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "02502faa257c0027e461b00a8f802c5bb60de704c3f75afbc09aa41b51763d71"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "02502faa257c0027e461b00a8f802c5bb60de704c3f75afbc09aa41b51763d71"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "02502faa257c0027e461b00a8f802c5bb60de704c3f75afbc09aa41b51763d71"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b8eedf8b9395fadd7cc1dd2011a9a31043acda33dd864bd214fa6457edb62a5f"
-    sha256 cellar: :any_skip_relocation, ventura:       "b8eedf8b9395fadd7cc1dd2011a9a31043acda33dd864bd214fa6457edb62a5f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "08e51dfcc87a621c5b02f9d4ce9e92b571bc9a7659d53f75d2f66ac55d9f84b8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "02502faa257c0027e461b00a8f802c5bb60de704c3f75afbc09aa41b51763d71"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "536452d243f62a2115d7753711b2c3a8a3d1964e7ab0902e9b0c7d42a5b2e113"
   end
 
   depends_on "node"
