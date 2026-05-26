@@ -7,8 +7,7 @@ class AntAT19 < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "a881e6229607ce27db2cf3686cc2f28deeb04d2e3a0e6f0967438dd123516eab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "647809d2c1047ab697426e8c17b2534de1078613da375d00e84b19e97a638527"
   end
 
   keg_only :versioned_formula
