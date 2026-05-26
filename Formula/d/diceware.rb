@@ -8,8 +8,7 @@ class Diceware < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "3fecb6390567f06e893d664105063c32aa80a8bb3b2f4cdc1944b8850b5c9749"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d155216e699d73c89e80e297a14e4c00420504b3548c62be9171b435eed0073a"
   end
 
   depends_on "python@3.14"
