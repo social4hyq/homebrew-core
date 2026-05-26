@@ -7,12 +7,7 @@ class Matcha < Formula
   head "https://github.com/piqoni/matcha.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ad7f42f9b518ff57b98581bb1b533a682f23e678e0fd2bef23737b1f19415a4e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ad7f42f9b518ff57b98581bb1b533a682f23e678e0fd2bef23737b1f19415a4e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ad7f42f9b518ff57b98581bb1b533a682f23e678e0fd2bef23737b1f19415a4e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ab9ca1727cd9571e5871aec213f0b4cad88a162f0c48ec7818d92df78a58cc84"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e199e6c8734699dd721a70e231c7e6bf420cdc6b0bee1aad7d9cd810c649483c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "415fbfbaf116b218447315b65f8f12113d47fe0d66b83d2ce0dc63831f0dd98e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "67f3294d1d3522aa55ee1a141324541dd813a244c00ee546b8b3fe38a0633c47"
   end
 
   depends_on "go" => :build
