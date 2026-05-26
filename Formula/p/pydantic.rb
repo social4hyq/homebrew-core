@@ -10,12 +10,7 @@ class Pydantic < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "5cfb42ea77db358f8b7182a230f3cd9fb5b9612540603ffa0db2d100b29a4a92"
-    sha256 cellar: :any,                 arm64_sequoia: "d55b259d1303f4a83a308060283f44acce735cd8700f4b3130daab8e483aa6f5"
-    sha256 cellar: :any,                 arm64_sonoma:  "cf55e6264cdb059e125f04135563c955a6bf1c4cb61296a695d6f377f4d3306e"
-    sha256 cellar: :any,                 sonoma:        "b4a1311842f86ca01d19907ae8faac25c0c9ce14dfab68d94261047508eaa888"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "489594a6e2d3be56236dfabb192e57abd5e3fd95b8dc3e7cf77a65309835fdf3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a087d54c5f0f78c384fe110baaac38a29d8d229a9c22b9dca894ad91aaa4344e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "54d7ecfe93f56b611883c8307f3b0e74ecdc5e4b0255d69175a6c1f947f3cd0b"
   end
 
   depends_on "maturin" => :build
