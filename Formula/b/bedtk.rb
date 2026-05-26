@@ -6,13 +6,7 @@ class Bedtk < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "cd6687dd9bad59b278142fd479824d407c6a905c24626b97f1539ad7eeb5caa9"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "74a65feea27bbbde2c15445ad3f9c3c2b2a519b3128e789356daf7ed0700ebeb"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "662b0278c4f58613e36036346bf93855ae5ddc59659bad93b6eea2e8dcd67083"
-    sha256 cellar: :any_skip_relocation, sonoma:        "149a91b7c3a8bff8b66d0cf23407ea2c1b9acb261cadb85e73ab887b7426d6e6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "634e3fce5cdedd155c531a2d98e327bc7312d9553236fbefa771eb05499c8d48"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "96e41ae22f6efd0be9dd6f7b8facec49bcef5f9f563dc73420ca7631904850a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "686e67cd14f3a3e15b2aa7dfcc572b24cee12cc1b0dca1467d9f4c0e82bbd966"
   end
 
   on_linux do
