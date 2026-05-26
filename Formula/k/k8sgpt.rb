@@ -7,12 +7,7 @@ class K8sgpt < Formula
   head "https://github.com/k8sgpt-ai/k8sgpt.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "21cd27b6ffd6d689b0e585fa1f88947014aead3eaca9c8bf93f965b46a7aa4e5"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b5e6cc95360d22f4ccea8780fda3ed26e4cec911e5e4b9bfb602a341aa036dae"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f73e0938dc85284c0db7dc066c6aa88f324d56ba2c6d0a52a8da4563e7d6a25e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "edb96a1ed25fa4858466f0caeec317ca3be80131f1f77689a93286211006a182"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "68370a09d1492e8fe89affb075e82026a51d9c7fdc2a1643f7018b18f191a779"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2a1cefb298bbaa09d97fabdaffd12ae7b47789727bcebcf149ce189f7f35b2bd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "71450ab8a477d0f787199afb2b158d15c897e22fdd4a7ef77e49b43eecca9356"
   end
 
   depends_on "go" => :build
