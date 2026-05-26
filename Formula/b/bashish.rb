@@ -6,8 +6,7 @@ class Bashish < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "593a8963d32a22c3c7a65c3d1f9f8ae8fec9a0a85dffe8ad5c71baba839091ca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6444253be55604b85db16b992807dd046404886a0c4a5fbbd88d32ec0b23acfd"
   end
 
   depends_on "dialog"
