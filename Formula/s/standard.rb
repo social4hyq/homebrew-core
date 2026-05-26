@@ -7,8 +7,7 @@ class Standard < Formula
   head "https://github.com/standard/standard.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "7a14e2bf791bc2e08a00dad45552c4fdac41dd10d576c034257475139e6e9e3f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "40dbd99ccb6350245e2a0948050c043c36e36985b31d6a364a3689c2b061fd58"
   end
 
   depends_on "node"
