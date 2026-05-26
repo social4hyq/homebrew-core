@@ -1,0 +1,36 @@
+class K3sup < Formula
+  desc "Utility to create k3s clusters on any local or remote VM"
+  homepage "https://k3sup.dev"
+  url "https://github.com/alexellis/k3sup.git",
+      tag:      "0.13.12",
+      revision: "ce927dd148cbc42f75fb3dd44f8836b4d3f9a0e0"
+  license "MIT"
+  head "https://github.com/alexellis/k3sup.git", branch: "master"
+
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7237d878d660320d71b907449ef2072ece535f3fc85999e4f70b124ce3a1f8ec"
+  end
+
+  depends_on "go" => :build
+
+  def install
+    ldflags = %W[
+      -s -w
+      -X github.com/alexellis/k3sup/cmd.Version=#{version}
+      -X github.com/alexellis/k3sup/cmd.GitCommit=#{Utils.git_short_head}
+    ]
+    system "go", "build", *std_go_args(ldflags:)
+
+    generate_completions_from_executable(bin/"k3sup", shell_parameter_format: :cobra)
+  end
+
+  test do
+    output = shell_output("#{bin}/k3sup install 2>&1", 1).split("\n").pop
+    assert_match "unable to load the ssh key", output
+  end
+end
