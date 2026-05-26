@@ -12,12 +12,7 @@ class Lisette < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "a90cba3456f3463dbe46f3b811cd90d93ff9b63003901621d662d7164f464edf"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f5cb392a9a18769a35a7a98d7c652a626e53024194f5b7440a1c965c2ef123a4"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6b45c32510a0b65809f6c5e2ceba93f2b7385bd4b6be1bcd308fceccff9224f8"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d2ae2a96373dbe7ab37ab8db1a2ceb27d5c4087200f0b01683af24558cd61451"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "94bf40db86166e136b40e10d00f0c12381dd77742bdd689cf1567b42bd776651"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7df79af977b2f181df2801c1bc87886018cc855dd6ffb6fd0ad10107030ad19f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e86f67cb7cd7d7435c791cb50fe317d64c8b4bdc11a394a9318ca4fddcf0cd86"
   end
 
   depends_on "rust" => :build
