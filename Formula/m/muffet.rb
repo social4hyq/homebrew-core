@@ -7,12 +7,7 @@ class Muffet < Formula
   head "https://github.com/raviqqe/muffet.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "768c3d06e0b0139abb31ff591ed8b60a3b1c8948b3c74e22f94a8eb2cee8b154"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "768c3d06e0b0139abb31ff591ed8b60a3b1c8948b3c74e22f94a8eb2cee8b154"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "768c3d06e0b0139abb31ff591ed8b60a3b1c8948b3c74e22f94a8eb2cee8b154"
-    sha256 cellar: :any_skip_relocation, sonoma:        "f5c7db4fa419c3371bbaec74b7e55e1903397bd651dd71e77f54b53047700d4f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c57baa11f89e65d3d1171f47b348266bb254dc443db4aaa883a57791f1329fee"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "700c48c0ae8f37b2b4225c01d5f276997b232f012ac01ad7b48036c6a82163b4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c664e555b98e02e54ed3292020735da83c122caea8d16cb313f444563c465d6"
   end
 
   depends_on "go" => :build
