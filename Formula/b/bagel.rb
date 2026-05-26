@@ -1,0 +1,48 @@
+class Bagel < Formula
+  desc "CLI to audit posture and evaluate compromise blast radius"
+  homepage "https://boostsecurityio.github.io/bagel/"
+  url "https://github.com/boostsecurityio/bagel/archive/refs/tags/v0.7.0.tar.gz"
+  sha256 "fe7d91c2887e32d638fb163975f099fedd32be11d533a00a91024332bd4de26f"
+  license "GPL-3.0-or-later"
+  head "https://github.com/boostsecurityio/bagel.git", branch: "main"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "400364c61edfac74d6c536a9c5d7aa12ecb9a28f014e41ffad3bef895b6d5782"
+  end
+
+  depends_on "go" => :build
+
+  def install
+    ldflags = %W[
+      -s -w
+      -X main.Version=#{version}
+      -X main.Commit=#{tap.user}
+      -X main.Date=#{time.iso8601}
+    ]
+
+    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/bagel"
+
+    generate_completions_from_executable(bin/"bagel", "completion")
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/bagel version")
+
+    (testpath/"bagel.yaml").write <<~YAML
+      version: 1
+      file_index:
+        base_dirs: ["#{testpath}"]
+    YAML
+
+    (testpath/".aws").mkpath
+    (testpath/".aws/credentials").write <<~INI
+      [default]
+      aws_access_key_id = AKIAIOSFODNN7EXAMPLE
+      aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    INI
+
+    # Removed the explicit '0' to satisfy brew audit
+    output = shell_output("#{bin}/bagel scan --config #{testpath}/bagel.yaml")
+    assert_match "AWS", output
+  end
+end
