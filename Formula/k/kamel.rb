@@ -1,0 +1,43 @@
+class Kamel < Formula
+  desc "Apache Camel K CLI"
+  homepage "https://camel.apache.org/"
+  url "https://www.apache.org/dyn/closer.lua?path=camel/camel-k/2.10.1/camel-k-sources-2.10.1.tar.gz"
+  mirror "https://archive.apache.org/dist/camel/camel-k/2.10.1/camel-k-sources-2.10.1.tar.gz"
+  sha256 "936fb5c9d5c1fd48f984cf9362dac4eb466543eef0a823917820402eebd2b941"
+  license "Apache-2.0"
+  head "https://github.com/apache/camel-k.git", branch: "main"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a662cd654d129ab4e2a7733ba3e9ae5d5aa07d500946bcd5a95614e00a4e5941"
+  end
+
+  depends_on "go" => :build
+
+  def install
+    ldflags = "-s -w -X github.com/apache/camel-k/v#{version.major}/pkg/util/defaults.GitCommit=#{tap.user}-#{version}"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/kamel"
+  end
+
+  test do
+    run_output = shell_output("#{bin}/kamel 2>&1")
+    assert_match "Apache Camel K is a lightweight", run_output
+
+    help_output = shell_output("echo $(#{bin}/kamel help 2>&1)")
+    assert_match "kamel [command] --help", help_output.chomp
+
+    get_output = shell_output("echo $(#{bin}/kamel get 2>&1)")
+    assert_match "Error: cannot get command client: invalid configuration", get_output
+
+    version_output = shell_output("echo $(#{bin}/kamel version 2>&1)")
+    assert_match version.to_s, version_output
+
+    reset_output = shell_output("echo $(#{bin}/kamel reset 2>&1)")
+    assert_match "Error: cannot get command client: invalid configuration", reset_output
+
+    rebuild_output = shell_output("echo $(#{bin}/kamel rebuild 2>&1)")
+    assert_match "Error: cannot get command client: invalid configuration", rebuild_output
+
+    reset_output = shell_output("echo $(#{bin}/kamel reset 2>&1)")
+    assert_match "Error: cannot get command client: invalid configuration", reset_output
+  end
+end
