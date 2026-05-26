@@ -9,14 +9,7 @@ class Gitless < Formula
   revision 16
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_sequoia: "1c40014729e41a0a003e1ee46e5bb19a36f009c711b62ce4fb2e231f8734115a"
-    sha256 cellar: :any,                 arm64_sonoma:  "386dd69aab3a33cea5cd627b012a470fda787e36e874d0a9906fb5aee4bc3cc0"
-    sha256 cellar: :any,                 arm64_ventura: "e8fbf4d8f756335b3561196b5719f8423976b856eccd9947e9516dd0aaa242f6"
-    sha256 cellar: :any,                 sonoma:        "4ec5cff232a3f893b45b29764e50c274ef294acae3ae67e39a8794f3a1f87e1e"
-    sha256 cellar: :any,                 ventura:       "42dbacc0c5716aaf7a7670bbbb3aaf56b1dfd35322e79ebe354da998f70d663f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c12fac140e28d8dde8bd59cca0f7c6297e229e5c4a4b31bdde816ec53e0411f9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "622c76bbb49845b2917a374693a0f6d0043fdb6f2d83b29e8a79bd2678ab90b5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "682951bba68c30ec1ba8103398aa199c2c028760754971fcf89ad9fa7ef3a5d0"
   end
 
   # https://github.com/gitless-vcs/gitless/issues/248
