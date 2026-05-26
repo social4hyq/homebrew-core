@@ -12,12 +12,7 @@ class Xgo < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "3d5bc393e4cce01f458e7b254e23eb01e84634fc2c0a57238ae6f52bf73eb04c"
-    sha256 arm64_sequoia: "3d5bc393e4cce01f458e7b254e23eb01e84634fc2c0a57238ae6f52bf73eb04c"
-    sha256 arm64_sonoma:  "3d5bc393e4cce01f458e7b254e23eb01e84634fc2c0a57238ae6f52bf73eb04c"
-    sha256 sonoma:        "1f66ab14492171bd2b075e0b7d623111a82184c183ab7d77ca0885f16219b23e"
-    sha256 arm64_linux:   "1bafb97ff8e503fe065b6811aec684677e36dc2d4a2471e7152696ea6ec8bef0"
-    sha256 x86_64_linux:  "87dd24df2498716fd78e40409b4ced3d0abbb66b912c02e6c96e4cef03f374e5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f10ea87d5c43b2882edb95b0269a854a0f3f44c9ca0c7de914e72fd26b07c37f"
   end
 
   depends_on "go"
