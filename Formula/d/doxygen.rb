@@ -14,12 +14,7 @@ class Doxygen < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "e10e1a237c33f3aec3117f565c6a57edfc2267add2dfbeeb71bdb12edcdfc7dd"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8ef2bf9c4dcde66dddaac5fc04d52c83e4817f66d497c3de444e23991633145d"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d8978bef041590908436d0ac06f44552f4d69555071c1079a98c67d0a71f7ba7"
-    sha256 cellar: :any_skip_relocation, sonoma:        "3c92988ecdcac370c67bb4c8e95deffb5b954344385db6f66226542973a6f942"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "6ae11fe672b4e5d6fc8f77ae846e95da2e957c537f22d57efe93c3c9eeba9c60"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "37c3265613b0d5334666077a3fb8264bede87da235cdc6abfd223243fd714205"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0efb22b675e8a0941d612dcda0f921702e19128e805f741d64ca2a23a76a9275"
   end
 
   depends_on "bison" => :build
