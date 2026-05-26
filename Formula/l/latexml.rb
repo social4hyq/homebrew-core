@@ -13,12 +13,7 @@ class Latexml < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0ee7b24cab9e984fcf31e129625112066fba70eec41af975edf335d6c4ada770"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0ee7b24cab9e984fcf31e129625112066fba70eec41af975edf335d6c4ada770"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0ee7b24cab9e984fcf31e129625112066fba70eec41af975edf335d6c4ada770"
-    sha256 cellar: :any_skip_relocation, sonoma:        "61d644697b4abd324431a973b3bcbd72d92fe4789322e34409871ea5780d0751"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c1ef021340ab4c5b7a72caf1c78405ba076c9aaa16d6832927fa077d542bec17"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0548ea531d505fa3fff0489d9f0e05a281cfa52492127fba9cfa280bd18dcd80"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "918ab4f6f7b5779486bdc2c2752b2bea9a8b24b64d980c1fbf06d81194d9565f"
   end
 
   depends_on "pkgconf" => :build
