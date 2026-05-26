@@ -1,14 +1,14 @@
 class CBlosc2 < Formula
   desc "Fast, compressed, persistent binary data store library for C"
   homepage "https://www.blosc.org"
-  url "https://github.com/Blosc/c-blosc2/archive/refs/tags/v3.0.3.tar.gz"
-  sha256 "535f2165906d59cba0783ca8cd286b358a0c23493e2d9c4c2840569498a163d0"
+  url "https://github.com/Blosc/c-blosc2/archive/refs/tags/v3.1.0.tar.gz"
+  sha256 "af1c1141decdccc628360629f1a79b35da47fbc977efe13c28b3a3d193689491"
   license "BSD-3-Clause"
   compatibility_version 1
   head "https://github.com/Blosc/c-blosc2.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "da0dbb247335905b291064f3cdc705e5c98c2c14a4528e94d58738a2e2bcf856"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f0738a024f0a5c5850b5b874bf39cb64dede2c5fa7e1c324ab4f2711186206dd"
   end
 
   depends_on "cmake" => :build
