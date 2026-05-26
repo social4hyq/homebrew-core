@@ -7,12 +7,7 @@ class Chdig < Formula
   head "https://github.com/azat/chdig.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "211db455b144b682d3a0c53dbc6c7f2fbd9d75a6df1650aff163be829af8ca87"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "dadf53a3185e4a7bc225a06c8ca2c59aa5e3a60609d0040ade2821fd76af5f6e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4fb3655624236a7b217b595083e7d3338e6a3278ec84c08c12aadd5beed7c23c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "66bbbea7b4e2cbc70d087a2732aff43a8f389623e4ef874d6b9d2e482efec892"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "52ac760737cf3057274b17dd962abf98bec9c3279bb3362dcf9dbd334fc7d3b2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c97b29ea545ddf5ca5eb23dd6600353409dda886cac41e4f0b38f57acd3d17f5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2da1fa4893b3a8e83b189028aefb1d68e4de233843e2af950251d93ce5a46c84"
   end
 
   depends_on "rust" => :build
