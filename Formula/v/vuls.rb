@@ -7,12 +7,7 @@ class Vuls < Formula
   head "https://github.com/future-architect/vuls.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "3c7cd1057e1453a84dd84990da5cb77edd8c1d0144abb9b03c27dd7b427ee550"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "3c7cd1057e1453a84dd84990da5cb77edd8c1d0144abb9b03c27dd7b427ee550"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "3c7cd1057e1453a84dd84990da5cb77edd8c1d0144abb9b03c27dd7b427ee550"
-    sha256 cellar: :any_skip_relocation, sonoma:        "6bfe76acf54fe6e1daea1cb971b35b64f28747cbdcb9ea4ba2a59943ff412fb9"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9f7146874c4f4d09d421b79403ef42034b0dd2f95207e3e9a9a95fdf6b8b6620"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8189544dd8634ce03fde70e79e46de5c0c8f7822f4eaaac0d37e8712ac5177cf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "215719fb5dca87b77e4aebc324288eba8dbf0f9da79436c961ae48c91fa49443"
   end
 
   depends_on "go" => :build
