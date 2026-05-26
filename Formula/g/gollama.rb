@@ -1,0 +1,36 @@
+class Gollama < Formula
+  desc "Go manage your Ollama models"
+  homepage "https://smcleod.net"
+  url "https://github.com/sammcj/gollama/archive/refs/tags/v2.0.4.tar.gz"
+  sha256 "4274f6140b9d1b6694a2453840a7108bb6964ad65b980925d0c994e28a431f3f"
+  license "MIT"
+  head "https://github.com/sammcj/gollama.git", branch: "main"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "facb7c61d7f929e8d3802e1f413d2c93f303db02a54de9ea5c4937fb1e138d30"
+  end
+
+  depends_on "go" => :build
+  depends_on "ollama" => :test
+
+  def install
+    system "go", "build", *std_go_args(ldflags: "-s -w -X main.Version=#{version}")
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/gollama -v")
+
+    port = free_port
+    ENV["OLLAMA_HOST"] = "localhost:#{port}"
+
+    pid = spawn Formula["ollama"].opt_bin/"ollama", "serve"
+    begin
+      sleep 3
+      output = shell_output("#{bin}/gollama -h http://localhost:#{port} -s chatgpt")
+      assert_match "No matching models found.", output
+    ensure
+      Process.kill "TERM", pid
+      Process.wait pid
+    end
+  end
+end
