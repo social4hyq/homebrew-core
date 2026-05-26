@@ -7,12 +7,7 @@ class Skeema < Formula
   head "https://github.com/skeema/skeema.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "09e95c80f0ea94675863694669cfaf9afe84c4c12e783f4dadb10c84763649dd"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "09e95c80f0ea94675863694669cfaf9afe84c4c12e783f4dadb10c84763649dd"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "09e95c80f0ea94675863694669cfaf9afe84c4c12e783f4dadb10c84763649dd"
-    sha256 cellar: :any_skip_relocation, sonoma:        "45ba7f03929b542b272931c89bb008b0dae549292dd5213cb78686bc82e7b807"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "18cff9e58173dcadb4f6466de695af0de6e35eb73896d7680619d3f0e5b2ed77"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5f81f006ded0059c9c04220b9d1ad0c2595e5b54470557bfa7b7ac37c936090a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "19a3fcd59b9835afda12e95ebca3a5f9be2549245f2150ef7c492b8017a0e309"
   end
 
   depends_on "go" => :build
