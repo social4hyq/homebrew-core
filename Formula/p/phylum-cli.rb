@@ -7,13 +7,7 @@ class PhylumCli < Formula
   head "https://github.com/phylum-dev/cli.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "a5c41404363af5e2bb318cad8f06e8cd609343c3b4efaeca80516e070c5b26b6"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "953504f633a2d23202b0e33a9ba472be2b6a181c9c2987998b4e3eb3de1028e8"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ff9f5c763d8accf8b1b12d99de451c6ac96d5bbdef58853f91fc4668c476e741"
-    sha256 cellar: :any_skip_relocation, sonoma:        "3bd8a1e2cb8065e893c93345403ef305ee324629f02269268325899f15101d46"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b5b7d147df44d98eae7c21b1eb90a6529a81209a11b197068c8da2172da8bd8c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "feac0ee8c27d884b9a2f4a04a1c240878b498abb40b0d050329b42b69a6d5bb0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d42837d6a5b732bac7078e0a87c424115ad518ac1ada6e92e0a71c4feeffd2c9"
   end
 
   depends_on "protobuf" => :build
