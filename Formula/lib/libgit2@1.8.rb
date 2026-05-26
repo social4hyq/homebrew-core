@@ -11,15 +11,7 @@ class Libgit2AT18 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "906d5ccc5117c9e2c7273223571961fbc1942a61c652ed31f494f85423069af2"
-    sha256 cellar: :any,                 arm64_sequoia: "9a7f4f48320b87e7067589fb218d6edf9513f7ca9d522cbc2e119b002409ce8e"
-    sha256 cellar: :any,                 arm64_sonoma:  "b062e85c407f021ec8541b55c9f08787d665e61762f0834c29fee0fce2f2558d"
-    sha256 cellar: :any,                 tahoe:         "f13c93f8f111aa5b58366fae780223237438c3486be7481b4263bbad0a23dcee"
-    sha256 cellar: :any,                 sequoia:       "7e5064dbf31f18bf27010982d08f752bd478ebedd1377ed55fb262503f16a305"
-    sha256 cellar: :any,                 sonoma:        "b1175c63eaade8f8df89fbbe12a77f45d902c72566b3e6a14b977363b19a7b7c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1feecd76d9334b09f4a24b69eb19af77910d1e1d5b83508ea115e3c63bb50d98"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3a03d39fce85a0f92345248fcdfff263023ee9eaf6a1b0103191d4302f5bddde"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "de8c387e3cc47c45a4236e8e2a9be7090a9e861a1b785af6c739dba813ecdd7e"
   end
 
   keg_only :versioned_formula
