@@ -9,12 +9,7 @@ class AdrViewer < Formula
   revision 5
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "8b12cb08799dcf6fb78b0bf55eb9601f6ddb14be34a69422e74f9c4377b6e6c5"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d5ebeb6ec7d5ef62ce1fbd71fd64e5cae43c0308200fb6607b67da929df7d452"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0e2c1f99a51f6e897fd58f048c90df94a1ce1cf03a6c6e61cc5fb15710b67602"
-    sha256 cellar: :any_skip_relocation, sonoma:        "48cfd793dcde485c4e19cdc8ca5488ea30282829ec888f9dd83fdf562ab84e47"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "410d4f2c715a9d2a1afe0522ecd8b249c2c8a607a86d2f946051fe6d5aba1923"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b267fa080e8d5b1750951fa2ae1b18c11687fa2af57dd9a5bc7032d2e71bdc69"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1f3f618c247202ae3d6a97b5d578344066d999faf99e2ca72d76f8fd464744c"
   end
 
   depends_on "python@3.14"
