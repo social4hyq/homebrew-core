@@ -1,8 +1,8 @@
 class Terragrunt < Formula
   desc "Thin wrapper for Terraform e.g. for locking state"
   homepage "https://terragrunt.gruntwork.io/"
-  url "https://github.com/gruntwork-io/terragrunt/archive/refs/tags/v1.0.5.tar.gz"
-  sha256 "75013ef30d3ec05343876d3cd9deccc5191334013007a0c8a9be29b3b94b1be8"
+  url "https://github.com/gruntwork-io/terragrunt/archive/refs/tags/v1.0.6.tar.gz"
+  sha256 "ecd41d35d794b9d580797590c3dccb1d166812ab21abb87191b190f9c556c7a1"
   license "MIT"
 
   # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
@@ -14,7 +14,7 @@ class Terragrunt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bde2fb5756f83817e81b7cca74721b4453fb799c5ac9ca0311e852cbec4e0426"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "19dfca2bc7e20d759fcccc3c5daf7f2231914ccf4a9d89a3fced5ce0f8ae877e"
   end
 
   depends_on "go" => :build
@@ -25,7 +25,7 @@ class Terragrunt < Formula
   def install
     ldflags = %W[
       -s -w
-      -X github.com/gruntwork-io/go-commons/version.Version=#{version}
+      -X github.com/gruntwork-io/terragrunt/internal/version.Version=#{version}
     ]
     system "go", "build", *std_go_args(ldflags:)
   end
