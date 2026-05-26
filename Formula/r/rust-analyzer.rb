@@ -2,12 +2,12 @@ class RustAnalyzer < Formula
   desc "Experimental Rust compiler front-end for IDEs"
   homepage "https://rust-analyzer.github.io/"
   url "https://github.com/rust-lang/rust-analyzer.git",
-      tag:      "2026-05-18",
-      revision: "ce81cf65580fb7a52d9f9a896092746356f39320"
+      tag:      "2026-05-25",
+      revision: "de5824b6d0457b0e35cb77de2c0d99402d63770f"
   license any_of: ["Apache-2.0", "MIT"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e12b754abbfb2434ef31e1db4f78cd12fd18d045c7e020188f288fc32dbaa31"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "55f38f1fbecb2667ffb7bb3f4a37cbf3fa4ea8bb42bc90ffec34b8d77eb7d123"
   end
 
   depends_on "rust" => :build
