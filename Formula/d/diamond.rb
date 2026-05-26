@@ -1,12 +1,12 @@
 class Diamond < Formula
   desc "Accelerated BLAST compatible local sequence aligner"
   homepage "https://github.com/bbuchfink/diamond"
-  url "https://github.com/bbuchfink/diamond/archive/refs/tags/v2.2.0.tar.gz"
-  sha256 "d06d26cfa474e17132a9ea4c0a2a7ce4ec7e2ce937606173b401883d62eff730"
+  url "https://github.com/bbuchfink/diamond/archive/refs/tags/v2.2.1.tar.gz"
+  sha256 "36a70540039c50e4afa1d36587eb80d1a85113288c2a49731cdaaf90e3de7d02"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dbd3de6c627869ee25fdc3b9a0943b31bbe05684c87cd406647248ee8dfbb62"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3727c97b6bedd8dba780d44fa934e7a1197f2765371f80dac811e40891e5aec"
   end
 
   depends_on "cmake" => :build
