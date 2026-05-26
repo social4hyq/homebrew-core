@@ -9,12 +9,7 @@ class Hyfetch < Formula
   head "https://github.com/hykilpikonna/hyfetch.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c8e23d042c63d216d9951ae1415f41027de311489de35fdb90b4760787ebc5fc"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "689a7b9884dcbab33646f59568d8d7817c3ac33b58a4307a1d5047ad728e02a5"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "bd5faea5be7465dcf4b25455554c79433fb8e8af0676442095d95b55863d27f0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "fe39c8a8bf21e71bda4a19306b0448f61b0c1f7d67c1094e0e71fc83633b2d5e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "74be4619e6dd47dc54929697a1fde1ef52419a5b0712fd945161c2017b7448f8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "389c8f79c54fafd508d554cb164296392c9e6b3cb9a1577dc2b92b96decae856"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ae5a06786d720b97a23423b79ca636ed3ab47177c7ba512acd90b4b19a32431"
   end
 
   depends_on "rust" => :build
