@@ -6,7 +6,7 @@ class Diamond < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dbd3de6c627869ee25fdc3b9a0943b31bbe05684c87cd406647248ee8dfbb62"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3727c97b6bedd8dba780d44fa934e7a1197f2765371f80dac811e40891e5aec"
   end
 
   depends_on "cmake" => :build
