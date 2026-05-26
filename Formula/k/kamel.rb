@@ -8,12 +8,7 @@ class Kamel < Formula
   head "https://github.com/apache/camel-k.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ad888301c2107cc211a47578379178f4553228651e78f597d760535e164df599"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "75e5a62206f5b40a367c886a0968f796f9a3d4ba2bb0cda26e978ac302f8d799"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2bc3bb8cdfa9434716722dd36f8f38487676e0dd45bde02926dac1a465f71c46"
-    sha256 cellar: :any_skip_relocation, sonoma:        "5653c7fe121e593dd2fac37e083f64a7e8ff4ea17e3f56076a29eb323a485f3b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0e48f773ce86c6ad327b9d98308c29b82be54be22dfdc573996a8662f69bbcda"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2eff60ba334459f7eb6e568c8c816a67d298b01ded4d6b9c85626b73df2e76a5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a662cd654d129ab4e2a7733ba3e9ae5d5aa07d500946bcd5a95614e00a4e5941"
   end
 
   depends_on "go" => :build
