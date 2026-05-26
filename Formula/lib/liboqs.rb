@@ -11,12 +11,7 @@ class Liboqs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "66a64fa3c0a45af280679399c5834168bdb8ad8e663336071a2e6922e3d60026"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b20974a09a4e7778815711de5956f92ceead897455ffa636349b1de26feb9a99"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2702ef0480eceb63b78613404c9f77ec281067683a14cb238093a7eaa82a64dd"
-    sha256 cellar: :any_skip_relocation, sonoma:        "27fd2fc81eed55057d6b3e4bff5f79987fc8ba4c6122475f1dc79f5aae6d41f2"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "44c8ae89e2ecbc135ba7f6ffb9b5c159671c00e6f5633dc785fdca1b820ea4c4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6716f67f3792c83e20161edbf20cc11cf8b6d9e7506cba2271b5986fcb5d2b55"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b6c4f2c92e0f03a6dd5ed6f843fc9d2ff124bf3dccf4ef3fe93e098615a21f5f"
   end
 
   depends_on "cmake" => :build
