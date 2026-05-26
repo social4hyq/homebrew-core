@@ -7,12 +7,7 @@ class Terratag < Formula
   head "https://github.com/env0/terratag.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ec3de53b4f5ff7ad700ae77ac76986e7d56834296725e768766111bd1e962627"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ec3de53b4f5ff7ad700ae77ac76986e7d56834296725e768766111bd1e962627"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ec3de53b4f5ff7ad700ae77ac76986e7d56834296725e768766111bd1e962627"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7fb26745918e415535ac96dd21655cb3dca676cdb458234483b042e377ed601b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ed92750d7fc30bc31568d9e5624debe9fa8e66d971d39d7a39ab0575990b81c7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a1d2ddfd257b6fcb1b27d496d5b34b9842a733e56b4343bb3735384615b6a260"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "080c67f95094bd3fe55adb8da009eb2a6fbc907c81b6e7b81e2ddce96b5fdaff"
   end
 
   depends_on "go" => :build
