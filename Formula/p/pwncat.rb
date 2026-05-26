@@ -9,8 +9,7 @@ class Pwncat < Formula
   head "https://github.com/cytopia/pwncat.git", branch: "master"
 
   bottle do
-    rebuild 5
-    sha256 cellar: :any_skip_relocation, all: "b1d84dd6fab9c761c073e4c598688836ab8f5a07b15cf87f8eb3cd9f1afba9a1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "041d46d4ccef1441e6243b0c2bf3015643db1e3095511452ec4b550eb1eb7a07"
   end
 
   depends_on "python@3.14"
