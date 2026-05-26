@@ -16,12 +16,7 @@ class Rke < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "7cc08970c661fe33ee24b7bfc73f53503414cc881bd90d90570b6bccfa9d44a3"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "aff2f601decd40399318b51a4030d2883c54e10c43705fd25029addd397841a5"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9103072a01bd3d80c0c4310409240f96623218e87484253d7a3410e1d885bbec"
-    sha256 cellar: :any_skip_relocation, sonoma:        "71dd0ee4591072fb19ffef92748cae476d220f2588ca7eaf8e473083514102b7"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "28c7eeb5d7137c9069842160521badd8eded593125a2c8d7d5634d9fa67addce"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d77f54bbdcff8784b5bb0ef58e4dedd0d78962359620935905279704b4373ac8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3018eaf6ee388c156e2380a80260ad49be237ab007bd37dd16aa34bfb15123ac"
   end
 
   depends_on "go" => :build
