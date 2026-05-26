@@ -7,12 +7,7 @@ class Jsongrep < Formula
   head "https://github.com/micahkepe/jsongrep.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c99626120c03c11d6975816987703f4ed6bcec13d9d2d0d1d084acec3d15c4c3"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f438dbd80f5932a8731835d0e6da1eb30e0b141c27b59c84b75922e25d9991a7"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d2682a083792707f9985d714ca321e3c7aab54254e6b0e43714f6f61d1fb0680"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9861c77aa8e4474dce67405c48e2a2e707f7a0fa95a567a3d04dfe30f81c7bd6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "943944a9e855d47810df639c4028e97b6dfe519a2d6d6b81555035d43ec842c7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b8d9744e9327d7c11fd437e20ca3142d8af778fad3ab775dc7ccca4ed8d93737"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "10e20d36307f21db19d5b0fc17f98c02543942d125b59fde41b7bcdb050fef21"
   end
 
   depends_on "rust" => :build
