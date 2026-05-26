@@ -13,12 +13,7 @@ class K3sup < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "28a9ee3f378c4c3d7779394f1874f928c4cf5998e5872b6cedc81b368e632a6c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "28a9ee3f378c4c3d7779394f1874f928c4cf5998e5872b6cedc81b368e632a6c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "28a9ee3f378c4c3d7779394f1874f928c4cf5998e5872b6cedc81b368e632a6c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ccfabb4d5060daf24b3be3459208a056ea73a7e2dd05d6bfb4dbcf7c050e180d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ca5bcf145ad386bf836f92cfdd57aeae600d146bf6b9de7b57d7be4a4d5b900a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f0a1700b591de02276fcb18db949915000da6612f72a954c127fc49a1344e5a7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7237d878d660320d71b907449ef2072ece535f3fc85999e4f70b124ce3a1f8ec"
   end
 
   depends_on "go" => :build
