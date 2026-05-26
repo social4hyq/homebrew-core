@@ -8,12 +8,7 @@ class Opal < Formula
   head "https://github.com/opal/opal.git", branch: "master"
 
   bottle do
-    sha256                               arm64_tahoe:   "d0e1b504e4fd8a90d061deebf3b7d196179cfc538408ec6b70a25634a31a6659"
-    sha256                               arm64_sequoia: "05ae63334332a7cbbfabb7754b46cf02b1611eed1c6759d0452c0e1c723c06f6"
-    sha256                               arm64_sonoma:  "ac6753b6913583f8c9f2b3a32f457ab4baecdf39bacd7ed05b68e99a1a1ab5ff"
-    sha256                               sonoma:        "49c4fab7a77ec600a1234f7a3c4313cb1082e1641b21c764f9c9322b4da55226"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "64a42c290b13d6f172e933b2b5433babf4f607dd818d55ce276f9bef95a04d61"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "64a42c290b13d6f172e933b2b5433babf4f607dd818d55ce276f9bef95a04d61"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22a06b98035a163c805aa0323eebd575529a9f7bdd3a2d6930e72baeeb4d1461"
   end
 
   depends_on "quickjs" => :test
