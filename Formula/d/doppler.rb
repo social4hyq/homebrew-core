@@ -7,12 +7,7 @@ class Doppler < Formula
   head "https://github.com/DopplerHQ/cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "5cb933eb03cfa51bdc1713c2740a030941511f01007b770c05ee87751a8ed0c5"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5cb933eb03cfa51bdc1713c2740a030941511f01007b770c05ee87751a8ed0c5"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5cb933eb03cfa51bdc1713c2740a030941511f01007b770c05ee87751a8ed0c5"
-    sha256 cellar: :any_skip_relocation, sonoma:        "2476285a16b493a1fb4432f2835b77544f8f0a6cd4e93536fe00eda68b970194"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9c1fd662c820af3ec1acd2542b2e2211984548fdfed533b5ef223c491c989cfe"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "34812b409f11d5252e08fedb251f28bf4446fa0f2dfba0112f59fd61ceabd402"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "488adaf939a30af1fbbda09f3f2ad203d2bb13e47aed92baa0f9947c61d96474"
   end
 
   depends_on "go" => :build
