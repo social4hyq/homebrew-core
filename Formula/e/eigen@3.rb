@@ -20,7 +20,7 @@ class EigenAT3 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "213fb8af2b98a2329bb16d3e3ed14e657af1ba01ac48c2c59613f465158196d0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6195ccff9e9ac1885ba1cc95a58546c453a1e821c2aad13c777fc06af502cb06"
   end
 
   keg_only :versioned_formula
