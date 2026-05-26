@@ -7,8 +7,7 @@ class XdgNinja < Formula
   head "https://github.com/b3nj5m1n/xdg-ninja.git", branch: "main"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "1fe099d79ef105b5a0272c820ccc1c774807c554c3e5e3bf180205afa50703ec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c749b151653548e6667be0e6493e830342368cac06f69f6800a957a1c492bd9"
   end
 
   depends_on "glow"
