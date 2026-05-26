@@ -1,12 +1,12 @@
 class Xlsclients < Formula
   desc "List client applications running on a display"
   homepage "https://gitlab.freedesktop.org/xorg/app/xlsclients"
-  url "https://www.x.org/archive/individual/app/xlsclients-1.1.5.tar.xz"
-  sha256 "68baee57e70250ac4a7759fb78221831f97d88bc8e51dcc2e64eb3f8ca56bae3"
+  url "https://www.x.org/archive/individual/app/xlsclients-1.1.6.tar.xz"
+  sha256 "909810a3fdbd01d84747907f2c0cc32ee732e77afc88cb310abb9d155b2a0807"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6208715db73041ebf24fff2f3c114d3a30f727fcd7e48e57583216e13ceaf6d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "370d788db80740a2e22f592778b19d3f667dbd86825002de68b14bebdd1024a2"
   end
 
   depends_on "pkgconf" => :build
