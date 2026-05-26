@@ -1,0 +1,55 @@
+class Privoxy < Formula
+  desc "Advanced filtering web proxy"
+  homepage "https://www.privoxy.org/"
+  url "https://downloads.sourceforge.net/project/ijbswa/Sources/4.1.0%20%28stable%29/privoxy-4.1.0-stable-src.tar.gz"
+  sha256 "23e4686e5848c74cb680c09c2811f0357739ecfe641f9c4072ee42399092c97b"
+  license "GPL-2.0-or-later"
+
+  livecheck do
+    url :stable
+    regex(%r{url=.*?/privoxy[._-]v?(\d+(?:\.\d+)+)[._-]stable[._-]src\.t}i)
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "abfda0f60e9a63216f0c2c13b5a8e8ada2a9629c16499fc45b2d6dd792492931"
+  end
+
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
+  depends_on "pcre2"
+
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
+
+  def install
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", "--sysconfdir=#{pkgetc}",
+                          "--localstatedir=#{var}",
+                          *std_configure_args
+    system "make"
+    system "make", "install"
+  end
+
+  service do
+    run [opt_sbin/"privoxy", "--no-daemon", etc/"privoxy/config"]
+    keep_alive true
+    working_dir var
+    error_log_path var/"log/privoxy/logfile"
+  end
+
+  test do
+    bind_address = "127.0.0.1:#{free_port}"
+    (testpath/"config").write("listen-address #{bind_address}\n")
+    pid = spawn sbin/"privoxy", "--no-daemon", testpath/"config"
+    begin
+      sleep 5
+      output = shell_output("curl --head --proxy #{bind_address} https://github.com")
+      assert_match "HTTP/1.1 200 Connection established", output
+    ensure
+      Process.kill("SIGINT", pid)
+      Process.wait(pid)
+    end
+  end
+end
