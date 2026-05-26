@@ -1,0 +1,30 @@
+class Oarfish < Formula
+  desc "Long read RNA-seq quantification"
+  homepage "https://github.com/COMBINE-lab/oarfish"
+  url "https://github.com/COMBINE-lab/oarfish/archive/refs/tags/v0.9.4.tar.gz"
+  sha256 "d991443d224edd97d6951b5d99c17bc1c920dc137fb0c606bc3dc5b9f3d25b62"
+  license "BSD-3-Clause"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ffd23eb069dd218d9ee67d138fbff220c611e81ce27d32ca5786c0dd2f54791"
+  end
+
+  depends_on "rust" => :build
+
+  uses_from_macos "bzip2"
+  uses_from_macos "zlib"
+
+  def install
+    system "cargo", "install", *std_cargo_args
+    pkgshare.install "test_data"
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/oarfish --version")
+
+    cp_r pkgshare/"test_data/SIRV_isoforms_multi-fasta_170612a.fasta", testpath/"test.fasta"
+    system bin/"oarfish", "--reads", "test.fasta", "--annotated", "test.fasta",
+                          "--seq-tech", "ont-cdna", "--output", "sample"
+    assert_path_exists "sample.quant"
+  end
+end
