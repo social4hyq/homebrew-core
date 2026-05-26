@@ -6,13 +6,7 @@ class Decasify < Formula
   license "LGPL-3.0-only"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "e4ff19c29a173914d458494a071d57926dae0d7144f8fdc02d4896da4937a523"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "310a18371e2755a252635f86b206b2316ae0a9d126c57a2e9bc01835c1a95575"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "96c10a27579028fcadedf827d1b5f73225f807a3ddbb8d7b99f94282f847c452"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b78974c9dd3ccfb401c2ebb9c9a44ab44cf75e9cd81f27c7fc118822f4c70b6c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "39912a574e08da91ded66573bb340a5a5cbacafcea47a0030d44abfe496df055"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "eaebb4b35dc5f6bdfd169b106bcc2b73c2b71d15943100aafda52beb2e1dc09f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7363f73c98ab339db4b124d39ffc53cbbab4f0f542cb20adb268e90b317d865"
   end
 
   head do
