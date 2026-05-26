@@ -14,8 +14,7 @@ class Liquibase < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "222519225b5374762241360ed0c6720d11f31a6b996c2df9268fe321bf7917aa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb00184f52ba4fc57134b5ee95124837108bbaf02efca045945ed1a371bdb7a8"
   end
 
   depends_on "openjdk"
