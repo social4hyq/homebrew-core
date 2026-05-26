@@ -12,13 +12,7 @@ class ProtobufAT29 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_tahoe:   "529447bb3f3cc0a131ee1a171eef643cf78257d0acc9ab2f83c29751981f60d2"
-    sha256 cellar: :any, arm64_sequoia: "67f2fdacf96b6bfe81ea3049b8a5295d62fa8b3f6dee4d32da6df963c20a1495"
-    sha256 cellar: :any, arm64_sonoma:  "44e99b689da10554f1b40f3141b7db369475c1ddef85ecc9ba9b8c7b011007e8"
-    sha256 cellar: :any, sonoma:        "6543a4d360f528ef50d620460019436745aa4a0c21a56258197492894eba15a9"
-    sha256               arm64_linux:   "838ffb210791c6591c7552126560a2d75df09a01166f34c47f702e03d52a8a08"
-    sha256               x86_64_linux:  "763ca704e1f0a497bfd7fd508b5ae440478d65531e78c22dd595785015e6cdf6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "529abed13c81fd85a034fbe87b3efd9fdcf08e4258ad3eff4f1a1f32bb31b1c2"
   end
 
   keg_only :versioned_formula
