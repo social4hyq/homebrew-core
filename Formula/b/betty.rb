@@ -7,8 +7,7 @@ class Betty < Formula
   revision 1
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "6e05c82883d813ce98372d8ed15bf2e4b9cd11cd91f36483a07e37ccec8204ee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1b554664a58715ea202ed2823d5f42a4f50225354e88b80a2285caa7e7cc82d5"
   end
 
   uses_from_macos "ruby"
