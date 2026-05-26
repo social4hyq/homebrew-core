@@ -6,7 +6,7 @@ class Xlsclients < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6208715db73041ebf24fff2f3c114d3a30f727fcd7e48e57583216e13ceaf6d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "370d788db80740a2e22f592778b19d3f667dbd86825002de68b14bebdd1024a2"
   end
 
   depends_on "pkgconf" => :build
