@@ -7,7 +7,7 @@ class TCompletion < Formula
   head "https://github.com/sferik/t-ruby.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "8f41fb3b6dcda43958db52bea7f259cddd0272735e4f09eafa61a01637ac9b9d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "425fc9bfc40de6a7e42838540c3e586fa8090373a7d1102c2ebb61b3ab734eb7"
   end
 
   def install
