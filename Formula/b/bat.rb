@@ -8,12 +8,7 @@ class Bat < Formula
   head "https://github.com/sharkdp/bat.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "d209bb9f1f7eab77b65f9b5573007ce52f39fb90b379ffefeffc2181119991aa"
-    sha256 cellar: :any,                 arm64_sequoia: "072537d409b056879cb735bcbc0454562b8bae732fbbfac9242afea736410f88"
-    sha256 cellar: :any,                 arm64_sonoma:  "9492e6fd0b1ee200e279476da087bf1cb6b2202c5e4c2507336c583b836c5049"
-    sha256 cellar: :any,                 sonoma:        "033b483e2d1b96c314365048f59a80a83c1827a82bcad99d7b7bc5ef90aa0f77"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d0211b0cbe32b5b14b76a02a1a15f47c96f677c35102739a3789fb376183b5e4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3d5a088fbd751c14317ee725a3b9751b835bf0a5ecbd4cfa7671ef90ce8ca922"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e954fc0a102aca6430324bbf7bf5013e526b9f02ae4cf0a0063f0147f4561fb"
   end
 
   depends_on "pkgconf" => :build
