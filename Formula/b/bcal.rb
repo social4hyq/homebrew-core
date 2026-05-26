@@ -1,0 +1,28 @@
+class Bcal < Formula
+  desc "Storage conversion and expression calculator"
+  homepage "https://github.com/jarun/bcal"
+  url "https://github.com/jarun/bcal/archive/refs/tags/v2.5.tar.gz"
+  sha256 "7e00d38aca2272ef93f55515841e2912ecf845914ec140f8e4c356e1493cf5cf"
+  license "GPL-3.0-or-later"
+
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "83fcb5b3caee649ec3bd5dfcb23e8edb25fab6e62b51cd76f1ae6d7a70714271"
+  end
+
+  on_linux do
+    depends_on "readline"
+  end
+
+  def install
+    system "make", "install", "PREFIX=#{prefix}"
+  end
+
+  test do
+    assert_match "9333353817", shell_output("#{bin}/bcal '56 gb / 6 + 4kib * 5 + 4 B'")
+  end
+end
