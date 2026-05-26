@@ -7,12 +7,7 @@ class Tfcmt < Formula
   head "https://github.com/suzuki-shunsuke/tfcmt.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "1eaf047ce8150f1feecb975470b97bd971d32720adbc01885fa5d469592efa9d"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1eaf047ce8150f1feecb975470b97bd971d32720adbc01885fa5d469592efa9d"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1eaf047ce8150f1feecb975470b97bd971d32720adbc01885fa5d469592efa9d"
-    sha256 cellar: :any_skip_relocation, sonoma:        "660ca0d854f4f6e4fae7ba34868905d20c1bea133bba07abf943592e15e3ebc8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1d71bea60799faab717d6ed7eb2b9c243e62411ebfaa3451454d03057dc57a69"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "bd2d37d70285a270280950b30822c5472e7021d62fbf7ce2666e0e6ac76e8beb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07928bc708177b3f98135be8d8e4bb5e87def2aba4bd8a67bfb91cc5f1c7b714"
   end
 
   depends_on "go" => :build
