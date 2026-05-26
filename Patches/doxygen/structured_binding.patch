@@ -1,0 +1,13 @@
+--- a/src/dotrunner.cpp
++++ b/src/dotrunner.cpp
+@@ -293,8 +293,10 @@
+   {
+     QCString format = QCString(fmtStr);
+
+-    for (const auto &[dirStr, jobs] : byDir)
++    for (const auto &_byDirEntry : byDir)
+     {
++      const auto &dirStr = _byDirEntry.first;
++      const auto &jobs   = _byDirEntry.second;
+       std::string oldDir = Dir::currentDirPath();
+       Dir::setCurrent(dirStr);
