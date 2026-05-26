@@ -7,12 +7,7 @@ class Committed < Formula
   head "https://github.com/crate-ci/committed.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "b0ba1b869ec35634f88a7be9be9681495649044c783de5a8919aafe3ccc08545"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "69d0840a3cd73a541795542ce7cdc7ebc068d3988f04f100e52a4a6726c13d8e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "943b0bd708823ed8a4111ac9b6279493d975f9490b4468f01699920f8e971302"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ff58466048d4e980b120aa381e8fafca7fc15f4317c088b2dd9e8f10922442dc"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d629fdb8f4e20bdf7577b37ba53dea36fe7702c0db4c0682ad09f5cf939d4238"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "289b4fffa6f5339cd7e6e6a0e9c04bce7b82e762acbf244646468630e4140088"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae74e37fb5d4819b9e1c32e97416a8d76588f36f74fef71edaf06991c39982c9"
   end
 
   depends_on "rust" => :build
