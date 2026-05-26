@@ -1,0 +1,37 @@
+class Just < Formula
+  desc "Handy way to save and run project-specific commands"
+  homepage "https://github.com/casey/just"
+  url "https://github.com/casey/just/archive/refs/tags/1.51.0.tar.gz"
+  sha256 "ed424dcf55ec08e22a0c58f6cfb7333573775d69dac3802bf0c1d96f7557089d"
+  license "CC0-1.0"
+  head "https://github.com/casey/just.git", branch: "master"
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3cf13644f3552c3d764315232fdeb5acb2705bd5448ba7c6969e7b9825b1663"
+  end
+
+  depends_on "rust" => :build
+
+  def install
+    system "cargo", "install", *std_cargo_args
+
+    generate_completions_from_executable(bin/"just", "--completions")
+    (man1/"just.1").write Utils.safe_popen_read(bin/"just", "--man")
+  end
+
+  test do
+    (testpath/"justfile").write <<~EOS
+      default:
+        touch it-worked
+    EOS
+    system bin/"just"
+    assert_path_exists testpath/"it-worked"
+
+    assert_match version.to_s, shell_output("#{bin}/just --version")
+  end
+end
