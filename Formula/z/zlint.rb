@@ -1,13 +1,13 @@
 class Zlint < Formula
   desc "X.509 Certificate Linter focused on Web PKI standards and requirements"
   homepage "https://zmap.io/"
-  url "https://github.com/zmap/zlint/archive/refs/tags/v3.7.0.tar.gz"
-  sha256 "b90aa52e3a2ade269783209982c644a834cda509cbc51f3ad91bddfae66519c9"
+  url "https://github.com/zmap/zlint/archive/refs/tags/v3.7.1.tar.gz"
+  sha256 "90b501bafd7533fc0831643ddd6d595751f8d0a1403d0bf0201a2a18da712eb8"
   license "Apache-2.0"
   head "https://github.com/zmap/zlint.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "018224f29957922ab9c1b055f3b71820f2c4bc949d79143654751fb298987e6d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6775ac0cd4caf1a0c1df3271f2f35791b8a020deb58a786a3463458de031a0e"
   end
 
   depends_on "go" => :build
