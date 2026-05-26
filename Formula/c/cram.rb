@@ -8,8 +8,7 @@ class Cram < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "3a0f3b04ef44d789fb07fe79107eb12c410dfc5794a730f3ab2825c890a76228"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "36f5be400c37daf149e1267ecfee88fec7054f70d57fe4708102a97c9e9a1628"
   end
 
   depends_on "python@3.14"
