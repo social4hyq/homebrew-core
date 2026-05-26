@@ -12,12 +12,7 @@ class Ov < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f861ca85d00ddb59a4913b3c861f34bae3ce36dc1cb1cc9f845196589d00be7c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f861ca85d00ddb59a4913b3c861f34bae3ce36dc1cb1cc9f845196589d00be7c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f861ca85d00ddb59a4913b3c861f34bae3ce36dc1cb1cc9f845196589d00be7c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "3280d7280ffa96af4216c417380b3f7ff47a00f77227165dda1da9580edbe86e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "beff1b32d331913d1cfb68ed300e3ce109f242fd276fda5905bedbef5f350b68"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9df3914c634a5230dbf1a4688d712a38c59ee9e482f2a30ae7d7dddb9ec7b89c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "57207a5abfcfc6a9a89288fd68aa97c65ab182e28940facba6aa4f7ecf99c5f1"
   end
 
   depends_on "go" => :build
