@@ -11,14 +11,7 @@ class Soci < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "d31676b530369e902ca7ef093254b8651d457d608d5fc3f043af44f399cfac1d"
-    sha256 arm64_sequoia: "d743ca216502631c357219d8e9062147831f2f5de3d20e18e8707e0fda86b9fc"
-    sha256 arm64_sonoma:  "b54a46e8519d45c7cdaf573d0744206603c4858aeaeeba7edfd982af15ae8eed"
-    sha256 arm64_ventura: "2816ca114d5b253b1a2910275280335e342ceaa9b5fc37b029c7b3c794e7789a"
-    sha256 sonoma:        "b470aff1683dacca56bd59826456c815feba82c68876f937dfe5a36b4c63a10e"
-    sha256 ventura:       "bf622c8bb7659153f4414864eb3243274c6e96ee892132ad67e918c68a4eeb63"
-    sha256 arm64_linux:   "7bdaa9f509b7eda5c845454d1a64cd0620f400fa0bceab65273433da986a6551"
-    sha256 x86_64_linux:  "bd1e51bb043843736d53493af5b7c84f5937a9a2bcd79b19336a69aecddb3061"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c722001d110130e4f2092927d55b2b3c2b6d8039c4c213d986c2a37237112b9"
   end
 
   depends_on "cmake" => :build
