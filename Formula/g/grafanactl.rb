@@ -7,12 +7,7 @@ class Grafanactl < Formula
   head "https://github.com/grafana/grafanactl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "8681101d7ce09ad2f0bbe19bac3729a733a9005aaa5e6a4fdd57a555f8c130c8"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8681101d7ce09ad2f0bbe19bac3729a733a9005aaa5e6a4fdd57a555f8c130c8"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8681101d7ce09ad2f0bbe19bac3729a733a9005aaa5e6a4fdd57a555f8c130c8"
-    sha256 cellar: :any_skip_relocation, sonoma:        "8b44a3bb495b05b91c124983e899a6e76573eecd61bade09bace5289255840d1"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f8fda68f21b5faafbbacaad8faa63435180d0c95f3a011f0e625fded17b28a5b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9aee39b653aaf1f4c2f58598eacac6f71dcb2cdc3f7a52f5f4948bbe30e87209"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a0236b660f2d45a3d0b71fed30f2d96420be66137f02f2bf8027709ee6e90bc"
   end
 
   depends_on "go" => :build
