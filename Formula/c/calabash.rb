@@ -28,8 +28,7 @@ class Calabash < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "c9cd2c20bea227a53c297e2bf265302d5c8fc696e5a5efb99982ab4eaf7ed6b6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "036088ee3c70898577def6a650fd3e3be83544b8ae5ee794c3f60054933a12c5"
   end
 
   depends_on "openjdk"
