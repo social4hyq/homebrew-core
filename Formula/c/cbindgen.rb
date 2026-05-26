@@ -14,12 +14,7 @@ class Cbindgen < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "b22a6b4dd3a6df2cdf179c40bc3e08c0c1dca9d94e1b580fed97be80e59ebca4"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7b51a913215b88a509297cb8b67e59cd31aaf5a30548587eb0bc34e3a9efe5b0"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "17eb4bea606ccb824b116a5612cd9865837dfa4f73b7f7f6809e0a1a126d0953"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d5f5b6e4ea72818d31b666c4809121e7ecdcade7a441c6b8ed190c7aa240cff9"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c87b333343a4627059eb5f7d0e771976b9361fc6ba9bc20d96083b333a32a527"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5d8e06847e23798a81461f36c09b887c5734ff67591a8abaa3e0cb444ced62b3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e807b0447fd771dc66b194a1c54f136c89a1c8e1576433100f1a4441d79d569"
   end
 
   depends_on "rust" => :build
