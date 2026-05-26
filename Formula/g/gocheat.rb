@@ -7,12 +7,7 @@ class Gocheat < Formula
   head "https://github.com/Achno/gocheat.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ae08f0650712309af012501f33769c1687deaaaaec02f3a0bedb58a0136a460e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ae08f0650712309af012501f33769c1687deaaaaec02f3a0bedb58a0136a460e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "ae08f0650712309af012501f33769c1687deaaaaec02f3a0bedb58a0136a460e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "955708f2189090ecf8a3c9eb4186761ab97dcb6469db93a2f398ab00d9575f86"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "76cbed7ecfcf140e7265c160bf91e37b15d79beae99a9ba2964614e73b1ba173"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "62a71a0b01f80ddadd42cf1888bb9c086ce849727f2e01982ee19309748744f0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e969f2cb3cfa01af0af38dbba7f7aa2b12881749e2899eea3b8cc3df377a9ab"
   end
 
   depends_on "go" => :build
