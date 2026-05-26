@@ -12,12 +12,7 @@ class FaasCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "adaa4ef0ef1be410575ade58f0797c7a1e2c185d3b8d5ed96425070e3582c62c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "adaa4ef0ef1be410575ade58f0797c7a1e2c185d3b8d5ed96425070e3582c62c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "adaa4ef0ef1be410575ade58f0797c7a1e2c185d3b8d5ed96425070e3582c62c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "52dafaf0046bd274a4b6b574dc176741ac520dab34aefec7317901eb108448d2"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "061c10610fa92e25019ca8ae562376518cfe4d949f66dfa384df3c1e5cc20879"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2b66e4b5d91605455a548ef4856d84cf75b515ec5020057db5c28f9b5bb3c90a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e30be32ac956695b7fe7cff081c6dc70e29946b2efe9a6a177cdf910796f0416"
   end
 
   depends_on "go" => :build
