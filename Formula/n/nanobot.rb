@@ -7,12 +7,7 @@ class Nanobot < Formula
   head "https://github.com/obot-platform/nanobot.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "2815472ff13e5c28aa33ebbb935da9138903447b2764796cc18d54a738f90f8c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2705f595018db591a589603516dd9cf498d3fa31b200c9b35831ba1be6e1c861"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9cac50e35c77e51071d91e783fa4b6d7b30e9168ab9e499ba84ee4d53fcf4497"
-    sha256 cellar: :any_skip_relocation, sonoma:        "48734f94715cfe45f9f0caed91d053391f3055e4b3f32a5fe9a14f6f2de2c290"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fa80438339090f2dbe2905b5823b6e721a3c242e5851e4dbc0a0661cb4760154"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "725ab0ea91154fedfa65002657056a90d7258b9c869eb6458512f2a889b00ba8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0cfc2a0aea2ad8543b95135b04b0b098c1fd471515240cbdf01b15e4069caa8"
   end
 
   depends_on "go" => :build
