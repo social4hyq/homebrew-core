@@ -7,12 +7,7 @@ class Frizbee < Formula
   head "https://github.com/stacklok/frizbee.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "07c65e819a36178726e14a5c1dfd614c54c3471cf1a88e2d4e885c2022520cf6"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "07c65e819a36178726e14a5c1dfd614c54c3471cf1a88e2d4e885c2022520cf6"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "07c65e819a36178726e14a5c1dfd614c54c3471cf1a88e2d4e885c2022520cf6"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7a768bb4744e281e1c04147c9e858d71a736f0ac25fb30f7d04b567accb36f6b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "faed5b12b9b9520de98d4e29626443aaa7dbe7fa94f04fe64918943cd0e2d988"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d4bbec3f991158720335c1566a0e43d9741d0f1ef1205c9aefca50aaffa46267"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9521ad4119b2e3add3d48b7fbd1c852182cd4ddc0f6dbecc98bfa0e42caf33e6"
   end
 
   depends_on "go" => :build
