@@ -6,8 +6,7 @@ class Webpod < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "ef076e7974529c853c352407873ff5cd53c23fccd374510778b508983995bd3a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f1f761f991ee0ab62ad90b8b469f63cd59a49d5579a88fb37a455912d3ffa50"
   end
 
   depends_on "node"
