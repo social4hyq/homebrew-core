@@ -7,12 +7,7 @@ class Xq < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "44d099153ec4a4be002387d1ad5c3217abe3ef79505690586c958114e6ff19b3"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "44d099153ec4a4be002387d1ad5c3217abe3ef79505690586c958114e6ff19b3"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "44d099153ec4a4be002387d1ad5c3217abe3ef79505690586c958114e6ff19b3"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9837eca65155b5e8d9ac7343865a0aaaf6c4c9da667827b9e2b5a667b00e6c59"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d0d82a46bd720fb0b7d0c963261efc56cdf3588ebb77525324dba58ce8253be1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0a4c75879494e05edd80fd217c005edd65f1580856e9b613ca8f1118a0337f3f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5235f0d27165bc7bdfe5c7a5322dd77ed9067e0f9729a776f68e852c442b3b98"
   end
 
   depends_on "go" => :build
