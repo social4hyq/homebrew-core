@@ -11,12 +11,7 @@ class Systemc < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "15b664b77b7660ce613e8219fb38b3dc192431896fe645906b97a57ce3ef03d2"
-    sha256 cellar: :any,                 arm64_sequoia: "be8e6a1922de610fda5745e21b8a2f1a8ae64db9afef613395ada807f218caf9"
-    sha256 cellar: :any,                 arm64_sonoma:  "e4c83297291edc511fcef51f9a87d919b4a7bb05059cf90be30de4614dd4f360"
-    sha256 cellar: :any,                 sonoma:        "6e344cab620163cae309e39ddfef2a322d4906340b75b73a5ce236939f5dbfa9"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2fa78339db2c12469cd5b4af5b79be4c5b0ec1c75cee2d28a54a049f62ad4ffb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6b646135f7f9d2940ab5b0c4c6eafc5fcf0c2632933664964d5747cf9e1c87ac"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ed1fee4b946b2e5ed2c92977df2540b297c802ccf9603c4c5ac824af532df3f2"
   end
 
   depends_on "autoconf" => :build
