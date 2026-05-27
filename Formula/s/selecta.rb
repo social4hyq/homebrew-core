@@ -6,7 +6,7 @@ class Selecta < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "9fb1dc1bfe59101569e6aea3522d36cf406a2c9b2b86464fce089cc36356b75f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc21d42d9db1bef3bd62e5ad9d788781eab097a2256298bd7235e12585cbb70d"
   end
 
   uses_from_macos "ruby"
