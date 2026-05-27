@@ -6,7 +6,7 @@ class Readerwriterqueue < Formula
   license all_of: ["BSD-2-Clause", "Zlib"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "907ae19ab677f362e0f4e54395b94da1703ef246bcc6083787fd4de3f0fb33a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0de130a2f51b6c8277334adac47cad7a88952a85ab72fb548e0ffbf1d5a81531"
   end
 
   depends_on "cmake" => :build
