@@ -11,8 +11,7 @@ class Funcoeszz < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "b9d4a7633bfd39f84797948a471e9d231cdc7539e472dc982cc33c2f4b6d3e88"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dde86e7e59b660dc449a9bff68efe929adbba046c3a35a0b15adfe609440041"
   end
 
   uses_from_macos "bc-gh" => :test
