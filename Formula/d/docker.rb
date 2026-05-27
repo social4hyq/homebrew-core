@@ -13,12 +13,7 @@ class Docker < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "67c1b6eaacbc6f4637c4aa6206a74f7e7ab9cf7b522ee0845f170f8bb2f53820"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d6689c2cbec6e37f37f9710652f01b49dc1f21c00b1920f346346d1b264ad976"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "38d25ff7d588f8480152f89e2177e3a91e10cd4e1738c3b45347f57acabde1b2"
-    sha256 cellar: :any_skip_relocation, sonoma:        "87320c07cf4a823d89eab0f58e39c528375a1ed0e4c5622aaced68ec3a5f38de"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "82fd1665d954f502b3f76d00a2145e734847d2c621dc03f5b6eaf9164e4b0fc7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "37ee45e00a7bc8b980a41c0c48e8a502bb9c6b6839501c1b4dfdce5ad2ba4dbf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "984e1af911f3ab074910841e7a351f502afae9419de9a51dd4616039676458b9"
   end
 
   depends_on "go" => :build
