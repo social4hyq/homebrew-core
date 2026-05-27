@@ -6,13 +6,7 @@ class Pgbackrest < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_tahoe:   "ddf0b1c7f851c41a77323611559129b573d908defcf89c0ce441c43d742d02a1"
-    sha256 cellar: :any, arm64_sequoia: "1e88c3515ef3cef29cc6f5b54d36553ea31162934558f664540f87e208fd41d3"
-    sha256 cellar: :any, arm64_sonoma:  "444bfaf0fbdab8e7a838ac28df2b141d28e50d2edca914655f2ac1a79a210dd8"
-    sha256 cellar: :any, sonoma:        "ab091b268bf5912d2d75eac9110303543d9d3e1a21fa30632bd38da38d3b4869"
-    sha256               arm64_linux:   "f94aa5e2ba0c8a37044fc749817bd8bdfa64c37095aee594c758aca26197c681"
-    sha256               x86_64_linux:  "aa984f5a9161767d92ea237ce5a55b01342b93c879da811baaba149ab3e0cabb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "41adb0380306bd5cea83b37fb0a0137af3845ebafa8e2c762c16dcbabc4fe9e0"
   end
 
   depends_on "cmake" => :build
