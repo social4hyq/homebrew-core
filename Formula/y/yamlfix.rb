@@ -9,7 +9,7 @@ class Yamlfix < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "8352d3055dfabda0ee6066853f28fd4a4b75c17ed9cece8373c51cd97d6906e4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5be86030955d05cbb94968ad01eb0c5157297aa8b0b60816799e9fd943982c2"
   end
 
   depends_on "pydantic" => :no_linkage
