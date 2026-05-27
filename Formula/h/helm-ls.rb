@@ -7,13 +7,7 @@ class HelmLs < Formula
   head "https://github.com/mrjosh/helm-ls.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "20bdf67a7e0236a71291e8859150a4881cb20f47f18291053c069a75c3f7cf2b"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "33272118580434420cd9afeb6d1b3b9c2a99197f11cf1ebdb5a6cf3b5108c924"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "945a15cc2432578822c0133e2391cc526775455c0606e4271a577d66cb06db5c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c283d2a66a8ac927eb6823d3936237bb5c09b106621972512720ba83f5ce894d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "6a7d9b12fb83c20cf9d8af4c64e33f62d5b427c155e6225c9f7579187b132d43"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "27695f6754f9efdd600932665de44b3e4cbd02f87ee95e69a639db027f8620b0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2561b008ab36c5196074457dadd092b6662004eb5f91cd39a8b3892725dddbbb"
   end
 
   depends_on "go" => :build
