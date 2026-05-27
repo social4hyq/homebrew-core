@@ -1,19 +1,18 @@
 class PythonAT314 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  url "https://www.python.org/ftp/python/3.14.4/Python-3.14.4.tgz"
-  sha256 "b4c059d5895f030e7df9663894ce3732bfa1b32cd3ab2883980266a45ce3cb3b"
+  url "https://www.python.org/ftp/python/3.14.5/Python-3.14.5.tgz"
+  sha256 "9c22bfe9939a6c5418fc74b289a5f1cc41859ae82ac6b163016b5844bd0a86bc"
   license "Python-2.0"
-  revision 4
   compatibility_version 1
 
   livecheck do
-    url "https://www.python.org/ftp/python/"
-    regex(%r{href=.*?v?(3\.14(?:\.\d+)*)/?["' >]}i)
+    url "https://www.python.org/downloads/source/"
+    regex(%r{href=.*?/Python[._-]v?(3\.14(?:\.\d+)*)\.t}i)
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c2c656ad7bdd85522592383073781920ff5f128c182cb22667576941bfdfcbb2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f4b5cb491ec10f64d03a50ff9f7949b6768066032569a6aa3de457a6c9082b0"
   end
 
   depends_on "pkgconf" => :build
@@ -67,8 +66,8 @@ class PythonAT314 < Formula
   end
 
   resource "pip" do
-    url "https://files.pythonhosted.org/packages/73/7e/d2b04004e1068ad4fdfa2f227b839b5d03e602e47cdbbf49de71137c9546/pip-26.1.tar.gz"
-    sha256 "81e13ebcca3ffa8cc85e4deff5c27e1ee26dea0aa7fc2f294a073ac208806ff3"
+    url "https://files.pythonhosted.org/packages/b6/48/cb9b7a682f6fe01a4221e1728941dd4ac3cd9090a17db3779d6ff490b602/pip-26.1.1.tar.gz"
+    sha256 "d36762751d156a4ee895de8af39aa0abeeeb577f93a2eca6ab62467bbf0f8a78"
 
     patch do
       file "Patches/python@3.14/0001-mock-abi-detection-for-pip.patch"
@@ -457,6 +456,11 @@ class PythonAT314 < Formula
   end
 
   def caveats
+    dbm_is = "`dbm.gnu` is"
+    on_linux do
+      dbm_is = "`dbm.gnu` and `dbm.ndbm` are"
+    end
+
     <<~EOS
       Python is installed as
         #{HOMEBREW_PREFIX}/bin/python3
@@ -468,7 +472,10 @@ class PythonAT314 < Formula
       `idle#{version.major_minor}` requires tkinter, which is available separately:
         brew install python-tk@#{version.major_minor}
 
-      See: https://docs.brew.sh/Homebrew-and-Python
+      #{dbm_is} available separately:
+        brew install python-gdbm@#{version.major_minor}
+
+      For more information about Homebrew and Python, see: https://docs.brew.sh/Homebrew-and-Python
     EOS
   end
 
