@@ -12,12 +12,7 @@ class Libcdio < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "0540e17ae70efae2eed49362ed8facd0d34e107fe1d957ee0e65163d73a98157"
-    sha256 cellar: :any,                 arm64_sequoia: "4d78ef901f92ff3f14d5809a48cc58dcc8a9b52b615645dda588c80814106ebc"
-    sha256 cellar: :any,                 arm64_sonoma:  "a5f3c809caf711932d2f63d9dd90b4279749819c8a27fe529e4a1d7d163e7fad"
-    sha256 cellar: :any,                 sonoma:        "f5f5849a0fba0231d2ec81f8a0e14501d25fbd5c1085ac150163c3b88f4eae42"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "094b43451bd995b9369199268863682ec177fbd2a19da2e88ccbb37e26cafede"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "91ce8a6bdca96d7b05c643598a02b3de6f13d70d845cbdd0cac40abf808255a1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "898d027ceedba5bdde07217ec12bf7e828c1ccdd8a68848f35ac6d8f603019c9"
   end
 
   depends_on "pkgconf" => :build
