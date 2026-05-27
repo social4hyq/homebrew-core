@@ -12,12 +12,7 @@ class RosaCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "7d83bb6b221bfea2d4d9c32fe0064f62395f7b44e2bf52b11ac49eaf9bea0fed"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1e6cabde04c64fd6d920ee08feaa3997fd2529c219a00a9f7139713183cdce1a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "a970033c686452f9ff399875ad5bb80ca2672ceed38a4c0d678f8e79eba49263"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c2820fa70a8e9f3e0655e1fc57501e69974d85c52b5be73cf4b476a6a4bba832"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9cb7a1d2d302cc864b27db1e1bc9b8e5d6f070505a632ea2aabccbd1e2d5bfe9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "52ceeb8a64addb2f484c1ae98b704622d3c15b85110c11cbbbd64038f410d4b9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61cb6ad0e32a8ff50fe5c361496a104018a071af4d15c218ae36d03e3fa400e5"
   end
 
   depends_on "go" => :build
