@@ -14,14 +14,7 @@ class Mercurial < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "b314da34e74eee6b843b2a2bc2141e7c77c2129b1340b4367873c8e53caa2b2b"
-    sha256 arm64_sequoia: "eb887e2837d02a2b43f72b5e60783f684bdec624424936da1815a9d2b5ae7672"
-    sha256 arm64_sonoma:  "dcc8b398239b62564b5f4dba1c93ab28afbfbc76c4e723b8c9262806ec5ce6e0"
-    sha256 tahoe:         "8926c3ed03a73f54083cefd3d6df30defed4302ca1ca00f478bee73f67a39d1d"
-    sha256 sequoia:       "4a13d61d6dff17789f5184ab8e598645f8c767c8c345fd3c5f0e1f4fd0b6756e"
-    sha256 sonoma:        "ae95fd5003ca3c57b9c52fcacc624522fff1332ad914f269fff36095908f0805"
-    sha256 arm64_linux:   "3c58bf407be023e33b32ed507322f86f5751e59ee5e7bbb58ec758f31f9c078f"
-    sha256 x86_64_linux:  "102cd57c321bd30309e3752172776b44a7a039ab7e75137383ad45abf2e7cbc2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d118e3d0190f995b2987ab171bb7ea9479f06e01af2d56452f11a7eed7606337"
   end
 
   depends_on "python@3.14"
