@@ -7,7 +7,7 @@ class Argparse < Formula
   head "https://github.com/p-ranav/argparse.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "92d7cc74e452d6e188643d82ee165ebae9a929a87f4608b50595b8daea7e91d4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db655e48de8cfff3a2da83285b9fb5222f37b3e89726c7a023b8f78138f70695"
   end
 
   depends_on "cmake" => :build
