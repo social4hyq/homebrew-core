@@ -12,12 +12,7 @@ class Coredns < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "22ef9f19ec4fd03b11d7325eca93384ef692c1d74e9df095c50c3eaf91b0fa02"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0743fe1bf7709cfbdd53ff4e9885edf654a07401c794eb0d894805e00aa9f254"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b8335119eeb51c8e3ee14e397d5cf0032dd0af3a672d2fe6b68ef5bce11b8b40"
-    sha256 cellar: :any_skip_relocation, sonoma:        "527cdf0e757e0c393d7b1b27ffc3b34150193fac57829c68f7d79931fc656d9a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e3e52ef41b4a080ae1d68935e5e16193f124798832cbb941a7c5fd4357d768fd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e6821499c09a53b3607c904d1affeea60de630da413d6d952d70f21f7e6c6385"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "87776e170c282fe869d4c4dde781533077b79a756dfeceaa345a0b743e329a9e"
   end
 
   depends_on "go" => :build
