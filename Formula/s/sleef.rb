@@ -8,14 +8,7 @@ class Sleef < Formula
   head "https://github.com/shibatch/sleef.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "6fe0e3a672461f15dd47162c7ba32505c6b81c41886524687a59c7690c16f0ea"
-    sha256 cellar: :any,                 arm64_sequoia: "10bd5e568d4abc431b8a8b604c5c3745106ba980dc71e1d22b607587e336bbf9"
-    sha256 cellar: :any,                 arm64_sonoma:  "ae22110074bfadf5d5d11ccebb7b211ddfed87724d79fe232c1ba551702747e8"
-    sha256 cellar: :any,                 arm64_ventura: "1dde65a699a3ec906047a473eab08828adac8f3592f91d87be5d6acab66f626c"
-    sha256 cellar: :any,                 sonoma:        "a26d81be375d9034c487372812dcd426c2573843173b610142214415cd635be7"
-    sha256 cellar: :any,                 ventura:       "aa5605545499143c1c1724ecb336205418686bcbed39080bca464794c8a0d924"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ffe74cf398e3979d201cba4686213e9719d71b2a0c24d9bdb1046d130b87e3be"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c160ff9688e9d6f8c98f84d380c667e351f9ea9d0726d121f7b423e9a70ccf02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e68ff7ce06c349a667f9f16a08908db503d4817a26d6cbfc57ca61f692497a7"
   end
 
   depends_on "cmake" => :build
