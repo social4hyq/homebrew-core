@@ -6,12 +6,7 @@ class NodeSass < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f97b804d8f6495291234a0365263ada86580c1b95d986e9a63173be2af0812e2"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f97b804d8f6495291234a0365263ada86580c1b95d986e9a63173be2af0812e2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f97b804d8f6495291234a0365263ada86580c1b95d986e9a63173be2af0812e2"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d1234f5d5c26acfc2c5e481ad8d10ce74e306b2adfce4f34ec2a32b487961c99"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "370e0514d0a8f205ccd55f08bff208c794c497adac573b1759cf0da401162f79"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "62856face0908d9fb41bc26dff3ff1b54327a0e513a0efb2c8a5476dd004e2e1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "02a1d7cb9bc85bfb7d43e675c2a2c52cdb5a540a65458ae32ccdf3ad343c5b3c"
   end
 
   depends_on "node"
