@@ -12,12 +12,7 @@ class Libdicom < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "e9a14120d4cfa52dd2071bbcb9d43523b712b43f19a06204ed6d6e87bb3b98d2"
-    sha256 cellar: :any,                 arm64_sequoia: "03152b93d7e51c7e967a3d5774f6c5f4a487e6404c06ff79780da38fc6085bbe"
-    sha256 cellar: :any,                 arm64_sonoma:  "6a70bf18be8cdab41295bcb8c702caaa02e41b10c40fcfda08698d86fa2a9e66"
-    sha256 cellar: :any,                 sonoma:        "1005712c39f20e0ed08bd41f71e356928ce8900bda502a3440c10b67afe4f121"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9a013097c92ecc377e3001ef0ecf42d716d34b68af3adb8d4dc0b3854ef27e03"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "940adb9a8ec118f961c3fba37a15b8594718895a5d12c485926632aea6b5613b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c45224c15ed735c40718f0c15bb4811496411db31ce0c8245ccec24b1d39518"
   end
 
   depends_on "meson" => :build
