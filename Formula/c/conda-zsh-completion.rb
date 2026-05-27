@@ -7,7 +7,7 @@ class CondaZshCompletion < Formula
   head "https://github.com/conda-incubator/conda-zsh-completion.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "e960cb656df12a852dc6861e660084b853f1eeb3ab3acd8569d78ccb23f699d4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b892c5d81c8a8cbc29c9d8c0a411f95657494f75660ef79d3459881ef56e204"
   end
 
   uses_from_macos "zsh" => :test
