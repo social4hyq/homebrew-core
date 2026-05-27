@@ -6,7 +6,7 @@ class BashUnit < Formula
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "8c7b39455fab02fd97f73960e4c41b3d65f7695d5442d3950385c4d5fe874f09"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce048d3b2391ca32b42c550867c72ea97f0398e730f3bca56614134303af4192"
   end
 
   def install
