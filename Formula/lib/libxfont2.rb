@@ -7,12 +7,7 @@ class Libxfont2 < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "6923bb0f5f8d3af8c1165951de8d6132aa1de17c9882fc0fc2ed051f7b63ca7a"
-    sha256 cellar: :any,                 arm64_sequoia: "ad1d313f2572ce8515429bc8dd9dab2ac9a4cc7e0b9f0510c7d4647968fc2b49"
-    sha256 cellar: :any,                 arm64_sonoma:  "ffd1d65361a267305f7c2b0fc21f4e53cc0b1dd7cf6f5553d2ea9c9c52533436"
-    sha256 cellar: :any,                 sonoma:        "41518f66f53d9ac2efc2c7fde9e919b9ed92b1eb91b0c4631fbec59022a966d1"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fce39009ed7ef80c230e3663b17fb82b70faeb4796e8a058cc3a0cfdebae5ab4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "33b750be1b1a0603cff595ed46908b6ce9cf7daa3ce8170ba8da567551b554a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a00249bd6100aaf75bb6e5a550cd91d5e7b8ece7039c86748bc151ff5754ec35"
   end
 
   depends_on "pkgconf" => :build
