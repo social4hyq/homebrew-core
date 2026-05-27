@@ -9,12 +9,7 @@ class Litecli < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "8461f281d2c089033b7abe786e2a6d8fe5032d8e4499793f2ccd233ecf477cd2"
-    sha256 cellar: :any,                 arm64_sequoia: "77bc04c43cc5cb35bc93f81b6fb221f49e89099ae4504f6629eb5fb36023d6b1"
-    sha256 cellar: :any,                 arm64_sonoma:  "aa066a8461d79e8661c5ac8cb5705a2b591b48aabdf1f3558040ec914922dcbc"
-    sha256 cellar: :any,                 sonoma:        "1c268b53b830c6e4bb621111ac11d492d820bc420189fe0d3b48026e90874c8e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "edcf1634c61e636531c06320f8423ab2aa1ab71e4c536ad0bd2e1611ed85c4c0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9b49f14c20387a3d053c91df3474184608b3ba60636c74b2c1dfa6651753eacd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d1d638fea01c60dc56de3a8654ed0ddb9167d8fe6ee1249096d22e19eaad830"
   end
 
   depends_on "rust" => :build # for jiter
