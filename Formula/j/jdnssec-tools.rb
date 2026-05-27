@@ -12,7 +12,7 @@ class JdnssecTools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "858e3b4879a31ebc05bba2a846ef68bba5e1fd41e44f6efcecfdedce13431213"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c98803317d55076448534d4b04f599d528ca7d54b5ac4498222f3c4b4b80de2e"
   end
 
   depends_on "openjdk"
