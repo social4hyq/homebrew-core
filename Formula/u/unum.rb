@@ -12,8 +12,7 @@ class Unum < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "49e6e959912529d4da9b0097beac4bcc654679022720b74eff4c5010d5ae6c77"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f707bd5384e2133ef54d2e500aab4001273b33afd1272dbacea52d821cc49f65"
   end
 
   depends_on "pod2man" => :build
