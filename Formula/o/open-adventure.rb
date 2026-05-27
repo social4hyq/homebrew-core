@@ -16,12 +16,7 @@ class OpenAdventure < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "e1e756daba18ba6acb0c2d8cb5ed79fb5cac368236cc721258ceed36c1c309ab"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "346050e4b4607a2b6b8c1a7cfcc7637d65c7338e2c5a5b3dba17fe54b1f16933"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c901cfdd624cdba01051559e5a8e8821ed8217c942f4f93b5b3d8512b4243cb8"
-    sha256 cellar: :any_skip_relocation, sonoma:        "3fce249b0871056bb4f9dac69c8ca5f0c64be4ad05250cf5752f51f547342511"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "400454c31641b59ca8ec560bb119463501d9734f47bf4f2f52af013fa2241afc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4b91344d5502ac8058a2ab367275a177da5e029edf4ee2d9a31068dade907beb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d0178daf25c652260c1b730164e76d0605d8368c606b3421d411837a551d3bc6"
   end
 
   depends_on "asciidoctor" => :build
