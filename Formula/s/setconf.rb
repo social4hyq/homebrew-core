@@ -9,7 +9,7 @@ class Setconf < Formula
   head "https://github.com/xyproto/setconf.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "4595c95b544f85bef09766354418d146364657157ba5f7dc614487bf50f85535"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b227f96e77d41a180bb0c1f8deb00bee2b13eaee27842fcb6a2d3909ed73ba6b"
   end
 
   uses_from_macos "python"
