@@ -14,7 +14,7 @@ class Davmail < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "9edabee235f963cc4122c9076e18e3023e562cf976057f0f62866147f2f98e34"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e15f186309ff29b6de4f286a4300e2e4c43b1ae6f6e8de0e5ecedfe7b94b0e92"
   end
 
   depends_on "openjdk"
