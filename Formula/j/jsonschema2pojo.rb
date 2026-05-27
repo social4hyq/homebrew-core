@@ -12,12 +12,7 @@ class Jsonschema2pojo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "7e54288130be9a5f59b961f8627cdecaf731da193d85ffe45425cb032fd5772f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7e54288130be9a5f59b961f8627cdecaf731da193d85ffe45425cb032fd5772f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7e54288130be9a5f59b961f8627cdecaf731da193d85ffe45425cb032fd5772f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7e54288130be9a5f59b961f8627cdecaf731da193d85ffe45425cb032fd5772f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "08a6643869c2531a18902af234a5a90a40106b9928a84c1918223e6454424e6e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "08a6643869c2531a18902af234a5a90a40106b9928a84c1918223e6454424e6e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0bd94d781a3c0604bea78be15a850e25a2435de1eccbc764b4116ccfb7ac3390"
   end
 
   depends_on "openjdk"
