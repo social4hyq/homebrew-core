@@ -6,12 +6,7 @@ class TreeSitterGo < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "abb2cdf96e2e7a44bceb1db0e97650d6574f514366061804a97d59f8e76d106f"
-    sha256 cellar: :any,                 arm64_sequoia: "7d424b01e2607f8ab843a09e12adb43b39944e405d53e8350b5d029d1aab1309"
-    sha256 cellar: :any,                 arm64_sonoma:  "d3367a53722b14f26fd7ca46f27dd43734119ba176c638de58d27814eb03e35c"
-    sha256 cellar: :any,                 sonoma:        "3f77f949e6eccdd23929f26f3bc312e305a40690512cf2acab7e0738415dcbea"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b95354230f025f212371d330dab2b6e7fcf1b5d53a1e61fd6df72d375606db59"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7f1c8eac835b1e9313c0ec544ce9d21809aeb22700df31cb80725c3f584f9858"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d0155aaf12a56f1f34e013197313c9d0d0b4fbd45471c173abcb7a36a4f9d417"
   end
 
   depends_on "tree-sitter" => :test
