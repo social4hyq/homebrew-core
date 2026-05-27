@@ -1,0 +1,30 @@
+class Ubi < Formula
+  desc "Universal Binary Installer"
+  homepage "https://github.com/houseabsolute/ubi"
+  url "https://github.com/houseabsolute/ubi/archive/refs/tags/v0.9.0.tar.gz"
+  sha256 "81f04e80b246dbac7371da822ea22afa2411ec0bde0fd04fa575c9c1a52f8471"
+  license any_of: ["Apache-2.0", "MIT"]
+  head "https://github.com/houseabsolute/ubi.git", branch: "master"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbae14ea2ed99a86f49a41cb3126ff333d80c4cea724ff78a128ecb71224fe95"
+  end
+
+  depends_on "pkgconf" => :build
+  depends_on "rust" => :build
+
+  depends_on "xz" # required for lzma support
+
+  uses_from_macos "bzip2"
+
+  def install
+    system "cargo", "install", *std_cargo_args(path: "ubi-cli")
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/ubi --version")
+
+    system bin/"ubi", "--project", "houseabsolute/precious"
+    system testpath/"bin/precious", "--version"
+  end
+end
