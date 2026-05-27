@@ -12,12 +12,7 @@ class GoJsonnet < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "85de63336520c4bff8ac427d7669521c77497a3e67e82a49b41c82de33feb6bd"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "85de63336520c4bff8ac427d7669521c77497a3e67e82a49b41c82de33feb6bd"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "85de63336520c4bff8ac427d7669521c77497a3e67e82a49b41c82de33feb6bd"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ac32711401c962f3781e5cef03fdc233dc8a2cc983fda610329bc5adde641bb5"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "408dd089b37267bdc16c7b10ce2269dca3eca7adcd71e22b1ac9219142356323"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a3b41611f2b1ea2b8cdefbc358239d10c9a7d0f6f0db19d82bb74ee11e70c968"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "99ca01b8c31209024290789aa255019173f69fc4ea81f77464f576b987dc3c82"
   end
 
   depends_on "go" => :build
