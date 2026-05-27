@@ -6,7 +6,7 @@ class OpenapiDiff < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "d6c148ec0b46df02d99c8a8e87e98ebbef0ccb9d776b13c9d2752737b5da3ba6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8bfca65188e8d82548c98b277b470c1254da231d14172a5927068d2dfbfb2f9f"
   end
 
   depends_on "maven" => :build
