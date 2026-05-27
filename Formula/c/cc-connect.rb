@@ -6,12 +6,7 @@ class CcConnect < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "fdb63aa32fe0d2f9fe92ca5ab18e295eea93d048bc5195444d149e924f9644a6"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "fdb63aa32fe0d2f9fe92ca5ab18e295eea93d048bc5195444d149e924f9644a6"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "fdb63aa32fe0d2f9fe92ca5ab18e295eea93d048bc5195444d149e924f9644a6"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b7726254e96a7a3c969b0f5c560bfd676e954cbad5d895949f62dd10670abd2a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "10a90420e60e3bd1c1971bbb49017eb7b5ce804df491eeb45435c94f2f53e2b4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "933a873a618580499db5806ac08d5ece3865f26632e872b91fc60a26cfc99ba0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "380378e255934d5241e528736279e89f7cfa9506c2df338f255f157c181490a1"
   end
 
   depends_on "go" => :build
