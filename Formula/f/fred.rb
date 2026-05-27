@@ -9,7 +9,7 @@ class Fred < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "13d10773ef060d0d9b93826004a99f8f0ea398fdcf0e102417ee759fa7d92d15"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "523d33e2431cd2d4734c22608ec1933af6935a4adedcf3e7ea15b4e95f7ce886"
   end
 
   depends_on "certifi"
