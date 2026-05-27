@@ -17,12 +17,7 @@ class AzureCli < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "1e58528b9835bef3c30c1392215ce944c516b3571e3c2944e5779310e0ffae56"
-    sha256 cellar: :any,                 arm64_sequoia: "eb34edb7f9f91232738a7dd002cbc31a5004d9c9c2865c5f478a23876a9224ba"
-    sha256 cellar: :any,                 arm64_sonoma:  "a7dd56b3e29abd39d80a4c51679806e71f2d1ec86bfa28d2979962992414b2e1"
-    sha256 cellar: :any,                 sonoma:        "f2235d158610cfedcad5d91f9a219a9a23d22b8bf3f9677ad0f06cd3dc1ed3de"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9c23ecf700c05d93124f1c95d78c9a08880676d847afd522f3bbfca06e171261"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d5d279b7fa0d857f90a962c8e5e4cab022f5bee4b4d2fcd4e1c6635d9cf322f8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1918e9c1ff4cb8f9fa62652fe6374bec51f922e02e0f022745e517c8b6bf321"
   end
 
   # `pkgconf`, `rust`, and `openssl@3` are for bcrypt and cryptography.
