@@ -6,7 +6,7 @@ class Ly < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "db74913f3293f2a0cde5225ab3721c7ce2682f7eaa896e843426717fc525b730"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "beda0574abbc4085c01c59c33c605d92849e21bd73e5abca20e0d5636a32c4a4"
   end
 
   depends_on "python@3.14"
