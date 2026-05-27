@@ -7,8 +7,7 @@ class Shtool < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "3edcbc54268a95648cc37c6f08b9ccf66968d3a7b8f76966c4038a1559203a56"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2d3030f2f16cc1972c81822ae756b72e2a8276c1b66ba40811721d96459c299"
   end
 
   def install
