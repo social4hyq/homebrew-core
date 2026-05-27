@@ -7,12 +7,7 @@ class Mmark < Formula
   head "https://github.com/mmarkdown/mmark.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "5c128c58341499027ae9a6c557bc1deced75dc22784e3e66beb7721c9fc4b620"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5c128c58341499027ae9a6c557bc1deced75dc22784e3e66beb7721c9fc4b620"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5c128c58341499027ae9a6c557bc1deced75dc22784e3e66beb7721c9fc4b620"
-    sha256 cellar: :any_skip_relocation, sonoma:        "f0e8cc63b303aac12c3fc03b18ee44370ea84d973c7bd6e6d1b00cf6c4529590"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "616c522bcc753ef42009639c7c9b7a0b90ef200aa7589abfc6b29aa7b755e4c5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "16175f09d52d0e483ed0afc7d10be5859d2977cd261df2393d6830fa37511a62"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5630dfaa5a79aff7c04cc2fae1fe73803f5cb98adcace571dea747f7edd41b0b"
   end
 
   depends_on "go" => :build
