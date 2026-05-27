@@ -10,13 +10,7 @@ class Unoconv < Formula
   head "https://github.com/unoconv/unoconv.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f291c61047fa90c216cc24d8363d849594bfac8ecbe103a4163a5fdd1c2621ab"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f291c61047fa90c216cc24d8363d849594bfac8ecbe103a4163a5fdd1c2621ab"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f291c61047fa90c216cc24d8363d849594bfac8ecbe103a4163a5fdd1c2621ab"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ff27d27f6639defe6172e7fa54ba4421e3b89fa89cea8bd6982072899bb0bc1e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ff27d27f6639defe6172e7fa54ba4421e3b89fa89cea8bd6982072899bb0bc1e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ff27d27f6639defe6172e7fa54ba4421e3b89fa89cea8bd6982072899bb0bc1e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3737ff4576d425f25e687a6a45d9d3ff2750b44e7273c679063d10a7bc5c7bde"
   end
 
   deprecate! date: "2025-04-27", because: :repo_archived, replacement_formula: "unoserver"
