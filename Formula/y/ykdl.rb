@@ -8,13 +8,7 @@ class Ykdl < Formula
   license "MIT"
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "dcfdd44c710a9891af4829313a096befb361c2708ede5fede7569a7b3f74c7c5"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "064f73209fcb6b73b9cc7fbb53b6b50af4a409c07f8ae1cf4ec03b625ecea5fd"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6e596fdb73331b055055570d42b4199feeb9591dc7ad6b2052abe1ac0141b828"
-    sha256 cellar: :any_skip_relocation, sonoma:        "064f73209fcb6b73b9cc7fbb53b6b50af4a409c07f8ae1cf4ec03b625ecea5fd"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "064f73209fcb6b73b9cc7fbb53b6b50af4a409c07f8ae1cf4ec03b625ecea5fd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dcfdd44c710a9891af4829313a096befb361c2708ede5fede7569a7b3f74c7c5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "82cf498103bf4076e691989e164882ac07e2029e71465d2805cb42c5a7e1dff6"
   end
 
   depends_on "python@3.14"
