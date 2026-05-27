@@ -1,13 +1,13 @@
 class S6 < Formula
   desc "Small & secure supervision software suite"
   homepage "https://skarnet.org/software/s6/"
-  url "https://skarnet.org/software/s6/s6-2.14.0.1.tar.gz"
-  sha256 "c25afe817cbc3f594efc5050351f8b9101ba78616d0ce915658f370e7ee2e258"
+  url "https://skarnet.org/software/s6/s6-2.15.0.0.tar.gz"
+  sha256 "27dff73d626285540133e075e75887087f5117fd51de59503ef7d29e96f69e4c"
   license "ISC"
   head "git://git.skarnet.org/s6.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "41e0388759021e10353387725bf8ad59d56eff9fd2d2169471bd39a795170aba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "efca80beeb47fdf0220e283763c6558dfd4dc8f49312707767a1ad9122fa92cc"
   end
 
   depends_on "pkgconf" => :build
