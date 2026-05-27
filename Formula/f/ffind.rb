@@ -8,8 +8,7 @@ class Ffind < Formula
   license "GPL-3.0-only"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "04003304502f97107473f1e6be50bf658ff48ec2f8b3c2b12e743279bbfcb2a7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e332bb1dbf33d91a4c4cc7f5e7c2bfc9ab70d7b54273b5fd24866bf046708a09"
   end
 
   uses_from_macos "python"
