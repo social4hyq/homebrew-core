@@ -7,12 +7,7 @@ class Ubi < Formula
   head "https://github.com/houseabsolute/ubi.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "760699c2377dc0f5624ab15da20ae3e2283cc497a5ed9ac57b1b85a2df80954c"
-    sha256 cellar: :any,                 arm64_sequoia: "457fb31dd150c9002f50fcd9bce9907fa11e5863c970c59657e4f04c08929dc5"
-    sha256 cellar: :any,                 arm64_sonoma:  "d9913549a762e66598afe801150369ed3dbafead3bd85b88a1fe64e2c52fdce5"
-    sha256 cellar: :any,                 sonoma:        "cc544dc0a7eed7f1b239caefabca618d6217d6f0954939ab350a6a809587de3d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "582fe47be0a3bf56cc2696c21de8cc69ca636a92e3eb7bbd338be4f9c74cc0de"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c9a99c46d9f23a0ff48f46dfbc524f63066b52981b88af55d76ce009a3718f20"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbae14ea2ed99a86f49a41cb3126ff333d80c4cea724ff78a128ecb71224fe95"
   end
 
   depends_on "pkgconf" => :build
