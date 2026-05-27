@@ -6,8 +6,7 @@ class BashSnippets < Formula
   license "MIT"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "d22507e71365355dc20eba3747a10f575f80ff3dc86103d1a2f9be08a08932d9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "56d28aaa2b645764125233d7e424a18ffb2883e8912277ebd6efa6b8bb53cb9c"
   end
 
   conflicts_with "cheat", because: "both install `cheat` binaries"
