@@ -7,7 +7,7 @@ class Libde265 < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "32246358eee8c93ac7d823211694d338071a6d784e0bf05dcbcfffffa7d17547"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae0f947898bffbc6b177b81515ff577003e2f4e548be2e39944487c48b332445"
   end
 
   depends_on "cmake" => :build
