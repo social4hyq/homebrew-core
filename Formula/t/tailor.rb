@@ -7,8 +7,7 @@ class Tailor < Formula
   revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "ff96b6b585afcd69215b88d8a797bfc4115c987b6dbd58c1e844c8d7ff268fec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "16f25b81c533d93d75126c311227bec78a87fadcf9d563a6be84f4730d6b6b8a"
   end
 
   depends_on "openjdk"
