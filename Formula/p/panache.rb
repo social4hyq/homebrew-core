@@ -1,13 +1,13 @@
 class Panache < Formula
   desc "Language server, formatter, and linter for Markdown, Quarto, and R Markdown"
   homepage "https://panache.bz"
-  url "https://github.com/jolars/panache/archive/refs/tags/v2.48.0.tar.gz"
-  sha256 "0bb4e3533cafff840202f89ecd282b9159f2fb8b68dcc91f851a0cbad301b27d"
+  url "https://github.com/jolars/panache/archive/refs/tags/v2.49.0.tar.gz"
+  sha256 "0857b3889788bae979867d4e15dff3489a27b12f92e7d94224826f7844091a4b"
   license "MIT"
   head "https://github.com/jolars/panache.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3c962c96fe7c7bae7f9f429913d8de0a16f74803a9902d6ea3f89a64fcc6cdf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22b9447017c4ea15e0555781b5e90b2bc2151fbcb4c1b59423d87a917695e570"
   end
 
   depends_on "rust" => :build
