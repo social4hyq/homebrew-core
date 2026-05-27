@@ -7,13 +7,7 @@ class Slowhttptest < Formula
   head "https://github.com/shekyan/slowhttptest.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any,                 arm64_tahoe:   "1ba7cafb59ed4524e48d4239aa70aeb822b4788deeb85b38909e568416b908f3"
-    sha256 cellar: :any,                 arm64_sequoia: "d36b04a9ac4e272cf5948d94f53aff869382d006110c9cc326610fece68ea7a7"
-    sha256 cellar: :any,                 arm64_sonoma:  "22b23a0784dfdf145d60d62a8dae8e1e7c59c22963da6574f4b506b07d6803fb"
-    sha256 cellar: :any,                 sonoma:        "032869712d088861b12d6cc9ce2fd12f4c40aaeadb5077201066526517b04e38"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "cf68abd4a416c7ddef4e1ae4738ac24c66a9a53e50d7a308373fea3c26d2693a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "97645f80bc0d31375ee2f451f7d99657a55b46d63baac8b46ab8a4facfc9674a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3cd4d4b1f247aea8055ae8e455a365fd1576e6ea1aa2d983534d5fa2ed22386c"
   end
 
   depends_on "openssl@4"
