@@ -12,12 +12,7 @@ class SentryCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "19a287c2a540c26b3ebc4ee77b6af1751a26617c60537c1e07847092fcc27968"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e3b54bd38f595416e0e3c0496c86452553c63299ffe15e38019cb535e1fcc4c8"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cd91d2a008180494d8f535986208cd1f31d0b0c097cdc0669ab33258be49718f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "8468a1386cf4bd963a003fc33adc31928c59d92ddf20509f17f853e033027f4a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e642edba5464dcc28d68b60517dbb5ec4f74192aeb08a13c7360e419b096a976"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dab798bedcbb06a230eab7dbf7e98bc9ecad461ac83bc6f2e3d28dd9606f9763"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "202007ca779845b5ddd0afe05a90af655c4e862330ef00c150af7ac47b9111c4"
   end
 
   depends_on "pkgconf" => :build
