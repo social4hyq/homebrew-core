@@ -16,8 +16,7 @@ class Safeint < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "ffba215daf83f5a8a3beffae5f56f6e58288ff1f7c9f35d52edf19db5e935663"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c855155ccb1b02f3dcfa8478a4a9bcc5220058914fbd299ca8d302e97802e48"
   end
 
   def install
