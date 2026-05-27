@@ -1,13 +1,13 @@
 class LivekitCli < Formula
   desc "Command-line interface to LiveKit"
   homepage "https://livekit.io"
-  url "https://github.com/livekit/livekit-cli/archive/refs/tags/v2.16.3.tar.gz"
-  sha256 "56a840b975097582e3d9b996eed58664909e0e3ac457261f2f004dd3be77ed4d"
+  url "https://github.com/livekit/livekit-cli/archive/refs/tags/v2.16.4.tar.gz"
+  sha256 "064070e62e3cd864c2e02f999eb6e000ce9ba5ecf7f7cbeffc2cf8d9685ffa7e"
   license "Apache-2.0"
   head "https://github.com/livekit/livekit-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3c210ad6c12e2cf7bbc7016a0968fea1ee7837a2c4e7e30b4ab02e785275c40"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6dbf3dbb690b7cb2e3cf67bccf3f41c654e5e52ea3e691d31a80cacfaab166b"
   end
 
   depends_on "go" => :build
