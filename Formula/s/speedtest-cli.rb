@@ -10,8 +10,7 @@ class SpeedtestCli < Formula
   head "https://github.com/sivel/speedtest-cli.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "93487be757c9b3763deeb1b1415ee8ad10c5a80fcc9ebaeacbb8fbac3e9b9474"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c04c4af912b7e025b97279f4f66bed0187055c72d461c652c6233f008021c967"
   end
 
   # see issue in https://github.com/sivel/speedtest-cli/pull/796
