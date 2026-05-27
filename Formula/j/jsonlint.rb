@@ -6,7 +6,7 @@ class Jsonlint < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "f385934d75bcc430e766ac449f35048cb99579b9179f8d7e38bf38459047bac1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b8c5cfad9142bef2f76e81c506a2f9e71fa98b0defa209191c0eeb7608be6caa"
   end
 
   depends_on "node"
