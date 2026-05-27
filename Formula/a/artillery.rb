@@ -1,0 +1,43 @@
+class Artillery < Formula
+  desc "Cloud-native performance & reliability testing for developers and SREs"
+  homepage "https://www.artillery.io/"
+  url "https://registry.npmjs.org/artillery/-/artillery-2.0.32.tgz"
+  sha256 "796be4097eda9bd74ceb5164223f71eb046012fe967ffff288dca705531a60cd"
+  license "MPL-2.0"
+
+  livecheck do
+    url "https://registry.npmjs.org/artillery/latest"
+    regex(%r{["'][^"' ]*?/artillery[._-]v?(\d+(?:[.-]\d+)+)\.t}i)
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a694fad3a3bebee3319c818f8bbe0839bab7425bdde2d8e83cb031f15ab800c4"
+  end
+
+  depends_on "node"
+
+  def install
+    system "npm", "install", *std_npm_args(ignore_scripts: false)
+    bin.install_symlink libexec.glob("bin/*")
+  end
+
+  test do
+    system bin/"artillery", "dino", "-m", "let's run some tests!"
+
+    (testpath/"config.yml").write <<~YAML
+      config:
+        target: "http://httpbin.org"
+        phases:
+          - duration: 10
+            arrivalRate: 1
+      scenarios:
+        - flow:
+            - get:
+                url: "/headers"
+            - post:
+                url: "/response-headers"
+    YAML
+
+    assert_match "All VUs finished", shell_output("#{bin}/artillery run #{testpath}/config.yml")
+  end
+end
