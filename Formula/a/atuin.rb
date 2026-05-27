@@ -7,13 +7,7 @@ class Atuin < Formula
   head "https://github.com/atuinsh/atuin.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "7c0a9028714c42a158eedafd0e3c616f1e6df335f5e2fe3d4796006d8996d5db"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "aabe5a89f5f07effa9b1d93087469c60e3630bbb1f1eef4b4f3e8e63b8c1790b"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "409a9e05765cda4f7271eaaa7833afb7d5ad55b71badac5b6459aa78cb85ee0e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ebb8239444b8ce96d114812593e5781d141406097b8348bcf0d5b5ab11619fd0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5edbd418eb0f9d32dedfa1c737e8e66487dd2bc81f02d31d27a807070dc6c7af"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "51817c931148502c0ba47dbdb24359642c402c5d1697765a482489a5eb8955d6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbf0b85730b3a220f03aded5562aee1bad13de3d0e95b824c0cb97d200425fd8"
   end
 
   depends_on "protobuf" => :build
