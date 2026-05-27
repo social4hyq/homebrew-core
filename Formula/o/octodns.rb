@@ -3,13 +3,13 @@ class Octodns < Formula
 
   desc "Tools for managing DNS across multiple providers"
   homepage "https://github.com/octodns/octodns"
-  url "https://files.pythonhosted.org/packages/6e/54/ae4ca569227e34102c2ac80bdcf795052cce20dd9407fd66c1b4ed7e07f5/octodns-1.17.0.tar.gz"
-  sha256 "76087921c14cab2a31dfb6da3ee3a1a8d741f509a409656fe198afa05095d7d1"
+  url "https://files.pythonhosted.org/packages/1a/5e/cb46895eda5d929b6488fbab2bcf2658272d60976e033cd9d2832a0fffcd/octodns-1.18.0.tar.gz"
+  sha256 "a00eaa454c9c33375f2b76a4b742158033fba8acd01587ef7317a0657c053c0d"
   license "MIT"
   head "https://github.com/octodns/octodns.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "88e31a0f39af99ea13a57f338460dbd94454defc55933f80e4155cbe9431e73d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ac018ee6c39b54769aa4e2c90e876ee8fb3bd8145d9574ba9cea981230ee482"
   end
 
   depends_on "libyaml"
@@ -26,8 +26,8 @@ class Octodns < Formula
   end
 
   resource "idna" do
-    url "https://files.pythonhosted.org/packages/ce/cc/762dfb036166873f0059f3b7de4565e1b5bc3d6f28a414c13da27e442f99/idna-3.13.tar.gz"
-    sha256 "585ea8fe5d69b9181ec1afba340451fba6ba764af97026f92a91d4eef164a242"
+    url "https://files.pythonhosted.org/packages/1a/88/bcf9709822fe69d02c2a6a77956c98ce6ea8ca8767a9aadcedc7eb6a2390/idna-3.16.tar.gz"
+    sha256 "d7a6da03db833450fca25d2358ac9ff06cd624577a4aea3a596d5c0f77b8e03d"
   end
 
   resource "natsort" do
