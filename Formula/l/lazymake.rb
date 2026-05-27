@@ -6,12 +6,7 @@ class Lazymake < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "fde256d4324ead2ab8eeae168e7e96303412904a0ba0841dc40d6412723636ab"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "fde256d4324ead2ab8eeae168e7e96303412904a0ba0841dc40d6412723636ab"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "fde256d4324ead2ab8eeae168e7e96303412904a0ba0841dc40d6412723636ab"
-    sha256 cellar: :any_skip_relocation, sonoma:        "dbc451d4fb88a854b24fb0a45b3eac8c227caf4a54750823d6cff6255455021e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3c118f176128b1beec7c5ea342e7755499be9f66e243bc02a43cd007a5e4de8f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ab0eb1e4227a744cd748d06db64c7b2ea18fb252284dacbe60fa584b7335acbb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "35fd08fc908c3dc575e9ae9a95389a55dfd5e16bfa66736ed4117623543cdcf8"
   end
 
   depends_on "go" => :build
