@@ -7,7 +7,7 @@ class Cloudfox < Formula
   head "https://github.com/BishopFox/cloudfox.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "11a75edf6c092521a33fc99aa0d8b3d106ecd03c6233ced02b17d67d3bf0e116"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "034d1c4addcfb139e624dd790ad6d94b29c38be8aa7ac4a4e5aa94abd75baa83"
   end
 
   depends_on "go" => :build
