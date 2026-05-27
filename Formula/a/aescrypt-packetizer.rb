@@ -8,19 +8,7 @@ class AescryptPacketizer < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:    "f8ea5602c897a56c72464bea7b0de0b3e06694dae88df581be1e27aa6a67a2b2"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "1039232a96b3efc3d8c4a1da6d48d8d37cc2991e8275dc467d0b8b16229ead5c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "d840ff8d10cb48274d58dac6bc26126ceba767c36e56b2e9e24f2b591dccca0d"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b40247d58019bfa5346f2cf07d75dbe765f64d9fea747c088f0ac1d44555fe7e"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "823e51604fff46f1cb74a791f7a94c35092393352861fee84c9e5517df795395"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3803d5d2dc8c254d7f68d95175e77dc62c5f4a0a6ee01d24e2a7c8a45049e33b"
-    sha256 cellar: :any_skip_relocation, sonoma:         "1a6a9157e3cff9a015e32f3e442dadfa6ac2241ff6766b951be3e11cd5b81eae"
-    sha256 cellar: :any_skip_relocation, ventura:        "4ec24729c18720223c80a584f59f4603c8caa72e23c30c52462e2a7777cc9410"
-    sha256 cellar: :any_skip_relocation, monterey:       "3e96703d06fcb1ac6114af1929f87cba2c6d04cb65f2d44aa4f51b56d28c04ac"
-    sha256 cellar: :any_skip_relocation, big_sur:        "6ded6050675d0f771f473d5873bf897d0391859c9f9280362444f2189661ac3b"
-    sha256 cellar: :any_skip_relocation, catalina:       "d129279cb28702f27173f99338f5ffd08f042202f5cc3bf2fd71f9107155cc51"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "64bf374350078c9e283cd1b4e283fc477f9c484ca0388eebf12a140d1f1fa999"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3eddb8372fd630b7f93288f2fb19c3ec96a061b1de150918bee53d0a7a1d55ee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "82d3e2163be29c0b47e7b6ca88e0938f27df31c80af6f1a32edfa528bedfd2c7"
   end
 
   # v3 source code has been unavailable since at least 2024-09-01.
