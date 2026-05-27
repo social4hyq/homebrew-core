@@ -7,13 +7,7 @@ class Dasel < Formula
   head "https://github.com/TomWright/dasel.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "8119bb802beef388364f8452a16e1927c49b8e221dbd14cbd93159561a5bdef8"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8119bb802beef388364f8452a16e1927c49b8e221dbd14cbd93159561a5bdef8"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8119bb802beef388364f8452a16e1927c49b8e221dbd14cbd93159561a5bdef8"
-    sha256 cellar: :any_skip_relocation, sonoma:        "60fff45bd36da2e38ea1e4df041d02907436d8538e075fbf6738084e43f6c08a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "126e9dd4af5f0e758157a773e0c467c60afdc9ba39d4bc6e7b63a810d894d065"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "bb733ad20e36af93a8f438bfec87bc205727f83d5a71a13ca1c0685f6ef69eeb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "23749cbf1f60af06dbdfea5f90bf944afa5ef48969f61498bd6b2a2fcfdbb587"
   end
 
   depends_on "go" => :build
