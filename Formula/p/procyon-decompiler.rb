@@ -6,8 +6,7 @@ class ProcyonDecompiler < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "6d383fdfc3e0cd6e98271bc33299c2553943305e40c4cc48b127ab4157dff604"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c054f87127d1123b8ff454a8ea341ee8872c834d32cbb54fa4b5f471d14a806"
   end
 
   depends_on "openjdk@21"
