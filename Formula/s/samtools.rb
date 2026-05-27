@@ -1,0 +1,34 @@
+class Samtools < Formula
+  desc "Tools for manipulating next-generation sequencing data"
+  homepage "https://www.htslib.org/"
+  url "https://github.com/samtools/samtools/releases/download/1.23.1/samtools-1.23.1.tar.bz2"
+  sha256 "32266198a4bc6a6df395d8526688c9697d9c8e472f888c749fdde2e08ea88dd2"
+  license "MIT"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f60c10e36640cc77b3a86b31b4cd29881bff7d2140ab518354bc6833b2ab28c0"
+  end
+
+  depends_on "htslib"
+
+  uses_from_macos "ncurses"
+
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
+
+  def install
+    system "./configure", "--prefix=#{prefix}",
+                          "--with-htslib=#{Formula["htslib"].opt_prefix}"
+    system "make", "install"
+  end
+
+  test do
+    (testpath/"test.fasta").write <<~EOS
+      >U00096.2:1-70
+      AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC
+    EOS
+    system bin/"samtools", "faidx", "test.fasta"
+    assert_equal "U00096.2:1-70\t70\t15\t70\t71\n", (testpath/"test.fasta.fai").read
+  end
+end
