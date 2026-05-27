@@ -7,13 +7,7 @@ class Authz0 < Formula
   head "https://github.com/hahwul/authz0.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0fe2da611b2c22d82a4279dc10401a4046c94da994c296f87e4cb30c6f1556d5"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0fe2da611b2c22d82a4279dc10401a4046c94da994c296f87e4cb30c6f1556d5"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0fe2da611b2c22d82a4279dc10401a4046c94da994c296f87e4cb30c6f1556d5"
-    sha256 cellar: :any_skip_relocation, sonoma:        "0cc9c71a90cc770c96bd24a6946a23759912d1dd52bc0b0953732a33064c208a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e60ac9cf6e9d8901bf7ad5f70e96757abd79f6b6121ad1945135f6043cd010e7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b5b62fb4bf2c7ac8e013fbff4d57cbb6ab2ea703e16be23f0415dc0d02bd7c83"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "451ab4ba4a97527edc408be72cd6e9cad8ab5cde431613f47e9045d2b27101b0"
   end
 
   depends_on "go" => :build
