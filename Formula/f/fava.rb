@@ -12,12 +12,7 @@ class Fava < Formula
   no_autobump! because: "`update-python-resources` cannot determine dependencies"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "bdd5789a9ad99e63fcf0a7ea7ffb7003d9ce1bda2138f615b780a52cc571f74f"
-    sha256 cellar: :any,                 arm64_sequoia: "3ae8b9d6557890653952f3fc070fda16ae5e39ce9a216fac9a8d11abbb29c1b4"
-    sha256 cellar: :any,                 arm64_sonoma:  "0654ee59d7552daba005d559b74319c971c2e4915344620b8aca488bc9ba47ff"
-    sha256 cellar: :any,                 sonoma:        "252737dadc9fbc22d73c2ee0ed0b6e5aebca2c03abf172269f54b4aa87a44b3c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "acd577e4d8f2b6e27469cf82f91e8332be7a2f5fc24b67550f1682b5503431e8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b58aba8c966ccf9dc6dc46edc1988b014ea4916d565242bef5ad850297549184"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c02e5cb9eeafb3dc25702962a8fba4e6415a656ba1b3823211ce7090aab46d0"
   end
 
   depends_on "bison" => :build # for beancount
