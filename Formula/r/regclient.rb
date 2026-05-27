@@ -7,7 +7,7 @@ class Regclient < Formula
   head "https://github.com/regclient/regclient.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f00ffacd98eddbc47aa414825f602e9e6cc547b7e2bfd4ad9a1ec0d02e00aa0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf7e6feae4e5fad999983712afe2054ad06c35dc7e33a83d23ac17fa9991639f"
   end
 
   depends_on "go" => :build
