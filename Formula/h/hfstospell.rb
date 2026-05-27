@@ -12,12 +12,7 @@ class Hfstospell < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "dd84297fca2dd33dcec237d5d54d0e45f52fcaf64e8d6e6b27695a7e0558825c"
-    sha256 cellar: :any,                 arm64_sequoia: "9f7a74646d284084392b523263f4e769dcd62d5433c3d40b1eb0da872c55ab6a"
-    sha256 cellar: :any,                 arm64_sonoma:  "915fcf467c2a1333cc3c73ec013fac25cf14bdeb4d40777cdb70bd48fca25a63"
-    sha256 cellar: :any,                 sonoma:        "d5530f8b220068236908e9776a9535978878e230067c4fe7f8bc30d633cf99d2"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8776bf8a9d43167fb8a09581a8b0870b2d7b3ac2061eba88d004c65274dfcb2b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "12e6440c7359b04a940556dfe100c181600a5832b01fed8c00c54693b5bc9c35"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e79b98eb2c74cb20130110c0ba5d8aefe8cbfa6b50ef7a79e42b90d367eac100"
   end
 
   depends_on "autoconf" => :build
