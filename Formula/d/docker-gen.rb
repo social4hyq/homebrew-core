@@ -7,7 +7,7 @@ class DockerGen < Formula
   head "https://github.com/nginx-proxy/docker-gen.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "69aef5ce4c2caadeb3bc99a1184995bdcf8752b9720e8eca914a9a9cda248a58"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2032dccc90212406016eec661669a6aa3cf78cc6d5aa72d4f8ef7a0789325ea8"
   end
 
   depends_on "go" => :build
