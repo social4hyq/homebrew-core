@@ -11,8 +11,7 @@ class Kanif < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "f8e0c833384c4479f288c31b55223157190f271ca6489bbcc47cfb8c9c2042e8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc64bb2f3577d7ddfad50955aa2ac96da5586da87fcf3044dd071dae0ed6b5a6"
   end
 
   depends_on "taktuk"
