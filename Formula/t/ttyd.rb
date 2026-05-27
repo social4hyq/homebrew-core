@@ -8,12 +8,7 @@ class Ttyd < Formula
   head "https://github.com/tsl0922/ttyd.git", branch: "main"
 
   bottle do
-    sha256 arm64_tahoe:   "b0285d45774be9ad71801ef8f588bc9b8be96cc9da2be6d7cbba6c3701701913"
-    sha256 arm64_sequoia: "f81449aaecf0d71e3679c230904eaaf746b2fc61b3186870a8c2f33e38eb8404"
-    sha256 arm64_sonoma:  "315c508acf0d28994704dc8617106908c5e24dbcf680c55fb0a353b732db13f3"
-    sha256 sonoma:        "ca9817e17c911a710a9df297cb195b80f4af2a9098f460409bf9c7c0910de5d1"
-    sha256 arm64_linux:   "80a24784f939cef75c9af2d4ef862b3813365fd9cd11520be520c7aeda4dc5e2"
-    sha256 x86_64_linux:  "921dbd457a02f4578317da406a081155dc5c88c9cbdf0c0926a2d10b747c2109"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9ee698d7663b76a0d31c9918cf4b496d5745353043bf526ac12cd8c9a0844656"
   end
 
   depends_on "cmake" => :build
