@@ -7,7 +7,7 @@ class Nave < Formula
   head "https://github.com/isaacs/nave.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "7f476c7839cadc0d37a067e2fd4b5d2de7fccbba142e6aa8d9aeb92e984587c2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ed9415c5efa5d21fcfffe57a51fc428b71244364836492dc7e631fe34e825029"
   end
 
   def install
