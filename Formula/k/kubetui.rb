@@ -12,12 +12,7 @@ class Kubetui < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "a8dcf32d520c8221e42906abb785f72a6e7e044c0a74ae74d039182c90aa8e35"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "44f7a5faa0ca542fae400e2a8040c4ef4387540e60a3003a67a8e389045fdc08"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "beb28247962fd9bf37b25fd3ddf8ebc13ceb507eac3de572809206323342dc54"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c09fdd6c17eca249349260ccb87a286fbaa4db3ce406d84e2fe7742cac32dde3"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "19568034b887ec118afd21db8f9d0ee7fb88c4752836549e5a69da822bc3b606"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "03e8e0e7914b35d3c49b3e9a32f96a5c92bf3ffca5a05f155d12f4cbf8b941a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "78ce32f17dc3f4d3a837863eeb00aab73b488ce2fabf0f20b7747d18afd806e4"
   end
 
   depends_on "rust" => :build
