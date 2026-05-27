@@ -7,12 +7,7 @@ class Sgn < Formula
   head "https://github.com/EgeBalci/sgn.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "07eccdd132aee13fd1372292119fe9c0626bed3fdf0c162a2ed61e9d5e89d279"
-    sha256 cellar: :any,                 arm64_sequoia: "5725e674f35d68b61e9c90b6de698aadb6e8345e4558a3b106d81e2930fa2e6c"
-    sha256 cellar: :any,                 arm64_sonoma:  "3008605b7acf03e6dc9cf7fcb4b9da85d6ed3a209b0b023c5745e630c0b1182d"
-    sha256 cellar: :any,                 sonoma:        "eee8805d37e8f4810277bee9468ec07bde62c9693600dadbfe3bd9c279f104f1"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d37bf2fe1818fce63dbccfd413bf31df69d3a4a67f899e5c2b54361ed3ac8a2e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1aa2c8e219183546fdfc6d3d60cc2441f9bd5f593c5c1ed7e3909588359fb67f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e658412e5061958fa54b37ad8b9466f9b124f36eee199970b4980df82347b8dd"
   end
 
   depends_on "go" => :build
