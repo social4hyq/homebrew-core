@@ -10,7 +10,7 @@ class Awscli < Formula
   head "https://github.com/aws/aws-cli.git", branch: "v2"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb46c8590af1bf5b706c0c37e5e323cefca14381a12091fff14353d4d106bb93"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0bcb9e9e613ec6ecf0b936ba6fe262864840a6ffbf9c061996336f1a793514e"
   end
 
   depends_on "cmake" => :build
