@@ -9,12 +9,7 @@ class Apkleaks < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9f306c7278077caa6a4068d501adfb95345fe39bc6add9ceb759f70fb965057b"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d390af53ad407f1cf952e8b23d5688850440100a6f944393119c6591ee3638ad"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "054cd745343049dfb4113ea39e7ec69bbf471d4c3a9a37947351e9ac5403547d"
-    sha256 cellar: :any_skip_relocation, sonoma:        "8e524812eb29c7b3eec58d93466856bc1583332b46c33c6fb3155068c4a291ed"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9143ccbd89bb4ba2641dc4127c277aebe4bf55d27e888d4c5af94298d3c0e8eb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "cc01ebfa7068a19c809ce7241cbafb88c0e518fdac5274a435e3c8584eb25dde"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2609e86e35b68769520dc5b99ae14f8f7e29175b77ee293bd689bd493f66c0ed"
   end
 
   depends_on "jadx"
