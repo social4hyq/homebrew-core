@@ -1,8 +1,8 @@
 class Restish < Formula
   desc "CLI tool for interacting with REST-ish HTTP APIs"
   homepage "https://rest.sh/"
-  url "https://github.com/rest-sh/restish/archive/refs/tags/v0.21.2.tar.gz"
-  sha256 "3686e652193c976a04c96f83ee1a78571509e22169b83f7212a7380b374d24b1"
+  url "https://github.com/rest-sh/restish/archive/refs/tags/v2.0.0.tar.gz"
+  sha256 "01788618eab038bc28f14329d2b177337d7284a82da09de2a47bae08e8eccc6a"
   license "MIT"
   head "https://github.com/rest-sh/restish.git", branch: "main"
 
@@ -25,7 +25,8 @@ class Restish < Formula
       ENV.append "GOFLAGS", "-buildmode=pie"
     end
 
-    system "go", "build", *std_go_args(ldflags: "-s -w -X main.version=#{version}")
+    ldflags = "-s -w -X github.com/rest-sh/restish/v2/internal/cli.Version=#{version}"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/restish"
 
     generate_completions_from_executable(bin/"restish", shell_parameter_format: :cobra)
   end
@@ -37,6 +38,6 @@ class Restish < Formula
     assert_match "slideshow", output
 
     output = shell_output("#{bin}/restish https://httpbin.org/get?foo=bar")
-    assert_match "\"foo\": \"bar\"", output
+    assert_match '"foo": "bar"', output
   end
 end
