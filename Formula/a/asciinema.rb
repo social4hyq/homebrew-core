@@ -7,12 +7,7 @@ class Asciinema < Formula
   head "https://github.com/asciinema/asciinema.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "957266f04bb63edbd0e5ef47a0b199d32f4ad6b5a79129aee3ffb2e5184468ae"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6f010b93dbcd8ffe51c1815b810c3c97950559223bd86700f9d32bc56117e5cb"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c05e6a4ad18495b3139defd17badd933d015ab8e999ed027728eb1c948afe0a5"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e12009a260e5e4771ba681edd7580e19b7c1f19648ce0fcdab8e5f8d16681a94"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7780bb54f22c281c204d04348c55eeedec49908552927e69ed5c23c48d5ba8d3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a65fffb9cbaa31616c6b8fbc74d24103950e02ef009a9409c354b3598f3bbf36"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "68f0a2be87cd581e43e84a28a3323d5d83eb7648543fb1e8ca306fd6b4428c7a"
   end
 
   depends_on "rust" => :build
