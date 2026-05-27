@@ -1,0 +1,37 @@
+class Xq < Formula
+  desc "Command-line XML and HTML beautifier and content extractor"
+  homepage "https://github.com/sibprogrammer/xq"
+  url "https://github.com/sibprogrammer/xq.git",
+      tag:      "v1.4.0",
+      revision: "02a8c391497a63acbea1c57f036770cef2e87b65"
+  license "MIT"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5235f0d27165bc7bdfe5c7a5322dd77ed9067e0f9729a776f68e852c442b3b98"
+  end
+
+  depends_on "go" => :build
+
+  conflicts_with "python-yq", because: "both install `xq` binaries"
+
+  def install
+    ENV["CGO_ENABLED"] = "0"
+    ldflags = %W[
+      -s -w
+      -X main.commit=#{Utils.git_head}
+      -X main.version=#{version}
+      -X main.date=#{time.iso8601}
+    ]
+
+    system "go", "build", *std_go_args(ldflags:)
+    man1.install "docs/xq.man" => "xq.1"
+  end
+
+  test do
+    version_output = shell_output("#{bin}/xq --version 2>&1")
+    assert_match "xq version #{version}", version_output
+
+    run_output = pipe_output(bin/"xq", "<root></root>")
+    assert_match("<root/>", run_output)
+  end
+end
