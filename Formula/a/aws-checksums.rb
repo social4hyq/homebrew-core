@@ -7,12 +7,7 @@ class AwsChecksums < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "6d445735de28c8a10112acf0aef35604333dd1e116178049cb14fac250cc2a8e"
-    sha256 cellar: :any,                 arm64_sequoia: "51f9c37d851867716d37defe9144f5835fb6278ca1f35907e911a1d586bb0072"
-    sha256 cellar: :any,                 arm64_sonoma:  "e24b9a1b71244f86bd5fa10251200429c07d8a059c0457f07adecab8ddb7f1ee"
-    sha256 cellar: :any,                 sonoma:        "a61857ac1b1680a507dc293eafaec707cb2d9f3b39f4aa8526cf802f22d53b28"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c915444ca9fc28a35b3b45d8af248c85af9e23b55d0f40e3dead889bd7f500e5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "36f9b3e8cbcd098bf0ef110583df824360ad86e71dd9265904203872f59c763f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e81b34755182930056094734851cf913164f5787795592980d025e9cf433520"
   end
 
   depends_on "cmake" => :build
