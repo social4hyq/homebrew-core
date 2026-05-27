@@ -6,12 +6,7 @@ class FirebaseCli < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "1f18155954f388ff4e2219bf854a9221155cab7ea787bbf1b22d60e527418b38"
-    sha256 cellar: :any,                 arm64_sequoia: "34e1c841cbf6bf005d24034f5f4c6c69d47aeea7e7dfb6c048bf25bad2122bd1"
-    sha256 cellar: :any,                 arm64_sonoma:  "34e1c841cbf6bf005d24034f5f4c6c69d47aeea7e7dfb6c048bf25bad2122bd1"
-    sha256 cellar: :any,                 sonoma:        "1bbc2e357ef0a0dc6b60a3aa4fbf4ed8bcabdddb34d84f26d00bd6034917f244"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d2699f4656b3b186158e86d0bc9fdaad5d7590b7c3c156952cb19a483cb52f35"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "67fd23260bedaf567b642be8f8ac587e8386231f3e6da69d9225e447668c1257"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7af3a2eb2631eaef66b6175f901ccd9f22bedb9c7b166d6730749c56a5b2db6e"
   end
 
   depends_on "node"
