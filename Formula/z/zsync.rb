@@ -12,12 +12,7 @@ class Zsync < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "12e96b41f0c2cca218d488016b5f113d9ca3eb9dde85d13dfbd1d07634671c74"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "12e96b41f0c2cca218d488016b5f113d9ca3eb9dde85d13dfbd1d07634671c74"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "12e96b41f0c2cca218d488016b5f113d9ca3eb9dde85d13dfbd1d07634671c74"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7d03856c3009453e1913140f378bc93e8a0aa56d7ba72aba27fc4a3709eff5c7"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4e9e2f4ce10ce50733c4f7329d80d052efa0898eda3f32c9d15237bcddedf702"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "42557ff05556fd843218746a1a1f129f72c44c9d67b72c2aa4f69ba64e118280"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a7cb64559e00b54d7fe41f8224958ae2e1b8dbd3e9eb0efa2be4a682c2b9adc"
   end
 
   depends_on "go" => :build
