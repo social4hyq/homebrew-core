@@ -6,13 +6,7 @@ class Openspec < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "25a8e251b633969c788ec4c66ebaff45127a2423774cb1ca3013c84f0de0e302"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "25a8e251b633969c788ec4c66ebaff45127a2423774cb1ca3013c84f0de0e302"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "25a8e251b633969c788ec4c66ebaff45127a2423774cb1ca3013c84f0de0e302"
-    sha256 cellar: :any_skip_relocation, sonoma:        "33527abf7c8531aae11ce4fa172a05b8f4cffec93ffaf3e0acc9334337e66b38"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "33527abf7c8531aae11ce4fa172a05b8f4cffec93ffaf3e0acc9334337e66b38"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "33527abf7c8531aae11ce4fa172a05b8f4cffec93ffaf3e0acc9334337e66b38"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "59cc36e428675ad6ab8b36858f1767d925b6f011daa0c40ee4f80394aed48c6f"
   end
 
   depends_on "node"
