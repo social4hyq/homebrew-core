@@ -14,12 +14,7 @@ class Httrack < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "b32f52b8a3d7c29bc4ef8786a5d7442b989d007c92ed205bd8e2fce3d7d9e7c3"
-    sha256 arm64_sequoia: "c490f41b189c3f0627d2430c16657c2789ef61fe533d90ed72ab5c5e0869fd9e"
-    sha256 arm64_sonoma:  "896935f765df6afd7676c0b3e582ae66ce4052a097b20e78200aadef15be4268"
-    sha256 sonoma:        "58af4297d8cdebb0c20de947610b3f473f5081ac81fbd75a253c27c570362c2c"
-    sha256 arm64_linux:   "548edf68271f1856edf0f9c34153043ece5575d8b97f1e3373cbabde82f93cff"
-    sha256 x86_64_linux:  "4425d23c7e0fc3fbae36a0201b1519e4fb2ad3f6789caa4cf1b58b43e8c826cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "947b82f55c2e2b3eaf6987eafaa4527863db73ac57ee2231525db59c347ec9f5"
   end
 
   depends_on "openssl@4"
