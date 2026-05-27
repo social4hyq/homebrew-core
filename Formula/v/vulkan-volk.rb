@@ -12,12 +12,7 @@ class VulkanVolk < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "42737514660db3603287af33cba34c8284657afb65602d1c515f8559471f522b"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b019c6e850ca86b1944fcfbf0ebb5f118152a2f1f2115ad25459927b53da37a0"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b90c534582929c2324a7694986b254f3c2924f6b83e990e368e9187e3fc3daf8"
-    sha256 cellar: :any_skip_relocation, sonoma:        "581afb0ef931e3e0d09a0f345037f76495b4cdb03349ceb9ca07134b4fb57e85"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "22e9b161000d55a7a4a544168a8502d3d0a949a61d44321a1bbc49584db2362c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c1192aef4a85f5fc28530ffde25c0e28f740bc495bf2359295968a51ce96c5bc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c5c58bf8067cb29fc51954ae47e2268cd17c833aa93326ef8a2589390a97784"
   end
 
   depends_on "cmake" => :build
