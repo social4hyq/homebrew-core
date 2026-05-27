@@ -11,14 +11,7 @@ class Log4cplus < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c2a1d0840621edc53d144eeca4f745ba6192061d457e8e0a60e6d28b23ed27e7"
-    sha256 cellar: :any,                 arm64_sequoia: "c2330f21e0b3c6f379e155d8270f758067c67d5086bad74350dd6841114f70ac"
-    sha256 cellar: :any,                 arm64_sonoma:  "8035d145371eff042f792dc7a2627c9b67a3f20530fb2f66e07e7b4bd25eeb93"
-    sha256 cellar: :any,                 arm64_ventura: "b60bac8e9aaf34f6b81055d7ebc3578462e1e144855e1e3d416e54fa87346fab"
-    sha256 cellar: :any,                 sonoma:        "b3cbcf75711ecb77bbf59942f30e8e6767105753b5363cc8cd8ca5d13201314b"
-    sha256 cellar: :any,                 ventura:       "7c62fc3ea51cc81fae1f97f5649898fdb567667b67d99fd419347e237b636fcf"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d789ed4a5d65789a09539bb155c14708acd9f7037318c43233933690d10cf474"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "038cc5359e99cc5e80a899304e02f22c54156539c5b3db4e03516982ebdb3c12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b31b5f5949d7071143c0e5df9ae920652e7b648a88a7a3fa598adda77c947a0d"
   end
 
   depends_on "pkgconf" => [:build, :test]
