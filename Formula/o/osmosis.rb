@@ -11,8 +11,7 @@ class Osmosis < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "bbf0840fce8067bb973ff59a7e9d9774178ae11b9af976aa0842e80b90264b00"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "af027152878b178e742a7ea0885a17c9006cec6f198b06e5e4f8e719a2c5764c"
   end
 
   depends_on "openjdk"
