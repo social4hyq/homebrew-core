@@ -7,12 +7,7 @@ class S6Rc < Formula
   head "git://git.skarnet.org/s6-rc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "fe87f78bdf90ce4b333fd938fefe7ddb83610d5ff56c8702379423aabb9e2aeb"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "39fa8c4fd1944a64087eacc799ea396508625794c30eb57967254aedf64438d7"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cfe09771cd716edaf7cf5f4823e5f6445aacfc4e44702daed550c0069007c3b8"
-    sha256 cellar: :any_skip_relocation, sonoma:        "cb335b14006884fa6f1767bde6055e9d8999fcd9be783c766482828b197daf53"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "89222f77047fe7d4830bf67744275a0d3b068e7cadf713e21fb84f791d535ee6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "86e2c5dd3090eb3b36a5c0d40b22f677337f4256a97c5118d0c34d5b7f2882fb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "28b46ad4389ba7ba54ac083ff1a12c93723c54f809aae289d45faa8dd242c25f"
   end
 
   depends_on "pkgconf" => :build
