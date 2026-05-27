@@ -8,12 +8,7 @@ class Libass < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "bb0721a4dc29f2bdff8decdcafebc18199381f48d270070d13f56b19ef17944a"
-    sha256 cellar: :any,                 arm64_sequoia: "8f95ded463c17df0c2aab2c740af0139bc4a0cdbcfb5166fd8f08dfecfadb2ee"
-    sha256 cellar: :any,                 arm64_sonoma:  "5c1a3edc4205935aef54e4145f34dc5af961eabd8fd0d9873263099443cb7646"
-    sha256 cellar: :any,                 sonoma:        "f35ce2f83bf6547a43cebd2c410dff6e06125fe5b293e3bfb053525422fa9825"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "24e7d218a421d7f5e68231640235508682e8a49178179b5b9f3771686c01f859"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3be86876627e29d2d7ce71dfac1df3afe013af1cd065b5367b43b25d64d01f17"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4673dc19e43f66516b42246d21271f76bb7b26122ce969afd5a3f8d7927f281"
   end
 
   head do
