@@ -14,12 +14,7 @@ class Mac < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "3fb9bf2e4498d103478a7ec6014de996dc3e6ca25fbc8676fdc5bcf4f9199d64"
-    sha256 cellar: :any,                 arm64_sequoia: "5b63ea2daefc70e821db9c01e091e34d741e27a3ab210d464773b2342962331a"
-    sha256 cellar: :any,                 arm64_sonoma:  "dda9f906a72e0e907e0ef9f7f7df166460e1abb668c0b13d66c1460b1986b509"
-    sha256 cellar: :any,                 sonoma:        "d635ee586033a9f010f8e38b8c2974874356d682dc958b33be2bafc1a87c738b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8e4b7c8d1d89dd5c2f717902397b44119707b61a631f3dcd994ba93d7a749b7f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7a22a9885bc8f95dd70301da38d6764edea80c1410a0152df79690f23bb4eee0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ada7e65fb7e60fd6fc9d5685034c3f68ddbbb5c68ad454773fc571519381b552"
   end
 
   depends_on "cmake" => :build
