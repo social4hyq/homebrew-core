@@ -7,8 +7,7 @@ class Plenv < Formula
   head "https://github.com/tokuhirom/plenv.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "5a0466e4db621c88c365d43a2833a11f9fb5c8284c906b34e2d8d71365370d31"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dac52fc3c2ec5c5b69329f30e4bdfcae67afd7c299ef07b8742b45840478f695"
   end
 
   depends_on "perl-build"
