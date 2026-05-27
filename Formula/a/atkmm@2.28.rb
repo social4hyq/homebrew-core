@@ -11,12 +11,7 @@ class AtkmmAT228 < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "705de48adab70c424550dc780e5605f793cdded64693e31ac89dfc89b6cc78b8"
-    sha256 cellar: :any, arm64_sequoia: "33cf53b6543685306f355219df4868756989754d68241ed2261f60166a1e9d84"
-    sha256 cellar: :any, arm64_sonoma:  "d529dc45c703e2701ea071875a552df76a88dbad5952e25bc1508a68a07177c6"
-    sha256 cellar: :any, sonoma:        "8d00c4665d3776f37519d276675fe3f678a6d763a23103f3f33d10168be23655"
-    sha256               arm64_linux:   "8eaf1ae166256b15fd53483a1eb2bb799e813e9f0af7c86b983a754d9a8d6a12"
-    sha256               x86_64_linux:  "66fe6c72737ac6e46980d801c614b3960e2d4f3883f884ba28820c87e9a339bc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb2315af7ef783e7fb44a915897271cb0c3c57f8b7e15884b47f77e61f9c34b4"
   end
 
   depends_on "meson" => :build
