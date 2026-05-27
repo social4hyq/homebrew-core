@@ -7,11 +7,7 @@ class Devcockpit < Formula
   head "https://github.com/caioricciuti/dev-cockpit.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c219068bdf25afb8b35eec889ca9904a71bab68eb877d74037a1bd53f0a7f443"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ba82bc26988600c8291347d23446a3aa3ac854f12a12059d47a5dd1b47676686"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "30b27277a81e21bb38aa937dada422adbad94ed6ea91eab3e34cb7981d619111"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fa8f5a921bb8f92fe91226b0fba5b679ab9ba28e8832140bfd70794ead6f8bd3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5d4501f7e77eababad97ccc88b68baaf3f93aae146bbbd5409669c48bc201512"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2256747328ff749d514ed3dc4d787fdb4515470e01fccdc0fa8f04385fe5bdc"
   end
 
   depends_on "go" => :build
