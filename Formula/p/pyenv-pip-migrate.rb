@@ -7,8 +7,7 @@ class PyenvPipMigrate < Formula
   head "https://github.com/pyenv/pyenv-pip-migrate.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "22d0416340223bd3821c6f57f00515c5dff2d92772f0613dcd81ee13730fab6f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "051e0f06922bec94f739d920c2628f92bdb9f57d878e292e95e3e13d1e469312"
   end
 
   depends_on "pyenv"
