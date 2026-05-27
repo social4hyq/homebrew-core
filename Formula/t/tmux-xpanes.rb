@@ -6,7 +6,7 @@ class TmuxXpanes < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "2be02befe36fe61aef1786514521572e2e4d48edbb828bc7154b1dafa629d0c4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "57d34963697d81ef15114812c018874e2322f8efabc24303105ce3b567c05633"
   end
 
   depends_on "tmux"
