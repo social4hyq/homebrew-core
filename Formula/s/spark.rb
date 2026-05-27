@@ -6,8 +6,7 @@ class Spark < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "538b171dbbf8740d4bd1ead547ed1928f3fc03d6846fd9ab1cc4a6c37707d09c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fcc00276710dbde68414fdb3bcd2d1f8ae229ab2077e6b0581c34bd3758516a6"
   end
 
   def install
