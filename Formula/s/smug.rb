@@ -6,12 +6,7 @@ class Smug < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "1126306e80147d592efcf3b57ff610c40e8bbc02df3eeebf80206eb392551f3f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1126306e80147d592efcf3b57ff610c40e8bbc02df3eeebf80206eb392551f3f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1126306e80147d592efcf3b57ff610c40e8bbc02df3eeebf80206eb392551f3f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "cb3aae2c875a366eb6778d839a1a9951e324b77c1e670b52bda045b0e6a309fe"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e19a9160964769f02cac3d20edd653fbbde0e3d74fc6e322fb9d39d1b390bc15"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8388b2211eb4bb3ec0668353d4005d84da74497827a5a155757d62e5df6f0f47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "56e5a859b0b4a6de0681539b0236013aa588bbf004ec6f66ce7e4303420d623b"
   end
 
   depends_on "go" => :build
