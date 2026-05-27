@@ -6,7 +6,7 @@ class Sitefetch < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "5f514ec63a1829bd85a7cb8f5aef1f4712ab83e21480f583a05d4e231f90ac83"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb4310e5b2305331ac56eb4bb6973f427d44f873ecaf151bc524dd13c008c2f9"
   end
 
   depends_on "node"
