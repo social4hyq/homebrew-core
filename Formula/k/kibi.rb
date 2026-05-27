@@ -6,12 +6,7 @@ class Kibi < Formula
   license any_of: ["Apache-2.0", "MIT"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "bb06d019acc78dbbe42b1f3859743ca1d516eb54cf54a72229aaeb5ee62aacc3"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "85d1fad82e87446f839686a6ee90533134fb949813bba8cbb04a583294d85201"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d51186943ed5638a037531ce219bfbc10be39e969cbdb2a11e355f06f0c75aa0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "2aa697080d2ca9d9f7d66d979cbe2fdeb18a06c724cf4dcf546a0e545342b432"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3852d8aa7f19bdea039b6b82944b8de02cba83deebbf86e291977aaba780f6ca"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "25f6258f4378e983e8272f46106fd76caa30914eb5f6a7eb990a7b05b83cfdb7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0f5ef9726b828791d3a8849e99dc2955ac08a3d4df79b70592c7c70d361cf8b"
   end
 
   depends_on "rust" => :build
