@@ -6,7 +6,7 @@ class AcmeSh < Formula
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "f323095950742f7e7899c48f5295433b55c6edfb7092eade86e16fcc74618037"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1bbcdcbfa15961f4aae1596b8c57e6296f15cb34856cacd7e35047c3238327c"
   end
 
   def install
