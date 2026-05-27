@@ -11,8 +11,7 @@ class Ack < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "8d040693538ad8d489770cf4186a47364fc2bbe4d47e863c491b863e04b4df30"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd97988f30c3450357222600d8eb9de5413ccc8e042603b1e61981d3834165a9"
   end
 
   head do
