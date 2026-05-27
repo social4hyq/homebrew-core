@@ -1,0 +1,46 @@
+class CairommAT114 < Formula
+  desc "Vector graphics library with cross-device output support"
+  homepage "https://cairographics.org/cairomm/"
+  url "https://cairographics.org/releases/cairomm-1.14.5.tar.xz"
+  sha256 "70136203540c884e89ce1c9edfb6369b9953937f6cd596d97c78c9758a5d48db"
+  license "LGPL-2.0-or-later"
+
+  livecheck do
+    url "https://cairographics.org/releases/?C=M&O=D"
+    regex(/href=.*?cairomm[._-]v?(1\.14(?:\.\d+)+)\.t/i)
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbb36e44880f143102bb6f0fd79815588d4015705d0363819c9a23f172afbeec"
+  end
+
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
+  depends_on "pkgconf" => [:build, :test]
+  depends_on "cairo"
+  depends_on "libpng"
+  depends_on "libsigc++@2"
+
+  def install
+    system "meson", "setup", "build", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
+  end
+
+  test do
+    (testpath/"test.cpp").write <<~CPP
+      #include <cairomm/cairomm.h>
+
+      int main(int argc, char *argv[])
+      {
+         Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, 600, 400);
+         Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(surface);
+         return 0;
+      }
+    CPP
+
+    pkg_config_cflags = shell_output("pkg-config --cflags --libs cairo cairomm-1.0").chomp.split
+    system ENV.cxx, "-std=c++11", "test.cpp", *pkg_config_cflags, "-o", "test"
+    system "./test"
+  end
+end
