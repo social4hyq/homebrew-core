@@ -9,12 +9,7 @@ class Cfripper < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "e55af1033c5567bb07806ee971d3e20599278d8b61c74486a3f638a22a92e177"
-    sha256 cellar: :any,                 arm64_sequoia: "8e5124b4254767b28564ecaaf8cdce3c48f125e8bb4d6d5f0cf6a7fda99bc360"
-    sha256 cellar: :any,                 arm64_sonoma:  "ebb259133ed941fc7ecec10b8fd8f68bb0f11e177523318ee1f8f0036bcb5bfc"
-    sha256 cellar: :any,                 sonoma:        "4f4ce5903797d72dc94c815bc70cd862384b716168db0719d821c43277c8acd6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "77454e686bc7d5def7bfae52d00c19a1d05b12a7ae825e5bf576de05731726aa"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3a59cf9e91b316f9922ceb706299a88126318be2e089b40b5a4ba99ec58ee1a4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65430bea16e5534d5f69cdcc3637c85fa44f76fb57f7e89a87dc585f929507db"
   end
 
   depends_on "libyaml"
