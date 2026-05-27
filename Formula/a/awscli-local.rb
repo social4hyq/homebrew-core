@@ -9,7 +9,7 @@ class AwscliLocal < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "01ea4917355263c817f7a6ed4fc8bda4a4f42574b27b0c66915cc627d355129e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e66f5e15c46a6a62802982c985fab1caa3831d74389a53e522b7c9b5ab879ce"
   end
 
   depends_on "awscli" => :test # awscli-local can work with any version of awscli
