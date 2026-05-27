@@ -6,12 +6,7 @@ class NomadPack < Formula
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9761fdb20f5158538de20b69389e72f4e27b9d6b5afa3d9ef4e84ad628662b4f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "9761fdb20f5158538de20b69389e72f4e27b9d6b5afa3d9ef4e84ad628662b4f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9761fdb20f5158538de20b69389e72f4e27b9d6b5afa3d9ef4e84ad628662b4f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "093c8100b110f48f781e0852c6a9d6703c672530a96461fdbcdc99e4c68ac0c5"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "913df678b2b04c2d2735b4c1d48498ef53244c088e6cd341c2ec0eed869e203a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e5af2f227ecad0890711d11356ef282f95653265446c363cd1187833e94b7304"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d82aa62a5a21efefca54e66be8d020398cbdce2cd274d71d4fcc328eb88dffb"
   end
 
   depends_on "go" => :build
