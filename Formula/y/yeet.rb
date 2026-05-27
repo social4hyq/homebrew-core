@@ -7,12 +7,7 @@ class Yeet < Formula
   head "https://github.com/TecharoHQ/yeet.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "0a64ebe364abe919c485ae2c45b8b907d6608d79c26c195c98e2b451f0d79502"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0a64ebe364abe919c485ae2c45b8b907d6608d79c26c195c98e2b451f0d79502"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0a64ebe364abe919c485ae2c45b8b907d6608d79c26c195c98e2b451f0d79502"
-    sha256 cellar: :any_skip_relocation, sonoma:        "16ba4cd6fc30270de1613de4b6a51a1c6c5cd0d4af1fc06fffc4a0843d2189c5"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "22266d8460064c82256e4196987b72c77b056cac9a2db4f9c0bff8baf38a81fb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f6d294ff56054ff457e2da59d46ec8adfcb2fce71572a3a9b67e403947fc3cf8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6016059352ba3a3c43eeb76ab0f142a425c75c45eb05081d6fa321b0f4825ed9"
   end
 
   depends_on "go" => :build
