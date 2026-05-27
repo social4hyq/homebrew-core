@@ -6,8 +6,7 @@ class Jmxterm < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "03113ff040a52832b1202c64ba4b784662b455e6aea16641d42206fa7c770661"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a5760f1be1969ba406329c59dc16394624f211b00cf40385b8baebd009025a6"
   end
 
   depends_on "openjdk"
