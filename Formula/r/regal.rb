@@ -7,12 +7,7 @@ class Regal < Formula
   head "https://github.com/open-policy-agent/regal.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "cec6c02fe7011597626821c8d2aa93693e857b9f622339e8e114c87f72c9f891"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "cec6c02fe7011597626821c8d2aa93693e857b9f622339e8e114c87f72c9f891"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cec6c02fe7011597626821c8d2aa93693e857b9f622339e8e114c87f72c9f891"
-    sha256 cellar: :any_skip_relocation, sonoma:        "39fe2905bef26492872ceaba4e96669a44ff0e2e5c6f8b21130b63522244d12e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "14bb6488833bab5cfb7995200c9e549a3e68e3b7c9ad2da54c59cfd842beaa33"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e169c07644b0ea9af9733e45d1668b036fb1db015a2d13f99b799e6878addbe1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f32369e92aec29422b4472236ac3c5b52812e55fa029285eccf23538a03ea96"
   end
 
   depends_on "go" => :build
