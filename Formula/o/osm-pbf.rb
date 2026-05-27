@@ -7,12 +7,7 @@ class OsmPbf < Formula
   revision 5
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "03b8c18a1f43e52e2a440a033d88e8a32e4d52ce725bc826e9d6ee8fdf9a6ec4"
-    sha256 cellar: :any, arm64_sequoia: "100151829a3af616fb0558ff88b884fda3573221d062dccadf1f5ccdcedf3ba5"
-    sha256 cellar: :any, arm64_sonoma:  "ddbea381cd744828a75101ea8c2397baf85b27e1e01b98b61e4473c01f7d61c8"
-    sha256 cellar: :any, sonoma:        "a2a094fb6ecc7b82e64b5dda75dc3118206d5d514a8c557e3fb923cbbd7f790c"
-    sha256               arm64_linux:   "0b361cc5af976eddd1afd9a8f4e3dc104aaa5ecfd6f1a1e661849e50e469db08"
-    sha256               x86_64_linux:  "c855cffe69ae03534363bbf06c7614f77b6b4e5c61f20866aa528e0d81e0cf6d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0e45b3745f1de3835d9fd75f8147ebc9b2dd6f0ccfcdf2fa67e06342f044b42"
   end
 
   depends_on "cmake" => :build
