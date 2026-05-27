@@ -7,12 +7,7 @@ class Ekphos < Formula
   head "https://github.com/hanebox/ekphos.git", branch: "release"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ccf301529373a873b634deb8f5afc01c61a06ddb8140e2a62cc4074cf7d2f7ff"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "67e03426e9a9619f9136556b92350f9fc08eb42bdaa931ea52801669a15a5be2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6c9c00694d5272bc33e6a378baa92a75a343c712f0f87aafdd06da7429f6416b"
-    sha256 cellar: :any_skip_relocation, sonoma:        "43f8e742cac3b608e60377ca7d59705d5cf1e7f85240abd44234290665fba439"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ca64eb1e1443d052a3241b1b2a4703407b811d90c397f3ce4d14912538945896"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "85d779ad9e4f45e1c708a0e72be365ee7ddd5a9cb824c7565e45fa81a20a861f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c440eeceb0c4dbf548ac7504c78845690b3cbf237dfb0fad5b439080503c4320"
   end
 
   depends_on "rust" => :build
