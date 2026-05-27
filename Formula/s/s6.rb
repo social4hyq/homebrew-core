@@ -7,7 +7,7 @@ class S6 < Formula
   head "git://git.skarnet.org/s6.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "41e0388759021e10353387725bf8ad59d56eff9fd2d2169471bd39a795170aba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "efca80beeb47fdf0220e283763c6558dfd4dc8f49312707767a1ad9122fa92cc"
   end
 
   depends_on "pkgconf" => :build
