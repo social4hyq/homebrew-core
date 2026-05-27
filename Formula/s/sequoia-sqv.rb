@@ -7,13 +7,7 @@ class SequoiaSqv < Formula
   head "https://gitlab.com/sequoia-pgp/sequoia-sqv.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "845015f993740f9d1698ad2cd74e6b4d6ca5520b230ef79f751c7b16074a4adb"
-    sha256 cellar: :any,                 arm64_sequoia: "0d2d0d9d29c1cffd455b11ffc5bc740500af785ab7812c997d83c179c89fc517"
-    sha256 cellar: :any,                 arm64_sonoma:  "5485c94b874a9c8a4fd40e946c2e1c43e64db3a9a4a0916bdf04634174313150"
-    sha256 cellar: :any,                 sonoma:        "0d605f0ec76c4a4e085be2a7b4d97c74b5afcef2e7fa9b094dfde1b5f79289e9"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a60d77009dbda5d2a4b93c79c67d2a13a2d3f84e7d1dd099eb620b5b6f7e0e39"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "232098b16c3f1b096bc2a5e11088baf698f090cec86a43c9be1ab8345cee2191"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d47507ee8d7dee390ae747038681a26ca5eb441175842075976b7afa06766f78"
   end
 
   depends_on "pkgconf" => :build
