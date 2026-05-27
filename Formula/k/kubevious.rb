@@ -6,8 +6,7 @@ class Kubevious < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "0a90f43ca3f6dc2ce0eff8244708ad484bf9a6860f949a04fb124a0536f41b72"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3803635a5d0eda218c729b62d67fd4adeb066ef6c19470e84c94addf0e9fbc72"
   end
 
   depends_on "node"
