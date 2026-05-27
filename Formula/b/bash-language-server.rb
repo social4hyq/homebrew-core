@@ -6,7 +6,7 @@ class BashLanguageServer < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "efa96e18937bedf5586191f4450794a30d0b7af5efede85876f5fa7629586e68"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "82165879f6463c020934994ebbd4d7f9f3077447b3c511eb03cff88abc0d6e80"
   end
 
   depends_on "node"
