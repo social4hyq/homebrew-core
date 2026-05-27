@@ -7,12 +7,7 @@ class Wails < Formula
   head "https://github.com/wailsapp/wails.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "123d4a761d220965354412a7296430d325381120b351627255cd85fc258164ce"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "123d4a761d220965354412a7296430d325381120b351627255cd85fc258164ce"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "123d4a761d220965354412a7296430d325381120b351627255cd85fc258164ce"
-    sha256 cellar: :any_skip_relocation, sonoma:        "2535ddf6a7c2a8740c717b70a54443ade662bd435371b3c6eaef4ccc5dd9ebaa"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1cd2739ffc1bf176c016b3a6a8b0af7274d554e00a0a1b1da3597bf2cd5048dd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8779c7b2548e06be05de74676f9467160f722c2836587d71e548c0f08ad8bab4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "06d826f4bee55dd20547fe7a4f4d42ca905233e086b0b2f70895736068d3d62c"
   end
 
   depends_on "go"
