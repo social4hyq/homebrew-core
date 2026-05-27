@@ -8,12 +8,7 @@ class ScIm < Formula
   head "https://github.com/andmarti1424/sc-im.git", branch: "main"
 
   bottle do
-    sha256 arm64_tahoe:   "1cc0a6f1c2ceaed2882bdfc320acff02e3aeca823226cffad9f9b53e5184d206"
-    sha256 arm64_sequoia: "6ca2186448913062e28c3304d76e7c8394b590c4a5452f7d7262dd4abf9c3fda"
-    sha256 arm64_sonoma:  "01c63cfb4dd104e85ba0c9bd08aaa3e603b07dfff6eb307723e56b402d3aaa5c"
-    sha256 sonoma:        "9335efab4aba90b13bdef0d33547d82115a5f2ef08b1cfa3a2583bf10e7be3ca"
-    sha256 arm64_linux:   "396e61cf946e7cf03a9f0712a9154589ca12bb6617f16b999e737988136a2a31"
-    sha256 x86_64_linux:  "7c24185e644c1c3e654b8006f7aae4b9d62cfac6cac39f7b8d7dae27583bb43a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6ec75ab2cfa12181f1d5996b5520808c4ddcc0e2e83019874e443b909406fc3"
   end
 
   depends_on "pkgconf" => :build
