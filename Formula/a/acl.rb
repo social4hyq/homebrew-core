@@ -11,9 +11,7 @@ class Acl < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 arm64_linux:  "df5af5425e87eda102251eacdf2a56622bfbda1b285441d438186d471cbd4cb7"
-    sha256 x86_64_linux: "65c9042358cb23a7510fb0a52f938e5b4e48d32c1a19c756165c6c814dd5146e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d83ec06c3b780b430874596d176efdd9088595e4ee412c32cdddd44a2bdcdb8"
   end
 
   depends_on "attr" => :build
