@@ -7,12 +7,7 @@ class Hysteria < Formula
   head "https://github.com/apernet/hysteria.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f11d979c0462bb60749915eeb953754e720056050b75075ffe38ef5975b73805"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f11d979c0462bb60749915eeb953754e720056050b75075ffe38ef5975b73805"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f11d979c0462bb60749915eeb953754e720056050b75075ffe38ef5975b73805"
-    sha256 cellar: :any_skip_relocation, sonoma:        "989e501798a819d372e4d508c0367f7f3cb112aa17a17c1c67cb243226739290"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7a9fc42dc9074b42e025cbf4bde45cea69898f33a72bd35a28644a27a04c9741"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "cf4bfe658f90d0b1ae97e618c5b0890e2c846586dbec74d881b2708e4c0610e5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5cc223aa1826a66577ac2ff5a258776ee06e1fab14a390efb23480ecc2f025f4"
   end
 
   depends_on "go" => :build
