@@ -7,12 +7,7 @@ class Jql < Formula
   head "https://github.com/yamafaktory/jql.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "a82127900b48ff5cab1b78b1b1a4f502491aaf7a5c9108cf5f40774e3ce3a856"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0af5b5ae39fb698d0d51505b252a69c7608ad9c01493307fefd7cb4a9bef26f8"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d53f0562177b605d34917aee2b142c63ee92e9bb9fce6adab96f1605ef017eea"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b5460290197caa35f2a9f4bb0624fcbf5090efb45073a8a37821ffb3dab7fc2e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3dcc62490d154fe8bca6ef6a93aa42a69fdff2c9910140afa16df7366941f1a9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "de3883d7e0ce9eca2dafe0a3e714b38cb16257786cbb9186e28c8772620d266d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "723cdfc8d605e44fc1ddbbef7666b4933fd2447eded81a8e5906338893242a70"
   end
 
   depends_on "rust" => :build
