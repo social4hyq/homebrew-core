@@ -1,0 +1,33 @@
+class FirebaseCli < Formula
+  desc "Firebase command-line tools"
+  homepage "https://firebase.google.com/docs/cli/"
+  url "https://registry.npmjs.org/firebase-tools/-/firebase-tools-15.18.0.tgz"
+  sha256 "f8aff59e5763a3fedf074ec8bb6127ada701b04b86635f04470350c55d80c5fa"
+  license "MIT"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7af3a2eb2631eaef66b6175f901ccd9f22bedb9c7b166d6730749c56a5b2db6e"
+  end
+
+  depends_on "node"
+
+  def install
+    system "npm", "install", *std_npm_args
+    bin.install_symlink libexec.glob("bin/*")
+
+    node_modules = libexec/"lib/node_modules/firebase-tools/node_modules"
+    deuniversalize_machos node_modules/"fsevents/fsevents.node" if OS.mac?
+
+    # Remove incompatible pre-built `bare-fs`/`bare-os`/`bare-url` binaries
+    os = OS.kernel_name.downcase
+    arch = Hardware::CPU.intel? ? "x64" : Hardware::CPU.arch.to_s
+    node_modules.glob("{bare-fs,bare-os,bare-url}/prebuilds/*")
+                .each { |dir| rm_r(dir) if dir.basename.to_s != "#{os}-#{arch}" }
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/firebase --version")
+
+    assert_match "Failed to authenticate", shell_output("#{bin}/firebase projects:list", 1)
+  end
+end
