@@ -1,0 +1,41 @@
+class Smug < Formula
+  desc "Automate your tmux workflow"
+  homepage "https://github.com/ivaaaan/smug"
+  url "https://github.com/ivaaaan/smug/archive/refs/tags/v0.3.18.tar.gz"
+  sha256 "a7397f62415adc096afdbef87af297a7d1fd625a55abb9c5dac3bc39d1196d0d"
+  license "MIT"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "56e5a859b0b4a6de0681539b0236013aa588bbf004ec6f66ce7e4303420d623b"
+  end
+
+  depends_on "go" => :build
+
+  def install
+    system "go", "build", *std_go_args(ldflags: "-s -w -X main.version=#{version}")
+
+    bash_completion.install "completion/smug.bash" => "smug"
+    fish_completion.install "completion/smug.fish"
+  end
+
+  test do
+    (testpath/".config/smug/test.yml").write <<~YAML
+      session: homebrew-test-session
+      root: .
+      windows:
+        - name: test
+    YAML
+
+    assert_equal(version, shell_output(bin/"smug").lines.first.split("Version").last.chomp)
+
+    begin
+      output_log = testpath/"output.log"
+      pid = spawn bin/"smug", "start", "--file", testpath/".config/smug/test.yml", [:out, :err] => output_log.to_s
+      sleep 2
+      assert_match "Starting a new session", output_log.read
+    ensure
+      Process.kill("TERM", pid)
+      Process.wait(pid)
+    end
+  end
+end
