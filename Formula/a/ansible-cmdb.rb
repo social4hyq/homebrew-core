@@ -9,13 +9,7 @@ class AnsibleCmdb < Formula
   revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "b6be47954b66a7ecc04bfff866f4417a531171c2bfa3dcf1ac7c17ed5bac7e5c"
-    sha256 cellar: :any,                 arm64_sequoia: "2164c629351884de60aaa7fa684d2384ee24e81c23f5515064becc5728cb7597"
-    sha256 cellar: :any,                 arm64_sonoma:  "f169a1b45de20cb12c7b2c8399fbc32e5d565a808d4a11b919d9595e02ef7175"
-    sha256 cellar: :any,                 sonoma:        "5a4011e6d5933f8e6fa6f6933fd0a222d15ad535bcdf4f4849a89ca5b8200fcc"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e02eca8dd4bf47a7cb861cd1c6ee75f735a46696b1e7e665cd1eb5f2e8f9cda0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c82c4713092df1c5856967eb0d0d4072622d531083501e3995dfa27f10f2fbdb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b8fcb971c3a611d76d9dd4602bcbe884ec6972ce56a707d010e476b636e8ebf8"
   end
 
   depends_on "libyaml"
