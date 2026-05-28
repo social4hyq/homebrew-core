@@ -7,8 +7,7 @@ class Sub2srt < Formula
   head "https://github.com/robelix/sub2srt.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "ea67deb8ff20129ec22608ac25dfa2928c935552cd1d8f480c54e2247f04b9fc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "59d815da783e084aecd1a0c6d5e5f0d36aa6f5590196e6853e9d1284954d4378"
   end
 
   uses_from_macos "perl"
