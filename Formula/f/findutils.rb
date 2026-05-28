@@ -7,13 +7,7 @@ class Findutils < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "bbf1fa06d2c0dd2b170e83266bfb76f9b59e6bd8a44423009aebdd23c99b5138"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c0ba2122a404aa878c9dc830fa726bd16b15c6c01a00b14837064b788c1deba4"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5f132d0f2ed5d4805e0c1b6266b7899298d79eb2e79231b3c023e9eba2a4f46e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ee53e5aa5b42856fe2feb224eb8348714e47bfdadb7084f903750ec0d6a9b0f4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "efc2f7cef22fbf5d5926c972fc0340c3c5a2063b744dd86e34df16192e4adcfb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c6eca32ebb39b10a1e1f6f78fb60ff1ad2c5b0f9e87c8dcb90ff9a113776fab1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e60897ffc6403b58b411d4b3ae55e121e17502648c9c8787278455d1ad8a5342"
   end
 
   patch do
