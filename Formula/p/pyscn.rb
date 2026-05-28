@@ -7,7 +7,7 @@ class Pyscn < Formula
   head "https://github.com/ludo-technologies/pyscn.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "111a09a4983221ae3150f1c8c57d3d8509c91f9971ec7effcd9908950fbecbd4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fdeeb494d664eeb543ab6e8e5599021130b3fb406f12457d96c66773c269532"
   end
 
   depends_on "go" => :build
