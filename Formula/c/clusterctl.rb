@@ -17,12 +17,7 @@ class Clusterctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "149a07dea354793ff15338916544bcd18c977ca453ffc1c24e9749a88f9e1d2f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5df22f03beaac197f70e7a34c5239c8777aea8a139a808021831e158caedb9c9"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f29fcfbce13f71bfe49fd5dcfc5b951e88536312f9aef0362a16c639f4c4b5e6"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ee531f6d43ce3187e2904358d3df6cce6686858581caa0395070c11ad7ac6114"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "335a71a765e12f5bdde54c8d8cb28affd84e329c3e17c69e6655948ef3efd0da"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2bd07a7f256baf6771e7d9bcd5a76cd6088ef9e96df0b2db7c1881aa1e066bca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b3f09e75542fdcf45c12382d3fddfd78a2cc174708d47c8c312d7eecee1b5b9"
   end
 
   depends_on "go" => :build
