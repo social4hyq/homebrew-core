@@ -8,8 +8,7 @@ class RbenvChefdk < Formula
   head "https://github.com/docwhat/rbenv-chefdk.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "dcdf8e0ad350e940be7783e378bf8c146bda6e446a13109511a9d4ed705170c0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07042969f8195377c37e29efc66554e5853c37612f554d255777f660dbefa968"
   end
 
   depends_on "rbenv"
