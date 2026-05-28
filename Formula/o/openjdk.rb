@@ -12,7 +12,8 @@ class Openjdk < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9cd9ffd5110c0638f26e71e8e94e1c695c67d532e9deb2590aa5e720e7afc736"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e5f09a638a9cf0b72350821f5d387d669d10ac97e458de95b4e9d2c191de1ab"
   end
 
   keg_only :shadowed_by_macos
@@ -48,12 +49,12 @@ class Openjdk < Formula
   resource "boot-jdk" do
     on_macos do
       on_arm do
-        url "https://download.java.net/java/GA/jdk25.0.1/2fbf10d8c78e40bd87641c434705079d/8/GPL/openjdk-25.0.1_macos-aarch64_bin.tar.gz"
-        sha256 "9175d602f3be2ffa241eb01d24ba4541e29a4dfa2095d4bdc1c9eb4bf4d56705"
+        url "https://download.java.net/java/GA/jdk26/c3cc523845074aa0af4f5e1e1ed4151d/35/GPL/openjdk-26_macos-aarch64_bin.tar.gz"
+        sha256 "254586bcd1bf6dcd125ad667ac32562cb1e2ab1abf3a61fb117b6fabb571e765"
       end
       on_intel do
-        url "https://download.java.net/java/GA/jdk25.0.1/2fbf10d8c78e40bd87641c434705079d/8/GPL/openjdk-25.0.1_macos-x64_bin.tar.gz"
-        sha256 "906fec42291d1f01b4cbd419eece8ff8872dbde1e74bb22e6a98ee0322a22bcb"
+        url "https://download.java.net/java/GA/jdk26/c3cc523845074aa0af4f5e1e1ed4151d/35/GPL/openjdk-26_macos-x64_bin.tar.gz"
+        sha256 "8642b89d889c14ede2c446fd5bbe3621c8a3082e3df02013fd1658e39f52929a"
       end
     end
     on_linux do
@@ -63,8 +64,8 @@ class Openjdk < Formula
         sha256 "502482e32a07ef708a16cb9bf819e3899c75e6795f39040de6593db7e89dfcd3"
       end
       on_intel do
-        url "https://download.java.net/java/GA/jdk25.0.1/2fbf10d8c78e40bd87641c434705079d/8/GPL/openjdk-25.0.1_linux-x64_bin.tar.gz"
-        sha256 "514db33011f2c81fa9c589f7712735b42b9d2575db8f817d3be40a92d2ef7ad8"
+        url "https://download.java.net/java/GA/jdk26/c3cc523845074aa0af4f5e1e1ed4151d/35/GPL/openjdk-26_linux-x64_bin.tar.gz"
+        sha256 "83c78367f8c81257beef72aca4bbbf8e6dac8ca2b3a4546a85879a09e6e4e128"
       end
     end
   end
