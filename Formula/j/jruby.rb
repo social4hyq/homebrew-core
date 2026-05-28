@@ -11,12 +11,7 @@ class Jruby < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "7da1bce0f6c86ddd2e21012388bc6cf502cfbf2eb6a35b76e3ba55884d73baf8"
-    sha256 cellar: :any,                 arm64_sequoia: "3151cfbb6c03860657f7486659019c9301f4f2dd23478d0f38e95704857b9271"
-    sha256 cellar: :any,                 arm64_sonoma:  "a92604f08d6356feb46b314fa6b8f1b4d977050382e5580d97f3b6cb0fa450b6"
-    sha256 cellar: :any,                 sonoma:        "6e1ab08b254db58e577ca641230715c627d7fe82d9c0cd0e6f719d0bfaf64c85"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f9be3c3183561da6916f17c3b89e830bbe9c05592c172fb0d85eee0d99c0ff37"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "35664651f16534720691b92148364014fcbad32ed5f4cc7d0a8737c486adf9db"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dfcf8d11a294616ffa0fc8dc2c8dab71137d0285dd3c70f45ce3c046882f618c"
   end
 
   depends_on "ant" => :build # for jffi
