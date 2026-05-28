@@ -12,7 +12,7 @@ class Lynx < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6597ec13ed4ed0b6acc5a5f5bc94fe6ee88bb93bfd6a46c505a0442bc822a5de"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6adb1871b2a9b24acc6a531ee83adac72c334aa7f8aa8c35ca2771f4cb452852"
   end
 
   # Move to brew ncurses to fix screen related bugs
