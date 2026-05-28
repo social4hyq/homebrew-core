@@ -6,12 +6,7 @@ class ReFlex < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "996e877eb9426eb383e76f7a5930dee4f607277379e6701ac8e00b232e27dcef"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "18a62db6b60b473130a24d91c68c071a26d97ac8b6b6a16417d1fe2de1b10759"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9f7e8d96b240548c3b5ce390234cd26fbdc0eb13da6fb7e9d129db5a44cf1a01"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b05e796aa7090e2542c6f8a8e65df43a5adeeabc09b9aace13093b874b5f14ce"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f1d6f30ec3f0d249ca91e07f7c672710e5de98dc9d56b14cce88c43e57a89a21"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6f2061d3ee5e8418d0bc18be7508ff3519124a77b87afd4e901fa8a205687901"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fe74932da5b9519a0dfef9c83ccae51490f91ee9c4d79e9632691876214e6b17"
   end
 
   depends_on "pcre2"
