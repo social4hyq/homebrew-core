@@ -15,12 +15,7 @@ class Cppcheck < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "518523694d41423a85550fde51b3599dbe612a3489961b0b9103780b336bec2d"
-    sha256 arm64_sequoia: "54a03bd83c1b09be713a064c801a01be591d17727ed71549aacb7d6d7d29e7c8"
-    sha256 arm64_sonoma:  "9d4984fcc1648cccfafc5ad24678ccd4c31637696190d54debb32df35af39ec8"
-    sha256 sonoma:        "a87f5f73792a9c8b76daeb39c3327f6fb0ca2fa851edff328d67eba555cfc46d"
-    sha256 arm64_linux:   "a3811cd45325bb8d14fe93f42f2c7753c3f31415f4878e39d570d00b4f2e123c"
-    sha256 x86_64_linux:  "164b387841e454ba37f7521c9034fc6543221577e1a4df17a23f142410fb30cd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65418dd040e9b47bd0a416466ebdf4eab6514455e3b7f9a89d5d34e0421dc0c8"
   end
 
   depends_on "cmake" => :build
