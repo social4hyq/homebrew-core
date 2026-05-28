@@ -11,7 +11,7 @@ index 2e608f893d6..a6de446fcb3 100644
  # Finally do some processing after the detection phase
  TOOLCHAIN_SETUP_BUILD_COMPILERS
 diff --git a/make/autoconf/flags-cflags.m4 b/make/autoconf/flags-cflags.m4
-index 9bea6b5062e..2750a767df6 100644
+index 3a61840e8c9..df366db9299 100644
 --- a/make/autoconf/flags-cflags.m4
 +++ b/make/autoconf/flags-cflags.m4
 @@ -546,7 +546,11 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_HELPER],
@@ -158,7 +158,7 @@ index 941cb254532..43b7c5682e1 100644
        warning("SVE2 specified, but not supported on current CPU. Using SVE.");
        FLAG_SET_DEFAULT(UseSVE, 1);
 diff --git a/src/hotspot/os/linux/os_linux.cpp b/src/hotspot/os/linux/os_linux.cpp
-index 3ef58971c2c..9ddabc817e3 100644
+index fc0578f4d9b..5a0c50d3115 100644
 --- a/src/hotspot/os/linux/os_linux.cpp
 +++ b/src/hotspot/os/linux/os_linux.cpp
 @@ -137,7 +137,7 @@
@@ -170,7 +170,7 @@ index 3ef58971c2c..9ddabc817e3 100644
  // dlvsym is not a part of POSIX
  // and musl libc doesn't implement it.
  static void *dlvsym(void *handle,
-@@ -1562,7 +1562,21 @@ int os::current_process_id() {
+@@ -1538,7 +1538,21 @@ int os::current_process_id() {
  
  // This must be hard coded because it's the system's temporary
  // directory not the java application's temp directory, ala java.io.tmpdir.
@@ -193,7 +193,7 @@ index 3ef58971c2c..9ddabc817e3 100644
  
  // check if addr is inside libjvm.so
  bool os::address_is_in_vm(address addr) {
-@@ -2035,7 +2049,12 @@ const char* os::Linux::dll_path(void* lib) {
+@@ -2009,7 +2023,12 @@ const char* os::Linux::dll_path(void* lib) {
    const char* l_path = nullptr;
    assert(lib != nullptr, "dll_path parameter must not be null");
  
@@ -206,7 +206,7 @@ index 3ef58971c2c..9ddabc817e3 100644
    if (res_dli == 0) {
      l_path = lmap->l_name;
    }
-@@ -3259,17 +3278,25 @@ extern "C" JNIEXPORT void numa_error(char *where) { }
+@@ -3230,17 +3249,25 @@ extern "C" JNIEXPORT void numa_error(char *where) { }
  // Handle request to load libnuma symbol version 1.1 (API v1). If it fails
  // load symbol from base version instead.
  void* os::Linux::libnuma_dlsym(void* handle, const char *name) {
@@ -232,7 +232,7 @@ index 3ef58971c2c..9ddabc817e3 100644
  }
  
  // Check numa dependent syscalls
-@@ -4765,6 +4792,12 @@ jint os::init_2(void) {
+@@ -4736,6 +4763,12 @@ jint os::init_2(void) {
    // initialize thread priority policy
    prio_init();
  
@@ -266,10 +266,10 @@ index d0c82135797..039c4e7822b 100644
  
  static void print_rlimit(outputStream* st, const char* msg,
 diff --git a/src/hotspot/os/posix/perfMemory_posix.cpp b/src/hotspot/os/posix/perfMemory_posix.cpp
-index 3deb7efeb9b..d4243d909c2 100644
+index e3483781794..3d362526dc1 100644
 --- a/src/hotspot/os/posix/perfMemory_posix.cpp
 +++ b/src/hotspot/os/posix/perfMemory_posix.cpp
-@@ -134,18 +134,22 @@ static void save_memory_to_file(char* addr, size_t size) {
+@@ -130,18 +130,22 @@ static void save_memory_to_file(char* addr, size_t size) {
  // return the user specific temporary directory name.
  // the caller is expected to free the allocated memory.
  //
@@ -295,7 +295,7 @@ index 3deb7efeb9b..d4243d909c2 100644
      tmpdir = buffer;
    }
  #endif
-@@ -437,7 +441,16 @@ static bool is_file_secure(int fd, const char *filename) {
+@@ -433,7 +437,16 @@ static bool is_file_secure(int fd, const char *filename) {
  // the caller is expected to free the allocated memory.
  //
  static char* get_user_name(uid_t uid) {
@@ -313,7 +313,7 @@ index 3deb7efeb9b..d4243d909c2 100644
    struct passwd pwent;
  
    // Determine the max pwbuf size from sysconf, and hardcode
-@@ -486,6 +499,7 @@ static char* get_user_name(uid_t uid) {
+@@ -482,6 +495,7 @@ static char* get_user_name(uid_t uid) {
  
    FREE_C_HEAP_ARRAY(char, pwbuf);
    return user_name;
@@ -321,7 +321,7 @@ index 3deb7efeb9b..d4243d909c2 100644
  }
  
  // return the name of the user that owns the process identified by vmid.
-@@ -517,7 +531,9 @@ static char* get_user_name_slow(int vmid, int nspid, TRAPS) {
+@@ -513,7 +527,9 @@ static char* get_user_name_slow(int vmid, int nspid, TRAPS) {
    char* tmpdirname = (char *)os::get_temp_directory();
  #if defined(LINUX)
    char buffer[MAXPATHLEN + 1];
@@ -331,7 +331,7 @@ index 3deb7efeb9b..d4243d909c2 100644
  
    // On Linux, if nspid != -1, look in /proc/{vmid}/root/tmp for directories
    // containing nspid, otherwise just look for vmid in /tmp.
-@@ -638,6 +654,13 @@ static char* get_user_name_slow(int vmid, int nspid, TRAPS) {
+@@ -634,6 +650,13 @@ static char* get_user_name_slow(int vmid, int nspid, TRAPS) {
  // return the name of the user that owns the JVM indicated by the given vmid.
  //
  static char* get_user_name(int vmid, int *nspid, TRAPS) {
@@ -345,7 +345,7 @@ index 3deb7efeb9b..d4243d909c2 100644
    char *result = get_user_name_slow(vmid, *nspid, CHECK_NULL);
  
  #if defined(LINUX)
-@@ -650,6 +673,7 @@ static char* get_user_name(int vmid, int *nspid, TRAPS) {
+@@ -646,6 +669,7 @@ static char* get_user_name(int vmid, int *nspid, TRAPS) {
    }
  #endif
    return result;
@@ -354,10 +354,10 @@ index 3deb7efeb9b..d4243d909c2 100644
  
  // return the file name of the backing store file for the named
 diff --git a/src/hotspot/share/gc/shenandoah/shenandoahArguments.cpp b/src/hotspot/share/gc/shenandoah/shenandoahArguments.cpp
-index 8247b82e861..401c0cfff98 100644
+index 65495882ef0..ce26d3bda3a 100644
 --- a/src/hotspot/share/gc/shenandoah/shenandoahArguments.cpp
 +++ b/src/hotspot/share/gc/shenandoah/shenandoahArguments.cpp
-@@ -70,9 +70,11 @@ void ShenandoahArguments::initialize() {
+@@ -69,9 +69,11 @@ void ShenandoahArguments::initialize() {
  
    // Enable NUMA by default. While Shenandoah is not NUMA-aware, enabling NUMA makes
    // storage allocation code NUMA-aware.
@@ -385,6 +385,22 @@ index 03aa8e5acee..395e972b448 100644
    } else {
      if (UseNUMA) {
        if (!FLAG_IS_DEFAULT(UseNUMA)) {
+diff --git a/src/hotspot/share/jfr/periodic/sampling/jfrCPUTimeThreadSampler.cpp b/src/hotspot/share/jfr/periodic/sampling/jfrCPUTimeThreadSampler.cpp
+index b5d1171ae97..91f65c35a77 100644
+--- a/src/hotspot/share/jfr/periodic/sampling/jfrCPUTimeThreadSampler.cpp
++++ b/src/hotspot/share/jfr/periodic/sampling/jfrCPUTimeThreadSampler.cpp
+@@ -672,7 +672,11 @@ static void set_timer_time(timer_t timerid, int64_t period_nanos) {
+ 
+ bool JfrCPUSamplerThread::create_timer_for_thread(JavaThread* thread, timer_t& timerid) {
+   struct sigevent sev;
++#ifdef __OHOS__
++  sev.sigev_notify = 4;
++#else
+   sev.sigev_notify = SIGEV_THREAD_ID;
++#endif
+   sev.sigev_signo = SIG;
+   sev.sigev_value.sival_ptr = nullptr;
+   ((int*)&sev.sigev_notify)[1] = thread->osthread()->thread_id();
 diff --git a/src/hotspot/share/runtime/globals.hpp b/src/hotspot/share/runtime/globals.hpp
 index 4b32e370dcd..9defd0112ff 100644
 --- a/src/hotspot/share/runtime/globals.hpp
