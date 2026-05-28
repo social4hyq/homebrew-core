@@ -11,12 +11,7 @@ class LibpqAT16 < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "ff4944817a39511786c625ba5415ce4bbbe2ae483c4d648b39f8cffaba1d622c"
-    sha256 arm64_sequoia: "b46ac41117c2cc68f2e6e877e4c64ecbe50dc263ed035d619ecd3fda739e430d"
-    sha256 arm64_sonoma:  "b97df2c07bad416e7514d339c4c680bce88929e58a05cb8139a9be8b80d575f1"
-    sha256 sonoma:        "a49e9f6086d867b249ee32582ffb1d704d1aacca7a2e069c491b5bc7a9f173f0"
-    sha256 arm64_linux:   "ceb9e6017d56f8f15cf58e574bb4417a277b265a2994aca3094364326b68c16e"
-    sha256 x86_64_linux:  "0baa7f8f0aa6b12f4cb38ae2d39e708cd2f7e2a6943716a683b5075f6cbe1277"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6fc05c3fa8c08979e0d7b9473f38468d2b755a6bd2c5e2df34ba6d4e3ef1ed4a"
   end
 
   keg_only :versioned_formula
