@@ -12,7 +12,7 @@ class Atomcode < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7da32997c1e0a0ac64325df04508a5a793c9c9000d2b95e2c694dc4da8eba0db"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "547d0aaab4c5ca08bd844d83d5929ac0d1bd526f3709a7b3a646e307ebd791be"
   end
 
   depends_on "rust" => :build
