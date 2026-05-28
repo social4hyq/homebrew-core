@@ -9,12 +9,7 @@ class Spaceship < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "17f3f81dd1ec6361d640d3eff4cc704bef2f9960679479d97687c7f66c3f984f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "17f3f81dd1ec6361d640d3eff4cc704bef2f9960679479d97687c7f66c3f984f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "582d9b26274e082389d273036c6b10de464b547b600ab91d3bae95966742b2ff"
-    sha256 cellar: :any_skip_relocation, sonoma:        "92eb0994406cec1e2d00a066340a8aaa547f2f693e582d91220e1e2ee48df8b4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fb5a623f8860d993877b3fa1af19bba17fea885a4f758c79c19b4f5330152189"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7b858564e2aff969020c5d0185d9231b2daf9235ef8b26ad6031acd5ac93a1b0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "97831026dcbc2fa14d34e10166654ad9f9b9c9a11537fe7a78c77bede203584d"
   end
 
   depends_on "zsh-async"
