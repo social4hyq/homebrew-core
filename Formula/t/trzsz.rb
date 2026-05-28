@@ -9,12 +9,7 @@ class Trzsz < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "18ceb2b8e4ef4b313862b6119dbf1e91bc466e3aed2bb69689d69af43047ed09"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "f87c644de771a0348261686ace196462c1bffd66a761db34333e29cfc946d1b1"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4b7b205435ce3504af46aff402036fd67d8de96262db3b0a8850246c46561ac1"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9f42b5cc4b373447f9471d5c272791fb0bb9ed0191fa7cb7a540a1fa37a84097"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ae88a004c6f5ae6bac55d16170511072994d19842a3cac6d629e7e43995aa7d5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4533c6cf24c2515bd79a4bca7cbcadbb276dc4bbb29fae8ba1078fbe14465b66"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d736d99186513f085dbfd93a8c81d8e240e2c0c28cb944f3abd5e1f3a7d21155"
   end
 
   depends_on "python@3.14"
