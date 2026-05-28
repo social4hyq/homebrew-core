@@ -8,7 +8,7 @@ class Mdformat < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "863671318644528a8d19c96fd1bad11e378951569eebf8db95004d872c108a30"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "184115e14f6df117f510de645d825946cd78c8acdb02775651bc3ea8542692e8"
   end
 
   depends_on "python@3.14"
