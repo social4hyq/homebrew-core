@@ -6,7 +6,7 @@ class Rootlesskit < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "83a2287e50929c0c22e6712641599b875b4d1313c2f4273c8b81ee7f49030e01"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e65fb20ab04df772cf5a8d67bfbcda99516b1d022c957e0e67101b276aa4dec"
   end
 
   depends_on "go" => :build
