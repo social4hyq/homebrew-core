@@ -12,7 +12,7 @@ class Lazygit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d69ffc596e39749b0b3bfd9835d3797b0793534926722ac55026c87b20ebf649"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1141a29b374199052efc9259c16a7cc41f9d2d80cefc5705b8e768b075f679a7"
   end
 
   depends_on "go" => :build
