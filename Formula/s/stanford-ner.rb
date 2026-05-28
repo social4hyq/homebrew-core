@@ -11,8 +11,7 @@ class StanfordNer < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "caf1491537a74417f2d4070335d5c281ce60387d984726f77458b329b0fbe9c8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e0b65a4e948604b1045a9764d3fabc30b2235c639c47615e0cc7cd2c3ad164e"
   end
 
   depends_on "openjdk"
