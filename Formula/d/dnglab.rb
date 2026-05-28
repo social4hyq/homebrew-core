@@ -1,0 +1,31 @@
+class Dnglab < Formula
+  desc "Camera RAW to DNG file format converter"
+  homepage "https://github.com/dnglab/dnglab"
+  url "https://github.com/dnglab/dnglab/archive/refs/tags/v0.7.2.tar.gz"
+  sha256 "c363a5ff8c058dd6d2ffe22a2ece986fa6ad146043f0211d9b77d789083901ce"
+  license "LGPL-2.1-only"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb956870a9fbc6e6f310a29f3b625f42fd86c6b9d0474c4c0522a1d342fe33bd"
+  end
+
+  depends_on "rust" => :build
+
+  def install
+    system "cargo", "install", *std_cargo_args(path: "bin/dnglab")
+
+    bash_completion.install "bin/dnglab/completions/dnglab.bash"
+    fish_completion.install "bin/dnglab/completions/dnglab.fish"
+    zsh_completion.install "bin/dnglab/completions/_dnglab"
+
+    man1.install Dir["bin/dnglab/manpages/*.1"]
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/dnglab --version")
+
+    touch testpath/"not_a_dng.dng"
+    output = shell_output("#{bin}/dnglab analyze --raw-checksum not_a_dng.dng 2>&1", 7)
+    assert_match "Error: No decoder found, model '', make: '', mode: ''", output
+  end
+end
