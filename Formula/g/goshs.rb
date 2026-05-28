@@ -1,8 +1,8 @@
 class Goshs < Formula
   desc "Simple, yet feature-rich web server written in Go"
   homepage "https://goshs.de"
-  url "https://github.com/patrickhener/goshs/archive/refs/tags/v2.0.8.tar.gz"
-  sha256 "cc5f99c7ed7bbf3fba8c133af194ca4f90709504989a4130f01a7f343e447563"
+  url "https://github.com/patrickhener/goshs/archive/refs/tags/v2.0.9.tar.gz"
+  sha256 "360cc2b9ca78db2d69ba5b45d09a6279bdf575df1babe306f21c3e619a591c97"
   license "MIT"
   head "https://github.com/patrickhener/goshs.git", branch: "main"
 
