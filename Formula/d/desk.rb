@@ -6,8 +6,7 @@ class Desk < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "95e0acae98be5f6f5d3105ff2c6236d3e9648b8bbc1ab350e7735ed3935db8fe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6fef1f04845677b7a87a9542e8bf8f63588672552e924ed4773d5bf85ab43953"
   end
 
   def install
