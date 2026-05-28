@@ -1,8 +1,8 @@
 class Prettierd < Formula
   desc "Prettier daemon"
   homepage "https://github.com/fsouza/prettierd"
-  url "https://registry.npmjs.org/@fsouza/prettierd/-/prettierd-0.27.0.tgz"
-  sha256 "a7a3b95cddf5860d315ccfaaf9df26eee4e7631534f427f68bfb7d1d182a163b"
+  url "https://registry.npmjs.org/@fsouza/prettierd/-/prettierd-0.28.0.tgz"
+  sha256 "944799736015578fdff5ba50dcf200eb052bec3cddfaf922c938867962d6b04a"
   license "ISC"
 
   bottle do
