@@ -7,12 +7,7 @@ class Texlab < Formula
   head "https://github.com/latex-lsp/texlab.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9376f7602a35d01e37ed4b77f3f24d3e7a43ca4d0acd2e9a1ef767b8679a68ab"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6179eb9a7b3d9c97db2022a80e9bbfcfd30f4c362143faa0be707943e84a27f7"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6a972dbc7415f5852c580396b52acf2852e2a14df9f6162a06d009c78235a2ea"
-    sha256 cellar: :any_skip_relocation, sonoma:        "44a52722139efe8a385787d1c68fe16bcc619bbd1cf7e0096060f441509255bd"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "81ba303fcda29afc73b3cd919511f64a5633a24bbc31130c6e814ea1632f2f26"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "77a7631e84cc28f6adbf5d55a2797904621be5b7b4f173383f33ae2bff3dce24"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cacbb9e690da15b965327d9ab1339ea32b25864a69f830f7d08403894d105107"
   end
 
   depends_on "rust" => :build
