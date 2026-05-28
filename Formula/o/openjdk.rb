@@ -1,8 +1,8 @@
 class Openjdk < Formula
   desc "Development kit for the Java programming language"
   homepage "https://openjdk.org/"
-  url "https://github.com/openjdk/jdk25u/archive/refs/tags/jdk-25.0.3-ga.tar.gz"
-  sha256 "24080b39d5bb28c34d1fa738e8704db411c6fc7dac0962cc33305536b0391b9e"
+  url "https://github.com/openjdk/jdk26u/archive/refs/tags/jdk-26.0.1-ga.tar.gz"
+  sha256 "1f9c92513a7b7949e6d01b1935c7b6f77096319b2657e0a4c013bc2da44e2d9d"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class Openjdk < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "911dde95d839fadcc48ba689c5cb388e0ba1fa79fffc420ebcb5f7e220fa559b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9cd9ffd5110c0638f26e71e8e94e1c695c67d532e9deb2590aa5e720e7afc736"
   end
 
   keg_only :shadowed_by_macos
@@ -59,8 +59,8 @@ class Openjdk < Formula
     on_linux do
       on_arm do
         # From BellSoft
-        url "https://download.bell-sw.com/java/25.0.3+11/bellsoft-jdk25.0.3+11-linux-aarch64-musl.tar.gz"
-        sha256 "7f00976d3ee57be1021a4fa94101ff598f6a4367f330080723301fa71faf2645"
+        url "https://download.bell-sw.com/java/26.0.1+10/bellsoft-jdk26.0.1+10-linux-aarch64-musl.tar.gz"
+        sha256 "502482e32a07ef708a16cb9bf819e3899c75e6795f39040de6593db7e89dfcd3"
       end
       on_intel do
         url "https://download.java.net/java/GA/jdk25.0.1/2fbf10d8c78e40bd87641c434705079d/8/GPL/openjdk-25.0.1_linux-x64_bin.tar.gz"
@@ -107,7 +107,6 @@ class Openjdk < Formula
       --enable-headless-only=yes
       --with-toolchain-type=clang
       --host=aarch64-unknown-linux-musl
-      --with-extra-cxxflags="-DSIGEV_THREAD_ID=4"
     ]
 
     ldflags = %W[
