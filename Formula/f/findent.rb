@@ -12,7 +12,7 @@ class Findent < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "916c5fc9c76252a53947881c878298869d9c62494df4270e1bf2daf641e9b138"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "217f543199df29cc38f0d834af165f923045d6a857ebb279f194c3ab35114dc6"
   end
 
   def install
