@@ -7,12 +7,7 @@ class PipeRename < Formula
   head "https://github.com/marcusbuffett/pipe-rename.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "8886d9edd07b147fbf3ce064fc16e76dbf8e6743adcf51e430a96840a4ad8d37"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "0d21af83ebdd3f7b5469630cf427f33bdab6dc981663a81eb16a0a326e8df434"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cec1a4fd195e350bdd24cf90802188a33b161c570dff6045683272021000efea"
-    sha256 cellar: :any_skip_relocation, sonoma:        "a03aa9abc0ed27030089de75e0c528e2a556526441761668417be2e2cea9dcc7"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "47fc5b5e6bb06cf1e0e152f47a4cf5676874206be8c6950dc92370274c300ef1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9e9bb134cc3f9d6e85c6165c6f942e8ec532a96a1d1dd7f329fdcbd5fa1eae21"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b8f3e850127f3098aefd8933d8026adff53cb3145094d65329c74fda0fee3d4"
   end
 
   depends_on "rust" => :build
