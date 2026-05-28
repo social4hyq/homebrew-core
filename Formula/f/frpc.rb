@@ -7,12 +7,7 @@ class Frpc < Formula
   head "https://github.com/fatedier/frp.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "daa7c0b542d64052fe1ef20793c2b85a2367cecde6b82591c920c2b217a32e4e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "daa7c0b542d64052fe1ef20793c2b85a2367cecde6b82591c920c2b217a32e4e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "daa7c0b542d64052fe1ef20793c2b85a2367cecde6b82591c920c2b217a32e4e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "cbb9c662db1dd395acca7e5310f653e93b6c099feed114d293c362e7b4fcbced"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "257261456f8d068ba0d4e104a8e43e088ae80fbcac05696a22979093719004b4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "18df22ac3b3516bbeaf1a4912c243deb9539d7820c54bc2c623156bfda5f992a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c329c08cd0fe89f55a8bc79a11a5c5c94758ecfa412de3416877f11ed252bf0c"
   end
 
   depends_on "go" => :build
