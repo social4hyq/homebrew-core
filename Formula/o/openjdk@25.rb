@@ -12,7 +12,8 @@ class OpenjdkAT25 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d340aa31a1c71c326afa902f8b86689be696c99c5d2e6aab5067418f1698a41"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6052cc323d4798457ba69cabe5a2905c0552404fb73fa92331a1c433de5a0120"
   end
 
   keg_only :versioned_formula
