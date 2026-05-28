@@ -11,12 +11,7 @@ class Lilv < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "0fad3cd65d7e13730119a398cb353a27bf3e08bd6ab20013e7d70ac2a6e5a70c"
-    sha256 cellar: :any, arm64_sequoia: "056bb5958fd905ff29a008eddad6012ee4893a3a853785cc81056323a32ca879"
-    sha256 cellar: :any, arm64_sonoma:  "eb1093c36ce5e5a635aa82c5ad6295ae879ed3d2a3ec1a79396aae6c43d9c564"
-    sha256 cellar: :any, sonoma:        "0a0f97402c765b406aaddce617e49c3c6fcc8d81ecaf0164d44a256fb5e1bfbf"
-    sha256               arm64_linux:   "425911220771e7aa4b1daf0f129484b129e7701d29587698c3304ed4f60329d1"
-    sha256               x86_64_linux:  "f986509920f7bf14d88a0e06483e99d939471804948abc07474a4b8858cb22ee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4992020346d5e0ba9b50d604201bbaf9d724d0edab051d425096146c0effe671"
   end
 
   depends_on "meson" => :build
