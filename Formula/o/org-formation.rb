@@ -6,7 +6,7 @@ class OrgFormation < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "4bbbc66ae295c0a0c257629f70558e877aaa352bac92685061ce94b193f170b9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dcda5201b597bd2a47b576ba29abe42563c8f6b24be28b0083c8938460984f35"
   end
 
   depends_on "node"
