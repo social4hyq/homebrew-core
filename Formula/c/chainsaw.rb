@@ -7,12 +7,7 @@ class Chainsaw < Formula
   head "https://github.com/WithSecureLabs/chainsaw.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9f34206032a5e317bfd1a87fd126e3ecdffada44ea2d3a32629e45d411aec756"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ea55b34e5c67c6a54aa1857cdff9f5927ef61a8098ffca8200321855eaa01a4c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e95d00c963763e3bbb6012e6ff40a186f7a50f89d714d0afd706f3829e10e77f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9f9268170a071e4d0202c10b0825bdcf4db3bc353ca7134795944197753062f3"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "679ef4103a45e0046f6feca4b3d292cecebedf3972d33fb766687899db19c543"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3d204d0e9059777bbf7318481d24a5b85b1391c58b0b9eec84bee0b697280787"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0efcca97d586b4dd6417781302616f29c6dc14e424af71361701d01617034702"
   end
 
   depends_on "rust" => :build
