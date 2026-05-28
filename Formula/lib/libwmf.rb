@@ -10,12 +10,7 @@ class Libwmf < Formula
   ]
 
   bottle do
-    sha256 arm64_tahoe:   "2c6e1d26d2213cbe408a6289a20cab2d9a385babb56997ad30afc0c733f89569"
-    sha256 arm64_sequoia: "648aebf55487d4a5dffd40319f0fc2309e1cfb075e88a27dc03e777f9c8d6f5a"
-    sha256 arm64_sonoma:  "b69efed6e318df46ace734007e3099d1d08dc5753b56b0b9eb8e6fc111083209"
-    sha256 sonoma:        "96d66c997be9b333c085daeda09d2ec1bca0613cfbb6ea66b5ec6bfac260129e"
-    sha256 arm64_linux:   "71f7063942f28d921e37b56cba7b7a323ac3d27fde289ab4adc4f1dabf4f207c"
-    sha256 x86_64_linux:  "bdf120383ed21317c5931926dcc30b3c8d662b0e0873213b321a72ec07b5411f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b4b1806d80197495597a1cd6f4719b9e01d3a09a85eda7b9305d4d5a4cb8077"
   end
 
   depends_on "pkgconf" => :build
