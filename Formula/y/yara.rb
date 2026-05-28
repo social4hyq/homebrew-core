@@ -15,12 +15,7 @@ class Yara < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "f50c08d6d468502fb468d9401c8087a31ed6e2193b518d9f2497e5306dac3df5"
-    sha256 cellar: :any,                 arm64_sequoia: "bed2c8becb6623fc30f867d7399b9b1c8847a0ec40c740cf041ed99adc249aa0"
-    sha256 cellar: :any,                 arm64_sonoma:  "320fd862a8a32c5ad2ed2b58c6db1dba4ff1869cab0b9f5b0998a1d8b255c4e7"
-    sha256 cellar: :any,                 sonoma:        "df647efb738f895f459dce114d2f5cd2add6b0013ef1b754256fcd695064ed1d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "dd2508d80b2e65d4e31548677fc7376e225498b09928b1ef3938bc08fc39f801"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b76a81e19bf1ca4a3f073e9c1811107b61b341e4d3bbd7ed2002cbb9c106c13c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b6dec681b3120c82e9174e97f5448dc9598927c2739ffa24d484b7f7ec3b04e"
   end
 
   depends_on "autoconf" => :build
