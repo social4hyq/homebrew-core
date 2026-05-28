@@ -1,13 +1,13 @@
 class Libextractor < Formula
   desc "Library to extract meta data from files"
   homepage "https://www.gnu.org/software/libextractor/"
-  url "https://ftpmirror.gnu.org/gnu/libextractor/libextractor-1.13.tar.gz"
-  mirror "https://ftp.gnu.org/gnu/libextractor/libextractor-1.13.tar.gz"
-  sha256 "bb8f312c51d202572243f113c6b62d8210301ab30cbaee604f9837d878cdf755"
+  url "https://ftpmirror.gnu.org/gnu/libextractor/libextractor-1.14.tar.gz"
+  mirror "https://ftp.gnu.org/gnu/libextractor/libextractor-1.14.tar.gz"
+  sha256 "1a3a55433fcafc4a32c64dc37b175458e35d6f4e9b8f9f4bf11b2c23cc6b4680"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "47dbbb28ef10a80f228af39c5b23c18bf6dfa1d3bfbb6ab813cbb971c3963434"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e98c6b12876294f4934b6818370dbc319a6d70063ca08af2c36d4f613dba9b3f"
   end
 
   depends_on "pkgconf" => :build
