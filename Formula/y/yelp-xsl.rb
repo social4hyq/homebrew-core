@@ -7,7 +7,7 @@ class YelpXsl < Formula
   head "https://gitlab.gnome.org/GNOME/yelp-xsl.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "e62b397f4153ee39a9ca982273b5d5e83e78d9271445be9883cdc69d1c8a29de"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f13f2463d5c8bc883b8d15a6be271e075553000f1b8992bf770a9455290c5469"
   end
 
   depends_on "gettext" => :build
