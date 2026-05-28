@@ -110,7 +110,6 @@ class OpenjdkAT25 < Formula
       --enable-headless-only=yes
       --with-toolchain-type=clang
       --host=aarch64-unknown-linux-musl
-      --with-extra-cxxflags="-DSIGEV_THREAD_ID=4"
     ]
 
     ldflags = %W[
