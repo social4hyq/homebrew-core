@@ -11,8 +11,7 @@ class AntContrib < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "11f6456cf47128a33054e067467dd8186dfd6db33c85cf60bb8620e4a269fced"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f0060a27d47c1d0f1be1a5154f14ed3364715f2326768dacced2614483a54df"
   end
 
   depends_on "ant"
