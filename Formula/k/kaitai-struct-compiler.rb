@@ -12,7 +12,7 @@ class KaitaiStructCompiler < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "66821f7ac017603678d4c0d615f1421a9a68996d5a7592421e72dbea54f829b8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "53af257b0235d215df2ca47a6ba05048697f9038c293bf4b62adc68d225c80ef"
   end
 
   depends_on "openjdk"
