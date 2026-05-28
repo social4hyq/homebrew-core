@@ -7,7 +7,7 @@ class Libavif < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f0ddbc6a881b81250c801416e1e9b2b307e92309f701ff56d3e3de1c5b70c03a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c453f66790f5382a299d82fd10daaa9f542605e3f08778ab501ff22f37ee552d"
   end
 
   depends_on "cmake" => :build
