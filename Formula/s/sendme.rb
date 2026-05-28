@@ -1,13 +1,13 @@
 class Sendme < Formula
   desc "Tool to send files and directories, based on iroh"
   homepage "https://iroh.computer/sendme"
-  url "https://github.com/n0-computer/sendme/archive/refs/tags/v0.34.0.tar.gz"
-  sha256 "5231ce3bf8636d0aa98dc612e0288ca3083d55d2983ae666d98762a9af926709"
+  url "https://github.com/n0-computer/sendme/archive/refs/tags/v0.35.0.tar.gz"
+  sha256 "57fb54bee5c279f50e3c2ee5ea4eb568cec8273e2bf4a4d46d92d693cd4a28ac"
   license "MIT"
   head "https://github.com/n0-computer/sendme.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1efa4c9ba9a7483a7514e021c2ec30800cbcd12252973d106203ae0e82844859"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5030c24e1454ca8cb53e9d531acc2df07b4e7d62191b747eeb09c68cecde12db"
   end
 
   depends_on "rust" => :build
