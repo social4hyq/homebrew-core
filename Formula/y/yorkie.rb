@@ -1,8 +1,8 @@
 class Yorkie < Formula
   desc "Document store for collaborative applications"
   homepage "https://yorkie.dev/"
-  url "https://github.com/yorkie-team/yorkie/archive/refs/tags/v0.7.9.tar.gz"
-  sha256 "0d67133278ec9e104d4082a9dd7cc312f32be7a1be86881b2ccc4bc55510585d"
+  url "https://github.com/yorkie-team/yorkie/archive/refs/tags/v0.7.10.tar.gz"
+  sha256 "63ed1b3b89dc3e28d7ed8f7895230b4cf84ea4fe78a6c31f17dcf3c21c2e3807"
   license "Apache-2.0"
   head "https://github.com/yorkie-team/yorkie.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Yorkie < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f6545577af572fee269ff5dc11d0063df8e0d9662973e3759db9f629c4fdee9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "91cdaeef6cb3e72471f61e60b4b2b0827cf36fa469efa68a978b6221454c6be2"
   end
 
   depends_on "go" => :build
