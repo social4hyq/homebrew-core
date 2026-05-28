@@ -12,7 +12,8 @@ class Openjdk < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9cd9ffd5110c0638f26e71e8e94e1c695c67d532e9deb2590aa5e720e7afc736"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e5f09a638a9cf0b72350821f5d387d669d10ac97e458de95b4e9d2c191de1ab"
   end
 
   keg_only :shadowed_by_macos
