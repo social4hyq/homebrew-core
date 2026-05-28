@@ -16,12 +16,7 @@ class Pango < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "5b77d8e0844bbfd23f6942aee1a1ad6caa380b5b49f01cddbb3240565f955c8a"
-    sha256 cellar: :any, arm64_sequoia: "f079f30f49b58e5be5932904e3bf303c3394d2029bd87cb44189cb816eb1b3a6"
-    sha256 cellar: :any, arm64_sonoma:  "1025ba606d675f9421b8b9faa6f32a6ef7e25e199cb53014a06a936e79202381"
-    sha256 cellar: :any, sonoma:        "65de49a9b1973a600d0c273da3a557b91d166e4d721f31a7a03bca4967b85fc4"
-    sha256               arm64_linux:   "7890c0f7859c0a9ac1c3de79f2d34b59159117f1d7ba2a638e0ada8636ff6f20"
-    sha256               x86_64_linux:  "b2261ea43e6c3e1716dbfdad810cc34e6ac60ab0eb8b57959fd80f4097db3dc2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e2ebaf851244558a01912c28b67bb3722d212504387be5696a8ea95a35ec473"
   end
 
   depends_on "gobject-introspection" => :build
