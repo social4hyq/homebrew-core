@@ -1,13 +1,13 @@
 class Opentofu < Formula
   desc "Drop-in replacement for Terraform. Infrastructure as Code Tool"
   homepage "https://opentofu.org/"
-  url "https://github.com/opentofu/opentofu/archive/refs/tags/v1.12.0.tar.gz"
-  sha256 "d33c3c8ec139abae4c45e8a4187f1400032c8441a2eea4f976d2f16cdb5ec9f4"
+  url "https://github.com/opentofu/opentofu/archive/refs/tags/v1.12.1.tar.gz"
+  sha256 "c736126cea1f0067e046ef0172eb4ba2b39bcf1494d399e067b9e63e0f0d20d6"
   license "MPL-2.0"
   head "https://github.com/opentofu/opentofu.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b86a81fbe32d2ad115ea58fb49a6f8f17e3a3ae6ad14719b4614bd413388f2d6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "882806ce32069c73e92873c6c4a1d2f9468ae316d8356b3badcc62b641fbcde4"
   end
 
   depends_on "go" => :build
