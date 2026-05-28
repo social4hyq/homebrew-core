@@ -12,9 +12,7 @@ class Libunwind < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_linux:  "c36c1cbc4e8cc6072c609ecc76f2fd8546dad4e1cebe8d41cd69984dcba2babb"
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "87c11a5130ea0663cb9e9b007d734470522501d25591b2a7f58034376f7aa3bb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "701baff4411aede21fea67053bf52ab3308d64360b4e005ba06ddd9083335ac0"
   end
 
   keg_only "it conflicts with LLVM"
