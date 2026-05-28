@@ -1,11 +1,10 @@
 class Lynx < Formula
   desc "Text-based web browser"
   homepage "https://invisible-island.net/lynx/"
-  url "https://invisible-mirror.net/archives/lynx/tarballs/lynx2.9.2.tar.bz2"
-  mirror "https://fossies.org/linux/www/lynx2.9.2.tar.bz2"
-  sha256 "7374b89936d991669e101f4e97f2c9592036e1e8cdaa7bafc259a77ab6fb07ce"
+  url "https://invisible-mirror.net/archives/lynx/tarballs/lynx2.9.3.tar.bz2"
+  mirror "https://fossies.org/linux/www/lynx2.9.3.tar.bz2"
+  sha256 "174b7f2866a60f3247ba75f5c7dbb10b124aede4a1359312de15f3bfebd2050f"
   license "GPL-2.0-only" # with non-SPDX exception in COPYHEADER to use OpenSSL and other libs
-  revision 1
 
   livecheck do
     url "https://invisible-mirror.net/archives/lynx/tarballs/?C=M&O=D"
@@ -13,7 +12,7 @@ class Lynx < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6597ec13ed4ed0b6acc5a5f5bc94fe6ee88bb93bfd6a46c505a0442bc822a5de"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6adb1871b2a9b24acc6a531ee83adac72c334aa7f8aa8c35ca2771f4cb452852"
   end
 
   # Move to brew ncurses to fix screen related bugs
