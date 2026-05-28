@@ -7,15 +7,7 @@ class Rdap < Formula
   head "https://github.com/openrdap/rdap.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "82be0fc5e32749b77743087bf6b5b6a62a61454b1891316e419242bcfaf9e6dc"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "4a73abdb1f73b15293ec718621dc35982af08454db08a899d6ddcf2f279eac55"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4a73abdb1f73b15293ec718621dc35982af08454db08a899d6ddcf2f279eac55"
-    sha256 cellar: :any_skip_relocation, arm64_ventura: "4a73abdb1f73b15293ec718621dc35982af08454db08a899d6ddcf2f279eac55"
-    sha256 cellar: :any_skip_relocation, sonoma:        "6941798ba46a5391886ce266bfb1c4b5bfeb9db8eb9cf11c33741256f0405784"
-    sha256 cellar: :any_skip_relocation, ventura:       "6941798ba46a5391886ce266bfb1c4b5bfeb9db8eb9cf11c33741256f0405784"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1b7d525df05bcaa24b18f462587052208ff5456170bc1d45f405f0b0667649a6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d791f01848f4e8c654a1174e55a1118d8f0ac743962bba87ec7350c81e027f58"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "425d0f2b8dd01bb7f5fe0ac51eb6c1aa419d8967bf28cd35c34109e1685e8366"
   end
 
   depends_on "go" => :build
