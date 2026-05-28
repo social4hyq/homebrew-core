@@ -6,8 +6,7 @@ class YarnCompletion < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "e743fe4680eb970207cd4a05ec2f2482f1c3baf96ae04827b75bffb29afd78be"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "74e83efa60fa1388444ff462d64c591cb27d425357ea0bd39a1c08217a9a2056"
   end
 
   on_macos do
