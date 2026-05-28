@@ -11,13 +11,7 @@ class Minimap2 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "bab9ae8b3c6ebe68b4cc6ec84c04cefd0a9ed544d474d0b97b3edde63613c029"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "cc2e9667c941db62f475850288cc477af72e76f3f2d601dc5504b33a25054bc0"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "dea2a7c77af4d26e3121377eaa17fe9f8fda9b195a729f30b0c2b031e71cb79c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d9697c3492313510140bb1d4290f854db37f419988e0e141d8c98cd8152e24e4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b66bf9449ae3f6d95f0fd33af2b2df9c1f556a59e6b1eb53754d5d39bbc3aa80"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "84a23620b041f878b15b147f1eee02ab87b73c26ff1afd8b40bef05503aa141a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e638c85c939ed3d335f133cf8723adc906a471fc832d7097d39304f0c3ffa4c1"
   end
 
   on_linux do
