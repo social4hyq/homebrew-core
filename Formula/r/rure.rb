@@ -10,12 +10,7 @@ class Rure < Formula
   version_scheme 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "62ec3ebb9421cfbb27839d929284df57577b0acf86f2cef8d65cf46654d64f1d"
-    sha256 cellar: :any,                 arm64_sequoia: "bfd9bfc2d13004898934ba27a34f09647df7c02a6dfe576866c53dcbc5505ac4"
-    sha256 cellar: :any,                 arm64_sonoma:  "085e8a19d1c6b171f3fb1f670f1781ec0e036be54f3286b1110e940d0858045d"
-    sha256 cellar: :any,                 sonoma:        "4b3bff1372782d2dd6ef2aedcabeca77b5a565d1ae1f672b3158ad49c6cf8119"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "80429ca549d0b6c36f0ef26c8f78dfa0606d6e401722cdbcff7343e1eb8d7141"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c1a9dfc85ba7c459e98c38b723dbc3d144d510e0f5fa57b4393553b6c2f85d99"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8213b65e8ccda040e554f86b68418f36525db1a20ba43f40f5a19c10d2ac3d1"
   end
 
   depends_on "rust" => :build
