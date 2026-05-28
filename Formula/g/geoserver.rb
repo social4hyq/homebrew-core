@@ -15,7 +15,7 @@ class Geoserver < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "af621c7df9e627646bc653bc1543022d58355c378e612ab317f980c038f68364"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f299ec16cfb85b3b5dfe08f84ef5227cd7de11e5b59c02cdbb464361a2dd8c36"
   end
 
   def install
