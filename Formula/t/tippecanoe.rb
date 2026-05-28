@@ -11,13 +11,7 @@ class Tippecanoe < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "789f0c1726dbfe2e753ee90977c212738d1435b6217c4d20df7e2e1a6fb09732"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "08faa5cd2a23753e7cea762bc9d69c2c3403086a923423158bee845cdf1c4eb5"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5115543a48645f67a4e3cbf8c545a5c152286df2112def83b2baad49c6fde501"
-    sha256 cellar: :any_skip_relocation, sonoma:        "198449b1baacb651f09b763511340e2279ffb817896a52701245d81345eb1abd"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7bad962c9d0003b05ed245187d525cec015d6e2dcae507f20af3be646394bbfd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "facc57688a1d929bef5456e1b2c5298c7ae089ed4e12fe37d46051b818c2d228"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4f3dbea5b9ce8998b08154f946a675e9a76e0a786223cd685091788d848fc24"
   end
 
   uses_from_macos "sqlite"
