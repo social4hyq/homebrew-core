@@ -11,12 +11,7 @@ class Pgrok < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "cf15fcb2cdcc2f5be2f04781be608941f86663e90d3ee1ff48d970281263aa8c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "cf15fcb2cdcc2f5be2f04781be608941f86663e90d3ee1ff48d970281263aa8c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "cf15fcb2cdcc2f5be2f04781be608941f86663e90d3ee1ff48d970281263aa8c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "68efbbd93c7aae98d6cc6a0c15f8cd4dce013eac925aa8d482eb2276e878ad32"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "419e8c45a8430f1b6c793a8e7ad3e5dff7d539e3ff19b6abb8ffacdaca86fb45"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2e303842681daf112dc720aaa3d091096b5e5cb0bd6771a42ad9d84ea631487e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e21bc473cda5fe62fef32ada1badf6f53c9d4b8a38a95f98ff815090458e7ae"
   end
 
   depends_on "go" => :build
