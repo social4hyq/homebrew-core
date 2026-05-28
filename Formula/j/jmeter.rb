@@ -7,8 +7,7 @@ class Jmeter < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "13c89a34f46a525ba7131741a8c7c8f0ea789ed231762b20ac6e5dc5f0757b04"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "662d14aec94dd813f8db57ecbd5538fab2119aab358ea6a983fbe6c3d040f7c8"
   end
 
   depends_on "openjdk@21"
