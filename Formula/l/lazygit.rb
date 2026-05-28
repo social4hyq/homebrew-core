@@ -1,8 +1,8 @@
 class Lazygit < Formula
   desc "Simple terminal UI for git commands"
   homepage "https://github.com/jesseduffield/lazygit/"
-  url "https://github.com/jesseduffield/lazygit/archive/refs/tags/v0.61.1.tar.gz"
-  sha256 "2a550c9b609c5eb0e1c2640e8114ac05b94c671803f77e08a9dcdbd66372e2c4"
+  url "https://github.com/jesseduffield/lazygit/archive/refs/tags/v0.62.0.tar.gz"
+  sha256 "15f20b97c98a799998bc2d32a9a68674a7ddee8b73735d6d4758fafc854a00cb"
   license "MIT"
   head "https://github.com/jesseduffield/lazygit.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Lazygit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d69ffc596e39749b0b3bfd9835d3797b0793534926722ac55026c87b20ebf649"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1141a29b374199052efc9259c16a7cc41f9d2d80cefc5705b8e768b075f679a7"
   end
 
   depends_on "go" => :build
