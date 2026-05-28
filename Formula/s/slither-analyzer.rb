@@ -10,12 +10,7 @@ class SlitherAnalyzer < Formula
   head "https://github.com/crytic/slither.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "f737df4fd2f78b12ff406fa78f34a315891a2ce69f2d5c2ea2dcc9ecbc6d6695"
-    sha256 cellar: :any,                 arm64_sequoia: "e8490f649d5404f54a50f60241436eface7aa7fb0cd1f5d3d90fa5e16c148af7"
-    sha256 cellar: :any,                 arm64_sonoma:  "0937a73f547f5e8971e7887676d3f668c607a31bc466ab472d60a80ce04534e0"
-    sha256 cellar: :any,                 sonoma:        "833ec4b36376ac9f3e93cff46a5ecf7074cc1d61313a190d829f98db8557c803"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "03adf6c717d86063dfe8830814f07e0a2c3c43d06e67f82a59a2091666f09976"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "482db96c26ac32b9138491f973645c110e1f12fbf61d14bdadf635fc0bd1cd4f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "44c482670675a8747c2cc089148bd0f19631d8569a3e3a878f144cf0a697050e"
   end
 
   depends_on "rust" => :build # for cbor2
