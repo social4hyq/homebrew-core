@@ -12,7 +12,7 @@ class TofuLs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f4643f44ffe37d9821fb625522ade113c0c8c8a9136bc4b42af075aa11fb6df"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00f667083cf17cdfc150c80d3f022c4cc1bc375e01bd005f65bf5b9a7520cd76"
   end
 
   depends_on "go" => :build
