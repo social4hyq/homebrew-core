@@ -6,8 +6,7 @@ class Anyenv < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "be1c3998ca482ca2cf3377f5db6690f1c74877e5cdfc4266d62c5cc1627caacd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d8a772318f028fc187e349a848fd78041dc7876e040f843980be5272ac01492"
   end
 
   def install
