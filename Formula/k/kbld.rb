@@ -7,12 +7,7 @@ class Kbld < Formula
   head "https://github.com/carvel-dev/kbld.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "8f25ec9489c43de04d1924f694d7dd4d8ce4b7830feacc6ca11c1de65883a542"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8f25ec9489c43de04d1924f694d7dd4d8ce4b7830feacc6ca11c1de65883a542"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8f25ec9489c43de04d1924f694d7dd4d8ce4b7830feacc6ca11c1de65883a542"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d2605d3464c40c82b53fabd2565690bf584f47189a477ccb92a98bb056f21be5"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "820282210681cd6e4c0691b6d3952ab579b58da863f4e9ccb2d7fde3c19ed916"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4666cbee00be7a8333979ac615dfa21fdd3a66ed5869e5efca419d39b9b34518"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f70fd87e9438eaacbbb082bc6dbc74db3eba2f44aa2354a9dde9dce671c86f1a"
   end
 
   depends_on "go" => :build
