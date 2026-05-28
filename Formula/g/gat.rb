@@ -7,7 +7,7 @@ class Gat < Formula
   head "https://github.com/koki-develop/gat.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3aee5954bc6d7c97925976a2eb913e91ab2ad4e27e4aa7a51a9d2a20f4096eb8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "19a3e8d01b16ead9960a0df13673013c7138ee87e06bf5a5351044ab0c23ec0e"
   end
 
   depends_on "go" => :build
