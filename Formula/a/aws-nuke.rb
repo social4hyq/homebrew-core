@@ -7,7 +7,7 @@ class AwsNuke < Formula
   head "https://github.com/ekristen/aws-nuke.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "899ab930409662a4df5fa67abf14b9596d5eb27bbf651cc9e69631c5e535919e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "56974d5ee20b81482dee0e98e3428d0f1643f751659e79ab127ac404886cce8c"
   end
 
   depends_on "go" => :build
