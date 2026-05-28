@@ -7,12 +7,7 @@ class Parqeye < Formula
   head "https://github.com/kaushiksrini/parqeye.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "bcdbc3ffdc5238b1d30348983dcc47c1c25a59a1d6a386869780cc99eb3faa98"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "16711b77ea4001da10c1fbd696f74c4e37704059556327a70ac8e1ebd065cd0f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "69dfee9b1c5cebbdeab45ff50f14d450cc582f04e19ef8dbae922b9f7c3e32bb"
-    sha256 cellar: :any_skip_relocation, sonoma:        "4f58d4d3834b9dd677ea7f720bcfe4c02dd36c65f28fa8231a227743830041fb"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9384c8f25f40c24911f5329fa86ade59496a29b95de02028c4f6c063e96589c0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "06ba0ddaec37c77ebe2260ff8aee31a0537e540bd1f0495742209c514b296417"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9bfc15508b5e0e9f5753281ff8b4423b8843a9338b269d0fb026518a67b59bd5"
   end
 
   depends_on "rust" => :build
