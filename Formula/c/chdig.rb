@@ -7,7 +7,7 @@ class Chdig < Formula
   head "https://github.com/azat/chdig.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2da1fa4893b3a8e83b189028aefb1d68e4de233843e2af950251d93ce5a46c84"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab3442d18be5db70cba17e331a001f5a7d9ff49974c23aa9c7d57e33def95e89"
   end
 
   depends_on "rust" => :build
