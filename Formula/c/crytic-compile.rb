@@ -9,12 +9,7 @@ class CryticCompile < Formula
   head "https://github.com/crytic/crytic-compile.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "58c9d0e677660fc95222e15fb5082841f4535607ef8a6cdda4ad2f97d8a67126"
-    sha256 cellar: :any,                 arm64_sequoia: "c28439d9a2e49a8dac26d60880685dca48914e3a3258adfa5c645c288d8c45ee"
-    sha256 cellar: :any,                 arm64_sonoma:  "bf65c50a7a241973df13fdb1621ea48f3fbbf1b0ca7780dee202f92c300666e8"
-    sha256 cellar: :any,                 sonoma:        "34b8d9f599bf86659e1bcf75ff6f2ccb085328a9b3c95322f2f909539f449d02"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0f389ac6d7347ab3724c329c01702452ab0ec926de9e36b8a9b09474686a7d6e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "5a6c05a39e47a6b02c3fa9b53a3de73bda0b8615350411b955b4113681c33d9e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7efb0a5a4241b07f864a4a5e24ed551ab54238c67ed2d8d30f2d9ec8838f7623"
   end
 
   depends_on "rust" => :build # for `cbor2`
