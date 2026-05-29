@@ -6,12 +6,7 @@ class Witr < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "22a3b348b3000c4dbb6aeee0c0fe03c2d780b0c887216c60e9439a65a4a93ca8"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "499dad8604be295b8241ac3a7c924f5da5448bfb349c0891642bba34cb93c5b8"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2f4f4f5d01820045842e781f8fce20a06af8957453e17c7e475a79981a964393"
-    sha256 cellar: :any_skip_relocation, sonoma:        "4f35476656a1339caf64c22c7474aaf75558725e2597ada41fcfb8c17472a1ad"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8d445a1f8e9a47900bd555b7d5516c784b8d76eb3df72ae246593c957e619df7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f33fee6b7fe39c681879b5400691695478ced8119133f52cbe49053d6abe0453"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9894023920a52f3ae62e0c4423e5b47e647196670c07ae69e1f2c430cd5c8bd6"
   end
 
   depends_on "go" => :build
