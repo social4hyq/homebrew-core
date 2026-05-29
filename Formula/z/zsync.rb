@@ -12,7 +12,7 @@ class Zsync < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a7cb64559e00b54d7fe41f8224958ae2e1b8dbd3e9eb0efa2be4a682c2b9adc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca138019142e5656ccdb92c5009d9f4eb266cbc518bc203ffab29d6a7001967d"
   end
 
   depends_on "go" => :build
