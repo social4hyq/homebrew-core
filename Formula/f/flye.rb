@@ -15,13 +15,7 @@ class Flye < Formula
   head "https://github.com/mikolmogorov/Flye.git", branch: "flye"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "da001a71cb1768fa863629df14bbeac7757f83f19cee3efffbf3e45fe84ac972"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "fe6f8b6e489495ed8d374ecdd3918e60eeb5abf1818287817526c6e78b435f78"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "72ae20f3a7b3adc25bc6d27ceaa30c4f03ae07e81723ab4aadd1a9380669684e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e5769476e56abbcb2450acf418837e5bb80005f7be5dd8922db99acb21b2d77b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ec4658bd46026fa973059b18e83ce0ccda8f183afe9ce6050c9f23fd4c3c0f8e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "926fdce4a0f64674434d766708ced9310e058ce8ba8f55f7ec2ff2e772b455b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72744ee8b9065f72af2d4cd36cb71f8cc34c905b78f70295967ea23a50b4b9dc"
   end
 
   depends_on "python@3.14"
