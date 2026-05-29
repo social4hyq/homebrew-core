@@ -1,8 +1,8 @@
 class LibtorrentRakshasa < Formula
   desc "BitTorrent library with a focus on high performance"
   homepage "https://github.com/rakshasa/libtorrent"
-  url "https://github.com/rakshasa/libtorrent/archive/refs/tags/v0.16.11.tar.gz"
-  sha256 "b1ccbc0f2241d840957d6e82cf1ea35fd537220d3f5478fef23994bd292bf184"
+  url "https://github.com/rakshasa/libtorrent/archive/refs/tags/v0.16.12.tar.gz"
+  sha256 "1ecbb5d7802e18e807d3c2f58499e5c189ef81badb2c6c6ebb2399d49c08f5c1"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class LibtorrentRakshasa < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5141b05bb209d69c55588c76f66050995c30fffa3e32fdea37539ac2eac152f4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "25b73588cc350d54c66cbce532466567de57808b7f4125373a2cd38fb74dd032"
   end
 
   depends_on "autoconf" => :build
@@ -38,10 +38,10 @@ class LibtorrentRakshasa < Formula
   test do
     (testpath/"test.cpp").write <<~CPP
       #include <iostream>#{"  "}
-      #include <torrent/torrent.h>
+      #include <torrent/runtime/runtime.h>
       int main(void)
       {
-        std::cout << torrent::version() << std::endl;
+        std::cout << torrent::runtime::version() << std::endl;
         return 0;
       }
     CPP
