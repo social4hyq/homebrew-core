@@ -11,12 +11,7 @@ class Logcli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c7bb7e4bfd4c57ebaa6d2a61d3d8c31e84a1e893d4898b0b989f7883b3c56a4d"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8c9d6d13aac45ed7c176525727fc201bf0d9c674962cafeef432daa6d1de7e04"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "91266473d3b8d9e346f44d60963a1bfb9ff66ff58d9fae52cbf21ae794f6d62c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "1a176ef53c33f1939fa3281dd6b16e97d5546702de7e35c98cdf4a3398d275ea"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a25ea9011f312f19e74db7488b1dd7b73d876532671f91293e145f8b60442a5d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "60158271c85ca816e64c98caedf00b693435a21c512ef61c7c08ffe404161e97"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf0cf5921fc49124f1623828889aa0ad184f10a92a4d667d74b7a94246420e42"
   end
 
   depends_on "go" => :build
