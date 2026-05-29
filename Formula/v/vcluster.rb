@@ -2,8 +2,8 @@ class Vcluster < Formula
   desc "Creates fully functional virtual k8s cluster inside host k8s cluster's namespace"
   homepage "https://www.vcluster.com"
   url "https://github.com/loft-sh/vcluster.git",
-      tag:      "v0.34.0",
-      revision: "bb9e88b0a9e45c68d744eebe6bde5c4664cdb676"
+      tag:      "v0.34.1",
+      revision: "de3fcb491a58159ced86d98aae5a71421abd0cf5"
   license "Apache-2.0"
   head "https://github.com/loft-sh/vcluster.git", branch: "main"
 
@@ -16,7 +16,7 @@ class Vcluster < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "25f9677f018bb6005030236cdcea54f80fc91c327053a5b3d0c0172061d9b10a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f45e2dfbbc3a9984b31a994764637749abc47d65e6e34144217a247c5d781e57"
   end
 
   depends_on "go" => :build
