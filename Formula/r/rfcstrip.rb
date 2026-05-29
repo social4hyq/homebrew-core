@@ -7,8 +7,7 @@ class Rfcstrip < Formula
   license :cannot_represent
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "19d81dc32428b71ea0c78047c6036eba4381ab7e6305051f3790d2dfc34ce2be"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11a8e1b5bd3d85f2d4e39879e25ba6aff722671712aa0a1a29e1c8439dbc0a2a"
   end
 
   resource "rfc1149" do
