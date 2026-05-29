@@ -6,7 +6,7 @@ class Prettierd < Formula
   license "ISC"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec2d6be281f939a0b61733e340861a7db0207dbb3ec0e67bc95c9ec9ed46e752"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f7874ef487baae02cf94af825150d66af6bb2317fbd9f83882eb15b956ea950e"
   end
 
   depends_on "node"
