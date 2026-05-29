@@ -16,12 +16,7 @@ class Glooctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d08d9f3deff17575a24758ea003bc0e88c89bb7f19fbc31fd0e6652c07f0e347"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "00ad9f5fed0c2be752f3f12fae363f1c77ceab2e370fb8158c92a0bfa3edcfc8"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "224bc5997f3828882f7b772612ae29f2eca005d04eb54a3a36e9b61895c4d740"
-    sha256 cellar: :any_skip_relocation, sonoma:        "fa405beeb152f496640f2f2610816065f1b04cd11bfbc4ee673315d0aad10c4f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "560d87fd1bb16f2d6ed8128a657e766f85aaf97bc45a09000b4a33579ee8e07a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "d4de3d14a4993be60565f304b950e3ac244c9eccc024b5d971dfc8519c31a425"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e2f04f2277e6c677308f0884551601cb70144bb0b1a3a15a643403b20f0d6d4"
   end
 
   depends_on "go" => :build
