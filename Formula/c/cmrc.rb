@@ -16,8 +16,7 @@ class Cmrc < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "bccb869a3fb9486fbd2594d68a8be7fb57819f27764bbf9b3888cdc54d746ce7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3853c327cb9e62427a6dadb19edced1d6a471defe9faafc7558d013a318aca93"
   end
 
   depends_on "cmake" => [:build, :test]
