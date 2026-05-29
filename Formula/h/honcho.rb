@@ -9,8 +9,7 @@ class Honcho < Formula
   head "https://github.com/nickstenning/honcho.git", branch: "main"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "f2c152161d10711eb03427dc2934e0a2f0d330ab029dbdbe715cb77a492f8481"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ff2e9d53a718cab1111dd8b53d2c18fec8547acd8997a240df325a8f37e14dd7"
   end
 
   depends_on "python@3.14"
