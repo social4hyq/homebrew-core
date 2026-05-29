@@ -6,7 +6,7 @@ class IcebergCli < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1620ad21eb841ef5f9e2e93e68b97c820db9394c516450911274e5af43bdf703"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2508fa602b47a67e336d52f803d5639967b24c1870e5cd0ee5f16a0b4b04e839"
   end
 
   depends_on "go" => :build
