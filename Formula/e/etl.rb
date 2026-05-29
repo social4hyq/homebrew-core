@@ -11,7 +11,7 @@ class Etl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "0a4090f4ab50fbb307622bff66ee04cc9150a73eb1213b4130d923153a755f66"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8b756561c68d4ccbb735155193e42987f1bd8426ee73f87a600fcefef312010"
   end
 
   depends_on "pkgconf" => :build
