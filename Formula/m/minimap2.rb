@@ -11,7 +11,7 @@ class Minimap2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e638c85c939ed3d335f133cf8723adc906a471fc832d7097d39304f0c3ffa4c1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ead05519260d477aff36fc5a754785d88a85562822017e27ff015a9f663540cc"
   end
 
   on_linux do
