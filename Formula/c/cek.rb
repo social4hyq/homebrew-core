@@ -7,12 +7,7 @@ class Cek < Formula
   head "https://github.com/bschaatsbergen/cek.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "fbdff3f7de472e4566a8b4d5b52d8dad6dab459f38adba09fe29958650738fec"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "fbdff3f7de472e4566a8b4d5b52d8dad6dab459f38adba09fe29958650738fec"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "fbdff3f7de472e4566a8b4d5b52d8dad6dab459f38adba09fe29958650738fec"
-    sha256 cellar: :any_skip_relocation, sonoma:        "0b70dbb71e41cfdc5c1850901a8fde575a3fc914f19936afca9399bab054474e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4d99a71a392f0d75ab253671d04b5bbb033466a205c403f84b44cdf122ae5967"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "cb5a90842490b3753de41eaccb5cb00989aaf88b4d7545abaf53960c47cc4d7c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7c58520f054b17173332c1b0de0015cde651d27d98bd3b6ad41544a94cb842f"
   end
 
   depends_on "go" => :build
