@@ -6,12 +6,7 @@ class Cnats < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "d6b6a71f904ece5d05e820a00279676169c201dd29af015760f14ec90eedf6c3"
-    sha256 cellar: :any,                 arm64_sequoia: "4802784048ccef88363702e5db80b98657daa8dd7ebd90d545535329c516de18"
-    sha256 cellar: :any,                 arm64_sonoma:  "f693d5fc84ab27feef7ef4d67b8674a88f36f42a05039ced84312f5a065d6ef2"
-    sha256 cellar: :any,                 sonoma:        "da0021e25b526acac1a1e0d4f6fbed9aae416f2986f4b000b31b1b80b72741b9"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f811f0043da5c8aa249aa337e7a983fa76c8e82eb1f5f99c88934551ebfb3882"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1891557d88308406f2cb6525cd9825777c4bc280becc0b68878d471a82f9c2b5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc4d0ab482c8262b25adcd1adef34296bb77fea29390a718c6a73a9e65972a7f"
   end
 
   depends_on "cmake" => :build
