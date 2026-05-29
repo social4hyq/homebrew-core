@@ -11,8 +11,7 @@ class Jhiccup < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "010529211ca43ed531a37e60a1c33ee7a38b823038d204992713461c4ef4b56c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b57029105f000aacb70817adcf01d6cc929171d89322d2887baa0d09523fe509"
   end
 
   def install
