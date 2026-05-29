@@ -1,0 +1,52 @@
+class MongoCxxDriver < Formula
+  desc "C++ driver for MongoDB"
+  homepage "https://github.com/mongodb/mongo-cxx-driver"
+  url "https://github.com/mongodb/mongo-cxx-driver/releases/download/r4.3.0/mongo-cxx-driver-r4.3.0.tar.gz"
+  sha256 "64722a58ff4b8b9c248cb85225ebe6c59fa6264fb97716b470858ebab8271c11"
+  license "Apache-2.0"
+  head "https://github.com/mongodb/mongo-cxx-driver.git", branch: "master"
+
+  livecheck do
+    url :stable
+    regex(/^[rv]?(\d+(?:\.\d+)+)$/i)
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e413af69da3ab6ace198ee7de776a0b12a4a06c2f89966f25399fb71a9b022a"
+  end
+
+  depends_on "cmake" => :build
+  depends_on "pkgconf" => :test
+  depends_on "mongo-c-driver"
+
+  def install
+    # We want to avoid shims referencing in examples,
+    # but we need to have examples/CMakeLists.txt file to make cmake happy
+    pkgshare.install "examples"
+    (buildpath / "examples/CMakeLists.txt").write ""
+
+    mongo_c_prefix = Formula["mongo-c-driver"].opt_prefix
+    args = %W[
+      -DBUILD_VERSION=#{version}
+      -DLIBBSON_DIR=#{mongo_c_prefix}
+      -DLIBMONGOC_DIR=#{mongo_c_prefix}
+      -DCMAKE_INSTALL_RPATH=#{rpath}
+    ]
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+  end
+
+  test do
+    pkgconf_flags = shell_output("pkgconf --cflags --libs libbsoncxx").chomp.split
+    system ENV.cc, "-std=c++11", pkgshare/"examples/bsoncxx/builder_basic.cpp",
+                   "-I#{pkgshare}", *pkgconf_flags, "-lstdc++", "-o", "test"
+    system "./test"
+
+    pkgconf_flags = shell_output("pkgconf --cflags --libs libbsoncxx libmongocxx").chomp.split
+    system ENV.cc, "-std=c++11", pkgshare/"examples/mongocxx/connect.cpp",
+                   "-I#{pkgshare}", *pkgconf_flags, "-lstdc++", "-o", "test"
+    assert_match "No suitable servers", shell_output("./test mongodb://0.0.0.0 2>&1", 1)
+  end
+end
