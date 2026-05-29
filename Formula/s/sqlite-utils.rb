@@ -8,8 +8,7 @@ class SqliteUtils < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "c0e99d36e603786d51605e4d9ff62d9ef8de3c71322e7635c4c4b50dda79d163"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ddb563165709cb8190ed257723438d28af088f12547d8280f573c4471b3eed2"
   end
 
   depends_on "python@3.14"
