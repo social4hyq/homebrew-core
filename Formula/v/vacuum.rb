@@ -1,13 +1,13 @@
 class Vacuum < Formula
   desc "World's fastest OpenAPI & Swagger linter"
   homepage "https://quobix.com/vacuum/"
-  url "https://github.com/daveshanley/vacuum/archive/refs/tags/v0.27.0.tar.gz"
-  sha256 "17cbf2426dd1954c2ef7352182cb485727997e453db3555786c170f2bda47c38"
+  url "https://github.com/daveshanley/vacuum/archive/refs/tags/v0.27.2.tar.gz"
+  sha256 "b43d56c99a02fc1c67f8ce8455d5b6ca72ed3449442ab287ad6bd8e6523f8f97"
   license "MIT"
   head "https://github.com/daveshanley/vacuum.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4a3756094077377247aae64129db146844cbbe1ea73b6aa1e5648c87b364a69"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a648e950386cf02cbd071409d516de34764d5f5e3442c9e0a885ee36a7d3e79f"
   end
 
   depends_on "go" => :build
