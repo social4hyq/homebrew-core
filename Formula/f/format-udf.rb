@@ -6,8 +6,7 @@ class FormatUdf < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "ba8a2952eb6a60e6660c71d6054d6a0adc3d450d5532ef270f2849a0fd13849d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "16a69fbd6ead0de4b3f1e576a1b54ea2d4d1b2e3de218e91bca63c8515823c29"
   end
 
   def install
