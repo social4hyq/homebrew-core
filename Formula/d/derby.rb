@@ -7,8 +7,7 @@ class Derby < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "a4ec775f18dc3de32bd09a237f3ed1eba99aa4b137cf4eedb529232a03e85201"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "89e48383892ba5705f1ef24d2c637254ea8dac0ee1c4b015211158ecef48b5a7"
   end
 
   # Project is retired and will have no further releases
