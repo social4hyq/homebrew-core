@@ -3,8 +3,8 @@ class Snakefmt < Formula
 
   desc "Snakemake code formatter"
   homepage "https://github.com/snakemake/snakefmt/"
-  url "https://files.pythonhosted.org/packages/8e/0a/ce930eafdc3ea5999c6fd65cb473c33a3f310606907e6de0241ec5e5f149/snakefmt-2.0.0.tar.gz"
-  sha256 "a47259b1fcd958b73e59052e2425708240652b7b2f9ff7d6b2b14d2894f10b33"
+  url "https://files.pythonhosted.org/packages/87/6d/d14bcae72c0b2c43b3a956e3690e5a27a2e659723ecc4af684b7be339d13/snakefmt-2.0.1.tar.gz"
+  sha256 "d535e3a0d149111a1e8d66ae8a78a506aff7a648137a619a36fe7c8946a02476"
   license "MIT"
   head "https://github.com/snakemake/snakefmt.git", branch: "master"
 
@@ -21,8 +21,8 @@ class Snakefmt < Formula
   end
 
   resource "click" do
-    url "https://files.pythonhosted.org/packages/23/e4/796662cd90cf80e3a363c99db2b88e0e394b988a575f60a17e16440cd011/click-8.4.0.tar.gz"
-    sha256 "638f1338fe1235c8f4e008e4a8a254fb5c5fbdcbb40ece3c9142ebb78e792973"
+    url "https://files.pythonhosted.org/packages/9b/98/518d8e5081007684232226f475082b30087d0f585e8457db087298259f49/click-8.4.1.tar.gz"
+    sha256 "918b5633eddf6b41c32d4f454bf0de810065c74e3f7dbf8ee5452f8be88d3e96"
   end
 
   resource "mypy-extensions" do
