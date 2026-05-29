@@ -7,12 +7,7 @@ class Odbc2parquet < Formula
   head "https://github.com/pacman82/odbc2parquet.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "6208f54aa6bba4c5018532f8641bf8b85b1a49df545b18baab2f5f78d40fe22d"
-    sha256 cellar: :any,                 arm64_sequoia: "51d3868c5562cbd6806e09cdc7643b6f955466995efbfb8d2c264d0ebd1fc665"
-    sha256 cellar: :any,                 arm64_sonoma:  "b56da333c74a8b21618c91c27bed345bbc502d1fc2a543378e915b5b2480d909"
-    sha256 cellar: :any,                 sonoma:        "481f3143707175ba4879b5372488793ce7a14efd8f986f7a757d8cda98035386"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fe01d3df75640f667095ce6a56db03f2ec58ed162989f3b4eb3f300c0ba9a78b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "370f9db660bef0eabfaf967896184c0b95590bb4cca81a3c0df5e2fc8bf1ea9b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7b02472ff1d7e4bfe0eb4d02029ccd5c59315a8e2102716a6bc6911f546caa1"
   end
 
   depends_on "pkgconf" => :build
