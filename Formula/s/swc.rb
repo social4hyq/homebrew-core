@@ -12,12 +12,7 @@ class Swc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "64f0faa673723cacdbeac74fb3b5d9cef615c45879b5367f6de60f7c696fa254"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b6fadefb8906e2992a7a3d9a2e90f71bb4f1e6bb96ce2b66af026af2856ce04c"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "be86327599beed0ea505baad1bfb06be5ab3b7d2f7347b87a6fac617aad6d93b"
-    sha256 cellar: :any_skip_relocation, sonoma:        "0c2668b9ef009bba7b1f1a7d61f6c99e4ad62084b3f29716faa81693ae3f310f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ef8542758d4e19f7fa18401d4ea3819b8281c984f19bd6dfe07ee82a88701a61"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b93e5a3dfc81e05fd4c693a096ed4ea0689ff3548380d67cd128fa27f9438e2d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae84335608c852b6ac416afad5c7c8b4abd044e5d3461e40ea8e80a2c6120a9b"
   end
 
   depends_on "rust" => :build
