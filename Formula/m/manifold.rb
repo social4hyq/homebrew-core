@@ -6,12 +6,7 @@ class Manifold < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "aebe32718c867e0458e5992e302fb514e036fde35cf6fcd64e6353d7c9d26147"
-    sha256 cellar: :any,                 arm64_sequoia: "0a699ed1cadd406c3556c058802cb8850d8c3b666c8f754427610503666d25a6"
-    sha256 cellar: :any,                 arm64_sonoma:  "09e39b664ae5d408d9cec45fad6322a18af36e2778448a277f7a873d6a995c97"
-    sha256 cellar: :any,                 sonoma:        "058002aa8807e559156498b38ddd49de455b8906d648d49dcf778972f0e5b406"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "628e0da7c6addd6a7365f1e246d47c5f2132357731c483fbc52309bfcf611ce4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2a85bf153f32fef04b36d069b310cec189bb48f3092660c0b7a9e7bd7a9e2492"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ab023131a486353f5af57556369cc13167986be7ad66e6504eb3b5b177c7903"
   end
 
   depends_on "cmake" => :build
