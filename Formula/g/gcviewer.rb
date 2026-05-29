@@ -11,7 +11,7 @@ class Gcviewer < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "b9de4dec3e8697881b60484da3b016d93ea54738c69accc151cdfa43e2f30eae"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ebd94a8e78f6ce1c3f67ee50329086f0d5098b12b893760ce513119c57b6220"
   end
 
   depends_on "openjdk"
