@@ -7,13 +7,7 @@ class Goclone < Formula
   head "https://github.com/goclone-dev/goclone.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "427643691179069c7834cf098036b07742eb8e17ee9de1ba024f022b59791a41"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "427643691179069c7834cf098036b07742eb8e17ee9de1ba024f022b59791a41"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "427643691179069c7834cf098036b07742eb8e17ee9de1ba024f022b59791a41"
-    sha256 cellar: :any_skip_relocation, sonoma:        "63b7e1660bea0cfec0e9998e5c5d10c4d4283461ab39eeb023240eac4f2f25c0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5840964691bed030e57c2e1530696170715d3982bbce48c2fec28c7250f317db"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "181e8771f7509e520cb7c6c88d9f8edc56e8c5eb5623a8aff286b2059fbe94b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5108c9409a6546bd678b92e5af457ea95d1673f76f3cd3c31966e17ed499b890"
   end
 
   depends_on "go" => :build
