@@ -15,12 +15,7 @@ class Nginx < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "c6a2b6edabd384f66113b3659c941334189d594a9eca0ce95be324f238533a7c"
-    sha256 arm64_sequoia: "5f0507a20678ffa00ff5a9df63b309e01fb1f0b6800d60ea79723af8963c8589"
-    sha256 arm64_sonoma:  "e35ed536a9e97eb39d849c28d16e90e19527c9b2a44bc91914458c94344c95a7"
-    sha256 sonoma:        "e87efe82dcfd0a312c6cd181decb6e59971a595894c2240d8d4b997c3458af66"
-    sha256 arm64_linux:   "9fd7f7a18e121e1b5a9592a99635d99aaca8886c29487e140f3c67306173996a"
-    sha256 x86_64_linux:  "04103af17cf99864bf713c99a93c87544f12d5e775a0a8a7d89011cabcb1cbbf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bccbd90816d372b966b3f0ee471151dc59658bdb7535f108d8ebc4798a039b36"
   end
 
   depends_on "openssl@3"
