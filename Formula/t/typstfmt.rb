@@ -7,15 +7,7 @@ class Typstfmt < Formula
   head "https://github.com/astrale-sharp/typstfmt.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "840ef206e895decf1e2e6f6d4667f0cb5ffc106720664f8651183ddbfa43942f"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "844ad26eecdbd64cc9e98bea828c52772bb45a0f6fdc0e79a8ac8a8092679cc2"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "582d6c33840b510206e0e80d85406a2f16de67fdcb93102f480330cb226b81d3"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "bb0272d469193fa0dadcca3ee4d379204a58774ad69b84ec3330064793fecaa8"
-    sha256 cellar: :any_skip_relocation, sonoma:         "f676e54a7b0e56cce946b8da875e5c991490b6d9e25dbd573ce58dc788a0139f"
-    sha256 cellar: :any_skip_relocation, ventura:        "73843c71221c4b6ac172f2a3f62f0549841074a7b09ef5ef4794b9c88fd0be3e"
-    sha256 cellar: :any_skip_relocation, monterey:       "8bd83b378a237b4be80690c7ad71e7c5609e3b85c6179f0d5a5806179ee1321a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "86165016420a35d4c382d1d96242e158279d866754c561f27ff2a853349a8147"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "560dc8c7913216f620d70b2322c5c384a756eee645d4db0369d798660fd0feef"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1e882636c17846c78c5ea018ee8e31db276b41e11f82d80459e9d18154cb2ff"
   end
 
   deprecate! date: "2024-06-08", because: :unmaintained
