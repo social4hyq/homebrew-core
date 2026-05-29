@@ -6,7 +6,7 @@ class Libre < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1ace301a02389fccea6c3455989f09bc7921a0451526a55a93f1938bca06017"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f392ab661ea4bb86b50cfa98cb3d251d36038e2f9d44cb3a52db4e61ba99f5e"
   end
 
   depends_on "cmake" => :build
