@@ -15,7 +15,7 @@ class RancherCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f17dc0d82d8ca07db392e20087640ca4ba2d29a9f75222edad04d8bd9fa703b9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4423f3c0a21127143955fe6a56a0f2a5437761fd497a666331775e845a43c2e9"
   end
 
   depends_on "go" => :build
