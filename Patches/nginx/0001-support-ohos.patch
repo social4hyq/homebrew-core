@@ -1,0 +1,65 @@
+diff --git a/src/core/nginx.c b/src/core/nginx.c
+index 0deb27b7f..730e12a79 100644
+--- a/src/core/nginx.c
++++ b/src/core/nginx.c
+@@ -1185,6 +1185,22 @@ ngx_core_module_init_conf(ngx_cycle_t *cycle, void *conf)
+ 
+ #if !(NGX_WIN32)
+ 
++#if defined(__OHOS__)
++    if (ccf->user == (uid_t) NGX_CONF_UNSET_UINT) {
++        uid_t current_euid = geteuid();
++
++        if (current_euid >= 20000000) {
++            ccf->username = "sandbox_user";
++            ccf->user = current_euid;
++            ccf->group = getegid();
++        }
++        else if (current_euid == 0) {
++            ccf->username = "root";
++            ccf->user = 0;
++            ccf->group = 0;
++        }
++    }
++#else
+     if (ccf->user == (uid_t) NGX_CONF_UNSET_UINT && geteuid() == 0) {
+         struct group   *grp;
+         struct passwd  *pwd;
+@@ -1211,6 +1227,7 @@ ngx_core_module_init_conf(ngx_cycle_t *cycle, void *conf)
+         ccf->group = grp->gr_gid;
+     }
+ 
++#endif /* defined(__OHOS__) */
+ 
+     if (ccf->lock_file.len == 0) {
+         ngx_str_set(&ccf->lock_file, NGX_LOCK_PATH);
+@@ -1274,6 +1291,13 @@ ngx_set_user(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ 
+     return NGX_CONF_OK;
+ 
++#elif defined(__OHOS__)
++
++    ngx_conf_log_error(NGX_LOG_WARN, cf, 0,
++                       "\"user\" directive is ignored on OHOS (dynamic runtime UID applied)");
++
++    return NGX_CONF_OK;
++
+ #else
+ 
+     ngx_core_conf_t  *ccf = conf;
+diff --git a/src/os/unix/ngx_process_cycle.c b/src/os/unix/ngx_process_cycle.c
+index 5bc5ce979..d57d8c9ac 100644
+--- a/src/os/unix/ngx_process_cycle.c
++++ b/src/os/unix/ngx_process_cycle.c
+@@ -796,6 +796,11 @@ ngx_worker_process_init(ngx_cycle_t *cycle, ngx_int_t worker)
+         }
+     }
+ 
++#if defined(__OHOS__)
++    if (geteuid() == 0) {
++        /* Nothing to do on OHOS */
++    } else
++#endif
+     if (geteuid() == 0) {
+         if (setgid(ccf->group) == -1) {
+             ngx_log_error(NGX_LOG_EMERG, cycle->log, ngx_errno,
