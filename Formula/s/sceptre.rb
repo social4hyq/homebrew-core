@@ -8,12 +8,7 @@ class Sceptre < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "392d911cc66f97282679b3c3d718e5453e905a28f10d444fe77ed9713954c7c1"
-    sha256 cellar: :any,                 arm64_sequoia: "5c6c91fdf6539d3d13bc3c386e2a351c2dde57587013a75cf151d9f809b5e2ea"
-    sha256 cellar: :any,                 arm64_sonoma:  "7b18c56b60d9db5e9a0227dbfabffda9b89eab5dbc8825b349f8e94b5503321c"
-    sha256 cellar: :any,                 sonoma:        "208b7193ab7c015485285643dfda69dd9832317a7a91a9422174d3a011d11c36"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0dce6d979ad5f5a8039ba8c30484f9b75263475406182f552b3b2ad593e5cf27"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "29d3c0cbcf35fd4b9764e6453025cffbaa713ca38a9b311603fefacf5f1ea0f9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1e6a81ffe3b8c97455be64dffe38196c9eba3e77eca7846c7452dfc51289c03"
   end
 
   depends_on "certifi" => :no_linkage
