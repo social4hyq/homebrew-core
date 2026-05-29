@@ -18,12 +18,7 @@ class SpirvCross < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "733bdc53b23929fa9a591ac1f45f65327a9b21c13767e123250b1e0ffec231ff"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7a8a344890252d1f29fd27977e65efd76e1c5e828511b6f3cf560e57d1f3571a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "3bf6ddb38bd9ad977880b4e07a9f5ec77ca2e86591bfc35d54a5c9cfc12cdf7e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e1345dce4ab28ccf68b363f1cad8794adec22242b357b96e7dc606a9a1a6d829"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "bdf73abb08c2292609c4d5431d1bbff8730669c0e25f4cf0fb2bd0db91e9d9d5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "df01299e1959ee86ed445f4be93b215eaa5a9f32cec348e2a709bd182ab786f3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e60ebb283c42e4a7c97ad21944314fe9840e8eeec07c67d85a66b75adb9f1c3"
   end
 
   depends_on "cmake" => :build
