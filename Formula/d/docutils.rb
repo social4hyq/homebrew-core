@@ -8,7 +8,7 @@ class Docutils < Formula
   license all_of: [:public_domain, "BSD-2-Clause", "GPL-3.0-or-later", "Python-2.0"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e845b85a9ed3617ebb7d5e5fe362ed12be2157d7524122c73f73a973fabbfcc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "afc9784dc07928ed7396a79b81684b594c8c3edfe39b1ef9c936e2ec2dccc195"
   end
 
   depends_on "python@3.14"
