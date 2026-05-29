@@ -11,7 +11,7 @@ class Jcal < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a25b1b71aadf79d4ba89438f10acf00bcec45d9931776afbdc7e71b7023946b7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "482fb09bcd39fafd984648768383280bdeb933571747dd8c23c26bd622dabd77"
   end
 
   def install
