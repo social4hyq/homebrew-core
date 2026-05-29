@@ -1,12 +1,12 @@
 class IcebergCli < Formula
   desc "Command-line interface for Apache Iceberg"
   homepage "https://go.iceberg.apache.org/cli.html"
-  url "https://github.com/apache/iceberg-go/archive/refs/tags/v0.5.0.tar.gz"
-  sha256 "bde108f9c61e2976c02cd9460d887ed875289a1bbb98e247466c093c4f0fd7be"
+  url "https://github.com/apache/iceberg-go/archive/refs/tags/v0.6.0.tar.gz"
+  sha256 "3ecdaa8851b84fa1c109be61b7ae6817aef6f301cee98ce68eac1eb649686050"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1620ad21eb841ef5f9e2e93e68b97c820db9394c516450911274e5af43bdf703"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2508fa602b47a67e336d52f803d5639967b24c1870e5cd0ee5f16a0b4b04e839"
   end
 
   depends_on "go" => :build
