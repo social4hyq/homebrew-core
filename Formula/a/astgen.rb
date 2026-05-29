@@ -7,7 +7,7 @@ class Astgen < Formula
   head "https://github.com/joernio/astgen.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "5415f948a456b8a335b2f52c2f79bbaca22c0cae02cf888cbb8598ce509dca16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ad6a35559a03a3582ca2ba69b0f83d15fffec9168d4c0d159115adb45d6fb55"
   end
 
   depends_on "node"
