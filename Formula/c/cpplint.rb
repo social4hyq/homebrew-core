@@ -8,8 +8,7 @@ class Cpplint < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "439258003bfc9b3bc95292234c4e295da040ba5057bd3dcac53204824e3b0caa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11f7a4b21c2b1d4beaaee6a0c63184b066cd498871460107bf0ad14edb9326ff"
   end
 
   depends_on "python@3.14"
