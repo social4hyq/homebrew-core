@@ -7,12 +7,7 @@ class BoshCli < Formula
   head "https://github.com/cloudfoundry/bosh-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "5bcc105df7c31caef931b92aa18bd40112e554498bc04fee3a9e71a34ecae8e6"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5bcc105df7c31caef931b92aa18bd40112e554498bc04fee3a9e71a34ecae8e6"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5bcc105df7c31caef931b92aa18bd40112e554498bc04fee3a9e71a34ecae8e6"
-    sha256 cellar: :any_skip_relocation, sonoma:        "854407af01c2ea98a1f5bf588c682b428b8cdb2a6e6052344ca31d74e439e2bb"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "267999ed68fe0866e9034b9602b16fb7b741d308dc8bed5b92fed9ff8f93b0af"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fac3f534314a93d9748b498e9ac909d24bf2b5ef9564b8f75c9fa03aa8960e63"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "26f89e02129963d62fcfe61a905407b0a8d20aab2e78eef9366bc87747979b7d"
   end
 
   depends_on "go" => :build
