@@ -7,12 +7,7 @@ class Doctl < Formula
   head "https://github.com/digitalocean/doctl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "38d3e601bf8d9f242e9eb88c874a929670cbfbd46e0fd8af2038de9bf547aaf2"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "38d3e601bf8d9f242e9eb88c874a929670cbfbd46e0fd8af2038de9bf547aaf2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "38d3e601bf8d9f242e9eb88c874a929670cbfbd46e0fd8af2038de9bf547aaf2"
-    sha256 cellar: :any_skip_relocation, sonoma:        "cc29f57dfdd32765709437dee2c7b6be8af0bdff174e010004606a67a2d3a8af"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "34d6ca17e2140adda78b734056f99cfa8f3549a60fe19fe660cd45f909698247"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "00cebbf09e6c44ea0f70041927639ac5e3dd48f8c9fb8af1921f0a141855ff84"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2aac860dcb137a69fa53e5ba42e84f9300616cc725b41e0e4cd1664de63f0ebb"
   end
 
   depends_on "go" => :build
