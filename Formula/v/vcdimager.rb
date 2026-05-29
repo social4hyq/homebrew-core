@@ -8,14 +8,7 @@ class Vcdimager < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "4fc5cf3e045233757dcf29a78fb731148d3c5ce9692df7825024b0b3ae66619e"
-    sha256 cellar: :any,                 arm64_sequoia: "2dbaab4b58479eca7337c3648f97c5f77bb8fb2ee40fd065b931215a16d52330"
-    sha256 cellar: :any,                 arm64_sonoma:  "3b3614dbce9b743fb1f7e31e2dfdd0a59ac7949277c5fb712c09d0fbdef0751d"
-    sha256 cellar: :any,                 arm64_ventura: "826dc8ca62806a582b3f6380e63c459e7f720a4a1d038fd9a3e9ddd0b6b0e260"
-    sha256 cellar: :any,                 sonoma:        "ead756089657c553a3d6e6f0fe321aa4075743698b15525101fcd6196bd1584f"
-    sha256 cellar: :any,                 ventura:       "418377dbcee1226a016018065deea7a062aff9dd367fc04af9ddd58ada1307a4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8ea9d3fa898a61767152f2a7fbdddc2375a42a10b24b7c38542d509d760bc7a7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0352ab14296e214d729962fb5c50eb822c7abcacede083e5107c273a908fbaee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "416b1dea961dae7b1a322996ac687724b0cf4336940db138e5109598b15485fb"
   end
 
   depends_on "pkgconf" => :build
