@@ -9,12 +9,7 @@ class LanggraphCli < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "225433e38f7e97c26c7b17cd06bc53021aaa57c4099926354235bb785e0740af"
-    sha256 cellar: :any,                 arm64_sequoia: "25e7e10b1632783039c4b2fb499b5c0d1a4c1cab6d600c5a84d74aa19c0d0590"
-    sha256 cellar: :any,                 arm64_sonoma:  "bdd8e138ceeb13e2b919c27aa90a82e354e690d543044ab2ff96d5a1b57d775a"
-    sha256 cellar: :any,                 sonoma:        "3b709c06b348dc18f95c4e887d8fbc2450e69032f8329cbb48fd7d1d416400fe"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "168d0f94d0d1357286a4c88ccd93982bff3de489b6fe948fb413336883123713"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "65e9b76f9095e7f0c52eed6a56322ab912d4b2b5a267d0d26da21314b5a40a2b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b1c913822945db41242f67e528914ea66a46e9ef912cb7b3c218f6953bee2c2"
   end
 
   depends_on "rust" => :build # for orjson
