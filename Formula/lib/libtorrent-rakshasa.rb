@@ -11,7 +11,7 @@ class LibtorrentRakshasa < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5141b05bb209d69c55588c76f66050995c30fffa3e32fdea37539ac2eac152f4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "25b73588cc350d54c66cbce532466567de57808b7f4125373a2cd38fb74dd032"
   end
 
   depends_on "autoconf" => :build
