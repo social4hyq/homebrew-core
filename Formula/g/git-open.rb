@@ -6,8 +6,7 @@ class GitOpen < Formula
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "142aaeed12d42b049c0414d59f19f8dfddf1c1c83dee8f208b1af1e745fd432d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a1c21cc5646d75d8698af9e610fa2e582efabbe8e46e9b768b2f3746517e0ea"
   end
 
   def install
