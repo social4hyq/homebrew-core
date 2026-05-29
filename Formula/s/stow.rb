@@ -7,16 +7,7 @@ class Stow < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:    "74d7b0d6d849528a320c63802f21390c65a700a28295f546be29d5b87d78b25f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia:  "d4c48d441c3aec3763807b9937c6f8e0aa118fd3e8726f4419ffe3928a4f4ae0"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "d4c48d441c3aec3763807b9937c6f8e0aa118fd3e8726f4419ffe3928a4f4ae0"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "22e553b127f24001900605515df147dff27f5eb0b99805d63de1bcffb1c5a0d3"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "22e553b127f24001900605515df147dff27f5eb0b99805d63de1bcffb1c5a0d3"
-    sha256 cellar: :any_skip_relocation, sonoma:         "4829b15c46ae06aebd28e6ca0148f7b743de698041f4f8dd1c88b8e1e2fb7f1b"
-    sha256 cellar: :any_skip_relocation, ventura:        "50ca7991910a8b752ee6d5504f8cab1e2012de4759d517c68e1389f42c952242"
-    sha256 cellar: :any_skip_relocation, monterey:       "50ca7991910a8b752ee6d5504f8cab1e2012de4759d517c68e1389f42c952242"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "d0c8d1eb137984030db04350a3efc522c26a486be22f6e940dbcd0f30927edf9"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "99e225c98e4bbc9dfaa3a6dfbeea16b9e2f91bacc18801212902fbb81962f73a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "80e80b7d097f97839e6d15a46fc6ef7c52aa828870281f4c519ce605e6a8c5c7"
   end
 
   uses_from_macos "perl"
