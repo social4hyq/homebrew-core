@@ -3,10 +3,9 @@ class LinodeCli < Formula
 
   desc "CLI for the Linode API"
   homepage "https://github.com/linode/linode-cli"
-  url "https://files.pythonhosted.org/packages/22/74/c07f3fb070b2c9d602fbd5c163fde70aeb3ec304e0f63f424bc6ac97daed/linode_cli-5.67.0.tar.gz"
-  sha256 "b5dc21013e86c4a5f775fb7237093920e01e50fd4bda877ae0f4dd3cce4b4497"
+  url "https://files.pythonhosted.org/packages/f4/53/a924ab651cffe044575bfd114a9c39f58b27974356ffcf2e52c2d54bfd98/linode_cli-5.68.0.tar.gz"
+  sha256 "c3af1dc617f8bc164baa9e98020e979b20c5ee6b6d35414276f3c2681d983507"
   license "BSD-3-Clause"
-  revision 2
   head "https://github.com/linode/linode-cli.git", branch: "dev"
 
   bottle do
@@ -45,8 +44,8 @@ class LinodeCli < Formula
   end
 
   resource "idna" do
-    url "https://files.pythonhosted.org/packages/82/77/7b3966d0b9d1d31a36ddf1746926a11dface89a83409bf1483f0237aa758/idna-3.15.tar.gz"
-    sha256 "ca962446ea538f7092a95e057da437618e886f4d349216d2b1e294abfdb65fdc"
+    url "https://files.pythonhosted.org/packages/b9/28/99c51f664567218d824af024c0251650fb27e4ca066df188dab0769c5b91/idna-3.17.tar.gz"
+    sha256 "5eb0cb53bc467c12eadcf6de83163ad8527cec9416f44b9b61b19caedad2b87f"
   end
 
   resource "linode-metadata" do
