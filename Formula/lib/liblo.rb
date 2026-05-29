@@ -7,12 +7,7 @@ class Liblo < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c1fa7f02794de81f4e06be6c432e4d9c2647761ef00992fa3de55945540afd44"
-    sha256 cellar: :any,                 arm64_sequoia: "4ff3f95735108c43158e6f0a2fe444697b9d62210d8ff51d0806693d030004f5"
-    sha256 cellar: :any,                 arm64_sonoma:  "c0febe0351ee278b9c3c7428549f39c001ff7aa20257299a7a23f142c20b9c4a"
-    sha256 cellar: :any,                 sonoma:        "0f827d91c8c2b1bb0bf9d131651e39e4271c79a746339357cdcb824d37a5b8c0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c5d4c3a58984a078e7ba8affce24a3dff5a3075db1e1764ae0f4d87f1a3ddae6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6f0ad474a27c6483b6b41697cfcdd9ddec8eb4fe9f2f93478469a2f949aea352"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "64d5e03f690f0c0edef77e9ebdacbc245063b440612ccb33aad74a7bdc02541d"
   end
 
   head do
