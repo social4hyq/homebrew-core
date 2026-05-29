@@ -1,13 +1,13 @@
 class Dra < Formula
   desc "Command-line tool to download release assets from GitHub"
   homepage "https://github.com/devmatteini/dra"
-  url "https://github.com/devmatteini/dra/archive/refs/tags/0.10.1.tar.gz"
-  sha256 "81fc4e6bd174d238932a6415db7029a84acda5f4dc84a285ee0a10c6b3cb3580"
+  url "https://github.com/devmatteini/dra/archive/refs/tags/0.10.2.tar.gz"
+  sha256 "40881a16141ee9d45441ebd2db4b43d8ac664b84adbec17ce39f344763b1b415"
   license "MIT"
   head "https://github.com/devmatteini/dra.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "00ab0872256516efb79a9abf0da44dae413cde5d8a5900383a52cc591cd229e9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6218b5c71b8c4e019bdb811f32c34be52aabb26e08cfcee505e49fdddcbc89bf"
   end
 
   depends_on "rust" => :build
