@@ -12,12 +12,7 @@ class Ooniprobe < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ab277c27cf293aa52073b1bb33dba292e8ccbb6ca0564cdab3871c53f922225e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ae91031bc77ee4fd6144f1a1fcdba4bb63facefac5735aa58e33713745fcc807"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f4f5a95779862d2af3c38f53cdc93cab25a921a3ba6049647a9c8877e4fc7ae6"
-    sha256 cellar: :any_skip_relocation, sonoma:        "5c51f566a7c6c9d85980c075c592d905d66e19ad4b88dac0fa148351fa0015c4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2c0e8a89156b74ff0e883f845f2fe7557b9ee42bfba41af6c8edd7d508cabeaa"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6b975e91fe4c5b5b86816b6f6d0f79d570c2b0ab950a3d32b637d4dab84c50ef"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac617278ca872e4a65a856ecebeaeceb3522bfe95593fef49d7cb9df5f8c20a8"
   end
 
   depends_on "go" => :build
