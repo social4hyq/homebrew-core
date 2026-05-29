@@ -47,6 +47,38 @@ index 0deb27b7f..730e12a79 100644
  #else
  
      ngx_core_conf_t  *ccf = conf;
+diff --git a/src/os/unix/ngx_process.c b/src/os/unix/ngx_process.c
+index 15680237a..b33a502f0 100644
+--- a/src/os/unix/ngx_process.c
++++ b/src/os/unix/ngx_process.c
+@@ -144,17 +144,27 @@ ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
+ 
+         on = 1;
+         if (ioctl(ngx_processes[s].channel[0], FIOASYNC, &on) == -1) {
++#ifdef __OHOS__
++            ngx_log_error(NGX_LOG_WARN, cycle->log, ngx_errno,
++                          "ioctl(FIOASYNC) failed while spawning \"%s\" (ignored for OHOS sandbox)", name);
++#else
+             ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
+                           "ioctl(FIOASYNC) failed while spawning \"%s\"", name);
+             ngx_close_channel(ngx_processes[s].channel, cycle->log);
+             return NGX_INVALID_PID;
++#endif
+         }
+ 
+         if (fcntl(ngx_processes[s].channel[0], F_SETOWN, ngx_pid) == -1) {
++#ifdef __OHOS__
++            ngx_log_error(NGX_LOG_WARN, cycle->log, ngx_errno,
++                          "fcntl(F_SETOWN) failed while spawning \"%s\" (ignored for OHOS sandbox)", name);
++#else
+             ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
+                           "fcntl(F_SETOWN) failed while spawning \"%s\"", name);
+             ngx_close_channel(ngx_processes[s].channel, cycle->log);
+             return NGX_INVALID_PID;
++#endif
+         }
+ 
+         if (fcntl(ngx_processes[s].channel[0], F_SETFD, FD_CLOEXEC) == -1) {
 diff --git a/src/os/unix/ngx_process_cycle.c b/src/os/unix/ngx_process_cycle.c
 index 5bc5ce979..d57d8c9ac 100644
 --- a/src/os/unix/ngx_process_cycle.c

@@ -6,6 +6,7 @@ class Nginx < Formula
   url "https://nginx.org/download/nginx-1.31.1.tar.gz"
   sha256 "9fcaaeb8f22544b09a19a761f3412c4112215422401634bebdd1296a403cc4bc"
   license "BSD-2-Clause"
+  revision 1
   compatibility_version 6
   head "https://github.com/nginx/nginx.git", branch: "master"
 
