@@ -1,10 +1,10 @@
 class Crossplane < Formula
   desc "Build control planes without needing to write code"
-  homepage "https://github.com/crossplane/crossplane"
-  url "https://github.com/crossplane/crossplane/archive/refs/tags/v2.2.1.tar.gz"
-  sha256 "ad9061b726f1e47f47253b1769883bd967e2127c2e17d75b86ded4c15ca96cec"
+  homepage "https://github.com/crossplane/cli"
+  url "https://github.com/crossplane/cli/archive/refs/tags/v2.3.1.tar.gz"
+  sha256 "6e7e5a7aaf745dd6d9fcf04fa19fc555d4f0a2df865f50a3c6a071173bb66373"
   license "Apache-2.0"
-  head "https://github.com/crossplane/crossplane.git", branch: "main"
+  head "https://github.com/crossplane/cli.git", branch: "main"
 
   livecheck do
     url :stable
@@ -12,7 +12,7 @@ class Crossplane < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4fc082ed8ae07b4b6a011a14091238fd2c90a0b43ff05549e6d81566d24bd9fc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e5be400a059c23d1512c44aafa6b4c73a267360c83ae0d49c0d577c4401ee66"
   end
 
   depends_on "go" => :build
@@ -20,9 +20,9 @@ class Crossplane < Formula
   def install
     ldflags = %W[
       -s -w
-      -X github.com/crossplane/crossplane/v#{version.major}/internal/version.version=v#{version}
+      -X github.com/crossplane/crossplane-runtime/v#{version.major}/pkg/version.version=v#{version}
     ]
-    system "go", "build", *std_go_args(ldflags:), "./cmd/crank"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/crossplane"
   end
 
   test do
@@ -44,7 +44,7 @@ class Crossplane < Formula
               name: example-function
     YAML
 
-    output = shell_output("#{bin}/crossplane beta convert composition-environment " \
+    output = shell_output("#{bin}/crossplane composition convert composition-environment " \
                           "composition.yaml -o converted.yaml 2>&1")
     assert_match "No changes needed", output
   end
