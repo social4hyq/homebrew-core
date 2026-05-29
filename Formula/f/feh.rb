@@ -11,12 +11,7 @@ class Feh < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "a229fdc150b9c044762ea45c12b41e516b630e306bffdb41cc304e575854b07c"
-    sha256 arm64_sequoia: "48d2599d4609f941acb54604b8b764809b5a251bd889a663a6cee3b266f062c8"
-    sha256 arm64_sonoma:  "cd3fa54ca32eae4cfc7872389931bd914e28b61b022b0c11cc1fd11c46b3e7df"
-    sha256 sonoma:        "4703dff6da28df336f891d4e33f45f964e80475a070b9e4b0d8a1b7a46f6b58e"
-    sha256 arm64_linux:   "4bf4fb9c8248721f8faf067433e9b5d007fb69c9f7fc39e0e3e9f4577457347c"
-    sha256 x86_64_linux:  "052e4b873c6f2135538a61580112feacc073fc918777267076ef19a225105fd7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "211ebbffa0d30e24c8706e248c68cdd13d86702cc44a730c2dfe5c4deec63a7e"
   end
 
   depends_on "imlib2"
