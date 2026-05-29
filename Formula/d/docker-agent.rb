@@ -7,7 +7,7 @@ class DockerAgent < Formula
   head "https://github.com/docker/docker-agent.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "997d11e651af273dbdb05dcf7f2fe34dd102851d9f6c32ce7949412be1997774"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd5440d7fe3e6618dd78a6ae52ec913bc051e2cfdaa7b7132491fa91fa17a7ca"
   end
 
   depends_on "go" => :build
