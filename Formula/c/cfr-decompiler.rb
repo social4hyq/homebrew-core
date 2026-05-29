@@ -13,13 +13,7 @@ class CfrDecompiler < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ab8834addd1841f1c2956e76a9ad07ba5de8baca81dcb20834ab0509c3c06c13"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "40e70dbc8a02f9af88b53433bb613530987d9cb816ac2225f2d723c40aa28571"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8ea66fb664c3dfa1afd2f261fe9899ad1a3edfd8ceb83fb43e1d35136bdb41ae"
-    sha256 cellar: :any_skip_relocation, sonoma:        "a2b939bf2b019303372c0a586249644cbfae34da0fc124f61c0d41039b834279"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "acb9fe0f76e43403de2c4f013238038b1359c1aed573cb0081d0414342b2e410"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b080b0a210c10148733e753b1b4ff7fcb4a05c67a086b8c698b99250a94e3e1f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c84bbcbe45637ac405146800ac749be06e58c2b8951d5dd2cbc126e4108faacb"
   end
 
   depends_on "maven" => :build
