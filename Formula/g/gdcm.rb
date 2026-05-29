@@ -11,12 +11,7 @@ class Gdcm < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "ccc916d2f436641dc57ef47cc42621d982d4c4f78ee065bfb4f8b7fa8373b739"
-    sha256 arm64_sequoia: "00c8e96f2057d7799a2f3ee572e4eeca2540f093c71347480b1d100eabe26a73"
-    sha256 arm64_sonoma:  "bcaa57f56d392eb8a56785c698dc89d15ddb5ac2e58b33dcd5dea5af7ebcb163"
-    sha256 sonoma:        "e1f978a314fd982f9a522fc10f8d8eaa4b8ec464c435cb3ff720e41989d19e21"
-    sha256 arm64_linux:   "ec3da1d9d8dad5857748363699f261593abc790cfabcb1b936a47044f22eff0f"
-    sha256 x86_64_linux:  "4ef06462203ebc92adb899b192c70b62074c048777aeaf6fca146da1c3257b6e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "327631013fba86f86769fe971c11d25ad8bd510713a1d19c02d0fdbf1bf374a0"
   end
 
   depends_on "cmake" => :build
