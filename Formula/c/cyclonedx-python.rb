@@ -10,12 +10,7 @@ class CyclonedxPython < Formula
   head "https://github.com/CycloneDX/cyclonedx-python.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "33c2af4771a43e3c21a252e58405783c969822174b47210d104afb67ac83c89b"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c8bcad60ea9d3e7357a1d69b4afe4919d39f3e680aaea83e745854743475a632"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "49edaa244ef2a96bc96e60f2ea2772afd73a64434d4102c24da13c05b1bd2236"
-    sha256 cellar: :any_skip_relocation, sonoma:        "1666fcde9bec02fa45c2140cc61e41c25339818ff6930a4c4bc4504f1f0d7af6"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "c87db5a06ef4eaefa7ac4ab464da7f55bd57e62a098b6bd4a0e69e8cbdac8386"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1d248eb6fe218c9c8d912abaf62bff5b876e248d5caa32815da4b041c5f3dfad"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1b9f506f967cf11cd22cc0ef7bb53a976177e0b6d5749686acf072c4edf2a4a"
   end
 
   depends_on "python@3.14"
