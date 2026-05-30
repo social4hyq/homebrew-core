@@ -7,13 +7,7 @@ class Kubespy < Formula
   head "https://github.com/pulumi/kubespy.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "029feef7bf428cc4b613f95bdbd189e7277d400cb6f54165933dddbcb04be245"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c37522a8957c50550223fb4b2328c1898e03ac58b396b4a29935bfa0ba117ad0"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5ddb3fd9926acbd341443c5cba25eadb6033a63777be75c8ffd8634bf4d1d976"
-    sha256 cellar: :any_skip_relocation, sonoma:        "624ad6a1151a4771a25cfea3900ca0292ce77d97aa2da129cc7e9c9db2733513"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5f43edfd8aafe2b5519b54c17e7028b53b365c29f5543b6af289ea84da49749d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f904a862816e12c913d12694bcfe8dab2bd6735704c2a33f75267e9888452f45"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "59f72fa7a32295027646a1d3864b1e0ba903f9fa57840d6c38188573439eb51f"
   end
 
   depends_on "go" => :build
