@@ -11,12 +11,7 @@ class Cadical < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "2967cc0540cdaf175371d3a4f566ada6998c14f565af4f3a0e844c38655e25d0"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "34eb631b3ca9f327844f593b90c8caf146e677c34221dece4e06d6e70309bf14"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "117549d37410d5cb9466328e14940c6d97aa1e7349536f146abac6df7e8dfb64"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c79fc253f0b70e9271afec97af7ccfa616c27399ae98469493bf269cd0329e27"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0b1269bb97bdc24a8a221815916362376d69f3a9f200adf44eb7052a6cb37161"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7d52a60004435c341e172b804ab0aa96e12170ab4b94e6f2919707a61f59b9e6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "975ec4acc06d1e139c15f9dadcf7a447454a7e1a0587e8a19c3b67c5dad8a401"
   end
 
   def install
