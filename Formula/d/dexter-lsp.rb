@@ -1,13 +1,13 @@
 class DexterLsp < Formula
   desc "Elixir LSP optimized for large codebases"
   homepage "https://github.com/remoteoss/dexter"
-  url "https://github.com/remoteoss/dexter/archive/refs/tags/v0.6.0.tar.gz"
-  sha256 "53344b29a92ce686383c7409bc3bc7e2c639af760cd4682d14956988b574d357"
+  url "https://github.com/remoteoss/dexter/archive/refs/tags/v0.7.0.tar.gz"
+  sha256 "6be8063a47b1258789f0a7855dde16cdacb30888d294ad940f8e8cfc2146b0f9"
   license "MIT"
   head "https://github.com/remoteoss/dexter.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "207d7feab3bd6c6277235019cba9f232348416d2d8d38cd7468c73fe0146c535"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb6f460f47483e964f098400c2a4ad6475ed1b399fdaa75bebffa22e2a29893f"
   end
 
   depends_on "go" => :build
