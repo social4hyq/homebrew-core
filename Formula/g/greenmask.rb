@@ -12,7 +12,7 @@ class Greenmask < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6433b6c7fb3457c3e088cf0c9a3cca02adf1c0afb434cb3f55d9d07294730f5c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "67b7653f2f849aac9d6eacac17861a61c8fb26e4256bc505c73f5abd1df15c91"
   end
 
   depends_on "go" => :build
