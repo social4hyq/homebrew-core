@@ -13,7 +13,7 @@ class Dolt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5934dff01eea35876abc200ae0a9a4d8f31650e82afe2ab5c7a80ca349f12bb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a33ea78b7cf2eed947d93d92b6503982d8725390803dfd6b94b52c3e7e3a4275"
   end
 
   depends_on "go" => :build
