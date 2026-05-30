@@ -7,7 +7,7 @@ class Trdsql < Formula
   head "https://github.com/noborus/trdsql.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5b7917b0ce7d69071cc52ff5538a46999c3c60285bbf3cad3d4b0194f05d3413"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "33b9b1360d43d8fe382daa0ff20c3f832026744e3ac20c0ba679aa172d0366ee"
   end
 
   depends_on "go" => :build
