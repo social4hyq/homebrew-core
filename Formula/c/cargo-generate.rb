@@ -1,13 +1,13 @@
 class CargoGenerate < Formula
   desc "Use pre-existing git repositories as templates"
   homepage "https://github.com/cargo-generate/cargo-generate"
-  url "https://github.com/cargo-generate/cargo-generate/archive/refs/tags/v0.23.10.tar.gz"
-  sha256 "3cec2d0a6fe45fb6bb4d1341abb1758cc799a348bd5e59b3c0551e4dabe94369"
+  url "https://github.com/cargo-generate/cargo-generate/archive/refs/tags/v0.23.11.tar.gz"
+  sha256 "586981962590a77589998cded424e08d22361f63e351c2396c71df1cda5d0a67"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/cargo-generate/cargo-generate.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "49e389431a5cdfc49f8fef4c2c661f745d290c407500a18293d0d743ccea0cca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4638295f24797d30a49a3b520ae68f04449cd3f110c975789596ba2532723957"
   end
 
   depends_on "pkgconf" => :build
