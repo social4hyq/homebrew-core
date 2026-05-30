@@ -15,7 +15,7 @@ class Govc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "494d2fa221e77f71597d652f3744e3179e19078234f4c5f8fb6cd6b9a675da15"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03ad9eae702e77f49995d5378d6b9ccba23738f441cab03612146f545f0b7544"
   end
 
   depends_on "go" => :build
