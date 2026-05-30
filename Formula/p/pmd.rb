@@ -1,8 +1,8 @@
 class Pmd < Formula
   desc "Source code analyzer for Java, JavaScript, and more"
   homepage "https://pmd.github.io"
-  url "https://github.com/pmd/pmd/releases/download/pmd_releases%2F7.24.0/pmd-dist-7.24.0-bin.zip"
-  sha256 "110934b36d39c19094d1b77386931978093f238f2c2f1851748822b69c7367ac"
+  url "https://github.com/pmd/pmd/releases/download/pmd_releases%2F7.25.0/pmd-dist-7.25.0-bin.zip"
+  sha256 "1fceb3005ebfd580cc9afa5242e07df74826eedeb225f239f503083845d77fc2"
   license "BSD-4-Clause"
 
   livecheck do
@@ -11,7 +11,7 @@ class Pmd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "29b649ad27703f080d19e145c6471c81eadd834aec15863650841f7ae5b4b628"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f33a0fb2f64ce125f496e8e92fdfa9e13ee819076ca8fa531dad28363c2b4dc6"
   end
 
   depends_on "openjdk"
