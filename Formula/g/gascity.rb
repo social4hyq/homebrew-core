@@ -1,13 +1,13 @@
 class Gascity < Formula
   desc "Orchestration-builder SDK for multi-agent coding workflows"
   homepage "https://github.com/gastownhall/gascity"
-  url "https://github.com/gastownhall/gascity/archive/refs/tags/v1.1.0.tar.gz"
-  sha256 "ae37e7dcc31e6ca3db435940c305bff36510dd2e32dbf472260c3eedaab0826c"
+  url "https://github.com/gastownhall/gascity/archive/refs/tags/v1.2.0.tar.gz"
+  sha256 "af94e8a9bbf276d4ba8278869f186339c702ffd3ef0eeb5666298484996f5390"
   license "MIT"
   head "https://github.com/gastownhall/gascity.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e201f31d7bc9d84162ce60cbe2abba3e2e8c801d1f92124853b544242a79d0c9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "09fcc1e1901b1a1a7d723fa0c7264d009295c290311567a36b18ee7f05b30a52"
   end
 
   depends_on "go" => :build
