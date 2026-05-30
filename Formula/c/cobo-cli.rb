@@ -10,12 +10,7 @@ class CoboCli < Formula
   head "https://github.com/CoboGlobal/cobo-cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "0f927983383669d7095e0669fb731f5bcc23e767bf5ef4e3d3fa2b3d2d19eea4"
-    sha256 cellar: :any,                 arm64_sequoia: "39d14652b42dd7801911ddd49c7ab98b65e104ab5a8a834d1f5bfddc816e139c"
-    sha256 cellar: :any,                 arm64_sonoma:  "a9908dceb0b428502a973408544624cf22eeb6ca31e6351bca2dfec525361c7d"
-    sha256 cellar: :any,                 sonoma:        "c4e385d488015ecab8a7a5857f51dae0f74a28e9530e96b7a838539c47aae254"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b12efd4a657276a237485409b492f4027f434873de34026acbcba61bdc81f0ca"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a54c36185f76dfccb9620f25ddce996893c7094145f3094893a036a4227ffa00"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "04df6433e3f84e3e0333b2e11d947bf4d8c10a857007d1b81862ed8dd0eace86"
   end
 
   depends_on "certifi" => :no_linkage
