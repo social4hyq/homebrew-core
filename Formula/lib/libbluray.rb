@@ -13,12 +13,7 @@ class Libbluray < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "3895fef0bbc04ee7271992f3908569416a67d97efba1c492a4ccc053de0a89c3"
-    sha256 cellar: :any, arm64_sequoia: "f20ad084fb722697dd0658fb7de27d94497f5849fd18fa3aacba1e2ea664fbc6"
-    sha256 cellar: :any, arm64_sonoma:  "fa3daea45cc9170bcb15d3d8fd7b238ebdb75ec241afe1488d57dbd7559d9982"
-    sha256 cellar: :any, sonoma:        "1aa87a3cf82c6b914c78856a9283e838e1d7426f4d1377537dae81e1041f64b0"
-    sha256               arm64_linux:   "0839ef787f9411f8056674b5f7e1dd7e68d5b5df330a11ed1e845f1635683ef1"
-    sha256               x86_64_linux:  "153b38bf91479d363e0dcaaef4ddebc96793a7db980baa3993a56f5a0082e477"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "54ec56f59aca655fea2ceb45c79727c98a3128f46f02f36be47fe6445ad8a714"
   end
 
   depends_on "meson" => :build
