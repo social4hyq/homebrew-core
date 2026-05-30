@@ -10,12 +10,7 @@ class Uhdm < Formula
   head "https://github.com/chipsalliance/UHDM.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "891f989496491f9c6761524ba78fe17dfcc34143ffce1989aa91f04abb8594f8"
-    sha256 cellar: :any,                 arm64_sequoia: "377be1b55b38ddd0e367f51f32d0751e2e292a138a7a4c1a0ecce43687209657"
-    sha256 cellar: :any,                 arm64_sonoma:  "7a68cab4fc1699b0e803ff3e2a19130ec903a48300ee4c08c8e3a7736996f5a2"
-    sha256 cellar: :any,                 sonoma:        "8581b3d7ffad5bdb3981c9e2c65b739fb4b097e357e060298ea958dfb9f91db4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a72012164f97109986cfd2f443e12ad9b60c7bdc9eaa6812ec1d8b328c7dad5c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "bd28d2d1d6c7099aa4dea9d924ee96a6a8d843c64a69f9af000e65dad60333c3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f65b691ae59509ef6b931b5c70709f04ed27a5cd513d1f7d3ee9c6930f0545d"
   end
 
   depends_on "cmake" => :build
