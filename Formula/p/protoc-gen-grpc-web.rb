@@ -12,12 +12,7 @@ class ProtocGenGrpcWeb < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "eca3efd24cbd6bbd502e6e85ad606fb34b6b4db00f9cc8648bdd3b28440e5abc"
-    sha256 cellar: :any,                 arm64_sequoia: "4d017bbf599ddf51e85fe2d2ecee539300e19e94c7dcf6547d90aeccc6363dc8"
-    sha256 cellar: :any,                 arm64_sonoma:  "72aab74e8cb9e4aac2e2ff3bd84010473e7f87d0e2b6a602e7472c0649263aeb"
-    sha256 cellar: :any,                 sonoma:        "a9269a12cdbb61272be1be21b8085ee356b3c27898eca1b8a518ddc1a0924843"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "12f2a1a5eb3605977bd2df8ae13e711369b78773a745e18473c09329a2e7c992"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8aee26e9c6442e2f46c7d2ed955fd7f477db739b2c0bc019738ed3f0dc465241"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a214e48bf1286f25df646af8f2edbf400fa926784654541c38e0579a4ca28e0"
   end
 
   depends_on "cmake" => :build
