@@ -20,12 +20,7 @@ class Vcpkg < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c09d0287fb118f1bcb20c97376ea2b81b592e0855b8bea42fa7321f142e505a6"
-    sha256 cellar: :any,                 arm64_sequoia: "3845d7fb084b796c8fc8b22d6f616d638ba6a928e3b81eb571bf0431acf8d971"
-    sha256 cellar: :any,                 arm64_sonoma:  "1d92ec032b89d40256a0cd61643482d8de4c87796c9b7254164b641fd284f47f"
-    sha256 cellar: :any,                 sonoma:        "0275fdf05ead062bca134337292b47e883fc3881403e0eab7a039d251b3bb8c7"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f9fb27cb4b59a64e60d330500598c509cd4bf692a8bb20e1fbf64c14a10df33a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f5bab9084f75c7217c4d3aa4065115148da3f10fe117766042c984a91620a483"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cbf4c84b8964740c9ec73a3fde41afcb365194699417cfadae9a3008f6c543ab"
   end
 
   depends_on "cmake" => :build
