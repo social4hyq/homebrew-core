@@ -17,7 +17,7 @@ class Mariadb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d4c6f1c8d4e7bfe35e8badf5db68cc8f3cab035e3afbf0586042a076ccbe073"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fc36c1d1bb962c00bc65687482f24ec04faa34dcd44c36bb17594d0b2cf55ef"
   end
 
   depends_on "bison" => :build
