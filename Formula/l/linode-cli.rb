@@ -9,7 +9,7 @@ class LinodeCli < Formula
   head "https://github.com/linode/linode-cli.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9bcb8d0ee3a41b6b9d9af2b3bea559315d2bac29034ed4c2401e6555a544cc0e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b38af305658b493ed5fce80b4e4e1693dacd8961855b9e2b3677e6dd07a014a7"
   end
 
   depends_on "certifi" => :no_linkage
