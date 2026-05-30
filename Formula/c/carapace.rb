@@ -7,7 +7,7 @@ class Carapace < Formula
   head "https://github.com/carapace-sh/carapace-bin.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1203e6897ea27a10d3d1791c875953234c5c654ae745e93781b42086d4d4ffc8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb48576865eac2b16d3428a211939d6b7a7309e36cac7b328e92ac899000b463"
   end
 
   depends_on "go" => :build
