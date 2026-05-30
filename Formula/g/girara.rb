@@ -11,12 +11,7 @@ class Girara < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "0ed07bd2e1e833c3b360de3e09c4a3e7a35d899a6af96aa7d3f8036bdde04aac"
-    sha256 cellar: :any, arm64_sequoia: "4951f6b0bb160e46f6a3da8564da885f14928799e907b71470cc8b03307c9041"
-    sha256 cellar: :any, arm64_sonoma:  "30936ee50244bebb9d81d3da45632661a9e11ed96bbf234548d11e78226eff0b"
-    sha256 cellar: :any, sonoma:        "1cf9391cf1d2f22c921895f5675154d2041685d0a698e03b9aadf8548f6feb03"
-    sha256               arm64_linux:   "494a9adfa607a0fe5238eb6cab449f576b5bc6ee31ea55d09582dabbceef241a"
-    sha256               x86_64_linux:  "2d31420fa52a0f3420f452284cf0fc58904cbafa6e10ada3027ee75a59f93675"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "667eb85183f6f2013a4e61592e368c8aa413b817b54e13e6947596fdd565c680"
   end
 
   depends_on "meson" => :build
