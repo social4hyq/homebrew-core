@@ -1,8 +1,8 @@
 class Subnetcalc < Formula
   desc "IPv4/IPv6 subnet calculator"
   homepage "https://www.nntb.no/~dreibh/subnetcalc/index.html"
-  url "https://github.com/dreibh/subnetcalc/archive/refs/tags/subnetcalc-2.6.6.tar.gz"
-  sha256 "5f33894fac3420d0d906ba7d4e3f7bcfee831707deec08a43d6f2397e30ac486"
+  url "https://github.com/dreibh/subnetcalc/archive/refs/tags/subnetcalc-2.7.1.tar.gz"
+  sha256 "e4a38fbab23ab17a8f10423f9c08153c2bdd7eaadc9251f9d5167eaf0642e9c7"
   license "GPL-3.0-or-later"
   head "https://github.com/dreibh/subnetcalc.git", branch: "master"
 
@@ -11,13 +11,16 @@ class Subnetcalc < Formula
   end
 
   depends_on "cmake" => :build
-  depends_on "gettext" => :build
-
-  on_macos do
-    depends_on "gettext"
-  end
+  depends_on "gettext"
+  depends_on "libidn2"
+  depends_on "libmaxminddb"
 
   def install
+    # OHOS musl doesn't provide IDN in getaddrinfo() like glibc does.
+    # Upstream CMakeLists.txt only searches libidn2 on FreeBSD/Darwin.
+    inreplace "CMakeLists.txt",
+              '( (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") OR',
+              '( (${CMAKE_SYSTEM_NAME} MATCHES "Linux") OR (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") OR'
     system "cmake", "-S", ".", "-B", "build", *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
@@ -32,14 +35,14 @@ class Subnetcalc < Formula
       Broadcast      = not needed on Point-to-Point links
       Wildcard Mask  = 0.0.0.0
       Hex. Address   = 01010101
-      Hosts Bits     = 0
+      Host Bits      = 0
       Max. Hosts     = 1   (2^0 - 0)
       Host Range     = { 1.1.1.1 - 1.1.1.1 }
       Properties     = \
 
          - 1.1.1.1 is a HOST address in 1.1.1.1/32
          - Class A
-      Performing reverse DNS lookup ...\r\e[KDNS Hostname   = one.one.one.one
+      DNS Hostname   = one.one.one.one
     EOS
     assert_equal expected, shell_output("#{bin}/subnetcalc 1.1.1.1/32")
   end
