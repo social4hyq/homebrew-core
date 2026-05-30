@@ -6,12 +6,7 @@ class Echtvar < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "967774e36783e194a74363623e9a0b9cdfd45aabfc65f733d2c96d9b9b6fda47"
-    sha256 cellar: :any,                 arm64_sequoia: "4070e9a38ac9d8f75cfa5cbb740b248998b6d3f42033de8597f8b8fba3624e9f"
-    sha256 cellar: :any,                 arm64_sonoma:  "7ab19da28e45af8d314ccd2bf7ad7adc61a875ea633673f8354925bc10dc327d"
-    sha256 cellar: :any,                 sonoma:        "cab470a71b38c30e926f6fd91cf7ffee9607434936abd12f230f922f8aa7a387"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9fccf79a988ad5faa9d5d81178597dcda3793373f30bdafa4554d702a5f85477"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "911a3b77a4afd48105d6a398fd58da0709880cb409d712d68a0e552286ec137b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d76e6225a32cd561bcee438bc47a2c8f7baf136dc4cd0a4721029ef7ea7e116"
   end
 
   depends_on "cmake" => :build
