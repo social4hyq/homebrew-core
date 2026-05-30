@@ -14,7 +14,7 @@ class Src < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "e758817a02405ef96de9f6b941ca748f60c320a682c1963488c91fd002daeabb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf9a457bf38b2f7b2c51cee3a665b7ea29172aa227a0ff6c513393f990d3986a"
   end
 
   depends_on "asciidoctor" => :build
