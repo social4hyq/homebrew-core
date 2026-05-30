@@ -1,8 +1,8 @@
 class Greenmask < Formula
   desc "PostgreSQL dump and obfuscation tool"
   homepage "https://www.greenmask.io/"
-  url "https://github.com/GreenmaskIO/greenmask/archive/refs/tags/v0.2.20.tar.gz"
-  sha256 "5c25aeeb089c16ec09755d36a9369f47758f0c2bcff7e5e9d38329f4ccb47647"
+  url "https://github.com/GreenmaskIO/greenmask/archive/refs/tags/v0.2.21.tar.gz"
+  sha256 "076538538f16a3e40586b0ac25e78e8b4de54d91a5dee4e757a38d8c1a0da7b1"
   license "Apache-2.0"
   head "https://github.com/GreenmaskIO/greenmask.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Greenmask < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6433b6c7fb3457c3e088cf0c9a3cca02adf1c0afb434cb3f55d9d07294730f5c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "67b7653f2f849aac9d6eacac17861a61c8fb26e4256bc505c73f5abd1df15c91"
   end
 
   depends_on "go" => :build
