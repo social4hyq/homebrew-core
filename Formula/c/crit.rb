@@ -1,8 +1,8 @@
 class Crit < Formula
   desc "Your feedback loop with the agent: review plans and code locally"
   homepage "https://crit.md/"
-  url "https://github.com/tomasz-tomczyk/crit/archive/refs/tags/v0.15.4.tar.gz"
-  sha256 "1a4e5bedb6f422a4dfcdf53f84843d2372aa672663e9413ffc18b5754b38a0de"
+  url "https://github.com/tomasz-tomczyk/crit/archive/refs/tags/v0.16.0.tar.gz"
+  sha256 "a4a3299cbbcecd2db2f7faf6289f9f3c653a3bddfb276daa12eb5481d7be654b"
   license "MIT"
   head "https://github.com/tomasz-tomczyk/crit.git", branch: "main"
 
