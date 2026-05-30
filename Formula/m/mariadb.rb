@@ -1,8 +1,8 @@
 class Mariadb < Formula
   desc "Drop-in replacement for MySQL"
   homepage "https://mariadb.org/"
-  url "https://archive.mariadb.org/mariadb-12.2.2/source/mariadb-12.2.2.tar.gz"
-  sha256 "fe82fe2e9af98dfcad8c0266a283ca349b78fd46989fff0d5e1ffca644b514bd"
+  url "https://archive.mariadb.org/mariadb-12.3.2/source/mariadb-12.3.2.tar.gz"
+  sha256 "82798714baf2f3456ed2f311fc803dc120f2bf3b82358e773847d628cdb4b670"
   license "GPL-2.0-only"
 
   livecheck do
@@ -17,7 +17,7 @@ class Mariadb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d4c6f1c8d4e7bfe35e8badf5db68cc8f3cab035e3afbf0586042a076ccbe073"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fc36c1d1bb962c00bc65687482f24ec04faa34dcd44c36bb17594d0b2cf55ef"
   end
 
   depends_on "bison" => :build
