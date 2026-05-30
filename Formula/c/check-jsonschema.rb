@@ -10,12 +10,7 @@ class CheckJsonschema < Formula
   head "https://github.com/python-jsonschema/check-jsonschema.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "12dd85f3c5ada3dd9230b2022e266485532a450e6f70d72dce962962383457ed"
-    sha256 cellar: :any,                 arm64_sequoia: "c08a7a64079070847a1e4c6bc86ba01b34455d8e4344e13c05e23942926ccfd0"
-    sha256 cellar: :any,                 arm64_sonoma:  "a1d2b12e232c0c8442718947779875405428165b03186b8eaf8b764c6b961bae"
-    sha256 cellar: :any,                 sonoma:        "022897ee92f4d09292a74d1d3fba9fa548dcc6968143ad87cd2d13838f3d1958"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9aa03b85a17e654a47d4e5708d378f04bd7024d8ca6a8397ec3e7990ed5ab7cf"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2f1d64eba390ed25aebfdc7aa42ed8bc394cda362a060f645c516dc4a877f935"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d18c480691f3ca9a26f685d55c7f930f94ad6b875f1a564e13335fe04aea1b1"
   end
 
   depends_on "rust" => :build # for regress
