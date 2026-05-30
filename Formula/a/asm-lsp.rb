@@ -7,12 +7,7 @@ class AsmLsp < Formula
   head "https://github.com/bergercookie/asm-lsp.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9dbd0fa7b74cb1681084b66a3734930224775007d96d00d31bf14a24ba018941"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1438e57e7d525aad8e337a2b8048956ffab380f8c6ca0f67a57ed6f9d9148ebd"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8466388eb30846c764f3b866085c171dbdeaa5b35f2db7358daafe42e3b8a6f3"
-    sha256 cellar: :any_skip_relocation, sonoma:        "847db26465932b751aadf74a7d26ccf155ea0788c5120d3440747e69059b38e7"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4044b50207f4e70ad533d93f322202a80f52b4a55bd046de5b3f9b039d539d10"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "76259656f79fee2add9b11db2439511d8eef903f3bb3419d889262fa486b2892"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9bb5587185af74d54fcd6c24693fb6fe2cf042ae742197789aac04401df6b5e2"
   end
 
   depends_on "pkgconf" => :build
