@@ -1,8 +1,8 @@
 class Doltgres < Formula
   desc "Dolt for Postgres"
   homepage "https://github.com/dolthub/doltgresql"
-  url "https://github.com/dolthub/doltgresql/archive/refs/tags/v0.56.3.tar.gz"
-  sha256 "2fbc86c79f1579cb0de8019a1296ef1c25509076db1f3b26aba74e93c534220b"
+  url "https://github.com/dolthub/doltgresql/archive/refs/tags/v0.56.4.tar.gz"
+  sha256 "b18fe514696ce211a98ee922eb19d85326c6935cff9fef5e4cde60dfa671473a"
   license "Apache-2.0"
   head "https://github.com/dolthub/doltgresql.git", branch: "main"
 
@@ -15,7 +15,7 @@ class Doltgres < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8047630b855d9b85ee9a84f9b9b6037a05f29d6cb304a69f6929f9dc07374aa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "045f764522a35ce5b1be52fef85bcf0519aff5a866312d857235ee48a4ca6ac3"
   end
 
   depends_on "go" => :build
