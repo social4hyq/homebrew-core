@@ -6,12 +6,7 @@ class Jjui < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d88a877e106a18dbc2a3824817e8e4b76d84683c9712d12895b53b9e4c58706d"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d88a877e106a18dbc2a3824817e8e4b76d84683c9712d12895b53b9e4c58706d"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d88a877e106a18dbc2a3824817e8e4b76d84683c9712d12895b53b9e4c58706d"
-    sha256 cellar: :any_skip_relocation, sonoma:        "5daa287d44c5570cfa24dd39e2ff794aeff5884cbf9b7b192f808b3065b84ed4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "772395cd22af145cd517f231b55fa217574fb7a24fc701b5707dc07d3954f4d2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b4e7889e48660e48df1049302653fc35322ca9a005b809daa8b54f7fc330736a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6064d1ceb368de5f386a4cb331f2d6af0e23d37ad7717b6004a58746e6e27a87"
   end
 
   depends_on "go" => :build
