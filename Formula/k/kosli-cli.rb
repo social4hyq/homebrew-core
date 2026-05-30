@@ -12,7 +12,7 @@ class KosliCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "01f59bef9b58d0e692955b3d438c01031346a711996442d82c32e63db1b8f751"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0db92f77d00e263150aa47b3c820691abaeb7d3813bf3f574fa3306d46e46c84"
   end
 
   depends_on "go" => :build
