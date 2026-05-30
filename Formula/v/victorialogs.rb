@@ -14,12 +14,7 @@ class Victorialogs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "119c6a82769954c63729626101fe056155a9c41669b6a1d398586681d789fd20"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "784446e03b3503db7c5e86c8a5a1a94bca696029ec3055f9c8070668b5857706"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d4c616054dd9bcc38fb0229e18ac3a55734ab1047db609ce97b38078e3b802d5"
-    sha256 cellar: :any_skip_relocation, sonoma:        "7451c31d5dc8498e0f7bb8bee08cff0009224b539dd0216b7bd5b239987293de"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "e8082b8ff24de63dbbfc420aa097c2e414df1e0b52a5be42ebb3a62da4e67b38"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a382e4afece52d57e68e9ee37d73a82114c27c3cab2e9d328e7bc295aba02503"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "356688a2d48a27e04594bf1d0a3f543ed3467550e38bd5755c9d3c128eac15c7"
   end
 
   depends_on "go" => :build
