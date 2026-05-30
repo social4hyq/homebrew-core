@@ -7,7 +7,7 @@ class LeafMd < Formula
   head "https://github.com/RivoLink/leaf.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f5ba34ad3a7f844194bb36cf68fe8fbff846dc5025b695be2e7331b18b99475"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b033b5902dfd7695a05f3b0982863d3ffbe6bbc44b9d3a93137ea7a4f536bd76"
   end
 
   depends_on "rust" => :build
