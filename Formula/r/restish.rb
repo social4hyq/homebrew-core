@@ -1,8 +1,8 @@
 class Restish < Formula
   desc "CLI tool for interacting with REST-ish HTTP APIs"
   homepage "https://rest.sh/"
-  url "https://github.com/rest-sh/restish/archive/refs/tags/v2.0.0.tar.gz"
-  sha256 "01788618eab038bc28f14329d2b177337d7284a82da09de2a47bae08e8eccc6a"
+  url "https://github.com/rest-sh/restish/archive/refs/tags/v2.1.1.tar.gz"
+  sha256 "28bb590d518c17ff51f6c07ad3cbbd417fb22a2cdbe122052f16b95cac652121"
   license "MIT"
   head "https://github.com/rest-sh/restish.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Restish < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d1276b2578db8383265a57358ae9e4b1101535fbc9c798071ab0f964cb52da9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "492399c9c598183ddd32cdfb3b9dcd1370c426a5d25c29058cc0588dcdc9cdd3"
   end
 
   depends_on "go" => :build
