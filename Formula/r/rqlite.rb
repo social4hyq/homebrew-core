@@ -1,13 +1,13 @@
 class Rqlite < Formula
   desc "Lightweight, distributed relational database built on SQLite"
   homepage "https://www.rqlite.io/"
-  url "https://github.com/rqlite/rqlite/archive/refs/tags/v10.1.0.tar.gz"
-  sha256 "56e2c10db24aef5dc362f65af73d71b2fdeb63d09efefae21fde83537513401e"
+  url "https://github.com/rqlite/rqlite/archive/refs/tags/v10.2.0.tar.gz"
+  sha256 "46cd26b490cfa5fe4a2a06f3cb296d5c05707c5b44a06f788633cb4938691361"
   license "MIT"
   head "https://github.com/rqlite/rqlite.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a37dab8c2f76d6cae11c5b3cd8e21fcc0977c59a28b6dfe43c2657aa2a2c7ef"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b229fc57e4d68a004e5dc9e4388b60fc2f718e41c8e0837652ca9ffde44a25a"
   end
 
   depends_on "go" => :build
