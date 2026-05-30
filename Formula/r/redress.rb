@@ -12,7 +12,7 @@ class Redress < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cde5c302a58965efce3224ffcdafe1e38c11dc3d1163ba63f9001977bfc7bf5b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "48fd9b49b862ae689166edff97fa4fa3fbd5d3632cdc31f386cfc8e4c9136c71"
   end
 
   depends_on "go" => :build
