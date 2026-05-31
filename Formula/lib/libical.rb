@@ -12,7 +12,7 @@ class Libical < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2baf63058831085c7d95d16955182ba5a1e692daedeb819db8820471a1819ca0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef98c79cc26ca372aac30e4fa72a2fec8348596e707d061bf8a3b03553c6416a"
   end
 
   depends_on "cmake" => :build
