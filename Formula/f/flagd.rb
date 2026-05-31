@@ -2,8 +2,8 @@ class Flagd < Formula
   desc "Feature flag daemon with a Unix philosophy"
   homepage "https://github.com/open-feature/flagd"
   url "https://github.com/open-feature/flagd.git",
-      tag:      "flagd/v0.15.6",
-      revision: "3aec90a1fc88ff1569e6dde1c3f30513de37d35d"
+      tag:      "flagd/v0.15.7",
+      revision: "1c7f7bc7c7612332bc873cd0a9bceefdbc5b5096"
   license "Apache-2.0"
   head "https://github.com/open-feature/flagd.git", branch: "main"
 
@@ -18,7 +18,7 @@ class Flagd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b8245e22e8dce9121877d1f1d49d0fe84eec2caa304e8b80759e7d5faf920b6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b89e065f3ff0b52428afcfa25c3e9a4a94552078222dcb22a22c9cd09a6461b4"
   end
 
   depends_on "go" => :build
