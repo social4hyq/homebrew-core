@@ -7,12 +7,7 @@ class Copa < Formula
   head "https://github.com/project-copacetic/copacetic.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "30dee3cd36f3833d836fee55efb1e7d501f764c60d92fe630af59b07834a4817"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "30dee3cd36f3833d836fee55efb1e7d501f764c60d92fe630af59b07834a4817"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "30dee3cd36f3833d836fee55efb1e7d501f764c60d92fe630af59b07834a4817"
-    sha256 cellar: :any_skip_relocation, sonoma:        "66cf669fed416c58c45a7de831ba7d9b5fd46d4824e8d9c0a714f73614057ffd"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "adfb1e400fafd193842b1f8b33acd0cf19560b65f918a1e5c29af6f12efdde94"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "89ba4a0ab08e28dc815a3d5112b8633d9d3aa4b9ae35566bd8c505ebe03b278e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "944bb50de5ba8b66e6a9382524f6591680846a3aaa7886cc606efd6acd1d587e"
   end
 
   depends_on "go" => :build
