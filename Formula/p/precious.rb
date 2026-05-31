@@ -1,8 +1,8 @@
 class Precious < Formula
   desc "One code quality tool to rule them all"
   homepage "https://github.com/houseabsolute/precious"
-  url "https://github.com/houseabsolute/precious/archive/refs/tags/v0.10.2.tar.gz"
-  sha256 "41ad60c386754ca5ad23742d086de4ae6034d3b64e9fd80062c93ccbe2454366"
+  url "https://github.com/houseabsolute/precious/archive/refs/tags/v0.11.0.tar.gz"
+  sha256 "87b5c72e22f83ac502721da58d5560866a8efccefc6f55646d59ce7402d74d0a"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/houseabsolute/precious.git", branch: "master"
 
