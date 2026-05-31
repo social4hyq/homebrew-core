@@ -6,7 +6,7 @@ class Vet < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cff67bfa1d480c32dc39604f39ecccd1b825c79f52d830ec72e4518ae303b36e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "96ac3c1348860eea1603accb60cd0691f75fb119da20cec0ba30f0ff7a6a8fb7"
   end
 
   depends_on "go"
