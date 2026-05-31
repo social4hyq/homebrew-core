@@ -7,7 +7,7 @@ class Kubelogin < Formula
   head "https://github.com/int128/kubelogin.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e2a7c061b17aa82b50a76e40f8af514e246ae8a447518e2965a68633b0756ff"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "717233995f17759ccefa5d53f976fbae0096f66a2c5ef5107b7abc2cfd702b79"
   end
 
   depends_on "go" => :build
