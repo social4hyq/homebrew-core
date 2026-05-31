@@ -7,7 +7,7 @@ class Circumflex < Formula
   head "https://github.com/bensadeh/circumflex.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e273ca502be042bf790d61d998e74c08aaf3abae32d14ea3cd0a92ad3cce1607"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "74714bce1d4cf94d38d1cd1d725abeccd1b0758d245ffa965ebc1c15700499d5"
   end
 
   depends_on "go" => :build
