@@ -6,12 +6,7 @@ class Rtorrent < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "db05d1872739eb1708a1546072c55520796acd3f6fc2d00b428a7c4e44952fbc"
-    sha256 cellar: :any,                 arm64_sequoia: "e909167183bebdc7fce846ed55885335f899896eb4a71965f2ebb54d09035121"
-    sha256 cellar: :any,                 arm64_sonoma:  "3b2c8c57d7d1a897f376c0ce072fa4837532267d58feab0135cab47ca8e2e614"
-    sha256 cellar: :any,                 sonoma:        "082798e2f2d3b7fce48691fe5bc0af7c7bac5a72fc26e0e245e682cdb77aef62"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7a12d46c2e59f95990f17e0e372b6a46b566f94b73e6b83daae36f7b96aafd49"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "24411c938327c2ab403e2e2dbb197341712d0aa3d171431f7098754e58753712"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2abde7ea1e156d5099e516310be1272b3fab92fb5330b85270f9989649a3cba"
   end
 
   depends_on "autoconf" => :build
