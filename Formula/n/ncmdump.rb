@@ -7,12 +7,7 @@ class Ncmdump < Formula
   head "https://github.com/taurusxin/ncmdump.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "99795c0e507a0a64b449c2688217ce0de2831260055765dbe37f56669c1ff9c7"
-    sha256 cellar: :any,                 arm64_sequoia: "e29cbd06aef33319b016e7b1013c6e1d72432cd1de0382994bb486be26c0268a"
-    sha256 cellar: :any,                 arm64_sonoma:  "9a6f52ab49f6d4ff627357f662192b2fca298ce66a9e51381ef87af6412fcc16"
-    sha256 cellar: :any,                 sonoma:        "ea72a6147d57e098312ea81119a4dd08b12464241db780a2ebaa0e7876c20189"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f95e343c040760559382f6cb2b8f7bf9199cb14be12b0e72fda4538dd605c2dd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6c4e754f69b305837012bc328cef7db9834483cf849a2a12c3d6a8f1e122636b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c2d6913196b27aaef73a5ca620b2c6f4de5688e3a2d71af24f36bfc670a614c"
   end
 
   depends_on "cmake" => :build
