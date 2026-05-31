@@ -6,12 +6,7 @@ class Ktfmt < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "106bb88438645dd8c6637d63045e8939d234cef082b53bd0dd862f4d1fdd6e31"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "106bb88438645dd8c6637d63045e8939d234cef082b53bd0dd862f4d1fdd6e31"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "106bb88438645dd8c6637d63045e8939d234cef082b53bd0dd862f4d1fdd6e31"
-    sha256 cellar: :any_skip_relocation, sonoma:        "106bb88438645dd8c6637d63045e8939d234cef082b53bd0dd862f4d1fdd6e31"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ac48dd69361bd524166f0197bb1d2a30fa954c113c859f8ea329fe84252f830b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "ac48dd69361bd524166f0197bb1d2a30fa954c113c859f8ea329fe84252f830b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "97f59ed70293103966fd017ab2a6566c56012b958277ac89ac31b6ac50e5c88f"
   end
 
   depends_on "gradle" => :build
