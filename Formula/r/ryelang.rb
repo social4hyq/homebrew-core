@@ -1,8 +1,8 @@
 class Ryelang < Formula
   desc "Rye is a homoiconic programming language focused on fluid expressions"
   homepage "https://ryelang.org/"
-  url "https://github.com/refaktor/rye/archive/refs/tags/v0.2.9.tar.gz"
-  sha256 "2b6962dd01deff4e659bb62465cfecc35f160f94fcca63bca061a3147a877276"
+  url "https://github.com/refaktor/rye/archive/refs/tags/v0.2.10.tar.gz"
+  sha256 "941741a135e66aa9ba3a39f9fe5503159254fe19edb8976e7a3231bfddb17b92"
   license "BSD-3-Clause"
   head "https://github.com/refaktor/rye.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Ryelang < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c4016deeac3a062540bafa2cd48391a270ba80f4211f52759f0814db4c5d289"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9309052189b7b4e21e0cfe1e86d2adf05265b5d57ebd021ab3a7f8e4a9f6554"
   end
 
   depends_on "go" => :build
