@@ -8,7 +8,7 @@ class Libxkbcommon < Formula
   head "https://github.com/xkbcommon/libxkbcommon.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4071780fa15ed8c2fdf067edb49f0d3307adb22d3ba45cce228213170b27792e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "79c183dae5d8b3d4bd8c2fee120eab6f1dcf58c0d6d95edbe47560e719b96fd0"
   end
 
   depends_on "bison" => :build
