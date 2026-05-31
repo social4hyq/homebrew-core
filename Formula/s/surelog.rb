@@ -8,12 +8,7 @@ class Surelog < Formula
   head "https://github.com/chipsalliance/Surelog.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "a9a184381e13dd4203297fc30ef4ab2b558d1928173890a5f691b408628c874e"
-    sha256 cellar: :any,                 arm64_sequoia: "f739758f803f9a0d57d4cee64bde8f1796df99d87b422a6c62698ab4fec7dab9"
-    sha256 cellar: :any,                 arm64_sonoma:  "3fead09571986e46436c02be39ffede9d21eaf6b4741a00ab2008d58531cb310"
-    sha256 cellar: :any,                 sonoma:        "eaa7d25eca0f82ec107faf3b1c76f98a7970378f5565aa1a59bbb2b5c4e1791c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "cf74e46e01f5fae04ccb6b23c241db056b2f337ce409ea1f58d54b2d36acf793"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e50811edef0de0103f097c6e799ba6a64472ab03d44062c64c3009cbb95a6173"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "15ba438dfcdf8b4a500c8d5b8eed659440b0409f8b8d79e29e9e4b5f03a973d3"
   end
 
   depends_on "antlr" => :build
