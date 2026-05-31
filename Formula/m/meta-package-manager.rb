@@ -10,12 +10,7 @@ class MetaPackageManager < Formula
   head "https://github.com/kdeldycke/meta-package-manager.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "d9794f64d7c08c841f757099866ac2d9244f933669694174d42353547b87428f"
-    sha256 cellar: :any, arm64_sequoia: "b1ba76d0ab7cd4c38c32b2b5a27e2dae17306868dc11f25160550a3e389dae13"
-    sha256 cellar: :any, arm64_sonoma:  "a140059f431782e1f3207720f284c73798d1052245706e997981cbd19ab38e9f"
-    sha256 cellar: :any, sonoma:        "8cd34e853b0ed14f40cc75bfea68bbb5e1b4af734a17aa694abc0e23b5fb55f3"
-    sha256 cellar: :any, arm64_linux:   "6f8b1b112e881e58abf5337c45854c3e8cb29030bbdf824267d2f4f1fd0198e8"
-    sha256 cellar: :any, x86_64_linux:  "631d0e2518a50f0ceb3beb2797f337fe56ba57af679a031d0ec2dd71e53dc025"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5659adfb2e9199d0d78a7e8c72e95d5a151fdc11ec4919a74a6367c28226ed18"
   end
 
   depends_on "rust" => :build
