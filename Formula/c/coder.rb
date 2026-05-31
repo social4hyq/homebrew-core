@@ -1,8 +1,8 @@
 class Coder < Formula
   desc "Tool for provisioning self-hosted development environments with Terraform"
   homepage "https://coder.com"
-  url "https://github.com/coder/coder/archive/refs/tags/v2.32.4.tar.gz"
-  sha256 "2ecacd40cafef1e5f0ef83eba263675a39c70b8327e3a01951d7e3c755267ab3"
+  url "https://github.com/coder/coder/archive/refs/tags/v2.32.5.tar.gz"
+  sha256 "a12ff06e1b3f3506f867d50d88a61c6197950608575a271b61c94ff4ac237c4c"
   license "AGPL-3.0-only"
   head "https://github.com/coder/coder.git", branch: "main"
 
@@ -15,7 +15,7 @@ class Coder < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d6fc516a7b2cf12f560b66f87aacd4e4c2aeed2372420b10f6e9154fdc7b5eb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c62f0de28d5b497f660c4c6de22bf049c5d573acfcf26df087d8f5a64c5f9935"
   end
 
   depends_on "go" => :build
