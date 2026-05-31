@@ -1,8 +1,8 @@
 class Goodls < Formula
   desc "CLI tool to download shared files and folders from Google Drive"
   homepage "https://github.com/tanaikech/goodls"
-  url "https://github.com/tanaikech/goodls/archive/refs/tags/v3.2.2.tar.gz"
-  sha256 "ddd8b8147ecd95e8aa4428b5bbb0d397878958736b331a4103a965364196b509"
+  url "https://github.com/tanaikech/goodls/archive/refs/tags/v3.3.0.tar.gz"
+  sha256 "0d377adb177fbb7220af8bf0379e2e707a9fd3b55a91449ed2a1f235e2a2b172"
   license "MIT"
   head "https://github.com/tanaikech/goodls.git", branch: "master"
 
