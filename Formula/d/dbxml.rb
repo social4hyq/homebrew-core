@@ -7,13 +7,7 @@ class Dbxml < Formula
   revision 4
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "3828eca647ae656062c684b2a22643d28cd2f0f1664ec44c960a5f7b20a7d5e6"
-    sha256 cellar: :any,                 arm64_sequoia: "2166cda564eb4f6e94f668bb382754318e67ef46b591e4a6a3739a234876656d"
-    sha256 cellar: :any,                 arm64_sonoma:  "ba173a558212fb40fa962959759c2217185e2827a30fa47ea516e82e449c2f22"
-    sha256 cellar: :any,                 sonoma:        "e40be797484590b2d264134fff52a2f77dd3e8e7f1104bbc312d9618828b9e0f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9a19a0a31bfa89f8b1ae945f05cd44281267114d25d49cc6f0b3f06f6c3f43bc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "afed5853113aeb049c66efecd663697396c9cca6466c67c5b34b7f37981415c6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc193a13216b187971f83b51d4b52ec98c87d235c63b677f5c5f966c418b8ed1"
   end
 
   deprecate! date: "2026-04-18", because: :unmaintained
