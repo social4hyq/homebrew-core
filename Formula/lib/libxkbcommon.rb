@@ -1,14 +1,14 @@
 class Libxkbcommon < Formula
   desc "Keyboard handling library"
   homepage "https://xkbcommon.org/"
-  url "https://github.com/xkbcommon/libxkbcommon/archive/refs/tags/xkbcommon-1.13.1.tar.gz"
-  sha256 "aeb951964c2f7ecc08174cb5517962d157595e9e3f38fc4a130b91dc2f9fec18"
+  url "https://github.com/xkbcommon/libxkbcommon/archive/refs/tags/xkbcommon-1.13.2.tar.gz"
+  sha256 "acc4d5f7c3cbba5f9f8d08d8bdbeede84ecede46792f47929aa9321873385528"
   license "MIT"
   compatibility_version 1
   head "https://github.com/xkbcommon/libxkbcommon.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4071780fa15ed8c2fdf067edb49f0d3307adb22d3ba45cce228213170b27792e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "79c183dae5d8b3d4bd8c2fee120eab6f1dcf58c0d6d95edbe47560e719b96fd0"
   end
 
   depends_on "bison" => :build
