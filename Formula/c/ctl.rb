@@ -7,12 +7,7 @@ class Ctl < Formula
   head "https://github.com/ampas/CTL.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "ca511a0c2b48007131b0582bb71116f5cc0eac17087434738e6f7a6c50397d91"
-    sha256 cellar: :any,                 arm64_sequoia: "45d8158cce14a51d6974e9cc1603b88c0329e26c76574ccbeaf9372d687bf05d"
-    sha256 cellar: :any,                 arm64_sonoma:  "46d3f74998db9417edb5725421b181e05a11e1a35dbd6cd19aa961a443c7b04c"
-    sha256 cellar: :any,                 sonoma:        "29d9deebf5250fa3faa927ce5ee71a4488ea49dd00c595c1f6443006e8106899"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9ec0a75ad70ea5c05ce1165095a98a1a69cf898cf09eb7206c7885e752fb7045"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0d035e411659b169fb4d073389599ddb0337c3a5b43cdb088e57496cff47709e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab3f38ef82456fdc2ea30d4c210cc8b7f1b391f3d44b90c4419c57f72927f76a"
   end
 
   depends_on "cmake" => :build
