@@ -6,12 +6,7 @@ class Libzim < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "a8ba9b1a3def50c6082b91f9990d8c8fa70e0225659bc8f177aa5745524d3dfb"
-    sha256 cellar: :any, arm64_sequoia: "04e5f1f940a6b1f2f750e5f86e4d2f81d2fe66811fcdb4bb60ece14bb9457266"
-    sha256 cellar: :any, arm64_sonoma:  "66e1d5260e5837dfedd05b87ee8b112036c65bab5cd69cbaf3cc3910a27ef6f4"
-    sha256 cellar: :any, sonoma:        "208123f4a5647b4cdd63c18e393f513d7dc2a2ad7c433612c8a792bbb79e6b80"
-    sha256               arm64_linux:   "d364a80e13808233938a97b57cabe483c0452d38f4e661b07270ef5e420c135d"
-    sha256               x86_64_linux:  "a8b9ee6d6c021ceaf7450a715d113f09de0a837b0dc6b0ec8b752e1b94e41cc7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "778ab34c157f67dacbc3d5e83533b20f1d285133b29a402e56a329aff35e4d80"
   end
 
   depends_on "meson" => :build
