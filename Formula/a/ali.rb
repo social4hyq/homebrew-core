@@ -7,12 +7,7 @@ class Ali < Formula
   head "https://github.com/nakabonne/ali.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "624cc8b3f6325523929329a805679aa2673e4661be3a1fce71e01e0e44b6b50a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "624cc8b3f6325523929329a805679aa2673e4661be3a1fce71e01e0e44b6b50a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "624cc8b3f6325523929329a805679aa2673e4661be3a1fce71e01e0e44b6b50a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c1da05b48801e6f5c3a531247c8324d4a64511163160cfc13fdf04d1563bff29"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "863149c4dcf2dae9d28782408691036e9ff7751d35a1972269c2e23e699a173a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7432b8c57f6c2b8db945d82dcc6904496eb17424e7de280cd01ef7339d731b72"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6558b780acb82e74654fffcbe65c0366c3c13c236fadae1f3f996a118b827a98"
   end
 
   depends_on "go" => :build
