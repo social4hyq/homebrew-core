@@ -1,13 +1,13 @@
 class Karmadactl < Formula
   desc "CLI for Karmada control plane"
   homepage "https://karmada.io/"
-  url "https://github.com/karmada-io/karmada/archive/refs/tags/v1.17.2.tar.gz"
-  sha256 "33917b21ed768cb70e6cb3eab47c504db6e8b04d2ec564a1d4fc2776e779586b"
+  url "https://github.com/karmada-io/karmada/archive/refs/tags/v1.18.0.tar.gz"
+  sha256 "91a93d38cdb16af28d2e91b52fc2f65dceff6309261c504ad81028a3688c1736"
   license "Apache-2.0"
   head "https://github.com/karmada-io/karmada.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cadff77763eed85e4f85edc97ec09482465420f0c2dcd01268d1e9dd1c1d0938"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a24fe60740739d3218399a78aa7eca165be12089aad498e1956a3937ad9d67e"
   end
 
   depends_on "go" => :build
