@@ -12,12 +12,7 @@ class Snap < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "6d42cf3a64a210e39c5b7dfd0899b9367930642e9e28093f81ca817c6c1609e8"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6d42cf3a64a210e39c5b7dfd0899b9367930642e9e28093f81ca817c6c1609e8"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "6d42cf3a64a210e39c5b7dfd0899b9367930642e9e28093f81ca817c6c1609e8"
-    sha256 cellar: :any_skip_relocation, sonoma:        "f574d6d95a3e4ca73611a6efb6295e89e43d3abc427a19ff92101ec6a38ef4e3"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "da54b1d720f372214c4ff3535a03a173df302c06fe600563b8337d010f864811"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "01b6de90fa78de68808e738fb06f389494d32200cba8f87bf713684b7e090b80"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "914516fc65e52ff38ac9b14d278ef093387309917d75c7f49971f3569682c81e"
   end
 
   depends_on "go" => :build
