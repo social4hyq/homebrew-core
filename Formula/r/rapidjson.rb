@@ -16,8 +16,7 @@ class Rapidjson < Formula
   end
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, all: "ba505c9a587b3c26539eae5dd732ae36bca53b67daf94579fee177d88094fa52"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1470239caed617c81ba6d17ef3d63cd97ec66e0473a6f36497baa86c26d5fef1"
   end
 
   depends_on "cmake" => :build
