@@ -16,7 +16,8 @@ class Flex < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f07da23c95c0139fc1c117049270d81af4c48bbc5e00b3834d9e2d99a85a96aa"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f68708d80b86442cc457080cc59cc9b2c630ce8b242716c094c5b2b37e33ac6"
   end
 
   head do
