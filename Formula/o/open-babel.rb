@@ -7,12 +7,7 @@ class OpenBabel < Formula
   head "https://github.com/openbabel/openbabel.git", branch: "master"
 
   bottle do
-    sha256               arm64_tahoe:   "fe47f3f9a0fcbdc70c449469cd5d8caee18e1861e31d69e8fb4187c585bc078d"
-    sha256               arm64_sequoia: "86b1026f7992fe9c7b8f7ddbca7426267764ad3471b92ba1d64ca0dad7bf7d3d"
-    sha256               arm64_sonoma:  "ee4285d661a4c74da24bc9b3523672a7ff10cbe65a86ab7302afb10bdcc67ebb"
-    sha256               sonoma:        "8a764adf6425fa7b3c505f9af5a91a19f5f5da856a7fee9000c41634bc37f816"
-    sha256 cellar: :any, arm64_linux:   "f5060a0e0d493709b247645fe9da90e5f20b041863fdadf1deae220fd50559ce"
-    sha256 cellar: :any, x86_64_linux:  "8de4b7ab8579307729ddccb05e959d2eded32475c57a34ee3c37777bcfc458e2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec78bbe4209abdb9ddc7059b8b0cba5e0af9a6ff01db2aafa06f255fd86e34bd"
   end
 
   depends_on "cmake" => :build
