@@ -1,8 +1,8 @@
 class Pyenv < Formula
   desc "Python version management"
   homepage "https://github.com/pyenv/pyenv"
-  url "https://github.com/pyenv/pyenv/archive/refs/tags/v2.6.31.tar.gz"
-  sha256 "cc9bbd814e5da1c461623ce151d3404591f4b0245df24cb5cebf16a7a300f9a1"
+  url "https://github.com/pyenv/pyenv/archive/refs/tags/v2.6.32.tar.gz"
+  sha256 "f9b0bddb6e4f99a2d57bb09dca1fa804586e85aa8739215838a8b8c44c4f86aa"
   license "MIT"
   version_scheme 1
   compatibility_version 1
@@ -14,7 +14,7 @@ class Pyenv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3107294379c8e33d1f8267f7ba72a64e8be6484ad19f42f4bf2ce1041e906fe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a3bbe8cd39e21bae51918e09bd9cd112474c02c4eb7187ac74d2eb0ee39bfd0b"
   end
 
   depends_on "autoconf"
