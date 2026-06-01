@@ -6,7 +6,7 @@ class SalesforceMcp < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "15d7f18c3cda54b2a260d3a4876fbe7bcbd9a86efaeff69bee12faa6ee8a0d2b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "55d20c4da55c5d127f3d0fdab30d8d893dedaeb82acbd9e9225666928fd6568a"
   end
 
   depends_on "node"
