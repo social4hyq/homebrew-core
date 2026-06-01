@@ -8,7 +8,7 @@ class Apprise < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c41b4a57a2e67771d9c2e3c2c984b9b3e10ca700c98b2a857a6799a060a5ac4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5962010e1f7bcbc06c3d7cf5941f5576bce39f2122f897f455c121d8eec8a34"
   end
 
   depends_on "certifi"
