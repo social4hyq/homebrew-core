@@ -1,0 +1,31 @@
+--- libbsd-0.12.2.orig/src/progname.c	2026-06-01 11:30:30.257420847 +0800
++++ libbsd-0.12.2/src/progname.c	2026-06-01 11:37:24.638146776 +0800
+@@ -33,6 +33,7 @@
+ 
+ #include <sys/param.h>
+ #include <errno.h>
++#include <stdio.h>
+ #include <string.h>
+ #include <stdlib.h>
+ #ifdef HAVE_PROCINFO_H
+@@ -137,6 +138,20 @@
+ 		free(wpath);
+ 		free(mbname);
+ 	}
++#elif defined(__linux__)
++	if (__progname == NULL) {
++		FILE *fp = fopen("/proc/self/comm", "r");
++		if (fp) {
++			static char comm[256];
++			if (fgets(comm, sizeof(comm), fp)) {
++				size_t len = strlen(comm);
++				if (len > 0 && comm[len - 1] == '\n')
++					comm[len - 1] = '\0';
++				__progname = comm;
++			}
++			fclose(fp);
++		}
++	}
+ #else
+ #error "Function getprogname() needs to be ported."
+ #endif
