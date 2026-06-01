@@ -1,0 +1,20 @@
+--- libssh-0.12.0.orig/examples/ssh_X11_client.c	2026-06-01 17:14:28.827030876 +0800
++++ libssh-0.12.0/examples/ssh_X11_client.c	2026-06-01 17:15:17.603880504 +0800
+@@ -829,7 +829,7 @@
+ 
+ int main(int argc, char **argv)
+ {
+-    char *password = NULL;
++    char password[128];
+ 
+     ssh_session session = NULL;
+     ssh_channel channel = NULL;
+@@ -868,7 +868,7 @@
+         exit(-1);
+     }
+ 
+-    password = getpass("Password: ");
++    ssh_getpass("Password: ", password, sizeof(password), 0, 0);
+     ret = ssh_userauth_password(session, NULL, password);
+     if (ret != SSH_AUTH_SUCCESS) {
+         fprintf(stderr, "Error authenticating with password: %s\n",
