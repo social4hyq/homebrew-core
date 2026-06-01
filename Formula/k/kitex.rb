@@ -12,12 +12,7 @@ class Kitex < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "8f238af142c3494e560def4808196be3f80ba1831126243bb680af54b263d459"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8f238af142c3494e560def4808196be3f80ba1831126243bb680af54b263d459"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8f238af142c3494e560def4808196be3f80ba1831126243bb680af54b263d459"
-    sha256 cellar: :any_skip_relocation, sonoma:        "2a32d3bafbaae26e40b050fefee8c47164ab765173ad1fa27e61f3dd4e839d4c"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "86883041d650d45b7cea432cb339d8e05268fba84f2f1d115006877ce5c796b3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1149dfbbbe8fff9e7d6bf64bea24789b58d91e3068de2ef80844c4d217a706f9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "30e6668f2f42713ca7c722ff15c8e9430be5a5d81bed90c2a38850b274c7a611"
   end
 
   depends_on "go" => [:build, :test]
