@@ -6,7 +6,7 @@ class Serpl < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d23da3045cca44f747c7a9c4bca8f1340092778055755ccccf0e95f2595122d0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f85caff94f73ad2b2f39134824fabdc8e3c008704159d7b3f9c6a9d89cd574f"
   end
 
   depends_on "rust" => :build
