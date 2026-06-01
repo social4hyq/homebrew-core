@@ -1,8 +1,8 @@
 class Osdctl < Formula
   desc "CLI tool for managed OpenShift clusters"
   homepage "https://github.com/openshift/osdctl"
-  url "https://github.com/openshift/osdctl/archive/refs/tags/v0.59.2.tar.gz"
-  sha256 "5d7e2b75199dff10c492e4f367592a2005d67c032af5fb585e77b1f5079285be"
+  url "https://github.com/openshift/osdctl/archive/refs/tags/v0.60.0.tar.gz"
+  sha256 "efe059200aac39043555b30ff1e2d571c862353f0006a16598947b0ebb1747e0"
   license "Apache-2.0"
   head "https://github.com/openshift/osdctl.git", branch: "master"
 
