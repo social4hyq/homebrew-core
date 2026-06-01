@@ -7,7 +7,7 @@ class ZshSystemClipboard < Formula
   head "https://github.com/kutsan/zsh-system-clipboard.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "0020905311350f9aa13a1a35b0632667fe6d4e3bcbbb69110add37eb2ce83b16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "04ba8e9d0953a60f55fe26cf28c6d2905be78711ca1d0608a31f9f307f94e54a"
   end
 
   uses_from_macos "zsh" => [:build, :test]
