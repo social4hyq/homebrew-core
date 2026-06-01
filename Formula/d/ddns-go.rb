@@ -7,7 +7,7 @@ class DdnsGo < Formula
   head "https://github.com/jeessy2/ddns-go.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "28311fbaafebce9d5c832e1c70ab3287e836a26328f79c04e45be9b7ef24ab7b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "39241dded6830cdd5726378dd182f1f2d2838e86e097c1b2de66fbc10b21b19a"
   end
 
   depends_on "go" => :build
