@@ -1,8 +1,8 @@
 class Goenv < Formula
   desc "Go version management"
   homepage "https://github.com/go-nv/goenv"
-  url "https://github.com/go-nv/goenv/archive/refs/tags/3.1.1.tar.gz"
-  sha256 "8c107c1ec31cd544bbf59dc822676ef1966811a13e006aa35ba09546a74c4d9b"
+  url "https://github.com/go-nv/goenv/archive/refs/tags/3.1.2.tar.gz"
+  sha256 "9edafa9c0e5a2245c62caaa7bf7d7c3bb9291991f0ba55f60f3a724367c04ca0"
   license "MIT"
   version_scheme 1
   # TODO: Uncomment when default branch is changed from 'master' to 'main'
