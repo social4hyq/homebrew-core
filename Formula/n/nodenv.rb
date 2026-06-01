@@ -7,7 +7,7 @@ class Nodenv < Formula
   head "https://github.com/nodenv/nodenv.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "a01dda203871fb80f56351ebb37f528f1f65de52f681a57e98d38d5fa6911792"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d14c0928b48a0806a521637b5b673fa7644e96f0e7936c7cd8da502b09d6ea9"
   end
 
   depends_on "node" => :test
