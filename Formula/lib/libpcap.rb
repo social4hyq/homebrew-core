@@ -13,12 +13,7 @@ class Libpcap < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "44f99c79e779b384423fc1177cd66cf1abadd9b3f4c8c51bd55f1843e95d6b1c"
-    sha256 cellar: :any,                 arm64_sequoia: "bb2a05ed47e0c6fc8305d5c60bbd711ada65f4cc39382d0277b4a310d7698508"
-    sha256 cellar: :any,                 arm64_sonoma:  "53e536f706ce763391ddd4b81cbdafe952dca8b32108539a6a7fe3abb10e871d"
-    sha256 cellar: :any,                 sonoma:        "7f39af412e6e3508a96c3daa45c1b4e2b83dc7b3e6126ad3512942e448138777"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "15596854dbfac794c2b5632077365596557cf4b66aea9dd222ef8bf9f901ca17"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "53b6667dfeb90b91b051a6ad7adcb97714c95b2196a2d155fc1ea79b5cbb09cd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ccb2f15be04bdc82668fa5f33360247c82d4d60c573246118377682951c230a7"
   end
 
   keg_only :provided_by_macos
