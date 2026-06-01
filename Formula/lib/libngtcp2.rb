@@ -1,15 +1,15 @@
 class Libngtcp2 < Formula
   desc "IETF QUIC protocol implementation"
   homepage "https://nghttp2.org/ngtcp2/"
-  url "https://github.com/ngtcp2/ngtcp2/releases/download/v1.22.1/ngtcp2-1.22.1.tar.xz"
-  mirror "http://fresh-center.net/linux/www/ngtcp2-1.22.1.tar.xz"
-  sha256 "dfd2c68bd64b89847c611425b9487105c46e8447b5c21e6aeb00642c8fbe2ca8"
+  url "https://github.com/ngtcp2/ngtcp2/releases/download/v1.23.0/ngtcp2-1.23.0.tar.xz"
+  mirror "http://fresh-center.net/linux/www/ngtcp2-1.23.0.tar.xz"
+  sha256 "59d5b4211e96970f2d3d5e6876f73dce03414800ba04aa56835b132fce8de730"
   license "MIT"
   compatibility_version 1
   head "https://github.com/ngtcp2/ngtcp2.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9563578d3686421d4010340e19c8c5c5df368f2224e4fe4fd4ef0d8d6daeb3d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "35882d7b631946f6590f996ed574adb42fc8c03420ec269e23b7a2b5e7e02e2c"
   end
 
   depends_on "pkgconf" => :build
