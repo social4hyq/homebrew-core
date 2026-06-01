@@ -1,0 +1,13 @@
+--- paho.mqtt.c-1.3.16.orig/src/Heap.h	2026-06-01 14:19:55.452372807 +0800
++++ paho.mqtt.c-1.3.16/src/Heap.h	2026-06-01 14:20:36.148247895 +0800
+@@ -30,6 +30,10 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ 
++#if !defined(_WIN32)
++#include <pthread.h>
++#endif
++
+ #if !defined(NO_HEAP_TRACKING)
+ 
+ #if !defined(TREE_C)
