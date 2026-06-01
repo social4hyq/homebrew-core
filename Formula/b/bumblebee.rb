@@ -12,12 +12,7 @@ class Bumblebee < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "3fca2487780ec10950f973b94c747cf243b100a52c34d1099c6c675930a5712e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "3fca2487780ec10950f973b94c747cf243b100a52c34d1099c6c675930a5712e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "3fca2487780ec10950f973b94c747cf243b100a52c34d1099c6c675930a5712e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "86f50f0a53373452b8e152dcd5dabac8cf2b4e81cd744cc396fafdb78fb1c0fb"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "31b484194ae4f54898f47a2bf797b086048e36022d6e3c2ef6ddd2f86bcd6721"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "cda1d4525da9b234e1243ef703916c830be214e18d2abb34536622b87dac3965"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "40291f78a0c10a7d0fdecc04c2e3e1372c37d1867d0393e9512ae3be209ecf92"
   end
 
   depends_on "go" => :build
