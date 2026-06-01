@@ -11,12 +11,7 @@ class Perltidy < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9ca7f622d92c873e5c1b1a4973f52cc56531ff6daed23168f70f7790b82a9985"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "9ca7f622d92c873e5c1b1a4973f52cc56531ff6daed23168f70f7790b82a9985"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9ca7f622d92c873e5c1b1a4973f52cc56531ff6daed23168f70f7790b82a9985"
-    sha256 cellar: :any_skip_relocation, sonoma:        "78aa30f7606cbb0be494e7cafa3431257d24140bf8e2f0968d230792a452c1df"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "888b618d4883d7d9915a737bb9fd90c25aa519f574c799b2e96fb45efc032d5f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4904b0b9f2ff96f3df306c931bda053f6aa9d447d79751ef871496e1fc6b2f0e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f83272f715001cdbadda6b6acb7d9b0dc52397009edaa13012895310585b85b9"
   end
 
   uses_from_macos "perl"
