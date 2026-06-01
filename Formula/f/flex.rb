@@ -39,9 +39,7 @@ class Flex < Formula
   uses_from_macos "bison" => :build
   uses_from_macos "m4"
 
-  on_macos do
-    depends_on "gettext"
-  end
+  depends_on "gettext"
 
   def install
     if build.head?
