@@ -1,15 +1,15 @@
 class Libnghttp3 < Formula
   desc "HTTP/3 library written in C"
   homepage "https://nghttp2.org/nghttp3/"
-  url "https://github.com/ngtcp2/nghttp3/releases/download/v1.15.0/nghttp3-1.15.0.tar.xz"
-  mirror "http://fresh-center.net/linux/www/nghttp3-1.15.0.tar.xz"
-  sha256 "6da0cd06b428d32a54c58137838505d9dc0371a900bb8070a46b29e1ceaf2e0f"
+  url "https://github.com/ngtcp2/nghttp3/releases/download/v1.16.0/nghttp3-1.16.0.tar.xz"
+  mirror "http://fresh-center.net/linux/www/nghttp3-1.16.0.tar.xz"
+  sha256 "776f59a99905c9a348846807b2e5ac9bb3485fc0f8c0250ba803018d5238a16e"
   license "MIT"
   compatibility_version 1
   head "https://github.com/ngtcp2/nghttp3.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc1a30f5c2a02ea0d43b7d5864b7b07f6743383d9fcfa807f22ed85a6f5b2d75"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b8880a5f4d350d911de13da952d0fefa49f0e45352dc3054059345f4394e68fd"
   end
 
   depends_on "cmake" => :build
