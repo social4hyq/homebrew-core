@@ -9,12 +9,7 @@ class B4 < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "e35e9bcf7da47891d673e85c6c425c5ae67a4cede872e99be1309fac93336225"
-    sha256 cellar: :any,                 arm64_sequoia: "5ae1f5564a87b9eac662bca7687e108b61a5f329ec293b22304424b00c059525"
-    sha256 cellar: :any,                 arm64_sonoma:  "4acd5fa15095f7efd74b0c160338c9453ab652c19f9563f068176e295418060f"
-    sha256 cellar: :any,                 sonoma:        "615edc0412ac2da021633f2d6b9257ef67adc23913118cb8c4a7dd36bcd6f5b4"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0c061b27b458e12faf4a5507e711e9d9e8fe8296912de58f9d4b8fdc6ba2fe8f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e5932989bb4539a3037735929a897d1fe4d8b631bc462a5c28b684df3c949c54"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1851f78bf6b57e234db3dfa0c8bacaa2c8d8683e8ef7d2bdeaec2c053107522"
   end
 
   depends_on "certifi" => :no_linkage
