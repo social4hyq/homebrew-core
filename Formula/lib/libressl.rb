@@ -13,12 +13,7 @@ class Libressl < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "76d955fdb9c556608ba23fe7f0474ff81f0cf6b321ef60a74b80e092d3c35c80"
-    sha256 arm64_sequoia: "cf88284fbd82632e6e368d8dda525c9cdc8a20533c142fa9d7f9eb5522fbf845"
-    sha256 arm64_sonoma:  "8903b4833944e4435b5b5ed8bc08462887786726a7e432ad47c20aba50b18071"
-    sha256 sonoma:        "39e22c373554bd43f99b10a57e4f8f93b48ad2076b0929e060f7a711b6489845"
-    sha256 arm64_linux:   "f67fe7ea826433c71eb04c827d050e40fafc45f2d87cd5ca53cf00749fa18499"
-    sha256 x86_64_linux:  "5b34254c709120de67438ae5494e9971c2b043f27f10484cba41853c6dbd9d70"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b6f5d6abda899e420a6207598fba921a59d92cd204358d7ce19df5ee189fed5b"
   end
 
   head do
