@@ -6,13 +6,7 @@ class Dict < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "694d764e37305e78a62434292d69b0d50a2a093554ca772789ea9652e56a92e7"
-    sha256 arm64_sequoia: "07762c92a3981c4028fd215f163867bd9fe2499fbd5419ca024bc7a10d7e11d1"
-    sha256 arm64_sonoma:  "030dd27736efe0640b5293f3f24d33a0b83304cbed29e158c91117be6c730a72"
-    sha256 sonoma:        "c5b41893bf0b335596c40a1e7e197d872bb98a7d7d4fbbd9ee55aab4183de4f3"
-    sha256 arm64_linux:   "e7efbe26bdb41e097a1a7533e9a48247e22cd4abc864654efb0382d5db9e5781"
-    sha256 x86_64_linux:  "3a4ad3c79cfde170a352b43cf03440508c8be5ed6389721043a5368ff045d023"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c2cf072dcc17d8498a140538c361f5158481666184f90ce76c6e88b5e0e11b7c"
   end
 
   depends_on "libtool" => :build
