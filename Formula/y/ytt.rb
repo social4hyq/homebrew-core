@@ -7,7 +7,7 @@ class Ytt < Formula
   head "https://github.com/carvel-dev/ytt.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8c5025b5dbec8ae392277be1520d7160a67879d0e7886f424813d10dece479f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea28d3b45fa1e8e7115bfaad538704b5d929abe661ca5f85d17b8339e98c6e06"
   end
 
   depends_on "go" => :build
