@@ -13,7 +13,7 @@ class Inform6 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c36164046d22572fe08c2b70f31285675bdc13270f85a1a062456019a631d84e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "38166a8e5d3dad75732edcc4c01c881d92d84f3cb14d005a8878be041d0324ff"
   end
 
   def install
