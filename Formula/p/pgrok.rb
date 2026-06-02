@@ -1,8 +1,8 @@
 class Pgrok < Formula
   desc "Poor man's ngrok, multi-tenant HTTP/TCP reverse tunnel solution"
   homepage "https://github.com/pgrok/pgrok"
-  url "https://github.com/pgrok/pgrok/archive/refs/tags/v1.5.0.tar.gz"
-  sha256 "e0dac3df791e9727c850a18874c7888544b548345b27a1a94914fcfc10f05e9c"
+  url "https://github.com/pgrok/pgrok/archive/refs/tags/v1.6.0.tar.gz"
+  sha256 "98599e07212151639e1acc5817f3d142dba6d533fbbee5c1d3f87d9588e2002d"
   license "MIT"
 
   livecheck do
@@ -11,7 +11,7 @@ class Pgrok < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e21bc473cda5fe62fef32ada1badf6f53c9d4b8a38a95f98ff815090458e7ae"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "312b6b180bfd068b502251577b8e16dcd7875e3bee2f7eb49fda80b1c82dc994"
   end
 
   depends_on "go" => :build
