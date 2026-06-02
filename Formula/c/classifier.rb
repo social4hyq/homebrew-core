@@ -6,7 +6,7 @@ class Classifier < Formula
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b4c6c11a46d1e6fd92d35e19eceb9a6753f86dec9ca0b65e49b685e88425af3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d605adaac911a79a86e4727807e4b6015efe364d5f598d8e2851928f111816d"
   end
 
   depends_on "ruby"
