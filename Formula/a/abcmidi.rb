@@ -11,7 +11,7 @@ class Abcmidi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b12aa8aa5a57f7e0fdf7e79cca8fe83e928a2479eff4d339fae808217aa42634"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd8fa05faa343eccca57a32e535c417cb8e277914bbc4b79dc9eac8f5761c9fa"
   end
 
   def install
