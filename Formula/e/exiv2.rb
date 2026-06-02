@@ -13,12 +13,7 @@ class Exiv2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "cb8893ed6691191316d9a49d154225d21de757100cba6ee4a4c7085ff42b4265"
-    sha256 cellar: :any,                 arm64_sequoia: "e3203c49dce1e55609cd9d5f4d31e6cdf884b705b087082a2a0d8f76b2e4db5b"
-    sha256 cellar: :any,                 arm64_sonoma:  "10cccfbeebc55c69140eb1d6649d7011696f349006ccaa05811d51c244067a8e"
-    sha256 cellar: :any,                 sonoma:        "f14d137e2dd33f271cfa714f180451f32eb6a7d3f9391b71ae8a374e96e538af"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "189b9457b0482eff75f5896e5494649796d576b6b723707360acd328b17b8ea6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "dce70243b7ae3edfb4b097810add3ec263dbec8254bcb1210445728f4af4edd2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "038d6c7283c60a48023be22ba813d5519c56005c7cbc733fe8160aa5fd204721"
   end
 
   depends_on "cmake" => :build
