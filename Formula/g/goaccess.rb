@@ -11,12 +11,7 @@ class Goaccess < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "7a698068fe2b1207233ff61c3b3881a27819d74cdb87e0df2b650703410e089d"
-    sha256 arm64_sequoia: "37dc6946eeb5bd7fb4b165bdbb2a6ac3ae0145b866298036c72aa6ac50e66c8e"
-    sha256 arm64_sonoma:  "26415e8602250913083cef1155f548207eb22cbda7a1a6712036127218d9a0b3"
-    sha256 sonoma:        "4cbf3d537d8c9e062191257c54d5a93859045cd4d9cba190151a6cda454e10d1"
-    sha256 arm64_linux:   "e4767498d50629470699c9f3fc3cfc78726f1307bdd61e4005301f394fdab5aa"
-    sha256 x86_64_linux:  "790bf490001601ad4681ce502577897ca00bfbfedccc7aec1800562c41c75a53"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "96979f9a60ed6e61d739b61eb1e441a4131a0d581ea4bd0b723ae47b91b50615"
   end
 
   head do
