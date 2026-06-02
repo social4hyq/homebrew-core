@@ -1,13 +1,13 @@
 class Osdctl < Formula
   desc "CLI tool for managed OpenShift clusters"
   homepage "https://github.com/openshift/osdctl"
-  url "https://github.com/openshift/osdctl/archive/refs/tags/v0.59.2.tar.gz"
-  sha256 "5d7e2b75199dff10c492e4f367592a2005d67c032af5fb585e77b1f5079285be"
+  url "https://github.com/openshift/osdctl/archive/refs/tags/v0.60.0.tar.gz"
+  sha256 "efe059200aac39043555b30ff1e2d571c862353f0006a16598947b0ebb1747e0"
   license "Apache-2.0"
   head "https://github.com/openshift/osdctl.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b992ba7290cea5bbb81b9eacad47b2a12c31b7a532f6d9c6c808021ba1f1ef95"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "063dba079d5fdddadbac2c676c133195543750391da394df8ab5d9b3c2bc7dc5"
   end
 
   depends_on "go" => :build
