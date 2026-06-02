@@ -7,12 +7,7 @@ class Libmaxminddb < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "5936b3b75b64cab056955f2bb8c0b756fa60c53804dcd7dbde8abad2abceed84"
-    sha256 cellar: :any,                 arm64_sequoia: "490b3efc56371925d11362dd017550824c13573c4b76edb4fa2848c549d46692"
-    sha256 cellar: :any,                 arm64_sonoma:  "dd18810ef2ff421397f0841540e9a8ed078bee4d99943e45fbed763e39ba6a70"
-    sha256 cellar: :any,                 sonoma:        "7aa6d1a05efe76995a324af5ea06acdc8dc5428f2dbd9fad2d7c098af91c1f5a"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "9546178cbb2f9b8d6b585c18d109f5fcc8b7bce72431e97654c5da23cbc94b9e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3fbff53ca34d511f0c71bb801ef011da1808855abb303957cf783069bd4e35f7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "157792636ec41bbef563cc8ac34972999185a870f68d1edaf3b288058e30686c"
   end
 
   head do
