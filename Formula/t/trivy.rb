@@ -8,7 +8,7 @@ class Trivy < Formula
   head "https://github.com/aquasecurity/trivy.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d26abd36372d93f7ec110b68791acfb3e1507517ce59d9fe389c59d27cf6ad7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "96d999684b945ab5f262f98f48d07716206964e7b96a6616f27def2a2bc99822"
   end
 
   depends_on "go" => :build
