@@ -7,7 +7,7 @@ class Act < Formula
   head "https://github.com/nektos/act.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bfa843bc3916c35b7d99b712d7b6743ea05fe6ae9d6e42902212da67e895715a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ada6c037985c745704496e78152d606a22e729f1a25ae06a77d0ca7fda45e96a"
   end
 
   depends_on "go" => :build
