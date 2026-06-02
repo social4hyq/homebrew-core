@@ -7,7 +7,7 @@ class Osdctl < Formula
   head "https://github.com/openshift/osdctl.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b992ba7290cea5bbb81b9eacad47b2a12c31b7a532f6d9c6c808021ba1f1ef95"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "063dba079d5fdddadbac2c676c133195543750391da394df8ab5d9b3c2bc7dc5"
   end
 
   depends_on "go" => :build
