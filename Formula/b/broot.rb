@@ -7,7 +7,7 @@ class Broot < Formula
   head "https://github.com/Canop/broot.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9cf37622b1d01081a95465448c5be840e1a4266ac1aebf7b912d3d4d222692e7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "45288bc0cf48930295718e844a5d7d04bc72e02413ad0438faf848f13db27f44"
   end
 
   depends_on "rust" => :build
