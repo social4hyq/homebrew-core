@@ -12,12 +12,7 @@ class AwsSdkCpp < Formula
   end
 
   bottle do
-    sha256                               arm64_tahoe:   "4492028b8e1d71b520b0e945c50918b8324a823feeddb40d11db21eb1e41a6fa"
-    sha256                               arm64_sequoia: "a39aafda735345b66c3fe002a70cb285ee9e18493a2bba17f85edd475779617b"
-    sha256                               arm64_sonoma:  "b4c177011ccc3a793d579e16b52f62a6909652decdfb32e3a9fc92d97514fb7f"
-    sha256 cellar: :any,                 sonoma:        "0052ff8e8c3cadfa866c1d3fd171498a3f24f4446f6de5fb01e56e13c849927b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5357d74ca5c5f8a2784e6c4e4b5d8334985a646ed85b044ca52a5004b2a23146"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0a732e1330a1c8589bf3a786f1512723347434aa526c7cbdca9d69c944eb1723"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c11af54d645d4856992aa94150dd26314a686514ba4dbee06e8b6c3394b89c04"
   end
 
   depends_on "cmake" => :build
