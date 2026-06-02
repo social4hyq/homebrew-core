@@ -13,12 +13,7 @@ class Yaf < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "bfcf711422adfa54260c067643bd0a96a2d8bf60fdd2fbd0e06ff8384e0c211e"
-    sha256 cellar: :any, arm64_sequoia: "ad18f1702c4d74ffae5b3170389e99bb411dcfe8c7ee64e1b4dad41a9bf1a7d2"
-    sha256 cellar: :any, arm64_sonoma:  "1ca0f942ce85a4deab36ef21685a17fec1c6496d854708241a18d7a530a1372d"
-    sha256 cellar: :any, sonoma:        "6e81d4d8d6963f765d965caa3d3a9cbb3b9e59babe0f62291c71fedd24868b79"
-    sha256 cellar: :any, arm64_linux:   "7fa6ce4dd4b0306e9b408d534a98a1c9edac323910b8bd49e22ccf90c1ec4a3f"
-    sha256 cellar: :any, x86_64_linux:  "88e2d6f2587e00c40ae787e8ac7e855a9816b7929f5afecd113da23c8e83332b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "13d1128c3237a5a3c3b6414845c0560f1556385f2cff40b8b337dffe0667b4b7"
   end
 
   depends_on "pkgconf" => :build
