@@ -6,8 +6,7 @@ class WlClipboard < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 arm64_linux:  "2ed9df6478788ec465afc01e214fc62780ff19216a9c5427296d8362a79fa2f6"
-    sha256 x86_64_linux: "3c5d5d55a1ccbe9df625a0cd3ca1d64538194afdae28c3d3e36d39a70f3e5cc2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7863bacb4bb3dee221b71518f01c3fc3fd119b0e399e16e854a63b38c6b2c56e"
   end
 
   depends_on "meson" => :build
