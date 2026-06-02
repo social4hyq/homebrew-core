@@ -16,12 +16,7 @@ class IcarusVerilog < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "9171910a21536b9bcb60e0de5b11f3d2ebc31f211cae962ad6e520ecfdba1175"
-    sha256 arm64_sequoia: "735d87e08978e857b0bd1771c7efdd91769ada308f8597400f16a560f72cbff7"
-    sha256 arm64_sonoma:  "936627d8dfbb9996d55b3f3044f6bdf45e433df0c5fe9d0f8390f1a35714978b"
-    sha256 sonoma:        "2eb03352145134b01eec88e2426a5bb066952c60f13c5d8b90067c6674ab56fe"
-    sha256 arm64_linux:   "04bdad86ad33286674ae98446235a96c1719df5bbf1fe4e85015da8031d4011b"
-    sha256 x86_64_linux:  "4aa2049753c29d8acb09a61dbcc98029dd0155111b39a8605aefbc024bd974a1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6181affd7e96c128fc7d38ff5bf3455416bc582464348e6a84565d08c51917b2"
   end
 
   depends_on "autoconf" => :build
