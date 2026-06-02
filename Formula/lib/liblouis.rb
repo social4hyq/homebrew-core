@@ -6,7 +6,7 @@ class Liblouis < Formula
   license all_of: ["GPL-3.0-or-later", "LGPL-2.1-or-later"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab6d58e187cb1584d93ed3c03351c372498afdd68c5bc84edcc6156dacee6bad"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9cb10f2e10156b8df98eb406ea13acf4f5f14dcd29719b72df15cbc4c25fd095"
   end
 
   head do
