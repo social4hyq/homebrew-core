@@ -7,7 +7,7 @@ class Hebcal < Formula
   head "https://github.com/hebcal/hebcal.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf4b2c93fbb04b33b948108ab696f0e6411e475e217cbb87e96a3c9c4c8ca04e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6696433ae8d88680d04fe9b3eba73c7fed4571cb3d3f31ab243c0fe9f6c23758"
   end
 
   depends_on "go" => :build
