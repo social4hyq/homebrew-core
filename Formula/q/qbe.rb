@@ -12,7 +12,7 @@ class Qbe < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e63730e813a88d30cde7ab9aa9d86e0c6d0615fba483b4c90b516107442fb1e3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3625bb3aeca28f529f0a5576d0c6711959e3726e7580566ba80fd5d7071cdb9a"
   end
 
   def install
