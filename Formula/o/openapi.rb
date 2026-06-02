@@ -7,7 +7,7 @@ class Openapi < Formula
   head "https://github.com/speakeasy-api/openapi.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1bc2d3fa9e913cca1751a71b19c4d159ec295a5ae6179674d1713801a2694535"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d7ead66c4860817c28b1426af27cc13df867eec4b9120205cf07cae9b67c42b"
   end
 
   depends_on "go" => :build
