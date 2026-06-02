@@ -7,7 +7,7 @@ class Deck < Formula
   head "https://github.com/k1LoW/deck.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "945c2dd45ca25f7a8554e89cc9ba05bc17f9ccd9c7b3ae61a163f8465f795046"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72ddf1b7f9830cec5b83dd8e2ad64922436763afc87bd5c39280fcb6375db889"
   end
 
   depends_on "go" => :build
