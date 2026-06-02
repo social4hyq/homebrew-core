@@ -9,16 +9,7 @@ class Jnethack < Formula
   head "https://github.com/jnethack/jnethack-release.git", branch: "master"
 
   bottle do
-    sha256 arm64_tahoe:    "201391d74743a2b3301e322324e49688ebb56767263f2d7d9961bf3517abe0c8"
-    sha256 arm64_sequoia:  "05dc1796a9fb75fac1d0d63a9fc31a7773f1ddd4e3a0351301899847ca6aba48"
-    sha256 arm64_sonoma:   "bae280dd42e8d357d686b2482676de03a1acd4b65b5eefcae753bba91fc42951"
-    sha256 arm64_ventura:  "44ca7f443ece59eef081c6d4a270d6aa63f6bd4d6bc173c7cfbd991dd2fb743b"
-    sha256 arm64_monterey: "3f4432dcdbf52b38e53446c0f35ec23d6d7438cc019b3b7587aaf5a28187e799"
-    sha256 sonoma:         "3b46b1e5f270af3786dcebde6c0fc008dd22ffdf0a51a3aaa6daa08fd96a0696"
-    sha256 ventura:        "84ac8940603749b3f1e3dbf11f8bdef227307c0e34bb9f0d2b227dd138223ac4"
-    sha256 monterey:       "82edd9a68cc86d599b8eb70f23b6e813c3b587af96b9986eb51679d82f6b1f83"
-    sha256 arm64_linux:    "48967c39f0adeb6f89b7adef4b086372e4faa33b27218c314b2acbc5943cb246"
-    sha256 x86_64_linux:   "b9d9a667b5f140032db12e1384be61894be2bc94340bba0fd08dfcfd5ec16031"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e17d9baf1f3f23cbf631e961f0357c49fec1dcba4705e43e1f1931d4a0b65289"
   end
 
   depends_on "nkf" => :build
