@@ -3,13 +3,13 @@ class Zuban < Formula
   homepage "https://zubanls.com/"
   # pull from git tag to get submodules
   url "https://github.com/zubanls/zuban.git",
-    tag:      "v0.7.2",
-    revision: "98605cfae4d1cd453ca0b8110d824488edafb6cb"
+    tag:      "v0.8.0",
+    revision: "c04cbb6a41a46f1b47dd663b4a7e4a6256c04d97"
   license "AGPL-3.0-only"
   head "https://github.com/zubanls/zuban.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "022d1e01e6622cd31086147e16eb6782d50edefd17482b58c252bf48d3cbc462"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a872da8e6c8f1858280af97768b43b98fe4b487c93ad1a5ac8e683900e0468ce"
   end
 
   depends_on "rust" => :build
