@@ -11,8 +11,7 @@ class Unp < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "fdcd81250f756b4075c45a1a4ca5282fab58f2b70008d85da4ad3fdd6b91738b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e54843c4143b75133861c3d552a423f9b80851579770255d9a65697fd343e49"
   end
 
   depends_on "p7zip"
