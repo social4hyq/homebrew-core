@@ -21,20 +21,7 @@ class Splint < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256                               arm64_tahoe:    "3d26b806b15af6dde29829bdca6d9c0cc44ac7ef96d5522dee1cbd3f24a9924e"
-    sha256                               arm64_sequoia:  "71b5c97c68f8d10d646955b1111d8556dc2f0ab90136dafd78f5beb673533fb3"
-    sha256                               arm64_sonoma:   "b7570a4d7dbb53a9da6cc06e69bb7fd2a850829fe93ea39ffc14f494c4b1c58b"
-    sha256                               arm64_ventura:  "6aae55c464e14dde1a9aa9f49da8e30d8184fcf12fbe06a9e913e1fc313455fa"
-    sha256                               arm64_monterey: "f47715d1e6f0f201c2486f0d788fd138e89b86cd0c11477b3e5576fa49cffc83"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "229d18ade0e3dfc1c9ed796732a57bb385de5dfd8c15d3b265c4ef42cfd5f765"
-    sha256                               sonoma:         "a0123a9c0adb426819b56a79a095066f4aa2fa13c6bf501c212eb58e3cbe08b8"
-    sha256                               ventura:        "2b3eaa69bb97239d281a12e678c4a5314413d3cc6543742fd67a6ec1e7d987a6"
-    sha256                               monterey:       "fa3307d22e30d030cc844b92c91891cfe0581226726a7ad54e1cec82dec07189"
-    sha256 cellar: :any_skip_relocation, big_sur:        "bbe9dd0df4449df4259f44c16dc1505e6cdde38c0e7b7cc275d17ae974c8a3b2"
-    sha256 cellar: :any_skip_relocation, catalina:       "98cc2bfccef60b21ec014ff35e71cc91a85e77435b4e429090e2767d0696bef8"
-    sha256                               arm64_linux:    "6003db1cf73e332befaff1d85a5a3c547a094594e014b775cfe55914158dff58"
-    sha256                               x86_64_linux:   "fded0340d91cfcbd99ddf5a89b505fd59895e980d86366654196192d6358a97c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8dacfc9e36a92d7a67cb0d82d5666da4ff80f8670acf99d0a2461f28bb98122"
   end
 
   head do
