@@ -7,7 +7,7 @@ class Gosec < Formula
   head "https://github.com/securego/gosec.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c989edba8897266d3cf28782f86c3a044dfed84ad7dabdf8fa76e0a05d8621bb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bb804d3ebffa6b54ce4c9d6c8f297c9e38f2b049a02aa028b28dc8b5a1307be5"
   end
 
   depends_on "go"
