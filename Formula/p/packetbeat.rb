@@ -8,12 +8,7 @@ class Packetbeat < Formula
   head "https://github.com/elastic/beats.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c2b86d9a8b9d13df63bc0ca5194f90f4e45927d79e6674184df7fbf547cb4599"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "96611e2ac8a52c3c7ba69b14494b86c9e7a97dd16d26fcc58fe3c902f1f6972d"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "0ab1b38f74a6392ee281e27fc35453586ce24c1c95e54bb7239866330b0c20b7"
-    sha256 cellar: :any_skip_relocation, sonoma:        "09273f67e9fcee7f087310119055e76a721721a5b9468c130bb0c1c8d7cc8f5e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0f2a34dcecfa25731e9b51087b0030bb71c75e246961b1f404254a2ff939dfbd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8e14220641523e22ccc5247b7c5e0b73f6aaa80c9146ea5e214f2e77bbff4ae3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d88637e453e92e2d3892b691eb1d86db3ab55176ed345c51695915269bb859cb"
   end
 
   depends_on "go" => :build
