@@ -7,7 +7,7 @@ class CpuFeatures < Formula
   head "https://github.com/google/cpu_features.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a61e17bdb518cfa360a8c0d26716f7833631522df31da12582fa3c42df2e8e19"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f5d23ea4130d235a6df96d8a3216c7cc38108d3f7cb1375ab7dcf3658091d332"
   end
 
   depends_on "cmake" => :build
