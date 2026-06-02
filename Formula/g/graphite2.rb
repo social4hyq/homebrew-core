@@ -7,7 +7,7 @@ class Graphite2 < Formula
   head "https://github.com/silnrsi/graphite.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d90591daae237907e472e359aaae8bb0a17192a49024e8875508dae2ba923e2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2628854f64cd2edc5339a567bbbccbf138b56c1199e1fbda2e1e36941b19818"
   end
 
   depends_on "cmake" => :build
