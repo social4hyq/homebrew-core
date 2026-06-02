@@ -7,12 +7,7 @@ class Ndpi < Formula
   head "https://github.com/ntop/nDPI.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "e36d749ae34d4213e05001e200919c6d9c96f7efbd44cd9225408e8691eceaeb"
-    sha256 cellar: :any,                 arm64_sequoia: "e62b6b4475ecf76666c907dd2902a12ecb340cc7dd313a65cffb273a456e8ff6"
-    sha256 cellar: :any,                 arm64_sonoma:  "ab4a5be202edd011b4171201c66f5ef7df058874ca0eb579de47a5d5825d70dc"
-    sha256 cellar: :any,                 sonoma:        "89b2916adee9e543900f7089ed517776a5943411817885121ae97153e1ed7a70"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ab29c1a19ee2b0bf75071152e77ab23d0da4fd4a589a770bb7c2519710470755"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "6a58d36dd8c1cef5dae9bf5edc5f395b12a9b9568c753a4f4487ade46863b9c5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c465c44c29e67f702f2ba28f87490ebb96b4d7b7439e629062e795f8f35d39d"
   end
 
   depends_on "autoconf" => :build
