@@ -12,7 +12,7 @@ class Temporal < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "60af427ff4f9dcf454a5e09583209a9520c0d5bb0286c00f9b0009133fa5cd02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e69710f812924a927de05e783aeeaf59422cb428222e4a96806ed859756b061e"
   end
 
   depends_on "go" => :build
