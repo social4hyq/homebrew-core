@@ -1,13 +1,13 @@
 class Pixlet < Formula
   desc "App runtime and UX toolkit for pixel-based apps"
   homepage "https://github.com/tronbyt/pixlet"
-  url "https://github.com/tronbyt/pixlet/archive/refs/tags/v0.52.0.tar.gz"
-  sha256 "4c796ac25041000d9d04d5e92e30790ab232778451aaf715e203b66d1dd12840"
+  url "https://github.com/tronbyt/pixlet/archive/refs/tags/v0.53.0.tar.gz"
+  sha256 "f26925bb4b8bca7b2b67009f93307ca486914e10c5c37edcd542149bf25e3aeb"
   license "Apache-2.0"
   head "https://github.com/tronbyt/pixlet.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "768bf6ae8ce2bb3358ea874dd88a1094925e4794856ce5a28592a90176f8f38b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3775ce02ed37798b0f7012974f391fffa79368f08cd3bb6cd64e09665a460bc8"
   end
 
   depends_on "go" => :build
