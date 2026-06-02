@@ -20,7 +20,7 @@ class Vcpkg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cbf4c84b8964740c9ec73a3fde41afcb365194699417cfadae9a3008f6c543ab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6df9b5575979e4330a7143fefd6c6f3ebf0449ad81acf9af8da55ffa709038b"
   end
 
   depends_on "cmake" => :build
