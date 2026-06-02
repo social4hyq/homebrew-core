@@ -1,13 +1,13 @@
 class Deck < Formula
   desc "Creates slide deck using Markdown and Google Slides"
   homepage "https://github.com/k1LoW/deck"
-  url "https://github.com/k1LoW/deck/archive/refs/tags/v1.23.1.tar.gz"
-  sha256 "6206fc6549e4229d4827b74675ba923c04d52de580dfb500ba9c06d3e87cb2fa"
+  url "https://github.com/k1LoW/deck/archive/refs/tags/v1.24.0.tar.gz"
+  sha256 "33e249eb4ac73a450507fa92f14c41f8b962eaa8af9b08ed338041ab293dd555"
   license "MIT"
   head "https://github.com/k1LoW/deck.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "945c2dd45ca25f7a8554e89cc9ba05bc17f9ccd9c7b3ae61a163f8465f795046"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72ddf1b7f9830cec5b83dd8e2ad64922436763afc87bd5c39280fcb6375db889"
   end
 
   depends_on "go" => :build
