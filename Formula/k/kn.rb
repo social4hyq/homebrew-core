@@ -2,8 +2,8 @@ class Kn < Formula
   desc "Command-line interface for managing Knative Serving and Eventing resources"
   homepage "https://github.com/knative/client"
   url "https://github.com/knative/client.git",
-      tag:      "knative-v1.22.0",
-      revision: "479f2162b627314c75e93b84be81290e3f4bc237"
+      tag:      "knative-v1.22.1",
+      revision: "67a85d32ee5df847ac57b7ec198f973c93c142da"
   license "Apache-2.0"
   head "https://github.com/knative/client.git", branch: "main"
 
