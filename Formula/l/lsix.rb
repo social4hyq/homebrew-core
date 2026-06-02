@@ -7,8 +7,7 @@ class Lsix < Formula
   license any_of: ["GPL-3.0-or-later", "X11"]
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "1236a71809bd24fd1cedb055f51286a8af6ce959d54c6669b8849eee706b050e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6653a3c0b730afa45dc0278912871c668a59752ba1ff1a3b5d36aa7430f8fd2f"
   end
 
   depends_on "imagemagick"
