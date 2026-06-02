@@ -1,13 +1,13 @@
 class StellarXdr < Formula
   desc "Stellar command-line tool for encoding/decoding XDR for the Stellar network"
   homepage "https://developers.stellar.org"
-  url "https://static.crates.io/crates/stellar-xdr/stellar-xdr-26.0.1.crate"
-  sha256 "ea6e29c7e1f071c2767916460d006668197843d5d93f0ec8893a26f72a14f595"
+  url "https://static.crates.io/crates/stellar-xdr/stellar-xdr-27.0.0.crate"
+  sha256 "05ff843326969bdf1ef673dcdba94c08f4a3c8f1e58d6e6ef39b1bd4f749179a"
   license "Apache-2.0"
   head "https://github.com/stellar/rs-stellar-xdr.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4bea6af1b89923aebd33eacfd608bce9ad1a5417149880fc14c07d4a2a5a59dd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "729e32169c9a1e9b1a771fb44775e22ea48f9f06417475c167cc13ef75520812"
   end
 
   depends_on "rust" => :build
