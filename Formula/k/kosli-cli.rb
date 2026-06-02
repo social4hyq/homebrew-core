@@ -1,8 +1,8 @@
 class KosliCli < Formula
   desc "CLI for managing Kosli"
   homepage "https://docs.kosli.com"
-  url "https://github.com/kosli-dev/cli/archive/refs/tags/v2.22.1.tar.gz"
-  sha256 "91bf5ca71d3d85bd5a7146340d36cb7f318acbbfe52b179af4dff1317a3e437d"
+  url "https://github.com/kosli-dev/cli/archive/refs/tags/v2.23.1.tar.gz"
+  sha256 "f97788cda1be2f13939ee74273985c56b88083e3ac653e82a35bb2aecd83bd2b"
   license "MIT"
   head "https://github.com/kosli-dev/cli.git", branch: "main"
 
@@ -12,7 +12,7 @@ class KosliCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0db92f77d00e263150aa47b3c820691abaeb7d3813bf3f574fa3306d46e46c84"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c02f763f137d675de9984b76cf6665f413ea7b86d369813611dddb9a273037c"
   end
 
   depends_on "go" => :build
