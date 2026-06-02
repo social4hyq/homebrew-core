@@ -14,7 +14,7 @@ class Goenv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e94c4c0affb37e4b2ec147e06af92c024802293d9e1512a5b663a44caab542c4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6e3b2c92d1303ab9614a450718436b35adb02145a2a78ca368a719ccf193fcd"
   end
 
   depends_on "go" => :build
