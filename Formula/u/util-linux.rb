@@ -1,8 +1,8 @@
 class UtilLinux < Formula
   desc "Collection of Linux utilities"
   homepage "https://github.com/util-linux/util-linux"
-  url "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.42/util-linux-2.42.tar.xz"
-  sha256 "3452b260bbaa775d6e749ac3bb22111785003fc1f444970025c8da26dfa758e9"
+  url "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.42/util-linux-2.42.1.tar.xz"
+  sha256 "82e9158eb12a9b0b569d84e1687fed9dd18fe89ccd8ef5ac3427218a7c0d7f7f"
   license all_of: [
     "BSD-3-Clause",
     "BSD-4-Clause-UC",
@@ -12,7 +12,6 @@ class UtilLinux < Formula
     "LGPL-2.1-or-later",
     :public_domain,
   ]
-  revision 2
   compatibility_version 1
 
   # The directory listing where the `stable` archive is found uses major/minor
@@ -29,10 +28,25 @@ class UtilLinux < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "285a2aa2714f5959a7cc0645ed053132d51ccc5bba96c1693bc1805c34e673c4"
   end
 
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
-  depends_on "autoconf" => :build
+  keg_only :shadowed_by_macos, "macOS provides the uuid.h header"
+
+  depends_on "pkgconf" => :build
+
+  uses_from_macos "libxcrypt"
+  uses_from_macos "ncurses"
+  uses_from_macos "sqlite"
+
   depends_on "gettext"
+
+  on_linux do
+    depends_on "readline"
+    depends_on "zlib-ng-compat"
+
+    conflicts_with "bash-completion", because: "both install `mount`, `rfkill`, and `rtcwake` completions"
+    conflicts_with "flock", because: "both install `flock` binaries"
+    conflicts_with "ossp-uuid", because: "both install `uuid.3` file"
+    conflicts_with "rename", because: "both install `rename` binaries"
+  end
 
   # Fix macOS builds
   # https://github.com/util-linux/util-linux/pull/4173
@@ -41,46 +55,106 @@ class UtilLinux < Formula
     sha256 "2fb01154faa3fd8b0fce27eb88049ed9c8f839e706e412399c19c087f7f3b5e1"
   end
 
-  def install
-    inreplace "lib/shells.c", '#include <unistd.h>', "#include <unistd.h>\nextern char *getusershell(void);\nextern void setusershell(void);\nextern void endusershell(void);"
+  # OHOS compatibility patches:
+  #   shells.c     → stub getusershell/setusershell/endusershell (libc missing)
+  #   ipc*.c       → mq_* functions unavailable (header exists, libc lacks them)
+  #   lsmem/chmem  → versionsort glibc extension stub
+  #   lsfd/file.c  → mqueue probe unavailable on OHOS
+  patch do
+    file "Patches/util-linux/0001-adapt-to-ohos.patch"
+  end
 
+  def install
     # Bypass gtk-doc dependency
     ENV["GTKDOCIZE"] = "/bin/true"
 
-    system "autoreconf", "--force", "--install", "--verbose"
+    # versionsort and strverscmp are glibc extensions; OHOS libc doesn't provide them.
+    # Fall back to POSIX alphasort / strcmp (no version-sort semantics, but compiles).
+    ENV.append_to_cflags "-Dversionsort=alphasort"
+    ENV.append_to_cflags "-Dstrverscmp=strcmp"
 
-    # Due to compilation failures in too many programs,
-    # build artifacts are specified via a whitelist only.
-
-    uuid_args = %W[
+    args = %W[
       --disable-silent-rules
-      --disable-liblastlog2
-      --disable-all-programs
-      --enable-libuuid
-      --without-python
-      --without-systemd
-      --without-udev
+      --disable-asciidoc
+      --with-bashcompletiondir=#{bash_completion}
     ]
-    system "./configure", *std_configure_args, *uuid_args
-    system "make"
-    system "make", "install"
 
-    system "make", "distclean"
+    if OS.mac?
+      # Support very old ncurses used on macOS 13 and earlier
+      # https://github.com/util-linux/util-linux/issues/2389
+      ENV.append_to_cflags "-D_XOPEN_SOURCE_EXTENDED" if MacOS.version <= :ventura
 
-    getopt_args = %W[
-      --disable-silent-rules
-      --disable-liblastlog2
-      --enable-getopt
-      --without-python
-      --without-systemd
-      --without-udev
-    ]
-    system "./configure", *std_configure_args, *getopt_args
-    system "make", "getopt"
-    bin.install "getopt"
+      args << "--disable-bits" # does not build on macOS
+      args << "--disable-ipcs" # does not build on macOS
+      args << "--disable-ipcrm" # does not build on macOS
+      args << "--disable-wall" # already comes with macOS
+      args << "--disable-liblastlog2" # does not build on macOS
+      args << "--disable-libmount" # does not build on macOS
+      args << "--enable-libuuid" # conflicts with ossp-uuid
+    else
+      # OHOS / Linux: let configure auto-detect what can build.
+      # Only disable things that are guaranteed to fail at compile time
+      # or would conflict with other packages.
+
+      # ---- Libraries ----
+      args << "--enable-libuuid" # conflicts with ossp-uuid
+      args << "--disable-liblastlog2"
+
+      # ---- PAM-dependent (login/auth) ----
+      args << "--disable-login"
+      args << "--disable-su"
+      args << "--disable-runuser"
+      args << "--disable-chfn-chsh"
+      args << "--disable-sulogin"
+      args << "--disable-nologin"
+      args << "--disable-newgrp"
+      args << "--disable-vipw"
+
+      # ---- Compile failures on OHOS ----
+      args << "--disable-wall"          # getutxent() returns int instead of struct utmpx*
+
+      # ---- Conflicts ----
+      args << "--disable-kill"         # conflicts with coreutils
+
+      # ---- Install-time hardening (no setuid on OHOS) ----
+      args << "--disable-use-tty-group"
+      args << "--disable-makeinstall-chown"
+      args << "--disable-makeinstall-setuid"
+
+      # ---- Systemd / udev / python (not on OHOS) ----
+      args << "--without-systemd"
+      args << "--without-udev"
+      args << "--without-python"
+    end
+
+    system "./configure", *args, *std_configure_args
+
+    install_args = []
+    install_args << "LDFLAGS=-lm" if OS.linux?
+    system "make", "install", *install_args
+  end
+
+  def caveats
+    if OS.linux?
+      <<~EOS
+        Some util-linux kernel-dependent components may not work if the
+        kernel or hardware does not support them (e.g. /proc, /sys,
+        /dev/rtc, PAM, etc.).
+      EOS
+    end
   end
 
   test do
-    system bin/"getopt", "--help"
+    stat  = File.stat "/usr"
+    owner = Etc.getpwuid(stat.uid).name
+    group = Etc.getgrgid(stat.gid).name
+
+    flags = ["x", "w", "r"] * 3
+    perms = flags.each_with_index.reduce("") do |sum, (flag, index)|
+      sum.insert 0, (stat.mode.nobits?(2 ** index) ? "-" : flag)
+    end
+
+    out = shell_output("#{bin}/namei -lx /usr").split("\n").last.split
+    assert_equal ["d#{perms}", owner, group, "usr"], out
   end
 end
