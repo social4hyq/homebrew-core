@@ -12,12 +12,7 @@ class Htop < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "db7f9d7446c4bdfbf056f8ec72eb6a0e980fc02fc1dfd8a2276fa2850b8e8e01"
-    sha256 cellar: :any,                 arm64_sequoia: "1b113c54d858a69b96802f5673f59e888fcb1ed16453658145090e8c4f99e4ea"
-    sha256 cellar: :any,                 arm64_sonoma:  "1d6d45bae52d39a2f19cecfa43b6e4cecc9c1a9895f30795c7e74c790348efd9"
-    sha256 cellar: :any,                 sonoma:        "6201b1181a3160778504ad76a3e641a8754027ce517924bc3c2a142046d0354d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "578b86f2ca817ee887c756f7d1a994b522240431900164cf9dbe1d7dbb1aaa93"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3c3b2a8655007ecc5cbdcc440d96294e6175ba8760bf28548fb7e5ec30b19edc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8cbbe32f5a6cd1e7bc8ac6bcbc858185df65e73e1c82c8f05d4255f72d1cf5c1"
   end
 
   depends_on "autoconf" => :build
