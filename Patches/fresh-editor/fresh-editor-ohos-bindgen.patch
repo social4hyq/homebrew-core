@@ -1,0 +1,27 @@
+Enable rquickjs bindgen for OHOS targets (aarch64-unknown-linux-ohos),
+since rquickjs-sys does not ship pre-generated bindings for this platform.
+
+diff --git a/crates/fresh-core/Cargo.toml b/crates/fresh-core/Cargo.toml
+index 0b2a1d5..f7e1c3a 100644
+--- a/crates/fresh-core/Cargo.toml
++++ b/crates/fresh-core/Cargo.toml
+@@ -18,7 +18,7 @@ rquickjs = { workspace = true, optional = true }
+ rquickjs-serde = { workspace = true, optional = true }
+ 
+ # rquickjs-sys has no pre-generated bindings for FreeBSD
+-[target.'cfg(target_os = "freebsd")'.dependencies]
++[target.'cfg(any(target_os = "freebsd", target_env = "ohos"))'.dependencies]
+ rquickjs = { workspace = true, optional = true, features = ["bindgen"] }
+ 
+ [dev-dependencies]
+diff --git a/crates/fresh-plugin-runtime/Cargo.toml b/crates/fresh-plugin-runtime/Cargo.toml
+index 4a8b2f6..d3c5e7b 100644
+--- a/crates/fresh-plugin-runtime/Cargo.toml
++++ b/crates/fresh-plugin-runtime/Cargo.toml
+@@ -29,6 +29,6 @@ oxc_diagnostics.workspace = true
+ trash = "5.2.5"
+ 
+ # rquickjs-sys has no pre-generated bindings for FreeBSD
+-[target.'cfg(target_os = "freebsd")'.dependencies]
++[target.'cfg(any(target_os = "freebsd", target_env = "ohos"))'.dependencies]
+ rquickjs = { workspace = true, features = ["bindgen"] }
