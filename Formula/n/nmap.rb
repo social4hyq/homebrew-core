@@ -13,12 +13,7 @@ class Nmap < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "610785e4dd545c5f71d3af2d221f8a92951714710cf98ac4ed10f6fd0d0c5153"
-    sha256 arm64_sequoia: "5840513b1bcc8c8e20b68a1a9e71977d424827ba9e26c157e79760dc218fb55e"
-    sha256 arm64_sonoma:  "47740d854f1669dc68deabbfd6f5d54036c99ddb606ba39d70e747f7632f4f85"
-    sha256 sonoma:        "a5c5594350aad5168e64c364c6508b669cd5ea2273ad0f88d005b27de75cd5bd"
-    sha256 arm64_linux:   "55edc13eebfb103bdc26cdcb479daf81d709b727d6c6e2e22ae2c447cebc638a"
-    sha256 x86_64_linux:  "71db30907d6cd22b65e60fbb825cbc394ea291123aba6f9422342026bdddd6ad"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c9acdefef6965370cde3bbd8233b2746defb71faf7c3eb4066c06db7a247833"
   end
 
   depends_on "python-setuptools" => :build
