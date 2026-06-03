@@ -1,0 +1,47 @@
+class Htop < Formula
+  desc "Improved top (interactive process viewer)"
+  homepage "https://htop.dev/"
+  url "https://github.com/htop-dev/htop/archive/refs/tags/3.5.1.tar.gz"
+  sha256 "dfc4a09845e9bc86f466a722e62b8f87d59028ff39689077ff2257a6a605061d"
+  license "GPL-2.0-or-later"
+  head "https://github.com/htop-dev/htop.git", branch: "main"
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8cbbe32f5a6cd1e7bc8ac6bcbc858185df65e73e1c82c8f05d4255f72d1cf5c1"
+  end
+
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
+  depends_on "pkgconf" => :build
+  depends_on "ncurses" # enables mouse scroll
+
+  on_linux do
+    depends_on "lm-sensors"
+  end
+
+  def install
+    system "./autogen.sh"
+    args = ["--prefix=#{prefix}"]
+    args << "--enable-sensors" if OS.linux?
+    system "./configure", *args
+    system "make", "install"
+  end
+
+  def caveats
+    <<~EOS
+      htop requires root privileges to correctly display all running processes,
+      so you will need to run `sudo htop`.
+      You should be certain that you trust any software you grant root privileges.
+    EOS
+  end
+
+  test do
+    pipe_output(bin/"htop", "q", 0)
+  end
+end
