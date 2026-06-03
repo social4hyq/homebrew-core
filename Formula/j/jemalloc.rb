@@ -28,11 +28,7 @@ class Jemalloc < Formula
     end
 
     system "make"
-    # Do not run checks with Xcode 15, they fail because of
-    # overly eager optimization in the new compiler:
-    # https://github.com/jemalloc/jemalloc/issues/2540
-    # Reported to Apple as FB13209585
-    system "make", "check" if DevelopmentTools.clang_build_version < 1500
+    system "make", "check"
     system "make", "install"
   end
 
