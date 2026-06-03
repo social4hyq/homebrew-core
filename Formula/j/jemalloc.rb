@@ -5,6 +5,10 @@ class Jemalloc < Formula
   sha256 "2db82d1e7119df3e71b7640219b6dfe84789bc0537983c3b7ac4f7189aecfeaa"
   license "BSD-2-Clause"
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e30a11eca4d247d454aca5515193cfa7b599b392cc68a4bb8f3b346db58a2f4a"
+  end
+
   head do
     url "https://github.com/jemalloc/jemalloc.git", branch: "dev"
 
