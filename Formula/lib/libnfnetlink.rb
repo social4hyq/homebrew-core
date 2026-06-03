@@ -12,9 +12,7 @@ class Libnfnetlink < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_linux:  "29a3d3fc305c9252a22b3bce85447d2f895924c959185c00889cedc2d23fc78b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "927f6b62c2f87ff79d92d07e52bb312d3fb24731e694cc804179730b08f15eae"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ca278e6761d216d7316c1f59169a71bf54ea5d11735b09aefba35422ecd0671"
   end
 
   depends_on :linux
