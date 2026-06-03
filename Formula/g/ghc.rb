@@ -15,12 +15,7 @@ class Ghc < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "3aa7ca72a5dba98f0f1f0ed5273f7465dfb14d5a54d8d08ec33bbe2a388fe3bf"
-    sha256 cellar: :any, arm64_sequoia: "d3afc8f7d175aae4d4087eb760b981ffed1a47bcc7fed0d094d25d9926d251fc"
-    sha256 cellar: :any, arm64_sonoma:  "74f1eda05d5796e81eba49f0598e9dbed4d7757362bdd380dc3e690245353394"
-    sha256 cellar: :any, sonoma:        "ed24dd4a13fe0bf6eb58d72d2c0ea32644989cbaa47cc3e674345e06d2d012ce"
-    sha256               arm64_linux:   "f4d2e86164d8462309958ceaf78f10c0707ee9899653c7cf315af9ccdf8588a3"
-    sha256               x86_64_linux:  "ab8e3190b14771a1ab62d0fd003965a31efd6ae5ca42e3a02ebceb63e302c4fb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf67450b7300e08a9ce3be6fc905c4c5c25067b4b902f831ba622426620bc8e1"
   end
 
   depends_on "autoconf" => :build
