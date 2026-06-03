@@ -1,0 +1,28 @@
+--- fish-4.7.1.orig/src/env_universal_common.rs	2026-06-03 14:18:16.964953189 +0800
++++ fish-4.7.1/src/env_universal_common.rs	2026-06-03 14:37:44.112387371 +0800
+@@ -11,11 +11,15 @@
+ use itertools::Itertools as _;
+ use std::collections::HashSet;
+ use std::collections::hash_map::Entry;
+-use std::ffi::CString;
++use std::ffi::{CString, c_char, c_int};
+ use std::fs::File;
+ use std::io::{Read as _, Write as _};
+ use std::mem::MaybeUninit;
+ 
++unsafe extern "C" {
++    fn sscanf(s: *const c_char, format: *const c_char, ...) -> c_int;
++}
++
+ /// Callback data, reflecting a change in universal variables.
+ #[derive(Clone, Debug, Eq, PartialEq)]
+ pub struct CallbackData {
+@@ -285,7 +289,7 @@
+             // Safety: test-only
+             let cstr = CString::new(line).unwrap();
+             if unsafe {
+-                libc::sscanf(
++                sscanf(
+                     cstr.as_ptr(),
+                     c"# VERSION: %64s".as_ptr().cast(),
+                     versionbuf.as_mut_ptr(),
