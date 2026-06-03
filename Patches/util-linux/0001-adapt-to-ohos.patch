@@ -1,0 +1,157 @@
+diff -ruN a/lib/shells.c b/lib/shells.c
+--- a/lib/shells.c	2026-05-12 12:23:02.696860200 +0000
++++ b/lib/shells.c	2026-06-03 06:39:00.256438864 +0000
+@@ -66,13 +66,15 @@
+ 	econf_free(keys);
+ 	econf_free(key_file);
+ #else
++#ifndef __OHOS__
+ 	char *s;
+ 
+ 	setusershell();
+ 	while ((s = getusershell()))
+ 		fprintf(out, format, s);
+ 	endusershell();
+-#endif
++#endif /* !__OHOS__ */
++#endif /* HAVE_LIBECONF && USE_VENDORDIR */
+ }
+ 
+ 
+@@ -108,6 +110,7 @@
+ 	free(val);
+ 	econf_free(key_file);
+ #else
++#ifndef __OHOS__
+ 	char *s;
+ 
+ 	setusershell();
+@@ -118,6 +121,7 @@
+ 		}
+ 	}
+ 	endusershell();
+-#endif
++#endif /* !__OHOS__ */
++#endif /* HAVE_LIBECONF && USE_VENDORDIR */
+ 	return ret;
+ }
+diff -ruN a/lsfd-cmd/file.c b/lsfd-cmd/file.c
+--- a/lsfd-cmd/file.c	2026-05-18 10:00:03.261849210 +0000
++++ b/lsfd-cmd/file.c	2026-06-03 06:39:00.259438877 +0000
+@@ -36,8 +36,10 @@
+ 
+ #include <fcntl.h>
+ #include <sys/stat.h>
++#ifndef __OHOS__
+ #include <mqueue.h>		/* mq_open */
+ 
++#endif /* !__OHOS__ */
+ #include "buffer.h"
+ #include "idcache.h"
+ #include "strutils.h"
+@@ -528,6 +530,7 @@
+ 	return m;
+ }
+ 
++#ifndef __OHOS__
+ static unsigned long get_minor_for_mqueue(void)
+ {
+ 	mqd_t mq;
+@@ -555,6 +558,7 @@
+ 	mq_unlink(mq_name);
+ 	return minor(sb.st_dev);
+ }
++#endif /* !__OHOS__ */
+ 
+ static unsigned long get_minor_for_pidfs(void)
+ {
+@@ -583,7 +587,9 @@
+ 	if (m)
+ 		add_nodev(m, "tmpfs");
+ 
++#ifndef __OHOS__
+ 	m = get_minor_for_mqueue();
++#endif
+ 	if (m)
+ 		add_nodev(m, "mqueue");
+ 
+diff -ruN a/sys-utils/chmem.c b/sys-utils/chmem.c
+--- a/sys-utils/chmem.c	2026-05-18 10:00:03.394848622 +0000
++++ b/sys-utils/chmem.c	2026-06-03 06:39:00.259438877 +0000
+@@ -24,6 +24,12 @@
+ #include <dirent.h>
+ 
+ #include "c.h"
++
++#ifndef versionsort
++# if defined(__OHOS__)
++#  define versionsort alphasort
++# endif
++#endif
+ #include "cctype.h"
+ #include "nls.h"
+ #include "path.h"
+diff -ruN a/sys-utils/ipcmk.c b/sys-utils/ipcmk.c
+--- a/sys-utils/ipcmk.c	2026-04-28 09:11:39.607775955 +0000
++++ b/sys-utils/ipcmk.c	2026-06-03 06:39:00.257438869 +0000
+@@ -94,7 +94,7 @@
+ 	return msgget(key, permission | IPC_CREAT);
+ }
+ 
+-#ifndef HAVE_MQUEUE_H
++#if !defined(HAVE_MQUEUE_H) || defined(__OHOS__)
+ static int create_posix_msg(const char *name __attribute__((__unused__)),
+ 			int permission __attribute__((__unused__)))
+ {
+diff -ruN a/sys-utils/ipcrm.c b/sys-utils/ipcrm.c
+--- a/sys-utils/ipcrm.c	2026-04-28 09:11:39.607775955 +0000
++++ b/sys-utils/ipcrm.c	2026-06-03 06:39:00.257438869 +0000
+@@ -256,7 +256,7 @@
+ 			#endif
+ 			break;
+ 		case PMSG:
+-			#ifndef HAVE_MQUEUE_H
++			#if !defined(HAVE_MQUEUE_H) || defined(__OHOS__)
+ 			warnx(_("POSIX message queues are not supported"));
+ 			#else
+ 			if (verbose)
+diff -ruN a/sys-utils/ipcutils.c b/sys-utils/ipcutils.c
+--- a/sys-utils/ipcutils.c	2026-05-12 12:44:00.890259061 +0000
++++ b/sys-utils/ipcutils.c	2026-06-03 06:39:00.256438864 +0000
+@@ -658,7 +658,7 @@
+ 	}
+ }
+ 
+-#ifndef HAVE_MQUEUE_H
++#if !defined(HAVE_MQUEUE_H) || defined(__OHOS__)
+ int posix_ipc_msg_get_info(const char *name __attribute__((unused)),
+ 			   struct posix_msg_data **msgds __attribute__((unused)))
+ {
+diff -ruN a/sys-utils/lsipc.c b/sys-utils/lsipc.c
+--- a/sys-utils/lsipc.c	2026-05-18 10:00:03.397848608 +0000
++++ b/sys-utils/lsipc.c	2026-06-03 06:39:00.258438873 +0000
+@@ -1119,7 +1119,7 @@
+ 	global_set_data(ctl, tb, "MSGMNB", _("Default max size of System V queue (bytes)"), 0, lim.msgmnb, 0, 1);
+ }
+ 
+-#ifndef HAVE_MQUEUE_H
++#if !defined(HAVE_MQUEUE_H) || defined(__OHOS__)
+ static void do_posix_msg_global(struct lsipc_control *ctl __attribute__((unused)), struct libscols_table *tb __attribute__((unused)))
+ {
+ 	return;
+diff -ruN a/sys-utils/lsmem.c b/sys-utils/lsmem.c
+--- a/sys-utils/lsmem.c	2026-05-18 10:00:03.398848604 +0000
++++ b/sys-utils/lsmem.c	2026-06-03 06:39:00.258438873 +0000
+@@ -23,6 +23,12 @@
+ #include <libsmartcols.h>
+ 
+ #include "c.h"
++
++#ifndef versionsort
++# if defined(__OHOS__)
++#  define versionsort alphasort
++# endif
++#endif
+ #include "cctype.h"
+ #include "nls.h"
+ #include "path.h"
