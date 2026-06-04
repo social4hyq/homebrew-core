@@ -1,0 +1,13 @@
+diff -ruN a/cbits/hs_resolv.h b/cbits/hs_resolv.h
+--- a/cbits/hs_resolv.h
++++ b/cbits/hs_resolv.h
+@@ -2,6 +2,10 @@
+ #define HS_RESOLV_H
+ 
+ #include "hs_resolv_config.h"
++#if defined(__OHOS__)
++/* OpenHarmony: _res not provided by libc, define it ourselves */
++struct __res_state _res;
++#endif
+ 
+ #include <sys/types.h>
