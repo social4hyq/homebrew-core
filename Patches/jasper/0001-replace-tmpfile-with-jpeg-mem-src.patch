@@ -1,0 +1,93 @@
+diff -r -u a/src/libjasper/jpg/jpg_dec.c b/src/libjasper/jpg/jpg_dec.c
+--- a/src/libjasper/jpg/jpg_dec.c	2026-06-04 12:22:28.648376317 +0000
++++ b/src/libjasper/jpg/jpg_dec.c	2026-06-04 12:22:46.551454504 +0000
+@@ -199,7 +199,6 @@
+ {
+ 	struct jpeg_decompress_struct cinfo;
+ 	struct jpeg_error_mgr jerr;
+-	FILE *input_file;
+ 	jpg_dest_t dest_mgr_buf;
+ 	jpg_dest_t *dest_mgr = &dest_mgr_buf;
+ 	JDIMENSION num_scanlines;
+@@ -207,6 +206,8 @@
+ 	int ret;
+ 	jpg_dec_importopts_t opts;
+ 	size_t num_samples;
++	unsigned char *buffer;
++	unsigned long buf_size;
+ 	bool cinfo_initialized = false;
+ 
+ 	// In theory, the two memset calls that follow are not needed.
+@@ -216,7 +217,8 @@
+ 	memset(dest_mgr, 0, sizeof(jpg_dest_t));
+ 
+ 	image = 0;
+-	input_file = 0;
++	buffer = 0;
++	buf_size = 0;
+ 	dest_mgr->data = 0;
+ 
+ 	JAS_LOGDEBUGF(10, "jpg_decode(%p, \"%s\")\n", in, optstr);
+@@ -234,15 +236,20 @@
+ 	JAS_LOGDEBUGF(10, "JPEG Turbo library version: %s\n",
+ 	  jas_libjpeg_turbo_version);
+ 
+-	if (!(input_file = tmpfile())) {
+-		jas_logerrorf("cannot make temporary file\n");
+-		goto error;
+-	}
+-	if (jpg_copystreamtofile(input_file, in)) {
+-		jas_logerrorf("cannot copy stream\n");
++	/* Read the input stream into a memory buffer and use jpeg_mem_src. */
++	/* This avoids tmpfile(), which is broken on some platforms (e.g. OHOS). */
++	if ((buf_size = jas_stream_length(in)) < 0) {
++		jas_logerrorf("cannot determine input length\n");
+ 		goto error;
+ 	}
+-	rewind(input_file);
++	if (!(buffer = jas_malloc(buf_size))) {
++		jas_logerrorf("out of memory\n");
++		goto error;
++	}
++	if (jas_stream_read(in, buffer, buf_size) != buf_size) {
++		jas_logerrorf("cannot read input stream\n");
++		goto error;
++	}
+ 
+ 	/* Allocate and initialize a JPEG decompression object. */
+ 	JAS_LOGDEBUGF(10, "jpeg_std_error(%p)\n", &jerr);
+@@ -252,8 +259,8 @@
+ 	cinfo_initialized = 1;
+ 
+ 	/* Specify the data source for decompression. */
+-	JAS_LOGDEBUGF(10, "jpeg_stdio_src(%p, %p)\n", &cinfo, input_file);
+-	jpeg_stdio_src(&cinfo, input_file);
++	JAS_LOGDEBUGF(10, "jpeg_mem_src(%p, %p, %lu)\n", &cinfo, buffer, buf_size);
++	jpeg_mem_src(&cinfo, buffer, buf_size);
+ 
+ 	/* Read the file header to obtain the image information. */
+ 	JAS_LOGDEBUGF(10, "jpeg_read_header(%p, TRUE)\n", &cinfo);
+@@ -337,9 +344,9 @@
+ 
+ 	jas_matrix_destroy(dest_mgr->data);
+ 
+-	JAS_LOGDEBUGF(10, "fclose(%p)\n", input_file);
+-	fclose(input_file);
+-	input_file = 0;
++	JAS_LOGDEBUGF(10, "jas_free(%p)\n", buffer);
++	jas_free(buffer);
++	buffer = 0;
+ 
+ 	if (dest_mgr->error) {
+ 		jas_logerrorf("error during decoding\n");
+@@ -358,8 +365,8 @@
+ 	if (image) {
+ 		jas_image_destroy(image);
+ 	}
+-	if (input_file) {
+-		fclose(input_file);
++	if (buffer) {
++		jas_free(buffer);
+ 	}
+ 	return 0;
+ }
