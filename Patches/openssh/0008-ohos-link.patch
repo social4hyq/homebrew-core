@@ -1,0 +1,47 @@
+diff -ruN a/hostfile.c b/hostfile.c
+--- a/hostfile.c	2026-04-02 08:09:03.000000000 +0000
++++ b/hostfile.c	2026-06-04 11:59:27.537431217 +0000
+@@ -729,7 +729,11 @@
+ 			r = SSH_ERR_SYSTEM_ERROR;
+ 			goto fail;
+ 		}
++#ifdef __OHOS__
++		if (rename(filename, back) == -1) {
++#else
+ 		if (link(filename, back) == -1) {
++#endif
+ 			oerrno = errno;
+ 			error_f("link %.100s to %.100s: %s", filename,
+ 			    back, strerror(errno));
+diff -ruN a/mux.c b/mux.c
+--- a/mux.c	2026-04-02 08:09:03.000000000 +0000
++++ b/mux.c	2026-06-04 11:59:27.539431226 +0000
+@@ -1372,6 +1372,21 @@
+ 		}
+ 	}
+
++#ifdef __OHOS__
++	/* OHOS may not support hard links, use non-atomic rename */
++	if (access(orig_control_path, F_OK) == 0) {
++		error("ControlSocket %s already exists, disabling multiplexing",
++		    orig_control_path);
++		unlink(options.control_path);
++		goto disable_mux_master;
++	} else {
++		if (rename(options.control_path, orig_control_path) == -1) {
++			fatal_f("link mux listener %s => %s: %s",
++			    options.control_path, orig_control_path,
++			    strerror(errno));
++		}
++	}
++#else
+ 	/* Now atomically "move" the mux socket into position */
+ 	if (link(options.control_path, orig_control_path) != 0) {
+ 		if (errno != EEXIST) {
+@@ -1385,6 +1400,7 @@
+ 		goto disable_mux_master;
+ 	}
+ 	unlink(options.control_path);
++#endif
+ 	free(options.control_path);
+ 	options.control_path = orig_control_path;

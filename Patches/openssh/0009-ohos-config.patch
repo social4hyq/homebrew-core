@@ -1,0 +1,28 @@
+diff -ruN a/readconf.c b/readconf.c
+--- a/readconf.c	2026-04-02 08:09:03.000000000 +0000
++++ b/readconf.c	2026-06-04 11:59:23.045411783 +0000
+@@ -2637,8 +2637,12 @@
+
+ 		if (fstat(fileno(f), &sb) == -1)
+ 			fatal("fstat %s: %s", filename, strerror(errno));
++#ifdef __OHOS__
++		if ((sb.st_mode & 022) != 0)
++#else
+ 		if (((sb.st_uid != 0 && sb.st_uid != getuid()) ||
+ 		    (sb.st_mode & 022) != 0))
++#endif
+ 			fatal("Bad owner or permissions on %s", filename);
+ 	}
+
+diff -ruN a/servconf.c b/servconf.c
+--- a/servconf.c	2026-04-02 08:09:03.000000000 +0000
++++ b/servconf.c	2026-06-04 11:59:23.049411802 +0000
+@@ -313,7 +313,7 @@
+ 	}
+ 	/* No certificates by default */
+ 	if (options->num_ports == 0)
+-		options->ports[options->num_ports++] = SSH_DEFAULT_PORT;
++		options->ports[options->num_ports++] = 8022; /* non-privileged port */
+ 	if (options->address_family == -1)
+ 		options->address_family = AF_UNSPEC;
+ 	if (options->listen_addrs == NULL)

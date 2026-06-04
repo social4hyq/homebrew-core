@@ -1,0 +1,49 @@
+diff -ruN a/auth.c b/auth.c
+--- a/auth.c	2026-04-02 08:09:03.000000000 +0000
++++ b/auth.c	2026-06-04 13:49:59.723197150 +0000
+@@ -491,6 +491,25 @@
+ #if defined(_AIX) && defined(HAVE_SETAUTHDB)
+ 	aix_restoreauthdb();
+ #endif
++#ifdef __OHOS__
++	if (pw == NULL) {
++		/* Synthesize a passwd entry from the current process identity.
++		 * This ensures any username works; the actual identity on the
++		 * device is the user who launched sshd. */
++		static struct passwd ohos_pw;
++		static char ohos_name[256], ohos_dir[1024];
++		const char *home = getenv("HOME");
++		snprintf(ohos_name, sizeof(ohos_name), "%s", user);
++		snprintf(ohos_dir, sizeof(ohos_dir), "%s", home ? home : "/");
++		ohos_pw.pw_name = ohos_name;
++		ohos_pw.pw_uid = getuid();
++		ohos_pw.pw_gid = getgid();
++		ohos_pw.pw_dir = ohos_dir;
++		ohos_pw.pw_shell = "/bin/sh";
++		pw = &ohos_pw;
++		ci->user_invalid = 0;
++	}
++#endif
+ 	if (pw == NULL) {
+ 		logit("Invalid user %.100s from %.100s port %d",
+ 		    user, ssh_remote_ipaddr(ssh), ssh_remote_port(ssh));
+
+diff -ruN a/authfile.c b/authfile.c
+--- a/authfile.c	2026-04-02 08:09:03.000000000 +0000
++++ b/authfile.c	2026-06-04 13:49:59.723197150 +0000
+@@ -94,6 +94,7 @@
+ 	if (check_ntsec(filename))
+ #endif
+ 	if ((st.st_uid == getuid()) && (st.st_mode & 077) != 0) {
++#ifndef __OHOS__
+ 		error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+ 		error("@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @");
+ 		error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+@@ -102,6 +103,7 @@
+ 		error("It is required that your private key files are NOT accessible by others.");
+ 		error("This private key will be ignored.");
+ 		return SSH_ERR_KEY_BAD_PERMISSIONS;
++#endif
+ 	}
+ 	return 0;
+ }
