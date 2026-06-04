@@ -1,0 +1,35 @@
+diff -ruN a/config.guess b/config.guess
+--- a/config.guess	2026-04-02 08:09:03.000000000 +0000
++++ b/config.guess	2026-06-04 11:59:44.563504876 +0000
+@@ -162,6 +162,8 @@
+ 	LIBC=dietlibc
+ 	#elif defined(__GLIBC__)
+ 	LIBC=gnu
++	#elif defined(__OHOS__)
++	LIBC=ohos
+ 	#else
+ 	#include <stdarg.h>
+ 	/* First heuristic to detect musl libc.  */
+
+diff -ruN a/config.sub b/config.sub
+--- a/config.sub	2026-04-02 08:09:03.000000000 +0000
++++ b/config.sub	2026-06-04 11:59:23.050411806 +0000
+@@ -1758,7 +1758,7 @@
+ 	     | onefs* | tirtos* | phoenix* | fuchsia* | redox* | bme* \
+ 	     | midnightbsd* | amdhsa* | unleashed* | emscripten* | wasi* \
+ 	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx* | zephyr* \
+-	     | fiwix* | mlibc* )
++	     | fiwix* | mlibc* | ohos* )
+ 		;;
+ 	# This one is extra strict with allowed versions
+ 	sco3.2v2 | sco3.2v[4-9]* | sco5v6*)
+@@ -1779,7 +1779,8 @@
+ # (given a valid OS), if there is a kernel.
+ case $kernel-$os in
+ 	linux-gnu* | linux-dietlibc* | linux-android* | linux-newlib* \
+-		   | linux-musl* | linux-relibc* | linux-uclibc* | linux-mlibc* )
++		   | linux-musl* | linux-relibc* | linux-uclibc* | linux-mlibc* \
++		   | linux-ohos* )
+ 		;;
+ 	uclinux-uclibc* )
+ 		;;

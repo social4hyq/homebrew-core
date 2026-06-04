@@ -1,0 +1,104 @@
+diff -ruN a/misc.c b/misc.c
+--- a/misc.c	2026-04-02 08:09:03.000000000 +0000
++++ b/misc.c	2026-06-04 11:59:27.537431217 +0000
+@@ -1917,7 +1917,17 @@
+ 		if (r > 0 && (size_t)r < len)
+ 			return;
+ 	}
++	#ifdef __OHOS__
++	{
++		struct stat _st;
++		const char *_fallback = "/tmp";
++		if (stat("/tmp", &_st) != 0 || !S_ISDIR(_st.st_mode))
++			_fallback = "/data/storage/el2/base/cache";
++		r = snprintf(s, len, "%s/ssh-XXXXXXXXXXXX", _fallback);
++	}
++#else
+ 	r = snprintf(s, len, "/tmp/ssh-XXXXXXXXXXXX");
++#endif
+ 	if (r < 0 || (size_t)r >= len)
+ 		fatal_f("template string too short");
+ }
+@@ -2945,6 +2955,7 @@
+ 			    pw->pw_name, (u_int)pw->pw_gid, strerror(errno));
+ 			_exit(1);
+ 		}
++#ifndef __OHOS__
+ 		if (setresgid(pw->pw_gid, pw->pw_gid, pw->pw_gid) == -1) {
+ 			error("%s: setresgid %u: %s", tag, (u_int)pw->pw_gid,
+ 			    strerror(errno));
+@@ -2955,6 +2966,7 @@
+ 			    strerror(errno));
+ 			_exit(1);
+ 		}
++#endif
+ 		/* stdin is pointed to /dev/null at this point */
+ 		if ((flags & SSH_SUBPROCESS_STDOUT_DISCARD) != 0 &&
+ 		    dup2(STDIN_FILENO, STDERR_FILENO) == -1) {
+
+diff -ruN a/openbsd-compat/xcrypt.c b/openbsd-compat/xcrypt.c
+--- a/openbsd-compat/xcrypt.c	2026-04-02 08:09:03.000000000 +0000
++++ b/openbsd-compat/xcrypt.c	2026-06-04 11:59:23.044411779 +0000
+@@ -70,14 +70,15 @@
+ static const char *
+ pick_salt(void)
+ {
+-	struct passwd *pw;
+-	char *passwd, *p;
+-	size_t typelen;
+ 	static char salt[32];
+ 
+ 	if (salt[0] != '\0')
+ 		return salt;
+ 	strlcpy(salt, "xx", sizeof(salt));
++#ifndef __OHOS__
++	struct passwd *pw;
++	char *passwd, *p;
++	size_t typelen;
+ 	setpwent();
+ 	while ((pw = getpwent()) != NULL) {
+ 		if ((passwd = shadow_pw(pw)) == NULL)
+@@ -91,6 +92,7 @@
+ 	}
+  out:
+ 	endpwent();
++#endif
+ 	return salt;
+ }
+ 
+@@ -130,7 +132,7 @@
+ {
+ 	char *pw_password = pw->pw_passwd;
+ 
+-# if defined(HAVE_SHADOW_H) && !defined(DISABLE_SHADOW)
++# if !defined(__OHOS__) && defined(HAVE_SHADOW_H) && !defined(DISABLE_SHADOW)
+ 	struct spwd *spw = getspnam(pw->pw_name);
+ 
+ 	if (spw != NULL)
+
+diff -ruN a/scp.c b/scp.c
+--- a/scp.c	2026-04-02 08:09:03.000000000 +0000
++++ b/scp.c	2026-06-04 13:49:59.723197150 +0000
+@@ -1679,7 +1679,9 @@
+ 	setimes = targisdir = 0;
+ 	mask = umask(0);
+ 	if (!pflag) {
++#ifndef __OHOS__
+ 		mask |= 07000;
++#endif
+ 		(void) umask(mask);
+ 	}
+ 	if (argc != 1) {
+
+diff -ruN a/platform.c b/platform.c
+--- a/platform.c	2026-04-02 08:09:03.000000000 +0000
++++ b/platform.c	2026-06-04 11:59:23.048411797 +0000
+@@ -160,7 +160,7 @@
+ {
+ 	int locked = 0;
+ 	char *passwd = pw->pw_passwd;
+-#ifdef USE_SHADOW
++#if defined(USE_SHADOW) && !defined(__OHOS__)
+ 	struct spwd *spw = NULL;
+ #ifdef USE_LIBIAF
+ 	char *iaf_passwd = NULL;

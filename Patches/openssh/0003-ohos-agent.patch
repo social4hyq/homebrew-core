@@ -1,0 +1,22 @@
+diff -ruN a/ssh-agent.c b/ssh-agent.c
+--- a/ssh-agent.c	2026-04-02 08:09:03.000000000 +0000
++++ b/ssh-agent.c	2026-06-04 11:59:27.531431192 +0000
+@@ -82,7 +82,7 @@
+ #include "myproposal.h"
+
+ #ifndef DEFAULT_ALLOWED_PROVIDERS
+-# define DEFAULT_ALLOWED_PROVIDERS "/usr/lib*/*,/usr/local/lib*/*"
++# define DEFAULT_ALLOWED_PROVIDERS "@@HOMEBREW_PREFIX@@/lib*/*"
+ #endif
+ #ifndef DEFAULT_WEBSAFE_ALLOWLIST
+ # define DEFAULT_WEBSAFE_ALLOWLIST "ssh:*"
+@@ -2255,8 +2255,10 @@
+ 	sanitise_stdfd();
+
+ 	/* drop */
++#ifndef __OHOS__
+ 	(void)setegid(getgid());
+ 	(void)setgid(getgid());
++#endif
+
+ 	platform_disable_tracing(0);	/* strict=no */

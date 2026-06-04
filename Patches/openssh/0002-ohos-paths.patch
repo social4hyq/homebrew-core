@@ -1,0 +1,42 @@
+diff -ruN a/pathnames.h b/pathnames.h
+--- a/pathnames.h	2026-04-02 08:09:03.000000000 +0000
++++ b/pathnames.h	2026-06-04 11:59:27.535431209 +0000
+@@ -126,7 +126,7 @@
+  * ~/.rhosts and /etc/hosts.equiv if rhosts authentication is enabled.
+  */
+ #define _PATH_SSH_HOSTS_EQUIV		SSHDIR "/shosts.equiv"
+-#define _PATH_RHOSTS_EQUIV		"/etc/hosts.equiv"
++#define _PATH_RHOSTS_EQUIV		"@@HOMEBREW_PREFIX@@/etc/hosts.equiv"
+
+ /*
+  * Default location of askpass
+@@ -152,7 +152,7 @@
+
+ /* xauth for X11 forwarding */
+ #ifndef _PATH_XAUTH
+-#define _PATH_XAUTH			"/usr/X11R6/bin/xauth"
++#define _PATH_XAUTH			"@@HOMEBREW_PREFIX@@/bin/xauth"
+ #endif
+
+ /* UNIX domain socket for X11 server; displaynum will replace %u */
+@@ -180,7 +180,7 @@
+
+ /* for passwd change */
+ #ifndef _PATH_PASSWD_PROG
+-#define _PATH_PASSWD_PROG		"/usr/bin/passwd"
++#define _PATH_PASSWD_PROG		"@@HOMEBREW_PREFIX@@/bin/passwd"
+ #endif
+
+ /* Askpass program define */
+diff -ruN a/defines.h b/defines.h
+--- a/defines.h	2026-04-02 08:09:03.000000000 +0000
++++ b/defines.h	2026-06-04 11:59:23.027411707 +0000
+@@ -468,7 +468,7 @@
+ #endif
+
+ #ifndef _PATH_NOLOGIN
+-# define _PATH_NOLOGIN "/etc/nologin"
++# define _PATH_NOLOGIN "@@HOMEBREW_PREFIX@@/etc/nologin"
+ #endif
+
+ /* Define this to be the path of the xauth program. */
