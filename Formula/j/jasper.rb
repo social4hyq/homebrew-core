@@ -12,7 +12,7 @@ class Jasper < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6ae0e7bba0f4a014b9510c593f4920083ad9d6bf3d2848a7a251babbedde4f7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d182dc436e8d602410fef1f01ec96e410346ecca015e57c79b334847ae3503f7"
   end
 
   depends_on "cmake" => :build
