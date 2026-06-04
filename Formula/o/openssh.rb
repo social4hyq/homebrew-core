@@ -14,7 +14,8 @@ class Openssh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a82f0da4a8682e90a22e18ab5f1b41cd408b01c43e743b5c899a1f190e6c14f5"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6928bfdd1d76f1115933997d417e1e849ec3a405593ed98fc8cd725b378206fc"
   end
 
   depends_on "pkgconf" => :build
@@ -22,49 +23,29 @@ class Openssh < Formula
 
   uses_from_macos "mandoc" => :build
 
-  # Auto-detect OHOS in config.guess/config.sub
+  # Auto-detect OHOS (config.guess/sub) and replace hardcoded system paths
+  # (pathnames.h, defines.h) with HOMEBREW_PREFIX.
   patch do
-    file "Patches/openssh/0001-ohos-autoconf.patch"
+    file "Patches/openssh/0001-ohos-build.patch"
   end
 
-  # Replace hardcoded /etc, /usr paths with HOMEBREW_PREFIX placeholders
+  # Server daemon: ssh-agent provider paths, auth passwd fallback, relaxed
+  # host key permissions, sshd runtime compat (skip setgroups/chdir,
+  # daemon(1,0)), sshd-auth privsep synthesis, session env handling.
   patch do
-    file "Patches/openssh/0002-ohos-paths.patch"
+    file "Patches/openssh/0002-ohos-server.patch"
   end
 
-  # Skip setgid/setuid calls and fix provider paths on OHOS
+  # Client tools: ssh/ssh-keygen passwd fallback, relaxed config permissions,
+  # default port 8022, rename-vs-link for OHOS.
   patch do
-    file "Patches/openssh/0003-ohos-agent.patch"
+    file "Patches/openssh/0003-ohos-client.patch"
   end
 
-  # Fallback passwd entry and relaxed host key permission check for OHOS
+  # Misc compat layer: tmp dir, setresgid, tilde_expand, shadow password,
+  # scp umask, platform setusercontext skip.
   patch do
-    file "Patches/openssh/0004-ohos-auth.patch"
-  end
-
-  # Allow sshd to run on OHOS: skip chdir("/"), skip setgroups, daemon(1,0)
-  patch do
-    file "Patches/openssh/0005-ohos-sshd.patch"
-  end
-
-  # Session environment handling for OHOS sandbox
-  patch do
-    file "Patches/openssh/0006-ohos-session.patch"
-  end
-
-  # Misc compat: tmp dirs, setresgid, shadow pw, scp, platform
-  patch do
-    file "Patches/openssh/0007-ohos-compat.patch"
-  end
-
-  # Use rename() instead of link() where hardlinks not supported
-  patch do
-    file "Patches/openssh/0008-ohos-link.patch"
-  end
-
-  # Relaxed permission checks and default port 8022
-  patch do
-    file "Patches/openssh/0009-ohos-config.patch"
+    file "Patches/openssh/0004-ohos-compat.patch"
   end
 
   def install

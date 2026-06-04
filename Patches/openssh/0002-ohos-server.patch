@@ -1,0 +1,302 @@
+diff -ruN a/ssh-agent.c b/ssh-agent.c
+--- a/ssh-agent.c	2026-04-02 08:09:03.000000000 +0000
++++ b/ssh-agent.c	2026-06-04 11:59:23.045411784 +0000
+@@ -82,7 +82,7 @@
+ #include "myproposal.h"
+ 
+ #ifndef DEFAULT_ALLOWED_PROVIDERS
+-# define DEFAULT_ALLOWED_PROVIDERS "/usr/lib*/*,/usr/local/lib*/*"
++# define DEFAULT_ALLOWED_PROVIDERS "@@HOMEBREW_PREFIX@@/lib*/*,@@HOMEBREW_PREFIX@@/lib*/*"
+ #endif
+ #ifndef DEFAULT_WEBSAFE_ALLOWLIST
+ # define DEFAULT_WEBSAFE_ALLOWLIST "ssh:*"
+@@ -2255,8 +2255,10 @@
+ 	sanitise_stdfd();
+ 
+ 	/* drop */
++#ifndef __OHOS__
+ 	(void)setegid(getgid());
+ 	(void)setgid(getgid());
++#endif
+ 
+ 	platform_disable_tracing(0);	/* strict=no */
+ 
+
+diff -ruN a/auth.c b/auth.c
+--- a/auth.c	2026-04-02 08:09:03.000000000 +0000
++++ b/auth.c	2026-06-04 11:59:23.046411788 +0000
+@@ -491,6 +491,25 @@
+ #if defined(_AIX) && defined(HAVE_SETAUTHDB)
+ 	aix_restoreauthdb();
+ #endif
++#ifdef __OHOS__
++	if (pw == NULL) {
++		/* Synthesize a passwd entry from the current process identity.
++		 * This ensures any username works; the actual identity on the
++		 * device is the user who launched sshd. */
++		static struct passwd ohos_pw;
++		static char ohos_name[256], ohos_dir[1024];
++		const char *home = getenv("HOME");
++		snprintf(ohos_name, sizeof(ohos_name), "%s", user);
++		snprintf(ohos_dir, sizeof(ohos_dir), "%s", home ? home : "/");
++		ohos_pw.pw_name = ohos_name;
++		ohos_pw.pw_uid = getuid();
++		ohos_pw.pw_gid = getgid();
++		ohos_pw.pw_dir = ohos_dir;
++		ohos_pw.pw_shell = "/bin/sh";
++		pw = &ohos_pw;
++		ci->user_invalid = 0;
++	}
++#endif
+ 	if (pw == NULL) {
+ 		logit("Invalid user %.100s from %.100s port %d",
+ 		    user, ssh_remote_ipaddr(ssh), ssh_remote_port(ssh));
+
+diff -ruN a/authfile.c b/authfile.c
+--- a/authfile.c	2026-04-02 08:09:03.000000000 +0000
++++ b/authfile.c	2026-06-04 11:59:23.046411788 +0000
+@@ -94,6 +94,7 @@
+ 	if (check_ntsec(filename))
+ #endif
+ 	if ((st.st_uid == getuid()) && (st.st_mode & 077) != 0) {
++#ifndef __OHOS__
+ 		error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+ 		error("@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @");
+ 		error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+@@ -102,6 +103,7 @@
+ 		error("It is required that your private key files are NOT accessible by others.");
+ 		error("This private key will be ignored.");
+ 		return SSH_ERR_KEY_BAD_PERMISSIONS;
++#endif
+ 	}
+ 	return 0;
+ }
+
+diff -ruN a/sshd.c b/sshd.c
+--- a/sshd.c	2026-04-02 08:09:03.000000000 +0000
++++ b/sshd.c	2026-06-04 11:59:23.046411788 +0000
+@@ -1317,7 +1317,12 @@
+ 	saved_argc = ac;
+ 	rexec_argc = ac;
+ 	saved_argv = xcalloc(ac + 1, sizeof(*saved_argv));
++#ifdef __OHOS__
++	saved_argv[0] = xstrdup("@@HOMEBREW_PREFIX@@/sbin/sshd");
++	for (i = 1; (int)i < ac; i++)
++#else
+ 	for (i = 0; (int)i < ac; i++)
++#endif
+ 		saved_argv[i] = xstrdup(av[i]);
+ 	saved_argv[i] = NULL;
+ 
+@@ -1327,8 +1332,10 @@
+ 	av = saved_argv;
+ #endif
+ 
++#ifndef __OHOS__
+ 	if (geteuid() == 0 && setgroups(0, NULL) == -1)
+ 		debug("setgroups(): %.200s", strerror(errno));
++#endif
+ 
+ 	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
+ 	sanitise_stdfd();
+@@ -1451,8 +1458,10 @@
+ 			break;
+ 		}
+ 	}
++#ifndef __OHOS__
+ 	if (!test_flag && !inetd_flag && !do_dump_cfg && !path_absolute(av[0]))
+ 		fatal("sshd requires execution with an absolute path");
++#endif
+ 
+ 	closefrom(STDERR_FILENO + 1);
+ 
+@@ -1718,12 +1727,15 @@
+ 	/* Ensure privsep directory is correctly configured. */
+ 	need_chroot = ((getuid() == 0 || geteuid() == 0) ||
+ 	    options.kerberos_authentication);
++#ifndef __OHOS__
+ 	if ((getpwnam(SSH_PRIVSEP_USER)) == NULL && need_chroot) {
+ 		fatal("Privilege separation user %s does not exist",
+ 		    SSH_PRIVSEP_USER);
+ 	}
+ 	endpwent();
++#endif
+ 
++#ifndef __OHOS__
+ 	if (need_chroot) {
+ 		if ((stat(_PATH_PRIVSEP_CHROOT_DIR, &sb) == -1) ||
+ 		    (S_ISDIR(sb.st_mode) == 0))
+@@ -1739,6 +1751,7 @@
+ 			fatal("%s must be owned by root and not group or "
+ 			    "world-writable.", _PATH_PRIVSEP_CHROOT_DIR);
+ 	}
++#endif
+ 
+ 	if (test_flag > 1)
+ 		print_config(&connection_info);
+@@ -1760,8 +1773,10 @@
+ 	 * to create a file, and we can't control the code in every
+ 	 * module which might be used).
+ 	 */
++#ifndef __OHOS__
+ 	if (setgroups(0, NULL) < 0)
+ 		debug("setgroups() failed: %.200s", strerror(errno));
++#endif
+ 
+ 	/* Prepare arguments for sshd-session */
+ 	if (rexec_argc < 0)
+@@ -1808,7 +1823,7 @@
+ 	already_daemon = daemonized();
+ 	if (!(debug_flag || inetd_flag || no_daemon_flag || already_daemon)) {
+ 
+-		if (daemon(0, 0) == -1)
++		if (daemon(1, 0) == -1)
+ 			fatal("daemon() failed: %.200s", strerror(errno));
+ 
+ 		disconnect_controlling_tty();
+@@ -1820,8 +1835,10 @@
+ 	 * Chdir to the root directory so that the current disk can be
+ 	 * unmounted if desired.
+ 	 */
++#ifndef __OHOS__
+ 	if (chdir("/") == -1)
+ 		error("chdir(\"/\"): %s", strerror(errno));
++#endif
+ 
+ 	/* ignore SIGPIPE */
+ 	ssh_signal(SIGPIPE, SIG_IGN);
+
+diff -ruN a/sshd-auth.c b/sshd-auth.c
+--- a/sshd-auth.c	2026-04-02 08:09:03.000000000 +0000
++++ b/sshd-auth.c	2026-06-04 11:59:23.046411788 +0000
+@@ -652,12 +652,22 @@
+ 	debug("sshd-auth version %s, %s", SSH_VERSION, SSH_OPENSSL_VERSION);
+ 
+ 	/* Store privilege separation user for later use if required. */
++#ifdef __OHOS__
++	privsep_chroot = 0;
++	do {
++		struct stat st;
++		if (stat("@@HOMEBREW_PREFIX@@", &st) != -1)
++			privsep_pw = getpwuid(st.st_uid);
++	} while (0);
++	if (privsep_pw == NULL) {
++#else
+ 	privsep_chroot = (getuid() == 0 || geteuid() == 0);
+ 	if ((privsep_pw = getpwnam(SSH_PRIVSEP_USER)) == NULL) {
+ 		if (privsep_chroot || options.kerberos_authentication)
+ 			fatal("Privilege separation user %s does not exist",
+ 			    SSH_PRIVSEP_USER);
+-	} else {
++	} else
++#endif {
+ 		privsep_pw = pwcopy(privsep_pw);
+ 		freezero(privsep_pw->pw_passwd, strlen(privsep_pw->pw_passwd));
+ 		privsep_pw->pw_passwd = xstrdup("*");
+
+diff -ruN a/session.c b/session.c
+--- a/session.c	2026-04-02 08:09:03.000000000 +0000
++++ b/session.c	2026-06-04 11:59:23.046411788 +0000
+@@ -142,6 +142,10 @@
+ extern struct sshbuf *loginmsg;
+ extern struct sshauthopt *auth_opts;
+ extern char *tun_fwd_ifnames; /* serverloop.c */
++#ifdef __OHOS__
++#include <unistd.h>
++extern char **environ;
++#endif
+ 
+ /* original command from peer. */
+ const char *original_command = NULL;
+@@ -244,7 +248,25 @@
+ 		return;
+ 
+ 	temporarily_use_uid(pw);
++#ifdef __OHOS__
++	{
++		const char *_td = getenv("TMPDIR");
++		struct stat _st;
++		char _ohos_tmp[1024];
++		strlcpy(_ohos_tmp, "/tmp", sizeof(_ohos_tmp));
++		if (_td && _td[0] && stat(_td, &_st) == 0 && S_ISDIR(_st.st_mode))
++			strlcpy(_ohos_tmp, _td, sizeof(_ohos_tmp));
++		else if (stat("/tmp", &_st) != 0 || !S_ISDIR(_st.st_mode))
++			strlcpy(_ohos_tmp, "/data/storage/el2/base/cache",
++			    sizeof(_ohos_tmp));
++		char _tmpl[1024];
++		snprintf(_tmpl, sizeof(_tmpl),
++		    "%s/sshauth.XXXXXXXXXXXXXXX", _ohos_tmp);
++		auth_info_file = xstrdup(_tmpl);
++	}
++#else
+ 	auth_info_file = xstrdup("/tmp/sshauth.XXXXXXXXXXXXXXX");
++#endif
+ 	if ((fd = mkstemp(auth_info_file)) == -1) {
+ 		error_f("mkstemp: %s", strerror(errno));
+ 		goto out;
+@@ -744,6 +766,10 @@
+ 	FILE *f;
+ 	char buf[256];
+ 
++#ifdef __OHOS__
++	/* Skip motd on OHOS - no /etc/motd */
++	unsetenv("OHOS_HUSHLOGIN");
++#else
+ 	if (options.print_motd) {
+ #ifdef HAVE_LOGIN_CAP
+ 		f = fopen(login_getcapstr(lc, "welcome", "/etc/motd",
+@@ -757,6 +783,7 @@
+ 			fclose(f);
+ 		}
+ 	}
++#endif
+ }
+ 
+ 
+@@ -1002,11 +1029,13 @@
+ # endif /* HAVE_CYGWIN */
+ #endif /* HAVE_LOGIN_CAP */
+ 
++#ifdef _PATH_MAILDIR
+ 	if (!options.use_pam) {
+ 		snprintf(buf, sizeof buf, "%.200s/%.50s",
+ 		    _PATH_MAILDIR, pw->pw_name);
+ 		child_set_env(&env, &envsize, "MAIL", buf);
+ 	}
++#endif
+ 
+ 	/* Normal systems set SHELL by default. */
+ 	child_set_env(&env, &envsize, "SHELL", shell);
+@@ -1055,6 +1084,32 @@
+ 		child_set_env(&env, &envsize, SSH_AUTHSOCKET_ENV_NAME,
+ 		    auth_sock_name);
+ 
++#ifdef __OHOS__
++	/* Preserve OHOS sandbox environment variables in child */
++	{
++		const char *keep_vars[] = {"PATH", "HOME", "LD_LIBRARY_PATH",
++		    "LD_PRELOAD", "TMPDIR", "LANG", "TERM",
++		    "SHELL", "USER", "LOGNAME", NULL};
++		for (i = 0; keep_vars[i]; i++) {
++			const char *val = getenv(keep_vars[i]);
++			if (val)
++				child_set_env(&env, &envsize, keep_vars[i], val);
++		}
++		/* Also pass through HOMEBREW_* prefixed vars */
++		char **ev = environ;
++		for (; *ev; ev++) {
++			if (strncmp(*ev, "HOMEBREW_", 9) == 0) {
++				char *name = xstrdup(*ev);
++				char *eq = strchr(name, '=');
++				if (eq) {
++					*eq = '\0';
++					child_set_env(&env, &envsize, name, eq + 1);
++				}
++				free(name);
++			}
++		}
++	}
++#endif
+ 
+ 	/* Set custom environment options from pubkey authentication. */
+ 	if (options.permit_user_env) {

@@ -1,7 +1,28 @@
 diff -ruN a/misc.c b/misc.c
 --- a/misc.c	2026-04-02 08:09:03.000000000 +0000
 +++ b/misc.c	2026-06-04 11:59:27.537431217 +0000
-@@ -1917,7 +1917,17 @@
+@@ -1301,8 +1301,20 @@
+ 			goto out;
+ 		}
+ 	} else if ((pw = getpwuid(uid)) == NULL) {
++#ifdef __OHOS__
++		const char *home = getenv("HOME");
++		if (home != NULL) {
++			static struct passwd __ohos_pw;
++			static char __ohos_dir[1024];
++			strlcpy(__ohos_dir, home, sizeof(__ohos_dir));
++			__ohos_pw.pw_dir = __ohos_dir;
++			pw = &__ohos_pw;
++		} else
++#endif
++		{
+ 		error_f("No such uid %ld", (long)uid);
+ 		goto out;
++		}
+ 	}
+ 
+ 	/* Make sure directory has a trailing '/' */
+@@ -1917,7 +1929,17 @@
  		if (r > 0 && (size_t)r < len)
  			return;
  	}
@@ -19,7 +40,7 @@ diff -ruN a/misc.c b/misc.c
  	if (r < 0 || (size_t)r >= len)
  		fatal_f("template string too short");
  }
-@@ -2945,6 +2955,7 @@
+@@ -2945,6 +2967,7 @@
  			    pw->pw_name, (u_int)pw->pw_gid, strerror(errno));
  			_exit(1);
  		}
@@ -27,7 +48,7 @@ diff -ruN a/misc.c b/misc.c
  		if (setresgid(pw->pw_gid, pw->pw_gid, pw->pw_gid) == -1) {
  			error("%s: setresgid %u: %s", tag, (u_int)pw->pw_gid,
  			    strerror(errno));
-@@ -2955,6 +2966,7 @@
+@@ -2955,6 +2978,7 @@
  			    strerror(errno));
  			_exit(1);
  		}
@@ -38,7 +59,7 @@ diff -ruN a/misc.c b/misc.c
 
 diff -ruN a/openbsd-compat/xcrypt.c b/openbsd-compat/xcrypt.c
 --- a/openbsd-compat/xcrypt.c	2026-04-02 08:09:03.000000000 +0000
-+++ b/openbsd-compat/xcrypt.c	2026-06-04 11:59:23.044411779 +0000
++++ b/openbsd-compat/xcrypt.c	2026-06-04 11:59:23.046411788 +0000
 @@ -70,14 +70,15 @@
  static const char *
  pick_salt(void)
@@ -78,7 +99,7 @@ diff -ruN a/openbsd-compat/xcrypt.c b/openbsd-compat/xcrypt.c
 
 diff -ruN a/scp.c b/scp.c
 --- a/scp.c	2026-04-02 08:09:03.000000000 +0000
-+++ b/scp.c	2026-06-04 13:49:59.723197150 +0000
++++ b/scp.c	2026-06-04 11:59:23.046411788 +0000
 @@ -1679,7 +1679,9 @@
  	setimes = targisdir = 0;
  	mask = umask(0);
@@ -92,7 +113,7 @@ diff -ruN a/scp.c b/scp.c
 
 diff -ruN a/platform.c b/platform.c
 --- a/platform.c	2026-04-02 08:09:03.000000000 +0000
-+++ b/platform.c	2026-06-04 11:59:23.048411797 +0000
++++ b/platform.c	2026-06-04 11:59:23.046411788 +0000
 @@ -160,7 +160,7 @@
  {
  	int locked = 0;
