@@ -169,7 +169,7 @@ diff -ruN a/sshd.c b/sshd.c
 diff -ruN a/sshd-auth.c b/sshd-auth.c
 --- a/sshd-auth.c	2026-04-02 08:09:03.000000000 +0000
 +++ b/sshd-auth.c	2026-06-04 11:59:23.046411788 +0000
-@@ -652,12 +652,22 @@
+@@ -652,12 +652,35 @@
  	debug("sshd-auth version %s, %s", SSH_VERSION, SSH_OPENSSL_VERSION);
  
  	/* Store privilege separation user for later use if required. */
@@ -181,6 +181,18 @@ diff -ruN a/sshd-auth.c b/sshd-auth.c
 +			privsep_pw = getpwuid(st.st_uid);
 +	} while (0);
 +	if (privsep_pw == NULL) {
++		static struct passwd ohos_privsep_pw;
++		static char ohos_name[32], ohos_home[1024];
++		const char *home = getenv("HOME");
++		snprintf(ohos_name, sizeof(ohos_name), "privsep");
++		snprintf(ohos_home, sizeof(ohos_home), "%s", home ? home : "/");
++		ohos_privsep_pw.pw_name = ohos_name;
++		ohos_privsep_pw.pw_uid = getuid();
++		ohos_privsep_pw.pw_gid = getgid();
++		ohos_privsep_pw.pw_dir = ohos_home;
++		ohos_privsep_pw.pw_shell = "/bin/sh";
++		privsep_pw = &ohos_privsep_pw;
++	}
 +#else
  	privsep_chroot = (getuid() == 0 || geteuid() == 0);
  	if ((privsep_pw = getpwnam(SSH_PRIVSEP_USER)) == NULL) {
@@ -189,7 +201,8 @@ diff -ruN a/sshd-auth.c b/sshd-auth.c
  			    SSH_PRIVSEP_USER);
 -	} else {
 +	} else
-+#endif {
++#endif
++	{
  		privsep_pw = pwcopy(privsep_pw);
  		freezero(privsep_pw->pw_passwd, strlen(privsep_pw->pw_passwd));
  		privsep_pw->pw_passwd = xstrdup("*");
