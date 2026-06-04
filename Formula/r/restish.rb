@@ -1,8 +1,8 @@
 class Restish < Formula
   desc "CLI tool for interacting with REST-ish HTTP APIs"
   homepage "https://rest.sh/"
-  url "https://github.com/rest-sh/restish/archive/refs/tags/v2.1.1.tar.gz"
-  sha256 "28bb590d518c17ff51f6c07ad3cbbd417fb22a2cdbe122052f16b95cac652121"
+  url "https://github.com/rest-sh/restish/archive/refs/tags/v2.1.2.tar.gz"
+  sha256 "56234eb8442c2badacda10ebfe24fcac7a07e0125b7f741321f3004bd25bb52d"
   license "MIT"
   head "https://github.com/rest-sh/restish.git", branch: "main"
 
