@@ -18,12 +18,7 @@ class Subversion < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "5e038b0cc26af690210dccba99843496bbfec1aeb880c4dd4e9d46f4d2a730a7"
-    sha256 arm64_sequoia: "6b7e822daf9fa486cd647077813e476c261cd86fb444e27ef750377ffb7748c7"
-    sha256 arm64_sonoma:  "cf34643fbdd5481f92294d8a4a4d90618f87972ab1994e966c4081e0d7e9b4bc"
-    sha256 sonoma:        "6d063196b675e9b5c514d1425061c798cfe78bea4f0a5704e44e4d9302e692c8"
-    sha256 arm64_linux:   "b949a958992ca6cdd90fd3c0540f0cff78f52e459b8b73abab8210f39f85e9ea"
-    sha256 x86_64_linux:  "c3dfdd9e92e870c396b53d2bdf3f410b4b5369386e467186e4b4fa86214ea02d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "384be8ba5c1f9fd5fdf0b597625dbbb0a54ffc4855c1524916260eea38e17017"
   end
 
   head do
