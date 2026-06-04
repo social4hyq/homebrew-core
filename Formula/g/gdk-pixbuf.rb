@@ -7,12 +7,7 @@ class GdkPixbuf < Formula
   compatibility_version 1
 
   bottle do
-    sha256 arm64_tahoe:   "023b480ec88e40ba0b7879663177a7baaa009d93853cf74b313ce1029f8e7c5b"
-    sha256 arm64_sequoia: "eed711bc1bc0a308e57ddcdcb0c5ab3e40cd03d47ecf82f344b508e1f4317475"
-    sha256 arm64_sonoma:  "f05616e33ac2730638a5e31d6f2835b05b17b08d94feabf773e8c3a92322016a"
-    sha256 sonoma:        "af601b57fead60ddd3d08af5025d41876d37d6f1cf9348bd79e03611b6d56ff7"
-    sha256 arm64_linux:   "2cf25e29b84262b52aa087c5ea8d8f113160e1ed107f50410203cd4d3244e7aa"
-    sha256 x86_64_linux:  "de021570fbdc6b613d5d620620f8ca735371d7fd5f442fbb127eb2e0331a56df"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "742b2824f33a246b86baaa307f3650a2dc5246ee428b04e0896b4e2b978f54c0"
   end
 
   depends_on "docutils" => :build # for rst2man
