@@ -15,12 +15,7 @@ class Librsvg < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "689a9ba31e5a1be9eed4212ebe6b373c509c65b25a5bd14422fcee6f07927885"
-    sha256 cellar: :any, arm64_sequoia: "89f02ea7f6ace3e6be469dcb31a8f8e68a00968bac9e11300c7e0a516864db50"
-    sha256 cellar: :any, arm64_sonoma:  "09a49f5812b52ce6bb66969a94fe537c260bd9dddb1fcde9bb11b0c2228181dd"
-    sha256 cellar: :any, sonoma:        "890998c76137bb50f2cd5c1861fee60a51b78470c86bebc2efb61842e1b339e3"
-    sha256               arm64_linux:   "eca904b40ce29d810887f19ce25801af0057de6e485a56a905b3a059d164421d"
-    sha256               x86_64_linux:  "3a93861fcdf5d79aac42dceed8109fa7927a34ca6836204fd472b14e21796c72"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "feef457aafd2921cefe3617bd0078c44cdf11050c69845fdcfe3dc3d137c6e2c"
   end
 
   depends_on "cargo-c" => :build
