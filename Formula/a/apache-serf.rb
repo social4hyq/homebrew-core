@@ -17,12 +17,7 @@ class ApacheSerf < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "cafe248c972f4b6f4ed05745e4e4a9950a7469e6216b27b6cb6f29c99ecdf0bd"
-    sha256 cellar: :any, arm64_sequoia: "f5d4fc56a03390c1689d731f7e73eecd41215d4a884cebe73afbdd74723810c1"
-    sha256 cellar: :any, arm64_sonoma:  "9eae42200cb24ed6dad84b19a8394d9cb1aa5d1d65ccdffd919c432b47f07dbe"
-    sha256 cellar: :any, sonoma:        "eba08705a3beea2a24b1ef71f67269d0890a611fe066131b8c48b88759592489"
-    sha256               arm64_linux:   "4265ddae6471dda76a024ad50592a4871c52594e8f8e215b1f28201b22465b39"
-    sha256               x86_64_linux:  "0bf90799a933a7d5aa306b5263bdf96e842375bb2fb777363399ed351c24ee19"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1147d6151520279c53fd9fac45f308c9c28e47ab6feb96aba333c7b9eaddc361"
   end
 
   depends_on "scons" => :build
