@@ -15,7 +15,8 @@ class Ghc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf67450b7300e08a9ce3be6fc905c4c5c25067b4b902f831ba622426620bc8e1"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ffc4393c16d1f670aea9709755187972665b94c4cd4faaf35fe7b7c2c5e9c43"
   end
 
   depends_on "autoconf" => :build
@@ -148,6 +149,79 @@ class Ghc < Formula
     ghc_libdir = build.head? ? lib.glob("ghc-*").first : lib/"ghc-#{version}"
     (ghc_libdir/"lib/package.conf.d/package.cache").unlink
     (ghc_libdir/"lib/package.conf.d/package.cache.lock").unlink
+
+    # OpenHarmony musl uses namespace isolation: when GHC's dynamic linker
+    # dlopen()s a Haskell-compiled .so at compile time (e.g. for Template
+    # Haskell or cross-module optimization), the newly loaded library cannot
+    # find RTS symbols (like stg_gc_unbx_r1) from the already-loaded
+    # libHSrts.so because musl does NOT share symbols across library
+    # boundaries by default.
+    #
+    # The fix is to set DF_1_GLOBAL in DT_FLAGS_1 on every libHSrts*.so,
+    # which tells the musl dynamic linker to place their symbols in the
+    # global symbol namespace, making them visible to subsequently
+    # dlopen()'d libraries. Without this, building any non-trivial Haskell
+    # package (e.g. directory-ospath-streaming via cabal-install) fails with
+    # "Error relocating ... stg_gc_unbx_r1: symbol not found".
+    rts_script = buildpath/"elf_patch_rts_global.py"
+    rts_script.write <<~PYTHON
+      import struct, sys
+
+      def patch_elf(so_path):
+          with open(so_path, "r+b") as f:
+              data = bytearray(f.read())
+
+              # 64-bit ELF only
+              if data[4] != 2:
+                  return False
+
+              shoff = struct.unpack_from("<Q", data, 0x28)[0]
+              shentsize = struct.unpack_from("<H", data, 0x3A)[0]
+              shnum = struct.unpack_from("<H", data, 0x3C)[0]
+              shstrndx = struct.unpack_from("<H", data, 0x3E)[0]
+
+              shstrtab_off = shoff + shstrndx * shentsize
+              shstrtab_sh_offset = struct.unpack_from("<Q", data, shstrtab_off + 0x18)[0]
+
+              for i in range(shnum):
+                  sh_off = shoff + i * shentsize
+                  sh_name = struct.unpack_from("<I", data, sh_off)[0]
+                  name = data[shstrtab_sh_offset + sh_name:].split(b"\\0")[0].decode()
+
+                  if name == ".dynamic":
+                      dyn_offset = struct.unpack_from("<Q", data, sh_off + 0x18)[0]
+                      dyn_size = struct.unpack_from("<Q", data, sh_off + 0x20)[0]
+                      n_entries = dyn_size // 16
+
+                      patched = False
+                      for j in range(n_entries):
+                          entry_off = dyn_offset + j * 16
+                          d_tag = struct.unpack_from("<q", data, entry_off)[0]
+                          if d_tag == 0x6ffffffb:  # DT_FLAGS_1
+                              d_val = struct.unpack_from("<Q", data, entry_off + 8)[0]
+                              d_val |= 0x2  # DF_1_GLOBAL
+                              struct.pack_into("<Q", data, entry_off + 8, d_val)
+                              patched = True
+                              break
+                      if patched:
+                          f.seek(0)
+                          f.truncate()
+                          f.write(data)
+                          return True
+                      break
+              return False
+
+      if __name__ == "__main__":
+          so_path = sys.argv[1]
+          ok = patch_elf(so_path)
+          sys.exit(0 if ok else 1)
+    PYTHON
+
+    rts_glob = "#{ghc_libdir}/lib/*/libHSrts*.so"
+    Pathname.glob(rts_glob).each do |so|
+      ohai "Adding DF_1_GLOBAL to #{so.basename}"
+      system "python3", rts_script.to_s, so.to_s
+    end
   end
 
   def post_install
