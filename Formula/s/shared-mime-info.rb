@@ -17,12 +17,7 @@ class SharedMimeInfo < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "fa674742c5c404fb7265f93a797e483c3ddec4a405180c467d73ffa3a4c2ad86"
-    sha256 cellar: :any, arm64_sequoia: "e67c7e8b3bb8386eaebdcaae85eae6a93b8ff0c0f5a710f80c114885edd8d784"
-    sha256 cellar: :any, arm64_sonoma:  "a3364bac447af0df2a587c1383b846f425fecd8ce465d804ddfda36ddb64dd94"
-    sha256 cellar: :any, sonoma:        "b5060956f4a630be979756cd6a331c223d6537951ee60d925f5e756ad15a1cdb"
-    sha256               arm64_linux:   "a1d39e8208f92717cee852ccc2f2fede36477a6e35bad0c95d2473989c789262"
-    sha256               x86_64_linux:  "fa1730cfb12535854fbbefeadec508fc4d066b8284b17ed3e89be9405ab8ddc2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa58ddde4d585cae44f5989f8a6ccaabc583e1e57df9b726ac2cee5b51df337d"
   end
 
   depends_on "gettext" => :build
