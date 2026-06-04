@@ -13,12 +13,7 @@ class Yq < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d17c2839ee1777042fee74ea12ae4b208ad185b7568736848056fca2c280ae10"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "d17c2839ee1777042fee74ea12ae4b208ad185b7568736848056fca2c280ae10"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d17c2839ee1777042fee74ea12ae4b208ad185b7568736848056fca2c280ae10"
-    sha256 cellar: :any_skip_relocation, sonoma:        "f286c6fe05ab3414f9698d81d59d36209980c63b3937e2e4e9437981e1fec8f7"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2fb220286c54f661e9779d91eff29f46055ff544995b8beffacd7e6486df5fb7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8c30770b766c4be4264aaab9e3d901451cb8465d6e34cd42480b3088446ea1dd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "affd534e7103592095b5101c0081f3564f4edaada5ef61ed687d0b2737d42d66"
   end
 
   depends_on "go" => :build
