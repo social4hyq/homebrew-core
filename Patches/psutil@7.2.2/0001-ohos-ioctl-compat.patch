@@ -1,0 +1,33 @@
+--- a/psutil/arch/linux/net.c.orig	2026-06-04 12:47:15.468000000 +0000
++++ b/psutil/arch/linux/net.c	2026-06-04 12:50:10.028000000 +0000
+@@ -7,6 +7,8 @@
+ #include <Python.h>
+ #include <linux/sockios.h>
+ #include <sys/socket.h>
++/* Prevent linux/socket.h from redefining sockaddr_storage on OHOS (uapi guard). */
++#define _UAPI_LINUX_SOCKET_H
+ #include <sys/ioctl.h>
+ #include <linux/if.h>
+ #include <linux/version.h>
+--- a/psutil/arch/posix/init.h.orig	2026-06-04 12:50:10.024000000 +0000
++++ b/psutil/arch/posix/init.h	2026-06-04 12:50:10.028000000 +0000
+@@ -14,7 +14,7 @@
+ #endif
+ 
+ // clang-format off
+-#if !defined(PSUTIL_OPENBSD) && !defined(PSUTIL_AIX)
++#if !defined(PSUTIL_OPENBSD) && !defined(PSUTIL_AIX) && !defined(__OHOS__)
+     #define PSUTIL_HAS_POSIX_USERS
+     PyObject *psutil_users(PyObject *self, PyObject *args);
+ #endif
+--- a/psutil/arch/posix/init.c.orig	2026-06-04 12:50:49.920000000 +0000
++++ b/psutil/arch/posix/init.c	2026-06-04 12:51:11.984000000 +0000
+@@ -57,7 +57,7 @@
+ #if defined(PSUTIL_BSD) || defined(PSUTIL_OSX)
+     {"net_if_duplex_speed", psutil_net_if_duplex_speed, METH_VARARGS},
+ #endif
+-#if !defined(PSUTIL_OPENBSD) && !defined(PSUTIL_AIX)
++#if !defined(PSUTIL_OPENBSD) && !defined(PSUTIL_AIX) && !defined(__OHOS__)
+     {"users", psutil_users, METH_VARARGS},
+ #endif
+ #if defined(PSUTIL_OSX) || defined(PSUTIL_BSD)
