@@ -11,12 +11,7 @@ class CargoC < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "20849665ff5f2ce89bbc748dc3447e36cd2c97ab108bd183a4d61ee4df105bcf"
-    sha256 cellar: :any, arm64_sequoia: "15702b52bf1c6da2d499ee4e8d810e8162a42b28b4db1a739768855eb1f2f71d"
-    sha256 cellar: :any, arm64_sonoma:  "ecfce6bb65a09f3c63522f04df8863487751a7be9f3ee775a6253195d31f4de4"
-    sha256 cellar: :any, sonoma:        "aec24a40b2fa4b967140285f0150e3e2df034815d4de83956d9b3a671b11f517"
-    sha256 cellar: :any, arm64_linux:   "9b1dd64c1e8f4821ab3ab454b5b11b75cedf84faab39ed3f3de3b8b720b17b2d"
-    sha256 cellar: :any, x86_64_linux:  "40de20bcf47149499b57456bd012b2b04d50c12fec4bc1625043b7b097810237"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b59d8ff1f5af9a6fec549f0e24f14b36e80279959fad98d6a64ea2c3828e600"
   end
 
   depends_on "pkgconf" => :build
