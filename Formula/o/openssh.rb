@@ -6,7 +6,7 @@ class Openssh < Formula
   version "10.3p1"
   sha256 "56682a36bb92dcf4b4f016fd8ec8e74059b79a8de25c15d670d731e7d18e45f4"
   license "SSH-OpenSSH"
-  revision 1
+  revision 2
   compatibility_version 1
 
   livecheck do
@@ -15,7 +15,7 @@ class Openssh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1aeed4e8a280d1117205244793b31f3bbbfca90de03661b3c1bfa8a602a66851"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "71a17e293e45090f4293de277dfff761c265e753e687322c4aa7b1205b7d8375"
   end
 
   depends_on "pkgconf" => :build
@@ -23,29 +23,18 @@ class Openssh < Formula
 
   uses_from_macos "mandoc" => :build
 
-  # Auto-detect OHOS (config.guess/sub) and replace hardcoded system paths
-  # (pathnames.h, defines.h) with HOMEBREW_PREFIX.
-  patch do
-    file "Patches/openssh/0001-ohos-build.patch"
-  end
-
-  # Server daemon: ssh-agent provider paths, auth passwd fallback, relaxed
-  # host key permissions, sshd runtime compat (skip setgroups/chdir,
-  # daemon(1,0)), sshd-auth privsep synthesis, session env handling.
-  patch do
-    file "Patches/openssh/0002-ohos-server.patch"
-  end
-
-  # Client tools: ssh/ssh-keygen passwd fallback, relaxed config permissions,
-  # default port 8022, rename-vs-link for OHOS.
-  patch do
-    file "Patches/openssh/0003-ohos-client.patch"
-  end
-
-  # Misc compat layer: tmp dir, setresgid, tilde_expand, shadow password,
-  # scp umask, platform setusercontext skip.
-  patch do
-    file "Patches/openssh/0004-ohos-compat.patch"
+  # Per-file patches for OHOS portability. Split so upstream version bumps
+  # only reject the affected file(s) instead of a multi-file mega-patch.
+  %w[
+    config.guess config.sub pathnames.h defines.h
+    auth.c authfile.c session.c ssh-agent.c sshd-auth.c sshd.c
+    ssh.c ssh-keygen.c readconf.c servconf.c hostfile.c mux.c
+    misc.c openbsd-compat_xcrypt.c scp.c platform.c
+    cipher.c myproposal.h
+  ].each do |p|
+    patch do
+      file "Patches/openssh/#{p}.patch"
+    end
   end
 
   def install
@@ -120,8 +109,16 @@ class Openssh < Formula
 
     # Fix paths in sshd_config if needed (replaces Cellar-prefix with opt-prefix)
     sshd_config = etc/"ssh/sshd_config"
-    if sshd_config.exist? && File.read(sshd_config).include?(prefix.to_s)
-      inreplace sshd_config, prefix, opt_prefix
+    if sshd_config.exist?
+      # Fix Cellar paths → opt paths
+      inreplace sshd_config, prefix, opt_prefix if File.read(sshd_config).include?(prefix.to_s)
+      # OHOS sandbox: home directory ownership belongs to sandbox infra, not the app user.
+      # OpenSSH's StrictModes refuses group-writable dirs. Disable it.
+      inreplace sshd_config, /^#?StrictModes yes$/, "StrictModes no"
+      # OHOS: no PAM, disable password auth (publickey only)
+      inreplace sshd_config, /^#?PasswordAuthentication yes$/, "PasswordAuthentication no"
+      # OHOS: default port changed from 22 to 8022 (non-privileged)
+      inreplace sshd_config, /^#?Port 22$/, "Port 8022"
     end
   end
 

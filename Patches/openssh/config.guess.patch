@@ -1,0 +1,12 @@
+--- a/config.guess
++++ b/config.guess
+@@ -162,6 +162,8 @@
+ 	LIBC=dietlibc
+ 	#elif defined(__GLIBC__)
+ 	LIBC=gnu
++	#elif defined(__OHOS__)
++	LIBC=ohos
+ 	#else
+ 	#include <stdarg.h>
+ 	/* First heuristic to detect musl libc.  */
+

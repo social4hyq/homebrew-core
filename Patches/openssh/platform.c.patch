@@ -1,0 +1,12 @@
+--- a/platform.c
++++ b/platform.c
+@@ -160,7 +160,7 @@
+ {
+ 	int locked = 0;
+ 	char *passwd = pw->pw_passwd;
+-#ifdef USE_SHADOW
++#if defined(USE_SHADOW) && !defined(__OHOS__)
+ 	struct spwd *spw = NULL;
+ #ifdef USE_LIBIAF
+ 	char *iaf_passwd = NULL;
+

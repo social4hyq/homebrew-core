@@ -1,0 +1,30 @@
+--- a/pathnames.h
++++ b/pathnames.h
+@@ -126,7 +126,7 @@
+  * ~/.rhosts and /etc/hosts.equiv if rhosts authentication is enabled.
+  */
+ #define _PATH_SSH_HOSTS_EQUIV		SSHDIR "/shosts.equiv"
+-#define _PATH_RHOSTS_EQUIV		"/etc/hosts.equiv"
++#define _PATH_RHOSTS_EQUIV		"@@HOMEBREW_PREFIX@@/etc/hosts.equiv"
+ 
+ /*
+  * Default location of askpass
+@@ -152,7 +152,7 @@
+ 
+ /* xauth for X11 forwarding */
+ #ifndef _PATH_XAUTH
+-#define _PATH_XAUTH			"/usr/X11R6/bin/xauth"
++#define _PATH_XAUTH			"@@HOMEBREW_PREFIX@@/bin/xauth"
+ #endif
+ 
+ /* UNIX domain socket for X11 server; displaynum will replace %u */
+@@ -180,7 +180,7 @@
+ 
+ /* for passwd change */
+ #ifndef _PATH_PASSWD_PROG
+-#define _PATH_PASSWD_PROG		"/usr/bin/passwd"
++#define _PATH_PASSWD_PROG		"@@HOMEBREW_PREFIX@@/bin/passwd"
+ #endif
+ 
+ /* Askpass program define */
+

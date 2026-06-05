@@ -1,0 +1,13 @@
+--- a/scp.c
++++ b/scp.c
+@@ -1679,7 +1679,9 @@
+ 	setimes = targisdir = 0;
+ 	mask = umask(0);
+ 	if (!pflag) {
++#ifndef __OHOS__
+ 		mask |= 07000;
++#endif
+ 		(void) umask(mask);
+ 	}
+ 	if (argc != 1) {
+

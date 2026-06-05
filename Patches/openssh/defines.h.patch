@@ -1,0 +1,12 @@
+--- a/defines.h
++++ b/defines.h
+@@ -468,7 +468,7 @@
+ #endif
+ 
+ #ifndef _PATH_NOLOGIN
+-# define _PATH_NOLOGIN "/etc/nologin"
++# define _PATH_NOLOGIN "@@HOMEBREW_PREFIX@@/etc/nologin"
+ #endif
+ 
+ /* Define this to be the path of the xauth program. */
+

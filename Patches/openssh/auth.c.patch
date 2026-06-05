@@ -1,0 +1,29 @@
+--- a/auth.c
++++ b/auth.c
+@@ -491,6 +491,25 @@
+ #if defined(_AIX) && defined(HAVE_SETAUTHDB)
+ 	aix_restoreauthdb();
+ #endif
++#ifdef __OHOS__
++	if (pw == NULL) {
++		/* Synthesize a passwd entry from the current process identity.
++		 * This ensures any username works; the actual identity on the
++		 * device is the user who launched sshd. */
++		static struct passwd ohos_pw;
++		static char ohos_name[256], ohos_dir[1024];
++		const char *home = getenv("HOME");
++		snprintf(ohos_name, sizeof(ohos_name), "%s", user);
++		snprintf(ohos_dir, sizeof(ohos_dir), "%s", home ? home : "/");
++		ohos_pw.pw_name = ohos_name;
++		ohos_pw.pw_uid = getuid();
++		ohos_pw.pw_gid = getgid();
++		ohos_pw.pw_dir = ohos_dir;
++		ohos_pw.pw_shell = "/bin/sh";
++		pw = &ohos_pw;
++		ci->user_invalid = 0;
++	}
++#endif
+ 	if (pw == NULL) {
+ 		logit("Invalid user %.100s from %.100s port %d",
+ 		    user, ssh_remote_ipaddr(ssh), ssh_remote_port(ssh));
+

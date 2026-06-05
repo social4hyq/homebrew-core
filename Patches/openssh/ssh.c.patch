@@ -1,0 +1,26 @@
+--- a/ssh.c
++++ b/ssh.c
+@@ -681,6 +681,22 @@
+ 
+ 	/* Get user data. */
+ 	pw = getpwuid(getuid());
++#ifdef __OHOS__
++	if (!pw) {
++		static struct passwd ohos_pw;
++		static char ohos_name[256], ohos_dir[1024];
++		const char *home = getenv("HOME");
++		const char *user = getenv("USER");
++		snprintf(ohos_name, sizeof(ohos_name), "%s", user ? user : "ohos");
++		snprintf(ohos_dir, sizeof(ohos_dir), "%s", home ? home : "/");
++		ohos_pw.pw_name = ohos_name;
++		ohos_pw.pw_uid = getuid();
++		ohos_pw.pw_gid = getgid();
++		ohos_pw.pw_dir = ohos_dir;
++		ohos_pw.pw_shell = "/bin/sh";
++		pw = &ohos_pw;
++	}
++#endif
+ 	if (!pw) {
+ 		logit("No user exists for uid %lu", (u_long)getuid());
+ 		exit(255);
+
