@@ -11,8 +11,7 @@ class Bumpversion < Formula
   revision 1
 
   bottle do
-    rebuild 6
-    sha256 cellar: :any_skip_relocation, all: "166ec2e234ca2b7970dac12809f1eb9642c8647cd030169049b866c7d03f19ee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "13fc24d0f15a3ae440f3a9f72fda288dfc4b21a1da6a2fb25c2538d1d503d1fb"
   end
 
   # Original and fork are both unmaintained:
