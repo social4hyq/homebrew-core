@@ -15,7 +15,7 @@ class Cppcheck < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "65418dd040e9b47bd0a416466ebdf4eab6514455e3b7f9a89d5d34e0421dc0c8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4237e45aadc2ff7a66699b5a0d694d30db521c5937ac140a420bd2f33356d0ad"
   end
 
   depends_on "cmake" => :build
