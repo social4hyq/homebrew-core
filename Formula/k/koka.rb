@@ -14,12 +14,7 @@ class Koka < Formula
   end
 
   bottle do
-    sha256               arm64_tahoe:   "4bc9da87f0e44e511ab343cbffd2ea01efb8ac1dce27699af73c876ff93b4e20"
-    sha256               arm64_sequoia: "d22074509e328133eb5511a075aa8e82a926494055aeb991e09aa5625994cfdc"
-    sha256               arm64_sonoma:  "8adbebe724b806025453e8e8f782899a0b7565a0fdc25e87b8b307cf4634d446"
-    sha256 cellar: :any, sonoma:        "a281980d8135d79077dc98048e17ab6b0f197d1e10a09081c9f3af2a8b8096e2"
-    sha256               arm64_linux:   "1d6f4504698decff324a10b1b923a5af15a8a036625d0939bf312152ad5e1234"
-    sha256               x86_64_linux:  "f7fdbc40fa2ff2a9cc86a55a4c7fb3bc35ee8af4ef7d33f52785bda641eea15c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a584b35ce405dc8335f4e57cdb7421dac1c0c0b0c0bfb9cd13afec16b3e1ff7"
   end
 
   depends_on "cabal-install" => :build
