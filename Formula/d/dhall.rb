@@ -11,13 +11,7 @@ class Dhall < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "8d1cada694c3dfd625aeb86fa339784b3fcc62bf88b561cc845bfb74f36d6f33"
-    sha256 cellar: :any,                 arm64_sequoia: "3b7a347308cfa4b651651415e637778f07ae2b5f7a0d5d58d738e194d2c45500"
-    sha256 cellar: :any,                 arm64_sonoma:  "7e537b533bd61f3b7eaa8b0a9f21e934f887f2fbb2a7610e76a12ec25d5d795a"
-    sha256 cellar: :any,                 sonoma:        "1684b9448091971b87dc6e1764028f94f891a874056ebc72b24efdeac50eac01"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ae7bc8a7b099ffe0baf3d2c64be38d16b59eb193b9dde5dc593d4821a23d8229"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "a4988d54246a5d4db6d2419c51ff3ff53f48be865a35223d86a919a544fcb953"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "886ceab8aa1c76ce879d6cabd1d78f61680eafdad603e518ddc45c8ed998c421"
   end
 
   depends_on "cabal-install" => :build
