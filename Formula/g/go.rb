@@ -5,6 +5,7 @@ class Go < Formula
   mirror "https://fossies.org/linux/misc/go1.26.4.src.tar.gz"
   sha256 "4f668a32fbfc1132e6a881fb968c2f1dada631492a339211735fbb255a42602d"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 4
   head "https://go.googlesource.com/go.git", branch: "master"
 
@@ -26,6 +27,9 @@ class Go < Formula
   end
 
   depends_on macos: :monterey
+
+  # HarmonyOS: ohos-sdk provides binary-sign-tool for auto-signing ELF binaries.
+  depends_on "ohos-sdk"
 
   # Don't update this unless this version cannot bootstrap the new version.
   resource "gobootstrap" do
@@ -58,6 +62,30 @@ class Go < Formula
         sha256 checksums["linux-amd64"]
       end
     end
+  end
+
+  # ═══════════════════════════════════════════════════════════════════
+  # HarmonyOS patches
+  #
+  # Problem: On HarmonyOS PC, hmdfs does not support mmap(PROT_WRITE)
+  # causing linker failures. Also, compiled ELF binaries require code
+  # signing to execute (noexec filesystem).
+  #
+  #   0001: Default GOCACHE → /data/storage/el2/base/cache/go-build
+  #   0002: Default GOTMPDIR → /data/storage/el2/base/cache
+  #   0003: Auto-sign ELF binaries after linking
+  # ═══════════════════════════════════════════════════════════════════
+
+  patch do
+    file "Patches/go/0001-gocache-default.patch"
+  end
+
+  patch do
+    file "Patches/go/0002-gotmpdir-default.patch"
+  end
+
+  patch do
+    file "Patches/go/0003-auto-sign-elf.patch"
   end
 
   def install
