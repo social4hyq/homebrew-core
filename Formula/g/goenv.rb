@@ -1,8 +1,8 @@
 class Goenv < Formula
   desc "Go version management"
   homepage "https://github.com/go-nv/goenv"
-  url "https://github.com/go-nv/goenv/archive/refs/tags/3.1.2.tar.gz"
-  sha256 "9edafa9c0e5a2245c62caaa7bf7d7c3bb9291991f0ba55f60f3a724367c04ca0"
+  url "https://github.com/go-nv/goenv/archive/refs/tags/3.1.3.tar.gz"
+  sha256 "e5d0b0fa87076666b2504d643247fbe6e5f874baa776ea8589bd23b481fdeda7"
   license "MIT"
   version_scheme 1
   # TODO: Uncomment when default branch is changed from 'master' to 'main'
@@ -14,7 +14,7 @@ class Goenv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6e3b2c92d1303ab9614a450718436b35adb02145a2a78ca368a719ccf193fcd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d09ea6d155fb8c135a7260ae9a26377635bb25446db38c1bf1a983553897cf7"
   end
 
   depends_on "go" => :build
