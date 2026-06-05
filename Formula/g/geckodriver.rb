@@ -37,12 +37,7 @@ class Geckodriver < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "e4dfca2edf8a430c1123c63105cf0e3117ca50dd1ac8fe127c521de995f02c65"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7bead554258eff6b4d2524304cd35422cde072ac537d7dc4d8d5412c646767e3"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "45fdb06f70e8e63df4568c22de843f46598eebaa3c4534fdc40bda8c24729bbe"
-    sha256 cellar: :any_skip_relocation, sonoma:        "3de88177363533d56200918cb12f01dbdd355d19ce0358ce8790d961d58885fb"
-    sha256 cellar: :any,                 arm64_linux:   "4074b185fa69f7105513c1eb3a33be3b3138b5e76558c0e318e65b5e23839fec"
-    sha256 cellar: :any,                 x86_64_linux:  "fbe5f5a88f1a060ab4df8932bf2ff54861b212b501728d4de65f0725c0051047"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ead0f74b101ef08d75726dd836aaf4dc008e97faa911e04712ecc4e6946c6ef"
   end
 
   depends_on "rust" => :build
