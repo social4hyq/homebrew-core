@@ -12,12 +12,7 @@ class Miniz < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "1791349309645e97c91130d018596feb202fb4d11a29a43354816f1245e0eb62"
-    sha256 cellar: :any, arm64_sequoia: "afbe55b53018063951693652a50f2b2878721429ade040276c69262ad357e7fc"
-    sha256 cellar: :any, arm64_sonoma:  "eca5fe8bef62f5be332dc6b08daceae477f8bcc9bfbf755ee4eb513de6f66067"
-    sha256 cellar: :any, sonoma:        "4dffddf12309cef740dfbae0a262efe3ee6e1efbf29109f8725608917bb48e73"
-    sha256 cellar: :any, arm64_linux:   "c228f31cb97c7cdf9dd2f8393bd043598211bd9a0512792f65db01aa798b5f89"
-    sha256 cellar: :any, x86_64_linux:  "b53d792c91a7ccd32a153f202d9c309b7da7213a28e9804da5243038e8c54b0e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7120e7041b2cb06754b6c6067286cc7bd35addb73e990fd06c6482daba3308a"
   end
 
   depends_on "cmake" => :build
