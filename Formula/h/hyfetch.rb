@@ -3,17 +3,27 @@ class Hyfetch < Formula
 
   desc "Fast, highly customisable system info script with LGBTQ+ pride flags"
   homepage "https://github.com/hykilpikonna/hyfetch"
-  url "https://files.pythonhosted.org/packages/d5/c5/80c472f9c616e31853a796006c62ff22170e7dd2576c6d74bf3cab8fe845/hyfetch-2.0.5.tar.gz"
-  sha256 "3034f789f64ccbecef5d5fb0103c0b1287f50434a4cdacbc7accfdc6cf7e79ca"
+  url "https://files.pythonhosted.org/packages/69/a8/df23913bb5e6791f339ca477558e14d1a43a23ebe72336e80001e188179e/hyfetch-2.1.0.tar.gz"
+  sha256 "257eb5effcdd58bfaee9e7e6460e04c1fd5b5693385d6de1d32739085c44b4bf"
   license "MIT"
   head "https://github.com/hykilpikonna/hyfetch.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ae5a06786d720b97a23423b79ca636ed3ab47177c7ba512acd90b4b19a32431"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d677b57c4231d52e08e4a3c1cc6625f01d095bd56fa8d6c9665005e4094f35d"
   end
 
   depends_on "rust" => :build
   depends_on "python@3.14"
+
+  resource "prompt-toolkit" do
+    url "https://files.pythonhosted.org/packages/a1/96/06e01a7b38dce6fe1db213e061a4602dd6032a8a97ef6c1a862537732421/prompt_toolkit-3.0.52.tar.gz"
+    sha256 "28cde192929c8e7321de85de1ddbe736f1375148b02f2e17edd840042b1be855"
+  end
+
+  resource "wcwidth" do
+    url "https://files.pythonhosted.org/packages/2c/ee/afaf0f85a9a18fe47a67f1e4422ed6cf1fe642f0ae0a2f81166231303c52/wcwidth-0.7.0.tar.gz"
+    sha256 "90e3a7ea092341c44b99562e75d09e4d5160fe7a3974c6fb842a101a95e7eed0"
+  end
 
   def install
     # Install to `buildpath` first or else `virtualenv_install_with_resources` will overwrite it.
