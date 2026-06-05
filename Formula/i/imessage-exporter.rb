@@ -6,7 +6,7 @@ class ImessageExporter < Formula
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f958c70cff77b8c05bdfc78f9a1004cb4e925e68e95b906b9e2837b378bf552"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "403b390ea7ab314e344396999aab104f2481b147391884e389688523fc5e067b"
   end
 
   depends_on "rust" => :build
