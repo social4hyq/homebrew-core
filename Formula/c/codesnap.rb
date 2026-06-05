@@ -7,7 +7,7 @@ class Codesnap < Formula
   head "https://github.com/codesnap-rs/codesnap.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "69dbf88b98a2887b810b40c28dfb132dd1cee1295f8a67501509176b77fde565"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "228d1d05d3a16175e430336647ecfa9a99643383554af4810d6cafeb1bf11e1c"
   end
 
   depends_on "pkgconf" => :build
