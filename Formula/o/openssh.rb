@@ -6,7 +6,7 @@ class Openssh < Formula
   version "10.3p1"
   sha256 "56682a36bb92dcf4b4f016fd8ec8e74059b79a8de25c15d670d731e7d18e45f4"
   license "SSH-OpenSSH"
-  revision 3
+  revision 4
   compatibility_version 1
 
   livecheck do
@@ -15,7 +15,7 @@ class Openssh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fe01629dcb6e41a6d679ef11df0f036f7a28152d657a206aea8b0fa23d341a69"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c723d26248c6fb319cbd8d437c8bca98ce89a95b30a3074e3b4b602ba1865d12"
   end
 
   depends_on "pkgconf" => :build
@@ -33,6 +33,7 @@ class Openssh < Formula
     ssh.c ssh-keygen.c readconf.c servconf.c hostfile.c mux.c
     misc.c openbsd-compat_xcrypt.c scp.c platform.c
     cipher.c myproposal.h
+    loginrec.c
   ].each do |p|
     patch do
       file "Patches/openssh/#{p}.patch"
@@ -126,20 +127,23 @@ class Openssh < Formula
 
   def caveats
     <<~EOS
-      OpenSSH has been installed for OpenHarmony.
+      OpenSSH has been installed.
 
       To SSH from this device to other servers (ssh client):
         The ssh client works normally and supports password authentication.
 
       To allow other machines to SSH into this device (sshd server):
-        1. Start sshd:
-           #{HOMEBREW_PREFIX}/sbin/sshd -D -p 8022
+        1. Start sshd as a background daemon:
+           #{HOMEBREW_PREFIX}/sbin/sshd -p 8022
 
         2. Copy your client's public key into ~/.ssh/authorized_keys, for example:
            mkdir -p ~/.ssh && echo "ssh-ed25519 AAAA..." >> ~/.ssh/authorized_keys
 
         3. Connect from your client (any username works; use ohos as convention):
            ssh ohos@ohos-ip -p 8022
+
+        4. To stop sshd:
+           pkill sshd
 
       Your actual identity on the device is the user who launched sshd.
 
