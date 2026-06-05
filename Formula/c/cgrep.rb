@@ -7,12 +7,7 @@ class Cgrep < Formula
   head "https://github.com/awgn/cgrep.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "2121aff4aa6b64a0d2572441c258f462adbd5bbe950af077038397d4585ea71d"
-    sha256 cellar: :any,                 arm64_sequoia: "74fc6cbccf7d7537d1d2c263d451e90a701902940cddac7144cc9179a6df4d54"
-    sha256 cellar: :any,                 arm64_sonoma:  "454f895083187092030e61d915bdc956259438f81f2acddbdf9ebeef15c3b8c3"
-    sha256 cellar: :any,                 sonoma:        "aec1d36a206a6467cbae25f5270aee6c4465c7ed7a58d7b1905ab5f1cfbbc46e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "91f91c22162403e2f54a8db84af60afd62d9603cdaef6935241fb47659db2615"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b6850439dc85753748788cbfb76565b78266222b4063b93d50c2b300104ae72e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e5d5914b59516b10652efb3fa2f54a72e99a9b01025fbf46a94ee4cd3be63790"
   end
 
   depends_on "cabal-install" => :build
