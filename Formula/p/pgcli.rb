@@ -8,7 +8,7 @@ class Pgcli < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f9694708ebc9cc1c9d7ba6265199d1c985fbb30157e63d95413f7c7c3886442"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d2ad33176d4ec52e8112d754d5730af1ba5634f991b70975364fb4cf0080eaf"
   end
 
   depends_on "libpq"
