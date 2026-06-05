@@ -7,7 +7,7 @@ class Kubeconform < Formula
   head "https://github.com/yannh/kubeconform.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "864c6d64ee2b3d7971844f0ddfafe2cf7949934805d12fa3bd376c70a036b490"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "69bb9a32c2667ceedc6f243fbf8039ac1903b03fcb888651aaf6b3c9b18e654a"
   end
 
   depends_on "go" => :build
