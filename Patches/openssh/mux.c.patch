@@ -1,0 +1,33 @@
+--- a/mux.c
++++ b/mux.c
+@@ -1372,6 +1372,21 @@
+ 		}
+ 	}
+ 
++#ifdef __OHOS__
++	/* OHOS may not support hard links, use non-atomic rename */
++	if (access(orig_control_path, F_OK) == 0) {
++		error("ControlSocket %s already exists, disabling multiplexing",
++		    orig_control_path);
++		unlink(options.control_path);
++		goto disable_mux_master;
++	} else {
++		if (rename(options.control_path, orig_control_path) == -1) {
++			fatal_f("link mux listener %s => %s: %s",
++			    options.control_path, orig_control_path,
++			    strerror(errno));
++		}
++	}
++#else
+ 	/* Now atomically "move" the mux socket into position */
+ 	if (link(options.control_path, orig_control_path) != 0) {
+ 		if (errno != EEXIST) {
+@@ -1385,6 +1400,7 @@
+ 		goto disable_mux_master;
+ 	}
+ 	unlink(options.control_path);
++#endif
+ 	free(options.control_path);
+ 	options.control_path = orig_control_path;
+ 
+

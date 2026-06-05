@@ -1,0 +1,19 @@
+--- a/authfile.c
++++ b/authfile.c
+@@ -94,6 +94,7 @@
+ 	if (check_ntsec(filename))
+ #endif
+ 	if ((st.st_uid == getuid()) && (st.st_mode & 077) != 0) {
++#ifndef __OHOS__
+ 		error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+ 		error("@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @");
+ 		error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+@@ -102,6 +103,7 @@
+ 		error("It is required that your private key files are NOT accessible by others.");
+ 		error("This private key will be ignored.");
+ 		return SSH_ERR_KEY_BAD_PERMISSIONS;
++#endif
+ 	}
+ 	return 0;
+ }
+

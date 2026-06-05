@@ -1,0 +1,40 @@
+--- a/sshd-auth.c
++++ b/sshd-auth.c
+@@ -652,12 +652,35 @@
+ 	debug("sshd-auth version %s, %s", SSH_VERSION, SSH_OPENSSL_VERSION);
+ 
+ 	/* Store privilege separation user for later use if required. */
++#ifdef __OHOS__
++	privsep_chroot = 0;
++	do {
++		struct stat st;
++		if (stat("@@HOMEBREW_PREFIX@@", &st) != -1)
++			privsep_pw = getpwuid(st.st_uid);
++	} while (0);
++	if (privsep_pw == NULL) {
++		static struct passwd ohos_privsep_pw;
++		static char ohos_name[32], ohos_home[1024];
++		const char *home = getenv("HOME");
++		snprintf(ohos_name, sizeof(ohos_name), "privsep");
++		snprintf(ohos_home, sizeof(ohos_home), "%s", home ? home : "/");
++		ohos_privsep_pw.pw_name = ohos_name;
++		ohos_privsep_pw.pw_uid = getuid();
++		ohos_privsep_pw.pw_gid = getgid();
++		ohos_privsep_pw.pw_dir = ohos_home;
++		ohos_privsep_pw.pw_shell = "/bin/sh";
++		privsep_pw = &ohos_privsep_pw;
++	}
++#else
+ 	privsep_chroot = (getuid() == 0 || geteuid() == 0);
+ 	if ((privsep_pw = getpwnam(SSH_PRIVSEP_USER)) == NULL) {
+ 		if (privsep_chroot || options.kerberos_authentication)
+ 			fatal("Privilege separation user %s does not exist",
+ 			    SSH_PRIVSEP_USER);
+-	} else {
++	} else
++#endif
++	{
+ 		privsep_pw = pwcopy(privsep_pw);
+ 		freezero(privsep_pw->pw_passwd, strlen(privsep_pw->pw_passwd));
+ 		privsep_pw->pw_passwd = xstrdup("*");
+

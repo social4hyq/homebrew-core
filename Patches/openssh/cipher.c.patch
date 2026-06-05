@@ -1,0 +1,12 @@
+--- a/cipher.c
++++ b/cipher.c
+@@ -102,8 +102,6 @@
+ 	{ "aes192-ctr",		16, 24, 0, 0, CFLAG_AESCTR, NULL },
+ 	{ "aes256-ctr",		16, 32, 0, 0, CFLAG_AESCTR, NULL },
+ #endif
+-	{ "chacha20-poly1305@openssh.com",
+-				8, 64, 0, 16, CFLAG_CHACHAPOLY, NULL },
+ 	{ "none",		8, 0, 0, 0, CFLAG_NONE, NULL },
+ 
+ 	{ NULL,			0, 0, 0, 0, 0, NULL }
+

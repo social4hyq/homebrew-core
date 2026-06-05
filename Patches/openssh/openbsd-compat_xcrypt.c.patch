@@ -1,0 +1,39 @@
+--- a/openbsd-compat/xcrypt.c
++++ b/openbsd-compat/xcrypt.c
+@@ -70,14 +70,15 @@
+ static const char *
+ pick_salt(void)
+ {
+-	struct passwd *pw;
+-	char *passwd, *p;
+-	size_t typelen;
+ 	static char salt[32];
+ 
+ 	if (salt[0] != '\0')
+ 		return salt;
+ 	strlcpy(salt, "xx", sizeof(salt));
++#ifndef __OHOS__
++	struct passwd *pw;
++	char *passwd, *p;
++	size_t typelen;
+ 	setpwent();
+ 	while ((pw = getpwent()) != NULL) {
+ 		if ((passwd = shadow_pw(pw)) == NULL)
+@@ -91,6 +92,7 @@
+ 	}
+  out:
+ 	endpwent();
++#endif
+ 	return salt;
+ }
+ 
+@@ -130,7 +132,7 @@
+ {
+ 	char *pw_password = pw->pw_passwd;
+ 
+-# if defined(HAVE_SHADOW_H) && !defined(DISABLE_SHADOW)
++# if !defined(__OHOS__) && defined(HAVE_SHADOW_H) && !defined(DISABLE_SHADOW)
+ 	struct spwd *spw = getspnam(pw->pw_name);
+ 
+ 	if (spw != NULL)
+

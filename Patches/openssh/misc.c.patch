@@ -1,0 +1,58 @@
+--- a/misc.c
++++ b/misc.c
+@@ -1301,8 +1301,20 @@
+ 			goto out;
+ 		}
+ 	} else if ((pw = getpwuid(uid)) == NULL) {
++#ifdef __OHOS__
++		const char *home = getenv("HOME");
++		if (home != NULL) {
++			static struct passwd __ohos_pw;
++			static char __ohos_dir[1024];
++			strlcpy(__ohos_dir, home, sizeof(__ohos_dir));
++			__ohos_pw.pw_dir = __ohos_dir;
++			pw = &__ohos_pw;
++		} else
++#endif
++		{
+ 		error_f("No such uid %ld", (long)uid);
+ 		goto out;
++		}
+ 	}
+ 
+ 	/* Make sure directory has a trailing '/' */
+@@ -1917,7 +1929,17 @@
+ 		if (r > 0 && (size_t)r < len)
+ 			return;
+ 	}
++	#ifdef __OHOS__
++	{
++		struct stat _st;
++		const char *_fallback = "/tmp";
++		if (stat("/tmp", &_st) != 0 || !S_ISDIR(_st.st_mode))
++			_fallback = "/data/storage/el2/base/cache";
++		r = snprintf(s, len, "%s/ssh-XXXXXXXXXXXX", _fallback);
++	}
++#else
+ 	r = snprintf(s, len, "/tmp/ssh-XXXXXXXXXXXX");
++#endif
+ 	if (r < 0 || (size_t)r >= len)
+ 		fatal_f("template string too short");
+ }
+@@ -2945,6 +2967,7 @@
+ 			    pw->pw_name, (u_int)pw->pw_gid, strerror(errno));
+ 			_exit(1);
+ 		}
++#ifndef __OHOS__
+ 		if (setresgid(pw->pw_gid, pw->pw_gid, pw->pw_gid) == -1) {
+ 			error("%s: setresgid %u: %s", tag, (u_int)pw->pw_gid,
+ 			    strerror(errno));
+@@ -2955,6 +2978,7 @@
+ 			    strerror(errno));
+ 			_exit(1);
+ 		}
++#endif
+ 		/* stdin is pointed to /dev/null at this point */
+ 		if ((flags & SSH_SUBPROCESS_STDOUT_DISCARD) != 0 &&
+ 		    dup2(STDIN_FILENO, STDERR_FILENO) == -1) {
+
