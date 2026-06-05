@@ -1,8 +1,8 @@
 class Dnsmasq < Formula
   desc "Lightweight DNS forwarder and DHCP server"
   homepage "https://thekelleys.org.uk/dnsmasq/doc.html"
-  url "https://thekelleys.org.uk/dnsmasq/dnsmasq-2.92.tar.gz"
-  sha256 "fd908e79ff37f73234afcb6d3363f78353e768703d92abd8e3220ade6819b1e1"
+  url "https://thekelleys.org.uk/dnsmasq/dnsmasq-2.93.tar.gz"
+  sha256 "cc967771abdafeb43d10db18932d6b59fd4bed2c69c22acf8cb96aff6920d55f"
   license any_of: ["GPL-2.0-only", "GPL-3.0-only"]
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class Dnsmasq < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7a0841668a947494732c13d6306fdee28c9fcdc52ad6ff445d779d1e500a298"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3cc3ad1b2d50757950a4d4eb60185830ed0b974f31f592053dfa4aefeb70bbff"
   end
 
   depends_on "pkgconf" => :build
