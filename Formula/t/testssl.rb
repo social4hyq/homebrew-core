@@ -7,8 +7,7 @@ class Testssl < Formula
   head "https://github.com/testssl/testssl.sh.git", branch: "3.3dev"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "9e385c68f0225f517f2aac0a60f28a3caa6516c726e228e28dac60e5d1b0d1e9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1eb9df0925b593894734d9f4e68dd7624cb1b34d7667ec641f9d03540596175"
   end
 
   depends_on "openssl@4"
