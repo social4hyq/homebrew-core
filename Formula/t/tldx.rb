@@ -6,7 +6,7 @@ class Tldx < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f22dca81df64be21db5526c3d553efb31b76c16ed6ce75875c6f17c8cdd7edf3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "99c7b7f93e7d8460514bc4c7bdfdfa792a82131c23b8baf20005e5cda87397d7"
   end
 
   depends_on "go" => :build
