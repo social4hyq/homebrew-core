@@ -1,19 +1,19 @@
 class Cascadia < Formula
   desc "Go cascadia package command-line CSS selector"
   homepage "https://github.com/suntong/cascadia"
-  url "https://github.com/suntong/cascadia/archive/refs/tags/v1.5.0.tar.gz"
-  sha256 "674d32db061fdab3329cda23263f0ff2a8551b64d49b4829cff54912bd8befd1"
+  url "https://github.com/suntong/cascadia/archive/refs/tags/v1.5.1.tar.gz"
+  sha256 "228ee980bc823adf21874dc4cd76c7832fca39b48fed4b9e014927889dd7051a"
   license "MIT"
   head "https://github.com/suntong/cascadia.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "11055c42afa140222a9ae7c5a4f0ab562fb365102e00efd9fabee6cc39154e05"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "868d159f215623734e0f222253a8120d0482b43e5198166981ab340c9efab273"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args(ldflags: "-s -w")
+    system "go", "build", *std_go_args(ldflags: "-s -w -X main.version=#{version}")
   end
 
   test do
