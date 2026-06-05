@@ -1,8 +1,8 @@
 class MercuryCli < Formula
   desc "CLI interface for Mercury banking"
   homepage "https://github.com/MercuryTechnologies/mercury-cli"
-  url "https://github.com/MercuryTechnologies/mercury-cli/archive/refs/tags/v0.9.2.tar.gz"
-  sha256 "df042ebd7f4acab549be14a781b64b9f16bf78ee60266a6b2c655ebbc8119b08"
+  url "https://github.com/MercuryTechnologies/mercury-cli/archive/refs/tags/v0.10.0.tar.gz"
+  sha256 "c75c4af4998aa10c5cafec65ba590dc805a3e5e551e2a6fa84a4f8dab588551f"
   license "Apache-2.0"
 
   bottle do
