@@ -12,7 +12,7 @@ class Verapdf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e202be163a74f174966e350a47086e60ab4869ec6ba79df2fc4a6e18de4cbdff"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "60fc0a209f0c6f5ba37738a9cc2cc9dcec25106456e398d7de06ce12f65bf3ee"
   end
 
   depends_on "maven" => :build
