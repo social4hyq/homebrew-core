@@ -21,13 +21,7 @@ class R3 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "ee6d57c13ed2ec24283ad9837f731a7964943070535d903206e8b7481a73dfad"
-    sha256 cellar: :any,                 arm64_sequoia: "a6aaba3f459b35b6ef04844f558fc82886c589159e406ad206a0a62e6b15cc1d"
-    sha256 cellar: :any,                 arm64_sonoma:  "8a3ba999410ade8c4c63d420e75f480a6c655172f462da5ed1e61ef4614b2861"
-    sha256 cellar: :any,                 sonoma:        "6ab1c2ef8e37e2d55981cb55fb8ea9556521f4cd9df65792f909573e72d05bc0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b947da0474e0674ab147aa19a3e7d6a5adbf6f22eeb99445be3e43e6af89ff58"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "06edf11bc09dab6f013e3d3ec0c2789572bd64fbdabcb546e6b87600d3c48d4b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1cc59a5f591eb2fd4e062adb5b881551910873fcd7a91f69c7c18dc6762348c"
   end
 
   depends_on "autoconf" => :build
