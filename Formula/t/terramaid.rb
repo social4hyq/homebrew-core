@@ -7,7 +7,7 @@ class Terramaid < Formula
   head "https://github.com/RoseSecurity/Terramaid.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f36401566597d8833076119eefb516a60b07b3497141386493dbea9a9975d68a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c28f3ce37cd6e1752fe44bf306ddd9568a45b593b09c0715bcab655b06ad4b36"
   end
 
   depends_on "go" => [:build, :test]
