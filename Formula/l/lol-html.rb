@@ -1,0 +1,42 @@
+class LolHtml < Formula
+  desc "Low output latency streaming HTML parser/rewriter with CSS selector-based API"
+  homepage "https://github.com/cloudflare/lol-html"
+  url "https://github.com/cloudflare/lol-html/archive/refs/tags/v3.0.0.tar.gz"
+  sha256 "41ed4231fd05b1c73c0664f1f05f18b0d96a34aabf488e6cb601c3bdc7306af9"
+  license "BSD-3-Clause"
+  head "https://github.com/cloudflare/lol-html.git", branch: "main"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4fb79653ee7785ca0b3604f288a8042f1e738bb84bb85e3b62615c22ba1915d"
+  end
+
+  depends_on "cargo-c" => :build
+  depends_on "rust" => :build
+  depends_on "pkgconf" => :test
+
+  def install
+    system "cargo", "cinstall", "--jobs", ENV.make_jobs.to_s, "--release", "--locked",
+                    "--manifest-path", "c-api/Cargo.toml",
+                    "--prefix", prefix, "--libdir", lib
+  end
+
+  test do
+    (testpath/"test.c").write <<~C
+      #include <stdio.h>
+      #include <lol_html.h>
+
+      int main() {
+        lol_html_str_t err = lol_html_take_last_error();
+        if (err.data == NULL && err.len == 0) {
+          return 0;
+        }
+
+        return 1;
+      }
+    C
+
+    flags = shell_output("pkgconf --cflags --libs lol-html").chomp.split
+    system ENV.cc, "test.c", "-o", "test", *flags
+    system "./test"
+  end
+end
