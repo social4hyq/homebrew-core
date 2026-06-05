@@ -7,7 +7,7 @@ class Blocky < Formula
   head "https://github.com/0xerr0r/blocky.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c942ee79d0f6945cb379144ca2d6dbffc20e530a4c3e81c2b524805f3e1f9330"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f79b3e13a1c0822d698e739f53c58c727d8d6afb185eb7baa1e561714bb620f4"
   end
 
   depends_on "go" => :build
