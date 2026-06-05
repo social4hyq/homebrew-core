@@ -1,0 +1,18 @@
+--- a/auth2-pubkeyfile.c
++++ b/auth2-pubkeyfile.c
+@@ -486,6 +486,7 @@
+ 		close(fd);
+ 		return NULL;
+ 	}
++#ifndef __OHOS__
+ 	if (strict_modes &&
+ 	    safe_path_fd(fileno(f), file, pw, line, sizeof(line)) != 0) {
+ 		fclose(f);
+@@ -493,6 +494,7 @@
+ 		auth_debug_add("Ignored %s: %s", file_type, line);
+ 		return NULL;
+ 	}
++#endif
+ 
+ 	return f;
+ }
