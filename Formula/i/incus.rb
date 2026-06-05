@@ -1,8 +1,8 @@
 class Incus < Formula
   desc "CLI client for interacting with Incus"
   homepage "https://linuxcontainers.org/incus"
-  url "https://linuxcontainers.org/downloads/incus/incus-7.0.0.tar.xz"
-  sha256 "fb72cc173a3703e45587ca59c9c512c21b0cb7662c8f683ead801812de266e87"
+  url "https://linuxcontainers.org/downloads/incus/incus-7.1.tar.xz"
+  sha256 "c684c7e9447df1e2b66cdd37c8cc602c4e995459a6c7e848b5ef0526ac7aeb6c"
   license "Apache-2.0"
   head "https://github.com/lxc/incus.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Incus < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b6db3e82f27a5fec74fd6d0c63999ef7c1b64d6b38c4295cd97c12f4670c323"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "feaa586749313ef5da8ff8010802c6793d0421b05bf1c438d97c6f6648136912"
   end
 
   depends_on "go" => :build
@@ -25,7 +25,7 @@ class Incus < Formula
 
   test do
     output = JSON.parse(shell_output("#{bin}/incus remote list --format json"))
-    assert_equal "https://images.linuxcontainers.org", output["images"]["Addr"]
+    assert_equal "https://images.linuxcontainers.org", output["images"]["Addrs"][0]
 
     assert_match version.to_s, shell_output("#{bin}/incus --version")
   end
