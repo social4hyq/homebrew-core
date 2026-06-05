@@ -7,7 +7,7 @@ class Cascadia < Formula
   head "https://github.com/suntong/cascadia.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "11055c42afa140222a9ae7c5a4f0ab562fb365102e00efd9fabee6cc39154e05"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "868d159f215623734e0f222253a8120d0482b43e5198166981ab340c9efab273"
   end
 
   depends_on "go" => :build
