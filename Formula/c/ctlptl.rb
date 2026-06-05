@@ -7,7 +7,7 @@ class Ctlptl < Formula
   head "https://github.com/tilt-dev/ctlptl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "748f621639e9111acb6f6993e63c8966e3624f0cd0d1c7a27e1e5a2350fcace2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "50cdd26452c54323f90793d1e2b8333da7816668ad3b763a6d5c8af1ba994ead"
   end
 
   depends_on "go" => :build
