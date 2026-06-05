@@ -5,7 +5,7 @@ class Go < Formula
   mirror "https://fossies.org/linux/misc/go1.26.4.src.tar.gz"
   sha256 "4f668a32fbfc1132e6a881fb968c2f1dada631492a339211735fbb255a42602d"
   license "BSD-3-Clause"
-  revision 1
+  revision 2
   compatibility_version 4
   head "https://go.googlesource.com/go.git", branch: "master"
 
@@ -23,7 +23,7 @@ class Go < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "24a5e6b8fdd6b3ebbdc307f07340382347169b97745675e8da94880797fb44c6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bfeba9e69c0cd9e58cfd2cd95fce5294d442f284b698e5102a17967dd47e5b1a"
   end
 
   depends_on macos: :monterey
@@ -73,7 +73,7 @@ class Go < Formula
   #
   #   0001: Default GOCACHE → /data/storage/el2/base/cache/go-build
   #   0002: Default GOTMPDIR → /data/storage/el2/base/cache
-  #   0003: Auto-sign ELF binaries after linking
+  #   0003: Auto-sign ELF binaries after buildid -w (in cmd/go, not linker)
   # ═══════════════════════════════════════════════════════════════════
 
   patch do
