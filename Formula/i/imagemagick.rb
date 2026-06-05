@@ -14,7 +14,7 @@ class Imagemagick < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5dfcd6efcbb5ec4a9f3c91c31ba774123a7a3a1a28af53dd28d79ff57ff352f7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d83307d7d50f216e44c2533e4a0421befee0e699a6039b0fc89e8a4e0b98f6db"
   end
 
   depends_on "pkgconf" => :build
