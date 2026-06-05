@@ -1,8 +1,8 @@
 class Rapidyaml < Formula
   desc "Library to parse and emit YAML, and do it fast"
   homepage "https://github.com/biojppm/rapidyaml"
-  url "https://github.com/biojppm/rapidyaml/releases/download/v0.13.0/rapidyaml-0.13.0-src.tgz"
-  sha256 "b70b484b612152b0dbb2ca61178c9534d80c392fe36d4d54e75d127ec8864d52"
+  url "https://github.com/biojppm/rapidyaml/releases/download/v0.14.0/rapidyaml-0.14.0-src.tgz"
+  sha256 "6e6e67e6b766c5a1c5fcb8b80292c7e7c15a3033c01730b41f4a91eb8a31767c"
   license "MIT"
 
   bottle do
