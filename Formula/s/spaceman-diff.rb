@@ -7,8 +7,7 @@ class SpacemanDiff < Formula
   head "https://github.com/holman/spaceman-diff.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "36d9e7a82debbc9f11c998ed776c67172a8ee7dfc08ced8c840dc430c906fba1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "892b0f5ae237adfef02a7951db731c3ca8642014506b1944c73ff7fd4f9d8e82"
   end
 
   depends_on "imagemagick"
