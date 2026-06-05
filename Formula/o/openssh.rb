@@ -6,7 +6,7 @@ class Openssh < Formula
   version "10.3p1"
   sha256 "56682a36bb92dcf4b4f016fd8ec8e74059b79a8de25c15d670d731e7d18e45f4"
   license "SSH-OpenSSH"
-  revision 2
+  revision 3
   compatibility_version 1
 
   livecheck do
@@ -20,6 +20,7 @@ class Openssh < Formula
 
   depends_on "pkgconf" => :build
   depends_on "openssl@3"
+  depends_on "zlib-ng-compat"
 
   uses_from_macos "mandoc" => :build
 
@@ -28,6 +29,7 @@ class Openssh < Formula
   %w[
     config.guess config.sub pathnames.h defines.h
     auth.c authfile.c session.c ssh-agent.c sshd-auth.c sshd.c
+    auth2-pubkeyfile.c
     ssh.c ssh-keygen.c readconf.c servconf.c hostfile.c mux.c
     misc.c openbsd-compat_xcrypt.c scp.c platform.c
     cipher.c myproposal.h
@@ -53,9 +55,6 @@ class Openssh < Formula
       end
     end
 
-    # OHOS SDK system zlib is used (no separate zlib formula needed)
-    zlib_rpath = "/opt/ohos-sdk/ohos/native/sysroot/usr/lib/aarch64-linux-ohos"
-
     ssl_prefix = Formula["openssl@3"].opt_prefix
 
     args = %W[
@@ -67,7 +66,7 @@ class Openssh < Formula
       --without-shadow
       --with-ssl-dir=#{ssl_prefix}
       --without-openssl-header-check
-      --without-zlib-version-check
+      --with-zlib=#{Formula["zlib-ng-compat"].opt_prefix}
       --without-stackprotect
       --with-hardening=no
       --with-sandbox=no
@@ -86,10 +85,6 @@ class Openssh < Formula
       --with-default-path=#{HOMEBREW_PREFIX}/bin
     ]
 
-    # Set rpaths so binaries work without LD_LIBRARY_PATH on OHOS
-    ENV.append "LDFLAGS", "-Wl,-rpath,#{ssl_prefix}/lib"
-    ENV.append "LDFLAGS", "-Wl,-rpath,#{zlib_rpath}"
-
     system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install-nokeys"
@@ -99,8 +94,15 @@ class Openssh < Formula
     (var/"lib/sshd").mkpath
     (var/"run").mkpath
 
-    etc.install "ssh_config" => "ssh/ssh_config" unless (etc/"ssh/ssh_config").exist?
-    etc.install "sshd_config" => "ssh/sshd_config" unless (etc/"ssh/sshd_config").exist?
+    # Remove stale .default files from previous installs so the fresh
+    # config is installed directly, not as .default.
+    Dir[etc/"ssh/*.default"].each { |f| File.delete(f) }
+
+    # Always install a fresh config file so inreplace patterns match.
+    (etc/"ssh/sshd_config").delete if (etc/"ssh/sshd_config").exist?
+    (etc/"ssh/ssh_config").delete if (etc/"ssh/ssh_config").exist?
+    etc.install "sshd_config" => "ssh/sshd_config"
+    etc.install "ssh_config" => "ssh/ssh_config"
     (etc/"ssh").install "moduli" unless (etc/"ssh/moduli").exist?
 
     # Generate host keys and make them group-readable for sandbox use
@@ -129,7 +131,7 @@ class Openssh < Formula
       To SSH from this device to other servers (ssh client):
         The ssh client works normally and supports password authentication.
 
-      To allow other machines to SSH INTO this device (sshd server):
+      To allow other machines to SSH into this device (sshd server):
         1. Start sshd:
            #{HOMEBREW_PREFIX}/sbin/sshd -D -p 8022
 
