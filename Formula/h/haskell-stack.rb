@@ -1,0 +1,53 @@
+class HaskellStack < Formula
+  desc "Cross-platform program for developing Haskell projects"
+  homepage "https://haskellstack.org/"
+  url "https://github.com/commercialhaskell/stack/archive/refs/tags/v3.9.3.tar.gz"
+  sha256 "144bc7eaaf384228f6b0f960ced130b503dc4945ffa42f3ca2037abbc8136c05"
+  license "BSD-3-Clause"
+  head "https://github.com/commercialhaskell/stack.git", branch: "master"
+
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e97b6ffaf3b26d60e2c4952244e7d133af56cbe949441926fe71c27aca01722"
+  end
+
+  depends_on "cabal-install" => :build
+  depends_on "ghc" => :build
+  depends_on "gmp"
+
+  uses_from_macos "libffi"
+
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
+
+  def install
+    # Remove locked dependencies which only work with a single patch version of GHC.
+    # If there are issues resolving dependencies, then can consider bootstrapping with stack instead.
+    (buildpath/"cabal.project").unlink
+    (buildpath/"cabal.project").write <<~EOS
+      packages: .
+    EOS
+
+    # Workaround to build aeson with GHC 9.14, https://github.com/haskell/aeson/issues/1155
+    args = ["--allow-newer=base,containers,template-haskell"]
+
+    system "cabal", "v2-update"
+    system "cabal", "v2-install", *args, *std_cabal_v2_args
+
+    [:bash, :fish, :zsh].each do |shell|
+      generate_completions_from_executable(bin/"stack", "--#{shell}-completion-script", bin/"stack",
+                                           shells: [shell], shell_parameter_format: :none)
+    end
+  end
+
+  test do
+    system bin/"stack", "new", "test"
+    assert_path_exists testpath/"test"
+    assert_match "# test", (testpath/"test/README.md").read
+  end
+end
