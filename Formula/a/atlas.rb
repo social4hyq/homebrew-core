@@ -9,7 +9,7 @@ class Atlas < Formula
   head "https://github.com/ariga/atlas.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "74fd16c5df83b054c2724aeefa6ee77d7839c791b754502d1b709e5a617e10a9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e70cad6c39480b084c2524da294286e848149ae251c4a789d7d61b64c6512d1"
   end
 
   depends_on "go" => :build
