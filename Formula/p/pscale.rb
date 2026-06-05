@@ -1,13 +1,13 @@
 class Pscale < Formula
   desc "CLI for PlanetScale Database"
   homepage "https://www.planetscale.com/"
-  url "https://github.com/planetscale/cli/archive/refs/tags/v0.286.0.tar.gz"
-  sha256 "d9d81857176c78104927d2d71385e7a7e42fcff06959e47634fd5b803dfaffde"
+  url "https://github.com/planetscale/cli/archive/refs/tags/v0.287.0.tar.gz"
+  sha256 "6b2675a61312d5604c1118f41217638442fed4f9c836a6a6862cf7dec77a64db"
   license "Apache-2.0"
   head "https://github.com/planetscale/cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "725c9a8e91e9aa973d6e8e11cc681294585250a2f09c0aa2e96bc21a1e5d4fc7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4852fe9c042130a428f81feedfda23678548e159285a7c98b62d6fd3b71146a"
   end
 
   depends_on "go" => :build
