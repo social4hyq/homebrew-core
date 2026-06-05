@@ -13,12 +13,7 @@ class ImagemagickAT6 < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "1c312176f220d5369a331ffbcaa23ebb199d5548b2c11819a65277fb43942a7a"
-    sha256 arm64_sequoia: "635a85a2c2789f1260b7f25397ea4f0b3ca294780a91c67f463f5c4ca1b6f2f4"
-    sha256 arm64_sonoma:  "de1ed0f4f49fe4195b2b4f586e022f87dc63002ec176149ae0f6a5ae81c64d03"
-    sha256 sonoma:        "1ce4c2384aa50125b07377dae9cc17e3f1a78aa1f8abc747193f20f27ebd25aa"
-    sha256 arm64_linux:   "228e1ed33660cf4009f5a5fe8cf7f4a3ffc7b6228453a17b53adfaeb40498fa6"
-    sha256 x86_64_linux:  "66b90a9382ac926a42b1648d526464d6497ebaef7f54883c33fbd857bdd2979e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a49e55b7756ca9b85d5715eacbe87afa6f675ed3d5508a70af7c68030317f242"
   end
 
   keg_only :versioned_formula
