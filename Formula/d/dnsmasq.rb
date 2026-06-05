@@ -12,7 +12,7 @@ class Dnsmasq < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7a0841668a947494732c13d6306fdee28c9fcdc52ad6ff445d779d1e500a298"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3cc3ad1b2d50757950a4d4eb60185830ed0b974f31f592053dfa4aefeb70bbff"
   end
 
   depends_on "pkgconf" => :build
