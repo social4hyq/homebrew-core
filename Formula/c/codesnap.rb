@@ -1,13 +1,13 @@
 class Codesnap < Formula
   desc "Generates code snapshots in various formats"
   homepage "https://github.com/codesnap-rs/codesnap"
-  url "https://github.com/codesnap-rs/codesnap/archive/refs/tags/v0.13.1.tar.gz"
-  sha256 "e1636f08781fdb6e380428bd54f458f59b7764702271a7f2f407ad4432753c33"
+  url "https://github.com/codesnap-rs/codesnap/archive/refs/tags/v0.13.4.tar.gz"
+  sha256 "47a249efd507c0e1dcd8122da1d263b2bf00dcedfa27eed976a02909cefe0725"
   license "MIT"
   head "https://github.com/codesnap-rs/codesnap.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "69dbf88b98a2887b810b40c28dfb132dd1cee1295f8a67501509176b77fde565"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "228d1d05d3a16175e430336647ecfa9a99643383554af4810d6cafeb1bf11e1c"
   end
 
   depends_on "pkgconf" => :build
