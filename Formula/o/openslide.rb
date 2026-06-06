@@ -8,13 +8,7 @@ class Openslide < Formula
   compatibility_version 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_tahoe:   "1534ce31db0f8eab68925e3df74fb60fd9b3f461d6d0d99d4699496295d89d86"
-    sha256 cellar: :any, arm64_sequoia: "fd6a1ef0fe67fb6d190693269e25606baf78d468d21b0c3f4e69ffb6d0f4c8db"
-    sha256 cellar: :any, arm64_sonoma:  "5218d6e83f65681f182d1f8bdbe8345856e2b98b768aa75bae4ec938b961715e"
-    sha256 cellar: :any, sonoma:        "929afa35741b04b99c6db1c1c3288f369de57cf068f7238e65f4c64027a67b63"
-    sha256               arm64_linux:   "2efb5e0590e855d721035304d0d56a8d6b6ab3ad5763c2a8f010a11f49d584f3"
-    sha256               x86_64_linux:  "7490f047fab423ba2c71a0290c87f9bb6ac2ed261b300a22b680e92d577f79f3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1228d28b5283db899c5b1908070ecbeafe8bf348021c7e5f75cd40d9902067d0"
   end
 
   depends_on "meson" => :build
