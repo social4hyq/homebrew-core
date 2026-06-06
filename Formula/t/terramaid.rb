@@ -1,13 +1,13 @@
 class Terramaid < Formula
   desc "Utility for generating Mermaid diagrams from Terraform configurations"
   homepage "https://github.com/RoseSecurity/Terramaid"
-  url "https://github.com/RoseSecurity/Terramaid/archive/refs/tags/v2.15.2.tar.gz"
-  sha256 "c74bc24a1125c8e7a5c64dc86111970aa9bca395be8b29fc00ec4e72e97f3e5b"
+  url "https://github.com/RoseSecurity/Terramaid/archive/refs/tags/v2.15.3.tar.gz"
+  sha256 "8b5faba19093664ebdf504d8bdb38fe5f37de06c9dc6e6a3939564ec34a8e692"
   license "Apache-2.0"
   head "https://github.com/RoseSecurity/Terramaid.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c28f3ce37cd6e1752fe44bf306ddd9568a45b593b09c0715bcab655b06ad4b36"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3b8e9f8148f17a38c8f0b03348eaec7be4e7997a8cb3748a2b8a7d0c80001ce"
   end
 
   depends_on "go" => [:build, :test]
