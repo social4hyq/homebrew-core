@@ -8,7 +8,7 @@ class Trufflehog < Formula
   head "https://github.com/trufflesecurity/trufflehog.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a0d8bda56c6aed0bc8d30f18101e87671b059a9f71bcd479d49ce2a67c98fb1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f33beb5307eab6ef97cc2ad6a8334fdb1f067f175146554653d0c44bd079653"
   end
 
   depends_on "go" => :build
