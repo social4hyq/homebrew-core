@@ -11,7 +11,7 @@ class CucumberRuby < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5cf94658f5c4d35fec07b79a2b5f9cf6c4b8529b378081930b10be1fe43531d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "431fd5a0784a186cf2695c53957464f9b2d1a1314bd5665534b267a6e0b29de6"
   end
 
   depends_on "pkgconf" => :build
