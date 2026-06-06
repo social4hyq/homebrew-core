@@ -10,12 +10,7 @@ class MemtierBenchmark < Formula
   ]
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "910510dea3e8893390580f540dd172e8342cfcc1cb87b60cad1b73b6d924ea6f"
-    sha256 cellar: :any, arm64_sequoia: "a8bb7be204410fcfac69653f8b4015a97bfa6c3f1949b4a8c77e48decfa987cb"
-    sha256 cellar: :any, arm64_sonoma:  "721994305fdceeabdb563ea3fe3611b57055d9516af20e0b67d6554ac19d0000"
-    sha256 cellar: :any, sonoma:        "c860fe8747cbbc63378235067cd4cc2932d56877e32900d6fd4b544982130c1f"
-    sha256 cellar: :any, arm64_linux:   "6cb5e33d429fca2ac8d9ad47bf09b7a5597f82a91759cdd61b3fc75f4918ee58"
-    sha256 cellar: :any, x86_64_linux:  "e63ca29fed05e7ff539630529407a9f39cd847607a2eab2b06c57e737c843f59"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c629adc4ab0adb3d60e633cb382ff39e304b0fc6ed8a2aaa7b5201c11c20e7a8"
   end
 
   depends_on "autoconf" => :build
