@@ -8,7 +8,7 @@ class Repren < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "413ba8b17e5706fb0ce42e4cc0e9ff801259a4a86f04b54be22d64256c819e47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a157505f11987fbe6565cfa75569175f37e110b1a1314f6a5471a7d35ff3df6d"
   end
 
   depends_on "python@3.14"
