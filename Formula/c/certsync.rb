@@ -9,12 +9,7 @@ class Certsync < Formula
   revision 10
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9f3df0e7f70ac8192266137322a1a977a9801df24d9ea410fc98f8807fad5860"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "fa06dcc1dd11db3a4b2946d2cae16667db99c5917792f613ee89f00d066a0730"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "a85f0396e4acad202c0f65252ebf8e748d518be3b9aa75688cc1e2f86c2907d5"
-    sha256 cellar: :any_skip_relocation, sonoma:        "5a5f62fe07e679c1fffa7248f492e8636b0e431e97d2a415b608097962873f98"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d2c0f2b1e6706703b75570b7b4812d99b0849d73780def09b89148357c03ecb8"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7753b2a27142331522388841a82ae349cc4379859bb8739607b81d84b052117e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "810015551b128d571975cc441fe96abb482a65dade9f08942fcdbdaa445ad6d2"
   end
 
   depends_on "certifi" => :no_linkage
