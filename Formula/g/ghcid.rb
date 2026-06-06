@@ -7,12 +7,7 @@ class Ghcid < Formula
   head "https://github.com/ndmitchell/ghcid.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "e3a2377db77d7a3b2c0a6d29395e0098610cac7775923e0492ef97da8f9db540"
-    sha256 cellar: :any, arm64_sequoia: "4375fa572a0578598a1042dcbad666e276fd977c9d62bddd2bfb341d07e7d05f"
-    sha256 cellar: :any, arm64_sonoma:  "7f26067c76ba687f968a0a6e490a92297233617d35fdccd618dcecc4960e6ef2"
-    sha256 cellar: :any, sonoma:        "2fcc824964d3eb194c18f54e2bace7c2014775f5a052e9bf87261b8269e2ebdc"
-    sha256 cellar: :any, arm64_linux:   "3453316aa7aa20b0a322463f195bc26a8cfede1f2d54080b59ecce962b1dc855"
-    sha256 cellar: :any, x86_64_linux:  "5a2009be9b09580db4d803195805136fc30aac1615fec93e778e1d4a387f7c49"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00d7a6a8a46346f4dbee1a5efe9695e909325c7ce2734abcee5dbd55bdbcd4eb"
   end
 
   depends_on "cabal-install" => :build
