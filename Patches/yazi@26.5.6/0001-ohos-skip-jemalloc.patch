@@ -1,0 +1,39 @@
+Subject: [PATCH] yazi-fm: skip tikv-jemallocator on target_env="ohos"
+
+tikv-jemalloc-sys 0.6.1 bundles a config.sub that does not recognise
+`aarch64-unknown-linux-ohos`, so its build.rs autoconf step fails with
+`Invalid configuration 'aarch64-unknown-linux-ohos': OS 'ohos' not
+recognized`.
+
+yazi-fm only adds the dependency for non-macOS / non-Windows builds and
+declares the global allocator behind the same cfg gate, so we extend
+both gates to also exclude `target_env = "ohos"`. The system allocator
+is used on OHOS until either tikv-jemalloc-sys ships a newer config.sub
+or yazi bumps past 0.6.1.
+
+---
+ yazi-fm/Cargo.toml  | 2 +-
+ yazi-fm/src/main.rs | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/yazi-fm/Cargo.toml b/yazi-fm/Cargo.toml
+--- a/yazi-fm/Cargo.toml
++++ b/yazi-fm/Cargo.toml
+@@ -73,7 +73,7 @@ libc              = { workspace = true }
+ [target.'cfg(target_os = "macos")'.dependencies]
+ crossterm = { workspace = true, features = [ "use-dev-tty", "libc" ] }
+
+-[target.'cfg(all(not(target_os = "macos"), not(target_os = "windows")))'.dependencies]
++[target.'cfg(all(not(target_os = "macos"), not(target_os = "windows"), not(target_env = "ohos")))'.dependencies]
+ tikv-jemallocator = "0.6.1"
+
+ [[bin]]
+diff --git a/yazi-fm/src/main.rs b/yazi-fm/src/main.rs
+--- a/yazi-fm/src/main.rs
++++ b/yazi-fm/src/main.rs
+@@ -1,4 +1,4 @@
+-#[cfg(all(not(target_os = "macos"), not(target_os = "windows")))]
++#[cfg(all(not(target_os = "macos"), not(target_os = "windows"), not(target_env = "ohos")))]
+ #[global_allocator]
+ static GLOBAL: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
+
