@@ -1,8 +1,8 @@
 class K3d < Formula
   desc "Little helper to run CNCF's k3s in Docker"
   homepage "https://k3d.io"
-  url "https://github.com/k3d-io/k3d/archive/refs/tags/v5.8.3.tar.gz"
-  sha256 "2ef51e029f43e70dcda616de98980017ca7de18848265525bf7882d2bd66f9f2"
+  url "https://github.com/k3d-io/k3d/archive/refs/tags/v5.9.0.tar.gz"
+  sha256 "969cce82c4871bb829be798655abe2b6709b77cc0f42f7ff69293c621dfbbab0"
   license "MIT"
   head "https://github.com/k3d-io/k3d.git", branch: "main"
 
@@ -12,7 +12,7 @@ class K3d < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "05fc5b9a3f8ed04d115a7343b3769d06537d27bc79a465901bae638d86adc36f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c29b2b91f571cca07257e4f695fb27b3b9445ae213c0901fa5e99715a8958e38"
   end
 
   depends_on "go" => :build
