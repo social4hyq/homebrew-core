@@ -10,12 +10,7 @@ class Forbidden < Formula
   head "https://github.com/ivan-sincek/forbidden.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "6c78f46743a663c83ed0ed740bb456e5d13eba4e4ce999441d0b41d6922c7da3"
-    sha256 cellar: :any, arm64_sequoia: "326e5f8bccaea76435ee581f550835ec29cc265d70068fc892510688ba9ce58e"
-    sha256 cellar: :any, arm64_sonoma:  "c5cb0dcdf023197c1fefdcd8b76dff45fe284ed389474997b9d471b6ecb10deb"
-    sha256 cellar: :any, sonoma:        "df2bccb30c6c1abf7fe28d5131c861db966076c72617cbf2b7623d3aa9ab6beb"
-    sha256 cellar: :any, arm64_linux:   "aedbcbbb725f1e38e4e9167c730ea2420f733a21950ee55d023a63c36697c20b"
-    sha256 cellar: :any, x86_64_linux:  "ec8650dcd08b92e15a9debec459a772e27e6d8accedf4b0b2eee06f18d952114"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3eb1a1fa73b8400c0a5812714c787be0065b232aa9eee6a0d85b556c8c079d1"
   end
 
   depends_on "certifi" => :no_linkage
