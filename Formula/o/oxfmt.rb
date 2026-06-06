@@ -6,7 +6,7 @@ class Oxfmt < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c04a15916147a277001124bb987b9c6eb455845f41f136c96b5e3ea62fe8c9c8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a12db7ca434a085ddf7af141868e2ed1ccba76cd0cdd41f7a17a86ded235e161"
   end
 
   depends_on "node"
