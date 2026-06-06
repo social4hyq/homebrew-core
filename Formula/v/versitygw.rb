@@ -7,7 +7,7 @@ class Versitygw < Formula
   head "https://github.com/versity/versitygw.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "93b3360539482f98fc189118f1d5cb165d0bbfc24365b09dc8e6b13f3422a71d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c4bbd087754cc2105867788004d87b31e7bb872b5bdcce5c717c49b9c234e77"
   end
 
   depends_on "go" => :build
