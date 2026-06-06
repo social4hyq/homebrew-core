@@ -19,7 +19,7 @@ class Pulsarctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a254d6df67dc413353fb441ba327c3c2145eca478dbe7fd82f47120186ecc757"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8dcb0fc77f82a01a16a45be4d8414c5a1e5ae310363b3fbedeebbb1dbe2e5ae"
   end
 
   depends_on "go" => :build
