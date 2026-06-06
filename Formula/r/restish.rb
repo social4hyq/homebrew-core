@@ -12,7 +12,7 @@ class Restish < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "492399c9c598183ddd32cdfb3b9dcd1370c426a5d25c29058cc0588dcdc9cdd3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "91527611a2b8d91a4f9338ba1f27d6273bbd93201fd6413154a9633ff21d1aad"
   end
 
   depends_on "go" => :build
