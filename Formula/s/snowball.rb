@@ -6,7 +6,7 @@ class Snowball < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b13875e8ae7d65bc8d2daed90bcd77ae01d97763823aca511792e26cae841acc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c39a4655b39299deb160907740dbf9a168b0eb6d7bd1b85ffbb68ae16571ef9d"
   end
 
   def install
