@@ -12,12 +12,7 @@ class Coturn < Formula
   end
 
   bottle do
-    sha256               arm64_tahoe:   "9cf357e8caad6be024bcac03a154593d2cd1fbe6ddf3a21ad4f0f523f63fe6dc"
-    sha256               arm64_sequoia: "71485f44877fa22abff04700d592bda04b1cef2477c90ac89356c89a81394461"
-    sha256               arm64_sonoma:  "067e71d860f38c8a43649f015bba0349e63b031a073b5455208bee1b679bc054"
-    sha256 cellar: :any, sonoma:        "29d8af1327a8af75c1833f19f9d891dfd014bfb350cc327f6c0966cbd7a8854b"
-    sha256               arm64_linux:   "391b73f312f4f18ccacab665c588806729065caea49258791bf59edb4c3d1c27"
-    sha256               x86_64_linux:  "f70af247288665d50e305f2303f8e593e7827b9fdaa9b668b2c5a5ce1158b1f8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ba2135fa5ab9a29063ed2b9be5db76d2347ff82ce683808a3092613efd8cd5a"
   end
 
   depends_on "pkgconf" => :build
