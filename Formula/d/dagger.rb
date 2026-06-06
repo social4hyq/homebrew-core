@@ -1,8 +1,8 @@
 class Dagger < Formula
   desc "Portable devkit for CI/CD pipelines"
   homepage "https://dagger.io"
-  url "https://github.com/dagger/dagger/archive/refs/tags/v0.21.3.tar.gz"
-  sha256 "741b1793459b092773530bb5461f67dcc197d389bfb787cbd54fac286a40ff64"
+  url "https://github.com/dagger/dagger/archive/refs/tags/v0.21.4.tar.gz"
+  sha256 "70501cfc2f9c0c2610d5c062347ac2cf0cec2abd831cfeffd9c0aa27093b4439"
   license "Apache-2.0"
   head "https://github.com/dagger/dagger.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Dagger < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21d7b2525cd96d4591688a52ea112c2aaf34aa4c80e62dee91b32186648f96b0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "173ec187687e56e02eb03987e0a667e423c38f5b0824495c60add9609c046302"
   end
 
   depends_on "go" => :build
