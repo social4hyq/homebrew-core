@@ -1,8 +1,8 @@
 class MongoCxxDriver < Formula
   desc "C++ driver for MongoDB"
   homepage "https://github.com/mongodb/mongo-cxx-driver"
-  url "https://github.com/mongodb/mongo-cxx-driver/releases/download/r4.3.0/mongo-cxx-driver-r4.3.0.tar.gz"
-  sha256 "64722a58ff4b8b9c248cb85225ebe6c59fa6264fb97716b470858ebab8271c11"
+  url "https://github.com/mongodb/mongo-cxx-driver/releases/download/r4.3.1/mongo-cxx-driver-r4.3.1.tar.gz"
+  sha256 "39cbb5010b27eb00b4e947ad5e7d368acd966cd773834a10923d4f008f85b0a2"
   license "Apache-2.0"
   head "https://github.com/mongodb/mongo-cxx-driver.git", branch: "master"
 
@@ -12,7 +12,7 @@ class MongoCxxDriver < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e413af69da3ab6ace198ee7de776a0b12a4a06c2f89966f25399fb71a9b022a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a124fe5ca641ede94c1b11eebcabc4369f95d665205d1f0a1f35707dbe64664"
   end
 
   depends_on "cmake" => :build
