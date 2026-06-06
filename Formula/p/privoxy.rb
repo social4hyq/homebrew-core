@@ -1,8 +1,8 @@
 class Privoxy < Formula
   desc "Advanced filtering web proxy"
   homepage "https://www.privoxy.org/"
-  url "https://downloads.sourceforge.net/project/ijbswa/Sources/4.1.0%20%28stable%29/privoxy-4.1.0-stable-src.tar.gz"
-  sha256 "23e4686e5848c74cb680c09c2811f0357739ecfe641f9c4072ee42399092c97b"
+  url "https://downloads.sourceforge.net/project/ijbswa/Sources/4.2.0%20%28stable%29/privoxy-4.2.0-stable-src.tar.gz"
+  sha256 "6f91267f81f626c416994db89ab62f4d09246eebf4754b81186e13a18ee9028f"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class Privoxy < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abfda0f60e9a63216f0c2c13b5a8e8ada2a9629c16499fc45b2d6dd792492931"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "37ee85b0d5ac8b14e690ea69d0223fd34a71681fb5032182fc01be1d3d0ef77f"
   end
 
   depends_on "autoconf" => :build
