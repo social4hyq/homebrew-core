@@ -15,7 +15,8 @@ class Openssh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c723d26248c6fb319cbd8d437c8bca98ce89a95b30a3074e3b4b602ba1865d12"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e9d0b9d5440bfce59d046b8b2e8501f05f69147418ce263e37e3ccc6f4afe15"
   end
 
   depends_on "pkgconf" => :build
@@ -129,26 +130,28 @@ class Openssh < Formula
     <<~EOS
       OpenSSH has been installed.
 
-      To SSH from this device to other servers (ssh client):
+      To SSH from this device to other servers (as ssh client):
         The ssh client works normally and supports password authentication.
 
-      To allow other machines to SSH into this device (sshd server):
+      To allow other machines to SSH into this device (as sshd server):
         1. Start sshd as a background daemon:
            #{HOMEBREW_PREFIX}/sbin/sshd -p 8022
 
-        2. Copy your client's public key into ~/.ssh/authorized_keys, for example:
+        2. Add your client's public key to ~/.ssh/authorized_keys on this device:
            mkdir -p ~/.ssh && echo "ssh-ed25519 AAAA..." >> ~/.ssh/authorized_keys
 
-        3. Connect from your client (any username works; use ohos as convention):
-           ssh ohos@ohos-ip -p 8022
+        3. Connect from your client machine:
+           ssh ohos@<this-device-ip> -p 8022
+           (any username works; use ohos as convention)
 
         4. To stop sshd:
            pkill sshd
 
-      Your actual identity on the device is the user who launched sshd.
-
-      Note: Password authentication is not supported in sshd on OHOS.
-            Use public key authentication instead.
+        Important notes for server mode:
+        * Password authentication is not supported by sshd on OHOS.
+          You must use public key authentication instead.
+        * Your remote login session will inherit the permissions of the
+          local user who launched the sshd daemon.
     EOS
   end
 
