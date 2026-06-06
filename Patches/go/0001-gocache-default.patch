@@ -11,7 +11,7 @@
 -		} else {
 -			defaultDir = filepath.Join(dir, "go-build")
 -		}
-+		defaultDir = filepath.Join("/data/storage/el2/base/haps/entry/files", "go-build")
++		defaultDir = filepath.Join("/data/storage/el2/base/files", "go-build")
  
  		newDir := cfg.Getenv("GOCACHE")
  		if newDir != "" {
