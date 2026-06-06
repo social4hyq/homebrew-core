@@ -7,7 +7,7 @@ class Nom < Formula
   head "https://github.com/guyfedwards/nom.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d78716ab1dbf93ae488500ede7879c4fe5efd745a87d44196771f44ed182897f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8688698053598d726e310d6843397c14d2b84236793494f11139a50ba372210e"
   end
 
   depends_on "go" => :build
