@@ -2,13 +2,13 @@ class Cosign < Formula
   desc "Container Signing"
   homepage "https://github.com/sigstore/cosign"
   url "https://github.com/sigstore/cosign.git",
-      tag:      "v3.0.6",
-      revision: "f1ad3ee952313be5d74a49d67ba0aa8d0d5e351f"
+      tag:      "v3.1.0",
+      revision: "d253adffe00042d99e7bd7cdcd1d6d2abc3d750d"
   license "Apache-2.0"
   head "https://github.com/sigstore/cosign.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5df71087d83d3f7eec7303848c59ed71cb533b70315630b04f849f214e9ef783"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "379a018d2bb9715d6980ca7be22d6e56afa5ec6fc8e4e3b74bdf414c3e8d2557"
   end
 
   depends_on "go" => :build
