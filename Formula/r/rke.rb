@@ -16,7 +16,7 @@ class Rke < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3018eaf6ee388c156e2380a80260ad49be237ab007bd37dd16aa34bfb15123ac"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "26375c866f737a4505c078c49674a13b13c0b714cb4fbb0b419cad2fc6c070a9"
   end
 
   depends_on "go" => :build
