@@ -6,7 +6,7 @@ class Jsrepo < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6fdd8a8aacc2ff779ed0bc07f9c2321579f62ca37848d018b3fd8a03316db6cd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b6e94c0d4d182e88563fe0215150ad25861fac7f5ddada982ccf83a86b3811a3"
   end
 
   depends_on "node"
