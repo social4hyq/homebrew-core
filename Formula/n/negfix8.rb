@@ -6,8 +6,7 @@ class Negfix8 < Formula
   license "GPL-2.0-only"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "8cfaf079531e850a4938db52d6a99d4626142eba30165284a39d9349d805a18b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6c6d3461812518483e0509770467b47be7a78ce36062ecf8e205703f032a836"
   end
 
   # https://github.com/chrishunt/negfix8/pull/2#issuecomment-1956815369
