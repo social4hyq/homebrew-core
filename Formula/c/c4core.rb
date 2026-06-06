@@ -6,7 +6,7 @@ class C4core < Formula
   license all_of: ["MIT", "BSL-1.0"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "047c9cb0367b35692c415255a4c109b1dec59e1f5bd6dcf50d841dd3df9d2f3d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b466f4e54d5f567b4efd78642afcc0c9191568f94b32e56a68688b373d305e89"
   end
 
   depends_on "cmake" => [:build, :test]
