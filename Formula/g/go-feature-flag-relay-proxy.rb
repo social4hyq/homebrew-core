@@ -1,13 +1,13 @@
 class GoFeatureFlagRelayProxy < Formula
   desc "Stand alone server to run GO Feature Flag"
   homepage "https://gofeatureflag.org"
-  url "https://github.com/thomaspoignant/go-feature-flag/archive/refs/tags/v1.53.0.tar.gz"
-  sha256 "b63a498677522c6c33e1d61fd6f346b0ccc43761cca65296ff5b927d4ca35daf"
+  url "https://github.com/thomaspoignant/go-feature-flag/archive/refs/tags/v1.54.0.tar.gz"
+  sha256 "4d2ba7dc850a9011a6a56a172e495bc663d01892c3eb62dc61464c5ef019f129"
   license "MIT"
   head "https://github.com/thomaspoignant/go-feature-flag.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1b2689192b2f482a924fd22f21b31874a9f77a8a14f8c94195229feb0cc90153"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9735d75ed32000d7ecf01a5152de98846f3c6814fe0d7b78b390511a77db021f"
   end
 
   depends_on "go" => :build
