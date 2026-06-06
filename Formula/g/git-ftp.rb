@@ -8,8 +8,7 @@ class GitFtp < Formula
   head "https://github.com/git-ftp/git-ftp.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "95470631e72758db4f8eb07739a78f6265c09bcf41da6f69bd8c701f02bed360"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61b07cbde0e19bf1da694b80688ca0a2d42bbe2e175d6f6a22939c51fa151bff"
   end
 
   depends_on "pandoc" => :build
