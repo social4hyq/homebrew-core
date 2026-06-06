@@ -2,13 +2,13 @@ class KeepSorted < Formula
   desc "Language-agnostic formatter that sorts selected lines"
   homepage "https://github.com/google/keep-sorted"
   url "https://github.com/google/keep-sorted.git",
-      tag:      "v0.8.0",
-      revision: "ac58172d1655aa47a6f806e56ff0f269d6dbe637"
+      tag:      "v0.9.0",
+      revision: "38613f5110f7fb5088d9ad68722e4018a11bc039"
   license "Apache-2.0"
   head "https://github.com/google/keep-sorted.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a4f9c59a48b7be251acbf5b5335b15c637df4c743562c955b46c9f14ed77338"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "14d1fec64ecc210822a83bdd29959c06bfee7dcc7f7f64a8a31660399cdee6b8"
   end
 
   depends_on "go" => :build
