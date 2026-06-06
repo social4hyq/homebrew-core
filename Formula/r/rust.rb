@@ -1,14 +1,15 @@
 class Rust < Formula
   desc "Safe, concurrent, practical language"
   homepage "https://www.rust-lang.org/"
-  url "https://static.rust-lang.org/dist/rustc-1.96.0-src.tar.gz"
-  sha256 "e90a9eb153b2948afac840dbe9d77b64e376706f2864387ee7717f7450043b44"
+  url "https://static.rust-lang.org/dist/rust-1.96.0-aarch64-unknown-linux-ohos.tar.xz"
+  sha256 "32aa6c8649149862f6ae43d56af870f5b7142424b3419b5e723ff17a364f1c32"
   license any_of: ["Apache-2.0", "MIT"]
   compatibility_version 1
   head "https://github.com/rust-lang/rust.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd944f21f8558750717f73bad773010c1c1c998592b699419c93213c020e7ac7"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "815d07d81b497b46911323850f1d59e08bbc672d5e9824840344fc4e6141cacf"
   end
 
   depends_on "patchelf" => :build
@@ -18,17 +19,9 @@ class Rust < Formula
   link_overwrite "etc/bash_completion.d/cargo"
   link_overwrite "bin/cargo-fmt", "bin/git-rustfmt", "bin/rustfmt", "bin/rustfmt-*"
 
-  resource "rust-prebuilt-ohos" do
-    url "https://static.rust-lang.org/dist/rust-1.95.0-aarch64-unknown-linux-ohos.tar.xz"
-    sha256 "42bc29d60fee94e87d841e2dc2e295fa8c9f8907d9b986fd762be3db9904641c"
-  end
 
   def install
-    resource("rust-prebuilt-ohos").stage do
-      system "./install.sh",
-             "--without=rust-analyzer-preview",
-             "--prefix=#{prefix}"
-    end
+    system "./install.sh", "--without=rust-analyzer-preview", "--prefix=#{prefix}"
 
     system "patchelf", "--add-rpath", Formula["openssl@3"].opt_lib.to_s, "#{bin}/cargo"
     system "patchelf", "--add-rpath", Formula["zlib-ng-compat"].opt_lib.to_s, "#{bin}/cargo"
