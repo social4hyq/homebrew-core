@@ -3,13 +3,13 @@ class Theharvester < Formula
 
   desc "Gather materials from public sources (for pen testers)"
   homepage "https://www.edge-security.com"
-  url "https://github.com/laramies/theHarvester/archive/refs/tags/4.11.0.tar.gz"
-  sha256 "c009a2dd0b4d8a37f6df5e5f9bbb0bb27751c083458d6d1432b2c84f5d7756d7"
+  url "https://github.com/laramies/theHarvester/archive/refs/tags/4.11.1.tar.gz"
+  sha256 "73a931f6e346972939203a82ae38fed24570b3137bfce5d1ae5517e8284df6df"
   license "GPL-2.0-only"
   head "https://github.com/laramies/theHarvester.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "183e5c1bde9d59cf92eb55d866f387ea5c10cb7e3616739510250fa93bd3292a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e699b9bd006b1ef6bbf8602a28699b73e4eb93fe55552dea7967555415ba6cf"
   end
 
   depends_on "cmake" => :build
