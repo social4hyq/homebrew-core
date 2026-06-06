@@ -11,7 +11,7 @@ class Privoxy < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abfda0f60e9a63216f0c2c13b5a8e8ada2a9629c16499fc45b2d6dd792492931"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "37ee85b0d5ac8b14e690ea69d0223fd34a71681fb5032182fc01be1d3d0ef77f"
   end
 
   depends_on "autoconf" => :build
