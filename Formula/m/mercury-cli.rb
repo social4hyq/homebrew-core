@@ -6,7 +6,7 @@ class MercuryCli < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ed1cb68e4c6caaaebc8afe41fc85348958dff28581ba38b211e4ffe02b0dad73"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c2f32926592f47716279473cdc2bebaac5ceb22e0b42d2909bd11f82c7caf974"
   end
 
   depends_on "go" => :build
