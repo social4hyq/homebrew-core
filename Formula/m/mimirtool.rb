@@ -17,7 +17,7 @@ class Mimirtool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "56ba2bedf8b18132b5cac0c696d7a63c5be4318a46a58812a2c7f0f8a03fd85b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "afe971d66efdc2ed632c8b64968a75d9150920e94d3608e5759f455329d7c9bc"
   end
 
   depends_on "go" => :build
