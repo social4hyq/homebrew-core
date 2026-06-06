@@ -12,7 +12,7 @@ class Cortex < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0fa92de0ea12daa641dfe95f0e22fcc77254a75fab6bf4cd4376124c2c406840"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c9c318140a21dbb9e1a6ece8a59ae89f9d6c05a3c84ec367c207ed4053993ff"
   end
 
   depends_on "go" => :build
