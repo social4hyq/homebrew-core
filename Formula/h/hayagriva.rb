@@ -1,13 +1,13 @@
 class Hayagriva < Formula
   desc "Bibliography management tool"
   homepage "https://github.com/typst/hayagriva"
-  url "https://github.com/typst/hayagriva/archive/refs/tags/v0.9.1.tar.gz"
-  sha256 "91d451608e96b3e06fe98d6bc20915b62eda69ff4fdfdbb2ae9b098eeb11a690"
+  url "https://github.com/typst/hayagriva/archive/refs/tags/v0.10.0.tar.gz"
+  sha256 "41c82a16510cdceb922250e2f133227759c6ee1ff05bef5328598b97f7168edf"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/typst/hayagriva.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9f9920c5aca265c34ccb25fa6cf4a88fd0df5b753adb0592d61deeabaa71e3a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a1b822a4af11f7f383ebfe9d86c09106b364895b03020349b654f5a3ac51e1a"
   end
 
   depends_on "rust" => :build
