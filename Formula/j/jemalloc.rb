@@ -1,12 +1,12 @@
 class Jemalloc < Formula
   desc "Implementation of malloc emphasizing fragmentation avoidance"
   homepage "https://jemalloc.net/"
-  url "https://github.com/jemalloc/jemalloc/releases/download/5.3.0/jemalloc-5.3.0.tar.bz2"
-  sha256 "2db82d1e7119df3e71b7640219b6dfe84789bc0537983c3b7ac4f7189aecfeaa"
+  url "https://github.com/jemalloc/jemalloc/releases/download/5.3.1/jemalloc-5.3.1.tar.bz2"
+  sha256 "3826bc80232f22ed5c4662f3034f799ca316e819103bdc7bb99018a421706f92"
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e30a11eca4d247d454aca5515193cfa7b599b392cc68a4bb8f3b346db58a2f4a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e91e83f78b2bcb9794b709ce1eccfc6fa30b138c1ec40a53c4ebd22358a982bb"
   end
 
   head do
