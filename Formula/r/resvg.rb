@@ -8,12 +8,7 @@ class Resvg < Formula
   head "https://github.com/linebender/resvg.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "2f90089fe3e4247ad113c2b84a711dc2dd811e359a6ebfebae1d24c8f80634a6"
-    sha256 cellar: :any,                 arm64_sequoia: "aaa0dae4ff75ecfc4d0d2339b0f6a14ac59432b8eafeca39f8724448e0cb2a56"
-    sha256 cellar: :any,                 arm64_sonoma:  "111ece6bf433eb6efc157c33b0de64d1819e881d30792219a0564eb400fb41e6"
-    sha256 cellar: :any,                 sonoma:        "268d40b77503bb41c303c1a5f4f2b2d5a37030d953b90888191d638333b5b2da"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2e95a9b431a196ed36a1d2e9e278d71286aab6cf96b67e531283a749b88f0d7b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9856e51fa8670f7a16ee58fc8e255e0033278800a42f7ce34672624ba78728a6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "463a976448b750ebcb29f8d234817b52c1ff235f5890c10ce3c0fb5da410336e"
   end
 
   depends_on "cargo-c" => :build
