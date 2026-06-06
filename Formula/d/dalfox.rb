@@ -1,13 +1,13 @@
 class Dalfox < Formula
   desc "XSS scanner and utility focused on automation"
   homepage "https://dalfox.hahwul.com"
-  url "https://github.com/hahwul/dalfox/archive/refs/tags/v3.0.0.tar.gz"
-  sha256 "277b98f2d2f75380292d8888d0f3e88d87b0a35dcfb510f3be5a17cb4d3a4186"
+  url "https://github.com/hahwul/dalfox/archive/refs/tags/v3.0.2.tar.gz"
+  sha256 "5e9429db49cbf5742555e0e4cca1f9fbe507c3979bba7685ea78db937ca7be92"
   license "MIT"
   head "https://github.com/hahwul/dalfox.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c41310cdcbce2e3bc75f3216e42d9452d505a58e7c66a77165f119aeadd7f34"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22b90532dc9c7c6bad88477afc9eb856275df6a30a5c6d019d5645a7749b6cf2"
   end
 
   depends_on "rust" => :build
