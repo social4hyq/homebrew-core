@@ -9,7 +9,7 @@ class Theharvester < Formula
   head "https://github.com/laramies/theHarvester.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "183e5c1bde9d59cf92eb55d866f387ea5c10cb7e3616739510250fa93bd3292a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e699b9bd006b1ef6bbf8602a28699b73e4eb93fe55552dea7967555415ba6cf"
   end
 
   depends_on "cmake" => :build
