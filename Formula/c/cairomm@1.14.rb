@@ -1,8 +1,8 @@
 class CairommAT114 < Formula
   desc "Vector graphics library with cross-device output support"
   homepage "https://cairographics.org/cairomm/"
-  url "https://cairographics.org/releases/cairomm-1.14.5.tar.xz"
-  sha256 "70136203540c884e89ce1c9edfb6369b9953937f6cd596d97c78c9758a5d48db"
+  url "https://cairographics.org/releases/cairomm-1.14.6.tar.xz"
+  sha256 "7e0d5c7f29175d573a03ab5c45aef63f48dd91a5caf335a404cd763e4b7cea4a"
   license "LGPL-2.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class CairommAT114 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbb36e44880f143102bb6f0fd79815588d4015705d0363819c9a23f172afbeec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f391e9c9ad9c150d73b3a146a6ac585bd3f9bac178db704560dde22bf0858696"
   end
 
   depends_on "meson" => :build
