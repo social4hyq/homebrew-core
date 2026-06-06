@@ -7,8 +7,7 @@ class ChrubyFish < Formula
   head "https://github.com/JeanMertz/chruby-fish.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "c4fc2b36d5552646f11abaef2bf3c8f18a3de7c6126e2c1d3ff653c83f095825"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "635d7315608429007718a12afa8ab1572c06cb68f0ddf079c21b84123c83fa21"
   end
 
   depends_on "chruby"
