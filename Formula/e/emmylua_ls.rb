@@ -8,7 +8,7 @@ class EmmyluaLs < Formula
   head "https://github.com/EmmyLuaLs/emmylua-analyzer-rust.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9988a526761f53129366ae3baeaee3f056a631d50e2333866a429fdd00b91c20"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1dcba29c779394e8e7ec0f2069334c6a500005ca80858b664d9ec6e70c8335f"
   end
 
   depends_on "pkgconf" => :build
