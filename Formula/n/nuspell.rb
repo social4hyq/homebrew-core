@@ -6,12 +6,7 @@ class Nuspell < Formula
   license "LGPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "6863e34c58596b85e558b7184ac455bf449ff65cd5b9ac2f3d3f4c509ca155a6"
-    sha256 cellar: :any,                 arm64_sequoia: "d28b1a84a1ec0cfd557fcf6febd53a6c0cf1fd10fb4363ddb7566518b5cd7ea6"
-    sha256 cellar: :any,                 arm64_sonoma:  "5462266d572558109b691dd064870f1bbeb1a7e6b7d455c8c6a7cd7cabf319e4"
-    sha256 cellar: :any,                 sonoma:        "38a0d023c75e8bb42cf442000fcf1e652517dbac3ad292d744a0f405e77e30ff"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "d32911d3302e34fc0d672550c67d524070c0313b29f2f8177154644eff4402c1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4f038716f553adbecc58cf191544f5cca27c9bdcdc0e79f8c380e66a13f1a34e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b5b85f73defda118935fa0755882680be21eff227efa21054db8a681b6eef51"
   end
 
   depends_on "cmake" => :build
