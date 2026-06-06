@@ -9,12 +9,7 @@ class Badkeys < Formula
   head "https://github.com/badkeys/badkeys.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "939345102044d4cb5b91f19ce47af8dabd04a966ffb986dffa8d03bae09b38ee"
-    sha256 cellar: :any,                 arm64_sequoia: "e047092e5a4a6fe5c1a415c2a00cb8c7f848caef707cd9e7749a9b067e6b49f9"
-    sha256 cellar: :any,                 arm64_sonoma:  "7a4bef0f516a7358a1e96335a6492f98aa8e88fdd82e1fd6609afc005e297942"
-    sha256 cellar: :any,                 sonoma:        "e7e16b9c22829fbc43f911fba0b21f66dd9936d06376377cf72b354dffca95ab"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8a803a4856fa1cb43932359e8b248ec6d7c5539f8151cd235794c3d3a071c182"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "869b2ef1b634c2c9e8225bb461576ea781a827d05bc899edd85fb14d47a430af"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b720b258e6f3edd25da5e3f526b861e2e07d9926f2f6e0cf8b1bb4783e084b8d"
   end
 
   depends_on "cryptography" => :no_linkage
