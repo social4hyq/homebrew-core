@@ -11,12 +11,7 @@ class GitSvn < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "dfcec0938f76961ddf5138fa9e242c62c0b4e041a0e78facbca31adf62b57aca"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "dfcec0938f76961ddf5138fa9e242c62c0b4e041a0e78facbca31adf62b57aca"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "dfcec0938f76961ddf5138fa9e242c62c0b4e041a0e78facbca31adf62b57aca"
-    sha256 cellar: :any_skip_relocation, sonoma:        "dfcec0938f76961ddf5138fa9e242c62c0b4e041a0e78facbca31adf62b57aca"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a840bc9fc039efb04c78073ebf64b74008afae667aeaecd5ecc16d62f192cc90"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f1c7165ed13807463746179ecc5097390877ae8b4f2b910fa2ba03ff6632db24"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dc98d4cddcbd975b11a1ec04029f2ab7c0e47531e88a52815fc661d5e8c7882"
   end
 
   depends_on "git"
