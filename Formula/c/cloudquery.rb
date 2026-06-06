@@ -12,7 +12,7 @@ class Cloudquery < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4f9e19e04890cbc493b743f569c231bb2fd58fadcfbe0a6ab28256c6d9be1579"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "32610c67c4ac1152a5bddea6126cec5b3224b6ee36023d228e164f0b13de0456"
   end
 
   depends_on "go" => :build
