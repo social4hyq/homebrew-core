@@ -5,7 +5,7 @@ class Go < Formula
   mirror "https://fossies.org/linux/misc/go1.26.4.src.tar.gz"
   sha256 "4f668a32fbfc1132e6a881fb968c2f1dada631492a339211735fbb255a42602d"
   license "BSD-3-Clause"
-  revision 3
+  revision 4
   compatibility_version 4
   head "https://go.googlesource.com/go.git", branch: "master"
 
@@ -71,7 +71,7 @@ class Go < Formula
   # causing linker failures. Also, compiled ELF binaries require code
   # signing to execute (noexec filesystem).
   #
-  #   0001: Default GOCACHE → /data/storage/el2/base/haps/entry/files/go-build (hmfs)
+  #   0001: Default GOCACHE → /data/storage/el2/base/files/go-build (hmfs)
   #   0002: Default GOTMPDIR → /data/storage/el2/base/cache (tmpfs)
   #   0003: Auto-sign ELF binaries after buildid -w (in cmd/go, not linker)
   # ═══════════════════════════════════════════════════════════════════
