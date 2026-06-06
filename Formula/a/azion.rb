@@ -1,13 +1,13 @@
 class Azion < Formula
   desc "CLI for the Azion service"
   homepage "https://github.com/aziontech/azion"
-  url "https://github.com/aziontech/azion/archive/refs/tags/4.21.0.tar.gz"
-  sha256 "54defc2576894a21f89d94e423ee81092d2238123f32075c80c7ca3919f2c6d9"
+  url "https://github.com/aziontech/azion/archive/refs/tags/4.22.0.tar.gz"
+  sha256 "a5f971d2885c0af4e225a31f1e2a7e2fb614e8141f709fd667b1e1f3b9dbda64"
   license "MIT"
   head "https://github.com/aziontech/azion.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4f96016f015f1efbfce9b2d9d86a2640d56d7f4a7da6c8a192804e519b2754f6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b00fbc5a5ba2c3559b639ebb6e2cf9229efa10e59b773ac16b21110bc54ad67f"
   end
 
   depends_on "go" => :build
