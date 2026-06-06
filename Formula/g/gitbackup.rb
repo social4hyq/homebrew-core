@@ -7,7 +7,7 @@ class Gitbackup < Formula
   head "https://github.com/amitsaha/gitbackup.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d10361ab7287d6c80db812d705b3af100b94f875bf98bbe9fd9ebdf28673f989"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c3cad9e0f6104e44821b7a36bf9d984b2cce1e0781c5cff2b966209fa3a5166"
   end
 
   depends_on "go" => :build
