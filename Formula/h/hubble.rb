@@ -1,8 +1,8 @@
 class Hubble < Formula
   desc "Network, Service & Security Observability for Kubernetes using eBPF"
   homepage "https://github.com/cilium/hubble"
-  url "https://github.com/cilium/hubble/archive/refs/tags/v1.19.3.tar.gz"
-  sha256 "575824523198799a2b0fd1e5ff1777de9a1962d1a41e31faaa8695442a5be23b"
+  url "https://github.com/cilium/hubble/archive/refs/tags/v1.19.4.tar.gz"
+  sha256 "82e8d062e8f2cfeecaeda19f300350d6b453d6d1584f2111f6a7763722994366"
   license "Apache-2.0"
   head "https://github.com/cilium/hubble.git", branch: "main"
 
@@ -15,7 +15,7 @@ class Hubble < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5130ca9f9388d270e6d9b39b80731ffd8f9229206776d90482b0d6863b3843b0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fbe96226d8d114051dfee9ab10593d3b2c7deb9970a455506c0e7b788f488e22"
   end
 
   depends_on "go" => :build
