@@ -7,15 +7,7 @@ class WebpPixbufLoader < Formula
   head "https://github.com/aruiz/webp-pixbuf-loader.git", branch: "mainline"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_tahoe:   "e3a73f1544d69019b2b351dfe0d77e7d43267dbe80fa5f74afe35f88f1f99618"
-    sha256 cellar: :any, arm64_sequoia: "7416b43e99db50887259c1e57bfa9bf9a63fc087ad56b0c8bdc50f8aeabbc8a0"
-    sha256 cellar: :any, arm64_sonoma:  "2d6760c39d49f2f829631ff7d94e69b08d80fe6e54d1c21c658abb036ee5c7e3"
-    sha256 cellar: :any, arm64_ventura: "aa2f49cc24d6fd4cc3126807ecf76cadc3e46108171fdeb064a52c628b82f780"
-    sha256 cellar: :any, sonoma:        "841913a93d467056a49f176338a660069c6998a4c2e07d04d668569b4f0a6ddf"
-    sha256 cellar: :any, ventura:       "db417e25ee2371e7e22cb11a70e2423e897d79c56826243942894a1456bac099"
-    sha256               arm64_linux:   "11d831a6753d21c518cac32cdc6d67e8f3751cf08bc3cb4f1d887fc6dc1bf44f"
-    sha256               x86_64_linux:  "623c54e77f46a6687ba4662cbec44fde554ea84a43b1bea5432ec759f4e2367a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2355940299ef16213e0135ce5a986a9b7a0e52f7db5fa68aee9033f61c226629"
   end
 
   depends_on "meson" => :build
