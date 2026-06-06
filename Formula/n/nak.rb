@@ -1,8 +1,8 @@
 class Nak < Formula
   desc "CLI for doing all things nostr"
   homepage "https://github.com/fiatjaf/nak"
-  url "https://github.com/fiatjaf/nak/archive/refs/tags/v0.19.10.tar.gz"
-  sha256 "711dfda5b569dce388d110a61da37cf02f3e6dfd8ee0be93d27c36176f96b1cb"
+  url "https://github.com/fiatjaf/nak/archive/refs/tags/v0.19.11.tar.gz"
+  sha256 "d5d2d3d9bda783d69b88693da4d5de89a83320c82d779b56c5e351bcb024a4a6"
   license "Unlicense"
   head "https://github.com/fiatjaf/nak.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Nak < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d1e34f199cee877281a863ad670e1f6bfe576c9f368a11ee5a101f0f96013f6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d7565f508eb08aabe204999ed8db35bc9ba37f193f3a229e7be4ae604904270"
   end
 
   depends_on "go" => :build
