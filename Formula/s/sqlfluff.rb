@@ -8,7 +8,7 @@ class Sqlfluff < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd78aa93205f24ff0d4f694ffe94cad2597fc80e71e143684693c5a919904614"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7f6a379d181efbccbe5f6cd55ce04ecbcfbfa78d87b644b959587fbb407d026"
   end
 
   depends_on "libyaml"
