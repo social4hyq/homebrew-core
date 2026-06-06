@@ -2,13 +2,13 @@ class EmmyluaLs < Formula
   desc "Lua Language Server"
   homepage "https://github.com/EmmyLuaLs/emmylua-analyzer-rust"
   # The project name is `emmylua-analyzer-rust`, but it contains several crates, not all of which we install.
-  url "https://github.com/EmmyLuaLs/emmylua-analyzer-rust/archive/refs/tags/0.23.1.tar.gz"
-  sha256 "c0923591e7005e0b4cf017687e9fe0bcdbfae0ab954fb2b2c5961b6a14672856"
+  url "https://github.com/EmmyLuaLs/emmylua-analyzer-rust/archive/refs/tags/0.23.2.tar.gz"
+  sha256 "6c4d380dd34ee3600684f4bfd35d7fd98d2c77334a3b4a6ad46ea5af106f667b"
   license "MIT"
   head "https://github.com/EmmyLuaLs/emmylua-analyzer-rust.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9988a526761f53129366ae3baeaee3f056a631d50e2333866a429fdd00b91c20"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1dcba29c779394e8e7ec0f2069334c6a500005ca80858b664d9ec6e70c8335f"
   end
 
   depends_on "pkgconf" => :build
