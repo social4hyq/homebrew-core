@@ -12,7 +12,7 @@ class K3d < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "05fc5b9a3f8ed04d115a7343b3769d06537d27bc79a465901bae638d86adc36f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c29b2b91f571cca07257e4f695fb27b3b9445ae213c0901fa5e99715a8958e38"
   end
 
   depends_on "go" => :build
