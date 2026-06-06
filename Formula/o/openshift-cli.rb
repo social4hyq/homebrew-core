@@ -1,7 +1,7 @@
 class OpenshiftCli < Formula
   desc "OpenShift command-line interface tools"
   homepage "https://www.openshift.com/"
-  url "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.21.16/openshift-client-src.tar.gz"
+  url "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.21.17/openshift-client-src.tar.gz"
   # This project employs synchronized versioning so the sha256 may not change on version bumps
   sha256 "569c731976e2fe7db8a357e55afecd4a2410a86236622671d818f95e3fdc5744"
   license "Apache-2.0"
@@ -13,7 +13,7 @@ class OpenshiftCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ff9f358a873fdb89d23a9e812e0ba83ca74e59e62c1af72bf7fb3aa11b20209a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee85d440d87e3fe2de963bd4b7846011fbb8ce5baca47ffdf9fac6bb9ed650b1"
   end
 
   depends_on "go" => :build
