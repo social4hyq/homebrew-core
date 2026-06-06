@@ -12,7 +12,7 @@ class Syncthing < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "42f5948b92e3fc24c255dad42c7e743ddc2d3d647ce977dac21770ceeeff5716"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f93b7aec28d05719d4b9b432030ce30f841748fb45b8e5553a4bad5bab69c1b"
   end
 
   depends_on "go" => :build
