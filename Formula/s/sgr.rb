@@ -9,13 +9,7 @@ class Sgr < Formula
   revision 15
 
   bottle do
-    rebuild 5
-    sha256 cellar: :any,                 arm64_tahoe:   "e7aebe5abe49e8650c7158dd2c1aa5d3f98c05a45bd71e58ece5ba54ec66a47c"
-    sha256 cellar: :any,                 arm64_sequoia: "890716f3428af4db534e207dac500744f869849fa930b5fc86402055eb502b2f"
-    sha256 cellar: :any,                 arm64_sonoma:  "c147fc451ccf80fa86f68d471656cef8a33fc0fcd8cd1aa1853f496a898fe02b"
-    sha256 cellar: :any,                 sonoma:        "8874bfcacadda5a0d88cfccd42431c25a8f1829d07fdda027177405a95b64212"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "a3c7210f01fad788228cb009bc24f77fbf2050c96e8a1e58a656803174f91c76"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e6fdb3c9457c67c4c2b6d022989578570645601006c1d5c898cd562e67b2e2ab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b77d5e619bb15a33c3f2558031bc73a873bb1a4db522310c1d41b1a26c779c13"
   end
 
   deprecate! date: "2025-06-21", because: :unmaintained
