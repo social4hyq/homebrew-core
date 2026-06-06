@@ -15,7 +15,7 @@ class Hubble < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5130ca9f9388d270e6d9b39b80731ffd8f9229206776d90482b0d6863b3843b0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fbe96226d8d114051dfee9ab10593d3b2c7deb9970a455506c0e7b788f488e22"
   end
 
   depends_on "go" => :build
