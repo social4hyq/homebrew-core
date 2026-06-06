@@ -7,7 +7,7 @@ class Buffrs < Formula
   head "https://github.com/helsing-ai/buffrs.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c77cca3e7d5c192b2c8f6cf18c9c6816c1d85e5506efb820197387231cf5487d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "702e07b0ca1fee99d4737f46d43984dffb6d2844dc431c5b70acf70206d7d2d2"
   end
 
   depends_on "rust" => :build
