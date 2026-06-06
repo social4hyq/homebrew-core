@@ -11,7 +11,7 @@ class Pgrok < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "312b6b180bfd068b502251577b8e16dcd7875e3bee2f7eb49fda80b1c82dc994"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8bacfd561d7777ca04424038a4024cb74ad4547368a8f22e12710897d1c76dfc"
   end
 
   depends_on "go" => :build
