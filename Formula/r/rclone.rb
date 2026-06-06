@@ -8,7 +8,7 @@ class Rclone < Formula
   head "https://github.com/rclone/rclone.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "02c17d7f7c05d3044122896ffdcd9615fa9ad069164ef89b8e330f9a858f32be"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1b86e10d11db5e9c6f79c9f41d7b2c7c5f146731f4260236079c24de9c2444c"
   end
 
   depends_on "go" => :build
