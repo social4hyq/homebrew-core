@@ -1,13 +1,13 @@
 class Caddy < Formula
   desc "Powerful, enterprise-ready, open source web server with automatic HTTPS"
   homepage "https://caddyserver.com/"
-  url "https://github.com/caddyserver/caddy/archive/refs/tags/v2.11.3.tar.gz"
-  sha256 "de751e6b7ca769f0dc1f9b0a1949c7b149c115efde3aaf53182da2bf6a94c825"
+  url "https://github.com/caddyserver/caddy/archive/refs/tags/v2.11.4.tar.gz"
+  sha256 "2c3d02078286a6282cdb4d1d8744077788d556659dac0b64d8ed5886a7e5aeb9"
   license "Apache-2.0"
   head "https://github.com/caddyserver/caddy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "36fddbbd725eddcf983a76ec21fce393091fe0235654535b3d37b4c07845181a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "15563a9d5e17db5260cd2ec0b2df8b4ce78c94871f60a44d712945656ff28c53"
   end
 
   depends_on "go" => :build
