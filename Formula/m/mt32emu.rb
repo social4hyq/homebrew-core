@@ -1,8 +1,8 @@
 class Mt32emu < Formula
   desc "Multi-platform software synthesiser"
   homepage "https://github.com/munt/munt"
-  url "https://github.com/munt/munt/archive/refs/tags/libmt32emu_2_8_2.tar.gz"
-  sha256 "d4778cf89b054ba7ab410ffcb02ecf1629fa32b5b60838addec99eb93804fdcb"
+  url "https://github.com/munt/munt/archive/refs/tags/libmt32emu_2_8_3.tar.gz"
+  sha256 "81f8c462f46bc8901618762ae34cf9de93894ff81f41db73c79472fa3baef875"
   license "LGPL-2.1-or-later"
   head "https://github.com/munt/munt.git", branch: "master"
 
@@ -15,7 +15,7 @@ class Mt32emu < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad290d24cc69e2df1bfa7af5e881e4f1e8810ebff88f43d15824719649a85699"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d15e3c84956101ff529d4ef99bf7b1b57f4db9322838edfc7d5833311d992d1d"
   end
 
   depends_on "cmake" => :build
