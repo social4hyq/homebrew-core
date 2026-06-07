@@ -1,8 +1,8 @@
 class Yek < Formula
   desc "Fast Rust based tool to serialize text-based files for LLM consumption"
   homepage "https://github.com/mohsen1/yek"
-  url "https://github.com/mohsen1/yek/archive/refs/tags/v0.25.3.tar.gz"
-  sha256 "9fc458cadd6eb1c97dc84f2d9dd166c8579a4320faca7d0b82e1313d656be1b3"
+  url "https://github.com/mohsen1/yek/archive/refs/tags/v0.25.4.tar.gz"
+  sha256 "337e126814f745c6ec5d948d7aec33bd1d42066e764e17b6482679f77927e102"
   license "MIT"
   head "https://github.com/mohsen1/yek.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Yek < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b12a84b9fbfa9d61554f4d73a41442fe4d4280ae634a8c51308b6dbf47821393"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec3965dd00563fabaaa5c8b707bca2fc959cbe8273b2f0768588d387f5e48f56"
   end
 
   depends_on "pkgconf" => :build
