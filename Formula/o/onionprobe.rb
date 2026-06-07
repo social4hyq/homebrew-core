@@ -10,12 +10,7 @@ class Onionprobe < Formula
   head "https://gitlab.torproject.org/tpo/onion-services/onionprobe.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "9ef708b4830dcb88a943f0195399e42fa7205767120f10b40aaa7e8f6c1e649a"
-    sha256 cellar: :any,                 arm64_sequoia: "c60241f3136f07ab6b58162bb6a972772307f6734f5354d91abe735fa57bc840"
-    sha256 cellar: :any,                 arm64_sonoma:  "c5e0bccca5f32bb4dc3aae6afaf8ded18a4b3a8f4fc718a9107af9307326de9a"
-    sha256 cellar: :any,                 sonoma:        "3943e953f309fd8fce62d9ddf826e8801cb002889ae491bd15cf79bf11247fcb"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3228c686541b84be207909c917285e545b608f0fed4ad9dc4a8960f6e77b8e90"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "9c512220b17db1fac0235573106677d205b8f8092d0f63c70037446d0ec64e9d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "64793851fd83ce192b00b060cadabde17a12fdd9c4ae395b9cfa2ef8df3143a7"
   end
 
   depends_on "certifi" => :no_linkage
