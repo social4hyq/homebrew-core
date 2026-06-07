@@ -9,12 +9,7 @@ class Scrapy < Formula
   head "https://github.com/scrapy/scrapy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "01ec3578c45a43c5cd6f6ce5f350e6c00aef9d6e213e6b42e1cfb997f5b66a6c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "ffb22782aa83a3d225996729f6a0a4574eca6f61000f2df396d591b983c4fa1e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2874374354715de801adeb2dc765a067ba3b684eac9d050744684eab3b95db84"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9f83eaca3811bd7ed8ebc37d3ba170e9ea98555fb977fc7a125a0534d7660023"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ffbcdc5bf6b618eed29fa6e2a15a416467b581070474fe18274a80193577f887"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fb465809e4154b2551b7965736558ec8996730c8a42ad818d1a04f07e048b3c5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a1ab1096b477027790ed103cc11f7296197c194318860d56b2d63180d382b66"
   end
 
   depends_on "certifi" => :no_linkage
