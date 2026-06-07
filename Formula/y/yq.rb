@@ -1,8 +1,8 @@
 class Yq < Formula
   desc "Process YAML, JSON, XML, CSV and properties documents from the CLI"
   homepage "https://github.com/mikefarah/yq"
-  url "https://github.com/mikefarah/yq/archive/refs/tags/v4.53.2.tar.gz"
-  sha256 "1bc19bb8b1029148afa3465a9383f6dcccb1ecce28a0af1d81f07c93396ce37d"
+  url "https://github.com/mikefarah/yq/archive/refs/tags/v4.53.3.tar.gz"
+  sha256 "fadf86d0ae3988bb40fa8aad424d0c71658493f6377285e711c7e7e313b3b238"
   license "MIT"
   compatibility_version 1
   head "https://github.com/mikefarah/yq.git", branch: "master"
@@ -13,7 +13,7 @@ class Yq < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "affd534e7103592095b5101c0081f3564f4edaada5ef61ed687d0b2737d42d66"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "20fbca2f498fb6a35418f7a23c9f9438c91bfe711d64bd99bea6a7b7ea4ece6a"
   end
 
   depends_on "go" => :build
