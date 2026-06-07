@@ -10,12 +10,7 @@ class Charmcraft < Formula
   head "https://github.com/canonical/charmcraft.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "ec0f360045b2cc69c4416e0c12fba61d68e63c3011896220e868b062d9040640"
-    sha256 cellar: :any,                 arm64_sequoia: "a6ed4b473cf53ce0eab8f5fcc92bba71c789b812cee496aef7e093c3c51aa3c4"
-    sha256 cellar: :any,                 arm64_sonoma:  "df9a1d28560fd0ba14b1d729bf182bbfb585fdc8f29c1eb6f561b0974f984317"
-    sha256 cellar: :any,                 sonoma:        "eb42943be82a0701fc8f3a3b3ea338abbf0d6a5102e810252a4daaa942bf5c78"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "64acfaf67ed0f4fe6c45b747122e7c30f1f71a93878f3c247098ed83f53d8001"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2034e97a79f408f32b233ed5ffa08827a22b978e532ab0906a2f3829df02255a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8709e7dd07d843d342dc4a20d269c2a66f0c9320b4e4eca24c13d41e74805a7f"
   end
 
   depends_on "certifi" => :no_linkage
