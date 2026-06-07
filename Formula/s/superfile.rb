@@ -1,8 +1,8 @@
 class Superfile < Formula
   desc "Modern and pretty fancy file manager for the terminal"
   homepage "https://superfile.netlify.app/"
-  url "https://github.com/yorukot/superfile/archive/refs/tags/v1.5.0.tar.gz"
-  sha256 "bb394f73817d164b9756613ccd850fb3dd5fd5ee898defd86b27eecd4cec48bf"
+  url "https://github.com/yorukot/superfile/archive/refs/tags/v1.6.0.tar.gz"
+  sha256 "7340ce9e3e7db401164310dd5d2d1dfa3ccf76118ac49d192b0fac2a292c5b0d"
   license "MIT"
 
   # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
