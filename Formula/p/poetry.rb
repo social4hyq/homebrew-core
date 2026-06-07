@@ -10,12 +10,7 @@ class Poetry < Formula
   head "https://github.com/python-poetry/poetry.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "bc72b2c982312bfeeffeb605b7187975cbe04c4d3aa9b14a577dbf7a8d8f0fae"
-    sha256 cellar: :any, arm64_sequoia: "ae7d41214112da9296692fcb4e6fe1a5ab747bc94cd132e43075c4111f0bb379"
-    sha256 cellar: :any, arm64_sonoma:  "5807ff01400aa0d38bd094e7039e23747e29918e28e68a8831a1609c7b32f538"
-    sha256 cellar: :any, sonoma:        "10ebfaf496364551d774e0c5b03cf8bfa6d8e0730f27d5e46129048509e48df6"
-    sha256 cellar: :any, arm64_linux:   "bd1c65e7ce1a5208cc86e45b192f1da56bc5936813ade80cdb8bb456c64d9dfc"
-    sha256 cellar: :any, x86_64_linux:  "4c5d7367fbfa2fe137e4f72feafb0978065d0049a6c85bcd0bd9ea13f12a1e1f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "66796b6ac63ee9dc7e07ba347911f3ea692b9addc348186621098d8665d3815b"
   end
 
   depends_on "cmake" => :build # for rapidfuzz
