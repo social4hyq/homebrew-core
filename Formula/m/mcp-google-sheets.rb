@@ -9,12 +9,7 @@ class McpGoogleSheets < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "4907194c18cf4657ba9b2dc110f994c4f3ab34f08a5ccfb075b567161f142d8a"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "fe8ed96e16e3183f433b1eaeae71768895052a6bb121d83584fdca2598be43f6"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "095951ff4b4febe77c46e3a49d583ea932f705d91e2b3f3977ceb87e406b5a86"
-    sha256 cellar: :any_skip_relocation, sonoma:        "a4b21b9f931c34ee32fb3a9d412bdc0257f24993261127be77dca19349c67e11"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "fba48d28e1eef286b175fdcb55215572ec2dd55c2e1c8029283b3d710f4f6cc0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8c4f22edc5c5fab281caacc4164bf86375d8edbe026a5a60927101f6278dea2b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "047cae186f5de0509cd32f45d3f9fc8276fff807742487a0b4c5074f588cbea6"
   end
 
   depends_on "certifi" => :no_linkage
