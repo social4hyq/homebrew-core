@@ -6,12 +6,7 @@ class Ec < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "807432832f53e054c38b5d2e446e1ad688c6e9289a488722410f6c774be53e21"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "807432832f53e054c38b5d2e446e1ad688c6e9289a488722410f6c774be53e21"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "807432832f53e054c38b5d2e446e1ad688c6e9289a488722410f6c774be53e21"
-    sha256 cellar: :any_skip_relocation, sonoma:        "d9efcfbfe86f35c81103e8a66ce69dd66c90864054a1ed4028df0ff8b8a21d14"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0ff9dcf9590448451f9644f468f051e4eef7cf824df069ed6c75ce1f734563d8"
-    sha256 cellar: :any,                 x86_64_linux:  "c16072a254b0667c4796eba5697815b0ec7400a0e5fc81f841e377f6562072a4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "69758ec3f980076f9451fac5f150647cbf703c87c668e55cad97511ee85d9d3a"
   end
 
   depends_on "go" => :build
