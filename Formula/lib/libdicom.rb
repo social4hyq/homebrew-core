@@ -1,8 +1,8 @@
 class Libdicom < Formula
   desc "DICOM WSI read library"
   homepage "https://github.com/ImagingDataCommons/libdicom"
-  url "https://github.com/ImagingDataCommons/libdicom/releases/download/v1.2.1/libdicom-1.2.1.tar.xz"
-  sha256 "7a448d295b179a4c0b311c09f5253655446a44bf66b3b7d2aa4c09d15f02f1f8"
+  url "https://github.com/ImagingDataCommons/libdicom/releases/download/v1.3.0/libdicom-1.3.0.tar.xz"
+  sha256 "75f1167f5153c659cdd58f2b432d2592bf0477abe0087e195bc621b5594ef10a"
   license "MIT"
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class Libdicom < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c45224c15ed735c40718f0c15bb4811496411db31ce0c8245ccec24b1d39518"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9eec4f983257f6d3cd9b9efbab53420a9b84f4dd64f5176a6824d4e4de13e95"
   end
 
   depends_on "meson" => :build
