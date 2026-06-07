@@ -7,12 +7,7 @@ class Hpack < Formula
   head "https://github.com/sol/hpack.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "cbeb93984ca220d9a0198fd017f3bf825a4e03939d52b2965f1eaac90047e060"
-    sha256 cellar: :any, arm64_sequoia: "548cfd994750ab91c7c4f6671f66b38f1e04b37c6e1e8107777cbe81047e046f"
-    sha256 cellar: :any, arm64_sonoma:  "c74bb0f485278329ee7ce5e7e384cb5f72b3499823ccc27664b2f4ca86a2e3fd"
-    sha256 cellar: :any, sonoma:        "cc1d838228b244f8fd919a5c6d33114081ec01db1cc2b4448ce68896e8495b7f"
-    sha256 cellar: :any, arm64_linux:   "e0ce950252b70b59e9a1dc2c9d86b34f1df707c8ca9d366441042612618b1fb5"
-    sha256 cellar: :any, x86_64_linux:  "a3c3008d4b1ad91ce6e9b9b38973236757d83c871d5f9698f266b66a61249c8b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c866995b31f18d1875e2b73ca76aaa84e9ce819c2b4ce6fe635ebf3f06cffc8a"
   end
 
   depends_on "cabal-install" => :build
