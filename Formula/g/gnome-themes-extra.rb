@@ -7,16 +7,7 @@ class GnomeThemesExtra < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:    "9e5e267fbc5af1034574b620c50a0cd8cfff1bf91058f572aa4a557dbd1004df"
-    sha256 cellar: :any,                 arm64_sequoia:  "24df82bb97a97e948c509c9271d68ca1d2111646883c81c927531887a4e0d313"
-    sha256 cellar: :any,                 arm64_sonoma:   "bc49731aec4652327aac34ead43265575048800ac75e769fb8effc8e975f6bad"
-    sha256 cellar: :any,                 arm64_ventura:  "291bd9c91143fd2dac260a4ae70c37e77fb3da2e92d3fecd66f88c23cc95d320"
-    sha256 cellar: :any,                 arm64_monterey: "35b85f8e887414d692cc57a6ada94634cbf446cad7e717714a499afcec1fe76e"
-    sha256 cellar: :any,                 sonoma:         "764d0ca9feceaf6a174c242d135cbe7d04bed2b98eee1208b9f0258c9545857a"
-    sha256 cellar: :any,                 ventura:        "11323caf0f8a1f3745f1f0ae6f0b5558590148a1eb0efd124a32b3ee945b50ab"
-    sha256 cellar: :any,                 monterey:       "ce23ae32bafec76ac518498866c1e32d4587909ed9c69f24ba9b5796f30428e0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:    "b5b957c2637a4a8475d36a1effc4e817bb936f34689af0c8c1551433d37cdf86"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4f5c9c176b316179b530c7d28fb245f93881339b1ec7737685c85f3d0857248e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bca667c5addcc8e1bd5a51e567812878266910285f779b5d9d45127042cf556a"
   end
 
   deprecate! date: "2024-12-10", because: :repo_archived
