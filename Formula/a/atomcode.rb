@@ -12,7 +12,8 @@ class Atomcode < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ed88221376e730fcf1158c82c79e6cd0a5734d3f2a84ac0b991a4272a697e90b"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad227369a75f2c96e736d8c529689bb1ba73648ac0c9a2d6a647cd4906172cb6"
   end
 
   depends_on "node" => :build
@@ -32,6 +33,20 @@ class Atomcode < Formula
     # in-app self-update is disabled and /upgrade tells users to run
     # `brew upgrade atomcode` instead of rewriting the binary itself.
     system "cargo", "install", *std_cargo_args(path: "crates/atomcode-cli"), "--features", "distro-pm"
+  end
+
+  def caveats
+    <<~EOS
+      The 'CodingPlan' feature is only supported in official builds from AtomGit
+      due to upstream licensing/anti-abuse restrictions.
+
+      Since this formula is built from source by Harmonybrew, CodingPlan will NOT
+      be available.
+
+      If you strictly require CodingPlan, please use the official build.
+      Get it from the official website:
+        https://atomcode.atomgit.com/
+    EOS
   end
 
   test do
