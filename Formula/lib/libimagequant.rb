@@ -7,12 +7,7 @@ class Libimagequant < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "9fe68c59c0500f834deced30fcd58c965148988f238d51791d39c6c284d71684"
-    sha256 cellar: :any,                 arm64_sequoia: "35636b9bf13cd99e77dec879e87736122925c790fec18da07dbcbea76083bdc6"
-    sha256 cellar: :any,                 arm64_sonoma:  "f1cfb5f5fb3e31907edf925d0df58be68d53fd4241fb819e946aba322cda4375"
-    sha256 cellar: :any,                 sonoma:        "8a25e968794937adcb94e84e2421a0b8fd48503205451fcc24ddd41ed84ad8be"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0884471a064070eb8209c726fbb5e2068c6dcc4a3f2f74b6fb0e69b4117e51e7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "f9943e809de898982fbd65821564d201a4f88d0d902d504d2b8f4a059ab9c94c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c7745646365d084b9f1d205a406871645a034b3b868b7dbc8a1b9beb2ef250f"
   end
 
   depends_on "cargo-c" => :build
