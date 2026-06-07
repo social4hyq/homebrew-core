@@ -34,6 +34,20 @@ class Atomcode < Formula
     system "cargo", "install", *std_cargo_args(path: "crates/atomcode-cli"), "--features", "distro-pm"
   end
 
+  def caveats
+    <<~EOS
+      The 'CodingPlan' feature is only supported in official builds from AtomGit
+      due to upstream licensing/anti-abuse restrictions.
+
+      Since this formula is built from source by Harmonybrew, CodingPlan will NOT
+      be available.
+
+      If you strictly require CodingPlan, please use the official build.
+      Get it from the official website:
+        https://atomcode.atomgit.com/
+    EOS
+  end
+
   test do
     assert_match "atomcode", shell_output("#{bin}/atomcode -V")
   end
