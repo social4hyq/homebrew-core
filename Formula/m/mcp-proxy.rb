@@ -9,7 +9,7 @@ class McpProxy < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "2a863ed421f9118f34edf0ca5aa45c626cab15df8391907c0c29ec0cbc48b1c6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aef14a908ce328c8f1ee0c4b791429f153a5e72c3681cff73fa17c39739f6a18"
   end
 
   depends_on "certifi" => :no_linkage
