@@ -10,12 +10,7 @@ class Showcert < Formula
   head "https://github.com/yaroslaff/showcert.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "1bf593201512f8c1783c9f15b6219e067e3044d3939c306af77ff742b6fb63d6"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "1bf593201512f8c1783c9f15b6219e067e3044d3939c306af77ff742b6fb63d6"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1bf593201512f8c1783c9f15b6219e067e3044d3939c306af77ff742b6fb63d6"
-    sha256 cellar: :any_skip_relocation, sonoma:        "877bdc676f26bdaafce37aa0d6952d89312b2cd84178af6fe4f0c1110507691b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "260fabaa9d1ae27b5283b9f799c3df7d605480265d0e4ff728765e775562932a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "260fabaa9d1ae27b5283b9f799c3df7d605480265d0e4ff728765e775562932a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b9cd8ec4a06e3117f38fd04660ef1add0afd713c116a16a89954e331e44e8f0"
   end
 
   depends_on "certifi" => :no_linkage
