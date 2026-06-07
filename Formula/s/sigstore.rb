@@ -9,12 +9,7 @@ class Sigstore < Formula
   head "https://github.com/sigstore/sigstore-python.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "2c0d8ef7fe6e8dfe60f8fd09e6ee6cd29d0a2e6e8673f2f8f313b5db6a07978f"
-    sha256 cellar: :any, arm64_sequoia: "91812308c0666b81be26be63ebbc47583c6f36bee290494fe52bcdfdd355ad42"
-    sha256 cellar: :any, arm64_sonoma:  "c46b81f8420051a512d26da531ab76d6d89016fe897dae777bc4908fa37d3384"
-    sha256 cellar: :any, sonoma:        "af5cc3e31483db531938869018a940eede925801e57c7fdaf8fb77f40cbdea41"
-    sha256 cellar: :any, arm64_linux:   "f2890d19baa1e3c4c726af2f3a80c43e7718a7dfa6efc0eedd1885b094efcc66"
-    sha256 cellar: :any, x86_64_linux:  "5992a2c69374f3409f0619d4f69db5b6241b198df656f581f4bdcac728633e75"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61b3c7e3d5465277cb4e8b1358dd90abacd3dfd15c62640d143cdff9236a966a"
   end
 
   depends_on "pkgconf" => :build # for rfc3161-client
