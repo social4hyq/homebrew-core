@@ -6,12 +6,7 @@ class Doge < Formula
   license "EUPL-1.2"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "71948198c956b00eb4a7876019460f9280593408830d4283419976b223699961"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c1d4cd89b97ec72efb1c213373314bcf50c2f550f616dedb72be413a6b591746"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "468d651e833eedaf42d4f9b707c9cd6a885f0a138cc22527d7fec660d344a18c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "efce39ee93945f293a68d081a90865e4702ad02979d6c71a6dfa4e5baf0cabb2"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "af6ca23e2bd46b2076cb90e8d5a36de27c701ced018d45ae062f6861d23a486f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0e1a7aa1977d9189061c8d1b0a25f8117f3f1a5b4d920dd832fb49cc5461e62c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "930f65d687dad4c7ede4119ba6d9e9778f4abe4b2608128930399eec12565193"
   end
 
   depends_on "pandoc" => :build
