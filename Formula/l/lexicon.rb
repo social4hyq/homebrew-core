@@ -10,12 +10,7 @@ class Lexicon < Formula
   head "https://github.com/dns-lexicon/dns-lexicon.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "55b9bba54b98d1350518829b3c9c27501f7d4b11ca4a3884555c4823fff5e8ea"
-    sha256 cellar: :any,                 arm64_sequoia: "8d77fdaf2faad760d1051eb2020405abdf87d233b2ba049361f1a736309a1331"
-    sha256 cellar: :any,                 arm64_sonoma:  "3496850b88c6db04060fda3b4bd563e25471bef98a8803827589106835348e1d"
-    sha256 cellar: :any,                 sonoma:        "6a1eae849eb61f729b9cf49f8c99f24e58f80b13b5363cc93f5638e447fde8ae"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2b6182a141eb575513ec216dfd5632a1d34585cb9b5f69f7b12fabc5d0340d72"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0e6d0f76d08eee312d3d1e6fa223f9d311dccda82fbba77152a4afcc93efeaba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "24424a42606bf8aa2c7729e1b54ed5790d5644fbd2a98a741def84be1e43f879"
   end
 
   depends_on "certifi" => :no_linkage
