@@ -10,12 +10,7 @@ class Sickchill < Formula
   head "https://github.com/SickChill/SickChill.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "a3aaf40efdc4c457c5b722f61041f3a9617853ed6b06c401444655b4aa903dc7"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "9666dbdee80f44b94ff6d4be9d23576f12905257882ed1bf27f18bae85e52872"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "4779b7e6e1aaa476c84b892924f16187ed4dc9145da0c1964119e16c5106897c"
-    sha256 cellar: :any_skip_relocation, sonoma:        "c0a288b25f24eec2e0505477ce730c3dfb6e2d60656d35534e5ddd388b0c8fb8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4328be867c7e78dcc576558bfa092f0331ba5bb5040e40f3312faccc225cf1cc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "36f78ed9e15e4ab28df8d9f96d7dbcebcc6d6cc131ed6c5ecbb5cb6927afe491"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e71b919ebc1fcc425a5d658509821f542f0db0c05091b2a0b9650ac96f499402"
   end
 
   depends_on "rust" => :build # for cachecontrol
