@@ -13,7 +13,7 @@ class K9s < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9f94cb9786e00bc081b49a7f7b207b0f5112a22be4b16d61e3c4cf2df26dfbc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d55764d81112164017cb1314ea8c1ce1d7d7d175e3fd4ebb4b6c8d8bbd339de6"
   end
 
   depends_on "go" => :build
