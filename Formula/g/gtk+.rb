@@ -17,16 +17,7 @@ class Gtkx < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:    "50bf4d48f706e87bc7bff60b97ea41bc0ca1d4616390be8fe2781360531244c2"
-    sha256 arm64_sequoia:  "a431feb1110a7b24050d4115bf8a0701eefb6ea735c276acc99c23a9260f72e8"
-    sha256 arm64_sonoma:   "659b62a2677b7e945221ab78abfab6919d7a4ac7c635de52417ab96eb4970a92"
-    sha256 arm64_ventura:  "140729098a62031c80b8e43c29314f84a5d0152b1348612f83d01331251ba02c"
-    sha256 arm64_monterey: "88b226c05abe1a848ee8ab7d98e7b0388383b3cdd003dff8448aa9d1901202c3"
-    sha256 sonoma:         "2f73f9eafd45eef1e37f3e795d1cb086988fcba1cc374be9c4bc124744bc561a"
-    sha256 ventura:        "e1724dfbff3e12dfc41c91d4ea850c52fbc716d30cae80308f55afaeaa887e42"
-    sha256 monterey:       "29944de5a2598f393c086c1b9284dee31f94309826780204065d91de38c0a14d"
-    sha256 arm64_linux:    "2738367a37a58ce253544f191877c5b653c3f6db7cbe3fd5ed3b3288b3bd243f"
-    sha256 x86_64_linux:   "a73d8262778cf3541249d2ce04dbe9c2e545cc46401c695a77a893f812f35920"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "417e0ac85cda4e77b5e2215cc801453ad5540298aa2d31630acc4c6b99a3751e"
   end
 
   depends_on "gobject-introspection" => :build
