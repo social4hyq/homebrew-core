@@ -1,8 +1,8 @@
 class Oasdiff < Formula
   desc "OpenAPI Diff and Breaking Changes"
   homepage "https://www.oasdiff.com/"
-  url "https://github.com/oasdiff/oasdiff/archive/refs/tags/v1.18.3.tar.gz"
-  sha256 "0e68d8a66b03e4b8c60cf7231871e93bad30ef50bf699cdc7d08d89f27891aa1"
+  url "https://github.com/oasdiff/oasdiff/archive/refs/tags/v1.18.4.tar.gz"
+  sha256 "77181c8101fda8017321b76cd84766ecde35c6d303d906da1f77857026679aff"
   license "Apache-2.0"
   head "https://github.com/oasdiff/oasdiff.git", branch: "main"
 
@@ -13,7 +13,7 @@ class Oasdiff < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "045d720f83558758b6a6693ca38805789730726016a2175d0700224135a3de73"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a64074cc4e52949df23d054e5708bf3a8a87e9a86658a22e3f24e9fd093705b"
   end
 
   depends_on "go" => :build
