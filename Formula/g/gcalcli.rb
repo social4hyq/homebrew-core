@@ -10,12 +10,7 @@ class Gcalcli < Formula
   head "https://github.com/insanum/gcalcli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "f0d428a140bced7a29ab6a5516d2fcebbcb8455189caeca8d1473c96496c85b6"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b20179d2adf43fba2b1e84d154d44192e239b35150654685291d8ebf0d09122b"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "f6a0b7edf38c2f44b7cb3d6365eec5fee64a6fc8851616f31a7cd3da22341bcf"
-    sha256 cellar: :any_skip_relocation, sonoma:        "dd94828a21578d470e6a6bb73b67d658f3a9824e0e503b95793c28184add7cf8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4fd08e638029d6c9196d3a45cd91d39b29b555a7defdbdb338cef686c5fa72c1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4672d2e3245a968cfa4885162a01e223a28d14f99d0e191d2623b759aca36a25"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c953eed934d88ac09557210a6d2240bb846f949ed84f9ab016d6c9d7191c562"
   end
 
   depends_on "certifi" => :no_linkage
