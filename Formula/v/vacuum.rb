@@ -7,7 +7,7 @@ class Vacuum < Formula
   head "https://github.com/daveshanley/vacuum.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "24bd6555cccf346662a263543442a869700540302026d65cd5d6b6494a326cfa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "abeb7dd2b844824688bea6dc5ff58a49545e830039538e64b0f91fc11a93846a"
   end
 
   depends_on "go" => :build
