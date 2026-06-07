@@ -20,13 +20,7 @@ class Bench < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "3064182e52b625f6abe652df7f1d6d7a01f2c58ac27bd8c7561bd03b9ca7cb80"
-    sha256 cellar: :any,                 arm64_sequoia: "a0386f704c608217e565de8f96d4896f24442fb9b9c4ab7d6eca35e2207b6faf"
-    sha256 cellar: :any,                 arm64_sonoma:  "4c385be74bcb734fdebba6911e0c50f03372589fdc35a3cf30b4cfdbd24c67ff"
-    sha256 cellar: :any,                 sonoma:        "e1fad9d66bd1904f7c6ce6f084d36719727b3958a456b8e00496d60e90e5a484"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "6b44a07113c5f89b4e662c0e25e233b5a5c50363dc329ac76d1adcd3246967e2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3bfc8a2a84dd8d843c3b68bbd054aa1493353210d1657062c5cecc5de9f4d982"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e4c33e892faf6a1dafef0ba1600f96f7607a56168ae3bd434b7143e9248642a"
   end
 
   depends_on "cabal-install" => :build
