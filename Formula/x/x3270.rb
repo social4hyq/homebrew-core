@@ -11,13 +11,7 @@ class X3270 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "40bacb8fca3aaec8c2c541906da72f5901e48fc9c32e08df7d9e8955ddba3177"
-    sha256 arm64_sequoia: "619e4f821224699da21abbbf4ce8c5038bdb22bec06734be199045a4c5504a40"
-    sha256 arm64_sonoma:  "a3fa3dfdcb1b8a3c10922c1f930b049d88b050330b982d96ada2e54bed2391c5"
-    sha256 sonoma:        "38a014060680924480e757610fe29aeff72f5bd0fce56032c76d3044fe71b2fd"
-    sha256 arm64_linux:   "5fa38afa032d8c01d4ba0340d6bd429636fa63d2266a7ce4ca2428e6dd1f0276"
-    sha256 x86_64_linux:  "cfc79e9762353f5b22bbf0bf4a5066e3d4df54cb7e0bec61d31944bfcf426512"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "de667a16f14b44ce0c7d843deda54a2d2ccdc4d40eb506f2f8efc52fc8a4fb17"
   end
 
   depends_on "openssl@3"
