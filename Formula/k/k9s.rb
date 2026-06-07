@@ -2,8 +2,8 @@ class K9s < Formula
   desc "Kubernetes CLI To Manage Your Clusters In Style!"
   homepage "https://k9scli.io/"
   url "https://github.com/derailed/k9s.git",
-      tag:      "v0.50.18",
-      revision: "6dbf571c59fd48dc5b384aa46ee7f3e5decfae2b"
+      tag:      "v0.51.0",
+      revision: "558caafe7ba067467de46b320cc22ef11fef9c34"
   license "Apache-2.0"
   head "https://github.com/derailed/k9s.git", branch: "master"
 
@@ -13,7 +13,7 @@ class K9s < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9f94cb9786e00bc081b49a7f7b207b0f5112a22be4b16d61e3c4cf2df26dfbc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d55764d81112164017cb1314ea8c1ce1d7d7d175e3fd4ebb4b6c8d8bbd339de6"
   end
 
   depends_on "go" => :build
