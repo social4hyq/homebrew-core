@@ -7,12 +7,7 @@ class Libnotify < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "d8ee57b001510f29334c55080553cf34f41b9e8643484429ec1a0d4852f9fb58"
-    sha256 cellar: :any, arm64_sequoia: "4081e1a50cd23929e7c1ae070e81bf2dc85e6099a274d4e1b98a60da459d0cb6"
-    sha256 cellar: :any, arm64_sonoma:  "2f5cab371969079dbee0c140accfc7a3267bbf006c63e3a1935c153fde4033a7"
-    sha256 cellar: :any, sonoma:        "43ec242ea169e80dda511f44370f9df94f2f50d0996a60149f236c9bbcc515ef"
-    sha256               arm64_linux:   "30a82c884d084884e6d52521fd84aa30c4192e60bca5756b8973a4a786280cf1"
-    sha256               x86_64_linux:  "8a89fcc90b7fc4b1a4559cadd439c9565ea597d4b6184125eb7e17ece817e483"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "52e08373b3fd243bca233c3ac422b0e1da96bfce488259e728c905ff67d4e503"
   end
 
   depends_on "docbook-xsl" => :build
