@@ -7,7 +7,7 @@ class HtmlToMarkdown < Formula
   head "https://github.com/JohannesKaufmann/html-to-markdown.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cce5382711e26ed2a0e11dcd0a61b34ca228bf8a108ee7432136d7f87e0c35cd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4311ccebe3462379c52dcc948ec0dc3826c5b241574f0e2461b6da90226c9fce"
   end
 
   depends_on "go" => :build
