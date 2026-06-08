@@ -1,13 +1,13 @@
 class Html2markdown < Formula
   desc "Convert HTML to Markdown"
   homepage "https://html-to-markdown.com"
-  url "https://github.com/JohannesKaufmann/html-to-markdown/archive/refs/tags/v2.5.1.tar.gz"
-  sha256 "9a4d8337f9456fa757ec0e4690ff720a60aef91ee64461ebba15d87def553da0"
+  url "https://github.com/JohannesKaufmann/html-to-markdown/archive/refs/tags/v2.5.2.tar.gz"
+  sha256 "1086b066a17bf49d8bec8fa493e07a54580924ad866ed7e8052692accba706dc"
   license "MIT"
   head "https://github.com/JohannesKaufmann/html-to-markdown.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "69df3c5e998c89f652f3a7877a0a10d4ca49118fd838f2f1a07c236580bf8cee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f145de7ee587dfd8dd6012bcebfd0ff65b6baa727fbc438cb134765ccae792a"
   end
 
   depends_on "go" => :build
