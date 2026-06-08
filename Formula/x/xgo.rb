@@ -1,8 +1,8 @@
 class Xgo < Formula
   desc "AI-native programming language that integrates software engineering"
   homepage "https://xgo.dev/"
-  url "https://github.com/goplus/xgo/archive/refs/tags/v1.7.1.tar.gz"
-  sha256 "a5a5278e9806a11d0618c5a18b704754e559ef434eebae3ea9190481d866a96f"
+  url "https://github.com/goplus/xgo/archive/refs/tags/v1.7.2.tar.gz"
+  sha256 "be369106bea43407da81390e82db6a9fa9afb5c3483a64d9664360369ce7d164"
   license "Apache-2.0"
   head "https://github.com/goplus/xgo.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Xgo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f10ea87d5c43b2882edb95b0269a854a0f3f44c9ca0c7de914e72fd26b07c37f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ee4d3ff78025f680e87b72b8ec6199d95a71fe1e94ab587c9bcf06a8c4c17d7"
   end
 
   depends_on "go"
