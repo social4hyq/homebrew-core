@@ -1,8 +1,8 @@
 class Hexapoda < Formula
   desc "Colorful modal hex editor"
   homepage "https://simonomi.dev/hexapoda"
-  url "https://github.com/simonomi/hexapoda/archive/refs/tags/v0.2.3.tar.gz"
-  sha256 "084156e55ad64bff5e43011fe58eaf588bf97da3f1e849c75d92821d8326149b"
+  url "https://github.com/simonomi/hexapoda/archive/refs/tags/v0.2.4.tar.gz"
+  sha256 "3c205ee738d97743f48aa6d4190c3a2892766a07e7ceb80e09dfa5844c32a395"
   license "GPL-3.0-only"
   head "https://github.com/simonomi/hexapoda.git", branch: "main"
 
