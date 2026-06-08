@@ -3,8 +3,8 @@ class HermesAgent < Formula
 
   desc "Self-improving AI agent that creates skills from experience"
   homepage "https://hermes-agent.nousresearch.com"
-  url "https://github.com/NousResearch/hermes-agent/archive/refs/tags/v2026.5.29.2.tar.gz"
-  sha256 "465ee7a8da014d89e8d381fd13b862469862b7aa6d42b2e9b938351d3787b48e"
+  url "https://github.com/NousResearch/hermes-agent/archive/refs/tags/v2026.6.5.tar.gz"
+  sha256 "09ae9eef4ea88d3a6689b2071e7c927a4a2ee10e737c0974afd5a19402c090ee"
   license "MIT"
   head "https://github.com/NousResearch/hermes-agent.git", branch: "main"
 
@@ -14,7 +14,7 @@ class HermesAgent < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6a4d7f26646d2a72ddea59e8949fc1694d1de8ee2f92a18c0ffd778c902c321"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1424b9b8bb60d96b4bae940d5074a7d31e56295f980893307b5f22e59174bdd"
   end
 
   depends_on "pkgconf" => :build
@@ -213,6 +213,9 @@ class HermesAgent < Formula
   end
 
   def install
+    # Allow to build with Python 3.14
+    inreplace "pyproject.toml", "requires-python = \">=3.11,<3.14\"", "requires-python = \">=3.11,<3.15\""
+
     virtualenv_install_with_resources
   end
 
