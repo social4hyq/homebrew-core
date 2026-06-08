@@ -1,13 +1,13 @@
 class Gomi < Formula
   desc "Functions like rm but with the ability to restore files"
   homepage "https://gomi.dev"
-  url "https://github.com/babarot/gomi/archive/refs/tags/v1.6.3.tar.gz"
-  sha256 "7a1c7962d4e33b5a80133119330bfc21b13ae805c0e7d2862d73c36ffac9fbb9"
+  url "https://github.com/babarot/gomi/archive/refs/tags/v1.6.4.tar.gz"
+  sha256 "27d4bfca8473a5c01c3ead075f2674b47b586b6de8afc7fb31ade1c01d7e5b8a"
   license "MIT"
   head "https://github.com/babarot/gomi.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd14d5854a3c52e02c3ea797a7dcfa179c906f40389fb96c5b2521195cb1f028"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "640306c2de50db54c75525ed364ae1f7f4ae952c3bdafd73cb13fc11cb8724ab"
   end
 
   depends_on "go" => :build
