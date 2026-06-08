@@ -14,7 +14,7 @@ class HermesAgent < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6a4d7f26646d2a72ddea59e8949fc1694d1de8ee2f92a18c0ffd778c902c321"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1424b9b8bb60d96b4bae940d5074a7d31e56295f980893307b5f22e59174bdd"
   end
 
   depends_on "pkgconf" => :build
