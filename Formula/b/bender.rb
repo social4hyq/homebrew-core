@@ -9,7 +9,8 @@ class Bender < Formula
   no_autobump! because: "newer version requires ohos-sdk with full c++20 support"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a7ebad507da8fef1cd7ea01d87c61eaceda98d608d139dc0a5e55fa1495ee73"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b89a65f870a383cca7e4977b8f18b77d2446070c1e7439622cc33d91827e06a0"
   end
 
   depends_on "rust" => :build
