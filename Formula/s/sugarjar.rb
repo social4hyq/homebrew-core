@@ -1,8 +1,8 @@
 class Sugarjar < Formula
   desc "Helper utility for a better Git/GitHub experience"
   homepage "https://github.com/jaymzh/sugarjar/"
-  url "https://github.com/jaymzh/sugarjar/archive/refs/tags/v2.0.2.tar.gz"
-  sha256 "b6db88d6539e662749a7cb78804bcdf89feac188310b87ab55d791aa18475ee3"
+  url "https://github.com/jaymzh/sugarjar/archive/refs/tags/v3.0.0.tar.gz"
+  sha256 "abccb802954dbf1cf37941516e3f750c64d56f24c99a730585c49609135f3456"
   license "Apache-2.0"
 
   bottle do
