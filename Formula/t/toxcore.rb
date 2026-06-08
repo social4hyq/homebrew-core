@@ -3,23 +3,13 @@ class Toxcore < Formula
   homepage "https://tox.chat/"
   # This repo is a fork, but it is the source used by Debian, Fedora, and Arch,
   # and is the repo linked in the homepage.
+  url "https://github.com/TokTok/c-toxcore/releases/download/v0.2.23/c-toxcore-v0.2.23.tar.xz"
+  sha256 "a6c3d559ac06eb6b9d48b3edc72f64a97df823c9f64f7dd97c3999ffdc05381b"
   license "GPL-3.0-or-later"
-  revision 1
   head "https://github.com/TokTok/c-toxcore.git", branch: "master"
 
-  stable do
-    url "https://github.com/TokTok/c-toxcore/releases/download/v0.2.22/c-toxcore-v0.2.22.tar.xz"
-    sha256 "b2599d62181d8c0d5f5f86012ed7bc4be9eb540f2d7a399ec96308eb9870f58e"
-
-    # Backport fix for size_t usage
-    patch do
-      url "https://github.com/TokTok/c-toxcore/commit/40ce0bce665e5589838db8444437957f8e3b83a3.patch?full_index=1"
-      sha256 "65200822334addcbcca431910e5c5076cd0d01622a019044f9399f95be67edeb"
-    end
-  end
-
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e92ea6a61582caecee004fb62f1e66b3cfb267384f0f527cb3f9a0a411cd2778"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a127648679ce7de1146eabb200f323ac45d7d714c9d7899b0e87d4658ed91b71"
   end
 
   depends_on "cmake" => :build
