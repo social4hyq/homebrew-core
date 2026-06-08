@@ -6,7 +6,7 @@ class Quien < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f89b2a468ac18e659a6b664b35e3f26791b6b9e514bd0b67a06b6d2c1c37a66c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61a4ae3ddfc251b2afe48d0c562901e4cc3f9b4854885e7eef1db1f34a74a8a4"
   end
 
   depends_on "go" => :build
