@@ -1,8 +1,8 @@
 class OpenapiGenerator < Formula
   desc "Generate clients, server & docs from an OpenAPI spec (v2, v3)"
   homepage "https://openapi-generator.tech/"
-  url "https://search.maven.org/remotecontent?filepath=org/openapitools/openapi-generator-cli/7.22.0/openapi-generator-cli-7.22.0.jar"
-  sha256 "3f1e6ce5c6ad4f15242c6170ab43aad4bad771622617eeece4a7d4f72ffaf329"
+  url "https://search.maven.org/remotecontent?filepath=org/openapitools/openapi-generator-cli/7.23.0/openapi-generator-cli-7.23.0.jar"
+  sha256 "cb087e40001e31eb08ef6140dd5de10938dbeb89016a1fe0481eaa25cd569026"
   license "Apache-2.0"
 
   livecheck do
