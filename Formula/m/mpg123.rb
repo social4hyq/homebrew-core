@@ -13,7 +13,7 @@ class Mpg123 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "39e906b59cabf4956b7dbebbd268f539674c76c00567d0272afb1fde634cc1fb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba87ce7df522a93dbcf09442491d90642e909126b015af1c6ef5533d93c2f214"
   end
 
   def install
