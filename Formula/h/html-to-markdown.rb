@@ -1,13 +1,13 @@
 class HtmlToMarkdown < Formula
   desc "Transforms HTML (even entire websites) into clean, readable Markdown"
   homepage "https://html-to-markdown.com"
-  url "https://github.com/JohannesKaufmann/html-to-markdown/archive/refs/tags/v2.5.1.tar.gz"
-  sha256 "9a4d8337f9456fa757ec0e4690ff720a60aef91ee64461ebba15d87def553da0"
+  url "https://github.com/JohannesKaufmann/html-to-markdown/archive/refs/tags/v2.5.2.tar.gz"
+  sha256 "1086b066a17bf49d8bec8fa493e07a54580924ad866ed7e8052692accba706dc"
   license "MIT"
   head "https://github.com/JohannesKaufmann/html-to-markdown.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cce5382711e26ed2a0e11dcd0a61b34ca228bf8a108ee7432136d7f87e0c35cd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4311ccebe3462379c52dcc948ec0dc3826c5b241574f0e2461b6da90226c9fce"
   end
 
   depends_on "go" => :build
