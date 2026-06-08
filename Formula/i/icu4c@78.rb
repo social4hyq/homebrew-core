@@ -4,6 +4,7 @@ class Icu4cAT78 < Formula
   url "https://github.com/unicode-org/icu/releases/download/release-78.3/icu4c-78.3-sources.tgz"
   sha256 "3a2e7a47604ba702f345878308e6fefeca612ee895cf4a5f222e7955fabfe0c0"
   license "ICU"
+  revision 1
   compatibility_version 1
 
   # We allow the livecheck to detect new `icu4c` major versions in order to
@@ -40,6 +41,35 @@ class Icu4cAT78 < Formula
     end
 
     inreplace [bin/"icu-config", *lib.glob("pkgconfig/icu-*.pc")], prefix, opt_prefix
+
+    # libicudata.so built by ICU's pkgdata tool is a pure data file
+    # wrapped in an ELF container, not a real shared library. The
+    # HarmonyOS system loader rejects such data-only ELFs.  Re-link
+    # the objects from libicudata.a into a proper shared library so
+    # that the system recognises it and the pipeline signing step
+    # can process it successfully.
+    if (lib/"libicudata.a").exist?
+      ohai "Re-linking libicudata.so as a real shared library"
+      ver = version.major
+      so_name = "libicudata.so.#{ver}"
+      so_full = "libicudata.so.#{version}"
+
+      tmpdir = Pathname.new(Dir.mktmpdir("icudata"))
+      begin
+        system "clang", "-shared", "-fPIC",
+               "-o", tmpdir/so_full,
+               "-Wl,--whole-archive", lib/"libicudata.a",
+               "-Wl,--no-whole-archive",
+               "-Wl,-soname=#{so_name}",
+               "-Wl,--gc-sections"
+
+        lib.install tmpdir/so_full
+        lib.install_symlink so_full => so_name
+        lib.install_symlink so_name => "libicudata.so"
+      ensure
+        tmpdir.rmtree if tmpdir.exist?
+      end
+    end
   end
 
   test do
