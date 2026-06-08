@@ -1,12 +1,12 @@
 class Oarfish < Formula
   desc "Long read RNA-seq quantification"
   homepage "https://github.com/COMBINE-lab/oarfish"
-  url "https://github.com/COMBINE-lab/oarfish/archive/refs/tags/v0.9.4.tar.gz"
-  sha256 "d991443d224edd97d6951b5d99c17bc1c920dc137fb0c606bc3dc5b9f3d25b62"
+  url "https://github.com/COMBINE-lab/oarfish/archive/refs/tags/v0.10.0.tar.gz"
+  sha256 "f8715c6fc2a23c1041d30303fa1a9d7a6e463ed5cc8e543526c085a64d5abfe9"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ffd23eb069dd218d9ee67d138fbff220c611e81ce27d32ca5786c0dd2f54791"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "02e1cfa482211cfcb4e53658b9ab415389bc2234eaaf88902b4a9dbfd9c43954"
   end
 
   depends_on "rust" => :build
