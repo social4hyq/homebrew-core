@@ -6,6 +6,8 @@ class Bender < Formula
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/pulp-platform/bender.git", branch: "master"
 
+  no_autobump! because: "newer version requires ohos-sdk with full c++20 support"
+
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "9a7ebad507da8fef1cd7ea01d87c61eaceda98d608d139dc0a5e55fa1495ee73"
   end
