@@ -6,7 +6,7 @@ class Rapidyaml < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ff862cf5176d91f871d072df5a38cc0c4f8f84e4294c79bfb679b90a691df5b6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "37b8dca5200fdb5f6a751fe7db4a53d1582e8206b63cc54f552164edff34d7f3"
   end
 
   depends_on "cmake" => :build
