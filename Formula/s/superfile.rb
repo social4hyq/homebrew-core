@@ -14,7 +14,7 @@ class Superfile < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e7e75c756fc8a93fb283fc9cc2e15d10317a937356d1ee0739b54acfb065dc7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6209c4ce388fcec3a8a9fb8e1ea6c7761e683422f324164e2ca632d6f70f0cdb"
   end
 
   depends_on "go" => :build
