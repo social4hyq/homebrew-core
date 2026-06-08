@@ -6,7 +6,7 @@ class NpmCheckUpdates < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a79e0c79be9317df84081e9e3ae5453268f39de46ec0fab83f8d08217a81408b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa3067bfe5159f4a58914ccf4fe0ea1b18b3ed95482173c60423ba4dc07a54fa"
   end
 
   depends_on "node"
