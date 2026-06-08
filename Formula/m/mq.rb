@@ -1,13 +1,13 @@
 class Mq < Formula
   desc "Jq-like command-line tool for markdown processing"
   homepage "https://mqlang.org/"
-  url "https://github.com/harehare/mq/archive/refs/tags/v0.5.31.tar.gz"
-  sha256 "9be94d114a4cec216733c357b642aaf5be40dc352f43c300ff8b1460135f0b82"
+  url "https://github.com/harehare/mq/archive/refs/tags/v0.6.0.tar.gz"
+  sha256 "c25dfdaec4eacaf47a601df84dde9d8f2016979b55e21130541255997002d320"
   license "MIT"
   head "https://github.com/harehare/mq.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f25a9162d28e03b579b1da2bd60b0da95e402e89e2488c2065e131609feb8dfe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d81c87a3bea825a1282e6ef939c05059349768b79eab819f557e888ca1876867"
   end
 
   depends_on "rust" => :build
