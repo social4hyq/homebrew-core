@@ -7,7 +7,7 @@ class Ghalint < Formula
   head "https://github.com/suzuki-shunsuke/ghalint.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ead976b9d7a1c460bccf3c1d3279fbd4ffe6d9b66b3ff87c76c29ae6e00beb1a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e3dc2214e1e1a8b9dbf3b54bf4b38e290eb5f01f28996f0a4423ed2f85f1cd4"
   end
 
   depends_on "go" => :build
