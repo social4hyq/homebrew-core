@@ -9,7 +9,7 @@ class Toxcore < Formula
   head "https://github.com/TokTok/c-toxcore.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e92ea6a61582caecee004fb62f1e66b3cfb267384f0f527cb3f9a0a411cd2778"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a127648679ce7de1146eabb200f323ac45d7d714c9d7899b0e87d4658ed91b71"
   end
 
   depends_on "cmake" => :build
