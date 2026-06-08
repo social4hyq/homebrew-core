@@ -8,7 +8,7 @@ class Icu4cAT76 < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "726a472943af63a576ce7603fa6403c50bdeb542b4d70682829502c85d3cd8fd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cb4523a894a490f987f3e705a46d729cb2c3a9de7117513a2731198ea2b6614"
   end
 
   keg_only :versioned_formula
