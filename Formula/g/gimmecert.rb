@@ -10,8 +10,7 @@ class Gimmecert < Formula
   no_autobump! because: "`update-python-resources` cannot determine dependencies"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "131301a3467e90afb96224fdccf103949029d5f963f612f3bf5f512f81adbed0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "39e6cd6c41442b3fbb7c5b64473fc246eaa3e632c45f7aa21b798a3409dbe18e"
   end
 
   depends_on "certifi"
