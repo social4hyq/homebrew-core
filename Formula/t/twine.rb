@@ -10,12 +10,7 @@ class Twine < Formula
   head "https://github.com/pypa/twine.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "86247e3009b8919ec3c75e2edbece87f4a804d93ed551356772d20fdc22547cc"
-    sha256 cellar: :any,                 arm64_sequoia: "b56fb9e9201e71eb7c8e709fb0df11954e3d462bc1f7d3f0efc6fd16fd247f76"
-    sha256 cellar: :any,                 arm64_sonoma:  "f2a1815f82ba1df372521b3c7b28e0c35b8ad86bfc45b279e6cff310778a233a"
-    sha256 cellar: :any,                 sonoma:        "d22a5f47d323c120627d9a7823c3bee6c1e8e61291f14fe3fabd4afc289205de"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "3e3d23da23dd993fe0a40b86f84cc2caf242ccd5c35cb8435ef81a4222cdf914"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e8c5f3b66bb76e18a1eec7817ad74fd9c903ceab2f038e01d208aea778094524"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5befd3cc66cc72c63ce0a3f8a587a6f17dfe5ad639f5a9d69be4628eab525618"
   end
 
   depends_on "rust" => :build
