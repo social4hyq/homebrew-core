@@ -7,7 +7,7 @@ class Harsh < Formula
   head "https://github.com/wakatara/harsh.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9ce27d6d7f302c7b54431f958899027886e177c3c8d040279dccc9085aab0c29"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3749ecb270ce61f52eda8b61c23ad6c77c39567246ee4cd40ba93e589c8b14f"
   end
 
   depends_on "go" => :build
