@@ -1,8 +1,8 @@
 class StripNondeterminism < Formula
   desc "Tool for stripping bits of non-deterministic information from files"
   homepage "https://salsa.debian.org/reproducible-builds/strip-nondeterminism"
-  url "https://salsa.debian.org/reproducible-builds/strip-nondeterminism/-/archive/1.15.0/strip-nondeterminism-1.15.0.tar.bz2"
-  sha256 "cde5567a8e20f3f31ee25132d38f5803efc47c05551d321d1dd1e7666a780a07"
+  url "https://salsa.debian.org/reproducible-builds/strip-nondeterminism/-/archive/1.15.1/strip-nondeterminism-1.15.1.tar.bz2"
+  sha256 "b8046b0faf182aff8de68abf8318d2b913637f4c23961cf61c47402af132a237"
   license "GPL-3.0-or-later"
   head "https://salsa.debian.org/reproducible-builds/strip-nondeterminism.git", branch: "master"
 
