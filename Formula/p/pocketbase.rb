@@ -6,7 +6,7 @@ class Pocketbase < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "edc690d7ddb49174a528d3df33e2122417960cd288aa20633260a2785a74b212"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9111b52d8fbc199b8158c1039a42d8f29ac037a874102c617c964849536bc5bc"
   end
 
   depends_on "go" => :build
