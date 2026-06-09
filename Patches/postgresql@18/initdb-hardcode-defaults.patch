@@ -1,0 +1,29 @@
+--- a/src/bin/initdb/initdb.c	2026-06-11 06:49:26.072346520 +0000
++++ b/src/bin/initdb/initdb.c	2026-06-11 06:55:02.389301205 +0000
+@@ -136,8 +136,8 @@
+ 
+ /* values to be obtained from arguments */
+ static char *pg_data = NULL;
+-static char *encoding = NULL;
+-static char *locale = NULL;
++static char *encoding = "UTF-8";
++static char *locale = "en_US.UTF-8";
+ static char *lc_collate = NULL;
+ static char *lc_ctype = NULL;
+ static char *lc_monetary = NULL;
+@@ -1075,7 +1075,14 @@
+ static const char *
+ choose_dsm_implementation(void)
+ {
+-#if defined(HAVE_SHM_OPEN) && !defined(__sun__)
++#if defined(__OHOS__)
++	/*
++	 * On OHOS, shm_open() may succeed but the compiled backend
++	 * only supports sysv and mmap (posix is excluded).  Force
++	 * mmap as the default to match what was compiled.
++	 */
++	return "mmap";
++#elif defined(HAVE_SHM_OPEN) && !defined(__sun__)
+ 	int			ntries = 10;
+ 	pg_prng_state prng_state;
+ 

@@ -1,0 +1,14 @@
+--- a/src/include/storage/dsm_impl.h	2026-06-11 03:53:50.734283123 +0000
++++ b/src/include/storage/dsm_impl.h	2026-06-11 03:53:50.757283056 +0000
+@@ -27,7 +27,10 @@
+ #define USE_DSM_WINDOWS
+ #define DEFAULT_DYNAMIC_SHARED_MEMORY_TYPE		DSM_IMPL_WINDOWS
+ #else
+-#ifdef HAVE_SHM_OPEN
++#if defined(__OHOS__)
++#define USE_DSM_MMAP
++#define DEFAULT_DYNAMIC_SHARED_MEMORY_TYPE		DSM_IMPL_MMAP
++#elif defined(HAVE_SHM_OPEN)
+ #define USE_DSM_POSIX
+ #define DEFAULT_DYNAMIC_SHARED_MEMORY_TYPE		DSM_IMPL_POSIX
+ #endif

@@ -1,0 +1,11 @@
+--- postgresql-18.4.orig/src/include/pg_config_manual.h	2026-05-11 19:44:35.000000000 +0000
++++ postgresql-18.4/src/include/pg_config_manual.h	2026-06-10 03:26:52.158745752 +0000
+@@ -190,7 +190,7 @@
+  * support them yet.
+  */
+ #ifndef WIN32
+-#define DEFAULT_PGSOCKET_DIR  "/tmp"
++#define DEFAULT_PGSOCKET_DIR  "/data/storage/el2/base/haps/entry/files"
+ #else
+ #define DEFAULT_PGSOCKET_DIR ""
+ #endif

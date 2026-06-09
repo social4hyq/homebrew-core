@@ -1,0 +1,77 @@
+--- postgresql-18.4.orig/src/interfaces/libpq/fe-auth.c	2026-05-11 19:44:35.000000000 +0000
++++ postgresql-18.4/src/interfaces/libpq/fe-auth.c	2026-06-10 03:26:52.122745851 +0000
+@@ -1308,18 +1308,31 @@
+ 						   GetLastError());
+ #else
+ 	rc = getpwuid_r(user_id, &pwbuf, buf, sizeof buf, &pw);
+-	if (rc != 0)
++	if (rc != 0 || !pw)
++	{
++		/*
++		 * If the UID is not found in the password database (common in
++		 * container/sandbox environments), try environment variables as
++		 * a fallback before giving up.
++		 */
++		const char *env_user = getenv("PGUSER");
++		if (!env_user) env_user = getenv("USER");
++		if (!env_user) env_user = getenv("LOGNAME");
++		if (env_user && env_user[0])
++			name = env_user;
++	}
++	if (!name && rc != 0)
+ 	{
+ 		errno = rc;
+ 		if (errorMessage)
+ 			libpq_append_error(errorMessage, "could not look up local user ID %ld: %m", (long) user_id);
+ 	}
+-	else if (!pw)
++	else if (!name && !pw)
+ 	{
+ 		if (errorMessage)
+ 			libpq_append_error(errorMessage, "local user with ID %ld does not exist", (long) user_id);
+ 	}
+-	else
++	else if (!name)
+ 		name = pw->pw_name;
+ #endif
+ 
+--- postgresql-18.4.orig/src/common/username.c	2026-05-11 19:44:35.000000000 +0000
++++ postgresql-18.4/src/common/username.c	2026-06-10 03:26:52.122745851 +0000
+@@ -38,15 +38,31 @@
+ 
+ 	errno = 0;					/* clear errno before call */
+ 	pw = getpwuid(user_id);
+-	if (!pw)
++	if (pw)
++		return pw->pw_name;
++
++	/*
++	 * If the UID is not found in the password database (common in
++	 * container/sandbox environments), try environment variables as
++	 * a fallback before giving up.
++	 */
+ 	{
+-		*errstr = psprintf(_("could not look up effective user ID %ld: %s"),
+-						   (long) user_id,
+-						   errno ? strerror(errno) : _("user does not exist"));
+-		return NULL;
++		const char *env_user;
++		env_user = getenv("PGUSER");
++		if (!env_user) env_user = getenv("USER");
++		if (!env_user) env_user = getenv("LOGNAME");
++		if (env_user && env_user[0])
++		{
++			static char env_buf[128];
++			strlcpy(env_buf, env_user, sizeof(env_buf));
++			return env_buf;
++		}
+ 	}
+ 
+-	return pw->pw_name;
++	*errstr = psprintf(_("could not look up effective user ID %ld: %s"),
++					   (long) user_id,
++					   errno ? strerror(errno) : _("user does not exist"));
++	return NULL;
+ #else
+ 	/* Microsoft recommends buffer size of UNLEN+1, where UNLEN = 256 */
+ 	/* "static" variable remains after function exit */

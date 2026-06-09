@@ -1,0 +1,27 @@
+--- postgresql-18.4.orig/src/include/common/file_perm.h	2026-05-11 19:44:35.000000000 +0000
++++ postgresql-18.4/src/include/common/file_perm.h	2026-06-10 03:26:52.154745763 +0000
+@@ -21,7 +21,7 @@
+  *
+  * This is the default.
+  */
+-#define PG_MODE_MASK_OWNER		    (S_IRWXG | S_IRWXO)
++#define PG_MODE_MASK_OWNER		    (S_IWGRP | S_IRWXO)
+ 
+ /*
+  * Mode mask for data directory permissions that also allows group read/execute.
+@@ -29,13 +29,13 @@
+ #define PG_MODE_MASK_GROUP			(S_IWGRP | S_IRWXO)
+ 
+ /* Default mode for creating directories */
+-#define PG_DIR_MODE_OWNER			S_IRWXU
++#define PG_DIR_MODE_OWNER			(S_IRWXU | S_IRGRP | S_IXGRP)
+ 
+ /* Mode for creating directories that allows group read/execute */
+ #define PG_DIR_MODE_GROUP			(S_IRWXU | S_IRGRP | S_IXGRP)
+ 
+ /* Default mode for creating files */
+-#define PG_FILE_MODE_OWNER		    (S_IRUSR | S_IWUSR)
++#define PG_FILE_MODE_OWNER		    (S_IRUSR | S_IWUSR | S_IRGRP)
+ 
+ /* Mode for creating files that allows group read */
+ #define PG_FILE_MODE_GROUP			(S_IRUSR | S_IWUSR | S_IRGRP)
