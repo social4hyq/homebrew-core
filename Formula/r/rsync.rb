@@ -13,7 +13,7 @@ class Rsync < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "39dca37d5734138e36b3a973b2558e2b06c15a14bbeee88d87ff9b37c5d43202"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0bac661db402d809b08f12f90ab5fe9fd5b22b2869be3c4876c5245497056270"
   end
 
   depends_on "autoconf" => :build
