@@ -1,30 +1,29 @@
 class Jscpd < Formula
   desc "Copy/paste detector for programming source code"
   homepage "https://github.com/kucherenko/jscpd"
-  url "https://registry.npmjs.org/jscpd/-/jscpd-4.2.5.tgz"
-  sha256 "1971e2283dd587cb77a9165726ca7f27f8912894789abef61fc0515ea525e9f4"
+  url "https://github.com/kucherenko/jscpd/archive/refs/tags/v5.0.4.tar.gz"
+  sha256 "dfaf2e068e20d14ebd50db45650dce8616059c070b375a978244f64400bd600d"
   license "MIT"
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "eb9e55089a916bd0f4b311831dca2767a07333b6807cf4057ba34fec6259ffa3"
   end
 
-  depends_on "node"
+  depends_on "rust" => :build
 
   def install
-    system "npm", "install", *std_npm_args
-    bin.install_symlink libexec.glob("bin/*")
+    system "cargo", "install", *std_cargo_args(path: "rust/crates/cpd")
   end
 
   test do
     test_file = testpath/"test.js"
     test_file2 = testpath/"test2.js"
-    test_file.write <<~EOS
+    test_file.write <<~JAVASCRIPT
       console.log("Hello, world!");
-    EOS
-    test_file2.write <<~EOS
+    JAVASCRIPT
+    test_file2.write <<~JAVASCRIPT
       console.log("Hello, brewtest!");
-    EOS
+    JAVASCRIPT
 
     output = shell_output("#{bin}/jscpd --min-lines 1 #{testpath}/*.js 2>&1")
     assert_match "Found 0 clones", output
