@@ -1,8 +1,8 @@
 class Zk < Formula
   desc "Plain text note-taking assistant"
   homepage "https://zk-org.github.io/zk/"
-  url "https://github.com/zk-org/zk/archive/refs/tags/v0.15.4.tar.gz"
-  sha256 "024b5a1615c8ac1924ec3338b36031c36131bad5de77dcce05adce35659b7489"
+  url "https://github.com/zk-org/zk/archive/refs/tags/v0.15.5.tar.gz"
+  sha256 "a3260eb1c6309a70a27d0e81c32fce58a9856905e781ea4138aa87d523e910aa"
   license "GPL-3.0-only"
   head "https://github.com/zk-org/zk.git", branch: "dev"
 
@@ -12,7 +12,7 @@ class Zk < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "30928d9b9399d79cb7b8890a5f801b4350a4b97c820940ca3a983b1037753109"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8aa349640287f9f600c21110737f93eb8ff64c7d0ee83d31efa3bcd9ea5c109e"
   end
 
   depends_on "go" => :build
