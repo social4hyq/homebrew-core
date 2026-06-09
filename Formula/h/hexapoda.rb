@@ -7,7 +7,7 @@ class Hexapoda < Formula
   head "https://github.com/simonomi/hexapoda.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2b5f898ba5f005d3c970c4ee5e8f0ceef4cb3e52c1041b64a4406937a2ec615"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c10a209096f3793e4ad6cb0195b6e49a35d39ae100ae9e05d9776d38fa69ebf6"
   end
 
   depends_on "rust" => :build
