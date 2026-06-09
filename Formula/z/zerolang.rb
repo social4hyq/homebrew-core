@@ -1,8 +1,8 @@
 class Zerolang < Formula
   desc "Programming language for agents with explicit effects and predictable memory"
   homepage "https://zerolang.ai/"
-  url "https://github.com/vercel-labs/zero/archive/refs/tags/v0.2.1.tar.gz"
-  sha256 "3d6d1e0ec37d0f4c13fa4f470f6f8679788ebdf19c266b36bfe45f0734e8f5c6"
+  url "https://github.com/vercel-labs/zero/archive/refs/tags/v0.3.0.tar.gz"
+  sha256 "235f04df04cf6b85eeac3779d40ca5fbbc8d68e6e34a8cfee8d6eea6760e9320"
   license "Apache-2.0"
   head "https://github.com/vercel-labs/zero.git", branch: "main"
 
@@ -18,11 +18,14 @@ class Zerolang < Formula
   test do
     assert_match version.to_s, shell_output("#{bin}/zero --version")
 
-    (testpath/"hello.0").write <<~'ZERO'
+    (testpath/"src/main.0").write <<~ZERO
       pub fn main(world: World) -> Void raises {
-        check world.out.write("hello\n")
+        check world.out.write("hello")
       }
     ZERO
-    system bin/"zero", "check", testpath/"hello.0"
+    system bin/"zero", "init"
+    system bin/"zero", "import"
+    system bin/"zero", "check"
+    assert_match "hello", shell_output("#{bin}/zero run")
   end
 end
