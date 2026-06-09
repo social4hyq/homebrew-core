@@ -1,8 +1,8 @@
 class Crit < Formula
   desc "Your feedback loop with the agent: review plans and code locally"
   homepage "https://crit.md/"
-  url "https://github.com/tomasz-tomczyk/crit/archive/refs/tags/v0.16.1.tar.gz"
-  sha256 "fe017755f9e1939a5a880fd89230bdf342170b340e72052019bfa34d50cabe88"
+  url "https://github.com/tomasz-tomczyk/crit/archive/refs/tags/v0.16.2.tar.gz"
+  sha256 "d927b4ef81d5c05b97c304157057f342ae1a4aa88a8781497afab6b1e665c50a"
   license "MIT"
   head "https://github.com/tomasz-tomczyk/crit.git", branch: "main"
 
@@ -19,7 +19,7 @@ class Crit < Formula
       -X main.commit=brew
       -X main.date=#{time.iso8601[0, 10]}
     ]
-    system "go", "build", *std_go_args(ldflags:)
+    system "go", "build", *std_go_args(ldflags:), "./cmd/crit"
   end
 
   test do
