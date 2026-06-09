@@ -7,7 +7,7 @@ class Asyncapi < Formula
   version_scheme 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9eed2455955fd02f01dec3c953ce1dd3d5463f01916be2e7b03e5b11cd5aec0e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef157e91b203e5c5577176f41b1591ff3a04e7843e54835d36d2a8c5bf6b98ed"
   end
 
   depends_on "node"
