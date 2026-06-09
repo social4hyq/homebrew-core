@@ -13,7 +13,7 @@ class Oasdiff < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a64074cc4e52949df23d054e5708bf3a8a87e9a86658a22e3f24e9fd093705b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e9597ae8b636eb0a2ff62adcd46074cfabaea19fb5b44b63aee3ca74b604502"
   end
 
   depends_on "go" => :build
