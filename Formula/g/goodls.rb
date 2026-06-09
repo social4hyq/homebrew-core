@@ -7,7 +7,7 @@ class Goodls < Formula
   head "https://github.com/tanaikech/goodls.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "885002969036d01891705e219f29f6362bdf136b1402d196bcfe34e021e3c8f1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0af2e68648aaa178579076d85bfae2043666f44917e6c32b5c5f33d4c2a8ae5f"
   end
 
   depends_on "go" => :build
