@@ -3,13 +3,13 @@ class Offlineimap < Formula
 
   desc "Synchronizes emails between two repositories"
   homepage "https://github.com/OfflineIMAP/offlineimap3"
-  url "https://github.com/OfflineIMAP/offlineimap3/archive/refs/tags/v8.0.2.tar.gz"
-  sha256 "c299cbbab92d48215ea37ec06ec68699d17e59ab97a1b98e792f75e0a507b306"
+  url "https://github.com/OfflineIMAP/offlineimap3/archive/refs/tags/v8.0.3.tar.gz"
+  sha256 "967a8ca24e5f665cd22941ba1173db10cbd908085ec22ab9b0e4a64c94007d85"
   license "GPL-2.0-or-later"
   head "https://github.com/OfflineIMAP/offlineimap3.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2371488c9a046c3e7941b4733d0f81e80aa17e4b448684477ded923dfe574d2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a1883e6a3609c8290f49f01b089ae88daf2d9f32c4437bf50e0ed8fbe7d988d"
   end
 
   depends_on "certifi"
