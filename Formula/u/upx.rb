@@ -1,13 +1,13 @@
 class Upx < Formula
   desc "Compress/expand executable files"
   homepage "https://upx.github.io/"
-  url "https://github.com/upx/upx/releases/download/v5.1.1/upx-5.1.1-src.tar.xz"
-  sha256 "8eb914115b306fd9fd2110bd3d27ddb8ae7c5a03bb965f7d10f046a3a4ff9dfe"
+  url "https://github.com/upx/upx/releases/download/v5.2.0/upx-5.2.0-src.tar.xz"
+  sha256 "af99e526d5759de94412aea1104d5e4ca406cb725295f8633ecc9e843dc1ce1c"
   license "GPL-2.0-or-later"
   head "https://github.com/upx/upx.git", branch: "devel"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "54dfa1e722881667967bbd7362ea25e6b5f75ce404ebdb544a8c4b5cabd95746"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6992e6ce24563368fd43667858c09e24d41970dd8e29fd72bea18bbdede7615"
   end
 
   depends_on "cmake" => :build
