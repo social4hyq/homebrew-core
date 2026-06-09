@@ -6,7 +6,7 @@ class Jose < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc78cf8630c3ba50d8e1c9535bff101cb48ca18292ccae463d8094df81229b20"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2fb034e5dda3b75ced534d3176dfb77c36d18634f3b5b1a147c1aeb8ee8b933b"
   end
 
   depends_on "meson" => :build
