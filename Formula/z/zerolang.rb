@@ -7,7 +7,7 @@ class Zerolang < Formula
   head "https://github.com/vercel-labs/zero.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "36d4fc8b344c28633b6be2267282a48db8ab2f348afaec12ecf5f7b48bb3b460"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa0aac135ce0956a729d2216b6a8d160a6249cae73d8e1a642bec0074cd1f4c4"
   end
 
   def install
