@@ -3,13 +3,13 @@ class Yoke < Formula
   homepage "https://yokecd.github.io/docs/"
   # We use a git checkout since the build relies on tags for the version
   url "https://github.com/yokecd/yoke.git",
-      tag:      "v0.20.15",
-      revision: "844fe8b8322bc4e38d95cb29afbcc80ae429d36a"
+      tag:      "v0.20.16",
+      revision: "ed8903300aeb9e17b8556c31a15334007efbcb96"
   license "MIT"
   head "https://github.com/yokecd/yoke.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4aeffa93b91420df2756d0fa83cd3a88a11c3a675cda637265a6c7e1b363fb6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c12fa2b863b2422e2c0fc81b2687542b73ef0cbe86a383f6a4b1dea92e242ab"
   end
 
   depends_on "go" => :build
