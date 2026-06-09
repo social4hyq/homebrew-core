@@ -7,7 +7,7 @@ class Azion < Formula
   head "https://github.com/aziontech/azion.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b00fbc5a5ba2c3559b639ebb6e2cf9229efa10e59b773ac16b21110bc54ad67f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c31b2abf6f0c3214e24cf4517f369fe93b2554271bde60799aa80848a613629e"
   end
 
   depends_on "go" => :build
