@@ -1,12 +1,12 @@
 class Jose < Formula
   desc "C-language implementation of Javascript Object Signing and Encryption"
   homepage "https://github.com/latchset/jose"
-  url "https://github.com/latchset/jose/releases/download/v14/jose-14.tar.xz"
-  sha256 "cee329ef9fce97c4c025604a8d237092f619aaa9f6d35fdf9d8c9052bc1ff95b"
+  url "https://github.com/latchset/jose/releases/download/v15/jose-15.tar.xz"
+  sha256 "1d055c445392aa48d709ecd6e56220384ae2b480496e270818bddf1f219c8659"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc78cf8630c3ba50d8e1c9535bff101cb48ca18292ccae463d8094df81229b20"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2fb034e5dda3b75ced534d3176dfb77c36d18634f3b5b1a147c1aeb8ee8b933b"
   end
 
   depends_on "meson" => :build
@@ -17,13 +17,6 @@ class Jose < Formula
 
   on_linux do
     depends_on "zlib-ng-compat"
-  end
-
-  # Apply upstream PR to fix build on macOS to use `-exported_symbol`
-  # PR ref: https://github.com/latchset/jose/pull/163
-  patch do
-    url "https://github.com/latchset/jose/commit/228d6782235238ed0d03eb2443caf530b377ffd5.patch?full_index=1"
-    sha256 "14e147b1541a915badefa46535999c17fe3f04d2ba4754775b928e4d5e97ce1a"
   end
 
   def install
