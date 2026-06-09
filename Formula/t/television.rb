@@ -7,7 +7,7 @@ class Television < Formula
   head "https://github.com/alexpasmantier/television.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "70e189fb49913e8f9cacc82e842b64559299723643a7e0398decf3fe8d7ce931"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f7b7749d5943c85aae4e599fa85cebb6b4e6796a2afc360bed25ab8144e6275b"
   end
 
   depends_on "rust" => :build
