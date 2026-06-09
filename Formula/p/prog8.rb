@@ -1,8 +1,8 @@
 class Prog8 < Formula
   desc "Compiled programming language targeting the 8-bit 6502 CPU family"
   homepage "https://prog8.readthedocs.io"
-  url "https://github.com/irmen/prog8/archive/refs/tags/v12.1.1.tar.gz"
-  sha256 "34ede7105af1c5eabc6e457d1eed0b9ef5655498d215197739bbb1c1ed71cc7a"
+  url "https://github.com/irmen/prog8/archive/refs/tags/v12.2.tar.gz"
+  sha256 "731efbf7cbdfef2202e7e664f9c9ef2193662c613f2366dd323bb2af26abf6a8"
   license "GPL-3.0-only"
 
   livecheck do
@@ -11,7 +11,7 @@ class Prog8 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5af6bb453e498e3b330292439f45787d4a9752a60a121ebd6e01149ee53f6e35"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc32bd2a24a3f624b7b8d7b2654329acdf0f6a67ce5b2c7c81b0937ccb277fea"
   end
 
   depends_on "gradle" => :build
