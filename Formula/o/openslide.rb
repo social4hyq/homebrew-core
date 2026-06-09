@@ -7,7 +7,7 @@ class Openslide < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1228d28b5283db899c5b1908070ecbeafe8bf348021c7e5f75cd40d9902067d0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "47f4b067f11cde1388e93b5793b059c73315d952b3e828205d5b534790cd1caa"
   end
 
   depends_on "meson" => :build
