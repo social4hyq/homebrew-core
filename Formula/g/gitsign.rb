@@ -7,7 +7,7 @@ class Gitsign < Formula
   head "https://github.com/sigstore/gitsign.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2fc3cd6678cb624c9b0f641e1dd7faa3742d699083a03ad00f87c2f74a79caf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a06bb1bd308570a40e380c2d21c4374a12ac894c21e2ff4df9bfc78e39fe1437"
   end
 
   depends_on "go" => :build
