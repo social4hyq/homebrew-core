@@ -12,7 +12,7 @@ class Hwloc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "90f96e5e1931c2405f7bcbc43d09d0f7d1d8d259ea99e5a3efab01777acc554c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "553c67ae1cc017d783ed85738359d4803ad302ac80f660d5e600314c50be7633"
   end
 
   head do
