@@ -1,13 +1,13 @@
 class Charls < Formula
   desc "C++ JPEG-LS library implementation"
   homepage "https://github.com/team-charls/charls"
-  url "https://github.com/team-charls/charls/archive/refs/tags/2.4.3.tar.gz"
-  sha256 "bbf67d51446a98eb8fc98c9c6de49a2605c709d3a14ba39f09a09f8e57527099"
+  url "https://github.com/team-charls/charls/archive/refs/tags/2.4.4.tar.gz"
+  sha256 "fbd712903d61306ad00d5fa5029a9882630c7311ca487f48d2d76000956e8ff9"
   license "BSD-3-Clause"
   head "https://github.com/team-charls/charls.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbd43c08d1ba3eafb80d0a5f3e17a50e3440c6fa78005c0c7f0a08fa23a6fd58"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "67895b18205f11dfa479dec053eca137550f421367b5b1b2473aa4337796feda"
   end
 
   depends_on "cmake" => :build
