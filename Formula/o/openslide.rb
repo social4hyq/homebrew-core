@@ -1,14 +1,13 @@
 class Openslide < Formula
   desc "C library to read whole-slide images (a.k.a. virtual slides)"
   homepage "https://openslide.org/"
-  url "https://github.com/openslide/openslide/releases/download/v4.0.0/openslide-4.0.0.tar.xz"
-  sha256 "cc227c44316abb65fb28f1c967706eb7254f91dbfab31e9ae6a48db6cf4ae562"
+  url "https://github.com/openslide/openslide/releases/download/v4.0.1/openslide-4.0.1.tar.xz"
+  sha256 "df82f6b264f98d11eeb80d85bbb10c7935fcd69c7abae1d610ce49b9a0437faf"
   license "LGPL-2.1-only"
-  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1228d28b5283db899c5b1908070ecbeafe8bf348021c7e5f75cd40d9902067d0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "47f4b067f11cde1388e93b5793b059c73315d952b3e828205d5b534790cd1caa"
   end
 
   depends_on "meson" => :build
