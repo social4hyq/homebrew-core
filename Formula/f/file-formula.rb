@@ -13,7 +13,7 @@ class FileFormula < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5cda21d42365f272d061d42a42b137152d47b4a402d52c519ac7861b5196f55f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "73680c7b7e785ef35f29e247130ee15274937d8d21724f9f5e94efacb55502c4"
   end
 
   keg_only :provided_by_macos
