@@ -12,7 +12,7 @@ class Regal < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f32369e92aec29422b4472236ac3c5b52812e55fa029285eccf23538a03ea96"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "710b4a20ae2ecb38abf3190cf3052c7cb20063809154381ab5780119cdafd721"
   end
 
   depends_on "go" => :build
