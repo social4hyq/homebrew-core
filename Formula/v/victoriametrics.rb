@@ -1,8 +1,8 @@
 class Victoriametrics < Formula
   desc "Cost-effective and scalable monitoring solution and time series database"
   homepage "https://victoriametrics.com/"
-  url "https://github.com/VictoriaMetrics/VictoriaMetrics/archive/refs/tags/v1.144.0.tar.gz"
-  sha256 "d5dd233d29a761c958d59ee071addbf41ea38385c40f0dfc8a6decb58f52c467"
+  url "https://github.com/VictoriaMetrics/VictoriaMetrics/archive/refs/tags/v1.145.0.tar.gz"
+  sha256 "4767d6a05468d370b7777cbdb0fc657e20052f9e3b70d99613784fea0f02ff54"
   license "Apache-2.0"
 
   # There are tags like `pmm-6401-v1.89.1` in the upstream repo. They don't
@@ -14,7 +14,7 @@ class Victoriametrics < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6eed2aa299699b6a11b3fc2fd25dfe61803e5417c6a6f11f255fc136d8de9c2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d53fecd11c935448d991ff436d84afaa2ae842be1c84c83fe976626238313ac6"
   end
 
   depends_on "go" => :build
