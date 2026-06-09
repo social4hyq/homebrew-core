@@ -1,8 +1,8 @@
 class Libmagic < Formula
   desc "Implementation of the file(1) command"
   homepage "https://www.darwinsys.com/file/"
-  url "https://astron.com/pub/file/file-5.47.tar.gz"
-  sha256 "45672fec165cb4cc1358a2d76b5d57d22876dcb97ab169427ac385cbe1d5597a"
+  url "https://astron.com/pub/file/file-5.48.tar.gz"
+  sha256 "ed14656883b23a364b4057c05595d93252da9bc473d30106519519d0da141283"
   license all_of: ["BSD-2-Clause-Darwin", "BSD-2-Clause", :public_domain]
   compatibility_version 1
 
@@ -11,7 +11,7 @@ class Libmagic < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bd1d8a0fb7e26e3cb88b6768a85bb7822c9ec5732349f805a3113d6ad9bda40"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ed0d6bbc8d779b7d24ce63f0ada9b9f2ea6d1a841248e441529438fc03b4fe7"
   end
 
   depends_on "pkgconf" => :test
