@@ -11,7 +11,7 @@ class Pdfcpu < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "28048cedf3cbf1b754115c99d320e536058848d68257d668c62b2c4e90ed9bd4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b8ee1d8c064a03248ccec885ea6415734f84e3bc075c29e4333d4f5d8c868591"
   end
 
   depends_on "go" => :build
