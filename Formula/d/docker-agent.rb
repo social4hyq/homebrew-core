@@ -1,8 +1,8 @@
 class DockerAgent < Formula
   desc "Agent Builder and Runtime by Docker Engineering"
   homepage "https://docker.github.io/docker-agent/"
-  url "https://github.com/docker/docker-agent/archive/refs/tags/v1.74.0.tar.gz"
-  sha256 "ca16849f4052c16b07a9892b245e71c93b61eaa042636116e8b97f1179bbd73a"
+  url "https://github.com/docker/docker-agent/archive/refs/tags/v1.77.0.tar.gz"
+  sha256 "3ee8ba0d45523123de6a29c4f7748d37b8d96c8daa54efb430dedec7720fe38e"
   license "Apache-2.0"
   head "https://github.com/docker/docker-agent.git", branch: "main"
 
