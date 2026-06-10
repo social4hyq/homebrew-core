@@ -1,13 +1,13 @@
 class RabbitmqC < Formula
   desc "C AMQP client library for RabbitMQ"
   homepage "https://github.com/alanxz/rabbitmq-c"
-  url "https://github.com/alanxz/rabbitmq-c/archive/refs/tags/v0.15.0.tar.gz"
-  sha256 "7b652df52c0de4d19ca36c798ed81378cba7a03a0f0c5d498881ae2d79b241c2"
+  url "https://github.com/alanxz/rabbitmq-c/archive/refs/tags/v0.16.0.tar.gz"
+  sha256 "1298b89a78bb8bc70862f612da6eb3a71ade16b5c3f2fa50ec6e5251803ed08a"
   license "MIT"
   head "https://github.com/alanxz/rabbitmq-c.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4fa8de2225c495070911dd48c9e494b985230d292892c60223f2048d2afa4f3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9703f20094ef05879061a031703adfbda1c7a2674941b167452f21353740600"
   end
 
   depends_on "cmake" => :build
