@@ -14,7 +14,7 @@ class Pinact < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6c41971c25e36a76814f822bccab7b5a14df6b87ec8a3606c164c6c4fe2521a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c13ef5439613d113abc79a6d9ac5974e6040da1ee9c89faeee3037a74aa9db86"
   end
 
   depends_on "go" => :build
