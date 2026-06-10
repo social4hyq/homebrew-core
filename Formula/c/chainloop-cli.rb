@@ -1,8 +1,8 @@
 class ChainloopCli < Formula
   desc "CLI for interacting with Chainloop"
   homepage "https://docs.chainloop.dev"
-  url "https://github.com/chainloop-dev/chainloop/archive/refs/tags/v1.99.1.tar.gz"
-  sha256 "303d869cf2f51d99a422355b69a73610a46272778c33b627398aa5e4bac6288d"
+  url "https://github.com/chainloop-dev/chainloop/archive/refs/tags/v1.100.0.tar.gz"
+  sha256 "b0f838bb6a5e4401db5922dfde0c078509affc413772c990585033101b510bf5"
   license "Apache-2.0"
   head "https://github.com/chainloop-dev/chainloop.git", branch: "main"
 
@@ -12,7 +12,7 @@ class ChainloopCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3cc660a4832cfa9611fc648b878bec073bd3ca6ff867d33b2c6b08e72b9d5b2f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "467364bd1fd14a317ac6a5b0b860a94f32de4c8ccf26e21dab51767709c892e3"
   end
 
   depends_on "go" => :build
