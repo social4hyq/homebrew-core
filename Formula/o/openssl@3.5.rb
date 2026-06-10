@@ -1,9 +1,9 @@
 class OpensslAT35 < Formula
   desc "Cryptography and SSL/TLS Toolkit"
   homepage "https://openssl-library.org"
-  url "https://github.com/openssl/openssl/releases/download/openssl-3.5.6/openssl-3.5.6.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/openssl-3.5.6.tar.gz"
-  sha256 "deae7c80cba99c4b4f940ecadb3c3338b13cb77418409238e57d7f31f2a3b736"
+  url "https://github.com/openssl/openssl/releases/download/openssl-3.5.7/openssl-3.5.7.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/openssl-3.5.7.tar.gz"
+  sha256 "a8c0d28a529ca480f9f36cf5792e2cd21984552a3c8e4aa11a24aa31aeac98e8"
   license "Apache-2.0"
 
   livecheck do
@@ -12,7 +12,7 @@ class OpensslAT35 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f8b3ae9443cce3df30c4583abac403fbfdaf90660867fd7f57614529fa7ede5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb654eb9d010cf95cf81e19c77f302268782e9994133f86478a43c8cfc6bb40f"
   end
 
   keg_only :versioned_formula
