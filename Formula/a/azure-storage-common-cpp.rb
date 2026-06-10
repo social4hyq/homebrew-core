@@ -1,8 +1,8 @@
 class AzureStorageCommonCpp < Formula
   desc "Provides common Azure Storage-related abstractions for Azure SDK"
   homepage "https://github.com/Azure/azure-sdk-for-cpp/tree/main/sdk/storage/azure-storage-common"
-  url "https://github.com/Azure/azure-sdk-for-cpp/archive/refs/tags/azure-storage-common_12.13.0.tar.gz"
-  sha256 "3c24422456c90a9e43b5edc6e9098397309318a0e0eca3fd22a56e94b7c3ccf9"
+  url "https://github.com/Azure/azure-sdk-for-cpp/archive/refs/tags/azure-storage-common_12.14.0.tar.gz"
+  sha256 "68b3d88d5f1358b3607b4fb76674373c91e1dd840920de05e5a82cf09fcc6e5b"
   license "MIT"
 
   livecheck do
