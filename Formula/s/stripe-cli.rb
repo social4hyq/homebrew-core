@@ -6,7 +6,7 @@ class StripeCli < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdc00d6640a704bbdbf1f365d1577f33fbb8b41281aa56f2dfa0679fa8428167"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2659ac946035960642a48321f7c2a9dab279b6b6ae1793cfcd91369c4aa70cfc"
   end
 
   depends_on "go" => :build
