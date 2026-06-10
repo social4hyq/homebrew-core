@@ -7,7 +7,7 @@ class Talosctl < Formula
   head "https://github.com/siderolabs/talos.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f09639d03dea62263fbb12878401e11cf403c0fc659e8e4c54988f2bf72c462"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cef50daa14c836f8e1b52bca6b2760d4f098c88ff69fa2c464ed4030dafbe7f"
   end
 
   depends_on "go" => :build
