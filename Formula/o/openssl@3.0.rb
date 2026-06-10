@@ -11,7 +11,7 @@ class OpensslAT30 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f052691614b72b8a32f2be56fc5d19a21137d4605ca767dcd7ca81cd57e1493e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b39a78bec44c5d47fcfd719791e5f772dad347c3c73cacc758aaa8f3babf7ed8"
   end
 
   keg_only :versioned_formula
