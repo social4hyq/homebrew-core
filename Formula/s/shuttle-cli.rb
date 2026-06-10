@@ -1,8 +1,8 @@
 class ShuttleCli < Formula
   desc "CLI for handling shared build and deploy tools between many projects"
   homepage "https://github.com/lunarway/shuttle"
-  url "https://github.com/lunarway/shuttle/archive/refs/tags/v0.24.3.tar.gz"
-  sha256 "4a8b93f01e9e21e543c393f59214145850895c89c2c6924a7faac6f8f12292cb"
+  url "https://github.com/lunarway/shuttle/archive/refs/tags/v0.25.0.tar.gz"
+  sha256 "dddc84927c985ec29cbbad7952d8c5e3d6c1fe1bcd5732c49269d0f517000f90"
   license "Apache-2.0"
   head "https://github.com/lunarway/shuttle.git", branch: "master"
 
