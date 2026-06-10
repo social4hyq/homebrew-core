@@ -6,8 +6,7 @@ class Wtype < Formula
   license "MIT"
 
   bottle do
-    sha256 arm64_linux:  "67c56b2dd69bc9e41cb2f1d31fae8421bf589e1c094cc16bd975dc743fc61c00"
-    sha256 x86_64_linux: "fb8b560329a38b9ffce961dbedbbfa9cd687d6e07f104604754da4328035ed11"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "50f5b2ee569cabfd062d3b6cf57a99155b861959af04b5eb24912b2d419ecb39"
   end
 
   depends_on "meson" => :build
