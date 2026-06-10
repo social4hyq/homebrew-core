@@ -1,8 +1,8 @@
 class Pinact < Formula
   desc "Pins GitHub Actions to full hashes and versions"
   homepage "https://github.com/suzuki-shunsuke/pinact"
-  url "https://github.com/suzuki-shunsuke/pinact/archive/refs/tags/v4.0.0.tar.gz"
-  sha256 "880e29511209f1cb55ac53e4e72b9ee2c62c13340420ed3263b99302f9b71bd2"
+  url "https://github.com/suzuki-shunsuke/pinact/archive/refs/tags/v4.1.0.tar.gz"
+  sha256 "0305c7db5cfcb2a62f7f5faa74e7cc3312c9ec10cbe01eadc23128d6a119eb03"
   license "MIT"
   head "https://github.com/suzuki-shunsuke/pinact.git", branch: "main"
 
@@ -14,7 +14,7 @@ class Pinact < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6c41971c25e36a76814f822bccab7b5a14df6b87ec8a3606c164c6c4fe2521a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c13ef5439613d113abc79a6d9ac5974e6040da1ee9c89faeee3037a74aa9db86"
   end
 
   depends_on "go" => :build
