@@ -13,7 +13,7 @@ class OpenshiftCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee85d440d87e3fe2de963bd4b7846011fbb8ce5baca47ffdf9fac6bb9ed650b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "baa5f935e7bd12d3bff311569b4b3b7e07eb768e278f07465936940ec06f3a0f"
   end
 
   depends_on "go" => :build
