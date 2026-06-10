@@ -1,8 +1,8 @@
 class Msgpack < Formula
   desc "Library for a binary-based efficient data interchange format"
   homepage "https://msgpack.org/"
-  url "https://github.com/msgpack/msgpack-c/releases/download/c-7.0.0/msgpack-c-7.0.0.tar.gz"
-  sha256 "0f1b34a42ea20b35350ad774e56666f64e860ce22d787626f2b3d2ab67061639"
+  url "https://github.com/msgpack/msgpack-c/releases/download/c-7.0.1/msgpack-c-7.0.1.tar.gz"
+  sha256 "2d80f190ab89b73b513025d8aef09b144e5c07b3734dfe99dd0137725d355504"
   license "BSL-1.0"
   head "https://github.com/msgpack/msgpack-c.git", branch: "c_master"
 
@@ -12,7 +12,7 @@ class Msgpack < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8496b13ded3a72a57588fd006c5d1ebd94cc09d2fc208ef1f8c832903b8a689c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "056c93d307e855aaec73d72ef63fe7ea32a606ac0588c925280d89bff50e70f9"
   end
 
   depends_on "cmake" => :build
