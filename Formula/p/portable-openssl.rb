@@ -27,7 +27,7 @@ class PortableOpenssl < PortableFormula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7dea0493e2a5fcd4db80c2779e74503a70ef88da2ee2f8c21954cf9527469fd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "caf0946a248646877a9804d382f677cc50b1339ea2f8ec747de18ae4d80c750e"
   end
 
   resource "cacert" do
