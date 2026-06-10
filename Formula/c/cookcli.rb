@@ -1,13 +1,13 @@
 class Cookcli < Formula
   desc "CLI-tool for cooking recipes formated using Cooklang"
   homepage "https://cooklang.org"
-  url "https://github.com/cooklang/cookcli/archive/refs/tags/v0.30.0.tar.gz"
-  sha256 "9a44b378b7e09e6e41a829e2bfd666f4da1809b281501fe5a2ea14851a01a338"
+  url "https://github.com/cooklang/cookcli/archive/refs/tags/v0.31.0.tar.gz"
+  sha256 "abcbeb7b35c45f39a68d2b75adc230161556c27c37b0864e947c47ceedfae9d5"
   license "MIT"
   head "https://github.com/cooklang/cookcli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e4012c22ac4f3ef3dc7483947d2ffd60abd4ca4267d3eae5e3dc29dff2bc299"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "86d464b1aee98241497877289045fbc4cd78167ee623d9c5da694f750ea32dbf"
   end
 
   depends_on "node" => :build
