@@ -49,16 +49,15 @@ class Tesseract < Formula
     sha256 "36f772980ff17c66a767f584a0d80bf2302a1afa585c01a226c1863afcea1392"
   end
 
-  patch do
-    file "Patches/tesseract/long-double.patch"
-  end
-
   def install
     # explicitly state leptonica header location, as the makefile defaults to /usr/local/include,
     # which doesn't work for non-default homebrew location
     ENV["LIBLEPT_HEADERSDIR"] = HOMEBREW_PREFIX/"include"
 
     ENV.cxx11
+
+    # Link compiler-rt builtins to resolve 128-bit long double soft-float symbols
+    ENV.append "LDFLAGS", "-lclang_rt.builtins"
 
     system "./autogen.sh"
     system "./configure", "--datarootdir=#{HOMEBREW_PREFIX}/share",
