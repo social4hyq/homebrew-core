@@ -1,8 +1,8 @@
 class Lilv < Formula
   desc "C library to use LV2 plugins"
   homepage "https://drobilla.net/software/lilv.html"
-  url "https://download.drobilla.net/lilv-0.26.4.tar.xz"
-  sha256 "1c8b5fcb78718173e67d76e51ad423f5113a9ff68463f2566195ae46396089e3"
+  url "https://download.drobilla.net/lilv-0.28.0.tar.xz"
+  sha256 "8dcb70adb5cf072335115a6b091f4113710bdc73abaadaa3f9e9c1e55957b149"
   license "ISC"
 
   livecheck do
@@ -11,7 +11,7 @@ class Lilv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4992020346d5e0ba9b50d604201bbaf9d724d0edab051d425096146c0effe671"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3bda13dfcb8c82dbe72f0cb32b4dc758419435d0309314dfd6da1f916fe631a"
   end
 
   depends_on "meson" => :build
