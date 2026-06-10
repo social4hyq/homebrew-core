@@ -2,13 +2,13 @@ class Tile38 < Formula
   desc "In-memory geolocation data store, spatial index, and realtime geofence"
   homepage "https://tile38.com/"
   url "https://github.com/tidwall/tile38.git",
-      tag:      "1.37.0",
-      revision: "48aa3d2f303447513bbc9dc06dedac42269f4ad2"
+      tag:      "1.38.0",
+      revision: "e6e0c39b5e7be578cc1aafd17751fe81c286e8b1"
   license "MIT"
   head "https://github.com/tidwall/tile38.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1f3148d26c2b622554bb7b76177ac31a402e45bb369ff03f179c834b9ae0620"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8591660fc2871ea9a6d7abe4c09bf8e9da5ae392f6ed9df2a20a7c4df2b263b3"
   end
 
   depends_on "go" => :build
