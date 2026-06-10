@@ -7,7 +7,7 @@ class Akamai < Formula
   head "https://github.com/akamai/cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a05dd17f4d0c3df731485f5ed496d4eb160ae0ff50a77fc74ddbeb4a6709141"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "42861c6a2df80db7a56b49256f98e1fa97e1adcc993e41850735108c28776872"
   end
 
   depends_on "go" => [:build, :test]
