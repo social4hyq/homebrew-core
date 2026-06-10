@@ -1,8 +1,8 @@
 class OpensslAT30 < Formula
   desc "Cryptography and SSL/TLS Toolkit"
   homepage "https://openssl-library.org"
-  url "https://github.com/openssl/openssl/releases/download/openssl-3.0.20/openssl-3.0.20.tar.gz"
-  sha256 "c80a01dfc70ece4dc21168932c37739042d404d46ccc81a5986dd75314ecda6f"
+  url "https://github.com/openssl/openssl/releases/download/openssl-3.0.21/openssl-3.0.21.tar.gz"
+  sha256 "617e29af8e421f46649484a4937e48c685e47f46488167c982f88bc4ec1d522f"
   license "Apache-2.0"
 
   livecheck do
@@ -11,7 +11,7 @@ class OpensslAT30 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f052691614b72b8a32f2be56fc5d19a21137d4605ca767dcd7ca81cd57e1493e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b39a78bec44c5d47fcfd719791e5f772dad347c3c73cacc758aaa8f3babf7ed8"
   end
 
   keg_only :versioned_formula
