@@ -1,0 +1,89 @@
+--- tesseract-5.5.2.orig/src/ccstruct/quadlsq.h	2026-06-09 20:25:22.453160043 +0800
++++ tesseract-5.5.2/src/ccstruct/quadlsq.h	2026-06-09 20:25:27.073146443 +0800
+@@ -60,9 +60,9 @@
+   double sigxx;        // sum x squared
+   double sigxy;        // sum of xy
+   double sigyy;        // sum y squared
+-  long double sigxxx;  // sum x cubed
+-  long double sigxxy;  // sum xsquared y
+-  long double sigxxxx; // sum x fourth
++  double sigxxx;  // sum x cubed
++  double sigxxy;  // sum xsquared y
++  double sigxxxx; // sum x fourth
+ };
+ 
+ } // namespace tesseract
+--- tesseract-5.5.2.orig/src/ccstruct/quadlsq.cpp	2026-06-09 20:25:22.453160043 +0800
++++ tesseract-5.5.2/src/ccstruct/quadlsq.cpp	2026-06-09 20:25:37.476115819 +0800
+@@ -26,7 +26,7 @@
+ namespace tesseract {
+ 
+ // Minimum variance in least squares before backing off to a lower degree.
+-const long double kMinVariance = 1.0L / 1024;
++const double kMinVariance = 1.0 / 1024;
+ 
+ /**********************************************************************
+  * QLSQ::clear
+@@ -62,9 +62,9 @@
+   sigxx += x * x;
+   sigxy += x * y;
+   sigyy += y * y;
+-  sigxxx += static_cast<long double>(x) * x * x;
+-  sigxxy += static_cast<long double>(x) * x * y;
+-  sigxxxx += static_cast<long double>(x) * x * x * x;
++  sigxxx += static_cast<double>(x) * x * x;
++  sigxxy += static_cast<double>(x) * x * y;
++  sigxxxx += static_cast<double>(x) * x * x * x;
+ }
+ 
+ /**********************************************************************
+@@ -84,9 +84,9 @@
+   sigxx -= x * x;
+   sigxy -= x * y;
+   sigyy -= y * y;
+-  sigxxx -= static_cast<long double>(x) * x * x;
+-  sigxxy -= static_cast<long double>(x) * x * y;
+-  sigxxxx -= static_cast<long double>(x) * x * x * x;
++  sigxxx -= static_cast<double>(x) * x * x;
++  sigxxy -= static_cast<double>(x) * x * y;
++  sigxxxx -= static_cast<double>(x) * x * x * x;
+ }
+ 
+ /**********************************************************************
+@@ -98,8 +98,8 @@
+  **********************************************************************/
+ 
+ void QLSQ::fit(int degree) {
+-  long double x_variance =
+-      static_cast<long double>(sigxx) * n - static_cast<long double>(sigx) * sigx;
++  double x_variance =
++      static_cast<double>(sigxx) * n - static_cast<double>(sigx) * sigx;
+ 
+   // Note: for computational efficiency, we do not normalize the variance,
+   // covariance and cube variance here as they are in the same order in both
+@@ -115,18 +115,18 @@
+     }
+     return;
+   }
+-  long double top96 = 0.0;    // Accurate top.
+-  long double bottom96 = 0.0; // Accurate bottom.
+-  long double cubevar = sigxxx * n - static_cast<long double>(sigxx) * sigx;
+-  long double covariance =
+-      static_cast<long double>(sigxy) * n - static_cast<long double>(sigx) * sigy;
++  double top96 = 0.0;    // Accurate top.
++  double bottom96 = 0.0; // Accurate bottom.
++  double cubevar = sigxxx * n - static_cast<double>(sigxx) * sigx;
++  double covariance =
++      static_cast<double>(sigxy) * n - static_cast<double>(sigx) * sigy;
+ 
+   if (n >= 4 && degree >= 2) {
+     top96 = cubevar * covariance;
+-    top96 += x_variance * (static_cast<long double>(sigxx) * sigy - sigxxy * n);
++    top96 += x_variance * (static_cast<double>(sigxx) * sigy - sigxxy * n);
+ 
+     bottom96 = cubevar * cubevar;
+-    bottom96 -= x_variance * (sigxxxx * n - static_cast<long double>(sigxx) * sigxx);
++    bottom96 -= x_variance * (sigxxxx * n - static_cast<double>(sigxx) * sigxx);
+   }
+   if (bottom96 >= kMinVariance * n * n * n * n) {
+     // Denominators looking good
