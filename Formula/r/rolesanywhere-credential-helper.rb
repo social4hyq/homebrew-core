@@ -1,8 +1,8 @@
 class RolesanywhereCredentialHelper < Formula
   desc "Manages getting temporary security credentials from IAM Roles Anywhere"
   homepage "https://github.com/aws/rolesanywhere-credential-helper"
-  url "https://github.com/aws/rolesanywhere-credential-helper/archive/refs/tags/v1.8.3.tar.gz"
-  sha256 "54e5e46647d172f158707ae8950756e9b85abef8b78ed344a710a660c0739e87"
+  url "https://github.com/aws/rolesanywhere-credential-helper/archive/refs/tags/v1.8.4.tar.gz"
+  sha256 "95fef11fbf3d4e9036dc6d4b6c26b62ce6cff9fb6cac90097f36bb0716d36a09"
   license "Apache-2.0"
   head "https://github.com/aws/rolesanywhere-credential-helper.git", branch: "main"
 
