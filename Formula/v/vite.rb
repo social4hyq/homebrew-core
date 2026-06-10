@@ -6,7 +6,7 @@ class Vite < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9fe9960871fe83f37aa609ce3c100d520c461d12cd853e2bc508bf6a15287fba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b12ce4e461ec35bf6de7374964a1b5c8ac3b72757f822318d24213353c0a969b"
   end
 
   depends_on "node"
