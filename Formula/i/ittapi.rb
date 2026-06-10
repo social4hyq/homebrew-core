@@ -7,7 +7,7 @@ class Ittapi < Formula
   head "https://github.com/intel/ittapi.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b77d4e0b1405b4e6a198c3901767220cca78dd7829a42db93be29f7b69c9548"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "290505a19117729bd98d43067bdaf20201f6074428110b3a5ec6b36a2010ff26"
   end
 
   depends_on "cmake" => :build
