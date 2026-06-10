@@ -8,7 +8,7 @@ class Cosign < Formula
   head "https://github.com/sigstore/cosign.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "379a018d2bb9715d6980ca7be22d6e56afa5ec6fc8e4e3b74bdf414c3e8d2557"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "afcc29e6991cd5b9faa44b962af50644c1b1b51a25fef92a359583480a3e1382"
   end
 
   depends_on "go" => :build
