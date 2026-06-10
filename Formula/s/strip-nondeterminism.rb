@@ -12,7 +12,7 @@ class StripNondeterminism < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e70305551bf0aafdaf1935c23dbc4552aef5b9945dacb09f70a8d80a58872b6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3961263f98d1b994dffb20cebf3a165d5cccd7727a71412b1957481778b14748"
   end
 
   uses_from_macos "file-formula" => :test
