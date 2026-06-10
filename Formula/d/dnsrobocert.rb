@@ -10,12 +10,7 @@ class Dnsrobocert < Formula
   head "https://github.com/adferrand/dnsrobocert.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "01511d2aa9800f3a4accc32d0b44e5629781a2ad869ee6a262030cd83230b042"
-    sha256 cellar: :any,                 arm64_sequoia: "cb079cc4969c168d5abd39d8017b4f350068b605c25508489f17d93e40b10719"
-    sha256 cellar: :any,                 arm64_sonoma:  "39eaa148d28ee7bdb4c5d244895965b686546d973eec3cb4eab2260209ec8b7b"
-    sha256 cellar: :any,                 sonoma:        "2d01865f96b474ed32ae563cee76578ec70fbfd1ff202e477c01be70d791d396"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "0df9d089d9ac970dc195d44e5f8a9bd6e4a75b2bfab212f24a33e16478fa0164"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "3fddeef77c75366e8345dee9de4a01fe19fa9b1383e5e648af66a37932cfb5a7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7965b4e48d9961e77a34f6b82162a48b136777cb07d93099fe3ebdb291d23769"
   end
 
   depends_on "rust" => :build
