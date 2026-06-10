@@ -12,7 +12,7 @@ class Just < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3cf13644f3552c3d764315232fdeb5acb2705bd5448ba7c6969e7b9825b1663"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c875d9448b8398184602111d51c32a08ec0989e54af2b295a6818e30ad80d856"
   end
 
   depends_on "rust" => :build
