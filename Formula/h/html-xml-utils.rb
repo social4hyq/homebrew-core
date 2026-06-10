@@ -11,7 +11,7 @@ class HtmlXmlUtils < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4034e5878e0ce3aa6eca0eaacb0823220d44e0a91de83a0e49b3866367a8c69"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "93af73e760de1fb7af10961f79fc62b0a71023eede8a579e568b5d4b6c51ba3e"
   end
 
   def install
