@@ -8,7 +8,7 @@ class Binutils < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3575955fcf7ec8ad7aee090af55090fb5e5d38def2731a00a4fdd55f7493f7e0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "592e900626db3983466ffcb226a80e023d799f97f7c6501e48d5623ec7e4ec4a"
   end
 
   keg_only "it shadows the host toolchain"
