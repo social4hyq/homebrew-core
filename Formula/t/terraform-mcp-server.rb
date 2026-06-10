@@ -1,8 +1,8 @@
 class TerraformMcpServer < Formula
   desc "MCP server for Terraform"
   homepage "https://github.com/hashicorp/terraform-mcp-server"
-  url "https://github.com/hashicorp/terraform-mcp-server/archive/refs/tags/v0.5.2.tar.gz"
-  sha256 "7f1c350360cfed54ab4cb9cc028846e37e9bf76441c7a347cc1037d8374f8990"
+  url "https://github.com/hashicorp/terraform-mcp-server/archive/refs/tags/v1.0.0.tar.gz"
+  sha256 "c214d0d6e49fd87ce0a1bf69d1b615495d6ba99f6659626339d08c47468b2a3c"
   license "MPL-2.0"
   head "https://github.com/hashicorp/terraform-mcp-server.git", branch: "main"
 
