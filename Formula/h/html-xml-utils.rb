@@ -1,8 +1,8 @@
 class HtmlXmlUtils < Formula
   desc "Tools for manipulating HTML and XML files"
   homepage "https://www.w3.org/Tools/HTML-XML-utils/"
-  url "https://www.w3.org/Tools/HTML-XML-utils/html-xml-utils-8.7.tar.gz"
-  sha256 "888a31631a7a70308bb2f333e077d0416f4bb78317f8697ffb4a95187f677301"
+  url "https://www.w3.org/Tools/HTML-XML-utils/html-xml-utils-8.8.tar.gz"
+  sha256 "950027e1780787ca88271570aae890e0ac9b906f764554c2dee263d4cf7b74b8"
   license "W3C"
 
   livecheck do
@@ -11,7 +11,7 @@ class HtmlXmlUtils < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4034e5878e0ce3aa6eca0eaacb0823220d44e0a91de83a0e49b3866367a8c69"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "93af73e760de1fb7af10961f79fc62b0a71023eede8a579e568b5d4b6c51ba3e"
   end
 
   def install
