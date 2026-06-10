@@ -6,7 +6,7 @@ class SigsumGo < Formula
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2789641637bef2e76d00d4ab78d4d56105e7c6141361a31fceb5f18b22fb9438"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e49bb7f79fc1796069335b63b6eb077e624146cf490b021d274bd017e0d03b6"
   end
 
   depends_on "go" => :build
