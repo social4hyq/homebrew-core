@@ -6,8 +6,7 @@ class TesseractLang < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, all: "ff6da65c5137edfec72e7826768d1d8f3fb311c45eb8c0ba21cfff191a7ed56c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ac7313146b4651df63270185cefc520d8bb8245f20500056d46f7a88d6e284b"
   end
 
   depends_on "tesseract"
