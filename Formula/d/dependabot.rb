@@ -7,7 +7,7 @@ class Dependabot < Formula
   head "https://github.com/dependabot/cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5090edfb7d564719b1e180a18fa54efecddf84bd3e4bb1d9772262d91812b4c3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0131bcb4397d7bda07b2966ac02862e8232fb16c495a0ca1c27d04304c911596"
   end
 
   depends_on "go" => :build
