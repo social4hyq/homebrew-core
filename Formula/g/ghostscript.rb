@@ -20,12 +20,7 @@ class Ghostscript < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 arm64_tahoe:   "6a3f21338c5e00b6d99930d96bdd12c9884147d033ae03f0ba3f3ae9d3f5ed06"
-    sha256 arm64_sequoia: "9011189c67f9727d4ada8f29201d320d0b0fb478dbc56449a1cbf4d44fa1aa2c"
-    sha256 arm64_sonoma:  "bbfa666526be13321a6ad2dfb557661b318c085ac12df041f10501486179406e"
-    sha256 sonoma:        "44e942ac04a6dd9f856f989483c86b372e8b86aac831acba7fc8b754292bc3e3"
-    sha256 arm64_linux:   "7c27cf6a1db4ccbaf969f57d15af41a18b5547424b1c9e3683ea320a0d69c241"
-    sha256 x86_64_linux:  "82acdc247c1252a412cb239f5de814e6bc4b8f6cfff4050b64716b0244d55bdb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fbfdb26b13ab8fe9005a925ea14a12b383b2fc9e3039d36ca770ce3ede1ec12"
   end
 
   head do
