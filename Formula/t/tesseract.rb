@@ -13,12 +13,7 @@ class Tesseract < Formula
   end
 
   bottle do
-    sha256               arm64_tahoe:   "5c573461bfef6b219120a51bff457cc7eca377c43b971cc5639c109517b1daf4"
-    sha256               arm64_sequoia: "2581ad24c87515f9dfb218ebbec5681bd36af0f4d6ec561dd91bf91cd412a61d"
-    sha256               arm64_sonoma:  "d30bb6d0c4f2675db059a902ea9a8d3a7a6469b5b256ee11f7128b0836df6a8e"
-    sha256 cellar: :any, sonoma:        "002f53df778424f6973071d5422061f2a07bd6da9294e05fbe5847a6763e4820"
-    sha256               arm64_linux:   "56c554781e18f586dc232a1a08ff4b866948cd32e8c99a58c1bfc41dc434b165"
-    sha256               x86_64_linux:  "89e359d2cb5283131f6d74c2bc4e26cbeb65ad36a3dad40eca500464eb5c5933"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6757c2184895f39e98c06f14e1a67cb590ff7c8d34073aa5f24bfd10c75ae085"
   end
 
   depends_on "autoconf" => :build
