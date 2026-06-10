@@ -7,7 +7,7 @@ class Muffet < Formula
   head "https://github.com/raviqqe/muffet.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c664e555b98e02e54ed3292020735da83c122caea8d16cb313f444563c465d6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "92f2b32628b2be4b0c49d1f76722d1713b7d9ef848f2ccc383611b43a864ecc0"
   end
 
   depends_on "go" => :build
