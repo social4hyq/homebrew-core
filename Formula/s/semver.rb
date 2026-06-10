@@ -1,8 +1,8 @@
 class Semver < Formula
   desc "Semantic version parser for node (the one npm uses)"
   homepage "https://github.com/npm/node-semver"
-  url "https://github.com/npm/node-semver/archive/refs/tags/v7.8.3.tar.gz"
-  sha256 "35bc00a54350b2c924796fb8d598541d7960882795d4391ef96bb07cd5c3e848"
+  url "https://github.com/npm/node-semver/archive/refs/tags/v7.8.4.tar.gz"
+  sha256 "16714f35def7bd981cc9afd23401a253e30dbac1e89e6b0e440bc719f8f38874"
   license "ISC"
 
   bottle do
