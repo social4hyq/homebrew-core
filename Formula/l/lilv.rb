@@ -11,7 +11,7 @@ class Lilv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4992020346d5e0ba9b50d604201bbaf9d724d0edab051d425096146c0effe671"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3bda13dfcb8c82dbe72f0cb32b4dc758419435d0309314dfd6da1f916fe631a"
   end
 
   depends_on "meson" => :build
