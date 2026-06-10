@@ -1,8 +1,8 @@
 class Pdfcpu < Formula
   desc "PDF processor written in Go"
   homepage "https://pdfcpu.io"
-  url "https://github.com/pdfcpu/pdfcpu/archive/refs/tags/v0.12.1.tar.gz"
-  sha256 "a15d61b50e432b90b435e59728fde241fdcb745eba06f437cbf106aafc7ff2d0"
+  url "https://github.com/pdfcpu/pdfcpu/archive/refs/tags/v0.13.0.tar.gz"
+  sha256 "d7e657051aef697d39da63a5366850d476485b33d5ad100b829b86153df8c094"
   license "Apache-2.0"
 
   livecheck do
@@ -11,7 +11,7 @@ class Pdfcpu < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "28048cedf3cbf1b754115c99d320e536058848d68257d668c62b2c4e90ed9bd4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b8ee1d8c064a03248ccec885ea6415734f84e3bc075c29e4333d4f5d8c868591"
   end
 
   depends_on "go" => :build
