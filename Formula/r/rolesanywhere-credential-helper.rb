@@ -7,7 +7,7 @@ class RolesanywhereCredentialHelper < Formula
   head "https://github.com/aws/rolesanywhere-credential-helper.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b67785d15f6768004a4983de367b963cdaab5014f29a5c42dfc3c64ec1588116"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6776194e133368a08f364244fac755993062d192ba0386ab46a73983b3e99baa"
   end
 
   depends_on "go" => :build
