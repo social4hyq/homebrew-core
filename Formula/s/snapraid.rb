@@ -6,7 +6,7 @@ class Snapraid < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "84805170e48f8d1dfc3738f568f3ff42ebe4d4044a3df5b99cc7746bab42f7b7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3fa0b057ce4b3ad16a61859519dfe095d798e826e42982e5fcfcab5d7192660e"
   end
 
   head do
