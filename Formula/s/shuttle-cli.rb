@@ -7,7 +7,7 @@ class ShuttleCli < Formula
   head "https://github.com/lunarway/shuttle.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e4374eb351e7e6cb431e9513f6513f6352b0f11db9685578f7be349838739f8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ed0a05b7aa5c6e2bff5b02bd7e39a30a90e728013bbb48b9c3477dbb60f74cb"
   end
 
   depends_on "go" => :build
