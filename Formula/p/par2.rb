@@ -11,7 +11,7 @@ class Par2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ca20380cbdfe8f570e31c1c7bb6515ecbfe31a8ed52ad5e247abdddc005f719"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "69aa50de75d3a1196227c89227eb2f2ede2184a029f0655be04e7e33733cdf6a"
   end
 
   on_macos do
