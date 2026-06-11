@@ -7,7 +7,7 @@ class Oksh < Formula
   head "https://github.com/ibara/oksh.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "be463af96b2f8aaaafb307f561722c2b2062c211efbbb73e0c07c0a45865f55a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2881c8beb3d5bb611bba9abe3d8fbf050b70d44e7cb4f7e5537841b0c285e51a"
   end
 
   uses_from_macos "ncurses"
