@@ -10,7 +10,7 @@ class PythonGdbmAT314 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4b78ebb71355a4cf87952b6582b8d86cb4b084b98264ebcc93df35d8f98c13c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d11199e671ef457e4f14d5b7687599fec1195f50d96ef3c359b82370b7ec258"
   end
 
   depends_on "gdbm"
