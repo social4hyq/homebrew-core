@@ -1,12 +1,12 @@
 class Ansilove < Formula
   desc "ANSI/ASCII art to PNG converter"
   homepage "https://www.ansilove.org"
-  url "https://github.com/ansilove/ansilove/releases/download/4.2.1/ansilove-4.2.1.tar.gz"
-  sha256 "60b1f1b6e4a5be287bb19310ea526c631a0bea5f4cb550f33c301a4b1ec30abf"
+  url "https://github.com/ansilove/ansilove/releases/download/4.2.2/ansilove-4.2.2.tar.gz"
+  sha256 "443e1d8b6d94851cb9563f530b56fb5ef8ffba4b1eda6fd2c3cafaa38adb62d3"
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "10e4a3870a980b18ef814705e400ef465f863e41a276ab96de1175a8c6f2854e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b32f93dc03af3688b83ea6dbdf9286e0b85899a697d6119629ccb8b9dd5e75bc"
   end
 
   depends_on "cmake" => :build
