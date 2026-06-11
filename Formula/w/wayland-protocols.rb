@@ -1,8 +1,8 @@
 class WaylandProtocols < Formula
   desc "Additional Wayland protocols"
   homepage "https://wayland.freedesktop.org"
-  url "http://ftp.debian.org/debian/pool/main/w/wayland-protocols/wayland-protocols_1.48.orig.tar.xz"
-  sha256 "398036ac0eb6484982ddbde7ff86848d753231f9cdeeae983f06b52946625aa1"
+  url "http://ftp.debian.org/debian/pool/main/w/wayland-protocols/wayland-protocols_1.49.orig.tar.xz"
+  sha256 "ec4c8f74942d6dff7ace8b4ce4764f0ef9ff618a935d974ea77edee2ad240b14"
   license "MIT"
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class WaylandProtocols < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc7903a57cddf9d09cb1e24a716ab34e9607d0dd697b8eb238ece269dc73629b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61bd781d315fae42019535ed31e74753b6e779b336d1373fe1f8e1359b0f3e17"
   end
 
   depends_on "meson" => :build
