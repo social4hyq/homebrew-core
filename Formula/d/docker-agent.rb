@@ -1,13 +1,13 @@
 class DockerAgent < Formula
   desc "Agent Builder and Runtime by Docker Engineering"
   homepage "https://docker.github.io/docker-agent/"
-  url "https://github.com/docker/docker-agent/archive/refs/tags/v1.74.0.tar.gz"
-  sha256 "ca16849f4052c16b07a9892b245e71c93b61eaa042636116e8b97f1179bbd73a"
+  url "https://github.com/docker/docker-agent/archive/refs/tags/v1.77.0.tar.gz"
+  sha256 "3ee8ba0d45523123de6a29c4f7748d37b8d96c8daa54efb430dedec7720fe38e"
   license "Apache-2.0"
   head "https://github.com/docker/docker-agent.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d75464e915a5f5043dd6776fbfbae0983ff2268cff4b7d40809feb06066d5677"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e08dd8ab0dd604a2fe9b7ef6493439f1c24d873de65aa4b4cf2c5c9354d9951"
   end
 
   depends_on "go" => :build
