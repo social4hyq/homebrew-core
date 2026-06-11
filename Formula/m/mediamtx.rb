@@ -9,7 +9,7 @@ class Mediamtx < Formula
   head "https://github.com/bluenviron/mediamtx.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abe0e1c29d4b26542e6ded55e6cf9fe6660ced3db269189dc211b9cf701b7290"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f49317f8559237ebf262265a82be90f0f046e45cdaf39fc6429e6359f8cea0b9"
   end
 
   depends_on "go" => :build
