@@ -12,7 +12,7 @@ class Melange < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac9989fffe393406f5b954cb660ea6a521f7296d41e523d1e42f4a0e14f7a763"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db475d9877799468cf248df6e07d8379ed4bf825aefe5b13c1bd6eb5e68d99f8"
   end
 
   depends_on "go" => :build
