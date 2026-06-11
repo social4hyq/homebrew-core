@@ -1,9 +1,9 @@
 class Wandio < Formula
   desc "Transparently read from and write to zip, bzip2, lzma or zstd archives"
   homepage "https://github.com/LibtraceTeam/wandio"
-  url "https://github.com/LibtraceTeam/wandio/archive/refs/tags/4.2.6-1.tar.gz"
-  version "4.2.6"
-  sha256 "f035d4d6beadf7a7e5619fb73db5a84d338008b5f4d6b1b8843619547248ec73"
+  url "https://github.com/LibtraceTeam/wandio/archive/refs/tags/4.2.7-1.tar.gz"
+  version "4.2.7"
+  sha256 "45021795b5c4d1609ba509358e730ea605c4c9621704d75214abb003f37602ab"
   license "LGPL-3.0-or-later"
 
   livecheck do
@@ -15,7 +15,7 @@ class Wandio < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f307da1c0309b1b405b3eb63a8ebc851d26d7b832b84f0b8bbfdea0ab35d4948"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "885b400a2fe7f272ae4cfacc43e603c1b97616b3900052d55e5a3ae57f899773"
   end
 
   depends_on "autoconf" => :build
