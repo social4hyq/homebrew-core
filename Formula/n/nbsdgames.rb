@@ -7,7 +7,7 @@ class Nbsdgames < Formula
   head "https://github.com/abakh/nbsdgames.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c825919ee0a3fa60384f1e1cb0bc538873bce83f7c09aa28fc14cdfa95a735ec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8495794753a52826ec08680b1c6c6baa1d24f90f825eef2b5462a09ba324600e"
   end
 
   depends_on "findutils" => :build
