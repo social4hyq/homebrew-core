@@ -6,7 +6,7 @@ class Ansilove < Formula
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "10e4a3870a980b18ef814705e400ef465f863e41a276ab96de1175a8c6f2854e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b32f93dc03af3688b83ea6dbdf9286e0b85899a697d6119629ccb8b9dd5e75bc"
   end
 
   depends_on "cmake" => :build
