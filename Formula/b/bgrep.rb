@@ -7,7 +7,7 @@ class Bgrep < Formula
   head "https://github.com/tmbinc/bgrep.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b8019b476195d9eaa0e486ecd305915c72dd856967c5f242a344fd143cc9d49"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f921bbcfcaaab18e9ed9252f175b0011efa44a576407f05143d32c64bcb9e8a"
   end
 
   def install
