@@ -14,7 +14,7 @@ class Cbindgen < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e807b0447fd771dc66b194a1c54f136c89a1c8e1576433100f1a4441d79d569"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9fc5bcd266c3c27510cb4074b5f37f94880e09e733b0b0bbc747a8319ffaea6"
   end
 
   depends_on "rust" => :build
