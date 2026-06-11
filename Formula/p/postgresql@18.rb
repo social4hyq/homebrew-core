@@ -4,6 +4,7 @@ class PostgresqlAT18 < Formula
   url "https://ftp.postgresql.org/pub/source/v18.4/postgresql-18.4.tar.bz2"
   sha256 "81a81ec695fb0c7901407defaa1d2f7973617154cf27ba74e3a7ab8e64436094"
   license "PostgreSQL"
+  revision 1
 
   livecheck do
     url "https://ftp.postgresql.org/pub/source/"
@@ -11,7 +12,7 @@ class PostgresqlAT18 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e72f71412611d266a0c482b7b9249e020af42f42df5e480c2afd2fb2e368c8a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "863677ec6cec91c7423842a6574d0998147378c71065ffd8f851877dea19469c"
   end
 
   keg_only :versioned_formula
@@ -47,6 +48,37 @@ class PostgresqlAT18 < Formula
     depends_on "linux-pam"
     depends_on "util-linux"
     depends_on "zlib-ng-compat"
+  end
+
+  # HarmonyOS adaptations:
+  # — fallback to PGUSER/USER/LOGNAME env vars when getpwuid fails (UID not in /etc/passwd)
+  #      covers: src/interfaces/libpq/fe-auth.c (libpq) + src/common/username.c (initdb/psql/pg_ctl)
+  # — default directory/file modes permit group access (filesystem UID remapping)
+  # — default unix_socket_directories to /data/storage/el2/base/haps/entry/files (/tmp is read-only)
+  # — skip data dir permission/ownership checks (UID/permissions not portable)
+  # — hardcode initdb defaults (UTF-8) + force mmap DSM (initdb matches backend)
+  # — skip SysV shmget for main shared memory (HarmonyOS seccomp blocks shmget)
+  # — force DSM implementation to mmap (avoid shm_open)
+  patch do
+    file "Patches/postgresql@18/fe-auth-username-fallback.patch"
+  end
+  patch do
+    file "Patches/postgresql@18/file-perm-group-default.patch"
+  end
+  patch do
+    file "Patches/postgresql@18/pg-config-no-unix-socket.patch"
+  end
+  patch do
+    file "Patches/postgresql@18/miscinit-relaxed-perm-check.patch"
+  end
+  patch do
+    file "Patches/postgresql@18/initdb-hardcode-defaults.patch"
+  end
+  patch do
+    file "Patches/postgresql@18/skip-sysv-shmem.patch"
+  end
+  patch do
+    file "Patches/postgresql@18/dsm-mmap-default.patch"
   end
 
   def install
@@ -150,21 +182,24 @@ class PostgresqlAT18 < Formula
 
   def caveats
     <<~EOS
-      This formula has created a default database cluster with:
+      To initialize a database cluster:
+        export PGUSER=currentUser
         initdb --locale=en_US.UTF-8 -E UTF-8 #{postgresql_datadir}
+
+      To start the server (run in background):
+        export PGUSER=currentUser
+        pg_ctl -D #{postgresql_datadir} -l #{postgresql_log_path} start
+
+      To stop the server:
+        pg_ctl -D #{postgresql_datadir} stop
+
+      Client utilities (psql, createdb, etc.) require PGUSER env var.
+      Add to your shell profile for convenience:
+        export PGUSER=currentUser
 
       When uninstalling, some dead symlinks are left behind so you may want to run:
         brew cleanup --prune-prefix
     EOS
-  end
-
-  service do
-    run [opt_bin/"postgres", "-D", f.postgresql_datadir]
-    environment_variables LC_ALL: "en_US.UTF-8"
-    keep_alive true
-    log_path f.postgresql_log_path
-    error_log_path f.postgresql_log_path
-    working_dir HOMEBREW_PREFIX
   end
 
   test do

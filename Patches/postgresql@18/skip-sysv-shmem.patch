@@ -1,0 +1,55 @@
+--- a/src/backend/port/sysv_shmem.c	2026-06-11 03:34:58.199563642 +0000
++++ b/src/backend/port/sysv_shmem.c	2026-06-11 03:37:50.690065193 +0000
+@@ -742,8 +742,34 @@
+ 		/* Register on-exit routine to unmap the anonymous segment */
+ 		on_shmem_exit(AnonymousShmemDetach, (Datum) 0);
+ 
++		/*
++		 * On OHOS the kernel blocks shmget() via seccomp, which kills
++		 * the process with SIGSYS.  When mmap is selected, skip the
++		 * SysV shmem entirely: place the PGShmemHeader at the start of
++		 * the anonymous segment, bypass the shmget loop below, and
++		 * return immediately.
++		 *
++		 * PGSharedMemoryDetach() is also patched below to skip the
++		 * shmdt() on UsedShmemSegAddr when we know it is really an mmap.
++		 */
++#ifdef __OHOS__
++		memAddress = AnonymousShmem;
++		hdr = (PGShmemHeader *) memAddress;
++		hdr->creatorPID = getpid();
++		hdr->magic = PGShmemMagic;
++		hdr->dsm_control = 0;
++		hdr->device = statbuf.st_dev;
++		hdr->inode = statbuf.st_ino;
++		hdr->totalsize = size;
++		hdr->freeoffset = MAXALIGN(sizeof(PGShmemHeader));
++		*shim = hdr;
++		UsedShmemSegAddr = memAddress;
++		UsedShmemSegID  = (unsigned long) statbuf.st_ino;
++		return hdr;
++#else
+ 		/* Now we need only allocate a minimal-sized SysV shmem block. */
+ 		sysvsize = sizeof(PGShmemHeader);
++#endif
+ 	}
+ 	else
+ 	{
+@@ -971,6 +997,7 @@
+ {
+ 	if (UsedShmemSegAddr != NULL)
+ 	{
++#ifndef __OHOS__
+ 		if ((shmdt(UsedShmemSegAddr) < 0)
+ #if defined(EXEC_BACKEND) && defined(__CYGWIN__)
+ 		/* Work-around for cygipc exec bug */
+@@ -978,6 +1005,9 @@
+ #endif
+ 			)
+ 			elog(LOG, "shmdt(%p) failed: %m", UsedShmemSegAddr);
++#else
++		/* On OHOS UsedShmemSegAddr points to mmap'd memory, not SysV */
++#endif
+ 		UsedShmemSegAddr = NULL;
+ 	}
+ 
