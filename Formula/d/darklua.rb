@@ -1,13 +1,13 @@
 class Darklua < Formula
   desc "Command-line tool that transforms Lua code"
   homepage "https://darklua.com/"
-  url "https://github.com/seaofvoices/darklua/archive/refs/tags/v0.18.0.tar.gz"
-  sha256 "3d2813da25c40cca8c65ac493261af233d90b7f8dc5bb592b34b8a97d527df27"
+  url "https://github.com/seaofvoices/darklua/archive/refs/tags/v0.19.0.tar.gz"
+  sha256 "6f2ce6d6f29aa256ca1ec47e33a25937a6964b1ada1083d427ebcc6a7d4ab43f"
   license "MIT"
   head "https://github.com/seaofvoices/darklua.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba9988224209e4916332c977529280ba52a90eae0deb622d36d9129eb033f9e6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "718103d171b172608638dda21af80051a1b7fd1d499c4e0c3f7d545923c86be0"
   end
 
   depends_on "rust" => :build
