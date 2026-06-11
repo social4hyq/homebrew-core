@@ -11,7 +11,7 @@ class AzureStorageCommonCpp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "31f402ea31a68cfb9cbdba8960d0c2c4fb5bfe54571817428473e613e901e10c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c3ad2f628e85f49d1a2d90678535030931d56ac3886370b911f1ea578484206"
   end
 
   depends_on "cmake" => :build
