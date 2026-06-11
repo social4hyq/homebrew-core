@@ -11,7 +11,7 @@ class AzureStorageBlobsCpp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6fe994723adb643ebe2ff8035456f83727f8c953c8feab5c01dd2620e577686e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d17b4094ddc179c3a38737bd9ee61519edef24d4af0c6430b4117638fa90a91f"
   end
 
   depends_on "cmake" => :build
