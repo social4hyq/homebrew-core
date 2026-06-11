@@ -13,7 +13,7 @@ class PnpmAT10 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9795f48eb1ef027eaac00fb063d93b5096659b80cb3886dd3c1d43c37af5f78e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03495c186a8afeebfef8667ab2b081305049233853667272ccad3f02fb28d76e"
   end
 
   keg_only :versioned_formula
