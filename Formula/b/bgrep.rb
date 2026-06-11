@@ -1,13 +1,13 @@
 class Bgrep < Formula
   desc "Like grep but for binary strings"
   homepage "https://github.com/tmbinc/bgrep"
-  url "https://github.com/tmbinc/bgrep/archive/refs/tags/bgrep-0.2.tar.gz"
-  sha256 "24c02393fb436d7a2eb02c6042ec140f9502667500b13a59795388c1af91f9ba"
+  url "https://github.com/tmbinc/bgrep/archive/refs/tags/bgrep-0.3.tar.gz"
+  sha256 "a54ad3101150d750c180718b487406bef630f062a5ef30fde59be10a7caaaf1e"
   license "BSD-2-Clause"
   head "https://github.com/tmbinc/bgrep.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b8019b476195d9eaa0e486ecd305915c72dd856967c5f242a344fd143cc9d49"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f921bbcfcaaab18e9ed9252f175b0011efa44a576407f05143d32c64bcb9e8a"
   end
 
   def install
