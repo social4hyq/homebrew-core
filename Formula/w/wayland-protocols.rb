@@ -1,8 +1,8 @@
 class WaylandProtocols < Formula
   desc "Additional Wayland protocols"
   homepage "https://wayland.freedesktop.org"
-  url "http://ftp.debian.org/debian/pool/main/w/wayland-protocols/wayland-protocols_1.48.orig.tar.xz"
-  sha256 "398036ac0eb6484982ddbde7ff86848d753231f9cdeeae983f06b52946625aa1"
+  url "http://ftp.debian.org/debian/pool/main/w/wayland-protocols/wayland-protocols_1.49.orig.tar.xz"
+  sha256 "ec4c8f74942d6dff7ace8b4ce4764f0ef9ff618a935d974ea77edee2ad240b14"
   license "MIT"
   compatibility_version 1
 
