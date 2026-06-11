@@ -12,7 +12,7 @@ class CloudNuke < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f189d725f8e922c002383c13780ac8bb342480e3a6eab3a5cb5fe740cd30700"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c733d050301b409ad962c93de525a3b2405df3d553982da5036d5bafa7ce983"
   end
 
   depends_on "go" => :build
