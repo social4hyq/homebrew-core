@@ -1,13 +1,13 @@
 class StaticWebServer < Formula
   desc "High-performance and asynchronous web server for static files-serving"
   homepage "https://static-web-server.net"
-  url "https://github.com/static-web-server/static-web-server/archive/refs/tags/v2.42.0.tar.gz"
-  sha256 "7ef8ad8f22c4655979771d0e269aaf8232617b815fd5528342ecfc7061ecacb8"
+  url "https://github.com/static-web-server/static-web-server/archive/refs/tags/v2.43.0.tar.gz"
+  sha256 "bc88f3bf22fceab1eb49f8a81277f4d73348849fab7376fb746607e0063f0a73"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/static-web-server/static-web-server.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd127a78cd3229908d9c94cd1c9236d463fb0333c172932c0b54e18429619b8a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "efe989a249602774a3e55d66bde0c48ac5f581891063fcbaa30b8a609ecb31cf"
   end
 
   depends_on "rust" => :build
