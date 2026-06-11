@@ -12,7 +12,7 @@ class PostgresqlAT18 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e72f71412611d266a0c482b7b9249e020af42f42df5e480c2afd2fb2e368c8a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "863677ec6cec91c7423842a6574d0998147378c71065ffd8f851877dea19469c"
   end
 
   keg_only :versioned_formula
