@@ -1,8 +1,8 @@
 class AzureStorageBlobsCpp < Formula
   desc "Microsoft Azure Storage Blobs SDK for C++"
   homepage "https://github.com/Azure/azure-sdk-for-cpp/tree/main/sdk/storage/azure-storage-blobs"
-  url "https://github.com/Azure/azure-sdk-for-cpp/archive/refs/tags/azure-storage-blobs_12.17.0.tar.gz"
-  sha256 "b512b4b5aeecd45fa26e696efef0d6e83e22b0e3b6cfb536f14cc8faeb82816a"
+  url "https://github.com/Azure/azure-sdk-for-cpp/archive/refs/tags/azure-storage-blobs_12.18.0.tar.gz"
+  sha256 "0f266f91cf00b79bb6c7c6f99e44942b43a7141db565556a4298f6ebe3a86fcc"
   license "MIT"
 
   livecheck do
@@ -11,7 +11,7 @@ class AzureStorageBlobsCpp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6fe994723adb643ebe2ff8035456f83727f8c953c8feab5c01dd2620e577686e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d17b4094ddc179c3a38737bd9ee61519edef24d4af0c6430b4117638fa90a91f"
   end
 
   depends_on "cmake" => :build
