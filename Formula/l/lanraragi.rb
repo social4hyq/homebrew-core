@@ -7,12 +7,7 @@ class Lanraragi < Formula
   head "https://github.com/Difegue/LANraragi.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "82f115b1051d6ae57411796a4a239c639106ee35ccdf1d73c4c4bb5b0979dcb1"
-    sha256 cellar: :any,                 arm64_sequoia: "e09a9184d798b6dfe60d293111c0f353546581f772b9ad3e45de40a851d50f53"
-    sha256 cellar: :any,                 arm64_sonoma:  "5656dc03498a8963e26890841f82298174fc928c8b5a6d0089b402fc97a0cf87"
-    sha256 cellar: :any,                 sonoma:        "339388cc5e250d86fe2022def364a219eebca2f0595f95bb6ac4685d3e897d9e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "4c177edbccbda0156e095788003c56ac911fc515d3ad941a079ac98d8ff4cb58"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "0157925219e3eb6d4b3ba454387d9b66d1eb41b9560e24da521d701b7d106f11"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a02dd60b4eb6f47f1d2ee5c6dca650d9459568746c2ec0c320b2ed87895692fa"
   end
 
   depends_on "cpanminus" => :build
