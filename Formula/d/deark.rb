@@ -11,7 +11,7 @@ class Deark < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "43e86082b3e3473e216484596ceaac70603fc7d38d7b4af9ce18ee032d259802"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e93715d35133f037c1e81ff8768b343c7b193458258b4fc6d500ec861091889"
   end
 
   def install
