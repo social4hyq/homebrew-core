@@ -7,7 +7,7 @@ class StaticWebServer < Formula
   head "https://github.com/static-web-server/static-web-server.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd127a78cd3229908d9c94cd1c9236d463fb0333c172932c0b54e18429619b8a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "efe989a249602774a3e55d66bde0c48ac5f581891063fcbaa30b8a609ecb31cf"
   end
 
   depends_on "rust" => :build
