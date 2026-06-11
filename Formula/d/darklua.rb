@@ -7,7 +7,7 @@ class Darklua < Formula
   head "https://github.com/seaofvoices/darklua.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba9988224209e4916332c977529280ba52a90eae0deb622d36d9129eb033f9e6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "718103d171b172608638dda21af80051a1b7fd1d499c4e0c3f7d545923c86be0"
   end
 
   depends_on "rust" => :build
