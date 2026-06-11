@@ -15,7 +15,7 @@ class Wandio < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f307da1c0309b1b405b3eb63a8ebc851d26d7b832b84f0b8bbfdea0ab35d4948"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "885b400a2fe7f272ae4cfacc43e603c1b97616b3900052d55e5a3ae57f899773"
   end
 
   depends_on "autoconf" => :build
