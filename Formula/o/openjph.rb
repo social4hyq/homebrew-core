@@ -8,7 +8,7 @@ class Openjph < Formula
   head "https://github.com/aous72/OpenJPH.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "18351463e1d6d743aabeba34561de66997e0a90ef26e518b9b2f5eb9866a1df9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f17cca25a081611ceff6603b5fcc7243df8a6b91dec9bb2ba1a08b06db2cf09"
   end
 
   depends_on "cmake" => :build
