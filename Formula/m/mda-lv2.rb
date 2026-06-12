@@ -11,7 +11,7 @@ class MdaLv2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "59918fe488b8fa41349350b7066919107d0987ded78dc2d4033e2fdcfa889ace"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "134df32355539de5e57dc719cbba47a9c4a8a1d8e7c1c28686dbb66927c8f03d"
   end
 
   depends_on "meson" => :build
