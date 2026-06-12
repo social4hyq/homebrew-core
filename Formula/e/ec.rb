@@ -6,7 +6,7 @@ class Ec < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "69758ec3f980076f9451fac5f150647cbf703c87c668e55cad97511ee85d9d3a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a37d8582f601a4a70afaf7b150e6d60d6777b2bde8977af0a07011109fff7b1a"
   end
 
   depends_on "go" => :build
