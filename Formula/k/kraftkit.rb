@@ -1,8 +1,8 @@
 class Kraftkit < Formula
   desc "Build and use highly customized and ultra-lightweight unikernel VMs"
   homepage "https://unikraft.org/docs/cli"
-  url "https://github.com/unikraft/kraftkit/archive/refs/tags/v0.12.11.tar.gz"
-  sha256 "25eff0cbe79527a3ccb792d238a7df8a76c4d505db6015f16b27be1d8be40e51"
+  url "https://github.com/unikraft/kraftkit/archive/refs/tags/v0.12.13.tar.gz"
+  sha256 "be13ed7ba3e7d640075c3b8b34c6149209c17d67cdbe07d951612456a70f2bde"
   license "BSD-3-Clause"
   head "https://github.com/unikraft/kraftkit.git", branch: "staging"
 
@@ -12,7 +12,7 @@ class Kraftkit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b78da5e4f40deab9c6c8778b4851a338bde00d91aeb4bd5a7ed857961846249"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "57de190124712fec14c7642c384b0d6dd957bdf86229ae955b01448678d56ace"
   end
 
   depends_on "go" => :build
@@ -37,11 +37,7 @@ class Kraftkit < Formula
   end
 
   test do
-    expected = if OS.mac?
-      "could not determine hypervisor and system mode"
-    else
-      "finding unikraft.org/helloworld:latest"
-    end
+    expected = "finding 1 unikraft.org/helloworld:latest"
     assert_match expected, shell_output("#{bin}/kraft run unikraft.org/helloworld:latest 2>&1", 1)
 
     assert_match version.to_s, shell_output("#{bin}/kraft version")
