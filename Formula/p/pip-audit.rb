@@ -9,7 +9,7 @@ class PipAudit < Formula
   version_scheme 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "41e07842aff981692b5892991e172887303c48e01c86cccb18ce041c562eb03e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c7c4a8dd21b166ba1c36916805cc03d82bfc60030656c247ec5d2a48dce9949"
   end
 
   depends_on "rust" => :build
