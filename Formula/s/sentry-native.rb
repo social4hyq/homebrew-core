@@ -1,12 +1,12 @@
 class SentryNative < Formula
   desc "Sentry SDK for C, C++ and native applications"
   homepage "https://docs.sentry.io/platforms/native/"
-  url "https://github.com/getsentry/sentry-native/archive/refs/tags/0.14.2.tar.gz"
-  sha256 "de48e4cb92bae42164aa91f127f68fbc0032a1d1de632462702450ee0308042c"
+  url "https://github.com/getsentry/sentry-native/archive/refs/tags/0.15.0.tar.gz"
+  sha256 "c4a029f90f65dda5272c3be8e7e041d9e4320e0b1da92eaead79f2a24c5e600c"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a2ed8fb839c7910c6735796bf10ef0ff7265b560f68d1748c8e6ef8b264a4cc2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b09d4e326b68f91bf8f55d30816cd29106efc528a5bae3680d19a9057ae2a07a"
   end
 
   depends_on "cmake" => :build
