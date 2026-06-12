@@ -7,7 +7,7 @@ class TryRs < Formula
   head "https://github.com/tassiovirginio/try-rs.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a72d6fc1a17811ee7d9f6ff03e1ac00b90978b2a389f18fc2b552d063376b695"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d56af5e80c90f4dde6db85f879d8e33fea17fd1933d3f350a35bc6da7a80b770"
   end
 
   depends_on "rust" => :build
