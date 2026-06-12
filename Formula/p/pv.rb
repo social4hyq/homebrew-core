@@ -1,8 +1,8 @@
 class Pv < Formula
   desc "Monitor data's progress through a pipe"
   homepage "https://www.ivarch.com/programs/pv.shtml"
-  url "https://www.ivarch.com/programs/sources/pv-1.10.5.tar.gz"
-  sha256 "ab21b4f8662280646b6a02e1b9f096790918f89c952bbe0d06fef75d3b52fb15"
+  url "https://www.ivarch.com/programs/sources/pv-1.11.0.tar.gz"
+  sha256 "fc02c9fc2b82b20a92cc8d98f844be63f22abd98751a8e4abc875e1d803662eb"
   license "Artistic-2.0"
 
   livecheck do
@@ -11,7 +11,7 @@ class Pv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "213917054fdd8ec4cec9ca2019f0bb60c5cab7bcd1c08944d021796f89c9395c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ca72be5f69af57b33e2fa01b607349422d0cfabbb577c12015424b56555ac36"
   end
 
   uses_from_macos "ncurses"
