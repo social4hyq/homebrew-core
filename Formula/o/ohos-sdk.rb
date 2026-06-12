@@ -5,9 +5,10 @@ class OhosSdk < Formula
   version "26.0.0.18" # Keep the version number consistent with the one in the zip package name.
   sha256 "191094c9efcc4c0a6874aadaec5a1bf8b16f09f60c8f34a828d4ab0007356248"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dc86ede13801f3f16fffe6b14b81e9e1a0773c36942b535101e68ce1526a390"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a38b192a13e6de838c15ba72441feb24f9f79ec89525d23a4455d93bc980c14"
   end
 
   depends_on "unzip" => :build
@@ -70,15 +71,29 @@ class OhosSdk < Formula
       lldb
       llvm-addr2line
       llvm-ar
+      llvm-as
+      llvm-cfi-verify
+      llvm-config
+      llvm-cov
       llvm-cxxfilt
+      llvm-dis
+      llvm-dwarfdump
+      llvm-dwp
+      llvm-lib
+      llvm-link
+      llvm-modextract
       llvm-nm
       llvm-objcopy
       llvm-objdump
+      llvm-profdata
       llvm-ranlib
+      llvm-rc
       llvm-readelf
+      llvm-readobj
       llvm-size
       llvm-strings
       llvm-strip
+      llvm-symbolizer
     ]
     whitelist.each do |file|
       ln_s "#{llvm_bin_path}/#{file}", bin/file
