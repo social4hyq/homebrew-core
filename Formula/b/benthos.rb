@@ -7,7 +7,7 @@ class Benthos < Formula
   head "https://github.com/redpanda-data/benthos.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4726656367ae8cc60dee218b367ead7a779934378e01b6c827fab18316e62808"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c63d7a64f681f122c074667fcec8edd267b8f7e72b81bad0795f61d350b30db2"
   end
 
   depends_on "go" => :build
