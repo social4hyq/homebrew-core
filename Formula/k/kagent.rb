@@ -7,7 +7,7 @@ class Kagent < Formula
   head "https://github.com/kagent-dev/kagent.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f34fba588693f1158dc1536ccd7b0ce00ed545e2094c2e41e6c6fbf6f6b2fc1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "023e5a62f9b43b992f959e895bbf78b79f6fd44f4aa11abf21b706281721e77e"
   end
 
   depends_on "go" => :build
