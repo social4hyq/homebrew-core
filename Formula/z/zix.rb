@@ -1,13 +1,13 @@
 class Zix < Formula
   desc "C99 portability and data structure library"
   homepage "https://gitlab.com/drobilla/zix"
-  url "https://gitlab.com/drobilla/zix/-/archive/v0.8.0/zix-v0.8.0.tar.gz"
-  sha256 "51d70d63e970214db84e32d55377d84090c02145f5768265ab140d117f2b8e24"
+  url "https://gitlab.com/drobilla/zix/-/archive/v0.8.2/zix-v0.8.2.tar.gz"
+  sha256 "a2464cdc11fa359b5e713b3c82bf0b476952efe397a02374ddbc1b62eee04f13"
   license "ISC"
   head "https://gitlab.com/drobilla/zix.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "959756764cef8d42cf6a64edc2a12f03ff07323d7c4484736b9412026ab9591d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d722b71f390bf315afd449a08f2b8bedfe9c59af5db5c448ac3150d4bf449e1a"
   end
 
   depends_on "meson" => :build
