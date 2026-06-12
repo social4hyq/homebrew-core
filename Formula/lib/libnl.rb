@@ -14,8 +14,7 @@ class Libnl < Formula
   end
 
   bottle do
-    sha256 arm64_linux:  "75c3dff2c1bd4a952ab0b661639b0629829b1d447e20cb6bb7471655d13ffe83"
-    sha256 x86_64_linux: "1d3128ef9d8dde95c5da2f454abc2b4b62670fd72528f4a0b9f62e7e163561f7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d70c519fc9bc291df558f39d21eaf0a9c3aded57b1b0d4f2ca06a992ca0a1a3e"
   end
 
   depends_on "bison" => :build
