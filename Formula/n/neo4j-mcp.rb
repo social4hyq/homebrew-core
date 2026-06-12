@@ -7,7 +7,7 @@ class Neo4jMcp < Formula
   head "https://github.com/neo4j/mcp.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "575eb6b9c20a0e6a02d277c25ff75519a8c6a2078f51baa45cfc9eb5167cb366"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0539e66cda503396210b61a8ab41cdb0e12fc8fec9c862b8b5d50f7893e4279d"
   end
 
   depends_on "go" => :build
