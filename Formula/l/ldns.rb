@@ -14,7 +14,7 @@ class Ldns < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4805a8fd2b837edefdf090f353e914866dabda4d34e32f9719117bdb196c8cdf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "92fb54c839bf671534d4b6eb678dd515993692803c92008246e67c56ae3ba2a9"
   end
 
   depends_on "swig" => :build
