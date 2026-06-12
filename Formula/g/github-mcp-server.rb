@@ -12,7 +12,7 @@ class GithubMcpServer < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e13f7968ec7eb7f5f21b273e7954a0ff67776217929aeee8015efb76278489cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5777a0dc621d77974b7f1e3facf9891216f14cc88a19afd9ba1ec690d1f6347a"
   end
 
   depends_on "go" => :build
