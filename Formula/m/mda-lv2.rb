@@ -1,8 +1,8 @@
 class MdaLv2 < Formula
   desc "LV2 port of the MDA plugins"
   homepage "https://drobilla.net/software/mda-lv2.html"
-  url "https://download.drobilla.net/mda-lv2-1.2.10.tar.xz"
-  sha256 "aeea5986a596dd953e2997421a25e45923928c6286c4c8c36e5ef63ca1c2a75a"
+  url "https://download.drobilla.net/mda-lv2-1.2.12.tar.xz"
+  sha256 "8f2090433e60e90d9c4d0326970c845a3cb471951657cd9355d3dbca4040b873"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class MdaLv2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "59918fe488b8fa41349350b7066919107d0987ded78dc2d4033e2fdcfa889ace"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "134df32355539de5e57dc719cbba47a9c4a8a1d8e7c1c28686dbb66927c8f03d"
   end
 
   depends_on "meson" => :build
