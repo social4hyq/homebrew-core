@@ -7,7 +7,7 @@ class Railway < Formula
   head "https://github.com/railwayapp/cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf118af8ec85c401d94cb55bfa9559b4a27c6b781aad7a1b9003bbfc4c586697"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2856585fcaeee36dc6c5c4bc67f32481b2bd282abcb6b5d3f05ffe0f2b43843"
   end
 
   depends_on "rust" => :build
