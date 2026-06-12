@@ -1,8 +1,8 @@
 class Ldns < Formula
   desc "DNS library written in C"
   homepage "https://nlnetlabs.nl/projects/ldns/"
-  url "https://nlnetlabs.nl/downloads/ldns/ldns-1.9.1.tar.gz"
-  sha256 "e2aa09b6d88c6aa01efa658d7a8aa9d9922d557a9cf166818991f81e1cab2b61"
+  url "https://nlnetlabs.nl/downloads/ldns/ldns-1.9.2.tar.gz"
+  sha256 "b524fa21994b6e834200ceb8c27f1b84bda5982fe35706f058196c079db94d5d"
   license "BSD-3-Clause"
   compatibility_version 1
 
@@ -14,7 +14,7 @@ class Ldns < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4805a8fd2b837edefdf090f353e914866dabda4d34e32f9719117bdb196c8cdf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "92fb54c839bf671534d4b6eb678dd515993692803c92008246e67c56ae3ba2a9"
   end
 
   depends_on "swig" => :build
