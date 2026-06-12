@@ -1,14 +1,14 @@
 class Openjph < Formula
   desc "Open-source implementation of JPEG2000 Part-15 (or JPH or HTJ2K)"
   homepage "https://github.com/aous72/OpenJPH"
-  url "https://github.com/aous72/OpenJPH/archive/refs/tags/0.27.4.tar.gz"
-  sha256 "4bd6c75cc74721b1a40c3e07206621d0c953d0b21e9f63c9982a8ecb4a6f326d"
+  url "https://github.com/aous72/OpenJPH/archive/refs/tags/0.28.1.tar.gz"
+  sha256 "89629a3c0f61d474073076bb6195e9bb1d63fafb2e1c57ab46aee53a62f21819"
   license "BSD-2-Clause"
   compatibility_version 2
   head "https://github.com/aous72/OpenJPH.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "18351463e1d6d743aabeba34561de66997e0a90ef26e518b9b2f5eb9866a1df9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f17cca25a081611ceff6603b5fcc7243df8a6b91dec9bb2ba1a08b06db2cf09"
   end
 
   depends_on "cmake" => :build
