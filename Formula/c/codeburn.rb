@@ -6,7 +6,7 @@ class Codeburn < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c0c145496e45b2d64df4a1fbd2e41162334ef1c4dbc51da3c19d272ca89aa70"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a226106df965888e74227823a4975754e5add68fa162452e0f43fc7a47fbe6eb"
   end
 
   depends_on "node"
