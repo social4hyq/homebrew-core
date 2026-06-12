@@ -7,7 +7,7 @@ class Zix < Formula
   head "https://gitlab.com/drobilla/zix.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "959756764cef8d42cf6a64edc2a12f03ff07323d7c4484736b9412026ab9591d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d722b71f390bf315afd449a08f2b8bedfe9c59af5db5c448ac3150d4bf449e1a"
   end
 
   depends_on "meson" => :build
