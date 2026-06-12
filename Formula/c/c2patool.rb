@@ -1,8 +1,8 @@
 class C2patool < Formula
   desc "CLI for working with C2PA manifests and media assets"
   homepage "https://contentauthenticity.org"
-  url "https://github.com/contentauth/c2pa-rs/archive/refs/tags/c2patool-v0.26.65.tar.gz"
-  sha256 "f28a3004eceaea4d80839c3ee995f332919e830f980b20ff0b70c2af95527ac1"
+  url "https://github.com/contentauth/c2pa-rs/archive/refs/tags/c2patool-v0.26.67.tar.gz"
+  sha256 "392389af2f2af57b44a6bc433453f35ee9fdce6e62c450fd54d9f29c8650c725"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/contentauth/c2pa-rs.git", branch: "main"
 
@@ -12,7 +12,7 @@ class C2patool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7cbd571278a59e53d88b825331a966d40c40adeba620d3bdbfacde13efe573d7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8808b389d7be02c03770901461024e6915e67f8bf45d60cbcc6a65d6bb7044a9"
   end
 
   depends_on "pkgconf" => :build
