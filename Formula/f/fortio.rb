@@ -2,8 +2,8 @@ class Fortio < Formula
   desc "HTTP and gRPC load testing and visualization tool and server"
   homepage "https://fortio.org/"
   url "https://github.com/fortio/fortio.git",
-      tag:      "v1.75.1",
-      revision: "a794ffd9e54d06d63392f072fba7bbef56faa16d"
+      tag:      "v1.75.2",
+      revision: "630bfb3db6cf663b4e01524f9e9be945e44f8a20"
   license "Apache-2.0"
   head "https://github.com/fortio/fortio.git", branch: "master"
 
@@ -16,7 +16,7 @@ class Fortio < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea140ca6eb99fc77e0ce80a18c7afe43b782811220174f851b6d0a0c7c8cdcaf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "581bc5e4e376f1de2d1b1f74ad9df0612936169b03a13d3c01ca47c75e3c7cfd"
   end
 
   depends_on "go" => :build
