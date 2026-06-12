@@ -1,14 +1,14 @@
 class Cryptography < Formula
   desc "Cryptographic recipes and primitives for Python"
   homepage "https://cryptography.io/en/latest/"
-  url "https://files.pythonhosted.org/packages/9f/a9/db8f313fdcd85d767d4973515e1db101f9c71f95fced83233de224673757/cryptography-48.0.0.tar.gz"
-  sha256 "5c3932f4436d1cccb036cb0eaef46e6e2db91035166f1ad6505c3c9d5a635920"
+  url "https://files.pythonhosted.org/packages/12/45/870e7f4bef50e5f53b9f51d4428aee5290eedf58ba443f16b1ebb7ab8e66/cryptography-48.0.1.tar.gz"
+  sha256 "266f4ee051abb2f725b74ef8072b521ce1feacf685a3364fa6a6b45548db791a"
   license any_of: ["Apache-2.0", "BSD-3-Clause"]
   compatibility_version 1
   head "https://github.com/pyca/cryptography.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "450b6164eb33da1f5ba3daf3628ff9c3351a65577f48b839eb70d246665f7bd1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef239b51996ae4a7b3bab2211f7c3d7e165209e87c97bf552ccdb901cd81b83d"
   end
 
   depends_on "maturin" => :build
