@@ -25,7 +25,7 @@ class MariadbConnectorC < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9148dc844240e2ea43feebd5d17b7a855b3d18cfe269897cac9de7c2152de0c9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "46ca4a3baf66fd75a5e40171e8389c42ba5fe9f2736acb15696ecf6158a76d80"
   end
 
   keg_only "it conflicts with mariadb"
