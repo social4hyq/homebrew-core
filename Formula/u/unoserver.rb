@@ -8,7 +8,7 @@ class Unoserver < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0876d0a34a8668ce61ffa6c534cb5407a7a492b95b59f28d2aff457c1483854"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f6dcea694ca31b1707c1df760c3040c9153a2f1eacf6dbe401a4dc1cc644547"
   end
 
   depends_on "python@3.14"
