@@ -15,7 +15,7 @@ class Mockery < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1520fdf01c63e824dd045eb7833b450d405bcc561988c7047401b2c6a47f1ecb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "85b203957a302208956830481ce0268ed6ee3066520f11318c0c75f65dfd599f"
   end
 
   depends_on "go" => :build
