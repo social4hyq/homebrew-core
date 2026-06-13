@@ -1,8 +1,8 @@
 class QuiltInstaller < Formula
   desc "Installer for Quilt for the vanilla launcher"
   homepage "https://quiltmc.org/"
-  url "https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-installer/0.13.1/quilt-installer-0.13.1.jar"
-  sha256 "6e1bd14860f30e74a5827ba9dcc8c201a0c64f700421670c4bc7c436baca2747"
+  url "https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-installer/0.14.1/quilt-installer-0.14.1.jar"
+  sha256 "4d016064beecd85e28b841ebaf7bfee45576dfe494a791de6ddc2aba1d10b8e5"
   license "Apache-2.0"
 
   livecheck do
@@ -11,7 +11,7 @@ class QuiltInstaller < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e52f8c5bba8c22e2895e588996f7ff631cd18c15496e64e11df499198150e86f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "17f99aaf9d177f0ace5fb14ce34278adcd066abfbaeb397b24946ce6ad16b264"
   end
 
   depends_on "openjdk"
