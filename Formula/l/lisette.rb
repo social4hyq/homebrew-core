@@ -1,8 +1,8 @@
 class Lisette < Formula
   desc "Language inspired by Rust that compiles to Go"
   homepage "https://lisette.run"
-  url "https://github.com/ivov/lisette/archive/refs/tags/lisette-v0.3.3.tar.gz"
-  sha256 "d7e7d8aa7ca4d1de92f037e41c2d97b0628dd1891f9368ec0efeceea222c6d32"
+  url "https://github.com/ivov/lisette/archive/refs/tags/lisette-v0.3.4.tar.gz"
+  sha256 "2463c36f1c2f8c647ab2f6c7ef452462472a27740b715cb2ce0cf15fc80b5faa"
   license "MIT"
   head "https://github.com/ivov/lisette.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Lisette < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "04f340e163e1a6d3fdb95f6b9e340448450ea71b47d35af26b9445bb8b886ac7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "057baf28ab534b7a6f9dff0b3b6d79aadf3c4edd6014ade3ae1f5c6b2d7c6a34"
   end
 
   depends_on "rust" => :build
