@@ -1,8 +1,8 @@
 class Wazero < Formula
   desc "Zero dependency WebAssembly runtime"
   homepage "https://wazero.io"
-  url "https://github.com/tetratelabs/wazero/archive/refs/tags/v1.11.0.tar.gz"
-  sha256 "a785f0eabe510e454a01e0d187675a913f96814d0c7e38c4717e03f6d5420ed4"
+  url "https://github.com/tetratelabs/wazero/archive/refs/tags/v1.12.0.tar.gz"
+  sha256 "81afcc5576db589dda5403f71aa5ae2593222a7ba9671007484bf0ce6e21e7ba"
   license "Apache-2.0"
 
   livecheck do
@@ -11,7 +11,7 @@ class Wazero < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c70f69996e17e3acf33b197cbf1174472a9223de253df691a8f35ef76ad1e97"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee50e2f0ae40001b6d2ab589e06b7b82b69246b14121cea7370d178b0b368ed7"
   end
 
   depends_on "go" => :build
