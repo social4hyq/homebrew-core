@@ -11,7 +11,7 @@ class Micronaut < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5effcaffa8e6f68cf6ed3798fd95241fd6ccda8e2cb0fd1c84a0fd9ba1ff234f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dd1c6cf79c8399e976efa18a1416d49df6e716d055b8a5c4117ab6d1d923ec0"
   end
 
   depends_on "gradle" => :build
