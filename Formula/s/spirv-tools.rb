@@ -14,7 +14,7 @@ class SpirvTools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e95da7d702c83980dcf34e698953a2d5bf97133f52d80aa800ed966268d165ee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "94d8f2083a5a66e73c55ce5358521d473b22c8982d34ba1af354879ffd943c24"
   end
 
   depends_on "cmake" => :build
