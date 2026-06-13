@@ -1,12 +1,12 @@
 class Scalingo < Formula
   desc "CLI for working with Scalingo's PaaS"
   homepage "https://doc.scalingo.com/cli"
-  url "https://github.com/Scalingo/cli/archive/refs/tags/1.44.1.tar.gz"
-  sha256 "c9178d944a13159df2c16ebe79be14e4e2cfa48877a5d5e4a15986d3f6e5ad3a"
+  url "https://github.com/Scalingo/cli/archive/refs/tags/1.45.0.tar.gz"
+  sha256 "0552aa61af9abf236c4102ade445e44c0d4aa2e8aa51b23158657d0ce390cf67"
   license "BSD-4-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "71339b0683ee746244357abdf724924555fee12598c1710e26e82261e3217335"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d4a919bc94198e02ae60645b3541793fcca704f83aa0e5c21b1133959485158"
   end
 
   depends_on "go" => :build
