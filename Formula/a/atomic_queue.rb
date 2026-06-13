@@ -1,12 +1,12 @@
 class AtomicQueue < Formula
   desc "C++14 lock-free queues"
   homepage "https://github.com/max0x7ba/atomic_queue"
-  url "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.9.1.tar.gz"
-  sha256 "f488e320a028428d8e7f908ca8e4fdf948431d5a26273b8a25f288246f8ae374"
+  url "https://github.com/max0x7ba/atomic_queue/archive/refs/tags/v1.9.2.tar.gz"
+  sha256 "7c3606f23cea69d39c3872996ffb83587bd4ab08da3c0c4c45aba7aa15eea9f8"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b092857033af9405e1f75f0354975a2b2bb2a1ff5f2cb433cb414ef7c7cec499"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "20af091a80486eaad961f0f9996504086b7706e47509f8c2db1720ca24da1858"
   end
 
   depends_on "meson" => :build
