@@ -1,15 +1,15 @@
 class DockerMachine < Formula
   desc "Create Docker hosts locally and on cloud providers"
   homepage "https://docs.gitlab.com/runner/executors/docker_machine.html"
-  url "https://gitlab.com/gitlab-org/ci-cd/docker-machine/-/archive/v0.16.2-gitlab.48/docker-machine-v0.16.2-gitlab.48.tar.bz2"
-  version "0.16.2-gitlab.48"
-  sha256 "d32358543bce4fc6356ed0edbe8ee85045fadecbc8c3c660ea56df43a181bb22"
+  url "https://gitlab.com/gitlab-org/ci-cd/docker-machine/-/archive/v0.16.2-gitlab.49/docker-machine-v0.16.2-gitlab.49.tar.bz2"
+  version "0.16.2-gitlab.49"
+  sha256 "7cf1733201c09486db68e5d1a7f89bf6ecf18178452239173736d48eef2d42a1"
   license "Apache-2.0"
   compatibility_version 1
   head "https://gitlab.com/gitlab-org/ci-cd/docker-machine.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "55e8ce5b0a99d819abf065680644d2e3ced26937e78b014b934ec2f38877fc70"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "752cf33fcda2fd6e83a52425984f742eb1ddeda993733dd69f92182a927231f2"
   end
 
   depends_on "go" => :build
