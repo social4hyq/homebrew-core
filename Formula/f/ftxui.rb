@@ -1,8 +1,8 @@
 class Ftxui < Formula
   desc "C++ Functional Terminal User Interface"
   homepage "https://github.com/ArthurSonzogni/FTXUI"
-  url "https://github.com/ArthurSonzogni/FTXUI/archive/refs/tags/v6.1.9.tar.gz"
-  sha256 "45819c1e54914783d4a1ca5633885035d74146778a1f74e1213cdb7b76340e71"
+  url "https://github.com/ArthurSonzogni/FTXUI/archive/refs/tags/v7.0.0.tar.gz"
+  sha256 "14bef1f8caff548c49af8eeadfca21910d66e93e68237f0c3d20236b60c01e7e"
   license "MIT"
   head "https://github.com/ArthurSonzogni/FTXUI.git", branch: "main"
 
