@@ -1,8 +1,8 @@
 class Hl < Formula
   desc "Fast and powerful log viewer and processor"
   homepage "https://github.com/pamburus/hl"
-  url "https://github.com/pamburus/hl/archive/refs/tags/v0.36.2.tar.gz"
-  sha256 "4b369b05f339b3cabb1c83a591fb6456966cb3d4197a5e1c75ed408e8aaed9e2"
+  url "https://github.com/pamburus/hl/archive/refs/tags/v0.36.3.tar.gz"
+  sha256 "941780a2830f236037b9732c272e1ce2127a05191f257ce11e47b7a483414f3a"
   license "MIT"
   head "https://github.com/pamburus/hl.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Hl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cded645a2ba10d39e72c5516374c3b21324de3cfd512e4b78547ed42d3173242"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "496756175d9b24f289eed25341dcda1091238b2643a3a233605cb151a59c826e"
   end
 
   depends_on "rust" => :build
