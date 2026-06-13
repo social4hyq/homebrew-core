@@ -7,7 +7,7 @@ class Betterleaks < Formula
   head "https://github.com/betterleaks/betterleaks.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "98061ffeb5ba21ed18a6534e3aecca4eee0edb6175ac07d92cfcad59fb697dde"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b5f7966d518bcd13324b56724c387b5cdf6f5c801f63589024ccdf320d7e642"
   end
 
   depends_on "go" => :build
