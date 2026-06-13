@@ -1,8 +1,8 @@
 class Roxctl < Formula
   desc "CLI for Stackrox"
   homepage "https://www.stackrox.io/"
-  url "https://github.com/stackrox/stackrox/archive/refs/tags/4.10.3.tar.gz"
-  sha256 "372d7e549da4cf323a317c510b56ba954a2c88eaccdb1850e41802143f4674c6"
+  url "https://github.com/stackrox/stackrox/archive/refs/tags/4.11.0.tar.gz"
+  sha256 "23cd60a835019c66c5742771e2566a47dc47858a7a59841e7efdf12a664aeae5"
   license "Apache-2.0"
   head "https://github.com/stackrox/stackrox.git", branch: "master"
 
