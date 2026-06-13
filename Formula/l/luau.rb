@@ -1,8 +1,8 @@
 class Luau < Formula
   desc "Fast, safe, gradually typed embeddable scripting language derived from Lua"
   homepage "https://luau.org"
-  url "https://github.com/luau-lang/luau/archive/refs/tags/0.724.tar.gz"
-  sha256 "4631f584b409a985b7daf52697dfdf26b2688bd7395afb09ef0f3937e7fb876d"
+  url "https://github.com/luau-lang/luau/archive/refs/tags/0.725.tar.gz"
+  sha256 "e51ead5f541633693d548057e0431927f3036c13b185fdb37fbc3f5a261e6676"
   license "MIT"
   version_scheme 1
   head "https://github.com/luau-lang/luau.git", branch: "master"
@@ -13,7 +13,7 @@ class Luau < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e8d002fc47289a3d0acd3edd3261397d3dd0bd4c3a833be1584f22d9809591c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "13f5f13752b9167fb49787d3ae1a9a5ee5cace94ebe1d84a4d3a0d9eb933a0f8"
   end
 
   depends_on "cmake" => :build
