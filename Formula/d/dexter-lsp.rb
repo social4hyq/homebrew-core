@@ -7,7 +7,7 @@ class DexterLsp < Formula
   head "https://github.com/remoteoss/dexter.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb6f460f47483e964f098400c2a4ad6475ed1b399fdaa75bebffa22e2a29893f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ac825025fe5c12dd5acca0d083e09367b1e0eb0f9b1ca3e2049840a6feed8f2"
   end
 
   depends_on "go" => :build
