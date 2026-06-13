@@ -1,8 +1,8 @@
 class SpirvTools < Formula
   desc "API and commands for processing SPIR-V modules"
   homepage "https://github.com/KhronosGroup/SPIRV-Tools"
-  url "https://github.com/KhronosGroup/SPIRV-Tools/archive/refs/tags/vulkan-sdk-1.4.341.0.tar.gz"
-  sha256 "15bfb678138cdf9cd1480dfb952547bbb66b763a735b6d5582578572f5c2e6f9"
+  url "https://github.com/KhronosGroup/SPIRV-Tools/archive/refs/tags/vulkan-sdk-1.4.350.0.tar.gz"
+  sha256 "446b288fe76d3f31bbf9a405d62b97020ac0f135edb0ed5dbdf1136c488138f5"
   license "Apache-2.0"
   version_scheme 1
   compatibility_version 1
@@ -14,7 +14,7 @@ class SpirvTools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e95da7d702c83980dcf34e698953a2d5bf97133f52d80aa800ed966268d165ee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "94d8f2083a5a66e73c55ce5358521d473b22c8982d34ba1af354879ffd943c24"
   end
 
   depends_on "cmake" => :build
