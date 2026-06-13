@@ -6,7 +6,7 @@ class McpServerKubernetes < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "75bf8696550c7d0a3cf35aaebd7556db005d57aa92382962b4c837456477dd50"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "45cc85b41c46619130e9973226e26c6082ed06f8d76415c4ef5e7619426dc92e"
   end
 
   depends_on "node"
