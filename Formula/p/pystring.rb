@@ -1,8 +1,8 @@
 class Pystring < Formula
   desc "Collection of C++ functions for the interface of Python's string class methods"
   homepage "https://github.com/imageworks/pystring"
-  url "https://github.com/imageworks/pystring/archive/refs/tags/v1.1.5.tar.gz"
-  sha256 "63c30c251b8017c897bd923826f400aee1d6e4f1c22ffbbd2104f150522a2040"
+  url "https://github.com/imageworks/pystring/archive/refs/tags/v1.2.0.tar.gz"
+  sha256 "020a603a757ba1e429f4b1ea6feb3afbe0fb34bcafa355032e1f1b8a0019d198"
   license "BSD-3-Clause"
   head "https://github.com/imageworks/pystring.git", branch: "master"
 
