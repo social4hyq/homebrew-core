@@ -11,7 +11,7 @@ class Wazero < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c70f69996e17e3acf33b197cbf1174472a9223de253df691a8f35ef76ad1e97"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee50e2f0ae40001b6d2ab589e06b7b82b69246b14121cea7370d178b0b368ed7"
   end
 
   depends_on "go" => :build
