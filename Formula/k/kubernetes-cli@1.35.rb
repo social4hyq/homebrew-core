@@ -2,8 +2,8 @@ class KubernetesCliAT135 < Formula
   desc "Kubernetes command-line interface"
   homepage "https://kubernetes.io/docs/reference/kubectl/"
   url "https://github.com/kubernetes/kubernetes.git",
-      tag:      "v1.35.5",
-      revision: "6636cbce3bbef91ff61d36658757179426f9e1b2"
+      tag:      "v1.35.6",
+      revision: "fc0e7a6ca50f7ce368f9a5516e1716b473ed3a26"
   license "Apache-2.0"
 
   livecheck do
@@ -12,7 +12,7 @@ class KubernetesCliAT135 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dd55c5a456d23dd4d24ddae86fe6bdab969b86a53c635f97acacc541ade381d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f7a2f49d20d39f8467449d42d1caddb3caa575196fbd184c9b11f55df3ff1a0"
   end
 
   keg_only :versioned_formula
