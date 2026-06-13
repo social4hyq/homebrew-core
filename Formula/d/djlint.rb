@@ -9,7 +9,7 @@ class Djlint < Formula
   head "https://github.com/djlint/djLint.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "31c9b4d4059ad9f5fc2a201633e5492b5c1a5f1a70f385d8d969be9a86ae730f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "06055b6d8f1ab76e87621285dffb4f4cdcbc4ab1cf6a0f44d66f0673bc252980"
   end
 
   depends_on "libyaml"
