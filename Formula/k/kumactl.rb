@@ -1,8 +1,8 @@
 class Kumactl < Formula
   desc "Kuma control plane command-line utility"
   homepage "https://kuma.io/"
-  url "https://github.com/kumahq/kuma/archive/refs/tags/v2.13.8.tar.gz"
-  sha256 "1a3d8d496c78a533fa491cbc7bcb2e92803d294e19defbe334f2d819cac7c44b"
+  url "https://github.com/kumahq/kuma/archive/refs/tags/v2.14.0.tar.gz"
+  sha256 "66a2713459122b5c0450c4f410fb47f44e1ffad8aefc1e063a841721f820a682"
   license "Apache-2.0"
   head "https://github.com/kumahq/kuma.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Kumactl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "22ae8118b17678f51223dd7e2c691bf6285c1513e592eefd9bacc6e028580e1a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bfc8a3dcbe561bef1df2d8814b3df6e88764a364c9dde9a16464791aa0865af2"
   end
 
   depends_on "go" => :build
