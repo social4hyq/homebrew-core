@@ -9,7 +9,7 @@ class DockerMachine < Formula
   head "https://gitlab.com/gitlab-org/ci-cd/docker-machine.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "55e8ce5b0a99d819abf065680644d2e3ced26937e78b014b934ec2f38877fc70"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "752cf33fcda2fd6e83a52425984f742eb1ddeda993733dd69f92182a927231f2"
   end
 
   depends_on "go" => :build
