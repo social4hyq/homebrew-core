@@ -6,7 +6,7 @@ class FishLsp < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "83f440a64ff420b6c0ded222fc221a5bc8f18eb26ae8fc981cfae195019c61f7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f83e47d32b2bb4701a3d83ac0ae6ac8b766bfd75cfc51bd3bca23ce8d085bce1"
   end
 
   depends_on "fish" => [:build, :test]
