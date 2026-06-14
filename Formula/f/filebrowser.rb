@@ -1,13 +1,13 @@
 class Filebrowser < Formula
   desc "Web File Browser"
   homepage "https://filebrowser.org/"
-  url "https://github.com/filebrowser/filebrowser/archive/refs/tags/v2.63.14.tar.gz"
-  sha256 "5611ca536a19e377132e0c344b48c26f45f80513fd8de6a65c960aa5c9c4ee62"
+  url "https://github.com/filebrowser/filebrowser/archive/refs/tags/v2.63.15.tar.gz"
+  sha256 "fc7b597642769ce47b590933e3b1a345154ea8877817a3a4106e23f24dab6705"
   license "Apache-2.0"
   head "https://github.com/filebrowser/filebrowser.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "02c5eab482994bad3fe06ea9bc5a74f34354bcedbd87ead25da68a6229b30683"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "55f6cae8cdeb6e5d226a53af425bb0c9992fe2bbd517646ee98c311abee12773"
   end
 
   depends_on "go" => :build
