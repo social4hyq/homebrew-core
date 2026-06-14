@@ -1,8 +1,8 @@
 class Hayagriva < Formula
   desc "Bibliography management tool"
   homepage "https://github.com/typst/hayagriva"
-  url "https://github.com/typst/hayagriva/archive/refs/tags/v0.10.0.tar.gz"
-  sha256 "41c82a16510cdceb922250e2f133227759c6ee1ff05bef5328598b97f7168edf"
+  url "https://github.com/typst/hayagriva/archive/refs/tags/v0.10.1.tar.gz"
+  sha256 "bce8393f5200a3672b0d5baade84cfd96646dc7f0e045faedb0bf9a754c1a48d"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/typst/hayagriva.git", branch: "main"
 
