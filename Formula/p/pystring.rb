@@ -7,7 +7,7 @@ class Pystring < Formula
   head "https://github.com/imageworks/pystring.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21296891b862287c54e0170c7d115e96843ec6075d1e10793f743639b6fe603c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "59b2f84bd285eeb0c833d740141abb6b41ebb4a86ce8724cc0f37d5f038a45ca"
   end
 
   depends_on "cmake" => :build
