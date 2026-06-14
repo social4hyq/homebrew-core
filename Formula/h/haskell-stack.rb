@@ -12,7 +12,7 @@ class HaskellStack < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e97b6ffaf3b26d60e2c4952244e7d133af56cbe949441926fe71c27aca01722"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d968b1d5228fac472db0977debe1d5f4f09cab55983d6ba0679dac3937663d4"
   end
 
   depends_on "cabal-install" => :build
