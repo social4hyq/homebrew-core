@@ -7,7 +7,7 @@ class Tig < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f5ee54170a90576327a7c8d38ebe830b42398d2280e9854eee34e939b96dc7a1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6776f57580e543334bb55559100bccf1a780a86ffb53f0ce304cc69b6b0762d9"
   end
 
   head do
