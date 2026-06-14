@@ -1,8 +1,8 @@
 class FastFloat < Formula
   desc "Fast and exact implementation of the C++ from_chars functions for number types"
   homepage "https://github.com/fastfloat/fast_float"
-  url "https://github.com/fastfloat/fast_float/archive/refs/tags/v8.2.9.tar.gz"
-  sha256 "bceaf8ba128a283c80124fffd96a8152c42b61ca4efa42d3fda51fc42c67383e"
+  url "https://github.com/fastfloat/fast_float/archive/refs/tags/v8.2.10.tar.gz"
+  sha256 "76f958dd97b1cf4d8862d1f0986a47d4bdfa8845252bae15ef0f40de3b95961f"
   license "Apache-2.0"
   head "https://github.com/fastfloat/fast_float.git", branch: "main"
 
