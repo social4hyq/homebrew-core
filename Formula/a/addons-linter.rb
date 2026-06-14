@@ -1,12 +1,12 @@
 class AddonsLinter < Formula
   desc "Firefox Add-ons linter, written in JavaScript"
   homepage "https://github.com/mozilla/addons-linter"
-  url "https://registry.npmjs.org/addons-linter/-/addons-linter-10.6.0.tgz"
-  sha256 "aa1a13037050043cb2b607a261201c112ba291c926d3778593a8a2bea40628aa"
+  url "https://registry.npmjs.org/addons-linter/-/addons-linter-10.7.0.tgz"
+  sha256 "ecda2311fbf95cea6a17b1fb24482c7de31525457bb766af87db42b7cb0a52cb"
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ff976551ad260f8bda0d18169db764f84775fbe918bf9f1d878aa75564ccf10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5121e2107018e8386f9cb51daf987d281c9f453304a65613a3b07855c331d3c"
   end
 
   depends_on "node"
