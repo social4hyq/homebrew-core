@@ -7,7 +7,7 @@ class Evtx < Formula
   head "https://github.com/omerbenamram/evtx.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e188789103053742a89e901cb0af335a6a5e93090527eea543ad39b2327e558"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0cba415b90fa7cd3ada0c24f7033b4c66640bdab81d55cc8bb4e76852a9409c"
   end
 
   depends_on "rust" => :build
