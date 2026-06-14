@@ -1,8 +1,8 @@
 class Pmccabe < Formula
   desc "Calculate McCabe-style cyclomatic complexity for C/C++ code"
   homepage "https://gitlab.com/pmccabe/pmccabe"
-  url "https://gitlab.com/pmccabe/pmccabe/-/archive/v2.8/pmccabe-v2.8.tar.bz2"
-  sha256 "d37cafadfb64507c32d75297193f99f1afcf12289b7fcc1ddde4a852f0f2ac8a"
+  url "https://gitlab.com/pmccabe/pmccabe/-/archive/v2.9/pmccabe-v2.9.tar.bz2"
+  sha256 "8b0e207c171bb3c8b9dcc226b85a8a8f1f87c98cc8e71e760a99c3058042ec48"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -14,7 +14,7 @@ class Pmccabe < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4873db2af396f190538110c555ef24b12823742640db99270d3149cd9112ea42"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d25901f0be4258f47008177509dc856ecaadf5edacd1a10508978a9e3e38faa"
   end
 
   def install
