@@ -7,7 +7,7 @@ class Flawz < Formula
   head "https://github.com/orhun/flawz.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b4eda64233961a087f7c398350370a6c28e4647bddfb43ead26d6dd9ba230b7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "67ce73dcd6a4ccbf3e50bd0c3533f0982ade155d2f102cf0f2537d1164543817"
   end
 
   depends_on "pkgconf" => :build
