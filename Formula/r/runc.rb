@@ -7,7 +7,7 @@ class Runc < Formula
   head "https://github.com/opencontainers/runc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce1de92ce5a4cf44075d7f4c05a216a782426f22855ee159c82b364b7c46a174"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8672e8b0aa825284a3540dfc8972763e6add7b1c251f4400fc19ca7dabb03aa"
   end
 
   depends_on "go" => :build
