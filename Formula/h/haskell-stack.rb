@@ -1,8 +1,8 @@
 class HaskellStack < Formula
   desc "Cross-platform program for developing Haskell projects"
   homepage "https://haskellstack.org/"
-  url "https://github.com/commercialhaskell/stack/archive/refs/tags/v3.9.3.tar.gz"
-  sha256 "144bc7eaaf384228f6b0f960ced130b503dc4945ffa42f3ca2037abbc8136c05"
+  url "https://github.com/commercialhaskell/stack/archive/refs/tags/v3.11.1.tar.gz"
+  sha256 "388916c20e2a9e9d343ef40c0c31fbb664cdbf302122ded8508ded8f765cbb4f"
   license "BSD-3-Clause"
   head "https://github.com/commercialhaskell/stack.git", branch: "master"
 
@@ -12,7 +12,7 @@ class HaskellStack < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e97b6ffaf3b26d60e2c4952244e7d133af56cbe949441926fe71c27aca01722"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d968b1d5228fac472db0977debe1d5f4f09cab55983d6ba0679dac3937663d4"
   end
 
   depends_on "cabal-install" => :build
