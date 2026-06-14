@@ -7,7 +7,7 @@ class Decompose < Formula
   head "https://github.com/s0rg/decompose.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "41cda90519167f81b4d4336aa29ff72a1a13ee66929556c59f7cebe4210a110e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d56e813f0b61370d7749f6eccb4f0ba41983afc51ce188f7c52aee7cc148061"
   end
 
   depends_on "go" => :build
