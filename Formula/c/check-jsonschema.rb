@@ -9,7 +9,7 @@ class CheckJsonschema < Formula
   head "https://github.com/python-jsonschema/check-jsonschema.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d18c480691f3ca9a26f685d55c7f930f94ad6b875f1a564e13335fe04aea1b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ce592def6c2eda26280b0fde78982a4ce27c62949638aa7ab3dd01acf84eba1"
   end
 
   depends_on "rust" => :build # for regress
