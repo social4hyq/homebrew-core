@@ -1,8 +1,8 @@
 class HackBrowserData < Formula
   desc "Command-line tool for decrypting and exporting browser data"
   homepage "https://github.com/moonD4rk/HackBrowserData"
-  url "https://github.com/moonD4rk/HackBrowserData/archive/refs/tags/v1.0.0.tar.gz"
-  sha256 "80d2b77ba764aaf88bae49d7a071c0309b8fb05f45af884b407ec58183b6478c"
+  url "https://github.com/moonD4rk/HackBrowserData/archive/refs/tags/v1.1.0.tar.gz"
+  sha256 "8efd8b28d85ef96683ee5f501e882685108ce78a8e128d42a194c949da74465f"
   license "MIT"
   head "https://github.com/moonD4rk/HackBrowserData.git", branch: "main"
 
