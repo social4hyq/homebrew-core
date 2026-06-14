@@ -1,10 +1,9 @@
 class Coturn < Formula
   desc "Free open source implementation of TURN and STUN Server"
   homepage "https://github.com/coturn/coturn"
-  url "https://github.com/coturn/coturn/archive/refs/tags/4.12.0.tar.gz"
-  sha256 "5374811d50548e2eb1982c0591a55c79c95d78633c17fd211bef13206087e95b"
+  url "https://github.com/coturn/coturn/archive/refs/tags/4.13.0.tar.gz"
+  sha256 "e1d7f2f6587dd1aa0a03fbddac0c8cbf3f6e3e746275eb44b145932749895f6d"
   license "BSD-3-Clause"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,7 +11,7 @@ class Coturn < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ba2135fa5ab9a29063ed2b9be5db76d2347ff82ce683808a3092613efd8cd5a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f005e334693557ccba1d0dd5997fa5acd3a8b222a0e7fe13c98d4356f5e10a53"
   end
 
   depends_on "pkgconf" => :build
