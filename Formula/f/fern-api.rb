@@ -10,7 +10,7 @@ class FernApi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9c24b432126f32e2d7aa328b4e7eb9a7ef8167d396a3d1ebe907595f7953013"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a69ca537041776a4a5b8bff1b594391e8cb121aca7b70c523fbfb5482b49b36d"
   end
 
   depends_on "node"
