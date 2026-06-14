@@ -7,7 +7,7 @@ class Cookcli < Formula
   head "https://github.com/cooklang/cookcli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "86d464b1aee98241497877289045fbc4cd78167ee623d9c5da694f750ea32dbf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e40ffd1836ad3a5a1a5d784eb2e4fc593f4a5bc024eb7329824aa8d51fbe3158"
   end
 
   depends_on "node" => :build
