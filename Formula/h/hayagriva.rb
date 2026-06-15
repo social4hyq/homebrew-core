@@ -7,7 +7,7 @@ class Hayagriva < Formula
   head "https://github.com/typst/hayagriva.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a1b822a4af11f7f383ebfe9d86c09106b364895b03020349b654f5a3ac51e1a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "40c165df0b8610338cb8b4e24418fd8d4ab5a6abb03888aa2a93233298b4144c"
   end
 
   depends_on "rust" => :build
