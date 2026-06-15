@@ -11,7 +11,7 @@ class Lighttpd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "218d3e6260b6668b50b556ff89ca2d6c0f8f993e2e17019fd1d1e2f126a126ed"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db3d26db0525da028d99c1885fffa0fe89895447c2121909b6419203766d296c"
   end
 
   depends_on "autoconf" => :build
