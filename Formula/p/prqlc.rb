@@ -1,13 +1,13 @@
 class Prqlc < Formula
   desc "Simple, powerful, pipelined SQL replacement"
   homepage "https://prql-lang.org"
-  url "https://github.com/PRQL/prql/archive/refs/tags/0.13.12.tar.gz"
-  sha256 "8e24657f9bec405bccc3c22404cc97e18d6583ffbafc3cd3286038f7c1728606"
+  url "https://github.com/PRQL/prql/archive/refs/tags/0.13.13.tar.gz"
+  sha256 "089e85cfe54e2bcf7018b32ccb6fe06bdfefc1f1b9f10ddb9a59c74a24c54c22"
   license "Apache-2.0"
   head "https://github.com/prql/prql.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c28bf913c38040052b3edeb591c18b1ef62f4bdfcc86a0cc2c9c5c2e26a36a88"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "903681e02bc86e90ca55d9819e56a2ed1a61514e9b547b1a140e373c83106fdc"
   end
 
   depends_on "rust" => :build
