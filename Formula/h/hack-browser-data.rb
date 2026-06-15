@@ -1,13 +1,13 @@
 class HackBrowserData < Formula
   desc "Command-line tool for decrypting and exporting browser data"
   homepage "https://github.com/moonD4rk/HackBrowserData"
-  url "https://github.com/moonD4rk/HackBrowserData/archive/refs/tags/v1.0.0.tar.gz"
-  sha256 "80d2b77ba764aaf88bae49d7a071c0309b8fb05f45af884b407ec58183b6478c"
+  url "https://github.com/moonD4rk/HackBrowserData/archive/refs/tags/v1.1.0.tar.gz"
+  sha256 "8efd8b28d85ef96683ee5f501e882685108ce78a8e128d42a194c949da74465f"
   license "MIT"
   head "https://github.com/moonD4rk/HackBrowserData.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f446dfbdf2e136a6e51921c7ce711c940f057c8fcb681c6262a6f882e32f7113"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b27f3c75e6d0bab3c505a838d8df409b455f99334cdfec567914b5f3b84413cc"
   end
 
   depends_on "go" => :build
