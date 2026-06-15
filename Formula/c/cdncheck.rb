@@ -12,7 +12,7 @@ class Cdncheck < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9a48af54677d1cc39a7072a212ba209c9d10ca3504ee418d06be4d5aa2e6b63"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f4f89fb3c30aac9294c8bf92c5767896ae1467921f1e11953679d8e29b78654"
   end
 
   depends_on "go" => :build
