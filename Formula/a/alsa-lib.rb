@@ -12,7 +12,7 @@ class AlsaLib < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8457db3658efea9186b52987bb03036f0a5d848ff58288344342e20de92e2be"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e24d88c4e2bdf40538f2c9d0813b7bf9ae16622ede11ef4580a197b7beefbd0a"
   end
 
   depends_on :linux
