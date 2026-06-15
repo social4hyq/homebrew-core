@@ -12,7 +12,7 @@ class Discount < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "97afecc2332c36a3c09f740a542d4976ef4b9ea9722ead9de5e29ad33ca61da2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c783bfeb5df1e5806220b56de6a9dba2e83c3b70ee27a67ccb2b3c27f9c11aa"
   end
 
   conflicts_with "markdown", because: "both install `markdown` binaries"
