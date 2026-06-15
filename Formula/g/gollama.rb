@@ -7,7 +7,7 @@ class Gollama < Formula
   head "https://github.com/sammcj/gollama.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "facb7c61d7f929e8d3802e1f413d2c93f303db02a54de9ea5c4937fb1e138d30"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b8f8d98bb504cf1eccf9213887b44d042ad285da51efc921afde777b5934f7a"
   end
 
   depends_on "go" => :build
