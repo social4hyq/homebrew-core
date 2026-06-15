@@ -32,12 +32,7 @@ class Gnutls < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "734c0efdecbab73827b30af2d46ecb7e4236eb9dbfa55b81b4293d369d434b2a"
-    sha256 cellar: :any, arm64_sequoia: "65c4d021683d2caf362f28a44962ed91d2fc2baf3dfff3e5d1013c2a48528e73"
-    sha256 cellar: :any, arm64_sonoma:  "f0e71d1231213068342c729c70cf8dd5421ec1c87d5b2d21736db4fe4803a301"
-    sha256 cellar: :any, sonoma:        "eb1d17b2a4abf89c34b79dd55b8808c24321ea6fed41da6550f3abbab70ad297"
-    sha256               arm64_linux:   "22abe8b61096729057db1937b2e7d219bac0835e450da4eee0fc9fa9f21f3e23"
-    sha256               x86_64_linux:  "be86239b5f1738315dfb08c0df9a36eee05dc5f2a1db0511efec2bf063c0dac2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6d31bffc1ff71966fb096901e98ad592a24091f04bd060a298d559f5baa8181"
   end
 
   depends_on "pkgconf" => :build
