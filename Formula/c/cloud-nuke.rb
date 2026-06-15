@@ -1,8 +1,8 @@
 class CloudNuke < Formula
   desc "CLI tool to nuke (delete) cloud resources"
   homepage "https://gruntwork.io/"
-  url "https://github.com/gruntwork-io/cloud-nuke/archive/refs/tags/v0.51.0.tar.gz"
-  sha256 "5626bc0f319b9c9d621cf5060d6c53edf719f5b997b69f35a39777301e2a90b4"
+  url "https://github.com/gruntwork-io/cloud-nuke/archive/refs/tags/v0.52.0.tar.gz"
+  sha256 "7a5d6f0feb99ef76943992d5a21d0f9c922e754f8da747c0df479d734a3bb4b6"
   license "MIT"
   head "https://github.com/gruntwork-io/cloud-nuke.git", branch: "master"
 
@@ -12,7 +12,7 @@ class CloudNuke < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c733d050301b409ad962c93de525a3b2405df3d553982da5036d5bafa7ce983"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f0d50fbc4791aef12706ae7f0479bef22da87d37551beceace502be2bfbe3ef"
   end
 
   depends_on "go" => :build
