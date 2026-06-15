@@ -16,13 +16,7 @@ class Ffmpeg < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_tahoe:   "1d2ef725aa9eb91b3d470a3d6e19257563c927e18a49ba94f619714a2081f3bc"
-    sha256 arm64_sequoia: "b7e349b89442406114070817698304fc124b523e0e76ba33cbb40f3021ef53f0"
-    sha256 arm64_sonoma:  "be2cf1454e80af1a13544df9081d5c5e51d76b81deaa18a4535182f34ecc3198"
-    sha256 sonoma:        "9f89a6a409346ea953a15a0ee27011ccdf660e09fb600ae2a064f4d637b0517e"
-    sha256 arm64_linux:   "2b4868d28550b7a87666d3ce7c431b6fe1de1021b6284addec53e456033a527a"
-    sha256 x86_64_linux:  "85a0a35aa20c97721c647f6a973f13bd56194b9d767b007376abb41e4d2709e1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "17acce0229e5ce7b03304bdec5dee5feb1b99fbc04b352b37bb74b7285fd4b01"
   end
 
   depends_on "pkgconf" => :build
