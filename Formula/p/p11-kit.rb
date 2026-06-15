@@ -5,6 +5,7 @@ class P11Kit < Formula
   sha256 "09fd9f44da4813a3141e73d5e7cf7008e5660d0405f13d56c15e1da9dcecf828"
   license "BSD-3-Clause"
   compatibility_version 1
+  revision 1
   head "https://github.com/p11-glue/p11-kit.git", branch: "master"
 
   bottle do
@@ -15,6 +16,7 @@ class P11Kit < Formula
   depends_on "ninja" => :build
   depends_on "pkgconf" => :build
   depends_on "ca-certificates"
+  depends_on "gettext"
   depends_on "libtasn1"
 
   uses_from_macos "libffi"
