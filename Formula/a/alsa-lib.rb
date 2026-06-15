@@ -1,8 +1,8 @@
 class AlsaLib < Formula
   desc "Provides audio and MIDI functionality to the Linux operating system"
   homepage "https://www.alsa-project.org/"
-  url "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.16.tar.bz2"
-  sha256 "122b1e3166d55fe19bcde656535d7a36f2ab10e66c72c6ad2f43f20ffded0a96"
+  url "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.16.1.tar.bz2"
+  sha256 "f740db7f488255944ffd4428416ee3390a96742856916433df468c281436480e"
   license all_of: ["LGPL-2.1-or-later", "GPL-2.0-or-later"]
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class AlsaLib < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8457db3658efea9186b52987bb03036f0a5d848ff58288344342e20de92e2be"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e24d88c4e2bdf40538f2c9d0813b7bf9ae16622ede11ef4580a197b7beefbd0a"
   end
 
   depends_on :linux
