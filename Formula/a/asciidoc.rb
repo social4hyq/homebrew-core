@@ -10,7 +10,7 @@ class Asciidoc < Formula
   head "https://github.com/asciidoc-py/asciidoc-py.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "1bc7364d821058b91231a5ccf9481b508bd85713522c2d2702c51807feecef78"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d26bde79b047281e351ca4d1f8a1707e857348811011d055faf6c7a56797e726"
   end
 
   depends_on "docbook"
