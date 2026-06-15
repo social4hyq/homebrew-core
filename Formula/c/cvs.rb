@@ -17,13 +17,7 @@ class Cvs < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "12f7b6ba364b0131ac464c51dac10844da7be696fa3ec85b2aaa5ab0ee10fbce"
-    sha256 cellar: :any,                 arm64_sequoia: "0495f3e13e3d8eb8a04fcf144bae83551341c35d8f4cfe2d9b11427dc49f34fe"
-    sha256 cellar: :any,                 arm64_sonoma:  "f8dade380a6cf039b4a15971a46dc9201dcf5c9d9acedd694f4adfa04368495b"
-    sha256 cellar: :any,                 sonoma:        "d23f89d868c88f29bd4447915da42d8e5eb4e9efeb05d83e41adbf031f967bce"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f3f13423ddb87b2c109ef4a83bc27adb7cfb2fed004e76d1b8902f7b5c8ee856"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7eb7d12ce9a3935d6c1caad26fd473cfad09f4e22dcba970fab57ab5f8dca9c6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9013ea7a317bd12c6f412aedb827ff27c9fbcdc86cd42b23fcc49f9803926a9c"
   end
 
   depends_on "autoconf" => :build
