@@ -1,8 +1,8 @@
 class Discount < Formula
   desc "C implementation of Markdown"
   homepage "https://www.pell.portland.or.us/~orc/Code/discount/"
-  url "https://www.pell.portland.or.us/~orc/Code/discount/discount-3.0.1.2.tar.bz2"
-  sha256 "ec670ca34fba6dd99cf30170b98f57fbd84ed51528cc3ae732b5ec298e738d9d"
+  url "https://www.pell.portland.or.us/~orc/Code/discount/discount-3.0.1.3.tar.bz2"
+  sha256 "a4e3d4ead2412905b9d07954331cfde30c30743c5e0e4c57f40b3c2659efa30e"
   license "BSD-3-Clause"
   head "https://github.com/Orc/discount.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Discount < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "97afecc2332c36a3c09f740a542d4976ef4b9ea9722ead9de5e29ad33ca61da2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c783bfeb5df1e5806220b56de6a9dba2e83c3b70ee27a67ccb2b3c27f9c11aa"
   end
 
   conflicts_with "markdown", because: "both install `markdown` binaries"
