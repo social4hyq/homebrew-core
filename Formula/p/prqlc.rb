@@ -7,7 +7,7 @@ class Prqlc < Formula
   head "https://github.com/prql/prql.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c28bf913c38040052b3edeb591c18b1ef62f4bdfcc86a0cc2c9c5c2e26a36a88"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "903681e02bc86e90ca55d9819e56a2ed1a61514e9b547b1a140e373c83106fdc"
   end
 
   depends_on "rust" => :build
