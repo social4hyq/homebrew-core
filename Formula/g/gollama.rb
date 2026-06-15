@@ -1,13 +1,13 @@
 class Gollama < Formula
   desc "Go manage your Ollama models"
   homepage "https://smcleod.net"
-  url "https://github.com/sammcj/gollama/archive/refs/tags/v2.0.4.tar.gz"
-  sha256 "4274f6140b9d1b6694a2453840a7108bb6964ad65b980925d0c994e28a431f3f"
+  url "https://github.com/sammcj/gollama/archive/refs/tags/v2.0.5.tar.gz"
+  sha256 "4f746092830783f3bdf66560044e89773418403903ff786a01777b98ebd7cb0e"
   license "MIT"
   head "https://github.com/sammcj/gollama.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "facb7c61d7f929e8d3802e1f413d2c93f303db02a54de9ea5c4937fb1e138d30"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b8f8d98bb504cf1eccf9213887b44d042ad285da51efc921afde777b5934f7a"
   end
 
   depends_on "go" => :build
