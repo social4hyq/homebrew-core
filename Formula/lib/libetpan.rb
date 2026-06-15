@@ -8,7 +8,7 @@ class Libetpan < Formula
   head "https://github.com/dinhvh/libetpan.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5957254cf0641591cac8fe27dfc127fa530151f0f647ecbd81914cfad3ab1fed"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ebad4a08dbabcb50dfe3b536458c12d131dc920172a6024dae9cdd721708a45"
   end
 
   depends_on "autoconf" => :build
