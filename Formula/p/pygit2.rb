@@ -1,14 +1,14 @@
 class Pygit2 < Formula
   desc "Bindings to the libgit2 shared library"
   homepage "https://github.com/libgit2/pygit2"
-  url "https://files.pythonhosted.org/packages/3a/a4/10ce00feef5c43eddacab19ae6610c4d4ef3ab77e544e9ee938772cd1c17/pygit2-1.19.2.tar.gz"
-  sha256 "cbeb3dbca9ca6ee3d5ea5d02f5e844c2d6084a2d5d6621e3e06aa2b11c645bfd"
+  url "https://files.pythonhosted.org/packages/a6/44/415aa93422b4bfc21a6448acb7e16280d5f33a9a3fae38a384e37b046ae4/pygit2-1.19.3.tar.gz"
+  sha256 "a543e6d4ebb43825564935758dc234e770016fed673b84370d46ae9580558831"
   license "GPL-2.0-only" => { with: "GCC-exception-2.0" }
   compatibility_version 1
   head "https://github.com/libgit2/pygit2.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a918a4b8c211b3ba331962674709b8513c791d048d2512f13181697218e4fcec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "64b999433607673dc30f30d6263fafdcd214e98286e6955716c50c9749be4427"
   end
 
   depends_on "python@3.13" => [:build, :test]
