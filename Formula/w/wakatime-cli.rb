@@ -2,13 +2,13 @@ class WakatimeCli < Formula
   desc "Command-line interface to the WakaTime api"
   homepage "https://wakatime.com/"
   url "https://github.com/wakatime/wakatime-cli.git",
-      tag:      "v2.15.3",
-      revision: "2aaa9c5583f47c0c7b1cdd0aaf8905c8d76d2fdd"
+      tag:      "v2.16.1",
+      revision: "1f78603fd52fb9f7ec8670241bfb607fd2b5b946"
   license "BSD-3-Clause"
   version_scheme 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5094f844e93c5af577779a7ebe5cc6af670a1f6945c6a28c3834616274b9091"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65c404a3189d0d2920530da467cb35c90fed2a518960c744345e7002f911a02a"
   end
 
   depends_on "go" => :build
