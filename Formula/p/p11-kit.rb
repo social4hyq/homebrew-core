@@ -5,16 +5,18 @@ class P11Kit < Formula
   sha256 "09fd9f44da4813a3141e73d5e7cf7008e5660d0405f13d56c15e1da9dcecf828"
   license "BSD-3-Clause"
   compatibility_version 1
+  revision 1
   head "https://github.com/p11-glue/p11-kit.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f46a0ff2725f7bc77af2055b35ee9fdda9145f1ba8041748da5874db66a2b6b4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e245638bf247a84047e151c18b9a58c4948db9f129e6294ab5a98c0c22592eb7"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkgconf" => :build
   depends_on "ca-certificates"
+  depends_on "gettext"
   depends_on "libtasn1"
 
   uses_from_macos "libffi"
