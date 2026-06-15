@@ -11,12 +11,7 @@ class GitRemoteHg < Formula
   head "https://github.com/felipec/git-remote-hg.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "e25f21baac92f208c898e41e22201baf8568f79ad70d6d2320af31cf0194b9af"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5774a55d897083c97d09bee950af1eae0bb06c380ba645d12d39ebc55c0a838b"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8cb999b51f6cc7e2186e44528ce87fc03c3a6217b444453340fa3c50529bae26"
-    sha256 cellar: :any_skip_relocation, sonoma:        "12e63c394983b8eb31be8e55382710769c7343b15284b1a7f671bdb37aa3fd6f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "2be20af1682f3f2478dc19aec707a0008dd60d8b7947744f9d4ac103c6264d73"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "7f57147cd5c04043ec2371325990ddbcf69d50db783690f30b46de98781e457b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "733ad1cd8ba751583cca7efd436d67e5e2290cc10579f42209e90ea78a244dc5"
   end
 
   depends_on "mercurial" => :test
