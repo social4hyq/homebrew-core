@@ -7,7 +7,7 @@ class Catch2 < Formula
   head "https://github.com/catchorg/Catch2.git", branch: "devel"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5cb271997b854375473ae6166f1ce8d057c367520c6c7f29d33ef3db37f609df"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "35c80c25416ba9bc92a43256a598c1090f0ed8755226b32ed763013a5d3429e1"
   end
 
   depends_on "cmake" => :build
