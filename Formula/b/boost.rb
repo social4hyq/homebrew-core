@@ -17,12 +17,7 @@ class Boost < Formula
   end
 
   bottle do
-    sha256                               arm64_tahoe:   "47ceccf6792941c223a6464f974b6ac56e1d3457e6d72e1f71b4fdb742cef1d0"
-    sha256                               arm64_sequoia: "48b32cf2c35011a4b7e9b6ac8a68247aebb872b39f4629dbfc3f343d9f6a2b2d"
-    sha256                               arm64_sonoma:  "900f3a5db294a038351027a97e5de0c72d3f3fb754b081294dbea4267b69963d"
-    sha256 cellar: :any,                 sonoma:        "29e1095cff0cab11964d27ad12ca18556ff9715f2c6b3216f0deb389ffdba653"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "533706af6bd0f1e62589e7421f190466451755f4e7bc91937661e3b2a13560c3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "175119f6f95179930c676c24615133249fea40b9bd86e1f37340c1544c18f9bc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d97ada8f4fbde911a56949af5e5404172908bd8837352c0acd55e84315650b4e"
   end
 
   depends_on "icu4c@78"
