@@ -7,7 +7,7 @@ class HackBrowserData < Formula
   head "https://github.com/moonD4rk/HackBrowserData.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f446dfbdf2e136a6e51921c7ce711c940f057c8fcb681c6262a6f882e32f7113"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b27f3c75e6d0bab3c505a838d8df409b455f99334cdfec567914b5f3b84413cc"
   end
 
   depends_on "go" => :build
