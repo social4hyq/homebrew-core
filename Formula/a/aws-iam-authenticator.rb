@@ -16,7 +16,7 @@ class AwsIamAuthenticator < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc81922ab175297dd905afecb488ae2a5e1198d3fdaa1d99f09b0f2297a5a92f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "43becd305df2e25ab965a85f1cc260f2b793eb14661898917e0c467aa29b59c3"
   end
 
   depends_on "go" => :build
