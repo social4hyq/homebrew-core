@@ -1,8 +1,8 @@
 class Soci < Formula
   desc "Database access library for C++"
   homepage "https://soci.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/soci/soci/soci-4.1.2/soci-4.1.2.zip"
-  sha256 "ac51bf6accbfae17066c8f9535cdd7827589381117254bc9c92ea2483abfa153"
+  url "https://downloads.sourceforge.net/project/soci/soci/soci-4.1.3/soci-4.1.3.zip"
+  sha256 "2760b6d4007a5fbfdd9c1fc00854dd39c430aacc201786fb01680a55311d6585"
   license "BSL-1.0"
 
   livecheck do
@@ -11,7 +11,7 @@ class Soci < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c722001d110130e4f2092927d55b2b3c2b6d8039c4c213d986c2a37237112b9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "395a7ba888d09500aa3504b54fff13476fa5a8760bc97c22087412df0935d59e"
   end
 
   depends_on "cmake" => :build
