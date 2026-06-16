@@ -12,7 +12,7 @@ class Hck < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9678e8c94d085622f9572cd18ade02ebd7d5d68cee61759866812d8dc3db3a4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc4df5db9bc3eda7e1a5bccf5074b5fda7d3e913a5b804e3b9c131a2dbf437be"
   end
 
   depends_on "cmake" => :build
