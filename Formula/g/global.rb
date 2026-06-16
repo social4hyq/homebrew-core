@@ -10,7 +10,7 @@ class Global < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "118bab1ff4ccabe4e542e30f0059db20b036fa0f5b4800107660bf3fb4d814d0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b0c63c41e080fad131753a39f97f1d8e43e2e9c8ec37a84d145df85a105d9ce"
   end
 
   head do
