@@ -7,7 +7,7 @@ class Sendme < Formula
   head "https://github.com/n0-computer/sendme.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5030c24e1454ca8cb53e9d531acc2df07b4e7d62191b747eeb09c68cecde12db"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "27774b29f3c5daef83aff952ad6f8c228c420ac26bbea61f2771e06affc6cebb"
   end
 
   depends_on "rust" => :build
