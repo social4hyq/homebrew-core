@@ -1,8 +1,8 @@
 class MemtierBenchmark < Formula
   desc "Redis and Memcache traffic generation and benchmarking tool"
   homepage "https://github.com/RedisLabs/memtier_benchmark"
-  url "https://github.com/RedisLabs/memtier_benchmark/archive/refs/tags/2.4.1.tar.gz"
-  sha256 "ef6f64a96385aa215702a0544db2e77711c93440fad73787d7bb6396fc97c0e5"
+  url "https://github.com/RedisLabs/memtier_benchmark/archive/refs/tags/2.4.2.tar.gz"
+  sha256 "906163dce897c1d94dbe4611ec0425f709a96d59eb7a42997b838b7c18b2b292"
   # https://github.com/redis/memtier_benchmark/blob/master/debian/copyright
   license all_of: [
     "GPL-2.0-or-later" => { with: "cryptsetup-OpenSSL-exception" },
