@@ -7,7 +7,7 @@ class TmuxSessionizer < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e0ead556bc7e2009a45aea720a86fa0e0246bde2af470127dc56d73e350c5c3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee64fa0cb5c5f85f55584e212677b4eead7d4e197fedddf6a24d0d2170fceaaf"
   end
 
   depends_on "rust" => :build
