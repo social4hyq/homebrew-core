@@ -1,8 +1,8 @@
 class Hugo < Formula
   desc "Configurable static site generator"
   homepage "https://gohugo.io/"
-  url "https://github.com/gohugoio/hugo/archive/refs/tags/v0.163.1.tar.gz"
-  sha256 "5ce13e4f55c2f3a285b5b5cb7a82b6c0e4fb2230531e590f073fe6cf5e4c5c9f"
+  url "https://github.com/gohugoio/hugo/archive/refs/tags/v0.163.2.tar.gz"
+  sha256 "69d6e84705d5453ce69d6827901f1320878ef7238f95370b31aff7c5aeb1f0db"
   license "Apache-2.0"
   head "https://github.com/gohugoio/hugo.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Hugo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5975ce11aef16cd07dfde3a1d07f81a4dc739c065331d53d679427bac294c9ae"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a04061a78a96d87c23a72a7a00e8ae561953888d163e37e0f1f147580dd4599a"
   end
 
   depends_on "go" => :build
