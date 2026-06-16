@@ -3,13 +3,13 @@ class Mackup < Formula
 
   desc "Keep your Mac's application settings in sync"
   homepage "https://github.com/lra/mackup"
-  url "https://files.pythonhosted.org/packages/58/d6/dd5e60719e8f75117ea0462f690c0bfffee9483f2438cf0408255900e36c/mackup-0.10.3.tar.gz"
-  sha256 "f0166a3b2bd9d01e51d0287d9129a533939919c4eaee3f55fa018aab2bafd3ca"
+  url "https://files.pythonhosted.org/packages/e3/24/d21c072a8f3c363b0957aab83ec8964c48080c7b08d5b3870792310ce035/mackup-0.10.4.tar.gz"
+  sha256 "7f93b262137521f08ffc2f71df15736572e996915093ae3dd7cd9f65903d1455"
   license "GPL-3.0-or-later"
   head "https://github.com/lra/mackup.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2dddd148525d7fdc551d902850a67050b0fc37958ba67a9e5e5e7eaf32d2e2c3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be82ca90afb9bac9f636d7cc3ec3fc43c886518c638c3786b4b6a3dfdb0ba3bd"
   end
 
   depends_on "python@3.14"
