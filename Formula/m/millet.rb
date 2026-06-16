@@ -7,7 +7,7 @@ class Millet < Formula
   head "https://github.com/azdavis/millet.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "73606137d1dafcec193199873e8ee8d964d2814cd5eef9e99094ad670ce2bb8f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad312abe9ca30079038946527fd8850ab3bd53d25bda632c3082716590a0ea90"
   end
 
   depends_on "rust" => :build
