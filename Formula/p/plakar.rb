@@ -11,7 +11,7 @@ class Plakar < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a6cac72feda801c772f48628759aa6a6c5ec6b4bdd3bb0560b4ec9f72b33f70"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1e3442f50dc2fc997cfd6819902ae784809b0aaaf57c1e1a3abfcac09e51dad"
   end
 
   depends_on "go" => :build
