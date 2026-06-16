@@ -1,8 +1,8 @@
 class Plakar < Formula
   desc "Create backups with compression, encryption and deduplication"
   homepage "https://plakar.io"
-  url "https://github.com/PlakarKorp/plakar/archive/refs/tags/v1.1.0.tar.gz"
-  sha256 "f44380395c39889289b31a5f20432d85a86eba5283a804d4601ce8ec25a6c527"
+  url "https://github.com/PlakarKorp/plakar/archive/refs/tags/v1.1.2.tar.gz"
+  sha256 "3a654d71873569f06e37ada26baada10912f0d7f478738080e2291bf610fc650"
   license "ISC"
 
   livecheck do
@@ -11,7 +11,7 @@ class Plakar < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a6cac72feda801c772f48628759aa6a6c5ec6b4bdd3bb0560b4ec9f72b33f70"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1e3442f50dc2fc997cfd6819902ae784809b0aaaf57c1e1a3abfcac09e51dad"
   end
 
   depends_on "go" => :build
