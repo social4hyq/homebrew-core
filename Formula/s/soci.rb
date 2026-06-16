@@ -11,7 +11,7 @@ class Soci < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c722001d110130e4f2092927d55b2b3c2b6d8039c4c213d986c2a37237112b9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "395a7ba888d09500aa3504b54fff13476fa5a8760bc97c22087412df0935d59e"
   end
 
   depends_on "cmake" => :build
