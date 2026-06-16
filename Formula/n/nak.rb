@@ -12,7 +12,7 @@ class Nak < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "68fc936fc565c7d7d0391041db90ab77fdb507bf4cc27157abfcdb4db0dbd9a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "09b9f33eed5ec8d2b28be95c39cea617f338a1d2b51974203d18ec2c32aa0b05"
   end
 
   depends_on "go" => :build
