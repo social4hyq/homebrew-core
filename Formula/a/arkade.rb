@@ -1,8 +1,8 @@
 class Arkade < Formula
   desc "Open Source Kubernetes Marketplace"
   homepage "https://blog.alexellis.io/kubernetes-marketplace-two-year-update/"
-  url "https://github.com/alexellis/arkade/archive/refs/tags/0.11.99.tar.gz"
-  sha256 "b0ffe1a5e04b4020d5ef41d4526051d6cac24b47b6223f03a1881344069f18b1"
+  url "https://github.com/alexellis/arkade/archive/refs/tags/0.11.100.tar.gz"
+  sha256 "9975594eb52fea701f25bf7e4e5d63d9fede4697c255ce5d37e423454eb0201a"
   license "MIT"
   head "https://github.com/alexellis/arkade.git", branch: "master"
 
@@ -33,7 +33,7 @@ class Arkade < Formula
   end
 
   test do
-    assert_match "Version: #{version}", shell_output("#{bin}/arkade version")
+    assert_match version.to_s, shell_output("#{bin}/arkade version")
     assert_match "Info for app: openfaas", shell_output("#{bin}/arkade info openfaas")
   end
 end
