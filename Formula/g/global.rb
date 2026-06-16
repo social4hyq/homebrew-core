@@ -4,13 +4,13 @@ class Global < Formula
 
   desc "Source code tag system"
   homepage "https://www.gnu.org/software/global/"
-  url "https://ftpmirror.gnu.org/gnu/global/global-6.6.14.tar.gz"
-  mirror "https://ftp.gnu.org/gnu/global/global-6.6.14.tar.gz"
-  sha256 "f6e7fd0b68aed292e85bb686616baf6551d5c9424adcddca11d808ba318cb320"
+  url "https://ftpmirror.gnu.org/gnu/global/global-6.6.15.tar.gz"
+  mirror "https://ftp.gnu.org/gnu/global/global-6.6.15.tar.gz"
+  sha256 "cf0937cb3ed521b2ab1acfa7aff45103040b860bb642c4c2f094ac3a3fe86024"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "118bab1ff4ccabe4e542e30f0059db20b036fa0f5b4800107660bf3fb4d814d0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b0c63c41e080fad131753a39f97f1d8e43e2e9c8ec37a84d145df85a105d9ce"
   end
 
   head do
