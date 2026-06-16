@@ -7,7 +7,7 @@ class Ahoy < Formula
   head "https://github.com/ahoy-cli/ahoy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0fe320b03d9c66f2add5501fdeb6cf0f7a696a97849bc724bde078b330e7fc86"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "263c340cab79fee5b611dea64d78c2c1a9ed42649af43033766b1e52c25f183a"
   end
 
   depends_on "go" => :build
