@@ -1,8 +1,8 @@
 class Hck < Formula
   desc "Sharp cut(1) clone"
   homepage "https://github.com/sstadick/hck"
-  url "https://github.com/sstadick/hck/archive/refs/tags/v0.11.5.tar.gz"
-  sha256 "5ce5fc816e9e009dafe8c42a0bd6b9e6c8b7ca5a839af6a797fba9accc569242"
+  url "https://github.com/sstadick/hck/archive/refs/tags/v0.11.6.tar.gz"
+  sha256 "b9821c4de35308d8d1d9e979da39f8a7effd82d2e0b1f4f7b1c83bc48ab8da20"
   license any_of: ["MIT", "Unlicense"]
   head "https://github.com/sstadick/hck.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Hck < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9678e8c94d085622f9572cd18ade02ebd7d5d68cee61759866812d8dc3db3a4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc4df5db9bc3eda7e1a5bccf5074b5fda7d3e913a5b804e3b9c131a2dbf437be"
   end
 
   depends_on "cmake" => :build
