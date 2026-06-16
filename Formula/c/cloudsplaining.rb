@@ -9,7 +9,7 @@ class Cloudsplaining < Formula
   head "https://github.com/salesforce/cloudsplaining.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef7b72e32da8b9faf7939046d1da9cec84cc9f2b9537d7c1f2d238b953df6ce2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9aa77a39966411cd8e5b3b0c849e0c4f770224f73997b32a7b547101fdf20187"
   end
 
   depends_on "rust" => :build # for orjson
