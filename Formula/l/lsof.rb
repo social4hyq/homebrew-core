@@ -1,12 +1,12 @@
 class Lsof < Formula
   desc "Utility to list open files"
   homepage "https://github.com/lsof-org/lsof"
-  url "https://github.com/lsof-org/lsof/archive/refs/tags/4.99.6.tar.gz"
-  sha256 "2ce65158694e9c44dfc54916f5b843d887763c03128e0a1c77d62ae106537009"
+  url "https://github.com/lsof-org/lsof/archive/refs/tags/4.99.7.tar.gz"
+  sha256 "bac1b0acbc50aede42fc97dffaa0b0475e97973e36a6351de5f349c6155afc68"
   license "lsof"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e3daa6eaed1fa8598229066c25d96cd4bd37cc714f3df0efb7efbdbdc3ac1db"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "711c89bd0d60165a126fc6ef3a5a14c530544ffc39fb4093e32781294fd17197"
   end
 
   keg_only :provided_by_macos
