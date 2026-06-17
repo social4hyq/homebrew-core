@@ -1,14 +1,14 @@
 class Helmfile < Formula
   desc "Deploy Kubernetes Helm Charts"
   homepage "https://github.com/helmfile/helmfile"
-  url "https://github.com/helmfile/helmfile/archive/refs/tags/v1.5.3.tar.gz"
-  sha256 "3e5d6fe03cd31aa76fdea5703abf36af4fbc4420a64da450f232d2ee65b5ac98"
+  url "https://github.com/helmfile/helmfile/archive/refs/tags/v1.5.4.tar.gz"
+  sha256 "bb3d9b36a5eaa25fe95ab25a9f2801a73a0f6ff389ed8192929056affc0f1d46"
   license "MIT"
   version_scheme 1
   head "https://github.com/helmfile/helmfile.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9aa9795d386cefc3c26e8d857b7f7f484e0e914b63f372a92b746e9e55be2b87"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1af78df8efe825c92302f35bf38331153c39c33598f004b614f8f310de15d7f6"
   end
 
   depends_on "go" => :build
