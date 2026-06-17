@@ -1,12 +1,12 @@
 class Vcfanno < Formula
   desc "Annotate a VCF with other VCFs/BEDs/tabixed files"
   homepage "https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0973-5"
-  url "https://github.com/brentp/vcfanno/archive/refs/tags/v0.3.8.tar.gz"
-  sha256 "f70b2dfcc9183bd984545144ba0d99b9cf9a837e49ba981b7cdb2085a617789f"
+  url "https://github.com/brentp/vcfanno/archive/refs/tags/v0.3.9.tar.gz"
+  sha256 "a5119f39a70a3872067e00be2f20ac69ec8c2688fc9f4cf603b3de12c90cba4d"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dab804a5813a01fdf891f1d45c374a731e2e807249b7e014fb5bb91748e5ccf2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4871716fcbf3fe3b134d206d7cd7f837c9202a2b0abef988a21ad0d6581f82a5"
   end
 
   depends_on "go" => :build
