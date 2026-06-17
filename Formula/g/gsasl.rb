@@ -8,7 +8,7 @@ class Gsasl < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "654b7cfbaeaec4882ef7d82cd3936ef486eb9d815d9c30f40f374e941261c779"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a44ca0baa69d7c0f6fdcf06dd04f4b6b8e402ee40a9b780d8aa617a2a1851109"
   end
 
   depends_on "libgcrypt"
