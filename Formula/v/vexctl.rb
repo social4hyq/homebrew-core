@@ -6,7 +6,7 @@ class Vexctl < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ea876718c8f9165afb973180b35bc5c228727708b13b68fe1c69d15fe3a49c9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22a84896650c2232812a9ba46b9a076c64a4586dbfa6b0866837484ea81b9654"
   end
 
   depends_on "go" => :build
