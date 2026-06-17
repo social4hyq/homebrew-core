@@ -1,8 +1,8 @@
 class Pugixml < Formula
   desc "Light-weight C++ XML processing library"
   homepage "https://pugixml.org/"
-  url "https://github.com/zeux/pugixml/releases/download/v1.15/pugixml-1.15.tar.gz"
-  sha256 "655ade57fa703fb421c2eb9a0113b5064bddb145d415dd1f88c79353d90d511a"
+  url "https://github.com/zeux/pugixml/releases/download/v1.16/pugixml-1.16.tar.gz"
+  sha256 "4cee1ca4aad395170f4c7a07824f3bdd41f28316c6e1e1090a1425b278ec0b4b"
   license "MIT"
 
   livecheck do
@@ -11,7 +11,7 @@ class Pugixml < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a22273920e34565839de0499e252c9a1b22255806b79a9754eda3c6c6964376a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb3b77c48ae75cb492fe1b293f19b4245574d5c7793fe21bf1636b0ec08fba90"
   end
 
   depends_on "cmake" => :build
