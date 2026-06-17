@@ -1,8 +1,8 @@
 class Picoclaw < Formula
   desc "Ultra-efficient personal AI assistant in Go"
   homepage "https://picoclaw.io/"
-  url "https://github.com/sipeed/picoclaw/archive/refs/tags/v0.2.9.tar.gz"
-  sha256 "e0e1dd419c836255c2db30739c3ed1cd340275d34a896bbcb6f8627aec6dcca0"
+  url "https://github.com/sipeed/picoclaw/archive/refs/tags/v0.3.0.tar.gz"
+  sha256 "656241e6b4756c2f6c297473d759130874740a2962b1a65a54de717a19102166"
   license "MIT"
   head "https://github.com/sipeed/picoclaw.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Picoclaw < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0d783d960e6215d416473de4ccf6e4d975cae5e3e6302f6b4f239f18a1ca69d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "172c900a80d4199eb88a3951378d45d8630720797267888f155db657df3e53ea"
   end
 
   depends_on "go" => :build
