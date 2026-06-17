@@ -1,8 +1,8 @@
 class Byteman < Formula
   desc "Java bytecode manipulation tool for testing, monitoring and tracing"
   homepage "https://byteman.jboss.org/"
-  url "https://downloads.jboss.org/byteman/4.0.26/byteman-download-4.0.26-bin.zip"
-  sha256 "48375f14c7faa474b17e20666c730d0bdecf2b9b18bda4e6e9dacb0650c99479"
+  url "https://downloads.jboss.org/byteman/4.0.27/byteman-download-4.0.27-bin.zip"
+  sha256 "729418b94bf7b2499861b7a69a9ecf38374127edb76bf5639e6091afe9463cee"
   license "LGPL-2.1-or-later"
   head "https://github.com/bytemanproject/byteman.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Byteman < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fc6b1770cd73f49aedca9a5f6467414d36f63b5c5271d530a14cb5ddafd1c4ad"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9ebf9c9ecad179108ab21340ab57d8d0c8270c884f042d8553cc3beec3ddbb2c"
   end
 
   depends_on "openjdk"
