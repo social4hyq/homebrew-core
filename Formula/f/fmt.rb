@@ -8,7 +8,7 @@ class Fmt < Formula
   head "https://github.com/fmtlib/fmt.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "92351666feb2904488e12be5945326496981f7c03d62e0f863764da559d08415"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa4e77f2e36a4388b847eb776acfcb675b64a35733168db861688146c3c144d1"
   end
 
   depends_on "cmake" => :build
