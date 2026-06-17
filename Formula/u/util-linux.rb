@@ -25,7 +25,7 @@ class UtilLinux < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c346d66040dc5656addf0ba3d0346b762a3c27280a15a9cdfedc47c32b9373b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0d910ef933d5764704aaf3d7d4acbe0eb2dc01424bf95de680c657d5422361b"
   end
 
   keg_only :shadowed_by_macos, "macOS provides the uuid.h header"
