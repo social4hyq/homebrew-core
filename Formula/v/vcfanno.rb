@@ -6,7 +6,7 @@ class Vcfanno < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dab804a5813a01fdf891f1d45c374a731e2e807249b7e014fb5bb91748e5ccf2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4871716fcbf3fe3b134d206d7cd7f837c9202a2b0abef988a21ad0d6581f82a5"
   end
 
   depends_on "go" => :build
