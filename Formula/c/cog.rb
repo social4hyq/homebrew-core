@@ -12,7 +12,7 @@ class Cog < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f4ad781c1e2fc26ebcf8b9c11003de1bafb4854a738d85cbc2a0cc788628b680"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "38c6990e8ff6de635826e1ccf490bc36404a01116ba57c739cf7aa9abeb7a664"
   end
 
   depends_on "go" => :build
