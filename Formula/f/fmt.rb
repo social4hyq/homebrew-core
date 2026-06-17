@@ -1,14 +1,14 @@
 class Fmt < Formula
   desc "Open-source formatting library for C++"
   homepage "https://fmt.dev/"
-  url "https://github.com/fmtlib/fmt/releases/download/12.1.0/fmt-12.1.0.zip"
-  sha256 "695fd197fa5aff8fc67b5f2bbc110490a875cdf7a41686ac8512fb480fa8ada7"
+  url "https://github.com/fmtlib/fmt/releases/download/12.2.0/fmt-12.2.0.zip"
+  sha256 "a2f4a8d51178f954e4c339007f77edd76ba0cb2e36f87a48e5a5403d9be5878f"
   license "MIT"
   compatibility_version 1
   head "https://github.com/fmtlib/fmt.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "92351666feb2904488e12be5945326496981f7c03d62e0f863764da559d08415"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa4e77f2e36a4388b847eb776acfcb675b64a35733168db861688146c3c144d1"
   end
 
   depends_on "cmake" => :build
