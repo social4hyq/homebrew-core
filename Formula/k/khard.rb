@@ -3,12 +3,12 @@ class Khard < Formula
 
   desc "Console carddav client"
   homepage "https://github.com/lucc/khard"
-  url "https://files.pythonhosted.org/packages/7d/10/01f3f4d875d3908d0d34fa32bb55d5015f68bc391257cfa1ceac27da763e/khard-0.20.1.tar.gz"
-  sha256 "b3e5bfadf6b5d7e8f168d0c320c74b954e4d0ef4194b28791140fe577a48f948"
+  url "https://files.pythonhosted.org/packages/8f/47/e31cf968dbbba341887dd33bb84fd1ecba737bc762a5149c9c673f1ab6da/khard-0.21.0.tar.gz"
+  sha256 "67a99a4655ceec9520ec4bb282845f83cc6c6efd29daf9b3208e5ed50270affb"
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "01771457fdf44eda55ed2588aafeb03462929d9a3f241ba8253999f4acc6e0f4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e236a5a1b0290faf015cfefffebd19e6ea2e6c95ef7e242b7c7ebd1f37bae8bf"
   end
 
   depends_on "python@3.14"
@@ -24,18 +24,13 @@ class Khard < Formula
   end
 
   resource "pytz" do
-    url "https://files.pythonhosted.org/packages/f8/bf/abbd3cdfb8fbc7fb3d4d38d320f2441b1e7cbe29be4f23797b4a2b5d8aac/pytz-2025.2.tar.gz"
-    sha256 "360b9e3dbb49a209c21ad61809c7fb453643e048b38924c765813546746e81c3"
+    url "https://files.pythonhosted.org/packages/ff/46/dd499ec9038423421951e4fad73051febaa13d2df82b4064f87af8b8c0c3/pytz-2026.2.tar.gz"
+    sha256 "0e60b47b29f21574376f218fe21abc009894a2321ea16c6754f3cad6eb7cdd6a"
   end
 
   resource "ruamel-yaml" do
-    url "https://files.pythonhosted.org/packages/0c/5d/8a1de57b5a11245c61c906d422cd1e66b6778e134a1c68823a451be5759c/ruamel_yaml-0.19.0.tar.gz"
-    sha256 "ff19233e1eb3e9301e7a3d437847713e361a80faace167639327efbe8c0e5f95"
-  end
-
-  resource "ruamel-yaml-clibz" do
-    url "https://files.pythonhosted.org/packages/8f/95/9bcc25e84703180c3941062796572e0fc73bd659086efdc4ef9b8af19e36/ruamel_yaml_clibz-0.3.4.tar.gz"
-    sha256 "e99077ac6aa4943af1000161a0cb793a379c5c8cd03ea8dd3803e0b58739b685"
+    url "https://files.pythonhosted.org/packages/c7/3b/ebda527b56beb90cb7652cb1c7e4f91f48649fbcd8d2eb2fb6e77cd3329b/ruamel_yaml-0.19.1.tar.gz"
+    sha256 "53eb66cd27849eff968ebf8f0bf61f46cdac2da1d1f3576dd4ccee9b25c31993"
   end
 
   resource "six" do
