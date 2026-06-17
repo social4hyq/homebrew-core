@@ -1,13 +1,13 @@
 class Hermit < Formula
   desc "Manages isolated, self-bootstrapping sets of tools in software projects"
   homepage "https://cashapp.github.io/hermit"
-  url "https://github.com/cashapp/hermit/archive/refs/tags/v0.52.1.tar.gz"
-  sha256 "2880db13df84630ddfc76e616d9ca1993d02e0d410f76c784944954494b6ef9d"
+  url "https://github.com/cashapp/hermit/archive/refs/tags/v0.52.3.tar.gz"
+  sha256 "1767bcb83352618f40f0e377d9df9bd199d342a0e2906ecd261c44dfc631f5a6"
   license "Apache-2.0"
   head "https://github.com/cashapp/hermit.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4631252d562d505178149b612e1cf58c01b2a351910efd22e80bd4a6e528cba4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f78e139f33609b03ee6edd740d2928da44ee6ab97bed9d3aa87cea26f9a22ec6"
   end
 
   depends_on "go" => :build
