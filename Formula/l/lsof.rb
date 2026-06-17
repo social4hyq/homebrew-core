@@ -6,7 +6,7 @@ class Lsof < Formula
   license "lsof"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e3daa6eaed1fa8598229066c25d96cd4bd37cc714f3df0efb7efbdbdc3ac1db"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "711c89bd0d60165a126fc6ef3a5a14c530544ffc39fb4093e32781294fd17197"
   end
 
   keg_only :provided_by_macos
