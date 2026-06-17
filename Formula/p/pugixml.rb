@@ -11,7 +11,7 @@ class Pugixml < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a22273920e34565839de0499e252c9a1b22255806b79a9754eda3c6c6964376a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb3b77c48ae75cb492fe1b293f19b4245574d5c7793fe21bf1636b0ec08fba90"
   end
 
   depends_on "cmake" => :build
