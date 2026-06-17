@@ -1,8 +1,8 @@
 class Urlfinder < Formula
   desc "Extracting URLs and subdomains from JS files on a website"
   homepage "https://github.com/pingc0y/URLFinder"
-  url "https://github.com/pingc0y/URLFinder/archive/refs/tags/2023.9.9.tar.gz"
-  sha256 "033944c58814547d240182daf8506bdf6cd0cd54b25a57212a87e2e70ec92bc7"
+  url "https://github.com/pingc0y/URLFinder/archive/refs/tags/2026.6.16.tar.gz"
+  sha256 "12041f7a02fa0f8dbe502d838fb3c5e4c84def44c1bf18efb39e4fdb096f464a"
   license "MIT"
   head "https://github.com/pingc0y/URLFinder.git", branch: "master"
 
@@ -11,12 +11,6 @@ class Urlfinder < Formula
   end
 
   depends_on "go" => :build
-
-  # upstream PR ref, https://github.com/pingc0y/URLFinder/pull/96
-  patch do
-    url "https://github.com/pingc0y/URLFinder/commit/cd4b141bd92448ed4b27a1db65b05075e40e8200.patch?full_index=1"
-    sha256 "e08f45c1a103125dfbaec04305f26140fe6766aa137b7a5fbe899d18efdb1064"
-  end
 
   def install
     system "go", "build", *std_go_args(ldflags: "-s -w")
