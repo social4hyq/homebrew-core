@@ -2,12 +2,12 @@ class Kopia < Formula
   desc "Fast and secure open-source backup"
   homepage "https://kopia.io"
   url "https://github.com/kopia/kopia.git",
-      tag:      "v0.23.0",
-      revision: "981d5f95ad7b64f834c46b7ac244d524644fbb46"
+      tag:      "v0.23.1",
+      revision: "72ec08fd8edb86c67ed27099bf1b955e1f308ffa"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f20111414ca98acbb130affc07e9a70a6adc25875a67fddcb437b7f07e87077b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9bb4fe6280b043e804394c90f2693f5cb06c343f59c1afde3bc3df1391a2dc51"
   end
 
   depends_on "go" => :build
