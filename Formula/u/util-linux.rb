@@ -1,8 +1,8 @@
 class UtilLinux < Formula
   desc "Collection of Linux utilities"
   homepage "https://github.com/util-linux/util-linux"
-  url "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.42/util-linux-2.42.1.tar.xz"
-  sha256 "82e9158eb12a9b0b569d84e1687fed9dd18fe89ccd8ef5ac3427218a7c0d7f7f"
+  url "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.42/util-linux-2.42.2.tar.xz"
+  sha256 "03a05d3adf9602ef128f2da05b84b3205ce60c351e5737c0370f74000679ce8a"
   license all_of: [
     "BSD-3-Clause",
     "BSD-4-Clause-UC",
