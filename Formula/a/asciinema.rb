@@ -7,7 +7,7 @@ class Asciinema < Formula
   head "https://github.com/asciinema/asciinema.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "68f0a2be87cd581e43e84a28a3323d5d83eb7648543fb1e8ca306fd6b4428c7a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e778f7fa5e91bc4b1f87688d85d2b9d9afb7a81b77e56309ba39a46abf3eabdd"
   end
 
   depends_on "rust" => :build
