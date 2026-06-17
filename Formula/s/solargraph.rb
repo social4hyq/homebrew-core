@@ -3,12 +3,12 @@ class Solargraph < Formula
   homepage "https://solargraph.org"
   # Must be git, because solargraph.gemspec uses git ls-files
   url "https://github.com/castwide/solargraph.git",
-      tag:      "v0.59.2",
-      revision: "43f4caa0da9415db37454ad9b9b3f992e9a3bec4"
+      tag:      "v0.60.0",
+      revision: "8220adbb75a404cf4077dee6f8f99e2d63ebfa23"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4d50e81e34efd511d93c34533073237b13eb87b66c2fd6f0fa6512b1b56cf51"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9ed1ff7d229e117ec02dd341fb6efda766049595bc18480c92062f5d450d0c3"
   end
 
   depends_on "ruby"
