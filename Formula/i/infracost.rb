@@ -12,7 +12,7 @@ class Infracost < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd987757f2993dcc2f3a5b53b932e0b1866fcd642e51c93dcddb1f7cd6ca4f00"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b751cc350b5febff8f1265f9ab4db131e6eb369453d0e354e5bf2da6b061677a"
   end
 
   depends_on "go" => :build
