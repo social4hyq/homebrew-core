@@ -8,7 +8,7 @@ class Ortp < Formula
   head "https://gitlab.linphone.org/BC/public/linphone-sdk.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "97b83a299ae2951287a78e503130b8a0a70ce9c9fcf020ffc3504685f9ed8148"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6e2483346eb035c5b3f3bec2e7379045ca5c4c85bf7456a26f7272d74d9a283"
   end
 
   depends_on "cmake" => :build
