@@ -1,12 +1,12 @@
 class Vexctl < Formula
   desc "Tool to create, transform and attest VEX metadata"
   homepage "https://openssf.org/projects/openvex/"
-  url "https://github.com/openvex/vexctl/archive/refs/tags/v0.4.1.tar.gz"
-  sha256 "ed77b48de3ead71af608fb3ae5e5f4e19647d87fe9dfe38d4ffce4ee1c1e7c3b"
+  url "https://github.com/openvex/vexctl/archive/refs/tags/v0.4.4.tar.gz"
+  sha256 "c846b1288f837ebcbebef7817ec450e5b0a4b3d8f7b176717ae6f3198539d991"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ea876718c8f9165afb973180b35bc5c228727708b13b68fe1c69d15fe3a49c9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22a84896650c2232812a9ba46b9a076c64a4586dbfa6b0866837484ea81b9654"
   end
 
   depends_on "go" => :build
