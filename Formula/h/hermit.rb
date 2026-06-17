@@ -7,7 +7,7 @@ class Hermit < Formula
   head "https://github.com/cashapp/hermit.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4631252d562d505178149b612e1cf58c01b2a351910efd22e80bd4a6e528cba4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f78e139f33609b03ee6edd740d2928da44ee6ab97bed9d3aa87cea26f9a22ec6"
   end
 
   depends_on "go" => :build
