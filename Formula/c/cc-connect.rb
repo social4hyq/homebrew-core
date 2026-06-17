@@ -1,12 +1,12 @@
 class CcConnect < Formula
   desc "Bridges local AI coding agents to messaging platforms"
   homepage "https://github.com/chenhg5/cc-connect"
-  url "https://github.com/chenhg5/cc-connect/archive/refs/tags/v1.3.3.tar.gz"
-  sha256 "a90d6a54af3beb9717547d5725a1f9bc6cfcf21102d06e22a111af81fcd82d45"
+  url "https://github.com/chenhg5/cc-connect/archive/refs/tags/v1.3.4.tar.gz"
+  sha256 "e3b8576d741e764b4fd6e0982b609d6dca6a980dbc66a9433b552369a9e719ff"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd2a7559aa0c6b91628130fe16003273b6907af6c83fc2ce02b529ce6b88390d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c1a5f8cb84fc7aa470299f43c491cf19959c81f8389b1c1813fc38f3b48e254"
   end
 
   depends_on "go" => :build
