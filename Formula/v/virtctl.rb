@@ -15,7 +15,7 @@ class Virtctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "32b1b2d55a2ca34bed11cb087e6ef21378d04f1234e278eee8d1a985a4a1ef16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8287c1392b14c01c328d52816be7ec07b1b96cb8bcc5dd122f6510892f18d21"
   end
 
   depends_on "go" => :build
