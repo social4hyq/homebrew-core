@@ -7,7 +7,7 @@ class Draft < Formula
   head "https://github.com/Azure/draft.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "076b8a9b8237af766bb4caac5860f14d8f6d07381741b2e5783029ff0850b9e7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e33f5837197329f98aed9e2683e8d11f4a3bae786f6073e1dd6301201601259"
   end
 
   depends_on "go" => :build
