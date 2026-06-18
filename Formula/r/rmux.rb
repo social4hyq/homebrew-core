@@ -1,12 +1,12 @@
 class Rmux < Formula
   desc "Terminal multiplexer with a tmux-style CLI and daemon runtime"
   homepage "https://rmux.io"
-  url "https://static.crates.io/crates/rmux/rmux-0.5.0.crate"
-  sha256 "c3ef5daf05ff928f4616d950a6bc1d0c8358a679c368c7049e3a2a3c79846f98"
+  url "https://static.crates.io/crates/rmux/rmux-0.6.1.crate"
+  sha256 "0dbcc917c881d1ceed1bd93caa218b59d192a48248aafc7fd9bf87fbc541a19f"
   license any_of: ["MIT", "Apache-2.0"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9eaf31df70322ce02d5c0b455c8988d9e98441fe29786c9e49cf7dc1833dab00"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5621f21c94a9e5f41782f10f8bc6141528163cf9460579c964bb3de2e9109e58"
   end
 
   depends_on "rust" => :build
