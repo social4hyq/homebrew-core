@@ -1,8 +1,8 @@
 class Fetchmail < Formula
   desc "Client for fetching mail from POP, IMAP, ETRN or ODMR-capable servers"
   homepage "https://www.fetchmail.info/"
-  url "https://downloads.sourceforge.net/project/fetchmail/branch_6.6/fetchmail-6.6.4.tar.xz"
-  sha256 "efe01690d22bda359a579c77e2b0072658a092bff490ec0478a212c6b7d0eb70"
+  url "https://downloads.sourceforge.net/project/fetchmail/branch_6.6/fetchmail-6.6.5.tar.xz"
+  sha256 "ab0320fe4df0b5ee8659189e66590d9de96aadbf929fe59f353ae7a317e9ef1e"
   license all_of: [
     "LGPL-2.1-or-later",
     "ISC",
@@ -17,7 +17,7 @@ class Fetchmail < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c18d07802773ac221a5a430e4233215e1b24627f019ba23421f65efc23a1cd22"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "76801343880a5872a6004a8b0472119bc6d94a2a29330c6d5035880b90e9ac18"
   end
 
   depends_on "pkgconf" => :build
