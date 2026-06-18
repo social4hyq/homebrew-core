@@ -7,7 +7,7 @@ class Urlfinder < Formula
   head "https://github.com/pingc0y/URLFinder.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a6af34de885d1b7659667feba09cc1c571b70d6503458e003436a03a39e9c75"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "768f7ab41a0cb87d4b9c0bc703b8f4be7bf4b582a4c36aef4edaa7ddaf4eb9dd"
   end
 
   depends_on "go" => :build
