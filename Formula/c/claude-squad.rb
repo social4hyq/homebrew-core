@@ -7,7 +7,7 @@ class ClaudeSquad < Formula
   head "https://github.com/smtg-ai/claude-squad.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "adfed674968a8ff19653ba7b0c24ec51dcc2fe4eef1a2ea99636011e5f061248"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "267db3a25db2d551d7ec8fd2d3c784c86e39aa57aacc677d40e3683442ec063b"
   end
 
   depends_on "go" => :build
