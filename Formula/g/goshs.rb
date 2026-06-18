@@ -7,7 +7,7 @@ class Goshs < Formula
   head "https://github.com/patrickhener/goshs.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2aecc9c50d7585a059ed8ff7329cff94a852b9dba81b63cb49761ed0c2823042"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc0518b30cf3ce791cb42677ca80ead28943e03f8968f95d0dfbeb37f851b2fa"
   end
 
   depends_on "go" => :build
