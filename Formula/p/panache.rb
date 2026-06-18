@@ -7,7 +7,7 @@ class Panache < Formula
   head "https://github.com/jolars/panache.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ea7c20b3829c06d2449e63b8f56351160cb64bda4658ea52226bee416d4daac"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b713c4e2e8c1b706117546a379b5448ac744acb3e0d53e4e59d250f6e6c5131"
   end
 
   depends_on "rust" => :build
