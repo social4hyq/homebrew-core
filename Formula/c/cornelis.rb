@@ -7,13 +7,7 @@ class Cornelis < Formula
   head "https://github.com/agda/cornelis.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_tahoe:   "3ab116742d0b8c90533803a535510040520b1a90d8e0b68e9a9d10fc6ca065af"
-    sha256 cellar: :any,                 arm64_sequoia: "f539829b0e192eb0891a00b8a200ccf0e6c11002499662de544535214dbc3f2d"
-    sha256 cellar: :any,                 arm64_sonoma:  "4a907e326af68978aa8c5a1bca6bc3f29557e7d94a5397a0ceff6b5a1e63468b"
-    sha256 cellar: :any,                 sonoma:        "05c0bca472d34b3ab32a48d4e67005584e2be329c93996817029724ffb857547"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "681e3180af2e1f4bd4c88f2ecaf47b73c5cf3999bfbe61fe9497bc3e618ebef0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "26837b1b79f08ab9ed366fd425cabec1d927cea8ba6d3355480c8e324be9476f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf28a9224af0e5538ae11565634b342fad8ba0e3dc52c7c73f2251e27d696343"
   end
 
   depends_on "cabal-install" => :build
