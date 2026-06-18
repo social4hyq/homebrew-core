@@ -1,8 +1,8 @@
 class HeadscaleCli < Formula
   desc "CLI for headscale, an open-source implementation of the Tailscale control server"
   homepage "https://github.com/juanfont/headscale"
-  url "https://github.com/juanfont/headscale/archive/refs/tags/v0.28.0.tar.gz"
-  sha256 "cb38683998d13d2700df258a81c00add199dccb999b1dacc4491305cdaa67db3"
+  url "https://github.com/juanfont/headscale/archive/refs/tags/v0.29.0.tar.gz"
+  sha256 "9ee04c5ade81fc36ed83e3a6d5ed28e9ab25e8ceb50f64ea7fa9a62394dd1cc8"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,7 +11,7 @@ class HeadscaleCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "37351a24c664a20e64ac0a1167b805504ebc9eb7c31234f472de37a3a71d4d9f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "89d7ff54f7cf0aa159f0ccd758c7436f0f743a7f6e141e9378aefdd1e6cbb10a"
   end
 
   depends_on "go" => :build
@@ -46,7 +46,7 @@ class HeadscaleCli < Formula
     YAML
 
     output = shell_output("#{bin}/headscale configtest --config #{testpath}/config.yaml 2>&1")
-    assert_match "No private key file at path, creating...", output
+    assert_match "no private key file at path, creating...", output
 
     assert_path_exists testpath/"noise_private.key"
   end
