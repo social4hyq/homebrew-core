@@ -7,7 +7,7 @@ class Drill < Formula
   head "https://github.com/fcsonline/drill.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab70cb65cce6fa9333edf12b4a60e9d7aef46d1180537988ea808b5881238dc1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "77eb16016220444cd818e12e39ea19992b8772268eb0bd3460ba258059c74117"
   end
 
   depends_on "cmake" => :build
