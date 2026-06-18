@@ -12,7 +12,7 @@ class Tanka < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c39d1e71ebcfa4b6424afb11f8256e9de84248f68b3dad370775eb1d0e05bbb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "62198cb70016e56e086307a1d5c099438dceda204b3b734505fbfc3c4ae338bd"
   end
 
   depends_on "go" => :build
