@@ -1,8 +1,8 @@
 class Worktrunk < Formula
   desc "CLI for Git worktree management, designed for parallel AI agent workflows"
   homepage "https://worktrunk.dev"
-  url "https://github.com/max-sixty/worktrunk/archive/refs/tags/v0.58.0.tar.gz"
-  sha256 "0dfd19c968393be8600476baf0af7082d76d172a7b61ad636db2d27e5d4e7283"
+  url "https://github.com/max-sixty/worktrunk/archive/refs/tags/v0.59.0.tar.gz"
+  sha256 "38fb3321111fb67dcf7a4218c4aeede795bee8168f3f4e8f59a5234629e896da"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/max-sixty/worktrunk.git", branch: "main"
 
@@ -15,6 +15,8 @@ class Worktrunk < Formula
   conflicts_with "wiredtiger", because: "both install `wt` binaries"
 
   def install
+    ENV["VERGEN_GIT_DESCRIBE"] = "v#{version}"
+
     system "cargo", "install", *std_cargo_args
     generate_completions_from_executable(bin/"wt", "config", "shell", "completions")
   end
