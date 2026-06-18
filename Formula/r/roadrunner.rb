@@ -7,7 +7,7 @@ class Roadrunner < Formula
   head "https://github.com/roadrunner-server/roadrunner.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e233cc51d721fcf21c7625f597af1a3bb2d3a70e09f9c66759da3d8e6bffcdf9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ead50ea48d9c60cb0e2d07f8af86f55037eb084afc9c8809eaaec3a66d9c6e58"
   end
 
   depends_on "go" => :build
