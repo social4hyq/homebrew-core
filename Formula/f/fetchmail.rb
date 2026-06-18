@@ -17,7 +17,7 @@ class Fetchmail < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c18d07802773ac221a5a430e4233215e1b24627f019ba23421f65efc23a1cd22"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "76801343880a5872a6004a8b0472119bc6d94a2a29330c6d5035880b90e9ac18"
   end
 
   depends_on "pkgconf" => :build
