@@ -7,7 +7,7 @@ class Nanobot < Formula
   head "https://github.com/obot-platform/nanobot.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "17deb1a05e71b17c01fc56d53da38a8cd2759d37d8863b8fe292740572ba93ff"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8dc20d625ebdeee25010b681542256b4682d5da179c228e664a0b2f50373bac3"
   end
 
   depends_on "go" => :build
