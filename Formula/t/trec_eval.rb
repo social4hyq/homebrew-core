@@ -1,8 +1,8 @@
 class TrecEval < Formula
   desc "Evaluation software used in the Text Retrieval Conference"
   homepage "https://trec.nist.gov/"
-  url "https://github.com/usnistgov/trec_eval/archive/refs/tags/v9.0.8.tar.gz"
-  sha256 "c3994a73103ec842e12df693749584a45814c35c36dcc15f38984bd463566ba1"
+  url "https://github.com/usnistgov/trec_eval/archive/refs/tags/v10.0.tar.gz"
+  sha256 "3edc204c0b9b8d8fddd02c797688213dc77180ee696d14a4a66cfb32e82c1051"
   license :public_domain
 
   bottle do
