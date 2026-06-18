@@ -13,7 +13,7 @@ class Jsoncpp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9fa6ee6e51e146a5ee9963cd68e1fd523dc8dd24530bf4eaaea10635b315fec7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0eba82f31e705700ead0cface87d60377fb4ae211b2e7e0510896b768af116ea"
   end
 
   # NOTE: Do not change this to use CMake, because the CMake build is deprecated.
