@@ -7,7 +7,7 @@ class Chroma < Formula
   head "https://github.com/alecthomas/chroma.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a085421d6946a7b85315ada424eee276fb5d441fa9b3bb4d913f9997759bcc02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "10ecdf9a4d2d29f71896491f2b03037e7b377058e3ba5d867a1f7fe3d23200ca"
   end
 
   depends_on "go" => :build
