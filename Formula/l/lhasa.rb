@@ -7,7 +7,7 @@ class Lhasa < Formula
   head "https://github.com/fragglet/lhasa.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "940b19064b86f4e93afe94c3a5b4998b752be635b8f76e7e76424287fb56d10b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "130abe33592087edfb50748df696b32b0284cc1b0bd0d0b6aa48da19c35a9ca6"
   end
 
   depends_on "autoconf" => :build
