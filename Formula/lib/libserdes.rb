@@ -8,7 +8,7 @@ class Libserdes < Formula
   head "https://github.com/confluentinc/libserdes.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d28fd4ea2974a183af9ca582f00feb543d3f64e190bd8110f3b3e6f80addd7a5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae5437f158fd46426765d042339047ae891a425269cd1c60c300bc8f836ae723"
   end
 
   depends_on "avro-c"
