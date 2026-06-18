@@ -7,14 +7,7 @@ class GumboParser < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c7ea823bbc414304986e981cfc0cb322c6b2ecf13b337645f6a8615284529122"
-    sha256 cellar: :any,                 arm64_sequoia: "431e4134fa525f0c69f3ae3ee54bb7213dbbbbbaaa32921eddc0f899811f890d"
-    sha256 cellar: :any,                 arm64_sonoma:  "790c2342eda7b07cfcaf46464dea8e376b68f790cb891d6567fb58c840b3e18b"
-    sha256 cellar: :any,                 arm64_ventura: "dbd212e34262be85283b0f8f7474bb9420350005de5b751f046d9f788444a381"
-    sha256 cellar: :any,                 sonoma:        "dab4d3f868ea634f979bba453ee14b6c3adeaaad533ea6142b6c7fa78417c553"
-    sha256 cellar: :any,                 ventura:       "d752c28f0a344934860673f86fcffe5ff578a374731bc66268f7f863a7959d01"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "42003f370d87b990cea248ab82ceafc3a046a8489711ed9d2518bf974326e36b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "296ea8a9753f6d0e83ab6ac43a6f66309991e27bc65d136ece7e0368993dc066"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a57a1235534f182a90e8ad446898830c49e9926cf5d822de89f05633de76842"
   end
 
   depends_on "autoconf" => :build
