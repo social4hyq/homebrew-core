@@ -1,8 +1,8 @@
 class Panache < Formula
   desc "Language server, formatter, and linter for Markdown, Quarto, and R Markdown"
   homepage "https://panache.bz"
-  url "https://github.com/jolars/panache/archive/refs/tags/v2.55.0.tar.gz"
-  sha256 "193fe5b13b07387ac46aa1786ebe69211e373b723357e937d5913d02bd22ff81"
+  url "https://github.com/jolars/panache/archive/refs/tags/v2.56.0.tar.gz"
+  sha256 "50dd73f1ef4d7e8afd9ce33708b2958bd2474305b375c42ca28889ab2d26f420"
   license "MIT"
   head "https://github.com/jolars/panache.git", branch: "main"
 
