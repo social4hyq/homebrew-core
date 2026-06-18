@@ -12,7 +12,7 @@ class Dagger < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6927e6891e28acb005461f62cceb582c6b9722e6a48a47ddcbecbdcfaa3959f7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aaaba123346e2b4d2cd870173dca0fb445ccc1fa1bb1ceed5f58661725a35925"
   end
 
   depends_on "go" => :build
