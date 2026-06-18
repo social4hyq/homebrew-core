@@ -1,13 +1,13 @@
 class Gauge < Formula
   desc "Test automation tool that supports executable documentation"
   homepage "https://gauge.org"
-  url "https://github.com/getgauge/gauge/archive/refs/tags/v1.6.31.tar.gz"
-  sha256 "efccc27163a36328a3d067bad8a33d4094058708e2555311cb36db740de3b266"
+  url "https://github.com/getgauge/gauge/archive/refs/tags/v1.6.32.tar.gz"
+  sha256 "d0e875e5a044f27d0898bfa1e27ef7f6199fbac398c55aff856ec9b7c7b37d4b"
   license "Apache-2.0"
   head "https://github.com/getgauge/gauge.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0725ab6a010ee28d93f11f2ed6a6730b1689f718967903a285399448b2946adc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fe3cb9057372b8a069b1dd1ccc3f45b3aba28ad1bf77c7b916a7b6f3af8ff2a7"
   end
 
   depends_on "go" => :build
