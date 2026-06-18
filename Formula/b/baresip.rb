@@ -6,7 +6,7 @@ class Baresip < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f4e3525dff5a729d505d980e687e1cfeffdb9249ce03ada2e506551a2aa9a38"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "222e0fe20fafe4cc657c686b1c2c77b4761e7364c02fbb21c8de66c9d3172cd8"
   end
 
   depends_on "cmake" => :build
