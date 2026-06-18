@@ -6,7 +6,7 @@ class TrecEval < Formula
   license :public_domain
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2befb9bc0fda4542dbc91026cb875d6ffc14ce7b35f34470e0290f8ab69b5ea0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "181a20d57009753118280c54107ba9aef689b5dca8aa5fc8b490c7fd417bcd2d"
   end
 
   def install
