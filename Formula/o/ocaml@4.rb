@@ -17,7 +17,7 @@ class OcamlAT4 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1fa7d952aebe81e430b3e9bfc2b73d7f4f4bf68faef09ef8217d4eb13fcee8ef"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2fc131898a84555f25ccefcf0717803d2dc86e4deface78732698becd17069dc"
   end
 
   # The ocaml compilers embed prefix information in weird ways that the default
