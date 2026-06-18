@@ -1,8 +1,8 @@
 class Bumblebee < Formula
   desc "Read-only developer endpoint scanner for supply-chain exposure"
   homepage "https://github.com/perplexityai/bumblebee"
-  url "https://github.com/perplexityai/bumblebee/archive/refs/tags/v0.1.1.tar.gz"
-  sha256 "559a5fa9ca48128fb113644e7800048b0b6c2ff3a33bc56fe5236582ba1686b0"
+  url "https://github.com/perplexityai/bumblebee/archive/refs/tags/v0.1.2.tar.gz"
+  sha256 "6ed6c27ae6b5c040eb018e247c09e53baa2fdea43bba1c3e63515d14d46157d2"
   license "Apache-2.0"
   head "https://github.com/perplexityai/bumblebee.git", branch: "main"
 
