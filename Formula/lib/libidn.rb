@@ -1,14 +1,14 @@
 class Libidn < Formula
   desc "International domain name library"
   homepage "https://www.gnu.org/software/libidn/"
-  url "https://ftpmirror.gnu.org/gnu/libidn/libidn-1.43.tar.gz"
-  mirror "https://ftp.gnu.org/gnu/libidn/libidn-1.43.tar.gz"
-  sha256 "bdc662c12d041b2539d0e638f3a6e741130cdb33a644ef3496963a443482d164"
+  url "https://ftpmirror.gnu.org/gnu/libidn/libidn-1.44.tar.gz"
+  mirror "https://ftp.gnu.org/gnu/libidn/libidn-1.44.tar.gz"
+  sha256 "499608bab3a65650a0ea52888c13a8deebe3f71408e319acd9ec52e02eb13959"
   license any_of: ["GPL-2.0-or-later", "LGPL-3.0-or-later"]
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c86450199fedc06c2c587ddeabb836ebeb18c4788993b9e2e9b007de16e0f904"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "420d5d9dad94bcbc68b4395b645a357d27a94d306e5a9152b7de15646e8c0cd6"
   end
 
   depends_on "pkgconf" => :build
