@@ -6,7 +6,7 @@ class Tllist < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "77de1b3da7cd1dabd452b4275407c913e1b43152a8617515d3bdee49124a094e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11e21d4e85d232d8dd5b3e9e4fa4fa994c335a9e92a8c92b8a913d1efd0eea27"
   end
 
   depends_on "meson" => :build
