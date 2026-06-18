@@ -1,13 +1,13 @@
 class Kbld < Formula
   desc "Tool for building and pushing container images in development workflows"
   homepage "https://carvel.dev/kbld/"
-  url "https://github.com/carvel-dev/kbld/archive/refs/tags/v0.49.0.tar.gz"
-  sha256 "5126535768a5e2f614f2d87fac0e9a0b1d8874ceaf09b3ddf074a270390028de"
+  url "https://github.com/carvel-dev/kbld/archive/refs/tags/v0.49.1.tar.gz"
+  sha256 "44b503eead99fcfcd7393c4bbeb61ac1cb9c0e97f5a294b762297c6a547ef730"
   license "Apache-2.0"
   head "https://github.com/carvel-dev/kbld.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2482406693af206b149b5a407267f3867d1fadfd0cb2ef5aaf81c71f8f6dc31b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e7703f85e402f51cb33d89c25d455ba27a363cfb513d2f6fb4505edf47054c5"
   end
 
   depends_on "go" => :build
