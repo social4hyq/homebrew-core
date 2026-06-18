@@ -13,7 +13,7 @@ class Libmpdclient < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dab1fdb6b43bdfc4dd9b3538e702af75f4b3d7fb468e63670f040543160d4d9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a487cf8ee21263c2ce47941dbb8b55de7f44f1825391249844e87bd3c525e460"
   end
 
   depends_on "meson" => :build
