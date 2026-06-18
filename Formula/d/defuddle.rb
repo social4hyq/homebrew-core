@@ -6,7 +6,7 @@ class Defuddle < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ef4a98f66d39b6594627832f6081530a5654dcffb99ae377eee3f5558f5c877"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a79d478ab5c48a776e9df7f8c699db0faa2b816334b36d970ccffcd93f00162"
   end
 
   depends_on "node"
