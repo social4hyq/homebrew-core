@@ -9,7 +9,7 @@ class Badkeys < Formula
   head "https://github.com/badkeys/badkeys.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b720b258e6f3edd25da5e3f526b861e2e07d9926f2f6e0cf8b1bb4783e084b8d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e4d83c17485b6ff30758e7a7d22dd08102c88702253ae15bae68ffa0a76bc50"
   end
 
   depends_on "cryptography" => :no_linkage
