@@ -7,12 +7,7 @@ class GmpEcm < Formula
   head "https://gitlab.inria.fr/zimmerma/ecm.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "c1e7785b052a5bd0e6500f603ea2408f96fb6d41ecb6856855dd54db6386b1e9"
-    sha256 cellar: :any,                 arm64_sequoia: "4d5f67adff90c862e4b85a8e3292bf63b4d93c5d362ced8f2575441b392e8766"
-    sha256 cellar: :any,                 arm64_sonoma:  "76f07b6c8e39b0ea818de44ce2e5cea6027ff9a80f4955fd2725f019b8d7949a"
-    sha256 cellar: :any,                 sonoma:        "4759ddec865273414af8373a30b4a17e0a01dfab539b4ae0393a935b03b12734"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "7500b4a76e6329df21c2930008e8884687663d66d7c11666ea563c94c4dbd020"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b3a28934ddb13feff78f9e5a3f7f1c0b7a8552848b3f3eaa8dc46506029dbe52"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "659d1b4a047a857039df485168544849bc8f373ca45934e32da0b7c051f6883f"
   end
 
   depends_on "autoconf" => :build
