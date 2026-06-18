@@ -6,7 +6,7 @@ class Libzim < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "778ab34c157f67dacbc3d5e83533b20f1d285133b29a402e56a329aff35e4d80"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2897b7a4b4b9d550b325343b5885c5aa49f8a05216cd0b339fec208ab4bcfa0e"
   end
 
   depends_on "meson" => :build
