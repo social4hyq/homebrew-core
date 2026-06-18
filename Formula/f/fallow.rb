@@ -1,13 +1,13 @@
 class Fallow < Formula
   desc "Codebase intelligence for TypeScript and JavaScript"
   homepage "https://docs.fallow.tools"
-  url "https://github.com/fallow-rs/fallow/archive/refs/tags/v2.97.0.tar.gz"
-  sha256 "90a69a4223e9f4d2f69cc98308812e98fabd79cff003ca7f2a9f17997dd1f7a9"
+  url "https://github.com/fallow-rs/fallow/archive/refs/tags/v2.98.0.tar.gz"
+  sha256 "163491646926aad1c0f05aea458dd7480fea1ff5f671326490b9c98ef64370f7"
   license "MIT"
   head "https://github.com/fallow-rs/fallow.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b3c2dcc9a296ece2795b1129b794f6acfd3da3b9ef402ea2c4730fcd093d4535"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3eba0813573c851b4f2379a14ed24d38fd2021c98c89566e3b98306bf1aafaa1"
   end
 
   depends_on "rust" => :build
