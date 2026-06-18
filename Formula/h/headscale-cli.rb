@@ -11,7 +11,7 @@ class HeadscaleCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "37351a24c664a20e64ac0a1167b805504ebc9eb7c31234f472de37a3a71d4d9f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "89d7ff54f7cf0aa159f0ccd758c7436f0f743a7f6e141e9378aefdd1e6cbb10a"
   end
 
   depends_on "go" => :build
