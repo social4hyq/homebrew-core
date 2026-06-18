@@ -1,13 +1,13 @@
 class Lhasa < Formula
   desc "LHA implementation to decompress .lzh and .lzs archives"
   homepage "https://fragglet.github.io/lhasa/"
-  url "https://github.com/fragglet/lhasa/archive/refs/tags/v0.5.0.tar.gz"
-  sha256 "1ae8d82d37fc12ec2c52c520b6528ec61268e243f33eca4446b440e182c66d91"
+  url "https://github.com/fragglet/lhasa/archive/refs/tags/v0.6.0.tar.gz"
+  sha256 "427c47527f11d157380d90e33c86535a3a0e8eb5c7e2cf0278bd6dbfe733fcee"
   license "ISC"
   head "https://github.com/fragglet/lhasa.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "940b19064b86f4e93afe94c3a5b4998b752be635b8f76e7e76424287fb56d10b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "130abe33592087edfb50748df696b32b0284cc1b0bd0d0b6aa48da19c35a9ca6"
   end
 
   depends_on "autoconf" => :build
