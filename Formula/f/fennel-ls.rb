@@ -6,12 +6,7 @@ class FennelLs < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "b9934b9c9d2df6da8693af31de78af5146777a2ba90bf6f6e57d9ba33d274a09"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b9934b9c9d2df6da8693af31de78af5146777a2ba90bf6f6e57d9ba33d274a09"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b9934b9c9d2df6da8693af31de78af5146777a2ba90bf6f6e57d9ba33d274a09"
-    sha256 cellar: :any_skip_relocation, sonoma:        "b9934b9c9d2df6da8693af31de78af5146777a2ba90bf6f6e57d9ba33d274a09"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "b9934b9c9d2df6da8693af31de78af5146777a2ba90bf6f6e57d9ba33d274a09"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2d21888a8352b783653791b7acd6f72be608c6389bc76054456b5796924707a8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "080ed913ef766f0c76502e2bbb4008d17c66eaa2c8280544f52b99328a0b5397"
   end
 
   depends_on "pandoc" => :build
