@@ -1,8 +1,8 @@
 class Tanka < Formula
   desc "Flexible, reusable and concise configuration for Kubernetes using Jsonnet"
   homepage "https://tanka.dev"
-  url "https://github.com/grafana/tanka/archive/refs/tags/v0.37.2.tar.gz"
-  sha256 "9b960d272c415c7ef2374cb7debc55fed1d4bed858c6aa8517114fac5a148900"
+  url "https://github.com/grafana/tanka/archive/refs/tags/v0.37.3.tar.gz"
+  sha256 "ef2a0d390097fee64cd1e37b11f886b7abd4634a2b5ae90618449ee38ddba2d0"
   license "Apache-2.0"
   head "https://github.com/grafana/tanka.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Tanka < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c39d1e71ebcfa4b6424afb11f8256e9de84248f68b3dad370775eb1d0e05bbb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "62198cb70016e56e086307a1d5c099438dceda204b3b734505fbfc3c4ae338bd"
   end
 
   depends_on "go" => :build
