@@ -6,7 +6,7 @@ class Fnlfmt < Formula
   license "LGPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "31998e471343bbd653c8067f40a91977a52fa02604254654aad53f5ce79e580d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "694e99f5efaa466eeab5f8afa4badf82bc47a73abbd7ecfbc7387ec51a3bd8d1"
   end
 
   depends_on "lua"
