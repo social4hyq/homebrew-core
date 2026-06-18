@@ -7,12 +7,7 @@ class Ijq < Formula
   head "https://codeberg.org/gpanders/ijq.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "1f71e8a5e46903cb8f61ad5177ac882d6c652d427c2a11170772835216a4a025"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "6934f0c8a0ae8352ab44ab1bf4d1ed2d5eb79d59d8709371152d3f64f9101805"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "1eb043ea52bdb123f3e673f084152606d02e35bec68a65231c97c7bea9b4426e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "bf74ff77d3d2af3f69e4d8f271bcbd39f4a42aed9802fc74e82eff9be044dd3e"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "6a091da8484e89d2cf988973d8c44af367fd59de321382fe50f96c91473a3f89"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "252b73640ebef012fae413591033b3a90a820a96a0f8e6195b874cc05e4425fc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e00f51f26da9e42b4803a3064f3511a8121a22d4ac2cf72159b3ffe7a239089"
   end
 
   depends_on "go" => :build
