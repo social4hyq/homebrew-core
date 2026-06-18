@@ -1,13 +1,13 @@
 class Openfga < Formula
   desc "High performance and flexible authorization/permission engine"
   homepage "https://openfga.dev/"
-  url "https://github.com/openfga/openfga/archive/refs/tags/v1.17.1.tar.gz"
-  sha256 "c62b8e2b7a0674e6642f87464ac82f1d608f3299178dce440078c6ddcf002f17"
+  url "https://github.com/openfga/openfga/archive/refs/tags/v1.18.0.tar.gz"
+  sha256 "d63f8ddd7b01546c14a35cbc18b9c75db41246ee6230f6f136c8950c72e77d97"
   license "Apache-2.0"
   head "https://github.com/openfga/openfga.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9aacb589030a94065f99a499dc68c0fda775265c474ee3a7a47ccf897fcece9c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "93a8248c8e9a8d7a372f082c35cb7ca91246be87c9af3887a21e45f98be3ca24"
   end
 
   depends_on "go" => :build
