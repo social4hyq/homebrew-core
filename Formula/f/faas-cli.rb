@@ -1,8 +1,8 @@
 class FaasCli < Formula
   desc "CLI for templating and/or deploying FaaS functions"
   homepage "https://www.openfaas.com/"
-  url "https://github.com/openfaas/faas-cli/archive/refs/tags/0.18.8.tar.gz"
-  sha256 "4d0eaf6c01ebbd69dcee389c3446bb6ea0cf042cb6f92fd471b5ec7b2785db96"
+  url "https://github.com/openfaas/faas-cli/archive/refs/tags/0.18.10.tar.gz"
+  sha256 "912125b727325ca12a98c0b8c3d2a50849fc030d1c379430b7641c2b5d3d8bff"
   license "MIT"
   head "https://github.com/openfaas/faas-cli.git", branch: "master"
 
@@ -12,7 +12,7 @@ class FaasCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e30be32ac956695b7fe7cff081c6dc70e29946b2efe9a6a177cdf910796f0416"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc509a6b4f97d59c28b62a819b7ddf8f48e8938b3d94fc7063d1f17cb325d45e"
   end
 
   depends_on "go" => :build
@@ -66,13 +66,13 @@ class FaasCli < Formula
     YAML
 
     begin
-      output = shell_output("#{bin}/faas-cli deploy --tls-no-verify -yaml test.yml 2>&1", 1)
+      output = shell_output("#{bin}/faas-cli deploy --tls-no-verify --yaml test.yml 2>&1", 1)
       assert_match "stat ./template/python/template.yml", output
 
       assert_match "dockerfile", shell_output("#{bin}/faas-cli template pull 2>&1")
       assert_match "node20", shell_output("#{bin}/faas-cli new --list")
 
-      output = shell_output("#{bin}/faas-cli deploy --tls-no-verify -yaml test.yml", 1)
+      output = shell_output("#{bin}/faas-cli deploy --tls-no-verify --yaml test.yml", 1)
       assert_match "Deploying: dummy_function.", output
 
       faas_cli_version = shell_output("#{bin}/faas-cli version")
