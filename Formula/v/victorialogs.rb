@@ -14,7 +14,7 @@ class Victorialogs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "356688a2d48a27e04594bf1d0a3f543ed3467550e38bd5755c9d3c128eac15c7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7efbefdecce8aabca5a6fcfc2a1e3c4aa90b8e71da05c66159f6d2775199a4cc"
   end
 
   depends_on "go" => :build
