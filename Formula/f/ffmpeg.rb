@@ -1,8 +1,8 @@
 class Ffmpeg < Formula
   desc "Play, record, convert, and stream select audio and video codecs"
   homepage "https://ffmpeg.org/"
-  url "https://ffmpeg.org/releases/ffmpeg-8.1.1.tar.xz"
-  sha256 "b6863adde98898f42602017462871b5f6333e65aec803fdd7a6308639c52edf3"
+  url "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz"
+  sha256 "464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c"
   # None of these parts are used by default, you have to explicitly pass `--enable-gpl`
   # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
   # Passing `--enable-version3` changes the license to GPL v3+.
@@ -16,7 +16,7 @@ class Ffmpeg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "17acce0229e5ce7b03304bdec5dee5feb1b99fbc04b352b37bb74b7285fd4b01"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a34c7897439e544594edfad42afcc02a9a6a2f35063d85ca34137e18d3a5fa50"
   end
 
   depends_on "pkgconf" => :build
