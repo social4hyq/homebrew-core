@@ -7,12 +7,7 @@ class ForgejoCli < Formula
   head "https://codeberg.org/forgejo-contrib/forgejo-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "da03e5e9283bacfecb9085684ba35701932a95254486a5d25b841f898715bcc5"
-    sha256 cellar: :any,                 arm64_sequoia: "50ef4d22fdd29d0144769db602da1a46098c6649959f702c7193a6ce55a474af"
-    sha256 cellar: :any,                 arm64_sonoma:  "b1d585c8520c57d6cb8a2309e3ea1ca71cdc278e371b3ed35d58645b1ea6af54"
-    sha256 cellar: :any,                 sonoma:        "90fdf8e55f03114a11c912f20ea1eeb60c09f26a69628ce94c6e1a5d9066076b"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "dee5a25bc9af4873f25cadd9152a7b43a7fe9f281694cc617d9b7c5a181ee4e0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "8bd9495f4637a8392608b9dfb0cb76c9b1e4a6fac326e5ef29008ee232d1f218"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc41d5cd2550057bfeabdbd2236cf3807902585d7948a3b48fb57daff8e22dc8"
   end
 
   depends_on "pkgconf" => :build
