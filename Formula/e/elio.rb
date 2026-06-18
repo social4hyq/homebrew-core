@@ -6,7 +6,7 @@ class Elio < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc3ab7b15d0c3e660c75f75b8f5dacfbaaeb13cc61f72b86db54ba36d0b0e3fb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b5375c72ef1ad01a7fa6e7395c1a87fd0032ef6399f173046200378e7a4912d"
   end
 
   depends_on "rust" => :build
