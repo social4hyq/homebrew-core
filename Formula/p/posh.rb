@@ -11,12 +11,7 @@ class Posh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "b4c49c448bc48352595390ec617225d314607e4252a3a1c2d09f359c94132ac7"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7c8ed5ec9c2e118a4f7e338a96f0220b3f07a0a4290fb0ee07244e86ef95b119"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "d57d832f54a956df8d62cfbb91debefee44c01572488e553e0913238b528fe84"
-    sha256 cellar: :any_skip_relocation, sonoma:        "1ea534ecc8db83c349191c2cc289025bc7b07b9c6b41506bda1a36b53aa7f831"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "55dad8d1b9709fe46183a0a0770f848221b685a7d70bec2120d7fcfb7fb55ef4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "99ea129f3be132e51c8eadcc1d7fc1fb00a330e62d2fa9fb69e69a6e79e2399a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b6fe109b9c3e821a130a128e1187090c8a2766db631bad08a080103c210ff101"
   end
 
   depends_on "autoconf" => :build
