@@ -1,8 +1,8 @@
 class VulkanUtilityLibraries < Formula
   desc "Utility Libraries for Vulkan"
   homepage "https://github.com/KhronosGroup/Vulkan-Utility-Libraries"
-  url "https://github.com/KhronosGroup/Vulkan-Utility-Libraries/archive/refs/tags/vulkan-sdk-1.4.350.0.tar.gz"
-  sha256 "19a215e9469df0749d7c1b389fc667a3f7e160f0b6da71000fadc30140494563"
+  url "https://github.com/KhronosGroup/Vulkan-Utility-Libraries/archive/refs/tags/vulkan-sdk-1.4.350.1.tar.gz"
+  sha256 "e8eca1be31a658c9d0ca30951f2fc7912e4bb01502da64f8decdc71836241a6c"
   license "Apache-2.0"
   compatibility_version 1
   head "https://github.com/KhronosGroup/Vulkan-Utility-Libraries.git", branch: "main"
@@ -13,7 +13,7 @@ class VulkanUtilityLibraries < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "704331f57cb45dcc4fc93d1d1d2992f22a4985c3851ddbbb32795d95dbcd707a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8eb61a1608f41d568ec49acb360ce982ebf2ef5fe4d3d26a3252ee229c95a367"
   end
 
   depends_on "cmake" => :build
