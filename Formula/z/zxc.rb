@@ -7,7 +7,7 @@ class Zxc < Formula
   head "https://github.com/hellobertrand/zxc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9b4c392684bc24f6cb28ef8f14edd190614e62b2940818536e54b444a98b6e5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9eff12b80853061a3404f3da3e7adf363dbeaf59667fe2f605737f58f239598"
   end
 
   depends_on "cmake" => :build
