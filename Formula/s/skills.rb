@@ -1,8 +1,8 @@
 class Skills < Formula
   desc "Open agent skills ecosystem"
   homepage "https://skills.sh"
-  url "https://registry.npmjs.org/skills/-/skills-1.5.11.tgz"
-  sha256 "e60e4b349fbabd7d18f42da3fdc5f9b4e19988adb3e39f6503da47fdb9ea2f14"
+  url "https://registry.npmjs.org/skills/-/skills-1.5.12.tgz"
+  sha256 "d5010fd9a942c79b38cad60f340437a07e1d19ad2e455bc593af10949ba8e534"
   license "MIT"
 
   bottle do
