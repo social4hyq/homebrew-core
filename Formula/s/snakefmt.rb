@@ -9,7 +9,7 @@ class Snakefmt < Formula
   head "https://github.com/snakemake/snakefmt.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fc9b797fe886d92601355a878a5f0ab1650aad409c4f5ed60689efb82f0de47e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1c19f05005078ea1f00380f4ed6e4fd6c4dd99424878903ff0a263199ed40fe"
   end
 
   depends_on "rust" => :build # pytokens -> mypy -> ast-serialize
