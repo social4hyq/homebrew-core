@@ -6,7 +6,7 @@ class Ucloud < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4be3cf5ca27f1288f89b77351783b968a7423868f7f93c47d21be8b2dfae7ded"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7770a9fddd90881e029f8e1e2cc0ea81b7c7bb9d70d2fa64abe4119ec60f690"
   end
 
   depends_on "go" => :build
