@@ -7,7 +7,7 @@ class Gauge < Formula
   head "https://github.com/getgauge/gauge.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fe3cb9057372b8a069b1dd1ccc3f45b3aba28ad1bf77c7b916a7b6f3af8ff2a7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a924fdf1942de3c0818bd66e753ef7b5239e099e35a7bfe5409af546310a5d2"
   end
 
   depends_on "go" => :build
