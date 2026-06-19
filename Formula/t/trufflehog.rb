@@ -1,14 +1,14 @@
 class Trufflehog < Formula
   desc "Find and verify credentials"
   homepage "https://trufflesecurity.com/"
-  url "https://github.com/trufflesecurity/trufflehog/archive/refs/tags/v3.95.5.tar.gz"
-  sha256 "323ab881ec00c80e787cf57ba2ab8a763dbadbc8607944f36b9cc9f3641473f2"
+  url "https://github.com/trufflesecurity/trufflehog/archive/refs/tags/v3.95.6.tar.gz"
+  sha256 "ab9d39c95439b698937aeb5d91427833c9f10424b4cd6174d2af461bcf534414"
   # upstream license ask, https://github.com/trufflesecurity/trufflehog/issues/1446
   license "AGPL-3.0-only"
   head "https://github.com/trufflesecurity/trufflehog.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f33beb5307eab6ef97cc2ad6a8334fdb1f067f175146554653d0c44bd079653"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d2f9966face4bbeb1f6eb41665bd0bc8a003a8f45bbfd5bc4a42278fc51e133"
   end
 
   depends_on "go" => :build
