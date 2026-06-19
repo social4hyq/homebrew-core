@@ -6,7 +6,7 @@ class FreshEditor < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e5ca3045d31870b07ae7a4acebe5306844d8b379478825d5e842e790f990aaca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a341ed8f0bcb20a136948f07844ecc25ddef65bed67efa755e845f39e429bed7"
   end
 
   depends_on "ohos-sdk" => :build
