@@ -1,8 +1,8 @@
 class NodeAT24 < Formula
   desc "Open-source, cross-platform JavaScript runtime environment"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v24.16.0/node-v24.16.0.tar.xz"
-  sha256 "2ff84a6de70b6165290111b0fc656ded1ad207a799816fe720cc7c31232df30f"
+  url "https://nodejs.org/dist/v24.17.0/node-v24.17.0.tar.xz"
+  sha256 "a7ab562ed2369a29c68b72fa00e3103bcdfe37063dff799c6acc8e404e275fcd"
   license "MIT"
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class NodeAT24 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bffeb59d59c277b609a0ea04b65df949cf0de17becd68599352dccf3298615e0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "374c8deb3e0856f8abbf872a9d2608f31b37ac6dd0ec9290524ad4b7e496d58d"
   end
 
   keg_only :versioned_formula
