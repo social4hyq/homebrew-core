@@ -3,8 +3,8 @@ class Snakefmt < Formula
 
   desc "Snakemake code formatter"
   homepage "https://github.com/snakemake/snakefmt/"
-  url "https://files.pythonhosted.org/packages/87/6d/d14bcae72c0b2c43b3a956e3690e5a27a2e659723ecc4af684b7be339d13/snakefmt-2.0.1.tar.gz"
-  sha256 "d535e3a0d149111a1e8d66ae8a78a506aff7a648137a619a36fe7c8946a02476"
+  url "https://files.pythonhosted.org/packages/1a/40/6c05d546237a73be5e80434682534337854fb7556713447c1c31236ba14c/snakefmt-2.0.2.tar.gz"
+  sha256 "aa037ff2579fcdb76f4d5b722b3438738fff05924d43faf4655ff7eebd64152a"
   license "MIT"
   head "https://github.com/snakemake/snakefmt.git", branch: "master"
 
@@ -41,8 +41,8 @@ class Snakefmt < Formula
   end
 
   resource "platformdirs" do
-    url "https://files.pythonhosted.org/packages/9f/4a/0883b8e3802965322523f0b200ecf33d31f10991d0401162f4b23c698b42/platformdirs-4.9.6.tar.gz"
-    sha256 "3bfa75b0ad0db84096ae777218481852c0ebc6c727b3168c1b9e0118e458cf0a"
+    url "https://files.pythonhosted.org/packages/d7/47/e4501f49c178ae1d9f4a75073fda4204f52647993f075a9db4d14930e0c5/platformdirs-4.10.0.tar.gz"
+    sha256 "31e761a6a0ca04faf7353ea759bdba55652be214725111e5aac52dfa29d4bef7"
   end
 
   resource "pytokens" do
