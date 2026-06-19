@@ -1,8 +1,8 @@
 class Air < Formula
   desc "Fast and opinionated formatter for R code"
   homepage "https://github.com/posit-dev/air"
-  url "https://github.com/posit-dev/air/archive/refs/tags/0.9.0.tar.gz"
-  sha256 "55cae527153badeb348b7b04ffb3c9f1d9f20e27e388edeae694a05a5e32f289"
+  url "https://github.com/posit-dev/air/archive/refs/tags/0.10.0.tar.gz"
+  sha256 "4ef28a95df9c037aa6bdb9b36f94dcdcdbb64b469e49729268e2921d6d2e1968"
   license "MIT"
 
   bottle do
