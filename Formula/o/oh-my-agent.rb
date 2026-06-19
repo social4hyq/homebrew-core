@@ -6,7 +6,7 @@ class OhMyAgent < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "90ba9bdf9a419f8b9e312cada2b33ac7489dbb983682a87db6b1c14ab44137cb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b525d459ab953182d5fa897b49e9d75e882da0b5a4e660fa88e2bbb847d1440"
   end
 
   depends_on "node"
