@@ -1,8 +1,8 @@
 class HeadscaleCli < Formula
   desc "CLI for headscale, an open-source implementation of the Tailscale control server"
   homepage "https://github.com/juanfont/headscale"
-  url "https://github.com/juanfont/headscale/archive/refs/tags/v0.29.0.tar.gz"
-  sha256 "9ee04c5ade81fc36ed83e3a6d5ed28e9ab25e8ceb50f64ea7fa9a62394dd1cc8"
+  url "https://github.com/juanfont/headscale/archive/refs/tags/v0.29.1.tar.gz"
+  sha256 "71a0e83ee94b163868c888c86d829b3adf4975b60e4f1d2706a2dc486ed0f124"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,7 +11,7 @@ class HeadscaleCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89d7ff54f7cf0aa159f0ccd758c7436f0f743a7f6e141e9378aefdd1e6cbb10a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5cd0dee42971533a34e9a9e03d30facf086c8911ad3f8b8c6528f4ef0f29bf5"
   end
 
   depends_on "go" => :build
