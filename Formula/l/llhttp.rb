@@ -7,7 +7,7 @@ class Llhttp < Formula
   compatibility_version 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f22ec69f661b117072b59a36e8e915c858e4fdb123c0b132d1778473d94a8f1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "43de9e83ccfe779015955fc4d291bdf94ccc628e07850c60bbb92765ee44970b"
   end
 
   depends_on "cmake" => :build
