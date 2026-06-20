@@ -8,7 +8,7 @@ class Gixy < Formula
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "436129f87b871b8918e9191b64a65e4e7c47fbef1c7540bf89838b0cc2125f81"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0449bb3f836c3382ea68059ce192f1017f7d2f8ce6bfd79f07e860856eb29c42"
   end
 
   depends_on "python@3.14"
