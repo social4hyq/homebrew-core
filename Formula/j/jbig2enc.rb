@@ -1,13 +1,13 @@
 class Jbig2enc < Formula
   desc "JBIG2 encoder (for monochrome documents)"
   homepage "https://github.com/agl/jbig2enc"
-  url "https://github.com/agl/jbig2enc/archive/refs/tags/0.31.tar.gz"
-  sha256 "35c255e44a9b1c4cbe27d2c84594a43d6666645156a2d186ba60f8832566141d"
+  url "https://github.com/agl/jbig2enc/archive/refs/tags/0.32.tar.gz"
+  sha256 "5b3b1c48617e5b1608f916a78038ea867a2c9eb20c2ff34a78a48a243f655c2a"
   license "Apache-2.0"
   head "https://github.com/agl/jbig2enc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f0272d5e64438866b359374311015af81595d9b92cfa0c85fb57812830fd3d5c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4d5676e8d88a249fc7ed038a048528afec2765dbad4c1af5f12f3fe054f40cb"
   end
 
   depends_on "autoconf" => :build
