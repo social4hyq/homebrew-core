@@ -6,7 +6,7 @@ class MarkdownOxide < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7e468a6dabe81b97885223ed64f8c9532b4a980da45ff71a38c4afd96a5e124"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c49e64fc615c15532a0efcad81729c2404014eb932b0e99c4f4135a4f84f43b"
   end
 
   depends_on "rust" => :build
