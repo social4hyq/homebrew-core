@@ -2,8 +2,8 @@ class HelmAT3 < Formula
   desc "Kubernetes package manager"
   homepage "https://helm.sh/"
   url "https://github.com/helm/helm.git",
-      tag:      "v3.21.1",
-      revision: "c56dd0095fd76da5d7b30ecdf506103e7f26745e"
+      tag:      "v3.21.2",
+      revision: "125963406833fe0525be91f46c8b5b0f22fb9e32"
   license "Apache-2.0"
   compatibility_version 1
 
