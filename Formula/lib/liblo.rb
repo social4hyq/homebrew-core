@@ -1,13 +1,13 @@
 class Liblo < Formula
   desc "Lightweight Open Sound Control implementation"
   homepage "https://liblo.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/liblo/liblo/0.35/liblo-0.35.tar.gz"
-  sha256 "9acc4f7e5a24f33472e9acd7e409b7bd6810a46f0a1f3cfeecea22d60f3aae13"
+  url "https://downloads.sourceforge.net/project/liblo/liblo/0.36/liblo-0.36.tar.gz"
+  sha256 "c08d14832e8dcf8f06840405824a4f9611a0cb3daed0198946326c740941c8b6"
   license "LGPL-2.1-or-later"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "64d5e03f690f0c0edef77e9ebdacbc245063b440612ccb33aad74a7bdc02541d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f79cabb86fc753656630caa6448e54372042bb37c301a052dd32369457cd3b5"
   end
 
   head do
