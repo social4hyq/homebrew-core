@@ -7,7 +7,7 @@ class Bagel < Formula
   head "https://github.com/boostsecurityio/bagel.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "400364c61edfac74d6c536a9c5d7aa12ecb9a28f014e41ffad3bef895b6d5782"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c7e18aed81426367372e7ddacf02e9b1c4d3880631cc2dc16fbb53f102658c7"
   end
 
   depends_on "go" => :build
