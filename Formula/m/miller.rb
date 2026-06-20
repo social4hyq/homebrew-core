@@ -7,7 +7,7 @@ class Miller < Formula
   head "https://github.com/johnkerl/miller.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "74e1d403e75fa251b40fe9e82650d39fdce47c24108b091008acd715a5d48b78"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6cefd7d9cf3a4a84c736e6733270271e6fcdce6a833651e7dc5e22b5e332644"
   end
 
   depends_on "go" => :build
