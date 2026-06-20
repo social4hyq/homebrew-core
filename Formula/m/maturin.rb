@@ -7,7 +7,7 @@ class Maturin < Formula
   head "https://github.com/PyO3/maturin.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "33db89835b48a8c074a8b013593fad9809a8f270f7500997426a8fafab979654"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "421a1b5f4a2785d08f4c4e2bf7b90f92ca9a15a2312378994842213f45dec258"
   end
 
   depends_on "pkgconf" => :build
