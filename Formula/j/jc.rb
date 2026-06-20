@@ -8,7 +8,7 @@ class Jc < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9bbc062387a5af68f1ff5b1818aa89b2478b5291a73e0a512656b336b08e1594"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb0859c5f7b381cf91ae141c74675af137c35aa7116dac2373ebfd2703c9c65e"
   end
 
   depends_on "libyaml"
