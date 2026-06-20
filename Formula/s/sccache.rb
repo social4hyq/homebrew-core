@@ -12,7 +12,7 @@ class Sccache < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a1d361c7026bd53ee84493cea0aaa48c2d19232dcb3ed5226929ed9b5c97b12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1ae5f03f66cb4ab31bc760385f46cbfb35ab1c9435c1f7ca215b9ee02e96a95"
   end
 
   depends_on "pkgconf" => :build
