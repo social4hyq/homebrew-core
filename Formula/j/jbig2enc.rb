@@ -7,7 +7,7 @@ class Jbig2enc < Formula
   head "https://github.com/agl/jbig2enc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f0272d5e64438866b359374311015af81595d9b92cfa0c85fb57812830fd3d5c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4d5676e8d88a249fc7ed038a048528afec2765dbad4c1af5f12f3fe054f40cb"
   end
 
   depends_on "autoconf" => :build
