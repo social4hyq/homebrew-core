@@ -6,7 +6,7 @@ class Air < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "83f25ff0f6431dccd6f4b3206b75560a5f6616ebfe60e1f53f8773b92a7dc43f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd0f334a198113141176a7b9833828e0a52a44bd83bdce9d5cc0eef8705dfc41"
   end
 
   depends_on "rust" => :build
