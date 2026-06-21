@@ -7,7 +7,7 @@ class Typstyle < Formula
   head "https://github.com/typstyle-rs/typstyle.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9601174d8597b4bdcf38ff64b7738d8cf7dc8660a40aba892a3c8826139e7626"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b184c40b72d6dae9fbf86bf618b06ef090a92ab18b0da8d94b2d9d6495f68786"
   end
 
   depends_on "rust" => :build
