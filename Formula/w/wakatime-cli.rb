@@ -8,7 +8,7 @@ class WakatimeCli < Formula
   version_scheme 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "147056ac147e48c1c5f5f93e3e0caeff75b47ed90863909b68205d7fa9067395"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f38709d69bf33490daf204114b63bf059a3d9c8d8d1333bafd6c6cdf51226c6"
   end
 
   depends_on "go" => :build
