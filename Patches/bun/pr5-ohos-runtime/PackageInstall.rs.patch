@@ -1,5 +1,5 @@
 diff --git a/src/install/PackageInstall.rs b/src/install/PackageInstall.rs
-index abea7ad08..1b557184e 100644
+index abea7ad087..1b557184eb 100644
 --- a/src/install/PackageInstall.rs
 +++ b/src/install/PackageInstall.rs
 @@ -1655,12 +1655,29 @@ impl<'a> PackageInstall<'a> {

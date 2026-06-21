@@ -1,5 +1,5 @@
 diff --git a/scripts/build/bun.ts b/scripts/build/bun.ts
-index 4b9b4f3c0..9a0e21ed0 100644
+index 4b9b4f3c08..9a0e21ed06 100644
 --- a/scripts/build/bun.ts
 +++ b/scripts/build/bun.ts
 @@ -94,6 +94,14 @@ function systemLibs(cfg: Config): string[] {

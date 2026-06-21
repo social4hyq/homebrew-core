@@ -1,5 +1,5 @@
 diff --git a/scripts/build/config.ts b/scripts/build/config.ts
-index 380575939..8c5e8f271 100644
+index 3805759394..8c5e8f2716 100644
 --- a/scripts/build/config.ts
 +++ b/scripts/build/config.ts
 @@ -17,7 +17,7 @@ import { resolveMacosSdkPath } from "./macos-sdk.ts";

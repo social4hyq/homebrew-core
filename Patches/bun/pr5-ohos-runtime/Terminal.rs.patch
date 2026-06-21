@@ -1,5 +1,5 @@
 diff --git a/src/runtime/api/bun/Terminal.rs b/src/runtime/api/bun/Terminal.rs
-index 18bc83151..0059bab09 100644
+index 18bc831514..0059bab092 100644
 --- a/src/runtime/api/bun/Terminal.rs
 +++ b/src/runtime/api/bun/Terminal.rs
 @@ -784,7 +784,9 @@ pub type OpenPtyFn = unsafe extern "C" fn(

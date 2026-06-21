@@ -1,5 +1,5 @@
 diff --git a/src/collections/multi_array_list.rs b/src/collections/multi_array_list.rs
-index 883f3d728..335fc085d 100644
+index 883f3d7288..335fc085d0 100644
 --- a/src/collections/multi_array_list.rs
 +++ b/src/collections/multi_array_list.rs
 @@ -344,10 +344,9 @@ impl<T> Reflected<T> {

@@ -1,5 +1,5 @@
 diff --git a/src/install/PackageManager.rs b/src/install/PackageManager.rs
-index 215998610..8c130d4bf 100644
+index 2159986104..8c130d4bf1 100644
 --- a/src/install/PackageManager.rs
 +++ b/src/install/PackageManager.rs
 @@ -1245,7 +1245,7 @@ fn ensure_temp_node_gyp_script_run(manager: &mut PackageManager) -> Result<(), E

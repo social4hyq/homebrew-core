@@ -1,5 +1,5 @@
 diff --git a/scripts/build/deps/cares.ts b/scripts/build/deps/cares.ts
-index bc5539bb2..bf1e3353e 100644
+index bc5539bb2b..bf1e3353e2 100644
 --- a/scripts/build/deps/cares.ts
 +++ b/scripts/build/deps/cares.ts
 @@ -286,8 +286,20 @@ function configH(cfg: Config): string {

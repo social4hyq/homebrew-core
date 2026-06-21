@@ -1,5 +1,5 @@
 diff --git a/scripts/build/flags.ts b/scripts/build/flags.ts
-index 7759c7576..8a7b9c782 100644
+index 7759c7576d..8a7b9c7829 100644
 --- a/scripts/build/flags.ts
 +++ b/scripts/build/flags.ts
 @@ -67,6 +67,11 @@ export const cpuTargetFlags: Flag[] = [

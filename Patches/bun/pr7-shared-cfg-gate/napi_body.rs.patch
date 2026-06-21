@@ -1,5 +1,5 @@
 diff --git a/src/runtime/napi/napi_body.rs b/src/runtime/napi/napi_body.rs
-index 600d9dcfa..1590833a5 100644
+index 600d9dcfac..1590833a52 100644
 --- a/src/runtime/napi/napi_body.rs
 +++ b/src/runtime/napi/napi_body.rs
 @@ -3253,7 +3253,8 @@ mod posix_platform_specific_v8_apis {

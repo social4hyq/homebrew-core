@@ -1,5 +1,5 @@
 diff --git a/src/crash_handler/lib.rs b/src/crash_handler/lib.rs
-index 0e9e4b571..83ed3e7ec 100644
+index 0e9e4b5719..83ed3e7ece 100644
 --- a/src/crash_handler/lib.rs
 +++ b/src/crash_handler/lib.rs
 @@ -2113,14 +2113,16 @@ mod draft {

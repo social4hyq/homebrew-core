@@ -1,5 +1,5 @@
 diff --git a/src/install/npm.rs b/src/install/npm.rs
-index 3c6052722..246199a88 100644
+index 3c60527220..246199a886 100644
 --- a/src/install/npm.rs
 +++ b/src/install/npm.rs
 @@ -1148,11 +1148,28 @@ pub mod package_manifest {

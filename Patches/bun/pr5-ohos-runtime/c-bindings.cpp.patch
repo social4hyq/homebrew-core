@@ -1,5 +1,5 @@
 diff --git a/src/jsc/bindings/c-bindings.cpp b/src/jsc/bindings/c-bindings.cpp
-index 13d71e7be..3ed8641e2 100644
+index 13d71e7be4..3ed8641e23 100644
 --- a/src/jsc/bindings/c-bindings.cpp
 +++ b/src/jsc/bindings/c-bindings.cpp
 @@ -71,21 +71,31 @@ extern "C" int32_t set_process_priority(int32_t pid, int32_t priority)

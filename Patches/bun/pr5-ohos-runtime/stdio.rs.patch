@@ -1,5 +1,5 @@
 diff --git a/src/runtime/api/bun/spawn/stdio.rs b/src/runtime/api/bun/spawn/stdio.rs
-index 81f5ef10f..8ac90c2f0 100644
+index 81f5ef10f2..8ac90c2f02 100644
 --- a/src/runtime/api/bun/spawn/stdio.rs
 +++ b/src/runtime/api/bun/spawn/stdio.rs
 @@ -108,13 +108,14 @@ impl Stdio {

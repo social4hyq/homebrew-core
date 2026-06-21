@@ -1,5 +1,5 @@
 diff --git a/src/runtime/shell/builtin/echo.rs b/src/runtime/shell/builtin/echo.rs
-index ee1163375..858f0413d 100644
+index ee1163375e..858f0413d3 100644
 --- a/src/runtime/shell/builtin/echo.rs
 +++ b/src/runtime/shell/builtin/echo.rs
 @@ -113,7 +113,7 @@ impl Echo {

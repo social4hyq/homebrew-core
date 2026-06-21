@@ -1,5 +1,5 @@
 diff --git a/scripts/build.ts b/scripts/build.ts
-index 6818debb2..b0c7e803d 100644
+index 6818debb23..b0c7e803de 100644
 --- a/scripts/build.ts
 +++ b/scripts/build.ts
 @@ -406,6 +406,8 @@ function parseArgs(argv: string[]): CliArgs {

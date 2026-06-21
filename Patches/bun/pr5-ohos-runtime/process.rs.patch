@@ -1,5 +1,5 @@
 diff --git a/src/spawn/process.rs b/src/spawn/process.rs
-index 7a5382817..6fa322e4e 100644
+index 7a5382817c..5c4fc3fbf9 100644
 --- a/src/spawn/process.rs
 +++ b/src/spawn/process.rs
 @@ -3204,6 +3204,10 @@ mod spawn_process_body {

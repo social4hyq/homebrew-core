@@ -1,5 +1,5 @@
 diff --git a/src/resolver/fs.rs b/src/resolver/fs.rs
-index c72ebe8c1..c7dc606a6 100644
+index c72ebe8c1b..c7dc606a62 100644
 --- a/src/resolver/fs.rs
 +++ b/src/resolver/fs.rs
 @@ -1171,7 +1171,35 @@ impl RealFS {

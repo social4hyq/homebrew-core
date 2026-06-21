@@ -1,5 +1,5 @@
 diff --git a/src/install/TarballStream.rs b/src/install/TarballStream.rs
-index 75492719d..004183755 100644
+index 75492719db..0041837552 100644
 --- a/src/install/TarballStream.rs
 +++ b/src/install/TarballStream.rs
 @@ -1465,7 +1465,17 @@ fn make_symlink(

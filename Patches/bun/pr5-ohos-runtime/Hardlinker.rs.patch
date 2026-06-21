@@ -1,5 +1,5 @@
 diff --git a/src/install/isolated_install/Hardlinker.rs b/src/install/isolated_install/Hardlinker.rs
-index ffe891fbe..485fe1022 100644
+index ffe891fbea..485fe10228 100644
 --- a/src/install/isolated_install/Hardlinker.rs
 +++ b/src/install/isolated_install/Hardlinker.rs
 @@ -273,6 +273,24 @@ impl Hardlinker {

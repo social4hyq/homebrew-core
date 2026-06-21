@@ -1,5 +1,5 @@
 diff --git a/scripts/build/tools.ts b/scripts/build/tools.ts
-index ff2163131..22e8a7380 100644
+index ff21631312..22e8a73800 100644
 --- a/scripts/build/tools.ts
 +++ b/scripts/build/tools.ts
 @@ -267,7 +267,9 @@ export function findTool(spec: ToolSpec): FoundTool | undefined {

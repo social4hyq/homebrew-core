@@ -1,5 +1,5 @@
 diff --git a/src/runtime/cli/run_command.rs b/src/runtime/cli/run_command.rs
-index a98d7bce7..1f8dce165 100644
+index a98d7bce7f..1f8dce165e 100644
 --- a/src/runtime/cli/run_command.rs
 +++ b/src/runtime/cli/run_command.rs
 @@ -59,6 +59,24 @@ fn runner_arena() -> &'static bun_alloc::Arena {

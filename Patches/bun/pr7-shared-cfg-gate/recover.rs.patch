@@ -1,5 +1,5 @@
 diff --git a/src/runtime/test_runner/harness/recover.rs b/src/runtime/test_runner/harness/recover.rs
-index ecf4d2949..9c066a03d 100644
+index ecf4d2949d..9729701df5 100644
 --- a/src/runtime/test_runner/harness/recover.rs
 +++ b/src/runtime/test_runner/harness/recover.rs
 @@ -6,18 +6,21 @@
@@ -27,7 +27,7 @@ index ecf4d2949..9c066a03d 100644
  struct TopCtxRestore {
      prev: Option<*const Context>,
  }
-@@ -96,27 +104,23 @@ unsafe extern "system" {
+@@ -96,27 +99,23 @@ unsafe extern "system" {
  }
  
  // darwin, bsd, gnu linux
@@ -63,7 +63,7 @@ index ecf4d2949..9c066a03d 100644
      }
      unsafe extern "C" {
          pub(super) fn setjmp(env: *mut jmp_buf) -> c_int;
-@@ -131,15 +135,16 @@ unsafe fn get_context(ctx: *mut Context) {
+@@ -131,15 +130,16 @@ unsafe fn get_context(ctx: *mut Context) {
          // SAFETY: ctx is a valid, writable, properly-aligned CONTEXT (caller contract).
          unsafe { bun_sys::windows::ntdll_context::RtlCaptureContext(ctx) };
      }
@@ -84,7 +84,7 @@ index ecf4d2949..9c066a03d 100644
          unsafe extern "C" { fn getcontext(ucp: *mut libc::ucontext_t) -> core::ffi::c_int; }
          // SAFETY: ctx is a valid, writable, properly-aligned ucontext_t (caller contract).
          let _ = unsafe { getcontext(ctx) };
-@@ -154,13 +159,13 @@ unsafe fn set_context(ctx: *const Context) -> ! {
+@@ -154,13 +154,13 @@ unsafe fn set_context(ctx: *const Context) -> ! {
          // this thread; the captured frame is still live (caller contract).
          unsafe { RtlRestoreContext(ctx, core::ptr::null()) };
      }

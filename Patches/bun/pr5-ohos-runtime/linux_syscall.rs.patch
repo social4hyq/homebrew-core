@@ -1,5 +1,5 @@
 diff --git a/src/sys/linux_syscall.rs b/src/sys/linux_syscall.rs
-index 433cbb830..28d2eed00 100644
+index 433cbb830a..28d2eed00e 100644
 --- a/src/sys/linux_syscall.rs
 +++ b/src/sys/linux_syscall.rs
 @@ -17,6 +17,7 @@

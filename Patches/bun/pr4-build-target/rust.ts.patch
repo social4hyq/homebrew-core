@@ -1,5 +1,5 @@
 diff --git a/scripts/build/rust.ts b/scripts/build/rust.ts
-index 698ae952b..b680208e5 100644
+index 698ae952ba..b680208e54 100644
 --- a/scripts/build/rust.ts
 +++ b/scripts/build/rust.ts
 @@ -53,6 +53,7 @@ export function rustTarget(cfg: Config): string {

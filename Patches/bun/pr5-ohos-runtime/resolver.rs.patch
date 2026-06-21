@@ -1,5 +1,5 @@
 diff --git a/src/resolver/resolver.rs b/src/resolver/resolver.rs
-index 1deea6ede..f680dab0d 100644
+index 1deea6ede3..f680dab0da 100644
 --- a/src/resolver/resolver.rs
 +++ b/src/resolver/resolver.rs
 @@ -4398,7 +4398,7 @@ impl<'a> Resolver<'a> {
