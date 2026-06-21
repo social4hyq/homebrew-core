@@ -10,7 +10,8 @@ class LlvmAT21 < Formula
 
   bottle do
     # 验证 tap 的 bottle;毕业后改 root_url → harmonybrew/homebrew-core releases
-    root_url "https://github.com/social4hyq/homebrew-core/releases/download/llvm@21-v21.1.8"
+    # tag 名不含 @（避免 GitHub URL 编码导致 brew 解析问题）
+    root_url "https://github.com/social4hyq/homebrew-core/releases/download/llvm21-v21.1.8"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "0ce8717c57f10569371e0f517d28b32525cd38b4c4f8e2c346d29d6d840c831f"
   end
 
