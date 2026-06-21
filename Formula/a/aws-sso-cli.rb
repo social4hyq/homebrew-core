@@ -7,7 +7,7 @@ class AwsSsoCli < Formula
   head "https://github.com/synfinatic/aws-sso-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "51ad610fd79a19560e1b769dc2020ee692c43922b1911584f4c544303f2a6952"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9dc511b2b0e7633d82bc64767a4adaa240f3e2a489ec1e6af1b61fee55a95b9"
   end
 
   depends_on "go" => :build
