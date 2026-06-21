@@ -8,7 +8,7 @@ class Pytest < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c456cd8d393c1eb8bdcfef1c6c67ecc90dd97aea50eebe4afa05d1a466cba296"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8bd4a2073e2808b7172d2d85853103bbf2687a600e3761ef0187e54256c16032"
   end
 
   depends_on "python@3.14"
