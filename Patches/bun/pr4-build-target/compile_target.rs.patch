@@ -1,5 +1,5 @@
 diff --git a/src/options_types/compile_target.rs b/src/options_types/compile_target.rs
-index 97ba48cbb..22f8cac2a 100644
+index 97ba48cbb0..b141592f33 100644
 --- a/src/options_types/compile_target.rs
 +++ b/src/options_types/compile_target.rs
 @@ -37,7 +37,9 @@ impl Default for CompileTarget {
@@ -65,9 +65,9 @@ index 97ba48cbb..22f8cac2a 100644
          match self.arch {
              Architecture::X64 => match self.libc {
 -                // process.platform: Node reports "android" on Android, not "linux".
-+                // process.platform: Node reports "android" on Android, "ohos" on OHOS.
++                // process.platform: Node reports "android" on Android, "openharmony" on OHOS.
                  Libc::Android => table!(b"\"android\"", b"\"x64\""),
-+                Libc::Ohos => table!(b"\"ohos\"", b"\"x64\""),
++                Libc::Ohos => table!(b"\"openharmony\"", b"\"x64\""),
                  _ => match self.os {
                      OperatingSystem::Mac => table!(b"\"darwin\"", b"\"x64\""),
                      OperatingSystem::Linux => table!(b"\"linux\"", b"\"x64\""),
@@ -75,7 +75,7 @@ index 97ba48cbb..22f8cac2a 100644
              },
              Architecture::Arm64 => match self.libc {
                  Libc::Android => table!(b"\"android\"", b"\"arm64\""),
-+                Libc::Ohos => table!(b"\"ohos\"", b"\"arm64\""),
++                Libc::Ohos => table!(b"\"openharmony\"", b"\"arm64\""),
                  _ => match self.os {
                      OperatingSystem::Mac => table!(b"\"darwin\"", b"\"arm64\""),
                      OperatingSystem::Linux => table!(b"\"linux\"", b"\"arm64\""),

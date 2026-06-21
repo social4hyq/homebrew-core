@@ -1,8 +1,8 @@
 diff --git a/src/sys/lib.rs b/src/sys/lib.rs
-index a07d7cf3e..53101ca43 100644
+index a07d7cf3eb..8f8a651f67 100644
 --- a/src/sys/lib.rs
 +++ b/src/sys/lib.rs
-@@ -2178,18 +2217,18 @@ mod posix_impl {
+@@ -2178,18 +2178,18 @@ mod posix_impl {
      #[cfg(any(target_os = "linux", target_os = "android"))]
      mod linux_statx {
          // glibc: libc 0.2.x exposes the full surface directly.
@@ -26,7 +26,7 @@ index a07d7cf3e..53101ca43 100644
          mod raw {
              #![allow(non_camel_case_types)]
              use core::ffi::{c_char, c_int, c_uint};
-@@ -2265,7 +2304,7 @@ mod posix_impl {
+@@ -2265,7 +2265,7 @@ mod posix_impl {
                  unsafe { libc::syscall(libc::SYS_statx, dirfd, path, flags, mask, buf) as c_int }
              }
          }
@@ -35,7 +35,7 @@ index a07d7cf3e..53101ca43 100644
          pub(super) use raw::*;
      }
      #[cfg(any(target_os = "linux", target_os = "android"))]
-@@ -2650,13 +2695,16 @@ mod posix_impl {
+@@ -2650,13 +2650,16 @@ mod posix_impl {
          // `buf.len()` bytes (including the NUL).
          let p = unsafe { libc::getcwd(buf.as_mut_ptr().cast(), buf.len()) };
          if p.is_null() {
@@ -54,7 +54,7 @@ index a07d7cf3e..53101ca43 100644
      pub fn link(src: &ZStr, dest: &ZStr) -> Maybe<()> {
          check_p!(
              // SAFETY: both `ZStr`s are valid NUL-terminated C strings.
-@@ -2828,7 +2876,10 @@ mod posix_impl {
+@@ -2828,7 +2831,10 @@ mod posix_impl {
              );
              Ok(())
          }
@@ -66,7 +66,7 @@ index a07d7cf3e..53101ca43 100644
          {
              const SYS_FCHMODAT2: libc::c_long = 452;
              loop {
-@@ -2855,6 +2906,15 @@ mod posix_impl {
+@@ -2855,6 +2861,15 @@ mod posix_impl {
                  return Ok(());
              }
          }
@@ -82,7 +82,7 @@ index a07d7cf3e..53101ca43 100644
      }
      pub fn chown(path: &ZStr, uid: u32, gid: u32) -> Maybe<()> {
          check_p!(
-@@ -3422,6 +3485,7 @@ mod posix_impl {
+@@ -3422,6 +3437,7 @@ mod posix_impl {
      }
      #[cfg(any(target_os = "linux", target_os = "android"))]
      impl MemfdFlags {
@@ -90,7 +90,7 @@ index a07d7cf3e..53101ca43 100644
          #[inline]
          fn older_kernel_flag(self) -> u32 {
              match self {
-@@ -3438,18 +3502,12 @@ mod posix_impl {
+@@ -3438,18 +3454,12 @@ mod posix_impl {
      static MEMFD_ENOSYS: core::sync::atomic::AtomicBool =
          core::sync::atomic::AtomicBool::new(false);
  
@@ -112,7 +112,7 @@ index a07d7cf3e..53101ca43 100644
          !MEMFD_ENOSYS.load(core::sync::atomic::Ordering::Relaxed)
      }
      #[cfg(not(any(target_os = "linux", target_os = "android")))]
-@@ -3464,39 +3522,43 @@ mod posix_impl {
+@@ -3464,39 +3474,43 @@ mod posix_impl {
      /// [`can_use_memfd`] to false.
      #[cfg(any(target_os = "linux", target_os = "android"))]
      pub fn memfd_create(name: &core::ffi::CStr, flags_: MemfdFlags) -> Maybe<Fd> {
@@ -184,7 +184,7 @@ index a07d7cf3e..53101ca43 100644
      #[cfg(any(target_os = "linux", target_os = "android"))]
      pub fn sendfile(src: Fd, dest: Fd, len: usize) -> Maybe<usize> {
          let len = len.min(i32::MAX as usize - 1);
-@@ -3631,12 +3698,12 @@ mod windows_impl {
+@@ -3631,12 +3645,12 @@ mod windows_impl {
          }
      }
      pub fn write(fd: Fd, buf: &[u8]) -> Maybe<usize> {
@@ -200,7 +200,7 @@ index a07d7cf3e..53101ca43 100644
          let adjusted_len = buf.len().min(MAX_COUNT) as w::DWORD;
          let mut bytes_written: w::DWORD = 0;
          // SAFETY: FFI; `fd.cast()` is a valid HANDLE, buf valid for `adjusted_len`.
-@@ -5314,12 +5415,12 @@ pub mod linux {
+@@ -5314,12 +5328,12 @@ pub mod linux {
      // `time_t == c_long == i64` on every libc, so spell it `i64` on musl to
      // sidestep the deprecation without changing layout. The `const _` below
      // guards the layout-identical-to-`libc::timespec` invariant.
@@ -216,7 +216,7 @@ index a07d7cf3e..53101ca43 100644
      /// Layout-identical to `libc::timespec` so a `*const timespec` can be
      /// passed straight to `syscall(SYS_futex, ..)`.
      #[repr(C)]
-@@ -6130,10 +6232,31 @@ pub mod RTLD {
+@@ -6130,14 +6144,35 @@ pub mod RTLD {
      pub const LOCAL: i32 = 0;
  }
  
@@ -225,13 +225,13 @@ index a07d7cf3e..53101ca43 100644
  pub fn dlopen(filename: &ZStr, flags: i32) -> Option<*mut c_void> {
 -    #[cfg(unix)]
 +    #[cfg(all(unix, not(target_env = "ohos")))]
-+    {
-+        // SAFETY: filename is NUL-terminated.
-+        let p = unsafe { libc::dlopen(filename.as_ptr(), flags) };
-+        if p.is_null() { None } else { Some(p) }
-+    }
-+    #[cfg(target_env = "ohos")]
      {
+         // SAFETY: filename is NUL-terminated.
+         let p = unsafe { libc::dlopen(filename.as_ptr(), flags) };
+         if p.is_null() { None } else { Some(p) }
+     }
++    #[cfg(target_env = "ohos")]
++    {
 +        fn ensure_signed(path: &ZStr) {
 +            use std::process::Command;
 +            let path_str = path.as_cstr().to_str().unwrap_or("");
@@ -247,10 +247,14 @@ index a07d7cf3e..53101ca43 100644
 +                .output();
 +        }
 +        ensure_signed(filename);
-         // SAFETY: filename is NUL-terminated.
-         let p = unsafe { libc::dlopen(filename.as_ptr(), flags) };
-         if p.is_null() { None } else { Some(p) }
-@@ -6146,7 +6269,24 @@ pub fn dlopen(filename: &ZStr, flags: i32) -> Option<*mut c_void> {
++        // SAFETY: filename is NUL-terminated.
++        let p = unsafe { libc::dlopen(filename.as_ptr(), flags) };
++        if p.is_null() { None } else { Some(p) }
++    }
+     #[cfg(windows)]
+     {
+         let _ = flags;
+@@ -6146,7 +6181,24 @@ pub fn dlopen(filename: &ZStr, flags: i32) -> Option<*mut c_void> {
          if p.is_null() { None } else { Some(p.cast()) }
      }
  }
@@ -276,7 +280,7 @@ index a07d7cf3e..53101ca43 100644
  pub fn dlsym_impl(handle: Option<*mut c_void>, name: &ZStr) -> Option<*mut c_void> {
      #[cfg(unix)]
      {
-@@ -7277,9 +7425,12 @@ pub fn read_nonblocking(fd: Fd, buf: &mut [u8]) -> Maybe<usize> {
+@@ -7277,9 +7329,12 @@ pub fn read_nonblocking(fd: Fd, buf: &mut [u8]) -> Maybe<usize> {
          if rc < 0 {
              let e = last_errno();
              match e {
@@ -291,7 +295,7 @@ index a07d7cf3e..53101ca43 100644
                      // actually readable now; otherwise return retry (EAGAIN).
                      return match bun_core::is_readable(fd) {
                          bun_core::Pollable::Ready | bun_core::Pollable::Hup => read(fd, buf),
-@@ -7307,9 +7458,12 @@ pub fn write_nonblocking(fd: Fd, buf: &[u8]) -> Maybe<usize> {
+@@ -7307,9 +7362,12 @@ pub fn write_nonblocking(fd: Fd, buf: &[u8]) -> Maybe<usize> {
          if rc < 0 {
              let e = last_errno();
              match e {
@@ -306,7 +310,7 @@ index a07d7cf3e..53101ca43 100644
                      return match bun_core::is_writable(fd) {
                          bun_core::Pollable::Ready | bun_core::Pollable::Hup => write(fd, buf),
                          _ => {
-@@ -8902,20 +9065,19 @@ pub fn exists(path: &[u8]) -> bool {
+@@ -8902,20 +8960,19 @@ pub fn exists(path: &[u8]) -> bool {
      let z = ZStr::from_buf(&buf.0[..], path.len());
      exists_z(z)
  }
@@ -333,7 +337,7 @@ index a07d7cf3e..53101ca43 100644
          Err(e) if e.get_errno() == E::EISDIR => {
              #[cfg(unix)]
              // SAFETY: destination is NUL-terminated.
-@@ -9250,7 +9414,7 @@ fn qw_set_fd(qw: &mut bun_core::output::QuietWriter, fd: Fd) {
+@@ -9250,7 +9307,7 @@ fn qw_set_fd(qw: &mut bun_core::output::QuietWriter, fd: Fd) {
  fn fd_write_all_quiet(fd: Fd, mut bytes: &[u8]) -> bool {
      while !bytes.is_empty() {
          match write(fd, bytes) {

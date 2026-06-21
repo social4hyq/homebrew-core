@@ -1,12 +1,12 @@
 diff --git a/scripts/build/deps/webkit.ts b/scripts/build/deps/webkit.ts
-index c47ae1ba6..c04d9a9c6 100644
+index c47ae1ba6d..fc9ced0318 100644
 --- a/scripts/build/deps/webkit.ts
 +++ b/scripts/build/deps/webkit.ts
 @@ -43,6 +43,7 @@ export const WEBKIT_VERSION = "6d586e293f008f0e74e5697611a379b1b24815c9";
   *   like the old cmake — avoids debug/release mixing.
   */
  
-+import { existsSync } from "node:fs";
++import { existsSync, mkdirSync, symlinkSync, cpSync, readFileSync, writeFileSync } from "node:fs";
  import { homedir } from "node:os";
  import { join, resolve } from "node:path";
  import type { Config } from "../config.ts";
@@ -39,7 +39,51 @@ index c47ae1ba6..c04d9a9c6 100644
      return ["lib/libicudata.a", "lib/libicui18n.a", "lib/libicuuc.a"];
    }
    return []; // darwin: system ICU
-@@ -253,7 +256,7 @@ export const webkit: Dependency = {
+@@ -193,6 +196,43 @@ export const webkit: Dependency = {
+   versionMacro: "WEBKIT",
+ 
+   source: cfg => {
++    // OHOS: use locally installed bun-webkit (formula) instead of downloading.
++    // The build environment pre-populates the cache from OHOS_WEBKIT_ROOT.
++    if (cfg.ohos) {
++      const destDir = prebuiltDestDir(cfg);
++      const identity = `${cfg.webkitVersion}${prebuiltSuffix(cfg)}`;
++      const identityPath = join(destDir, ".identity");
++      const ohosRoot = process.env.OHOS_WEBKIT_ROOT;
++      // Check if cache was pre-populated by the formula; skip if identity matches.
++      if (!existsSync(identityPath) || readFileSync(identityPath, "utf-8").trim() !== identity) {
++        if (!ohosRoot) {
++          throw new Error(
++            "OHOS build requires OHOS_WEBKIT_ROOT env var pointing to bun-webkit installation.\n" +
++            "  Install with: brew install bun-webkit"
++          );
++        }
++        mkdirSync(destDir, { recursive: true });
++        mkdirSync(join(destDir, "lib"), { recursive: true });
++        mkdirSync(join(destDir, "include"), { recursive: true });
++        for (const lib of ["libJavaScriptCore.a", "libWTF.a", "libbmalloc.a"]) {
++          symlinkSync(join(ohosRoot, "lib", lib), join(destDir, "lib", lib));
++        }
++        const inc = join(ohosRoot, "include", "webkit");
++        symlinkSync(join(inc, "JavaScriptCore"), join(destDir, "include", "JavaScriptCore"));
++        symlinkSync(join(inc, "wtf"), join(destDir, "include", "wtf"));
++        symlinkSync(join(inc, "bmalloc"), join(destDir, "include", "bmalloc"));
++        const cmakeCfg = join(inc, "cmakeconfig.h");
++        if (existsSync(cmakeCfg)) cpSync(cmakeCfg, join(destDir, "include", "cmakeconfig.h"));
++        writeFileSync(identityPath, identity);
++      }
++      return {
++        kind: "prebuilt",
++        identity,
++        destDir,
++        url: ohosRoot ? `file://${ohosRoot}` : `file:///dev/null`, // Already set up; fetch checks identity first
++      };
++    }
++
+     if (cfg.webkit === "prebuilt") {
+       const src: Source = {
+         kind: "prebuilt",
+@@ -253,7 +293,7 @@ export const webkit: Dependency = {
      // -no-pie rides along in CMAKE_C_FLAGS so try_compile() probes link on
      // PIE-default distros — without it the driver still passes -pie and the
      // -fno-pic probe object fails R_X86_64_32S relocation, killing FindThreads.
@@ -48,7 +92,7 @@ index c47ae1ba6..c04d9a9c6 100644
      if (cfg.lto) optFlags.push("-flto=thin");
      if (cfg.pgoGenerate) optFlags.push(`-fprofile-generate=${cfg.pgoGenerate}`);
      if (cfg.pgoUse) {
-@@ -321,12 +324,30 @@ export const webkit: Dependency = {
+@@ -321,12 +361,30 @@ export const webkit: Dependency = {
              CMAKE_FIND_ROOT_PATH_MODE_INCLUDE: "BOTH",
            }
          : {}),
@@ -80,7 +124,7 @@ index c47ae1ba6..c04d9a9c6 100644
        PORT: "JSCOnly",
        ENABLE_STATIC_JSC: "ON",
        USE_THIN_ARCHIVES: "OFF",
-@@ -386,6 +407,41 @@ export const webkit: Dependency = {
+@@ -386,6 +444,41 @@ export const webkit: Dependency = {
        };
      }
  
