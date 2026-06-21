@@ -12,7 +12,7 @@ class Jq < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "18968d137f9d561b0a8273f37eb254ce961b41bc11cc9f4c0812e370f7579d8e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "224c55bf138733583787eff2f60a1653b0b92786ec066593fd443bdbd4deafd0"
   end
 
   head do
