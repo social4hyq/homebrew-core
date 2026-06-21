@@ -1,13 +1,13 @@
 class Joker < Formula
   desc "Small Clojure interpreter, linter and formatter"
   homepage "https://joker-lang.org/"
-  url "https://github.com/candid82/joker/archive/refs/tags/v1.8.1.tar.gz"
-  sha256 "40f2f4989107c3ee070f18b55ce7c51ef6adceba44d8519b77bff478861ebda3"
+  url "https://github.com/candid82/joker/archive/refs/tags/v1.8.2.tar.gz"
+  sha256 "51281b77741f61cc8fbe8f11b9c6da49cadebc66565f9be91f71530d562db441"
   license "EPL-1.0"
   head "https://github.com/candid82/joker.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4bc9063c9178868459a8fd9924f85c038dce327bd465582f37f3a17b2d0f3c19"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a76e9e18fe2de20ff4c9ffca7e7c0128efd9cd7d52ff7b3ce14a83aa8f7d1e07"
   end
 
   depends_on "go" => :build
