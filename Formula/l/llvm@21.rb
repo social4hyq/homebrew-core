@@ -24,6 +24,9 @@ class LlvmAT21 < Formula
   depends_on "cmake"    => :build
   depends_on "ninja"    => :build
   depends_on "ohos-sdk"
+  # 运行时依赖:lld 链 libxml2/zlib(keg_only 环境需显式声明,否则 loader 找不到 .so)
+  depends_on "libxml2"
+  depends_on "zlib"
 
   # HarmonyOS code-sign support (adds CodeSign.cpp to lld/ELF).  Version-specific
   patch :p1 do
