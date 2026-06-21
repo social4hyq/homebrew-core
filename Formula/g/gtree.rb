@@ -1,13 +1,13 @@
 class Gtree < Formula
   desc "Generate directory trees and directories using Markdown or programmatically"
   homepage "https://ddddddo.github.io/gtree/"
-  url "https://github.com/ddddddO/gtree/archive/refs/tags/v1.14.1.tar.gz"
-  sha256 "a5e1d360ab3da8973aa3b2010233479d2895101ee8c6023ab320557ee644cded"
+  url "https://github.com/ddddddO/gtree/archive/refs/tags/v1.14.2.tar.gz"
+  sha256 "03b2b060e2f135b6ec4239b3c6b11061797ac13213383fdbf69478e3100db7e3"
   license "BSD-2-Clause"
   head "https://github.com/ddddddO/gtree.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2cae57c33ca15f701b7e24ef2db3698d8365cd3c80fc4c57b3977d929fc4f969"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f0900098f32076afec2850b8a6dd672ecc584c9032b13973dce0ca5a709b2621"
   end
 
   depends_on "go" => :build
