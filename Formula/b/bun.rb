@@ -19,7 +19,7 @@ class Bun < Formula
 
   bottle do
     root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89c39e275fbff3211bcf3c7e445c9cd8ddbedda8ea2d5d10d3f24613c91e391d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c79bd44f1efb37ab04e9e98d3f87b7622f814b34cd6d6e3032b1618586b0e8ff"
   end
 
   # ── 依赖(全部裸名,毕业 harmonybrew/core 时零改动)──
@@ -355,9 +355,9 @@ class Bun < Formula
     ENV.prepend_path "PATH", llvm.opt_bin
     system "bun", "install"
 
-    # ── Rust nightly(装到 libexec,设环境让 bun 找到)──
+    # ── Rust nightly(装到 buildpath,仅构建期用。不进 bottle)──
     # OHOS Tier 3 target:bun 用 -Zbuild-std 编 std,需 rust-src(完整 tarball 含)。
-    rust_home = libexec/"rust-nightly"
+    rust_home = buildpath/"rust-nightly"
     rust_home.mkpath
     resource("rust-nightly").stage do
       # host tarball 含 rustc/cargo/rust-std,用 install.sh 装到 rust_home。
