@@ -1,8 +1,8 @@
 class Jq < Formula
   desc "Lightweight and flexible command-line JSON processor"
   homepage "https://jqlang.github.io/jq/"
-  url "https://github.com/jqlang/jq/releases/download/jq-1.8.1/jq-1.8.1.tar.gz"
-  sha256 "2be64e7129cecb11d5906290eba10af694fb9e3e7f9fc208a311dc33ca837eb0"
+  url "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-1.8.2.tar.gz"
+  sha256 "71b8d6e8f5fe81f6c6d0d110e3892251f6ce76ed095abd315e26e6e1193af3af"
   license "MIT"
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class Jq < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "18968d137f9d561b0a8273f37eb254ce961b41bc11cc9f4c0812e370f7579d8e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "224c55bf138733583787eff2f60a1653b0b92786ec066593fd443bdbd4deafd0"
   end
 
   head do
