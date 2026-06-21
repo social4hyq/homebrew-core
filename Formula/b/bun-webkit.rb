@@ -19,11 +19,10 @@ class BunWebkit < Formula
   # 不能自动 bump,否则与 bun 的 ABI 不匹配。
   no_autobump! because: "pinned to bun's WEBKIT_VERSION"
 
-  # bottle: 尚未出,先走 build-from-source。出 bottle 时取消注释 + 填 sha256。
-  # bottle do
-  #   root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-webkit-v6d586e293f"
-  #   sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
-  # end
+  bottle do
+    root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-webkit-v6d586e293f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b24f668229c547b3677a87e2cd6948f0b83d6654e0e1dba2b3283d7fafbbf682"
+  end
 
   keg_only "WebKit static archives are consumed in-tree by Bun, not linked system-wide"
 
