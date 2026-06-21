@@ -1,0 +1,17 @@
+# 构建产物 / 外部源码 / 大文件
+bun-src/
+build/
+runs/
+logs/
+*.heapsnapshot
+*.bun-build
+app-with-resources
+hello-standalone*
+*.tar.gz
+prebuilt/
+
+# 临时/验证产物
+.verify-wt/
+.arts/
+test.db
+append_output.txt

@@ -1,0 +1,16 @@
+diff --git a/scripts/utils.mjs b/scripts/utils.mjs
+index 9637dbff1..4052807cc 100755
+--- a/scripts/utils.mjs
++++ b/scripts/utils.mjs
+@@ -1478,6 +1478,11 @@ export function tmpdir() {
+   }
+ 
+   if (isMacOS || isLinux) {
++    // Check TMPDIR env var first (user override for read-only /tmp, e.g. OHOS)
++    const userTmp = process.env["TMPDIR"] || process.env["TEMP"] || process.env["TMP"];
++    if (userTmp) {
++      return userTmp;
++    }
+     if (existsSync("/tmp")) {
+       return "/tmp";
+     }

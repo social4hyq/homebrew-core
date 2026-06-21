@@ -1,0 +1,59 @@
+diff --git a/src/runtime/api/bun/Terminal.rs b/src/runtime/api/bun/Terminal.rs
+index 18bc83151..0059bab09 100644
+--- a/src/runtime/api/bun/Terminal.rs
++++ b/src/runtime/api/bun/Terminal.rs
+@@ -784,7 +784,9 @@ pub type OpenPtyFn = unsafe extern "C" fn(
+     winp: *const Winsize,
+ ) -> c_int;
+ 
+-/// Dynamic loading of openpty on Linux (it's in libutil which may not be linked)
++/// Dynamic loading of openpty on Linux (it's in libutil which may not be linked).
++/// OHOS: openpty lives in libc.so; the libc.so entry below + RTLD_DEFAULT
++/// fallback covers it (verified by ohos-preflight i17_openpty_libc 2026-06-15).
+ #[cfg(any(target_os = "linux", target_os = "android"))]
+ mod lib_util {
+     use super::*;
+@@ -805,11 +807,13 @@ mod lib_util {
+         }
+         LOADED.store(true, Relaxed);
+ 
+-        // Try libutil.so first (most common), then libutil.so.1
+-        const LIB_NAMES: [&ZStr; 3] = [
++        // Try libutil.so first (most common), then libutil.so.1,
++        // libc.so.6 (glibc), then libc.so (musl/ohos).
++        const LIB_NAMES: [&ZStr; 4] = [
+             bun_core::zstr!("libutil.so"),
+             bun_core::zstr!("libutil.so.1"),
+             bun_core::zstr!("libc.so.6"),
++            bun_core::zstr!("libc.so"),
+         ];
+         for lib_name in LIB_NAMES {
+             if let Some(h) = sys::dlopen(lib_name, sys::RTLD::LAZY) {
+@@ -821,7 +825,15 @@ mod lib_util {
+     }
+ 
+     pub(super) fn get_open_pty() -> Option<OpenPtyFn> {
+-        sys::dlsym_with_handle!(OpenPtyFn, "openpty", get_handle())
++        // First try the handle from dlopen (specific library)
++        if let Some(f) = sys::dlsym_with_handle!(OpenPtyFn, "openpty", get_handle()) {
++            return Some(f);
++        }
++        // Fallback: RTLD_DEFAULT — covers musl/OHOS where openpty is in libc
++        // but some runtimes may not expose it through a dlopen'd handle.
++        let name = c"openpty";
++        let p = unsafe { libc::dlsym(core::ptr::null_mut(), name.as_ptr()) };
++        if p.is_null() { None } else { Some(unsafe { core::mem::transmute(p) }) }
+     }
+ }
+ 
+@@ -847,8 +859,8 @@ fn get_open_pty_fn() -> Option<OpenPtyFn> {
+         return Some(openpty);
+     }
+ 
+-    // On Linux, openpty is in libutil, which may not be linked
+-    // Load it dynamically via dlopen
++    // On Linux/Android/OHOS, openpty is in libutil (glibc) or libc (musl/OHOS).
++    // Load it dynamically via dlopen.
+     #[cfg(any(target_os = "linux", target_os = "android"))]
+     {
+         return lib_util::get_open_pty();

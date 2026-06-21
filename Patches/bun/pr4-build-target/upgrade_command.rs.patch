@@ -1,0 +1,19 @@
+diff --git a/src/runtime/cli/upgrade_command.rs b/src/runtime/cli/upgrade_command.rs
+index 5c399eda8..dbcf5dfc5 100644
+--- a/src/runtime/cli/upgrade_command.rs
++++ b/src/runtime/cli/upgrade_command.rs
+@@ -104,10 +104,12 @@ impl Version {
+     };
+     pub const TRIPLET: &'static str =
+         const_format::concatcp!(Version::PLATFORM_LABEL, "-", Version::ARCH_LABEL);
+-    const SUFFIX_ABI: &'static str = if Environment::IS_MUSL {
+-        "-musl"
++    const SUFFIX_ABI: &'static str = if Environment::IS_OHOS {
++        "-ohos"
+     } else if Environment::IS_ANDROID {
+         "-android"
++    } else if Environment::IS_MUSL {
++        "-musl"
+     } else {
+         ""
+     };

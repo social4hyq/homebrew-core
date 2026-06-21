@@ -1,0 +1,53 @@
+diff --git a/src/runtime/cli/build_command.rs b/src/runtime/cli/build_command.rs
+index 49e22af83..bf4a35a70 100644
+--- a/src/runtime/cli/build_command.rs
++++ b/src/runtime/cli/build_command.rs
+@@ -975,6 +975,48 @@ impl BuildCommand {
+                     }
+                 }
+ 
++                // OHOS: sign the compiled binary so it can execute (seccomp policy).
++                #[cfg(target_env = "ohos")]
++                {
++                    use std::os::unix::ffi::OsStrExt;
++                    let outfile_path = if root_path.is_empty() || root_path == b"." {
++                        outfile.to_vec()
++                    } else {
++                        let mut full = root_path.to_vec();
++                        if !full.ends_with(b"/") {
++                            full.push(b'/');
++                        }
++                        full.extend_from_slice(outfile);
++                        full
++                    };
++                    if !outfile_path.is_empty() {
++                        let outfile_os = std::ffi::OsStr::from_bytes(&outfile_path[..]);
++                        // Check if already signed — binary-sign-tool adds a "codesign" section
++                        let already_signed = std::process::Command::new("readelf")
++                            .arg("-S")
++                            .arg(outfile_os)
++                            .output()
++                            .map(|o| String::from_utf8_lossy(&o.stdout).contains("codesign"))
++                            .unwrap_or(false);
++                        if !already_signed {
++                            // binary-sign-tool sign first, then chmod
++                            let _ = std::process::Command::new("binary-sign-tool")
++                                .arg("sign")
++                                .arg("-inFile")
++                                .arg(outfile_os)
++                                .arg("-outFile")
++                                .arg(outfile_os)
++                                .arg("-selfSign")
++                                .arg("1")
++                                .output();
++                        }
++                        let _ = std::process::Command::new("chmod")
++                            .arg("755")
++                            .arg(outfile_os)
++                            .output();
++                    }
++                }
++
+                 let compiled_elapsed = ((bun_core::time::nano_timestamp() - bundled_end) as i64)
+                     / (bun_core::time::NS_PER_MS as i64);
+                 let compiled_elapsed_digit_count =
