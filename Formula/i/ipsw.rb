@@ -1,8 +1,8 @@
 class Ipsw < Formula
   desc "Research tool for iOS & macOS devices"
   homepage "https://blacktop.github.io/ipsw"
-  url "https://github.com/blacktop/ipsw/archive/refs/tags/v3.1.695.tar.gz"
-  sha256 "bbc8294818e0adb0a132395f476c759a67731af2f3763d51462980c188f2424a"
+  url "https://github.com/blacktop/ipsw/archive/refs/tags/v3.1.696.tar.gz"
+  sha256 "94242c6d4366b96152335d9953515e0446475670c257e3a770d12158a5934b38"
   license "MIT"
   head "https://github.com/blacktop/ipsw.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Ipsw < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c4b398e7e07cc86135a9ecf8e152173d09b91e6bcc6b8982ca398c40a7319fb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f8cc84545c7165131814e353768b75126750e63201e9a358c23b801b6fecc7e"
   end
 
   depends_on "go" => :build
