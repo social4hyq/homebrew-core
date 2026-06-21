@@ -17,11 +17,10 @@ class Bun < Formula
     regex(/^bun-v?(\d+(?:\.\d+)+)$/i)
   end
 
-  # bottle: 尚未出,先 build-from-source。出 bottle 时取消注释。
-  #   bottle do
-  #     root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-v1.3.14"
-  # sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
-  # end
+  bottle do
+    root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "89c39e275fbff3211bcf3c7e445c9cd8ddbedda8ea2d5d10d3f24613c91e391d"
+  end
 
   # ── 依赖(全部裸名,毕业 harmonybrew/core 时零改动)──
   depends_on "bun-bootstrap" => :build   # 自举:`bun bd` 本身是 bun 脚本
