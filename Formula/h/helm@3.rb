@@ -2,8 +2,8 @@ class HelmAT3 < Formula
   desc "Kubernetes package manager"
   homepage "https://helm.sh/"
   url "https://github.com/helm/helm.git",
-      tag:      "v3.21.1",
-      revision: "c56dd0095fd76da5d7b30ecdf506103e7f26745e"
+      tag:      "v3.21.2",
+      revision: "125963406833fe0525be91f46c8b5b0f22fb9e32"
   license "Apache-2.0"
   compatibility_version 1
 
@@ -13,7 +13,7 @@ class HelmAT3 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9803682adc08c928cad25717aaa7aa4b81632de235b87fe6054f4f291609f23b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "95f0ad9f0071e385dd5995d3c88b7fd4efd5b8fd95e3c20cc648f48e68b296ba"
   end
 
   keg_only :versioned_formula
