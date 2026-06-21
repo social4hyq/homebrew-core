@@ -16,10 +16,11 @@ class BunCanary < Formula
     regex(/bun-v?canary\.?(.+)/i)
   end
 
-  bottle do
-    root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-canary-v1.4.0-a4cd4d2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
-  end
+  # bottle: 尚未出,先 build-from-source。出 bottle 时取消注释。
+  #   bottle do
+  #     root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-canary-v1.4.0-a4cd4d2"
+  # sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
+  # end
 
   keg_only "canary build; use `bun` for the stable command"
 

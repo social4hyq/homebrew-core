@@ -1,5 +1,5 @@
 diff --git a/src/sys/lib.rs b/src/sys/lib.rs
-index a07d7cf3eb..8f8a651f67 100644
+index a07d7cf3eb..b4427189c1 100644
 --- a/src/sys/lib.rs
 +++ b/src/sys/lib.rs
 @@ -2178,18 +2178,18 @@ mod posix_impl {
@@ -310,7 +310,7 @@ index a07d7cf3eb..8f8a651f67 100644
                      return match bun_core::is_writable(fd) {
                          bun_core::Pollable::Ready | bun_core::Pollable::Hup => write(fd, buf),
                          _ => {
-@@ -8902,20 +8960,19 @@ pub fn exists(path: &[u8]) -> bool {
+@@ -8902,20 +8960,17 @@ pub fn exists(path: &[u8]) -> bool {
      let z = ZStr::from_buf(&buf.0[..], path.len());
      exists_z(z)
  }
@@ -329,15 +329,13 @@ index a07d7cf3eb..8f8a651f67 100644
      destination: &ZStr,
  ) -> core::result::Result<(), bun_core::Error> {
 -    match renameat_concurrently_without_fallback(from_dir, filename, to_dir, destination) {
-+    // TODO(port): renameatConcurrentlyWithoutFallback (renameat2 NOREPLACE →
-+    // EXCHANGE → deleteTree) — sys.zig:2480. Plain `renameat` for now.
 +    match renameat(from_dir, filename, to_dir, destination) {
          Ok(()) => Ok(()),
 -        // allow over-writing an empty directory
          Err(e) if e.get_errno() == E::EISDIR => {
              #[cfg(unix)]
              // SAFETY: destination is NUL-terminated.
-@@ -9250,7 +9307,7 @@ fn qw_set_fd(qw: &mut bun_core::output::QuietWriter, fd: Fd) {
+@@ -9250,7 +9305,7 @@ fn qw_set_fd(qw: &mut bun_core::output::QuietWriter, fd: Fd) {
  fn fd_write_all_quiet(fd: Fd, mut bytes: &[u8]) -> bool {
      while !bytes.is_empty() {
          match write(fd, bytes) {

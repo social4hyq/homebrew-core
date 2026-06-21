@@ -8,7 +8,7 @@ class BunBootstrap < Formula
   # 等同 rust 的 bootstrap compiler / ghc 的 ghc-bootstrap。
   url "https://github.com/social4hyq/homebrew-core/releases/download/bun-bootstrap-v1.4.0-a4cd4d2/bun-ohos-aarch64-1.4.0-a4cd4d2.tar.gz"
   version "1.4.0-a4cd4d2"
-  sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+  sha256 "80d88257496b634b55b61e3b1dd82b902b8f6669b74547931c582ed67437f008"
 
   # 预编译二进制,无源码构建步骤;仅构建期被 bun/bun-canary 引用,不进入运行时。
   keg_only "bootstrap only; not for direct use"
@@ -16,11 +16,14 @@ class BunBootstrap < Formula
   depends_on "ohos-sdk"
 
   def install
-    # tarball 内是 bun 二进制(未签名)。OHOS 要求 ELF 签名才能执行。
+    # tarball 内是 bun 二进制(LLD 已嵌 --code-sign 段,无 binary-sign-tool 签名)。
+    # OHOS 要求 ELF 同时具备 LLD code-sign + binary-sign-tool 证书才能执行。
     libexec.install Dir["*"]
 
     sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
     if sign_tool.exist? && (libexec/"bun").exist?
+      ohai "Stripping existing .codesign section (from LLD)"
+      system "llvm-objcopy", "--remove-section=.codesign", libexec/"bun"
       ohai "Self-signing bootstrap bun"
       system sign_tool, "sign", "-selfSign", "1",
              "-inFile", libexec/"bun", "-outFile", libexec/"bun.signed"

@@ -1,12 +1,9 @@
 diff --git a/src/install/PackageInstaller.rs b/src/install/PackageInstaller.rs
-index 6533c9e3ca..54a36c945b 100644
+index 6533c9e3ca..d4fa2e0b77 100644
 --- a/src/install/PackageInstaller.rs
 +++ b/src/install/PackageInstaller.rs
-@@ -177,9 +177,10 @@ impl NodeModulesFolder {
-         root_node_modules_dir: &Dir,
-         file_path: &ZStr,
+@@ -179,7 +179,7 @@ impl NodeModulesFolder {
      ) -> Result<bun_sys::file::ReadToEndResult, bun_core::Error> {
-+        // TODO(port): narrow error set
          let file = self.open_file(root_node_modules_dir, file_path)?;
          let res = file.read_to_end_small();
 -        let _ = file.close(); // close error is non-actionable
@@ -14,7 +11,7 @@ index 6533c9e3ca..54a36c945b 100644
          Ok(match res {
              Ok(bytes) => bun_sys::file::ReadToEndResult { bytes, err: None },
              Err(e) => bun_sys::file::ReadToEndResult {
-@@ -1763,6 +1764,18 @@ impl<'a> PackageInstaller<'a> {
+@@ -1763,6 +1763,18 @@ impl<'a> PackageInstaller<'a> {
                  }
              };
  
@@ -33,7 +30,7 @@ index 6533c9e3ca..54a36c945b 100644
              match install_result {
                  package_install::InstallResult::Success => {
                      let is_duplicate = self.successfully_installed.is_set(package_id as usize);
-@@ -2338,3 +2351,54 @@ impl<'a> PackageInstaller<'a> {
+@@ -2338,3 +2350,54 @@ impl<'a> PackageInstaller<'a> {
          );
      }
  }
