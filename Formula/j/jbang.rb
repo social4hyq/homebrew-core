@@ -11,7 +11,7 @@ class Jbang < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "20e21e7f82b2853b62dead6e50a88138356dfdcb318d6965adc26f090507be48"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0da456e593c177eaabaaee02bc87aba3990c1b262d23b993746809aff1596c0"
   end
 
   depends_on "openjdk"
