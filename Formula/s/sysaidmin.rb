@@ -9,12 +9,7 @@ class Sysaidmin < Formula
   revision 18
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "c22c525396c3669c29ce249dbaf3ecc835b5a0516b6f7104c88949ae30cbeb41"
-    sha256 cellar: :any, arm64_sequoia: "90dc2a4706ef5cef8bb2fa3b8607acd1f4c6a0d11344e94f41329575f0b5bc67"
-    sha256 cellar: :any, arm64_sonoma:  "8ef5a1cd213d347d1c5901cf50b04e0505320284eea5ec4a9c96898f3e93944c"
-    sha256 cellar: :any, sonoma:        "70bc8ce2d92615bbc0fb66af78ba7b3d2721b058ea3bdb172ca6a328f1fd7238"
-    sha256 cellar: :any, arm64_linux:   "62ae4acf7e9af5f12a50dc1cf98828099855e7847e38962486ea296deadfbf36"
-    sha256 cellar: :any, x86_64_linux:  "f6c17553b09510ede9b99112f1ab87f2c9d9cfa22438ec954325a031dafd1722"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a54eaaf17da698946807cdad1270cd427564febbbbf76c6aacc6487c29fa0e6"
   end
 
   depends_on "rust" => :build # for jiter
