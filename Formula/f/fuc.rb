@@ -7,7 +7,7 @@ class Fuc < Formula
   head "https://github.com/supercilex/fuc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "afb23e9643e0508867ef2b2b21c27001c7f241e9e1420c62bdaa9f2ff01f7036"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad5eba8e76e87734f872ae87cab488159d2ed6fbc2724553e5757d82538f5da6"
   end
 
   depends_on "rust" => :build
