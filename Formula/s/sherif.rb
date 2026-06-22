@@ -1,12 +1,12 @@
 class Sherif < Formula
   desc "Opinionated, zero-config linter for JavaScript monorepos"
   homepage "https://github.com/QuiiBz/sherif"
-  url "https://github.com/QuiiBz/sherif/archive/refs/tags/v1.11.1.tar.gz"
-  sha256 "4069bb60326caf7d50d06d15e85e838707206f061319461867101046e4fe01b8"
+  url "https://github.com/QuiiBz/sherif/archive/refs/tags/v1.12.0.tar.gz"
+  sha256 "db9449256cfedc96c797237cc0ace54df20b8380697acef3df78787132c35d2a"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d111a3e72757b86303fe7390c45786e3f93821129e5ad5d6b492685c0ca57a53"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b3318035abed49347567b09fff8cf2b30aea4380884658fce7c1937d5d7f29a6"
   end
 
   depends_on "rust" => :build
