@@ -7,7 +7,7 @@ class Dalfox < Formula
   head "https://github.com/hahwul/dalfox.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "722c8ef0edfe1cf68fcedcc60924e60d91d71eaa6e68ebf1176ee2066a6980e2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "84b7867a4f5e3132fdde87211cd837a7c1363db1f51eca2e048f7228d6056850"
   end
 
   depends_on "rust" => :build
