@@ -6,7 +6,7 @@ class Sherif < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d111a3e72757b86303fe7390c45786e3f93821129e5ad5d6b492685c0ca57a53"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b3318035abed49347567b09fff8cf2b30aea4380884658fce7c1937d5d7f29a6"
   end
 
   depends_on "rust" => :build
