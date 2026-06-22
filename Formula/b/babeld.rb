@@ -12,7 +12,7 @@ class Babeld < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5796e59a2102a1444ee88466ae77ec3166c218ae3459de283f378da77a26ae2e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f4350ac2d2c7c1bc76faf409b86d40f51dceb305cd2be1e027d19df4dbe156a2"
   end
 
   def install
