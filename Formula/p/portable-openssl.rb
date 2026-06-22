@@ -3,31 +3,19 @@ require File.expand_path("../../Abstract/portable-formula", __dir__)
 class PortableOpenssl < PortableFormula
   desc "Cryptography and SSL/TLS Toolkit"
   homepage "https://openssl.org/"
-  url "https://github.com/openssl/openssl/releases/download/openssl-4.0.1/openssl-4.0.1.tar.gz"
-  mirror "https://www.openssl.org/source/openssl-4.0.1.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/openssl-4.0.1.tar.gz"
-  sha256 "2db3f3a0d6ea4b59e1f094ace2c8cd536dffb87cdc39084c5afa1e6f7f37dd09"
+  url "https://github.com/openssl/openssl/releases/download/openssl-3.6.2/openssl-3.6.2.tar.gz"
+  mirror "https://www.openssl.org/source/openssl-3.6.2.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/openssl-3.6.2.tar.gz"
+  sha256 "aaf51a1fe064384f811daeaeb4ec4dce7340ec8bd893027eee676af31e83a04f"
   license "Apache-2.0"
 
   livecheck do
-    url :stable
-    strategy :github_releases do |json, regex|
-      json.filter_map do |release|
-        next if release["draft"] || release["prerelease"]
-
-        match = release["tag_name"]&.match(regex)
-        next if match.blank?
-
-        version = Version.new(match[1])
-        next if version.patch.to_i.zero?
-
-        version
-      end
-    end
+    url "https://openssl-library.org/source/"
+    regex(/href=.*?openssl[._-]v?(3(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "caf0946a248646877a9804d382f677cc50b1339ea2f8ec747de18ae4d80c750e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "82f83860d3da4a5ba311983cc28a991127c9257ae7b038515116a376223efde0"
   end
 
   resource "cacert" do
