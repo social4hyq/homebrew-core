@@ -12,7 +12,7 @@ class Gmssl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b872b88de858722876178b047ec002f8771d2b7bbd3a8578f023da8a77bf52e2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c77de6532d91925b26efa460530e34141582ba6e487e7b9caf9fe1fae8ccffcf"
   end
 
   depends_on "cmake" => :build
