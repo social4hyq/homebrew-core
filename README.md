@@ -14,11 +14,14 @@ HarmonyOS (OHOS aarch64) Homebrew tap — **验证场**。所有 formula 先在�
 |---|---|---|---|
 | `llvm@21` | 21.1.8 | OHOS 补丁版 clang + lld + multiarch runtime libs | 验证中 |
 | `icu4c@78` | 78.3 | Unicode 库(用 llvm@21 重编,消除 stale ABI 标签) | **已在官方 core**(本仓仅验证新 bottle) |
-| `bun-bootstrap` | 1.4.0-a4cd4d2 | 预编译 bun,自举构建用(L3 driver) | 验证中 |
+| `bun-bootstrap` | 1.4.0-a4cd4d2 | 预编译 bun,自举构建用(L3 driver) | 已发 bottle |
 | `bun-webkit` | 6d586e293f | JavaScriptCore/WTF/bmalloc 静态库(bun 专用 fork) | 验证中 |
 | `bun` | 1.3.14 | bun 稳定版 | 验证中(毕业目标) |
 | `bun-canary` | 1.4.0-a4cd4d2 | bun canary 滚动版(`keg_only`,**不毕业**) | 仅验证 |
-| `bun-pty` | 0.4.10 | bun-pty 的 `librust_pty.so`(portable-pty nix→0.31,源码构建+签名,`keg_only`) | 验证中 |
+| `bun-pty` | 0.4.10 | bun-pty 的 `librust_pty.so`(portable-pty nix→0.31,源码构建+签名,`keg_only`) | 已发 bottle |
+| `lightningcss` | 1.30.1 | `liblightningcss_node.so`(`lightningcss_node` crate 源码构建+签名,`keg_only`) | 已发 bottle |
+| `tailwindcss-oxide` | 4.1.11 | `libtailwind_oxide.so`(`tailwind-oxide` crate 源码构建+签名,`keg_only`) | 已发 bottle |
+| `opencode` | 1.17.8 | OpenCode(AI 编码代理 CLI,bun compile 单文件 + 嵌入 Web UI) | 已发 bottle |
 
 ## 依赖图
 
@@ -33,6 +36,18 @@ bun            ──build──► bun-bootstrap
 bun-pty        ──build──► rust
   └─► ohos-sdk          (binary-sign-tool 签名 .so)
 
+lightningcss   ──build──► rust
+  └─► ohos-sdk
+
+tailwindcss-oxide ──build──► rust
+  └─► ohos-sdk
+
+opencode       ──build──► bun, bun-pty, lightningcss, tailwindcss-oxide
+  ├─► llvm@21                 (llvm-objcopy 剥 .codesign 段后重签)
+  ├─► ohos-sdk                (binary-sign-tool 签 node_modules 中的 .so/.node)
+  ├─► node                    (node-gyp 头)
+  └─► python@3.14             (构建期)
+
 llvm@21        ──► ohos-sdk
 ```
 
@@ -44,6 +59,7 @@ brew install bun             # 稳定版
 brew install bun-canary      # canary(keg_only,提供 bun-canary 命令)
 brew install llvm@21
 brew install bun-webkit
+brew install opencode        # AI 编码代理 CLI(内含 bun/lightningcss/tailwindcss-oxide 等)
 ```
 
 ## 毕业一个 formula 到官方 core
@@ -69,9 +85,15 @@ Formula/                  # 配方(.rb)
   b/bun-webkit.rb         # JavaScriptCore 静态库
   b/bun.rb                # bun 稳定版
   b/bun-canary.rb         # bun canary(不毕业)
+  b/bun-pty.rb            # bun-pty 的 librust_pty.so
+  l/lightningcss.rb       # lightningcss Node native binding
+  t/tailwindcss-oxide.rb  # tailwindcss/oxide Node native binding
+  o/opencode.rb           # OpenCode CLI(bun compile 单文件)
 Patches/                  # 所有补丁,按 formula 名分子目录
   llvm@21/code-sign.patch
   bun-webkit/*.patch
+  lightningcss/*.patch    # OHOS target + platform 分支
+  opencode/*.patch        # OHOS target + esbuild/rolldown/vite 适配
   bun/                    # bun 源码补丁(按 PR 分组,扁平存放)
     pr3-vendor/*.patch
     pr4-build-target/*.patch
