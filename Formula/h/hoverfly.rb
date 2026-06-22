@@ -7,7 +7,7 @@ class Hoverfly < Formula
   head "https://github.com/SpectoLabs/hoverfly.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "605906e2539e2d45f8dab9daae658203dc0acdb7a41747ff07d0cafe6fc5a488"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b98acfaac7fba80bffa2652af6e832f439789f5c845664ff63c9ef93d05a092c"
   end
 
   depends_on "go" => :build
