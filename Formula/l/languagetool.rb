@@ -13,12 +13,7 @@ class Languagetool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "d6f1f9c9689a9c44484d7bdaeebec9bd9c5ade21f2d0a31bc229cf8862564a0c"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8d8adb5386f04909c226e5655817e944b05c888608e032ded305c3f99618b8c2"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e22c41d9a141788580600f4e5296c9ea75e41f24bb55f3501c3a330fd7e07ae2"
-    sha256 cellar: :any_skip_relocation, sonoma:        "6f7f36ab6f9345d9c0b76e550fdf36b2d3162ebcea8ff93f1f189d4b3142db75"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "f0c7bc609cc7f0f1a820a3726de8b5c768e44035834209ab3d3d3d30e755a1a1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "62426512fa454101a223b9a178e4983f43b48aed3782352c268b04f4e9859273"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0b033d91a65f9139f36e61e240f1efedfba85d5d4d2810cfa9758034408ebc2"
   end
 
   depends_on "maven" => :build
