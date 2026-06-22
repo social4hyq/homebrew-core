@@ -7,7 +7,7 @@ class Worktrunk < Formula
   head "https://github.com/max-sixty/worktrunk.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bccbdb8bc53b693839b35e43e8a542ba8f506b17d5555506a8d7c9679d670ccf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "101a2ffdf9302853c9bd9f5743c71441ea2c967eb395e70e36db577d91431191"
   end
 
   depends_on "rust" => :build
