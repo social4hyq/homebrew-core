@@ -7,7 +7,7 @@ class Keploy < Formula
   head "https://github.com/keploy/keploy.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e52fa0fcf1f95b6c6ab2024a49a92403c3a4764dd3eacee6e853a1940fe0151"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "615b802f75c5d4873e9492b86d4280d1d1472509a55e01ff59d4f5631c44223a"
   end
 
   depends_on "go" => :build
