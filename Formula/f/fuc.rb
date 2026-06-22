@@ -1,8 +1,8 @@
 class Fuc < Formula
   desc "Modern, performance focused unix commands"
   homepage "https://github.com/supercilex/fuc"
-  url "https://github.com/supercilex/fuc/archive/refs/tags/3.1.2.tar.gz"
-  sha256 "75b4a568c6a4f04ad1289fc68fc8219b95547ac285330eab46082db19ddf25e0"
+  url "https://github.com/supercilex/fuc/archive/refs/tags/3.1.7.tar.gz"
+  sha256 "e3dda4699ff12a08336e93120c55c172b296f6be64de202350eb5b3217078c10"
   license "Apache-2.0"
   head "https://github.com/supercilex/fuc.git", branch: "master"
 
