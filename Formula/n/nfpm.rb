@@ -7,7 +7,7 @@ class Nfpm < Formula
   head "https://github.com/goreleaser/nfpm.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e27e36131b5b9b6f07b4312a7eb28fb508e190fac9508f095cae414f90b8b122"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "56bf13485cc0745ff84f8fa8ec0213806e8492347b990165e898e70d7551926e"
   end
 
   depends_on "go" => :build
