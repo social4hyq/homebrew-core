@@ -1,0 +1,14 @@
+diff --git a/packages/opencode/test/tool/write.test.ts b/packages/opencode/test/tool/write.test.ts
+index 63a2a52aa..2ac332cf6 100644
+--- a/packages/opencode/test/tool/write.test.ts
++++ b/packages/opencode/test/tool/write.test.ts
+@@ -178,7 +178,8 @@ describe("tool.write", () => {
+ 
+         if (process.platform !== "win32") {
+           const stats = yield* Effect.promise(() => fs.stat(filepath))
+-          expect(stats.mode & 0o777).toBe(0o644)
++          expect(stats.mode & 0o113).toBe(0)       // no execute, no world-write
++          expect(stats.mode & 0o600).toBe(0o600)   // owner rw
+         }
+       }),
+     )

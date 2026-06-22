@@ -1,0 +1,34 @@
+diff --git a/packages/core/src/project.ts b/packages/core/src/project.ts
+index c439da0fd..85d5e0881 100644
+--- a/packages/core/src/project.ts
++++ b/packages/core/src/project.ts
+@@ -2,6 +2,7 @@ export * as ProjectV2 from "./project"
+ export * as Project from "./project"
+ 
+ import { Context, Effect, Layer, Schema } from "effect"
++import os from "os"
+ import path from "path"
+ import { AbsolutePath } from "./schema"
+ import { FSUtil } from "./fs-util"
+@@ -109,7 +110,7 @@ export const layer = Layer.effect(
+ 
+     const resolve = Effect.fn("Project.resolve")(function* (input: AbsolutePath) {
+       const repo = yield* git.find(input)
+-      if (!repo) return { id: ID.global, directory: AbsolutePath.make(path.parse(input).root), vcs: undefined }
++      if (!repo) return { id: ID.global, directory: AbsolutePath.make(os.homedir()), vcs: undefined }
+ 
+       const previous = yield* cached(repo.store)
+       const id = (yield* remote(repo)) ?? previous ?? (yield* root(repo))
+diff --git a/packages/opencode/src/project/project.ts b/packages/opencode/src/project/project.ts
+index 5f1b64743..eeaddc0ce 100644
+--- a/packages/opencode/src/project/project.ts
++++ b/packages/opencode/src/project/project.ts
+@@ -243,7 +243,7 @@ export const layer = Layer.effect(
+       yield* Effect.logInfo("fromDirectory", { directory })
+ 
+       const data = yield* projectV2.resolve(AbsolutePath.make(directory))
+-      const worktree = data.id === ProjectV2.ID.make("global") && !data.vcs ? "/" : data.directory
++      const worktree = data.directory
+ 
+       // Phase 2: upsert
+       const projectID = ProjectV2.ID.make(data.id)

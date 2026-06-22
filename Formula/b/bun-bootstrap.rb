@@ -10,6 +10,11 @@ class BunBootstrap < Formula
   version "1.4.0-a4cd4d2"
   sha256 "80d88257496b634b55b61e3b1dd82b902b8f6669b74547931c582ed67437f008"
 
+  bottle do
+    root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-bootstrap-v1.4.0-a4cd4d2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9ed14895bd4ac371829b7b91be2b9704a30c2bd1aa00ed5fe80e8eec73edb3c0"
+  end
+
   # 预编译二进制,无源码构建步骤;仅构建期被 bun/bun-canary 引用,不进入运行时。
   keg_only "bootstrap only; not for direct use"
 
