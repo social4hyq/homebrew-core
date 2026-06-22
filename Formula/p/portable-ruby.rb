@@ -6,6 +6,7 @@ class PortableRuby < PortableFormula
   url "https://cache.ruby-lang.org/pub/ruby/4.0/ruby-4.0.3.tar.gz"
   sha256 "77964acc370d5c8375b9502e5ba6c13c03ef91ab9eb9f521c84fb42b9c9a6b0f"
   license "Ruby"
+  revision 1
 
   # This regex restricts matching to versions other than X.Y.0.
   livecheck do
@@ -102,6 +103,7 @@ class PortableRuby < PortableFormula
 
     args = portable_configure_args + %W[
       --prefix=#{prefix}
+      --host=aarch64-linux
       --enable-load-relative
       --with-static-linked-ext
       --with-baseruby=#{RbConfig.ruby}
