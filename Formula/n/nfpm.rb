@@ -1,13 +1,13 @@
 class Nfpm < Formula
   desc "Simple deb and rpm packager"
   homepage "https://nfpm.goreleaser.com/"
-  url "https://github.com/goreleaser/nfpm/archive/refs/tags/v2.46.3.tar.gz"
-  sha256 "b5b46bc6e7e9b5b9db4c2ffb5937d7d8b371fd573ffcf55f179e8fd81f7d1971"
+  url "https://github.com/goreleaser/nfpm/archive/refs/tags/v2.47.0.tar.gz"
+  sha256 "906b8dde0c5626376779f3ebddea3554b0eb6e1b8450a09bdc746cba92ef5dea"
   license "MIT"
   head "https://github.com/goreleaser/nfpm.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e27e36131b5b9b6f07b4312a7eb28fb508e190fac9508f095cae414f90b8b122"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "56bf13485cc0745ff84f8fa8ec0213806e8492347b990165e898e70d7551926e"
   end
 
   depends_on "go" => :build
