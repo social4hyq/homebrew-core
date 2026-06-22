@@ -7,7 +7,7 @@ class EnpassCli < Formula
   head "https://github.com/hazcod/enpass-cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4111e57eeb8f4e9e7cd6294453e794c54cc1e69ac286f00cfd68b46b18ad888"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec10b2cc1993eb11004cc54ebb2832d638ee8f5bd992b934fce01fcd5b5c79e0"
   end
 
   depends_on "go" => :build
