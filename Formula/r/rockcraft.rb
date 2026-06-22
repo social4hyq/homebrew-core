@@ -5,8 +5,8 @@ class Rockcraft < Formula
   homepage "https://documentation.ubuntu.com/rockcraft/"
   # git checkout needed for setuptools-scm
   url "https://github.com/canonical/rockcraft.git",
-      tag:      "1.19.0",
-      revision: "77be1bab830d1683791c004b3c0df856f294d805"
+      tag:      "1.19.1",
+      revision: "5a78bf4b84c41d730012932881c7966fcdac0170"
   license "GPL-3.0-only"
   head "https://github.com/canonical/rockcraft.git", branch: "main"
 
