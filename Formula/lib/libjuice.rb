@@ -6,12 +6,7 @@ class Libjuice < Formula
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "f1e78cce2eb6ea006d4ff28b2323925581e538bfb82c93d34d587251cc9c90e4"
-    sha256 cellar: :any,                 arm64_sequoia: "b3f2ee1f575519fdc97872b7e82766480415c197a0fb4c5e5cb5781321a5fa3d"
-    sha256 cellar: :any,                 arm64_sonoma:  "b3b1b90e4695d5ac6186f905e6a26c0cb14c4e3e8519f10f1f82048793e19dbb"
-    sha256 cellar: :any,                 sonoma:        "8953e08c9c6db27015a810656b8db66b1082f185daf47d6d4c69716968b24159"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "8259600a2ebb565ec5eee65dad1024857fed43ae0f52deb14ad603a603008a79"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "260c2f1c012b30ef8ebd14ccf3fd83ddcf67ca420976f230900cb5477c7dc1d4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "68b326c6732593f53e346d79c7ca07d98c25593ccda55c93f599dde28e8dacaa"
   end
 
   depends_on "cmake" => :build
