@@ -13,7 +13,7 @@ class Protobuf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0d7907467e3d324104a1962a60adbaae3e108a75a66c3b8fd6bc4a7c555ecd5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ff8d8f9054d1ad0dca16bd76ea216be361c6c0beb1ebe2ae85e31bc91a22ecf"
   end
 
   depends_on "cmake" => :build
