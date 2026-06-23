@@ -112,7 +112,7 @@ class HermesAgent < Formula
     sha256 "0746f5f8d406af344fd547f1c8daa5f5c33dbc293bb8d6a16d80b4bb88f59372"
 
     patch do
-      file "Patches/psutil@7.2.2/0001-ohos-ioctl-compat.patch"
+      file "Patches/hermes-agent/0001-port-psutil-to-ohos.patch"
     end
   end
 
