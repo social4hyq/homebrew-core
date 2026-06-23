@@ -104,7 +104,7 @@ brew trust social4hyq/core         # Homebrew 6.0+ 必须显式信任第三方 t
 # 只装 bun：
 brew install bun
 
-# 只装 opencode（自动拉入 bun + ohos-sdk，其余 native binding 已嵌入二进制）：
+# 只装 opencode：
 brew install opencode
 ```
 
