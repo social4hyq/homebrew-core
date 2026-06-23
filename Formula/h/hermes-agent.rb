@@ -14,7 +14,8 @@ class HermesAgent < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d2e27c58a246d7d12caa2c04275d8a71d1cf4745f204da41cf81cfa593b70d5"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e18e832c7507e386025a630a2fb45a16c0059f648b6acb2140d3ab22ade8c0d6"
   end
 
   depends_on "pkgconf" => :build
@@ -112,7 +113,7 @@ class HermesAgent < Formula
     sha256 "0746f5f8d406af344fd547f1c8daa5f5c33dbc293bb8d6a16d80b4bb88f59372"
 
     patch do
-      file "Patches/psutil@7.2.2/0001-ohos-ioctl-compat.patch"
+      file "Patches/hermes-agent/0001-port-psutil-to-ohos.patch"
     end
   end
 
