@@ -12,7 +12,7 @@ class BunPty < Formula
   end
 
   bottle do
-    root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-pty-v0.4.10"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-pty-v0.4.10"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "da10d8b9d51837b604e2fbb7dbfab9261d0009ca9a771058b9e8a4b25e542fa7"
   end
 

@@ -20,7 +20,7 @@ class Icu4cAT78 < Formula
   # When graduating to official core: icu4c@78 can use system clang; this validation version
   # is only for verifying ABI alignment.
   bottle do
-    root_url "https://github.com/social4hyq/homebrew-core/releases/download/icu4c@78-v78.3"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/icu4c@78-v78.3"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "98f5609d63c8202fbee0c179b81f7af964f72dea6e760f0c1b8e0d1c1ab29cee"
   end
 

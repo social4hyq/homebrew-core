@@ -13,7 +13,7 @@ class BunCanary < Formula
 
   # bottle: not yet built, use build-from-source for now. Uncomment when bottle is published.
   #   bottle do
-  #     root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-canary-v1.4.0-a4cd4d2"
+  #     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-canary-v1.4.0-a4cd4d2"
   # sha256 cellar: :any_skip_relocation, arm64_ohos: "<fill-after-bottle-build>"
   # end
 

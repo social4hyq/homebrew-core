@@ -16,7 +16,7 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "33f503249c9a1db8bb1d0f6adc0b93a0ce21e9a6706963e3c924278b24a5c887"
   end
 

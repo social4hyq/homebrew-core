@@ -12,7 +12,7 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.8"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.8"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "dc1e8cd9effa2799a94493b87279a02444f2b6e151de280b6b49af3a5e1b4c73"
   end
 

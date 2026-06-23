@@ -12,7 +12,7 @@ class TailwindcssOxide < Formula
   end
 
   bottle do
-    root_url "https://github.com/social4hyq/homebrew-core/releases/download/tailwindcss-oxide-v4.1.11"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/tailwindcss-oxide-v4.1.11"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "4ce2e68589cbca2d84c1d47385e7b2c4d35186c1ce1e124e06bbd35ae53cf5eb"
   end
 

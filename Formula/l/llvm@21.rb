@@ -16,7 +16,7 @@ class LlvmAT21 < Formula
   bottle do
     # Validation tap bottle; when graduating to official core, change root_url → harmonybrew/homebrew-core releases.
     # Tag name does not contain @ (avoids GitHub URL encoding causing brew parsing issues).
-    root_url "https://github.com/social4hyq/homebrew-core/releases/download/llvm21-v21.1.8"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm21-v21.1.8"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "0ce8717c57f10569371e0f517d28b32525cd38b4c4f8e2c346d29d6d840c831f"
   end
 

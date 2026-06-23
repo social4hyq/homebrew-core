@@ -20,7 +20,7 @@ class BunWebkit < Formula
   end
 
   bottle do
-    root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-webkit-v6d586e293f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-webkit-v6d586e293f"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "a30b36850cb1af505384a22bfae7b4aae5706cc219392a3b05fcedb2609e3360"
   end
 
