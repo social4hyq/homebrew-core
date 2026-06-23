@@ -1,14 +1,9 @@
 class BunCanary < Formula
   desc "Bun — JavaScript runtime for HarmonyOS aarch64 (canary, rolling)"
   homepage "https://github.com/oven-sh/bun"
+  url "https://github.com/oven-sh/bun.git", branch: "canary"
+  version "1.4.0-a4cd4d2"
   license "MIT"
-
-  # canary:主 url = bun.git canary 分支。keg_only,不毕业(对照 rust nightly 惯例)。
-  stable do
-    url "https://github.com/oven-sh/bun.git", branch: "canary"
-    version "1.4.0-a4cd4d2"
-  end
-
   head "https://github.com/oven-sh/bun.git", branch: "canary"
 
   livecheck do
@@ -16,252 +11,253 @@ class BunCanary < Formula
     regex(/bun-v?canary\.?(.+)/i)
   end
 
-  # bottle: 尚未出,先 build-from-source。出 bottle 时取消注释。
+  # bottle: not yet built, use build-from-source for now. Uncomment when bottle is published.
   #   bottle do
   #     root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-canary-v1.4.0-a4cd4d2"
-  # sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
+  # sha256 cellar: :any_skip_relocation, arm64_ohos: "<fill-after-bottle-build>"
   # end
 
   keg_only "canary build; use `bun` for the stable command"
 
   depends_on "bun-bootstrap" => :build
-  depends_on "bun-webkit"
-  depends_on "llvm@21"        => :build
-  depends_on "icu4c@78"
-  depends_on "ohos-sdk"
   depends_on "cmake"          => :build
+  depends_on "gperf"          => :build
+  depends_on "llvm@21" => :build
   depends_on "ninja"          => :build
   depends_on "perl"           => :build
   depends_on "python@3.14"    => :build
   depends_on "ruby"           => :build
-  depends_on "gperf"          => :build
+  depends_on "bun-webkit"
+  depends_on "icu4c@78"
+  depends_on "ohos-sdk"
 
-  # Rust nightly(原生 OHOS host 工具链,同 bun.rb)
+  # Rust nightly (native OHOS host toolchain, same as bun.rb)
   resource "rust-nightly" do
     url "https://static.rust-lang.org/dist/2026-05-06/rust-nightly-aarch64-unknown-linux-ohos.tar.gz"
-    sha256 "0000000000000000000000000000000000000000000000000000000000000000"
     version "nightly-2026-05-06"
+    sha256 "7e93009ca8eb40fa039ba7fce6d8d6e95646b6459a7582e4ea46308c7db00eb8"
   end
 
-  # ── OHOS patches(对照 git.rb 的 patch do file 模式)──
-  # Homebrew 在 def install 前自动 apply 到 buildpath(= bun 源码根)。
-  # 按 PR 顺序声明(pr3 → pr7,顺序敏感)。
-  # 每个补丁必须有注释说明目的和上游 issue(Homebrew 审计要求)。
+  # ── OHOS patches (mirroring git.rb's patch do file pattern) ──
+  # Homebrew auto-applies them to buildpath (= bun source root) before def install.
+  # Declared in PR order (pr3 → pr7, order-sensitive).
+  # Each patch must have a comment explaining its purpose and upstream issue (Homebrew audit requirement).
   patch :p1 do
-    # pr3-vendor: lolhtml crate-type 改 staticlib(OHOS 无动态链接支持)
+    # pr3-vendor: change lolhtml crate-type to staticlib (OHOS has no dynamic linking support)
     file "Patches/bun/pr3-vendor/crate-type.patch"
   end
   patch :p1 do
-    # pr3-vendor: zstd qsort_r 在 OHOS musl 不可用
+    # pr3-vendor: zstd qsort_r not available on OHOS musl
     file "Patches/bun/pr3-vendor/ohos-qsort-r.patch"
   end
   patch :p1 do
-    # pr3-vendor: zstd dep 构建脚本 OHOS 适配
+    # pr3-vendor: OHOS adaptation for zstd dep build script
     file "Patches/bun/pr3-vendor/zstd.ts.patch"
   end
-  # pr4-build-target: OHOS 交叉编译目标支持(OS="ohos"、triple、sysroot/SDK 配置)
+  # pr4-build-target: OHOS cross-compilation target support (OS="ohos", triple, sysroot/SDK config)
   patch :p1 do
-    # build.ts 新增 --ohos-sysroot / --ohos-sdk-root 命令行选项
+    # build.ts: add --ohos-sysroot / --ohos-sdk-root CLI options
     file "Patches/bun/pr4-build-target/build.ts.patch"
   end
   patch :p1 do
-    # OHOS 链接 libc/pthread/dl 及本地 WebKit ICU,跨编译时跳过 smoke 测试
+    # OHOS: link libc/pthread/dl and local WebKit ICU, skip smoke tests during cross-compile
     file "Patches/bun/pr4-build-target/bun.ts.patch"
   end
   patch :p1 do
-    # OHOS musl 缺 GNU 扩展(memmem/getservbyport_r),c-ares config.h 排除
+    # OHOS musl lacks GNU extensions (memmem/getservbyport_r), exclude in c-ares config.h
     file "Patches/bun/pr4-build-target/cares.ts.patch"
   end
   patch :p1 do
-    # 新增 OS="ohos"、hostCc 字段及 sysroot/SDK/cross-libs/ICU 交叉编译配置
+    # Add OS="ohos", hostCc field and sysroot/SDK/cross-libs/ICU cross-compilation config
     file "Patches/bun/pr4-build-target/config.ts.patch"
   end
   patch :p1 do
-    # OHOS 编译/链接 flag:triple、sysroot、libc++、PIE、8MB 栈、免 zstd 调试
+    # OHOS compile/link flags: triple, sysroot, libc++, PIE, 8MB stack, skip zstd debug
     file "Patches/bun/pr4-build-target/flags.ts.patch"
   end
   patch :p1 do
-    # OHOS 一并禁用 MI_NO_SET_VMA_NAME(VMA 标签调试糖)
+    # OHOS: also disable MI_NO_SET_VMA_NAME (VMA label debug sugar)
     file "Patches/bun/pr4-build-target/mimalloc.ts.patch"
   end
   patch :p1 do
-    # 新增 aarch64-unknown-linux-ohos 目标,链接器可走签名包装
+    # Add aarch64-unknown-linux-ohos target, linker can go through signed wrapper
     file "Patches/bun/pr4-build-target/rust.ts.patch"
   end
   patch :p1 do
-    # dep_host_cc 链后串调 binary-sign-tool 签名,OHOS 原生 cargo 用签名链接器
+    # dep_host_cc: chain binary-sign-tool after link for signing, OHOS native cargo uses signed linker
     file "Patches/bun/pr4-build-target/source.ts.patch"
   end
   patch :p1 do
-    # 放宽 LLVM 版本至 21–23,新增 OHOS LLVM22 搜索路径与安装提示
+    # Relax LLVM version range to 21–23, add OHOS LLVM22 search path and install hint
     file "Patches/bun/pr4-build-target/tools.ts.patch"
   end
   patch :p1 do
-    # 新增 OHOS prebuilt/ICU 选取与交叉编译 CMake 配置(sysroot、libc++ 头、ICU 工具)
+    # Add OHOS prebuilt/ICU selection and cross-compilation CMake config (sysroot, libc++ headers, ICU tools)
     file "Patches/bun/pr4-build-target/webkit.ts.patch"
   end
   patch :p1 do
-    # tmpdir() 优先用 $TMPDIR,适配 OHOS 只读 /tmp(erofs)
+    # tmpdir() prefers $TMPDIR, adapt to OHOS read-only /tmp (erofs)
     file "Patches/bun/pr4-build-target/utils.mjs.patch"
   end
   patch :p1 do
-    # 新增 ohos-signpost 依赖与 postinstall 探针钩子(补 detect-libc 等依赖)
+    # Add ohos-signpost dep and postinstall probe hook (backfill detect-libc and other deps)
     file "Patches/bun/pr4-build-target/package.json.patch"
   end
   patch :p1 do
-    # 新增 Libc::Ohos 枚举与 triple 解析,平台串报 "ohos"、支持 file:// 注册
+    # Add Libc::Ohos enum and triple parsing, platform string reports "ohos", support file:// registration
     file "Patches/bun/pr4-build-target/compile_target.rs.patch"
   end
   patch :p1 do
-    # bun upgrade 下载后缀 OHOS 用 -ohos(musl/android 之外新增一支)
+    # bun upgrade download suffix for OHOS uses -ohos (new branch beyond musl/android)
     file "Patches/bun/pr4-build-target/upgrade_command.rs.patch"
   end
-  # pr5-ohos-runtime: OHOS 专属运行时替代(syscall 回退、vfork→fork、签名、platform=openharmony)
+  # pr5-ohos-runtime: OHOS-specific runtime substitutions
+  # (syscall fallbacks, vfork→fork, signing, platform=openharmony)
   patch :p1 do
-    # OHOS 下 process.platform 返回 "openharmony"(对齐 Node 命名)
+    # OHOS: process.platform returns "openharmony" (align with Node naming)
     file "Patches/bun/pr5-ohos-runtime/BunProcess.cpp.patch"
   end
   patch :p1 do
-    # OHOS 对外 OS 名映射为 openharmony/OpenHarmony(让 optional deps 解析正确)
+    # OHOS: external OS name maps to openharmony/OpenHarmony (so optional deps resolve correctly)
     file "Patches/bun/pr5-ohos-runtime/Global.rs.patch"
   end
   patch :p1 do
-    # 新增 IS_OHOS / IS_GLIBC,IS_MUSL 把 ohos 一并算入
+    # Add IS_OHOS / IS_GLIBC; IS_MUSL counts ohos in as well
     file "Patches/bun/pr5-ohos-runtime/env.rs.patch"
   end
   patch :p1 do
-    # OHOS 跳过 fchmodat2、getcwd 兜底 "/"、dlopen 前先调签名工具
+    # OHOS: skip fchmodat2, getcwd falls back to "/", call signing tool before dlopen
     file "Patches/bun/pr5-ohos-runtime/lib.rs.patch"
   end
   patch :p1 do
-    # OHOS 编译产物调 binary-sign-tool 签名并 chmod 755(seccomp 要求)
+    # OHOS: call binary-sign-tool to sign build output and chmod 755 (seccomp requirement)
     file "Patches/bun/pr5-ohos-runtime/build_command.rs.patch"
   end
   patch :p1 do
-    # OHOS 设 $PWD,pipe 标记 socket+非阻塞避免阻塞死循环
+    # OHOS: set $PWD, mark pipe as socket + non-blocking to avoid blocking infinite loop
     file "Patches/bun/pr5-ohos-runtime/filter_run.rs.patch"
   end
   patch :p1 do
-    # OHOS 设 $PWD(bash 走 stat 而非 getcwd),CWD EPERM 静默并回退 $HOME
+    # OHOS: set $PWD (bash uses stat instead of getcwd), silently swallow CWD EPERM and fall back to $HOME
     file "Patches/bun/pr5-ohos-runtime/run_command.rs.patch"
   end
   patch :p1 do
-    # pm scan 合法 OS 列表加入 openharmony
+    # pm scan: add openharmony to the list of valid OSes
     file "Patches/bun/pr5-ohos-runtime/CommandLineArguments.rs.patch"
   end
   patch :p1 do
-    # linkat EEXIST 重试 + EPERM/EACCES 失败回退 copy 安装(OHOS SELinux)
+    # linkat EEXIST retry + EPERM/EACCES failure falls back to copy install (OHOS SELinux)
     file "Patches/bun/pr5-ohos-runtime/PackageInstall.rs.patch"
   end
   patch :p1 do
-    # OHOS 装包后扫描 .so/.node 调 binary-sign-tool 签名
+    # OHOS: after installing packages, scan .so/.node and call binary-sign-tool to sign
     file "Patches/bun/pr5-ohos-runtime/PackageInstaller.rs.patch"
   end
   patch :p1 do
-    # OHOS 的 node-gyp 临时脚本改用 /system/bin/sh(同 Android)
+    # OHOS: node-gyp temp scripts use /system/bin/sh (same as Android)
     file "Patches/bun/pr5-ohos-runtime/PackageManager.rs.patch"
   end
   patch :p1 do
-    # symlinkat EPERM/EACCES 建父目录后重试;拆出 ENOENT 单独处理
+    # symlinkat EPERM/EACCES: retry after creating parent dir; split out ENOENT for separate handling
     file "Patches/bun/pr5-ohos-runtime/TarballStream.rs.patch"
   end
   patch :p1 do
-    # linkat EPERM/EACCES 多级回退到 copy(OHOS SELinux 禁硬链)
+    # linkat EPERM/EACCES: multi-level fallback to copy (OHOS SELinux forbids hardlinks)
     file "Patches/bun/pr5-ohos-runtime/Hardlinker.rs.patch"
   end
   patch :p1 do
-    # OHOS 生命周期脚本前插 cd(规避 hmdfs getcwd 失败导致 shell 退出)
+    # OHOS: insert cd before lifecycle scripts (avoid hmdfs getcwd failure causing shell to exit)
     file "Patches/bun/pr5-ohos-runtime/lifecycle_script_runner.rs.patch"
   end
   patch :p1 do
-    # npm 缓存 linkat 第 3 次失败改拷贝内容(OHOS SELinux EPERM)
+    # npm cache linkat: on 3rd failure, copy contents instead (OHOS SELinux EPERM)
     file "Patches/bun/pr5-ohos-runtime/npm.rs.patch"
   end
   patch :p1 do
-    # OperatingSystem 枚举新增 OPENHARMONY 位及 CURRENT、名字表
+    # OperatingSystem enum: add OPENHARMONY variant plus CURRENT and name table
     file "Patches/bun/pr5-ohos-runtime/resolver_hooks.rs.patch"
   end
   patch :p1 do
-    # os.type/arch 把 openharmony 归 Linux、arm64 返 aarch64(对齐 Android)
+    # os.type/arch: classify openharmony as Linux, arm64 returns aarch64 (align with Android)
     file "Patches/bun/pr5-ohos-runtime/os.ts.patch"
   end
   patch :p1 do
-    # OHOS 改用 fork(seccomp 禁 vfork),exit_group 兜底 _exit,CLOEXEC fd 下限抬到 2
+    # OHOS: switch to fork (seccomp forbids vfork), exit_group falls back to _exit, raise CLOEXEC fd lower bound to 2
     file "Patches/bun/pr5-ohos-runtime/bun-spawn.cpp.patch"
   end
   patch :p1 do
-    # OHOS 关 close_range(返 ENOSYS)、装 SIGSYS 处理器、PATH 加 /system/bin
+    # OHOS: disable close_range (returns ENOSYS), install SIGSYS handler, add /system/bin to PATH
     file "Patches/bun/pr5-ohos-runtime/c-bindings.cpp.patch"
   end
   patch :p1 do
-    # 代码生成 platform 对 OHOS 输出 "openharmony"
+    # Code generation: platform outputs "openharmony" for OHOS
     file "Patches/bun/pr5-ohos-runtime/codegen.ts.patch"
   end
   patch :p1 do
-    # pr5 版:Libc::Ohos 平台串改用 "openharmony"(覆盖 pr4,对齐 Node)
+    # pr5 version: Libc::Ohos platform string now uses "openharmony" (overrides pr4, aligns with Node)
     file "Patches/bun/pr5-ohos-runtime/compile_target.rs.patch"
   end
   patch :p1 do
-    # /tmp 只读回退 /data/local/tmp/$HOME/tmp,RLIMIT_NOFILE 最低值,EACCES 视为缺失
+    # /tmp read-only: fall back to /data/local/tmp/$HOME/tmp, RLIMIT_NOFILE minimum, treat EACCES as missing
     file "Patches/bun/pr5-ohos-runtime/fs.rs.patch"
   end
   patch :p1 do
-    # EACCES/EPERM 跳过祖先目录或视为缺失(OHOS 沙箱 "/","/storage" 不可读)
+    # EACCES/EPERM: skip ancestor dirs or treat as missing (OHOS sandbox: "/", "/storage" unreadable)
     file "Patches/bun/pr5-ohos-runtime/resolver.rs.patch"
   end
   patch :p1 do
-    # openpty dlopen 增加 libc.so 名与 RTLD_DEFAULT 兜底(OHOS openpty 在 libc)
+    # openpty dlopen: add libc.so name and RTLD_DEFAULT fallback (OHOS openpty lives in libc)
     file "Patches/bun/pr5-ohos-runtime/Terminal.rs.patch"
   end
   patch :p1 do
-    # OHOS 关闭 can_use_memfd/use_memfd(同 spawn_process fstat 不可见问题)
+    # OHOS: disable can_use_memfd/use_memfd (same fstat invisibility issue as spawn_process)
     file "Patches/bun/pr5-ohos-runtime/stdio.rs.patch"
   end
   patch :p1 do
-    # OHOS no_orphans 用 pidfd + 100ms 轮询检测父进程退出(signalfd 挂死)
+    # OHOS: no_orphans uses pidfd + 100ms polling to detect parent exit (signalfd hangs)
     file "Patches/bun/pr5-ohos-runtime/process.rs.patch"
   end
   patch :p1 do
-    # OHOS 禁用 memfd stdio 快路径(子进程写后 fstat size=0)
+    # OHOS: disable memfd stdio fast path (child writes, fstat reports size=0)
     file "Patches/bun/pr5-ohos-runtime/spawn_process.rs.patch"
   end
   patch :p1 do
-    # OHOS 解析 ELF SHT 定位 .bun 段,ftruncate+fsync 防 COW 写丢失
+    # OHOS: parse ELF SHT to locate .bun section, ftruncate+fsync to prevent COW write loss
     file "Patches/bun/pr5-ohos-runtime/StandaloneModuleGraph.rs.patch"
   end
   patch :p1 do
-    # OHOS openat2 直接返 ENOSYS(seccomp SIGSYS),放宽若干 fn 可见性
+    # OHOS: openat2 returns ENOSYS directly (seccomp SIGSYS), relax visibility of several fns
     file "Patches/bun/pr5-ohos-runtime/linux_syscall.rs.patch"
   end
-  # pr6-rust-compat: Rust nightly toolchain 兼容性修复(与 OHOS 无关,可独立推上游)
+  # pr6-rust-compat: Rust nightly toolchain compatibility fixes (OHOS-independent, can be pushed upstream standalone)
   patch :p1 do
-    # 适配 nightly:Type::info().size 改为 Type::size().expect()
+    # Adapt to nightly: Type::info().size becomes Type::size().expect()
     file "Patches/bun/pr6-rust-compat/multi_array_list.rs.patch"
   end
   patch :p1 do
-    # errno 转 ExitCode 改用 unsigned_abs()(nightly 类型变更)
+    # errno to ExitCode conversion now uses unsigned_abs() (nightly type change)
     file "Patches/bun/pr6-rust-compat/echo.rs.patch"
   end
   patch :p1 do
-    # errno 转 ExitCode 改用 unsigned_abs()(同 echo.rs)
+    # errno to ExitCode conversion now uses unsigned_abs() (same as echo.rs)
     file "Patches/bun/pr6-rust-compat/which.rs.patch"
   end
-  # pr7-shared-cfg-gate: 共享 musl/OHOS 代码路径的 cfg 门控扩展(OHOS libc 是 musl 派生)
+  # pr7-shared-cfg-gate: shared musl/OHOS code path cfg gate extensions (OHOS libc is musl-derived)
   patch :p1 do
-    # crash_handler musl 门控扩 ohos,崩溃头 libc 标签输出 "ohos (musl)"
+    # crash_handler: extend musl gate to ohos, crash header libc label outputs "ohos (musl)"
     file "Patches/bun/pr7-shared-cfg-gate/lib.rs.patch"
   end
   patch :p1 do
-    # v8 平台 API 块对 OHOS 排除(让其走 musl 回避路径,免 smoke 重定位 fatal)
+    # Exclude v8 platform API block for OHOS (let it take musl workaround path, avoid smoke relocation fatal)
     file "Patches/bun/pr7-shared-cfg-gate/napi_body.rs.patch"
   end
   patch :p1 do
-    # setjmp/longjmp 的 musl 路径扩 ohos,jmp_buf 缩为 32×u64
+    # Extend setjmp/longjmp musl path to ohos, shrink jmp_buf to 32×u64
     file "Patches/bun/pr7-shared-cfg-gate/recover.rs.patch"
   end
 
   def install
-    # 构建逻辑内联(同 bun.rb,只差 --canary=on + 装为 bun-canary)。
+    # Build logic inlined (same as bun.rb, only differs in --canary=on + installed as bun-canary).
     llvm     = Formula["llvm@21"]
     webkit   = Formula["bun-webkit"]
     boot     = Formula["bun-bootstrap"]

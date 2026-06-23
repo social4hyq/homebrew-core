@@ -1,32 +1,33 @@
 class LlvmAT21 < Formula
-  desc "LLVM 21 toolchain for HarmonyOS (clang + lld + OHOS multiarch runtime libs for aarch64-linux-ohos)"
+  desc "LLVM 21 toolchain: clang, lld, OHOS multiarch runtime libs"
   homepage "https://llvm.org/"
+  url "https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.8/llvm-project-21.1.8.src.tar.xz"
+  sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
   license "Apache-2.0" => { with: "LLVM-exception" }
-
-  stable do
-    url "https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.8/llvm-project-21.1.8.src.tar.xz"
-    sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
-  end
-
-  bottle do
-    # 验证 tap 的 bottle;毕业后改 root_url → harmonybrew/homebrew-core releases
-    # tag 名不含 @（避免 GitHub URL 编码导致 brew 解析问题）
-    root_url "https://github.com/social4hyq/homebrew-core/releases/download/llvm21-v21.1.8"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ce8717c57f10569371e0f517d28b32525cd38b4c4f8e2c346d29d6d840c831f"
-  end
+  # This formula is fully rewritten from upstream because HarmonyOS requires an
+  # OHOS code-sign patch (CodeSign.cpp in lld/ELF), config.guess stubbing,
+  # and two separate runtime builds (compiler-rt + multiarch libc++/libcxxabi/libunwind).
 
   livecheck do
     url :stable
     regex(/^llvmorg[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    # Validation tap bottle; when graduating to official core, change root_url → harmonybrew/homebrew-core releases.
+    # Tag name does not contain @ (avoids GitHub URL encoding causing brew parsing issues).
+    root_url "https://github.com/social4hyq/homebrew-core/releases/download/llvm21-v21.1.8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ce8717c57f10569371e0f517d28b32525cd38b4c4f8e2c346d29d6d840c831f"
+  end
+
   keg_only "this is a versioned HarmonyOS bootstrap toolchain"
 
   depends_on "cmake"    => :build
   depends_on "ninja"    => :build
-  depends_on "ohos-sdk"
-  # 运行时依赖:lld 链 libxml2/zlib(keg_only 环境需显式声明,否则 loader 找不到 .so)
   depends_on "libxml2"
+  depends_on "ohos-sdk"
+  # Runtime dependency: lld links against libxml2/zlib (must be declared explicitly in a keg_only
+  # environment, otherwise the loader cannot find the .so).
   depends_on "zlib"
 
   # HarmonyOS code-sign support (adds CodeSign.cpp to lld/ELF).  Version-specific
@@ -36,13 +37,14 @@ class LlvmAT21 < Formula
 
   HOST_TRIPLE   = "aarch64-unknown-linux-ohos".freeze
   TARGET_TRIPLE = "aarch64-linux-ohos".freeze
+  COMPILERS     = %w[clang clang++].freeze
 
   def install
     ohos_sdk    = Formula["ohos-sdk"].opt_prefix
     sysroot     = "#{ohos_sdk}/native/sysroot"
     libcxx_ohos = "#{ohos_sdk}/native/llvm/include/libcxx-ohos/include/c++/v1"
 
-    odie "OHOS sysroot missing: #{sysroot}/usr/lib"  unless File.directory?("#{sysroot}/usr/lib")
+    odie "OHOS sysroot missing: #{sysroot}/usr/lib" unless File.directory?("#{sysroot}/usr/lib")
     odie "libcxx-ohos headers missing: #{libcxx_ohos}" unless File.directory?(libcxx_ohos)
 
     patch_config_guess(buildpath/"llvm/cmake/config.guess")
@@ -121,11 +123,16 @@ class LlvmAT21 < Formula
     ]
     # Multi-word flags must not go in %W[...] — %W splits on whitespace.
     args << "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
-    args << "-DCMAKE_C_FLAGS=-D__MUSL__ -fstack-protector-strong -no-canonical-prefixes -ffunction-sections -fdata-sections"
-    args << "-DCMAKE_CXX_FLAGS=-D__MUSL__ -fstack-protector-strong -no-canonical-prefixes -ffunction-sections -fdata-sections"
-    args << "-DCMAKE_EXE_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 -Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack"
-    args << "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 -Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack"
-    args << "-DCMAKE_MODULE_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 -Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack"
+    args << "-DCMAKE_C_FLAGS=-D__MUSL__ -fstack-protector-strong " \
+            "-no-canonical-prefixes -ffunction-sections -fdata-sections"
+    args << "-DCMAKE_CXX_FLAGS=-D__MUSL__ -fstack-protector-strong " \
+            "-no-canonical-prefixes -ffunction-sections -fdata-sections"
+    args << "-DCMAKE_EXE_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 " \
+            "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack"
+    args << "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 " \
+            "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack"
+    args << "-DCMAKE_MODULE_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 " \
+            "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack"
     args << "-DRUNTIMES_CMAKE_ARGS=-DCMAKE_MODULE_PATH=#{cmake_modules}" \
             ";-DCMAKE_SYSROOT=#{sysroot}" \
             ";-DCMAKE_C_FLAGS=-D__MUSL__" \
@@ -146,18 +153,19 @@ class LlvmAT21 < Formula
     build_multiarch_runtimes(sysroot: sysroot, libcxx_ohos: libcxx_ohos, jobs: jobs)
   end
 
-  def patch_config_guess(cg)
-    return unless cg.exist?
-    return if cg.read(64).include?("Stubbed for HarmonyOS")
-    FileUtils.cp(cg, "#{cg}.orig")
+  def patch_config_guess(config_guess)
+    return unless config_guess.exist?
+    return if config_guess.read(64).include?("Stubbed for HarmonyOS")
+
+    cp(config_guess, "#{config_guess}.orig")
     # brew extends Pathname#write to refuse overwriting existing files —
     # use File.write to bypass that safety check.
-    File.write(cg, <<~SH)
+    File.write(config_guess, <<~SH)
       #!/bin/sh
       # Stubbed for HarmonyOS host build — original at config.guess.orig
       echo "#{HOST_TRIPLE}"
     SH
-    cg.chmod(0755)
+    config_guess.chmod(0755)
   end
 
   def sign_dir(dir)
@@ -169,14 +177,15 @@ class LlvmAT21 < Formula
       Pathname.glob(dir/"*").each do |f|
         next unless f.file?
         next if f.symlink?
-        next unless f.binread(4) == "\x7fELF".b
+        next if f.binread(4) != "\x7fELF".b
+
         skipped += 1
 
         out = Pathname.pwd/f.basename
         ok = quiet_system binary_sign, "sign", "-selfSign", "1",
                           "-inFile", f.to_s, "-outFile", out.to_s
         if ok && out.exist?
-          FileUtils.mv(out, f, force: true)
+          mv(out, f, force: true)
           f.chmod(0755)
           signed += 1
         else
@@ -191,7 +200,7 @@ class LlvmAT21 < Formula
 
   def install_triple_wrappers
     %w[aarch64-unknown-linux-ohos aarch64-linux-ohos].each do |pfx|
-      %w[clang clang++].each do |t|
+      COMPILERS.each do |t|
         w = bin/"#{pfx}-#{t}"
         w.write <<~SH
           #!/bin/sh
@@ -213,7 +222,7 @@ class LlvmAT21 < Formula
 
     rt_root = Pathname.glob("#{lib}/clang/*").first
     odie "compiler-rt host dir missing: #{lib}/clang/<ver>" unless rt_root
-    rt_tgt  = rt_root/"lib"/TARGET_TRIPLE
+    rt_tgt = rt_root/"lib"/TARGET_TRIPLE
     rt_tgt.mkpath
 
     mkdir buildpath/"compiler-rt-build" do
@@ -250,13 +259,14 @@ class LlvmAT21 < Formula
 
     Pathname.glob("#{buildpath}/compiler-rt-build/**/*").each do |f|
       next unless f.file?
+
       base = case f.basename.to_s
-             when /\Alibclang_rt\.builtins-.*\.a\z/ then "libclang_rt.builtins.a"
-             when /\Aclang_rt\.crtbegin-.*\.o\z/    then "clang_rt.crtbegin.o"
-             when /\Aclang_rt\.crtend-.*\.o\z/      then "clang_rt.crtend.o"
-             else next
-             end
-      FileUtils.cp(f, rt_tgt/base)
+      when /\Alibclang_rt\.builtins-.*\.a\z/ then "libclang_rt.builtins.a"
+      when /\Aclang_rt\.crtbegin-.*\.o\z/    then "clang_rt.crtbegin.o"
+      when /\Aclang_rt\.crtend-.*\.o\z/      then "clang_rt.crtend.o"
+      else next
+      end
+      cp(f, rt_tgt/base)
     end
 
     odie "libclang_rt.builtins.a missing in #{rt_tgt}" unless (rt_tgt/"libclang_rt.builtins.a").exist?
@@ -280,7 +290,7 @@ class LlvmAT21 < Formula
       -DCMAKE_SYSTEM_NAME=Linux
       -DCMAKE_SYSTEM_PROCESSOR=aarch64
       -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
-      -DCMAKE_REQUIRED_FLAGS=--target=#{TARGET_TRIPLE}\;--sysroot=#{sysroot}
+      -DCMAKE_REQUIRED_FLAGS=--target=#{TARGET_TRIPLE};--sysroot=#{sysroot}
     ]
 
     stage = buildpath/"multiarch-runtimes-stage"
@@ -344,26 +354,26 @@ class LlvmAT21 < Formula
     target_incdir.dirname.mkpath
     (share/"libc++").mkpath
 
-    FileUtils.mv("#{stage}/libcxx/lib/libc++.a",             target_libdir/"libc++_static.a")
-    FileUtils.mv("#{stage}/libcxx/lib/libc++abi.a",          target_libdir/"libc++abi.a")
-    FileUtils.mv("#{stage}/libcxx/lib/libc++experimental.a", target_libdir/"libc++experimental.a")
-    FileUtils.mv("#{stage}/libcxx/lib/libc++.modules.json",  target_libdir/"libc++.modules.json")
+    mv("#{stage}/libcxx/lib/libc++.a",             target_libdir/"libc++_static.a")
+    mv("#{stage}/libcxx/lib/libc++abi.a",          target_libdir/"libc++abi.a")
+    mv("#{stage}/libcxx/lib/libc++experimental.a", target_libdir/"libc++experimental.a")
+    mv("#{stage}/libcxx/lib/libc++.modules.json",  target_libdir/"libc++.modules.json")
 
-    FileUtils.rm("#{stage}/libcxx/lib/libunwind.a")
-    FileUtils.mv("#{stage}/libunwind/lib/libunwind.a", target_libdir/"libunwind.a")
+    rm("#{stage}/libcxx/lib/libunwind.a")
+    mv("#{stage}/libunwind/lib/libunwind.a", target_libdir/"libunwind.a")
 
-    target_incdir.rmtree if target_incdir.exist?
-    FileUtils.mv("#{stage}/libcxx/include/c++/v1", target_incdir)
+    rm_r(target_incdir) if target_incdir.exist?
+    mv("#{stage}/libcxx/include/c++/v1", target_incdir)
 
     %w[__libunwind_config.h libunwind.h libunwind.modulemap
        unwind_arm_ehabi.h unwind_itanium.h unwind.h].each do |h|
-      FileUtils.mv("#{stage}/libunwind/include/#{h}", unwind_incdir/h)
+      mv("#{stage}/libunwind/include/#{h}", unwind_incdir/h)
     end
-    FileUtils.mv("#{stage}/libunwind/include/mach-o", unwind_incdir/"mach-o")
+    mv("#{stage}/libunwind/include/mach-o", unwind_incdir/"mach-o")
 
     std_mod_dst = share/"libc++/v1"
-    std_mod_dst.rmtree if std_mod_dst.exist?
-    FileUtils.mv("#{stage}/libcxx/share/libc++/v1", std_mod_dst)
+    rm_r(std_mod_dst) if std_mod_dst.exist?
+    mv("#{stage}/libcxx/share/libc++/v1", std_mod_dst)
 
     (target_libdir/"libc++.a").write <<~LDSCRIPT
       INPUT(-lc++_static -lc++abi -lunwind)
@@ -390,8 +400,8 @@ class LlvmAT21 < Formula
     assert_match HOST_TRIPLE,  shell_output("#{bin}/clang --version")
 
     %w[aarch64-unknown-linux-ohos aarch64-linux-ohos].each do |pfx|
-      %w[clang clang++].each do |t|
-        assert_predicate bin/"#{pfx}-#{t}", :exist?
+      COMPILERS.each do |t|
+        assert_path_exists bin/"#{pfx}-#{t}"
       end
     end
 
@@ -399,14 +409,14 @@ class LlvmAT21 < Formula
     sysroot  = "#{ohos_sdk}/native/sysroot"
 
     rt_root = Pathname.glob("#{lib}/clang/*").first
-    assert_predicate rt_root/"lib"/TARGET_TRIPLE/"libclang_rt.builtins.a", :exist?
-    assert_predicate rt_root/"lib"/TARGET_TRIPLE/"clang_rt.crtbegin.o",    :exist?
-    assert_predicate rt_root/"lib"/TARGET_TRIPLE/"clang_rt.crtend.o",      :exist?
-    assert_predicate lib/TARGET_TRIPLE/"libc++_static.a",                   :exist?
-    assert_predicate lib/TARGET_TRIPLE/"libc++abi.a",                       :exist?
-    assert_predicate lib/TARGET_TRIPLE/"libunwind.a",                       :exist?
-    assert_predicate lib/TARGET_TRIPLE/"libc++.a",                          :exist?
-    assert_predicate include/TARGET_TRIPLE/"c++/v1/iostream",               :exist?
+    assert_path_exists rt_root/"lib"/TARGET_TRIPLE/"libclang_rt.builtins.a"
+    assert_path_exists rt_root/"lib"/TARGET_TRIPLE/"clang_rt.crtbegin.o"
+    assert_path_exists rt_root/"lib"/TARGET_TRIPLE/"clang_rt.crtend.o"
+    assert_path_exists lib/TARGET_TRIPLE/"libc++_static.a"
+    assert_path_exists lib/TARGET_TRIPLE/"libc++abi.a"
+    assert_path_exists lib/TARGET_TRIPLE/"libunwind.a"
+    assert_path_exists lib/TARGET_TRIPLE/"libc++.a"
+    assert_path_exists include/TARGET_TRIPLE/"c++/v1/iostream"
 
     (testpath/"hello.cpp").write <<~CPP
       #include <iostream>
@@ -414,6 +424,6 @@ class LlvmAT21 < Formula
     CPP
     system bin/"aarch64-linux-ohos-clang++", "-stdlib=libc++",
            "--sysroot=#{sysroot}", "hello.cpp", "-o", "hello"
-    assert_predicate testpath/"hello", :exist?
+    assert_path_exists testpath/"hello"
   end
 end

@@ -1,55 +1,47 @@
 class BunWebkit < Formula
-  desc "Bun WebKit fork (JavaScriptCore/WTF/bmalloc) static archives for HarmonyOS aarch64"
+  desc "JavaScriptCore/WTF/bmalloc static archives for Bun"
   homepage "https://github.com/oven-sh/bun"
-  license "BSD-3-Clause"           # JavaScriptCore (JSCOnly port)
+  url "https://github.com/oven-sh/WebKit.git",
+      revision: "6d586e293f008f0e74e5697611a379b1b24815c9"
+  version "6d586e293f"
+  license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
+  # This formula is fully rewritten from upstream because it builds only the
+  # JavaScriptCore/WTF/bmalloc static archives from oven-sh/WebKit, pinned to
+  # bun's WEBKIT_VERSION. Upstream does not package WebKit this way.
 
-  # WebKit 源码(oven-sh/WebKit 官方仓库)。
-  # commit 对齐 bun-src/scripts/build/deps/webkit.ts 的 WEBKIT_VERSION。
-  # 用 oven-sh 而非个人 fork(springmin/WebKit):6d586e293f 原本就在 oven-sh,
-  # 且 OHOS 适配靠 bun 侧的 webkit.ts.patch,无需改 WebKit 源码。
-  # 无对应 tag,直接用 commit sha 作 revision(Homebrew git url 支持)。
-  # 验证阶段:先用本地已有源码(/ohos-bun-webkit/webkit-src),跳过 git clone。
-  # 毕业时改回 oven-sh/WebKit.git。
-  stable do
-    url "file:///storage/Users/currentUser/HarmonyPC/Software/ohos-bun-webkit/webkit-src"
-    version "6d586e293f"
+  # WebKit source (oven-sh/WebKit official repo).
+  # commit aligns with WEBKIT_VERSION in bun-src/scripts/build/deps/webkit.ts.
+  # OHOS adaptation is handled by bun-side webkit.ts.patch, no need to modify WebKit source.
+
+  # WebKit version must match WEBKIT_VERSION in bun-src/scripts/build/deps/webkit.ts,
+  # cannot auto-bump, otherwise ABI mismatch with bun.
+  livecheck do
+    skip "pinned to bun's WEBKIT_VERSION"
   end
-
-  # WebKit 版本必须与 bun-src/scripts/build/deps/webkit.ts 的 WEBKIT_VERSION 一致,
-  # 不能自动 bump,否则与 bun 的 ABI 不匹配。
-  no_autobump! because: "pinned to bun's WEBKIT_VERSION"
 
   bottle do
     root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-webkit-v6d586e293f"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b24f668229c547b3677a87e2cd6948f0b83d6654e0e1dba2b3283d7fafbbf682"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a30b36850cb1af505384a22bfae7b4aae5706cc219392a3b05fcedb2609e3360"
   end
 
-  keg_only "WebKit static archives are consumed in-tree by Bun, not linked system-wide"
+  keg_only "webKit static archives are consumed in-tree by Bun, not linked system-wide"
 
   depends_on "cmake"        => :build
-  depends_on "ninja"        => :build
-  depends_on "perl"         => :build
-  depends_on "python@3.14"  => :build
-  depends_on "ruby"         => :build
   depends_on "gperf"        => :build
-  depends_on "llvm@21"
-  depends_on "icu4c@78"
-  depends_on "ohos-sdk"            # JSC 交叉编译用其 sysroot
-  # llvm@21 的 lld 运行时依赖 libxml2/zlib;显式声明让 superenv 注入库路径。
   depends_on "libxml2" => :build
-  depends_on "zlib"    => :build
+  depends_on "ninja" => :build
+  depends_on "perl" => :build
+  depends_on "python@3.14" => :build
+  depends_on "ruby" => :build
+  depends_on "zlib" => :build
+  depends_on "icu4c@78"
+  depends_on "llvm@21"
+  depends_on "ohos-sdk" # JSC cross-compilation uses its sysroot
+  # llvm@21's lld runtime depends on libxml2/zlib; explicitly declare so superenv injects library paths.
 
   def install
-    # 验证阶段:用本地源码(改回 oven-sh/WebKit url 后,此段删掉)。
-    # `file://` URL 经 brew 的 download strategy 处理时 buildpath 为空,手动 copy。
-    local_src = "/storage/Users/currentUser/HarmonyPC/Software/ohos-bun-webkit/webkit-src"
-    if File.directory?(local_src) && !File.exist?(buildpath/"CMakeLists.txt")
-      ohai "Copying local WebKit source to buildpath..."
-      FileUtils.cp_r "#{local_src}/.", buildpath, preserve: true
-    end
-
-    # llvm@21 的 lld 运行时依赖 libxml2/zlib,brew superenv 可能剥离 LD_LIBRARY_PATH,
-    # 显式注入库搜索路径(参照 icu4c@78 的经验)。
+    # llvm@21's lld runtime depends on libxml2/zlib, brew superenv may strip LD_LIBRARY_PATH,
+    # explicitly inject library search paths (per icu4c@78 experience).
     ENV.prepend_path "LD_LIBRARY_PATH", Formula["libxml2"].opt_lib.to_s
     ENV.prepend_path "LD_LIBRARY_PATH", Formula["zlib"].opt_lib.to_s
 
@@ -57,7 +49,7 @@ class BunWebkit < Formula
     clangxx  = Formula["llvm@21"].opt_bin/"clang++"
     sysroot  = "#{Formula["ohos-sdk"].opt_prefix}/native/sysroot"
 
-    # OHOS 交叉编译 flags(对齐 bun-src/scripts/build/deps/webkit.ts 的 cfg.ohos 分支)。
+    # OHOS cross-compilation flags (align with cfg.ohos branch in bun-src/scripts/build/deps/webkit.ts).
     target_flag = "--target=aarch64-linux-ohos"
     sysroot_flag = "--sysroot=#{sysroot}"
     icu_include = "-I#{Formula["icu4c@78"].opt_include}"
@@ -66,16 +58,14 @@ class BunWebkit < Formula
       target_flag, sysroot_flag, "-D__MUSL__",
       "-mbranch-protection=none", "-mno-outline-atomics",
       "-nostdinc++ -I#{Formula["llvm@21"].opt_include}/aarch64-linux-ohos/c++/v1",
-      icu_include, "-fno-c++-static-destructors", "-std=gnu++23",
+      icu_include, "-fno-c++-static-destructors", "-std=gnu++23"
     ].join(" ")
 
     cflags = [
       target_flag, sysroot_flag, "-D__MUSL__",
-      "-mbranch-protection=none", "-mno-outline-atomics", icu_include,
+      "-mbranch-protection=none", "-mno-outline-atomics", icu_include
     ].join(" ")
 
-    # lib/ 目录(对齐 setup-webkit-cache.sh 期望的布局)
-    libpath = lib
     mkdir buildpath/"build" do
       args = %W[
         -G Ninja
@@ -111,24 +101,45 @@ class BunWebkit < Formula
       system "ninja", "-j", ENV.make_jobs.to_s, "JavaScriptCore", "WTF", "bmalloc"
     end
 
-    # 产物:libJavaScriptCore.a / libWTF.a / libbmalloc.a + 头文件
-    # (cmake JSCOnly target 输出在 build/lib/)
+    # Output: libJavaScriptCore.a / libWTF.a / libbmalloc.a + headers
+    # (cmake JSCOnly target output is in build/lib/)
     lib.install Dir["build/lib/libJavaScriptCore.a", "build/lib/libWTF.a", "build/lib/libbmalloc.a"]
-    # 三个组件的顶层目录都叫 Headers,不能直接 install 目录名(会 EEXIST),
-    # 改为安装各 Headers 的内容,合并到 include/webkit/。
+    # All three components' top-level dirs are named Headers, cannot install dirs directly (EEXIST),
+    # instead install the contents of each Headers, merged into include/webkit/.
     (include/"webkit").install Dir["build/JavaScriptCore/Headers/*"]
     (include/"webkit").install Dir["build/WTF/Headers/*"]
     (include/"webkit").install Dir["build/bmalloc/Headers/*"]
-    # bun 构建时需要此文件验证 WebKit 配置完整性
+    # bun build needs this file to verify WebKit config completeness
     (include/"webkit").install "build/cmakeconfig.h" if File.exist?("build/cmakeconfig.h")
-    # JSC 运行时头文件(Source + DerivedSources) — bun PCH 需要,
-    # 以平面布局安装到 include/webkit/JavaScriptCore/(与 setup-webkit-cache.sh 一致)。
+    # JSC runtime headers (Source + DerivedSources) — needed by bun PCH,
+    # installed in flat layout under include/webkit/JavaScriptCore/ (consistent with setup-webkit-cache.sh).
     jsc_inc = include/"webkit/JavaScriptCore"
+    # OHOS uses the socket-based remote inspector, not the glib one.
+    # Exclude inspector/remote/glib/ so the basename-flatten picks the socket variant
+    # of files that exist in both (notably RemoteInspectorServer.h).
     Dir.glob(buildpath.to_s + "/Source/JavaScriptCore/**/*.h").each do |h|
+      next if h.include?("/inspector/remote/glib/")
+
       cp h, jsc_inc/File.basename(h) unless File.exist?(jsc_inc/File.basename(h))
     end
     Dir.glob(buildpath.to_s + "/build/JavaScriptCore/DerivedSources/**/*.h").each do |h|
       cp h, jsc_inc/File.basename(h) unless File.exist?(jsc_inc/File.basename(h))
+    end
+    # WTF platform subdirs (posix/cocoa/android/bun/…) are NOT in the cmake WTF/Headers
+    # export but bun source pulls them in. Overlay from Source/WTF/wtf/ to match
+    # setup-webkit-cache.sh. Skip glib/ (OHOS has no GLib).
+    wtf_inc = include/"webkit/wtf"
+    Dir.glob(buildpath.to_s + "/Source/WTF/wtf/*").each do |entry|
+      next unless File.directory?(entry)
+
+      name = File.basename(entry)
+      next if name == "glib"
+
+      dest = wtf_inc/name
+      cp_r entry, dest unless dest.exist?
+    end
+    Dir.glob(buildpath.to_s + "/Source/WTF/wtf/*.h").each do |h|
+      cp h, wtf_inc/File.basename(h) unless File.exist?(wtf_inc/File.basename(h))
     end
   end
 
@@ -141,8 +152,8 @@ class BunWebkit < Formula
   end
 
   test do
-    assert_predicate lib/"libJavaScriptCore.a", :exist?
-    assert_predicate lib/"libWTF.a",            :exist?
-    assert_predicate lib/"libbmalloc.a",         :exist?
+    assert_path_exists lib/"libJavaScriptCore.a"
+    assert_path_exists lib/"libWTF.a"
+    assert_path_exists lib/"libbmalloc.a"
   end
 end

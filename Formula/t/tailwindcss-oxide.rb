@@ -1,10 +1,15 @@
 class TailwindcssOxide < Formula
   desc "Tailwind CSS v4 native engine binding for HarmonyOS aarch64"
   homepage "https://tailwindcss.com"
-  license "MIT"
   url "https://github.com/tailwindlabs/tailwindcss/archive/refs/tags/v4.1.11.tar.gz"
-  sha256 "149b7db8417a4a0419ada1d2dc428a11202fc6b971f037b7a8527371c59e0cae"
   version "4.1.11"
+  sha256 "149b7db8417a4a0419ada1d2dc428a11202fc6b971f037b7a8527371c59e0cae"
+  license "MIT"
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
     root_url "https://github.com/social4hyq/homebrew-core/releases/download/tailwindcss-oxide-v4.1.11"
@@ -12,12 +17,14 @@ class TailwindcssOxide < Formula
   end
 
   keg_only "consumed in-tree by opencode/vite build"
-  depends_on "rust"    => :build
+  depends_on "rust" => :build
   depends_on "ohos-sdk"
 
   def install
     ENV.delete("RUSTC_WRAPPER")
-    system "cargo", "build", "-p", "tailwind-oxide", "--release", "--target", "aarch64-unknown-linux-ohos"
+
+    system "cargo", "build", "--lib", "-p", "tailwind-oxide", "--release", "--target", "aarch64-unknown-linux-ohos"
+
     so = "target/aarch64-unknown-linux-ohos/release/libtailwind_oxide.so"
     odie "build failed" unless File.exist?(so)
     sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
@@ -30,6 +37,6 @@ class TailwindcssOxide < Formula
   end
 
   test do
-    assert_predicate lib/"libtailwind_oxide.so", :exist?
+    assert_path_exists lib/"libtailwind_oxide.so"
   end
 end

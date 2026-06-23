@@ -1,13 +1,14 @@
 class BunPty < Formula
-  desc "bun-pty native shared library for HarmonyOS aarch64"
+  desc "Native shared library for HarmonyOS aarch64"
   homepage "https://github.com/sursaone/bun-pty"
+  url "https://github.com/sursaone/bun-pty.git",
+      tag:      "v0.4.10",
+      revision: "f46192643865ab7fe7a76da63363f5d174210bfe"
   license "MIT"
 
-  # bun-pty 上游源码。brew install 时 clone 到 buildpath。
-  stable do
-    url "https://github.com/sursaone/bun-pty.git",
-        tag: "v0.4.10",
-        revision: "f46192643865ab7fe7a76da63363f5d174210bfe"
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
@@ -15,47 +16,48 @@ class BunPty < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "da10d8b9d51837b604e2fbb7dbfab9261d0009ca9a771058b9e8a4b25e542fa7"
   end
 
-  # portable-pty 上游源码(crates.io 0.9.0)。其默认 nix 0.28 不支持 OHOS,
-  # 在 install 里把 nix 升到 0.31(nix 0.30 起支持 *-unknown-linux-ohos,
-  # 见 nix-rust/nix#2599/#2587/#2456)。仅此一行 inreplace,无需 fork 仓库。
+  # portable-pty upstream source (crates.io 0.9.0). Its default nix 0.28 does not support OHOS;
+  # in install we bump nix to 0.31 (nix 0.30 onwards supports *-unknown-linux-ohos,
+  # see nix-rust/nix#2599/#2587/#2456). Just this one inreplace line — no need to fork the repo.
+  keg_only "consumed in-tree by opencode build"
+
+  depends_on "rust" => :build
+  depends_on "ohos-sdk"
+
   resource "portable-pty" do
     url "https://static.crates.io/crates/portable-pty/0.9.0/download"
     sha256 "b4a596a2b3d2752d94f51fac2d4a96737b8705dddd311a32b9af47211f08671e"
   end
 
-  keg_only "consumed in-tree by opencode build"
-
-  depends_on "rust" => :build
-  depends_on "ohos-sdk"   # binary-sign-tool:OHOS .so 须签名方可加载
-
   def install
-    # 1. 解压 portable-pty 源码;glob 定位包根(.crate 可能扁平或带版本号顶层目录)。
+    # 1. Extract portable-pty source; glob to locate the package root
+    #    (.crate may be flat or have a versioned top-level dir).
     pp_dir = buildpath/"portable-pty-src"
     pp_dir.install resource("portable-pty")
     pp_src = (pp_dir/"Cargo.toml").exist? ? pp_dir : pp_dir.glob("portable-pty-*/Cargo.toml").first&.dirname
     odie "portable-pty source not staged under #{pp_dir}" if pp_src.nil?
 
-    # 2. 把 portable-pty 的 nix 依赖从 0.28 升到 0.31(OHOS 支持)
+    # 2. Bump portable-pty's nix dependency from 0.28 to 0.31 (OHOS support).
     inreplace pp_src/"Cargo.toml", 'version = "0.28"', 'version = "0.31"'
 
-    # 3. 把 rust-pty/Cargo.toml 的 portable-pty 改指到上面这份源码(path 依赖)
+    # 3. Repoint rust-pty/Cargo.toml's portable-pty to the source above (path dependency).
     inreplace "rust-pty/Cargo.toml" do |s|
       s.sub!(/^portable-pty\s*=.*/,
-             %(portable-pty = { path = "#{pp_src}", features = ["serde_support"] }))
+             %Q(portable-pty = { path = "#{pp_src}", features = ["serde_support"] }))
     end
 
-    # 4. 原生编译(OHOS 主机,rust host == aarch64-unknown-linux-ohos,无需 NDK/sysroot)。
-    #    superenv 适配:rustc_wrapper shim 是 #!/bin/bash 而 OHOS 无 /bin/bash → 删除;
-    #    OHOS musl 无系统 CA store → 给 cargo 指 CA bundle(同 bun.rb)。
+    # 4. Native compile (OHOS host, rust host == aarch64-unknown-linux-ohos, no NDK/sysroot needed).
+    #    superenv adaptation: the rustc_wrapper shim is #!/bin/bash but OHOS has no /bin/bash → remove it;
+    #    OHOS musl has no system CA store → point cargo at a CA bundle (same as bun.rb).
     ENV.delete("RUSTC_WRAPPER")
     ENV["SSL_CERT_FILE"]  = (HOMEBREW_PREFIX/"etc/ca-certificates/cert.pem").to_s
     ENV["CURL_CA_BUNDLE"] = ENV["SSL_CERT_FILE"]
 
     cd "rust-pty" do
-      system "cargo", "build", "--release", "--target", "aarch64-unknown-linux-ohos"
+      system "cargo", "build", "--lib", "--release", "--target", "aarch64-unknown-linux-ohos"
     end
 
-    # 5. 签名 + 安装
+    # 5. Sign + install
     so = buildpath/"rust-pty/target/aarch64-unknown-linux-ohos/release/librust_pty.so"
     odie "librust_pty.so build failed" unless so.exist?
     sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
@@ -65,6 +67,6 @@ class BunPty < Formula
   end
 
   test do
-    assert_predicate lib/"librust_pty.so", :exist?
+    assert_path_exists lib/"librust_pty.so"
   end
 end
