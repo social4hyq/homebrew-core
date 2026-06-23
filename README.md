@@ -69,8 +69,8 @@ graph TD
     bb[bun-bootstrap]:::boot
     bw[bun-webkit]:::boot
 
-    llvm[llvm@21]:::tc
-    icu[icu4c@78]:::tc
+    llvm["llvm@21"]:::tc
+    icu["icu4c@78"]:::tc
 
     sdk[ohos-sdk]:::sdk
 
