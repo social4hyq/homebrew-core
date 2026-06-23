@@ -95,20 +95,6 @@ graph TD
     tw --> sdk
 ```
 
-不支持 Mermaid 渲染时的简化视图：
-
-```
-应用层    opencode
-            ↓
-运行时层  bun ────────► bun-pty / lightningcss / tailwindcss-oxide
-            ↓
-自举层    bun-bootstrap (一次性) , bun-webkit
-            ↓
-工具链层  llvm@21 ◄── icu4c@78
-            ↓
-系统层    ohos-sdk
-```
-
 ## 安装
 
 ```bash
