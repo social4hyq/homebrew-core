@@ -1,12 +1,14 @@
 # social4hyq/homebrew-core
 
-HarmonyOS (OHOS aarch64) Homebrew tap：收录在鸿蒙系统上从源码构建的 formula 及其预编译 bottle，作为 [Harmonybrew](https://atomgit.com/Harmonybrew) 官方 core 的先行验证仓库。
+HarmonyOS (OHOS aarch64) Homebrew tap：收录在鸿蒙系统上从源码构建的 formula 及其预编译 bottle，作为 [Harmonybrew/homebrew-core](https://atomgit.com/Harmonybrew/homebrew-core) 的先行验证仓库。
+
+> Harmonybrew/homebrew-core 是 Harmonybrew 项目的 core tap，绝大多数 formula 由上游 [Homebrew/homebrew-core](https://github.com/Homebrew/homebrew-core) 迁移而来。本仓库则负责孵化那些尚未具备迁移条件、需要在鸿蒙上从零打通自举链路的 formula，待稳定后再回流到官方 core。
 
 > ⚠️ **早期实验版本** — 当前仓库内的 formula 处于"能跑通即发布"的探路阶段，**不保证生产可用**。继续阅读「当前状态与已知限制」了解风险。
 
 ## 仓库定位
 
-最终目标是把本仓库中稳定下来的 formula 合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew)。目前不合入官方 core，原因有三：
+最终目标是把本仓库中稳定下来的 formula 合入 [Harmonybrew/homebrew-core](https://atomgit.com/Harmonybrew/homebrew-core)。目前不合入官方 core，原因有三：
 
 1. **Bun 上游正在迁移到 Rust 重写** — 官方 OHOS aarch64 二进制尚未发布；Bun 源码持续大改，本仓库的补丁集（`pr3-pr8`，~50 个 patch）需要频繁 rebase。官方 Rust 版发布之前，本仓库的 `bun` / `bun-bootstrap` / `bun-webkit` 三件套都属于过渡形态。
 2. **HarmonyOS 系统调用面尚未对齐 Linux** — Bun 大量功能依赖底层 syscall，部分 syscall 在鸿蒙内核尚未开放或未实现；本仓库通过"功能降级 / 回退路径 / 软件模拟"绕过缺口，可能在功能完整性、性能与并发上偏离上游基准。
