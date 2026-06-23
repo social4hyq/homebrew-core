@@ -21,8 +21,8 @@ class BunPty < Formula
   # see nix-rust/nix#2599/#2587/#2456). Just this one inreplace line — no need to fork the repo.
   keg_only "consumed in-tree by opencode build"
 
-  depends_on "rust" => :build
-  depends_on "ohos-sdk"
+  depends_on "ohos-sdk" => :build # binary-sign-tool, only used during install
+  depends_on "rust"     => :build
 
   resource "portable-pty" do
     url "https://static.crates.io/crates/portable-pty/0.9.0/download"

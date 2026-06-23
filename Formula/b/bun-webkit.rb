@@ -34,9 +34,10 @@ class BunWebkit < Formula
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
   depends_on "zlib" => :build
-  depends_on "icu4c@78"
-  depends_on "llvm@21"
-  depends_on "ohos-sdk" # JSC cross-compilation uses its sysroot
+  # Outputs are static .a archives + headers — zero runtime linkage.
+  depends_on "icu4c@78" => :build
+  depends_on "llvm@21"  => :build
+  depends_on "ohos-sdk" => :build # JSC cross-compilation uses its sysroot
   # llvm@21's lld runtime depends on libxml2/zlib; explicitly declare so superenv injects library paths.
 
   def install

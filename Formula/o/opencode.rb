@@ -16,14 +16,16 @@ class Opencode < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "dc1e8cd9effa2799a94493b87279a02444f2b6e151de280b6b49af3a5e1b4c73"
   end
 
-  depends_on "python@3.14" => :build
-  depends_on "bun"
-  depends_on "bun-pty"
-  depends_on "lightningcss"
-  depends_on "llvm@21"
-  depends_on "node"
-  depends_on "ohos-sdk"
-  depends_on "tailwindcss-oxide"
+  # opencode is a `bun build --compile` single binary with bun runtime + JS + native .node/.so
+  # all embedded and pre-signed. The bottle has zero runtime dependencies.
+  depends_on "bun"               => :build
+  depends_on "bun-pty"           => :build
+  depends_on "lightningcss"      => :build
+  depends_on "llvm@21"           => :build # llvm-objcopy strips .codesign before re-sign
+  depends_on "node"              => :build # npm_config_nodedir for bun install
+  depends_on "ohos-sdk"          => :build # binary-sign-tool for the final binary
+  depends_on "python@3.14"       => :build
+  depends_on "tailwindcss-oxide" => :build
 
   patch :p1 do
     file "Patches/opencode/build-ohos-target.patch"

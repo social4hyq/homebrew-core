@@ -17,8 +17,8 @@ class TailwindcssOxide < Formula
   end
 
   keg_only "consumed in-tree by opencode/vite build"
-  depends_on "rust" => :build
-  depends_on "ohos-sdk"
+  depends_on "ohos-sdk" => :build # binary-sign-tool, only used during install
+  depends_on "rust"     => :build
 
   def install
     ENV.delete("RUSTC_WRAPPER")

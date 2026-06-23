@@ -30,10 +30,13 @@ class Bun < Formula
   depends_on "perl"           => :build
   depends_on "python@3.14"    => :build
   depends_on "ruby"           => :build
-  depends_on "bun-webkit"
-  depends_on "icu4c@78"
-  depends_on "ohos-sdk"                # bun source OHOS path uses its sysroot
-  depends_on "openssl@3"               # rust-nightly cargo dynamically links libssl/libcrypto
+  depends_on "bun-webkit" => :build    # JSC/WTF/bmalloc static .a, linked into bun binary
+  depends_on "icu4c@78"   => :build    # libicu*.a, linked into bun binary
+  depends_on "openssl@3"  => :build    # only build-time rust-nightly cargo links libssl/libcrypto
+  # ohos-sdk stays runtime: bun calls binary-sign-tool at runtime in three places
+  # (PackageInstaller signs downloaded .node files; dlopen ensures .so is signed;
+  # `bun build --compile` signs its output). OHOS refuses to exec unsigned ELF.
+  depends_on "ohos-sdk"
 
   # Rust nightly (native OHOS host toolchain, needed by bun's libbun_rust.a).
   # OHOS is a Tier 3 target with no prebuilt rust-std, so bun uses -Zbuild-std
