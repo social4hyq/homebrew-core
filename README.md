@@ -100,8 +100,12 @@ graph TD
 ```bash
 brew tap social4hyq/core https://github.com/social4hyq/homebrew-core.git
 brew trust social4hyq/core         # Homebrew 6.0+ 必须显式信任第三方 tap
-brew install bun                   # JavaScript / TypeScript 运行时
-brew install opencode              # AI 编码代理（自动拉入 bun 与全部 native 依赖）
+
+# 只装 bun：
+brew install bun
+
+# 只装 opencode（自动拉入 bun + ohos-sdk，其余 native binding 已嵌入二进制）：
+brew install opencode
 ```
 
 装完跑一次 smoke：
