@@ -3,13 +3,13 @@ class Octodns < Formula
 
   desc "Tools for managing DNS across multiple providers"
   homepage "https://github.com/octodns/octodns"
-  url "https://files.pythonhosted.org/packages/a5/ba/287143db4290e0990d67a542d7fbf8bec02652f4b811da3b3d01a03ac5d7/octodns-1.19.0.tar.gz"
-  sha256 "fc2f833fd7ad9bc2b604dc7756def49172a9be207ff4256cab0a46cffc9112a5"
+  url "https://files.pythonhosted.org/packages/6c/3f/efa3684728098eec6e406958920497704805e9d676a32cb75f2fa9abb439/octodns-1.20.0.tar.gz"
+  sha256 "35a556be684e8e07a02efb7f8c26669cbf16cb6a74c302d59410569cffb3a1e2"
   license "MIT"
   head "https://github.com/octodns/octodns.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "974a50dd107c319473892ee1f50d57a0c22c0e1f62e32aefb1e77e10c17049b0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b9976fedf4f2c01d0f99d389da950c46327f9acb6384d7895c45e8305c47efe"
   end
 
   depends_on "libyaml"
