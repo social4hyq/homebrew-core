@@ -5,8 +5,8 @@ class Rockcraft < Formula
   homepage "https://documentation.ubuntu.com/rockcraft/"
   # git checkout needed for setuptools-scm
   url "https://github.com/canonical/rockcraft.git",
-      tag:      "1.19.0",
-      revision: "77be1bab830d1683791c004b3c0df856f294d805"
+      tag:      "1.19.1",
+      revision: "5a78bf4b84c41d730012932881c7966fcdac0170"
   license "GPL-3.0-only"
   head "https://github.com/canonical/rockcraft.git", branch: "main"
 
@@ -16,7 +16,7 @@ class Rockcraft < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "961c3a34977dbfa7c175073c18643554e201f4de02cf76945b9a98c8e02f2869"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ac73ef30af5d2b44f0b694bbc33364daa2d99d450de8303753bd9f685a8bbe9"
   end
 
   depends_on "certifi" => :no_linkage
