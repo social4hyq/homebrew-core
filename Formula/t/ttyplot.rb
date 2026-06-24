@@ -11,7 +11,7 @@ class Ttyplot < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "95a88df327bd104729413a3f843fd1a815f1897d353dc596645fc166caab9c2e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e91e431ebf1b06b293465f796cd1d38e4c59cb2a9889ae51d66ecc4627abbe84"
   end
 
   depends_on "pkgconf" => :build
