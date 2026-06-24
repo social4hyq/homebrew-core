@@ -16,8 +16,9 @@ class LlvmAT21 < Formula
   bottle do
     # Validation tap bottle; when graduating to official core, change root_url → harmonybrew/homebrew-core releases.
     # Tag name does not contain @ (avoids GitHub URL encoding causing brew parsing issues).
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm21-v21.1.8"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ce8717c57f10569371e0f517d28b32525cd38b4c4f8e2c346d29d6d840c831f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm21-v21.1.8-pruned"
+    # sha256 placeholder — backfilled after `brew bottle` (Task 13 of slim-llvm21-bottle plan).
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
   keg_only "this is a versioned HarmonyOS bootstrap toolchain"
@@ -431,16 +432,28 @@ class LlvmAT21 < Formula
 
   def caveats
     <<~EOS
-      HarmonyOS LLVM 21 (clang + lld + OHOS multiarch runtime libs) at:
+      HarmonyOS LLVM 21 (slim bootstrap build) at:
         #{opt_prefix}
 
-      Default target triple:    #{HOST_TRIPLE}
+      Default target triple:      #{HOST_TRIPLE}
       Runtime libs target triple: #{TARGET_TRIPLE}
+
+      This is a SLIM build — only what downstream C++23 bootstraps consume:
+        ✓ clang/clang++ v21, ld.lld v21 (CodeSign patch), llvm-config
+        ✓ multiarch libc++/libunwind/compiler-rt static libs + headers
+        ✗ libLLVM*.a / libclang*.a / libclang-cpp.so (use upstream for LLVM dev)
+        ✗ clang-format/tidy/clangd, scan-build (use ohos-sdk LLVM 15)
+
+      bin/ tools like llvm-ar/nm/objcopy/objdump/readelf/strip/cov/FileCheck
+      are relative symlinks to ohos-sdk LLVM 15 (formats stable across 15-21).
 
       Example:
         #{opt_bin}/aarch64-linux-ohos-clang++ -stdlib=libc++ \\
           --sysroot=#{HOMEBREW_PREFIX}/opt/ohos-sdk/native/sysroot \\
           hello.cpp -o hello
+
+      For a full LLVM 21 dev environment (all tools + static libs + headers),
+      track future `llvm@21-full` formula (not yet implemented).
     EOS
   end
 
