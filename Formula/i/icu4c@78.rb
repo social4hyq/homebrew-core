@@ -69,6 +69,8 @@ class Icu4cAT78 < Formula
       system "./configure", *%w[--disable-samples --disable-tests --enable-static --with-library-bits=64],
              "--build=aarch64-linux-ohos", "--prefix=#{native_prefix}",
              "CC=#{clang}", "CXX=#{clangxx}",
+             "AR=#{Formula["llvm@21"].opt_bin}/llvm-ar",
+             "RANLIB=#{Formula["llvm@21"].opt_bin}/llvm-ranlib",
              "CFLAGS=-O2", "CXXFLAGS=-O2 -stdlib=libc++",
              # -Wl,--code-sign: lld signs the binary so the tools are executable when Phase 2 invokes them.
              "LDFLAGS=-stdlib=libc++ -Wl,--code-sign"
@@ -86,6 +88,8 @@ class Icu4cAT78 < Formula
              "--with-cross-build=#{native_prefix}", "--disable-tools",
              *std_configure_args,
              "CC=#{clang}", "CXX=#{clangxx}",
+             "AR=#{Formula["llvm@21"].opt_bin}/llvm-ar",
+             "RANLIB=#{Formula["llvm@21"].opt_bin}/llvm-ranlib",
              "CFLAGS=-O2 -fPIC --target=aarch64-linux-ohos",
              "CXXFLAGS=-O2 -stdlib=libc++ -fPIC --target=aarch64-linux-ohos",
              "LDFLAGS=-stdlib=libc++ --target=aarch64-linux-ohos -Wl,--code-sign"
