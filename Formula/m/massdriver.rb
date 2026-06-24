@@ -15,7 +15,7 @@ class Massdriver < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f9943f2ed618ca7660bbb1f8cf9b287a9d717bb1d911cee8185eee441ab14e8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e857e4352352eaf66a22368104feba91e13d7fdad380fce8a9ac6cef5bdd33fb"
   end
 
   depends_on "go" => :build
