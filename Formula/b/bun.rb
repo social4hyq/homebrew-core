@@ -22,17 +22,17 @@ class Bun < Formula
 
   # ── Dependencies (all bare names, zero changes when graduating to harmonybrew/core) ──
   depends_on "bun-bootstrap" => :build # Bootstrap: `bun bd` itself is a bun script
-  depends_on "cmake"          => :build
-  depends_on "gperf"          => :build
+  depends_on "bun-webkit" => :build
+  depends_on "cmake" => :build
+  depends_on "gperf" => :build
   depends_on "llvm@21" => :build
-  depends_on "ninja"          => :build
-  depends_on "node"           => :build
-  depends_on "perl"           => :build
-  depends_on "python@3.14"    => :build
-  depends_on "ruby"           => :build
-  depends_on "bun-webkit" => :build    # JSC/WTF/bmalloc static .a, linked into bun binary
-  depends_on "social4hyq/core/icu4c@78" => :build    # libicu*.a, linked into bun binary (qualified: icu4c@78 exists in both social4hyq/core and harmonybrew/core)
-  depends_on "openssl@3"  => :build    # only build-time rust-nightly cargo links libssl/libcrypto
+  depends_on "ninja" => :build
+  depends_on "node" => :build
+  depends_on "openssl@3" => :build # only build-time rust-nightly cargo links libssl/libcrypto
+  depends_on "perl" => :build
+  depends_on "python@3.14" => :build
+  depends_on "ruby" => :build
+  depends_on "social4hyq/core/icu4c@78" => :build # qualified: icu4c@78 exists in both taps
   # ohos-sdk stays runtime: bun calls binary-sign-tool at runtime in three places
   # (PackageInstaller signs downloaded .node files; dlopen ensures .so is signed;
   # `bun build --compile` signs its output). OHOS refuses to exec unsigned ELF.

@@ -137,15 +137,14 @@ class LlvmAT21 < Formula
             "-no-canonical-prefixes -ffunction-sections -fdata-sections"
     args << "-DCMAKE_CXX_FLAGS=-D__MUSL__ -fstack-protector-strong " \
             "-no-canonical-prefixes -ffunction-sections -fdata-sections"
-    args << "-DCMAKE_EXE_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 " \
-            "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack " \
-            "-Wl,-rpath,$ORIGIN/../lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib"
-    args << "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 " \
-            "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack " \
-            "-Wl,-rpath,$ORIGIN/../lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib"
-    args << "-DCMAKE_MODULE_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 " \
-            "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack " \
-            "-Wl,-rpath,$ORIGIN/../lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib"
+    rpath_flags = "-Wl,-rpath,$ORIGIN/../lib " \
+                  "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib " \
+                  "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib"
+    common_linker_flags = "-Wl,--code-sign -Wl,--build-id=sha1 " \
+                          "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack #{rpath_flags}"
+    args << "-DCMAKE_EXE_LINKER_FLAGS=#{common_linker_flags}"
+    args << "-DCMAKE_SHARED_LINKER_FLAGS=#{common_linker_flags}"
+    args << "-DCMAKE_MODULE_LINKER_FLAGS=#{common_linker_flags}"
     args << "-DRUNTIMES_CMAKE_ARGS=-DCMAKE_MODULE_PATH=#{cmake_modules}" \
             ";-DCMAKE_SYSROOT=#{sysroot}" \
             ";-DCMAKE_C_FLAGS=-D__MUSL__" \
@@ -427,17 +426,18 @@ class LlvmAT21 < Formula
     Pathname.glob(bin/"*").each do |f|
       name = f.basename.to_s
       next if KEEP_BIN_ENTRIES.include?(name)
-      next if name =~ /\Aaarch64-(unknown-)?linux-ohos-(clang|clang\+\+)\z/
-      next if f.symlink?  # preserve ohos-sdk symlinks created by link_overlapping_tools
-      rm_f(f)
+      next if /\Aaarch64-(unknown-)?linux-ohos-(clang|clang\+\+)\z/.match?(name)
+      next if f.symlink? # preserve ohos-sdk symlinks created by link_overlapping_tools
+
+      rm(f)
     end
 
     # lib/: delete static libs and large .so (binaries statically link what they need).
     %w[libLLVM*.a libclang*.a liblld*.a
        libclang-cpp.so* libLTO.so* libclang.so*].each do |pat|
-      Dir.glob(lib/pat).each { |f| rm_f(f) }
+      Dir.glob(lib/pat).each { |f| rm(f) }
     end
-    rm_rf(lib/"scanbuild") if (lib/"scanbuild").exist?
+    rm_r(lib/"scanbuild") if (lib/"scanbuild").exist?
 
     # include/: drop LLVM internal dev headers (downstream uses libc++ headers only).
     %w[llvm llvm-c clang clang-c lld].each do |sub|
@@ -460,6 +460,7 @@ class LlvmAT21 < Formula
     KEEP_TOOLS_FROM_SDK.each do |t|
       src = sdk_bin/t
       next unless src.exist?
+
       target = bin/t
       target.unlink if target.exist? || target.symlink?
       target.make_symlink src.relative_path_from(bin)

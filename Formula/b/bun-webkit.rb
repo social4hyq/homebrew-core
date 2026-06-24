@@ -29,15 +29,15 @@ class BunWebkit < Formula
   depends_on "cmake"        => :build
   depends_on "gperf"        => :build
   depends_on "libxml2" => :build
+  depends_on "llvm@21"  => :build
   depends_on "ninja" => :build
+  depends_on "ohos-sdk" => :build
   depends_on "perl" => :build
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
-  depends_on "zlib" => :build
-  # Outputs are static .a archives + headers — zero runtime linkage.
   depends_on "social4hyq/core/icu4c@78" => :build
-  depends_on "llvm@21"  => :build
-  depends_on "ohos-sdk" => :build # JSC cross-compilation uses its sysroot
+  depends_on "zlib" => :build
+  # Outputs are static .a archives + headers — zero runtime linkage. # JSC cross-compilation uses its sysroot
   # llvm@21's lld runtime depends on libxml2/zlib; explicitly declare so superenv injects library paths.
 
   def install
