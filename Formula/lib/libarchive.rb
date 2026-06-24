@@ -1,8 +1,8 @@
 class Libarchive < Formula
   desc "Multi-format archive and compression library"
   homepage "https://www.libarchive.org"
-  url "https://www.libarchive.org/downloads/libarchive-3.8.7.tar.xz"
-  sha256 "d3a8ba457ae25c27c84fd2830a2efdcc5b1d40bf585d4eb0d35f47e99e5d4774"
+  url "https://www.libarchive.org/downloads/libarchive-3.8.8.tar.xz"
+  sha256 "3873a88801da067d0528a989af06877710529d50ee8fe6f3970cbb4302efb918"
   license "BSD-2-Clause"
   compatibility_version 1
 
