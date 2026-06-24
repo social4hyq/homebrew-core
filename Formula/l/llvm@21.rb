@@ -139,11 +139,14 @@ class LlvmAT21 < Formula
     args << "-DCMAKE_CXX_FLAGS=-D__MUSL__ -fstack-protector-strong " \
             "-no-canonical-prefixes -ffunction-sections -fdata-sections"
     args << "-DCMAKE_EXE_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 " \
-            "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack"
+            "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack " \
+            "-Wl,-rpath,\\$ORIGIN/../lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib"
     args << "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 " \
-            "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack"
+            "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack " \
+            "-Wl,-rpath,\\$ORIGIN/../lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib"
     args << "-DCMAKE_MODULE_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 " \
-            "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack"
+            "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack " \
+            "-Wl,-rpath,\\$ORIGIN/../lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib"
     args << "-DRUNTIMES_CMAKE_ARGS=-DCMAKE_MODULE_PATH=#{cmake_modules}" \
             ";-DCMAKE_SYSROOT=#{sysroot}" \
             ";-DCMAKE_C_FLAGS=-D__MUSL__" \
