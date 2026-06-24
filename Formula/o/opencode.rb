@@ -21,9 +21,8 @@ class Opencode < Formula
   depends_on "bun"               => :build
   depends_on "bun-pty"           => :build
   depends_on "lightningcss"      => :build
-  depends_on "llvm@21"           => :build # llvm-objcopy strips .codesign before re-sign
   depends_on "node"              => :build # npm_config_nodedir for bun install
-  depends_on "ohos-sdk"          => :build # binary-sign-tool for the final binary
+  depends_on "ohos-sdk"          => :build # binary-sign-tool + llvm-objcopy (strips .codesign before re-sign)
   depends_on "python@3.14"       => :build
   depends_on "tailwindcss-oxide" => :build
 
@@ -60,7 +59,9 @@ class Opencode < Formula
     end
 
     sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
-    objcopy   = Formula["llvm@21"].opt_bin/"llvm-objcopy"
+    # llvm-objcopy from ohos-sdk (LLVM 15) — ELF section ops stable across LLVM 15-21.
+    # (Formerly depended on llvm@21; dependency removed in slim-llvm21-bottle change.)
+    objcopy   = Formula["ohos-sdk"].opt_prefix/"native/llvm/bin/llvm-objcopy"
 
     deploy_native = lambda do |src, dest|
       cp src, dest
