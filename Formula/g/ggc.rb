@@ -1,13 +1,13 @@
 class Ggc < Formula
   desc "Modern Git CLI"
   homepage "https://github.com/bmf-san/ggc"
-  url "https://github.com/bmf-san/ggc/archive/refs/tags/v8.6.8.tar.gz"
-  sha256 "3da45faa65b3d70dce18ebd417d03a05756c9df05531ccd4287940d0aced0a0a"
+  url "https://github.com/bmf-san/ggc/archive/refs/tags/v8.7.0.tar.gz"
+  sha256 "034e9645b980071dba922839e0878680ff1130fa3439115cfd525554e01a2340"
   license "MIT"
   head "https://github.com/bmf-san/ggc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a99cb3270d6005bb098510e48ab717b4ca6693a5139878c7b0ea8ed58dcfd08"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "46dab9505628b04894f30de6e44019490abef98624a6615904818d6348474fae"
   end
 
   depends_on "go" => :build
