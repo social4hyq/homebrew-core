@@ -9,7 +9,7 @@ class Jupytext < Formula
   head "https://github.com/mwouts/jupytext.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "83d93f59ee6fa1d3295b0753ced7b05ddd11ceca5770af7ce72347201d760a4c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00741b75b3aa5f9a80e656cd18b41e539c514809e1eda006ca5bdaa90c229f6a"
   end
 
   depends_on "libyaml"
