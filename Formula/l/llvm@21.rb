@@ -168,11 +168,14 @@ class LlvmAT21 < Formula
 
     sign_dir(bin)
     install_triple_wrappers
+    # Link BEFORE build_compiler_rt / build_multiarch_runtimes, because those
+    # methods reference bin/llvm-ar and bin/llvm-ranlib, which are no longer
+    # installed by LLVM toolchain (LLVM_BUILD_TOOLS=OFF).
+    link_overlapping_tools
     build_compiler_rt(sysroot: sysroot, jobs: jobs)
     build_multiarch_runtimes(sysroot: sysroot, libcxx_ohos: libcxx_ohos, jobs: jobs)
 
     prune_bootstrap_extras
-    link_overlapping_tools
   end
 
   def patch_config_guess(config_guess)
