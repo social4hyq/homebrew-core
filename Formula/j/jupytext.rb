@@ -3,13 +3,13 @@ class Jupytext < Formula
 
   desc "Jupyter notebooks as Markdown documents, Julia, Python or R scripts"
   homepage "https://jupytext.readthedocs.io/en/latest/"
-  url "https://files.pythonhosted.org/packages/ef/2d/15624c3d9440d85a280ff13d2d23afd989802f25470ac59932f4fef6f0c6/jupytext-1.19.3.tar.gz"
-  sha256 "713c3ed4441afe0f31474d28ea2e6b61a268c04c40fd78e5ccfd7f7ac9e9f766"
+  url "https://files.pythonhosted.org/packages/3b/52/e014296ac8f40ca783aeb73dae52e65edbb0eaae0dcdc1ea41bfaa8aebf7/jupytext-1.19.4.tar.gz"
+  sha256 "739bcd4bc12aa4fe298a38017cdb5ae27b08a6ba3a5470728d2fe9e04b155db1"
   license "MIT"
   head "https://github.com/mwouts/jupytext.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "83d93f59ee6fa1d3295b0753ced7b05ddd11ceca5770af7ce72347201d760a4c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00741b75b3aa5f9a80e656cd18b41e539c514809e1eda006ca5bdaa90c229f6a"
   end
 
   depends_on "libyaml"
@@ -69,8 +69,8 @@ class Jupytext < Formula
   end
 
   resource "platformdirs" do
-    url "https://files.pythonhosted.org/packages/9f/4a/0883b8e3802965322523f0b200ecf33d31f10991d0401162f4b23c698b42/platformdirs-4.9.6.tar.gz"
-    sha256 "3bfa75b0ad0db84096ae777218481852c0ebc6c727b3168c1b9e0118e458cf0a"
+    url "https://files.pythonhosted.org/packages/d7/47/e4501f49c178ae1d9f4a75073fda4204f52647993f075a9db4d14930e0c5/platformdirs-4.10.0.tar.gz"
+    sha256 "31e761a6a0ca04faf7353ea759bdba55652be214725111e5aac52dfa29d4bef7"
   end
 
   resource "pyyaml" do
@@ -84,8 +84,8 @@ class Jupytext < Formula
   end
 
   resource "traitlets" do
-    url "https://files.pythonhosted.org/packages/1b/22/40f55b26baeab80c2d7b3f1db0682f8954e4617fee7d90ce634022ef05c6/traitlets-5.15.0.tar.gz"
-    sha256 "4fead733f81cf1c4c938e06f8ca4633896833c9d89eff878159457f4d4392971"
+    url "https://files.pythonhosted.org/packages/57/a9/a2584b8313b89f94869ddb3c4074617a691de1812a614d2d50e32ca5a7a6/traitlets-5.15.1.tar.gz"
+    sha256 "7b1c07854fe25acb39e009bae49f11b79ff6cbb2f27999104e9110e7a6b53722"
   end
 
   def install
