@@ -7,7 +7,7 @@ class Crit < Formula
   head "https://github.com/tomasz-tomczyk/crit.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd5d43bed52d8091942cea1ba328f3271acfcc7d643e77b041cce182765e089d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2862cba635f081ddf6929d3b2f34e192705c826f15ff12a277f4e25321e10671"
   end
 
   depends_on "go" => :build
