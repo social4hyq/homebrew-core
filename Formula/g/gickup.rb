@@ -1,13 +1,13 @@
 class Gickup < Formula
   desc "Backup all your repositories with Ease"
   homepage "https://cooperspencer.github.io/gickup-documentation/"
-  url "https://github.com/cooperspencer/gickup/archive/refs/tags/v0.10.44.tar.gz"
-  sha256 "07aeec9ea820595fd6beba7bdf76cd746988b0d64ae84275ab2b61edc7eedf6f"
+  url "https://github.com/cooperspencer/gickup/archive/refs/tags/v0.10.45.tar.gz"
+  sha256 "61cb2fef81f719bdf4bce8061aae2a0280985e13e194121455ffbfb4d2cfce24"
   license "Apache-2.0"
   head "https://github.com/cooperspencer/gickup.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "95186a5c17a8dd03eef58e45a119e1fe50de51963527099a89565013478519e5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "86e184cdbf0e211bea36e5ac47d7db9cf316a0c97b4c7d093b285dd76ef8d7e1"
   end
 
   depends_on "go" => :build
