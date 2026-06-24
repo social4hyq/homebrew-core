@@ -17,8 +17,7 @@ class LlvmAT21 < Formula
     # Validation tap bottle; when graduating to official core, change root_url → harmonybrew/homebrew-core releases.
     # Tag name does not contain @ (avoids GitHub URL encoding causing brew parsing issues).
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm21-v21.1.8-pruned"
-    # sha256 placeholder — backfilled after `brew bottle` (Task 13 of slim-llvm21-bottle plan).
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7f2552bf73ca4ca3db8dc8f81e2d2f70e991c6897c2619d39cf7e8984b52120"
   end
 
   keg_only "this is a versioned HarmonyOS bootstrap toolchain"
