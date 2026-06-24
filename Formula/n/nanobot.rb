@@ -1,8 +1,8 @@
 class Nanobot < Formula
   desc "Build MCP Agents"
   homepage "https://www.nanobot.ai/"
-  url "https://github.com/obot-platform/nanobot/archive/refs/tags/v0.0.86.tar.gz"
-  sha256 "1eb5adb37dac7a75d445a96008736fac03afe199825ed1bd91bb417d34884883"
+  url "https://github.com/obot-platform/nanobot/archive/refs/tags/v0.0.87.tar.gz"
+  sha256 "23426b9c981e698365ee1b59405b3d13a4cbe8bdcd46f291ab574a9bce191955"
   license "Apache-2.0"
   head "https://github.com/obot-platform/nanobot.git", branch: "main"
 
