@@ -7,7 +7,7 @@ class Gup < Formula
   head "https://github.com/nao1215/gup.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd4bf96b3f55c8ed6b4b8fcb8b6143d7f077a3f3d6e6ff61310cdf471360f65a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "64d379779bdfc91e35d5b0db81f67b96699044fbe374b5b37fd2e8d398cc2a0c"
   end
 
   depends_on "go"
