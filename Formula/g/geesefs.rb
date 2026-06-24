@@ -7,7 +7,7 @@ class Geesefs < Formula
   head "https://github.com/yandex-cloud/geesefs.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0b904d31b65441a9f80453dd7289a84966c790e93a38abac0f7149f2cf37f71"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f111427fb52f618faae16b8d2942e0c4700d15a0b26e606cd75af3bc67f9e4a9"
   end
 
   depends_on "go" => :build
