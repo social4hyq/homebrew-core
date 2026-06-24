@@ -39,6 +39,15 @@ class LlvmAT21 < Formula
   TARGET_TRIPLE = "aarch64-linux-ohos".freeze
   COMPILERS     = %w[clang clang++].freeze
 
+  # Tools borrowed from ohos-sdk (LLVM 15) via relative symlinks.
+  # ELF/DWARF/IR formats stable across LLVM 15-21. See slim-llvm21-bottle design §4.3.
+  KEEP_TOOLS_FROM_SDK = %w[
+    llvm-ar llvm-ranlib llvm-nm llvm-objcopy llvm-objdump
+    llvm-readelf llvm-readobj llvm-strip llvm-cxxfilt
+    llvm-dwarfdump llvm-cov llvm-profdata llvm-symbolizer llvm-addr2line
+    FileCheck not count
+  ].freeze
+
   def install
     ohos_sdk    = Formula["ohos-sdk"].opt_prefix
     sysroot     = "#{ohos_sdk}/native/sysroot"
@@ -138,11 +147,19 @@ class LlvmAT21 < Formula
             ";-DCMAKE_C_FLAGS=-D__MUSL__" \
             ";-DCMAKE_CXX_FLAGS=-D__MUSL__ -isystem #{libcxx_ohos}"
 
+    # --- Bootstrap slim mode (see docs/superpowers/specs/2026-06-24-slim-llvm21-bottle-design.md)
+    args << "-DLLVM_BUILD_TOOLS=OFF"            # skip llvm-ar/nm/opt/llc/... default build
+    args << "-DLLVM_INCLUDE_TOOLS=ON"           # keep cmake targets (build llvm-config explicitly)
+    args << "-DLLVM_BUILD_UTILS=OFF"            # skip FileCheck/not/count default build
+    args << "-DLLVM_INCLUDE_UTILS=ON"           # keep cmake targets
+    args << "-DCLANG_BUILD_TOOLS=OFF"           # skip clang-format/tidy/clangd/...
+    args << "-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON"  # ninja install skips libLLVM*.a (520M) + .so (279M)
+
     llvmpath = buildpath/"llvm"
 
     mkdir "build" do
       system "cmake", "-G", "Ninja", llvmpath, *args
-      system "ninja", "-j", jobs.to_s, "clang", "lld"
+      system "ninja", "-j", jobs.to_s, "clang", "lld", "llvm-config"
       system "cmake", llvmpath.to_s, "-ULLVM_ENABLE_RUNTIMES", "-DLLVM_ENABLE_RUNTIMES="
       system "ninja", "-j", jobs.to_s, "install"
     end
@@ -151,6 +168,9 @@ class LlvmAT21 < Formula
     install_triple_wrappers
     build_compiler_rt(sysroot: sysroot, jobs: jobs)
     build_multiarch_runtimes(sysroot: sysroot, libcxx_ohos: libcxx_ohos, jobs: jobs)
+
+    prune_bootstrap_extras
+    link_overlapping_tools
   end
 
   def patch_config_guess(config_guess)
@@ -378,6 +398,35 @@ class LlvmAT21 < Formula
     (target_libdir/"libc++.a").write <<~LDSCRIPT
       INPUT(-lc++_static -lc++abi -lunwind)
     LDSCRIPT
+  end
+
+  def prune_bootstrap_extras
+    # LLVM_INSTALL_TOOLCHAIN_ONLY=ON already skipped libLLVM*.a / libclang*.a /
+    # libclang-cpp.so / libLTO.so during install. Here only include/ and share/
+    # extras are removed; bin/, lib/clang/, lib/aarch64-linux-ohos/, lib/cmake/,
+    # include/mach-o (moved in by build_multiarch_runtimes) are preserved.
+    %w[llvm llvm-c clang clang-c lld].each do |sub|
+      p = include/sub
+      rm_r(p) if p.exist?
+    end
+    %w[clang scan-build scan-view opt-viewer man].each do |sub|
+      p = share/sub
+      rm_r(p) if p.exist?
+    end
+  end
+
+  def link_overlapping_tools
+    # Build relative symlinks for binutils/diagnostic tools that downstream
+    # cmake find_program / build scripts expect but we don't ship from v21.
+    # Targets are ohos-sdk LLVM 15 (formats stable across LLVM 15-21).
+    sdk_bin = Formula["ohos-sdk"].opt_prefix/"native/llvm/bin"
+    KEEP_TOOLS_FROM_SDK.each do |t|
+      src = sdk_bin/t
+      next unless src.exist?
+      target = bin/t
+      target.unlink if target.exist? || target.symlink?
+      target.make_symlink src.relative_path_from(bin)
+    end
   end
 
   def caveats
