@@ -140,13 +140,13 @@ class LlvmAT21 < Formula
             "-no-canonical-prefixes -ffunction-sections -fdata-sections"
     args << "-DCMAKE_EXE_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 " \
             "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack " \
-            "-Wl,-rpath,\\$ORIGIN/../lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib"
+            "-Wl,-rpath,$ORIGIN/../lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib"
     args << "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 " \
             "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack " \
-            "-Wl,-rpath,\\$ORIGIN/../lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib"
+            "-Wl,-rpath,$ORIGIN/../lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib"
     args << "-DCMAKE_MODULE_LINKER_FLAGS=-Wl,--code-sign -Wl,--build-id=sha1 " \
             "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack " \
-            "-Wl,-rpath,\\$ORIGIN/../lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib"
+            "-Wl,-rpath,$ORIGIN/../lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib -Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib"
     args << "-DRUNTIMES_CMAKE_ARGS=-DCMAKE_MODULE_PATH=#{cmake_modules}" \
             ";-DCMAKE_SYSROOT=#{sysroot}" \
             ";-DCMAKE_C_FLAGS=-D__MUSL__" \
@@ -226,7 +226,9 @@ class LlvmAT21 < Formula
     %w[aarch64-unknown-linux-ohos aarch64-linux-ohos].each do |pfx|
       COMPILERS.each do |t|
         w = bin/"#{pfx}-#{t}"
-        w.write <<~SH
+        # LLVM install already creates triple-prefix wrappers; bypass brew's
+        # Pathname#write safety check (refuses overwrite) via File.write.
+        File.write(w, <<~SH)
           #!/bin/sh
           exec "$(dirname "$0")/#{t}" --target=#{pfx} "$@"
         SH
