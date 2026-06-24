@@ -155,7 +155,6 @@ class LlvmAT21 < Formula
     args << "-DLLVM_BUILD_UTILS=OFF"            # skip FileCheck/not/count default build
     args << "-DLLVM_INCLUDE_UTILS=ON"           # keep cmake targets
     args << "-DCLANG_BUILD_TOOLS=OFF"           # skip clang-format/tidy/clangd/...
-    args << "-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON"  # ninja install skips libLLVM*.a (520M) + .so (279M)
 
     llvmpath = buildpath/"llvm"
 
@@ -409,10 +408,15 @@ class LlvmAT21 < Formula
   end
 
   def prune_bootstrap_extras
-    # LLVM_INSTALL_TOOLCHAIN_ONLY=ON already skipped libLLVM*.a / libclang*.a /
-    # libclang-cpp.so / libLTO.so during install. Here only include/ and share/
-    # extras are removed; bin/, lib/clang/, lib/aarch64-linux-ohos/, lib/cmake/,
-    # include/mach-o (moved in by build_multiarch_runtimes) are preserved.
+    # LLVM_INSTALL_TOOLCHAIN_ONLY could skip libLLVM*.a / libclang*.a /
+    # libclang-cpp.so / libLTO.so, but in LLVM 21 it also skips clang itself,
+    # so we don't set it and instead prune lib/ manually here.
+    %w[libLLVM*.a libclang*.a liblld*.a
+       libclang-cpp.so* libLTO.so* libclang.so*].each do |pat|
+      Dir.glob(lib/pat).each { |f| rm_f(f) }
+    end
+    rm_rf(lib/"scanbuild") if (lib/"scanbuild").exist?
+
     %w[llvm llvm-c clang clang-c lld].each do |sub|
       p = include/sub
       rm_r(p) if p.exist?
