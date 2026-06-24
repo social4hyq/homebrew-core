@@ -16,7 +16,7 @@ class Rockcraft < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "961c3a34977dbfa7c175073c18643554e201f4de02cf76945b9a98c8e02f2869"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ac73ef30af5d2b44f0b694bbc33364daa2d99d450de8303753bd9f685a8bbe9"
   end
 
   depends_on "certifi" => :no_linkage
