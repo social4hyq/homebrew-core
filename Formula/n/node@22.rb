@@ -1,8 +1,8 @@
 class NodeAT22 < Formula
   desc "Open-source, cross-platform JavaScript runtime environment"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v22.23.0/node-v22.23.0.tar.xz"
-  sha256 "3acfae100c7b855a4c76520ee0f95cadcace3f4254f16b7d4887f178fc95d4a0"
+  url "https://nodejs.org/dist/v22.23.1/node-v22.23.1.tar.xz"
+  sha256 "b27385d6845089bdb91285d94b06c2a5cf1c37f8173a3c4e10824cc1ffadeaba"
   license "MIT"
   compatibility_version 1
 
