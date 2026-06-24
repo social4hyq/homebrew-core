@@ -25,6 +25,7 @@ class LlvmAT21 < Formula
 
   depends_on "cmake"    => :build
   depends_on "ninja"    => :build
+  depends_on "python@3.14" => :build
   depends_on "libxml2"
   depends_on "ohos-sdk"
   # Runtime dependency: lld links against libxml2/zlib (must be declared explicitly in a keg_only
