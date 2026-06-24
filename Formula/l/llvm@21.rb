@@ -150,26 +150,23 @@ class LlvmAT21 < Formula
             ";-DCMAKE_CXX_FLAGS=-D__MUSL__ -isystem #{libcxx_ohos}"
 
     # --- Bootstrap slim mode (see docs/superpowers/specs/2026-06-24-slim-llvm21-bottle-design.md)
-    args << "-DLLVM_BUILD_TOOLS=OFF"            # skip llvm-ar/nm/opt/llc/... default build
-    args << "-DLLVM_INCLUDE_TOOLS=ON"           # keep cmake targets (build llvm-config explicitly)
-    args << "-DLLVM_BUILD_UTILS=OFF"            # skip FileCheck/not/count default build
-    args << "-DLLVM_INCLUDE_UTILS=ON"           # keep cmake targets
-    args << "-DCLANG_BUILD_TOOLS=OFF"           # skip clang-format/tidy/clangd/...
+    # Note: CLANG_BUILD_TOOLS=OFF / LLVM_BUILD_TOOLS=OFF would skip clang driver and
+    # llvm-config themselves (gates `add_clang_executable` / `add_llvm_tool`), so we
+    # keep them ON and prune post-install instead.
 
     llvmpath = buildpath/"llvm"
 
     mkdir "build" do
       system "cmake", "-G", "Ninja", llvmpath, *args
-      system "ninja", "-j", jobs.to_s, "clang", "lld", "llvm-config"
+      system "ninja", "-j", jobs.to_s, "clang", "lld"
       system "cmake", llvmpath.to_s, "-ULLVM_ENABLE_RUNTIMES", "-DLLVM_ENABLE_RUNTIMES="
       system "ninja", "-j", jobs.to_s, "install"
     end
 
     sign_dir(bin)
     install_triple_wrappers
-    # Link BEFORE build_compiler_rt / build_multiarch_runtimes, because those
-    # methods reference bin/llvm-ar and bin/llvm-ranlib, which are no longer
-    # installed by LLVM toolchain (LLVM_BUILD_TOOLS=OFF).
+    # Link BEFORE build_compiler_rt / build_multiarch_runtimes: symlink targets
+    # (ohos-sdk LLVM 15) are functionally equivalent for AR/RANLIB (format stable).
     link_overlapping_tools
     build_compiler_rt(sysroot: sysroot, jobs: jobs)
     build_multiarch_runtimes(sysroot: sysroot, libcxx_ohos: libcxx_ohos, jobs: jobs)
@@ -407,20 +404,44 @@ class LlvmAT21 < Formula
     LDSCRIPT
   end
 
+  # bin/ entries preserved by prune_bootstrap_extras. Everything else LLVM
+  # installed (clang-format / clang-tidy / opt / llc / bugpoint / llvm-exegesis
+  # / analyze-build / scan-build / ...) is deleted to slim the bottle.
+  # Triple-prefix wrappers and KEEP_TOOLS_FROM_SDK (handled by
+  # link_overlapping_tools as symlinks) are also preserved.
+  KEEP_BIN_ENTRIES = %w[
+    clang clang++ clang-21
+    clang-cl clang-cpp
+    ld.lld lld ld64.lld lld-link
+    llvm-config
+    hmaptool
+    llvm-tblgen clang-tblgen
+  ].freeze
+
   def prune_bootstrap_extras
-    # LLVM_INSTALL_TOOLCHAIN_ONLY could skip libLLVM*.a / libclang*.a /
-    # libclang-cpp.so / libLTO.so, but in LLVM 21 it also skips clang itself,
-    # so we don't set it and instead prune lib/ manually here.
+    # bin/: keep only KEEP_BIN_ENTRIES + triple wrappers + symlinks (ohos-sdk links).
+    Pathname.glob(bin/"*").each do |f|
+      name = f.basename.to_s
+      next if KEEP_BIN_ENTRIES.include?(name)
+      next if name =~ /\Aaarch64-(unknown-)?linux-ohos-(clang|clang\+\+)\z/
+      next if f.symlink?  # preserve ohos-sdk symlinks created by link_overlapping_tools
+      rm_f(f)
+    end
+
+    # lib/: delete static libs and large .so (binaries statically link what they need).
     %w[libLLVM*.a libclang*.a liblld*.a
        libclang-cpp.so* libLTO.so* libclang.so*].each do |pat|
       Dir.glob(lib/pat).each { |f| rm_f(f) }
     end
     rm_rf(lib/"scanbuild") if (lib/"scanbuild").exist?
 
+    # include/: drop LLVM internal dev headers (downstream uses libc++ headers only).
     %w[llvm llvm-c clang clang-c lld].each do |sub|
       p = include/sub
       rm_r(p) if p.exist?
     end
+
+    # share/: drop IDE / analysis helpers.
     %w[clang scan-build scan-view opt-viewer man].each do |sub|
       p = share/sub
       rm_r(p) if p.exist?
