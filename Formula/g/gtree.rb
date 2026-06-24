@@ -7,7 +7,7 @@ class Gtree < Formula
   head "https://github.com/ddddddO/gtree.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f0900098f32076afec2850b8a6dd672ecc584c9032b13973dce0ca5a709b2621"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "63268b4988cbccd2eb0e35f2d31423af8cd399bced29f3b892845855532be8e7"
   end
 
   depends_on "go" => :build
