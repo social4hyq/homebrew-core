@@ -12,7 +12,7 @@ class Codewhale < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2319bd7a04e954535565a6fe32b83b4848dab1d4e3aea62cc4d9d0fe9ca04a72"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "24928a8f2565feac185951e3b4148b6b7231ea27eef6e7540b9d93aa55b66f43"
   end
 
   depends_on "rust" => :build
