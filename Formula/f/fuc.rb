@@ -1,13 +1,13 @@
 class Fuc < Formula
   desc "Modern, performance focused unix commands"
   homepage "https://github.com/supercilex/fuc"
-  url "https://github.com/supercilex/fuc/archive/refs/tags/3.1.2.tar.gz"
-  sha256 "75b4a568c6a4f04ad1289fc68fc8219b95547ac285330eab46082db19ddf25e0"
+  url "https://github.com/supercilex/fuc/archive/refs/tags/3.1.7.tar.gz"
+  sha256 "e3dda4699ff12a08336e93120c55c172b296f6be64de202350eb5b3217078c10"
   license "Apache-2.0"
   head "https://github.com/supercilex/fuc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad5eba8e76e87734f872ae87cab488159d2ed6fbc2724553e5757d82538f5da6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7efaadcad476d765d7ad4e398c5bc119439b3c701643629b473f9572f2160d2"
   end
 
   depends_on "rust" => :build
