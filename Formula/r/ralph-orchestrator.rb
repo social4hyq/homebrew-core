@@ -7,7 +7,7 @@ class RalphOrchestrator < Formula
   head "https://github.com/mikeyobrien/ralph-orchestrator.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d185656cc5f0a7db2f51aef39e3bd593f08410cc8d5d5b011984517ffbace18c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d3cbbd78daca51268613df55857587899f75ebe3e72c472a1d8f2446002dd72"
   end
 
   depends_on "rust" => :build
