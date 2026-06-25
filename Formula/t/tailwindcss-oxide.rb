@@ -12,8 +12,9 @@ class TailwindcssOxide < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/tailwindcss-oxide-v4.1.11"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ce2e68589cbca2d84c1d47385e7b2c4d35186c1ce1e124e06bbd35ae53cf5eb"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/tailwindcss-oxide-v4.1.11-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "366d6629758618c4460b96fc0241ad3d8da2b229a6d1d6ef968801450874fa1b"
   end
 
   keg_only "consumed in-tree by opencode/vite build"
