@@ -3,12 +3,13 @@ class AnsibleCreator < Formula
 
   desc "CLI tool for scaffolding Ansible Content"
   homepage "https://ansible.readthedocs.io/projects/creator/"
-  url "https://files.pythonhosted.org/packages/29/43/b6d5e389fb41f689459fd0d148c6f4f7e7bc3c30f1d8ec9e3386415973e8/ansible_creator-26.4.3.tar.gz"
-  sha256 "db8a33fa765f5a3cb4f17ac6856a2e9e93b2434a7ecf5cbbdd495d96b0ec71d1"
+  url "https://files.pythonhosted.org/packages/81/72/466f53d93fd26a16c8020b5c53e1594757491ce75be58abffa48790a5266/ansible_creator-26.6.0.tar.gz"
+  sha256 "411cbadc595c18945e2c5e4f4bbdab82c6c2db524dbc816b22fb47157252622e"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0366664c44140d05436fd9deedc9b3a8010428dd013b8e55bc2f060f1dc4062"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be8c577e152cc6dff8406330833b2aee8141023581ebb29d666c0c519f070f3b"
   end
 
   depends_on "libyaml"
