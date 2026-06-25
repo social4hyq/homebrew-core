@@ -44,10 +44,15 @@ class Opencode < Formula
     # every time; place it under HOMEBREW_CACHE).
     ENV["BUN_INSTALL_CACHE"] = (HOMEBREW_CACHE/"bun-install-cache").to_s
 
-    # packages/desktop is an Electron desktop app added in v1.17.9; not needed for CLI build.
-    # Removing it before bun install avoids pulling electron-builder / app-builder-bin
-    # which require GitHub release assets inaccessible in restricted network environments.
+    # Remove workspace packages not needed for the CLI build.
+    # - desktop: Electron app (pulls electron-builder / app-builder-bin, requires GitHub release assets)
+    # - web: Astro marketing site (pulls astro → older shiki@3.x / fontkit via npmjs.org)
+    # - docs: documentation site
+    # - storybook: UI component explorer (additional heavy deps)
     rm_rf "packages/desktop"
+    rm_rf "packages/web"
+    rm_rf "packages/docs"
+    rm_rf "packages/storybook"
 
     system "bun", "install", "--ignore-scripts"
 
