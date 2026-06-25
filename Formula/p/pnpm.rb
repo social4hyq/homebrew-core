@@ -14,7 +14,8 @@ class Pnpm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "93829ce71c9aa7536b7a8c54f340976a2ed2a1e0decacb11c2bab4bffde4c80a"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5859cdad924bb9757a358714f7564c2c6c597465f44e1720ad8fb6ef0efc025"
   end
 
   depends_on "node" => [:build, :test]
