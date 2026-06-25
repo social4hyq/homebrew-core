@@ -1,12 +1,13 @@
 class Papeer < Formula
   desc "Convert websites into eBooks and Markdown"
   homepage "https://papeer.tech"
-  url "https://github.com/lapwat/papeer/archive/refs/tags/v0.8.8.tar.gz"
-  sha256 "97c717d23a07c2aa9d9f59441e584bf9947cf9baa4c18b4dbb20f43cff3e574e"
+  url "https://github.com/lapwat/papeer/archive/refs/tags/v0.9.1.tar.gz"
+  sha256 "102c77d982228794028d83b637a2491de10fb34314a2a9f07a363a45fd73eaea"
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89d6aef4573fd22b73e843454ef12c829dd0c4f55dbcb26a1094cb67d0753a2e"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "75ccc14a2c914a68f10911b14dcb4fac1a992c13df49bcc4443b7c878b75e75b"
   end
 
   depends_on "go" => :build
