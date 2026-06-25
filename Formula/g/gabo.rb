@@ -7,7 +7,8 @@ class Gabo < Formula
   head "https://github.com/ashishb/gabo.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "98ebc8358a513e11096277480b8aeaac11483db6704f0c9b40491f6aa3704793"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b728feb9c364636aa7abb92f7828ed05930949da4841d5aa68850bd82490046d"
   end
 
   depends_on "go" => :build
