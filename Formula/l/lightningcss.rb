@@ -14,8 +14,9 @@ class Lightningcss < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/lightningcss-v1.30.1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f941d3ce8aa41f2259a7281e8e45cadba0855110555d13ea4e63711df2666a42"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/lightningcss-v1.30.1-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c54453b270011c1c10bb3700c9b41f89b1dcff5d492054b58fad3ccf58722646"
   end
 
   keg_only "consumed in-tree by opencode/vite build"
