@@ -1,8 +1,8 @@
 class Marmite < Formula
   desc "Static Site Generator for Blogs using Markdown"
   homepage "https://rochacbruno.github.io/marmite/"
-  url "https://github.com/rochacbruno/marmite/archive/refs/tags/0.3.1.tar.gz"
-  sha256 "cf9b749a5f723d6fb7a10b91b1444da514d670397ee9e115613a62c0b956b7e6"
+  url "https://github.com/rochacbruno/marmite/archive/refs/tags/0.3.2.tar.gz"
+  sha256 "926e5ba85886178ec31cbc5ae7c8ba180395a6930e1b94d3ca285b38f3816898"
   license "AGPL-3.0-or-later"
   head "https://github.com/rochacbruno/marmite.git", branch: "main"
 
