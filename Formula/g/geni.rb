@@ -6,7 +6,8 @@ class Geni < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d96bb32dd6d24f42d6580de7977be125e5554cb963e3474c7ebc03287e190386"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aadc2a5e362279acc1125d79ff152e1412f26fa6808a20c687370d8b9ad2cc42"
   end
 
   depends_on "rust" => :build
