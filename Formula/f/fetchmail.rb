@@ -17,7 +17,8 @@ class Fetchmail < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "76801343880a5872a6004a8b0472119bc6d94a2a29330c6d5035880b90e9ac18"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec44842e7e4db8ac4909d376d5dec97b5bb866c8d1429eb15109cba2b8a622f6"
   end
 
   depends_on "pkgconf" => :build
