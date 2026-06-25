@@ -1,12 +1,13 @@
 class Mongoose < Formula
   desc "Web server build on top of Libmongoose embedded library"
   homepage "https://mongoose.ws/"
-  url "https://github.com/cesanta/mongoose/archive/refs/tags/7.21.tar.gz"
-  sha256 "d4ddbd12c12f223abefcc0a74417a638ae5c118d7cf10ba546553c6b0e0b5ada"
+  url "https://github.com/cesanta/mongoose/archive/refs/tags/7.22.tar.gz"
+  sha256 "87727cd2c240ff559b16e9710d44b61ba3513dbee50428bd8ee1596d7c58460a"
   license "GPL-2.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "567bed06c66abb512212d853ddd7789b0b978f721750d80d7e581e6f9e4f1046"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ff1f4286459fc546c4b7e489d0e4ea65ded48f6f7031d40899a1ea059189b5a6"
   end
 
   def install
