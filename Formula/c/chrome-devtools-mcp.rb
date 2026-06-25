@@ -6,7 +6,8 @@ class ChromeDevtoolsMcp < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c73d9b0bc6bd0c097da773c8c810a2fe2088539f6e2b17727078850b2575fdf"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e938c46faa0b52ea8dc43d1d424236575496f7595f732e192a4d5fd79e3ba48"
   end
 
   depends_on "node"
