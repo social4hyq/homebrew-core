@@ -1,7 +1,7 @@
 class Opencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://github.com/anomalyco/opencode.git",
+  url "https://gh-proxy.com/https://github.com/anomalyco/opencode.git",
       revision: "67aec2212010d67775c35e696d8b8b54902eb338"
   version "1.17.11"
   license "MIT"
@@ -13,7 +13,7 @@ class Opencode < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.11-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "PLACEHOLDER"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
   # opencode is a `bun build --compile` single binary with bun runtime + JS + native .node/.so
@@ -43,6 +43,11 @@ class Opencode < Formula
     # Persistent bun cache (buildpath is wiped each run, causing network-failed packages to be re-downloaded
     # every time; place it under HOMEBREW_CACHE).
     ENV["BUN_INSTALL_CACHE"] = (HOMEBREW_CACHE/"bun-install-cache").to_s
+
+    # packages/desktop is an Electron desktop app added in v1.17.9; not needed for CLI build.
+    # Removing it before bun install avoids pulling electron-builder / app-builder-bin
+    # which require GitHub release assets inaccessible in restricted network environments.
+    rm_rf "packages/desktop"
 
     system "bun", "install", "--ignore-scripts"
 
