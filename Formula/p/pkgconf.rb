@@ -14,7 +14,8 @@ class Pkgconf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "53876174b821ed1370ed34688776b1902b1019072eed1f8451b18c04c5bc5a1b"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6b88c2b9b8817ad5e4436cd6cb828b7d2629d4ef89de393a4d9037a5cf45fbb"
   end
 
   head do
