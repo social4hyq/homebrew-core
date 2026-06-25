@@ -12,7 +12,8 @@ class Harper < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bfc2c9944efc9f74d41be7cd1caebfb58e41567ecd16e02f72730069671f28c7"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c2dcba69c17eff29fa8dafc94d77f67e86120446d8bb3d376fb57a5ce263336"
   end
 
   depends_on "rust" => :build
