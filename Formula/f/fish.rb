@@ -15,7 +15,8 @@ class Fish < Formula
   pour_bottle? only_if: :default_prefix
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c9ba174cb30478b358ee035540d15f3dd719cbe171f462d15d3ef060a2b0a60"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5fe9f9e053a80d9f1178e4359d518832e9587f85e11f77a214595463a4cf490a"
   end
 
   depends_on "cmake" => :build
