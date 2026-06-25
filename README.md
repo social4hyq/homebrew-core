@@ -138,7 +138,7 @@ opencode --version
 | 包 | PR | 状态 |
 |---|---|---|
 | `lightningcss` | [parcel-bundler/lightningcss#1264](https://github.com/parcel-bundler/lightningcss/pull/1264) | 已提交，待合并 |
-| `@tailwindcss/oxide` | [tailwindlabs/tailwindcss#20276](https://github.com/tailwindlabs/tailwindcss/pull/20276) | 已提交，待合并 |
+| `@tailwindcss/oxide` | [tailwindlabs/tailwindcss#20276](https://github.com/tailwindlabs/tailwindcss/pull/20276) | 已提交，评审意见已处理，待合并 |
 
 PR 合并并发布后，`opencode.rb` 中对应的 `index.js` 字符串替换 patch 可以删除，直接用上游原生包。
 
