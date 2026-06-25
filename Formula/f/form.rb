@@ -1,10 +1,9 @@
 class Form < Formula
   desc "Symbolic manipulation system"
   homepage "https://www.nikhef.nl/~form/"
-  url "https://github.com/form-dev/form/releases/download/v5.0.0/form-5.0.0.tar.gz"
-  sha256 "10d22acf2f0acf831b494e6a73682828980b9054ea8ec2b5dc46677dca8d6518"
+  url "https://github.com/form-dev/form/releases/download/v5.0.1/form-5.0.1.tar.gz"
+  sha256 "ce62530a54e5232dfefb6c1ff0e7047372a43941b3c0e0db08b5714fd868722c"
   license "GPL-3.0-or-later"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,7 +11,8 @@ class Form < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6c9be5b4d92c88b7bdbb0eb369f714b684d65c19465ce10a9f9c18867021b77"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae2010d96ff61ff5dadf284915abaf85bdad03ed3ff7a178bc6963ca00af9a98"
   end
 
   depends_on "flint"
