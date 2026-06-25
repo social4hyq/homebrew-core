@@ -7,7 +7,8 @@ class Lxc < Formula
   head "https://github.com/canonical/lxd.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "22b557964c68ab069bba36896a86c195a25e90ff2c5968488f2a05e1e657e13e"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e744505d400e8b34a5b31dd8bd2cf1619f313473af70786df2f5c0e6b2e1977a"
   end
 
   depends_on "go" => :build
