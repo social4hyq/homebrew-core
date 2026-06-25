@@ -1,8 +1,8 @@
 class Nano < Formula
   desc "Free (GNU) replacement for the Pico text editor"
   homepage "https://www.nano-editor.org/"
-  url "https://www.nano-editor.org/dist/v9/nano-9.0.tar.xz"
-  sha256 "9f384374b496110a25b73ad5a5febb384783c6e3188b37063f677ac908013fde"
+  url "https://www.nano-editor.org/dist/v9/nano-9.1.tar.xz"
+  sha256 "5f47764274cb7532349ce0aa20ec10f1e8e851a6e9fa3eb66812c43d196db042"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,7 +11,8 @@ class Nano < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cb398061dd686a5559abe603675fd646fd685ce123441392f4734c767c4b2eb"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "339b21cd81d80ea63e5789de8951f32ee38b70fb4e77a45763e5019a9cc735d5"
   end
 
   depends_on "pkgconf" => :build
