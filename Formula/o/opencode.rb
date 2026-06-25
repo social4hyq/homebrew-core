@@ -64,6 +64,7 @@ class Opencode < Formula
     cd "packages/opencode" do
       system "bun", "install", "--os=*", "--cpu=*", "@opentui/core@0.3.4"
       system "bun", "install", "--os=*", "--cpu=*", "@parcel/watcher@2.5.1"
+      system "bun", "install", "--os=*", "--cpu=*", "@rollup/rollup-openharmony-arm64@4.60.4"
     end
 
     sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
