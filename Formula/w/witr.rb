@@ -1,12 +1,13 @@
 class Witr < Formula
   desc "Why is this running?"
   homepage "https://github.com/pranshuparmar/witr"
-  url "https://github.com/pranshuparmar/witr/archive/refs/tags/v0.3.2.tar.gz"
-  sha256 "4ba1bdb58845aa74a219e905003c3ea604985fd14162c47419954ece2b35410b"
+  url "https://github.com/pranshuparmar/witr/archive/refs/tags/v0.3.3.tar.gz"
+  sha256 "af94fe23b01f4b7c672278228efb4a2df622170e0a4ef0e475be337bad11146a"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9894023920a52f3ae62e0c4423e5b47e647196670c07ae69e1f2c430cd5c8bd6"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d5cdf62b666af60d681d0f47b07b09d497c65069779596c7c0c9c47bc193b58"
   end
 
   depends_on "go" => :build
