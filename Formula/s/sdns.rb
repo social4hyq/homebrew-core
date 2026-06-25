@@ -7,7 +7,8 @@ class Sdns < Formula
   head "https://github.com/semihalev/sdns.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d55355b1a8d529f29814be4aeb4ea0c9186f4328ab569f54c900893abaddeb83"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "791bc96083016a871e76f21b668b23adb7c7926d9a955a044093fc2f8807ea48"
   end
 
   depends_on "go" => :build
