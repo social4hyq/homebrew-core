@@ -13,7 +13,7 @@ class Opencode < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.11-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7250ca3c9b2c8b2819a02024bf079ae2f044e322d00db9a0e0d733060d02b44"
   end
 
   # opencode is a `bun build --compile` single binary with bun runtime + JS + native .node/.so
