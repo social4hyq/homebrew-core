@@ -12,7 +12,8 @@ class Lisette < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e47e13661214de4046671fb2a7c2955de22061635231f960c4c9d8cc3327c660"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2df4daf09c605e4a7a150cfa6f005fcb45a3158bfd75ef9d9a2a01054ff7bd5"
   end
 
   depends_on "rust" => :build
