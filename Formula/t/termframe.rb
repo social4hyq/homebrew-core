@@ -7,7 +7,8 @@ class Termframe < Formula
   head "https://github.com/pamburus/termframe.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca529b06da8d10e29f86264ced30dccf34d9fd2cbccf36e21100f35f9eda3f68"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5096a98fd5660acde1e0437bf7671ab92a8237ef4dac606ad427b36144616180"
   end
 
   depends_on "rust" => :build
