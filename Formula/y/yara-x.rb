@@ -12,7 +12,7 @@ class YaraX < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e233b844964304328908e00f07bf09e2f5518d29cf4186d5202cd35755b31200"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3b34679fe830a22326cb484b79cdfe3b61609946e93616312113ee1493284c4"
   end
 
   depends_on "cargo-c" => :build
