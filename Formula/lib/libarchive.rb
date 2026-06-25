@@ -12,7 +12,8 @@ class Libarchive < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fac7360a9ec8a43085d615a568aa962f27334a5f849441970729ebe781683dda"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f89a43630e45b37d23ec2c4cf2a946a257f5d262ba2e8d367fbdc508b31e7b81"
   end
 
   keg_only :provided_by_macos
