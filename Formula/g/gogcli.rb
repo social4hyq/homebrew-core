@@ -7,7 +7,8 @@ class Gogcli < Formula
   head "https://github.com/steipete/gogcli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "befa358834e9855971d315ab2a7100c1a15915b5333dc469b7b91525357f5cef"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6be3f45cb7a39a22fe89fd6797dfe6ba046985ee8944edcea8636a3926325c1"
   end
 
   depends_on "go" => :build
