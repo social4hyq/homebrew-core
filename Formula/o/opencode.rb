@@ -38,6 +38,9 @@ class Opencode < Formula
   patch :p1 do
     file "Patches/opencode/vite-rolldown-catalog.patch"
   end
+  patch :p1 do
+    file "Patches/opencode/channel-indicator-local-var.patch"
+  end
 
   def install
     ENV["PYTHON"] = Formula["python@3.14"].opt_bin/"python3"
