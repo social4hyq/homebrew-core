@@ -63,6 +63,18 @@ class Opencode < Formula
     # catalog re-resolution failures when npm cache is empty; omit it.
     system "bun", "install", "--os=*", "--cpu=*", "@rollup/rollup-openharmony-arm64@4.60.4"
 
+    # Bun's isolated node_modules layout puts @rollup/rollup-openharmony-arm64 at workspace root,
+    # but rollup's native.js requires it from its own nested node_modules scope
+    # (node_modules/.bun/rollup@x.y.z/node_modules/@rollup/rollup-openharmony-arm64).
+    # Symlink the binding into each rollup scope so vite build can resolve it.
+    rollup_binding = "node_modules/@rollup/rollup-openharmony-arm64"
+    Dir.glob("node_modules/.bun/rollup@*/node_modules").each do |rollup_nm|
+      dest = "#{rollup_nm}/@rollup/rollup-openharmony-arm64"
+      next if File.exist?(dest)
+      mkdir_p "#{rollup_nm}/@rollup"
+      ln_sf "../../../../@rollup/rollup-openharmony-arm64", dest
+    end
+
     cd "packages/opencode" do
       system "bun", "install", "--os=*", "--cpu=*", "@opentui/core@0.3.4"
       system "bun", "install", "--os=*", "--cpu=*", "@parcel/watcher@2.5.1"
