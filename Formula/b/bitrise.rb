@@ -12,7 +12,8 @@ class Bitrise < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5ba96a406fb7b1ca5a188b2384d18ac3f9298ed089aa8111bbfc56555f26763"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8fc79b3ef00550c560f1d1dc8594a08fbb4ee9846aee0b245d3772ca0f8b601"
   end
 
   depends_on "go" => [:build, :test]
