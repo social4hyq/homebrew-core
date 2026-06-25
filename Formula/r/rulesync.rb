@@ -6,7 +6,8 @@ class Rulesync < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "42fda2c3cf1f87df9762f488dd19906ebe52ab6f10102e7f2d64b8b19c2524f5"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac56ba41674fa47ceafd80cabc123f18ed43be30b83b92fe104f9d300a9ee678"
   end
 
   depends_on "node"
