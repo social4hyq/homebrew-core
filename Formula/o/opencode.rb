@@ -2,8 +2,8 @@ class Opencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64"
   homepage "https://github.com/anomalyco/opencode"
   url "https://github.com/anomalyco/opencode.git",
-      revision: "11e47f91496005aab4d7c5a2d0a7da5d2651b4ac"
-  version "1.17.8"
+      revision: "67aec2212010d67775c35e696d8b8b54902eb338"
+  version "1.17.11"
   license "MIT"
 
   livecheck do
@@ -12,9 +12,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.8-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a09fe3bda04cfc8374c86bc2e96ff3cd8a76ecd6f936c3e89098b28b559166ce"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.11-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "PLACEHOLDER"
   end
 
   # opencode is a `bun build --compile` single binary with bun runtime + JS + native .node/.so
@@ -35,9 +34,6 @@ class Opencode < Formula
   end
   patch :p1 do
     file "Patches/opencode/esbuild-rolldown-bump.patch"
-  end
-  patch :p1 do
-    file "Patches/opencode/vite-rolldown-catalog.patch"
   end
 
   def install
