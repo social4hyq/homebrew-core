@@ -1,8 +1,8 @@
 class Libarchive < Formula
   desc "Multi-format archive and compression library"
   homepage "https://www.libarchive.org"
-  url "https://www.libarchive.org/downloads/libarchive-3.8.7.tar.xz"
-  sha256 "d3a8ba457ae25c27c84fd2830a2efdcc5b1d40bf585d4eb0d35f47e99e5d4774"
+  url "https://www.libarchive.org/downloads/libarchive-3.8.8.tar.xz"
+  sha256 "3873a88801da067d0528a989af06877710529d50ee8fe6f3970cbb4302efb918"
   license "BSD-2-Clause"
   compatibility_version 1
 
@@ -12,7 +12,8 @@ class Libarchive < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fac7360a9ec8a43085d615a568aa962f27334a5f849441970729ebe781683dda"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f89a43630e45b37d23ec2c4cf2a946a257f5d262ba2e8d367fbdc508b31e7b81"
   end
 
   keg_only :provided_by_macos
