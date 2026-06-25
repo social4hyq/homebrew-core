@@ -1,8 +1,8 @@
 class Iguana < Formula
   desc "Universal serialization engine"
   homepage "https://github.com/qicosmos/iguana"
-  url "https://github.com/qicosmos/iguana/archive/refs/tags/1.1.0.tar.gz"
-  sha256 "86bf230b5ccea629ad806e4b007d6dcd2e9f0cba8a477c123c920ee0e3329abf"
+  url "https://github.com/qicosmos/iguana/archive/refs/tags/1.2.0.tar.gz"
+  sha256 "29ad1ff853a278df0b1598db992e1507167bd4521b232a55e360928cf751a9af"
   license "Apache-2.0"
   head "https://github.com/qicosmos/iguana.git", branch: "master"
 
