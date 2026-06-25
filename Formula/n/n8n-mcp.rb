@@ -6,7 +6,8 @@ class N8nMcp < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "807a4c5bacf5d7b5d8b82b7d7d2a3c55e6e62d84b9fd672df2f4552e4b7e112f"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8807f79ca24ef128d2f8840ce0976ec2dfdaa8bf518137b7abdd3d89a16098d4"
   end
 
   depends_on "node"
