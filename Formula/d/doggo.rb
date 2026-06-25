@@ -7,7 +7,8 @@ class Doggo < Formula
   head "https://github.com/mr-karan/doggo.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "03d4f5f4eeafc73ece6310f84cf4412f57680fa98c568647e72c55ce0b600aac"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d18e40628351e6b323ad59d506a204d9351bc400e50e2d00874c7e3061866597"
   end
 
   depends_on "go" => :build
