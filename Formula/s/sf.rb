@@ -13,7 +13,8 @@ class Sf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c51af1d8ed5ee227a3b8c2b669ab47056e92e9c9249922c08c2f32c08dffff99"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "25a5619fdc3fa97ee98f42bf7e861794c9c70a87cd418fd6b28f55882b5a6a8e"
   end
 
   depends_on "node"
