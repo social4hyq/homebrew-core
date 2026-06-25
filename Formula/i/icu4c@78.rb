@@ -121,6 +121,7 @@ class Icu4cAT78 < Formula
                "-Wl,--no-whole-archive",
                "-Wl,-soname=#{so_name}",
                "-Wl,--gc-sections",
+               "-Wl,--code-sign",
                "--target=aarch64-linux-ohos"
 
         lib.install tmpdir/so_full
