@@ -17,7 +17,8 @@ class PortableCurl < PortableFormula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa9fb23a4b5a3d3199c928891edfc47e2466f17644c6415c67f8d6a50d02501a"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "73e2b652c5e0ed0d27f61259a6e3ed5c3de4144fadcb616e48183edf9e882d2e"
   end
 
   head do
