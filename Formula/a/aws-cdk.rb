@@ -6,7 +6,8 @@ class AwsCdk < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "46b84e90bc466c6d707954eb56ae2267d1efc3bd57caa41ef955f5a1cb9a2ef1"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d139a57d34b54de23dc45eaf3486dd42783910de9cdc63d40ff51f84b58c0b1c"
   end
 
   depends_on "node"
