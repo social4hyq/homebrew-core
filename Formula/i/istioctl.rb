@@ -12,7 +12,8 @@ class Istioctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d8aebf742007bb9bc28d229325598389ad7f68275b6e0c5abd24407e90c4c48"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "67bb5a763b36314e56d0a25b1a895ba59964a8b46247970d33fdf45ae8894925"
   end
 
   depends_on "go" => :build
