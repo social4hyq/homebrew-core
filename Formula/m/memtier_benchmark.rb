@@ -10,7 +10,8 @@ class MemtierBenchmark < Formula
   ]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c3326c1e37c5ed7a17411346de21c6e026e6dbd2859663ebff3b3a5cbbba2b5"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd0436f54fa28ec35599ac5b518660fd81dd2d283ca215289f303150be71b93f"
   end
 
   depends_on "autoconf" => :build
