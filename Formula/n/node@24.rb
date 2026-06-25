@@ -12,7 +12,8 @@ class NodeAT24 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "374c8deb3e0856f8abbf872a9d2608f31b37ac6dd0ec9290524ad4b7e496d58d"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f4794c43996907f7b529e7266c0abf69acda119a80a7b2acb508dcc842c73ff8"
   end
 
   keg_only :versioned_formula
