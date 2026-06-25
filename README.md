@@ -39,7 +39,7 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 | Formula | 版本 | 说明 |
 |---|---|---|
 | `opencode` | 1.17.8 | OpenCode AI 编码代理 CLI（单文件二进制 + 嵌入 Web UI） |
-| `bun` | 1.4.0 | Bun JavaScript runtime |
+| `bun` | 1.4.0 @ `e0acad318`（main，2026-06-15） | Bun JavaScript runtime |
 | `bun-bootstrap` | 1.4.0-a4cd4d2 | 预编译 bun，用来启动 `bun bd` 自举本机 bun（`keg_only`） |
 | `bun-webkit` | 6d586e293f | JavaScriptCore / WTF / bmalloc 静态库，bun 专用 WebKit fork（`keg_only`） |
 | `bun-pty` | 0.4.10 | `librust_pty.so`，portable-pty + nix 0.31 OHOS 支持（`keg_only`） |
@@ -95,7 +95,7 @@ graph TD
     opencode --> lcss
     opencode --> tw
 
-    bun --> bb
+    bun -.->|bootstrap| bb
     bun --> bw
     bun --> icu
     bun --> llvm
