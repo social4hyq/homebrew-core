@@ -17,7 +17,8 @@ class Clusterctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b3f09e75542fdcf45c12382d3fddfd78a2cc174708d47c8c312d7eecee1b5b9"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bbf8b958881ba9206dcdbd8b2ee4c90728263ff15d528563869e4305cb3b46f3"
   end
 
   depends_on "go" => :build
