@@ -66,7 +66,7 @@ class Icu4cAT78 < Formula
     cd "source" do
       # Phase 1 is a native build (no --host), so test programs must be runnable on the device.
       # OHOS developer mode allows unsigned ELF to execute; --build=ohos skips config.guess.
-      system "./configure", *%w[--disable-samples --disable-tests --enable-static --with-library-bits=64],
+      system "./configure", *%w[--disable-samples --disable-tests --enable-static --disable-shared --with-library-bits=64],
              "--build=aarch64-linux-ohos", "--prefix=#{native_prefix}",
              "CC=#{clang}", "CXX=#{clangxx}",
              "AR=#{Formula["llvm@21"].opt_bin}/llvm-ar",
