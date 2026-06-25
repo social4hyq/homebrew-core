@@ -6,7 +6,8 @@ class RRig < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a2f70081f7aac1e0a598a627e74cadad8f0539bf9379579445dab0c8b0ed1a6f"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "42d066b9dab5bdabf76d6f79dc299717079b47333ac1ff2608ce2f46d698dae1"
   end
 
   depends_on "rust" => :build
