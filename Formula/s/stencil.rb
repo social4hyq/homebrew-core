@@ -7,7 +7,8 @@ class Stencil < Formula
   head "https://github.com/rgst-io/stencil.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c615718b7c3d8970af1a451ff45f0a8a0a1028b4eec590227d06ccd46c2b1dc"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a58fb793f89cd7ab603f9c5dd6f5e5b94b44afcd79377a49f468cc59f2e2a635"
   end
 
   depends_on "go" => :build
