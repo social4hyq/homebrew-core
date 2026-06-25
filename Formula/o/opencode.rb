@@ -12,8 +12,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.11-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b3d980d1591acb668a16334ae5cc2606c41b17493aa9f47572b8b1a1418f926"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.11-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
   # opencode is a `bun build --compile` single binary with bun runtime + JS + native .node/.so
@@ -33,13 +33,15 @@ class Opencode < Formula
     file "Patches/opencode/project-global-worktree.patch"
   end
   patch :p1 do
-    file "Patches/opencode/esbuild-rolldown-bump.patch"
-  end
-  patch :p1 do
-    file "Patches/opencode/vite-rolldown-catalog.patch"
-  end
-  patch :p1 do
-    file "Patches/opencode/channel-indicator-local-var.patch"
+    # upstream bun.lock (generated on Linux) records 5 openharmony bindings as
+    # `"os": "none"` because upstream bun doesn't recognize the openharmony
+    # platform. The patched bun 1.4.0 (pr5-ohos-runtime/resolver_hooks.rs.patch)
+    # already understands openharmony, but bun install uses the lockfile
+    # fast-path and skips any package whose recorded `os` doesn't match
+    # `OperatingSystem::CURRENT`. This patch rewrites those 5 entries'
+    # metadata so the fast-path installs them. Re-generate with:
+    #   sed -i -E '/^    "[^"]*openharmony-arm64":/ s/"os": "none"/"os": "openharmony"/' bun.lock
+    file "Patches/opencode/bun-lock-openharmony-os.patch"
   end
 
   def install
