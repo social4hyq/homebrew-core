@@ -1,8 +1,8 @@
 class Talm < Formula
   desc "Manage Talos Linux configurations the GitOps way"
   homepage "https://github.com/cozystack/talm"
-  url "https://github.com/cozystack/talm/archive/refs/tags/v0.31.0.tar.gz"
-  sha256 "b7ac081fcd6628efe8c5fb5f76fffc0064cfa6c72ff0f342eaddb871eab91fd6"
+  url "https://github.com/cozystack/talm/archive/refs/tags/v0.32.0.tar.gz"
+  sha256 "60326eac385f71d6377adb9aa4a4ab04b9a5e359334c216a794d741afa4e9e28"
   license "Apache-2.0"
   head "https://github.com/cozystack/talm.git", branch: "main"
 
