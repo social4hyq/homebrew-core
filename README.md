@@ -98,7 +98,7 @@ graph TD
 ## 安装
 
 ```bash
-brew tap social4hyq/core https://github.com/social4hyq/homebrew-core.git
+brew tap social4hyq/core https://atomgit.com/social4hyq/homebrew-core.git
 brew trust social4hyq/core         # Homebrew 6.0+ 必须显式信任第三方 tap
 
 # 只装 bun：
