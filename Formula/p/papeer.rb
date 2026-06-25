@@ -6,7 +6,8 @@ class Papeer < Formula
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89d6aef4573fd22b73e843454ef12c829dd0c4f55dbcb26a1094cb67d0753a2e"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "75ccc14a2c914a68f10911b14dcb4fac1a992c13df49bcc4443b7c878b75e75b"
   end
 
   depends_on "go" => :build
