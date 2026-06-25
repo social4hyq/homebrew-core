@@ -11,7 +11,8 @@ class Logcli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf0cf5921fc49124f1623828889aa0ad184f10a92a4d667d74b7a94246420e42"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "04ec7ab85c249046ffb57f0b33788c83970d3077f1f1c989916b9beb3ae743d6"
   end
 
   depends_on "go" => :build
