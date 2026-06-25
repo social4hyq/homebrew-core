@@ -12,7 +12,8 @@ class Loki < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7aade9a9ebf778b32b305285108d149c1949f659b09ce15583da99244081ae88"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5b471d6e6dedabfb843fcb4b17abacc247d1e6eb52e2cdeebf24c22d79d33625"
   end
 
   depends_on "go" => :build
