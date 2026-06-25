@@ -6,7 +6,8 @@ class BrunoCli < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "328449fa4bcb42fd35ac048eced4721b4341ca23f92c4d1def1f49ee9c57bd90"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "10eb4da16461809093e545f6755a6edc3425b9c2d5ef35d54e17ab19a6fb9c03"
   end
 
   depends_on "node"
