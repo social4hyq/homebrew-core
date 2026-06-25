@@ -1,8 +1,8 @@
 class MemtierBenchmark < Formula
   desc "Redis and Memcache traffic generation and benchmarking tool"
   homepage "https://github.com/RedisLabs/memtier_benchmark"
-  url "https://github.com/RedisLabs/memtier_benchmark/archive/refs/tags/2.4.2.tar.gz"
-  sha256 "906163dce897c1d94dbe4611ec0425f709a96d59eb7a42997b838b7c18b2b292"
+  url "https://github.com/RedisLabs/memtier_benchmark/archive/refs/tags/2.4.3.tar.gz"
+  sha256 "88de452b2a6e1ecef0064c98be046ea032771d9f1c8874d2bec9caa946c0acfe"
   # https://github.com/redis/memtier_benchmark/blob/master/debian/copyright
   license all_of: [
     "GPL-2.0-or-later" => { with: "cryptsetup-OpenSSL-exception" },
@@ -10,7 +10,8 @@ class MemtierBenchmark < Formula
   ]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c3326c1e37c5ed7a17411346de21c6e026e6dbd2859663ebff3b3a5cbbba2b5"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd0436f54fa28ec35599ac5b518660fd81dd2d283ca215289f303150be71b93f"
   end
 
   depends_on "autoconf" => :build
