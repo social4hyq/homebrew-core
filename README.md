@@ -46,8 +46,25 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 | `bun-pty` | 0.4.10 | `librust_pty.so`（portable-pty 升 nix 到 0.31，`keg_only`） |
 | `lightningcss` | 1.30.1 | `liblightningcss_node.so`（`keg_only`） |
 | `tailwindcss-oxide` | 4.1.11 | `libtailwind_oxide.so`（`keg_only`） |
-| `llvm@21` | 21.1.8 | OHOS 补丁版 clang + lld + multiarch runtime libs |
+| `llvm@21` | 21.1.8 | OHOS 补丁版 clang + lld + multiarch runtime libs（**裁剪版**，仅工具链，71 MB） |
 | `icu4c@78` | 78.3 | Unicode 库（用本仓库的 llvm@21 重编，对齐 libc++ ABI） |
+
+## Bottle 状态
+
+所有 bottle 均面向 `arm64_ohos`，当前全部为 rebuild 1（`-r2`，2026-06-25 重编）：
+
+| Formula | Bottle tag | 大小 |
+|---------|-----------|------|
+| `llvm@21` | `llvm21-v21.1.8-pruned-r2` | 71 MB |
+| `icu4c@78` | `icu4c@78-v78.3-r2` | 32 MB |
+| `bun-webkit` | `bun-webkit-v6d586e293f-r2` | 23 MB |
+| `bun-pty` | `bun-pty-v0.4.10-r2` | 270 KB |
+| `lightningcss` | `lightningcss-v1.30.1-r2` | 3.4 MB |
+| `tailwindcss-oxide` | `tailwindcss-oxide-v4.1.11-r2` | 1.3 MB |
+| `bun` | `bun-v1.4.0-r2` | 39 MB |
+| `opencode` | `opencode-v1.17.8-r2` | 57 MB |
+
+> `bun-bootstrap` 为预编译 binary pour（212 MB），tag 不含 -r2。
 
 ## 依赖图
 
