@@ -12,8 +12,9 @@ class BunPty < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-pty-v0.4.10"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "da10d8b9d51837b604e2fbb7dbfab9261d0009ca9a771058b9e8a4b25e542fa7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-pty-v0.4.10-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce098203c1976adee116aa905c2689f7918c70aa562615bec83ca8ce6e7224b2"
   end
 
   # portable-pty upstream source (crates.io 0.9.0). Its default nix 0.28 does not support OHOS;
