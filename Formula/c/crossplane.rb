@@ -1,8 +1,8 @@
 class Crossplane < Formula
   desc "Build control planes without needing to write code"
   homepage "https://github.com/crossplane/cli"
-  url "https://github.com/crossplane/cli/archive/refs/tags/v2.3.3.tar.gz"
-  sha256 "8121844ba24b59cea86a0b21482f1d0c29a9b9c587d1516f9471670eb67040a5"
+  url "https://github.com/crossplane/cli/archive/refs/tags/v2.4.0.tar.gz"
+  sha256 "f118463fd03cfbfa35b677514e7b6b96864540134e6a3dff2c0779f8c1d0080f"
   license "Apache-2.0"
   head "https://github.com/crossplane/cli.git", branch: "main"
 
@@ -12,7 +12,8 @@ class Crossplane < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4fc945bb7490392f8a9ef7bec438f465b37b3d3f70877f6bcc6a926f609565d1"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9bd328d84797ec3f5c1c09cda9310875d6c9d249eda33ca28fd4fefec9183d9f"
   end
 
   depends_on "go" => :build
