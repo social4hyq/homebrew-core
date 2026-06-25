@@ -1,12 +1,13 @@
 class Quien < Formula
   desc "Better WHOIS and domain intelligence toolkit"
   homepage "https://benword.com/quien-a-better-whois-and-domain-intelligence-toolkit"
-  url "https://github.com/retlehs/quien/archive/refs/tags/v0.11.0.tar.gz"
-  sha256 "8361a2d292152896e93220ca5e85474ac72b5f44795f640f69b0b2a8dace26c3"
+  url "https://github.com/retlehs/quien/archive/refs/tags/v0.12.0.tar.gz"
+  sha256 "49eef2d196a1b9c1e46c037c8fa300f6ced71c952828761fb4810ad8151e14c2"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61a4ae3ddfc251b2afe48d0c562901e4cc3f9b4854885e7eef1db1f34a74a8a4"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0518f58983e81b13d87db8fbcf7226bc0f6eca0ba8cf085a7cf8f098d89f3af0"
   end
 
   depends_on "go" => :build
