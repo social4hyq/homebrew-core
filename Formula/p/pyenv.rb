@@ -14,7 +14,8 @@ class Pyenv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5359d9b8abafa7061abc6f1eeedd476df31262858369951451ffd345948ea707"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "06a0e266517a13e5bac903ee5cf11eba7c254ff5ceb39097cb78cbee068bd5af"
   end
 
   depends_on "autoconf"
