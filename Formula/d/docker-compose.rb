@@ -15,7 +15,8 @@ class DockerCompose < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a0f9e3a3df661637781ea67f8aa66fd01724b39c7e112cf8832cbc9c8466186"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "24cf4d2c8728c3194fd6c6b71a2e11274abbe14bac2761389eec90784c3bf3d0"
   end
 
   depends_on "go" => :build
