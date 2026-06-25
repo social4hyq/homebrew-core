@@ -131,6 +131,17 @@ bun --version && bun -e 'console.log(2**32, Math.PI)'
 opencode --version
 ```
 
+## 上游 PR 进展
+
+本仓库的长期目标是把适配推回上游，消除 formula 层 workaround。
+
+| 包 | PR | 状态 |
+|---|---|---|
+| `lightningcss` | [parcel-bundler/lightningcss#1264](https://github.com/parcel-bundler/lightningcss/pull/1264) | 已提交，待合并 |
+| `@tailwindcss/oxide` | [tailwindlabs/tailwindcss#20276](https://github.com/tailwindlabs/tailwindcss/pull/20276) | 已提交，待合并 |
+
+PR 合并并发布后，`opencode.rb` 中对应的 `index.js` 字符串替换 patch 可以删除，直接用上游原生包。
+
 ## 反馈与贡献
 
 - 遇到功能差异或崩溃，请附：HarmonyOS 版本、`bun --version`、复现命令、是否触及上面表格里的降级类别
