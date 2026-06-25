@@ -11,7 +11,8 @@ class TomcatAT9 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a84ee59e9df0ca1c22927531d059ece47e7158f214d1233e91cd6fc4b307690b"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9785c3897f5e1e853e3aa54a5ad8773c0d6800da7703a3fc6d5a333b0615cad1"
   end
 
   keg_only :versioned_formula
