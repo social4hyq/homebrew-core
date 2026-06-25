@@ -2,12 +2,11 @@ class Pmix < Formula
   desc "Process Management Interface for HPC environments"
   homepage "https://openpmix.github.io/"
   license "BSD-3-Clause"
-  revision 1
   compatibility_version 1
 
   stable do
-    url "https://github.com/openpmix/openpmix/releases/download/v5.0.10/pmix-5.0.10.tar.bz2"
-    sha256 "78663f6b932589d68e24feaf7f8a948d60be68d91965f3effbacb4cd88cf9a95"
+    url "https://github.com/openpmix/openpmix/releases/download/v5.0.11/pmix-5.0.11.tar.bz2"
+    sha256 "e10baa9821882140ebd134051702d65b1561fe91954d3978f7ea2c4e4cd36e7f"
 
     # Fix -flat_namespace being used on Big Sur and later.
     patch do
@@ -22,7 +21,8 @@ class Pmix < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a252675340ea42111b8fa6640997a3520119e623f3ffa1c63b6fa19a7e13f883"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d603e3fa1c33aca554701b8bd77e57f2e914613faa2a1ceef696b56bb45a56fd"
   end
 
   head do
