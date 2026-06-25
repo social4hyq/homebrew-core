@@ -7,7 +7,8 @@ class AwsCCommon < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c09bd407a68f8b7ee91f194f23cf30b259d1875afe72e16a7853067ac226816"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ebc4397f8c6365f0356a7109f5f710d37a8d46807d845c47eabcc2394ae26260"
   end
 
   depends_on "cmake" => :build
