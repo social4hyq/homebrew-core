@@ -1,9 +1,9 @@
 class MariadbConnectorOdbc < Formula
   desc "Database driver using the industry standard ODBC API"
   homepage "https://mariadb.org/download/?tab=connector&prod=connector-odbc"
-  url "https://archive.mariadb.org/connector-odbc-3.2.8/mariadb-connector-odbc-3.2.8-src.tar.gz"
-  mirror "https://fossies.org/linux/misc/mariadb-connector-odbc-3.2.8-src.tar.gz/"
-  sha256 "9968979aae46a1750452eb934558af81c6eda957eaee00f7ec72b24ee8ead547"
+  url "https://archive.mariadb.org/connector-odbc-3.2.9/mariadb-connector-odbc-3.2.9-src.tar.gz"
+  mirror "https://fossies.org/linux/misc/mariadb-connector-odbc-3.2.9-src.tar.gz/"
+  sha256 "5062f491f7189ba32352a9834777886dfbc64a107bb0e2e50921dd6ae2bd18ad"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -18,7 +18,8 @@ class MariadbConnectorOdbc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "84b58d2945d071a27addbe9648d550e12e003b162a37b4877478f1d593fabc1e"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dfa8fc0d05ee3ca30d2ef0975cd672c7c70b786ef543609018918116f1221867"
   end
 
   depends_on "cmake" => :build
