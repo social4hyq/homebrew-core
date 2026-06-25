@@ -6,7 +6,8 @@ class Codeburn < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a226106df965888e74227823a4975754e5add68fa162452e0f43fc7a47fbe6eb"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9fb1a31a5ec8111b0df7ea2d0778fa2aa13a0769e4759a97ab315cacc7dffe0"
   end
 
   depends_on "node"
