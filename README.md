@@ -38,15 +38,15 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 
 | Formula | 版本 | 说明 |
 |---|---|---|
-| `opencode` | 1.17.8 | OpenCode AI 编码代理 CLI（单文件二进制 + 嵌入 Web UI） |
+| `opencode` | 1.17.8 @ `11e47f91`（2026-06-17） | OpenCode AI 编码代理 CLI（单文件二进制 + 嵌入 Web UI） |
 | `bun` | 1.4.0 @ `e0acad318`（main，2026-06-15） | Bun JavaScript runtime |
-| `bun-bootstrap` | 1.4.0-a4cd4d2 | 预编译 bun，用来启动 `bun bd` 自举本机 bun（`keg_only`） |
-| `bun-webkit` | 6d586e293f | JavaScriptCore / WTF / bmalloc 静态库，bun 专用 WebKit fork（`keg_only`） |
-| `bun-pty` | 0.4.10 | `librust_pty.so`，portable-pty + nix 0.31 OHOS 支持（`keg_only`） |
-| `lightningcss` | 1.30.1 | `liblightningcss_node.so` CSS 原生绑定（`keg_only`） |
-| `tailwindcss-oxide` | 4.1.11 | `libtailwind_oxide.so` Tailwind v4 原生引擎绑定（`keg_only`） |
-| `llvm@21` | 21.1.8 | OHOS 补丁版 clang + lld + multiarch runtime libs（**裁剪版**，仅工具链，71 MB，`keg_only`） |
-| `icu4c@78` | 78.3 | Unicode 库，用本仓库 llvm@21 重编以对齐 libc++ ABI（`keg_only`） |
+| `bun-bootstrap` | 1.4.0 @ `a4cd4d2`（main，2026-06-14） | 预编译 bun，用来启动 `bun bd` 自举本机 bun（`keg_only`） |
+| `bun-webkit` | `6d586e293f`（2026-06-17） | JavaScriptCore / WTF / bmalloc 静态库，bun 专用 WebKit fork（`keg_only`） |
+| `bun-pty` | 0.4.10（2026-06-15） | `librust_pty.so`，portable-pty + nix 0.31 OHOS 支持（`keg_only`） |
+| `lightningcss` | 1.30.1（2025-05-14） | `liblightningcss_node.so` CSS 原生绑定（`keg_only`） |
+| `tailwindcss-oxide` | 4.1.11（2025-06-26） | `libtailwind_oxide.so` Tailwind v4 原生引擎绑定（`keg_only`） |
+| `llvm@21` | 21.1.8（2025-12-16） | OHOS 补丁版 clang + lld + multiarch runtime libs（**裁剪版**，仅工具链，71 MB，`keg_only`） |
+| `icu4c@78` | 78.3（2026-03-17） | Unicode 库，用本仓库 llvm@21 重编以对齐 libc++ ABI（`keg_only`） |
 
 ## Bottle 状态
 
