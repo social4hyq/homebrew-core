@@ -1,8 +1,8 @@
 class Bitrise < Formula
   desc "Command-line automation tool"
   homepage "https://github.com/bitrise-io/bitrise"
-  url "https://github.com/bitrise-io/bitrise/archive/refs/tags/v2.40.5.tar.gz"
-  sha256 "6afa60bf714f2134a3d2e366955c6ce3af3c675fb2ee47351d95cee064a4e729"
+  url "https://github.com/bitrise-io/bitrise/archive/refs/tags/v2.40.7.tar.gz"
+  sha256 "c097b9c764db3fea347b14d0f02ee9df66b5680e7b8f618261d8409252aee21c"
   license "MIT"
   head "https://github.com/bitrise-io/bitrise.git", branch: "master"
 
@@ -12,7 +12,8 @@ class Bitrise < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5ba96a406fb7b1ca5a188b2384d18ac3f9298ed089aa8111bbfc56555f26763"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8fc79b3ef00550c560f1d1dc8594a08fbb4ee9846aee0b245d3772ca0f8b601"
   end
 
   depends_on "go" => [:build, :test]
