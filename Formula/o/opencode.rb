@@ -52,10 +52,11 @@ class Opencode < Formula
     # build.ts defaults to running `bun install --os=* --cpu=*` to pull all-platform native variants, but it
     # depends on Bun.$ → on OHOS, sh cannot exec bun from PATH (EPERM), so we pass --skip-install to skip the
     # internal version in build.ts and invoke it directly here, avoiding the broken $ path.
+    # @ff-labs/fff-bun is pure TypeScript (no native binaries), so --os=* is a no-op and triggers
+    # catalog re-resolution failures when npm cache is empty; omit it.
     cd "packages/opencode" do
       system "bun", "install", "--os=*", "--cpu=*", "@opentui/core@0.3.4"
       system "bun", "install", "--os=*", "--cpu=*", "@parcel/watcher@2.5.1"
-      system "bun", "install", "--os=*", "--cpu=*", "@ff-labs/fff-bun@0.9.4"
     end
 
     sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
