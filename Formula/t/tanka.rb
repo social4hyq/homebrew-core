@@ -12,7 +12,8 @@ class Tanka < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "62198cb70016e56e086307a1d5c099438dceda204b3b734505fbfc3c4ae338bd"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d91a90a5d361f3ab114bd0d8069e3d6a1a3cf843c6e551548516b7fbd034e02f"
   end
 
   depends_on "go" => :build
