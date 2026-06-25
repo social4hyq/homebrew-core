@@ -15,7 +15,8 @@ class Buildkit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c32ad3199167c37ab7d3998d56966030a102e366c9d9cc093f95bbfbfbf31e0"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61664fb6c1b989325f88cfeb36f7e60eb549e3f584e73d649e1f06cb7c26f7f6"
   end
 
   depends_on "go" => :build
