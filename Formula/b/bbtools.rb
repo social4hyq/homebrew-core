@@ -12,7 +12,8 @@ class Bbtools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "70608009632e162477c887c2e2943b62d350068b50f99c56f5b6e5b6ea682f31"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5fb90ce9cb7922251136ae10b999c6eaa8d5a56e2c8bfdf748203ce9c8e8e1b8"
   end
 
   depends_on "openjdk"
