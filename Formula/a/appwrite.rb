@@ -6,7 +6,8 @@ class Appwrite < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d12022b9f0336fe984a4352d2689b13e44400818d43524662572be9876f58130"
+    root_url "http://192.168.0.27:20080/bottles"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf5b2967b20f95c2a27aea55174cb8c781417df13506d0067b4b48625f28beda"
   end
 
   depends_on "node"
