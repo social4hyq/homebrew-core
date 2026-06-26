@@ -7,7 +7,6 @@ class Gup < Formula
   head "https://github.com/nao1215/gup.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "a8fead1ea46cad3d83698eef2cc6acdfa2cbd8c9a33b46485332967c4891a9cd"
   end
 
