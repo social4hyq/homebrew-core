@@ -12,7 +12,6 @@ class Atomcode < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "4fa768b0b8dbdacc3d2eb2c8caca5e85b1997e3e533ce71b8ce12ea3075f1b00"
   end
 
