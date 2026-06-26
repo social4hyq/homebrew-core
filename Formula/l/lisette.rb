@@ -12,7 +12,6 @@ class Lisette < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "e2df4daf09c605e4a7a150cfa6f005fcb45a3158bfd75ef9d9a2a01054ff7bd5"
   end
 
