@@ -12,7 +12,6 @@ class Harper < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "2c2dcba69c17eff29fa8dafc94d77f67e86120446d8bb3d376fb57a5ce263336"
   end
 
