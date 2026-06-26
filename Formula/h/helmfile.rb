@@ -8,7 +8,8 @@ class Helmfile < Formula
   head "https://github.com/helmfile/helmfile.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "912cc96bf0219526425f619ea5f3549605958f6f2ce4069380ba252d7c763eb9"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5d8c63e03d36f3d78dc1e4eebc16c37bfb7648e72ad2934298d39e09f33e3f3"
   end
 
   depends_on "go" => :build
