@@ -11,8 +11,8 @@ class ClosureCompiler < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6f2e075e1b4f4f32d40f5ee1f3000789db391581a2939e506e8e3d83b1ac118"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "69d797dca7c997c8a77d0b491c8ba6e4d27d0ecae0a23857c843a1b79e72f699"
   end
 
   depends_on "openjdk"
