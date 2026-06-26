@@ -6,7 +6,6 @@ class QwenCode < Formula
   license "Apache-2.0"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "c6f52e68545da0a1dfce78756f28cd13342a512f59daf073f964ae0d2d697ddb"
   end
 
