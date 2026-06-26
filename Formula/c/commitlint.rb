@@ -6,7 +6,6 @@ class Commitlint < Formula
   license "MIT"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "46ba89613f6126b89d2f57249d6e4f2f580bcab7337c7af5690049b53c43adf6"
   end
 
