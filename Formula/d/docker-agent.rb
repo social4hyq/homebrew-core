@@ -7,7 +7,6 @@ class DockerAgent < Formula
   head "https://github.com/docker/docker-agent.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "9bef79f68b95cd131457fd21de4ae0ffb4e6d94caba4211cf77dd4666d81ce39"
   end
 
