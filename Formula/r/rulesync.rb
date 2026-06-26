@@ -6,7 +6,6 @@ class Rulesync < Formula
   license "MIT"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "ac56ba41674fa47ceafd80cabc123f18ed43be30b83b92fe104f9d300a9ee678"
   end
 
