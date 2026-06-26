@@ -15,7 +15,6 @@ class Apko < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "271f03c35d59a094e48efb09909f36613722e7d85b723d85fafa33d798e4da35"
   end
 
