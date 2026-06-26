@@ -7,7 +7,6 @@ class Nanobot < Formula
   head "https://github.com/obot-platform/nanobot.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "f8b732843e20eff2772f3551a476f0b3cf05d1b1c7f857f8c3dd80f27773d6db"
   end
 
