@@ -6,7 +6,6 @@ class SentryNative < Formula
   license "MIT"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "29bc2b89a276c72844c921033a93cb6d609e2ab854d2e01decc00a1319a9f73f"
   end
 
