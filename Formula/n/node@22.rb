@@ -12,7 +12,6 @@ class NodeAT22 < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "538b43efa542d3b21a2109023f461492e28fbba0ed65b08a25a07aaf4ecbaec6"
   end
 
