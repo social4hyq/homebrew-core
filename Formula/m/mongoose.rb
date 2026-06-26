@@ -6,7 +6,6 @@ class Mongoose < Formula
   license "GPL-2.0-only"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "ff1f4286459fc546c4b7e489d0e4ea65ded48f6f7031d40899a1ea059189b5a6"
   end
 
