@@ -18,7 +18,6 @@ class Renovate < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "d1aa965f99421fa36fda4fc0cc78140706a70c580a603afc2a712df0ec7976d1"
   end
 
