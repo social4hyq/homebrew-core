@@ -12,7 +12,6 @@ class KosliCli < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "bb8a9be6456d4d821115de9b6650f798d9938d031845a08bd0834bbc702d9347"
   end
 
