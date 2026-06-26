@@ -12,7 +12,8 @@ class NodeAT24 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f4794c43996907f7b529e7266c0abf69acda119a80a7b2acb508dcc842c73ff8"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf2fbc061168f047a14af59290483072dc7ebdd8ada325f670a74a5c7a74ab6f"
   end
 
   keg_only :versioned_formula
