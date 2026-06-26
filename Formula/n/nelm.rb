@@ -14,7 +14,6 @@ class Nelm < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "57f3b85a81270dc890db0e00afff56d914b004d5e27d19db457c17a129e6bea4"
   end
 
