@@ -12,8 +12,8 @@ class Just < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3550ebb4ba06769aa00e04ec164eeda9a63da6419d89ddc0706c72381bed8d1"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "124fe795b7bd104951967f356aff55451176eda9dfd42e4fb0fb7f39bda71e4b"
   end
 
   depends_on "rust" => :build
