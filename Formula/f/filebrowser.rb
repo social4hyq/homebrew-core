@@ -7,7 +7,6 @@ class Filebrowser < Formula
   head "https://github.com/filebrowser/filebrowser.git", branch: "master"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "fe226edef5d206793fe4c7b5e8423523edc94aeb9c594f110e13403bf91397b1"
   end
 
