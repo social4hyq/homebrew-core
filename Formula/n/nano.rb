@@ -11,7 +11,6 @@ class Nano < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "339b21cd81d80ea63e5789de8951f32ee38b70fb4e77a45763e5019a9cc735d5"
   end
 
