@@ -12,7 +12,9 @@ class OpensslAT35 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb654eb9d010cf95cf81e19c77f302268782e9994133f86478a43c8cfc6bb40f"
+    root_url "http://192.168.0.27:20080/bottles"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8863fc4becf304cb7fcd4f38ac3d413f29875e1ce1e37deb097641f8be9526a"
   end
 
   keg_only :versioned_formula
