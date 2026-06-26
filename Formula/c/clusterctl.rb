@@ -17,7 +17,6 @@ class Clusterctl < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "bbf8b958881ba9206dcdbd8b2ee4c90728263ff15d528563869e4305cb3b46f3"
   end
 
