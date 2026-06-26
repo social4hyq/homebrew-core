@@ -9,7 +9,6 @@ class DockerMachine < Formula
   head "https://gitlab.com/gitlab-org/ci-cd/docker-machine.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "30abc9afa6077da2f8a1d628d14abc0bedcc903f77594ceddbb2245178838a43"
   end
 
