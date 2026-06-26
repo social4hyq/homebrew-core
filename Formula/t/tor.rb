@@ -21,7 +21,6 @@ class Tor < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "e0433d7f6a236f82070cc235e56575e869a92cf5314c5992fa0c7300484c532e"
   end
 
