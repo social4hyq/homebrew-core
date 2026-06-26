@@ -6,7 +6,6 @@ class Geni < Formula
   license "MIT"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "aadc2a5e362279acc1125d79ff152e1412f26fa6808a20c687370d8b9ad2cc42"
   end
 
