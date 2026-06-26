@@ -11,6 +11,11 @@ class OpensslAT35 < Formula
     regex(/href=.*?openssl[._-]v?(3\.5(?:\.\d+)+)\.t/i)
   end
 
+  bottle do
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f03f2b39d603518681dd178c76d1276edb466677fe0d3ba087219364275b80e"
+  end
+
   keg_only :versioned_formula
 
   depends_on "ca-certificates"
