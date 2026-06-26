@@ -7,7 +7,6 @@ class Hcloud < Formula
   head "https://github.com/hetznercloud/cli.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "ce5d633a1ec41bf15c45cdeee9c78e551a389d899015b6b34748fd4c3091d62d"
   end
 
