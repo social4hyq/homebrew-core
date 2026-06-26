@@ -12,7 +12,8 @@ class Crossplane < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9bd328d84797ec3f5c1c09cda9310875d6c9d249eda33ca28fd4fefec9183d9f"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e5fd0b0041f49b6f9355ccf17a56a02bb43b16b0599f1f7daf01f1c4ea54776"
   end
 
   depends_on "go" => :build
