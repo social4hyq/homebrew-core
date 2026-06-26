@@ -1,8 +1,8 @@
 class Asn1c < Formula
   desc "Compile ASN.1 specifications into C source code"
   homepage "https://lionet.info/asn1c/blog"
-  url "https://github.com/vlm/asn1c/releases/download/v0.9.28/asn1c-0.9.28.tar.gz"
-  sha256 "8007440b647ef2dd9fb73d931c33ac11764e6afb2437dbe638bb4e5fc82386b9"
+  url "https://github.com/vlm/asn1c/releases/download/v0.9.29/asn1c-0.9.29.tar.gz"
+  sha256 "a8b7b60475357285ac7250f0f3452d0c7555abffa50e1226a0a671df715cc9ff"
   license "BSD-2-Clause"
 
   bottle do
