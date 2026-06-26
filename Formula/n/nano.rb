@@ -11,7 +11,8 @@ class Nano < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "339b21cd81d80ea63e5789de8951f32ee38b70fb4e77a45763e5019a9cc735d5"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f071467de8e07c769db30b60500a8d7f7ab77e4717e06b057bc0137baa9f0b9"
   end
 
   depends_on "pkgconf" => :build
