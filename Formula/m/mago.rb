@@ -6,8 +6,8 @@ class Mago < Formula
   license any_of: ["Apache-2.0", "MIT"]
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "72587f8fa29a0da33afff7dbbf56272b4fc5248cd1ac0a53a1db3fd3d9608608"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11d76e8e651be70eca6f8fa86d583f7db979187998dfcfd3a03f8fab94b56492"
   end
 
   depends_on "pkgconf" => :build
