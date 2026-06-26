@@ -6,8 +6,8 @@ class KimiCode < Formula
   license "MIT"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9db083d7cac9df65dd37d615f37a192826241543040c215c35ef8db8e94e34f"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d60cb67f9cd511f7ced66769633e37e06e66f1faf0e116c8451ae756ed13ace7"
   end
 
   depends_on "node"
