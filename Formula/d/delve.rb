@@ -7,7 +7,8 @@ class Delve < Formula
   head "https://github.com/go-delve/delve.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "99143184b4e7239b2996f30e913a4898b4d82bfae6e28d5ce8731181c534fdff"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dac6dfda5a603075890425f82df98c5f75680513140066816f251c43d26244dd"
   end
 
   depends_on "go" => :build
