@@ -11,7 +11,6 @@ class Scw < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "4507fd5bc9a62cc7df2be6a4b9db52fa5d814072b596cbc7bced9e6ef08faa3f"
   end
 
