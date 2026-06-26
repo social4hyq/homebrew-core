@@ -11,7 +11,6 @@ class Logcli < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "04ec7ab85c249046ffb57f0b33788c83970d3077f1f1c989916b9beb3ae743d6"
   end
 
