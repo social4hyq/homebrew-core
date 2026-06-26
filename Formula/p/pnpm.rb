@@ -14,7 +14,6 @@ class Pnpm < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "d5859cdad924bb9757a358714f7564c2c6c597465f44e1720ad8fb6ef0efc025"
   end
 
