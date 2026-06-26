@@ -6,8 +6,8 @@ class Context7Mcp < Formula
   license "MIT"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8dc7024d55effc8f2aa89bbd1f5745487630a73c70e787a231350eb832d1a631"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a3d69d652c4844e934920161d03987a5868b1e83b3c8790c66a57e655a22f39"
   end
 
   depends_on "node"
