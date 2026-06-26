@@ -7,8 +7,8 @@ class Goshs < Formula
   head "https://github.com/patrickhener/goshs.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec79f9bd718ef1c55a6b04e7d54214a61098bd5ea8d0f59d193b10a7587eac44"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "abeb0b319f670625727aafa9433c8a5b564833ea0326a0449600f7fd9909c5ee"
   end
 
   depends_on "go" => :build
