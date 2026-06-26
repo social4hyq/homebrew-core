@@ -18,8 +18,8 @@ class MariadbConnectorOdbc < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dfa8fc0d05ee3ca30d2ef0975cd672c7c70b786ef543609018918116f1221867"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f2d1f92fcbb65f8a30fa95d356bef6a3463df2d99364f3f910db22ae61d31c4"
   end
 
   depends_on "cmake" => :build
