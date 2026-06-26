@@ -6,7 +6,6 @@ class CubejsCli < Formula
   license "Apache-2.0"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "45868c6b02c2270677c3f71cc9d53279778b2334ee253de93046ea6eb9ff91ed"
   end
 
