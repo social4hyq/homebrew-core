@@ -21,8 +21,8 @@ class Pmix < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d603e3fa1c33aca554701b8bd77e57f2e914613faa2a1ceef696b56bb45a56fd"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dcbf4576127935f0faec55d0ab259863a17e779ea54b7750446c22141e6f764e"
   end
 
   head do
