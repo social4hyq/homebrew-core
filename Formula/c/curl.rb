@@ -16,8 +16,8 @@ class Curl < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a731b98003835def247a3e18f155083d5e1874522654f53b507888c61d82856a"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9968900b1d822725ec7ca9868020d2040c846232b630fccdcf007b751fcf507"
   end
 
   head do
