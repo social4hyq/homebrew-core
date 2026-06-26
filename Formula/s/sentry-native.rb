@@ -6,7 +6,8 @@ class SentryNative < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "29bc2b89a276c72844c921033a93cb6d609e2ab854d2e01decc00a1319a9f73f"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a00cb0d845f0da9b3193725d7ab7908c60a7fcee23ec385a7e37ed77af0059f4"
   end
 
   depends_on "cmake" => :build
