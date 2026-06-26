@@ -12,7 +12,7 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.11-r5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.11-r6"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
@@ -43,16 +43,6 @@ class Opencode < Formula
     #   sed -i -E '/^    "[^"]*openharmony-arm64":/ s/"os": "none"/"os": "openharmony"/' bun.lock
     file "Patches/opencode/bun-lock-openharmony-os.patch"
   end
-  patch :p1 do
-    # `opencode web` calls npm `open` to spawn a browser. open uses
-    # child_process.spawn("xdg-open", ...). Under bun --compile, spawn
-    # ENOENT throws synchronously instead of emitting an async 'error'
-    # event, so the existing .catch() doesn't help — wrap in try/catch.
-    # On OHOS (no xdg-open in $PATH) this lets the server start anyway;
-    # the URL is still printed for manual access.
-    file "Patches/opencode/web-open-try-catch.patch"
-  end
-
   def install
     ENV["PYTHON"] = Formula["python@3.14"].opt_bin/"python3"
     ENV["npm_config_nodedir"] = Formula["node"].opt_prefix.to_s
@@ -191,6 +181,9 @@ class Opencode < Formula
     rm unsigned
     rm stripped
     bin.install out => "opencode"
+    # Stub xdg-open so `opencode web` can spawn it without ENOENT on OHOS.
+    (bin/"xdg-open").write "#!/bin/sh\nexit 0\n"
+    chmod 0755, bin/"xdg-open"
   end
 
   test do
