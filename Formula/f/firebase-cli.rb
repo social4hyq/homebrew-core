@@ -6,7 +6,6 @@ class FirebaseCli < Formula
   license "MIT"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "3b394031a93202b623a811269a02c8dae08aa67384a0864eddc9117b6f1cf635"
   end
 
