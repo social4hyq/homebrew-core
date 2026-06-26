@@ -18,8 +18,8 @@ class StorjUplink < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "433669836e696de7d56e2cbc656c087a47dd1b3245b0a299e9d68e537f5f3d42"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "28871b823f899a0d336196ec1fd3069aabee4bb9c41b44cf4daff718bd0602c2"
   end
 
   depends_on "go" => :build
