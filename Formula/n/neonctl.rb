@@ -6,7 +6,6 @@ class Neonctl < Formula
   license "Apache-2.0"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "22d6610d4d3388f7234faf52d47e10f83e00e51e9f8cb00d6384a2ed92bcd832"
   end
 
