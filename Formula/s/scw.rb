@@ -11,7 +11,8 @@ class Scw < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4507fd5bc9a62cc7df2be6a4b9db52fa5d814072b596cbc7bced9e6ef08faa3f"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bf83c75c562a0eec9284c7cbf9c5cae2cfe73a34e3bbfbb96806f224ede782b"
   end
 
   depends_on "go" => :build
