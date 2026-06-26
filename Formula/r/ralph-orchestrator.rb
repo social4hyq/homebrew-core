@@ -7,8 +7,8 @@ class RalphOrchestrator < Formula
   head "https://github.com/mikeyobrien/ralph-orchestrator.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8bcea5857743febc6fe46a18f423f014aa972bfa039e836a6509e290584a81f7"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ccc07b53194a2f6e4efbf2687839cd91a08b1c8625bf1c2ca6ce30ac2982a18"
   end
 
   depends_on "rust" => :build
