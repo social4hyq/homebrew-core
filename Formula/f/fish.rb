@@ -15,7 +15,6 @@ class Fish < Formula
   pour_bottle? only_if: :default_prefix
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "5fe9f9e053a80d9f1178e4359d518832e9587f85e11f77a214595463a4cf490a"
   end
 
