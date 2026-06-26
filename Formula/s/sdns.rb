@@ -7,7 +7,6 @@ class Sdns < Formula
   head "https://github.com/semihalev/sdns.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "791bc96083016a871e76f21b668b23adb7c7926d9a955a044093fc2f8807ea48"
   end
 
