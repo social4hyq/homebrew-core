@@ -7,7 +7,6 @@ class Delve < Formula
   head "https://github.com/go-delve/delve.git", branch: "master"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "99143184b4e7239b2996f30e913a4898b4d82bfae6e28d5ce8731181c534fdff"
   end
 
