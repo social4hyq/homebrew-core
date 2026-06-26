@@ -11,6 +11,12 @@ class OpensslAT35 < Formula
     regex(/href=.*?openssl[._-]v?(3\.5(?:\.\d+)+)\.t/i)
   end
 
+  bottle do
+    root_url "http://192.168.0.27:20080/bottles"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8863fc4becf304cb7fcd4f38ac3d413f29875e1ce1e37deb097641f8be9526a"
+  end
+
   keg_only :versioned_formula
 
   depends_on "ca-certificates"
