@@ -7,7 +7,6 @@ class Ntfy < Formula
   head "https://github.com/binwiederhier/ntfy.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "ccfc71f84f9412eb8199f9a626fcd860a0d0984562c93571caa365fddbcf8ebf"
   end
 
