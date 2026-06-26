@@ -15,7 +15,6 @@ class DockerCompose < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "24cf4d2c8728c3194fd6c6b71a2e11274abbe14bac2761389eec90784c3bf3d0"
   end
 
