@@ -9,7 +9,6 @@ class Zuban < Formula
   head "https://github.com/zubanls/zuban.git", branch: "master"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "4ccfb931293c2d972c15af5630ed8930cf0b0e15305fa61b37872dea0bc0d522"
   end
 
