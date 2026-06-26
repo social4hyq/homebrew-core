@@ -7,7 +7,6 @@ class Panache < Formula
   head "https://github.com/jolars/panache.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "efa4b5c9b13b054492a417f24028de1f070272cdaa23a19f366ff21d1234077e"
   end
 
