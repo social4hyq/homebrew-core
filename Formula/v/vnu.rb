@@ -1,8 +1,8 @@
 class Vnu < Formula
   desc "Nu Markup Checker: command-line and server HTML validator"
   homepage "https://validator.github.io/validator/"
-  url "https://registry.npmjs.org/vnu-jar/-/vnu-jar-26.6.20.tgz"
-  sha256 "fd444259e1cc8417f7f2d21b20cc67bb5e6685dc0d4a922f8c7d2c11b8840d73"
+  url "https://registry.npmjs.org/vnu-jar/-/vnu-jar-26.6.24.tgz"
+  sha256 "c5cac3ea079fd1802d104d89aa7852fef70da4e88f74e03d28375e267aa50532"
   license "MIT"
   version_scheme 1
 
