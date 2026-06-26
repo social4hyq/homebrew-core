@@ -12,7 +12,6 @@ class Bitrise < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "c8fc79b3ef00550c560f1d1dc8594a08fbb4ee9846aee0b245d3772ca0f8b601"
   end
 
