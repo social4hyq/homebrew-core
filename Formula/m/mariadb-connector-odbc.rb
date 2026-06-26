@@ -18,7 +18,6 @@ class MariadbConnectorOdbc < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "dfa8fc0d05ee3ca30d2ef0975cd672c7c70b786ef543609018918116f1221867"
   end
 
