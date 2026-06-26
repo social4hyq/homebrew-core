@@ -1,8 +1,8 @@
 class Gradle < Formula
   desc "Open-source build automation tool based on the Groovy and Kotlin DSL"
   homepage "https://www.gradle.org/"
-  url "https://services.gradle.org/distributions/gradle-9.6.0-all.zip"
-  sha256 "87a2216cc1f9122192d4e0fe905ffdf1b4c72cff797e9f733b174e157cadd396"
+  url "https://services.gradle.org/distributions/gradle-9.6.1-all.zip"
+  sha256 "61ba77b3ff7167e60962763eb4bae79db7120c189b9544358d0ade3c1e712a83"
   license "Apache-2.0"
 
   livecheck do
