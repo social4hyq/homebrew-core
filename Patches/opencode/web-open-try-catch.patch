@@ -1,0 +1,18 @@
+diff --git a/packages/opencode/src/cli/cmd/web.ts b/packages/opencode/src/cli/cmd/web.ts
+index 69a981aad..bf42b0666 100644
+--- a/packages/opencode/src/cli/cmd/web.ts
++++ b/packages/opencode/src/cli/cmd/web.ts
+@@ -72,11 +72,11 @@ export const WebCommand = effectCmd({
+       }
+ 
+       // Open localhost in browser
+-      open(localhostUrl).catch(() => {})
++      try { open(localhostUrl).catch(() => {}) } catch {}
+     } else {
+       const displayUrl = server.url.toString()
+       UI.println(UI.Style.TEXT_INFO_BOLD + "  Web interface:    ", UI.Style.TEXT_NORMAL, displayUrl)
+-      open(displayUrl).catch(() => {})
++      try { open(displayUrl).catch(() => {}) } catch {}
+     }
+ 
+     yield* Effect.never

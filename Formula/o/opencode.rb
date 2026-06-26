@@ -12,8 +12,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.11-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c07e46f198b7624a3273df00052cff71384fe4285b2201542fb5623c7a5a813"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.11-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
   # opencode is a `bun build --compile` single binary with bun runtime + JS + native .node/.so
@@ -42,6 +42,15 @@ class Opencode < Formula
     # metadata so the fast-path installs them. Re-generate with:
     #   sed -i -E '/^    "[^"]*openharmony-arm64":/ s/"os": "none"/"os": "openharmony"/' bun.lock
     file "Patches/opencode/bun-lock-openharmony-os.patch"
+  end
+  patch :p1 do
+    # `opencode web` calls npm `open` to spawn a browser. open uses
+    # child_process.spawn("xdg-open", ...). Under bun --compile, spawn
+    # ENOENT throws synchronously instead of emitting an async 'error'
+    # event, so the existing .catch() doesn't help — wrap in try/catch.
+    # On OHOS (no xdg-open in $PATH) this lets the server start anyway;
+    # the URL is still printed for manual access.
+    file "Patches/opencode/web-open-try-catch.patch"
   end
 
   def install
