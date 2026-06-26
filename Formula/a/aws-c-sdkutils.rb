@@ -7,7 +7,6 @@ class AwsCSdkutils < Formula
   compatibility_version 1
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "bd28e8c91db4cb80f2a8eb5250efb990cd7ef6b5ba82d00f1eb5dc44cec3c8ca"
   end
 
