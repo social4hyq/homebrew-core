@@ -12,7 +12,6 @@ class Just < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "e3550ebb4ba06769aa00e04ec164eeda9a63da6419d89ddc0706c72381bed8d1"
   end
 
