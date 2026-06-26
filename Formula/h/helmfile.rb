@@ -8,7 +8,6 @@ class Helmfile < Formula
   head "https://github.com/helmfile/helmfile.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "912cc96bf0219526425f619ea5f3549605958f6f2ce4069380ba252d7c763eb9"
   end
 
