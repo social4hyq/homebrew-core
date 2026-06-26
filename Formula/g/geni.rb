@@ -6,7 +6,8 @@ class Geni < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aadc2a5e362279acc1125d79ff152e1412f26fa6808a20c687370d8b9ad2cc42"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea58c94932ed82642d410560876f6bc71920aa6a1f4e790e37908605afa86c95"
   end
 
   depends_on "rust" => :build
