@@ -11,7 +11,6 @@ class Form < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "ae2010d96ff61ff5dadf284915abaf85bdad03ed3ff7a178bc6963ca00af9a98"
   end
 
