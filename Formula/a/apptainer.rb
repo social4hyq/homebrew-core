@@ -7,7 +7,6 @@ class Apptainer < Formula
   head "https://github.com/apptainer/apptainer.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "35c2d2fa2d37adf4bec3296265148c3834d09dccf7bd1aaf87cff588b977a42e"
   end
 
