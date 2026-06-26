@@ -7,7 +7,6 @@ class Libpsl < Formula
   compatibility_version 1
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "3ef886c93a5041f27b616ce0a3e2d6fbbba5cb133550b54f8b39de68562019d7"
   end
 
