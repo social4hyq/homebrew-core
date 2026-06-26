@@ -8,8 +8,8 @@ class AnsibleCreator < Formula
   license "Apache-2.0"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "be8c577e152cc6dff8406330833b2aee8141023581ebb29d666c0c519f070f3b"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8ab5675d5ad0bdf6f9b118825ad031337ae486e6085c882b6bcf792b7c3117d"
   end
 
   depends_on "libyaml"
