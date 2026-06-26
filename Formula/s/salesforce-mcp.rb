@@ -6,7 +6,6 @@ class SalesforceMcp < Formula
   license "Apache-2.0"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "1734e654adfbaf747f70defaa4bad394d2befdb966bdc09e35c5b71c887e69a2"
   end
 
