@@ -7,7 +7,6 @@ class Runme < Formula
   head "https://github.com/runmedev/runme.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "f05ea74acf690a0cc5306abfc19cd151940ba162f009e4b04db3fbca6d00724f"
   end
 
