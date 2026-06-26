@@ -6,7 +6,6 @@ class NotionMcpServer < Formula
   license "MIT"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "700d7a78c4c36e94f7db13a4cc0825b5ef4bbec6f98c49001cfe089210fcb5b5"
   end
 
