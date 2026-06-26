@@ -6,7 +6,6 @@ class PiCodingAgent < Formula
   license "MIT"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "a5c15d7e81b6445fbc58cb85b2a4508ed12d1156747dc6c900531718cd3211ce"
   end
 
