@@ -6,7 +6,6 @@ class Skills < Formula
   license "MIT"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "ffe44e2e990298430a440ccbac6c3fd96e08b39859e1e4059b8c3dcb830dfe15"
   end
 
