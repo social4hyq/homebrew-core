@@ -13,8 +13,8 @@ class AliyunCli < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e748bfb6ae455308076f2bd118e1a900ba3a52ff602ffe6de9ae818b7291a49"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "21f4786c95cc360977a1ad13ed75abbafa7a818d7bca5c41efc609e81fa50621"
   end
 
   depends_on "go" => :build
