@@ -6,7 +6,6 @@ class Quien < Formula
   license "MIT"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "0518f58983e81b13d87db8fbcf7226bc0f6eca0ba8cf085a7cf8f098d89f3af0"
   end
 
