@@ -12,7 +12,6 @@ class GoCritic < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "0768f290a2a47ed210ce194f95537466a501900f98cd15f19010784a012cf0d8"
   end
 
