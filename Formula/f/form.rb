@@ -11,8 +11,8 @@ class Form < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae2010d96ff61ff5dadf284915abaf85bdad03ed3ff7a178bc6963ca00af9a98"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac458fb1eb1ab6b771aee7621e4302e401e7ec4e4229755a9f4f75e3a41f212d"
   end
 
   depends_on "flint"
