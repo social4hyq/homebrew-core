@@ -12,7 +12,6 @@ class Bbtools < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "5fb90ce9cb7922251136ae10b999c6eaa8d5a56e2c8bfdf748203ce9c8e8e1b8"
   end
 
