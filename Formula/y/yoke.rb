@@ -9,7 +9,6 @@ class Yoke < Formula
   head "https://github.com/yokecd/yoke.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "06f3bd1a1964e91184e78f8a3b387946f57c196f04c897f613c02d49e2fd850e"
   end
 
