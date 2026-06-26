@@ -7,7 +7,6 @@ class Mq < Formula
   head "https://github.com/harehare/mq.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "c780660662dc14b6321629324c78be16c6340bcbdc4def390551f8f1ab4c5cda"
   end
 
