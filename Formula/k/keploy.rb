@@ -7,7 +7,6 @@ class Keploy < Formula
   head "https://github.com/keploy/keploy.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "dd8ad96f61e0bdb48070d1f6daca6557d83058e10aade10ecaf2e1c21fdb045c"
   end
 
