@@ -7,7 +7,6 @@ class ConfigFileValidator < Formula
   head "https://github.com/Boeing/config-file-validator.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "bb547584bc5fb8d0e858af311022e39e4ee18aa1dbc03b6b8122d04ac124d49f"
   end
 
