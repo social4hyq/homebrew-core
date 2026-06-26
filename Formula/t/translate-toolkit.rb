@@ -9,7 +9,6 @@ class TranslateToolkit < Formula
   head "https://github.com/translate/translate.git", branch: "master"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "2d811089fcbab64f6ce56ad22dabc4a5aa3415962312a8d8db13d03f5509acba"
   end
 
