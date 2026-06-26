@@ -7,7 +7,6 @@ class Gascity < Formula
   head "https://github.com/gastownhall/gascity.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "8e5789bc3f39dcb4692928236b163b7ff590fb186ee34a84a563cdcc418d39e3"
   end
 
