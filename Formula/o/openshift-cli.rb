@@ -13,7 +13,6 @@ class OpenshiftCli < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "a7c5510efee09a6601858d4dd021738c1cad94f208c20635ed8e25c7aa5b4393"
   end
 
