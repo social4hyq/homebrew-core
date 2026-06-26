@@ -15,7 +15,6 @@ class OhMyPosh < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "3df46e0e9ed294892250659733a5e54d1113653a085e944f1f3b0ae820328e19"
   end
 
