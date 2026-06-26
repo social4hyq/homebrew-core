@@ -12,7 +12,6 @@ class Loki < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "5b471d6e6dedabfb843fcb4b17abacc247d1e6eb52e2cdeebf24c22d79d33625"
   end
 
