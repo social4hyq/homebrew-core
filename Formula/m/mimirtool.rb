@@ -17,7 +17,6 @@ class Mimirtool < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "0cf3733fc85b179cd11243e9dffc38c31bef0851f178f674a8de9981c45d2bba"
   end
 
