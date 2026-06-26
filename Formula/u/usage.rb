@@ -8,7 +8,6 @@ class Usage < Formula
   head "https://github.com/jdx/usage.git", branch: "main"
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "f0d0c78ab298568c0c2a5ca3f785f7472e868406b5610f60762d49138a63cbe7"
   end
 
