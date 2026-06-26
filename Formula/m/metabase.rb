@@ -14,8 +14,8 @@ class Metabase < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "683c8e3cf873a9d01fa8ad40d93a6742b8f1c23fc2d50bbb1c9111c9ba2c62de"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be118cd95c789d0bfca9837dc85d8e319fd2b31f214b902895c530a3ea0a6363"
   end
 
   head do
