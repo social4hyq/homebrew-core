@@ -12,7 +12,6 @@ class ChainloopCli < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "50677e4b9e824139c4aa5ec799f2dfa0f68cc3df114b42b10faa99d5aeb22673"
   end
 
