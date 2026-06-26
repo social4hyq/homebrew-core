@@ -7,7 +7,6 @@ class Libass < Formula
   compatibility_version 1
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "6f16dc50059e5be6c93f53bec3513ff79fc7ce957161dab9d2abf29118e7a557"
   end
 
