@@ -15,8 +15,8 @@ class Apko < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "271f03c35d59a094e48efb09909f36613722e7d85b723d85fafa33d798e4da35"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "252f5729d5dfa1cffce6a75fd746e3998fe50c2e02617a20a7ca52365d1e3f38"
   end
 
   depends_on "go" => :build
