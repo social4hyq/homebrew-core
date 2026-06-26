@@ -16,7 +16,6 @@ class LaceworkCli < Formula
   end
 
   bottle do
-    root_url "http://192.168.0.27:20080/bottles"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "c1a244b79ccb6ff23430ba40a8df4c3a8afe370d3dbff7c1c5890494f305d2ae"
   end
 
