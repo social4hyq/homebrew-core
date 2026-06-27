@@ -6,7 +6,7 @@ class Asn1c < Formula
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "43c56a48167cf60ddee3c2ce84c9f24461cd307b460d82d071aa99f31c4e879b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "50f5ef1073de295483ff3facc08deff52c238d543542d0857fc90c6cb75f5d85"
   end
 
   head do
