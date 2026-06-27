@@ -6,7 +6,7 @@ class Lynis < Formula
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "952e6ae1782e8c016ecf3f51e4253bfd16f2261bf481f8556dcafac53a0ac019"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6eec01d69a347875fb4d9b390207207b9eb9a8ee366a1ed7c73761c1cbf20961"
   end
 
   def install
