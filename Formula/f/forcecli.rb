@@ -7,7 +7,7 @@ class Forcecli < Formula
   head "https://github.com/ForceCLI/force.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f160ff3485671c38f5524aa84db521d99236a13df059c4c38ca6c5dfdaa54d5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5dd4ea5e74a468bd6d651b065ece0d1e6326845d24deb220c58719bfc3a2599e"
   end
 
   depends_on "go" => :build
