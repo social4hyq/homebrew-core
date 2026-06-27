@@ -6,7 +6,7 @@ class HfMcpServer < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "85500936f86eacb89b989db1ac7d9935d6a6c4173b08b14f23b35fc44802f8d0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d4f770ae70de083b256066ffcf3dab3f55b1d8ced19e61ef81514f18f715ec0"
   end
 
   depends_on "node"
