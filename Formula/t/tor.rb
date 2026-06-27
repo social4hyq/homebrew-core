@@ -21,8 +21,7 @@ class Tor < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3644537d85502558dc4ff6537b5aa013692fe5992aca43779e67d4a79f664f05"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "896fb9fb1f45fe3b01abb3b8df07a944c3aaadfe2768b608d402527221174cb7"
   end
 
   depends_on "pkgconf" => :build
