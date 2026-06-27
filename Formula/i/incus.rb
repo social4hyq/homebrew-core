@@ -1,8 +1,8 @@
 class Incus < Formula
   desc "CLI client for interacting with Incus"
   homepage "https://linuxcontainers.org/incus"
-  url "https://linuxcontainers.org/downloads/incus/incus-7.1.tar.xz"
-  sha256 "c684c7e9447df1e2b66cdd37c8cc602c4e995459a6c7e848b5ef0526ac7aeb6c"
+  url "https://linuxcontainers.org/downloads/incus/incus-7.2.tar.xz"
+  sha256 "806230f72ac4dc3cb584de76763428218d4005c2184c391f701048182ee9e982"
   license "Apache-2.0"
   head "https://github.com/lxc/incus.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Incus < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "feaa586749313ef5da8ff8010802c6793d0421b05bf1c438d97c6f6648136912"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a87e2985646f5e76bcbd66c7c30775c240a50fbccdd147bd36e8de011107dbff"
   end
 
   depends_on "go" => :build
