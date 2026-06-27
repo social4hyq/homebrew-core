@@ -1,13 +1,13 @@
 class Skeema < Formula
   desc "Declarative pure-SQL schema management for MySQL and MariaDB"
   homepage "https://www.skeema.io/"
-  url "https://github.com/skeema/skeema/archive/refs/tags/v1.13.2.tar.gz"
-  sha256 "05d259e214d81908880b7d3b3c0b99cecc8674e8df4220474863c5003a9ac215"
+  url "https://github.com/skeema/skeema/archive/refs/tags/v1.14.0.tar.gz"
+  sha256 "931a88df4a86502822fd315587dcb7527aa4a1c67ed6f97b00698f33fd5a51a2"
   license "Apache-2.0"
   head "https://github.com/skeema/skeema.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "19a3fcd59b9835afda12e95ebca3a5f9be2549245f2150ef7c492b8017a0e309"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "296e32d3ec779e24d5bf8daf1d731c21309deba7b8885a74c8af5fe83856bf69"
   end
 
   depends_on "go" => :build
