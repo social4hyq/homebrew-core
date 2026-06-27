@@ -16,7 +16,7 @@ class PortableRuby < PortableFormula
   no_autobump! because: "this is a critical package so an auto bump might break Homebrew usability."
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "18e60da116ad7efa00ef6f37e2f499eba272c367d46b6781777058f9ffee8577"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3638b185399c589c8d585ee4dcf0632da45af4880ae8d3eab9eb55ccbdcbd0a5"
   end
 
   depends_on "autoconf" => :build
