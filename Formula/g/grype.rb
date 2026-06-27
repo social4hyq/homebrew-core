@@ -7,7 +7,7 @@ class Grype < Formula
   head "https://github.com/anchore/grype.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fde8f061eb57df2d7368a0824802d613802c5365a103d41199ad54838228a66a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0cbe0dc5aa560a1ba14bf8fc5f36c9b88ed9086d36a9829efdc5bafc35605dcb"
   end
 
   depends_on "go" => :build
