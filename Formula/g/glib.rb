@@ -3,14 +3,13 @@ class Glib < Formula
 
   desc "Core application library for C"
   homepage "https://docs.gtk.org/glib/"
-  url "https://download.gnome.org/sources/glib/2.88/glib-2.88.1.tar.xz"
-  sha256 "51ab804c56f6eab3e5045c774d1290ac5e4c923d4f9a3d8e33123bee45c1840e"
+  url "https://download.gnome.org/sources/glib/2.88/glib-2.88.2.tar.xz"
+  sha256 "cf3f215a640c8a4257f14317586b8f1fdd25a10a93cb4bdda147c0f9ad88e74f"
   license "LGPL-2.1-or-later"
-  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "82102254d1f9a5a89798a83399efc444c3556cb709238bde2b4ed2b439e8af88"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e32a93229dea1dec3940c04618c77319349a9c3d0d76be696e5e38521cfd82a"
   end
 
   depends_on "bison" => :build # for gobject-introspection
