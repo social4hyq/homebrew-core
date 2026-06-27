@@ -1,8 +1,8 @@
 class Velero < Formula
   desc "Disaster recovery for Kubernetes resources and persistent volumes"
   homepage "https://velero.io/"
-  url "https://github.com/vmware-tanzu/velero/archive/refs/tags/v1.18.1.tar.gz"
-  sha256 "ed9d9191f01f214e5e66b700b71c4ee7db728a6adeddbd8e097706444ee0308b"
+  url "https://github.com/vmware-tanzu/velero/archive/refs/tags/v1.18.2.tar.gz"
+  sha256 "68d8c95817d882b2832c4c08689eb5f7b14dd581f71292a6c794acd15633b6d9"
   license "Apache-2.0"
 
   livecheck do
@@ -11,7 +11,7 @@ class Velero < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e987ff0c76a50d7daf3c1e3f56d75e67c1bf2a78ef6e8b12f868b7ed529dbb8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07e2171402b68c337ed02a6b65c25fd44d2913c652d8c8fbc0efba9b3181f385"
   end
 
   depends_on "go" => :build
