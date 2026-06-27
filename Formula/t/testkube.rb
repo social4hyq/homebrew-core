@@ -12,7 +12,7 @@ class Testkube < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b7bee10864faf1804b471d2e043ceb8452cc8ab4bf654b75a208bdf26ccf5b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9abc895a51f4ef0c0bafe310eeee43560dac7a313343a1c35b76b3ef8e828f2c"
   end
 
   depends_on "go" => :build
