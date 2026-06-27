@@ -12,7 +12,7 @@ class Immudb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8c51b4f77fcfcc49823f7cdf6c5372ac0dbc3102924e1904948b201d5ddddb1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "545927147b87be928133d28c26ebcbde749060ffc4f466bcaa3bb82e76d8fb25"
   end
 
   depends_on "go" => :build
