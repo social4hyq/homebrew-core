@@ -6,7 +6,7 @@ class Pangomm < Formula
   license "LGPL-2.1-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb86985d43e3151b0d23f17ca7a4064f940a1023db75d6889625fa763ddffdfe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e318c1c5264173e19fd52cac52411339b88ce9770b7d28d83560832fc67fd78"
   end
 
   depends_on "meson" => :build
