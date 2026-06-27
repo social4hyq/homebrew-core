@@ -11,7 +11,7 @@ class Libcpucycles < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bab2234a5f50b90f8fac6fb8c5e40f9d0570fb6565f0eee0852cdb3816a209f0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac78df89e0fba13a37ead930b479f5270ba9bccec39005b8c2eb331bc4a63101"
   end
 
   uses_from_macos "python" => :build
