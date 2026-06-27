@@ -1,8 +1,8 @@
 class PythonAT314 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  url "https://www.python.org/ftp/python/3.14.5/Python-3.14.5.tgz"
-  sha256 "9c22bfe9939a6c5418fc74b289a5f1cc41859ae82ac6b163016b5844bd0a86bc"
+  url "https://www.python.org/ftp/python/3.14.6/Python-3.14.6.tgz"
+  sha256 "74d0d71d0600e477651a077101d6e62d1e2e69b8e992ba18c993dd643b7ba222"
   license "Python-2.0"
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class PythonAT314 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f4b5cb491ec10f64d03a50ff9f7949b6768066032569a6aa3de457a6c9082b0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7d0c34b79e8c4df6bf5c48f7f4c5aa50286d1b87679325a2bc690c8dcffbfbf"
   end
 
   depends_on "pkgconf" => :build
@@ -66,8 +66,8 @@ class PythonAT314 < Formula
   end
 
   resource "pip" do
-    url "https://files.pythonhosted.org/packages/b6/48/cb9b7a682f6fe01a4221e1728941dd4ac3cd9090a17db3779d6ff490b602/pip-26.1.1.tar.gz"
-    sha256 "d36762751d156a4ee895de8af39aa0abeeeb577f93a2eca6ab62467bbf0f8a78"
+    url "https://files.pythonhosted.org/packages/01/91/47e7d486260f618783899587af63ccf7980fb60245c3e63dd4571c6b57ad/pip-26.1.2.tar.gz"
+    sha256 "f49cd134c61cf2fd75e0ce2676db03e4054504a5a4986d00f8299ae632dc4605"
 
     patch do
       file "Patches/python@3.14/0001-mock-abi-detection-for-pip.patch"
@@ -104,6 +104,8 @@ class PythonAT314 < Formula
   def altinstall? = name != Formula["python3"].name
 
   def python3 = bin/"python#{version.major_minor}"
+
+  deny_network_access!
 
   def install
     # Unset these so that installing pip and setuptools puts them where we want
