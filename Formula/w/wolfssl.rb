@@ -16,7 +16,7 @@ class Wolfssl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "095c5e3b99cbd9dd70e4a8ac63ffca179e5ed83be16cc5826e645fcbe07eab00"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fac86a123ff963b6770d7c921fb78ae01af88f11801c8a67cac379015b5b96b7"
   end
 
   depends_on "autoconf" => :build
