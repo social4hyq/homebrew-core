@@ -7,7 +7,8 @@ class CodebergCli < Formula
   head "https://codeberg.org/Aviac/codeberg-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdb4449976450f6bed51c764affc8a19b4e6a965ba771cc3733f8d4f14429c88"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "efcb12c5070ef82f9cc11965bbf165369de5629c0623b1cc29d2b2112dee785d"
   end
 
   deprecate! date: "2026-05-13", because: :repo_archived, replacement_formula: "forgejo-cli"
