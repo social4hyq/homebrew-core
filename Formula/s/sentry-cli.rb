@@ -1,8 +1,8 @@
 class SentryCli < Formula
   desc "Command-line utility to interact with Sentry"
   homepage "https://docs.sentry.io/cli/"
-  url "https://github.com/getsentry/sentry-cli/archive/refs/tags/3.5.1.tar.gz"
-  sha256 "ca12d6b5271bf1afbc451fc8bda1e1e768895a7875e94aa740ae16f32eb7d66c"
+  url "https://github.com/getsentry/sentry-cli/archive/refs/tags/3.6.0.tar.gz"
+  sha256 "c3510864bcb5978ace21f2f4e4770738df4c34fe46b194ddf04f23aab0956faf"
   license "BSD-3-Clause"
   head "https://github.com/getsentry/sentry-cli.git", branch: "master"
 
@@ -12,7 +12,7 @@ class SentryCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "df4f82b888cde2191ab8432f7c8d054b9578ce237a659ca313a9c648d325765f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2170bb1101f4654a2846f87fd31b481dae2add03ec493d9067569449710bed7a"
   end
 
   depends_on "pkgconf" => :build
