@@ -7,7 +7,7 @@ class Ko < Formula
   head "https://github.com/ko-build/ko.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1bba599512b8c5bc6f0c1dc5e2c6fccdd952bf742fd03faf5c2920ddd7c16238"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "89743707f668f7f2fa02932c10f84a9f2dc0769cc80e790521e6f8d692f98b6a"
   end
 
   depends_on "go" => :build
