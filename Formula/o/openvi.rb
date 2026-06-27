@@ -7,7 +7,7 @@ class Openvi < Formula
   head "https://github.com/johnsonjh/OpenVi.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef1269d45c0794354473264a15c4a4145731a698ceebb6a3976660d1b671206d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2f3901458337047468e84c91f604e05b2a7d7936e29094f48aebf153cc8c03c"
   end
 
   depends_on "pkgconf" => :build
