@@ -1,13 +1,13 @@
 class Doctl < Formula
   desc "Command-line tool for DigitalOcean"
   homepage "https://github.com/digitalocean/doctl"
-  url "https://github.com/digitalocean/doctl/archive/refs/tags/v1.162.0.tar.gz"
-  sha256 "2061a1a10f0717030997d3c083642ddb951d64d86b9476b88f0948bc4cfc4605"
+  url "https://github.com/digitalocean/doctl/archive/refs/tags/v1.163.0.tar.gz"
+  sha256 "8cc7acd78114eea8409f86b11843d1298d9b12cc984c277f594802acbb3c972a"
   license "Apache-2.0"
   head "https://github.com/digitalocean/doctl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0110b3aae53f2eaede174c5b3200ec56cd1a4771d0e6742d689b9cf3551a0c05"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8233dd21afb4d3fb0c1a9ce7feee7837eddde806416b700d3d68dfb4a6becb20"
   end
 
   depends_on "go" => :build
