@@ -6,7 +6,7 @@ class Rura < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a1035f12d5ebc6923f9a8de84893c7a0c12b39e0426d0cb8a5aff7996f3652f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f5548f4dd2ba515a98c39ed31b63c1c49fbaf5f591639714f2b47c77f1c6e672"
   end
 
   depends_on "rust" => :build
