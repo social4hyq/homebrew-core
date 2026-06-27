@@ -1,10 +1,9 @@
 class PythonAT313 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  url "https://www.python.org/ftp/python/3.13.13/Python-3.13.13.tgz"
-  sha256 "f9cde7b0e2ec8165d7326e2a0f59ea2686ce9d0c617dbbb3d66a7e54d31b74b9"
+  url "https://www.python.org/ftp/python/3.13.14/Python-3.13.14.tgz"
+  sha256 "5ae535a36af0ebca6fca176ecb8197f5db9c1cb8c8f0cd12cdf1787046db1f41"
   license "Python-2.0"
-  revision 1
   compatibility_version 1
 
   livecheck do
@@ -13,8 +12,7 @@ class PythonAT313 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "87888fee4b8a73515cca6b564d35ef6759b95664752db534349db84d0d10e5f5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ba30300c419ff8c5fdb342d33c0474ad11d1359bce4734318f62fa722ea35ef"
   end
 
   depends_on "pkgconf" => :build
@@ -442,6 +440,11 @@ class PythonAT313 < Formula
   end
 
   def caveats
+    dbm_is = "`dbm.gnu` is"
+    on_linux do
+      dbm_is = "`dbm.gnu` and `dbm.ndbm` are"
+    end
+
     <<~EOS
       Python is installed as
         #{HOMEBREW_PREFIX}/bin/python#{version.major_minor}
@@ -456,7 +459,10 @@ class PythonAT313 < Formula
       `idle#{version.major_minor}` requires tkinter, which is available separately:
         brew install python-tk@#{version.major_minor}
 
-      See: https://docs.brew.sh/Homebrew-and-Python
+      #{dbm_is} available separately:
+        brew install python-gdbm@#{version.major_minor}
+
+      For more information about Homebrew and Python, see: https://docs.brew.sh/Homebrew-and-Python
     EOS
   end
 
