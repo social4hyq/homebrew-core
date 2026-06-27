@@ -6,6 +6,11 @@ class CodebergCli < Formula
   license "AGPL-3.0-or-later"
   head "https://codeberg.org/Aviac/codeberg-cli.git", branch: "main"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "efcb12c5070ef82f9cc11965bbf165369de5629c0623b1cc29d2b2112dee785d"
+  end
+
   deprecate! date: "2026-05-13", because: :repo_archived, replacement_formula: "forgejo-cli"
   disable! date: "2027-05-13", because: :repo_archived, replacement_formula: "forgejo-cli"
 
