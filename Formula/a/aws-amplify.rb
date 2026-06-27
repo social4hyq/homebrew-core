@@ -6,7 +6,7 @@ class AwsAmplify < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "057506965c15a332f7cbd947a1c6ea68d1bb6fc83ce29814ce7662d421319d27"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "432265acd905ac3f0b36db4e04bbbff192dc6765e92b0069d39045a3ac56dcf0"
   end
 
   depends_on "node"
