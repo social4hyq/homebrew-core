@@ -11,7 +11,7 @@ class ReleaseIt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c720824961cac41149807ce169408d124a48cd1a785d15acda1226ed27fcf08f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1600bbf853bbc0b3b748d7f2126353ebe08546a238468dce4534a45b042f66bc"
   end
 
   depends_on "node"
