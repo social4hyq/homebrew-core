@@ -12,7 +12,7 @@ class ImmichGo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1941cbdc158b1d341d204f2b7ed4fd2b43a322b79d98db28c372ec56feae0732"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2af999a93d0d9c6108f3f565a3386d21587c1468ebef9819e04b37f963e8eea5"
   end
 
   depends_on "go" => :build
