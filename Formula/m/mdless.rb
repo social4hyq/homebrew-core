@@ -6,7 +6,7 @@ class Mdless < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "80fc5b14c15bea750685abc1f31691da4b2fa6572c07538e1250c93666510e25"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a86aa682dedbd1928962b9467f1ea52093d6b13b2609fb3b7ce18fd0b99284bb"
   end
 
   # Requires Ruby >= 2.7
