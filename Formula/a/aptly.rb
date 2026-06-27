@@ -12,7 +12,7 @@ class Aptly < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "830839fc9b22d127d420920e7e7bd27795ee4b34dad995841bd953e690ec91fd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6a2caa2d0734d69eef0da0a50cf00bbea77f5c5a59d511816ad77c7f0e25bbb"
   end
 
   depends_on "go" => :build
