@@ -6,8 +6,7 @@ class Appwrite < Formula
   license "BSD-3-Clause"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a9eb15bdce8889c63bf36683b18bab8356986e7d914320afdc88dc78f7c340c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "abdc5e7093e84a4d70c0f673dc0e54f6746d8f9bf1f3a1c578e458d950883718"
   end
 
   depends_on "node"
