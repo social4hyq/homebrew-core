@@ -14,7 +14,7 @@ class ApacheFlink < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4427c9ef92f818831829d5f77e9e484a989f04645d4b9d7bbd28bcfa65158f16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a5819c1b81fa900e67d75cbe502775923439ade3904b75dd04981059d94bc9a"
   end
 
   # Java 11, 17 (Default), and 21 are supported.
