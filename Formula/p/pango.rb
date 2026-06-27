@@ -1,8 +1,8 @@
 class Pango < Formula
   desc "Framework for layout and rendering of i18n text"
   homepage "https://www.gtk.org/docs/architecture/pango"
-  url "https://download.gnome.org/sources/pango/1.57/pango-1.57.1.tar.xz"
-  sha256 "e65d6d117080dc3aeeb7d8b4b3b518f7383aa2e6cfce23117c623cd624764c2f"
+  url "https://download.gnome.org/sources/pango/1.58/pango-1.58.0.tar.xz"
+  sha256 "bc5bad6213ad4886a47d1e80292fd850b64159b50db67917a43d9ea80ee2298a"
   license "LGPL-2.0-or-later"
   compatibility_version 1
   head "https://gitlab.gnome.org/GNOME/pango.git", branch: "main"
@@ -16,7 +16,7 @@ class Pango < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e2ebaf851244558a01912c28b67bb3722d212504387be5696a8ea95a35ec473"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a00c93e8d0dc223b03d864ab86e23eb2a3af79169b879a76d5b0c7ca3af557a"
   end
 
   depends_on "gobject-introspection" => :build
