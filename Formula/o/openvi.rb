@@ -1,13 +1,13 @@
 class Openvi < Formula
   desc "Portable OpenBSD vi for UNIX systems"
   homepage "https://github.com/johnsonjh/OpenVi"
-  url "https://github.com/johnsonjh/OpenVi/archive/refs/tags/7.7.32.tar.gz"
-  sha256 "3378f371b7446708b5d909dcbf8608a74d771f2660f06014888da2163a77af81"
+  url "https://github.com/johnsonjh/OpenVi/archive/refs/tags/7.9.33.tar.gz"
+  sha256 "3b807837b8458609b37e107fa063160298ee3655998dd8df590885c297af1fd3"
   license "BSD-3-Clause"
   head "https://github.com/johnsonjh/OpenVi.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef1269d45c0794354473264a15c4a4145731a698ceebb6a3976660d1b671206d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2f3901458337047468e84c91f604e05b2a7d7936e29094f48aebf153cc8c03c"
   end
 
   depends_on "pkgconf" => :build
