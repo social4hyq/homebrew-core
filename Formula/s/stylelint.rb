@@ -1,8 +1,8 @@
 class Stylelint < Formula
   desc "Modern CSS linter"
   homepage "https://stylelint.io/"
-  url "https://registry.npmjs.org/stylelint/-/stylelint-17.13.0.tgz"
-  sha256 "bfb181aaaaca1f5f37b221c1c518bfb7702c474a4380360ef51fae315c80d3b6"
+  url "https://registry.npmjs.org/stylelint/-/stylelint-17.14.0.tgz"
+  sha256 "4d73e694e4fc7f76aa08b18519308006a91c2aae7583c408e0912cf7e7f96b75"
   license "MIT"
 
   bottle do
