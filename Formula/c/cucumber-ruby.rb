@@ -1,8 +1,8 @@
 class CucumberRuby < Formula
   desc "Cucumber for Ruby"
   homepage "https://cucumber.io"
-  url "https://github.com/cucumber/cucumber-ruby/archive/refs/tags/v11.1.0.tar.gz"
-  sha256 "ea8a759fcf703a15734a1f83bfe796fa62eb3a71c2df14283b482e670ba3de58"
+  url "https://github.com/cucumber/cucumber-ruby/archive/refs/tags/v11.1.1.tar.gz"
+  sha256 "b85812f47166983c8b7f5f8e046fad80a3087410918a05ec2dc4e42c6cbd017e"
   license "MIT"
 
   livecheck do
@@ -11,7 +11,7 @@ class CucumberRuby < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "431fd5a0784a186cf2695c53957464f9b2d1a1314bd5665534b267a6e0b29de6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd9060be55b12fc02ce2e69a60f24511d84037d95fafaf4a2106dc695478d47e"
   end
 
   depends_on "pkgconf" => :build
