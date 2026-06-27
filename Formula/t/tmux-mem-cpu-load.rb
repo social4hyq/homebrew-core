@@ -7,7 +7,7 @@ class TmuxMemCpuLoad < Formula
   head "https://github.com/thewtex/tmux-mem-cpu-load.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa1c85b7d0817a578220691c78f8efac27bc4d38e991c5265cc796d243f3ccb4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "96a43f1966e939479b37cc410b9d8675d197f4a11c9cae24bae54f14f97b492f"
   end
 
   depends_on "cmake" => :build
