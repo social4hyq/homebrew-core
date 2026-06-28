@@ -1,8 +1,8 @@
 class Shellharden < Formula
   desc "Bash syntax highlighter that encourages/fixes variables quoting"
   homepage "https://github.com/anordal/shellharden"
-  url "https://github.com/anordal/shellharden/archive/refs/tags/v4.3.1.tar.gz"
-  sha256 "3c16a98502df01a2fa2b81467d5232cc1aa4c80427e2ecf9f7e74591d692e22c"
+  url "https://github.com/anordal/shellharden/archive/refs/tags/v4.3.2.tar.gz"
+  sha256 "3a6721c3409c70449c24a5b33f83d0d05026f2318fe052db5c6d0834e2b29c6c"
   license "MPL-2.0"
 
   bottle do
