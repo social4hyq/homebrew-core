@@ -1,13 +1,13 @@
 class Ifacemaker < Formula
   desc "Generate interfaces from structure methods"
   homepage "https://github.com/vburenin/ifacemaker"
-  url "https://github.com/vburenin/ifacemaker/archive/refs/tags/v1.3.0.tar.gz"
-  sha256 "36d1b93300169c2d9d607fc7c082ff62914300e2d20f67250113d0f9acf71457"
+  url "https://github.com/vburenin/ifacemaker/archive/refs/tags/v1.4.0.tar.gz"
+  sha256 "c14fb68397812f4ac487a2626262396d9f9a01a4da39023713795b04b5714a83"
   license "Apache-2.0"
   head "https://github.com/vburenin/ifacemaker.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a6ad1259b9b466bbdbade0414a9adec533f75a31261789d1a9c58d5e32352a6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3a4a43721f5b510fb9cd0789305a06426bd49b83675251a02bea8069a298ee0"
   end
 
   depends_on "go"
