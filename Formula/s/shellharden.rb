@@ -6,7 +6,7 @@ class Shellharden < Formula
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e62bd93fc18b110801859faaa5082d2bdf46b238f9337bb386bab1178498800"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "145ee4d3638558de1304ebccdb8f60283ecb2671e5d5a762ad28ae1c74349aff"
   end
 
   depends_on "rust" => :build
