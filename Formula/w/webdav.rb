@@ -1,8 +1,8 @@
 class Webdav < Formula
   desc "Simple and standalone WebDAV server"
   homepage "https://github.com/hacdias/webdav"
-  url "https://github.com/hacdias/webdav/archive/refs/tags/v5.11.11.tar.gz"
-  sha256 "135bf20e3b86c986edaca529f3fbe060780c2e9a05f21ea5ff3e090936752cc9"
+  url "https://github.com/hacdias/webdav/archive/refs/tags/v5.12.0.tar.gz"
+  sha256 "8234159a648e303492f8bbd65af36345e3773893c8a7c13db17e5d62af3eaa17"
   license "MIT"
   head "https://github.com/hacdias/webdav.git", branch: "main"
 
