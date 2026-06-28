@@ -7,7 +7,7 @@ class Ghorg < Formula
   head "https://github.com/gabrie30/ghorg.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d569cc33fbf03ed446d52e3d1b24a6ef1e36543b21a6b3f14c1765d9bfc95330"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0ba92711ab998b83349d6cc34599d511a0991c7483599296ecf29a491e4053f"
   end
 
   depends_on "go" => :build
