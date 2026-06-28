@@ -1,9 +1,9 @@
 class Parallel < Formula
   desc "Shell command parallelization utility"
   homepage "https://savannah.gnu.org/projects/parallel/"
-  url "https://ftpmirror.gnu.org/gnu/parallel/parallel-20260522.tar.bz2"
-  mirror "https://ftp.gnu.org/gnu/parallel/parallel-20260522.tar.bz2"
-  sha256 "2bab0cf913eeb60a24c6575d60e3c167cd03e63b4f7d17965915844e005dd895"
+  url "https://ftpmirror.gnu.org/gnu/parallel/parallel-20260622.tar.bz2"
+  mirror "https://ftp.gnu.org/gnu/parallel/parallel-20260622.tar.bz2"
+  sha256 "bcdb706d92a9f0a496c05e143d90c26b57e1848f06842c7de419dc3efb56a865"
   license "GPL-3.0-or-later"
   version_scheme 1
   head "https://git.savannah.gnu.org/git/parallel.git", branch: "master"
@@ -14,7 +14,7 @@ class Parallel < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b8b2b6b15bd8eb8a523a1d63e814c4ed18da8cc22b56c5f0bbc866b9f40fb4a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa82202232f40dbeb1f4e830c8855b2d4fda35bb1d0180431a5176b772a50dc3"
   end
 
   conflicts_with "moreutils", because: "both install a `parallel` executable"
