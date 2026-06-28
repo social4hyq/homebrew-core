@@ -7,7 +7,7 @@ class Ifacemaker < Formula
   head "https://github.com/vburenin/ifacemaker.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a6ad1259b9b466bbdbade0414a9adec533f75a31261789d1a9c58d5e32352a6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3a4a43721f5b510fb9cd0789305a06426bd49b83675251a02bea8069a298ee0"
   end
 
   depends_on "go"
