@@ -7,7 +7,7 @@ class Frei0r < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d78dfbbf933ce71a9552e917720c1220d561dfd373cd37269f077b221f8efe7b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d08481ea112a7f4e0bfbbca3d94cd64deb8a4ddc7a271cf67332513113ab7616"
   end
 
   depends_on "cmake" => :build
