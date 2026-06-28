@@ -6,7 +6,7 @@ class KimiCode < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0043a3a81ddb392e7c79137701282d97e737e2ec4fb1c6557e7bac26c83b1b0b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d188575991c1c177bee6ed82c44df077c54df1f0bc9ffaffc1607bd95d689d2a"
   end
 
   depends_on "node"
