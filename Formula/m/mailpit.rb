@@ -6,7 +6,7 @@ class Mailpit < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a2d4c398348c04ae90a2623ce0140f54add9918c6e811754961790788312bc2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6c44f11105547df603ed3b13d6440ca017458a5c31d7bc75a76a976ebd51ff8"
   end
 
   depends_on "go" => :build
