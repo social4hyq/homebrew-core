@@ -1,13 +1,13 @@
 class Circumflex < Formula
   desc "Hacker News in your terminal"
   homepage "https://github.com/bensadeh/circumflex"
-  url "https://github.com/bensadeh/circumflex/archive/refs/tags/4.3.tar.gz"
-  sha256 "92d4061252ad3fa625df15c5b22d746222ab82f65e42bb91acc54c01d3189a19"
+  url "https://github.com/bensadeh/circumflex/archive/refs/tags/4.4.tar.gz"
+  sha256 "ea0d29d95a8999d32a592d68484a7acd2dc2651da3ecbe49cbfab43038c9b68d"
   license "MIT"
   head "https://github.com/bensadeh/circumflex.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "74714bce1d4cf94d38d1cd1d725abeccd1b0758d245ffa965ebc1c15700499d5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bfa9f165ecf9df20582ef347c846611d7957a8c990ff7023e66322ec7e2060df"
   end
 
   depends_on "go" => :build
