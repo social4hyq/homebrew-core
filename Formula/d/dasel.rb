@@ -7,7 +7,7 @@ class Dasel < Formula
   head "https://github.com/TomWright/dasel.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "05cb8fd453e85b149af0b12de841a9ea326dc545271f2337a57b5879a051be69"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a632de0f1acdb4f9b7f44815421ad2d977d0636721387ed47f85383c212eadca"
   end
 
   depends_on "go" => :build
