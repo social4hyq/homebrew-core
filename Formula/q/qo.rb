@@ -6,7 +6,7 @@ class Qo < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba24014a0f87aff0533765e9768c0083b2ce561d4e9d6a4db20f0ab4b64f2bd5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8349a8cad1bd73966daa111b2126d385890c20a4f67a93874c4e220639179372"
   end
 
   depends_on "go" => :build
