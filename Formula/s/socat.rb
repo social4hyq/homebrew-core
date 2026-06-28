@@ -13,7 +13,7 @@ class Socat < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ad053c350f281915df51bd6ddebae33cde019e5d28bd9929764ba914ca62cf0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "31e0b57aa2bedd2387f78cebfa3eba95187ac125bef8882611a702d148a802c7"
   end
 
   depends_on "openssl@3"
