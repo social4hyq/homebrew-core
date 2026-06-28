@@ -1,9 +1,9 @@
 class Socat < Formula
   desc "SOcket CAT: netcat on steroids"
   homepage "http://www.dest-unreach.org/socat/"
-  url "https://distfiles.alpinelinux.org/distfiles/edge/socat-1.8.1.1.tar.gz"
-  mirror "http://www.dest-unreach.org/socat/download/socat-1.8.1.1.tar.gz"
-  sha256 "f68b602c80e94b4b7498d74ec408785536fe33534b39467977a82ab2f7f01ddb"
+  url "https://distfiles.alpinelinux.org/distfiles/edge/socat-1.8.1.3.tar.gz"
+  mirror "http://www.dest-unreach.org/socat/download/socat-1.8.1.3.tar.gz"
+  sha256 "06602ffd591e98c75b3dc1d66f0f19136cc666b0b2d95caad987d6ab2cb28097"
   license "GPL-2.0-only"
   compatibility_version 1
 
@@ -13,7 +13,7 @@ class Socat < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ad053c350f281915df51bd6ddebae33cde019e5d28bd9929764ba914ca62cf0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "31e0b57aa2bedd2387f78cebfa3eba95187ac125bef8882611a702d148a802c7"
   end
 
   depends_on "openssl@3"
