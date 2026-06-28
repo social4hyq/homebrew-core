@@ -1,13 +1,13 @@
 class AtSpi2Core < Formula
   desc "Protocol definitions and daemon for D-Bus at-spi"
   homepage "https://www.freedesktop.org/wiki/Accessibility/AT-SPI2/"
-  url "https://download.gnome.org/sources/at-spi2-core/2.60/at-spi2-core-2.60.4.tar.xz"
-  sha256 "1a1f5ba9805917f41fc6aa6823dcf887a291d607a427e2d5afb6b5dfa65070c7"
+  url "https://download.gnome.org/sources/at-spi2-core/2.60/at-spi2-core-2.60.5.tar.xz"
+  sha256 "6059a77d507438ff6c8d6d06025f8f9f5774fa0f8eabe9c9b059b1cc41e1bbc0"
   license "LGPL-2.1-or-later"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6229fcf1d87b0bbf1043984034584b5859dab03c470cae0aed98cea5e57389ba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6dbf441fae0e8dd6cdda3b270a85251797905955406b2f514d5bc69543062218"
   end
 
   depends_on "gettext" => :build
