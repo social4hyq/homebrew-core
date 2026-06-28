@@ -9,8 +9,7 @@ class TranslateToolkit < Formula
   head "https://github.com/translate/translate.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "019ed75f88f3b757bbf3464e507e9d80386705f06ce67b95ae034fe24673eb67"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "04304d488d521106cdb51d5190231167879d00c4f0960241246f3cbc7554d2e5"
   end
 
   depends_on "rust" => :build # for `unicode_segmentation_py`
