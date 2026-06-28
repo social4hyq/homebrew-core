@@ -1,13 +1,13 @@
 class Ghorg < Formula
   desc "Quickly clone an entire org's or user's repositories into one directory"
   homepage "https://github.com/gabrie30/ghorg"
-  url "https://github.com/gabrie30/ghorg/archive/refs/tags/v1.11.11.tar.gz"
-  sha256 "a7970baf8b80b1968a81607f21adc6b19c6febf322889fc3a10f59cb3dfd2cb6"
+  url "https://github.com/gabrie30/ghorg/archive/refs/tags/v1.11.12.tar.gz"
+  sha256 "d3a6c0897092262f94770ace76b88fd76cf28b2f0d2c4bde37af5e446ecd5303"
   license "Apache-2.0"
   head "https://github.com/gabrie30/ghorg.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d569cc33fbf03ed446d52e3d1b24a6ef1e36543b21a6b3f14c1765d9bfc95330"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0ba92711ab998b83349d6cc34599d511a0991c7483599296ecf29a491e4053f"
   end
 
   depends_on "go" => :build
