@@ -7,7 +7,7 @@ class Dockerfmt < Formula
   head "https://github.com/reteps/dockerfmt.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a61104e5e49b3ccf09800384ae15699cde842ac6d3e926c7e8b6d7dfa6bf7d04"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07f0892327547ada4083dd9152e3e2b844b25da9a32ad0559ab972c94c2f3f99"
   end
 
   depends_on "go" => :build
