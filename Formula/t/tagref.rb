@@ -6,12 +6,7 @@ class Tagref < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "ef46bd26be5719fd68aa0ed4a8b132d4fe1bcadf7e258f598bb3e3a11b71424d"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8973472b765cf3ceaac8f21dd4d40fc66837b3ad8dcb80ca748ea6d3533e363a"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9fd932b84bc1ebd27eaf725fd382fca7f04ffbf592ab0a15f1dee6d3e235a5fe"
-    sha256 cellar: :any_skip_relocation, sonoma:        "339d31bfb497429597f56e74f31fcf4ebb06945d5db6bf81c2f34a56d6e16498"
-    sha256 cellar: :any,                 arm64_linux:   "b280a4fca55ed96b32662267c11d49d636064731c6f5b9c62e9a0d286c446f92"
-    sha256 cellar: :any,                 x86_64_linux:  "508ba941b3247e43efa7ee2c93110e188a703e0ff23fbcc9ca5bb7e25f9492b6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8ec2608e6d034344f051a507e772370ffb560d5af2086f1b5668f0e803572c6"
   end
 
   depends_on "rust" => :build
