@@ -1,16 +1,26 @@
 class Idnits < Formula
   desc "Looks for problems in internet draft formatting"
-  homepage "https://github.com/ietf-tools/idnits"
-  url "https://github.com/ietf-tools/idnits/archive/refs/tags/2.17.1.tar.gz"
-  sha256 "195ed8c9bfd38fbaf1ecb674a894f98f43be774dfecc37da5ef953ccba99ce76"
-  license "GPL-2.0-or-later"
+  homepage "https://author-tools.ietf.org/idnits3/"
+  url "https://registry.npmjs.org/@ietf-tools/idnits/-/idnits-3.1.0.tgz"
+  sha256 "ddbafc75f62868c37cc3d5bc2075390cc23a71930114309588917484adf0f8cd"
+  license "BSD-3-Clause"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d98a769943853e9b74c2ee20aad2b6e72ac84fabf48cfd6f8cea61b8b8f233c3"
+  livecheck do
+    url "https://registry.npmjs.org/@ietf-tools/idnits/latest"
+    strategy :json do |json|
+      json["version"]
+    end
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "81129a1077c51a93d9c4c8b9e205ad9fca875934ff54537b469e33d9db818a36"
+  end
+
+  depends_on "node"
+
   def install
-    bin.install "idnits"
+    system "npm", "install", *std_npm_args
+    bin.install_symlink Dir["#{libexec}/bin/*"]
   end
 
   test do
@@ -20,8 +30,9 @@ class Idnits < Formula
     end
 
     testpath.install resource("homebrew-test")
-    system bin/"idnits", "draft-tian-frr-alt-shortest-path-01.txt"
+    output = shell_output("#{bin}/idnits draft-tian-frr-alt-shortest-path-01.txt")
+    assert_match(/\d+ errors?/, output)
 
-    assert_match "idnits\t#{version}", shell_output("#{bin}/idnits --version")
+    assert_match version.to_s, shell_output("#{bin}/idnits --version")
   end
 end
