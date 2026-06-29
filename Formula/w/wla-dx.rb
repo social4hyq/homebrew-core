@@ -1,8 +1,8 @@
 class WlaDx < Formula
   desc "Yet another crossassembler package"
   homepage "https://github.com/vhelin/wla-dx"
-  url "https://github.com/vhelin/wla-dx/archive/refs/tags/v10.6.tar.gz"
-  sha256 "010c4d426fd1733b978cbca7530a5e68bdfb6f62976c0d5ff7bff447894e19a8"
+  url "https://github.com/vhelin/wla-dx/archive/refs/tags/v10.7.tar.gz"
+  sha256 "38296a96bc20be873d17e0e88be0c5b20a15ef2ec4da5279600e56af30ad925a"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -12,16 +12,15 @@ class WlaDx < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d30d0889f611771598f4a77b46fbc50fee8da581abd6c5159df5a1c1364da4d"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "14835aed5364771805901495fdeca30f6f7c9f56835dbadea59173639a949abd"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "dda35cea50a7e7f1149d1ef1e38ea8a5b97992bb06a6dff615e47c0440366373"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5fe78c5b54142ff1711ec529839332910b15036262b5602b4190afec9e785aa2"
+    sha256 cellar: :any_skip_relocation, sonoma:        "fc58862171d224ff6f482a2e966c9ca83d7d71ee58c14babbdaaca8aa0867642"
+    sha256 cellar: :any,                 arm64_linux:   "9e90004ff3e66541a4bf3545900877008cb582bf7a9df7707bdf31e810cca33b"
+    sha256 cellar: :any,                 x86_64_linux:  "61f7c89346e1f7b70980388e89fea7babf8c53aa78af5012e876090d2ce193f4"
   end
 
   depends_on "cmake" => :build
-
-  # Backport support for CMake 4
-  patch do
-    url "https://github.com/vhelin/wla-dx/commit/6fa1f673f010e4fa4571c40929019cd7e67d1bbd.patch?full_index=1"
-    sha256 "08ba18fe27c6b0ff0bad4e9ce15a4e76be5626407e03ffdf1c19228902e02493"
-  end
 
   def install
     system "cmake", "-S", ".", "-B", "build", *std_cmake_args
