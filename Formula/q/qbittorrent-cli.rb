@@ -1,8 +1,8 @@
 class QbittorrentCli < Formula
   desc "Command-line interface for qBittorrent written in Go"
   homepage "https://github.com/ludviglundgren/qbittorrent-cli"
-  url "https://github.com/ludviglundgren/qbittorrent-cli/archive/refs/tags/v2.2.0.tar.gz"
-  sha256 "66b082b4b1653aae785b0f12bc00d7ac4dd8f17028d99e3feafac8aded931957"
+  url "https://github.com/ludviglundgren/qbittorrent-cli/archive/refs/tags/v2.3.0.tar.gz"
+  sha256 "89342037e76c0877f7ac43530303227b6e15e727153f0415c027ae92af6e4f9e"
   license "MIT"
   head "https://github.com/ludviglundgren/qbittorrent-cli.git", branch: "master"
 
