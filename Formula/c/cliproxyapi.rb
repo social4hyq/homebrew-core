@@ -13,12 +13,7 @@ class Cliproxyapi < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "399ccf6a439ab2c26dc572cc2158dded4fb2b09bbb594d22bb9852763ec0db0d"
-    sha256 arm64_sequoia: "25ae16b9de324030e53b74f7838b89e7cff7b45edbad45c594e7be5a6011f8b9"
-    sha256 arm64_sonoma:  "5fcbe5cda04db642f9eb92a4156ae73c3eb67e4d9ead5587417aaed7dab5cda6"
-    sha256 sonoma:        "c2b2457d626b3de99d80ddf1224b005d5f8ade200370bfd186120a1f6bbcbae2"
-    sha256 arm64_linux:   "4d185f72c307b96d793ff0c631ae2ea474f8c99d21f73d1a4d778270514dc7c8"
-    sha256 x86_64_linux:  "a23013dd318b07fe6f487a2dc6345ad8d044d4152a42c26fe83b90d8117eacb6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f2e117eccdef185f31f1e26df31da266a6c66d3ec4e3e646509406a4a65d0a6"
   end
 
   depends_on "go" => :build
