@@ -6,7 +6,7 @@ class Fselect < Formula
   license any_of: ["Apache-2.0", "MIT"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6df98c5935ba862802fe908cf7725c749efcd87e3b56aa1865a2d33224c7ae65"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "30417e445ca9090c813c6845aa389d4ff9465109a144982b4d92e5511ab75eb9"
   end
 
   depends_on "cmake" => :build # for libz-ng-sys
