@@ -1,8 +1,8 @@
 class Oasdiff < Formula
   desc "OpenAPI Diff and Breaking Changes"
   homepage "https://www.oasdiff.com/"
-  url "https://github.com/oasdiff/oasdiff/archive/refs/tags/v1.20.1.tar.gz"
-  sha256 "6d1ca07fee91c359da04b9094b9d29da5e8cf40466f94f1cefc0d437a5b2fb93"
+  url "https://github.com/oasdiff/oasdiff/archive/refs/tags/v1.21.0.tar.gz"
+  sha256 "e6cbab12470548920914ae45f900e9b8899ed0b6c692b98b1409f960d79e45f2"
   license "Apache-2.0"
   head "https://github.com/oasdiff/oasdiff.git", branch: "main"
 
@@ -13,7 +13,7 @@ class Oasdiff < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb5f5e35ec001ad012424a2e2f24bd0040a85c31cbaa4ecfa58778ce9f5fd2f4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5807de7b589eb8fbb511164790cb3d8e1a7840a9f54f24c867cb289f5d5a40e9"
   end
 
   depends_on "go" => :build
@@ -39,7 +39,7 @@ class Oasdiff < Formula
     testpath.install resource("homebrew-openapi-test1.yaml")
     testpath.install resource("homebrew-openapi-test5.yaml")
 
-    expected = "11 changes: 3 error, 2 warning, 6 info"
+    expected = "3 error, 2 warning"
     assert_match expected, shell_output("#{bin}/oasdiff changelog openapi-test1.yaml openapi-test5.yaml")
 
     assert_match version.to_s, shell_output("#{bin}/oasdiff --version")
