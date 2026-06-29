@@ -7,7 +7,8 @@ class Gup < Formula
   head "https://github.com/nao1215/gup.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cbd288ea4eb2440c2b5a6091dfcf99e469285f002ed3a761d8d9aac5a31a2f4e"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c38809497daa386825a1fdf7e818e2df17ac3746539882d72a4572e2bfed36bb"
   end
 
   depends_on "go"
@@ -29,15 +30,15 @@ class Gup < Formula
     (testpath/"bin").mkpath
 
     (testpath/"hello").mkpath
-    (testpath/"hello/go.mod").write <<~EOS
+    (testpath/"hello/go.mod").write <<~MOD
       module example.com/hello
       go 1.22
-    EOS
-    (testpath/"hello/main.go").write <<~EOS
+    MOD
+    (testpath/"hello/main.go").write <<~GO
       package main
       import "fmt"
       func main() { fmt.Println("hello") }
-    EOS
+    GO
 
     cd testpath/"hello" do
       system "go", "install", "."
