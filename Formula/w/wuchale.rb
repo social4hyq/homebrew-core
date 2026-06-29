@@ -6,7 +6,7 @@ class Wuchale < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f592651c3bec7d21c54fd1eecf56a5549e7b831985bc95e81643b61f364ccc26"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65ccf936ab2aeb07fb3eea20d5162b55588f7d1e2ac9685f2c881768c8d53ac7"
   end
 
   depends_on "node"
