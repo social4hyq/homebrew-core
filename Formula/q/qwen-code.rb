@@ -1,13 +1,12 @@
 class QwenCode < Formula
   desc "AI-powered command-line workflow tool for developers"
   homepage "https://github.com/QwenLM/qwen-code"
-  url "https://registry.npmjs.org/@qwen-code/qwen-code/-/qwen-code-0.19.1.tgz"
-  sha256 "7246af967e75719d08721c636102f5121f9a1b35444ebfb8264c1dd341dd0180"
+  url "https://registry.npmjs.org/@qwen-code/qwen-code/-/qwen-code-0.19.2.tgz"
+  sha256 "13e072d97332b21ed023cbe98c1f43805cc58dd636537e1bb30cc04c15df47bf"
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f021e7a6c071d1ed23f4bc29b1cb1465ad4f0ee6c5cf9b9f2721839ea8852237"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0802bd24603e55a5ce4e6072dc4f4c905b71838aedc68e3e10355b41aca1f057"
   end
 
   depends_on "node"
@@ -25,6 +24,10 @@ class QwenCode < Formula
     os = OS.mac? ? "darwin" : "linux"
     arch = Hardware::CPU.intel? ? "x64" : "arm64"
     (qwen_code/"node_modules/node-pty/prebuilds").glob("*").each do |dir|
+      rm_r(dir) if dir.basename.to_s != "#{os}-#{arch}"
+    end
+
+    qwen_code.glob("node_modules/@qwen-code/audio-capture/prebuilds/*").each do |dir|
       rm_r(dir) if dir.basename.to_s != "#{os}-#{arch}"
     end
   end
