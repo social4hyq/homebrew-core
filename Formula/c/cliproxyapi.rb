@@ -1,8 +1,8 @@
 class Cliproxyapi < Formula
   desc "Wrap Gemini CLI, Codex, Claude Code, Qwen Code as an API service"
   homepage "https://github.com/router-for-me/CLIProxyAPI"
-  url "https://github.com/router-for-me/CLIProxyAPI/archive/refs/tags/v7.2.15.tar.gz"
-  sha256 "81abb0275c8bb62f71d0f4401283bd671df977642935c7928727add1ed9f228b"
+  url "https://github.com/router-for-me/CLIProxyAPI/archive/refs/tags/v7.2.45.tar.gz"
+  sha256 "299212b89893cd640b810083281de7f86e4d0363b9f06db4dc6bf258f01adaa4"
   license "MIT"
   head "https://github.com/router-for-me/CLIProxyAPI.git", branch: "main"
 
@@ -13,7 +13,7 @@ class Cliproxyapi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce63b7edb1ca1ad2a70e404118e95db27cb2151855010803e1cdddd49df923c4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f2e117eccdef185f31f1e26df31da266a6c66d3ec4e3e646509406a4a65d0a6"
   end
 
   depends_on "go" => :build
@@ -38,7 +38,7 @@ class Cliproxyapi < Formula
 
   test do
     require "pty"
-    PTY.spawn(bin/"cliproxyapi", "-login", "-no-browser") do |r, _w, pid|
+    PTY.spawn(bin/"cliproxyapi", "-antigravity-login", "-no-browser") do |r, _w, pid|
       sleep 5
       Process.kill "TERM", pid
       assert_match "accounts.google.com", r.read_nonblock(1024)
