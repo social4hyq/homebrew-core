@@ -1,13 +1,13 @@
 class Threatcl < Formula
   desc "Documenting your Threat Models with HCL"
   homepage "https://github.com/threatcl/threatcl"
-  url "https://github.com/threatcl/threatcl/archive/refs/tags/v0.5.1.tar.gz"
-  sha256 "ceea59b0621eacaa55bb24b6a51ac40b235a60b7f9bf3e01cdd0769332371f6c"
+  url "https://github.com/threatcl/threatcl/archive/refs/tags/v0.5.2.tar.gz"
+  sha256 "d81b6685e709b1e039365143709466a7f6f330d1784769e027a6aa3417d56c81"
   license "MIT"
   head "https://github.com/threatcl/threatcl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d77172f2653248163c11a50b14bf34e9d33c2b8e30d8fbd2e7aee1bab4ed7d0f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "38adf3e61ce78281b396e10db59654271c2350c7d9caa19ee288da39abad332b"
   end
 
   depends_on "go" => :build
@@ -15,7 +15,8 @@ class Threatcl < Formula
   def install
     ENV["CGO_ENABLED"] = "0"
 
-    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/threatcl"
+    ldflags = "-s -w -X github.com/threatcl/threatcl/version.Version=#{version}"
+    system "go", "build", *std_go_args(ldflags:), "./cmd/threatcl"
 
     pkgshare.install "examples"
   end
