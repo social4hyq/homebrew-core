@@ -1,14 +1,13 @@
 class Goshs < Formula
   desc "Simple, yet feature-rich web server written in Go"
   homepage "https://goshs.de"
-  url "https://github.com/patrickhener/goshs/archive/refs/tags/v2.1.2.tar.gz"
-  sha256 "221822c285bef62c1c6c296cd208aa77d7f334953cf1bb285393f94dd1db6f46"
+  url "https://github.com/goshs-labs/goshs/archive/refs/tags/v2.1.3.tar.gz"
+  sha256 "5cc4db479ae26195651b625c686b2fa23cc1b9e611ca083f9f1964e5c6154eca"
   license "MIT"
-  head "https://github.com/patrickhener/goshs.git", branch: "main"
+  head "https://github.com/goshs-labs/goshs.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abeb0b319f670625727aafa9433c8a5b564833ea0326a0449600f7fd9909c5ee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9880d5752428320ea1b3772917d22e07f153f436901b433048b3060e70317f5f"
   end
 
   depends_on "go" => :build
