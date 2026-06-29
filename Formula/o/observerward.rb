@@ -6,7 +6,7 @@ class Observerward < Formula
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a05849c61c22bd022a0799c82e50a08f8ce58cffb3402666f6b11b02089e0b7a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec664571a93e2b02e861ffeaffb2374afb170bb93c408a8f0c5266e465ac7cbd"
   end
 
   depends_on "pkgconf" => :build
