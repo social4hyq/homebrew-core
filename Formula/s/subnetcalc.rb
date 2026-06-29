@@ -1,26 +1,25 @@
 class Subnetcalc < Formula
   desc "IPv4/IPv6 subnet calculator"
   homepage "https://www.nntb.no/~dreibh/subnetcalc/index.html"
-  url "https://github.com/dreibh/subnetcalc/archive/refs/tags/subnetcalc-2.7.1.tar.gz"
-  sha256 "e4a38fbab23ab17a8f10423f9c08153c2bdd7eaadc9251f9d5167eaf0642e9c7"
+  url "https://github.com/dreibh/subnetcalc/archive/refs/tags/subnetcalc-2.7.4.tar.gz"
+  sha256 "05450353236b3a9cbbd24c1aa2fd866d770a7244874c978b764bf574600b433d"
   license "GPL-3.0-or-later"
   head "https://github.com/dreibh/subnetcalc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b5c42eea72be017a6078adc7e9bf5c55ab33535b63bdad7100060bb04df1b80"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "df4b6ed0b4d982b15e92c61439385a7cb55a74a4e6ee3b73aa3ddc60cb75ea7a"
   end
 
   depends_on "cmake" => :build
-  depends_on "gettext"
+  depends_on "gettext" => :build
   depends_on "libidn2"
   depends_on "libmaxminddb"
 
+  on_macos do
+    depends_on "gettext"
+  end
+
   def install
-    # OHOS musl doesn't provide IDN in getaddrinfo() like glibc does.
-    # Upstream CMakeLists.txt only searches libidn2 on FreeBSD/Darwin.
-    inreplace "CMakeLists.txt",
-              '( (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") OR',
-              '( (${CMAKE_SYSTEM_NAME} MATCHES "Linux") OR (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") OR'
     system "cmake", "-S", ".", "-B", "build", *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
