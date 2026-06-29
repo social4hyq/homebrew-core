@@ -1,6 +1,6 @@
 class Clair < Formula
   desc "Vulnerability Static Analysis for Containers"
-  homepage "https://github.com/quay/clair"
+  homepage "https://quay.github.io/clair/"
   url "https://github.com/quay/clair/archive/refs/tags/v4.8.0.tar.gz"
   sha256 "354cfddb1e4594fd5982fdf55096f8b0e19649bcc5024156170a409aabcf3081"
   license "Apache-2.0"
@@ -12,7 +12,8 @@ class Clair < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "257a58fc89d20c5bc6329aaffc107fc59dc6b6bf91f3052967a0522e92fb4a3a"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2847084c2344707094a96dfc3714ffe512991f1a80e96c4c24de2a0cb94ea340"
   end
 
   depends_on "go" => :build
