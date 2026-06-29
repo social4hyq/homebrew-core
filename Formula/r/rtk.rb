@@ -1,13 +1,13 @@
 class Rtk < Formula
   desc "CLI proxy to minimize LLM token consumption"
   homepage "https://www.rtk-ai.app/"
-  url "https://github.com/rtk-ai/rtk/archive/refs/tags/v0.42.4.tar.gz"
-  sha256 "59c3864751715913c040732d216bf07114fb803158ebff8fe44ad7b23c3f5fc2"
+  url "https://github.com/rtk-ai/rtk/archive/refs/tags/v0.43.0.tar.gz"
+  sha256 "196bec9e9b438f0b8cd0198f68e05f072ccdfdec2c2655a3562d6ea357fa485b"
   license "Apache-2.0"
   head "https://github.com/rtk-ai/rtk.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "037c9b669b73f4403b938a7ff58928710d9283fac1ad6540b0229f98c0bb57e3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "87aa624b559c73d4f501f428081747206826705e4410d2b62745f18676b080c6"
   end
 
   depends_on "rust" => :build
