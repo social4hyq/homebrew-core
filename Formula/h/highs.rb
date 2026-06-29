@@ -1,8 +1,8 @@
 class Highs < Formula
   desc "Linear optimization software"
   homepage "https://www.maths.ed.ac.uk/hall/HiGHS/"
-  url "https://github.com/ERGO-Code/HiGHS/archive/refs/tags/v1.14.0.tar.gz"
-  sha256 "05931e8dd8c8cac514da8297003c31a206a0004d542b7da500810b85c87c20b9"
+  url "https://github.com/ERGO-Code/HiGHS/archive/refs/tags/v1.15.0.tar.gz"
+  sha256 "c3fc3e9ee43e6d562361f8647b4c69f958c95356a1af8bc5a3647f5882230d44"
   license "MIT"
   compatibility_version 3
 
@@ -15,7 +15,7 @@ class Highs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab6dcce1e0c9b9db13776ed208c4f00521ca3df8a453f542630ce28efc2e354b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0830cb5dc52787f67f12c739d2468f075609fb6ffca9a8c25aada0b4766a1da2"
   end
 
   depends_on "cmake" => :build
