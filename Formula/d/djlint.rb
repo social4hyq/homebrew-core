@@ -3,14 +3,18 @@ class Djlint < Formula
 
   desc "Lint & Format HTML Templates"
   homepage "https://djlint.com"
-  url "https://files.pythonhosted.org/packages/5c/aa/3ade035e216087d93eb1f07e82dd63280261e20f391f6f3ca10e903da06f/djlint-1.39.3.tar.gz"
-  sha256 "6d410cc25446589aeb387168e026f66840619c98829a8ff60abebd51126f719e"
+  url "https://files.pythonhosted.org/packages/63/6b/db4829f972157ef45a04563f3360d1bd6425c040c4cb488646755bbc1387/djlint-1.39.4.tar.gz"
+  sha256 "e9ea9b4558785a1193268ad06ac5766647613b3733c00fda5c20a479e031bdbd"
   license "GPL-3.0-or-later"
   head "https://github.com/djlint/djLint.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "640e1b7c0cb3d8ace42bce5f890b4068d252c7c74fe38664bce643d3525d2f39"
+    sha256 cellar: :any, arm64_tahoe:   "fd20ddf0b99432aa28baecb54b2ca642c78f76c1e3c8b66db457a6000aa26042"
+    sha256 cellar: :any, arm64_sequoia: "1208fe6a50ffb68ecb869ed23493faf06074876b324948abcb24040e50a84c14"
+    sha256 cellar: :any, arm64_sonoma:  "d212d5a02ed0914d81419aaeca1db98a51f78ec03470fa71ab893c2a908c1c90"
+    sha256 cellar: :any, sonoma:        "d88764e8c4beddb75a5929c7e388e4b9b5e77433ad5bcc93767ecc47ee6ec69d"
+    sha256 cellar: :any, arm64_linux:   "c5ac3e572729c834adefb3c9801f40acaafa4dddcd6cfbcec493fdf4d8eff45e"
+    sha256 cellar: :any, x86_64_linux:  "bbc7a60b56b88013ac8ebcafa2364bebb07a3d15cd957967412c16157099ae68"
   end
 
   depends_on "libyaml"
@@ -69,6 +73,7 @@ class Djlint < Formula
       {% load static %}<!DOCTYPE html>
     HTML
 
-    assert_includes shell_output("#{bin}/djlint --reformat #{testpath}/test.html", 1), "1 file was updated."
+    output = shell_output("#{bin}/djlint --reformat --no-github-output #{testpath}/test.html", 1)
+    assert_match "1 file was updated.", output
   end
 end
