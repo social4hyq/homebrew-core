@@ -7,12 +7,7 @@ class Runme < Formula
   head "https://github.com/runmedev/runme.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "7d32bdfbbc2de9c45bf1f9f4d09a09a05f61762f1b9cfeaa6bce9ffa140c2c57"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "fe5644d2f7ec95acf05e6936224aba0c0de615306879c803bff3128da6264468"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8e4675792a4ade28ea012c6d403fe0f2f83f45a3e1899f8a88dceb12601068c7"
-    sha256 cellar: :any_skip_relocation, sonoma:        "1dcc71f3ab9a96c06595bd2d11a1f2f1e4a74360a5f315641f255f21c9912e43"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "cda281702af534807f1168c8a92a192ad1c66802e0cd992461b6e2349cc1991a"
-    sha256 cellar: :any,                 x86_64_linux:  "cb58db17d14d5bf0083fd49c6bb940aec7dcce70496967974013ce03285bbaaf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "337968bbecc610643fd46329e765b81c15187b2f0ba96a50191084e842539af1"
   end
 
   depends_on "go" => :build
