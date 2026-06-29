@@ -1,13 +1,13 @@
 class EditorconfigChecker < Formula
   desc "Tool to verify that your files are in harmony with your .editorconfig"
   homepage "https://github.com/editorconfig-checker/editorconfig-checker"
-  url "https://github.com/editorconfig-checker/editorconfig-checker/archive/refs/tags/v3.7.0.tar.gz"
-  sha256 "df08c7aa8eb33c147ba38b628f53aff7baf3877d44c577d8964d9899e8052c81"
+  url "https://github.com/editorconfig-checker/editorconfig-checker/archive/refs/tags/v3.8.0.tar.gz"
+  sha256 "bc0001cf4d3fede6fc1010c25e7603b5c6f36dc6882e6de89aad1612ef4447c9"
   license "MIT"
   head "https://github.com/editorconfig-checker/editorconfig-checker.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c09a33c4eb432b3d3904a4cae8a71129b133c70e94bab2ecb054c6c95732f74"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0298048fd8b80fec9e30a7879ba1e552c7bf4541819b49f0d06d639627a19d7"
   end
 
   depends_on "go" => :build
