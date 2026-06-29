@@ -8,12 +8,7 @@ class Tea < Formula
   head "https://gitea.com/gitea/tea.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "631c12e1cd0d3a577ac725b6628047c891f9f96ff8c9c211537735b403577efa"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "631c12e1cd0d3a577ac725b6628047c891f9f96ff8c9c211537735b403577efa"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "631c12e1cd0d3a577ac725b6628047c891f9f96ff8c9c211537735b403577efa"
-    sha256 cellar: :any_skip_relocation, sonoma:        "5deee6bf39583020b446b2aa4b5bf228a077faefaddc6d661b84126a01b7037f"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "5d379327eba2318746591d87221ab14b9373b845d6fec1346517af068989f58c"
-    sha256 cellar: :any,                 x86_64_linux:  "8cbfce4fd2342c7caac36823126dbdaf2ddda34b049b649c10b60ef5346c298f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f708ca30ceab239abd8586738e974aeb90bbf49d4fb9d1df3f530ebec987c861"
   end
 
   depends_on "go" => :build
