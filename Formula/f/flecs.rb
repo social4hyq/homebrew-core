@@ -1,13 +1,13 @@
 class Flecs < Formula
   desc "Fast entity component system for C & C++"
   homepage "https://www.flecs.dev"
-  url "https://github.com/SanderMertens/flecs/archive/refs/tags/v4.1.5.tar.gz"
-  sha256 "8b94f56dfdda0b3c86110f651a4e0ec1c59030db43bb4810ae296a0630682ab9"
+  url "https://github.com/SanderMertens/flecs/archive/refs/tags/v4.1.6.tar.gz"
+  sha256 "29ccf56961b7ffbd38cce2227a06c0722c7df464422e86619a65ee37bb31bae7"
   license "MIT"
   head "https://github.com/SanderMertens/flecs.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f7e0144d49151be2cefb5b53477a2f1ac9bbcbb7970bb5fe21456e5ee01036bf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "41b8990e2150c86e63bd93c4190036887e5c5362fa38f4515c246947bf3ce5ab"
   end
 
   depends_on "cmake" => [:build, :test]
