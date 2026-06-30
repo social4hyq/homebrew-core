@@ -1,12 +1,12 @@
 class Jreleaser < Formula
   desc "Release projects quickly and easily with JReleaser"
   homepage "https://jreleaser.org/"
-  url "https://github.com/jreleaser/jreleaser/releases/download/v1.24.0/jreleaser-1.24.0.zip"
-  sha256 "b9474ee4e8ab7b69ef8335f746a200861588325cab9eb40470f016fe2c56062f"
+  url "https://github.com/jreleaser/jreleaser/releases/download/v1.25.0/jreleaser-1.25.0.zip"
+  sha256 "7c086a384e509ae30ad12ce2f10946601c0798e746d06a5538afc267e398644b"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "438f0a3d93fce61457ca55629fe96e452805c153a16566f476c9b34d75031003"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "949f443dfc07b3a1f3c4ba61833295ba9b5ed9a5680f80e617c1d85daac37859"
   end
 
   depends_on "openjdk"
