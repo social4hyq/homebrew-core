@@ -1,8 +1,8 @@
 class Lazysql < Formula
   desc "Cross-platform TUI database management tool"
   homepage "https://github.com/jorgerojas26/lazysql"
-  url "https://github.com/jorgerojas26/lazysql/archive/refs/tags/v0.5.4.tar.gz"
-  sha256 "f2ee82ca2bb4063eae8cb12c63cedaba39b1665dbe65492695105f4262c1c865"
+  url "https://github.com/jorgerojas26/lazysql/archive/refs/tags/v0.5.5.tar.gz"
+  sha256 "e979b86b7b40e03987d5855cece649791cf6307fc5785e1c6aac96ce6ee5135a"
   license "MIT"
   head "https://github.com/jorgerojas26/lazysql.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Lazysql < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1570e312ba50cb6b013ea9c97df0a80e70d24de04b142dfb0449649d56def060"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6621f7ff74c380c195916b20c34a17798ab4dbbb592b30847991bfea63b7a6c"
   end
 
   depends_on "go" => :build
