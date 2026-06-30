@@ -3,8 +3,8 @@ class CheckJsonschema < Formula
 
   desc "JSON Schema CLI"
   homepage "https://github.com/python-jsonschema/check-jsonschema"
-  url "https://files.pythonhosted.org/packages/0a/50/d4d2d090d1a4dd90e1e81125a5de66a32f8f7828dd58ba733cb467176e38/check_jsonschema-0.37.3.tar.gz"
-  sha256 "4d683589005c2b77a5f2dff41129ac5a6f92167e2f2ea0a8534446e3eddba239"
+  url "https://files.pythonhosted.org/packages/f3/dd/27b7f575586505c3d71b66b1fd60076feeba1ba7ffd1303fbf5a70cedad6/check_jsonschema-0.37.4.tar.gz"
+  sha256 "f933521f14cbeaaf113270751185b01379f453ac9ce9fb01d6190ce1352ccaa6"
   license "Apache-2.0"
   head "https://github.com/python-jsonschema/check-jsonschema.git", branch: "main"
 
@@ -37,8 +37,8 @@ class CheckJsonschema < Formula
   end
 
   resource "click" do
-    url "https://files.pythonhosted.org/packages/9b/98/518d8e5081007684232226f475082b30087d0f585e8457db087298259f49/click-8.4.1.tar.gz"
-    sha256 "918b5633eddf6b41c32d4f454bf0de810065c74e3f7dbf8ee5452f8be88d3e96"
+    url "https://files.pythonhosted.org/packages/76/d4/81420972a676e8ffea40450d8c8c92943e7218a78fe9b64359836cc9876b/click-8.4.2.tar.gz"
+    sha256 "9a6cea6e60b17ebe0a44c5cc636d94f09bd66142c1cd7d8b4cd731c4917a15f6"
   end
 
   resource "fqdn" do
