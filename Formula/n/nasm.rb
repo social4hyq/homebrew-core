@@ -11,7 +11,7 @@ class Nasm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3a89e770f61e72f5b3ed6ecd8caaa641e52c96a8a76dc8ed96909bcdbb58ff3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22393093061747491faa33829c2c587f577761d229c1d93e1fc2ff91c3104d50"
   end
 
   on_linux do
