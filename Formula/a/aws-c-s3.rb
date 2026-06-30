@@ -1,13 +1,13 @@
 class AwsCS3 < Formula
   desc "C99 library implementation for communicating with the S3 service"
   homepage "https://github.com/awslabs/aws-c-s3"
-  url "https://github.com/awslabs/aws-c-s3/archive/refs/tags/v0.12.6.tar.gz"
-  sha256 "d70061a523ee1fb6f0127e52653e7cc252347893295d675797b3d387e0e46049"
+  url "https://github.com/awslabs/aws-c-s3/archive/refs/tags/v0.12.7.tar.gz"
+  sha256 "daa717ccac1136cf73b69cd4057d3d302b4037f0ebfa6552a8f532f79f8032f8"
   license "Apache-2.0"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b631e31248a81ed6c193546ff25eaa45d73c67036525fb0ebb31c3d16a727859"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "68e0d2785c2821920ecc3521c16e78c21c366ab2ebbee81240c8d9e89e14385d"
   end
 
   depends_on "cmake" => :build
@@ -59,7 +59,7 @@ class AwsCS3 < Formula
       }
     C
     system ENV.cc, "test.c", "-o", "test", "-L#{lib}", "-laws-c-s3",
-                   "-L#{Formula["aws-c-common"].opt_lib}", "-laws-c-common"
+                   "-L#{formula_opt_lib("aws-c-common")}", "-laws-c-common"
     system "./test"
   end
 end
