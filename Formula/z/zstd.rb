@@ -21,6 +21,11 @@ class Zstd < Formula
     strategy :github_latest
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e9442520703307c9b4d272ace959065bedbe6a57f9715053119e938fdbf5861"
+  end
+
   depends_on "cmake" => :build
   depends_on "lz4"
   depends_on "xz"
