@@ -1,11 +1,10 @@
 class Protobuf < Formula
   desc "Protocol buffers (Google's data interchange format)"
   homepage "https://protobuf.dev/"
-  url "https://github.com/protocolbuffers/protobuf/releases/download/v34.1/protobuf-34.1.tar.gz"
-  sha256 "e4e6ff10760cf747a2decd1867741f561b216bd60cc4038c87564713a6da1848"
+  url "https://github.com/protocolbuffers/protobuf/releases/download/v35.1/protobuf-35.1.tar.gz"
+  sha256 "f0b6838e7522a8da96126d487068c959bc624926368f3024ac8fd03abd0a1ac4"
   license "BSD-3-Clause"
-  revision 1
-  compatibility_version 2
+  compatibility_version 4
 
   livecheck do
     url :stable
@@ -13,11 +12,15 @@ class Protobuf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ff8d8f9054d1ad0dca16bd76ea216be361c6c0beb1ebe2ae85e31bc91a22ecf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "92929e90a6d4429fdbd92ff75cfb1b9d452a7fdb412085c9377f75ac37b306ab"
   end
 
   depends_on "cmake" => :build
   depends_on "abseil"
+
+  patch do
+    file "Patches/protobuf/0001-workaround-clang-ice-and-posix-close-on-ohos.patch"
+  end
 
   on_macos do
     # TODO: Try restoring tests on Linux in a future release. Currently they
