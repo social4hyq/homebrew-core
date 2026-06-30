@@ -7,7 +7,7 @@ class Aliyunpan < Formula
   head "https://github.com/tickstep/aliyunpan.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "73fc5b711c8cf0e072bec6944d74efda0c430d9a82c2542a9d62327ff3e2dffd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bdc3bec5f4b3b5df8416e60c84eea2e69dc25eb15ece6130fce4a6ba360fccdf"
   end
 
   depends_on "go" => :build
