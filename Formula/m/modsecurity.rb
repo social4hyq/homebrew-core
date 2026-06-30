@@ -6,7 +6,7 @@ class Modsecurity < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "65a9f3b054442b26fc3b41c2f70a156ae87fc4db107a47bb18e62532e34a3e61"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3a886135417b840628fe744a7e8b7841ae075761f4275af63ac4ccbe8441e2c"
   end
 
   depends_on "autoconf" => :build
