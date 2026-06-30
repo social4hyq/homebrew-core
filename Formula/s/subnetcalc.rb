@@ -7,7 +7,8 @@ class Subnetcalc < Formula
   head "https://github.com/dreibh/subnetcalc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "df4b6ed0b4d982b15e92c61439385a7cb55a74a4e6ee3b73aa3ddc60cb75ea7a"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "69ecb541a506a7aa59f49b92efc43ce14c6d931c2627d5fee9d79fae56d2a37f"
   end
 
   depends_on "cmake" => :build
