@@ -7,7 +7,7 @@ class HdrhistogramC < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ec35d1170cdabb9b9db7dce619d93628a871908ea7b67a5fb68ad58ffaf9b6f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8035ca9f9cdae1eb084f6cf08e7fa0b0a6fbba0d70d97d9fb17f71c117a45be6"
   end
 
   depends_on "cmake" => :build
