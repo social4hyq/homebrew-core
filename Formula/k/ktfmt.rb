@@ -6,7 +6,7 @@ class Ktfmt < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "97f59ed70293103966fd017ab2a6566c56012b958277ac89ac31b6ac50e5c88f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8e13824f992b0f5b4e4097b05fe48020f5578af739cca810deb36e6ffd4d0de"
   end
 
   depends_on "gradle" => :build
