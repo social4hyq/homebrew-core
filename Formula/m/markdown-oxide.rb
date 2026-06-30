@@ -1,12 +1,12 @@
 class MarkdownOxide < Formula
   desc "Personal Knowledge Management System for the LSP"
   homepage "https://oxide.md"
-  url "https://github.com/Feel-ix-343/markdown-oxide/archive/refs/tags/v0.25.11.tar.gz"
-  sha256 "274446b861ebbf3098dcb7e0a5d3135df88df34b16a2c128288f900391dfbf75"
+  url "https://github.com/Feel-ix-343/markdown-oxide/archive/refs/tags/v0.25.12.tar.gz"
+  sha256 "fc7c472c2bd93a9b8f58848d71f054ed02442310f5328081f3036a7ce79040cb"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c49e64fc615c15532a0efcad81729c2404014eb932b0e99c4f4135a4f84f43b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0132bbdc1d5cde69de38cfe522cd74474269c22cc76256b63437dc26067dccb0"
   end
 
   depends_on "rust" => :build
