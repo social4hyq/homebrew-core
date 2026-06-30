@@ -16,20 +16,20 @@ class PortableGit < PortableFormula
   no_autobump! because: "this is a critical package so an auto bump might break Homebrew usability."
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7965ccc9fcdb760dbfd3a6420f53a76abe04db31553bfd1ae4380c5d8588f5a"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc5c69f517e4f4ca0462647ce9492d679ae2b64b74379fc85ec7c2113197fef1"
   end
 
   patch do
-    file "Patches/portable-git/0001-let-git-portable.patch"
+    file "Patches/portable-git/0001-disable-pthread-setcancelstate.patch"
   end
 
   patch do
-    file "Patches/git/0001-disable-pthread-setcancelstate.patch"
+    file "Patches/portable-git/0002-skip-ownership-check.patch"
   end
 
   patch do
-    file "Patches/git/0002-skip-ownership-check.patch"
+    file "Patches/portable-git/0003-let-git-portable.patch"
   end
 
   depends_on "portable-openssl" => :build

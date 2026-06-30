@@ -1,0 +1,27 @@
+diff --git a/run-command.c b/run-command.c
+index e3e02475cc..c902650ecd 100644
+--- a/run-command.c
++++ b/run-command.c
+@@ -529,9 +529,11 @@ static void atfork_prepare(struct atfork_state *as)
+ #else
+ 	CHECK_BUG(pthread_sigmask(SIG_SETMASK, &all, &as->old),
+ 		"blocking all signals");
++#ifndef __OHOS__
+ 	CHECK_BUG(pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &as->cs),
+ 		"disabling cancellation");
+ #endif
++#endif
+ }
+ 
+ static void atfork_parent(struct atfork_state *as)
+@@ -540,8 +542,10 @@ static void atfork_parent(struct atfork_state *as)
+ 	if (sigprocmask(SIG_SETMASK, &as->old, NULL))
+ 		die_errno("sigprocmask");
+ #else
++#ifndef __OHOS__
+ 	CHECK_BUG(pthread_setcancelstate(as->cs, NULL),
+ 		"re-enabling cancellation");
++#endif
+ 	CHECK_BUG(pthread_sigmask(SIG_SETMASK, &as->old, NULL),
+ 		"restoring signal mask");
+ #endif
