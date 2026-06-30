@@ -6,7 +6,7 @@ class Structurizr < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1ef8a528ef41bd91b7a44b7ce5adbc84746a4c3383212ee13474531ac1ecfba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "edee6a7c950dab5088d7ecee45ac0e9668a37bd319023b5c166a13baafae3086"
   end
 
   depends_on "maven" => :build
