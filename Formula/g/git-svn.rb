@@ -11,7 +11,7 @@ class GitSvn < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dc98d4cddcbd975b11a1ec04029f2ab7c0e47531e88a52815fc661d5e8c7882"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac97041bbff8d24d6fb1cd18fe48d8f52b50a5e948ebaaad82bc87aba3bfb853"
   end
 
   depends_on "git"
