@@ -1,8 +1,8 @@
 class Plakar < Formula
   desc "Create backups with compression, encryption and deduplication"
   homepage "https://plakar.io"
-  url "https://github.com/PlakarKorp/plakar/archive/refs/tags/v1.1.3.tar.gz"
-  sha256 "6a23f149e7ac38009d2302b335df746be5408f775da89ef474f8b108bfb72cee"
+  url "https://github.com/PlakarKorp/plakar/archive/refs/tags/v1.1.4.tar.gz"
+  sha256 "3991e0bec18fa098d6a6450e68a6bda21fb2541f9ec95e543568fe23ad78ab6a"
   license "ISC"
 
   livecheck do
