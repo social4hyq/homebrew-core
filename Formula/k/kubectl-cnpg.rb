@@ -8,7 +8,7 @@ class KubectlCnpg < Formula
   head "https://github.com/cloudnative-pg/cloudnative-pg.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c791217a7d3decd9782d3fd657984b83aa1dfcf32133480be7422756a43a38bb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec60e03c96aa90b51511e810ae1bb931faac71534e7521c83c5a7da27427ba7c"
   end
 
   depends_on "go" => :build
