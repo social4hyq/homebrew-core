@@ -1,13 +1,13 @@
 class Ko < Formula
   desc "Build and deploy Go applications on Kubernetes"
   homepage "https://ko.build"
-  url "https://github.com/ko-build/ko/archive/refs/tags/v0.19.0.tar.gz"
-  sha256 "76275e4262faf2aab10507b969a50728dbc3f48511e61d138c834243f60452b1"
+  url "https://github.com/ko-build/ko/archive/refs/tags/v0.19.1.tar.gz"
+  sha256 "7accc1f4ad074285086573b084387bef5871872ef16e3f292d5818a99e4feeae"
   license "Apache-2.0"
   head "https://github.com/ko-build/ko.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89743707f668f7f2fa02932c10f84a9f2dc0769cc80e790521e6f8d692f98b6a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce2aa994505710774b282df96c22606878b70a8fad18b71d026592bec345302d"
   end
 
   depends_on "go" => :build
