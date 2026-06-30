@@ -1,8 +1,8 @@
 class Protozero < Formula
   desc "Minimalist protocol buffer decoder and encoder in C++"
   homepage "https://github.com/mapbox/protozero"
-  url "https://github.com/mapbox/protozero/archive/refs/tags/v1.8.1.tar.gz"
-  sha256 "6c7a896f1dc08435e8cd4f3780ff688cd0bfce6890599b755f6f3cb36398dc25"
+  url "https://github.com/mapbox/protozero/archive/refs/tags/v1.8.2.tar.gz"
+  sha256 "68d1df951b4d8397355c8fc9ffed40d9c06282a877fe847403feac6edcee3ef1"
   license "BSD-2-Clause"
 
   bottle do
