@@ -7,7 +7,7 @@ class Openfga < Formula
   head "https://github.com/openfga/openfga.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "93a8248c8e9a8d7a372f082c35cb7ca91246be87c9af3887a21e45f98be3ca24"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf4f625ffc76e05802505f495145ec1076828da2641bfc69cf7b12d1d242a775"
   end
 
   depends_on "go" => :build
