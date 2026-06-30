@@ -15,7 +15,7 @@ class WasmMicroRuntime < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "525ec18bb132736958a15059e0b53e0d209624d28fa258941ff4f2213c7e07c4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "71c5188e98725ff6370b5a6a2681bebb2bd92a60cc02bcd6a4da4c51c0e69501"
   end
 
   depends_on "cmake" => :build
