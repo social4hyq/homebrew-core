@@ -12,7 +12,7 @@ class AnycableGo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "59326d568393c4f976eff14168378778ece527e1078979340ef5d462c08170e1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ed989feb48b5a52faa06cb221493be7f33408e1529e01671e91c11d70b91bfa"
   end
 
   depends_on "go" => :build
