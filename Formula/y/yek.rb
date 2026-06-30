@@ -1,8 +1,8 @@
 class Yek < Formula
   desc "Fast Rust based tool to serialize text-based files for LLM consumption"
   homepage "https://github.com/mohsen1/yek"
-  url "https://github.com/mohsen1/yek/archive/refs/tags/v0.25.4.tar.gz"
-  sha256 "337e126814f745c6ec5d948d7aec33bd1d42066e764e17b6482679f77927e102"
+  url "https://github.com/mohsen1/yek/archive/refs/tags/v0.25.5.tar.gz"
+  sha256 "e74cdfc577bdfb6577324afc086546ff306c7c43053f526e7ae30031c4433ab4"
   license "MIT"
   head "https://github.com/mohsen1/yek.git", branch: "main"
 
