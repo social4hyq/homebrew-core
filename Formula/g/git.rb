@@ -1,8 +1,8 @@
 class Git < Formula
   desc "Distributed revision control system"
   homepage "https://git-scm.com"
-  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.54.0.tar.xz"
-  sha256 "f689162364c10de79ef89aa8dbf48731eb057e34edbbd20aca510ce0154681a3"
+  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.55.0.tar.xz"
+  sha256 "457fdb04dc8728e007d4688695e6912e6f680727920f2a40bf11eacc17505357"
   license all_of: [
     "GPL-2.0-only",
     "GPL-2.0-or-later",  # imap-send.c; trace.c; ...
@@ -19,8 +19,7 @@ class Git < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2717420528f8d5f9a7fc92301550607f1f5fab768c1eb4a42eee75d6369e4de7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "95f9422518f39e76a6cd2f0bebb683467fe3fbf1d93f6ec7a8c264dc65e487b4"
   end
 
   depends_on "gettext" => :build
@@ -47,8 +46,8 @@ class Git < Formula
   end
 
   resource "html" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.54.0.tar.xz"
-    sha256 "7ff72bfdfed4f20563f34416cf27614fb9c35bfad590db0062f2a0a9636514e4"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.55.0.tar.xz"
+    sha256 "d1142c4e28b469d297d6df6519653e92a76c952f55202fde17a72a3b03d49437"
 
     livecheck do
       formula :parent
@@ -56,8 +55,8 @@ class Git < Formula
   end
 
   resource "man" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.54.0.tar.xz"
-    sha256 "292062d18f3a215213ea8317ed22b94f02ad9572520b9293164d7db3eb888953"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.55.0.tar.xz"
+    sha256 "a32d432f80df46a14a05d1104c72d5a13fe27e9feba9aa0f017e54131db6b982"
 
     livecheck do
       formula :parent
@@ -77,6 +76,8 @@ class Git < Formula
     file "Patches/git/0002-skip-ownership-check.patch"
   end
 
+  deny_network_access! [:build, :postinstall]
+
   def install
     odie "html resource needs to be updated" if build.stable? && version != resource("html").version
     odie "man resource needs to be updated" if build.stable? && version != resource("man").version
@@ -88,7 +89,7 @@ class Git < Formula
     ENV["PERL_PATH"] = which("perl")
     ENV["USE_LIBPCRE2"] = "1"
     ENV["INSTALL_SYMLINKS"] = "1"
-    ENV["LIBPCREDIR"] = Formula["pcre2"].opt_prefix
+    ENV["LIBPCREDIR"] = formula_opt_prefix("pcre2")
     ENV["V"] = "1" # build verbosely
 
     perl_version = Utils.safe_popen_read("perl", "--version")[/v(\d+\.\d+)(?:\.\d+)?/, 1]
@@ -119,12 +120,13 @@ class Git < Formula
       NEEDS_LIBICONV=YesPlease
       NEEDS_LIBINTL_BEFORE_LIBICONV=YesPlease
       HOMEBREW_PREFIX=#{HOMEBREW_PREFIX}
+      NO_RUST=1
     ]
 
     args += if OS.mac?
       %w[NO_OPENSSL=1 APPLE_COMMON_CRYPTO=1]
     else
-      openssl_prefix = Formula["openssl@3"].opt_prefix
+      openssl_prefix = formula_opt_prefix("openssl@3")
 
       %W[NO_APPLE_COMMON_CRYPTO=1 OPENSSLDIR=#{openssl_prefix}]
     end
@@ -141,9 +143,7 @@ class Git < Formula
     # Install the macOS keychain credential helper
     if OS.mac?
       cd "contrib/credential/osxkeychain" do
-        system "make", "CC=#{ENV.cc}",
-                       "CFLAGS=#{ENV.cflags}",
-                       "LDFLAGS=#{ENV.ldflags}"
+        system "make", *args
         git_core.install "git-credential-osxkeychain"
         system "make", "clean"
       end
@@ -178,6 +178,7 @@ class Git < Formula
     bash_completion.install "contrib/completion/git-prompt.sh"
     zsh_completion.install "contrib/completion/git-completion.zsh" => "_git"
     cp "#{bash_completion}/git-completion.bash", zsh_completion
+    cp "#{bash_completion}/git-prompt.sh", zsh_completion
 
     (share/"git-core").install "contrib"
 
