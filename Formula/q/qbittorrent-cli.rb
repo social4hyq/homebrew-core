@@ -7,7 +7,7 @@ class QbittorrentCli < Formula
   head "https://github.com/ludviglundgren/qbittorrent-cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5017a5b68886fd90bb9a9ac51b447f7c7be0a567e59880b8f64a952532bf6d39"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2caee8b510c1b5526fbc132b8f82b08213a00f1bd5eb9870d259e1c2784e1445"
   end
 
   depends_on "go" => :build
