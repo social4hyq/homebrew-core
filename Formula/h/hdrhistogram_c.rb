@@ -1,13 +1,13 @@
 class HdrhistogramC < Formula
   desc "C port of the HdrHistogram"
   homepage "https://github.com/HdrHistogram/HdrHistogram_c"
-  url "https://github.com/HdrHistogram/HdrHistogram_c/archive/refs/tags/0.11.9.tar.gz"
-  sha256 "0eb5fdb9f1f8c4b9c6eb319502f8d9e28991afffb8418672a61741993855650e"
+  url "https://github.com/HdrHistogram/HdrHistogram_c/archive/refs/tags/0.11.10.tar.gz"
+  sha256 "c3b06d077e680d112abf9f027d8a558f1176ee4a55a7c523577833391d8c2249"
   license any_of: ["CC0-1.0", "BSD-2-Clause"]
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ec35d1170cdabb9b9db7dce619d93628a871908ea7b67a5fb68ad58ffaf9b6f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8035ca9f9cdae1eb084f6cf08e7fa0b0a6fbba0d70d97d9fb17f71c117a45be6"
   end
 
   depends_on "cmake" => :build
