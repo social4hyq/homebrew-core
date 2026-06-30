@@ -8,7 +8,7 @@ class Opencc < Formula
   head "https://github.com/BYVoid/OpenCC.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f985f42a379b46632133bb20a1a4dc7416eb35e7bf54c01a26a916d57c732028"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4aa0053f3a7e16f297c47e79da4e50e896ec73ae18ab750b29435c205ad1a38"
   end
 
   depends_on "cmake" => :build
