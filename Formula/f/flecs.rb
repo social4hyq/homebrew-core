@@ -7,7 +7,7 @@ class Flecs < Formula
   head "https://github.com/SanderMertens/flecs.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f7e0144d49151be2cefb5b53477a2f1ac9bbcbb7970bb5fe21456e5ee01036bf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "41b8990e2150c86e63bd93c4190036887e5c5362fa38f4515c246947bf3ce5ab"
   end
 
   depends_on "cmake" => [:build, :test]
