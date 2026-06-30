@@ -12,7 +12,7 @@ class Attr < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "37bb0e5e2e233156ae006f0ff7a5b135d2d35ee6c11e389c852bcf9abbc82c54"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5a8f2e5b50a77b37b68fb5ec451d9d6ba52ad1f9a6d3d784f6b38a39de00e62"
   end
 
   depends_on :linux
