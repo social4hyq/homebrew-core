@@ -12,7 +12,7 @@ class Yek < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec3965dd00563fabaaa5c8b707bca2fc959cbe8273b2f0768588d387f5e48f56"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7f358e69d04a17f1fc651e3f799e2b9918b691b4fa418e992a3437b46a381d8"
   end
 
   depends_on "pkgconf" => :build
