@@ -21,15 +21,15 @@ class PortableGit < PortableFormula
   end
 
   patch do
-    file "Patches/portable-git/0001-let-git-portable.patch"
+    file "Patches/portable-git/0001-disable-pthread-setcancelstate.patch"
   end
 
   patch do
-    file "Patches/git/0001-disable-pthread-setcancelstate.patch"
+    file "Patches/portable-git/0002-skip-ownership-check.patch"
   end
 
   patch do
-    file "Patches/git/0002-skip-ownership-check.patch"
+    file "Patches/portable-git/0003-let-git-portable.patch"
   end
 
   depends_on "portable-openssl" => :build
