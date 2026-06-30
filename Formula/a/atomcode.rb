@@ -12,8 +12,7 @@ class Atomcode < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa305fd3119677597c291bc4d2306bed965a4d9926dde7338d032d78f7b74041"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "875e4cf8e35123ebe21779c41a475aeda8b108038e88fe42b20bcdfd7b7dfd0e"
   end
 
   depends_on "node" => :build
