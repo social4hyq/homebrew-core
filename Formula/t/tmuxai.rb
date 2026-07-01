@@ -1,12 +1,12 @@
 class Tmuxai < Formula
   desc "AI-powered, non-intrusive terminal assistant"
   homepage "https://tmuxai.dev/"
-  url "https://github.com/BoringDystopiaDevelopment/tmuxai/archive/refs/tags/v2.2.2.tar.gz"
-  sha256 "3d0a4fe8634831f4c6ede94cabfacca79f49171936469913a527f6c27bed6950"
+  url "https://github.com/BoringDystopiaDevelopment/tmuxai/archive/refs/tags/v2.3.0.tar.gz"
+  sha256 "40e2027a162003f10b6f428449b33a09855c8181b989283f59b8645b7808f385"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d32d2755af5e364c04851b78c29fe9d291c0aca02f6bd9f19908357783ee0b8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "53eb19caa2f3594c0c0e17fe3081156b3e388e0496e8fda41611d27d62670732"
   end
 
   depends_on "go" => :build
