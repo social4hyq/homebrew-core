@@ -1,13 +1,13 @@
 class Gittuf < Formula
   desc "Security layer for Git repositories"
   homepage "https://gittuf.dev/"
-  url "https://github.com/gittuf/gittuf/archive/refs/tags/v0.14.1.tar.gz"
-  sha256 "4b6647429beed2f688fc51add387e285afd80e075a1c47cec5441c6dbaa17cb4"
+  url "https://github.com/gittuf/gittuf/archive/refs/tags/v0.15.0.tar.gz"
+  sha256 "537f31645b72f9d60fa294afbd6f223c93f8004d15bd02886ac7436522b4892d"
   license "Apache-2.0"
   head "https://github.com/gittuf/gittuf.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6181cb1d407b775d4bb0b63934d499f0907e9b0c2f962d69ef8fd4115c730ae6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbd48df1fb1a411255b186430adaad1467d610efe5bea8a15833c659b7fb3541"
   end
 
   depends_on "go" => :build
