@@ -1,8 +1,8 @@
 class Librdkafka < Formula
   desc "Apache Kafka C/C++ library"
   homepage "https://github.com/confluentinc/librdkafka"
-  url "https://github.com/confluentinc/librdkafka/archive/refs/tags/v2.14.2.tar.gz"
-  sha256 "d7eec9c31c817fa44402f679c252dfbf97e4c338a849a25c3579a31fd127beb8"
+  url "https://github.com/confluentinc/librdkafka/archive/refs/tags/v2.15.0.tar.gz"
+  sha256 "259015220cdca708afe838b5aa79ebf1a5fb710fb4179cf918d390aed85d5dbc"
   license "BSD-2-Clause"
   compatibility_version 1
   head "https://github.com/confluentinc/librdkafka.git", branch: "master"
@@ -13,7 +13,7 @@ class Librdkafka < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7c5ecf65d7859a4b824074722ed3b5e65950b572240f63329e56732be16e8f0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a417aff6f7e9898f3113155dec9611a71a112559265f951bfcf0fa06acaea117"
   end
 
   depends_on "pkgconf" => :build
