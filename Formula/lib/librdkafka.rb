@@ -13,7 +13,7 @@ class Librdkafka < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7c5ecf65d7859a4b824074722ed3b5e65950b572240f63329e56732be16e8f0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a417aff6f7e9898f3113155dec9611a71a112559265f951bfcf0fa06acaea117"
   end
 
   depends_on "pkgconf" => :build
