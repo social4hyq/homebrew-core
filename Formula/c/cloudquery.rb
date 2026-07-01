@@ -1,8 +1,8 @@
 class Cloudquery < Formula
   desc "Data movement tool to sync data from any source to any destination"
   homepage "https://www.cloudquery.io"
-  url "https://github.com/cloudquery/cloudquery/archive/refs/tags/cli-v6.37.0.tar.gz"
-  sha256 "d4fc672963230459f18c47136ebf36baeba2ca208067e2d39cbad497f9320ae4"
+  url "https://github.com/cloudquery/cloudquery/archive/refs/tags/cli-v6.38.0.tar.gz"
+  sha256 "cf295ed993a529e01a68c832cc483d5e7648e55b2425419b5fbfa0181c5ab3e2"
   license "MPL-2.0"
   head "https://github.com/cloudquery/cloudquery.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Cloudquery < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5edf60ed389f63413f0e00f49bee5d413f791f8734d88aa918a01d4376c6b7b0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c2d63bcd19d491ae66b5fc98ce56d399b4e0dc8dc6e8bbcf7ee23508897eab2"
   end
 
   depends_on "go" => :build
