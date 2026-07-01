@@ -17,7 +17,7 @@ class JpegTurbo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e06f7b29b035d7a7118655e133e80ff7144eab519a5f0948b4ab7d8ef932c41a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eaff635752694f3dfa8752c6f8f4b5f60522650ab9478297a07d8e86e5cb5a79"
   end
 
   depends_on "cmake" => :build
