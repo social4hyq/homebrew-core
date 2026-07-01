@@ -1,13 +1,13 @@
 class Wtfutil < Formula
   desc "Personal information dashboard for your terminal"
   homepage "https://wtfutil.com"
-  url "https://github.com/wtfutil/wtf/archive/refs/tags/v0.49.1.tar.gz"
-  sha256 "77860a2bc3a14ebea15a8f31b388fd14a09dd2ecaade4e82079331c094896bb6"
+  url "https://github.com/wtfutil/wtf/archive/refs/tags/v0.50.0.tar.gz"
+  sha256 "cec9b0a4d01dd6d2a81a8cd429e992786a2a3a212d4e2c090ab4d10172ca9794"
   license "MPL-2.0"
   head "https://github.com/wtfutil/wtf.git", branch: "trunk"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "49d817fecdd007c8f019cfb5673bd201fdf96cb76ca5c5f3a5bc4257652a0406"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a39a7a1c10218eb14459877b16da5b4a5969b0e38f7bc339ce57253fb9b5b9d"
   end
 
   depends_on "go" => :build
