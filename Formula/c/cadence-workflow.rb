@@ -16,7 +16,7 @@ class CadenceWorkflow < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b9a9c3e5d5ba215ccd92d657d0921a809681eab4c4cfdb2de44d89321308a06"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a04512675207770ee56b54f9776901e5c767131fe5f40f912491156fb17fb4a5"
   end
 
   depends_on "go" => :build
