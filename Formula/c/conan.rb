@@ -3,13 +3,13 @@ class Conan < Formula
 
   desc "Distributed, open source, package manager for C/C++"
   homepage "https://conan.io"
-  url "https://files.pythonhosted.org/packages/1d/89/4bc94f3736d1b0a0f2d639b152192bb036afb6186af1ed246710b109e6e0/conan-2.29.1.tar.gz"
-  sha256 "3a3bc1bfda462237c537d0dd8baa9dd68f6ac29c3ecc98dbb4a668ccc943ff33"
+  url "https://files.pythonhosted.org/packages/4e/95/589f05549953f74377d671ab8d5ba041dbeec8208e360ed00fe69c77cfda/conan-2.30.0.tar.gz"
+  sha256 "8cee363744b164fc043d0b9bef8db856bd6b27a3c971d9c494441d2aa92794fa"
   license "MIT"
   head "https://github.com/conan-io/conan.git", branch: "develop2"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "17c3c55e38a878c4e0f61bcb2b578c4ee66acbd721c47291598a9f668a07ad3a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2fea6b04a1d77785e577736bb0160695d0abcb23540075c7b1cc5558f98292b1"
   end
 
   depends_on "pkgconf" => :build
