@@ -1,8 +1,8 @@
 class Sift < Formula
   desc "Fast and powerful open source alternative to grep"
   homepage "https://sift-tool.org/"
-  url "https://github.com/svent/sift/archive/refs/tags/v0.9.1.tar.gz"
-  sha256 "8830db8aa7d34445eee66a5817127919040531c5ade186b909655ef274c3e4ce"
+  url "https://github.com/svent/sift/archive/refs/tags/v0.9.2.tar.gz"
+  sha256 "d6d8274e475f3f1235eb0118a89f981e0f7741b9f27243d679d3ecd76f68fe03"
   license "GPL-3.0-only"
 
   bottle do
