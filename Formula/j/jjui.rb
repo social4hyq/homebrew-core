@@ -6,7 +6,7 @@ class Jjui < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6064d1ceb368de5f386a4cb331f2d6af0e23d37ad7717b6004a58746e6e27a87"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "39d33541c1f7c813643ed3951482de01d283ebf79c2d11c7e1cb7339801af175"
   end
 
   depends_on "go" => :build
