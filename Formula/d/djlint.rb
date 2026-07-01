@@ -3,8 +3,8 @@ class Djlint < Formula
 
   desc "Lint & Format HTML Templates"
   homepage "https://djlint.com"
-  url "https://files.pythonhosted.org/packages/b1/64/5de9a070a4eb90fe3e590d5d2feb5d8fc5cbc1a4982b33e4c083a04ef321/djlint-1.39.5.tar.gz"
-  sha256 "07a74deb6d5e132723392635e2fe19de0546ac92e252ccddbe54d417862346e8"
+  url "https://files.pythonhosted.org/packages/8f/8e/f7cf340f8bb7e2db90853ffbd37ecfd1d6aac5be173f4312c120650a5e95/djlint-1.39.6.tar.gz"
+  sha256 "2afd218644f4f88daef8e0d0a491cc46dfe7096676469f66eb0f00fe6bbcbcd8"
   license "GPL-3.0-or-later"
   head "https://github.com/djlint/djLint.git", branch: "master"
 
@@ -21,8 +21,8 @@ class Djlint < Formula
   end
 
   resource "cssbeautifier" do
-    url "https://files.pythonhosted.org/packages/7b/dc/05e09a3cdacaeb73350442dfef37b9e22f764a076636df70e6d4c779c2a9/cssbeautifier-2.0.1.tar.gz"
-    sha256 "f6102c0589c85be3c1a016cee76ee3661ee4bd5da88d48a5f8708bfaf663ae26"
+    url "https://files.pythonhosted.org/packages/8f/b2/ed2890f0862fea7b79bb5224e22b2393376fdcd8f4b4e24dbbf1e9256d23/cssbeautifier-2.0.3.tar.gz"
+    sha256 "2c2fd129342561029de86b1744efa231c9fafe26023dbc988a1deb0ca0f5c845"
   end
 
   resource "editorconfig" do
@@ -31,8 +31,8 @@ class Djlint < Formula
   end
 
   resource "jsbeautifier" do
-    url "https://files.pythonhosted.org/packages/48/a4/6283089b46c2bd895f5c4b223456167ea859ce54fed01f4c1ee4e8a8ed20/jsbeautifier-2.0.1.tar.gz"
-    sha256 "45603b2097410feee8d3a6ef8ad5a8e0a0e89f347331888a97e46f332ce8d953"
+    url "https://files.pythonhosted.org/packages/2e/81/e0e11e305caa89831a0c8e555638d588c28b426d1105e734e113b00efd5d/jsbeautifier-2.0.3.tar.gz"
+    sha256 "9579d4e9dbaa00383f3efdff4c98c8140bb85ba319398e8b97cdaba27abd6ba3"
   end
 
   resource "json5" do
