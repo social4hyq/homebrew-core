@@ -7,7 +7,7 @@ class Gittuf < Formula
   head "https://github.com/gittuf/gittuf.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6181cb1d407b775d4bb0b63934d499f0907e9b0c2f962d69ef8fd4115c730ae6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbd48df1fb1a411255b186430adaad1467d610efe5bea8a15833c659b7fb3541"
   end
 
   depends_on "go" => :build
