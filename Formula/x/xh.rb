@@ -7,7 +7,7 @@ class Xh < Formula
   head "https://github.com/ducaale/xh.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf23b918adee79da3f80e75143a3f782c4b921ec7f39e57434db4501daf137ca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "96bb166c24d3e75d6dbacf257a026815e34f05c686b9f9aff7a66b4d415717af"
   end
 
   depends_on "rust" => :build
