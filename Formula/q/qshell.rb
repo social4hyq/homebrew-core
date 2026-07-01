@@ -7,7 +7,7 @@ class Qshell < Formula
   head "https://github.com/qiniu/qshell.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "30f3f1930c34b4643e6c13d30b334e5008573b9a5b791f7ae96370b88679d6c3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c216cd244b3e1cccfe4943121cbfde4aa274e280caab6bb9046475491e9ef4f"
   end
 
   depends_on "go" => :build
