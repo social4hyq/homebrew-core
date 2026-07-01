@@ -11,7 +11,7 @@ class Libupnp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d95fec013cfbb2e4f8dcae42736f8f8f7762526036466c9ae25c369341063c43"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "683f79ce777a967461626079976192328f0e240d1181a944ac89ae6b80d45bb8"
   end
 
   def install
