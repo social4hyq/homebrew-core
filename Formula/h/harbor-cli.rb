@@ -1,13 +1,13 @@
 class HarborCli < Formula
   desc "CLI for Harbor container registry"
   homepage "https://github.com/goharbor/harbor-cli"
-  url "https://github.com/goharbor/harbor-cli/archive/refs/tags/v0.0.22.tar.gz"
-  sha256 "c8db729fa244c647f58c88a04bba3244248a19817073ef095efbc1befee3b4d4"
+  url "https://github.com/goharbor/harbor-cli/archive/refs/tags/v0.0.23.tar.gz"
+  sha256 "7afe257e071c509143fe9f2b4b7bbe16e8076e42001b07a35161160f77697c30"
   license "Apache-2.0"
   head "https://github.com/goharbor/harbor-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dab949f34bc051865e09325d5f1c0fe3094ffcac3392bcfefec5964f6561b22f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "994acff06fa6f6a79a4524229ea7c6bc1aee34bb73319c280ba5bbf873cfab56"
   end
 
   depends_on "go" => :build
