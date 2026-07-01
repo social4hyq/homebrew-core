@@ -1,8 +1,8 @@
 class Xh < Formula
   desc "Friendly and fast tool for sending HTTP requests"
   homepage "https://github.com/ducaale/xh"
-  url "https://github.com/ducaale/xh/archive/refs/tags/v0.25.3.tar.gz"
-  sha256 "ba331c33dc5d222f43cc6ad9f602002817772fd52ae28541976db49f34935ae3"
+  url "https://github.com/ducaale/xh/archive/refs/tags/v0.26.1.tar.gz"
+  sha256 "6c4822374d3b9bacfc50719ffb5653a32fd84344e50fd88b499ed8fc9e52198b"
   license "MIT"
   head "https://github.com/ducaale/xh.git", branch: "master"
 
@@ -11,8 +11,11 @@ class Xh < Formula
   end
 
   depends_on "rust" => :build
+  depends_on "cmake" => :build
 
   def install
+    ENV["AWS_LC_SYS_NO_JITTER_ENTROPY"] = "1"
+
     system "cargo", "install", *std_cargo_args
     bin.install_symlink bin/"xh" => "xhs"
 
