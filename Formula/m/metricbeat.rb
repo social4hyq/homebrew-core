@@ -2,13 +2,13 @@ class Metricbeat < Formula
   desc "Collect metrics from your systems and services"
   homepage "https://www.elastic.co/beats/metricbeat"
   url "https://github.com/elastic/beats.git",
-      tag:      "v9.4.2",
-      revision: "e98b93df5a916738f04a338ea2ddcf53ebd0bc0b"
+      tag:      "v9.4.3",
+      revision: "f81a982a107ef6e450ae5c0deb634fffe8be3404"
   license "Apache-2.0"
   head "https://github.com/elastic/beats.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1a6d6849a13d9e34962ba1f0793f9759b8a82bee2c8700214573637cbe8543d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c4ea029fae92ea79351abf2b45bf4ac4a46f77524d4715cf80d68ecdefa4999"
   end
 
   depends_on "go" => :build
