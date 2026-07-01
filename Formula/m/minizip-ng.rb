@@ -1,13 +1,13 @@
 class MinizipNg < Formula
   desc "Zip file manipulation library with minizip 1.x compatibility layer"
   homepage "https://github.com/zlib-ng/minizip-ng"
-  url "https://github.com/zlib-ng/minizip-ng/archive/refs/tags/4.2.1.tar.gz"
-  sha256 "3cc35c2cb925dbe67cc801e3234b31b0f30197812a99377352fa1b551ab3d011"
+  url "https://github.com/zlib-ng/minizip-ng/archive/refs/tags/4.2.2.tar.gz"
+  sha256 "71af7b9799856d8b03619df3949e9c1be9703f8de0795af71399ba283cb27aac"
   license "Zlib"
   head "https://github.com/zlib-ng/minizip-ng.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d72d470781337785534a0dcee98d9e8ad9fb4f2b7a77a82b822be3783d6a74a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88a6b3284f1442ea12960e531d7840335b77c42e50a624a161cd43c4acd0d167"
   end
 
   depends_on "cmake" => :build
