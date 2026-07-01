@@ -7,7 +7,7 @@ class AzureDev < Formula
   head "https://github.com/Azure/azure-dev.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "17371a6582ae79f810562062b9718caf3808246ea6834f5e26ce8b6355a7e2ce"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b484d683817e9ea7a0b7f2a2337425d5240cec8d53080313e2cc2589cf50366e"
   end
 
   depends_on "go" => :build
