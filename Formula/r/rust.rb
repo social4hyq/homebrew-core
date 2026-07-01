@@ -8,8 +8,7 @@ class Rust < Formula
   head "https://github.com/rust-lang/rust.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "815d07d81b497b46911323850f1d59e08bbc672d5e9824840344fc4e6141cacf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "121578e9adca0234cb682085dcd1defacc71f818fad59b6d33b9f8c7982f1899"
   end
 
   depends_on "patchelf" => :build
