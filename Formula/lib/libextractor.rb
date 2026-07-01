@@ -7,12 +7,7 @@ class Libextractor < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 arm64_tahoe:   "54c8ba537d357d11e60953f7fd61b6c75c709c844e9a53e8d3034a80d591bd22"
-    sha256 arm64_sequoia: "d559fc70e37c2e90d3ec4e9b4327b8fbeede7cbaaf3d62d6ffb8ed4727e5e480"
-    sha256 arm64_sonoma:  "4fb7812c924cf6ace54a6ea9512616c1d3ffe838870b8421dc9b297170da13c2"
-    sha256 sonoma:        "c729f8320d73aab60fff0fbd976dcde1fd6e77bf849e4345f7f2b41faeae510a"
-    sha256 arm64_linux:   "195638982682a12cbb8bcc1e864df2b6dce84a2974c47c15ce7e891dccad4ee5"
-    sha256 x86_64_linux:  "4b8c453900de940c0e8a5ec553b27fac500d2b2ac8e5080ec1da38d237e7f81a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f0ebf80b732ce2fc51353f4b3a226b7e3f6b80638d5f6ba47e3e703929323540"
   end
 
   depends_on "pkgconf" => :build
