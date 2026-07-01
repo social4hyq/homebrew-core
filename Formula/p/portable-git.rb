@@ -3,8 +3,8 @@ require File.expand_path("../../Abstract/portable-formula", __dir__)
 class PortableGit < PortableFormula
   desc "Distributed revision control system"
   homepage "https://git-scm.com"
-  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.54.0.tar.xz"
-  sha256 "f689162364c10de79ef89aa8dbf48731eb057e34edbbd20aca510ce0154681a3"
+  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.55.0.tar.xz"
+  sha256 "457fdb04dc8728e007d4688695e6912e6f680727920f2a40bf11eacc17505357"
   license "GPL-2.0-only"
   head "https://github.com/git/git.git", branch: "master"
 
@@ -42,7 +42,6 @@ class PortableGit < PortableFormula
 
   def install
     ENV.append "CFLAGS", "-DRUNTIME_PREFIX"
-    ENV["NO_GETTEXT"] = "1"
     ENV["LIBS"] = "-lcurl -lssl -lcrypto -lz"
 
     args = %W[
@@ -59,8 +58,8 @@ class PortableGit < PortableFormula
     ]
 
     system "make", "configure"
-    system "./configure", *args
-    system "make", "install", "RUNTIME_PREFIX=1", "NO_GETTEXT=1", "INSTALL_SYMLINKS=1"
+    system "./configure", "ac_cv_header_libintl_h=no", *args
+    system "make", "install", "RUNTIME_PREFIX=1", "INSTALL_SYMLINKS=1", "NO_RUST=1"
   end
 
   test do
