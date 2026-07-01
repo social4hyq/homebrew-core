@@ -7,7 +7,7 @@ class HarborCli < Formula
   head "https://github.com/goharbor/harbor-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dab949f34bc051865e09325d5f1c0fe3094ffcac3392bcfefec5964f6561b22f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "994acff06fa6f6a79a4524229ea7c6bc1aee34bb73319c280ba5bbf873cfab56"
   end
 
   depends_on "go" => :build
