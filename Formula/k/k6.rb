@@ -12,7 +12,7 @@ class K6 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "058fa96c67747380a32e815ef11b3586e3deb2d88c77e8355712a2c637a24763"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b89537fae3ce1210601daf49e9ed551ae912cc7790ea042117c7b3c5d3dd8952"
   end
 
   depends_on "go" => :build
