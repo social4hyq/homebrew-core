@@ -7,7 +7,7 @@ class Wtfutil < Formula
   head "https://github.com/wtfutil/wtf.git", branch: "trunk"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "49d817fecdd007c8f019cfb5673bd201fdf96cb76ca5c5f3a5bc4257652a0406"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a39a7a1c10218eb14459877b16da5b4a5969b0e38f7bc339ce57253fb9b5b9d"
   end
 
   depends_on "go" => :build
