@@ -8,7 +8,7 @@ class AwsElasticbeanstalk < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6320d7f519666adab08d38e348dd82f0c6f02e953db371362c4a3ba088df0542"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd892658357cca67bcaf2451e9e65fcdda60dcda5d54d5b2731da5aac0414098"
   end
 
   # `pkgconf` and `rust` are for bcrypt
