@@ -6,7 +6,7 @@ class Protozero < Formula
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6dcabf1c4be1edb4e7e3ea6cbe376601951eb28441ad3fe98af36e691d1d3a2e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f124155555613ae919eae576dcf9a8ce00349a3946732227ee19ce0144d1478c"
   end
 
   depends_on "cmake" => :build
