@@ -6,7 +6,7 @@ class Sift < Formula
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "82433373ecb87155aa81bca848ff36ca4c36240a1b12e48ee527b058c67b5f46"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6afe0dbb6d4c128b044e0d1cd08facc68b12a7c75f6055fb645a9d32bfb31679"
   end
 
   depends_on "go" => :build
