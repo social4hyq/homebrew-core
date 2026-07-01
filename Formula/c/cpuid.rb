@@ -7,7 +7,7 @@ class Cpuid < Formula
   head "https://github.com/klauspost/cpuid.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1cf6816583eeabb441cc497fe6cfa2d2ba5a32560d195b7ddd4ba4272103a53"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e001bd9fd9811d63a2e5efdbc6de3483115eaca362bafbbdb61cfec70970ed3"
   end
 
   depends_on "go" => :build
