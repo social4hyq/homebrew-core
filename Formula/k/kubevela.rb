@@ -2,13 +2,13 @@ class Kubevela < Formula
   desc "Application Platform based on Kubernetes and Open Application Model"
   homepage "https://kubevela.io"
   url "https://github.com/kubevela/kubevela.git",
-      tag:      "v1.10.8",
-      revision: "25473ac9fc1a980965cec80be1fc7c2f092c127a"
+      tag:      "v1.10.9",
+      revision: "65dedda40a69cc1eccf4072a4c835e5b9f13334e"
   license "Apache-2.0"
   head "https://github.com/kubevela/kubevela.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a82935e2c0289c6c8c9db36c97839e24e36aee9c6911abe16dd38b78503464db"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "181e62163f0025e8216828263357d7074a484303f2637c8a7e30e6a2929cd743"
   end
 
   depends_on "go" => :build
