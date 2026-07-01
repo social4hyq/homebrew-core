@@ -1,12 +1,12 @@
 class Elio < Formula
   desc "Batteries-included terminal file manager with rich previews"
   homepage "https://github.com/elio-fm/elio"
-  url "https://github.com/elio-fm/elio/archive/refs/tags/v1.9.0.tar.gz"
-  sha256 "c8a43ff0fd8ffcbbf48296b6d26ad02a123e882cbfb832a0a9c2e3c00576109b"
+  url "https://github.com/elio-fm/elio/archive/refs/tags/v1.10.0.tar.gz"
+  sha256 "332ea7a7437f820ab732842f1674c9b8436e0b7c2a0dbece0a52155843a8001a"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b5375c72ef1ad01a7fa6e7395c1a87fd0032ef6399f173046200378e7a4912d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b4f3ee002697860d590cb31cde77d4aae974e55df97c97bc3493059f2fb76c3"
   end
 
   depends_on "rust" => :build
