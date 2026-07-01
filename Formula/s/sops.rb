@@ -1,13 +1,13 @@
 class Sops < Formula
   desc "Editor of encrypted files"
   homepage "https://getsops.io/"
-  url "https://github.com/getsops/sops/archive/refs/tags/v3.13.1.tar.gz"
-  sha256 "60408fa04a024328e6142c7dc67d08810a470aaa440b9f6cb7b3a358359636e9"
+  url "https://github.com/getsops/sops/archive/refs/tags/v3.13.2.tar.gz"
+  sha256 "79560b53814e20031d094a293d6c169314eaaf97efd6e95a6d765e61e881db2c"
   license "MPL-2.0"
   head "https://github.com/getsops/sops.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cee60c283dfa167d55774562bfc128947da760453b53d55e2e7c839e93240c71"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "04b89153bdf5220d5b91b8c71758e59f0cd78da43e25a60b5f4df0ba609a21d6"
   end
 
   depends_on "go" => :build
