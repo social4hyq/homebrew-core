@@ -13,6 +13,8 @@ class Z3 < Formula
     strategy :github_latest
   end
 
+  no_autobump! because: "newer version requires c++20 support"
+
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "cad9f7fb606f097e756de62d9b5c1c60f7ca1b36bc39ee205a0b489212e7f963"
   end
