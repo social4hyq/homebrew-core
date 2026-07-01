@@ -11,7 +11,7 @@ class TaskSpooler < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc553cd65a72b8488ca9186dde2a5854b756e7ef27074b30d314cd5a778ed68d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a56ff45c71fbf0fbb0a91e35a3b6f6d3a262620cf95abdc5eae8a6570489628"
   end
 
   conflicts_with "moreutils", because: "both install a `ts` executable"
