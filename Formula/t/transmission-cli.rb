@@ -11,7 +11,7 @@ class TransmissionCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ea0c98dd323095ca84265ed138b1938a8ba4d77777dde4c1d771a595a37a8bf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5bbc93b85106a7d8b869c11b719d649f38e3b2822c6cfe2981c9824b65772ae0"
   end
 
   depends_on "cmake" => :build
