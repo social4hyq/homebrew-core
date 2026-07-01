@@ -7,7 +7,7 @@ class Zork < Formula
   head "https://github.com/devshane/zork.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "11890f9c1b854d21bc57e45345657d84d1f4cd5089572487bbb6558f84638a7e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "32dd7ff61d49f5016de4ed6ccfa5c90ee64f01955c051d697ce497affb137718"
   end
 
   uses_from_macos "ncurses"
