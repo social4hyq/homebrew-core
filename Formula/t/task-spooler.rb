@@ -1,8 +1,8 @@
 class TaskSpooler < Formula
   desc "Batch system to run tasks one after another"
   homepage "https://viric.name/soft/ts/"
-  url "https://viric.name/soft/ts/ts-1.0.3.tar.gz"
-  sha256 "fa833311543dc535b60cb7ab83c64ab5ee31128dbaaaa13dde341984e542b428"
+  url "https://viric.name/soft/ts/ts-1.0.4.tar.gz"
+  sha256 "b1ab3db52dca36af3699178b8d0e936a30107f8d5c86a974163c580823b01790"
   license "GPL-2.0-only"
 
   livecheck do
