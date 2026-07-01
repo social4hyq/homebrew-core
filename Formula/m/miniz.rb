@@ -1,8 +1,8 @@
 class Miniz < Formula
   desc "Lossless, high-performance data compression library (zlib/Deflate)"
   homepage "https://github.com/richgel999/miniz"
-  url "https://github.com/richgel999/miniz/archive/refs/tags/3.1.1.tar.gz"
-  sha256 "8bb29c7bd6f22356e5583e794bed4a0b3e6dfcbcadb49974fc9270ccca1e5557"
+  url "https://github.com/richgel999/miniz/archive/refs/tags/3.1.2.tar.gz"
+  sha256 "98468f8924934b723276680f85238b6c78bf1f8b49b4459cc9b7214a20e2e9fb"
   license "MIT"
   head "https://github.com/richgel999/miniz.git", branch: "master"
 
