@@ -7,7 +7,7 @@ class Nuclei < Formula
   head "https://github.com/projectdiscovery/nuclei.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0ed160cde3793b141df5e0892b123e494b1100091a4d7c88de71f3b817d6ecd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6d578e1214457f03257f50e00c250093955dbc92fbb9bffe0fe9d92fb9e1ee6"
   end
 
   depends_on "go" => :build
