@@ -1,8 +1,8 @@
 class Zork < Formula
   desc "Dungeon modified from FORTRAN to C"
   homepage "https://github.com/devshane/zork"
-  url "https://github.com/devshane/zork/archive/refs/tags/v1.0.3.tar.gz"
-  sha256 "929871abae9be902d4fb592f2e76e52b58b386d208f127c826ae1d7b7bade9ef"
+  url "https://github.com/devshane/zork/archive/refs/tags/v1.1.0.tar.gz"
+  sha256 "df2934f886d9d225f27062a783df3f32d73151d32f53b20f37415492932837e4"
   license :public_domain
   head "https://github.com/devshane/zork.git", branch: "master"
 
