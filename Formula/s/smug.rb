@@ -6,7 +6,7 @@ class Smug < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "56e5a859b0b4a6de0681539b0236013aa588bbf004ec6f66ce7e4303420d623b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "60a3efeada94a9d3aab80dd32d696098d6860741452aebb3ffe48944e57826c3"
   end
 
   depends_on "go" => :build
