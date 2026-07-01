@@ -1,8 +1,8 @@
 class TofuLs < Formula
   desc "OpenTofu Language Server"
   homepage "https://github.com/opentofu/tofu-ls"
-  url "https://github.com/opentofu/tofu-ls/archive/refs/tags/v0.5.0.tar.gz"
-  sha256 "6e6ba0f69a85cd9cc59a545c8fe6fa85ffd1ae0fe1989422cc24b1c05f08a5f4"
+  url "https://github.com/opentofu/tofu-ls/archive/refs/tags/v0.5.1.tar.gz"
+  sha256 "a25eacdf28dcb632b25592572303ecdb06c658d039af6d4a29df89025a657f90"
   license "MPL-2.0"
   head "https://github.com/opentofu/tofu-ls.git", branch: "main"
 
@@ -12,7 +12,7 @@ class TofuLs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "00f667083cf17cdfc150c80d3f022c4cc1bc375e01bd005f65bf5b9a7520cd76"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9655fe49b74870d1d5cb639f466f8441d2019cf403cc1ad721d30fe32216bfca"
   end
 
   depends_on "go" => :build
