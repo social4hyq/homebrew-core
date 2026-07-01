@@ -1,10 +1,10 @@
 class Pkgconf < Formula
   desc "Package compiler and linker metadata toolkit"
   homepage "https://github.com/pkgconf/pkgconf"
-  url "https://distfiles.ariadne.space/pkgconf/pkgconf-2.9.95.tar.xz"
-  mirror "https://fossies.org/linux/misc/pkgconf-2.9.95.tar.xz"
-  mirror "http://fresh-center.net/linux/misc/pkgconf-2.9.95.tar.xz"
-  sha256 "f8f0c834a493c610d31a1a84142fdbc5f8273fb3d98c3e9bb6fc0e1d999739c6"
+  url "https://distfiles.ariadne.space/pkgconf/pkgconf-2.9.96.tar.xz"
+  mirror "https://fossies.org/linux/misc/pkgconf-2.9.96.tar.xz"
+  mirror "http://fresh-center.net/linux/misc/pkgconf-2.9.96.tar.xz"
+  sha256 "f2e7898225914d8ded87c0bea1e2d238795e14834dd3cb33e8c93e5d55b47eb5"
   license "ISC"
   compatibility_version 1
 
@@ -14,7 +14,7 @@ class Pkgconf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f7ac7b4848f1bf490c07dd5cd7e798b898ced1568c7604248f85d495f7cda27"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "181daf0cb755b34b0be423247434234cbce03d088b87ecb21ba68c4da8120a09"
   end
 
   head do
