@@ -1,8 +1,8 @@
 class Libupnp < Formula
   desc "Portable UPnP development kit"
   homepage "https://pupnp.sourceforge.io/"
-  url "https://github.com/pupnp/pupnp/releases/download/release-1.18.5/libupnp-1.18.5.tar.bz2"
-  sha256 "fe17522c605752f9f522d8cceab2a4601d75c2b701288a3bdbd9926e1bd9a9a1"
+  url "https://github.com/pupnp/pupnp/releases/download/release-2.0.2/libupnp-2.0.2.tar.bz2"
+  sha256 "4a79edb812397e38b85bb95344a7fda4a17f54fbf53fdb828cc23ddb7e695f77"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,10 +11,14 @@ class Libupnp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d95fec013cfbb2e4f8dcae42736f8f8f7762526036466c9ae25c369341063c43"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "683f79ce777a967461626079976192328f0e240d1181a944ac89ae6b80d45bb8"
   end
 
   def install
+    # https://github.com/llvm/llvm-project/issues/65557
+    inreplace "upnp/src/genlib/miniserver/miniserver.c", "switch (gMServState)",
+                                                           "switch ((MiniServerState)gMServState)"
+
     system "./configure", "--enable-ipv6", *std_configure_args
     system "make", "install"
     pkgshare.install "upnp/test/test_init.c"
