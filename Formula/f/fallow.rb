@@ -7,7 +7,7 @@ class Fallow < Formula
   head "https://github.com/fallow-rs/fallow.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac7a7c8f1f0a9561897db8c7ec87440002bdbb02c1a96539ad07cdbac7825785"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bb7460c5df8778d4c41165e2588ee066a6ab4bb25a8d104802b56898c0570b44"
   end
 
   depends_on "rust" => :build
