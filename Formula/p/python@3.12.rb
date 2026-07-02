@@ -207,16 +207,11 @@ class PythonAT312 < Formula
       system "make", "frameworkinstallextras", "PYTHONAPPSDIR=#{pkgshare}" if OS.mac?
     end
 
-    # Inject musl-compat shim into libpython3.so via DT_NEEDED.
+    # Inject musl-compat shim into python via DT_NEEDED.
     # This is done post-build so configure/make never see the extra symbols,
     # avoiding false detection of features (e.g. qsort_r) that rely on
     # kernel support not available on the target system.
-    # Use .realpath to resolve any symlinks before writing DT_NEEDED.
-    libpython = Pathname.new(lib/"libpython3.12.so").realpath
-    musl_compat_lib = Formula["musl-compat"].opt_lib/"libmusl_compat.so"
-    system "patchelf", "--add-needed", musl_compat_lib.to_s, libpython.to_s
-    system "patchelf", "--add-rpath", Formula["musl-compat"].opt_lib.to_s,
-           libpython.to_s
+    system "patchelf", "--add-needed", "libmusl_compat.so", bin/"python3.12"
 
     if OS.mac?
       # Any .app get a " 3" attached, so it does not conflict with python 2.x.
