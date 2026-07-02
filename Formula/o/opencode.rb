@@ -153,6 +153,12 @@ class Opencode < Formula
       File.write(loader, content)
     end
 
+    # rollup: @rollup/rollup-openharmony-arm64@4.60.4 is an official upstream binding,
+    # installed automatically by `bun install` (bun-lock-openharmony-os.patch flips its
+    # lockfile `os` from "none" to "openharmony"). Its rollup.openharmony-arm64.node
+    # gets ELF-signed by the generic .so/.node loop above; rollup's native.js falls back
+    # to `require('@rollup/rollup-openharmony-arm64')` when dist/*.node is absent.
+
     # @opentui/core@0.3.4 bundle patches (libopentui.so was already ELF-signed by the
     # generic .so/.node signing loop above):
     # (1) drop stray uppercase-hex line before the trailing `//# sourceMappingURL=` — an
