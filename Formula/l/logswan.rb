@@ -6,7 +6,7 @@ class Logswan < Formula
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5027838b4417ba122feb52a0391428dc4dccec5f422fbbc7a0f338174d8a02ba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be97166b6b68e8bd62a5d8c804e8463865feb2f12e39033a74ff22b29e080f4c"
   end
 
   depends_on "cmake" => :build
