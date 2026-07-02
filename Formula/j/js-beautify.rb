@@ -6,7 +6,7 @@ class JsBeautify < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "88d9df986cd1ac3a681f484614d272135629cea3adbbbb8be5c1add5edf8cbdd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2678cf64d75f054d802216ecb45eb218d6db5d9e43fc475165313fa3167f8139"
   end
 
   depends_on "node"
