@@ -1,9 +1,9 @@
 class BunBootstrap < Formula
   desc "Prebuilt Bun for bootstrapping Bun builds (L3 driver)"
   homepage "https://github.com/oven-sh/bun"
-  url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-bootstrap-v1.4.0-a4cd4d2/bun-ohos-aarch64-1.4.0-a4cd4d2.tar.gz"
-  version "1.4.0-a4cd4d2"
-  sha256 "80d88257496b634b55b61e3b1dd82b902b8f6669b74547931c582ed67437f008"
+  url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-bootstrap-v1.4.0-e0acad318/bun-ohos-aarch64-1.4.0-e0acad318.tar.gz"
+  version "1.4.0-e0acad318"
+  sha256 "3f750dd48448fecf720b3f61a9517d625451774dee67a22882622d0204b9a7f2"
   license "MIT"
 
   # Prebuilt tarball, hosted as a release asset of this repo (not committed to git).
@@ -15,8 +15,8 @@ class BunBootstrap < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-bootstrap-v1.4.0-a4cd4d2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9ed14895bd4ac371829b7b91be2b9704a30c2bd1aa00ed5fe80e8eec73edb3c0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-bootstrap-v1.4.0-e0acad318"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a71df0c888aa49f1b56ae1c53368d141443a6b911458d24d45831a79795492c"
   end
 
   # Prebuilt binary, no source build step; only referenced by bun/bun-canary at build time, not at runtime.
