@@ -13,7 +13,7 @@ class Tmux < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf0a12cc03a0b031b8535713a5f73dc5e6076e88fab091045d18b7a1e27294c3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ce2130ea0689d8fa97001a3b7ecf0e5f54affe03c8b2b3efc2a94b35b8ff002"
   end
 
   head do
