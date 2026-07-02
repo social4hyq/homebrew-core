@@ -5,6 +5,7 @@ class Opencode < Formula
       revision: "10c894bdeef3618f5666fb506ef7f9491bb964d8"
   version "1.17.13"
   license "MIT"
+  revision 1
 
   livecheck do
     url "https://github.com/anomalyco/opencode/releases/latest"
@@ -12,9 +13,9 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.13-r2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.13-r3"
     rebuild 0
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9d894d6c789a3c68879a037e1fc155896355579f2417136828119a75a8b8a3c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "241baf49b3fcee0024c54bcd8c9db765099088c43d9822886c57077c148333d5"
   end
 
   # opencode is a `bun build --compile` single binary with bun runtime + JS + native .node/.so
