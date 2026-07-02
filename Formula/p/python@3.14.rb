@@ -4,6 +4,7 @@ class PythonAT314 < Formula
   url "https://www.python.org/ftp/python/3.14.6/Python-3.14.6.tgz"
   sha256 "74d0d71d0600e477651a077101d6e62d1e2e69b8e992ba18c993dd643b7ba222"
   license "Python-2.0"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class PythonAT314 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7d0c34b79e8c4df6bf5c48f7f4c5aa50286d1b87679325a2bc690c8dcffbfbf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad5a60a0009b0efe3de765c09b400b6b4a4da4a6b2cc3186f6014a873a0d2ca5"
   end
 
   depends_on "pkgconf" => :build
@@ -33,6 +34,8 @@ class PythonAT314 < Formula
     depends_on "gettext"
     depends_on "util-linux"
     depends_on "zlib-ng-compat"
+    depends_on "musl-compat"
+    depends_on "patchelf" => :build
   end
 
   link_overwrite "bin/idle3"
@@ -206,6 +209,17 @@ class PythonAT314 < Formula
       system "make", target, "PYTHONAPPSDIR=#{prefix}"
       system "make", "frameworkinstallextras", "PYTHONAPPSDIR=#{pkgshare}" if OS.mac?
     end
+
+    # Inject musl-compat shim into libpython3.so via DT_NEEDED.
+    # This is done post-build so configure/make never see the extra symbols,
+    # avoiding false detection of features (e.g. qsort_r) that rely on
+    # kernel support not available on the target system.
+    # Use .realpath to resolve any symlinks before writing DT_NEEDED.
+    libpython = Pathname.new(lib/"libpython3.14.so").realpath
+    musl_compat_lib = Formula["musl-compat"].opt_lib/"libmusl_compat.so"
+    system "patchelf", "--add-needed", musl_compat_lib.to_s, libpython.to_s
+    system "patchelf", "--add-rpath", Formula["musl-compat"].opt_lib.to_s,
+           libpython.to_s
 
     if OS.mac?
       # Any .app get a " 3" attached, so it does not conflict with python 2.x.
