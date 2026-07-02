@@ -12,9 +12,9 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.13-r1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.13-r2"
     rebuild 0
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "54349621d7309132f3ebcef31fb507a932e12eaad8a76638e3cccc76d4171a31"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9d894d6c789a3c68879a037e1fc155896355579f2417136828119a75a8b8a3c"
   end
 
   # opencode is a `bun build --compile` single binary with bun runtime + JS + native .node/.so
@@ -150,6 +150,45 @@ class Opencode < Formula
         "} else if (process.platform === 'linux' || process.platform === 'openharmony') {",
       )
       File.write(loader, content)
+    end
+
+    # @opentui/core@0.3.4 bundle patches (libopentui.so was already ELF-signed by the
+    # generic .so/.node signing loop above):
+    # (1) drop stray uppercase-hex line before the trailing `//# sourceMappingURL=` — an
+    #     upstream bundler bug leaves a partial debugId duplicate that bun 1.4.0's strict-mode
+    #     parser rejects as "Decimal integer literals with a leading zero...";
+    # (2) map openharmony-arm64 to @opentui/core-linux-arm64 (libopentui.so is Linux/musl-ABI
+    #     compatible via the LLD-CodeSign patched linker).
+    Dir.glob("node_modules/**/@opentui/core", File::FNM_DOTMATCH).each do |d|
+      Dir.glob("#{d}/index-*.js").each do |bundle|
+        next if bundle.end_with?(".map")
+
+        content = File.read(bundle)
+        next unless content.include?("resolveNativePackage")
+
+        changed = false
+        # Fix 1: strip orphan hex line immediately before sourceMappingURL comment.
+        new_content = content.sub(%r{\n[0-9A-F]{20,}\n(?=//# (?:debugId|sourceMappingURL)=)}, "\n")
+        if new_content != content
+          content = new_content
+          changed = true
+        end
+        # Fix 2: add openharmony branch (idempotent).
+        unless content.include?("process.platform === \"openharmony\"")
+          ohos_branch = <<~JS.chomp
+            if (process.platform === "openharmony" && process.arch === "arm64") {
+                return await import("@opentui/core-linux-arm64");
+              }
+              throw new Error(`opentui is not supported on the current platform:
+          JS
+          content = content.sub(
+            "throw new Error(`opentui is not supported on the current platform:",
+            ohos_branch,
+          )
+          changed = true
+        end
+        File.write(bundle, content) if changed
+      end
     end
 
     # Bun runtime symlink: Bun.build({compile: {target: "bun-linux-arm64-musl"}}) expects a local bun
