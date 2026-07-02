@@ -11,7 +11,7 @@ class Forgit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f62ea9e7ab8c14f538e09b7a5ee353f178e5ce5db6e7229366ba4d45fa59041d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "127478ab670235410490d2d6c5ad9161c5275f6773c06358f26b6e7def56c6f8"
   end
 
   depends_on "fzf"
