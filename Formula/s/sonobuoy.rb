@@ -6,7 +6,7 @@ class Sonobuoy < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "54a76044d10b7122e60801d76c20e30a296e424a7aaa53c46e0938160f896f53"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e1e024cb3ce2c9c2010bafd61082800aa76223afb346c8c32989042d6c938fb"
   end
 
   depends_on "go" => :build
