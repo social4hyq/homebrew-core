@@ -1,13 +1,13 @@
 class Jansson < Formula
   desc "C library for encoding, decoding, and manipulating JSON"
   homepage "https://digip.org/jansson/"
-  url "https://github.com/akheron/jansson/releases/download/v2.15.0/jansson-2.15.0.tar.gz"
-  sha256 "070a629590723228dc3b744ae90e965a569efb9c535b3309b52e80e75d8eb3be"
+  url "https://github.com/akheron/jansson/releases/download/v2.15.1/jansson-2.15.1.tar.gz"
+  sha256 "0c7114dc0b2d22a670724a1f95922029d7077c19dbf79a584cb8084d2f267f2f"
   license "MIT"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8337be52fd3efb0927dd71db283b10501e4d8a9b6837c970bb6d7987f0ab55ca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "26dc97bbfdeeff4e4af2c41a6d0a2ceec708c1bf7306b904324c9c97c8079082"
   end
 
   def install
