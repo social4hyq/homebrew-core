@@ -7,7 +7,7 @@ class Libcotp < Formula
   head "https://github.com/paolostivanin/libcotp.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a5cfec97a5af78fb02a08ed5f745c9bf1476e2a14e4b720c00d53b2fd9b0142"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8dd7d995da590a24d4d471d28685a6821eab51177b70ba4bad652e420b72beb"
   end
 
   depends_on "cmake" => :build
