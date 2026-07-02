@@ -2,8 +2,8 @@ class Opencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64"
   homepage "https://github.com/anomalyco/opencode"
   url "https://gh-proxy.com/https://github.com/anomalyco/opencode.git",
-      revision: "67aec2212010d67775c35e696d8b8b54902eb338"
-  version "1.17.11"
+      revision: "10c894bdeef3618f5666fb506ef7f9491bb964d8"
+  version "1.17.13"
   license "MIT"
 
   livecheck do
@@ -12,9 +12,9 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.11-r6"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa0f8321c52c1cb69b4d5209f6c42224e767fb04f29bec8286325ac698a50103"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.13-r1"
+    rebuild 0
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "54349621d7309132f3ebcef31fb507a932e12eaad8a76638e3cccc76d4171a31"
   end
 
   # opencode is a `bun build --compile` single binary with bun runtime + JS + native .node/.so
