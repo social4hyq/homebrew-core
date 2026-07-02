@@ -1,8 +1,8 @@
 class Zsync < Formula
   desc "File transfer program"
   homepage "https://zsync.moria.org.uk/"
-  url "https://zsync.moria.org.uk/download/zsync-0.7.1.tar.gz"
-  sha256 "f521437761d9d19b5ca351f7736f28543cfb8a37391bbdc5b49681403268ff89"
+  url "https://zsync.moria.org.uk/download/zsync-0.7.2.tar.gz"
+  sha256 "51a54a2bcf60311f108924b5f8795fb7a8eeeedd0b52f4f634842ea3470978a2"
   license "Artistic-2.0"
   head "https://github.com/cph6/zsync.git", branch: "master"
 
