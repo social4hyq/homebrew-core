@@ -12,7 +12,7 @@ class Miniz < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7120e7041b2cb06754b6c6067286cc7bd35addb73e990fd06c6482daba3308a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "63fb260500080ada7747103c4da9498377aad38c395bc8ad38066ac0173bad28"
   end
 
   depends_on "cmake" => :build
