@@ -4,6 +4,7 @@ class PythonAT313 < Formula
   url "https://www.python.org/ftp/python/3.13.14/Python-3.13.14.tgz"
   sha256 "5ae535a36af0ebca6fca176ecb8197f5db9c1cb8c8f0cd12cdf1787046db1f41"
   license "Python-2.0"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -32,6 +33,8 @@ class PythonAT313 < Formula
     depends_on "gettext"
     depends_on "util-linux"
     depends_on "zlib-ng-compat"
+    depends_on "musl-compat"
+    depends_on "patchelf" => :build
   end
 
   link_overwrite "lib/python3.13/site-packages/pip*"
@@ -189,6 +192,17 @@ class PythonAT313 < Formula
       system "make", target, "PYTHONAPPSDIR=#{prefix}"
       system "make", "frameworkinstallextras", "PYTHONAPPSDIR=#{pkgshare}" if OS.mac?
     end
+
+    # Inject musl-compat shim into libpython3.so via DT_NEEDED.
+    # This is done post-build so configure/make never see the extra symbols,
+    # avoiding false detection of features (e.g. qsort_r) that rely on
+    # kernel support not available on the target system.
+    # Use .realpath to resolve any symlinks before writing DT_NEEDED.
+    libpython = Pathname.new(lib/"libpython3.13.so").realpath
+    musl_compat_lib = Formula["musl-compat"].opt_lib/"libmusl_compat.so"
+    system "patchelf", "--add-needed", musl_compat_lib.to_s, libpython.to_s
+    system "patchelf", "--add-rpath", Formula["musl-compat"].opt_lib.to_s,
+           libpython.to_s
 
     if OS.mac?
       # Any .app get a " 3" attached, so it does not conflict with python 2.x.
