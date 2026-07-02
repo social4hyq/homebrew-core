@@ -12,7 +12,7 @@ class Libevent < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "80c9e196e7deb8fe81d8c518683c1220fb17a15ef51772c2d45f97cc5c5efb6f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f30a9b84ea55aef0c3bbb2300920ead95b6888504bc6bd00ff45a056e5e8542"
   end
 
   depends_on "autoconf" => :build
