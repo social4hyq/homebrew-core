@@ -1,9 +1,9 @@
 class BunWebkit < Formula
   desc "JavaScriptCore/WTF/bmalloc static archives for Bun"
   homepage "https://github.com/oven-sh/bun"
-  url "https://github.com/oven-sh/WebKit.git",
-      revision: "6d586e293f008f0e74e5697611a379b1b24815c9"
-  version "6d586e293f"
+  url "https://gh-proxy.com/https://github.com/oven-sh/WebKit.git",
+      revision: "c9ad5813fd23bd8b98b0738abc3d037ec716aa92"
+  version "c9ad5813fd"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
   # This formula is fully rewritten from upstream because it builds only the
   # JavaScriptCore/WTF/bmalloc static archives from oven-sh/WebKit, pinned to
@@ -20,9 +20,8 @@ class BunWebkit < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-webkit-v6d586e293f-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e16bd7571a44afe221265e581137c1a599178f53ddd3b07b41567979c47209dc"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-webkit-vc9ad5813fd-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4486c796feedc6c1228925c636ce2bd1f27b798571f5f9b0a7f2c9018e66e18e"
   end
 
   keg_only "webKit static archives are consumed in-tree by Bun, not linked system-wide"
@@ -54,7 +53,7 @@ class BunWebkit < Formula
     # OHOS cross-compilation flags (align with cfg.ohos branch in bun-src/scripts/build/deps/webkit.ts).
     target_flag = "--target=aarch64-linux-ohos"
     sysroot_flag = "--sysroot=#{sysroot}"
-    icu_include = "-I#{Formula["icu4c@78"].opt_include}"
+    icu_include = "-I#{Formula["social4hyq/core/icu4c@78"].opt_include}"
 
     cxxflags = [
       target_flag, sysroot_flag, "-D__MUSL__",
@@ -90,13 +89,15 @@ class BunWebkit < Formula
         -DENABLE_MEDIA_SOURCE=OFF
         -DENABLE_MEDIA_STREAM=OFF
         -DENABLE_WEB_RTC=OFF
+        -DENABLE_SWIFT_DEMO_URI_SCHEME=OFF
+        -DENABLE_BACK_FORWARD_LIST_SWIFT=OFF
         -DCMAKE_SYSTEM_NAME=Linux
         -DCMAKE_SYSTEM_PROCESSOR=aarch64
         -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
-        -DCMAKE_FIND_ROOT_PATH=#{sysroot};#{Formula["icu4c@78"].opt_prefix}
-        -DCMAKE_PREFIX_PATH=#{Formula["icu4c@78"].opt_prefix}
-        -DICU_ROOT=#{Formula["icu4c@78"].opt_prefix}
-        -DICU_INCLUDE_DIR=#{Formula["icu4c@78"].opt_include}
+        -DCMAKE_FIND_ROOT_PATH=#{sysroot};#{Formula["social4hyq/core/icu4c@78"].opt_prefix}
+        -DCMAKE_PREFIX_PATH=#{Formula["social4hyq/core/icu4c@78"].opt_prefix}
+        -DICU_ROOT=#{Formula["social4hyq/core/icu4c@78"].opt_prefix}
+        -DICU_INCLUDE_DIR=#{Formula["social4hyq/core/icu4c@78"].opt_include}
         -DCMAKE_HAVE_THREADS_LIBRARY=1
       ]
       system "cmake", *args, buildpath.to_s
@@ -148,7 +149,7 @@ class BunWebkit < Formula
   def caveats
     <<~EOS
       bun-webkit provides JSC/WTF/bmalloc static archives for Bun on HarmonyOS.
-      Pinned to WebKit commit 6d586e293f (matches bun's WEBKIT_VERSION).
+      Pinned to WebKit commit c9ad5813fd (matches bun's WEBKIT_VERSION).
       Consumed in-tree by the `bun` formula; keg-only.
     EOS
   end
