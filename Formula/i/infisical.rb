@@ -1,13 +1,13 @@
 class Infisical < Formula
   desc "CLI for Infisical"
   homepage "https://infisical.com/docs/cli/overview"
-  url "https://github.com/Infisical/cli/archive/refs/tags/v0.43.99.tar.gz"
-  sha256 "ea59e6b700a345ed231593e2bd6a01f2fd3ccde7dd894633d37b2cacc9416264"
+  url "https://github.com/Infisical/cli/archive/refs/tags/v0.43.100.tar.gz"
+  sha256 "117ab08be0e45ca653530b69529cb0f8ef86a454ac5c9142845915b1d892fd3f"
   license "MIT"
   head "https://github.com/Infisical/cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b06d5259353fffd139f7f1e6ae18ce4faf2a2d3c1706bfe8fa0ab436b1d17c62"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b53d00508f7abfdf7772d5dfa31b028a4759c190bdb25009c25fa974045868a6"
   end
 
   depends_on "go" => :build
