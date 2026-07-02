@@ -6,7 +6,7 @@ class Cython < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ebf687fb8c9af453d9158579e387e9132bea30a2df5c458032cd849660e72ac3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6b6ddbbfefb7fdafa86e0476868da71e926aea5ef0952f50cbc4fa77ea94231"
   end
 
   keg_only <<~EOS
