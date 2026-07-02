@@ -6,7 +6,7 @@ class MuslCompat < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "582e60e9ecdeddc4d9f54ce6bb3c2eb8f38b7614619b249c55fb4eeb17703541"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "92a6c6a98c21677fb42ba13c875b3d0d4a92d89f3540279062697576d6213c60"
   end
 
   def install
