@@ -1,12 +1,12 @@
 class MuslCompat < Formula
   desc "Compatibility shim for musl symbols missing on OpenHarmony"
   homepage "https://atomgit.com/Harmonybrew/musl-compat"
-  url "https://raw.atomgit.com/Harmonybrew/musl-compat/archive/refs/heads/v1.0.0.tar.gz"
-  sha256 "72104ecc504e86c12291cd5457ba9d9f660fce6c034ed44b1cc32b7a73d63020"
+  url "https://raw.atomgit.com/Harmonybrew/musl-compat/archive/refs/heads/v1.0.1.tar.gz"
+  sha256 "b3e4d8da001019b09a2d7d15198000b0d6c00307f3857eb956f057cc6ec144bb"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "582e60e9ecdeddc4d9f54ce6bb3c2eb8f38b7614619b249c55fb4eeb17703541"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "92a6c6a98c21677fb42ba13c875b3d0d4a92d89f3540279062697576d6213c60"
   end
 
   def install
