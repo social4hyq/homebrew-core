@@ -6,7 +6,7 @@ class FirebaseCli < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "acf890075f216177f80a30b824764d4a1650e3e3e1b6211553c5dada5498ade0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "19a289497cc4adb96f6ffe2a17169a0966ce63c1c165bb0711b286a711fcd549"
   end
 
   depends_on "node"
