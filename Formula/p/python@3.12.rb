@@ -13,7 +13,7 @@ class PythonAT312 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "417c4f0e5974496ec86146e9f0c867086e3793b6af02e7e42e69e4c7362d44f4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1946bfab319786432e7f2cfb3ba6e3f24ca050d6eb9d3aa0b0fc8e6d84de1799"
   end
 
   depends_on "pkgconf" => :build
