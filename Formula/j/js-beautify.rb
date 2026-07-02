@@ -1,12 +1,12 @@
 class JsBeautify < Formula
   desc "JavaScript, CSS and HTML unobfuscator and beautifier"
   homepage "https://beautifier.io"
-  url "https://registry.npmjs.org/js-beautify/-/js-beautify-1.15.4.tgz"
-  sha256 "5feefb437c9467e789d179fc4cbc4f942008c05222f6b573a4f03ee41e31d9a6"
+  url "https://registry.npmjs.org/js-beautify/-/js-beautify-2.0.3.tgz"
+  sha256 "f687b307188ea030cf65f49cc56b036dd6344eb6fd9592907453d3f1a083ca6b"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "88d9df986cd1ac3a681f484614d272135629cea3adbbbb8be5c1add5edf8cbdd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2678cf64d75f054d802216ecb45eb218d6db5d9e43fc475165313fa3167f8139"
   end
 
   depends_on "node"
