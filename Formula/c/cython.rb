@@ -1,12 +1,12 @@
 class Cython < Formula
   desc "Compiler for writing C extensions for the Python language"
   homepage "https://cython.org/"
-  url "https://files.pythonhosted.org/packages/7e/48/89a4aa420f63ff35bd0081433e483a991234558fefb1ac4e4f1b62b059b9/cython-3.2.6.tar.gz"
-  sha256 "6509472a245ccdf5fd11637a4744a1edfd38debb1a48332a8f3fe4b07db725bd"
+  url "https://files.pythonhosted.org/packages/b6/6b/80101e02ebacaf9232ecf32bf6a788d36b27d820ee02434746252569ef98/cython-3.2.8.tar.gz"
+  sha256 "f4f23a56b25221a06f91817fe8f3114ab8b48a4fac73187dbb64bc2c4a87961f"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ebf687fb8c9af453d9158579e387e9132bea30a2df5c458032cd849660e72ac3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6b6ddbbfefb7fdafa86e0476868da71e926aea5ef0952f50cbc4fa77ea94231"
   end
 
   keg_only <<~EOS
