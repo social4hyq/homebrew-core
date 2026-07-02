@@ -1,10 +1,9 @@
 class Libevent < Formula
   desc "Asynchronous event library"
   homepage "https://libevent.org/"
-  url "https://github.com/libevent/libevent/archive/refs/tags/release-2.1.12-stable.tar.gz"
-  sha256 "7180a979aaa7000e1264da484f712d403fcf7679b1e9212c4e3d09f5c93efc24"
+  url "https://github.com/libevent/libevent/archive/refs/tags/release-2.1.13-stable.tar.gz"
+  sha256 "1a0885e17dc78afbaeddf13cf849f9238bbc24acdc178464a0d1934d7c5ffbd5"
   license "BSD-3-Clause"
-  revision 1
   compatibility_version 1
 
   livecheck do
@@ -13,7 +12,7 @@ class Libevent < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "80c9e196e7deb8fe81d8c518683c1220fb17a15ef51772c2d45f97cc5c5efb6f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f30a9b84ea55aef0c3bbb2300920ead95b6888504bc6bd00ff45a056e5e8542"
   end
 
   depends_on "autoconf" => :build
