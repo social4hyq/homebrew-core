@@ -7,7 +7,7 @@ class Jansson < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8337be52fd3efb0927dd71db283b10501e4d8a9b6837c970bb6d7987f0ab55ca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "26dc97bbfdeeff4e4af2c41a6d0a2ceec708c1bf7306b904324c9c97c8079082"
   end
 
   def install
