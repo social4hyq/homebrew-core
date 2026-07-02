@@ -5,6 +5,10 @@ class MuslCompat < Formula
   sha256 "72104ecc504e86c12291cd5457ba9d9f660fce6c034ed44b1cc32b7a73d63020"
   license "MIT"
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "582e60e9ecdeddc4d9f54ce6bb3c2eb8f38b7614619b249c55fb4eeb17703541"
+  end
+
   def install
     system "make", "static", "shared",
            "CC=#{ENV.cc}",
