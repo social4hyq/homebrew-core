@@ -7,7 +7,7 @@ class Okteto < Formula
   head "https://github.com/okteto/okteto.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "208d3a97d2504a5c40228db17bfbddf5831b827b31bcbefa52921eda9463d50d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9bdf4fc781b47f971c8b25bf95ec66fa84ab4ba643967d4cb2d6cc5e6dafb4b"
   end
 
   depends_on "go" => :build
