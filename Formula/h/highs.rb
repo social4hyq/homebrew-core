@@ -15,7 +15,7 @@ class Highs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0830cb5dc52787f67f12c739d2468f075609fb6ffca9a8c25aada0b4766a1da2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a415ec6198793e52b02e3a20ba6954b31642279d655a8a46327a1a60621f4953"
   end
 
   depends_on "cmake" => :build
