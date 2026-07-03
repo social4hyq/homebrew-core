@@ -12,7 +12,7 @@ class TerraformLs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ead3b058231bb9f72dfcc5735c0676dd50412b2bbac2037694e8312a854c5d0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bb4b92d5ce6289d2bed4299e855761e01c6a1528e354a787a392035e9cc9e19e"
   end
 
   depends_on "go" => :build
