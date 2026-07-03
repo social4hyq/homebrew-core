@@ -9,7 +9,7 @@ class Rojo < Formula
   head "https://github.com/rojo-rbx/rojo.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f12d10abf388557d5fac8aeeb90ee50f9880b0cabeb32e1856d401e73c4a368"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "537741b9c941b77c1b99ec177d254158c01eabed0d8cd387eec9045fabcb7ad7"
   end
 
   depends_on "pkgconf" => :build
