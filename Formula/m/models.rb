@@ -7,7 +7,7 @@ class Models < Formula
   head "https://github.com/arimxyer/models.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dfbf29b3c0b2896bd91937cd1947226c19087a1c5ac59c62aaf2890a4bb781ac"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d662931b48abb400fd74b6095819c2fb1af47b175196c00b580cb69fd27b0e5"
   end
 
   depends_on "rust" => :build
