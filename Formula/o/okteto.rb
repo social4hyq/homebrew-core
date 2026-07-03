@@ -1,13 +1,13 @@
 class Okteto < Formula
   desc "Build better apps by developing and testing code directly in Kubernetes"
   homepage "https://okteto.com"
-  url "https://github.com/okteto/okteto/archive/refs/tags/3.20.0.tar.gz"
-  sha256 "b92904b0bce510f6225cd152447099419b33edda77a66b6844190386383dfce6"
+  url "https://github.com/okteto/okteto/archive/refs/tags/3.21.0.tar.gz"
+  sha256 "1d2b32e8ee421eff2bd28c781427b15bfe8f4862b49b408469b10ee96ec3078a"
   license "Apache-2.0"
   head "https://github.com/okteto/okteto.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "208d3a97d2504a5c40228db17bfbddf5831b827b31bcbefa52921eda9463d50d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9bdf4fc781b47f971c8b25bf95ec66fa84ab4ba643967d4cb2d6cc5e6dafb4b"
   end
 
   depends_on "go" => :build
