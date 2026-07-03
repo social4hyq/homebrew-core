@@ -7,7 +7,7 @@ class Wolfmqtt < Formula
   head "https://github.com/wolfSSL/wolfMQTT.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bfaa989384a27bbaa9a9cd1bc30519c0f7cf43795132dc814180f5bb4405afb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e603b099a11f3c4ac3ed78ef4404b7a6bfe7377f8784ace386f238ebc73ca978"
   end
 
   depends_on "autoconf" => :build
