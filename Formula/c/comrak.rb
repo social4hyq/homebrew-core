@@ -1,13 +1,13 @@
 class Comrak < Formula
   desc "CommonMark + GFM compatible Markdown parser and renderer"
   homepage "https://github.com/kivikakk/comrak"
-  url "https://github.com/kivikakk/comrak/archive/refs/tags/v0.52.0.tar.gz"
-  sha256 "2321a3f9f23feae95402234fa02e71cad2a902583fdfa7097b7da0717fdad49b"
+  url "https://github.com/kivikakk/comrak/archive/refs/tags/v0.53.0.tar.gz"
+  sha256 "bf14ae3d07b620f0d5186831e62021161a2de7f112295cf107259ec9ebc2ecd8"
   license "BSD-2-Clause"
   head "https://github.com/kivikakk/comrak.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ed4ff089eef94834d89177d7857ef619dc90cf58c55bdc1456e1dee00d44981"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "902fc874eee7960a4114d1b4217f44355832a4f26065fcc8bf13642d989d909e"
   end
 
   depends_on "rust" => :build
