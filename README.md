@@ -38,10 +38,10 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 
 | Formula | 版本 | 说明 |
 |---|---|---|
-| `opencode` | 1.17.8 @ `11e47f91`（2026-06-17） | OpenCode AI 编码代理 CLI（单文件二进制 + 嵌入 Web UI） |
-| `bun` | 1.4.0 @ `e0acad318`（main，2026-06-15） | Bun JavaScript runtime |
-| `bun-bootstrap` | 1.4.0 @ `a4cd4d2`（main，2026-06-14） | 预编译 bun，用来启动 `bun bd` 自举本机 bun（`keg_only`） |
-| `bun-webkit` | `6d586e293f`（2026-06-17） | JavaScriptCore / WTF / bmalloc 静态库，bun 专用 WebKit fork（`keg_only`） |
+| `opencode` | 1.17.13 @ `10c894bd`（2026-07-03） | OpenCode AI 编码代理 CLI（单文件二进制 + 嵌入 Web UI） |
+| `bun` | 1.4.0 @ `1498d7b77a`（main，2026-07-03） | Bun JavaScript runtime |
+| `bun-bootstrap` | 1.4.0 @ `e0acad318`（main，2026-06-15） | 预编译 bun，用来启动 `bun bd` 自举本机 bun（`keg_only`） |
+| `bun-webkit` | `c9ad5813fd`（2026-07-03） | JavaScriptCore / WTF / bmalloc 静态库，bun 专用 WebKit fork（`keg_only`） |
 | `bun-pty` | 0.4.10（2026-06-15） | `librust_pty.so`，portable-pty + nix 0.31 OHOS 支持（`keg_only`） |
 | `lightningcss` | 1.30.1（2025-05-14） | `liblightningcss_node.so` CSS 原生绑定（`keg_only`） |
 | `tailwindcss-oxide` | 4.1.11（2025-06-26） | `libtailwind_oxide.so` Tailwind v4 原生引擎绑定（`keg_only`） |
@@ -50,20 +50,20 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 
 ## Bottle 状态
 
-所有 bottle 均面向 `arm64_ohos`，当前全部为 rebuild 1（`-r2`，2026-06-25 重编）：
+所有 bottle 均面向 `arm64_ohos`：
 
 | Formula | Bottle tag | 大小 |
 |---------|-----------|------|
 | `llvm@21` | `llvm21-v21.1.8-pruned-r2` | 71 MB |
 | `icu4c@78` | `icu4c@78-v78.3-r2` | 32 MB |
-| `bun-webkit` | `bun-webkit-v6d586e293f-r2` | 23 MB |
+| `bun-webkit` | `bun-webkit-vc9ad5813fd-r1` | 23 MB |
 | `bun-pty` | `bun-pty-v0.4.10-r2` | 270 KB |
 | `lightningcss` | `lightningcss-v1.30.1-r2` | 3.4 MB |
 | `tailwindcss-oxide` | `tailwindcss-oxide-v4.1.11-r2` | 1.3 MB |
-| `bun` | `bun-v1.4.0-r2` | 39 MB |
-| `opencode` | `opencode-v1.17.8-r2` | 57 MB |
+| `bun` | `bun-v1.4.0_1` | 40 MB |
+| `opencode` | `opencode-v1.17.13-r6` | 58 MB |
 
-> `bun-bootstrap` 为预编译 binary pour（212 MB），tag 不含 -r2。
+> `bun-bootstrap` 为预编译 binary pour（41 MB），tag `bun-bootstrap-v1.4.0-e0acad318`。
 
 ## 依赖图
 
