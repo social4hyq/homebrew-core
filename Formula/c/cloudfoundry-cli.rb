@@ -1,8 +1,8 @@
 class CloudfoundryCli < Formula
   desc "Official command-line client for Cloud Foundry"
   homepage "https://docs.cloudfoundry.org/cf-cli"
-  url "https://github.com/cloudfoundry/cli/archive/refs/tags/v8.18.3.tar.gz"
-  sha256 "b1d752410595f21838eafe56887e57d31e1dd212db2d77137d606d5a85039bf0"
+  url "https://github.com/cloudfoundry/cli/archive/refs/tags/v8.18.4.tar.gz"
+  sha256 "1371bedf6c3929d018edb18608634888c0e7a89f6d27faad24ce8bde25e91106"
   license "Apache-2.0"
   head "https://github.com/cloudfoundry/cli.git", branch: "main"
 
@@ -12,7 +12,7 @@ class CloudfoundryCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "639111559fdb159f7e68da040e3a827a6151418d78b3264cd03a05ca2d03f91a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d10ba4b1a15e6433969059ead78b81b280a867822d831e1380029bc4e61dbb2b"
   end
 
   depends_on "go" => :build
