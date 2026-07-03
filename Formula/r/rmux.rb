@@ -6,7 +6,7 @@ class Rmux < Formula
   license any_of: ["MIT", "Apache-2.0"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "53f7677a8917cabbf5f3b73b5cf221b7b73876243f07e4d8bddb6999653957e3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "13587b4acca24ee4d30f717096ad97871efb48e7a8e7e8f7c5f991cbb2d43f2c"
   end
 
   depends_on "rust" => :build
