@@ -11,7 +11,7 @@ class RekorCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a17e8bcb210d7b09bf35716a55bebf1ce173198255b565add4774d1d649570e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b85b3e6dbd421ae1a6296d14cd9995d13bf928ce46d6a9c80394476179065fd"
   end
 
   depends_on "go" => :build
