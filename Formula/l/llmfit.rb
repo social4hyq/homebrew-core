@@ -1,13 +1,13 @@
 class Llmfit < Formula
   desc "Find what models run on your hardware"
   homepage "https://github.com/AlexsJones/llmfit"
-  url "https://static.crates.io/crates/llmfit/llmfit-0.9.34.crate"
-  sha256 "d5bf498338016b12b9e52cdb6c82e93a5daa1c27a786e78a608505214ad154e2"
+  url "https://static.crates.io/crates/llmfit/llmfit-0.9.35.crate"
+  sha256 "bbdc0c09dd06c7989abcd3ca9ce17bcb24bc55fb095db36adbc3fec138f373d2"
   license "MIT"
   head "https://github.com/AlexsJones/llmfit.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "58e58fd69239a8cf9a927d61055e92b14b57aa9bfe8f392358d5e2b32d5b4afa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b433c240636aba5bcd99a3b4201a50072b2799c13d72a901d5c7dd5ff0ba312"
   end
 
   depends_on "rust" => :build
