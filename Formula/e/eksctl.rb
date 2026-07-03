@@ -8,8 +8,7 @@ class Eksctl < Formula
   head "https://github.com/eksctl-io/eksctl.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ce11f9640bb32ed40b8f608c79c087cc2d9c08a008443818c830920c62548af"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9db8a4ed33152ebe9cb78f8d33edb024aca404e8cb4e249845ac586b160bf162"
   end
 
   depends_on "go" => :build
