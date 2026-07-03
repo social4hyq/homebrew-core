@@ -1,8 +1,8 @@
 class Liqoctl < Formula
   desc "Is a CLI tool to install and manage Liqo-enabled clusters"
   homepage "https://liqo.io"
-  url "https://github.com/liqotech/liqo/archive/refs/tags/v1.1.2.tar.gz"
-  sha256 "eee014defa902a22e008f8b1b13bd53f5154629b5f31b9b24e60d102bd9d6125"
+  url "https://github.com/liqotech/liqo/archive/refs/tags/v1.2.0.tar.gz"
+  sha256 "a4fcd3a9acafc67c8eda1dfc1fd5914e827f4ace4843d97026520903ab37254d"
   license "Apache-2.0"
   head "https://github.com/liqotech/liqo.git", branch: "master"
 
