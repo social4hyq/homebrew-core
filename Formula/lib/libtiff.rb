@@ -1,11 +1,10 @@
 class Libtiff < Formula
   desc "TIFF library and utilities"
   homepage "https://libtiff.gitlab.io/libtiff/"
-  url "https://download.osgeo.org/libtiff/tiff-4.7.1.tar.gz"
-  mirror "https://fossies.org/linux/misc/tiff-4.7.1.tar.gz"
-  sha256 "f698d94f3103da8ca7438d84e0344e453fe0ba3b7486e04c5bf7a9a3fabe9b69"
+  url "https://download.osgeo.org/libtiff/tiff-4.7.2.tar.gz"
+  mirror "https://fossies.org/linux/misc/tiff-4.7.2.tar.gz"
+  sha256 "672bd7d10aee4606171afb864f3570b83340f6a33e2c186dc0512f7145ffdf6a"
   license "libtiff"
-  revision 1
   compatibility_version 1
 
   livecheck do
