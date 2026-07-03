@@ -12,7 +12,7 @@ class Openvpn < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a16b98c08b2d54cc926f99fa3c38d0e438cf8298a09e076f1816379f7560bd8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65dc25dfcd2c3f75b072b601eacb6a089405c1d19bad699bbfedf812d083e484"
   end
 
   depends_on "pkgconf" => :build
