@@ -1,8 +1,8 @@
 class Copa < Formula
   desc "Tool to directly patch container images given the vulnerability scanning results"
   homepage "https://github.com/project-copacetic/copacetic"
-  url "https://github.com/project-copacetic/copacetic/archive/refs/tags/v0.14.1.tar.gz"
-  sha256 "2f1a34928192afa3c81cfd8e069e61443e4a1041f8c5cd58c74f9425fea8df4f"
+  url "https://github.com/project-copacetic/copacetic/archive/refs/tags/v0.14.2.tar.gz"
+  sha256 "035d87fb7589234102d17c354ab35e1f2c28f1f80df875bc9438b92a19a86804"
   license "Apache-2.0"
   head "https://github.com/project-copacetic/copacetic.git", branch: "main"
 
