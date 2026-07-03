@@ -1,5 +1,5 @@
 diff --git a/src/jsc/bindings/bun-spawn.cpp b/src/jsc/bindings/bun-spawn.cpp
-index 51fd666a9b..c932b55a14 100644
+index 51fd666a9b..00678aae1a 100644
 --- a/src/jsc/bindings/bun-spawn.cpp
 +++ b/src/jsc/bindings/bun-spawn.cpp
 @@ -4,6 +4,7 @@
@@ -10,7 +10,7 @@ index 51fd666a9b..c932b55a14 100644
  #include <signal.h>
  #include <unistd.h>
  #include <sys/stat.h>
-@@ -114,11 +115,12 @@ typedef struct bun_spawn_request_t {
+@@ -114,11 +115,12 @@
  // as _exit() may try to acquire locks held by threads that don't exist in the child.
  static inline void rawExit(int status)
  {
@@ -27,7 +27,20 @@ index 51fd666a9b..c932b55a14 100644
  }
  
  extern "C" ssize_t posix_spawn_bun(
-@@ -146,28 +148,37 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -131,9 +133,9 @@
+     sigset_t blockall, oldmask;
+     int res = 0, cs = 0;
+ 
+-#if OS(DARWIN) || OS(FREEBSD)
+-    // On macOS, we use fork() which requires a self-pipe trick to detect exec failures.
+-    // Create a pipe for child-to-parent error communication.
++#if OS(DARWIN) || OS(FREEBSD) || defined(__OHOS__)
++    // On macOS/FreeBSD/OHOS, we use fork() which requires a self-pipe trick to
++    // detect exec failures. Create a pipe for child-to-parent error communication.
+     // The write end has O_CLOEXEC so it's automatically closed on successful exec.
+     // If exec fails, child writes errno to the pipe.
+     int errpipe[2];
+@@ -146,31 +148,34 @@
  
      sigfillset(&blockall);
      sigprocmask(SIG_SETMASK, &blockall, &oldmask);
@@ -69,16 +82,14 @@ index 51fd666a9b..c932b55a14 100644
 -    // This code path should only be used for PTY spawns on macOS.
 -    pid_t child = fork();
 +    child = fork();
-+#if defined(__OHOS__)
-+    // OHOS uses fork() (vfork is blocked by seccomp). With fork(), child has
-+    // its own memory — the volatile child_errno mechanism (used for vfork
-+    // shared-memory semantics) is unreliable. Skip child_errno checks.
-+    use_fork_fallback = true;
-+#endif
  #endif
  
- #if OS(DARWIN) || OS(FREEBSD)
-@@ -341,7 +352,10 @@ extern "C" ssize_t posix_spawn_bun(
+-#if OS(DARWIN) || OS(FREEBSD)
++#if OS(DARWIN) || OS(FREEBSD) || defined(__OHOS__)
+     const auto childFailed = [&]() -> ssize_t {
+         int err = errno;
+         // Write errno to pipe so parent can read it
+@@ -341,7 +346,10 @@
          if (!envp)
              envp = environ;
  
@@ -90,7 +101,26 @@ index 51fd666a9b..c932b55a14 100644
          closeRangeOrLoop(current_max_fd + 1, INT_MAX, true);
  
          if (execve(path, argv, envp) == -1) {
-@@ -405,10 +419,17 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -354,15 +362,15 @@
+     };
+ 
+     if (child == 0) {
+-#if OS(DARWIN) || OS(FREEBSD)
++#if OS(DARWIN) || OS(FREEBSD) || defined(__OHOS__)
+         // Close read end in child
+         close(errpipe[0]);
+ #endif
+         return startChild();
+     }
+ 
+-#if OS(DARWIN) || OS(FREEBSD)
+-    // macOS fork() path: use self-pipe trick to detect exec failure
++#if OS(DARWIN) || OS(FREEBSD) || defined(__OHOS__)
++    // macOS/FreeBSD/OHOS fork() path: use self-pipe trick to detect exec failure
+     // Parent: close write end
+     close(errpipe[1]);
+ 
+@@ -405,10 +413,17 @@
      }
  #else
      // Linux vfork() path: parent resumes after child calls exec or _exit
@@ -111,7 +141,7 @@ index 51fd666a9b..c932b55a14 100644
              // Reap the zombie child process
              wait4(child, NULL, 0, NULL);
              res = child_errno;
-@@ -420,7 +441,7 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -420,7 +435,7 @@
              }
          }
      } else {
@@ -120,7 +150,7 @@ index 51fd666a9b..c932b55a14 100644
          res = errno;
      }
  
-@@ -432,7 +453,7 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -432,7 +447,7 @@
  #endif
  
      sigprocmask(SIG_SETMASK, &oldmask, 0);
