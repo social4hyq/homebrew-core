@@ -1,5 +1,5 @@
 diff --git a/src/jsc/bindings/bun-spawn.cpp b/src/jsc/bindings/bun-spawn.cpp
-index 6ed66116c7..4abf280728 100644
+index 51fd666a9b..c932b55a14 100644
 --- a/src/jsc/bindings/bun-spawn.cpp
 +++ b/src/jsc/bindings/bun-spawn.cpp
 @@ -4,6 +4,7 @@
@@ -10,7 +10,7 @@ index 6ed66116c7..4abf280728 100644
  #include <signal.h>
  #include <unistd.h>
  #include <sys/stat.h>
-@@ -109,11 +110,12 @@ typedef struct bun_spawn_request_t {
+@@ -114,11 +115,12 @@ typedef struct bun_spawn_request_t {
  // as _exit() may try to acquire locks held by threads that don't exist in the child.
  static inline void rawExit(int status)
  {
@@ -27,7 +27,7 @@ index 6ed66116c7..4abf280728 100644
  }
  
  extern "C" ssize_t posix_spawn_bun(
-@@ -141,23 +143,31 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -146,28 +148,37 @@ extern "C" ssize_t posix_spawn_bun(
  
      sigfillset(&blockall);
      sigprocmask(SIG_SETMASK, &blockall, &oldmask);
@@ -47,11 +47,18 @@ index 6ed66116c7..4abf280728 100644
 +    // if vfork fails (e.g. blocked by seccomp on platforms like OHOS).
 +    // On other Unix platforms (macOS, FreeBSD), use fork() directly.
      volatile int child_errno = 0;
--    pid_t child = vfork();
 +    bool use_fork_fallback = false;
++    int saved_dumpable = -1;
 +
 +    pid_t child;
 +#if OS(LINUX) && !defined(__OHOS__)
+     // The vfork child shares this mm, and set*id in the child resets the
+     // mm-wide "dumpable" flag to /proc/sys/fs/suid_dumpable (commit_creds).
+     // Save it so the parent can restore it once vfork returns, like Go's
+     // forkAndExecInChild1 and systemd's safe_fork_full do.
+-    int saved_dumpable = (request->set_uid || request->set_gid) ? prctl(PR_GET_DUMPABLE, 0, 0, 0, 0) : -1;
+-    pid_t child = vfork();
++    saved_dumpable = (request->set_uid || request->set_gid) ? prctl(PR_GET_DUMPABLE, 0, 0, 0, 0) : -1;
 +    child = vfork();
 +    if (child == -1) {
 +        use_fork_fallback = true;
@@ -71,7 +78,7 @@ index 6ed66116c7..4abf280728 100644
  #endif
  
  #if OS(DARWIN) || OS(FREEBSD)
-@@ -297,7 +307,10 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -341,7 +352,10 @@ extern "C" ssize_t posix_spawn_bun(
          if (!envp)
              envp = environ;
  
@@ -83,7 +90,7 @@ index 6ed66116c7..4abf280728 100644
          closeRangeOrLoop(current_max_fd + 1, INT_MAX, true);
  
          if (execve(path, argv, envp) == -1) {
-@@ -361,10 +374,17 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -405,10 +419,17 @@ extern "C" ssize_t posix_spawn_bun(
      }
  #else
      // Linux vfork() path: parent resumes after child calls exec or _exit
@@ -104,7 +111,7 @@ index 6ed66116c7..4abf280728 100644
              // Reap the zombie child process
              wait4(child, NULL, 0, NULL);
              res = child_errno;
-@@ -376,13 +396,13 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -420,7 +441,7 @@ extern "C" ssize_t posix_spawn_bun(
              }
          }
      } else {
@@ -112,6 +119,8 @@ index 6ed66116c7..4abf280728 100644
 +        // fork/vfork() failed
          res = errno;
      }
+ 
+@@ -432,7 +453,7 @@ extern "C" ssize_t posix_spawn_bun(
  #endif
  
      sigprocmask(SIG_SETMASK, &oldmask, 0);

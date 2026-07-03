@@ -1,5 +1,5 @@
 diff --git a/package.json b/package.json
-index fda02bd39d..ea261fa6f5 100644
+index 9ca95609b3..d53e84f798 100644
 --- a/package.json
 +++ b/package.json
 @@ -11,7 +11,8 @@
@@ -10,9 +10,9 @@ index fda02bd39d..ea261fa6f5 100644
 +    "esbuild": "^0.28.1",
 +    "ohos-signpost": "^1.0.2",
      "mitata": "^0.1.14",
+     "oxlint": "1.70.0",
      "peechy": "0.4.34",
-     "prettier": "^3.6.2",
-@@ -19,7 +20,7 @@
+@@ -20,7 +21,7 @@
      "react": "^18.3.1",
      "react-dom": "^18.3.1",
      "source-map-js": "^1.2.1",
@@ -21,7 +21,7 @@ index fda02bd39d..ea261fa6f5 100644
    },
    "resolutions": {
      "bun-types": "workspace:packages/bun-types",
-@@ -27,6 +28,7 @@
+@@ -28,6 +29,7 @@
      "@types/node": "25.0.0"
    },
    "scripts": {

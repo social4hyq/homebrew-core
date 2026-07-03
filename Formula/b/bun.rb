@@ -5,9 +5,10 @@ class Bun < Formula
   # 50+ OHOS-specific patches (pr3-pr8), L4 self-bootstrap via bun-bootstrap, a
   # pre-populated WebKit cache, and a Rust nightly toolchain with -Zbuild-std.
   # Upstream formula cannot accommodate these build requirements.
-  url "https://gh-proxy.com/https://github.com/oven-sh/bun.git", revision: "e0acad3182a23af828e383a7b419fe82bc0d125f"
+  url "https://gh-proxy.com/https://github.com/oven-sh/bun.git", revision: "1498d7b77a5a6fd18075425aef4fc7b737ec8e08"
   version "1.4.0"
   license "MIT"
+  revision 1
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -16,9 +17,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc9758fa9bf39bfd46d5dbe12d84a3968630b9a9ccee263d8065ce2fd6bbb4a0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0_1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "484b908ad6a85ed1c20287a4e5243ba326fed587daeb7cb1d9f36054aa0764f6"
   end
 
   # ── Dependencies (all bare names, zero changes when graduating to harmonybrew/core) ──
@@ -321,7 +321,7 @@ class Bun < Formula
     # ── Pre-populate WebKit cache (bun bd's fetch checks .identity to skip download) ──
     # webkit.ts.patch performs the same operation inside the source function, but the
     # ninja fetch step may run before the source function takes effect — belt and suspenders.
-    webkit_ver = "6d586e293f008f0e74e5697611a379b1b24815c9"
+    webkit_ver = "c9ad5813fd23bd8b98b0738abc3d037ec716aa92"
     brew_home = Pathname.new(Dir.home)
     wc = brew_home/".bun/build-cache/webkit-#{webkit_ver[0...16]}-ohos-arm64"
     wc.mkpath
@@ -338,7 +338,7 @@ class Bun < Formula
       cp webkit.include/"webkit/cmakeconfig.h", "cmakeconfig.h"
     end
     %w[libicudata.a libicui18n.a libicuuc.a].each do |a|
-      ln_sf Formula["icu4c@78"].opt_lib/a, wc/"lib"/a
+      ln_sf Formula["social4hyq/core/icu4c@78"].opt_lib/a, wc/"lib"/a
     end
 
     # ── Scaffold build/ohos-icu/{target,host} layout for bun's config.ts ──
@@ -347,7 +347,7 @@ class Bun < Formula
     # build-icu.sh, so point this layout at icu4c@78 formula instead.
     # webkit.ts:472 also resolves hostBin = <ohosIcuDir>/../host/bin for ICU
     # data tools (genrb/genccode/gencmn/pkgdata) — symlink those too.
-    icu = Formula["icu4c@78"]
+    icu = Formula["social4hyq/core/icu4c@78"]
     (buildpath/"build/ohos-icu/target/include").mkpath
     ln_sf icu.opt_include/"unicode", buildpath/"build/ohos-icu/target/include/unicode"
     (buildpath/"build/ohos-icu/target/lib").mkpath
@@ -436,6 +436,9 @@ class Bun < Formula
       mv -f "$out" "$tmp"
       if "#{Formula["ohos-sdk"].opt_bin}/binary-sign-tool" sign -selfSign 1 -inFile "$tmp" -outFile "$out" >/dev/null 2>&1; then
         chmod +x "$out"
+        # OHOS/tmpfs race: cargo build-script exec right after signing hits ETXTBSY
+        # (kernel still sees stale writable fd reference). Force flush + brief settle.
+        sync
         rm -f "$tmp"
       else
         mv -f "$tmp" "$out"
