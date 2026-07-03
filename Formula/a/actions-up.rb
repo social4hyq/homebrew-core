@@ -1,8 +1,8 @@
 class ActionsUp < Formula
   desc "Tool to update GitHub Actions to latest versions with SHA pinning"
   homepage "https://github.com/azat-io/actions-up"
-  url "https://registry.npmjs.org/actions-up/-/actions-up-1.15.0.tgz"
-  sha256 "80c158ce2566661e211d3df75414525f868d1785ba40571fa62a7b2a45f4a888"
+  url "https://registry.npmjs.org/actions-up/-/actions-up-1.16.0.tgz"
+  sha256 "26c3ea5750a0fad9ea58923fb789c43f72b485c4414ffaa66ffc34a4ca7bb07b"
   license "MIT"
 
   bottle do
