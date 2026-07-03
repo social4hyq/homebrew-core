@@ -1,13 +1,13 @@
 class Models < Formula
   desc "Fast TUI and CLI for browsing AI models, benchmarks, and coding agents"
   homepage "https://github.com/arimxyer/models"
-  url "https://github.com/arimxyer/models/archive/refs/tags/v0.13.0.tar.gz"
-  sha256 "b747f3669a41926af9cdeb74e2d8e8f65d18479598c582ac5b6c541101355a60"
+  url "https://github.com/arimxyer/models/archive/refs/tags/v0.14.0.tar.gz"
+  sha256 "668c931304d80d95aac4a2bcf3f85b6aa3e1e1a457901c943a16f6d7df6230cb"
   license "MIT"
   head "https://github.com/arimxyer/models.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dfbf29b3c0b2896bd91937cd1947226c19087a1c5ac59c62aaf2890a4bb781ac"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d662931b48abb400fd74b6095819c2fb1af47b175196c00b580cb69fd27b0e5"
   end
 
   depends_on "rust" => :build
