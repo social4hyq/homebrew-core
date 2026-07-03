@@ -13,7 +13,8 @@ class PythonAT314 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad5a60a0009b0efe3de765c09b400b6b4a4da4a6b2cc3186f6014a873a0d2ca5"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f572540f17eff26009a0d8eadf30e2489f3f1d37e94cb2912c8effedd008746a"
   end
 
   depends_on "pkgconf" => :build
@@ -210,16 +211,11 @@ class PythonAT314 < Formula
       system "make", "frameworkinstallextras", "PYTHONAPPSDIR=#{pkgshare}" if OS.mac?
     end
 
-    # Inject musl-compat shim into libpython3.so via DT_NEEDED.
+    # Inject musl-compat shim into python via DT_NEEDED.
     # This is done post-build so configure/make never see the extra symbols,
     # avoiding false detection of features (e.g. qsort_r) that rely on
     # kernel support not available on the target system.
-    # Use .realpath to resolve any symlinks before writing DT_NEEDED.
-    libpython = Pathname.new(lib/"libpython3.14.so").realpath
-    musl_compat_lib = Formula["musl-compat"].opt_lib/"libmusl_compat.so"
-    system "patchelf", "--add-needed", musl_compat_lib.to_s, libpython.to_s
-    system "patchelf", "--add-rpath", Formula["musl-compat"].opt_lib.to_s,
-           libpython.to_s
+    system "patchelf", "--add-needed", "libmusl_compat.so", bin/"python3.14"
 
     if OS.mac?
       # Any .app get a " 3" attached, so it does not conflict with python 2.x.
