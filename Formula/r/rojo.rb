@@ -3,13 +3,13 @@ class Rojo < Formula
   homepage "https://rojo.space/"
   # pull from git tag to get submodules
   url "https://github.com/rojo-rbx/rojo.git",
-      tag:      "v7.6.1",
-      revision: "825726c8835d26e37290cb7343e7765741aefefd"
+      tag:      "v7.7.0",
+      revision: "bcadc97de27ab3800e915abcb72c6c7a3c30f363"
   license "MPL-2.0"
   head "https://github.com/rojo-rbx/rojo.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f12d10abf388557d5fac8aeeb90ee50f9880b0cabeb32e1856d401e73c4a368"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "537741b9c941b77c1b99ec177d254158c01eabed0d8cd387eec9045fabcb7ad7"
   end
 
   depends_on "pkgconf" => :build
