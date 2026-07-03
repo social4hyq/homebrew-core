@@ -7,7 +7,7 @@ class GoTask < Formula
   head "https://github.com/go-task/task.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2024328e7f598f7498609d1af68718b96f18d25cd8f86cd76cb33c30b20da011"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e790e177976333a782e5f0cb2f1737c1b0c8568d37df7c2305a4a1c7cdb594af"
   end
 
   depends_on "go" => :build
