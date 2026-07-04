@@ -9,7 +9,7 @@ class Aerleon < Formula
   head "https://github.com/aerleon/aerleon.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdf9a8034f635af34c4d1aef803239228f82fb67ceb7a921dd80c9835c7e34cf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "98632532cb4832a330913dcfcfa11377327e2eaf6fe4db1974b7e629874e050f"
   end
 
   depends_on "libyaml"
