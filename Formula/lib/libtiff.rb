@@ -1,11 +1,10 @@
 class Libtiff < Formula
   desc "TIFF library and utilities"
   homepage "https://libtiff.gitlab.io/libtiff/"
-  url "https://download.osgeo.org/libtiff/tiff-4.7.1.tar.gz"
-  mirror "https://fossies.org/linux/misc/tiff-4.7.1.tar.gz"
-  sha256 "f698d94f3103da8ca7438d84e0344e453fe0ba3b7486e04c5bf7a9a3fabe9b69"
+  url "https://download.osgeo.org/libtiff/tiff-4.7.2.tar.gz"
+  mirror "https://fossies.org/linux/misc/tiff-4.7.2.tar.gz"
+  sha256 "672bd7d10aee4606171afb864f3570b83340f6a33e2c186dc0512f7145ffdf6a"
   license "libtiff"
-  revision 1
   compatibility_version 1
 
   livecheck do
@@ -14,7 +13,7 @@ class Libtiff < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e45bc6ff5fe11f6dab6d238da706d964947b079b73eaae9b7d0047855cbb9010"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c90967d28bdaccb00269107cf908c0b488f286f81ed3fb7d92f0c2b21dfdd47"
   end
 
   depends_on "jpeg-turbo"
