@@ -12,7 +12,7 @@ class Scarb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e38407ee96dda23643296ff8d969cedf89e53460e4c167688796b6cb1c139d15"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e17786e5e68f179ef76b5633611cd1def1ad8ee81bca37215bed964dc7fd2634"
   end
 
   depends_on "rust" => :build
