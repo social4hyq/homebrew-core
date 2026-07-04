@@ -8,7 +8,7 @@ class Bun < Formula
   url "https://gh-proxy.com/https://github.com/oven-sh/bun.git", revision: "1498d7b77a5a6fd18075425aef4fc7b737ec8e08"
   version "1.4.0"
   license "MIT"
-  revision 6
+  revision 7
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -17,8 +17,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "77a0f4c817ed1662bf5c71ced018b7d00f885156ec1e497ca276984ede914ac4"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a26a56f05f326a9467585a77066bcf9168852e416f3f98cc3a3714e56b9d70af"
   end
 
   # ── Dependencies (all bare names, zero changes when graduating to harmonybrew/core) ──
@@ -155,6 +155,10 @@ class Bun < Formula
   patch :p1 do
     # OHOS build artifacts invoke binary-sign-tool for signing and chmod 755 (seccomp requirement)
     file "Patches/bun/pr5-ohos-runtime/build_command.rs.patch"
+  end
+  patch :p1 do
+    # OHOS Bun.build({compile}) JS API mirrors the CLI compile sign hook
+    file "Patches/bun/pr5-ohos-runtime/js_bundle_completion_task.rs.patch"
   end
   patch :p1 do
     # OHOS sets $PWD; pipes are marked socket+non-blocking to avoid blocking infinite loops
