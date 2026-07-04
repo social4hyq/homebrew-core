@@ -7,7 +7,7 @@ class Copa < Formula
   head "https://github.com/project-copacetic/copacetic.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "944bb50de5ba8b66e6a9382524f6591680846a3aaa7886cc606efd6acd1d587e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0965b860c4cb4f406230e19c32c16132d7629af9849e60f6188d3746ee7407ed"
   end
 
   depends_on "go" => :build
