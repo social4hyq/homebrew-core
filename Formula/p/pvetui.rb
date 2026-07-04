@@ -7,7 +7,7 @@ class Pvetui < Formula
   head "https://github.com/devnullvoid/pvetui.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f46cc2d0f77e5e5bfdc8c0390a0652061754c4dedfa8202890599ce796009b1f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a59091ef83a40b55398376600830cc7dff55d587037a3973425b15a41c4dbab9"
   end
 
   depends_on "go" => :build
