@@ -30,6 +30,9 @@ index 49e22af83b..bf4a35a703 100644
 +                            .map(|o| String::from_utf8_lossy(&o.stdout).contains("codesign"))
 +                            .unwrap_or(false);
 +                        if !already_signed {
++                            // Ensure file data is synced before signing (hmfs may not commit
++                            // the write without explicit fsync, producing misaligned codesign).
++                            let _ = std::fs::File::open(outfile_os).and_then(|f| f.sync_all());
 +                            // binary-sign-tool sign first, then chmod
 +                            let _ = std::process::Command::new("binary-sign-tool")
 +                                .arg("sign")

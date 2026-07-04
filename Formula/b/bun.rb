@@ -8,7 +8,7 @@ class Bun < Formula
   url "https://gh-proxy.com/https://github.com/oven-sh/bun.git", revision: "1498d7b77a5a6fd18075425aef4fc7b737ec8e08"
   version "1.4.0"
   license "MIT"
-  revision 2
+  revision 3
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
