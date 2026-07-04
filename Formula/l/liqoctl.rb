@@ -7,7 +7,7 @@ class Liqoctl < Formula
   head "https://github.com/liqotech/liqo.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4031484a97928539c1e152f40649e749248915a029475fc1428c25716ecf7759"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2fb28fc507b9526383a021320bf58b048ddf24873ec252f56299e4a0dad7a38"
   end
 
   depends_on "go" => :build
