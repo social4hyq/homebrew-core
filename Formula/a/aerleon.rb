@@ -3,13 +3,13 @@ class Aerleon < Formula
 
   desc "Generate firewall configs for multiple firewall platforms"
   homepage "https://aerleon.readthedocs.io/en/latest/"
-  url "https://files.pythonhosted.org/packages/91/27/aeaf0098e517f9eeda65e71f5764f3913d465d2c7557281f69b43a66d83c/aerleon-1.16.0.tar.gz"
-  sha256 "3678e15a1faf00fc63263bbbc413e746261893c59d3383358d23a7f1a04ab61c"
+  url "https://files.pythonhosted.org/packages/65/db/570b7174e40919b131ec3cef0fc373e39213b39398c8adb032a41c99f249/aerleon-1.17.0.tar.gz"
+  sha256 "debb66a0749c3c24df8ba27a3be09b87a70fdc023eb0da4e8a7f20c036f995ea"
   license "Apache-2.0"
   head "https://github.com/aerleon/aerleon.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdf9a8034f635af34c4d1aef803239228f82fb67ceb7a921dd80c9835c7e34cf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "98632532cb4832a330913dcfcfa11377327e2eaf6fe4db1974b7e629874e050f"
   end
 
   depends_on "libyaml"
@@ -28,8 +28,8 @@ class Aerleon < Formula
   end
 
   resource "typing-extensions" do
-    url "https://files.pythonhosted.org/packages/72/94/1a15dd82efb362ac84269196e94cf00f187f7ed21c242792a923cdb1c61f/typing_extensions-4.15.0.tar.gz"
-    sha256 "0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466"
+    url "https://files.pythonhosted.org/packages/f6/cc/6253133b5bb138fc3306cebfbda2c520f545d36b5be2c7255cc528bb45d6/typing_extensions-4.16.0.tar.gz"
+    sha256 "dc983d19a509c94dba722ee6abd33940f7c05a89e243c47e907eb4db6f1a43e5"
   end
 
   def install
