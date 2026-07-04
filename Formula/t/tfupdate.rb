@@ -7,7 +7,7 @@ class Tfupdate < Formula
   head "https://github.com/minamijoyo/tfupdate.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "447bdbf0e96321b545b39b5ad921ff6db3980cb88de9d62831ada7013dcc74ca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e859a1b8fd975ba095148ab5c819a1a27b899d0135f6d8a8c03c673d04c022a5"
   end
 
   depends_on "go" => :build
