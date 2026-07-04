@@ -8,7 +8,7 @@ class Bun < Formula
   url "https://gh-proxy.com/https://github.com/oven-sh/bun.git", revision: "1498d7b77a5a6fd18075425aef4fc7b737ec8e08"
   version "1.4.0"
   license "MIT"
-  revision 3
+  revision 6
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -17,8 +17,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0_2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f0a0fefe25c36e016a04f91aaeab63309f8d501aa83d0e4fafc6bb4cf862647"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "77a0f4c817ed1662bf5c71ced018b7d00f885156ec1e497ca276984ede914ac4"
   end
 
   # ── Dependencies (all bare names, zero changes when graduating to harmonybrew/core) ──

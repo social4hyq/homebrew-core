@@ -1,48 +1,59 @@
 diff --git a/src/runtime/cli/build_command.rs b/src/runtime/cli/build_command.rs
-index 49e22af83b..bf4a35a703 100644
 --- a/src/runtime/cli/build_command.rs
 +++ b/src/runtime/cli/build_command.rs
-@@ -975,6 +975,48 @@ impl BuildCommand {
+@@ -984,6 +984,63 @@
                      }
                  }
  
 +                // OHOS: sign the compiled binary so it can execute (seccomp policy).
++                // bun's compile appends `.bun` payload of variable size, which pushes
++                // the stale `.codesign` section to a non-4KB-aligned file offset.
++                // binary-sign-tool refreshes codesign contents in-place, so we must
++                // strip the stale section first (llvm-objcopy) then sign, letting the
++                // tool place a fresh 4KB-aligned `.codesign` at the file end.
 +                #[cfg(target_env = "ohos")]
 +                {
 +                    use std::os::unix::ffi::OsStrExt;
++                    // The compiled binary is physically written at `root_dir/basename(outfile)`.
++                    // When `--outfile` is absolute, `outfile` still holds the full path but
++                    // `root_path = dirname(outfile)`, so naive concat produces a doubled path.
++                    // Always take the basename of `outfile` and join with `root_path`.
++                    let outfile_basename: &[u8] = match outfile.iter().rposition(|&b| b == b'/') {
++                        Some(i) => &outfile[i + 1..],
++                        None => outfile,
++                    };
 +                    let outfile_path = if root_path.is_empty() || root_path == b"." {
-+                        outfile.to_vec()
++                        outfile_basename.to_vec()
 +                    } else {
 +                        let mut full = root_path.to_vec();
 +                        if !full.ends_with(b"/") {
 +                            full.push(b'/');
 +                        }
-+                        full.extend_from_slice(outfile);
++                        full.extend_from_slice(outfile_basename);
 +                        full
 +                    };
 +                    if !outfile_path.is_empty() {
 +                        let outfile_os = std::ffi::OsStr::from_bytes(&outfile_path[..]);
-+                        // Check if already signed — binary-sign-tool adds a "codesign" section
-+                        let already_signed = std::process::Command::new("readelf")
-+                            .arg("-S")
-+                            .arg(outfile_os)
-+                            .output()
-+                            .map(|o| String::from_utf8_lossy(&o.stdout).contains("codesign"))
-+                            .unwrap_or(false);
-+                        if !already_signed {
-+                            // Ensure file data is synced before signing (hmfs may not commit
-+                            // the write without explicit fsync, producing misaligned codesign).
-+                            let _ = std::fs::File::open(outfile_os).and_then(|f| f.sync_all());
-+                            // binary-sign-tool sign first, then chmod
++                        let _ = std::fs::File::open(outfile_os).and_then(|f| f.sync_all());
++                        let mut unsigned_path = outfile_path.clone();
++                        unsigned_path.extend_from_slice(b".unsigned");
++                        let unsigned_os = std::ffi::OsStr::from_bytes(&unsigned_path[..]);
++                        if std::fs::rename(outfile_os, unsigned_os).is_ok() {
++                            let _ = std::process::Command::new("llvm-objcopy")
++                                .arg("--remove-section=.codesign")
++                                .arg(unsigned_os)
++                                .arg(unsigned_os)
++                                .output();
 +                            let _ = std::process::Command::new("binary-sign-tool")
 +                                .arg("sign")
 +                                .arg("-inFile")
-+                                .arg(outfile_os)
++                                .arg(unsigned_os)
 +                                .arg("-outFile")
 +                                .arg(outfile_os)
 +                                .arg("-selfSign")
 +                                .arg("1")
 +                                .output();
++                            let _ = std::fs::remove_file(unsigned_os);
 +                        }
 +                        let _ = std::process::Command::new("chmod")
 +                            .arg("755")
