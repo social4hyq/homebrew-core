@@ -1,13 +1,13 @@
 class SequoiaSqv < Formula
   desc "Simple OpenPGP signature verification program"
   homepage "https://sequoia-pgp.org/"
-  url "https://gitlab.com/sequoia-pgp/sequoia-sqv/-/archive/v1.4.0/sequoia-sqv-v1.4.0.tar.bz2"
-  sha256 "1b004c7cbd3aa5ec39b445ea19eb8034111d668e92d1aab277a582e39101912c"
+  url "https://gitlab.com/sequoia-pgp/sequoia-sqv/-/archive/v1.5.0/sequoia-sqv-v1.5.0.tar.bz2"
+  sha256 "695749c7b8dc006c0d5ade1830bf6263453eff8211d1e18402f6686327124800"
   license "LGPL-2.0-or-later"
   head "https://gitlab.com/sequoia-pgp/sequoia-sqv.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "26f0b7c0294e1a97354cd8afe069b64b51834894d05befa9e1a1d994396af1ce"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ba9cfa151b48c6404f86d33dc4e2a8ffc52af11fad4208e0add9357e82c3891"
   end
 
   depends_on "pkgconf" => :build
