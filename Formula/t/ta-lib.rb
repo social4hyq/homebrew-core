@@ -6,7 +6,7 @@ class TaLib < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "16dc9a521a4a779c36ce7803a9f895721ee1390f9b7548c9caf0bc14fd70c354"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88ea7089f2b33748f74a0c7a9a5b3781f9d2f2839e49862db43431e1a82e6791"
   end
 
   on_macos do
