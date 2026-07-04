@@ -12,7 +12,7 @@ class Arkade < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "09e070928e43ff965418695ecd681653dd4022e51e6c276f854a1296ea3aa5bf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "32f564a120927cc394bec2a9f3bb803433d024dbcde54e1a4dddcb70e8e08a00"
   end
 
   depends_on "go" => :build
