@@ -2,8 +2,8 @@ class Kubeseal < Formula
   desc "Kubernetes controller and tool for one-way encrypted Secrets"
   homepage "https://github.com/bitnami-labs/sealed-secrets"
   url "https://github.com/bitnami-labs/sealed-secrets.git",
-      tag:      "v0.38.1",
-      revision: "706528904566e28373b584b5adb7e92ef8f81c1d"
+      tag:      "v0.38.4",
+      revision: "0cc547ad0c3756726768dcc916e39de3ac5b101b"
   license "Apache-2.0"
   head "https://github.com/bitnami-labs/sealed-secrets.git", branch: "main"
 
@@ -13,7 +13,7 @@ class Kubeseal < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "078d4f67383751b67c1e9a62b9c0e0c11fea04ffe6cbca76d7184e8009b9db95"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1b42314dd3e5dd409f183d1323eb0bcd1aabcfc1c1ecdc843c45a627c057ffd"
   end
 
   depends_on "go" => :build
