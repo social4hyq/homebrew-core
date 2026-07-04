@@ -9,7 +9,7 @@ class SigmaCli < Formula
   head "https://github.com/SigmaHQ/sigma-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0de21bc172c71a0f6d56c2cc78df35b92e3c023e23eb2d6f7fe3e8093bbac6cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dca212ae59a7f5b7fa0d50dbf29133fd1b17e83743d62002d0b81785387a7274"
   end
 
   depends_on "certifi" => :no_linkage
