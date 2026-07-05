@@ -1,13 +1,13 @@
 class Stormlib < Formula
   desc "Library for handling Blizzard MPQ archives"
   homepage "http://www.zezula.net/en/mpq/stormlib.html"
-  url "https://github.com/ladislav-zezula/StormLib/archive/refs/tags/v9.31.tar.gz"
-  sha256 "c8d77e626cc907c8f2d00bb5c48f9d6c70344848d49cab4468f6234afaf815c1"
+  url "https://github.com/ladislav-zezula/StormLib/archive/refs/tags/v9.40.tar.gz"
+  sha256 "f80b08bae168888702a4251312d6c2279f487673df611c2b5ef4f395e810c3b1"
   license "MIT"
   head "https://github.com/ladislav-zezula/StormLib.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "84ec3c22c074ebd4a4bcaa578e2456ce9908afeb506e132ab5a2c7adfc1cde03"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6ba4c402cc7dd0c78f86d843f47d46c1afbe23f3530b187b400ab12d96084c5"
   end
 
   depends_on "cmake" => :build
