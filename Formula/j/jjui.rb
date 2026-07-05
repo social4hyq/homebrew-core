@@ -1,12 +1,12 @@
 class Jjui < Formula
   desc "TUI for interacting with the Jujutsu version control system"
   homepage "https://github.com/idursun/jjui"
-  url "https://github.com/idursun/jjui/archive/refs/tags/v0.10.7.tar.gz"
-  sha256 "87fd894a2272d91ad7a4576f0d44cfd161421c3a242e1e91f84c40b6357e27bb"
+  url "https://github.com/idursun/jjui/archive/refs/tags/v0.10.8.tar.gz"
+  sha256 "964fc721c5494237a8259b044001327d7c93aa58aba07f9444d873f05d18d21d"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "39d33541c1f7c813643ed3951482de01d283ebf79c2d11c7e1cb7339801af175"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "18992f9993c371e10dc6d01edf5618185a5bf97f9e5dd24e1be2f6f1307eaea4"
   end
 
   depends_on "go" => :build
