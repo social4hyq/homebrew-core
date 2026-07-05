@@ -8,7 +8,7 @@ class Bun < Formula
   url "https://gh-proxy.com/https://github.com/oven-sh/bun.git", revision: "1498d7b77a5a6fd18075425aef4fc7b737ec8e08"
   version "1.4.0"
   license "MIT"
-  revision 8
+  revision 9
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -89,7 +89,8 @@ class Bun < Formula
     file "Patches/bun/pr4-build-target/config.ts.patch"
   end
   patch :p1 do
-    # OHOS compile/link flags: triple, sysroot, libc++, PIE, 8MB stack, no zstd debug
+    # OHOS compile/link flags: triple, sysroot, libc++, PIE, 8MB stack, no zstd debug,
+    # + dynamic symbol list + version script (exposes napi_/node_api_ for .node dlopen)
     file "Patches/bun/pr4-build-target/flags.ts.patch"
   end
   patch :p1 do

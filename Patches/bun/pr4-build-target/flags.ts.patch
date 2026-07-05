@@ -1,20 +1,20 @@
 diff --git a/scripts/build/flags.ts b/scripts/build/flags.ts
-index 7759c7576d..8a7b9c7829 100644
+index 7759c7576d..0000000000 100644
 --- a/scripts/build/flags.ts
 +++ b/scripts/build/flags.ts
-@@ -67,6 +67,11 @@ export const cpuTargetFlags: Flag[] = [
-     when: c => c.windows && c.arm64,
+@@ -68,6 +68,11 @@
      desc: "ARM64 Windows: clang-cl prefix required (/clang: passes to clang)",
    },
-+  {
+   {
 +    flag: ["-march=armv8-a", "-mtune=cortex-a53"],
 +    when: c => c.ohos && c.arm64,
 +    desc: "OHOS aarch64: ARMv8.0 baseline (no crypto, no SVE, no dotprod, no LSE)",
 +  },
-   {
++  {
      flag: "-march=nehalem",
      when: c => c.x64 && c.baseline,
-@@ -208,6 +213,41 @@ export const globalFlags: Flag[] = [
+     desc: "x64 baseline: Nehalem (2008) — no AVX, broadest compatibility",
+@@ -208,6 +213,41 @@
      desc: "macOS cross: address-significance table for the linker's safe ICF",
    },
  
@@ -56,7 +56,7 @@ index 7759c7576d..8a7b9c7829 100644
    // ─── CPU target ───
    ...cpuTargetFlags,
    {
-@@ -293,10 +333,16 @@ export const globalFlags: Flag[] = [
+@@ -293,11 +333,17 @@
    {
      // Nix LLVM doesn't support zstd — but we target standard distros.
      // Nix users can override via profile if needed.
@@ -66,28 +66,29 @@ index 7759c7576d..8a7b9c7829 100644
 +    when: c => c.unix && c.debug && !c.ohos,
      desc: "Full debug info, zstd-compressed",
    },
-+  {
+   {
 +    flag: "-g3",
 +    when: c => c.unix && c.debug && c.ohos,
 +    desc: "Full debug info, uncompressed (OHOS host LLVM lacks zstd)",
 +  },
-   {
++  {
      flag: "-g1",
      when: c => c.unix && c.release,
-@@ -596,6 +642,12 @@ export const bunOnlyFlags: Flag[] = [
-     lang: "cxx",
+     desc: "Minimal debug info for backtraces",
+@@ -597,6 +643,12 @@
      desc: "C++23 with GNU extensions (required to match WebKit's ABI on Linux/FreeBSD)",
    },
-+  {
+   {
 +    flag: "-std=gnu++23",
 +    when: c => c.ohos,
 +    lang: "cxx",
 +    desc: "C++23 with GNU extensions (match new WebKit prebuilt ABI for OHOS compat)",
 +  },
-   {
++  {
      flag: "-std=c++23",
      when: c => c.darwin,
-@@ -665,7 +717,7 @@ export const bunOnlyFlags: Flag[] = [
+     lang: "cxx",
+@@ -665,7 +717,7 @@
    },
    {
      flag: ["-fno-pic", "-fno-pie"],
@@ -96,7 +97,7 @@ index 7759c7576d..8a7b9c7829 100644
      desc: "No position-independent code (we're a final executable)",
    },
    {
-@@ -1130,6 +1182,56 @@ export const linkerFlags: Flag[] = [
+@@ -1133,6 +1185,66 @@
      desc: "Persist the LTO-generated object so dsymutil can extract its DWARF into the dSYM",
    },
  
@@ -149,11 +150,21 @@ index 7759c7576d..8a7b9c7829 100644
 +    when: c => c.ohos,
 +    desc: "OHOS: LLD alignment warnings → ignore (SCTLR_EL1.A is 0 on aarch64)",
 +  },
++  {
++    flag: c => [
++      "-Wl,-Bsymbolic-functions",
++      "-rdynamic",
++      `-Wl,--dynamic-list=${c.cwd}/src/symbols.dyn`,
++      `-Wl,--version-script=${c.cwd}/src/linker.lds`,
++    ],
++    when: c => c.ohos,
++    desc: "OHOS: dynamic symbol list + version script (mirror linux block; exposes napi_/node_api_ for .node dlopen)",
++  },
 +
    // ─── Linux ───
    {
      // Wrap glibc symbols whose default version on a modern build host is
-@@ -1238,7 +1340,7 @@ export const linkerFlags: Flag[] = [
+@@ -1241,7 +1353,7 @@
    },
    {
      flag: ["-fno-pic", "-Wl,-no-pie"],
@@ -162,7 +173,7 @@ index 7759c7576d..8a7b9c7829 100644
      desc: "No PIE (we don't need ASLR; simpler codegen)",
    },
    {
-@@ -1371,8 +1473,8 @@ export const linkerFlags: Flag[] = [
+@@ -1374,8 +1486,8 @@
      // and only on agents where the LLVM versions diverge. The system lld path
      // (linux/freebsd llvm-* packages) keeps compressing.
      flag: "-Wl,--compress-debug-sections=zlib",
