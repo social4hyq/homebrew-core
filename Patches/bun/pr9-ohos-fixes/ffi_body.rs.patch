@@ -1,0 +1,34 @@
+diff --git a/src/runtime/ffi/ffi_body.rs b/src/runtime/ffi/ffi_body.rs
+index d3645a35ea..00e0d66210 100644
+--- a/src/runtime/ffi/ffi_body.rs
++++ b/src/runtime/ffi/ffi_body.rs
+@@ -714,6 +714,29 @@ impl CompileC {
+             }
+         }
+ 
++        #[cfg(target_env = "ohos")]
++        {
++            // OHOS: libc lives in the SDK sysroot, not in standard FHS paths.
++            // TCC needs libc to link; the SDK sysroot provides libc.so / libc.a.
++            // Try known SDK install location at runtime (brew prefix).
++            const OHOS_SDK_LIB: &[u8] =
++                b"/storage/Users/currentUser/.harmonybrew/opt/ohos-sdk/native/sysroot/usr/lib/aarch64-linux-ohos";
++            if dir_exists(OHOS_SDK_LIB) {
++                let path_z = bun_core::ZBox::from_bytes(OHOS_SDK_LIB);
++                if state.add_library_path(&path_z).is_err() {
++                    bun_output::scoped_log!(TCC, "TinyCC failed to add OHOS SDK library path");
++                }
++            }
++            const OHOS_SDK_INCLUDE: &[u8] =
++                b"/storage/Users/currentUser/.harmonybrew/opt/ohos-sdk/native/sysroot/usr/include";
++            if dir_exists(OHOS_SDK_INCLUDE) {
++                let path_z = bun_core::ZBox::from_bytes(OHOS_SDK_INCLUDE);
++                if state.add_sys_include_path(&path_z).is_err() {
++                    bun_output::scoped_log!(TCC, "TinyCC failed to add OHOS SDK include path");
++                }
++            }
++        }
++
+         #[cfg(unix)]
+         {
+             if dir_exists(b"/usr/local/include") {
