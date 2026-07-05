@@ -7,7 +7,7 @@ class Libxmp < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6631df9724e91ef0ad9a3004c51813a2698a9f748414197711f4ae42e80342b8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5845d45a7b16dda20e4981f3a36a8fd05049b757912bc7eba08ac7faad88bd06"
   end
 
   head do
