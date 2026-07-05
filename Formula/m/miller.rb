@@ -1,13 +1,13 @@
 class Miller < Formula
   desc "Like sed, awk, cut, join & sort for name-indexed data such as CSV"
   homepage "https://github.com/johnkerl/miller"
-  url "https://github.com/johnkerl/miller/archive/refs/tags/v6.19.0.tar.gz"
-  sha256 "032cd07d947986dfe9a97ed4f4ea5fb8bf354dce81229b58acad9e89e941a59e"
+  url "https://github.com/johnkerl/miller/archive/refs/tags/v6.20.2.tar.gz"
+  sha256 "3fe628547293f1c70c70593961277e3e27940c4968a6115304251a0b494acd30"
   license "BSD-2-Clause"
   head "https://github.com/johnkerl/miller.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6cefd7d9cf3a4a84c736e6733270271e6fcdce6a833651e7dc5e22b5e332644"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "45027839eeed1ba935f900ed909f45a37d6de9c51d4ed315170e88c7307cf908"
   end
 
   depends_on "go" => :build
