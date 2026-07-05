@@ -8,7 +8,7 @@ class Bun < Formula
   url "https://gh-proxy.com/https://github.com/oven-sh/bun.git", revision: "1498d7b77a5a6fd18075425aef4fc7b737ec8e08"
   version "1.4.0"
   license "MIT"
-  revision 7
+  revision 8
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -243,7 +243,10 @@ class Bun < Formula
     file "Patches/bun/pr5-ohos-runtime/process.rs.patch"
   end
   patch :p1 do
-    # OHOS disables the memfd stdio fast path (fstat returns size=0 after child writes)
+    # OHOS disables the memfd stdio fast path (fstat returns size=0 after child writes);
+    # also adds a shebang shim before posix_spawn_z: kernel exec rejects unsigned
+    # shebang scripts (binary-sign-tool refuses non-ELF), so manually rewrite argv
+    # to exec the already-signed interpreter with the script path as an argument.
     file "Patches/bun/pr5-ohos-runtime/spawn_process.rs.patch"
   end
   patch :p1 do
