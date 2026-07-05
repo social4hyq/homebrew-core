@@ -1,13 +1,13 @@
 class Libxmp < Formula
   desc "C library for playback of module music (MOD, S3M, IT, etc)"
   homepage "https://xmp.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/xmp/libxmp/4.7.0/libxmp-4.7.0.tar.gz"
-  sha256 "b6251de1859352c6988752563d60983cb8aa9fd7dfe9f81b8bc6688da47f3464"
+  url "https://downloads.sourceforge.net/project/xmp/libxmp/4.7.1/libxmp-4.7.1.tar.gz"
+  sha256 "398052ddff91472e9939240422d10b92149a1f5b80d2455ff5dde129f10c28e5"
   license "LGPL-2.1-or-later"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6631df9724e91ef0ad9a3004c51813a2698a9f748414197711f4ae42e80342b8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5845d45a7b16dda20e4981f3a36a8fd05049b757912bc7eba08ac7faad88bd06"
   end
 
   head do
