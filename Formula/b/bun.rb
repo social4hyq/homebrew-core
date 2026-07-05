@@ -8,7 +8,7 @@ class Bun < Formula
   url "https://gh-proxy.com/https://github.com/oven-sh/bun.git", revision: "1498d7b77a5a6fd18075425aef4fc7b737ec8e08"
   version "1.4.0"
   license "MIT"
-  revision 9
+  revision 10
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -196,6 +196,12 @@ class Bun < Formula
   patch :p1 do
     # OHOS prepends cd to lifecycle scripts (avoids hmdfs getcwd failure causing shell exit)
     file "Patches/bun/pr5-ohos-runtime/lifecycle_script_runner.rs.patch"
+  end
+  patch :p1 do
+    # OHOS: inject CXX/CC = harmonybrew shims into install/postinstall spawn env.
+    # node-gyp/make find C++ via $CXX; routing to shim gets llvm@21 libc++
+    # (<source_location>) and auto-signs the .node ELF output (closes REPORT.md 3a + 3b)
+    file "Patches/bun/pr5-ohos-runtime/lifecycle_env_cxx.rs.patch"
   end
   patch :p1 do
     # npm cache linkat: on 3rd failure switch to copying contents (OHOS SELinux EPERM)

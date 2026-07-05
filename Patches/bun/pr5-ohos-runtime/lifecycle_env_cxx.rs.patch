@@ -1,0 +1,24 @@
+diff --git a/src/install/PackageManager/PackageManagerLifecycle.rs b/src/install/PackageManager/PackageManagerLifecycle.rs
+--- a/src/install/PackageManager/PackageManagerLifecycle.rs
++++ b/src/install/PackageManager/PackageManagerLifecycle.rs
+@@ -447,6 +447,20 @@
+         path.append(original_path.as_slice())?;
+         script_env.put(b"PATH", path.slice())?;
+ 
++        #[cfg(target_env = "ohos")]
++        {
++            // node-gyp/make find C++ via $CXX/$CC; route to harmonybrew shims
++            // (llvm@21 libc++ has <source_location>; shim auto-signs ELF).
++            // SDK clang++ lacks <source_location>; without this, node-gyp
++            // V8 headers fail to compile.
++            if script_env.get(b"CXX").unwrap_or(b"").is_empty() {
++                script_env.put(b"CXX", b"/storage/Users/currentUser/.harmonybrew/bin/c++")?;
++            }
++            if script_env.get(b"CC").unwrap_or(b"").is_empty() {
++                script_env.put(b"CC", b"/storage/Users/currentUser/.harmonybrew/bin/cc")?;
++            }
++        }
++
+         // Ownership transfers to `LifecycleScriptSubprocess`, which
+         // re-uses it across every `spawn_next_script` in the chain. Move the
+         // owning `NullDelimitedEnvMap` by value so its `K=V\0` buffers outlive
