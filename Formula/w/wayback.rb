@@ -1,8 +1,8 @@
 class Wayback < Formula
   desc "Archiving tool integrated with various archival services"
   homepage "https://docs.wabarc.eu.org"
-  url "https://github.com/wabarc/wayback/archive/refs/tags/v0.20.1.tar.gz"
-  sha256 "b65833d8aa5c19ab8971c0b97bd96bdda235a6e420259aabe0daa5adf098d972"
+  url "https://github.com/wabarc/wayback/archive/refs/tags/v0.21.1.tar.gz"
+  sha256 "b52cf015420852b99246cde0d0183ec746a1c851ff2e9ebbed80e05be7eccfa7"
   license "GPL-3.0-or-later"
 
   bottle do
