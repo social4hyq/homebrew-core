@@ -1,8 +1,8 @@
 class Restic < Formula
   desc "Fast, efficient and secure backup program"
   homepage "https://restic.net/"
-  url "https://github.com/restic/restic/archive/refs/tags/v0.19.0.tar.gz"
-  sha256 "800779b6c4c2396971c0567b09ccdd435e03155e1a0ec94e8bbf3d98641a8bc2"
+  url "https://github.com/restic/restic/archive/refs/tags/v0.19.1.tar.gz"
+  sha256 "bb9b1a19040744d26d8a79be029d4e6b189c45ccc9d8831d7fe367d3c33df725"
   license "BSD-2-Clause"
   head "https://github.com/restic/restic.git", branch: "master"
 
