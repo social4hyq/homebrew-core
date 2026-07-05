@@ -1,13 +1,13 @@
 class Dblab < Formula
   desc "Database client every command-line junkie deserves"
   homepage "https://dblab.app/"
-  url "https://github.com/danvergara/dblab/archive/refs/tags/v0.42.1.tar.gz"
-  sha256 "175633c9f7fab2b58dca4207b094c93c30162b09b53909a96dbcd679d0bb6889"
+  url "https://github.com/danvergara/dblab/archive/refs/tags/v0.43.0.tar.gz"
+  sha256 "d177e4aeff702f699f2b5c8ea37e75c3736582fa2c9956e2751e69ad6287e16f"
   license "MIT"
   head "https://github.com/danvergara/dblab.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "64a9d98b53eefd0d94ede3ac1cf563716f002ca03bef5434637ecd939ca73a23"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7640cf6b1be37ff78f4b64c353d820aec9054faa838cbf78426471a372d79bf5"
   end
 
   depends_on "go" => :build
