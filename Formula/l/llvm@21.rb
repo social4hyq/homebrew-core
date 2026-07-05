@@ -526,8 +526,16 @@ class LlvmAT21 < Formula
           _magic=$(head -c4 "$_out" 2>/dev/null | od -An -c | head -1)
           case "$_magic" in
             *"177"*E*L*F*)
-              "#{sign_tool}" sign -selfSign 1 -inFile "$_out" -outFile "$_out" >/dev/null 2>&1
-              chmod +x "$_out" 2>/dev/null
+              # ELF type byte at offset 16: 1=REL(.o), 2=EXEC, 3=DYN(.node/.so)
+              # Skip .o — signing them propagates codesign into linker output
+              # and breaks downstream "already exists" sign of the final binary.
+              _etype=$(od -An -tu1 -j16 -N1 "$_out" 2>/dev/null | tr -d ' ')
+              case "$_etype" in
+                2|3)
+                  "#{sign_tool}" sign -selfSign 1 -inFile "$_out" -outFile "$_out" >/dev/null 2>&1
+                  chmod +x "$_out" 2>/dev/null
+                  ;;
+              esac
               ;;
           esac
         fi
