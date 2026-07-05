@@ -1,8 +1,8 @@
 class Znapzend < Formula
   desc "ZFS backup with remote capabilities and mbuffer integration"
   homepage "https://www.znapzend.org/"
-  url "https://github.com/oetiker/znapzend/releases/download/v0.23.2/znapzend-0.23.2.tar.gz"
-  sha256 "69928caacde7468e5154d81197e257cd0c85ee3eedb3192be67fdfe486defefe"
+  url "https://github.com/oetiker/znapzend/releases/download/v0.23.4/znapzend-0.23.4.tar.gz"
+  sha256 "253a2719c119d59a7e6db3f4aa26bc9b3b4fd74c2e737b9c8726cdb670abc6fc"
   license "GPL-3.0-or-later"
   head "https://github.com/oetiker/znapzend.git", branch: "master"
 
@@ -15,7 +15,7 @@ class Znapzend < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5fe8cacff8700aefc70bfcde120c856fc0e648d2b2b6786062e887aee286f2ad"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d0ff159595be4d3d6faf3268c43e031b12fb930572a39b50260dfe79c737413"
   end
 
   uses_from_macos "perl", since: :big_sur
