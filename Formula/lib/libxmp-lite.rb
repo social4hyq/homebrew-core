@@ -6,7 +6,7 @@ class LibxmpLite < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0cc11b9ffe6fba7c6eee09325bf3706afef3a5f5d2a75ecf050b29994d42612b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c4e7ed0a20062f07a4b0cf837fb7963d1b60143fb4d0a0bc6c18d92338061b1"
   end
 
   def install
