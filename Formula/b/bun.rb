@@ -8,7 +8,7 @@ class Bun < Formula
   url "https://gh-proxy.com/https://github.com/oven-sh/bun.git", revision: "1498d7b77a5a6fd18075425aef4fc7b737ec8e08"
   version "1.4.0"
   license "MIT"
-  revision 10
+  revision 12
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -17,9 +17,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r10"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "28cdb01e7e9faa0bd3d1b0b3f171a92293cc0568be73f400a720d8c828a4801f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f5db0a0c9f51a0bdd72a3784b596bb6871a516bc778561658185cc296bde3c6b"
   end
 
   # ── Dependencies (all bare names, zero changes when graduating to harmonybrew/core) ──
@@ -29,7 +28,7 @@ class Bun < Formula
   depends_on "gperf" => :build
   depends_on "llvm@21" => :build
   depends_on "ninja" => :build
-  depends_on "node" => :build
+  depends_on "node"
   depends_on "openssl@3" => :build # only build-time rust-nightly cargo links libssl/libcrypto
   depends_on "perl" => :build
   depends_on "python@3.14" => :build
@@ -310,6 +309,27 @@ class Bun < Formula
     # Extend setjmp/longjmp musl path to ohos; jmp_buf shrunk to 32×u64
     file "Patches/bun/pr7-shared-cfg-gate/recover.rs.patch"
   end
+  # pr9-ohos-fixes: runtime fixes for TCC libc lookup and node symlink permission
+  patch :p1 do
+    # Add OHOS SDK sysroot to TCC library/include search paths so cc() can find libc
+    file "Patches/bun/pr9-ohos-fixes/ffi_body.rs.patch"
+  end
+  patch :p1 do
+    # Fix BUN_NODE_DIR tmp path → /data/storage/el2/base/tmp;
+    # relax group-write permission check (OHOS tmpfs forces setgid);
+    # chmod after mkdir to fix permissions for re-entry
+    file "Patches/bun/pr9-ohos-fixes/install-lib.rs.patch"
+  end
+  patch :p1 do
+    # OHOS platform detection for tests: isLinux, isPosix, libcFamily, musl;
+    # GITHUB_API_URL → gh-proxy (GitHub blocked on OHOS)
+    file "Patches/bun/pr9-ohos-fixes/harness.ts.patch"
+  end
+  patch :p1 do
+    # OHOS system CA path: /system/etc/security/certificates/ (c_rehash <hash>.0 format)
+    # Fixes UNKNOWN_CERTIFICATE_VERIFICATION_ERROR on bun install
+    file "Patches/bun/pr9-ohos-fixes/root_certs_linux_ohos_ca.patch"
+  end
 
   def install
     # buildpath = bun source root (patches already auto-applied by Homebrew).
@@ -527,6 +547,16 @@ class Bun < Formula
     chmod 0755, out
     rm unsigned
     bin.install out => "bun"
+  end
+
+  def post_install
+    # Pre-cache node-gyp@11 in bunx cache so napi tests don't timeout
+    # on first download when running in parallel.
+    # Brew sandbox may set a TMPDIR with mismatched ownership; use the
+    # standard EL2 tmp which the current user owns.
+    ENV["TMPDIR"] = "/data/storage/el2/base/tmp"
+    ENV.prepend_path "PATH", Formula["node"].opt_bin
+    system bin/"bun", "--bun", "x", "node-gyp@11", "--version"
   end
 
   def caveats
