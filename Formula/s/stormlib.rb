@@ -7,7 +7,7 @@ class Stormlib < Formula
   head "https://github.com/ladislav-zezula/StormLib.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "84ec3c22c074ebd4a4bcaa578e2456ce9908afeb506e132ab5a2c7adfc1cde03"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6ba4c402cc7dd0c78f86d843f47d46c1afbe23f3530b187b400ab12d96084c5"
   end
 
   depends_on "cmake" => :build
