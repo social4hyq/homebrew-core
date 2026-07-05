@@ -1,13 +1,13 @@
 class Neocmakelsp < Formula
   desc "Another cmake lsp"
   homepage "https://neocmakelsp.github.io/"
-  url "https://github.com/neocmakelsp/neocmakelsp/archive/refs/tags/v0.10.3.tar.gz"
-  sha256 "99420a3c340ec5665df625f398d6ebb5e4ab5f10c4b1d7c937f8e1e646ed27c6"
+  url "https://github.com/neocmakelsp/neocmakelsp/archive/refs/tags/v0.10.4.tar.gz"
+  sha256 "c36516b48b018ad25f3d97f79f346f5712b02365e800b87b8ddd3292245c8f46"
   license "MIT"
   head "https://github.com/neocmakelsp/neocmakelsp.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b10e13fb836cd078f5bf5602dc83f007d912956afb0347a59101c2f4bbf869a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b58d2277e0b3b0f4753d4309f795779a2eaffdc74e16380c05c6ccc1422fd590"
   end
 
   depends_on "rust" => :build
