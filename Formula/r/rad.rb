@@ -7,7 +7,7 @@ class Rad < Formula
   head "https://github.com/amterp/rad.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca988b73179cd9cd7bbc1f4d61d5d9b4256bfb7464a717dd219a218dfc2c9737"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f391a89d2376de532a28f5e2f5ffbbbe0562e5eb3a0bb795acc3adfec27a647"
   end
 
   depends_on "go" => :build
