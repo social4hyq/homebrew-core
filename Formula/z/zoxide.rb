@@ -1,12 +1,12 @@
 class Zoxide < Formula
   desc "Shell extension to navigate your filesystem faster"
   homepage "https://github.com/ajeetdsouza/zoxide"
-  url "https://github.com/ajeetdsouza/zoxide/archive/refs/tags/v0.9.9.tar.gz"
-  sha256 "eddc76e94db58567503a3893ecac77c572f427f3a4eabdfc762f6773abf12c63"
+  url "https://github.com/ajeetdsouza/zoxide/archive/refs/tags/v0.10.0.tar.gz"
+  sha256 "4fcd4272b013a10b637dbcc299c58a9924b94470a9042677ca1a204cc2e9150e"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "71e618975f15ffed7c26d65d04b0873e41b0633ec7292ec1e6fdb0aeaf26c8b5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9a96a2a4663ca979c800b646132c53f51ea7f20cc56a2e82f44b49156fa9e24"
   end
 
   depends_on "rust" => :build
