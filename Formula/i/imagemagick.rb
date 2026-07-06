@@ -1,8 +1,8 @@
 class Imagemagick < Formula
   desc "Tools and libraries to manipulate images in select formats"
   homepage "https://imagemagick.org/index.php"
-  url "https://github.com/ImageMagick/ImageMagick/releases/download/7.1.2-26/ImageMagick-7.1.2-26.7z"
-  sha256 "87aceeed7448836b0f729eddca6d7c5bad8b8e95c043cb6b1b2f72247189edcf"
+  url "https://github.com/ImageMagick/ImageMagick/releases/download/7.1.2-27/ImageMagick-7.1.2-27.7z"
+  sha256 "dcfbdd8294b3ad6d07fc0edaa2c2071ffa6085b1207b525929b70ffb067300ae"
   license "ImageMagick"
   compatibility_version 1
   head "https://github.com/ImageMagick/ImageMagick.git", branch: "main"
@@ -14,7 +14,7 @@ class Imagemagick < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9baf672520b065be46f0ee5b01514296b224553bb776851c487dd3ce28763e1a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d31e36a76b5100a339892cb87ff47814d6209db73ca56c1ea2961786420b069b"
   end
 
   depends_on "pkgconf" => :build
