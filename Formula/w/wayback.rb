@@ -1,12 +1,12 @@
 class Wayback < Formula
   desc "Archiving tool integrated with various archival services"
   homepage "https://docs.wabarc.eu.org"
-  url "https://github.com/wabarc/wayback/archive/refs/tags/v0.20.1.tar.gz"
-  sha256 "b65833d8aa5c19ab8971c0b97bd96bdda235a6e420259aabe0daa5adf098d972"
+  url "https://github.com/wabarc/wayback/archive/refs/tags/v0.21.1.tar.gz"
+  sha256 "b52cf015420852b99246cde0d0183ec746a1c851ff2e9ebbed80e05be7eccfa7"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "39327096cf38c30811223946ad6e8caa9f8b98fcf2aab3a0086cef24e2c990c1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "38d65d8c0489adc7a9470507cb7fe58c84748d100ee8642d484c87b6f926d4cd"
   end
 
   depends_on "go" => :build
