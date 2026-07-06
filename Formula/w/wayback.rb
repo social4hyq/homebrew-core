@@ -6,7 +6,7 @@ class Wayback < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "39327096cf38c30811223946ad6e8caa9f8b98fcf2aab3a0086cef24e2c990c1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "38d65d8c0489adc7a9470507cb7fe58c84748d100ee8642d484c87b6f926d4cd"
   end
 
   depends_on "go" => :build
