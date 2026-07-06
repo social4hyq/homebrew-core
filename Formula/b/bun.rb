@@ -8,7 +8,7 @@ class Bun < Formula
   url "https://gh-proxy.com/https://github.com/oven-sh/bun.git", revision: "1498d7b77a5a6fd18075425aef4fc7b737ec8e08"
   version "1.4.0"
   license "MIT"
-  revision 13
+  revision 14
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -17,8 +17,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r13"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f4eda45418b403ef48f7edf2d9aad27d428cb8ff0160f90f5e7f95789279244"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
   # ── Dependencies (all bare names, zero changes when graduating to harmonybrew/core) ──
@@ -120,6 +120,12 @@ class Bun < Formula
   patch :p1 do
     # Add ohos-signpost dependency and postinstall probe hook (fills in detect-libc and other deps)
     file "Patches/bun/pr4-build-target/package.json.patch"
+  end
+  patch :p1 do
+    # Sync bun.lock with post-pr4 package.json: esbuild ^0.21.5→^0.28.1, add ohos-signpost,
+    # add @esbuild/openharmony-arm64 entries. Without this bun install sees a stale lock and
+    # re-resolves bun-tracestrings (a github: dep), which fails because GitHub is blocked on OHOS.
+    file "Patches/bun/pr4-build-target/bun.lock.patch"
   end
   patch :p1 do
     # Add Libc::Ohos enum and triple parsing; platform string reports "ohos"; support file:// registration
@@ -331,10 +337,11 @@ class Bun < Formula
     file "Patches/bun/pr9-ohos-fixes/root_certs_linux_ohos_ca.patch"
   end
   patch :p1 do
-    # O_TMPFILE fallback (Attempt #3): write_all moved file pos to EOF before
-    # linkat_tmpfile failed (OHOS SELinux EPERM). Read from file returned 0
-    # bytes, leaving the .npm cache file empty → "manifest is invalid".
-    # Fix: write the in-memory buffer instead of reading back from the file.
+    # O_TMPFILE fallback (Attempt #3): linkat_tmpfile fails with OHOS SELinux
+    # EPERM. Previous fix wrote buffer directly to File::create(outpath) which
+    # truncates to 0 bytes before write_all runs; if quick_exit races between
+    # create and write the cache file is left empty → "manifest is invalid".
+    # Fix: write to tmp_path in tmpdir first, then renameat atomically.
     file "Patches/bun/pr9-ohos-fixes/npm.rs.patch"
   end
   patch :p1 do
@@ -409,9 +416,11 @@ class Bun < Formula
       ln_sf icu.opt_bin/t, buildpath/"build/ohos-icu/host/bin"/t if (icu.opt_bin/t).exist?
     end
 
-    # ── bun install (updates lockfile because package.json.patch modified devDependencies) ──
-    # package.json.patch only changes build-essential items (esbuild version, ohos-signpost, postinstall),
-    # so --ignore-scripts is not needed.
+    # ── bun install (bun.lock.patch keeps lock consistent with post-pr4 package.json) ──
+    # bun.lock.patch upgrades esbuild and adds ohos-signpost so the lock matches package.json exactly.
+    # bun install then resolves all packages from ~/.bun/install/cache without network access.
+    # (bun-tracestrings: github-hosted dep; GitHub is blocked on OHOS but the package is pre-cached
+    # at @GH@oven-sh-bun.report-912ca63@@@1 so no download is attempted.)
     ENV.prepend_path "PATH", boot.opt_bin
     ENV.prepend_path "PATH", llvm.opt_bin
     system "bun", "install"
@@ -426,32 +435,38 @@ class Bun < Formula
     system "bun", "run",
            ohos_patches/"patch-ohos-native-binlink-targets.ts"
 
-    # ── Rust nightly (installed into buildpath, build-time only. Not included in bottle) ──
+    # ── Rust nightly (persistent cache keyed by toolchain date; skips reinstall+signing if already done) ──
     # OHOS is a Tier 3 target: bun uses -Zbuild-std to build std, which requires rust-src (in full tarball).
-    rust_home = buildpath/"rust-nightly"
-    rust_home.mkpath
-    resource("rust-nightly").stage do
-      # The host tarball contains rustc/cargo/rust-std; install into rust_home via install.sh.
-      # On OHOS the bash path is not in the superenv PATH, so run via sh to bypass the shebang dependency.
-      system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
-    end
-    resource("rust-src").stage do
-      # rust-src is a standalone target-agnostic tarball; bun -Zbuild-std needs library/Cargo.lock.
-      system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
-    end
+    rust_ver = resource("rust-nightly").version.to_s  # e.g. "nightly-2026-05-06"
+    rust_home = Pathname.new("/data/storage/el2/base/tmp/rust-#{rust_ver}")
+    rust_ready = rust_home/"BREW_SIGNED_OK"
 
-    # ── Sign the rust binaries (OHOS kernel refuses to exec unsigned ELF, otherwise cargo reports 127) ──
-    sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
-    Dir.glob(rust_home/"**/*").each do |f|
-      next unless File.file?(f)
-      next if File.symlink?(f)
-      next if File.read(f, 4, mode: "rb") != "\x7fELF"
+    unless rust_ready.exist?
+      rust_home.mkpath
+      resource("rust-nightly").stage do
+        # The host tarball contains rustc/cargo/rust-std; install via install.sh.
+        # Use sh explicitly: OHOS superenv PATH has no bash for the shebang.
+        system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
+      end
+      resource("rust-src").stage do
+        system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
+      end
 
-      tmp = "#{f}.unsigned"
-      mv f, tmp
-      system sign_tool, "sign", "-selfSign", "1", "-inFile", tmp, "-outFile", f
-      chmod 0755, f
-      rm tmp
+      # ── Sign the rust binaries (OHOS kernel refuses to exec unsigned ELF → cargo exits 127) ──
+      sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
+      Dir.glob(rust_home/"**/*").each do |f|
+        next unless File.file?(f)
+        next if File.symlink?(f)
+        next if File.read(f, 4, mode: "rb") != "\x7fELF"
+
+        tmp = "#{f}.unsigned"
+        mv f, tmp
+        system sign_tool, "sign", "-selfSign", "1", "-inFile", tmp, "-outFile", f
+        chmod 0755, f
+        rm tmp
+      end
+
+      rust_ready.write("signed #{Time.now}\n")
     end
 
     # ── Build environment (PATH + env) ──
@@ -493,14 +508,18 @@ class Bun < Formula
       [ "$magic" = "7f454c46" ] || exit 0
       readelf -S "$out" 2>/dev/null | grep -q '\\.codesign' && exit 0
       tmp="${out}.unsigned.$$"
+      signed="${out}.signed.$$"
       mv -f "$out" "$tmp"
-      if "#{Formula["ohos-sdk"].opt_bin}/binary-sign-tool" sign -selfSign 1 -inFile "$tmp" -outFile "$out" >/dev/null 2>&1; then
-        chmod +x "$out"
-        # OHOS/tmpfs race: cargo build-script exec right after signing hits ETXTBSY
-        # (kernel still sees stale writable fd reference). Force flush + brief settle.
+      if "#{Formula["ohos-sdk"].opt_bin}/binary-sign-tool" sign -selfSign 1 -inFile "$tmp" -outFile "$signed" >/dev/null 2>&1 && [ -f "$signed" ]; then
+        chmod +x "$signed"
+        # OHOS/tmpfs ETXTBSY fix: write signed output to staging path, then rename
+        # atomically to final path.  binary-sign-tool wrote and closed $signed; after
+        # mv the final inode has no in-flight write FDs, so cargo can exec immediately.
         sync
+        mv -f "$signed" "$out"
         rm -f "$tmp"
       else
+        rm -f "$signed" 2>/dev/null
         mv -f "$tmp" "$out"
       fi
       exit 0
