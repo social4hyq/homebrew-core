@@ -1,13 +1,13 @@
 class Restic < Formula
   desc "Fast, efficient and secure backup program"
   homepage "https://restic.net/"
-  url "https://github.com/restic/restic/archive/refs/tags/v0.19.0.tar.gz"
-  sha256 "800779b6c4c2396971c0567b09ccdd435e03155e1a0ec94e8bbf3d98641a8bc2"
+  url "https://github.com/restic/restic/archive/refs/tags/v0.19.1.tar.gz"
+  sha256 "bb9b1a19040744d26d8a79be029d4e6b189c45ccc9d8831d7fe367d3c33df725"
   license "BSD-2-Clause"
   head "https://github.com/restic/restic.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d26067f458ca2777c77c3a4913db54561e1ac5009b978c75a82c8967a8020b17"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a198815b02002115c894ffe33f37b9a27f6bbf8a15dd5e30599ad64051645091"
   end
 
   depends_on "go" => :build
