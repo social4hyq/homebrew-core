@@ -130,6 +130,9 @@ class Bun < Formula
     ENV.prepend_path "PATH", boot.opt_bin
     ENV.prepend_path "PATH", llvm.opt_bin
     system "bun", "install"
+    # node-fallbacks has its own bun.lock; pre-populate cache so ninja's
+    # subsequent `bun install --frozen-lockfile` can verify without network.
+    system "bun", "install", "--cwd", "src/node-fallbacks"
 
     # ── Regenerate native binlink test packages with openharmony in os[] ──
     # Upstream test packages (test-native-binlink-*-target) list os:["darwin","linux","win32"].
