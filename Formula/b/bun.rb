@@ -330,6 +330,13 @@ class Bun < Formula
     # Fixes UNKNOWN_CERTIFICATE_VERIFICATION_ERROR on bun install
     file "Patches/bun/pr9-ohos-fixes/root_certs_linux_ohos_ca.patch"
   end
+  patch :p1 do
+    # O_TMPFILE fallback (Attempt #3): write_all moved file pos to EOF before
+    # linkat_tmpfile failed (OHOS SELinux EPERM). Read from file returned 0
+    # bytes, leaving the .npm cache file empty → "manifest is invalid".
+    # Fix: write the in-memory buffer instead of reading back from the file.
+    file "Patches/bun/pr9-ohos-fixes/npm.rs.patch"
+  end
 
   def install
     # buildpath = bun source root (patches already auto-applied by Homebrew).
@@ -400,6 +407,16 @@ class Bun < Formula
     ENV.prepend_path "PATH", boot.opt_bin
     ENV.prepend_path "PATH", llvm.opt_bin
     system "bun", "install"
+
+    # ── Regenerate native binlink test packages with openharmony in os[] ──
+    # Upstream test packages (test-native-binlink-*-target) list os:["darwin","linux","win32"].
+    # On OHOS, OperatingSystem::CURRENT = OPENHARMONY (not LINUX), so those packages are
+    # never selected as the platform-specific binary → native binlink optimization silently
+    # falls back to the main package. Add "openharmony" and repack via Bun.gzipSync
+    # (system gzip on OHOS is toybox store-only; the resulting tarballs would not decompress).
+    ohos_patches = Pathname.new(__dir__)/"../../Patches/bun/pr9-ohos-fixes"
+    system "bun", "run",
+           ohos_patches/"patch-ohos-native-binlink-targets.ts"
 
     # ── Rust nightly (installed into buildpath, build-time only. Not included in bottle) ──
     # OHOS is a Tier 3 target: bun uses -Zbuild-std to build std, which requires rust-src (in full tarball).

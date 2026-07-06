@@ -1,0 +1,29 @@
+diff --git a/src/install/npm.rs b/src/install/npm.rs
+index 246ff87bbd..ea841684c9 100644
+--- a/src/install/npm.rs
++++ b/src/install/npm.rs
+@@ -1176,19 +1176,12 @@ pub mod package_manifest {
+                     let link_ok2 = bun_sys::linkat_tmpfile(file.handle, cache_dir, outpath);
+                     if link_ok2.is_err() {
+                         // Attempt #3: linkat may be blocked (e.g. OHOS SELinux EPERM).
+-                        // Fall back to copying the file content.
++                        // Fall back to writing the in-memory buffer directly.
++                        // Reading from `file` would require an lseek (write_all
++                        // above left the file position at EOF). Using `buffer`
++                        // is simpler and avoids the seek.
+                         if let Ok(cache_file) = bun_sys::File::create(cache_dir, outpath, true) {
+-                            let mut buf = [0u8; 65536];
+-                            loop {
+-                                let n = match file.read(&mut buf) {
+-                                    Ok(0) => break,
+-                                    Ok(n) => n,
+-                                    Err(_) => break,
+-                                };
+-                                if cache_file.write_all(&buf[..n]).is_err() {
+-                                    break;
+-                                }
+-                            }
++                            let _ = cache_file.write_all(&buffer);
+                         }
+                     }
+                 }
