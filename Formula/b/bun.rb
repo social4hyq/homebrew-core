@@ -65,8 +65,6 @@ class Bun < Formula
   # pr7-shared-cfg-gate / pr8-upstream-sync / pr9-ohos-fixes on that branch.
   # Vendor patch files (patches/lolhtml/crate-type.patch, patches/zstd/ohos-qsort-r.patch)
   # are committed directly in the source tree; ninja applies them during the build.
-  # The pr9 runtime script (patch-ohos-native-binlink-targets.ts) is still in the tap
-  # and run via bun in the install block below.
 
   def install
     # buildpath = bun source root (patches already auto-applied by Homebrew).
@@ -135,14 +133,6 @@ class Bun < Formula
 
     # ── Regenerate native binlink test packages with openharmony in os[] ──
     # Upstream test packages (test-native-binlink-*-target) list os:["darwin","linux","win32"].
-    # On OHOS, OperatingSystem::CURRENT = OPENHARMONY (not LINUX), so those packages are
-    # never selected as the platform-specific binary → native binlink optimization silently
-    # falls back to the main package. Add "openharmony" and repack via Bun.gzipSync
-    # (system gzip on OHOS is toybox store-only; the resulting tarballs would not decompress).
-    ohos_patches = Pathname.new(__dir__)/"../../Patches/bun/pr9-ohos-fixes"
-    system "bun", "run",
-           ohos_patches/"patch-ohos-native-binlink-targets.ts"
-
     # ── Rust nightly (persistent cache keyed by toolchain date; skips reinstall+signing if already done) ──
     # OHOS is a Tier 3 target: bun uses -Zbuild-std to build std, which requires rust-src (in full tarball).
     rust_ver = resource("rust-nightly").version.to_s  # e.g. "nightly-2026-05-06"
