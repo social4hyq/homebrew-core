@@ -2,13 +2,14 @@ class Bun < Formula
   desc "— JavaScript runtime for HarmonyOS aarch64 (stable)"
   homepage "https://github.com/oven-sh/bun"
   # This formula is fully rewritten from upstream because Bun on HarmonyOS requires
-  # 50+ OHOS-specific patches (pr3-pr8), L4 self-bootstrap via bun-bootstrap, a
+  # 50+ OHOS-specific patches, L4 self-bootstrap via bun-bootstrap, a
   # pre-populated WebKit cache, and a Rust nightly toolchain with -Zbuild-std.
+  # All patches are pre-applied on the openharmony branch of social4hyq/ohos-bun.
   # Upstream formula cannot accommodate these build requirements.
-  url "https://gh-proxy.com/https://github.com/oven-sh/bun.git", revision: "1498d7b77a5a6fd18075425aef4fc7b737ec8e08"
+  url "https://gh-proxy.com/https://github.com/social4hyq/ohos-bun.git", revision: "fba6ba98342b74b0cedfbaa6178dea4e643082f3", branch: "openharmony"
   version "1.4.0"
   license "MIT"
-  revision 14
+  revision 15
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -17,8 +18,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r14"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "552d71b51b3f3cdd94c33b4ccf019ed0f5e9dbfae6afc8e0b3e4c551c8bc37ab"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r15"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "TODO-rebuild-bottle"
   end
 
   # ── Dependencies (all bare names, zero changes when graduating to harmonybrew/core) ──
@@ -59,312 +60,19 @@ class Bun < Formula
     sha256 "2bfd8eed73318df568cc5831083b11de986af6da5c66f140b73cf4ae365ceca3"
   end
 
-  # ── OHOS patches (mirroring the patch do file pattern from git.rb) ──
-  # Homebrew auto-applies these to buildpath (= bun source root) before def install.
-  # Declared in PR order (pr3 → pr7, order-sensitive).
-  # Each patch must have a comment explaining its purpose and upstream issue
-  # (Homebrew audit requirement).
-  # Note: vendor patches (crate-type/ohos-qsort-r) do not go through git apply;
-  # instead the install step copies them into bun's patches/ directory and ninja
-  # applies them as file dependencies during the build.
-  patch :p1 do
-    # pr3-vendor: OHOS adaptation for the zstd dep build script
-    file "Patches/bun/pr3-vendor/zstd.ts.patch"
-  end
-  # pr4-build-target: OHOS cross-compilation target support (OS="ohos", triple, sysroot/SDK config)
-  patch :p1 do
-    # build.ts adds --ohos-sysroot / --ohos-sdk-root command-line options
-    file "Patches/bun/pr4-build-target/build.ts.patch"
-  end
-  patch :p1 do
-    # OHOS links libc/pthread/dl and local WebKit ICU; skip smoke test during cross-compilation
-    file "Patches/bun/pr4-build-target/bun.ts.patch"
-  end
-  patch :p1 do
-    # OHOS musl lacks GNU extensions (memmem/getservbyport_r); exclude them in c-ares config.h
-    file "Patches/bun/pr4-build-target/cares.ts.patch"
-  end
-  patch :p1 do
-    # Add OS="ohos", hostCc field and sysroot/SDK/cross-libs/ICU cross-compilation config
-    file "Patches/bun/pr4-build-target/config.ts.patch"
-  end
-  patch :p1 do
-    # OHOS compile/link flags: triple, sysroot, libc++, PIE, 8MB stack, no zstd debug,
-    # + dynamic symbol list + version script (exposes napi_/node_api_ for .node dlopen)
-    file "Patches/bun/pr4-build-target/flags.ts.patch"
-  end
-  patch :p1 do
-    # OHOS also disables MI_NO_SET_VMA_NAME (VMA label debug sugar)
-    file "Patches/bun/pr4-build-target/mimalloc.ts.patch"
-  end
-  patch :p1 do
-    # Add aarch64-unknown-linux-ohos target; linker can go through the signing wrapper
-    file "Patches/bun/pr4-build-target/rust.ts.patch"
-  end
-  patch :p1 do
-    # dep_host_cc invokes binary-sign-tool for signing after linking; OHOS native cargo uses the signing linker
-    file "Patches/bun/pr4-build-target/source.ts.patch"
-  end
-  patch :p1 do
-    # Broaden LLVM version to 21–23; add OHOS LLVM22 search paths and install hints
-    file "Patches/bun/pr4-build-target/tools.ts.patch"
-  end
-  patch :p1 do
-    # Add OHOS prebuilt/ICU selection and cross-compilation CMake config (sysroot, libc++ headers, ICU tools)
-    file "Patches/bun/pr4-build-target/webkit.ts.patch"
-  end
-  patch :p1 do
-    # Add OHOS branch to bun scripts/utils.mjs tmpdir() (fallback to /data/local/tmp/$HOME/tmp)
-    file "Patches/bun/pr4-build-target/utils.mjs.patch"
-  end
-  patch :p1 do
-    # Add ohos-signpost dependency and postinstall probe hook (fills in detect-libc and other deps)
-    file "Patches/bun/pr4-build-target/package.json.patch"
-  end
-  patch :p1 do
-    # Sync bun.lock with post-pr4 package.json: esbuild ^0.21.5→^0.28.1, add ohos-signpost,
-    # add @esbuild/openharmony-arm64 entries. Without this bun install sees a stale lock and
-    # re-resolves bun-tracestrings (a github: dep), which fails because GitHub is blocked on OHOS.
-    file "Patches/bun/pr4-build-target/bun.lock.patch"
-  end
-  patch :p1 do
-    # Add Libc::Ohos enum and triple parsing; platform string reports "ohos"; support file:// registration
-    file "Patches/bun/pr4-build-target/compile_target.rs.patch"
-  end
-  patch :p1 do
-    # bun upgrade download suffix for OHOS uses -ohos (a new branch alongside musl/android)
-    file "Patches/bun/pr4-build-target/upgrade_command.rs.patch"
-  end
-  # pr8-upstream-sync: sync the lockfile that is out of sync with upstream package.json.
-  # Not a standalone OHOS change — upstream package.json bumped esbuild 0.25→0.28,
-  # but bun.lock still pins 0.25.12; sync here so bun install resolves consistently.
-  patch :p1 do
-    file "Patches/bun/pr8-upstream-sync/node-fallbacks-esbuild-lockfile.patch"
-  end
-  # pr5-ohos-runtime: OHOS-specific runtime substitutions
-  # (syscall fallbacks, vfork→fork, signing, platform=openharmony)
-  patch :p1 do
-    # On OHOS process.platform returns "openharmony" (aligning with Node naming)
-    file "Patches/bun/pr5-ohos-runtime/BunProcess.cpp.patch"
-  end
-  patch :p1 do
-    # OHOS maps the external OS name to openharmony/OpenHarmony (so optional deps resolve correctly)
-    file "Patches/bun/pr5-ohos-runtime/Global.rs.patch"
-  end
-  patch :p1 do
-    # Add IS_OHOS / IS_GLIBC; IS_MUSL now includes ohos too
-    file "Patches/bun/pr5-ohos-runtime/env.rs.patch"
-  end
-  patch :p1 do
-    # OHOS skips fchmodat2, getcwd falls back to "/", and the signing tool is invoked before dlopen
-    file "Patches/bun/pr5-ohos-runtime/lib.rs.patch"
-  end
-  patch :p1 do
-    # OHOS build artifacts invoke binary-sign-tool for signing and chmod 755 (seccomp requirement)
-    file "Patches/bun/pr5-ohos-runtime/build_command.rs.patch"
-  end
-  patch :p1 do
-    # OHOS Bun.build({compile}) JS API mirrors the CLI compile sign hook
-    file "Patches/bun/pr5-ohos-runtime/js_bundle_completion_task.rs.patch"
-  end
-  patch :p1 do
-    # OHOS sets $PWD; pipes are marked socket+non-blocking to avoid blocking infinite loops
-    file "Patches/bun/pr5-ohos-runtime/filter_run.rs.patch"
-  end
-  patch :p1 do
-    # OHOS sets $PWD (bash uses stat instead of getcwd); CWD EPERM is silent and falls back to $HOME
-    file "Patches/bun/pr5-ohos-runtime/run_command.rs.patch"
-  end
-  patch :p1 do
-    # Add openharmony to the legal OS list for pm scan
-    file "Patches/bun/pr5-ohos-runtime/CommandLineArguments.rs.patch"
-  end
-  patch :p1 do
-    # linkat EEXIST retry + EPERM/EACCES fallback to copy install (OHOS SELinux)
-    file "Patches/bun/pr5-ohos-runtime/PackageInstall.rs.patch"
-  end
-  patch :p1 do
-    # After installing packages on OHOS, scan .so/.node and invoke binary-sign-tool for signing
-    file "Patches/bun/pr5-ohos-runtime/PackageInstaller.rs.patch"
-  end
-  patch :p1 do
-    # OHOS node-gyp temp scripts switch to /system/bin/sh (same as Android)
-    file "Patches/bun/pr5-ohos-runtime/PackageManager.rs.patch"
-  end
-  patch :p1 do
-    # symlinkat EPERM/EACCES retries after creating parent dir; split out ENOENT for separate handling
-    file "Patches/bun/pr5-ohos-runtime/TarballStream.rs.patch"
-  end
-  patch :p1 do
-    # linkat EPERM/EACCES multi-level fallback to copy (OHOS SELinux forbids hard links)
-    file "Patches/bun/pr5-ohos-runtime/Hardlinker.rs.patch"
-  end
-  patch :p1 do
-    # OHOS prepends cd to lifecycle scripts (avoids hmdfs getcwd failure causing shell exit)
-    file "Patches/bun/pr5-ohos-runtime/lifecycle_script_runner.rs.patch"
-  end
-  patch :p1 do
-    # OHOS: inject CXX/CC = harmonybrew shims into install/postinstall spawn env.
-    # node-gyp/make find C++ via $CXX; routing to shim gets llvm@21 libc++
-    # (<source_location>) and auto-signs the .node ELF output (closes REPORT.md 3a + 3b)
-    file "Patches/bun/pr5-ohos-runtime/lifecycle_env_cxx.rs.patch"
-  end
-  patch :p1 do
-    # npm cache linkat: on 3rd failure switch to copying contents (OHOS SELinux EPERM)
-    file "Patches/bun/pr5-ohos-runtime/npm.rs.patch"
-  end
-  patch :p1 do
-    # Add OPENHARMONY variant to OperatingSystem enum plus CURRENT and name table
-    file "Patches/bun/pr5-ohos-runtime/resolver_hooks.rs.patch"
-  end
-  patch :p1 do
-    # os.type/arch classifies openharmony as Linux; arm64 returns aarch64 (aligning with Android)
-    file "Patches/bun/pr5-ohos-runtime/os.ts.patch"
-  end
-  patch :p1 do
-    # OHOS switches to fork (seccomp forbids vfork); exit_group falls back to _exit; CLOEXEC fd floor raised to 2
-    file "Patches/bun/pr5-ohos-runtime/bun-spawn.cpp.patch"
-  end
-  patch :p1 do
-    # OHOS disables close_range (returns ENOSYS); installs SIGSYS handler; adds /system/bin to PATH
-    file "Patches/bun/pr5-ohos-runtime/c-bindings.cpp.patch"
-  end
-  patch :p1 do
-    # Codegen outputs "openharmony" for platform on OHOS
-    file "Patches/bun/pr5-ohos-runtime/codegen.ts.patch"
-  end
-  # The pr5 version of compile_target.rs is already merged into the pr4
-  # patch of the same name; no separate apply needed
-  patch :p1 do
-    # /tmp read-only falls back to /data/local/tmp/$HOME/tmp; RLIMIT_NOFILE minimum value; EACCES treated as missing
-    file "Patches/bun/pr5-ohos-runtime/fs.rs.patch"
-  end
-  patch :p1 do
-    # EACCES/EPERM skips ancestor dirs or treats them as missing (OHOS sandbox: "/","/storage" unreadable)
-    file "Patches/bun/pr5-ohos-runtime/resolver.rs.patch"
-  end
-  patch :p1 do
-    # openpty dlopen adds libc.so name and RTLD_DEFAULT fallback (OHOS openpty lives in libc)
-    file "Patches/bun/pr5-ohos-runtime/Terminal.rs.patch"
-  end
-  patch :p1 do
-    # OHOS disables can_use_memfd/use_memfd (same fstat-not-visible issue as spawn_process)
-    file "Patches/bun/pr5-ohos-runtime/stdio.rs.patch"
-  end
-  patch :p1 do
-    # OHOS no_orphans uses pidfd + 100ms polling to detect parent exit (signalfd hangs)
-    file "Patches/bun/pr5-ohos-runtime/process.rs.patch"
-  end
-  patch :p1 do
-    # OHOS disables the memfd stdio fast path (fstat returns size=0 after child writes);
-    # also adds a shebang shim before posix_spawn_z: kernel exec rejects unsigned
-    # shebang scripts (binary-sign-tool refuses non-ELF), so manually rewrite argv
-    # to exec the already-signed interpreter with the script path as an argument.
-    file "Patches/bun/pr5-ohos-runtime/spawn_process.rs.patch"
-  end
-  patch :p1 do
-    # OHOS parses ELF SHT to locate the .bun section; ftruncate+fsync prevents COW write loss
-    file "Patches/bun/pr5-ohos-runtime/StandaloneModuleGraph.rs.patch"
-  end
-  patch :p1 do
-    # OHOS SELinux rejects linkat/symlinkat → add a copy_file_fallback content-copy path,
-    # and add an OHOS tmpdir branch (shared by Hardlinker/PackageInstall/TarballStream)
-    file "Patches/bun/pr5-ohos-runtime/install-lib.rs.patch"
-  end
-  # Not a standalone OHOS change — adds the filename to the npm manifest
-  # invalid error message (general debug improvement)
-  patch :p1 do
-    file "Patches/bun/pr8-upstream-sync/npm_jsc-error-msg.patch"
-  end
-  patch :p1 do
-    # OHOS resolver entry: short-circuit fs/deps/import-mapper
-    file "Patches/bun/pr5-ohos-runtime/resolver-lib.rs.patch"
-  end
-  patch :p1 do
-    # P0 epoll_pwait2: OHOS seccomp SECCOMP_RET_TRAP → SIGSYS kills the process outright,
-    # so the upstream ENOSYS/EPERM/EACCES fallback chain never triggers. Force has_epoll_pwait2=0
-    # to skip the first attempt and go straight to epoll_pwait (millisecond precision).
-    # Lose nanosecond-granularity timeouts to stay alive.
-    # Preflight probe c13_epoll_pwait2.
-    file "Patches/bun/pr5-ohos-runtime/epoll_kqueue.c.patch"
-  end
-  patch :p1 do
-    # OHOS openat2 returns ENOSYS directly (seccomp SIGSYS); loosen visibility of several fns
-    file "Patches/bun/pr5-ohos-runtime/linux_syscall.rs.patch"
-  end
-  # pr6-rust-compat: Rust nightly toolchain compatibility fixes
-  # (unrelated to OHOS, can be pushed upstream independently)
-  patch :p1 do
-    # errno → ExitCode now uses unsigned_abs() (nightly type change)
-    file "Patches/bun/pr6-rust-compat/echo.rs.patch"
-  end
-  patch :p1 do
-    # errno → ExitCode now uses unsigned_abs() (same as echo.rs)
-    file "Patches/bun/pr6-rust-compat/which.rs.patch"
-  end
-  # pr7-shared-cfg-gate: cfg gate extensions for the shared musl/OHOS code path (OHOS libc is musl-derived)
-  patch :p1 do
-    # crash_handler musl gate extended to ohos; crash header libc label outputs "ohos (musl)"
-    file "Patches/bun/pr7-shared-cfg-gate/lib.rs.patch"
-  end
-  patch :p1 do
-    # Exclude v8 platform API block on OHOS (routes through the musl avoidance path; avoids smoke relocation fatal)
-    file "Patches/bun/pr7-shared-cfg-gate/napi_body.rs.patch"
-  end
-  patch :p1 do
-    # Extend setjmp/longjmp musl path to ohos; jmp_buf shrunk to 32×u64
-    file "Patches/bun/pr7-shared-cfg-gate/recover.rs.patch"
-  end
-  # pr9-ohos-fixes: runtime fixes for TCC libc lookup and node symlink permission
-  patch :p1 do
-    # Add OHOS SDK sysroot to TCC library/include search paths so cc() can find libc
-    file "Patches/bun/pr9-ohos-fixes/ffi_body.rs.patch"
-  end
-  patch :p1 do
-    # Fix BUN_NODE_DIR tmp path → /data/storage/el2/base/tmp;
-    # relax group-write permission check (OHOS tmpfs forces setgid);
-    # chmod after mkdir to fix permissions for re-entry
-    file "Patches/bun/pr9-ohos-fixes/install-lib.rs.patch"
-  end
-  patch :p1 do
-    # OHOS platform detection for tests: isLinux, isPosix, libcFamily, musl;
-    # GITHUB_API_URL → gh-proxy (GitHub blocked on OHOS)
-    file "Patches/bun/pr9-ohos-fixes/harness.ts.patch"
-  end
-  patch :p1 do
-    # OHOS system CA path: /system/etc/security/certificates/ (c_rehash <hash>.0 format)
-    # Fixes UNKNOWN_CERTIFICATE_VERIFICATION_ERROR on bun install
-    file "Patches/bun/pr9-ohos-fixes/root_certs_linux_ohos_ca.patch"
-  end
-  patch :p1 do
-    # O_TMPFILE fallback (Attempt #3): linkat_tmpfile fails with OHOS SELinux
-    # EPERM. Previous fix wrote buffer directly to File::create(outpath) which
-    # truncates to 0 bytes before write_all runs; if quick_exit races between
-    # create and write the cache file is left empty → "manifest is invalid".
-    # Fix: write to tmp_path in tmpdir first, then renameat atomically.
-    file "Patches/bun/pr9-ohos-fixes/npm.rs.patch"
-  end
-  patch :p1 do
-    # Binary lockfiles created before OPENHARMONY was added stored ALL_VALUE
-    # without the OPENHARMONY bit (LEGACY_ALL = ALL & !OPENHARMONY). On OHOS
-    # bun ALL_VALUE now includes OPENHARMONY, so LEGACY_ALL != ALL, causing
-    # bun.lock serialization to emit "os: !openharmony" for every package
-    # without an OS restriction. Upgrade LEGACY_ALL → ALL on lockfile load.
-    file "Patches/bun/pr9-ohos-fixes/bun.lockb.rs.patch"
-  end
+  # ── OHOS patches are pre-applied on the openharmony branch of social4hyq/ohos-bun ──
+  # See commits pr3-vendor / pr4-build-target / pr5-ohos-runtime / pr6-rust-compat /
+  # pr7-shared-cfg-gate / pr8-upstream-sync / pr9-ohos-fixes on that branch.
+  # Vendor patch files (patches/lolhtml/crate-type.patch, patches/zstd/ohos-qsort-r.patch)
+  # are committed directly in the source tree; ninja applies them during the build.
+  # The pr9 runtime script (patch-ohos-native-binlink-targets.ts) is still in the tap
+  # and run via bun in the install block below.
 
   def install
     # buildpath = bun source root (patches already auto-applied by Homebrew).
     # Build logic is fully inlined (mirroring git.rb in harmonybrew core — no external scripts).
     # All dependencies are declared via depends_on: llvm@21 (signing clang/lld), icu4c@78,
     # bun-webkit (JSC static libs), bun-bootstrap (L3 driver, bootstrap).
-
-    # ── Vendor patches (not applied via git apply; applied by ninja to vendored crates during build) ──
-    tap_patches = Pathname.new(__dir__)/"../../Patches/bun/pr3-vendor"
-    (buildpath/"patches/lolhtml").mkpath
-    (buildpath/"patches/zstd").mkpath
-    cp tap_patches/"crate-type.patch", buildpath/"patches/lolhtml/crate-type.patch"
-    cp tap_patches/"ohos-qsort-r.patch", buildpath/"patches/zstd/ohos-qsort-r.patch"
 
     # ── Fix host platform detection in config.ts: on OHOS process.platform returns "openharmony" ──
     inreplace buildpath/"scripts/build/config.ts",
