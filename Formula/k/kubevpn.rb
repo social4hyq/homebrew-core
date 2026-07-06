@@ -1,13 +1,13 @@
 class Kubevpn < Formula
   desc "Offers a Cloud-Native Dev Environment that connects to your K8s cluster network"
   homepage "https://www.kubevpn.dev"
-  url "https://github.com/kubenetworks/kubevpn/archive/refs/tags/v2.10.2.tar.gz"
-  sha256 "1f9e6a52f111024a804cbf42cff495ff9b5f007bac3794d12ef0d96b5602ce73"
+  url "https://github.com/kubenetworks/kubevpn/archive/refs/tags/v2.11.0.tar.gz"
+  sha256 "de703279927db399ff05aa10d81b4b7541baa1a7e384dc4fce7204c44de7c7c4"
   license "MIT"
   head "https://github.com/kubenetworks/kubevpn.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3ef468e5dae4939924c746221047c1907c5ecd6d2ec2861988f37f84c65b3f2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7409c36faa86ec7b33811c670a07bd5cf04f1aad8d0110c5991ad79297994716"
   end
 
   depends_on "go" => :build
