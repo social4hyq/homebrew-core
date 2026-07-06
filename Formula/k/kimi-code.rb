@@ -1,12 +1,17 @@
 class KimiCode < Formula
   desc "AI coding agent for your terminal"
-  homepage "https://github.com/MoonshotAI/kimi-code"
-  url "https://registry.npmjs.org/@moonshot-ai/kimi-code/-/kimi-code-0.21.1.tgz"
-  sha256 "568419c6ca064e3007311826ef8884a933212c07e39d43cccdaebf26f8fa6809"
+  homepage "https://moonshotai.github.io/kimi-code/"
+  url "https://registry.npmjs.org/@moonshot-ai/kimi-code/-/kimi-code-0.22.3.tgz"
+  sha256 "d6fbd17c0cdaaf5169d9bcde4efab36fdaf9e72a2c99bdecaacc7b4aff132953"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "24e8cbea22c92081ef9e02865b68ba45980c2207caa4bc810738db2e412cc605"
+    sha256 cellar: :any,                 arm64_tahoe:   "43943b8a5841c639c3da8690a378c2d871141be16b7951d98204f97c6b87043a"
+    sha256 cellar: :any,                 arm64_sequoia: "2987c76e968d078ceb808e8b0bdf26765ac5e688604f8b57ee57e9a3e8987df9"
+    sha256 cellar: :any,                 arm64_sonoma:  "2987c76e968d078ceb808e8b0bdf26765ac5e688604f8b57ee57e9a3e8987df9"
+    sha256 cellar: :any,                 sonoma:        "4070db4510cc46afd17c9664a9778d6e6cd9b62bd047bc1d00559f01f0c5906a"
+    sha256 cellar: :any_skip_relocation, arm64_linux:   "148fbeb205bfcd6dcb04a92cd6c7d81459692895cff9af22d0743dde182118c2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "c787610375bf1b302a08f991daf8fba39ff5445c8c577273cf1df1377312521d"
   end
 
   depends_on "node"
@@ -15,23 +20,16 @@ class KimiCode < Formula
     system "npm", "install", *std_npm_args
     bin.install_symlink Dir[libexec/"bin/*"]
 
-    node_modules = libexec/"lib/node_modules/@moonshot-ai/kimi-code/node_modules"
-
-    # Remove non-native architecture binaries from `koffi`
     if OS.mac?
-      if Hardware::CPU.arm?
-        rm_r node_modules/"koffi/build/koffi/darwin_x64"
-      elsif Hardware::CPU.intel?
-        rm_r node_modules/"koffi/build/koffi/darwin_arm64"
-      end
-    elsif OS.linux?
-      # koffi requires libc++ which is not available in Homebrew Linux;
-      # remove all prebuilt native binaries to avoid audit/linkage failures
-      rm_r node_modules/"koffi/build"
-    end
+      kimi_code_prefix = libexec/"lib/node_modules/@moonshot-ai/kimi-code"
+      node_modules = kimi_code_prefix/"node_modules"
 
-    # Strip universal binary to native architecture for `clipboard`
-    if OS.mac?
+      # Remove non-native architecture binaries from `node-pty` and `native`
+      other_arch = Hardware::CPU.arm? ? "x64" : "arm64"
+      rm_r node_modules/"node-pty/prebuilds/darwin-#{other_arch}"
+      rm_r kimi_code_prefix/"native/darwin/prebuilds/darwin-#{other_arch}"
+
+      # Strip universal binary to native architecture for `clipboard`
       deuniversalize_machos "#{node_modules}/@mariozechner/clipboard-darwin-universal/clipboard.darwin-universal.node"
     end
   end
