@@ -19,7 +19,7 @@ class Bun < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r15"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "TODO-rebuild-bottle"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
   # ── Dependencies (all bare names, zero changes when graduating to harmonybrew/core) ──
@@ -267,6 +267,9 @@ class Bun < Formula
     # hits EACCES on exec. CC goes through clang-sign so link artifacts are signed automatically.
     ENV["CC"]  = clang_sign.to_s
     ENV["CXX"] = clang_sign_pp.to_s
+    # bun's tmpdir() reads TMPDIR first; superenv may reset it to ~/.tmp/ which is noexec
+    # on OHOS — cargo build-script-build hits ETXTBSY. Force EL2 tmp (executable, user-owned).
+    ENV["TMPDIR"] = "/data/storage/el2/base/tmp"
 
     # ── Build: bun scripts/build.ts (equivalent to invoking `bun bd`) ──
     # --os=ohos --arch=aarch64 triggers the OHOS compile path in the bun source (pr4+pr5 patch).
