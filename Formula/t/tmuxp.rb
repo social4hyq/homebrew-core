@@ -8,7 +8,7 @@ class Tmuxp < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b25fd0899bf52f5cc22effdc775c11c10f8426cd216a9f726a811b080e7969ab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "14b36e87964d9de078d255273b4ce5b963559677e94b64ab126f56a380838549"
   end
 
   depends_on "libyaml"
