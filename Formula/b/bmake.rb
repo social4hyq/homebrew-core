@@ -11,7 +11,7 @@ class Bmake < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ead83905bf1b31dd490ceb4f0397c0b0fe56621beb181433fe9fdb58cf9d3223"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "813db44c99ab25cd0fc544c18cd054b3c6b9a21b2ca0c7094e9b78659bda2a40"
   end
 
   uses_from_macos "bc-gh" => :build
