@@ -3,13 +3,13 @@ class SshAudit < Formula
 
   desc "SSH server & client auditing"
   homepage "https://github.com/jtesta/ssh-audit"
-  url "https://files.pythonhosted.org/packages/3b/ec/e89fdfaaa6f08813e1a5cf926bc0dc155761144ebcac57191b4c8001aae3/ssh_audit-3.3.0.tar.gz"
-  sha256 "b76e36ac9844f45d64986c9f293a4b46766a10412dc29fb43bd52d0f6661a5b0"
+  url "https://files.pythonhosted.org/packages/b4/95/0dc036428ef8d76e2c812cbec9e69c2020230da32ea0e699908735894a2f/ssh_audit-3.9.0.tar.gz"
+  sha256 "f1225d0364b3cb61c7dfb1f5065a6958dbb814d98b2c1dd2a779ba2cdef41f61"
   license "MIT"
   head "https://github.com/jtesta/ssh-audit.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4cdcd8197a944ab373a356070ac8761c56638122c6aa2b355b77a73a7befe0f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "951608b424902bcef20e99026595e6be139451863dce0f23779626699aa2db56"
   end
 
   depends_on "python@3.14"
