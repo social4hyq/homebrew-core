@@ -13,7 +13,7 @@ class ImagemagickAT6 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5544af5e4df57beb50e7033474bbfbef5d65918f548d41aec6ffee087dc93449"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "82bce4a47c3716fe913f4833e54adfaff88cd05f956c77e7041ec89b85205f67"
   end
 
   keg_only :versioned_formula
