@@ -337,6 +337,14 @@ class Bun < Formula
     # Fix: write the in-memory buffer instead of reading back from the file.
     file "Patches/bun/pr9-ohos-fixes/npm.rs.patch"
   end
+  patch :p1 do
+    # Binary lockfiles created before OPENHARMONY was added stored ALL_VALUE
+    # without the OPENHARMONY bit (LEGACY_ALL = ALL & !OPENHARMONY). On OHOS
+    # bun ALL_VALUE now includes OPENHARMONY, so LEGACY_ALL != ALL, causing
+    # bun.lock serialization to emit "os: !openharmony" for every package
+    # without an OS restriction. Upgrade LEGACY_ALL → ALL on lockfile load.
+    file "Patches/bun/pr9-ohos-fixes/bun.lockb.rs.patch"
+  end
 
   def install
     # buildpath = bun source root (patches already auto-applied by Homebrew).
