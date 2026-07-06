@@ -11,7 +11,7 @@ class BashCompletionAT2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d9eacb035a0f7343bba0b8591f271e6df6f06da5c45c812eec066fdcc7cc4b3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea503a444dfc626e7200d0dd33d2161ad9299bc274aa10d098924b287d79cef3"
   end
 
   head do
