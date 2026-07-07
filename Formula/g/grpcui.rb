@@ -12,7 +12,7 @@ class Grpcui < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fa643da6bc93231810d1d4ce082aed4d5e1384a5f30fa96fb42a7e3e237dcfd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d2aa6d2ad8ca92f1a69f9bc7d9bce1e1bc2018af1f7f7d2a5469c7ac7e0c59d"
   end
 
   depends_on "go" => :build
