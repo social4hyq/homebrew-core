@@ -1,0 +1,45 @@
+--- a/sftp-server-main.c	2026-07-07 07:56:07.476774043 +0000
++++ b/sftp-server-main.c	2026-07-07 07:56:31.813090439 +0000
+@@ -22,6 +22,9 @@
+ #include <stdarg.h>
+ #include <stdio.h>
+ #include <unistd.h>
++#ifdef __OHOS__
++#include <stdlib.h>
++#endif
+ 
+ #include "log.h"
+ #include "sftp.h"
+@@ -43,9 +46,32 @@
+ 	sanitise_stdfd();
+ 
+ 	if ((user_pw = getpwuid(getuid())) == NULL) {
++#ifdef __OHOS__
++		{
++			uid_t uid = getuid();
++			gid_t gid = getgid();
++			const char *home = getenv("HOME");
++			static struct passwd ohos_pw;
++			static char ohos_name[32], ohos_home[1024];
++
++			snprintf(ohos_name, sizeof(ohos_name), "u%u", (unsigned)uid);
++			snprintf(ohos_home, sizeof(ohos_home), "%s",
++			    home ? home : "/");
++			ohos_pw.pw_name = ohos_name;
++			ohos_pw.pw_passwd = "";
++			ohos_pw.pw_uid = uid;
++			ohos_pw.pw_gid = gid;
++			ohos_pw.pw_gecos = "";
++			ohos_pw.pw_dir = ohos_home;
++			ohos_pw.pw_shell = "/bin/sh";
++			user_pw = &ohos_pw;
++			debug("OHOS: synthetic passwd entry for uid %u", uid);
++		}
++#else
+ 		fprintf(stderr, "No user found for uid %lu\n",
+ 		    (u_long)getuid());
+ 		return 1;
++#endif
+ 	}
+ 
+ 	return (sftp_server_main(argc, argv, user_pw));

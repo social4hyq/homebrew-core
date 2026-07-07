@@ -6,7 +6,7 @@ class Openssh < Formula
   version "10.3p1"
   sha256 "56682a36bb92dcf4b4f016fd8ec8e74059b79a8de25c15d670d731e7d18e45f4"
   license "SSH-OpenSSH"
-  revision 5
+  revision 6
   compatibility_version 1
 
   livecheck do
@@ -15,7 +15,7 @@ class Openssh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b906dbabbe28e2e2a7b52a7fa6852e5561107167970bee89777d843409fdb1c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d0d4a8e7268a6ac66e11e50882bddcb74cf742f8c530789371a7bc41a7f04745"
   end
 
   depends_on "pkgconf" => :build
@@ -34,6 +34,7 @@ class Openssh < Formula
     misc.c openbsd-compat_xcrypt.c scp.c platform.c
     cipher.c myproposal.h
     loginrec.c
+    sftp-server-main.c
   ].each do |p|
     patch do
       file "Patches/openssh/#{p}.patch"
@@ -122,6 +123,10 @@ class Openssh < Formula
       inreplace sshd_config, /^#?PasswordAuthentication yes$/, "PasswordAuthentication no"
       # OHOS: default port changed from 22 to 8022 (non-privileged)
       inreplace sshd_config, /^#?Port 22$/, "Port 8022"
+      # OHOS: fix sftp-server subsystem path to point to the Homebrew install
+      inreplace sshd_config,
+        %r{^Subsystem\s+sftp\s+/usr/libexec/sftp-server},
+        "Subsystem\tsftp\t#{opt_libexec}/sftp-server"
     end
   end
 
