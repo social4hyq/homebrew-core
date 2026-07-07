@@ -143,6 +143,17 @@ opencode --version
 
 PR 合并并发布后，`opencode.rb` 中对应的 `index.js` 字符串替换 patch 可以删除，直接用上游原生包。
 
+## 最近变更
+
+```
+940fc7c docs: fix bun-bootstrap bottle size to 40 MB
+17aee5a docs: update bun-bootstrap to 1.4.0-5467a689 in README
+36ed70f chore(bun-bootstrap): update to 1.4.0-5467a689 (r16, ohos_sign in-process signing)
+94bbb95 chore(opencode): remove redundant .so/.node signing loop — bun r16 PackageInstaller handles it in-process
+cc5d5ec docs: update README for bun r16 — ohos_sign in-process signing
+e331d54 bun 1.4.0 r16: replace binary-sign-tool with in-process ohos_sign crate
+```
+
 ## 反馈与贡献
 
 - 遇到功能差异或崩溃，请附：HarmonyOS 版本、`bun --version`、复现命令、是否触及上面表格里的降级类别
