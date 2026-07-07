@@ -31,7 +31,8 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 
 - WebKit Inspector 走 socket 后端而非 glib 后端（OHOS 没有 GLib），远程调试连接方式和上游略有差异
 - `icu4c@78` 用本仓库的 `llvm@21` 重编，让 ICU 的 libc++ 符号和 `bun` / `bun-webkit` 用同一个 mangling（`__h` namespace），避免链接器找不到符号
-- 所有 ELF 必须经 `ohos-sdk` 的 `binary-sign-tool` 自签后才能执行，formula 内已经处理；二次打包请保留签名步骤
+- OHOS 要求 ELF 经 fs-verity 自签后才能执行。**运行时签名**（`bun install` 装的 `.node`/`.so`、`bun build --compile` 产物、dlopen 兜底）由 Bun 内置的 `ohos_sign` Rust crate 完成（in-process，零 fork）；**构建期签名**（clang-sign wrapper、最终 bun 二进制）仍由 `ohos-sdk` 的 `binary-sign-tool` 承担，formula 内已处理
+- 自签算法参考 [hqzing/ohos-bst-light](https://github.com/hqzing/ohos-bst-light)（fs-verity descriptor + SHA-256 merkle tree + `.codesign` ELF64 section 注入，Rust 移植实现在 `src/ohos_sign/`）；二次打包时可直接调用 `ohos-selfsign sign <file> --force`
 - bottle 只覆盖 `arm64_ohos`，不提供 macOS / x86_64 等其他平台产物
 
 ## Formulae
@@ -39,7 +40,7 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 | Formula | 版本 | 说明 |
 |---|---|---|
 | `opencode` | 1.17.13 @ `10c894bd`（2026-07-03） | OpenCode AI 编码代理 CLI（单文件二进制 + 嵌入 Web UI） |
-| `bun` | 1.4.0 @ `1498d7b77a`（main，2026-07-03） | Bun JavaScript runtime |
+| `bun` | 1.4.0 @ `5467a6893`（openharmony，2026-07-07） | Bun JavaScript runtime；运行时签名由内置 `ohos_sign` crate 承担，`ohos-sdk` 降为 build-only 依赖 |
 | `bun-bootstrap` | 1.4.0 @ `e0acad318`（main，2026-06-15） | 预编译 bun，用来启动 `bun bd` 自举本机 bun（`keg_only`） |
 | `bun-webkit` | `c9ad5813fd`（2026-07-03） | JavaScriptCore / WTF / bmalloc 静态库，bun 专用 WebKit fork（`keg_only`） |
 | `bun-pty` | 0.4.10（2026-06-15） | `librust_pty.so`，portable-pty + nix 0.31 OHOS 支持（`keg_only`） |
@@ -60,7 +61,7 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 | `bun-pty` | `bun-pty-v0.4.10-r2` | 270 KB |
 | `lightningcss` | `lightningcss-v1.30.1-r2` | 3.4 MB |
 | `tailwindcss-oxide` | `tailwindcss-oxide-v4.1.11-r2` | 1.3 MB |
-| `bun` | `bun-v1.4.0_1` | 40 MB |
+| `bun` | `bun-v1.4.0-r16` | 107 MB |
 | `opencode` | `opencode-v1.17.13-r6` | 58 MB |
 
 > `bun-bootstrap` 为预编译 binary pour（41 MB），tag `bun-bootstrap-v1.4.0-e0acad318`。
@@ -105,7 +106,7 @@ graph TD
     icu --> llvm
 
     llvm --> sdk
-    bun --> sdk
+    bun -.->|build only| sdk
     pty --> sdk
     lcss --> sdk
     tw --> sdk
