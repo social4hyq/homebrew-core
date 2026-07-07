@@ -85,15 +85,6 @@ class Opencode < Formula
       chmod 0755, dest
     end
 
-    Dir.glob("node_modules/**/*.{so,node}", File::FNM_DOTMATCH).each do |f|
-      next unless File.file?(f)
-      next if File.symlink?(f)
-      next if File.binread(f, 4) != "\x7fELF"
-
-      system sign_tool, "sign", "-selfSign", "1", "-inFile", f, "-outFile", f
-      chmod 0755, f
-    end
-
     pty_so = Formula["bun-pty"].opt_lib/"librust_pty.so"
     pty_names = %w[librust_pty_arm64_musl.so librust_pty_arm64.so librust_pty.so]
     Dir.glob("node_modules/**/bun-pty/rust-pty/target/release", File::FNM_DOTMATCH).each do |d|
@@ -155,11 +146,12 @@ class Opencode < Formula
     # rollup: @rollup/rollup-openharmony-arm64@4.60.4 is an official upstream binding,
     # installed automatically by `bun install` (bun-lock-openharmony-os.patch flips its
     # lockfile `os` from "none" to "openharmony"). Its rollup.openharmony-arm64.node
-    # gets ELF-signed by the generic .so/.node loop above; rollup's native.js falls back
-    # to `require('@rollup/rollup-openharmony-arm64')` when dist/*.node is absent.
+    # is ELF-signed by bun's PackageInstaller (in-process, no external tool needed);
+    # rollup's native.js falls back to `require('@rollup/rollup-openharmony-arm64')`
+    # when dist/*.node is absent.
 
-    # @opentui/core@0.3.4 bundle patches (libopentui.so was already ELF-signed by the
-    # generic .so/.node signing loop above):
+    # @opentui/core@0.3.4 bundle patches (libopentui.so is ELF-signed by bun's
+    # PackageInstaller during `bun install`):
     # (1) drop stray uppercase-hex line before the trailing `//# sourceMappingURL=` — an
     #     upstream bundler bug leaves a partial debugId duplicate that bun 1.4.0's strict-mode
     #     parser rejects as "Decimal integer literals with a leading zero...";
