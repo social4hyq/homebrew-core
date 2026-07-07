@@ -64,7 +64,7 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 | `bun` | `bun-v1.4.0-r16` | 107 MB |
 | `opencode` | `opencode-v1.17.13-r6` | 58 MB |
 
-> `bun-bootstrap` 为预编译 binary pour（41 MB），tag `bun-bootstrap-v1.4.0-5467a689`。
+> `bun-bootstrap` 为预编译 binary pour（40 MB），tag `bun-bootstrap-v1.4.0-5467a689`。
 
 ## 依赖图
 
