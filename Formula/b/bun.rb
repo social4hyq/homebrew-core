@@ -6,10 +6,10 @@ class Bun < Formula
   # pre-populated WebKit cache, and a Rust nightly toolchain with -Zbuild-std.
   # All patches are pre-applied on the openharmony branch of social4hyq/ohos-bun.
   # Upstream formula cannot accommodate these build requirements.
-  url "https://gh-proxy.com/https://github.com/social4hyq/ohos-bun.git", revision: "1c42c9cd7f08adca7c5b6dbebd42762dd0848441", branch: "openharmony"
+  url "https://gh-proxy.com/https://github.com/social4hyq/ohos-bun.git", revision: "dccdf6a1ec768523fe1b97093b4b4e3e902b8c99", branch: "openharmony"
   version "1.4.0"
   license "MIT"
-  revision 18
+  revision 19
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -18,8 +18,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r18"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fdc06696931a4b324ad0c2259f712dc07e96af4601db96f95cbd00251de0a2f4"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r19"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb7e62322490ef01b38fb8b102f5833806e473b06657cbbc158f5694c86afec5"
   end
 
   # ── Dependencies (all bare names, zero changes when graduating to harmonybrew/core) ──
