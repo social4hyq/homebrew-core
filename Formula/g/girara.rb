@@ -1,8 +1,8 @@
 class Girara < Formula
   desc "Common components for zathura"
   homepage "https://pwmt.org/projects/girara/"
-  url "https://pwmt.org/projects/girara/download/girara-2026.02.04.tar.xz"
-  sha256 "342eca8108bd05a2275e3eacb18107fa3170fa89a12c77e541a5f111f7bba56d"
+  url "https://pwmt.org/projects/girara/download/girara-2026.07.07.tar.xz"
+  sha256 "475f154148647d45e0f1324762fe5452094147085fddf2ccef4e9725c335b0c1"
   license "Zlib"
 
   livecheck do
@@ -21,7 +21,8 @@ class Girara < Formula
   depends_on "glib"
 
   def install
-    system "meson", "setup", "build", "-Ddocs=disabled", "-Dtests=disabled", *std_meson_args
+    # Upstream defaults to c_std=c23, which GCC 13 (CI) rejects; c17 is equivalent here.
+    system "meson", "setup", "build", "-Ddocs=disabled", "-Dc_std=c17", *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
   end
