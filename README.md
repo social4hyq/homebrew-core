@@ -83,7 +83,7 @@ graph TD
     lcss[lightningcss]:::rt
     tw[tailwindcss-oxide]:::rt
 
-    bb[bun-bootstrap]:::boot
+    bb["bun-bootstrap\n(已预签，无需 ohos-sdk)"]:::boot
     bw[bun-webkit]:::boot
 
     llvm["llvm@21"]:::tc
