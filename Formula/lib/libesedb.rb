@@ -1,15 +1,15 @@
 class Libesedb < Formula
   desc "Library and tools for Extensible Storage Engine (ESE) Database files"
   homepage "https://github.com/libyal/libesedb"
-  url "https://github.com/libyal/libesedb/releases/download/20240420/libesedb-experimental-20240420.tar.gz"
-  sha256 "07250741dff8a1ea1f5e38c02f1b9a1ae5e9fa52d013401067338842883a5b9f"
+  url "https://github.com/libyal/libesedb/releases/download/20260704/libesedb-experimental-20260704.tar.gz"
+  sha256 "78f5e4cd11b551e673db270a9d40abf3c8ec8523b91939a9251ca80ee5a83bd1"
   license "LGPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3fc8486103cb89a1a730264b1be1eba2b66dd9e0d892666d5473fd58a1d3b57d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c5a53fdeacacd3822810ccbf3b2c4f24523f9ff23350a1c28e873ba3b2438ae"
   end
 
-  depends_on "pkgconf" => :test
+  depends_on "pkgconf" => [:build, :test]
 
   def install
     system "./configure", *std_configure_args
