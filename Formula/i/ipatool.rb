@@ -7,12 +7,7 @@ class Ipatool < Formula
   head "https://github.com/majd/ipatool.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "dfb2caea11dbc2ea5574126e34ef8c4519bdf0f89e9f3e70b08fd616299c74d7"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "a9d6173e33f7d076b8bc3c4f49fb876fa9bcfe5d9bde2cd9c2b1c182174d968d"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "286bc78f6b3ae9db1b6b4695ba9e430d9b465a2130bb6248335fac1eede0f42a"
-    sha256 cellar: :any_skip_relocation, sonoma:        "9954dd39e7bac548e40b4df57f5d2f16afb2e41e6b148143eea81fda9f40f467"
-    sha256 cellar: :any,                 arm64_linux:   "e2024617f5c29f465aa2b2809dabbf7f7ada2bf608a3640e07435c0c38fc91a1"
-    sha256 cellar: :any,                 x86_64_linux:  "e1e4cbede7a49a7256be6dd329a654a7d94e50604cd82601a642e33b0bb6b043"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "889ebaea74c54224dde913004ce2d79a76aac25b44ea29606345ca04c0bfe14e"
   end
 
   depends_on "go" => :build
