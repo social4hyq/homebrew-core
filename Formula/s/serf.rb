@@ -1,8 +1,8 @@
 class Serf < Formula
   desc "Service orchestration and management tool"
   homepage "https://github.com/hashicorp/serf"
-  url "https://github.com/hashicorp/serf/archive/refs/tags/v0.10.2.tar.gz"
-  sha256 "bcccbf847024af099e164faf6d6d111345edf166eb24e53e3ccc7f37d6e281a1"
+  url "https://github.com/hashicorp/serf/archive/refs/tags/v0.10.4.tar.gz"
+  sha256 "14b667203f34dd0a2cb54fcf863cd91799268f8b20230ad893fc36c23a1c7a00"
   license "MPL-2.0"
   head "https://github.com/hashicorp/serf.git", branch: "master"
 
