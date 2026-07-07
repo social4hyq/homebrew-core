@@ -1,8 +1,8 @@
 class CAres < Formula
   desc "Asynchronous DNS library"
   homepage "https://c-ares.org/"
-  url "https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz"
-  sha256 "912dd7cc3b3e8a79c52fd7fb9c0f4ecf0aaa73e45efda880266a2d6e26b84ef5"
+  url "https://github.com/c-ares/c-ares/releases/download/v1.34.7/c-ares-1.34.7.tar.gz"
+  sha256 "556f781dd188ad932dc8263fee0ad3aaba675b4cd8e54d86908681b43ce3e327"
   license "MIT"
   compatibility_version 1
   head "https://github.com/c-ares/c-ares.git", branch: "main"
@@ -13,7 +13,7 @@ class CAres < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0615467fdbdca668718feea110490ff15071c1ff3b87a79eca8c6982998b3b4a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "139ba35438004831e71f36f6fcba8bdb367fface99dedb1a66e9e097e2cb0416"
   end
 
   depends_on "cmake" => :build
