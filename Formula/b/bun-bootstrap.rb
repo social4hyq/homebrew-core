@@ -1,9 +1,9 @@
 class BunBootstrap < Formula
   desc "Prebuilt Bun for bootstrapping Bun builds (L3 driver)"
   homepage "https://github.com/oven-sh/bun"
-  url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-bootstrap-v1.4.0-e0acad318/bun-ohos-aarch64-1.4.0-e0acad318.tar.gz"
-  version "1.4.0-e0acad318"
-  sha256 "3f750dd48448fecf720b3f61a9517d625451774dee67a22882622d0204b9a7f2"
+  url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-bootstrap-v1.4.0-5467a689/bun-ohos-aarch64-1.4.0-5467a689.tar.gz"
+  version "1.4.0-5467a689"
+  sha256 "7c1f187907eba7090c60e14dc1bc474fd62ec5b6273cc44c571cf18d35305a2b"
   license "MIT"
 
   # Prebuilt tarball, hosted as a release asset of this repo (not committed to git).
@@ -15,32 +15,18 @@ class BunBootstrap < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-bootstrap-v1.4.0-e0acad318"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a71df0c888aa49f1b56ae1c53368d141443a6b911458d24d45831a79795492c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-bootstrap-v1.4.0-5467a689"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "463b5efa40e04405914ae629e2762e6710defeeaae73bd6cdcc3d3892cb4d82a"
   end
 
   # Prebuilt binary, no source build step; only referenced by bun/bun-canary at build time, not at runtime.
   keg_only "bootstrap only; not for direct use"
 
-  depends_on "ohos-sdk"
-
   def install
-    # tarball contains the bun binary (LLD has already embedded --code-sign section, no binary-sign-tool signature).
-    # OHOS requires ELF to have both LLD code-sign and binary-sign-tool certificate to execute.
+    # Tarball contains bun already signed by binary-sign-tool (via bun.rb r16 install block).
+    # No strip+resign needed here.
     libexec.install Dir["*"]
-
-    sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
-    if sign_tool.exist? && (libexec/"bun").exist?
-      ohai "Stripping existing .codesign section (from LLD)"
-      system "llvm-objcopy", "--remove-section=.codesign", libexec/"bun"
-      ohai "Self-signing bootstrap bun"
-      system sign_tool, "sign", "-selfSign", "1",
-             "-inFile", libexec/"bun", "-outFile", libexec/"bun.signed"
-      (libexec/"bun.signed").chmod(0755)
-      bin.install_symlink libexec/"bun.signed" => "bun"
-    else
-      bin.install_symlink libexec/"bun" => "bun"
-    end
+    bin.install_symlink libexec/"bun" => "bun"
   end
 
   def caveats
@@ -52,7 +38,6 @@ class BunBootstrap < Formula
   end
 
   test do
-    # bootstrap bun can execute and output version (verify the signed binary is runnable)
-    assert_match "bun", shell_output("#{bin}/bun --version").downcase
+    assert_match version.to_s.split("-").first, shell_output("#{bin}/bun --version")
   end
 end
