@@ -7,12 +7,7 @@ class Croc < Formula
   head "https://github.com/schollz/croc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "b20d661da255e2c5419a6248dad41160be0f7d6858a898df17ed0d2d19e956cf"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "b20d661da255e2c5419a6248dad41160be0f7d6858a898df17ed0d2d19e956cf"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b20d661da255e2c5419a6248dad41160be0f7d6858a898df17ed0d2d19e956cf"
-    sha256 cellar: :any_skip_relocation, sonoma:        "1a9fe521ae369730754ba4293de0a6461c6128dfc75da1048f9df3d150584d9d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "1ca6ac2d55e27eb736a0d58aa26d9f131968bb7b9b8925de663d366f54b6a91f"
-    sha256 cellar: :any,                 x86_64_linux:  "9b7364af23d898ceb71e2af0a242471466cbcf9c2c54972116d8c9808ae5cd14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "89c117d8077d1a8c128e2d01a65477a4280c351c1811b3e5448c63a870cc7bec"
   end
 
   depends_on "go" => :build
