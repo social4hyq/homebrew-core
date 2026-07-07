@@ -41,7 +41,7 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 |---|---|---|
 | `opencode` | 1.17.13 @ `10c894bd`（2026-07-03） | OpenCode AI 编码代理 CLI（单文件二进制 + 嵌入 Web UI） |
 | `bun` | 1.4.0 @ `5467a6893`（openharmony，2026-07-07） | Bun JavaScript runtime；运行时签名由内置 `ohos_sign` crate 承担，`ohos-sdk` 降为 build-only 依赖 |
-| `bun-bootstrap` | 1.4.0 @ `e0acad318`（main，2026-06-15） | 预编译 bun，用来启动 `bun bd` 自举本机 bun（`keg_only`） |
+| `bun-bootstrap` | 1.4.0 @ `5467a689`（openharmony，2026-07-07） | 预编译 bun，用来启动 `bun bd` 自举本机 bun；已内置 ohos_sign，无需 ohos-sdk（`keg_only`） |
 | `bun-webkit` | `c9ad5813fd`（2026-07-03） | JavaScriptCore / WTF / bmalloc 静态库，bun 专用 WebKit fork（`keg_only`） |
 | `bun-pty` | 0.4.10（2026-06-15） | `librust_pty.so`，portable-pty + nix 0.31 OHOS 支持（`keg_only`） |
 | `lightningcss` | 1.30.1（2025-05-14） | `liblightningcss_node.so` CSS 原生绑定（`keg_only`） |
@@ -64,7 +64,7 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 | `bun` | `bun-v1.4.0-r16` | 107 MB |
 | `opencode` | `opencode-v1.17.13-r6` | 58 MB |
 
-> `bun-bootstrap` 为预编译 binary pour（41 MB），tag `bun-bootstrap-v1.4.0-e0acad318`。
+> `bun-bootstrap` 为预编译 binary pour（41 MB），tag `bun-bootstrap-v1.4.0-5467a689`。
 
 ## 依赖图
 
