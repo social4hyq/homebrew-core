@@ -1,8 +1,8 @@
 class Nixfmt < Formula
   desc "Command-line tool to format Nix language code"
   homepage "https://github.com/NixOS/nixfmt"
-  url "https://github.com/NixOS/nixfmt/archive/refs/tags/v1.3.1.tar.gz"
-  sha256 "e3ff9cbaedd90b0cb71c897f2e09542a3601f7ea6b6ec02f156405e5b8ea8749"
+  url "https://github.com/NixOS/nixfmt/archive/refs/tags/v1.4.0.tar.gz"
+  sha256 "adc9a3174fe18333b6de5829f4b663a2736d6d78450e1f19270fc994b38a49aa"
   license "MPL-2.0"
   head "https://github.com/NixOS/nixfmt.git", branch: "master"
 
