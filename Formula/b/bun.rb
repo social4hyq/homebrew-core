@@ -6,10 +6,10 @@ class Bun < Formula
   # pre-populated WebKit cache, and a Rust nightly toolchain with -Zbuild-std.
   # All patches are pre-applied on the openharmony branch of social4hyq/ohos-bun.
   # Upstream formula cannot accommodate these build requirements.
-  url "https://gh-proxy.com/https://github.com/social4hyq/ohos-bun.git", revision: "49d528cc6b2c6d5b17f0038f855547a4a87d6da8", branch: "openharmony"
+  url "https://gh-proxy.com/https://github.com/social4hyq/ohos-bun.git", revision: "5467a689326b09714955a4033e7582619410572c", branch: "openharmony"
   version "1.4.0"
   license "MIT"
-  revision 15
+  revision 16
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -18,8 +18,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r15"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce67ca7ade7bfd66a5a337df006348e44242bc9349ffe69c267f59f42c702217"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1cf1f01de722ac6d05d5c6f88290022b5f77d658f9eadb1dfa849d80c0de7a54"
   end
 
   # ── Dependencies (all bare names, zero changes when graduating to harmonybrew/core) ──
@@ -35,10 +35,10 @@ class Bun < Formula
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
   depends_on "social4hyq/core/icu4c@78" => :build # qualified: icu4c@78 exists in both taps
-  # ohos-sdk stays runtime: bun calls binary-sign-tool at runtime in three places
-  # (PackageInstaller signs downloaded .node files; dlopen ensures .so is signed;
-  # `bun build --compile` signs its output). OHOS refuses to exec unsigned ELF.
-  depends_on "ohos-sdk"
+  # ohos-sdk is build-time only: used to sign rust-nightly binaries, the
+  # clang-sign wrapper, and the final bun binary. Runtime signing (PackageInstaller
+  # .node/.so, dlopen, bun build --compile) is now handled in-process by ohos_sign.
+  depends_on "ohos-sdk" => :build
 
   # Rust nightly (native OHOS host toolchain, needed by bun's libbun_rust.a).
   # OHOS is a Tier 3 target with no prebuilt rust-std, so bun uses -Zbuild-std
@@ -122,9 +122,9 @@ class Bun < Formula
       ln_sf icu.opt_bin/t, buildpath/"build/ohos-icu/host/bin"/t if (icu.opt_bin/t).exist?
     end
 
-    # ── bun install (bun.lock.patch keeps lock consistent with post-pr4 package.json) ──
-    # bun.lock.patch upgrades esbuild and adds ohos-signpost so the lock matches package.json exactly.
-    # bun install then resolves all packages from ~/.bun/install/cache without network access.
+    # ── bun install (bun.lock committed on openharmony branch matches package.json) ──
+    # bun.lock was updated to remove ohos-signpost (replaced by in-process ohos_sign crate).
+    # bun install resolves all packages from ~/.bun/install/cache without network access.
     # (bun-tracestrings: github-hosted dep; GitHub is blocked on OHOS but the package is pre-cached
     # at @GH@oven-sh-bun.report-912ca63@@@1 so no download is attempted.)
     ENV.prepend_path "PATH", boot.opt_bin
