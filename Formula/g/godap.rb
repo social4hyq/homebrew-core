@@ -1,13 +1,13 @@
 class Godap < Formula
   desc "Complete TUI (terminal user interface) for LDAP"
   homepage "https://github.com/Macmod/godap"
-  url "https://github.com/Macmod/godap/archive/refs/tags/v2.11.0.tar.gz"
-  sha256 "8b36a883dd571fbdb39a66be6c79ffbf2f6c4a24adcf554a5da858af626f4559"
+  url "https://github.com/Macmod/godap/archive/refs/tags/v2.11.1.tar.gz"
+  sha256 "d44259fb90b4687284200cbccedf7a55c273ffd162583fdc366f9e77506622ad"
   license "MIT"
   head "https://github.com/Macmod/godap.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d285aedb9c18d22f1368bbe03308d0f66ea7827ed3177d6921dddd1d6cdbec15"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef650c586cdbecdcf571ea2ef4c8cdff4f7aed0e29653dd0f919fdbe0c4e5c4c"
   end
 
   depends_on "go" => :build
