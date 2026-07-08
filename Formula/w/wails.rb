@@ -1,18 +1,20 @@
 class Wails < Formula
   desc "Create beautiful applications using Go"
   homepage "https://wails.io"
-  url "https://github.com/wailsapp/wails/archive/refs/tags/v2.12.0.tar.gz"
-  sha256 "bfc663dd01f762c5524006d945616c5ce361055fa649ebc3b1ae2a16247d8fee"
+  url "https://github.com/wailsapp/wails/archive/refs/tags/v2.13.0.tar.gz"
+  sha256 "08b8135f6dce18be6016046aa8e75607e998f4f4687154f7d9ebb1bb03666756"
   license "MIT"
   head "https://github.com/wailsapp/wails.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "06d826f4bee55dd20547fe7a4f4d42ca905233e086b0b2f70895736068d3d62c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "649abfb2367f41143d0949296e29e15f1f782e7e54bba42d7e0d9f832f7e1091"
   end
 
   depends_on "go"
 
   def install
+    # The top-level go.work only lists v3, so disable workspace mode to build v2.
+    ENV["GOWORK"] = "off"
     cd "v2" do
       system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/wails"
     end
