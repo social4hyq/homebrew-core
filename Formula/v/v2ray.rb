@@ -12,12 +12,7 @@ class V2ray < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "59842e0ad329399214231d391dcbe353bc12a708657900eb456788acecbc7bbd"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "59842e0ad329399214231d391dcbe353bc12a708657900eb456788acecbc7bbd"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "59842e0ad329399214231d391dcbe353bc12a708657900eb456788acecbc7bbd"
-    sha256 cellar: :any_skip_relocation, sonoma:        "137944c81742a9c205b7964ccac565d060c21f09c0c810eb32306866c37de987"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "33f5ab5b73af7cade6881fc61a207a2900e99052cd41226674a7cf14c8bd5ccd"
-    sha256 cellar: :any,                 x86_64_linux:  "49a99d1cfd49d3bcf8faa49b4f685e6dfb2649a12c43106d37f422842345f407"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "79053bca5392c64e15a89aa2e8b61c0d8edd833689744b0b49bfe6683f506c12"
   end
 
   depends_on "go" => :build
