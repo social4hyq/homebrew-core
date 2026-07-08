@@ -1,8 +1,8 @@
 class UBootTools < Formula
   desc "Universal boot loader"
   homepage "https://www.denx.de/wiki/U-Boot/"
-  url "https://ftp.denx.de/pub/u-boot/u-boot-2026.04.tar.bz2"
-  sha256 "ac7c04b8b7004923b00a4e5d6699c5df4d21233bac9fda690d8cfbc209fff2fd"
+  url "https://ftp.denx.de/pub/u-boot/u-boot-2026.07.tar.bz2"
+  sha256 "78e8bfc382fe388f9b55aa1daf8c563522a037779b5d4c349d1415e381f1243e"
   license all_of: ["GPL-2.0-only", "GPL-2.0-or-later", "BSD-3-Clause"]
 
   livecheck do
@@ -11,7 +11,7 @@ class UBootTools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f3c400375ee4fcfd5e992176a83d2dcb0584a5e1679564bf13b388b685849a0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "75adeaec858254de0a3c493fdb21c7f6fd2f2952e41a9cbbf6aaf634a0a3e297"
   end
 
   depends_on "coreutils" => :build # Makefile needs $(gdate)
