@@ -15,7 +15,7 @@ class Znapzend < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d0ff159595be4d3d6faf3268c43e031b12fb930572a39b50260dfe79c737413"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "92226921d3ae37c01bd0a974cdf1ea925ebf87ebaac25389a24fc8f1003cf6bc"
   end
 
   uses_from_macos "perl", since: :big_sur
