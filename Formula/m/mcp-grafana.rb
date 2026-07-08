@@ -1,14 +1,13 @@
 class McpGrafana < Formula
   desc "MCP server for Grafana"
   homepage "https://github.com/grafana/mcp-grafana"
-  url "https://github.com/grafana/mcp-grafana/archive/refs/tags/v0.17.0.tar.gz"
-  sha256 "f1377df93a76b580a9b35a5abecc95587ac15fdba2ee6a4dd795eb12bde95173"
+  url "https://github.com/grafana/mcp-grafana/archive/refs/tags/v0.17.1.tar.gz"
+  sha256 "bae7104e2ca4c4381b2dd753309b3a0ce4b2256df0fcf43e9982668e3f69c4b0"
   license "Apache-2.0"
   head "https://github.com/grafana/mcp-grafana.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc8cbc38b6e729d4a06334144ef30b741661562ba4760326fe20ac99402e5f3a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "940c4503cbfeb8700e265b80f1120dc47ba7a2e418ff8af6f5ea4b76447d457a"
   end
 
   depends_on "go" => :build
