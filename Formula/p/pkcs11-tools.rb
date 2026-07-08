@@ -6,7 +6,7 @@ class Pkcs11Tools < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a14daf393386a21146d95b90ff670a891e6798a97a4cde347cabab15947cdfb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be588308c48e9e9b603716327362692cf882dab72fcd808e548df3d7f587c83e"
   end
 
   depends_on "pkgconf" => :build
