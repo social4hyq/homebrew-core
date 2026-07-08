@@ -7,7 +7,7 @@ class Mdbook < Formula
   head "https://github.com/rust-lang/mdBook.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "57721bfafd687235ce41f35c6907e586159cae67533b2d6dd27e12017cd3f80c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "757f2c62338cf1bdff3ad24b838af1594384f8e727288f9a643a4804e5899535"
   end
 
   depends_on "rust" => :build
