@@ -1,8 +1,8 @@
 class Mbedtls < Formula
   desc "Cryptographic & SSL/TLS library"
   homepage "https://tls.mbed.org/"
-  url "https://github.com/Mbed-TLS/mbedtls/releases/download/mbedtls-4.1.0/mbedtls-4.1.0.tar.bz2"
-  sha256 "377a09cf8eb81b5fb2707045e5522d5489d3309fed5006c9874e60558fc81d10"
+  url "https://github.com/Mbed-TLS/mbedtls/releases/download/mbedtls-4.2.0/mbedtls-4.2.0.tar.bz2"
+  sha256 "2bed9d713b4668f76553b097e72b8aa30bc8f112a940d7ae228d524bbde6ffea"
   license "Apache-2.0"
   head "https://github.com/Mbed-TLS/mbedtls.git", branch: "development"
 
@@ -13,7 +13,7 @@ class Mbedtls < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "27b0d0b7ff2b2d14be6090bedcd4a512544507063d1f644b27ad1d22b266fe5a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "244e2ee55654707f2627599784c0126464bb23e44b07e2ec9b0e57169a6e03c0"
   end
 
   depends_on "cmake" => :build
