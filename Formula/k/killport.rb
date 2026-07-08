@@ -1,12 +1,12 @@
 class Killport < Formula
   desc "Command-line tool to kill processes listening on a specific port"
   homepage "https://github.com/jkfran/killport"
-  url "https://github.com/jkfran/killport/archive/refs/tags/v2.0.0.tar.gz"
-  sha256 "06e01de691c0fd0244cef340ac6bd0fb991d779191b0f5014f97353691a508e3"
+  url "https://github.com/jkfran/killport/archive/refs/tags/v2.0.1.tar.gz"
+  sha256 "a662571935cc9d425bbce8beb7725ff87e215ac0e47371b1b8b8443b63465dee"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "204467a6464242a8543a85c4d2aaea56107c01793816b45dad416807eb2eccb3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b4cb010b730494db5b32437c5ba9a20a898e9df5812de9cc881ff3ac72e8b58"
   end
 
   depends_on "rust" => :build
