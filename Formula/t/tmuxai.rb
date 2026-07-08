@@ -6,7 +6,7 @@ class Tmuxai < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "53eb19caa2f3594c0c0e17fe3081156b3e388e0496e8fda41611d27d62670732"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "80109baac47deb8cdf7451f17605435231646ee4e22ad1f3788c1e2043059565"
   end
 
   depends_on "go" => :build
