@@ -12,7 +12,7 @@ class Conduit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e12dfaca6d3285c35f87846b6d4433a11f154c3a3de87ad0f057bce5bfa77bb1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7faa3b6d2d2bffec2040b417a989628f60262465125a35bb5057a4ba948fee5c"
   end
 
   depends_on "go" => :build
