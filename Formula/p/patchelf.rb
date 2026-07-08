@@ -1,8 +1,8 @@
 class Patchelf < Formula
   desc "Modify dynamic ELF executables"
   homepage "https://github.com/NixOS/patchelf"
-  url "https://github.com/NixOS/patchelf/releases/download/0.19.0/patchelf-0.19.0.tar.bz2"
-  sha256 "b189d3ec57730757895b9e7d3a1f136d3af96ec9228ae6ef0a07c20a213f28f5"
+  url "https://github.com/NixOS/patchelf/releases/download/0.19.1/patchelf-0.19.1.tar.bz2"
+  sha256 "2cce01de93653829f6ab68a20c2ec275e1c00a946110704a27e928d2e6e88716"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class Patchelf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4181a878bdd8162b14fced1ae3fbb7aeeeb770f5916e3becccd49349c046497f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8d75ce4b0e5da93d45ebedc3e2d7c52c87a1d2312e0f8f3eba0e9b2b1077281"
   end
 
   head do
