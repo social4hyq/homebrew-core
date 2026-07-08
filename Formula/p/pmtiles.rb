@@ -11,7 +11,7 @@ class Pmtiles < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4038f356c24ba19fe44a146119edb576016e5276076d4976aed69c8795a3e0a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9fede06bfc319a3c05e380e122b2000e33189bc371cac774d9be37667f65bf7d"
   end
 
   depends_on "go" => :build
