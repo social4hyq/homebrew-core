@@ -22,7 +22,7 @@ class Go < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "763d4ba88ced3935af48497a7559d8973646ef1b182f9274e4e5ce690043d8f7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b2a6d4f6be0c3a7801de9f0a1d6483f8ae8442fd42ac5ae6def360a83028fa4"
   end
 
   depends_on macos: :monterey
