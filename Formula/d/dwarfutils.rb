@@ -13,7 +13,7 @@ class Dwarfutils < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "650443467a6175043ceff141b34dd456db8ff504641a2323f11ce6ddb1f775bd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b1eb13016e89f8b98325a09b9ddcf479d5c88040e13b80ff69a3433f5c08c39"
   end
 
   head do
