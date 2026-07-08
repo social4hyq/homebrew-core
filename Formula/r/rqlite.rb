@@ -7,7 +7,7 @@ class Rqlite < Formula
   head "https://github.com/rqlite/rqlite.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3061418d1e296d8078bb7451b419e64caa3c98a46ed66936e5d9d8fa380aaa46"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "18ca80dcf25b231b6373d1fcd369b30e8f45e231eef3798d9daa1119350a47e5"
   end
 
   depends_on "go" => :build
