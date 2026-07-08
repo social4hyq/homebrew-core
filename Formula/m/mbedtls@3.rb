@@ -12,7 +12,7 @@ class MbedtlsAT3 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "502ff6a6f02c670d08ec5d8b7e7d1e11766c3156c011a405494c57ea038beaa4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6803b3dad4f348f9b571e9ba847f13dfd863979865532a5252ba7f31696b242b"
   end
 
   keg_only :versioned_formula
