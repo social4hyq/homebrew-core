@@ -1,13 +1,13 @@
 class Nixfmt < Formula
   desc "Command-line tool to format Nix language code"
   homepage "https://github.com/NixOS/nixfmt"
-  url "https://github.com/NixOS/nixfmt/archive/refs/tags/v1.3.1.tar.gz"
-  sha256 "e3ff9cbaedd90b0cb71c897f2e09542a3601f7ea6b6ec02f156405e5b8ea8749"
+  url "https://github.com/NixOS/nixfmt/archive/refs/tags/v1.4.0.tar.gz"
+  sha256 "adc9a3174fe18333b6de5829f4b663a2736d6d78450e1f19270fc994b38a49aa"
   license "MPL-2.0"
   head "https://github.com/NixOS/nixfmt.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "054e6bdff4e2588b1ed25c330708e32c4a6b1777e97ea0f2985444ce0f2576cf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4932b060489c3e072de42f1b2622a3b205878414685685c88454a7a585a3e84"
   end
 
   depends_on "cabal-install" => :build
