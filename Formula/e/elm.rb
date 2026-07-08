@@ -6,12 +6,7 @@ class Elm < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "70f6f7f915c20c7b494a0c68ea5d4eafb7a6cfef22b02e229cd084d0bffe4bf3"
-    sha256 cellar: :any, arm64_sequoia: "9300c6c9314285996acbde5b1cf6dc9d8d24478aff12506b7a949dc8b35da2ea"
-    sha256 cellar: :any, arm64_sonoma:  "062b153f12bcefbac51e9768680fa72e71ed30d6e7967e9030623e1bf1ab29d7"
-    sha256 cellar: :any, sonoma:        "f099f4b3604eb1d29cf81f49c70aa66f9c5a1da262c9196ae7a5b2656c8e217e"
-    sha256 cellar: :any, arm64_linux:   "6761d2c3c643a821b2e7274475b0086ef590a495ad1436c070648e5faab58e26"
-    sha256 cellar: :any, x86_64_linux:  "52fc6c86c6e28b1b75275e0b613e06c388426dbb3ae3cc9a91ff648ab896775c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec961be4599ccfa525066a85c5fa8c0a5c1f8eef2a237866afca410fa3cba350"
   end
 
   depends_on "cabal-install" => :build
