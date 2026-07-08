@@ -12,7 +12,7 @@ class VespaCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e6e2f4ac78dc6c6d4cc3177bc20adb50d51b0af1002b4589017af58ddb4796d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd74c4602bf2a4c0ce14f43bbafe2e42cf66ad06a3a724ab5b2bfcd5db36bb74"
   end
 
   depends_on "go" => :build
