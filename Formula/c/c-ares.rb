@@ -13,7 +13,7 @@ class CAres < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "139ba35438004831e71f36f6fcba8bdb367fface99dedb1a66e9e097e2cb0416"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "481899f04830a692d266727a4f9ebf2be544537166ceebd8e03c56b582b89bf4"
   end
 
   depends_on "cmake" => :build
