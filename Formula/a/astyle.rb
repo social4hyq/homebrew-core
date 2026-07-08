@@ -12,7 +12,7 @@ class Astyle < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "72883a6cc4a56f4685d7b26d61dd078bbe26102c27b1f9de141779ccb67abe13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2176c811ae05cca9f9c7542f26714b7dc83b964efdad5a8d2558401f49e8727"
   end
 
   depends_on "cmake" => :build
