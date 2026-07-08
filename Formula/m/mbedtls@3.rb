@@ -1,8 +1,8 @@
 class MbedtlsAT3 < Formula
   desc "Cryptographic & SSL/TLS library"
   homepage "https://tls.mbed.org/"
-  url "https://github.com/Mbed-TLS/mbedtls/releases/download/mbedtls-3.6.6/mbedtls-3.6.6.tar.bz2"
-  sha256 "8fb65fae8dcae5840f793c0a334860a411f884cc537ea290ce1c52bb64ca007a"
+  url "https://github.com/Mbed-TLS/mbedtls/releases/download/mbedtls-3.6.7/mbedtls-3.6.7.tar.bz2"
+  sha256 "a7e8bcbec0e6f761b4af24f25677626b35f762f68eef79c08677a363212d11f6"
   license "Apache-2.0"
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class MbedtlsAT3 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "502ff6a6f02c670d08ec5d8b7e7d1e11766c3156c011a405494c57ea038beaa4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6803b3dad4f348f9b571e9ba847f13dfd863979865532a5252ba7f31696b242b"
   end
 
   keg_only :versioned_formula
