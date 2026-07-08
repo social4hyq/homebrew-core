@@ -14,7 +14,7 @@ class Victoriametrics < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d21d08c104b31caf32df598ec902b5d6bc79fae39456773cf3967c88b1bc518c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c75f9862f5c0d2f993268b3153a59129c3d7c562c545d593973b51a2b233ddd"
   end
 
   depends_on "go" => :build
