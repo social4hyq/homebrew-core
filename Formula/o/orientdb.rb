@@ -15,7 +15,7 @@ class Orientdb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "46e6b43f34cb409138e648c8637729d7963ab8c8777f10ec699d7b8329a694cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "44e3e4440d9f580fa685efa7885f9cc7775080c04737def46774b86ddeaa40e7"
   end
 
   depends_on "maven" => :build
