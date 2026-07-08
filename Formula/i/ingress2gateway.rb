@@ -7,7 +7,7 @@ class Ingress2gateway < Formula
   head "https://github.com/kubernetes-sigs/ingress2gateway.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e573a1ff5a1d019ab5e39478b4808bb30fdc7532db7a396206d34d30853961e0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ea7c20b5a29a3680a09a7d92de09557213dce8afbc80de0828386170418c066"
   end
 
   depends_on "go" => :build
