@@ -1,8 +1,8 @@
 class MongoCDriver < Formula
   desc "C driver for MongoDB"
   homepage "https://github.com/mongodb/mongo-c-driver"
-  url "https://github.com/mongodb/mongo-c-driver/archive/refs/tags/2.3.1.tar.gz"
-  sha256 "a3fc6ebf73e7a26482a5c0f86e4011e4c1f1d8f5bd16ca9ae7c732a8e6965490"
+  url "https://github.com/mongodb/mongo-c-driver/archive/refs/tags/2.3.2.tar.gz"
+  sha256 "030bcf814856a06f39d0e49d4b4420b28dc851d87e2a86f12f2d2ac50edad9d8"
   license "Apache-2.0"
   compatibility_version 1
   head "https://github.com/mongodb/mongo-c-driver.git", branch: "master"
@@ -13,7 +13,7 @@ class MongoCDriver < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b25e1f0f620a75565af27fcb194af04b4140156e5ab898cded49f2033cdb5c1d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e4e276d8815d3e0cfe208f78507c5b52e356b4cd6cb7251c6a16ce4b51df789"
   end
 
   depends_on "cmake" => :build
