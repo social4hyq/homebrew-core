@@ -1,8 +1,8 @@
 class Orientdb < Formula
   desc "Graph database"
   homepage "https://github.com/orientechnologies/orientdb/"
-  url "https://search.maven.org/remotecontent?filepath=com/orientechnologies/orientdb-community/3.2.53/orientdb-community-3.2.53.zip"
-  sha256 "d6c9f225849b738fa2f10df78fd82887676717a6692e87e5391821018e060503"
+  url "https://search.maven.org/remotecontent?filepath=com/orientechnologies/orientdb-community/3.2.54/orientdb-community-3.2.54.zip"
+  sha256 "890783abf9e6891f0e9ff58f494b4124f6881cd9882a2b646547ed330c143e51"
   license "Apache-2.0"
 
   # The GitHub release description contains links to files on Maven.
@@ -15,7 +15,7 @@ class Orientdb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "46e6b43f34cb409138e648c8637729d7963ab8c8777f10ec699d7b8329a694cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "44e3e4440d9f580fa685efa7885f9cc7775080c04737def46774b86ddeaa40e7"
   end
 
   depends_on "maven" => :build
