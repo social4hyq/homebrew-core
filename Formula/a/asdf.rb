@@ -12,7 +12,7 @@ class Asdf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "932b2df3396a9d781cbbd38c7dcad4c09aefef1d59730ad7d50b0fa9166d21fe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a47449b03e1a9b674ff3e2ecb60e15057d296cbdba11b26cecb2bacdb54d022"
   end
 
   depends_on "go" => :build
