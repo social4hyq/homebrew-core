@@ -11,7 +11,7 @@ class UBootTools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f3c400375ee4fcfd5e992176a83d2dcb0584a5e1679564bf13b388b685849a0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "75adeaec858254de0a3c493fdb21c7f6fd2f2952e41a9cbbf6aaf634a0a3e297"
   end
 
   depends_on "coreutils" => :build # Makefile needs $(gdate)
