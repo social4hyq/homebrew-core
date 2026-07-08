@@ -7,7 +7,7 @@ class Pscale < Formula
   head "https://github.com/planetscale/cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "17abcbb222b372cb37035fb4cda8c4b90273cf7c1275ce3092ece65ce10dc32c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "78186d983c98850848d44899ea9b39616a030e56e07fca76cdea99cc8d981153"
   end
 
   depends_on "go" => :build
