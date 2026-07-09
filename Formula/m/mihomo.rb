@@ -7,7 +7,7 @@ class Mihomo < Formula
   head "https://github.com/MetaCubeX/mihomo.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1200f68dcd957973795df27f15c83e453ebf1fc878704f9fd5f517136df0107"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc472fc707bee5d69cb09a657b32e2d5465b943413a399d0f9c65cccf0e3dae7"
   end
 
   depends_on "go" => :build
