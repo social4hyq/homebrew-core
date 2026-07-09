@@ -6,7 +6,7 @@ class AlevinFry < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5b320ab60f201e3a0e9446a706cba485ad1b77154ee8075f5b7a9f152cf7f57"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a54582dadaa10a2f737bc3e5ef646698f82f7cf1127121c3877612d7256a6a9"
   end
 
   depends_on "cmake" => :build
