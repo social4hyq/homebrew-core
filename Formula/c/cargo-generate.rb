@@ -7,7 +7,7 @@ class CargoGenerate < Formula
   head "https://github.com/cargo-generate/cargo-generate.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1a0bd65c9bb56a0d77cd954c7a4f3338acb798f550bad4a9cc9762170852ea0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d03d0d50506bfc2f0a0e2819b322403f4d79bc346e529ccaa2f9f7ff885a8ba"
   end
 
   depends_on "pkgconf" => :build
