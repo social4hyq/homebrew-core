@@ -6,7 +6,7 @@ class Caesiumclt < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "29afd358c1a13cca14541694e413ea31d59c5d93e912c977ce3dbf9726ca1ce6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "62f3f7e36100d7d6af9b27dd682f1cda0a5b826662a1a4aff26335f170dc30ff"
   end
 
   depends_on "rust" => :build
