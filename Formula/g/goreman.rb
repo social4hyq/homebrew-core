@@ -12,7 +12,7 @@ class Goreman < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8826456095779732ba6e191e629f5745042f6df814a42af78966c55bf4dd8c88"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a65d1bc62d3d27877b50f11505516f5d550470c69d6456cb6d7c7b2fbbde416e"
   end
 
   depends_on "go" => :build
