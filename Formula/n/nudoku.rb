@@ -1,13 +1,13 @@
 class Nudoku < Formula
   desc "Ncurses based sudoku game"
   homepage "https://jubalh.github.io/nudoku/"
-  url "https://github.com/jubalh/nudoku/archive/refs/tags/8.0.0.tar.gz"
-  sha256 "061ef63cd4754e22024fbfbc5fc103de9e4a90ffe21790a3433c8af770e6da09"
+  url "https://github.com/jubalh/nudoku/archive/refs/tags/8.0.1.tar.gz"
+  sha256 "4e8a35950b7b7ce1e49f9457a8aceffbd21fb2b34aa8386847a7a158a2cab551"
   license "GPL-3.0-or-later"
   head "https://github.com/jubalh/nudoku.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cbd1346f61cee6cd9435c822ab5c75d2e99ce1de45c515b74288fa1f8b1be6d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9aea6a1b1d3101b480d039bdb04da7aa7960da909b7e104d39897e0b952bd977"
   end
 
   depends_on "autoconf" => :build
