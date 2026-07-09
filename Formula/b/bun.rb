@@ -12,6 +12,12 @@ class Bun < Formula
   revision 27
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r27"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bb4491a296c2b35671c7d3c11f003a6fa8c54f39c5585fe6009860bcb9613eca"
+  end
+
   livecheck do
     url :stable
     regex(/^bun-v?(\d+(?:\.\d+)+)$/i)
