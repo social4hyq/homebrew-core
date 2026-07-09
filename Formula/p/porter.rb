@@ -1,8 +1,8 @@
 class Porter < Formula
   desc "App artifacts, tools, configs, and logic packaged as distributable installer"
   homepage "https://porter.sh"
-  url "https://github.com/getporter/porter/archive/refs/tags/v1.5.0.tar.gz"
-  sha256 "8c9603671bfdcda82b19f0213855f0a66373cff7ba7994e22752233a7f95b1d7"
+  url "https://github.com/getporter/porter/archive/refs/tags/v1.6.0.tar.gz"
+  sha256 "119eb70ee9148a3165ec0082f3d6da44baff68edd770d89b7c7f030bf03ddf1c"
   license "Apache-2.0"
   head "https://github.com/getporter/porter.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Porter < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "105976ea52e09c8724833194d829b90367fc2281548b4361e65971a8312dca73"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b357301505ea56dc239246a3fb4f1f5836908414b9a9878a9e83e1cd9f301d1a"
   end
 
   depends_on "go" => :build
