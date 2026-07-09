@@ -12,7 +12,8 @@ class Node < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "34b5538f12a130ce58db2a39c25afef91cd2bb79928a4a9a29df0a4305128ec1"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a9d1a73c516d1e6ec74ccce2fed6733f9f2d5b2979760d05e3511e6308e2cdc"
   end
 
   resource "alpine-rootfs" do
@@ -78,6 +79,7 @@ class Node < Formula
 
     (libexec/"lib/node_modules").mkpath
     cp_r lib/"node_modules/npm", libexec/"lib/node_modules/npm"
+    rm_r lib/"node_modules/npm"           # 删掉 bundled npm
     rm_f [bin/"npm", bin/"npx"]
     ln_s libexec/"lib/node_modules/npm/bin/npm-cli.js", bin/"npm"
     ln_s libexec/"lib/node_modules/npm/bin/npx-cli.js", bin/"npx"
