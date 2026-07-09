@@ -1,12 +1,12 @@
 class MercuryCli < Formula
   desc "CLI interface for Mercury banking"
   homepage "https://github.com/MercuryTechnologies/mercury-cli"
-  url "https://github.com/MercuryTechnologies/mercury-cli/archive/refs/tags/v0.10.2.tar.gz"
-  sha256 "681d15b889ef06821864926c33e1916cc603d4fb87f550f2324648e747e7e4cb"
+  url "https://github.com/MercuryTechnologies/mercury-cli/archive/refs/tags/v0.10.3.tar.gz"
+  sha256 "64c4edad351c243d98962ae85adacfdcc40acbf0e124d62741b452efe1dfc658"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "804cf3ffa1e85797e10ac979c9f293f0811b3a75ae7c763bcbfe32a27be50860"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2cd73904400800addf5744b8a737220465d22af8a23de1f2f2b456abf8fe5457"
   end
 
   depends_on "go" => :build
