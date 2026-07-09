@@ -1,8 +1,8 @@
 class Rust < Formula
   desc "Safe, concurrent, practical language"
   homepage "https://www.rust-lang.org/"
-  url "https://static.rust-lang.org/dist/rust-1.96.1-aarch64-unknown-linux-ohos.tar.xz"
-  sha256 "d45d0d14d5767113df5e98975014209d8a7f7f0988ad68e3413d905b9b94e9e6"
+  url "https://static.rust-lang.org/dist/rust-1.97.0-aarch64-unknown-linux-ohos.tar.xz"
+  sha256 "dd9dc155f797464befdf799359f45d3d699e4fb5585841f16dac4e2b35700613"
   license any_of: ["Apache-2.0", "MIT"]
   compatibility_version 1
   head "https://github.com/rust-lang/rust.git", branch: "main"
