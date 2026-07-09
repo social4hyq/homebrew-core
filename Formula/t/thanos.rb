@@ -6,7 +6,7 @@ class Thanos < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8f9b5d178b3990496a4b8e9cda55521728068efc12de6ce4675a237c41f1b3b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c93c61031450a96fceb579db617665c7fcf9b712fefbeb7f464e71594e46d7b"
   end
 
   depends_on "go" => :build
