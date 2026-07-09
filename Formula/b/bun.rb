@@ -6,16 +6,11 @@ class Bun < Formula
   # pre-populated WebKit cache, and a Rust nightly toolchain with -Zbuild-std.
   # All patches are pre-applied on the openharmony branch of social4hyq/ohos-bun.
   # Upstream formula cannot accommodate these build requirements.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "e31528dd0e1b7c2b8a2f2c3bdec5d0b659f0fcb5", branch: "openharmony"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "04eb256f8e8346b5557f92f8b7f48044c8d194f3", branch: "openharmony"
   version "1.4.0"
   license "MIT"
-  revision 26
+  revision 27
   head "https://github.com/oven-sh/bun.git", branch: "main"
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r26"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "76aa8a0757ef5f16b8f45d102768086838b10a1413e8cd86a7e6caa0eb4b263a"
-  end
 
   livecheck do
     url :stable
@@ -179,63 +174,9 @@ class Bun < Formula
     # without injecting, musl startup hits "Error relocating ... symbol not found" → exit 127.
     ENV.prepend_path "LD_LIBRARY_PATH", Formula["openssl@3"].opt_lib.to_s
     # llvm@21 only ships llvm-strip; the bun build script needs strip.
-    # cc/c++ must sign link artifacts: the OHOS kernel refuses to exec unsigned ELF, and cargo's
-    # build-script-build binary runs natively → "Permission denied (os error 13)". clang-sign runs
-    # binary-sign-tool automatically after linking; it only signs link output and skips -c/-E/-S/-M/-MM
-    # (an .o with a .codesign section makes the final binary report
-    # ".codesign section already exists", which binary-sign-tool refuses to sign).
     mkdir_p buildpath/".bin"
     ln_sf llvm.opt_bin/"llvm-strip", buildpath/".bin/strip"
-    clang_sign = buildpath/".bin/clang-sign"
-    clang_sign.write <<~SHELL
-      #!/bin/sh
-      set -e
-      "#{llvm.opt_bin}/clang" "$@"
-      rc=$?
-      [ $rc -ne 0 ] && exit $rc
-      out=""; prev=""
-      for arg in "$@"; do
-        [ "$prev" = "-o" ] && out="$arg"
-        prev="$arg"
-      done
-      has_link=1
-      for a in "$@"; do
-        case "$a" in -c|-E|-S|-M|-MM) has_link=0 ;; esac
-      done
-      [ "$has_link" = "1" ] || exit 0
-      [ -z "$out" ] && [ -f a.out ] && out=a.out
-      [ -n "$out" ] && [ -f "$out" ] || exit 0
-      magic=$(od -An -N4 -tx1 "$out" 2>/dev/null | tr -d ' \\n')
-      [ "$magic" = "7f454c46" ] || exit 0
-      readelf -S "$out" 2>/dev/null | grep -q '\\.codesign' && exit 0
-      tmp="${out}.unsigned.$$"
-      signed="${out}.signed.$$"
-      mv -f "$out" "$tmp"
-      if "#{Formula["ohos-sdk"].opt_bin}/binary-sign-tool" sign -selfSign 1 -inFile "$tmp" -outFile "$signed" >/dev/null 2>&1 && [ -f "$signed" ]; then
-        chmod +x "$signed"
-        # OHOS/tmpfs ETXTBSY fix: write signed output to staging path, then rename
-        # atomically to final path.  binary-sign-tool wrote and closed $signed; after
-        # mv the final inode has no in-flight write FDs, so cargo can exec immediately.
-        sync
-        mv -f "$signed" "$out"
-        rm -f "$tmp"
-      else
-        rm -f "$signed" 2>/dev/null
-        mv -f "$tmp" "$out"
-      fi
-      exit 0
-    SHELL
-    chmod 0755, clang_sign
-    clang_sign_pp = buildpath/".bin/clang++-sign"
-    clang_sign_pp.write clang_sign.read.gsub("/clang\"", "/clang++\"")
-    chmod 0755, clang_sign_pp
-    ln_sf clang_sign,    buildpath/".bin/cc"
-    ln_sf clang_sign_pp, buildpath/".bin/c++"
     # bun flags.ts expects ohosCrossLibs to contain libcxx/include/v1/ and libcxxabi/include/.
-    # The corresponding headers in llvm@21 live at include/aarch64-linux-ohos/c++/v1/.
-    # Create the matching layout under buildpath so build.ts finds it via OHOS_LLVM_PREFIX.
-    # The bun build system in OHOS mode uses -nostdinc++ and looks under build/ohos-cross-libs/.
-    # Pre-create that dir and symlink it to llvm@21's headers and libs to satisfy flags.ts include/link paths.
     ohos_cross = buildpath/"build/ohos-cross-libs"
     (ohos_cross/"libcxx/include").mkpath
     (ohos_cross/"libcxxabi").mkpath
@@ -247,31 +188,32 @@ class Bun < Formula
         ln_sf a, ohos_cross/d/"lib"/File.basename(a)
       end
     end
-    ENV.prepend_path "PATH", buildpath/".bin"
+    # Use llvm@21's cc/c++ shims (HOMEBREW_PREFIX/bin/cc, c++) — they wrap clang 21
+    # with LLD --code-sign. This replaces the legacy clang-sign wrapper that ran
+    # binary-sign-tool after linking.
     # Put bootstrap bun in PATH: `bun bd` is itself a bun script, so a working bun must exist first.
+    ENV.prepend_path "PATH", buildpath/".bin"
     ENV.prepend_path "PATH", boot.opt_bin
     ENV.prepend_path "PATH", llvm.opt_bin
     ENV.prepend_path "PATH", rust_home/"bin"
     ENV["CARGO_HOME"]    = (rust_home/"cargo").to_s
     ENV["RUSTUP_HOME"]   = rust_home.to_s
-    # The rustc_wrapper shim injected by superenv is #!/bin/bash; OHOS has no /bin/bash → exec ENOENT.
     ENV.delete("RUSTC_WRAPPER")
-    # cargo needs a CA bundle when pulling from crates.io (OHOS musl has no system CA store).
     ca_bundle = HOMEBREW_PREFIX/"etc/ca-certificates/cert.pem"
     ENV["SSL_CERT_FILE"]  = ca_bundle.to_s
     ENV["CURL_CA_BUNDLE"] = ca_bundle.to_s
-    # Channel pinned by rust-toolchain.toml; OHOS target goes through -Zbuild-std (pr4 patch)
     ENV["RUSTUP_TOOLCHAIN"] = "nightly-2026-05-06"
     ENV["OHOS_LLVM_PREFIX"]  = llvm.opt_prefix.to_s
     ENV["OHOS_WEBKIT_ROOT"]  = webkit.opt_prefix.to_s
-    # bun rust.ts:647/source.ts:1411 uses this env to swap in the linker for the OHOS target link.
-    ENV["OHOS_BUN_SIGNING_LINKER"] = clang_sign_pp.to_s
-    # The cargo host build-script links via CC (cc-rs crate); if unsigned, build-script-build
-    # hits EACCES on exec. CC goes through clang-sign so link artifacts are signed automatically.
-    ENV["CC"]  = clang_sign.to_s
-    ENV["CXX"] = clang_sign_pp.to_s
-    # bun's tmpdir() reads TMPDIR first; superenv may reset it to ~/.tmp/ which is noexec
-    # on OHOS — cargo build-script-build hits ETXTBSY. Force EL2 tmp (executable, user-owned).
+    # LLD --code-sign injects .codesign at link time (llvm@21 CodeSign patch).
+    # cc/c++ are llvm@21 shims that already pass -Wl,--code-sign; set them as
+    # CC/CXX so cargo build-script artifacts are signed on exec.
+    ENV["OHOS_BUN_SIGNING_LINKER"] = (HOMEBREW_PREFIX/"bin/c++").to_s
+    ENV["CC"]  = (HOMEBREW_PREFIX/"bin/cc").to_s
+    ENV["CXX"] = (HOMEBREW_PREFIX/"bin/c++").to_s
+    # Serialize cargo build scripts: OHOS tmpfs may not release write locks fast
+    # enough between write+exec, causing ETXTBSY on parallel build-script builds.
+    ENV["CARGO_BUILD_JOBS"] = "1"
     ENV["TMPDIR"] = "/data/storage/el2/base/tmp"
 
     # ── Build: bun scripts/build.ts (equivalent to invoking `bun bd`) ──
@@ -311,6 +253,11 @@ class Bun < Formula
     <<~EOS
       Bun (stable, #{version}) for HarmonyOS aarch64.
       Built via L4 self-bootstrap (bun-bootstrap → bun bd).
+
+      Native addon support (node-gyp / N-API): bun auto-configures CC=clang,
+      CXX=clang++, LDFLAGS=-Wl,--code-sign on OHOS. Install llvm@21 to provide
+      the signed clang toolchain:
+        brew install llvm@21
     EOS
   end
 
