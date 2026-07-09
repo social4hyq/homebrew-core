@@ -1,11 +1,10 @@
 class Opencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64"
-  homepage "https://github.com/anomalyco/opencode"
-  url "https://gh-proxy.com/https://github.com/anomalyco/opencode.git",
-      revision: "10c894bdeef3618f5666fb506ef7f9491bb964d8"
-  version "1.17.13"
+  homepage "https://github.com/social4hyq/ohos-opencode"
+  url "https://github.com/social4hyq/ohos-opencode.git",
+      tag:      "v1.17.15"
+  version "1.17.15"
   license "MIT"
-  revision 3
 
   livecheck do
     url "https://github.com/anomalyco/opencode/releases/latest"
@@ -13,8 +12,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.13-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "40809c09cb46de5a2a2a2382b1d05c8d74b4db5e16892b288826dcb6b4af0100"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.15-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e1e12cd358984d276a861459602a0bc0aaa9562f291acced8ba1c7f3fd38a56"
   end
 
   # opencode is a `bun build --compile` single binary with bun runtime + JS + native .node/.so
@@ -23,27 +22,10 @@ class Opencode < Formula
   depends_on "bun-pty"           => :build
   depends_on "lightningcss"      => :build
   depends_on "node"              => :build # npm_config_nodedir for bun install
-  depends_on "ohos-sdk"          => :build # binary-sign-tool + llvm-objcopy (strips .codesign before re-sign)
+  depends_on "ohos-sdk"          => :build # binary-sign-tool (deploy_native) + llvm-objcopy (strip .codesign)
   depends_on "python@3.14"       => :build
   depends_on "tailwindcss-oxide" => :build
 
-  patch :p1 do
-    file "Patches/opencode/build-ohos-target.patch"
-  end
-  patch :p1 do
-    file "Patches/opencode/project-global-worktree.patch"
-  end
-  patch :p1 do
-    # upstream bun.lock (generated on Linux) records 5 openharmony bindings as
-    # `"os": "none"` because upstream bun doesn't recognize the openharmony
-    # platform. The patched bun 1.4.0 (pr5-ohos-runtime/resolver_hooks.rs.patch)
-    # already understands openharmony, but bun install uses the lockfile
-    # fast-path and skips any package whose recorded `os` doesn't match
-    # `OperatingSystem::CURRENT`. This patch rewrites those 5 entries'
-    # metadata so the fast-path installs them. Re-generate with:
-    #   sed -i -E '/^    "[^"]*openharmony-arm64":/ s/"os": "none"/"os": "openharmony"/' bun.lock
-    file "Patches/opencode/bun-lock-openharmony-os.patch"
-  end
   def install
     ENV["PYTHON"] = Formula["python@3.14"].opt_bin/"python3"
     ENV["npm_config_nodedir"] = Formula["node"].opt_prefix.to_s
@@ -53,30 +35,24 @@ class Opencode < Formula
     ENV["BUN_INSTALL_CACHE"] = (HOMEBREW_CACHE/"bun-install-cache").to_s
 
     # Remove workspace packages not needed for the CLI build.
-    # - desktop: Electron app (pulls electron-builder / app-builder-bin, requires GitHub release assets)
-    # - web: Astro marketing site (pulls astro → older shiki@3.x / fontkit via npmjs.org)
-    # - docs: documentation site
-    # - storybook: UI component explorer (additional heavy deps)
     rm_rf "packages/desktop"
     rm_rf "packages/web"
     rm_rf "packages/docs"
     rm_rf "packages/storybook"
 
+    # bun 1.4.0_26+ auto-signs .node/.so files in workspace mode —
+    # rollup, oxc, and any other native packages are handled transparently.
     system "bun", "install", "--ignore-scripts"
 
     # build.ts defaults to running `bun install --os=* --cpu=*` to pull all-platform native variants, but it
     # depends on Bun.$ → on OHOS, sh cannot exec bun from PATH (EPERM), so we pass --skip-install to skip the
     # internal version in build.ts and invoke it directly here, avoiding the broken $ path.
-    # @ff-labs/fff-bun is pure TypeScript (no native binaries), so --os=* is a no-op and triggers
-    # catalog re-resolution failures when npm cache is empty; omit it.
     cd "packages/opencode" do
       system "bun", "install", "--os=*", "--cpu=*", "@opentui/core@0.3.4"
       system "bun", "install", "--os=*", "--cpu=*", "@parcel/watcher@2.5.1"
     end
 
     sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
-    # llvm-objcopy from ohos-sdk (LLVM 15) — ELF section ops stable across LLVM 15-21.
-    # (Formerly depended on llvm@21; dependency removed in slim-llvm21-bottle change.)
     objcopy   = Formula["ohos-sdk"].opt_prefix/"native/llvm/bin/llvm-objcopy"
 
     deploy_native = lambda do |src, dest|
@@ -142,13 +118,6 @@ class Opencode < Formula
       )
       File.write(loader, content)
     end
-
-    # rollup: @rollup/rollup-openharmony-arm64@4.60.4 is an official upstream binding,
-    # installed automatically by `bun install` (bun-lock-openharmony-os.patch flips its
-    # lockfile `os` from "none" to "openharmony"). Its rollup.openharmony-arm64.node
-    # is ELF-signed by bun's PackageInstaller (in-process, no external tool needed);
-    # rollup's native.js falls back to `require('@rollup/rollup-openharmony-arm64')`
-    # when dist/*.node is absent.
 
     # @opentui/core@0.3.4 bundle patches (libopentui.so is ELF-signed by bun's
     # PackageInstaller during `bun install`):
