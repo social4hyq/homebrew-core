@@ -31,7 +31,7 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 
 - WebKit Inspector 走 socket 后端而非 glib 后端（OHOS 没有 GLib），远程调试连接方式和上游略有差异
 - `icu4c@78` 用本仓库的 `llvm@21` 重编，让 ICU 的 libc++ 符号和 `bun` / `bun-webkit` 用同一个 mangling（`__h` namespace），避免链接器找不到符号
-- OHOS 要求 ELF 经 fs-verity 自签后才能执行。**运行时签名**（`bun install` 装的 `.node`/`.so`、`bun build --compile` 产物、dlopen 兜底）由 Bun 内置的 `ohos_sign` Rust crate 完成（in-process，零 fork）；**构建期签名**（clang-sign wrapper、最终 bun 二进制）仍由 `ohos-sdk` 的 `binary-sign-tool` 承担，formula 内已处理
+- OHOS 要求 ELF 经 fs-verity 自签后才能执行。**运行时签名**（`bun install` 装的 `.node`/`.so`、`bun build --compile` 产物、dlopen 兜底）由 Bun 内置的 `ohos_sign` Rust crate 完成（in-process，零 fork）；**构建期签名**（cargo build-script 产物、最终 bun 二进制）由 llvm@21 的 `cc`/`c++` shim 在链接时通过 LLD `--code-sign` 注入 `.codesign` section 完成，不再需要 post-compile 的 `binary-sign-tool` 包装
 - 自签算法参考 [hqzing/ohos-bst-light](https://github.com/hqzing/ohos-bst-light)（fs-verity descriptor + SHA-256 merkle tree + `.codesign` ELF64 section 注入，Rust 移植实现在 `src/ohos_sign/`）；二次打包时可直接调用 `ohos-selfsign sign <file> --force`
 - bottle 只覆盖 `arm64_ohos`，不提供 macOS / x86_64 等其他平台产物
 
@@ -39,14 +39,14 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 
 | Formula | 版本 | 说明 |
 |---|---|---|
-| `opencode` | 1.17.13 @ `10c894bd`（2026-07-03） | OpenCode AI 编码代理 CLI（单文件二进制 + 嵌入 Web UI） |
-| `bun` | 1.4.0 @ `5467a6893`（openharmony，2026-07-07） | Bun JavaScript runtime；运行时签名由内置 `ohos_sign` crate 承担，`ohos-sdk` 降为 build-only 依赖 |
+| `opencode` | 1.17.15 @ `10c894bd`（2026-07-09） | OpenCode AI 编码代理 CLI（单文件二进制 + 嵌入 Web UI）；bun 内置签名覆盖原生依赖 |
+| `bun` | 1.4.0 @ `04eb256f8`（openharmony，2026-07-09） | Bun JavaScript runtime；运行时签名由内置 `ohos_sign` crate 承担；node-gyp 自动配置 CC/CXX/LDFLAGS |
 | `bun-bootstrap` | 1.4.0 @ `5467a689`（openharmony，2026-07-07） | 预编译 bun，用来启动 `bun bd` 自举本机 bun；已内置 ohos_sign，无需 ohos-sdk（`keg_only`） |
 | `bun-webkit` | `c9ad5813fd`（2026-07-03） | JavaScriptCore / WTF / bmalloc 静态库，bun 专用 WebKit fork（`keg_only`） |
 | `bun-pty` | 0.4.10（2026-06-15） | `librust_pty.so`，portable-pty + nix 0.31 OHOS 支持（`keg_only`） |
 | `lightningcss` | 1.30.1（2025-05-14） | `liblightningcss_node.so` CSS 原生绑定（`keg_only`） |
 | `tailwindcss-oxide` | 4.1.11（2025-06-26） | `libtailwind_oxide.so` Tailwind v4 原生引擎绑定（`keg_only`） |
-| `llvm@21` | 21.1.8（2025-12-16） | OHOS 补丁版 clang + lld + multiarch runtime libs（**裁剪版**，仅工具链，71 MB，`keg_only`） |
+| `llvm@21` | 21.1.8（2025-12-16） | OHOS 补丁版 clang + lld + multiarch runtime libs；cc/c++ shim 内置 LLD `--code-sign` 链接签名（**裁剪版**，71 MB，`keg_only`） |
 | `icu4c@78` | 78.3（2026-03-17） | Unicode 库，用本仓库 llvm@21 重编以对齐 libc++ ABI（`keg_only`） |
 
 ## Bottle 状态
@@ -55,14 +55,14 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 
 | Formula | Bottle tag | 大小 |
 |---------|-----------|------|
-| `llvm@21` | `llvm21-v21.1.8-pruned-r2` | 71 MB |
+| `llvm@21` | `llvm21-v21.1.8-pruned-r3` | 71 MB |
 | `icu4c@78` | `icu4c@78-v78.3-r2` | 32 MB |
 | `bun-webkit` | `bun-webkit-vc9ad5813fd-r1` | 23 MB |
 | `bun-pty` | `bun-pty-v0.4.10-r2` | 270 KB |
 | `lightningcss` | `lightningcss-v1.30.1-r2` | 3.4 MB |
 | `tailwindcss-oxide` | `tailwindcss-oxide-v4.1.11-r2` | 1.3 MB |
-| `bun` | `bun-v1.4.0-r16` | 107 MB |
-| `opencode` | `opencode-v1.17.13-r6` | 58 MB |
+| `bun` | `bun-v1.4.0-r27` | 103 MB |
+| `opencode` | `opencode-v1.17.15-r1` | 58 MB |
 
 > `bun-bootstrap` 为预编译 binary pour（40 MB），tag `bun-bootstrap-v1.4.0-5467a689`。
 
@@ -146,12 +146,16 @@ PR 合并并发布后，`opencode.rb` 中对应的 `index.js` 字符串替换 pa
 ## 最近变更
 
 ```
-940fc7c docs: fix bun-bootstrap bottle size to 40 MB
-17aee5a docs: update bun-bootstrap to 1.4.0-5467a689 in README
-36ed70f chore(bun-bootstrap): update to 1.4.0-5467a689 (r16, ohos_sign in-process signing)
-94bbb95 chore(opencode): remove redundant .so/.node signing loop — bun r16 PackageInstaller handles it in-process
-cc5d5ec docs: update README for bun r16 — ohos_sign in-process signing
-e331d54 bun 1.4.0 r16: replace binary-sign-tool with in-process ohos_sign crate
+bed2300 bun: 1.4.0_27 — bottle with node-gyp auto-config + clang-sign removal
+256dfd8 bun: replace clang-sign wrapper with llvm@21 cc/c++ shims
+913503e llvm@21: simplify cc/c++ shims — use LLD --code-sign at link time
+9646eec opencode: narrow --os/--cpu from * to linux+arm64
+77b922e opencode: drop manual rollup/oxc signing — handled by bun 1.4.0_26+
+6c948b3 bun: 1.4.0_26 — workspace signing fix + bottle
+6267b43 bun 1.4.0-r23: rebuild at 28603b97c (OHOS test hardening + Bun.write slice fix)
+2c6c1b3 chore(bun): r22 — fix execute-only ELF PIE load base detection
+c73bff5 chore(bun): r20 bottle — BUG-01 real fix (stat dot probe for deleted cwd)
+ec48dc6 chore(bun): r19 bottle — BUG-01/02/03 fixed (deleted-cwd, execute-only ELF, parallel worker-ID)
 ```
 
 ## 反馈与贡献

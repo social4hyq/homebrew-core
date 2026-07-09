@@ -260,9 +260,9 @@ class Bun < Formula
       Bun (stable, #{version}) for HarmonyOS aarch64.
       Built via L4 self-bootstrap (bun-bootstrap → bun bd).
 
-      Native addon support (node-gyp / N-API): bun auto-configures CC=clang,
-      CXX=clang++, LDFLAGS=-Wl,--code-sign on OHOS. Install llvm@21 to provide
-      the signed clang toolchain:
+      Native addon support (node-gyp / N-API): bun auto-configures CC=cc,
+      CXX=c++, LDFLAGS=-Wl,--code-sign on OHOS. Install llvm@21 to provide
+      the signed toolchain (cc/c++ → clang + LLD --code-sign):
         brew install llvm@21
     EOS
   end
