@@ -7,7 +7,7 @@ class Resterm < Formula
   head "https://github.com/unkn0wn-root/resterm.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7bb7a5a38070489099133c38a1dfead29c2b5fd6be71f3b02770cae6d8ca61ea"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b5d0f98f6830c93a8147904a6213ac36a79c5c22001839121d2dc51dcd3c731"
   end
 
   depends_on "go" => :build
