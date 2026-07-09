@@ -7,7 +7,7 @@ class Talm < Formula
   head "https://github.com/cozystack/talm.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a7d28a859e1104e9fa50ab1700248e42bdb048715c4f5e489f0c9bb810a5cf9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "678df8f3521cdec42974a8148d81b5359681663b6d0fbb03f9262d6c5b98d067"
   end
 
   depends_on "go" => :build
