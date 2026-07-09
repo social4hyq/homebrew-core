@@ -7,7 +7,7 @@ class Nudoku < Formula
   head "https://github.com/jubalh/nudoku.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cbd1346f61cee6cd9435c822ab5c75d2e99ce1de45c515b74288fa1f8b1be6d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9aea6a1b1d3101b480d039bdb04da7aa7960da909b7e104d39897e0b952bd977"
   end
 
   depends_on "autoconf" => :build
