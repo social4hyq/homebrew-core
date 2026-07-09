@@ -7,7 +7,7 @@ class Difi < Formula
   head "https://github.com/oug-t/difi.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "250c9b94afbaeb99c044f6c376a0033158977d9415e335742e1c7c0402074851"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bec5e59f59d6d1dbdd792b4e5ef4e4f1cfba6e2873b9d0af18ee4ae5ceaed96d"
   end
 
   depends_on "go" => :build
