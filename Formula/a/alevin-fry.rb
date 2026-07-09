@@ -1,12 +1,12 @@
 class AlevinFry < Formula
   desc "Efficient and flexible tool for processing single-cell sequencing data"
   homepage "https://github.com/COMBINE-lab/alevin-fry"
-  url "https://github.com/COMBINE-lab/alevin-fry/archive/refs/tags/v0.15.0.tar.gz"
-  sha256 "62ba4c02b4b86dd56ccc8c8c0ec8728f0f159f1107cea37e27a02ee4b54de7bb"
+  url "https://github.com/COMBINE-lab/alevin-fry/archive/refs/tags/v0.16.0.tar.gz"
+  sha256 "0186c76859abd164bfa9cd3f6b13d2b31d572aff83d11bfb7f536d74810089ef"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5b320ab60f201e3a0e9446a706cba485ad1b77154ee8075f5b7a9f152cf7f57"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a54582dadaa10a2f737bc3e5ef646698f82f7cf1127121c3877612d7256a6a9"
   end
 
   depends_on "cmake" => :build
