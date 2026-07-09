@@ -3,8 +3,8 @@ class HermesAgent < Formula
 
   desc "Self-improving AI agent that creates skills from experience"
   homepage "https://hermes-agent.nousresearch.com"
-  url "https://github.com/NousResearch/hermes-agent/archive/refs/tags/v2026.7.1.tar.gz"
-  sha256 "ec8a380629cc2f3f2102dd92cad50c4ded706fe59c0e359a05681166a0ae2991"
+  url "https://github.com/NousResearch/hermes-agent/archive/refs/tags/v2026.7.7.2.tar.gz"
+  sha256 "f5d1022eed3763a768cf7b0f0844831f0170a35f54eb8d18223f2e93f503025e"
   license "MIT"
   head "https://github.com/NousResearch/hermes-agent.git", branch: "main"
 
@@ -14,7 +14,7 @@ class HermesAgent < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "88d2d5936c7cbf77b40cd149e43fe5377396e4095a7b37ab76ca48c4c9a74127"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dea12a93b9a95eaddbcd6edeaa2341757157355a01655dc567c5695c8ad8f01"
   end
 
   depends_on "pkgconf" => :build
