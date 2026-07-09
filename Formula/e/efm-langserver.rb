@@ -7,7 +7,7 @@ class EfmLangserver < Formula
   head "https://github.com/mattn/efm-langserver.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3971f350dbf4c27387a3e1219b2d59f15cf2fea21135d53f08b7f5a5b8992289"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f57c9338611c70f41842d76a274ecfe7e7d0494aae5dfd184194284efd55763"
   end
 
   depends_on "go" => :build
