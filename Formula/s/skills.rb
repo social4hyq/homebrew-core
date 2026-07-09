@@ -6,7 +6,7 @@ class Skills < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c948a706eb6ba24e60de8a154f098b855b771c060903c6b48bd5a17f6b5df51"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2dff415df8ec05fdc72c15441016707e6fa8496c66da6b495a08e31a426a5d4"
   end
 
   depends_on "node"
