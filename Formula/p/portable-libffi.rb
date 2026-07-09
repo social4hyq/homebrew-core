@@ -3,8 +3,8 @@ require File.expand_path("../../Abstract/portable-formula", __dir__)
 class PortableLibffi < PortableFormula
   desc "Portable Foreign Function Interface library"
   homepage "https://sourceware.org/libffi/"
-  url "https://github.com/libffi/libffi/releases/download/v3.6.0/libffi-3.6.0.tar.gz"
-  sha256 "31ff1fe32deaebfbb388727f32677bb254bf2a41382c51464c0b1837c9ee9828"
+  url "https://github.com/libffi/libffi/releases/download/v3.7.0/libffi-3.7.0.tar.gz"
+  sha256 "2255c5a638dfb51bf67c20a12a7bb70d17feb1e9eababac05f5573146f586436"
   license "MIT"
 
   livecheck do
@@ -12,7 +12,7 @@ class PortableLibffi < PortableFormula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b79b47189bde3cff97bd9366972e2d678044e235e64121d1e9cd7af389928e29"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "43c71eb629c4944f2f06e51767c5827d22cbba8bab7ba1063c799e7ed7facfa5"
   end
 
   def install
