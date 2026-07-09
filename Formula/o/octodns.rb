@@ -3,8 +3,8 @@ class Octodns < Formula
 
   desc "Tools for managing DNS across multiple providers"
   homepage "https://github.com/octodns/octodns"
-  url "https://files.pythonhosted.org/packages/6c/3f/efa3684728098eec6e406958920497704805e9d676a32cb75f2fa9abb439/octodns-1.20.0.tar.gz"
-  sha256 "35a556be684e8e07a02efb7f8c26669cbf16cb6a74c302d59410569cffb3a1e2"
+  url "https://files.pythonhosted.org/packages/d1/e0/84a427c9134822d5fca1b366d2b232ac8f5f789ebac951f680a0a0b34b57/octodns-1.21.0.tar.gz"
+  sha256 "78cfc58ae508719d15bd35129b8ff2a00defbd561f5506b9036082b72382d69f"
   license "MIT"
   head "https://github.com/octodns/octodns.git", branch: "main"
 
