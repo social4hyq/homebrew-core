@@ -12,7 +12,7 @@ class Azcopy < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f784d5cafaa8cb831bc0ac1e3cb74f3841772045708aeac24f4e61310c7317b7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0eedb78414d413af9ee287cadde64cd97b1f79245cd5c90f3340c6da8809e264"
   end
 
   depends_on "go" => :build
