@@ -61,6 +61,9 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 | `tailwindcss-oxide` | 4.1.11（2025-06-26） | `libtailwind_oxide.so` Tailwind v4 原生引擎绑定（`keg_only`） |
 | `llvm@21` | 21.1.8（2025-12-16） | OHOS 补丁版 clang + lld + multiarch runtime libs；cc/c++ shim 内置 LLD `--code-sign` 链接签名（**裁剪版**，71 MB，`keg_only`） |
 | `icu4c@78` | 78.3（2026-03-17） | Unicode 库，用本仓库 llvm@21 重编以对齐 libc++ ABI（`keg_only`） |
+| `ohos-bst-light` | 0.1.0（2026-07-10） | 轻量二进制自签工具，保留 ELF 结构不被破坏（Claude Code 签名专用） |
+| `close-range-shim` | 0.1.0（2026-07-10） | LD_PRELOAD 垫片库，拦截 `close_range` syscall 提供退化处理 |
+| `claude-code` | 2.1.206（2026-07-10） | Anthropic Claude Code CLI（Linux musl 二进制 + OHOS 自签） |
 
 ## Bottle 状态
 
@@ -76,6 +79,9 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 | `tailwindcss-oxide` | `tailwindcss-oxide-v4.1.11-r2` | 1.3 MB |
 | `bun` | `bun-v1.4.0-r27` | 103 MB |
 | `opencode` | `opencode-v1.17.15-r1` | 58 MB |
+| `ohos-bst-light` | 源码构建 | < 50 KB |
+| `close-range-shim` | 源码构建 | < 20 KB |
+| `claude-code` | 源码构建（从 npm 官方 registry 下载 200+ MB） | ~200 MB |
 
 > `bun-bootstrap` 为预编译 binary pour（40 MB），tag `bun-bootstrap-v1.4.0-5467a689`。
 
@@ -90,6 +96,7 @@ graph TD
     classDef sdk fill:#f1f5f9,stroke:#64748b,color:#1f2937
 
     opencode:::app
+    cc[claude-code]:::app
 
     bun:::rt
     pty[bun-pty]:::rt
@@ -103,6 +110,8 @@ graph TD
     icu["icu4c@78"]:::tc
 
     sdk[ohos-sdk]:::sdk
+    obl[ohos-bst-light]:::sdk
+    crs[close-range-shim]:::sdk
 
     opencode --> bun
     opencode --> pty
@@ -123,6 +132,11 @@ graph TD
     pty --> sdk
     lcss --> sdk
     tw --> sdk
+
+    cc --> crs
+    cc --> obl
+    obl --> sdk
+    crs --> sdk
 ```
 
 ## 安装
@@ -136,6 +150,9 @@ brew install bun
 
 # 只装 opencode：
 brew install opencode
+
+# 只装 claude-code：
+brew install claude-code
 ```
 
 装完跑一次 smoke：
@@ -159,6 +176,9 @@ PR 合并并发布后，`opencode.rb` 中对应的 `index.js` 字符串替换 pa
 ## 最近变更
 
 ```
+<new>   claude-code: 2.1.206 — npm fetch + self-sign + close-range-shim wrapper
+<new>   close-range-shim: 0.1.0 — LD_PRELOAD shim for close_range syscall
+<new>   ohos-bst-light: 0.1.0 — lightweight self-sign tool (preserves ELF structure)
 bed2300 bun: 1.4.0_27 — bottle with node-gyp auto-config + clang-sign removal
 256dfd8 bun: replace clang-sign wrapper with llvm@21 cc/c++ shims
 913503e llvm@21: simplify cc/c++ shims — use LLD --code-sign at link time
