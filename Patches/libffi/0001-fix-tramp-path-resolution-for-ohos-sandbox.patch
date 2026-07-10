@@ -1,7 +1,6 @@
 diff --git a/src/tramp.c b/src/tramp.c
-index 76a9dfe..8e733bd 100644
---- a/src/tramp.c
-+++ b/src/tramp.c
+--- a/src/tramp.c	2026-07-10 07:42:58.569334219 +0000
++++ b/src/tramp.c	2026-07-10 07:43:05.608424936 +0000
 @@ -60,6 +60,10 @@
  #endif
  #endif
@@ -13,7 +12,7 @@ index 76a9dfe..8e733bd 100644
  /*
   * Each architecture defines static code for a trampoline code table. The
   * trampoline code table is mapped into the address space of a process.
-@@ -215,6 +219,44 @@ ffi_tramp_get_libffi (void)
+@@ -222,6 +226,44 @@
    open_flags |= O_CLOEXEC;
  #endif
  
@@ -55,6 +54,6 @@ index 76a9dfe..8e733bd 100644
 +    }
 +#endif
 +
-   snprintf (file, PATH_MAX, "/proc/%d/maps", getpid());
+   snprintf (file, sizeof (file), "/proc/%d/maps", getpid());
    fp = fopen (file, "r");
    if (fp == NULL)

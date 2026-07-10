@@ -1,8 +1,8 @@
 class Libffi < Formula
   desc "Portable Foreign Function Interface library"
   homepage "https://sourceware.org/libffi/"
-  url "https://github.com/libffi/libffi/releases/download/v3.6.0/libffi-3.6.0.tar.gz"
-  sha256 "31ff1fe32deaebfbb388727f32677bb254bf2a41382c51464c0b1837c9ee9828"
+  url "https://github.com/libffi/libffi/releases/download/v3.7.0/libffi-3.7.0.tar.gz"
+  sha256 "2255c5a638dfb51bf67c20a12a7bb70d17feb1e9eababac05f5573146f586436"
   license "MIT"
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class Libffi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5054e9d51c51663d6d2ba2272b358b43f827b53da2fcd27106015fd592ba5d2a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d31b79b5b064b40ca1ae234ac0783d9e5a1cddb2bf04ed9e4ad2b40486befc6c"
   end
 
   head do
