@@ -3,13 +3,13 @@ class SigmaCli < Formula
 
   desc "CLI based on pySigma"
   homepage "https://github.com/SigmaHQ/sigma-cli"
-  url "https://files.pythonhosted.org/packages/09/7e/8316ee750eaa9499b332c6c308173a88242ef7e086ec68a66b08f326104b/sigma_cli-3.0.3.tar.gz"
-  sha256 "3ffe2d851a8b911994cc58c690659afcaec3ec0edb3e5ec5f63ecfbbc135c3bf"
+  url "https://files.pythonhosted.org/packages/13/63/f6bae3c67004d3f0f496805d25cf8d7e355c59341b58ae534778e33c17be/sigma_cli-3.1.0.tar.gz"
+  sha256 "e87e4f241b309e84f67fb38aa768ddd6d911f90e061c885c0aa16a6dcb7fbad7"
   license "LGPL-2.1-or-later"
   head "https://github.com/SigmaHQ/sigma-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dca212ae59a7f5b7fa0d50dbf29133fd1b17e83743d62002d0b81785387a7274"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "681bd50068c19044e0d8fffb1d45702cb646b8a2442aad5896a6126fdd02ec74"
   end
 
   depends_on "certifi" => :no_linkage
@@ -23,8 +23,8 @@ class SigmaCli < Formula
   pypi_packages exclude_packages: "certifi"
 
   resource "charset-normalizer" do
-    url "https://files.pythonhosted.org/packages/e7/a1/67fe25fac3c7642725500a3f6cfe5821ad557c3abb11c9d20d12c7008d3e/charset_normalizer-3.4.7.tar.gz"
-    sha256 "ae89db9e5f98a11a4bf50407d4363e7b09b31e55bc117b4f7d80aab97ba009e5"
+    url "https://files.pythonhosted.org/packages/bd/2a/23f34ec9d04624958e137efdc394888716353190e75f25dd22c7a2c7a8aa/charset_normalizer-3.4.9.tar.gz"
+    sha256 "673611bbd43f0810bec0b0f028ddeaaa501190339cac411f347ac76917c3ae7b"
   end
 
   resource "click" do
