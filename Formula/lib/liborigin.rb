@@ -11,7 +11,7 @@ class Liborigin < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cefdba87c070eefea527884cda103110f8cc6e8e44f8656054c9c2e45d44d5f8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f5ad10f0fee5d2043122f64f1a50576181c0ecccb7053b7f62019426c13eabe7"
   end
 
   depends_on "cmake" => :build
