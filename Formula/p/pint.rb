@@ -6,7 +6,7 @@ class Pint < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e7aa87653f18d36a2b6b32ff709d702444811b996bfc5e9bf4b7a3cc8b3acb6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "28c1f8701478d05f8af7b5ec8775f2754d2b24514a9743bde2d294ca3decb592"
   end
 
   depends_on "go" => :build
