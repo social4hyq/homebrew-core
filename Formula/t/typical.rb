@@ -1,12 +1,12 @@
 class Typical < Formula
   desc "Data interchange with algebraic data types"
   homepage "https://github.com/stepchowfun/typical"
-  url "https://github.com/stepchowfun/typical/archive/refs/tags/v0.15.0.tar.gz"
-  sha256 "f8d6889b6be5e6883c93732763b832147c9986539585435d64f8214d5a97e45f"
+  url "https://github.com/stepchowfun/typical/archive/refs/tags/v0.16.0.tar.gz"
+  sha256 "ccc939b15ab5ae91ab2e9fda95cce08259092dfce7a49e579f7ff9821c748871"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c503183e1adaea01dd663d3083ef5709cc14881ce64e7fba70ff4410028e5b77"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "36fed14e75e138b8a21adbbad7a4e105dfe556b7a1e68a83d3c0e5d903054d52"
   end
 
   depends_on "rust" => :build
