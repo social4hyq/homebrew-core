@@ -63,7 +63,7 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 | `icu4c@78` | 78.3（2026-03-17） | Unicode 库，用本仓库 llvm@21 重编以对齐 libc++ ABI（`keg_only`） |
 | `ohos-bst-light` | 1.0.0（2026-07-10） | 轻量二进制自签工具，保留 ELF 结构不被破坏（Claude Code 签名专用） |
 | `close-range-shim` | 0.1.0（2026-07-10） | LD_PRELOAD 垫片库，拦截 `close_range` syscall 提供退化处理 |
-| `claude-code` | 2.1.206（2026-07-10） | Anthropic Claude Code CLI，从 npm 官方 registry 下载；不自建 bottle（Anthropic 专有许可，二次分发不合法） |
+| `claude-code` | 2.1.206（2026-07-10） | Anthropic Claude Code CLI，从 npm 下载后自签（**无 bottle**，依专有许可不二次分发） |
 
 ## Bottle 状态
 
@@ -81,7 +81,9 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 | `opencode` | `opencode-v1.17.15-r1` | 58 MB |
 | `ohos-bst-light` | `ohos-bst-light-v1.0.0` | 43 KB |
 | `close-range-shim` | `close-range-shim-v0.1.0` | 14 KB |
-| `claude-code` | 从 npm 下载（不打包 bottle） | ~250 MB |
+| `claude-code` | 从 npm 下载后自签（无 bottle） | ~250 MB |
+
+> `claude-code` 自身不打 bottle，但其依赖 `ohos-bst-light` 和 `close-range-shim` 已有 bottle，安装时无需 `ohos-sdk`。
 
 > `bun-bootstrap` 为预编译 binary pour（40 MB），tag `bun-bootstrap-v1.4.0-5467a689`。
 
@@ -151,7 +153,7 @@ brew install bun
 # 只装 opencode：
 brew install opencode
 
-# 只装 claude-code：
+# 只装 claude-code（无 bottle，从 npm 下载后自签；依赖已有 bottle，无需 ohos-sdk）：
 brew install claude-code
 ```
 
@@ -160,6 +162,7 @@ brew install claude-code
 ```bash
 bun --version && bun -e 'console.log(2**32, Math.PI)'
 opencode --version
+claude --version
 ```
 
 ## 上游 PR 进展
