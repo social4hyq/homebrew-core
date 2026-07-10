@@ -1,8 +1,8 @@
 class Libffi < Formula
   desc "Portable Foreign Function Interface library"
   homepage "https://sourceware.org/libffi/"
-  url "https://github.com/libffi/libffi/releases/download/v3.6.0/libffi-3.6.0.tar.gz"
-  sha256 "31ff1fe32deaebfbb388727f32677bb254bf2a41382c51464c0b1837c9ee9828"
+  url "https://github.com/libffi/libffi/releases/download/v3.7.0/libffi-3.7.0.tar.gz"
+  sha256 "2255c5a638dfb51bf67c20a12a7bb70d17feb1e9eababac05f5573146f586436"
   license "MIT"
   compatibility_version 1
 
