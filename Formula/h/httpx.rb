@@ -7,7 +7,7 @@ class Httpx < Formula
   head "https://github.com/projectdiscovery/httpx.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b415b970eb1ee28003e035167529e0e5ac38fb3c98989b0291345b86f7abd71"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e6cacd562c48cc7c9c750094051425a062bf287c6a87a44c96bb5980d66597d"
   end
 
   depends_on "go" => :build
