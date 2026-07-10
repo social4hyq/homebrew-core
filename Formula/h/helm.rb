@@ -8,7 +8,7 @@ class Helm < Formula
   head "https://github.com/helm/helm.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e5c49b1155abe9a89e7697a7e34f62bc9b0e4fd8b4c8910992503262bc1a0f5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "236c66701f4884fae1248faf4974207d2cd9f7b8d6ab99ed8ed54203a0bb00f3"
   end
 
   depends_on "go" => :build
