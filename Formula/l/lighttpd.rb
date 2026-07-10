@@ -1,8 +1,8 @@
 class Lighttpd < Formula
   desc "Small memory footprint, flexible web-server"
   homepage "https://www.lighttpd.net/"
-  url "https://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-1.4.84.tar.xz"
-  sha256 "076dd43bec8f2ba9ce6db7e7ca7e8ad72271cd529805ead2400b56efaa026f70"
+  url "https://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-1.4.85.tar.xz"
+  sha256 "18de51b393bac4a6827879e1a7ff377c169e414bae92cd245091d80fc2601d13"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,7 +11,7 @@ class Lighttpd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d81a7f425beb8808ee52402a35a3bfbdb573f16003488ef43706e223a27421e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c4781c7e12c368eb5eda112cb9fc99c457b86370015b3f7298c3933ac7e1792"
   end
 
   depends_on "autoconf" => :build
