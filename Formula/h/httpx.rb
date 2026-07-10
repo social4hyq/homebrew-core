@@ -1,13 +1,13 @@
 class Httpx < Formula
   desc "Fast and multi-purpose HTTP toolkit"
   homepage "https://github.com/projectdiscovery/httpx"
-  url "https://github.com/projectdiscovery/httpx/archive/refs/tags/v1.9.0.tar.gz"
-  sha256 "4e24f4d877d4951525954352a81d9b5a29a6a784b48a9aa66a3c9e1f92b3a1fd"
+  url "https://github.com/projectdiscovery/httpx/archive/refs/tags/v1.10.0.tar.gz"
+  sha256 "3665354f4b090224c546e9ad0508d72375fb3885950b6aa8b34b8ca80db61ee2"
   license "MIT"
   head "https://github.com/projectdiscovery/httpx.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b415b970eb1ee28003e035167529e0e5ac38fb3c98989b0291345b86f7abd71"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e6cacd562c48cc7c9c750094051425a062bf287c6a87a44c96bb5980d66597d"
   end
 
   depends_on "go" => :build
