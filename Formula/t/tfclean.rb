@@ -7,7 +7,7 @@ class Tfclean < Formula
   head "https://github.com/takaishi/tfclean.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "615b15e90d6cb37d3b75c093af8ca96e9ca4afa4dce9c319d4beba6cdedf2622"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "201ae062289698de3481248f52dbe800522022074fcdb134e7c245876067244a"
   end
 
   depends_on "go" => :build
