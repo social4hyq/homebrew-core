@@ -1,8 +1,8 @@
 class Prestd < Formula
   desc "Simplify and accelerate development on any Postgres application, existing or new"
   homepage "https://github.com/prest/prest"
-  url "https://github.com/prest/prest/archive/refs/tags/v1.5.5.tar.gz"
-  sha256 "a9a94f4c00629044bf60de214b51d4defb17b30a41b369d404043adde955673f"
+  url "https://github.com/prest/prest/archive/refs/tags/v2.0.0.tar.gz"
+  sha256 "2c8bb5f1e1905d7677c892092ba37c21fd728163fba91bf8177a2a20ceb56227"
   license "MIT"
   head "https://github.com/prest/prest.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Prestd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d6eb7a85261fa217723abcf3a83127f2b11afebc0807925d8046332a1a451c2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "24382f470fd7b9349e928d56fa01c3351f7fd7b928d11bf9e348cc93716db394"
   end
 
   depends_on "go" => :build
@@ -37,7 +37,7 @@ class Prestd < Formula
       database = "prest"
     TOML
 
-    output = shell_output("#{bin}/prestd migrate up --path .", 255)
+    output = shell_output("#{bin}/prestd migrate up --path .", 1)
     assert_match "connect: connection refused", output
 
     assert_match version.to_s, shell_output("#{bin}/prestd version")
