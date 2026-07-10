@@ -1,8 +1,8 @@
 class Kitex < Formula
   desc "Golang RPC framework for microservices"
   homepage "https://github.com/cloudwego/kitex"
-  url "https://github.com/cloudwego/kitex/archive/refs/tags/v0.16.2.tar.gz"
-  sha256 "748d1f5f8f9a96d293e49d83e02cc4bd51b7a0f74ccbeac0de16f21e4b00d996"
+  url "https://github.com/cloudwego/kitex/archive/refs/tags/v0.16.3.tar.gz"
+  sha256 "89a82cb1e86b2c8f7cdee8d73ba243674d159c22a23d33c398291a5cfd79b725"
   license "Apache-2.0"
   head "https://github.com/cloudwego/kitex.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Kitex < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "30e6668f2f42713ca7c722ff15c8e9430be5a5d81bed90c2a38850b274c7a611"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "18e175285dfceec73866697bca80d669f895951bd9e95cc6a05123c85d1099b0"
   end
 
   depends_on "go" => [:build, :test]
