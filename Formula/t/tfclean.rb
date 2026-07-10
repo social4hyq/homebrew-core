@@ -1,13 +1,13 @@
 class Tfclean < Formula
   desc "Remove applied moved block, import block, etc"
   homepage "https://github.com/takaishi/tfclean"
-  url "https://github.com/takaishi/tfclean/archive/refs/tags/v0.0.18.tar.gz"
-  sha256 "3e4e0abfede86e3e69a83bf864eef84aa83f06f0795ef0bcb0e03630ed6e3e06"
+  url "https://github.com/takaishi/tfclean/archive/refs/tags/v0.0.19.tar.gz"
+  sha256 "c49a21e2e5dbf06a2e0c7e93877ea37912e92411ca84a0caca5ea3282e70ef5d"
   license "MIT"
   head "https://github.com/takaishi/tfclean.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "615b15e90d6cb37d3b75c093af8ca96e9ca4afa4dce9c319d4beba6cdedf2622"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "201ae062289698de3481248f52dbe800522022074fcdb134e7c245876067244a"
   end
 
   depends_on "go" => :build
