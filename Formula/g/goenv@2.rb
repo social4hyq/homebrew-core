@@ -11,7 +11,7 @@ class GoenvAT2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c3f140a8c514762c1b01c50f627d0fa1bbc88a996c3990536c72a3df97047d6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4147b50d46d737e23401d7b6df56a225d0cce1c6519c5e953d7868cb2be4f726"
   end
 
   keg_only :versioned_formula
