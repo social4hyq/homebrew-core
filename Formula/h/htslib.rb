@@ -12,7 +12,7 @@ class Htslib < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "78a51ef5a6f36c915bf296f49e00f6ad88d55551499c6c5004707daf11994029"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d292ecbb331ffd3830c7f8ec868856fc5ea9cf570a873ace10b0db10eacf736f"
   end
 
   depends_on "libdeflate"
