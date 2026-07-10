@@ -1,13 +1,13 @@
 class Talm < Formula
   desc "Manage Talos Linux configurations the GitOps way"
   homepage "https://github.com/cozystack/talm"
-  url "https://github.com/cozystack/talm/archive/refs/tags/v0.33.0.tar.gz"
-  sha256 "487eae755c8900ca68b8800c215c13996645305c960d85f2ba4cf99ad0ff4147"
+  url "https://github.com/cozystack/talm/archive/refs/tags/v0.33.1.tar.gz"
+  sha256 "cdce0a060aa3c30b6fd51a5583c7d7fa228445412696a2a1f7aab835f059f55b"
   license "Apache-2.0"
   head "https://github.com/cozystack/talm.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "678df8f3521cdec42974a8148d81b5359681663b6d0fbb03f9262d6c5b98d067"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0b2ff1d5b2d2845fdffe2bcfaa243cb113506f9407a461ffa1a2fe401e30829"
   end
 
   depends_on "go" => :build
