@@ -7,12 +7,7 @@ class Teamtype < Formula
   head "https://github.com/teamtype/teamtype.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "5fb2d7442ecaaea0c5cf243729e22356ccb76ba979e92c76d5531c8dae77f8ba"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7eadb16bb1a0773f7de641bd279069ee49716abbaed50e9b5241820673bdecfa"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "df7da3909aa55ee7d81883bb41f78944e5a6ee9c1d32d3073f51282734865938"
-    sha256 cellar: :any_skip_relocation, sonoma:        "1f050e83510628bdcbf87b0a9befd19f584fb7901a3d5a44b5a1a178ffe57804"
-    sha256 cellar: :any,                 arm64_linux:   "c4026250f0f68b91cee85c365a3793f75ac41ff77ac93fec33a43d3b32074cbd"
-    sha256 cellar: :any,                 x86_64_linux:  "3e05440ce176a996371de197006bf5a16818eea9011432d7f51fa15a9cb88b6a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "89149d065f5cd6b25d0655f9b1c79ba66020512f5369f8e7257db27ad941bec3"
   end
 
   depends_on "rust" => :build
