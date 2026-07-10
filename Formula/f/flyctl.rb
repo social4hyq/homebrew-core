@@ -18,7 +18,7 @@ class Flyctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d0c674cc269fee0df2d5c80b6f367db58696988c763baec5fa498484853a7390"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "434996b926a846f480aab0f2e0ef47deb916225802f76864d16614d5e714add1"
   end
 
   depends_on "go" => :build
