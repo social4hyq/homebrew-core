@@ -18,7 +18,7 @@ class StorjUplink < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d23fb7666db7ea97cff2994f9ecd0de52b2d7b8ed5b0bce7bf8f31e9de2d5aa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c9253f3d993acce89b88b1013f67a8b30f388d086df783aa6403720129eac80"
   end
 
   depends_on "go" => :build
