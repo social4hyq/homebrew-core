@@ -1,6 +1,8 @@
+diff --git a/pathnames.h b/pathnames.h
+index 2f0b9f4..1468218 100644
 --- a/pathnames.h
 +++ b/pathnames.h
-@@ -126,7 +126,7 @@
+@@ -128,7 +128,7 @@
   * ~/.rhosts and /etc/hosts.equiv if rhosts authentication is enabled.
   */
  #define _PATH_SSH_HOSTS_EQUIV		SSHDIR "/shosts.equiv"
@@ -9,7 +11,7 @@
  
  /*
   * Default location of askpass
-@@ -152,7 +152,7 @@
+@@ -154,7 +154,7 @@
  
  /* xauth for X11 forwarding */
  #ifndef _PATH_XAUTH
@@ -18,7 +20,7 @@
  #endif
  
  /* UNIX domain socket for X11 server; displaynum will replace %u */
-@@ -180,7 +180,7 @@
+@@ -182,7 +182,7 @@
  
  /* for passwd change */
  #ifndef _PATH_PASSWD_PROG
@@ -27,4 +29,3 @@
  #endif
  
  /* Askpass program define */
-

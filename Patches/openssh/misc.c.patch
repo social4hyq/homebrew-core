@@ -1,6 +1,8 @@
+diff --git a/misc.c b/misc.c
+index 517fa7a..6ce319a 100644
 --- a/misc.c
 +++ b/misc.c
-@@ -1301,8 +1301,20 @@
+@@ -1301,8 +1301,20 @@ tilde_expand(const char *filename, uid_t uid, char **retp)
  			goto out;
  		}
  	} else if ((pw = getpwuid(uid)) == NULL) {
@@ -21,7 +23,7 @@
  	}
  
  	/* Make sure directory has a trailing '/' */
-@@ -1917,7 +1929,17 @@
+@@ -1917,7 +1929,17 @@ mktemp_proto(char *s, size_t len)
  		if (r > 0 && (size_t)r < len)
  			return;
  	}
@@ -39,7 +41,7 @@
  	if (r < 0 || (size_t)r >= len)
  		fatal_f("template string too short");
  }
-@@ -2945,6 +2967,7 @@
+@@ -2947,6 +2969,7 @@ subprocess(const char *tag, const char *command,
  			    pw->pw_name, (u_int)pw->pw_gid, strerror(errno));
  			_exit(1);
  		}
@@ -47,7 +49,7 @@
  		if (setresgid(pw->pw_gid, pw->pw_gid, pw->pw_gid) == -1) {
  			error("%s: setresgid %u: %s", tag, (u_int)pw->pw_gid,
  			    strerror(errno));
-@@ -2955,6 +2978,7 @@
+@@ -2957,6 +2980,7 @@ subprocess(const char *tag, const char *command,
  			    strerror(errno));
  			_exit(1);
  		}
@@ -55,4 +57,3 @@
  		/* stdin is pointed to /dev/null at this point */
  		if ((flags & SSH_SUBPROCESS_STDOUT_DISCARD) != 0 &&
  		    dup2(STDIN_FILENO, STDERR_FILENO) == -1) {
-

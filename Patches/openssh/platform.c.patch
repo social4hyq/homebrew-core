@@ -1,6 +1,8 @@
+diff --git a/platform.c b/platform.c
+index fd1a7a7..fe0c599 100644
 --- a/platform.c
 +++ b/platform.c
-@@ -160,7 +160,7 @@
+@@ -160,7 +160,7 @@ platform_locked_account(struct passwd *pw)
  {
  	int locked = 0;
  	char *passwd = pw->pw_passwd;
@@ -9,4 +11,3 @@
  	struct spwd *spw = NULL;
  #ifdef USE_LIBIAF
  	char *iaf_passwd = NULL;
-

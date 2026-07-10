@@ -1,6 +1,8 @@
+diff --git a/ssh.c b/ssh.c
+index 7c644c2..ac58f5b 100644
 --- a/ssh.c
 +++ b/ssh.c
-@@ -681,6 +681,22 @@
+@@ -662,6 +662,22 @@ main(int ac, char **av)
  
  	/* Get user data. */
  	pw = getpwuid(getuid());
@@ -23,4 +25,3 @@
  	if (!pw) {
  		logit("No user exists for uid %lu", (u_long)getuid());
  		exit(255);
-

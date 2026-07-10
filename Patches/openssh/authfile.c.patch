@@ -1,6 +1,8 @@
+diff --git a/authfile.c b/authfile.c
+index 954f78c..bc19cc3 100644
 --- a/authfile.c
 +++ b/authfile.c
-@@ -94,6 +94,7 @@
+@@ -94,6 +94,7 @@ sshkey_perm_ok(int fd, const char *filename)
  	if (check_ntsec(filename))
  #endif
  	if ((st.st_uid == getuid()) && (st.st_mode & 077) != 0) {
@@ -8,7 +10,7 @@
  		error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
  		error("@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @");
  		error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-@@ -102,6 +103,7 @@
+@@ -102,6 +103,7 @@ sshkey_perm_ok(int fd, const char *filename)
  		error("It is required that your private key files are NOT accessible by others.");
  		error("This private key will be ignored.");
  		return SSH_ERR_KEY_BAD_PERMISSIONS;
@@ -16,4 +18,3 @@
  	}
  	return 0;
  }
-

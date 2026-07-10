@@ -1,12 +1,11 @@
 class Openssh < Formula
   desc "OpenBSD freely-licensed SSH connectivity tools"
   homepage "https://www.openssh.com/"
-  url "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-10.3p1.tar.gz"
-  mirror "https://cloudflare.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-10.3p1.tar.gz"
-  version "10.3p1"
-  sha256 "56682a36bb92dcf4b4f016fd8ec8e74059b79a8de25c15d670d731e7d18e45f4"
+  url "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-10.4p1.tar.gz"
+  mirror "https://cloudflare.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-10.4p1.tar.gz"
+  version "10.4p1"
+  sha256 "ef6026dd2aea8d56059638d5d3262902c892ceba9f88395835e0d06d3fb63238"
   license "SSH-OpenSSH"
-  revision 6
   compatibility_version 1
 
   livecheck do
@@ -15,7 +14,7 @@ class Openssh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d0d4a8e7268a6ac66e11e50882bddcb74cf742f8c530789371a7bc41a7f04745"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "51e1f16a750074f17bd4fae872fd6cba945bc5e2816fdf37874f84e99acb89d8"
   end
 
   depends_on "pkgconf" => :build

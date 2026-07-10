@@ -1,6 +1,8 @@
+diff --git a/defines.h b/defines.h
+index 634db45..57a076f 100644
 --- a/defines.h
 +++ b/defines.h
-@@ -468,7 +468,7 @@
+@@ -468,7 +468,7 @@ struct winsize {
  #endif
  
  #ifndef _PATH_NOLOGIN
@@ -9,4 +11,3 @@
  #endif
  
  /* Define this to be the path of the xauth program. */
-

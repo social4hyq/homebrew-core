@@ -1,6 +1,8 @@
+diff --git a/mux.c b/mux.c
+index 0cd1697..923701c 100644
 --- a/mux.c
 +++ b/mux.c
-@@ -1372,6 +1372,21 @@
+@@ -1372,6 +1372,21 @@ muxserver_listen(struct ssh *ssh)
  		}
  	}
  
@@ -22,7 +24,7 @@
  	/* Now atomically "move" the mux socket into position */
  	if (link(options.control_path, orig_control_path) != 0) {
  		if (errno != EEXIST) {
-@@ -1385,6 +1400,7 @@
+@@ -1385,6 +1400,7 @@ muxserver_listen(struct ssh *ssh)
  		goto disable_mux_master;
  	}
  	unlink(options.control_path);
@@ -30,4 +32,3 @@
  	free(options.control_path);
  	options.control_path = orig_control_path;
  
-
