@@ -7,7 +7,7 @@ class Govulncheck < Formula
   head "https://github.com/golang/vuln.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cac616ac3c9ce7d7fc4596af26a0fda2636e6a727e10e7347522fb98a5894f76"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f7077b6ec9150196ba4ff62bca3cbed965dce4a388dfefb0727c1983c252520f"
   end
 
   depends_on "go" => [:build, :test]
