@@ -3,13 +3,18 @@ class SigmaCli < Formula
 
   desc "CLI based on pySigma"
   homepage "https://github.com/SigmaHQ/sigma-cli"
-  url "https://files.pythonhosted.org/packages/09/7e/8316ee750eaa9499b332c6c308173a88242ef7e086ec68a66b08f326104b/sigma_cli-3.0.3.tar.gz"
-  sha256 "3ffe2d851a8b911994cc58c690659afcaec3ec0edb3e5ec5f63ecfbbc135c3bf"
+  url "https://files.pythonhosted.org/packages/13/63/f6bae3c67004d3f0f496805d25cf8d7e355c59341b58ae534778e33c17be/sigma_cli-3.1.0.tar.gz"
+  sha256 "e87e4f241b309e84f67fb38aa768ddd6d911f90e061c885c0aa16a6dcb7fbad7"
   license "LGPL-2.1-or-later"
   head "https://github.com/SigmaHQ/sigma-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dca212ae59a7f5b7fa0d50dbf29133fd1b17e83743d62002d0b81785387a7274"
+    sha256 cellar: :any, arm64_tahoe:   "721e171aafed169d247727e17dbeba45ec8a49786910c50ad08ea8f08e171348"
+    sha256 cellar: :any, arm64_sequoia: "f580812d36bb2c01e9f7fb69f56765b9025717d38a78463113576204a883b6b0"
+    sha256 cellar: :any, arm64_sonoma:  "27c782cf5a11d05a7d99aeae83313844bab0575d698cbdee6253c5c5b1474394"
+    sha256 cellar: :any, sonoma:        "78ff61685549b610bc6af4a41391d0cdc0835295781f6d99368a8b47e527c628"
+    sha256 cellar: :any, arm64_linux:   "12b2c0d4d558c9648e1b2ae8ea6ef192f772830998f470ecaff354b1a687d212"
+    sha256 cellar: :any, x86_64_linux:  "a01c5cf61e12588d10e0dbb5bfb6b26e6344aadcec4e1a02dd347100dffef7b1"
   end
 
   depends_on "certifi" => :no_linkage
@@ -23,8 +28,8 @@ class SigmaCli < Formula
   pypi_packages exclude_packages: "certifi"
 
   resource "charset-normalizer" do
-    url "https://files.pythonhosted.org/packages/e7/a1/67fe25fac3c7642725500a3f6cfe5821ad557c3abb11c9d20d12c7008d3e/charset_normalizer-3.4.7.tar.gz"
-    sha256 "ae89db9e5f98a11a4bf50407d4363e7b09b31e55bc117b4f7d80aab97ba009e5"
+    url "https://files.pythonhosted.org/packages/bd/2a/23f34ec9d04624958e137efdc394888716353190e75f25dd22c7a2c7a8aa/charset_normalizer-3.4.9.tar.gz"
+    sha256 "673611bbd43f0810bec0b0f028ddeaaa501190339cac411f347ac76917c3ae7b"
   end
 
   resource "click" do
