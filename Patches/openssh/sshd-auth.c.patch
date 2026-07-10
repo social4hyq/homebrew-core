@@ -1,6 +1,8 @@
+diff --git a/sshd-auth.c b/sshd-auth.c
+index fb1bab6..27714eb 100644
 --- a/sshd-auth.c
 +++ b/sshd-auth.c
-@@ -652,12 +652,35 @@
+@@ -626,12 +626,35 @@ main(int ac, char **av)
  	debug("sshd-auth version %s, %s", SSH_VERSION, SSH_OPENSSL_VERSION);
  
  	/* Store privilege separation user for later use if required. */
@@ -37,4 +39,3 @@
  		privsep_pw = pwcopy(privsep_pw);
  		freezero(privsep_pw->pw_passwd, strlen(privsep_pw->pw_passwd));
  		privsep_pw->pw_passwd = xstrdup("*");
-

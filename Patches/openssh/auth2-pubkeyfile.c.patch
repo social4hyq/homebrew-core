@@ -1,6 +1,8 @@
+diff --git a/auth2-pubkeyfile.c b/auth2-pubkeyfile.c
+index e729cc5..f9cc89f 100644
 --- a/auth2-pubkeyfile.c
 +++ b/auth2-pubkeyfile.c
-@@ -486,6 +486,7 @@
+@@ -486,6 +486,7 @@ auth_openfile(const char *file, struct passwd *pw, int strict_modes,
  		close(fd);
  		return NULL;
  	}
@@ -8,7 +10,7 @@
  	if (strict_modes &&
  	    safe_path_fd(fileno(f), file, pw, line, sizeof(line)) != 0) {
  		fclose(f);
-@@ -493,6 +494,7 @@
+@@ -493,6 +494,7 @@ auth_openfile(const char *file, struct passwd *pw, int strict_modes,
  		auth_debug_add("Ignored %s: %s", file_type, line);
  		return NULL;
  	}

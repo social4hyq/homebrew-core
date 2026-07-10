@@ -1,9 +1,12 @@
+diff --git a/auth.c b/auth.c
+index a0217a8..c55e0ba 100644
 --- a/auth.c
 +++ b/auth.c
-@@ -491,6 +491,25 @@
+@@ -490,6 +490,25 @@ getpwnamallow(struct ssh *ssh, const char *user)
+ 
  #if defined(_AIX) && defined(HAVE_SETAUTHDB)
  	aix_restoreauthdb();
- #endif
++#endif
 +#ifdef __OHOS__
 +	if (pw == NULL) {
 +		/* Synthesize a passwd entry from the current process identity.
@@ -22,8 +25,6 @@
 +		pw = &ohos_pw;
 +		ci->user_invalid = 0;
 +	}
-+#endif
+ #endif
  	if (pw == NULL) {
  		logit("Invalid user %.100s from %.100s port %d",
- 		    user, ssh_remote_ipaddr(ssh), ssh_remote_port(ssh));
-

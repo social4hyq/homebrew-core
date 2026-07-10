@@ -1,6 +1,8 @@
+diff --git a/sshd.c b/sshd.c
+index 7d1466d..e2b5c8a 100644
 --- a/sshd.c
 +++ b/sshd.c
-@@ -1317,7 +1317,12 @@
+@@ -1317,7 +1317,12 @@ main(int ac, char **av)
  	saved_argc = ac;
  	rexec_argc = ac;
  	saved_argv = xcalloc(ac + 1, sizeof(*saved_argv));
@@ -13,7 +15,7 @@
  		saved_argv[i] = xstrdup(av[i]);
  	saved_argv[i] = NULL;
  
-@@ -1327,8 +1332,10 @@
+@@ -1327,8 +1332,10 @@ main(int ac, char **av)
  	av = saved_argv;
  #endif
  
@@ -24,7 +26,7 @@
  
  	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
  	sanitise_stdfd();
-@@ -1451,8 +1458,10 @@
+@@ -1451,8 +1458,10 @@ main(int ac, char **av)
  			break;
  		}
  	}
@@ -35,7 +37,7 @@
  
  	closefrom(STDERR_FILENO + 1);
  
-@@ -1718,12 +1727,15 @@
+@@ -1720,12 +1729,15 @@ main(int ac, char **av)
  	/* Ensure privsep directory is correctly configured. */
  	need_chroot = ((getuid() == 0 || geteuid() == 0) ||
  	    options.kerberos_authentication);
@@ -51,7 +53,7 @@
  	if (need_chroot) {
  		if ((stat(_PATH_PRIVSEP_CHROOT_DIR, &sb) == -1) ||
  		    (S_ISDIR(sb.st_mode) == 0))
-@@ -1739,6 +1751,7 @@
+@@ -1741,6 +1753,7 @@ main(int ac, char **av)
  			fatal("%s must be owned by root and not group or "
  			    "world-writable.", _PATH_PRIVSEP_CHROOT_DIR);
  	}
@@ -59,7 +61,7 @@
  
  	if (test_flag > 1)
  		print_config(&connection_info);
-@@ -1760,8 +1773,10 @@
+@@ -1762,8 +1775,10 @@ main(int ac, char **av)
  	 * to create a file, and we can't control the code in every
  	 * module which might be used).
  	 */
@@ -70,7 +72,7 @@
  
  	/* Prepare arguments for sshd-session */
  	if (rexec_argc < 0)
-@@ -1808,7 +1823,7 @@
+@@ -1810,7 +1825,7 @@ main(int ac, char **av)
  	already_daemon = daemonized();
  	if (!(debug_flag || inetd_flag || no_daemon_flag || already_daemon)) {
  
@@ -79,7 +81,7 @@
  			fatal("daemon() failed: %.200s", strerror(errno));
  
  		disconnect_controlling_tty();
-@@ -1820,8 +1835,10 @@
+@@ -1822,8 +1837,10 @@ main(int ac, char **av)
  	 * Chdir to the root directory so that the current disk can be
  	 * unmounted if desired.
  	 */
@@ -90,4 +92,3 @@
  
  	/* ignore SIGPIPE */
  	ssh_signal(SIGPIPE, SIG_IGN);
-

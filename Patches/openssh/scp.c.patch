@@ -1,3 +1,5 @@
+diff --git a/scp.c b/scp.c
+index 28ac7a2..ce1c82d 100644
 --- a/scp.c
 +++ b/scp.c
 @@ -628,8 +628,10 @@ main(int argc, char **argv)
@@ -11,13 +13,13 @@
  
  	if (!isatty(STDOUT_FILENO))
  		showprogress = 0;
-@@ -1679,7 +1681,9 @@ sink(int argc, char **argv, const char *src)
- 	setimes = targisdir = 0;
+@@ -1680,7 +1682,9 @@ sink(int argc, char **argv, const char *src)
  	mask = umask(0);
  	if (!pflag) {
+ 		(void) umask(mask);
 +#ifndef __OHOS__
  		mask |= 07000;
 +#endif
- 		(void) umask(mask);
  	}
  	if (argc != 1) {
+ 		run_err("ambiguous target");

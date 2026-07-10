@@ -1,6 +1,8 @@
+diff --git a/session.c b/session.c
+index fc9c9d6..fca9f83 100644
 --- a/session.c
 +++ b/session.c
-@@ -142,6 +142,10 @@
+@@ -142,6 +142,10 @@ extern int debug_flag;
  extern struct sshbuf *loginmsg;
  extern struct sshauthopt *auth_opts;
  extern char *tun_fwd_ifnames; /* serverloop.c */
@@ -11,7 +13,7 @@
  
  /* original command from peer. */
  const char *original_command = NULL;
-@@ -244,7 +248,25 @@
+@@ -244,7 +248,25 @@ prepare_auth_info_file(struct passwd *pw, struct sshbuf *info)
  		return;
  
  	temporarily_use_uid(pw);
@@ -37,7 +39,7 @@
  	if ((fd = mkstemp(auth_info_file)) == -1) {
  		error_f("mkstemp: %s", strerror(errno));
  		goto out;
-@@ -744,6 +766,10 @@
+@@ -744,6 +766,10 @@ do_motd(void)
  	FILE *f;
  	char buf[256];
  
@@ -48,7 +50,7 @@
  	if (options.print_motd) {
  #ifdef HAVE_LOGIN_CAP
  		f = fopen(login_getcapstr(lc, "welcome", "/etc/motd",
-@@ -757,6 +783,7 @@
+@@ -757,6 +783,7 @@ do_motd(void)
  			fclose(f);
  		}
  	}
@@ -56,7 +58,7 @@
  }
  
  
-@@ -1002,11 +1029,13 @@
+@@ -1002,11 +1029,13 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
  # endif /* HAVE_CYGWIN */
  #endif /* HAVE_LOGIN_CAP */
  
@@ -70,7 +72,7 @@
  
  	/* Normal systems set SHELL by default. */
  	child_set_env(&env, &envsize, "SHELL", shell);
-@@ -1055,6 +1084,32 @@
+@@ -1055,6 +1084,32 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
  		child_set_env(&env, &envsize, SSH_AUTHSOCKET_ENV_NAME,
  		    auth_sock_name);
  
@@ -103,4 +105,3 @@
  
  	/* Set custom environment options from pubkey authentication. */
  	if (options.permit_user_env) {
-

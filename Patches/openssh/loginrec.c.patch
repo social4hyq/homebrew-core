@@ -1,6 +1,8 @@
---- a/loginrec.c	2026-06-05 04:01:45.127286268 +0000
-+++ b/loginrec.c	2026-06-05 04:02:02.078359254 +0000
-@@ -294,8 +294,13 @@
+diff --git a/loginrec.c b/loginrec.c
+index 7499aa9..ff083fb 100644
+--- a/loginrec.c
++++ b/loginrec.c
+@@ -294,8 +294,13 @@ login_get_lastlog(struct logininfo *li, const uid_t uid)
  	 */
  	pw = getpwuid(uid);
  	if (pw == NULL)
@@ -14,7 +16,7 @@
  
  	if (strlcpy(li->username, pw->pw_name, sizeof(li->username)) >=
  	    sizeof(li->username)) {
-@@ -367,8 +372,13 @@
+@@ -367,8 +372,13 @@ login_init_entry(struct logininfo *li, pid_t pid, const char *username,
  		strlcpy(li->username, username, sizeof(li->username));
  		pw = getpwnam(li->username);
  		if (pw == NULL) {

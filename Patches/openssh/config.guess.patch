@@ -1,6 +1,8 @@
+diff --git a/config.guess b/config.guess
+index 980b020..58aeedf 100755
 --- a/config.guess
 +++ b/config.guess
-@@ -162,6 +162,8 @@
+@@ -162,6 +162,8 @@ Linux|GNU|GNU/*)
  	LIBC=dietlibc
  	#elif defined(__GLIBC__)
  	LIBC=gnu
@@ -9,4 +11,3 @@
  	#else
  	#include <stdarg.h>
  	/* First heuristic to detect musl libc.  */
-

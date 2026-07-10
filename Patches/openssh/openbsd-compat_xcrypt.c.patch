@@ -1,3 +1,5 @@
+diff --git a/openbsd-compat/xcrypt.c b/openbsd-compat/xcrypt.c
+index 9cded66..1736209 100644
 --- a/openbsd-compat/xcrypt.c
 +++ b/openbsd-compat/xcrypt.c
 @@ -70,14 +70,15 @@
@@ -19,7 +21,7 @@
  	setpwent();
  	while ((pw = getpwent()) != NULL) {
  		if ((passwd = shadow_pw(pw)) == NULL)
-@@ -91,6 +92,7 @@
+@@ -91,6 +92,7 @@ pick_salt(void)
  	}
   out:
  	endpwent();
@@ -27,7 +29,7 @@
  	return salt;
  }
  
-@@ -130,7 +132,7 @@
+@@ -130,7 +132,7 @@ shadow_pw(struct passwd *pw)
  {
  	char *pw_password = pw->pw_passwd;
  
@@ -36,4 +38,3 @@
  	struct spwd *spw = getspnam(pw->pw_name);
  
  	if (spw != NULL)
-

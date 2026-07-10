@@ -1,6 +1,8 @@
+diff --git a/hostfile.c b/hostfile.c
+index 033b291..6c6ef67 100644
 --- a/hostfile.c
 +++ b/hostfile.c
-@@ -729,7 +729,11 @@
+@@ -729,7 +729,11 @@ hostfile_replace_entries(const char *filename, const char *host, const char *ip,
  			r = SSH_ERR_SYSTEM_ERROR;
  			goto fail;
  		}
@@ -12,4 +14,3 @@
  			oerrno = errno;
  			error_f("link %.100s to %.100s: %s", filename,
  			    back, strerror(errno));
-

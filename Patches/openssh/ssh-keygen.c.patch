@@ -1,6 +1,8 @@
+diff --git a/ssh-keygen.c b/ssh-keygen.c
+index a62e5dc..52de596 100644
 --- a/ssh-keygen.c
 +++ b/ssh-keygen.c
-@@ -3327,6 +3327,22 @@
+@@ -3335,6 +3335,22 @@ main(int argc, char **argv)
  
  	/* we need this for the home * directory.  */
  	pw = getpwuid(getuid());
@@ -23,4 +25,3 @@
  	if (!pw)
  		fatal("No user exists for uid %lu", (u_long)getuid());
  	pw = pwcopy(pw);
-

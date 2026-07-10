@@ -1,5 +1,7 @@
---- a/sftp-server-main.c	2026-07-07 07:56:07.476774043 +0000
-+++ b/sftp-server-main.c	2026-07-07 07:56:31.813090439 +0000
+diff --git a/sftp-server-main.c b/sftp-server-main.c
+index 2c70f89..90a5bb6 100644
+--- a/sftp-server-main.c
++++ b/sftp-server-main.c
 @@ -22,6 +22,9 @@
  #include <stdarg.h>
  #include <stdio.h>
@@ -10,7 +12,7 @@
  
  #include "log.h"
  #include "sftp.h"
-@@ -43,9 +46,32 @@
+@@ -43,9 +46,32 @@ main(int argc, char **argv)
  	sanitise_stdfd();
  
  	if ((user_pw = getpwuid(getuid())) == NULL) {
