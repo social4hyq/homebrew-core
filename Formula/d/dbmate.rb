@@ -7,7 +7,7 @@ class Dbmate < Formula
   head "https://github.com/amacneil/dbmate.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8114efbee1b3d39c927612f78eb1c74cf8ea2a03f637847ab67f27ff017d2664"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1baec8f616d7873e2673d16d8977b7483dcd8ed2cc704a6d69cd2c4b752eaf19"
   end
 
   depends_on "go" => :build
