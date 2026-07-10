@@ -3,8 +3,8 @@ class OpenAdventure < Formula
 
   desc "Colossal Cave Adventure, the 1995 430-point version"
   homepage "http://www.catb.org/~esr/open-adventure/"
-  url "https://gitlab.com/esr/open-adventure/-/archive/1.21/open-adventure-1.21.tar.bz2"
-  sha256 "8ddff48254f868999957bef5f9a1606140d8cacae4a4d87f676fd819876e57c6"
+  url "https://gitlab.com/esr/open-adventure/-/archive/1.22/open-adventure-1.22.tar.bz2"
+  sha256 "d3e48baee13fe953e041f1b8264580bf96bc893edee62586151de234350c3ccb"
   license "BSD-2-Clause"
   head "https://gitlab.com/esr/open-adventure.git", branch: "master"
 
@@ -16,7 +16,7 @@ class OpenAdventure < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d0178daf25c652260c1b730164e76d0605d8368c606b3421d411837a551d3bc6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "53863332dd3a6531c5aeaf2248a7d53df10c626b355228bf2e9403f8342a59e9"
   end
 
   depends_on "asciidoctor" => :build
