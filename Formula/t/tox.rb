@@ -8,7 +8,7 @@ class Tox < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d653fe76f2958cc3d2ce40f1f1df2af4264937889a9ca03ad551dda0b600caf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f05d8bfd8dcaa84756a08dbf8415efa67655b6f6fd3a3f3c6483df99f9ae3dff"
   end
 
   depends_on "python@3.14"
