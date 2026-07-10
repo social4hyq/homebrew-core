@@ -6,7 +6,7 @@ class Commitlint < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "783672ea0d6e1ca287eba07371f7aeb6c41604a171776ed4d0cfc36a867a7e08"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "054532921cb7e046df64c6b94fc794847c0f7747019686f8317cd8e2d4f54174"
   end
 
   depends_on "node"
