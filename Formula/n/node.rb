@@ -12,8 +12,8 @@ class Node < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a9d1a73c516d1e6ec74ccce2fed6733f9f2d5b2979760d05e3511e6308e2cdc"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d25c7149d448472676dc5e5ed4ae526304e690a0335d33e85c992cfaa1f116c8"
   end
 
   resource "alpine-rootfs" do
