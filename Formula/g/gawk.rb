@@ -1,15 +1,15 @@
 class Gawk < Formula
   desc "GNU awk utility"
   homepage "https://www.gnu.org/software/gawk/"
-  url "https://ftpmirror.gnu.org/gnu/gawk/gawk-5.4.0.tar.xz"
-  mirror "https://ftp.gnu.org/gnu/gawk/gawk-5.4.0.tar.xz"
-  sha256 "3dd430f0cd3b4428c6c3f6afc021b9cd3c1f8c93f7a688dc268ca428a90b4ac1"
+  url "https://ftpmirror.gnu.org/gnu/gawk/gawk-5.4.1.tar.xz"
+  mirror "https://ftp.gnu.org/gnu/gawk/gawk-5.4.1.tar.xz"
+  sha256 "07f6f7342b7febe4313fc2c2542ad93d64fe20ad8717200109f105a826f5fd37"
   license "GPL-3.0-or-later"
   compatibility_version 1
   head "https://git.savannah.gnu.org/git/gawk.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a0dad0dd51038c563312322a44640ba1c150823c75215579354ced3ad4ce6f0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5fa9f58bbdedfab8072bb3ae950a8ff73f2fef5ae39e982b22f1e300a222f70a"
   end
 
   depends_on "gmp"
