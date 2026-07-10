@@ -9,7 +9,7 @@ class Gawk < Formula
   head "https://git.savannah.gnu.org/git/gawk.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a0dad0dd51038c563312322a44640ba1c150823c75215579354ced3ad4ce6f0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5fa9f58bbdedfab8072bb3ae950a8ff73f2fef5ae39e982b22f1e300a222f70a"
   end
 
   depends_on "gmp"
