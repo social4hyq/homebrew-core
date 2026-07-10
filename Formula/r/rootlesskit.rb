@@ -1,8 +1,8 @@
 class Rootlesskit < Formula
   desc "Linux-native \"fake root\" for implementing rootless containers"
   homepage "https://github.com/rootless-containers/rootlesskit"
-  url "https://github.com/rootless-containers/rootlesskit/archive/refs/tags/v3.0.1.tar.gz"
-  sha256 "6d70d1be48fabe0e2b6e24eb1532b4de8d7689374eaf178a67d54d675c10c22b"
+  url "https://github.com/rootless-containers/rootlesskit/archive/refs/tags/v3.0.2.tar.gz"
+  sha256 "fcb6cd631ed8e211046431c048704b16d72d0ebba6283ae35713e3b8e09d709e"
   license "Apache-2.0"
 
   bottle do
