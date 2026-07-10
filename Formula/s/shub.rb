@@ -9,7 +9,7 @@ class Shub < Formula
   head "https://github.com/scrapinghub/shub.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b2ecd690a39d124f655907b76752d2066662949d534a90a858ac61d359fc965"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6916b2c18f6508d0b936d9f1dff75db2dce1585faf2576f12dc741e2aa45c742"
   end
 
   depends_on "certifi" => :no_linkage
