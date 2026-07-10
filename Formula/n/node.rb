@@ -79,7 +79,7 @@ class Node < Formula
 
     (libexec/"lib/node_modules").mkpath
     cp_r lib/"node_modules/npm", libexec/"lib/node_modules/npm"
-    rm_r lib/"node_modules/npm"           # 删掉 bundled npm
+    rm_r lib/"node_modules/npm"
     rm_f [bin/"npm", bin/"npx"]
     ln_s libexec/"lib/node_modules/npm/bin/npm-cli.js", bin/"npm"
     ln_s libexec/"lib/node_modules/npm/bin/npx-cli.js", bin/"npx"
