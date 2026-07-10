@@ -12,7 +12,7 @@ class Libffi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5054e9d51c51663d6d2ba2272b358b43f827b53da2fcd27106015fd592ba5d2a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d31b79b5b064b40ca1ae234ac0783d9e5a1cddb2bf04ed9e4ad2b40486befc6c"
   end
 
   head do
