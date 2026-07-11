@@ -7,7 +7,7 @@ class Dtop < Formula
   head "https://github.com/amir20/dtop.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "965912c7a973858b974e6e5f76a22c1f9f1b6679e7ffa8171f02d2964228fcfb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "75a733eb2ee860e1c9a1e9282593f7b475b8039e8a8a421d50df3280da5b75df"
   end
 
   depends_on "rust" => :build
