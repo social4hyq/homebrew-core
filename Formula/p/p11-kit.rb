@@ -1,15 +1,14 @@
 class P11Kit < Formula
   desc "Library to load and enumerate PKCS#11 modules"
   homepage "https://p11-glue.github.io/p11-glue/p11-kit.html"
-  url "https://github.com/p11-glue/p11-kit/releases/download/0.26.2/p11-kit-0.26.2.tar.xz"
-  sha256 "09fd9f44da4813a3141e73d5e7cf7008e5660d0405f13d56c15e1da9dcecf828"
+  url "https://github.com/p11-glue/p11-kit/releases/download/0.26.4/p11-kit-0.26.4.tar.xz"
+  sha256 "89c3ffb10e076ee036e14732bf6547a1e1c4fb48699a5dee7ceb5ce4f7c0c462"
   license "BSD-3-Clause"
   compatibility_version 1
-  revision 1
   head "https://github.com/p11-glue/p11-kit.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e245638bf247a84047e151c18b9a58c4948db9f129e6294ab5a98c0c22592eb7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "338fdad0fd42b65d26af6e9e0a6981136732a776ff9f18cbb036ec3559058e03"
   end
 
   depends_on "meson" => :build
