@@ -1,13 +1,13 @@
 class Geoipupdate < Formula
   desc "Automatic updates of GeoIP2 and GeoIP Legacy databases"
   homepage "https://github.com/maxmind/geoipupdate"
-  url "https://github.com/maxmind/geoipupdate/archive/refs/tags/v7.1.1.tar.gz"
-  sha256 "f21b26d9be7281a0c90f9009ed150acb97e68e02be8a3e975315a7956de6965a"
+  url "https://github.com/maxmind/geoipupdate/archive/refs/tags/v8.0.0.tar.gz"
+  sha256 "5c08b39d2ac49ad492138b3d618dddac130065852b6237ec450bac856ace7e0a"
   license "Apache-2.0"
   head "https://github.com/maxmind/geoipupdate.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61ee5460c8c670e0478352df9236fc9e0fe29a6e5088d4d393800c72f7f2bc11"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "473670e719874f6056346c85730059b7d63d6d1a5429397f6ef6d77313c668f6"
   end
 
   depends_on "go" => :build
