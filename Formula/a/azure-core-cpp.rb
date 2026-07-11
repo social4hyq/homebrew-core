@@ -12,7 +12,7 @@ class AzureCoreCpp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c811a999bc9620bb6b366aae88ea619e727436edf3a5be4e68211cd924d07ad"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e039f61a1264864abc194f470119a2985953682d85ebb577f172eb7f8d3fdf95"
   end
 
   depends_on "cmake" => :build
