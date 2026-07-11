@@ -7,7 +7,7 @@ class Immortal < Formula
   head "https://github.com/immortal/immortal.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3fefe198b308d7c70470dd29fa83e33696e5965ce26b4bc5fa83e00d7a399eee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "beeecdd35b81d0e36a328147324a8fbf26f46740f4dd09751caf8b84d454f372"
   end
 
   depends_on "go" => :build
