@@ -7,7 +7,7 @@ class Geoipupdate < Formula
   head "https://github.com/maxmind/geoipupdate.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61ee5460c8c670e0478352df9236fc9e0fe29a6e5088d4d393800c72f7f2bc11"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "473670e719874f6056346c85730059b7d63d6d1a5429397f6ef6d77313c668f6"
   end
 
   depends_on "go" => :build
