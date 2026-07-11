@@ -13,7 +13,7 @@ class Capnp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2017c4b57912ff362bda3fe7f61a5b31abd9068bb156c05b9820b9eefd51be4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ba8b6ea6d62f8bb571e5b91920b7d2492ecc3f1635d17a6357d75bbc5ae9ef9"
   end
 
   depends_on "cmake" => :build
