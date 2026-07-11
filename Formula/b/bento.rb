@@ -6,7 +6,7 @@ class Bento < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa386140c0f25c086fa0252f4e86b33ae95ebb68c419ef6f015fe6ff3ee995c6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dde221b081d4e16fc60fad216206d2df5bf2e80b0e4865d2771c0aa61f15bec8"
   end
 
   depends_on "go" => :build
