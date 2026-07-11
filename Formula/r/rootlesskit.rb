@@ -1,12 +1,12 @@
 class Rootlesskit < Formula
   desc "Linux-native \"fake root\" for implementing rootless containers"
   homepage "https://github.com/rootless-containers/rootlesskit"
-  url "https://github.com/rootless-containers/rootlesskit/archive/refs/tags/v3.0.1.tar.gz"
-  sha256 "6d70d1be48fabe0e2b6e24eb1532b4de8d7689374eaf178a67d54d675c10c22b"
+  url "https://github.com/rootless-containers/rootlesskit/archive/refs/tags/v3.0.2.tar.gz"
+  sha256 "fcb6cd631ed8e211046431c048704b16d72d0ebba6283ae35713e3b8e09d709e"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e65fb20ab04df772cf5a8d67bfbcda99516b1d022c957e0e67101b276aa4dec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dba578cbb09ebb36c197ca8aa06de79a3c59c2d8c971f6aeb6a679b7d2f2c940"
   end
 
   depends_on "go" => :build
