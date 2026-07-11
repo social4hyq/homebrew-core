@@ -1,8 +1,8 @@
 class AzureCoreCpp < Formula
   desc "Primitives, abstractions and helpers for Azure SDK client libraries"
   homepage "https://github.com/Azure/azure-sdk-for-cpp/tree/main/sdk/core/azure-core"
-  url "https://github.com/Azure/azure-sdk-for-cpp/archive/refs/tags/azure-core_1.16.3.tar.gz"
-  sha256 "70d5d2aea5ece95148ee8b71fb302ae35a1178e58b58150a14df8866a0c54464"
+  url "https://github.com/Azure/azure-sdk-for-cpp/archive/refs/tags/azure-core_1.16.4.tar.gz"
+  sha256 "25f8badf23c66ae82debd95e0d074d6269b276e5fa2ce5d4d3cff38fda9ab8c2"
   license "MIT"
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class AzureCoreCpp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c811a999bc9620bb6b366aae88ea619e727436edf3a5be4e68211cd924d07ad"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e039f61a1264864abc194f470119a2985953682d85ebb577f172eb7f8d3fdf95"
   end
 
   depends_on "cmake" => :build
