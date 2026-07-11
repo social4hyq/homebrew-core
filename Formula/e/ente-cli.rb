@@ -12,7 +12,7 @@ class EnteCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ba2d9fba4f8057769c5cb82a903bbedd2185ef22013456e708d421fd15df274"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "33c490eeb4e63676ecaffba8d870d50b21da43196fbda91b815599fd3bb832e9"
   end
 
   depends_on "go" => :build
