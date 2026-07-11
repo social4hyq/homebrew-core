@@ -1,8 +1,8 @@
 class Capnp < Formula
   desc "Data interchange format and capability-based RPC system"
   homepage "https://capnproto.org/"
-  url "https://github.com/capnproto/capnproto/archive/refs/tags/v1.4.0.tar.gz"
-  sha256 "d14a9149b79c055fee9d5aa778defe8e8cee0d2a11f0729865cd30dcc345eef2"
+  url "https://github.com/capnproto/capnproto/archive/refs/tags/v1.5.0.tar.gz"
+  sha256 "d5ebdf858e9885c33d4b3f765006d68bd66e9b002bf4d607ff4317ef9c1aac6a"
   license "MIT"
   compatibility_version 2
   head "https://github.com/capnproto/capnproto.git", branch: "v2"
@@ -13,7 +13,7 @@ class Capnp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2017c4b57912ff362bda3fe7f61a5b31abd9068bb156c05b9820b9eefd51be4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ba8b6ea6d62f8bb571e5b91920b7d2492ecc3f1635d17a6357d75bbc5ae9ef9"
   end
 
   depends_on "cmake" => :build
