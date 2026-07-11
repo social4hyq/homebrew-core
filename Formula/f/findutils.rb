@@ -1,9 +1,9 @@
 class Findutils < Formula
   desc "Collection of GNU find, xargs, and locate"
   homepage "https://www.gnu.org/software/findutils/"
-  url "https://ftpmirror.gnu.org/gnu/findutils/findutils-4.10.0.tar.xz"
-  mirror "https://ftp.gnu.org/gnu/findutils/findutils-4.10.0.tar.xz"
-  sha256 "1387e0b67ff247d2abde998f90dfbf70c1491391a59ddfecb8ae698789f0a4f5"
+  url "https://ftpmirror.gnu.org/gnu/findutils/findutils-4.11.0.tar.xz"
+  mirror "https://ftp.gnu.org/gnu/findutils/findutils-4.11.0.tar.xz"
+  sha256 "bfd19cb06cc71f3352d567e90284d8cdac02ac89774bbeadf0b533b0c11432fd"
   license "GPL-3.0-or-later"
 
   bottle do
