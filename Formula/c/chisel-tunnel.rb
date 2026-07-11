@@ -7,7 +7,7 @@ class ChiselTunnel < Formula
   head "https://github.com/jpillora/chisel.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "817958ae051447e491f739cf70d14aa9ddbb5a7d6c9c244300ae067e162c9360"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ffc7c832f6ad8c3230d7c1e4bd96397181b550a83aa9f2f9669c4b5ccc4ff4b5"
   end
 
   depends_on "go" => :build
