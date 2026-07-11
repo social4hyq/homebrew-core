@@ -1,8 +1,8 @@
 class Kyverno < Formula
   desc "Kubernetes Native Policy Management"
   homepage "https://kyverno.io/"
-  url "https://github.com/kyverno/kyverno/archive/refs/tags/v1.18.1.tar.gz"
-  sha256 "d8aefee8cc5dd5e127bb536e2fa4c42f20879f163026c05184499ddd3f44f88f"
+  url "https://github.com/kyverno/kyverno/archive/refs/tags/v1.18.2.tar.gz"
+  sha256 "7c93c274b8d79d21413fe7bbb9de4ace9a5f7fb64c969af675f6492c2db95d39"
   license "Apache-2.0"
   head "https://github.com/kyverno/kyverno.git", branch: "main"
 
@@ -14,7 +14,7 @@ class Kyverno < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c68ef85b8406ee5f588ca0204ee63ed5d670e5f42fb223617de97b74c67e4e1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4270b0a3b7db14435e43f5d7d556eb2be6929917d1c936613b9cdf7ea594a35f"
   end
 
   depends_on "go" => :build
