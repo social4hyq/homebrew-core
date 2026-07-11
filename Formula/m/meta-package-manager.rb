@@ -4,13 +4,13 @@ class MetaPackageManager < Formula
 
   desc "Wrapper around all package managers with a unifying CLI"
   homepage "https://kdeldycke.github.io/meta-package-manager/"
-  url "https://files.pythonhosted.org/packages/a8/3d/cbe2e540c555ea107752bc1c7ad0d9de24151d6aecb72bfbd5bacb7f9c5a/meta_package_manager-7.1.0.tar.gz"
-  sha256 "f1ea18056b81f0a7122c66d4d00d9dea616d6629423103f524b6f3050c190f27"
+  url "https://files.pythonhosted.org/packages/8d/48/21c66c54142e9b5957f2787a9b8f8f4ce04f57b20cd5b8b66fcb54417a16/meta_package_manager-7.2.0.tar.gz"
+  sha256 "54c361f4398d607616ae474f385df1a6a97bd6e7059f36beb5af44456b490c62"
   license "GPL-2.0-or-later"
   head "https://github.com/kdeldycke/meta-package-manager.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d0fe57dd7fe9f72b80442b7f674b9e6de287d3da58b84179c7e5a82ccc49fa2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "71706fd1e9b2ea8541168f7a4a48810dab4e5a0900985d0a97b8e4a30fd9aeac"
   end
 
   depends_on "rust" => :build
@@ -41,8 +41,8 @@ class MetaPackageManager < Formula
   end
 
   resource "click-extra" do
-    url "https://files.pythonhosted.org/packages/61/ec/0c0ab4f74db0c1a92a640d67eee84e65354c4da56711b85c4ac9ae19099e/click_extra-8.2.0.tar.gz"
-    sha256 "ed9ba95a8d0f3af5079a8ab37c9696e2b9283c7f5df833a768666b6c63cd2e9b"
+    url "https://files.pythonhosted.org/packages/a6/2c/114e90d1703ccfb25c14dc0f2a44f2296c3d924cb91948a36c92c1f77e11/click_extra-8.3.0.tar.gz"
+    sha256 "f95cdec794dbb7f1f191f82a60be4ae3175e79c3f26ed4d3079f4b06d9542301"
   end
 
   resource "cloup" do
@@ -56,8 +56,8 @@ class MetaPackageManager < Formula
   end
 
   resource "extra-platforms" do
-    url "https://files.pythonhosted.org/packages/9f/4d/b793283bf4d002e7ffa8ad45c125f1f2306b238c0a641677d6b3a7397f1a/extra_platforms-13.0.1.tar.gz"
-    sha256 "2194e5cd8d58fbbba42d2810f15fea3da072020109998ca8d7ec938abcf59717"
+    url "https://files.pythonhosted.org/packages/01/c5/e808dd8810c12a5bd6909db89a6e062641d4f9b3bb055bff652b43f53b98/extra_platforms-13.1.0.tar.gz"
+    sha256 "8424f1644980b44f42fa2305d1da0e589541313451d952a35337c919c4bd234f"
   end
 
   resource "packageurl-python" do
