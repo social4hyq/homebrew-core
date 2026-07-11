@@ -1,8 +1,8 @@
 class Just < Formula
   desc "Handy way to save and run project-specific commands"
   homepage "https://github.com/casey/just"
-  url "https://github.com/casey/just/archive/refs/tags/1.55.1.tar.gz"
-  sha256 "40a2d3725480523ffebb762669cafe2b0135a00383946eec3d47adf5e9be6345"
+  url "https://github.com/casey/just/archive/refs/tags/1.56.0.tar.gz"
+  sha256 "145cb76ccd858da30ee56de884dad9241b2706140bcf9ae189dfda5e5a62ed52"
   license "CC0-1.0"
   head "https://github.com/casey/just.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Just < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a64a1ce0cd696bed2eab279ab5db4905ba5ff89964b86c5853cfa25e8e96578"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b17f1ffd7449673b011a042da94afa5f0d599fa315a1de421df6f7f17314aaaa"
   end
 
   depends_on "rust" => :build
