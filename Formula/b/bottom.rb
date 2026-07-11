@@ -15,7 +15,7 @@ class Bottom < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "84535e39f2bb727f489aee54e0e7906737d9f9a8ba0a306a12c3327199bd6c98"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29aa39c9043f62939c0bf83e3919a4b848952d85f719748862a6c7769a1cf0bb"
   end
 
   depends_on "rust" => :build
