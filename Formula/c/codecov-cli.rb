@@ -8,7 +8,7 @@ class CodecovCli < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8ba01ee2693b2186863bfb1a8489e4d855705d1580cec48601da75b0c7cedf7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72a26cc3c19d31267b51da86a486bf43068bd035959460143a98a7ae9b9a133e"
   end
 
   depends_on "rust" => :build
