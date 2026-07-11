@@ -1,13 +1,13 @@
 class Algolia < Formula
   desc "CLI for Algolia"
   homepage "https://www.algolia.com/doc/tools/cli/get-started"
-  url "https://github.com/algolia/cli/archive/refs/tags/v1.12.0.tar.gz"
-  sha256 "59da486004973a7a337e505d9d099c1cd96bd91d22e7eda5bdf10ff29316d002"
+  url "https://github.com/algolia/cli/archive/refs/tags/v1.13.0.tar.gz"
+  sha256 "9e861fa2d60d09ca773409f86c45b0ecdfd7c040da01e498e6c8094d0d3aed3f"
   license "MIT"
   head "https://github.com/algolia/cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b4f1436bd1fb41497d5e957e41decd72103b340bae484b24630d8f69a6e1f65"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "14edac81e670023270392a890dcf25af213b8d616f3e82ea28e5e9618972047c"
   end
 
   depends_on "go" => :build
