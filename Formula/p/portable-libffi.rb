@@ -12,7 +12,7 @@ class PortableLibffi < PortableFormula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "43c71eb629c4944f2f06e51767c5827d22cbba8bab7ba1063c799e7ed7facfa5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d47b79110cf45173b8cea62376ba862d5ba0cc985f3b32515e39befbc33b17e"
   end
 
   def install
