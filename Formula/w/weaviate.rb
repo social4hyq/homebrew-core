@@ -11,7 +11,7 @@ class Weaviate < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8a4a815135cbb89c0fc7d5c48f146bc1f82a71382eaa1b1260dd241104e09fe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a1e5261b0cecef63b93d8e4dcdb981b758cb4284eb9bf654c13bb92489710a6"
   end
 
   depends_on "go" => :build
