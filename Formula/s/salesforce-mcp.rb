@@ -1,13 +1,12 @@
 class SalesforceMcp < Formula
   desc "MCP Server for interacting with Salesforce instances"
   homepage "https://github.com/salesforcecli/mcp"
-  url "https://registry.npmjs.org/@salesforce/mcp/-/mcp-0.30.14.tgz"
-  sha256 "e7724500ed5f151592bbdeb09bea56f1999ae44abf42977b12b513c5b97d5c85"
+  url "https://registry.npmjs.org/@salesforce/mcp/-/mcp-0.30.15.tgz"
+  sha256 "7cd9f0a3437b5102d01d8d629fd1666487414c1256487fe60245a86b66e831b6"
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "98f508d5ec6ea6e95abcdaa1ea00dc815792704a14a6221ce12e4160435d87ed"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7bbb088e9c4a90167dc6b0235a69dca4ae137684e423350e287c794159e91db"
   end
 
   depends_on "node"
