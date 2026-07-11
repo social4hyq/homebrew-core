@@ -1,13 +1,13 @@
 class Dtop < Formula
   desc "Terminal dashboard for Docker monitoring across multiple hosts"
   homepage "https://dtop.dev/"
-  url "https://github.com/amir20/dtop/archive/refs/tags/v0.7.8.tar.gz"
-  sha256 "53c30ea858ff27fa6e6438790d17697b4261bd5145f87bd17342309194cdea36"
+  url "https://github.com/amir20/dtop/archive/refs/tags/v0.7.9.tar.gz"
+  sha256 "810b66717e94f944b7cdb9051b0952a027861d7f6d0bae7393295189cae55f8c"
   license "MIT"
   head "https://github.com/amir20/dtop.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "965912c7a973858b974e6e5f76a22c1f9f1b6679e7ffa8171f02d2964228fcfb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "75a733eb2ee860e1c9a1e9282593f7b475b8039e8a8a421d50df3280da5b75df"
   end
 
   depends_on "rust" => :build
