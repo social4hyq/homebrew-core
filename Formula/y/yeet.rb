@@ -1,13 +1,13 @@
 class Yeet < Formula
   desc "Packaging tool that lets you declare build instructions in JavaScript"
   homepage "https://github.com/TecharoHQ/yeet"
-  url "https://github.com/TecharoHQ/yeet/archive/refs/tags/v0.11.0.tar.gz"
-  sha256 "b793d07304071c07dde135c656aa6effd5b3bc1d38623a72a3510e5c611672a8"
+  url "https://github.com/TecharoHQ/yeet/archive/refs/tags/v0.12.1.tar.gz"
+  sha256 "c76bd0513c4e7601c1181f99565d2015329622d7cb35dfbde06f40b020f66c90"
   license "MIT"
   head "https://github.com/TecharoHQ/yeet.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6016059352ba3a3c43eeb76ab0f142a425c75c45eb05081d6fa321b0f4825ed9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "33302f429c773663842c4db541d6f53b75694ae3db5a1a703ab74a19971513d3"
   end
 
   depends_on "go" => :build
