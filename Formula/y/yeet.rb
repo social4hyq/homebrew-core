@@ -7,7 +7,7 @@ class Yeet < Formula
   head "https://github.com/TecharoHQ/yeet.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6016059352ba3a3c43eeb76ab0f142a425c75c45eb05081d6fa321b0f4825ed9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "33302f429c773663842c4db541d6f53b75694ae3db5a1a703ab74a19971513d3"
   end
 
   depends_on "go" => :build
