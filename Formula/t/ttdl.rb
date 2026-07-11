@@ -6,7 +6,7 @@ class Ttdl < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b91f2a51da603f2105f1f7dad2071e5963a6d445c07367926a067a75e9ab9adc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "099c03daa8cb0e5e1f147c54a43b37616c6ba32225eb46d94b0dee88ebfea435"
   end
 
   depends_on "rust" => :build
