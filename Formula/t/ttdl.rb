@@ -1,12 +1,12 @@
 class Ttdl < Formula
   desc "Terminal Todo List Manager"
   homepage "https://github.com/VladimirMarkelov/ttdl"
-  url "https://github.com/VladimirMarkelov/ttdl/archive/refs/tags/v6.2.1.tar.gz"
-  sha256 "0a26eb79bc8270b7c2535ed1db1c3af3506bff929c2520b90a3a3cb4d7d2745a"
+  url "https://github.com/VladimirMarkelov/ttdl/archive/refs/tags/v6.2.2.tar.gz"
+  sha256 "12dc4f62ee48914bf46e27c4367a697b4a4392677f5b49efa71e24802470889d"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "099c03daa8cb0e5e1f147c54a43b37616c6ba32225eb46d94b0dee88ebfea435"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f50293bf333f1c553e42cdc5927e17a700d855fadea313333fe1a18a9b88b2ed"
   end
 
   depends_on "rust" => :build
