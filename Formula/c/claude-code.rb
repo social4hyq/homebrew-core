@@ -1,9 +1,9 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI — HarmonyOS aarch64 (Linux musl binary + OHOS signing)"
   homepage "https://docs.anthropic.com/en/docs/claude-code"
-  version "2.1.206"
+  version "2.1.207"
   url "https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-#{version}.tgz"
-  sha256 "39bbfb9c07dedf64308f26778414e2a433477f058e67a920e6286e48d93ebc58"
+  sha256 "6b76b77b3e5c1f05ceb898266db1cf603f67d5132b3c080ac6d63da9ed4cd6e1"
   license "Anthropic License"
 
   livecheck do
