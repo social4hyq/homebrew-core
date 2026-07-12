@@ -6,7 +6,7 @@ class Oarfish < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "02e1cfa482211cfcb4e53658b9ab415389bc2234eaaf88902b4a9dbfd9c43954"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c613b8271d458d0bf31864774d652ff4f066cb76d8483fbbfb6e71e43af22c89"
   end
 
   depends_on "rust" => :build
