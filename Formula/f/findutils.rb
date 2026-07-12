@@ -7,7 +7,7 @@ class Findutils < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e60897ffc6403b58b411d4b3ae55e121e17502648c9c8787278455d1ad8a5342"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2dca7a7739679fecc0540dbb817df0c4edcb9369be6b4c139ee6c23ea829426c"
   end
 
   patch do
