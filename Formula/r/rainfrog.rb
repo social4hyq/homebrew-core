@@ -7,7 +7,7 @@ class Rainfrog < Formula
   head "https://github.com/achristmascarl/rainfrog.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2976160b603b70415d0cb037749a6a4d060d24da8e7c70b13c7804b9b14ff8be"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "da6233c1d8ccc78afc7fc08e9be2c351919ce7251c7c68a4aff232855bde3629"
   end
 
   depends_on "rust" => :build
