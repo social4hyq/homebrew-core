@@ -1,8 +1,8 @@
 class Lstr < Formula
   desc "Fast, minimalist directory tree viewer"
   homepage "https://github.com/bgreenwell/lstr"
-  url "https://github.com/bgreenwell/lstr/archive/refs/tags/v0.2.1.tar.gz"
-  sha256 "9a59c59e3b4a0a1537f165a4818daa7cf1ee3feb689eaf8c495f70f280c3e547"
+  url "https://github.com/bgreenwell/lstr/archive/refs/tags/v0.3.0.tar.gz"
+  sha256 "fec5f7444cbf32c826c10a932e30fdc1a1a4673828c11b82929c585e5614fbf8"
   license "MIT"
   head "https://github.com/bgreenwell/lstr.git", branch: "main"
 
