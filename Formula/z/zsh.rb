@@ -9,14 +9,14 @@ class Zsh < Formula
   ]
 
   stable do
-    url "https://downloads.sourceforge.net/project/zsh/zsh/5.9.1/zsh-5.9.1.tar.xz"
-    mirror "https://www.zsh.org/pub/zsh-5.9.1.tar.xz"
-    sha256 "5d20bec03f981dc4e9a09ec245e7415388ff641f79c5c5c416b5042e58d8280d"
+    url "https://downloads.sourceforge.net/project/zsh/zsh/5.9.2/zsh-5.9.2.tar.xz"
+    mirror "https://www.zsh.org/pub/zsh-5.9.2.tar.xz"
+    sha256 "36fa734374b44783582cec09bcd67822e2f992c779ec1624ab5596df078d2f81"
 
     resource "htmldoc" do
-      url "https://downloads.sourceforge.net/project/zsh/zsh-doc/5.9.1/zsh-5.9.1-doc.tar.xz"
-      mirror "https://www.zsh.org/pub/zsh-5.9.1-doc.tar.xz"
-      sha256 "c40b34cb332ddbee627f8d9a3e4cb92e2c851942b33e6c178b1d571375b80f67"
+      url "https://downloads.sourceforge.net/project/zsh/zsh-doc/5.9.2/zsh-5.9.2-doc.tar.xz"
+      mirror "https://www.zsh.org/pub/zsh-5.9.2-doc.tar.xz"
+      sha256 "020ee644be1749507b282e619cdcd95c56ff36144e79b7a3c245458aacd9458f"
 
       livecheck do
         formula :parent
