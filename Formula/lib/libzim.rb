@@ -1,12 +1,12 @@
 class Libzim < Formula
   desc "Reference implementation of the ZIM specification"
   homepage "https://github.com/openzim/libzim"
-  url "https://github.com/openzim/libzim/archive/refs/tags/9.8.0.tar.gz"
-  sha256 "27a6dadd56eef37cf025e68f938ab1f193cd6eb3ddadc624c6f75fb06658410c"
+  url "https://github.com/openzim/libzim/archive/refs/tags/9.8.1.tar.gz"
+  sha256 "718d82930949de8eae14809de1af92414071811ba68c91e9ad0abb1fe3287799"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2897b7a4b4b9d550b325343b5885c5aa49f8a05216cd0b339fec208ab4bcfa0e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "02a6b4e74b19aae04c5fed59404203b8cdcf054623013025ad28abd46d7ab2f7"
   end
 
   depends_on "meson" => :build
