@@ -1,8 +1,8 @@
 class Testssl < Formula
   desc "Tool which checks for the support of TLS/SSL ciphers and flaws"
   homepage "https://testssl.sh/"
-  url "https://github.com/testssl/testssl.sh/archive/refs/tags/v3.2.3.tar.gz"
-  sha256 "1c4bb10185a67592164eb870c717b8bdd03f290c8d68f9a8c658335ff5ac8b91"
+  url "https://github.com/testssl/testssl.sh/archive/refs/tags/v3.2.4.tar.gz"
+  sha256 "98528f8a0ac07f1e226efaa8ead438247df8efcb8fee4e056a937ab82a305490"
   license "GPL-2.0-only"
   head "https://github.com/testssl/testssl.sh.git", branch: "3.3dev"
 
