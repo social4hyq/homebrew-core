@@ -8,7 +8,7 @@ class Libmicrohttpd < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8eae5476ac8bc738ab161bf8917ec13517d2c3a938c26772477f8349d519a77f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2684523638ea4313c56d0f28caa3d4bfae9bf264058c119891379f98a5b0a9b7"
   end
 
   depends_on "pkgconf" => :build
