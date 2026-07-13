@@ -1,8 +1,8 @@
 class Lame < Formula
   desc "High quality MPEG Audio Layer III (MP3) encoder"
   homepage "https://lame.sourceforge.io/"
-  url "https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz"
-  sha256 "ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e"
+  url "https://downloads.sourceforge.net/project/lame/lame/4.0/lame-4.0.tar.gz"
+  sha256 "3df5124d5ad3a98312ffd7ba6a9b36230e4f8a3e66d3ce0f425e336c32d216eb"
   license "LGPL-2.0-or-later"
 
   livecheck do
@@ -11,15 +11,19 @@ class Lame < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "333786018dcfac51e7782f5133fed0e30e001fd10d475b3f82affe3259ade474"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ff81a2e367d9a2c21ea8347d0ec2b6d09ad517a38858c7ee2e69cb5f3772a09"
   end
+
+  depends_on "pkgconf" => :build
+  depends_on "mpg123"
 
   uses_from_macos "ncurses"
 
   def install
-    # Fix undefined symbol error _lame_init_old
-    # https://sourceforge.net/p/lame/mailman/message/36081038/
-    inreplace "include/libmp3lame.sym", "lame_init_old\n", ""
+    # LAME still calls undeclared legacy ID3 APIs, which do not compile as C23.
+    # https://sourceforge.net/p/lame/bugs/517/
+    ENV["ac_cv_prog_cc_c23"] = "no"
+    ENV.append_to_cflags "-Wno-implicit-function-declaration"
 
     system "./configure", "--disable-dependency-tracking",
                           "--disable-debug",
