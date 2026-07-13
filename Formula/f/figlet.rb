@@ -13,7 +13,8 @@ class Figlet < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "23be06b3039beb8ef80cb83ff7df540d0eab6823c3d63e3589b7812b8bd34712"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "705ce68445d6632f8b7eaeb10f28773a306df9ab6ba83724a7f97d76840f72f3"
   end
 
   resource "contrib" do
