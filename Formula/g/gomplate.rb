@@ -1,8 +1,8 @@
 class Gomplate < Formula
   desc "Command-line Golang template processor"
   homepage "https://gomplate.ca/"
-  url "https://github.com/hairyhenderson/gomplate/archive/refs/tags/v5.1.0.tar.gz"
-  sha256 "b6763aaf2c52a2e57a02f5e4cae199166b1ae8df8beb43ef5c927bb10ca775fc"
+  url "https://github.com/hairyhenderson/gomplate/archive/refs/tags/v5.2.0.tar.gz"
+  sha256 "fb08872f54f776863a30adcd58dce0437529d0e6a468839d107803bbff1d0b23"
   license "MIT"
   head "https://github.com/hairyhenderson/gomplate.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Gomplate < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "84bc7ae3b6f3015418f37b462db4549747efc2ec2109b3f6e8808d6706da8924"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b23f90831acee5f515895cb1df2cd808ae780b54fd5a606a9aa4925f2e40f0c2"
   end
 
   depends_on "go" => :build
