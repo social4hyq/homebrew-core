@@ -12,7 +12,7 @@ class Sentencepiece < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "718253d1e573904a3204da1c7c82c2f903981fd1d46de091d41b18e3a5e844cb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e85e877be7ca6061ee05deda5c8132af57cfa968725545a8f9ac94098de66e92"
   end
 
   depends_on "cmake" => :build
