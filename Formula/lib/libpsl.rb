@@ -7,8 +7,7 @@ class Libpsl < Formula
   compatibility_version 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a010fd051a6074115a540433370ec90911d5bcba9cb765f60d1f10a59acbd2d9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a438df6acb7a7c758485cde696d4e9faa943a8fff7591a234c44f2c19a5c2eb"
   end
 
   depends_on "meson" => :build
