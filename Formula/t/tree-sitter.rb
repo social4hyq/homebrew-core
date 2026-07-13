@@ -1,8 +1,8 @@
 class TreeSitter < Formula
   desc "Incremental parsing library"
   homepage "https://tree-sitter.github.io/"
-  url "https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v0.26.10.tar.gz"
-  sha256 "450cb85fd1af34111eb162e931e0e9e4d4dbf23fc09b9cb56f6299a1a80483b6"
+  url "https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v0.26.11.tar.gz"
+  sha256 "1bab01ed21464f3272665b9c60e39ee79f68da1333e80b23f2c9356569d06971"
   license "MIT"
   compatibility_version 1
   head "https://github.com/tree-sitter/tree-sitter.git", branch: "master"
@@ -13,7 +13,7 @@ class TreeSitter < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e5b1f2bc90782036b254b0928bd23d49c1d5972b1fd940ee0caee1d25aa57c1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5dd438ffe25ff1b60e8130e2f6cb7b76ec9b5a613eba10bb75f09ebbccd0d50"
   end
 
   def install
