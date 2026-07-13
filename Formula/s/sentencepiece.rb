@@ -1,8 +1,8 @@
 class Sentencepiece < Formula
   desc "Unsupervised text tokenizer and detokenizer"
   homepage "https://github.com/google/sentencepiece"
-  url "https://github.com/google/sentencepiece/archive/refs/tags/v0.2.1.tar.gz"
-  sha256 "c1a59e9259c9653ad0ade653dadff074cd31f0a6ff2a11316f67bee4189a8f1b"
+  url "https://github.com/google/sentencepiece/archive/refs/tags/v0.2.2.tar.gz"
+  sha256 "92381f713e094a15a1ccff1ac4a5315a4c4b82a99ac1332d6ac53c9dc8e1bcf1"
   license "Apache-2.0"
   head "https://github.com/google/sentencepiece.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Sentencepiece < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "718253d1e573904a3204da1c7c82c2f903981fd1d46de091d41b18e3a5e844cb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e85e877be7ca6061ee05deda5c8132af57cfa968725545a8f9ac94098de66e92"
   end
 
   depends_on "cmake" => :build
