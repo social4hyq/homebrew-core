@@ -7,7 +7,7 @@ class Comrak < Formula
   head "https://github.com/kivikakk/comrak.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "902fc874eee7960a4114d1b4217f44355832a4f26065fcc8bf13642d989d909e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b14d815330b3dd5ef2d745d8bba74438bebe8a7a90236e4c6444df8e6ff0452"
   end
 
   depends_on "rust" => :build
