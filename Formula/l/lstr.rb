@@ -7,7 +7,7 @@ class Lstr < Formula
   head "https://github.com/bgreenwell/lstr.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "48f669846dc07830efc1c5564921b8498e9dcd13497bb06443dc72e2e4020f76"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd38868f10a30490fa76d096956d40c1b46d9b3af9b8e1682aa1e1c632040f3b"
   end
 
   depends_on "rust" => :build
