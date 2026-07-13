@@ -1,10 +1,10 @@
 class Cmake < Formula
   desc "Cross-platform make"
   homepage "https://www.cmake.org/"
-  url "https://github.com/Kitware/CMake/releases/download/v4.3.4/cmake-4.3.4.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/cmake-4.3.4.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/legacy/cmake-4.3.4.tar.gz"
-  sha256 "fdeff897b9eb49d764539f2b1edc6eb7e1440df325678a97c1978499e931adda"
+  url "https://github.com/Kitware/CMake/releases/download/v4.4.0/cmake-4.4.0.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/cmake-4.4.0.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/legacy/cmake-4.4.0.tar.gz"
+  sha256 "65757f442fdd242e27f1728fc26dc0cba4164f7a0791a5c788631c00080369bc"
   license "BSD-3-Clause"
   compatibility_version 1
   head "https://gitlab.kitware.com/cmake/cmake.git", branch: "master"
@@ -18,12 +18,13 @@ class Cmake < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf7fda89cede23902e139d9db30d7d5e4fac6e56238fc9d4d42d15d3af276615"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "96edea9178455135d99299f8f8a4149e50739b576184244befbeb5291699f13c"
   end
 
   uses_from_macos "ncurses"
 
   on_linux do
+    depends_on "libiconv"
     depends_on "openssl@3"
   end
 
