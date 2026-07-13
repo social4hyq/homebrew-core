@@ -8,7 +8,7 @@ class PythonYq < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a215af577437cd9c6dfd7e237e9b93ddf16814cf0b8c295a68e2dacd7a83fde0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "406e0c292ae839a36cb7f3cd594819c1c177a7f604ceb14ec19a5c7b31d56b6a"
   end
 
   depends_on "libyaml"
