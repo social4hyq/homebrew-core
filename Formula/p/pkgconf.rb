@@ -14,7 +14,7 @@ class Pkgconf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c083fc40e94f90d982d615c48ffc46d500f3050100fb8d002791081cfce4049"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f3025ee65e24a51d6a84c68df32fb6355bf32d2aa73f257d7d287d71f385861"
   end
 
   head do
