@@ -7,7 +7,7 @@ class PowermanDockerize < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9afa0e14bcc540305473d681a42a0501753d906163cd96282a1cfd40f875342f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88764f0bbde9eb9c7da4eb4135617eead7fdd4241571b98f2601bec5765e2ca4"
   end
 
   depends_on "go" => :build
