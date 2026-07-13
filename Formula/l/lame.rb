@@ -11,7 +11,7 @@ class Lame < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "333786018dcfac51e7782f5133fed0e30e001fd10d475b3f82affe3259ade474"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ff81a2e367d9a2c21ea8347d0ec2b6d09ad517a38858c7ee2e69cb5f3772a09"
   end
 
   depends_on "pkgconf" => :build
