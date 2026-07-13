@@ -12,7 +12,7 @@ class Gomplate < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "84bc7ae3b6f3015418f37b462db4549747efc2ec2109b3f6e8808d6706da8924"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b23f90831acee5f515895cb1df2cd808ae780b54fd5a606a9aa4925f2e40f0c2"
   end
 
   depends_on "go" => :build
