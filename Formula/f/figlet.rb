@@ -5,7 +5,6 @@ class Figlet < Formula
   mirror "https://fossies.org/linux/misc/figlet-2.2.5.tar.gz"
   sha256 "bf88c40fd0f077dab2712f54f8d39ac952e4e9f2e1882f1195be9e5e4257417d"
   license "BSD-3-Clause"
-  compatibility_version 1
 
   livecheck do
     url "ftp://ftp.figlet.org/pub/figlet/program/unix/"
@@ -14,7 +13,8 @@ class Figlet < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "23be06b3039beb8ef80cb83ff7df540d0eab6823c3d63e3589b7812b8bd34712"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "705ce68445d6632f8b7eaeb10f28773a306df9ab6ba83724a7f97d76840f72f3"
   end
 
   resource "contrib" do
@@ -40,11 +40,8 @@ class Figlet < Formula
 
     # OpenHarmony uses musl libc which lacks the glibc-specific macros
     # __BEGIN_DECLS / __END_DECLS. Provide fallback definitions.
-    ENV.append "CFLAGS", "-D__BEGIN_DECLS="
-    ENV.append "CFLAGS", "-D__END_DECLS="
-
     system "make", "prefix=#{prefix}",
-                   "CFLAGS=#{ENV["CFLAGS"]} -Wno-implicit-function-declaration",
+                   "CFLAGS=-Wno-implicit-function-declaration -D__BEGIN_DECLS= -D__END_DECLS=",
                    "DEFAULTFONTDIR=#{pkgshare}/fonts",
                    "MANDIR=#{man}",
                    "install"
