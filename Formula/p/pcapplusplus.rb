@@ -7,7 +7,7 @@ class Pcapplusplus < Formula
   license "Unlicense"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cedae69c956b6f8e721050b202af119d9a80b68069116972600f89d71ff2b574"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f1e84de19a504799869bb3fabcc4454b0215d7ff52f9819e3f39bb2837c34e3"
   end
 
   depends_on "cmake" => [:build, :test]
