@@ -13,6 +13,10 @@ class Figlet < Formula
     strategy :page_match
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "23be06b3039beb8ef80cb83ff7df540d0eab6823c3d63e3589b7812b8bd34712"
+  end
+
   resource "contrib" do
     url "ftp://ftp.figlet.org/pub/figlet/fonts/contributed.tar.gz"
     mirror "https://www.minix3.org/distfiles-backup/figlet-fonts-20021023/contributed.tar.gz"
