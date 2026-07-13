@@ -1,8 +1,8 @@
 class DoviTool < Formula
   desc "CLI tool for Dolby Vision metadata on video streams"
   homepage "https://github.com/quietvoid/dovi_tool/"
-  url "https://github.com/quietvoid/dovi_tool/archive/refs/tags/2.3.2.tar.gz"
-  sha256 "8e1ca50219a68ba27a200ea1dd4210a6ef232b5f66d1b6ffc4a8303c87fe16bf"
+  url "https://github.com/quietvoid/dovi_tool/archive/refs/tags/2.3.3.tar.gz"
+  sha256 "b4906f67b339b10f885a5c7d89364a359cbd3845f3b95115cac5d7964e13422d"
   license "MIT"
   head "https://github.com/quietvoid/dovi_tool.git", branch: "main"
 
@@ -12,7 +12,7 @@ class DoviTool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "336a820675d050d5c6bc6949fa32783e9460405ada5b749afa1eb041e339c3d5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "82738fda2383daba0960021f2c8feddf32f622481d0759beb0a825812037eb9d"
   end
 
   depends_on "cargo-c" => :build
