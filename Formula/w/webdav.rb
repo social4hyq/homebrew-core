@@ -7,7 +7,7 @@ class Webdav < Formula
   head "https://github.com/hacdias/webdav.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f6ac50906c253963ee9fa4332c9dad33b71a12d4944cbc865fb2b1abd6d6e20"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "92344161a73cc01f502ba58869e1df45597e0407dae6bcacc796a66d12220ebb"
   end
 
   depends_on "go" => :build
