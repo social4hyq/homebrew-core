@@ -12,7 +12,7 @@ class Ov < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "57207a5abfcfc6a9a89288fd68aa97c65ab182e28940facba6aa4f7ecf99c5f1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "73e20845dca7759e6fd12178bb9c1cc747a89382a45a8c9ddc085e8722ab500c"
   end
 
   depends_on "go" => :build
