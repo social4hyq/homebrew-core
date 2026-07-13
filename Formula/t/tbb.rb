@@ -1,8 +1,8 @@
 class Tbb < Formula
   desc "Rich and complete approach to parallelism in C++"
   homepage "https://uxlfoundation.github.io/oneTBB/"
-  url "https://github.com/uxlfoundation/oneTBB/archive/refs/tags/v2023.0.0.tar.gz"
-  sha256 "f8767b971ec6aea25dde58ae0f593e94e7aa75a739a86f67967012f69e2199b1"
+  url "https://github.com/uxlfoundation/oneTBB/archive/refs/tags/v2023.1.0.tar.gz"
+  sha256 "191288b52e1e6b17198000b64d77d194bb65e791be46ebc606e9b091781e2070"
   license "Apache-2.0"
   compatibility_version 1
 
