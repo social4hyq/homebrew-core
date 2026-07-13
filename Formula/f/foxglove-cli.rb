@@ -1,8 +1,8 @@
 class FoxgloveCli < Formula
   desc "Foxglove command-line tool"
   homepage "https://github.com/foxglove/foxglove-cli"
-  url "https://github.com/foxglove/foxglove-cli/archive/refs/tags/v1.0.31.tar.gz"
-  sha256 "c8dcc85135ea375ec0d06e3ff8a0194a5c8756bac58d60d05bf2259be7d815a4"
+  url "https://github.com/foxglove/foxglove-cli/archive/refs/tags/v1.0.32.tar.gz"
+  sha256 "4855f94bcb9e399aec99111dea90626abbf77cbfa70d86be9e285f530e3f3220"
   license "MIT"
   head "https://github.com/foxglove/foxglove-cli.git", branch: "main"
 
