@@ -1,8 +1,8 @@
 class Depot < Formula
   desc "Build your Docker images in the cloud"
   homepage "https://depot.dev/"
-  url "https://github.com/depot/cli/archive/refs/tags/v2.101.69.tar.gz"
-  sha256 "e39ce4aea211fcbe329283c12e3fbb79f2a5dd477fe791fe8e5582797c874bb0"
+  url "https://github.com/depot/cli/archive/refs/tags/v2.101.72.tar.gz"
+  sha256 "db5109add729c4ae076592db40558ede0a4e7787aa672284af979142a25b91bd"
   license "MIT"
   head "https://github.com/depot/cli.git", branch: "main"
 
@@ -14,7 +14,7 @@ class Depot < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5bd2c68af2dca01e19ad413e789b47caab0c776c2d9077f781204cbd56cb55f6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "33a60daf38163ffa73844dea70281dcda497fc7b9c768aa78496957d8cb88c6a"
   end
 
   depends_on "go" => :build
@@ -35,6 +35,6 @@ class Depot < Formula
   test do
     assert_match version.to_s, shell_output("#{bin}/depot --version")
     output = shell_output("#{bin}/depot list builds 2>&1", 1)
-    assert_match "Error: unknown project ID", output
+    assert_match "unknown project ID", output
   end
 end
