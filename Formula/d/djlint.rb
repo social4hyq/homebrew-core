@@ -3,8 +3,8 @@ class Djlint < Formula
 
   desc "Lint & Format HTML Templates"
   homepage "https://djlint.com"
-  url "https://files.pythonhosted.org/packages/55/34/95284072186e09ea3c7a63a18930061d1ff393f7896fd693f0308fa4aef7/djlint-1.40.4.tar.gz"
-  sha256 "76949030ddfe7334bcde9bcb022133c5d7bb7d292ea7717fc8df425bad4b41c3"
+  url "https://files.pythonhosted.org/packages/32/8b/6eea043becd3eb6cf1a23b5701aac2b35ec5500e53a912e9a08c5d880a02/djlint-1.40.5.tar.gz"
+  sha256 "f9c2b08d41f6b5173e02986b3b9fd349f7892788360414e6805c0a8c10135ac1"
   license "GPL-3.0-or-later"
   head "https://github.com/djlint/djLint.git", branch: "master"
 
@@ -51,8 +51,8 @@ class Djlint < Formula
   end
 
   resource "regex" do
-    url "https://files.pythonhosted.org/packages/f1/05/e4f219230e11e774a6c9987d2ab0d0c6b8573e13a17e143d0015bee710ef/regex-2026.6.28.tar.gz"
-    sha256 "3cb4b6c5cb3060cc31efdc1fbb27c25fb9b29044afd87e40601a1c4d9db54342"
+    url "https://files.pythonhosted.org/packages/7b/37/451aaddbf50922f34d744ad5ca919ae1fcfac112123885d9728f52a484b3/regex-2026.7.10.tar.gz"
+    sha256 "1050fedf0a8a92e843971120c2f57c3a99bea86c0dfa1d63a9fac053fe54b135"
   end
 
   def install
