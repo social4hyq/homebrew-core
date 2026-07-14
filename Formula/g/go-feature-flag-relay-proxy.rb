@@ -7,7 +7,7 @@ class GoFeatureFlagRelayProxy < Formula
   head "https://github.com/thomaspoignant/go-feature-flag.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a2fe3c8aab6da8155ff38779d774375393df27e7c9e37d928104694c10c3e02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5d09bd99555d9f67afdaf716a350ae6c5792120249035fd7649cf7d183e155f"
   end
 
   depends_on "go" => :build
