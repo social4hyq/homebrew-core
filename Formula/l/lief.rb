@@ -6,7 +6,7 @@ class Lief < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4f8e96e424c1564e7ea864c9b2ff46d364e61ccc31a4d5e5b7bd32c23a113474"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "781b27ad66a684a017076855db0495014ab0f9fc75998e8ee412879c49728973"
   end
 
   depends_on "cmake" => :build
