@@ -7,7 +7,7 @@ class FoxgloveCli < Formula
   head "https://github.com/foxglove/foxglove-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc6b98b5173302ed38458079571ea2eeb13d830c8be8e9bbbd3ba6d3c87f4d71"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dfb29d79629b756c70754986cf8fdc9ffc78f0b831dd1c4ef204a4b0f309344"
   end
 
   depends_on "go" => :build
