@@ -1,13 +1,13 @@
 class Sesh < Formula
   desc "Smart session manager for the terminal"
   homepage "https://github.com/joshmedeski/sesh"
-  url "https://github.com/joshmedeski/sesh/archive/refs/tags/v2.26.2.tar.gz"
-  sha256 "f6bbfd1513332bd5abd4dc5e0b135b8aeac375abb8601f2d7bb9ffe25174f006"
+  url "https://github.com/joshmedeski/sesh/archive/refs/tags/v2.27.0.tar.gz"
+  sha256 "c56154a3c31b23751a02d3301064ba75e112f39d36473fb467f4c50d89b3d548"
   license "MIT"
   head "https://github.com/joshmedeski/sesh.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8495ffa511112e61d050c9b829d5fc9221ab53be21f5c9c72514509bac4b1e6d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0c5f865fcbb7cd31094893ac01021c4140ff44b8c5167822fbe4d8533fe59bf"
   end
 
   depends_on "go" => :build
