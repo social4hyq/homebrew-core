@@ -7,7 +7,7 @@ class Tbb < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d250845c965c3315754f35d941e4c408cc2bfd535cb9f8db455413417c0b962"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8edfd1ec83b7050cd19de6bb3f3fb0cfbeb301f67e49d9b55c11a37c86f3591c"
   end
 
   depends_on "cmake" => :build
