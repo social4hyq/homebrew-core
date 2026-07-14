@@ -7,7 +7,7 @@ class Threatcl < Formula
   head "https://github.com/threatcl/threatcl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "38adf3e61ce78281b396e10db59654271c2350c7d9caa19ee288da39abad332b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6095e7ae851db6bf417531085990c37c0aec84ec6e8e05aed8a7fe36d411f1dd"
   end
 
   depends_on "go" => :build
