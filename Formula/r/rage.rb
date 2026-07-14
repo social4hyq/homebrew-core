@@ -1,8 +1,8 @@
 class Rage < Formula
   desc "Simple, modern, secure file encryption"
   homepage "https://str4d.xyz/rage"
-  url "https://github.com/str4d/rage/archive/refs/tags/v0.11.2.tar.gz"
-  sha256 "a8e5c57f131683f86957af7fddeccf61a3882383dd24e752bab3855f570c086c"
+  url "https://github.com/str4d/rage/archive/refs/tags/v0.12.0.tar.gz"
+  sha256 "fb5255ff9faa944a15a128f812499cd5c08e6155790e284af34c914cbc3d0103"
   license any_of: ["MIT", "Apache-2.0"]
   head "https://github.com/str4d/rage.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Rage < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e839460f7582687215204201121efdbe048d2c8f291fc66ec515083f375a0572"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2442377fbb2bc975eceb04e0d9b2147b4969e4a62c0dfc6598de5ad4d41418e9"
   end
 
   depends_on "rust" => :build
