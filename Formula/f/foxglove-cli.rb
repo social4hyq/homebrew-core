@@ -1,13 +1,13 @@
 class FoxgloveCli < Formula
   desc "Foxglove command-line tool"
   homepage "https://github.com/foxglove/foxglove-cli"
-  url "https://github.com/foxglove/foxglove-cli/archive/refs/tags/v1.0.31.tar.gz"
-  sha256 "c8dcc85135ea375ec0d06e3ff8a0194a5c8756bac58d60d05bf2259be7d815a4"
+  url "https://github.com/foxglove/foxglove-cli/archive/refs/tags/v1.0.32.tar.gz"
+  sha256 "4855f94bcb9e399aec99111dea90626abbf77cbfa70d86be9e285f530e3f3220"
   license "MIT"
   head "https://github.com/foxglove/foxglove-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc6b98b5173302ed38458079571ea2eeb13d830c8be8e9bbbd3ba6d3c87f4d71"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dfb29d79629b756c70754986cf8fdc9ffc78f0b831dd1c4ef204a4b0f309344"
   end
 
   depends_on "go" => :build
