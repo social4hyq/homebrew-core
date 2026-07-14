@@ -1,7 +1,11 @@
 class Codex < Formula
   desc "OpenAI Codex CLI — HarmonyOS aarch64 (Linux musl binary + OHOS signing)"
   homepage "https://github.com/openai/codex"
+  url "https://registry.npmjs.org/@openai/codex/-/codex-0.144.3-linux-arm64.tgz"
   version "0.144.3"
+  sha256 "33384d62153cad2b197eaff2204c1da3d3e0c317c856cc14aa540254b25c69df"
+  license "Apache-2.0"
+  revision 1
   # Codex ships a native Rust binary per platform. We fetch the linux-arm64
   # platform package directly — the @openai/codex JS wrapper throws
   # "Unsupported platform: openharmony" on OHOS. The aarch64-unknown-linux-musl
@@ -14,27 +18,24 @@ class Codex < Formula
   # build this formula with `HOMEBREW_OHOS_BOTTLE_BINARY_SIGN=` unset (or
   # `env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN`) so the automatic pass doesn't
   # re-sign and re-break it after install() below.
-  url "https://registry.npmjs.org/@openai/codex/-/codex-#{version}-linux-arm64.tgz"
-  sha256 "33384d62153cad2b197eaff2204c1da3d3e0c317c856cc14aa540254b25c69df"
-  license "Apache-2.0"
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-v0.144.3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2270e682824354cd412cd00232ca67dae2f7cf3c977af6e004e89f79609aea71"
-  end
 
   livecheck do
     url "https://registry.npmjs.org/@openai/codex/latest"
-    regex(/"version":\s*"(\d+(?:\.\d+)+)"/)
+    regex(/"version":\s*"(\d+(?:\.\d+)+)"/i)
   end
 
-  depends_on "ohos-bst-light"  => :build
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-v0.144.3-r1b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "01cd9dacf2bb89b1a53fc8ce92b79753bb9cfc6f1a1b3c00f8e054ed01f730da"
+  end
+
+  depends_on "ohos-bst-light" => :build
   depends_on "close-range-shim"
   depends_on "ripgrep"
 
   def install
     vendor = buildpath/"vendor/aarch64-unknown-linux-musl"
-    sign = Formula["ohos-bst-light"].opt_bin/"self-sign"
+    sign = formula_opt_bin("ohos-bst-light")/"self-sign"
 
     # Self-sign the static musl binaries (self-sign preserves ELF structure,
     # unlike binary-sign-tool which corrupts this binary — see comment above).
@@ -51,17 +52,25 @@ class Codex < Formula
     # The bundled ripgrep is glibc-linked (/lib/ld-linux-aarch64.so.1) and
     # cannot run on OHOS. Replace it with the musl-native ripgrep from the tap.
     mkdir_p libexec/"codex-path"
-    ln_sf Formula["ripgrep"].opt_bin/"rg", libexec/"codex-path/rg"
+    ln_sf formula_opt_bin("ripgrep")/"rg", libexec/"codex-path/rg"
 
     # bwrap/landlock sandbox (codex-resources/) is non-functional on OHOS
     # (no user namespaces / setuid) — see caveats to disable sandbox_mode.
 
+    # Self-reference via opt_libexec (prefix-relative, stable) rather than
+    # libexec (Cellar-relative). HOMEBREW_CELLAR flips between
+    # HOMEBREW_PREFIX/Cellar and HOMEBREW_REPOSITORY/Cellar depending on
+    # which happens to exist at brew startup (see brew.sh) — a bottle baked
+    # with the Cellar-absolute path breaks if poured on a machine where that
+    # resolved differently than the machine it was built on. opt/<name> is
+    # always HOMEBREW_PREFIX-relative and Homebrew re-links it correctly on
+    # every install, so it's stable across that flip. Verified 2026-07-14.
     (bin/"codex").write <<~SH
       #!/bin/sh
-      export LD_PRELOAD="#{Formula["close-range-shim"].opt_lib}/libclose_range_shim.so${LD_PRELOAD:+:$LD_PRELOAD}"
+      export LD_PRELOAD="#{formula_opt_lib("close-range-shim")}/libclose_range_shim.so${LD_PRELOAD:+:$LD_PRELOAD}"
       export TMPDIR="${CODEX_TMPDIR:-/data/storage/el2/base/cache}"
       export SHELL="${SHELL:-/bin/sh}"
-      exec "#{libexec}/bin/codex" "$@"
+      exec "#{opt_libexec}/bin/codex" "$@"
     SH
     chmod 0755, bin/"codex"
   end
