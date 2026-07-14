@@ -12,7 +12,7 @@ class Nmstatectl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a3772a005043ffda108cd26e2d30c0463efd8aac90e512de5265c48f420c0255"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "997b375ce26df1e4e3852afc5a4c25e2eff12e8a170df61c87aef748f901d97c"
   end
 
   depends_on "rust" => :build
