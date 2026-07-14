@@ -6,7 +6,7 @@ class Valijson < Formula
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fbed4920c84a1ee5090a2d9a3738b7d7e2970601637f7df36efe6b8799daddd0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bb8803708f401917488fe40fa1f29679ac2c73b368271b88d05415de85b0bcb"
   end
 
   depends_on "cmake" => :build
