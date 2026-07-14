@@ -7,7 +7,7 @@ class McpPublisher < Formula
   head "https://github.com/modelcontextprotocol/registry.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "69e05153c6af81d5ac11d65ad259a886f2e02ae18c6f7123a470497a162979b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba3de1c3a214f95a7c531a902288a27e86f6f3eacebca4ee1ed28e50b96550bc"
   end
 
   depends_on "go" => :build
