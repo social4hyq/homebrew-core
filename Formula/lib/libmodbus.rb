@@ -7,7 +7,7 @@ class Libmodbus < Formula
   head "https://github.com/stephane/libmodbus.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2417e99bf6e2f77630706b7c2a272cae43876843a2643c4270a668b94896f64c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1130a80aa446e8dc5c714ab4d49da8c8705cefe03760719d1d1570e82496f0d1"
   end
 
   depends_on "autoconf" => :build
