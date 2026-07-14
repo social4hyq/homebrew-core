@@ -6,7 +6,7 @@ class Cot < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d1d24b0b12a661466e2124765a3a3ab04c4430816dbb7581328a54d5ea392a4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "327dd7f6d0b00a3155fa2198e3a0e57685f6ac932d43e06cb28644b0674cacf4"
   end
 
   depends_on "rust" => :build
