@@ -7,7 +7,7 @@ class Ffuf < Formula
   head "https://github.com/ffuf/ffuf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "596923f479eab8514a4fd0e4f0f469a46232c52168bc0685286122268c93b6cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "222769e0eb8e565c79835d3bdab7574681b612f4ac2eccd29499b4ac3e9e9fbd"
   end
 
   depends_on "go" => :build
