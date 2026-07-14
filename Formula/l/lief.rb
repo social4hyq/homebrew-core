@@ -1,12 +1,12 @@
 class Lief < Formula
   desc "Library to Instrument Executable Formats"
   homepage "https://lief.re/"
-  url "https://github.com/lief-project/LIEF/archive/refs/tags/0.17.6.tar.gz"
-  sha256 "5fbbd19c85912d417eabbaef2b98e70144496356964685b82e0792d708b9be87"
+  url "https://github.com/lief-project/LIEF/archive/refs/tags/1.0.0.tar.gz"
+  sha256 "2cf412695ff739d82e129db441e5c2025f3bb4873a3d3a1d3dd4cf300b682abd"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4f8e96e424c1564e7ea864c9b2ff46d364e61ccc31a4d5e5b7bd32c23a113474"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "781b27ad66a684a017076855db0495014ab0f9fc75998e8ee412879c49728973"
   end
 
   depends_on "cmake" => :build
@@ -14,20 +14,36 @@ class Lief < Formula
   depends_on "nlohmann-json" => :build
   depends_on "utf8cpp" => :build
   depends_on "fmt"
-  depends_on "mbedtls@3" # https://github.com/lief-project/LIEF/commit/71e69423090e1bfaee7d2512a843605a373b1026
   depends_on "spdlog"
   depends_on "tl-expected" => :no_linkage
 
-  def install
-    rm_r(Dir["third-party/*"] - Dir["third-party/tcb-span*"])
+  resource "mbedtls" do
+    url "https://raw.githubusercontent.com/lief-project/LIEF/1.0.0/third-party/mbedtls-4.0.0.r0.gec4044008d.zip"
+    sha256 "01aec4471547dec5308853ff0d797611a68a521a10496898b626035dfdc07183"
+  end
 
-    args = %w[
+  resource "tcb-span" do
+    url "https://raw.githubusercontent.com/lief-project/LIEF/1.0.0/third-party/tcb-span-b70b0ff.zip"
+    sha256 "f3d47ed83507fce94245a9f3cf97bc433cd1116f94d11ac0dca1a6f53bbeb239"
+  end
+
+  def install
+    rm_r Dir["third-party/*"]
+    resource("mbedtls").stage do
+      (buildpath/"third-party/mbedtls").install Dir["*"]
+    end
+    resource("tcb-span").stage do
+      (buildpath/"third-party/tcb").install "span.hpp"
+    end
+
+    args = %W[
       -DBUILD_SHARED_LIBS=ON
+      -DFETCHCONTENT_SOURCE_DIR_LIEF_MBEDTLS=#{buildpath}/third-party/mbedtls
+      -DFETCHCONTENT_SOURCE_DIR_LIEF_SPAN=#{buildpath}/third-party/tcb
       -DLIEF_EXAMPLES=OFF
       -DLIEF_EXTERNAL_SPDLOG=ON
       -DLIEF_OPT_EXTERNAL_EXPECTED=ON
       -DLIEF_OPT_FROZEN_EXTERNAL=ON
-      -DLIEF_OPT_MBEDTLS_EXTERNAL=ON
       -DLIEF_OPT_NLOHMANN_JSON_EXTERNAL=ON
       -DLIEF_OPT_UTFCPP_EXTERNAL=ON
       -DLIEF_SO_VERSION=ON
