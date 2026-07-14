@@ -7,7 +7,7 @@ class Rdap < Formula
   head "https://github.com/openrdap/rdap.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "425d0f2b8dd01bb7f5fe0ac51eb6c1aa419d8967bf28cd35c34109e1685e8366"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "581e5aa6dce6a1896056925b22d2355cc0023de82478f37eef3ec6d869dab824"
   end
 
   depends_on "go" => :build
