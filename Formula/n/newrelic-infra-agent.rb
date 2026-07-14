@@ -15,7 +15,7 @@ class NewrelicInfraAgent < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "adebe76a0858b273f341022a9887c7ab2053c4f6bb07be2f4ab8e2f13cdd59fd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5951518f659260b170c7949daf80330a32416e0460b35c70fb4329b8d0c0b461"
   end
 
   depends_on "go" => :build
