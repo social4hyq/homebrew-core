@@ -1,0 +1,12 @@
+--- a/src/modbus-rtu.c
++++ b/src/modbus-rtu.c
+@@ -13,6 +13,9 @@
+ #endif
+ #if defined(HAVE_STRUCT_TERMIOS2)
+ #include <sys/ioctl.h>
++#ifdef HAVE_ASM_IOCTLS_H
++#include <asm/ioctls.h>
++#endif
+ #endif
+ #include "modbus-private.h"
+ #include <assert.h>

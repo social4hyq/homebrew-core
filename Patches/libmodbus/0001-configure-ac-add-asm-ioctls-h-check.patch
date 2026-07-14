@@ -1,0 +1,10 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -87,6 +87,7 @@
+ AC_CHECK_HEADERS([ \
+     arpa/inet.h \
+     byteswap.h \
++    asm/ioctls.h \
+     errno.h \
+     fcntl.h \
+     limits.h \
