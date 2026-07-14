@@ -6,7 +6,7 @@ class Mp4ff < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2107c286a72f5546fa52b8b4a117eacadcb2320ceee1d964b969849c4dc46051"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6178cc1459a97141e27d53d7b5c92f01840c641f79e364e7f59582b37394b4b4"
   end
 
   depends_on "go" => :build
