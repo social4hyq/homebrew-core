@@ -1,8 +1,8 @@
 class Opkssh < Formula
   desc "Enables SSH to be used with OpenID Connect"
   homepage "https://eprint.iacr.org/2023/296"
-  url "https://github.com/openpubkey/opkssh/archive/refs/tags/v0.15.0.tar.gz"
-  sha256 "036287cf27ce2baa3715fe917e2d6b300a499ee8766c1895bfb708690162502c"
+  url "https://github.com/openpubkey/opkssh/archive/refs/tags/v0.16.0.tar.gz"
+  sha256 "b7c326b24d6fe97056d459f2d5ef7eafb25890b70279537746a368467fe2dc3b"
   license "Apache-2.0"
   head "https://github.com/openpubkey/opkssh.git", branch: "main"
 
