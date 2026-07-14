@@ -7,7 +7,7 @@ class Libextractor < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f0ebf80b732ce2fc51353f4b3a226b7e3f6b80638d5f6ba47e3e703929323540"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fad09739d424b959250d12649a1bcb0ea26119a00eed86df0296b744bd240ce8"
   end
 
   depends_on "pkgconf" => :build
