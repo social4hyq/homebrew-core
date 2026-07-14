@@ -1,13 +1,13 @@
 class Aliae < Formula
   desc "Cross shell and platform alias management"
   homepage "https://aliae.dev"
-  url "https://github.com/jandedobbeleer/aliae/archive/refs/tags/v0.26.6.tar.gz"
-  sha256 "905602b3dd56b6caf099970132edf7e3366b3ef0d98a71b277e23c00990e979d"
+  url "https://github.com/jandedobbeleer/aliae/archive/refs/tags/v1.1.1.tar.gz"
+  sha256 "18cca0f0bf38479d39c51a9f0ac8a73b4a1c903e03e09c7d73d262ee6905f082"
   license "MIT"
   head "https://github.com/jandedobbeleer/aliae.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b585c7d5a78a45f9bee240eed805f331fc4cf4c3db9f3b7b175d3a9ca81d795a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b77103d7445e4b691b447a69637bd3cda0675007e160f444470429959c263c6b"
   end
 
   depends_on "go" => :build
