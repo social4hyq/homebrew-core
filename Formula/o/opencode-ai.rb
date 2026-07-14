@@ -1,4 +1,4 @@
-class Opencode < Formula
+class OpencodeAi < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64"
   homepage "https://github.com/social4hyq/ohos-opencode"
   url "https://github.com/social4hyq/ohos-opencode.git",
@@ -188,13 +188,13 @@ class Opencode < Formula
     chmod 0755, out
     rm unsigned
     rm stripped
-    bin.install out => "opencode"
+    bin.install out => "opencode-ai"
     # Stub xdg-open so `opencode web` can spawn it without ENOENT on OHOS.
     (bin/"xdg-open").write "#!/bin/sh\nexit 0\n"
     chmod 0755, bin/"xdg-open"
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/opencode --version 2>&1")
+    assert_match version.to_s, shell_output("#{bin}/opencode-ai --version 2>&1")
   end
 end
