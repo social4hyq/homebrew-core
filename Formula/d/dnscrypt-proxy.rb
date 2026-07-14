@@ -12,7 +12,7 @@ class DnscryptProxy < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "05a0d8eae066a0dc0af1f27b6261dfed7b82ec0f961ef0e608f750a6ce51ff78"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1e73b51a8ac2f0a3cd766c0d13e0f9a26126a3116cd42c9450484f4ca1e2ed9"
   end
 
   depends_on "go" => :build
