@@ -1,8 +1,8 @@
 class Pyenv < Formula
   desc "Python version management"
   homepage "https://github.com/pyenv/pyenv"
-  url "https://github.com/pyenv/pyenv/archive/refs/tags/v2.7.3.tar.gz"
-  sha256 "fb3e009368dfd271e910795b38d338179a1a6cadf28ec6c0cd60c48c69c5e838"
+  url "https://github.com/pyenv/pyenv/archive/refs/tags/v2.8.0.tar.gz"
+  sha256 "0773be07e7276f71496c387874ebeb780f8593468546a511bda7750da80c7d8a"
   license "MIT"
   version_scheme 1
   compatibility_version 1
@@ -14,8 +14,7 @@ class Pyenv < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "98aa4f6ebad128635afa785bcc7adcea0141329232e0256a97d5d73cc9256d9c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "62b0cb169de221eebe16e096be324a2830d2f0ffab4734f388bbe15c0ea85eed"
   end
 
   depends_on "autoconf"
