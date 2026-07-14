@@ -1,13 +1,13 @@
 class Ffuf < Formula
   desc "Fast web fuzzer written in Go"
   homepage "https://github.com/ffuf/ffuf"
-  url "https://github.com/ffuf/ffuf/archive/refs/tags/v2.2.0.tar.gz"
-  sha256 "ee4861be87df612045ace6feead2d51aa5ba6d5181d98820e2ebdb3ab09baa4f"
+  url "https://github.com/ffuf/ffuf/archive/refs/tags/v2.2.1.tar.gz"
+  sha256 "3c47086915216021bec493d59e5f07fc413e39675aeb0bea5b69e1a0c7fd877e"
   license "MIT"
   head "https://github.com/ffuf/ffuf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "596923f479eab8514a4fd0e4f0f469a46232c52168bc0685286122268c93b6cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "222769e0eb8e565c79835d3bdab7574681b612f4ac2eccd29499b4ac3e9e9fbd"
   end
 
   depends_on "go" => :build
