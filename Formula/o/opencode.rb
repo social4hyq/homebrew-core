@@ -5,7 +5,7 @@ class Opencode < Formula
   version "1.17.20"
   sha256 "4366d8623ebe5bbcecf655d77153803c7b0d59f8b9bda1cfafb11f0ee2ee460f"
   license "MIT"
-  revision 2
+  revision 3
   # opencode's official prebuilt linux-arm64-musl single binary (Bun --compile).
   # Bypasses the opencode-ai npm JS wrapper. The musl-ABI binary is
   # OHOS-compatible once its GCC runtime deps are provided (see resources).
@@ -16,8 +16,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.20-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "59cad51835cefda1390f171544b7ba856e61c92bd95e1a0526f0c980a6487fc2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.20-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef2611f2df81a6941ca1095b55ab5fcf63124cb03bc1e39766793f1356c3b1fe"
   end
   # r1 fixed a real portability bug (not just the `brew bottle` check below):
   # HOMEBREW_CELLAR flips between HOMEBREW_PREFIX/Cellar and
@@ -49,6 +49,12 @@ class Opencode < Formula
   # read/parse errors partway through the ELF, since a partially-written
   # file mid-extraction should not be silently treated as "already fine".
   # Verified 2026-07-14.
+  #
+  # r3 extracted dlopen_sign_shim into its own formula (dlopen-sign-shim) —
+  # it's a general OHOS compatibility shim, not opencode-specific (same
+  # category as close-range-shim / ohos-bst-light in this tap), and this
+  # drops opencode's own ohos-sdk :build dependency entirely since compiling
+  # the shim was the only thing that needed it.
 
   # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
   # runtime), which OHOS does NOT ship (OHOS uses libc++). We bundle musl-aarch64
@@ -59,15 +65,13 @@ class Opencode < Formula
   # so RUNPATH is injected in-place (zero file-offset shift) via inject-runpath.py.
   #
   # Additionally, the TUI extracts its embedded native modules (libopentui.so,
-  # *.node, ...) to TMPDIR at runtime and dlopens them. OHOS rejects unsigned
-  # .so with "Permission denied", and Bun extracts only the stored (unsigned)
-  # byte length so signing the embedded copy does not help. A small LD_PRELOAD
-  # shim (dlopen_sign_shim) intercepts dlopen and signs any unsigned ELF under
-  # TMPDIR via self-sign before delegating.
+  # *.node, ...) to a scratch file at runtime and dlopens them. OHOS rejects
+  # unsigned .so with "Permission denied" — dlopen-sign-shim (below) handles
+  # this generically.
   depends_on "ohos-bst-light" => :build
-  depends_on "ohos-sdk"       => :build # clang to compile the dlopen-sign shim
   depends_on "python@3.14"    => :build
   depends_on "close-range-shim"
+  depends_on "dlopen-sign-shim"
 
   resource "libstdc++" do
     url "https://dl-cdn.alpinelinux.org/alpine/latest-stable/main/aarch64/libstdc++-15.2.0-r5.apk"
@@ -192,100 +196,11 @@ class Opencode < Formula
     libexec.install src => "bin/opencode"
     chmod 0755, libexec/"bin/opencode"
 
-    # Build the dlopen-sign shim: intercepts dlopen/dlmopen and signs any
-    # unsigned ELF before loading it (see r2 note above re: not scoping to
-    # TMPDIR).
-    signer_path = formula_opt_bin("ohos-bst-light")/"self-sign"
-    (buildpath/"dlopen_sign_shim.c").write <<~C
-      #define _GNU_SOURCE
-      #include <dlfcn.h>
-      #include <elf.h>
-      #include <fcntl.h>
-      #include <stdlib.h>
-      #include <string.h>
-      #include <sys/wait.h>
-      #include <unistd.h>
-      static const char SIGNER[] = "#{signer_path}";
-      /* Fail CLOSED (attempt to sign) on any open/read/parse error past the
-       * point we know it's an ELF — a partially-written file mid-extraction
-       * should not be silently treated as "already fine". The one exception
-       * is the ELF-magic check itself: a definite non-ELF genuinely does not
-       * need signing and self-sign would have nothing to do on it. */
-      static int needs_signing(const char *path) {
-        int fd = open(path, O_RDONLY);
-        if (fd < 0) return 0;
-        Elf64_Ehdr eh;
-        if (read(fd, &eh, sizeof eh) != (ssize_t)sizeof eh) { close(fd); return 1; }
-        if (memcmp(eh.e_ident, ELFMAG, SELFMAG) != 0) { close(fd); return 0; }
-        Elf64_Shdr *sh = calloc(eh.e_shnum, sizeof(Elf64_Shdr));
-        if (!sh) { close(fd); return 1; }
-        if (lseek(fd, eh.e_shoff, SEEK_SET) < 0 ||
-            read(fd, sh, (size_t)eh.e_shnum * sizeof(Elf64_Shdr)) !=
-                (ssize_t)((size_t)eh.e_shnum * sizeof(Elf64_Shdr))) { free(sh); close(fd); return 1; }
-        Elf64_Shdr *str = &sh[eh.e_shstrndx];
-        char *names = malloc(str->sh_size);
-        if (!names) { free(sh); close(fd); return 1; }
-        if (lseek(fd, str->sh_offset, SEEK_SET) < 0 ||
-            read(fd, names, str->sh_size) != (ssize_t)str->sh_size) { free(names); free(sh); close(fd); return 1; }
-        close(fd);
-        int has = 0;
-        for (int i = 0; i < eh.e_shnum; i++) {
-          if (strcmp(names + sh[i].sh_name, ".codesign") == 0) { has = 1; break; }
-        }
-        free(names); free(sh);
-        return !has;
-      }
-      /* No TMPDIR-prefix scoping: Bun's own extraction of embedded native
-       * modules does not honor our exported TMPDIR (observed landing under
-       * an OHOS-patched musl libc default instead), so we can't reliably
-       * predict where it will land. Sign any unsigned ELF this process
-       * tries to dlopen, regardless of location — needs_signing() already
-       * no-ops on non-ELF and already-signed files, and self-sign failing
-       * on a file we have no business touching is silently discarded below,
-       * so this is safe. */
-      static void ensure_signed(const char *path) {
-        if (!path) return;
-        if (!needs_signing(path)) return;
-        pid_t p = fork();
-        if (p == 0) {
-          /* Silence self-sign so its output does not corrupt the TUI. */
-          int devnull = open("/dev/null", O_WRONLY);
-          if (devnull >= 0) {
-            dup2(devnull, STDOUT_FILENO);
-            dup2(devnull, STDERR_FILENO);
-            close(devnull);
-          }
-          execl(SIGNER, "self-sign", path, (char *)NULL);
-          _exit(127);
-        }
-        if (p > 0) { int st; while (waitpid(p, &st, 0) < 0) {} }
-      }
-      void *dlopen(const char *filename, int flags) {
-        ensure_signed(filename);
-        static void *(*real)(const char *, int);
-        if (!real) real = (void *(*)(const char *, int))dlsym(RTLD_NEXT, "dlopen");
-        return real(filename, flags);
-      }
-      void *dlmopen(long nsid, const char *filename, int flags) {
-        ensure_signed(filename);
-        static void *(*real)(long, const char *, int);
-        if (!real) real = (void *(*)(long, const char *, int))dlsym(RTLD_NEXT, "dlmopen");
-        return real(nsid, filename, flags);
-      }
-    C
-    system formula_opt_bin("ohos-sdk")/"../native/llvm/bin/clang",
-           "-shared", "-fPIC", "-o", "libdlopen_sign_shim.so",
-           "dlopen_sign_shim.c", "-O2", "-Wall", "-Wextra"
-    libexec.install "libdlopen_sign_shim.so" => "lib/libdlopen_sign_shim.so"
-    # ohos-sdk clang already signs its output (adds a .codesign section);
-    # self-sign errors on a file that's already signed rather than skipping,
-    # so don't call it again here.
-
     # Self-reference via opt_libexec (see RUNPATH comment above) rather than
     # libexec, for the same portability reason.
     (bin/"opencode").write <<~SH
       #!/bin/sh
-      export LD_PRELOAD="#{opt_libexec}/lib/libdlopen_sign_shim.so:#{formula_opt_lib("close-range-shim")}/libclose_range_shim.so${LD_PRELOAD:+:$LD_PRELOAD}"
+      export LD_PRELOAD="#{formula_opt_lib("dlopen-sign-shim")}/libdlopen_sign_shim.so:#{formula_opt_lib("close-range-shim")}/libclose_range_shim.so${LD_PRELOAD:+:$LD_PRELOAD}"
       export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
       exec "#{opt_libexec}/bin/opencode" "$@"
     SH
