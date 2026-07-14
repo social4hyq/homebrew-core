@@ -1,33 +1,37 @@
 class Opencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64 (prebuilt musl binary)"
   homepage "https://github.com/anomalyco/opencode"
+  url "https://registry.npmjs.org/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-1.17.20.tgz"
   version "1.17.20"
+  sha256 "4366d8623ebe5bbcecf655d77153803c7b0d59f8b9bda1cfafb11f0ee2ee460f"
+  license "MIT"
+  revision 1
   # opencode's official prebuilt linux-arm64-musl single binary (Bun --compile).
   # Bypasses the opencode-ai npm JS wrapper. The musl-ABI binary is
   # OHOS-compatible once its GCC runtime deps are provided (see resources).
-  url "https://registry.npmjs.org/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-#{version}.tgz"
-  sha256 "4366d8623ebe5bbcecf655d77153803c7b0d59f8b9bda1cfafb11f0ee2ee460f"
-  license "MIT"
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.20"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8caa573517f96049b91885fde91a70fd72c9c85f01d3e6f367de0c2ea64fa6c3"
-  end
-  # NOTE for rebuilds: `brew bottle` unconditionally odie()s with "non-relocatable
-  # reference to HOMEBREW_REPOSITORY" for this formula — the injected DT_RUNPATH
-  # (libexec/lib, required above) resolves under .../Homebrew/Cellar, and this
-  # tap's HOMEBREW_PREFIX != HOMEBREW_REPOSITORY, so the check always fires
-  # regardless of --skip-relocation (that flag doesn't gate this specific check).
-  # No formula-level escape hatch exists (formula_ignores only special-cases go
-  # deps). Verified 2026-07-14: temporarily changing the `odie` to `opoo` at
-  # dev-cmd/bottle.rb:570 for the single `brew bottle` invocation, then
-  # reverting it immediately, is safe — same `:any_skip_relocation` pattern
-  # already used by ohos-bst-light/close-range-shim in this tap.
 
   livecheck do
     url "https://registry.npmjs.org/opencode-ai/latest"
-    regex(/"version":\s*"(\d+(?:\.\d+)+)"/)
+    regex(/"version":\s*"(\d+(?:\.\d+)+)"/i)
   end
+
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.20-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6cd6120285ea999190b0656bfc41c9ac8a47ce37eab18b66d538faf7975b3123"
+  end
+  # r1 fixed a real portability bug (not just the `brew bottle` check below):
+  # HOMEBREW_CELLAR flips between HOMEBREW_PREFIX/Cellar and
+  # HOMEBREW_REPOSITORY/Cellar depending on which happens to exist at brew
+  # startup (see brew.sh) — r0's DT_RUNPATH/wrapper baked in the Cellar-
+  # absolute path from the machine that built the bottle, so pouring it on a
+  # machine where HOMEBREW_CELLAR resolved the other way broke at runtime
+  # ("inaccessible or not found"). Fixed by pointing RUNPATH and the wrapper's
+  # self-reference at opt_libexec instead (see install() below) — opt/<name>
+  # is always HOMEBREW_PREFIX-relative, so it's stable across that flip. This
+  # also incidentally fixed the `brew bottle` "non-relocatable reference to
+  # HOMEBREW_REPOSITORY" odie() that r0 needed a temporary bottle.rb patch to
+  # get past — the RUNPATH no longer contains a HOMEBREW_REPOSITORY-shaped
+  # path at all, so that check just doesn't fire anymore. Verified 2026-07-14.
 
   # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
   # runtime), which OHOS does NOT ship (OHOS uses libc++). We bundle musl-aarch64
@@ -64,20 +68,21 @@ class Opencode < Formula
 
     libdir = libexec/"lib"
     libdir.mkpath
-    sign = Formula["ohos-bst-light"].opt_bin/"self-sign"
-    python = Formula["python@3.14"].opt_bin/"python3"
+    sign = formula_opt_bin("ohos-bst-light")/"self-sign"
+    python = formula_opt_bin("python@3.14")/"python3"
 
     # Deploy + sign the musl GCC runtime libraries (.apk = gzip tar).
     # Stage each resource into a Pathname target (the block form yields a
     # ResourceStageContext that does not support path division), then extract
     # the .apk if brew did not already, and copy the .so out.
-    libgcc_dir   = buildpath/"libgcc-rsrc"
+    libgcc_dir = buildpath/"libgcc-rsrc"
     libstdcxx_dir = buildpath/"libstdcxx-rsrc"
     resource("libgcc").stage(libgcc_dir)
     resource("libstdc++").stage(libstdcxx_dir)
 
     extract_apk = lambda do |dir|
       return if (dir/"usr/lib").exist?
+
       apk = Dir[dir/"*.apk"].first
       system "tar", "-xzf", apk, "-C", dir.to_s if apk
     end
@@ -153,7 +158,16 @@ class Opencode < Formula
           print("RUNPATH=%s injected"%libdir)
       patch(sys.argv[1], sys.argv[2])
     PY
-    system python, (buildpath/"inject-runpath.py").to_s, src.to_s, libdir.to_s
+    # RUNPATH points at opt_libexec/lib (prefix-relative, stable), not
+    # libdir/libexec (Cellar-relative). HOMEBREW_CELLAR flips between
+    # HOMEBREW_PREFIX/Cellar and HOMEBREW_REPOSITORY/Cellar depending on
+    # which happens to exist at brew startup (see brew.sh) — a RUNPATH baked
+    # with the Cellar-absolute path breaks if poured on a machine where that
+    # resolved differently than the machine it was built on. opt/<name> is
+    # always HOMEBREW_PREFIX-relative and Homebrew re-links it correctly on
+    # every install, so it's stable across that flip, and the dynamic linker
+    # follows the opt/ symlink same as any other directory. Verified 2026-07-14.
+    system python, (buildpath/"inject-runpath.py").to_s, src.to_s, (opt_libexec/"lib").to_s
 
     # Self-sign the patched binary.
     system sign, src.to_s
@@ -163,7 +177,7 @@ class Opencode < Formula
 
     # Build the dlopen-sign shim: intercepts dlopen/dlmopen and signs any
     # unsigned ELF extracted under TMPDIR before loading it.
-    signer_path = Formula["ohos-bst-light"].opt_bin/"self-sign"
+    signer_path = formula_opt_bin("ohos-bst-light")/"self-sign"
     (buildpath/"dlopen_sign_shim.c").write <<~C
       #define _GNU_SOURCE
       #include <dlfcn.h>
@@ -232,7 +246,7 @@ class Opencode < Formula
         return real(nsid, filename, flags);
       }
     C
-    system Formula["ohos-sdk"].opt_bin/"../native/llvm/bin/clang",
+    system formula_opt_bin("ohos-sdk")/"../native/llvm/bin/clang",
            "-shared", "-fPIC", "-o", "libdlopen_sign_shim.so",
            "dlopen_sign_shim.c", "-O2", "-Wall", "-Wextra"
     libexec.install "libdlopen_sign_shim.so" => "lib/libdlopen_sign_shim.so"
@@ -240,11 +254,13 @@ class Opencode < Formula
     # self-sign errors on a file that's already signed rather than skipping,
     # so don't call it again here.
 
+    # Self-reference via opt_libexec (see RUNPATH comment above) rather than
+    # libexec, for the same portability reason.
     (bin/"opencode").write <<~SH
       #!/bin/sh
-      export LD_PRELOAD="#{libexec}/lib/libdlopen_sign_shim.so:#{Formula["close-range-shim"].opt_lib}/libclose_range_shim.so${LD_PRELOAD:+:$LD_PRELOAD}"
+      export LD_PRELOAD="#{opt_libexec}/lib/libdlopen_sign_shim.so:#{formula_opt_lib("close-range-shim")}/libclose_range_shim.so${LD_PRELOAD:+:$LD_PRELOAD}"
       export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
-      exec "#{libexec}/bin/opencode" "$@"
+      exec "#{opt_libexec}/bin/opencode" "$@"
     SH
     chmod 0755, bin/"opencode"
   end
