@@ -7,7 +7,7 @@ class Oasis < Formula
   head "https://github.com/oasisprotocol/cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5eddd5464b82bd99e2b5061bebd1c6c84c86f0fe5269275bfecfa9a3e4e67064"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d703909b03dce16bc10804bf9d9b613a97709c5d7d4561da2375f851d194318"
   end
 
   depends_on "go" => :build
