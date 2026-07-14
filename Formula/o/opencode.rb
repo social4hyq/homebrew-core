@@ -5,7 +5,7 @@ class Opencode < Formula
   version "1.17.20"
   sha256 "4366d8623ebe5bbcecf655d77153803c7b0d59f8b9bda1cfafb11f0ee2ee460f"
   license "MIT"
-  revision 1
+  revision 2
   # opencode's official prebuilt linux-arm64-musl single binary (Bun --compile).
   # Bypasses the opencode-ai npm JS wrapper. The musl-ABI binary is
   # OHOS-compatible once its GCC runtime deps are provided (see resources).
@@ -16,8 +16,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.20-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6cd6120285ea999190b0656bfc41c9ac8a47ce37eab18b66d538faf7975b3123"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.20-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "59cad51835cefda1390f171544b7ba856e61c92bd95e1a0526f0c980a6487fc2"
   end
   # r1 fixed a real portability bug (not just the `brew bottle` check below):
   # HOMEBREW_CELLAR flips between HOMEBREW_PREFIX/Cellar and
@@ -32,6 +32,23 @@ class Opencode < Formula
   # HOMEBREW_REPOSITORY" odie() that r0 needed a temporary bottle.rb patch to
   # get past — the RUNPATH no longer contains a HOMEBREW_REPOSITORY-shaped
   # path at all, so that check just doesn't fire anymore. Verified 2026-07-14.
+  #
+  # r2 fixed dlopen_sign_shim: it only signed unsigned ELFs whose path was
+  # prefixed by $TMPDIR, but Bun's own extraction of embedded native modules
+  # (libopentui.so etc.) does not honor our exported TMPDIR at all — observed
+  # landing under /data/storage/el2/base/tmp (an OHOS-patched musl libc
+  # default, independent of the TMPDIR env var) instead of the
+  # /data/storage/el2/base/cache we export, so the prefix check always
+  # failed and the file was never signed → "Permission denied" on dlopen.
+  # r2 drops the path-prefix restriction entirely: sign any unsigned ELF
+  # this process tries to dlopen, regardless of location. needs_signing()
+  # already no-ops on non-ELF files and already-signed ones, and self-sign
+  # failing on a file we have no business touching is silently discarded
+  # (see ensure_signed), so this is safe. Also made needs_signing() fail
+  # closed (attempt to sign) instead of fail open (skip signing) on
+  # read/parse errors partway through the ELF, since a partially-written
+  # file mid-extraction should not be silently treated as "already fine".
+  # Verified 2026-07-14.
 
   # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
   # runtime), which OHOS does NOT ship (OHOS uses libc++). We bundle musl-aarch64
@@ -176,7 +193,8 @@ class Opencode < Formula
     chmod 0755, libexec/"bin/opencode"
 
     # Build the dlopen-sign shim: intercepts dlopen/dlmopen and signs any
-    # unsigned ELF extracted under TMPDIR before loading it.
+    # unsigned ELF before loading it (see r2 note above re: not scoping to
+    # TMPDIR).
     signer_path = formula_opt_bin("ohos-bst-light")/"self-sign"
     (buildpath/"dlopen_sign_shim.c").write <<~C
       #define _GNU_SOURCE
@@ -188,22 +206,27 @@ class Opencode < Formula
       #include <sys/wait.h>
       #include <unistd.h>
       static const char SIGNER[] = "#{signer_path}";
+      /* Fail CLOSED (attempt to sign) on any open/read/parse error past the
+       * point we know it's an ELF — a partially-written file mid-extraction
+       * should not be silently treated as "already fine". The one exception
+       * is the ELF-magic check itself: a definite non-ELF genuinely does not
+       * need signing and self-sign would have nothing to do on it. */
       static int needs_signing(const char *path) {
         int fd = open(path, O_RDONLY);
         if (fd < 0) return 0;
         Elf64_Ehdr eh;
-        if (read(fd, &eh, sizeof eh) != (ssize_t)sizeof eh) { close(fd); return 0; }
+        if (read(fd, &eh, sizeof eh) != (ssize_t)sizeof eh) { close(fd); return 1; }
         if (memcmp(eh.e_ident, ELFMAG, SELFMAG) != 0) { close(fd); return 0; }
         Elf64_Shdr *sh = calloc(eh.e_shnum, sizeof(Elf64_Shdr));
-        if (!sh) { close(fd); return 0; }
+        if (!sh) { close(fd); return 1; }
         if (lseek(fd, eh.e_shoff, SEEK_SET) < 0 ||
             read(fd, sh, (size_t)eh.e_shnum * sizeof(Elf64_Shdr)) !=
-                (ssize_t)((size_t)eh.e_shnum * sizeof(Elf64_Shdr))) { free(sh); close(fd); return 0; }
+                (ssize_t)((size_t)eh.e_shnum * sizeof(Elf64_Shdr))) { free(sh); close(fd); return 1; }
         Elf64_Shdr *str = &sh[eh.e_shstrndx];
         char *names = malloc(str->sh_size);
-        if (!names) { free(sh); close(fd); return 0; }
+        if (!names) { free(sh); close(fd); return 1; }
         if (lseek(fd, str->sh_offset, SEEK_SET) < 0 ||
-            read(fd, names, str->sh_size) != (ssize_t)str->sh_size) { free(names); free(sh); close(fd); return 0; }
+            read(fd, names, str->sh_size) != (ssize_t)str->sh_size) { free(names); free(sh); close(fd); return 1; }
         close(fd);
         int has = 0;
         for (int i = 0; i < eh.e_shnum; i++) {
@@ -212,12 +235,16 @@ class Opencode < Formula
         free(names); free(sh);
         return !has;
       }
+      /* No TMPDIR-prefix scoping: Bun's own extraction of embedded native
+       * modules does not honor our exported TMPDIR (observed landing under
+       * an OHOS-patched musl libc default instead), so we can't reliably
+       * predict where it will land. Sign any unsigned ELF this process
+       * tries to dlopen, regardless of location — needs_signing() already
+       * no-ops on non-ELF and already-signed files, and self-sign failing
+       * on a file we have no business touching is silently discarded below,
+       * so this is safe. */
       static void ensure_signed(const char *path) {
         if (!path) return;
-        const char *tmp = getenv("TMPDIR");
-        if (!tmp || *tmp == '\\0') return;
-        size_t n = strlen(tmp);
-        if (strncmp(path, tmp, n) != 0) return;
         if (!needs_signing(path)) return;
         pid_t p = fork();
         if (p == 0) {
@@ -239,10 +266,10 @@ class Opencode < Formula
         if (!real) real = (void *(*)(const char *, int))dlsym(RTLD_NEXT, "dlopen");
         return real(filename, flags);
       }
-      void *dlmopen(void *nsid, const char *filename, int flags) {
+      void *dlmopen(long nsid, const char *filename, int flags) {
         ensure_signed(filename);
-        static void *(*real)(void *, const char *, int);
-        if (!real) real = (void *(*)(void *, const char *, int))dlsym(RTLD_NEXT, "dlmopen");
+        static void *(*real)(long, const char *, int);
+        if (!real) real = (void *(*)(long, const char *, int))dlsym(RTLD_NEXT, "dlmopen");
         return real(nsid, filename, flags);
       }
     C
