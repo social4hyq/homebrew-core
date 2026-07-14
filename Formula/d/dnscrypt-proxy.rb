@@ -1,8 +1,8 @@
 class DnscryptProxy < Formula
   desc "Secure communications between a client and a DNS resolver"
   homepage "https://dnscrypt.info"
-  url "https://github.com/DNSCrypt/dnscrypt-proxy/archive/refs/tags/2.1.16.tar.gz"
-  sha256 "7ba5aa76d3fdc6fbb667689ba13d8ac3e66be27655695a9d412e5ad4afe34f8d"
+  url "https://github.com/DNSCrypt/dnscrypt-proxy/archive/refs/tags/2.1.17.tar.gz"
+  sha256 "06f59c64e2aa6cf7916c335cb57b369ce55e2d6e7fa01803e0da8f6728e3196e"
   license "ISC"
   head "https://github.com/DNSCrypt/dnscrypt-proxy.git", branch: "master"
 
@@ -12,7 +12,7 @@ class DnscryptProxy < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "05a0d8eae066a0dc0af1f27b6261dfed7b82ec0f961ef0e608f750a6ce51ff78"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1e73b51a8ac2f0a3cd766c0d13e0f9a26126a3116cd42c9450484f4ca1e2ed9"
   end
 
   depends_on "go" => :build
