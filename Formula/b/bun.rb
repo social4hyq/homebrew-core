@@ -35,6 +35,7 @@ class Bun < Formula
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
   depends_on "social4hyq/core/icu4c@78" => :build # qualified: icu4c@78 exists in both taps
+  depends_on "ohos-compat-shim" # runtime: LD_PRELOAD'd by the bin/bun wrapper
   # ohos-sdk is build-time only: used to sign rust-nightly binaries, the
   # clang-sign wrapper, and the final bun binary. Runtime signing (PackageInstaller
   # .node/.so, dlopen, bun build --compile) is now handled in-process by ohos_sign.
@@ -241,7 +242,26 @@ class Bun < Formula
     system sign_tool, "sign", "-selfSign", "1", "-inFile", unsigned, "-outFile", out
     chmod 0755, out
     rm unsigned
-    bin.install out => "bun"
+    # Install the real binary under libexec/bin and front it with a shell
+    # wrapper at bin/bun that preloads ohos-compat-shim. The shim covers
+    # OHOS-blocked syscalls (close_range, fchmodat2) plus getpwuid_r/tmpfile/
+    # getcwd for spawned children, which inherit LD_PRELOAD. Mirrors the
+    # opencode/codex wrapper pattern; opt_libexec is HOMEBREW_PREFIX-relative
+    # so the bottle stays relocatable across the HOMEBREW_CELLAR flip.
+    mkdir_p libexec/"bin"
+    libexec.install out => "bin/bun"
+    chmod 0755, libexec/"bin/bun"
+    (bin/"bun").write <<~SH
+      #!/bin/sh
+      export LD_PRELOAD="#{formula_opt_lib("ohos-compat-shim")}/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
+      # Opt in the shim's linkat hook (default OFF): OHOS SELinux blocks hardlinks.
+      # bun's source-level copy_file_fallback was removed in favor of the shim's
+      # byte-copy fallback (equivalent — both lose hardlink identity). symlinkat is
+      # deliberately NOT opted in (unsafe for relative tarball symlink targets).
+      export OHOS_COMPAT_SHIM_ENABLE="linkat${OHOS_COMPAT_SHIM_ENABLE:+,$OHOS_COMPAT_SHIM_ENABLE}"
+      exec "#{opt_libexec}/bin/bun" "$@"
+    SH
+    chmod 0755, bin/"bun"
   end
 
   def post_install
@@ -263,6 +283,10 @@ class Bun < Formula
       CXX=c++, LDFLAGS=-Wl,--code-sign on OHOS. Install llvm@21 to provide
       the signed toolchain (cc/c++ → clang + LLD --code-sign):
         brew install llvm@21
+
+      The bin/bun wrapper preloads ohos-compat-shim (LD_PRELOAD) to cover
+      OHOS-blocked syscalls (close_range, fchmodat2, getcwd, ...); spawned
+      children inherit it. Disable per-symbol via OHOS_COMPAT_SHIM_DISABLE.
     EOS
   end
 
