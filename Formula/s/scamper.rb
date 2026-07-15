@@ -11,7 +11,7 @@ class Scamper < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "912224b77665f27c9737b72b2463126adc946328fd76d2081ad351b57819e05c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f59e3cc6e1f3acdb605cfca4069250de126eb87e79918d5dcf146b949df01e3"
   end
 
   depends_on "pkgconf" => :build
