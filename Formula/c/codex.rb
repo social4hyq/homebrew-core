@@ -5,7 +5,7 @@ class Codex < Formula
   version "0.144.3"
   sha256 "33384d62153cad2b197eaff2204c1da3d3e0c317c856cc14aa540254b25c69df"
   license "Apache-2.0"
-  revision 1
+  revision 3
   # Codex ships a native Rust binary per platform. We fetch the linux-arm64
   # platform package directly — the @openai/codex JS wrapper throws
   # "Unsupported platform: openharmony" on OHOS. The aarch64-unknown-linux-musl
@@ -25,12 +25,12 @@ class Codex < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-v0.144.3-r1b"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "01cd9dacf2bb89b1a53fc8ce92b79753bb9cfc6f1a1b3c00f8e054ed01f730da"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-v0.144.3-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cb2d39c6db27d798e1dce638c5569b6434a52596ffbdbbf4846d0717f3c1275"
   end
 
   depends_on "ohos-bst-light" => :build
-  depends_on "close-range-shim"
+  depends_on "ohos-compat-shim"
   depends_on "ripgrep"
 
   def install
@@ -67,7 +67,7 @@ class Codex < Formula
     # every install, so it's stable across that flip. Verified 2026-07-14.
     (bin/"codex").write <<~SH
       #!/bin/sh
-      export LD_PRELOAD="#{formula_opt_lib("close-range-shim")}/libclose_range_shim.so${LD_PRELOAD:+:$LD_PRELOAD}"
+      export LD_PRELOAD="#{formula_opt_lib("ohos-compat-shim")}/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
       export TMPDIR="${CODEX_TMPDIR:-/data/storage/el2/base/cache}"
       export SHELL="${SHELL:-/bin/sh}"
       exec "#{opt_libexec}/bin/codex" "$@"
