@@ -3,13 +3,13 @@ class TranslateToolkit < Formula
 
   desc "Toolkit for localization engineers"
   homepage "https://toolkit.translatehouse.org/"
-  url "https://files.pythonhosted.org/packages/a6/90/8d60a44eae3715809a93017efc71387b675efad61365b3a557808ded8235/translate_toolkit-3.19.13.tar.gz"
-  sha256 "56e57673c6a17d6cd75176fc31b207b1baf1a5008e09e17c810d940dbe6b41ed"
+  url "https://files.pythonhosted.org/packages/d8/7a/249a4fe2ebbd857f86156a22e1ddfe9b6f26f46ed1f3f391912ee34eb96b/translate_toolkit-3.19.14.tar.gz"
+  sha256 "35874f96ff83188151ee36f01ba1aa24d188151944cd567b85606095171c10d2"
   license "GPL-2.0-or-later"
   head "https://github.com/translate/translate.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "04304d488d521106cdb51d5190231167879d00c4f0960241246f3cbc7554d2e5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0cdc39e1ebc6b9ab2ad60ff3ee93d5419e22c39a959cb5208e2b11517cc5a7a2"
   end
 
   depends_on "rust" => :build # for `unicode_segmentation_py`
