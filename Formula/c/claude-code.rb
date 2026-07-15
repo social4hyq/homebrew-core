@@ -1,43 +1,109 @@
 class ClaudeCode < Formula
-  desc "Anthropic Claude Code CLI — HarmonyOS aarch64 (Linux musl binary + OHOS signing)"
+  desc "Anthropic Claude Code CLI — HarmonyOS (runtime-fetch stub; no binary in bottle)"
   homepage "https://docs.anthropic.com/en/docs/claude-code"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.207.tgz"
   version "2.1.207"
-  url "https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-#{version}.tgz"
   sha256 "6b76b77b3e5c1f05ceb898266db1cf603f67d5132b3c080ac6d63da9ed4cd6e1"
   license "Anthropic License"
+  revision 2
+  # Claude Code 2.1.113+ only ships Bun-compiled binaries (linux-arm64-musl,
+  # musl ABI compatible with OHOS). The tgz is mirrored on npmmirror (Aliyun
+  # CDN): brew's curl 8.21 (OpenSSL 3.6) SIGILLs on bulk TLS GET from the
+  # Cloudflare-fronted registry.npmjs.org on OHOS — its aarch64 SIMD AES bulk
+  # decrypt path is trapped by the kernel (verified: HEAD always succeeds, GET
+  # of the ~78MB body always SIGILLs, exit 132); Aliyun's CDN does not. The
+  # file is byte-identical on both (sha256 matches), so the wrapper tries
+  # npmmirror first and falls back to registry.npmjs.org for non-buggy curl
+  # builds or mirror lag on a freshly released version.
+  #
+  # Why a stub bottle: Anthropic License does not allow redistributing the
+  # official binary inside a bottle, so install() writes ONLY a wrapper stub —
+  # the official binary is fetched at first run, sha256-checked, self-signed
+  # and cached. The bottle therefore contains just the wrapper script.
+  # That also makes `pour_bottle?` true, which bypasses Homebrew's
+  # DevelopmentTools requirement (formula_installer.rb:574 raises UnbottledError
+  # when !pour_bottle? && !DevelopmentTools.installed?): claude-code doesn't
+  # compile anything, but Homebrew demands a compiler for any bottle-less
+  # formula regardless — and OHOS ships no /usr/bin/clang, so users without
+  # llvm hit a "missing toolchain" error. A bottle sidesteps that entirely.
+  #
+  # Relocatability: the wrapper references other formulae (ohos-bst-light,
+  # ohos-compat-shim) via the runtime $HOMEBREW_PREFIX env var only — NO
+  # build-time path interpolation. `brew bottle` rejects HOMEBREW_PREFIX/Cellar
+  # -shaped baked paths in skip_relocation bottles (opencode r0 hit this), so
+  # baking the build machine's absolute prefix would odie. $HOMEBREW_PREFIX is
+  # exported by Harmonybrew's `brew shellenv`, which every user is expected to
+  # have eval'd.
 
   livecheck do
     url "https://www.npmjs.com/package/@anthropic-ai/claude-code-linux-arm64-musl"
-    regex(/"version":\s*"(\d+(?:\.\d+)+)"/)
+    regex(/"version":\s*"(\d+(?:\.\d+)+)"/i)
   end
 
-  # Claude Code from 2.1.113+ only ships Bun-compiled binaries (no plain JS).
-  # Use the linux-arm64-musl binary — musl ABI is compatible with OHOS.
-  # Downloaded from official npm registry. Users behind GFW may set proxy via
-  # ALL_PROXY / HTTP_PROXY environment variables, or use HOMEBREW_ARTIFACT_DOMAIN.
-  depends_on "ohos-bst-light"  => :build
-  depends_on "close-range-shim"
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.207-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c2993d7ec7b1a0dc4d1b5a47204189e1b7c1f646521c61080f6b76f130dfb1e"
+  end
+
+  depends_on "ohos-bst-light"
+  depends_on "ohos-compat-shim"
 
   def install
-    claude_bin = buildpath.glob("package/claude").first || buildpath.glob("**/claude").first
-    odie "claude binary not found in npm tarball" unless claude_bin
-
-    system Formula["ohos-bst-light"].opt_bin/"self-sign", claude_bin.to_s
-
-    libexec.install claude_bin => "claude"
-    chmod 0755, libexec/"claude"
-
+    # install() never downloads or references the official binary from buildpath,
+    # so it cannot end up in the bottle (compliance). Only the wrapper is staged.
     (bin/"claude").write <<~SH
       #!/bin/sh
-      export LD_PRELOAD="#{Formula["close-range-shim"].opt_lib}/libclose_range_shim.so${LD_PRELOAD:+:$LD_PRELOAD}"
+      set -e
+      : "${HOMEBREW_PREFIX:?claude-code: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
+      HB="$HOMEBREW_PREFIX"
+      VER="#{version}"
+      NPM_URL="#{stable.url}"
+      NPM_SHA="#{stable.checksum}"
+      CACHE="${CLAUDE_CODE_CACHE:-${HOMEBREW_CACHE:-$HOME/.cache/homebrew}/claude-code/$VER}"
+      BIN="$CACHE/claude"
+
+      if [ ! -x "$BIN" ]; then
+        mkdir -p "$CACHE"
+        TMP="$(mktemp -d)"
+        trap 'rm -rf "$TMP"' EXIT
+        echo "claude-code: fetching official binary $VER..." >&2
+        # NPM_URL = npmmirror (primary, see top-of-file curl SIGILL note);
+        # FALLBACK = registry.npmjs.org (helps non-buggy curl or mirror lag).
+        # sha256 below verifies integrity regardless of which source served it.
+        FALLBACK="https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-$VER.tgz"
+        fetched=0
+        for u in "$NPM_URL" "$FALLBACK"; do
+          curl -fL "$u" -o "$TMP/pkg.tgz" && { fetched=1; break; }
+        done
+        [ "$fetched" = 1 ] || { echo "claude-code: download failed from all mirrors" >&2; exit 1; }
+        if command -v sha256sum >/dev/null 2>&1; then
+          printf '%s  %s\\n' "$NPM_SHA" "$TMP/pkg.tgz" | sha256sum -c -
+        else
+          echo "claude-code: sha256sum not found, skipping integrity check" >&2
+        fi
+        tar -xzf "$TMP/pkg.tgz" -C "$TMP"
+        SRC="$TMP/package/claude"
+        [ -f "$SRC" ] || SRC="$(find "$TMP" -type f -name claude | head -n1)"
+        [ -f "$SRC" ] || { echo "claude-code: 'claude' binary not found in tarball" >&2; exit 1; }
+        "$HB/opt/ohos-bst-light/bin/self-sign" "$SRC"
+        mv "$SRC" "$BIN"
+        chmod 0755 "$BIN"
+      fi
+
+      export LD_PRELOAD="$HB/opt/ohos-compat-shim/lib/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
       export CLAUDE_CODE_TMPDIR="${CLAUDE_CODE_TMPDIR:-/data/storage/el2/base/cache}"
-      exec "#{libexec}/claude" "$@"
+      exec "$BIN" "$@"
     SH
     chmod 0755, bin/"claude"
   end
 
   def caveats
     <<~EOS
+      claude-code is installed as a runtime-fetch stub: the official binary is
+      NOT in the bottle (Anthropic License). The first `claude` invocation
+      downloads it (via the npmmirror mirror), self-signs it, and caches it under
+      $HOMEBREW_CACHE/claude-code/#{version}/ (override with CLAUDE_CODE_CACHE).
+
       Claude Code requires API credentials. Configure via environment variables:
 
         export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
@@ -58,6 +124,8 @@ class ClaudeCode < Formula
   end
 
   test do
-    assert_path_exists libexec/"claude"
+    # Don't run `claude --version` here: that would trigger the runtime fetch
+    # (network + signing) during `brew test`. Just assert the stub is installed.
+    assert_path_exists bin/"claude"
   end
 end
