@@ -1,8 +1,8 @@
 class Nuspell < Formula
   desc "Fast and safe spellchecking C++ library"
   homepage "https://nuspell.github.io/"
-  url "https://github.com/nuspell/nuspell/archive/refs/tags/v5.1.7.tar.gz"
-  sha256 "9aee944e86924ce44434741cb950fee8f9a6ff9c4f002803ab5f04698c8e4c68"
+  url "https://github.com/nuspell/nuspell/archive/refs/tags/v5.1.8.tar.gz"
+  sha256 "4221df51003a4406717440f617044e03f916dfcb900e2d1f13902c533b0969f8"
   license "LGPL-3.0-or-later"
 
   bottle do
