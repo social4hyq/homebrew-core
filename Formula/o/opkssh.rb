@@ -7,8 +7,7 @@ class Opkssh < Formula
   head "https://github.com/openpubkey/opkssh.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0eb7942b881990dd690f2f146d3e083cdcb12f5e7f77b8a099b6ccf0f51015dd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2fa0337c2bdaf02825e0ce1a0b6f6ff22353f1f55ddb1e7a1ea148f96e34260e"
   end
 
   depends_on "go" => :build
