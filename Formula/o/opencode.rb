@@ -5,7 +5,7 @@ class Opencode < Formula
   version "1.17.20"
   sha256 "4366d8623ebe5bbcecf655d77153803c7b0d59f8b9bda1cfafb11f0ee2ee460f"
   license "MIT"
-  revision 3
+  revision 5
   # opencode's official prebuilt linux-arm64-musl single binary (Bun --compile).
   # Bypasses the opencode-ai npm JS wrapper. The musl-ABI binary is
   # OHOS-compatible once its GCC runtime deps are provided (see resources).
@@ -16,9 +16,10 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.20-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef2611f2df81a6941ca1095b55ab5fcf63124cb03bc1e39766793f1356c3b1fe"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.20-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b112a7d061b55f0abeffbc6b5e5c455fe8e5c570f6255a02913a4a5870a8bb06"
   end
+
   # r1 fixed a real portability bug (not just the `brew bottle` check below):
   # HOMEBREW_CELLAR flips between HOMEBREW_PREFIX/Cellar and
   # HOMEBREW_REPOSITORY/Cellar depending on which happens to exist at brew
@@ -70,8 +71,8 @@ class Opencode < Formula
   # this generically.
   depends_on "ohos-bst-light" => :build
   depends_on "python@3.14"    => :build
-  depends_on "close-range-shim"
   depends_on "dlopen-sign-shim"
+  depends_on "ohos-compat-shim"
 
   resource "libstdc++" do
     url "https://dl-cdn.alpinelinux.org/alpine/latest-stable/main/aarch64/libstdc++-15.2.0-r5.apk"
@@ -200,7 +201,7 @@ class Opencode < Formula
     # libexec, for the same portability reason.
     (bin/"opencode").write <<~SH
       #!/bin/sh
-      export LD_PRELOAD="#{formula_opt_lib("dlopen-sign-shim")}/libdlopen_sign_shim.so:#{formula_opt_lib("close-range-shim")}/libclose_range_shim.so${LD_PRELOAD:+:$LD_PRELOAD}"
+      export LD_PRELOAD="#{formula_opt_lib("dlopen-sign-shim")}/libdlopen_sign_shim.so:#{formula_opt_lib("ohos-compat-shim")}/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
       export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
       exec "#{opt_libexec}/bin/opencode" "$@"
     SH
@@ -214,7 +215,7 @@ class Opencode < Formula
 
       This build bundles musl libstdc++/libgcc_s (Alpine) and injects a
       DT_RUNPATH at them, since OHOS lacks the GCC runtime. It also preloads
-      close-range-shim (OHOS seccomp blocks the close_range syscall).
+      ohos-compat-shim (OHOS seccomp blocks close_range and a few other syscalls).
     EOS
   end
 
