@@ -1,15 +1,18 @@
 class Codex < Formula
   desc "OpenAI Codex CLI — HarmonyOS aarch64 (Linux musl binary + OHOS signing)"
   homepage "https://github.com/openai/codex"
-  url "https://registry.npmjs.org/@openai/codex/-/codex-0.144.3-linux-arm64.tgz"
-  version "0.144.3"
-  sha256 "33384d62153cad2b197eaff2204c1da3d3e0c317c856cc14aa540254b25c69df"
+  url "https://registry.npmmirror.com/@openai/codex/-/codex-0.144.4-linux-arm64.tgz"
+  version "0.144.4"
+  sha256 "38461c769ce95e734a4200bb5e7aac8bbe8a8052603d648eae4afaa26ac066a7"
   license "Apache-2.0"
-  revision 3
   # Codex ships a native Rust binary per platform. We fetch the linux-arm64
   # platform package directly — the @openai/codex JS wrapper throws
   # "Unsupported platform: openharmony" on OHOS. The aarch64-unknown-linux-musl
   # static binary is OHOS-compatible after self-signing.
+  #
+  # Source mirrored on npmmirror: this ~120MB tgz from registry.npmjs.org
+  # (Cloudflare) SIGILLs brew's curl 8.21 on OHOS — see claude-code.rb for the
+  # full diagnosis. The file is byte-identical on both mirrors.
   #
   # binary-sign-tool (Harmonybrew's automatic post-install ELF signing pass,
   # HOMEBREW_OHOS_BOTTLE_BINARY_SIGN) reliably segfaults this specific binary
@@ -25,8 +28,8 @@ class Codex < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-v0.144.3-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cb2d39c6db27d798e1dce638c5569b6434a52596ffbdbbf4846d0717f3c1275"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-v0.144.4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a111acb32f119a4d9f0574d40a1b05b99fec0d3d6a297c421a49fa6d5abdfb9"
   end
 
   depends_on "ohos-bst-light" => :build
