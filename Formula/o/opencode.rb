@@ -63,9 +63,9 @@ class Opencode < Formula
   #
   # r3 extracted dlopen_sign_shim into its own formula (dlopen-sign-shim) —
   # it's a general OHOS compatibility shim, not opencode-specific (same
-  # category as close-range-shim / ohos-bst-light in this tap), and this
-  # drops opencode's own ohos-sdk :build dependency entirely since compiling
-  # the shim was the only thing that needed it.
+  # category as ohos-bst-light in this tap), and this drops opencode's own
+  # ohos-sdk :build dependency entirely since compiling the shim was the
+  # only thing that needed it.
 
   # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
   # runtime), which OHOS does NOT ship (OHOS uses libc++). We bundle musl-aarch64

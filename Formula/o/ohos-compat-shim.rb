@@ -6,13 +6,13 @@ class OhosCompatShim < Formula
   version "0.1.0"
   license "MIT"
 
+  livecheck do
+    skip "development tool, manually versioned"
+  end
+
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.1.0"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "0ae7dcd9fe30896487ce1c9a4ed1feefc871385beb522cb20b4bd95c12f5b6ca"
-  end
-
-  livecheck do
-    skip "development tool, manually versioned"
   end
 
   # HarmonyOS's application sandbox seccomp-filters several Linux syscalls
@@ -22,8 +22,7 @@ class OhosCompatShim < Formula
   # falls back to a userspace implementation when the real one fails in the
   # HarmonyOS-specific way — design rule is "prefer the real impl via
   # dlsym(RTLD_NEXT), fall back only on the documented symptom", so it's a
-  # safe no-op on any target where the real call already works. Same
-  # LD_PRELOAD .so category as close-range-shim in this tap.
+  # safe no-op on any target where the real call already works.
   depends_on "ohos-sdk" => :build
 
   def install
