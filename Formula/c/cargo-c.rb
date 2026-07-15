@@ -1,8 +1,8 @@
 class CargoC < Formula
   desc "Helper program to build and install c-like libraries"
   homepage "https://github.com/lu-zero/cargo-c"
-  url "https://github.com/lu-zero/cargo-c/archive/refs/tags/v0.10.23.tar.gz"
-  sha256 "17679af6c00a70ce1d70668023e993045539afdc7ab0ca1a081aa8ef6993a595"
+  url "https://github.com/lu-zero/cargo-c/archive/refs/tags/v0.10.24.tar.gz"
+  sha256 "91c6e0be34aa0ad26b7ef21ce21a390c95635e4e6e00b7a6ff07323f9af8550b"
   license "MIT"
 
   livecheck do
@@ -11,7 +11,7 @@ class CargoC < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b59d8ff1f5af9a6fec549f0e24f14b36e80279959fad98d6a64ea2c3828e600"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c5ac6d23e0b4b59bf86117e9874da4b616809e0b0651fa1064c3bed3862e9a1"
   end
 
   depends_on "pkgconf" => :build
