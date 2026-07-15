@@ -1,8 +1,8 @@
 class Groonga < Formula
   desc "Fulltext search engine and column store"
   homepage "https://groonga.org/"
-  url "https://github.com/groonga/groonga/releases/download/v16.0.5/groonga-16.0.5.tar.gz"
-  sha256 "1b56c83929853a21990ada02621a5fea23e22093badf419ac71bf7e85d234393"
+  url "https://github.com/groonga/groonga/releases/download/v16.0.8/groonga-16.0.8.tar.gz"
+  sha256 "cdd27b34f1b8bd3b1b59c2278fd5d6f7cd123d2a9366d23be0a08833b00ec000"
   license "LGPL-2.1-or-later"
   compatibility_version 1
   head "https://github.com/groonga/groonga.git", branch: "main"
@@ -13,7 +13,7 @@ class Groonga < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e109033e29291ee39c9c6ea28d68b5b897a455938e80b0d7dd6ddaf0d6a57217"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc84de155c260098f26900130d01a140cec5b1dbda483969022379a5958f1ddb"
   end
 
   depends_on "cmake" => :build
