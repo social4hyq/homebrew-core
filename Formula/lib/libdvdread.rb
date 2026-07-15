@@ -1,8 +1,8 @@
 class Libdvdread < Formula
   desc "C library for reading DVD-video images"
   homepage "https://www.videolan.org/developers/libdvdnav.html"
-  url "https://download.videolan.org/pub/videolan/libdvdread/7.0.1/libdvdread-7.0.1.tar.xz"
-  sha256 "2e3e04a305c15c3963aa03ae1b9a83c1d239880003fcf3dde986d3943355d407"
+  url "https://download.videolan.org/pub/videolan/libdvdread/7.1.0/libdvdread-7.1.0.tar.xz"
+  sha256 "0bab58b7fbbc22a4a8497435eda7c88c20ba5b575da22d1ee2c6842c16dae8ea"
   license "GPL-2.0-or-later"
   compatibility_version 1
   head "https://code.videolan.org/videolan/libdvdread.git", branch: "master"
@@ -13,7 +13,7 @@ class Libdvdread < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c788ca946a1b18ba37819b5b0de559645b9db896d7c30f024f86f901f0976a1d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad55931dc1cfa528c278f210f35d47fa9162519b6561e70ec6d13188756d9d7f"
   end
 
   depends_on "meson" => :build
