@@ -12,7 +12,7 @@ class NodeExporter < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "54d75e348e85d0d45f929c8da14d66d161e5261427269531c4c0fccaff04e119"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "508513bffa636b5ed3c49157310dad3d077ec1ae5a0e6f9c4d7da2322b498378"
   end
 
   depends_on "go" => :build
