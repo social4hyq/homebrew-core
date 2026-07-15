@@ -15,7 +15,7 @@ class Coder < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "63a1c853ca3a65a4a288d18a1fe02036bea52c60c7c886c28ea246799125e9f0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "27df42a8afb0b1575c996f8a51b3aa1c8a8764de7bbd19c427557397e620e3c6"
   end
 
   depends_on "go" => :build
