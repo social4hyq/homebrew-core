@@ -1,8 +1,8 @@
 class Libbcg729 < Formula
   desc "Encoder and decoder of the ITU G.729 Annex A/B speech codec"
   homepage "https://www.linphone.org"
-  url "https://github.com/BelledonneCommunications/bcg729/archive/refs/tags/1.1.1.tar.gz"
-  sha256 "68599a850535d1b182932b3f86558ac8a76d4b899a548183b062956c5fdc916d"
+  url "https://github.com/BelledonneCommunications/bcg729/archive/refs/tags/1.1.2.tar.gz"
+  sha256 "9c22d98c2debc1e37163b8a703f05278ad5d9c03f1c6b373629d8a072092184a"
   license "GPL-3.0-only"
   head "https://github.com/BelledonneCommunications/bcg729.git", branch: "master"
 
