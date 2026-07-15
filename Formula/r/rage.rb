@@ -12,7 +12,7 @@ class Rage < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2442377fbb2bc975eceb04e0d9b2147b4969e4a62c0dfc6598de5ad4d41418e9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "449fefb01795b10b8614bd4f605b22be095d854a5fc4777d7faba674c761ca89"
   end
 
   depends_on "rust" => :build
