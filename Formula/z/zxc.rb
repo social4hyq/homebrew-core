@@ -1,8 +1,8 @@
 class Zxc < Formula
   desc "High-performance asymmetric lossless compression library"
   homepage "https://github.com/hellobertrand/zxc"
-  url "https://github.com/hellobertrand/zxc/archive/refs/tags/v0.12.0.tar.gz"
-  sha256 "2de4e21a4ecb33a71ba04b052b94d4e4f9882c85851d2142863f8629a9e06623"
+  url "https://github.com/hellobertrand/zxc/archive/refs/tags/v0.13.0.tar.gz"
+  sha256 "2e7f960c37c8c0225bba122d17dcefda1597f3a98e9822611a6963416b769e8b"
   license "BSD-3-Clause"
   head "https://github.com/hellobertrand/zxc.git", branch: "main"
 
