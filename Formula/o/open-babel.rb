@@ -1,13 +1,19 @@
 class OpenBabel < Formula
   desc "Chemical toolbox"
   homepage "https://github.com/openbabel/openbabel"
-  url "https://github.com/openbabel/openbabel/archive/refs/tags/openbabel-3-2-0.tar.gz"
-  sha256 "9aadf9f01b3d0ff15d49fcd28d7d76b923218d70bf10f99ea4cc466607f4c7e2"
+  url "https://github.com/openbabel/openbabel/archive/refs/tags/openbabel-3-2-1.tar.gz"
+  version "3.2.1"
+  sha256 "e140c25480fe1678d00b9a52462368fa4e7805fba67b12ee496784437f3e239e"
   license "GPL-2.0-only"
   head "https://github.com/openbabel/openbabel.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec78bbe4209abdb9ddc7059b8b0cba5e0af9a6ff01db2aafa06f255fd86e34bd"
+    sha256 arm64_tahoe:   "d667891c9d9c49a9d60e67cc328614b77424c2d8d5bfcaa5c6566355596961b0"
+    sha256 arm64_sequoia: "5e3c5353ffcd0dc7ca0ecf6dd675d237c572ef05fc53fd88b2d3fa80af739ba1"
+    sha256 arm64_sonoma:  "2324ac199cb685f82b502680dafe7f6be0bbcfcc7d8ee9cd68f70c1bcc101a94"
+    sha256 sonoma:        "6a8e5be4171c9c7ab552226d3a0f8f9a5873f12c8ab83581679f90d969493ae5"
+    sha256 arm64_linux:   "a224c4ad98f57e8492688c854a70982d9955e545f0ae88b0960b6d29e05d1188"
+    sha256 x86_64_linux:  "741ab890bea667e2129f3ca9d4d218ed5cd59a33af0f8d4fdb9b617539fa53ca"
   end
 
   depends_on "cmake" => :build
@@ -34,7 +40,7 @@ class OpenBabel < Formula
 
   def install
     args = %W[
-      -DINCHI_INCLUDE_DIR=#{Formula["inchi"].opt_include}/inchi
+      -DINCHI_INCLUDE_DIR=#{formula_opt_include("inchi")}/inchi
       -DOPENBABEL_USE_SYSTEM_INCHI=ON
       -DRUN_SWIG=ON
       -DPYTHON_BINDINGS=ON
