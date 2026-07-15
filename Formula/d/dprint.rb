@@ -1,13 +1,13 @@
 class Dprint < Formula
   desc "Pluggable and configurable code formatting platform written in Rust"
   homepage "https://dprint.dev/"
-  url "https://github.com/dprint/dprint/archive/refs/tags/0.55.1.tar.gz"
-  sha256 "ea59bc3c688182b32ba8f4f6f17a720da460f70c9f8ba57fb9735334c749c463"
+  url "https://github.com/dprint/dprint/archive/refs/tags/0.55.2.tar.gz"
+  sha256 "66291b68f34a8fbac53fda9a367a1fae31f620c6fd913c1004342b3c8aff0779"
   license "MIT"
   head "https://github.com/dprint/dprint.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a4151e612bedeeb80ea9213b004d91349e553f2ab7903b3cf42eb22ca9b1a7e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9401beece547a8cecf2b755396e362666d0ccddeecbfc8ba8eb24263e4a8e588"
   end
 
   depends_on "pkgconf" => :build
