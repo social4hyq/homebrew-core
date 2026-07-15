@@ -8,7 +8,7 @@ class Skalibs < Formula
   head "git://git.skarnet.org/skalibs.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fabbf70e55faf4aa144213384b4c7c7b6f099ce7f17aada31a79c1014f75d6b5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "21453d581e9a1c1912a8ee4c7af3c0f13478e2551db8f5da763cbc584abf1e6f"
   end
 
   def install
