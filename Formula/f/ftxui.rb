@@ -1,13 +1,13 @@
 class Ftxui < Formula
   desc "C++ Functional Terminal User Interface"
   homepage "https://github.com/ArthurSonzogni/FTXUI"
-  url "https://github.com/ArthurSonzogni/FTXUI/archive/refs/tags/v7.0.0.tar.gz"
-  sha256 "14bef1f8caff548c49af8eeadfca21910d66e93e68237f0c3d20236b60c01e7e"
+  url "https://github.com/ArthurSonzogni/FTXUI/archive/refs/tags/v7.0.1.tar.gz"
+  sha256 "80f544bb47fab24d3e57bc561324da228c050b3f2e8683fe806883ca5cd561a2"
   license "MIT"
   head "https://github.com/ArthurSonzogni/FTXUI.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b79952e72dabc15196915fa0e8fbac263aa04a19bc6dc8277672426d691ae0b4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f88b4fafae20dbf7b952ba0d89ca8f2d54be9292a9a70e3ecf1dd7491b4cf8fe"
   end
 
   depends_on "cmake" => :build
