@@ -1,14 +1,15 @@
 class Opencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64 (prebuilt musl binary)"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://registry.npmjs.org/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-1.17.20.tgz"
-  version "1.17.20"
-  sha256 "4366d8623ebe5bbcecf655d77153803c7b0d59f8b9bda1cfafb11f0ee2ee460f"
+  url "https://registry.npmmirror.com/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-1.18.1.tgz"
+  version "1.18.1"
+  sha256 "0eac979da5470b4b5b61783e464926f5e1d5adee4b37d9ce4298b59b898a5c51"
   license "MIT"
-  revision 5
   # opencode's official prebuilt linux-arm64-musl single binary (Bun --compile).
   # Bypasses the opencode-ai npm JS wrapper. The musl-ABI binary is
   # OHOS-compatible once its GCC runtime deps are provided (see resources).
+  # Source mirrored on npmmirror for the same curl-SIGILL reason as codex /
+  # claude-code (see claude-code.rb); byte-identical on both mirrors.
 
   livecheck do
     url "https://registry.npmjs.org/opencode-ai/latest"
@@ -16,8 +17,17 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.20-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b112a7d061b55f0abeffbc6b5e5c455fe8e5c570f6255a02913a4a5870a8bb06"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.1"
+    # `brew bottle` emits `cellar: "<HOMEBREW_CELLAR>"` (not :any_skip_relocation)
+    # for this formula: the RUNPATH injected into the ELF (inject-runpath.py
+    # below) is an absolute HOMEBREW_PREFIX/opt/... path, and the bottle
+    # auditor flags any absolute-prefix reference in an ELF. We keep
+    # :any_skip_relocation anyway — every baked reference is opt/-relative (no
+    # Cellar path), the opt/<name> symlink is recreated on every pour, and
+    # HOMEBREW_PREFIX is constant across build/target machines — so the bottle
+    # pours identically regardless of the flat/nested HOMEBREW_CELLAR flip.
+    # Verified on the real machine for r5 (1.17.20) and 1.18.1.
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c41d27056baf123ffa41fa8af37bd71ecbd87e6534f3dbe0f98da8577e1db91"
   end
 
   # r1 fixed a real portability bug (not just the `brew bottle` check below):
