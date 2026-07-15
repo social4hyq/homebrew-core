@@ -1,8 +1,8 @@
 class NodeExporter < Formula
   desc "Prometheus exporter for machine metrics"
   homepage "https://prometheus.io/"
-  url "https://github.com/prometheus/node_exporter/archive/refs/tags/v1.12.0.tar.gz"
-  sha256 "2b759f480fbb9bb756d051e2c6c0bc5f1a6bfc3720db734b6b5be7f4e24f45d7"
+  url "https://github.com/prometheus/node_exporter/archive/refs/tags/v1.12.1.tar.gz"
+  sha256 "a90f1df0fde58d216d4a7d342e64831d2e3257db8084deadbe69754d34b15142"
   license "Apache-2.0"
   head "https://github.com/prometheus/node_exporter.git", branch: "master"
 
@@ -12,7 +12,7 @@ class NodeExporter < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "54d75e348e85d0d45f929c8da14d66d161e5261427269531c4c0fccaff04e119"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "508513bffa636b5ed3c49157310dad3d077ec1ae5a0e6f9c4d7da2322b498378"
   end
 
   depends_on "go" => :build
