@@ -1,4 +1,12 @@
 class CloseRangeShim < Formula
+  # DEPRECATED — superseded by ohos-compat-shim (social4hyq/ohos-compat-shim),
+  # a strict superset: identical close_range() / syscall(SYS_close_range) handling
+  # (same probe-then-fallback pattern, this is its upstream), PLUS getpwuid_r,
+  # tmpfile, getcwd and fchmodat2 interceptors that the same class of prebuilt
+  # musl binaries also needs on OHOS. New formulae should `depends_on
+  # "ohos-compat-shim"` instead. This formula is retained only so existing
+  # `brew install close-range-shim` users are not broken; no formula in this
+  # tap depends on it anymore (opencode, codex and claude-code all moved off it).
   desc "LD_PRELOAD shim to handle close_range syscall interception on HarmonyOS"
   homepage "https://github.com/hqzing/close-range-shim"
   url "https://github.com/hqzing/close-range-shim.git",
