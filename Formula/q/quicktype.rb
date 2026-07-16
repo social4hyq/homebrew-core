@@ -6,7 +6,7 @@ class Quicktype < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aed1895c6485cd82ccabdcdc089a5f82baf4d1e33790ea26412d62f8162d6afb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "76bf83fb96a83bda49fa70c0564079d4f06ae1a4f055418574c86132278cf368"
   end
 
   depends_on "node"
