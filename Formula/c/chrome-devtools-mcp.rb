@@ -6,7 +6,7 @@ class ChromeDevtoolsMcp < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4004c63d98ef4d7e936de4a523a828b98d0b565528e705f5d1a700a8eb1d485"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "63eb18fb00ad9c3b11b77b380e4b7bf90652f0b07f9c9e55338ba0ef7de03c47"
   end
 
   depends_on "node"
