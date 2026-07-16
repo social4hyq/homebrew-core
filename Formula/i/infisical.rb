@@ -7,7 +7,7 @@ class Infisical < Formula
   head "https://github.com/Infisical/cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad5c6b58a128586c1bcc04753ee3f0044ebfa10fa6ff455f7e978dcb95bf54ab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "492ebbd4cc5865391559d26d05afedce344c98cfd56de2f99d4d4bbe5147600c"
   end
 
   depends_on "go" => :build
