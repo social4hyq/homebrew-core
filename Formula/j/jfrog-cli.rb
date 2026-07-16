@@ -15,7 +15,7 @@ class JfrogCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fda6d875dc7e63ab29916319b1b8bafac81629d0de1baa29ecae655c7bdafb2a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "84ae9a88643daf4258e52795d7b03a9f6ed677a2335496ef0041771734595a74"
   end
 
   depends_on "go" => :build
