@@ -1,8 +1,8 @@
 class AwsLc < Formula
   desc "General-purpose cryptographic library"
   homepage "https://github.com/aws/aws-lc"
-  url "https://github.com/aws/aws-lc/archive/refs/tags/v5.1.0.tar.gz"
-  sha256 "a6bf6adfc5f9bba559d28554b7d3581b15f2813f03bc9f2ae19f0d915e97dadf"
+  url "https://github.com/aws/aws-lc/archive/refs/tags/v5.2.0.tar.gz"
+  sha256 "f9ad6bde29eb9c8ce585085d9a12bb2ffe89bfd940a631f760eeb1b2d9b2d1a7"
   license all_of: ["Apache-2.0", "ISC", "OpenSSL", "MIT", "BSD-3-Clause"]
 
   livecheck do
@@ -11,7 +11,7 @@ class AwsLc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd484487971a6958c5c8c1225a312bd3189f8a2e579f841fe63ea8fb6a71bacb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aafa1460fce3b18430364db67ccfe1fcc6318a92f7c320afa1f3cf9091af482f"
   end
 
   keg_only "it conflicts with OpenSSL"
