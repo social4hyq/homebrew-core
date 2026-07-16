@@ -1,12 +1,12 @@
 class MarkdownlintCli < Formula
   desc "CLI for Node.js style checker and lint tool for Markdown files"
   homepage "https://github.com/igorshubovych/markdownlint-cli"
-  url "https://registry.npmjs.org/markdownlint-cli/-/markdownlint-cli-0.49.0.tgz"
-  sha256 "7ee7906ac4ccedcc59c24af24a2a78eb185d70a0d8c852825579a39b76d3d6c6"
+  url "https://registry.npmjs.org/markdownlint-cli/-/markdownlint-cli-0.49.1.tgz"
+  sha256 "3a98ad54490c1589bb5fd3ecc863eb2d76e7b25191b3a0b98b885f2d97431b8c"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "444caed15414016c24753d2156bf0318617ade66360804f27d3ba563463c9db6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0afcb28511c2c54e9efa13a022094b08386dc82a768c61f262fd2bcad8fc4400"
   end
 
   depends_on "node"
