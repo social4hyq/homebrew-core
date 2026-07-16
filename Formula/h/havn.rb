@@ -6,7 +6,7 @@ class Havn < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "19db3c3737a1958f4768c5872f518a2739967e298ecef12109bcc0e1c315749b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6acd50b2e44f2edd81d766c5e0ddab059fd574f7043b6d900e138779c9f03add"
   end
 
   depends_on "rust" => :build
