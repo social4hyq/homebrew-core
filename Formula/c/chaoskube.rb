@@ -1,8 +1,8 @@
 class Chaoskube < Formula
   desc "Periodically kills random pods in your Kubernetes cluster"
   homepage "https://github.com/linki/chaoskube"
-  url "https://github.com/linki/chaoskube/archive/refs/tags/v0.39.0.tar.gz"
-  sha256 "70260e47101cf0735c6190fafb5ab273e5003803d332496063398fe9b18c1368"
+  url "https://github.com/linki/chaoskube/archive/refs/tags/v0.39.1.tar.gz"
+  sha256 "2228937790850075ca424bbfa221172fc0be0d1b3fb3c2d755dab7101945a5dd"
   license "MIT"
   head "https://github.com/linki/chaoskube.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Chaoskube < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d97bffc8fbccf1669229228b24904325f0b7f6a55a935e6b955b075a0c0c6e0c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e577f2b2e91d4a5dccd16c0c209167764c9c8ddd506992ce6067acdd28973839"
   end
 
   depends_on "go" => :build
