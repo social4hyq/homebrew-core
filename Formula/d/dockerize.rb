@@ -7,7 +7,7 @@ class Dockerize < Formula
   head "https://github.com/jwilder/dockerize.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61520d486a1a930442ad86643183de9a7750b993585294bfc6c9a88fa2080b2d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e5cfe9fac6fb4bce6db92c0f3e6049b82ca30a77163177d913ba9f3e20a6e17"
   end
 
   depends_on "go" => :build
