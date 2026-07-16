@@ -1,12 +1,12 @@
 class Ucloud < Formula
   desc "Official tool for managing UCloud services"
   homepage "https://www.ucloud.cn"
-  url "https://github.com/ucloud/ucloud-cli/archive/refs/tags/v0.3.7.tar.gz"
-  sha256 "1e2c0d418ef1f916f1c7659fff1de298ebfdd28f6f343cd40d31a37c57366b2a"
+  url "https://github.com/ucloud/ucloud-cli/archive/refs/tags/v0.3.8.tar.gz"
+  sha256 "2f47fa612d340b9bc19e792e4e58078b42a2f8d2e1c67c1801735a82e9ce5429"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "13dfda5d33cbb4358b6c04d29b7cb9f3603469bf1f67560a72efef4e06954f82"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "025e1d0d4753af8dccd40e31c7cd5a43c2003456fbc39f4fe1b119b37aa92343"
   end
 
   depends_on "go" => :build
