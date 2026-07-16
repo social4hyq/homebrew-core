@@ -15,7 +15,7 @@ class Nginx < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8653f0985af541b3b22f1885aad4b9df3d028ea6d6685c475549aaf162d2111e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b0d96a77509065fa8c02800dd910e6a13944a1a78109613f4f4d56f3ea94678"
   end
 
   depends_on "openssl@3"
