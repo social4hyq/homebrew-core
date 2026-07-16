@@ -1,13 +1,13 @@
 class Zxc < Formula
   desc "High-performance asymmetric lossless compression library"
   homepage "https://github.com/hellobertrand/zxc"
-  url "https://github.com/hellobertrand/zxc/archive/refs/tags/v0.13.0.tar.gz"
-  sha256 "2e7f960c37c8c0225bba122d17dcefda1597f3a98e9822611a6963416b769e8b"
+  url "https://github.com/hellobertrand/zxc/archive/refs/tags/v0.13.1.tar.gz"
+  sha256 "db8a1882bc1899a602d71b0b3f81995ef73162dbefe8c4b2a3f9f8b9f8b4b673"
   license "BSD-3-Clause"
   head "https://github.com/hellobertrand/zxc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b9f7233b3061dd697fb982d349051efbdcce40f3dab536cbbdf6ee711ecb997"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1161cc4bbd9d7b4af70dcb451c2c81322005142f85dc20f6c11715956e961492"
   end
 
   depends_on "cmake" => :build
