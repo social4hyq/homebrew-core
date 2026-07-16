@@ -7,7 +7,7 @@ class Cntb < Formula
   head "https://github.com/contabo/cntb.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d01061a9b3623fa36d82ae4558316d7d583f80faec40d14ce3290e162b715e7c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c09e76a7890f60ad8572a206bac7fd012766a626012d71afd14997a396cd540"
   end
 
   depends_on "go" => :build
