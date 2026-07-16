@@ -1,8 +1,8 @@
 class Ripgrep < Formula
   desc "Search tool like grep and The Silver Searcher"
   homepage "https://github.com/BurntSushi/ripgrep"
-  url "https://github.com/BurntSushi/ripgrep/archive/refs/tags/15.1.0.tar.gz"
-  sha256 "046fa01a216793b8bd2750f9d68d4ad43986eb9c0d6122600f993906012972e8"
+  url "https://github.com/BurntSushi/ripgrep/archive/refs/tags/15.2.0.tar.gz"
+  sha256 "7605249d3eb0d5f170e3414498e3344e26b1e7a147aec518b57090b80036a562"
   license "Unlicense"
   compatibility_version 1
   head "https://github.com/BurntSushi/ripgrep.git", branch: "master"
@@ -13,7 +13,7 @@ class Ripgrep < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c3834f8667477e6f2d04f461c0279fe14268606e6e87ec0ae8126a44b787fa9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d68e65d2c6a7ff921aa41b1b48f641d5f7b305af9f0b9084dbc47926384b0bb"
   end
 
   depends_on "asciidoctor" => :build
