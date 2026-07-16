@@ -12,7 +12,7 @@ class AwsVault < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9c88b2e055cd1e69534e691f30c75ea2e322f353437fb02e4a09fc6bd08eaa9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "36b072b9dae6971cd3d0b94276b7e7cea291e2a5fa59ee718eca9052d881ea8f"
   end
 
   depends_on "go" => :build
