@@ -6,7 +6,7 @@ class Nuspell < Formula
   license "LGPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b5b85f73defda118935fa0755882680be21eff227efa21054db8a681b6eef51"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea68116d48aa3e70f2b98295f3b33e807bba6463e085b23c3b4dc048a25536c4"
   end
 
   depends_on "cmake" => :build
