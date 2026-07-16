@@ -1,13 +1,13 @@
 class Gonzo < Formula
   desc "Log analysis TUI"
   homepage "https://gonzo.controltheory.com/"
-  url "https://github.com/control-theory/gonzo/archive/refs/tags/v0.4.2.tar.gz"
-  sha256 "1b7509fcbc27b571cd52359799d3e7bddce020b5088304d3ff9c0911a65dd78e"
+  url "https://github.com/control-theory/gonzo/archive/refs/tags/v0.4.3.tar.gz"
+  sha256 "cc9b0c79238f39b18f05ac5076c286166984d55056e8583fd9964b6594f7409f"
   license "MIT"
   head "https://github.com/control-theory/gonzo.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa3cc02eb0dd1ede369728ab8eda6ca44b0318c85f2c0444714e2d08e41f521f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03dfb8f2437ec43e06554caa1c52733f70a44b145769c0370df43d7881a45e41"
   end
 
   depends_on "go" => :build
