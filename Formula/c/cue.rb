@@ -2,8 +2,8 @@ class Cue < Formula
   desc "Validate and define text-based and dynamic configuration"
   homepage "https://cuelang.org/"
   url "https://github.com/cue-lang/cue.git",
-      tag:      "v0.17.0",
-      revision: "0fc639bbe9819f08ed132d3981a13ac2e3bf330f"
+      tag:      "v0.17.1",
+      revision: "fc6c0b2ecd3666da92f7053d13fcfbf009b7d7a3"
   license "Apache-2.0"
   head "https://github.com/cue-lang/cue.git", branch: "master"
 
