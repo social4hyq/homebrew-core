@@ -7,7 +7,7 @@ class Superseedr < Formula
   head "https://github.com/Jagalite/superseedr.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a355b8e990de5180728252dee3e48e3afc26f040dd46f91c6f6355fb353a06cd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "30fff1d04f31da57092a15ffa4ca74cb947b8143a7e9dd0c2aae1698540bde40"
   end
 
   depends_on "pkgconf" => :build
