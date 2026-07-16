@@ -1,8 +1,8 @@
 class OhMyPosh < Formula
   desc "Prompt theme engine for any shell"
   homepage "https://ohmyposh.dev"
-  url "https://github.com/JanDeDobbeleer/oh-my-posh/archive/refs/tags/v29.28.0.tar.gz"
-  sha256 "2fc263e93a51f40d2e8defb85b9d610866f54eb2ee547724bff0c8c70f9182ac"
+  url "https://github.com/JanDeDobbeleer/oh-my-posh/archive/refs/tags/v29.31.0.tar.gz"
+  sha256 "4f20b2516cc38757656f456225408344d881333b9fb0f68bf4455d30b06fe91a"
   license "MIT"
   head "https://github.com/JanDeDobbeleer/oh-my-posh.git", branch: "main"
 
@@ -15,7 +15,7 @@ class OhMyPosh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8cffe5ebae07100a0d3baf611960634931cea32c18b5c6ca6bce92369fff4df3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "34a6bf35cf3a2b0aaf701d11ba35b5647056dd43e3e92b359f043dc3f2cbbe3a"
   end
 
   depends_on "go" => :build
