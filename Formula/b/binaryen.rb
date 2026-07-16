@@ -12,7 +12,7 @@ class Binaryen < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6667d48b4d058a47019c5964e8f7999a1fa1fe67a1cc1f8b87e5129fbfa6a69f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b935805c82bc6a2a203b72ca144333752058e77a2efc1715850b9a0c7c9e9950"
   end
 
   depends_on "cmake" => :build
