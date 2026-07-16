@@ -1,13 +1,13 @@
 class Cntb < Formula
   desc "Contabo Command-Line Interface (CLI)"
   homepage "https://github.com/contabo/cntb"
-  url "https://github.com/contabo/cntb/archive/refs/tags/v1.6.tar.gz"
-  sha256 "70ba41e521283574f46afa8a1e4a9ee6244fa641568c24b5414304f2fc4c89f7"
+  url "https://github.com/contabo/cntb/archive/refs/tags/v1.7.tar.gz"
+  sha256 "bd8f1aa809496b69ec86c60dfd1b1aacf511a7f286d3f15c012561aae0e89b82"
   license "GPL-3.0-only"
   head "https://github.com/contabo/cntb.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d01061a9b3623fa36d82ae4558316d7d583f80faec40d14ce3290e162b715e7c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c09e76a7890f60ad8572a206bac7fd012766a626012d71afd14997a396cd540"
   end
 
   depends_on "go" => :build
