@@ -13,7 +13,7 @@ class Ripgrep < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c3834f8667477e6f2d04f461c0279fe14268606e6e87ec0ae8126a44b787fa9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d68e65d2c6a7ff921aa41b1b48f641d5f7b305af9f0b9084dbc47926384b0bb"
   end
 
   depends_on "asciidoctor" => :build
