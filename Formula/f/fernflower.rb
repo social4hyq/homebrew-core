@@ -2,8 +2,8 @@ class Fernflower < Formula
   desc "Advanced decompiler for Java bytecode"
   homepage "https://github.com/JetBrains/fernflower"
   # This project employs synchronized versioning so the sha256 may not change on version bumps
-  url "https://www.jetbrains.com/intellij-repository/releases/com/jetbrains/intellij/java/java-decompiler-engine/261.26222.65/java-decompiler-engine-261.26222.65.jar"
-  sha256 "42c80bd7ffbd27f156f949040da2db04c5d1c230a05931cc4bf75d10adeb1cb0"
+  url "https://www.jetbrains.com/intellij-repository/releases/com/jetbrains/intellij/java/java-decompiler-engine/262.8665.258/java-decompiler-engine-262.8665.258.jar"
+  sha256 "2885f0ff6526eb5791367c21055f685b8f9010cb841666cccaec7fc248a6d5e7"
   license "Apache-2.0"
 
   livecheck do
