@@ -7,7 +7,7 @@ class Libbcg729 < Formula
   head "https://github.com/BelledonneCommunications/bcg729.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aeb1dbd17ab85588a451d047ffe1ad89c10e67fca7bcfb71ccdb43f076ef684c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "adc629e6f6dcc23fbb289999c030a16fda7e8f7901af24f96b4f282c8be37b71"
   end
 
   depends_on "cmake" => :build
