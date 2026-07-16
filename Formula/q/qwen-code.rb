@@ -6,7 +6,7 @@ class QwenCode < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec666e8f3bd5e29f68ac44eb8e0a53d34075b910b9013010a75034640ed76ac7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e428c20d83346b94841ce202afc2257b5fd8af3a02b84677604821fc67328476"
   end
 
   depends_on "node"
