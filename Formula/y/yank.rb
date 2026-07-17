@@ -6,7 +6,7 @@ class Yank < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1f4b04026c14f5d8c8508fc64c8c30fc7577d5f5f32debce668fed381e59a20"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3144ab677359c46ff485440f666a83971a39cecb708e55d25b9a74645bff2144"
   end
 
   on_linux do
