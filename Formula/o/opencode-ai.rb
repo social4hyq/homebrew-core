@@ -51,8 +51,12 @@ class OpencodeAi < Formula
     # build.ts defaults to running `bun install --os=* --cpu=*` to pull all-platform native variants, but it
     # depends on Bun.$ → on OHOS, sh cannot exec bun from PATH (EPERM), so we pass --skip-install to skip the
     # internal version in build.ts and invoke it directly here, avoiding the broken $ path.
-    # Native variants for openharmony are provided by the @ohos-ports/* overrides, so no
-    # manual `--os=linux --cpu=arm64` installs are needed.
+    #
+    # @ohos-ports/opentui-core's loader maps openharmony-arm64 → @opentui/core-linux-arm64-musl
+    # (musl ABI compatible), but bun's os filter skips linux optional deps on openharmony, so the
+    # musl variant must be pulled explicitly. bun's installer auto-signs the shipped libopentui.so.
+    # Version must match the @opentui/core override in package.json.
+    system "bun", "install", "--os=linux", "--cpu=arm64", "@opentui/core-linux-arm64-musl@0.4.3"
 
     # Bun runtime symlink: Bun.build({compile: {target: "bun-linux-arm64-musl"}}) expects a local bun
     bun_runtime = buildpath/"packages/opencode/bun-linux-aarch64-musl-v1.4.0"
