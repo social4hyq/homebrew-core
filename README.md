@@ -65,7 +65,7 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 | `codex` | 0.144.5（2026-07-17） | OpenAI Codex CLI；从 npmmirror 拉取 `linux-arm64` musl 静态二进制 + `ohos-bst-light` 自签；内置 ripgrep 替换为本 tap 的 musl 版 |
 | `claude-code` | 2.1.212（2026-07-17） | Anthropic Claude Code CLI；**runtime-fetch stub**（Anthropic License 不允许重分发官方二进制），首次运行拉取 + 自签 + 缓存 |
 | `grok-build` | 0.2.102（2026-07-17） | xAI Grok Build CLI；完全静态 ELF，仅 `ohos-bst-light` self-sign，无需 shim/RUNPATH |
-| `bun` | 1.4.0 r29 @ `62b00a06`（openharmony，2026-07-15） | Bun JavaScript runtime；运行时签名由内置 `ohos_sign` crate 承担；`bin/bun` 包装脚本 LD_PRELOAD `ohos-compat-shim` |
+| `bun` | 1.4.0 r30 @ `87e50375`（ohos-aarch64，2026-07-17） | Bun JavaScript runtime；已并入 upstream main `6618e7f7e`；运行时签名由内置 `ohos_sign` crate 承担；`bin/bun` 包装脚本 LD_PRELOAD `ohos-compat-shim` |
 | `bun-bootstrap` | 1.4.0-5467a689（2026-07-07） | 预编译 bun，用来启动 `bun bd` 自举本机 bun；已内置 ohos_sign，无需 ohos-sdk（`keg_only`） |
 | `bun-webkit` | `4895f45dfb`（2026-07-17） | JavaScriptCore / WTF / bmalloc 静态库，bun 专用 WebKit fork（`keg_only`） |
 | `bun-pty` | 0.4.10（2026-06-15） | `librust_pty.so`，portable-pty + nix 0.31 OHOS 支持（`keg_only`，供 `opencode-ai` 构建用） |
@@ -91,7 +91,7 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 | `bun-pty` | `bun-pty-v0.4.10-r2` |
 | `lightningcss` | `lightningcss-v1.30.1-r2` |
 | `tailwindcss-oxide` | `tailwindcss-oxide-v4.1.11-r2` |
-| `bun` | `bun-v1.4.0-r29` |
+| `bun` | `bun-v1.4.0-r30`（2026-07-17，容器构建） |
 | `opencode` | `opencode-v1.18.3`（prebuilt，非本仓库源码构建） |
 | `opencode-ai` | `opencode-v1.17.15-r1` |
 | `codex` | `codex-v0.144.5` |

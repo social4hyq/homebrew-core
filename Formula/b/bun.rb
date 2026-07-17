@@ -4,12 +4,12 @@ class Bun < Formula
   # This formula is fully rewritten from upstream because Bun on HarmonyOS requires
   # 50+ OHOS-specific patches, L4 self-bootstrap via bun-bootstrap, a
   # pre-populated WebKit cache, and a Rust nightly toolchain with -Zbuild-std.
-  # All patches are pre-applied on the openharmony branch of social4hyq/ohos-bun.
+  # All patches are pre-applied on the ohos-aarch64 branch of social4hyq/ohos-bun.
   # Upstream formula cannot accommodate these build requirements.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "62b00a06bfa46fdbef6a2a5dc1670e431b448643", branch: "openharmony"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "87e50375f723ad650fa8563fe4d19f7133171a65", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
-  revision 29
+  revision 30
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -18,8 +18,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r29"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8164f9b2c65a1f8fb00ae828c1b854bc70082ca4f4e6fb004656bd2a1f46d0fc"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r30"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "876c785f66452591485236a50648d3af8694d1ae06d1a45b56d86f3848e3f0c6"
   end
 
   # ── Dependencies (all bare names, zero changes when graduating to harmonybrew/core) ──
@@ -62,11 +62,11 @@ class Bun < Formula
     sha256 "2bfd8eed73318df568cc5831083b11de986af6da5c66f140b73cf4ae365ceca3"
   end
 
-  # ── OHOS patches are pre-applied on the openharmony branch of social4hyq/ohos-bun ──
-  # See commits pr3-vendor / pr4-build-target / pr5-ohos-runtime / pr6-rust-compat /
-  # pr7-shared-cfg-gate / pr8-upstream-sync / pr9-ohos-fixes on that branch.
-  # Vendor patch files (patches/lolhtml/crate-type.patch, patches/zstd/ohos-qsort-r.patch)
-  # are committed directly in the source tree; ninja applies them during the build.
+  # ── OHOS patches are pre-applied on the ohos-aarch64 branch of social4hyq/ohos-bun ──
+  # The branch is a linear series of feat/fix(ohos) commits kept in sync with
+  # upstream oven-sh/bun main via merge (last: 87e50375f, upstream 6618e7f7e).
+  # Vendor patch files (patches/zstd/ohos-qsort-r.patch) are committed directly
+  # in the source tree; ninja applies them during the build.
 
   def install
     # buildpath = bun source root (patches already auto-applied by Homebrew).
@@ -74,21 +74,22 @@ class Bun < Formula
     # All dependencies are declared via depends_on: llvm@21 (signing clang/lld), icu4c@78,
     # bun-webkit (JSC static libs), bun-bootstrap (L3 driver, bootstrap).
 
-    # ── Fix host platform detection in config.ts: on OHOS process.platform returns "openharmony" ──
-    inreplace buildpath/"scripts/build/config.ts",
-              "plat === \"linux\"",
-              "plat === \"linux\" || plat === \"openharmony\""
-
     llvm     = Formula["llvm@21"]
     webkit   = Formula["bun-webkit"]
     boot     = Formula["bun-bootstrap"]
 
+    # ── Persistent build cache (vendor tarballs + webkit) ──
+    # Default cacheDir is $HOME/.bun/build-cache, but brew's HOME is the
+    # per-build .brew_home — the cache would be wiped every run and every
+    # vendor tarball re-downloaded (GitHub is unreliable/blocked on OHOS).
+    # Pin it to a stable EL2 path (same convention as rust_home below) and
+    # pass --cache-dir so fetch-cli/webkit both hit it; pre-seed
+    # <cache_dir>/tarballs to build fully offline.
+    cache_dir = Pathname.new("/data/storage/el2/base/tmp/bun-build-cache")
+
     # ── Pre-populate WebKit cache (bun bd's fetch checks .identity to skip download) ──
-    # webkit.ts.patch performs the same operation inside the source function, but the
-    # ninja fetch step may run before the source function takes effect — belt and suspenders.
-    webkit_ver = "c9ad5813fd23bd8b98b0738abc3d037ec716aa92"
-    brew_home = Pathname.new(Dir.home)
-    wc = brew_home/".bun/build-cache/webkit-#{webkit_ver[0...16]}-ohos-arm64"
+    webkit_ver = "4895f45dfbd0d1226c4d41799887bc0ecb9f341b"
+    wc = cache_dir/"webkit-#{webkit_ver[0...16]}-ohos-arm64"
     wc.mkpath
     File.write(wc/".identity", webkit_ver)
     (wc/"lib").mkpath
@@ -124,7 +125,7 @@ class Bun < Formula
       ln_sf icu.opt_bin/t, buildpath/"build/ohos-icu/host/bin"/t if (icu.opt_bin/t).exist?
     end
 
-    # ── bun install (bun.lock committed on openharmony branch matches package.json) ──
+    # ── bun install (bun.lock committed on ohos-aarch64 branch matches package.json) ──
     # bun.lock was updated to remove ohos-signpost (replaced by in-process ohos_sign crate).
     # bun install resolves all packages from ~/.bun/install/cache without network access.
     # (bun-tracestrings: github-hosted dep; GitHub is blocked on OHOS but the package is pre-cached
@@ -218,16 +219,18 @@ class Bun < Formula
     ENV["OHOS_BUN_SIGNING_LINKER"] = (HOMEBREW_PREFIX/"bin/c++").to_s
     ENV["CC"]  = (HOMEBREW_PREFIX/"bin/cc").to_s
     ENV["CXX"] = (HOMEBREW_PREFIX/"bin/c++").to_s
-    # Serialize cargo build scripts: OHOS tmpfs may not release write locks fast
-    # enough between write+exec, causing ETXTBSY on parallel build-script builds.
-    ENV["CARGO_BUILD_JOBS"] = "1"
+    # No CARGO_BUILD_JOBS cap: the historical ETXTBSY came from the llvm@21
+    # cc/c++ shims re-signing outputs in-place with no sync barrier; the shim
+    # now signs at link time only (LLD --code-sign). Verified zero ETXTBSY at
+    # full parallelism in CI (ohos-build.yml).
     ENV["TMPDIR"] = "/data/storage/el2/base/tmp"
 
     # ── Build: bun scripts/build.ts (equivalent to invoking `bun bd`) ──
-    # --os=ohos --arch=aarch64 triggers the OHOS compile path in the bun source (pr4+pr5 patch).
+    # --os=ohos --arch=aarch64 triggers the OHOS compile path in the bun source.
     sysroot = formula_opt_prefix("ohos-sdk")/"native/sysroot"
     system "bun", "scripts/build.ts",
            "--profile=release", "--os=ohos", "--arch=aarch64", "--canary=off",
+           "--cache-dir=#{cache_dir}",
            "--ohos-sdk-root=#{formula_opt_prefix("ohos-sdk")}",
            "--ohos-sysroot=#{sysroot}"
 
