@@ -8,7 +8,7 @@ class Codespell < Formula
   license "GPL-2.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "70946aaa395a0878a480aad6a8cb690d588fc9c3c469347a0795c1c2eeccc643"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2ba7ce7946ff1d5e282e839cd828c864d17817fddf99921d976e3c160d4ae4b"
   end
 
   depends_on "python@3.14"
