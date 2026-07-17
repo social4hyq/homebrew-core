@@ -1,13 +1,13 @@
 class Vals < Formula
   desc "Helm-like configuration values loader with support for various sources"
   homepage "https://github.com/helmfile/vals"
-  url "https://github.com/helmfile/vals/archive/refs/tags/v0.44.4.tar.gz"
-  sha256 "cfb28b29d1f913322e3d7bce7ae7e9d83ed13dfebf57459189c791eb9e7ba208"
+  url "https://github.com/helmfile/vals/archive/refs/tags/v0.44.5.tar.gz"
+  sha256 "afb92e93664870da150a4fa10c0f1e7dcd2383c7d0d4105d1f69179872a19632"
   license "Apache-2.0"
   head "https://github.com/helmfile/vals.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f604927abd061cc1ec6b0172d9ba60fc5c4ee2826f2808b0520e8061c2c3c4f7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "01646557ff1228adb0483a8b2b3c91c87e98ce621dfc6ce6d53202d10470b7e1"
   end
 
   depends_on "go" => :build
