@@ -3,7 +3,7 @@ class OpencodeAi < Formula
   homepage "https://github.com/social4hyq/ohos-opencode"
   url "https://github.com/social4hyq/ohos-opencode.git",
       tag:      "v1.18.3",
-      revision: "4377ec604fb0f054c2e42a76aa026edb739e015a"
+      revision: "44049810b225e29e140cbe2c0d0980eb6b687ca8"
   version "1.18.3"
   license "MIT"
 
