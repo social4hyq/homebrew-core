@@ -1,8 +1,8 @@
 class OrcTools < Formula
   desc "ORC java command-line tools and utilities"
   homepage "https://orc.apache.org/"
-  url "https://search.maven.org/remotecontent?filepath=org/apache/orc/orc-tools/2.3.0/orc-tools-2.3.0-uber.jar"
-  sha256 "6ea7e5d0ad410efc8b69f7d28dc6eaba8403185c709053fff24c6fa884c63a4a"
+  url "https://search.maven.org/remotecontent?filepath=org/apache/orc/orc-tools/2.3.1/orc-tools-2.3.1-uber.jar"
+  sha256 "05110c26350d384da0315291b13490a1aa4879d8b80af1d1117fd072d46bdff0"
   license "Apache-2.0"
 
   livecheck do
@@ -11,7 +11,7 @@ class OrcTools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b0fc9d73047783d843bb89a4c1e3ea7ca8e0f3d7a7d7f369235d9bb29d6f08c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "36eea0705fb8258e3060d9bd50923a74b23bb0885424f2ce3cad0a20d758080c"
   end
 
   depends_on "openjdk"
