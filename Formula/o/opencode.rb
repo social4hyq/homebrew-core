@@ -1,9 +1,9 @@
 class Opencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64 (prebuilt musl binary)"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://registry.npmmirror.com/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-1.18.1.tgz"
-  version "1.18.1"
-  sha256 "0eac979da5470b4b5b61783e464926f5e1d5adee4b37d9ce4298b59b898a5c51"
+  url "https://registry.npmmirror.com/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-1.18.3.tgz"
+  version "1.18.3"
+  sha256 "3431f5cbbc1e3b0b08d23b60746d4f855ca836c0e91a91a89017f2c0e60238fe"
   license "MIT"
   # opencode's official prebuilt linux-arm64-musl single binary (Bun --compile).
   # Bypasses the opencode-ai npm JS wrapper. The musl-ABI binary is
@@ -17,7 +17,7 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.3"
     # `brew bottle` emits `cellar: "<HOMEBREW_CELLAR>"` (not :any_skip_relocation)
     # for this formula: the RUNPATH injected into the ELF (inject-runpath.py
     # below) is an absolute HOMEBREW_PREFIX/opt/... path, and the bottle
@@ -26,8 +26,8 @@ class Opencode < Formula
     # Cellar path), the opt/<name> symlink is recreated on every pour, and
     # HOMEBREW_PREFIX is constant across build/target machines — so the bottle
     # pours identically regardless of the flat/nested HOMEBREW_CELLAR flip.
-    # Verified on the real machine for r5 (1.17.20) and 1.18.1.
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c41d27056baf123ffa41fa8af37bd71ecbd87e6534f3dbe0f98da8577e1db91"
+    # Verified on the real machine for r5 (1.17.20), 1.18.1, and 1.18.3.
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "95fea1e68dd9e3ce79b0c065ee236d45e15225cb5697b9df3c798df8be39c11c"
   end
 
   # r1 fixed a real portability bug (not just the `brew bottle` check below):
