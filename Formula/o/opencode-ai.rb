@@ -2,8 +2,9 @@ class OpencodeAi < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64"
   homepage "https://github.com/social4hyq/ohos-opencode"
   url "https://github.com/social4hyq/ohos-opencode.git",
-      tag: "v1.17.15"
-  version "1.17.15"
+      tag:      "v1.18.3",
+      revision: "4377ec604fb0f054c2e42a76aa026edb739e015a"
+  version "1.18.3"
   license "MIT"
 
   livecheck do
@@ -12,19 +13,24 @@ class OpencodeAi < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.17.15-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e1e12cd358984d276a861459602a0bc0aaa9562f291acced8ba1c7f3fd38a56"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.3-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
   # opencode is a `bun build --compile` single binary with bun runtime + JS + native .node/.so
   # all embedded and pre-signed. The bottle has zero runtime dependencies.
-  depends_on "bun"               => :build
-  depends_on "bun-pty"           => :build
-  depends_on "lightningcss"      => :build
-  depends_on "node"              => :build # npm_config_nodedir for bun install
-  depends_on "ohos-sdk"          => :build # binary-sign-tool (deploy_native) + llvm-objcopy (strip .codesign)
-  depends_on "python@3.14"       => :build
-  depends_on "tailwindcss-oxide" => :build
+  #
+  # Native deps (bun-pty, lightningcss, @tailwindcss/oxide, @opentui/core) come from
+  # @ohos-ports/* npm packages via package.json overrides aliases (loader patches ship
+  # inside those packages); bun 1.4.0_26+ auto-signs .node/.so in workspace mode during
+  # `bun install`. No Homebrew-keg copying or node_modules string patching needed.
+  #
+  # @parcel/watcher needs no handling: opencode lazy-loads it with try/catch and degrades
+  # gracefully on openharmony (file watching disabled, no crash).
+  depends_on "bun"         => :build
+  depends_on "node"        => :build # npm_config_nodedir for bun install
+  depends_on "ohos-sdk"    => :build # binary-sign-tool + llvm-objcopy (strip .codesign)
+  depends_on "python@3.14" => :build
 
   def install
     ENV["PYTHON"] = formula_opt_bin("python@3.14")/"python3"
@@ -40,124 +46,13 @@ class OpencodeAi < Formula
     rm_r("packages/docs")
     rm_r("packages/storybook")
 
-    # bun 1.4.0_26+ auto-signs .node/.so files in workspace mode —
-    # rollup, oxc, and any other native packages are handled transparently.
     system "bun", "install", "--ignore-scripts"
 
     # build.ts defaults to running `bun install --os=* --cpu=*` to pull all-platform native variants, but it
     # depends on Bun.$ → on OHOS, sh cannot exec bun from PATH (EPERM), so we pass --skip-install to skip the
     # internal version in build.ts and invoke it directly here, avoiding the broken $ path.
-    # Only need linux+arm64 — OHOS loaders are patched to map openharmony→linux-arm64 (musl ABI compatible).
-    cd "packages/opencode" do
-      system "bun", "install", "--os=linux", "--cpu=arm64", "@opentui/core@0.3.4"
-      system "bun", "install", "--os=linux", "--cpu=arm64", "@parcel/watcher@2.5.1"
-    end
-
-    sign_tool = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
-    objcopy   = formula_opt_prefix("ohos-sdk")/"native/llvm/bin/llvm-objcopy"
-
-    deploy_native = lambda do |src, dest|
-      cp src, dest
-      system sign_tool, "sign", "-selfSign", "1", "-inFile", dest, "-outFile", dest
-      chmod 0755, dest
-    end
-
-    pty_so = formula_opt_lib("bun-pty")/"librust_pty.so"
-    pty_names = %w[librust_pty_arm64_musl.so librust_pty_arm64.so librust_pty.so]
-    Dir.glob("node_modules/**/bun-pty/rust-pty/target/release", File::FNM_DOTMATCH).each do |d|
-      pty_names.each do |n|
-        deploy_native.call(pty_so, "#{d}/#{n}")
-      end
-    end
-
-    lcss_so = formula_opt_lib("lightningcss")/"liblightningcss_node.so"
-    lcss_names = %w[lightningcss.linux-arm64-ohos.node
-                    lightningcss.openharmony-arm64.node
-                    lightningcss.linux-arm64-musl.node]
-    Dir.glob("node_modules/**/lightningcss", File::FNM_DOTMATCH).each do |d|
-      next unless File.directory?(d)
-
-      lcss_names.each do |n|
-        deploy_native.call(lcss_so, "#{d}/#{n}")
-      end
-      loader = "#{d}/node/index.js"
-      next unless File.exist?(loader)
-
-      content = File.read(loader)
-      next if content.include?("process.platform === 'openharmony'")
-
-      lcss_pattern = /^let parts = \[process\.platform, process\.arch\];\nif \(process\.platform === 'linux'\) \{/
-      File.write(loader, content.sub(
-                           lcss_pattern,
-        "let parts = [process.platform, process.arch];\n" \
-        "if (process.platform === 'openharmony') {\n  " \
-        "parts = ['linux', process.arch, 'ohos'];\n" \
-        "} else if (process.platform === 'linux') {",
-                         ))
-    end
-
-    tw_so = formula_opt_lib("tailwindcss-oxide")/"libtailwind_oxide.so"
-    Dir.glob("node_modules/**/@tailwindcss/oxide", File::FNM_DOTMATCH).each do |d|
-      deploy_native.call(tw_so, "#{d}/tailwindcss-oxide.linux-arm64-musl.node")
-      loader = "#{d}/index.js"
-      next unless File.exist?(loader)
-
-      content = File.read(loader)
-      next if content.include?("process.platform === 'openharmony'")
-
-      # isMusl(): treat openharmony as musl
-      content = content.sub(
-        "if (process.platform === 'linux') {\n    musl = isMuslFromFilesystem()",
-        "if (process.platform === 'linux' || process.platform === 'openharmony') {\n    " \
-        "if (process.platform === 'openharmony') return true\n    " \
-        "musl = isMuslFromFilesystem()",
-      )
-      # requireNative(): match openharmony alongside linux
-      content = content.sub(
-        "} else if (process.platform === 'linux') {",
-        "} else if (process.platform === 'linux' || process.platform === 'openharmony') {",
-      )
-      File.write(loader, content)
-    end
-
-    # @opentui/core@0.3.4 bundle patches (libopentui.so is ELF-signed by bun's
-    # PackageInstaller during `bun install`):
-    # (1) drop stray uppercase-hex line before the trailing `//# sourceMappingURL=` — an
-    #     upstream bundler bug leaves a partial debugId duplicate that bun 1.4.0's strict-mode
-    #     parser rejects as "Decimal integer literals with a leading zero...";
-    # (2) map openharmony-arm64 to @opentui/core-linux-arm64 (libopentui.so is Linux/musl-ABI
-    #     compatible via the LLD-CodeSign patched linker).
-    Dir.glob("node_modules/**/@opentui/core", File::FNM_DOTMATCH).each do |d|
-      Dir.glob("#{d}/index-*.js").each do |bundle|
-        next if bundle.end_with?(".map")
-
-        content = File.read(bundle)
-        next unless content.include?("resolveNativePackage")
-
-        changed = false
-        # Fix 1: strip orphan hex line immediately before sourceMappingURL comment.
-        new_content = content.sub(%r{\n[0-9A-F]{20,}\n(?=//# (?:debugId|sourceMappingURL)=)}, "\n")
-        if new_content != content
-          content = new_content
-          changed = true
-        end
-        # Fix 2: add openharmony branch (idempotent).
-        unless content.include?("process.platform === \"openharmony\"")
-          ohos_branch = <<~JS.chomp
-            if (process.platform === "openharmony" && process.arch === "arm64") {
-                return await import("@opentui/core-linux-arm64");
-              }
-              throw new Error(`opentui is not supported on the current platform:
-          JS
-          content = content.sub(
-            "throw new Error(`opentui is not supported on the current platform:",
-            ohos_branch,
-          )
-          changed = true
-        end
-        File.write(bundle, content) if changed
-      end
-    end
+    # Native variants for openharmony are provided by the @ohos-ports/* overrides, so no
+    # manual `--os=linux --cpu=arm64` installs are needed.
 
     # Bun runtime symlink: Bun.build({compile: {target: "bun-linux-arm64-musl"}}) expects a local bun
     bun_runtime = buildpath/"packages/opencode/bun-linux-aarch64-musl-v1.4.0"
@@ -178,6 +73,9 @@ class OpencodeAi < Formula
     end
 
     # 3) Strip the embedded .codesign section, then re-sign with binary-sign-tool
+    sign_tool = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
+    objcopy   = formula_opt_prefix("ohos-sdk")/"native/llvm/bin/llvm-objcopy"
+
     out = "packages/opencode/dist/opencode-openharmony-arm64-musl/bin/opencode"
     odie "opencode binary missing" unless File.exist?(out)
     unsigned = "#{out}.unsigned"
