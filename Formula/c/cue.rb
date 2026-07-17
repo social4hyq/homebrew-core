@@ -8,7 +8,7 @@ class Cue < Formula
   head "https://github.com/cue-lang/cue.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "86c771cfb6643b4bde7e263733a99a38e5416906443f12552ed63a0883e63e23"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "26e139ec5a64777d7e957b2ef9314d7f8e435f78735102e5e709492e862f5887"
   end
 
   depends_on "go" => :build
