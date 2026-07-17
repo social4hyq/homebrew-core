@@ -2,13 +2,13 @@ class Cue < Formula
   desc "Validate and define text-based and dynamic configuration"
   homepage "https://cuelang.org/"
   url "https://github.com/cue-lang/cue.git",
-      tag:      "v0.17.0",
-      revision: "0fc639bbe9819f08ed132d3981a13ac2e3bf330f"
+      tag:      "v0.17.1",
+      revision: "fc6c0b2ecd3666da92f7053d13fcfbf009b7d7a3"
   license "Apache-2.0"
   head "https://github.com/cue-lang/cue.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "86c771cfb6643b4bde7e263733a99a38e5416906443f12552ed63a0883e63e23"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "26e139ec5a64777d7e957b2ef9314d7f8e435f78735102e5e709492e862f5887"
   end
 
   depends_on "go" => :build
