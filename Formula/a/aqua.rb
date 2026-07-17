@@ -15,7 +15,7 @@ class Aqua < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f677b587500f85b74cf20cabd01de02c3091f39df46c2857496f36b114966a0b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4609b2338168358c9ead42c67e383be9de3a040cad19cb47cbb2511f84a6b816"
   end
 
   depends_on "go" => :build
