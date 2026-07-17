@@ -300,13 +300,16 @@ diff -ruN a/lld/ELF/Config.h b/lld/ELF/Config.h
  
  struct Ctx : CommonLinkerContext {
 diff -ruN a/lld/ELF/Driver.cpp b/lld/ELF/Driver.cpp
---- a/lld/ELF/Driver.cpp	2026-06-20 07:31:11.393591562 +0800
-+++ b/lld/ELF/Driver.cpp	2026-06-20 07:31:11.809590937 +0800
-@@ -1898,6 +1898,8 @@
+--- a/lld/ELF/Driver.cpp
++++ b/lld/ELF/Driver.cpp
+@@ -1898,6 +1898,11 @@
  
    std::tie(ctx.arg.buildId, ctx.arg.buildIdVector) = getBuildId(ctx, args);
  
-+  ctx.arg.codeSign = args.hasFlag(OPT_code_sign, OPT_no_code_sign, false);
++  // OHOS: code-sign defaults to ON — every executable ELF on HarmonyOS must
++  // carry a .codesign block, so callers no longer need to pass -Wl,--code-sign
++  // explicitly. Use --no-code-sign to opt out.
++  ctx.arg.codeSign = args.hasFlag(OPT_code_sign, OPT_no_code_sign, true);
 +
    if (getZFlag(args, "pack-relative-relocs", "nopack-relative-relocs", false)) {
      ctx.arg.relrGlibc = true;
@@ -383,8 +386,8 @@ diff -ruN a/lld/ELF/SyntheticSections.h b/lld/ELF/SyntheticSections.h
  // We create three instances of this class for .bss, .bss.rel.ro and "COMMON",
  // that are used for writable symbols, read-only symbols and common symbols,
 diff -ruN a/lld/ELF/Writer.cpp b/lld/ELF/Writer.cpp
---- a/lld/ELF/Writer.cpp	2026-06-20 07:31:11.393591562 +0800
-+++ b/lld/ELF/Writer.cpp	2026-06-20 07:31:11.805590781 +0800
+--- a/lld/ELF/Writer.cpp
++++ b/lld/ELF/Writer.cpp
 @@ -11,6 +11,7 @@
  #include "ARMErrataFix.h"
  #include "BPSectionOrderer.h"
@@ -393,7 +396,7 @@ diff -ruN a/lld/ELF/Writer.cpp b/lld/ELF/Writer.cpp
  #include "Config.h"
  #include "InputFiles.h"
  #include "LinkerScript.h"
-@@ -30,9 +31,13 @@
+@@ -30,9 +31,15 @@
  #include "llvm/Support/BLAKE3.h"
  #include "llvm/Support/Parallel.h"
  #include "llvm/Support/RandomNumberGenerator.h"
@@ -404,10 +407,12 @@ diff -ruN a/lld/ELF/Writer.cpp b/lld/ELF/Writer.cpp
  #include <climits>
 +#include <cstdint>
 +#include <cstring>
++#include <fcntl.h>
++#include <unistd.h>
  
  #define DEBUG_TYPE "lld"
  
-@@ -41,6 +46,7 @@
+@@ -41,6 +48,7 @@
  using namespace llvm::object;
  using namespace llvm::support;
  using namespace llvm::support::endian;
@@ -415,7 +420,7 @@ diff -ruN a/lld/ELF/Writer.cpp b/lld/ELF/Writer.cpp
  using namespace lld;
  using namespace lld::elf;
  
-@@ -81,6 +87,7 @@
+@@ -81,6 +89,7 @@
    void writeSections();
    void writeSectionsBinary();
    void writeBuildId();
@@ -423,7 +428,7 @@ diff -ruN a/lld/ELF/Writer.cpp b/lld/ELF/Writer.cpp
  
    Ctx &ctx;
    std::unique_ptr<FileOutputBuffer> &buffer;
-@@ -381,6 +388,11 @@
+@@ -381,6 +390,11 @@
      // Backfill .note.gnu.build-id section content. This is done at last
      // because the content is usually a hash value of the entire output file.
      writeBuildId();
@@ -435,7 +440,25 @@ diff -ruN a/lld/ELF/Writer.cpp b/lld/ELF/Writer.cpp
      if (errCount(ctx))
        return;
  
-@@ -3089,6 +3101,44 @@
+@@ -388,6 +402,17 @@
+       if (auto e = buffer->commit())
+         Err(ctx) << "failed to write output '" << buffer->getPath()
+                  << "': " << std::move(e);
++      else if (ctx.arg.codeSign) {
++        // OHOS: flush the code-signed output to stable storage before this
++        // process returns. The cc shim execs clang which links + code-signs
++        // the binary in place; cargo then execs it immediately. Without an
++        // explicit sync, hmfs page-cache writeback can still be in flight
++        // when exec runs the new binary -> ETXTBSY (Text file busy, os 26).
++        if (int fd = ::open(buffer->getPath().str().c_str(), O_RDONLY); fd >= 0) {
++          ::fsync(fd);
++          ::close(fd);
++        }
++      }
+     }
+ 
+     if (!ctx.arg.cmseOutputLib.empty())
+@@ -3089,6 +3114,44 @@
      part.buildId->writeBuildId(output);
  }
  

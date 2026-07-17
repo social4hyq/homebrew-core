@@ -40,10 +40,10 @@ class Icu4cAT78 < Formula
   def install
     odie "Major version bumps need a new formula!" if version.major.to_s != name[/@(\d+)$/, 1]
 
-    clang = Formula["llvm@21"].opt_bin/"clang"
-    clangxx = Formula["llvm@21"].opt_bin/"clang++"
-    libxml2_lib = Formula["libxml2"].opt_lib.to_s
-    zlib_lib    = Formula["zlib"].opt_lib.to_s
+    clang = formula_opt_bin("llvm@21")/"clang"
+    clangxx = formula_opt_bin("llvm@21")/"clang++"
+    libxml2_lib = formula_opt_lib("libxml2").to_s
+    zlib_lib    = formula_opt_lib("zlib").to_s
     ENV.prepend_path "LD_LIBRARY_PATH", libxml2_lib
     ENV.prepend_path "LD_LIBRARY_PATH", zlib_lib
 
@@ -70,11 +70,12 @@ class Icu4cAT78 < Formula
     cd native_build do
       # VPATH configure: source at ../source relative to native_build.
       # OHOS developer mode allows unsigned ELF to execute; --build= skips config.guess.
-      system "../source/configure", *%w[--disable-samples --disable-tests --enable-static --disable-shared --with-library-bits=64],
+      args = %w[--disable-samples --disable-tests --enable-static --disable-shared --with-library-bits=64]
+      system "../source/configure", *args,
              "--build=aarch64-linux-ohos", "--prefix=#{native_prefix}",
              "CC=#{clang}", "CXX=#{clangxx}",
-             "AR=#{Formula["llvm@21"].opt_bin}/llvm-ar",
-             "RANLIB=#{Formula["llvm@21"].opt_bin}/llvm-ranlib",
+             "AR=#{formula_opt_bin("llvm@21")}/llvm-ar",
+             "RANLIB=#{formula_opt_bin("llvm@21")}/llvm-ranlib",
              "CFLAGS=-O2", "CXXFLAGS=-O2 -stdlib=libc++",
              # -Wl,--code-sign: lld signs the binary so the tools are executable when Phase 2 invokes them.
              "LDFLAGS=-stdlib=libc++ -Wl,--code-sign"
@@ -93,8 +94,8 @@ class Icu4cAT78 < Formula
              "--with-cross-build=#{native_build}", "--disable-tools",
              *std_configure_args,
              "CC=#{clang}", "CXX=#{clangxx}",
-             "AR=#{Formula["llvm@21"].opt_bin}/llvm-ar",
-             "RANLIB=#{Formula["llvm@21"].opt_bin}/llvm-ranlib",
+             "AR=#{formula_opt_bin("llvm@21")}/llvm-ar",
+             "RANLIB=#{formula_opt_bin("llvm@21")}/llvm-ranlib",
              "CFLAGS=-O2 -fPIC --target=aarch64-linux-ohos",
              "CXXFLAGS=-O2 -stdlib=libc++ -fPIC --target=aarch64-linux-ohos",
              "LDFLAGS=-stdlib=libc++ --target=aarch64-linux-ohos -Wl,--code-sign"

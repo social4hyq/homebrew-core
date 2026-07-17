@@ -61,7 +61,7 @@ class BunPty < Formula
     # 5. Sign + install
     so = buildpath/"rust-pty/target/aarch64-unknown-linux-ohos/release/librust_pty.so"
     odie "librust_pty.so build failed" unless so.exist?
-    sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
+    sign_tool = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
     system sign_tool, "sign", "-selfSign", "1", "-inFile", so.to_s, "-outFile", so.to_s
     chmod 0755, so
     lib.install so => "librust_pty.so"

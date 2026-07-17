@@ -12,13 +12,13 @@ class DlopenSignShim < Formula
   version "0.1.0"
   license "MIT"
 
+  livecheck do
+    skip "development tool, manually versioned"
+  end
+
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/dlopen-sign-shim-v0.1.0"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "3d95ad4fbcff79c20c47a0b10be676c12d6f1df14a4077b758d83622973703cd"
-  end
-
-  livecheck do
-    skip "development tool, manually versioned"
   end
 
   # Extracted from opencode.rb (originally written for its OpenTUI native

@@ -30,7 +30,7 @@ class Lightningcss < Formula
 
     so = "target/aarch64-unknown-linux-ohos/release/liblightningcss_node.so"
     odie "build failed" unless File.exist?(so)
-    sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
+    sign_tool = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
     unsigned = "#{so}.unsigned"
     mv so, unsigned
     system sign_tool, "sign", "-selfSign", "1", "-inFile", unsigned, "-outFile", so

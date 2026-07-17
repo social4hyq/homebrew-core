@@ -2,7 +2,7 @@ class OpencodeAi < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64"
   homepage "https://github.com/social4hyq/ohos-opencode"
   url "https://github.com/social4hyq/ohos-opencode.git",
-      tag:      "v1.17.15"
+      tag: "v1.17.15"
   version "1.17.15"
   license "MIT"
 
@@ -27,18 +27,18 @@ class OpencodeAi < Formula
   depends_on "tailwindcss-oxide" => :build
 
   def install
-    ENV["PYTHON"] = Formula["python@3.14"].opt_bin/"python3"
-    ENV["npm_config_nodedir"] = Formula["node"].opt_prefix.to_s
+    ENV["PYTHON"] = formula_opt_bin("python@3.14")/"python3"
+    ENV["npm_config_nodedir"] = formula_opt_prefix("node").to_s
     ENV["BUN_TMPDIR"] = (buildpath/".bun-tmp").to_s
     # Persistent bun cache (buildpath is wiped each run, causing network-failed packages to be re-downloaded
     # every time; place it under HOMEBREW_CACHE).
     ENV["BUN_INSTALL_CACHE"] = (HOMEBREW_CACHE/"bun-install-cache").to_s
 
     # Remove workspace packages not needed for the CLI build.
-    rm_rf "packages/desktop"
-    rm_rf "packages/web"
-    rm_rf "packages/docs"
-    rm_rf "packages/storybook"
+    rm_r("packages/desktop")
+    rm_r("packages/web")
+    rm_r("packages/docs")
+    rm_r("packages/storybook")
 
     # bun 1.4.0_26+ auto-signs .node/.so files in workspace mode —
     # rollup, oxc, and any other native packages are handled transparently.
@@ -53,8 +53,8 @@ class OpencodeAi < Formula
       system "bun", "install", "--os=linux", "--cpu=arm64", "@parcel/watcher@2.5.1"
     end
 
-    sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
-    objcopy   = Formula["ohos-sdk"].opt_prefix/"native/llvm/bin/llvm-objcopy"
+    sign_tool = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
+    objcopy   = formula_opt_prefix("ohos-sdk")/"native/llvm/bin/llvm-objcopy"
 
     deploy_native = lambda do |src, dest|
       cp src, dest
@@ -62,7 +62,7 @@ class OpencodeAi < Formula
       chmod 0755, dest
     end
 
-    pty_so = Formula["bun-pty"].opt_lib/"librust_pty.so"
+    pty_so = formula_opt_lib("bun-pty")/"librust_pty.so"
     pty_names = %w[librust_pty_arm64_musl.so librust_pty_arm64.so librust_pty.so]
     Dir.glob("node_modules/**/bun-pty/rust-pty/target/release", File::FNM_DOTMATCH).each do |d|
       pty_names.each do |n|
@@ -70,7 +70,7 @@ class OpencodeAi < Formula
       end
     end
 
-    lcss_so = Formula["lightningcss"].opt_lib/"liblightningcss_node.so"
+    lcss_so = formula_opt_lib("lightningcss")/"liblightningcss_node.so"
     lcss_names = %w[lightningcss.linux-arm64-ohos.node
                     lightningcss.openharmony-arm64.node
                     lightningcss.linux-arm64-musl.node]
@@ -96,7 +96,7 @@ class OpencodeAi < Formula
                          ))
     end
 
-    tw_so = Formula["tailwindcss-oxide"].opt_lib/"libtailwind_oxide.so"
+    tw_so = formula_opt_lib("tailwindcss-oxide")/"libtailwind_oxide.so"
     Dir.glob("node_modules/**/@tailwindcss/oxide", File::FNM_DOTMATCH).each do |d|
       deploy_native.call(tw_so, "#{d}/tailwindcss-oxide.linux-arm64-musl.node")
       loader = "#{d}/index.js"
@@ -161,7 +161,7 @@ class OpencodeAi < Formula
 
     # Bun runtime symlink: Bun.build({compile: {target: "bun-linux-arm64-musl"}}) expects a local bun
     bun_runtime = buildpath/"packages/opencode/bun-linux-aarch64-musl-v1.4.0"
-    ln_sf Formula["bun"].opt_bin/"bun", bun_runtime
+    ln_sf formula_opt_bin("bun")/"bun", bun_runtime
 
     cd "packages/opencode" do
       version = JSON.parse(File.read("package.json"))["version"]

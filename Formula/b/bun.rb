@@ -12,14 +12,14 @@ class Bun < Formula
   revision 29
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r29"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8164f9b2c65a1f8fb00ae828c1b854bc70082ca4f4e6fb004656bd2a1f46d0fc"
-  end
-
   livecheck do
     url :stable
     regex(/^bun-v?(\d+(?:\.\d+)+)$/i)
+  end
+
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r29"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8164f9b2c65a1f8fb00ae828c1b854bc70082ca4f4e6fb004656bd2a1f46d0fc"
   end
 
   # ── Dependencies (all bare names, zero changes when graduating to harmonybrew/core) ──
@@ -29,17 +29,18 @@ class Bun < Formula
   depends_on "gperf" => :build
   depends_on "llvm@21" => :build
   depends_on "ninja" => :build
-  depends_on "node"
-  depends_on "openssl@3" => :build # only build-time rust-nightly cargo links libssl/libcrypto
+  depends_on "ohos-sdk" => :build
+  depends_on "openssl@3" => :build
   depends_on "perl" => :build
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
-  depends_on "social4hyq/core/icu4c@78" => :build # qualified: icu4c@78 exists in both taps
+  depends_on "social4hyq/core/icu4c@78" => :build
+  # only build-time rust-nightly cargo links libssl/libcrypto
+  depends_on "node"
   depends_on "ohos-compat-shim" # runtime: LD_PRELOAD'd by the bin/bun wrapper
   # ohos-sdk is build-time only: used to sign rust-nightly binaries, the
   # clang-sign wrapper, and the final bun binary. Runtime signing (PackageInstaller
   # .node/.so, dlopen, bun build --compile) is now handled in-process by ohos_sign.
-  depends_on "ohos-sdk" => :build
 
   # Rust nightly (native OHOS host toolchain, needed by bun's libbun_rust.a).
   # OHOS is a Tier 3 target with no prebuilt rust-std, so bun uses -Zbuild-std
@@ -102,7 +103,7 @@ class Bun < Formula
       cp webkit.include/"webkit/cmakeconfig.h", "cmakeconfig.h"
     end
     %w[libicudata.a libicui18n.a libicuuc.a].each do |a|
-      ln_sf Formula["social4hyq/core/icu4c@78"].opt_lib/a, wc/"lib"/a
+      ln_sf formula_opt_lib("social4hyq/core/icu4c@78")/a, wc/"lib"/a
     end
 
     # ── Scaffold build/ohos-icu/{target,host} layout for bun's config.ts ──
@@ -139,7 +140,7 @@ class Bun < Formula
     # Upstream test packages (test-native-binlink-*-target) list os:["darwin","linux","win32"].
     # ── Rust nightly (persistent cache keyed by toolchain date; skips reinstall+signing if already done) ──
     # OHOS is a Tier 3 target: bun uses -Zbuild-std to build std, which requires rust-src (in full tarball).
-    rust_ver = resource("rust-nightly").version.to_s  # e.g. "nightly-2026-05-06"
+    rust_ver = resource("rust-nightly").version.to_s # e.g. "nightly-2026-05-06"
     rust_home = Pathname.new("/data/storage/el2/base/tmp/rust-#{rust_ver}")
     rust_ready = rust_home/"BREW_SIGNED_OK"
 
@@ -155,7 +156,7 @@ class Bun < Formula
       end
 
       # ── Sign the rust binaries (OHOS kernel refuses to exec unsigned ELF → cargo exits 127) ──
-      sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
+      sign_tool = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
       Dir.glob(rust_home/"**/*").each do |f|
         next unless File.file?(f)
         next if File.symlink?(f)
@@ -174,11 +175,11 @@ class Bun < Formula
     # ── Build environment (PATH + env) ──
     # lld from llvm@21 has runtime deps on libxml2/zlib; brew superenv strips system lib paths,
     # so inject them explicitly so ld.lld can find them (consistent with bun-webkit).
-    ENV.prepend_path "LD_LIBRARY_PATH", Formula["libxml2"].opt_lib.to_s
-    ENV.prepend_path "LD_LIBRARY_PATH", Formula["zlib"].opt_lib.to_s
+    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("libxml2").to_s
+    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib").to_s
     # rust-nightly cargo NEEDS libssl.so/libcrypto.so (brew openssl@3);
     # without injecting, musl startup hits "Error relocating ... symbol not found" → exit 127.
-    ENV.prepend_path "LD_LIBRARY_PATH", Formula["openssl@3"].opt_lib.to_s
+    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3").to_s
     # llvm@21 only ships llvm-strip; the bun build script needs strip.
     mkdir_p buildpath/".bin"
     ln_sf llvm.opt_bin/"llvm-strip", buildpath/".bin/strip"
@@ -224,10 +225,10 @@ class Bun < Formula
 
     # ── Build: bun scripts/build.ts (equivalent to invoking `bun bd`) ──
     # --os=ohos --arch=aarch64 triggers the OHOS compile path in the bun source (pr4+pr5 patch).
-    sysroot = Formula["ohos-sdk"].opt_prefix/"native/sysroot"
+    sysroot = formula_opt_prefix("ohos-sdk")/"native/sysroot"
     system "bun", "scripts/build.ts",
            "--profile=release", "--os=ohos", "--arch=aarch64", "--canary=off",
-           "--ohos-sdk-root=#{Formula["ohos-sdk"].opt_prefix}",
+           "--ohos-sdk-root=#{formula_opt_prefix("ohos-sdk")}",
            "--ohos-sysroot=#{sysroot}"
 
     # The release profile produces `bun-profile` (unstripped, ~455MB) + `bun`
@@ -236,7 +237,7 @@ class Bun < Formula
     odie "bun binary missing after build: #{out}" unless out.exist?
     # The OHOS kernel refuses to exec unsigned ELF. The bun build system does not sign itself
     # (the signing tool is OHOS-specific), so sign explicitly after install.
-    sign_tool = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
+    sign_tool = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
     unsigned = "#{out}.unsigned"
     mv out, unsigned
     system sign_tool, "sign", "-selfSign", "1", "-inFile", unsigned, "-outFile", out
@@ -270,7 +271,7 @@ class Bun < Formula
     # Brew sandbox may set a TMPDIR with mismatched ownership; use the
     # standard EL2 tmp which the current user owns.
     ENV["TMPDIR"] = "/data/storage/el2/base/tmp"
-    ENV.prepend_path "PATH", Formula["node"].opt_bin
+    ENV.prepend_path "PATH", formula_opt_bin("node")
     system bin/"bun", "--bun", "x", "node-gyp@11", "--version"
   end
 

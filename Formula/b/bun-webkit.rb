@@ -43,22 +43,22 @@ class BunWebkit < Formula
   def install
     # llvm@21's lld runtime depends on libxml2/zlib, brew superenv may strip LD_LIBRARY_PATH,
     # explicitly inject library search paths (per icu4c@78 experience).
-    ENV.prepend_path "LD_LIBRARY_PATH", Formula["libxml2"].opt_lib.to_s
-    ENV.prepend_path "LD_LIBRARY_PATH", Formula["zlib"].opt_lib.to_s
+    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("libxml2").to_s
+    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib").to_s
 
-    clang    = Formula["llvm@21"].opt_bin/"clang"
-    clangxx  = Formula["llvm@21"].opt_bin/"clang++"
-    sysroot  = "#{Formula["ohos-sdk"].opt_prefix}/native/sysroot"
+    clang    = formula_opt_bin("llvm@21")/"clang"
+    clangxx  = formula_opt_bin("llvm@21")/"clang++"
+    sysroot  = "#{formula_opt_prefix("ohos-sdk")}/native/sysroot"
 
     # OHOS cross-compilation flags (align with cfg.ohos branch in bun-src/scripts/build/deps/webkit.ts).
     target_flag = "--target=aarch64-linux-ohos"
     sysroot_flag = "--sysroot=#{sysroot}"
-    icu_include = "-I#{Formula["social4hyq/core/icu4c@78"].opt_include}"
+    icu_include = "-I#{formula_opt_include("social4hyq/core/icu4c@78")}"
 
     cxxflags = [
       target_flag, sysroot_flag, "-D__MUSL__",
       "-mbranch-protection=none", "-mno-outline-atomics",
-      "-nostdinc++ -I#{Formula["llvm@21"].opt_include}/aarch64-linux-ohos/c++/v1",
+      "-nostdinc++ -I#{formula_opt_include("llvm@21")}/aarch64-linux-ohos/c++/v1",
       icu_include, "-fno-c++-static-destructors", "-std=gnu++23"
     ].join(" ")
 
@@ -76,7 +76,7 @@ class BunWebkit < Formula
         -DCMAKE_CXX_COMPILER=#{clangxx}
         -DCMAKE_C_FLAGS=#{cflags}
         -DCMAKE_CXX_FLAGS=#{cxxflags}
-        -DCMAKE_EXE_LINKER_FLAGS=-L#{Formula["llvm@21"].opt_lib}/aarch64-linux-ohos -Wl,--code-sign
+        -DCMAKE_EXE_LINKER_FLAGS=-L#{formula_opt_lib("llvm@21")}/aarch64-linux-ohos -Wl,--code-sign
         -DPORT=JSCOnly
         -DENABLE_STATIC_JSC=ON
         -DUSE_THIN_ARCHIVES=OFF
@@ -94,10 +94,10 @@ class BunWebkit < Formula
         -DCMAKE_SYSTEM_NAME=Linux
         -DCMAKE_SYSTEM_PROCESSOR=aarch64
         -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
-        -DCMAKE_FIND_ROOT_PATH=#{sysroot};#{Formula["social4hyq/core/icu4c@78"].opt_prefix}
-        -DCMAKE_PREFIX_PATH=#{Formula["social4hyq/core/icu4c@78"].opt_prefix}
-        -DICU_ROOT=#{Formula["social4hyq/core/icu4c@78"].opt_prefix}
-        -DICU_INCLUDE_DIR=#{Formula["social4hyq/core/icu4c@78"].opt_include}
+        -DCMAKE_FIND_ROOT_PATH=#{sysroot};#{formula_opt_prefix("social4hyq/core/icu4c@78")}
+        -DCMAKE_PREFIX_PATH=#{formula_opt_prefix("social4hyq/core/icu4c@78")}
+        -DICU_ROOT=#{formula_opt_prefix("social4hyq/core/icu4c@78")}
+        -DICU_INCLUDE_DIR=#{formula_opt_include("social4hyq/core/icu4c@78")}
         -DCMAKE_HAVE_THREADS_LIBRARY=1
       ]
       system "cmake", *args, buildpath.to_s

@@ -17,8 +17,8 @@ class LlvmAT21 < Formula
   bottle do
     # Validation tap bottle; when graduating to official core, change root_url → harmonybrew/homebrew-core releases.
     # Tag name does not contain @ (avoids GitHub URL encoding causing brew parsing issues).
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm21-v21.1.8-pruned-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3d212f5add370460d7cba4b83416c52e2d5c3c9122be8515971ac721528921c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm21-v21.1.8-pruned-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "843c1bc74097f3b2b17b99109e14051d88f98d1a9cb6adbb78d35eb0c5ba1f32"
   end
 
   keg_only "this is a versioned HarmonyOS bootstrap toolchain"
@@ -31,6 +31,7 @@ class LlvmAT21 < Formula
   # Runtime dependency: lld links against libxml2/zlib (must be declared explicitly in a keg_only
   # environment, otherwise the loader cannot find the .so).
   depends_on "zlib"
+  depends_on "zstd"
 
   # HarmonyOS code-sign support (adds CodeSign.cpp to lld/ELF).  Version-specific
   patch :p1 do
@@ -51,7 +52,7 @@ class LlvmAT21 < Formula
   ].freeze
 
   def install
-    ohos_sdk    = Formula["ohos-sdk"].opt_prefix
+    ohos_sdk    = formula_opt_prefix("ohos-sdk")
     sysroot     = "#{ohos_sdk}/native/sysroot"
     libcxx_ohos = "#{ohos_sdk}/native/llvm/include/libcxx-ohos/include/c++/v1"
 
@@ -99,7 +100,7 @@ class LlvmAT21 < Formula
       -DCMAKE_C_COMPILER=clang
       -DCMAKE_CXX_COMPILER=clang++
       -DLLVM_ENABLE_PROJECTS=clang;lld
-      -DLLVM_ENABLE_RUNTIMES=libcxx;libcxxabi;libunwind;compiler-rt
+      -DLLVM_ENABLE_RUNTIMES=libcxx;libcxxabi;libunwind
       -DLLVM_TARGETS_TO_BUILD=AArch64
       -DLLVM_DEFAULT_TARGET_TRIPLE=#{HOST_TRIPLE}
       -DLLVM_ENABLE_ASSERTIONS=OFF
@@ -122,6 +123,11 @@ class LlvmAT21 < Formula
       -DLLVM_ENABLE_ZSTD=FORCE_ON
       -DLLVM_USE_STATIC_ZSTD=ON
       -DBUILD_SHARED_LIBS=OFF
+      -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON
+      -DHAVE_CXX_ATOMICS_WITHOUT_LIB=ON
+      -DHAVE_CXX_ATOMICS64_WITHOUT_LIB=ON
+      -DCMAKE_CXX_STANDARD=17
+      -DCMAKE_CXX_STANDARD_REQUIRED=ON
       -DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON
       -DLIBCXX_HAS_MUSL_LIBC=ON
       -DLIBCXX_HAS_PTHREAD_API=ON
@@ -136,11 +142,14 @@ class LlvmAT21 < Formula
     args << "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
     args << "-DCMAKE_C_FLAGS=-D__MUSL__ -fstack-protector-strong " \
             "-no-canonical-prefixes -ffunction-sections -fdata-sections"
-    args << "-DCMAKE_CXX_FLAGS=-D__MUSL__ -fstack-protector-strong " \
+    args << "-DCMAKE_CXX_FLAGS=-D__MUSL__ -std=c++17 -fstack-protector-strong " \
             "-no-canonical-prefixes -ffunction-sections -fdata-sections"
     rpath_flags = "-Wl,-rpath,$ORIGIN/../lib " \
                   "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib " \
-                  "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib"
+                  "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib " \
+                  "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zstd/lib"
+    args << "-Dzstd_ROOT=#{Formula["zstd"].opt_prefix}"
+    args << "-Dzstd_LIBRARY=#{Formula["zstd"].opt_lib}/libzstd.so"
     common_linker_flags = "-Wl,--code-sign -Wl,--build-id=sha1 " \
                           "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack #{rpath_flags}"
     args << "-DCMAKE_EXE_LINKER_FLAGS=#{common_linker_flags}"
@@ -157,6 +166,27 @@ class LlvmAT21 < Formula
     # keep them ON and prune post-install instead.
 
     llvmpath = buildpath/"llvm"
+
+    # Fix cmake 4.x compatibility: cmake 4's if() parser no longer
+    # accepts inner parentheses or ${} dereferences.  Remove all of
+    # them from the MSVC version-check block (not relevant for OHOS/clang).
+    ccv = llvmpath/"cmake/modules/CheckCompilerVersion.cmake"
+    s = File.read(ccv)
+    s.gsub!('if ((${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC) AND',
+            'if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC AND')
+    s.gsub!('    (19.24 VERSION_LESS_EQUAL ${CMAKE_CXX_COMPILER_VERSION}) AND',
+            '    19.24 VERSION_LESS_EQUAL CMAKE_CXX_COMPILER_VERSION AND')
+    s.gsub!('    (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 19.25))',
+            '    CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.25)')
+    File.write(ccv, s)
+
+    # Fix cmake 4.x LINKER:--version-script → clang++ doesn't recognise the
+    # bare --version-script flag that cmake 4 produces. Patch to raw -Wl, form.
+    csl = buildpath/"clang/tools/clang-shlib/CMakeLists.txt"
+    s2 = File.read(csl)
+    s2.gsub!('LINKER:--version-script,${CMAKE_CURRENT_BINARY_DIR}/simple_version_script.map',
+             '-Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/simple_version_script.map')
+    File.write(csl, s2)
 
     mkdir "build" do
       system "cmake", "-G", "Ninja", llvmpath, *args
@@ -192,7 +222,7 @@ class LlvmAT21 < Formula
   end
 
   def sign_dir(dir)
-    binary_sign = Formula["ohos-sdk"].opt_bin/"binary-sign-tool"
+    binary_sign = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
     return opoo "binary-sign-tool not found; binaries left unsigned" unless binary_sign.exist?
 
     signed = failed = skipped = 0
@@ -457,7 +487,7 @@ class LlvmAT21 < Formula
     # Build relative symlinks for binutils/diagnostic tools that downstream
     # cmake find_program / build scripts expect but we don't ship from v21.
     # Targets are ohos-sdk LLVM 15 (formats stable across LLVM 15-21).
-    sdk_bin = Formula["ohos-sdk"].opt_prefix/"native/llvm/bin"
+    sdk_bin = formula_opt_prefix("ohos-sdk")/"native/llvm/bin"
     KEEP_TOOLS_FROM_SDK.each do |t|
       src = sdk_bin/t
       next unless src.exist?
@@ -466,6 +496,28 @@ class LlvmAT21 < Formula
       target.unlink if target.exist? || target.symlink?
       target.make_symlink src.relative_path_from(bin)
     end
+  end
+
+  def post_install
+    # Generate cc/c++ shims in HOMEBREW_PREFIX/bin.
+    # --code-sign is now LLD's default (Driver.cpp codeSign defaults ON), so
+    # every link is auto-signed — no -Wl,--code-sign flag and no link-phase
+    # gating is needed here. The shim only sets LD_LIBRARY_PATH so lld finds
+    # its libxml2/zlib/libLLVM runtime deps.
+    shims = { "cc" => "clang", "c++" => "clang++" }
+    shims.each do |shim_name, target|
+      shim_path = HOMEBREW_PREFIX/"bin"/shim_name
+      File.write(shim_path, <<~SH)
+        #!/bin/sh
+        # Auto-generated by llvm@21 post_install. Edits will be lost on reinstall.
+        # --code-sign is LLD's default, so links are auto-signed — no flag needed.
+        export LD_LIBRARY_PATH="#{HOMEBREW_PREFIX}/opt/libxml2/lib:#{HOMEBREW_PREFIX}/opt/llvm@21/lib:$LD_LIBRARY_PATH"
+        exec "#{opt_bin}/#{target}" "$@"
+      SH
+      shim_path.chmod(0755)
+    end
+
+    ohai "Generated cc/c++ shims in #{HOMEBREW_PREFIX}/bin (LD_LIBRARY_PATH only; --code-sign is LLD default)"
   end
 
   def caveats
@@ -495,28 +547,6 @@ class LlvmAT21 < Formula
     EOS
   end
 
-  def post_install
-    # Generate cc/c++ shims in HOMEBREW_PREFIX/bin.
-    # --code-sign is now LLD's default (Driver.cpp codeSign defaults ON), so
-    # every link is auto-signed — no -Wl,--code-sign flag and no link-phase
-    # gating is needed here. The shim only sets LD_LIBRARY_PATH so lld finds
-    # its libxml2/zlib/libLLVM runtime deps.
-    shims = { "cc" => "clang", "c++" => "clang++" }
-    shims.each do |shim_name, target|
-      shim_path = HOMEBREW_PREFIX/"bin"/shim_name
-      File.write(shim_path, <<~SH)
-        #!/bin/sh
-        # Auto-generated by llvm@21 post_install. Edits will be lost on reinstall.
-        # --code-sign is LLD's default, so links are auto-signed — no flag needed.
-        export LD_LIBRARY_PATH="#{HOMEBREW_PREFIX}/opt/libxml2/lib:#{HOMEBREW_PREFIX}/opt/llvm@21/lib:$LD_LIBRARY_PATH"
-        exec "#{opt_bin}/#{target}" "$@"
-      SH
-      shim_path.chmod(0755)
-    end
-
-    ohai "Generated cc/c++ shims in #{HOMEBREW_PREFIX}/bin (LD_LIBRARY_PATH only; --code-sign is LLD default)"
-  end
-
   test do
     assert_match version.to_s, shell_output("#{bin}/clang --version")
     assert_match HOST_TRIPLE,  shell_output("#{bin}/clang --version")
@@ -527,7 +557,7 @@ class LlvmAT21 < Formula
       end
     end
 
-    ohos_sdk = Formula["ohos-sdk"].opt_prefix
+    ohos_sdk = formula_opt_prefix("ohos-sdk")
     sysroot  = "#{ohos_sdk}/native/sysroot"
 
     rt_root = Pathname.glob("#{lib}/clang/*").first
