@@ -12,7 +12,8 @@ class OpencodeAi < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-ai-v1.18.3-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ee0c8549445e5c9430a26000b5dc0aea068fba60c74bb399ea633ef301a9c40"
   end
 
   # opencode is a `bun build --compile` single binary: OHOS bun runtime + JS
