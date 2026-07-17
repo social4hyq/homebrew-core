@@ -12,7 +12,7 @@ class Libraw < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd17251a6fcb3da63469901a167f13d92b6edf0cad0b95490e48cc186ba8c284"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "002ad48c37b3dbf4870868d33ae37d2ee8489a4fb95d26f83cba71ff4659b1f2"
   end
 
   head do
