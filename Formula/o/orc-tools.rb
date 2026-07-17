@@ -11,7 +11,7 @@ class OrcTools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b0fc9d73047783d843bb89a4c1e3ea7ca8e0f3d7a7d7f369235d9bb29d6f08c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "36eea0705fb8258e3060d9bd50923a74b23bb0885424f2ce3cad0a20d758080c"
   end
 
   depends_on "openjdk"
