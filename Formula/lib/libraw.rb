@@ -1,8 +1,8 @@
 class Libraw < Formula
   desc "Library for reading RAW files from digital photo cameras"
   homepage "https://www.libraw.org/"
-  url "https://www.libraw.org/data/LibRaw-0.22.1.tar.gz"
-  sha256 "a789dc4e2409e2901d93793a4e0b80c7b49d0d97cf6ad71c850eb7616acfd786"
+  url "https://www.libraw.org/data/LibRaw-0.22.2.tar.gz"
+  sha256 "de86b035655accff8d4010f1a221fdf50d353cb7b1422ba26f14a0db92612cfa"
   license any_of: ["LGPL-2.1-only", "CDDL-1.0"]
   compatibility_version 2
 
@@ -12,7 +12,7 @@ class Libraw < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd17251a6fcb3da63469901a167f13d92b6edf0cad0b95490e48cc186ba8c284"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "002ad48c37b3dbf4870868d33ae37d2ee8489a4fb95d26f83cba71ff4659b1f2"
   end
 
   head do
