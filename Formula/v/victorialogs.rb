@@ -1,8 +1,8 @@
 class Victorialogs < Formula
   desc "Open source user-friendly database for logs from VictoriaMetrics"
   homepage "https://docs.victoriametrics.com/victorialogs/"
-  url "https://github.com/VictoriaMetrics/VictoriaLogs/archive/refs/tags/v1.51.0.tar.gz"
-  sha256 "06e582370a74983a12f27999470d13fb0fa9ab31c80cc12f9c23db04256690f2"
+  url "https://github.com/VictoriaMetrics/VictoriaLogs/archive/refs/tags/v1.52.0.tar.gz"
+  sha256 "90d20500b5d9ecc41b0e1c2487696cde8aa16b025a1f2d176d53d759490d8f90"
   license "Apache-2.0"
 
   # The Git tags are interspersed with higher versions like 1.118.0, so we check
@@ -14,7 +14,7 @@ class Victorialogs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7efbefdecce8aabca5a6fcfc2a1e3c4aa90b8e71da05c66159f6d2775199a4cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1cc6c5a5b7349e3782b4e8e8daa09734c8c4d5bf411aa8160d40e2665950ae1"
   end
 
   depends_on "go" => :build
