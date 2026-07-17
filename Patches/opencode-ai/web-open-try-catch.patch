@@ -1,22 +1,22 @@
 diff --git a/packages/opencode/src/cli/cmd/web.ts b/packages/opencode/src/cli/cmd/web.ts
-index 69a981aad..0000000 100644
+index 69a981aad..6b586d51f 100644
 --- a/packages/opencode/src/cli/cmd/web.ts
 +++ b/packages/opencode/src/cli/cmd/web.ts
 @@ -72,11 +72,15 @@ export const WebCommand = effectCmd({
        }
-
+ 
        // Open localhost in browser
 -      open(localhostUrl).catch(() => {})
-+      if (process.env.DISPLAY || process.env.WAYLAND_DISPLAY || process.platform !== "linux") {
++      if (process.env.DISPLAY || process.env.WAYLAND_DISPLAY || (process.platform !== "linux" && process.platform !== "openharmony")) {
 +        open(localhostUrl).catch(() => {})
 +      }
      } else {
        const displayUrl = server.url.toString()
        UI.println(UI.Style.TEXT_INFO_BOLD + "  Web interface:    ", UI.Style.TEXT_NORMAL, displayUrl)
 -      open(displayUrl).catch(() => {})
-+      if (process.env.DISPLAY || process.env.WAYLAND_DISPLAY || process.platform !== "linux") {
++      if (process.env.DISPLAY || process.env.WAYLAND_DISPLAY || (process.platform !== "linux" && process.platform !== "openharmony")) {
 +        open(displayUrl).catch(() => {})
 +      }
      }
-
+ 
      yield* Effect.never

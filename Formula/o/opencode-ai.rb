@@ -1,10 +1,8 @@
 class OpencodeAi < Formula
-  desc "AI coding agent terminal UI — HarmonyOS aarch64"
-  homepage "https://github.com/social4hyq/ohos-opencode"
-  url "https://github.com/social4hyq/ohos-opencode.git",
-      tag:      "v1.18.3",
-      revision: "44049810b225e29e140cbe2c0d0980eb6b687ca8"
-  version "1.18.3"
+  desc "AI coding agent terminal UI — HarmonyOS aarch64, built from source"
+  homepage "https://github.com/anomalyco/opencode"
+  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.3.tar.gz"
+  sha256 "494041aedd7407079f91fd694de355f4ff022ba6bf876e09ff30983bbdc70ae1"
   license "MIT"
 
   livecheck do
@@ -13,34 +11,58 @@ class OpencodeAi < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.3-r1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-ai-v1.18.3-r1"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
-  # opencode is a `bun build --compile` single binary with bun runtime + JS + native .node/.so
-  # all embedded and pre-signed. The bottle has zero runtime dependencies.
+  # opencode is a `bun build --compile` single binary: OHOS bun runtime + JS
+  # bundle + native .so all embedded. The bottle has zero runtime dependencies.
   #
-  # Native deps (bun-pty, lightningcss, @tailwindcss/oxide, @opentui/core) come from
-  # @ohos-ports/* npm packages via package.json overrides aliases (loader patches ship
-  # inside those packages); bun 1.4.0_26+ auto-signs .node/.so in workspace mode during
-  # `bun install`. No Homebrew-keg copying or node_modules string patching needed.
+  # Native deps come from @ohos-ports/* npm packages via package.json override
+  # aliases (see Patches/opencode-ai/ohos-ports-deps.patch): opentui-core
+  # (bundled musl libopentui.so via file-loader import, 0.4.4+), bun-pty,
+  # lightningcss, tailwindcss-oxide. bun signs extracted .node/.so in-process
+  # during `bun install`, and `bun build --compile` re-signs its output ELF
+  # (bun.rb r16+), so no external signing pass is needed here — install()
+  # asserts the .codesign section is present instead.
   #
-  # @parcel/watcher needs no handling: opencode lazy-loads it with try/catch and degrades
-  # gracefully on openharmony (file watching disabled, no crash).
-  depends_on "bun"         => :build
-  depends_on "node"        => :build # npm_config_nodedir for bun install
-  depends_on "ohos-sdk"    => :build # binary-sign-tool + llvm-objcopy (strip .codesign)
-  depends_on "python@3.14" => :build
+  # `bun install --ignore-scripts` is intentional: lifecycle scripts are
+  # irrelevant to signing, and tree-sitter-bash/-powershell (in
+  # trustedDependencies) would fall back to a node-gyp source build on
+  # openharmony (no prebuilds) for native bindings the app never loads —
+  # opencode uses web-tree-sitter (wasm) at runtime.
+  #
+  # @parcel/watcher needs no handling: opencode lazy-loads it with try/catch
+  # and degrades gracefully on openharmony (file watching disabled, no crash).
+  depends_on "bun" => :build
+  depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
+
+  # OHOS adaptations, mirrored from social4hyq/ohos-opencode dev (patches are
+  # the `git diff v1.18.3..dev` for the respective files — regenerate there,
+  # never hand-edit hunks).
+  patch :p1 do
+    file "Patches/opencode-ai/ohos-ports-deps.patch"
+  end
+  patch :p1 do
+    file "Patches/opencode-ai/build-ohos-target.patch"
+  end
+  patch :p1 do
+    file "Patches/opencode-ai/project-global-worktree.patch"
+  end
+  patch :p1 do
+    file "Patches/opencode-ai/web-open-try-catch.patch"
+  end
 
   def install
-    ENV["PYTHON"] = formula_opt_bin("python@3.14")/"python3"
-    ENV["npm_config_nodedir"] = formula_opt_prefix("node").to_s
     ENV["BUN_TMPDIR"] = (buildpath/".bun-tmp").to_s
-    # Persistent bun cache (buildpath is wiped each run, causing network-failed packages to be re-downloaded
-    # every time; place it under HOMEBREW_CACHE).
-    ENV["BUN_INSTALL_CACHE"] = (HOMEBREW_CACHE/"bun-install-cache").to_s
+    (buildpath/".bun-tmp").mkpath
+    # Persistent bun cache: buildpath is wiped each run, which would re-download
+    # every package after a network hiccup. (The env var is BUN_INSTALL_CACHE_DIR;
+    # BUN_INSTALL_CACHE is a no-op.)
+    ENV["BUN_INSTALL_CACHE_DIR"] = (HOMEBREW_CACHE/"bun-install-cache").to_s
 
-    # Remove workspace packages not needed for the CLI build.
+    # Workspace packages not needed for the CLI build (drops electron etc. from
+    # the install set entirely).
     rm_r("packages/desktop")
     rm_r("packages/web")
     rm_r("packages/docs")
@@ -48,52 +70,33 @@ class OpencodeAi < Formula
 
     system "bun", "install", "--ignore-scripts"
 
-    # build.ts defaults to running `bun install --os=* --cpu=*` to pull all-platform native variants, but it
-    # depends on Bun.$ → on OHOS, sh cannot exec bun from PATH (EPERM), so we pass --skip-install to skip the
-    # internal version in build.ts and invoke it directly here, avoiding the broken $ path.
+    # Script.version short-circuits on OPENCODE_VERSION (no git / registry
+    # lookup), which also flips Script.channel to "latest".
+    ENV["OPENCODE_VERSION"] = version.to_s
+
+    # build.ts (patched) self-materializes the compile runtime from
+    # process.execPath (the real OHOS bun ELF, even under the brew LD_PRELOAD
+    # wrapper) and picks the openharmony-arm64-musl target under --single.
     #
-    # @ohos-ports/opentui-core's loader maps openharmony-arm64 → @opentui/core-linux-arm64-musl
-    # (musl ABI compatible), but bun's os filter skips linux optional deps on openharmony, so the
-    # musl variant must be pulled explicitly. bun's installer auto-signs the shipped libopentui.so.
-    # Version must match the @opentui/core override in package.json.
-    system "bun", "install", "--os=linux", "--cpu=arm64", "@opentui/core-linux-arm64-musl@0.4.3"
-
-    # Bun runtime symlink: Bun.build({compile: {target: "bun-linux-arm64-musl"}}) expects a local bun
-    bun_runtime = buildpath/"packages/opencode/bun-linux-aarch64-musl-v1.4.0"
-    ln_sf formula_opt_bin("bun")/"bun", bun_runtime
-
+    # No --skip-install: build.ts's internal `bun install --os="*" --cpu="*"`
+    # passes are required here. bun's bundler hard-errors on imports of
+    # platform packages matching the compile target (linux-arm64-musl), and
+    # the openharmony install filter skips exactly those (fff-bun, opentui,
+    # parcel-watcher variants are all os-gated to linux/darwin/win32).
     cd "packages/opencode" do
-      version = JSON.parse(File.read("package.json"))["version"]
-      ENV["OPENCODE_VERSION"] = version
+      system "bun", "run", "script/build.ts", "--single"
     end
-
-    # 1) Pre-build the Web UI (vite → rolldown-vite)
-    system "bun", "run", "--cwd", "packages/app", "build"
-
-    # 2) bun compile + embed Web UI (SKIP_VITE_BUILD=1 skips the second vite invocation inside build.ts)
-    cd "packages/opencode" do
-      ENV["SKIP_VITE_BUILD"] = "1"
-      system "bun", "run", "script/build.ts", "--single", "--skip-install"
-    end
-
-    # 3) Strip the embedded .codesign section, then re-sign with binary-sign-tool
-    sign_tool = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
-    objcopy   = formula_opt_prefix("ohos-sdk")/"native/llvm/bin/llvm-objcopy"
 
     out = "packages/opencode/dist/opencode-openharmony-arm64-musl/bin/opencode"
     odie "opencode binary missing" unless File.exist?(out)
-    unsigned = "#{out}.unsigned"
-    stripped = "#{out}.stripped"
-    mv out, unsigned
-    system objcopy, "--remove-section", ".codesign", unsigned, stripped
-    system sign_tool, "sign", "-selfSign", "1", "-inFile", stripped, "-outFile", out
-    chmod 0755, out
-    rm unsigned
-    rm stripped
+
+    # The device kernel refuses to exec unsigned ELFs; bun's compile step must
+    # have produced a .codesign section (ohos_sign, bun.rb r16+).
+    readelf = formula_opt_prefix("ohos-sdk")/"native/llvm/bin/llvm-readelf"
+    sections = Utils.safe_popen_read(readelf.to_s, "--section-headers", out)
+    odie "compiled binary lacks .codesign section" unless sections.include?(".codesign")
+
     bin.install out => "opencode-ai"
-    # Stub xdg-open so `opencode web` can spawn it without ENOENT on OHOS.
-    (bin/"xdg-open").write "#!/bin/sh\nexit 0\n"
-    chmod 0755, bin/"xdg-open"
   end
 
   test do
