@@ -3,13 +3,13 @@ class TranslateToolkit < Formula
 
   desc "Toolkit for localization engineers"
   homepage "https://toolkit.translatehouse.org/"
-  url "https://files.pythonhosted.org/packages/d8/7a/249a4fe2ebbd857f86156a22e1ddfe9b6f26f46ed1f3f391912ee34eb96b/translate_toolkit-3.19.14.tar.gz"
-  sha256 "35874f96ff83188151ee36f01ba1aa24d188151944cd567b85606095171c10d2"
+  url "https://files.pythonhosted.org/packages/12/9b/b5a1ad047af188983eac294cabad8492d0ffeca48028f7fa37aa18574e11/translate_toolkit-3.19.15.tar.gz"
+  sha256 "d4762323eb27dcf344de4ca5050ae67a9fa84b06b6b7f0f486c12970a363c96a"
   license "GPL-2.0-or-later"
   head "https://github.com/translate/translate.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0cdc39e1ebc6b9ab2ad60ff3ee93d5419e22c39a959cb5208e2b11517cc5a7a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f14d5cd9106150656b609f50226cd40c94b1fc7017fbb98a4f4da28c0ce367cf"
   end
 
   depends_on "rust" => :build # for `unicode_segmentation_py`
@@ -24,8 +24,8 @@ class TranslateToolkit < Formula
   end
 
   resource "unicode-segmentation-rs" do
-    url "https://files.pythonhosted.org/packages/15/cd/36adf321a9ba23906f44c1358164d6f69a149350c53802e366a270f7d82c/unicode_segmentation_rs-0.2.4.tar.gz"
-    sha256 "d22f419787e77baeac966076d1bf09272cc1087bddfec14f74ce994437d3779d"
+    url "https://files.pythonhosted.org/packages/4e/71/52f1a87120d92eafbd56c98e0d7abeb10d097bbd3dfb697bd8bc1dcd9070/unicode_segmentation_rs-0.3.0.tar.gz"
+    sha256 "6178f1097f3b1bf8098b43e35daea302c994a738f786b807890ef6ace21abf94"
   end
 
   def install
