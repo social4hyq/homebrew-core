@@ -30,8 +30,9 @@ class GrokBuild < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/grok-build-v0.2.102"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e652f46513a8a8c10f2ddf4c60b411a69b7b0d6cf29f2b00c391a9dddc8ee8a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/grok-build-v0.2.102-r1"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "929463671e303925dab8ea75f160be1ca3b7ce81cf77bc7157e56f51d2a4b682"
   end
 
   depends_on "ohos-bst-light" => :build
@@ -57,7 +58,9 @@ class GrokBuild < Formula
     SH
     chmod 0755, bin/"grok"
 
-    generate_completions_from_executable(bin/"grok", "completions")
+    # Generate from the libexec binary: the bin/grok wrapper execs
+    # opt_libexec, whose opt/ symlink only exists after install.
+    generate_completions_from_executable(libexec/"bin/grok", "completions")
   end
 
   def caveats

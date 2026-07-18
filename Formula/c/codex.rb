@@ -28,8 +28,9 @@ class Codex < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-v0.144.5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb0df7aa32a454a3c0cc70c92b9cf9d9833807c697c6a95bba41ce6467ab646f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-v0.144.5-r1"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "87cd0d8c630639eceef3bd154269fbd49bf549c041288ae2ce13abda248d7701"
   end
 
   depends_on "ohos-bst-light" => :build
@@ -77,7 +78,10 @@ class Codex < Formula
     SH
     chmod 0755, bin/"codex"
 
-    generate_completions_from_executable(bin/"codex", "completion")
+    # Generate from the libexec binary: the bin/codex wrapper execs
+    # opt_libexec, whose opt/ symlink only exists after install.
+    ENV["LD_PRELOAD"] = "#{formula_opt_lib("ohos-compat-shim")}/libohos_compat.so"
+    generate_completions_from_executable(libexec/"bin/codex", "completion")
   end
 
   def caveats
