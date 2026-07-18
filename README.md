@@ -31,7 +31,7 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 
 - **签名有四套并行路径，按产物来源区分**：
   - `bun` 内置 `ohos_sign` Rust crate（in-process，零 fork）—— `bun install` 装的 `.node`/`.so`、`bun build --compile` 产物、dlopen 兜底
-  - `llvm@21` 的 `cc`/`c++` shim（LLD `--code-sign`，链接期签名）—— cargo build-script 产物、`icu4c@78`/`bun-webkit`/`bun-pty`/`lightningcss`/`tailwindcss-oxide` 等 source-build formula 的最终产物
+  - `llvm@21` 的 `cc`/`c++` shim（LLD `--code-sign`，链接期签名）—— cargo build-script 产物、`icu4c@78`/`bun-webkit` 等 source-build formula 的最终产物
   - `ohos-bst-light` 的 `self-sign`（保留 ELF section 布局，不像 `binary-sign-tool` 那样可能破坏结构）—— `codex`/`claude-code`/`grok-build`/`opencode`（prebuilt）这类从 npm/官方渠道直接 fetch 的二进制，以及 vendor 的 musl 运行时库（libstdc++/libgcc）
   - `dlopen-sign-shim`（LD_PRELOAD 拦截 `dlopen`/`dlmopen`）—— 运行时才解包落盘、无法在构建期预签的原生模块（`opencode` 的 `@opentui/core` 等）
 - `claude-code` 遵循 Anthropic License，不在 bottle 里重新分发官方二进制：安装的是 runtime-fetch 包装脚本，首次运行时从 npmmirror（或 registry.npmjs.org 兜底）下载、校验 sha256、用 `ohos-bst-light` 自签并缓存
@@ -60,24 +60,21 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 
 | Formula | 版本 | 说明 |
 |---|---|---|
-| `opencode` | 1.18.3（2026-07-17） | OpenCode AI 编码代理 CLI，**预编译 musl 二进制**（从 npmmirror 拉取 `opencode-linux-arm64-musl`）；注入 RUNPATH 补 Alpine libstdc++/libgcc，LD_PRELOAD `dlopen-sign-shim` + `ohos-compat-shim` |
-| `opencode-ai` | 1.17.15 @ `v1.17.15`（2026-07-09） | opencode 的**源码构建**变体（`bun build --compile` 单文件二进制），原 `opencode` 改名而来；依赖本 tap 的 `bun`/`bun-pty`/`lightningcss`/`tailwindcss-oxide` |
-| `codex` | 0.144.5（2026-07-17） | OpenAI Codex CLI；从 npmmirror 拉取 `linux-arm64` musl 静态二进制 + `ohos-bst-light` 自签；内置 ripgrep 替换为本 tap 的 musl 版 |
+| `ohos-opencode` | 1.18.3（2026-07-18） | OpenCode AI 编码代理 CLI，**上游源码构建**（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；原生依赖走 `@ohos-ports/*` npm 包（opentui-core/bun-pty/lightningcss/tailwindcss-oxide），bottle 零运行时依赖；附带 zsh 补全。命令名 `ohos-opencode`，与官方 `opencode-ai` npm 包区分 |
+| `opencode` | 1.18.3（2026-07-17） | 同一 CLI 的**预编译 musl 二进制**路线（从 npmmirror 拉取 `opencode-linux-arm64-musl`）；注入 RUNPATH 补 Alpine libstdc++/libgcc，LD_PRELOAD `dlopen-sign-shim` + `ohos-compat-shim` |
+| `codex` | 0.144.5（2026-07-18） | OpenAI Codex CLI；从 npmmirror 拉取 `linux-arm64` musl 静态二进制 + `ohos-bst-light` 自签；内置 ripgrep 替换为本 tap 的 musl 版；bash/zsh/fish 补全 |
 | `claude-code` | 2.1.212（2026-07-17） | Anthropic Claude Code CLI；**runtime-fetch stub**（Anthropic License 不允许重分发官方二进制），首次运行拉取 + 自签 + 缓存 |
-| `grok-build` | 0.2.102（2026-07-17） | xAI Grok Build CLI；完全静态 ELF，仅 `ohos-bst-light` self-sign，无需 shim/RUNPATH |
+| `grok-build` | 0.2.102（2026-07-18） | xAI Grok Build CLI；完全静态 ELF，仅 `ohos-bst-light` self-sign，无需 shim/RUNPATH；bash/zsh/fish 补全 |
 | `bun` | 1.4.0 r30 @ `87e50375`（ohos-aarch64，2026-07-17） | Bun JavaScript runtime；已并入 upstream main `6618e7f7e`；运行时签名由内置 `ohos_sign` crate 承担；`bin/bun` 包装脚本 LD_PRELOAD `ohos-compat-shim` |
 | `bun-bootstrap` | 1.4.0-5467a689（2026-07-07） | 预编译 bun，用来启动 `bun bd` 自举本机 bun；已内置 ohos_sign，无需 ohos-sdk（`keg_only`） |
 | `bun-webkit` | `4895f45dfb`（2026-07-17） | JavaScriptCore / WTF / bmalloc 静态库，bun 专用 WebKit fork（`keg_only`） |
-| `bun-pty` | 0.4.10（2026-06-15） | `librust_pty.so`，portable-pty + nix 0.31 OHOS 支持（`keg_only`，供 `opencode-ai` 构建用） |
-| `lightningcss` | 1.30.1（2025-05-14） | `liblightningcss_node.so` CSS 原生绑定（`keg_only`，供 `opencode-ai` 构建用） |
-| `tailwindcss-oxide` | 4.1.11（2025-06-26） | `libtailwind_oxide.so` Tailwind v4 原生引擎绑定（`keg_only`，供 `opencode-ai` 构建用） |
 | `llvm@21` | 21.1.8（2025-12-16），revision 2 | OHOS 补丁版 clang + lld + multiarch runtime libs；cc/c++ shim 内置 LLD `--code-sign` 链接签名（**裁剪版**，`keg_only`） |
 | `icu4c@78` | 78.3（2026-03-17），revision 1 | Unicode 库，用本仓库 llvm@21 重编以对齐 libc++ ABI（`keg_only`） |
 | `ohos-bst-light` | 1.0.0（2026-07-10） | 轻量二进制自签工具，保留 ELF 结构不被破坏；`codex`/`claude-code`/`grok-build`/`opencode` 等运行时/构建期 self-sign 都靠它 |
-| `ohos-compat-shim` | 0.1.0（2026-07-15，新增） | LD_PRELOAD 兼容垫片：拦截 `close_range`/`fchmodat2`/`getpwuid_r`/`tmpfile`/`getcwd`/（可选）`linkat`；`bun`/`opencode`/`codex`/`claude-code` 共用，取代 `close-range-shim` |
-| `dlopen-sign-shim` | 0.1.0（2026-07-14，新增，从 `opencode` 拆出） | LD_PRELOAD 垫片：`dlopen`/`dlmopen` 前自动 self-sign 未签名 ELF，兜底运行时才解包落盘的原生模块 |
+| `ohos-compat-shim` | 0.1.0（2026-07-15） | LD_PRELOAD 兼容垫片：拦截 `close_range`/`fchmodat2`/`getpwuid_r`/`tmpfile`/`getcwd`/（可选）`linkat`；`bun`/`opencode`/`codex`/`claude-code` 共用，取代 `close-range-shim` |
+| `dlopen-sign-shim` | 0.1.0（2026-07-14，从 `opencode` 拆出） | LD_PRELOAD 垫片：`dlopen`/`dlmopen` 前自动 self-sign 未签名 ELF，兜底运行时才解包落盘的原生模块 |
 
-> `close-range-shim` 已于 2026-07-15 移除（功能被 `ohos-compat-shim` 取代，不再是独立 formula）。
+> 已下线：`close-range-shim`（2026-07-15，并入 `ohos-compat-shim`）；`bun-pty` / `lightningcss` / `tailwindcss-oxide`（2026-07-18，原 `keg_only` 原生库 keg，唯一消费者是 legacy opencode 本机构建——现 `ohos-opencode` 改走 `@ohos-ports/*` npm 包，formula 失去存在意义）。
 
 ## Bottle 状态
 
@@ -88,15 +85,12 @@ HarmonyOS (OHOS aarch64) 上从源码构建的 Homebrew tap，孵化那些还没
 | `llvm@21` | `llvm21-v21.1.8-pruned-r5`（2026-07-17，容器构建 + cmake readdir-errno 修复） |
 | `icu4c@78` | `icu4c@78-v78.3-r2` |
 | `bun-webkit` | `bun-webkit-v4895f45dfb-r1`（2026-07-17，容器构建） |
-| `bun-pty` | `bun-pty-v0.4.10-r2` |
-| `lightningcss` | `lightningcss-v1.30.1-r2` |
-| `tailwindcss-oxide` | `tailwindcss-oxide-v4.1.11-r2` |
 | `bun` | `bun-v1.4.0-r30`（2026-07-17，容器构建） |
+| `ohos-opencode` | `ohos-opencode-v1.18.3-r1`（2026-07-18，容器从上游源码构建，含 zsh 补全） |
 | `opencode` | `opencode-v1.18.3`（prebuilt，非本仓库源码构建） |
-| `opencode-ai` | `opencode-v1.17.15-r1` |
-| `codex` | `codex-v0.144.5` |
+| `codex` | `codex-v0.144.5-r1`（含 shell 补全） |
 | `claude-code` | `claude-code-v2.1.212`（stub bottle，仅含 wrapper，官方二进制 runtime-fetch） |
-| `grok-build` | `grok-build-v0.2.102` |
+| `grok-build` | `grok-build-v0.2.102-r1`（含 shell 补全） |
 | `ohos-bst-light` | `ohos-bst-light-v1.0.0` |
 | `ohos-compat-shim` | `ohos-compat-shim-v0.1.0` |
 | `dlopen-sign-shim` | `dlopen-sign-shim-v0.1.0` |
@@ -112,17 +106,16 @@ graph TD
     classDef boot fill:#e9d5ff,stroke:#a855f7,color:#1f2937
     classDef tc fill:#d1fae5,stroke:#10b981,color:#1f2937
     classDef sdk fill:#f1f5f9,stroke:#64748b,color:#1f2937
+    classDef npm fill:#fee2e2,stroke:#ef4444,color:#1f2937
 
     oc["opencode\n(prebuilt)"]:::app
-    ocai["opencode-ai\n(source-build)"]:::app
+    oho["ohos-opencode\n(source-build)"]:::app
     codex[codex]:::app
     cc[claude-code]:::app
     grok[grok-build]:::app
 
     bun:::rt
-    pty[bun-pty]:::rt
-    lcss[lightningcss]:::rt
-    tw[tailwindcss-oxide]:::rt
+    ports["@ohos-ports/*\nnpm packages"]:::npm
 
     bb["bun-bootstrap\n(已预签，无需 ohos-sdk)"]:::boot
     bw[bun-webkit]:::boot
@@ -135,10 +128,9 @@ graph TD
     ocs[ohos-compat-shim]:::sdk
     dss[dlopen-sign-shim]:::sdk
 
-    ocai --> bun
-    ocai --> pty
-    ocai --> lcss
-    ocai --> tw
+    oho -->|build| bun
+    oho -->|build| ports
+    oho -->|build only| sdk
 
     oc -.->|runtime LD_PRELOAD| dss
     oc -.->|runtime LD_PRELOAD| ocs
@@ -156,9 +148,6 @@ graph TD
 
     llvm --> sdk
     bun -.->|build only| sdk
-    pty --> sdk
-    lcss --> sdk
-    tw --> sdk
 
     codex --> obl
     codex -.->|runtime LD_PRELOAD| ocs
@@ -180,11 +169,11 @@ brew trust social4hyq/core         # Homebrew 6.0+ 必须显式信任第三方 t
 # 只装 bun：
 brew install bun
 
-# 只装 opencode（预编译二进制，默认选项）：
-brew install opencode
+# 装 ohos-opencode（上游源码构建的单体二进制，推荐）：
+brew install ohos-opencode
 
-# 装源码构建的 opencode-ai（会拉 bun/bun-pty/lightningcss/tailwindcss-oxide 编译）：
-brew install opencode-ai
+# 或装预编译二进制路线的 opencode：
+brew install opencode
 
 # 只装 claude-code / codex / grok-build（均从官方渠道拉取二进制 + 自签，依赖均已有 bottle）：
 brew install claude-code
@@ -196,11 +185,13 @@ brew install grok-build
 
 ```bash
 bun --version && bun -e 'console.log(2**32, Math.PI)'
-opencode --version
+ohos-opencode --version
 claude --version
 codex --version
 grok --version
 ```
+
+zsh 补全（`ohos-opencode` / `codex` / `grok`）随 bottle 装入 `share/zsh/site-functions/`，brew 的 zsh 环境开箱即用。
 
 ## 上游 PR 进展
 
@@ -211,31 +202,31 @@ grok --version
 | `lightningcss` | [parcel-bundler/lightningcss#1264](https://github.com/parcel-bundler/lightningcss/pull/1264) | 已提交，待合并 |
 | `@tailwindcss/oxide` | [tailwindlabs/tailwindcss#20276](https://github.com/tailwindlabs/tailwindcss/pull/20276) | 已提交，评审意见已处理，待合并 |
 
-PR 合并并发布后，`opencode-ai.rb` 中对应的 `index.js` 字符串替换 patch 可以删除，直接用上游原生包；默认安装的 `opencode`（预编译二进制）不受影响 —— 它本来就是纯 vendor 二进制，不做本地构建。
+PR 合并并发布后，对应 `@ohos-ports/*` 包会 `npm deprecate`，`ohos-opencode` 的依赖 override 切回官方包；默认安装的 `opencode`（预编译二进制）不受影响 —— 它本来就是纯 vendor 二进制，不做本地构建。
 
 ## 最近变更
 
 ```
+9490c4a66 codex/grok-build: shell completions, bottles re-tagged -r1
+77ab50344 ohos-opencode: rename from opencode-ai, add zsh completion
+0569ec814 remove bun-pty, lightningcss, tailwindcss-oxide formulas
+3e00b237c opencode-ai patches: drop header annotations (199 lines total)
+1d8ba149d opencode-ai patches: compile for bun-linux-arm64-ohos
+f3ce0c196 opencode-ai patches: truly minimal deps patches
+59819e724 opencode-ai: bottle 1.18.3 (rebuild 1)
+a3af80e1f opencode-ai 1.18.3: build from upstream source + Patches
+92aac6a9f opencode-ai: 1.18.3 — native deps via @ohos-ports npm overrides
 dc39127a2 grok-build: new formula for xAI's Grok Build CLI
-99afc0bfa bottle(llvm@21): rebuild bottle llvm21-v21.1.8-pruned-r5 (container build, cmake readdir-errno fix)
+99afc0bfa bottle(llvm@21): rebuild bottle llvm21-v21.1.8-pruned-r5
 beeacf9af opencode: bump to 1.18.3
 b884a2e28 codex: bump to 0.144.5
 06d72d110 claude-code: bump to 2.1.212
-660c4e8bc bottle(llvm@21): rebuild bottle llvm21-v21.1.8-pruned-r4 (revision 2)
+660c4e8bc bottle(llvm@21): rebuild bottle llvm21-v21.1.8-pruned-r4
 03dd3743e bun: wire ohos-compat-shim via LD_PRELOAD wrapper
 7c02f7682 close-range-shim: remove formula (superseded by ohos-compat-shim)
 54e65daf7 opencode: 1.17.20 -> 1.18.1, switch source to npmmirror
 ce31d3426 codex: 0.144.3 -> 0.144.4, switch source to npmmirror
 5270c750d claude-code: 2.1.207 -> 2.1.210
-23f72073f opencode: revision 5, swap close-range-shim for ohos-compat-shim
-1fb52fece codex: revision 3, swap close-range-shim for ohos-compat-shim
-359199c0e claude-code: stub bottle (runtime-fetch) + swap to ohos-compat-shim
-f9d06b87b ohos-compat-shim: new formula, LD_PRELOAD compat shim (close_range/getpwuid_r/tmpfile/getcwd/fchmodat2)
-5a0cee6fa opencode: revision 3, extract dlopen_sign_shim into own formula
-724f10189 opencode: revision 1, fix Cellar-absolute RUNPATH/self-reference for portability
-64af51870 opencode: new formula, prebuilt musl binary + RUNPATH injection (replaces source-build)
-5dec7e69d codex: new formula, OpenAI Codex CLI prebuilt musl binary + self-sign
-da1cbfe97 opencode-ai: rename from opencode, free up opencode name for prebuilt binary formula
 ```
 
 ## 反馈与贡献
