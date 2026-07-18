@@ -41,18 +41,18 @@ zsh 补全（`ohos-opencode` / `codex` / `grok`）随 bottle 装入 `share/zsh/s
 
 | Formula | 版本 | 定位 |
 |---|---|---|
-| `ohos-opencode` | 1.18.3 | OpenCode AI 编码代理 CLI，**上游源码构建**（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；原生依赖走 `@ohos-ports/*` npm 包（opentui-core/bun-pty/lightningcss/tailwindcss-oxide）；wrapper LD_PRELOAD `ohos-compat-shim`；附 zsh 补全。命令名 `ohos-opencode`，与官方 `opencode-ai` npm 包区分 |
+| `ohos-opencode` | 1.18.3 | OpenCode AI 编码代理 CLI，**上游源码构建**（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；原生依赖走 `@ohos-ports/*` npm 包（opentui-core/bun-pty/lightningcss/tailwindcss-oxide）；shim 随编译产物静态内嵌，无 LD_PRELOAD、零运行时依赖；附 zsh 补全。命令名 `ohos-opencode`，与官方 `opencode-ai` npm 包区分 |
 | `opencode` | 1.18.3 | 同一 CLI 的**预编译 musl 二进制**路线（从 npmmirror 拉取 `opencode-linux-arm64-musl`）；注入 RUNPATH 补 Alpine libstdc++/libgcc，wrapper LD_PRELOAD `ohos-compat-shim` + `dlopen-sign-shim` |
 | `codex` | 0.144.5 | OpenAI Codex CLI；从 npmmirror 拉取 `linux-arm64` musl 静态二进制 + `ohos-bst-light` 自签；内置 ripgrep 替换为本 tap 的 musl 版；bash/zsh/fish 补全 |
 | `claude-code` | 2.1.212 | Anthropic Claude Code CLI；**runtime-fetch stub**（Anthropic License 不允许重分发官方二进制），首次运行拉取 + 校验 sha256 + 自签 + 缓存 |
 | `grok-build` | 0.2.102 | xAI Grok Build CLI；完全静态 ELF，仅 `ohos-bst-light` self-sign，无需 shim/RUNPATH；bash/zsh/fish 补全 |
-| `bun` | 1.4.0 r32 | Bun JavaScript runtime（`social4hyq/ohos-bun` 的 `ohos-aarch64` 分支）；运行时签名由内置 `ohos_sign` crate 承担；`ohos-compat-shim` 已**静态内嵌**进可执行文件（覆盖 bun 及所有 `bun build --compile` 产物），`bin/bun` 为 symlink，无 LD_PRELOAD wrapper |
+| `bun` | 1.4.0 r33 | Bun JavaScript runtime（`social4hyq/ohos-bun` 的 `ohos-aarch64` 分支）；运行时签名由内置 `ohos_sign` crate 承担；`ohos-compat-shim` 已**静态内嵌**进可执行文件（覆盖 bun 及所有 `bun build --compile` 产物），`bin/bun` 为相对 symlink，无 LD_PRELOAD wrapper |
 | `bun-bootstrap` | 1.4.0-5467a689 | 预编译 bun，用来启动 `bun bd` 自举本机 bun；已预签，无需 ohos-sdk（`keg_only`） |
 | `bun-webkit` | `4895f45dfb` | JavaScriptCore / WTF / bmalloc 静态库，bun 专用 WebKit fork（`keg_only`） |
 | `llvm@21` | 21.1.8, revision 2 | OHOS 补丁版 clang + lld + multiarch runtime libs；链接期 LLD `--code-sign` 签名（**裁剪版**，`keg_only`） |
 | `icu4c@78` | 78.3, revision 1 | Unicode 库，用本仓库 llvm@21 重编以对齐 libc++ ABI（`keg_only`） |
 | `ohos-bst-light` | 1.0.0 | 轻量二进制自签工具，保留 ELF 结构不被破坏；`codex`/`claude-code`/`grok-build`/`opencode` 等的 self-sign 都靠它 |
-| `ohos-compat-shim` | 0.1.0 | LD_PRELOAD 兼容垫片：拦截 `close_range`/`fchmodat2`/`getpwuid_r`/`tmpfile`/`getcwd`/`linkat` 等；`opencode`/`codex`/`claude-code`/`ohos-opencode` 共用（bun 自 r31 起改为静态内嵌，不再是本包用户） |
+| `ohos-compat-shim` | 0.2.0 | LD_PRELOAD 兼容垫片：拦截 `close_range`/`fchmodat2`/`getpwuid_r`/`tmpfile`/`getcwd`/`linkat`/`symlinkat` 等（linkat/symlinkat 默认开启）；`opencode`/`codex`/`claude-code` 共用（bun 及 `bun build --compile` 产物静态内嵌副本，不是本包用户） |
 | `dlopen-sign-shim` | 0.1.0 | LD_PRELOAD 垫片：`dlopen`/`dlmopen` 前调用 `ohos-bst-light` 自动 self-sign 未签名 ELF，兜底运行时才解包落盘的原生模块 |
 
 > 已下线：`close-range-shim`（2026-07-15，并入 `ohos-compat-shim`）；`bun-pty` / `lightningcss` / `tailwindcss-oxide`（2026-07-18，原 `keg_only` 原生库 keg——`ohos-opencode` 已改走 `@ohos-ports/*` npm 包，formula 失去存在意义）。
@@ -61,13 +61,12 @@ zsh 补全（`ohos-opencode` / `codex` / `grok`）随 bottle 装入 `share/zsh/s
 
 - 所有 bottle 均面向 `arm64_ohos`，托管在 atomgit releases，tag 以各 formula 的 `root_url` 为准。
 - `bun-bootstrap` 为预编译 binary pour。
-- ⚠️ 当前例外：`bun` r32 的 bottle **尚未发布**（formula 中 sha256 为占位符），`brew install bun` 在 r32 bottle 上传前会走源码构建。
 
 ## 已知限制
 
 ### 系统调用降级
 
-`ohos-compat-shim` 以两种形态生效：`opencode` / `codex` / `claude-code` / `ohos-opencode` 经 wrapper LD_PRELOAD 它；bun（r31+）把它静态内嵌进可执行文件，且覆盖所有 `bun build --compile` 产物。使用者一般不用关心，但极端场景下能感知到：
+`ohos-compat-shim` 以两种形态生效：`opencode` / `codex` / `claude-code` 经 wrapper LD_PRELOAD 它；bun（r31+）把它静态内嵌进可执行文件，且覆盖所有 `bun build --compile` 产物（含 `ohos-opencode`）。使用者一般不用关心，但极端场景下能感知到：
 
 | 类别 | 鸿蒙缺什么 | 降级方式 | 用户能感知到的影响 |
 |---|---|---|---|
@@ -115,7 +114,7 @@ llvm@21 → icu4c@78 → bun-webkit → bun → ohos-opencode
 
 - `ohos-opencode` 的原生依赖（opentui-core/bun-pty/lightningcss/tailwindcss-oxide）来自 `@ohos-ports/*` npm 包，不是本 tap 的 formula。
 - **支撑层**：`ohos-sdk` 为构建期依赖（签名工具）；`ohos-bst-light` / `ohos-compat-shim` / `dlopen-sign-shim` 三个工具 formula 也依赖它。
-- **运行时 shim**：`opencode` / `codex` / `claude-code` / `ohos-opencode` 的 wrapper LD_PRELOAD `ohos-compat-shim`；`opencode` 另 LD_PRELOAD `dlopen-sign-shim`（后者运行时调用 `ohos-bst-light`）；`bun` 自 r31 起静态内嵌 shim，无运行时 shim 依赖。
+- **运行时 shim**：`opencode` / `codex` / `claude-code` 的 wrapper LD_PRELOAD `ohos-compat-shim`；`opencode` 另 LD_PRELOAD `dlopen-sign-shim`（后者运行时调用 `ohos-bst-light`）；`bun` 及 `bun build --compile` 产物（含 `ohos-opencode`）自 r31 起静态内嵌 shim，无运行时 shim 依赖。
 
 ## 上游 PR 进展
 
