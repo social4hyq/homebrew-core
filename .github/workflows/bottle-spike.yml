@@ -60,7 +60,10 @@ jobs:
       - name: 拉取镜像并启动 OHOS 容器
         run: |
           docker pull "$IMAGE"
+          # seccomp=unconfined：docker 默认 profile 拦截 io_uring_setup(EPERM)，
+          # bun-bootstrap 的 bun 启动即死；服务器 podman 默认放行，这里对齐
           docker run -d --name "$CONTAINER" --init \
+            --security-opt seccomp=unconfined \
             -v "$GITHUB_WORKSPACE:$TAP_IN_CONTAINER" \
             "$IMAGE" sleep infinity
           # 一次性容器配置（与服务器一致）：musl tmpfile() 硬编码路径 + /system/bin/sh
@@ -86,6 +89,17 @@ jobs:
             | jq -r '.formulae[0].installed | length')
           echo "installed_kegs=$N"
           [ "$N" -ge 1 ] || { echo "::error::formula 未安装（疑似 brew 静默拒绝，检查 trust/依赖）"; exit 1; }
+
+      - name: 构建失败诊断
+        if: failure()
+        run: |
+          echo "== brew 日志 =="
+          docker exec "$CONTAINER" bash -lc \
+            'for f in /root/.cache/Homebrew/Logs/*/*; do echo "--- $f"; tail -30 "$f"; done' || true
+          echo "== bun-bootstrap 可执行性自检 =="
+          BIN=/storage/Users/currentUser/.harmonybrew/opt/bun-bootstrap/bin/bun
+          docker exec "$CONTAINER" bash -lc \
+            "ls -la $BIN* 2>/dev/null; file $BIN 2>/dev/null; head -c 200 $BIN | od -c | head -3; $BIN --version; echo bun_exit=\$?" || true
 
       - name: 打 bottle
         id: bottle
