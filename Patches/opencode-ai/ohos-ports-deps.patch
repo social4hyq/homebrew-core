@@ -1,3 +1,20 @@
+From: opencode-ai formula (OHOS)
+Subject: package.json/bunfig/bun.lock — @ohos-ports/* native deps + openharmony os metadata
+
+现象: bun-pty / lightningcss / @tailwindcss/oxide / @opentui/core 上游包
+没有 openharmony 平台二进制（os 门槛导致 OHOS 上装不进）；上游 bun.lock
+由官方 bun 生成，不认识 openharmony os 值写成 "none"，OHOS bun install
+会跳过这些平台包安装。
+
+为什么这么改: 4 个 override 别名换入 @ohos-ports/*（OHOS 交叉编译
++ 预签名 .so + loader patch 的包）；bunfig 加 minimumReleaseAge 豁免
+（自家包可能刚发布 < 3 天）；bun.lock 同步 os 字段为 "openharmony"
+——E2 实验证明 lock 必须 patch：OHOS bun install 看到上游 "none"
+os 值不会自动收敛，而是跳过安装（esbuild/vite 随后即缺二进制报错）。
+
+何时可删除: 上游对应平台包发布官方 openharmony 二进制（lightningcss
+#1264 / tailwindcss-oxide #20276 合并后上游收口，对应包可 deprecate）。
+
 diff --git a/bun.lock b/bun.lock
 index 3d8722b15..1e4510be5 100644
 --- a/bun.lock

@@ -1,3 +1,16 @@
+From: opencode-ai formula (OHOS)
+Subject: project resolve — global project worktree / → homedir
+
+现象: 非 git 目录启动时，global project 的 worktree 被设为文件系统
+根 "/"，OHOS 沙箱下对 / 的递归扫描既无意义又触发大量 EPERM。
+
+为什么这么改: resolve() 的 no-repo 分支与 fromDirectory() 的 worktree
+赋值统一改用 os.homedir() 与 data.directory——global 项目作用域限于
+用户主目录。
+
+何时可删除: 上游化 PR（"global worktree '/' 在任何平台都可疑"），
+合并后即删。
+
 diff --git a/packages/core/src/project.ts b/packages/core/src/project.ts
 index 49e054d7c..43b186dda 100644
 --- a/packages/core/src/project.ts

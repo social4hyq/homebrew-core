@@ -1,3 +1,15 @@
+From: opencode-ai formula (OHOS)
+Subject: web command — 无 DISPLAY 时不调 open()
+
+现象: opencode web 在无头 linux/openharmony 环境也会调 open() →
+spawn xdg-open ENOENT。原 guard 只排 linux，编译产物
+process.platform === "openharmony" 时恒为真，同样会触发。
+
+为什么这么改: DISPLAY/WAYLAND_DISPLAY 缺失时跳过 open()；platform
+检查同时排除 linux 与 openharmony。
+
+何时可删除: 上游化 PR（无头 linux 同样不该调 open()），合并后即删。
+
 diff --git a/packages/opencode/src/cli/cmd/web.ts b/packages/opencode/src/cli/cmd/web.ts
 index 69a981aad..6b586d51f 100644
 --- a/packages/opencode/src/cli/cmd/web.ts
