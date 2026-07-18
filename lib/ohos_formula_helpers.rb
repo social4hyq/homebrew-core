@@ -35,12 +35,10 @@ module OhosFormulaHelpers
   #   extra_exports - verbatim extra export lines, emitted after TMPDIR
   def cli_wrapper(target, tmpdir_env:, preload: [], extra_exports: [])
     lines = ["#!/bin/sh"]
-    unless preload.empty?
-      lines << "export LD_PRELOAD=\"#{preload.join(":")}${LD_PRELOAD:+:$LD_PRELOAD}\""
-    end
+    lines << "export LD_PRELOAD=\"#{preload.join(":")}${LD_PRELOAD:+:$LD_PRELOAD}\"" unless preload.empty?
     lines << "export TMPDIR=\"${#{tmpdir_env}:-#{OHOS_DEFAULT_TMPDIR}}\""
     lines.concat(extra_exports)
     lines << "exec \"#{target}\" \"$@\""
-    lines.join("\n") + "\n"
+    "#{lines.join("\n")}\n"
   end
 end
