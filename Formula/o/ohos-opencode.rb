@@ -1,3 +1,5 @@
+require_relative "../../lib/ohos_formula_helpers"
+
 class OhosOpencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
@@ -114,18 +116,14 @@ class OhosOpencode < Formula
     # (`with { type: "file" }`) preserves those bytes, so the runtime-extracted
     # libraries are already signed.
     #
-    # The launcher wrapper remains only to default TMPDIR to a writable EL2
-    # path (OHOS /tmp is read-only in app contexts); override via
-    # OPENCODE_TMPDIR. Self-reference via opt_libexec (not libexec) so the
-    # baked path stays stable across the HOMEBREW_CELLAR flat/nested flip
-    # (see opencode.rb).
+    # The launcher wrapper remains only to default TMPDIR (override via
+    # OPENCODE_TMPDIR) — see lib/ohos_formula_helpers.rb for the TMPDIR and
+    # opt_libexec-self-reference rationale.
     mkdir_p libexec/"bin"
     libexec.install out => "bin/ohos-opencode"
-    (bin/"ohos-opencode").write <<~SH
-      #!/bin/sh
-      export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
-      exec "#{opt_libexec}/bin/ohos-opencode" "$@"
-    SH
+    (bin/"ohos-opencode").write OhosFormulaHelpers.cli_wrapper(
+      "#{opt_libexec}/bin/ohos-opencode", tmpdir_env: "OPENCODE_TMPDIR"
+    )
     chmod 0755, bin/"ohos-opencode"
 
     # Static zsh completion: upstream has no completion generator. Top-level

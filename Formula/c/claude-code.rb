@@ -1,3 +1,5 @@
+require_relative "../../lib/ohos_formula_helpers"
+
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI — HarmonyOS (runtime-fetch stub; no binary in bottle)"
   homepage "https://docs.anthropic.com/en/docs/claude-code"
@@ -90,7 +92,7 @@ class ClaudeCode < Formula
       fi
 
       export LD_PRELOAD="$HB/opt/ohos-compat-shim/lib/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
-      export CLAUDE_CODE_TMPDIR="${CLAUDE_CODE_TMPDIR:-/data/storage/el2/base/cache}"
+      export CLAUDE_CODE_TMPDIR="${CLAUDE_CODE_TMPDIR:-#{OhosFormulaHelpers::OHOS_DEFAULT_TMPDIR}}"
       exec "$BIN" "$@"
     SH
     chmod 0755, bin/"claude"

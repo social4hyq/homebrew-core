@@ -1,3 +1,5 @@
+require_relative "../../lib/ohos_formula_helpers"
+
 class GrokBuild < Formula
   desc "XAI Grok coding agent CLI — HarmonyOS aarch64 (prebuilt static binary)"
   homepage "https://github.com/xai-org/grok-build"
@@ -48,14 +50,10 @@ class GrokBuild < Formula
     libexec.install src => "bin/grok"
     chmod 0755, libexec/"bin/grok"
 
-    # Self-reference via opt_libexec (prefix-relative, stable) rather than
-    # libexec (Cellar-relative) — same HOMEBREW_CELLAR-flip reasoning as the
-    # other OHOS CLI formulas in this tap (see opencode.rb / codex.rb).
-    (bin/"grok").write <<~SH
-      #!/bin/sh
-      export TMPDIR="${GROK_TMPDIR:-/data/storage/el2/base/cache}"
-      exec "#{opt_libexec}/bin/grok" "$@"
-    SH
+    # opt_libexec self-reference rationale: see lib/ohos_formula_helpers.rb.
+    (bin/"grok").write OhosFormulaHelpers.cli_wrapper(
+      "#{opt_libexec}/bin/grok", tmpdir_env: "GROK_TMPDIR"
+    )
     chmod 0755, bin/"grok"
 
     # Generate from the libexec binary: the bin/grok wrapper execs

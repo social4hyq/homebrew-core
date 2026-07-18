@@ -1,3 +1,5 @@
+require_relative "../../lib/ohos_formula_helpers"
+
 class Opencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64 (prebuilt musl binary)"
   homepage "https://github.com/anomalyco/opencode"
@@ -167,14 +169,16 @@ class Opencode < Formula
     libexec.install src => "bin/opencode"
     chmod 0755, libexec/"bin/opencode"
 
-    # Self-reference via opt_libexec (see RUNPATH comment above) rather than
-    # libexec, for the same portability reason.
-    (bin/"opencode").write <<~SH
-      #!/bin/sh
-      export LD_PRELOAD="#{formula_opt_lib("dlopen-sign-shim")}/libdlopen_sign_shim.so:#{formula_opt_lib("ohos-compat-shim")}/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
-      export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
-      exec "#{opt_libexec}/bin/opencode" "$@"
-    SH
+    # opt_libexec self-reference: same portability reasoning as the RUNPATH
+    # comment above (canonical version in lib/ohos_formula_helpers.rb).
+    (bin/"opencode").write OhosFormulaHelpers.cli_wrapper(
+      "#{opt_libexec}/bin/opencode",
+      tmpdir_env: "OPENCODE_TMPDIR",
+      preload:    [
+        "#{formula_opt_lib("dlopen-sign-shim")}/libdlopen_sign_shim.so",
+        "#{formula_opt_lib("ohos-compat-shim")}/libohos_compat.so",
+      ],
+    )
     chmod 0755, bin/"opencode"
   end
 
