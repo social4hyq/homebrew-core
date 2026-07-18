@@ -24,6 +24,11 @@ on:
         required: true
         type: boolean
         default: false
+      probe:
+        description: '只跑 spawnSync stdin 探针（跳过构建，诊断用）'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -80,7 +85,27 @@ jobs:
           # Harmonybrew fork 的信任机制：formula 内容变化后需重新 trust，否则拒绝加载（静默 exit 0）
           docker exec "$CONTAINER" bash -lc 'brew trust social4hyq/core'
 
+      - name: spawnSync stdin 探针（probe=true）
+        if: inputs.probe
+        run: |
+          docker exec "$CONTAINER" bash -lc "$BREW_ENV brew install bun-bootstrap"
+          docker exec "$CONTAINER" bash -lc 'cd /tmp && printf "a\n" > tcc.h &&
+            /storage/Users/currentUser/.harmonybrew/opt/bun-bootstrap/bin/bun -e "
+              const { spawnSync } = require(\"node:child_process\");
+              const r = spawnSync(\"git\", [\"apply\",\"--no-index\",\"-\"],
+                { input: \"--- tcc.h\n+++ tcc.h\n@@ -1,1 +1,1 @@\n-a\n+b\n\",
+                  stdio: [\"pipe\",\"ignore\",\"pipe\"], encoding: \"utf8\" });
+              console.log(\"node:child_process spawnSync status=\" + r.status +
+                \" stderr=\" + JSON.stringify(r.stderr));
+              const r2 = Bun.spawnSync([\"git\",\"apply\",\"--no-index\",\"-\"],
+                { input: \"--- tcc.h\n+++ tcc.h\n@@ -1,1 +1,1 @@\n-b\n+c\n\",
+                  stdio: [\"pipe\",\"ignore\",\"pipe\"], encoding: \"utf8\" });
+              console.log(\"Bun.spawnSync status=\" + r2.status +
+                \" stderr=\" + JSON.stringify(r2.stderr));
+            " && echo "--- tcc.h now: $(cat tcc.h)"'
+
       - name: 源码构建 formula
+        if: '!inputs.probe'
         run: |
           docker exec "$CONTAINER" bash -lc \
             "$BREW_ENV brew install --build-bottle --verbose social4hyq/core/${{ inputs.formula }}" 2>&1 | tee build.log
@@ -106,6 +131,7 @@ jobs:
             "ls -la $BIN* 2>/dev/null; file $BIN 2>/dev/null; head -c 200 $BIN | od -c | head -3; $BIN --version; echo bun_exit=\$?" || true
 
       - name: 打 bottle
+        if: '!inputs.probe'
         id: bottle
         run: |
           VER=$(docker exec "$CONTAINER" bash -lc \
@@ -125,7 +151,7 @@ jobs:
           ls -la bottle-out/
 
       - name: 上传 bottle 为 artifact（不上 Release 时的产物出口）
-        if: success()
+        if: success() && !inputs.probe
         uses: actions/upload-artifact@v4
         with:
           name: bottle-${{ inputs.formula }}-run${{ github.run_number }}
