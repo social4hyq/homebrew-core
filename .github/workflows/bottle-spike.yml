@@ -107,8 +107,17 @@ jobs:
       - name: 源码构建 formula
         if: '!inputs.probe'
         run: |
-          docker exec "$CONTAINER" bash -lc \
-            "$BREW_ENV brew install --build-bottle --verbose social4hyq/core/${{ inputs.formula }}" 2>&1 | tee build.log
+          # atomgit CDN 有瞬时 404（实测 node bottle 连续 4 次 404，1 分钟后恢复 200）；
+          # 失败隔 90s 重试一次。brew 对已下载/已安装部分增量复用，重试成本低
+          for i in 1 2; do
+            if docker exec "$CONTAINER" bash -lc \
+              "$BREW_ENV brew install --build-bottle --verbose social4hyq/core/${{ inputs.formula }}" 2>&1 | tee build.log; then
+              break
+            fi
+            [ "$i" = 2 ] && exit 1
+            echo "::warning::brew install 第 $i 次失败，90s 后重试（atomgit 瞬时 404 容错）"
+            sleep 90
+          done
           echo "== 构建后磁盘 =="
           docker exec "$CONTAINER" df -h /
           df -h /
