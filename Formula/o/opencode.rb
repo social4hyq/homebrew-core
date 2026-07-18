@@ -19,8 +19,8 @@ class Opencode < Formula
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.3"
     # `brew bottle` emits `cellar: "<HOMEBREW_CELLAR>"` (not :any_skip_relocation)
-    # for this formula: the RUNPATH injected into the ELF (inject-runpath.py
-    # below) is an absolute HOMEBREW_PREFIX/opt/... path, and the bottle
+    # for this formula: the RUNPATH injected into the ELF (via the
+    # inject-runpath formula) is an absolute HOMEBREW_PREFIX/opt/... path, and the bottle
     # auditor flags any absolute-prefix reference in an ELF. We keep
     # :any_skip_relocation anyway — every baked reference is opt/-relative (no
     # Cellar path), the opt/<name> symlink is recreated on every pour, and
@@ -66,6 +66,10 @@ class Opencode < Formula
   # category as ohos-bst-light in this tap), and this drops opencode's own
   # ohos-sdk :build dependency entirely since compiling the shim was the
   # only thing that needed it.
+  #
+  # r4-era cleanup: inject-runpath.py was likewise extracted into its own
+  # formula (inject-runpath) — it's a general fix-prebuilt-ELF-for-OHOS tool,
+  # not opencode-specific. This also moved the python@3.14 :build dep there.
 
   # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
   # runtime), which OHOS does NOT ship (OHOS uses libc++). We bundle musl-aarch64
@@ -73,14 +77,15 @@ class Opencode < Formula
   # OHOS ignores LD_LIBRARY_PATH, and LD_PRELOAD cannot satisfy NEEDED entries,
   # so RUNPATH (which the OHOS musl loader DOES honor) is the only mechanism.
   # patchelf rewrites segment offsets and corrupts Bun's appended module graph,
-  # so RUNPATH is injected in-place (zero file-offset shift) via inject-runpath.py.
+  # so RUNPATH is injected in-place (zero file-offset shift) via the
+  # inject-runpath tool (its own formula in this tap).
   #
   # Additionally, the TUI extracts its embedded native modules (libopentui.so,
   # *.node, ...) to a scratch file at runtime and dlopens them. OHOS rejects
   # unsigned .so with "Permission denied" — dlopen-sign-shim (below) handles
   # this generically.
+  depends_on "inject-runpath" => :build
   depends_on "ohos-bst-light" => :build
-  depends_on "python@3.14"    => :build
   depends_on "dlopen-sign-shim"
   depends_on "ohos-compat-shim"
 
@@ -101,7 +106,6 @@ class Opencode < Formula
     libdir = libexec/"lib"
     libdir.mkpath
     sign = formula_opt_bin("ohos-bst-light")/"self-sign"
-    python = formula_opt_bin("python@3.14")/"python3"
 
     # Deploy + sign the musl GCC runtime libraries (.apk = gzip tar).
     # Stage each resource into a Pathname target (the block form yields a
@@ -132,64 +136,6 @@ class Opencode < Formula
     ln_sf "libstdc++.so.6.0.34", libdir/"libstdc++.so.6"
 
     # Inject DT_RUNPATH (in-place, zero offset shift) → libexec/lib.
-    (buildpath/"inject-runpath.py").write <<~'PY'
-      import os, sys, struct
-      def u(d, off, fmt): return struct.unpack_from(fmt, d, off)
-      def patch(path, libdir):
-          with open(path, "rb") as f: d = bytearray(f.read())
-          e_phoff=u(d,0x20,"<Q")[0]; e_phnum=u(d,0x38,"<H")[0]; e_phentsize=u(d,0x36,"<H")[0]
-          loads=[]; ptdyn=None
-          for i in range(e_phnum):
-              b=e_phoff+i*e_phentsize
-              t,fl,off,va,pa,fsz,msz,al=u(d,b,"<IIQQQQQQ")
-              if t==1: loads.append((off,va,fsz,msz))
-              if t==2: ptdyn=(i,b)
-          def seg_for_v(v):
-              for off,va,fsz,msz in loads:
-                  if va<=v<va+msz: return (off,va)
-          def v2f(v):
-              o,va=seg_for_v(v); return o+(v-va)
-          rw=max(loads,key=lambda l:l[1]); rw_off,rw_v=rw[0],rw[1]
-          def f2v_rw(off): return rw_v+(off-rw_off)
-          _,db=ptdyn
-          _,_,d_off,d_va,d_pa,d_fsz,_,_=u(d,db,"<IIQQQQQQ")
-          entries=[]; strtab_v=None; strsz=None; i=0
-          while True:
-              tag,val=u(d,d_off+i*16,"<qQ")
-              if tag==0: break
-              entries.append((tag,val))
-              if tag==5: strtab_v=val
-              if tag==10: strsz=val
-              i+=1
-          strtab_f=v2f(strtab_v)
-          orig=bytes(d[strtab_f:strtab_f+strsz])
-          e_shoff=u(d,0x28,"<Q")[0]; e_shnum=u(d,0x3c,"<H")[0]; e_shentsize=u(d,0x3a,"<H")[0]
-          maxend=0
-          for i in range(e_shnum):
-              b=e_shoff+i*e_shentsize; off,size=u(d,b+24,"<QQ")
-              if rw_off<=off<rw_off+rw[2]: maxend=max(maxend,off+size)
-          free=maxend+((16-(maxend%16))%16)
-          rp=libdir.encode()+b"\x00"
-          pad=(8-(len(orig)%8))%8
-          new_str=orig+b"\x00"*pad+rp
-          rp_off=len(orig)+pad; new_sz=len(new_str)
-          str_f=free; str_v=f2v_rw(str_f)
-          dyn_f=str_f+new_sz+((16-((str_f+new_sz)%16))%16); dyn_v=f2v_rw(dyn_f)
-          nd=[]
-          for tag,val in entries:
-              if tag==5: val=str_v
-              elif tag==10: val=new_sz
-              nd.append((tag,val))
-          nd.append((29,rp_off)); nd.append((0,0))
-          db_b=b"".join(struct.pack("<qQ",t,v) for t,v in nd)
-          assert dyn_f+len(db_b)<=rw_off+rw[2], "not enough RW padding"
-          d[str_f:str_f+new_sz]=new_str
-          d[dyn_f:dyn_f+len(db_b)]=db_b
-          struct.pack_into("<IIQQQQQQ",d,db,2,u(d,db,"<IIQQQQQQ")[1],dyn_f,dyn_v,dyn_v,len(db_b),len(db_b),8)
-          with open(path,"wb") as f: f.write(d)
-          print("RUNPATH=%s injected"%libdir)
-      patch(sys.argv[1], sys.argv[2])
-    PY
     # RUNPATH points at opt_libexec/lib (prefix-relative, stable), not
     # libdir/libexec (Cellar-relative). HOMEBREW_CELLAR flips between
     # HOMEBREW_PREFIX/Cellar and HOMEBREW_REPOSITORY/Cellar depending on
@@ -199,7 +145,7 @@ class Opencode < Formula
     # always HOMEBREW_PREFIX-relative and Homebrew re-links it correctly on
     # every install, so it's stable across that flip, and the dynamic linker
     # follows the opt/ symlink same as any other directory. Verified 2026-07-14.
-    system python, (buildpath/"inject-runpath.py").to_s, src.to_s, (opt_libexec/"lib").to_s
+    system formula_opt_bin("inject-runpath")/"inject-runpath", src.to_s, (opt_libexec/"lib").to_s
 
     # Self-sign the patched binary.
     system sign, src.to_s
