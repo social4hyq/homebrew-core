@@ -4,6 +4,7 @@ class OhosOpencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.3.tar.gz"
   sha256 "494041aedd7407079f91fd694de355f4ff022ba6bf876e09ff30983bbdc70ae1"
   license "MIT"
+  revision 1
 
   livecheck do
     url "https://github.com/anomalyco/opencode/releases/latest"
@@ -11,12 +12,13 @@ class OhosOpencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.3-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e03e566cf7a083dbf9f35554752cfe19d1108b648090d272b97d0edda0c417ec"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.3-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e29526f148b3cdc1021bf1b357b9f6adb2508950afe607952220a960059f0bfb"
   end
 
   # opencode is a `bun build --compile` single binary: OHOS bun runtime + JS
-  # bundle + native .so all embedded. The bottle has zero runtime dependencies.
+  # bundle + native .so all embedded. Runtime dependency: ohos-compat-shim
+  # only (see wrapper below).
   #
   # Native deps come from @ohos-ports/* npm packages via package.json override
   # aliases (see Patches/ohos-opencode/ohos-ports-deps.patch): opentui-core
@@ -36,6 +38,7 @@ class OhosOpencode < Formula
   # and degrades gracefully on openharmony (file watching disabled, no crash).
   depends_on "bun" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
+  depends_on "social4hyq/core/ohos-compat-shim"
 
   # OHOS adaptations, mirrored from social4hyq/ohos-opencode dev (patches are
   # the `git diff v1.18.3..dev` for the respective files — regenerate there,
@@ -100,7 +103,28 @@ class OhosOpencode < Formula
     sections = Utils.safe_popen_read(readelf.to_s, "--section-headers", out)
     odie "compiled binary lacks .codesign section" unless sections.include?(".codesign")
 
-    bin.install out => "ohos-opencode"
+    # The raw binary must not go straight into bin: the OHOS bun runtime calls
+    # close_range(2) at startup, which app seccomp policies (hishell, this
+    # build context, ...) block with SIGSYS — the process dies with "invalid
+    # system call (core dumped)" before printing anything. ohos-compat-shim
+    # intercepts close_range (and friends) in libc, so the launcher preloads
+    # it. Self-reference via opt_libexec (not libexec) so the baked path stays
+    # stable across the HOMEBREW_CELLAR flat/nested flip (see opencode.rb).
+    #
+    # dlopen-sign-shim is NOT needed here, unlike opencode.rb: bun signs the
+    # @ohos-ports native .so in-process during `bun install`, and the embed
+    # (`with { type: "file" }`) preserves those bytes, so the runtime-extracted
+    # libraries are already signed. Verified: TUI renders with only
+    # libohos_compat.so preloaded.
+    mkdir_p libexec/"bin"
+    libexec.install out => "bin/ohos-opencode"
+    (bin/"ohos-opencode").write <<~SH
+      #!/bin/sh
+      export LD_PRELOAD="#{formula_opt_lib("ohos-compat-shim")}/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
+      export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
+      exec "#{opt_libexec}/bin/ohos-opencode" "$@"
+    SH
+    chmod 0755, bin/"ohos-opencode"
 
     # Static zsh completion: upstream has no completion generator. Top-level
     # commands from packages/opencode/src/cli/cmd/*.ts (v1.18.3).
