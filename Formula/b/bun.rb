@@ -22,7 +22,9 @@ class Bun < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "d4656ab79a07c7bf6f37b691978119ecd46737870353e862aef97d4e837305ed"
   end
 
-  # ── Dependencies (all bare names, zero changes when graduating to harmonybrew/core) ──
+  # ── Dependencies (bare names except icu4c@78 — the one name harmonybrew/core
+  # also ships, which a bare reference would resolve to; see README "Formula
+  # 引用约定") ──
   depends_on "bun-bootstrap" => :build # Bootstrap: `bun bd` itself is a bun script
   depends_on "bun-webkit" => :build
   depends_on "cmake" => :build

@@ -57,10 +57,25 @@ zsh 补全（`ohos-opencode` / `codex` / `grok`）随 bottle 装入 `share/zsh/s
 
 > 已下线：`close-range-shim`（2026-07-15，并入 `ohos-compat-shim`）；`bun-pty` / `lightningcss` / `tailwindcss-oxide`（2026-07-18，原 `keg_only` 原生库 keg——`ohos-opencode` 已改走 `@ohos-ports/*` npm 包，formula 失去存在意义）。
 
+### 双轨 opencode 的退役判据
+
+`ohos-opencode`（源码轨，推荐）与 `opencode`（预编译轨）当前并行维护，每个上游版本双倍成本。退役条件：**源码轨自 1.19.x 起连续 2 个上游版本在真机零回归后，预编译轨标记 `deprecate! because: :superseded`**；在此之前预编译轨保留，作为源码轨回归时的对照与 bisect 参照。上游 PR（lightningcss #1264、oxide #20276）合并与否只影响 `@ohos-ports/*` 依赖来源，不改变本判据。
+
 ## Bottle
 
 - 所有 bottle 均面向 `arm64_ohos`，托管在 atomgit releases，tag 以各 formula 的 `root_url` 为准。
+- **tag 的 `-rN` 序号与 formula 的 `revision` 无对应关系**：bottle 内容（sha256）每变一次就新建一个 tag、rN 递增，而 `revision` 只在需要驱动已装用户升级时才 bump（例：ohos-opencode `revision 2` 对应 tag `-r3`）。读 formula 时不要拿两者互相推断。
 - `bun-bootstrap` 为预编译 binary pour。
+
+## Formula 引用约定
+
+- `depends_on` / `Formula[]` 里，**与官方 harmonybrew/core 同名的 formula 必须写 tap 全限定名**，否则裸名会解析到官方版本。当前冲突集合只有 `icu4c@78`（官方 core 也有 78.3，但那是系统 clang 构建，ABI 与本 tap 的 bun/webkit 不兼容）→ 必须写 `social4hyq/core/icu4c@78`，并忽略 `brew style` 的短名建议。
+- 其余名字（llvm@21、bun、bun-webkit 等官方 core 不存在的）一律用裸名，毕业迁移到官方 core 时零改动。
+- 新增 formula/依赖时先探测冲突：`brew info homebrew/core/<name>` 能解析出 stable 版本即为冲突。
+
+## 共享代码
+
+CLI formula 的 bin/ wrapper 生成（TMPDIR 默认值、LD_PRELOAD 链、opt_libexec 自引用）收敛在 `lib/ohos_formula_helpers.rb`，CELLAR-flip 与 TMPDIR 的完整 rationale 也在该文件头部注释。改 wrapper 行为改这里；改动会影响多个 formula 的 bottle 内容，重打 bottle 前先确认生成结果是否字节级等价。
 
 ## 已知限制
 
@@ -89,6 +104,7 @@ zsh 补全（`ohos-opencode` / `codex` / `grok`）随 bottle 装入 `share/zsh/s
 - `icu4c@78` 用本仓库的 `llvm@21` 重编，让 ICU 的 libc++ 符号和 `bun` / `bun-webkit` 用同一个 mangling（`__h` namespace），避免链接器找不到符号
 - 自签算法参考 [hqzing/ohos-bst-light](https://github.com/hqzing/ohos-bst-light)（fs-verity descriptor + SHA-256 merkle tree + `.codesign` ELF64 section 注入）
 - bottle 只覆盖 `arm64_ohos`，不提供 macOS / x86_64 等其他平台产物
+- **`bun-webkit` 源码经 gh-proxy.com 第三方代理拉取**（GitHub 在 OHOS 网络环境不可靠/被断流）：完整性由 40 位 commit pin 保证（git 校验 revision，代理无法篡改而不被发现），但可用性依赖该代理存续 —— 代理失效时改回直连 github.com 或换镜像即可，formula 只需改 url 前缀
 
 ## 核心能力确认
 
