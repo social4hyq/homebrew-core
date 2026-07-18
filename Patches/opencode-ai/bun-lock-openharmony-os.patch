@@ -1,20 +1,3 @@
-From: opencode-ai formula (OHOS)
-Subject: bun.lock — openharmony 平台包 os 元数据
-
-现象: 上游 bun.lock 由官方 bun 生成，不认识 openharmony os 值写成
-"none"。OHOS bun install 以此为平台过滤依据：os 为 "none" 时跳过安装
-（E2 实验证明 @esbuild/@oxc-*/@oxlint/@rollup 的 openharmony 变体一个
-都不落盘，esbuild/vite 随后缺二进制）；修正为 "openharmony" 后全部
-正常安装（E3 实验）。
-
-为什么这么改: 单行元数据修正 ×5。生成方式：git diff v1.18.3..dev --
-bun.lock 过滤出含 "os": "openharmony" 的 hunk；其余 diff（override
-落地、@ohos-ports 条目、OHOS bun 序列化顺序差异）由构建期 bun install
-自动收敛，不入 patch。
-
-何时可删除: 上游 bun.lock 由认识 openharmony 的 bun 生成（或上游
-接受 openharmony 为一等平台后）。
-
 diff --git a/bun.lock b/bun.lock
 index 3d8722b15..1e4510be5 100644
 --- a/bun.lock

@@ -1,19 +1,3 @@
-From: opencode-ai formula (OHOS)
-Subject: package.json/bunfig — @ohos-ports/* native deps overrides
-
-现象: bun-pty / lightningcss / @tailwindcss/oxide / @opentui/core 上游包
-没有 openharmony 平台二进制（os 门槛导致 OHOS 上装不进）。
-
-为什么这么改: 4 个 override 别名换入 @ohos-ports/*（OHOS 交叉编译
-+ 预签名 .so + loader patch 的包）；bunfig 加 minimumReleaseAge 豁免
-（自家包可能刚发布 < 3 天）。bun.lock 里的 override 落地条目不需要
-patch——E3 实验证明 OHOS bun install 会自动重解析 overrides 并安装
-@ohos-ports 包；需要 patch 的只有 os 元数据（见
-bun-lock-openharmony-os.patch）。
-
-何时可删除: 上游对应平台包发布官方 openharmony 二进制（lightningcss
-#1264 / tailwindcss-oxide #20276 合并后上游收口，对应包可 deprecate）。
-
 diff --git a/bunfig.toml b/bunfig.toml
 index c506ff57c..b41c6bda9 100644
 --- a/bunfig.toml

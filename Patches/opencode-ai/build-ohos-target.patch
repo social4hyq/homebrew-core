@@ -1,22 +1,3 @@
-From: opencode-ai formula (OHOS)
-Subject: build.ts — openharmony compile target (bun-linux-arm64-ohos)
-
-现象: 上游 build.ts 没有 openharmony target。OHOS bun 的 Libc 枚举
-有 Ohos 变体（musl-based，独立 compile target bun-linux-arm64-ohos，
-烘焙 process.platform="openharmony"）；误用 bun-linux-arm64-musl 会把
-platform 烘焙成 "linux"，@ohos-ports/* loader 的 openharmony 分支全部
-失效，只能靠上游 musl fallback 碰巧工作。
-
-为什么这么改: allTargets 插入 openharmony-arm64（abi:"musl" 仅用于
-dist 命名与 FFF/OPENTUI libc define——上游 loader 只认 gnu/musl，OHOS
-用户态是 musl ABI）；compile target 用 bun-linux-arm64-ohos——它在
-OHOS 上等于 CompileTarget::default()，bun 直接嵌入运行中的 OHOS
-runtime，无需本地 runtime 文件或下载。OTUI/OPENCODE worker path 需
-JSON.stringify（上游裸拼接疑似 bug，未上游化）。
-
-何时可删除: 上游接受 openharmony target PR（参照 lightningcss #1264
-先例）后此 patch 大半消失；defines 两处 stringify 可单独提 PR。
-
 diff --git a/packages/opencode/script/build.ts b/packages/opencode/script/build.ts
 index 236838dbd..e32a8a3e6 100755
 --- a/packages/opencode/script/build.ts
