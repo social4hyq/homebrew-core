@@ -91,7 +91,9 @@ class Bun < Formula
     cache_dir = Pathname.new("/data/storage/el2/base/tmp/bun-build-cache")
 
     # ── Pre-populate WebKit cache (bun bd's fetch checks .identity to skip download) ──
-    webkit_ver = "4895f45dfbd0d1226c4d41799887bc0ecb9f341b"
+    # Single source of truth for the WebKit commit is bun-webkit.rb's pinned
+    # revision — read it from the formula instead of duplicating the hash here.
+    webkit_ver = webkit.stable.specs[:revision]
     wc = cache_dir/"webkit-#{webkit_ver[0...16]}-ohos-arm64"
     wc.mkpath
     File.write(wc/".identity", webkit_ver)
@@ -213,7 +215,7 @@ class Bun < Formula
     ca_bundle = HOMEBREW_PREFIX/"etc/ca-certificates/cert.pem"
     ENV["SSL_CERT_FILE"]  = ca_bundle.to_s
     ENV["CURL_CA_BUNDLE"] = ca_bundle.to_s
-    ENV["RUSTUP_TOOLCHAIN"] = "nightly-2026-05-06"
+    ENV["RUSTUP_TOOLCHAIN"] = rust_ver
     ENV["OHOS_LLVM_PREFIX"]  = llvm.opt_prefix.to_s
     ENV["OHOS_WEBKIT_ROOT"]  = webkit.opt_prefix.to_s
     # LLD --code-sign injects .codesign at link time (llvm@21 CodeSign patch).
