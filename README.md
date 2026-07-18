@@ -70,12 +70,12 @@ zsh 补全（`ohos-opencode` / `codex` / `grok`）随 bottle 装入 `share/zsh/s
 ## Formula 引用约定
 
 - `depends_on` / `Formula[]` 里，**与官方 harmonybrew/core 同名的 formula 必须写 tap 全限定名**，否则裸名会解析到官方版本。当前冲突集合只有 `icu4c@78`（官方 core 也有 78.3，但那是系统 clang 构建，ABI 与本 tap 的 bun/webkit 不兼容）→ 必须写 `social4hyq/core/icu4c@78`，并忽略 `brew style` 的短名建议。
-- 其余名字（llvm@21、bun、bun-webkit 等官方 core 不存在的）一律用裸名，毕业迁移到官方 core 时零改动。
+- 其余名字（llvm@21、bun、bun-webkit 等官方 core 不存在的）一律用裸名，合入官方 core 时零改动。
 - 新增 formula/依赖时先探测冲突：`brew info homebrew/core/<name>` 能解析出 stable 版本即为冲突。
 
 ## CLI wrapper 约定
 
-CLI formula 的 bin/ wrapper 刻意**内联**在各 formula 里（不抽 tap 级共享代码）：formula 必须保持单文件自包含，毕业合入官方 core 走的是单文件拷贝流程，任何 `require` tap 内代码都会破坏这一点。写新 wrapper 时遵守三条：
+CLI formula 的 bin/ wrapper 刻意**内联**在各 formula 里（不抽 tap 级共享代码）：formula 必须保持单文件自包含，合入官方 core 走的是单文件拷贝流程，任何 `require` tap 内代码都会破坏这一点。写新 wrapper 时遵守三条：
 
 1. exec 目标用 `opt_libexec` 路径（HOMEBREW_PREFIX/opt 相对），禁止 Cellar 绝对路径——HOMEBREW_CELLAR 会随 brew 启动环境在 PREFIX/Cellar 与 REPOSITORY/Cellar 间翻转，烤死的 Cellar 路径换机即断（opencode r0 事故）
 2. TMPDIR 默认值统一 `/data/storage/el2/base/cache`（OHOS /tmp 只读），提供 `<NAME>_TMPDIR` 覆盖口

@@ -17,7 +17,7 @@ class Icu4cAT78 < Formula
 
   # Built with the OHOS-patched llvm@21 so ICU's libc++ symbols land in the __1 namespace,
   # matching the libc++ ABI linked by bun / WebKit (eliminates the stale bottle B9nqe220107 tag).
-  # When graduating to official core: icu4c@78 can use system clang; this validation version
+  # When merging into official core: icu4c@78 can use system clang; this validation version
   # is only for verifying ABI alignment.
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/icu4c@78-v78.3-r2"
