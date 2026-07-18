@@ -70,6 +70,8 @@ jobs:
           docker exec "$CONTAINER" bash -lc \
             'mkdir -p /root/.cargo && printf "[registries.crates-io]\nprotocol = \"sparse\"\n\n[net]\ngit-fetch-with-cli = true\nretry = 3\n" > /root/.cargo/config.toml'
           docker exec "$CONTAINER" bash -lc 'brew --version && brew tap'
+          # Harmonybrew fork 的信任机制：formula 内容变化后需重新 trust，否则拒绝加载（静默 exit 0）
+          docker exec "$CONTAINER" bash -lc 'brew trust social4hyq/core'
 
       - name: 源码构建 formula
         run: |
@@ -78,6 +80,12 @@ jobs:
           echo "== 构建后磁盘 =="
           docker exec "$CONTAINER" df -h /
           df -h /
+          # Harmonybrew 的 trust 拒绝会静默 exit 0，显式校验 keg 真的装上了
+          N=$(docker exec "$CONTAINER" bash -lc \
+            "$BREW_ENV brew info --json=v2 social4hyq/core/${{ inputs.formula }}" \
+            | jq -r '.formulae[0].installed | length')
+          echo "installed_kegs=$N"
+          [ "$N" -ge 1 ] || { echo "::error::formula 未安装（疑似 brew 静默拒绝，检查 trust/依赖）"; exit 1; }
 
       - name: 打 bottle
         id: bottle
