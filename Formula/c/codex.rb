@@ -76,6 +76,8 @@ class Codex < Formula
       exec "#{opt_libexec}/bin/codex" "$@"
     SH
     chmod 0755, bin/"codex"
+
+    generate_completions_from_executable(bin/"codex", "completion")
   end
 
   def caveats

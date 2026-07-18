@@ -56,6 +56,8 @@ class GrokBuild < Formula
       exec "#{opt_libexec}/bin/grok" "$@"
     SH
     chmod 0755, bin/"grok"
+
+    generate_completions_from_executable(bin/"grok", "completions")
   end
 
   def caveats

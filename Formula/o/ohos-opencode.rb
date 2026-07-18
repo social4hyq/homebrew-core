@@ -1,4 +1,4 @@
-class OpencodeAi < Formula
+class OhosOpencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.3.tar.gz"
@@ -11,16 +11,15 @@ class OpencodeAi < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-ai-v1.18.3-r1"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ee0c8549445e5c9430a26000b5dc0aea068fba60c74bb399ea633ef301a9c40"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.3-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e03e566cf7a083dbf9f35554752cfe19d1108b648090d272b97d0edda0c417ec"
   end
 
   # opencode is a `bun build --compile` single binary: OHOS bun runtime + JS
   # bundle + native .so all embedded. The bottle has zero runtime dependencies.
   #
   # Native deps come from @ohos-ports/* npm packages via package.json override
-  # aliases (see Patches/opencode-ai/ohos-ports-deps.patch): opentui-core
+  # aliases (see Patches/ohos-opencode/ohos-ports-deps.patch): opentui-core
   # (bundled musl libopentui.so via file-loader import, 0.4.4+), bun-pty,
   # lightningcss, tailwindcss-oxide. bun signs extracted .node/.so in-process
   # during `bun install`, and `bun build --compile` re-signs its output ELF
@@ -42,19 +41,19 @@ class OpencodeAi < Formula
   # the `git diff v1.18.3..dev` for the respective files — regenerate there,
   # never hand-edit hunks).
   patch :p1 do
-    file "Patches/opencode-ai/ohos-ports-deps.patch"
+    file "Patches/ohos-opencode/ohos-ports-deps.patch"
   end
   patch :p1 do
-    file "Patches/opencode-ai/bun-lock-openharmony-os.patch"
+    file "Patches/ohos-opencode/bun-lock-openharmony-os.patch"
   end
   patch :p1 do
-    file "Patches/opencode-ai/build-ohos-target.patch"
+    file "Patches/ohos-opencode/build-ohos-target.patch"
   end
   patch :p1 do
-    file "Patches/opencode-ai/project-global-worktree.patch"
+    file "Patches/ohos-opencode/project-global-worktree.patch"
   end
   patch :p1 do
-    file "Patches/opencode-ai/web-open-try-catch.patch"
+    file "Patches/ohos-opencode/web-open-try-catch.patch"
   end
 
   def install
@@ -78,9 +77,10 @@ class OpencodeAi < Formula
     # lookup), which also flips Script.channel to "latest".
     ENV["OPENCODE_VERSION"] = version.to_s
 
-    # build.ts (patched) self-materializes the compile runtime from
-    # process.execPath (the real OHOS bun ELF, even under the brew LD_PRELOAD
-    # wrapper) and picks the openharmony-arm64-musl target under --single.
+    # build.ts (patched) compiles for bun-linux-arm64-ohos, which equals
+    # CompileTarget::default() on OHOS — bun embeds the running OHOS runtime
+    # directly (no local runtime file, no download) and bakes
+    # process.platform="openharmony" into the binary.
     #
     # No --skip-install: build.ts's internal `bun install --os="*" --cpu="*"`
     # passes are required here. bun's bundler hard-errors on imports of
@@ -100,10 +100,80 @@ class OpencodeAi < Formula
     sections = Utils.safe_popen_read(readelf.to_s, "--section-headers", out)
     odie "compiled binary lacks .codesign section" unless sections.include?(".codesign")
 
-    bin.install out => "opencode-ai"
+    bin.install out => "ohos-opencode"
+
+    # Static zsh completion: upstream has no completion generator. Top-level
+    # commands from packages/opencode/src/cli/cmd/*.ts (v1.18.3).
+    (zsh_completion/"_ohos-opencode").write <<~'ZSH'
+      #compdef ohos-opencode
+
+      _ohos-opencode() {
+        local -a commands
+        commands=(
+          'acp:Start ACP (Agent Client Protocol) server'
+          'agent:Manage agents'
+          'attach:Attach to a running opencode server'
+          'auth:Manage provider credentials'
+          'db:Database utilities'
+          'debug:Debug utilities'
+          'export:Export a session'
+          'generate:Generate artifacts'
+          'github:GitHub integration'
+          'import:Import a session from file'
+          'mcp:Manage MCP servers'
+          'models:List models'
+          'plug:Manage plugins'
+          'pr:Check out a pull request'
+          'providers:Manage providers'
+          'run:Run opencode with a message'
+          'serve:Start the opencode server'
+          'session:Manage sessions'
+          'stats:Show usage statistics'
+          'uninstall:Uninstall opencode'
+          'upgrade:Upgrade opencode'
+          'web:Start the web interface'
+        )
+        _arguments -C \
+          '(-h --help)'{-h,--help}'[show help]' \
+          '(-v --version)'{-v,--version}'[show version]' \
+          '1:command:->command' \
+          '*::arg:->args'
+        case $state in
+          command)
+            _describe -t commands 'ohos-opencode command' commands
+            ;;
+          args)
+            case $words[1] in
+              mcp)
+                local -a mcp_cmds
+                mcp_cmds=('list:List MCP servers' 'auth:Authenticate an MCP server' 'logout:Remove MCP auth')
+                _describe -t commands 'mcp command' mcp_cmds
+                ;;
+              session)
+                local -a session_cmds
+                session_cmds=('list:List sessions' 'delete:Delete a session')
+                _describe -t commands 'session command' session_cmds
+                ;;
+              auth)
+                local -a auth_cmds
+                auth_cmds=('login:Log in to a provider' 'logout:Log out of a provider' 'list:List credentials')
+                _describe -t commands 'auth command' auth_cmds
+                ;;
+              db)
+                local -a db_cmds
+                db_cmds=('path:Print database path')
+                _describe -t commands 'db command' db_cmds
+                ;;
+            esac
+            ;;
+        esac
+      }
+
+      _ohos-opencode "$@"
+    ZSH
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/opencode-ai --version 2>&1")
+    assert_match version.to_s, shell_output("#{bin}/ohos-opencode --version 2>&1")
   end
 end
