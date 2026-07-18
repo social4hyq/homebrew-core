@@ -85,6 +85,11 @@ jobs:
           docker exec "$CONTAINER" bash -lc 'brew --version && brew tap'
           # Harmonybrew fork 的信任机制：formula 内容变化后需重新 trust，否则拒绝加载（静默 exit 0）
           docker exec "$CONTAINER" bash -lc 'brew trust social4hyq/core'
+          # brew bottle --merge --write 在 fork 里会自动 git commit tap；容器内 root
+          # 操作挂载的 runner 目录会撞 git dubious ownership，且需要提交身份
+          docker exec "$CONTAINER" git config --global --add safe.directory "$TAP_IN_CONTAINER"
+          docker exec "$CONTAINER" git config --global user.name "github-actions[bot]"
+          docker exec "$CONTAINER" git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: spawnSync stdin 探针（probe=true）
         if: inputs.probe
@@ -214,10 +219,11 @@ jobs:
           docker exec -w "$TAP_IN_CONTAINER/bottle-out" "$CONTAINER" bash -lc \
             "$BREW_ENV brew bottle --merge --write ./*.bottle.json"
           # 5. push 双 remote（atomgit push 失败不阻断——主同步走 GitHub，atomgit 可后补）
+          # 注意：brew --merge --write 在 fork 里已自动 commit，worktree 干净时跳过自己的 commit
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Formula/
-          git commit -m "bottle(${{ inputs.formula }}): rebuild bottle $TAG"
+          git diff --cached --quiet || git commit -m "bottle(${{ inputs.formula }}): rebuild bottle $TAG"
           git push origin HEAD:main
           git push "https://social4hyq:${ATOMGIT_TOKEN}@atomgit.com/social4hyq/homebrew-core.git" HEAD:main \
             || echo "::warning::atomgit push 失败，GitHub 已更新，atomgit 侧需手动同步"
