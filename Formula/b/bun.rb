@@ -9,7 +9,7 @@ class Bun < Formula
   url "https://github.com/social4hyq/ohos-bun.git", revision: "c60d97743dabb5895b0f2c2f4f064719e50ff284", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
-  revision 32
+  revision 33
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -18,7 +18,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r32"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r33"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "487598087abfd54e36fac8d06c08beb571f81b926436b16e81f0880ced0e9845"
   end
 
   # ── Dependencies (all bare names, zero changes when graduating to harmonybrew/core) ──
@@ -252,13 +253,18 @@ class Bun < Formula
     # tree emitShims + workarounds.ts "ohos-compat-shim-embed"), so no
     # LD_PRELOAD or OHOS_COMPAT_SHIM_ENABLE wrapper is needed — linkat and
     # symlinkat are default-on in the shim since 0.2.0. The real ELF stays
-    # at libexec/bin/bun, symlinked from bin/bun; opt_libexec is
-    # HOMEBREW_PREFIX-relative so the bottle stays relocatable across the
-    # HOMEBREW_CELLAR flip.
+    # at libexec/bin/bun, symlinked from bin/bun.
+    # The symlink MUST be relative and keg-internal: install_symlink with an
+    # opt_libexec target resolves through the *previous* version's opt link
+    # during upgrade installs (pathname.rb install_symlink_p realpaths src
+    # when its dirname exists), producing a symlink into the old keg that
+    # dangles — and vanishes — once cleanup removes that keg (this exact
+    # failure shipped the r32 bottle without bin/bun).
     mkdir_p libexec/"bin"
     libexec.install out => "bin/bun"
     chmod 0755, libexec/"bin/bun"
-    bin.install_symlink opt_libexec/"bin/bun" => "bun"
+    bin.mkpath
+    (bin/"bun").make_symlink "../libexec/bin/bun"
   end
 
   def post_install
