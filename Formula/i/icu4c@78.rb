@@ -25,7 +25,7 @@ class Icu4cAT78 < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "c64495f6545122ca3732094acb5a3fb1f5f126193936f40dc0ceb1fa3527f6ed"
   end
 
-  keg_only :shadowed_by_macos, "macOS provides libicucore.dylib (but nothing else)"
+  keg_only "ABI-validation build pinned to llvm@21's libc++; linked in-tree by bun/bun-webkit, not system-wide"
 
   depends_on "libxml2" => :build
 
