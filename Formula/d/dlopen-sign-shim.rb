@@ -6,7 +6,7 @@ class DlopenSignShim < Formula
   # being extracted here). Homebrew requires a url/resource on every
   # formula, so this pins to the tap's own repo; install() never reads
   # anything from the checkout, it only exists to satisfy that requirement.
-  url "git@atomgit.com:social4hyq/homebrew-core.git",
+  url "https://atomgit.com/social4hyq/homebrew-core.git",
       revision: "f85bb6b03d69481502a275dd33b12e9ff213d7ed",
       using:    :git
   version "0.1.0"
