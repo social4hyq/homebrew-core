@@ -1,5 +1,3 @@
-require_relative "../../lib/ohos_formula_helpers"
-
 class Codex < Formula
   desc "OpenAI Codex CLI — HarmonyOS aarch64 (Linux musl binary + OHOS signing)"
   homepage "https://github.com/openai/codex"
@@ -72,13 +70,21 @@ class Codex < Formula
     # bwrap/landlock sandbox (codex-resources/) is non-functional on OHOS
     # (no user namespaces / setuid) — see caveats to disable sandbox_mode.
 
-    # opt_libexec self-reference rationale: see lib/ohos_formula_helpers.rb.
-    (bin/"codex").write OhosFormulaHelpers.cli_wrapper(
-      "#{opt_libexec}/bin/codex",
-      tmpdir_env:    "CODEX_TMPDIR",
-      preload:       ["#{formula_opt_lib("ohos-compat-shim")}/libohos_compat.so"],
-      extra_exports: ['export SHELL="${SHELL:-/bin/sh}"'],
-    )
+    # Self-reference via opt_libexec (prefix-relative, stable) rather than
+    # libexec (Cellar-relative). HOMEBREW_CELLAR flips between
+    # HOMEBREW_PREFIX/Cellar and HOMEBREW_REPOSITORY/Cellar depending on
+    # which happens to exist at brew startup (see brew.sh) — a bottle baked
+    # with the Cellar-absolute path breaks if poured on a machine where that
+    # resolved differently than the machine it was built on. opt/<name> is
+    # always HOMEBREW_PREFIX-relative and Homebrew re-links it correctly on
+    # every install, so it's stable across that flip. Verified 2026-07-14.
+    (bin/"codex").write <<~SH
+      #!/bin/sh
+      export LD_PRELOAD="#{formula_opt_lib("ohos-compat-shim")}/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
+      export TMPDIR="${CODEX_TMPDIR:-/data/storage/el2/base/cache}"
+      export SHELL="${SHELL:-/bin/sh}"
+      exec "#{opt_libexec}/bin/codex" "$@"
+    SH
     chmod 0755, bin/"codex"
 
     # Generate from the libexec binary: the bin/codex wrapper execs
