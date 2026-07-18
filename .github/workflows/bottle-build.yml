@@ -210,9 +210,9 @@ jobs:
             -H "x-obs-callback: $H_CALLBACK" \
             -H "Content-Type: application/octet-stream" \
             --data-binary "@$BOTTLE" -w "HTTP=%{http_code}\n"
-          # 4. 回写 formula bottle 块（json 在 bottle-out，即容器内 tap 挂载点下）
+          # 4. 回写 formula bottle 块（--merge 的参数是 json 文件，不是 formula 名）
           docker exec -w "$TAP_IN_CONTAINER/bottle-out" "$CONTAINER" bash -lc \
-            "$BREW_ENV brew bottle --merge --write social4hyq/core/${{ inputs.formula }}"
+            "$BREW_ENV brew bottle --merge --write ./*.bottle.json"
           # 5. push 双 remote（atomgit push 失败不阻断——主同步走 GitHub，atomgit 可后补）
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
