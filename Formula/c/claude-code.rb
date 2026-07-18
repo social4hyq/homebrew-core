@@ -7,6 +7,7 @@ class ClaudeCode < Formula
   version "2.1.212"
   sha256 "7088f5eab71b99a10ec179800001a8bcc4737122ed3c1be191146d88fa6f380a"
   license "Anthropic License"
+  revision 1
   # Claude Code 2.1.113+ only ships Bun-compiled binaries (linux-arm64-musl,
   # musl ABI compatible with OHOS). The tgz is mirrored on npmmirror (Aliyun
   # CDN): brew's curl 8.21 (OpenSSL 3.6) SIGILLs on bulk TLS GET from the
@@ -42,8 +43,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.212"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "364a99e5d4115778588093232ccc0a1d59fef4b61d877a6bea34e2a5f7cdeb6e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.212-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1fd4de73de519d8b6530676591dc76eae14c1b2bb5f01c7481990d6f1405f410"
   end
 
   depends_on "ohos-bst-light"
@@ -77,11 +78,13 @@ class ClaudeCode < Formula
           curl -fL "$u" -o "$TMP/pkg.tgz" && { fetched=1; break; }
         done
         [ "$fetched" = 1 ] || { echo "claude-code: download failed from all mirrors" >&2; exit 1; }
-        if command -v sha256sum >/dev/null 2>&1; then
-          printf '%s  %s\\n' "$NPM_SHA" "$TMP/pkg.tgz" | sha256sum -c -
-        else
-          echo "claude-code: sha256sum not found, skipping integrity check" >&2
-        fi
+        # Fail closed: this is a runtime-downloaded executable — refusing to
+        # run unverified beats running unverified.
+        command -v sha256sum >/dev/null 2>&1 || {
+          echo "claude-code: sha256sum not found; refusing to run an unverified download" >&2
+          exit 1
+        }
+        printf '%s  %s\\n' "$NPM_SHA" "$TMP/pkg.tgz" | sha256sum -c -
         tar -xzf "$TMP/pkg.tgz" -C "$TMP"
         SRC="$TMP/package/claude"
         [ -f "$SRC" ] || SRC="$(find "$TMP" -type f -name claude | head -n1)"
