@@ -1,8 +1,8 @@
 class ZshHistoryEnquirer < Formula
   desc "Zsh plugin that enhances history search interaction"
   homepage "https://zsh-history-enquirer.zthxxx.me"
-  url "https://registry.npmjs.org/zsh-history-enquirer/-/zsh-history-enquirer-1.3.1.tgz"
-  sha256 "dab146c955f167089bbe8f24a79b4a6cabe4c9ce2b8b246eb9fca27eca2bc4ae"
+  url "https://registry.npmjs.org/zsh-history-enquirer/-/zsh-history-enquirer-1.3.2.tgz"
+  sha256 "eb5fc111b9122974e086f625ba6b46accb8e06ee7cad9519b0f2daec098f7ff1"
   license "MIT"
 
   bottle do
