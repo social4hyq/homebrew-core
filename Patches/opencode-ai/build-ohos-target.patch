@@ -1,46 +1,27 @@
 From: opencode-ai formula (OHOS)
-Subject: build.ts — openharmony compile target + runtime self-materialization
+Subject: build.ts — openharmony compile target (bun-linux-arm64-ohos)
 
-现象: 上游 build.ts 没有 openharmony target；bun compile 会下载官方
-（非 OHOS 补丁的）musl runtime 嵌入，产物真机解包 .so 无签名。
+现象: 上游 build.ts 没有 openharmony target。OHOS bun 的 Libc 枚举
+有 Ohos 变体（musl-based，独立 compile target bun-linux-arm64-ohos，
+烘焙 process.platform="openharmony"）；误用 bun-linux-arm64-musl 会把
+platform 烘焙成 "linux"，@ohos-ports/* loader 的 openharmony 分支全部
+失效，只能靠上游 musl fallback 碰巧工作。
 
-为什么这么改: 插入 openharmony-arm64-musl target（映射到 bun 的
-bun-linux-arm64-musl compile target），OHOS 本机构建时从 process.execPath
-自物化 runtime 文件（详见 porting guide §3.8）；openharmony 分支纳入
-OPENCODE_LIBC/OPENTUI_LIBC define；OTUI/OPENCODE worker path 需
+为什么这么改: allTargets 插入 openharmony-arm64（abi:"musl" 仅用于
+dist 命名与 FFF/OPENTUI libc define——上游 loader 只认 gnu/musl，OHOS
+用户态是 musl ABI）；compile target 用 bun-linux-arm64-ohos——它在
+OHOS 上等于 CompileTarget::default()，bun 直接嵌入运行中的 OHOS
+runtime，无需本地 runtime 文件或下载。OTUI/OPENCODE worker path 需
 JSON.stringify（上游裸拼接疑似 bug，未上游化）。
 
-何时可删除: 上游接受 openharmony target PR（参照 lightningcss #1264 先例）
-后，此 patch 大半消失；defines 两处 stringify 可单独提 PR。
+何时可删除: 上游接受 openharmony target PR（参照 lightningcss #1264
+先例）后此 patch 大半消失；defines 两处 stringify 可单独提 PR。
 
 diff --git a/packages/opencode/script/build.ts b/packages/opencode/script/build.ts
-index 236838dbd..8cf521015 100755
+index 236838dbd..e32a8a3e6 100755
 --- a/packages/opencode/script/build.ts
 +++ b/packages/opencode/script/build.ts
-@@ -23,6 +23,22 @@ const skipInstall = process.argv.includes("--skip-install")
- const sourcemapsFlag = process.argv.includes("--sourcemaps")
- const plugin = createSolidTransformPlugin()
- const skipEmbedWebUi = process.argv.includes("--skip-embed-web-ui")
-+// OHOS native build: materialize the compile runtime from the running bun.
-+// Bun.build embeds a local runtime named bun-<os>-<arch>-<abi>-v<version>
-+// from the package dir if present, otherwise downloads the official release —
-+// which lacks the OHOS patches (openharmony platform, in-process ELF signing).
-+// process.execPath is the real ELF even when bun was launched via a wrapper
-+// script.
-+if (process.platform === "openharmony") {
-+  const runtimeFile = path.join(import.meta.dirname, "..", `bun-linux-aarch64-musl-v${Bun.version}`)
-+  if (!fs.existsSync(runtimeFile)) {
-+    try {
-+      fs.symlinkSync(process.execPath, runtimeFile)
-+    } catch {
-+      fs.copyFileSync(process.execPath, runtimeFile)
-+    }
-+  }
-+}
- 
- const createEmbeddedWebUIBundle = async () => {
-   console.log(`Building Web UI to embed in the binary`)
-@@ -74,6 +90,11 @@ const allTargets: {
+@@ -74,6 +74,11 @@ const allTargets: {
      arch: "arm64",
      abi: "musl",
    },
@@ -52,7 +33,7 @@ index 236838dbd..8cf521015 100755
    {
      os: "linux",
      arch: "x64",
-@@ -125,8 +146,12 @@ const targets = singleFlag
+@@ -125,8 +130,12 @@ const targets = singleFlag
          return baselineFlag
        }
  
@@ -67,17 +48,20 @@ index 236838dbd..8cf521015 100755
          return false
        }
  
-@@ -179,7 +204,8 @@ for (const item of targets) {
+@@ -179,7 +188,11 @@ for (const item of targets) {
        autoloadDotenv: false,
        autoloadTsconfig: true,
        autoloadPackageJson: true,
 -      target: name.replace(pkg.name, "bun") as any,
-+      // Map openharmony → linux for bun compile target (bun uses Libc::Ohos, not OS name)
-+      target: name.replace(pkg.name, "bun").replace("-openharmony-", "-linux-") as any,
++      // OHOS bun has Libc::Ohos as a distinct musl-based compile target
++      // (bun-linux-arm64-ohos), baking process.platform="openharmony" and
++      // equal to CompileTarget::default() on-device — bun embeds the running
++      // OHOS runtime directly, no local runtime file or download needed.
++      target: (item.os === "openharmony" ? "bun-linux-arm64-ohos" : name.replace(pkg.name, "bun")) as any,
        outfile: `dist/${name}/bin/opencode`,
        execArgv: [`--user-agent=opencode/${Script.version}`, "--use-system-ca", "--"],
        windows: {},
-@@ -190,16 +216,16 @@ for (const item of targets) {
+@@ -190,11 +203,11 @@ for (const item of targets) {
        FFF_LIBC: JSON.stringify(item.abi === "musl" ? "musl" : "gnu"),
        OPENCODE_VERSION: `'${Script.version}'`,
        OPENCODE_MODELS_DEV: generated.modelsData,
@@ -93,9 +77,3 @@ index 236838dbd..8cf521015 100755
      },
    })
  
-   // Smoke test: only run if binary is for current platform
--  if (item.os === process.platform && item.arch === process.arch && !item.abi) {
-+  if (item.os === process.platform && item.arch === process.arch && item.abi !== "musl") {
-     const binaryPath = `dist/${name}/bin/opencode`
-     console.log(`Running smoke test: ${binaryPath} --version`)
-     try {
