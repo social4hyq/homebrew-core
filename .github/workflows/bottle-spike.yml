@@ -54,6 +54,9 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - name: 登录 ghcr.io（镜像当前为 private，用 GHCR_PAT secret 拉取）
+        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u social4hyq --password-stdin
+
       - name: 拉取镜像并启动 OHOS 容器
         run: |
           docker pull "$IMAGE"
