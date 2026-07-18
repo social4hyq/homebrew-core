@@ -105,6 +105,15 @@ class Opencode < Formula
   end
 
   def install
+    # Guard against the auto-sign pass corrupting this prebuilt binary (see
+    # r4 note above) — enforce here instead of relying on the builder to
+    # remember the env dance.
+    if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
+      odie "opencode must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
+           "(env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN brew install ...): the " \
+           "binary-sign-tool pass double-signs and corrupts this prebuilt binary"
+    end
+
     src = buildpath.glob("package/bin/opencode").first || buildpath.glob("**/opencode").first
     odie "opencode binary not found in tarball" unless src
 

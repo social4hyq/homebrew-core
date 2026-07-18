@@ -38,6 +38,15 @@ class Codex < Formula
   depends_on "ripgrep"
 
   def install
+    # Guard against the auto-sign pass corrupting this prebuilt binary (see
+    # top-of-file note) — enforce here instead of relying on the builder to
+    # remember the env dance.
+    if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
+      odie "codex must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
+           "(env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN brew install ...): the " \
+           "binary-sign-tool pass segfaults this prebuilt binary"
+    end
+
     vendor = buildpath/"vendor/aarch64-unknown-linux-musl"
     sign = formula_opt_bin("ohos-bst-light")/"self-sign"
 
