@@ -1,8 +1,8 @@
 class Girara < Formula
   desc "Common components for zathura"
   homepage "https://pwmt.org/projects/girara/"
-  url "https://pwmt.org/projects/girara/download/girara-2026.07.07.tar.xz"
-  sha256 "475f154148647d45e0f1324762fe5452094147085fddf2ccef4e9725c335b0c1"
+  url "https://pwmt.org/projects/girara/download/girara-2026.07.18.tar.xz"
+  sha256 "d7255635776a45d42d1e555aa425ab96caf23755442474cf240cbac966d8502f"
   license "Zlib"
 
   livecheck do
