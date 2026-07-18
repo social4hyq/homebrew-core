@@ -1,8 +1,8 @@
 class Tsshd < Formula
   desc "UDP-based SSH server with roaming support"
   homepage "https://trzsz.github.io/tsshd"
-  url "https://github.com/trzsz/tsshd/archive/refs/tags/v0.1.8.tar.gz"
-  sha256 "1d19f99a95f19933d8058df1209b421400eaca8c2bf2e045747c8f6c68887d56"
+  url "https://github.com/trzsz/tsshd/archive/refs/tags/v0.1.9.tar.gz"
+  sha256 "fdf05a2323c8cc4ecef30e5258714d1651d80206f1bc0a5a88a45d716e82bb18"
   license "MIT"
 
   bottle do
