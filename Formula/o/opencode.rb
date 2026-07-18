@@ -5,6 +5,7 @@ class Opencode < Formula
   version "1.18.3"
   sha256 "3431f5cbbc1e3b0b08d23b60746d4f855ca836c0e91a91a89017f2c0e60238fe"
   license "MIT"
+  revision 1
   # opencode's official prebuilt linux-arm64-musl single binary (Bun --compile).
   # Bypasses the opencode-ai npm JS wrapper. The musl-ABI binary is
   # OHOS-compatible once its GCC runtime deps are provided (see resources).
@@ -17,7 +18,7 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.3"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.3-r1"
     # `brew bottle` emits `cellar: "<HOMEBREW_CELLAR>"` (not :any_skip_relocation)
     # for this formula: the RUNPATH injected into the ELF (via the
     # inject-runpath formula) is an absolute HOMEBREW_PREFIX/opt/... path, and the bottle
@@ -27,7 +28,7 @@ class Opencode < Formula
     # HOMEBREW_PREFIX is constant across build/target machines — so the bottle
     # pours identically regardless of the flat/nested HOMEBREW_CELLAR flip.
     # Verified on the real machine for r5 (1.17.20), 1.18.1, and 1.18.3.
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "95fea1e68dd9e3ce79b0c065ee236d45e15225cb5697b9df3c798df8be39c11c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "68d49e23f3b70282faa3faa1d9703e0230a3569ef2caf6a270e1c6bdaa7f108b"
   end
 
   # r1 fixed a real portability bug (not just the `brew bottle` check below):
@@ -67,9 +68,13 @@ class Opencode < Formula
   # ohos-sdk :build dependency entirely since compiling the shim was the
   # only thing that needed it.
   #
-  # r4-era cleanup: inject-runpath.py was likewise extracted into its own
-  # formula (inject-runpath) — it's a general fix-prebuilt-ELF-for-OHOS tool,
-  # not opencode-specific. This also moved the python@3.14 :build dep there.
+  # r4: inject-runpath.py was likewise extracted into its own formula
+  # (inject-runpath) — it's a general fix-prebuilt-ELF-for-OHOS tool, not
+  # opencode-specific. This also moved the python@3.14 :build dep there.
+  # Rebuilt with `env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN` (see
+  # environment_bottle_binary_sign_breaks_prebuilt in project memory — that
+  # auto-sign pass double-signs and corrupts this prebuilt binary if left
+  # set during the build). Verified 2026-07-18.
 
   # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
   # runtime), which OHOS does NOT ship (OHOS uses libc++). We bundle musl-aarch64
