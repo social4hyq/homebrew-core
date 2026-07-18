@@ -1,16 +1,19 @@
-name: bottle-spike
+name: bottle-build
 
-# Spike：验证在 GitHub 托管 ARM runner 上用 OHOS 容器构建 formula bottle。
-# 用法：Actions → bottle-spike → Run workflow → 填 formula（如 icu4c@78 / bun / llvm@21）
+# 正式 bottle 构建流水线：GitHub 托管 ARM runner（ubuntu-24.04-arm）+ OHOS 容器。
+# 用法：Actions → bottle-build → Run workflow → 填 formula
+#   upload=false（默认）：构建 + 打 bottle + 传 workflow artifact（验证/调试，不改仓库）
+#   upload=true：上传到 atomgit releases（tag <formula>-v<ver>-r<N>，N 按现有最大
+#     值 +1）、brew bottle --merge --write 回写 formula、push GitHub main + atomgit
+#     main，最后卸载重装验证 poured_from_bottle + brew test
+#   probe=true：只跑 spawnSync stdin 探针（环境诊断用）
 #
-# - upload=false（默认）：只构建 + 打 bottle + 上传为 workflow artifact，不改仓库
-# - upload=true：创建 GitHub Release 放 bottle、brew bottle --merge --write 回写
-#   formula 的 bottle 块并 push 到 main。注意：若 formula 同版本已有 atomgit
-#   bottle，root_url/sha256 会被 CI 产物替换。
-#
-# 已知边界：deps 的 bottle 仍从 atomgit 下载（Azure → 国内，bun-bootstrap 有
-# 213MB，可能偏慢，spike 会实测）；llvm@21 磁盘占用临界，超了则该 formula
-# 保留服务器构建。
+# 环境要点（都是 spike 阶段实测踩过的坑，勿删）：
+# - seccomp=unconfined：docker 默认 profile 拦截 io_uring_setup(EPERM)，bun 启动即死
+# - /system/lib/ld-musl symlink：bottle 二进制的 PT_INTERP 是真机路径，镜像内没有
+# - brew trust：Harmonybrew fork 信任机制，formula 内容变化后不 trust 会静默 exit 0
+# - brew install 失败 90s 重试一次：atomgit CDN 有瞬时 404
+# - cargo sparse：镜像内默认 git protocol，从 Azure 拉太慢
 
 on:
   workflow_dispatch:
@@ -20,7 +23,7 @@ on:
         required: true
         type: string
       upload:
-        description: '上传 bottle 到 GitHub Release 并回写 formula（push main）'
+        description: '上传 bottle 到 atomgit Release 并回写 formula（push 双 remote）'
         required: true
         type: boolean
         default: false
@@ -34,7 +37,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: bottle-spike-${{ inputs.formula }}
+  group: bottle-build-${{ inputs.formula }}
   cancel-in-progress: false
 
 env:
@@ -59,20 +62,18 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: 登录 ghcr.io（镜像当前为 private，用 GHCR_PAT secret 拉取）
+      - name: 登录 ghcr.io（镜像为 private，用 GHCR_PAT secret 拉取）
         run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u social4hyq --password-stdin
 
       - name: 拉取镜像并启动 OHOS 容器
         run: |
           docker pull "$IMAGE"
-          # seccomp=unconfined：docker 默认 profile 拦截 io_uring_setup(EPERM)，
-          # bun-bootstrap 的 bun 启动即死；服务器 podman 默认放行，这里对齐
           docker run -d --name "$CONTAINER" --init \
             --security-opt seccomp=unconfined \
             -v "$GITHUB_WORKSPACE:$TAP_IN_CONTAINER" \
             "$IMAGE" sleep infinity
           # 一次性容器配置（与服务器一致）：musl tmpfile() 硬编码路径 + /system/bin/sh
-          # + /system/lib/ld-musl（bun 等 bottle 二进制的 PT_INTERP 是真机路径
+          # + /system/lib/ld-musl（bottle 二进制的 PT_INTERP 是真机路径
           # /system/lib/ld-musl-aarch64.so.1，镜像里没有，服务器上是手工建的 symlink）
           docker exec "$CONTAINER" bash -lc \
             'mkdir -p /data/local/tmp /system/bin /system/lib && \
@@ -139,21 +140,32 @@ jobs:
           docker exec "$CONTAINER" bash -lc \
             "ls -la $BIN* 2>/dev/null; file $BIN 2>/dev/null; head -c 200 $BIN | od -c | head -3; $BIN --version; echo bun_exit=\$?" || true
 
-      - name: 打 bottle
+      - name: 打 bottle（upload=true 时先定 atomgit tag）
         if: '!inputs.probe'
         id: bottle
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
         run: |
           VER=$(docker exec "$CONTAINER" bash -lc \
             "$BREW_ENV brew info --json=v2 social4hyq/core/${{ inputs.formula }}" \
             | jq -r '.formulae[0].versions.stable')
-          SAFE_NAME=$(echo "${{ inputs.formula }}" | tr -d '@')
-          TAG="${SAFE_NAME}-v${VER}-ci${{ github.run_number }}"
+          BASE="${{ inputs.formula }}-v${VER}"
+          if [ "${{ inputs.upload }}" = "true" ]; then
+            # tag 与现有约定一致（保留 @）：icu4c@78-v78.3-r2；N = 现有最大 + 1
+            MAX=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+              "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases?per_page=100" \
+              | jq -r '.[].tag_name' | grep -E "^${BASE}-r[0-9]+$" \
+              | sed "s/^${BASE}-r//" | sort -n | tail -1 || true)
+            TAG="${BASE}-r$(( ${MAX:-0} + 1 ))"
+            ROOT="https://atomgit.com/social4hyq/homebrew-core/releases/download/$TAG"
+          else
+            TAG="${BASE}-ci${{ github.run_number }}"
+            ROOT="https://github.com/social4hyq/homebrew-core/releases/download/$TAG"
+          fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "== version=$VER tag=$TAG =="
           docker exec -w /root "$CONTAINER" bash -lc \
-            "$BREW_ENV brew bottle --json \
-              --root-url https://github.com/social4hyq/homebrew-core/releases/download/$TAG \
-              social4hyq/core/${{ inputs.formula }}"
+            "$BREW_ENV brew bottle --json --root-url $ROOT social4hyq/core/${{ inputs.formula }}"
           mkdir -p bottle-out
           docker exec "$CONTAINER" bash -lc \
             "mv /root/*.bottle.tar.gz /root/*.bottle.json '$TAP_IN_CONTAINER/bottle-out/'"
@@ -167,23 +179,48 @@ jobs:
           path: bottle-out/
           retention-days: 14
 
-      - name: 上传 Release + 回写 formula + push（upload=true）
+      - name: 上传 atomgit + 回写 formula + push（upload=true）
         if: inputs.upload
         env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -e
           TAG="${{ steps.bottle.outputs.tag }}"
-          gh release create "$TAG" --title "$TAG" \
-            --notes "CI bottle (spike run ${{ github.run_number }})" \
-            bottle-out/*.bottle.tar.gz
-          # 把 bottle 块合并回 formula（读 /root 下刚生成的 json）
-          docker exec -w /root "$CONTAINER" bash -lc \
+          BOTTLE=$(ls bottle-out/*.tar.gz | head -1)
+          FILENAME=$(basename "$BOTTLE")
+          # 1. 检查或创建 release（atomgit 不返回 release id，用 tag 标识）
+          curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+            "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases/tags/$TAG" \
+            || curl -sf -m 30 -X POST -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+                 -H "Content-Type: application/json" \
+                 -d "{\"tag_name\":\"$TAG\",\"name\":\"$TAG\",\"target_commitish\":\"main\",\"body\":\"$TAG bottle (CI run ${{ github.run_number }})\"}" \
+                 "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases"
+          # 2. 取预签名 upload URL（必须带 file_name）
+          RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+            "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases/$TAG/upload_url?file_name=$FILENAME")
+          UPLOAD_URL=$(echo "$RESP" | jq -r .url)
+          H_PROJECT=$(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')
+          H_ACL=$(echo "$RESP" | jq -r '.headers["x-obs-acl"]')
+          H_CALLBACK=$(echo "$RESP" | jq -r '.headers["x-obs-callback"]')
+          # 3. PUT 到预签名 URL（OBS 对象存储）
+          curl -sf -m 300 -X PUT "$UPLOAD_URL" \
+            -H "x-obs-meta-project-id: $H_PROJECT" \
+            -H "x-obs-acl: $H_ACL" \
+            -H "x-obs-callback: $H_CALLBACK" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary "@$BOTTLE" -w "HTTP=%{http_code}\n"
+          # 4. 回写 formula bottle 块（json 在 bottle-out，即容器内 tap 挂载点下）
+          docker exec -w "$TAP_IN_CONTAINER/bottle-out" "$CONTAINER" bash -lc \
             "$BREW_ENV brew bottle --merge --write social4hyq/core/${{ inputs.formula }}"
+          # 5. push 双 remote（atomgit push 失败不阻断——主同步走 GitHub，atomgit 可后补）
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Formula/
-          git commit -m "bottle(${{ inputs.formula }}): CI bottle $TAG"
+          git commit -m "bottle(${{ inputs.formula }}): rebuild bottle $TAG"
           git push origin HEAD:main
+          git push "https://social4hyq:${ATOMGIT_TOKEN}@atomgit.com/social4hyq/homebrew-core.git" HEAD:main \
+            || echo "::warning::atomgit push 失败，GitHub 已更新，atomgit 侧需手动同步"
 
       - name: poured + test 验证（upload=true）
         if: inputs.upload
