@@ -67,8 +67,12 @@ jobs:
             -v "$GITHUB_WORKSPACE:$TAP_IN_CONTAINER" \
             "$IMAGE" sleep infinity
           # 一次性容器配置（与服务器一致）：musl tmpfile() 硬编码路径 + /system/bin/sh
+          # + /system/lib/ld-musl（bun 等 bottle 二进制的 PT_INTERP 是真机路径
+          # /system/lib/ld-musl-aarch64.so.1，镜像里没有，服务器上是手工建的 symlink）
           docker exec "$CONTAINER" bash -lc \
-            'mkdir -p /data/local/tmp /system/bin && ln -sf /bin/sh /system/bin/sh'
+            'mkdir -p /data/local/tmp /system/bin /system/lib && \
+             ln -sf /bin/sh /system/bin/sh && \
+             ln -sf /lib/ld-musl-aarch64.so.1 /system/lib/ld-musl-aarch64.so.1'
           # CI 网络（Azure）下 cargo 走 sparse 直连 crates.io；镜像内默认 git protocol 太慢
           docker exec "$CONTAINER" bash -lc \
             'mkdir -p /root/.cargo && printf "[registries.crates-io]\nprotocol = \"sparse\"\n\n[net]\ngit-fetch-with-cli = true\nretry = 3\n" > /root/.cargo/config.toml'
