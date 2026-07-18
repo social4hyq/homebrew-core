@@ -45,6 +45,9 @@ class OpencodeAi < Formula
     file "Patches/opencode-ai/ohos-ports-deps.patch"
   end
   patch :p1 do
+    file "Patches/opencode-ai/bun-lock-openharmony-os.patch"
+  end
+  patch :p1 do
     file "Patches/opencode-ai/build-ohos-target.patch"
   end
   patch :p1 do
