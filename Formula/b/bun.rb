@@ -85,10 +85,12 @@ class Bun < Formula
     # Default cacheDir is $HOME/.bun/build-cache, but brew's HOME is the
     # per-build .brew_home — the cache would be wiped every run and every
     # vendor tarball re-downloaded (GitHub is unreliable/blocked on OHOS).
-    # Pin it to a stable EL2 path (same convention as rust_home below) and
-    # pass --cache-dir so fetch-cli/webkit both hit it; pre-seed
-    # <cache_dir>/tarballs to build fully offline.
-    cache_dir = Pathname.new("/data/storage/el2/base/tmp/bun-build-cache")
+    # HOMEBREW_CACHE persists across runs (same convention as
+    # ohos-opencode.rb's bun-install-cache); pass --cache-dir so
+    # fetch-cli/webkit both hit it; pre-seed <cache_dir>/tarballs to build
+    # fully offline. Unlike rust_home below this holds no executables, so it
+    # does not need to live on EL2.
+    cache_dir = HOMEBREW_CACHE/"bun-build-cache"
 
     # ── Pre-populate WebKit cache (bun bd's fetch checks .identity to skip download) ──
     # Single source of truth for the WebKit commit is bun-webkit.rb's pinned
@@ -147,35 +149,45 @@ class Bun < Formula
     # ── Rust nightly (persistent cache keyed by toolchain date; skips reinstall+signing if already done) ──
     # OHOS is a Tier 3 target: bun uses -Zbuild-std to build std, which requires rust-src (in full tarball).
     rust_ver = resource("rust-nightly").version.to_s # e.g. "nightly-2026-05-06"
+    # rust_home must stay on EL2 (not HOMEBREW_CACHE/HOME): these binaries are
+    # exec'd after signing, and the EL3 hmmac policy refuses to exec signed
+    # ELFs outside EL2.
     rust_home = Pathname.new("/data/storage/el2/base/tmp/rust-#{rust_ver}")
     rust_ready = rust_home/"BREW_SIGNED_OK"
 
-    unless rust_ready.exist?
-      rust_home.mkpath
-      resource("rust-nightly").stage do
-        # The host tarball contains rustc/cargo/rust-std; install via install.sh.
-        # Use sh explicitly: OHOS superenv PATH has no bash for the shebang.
-        system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
-      end
-      resource("rust-src").stage do
-        system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
-      end
+    # The toolchain is shared mutable state outside the keg; concurrent brew
+    # sessions (a known failure mode on this tap) racing the install+sign
+    # sequence corrupt it — serialize via flock, re-checking the sentinel
+    # under the lock.
+    rust_home.mkpath
+    File.open(rust_home/".brew-install-lock", File::CREAT | File::RDWR) do |lock|
+      lock.flock(File::LOCK_EX)
+      unless rust_ready.exist?
+        resource("rust-nightly").stage do
+          # The host tarball contains rustc/cargo/rust-std; install via install.sh.
+          # Use sh explicitly: OHOS superenv PATH has no bash for the shebang.
+          system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
+        end
+        resource("rust-src").stage do
+          system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
+        end
 
-      # ── Sign the rust binaries (OHOS kernel refuses to exec unsigned ELF → cargo exits 127) ──
-      sign_tool = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
-      Dir.glob(rust_home/"**/*").each do |f|
-        next unless File.file?(f)
-        next if File.symlink?(f)
-        next if File.read(f, 4, mode: "rb") != "\x7fELF"
+        # ── Sign the rust binaries (OHOS kernel refuses to exec unsigned ELF → cargo exits 127) ──
+        sign_tool = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
+        Dir.glob(rust_home/"**/*").each do |f|
+          next unless File.file?(f)
+          next if File.symlink?(f)
+          next if File.read(f, 4, mode: "rb") != "\x7fELF"
 
-        tmp = "#{f}.unsigned"
-        mv f, tmp
-        system sign_tool, "sign", "-selfSign", "1", "-inFile", tmp, "-outFile", f
-        chmod 0755, f
-        rm tmp
+          tmp = "#{f}.unsigned"
+          mv f, tmp
+          system sign_tool, "sign", "-selfSign", "1", "-inFile", tmp, "-outFile", f
+          chmod 0755, f
+          rm tmp
+        end
+
+        rust_ready.write("signed #{Time.now}\n")
       end
-
-      rust_ready.write("signed #{Time.now}\n")
     end
 
     # ── Build environment (PATH + env) ──
