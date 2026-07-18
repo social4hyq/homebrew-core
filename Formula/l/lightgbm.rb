@@ -2,8 +2,8 @@ class Lightgbm < Formula
   desc "Fast, distributed, high performance gradient boosting framework"
   homepage "https://github.com/lightgbm-org/LightGBM"
   url "https://github.com/lightgbm-org/LightGBM.git",
-      tag:      "v4.6.0",
-      revision: "d02a01ac6f51d36c9e62388243bcb75c3b1b1774"
+      tag:      "v4.7.0",
+      revision: "8f7036f03627054d5a54a6f965b13f4b9ff2cb63"
   license "MIT"
 
   bottle do
