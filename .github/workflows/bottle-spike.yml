@@ -1,0 +1,136 @@
+name: bottle-spike
+
+# Spike：验证在 GitHub 托管 ARM runner 上用 OHOS 容器构建 formula bottle。
+# 用法：Actions → bottle-spike → Run workflow → 填 formula（如 icu4c@78 / bun / llvm@21）
+#
+# - upload=false（默认）：只构建 + 打 bottle + 上传为 workflow artifact，不改仓库
+# - upload=true：创建 GitHub Release 放 bottle、brew bottle --merge --write 回写
+#   formula 的 bottle 块并 push 到 main。注意：若 formula 同版本已有 atomgit
+#   bottle，root_url/sha256 会被 CI 产物替换。
+#
+# 已知边界：deps 的 bottle 仍从 atomgit 下载（Azure → 国内，bun-bootstrap 有
+# 213MB，可能偏慢，spike 会实测）；llvm@21 磁盘占用临界，超了则该 formula
+# 保留服务器构建。
+
+on:
+  workflow_dispatch:
+    inputs:
+      formula:
+        description: 'Formula 名（如 icu4c@78 / bun / bun-webkit / llvm@21 / ohos-opencode）'
+        required: true
+        type: string
+      upload:
+        description: '上传 bottle 到 GitHub Release 并回写 formula（push main）'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bottle-spike-${{ inputs.formula }}
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/social4hyq/ci-runner:latest
+  CONTAINER: ohos
+  BREW_ENV: HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1
+  TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 360
+    steps:
+      - name: 释放磁盘 + 资源摸底
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /usr/local/share/swift \
+                      /opt/hostedtoolcache /usr/local/share/powershell \
+                      /usr/local/lib/minikube /usr/local/share/chromium 2>/dev/null || true
+          docker system prune -af >/dev/null 2>&1 || true
+          echo "== 清理后磁盘 =="; df -h /
+          echo "== 资源 =="; nproc; free -g
+
+      - uses: actions/checkout@v4
+
+      - name: 拉取镜像并启动 OHOS 容器
+        run: |
+          docker pull "$IMAGE"
+          docker run -d --name "$CONTAINER" --init \
+            -v "$GITHUB_WORKSPACE:$TAP_IN_CONTAINER" \
+            "$IMAGE" sleep infinity
+          # 一次性容器配置（与服务器一致）：musl tmpfile() 硬编码路径 + /system/bin/sh
+          docker exec "$CONTAINER" bash -lc \
+            'mkdir -p /data/local/tmp /system/bin && ln -sf /bin/sh /system/bin/sh'
+          # CI 网络（Azure）下 cargo 走 sparse 直连 crates.io；镜像内默认 git protocol 太慢
+          docker exec "$CONTAINER" bash -lc \
+            'mkdir -p /root/.cargo && printf "[registries.crates-io]\nprotocol = \"sparse\"\n\n[net]\ngit-fetch-with-cli = true\nretry = 3\n" > /root/.cargo/config.toml'
+          docker exec "$CONTAINER" bash -lc 'brew --version && brew tap'
+
+      - name: 源码构建 formula
+        run: |
+          docker exec "$CONTAINER" bash -lc \
+            "$BREW_ENV brew install --build-bottle --verbose social4hyq/core/${{ inputs.formula }}" 2>&1 | tee build.log
+          echo "== 构建后磁盘 =="
+          docker exec "$CONTAINER" df -h /
+          df -h /
+
+      - name: 打 bottle
+        id: bottle
+        run: |
+          VER=$(docker exec "$CONTAINER" bash -lc \
+            "$BREW_ENV brew info --json=v2 social4hyq/core/${{ inputs.formula }}" \
+            | jq -r '.formulae[0].versions.stable')
+          SAFE_NAME=$(echo "${{ inputs.formula }}" | tr -d '@')
+          TAG="${SAFE_NAME}-v${VER}-ci${{ github.run_number }}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "== version=$VER tag=$TAG =="
+          docker exec -w /root "$CONTAINER" bash -lc \
+            "$BREW_ENV brew bottle --json \
+              --root-url https://github.com/social4hyq/homebrew-core/releases/download/$TAG \
+              social4hyq/core/${{ inputs.formula }}"
+          mkdir -p bottle-out
+          docker exec "$CONTAINER" bash -lc \
+            "mv /root/*.bottle.tar.gz /root/*.bottle.json '$TAP_IN_CONTAINER/bottle-out/'"
+          ls -la bottle-out/
+
+      - name: 上传 bottle 为 artifact（不上 Release 时的产物出口）
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bottle-${{ inputs.formula }}-run${{ github.run_number }}
+          path: bottle-out/
+          retention-days: 14
+
+      - name: 上传 Release + 回写 formula + push（upload=true）
+        if: inputs.upload
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.bottle.outputs.tag }}"
+          gh release create "$TAG" --title "$TAG" \
+            --notes "CI bottle (spike run ${{ github.run_number }})" \
+            bottle-out/*.bottle.tar.gz
+          # 把 bottle 块合并回 formula（读 /root 下刚生成的 json）
+          docker exec -w /root "$CONTAINER" bash -lc \
+            "$BREW_ENV brew bottle --merge --write social4hyq/core/${{ inputs.formula }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula/
+          git commit -m "bottle(${{ inputs.formula }}): CI bottle $TAG"
+          git push origin HEAD:main
+
+      - name: poured + test 验证（upload=true）
+        if: inputs.upload
+        run: |
+          docker exec "$CONTAINER" bash -lc \
+            "$BREW_ENV brew uninstall --ignore-dependencies ${{ inputs.formula }} || true"
+          docker exec "$CONTAINER" bash -lc \
+            "$BREW_ENV brew install --verbose social4hyq/core/${{ inputs.formula }}"
+          POURED=$(docker exec "$CONTAINER" bash -lc \
+            "$BREW_ENV brew info --json=v2 social4hyq/core/${{ inputs.formula }}" \
+            | jq -r '.formulae[0].installed[0].poured_from_bottle')
+          echo "poured_from_bottle=$POURED"
+          [ "$POURED" = "true" ]
+          docker exec "$CONTAINER" bash -lc "$BREW_ENV brew test ${{ inputs.formula }}"
