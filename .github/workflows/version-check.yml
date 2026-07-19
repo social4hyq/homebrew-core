@@ -8,6 +8,9 @@ on:
   schedule:
     - cron: '0 3 * * 1'
   workflow_dispatch:
+  push: # TODO: temporary branch-test trigger, remove before merge
+    branches: [claude/repository-ci-analysis-x0wmfg]
+    paths: ['.github/workflows/version-check.yml']
 
 permissions:
   contents: read
