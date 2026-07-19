@@ -218,6 +218,10 @@ jobs:
           # 4. 回写 formula bottle 块（--merge 的参数是 json 文件，不是 formula 名）
           docker exec -w "$TAP_IN_CONTAINER/bottle-out" "$CONTAINER" bash -lc \
             "$BREW_ENV brew bottle --merge --write ./*.bottle.json"
+          # 4b. brew 以 root 身份在容器内自动 commit，.git 里留下 root 属主对象；
+          # 不交还给 runner 用户会导致后续 git add/push 报
+          # "insufficient permission for adding an object to repository database"
+          sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
           # 5. push 双 remote（atomgit push 失败不阻断——主同步走 GitHub，atomgit 可后补）
           # 注意：brew --merge --write 在 fork 里已自动 commit，worktree 干净时跳过自己的 commit
           git config user.name "github-actions[bot]"
