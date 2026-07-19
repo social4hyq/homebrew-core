@@ -58,11 +58,9 @@ for i in 1 2 3; do
   git rebase origin/main
   sleep 5
 done
-git push "https://social4hyq:${ATOMGIT_TOKEN}@atomgit.com/social4hyq/homebrew-core.git" HEAD:main \
-  || {
-    echo "::warning::atomgit push failed; GitHub updated, sync atomgit manually"
-    echo "- ⚠️ atomgit push failed for $TAG — remotes diverged, sync atomgit manually" >> "$GITHUB_STEP_SUMMARY"
-  }
+# atomgit main is now synced by the sync-to-atomgit workflow (triggered by this
+# GitHub push), which hard-fails visibly instead of the old warning-only push
+# here. No separate atomgit push in publish.sh anymore.
 
 # 5. GitHub release mirror copy, best-effort (atomgit stays the primary:
 #    every root_url points there; this is disaster-recovery / future-switch
