@@ -336,4 +336,4 @@ jobs:
             curl -s -X DELETE -H "Authorization: Bearer $ATOMGIT_TOKEN" \
               "$API/releases/$TAG/attach_files/$id" || true
           done
-          echo "::notice::release object $TAG cannot be deleted via the API (DELETE on both /releases/tags/{tag} and /releases/{id} returns 405, confirmed 2026-07-19 — atomgit has no release-delete capability at all, only per-asset deletion); the now-empty test release stays behind and must be removed manually via the atomgit web UI if desired (https://atomgit.com/social4hyq/homebrew-core/releases)"
+          echo "::notice::release object $TAG has no API delete endpoint (DELETE on both /releases/tags/{tag} and /releases/{id} returns 405, confirmed 2026-07-19), but that's fine: once a release has zero attach-type assets left it stops appearing in the API within a short window on its own (observed 2026-07-19 — no manual cleanup needed, nothing further to do here)"
