@@ -1,3 +1,4 @@
+# ci-test: auto-validate live test (will be reverted)
 class LlvmAT21 < Formula
   desc "LLVM 21 toolchain: clang, lld, OHOS multiarch runtime libs"
   homepage "https://llvm.org/"
