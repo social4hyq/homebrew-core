@@ -1,0 +1,95 @@
+name: backfill-github-releases
+
+# Throwaway: copy every existing atomgit bottle to a GitHub release mirror
+# under the same TAG. atomgit stays the root_url target; this just builds the
+# GitHub-side mirror retroactively. Idempotent (re-runs only fill gaps).
+# Delete this file once the backfill is confirmed.
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include:
+          - tag: bun-bootstrap-v1.4.0-5467a689
+            sha: 463b5efa40e04405914ae629e2762e6710defeeaae73bd6cdcc3d3892cb4d82a
+          - tag: bun-webkit-v4895f45dfb-r1
+            sha: 9654b533ce43e8e1ac471562cf0b3a0c84f92c83e628adeb7b2072c82545d5f2
+          - tag: bun-v1.4.0-r34
+            sha: d4656ab79a07c7bf6f37b691978119ecd46737870353e862aef97d4e837305ed
+          - tag: claude-code-v2.1.215-r1
+            sha: 384ac5811a44350b4f7dcbd45b70cc32621e7b70655747a04921c0514a7fa206
+          - tag: codex-v0.144.5-r1
+            sha: 87cd0d8c630639eceef3bd154269fbd49bf549c041288ae2ce13abda248d7701
+          - tag: dlopen-sign-shim-v0.1.0
+            sha: 3d95ad4fbcff79c20c47a0b10be676c12d6f1df14a4077b758d83622973703cd
+          - tag: grok-build-v0.2.102-r1
+            sha: 929463671e303925dab8ea75f160be1ca3b7ce81cf77bc7157e56f51d2a4b682
+          - tag: icu4c@78-v78.3-r5
+            sha: 05fd5b075d4af6af9a0e056b63e2f18998ab33f7236d342b3e5a30b7709302da
+          - tag: inject-runpath-v0.1.0
+            sha: 61307e99f9a924fa4009ca5cf9556299db5ceff6fa71355a328532fbcd4b8866
+          - tag: llvm21-v21.1.8-pruned-r5
+            sha: 843c1bc74097f3b2b17b99109e14051d88f98d1a9cb6adbb78d35eb0c5ba1f32
+          - tag: ohos-bst-light-v1.0.0
+            sha: 8ba067e83f8ca5721f90019aa6de165e46298268afba7fd481f33b6df39c5d17
+          - tag: ohos-compat-shim-v0.2.0
+            sha: cff37f72d430c7883a86e2175bc944bda11c178836a354a089ba0a4538737f96
+          - tag: ohos-opencode-v1.18.3-r3
+            sha: 1ee3d32a1f7a1ca402430f90d2c2b4b878f422983e20d9d902189ff616b0a5e4
+          - tag: opencode-v1.18.3-r1
+            sha: 68d49e23f3b70282faa3faa1d9703e0230a3569ef2caf6a270e1c6bdaa7f108b
+
+    steps:
+      - name: Discover bottle asset on atomgit
+        id: asset
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+        run: |
+          set -eo pipefail
+          API=https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
+          # list release assets, pick the brewed bottle (skip source archives)
+          URL=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+            "$API/releases/tags/${{ matrix.tag }}" \
+            | jq -r '.assets[] | select(.name | endswith(".bottle.tar.gz")) | .browser_download_url' | head -1)
+          NAME=$(basename "$URL")
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "discovered: $NAME"
+
+      - name: Download + sha256 verify
+        env:
+          URL: ${{ steps.asset.outputs.url }}
+          NAME: ${{ steps.asset.outputs.name }}
+        run: |
+          set -eo pipefail
+          [ -n "$URL" ] || { echo "::error::no bottle asset found for ${{ matrix.tag }}"; exit 1; }
+          # tolerant of slow transpacific leg (mirror primary's strategy)
+          curl -fL --speed-limit 1024 --speed-time 120 -m 1800 -o "$NAME" "$URL"
+          ACTUAL=$(sha256sum "$NAME" | awk '{print $1}')
+          [ "$ACTUAL" = "${{ matrix.sha }}" ] \
+            || { echo "::error::sha256 mismatch for ${{ matrix.tag }}: got $ACTUAL want ${{ matrix.sha }}"; exit 1; }
+          echo "sha256 OK ($ACTUAL)"
+
+      - name: Create GitHub mirror release + upload
+        env:
+          NAME: ${{ steps.asset.outputs.name }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eo pipefail
+          TAG=${{ matrix.tag }}
+          # create release+tag if absent (idempotent); --clobber upload fills/overwrites the asset
+          gh release create "$TAG" -R social4hyq/homebrew-core \
+            --title "$TAG" --notes "atomgit bottle mirror (backfill); primary: atomgit release $TAG" \
+            2>/dev/null || echo "release $TAG already exists, uploading asset only"
+          gh release upload "$TAG" -R social4hyq/homebrew-core "$NAME" --clobber
+          echo "✅ $TAG -> $NAME mirrored"
