@@ -60,7 +60,7 @@ jobs:
           # list release assets, pick the brewed bottle (skip source archives)
           URL=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
             "$API/releases/tags/${{ matrix.tag }}" \
-            | jq -r '.assets[] | select(.name | endswith(".bottle.tar.gz")) | .browser_download_url' | head -1)
+            | jq -r '.assets[] | select(.name | contains(".bottle.")) | .browser_download_url' | head -1)
           NAME=$(basename "$URL")
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
