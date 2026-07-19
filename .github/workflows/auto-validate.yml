@@ -11,8 +11,7 @@ name: auto-validate
 
 on:
   push:
-    # TODO(上线)：实测完成后改回只留 main
-    branches: [main, claude/repository-ci-analysis-x0wmfg]
+    branches: [main]
     paths: ['Formula/**']
 
 permissions:
