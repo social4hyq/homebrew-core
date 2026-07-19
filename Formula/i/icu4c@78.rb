@@ -20,8 +20,8 @@ class Icu4cAT78 < Formula
   # When merging into official core: icu4c@78 can use system clang; this validation version
   # is only for verifying ABI alignment.
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/icu4c@78-v78.3-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5842b621df8ecee8a54d0fad7df87500c1c22db042eff5bb597cb0ea7b44eed"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/icu4c@78-v78.3-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9fd9bcb574da422a46f2dacd76b05fe724201f1b168f4a50626f58ad76f5ea32"
   end
 
   keg_only "abi-validation build pinned to llvm@21's libc++; linked in-tree by bun/bun-webkit, not system-wide"
