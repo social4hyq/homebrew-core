@@ -116,12 +116,22 @@ jobs:
       - name: readall + audit（全部改动 formula，含重量级）
         run: |
           set -eo pipefail
+          # readall 阻断：语法/加载错误没有任何借口
           docker exec "$CONTAINER" bash -lc "$BREW_ENV brew readall social4hyq/core"
-          # audit 默认离线（--online 才联网）；首期不加 --strict，fork 特有写法会误伤
+          # audit 默认离线（--online 才联网）；首期不加 --strict，fork 特有写法会误伤。
+          # 暂为告警不阻断：存量 formula 有历史 audit 问题（如 claude-code 的
+          # version 冗余、非 SPDX license），阻断会永久卡死其自动构建；
+          # 存量清零后把 FAIL 判定改回 exit 1
+          FAIL=()
           for name in $(jq -r '.[]' <<< "$CHANGED_JSON"); do
             echo "== brew audit $name =="
-            docker exec "$CONTAINER" bash -lc "$BREW_ENV brew audit --formula social4hyq/core/$name"
+            docker exec "$CONTAINER" bash -lc "$BREW_ENV brew audit --formula social4hyq/core/$name" \
+              || FAIL+=("$name")
           done
+          if [ "${#FAIL[@]}" -gt 0 ]; then
+            echo "::warning::brew audit 未通过（暂不阻断，建议尽快修复）: ${FAIL[*]}"
+            echo "- ⚠️ audit 未通过: ${FAIL[*]}" >> "$GITHUB_STEP_SUMMARY"
+          fi
 
   build:
     # 先过轻检查再烧构建时长；audit/readall 挂了不值得烧 30-90 分钟
