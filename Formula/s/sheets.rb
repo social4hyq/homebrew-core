@@ -1,8 +1,8 @@
 class Sheets < Formula
   desc "Terminal based spreadsheet tool"
   homepage "https://github.com/maaslalani/sheets"
-  url "https://github.com/maaslalani/sheets/archive/refs/tags/v0.2.0.tar.gz"
-  sha256 "e33563769858abba1812d6f9e1f427241a9a5c65da3a34a87d8784c8a050e25e"
+  url "https://github.com/maaslalani/sheets/archive/refs/tags/v0.3.0.tar.gz"
+  sha256 "d65b37c4d40c0a531a87a81848350528387e1247b24d2aa3a04dd5a41338c9fa"
   license "MIT"
   head "https://github.com/maaslalani/sheets.git", branch: "main"
 
