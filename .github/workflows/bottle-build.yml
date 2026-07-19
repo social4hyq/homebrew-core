@@ -1,30 +1,18 @@
 name: bottle-build
 
-# OHOS bottle pipeline: GitHub-hosted ARM runner (ubuntu-24.04-arm) + OHOS container.
+# OHOS bottle pipeline: GitHub-hosted ARM runner + OHOS container.
+# Logic lives in .github/scripts/; this file is orchestration only.
+#
 # Manual: Actions → bottle-build → Run workflow
 #   upload=false (default): build + bottle + workflow artifact (no repo changes)
-#   upload=true: upload to atomgit releases (tag <formula>-v<ver>-r<N>), merge the
-#     bottle block back into the formula, push GitHub + atomgit main, verify
-#     poured_from_bottle
+#   upload=true: upload to atomgit release (tag <formula>-v<ver>-rN), merge the
+#     bottle block back, push GitHub + atomgit main, verify poured_from_bottle
 # Also callable via workflow_call: auto-validate.yml invokes this per changed
 # formula on push to main (always upload=false).
 #
-# Quality gates: brew test runs after build and before bottling (blocking when
-# upload=true, warning otherwise), and again on the poured bottle after upload.
-#
-# Environment notes (all learned from real failures — do not remove):
-# - seccomp=unconfined: default docker profile blocks io_uring_setup, killing bun
-# - /system/lib/ld-musl symlink: bottle ELFs' PT_INTERP targets the real-device path
-# - brew trust: Harmonybrew silently rejects changed formulae (exit 0) without it
-# - git safe.directory + identity: brew bottle --merge --write auto-commits in-container
-# - retry brew install once after 90s: atomgit CDN has transient 404s
-# - cargo sparse protocol: the image defaults to git protocol, too slow from Azure
-#
-# TODO (low priority):
-# - M3: release "GET || POST" can hit a misleading 409 when the GET flakes
-# - M4: atomgit push failure only warns; the two remotes can silently diverge
-# - L1: pin ci-runner image by digest instead of :latest
-# - L2: upload=false artifacts carry a fake root-url; never merge them manually
+# TODO (low priority): M3 release GET||POST 409 race; M4 atomgit push warn-only
+# divergence; L1 pin image by digest; L2 upload=false artifacts have a fake
+# root-url, never merge them manually.
 
 on:
   workflow_dispatch:
@@ -60,138 +48,47 @@ concurrency:
 env:
   IMAGE: ghcr.io/social4hyq/ci-runner:latest
   CONTAINER: ohos
-  BREW_ENV: HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+  # Inputs pass through env (never interpolated into shell) and a whitelist check
+  FORMULA: ${{ inputs.formula }}
+  UPLOAD: ${{ inputs.upload }}
+  RUN_NUMBER: ${{ github.run_number }}
 
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 360
-    env:
-      # Input passes through env and a whitelist check; later steps only use
-      # "$FORMULA" — interpolating ${{ inputs.formula }} into shell is an
-      # injection surface, and this input can reach ATOMGIT_TOKEN/GITHUB_TOKEN
-      FORMULA: ${{ inputs.formula }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate input (formula whitelist)
+      - name: Validate input
         run: |
           [[ "$FORMULA" =~ ^[A-Za-z0-9@+._-]+$ ]] \
             || { echo "::error::invalid formula name: $FORMULA (allowed: [A-Za-z0-9@+._-])"; exit 1; }
 
-      - name: Pull image and start OHOS container
-        run: |
-          docker pull "$IMAGE"
-          docker run -d --name "$CONTAINER" --init \
-            --security-opt seccomp=unconfined \
-            -v "$GITHUB_WORKSPACE:$TAP_IN_CONTAINER" \
-            "$IMAGE" sleep infinity
-          # musl tmpfile() hardcoded path + /system/bin/sh + /system/lib/ld-musl
-          # (bottle ELFs' PT_INTERP targets the real-device path)
-          docker exec "$CONTAINER" bash -lc \
-            'mkdir -p /data/local/tmp /system/bin /system/lib && \
-             ln -sf /bin/sh /system/bin/sh && \
-             ln -sf /lib/ld-musl-aarch64.so.1 /system/lib/ld-musl-aarch64.so.1'
-          # cargo sparse protocol straight to crates.io (git protocol too slow on Azure)
-          docker exec "$CONTAINER" bash -lc \
-            'mkdir -p /root/.cargo && printf "[registries.crates-io]\nprotocol = \"sparse\"\n\n[net]\ngit-fetch-with-cli = true\nretry = 3\n" > /root/.cargo/config.toml'
-          docker exec "$CONTAINER" bash -lc 'brew --version && brew tap'
-          # Harmonybrew silently rejects changed formulae without re-trust
-          docker exec "$CONTAINER" bash -lc 'brew trust social4hyq/core'
-          # brew bottle --merge --write auto-commits the tap in-container as root
-          docker exec "$CONTAINER" git config --global --add safe.directory "$TAP_IN_CONTAINER"
-          docker exec "$CONTAINER" git config --global user.name "github-actions[bot]"
-          docker exec "$CONTAINER" git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Start OHOS container
+        run: .github/scripts/setup-container.sh
 
-      - name: Build formula from source
-        run: |
-          # explicit pipefail: failure detection relies on the `docker exec | tee` pipe
-          set -eo pipefail
-          # atomgit CDN transient 404s: retry once after 90s; brew reuses partial work
-          for i in 1 2; do
-            if docker exec "$CONTAINER" bash -lc \
-              "$BREW_ENV brew install --build-bottle --verbose social4hyq/core/$FORMULA" 2>&1 | tee build.log; then
-              break
-            fi
-            [ "$i" = 2 ] && exit 1
-            echo "::warning::brew install attempt $i failed, retrying in 90s (atomgit transient 404)"
-            sleep 90
-          done
-          # trust rejections are silent (exit 0); verify the keg actually installed
-          N=$(docker exec "$CONTAINER" bash -lc \
-            "$BREW_ENV brew info --json=v2 social4hyq/core/$FORMULA" \
-            | jq -r '.formulae[0].installed | length')
-          echo "installed_kegs=$N"
-          [ "$N" -ge 1 ] || { echo "::error::formula not installed (silent trust rejection? check trust/deps)"; exit 1; }
+      - name: Build from source
+        run: .github/scripts/build.sh
 
-      - name: brew test gate (blocking when upload=true)
-        run: |
-          set -eo pipefail
-          if docker exec "$CONTAINER" bash -lc "$BREW_ENV brew test $FORMULA"; then
-            echo "brew test passed"
-          elif [ "${{ inputs.upload }}" = "true" ]; then
-            echo "::error::brew test $FORMULA failed, refusing to publish. Fix the formula's test block first"
-            exit 1
-          else
-            echo "::warning::brew test $FORMULA failed (non-blocking with upload=false; blocks publishing)"
-          fi
+      - name: brew test gate
+        run: .github/scripts/test-gate.sh
 
-      - name: Failure diagnostics (build / test gate)
+      - name: Failure diagnostics
         if: failure()
         run: |
           echo "== brew logs =="
           docker exec "$CONTAINER" bash -lc \
             'for f in /root/.cache/Homebrew/Logs/*/*; do echo "--- $f"; tail -30 "$f"; done' || true
 
-      - name: Bottle (resolve atomgit tag first when upload=true)
+      - name: Bottle
         id: bottle
         env:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
-        run: |
-          set -eo pipefail
-          VER=$(docker exec "$CONTAINER" bash -lc \
-            "$BREW_ENV brew info --json=v2 social4hyq/core/$FORMULA" \
-            | jq -r '.formulae[0].versions.stable')
-          BASE="${FORMULA}-v${VER}"
-          if [ "${{ inputs.upload }}" = "true" ]; then
-            # Tag keeps '@' (e.g. icu4c@78-v78.3-r2); N = max existing + 1 across
-            # ALL pages. Any API failure aborts (curl -sf + pipefail) instead of
-            # silently falling back to -r1, which would overwrite old release assets.
-            MAX=0
-            PAGE=1
-            while :; do
-              TAGS=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-                "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases?per_page=100&page=$PAGE")
-              NEW_MAX=$(echo "$TAGS" | jq -r '.[].tag_name' \
-                | { grep -E "^${BASE}-r[0-9]+$" || true; } \
-                | sed "s/^${BASE}-r//" | sort -n | tail -1)
-              [ -n "$NEW_MAX" ] && [ "$NEW_MAX" -gt "$MAX" ] && MAX=$NEW_MAX
-              [ "$(echo "$TAGS" | jq 'length')" -lt 100 ] && break
-              PAGE=$((PAGE + 1))
-            done
-            TAG="${BASE}-r$(( MAX + 1 ))"
-            # The computed tag must not exist; reuse would overwrite published bottles
-            if curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-              "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases/tags/$TAG" > /dev/null; then
-              echo "::error::tag $TAG already exists, refusing to reuse (protects published bottles)"
-              exit 1
-            fi
-            ROOT="https://atomgit.com/social4hyq/homebrew-core/releases/download/$TAG"
-          else
-            TAG="${BASE}-ci${{ github.run_number }}"
-            ROOT="https://github.com/social4hyq/homebrew-core/releases/download/$TAG"
-          fi
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "== version=$VER tag=$TAG =="
-          docker exec -w /root "$CONTAINER" bash -lc \
-            "$BREW_ENV brew bottle --json --root-url $ROOT social4hyq/core/$FORMULA"
-          mkdir -p bottle-out
-          docker exec "$CONTAINER" bash -lc \
-            "mv /root/*.bottle.tar.gz /root/*.bottle.json '$TAP_IN_CONTAINER/bottle-out/'"
-          ls -la bottle-out/
+        run: .github/scripts/bottle.sh
 
-      - name: Upload bottle as artifact (upload=false output)
+      - name: Upload bottle as artifact
         if: success() && !inputs.upload
         uses: actions/upload-artifact@v4
         with:
@@ -199,78 +96,14 @@ jobs:
           path: bottle-out/
           retention-days: 14
 
-      - name: Upload to atomgit + merge bottle block + push (upload=true)
+      - name: Publish to atomgit and push
         if: inputs.upload
         env:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -eo pipefail
-          TAG="${{ steps.bottle.outputs.tag }}"
-          BOTTLE=$(ls bottle-out/*.tar.gz | head -1)
-          FILENAME=$(basename "$BOTTLE")
-          # 1. get-or-create release (atomgit returns no release id; keyed by tag)
-          # TODO(M3): a flaky GET falls through to POST and hits a confusing 409
-          curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-            "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases/tags/$TAG" \
-            || curl -sf -m 30 -X POST -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-                 -H "Content-Type: application/json" \
-                 -d "{\"tag_name\":\"$TAG\",\"name\":\"$TAG\",\"target_commitish\":\"main\",\"body\":\"$TAG bottle (CI run ${{ github.run_number }})\"}" \
-                 "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases"
-          # 2. presigned upload URL (file_name required)
-          RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-            "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases/$TAG/upload_url?file_name=$FILENAME")
-          UPLOAD_URL=$(echo "$RESP" | jq -r .url)
-          H_PROJECT=$(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')
-          H_ACL=$(echo "$RESP" | jq -r '.headers["x-obs-acl"]')
-          H_CALLBACK=$(echo "$RESP" | jq -r '.headers["x-obs-callback"]')
-          # 3. PUT to the presigned URL (OBS object storage)
-          curl -sf -m 300 -X PUT "$UPLOAD_URL" \
-            -H "x-obs-meta-project-id: $H_PROJECT" \
-            -H "x-obs-acl: $H_ACL" \
-            -H "x-obs-callback: $H_CALLBACK" \
-            -H "Content-Type: application/octet-stream" \
-            --data-binary "@$BOTTLE" -w "HTTP=%{http_code}\n"
-          # 4. merge bottle block back (--merge takes the json file, not the formula name)
-          docker exec -w "$TAP_IN_CONTAINER/bottle-out" "$CONTAINER" bash -lc \
-            "$BREW_ENV brew bottle --merge --write ./*.bottle.json"
-          # 4b. brew committed as root in-container; restore ownership before git push
-          sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
-          # 5. push both remotes. Concurrency is per-formula, so parallel uploads of
-          #    different formulae can race non-fast-forward: fetch+rebase and retry.
-          #    A real rebase conflict aborts via set -e rather than force-pushing.
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Formula/
-          git diff --cached --quiet || git commit -m "bottle($FORMULA): rebuild bottle $TAG"
-          for i in 1 2 3; do
-            if git push origin HEAD:main; then
-              break
-            fi
-            [ "$i" = 3 ] && { echo "::error::push origin failed 3 times; atomgit release $TAG already uploaded, verify the bottle merge manually"; exit 1; }
-            echo "::warning::push origin rejected (concurrent upload?), fetch+rebase retry ($i/3)"
-            git fetch origin main
-            git rebase origin/main
-            sleep 5
-          done
-          # TODO(M4): warn-only leaves the two remotes silently diverged
-          git push "https://social4hyq:${ATOMGIT_TOKEN}@atomgit.com/social4hyq/homebrew-core.git" HEAD:main \
-            || echo "::warning::atomgit push failed; GitHub updated, sync atomgit manually"
+          TAG: ${{ steps.bottle.outputs.tag }}
+        run: .github/scripts/publish.sh
 
-      - name: Poured + test verification (upload=true)
+      - name: Verify poured bottle
         if: inputs.upload
-        run: |
-          set -eo pipefail
-          # formula content just changed; re-trust before reinstalling
-          docker exec "$CONTAINER" bash -lc 'brew trust social4hyq/core'
-          docker exec "$CONTAINER" bash -lc \
-            "$BREW_ENV brew uninstall --ignore-dependencies $FORMULA || true"
-          docker exec "$CONTAINER" bash -lc \
-            "$BREW_ENV brew install --verbose social4hyq/core/$FORMULA"
-          POURED=$(docker exec "$CONTAINER" bash -lc \
-            "$BREW_ENV brew info --json=v2 social4hyq/core/$FORMULA" \
-            | jq -r '.formulae[0].installed[0].poured_from_bottle')
-          echo "poured_from_bottle=$POURED"
-          [ "$POURED" = "true" ]
-          # A failure here means the published tag is bad: pull the release, fix, rerun
-          docker exec "$CONTAINER" bash -lc "$BREW_ENV brew test $FORMULA"
+        run: .github/scripts/verify-poured.sh

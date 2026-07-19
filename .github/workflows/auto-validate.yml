@@ -1,12 +1,12 @@
 name: auto-validate
 
 # Auto-validation on push to main: changed formulae get a source build +
-# brew test (artifact only, nothing published). Heavy formulae get light
-# checks only. Publishing stays manual via bottle-build upload=true.
+# brew test via bottle-build (artifact only, nothing published). Heavy
+# formulae get light checks only. Publishing stays manual (upload=true).
 
 on:
   push:
-    branches: [main]
+    branches: [main, claude/repository-ci-analysis-x0wmfg] # TODO: converge to [main] after live test
     paths: ['Formula/**']
 
 permissions:
@@ -21,7 +21,6 @@ env:
   HEAVY_FORMULAS: "llvm@21 bun-webkit"
   IMAGE: ghcr.io/social4hyq/ci-runner:latest
   CONTAINER: ohos
-  BREW_ENV: HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
 
 jobs:
@@ -44,44 +43,7 @@ jobs:
         env:
           BEFORE: ${{ github.event.before }}
           AFTER: ${{ github.sha }}
-        run: |
-          set -eo pipefail
-          if [[ "$BEFORE" =~ ^0+$ ]] || ! git cat-file -e "$BEFORE" 2>/dev/null; then
-            echo "::warning::event.before unavailable (new branch/force push), comparing HEAD^..HEAD"
-            BEFORE=$(git rev-parse "$AFTER^")
-          fi
-          strip_bottle() { sed '/^  bottle do$/,/^  end$/d'; }
-          mapfile -t FILES < <(git diff --name-status --no-renames "$BEFORE" "$AFTER" -- 'Formula/' \
-            | awk '$1 != "D" && $2 ~ /^Formula\/[^\/]+\/[^\/]+\.rb$/ {print $2}')
-          BUILD=(); HEAVY=(); CHANGED=()
-          for f in "${FILES[@]}"; do
-            name=$(basename "$f" .rb)
-            [[ "$name" =~ ^[A-Za-z0-9@+._-]+$ ]] \
-              || { echo "::error::invalid formula name: $name"; exit 1; }
-            CHANGED+=("$name")
-            # bottle-block-only changes don't need a rebuild
-            if git cat-file -e "$BEFORE:$f" 2>/dev/null && \
-               diff <(git show "$BEFORE:$f" | strip_bottle) \
-                    <(git show "$AFTER:$f"  | strip_bottle) >/dev/null; then
-              echo "::notice::$name: bottle block only, skipping build"
-              continue
-            fi
-            if tr ' ' '\n' <<< "$HEAVY_FORMULAS" | grep -qx "$name"; then
-              HEAVY+=("$name")
-            else
-              BUILD+=("$name")
-            fi
-          done
-          {
-            echo "build=$(jq -cn '$ARGS.positional' --args "${BUILD[@]}")"
-            echo "changed=$(jq -cn '$ARGS.positional' --args "${CHANGED[@]}")"
-            echo "heavy=$(jq -cn '$ARGS.positional' --args "${HEAVY[@]}")"
-          } >> "$GITHUB_OUTPUT"
-          {
-            echo "### auto-validate"
-            echo "- build: ${BUILD[*]:-(none)}"
-            echo "- heavy (light-check only): ${HEAVY[*]:-(none)}"
-          } >> "$GITHUB_STEP_SUMMARY"
+        run: .github/scripts/detect-changes.sh
 
   light-check:
     needs: detect
@@ -93,28 +55,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Start OHOS container
-        run: |
-          docker pull "$IMAGE"
-          docker run -d --name "$CONTAINER" --init \
-            -v "$GITHUB_WORKSPACE:$TAP_IN_CONTAINER" "$IMAGE" sleep infinity
-          docker exec "$CONTAINER" git config --global --add safe.directory "$TAP_IN_CONTAINER"
-          docker exec "$CONTAINER" bash -lc 'brew trust social4hyq/core'
+        run: .github/scripts/setup-container.sh
       - name: readall + audit
-        run: |
-          set -eo pipefail
-          docker exec "$CONTAINER" bash -lc "$BREW_ENV brew readall social4hyq/core"
-          # audit is advisory until pre-existing findings are cleared,
-          # then flip it back to blocking
-          FAIL=()
-          for name in $(jq -r '.[]' <<< "$CHANGED_JSON"); do
-            echo "== brew audit $name =="
-            docker exec "$CONTAINER" bash -lc "$BREW_ENV brew audit --formula social4hyq/core/$name" \
-              || FAIL+=("$name")
-          done
-          if [ "${#FAIL[@]}" -gt 0 ]; then
-            echo "::warning::brew audit failed (non-blocking): ${FAIL[*]}"
-            echo "- ⚠️ audit failed: ${FAIL[*]}" >> "$GITHUB_STEP_SUMMARY"
-          fi
+        run: .github/scripts/light-check.sh
 
   build:
     # bottle-build declares contents:write, and a called workflow may not
