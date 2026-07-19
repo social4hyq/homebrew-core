@@ -1,17 +1,17 @@
 name: bottle-build
 
-# 正式 bottle 构建流水线：GitHub 托管 ARM runner（ubuntu-24.04-arm）+ OHOS 容器。
+# OHOS bottle 构建流水线：GitHub 托管 ARM runner（ubuntu-24.04-arm）+ OHOS 容器。
 # 用法：Actions → bottle-build → Run workflow → 填 formula
 #   upload=false（默认）：构建 + 打 bottle + 传 workflow artifact（验证/调试，不改仓库）
 #   upload=true：上传到 atomgit releases（tag <formula>-v<ver>-r<N>，N 按现有最大
 #     值 +1）、brew bottle --merge --write 回写 formula、push GitHub main + atomgit
-#     main，最后卸载重装验证 poured_from_bottle + brew test
-#   probe=true：只跑 spawnSync stdin 探针（环境诊断用）
+#     main，最后卸载重装验证 poured_from_bottle（brew test 仅告警）
 #
-# 环境要点（都是 spike 阶段实测踩过的坑，勿删）：
+# 环境要点（全是实测踩过的坑，勿删）：
 # - seccomp=unconfined：docker 默认 profile 拦截 io_uring_setup(EPERM)，bun 启动即死
 # - /system/lib/ld-musl symlink：bottle 二进制的 PT_INTERP 是真机路径，镜像内没有
 # - brew trust：Harmonybrew fork 信任机制，formula 内容变化后不 trust 会静默 exit 0
+# - git safe.directory + identity：brew bottle --merge --write 会在容器内自动 commit tap
 # - brew install 失败 90s 重试一次：atomgit CDN 有瞬时 404
 # - cargo sparse：镜像内默认 git protocol，从 Azure 拉太慢
 
@@ -19,16 +19,11 @@ on:
   workflow_dispatch:
     inputs:
       formula:
-        description: 'Formula 名（如 icu4c@78 / bun / bun-webkit / llvm@21 / ohos-opencode）'
+        description: 'Formula 名（如 icu4c@78 / bun / bun-webkit / llvm@21 / claude-code）'
         required: true
         type: string
       upload:
         description: '上传 bottle 到 atomgit Release 并回写 formula（push 双 remote）'
-        required: true
-        type: boolean
-        default: false
-      probe:
-        description: '只跑 spawnSync stdin 探针（跳过构建，诊断用）'
         required: true
         type: boolean
         default: false
@@ -51,19 +46,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 360
     steps:
-      - name: 释放磁盘 + 资源摸底
-        run: |
-          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /usr/local/share/swift \
-                      /opt/hostedtoolcache /usr/local/share/powershell \
-                      /usr/local/lib/minikube /usr/local/share/chromium 2>/dev/null || true
-          docker system prune -af >/dev/null 2>&1 || true
-          echo "== 清理后磁盘 =="; df -h /
-          echo "== 资源 =="; nproc; free -g
-
       - uses: actions/checkout@v4
-
-      - name: 登录 ghcr.io（镜像为 private，用 GHCR_PAT secret 拉取）
-        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u social4hyq --password-stdin
 
       - name: 拉取镜像并启动 OHOS 容器
         run: |
@@ -73,8 +56,7 @@ jobs:
             -v "$GITHUB_WORKSPACE:$TAP_IN_CONTAINER" \
             "$IMAGE" sleep infinity
           # 一次性容器配置（与服务器一致）：musl tmpfile() 硬编码路径 + /system/bin/sh
-          # + /system/lib/ld-musl（bottle 二进制的 PT_INTERP 是真机路径
-          # /system/lib/ld-musl-aarch64.so.1，镜像里没有，服务器上是手工建的 symlink）
+          # + /system/lib/ld-musl（bottle 二进制的 PT_INTERP 是真机路径，镜像没有）
           docker exec "$CONTAINER" bash -lc \
             'mkdir -p /data/local/tmp /system/bin /system/lib && \
              ln -sf /bin/sh /system/bin/sh && \
@@ -91,27 +73,7 @@ jobs:
           docker exec "$CONTAINER" git config --global user.name "github-actions[bot]"
           docker exec "$CONTAINER" git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: spawnSync stdin 探针（probe=true）
-        if: inputs.probe
-        run: |
-          docker exec "$CONTAINER" bash -lc "$BREW_ENV brew install bun-bootstrap"
-          docker exec "$CONTAINER" bash -lc 'cd /tmp && printf "a\n" > tcc.h &&
-            /storage/Users/currentUser/.harmonybrew/opt/bun-bootstrap/bin/bun -e "
-              const { spawnSync } = require(\"node:child_process\");
-              const r = spawnSync(\"git\", [\"apply\",\"--no-index\",\"-\"],
-                { input: \"--- tcc.h\n+++ tcc.h\n@@ -1,1 +1,1 @@\n-a\n+b\n\",
-                  stdio: [\"pipe\",\"ignore\",\"pipe\"], encoding: \"utf8\" });
-              console.log(\"node:child_process spawnSync status=\" + r.status +
-                \" stderr=\" + JSON.stringify(r.stderr));
-              const r2 = Bun.spawnSync([\"git\",\"apply\",\"--no-index\",\"-\"],
-                { input: \"--- tcc.h\n+++ tcc.h\n@@ -1,1 +1,1 @@\n-b\n+c\n\",
-                  stdio: [\"pipe\",\"ignore\",\"pipe\"], encoding: \"utf8\" });
-              console.log(\"Bun.spawnSync status=\" + r2.status +
-                \" stderr=\" + JSON.stringify(r2.stderr));
-            " && echo "--- tcc.h now: $(cat tcc.h)"'
-
       - name: 源码构建 formula
-        if: '!inputs.probe'
         run: |
           # atomgit CDN 有瞬时 404（实测 node bottle 连续 4 次 404，1 分钟后恢复 200）；
           # 失败隔 90s 重试一次。brew 对已下载/已安装部分增量复用，重试成本低
@@ -124,9 +86,6 @@ jobs:
             echo "::warning::brew install 第 $i 次失败，90s 后重试（atomgit 瞬时 404 容错）"
             sleep 90
           done
-          echo "== 构建后磁盘 =="
-          docker exec "$CONTAINER" df -h /
-          df -h /
           # Harmonybrew 的 trust 拒绝会静默 exit 0，显式校验 keg 真的装上了
           N=$(docker exec "$CONTAINER" bash -lc \
             "$BREW_ENV brew info --json=v2 social4hyq/core/${{ inputs.formula }}" \
@@ -140,13 +99,8 @@ jobs:
           echo "== brew 日志 =="
           docker exec "$CONTAINER" bash -lc \
             'for f in /root/.cache/Homebrew/Logs/*/*; do echo "--- $f"; tail -30 "$f"; done' || true
-          echo "== bun-bootstrap 可执行性自检 =="
-          BIN=/storage/Users/currentUser/.harmonybrew/opt/bun-bootstrap/bin/bun
-          docker exec "$CONTAINER" bash -lc \
-            "ls -la $BIN* 2>/dev/null; file $BIN 2>/dev/null; head -c 200 $BIN | od -c | head -3; $BIN --version; echo bun_exit=\$?" || true
 
       - name: 打 bottle（upload=true 时先定 atomgit tag）
-        if: '!inputs.probe'
         id: bottle
         env:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
@@ -176,8 +130,8 @@ jobs:
             "mv /root/*.bottle.tar.gz /root/*.bottle.json '$TAP_IN_CONTAINER/bottle-out/'"
           ls -la bottle-out/
 
-      - name: 上传 bottle 为 artifact（不上 Release 时的产物出口）
-        if: success() && !inputs.probe
+      - name: 上传 bottle 为 artifact（upload=false 时的产物出口）
+        if: success() && !inputs.upload
         uses: actions/upload-artifact@v4
         with:
           name: bottle-${{ inputs.formula }}-run${{ github.run_number }}
@@ -219,11 +173,9 @@ jobs:
           docker exec -w "$TAP_IN_CONTAINER/bottle-out" "$CONTAINER" bash -lc \
             "$BREW_ENV brew bottle --merge --write ./*.bottle.json"
           # 4b. brew 以 root 身份在容器内自动 commit，.git 里留下 root 属主对象；
-          # 不交还给 runner 用户会导致后续 git add/push 报
-          # "insufficient permission for adding an object to repository database"
+          # 不交还给 runner 用户会导致 git add/push 报权限错误
           sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
-          # 5. push 双 remote（atomgit push 失败不阻断——主同步走 GitHub，atomgit 可后补）
-          # 注意：brew --merge --write 在 fork 里已自动 commit，worktree 干净时跳过自己的 commit
+          # 5. push 双 remote（atomgit push 失败不阻断；brew 已自动 commit 时跳过自己 commit）
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Formula/
@@ -245,6 +197,5 @@ jobs:
           echo "poured_from_bottle=$POURED"
           [ "$POURED" = "true" ]
           # brew test 只告警不阻断：formula 的 test 块现状在服务器上同样失败
-          # （如 icu4c@78 的 gendict），属 formula 质量问题而非 CI 管线问题
           docker exec "$CONTAINER" bash -lc "$BREW_ENV brew test ${{ inputs.formula }}" \
-            || echo "::warning::brew test ${{ inputs.formula }} 未通过（服务器上同样失败的既有问题，不阻断）"
+            || echo "::warning::brew test ${{ inputs.formula }} 未通过（既有问题，不阻断）"
