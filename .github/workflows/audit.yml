@@ -6,9 +6,6 @@ name: audit
 
 on:
   workflow_dispatch:
-  push: # TODO: temporary branch-test trigger, remove before merge
-    branches: [claude/repository-ci-analysis-x0wmfg]
-    paths: ['Formula/**', '.github/workflows/audit.yml']
 
 permissions:
   contents: read
