@@ -28,10 +28,14 @@ class Icu4cAT78 < Formula
 
   depends_on "libxml2" => :build
 
-  depends_on "llvm@21" => :build
+  depends_on "llvm@21" => [:build, :test]
   # llvm@21's lld has runtime dependencies on libxml2/zlib; declare them explicitly so
   # superenv injects the library paths.
   depends_on "zlib"    => :build
+
+  # test compiles+links+runs a smoke binary with llvm@21 against the ohos-sdk sysroot,
+  # mirroring how bun/bun-webkit consume this formula (static ICU, __h libc++ ABI).
+  depends_on "ohos-sdk" => :test
 
   # bottle: validation version uses build-from-source first. Uncomment when publishing the
   # bottle and re-build to fill in the sha256.
@@ -134,7 +138,39 @@ class Icu4cAT78 < Formula
   end
 
   test do
-    (testpath/"hello").write "hello\nworld\n"
-    system bin/"gendict", "--uchars", "hello", "dict"
+    # Phase 2 configures --disable-tools, so upstream's gendict test cannot run
+    # (gendict is never installed; only icu-config/uconv land in bin). Test what
+    # this formula actually ships and how it is consumed: static ICU libs linked
+    # with llvm@21's libc++ (__h ABI) — the exact path bun/bun-webkit use.
+    assert_path_exists lib/"libicudata.a"
+    assert_path_exists lib/"libicui18n.a"
+    assert_path_exists lib/"libicuuc.a"
+    # The stock libicudata.so is a pure-data ELF rejected by the OHOS loader;
+    # install re-links it from the .a as a real shared library. Assert it landed.
+    assert_path_exists lib/"libicudata.so.#{version}"
+
+    (testpath/"icu_smoke.cpp").write <<~CPP
+      #include <unicode/utypes.h>
+      #include <unicode/ucnv.h>
+      #include <cstdio>
+      int main() {
+        UErrorCode status = U_ZERO_ERROR;
+        UConverter* cnv = ucnv_open("UTF-8", &status);
+        if (U_FAILURE(status) || cnv == nullptr) return 1;
+        ucnv_close(cnv);
+        std::printf("icu %s ok\\n", U_ICU_VERSION);
+        return 0;
+      }
+    CPP
+
+    ohos_sdk = formula_opt_prefix("ohos-sdk")
+    clangxx  = formula_opt_bin("llvm@21")/"clang++"
+    system clangxx, "-O0", "--target=aarch64-linux-ohos", "-stdlib=libc++",
+           "--sysroot=#{ohos_sdk}/native/sysroot",
+           "-DU_STATIC_IMPLEMENTATION", "-I#{include}",
+           "icu_smoke.cpp", "-o", "icu_smoke",
+           lib/"libicui18n.a", lib/"libicuuc.a", lib/"libicudata.a",
+           "-Wl,--code-sign"
+    assert_match "icu #{version} ok", shell_output("./icu_smoke")
   end
 end
