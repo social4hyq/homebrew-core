@@ -16,9 +16,13 @@ ag "$API/releases/tags/$TAG" \
        -d "{\"tag_name\":\"$TAG\",\"name\":\"$TAG\",\"target_commitish\":\"main\",\"body\":\"$TAG bottle (CI run $RUN_NUMBER)\"}" \
        "$API/releases"
 
-# 2. presigned upload URL (file_name required), then PUT to OBS object storage
+# 2. presigned upload URL (file_name required), then PUT to OBS object storage.
+#    GHA-to-OBS bandwidth can sink to ~18KB/s (measured 2026-07-19), so a hard
+#    -m 300 kills viable-but-slow uploads. Use low-speed detection instead:
+#    <1KB/s sustained for 120s = genuinely stalled; -m 7200 caps a 71MB
+#    llvm-sized bottle even at the observed worst-case rate.
 RESP=$(ag "$API/releases/$TAG/upload_url?file_name=$FILENAME")
-curl -sf -m 300 -X PUT "$(echo "$RESP" | jq -r .url)" \
+curl -sf --speed-limit 1024 --speed-time 120 -m 7200 -X PUT "$(echo "$RESP" | jq -r .url)" \
   -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
   -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
   -H "x-obs-callback: $(echo "$RESP" | jq -r '.headers["x-obs-callback"]')" \
@@ -59,3 +63,18 @@ git push "https://social4hyq:${ATOMGIT_TOKEN}@atomgit.com/social4hyq/homebrew-co
     echo "::warning::atomgit push failed; GitHub updated, sync atomgit manually"
     echo "- ⚠️ atomgit push failed for $TAG — remotes diverged, sync atomgit manually" >> "$GITHUB_STEP_SUMMARY"
   }
+
+# 5. GitHub release mirror copy, best-effort (atomgit stays the primary:
+#    every root_url points there; this is disaster-recovery / future-switch
+#    material only, so a failure here never fails the publish and never
+#    triggers rollback-release.sh)
+if gh release create "$TAG" -R social4hyq/homebrew-core \
+     --title "$TAG" --notes "$TAG bottle mirror (CI run $RUN_NUMBER); primary: atomgit release $TAG" \
+   && gh release upload "$TAG" -R social4hyq/homebrew-core "$BOTTLE"; then
+  echo "github mirror release $TAG done"
+else
+  # don't leave a half-made empty release behind
+  gh release delete "$TAG" -R social4hyq/homebrew-core --yes --cleanup-tag 2>/dev/null || true
+  echo "::warning::github mirror release $TAG failed; atomgit publish is complete, backfill the mirror manually"
+  echo "- ⚠️ github mirror $TAG failed — backfill manually (atomgit publish OK)" >> "$GITHUB_STEP_SUMMARY"
+fi
