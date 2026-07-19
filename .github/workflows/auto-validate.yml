@@ -27,9 +27,12 @@ jobs:
   detect:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    # Belt-and-suspenders: GITHUB_TOKEN pushes never trigger push workflows;
-    # revisit if pushes ever switch to a PAT
-    if: github.actor != 'github-actions[bot]'
+    # bottle-build's publish step now pushes bottle commits with an admin PAT
+    # (main requires PRs; GITHUB_TOKEN can't bypass that ruleset), so
+    # github.actor is no longer 'github-actions[bot]' for those pushes.
+    # Filter on the bottle commit's message prefix instead (set in
+    # .github/scripts/publish.sh) to avoid re-triggering on our own writes.
+    if: ${{ !startsWith(github.event.head_commit.message, 'bottle(') }}
     outputs:
       build: ${{ steps.diff.outputs.build }}
       changed: ${{ steps.diff.outputs.changed }}
