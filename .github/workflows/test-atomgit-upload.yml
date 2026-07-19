@@ -1,0 +1,57 @@
+name: test-atomgit-upload
+
+# Throwaway diagnostic: isolate the atomgit release-create + presigned-PUT
+# upload from a full brew build, to check whether it's currently broken in
+# general or only for larger payloads (icu4c@78's real bottle is ~30MB).
+# Delete this file once diagnosed.
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Create test release
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+        run: |
+          set -x
+          API=https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
+          TAG="test-atomgit-upload-verify-$(date +%s)"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" -H "Content-Type: application/json" \
+            -X POST -d "{\"tag_name\":\"$TAG\",\"name\":\"$TAG\",\"target_commitish\":\"main\",\"body\":\"diagnostic, safe to delete\"}" \
+            "$API/releases"
+
+      - name: Small upload (1KB)
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+        run: |
+          set -x
+          API=https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
+          head -c 1024 /dev/urandom > small.bin
+          RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" "$API/releases/$TAG/upload_url?file_name=small.bin")
+          echo "presign resp: $RESP"
+          time curl -sf -m 60 -X PUT "$(echo "$RESP" | jq -r .url)" \
+            -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
+            -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
+            -H "x-obs-callback: $(echo "$RESP" | jq -r '.headers["x-obs-callback"]')" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary "@small.bin" -w "\nHTTP=%{http_code} speed=%{speed_upload} time=%{time_total}\n"
+
+      - name: Large upload (30MB, matches icu4c@78 bottle size)
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+        run: |
+          set -x
+          API=https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
+          head -c $((30*1024*1024)) /dev/urandom > large.bin
+          RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" "$API/releases/$TAG/upload_url?file_name=large.bin")
+          echo "presign resp: $RESP"
+          time curl -v -m 300 -X PUT "$(echo "$RESP" | jq -r .url)" \
+            -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
+            -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
+            -H "x-obs-callback: $(echo "$RESP" | jq -r '.headers["x-obs-callback"]')" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary "@large.bin" -w "\nHTTP=%{http_code} speed=%{speed_upload} time=%{time_total}\n"
