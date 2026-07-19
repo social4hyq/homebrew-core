@@ -1,8 +1,8 @@
 class Swc < Formula
   desc "Super-fast Rust-based JavaScript/TypeScript compiler"
   homepage "https://swc.rs"
-  url "https://github.com/swc-project/swc/archive/refs/tags/v1.15.43.tar.gz"
-  sha256 "56f9d348cb5f41db294bdd8db6970d2bee7171ea5250c1c31373a6816eac9900"
+  url "https://github.com/swc-project/swc/archive/refs/tags/v1.15.46.tar.gz"
+  sha256 "350a7e19747dd9bdb98d764cc72281849ae7e1e26c33a61ba6052404a1321d22"
   license "Apache-2.0"
   head "https://github.com/swc-project/swc.git", branch: "main"
 
