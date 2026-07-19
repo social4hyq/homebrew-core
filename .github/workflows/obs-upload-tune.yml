@@ -1,0 +1,323 @@
+name: obs-upload-tune
+
+# THROWAWAY experiment — delete this file once the data is collected and
+# the winning config is landed in publish.sh.
+#
+# obs-upload-probe (see PR #16, run 29691270091) established:
+#   - single-connection PUT: ~14KB/s on both ARM and x86 runners (runner
+#     choice doesn't matter)
+#   - 4 parallel PUTs of independent objects: ~42KB/s aggregate (~3x a
+#     single connection) — the pipe is NOT hard-capped at ~14KB/s, a single
+#     TCP stream is what's throttled
+#   - atomgit's presigned upload_url is single-PUT only, no multipart — so
+#     splitting one bottle object across connections isn't an option; any
+#     win has to come from making the ONE stream faster
+#
+# That signature (aggregate >> single-stream) is classic long-fat-network
+# behavior: high trans-Pacific RTT + any packet loss, CUBIC's loss-based
+# window on a GitHub-hosted runner never fills the pipe. This probe tests
+# whether swapping to BBR (+ fq pacing, + larger send buffers, + a bumped
+# initial congestion window) closes that gap on a single connection —
+# which would fix the real upload without touching architecture, root_url,
+# or atomgit's primary-source status at all.
+#
+# Every tuning job also prints a control read of the congestion-control
+# knobs and applies its sysctls best-effort (`|| true`) so a runner that
+# refuses (e.g. no CAP_NET_ADMIN) still completes and just reports "no
+# effect" instead of failing the job.
+
+on:
+  workflow_dispatch: {}
+
+concurrency:
+  group: obs-upload-tune
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  API: https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
+  TAG: obs-upload-tune-${{ github.run_id }}
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Create throwaway atomgit release
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+        run: |
+          curl -sf -X POST -H "Authorization: Bearer $ATOMGIT_TOKEN" -H "Content-Type: application/json" \
+            -d "{\"tag_name\":\"$TAG\",\"name\":\"$TAG\",\"target_commitish\":\"main\",\"body\":\"throwaway obs-upload-tune run ${{ github.run_id }}, safe to delete\"}" \
+            "$API/releases"
+
+  control-cubic:
+    needs: setup
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    outputs:
+      speed_kbs: ${{ steps.put.outputs.speed_kbs }}
+    steps:
+      - name: Report congestion control (unmodified baseline)
+        run: |
+          sysctl net.ipv4.tcp_congestion_control net.ipv4.tcp_available_congestion_control || true
+          sysctl net.core.wmem_max net.ipv4.tcp_wmem || true
+
+      - name: Generate 30MB blob
+        run: dd if=/dev/urandom of=blob.bin bs=1M count=30 status=none
+
+      - name: PUT via presigned URL
+        id: put
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+        run: |
+          FILENAME=control-cubic-${{ github.run_id }}.bin
+          RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+            "$API/releases/$TAG/upload_url?file_name=$FILENAME")
+          STATS=$(curl -sf --speed-limit 1024 --speed-time 120 -m 3600 -X PUT "$(echo "$RESP" | jq -r .url)" \
+            -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
+            -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
+            -H "x-obs-callback: $(echo "$RESP" | jq -r '.headers["x-obs-callback"]')" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary "@blob.bin" -w "\n%{http_code} %{time_total} %{size_upload}")
+          echo "$STATS"
+          read -r CODE TIME SIZE <<< "$(echo "$STATS" | tail -1)"
+          KBS=$(awk -v s="$SIZE" -v t="$TIME" 'BEGIN { printf "%.2f", (s/1024)/t }')
+          echo "control-cubic: ${KBS} KB/s (http=$CODE time=${TIME}s size=${SIZE}B)"
+          echo "speed_kbs=$KBS" >> "$GITHUB_OUTPUT"
+
+  bbr-single:
+    needs: setup
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    outputs:
+      speed_kbs: ${{ steps.put.outputs.speed_kbs }}
+      bbr_applied: ${{ steps.tune.outputs.applied }}
+    steps:
+      - name: Enable BBR + fq pacing
+        id: tune
+        run: |
+          sudo modprobe tcp_bbr 2>&1 || true
+          sudo sysctl -w net.core.default_qdisc=fq net.ipv4.tcp_congestion_control=bbr 2>&1 || true
+          IFACE=$(ip route show default | awk '{print $5; exit}')
+          echo "default iface: $IFACE"
+          sudo tc qdisc replace dev "$IFACE" root fq 2>&1 || true
+          echo "== post-tune state =="
+          sysctl net.ipv4.tcp_congestion_control net.ipv4.tcp_available_congestion_control net.core.default_qdisc
+          ACTUAL=$(sysctl -n net.ipv4.tcp_congestion_control)
+          [ "$ACTUAL" = "bbr" ] && echo "applied=true" >> "$GITHUB_OUTPUT" || echo "applied=false" >> "$GITHUB_OUTPUT"
+
+      - name: Generate 30MB blob
+        run: dd if=/dev/urandom of=blob.bin bs=1M count=30 status=none
+
+      - name: PUT via presigned URL
+        id: put
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+        run: |
+          FILENAME=bbr-single-${{ github.run_id }}.bin
+          RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+            "$API/releases/$TAG/upload_url?file_name=$FILENAME")
+          STATS=$(curl -sf --tcp-nodelay -H "Expect:" --speed-limit 1024 --speed-time 120 -m 3600 -X PUT "$(echo "$RESP" | jq -r .url)" \
+            -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
+            -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
+            -H "x-obs-callback: $(echo "$RESP" | jq -r '.headers["x-obs-callback"]')" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary "@blob.bin" -w "\n%{http_code} %{time_total} %{size_upload}")
+          echo "$STATS"
+          read -r CODE TIME SIZE <<< "$(echo "$STATS" | tail -1)"
+          KBS=$(awk -v s="$SIZE" -v t="$TIME" 'BEGIN { printf "%.2f", (s/1024)/t }')
+          echo "bbr-single: ${KBS} KB/s (http=$CODE time=${TIME}s size=${SIZE}B)"
+          echo "speed_kbs=$KBS" >> "$GITHUB_OUTPUT"
+
+  bbr-bigbuf:
+    needs: setup
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    outputs:
+      speed_kbs: ${{ steps.put.outputs.speed_kbs }}
+      bbr_applied: ${{ steps.tune.outputs.applied }}
+    steps:
+      - name: Enable BBR + fq pacing + larger send buffers
+        id: tune
+        run: |
+          sudo modprobe tcp_bbr 2>&1 || true
+          sudo sysctl -w net.core.default_qdisc=fq net.ipv4.tcp_congestion_control=bbr \
+            net.core.wmem_max=134217728 net.core.rmem_max=134217728 \
+            net.ipv4.tcp_wmem='4096 262144 134217728' net.ipv4.tcp_rmem='4096 262144 134217728' 2>&1 || true
+          IFACE=$(ip route show default | awk '{print $5; exit}')
+          sudo tc qdisc replace dev "$IFACE" root fq 2>&1 || true
+          echo "== post-tune state =="
+          sysctl net.ipv4.tcp_congestion_control net.core.wmem_max net.ipv4.tcp_wmem
+          ACTUAL=$(sysctl -n net.ipv4.tcp_congestion_control)
+          [ "$ACTUAL" = "bbr" ] && echo "applied=true" >> "$GITHUB_OUTPUT" || echo "applied=false" >> "$GITHUB_OUTPUT"
+
+      - name: Generate 30MB blob
+        run: dd if=/dev/urandom of=blob.bin bs=1M count=30 status=none
+
+      - name: PUT via presigned URL
+        id: put
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+        run: |
+          FILENAME=bbr-bigbuf-${{ github.run_id }}.bin
+          RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+            "$API/releases/$TAG/upload_url?file_name=$FILENAME")
+          STATS=$(curl -sf --tcp-nodelay -H "Expect:" --speed-limit 1024 --speed-time 120 -m 3600 -X PUT "$(echo "$RESP" | jq -r .url)" \
+            -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
+            -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
+            -H "x-obs-callback: $(echo "$RESP" | jq -r '.headers["x-obs-callback"]')" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary "@blob.bin" -w "\n%{http_code} %{time_total} %{size_upload}")
+          echo "$STATS"
+          read -r CODE TIME SIZE <<< "$(echo "$STATS" | tail -1)"
+          KBS=$(awk -v s="$SIZE" -v t="$TIME" 'BEGIN { printf "%.2f", (s/1024)/t }')
+          echo "bbr-bigbuf: ${KBS} KB/s (http=$CODE time=${TIME}s size=${SIZE}B)"
+          echo "speed_kbs=$KBS" >> "$GITHUB_OUTPUT"
+
+  initcwnd-bump:
+    needs: setup
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    outputs:
+      speed_kbs: ${{ steps.put.outputs.speed_kbs }}
+      bbr_applied: ${{ steps.tune.outputs.applied }}
+    steps:
+      - name: BBR + fq + big buffers + bumped initcwnd/initrwnd
+        id: tune
+        run: |
+          sudo modprobe tcp_bbr 2>&1 || true
+          sudo sysctl -w net.core.default_qdisc=fq net.ipv4.tcp_congestion_control=bbr \
+            net.core.wmem_max=134217728 net.core.rmem_max=134217728 \
+            net.ipv4.tcp_wmem='4096 262144 134217728' net.ipv4.tcp_rmem='4096 262144 134217728' 2>&1 || true
+          IFACE=$(ip route show default | awk '{print $5; exit}')
+          sudo tc qdisc replace dev "$IFACE" root fq 2>&1 || true
+          DEFROUTE=$(ip route show default)
+          echo "default route: $DEFROUTE"
+          sudo ip route change $DEFROUTE initcwnd 64 initrwnd 64 2>&1 || true
+          echo "== post-tune state =="
+          ip route show default
+          sysctl net.ipv4.tcp_congestion_control
+          ACTUAL=$(sysctl -n net.ipv4.tcp_congestion_control)
+          [ "$ACTUAL" = "bbr" ] && echo "applied=true" >> "$GITHUB_OUTPUT" || echo "applied=false" >> "$GITHUB_OUTPUT"
+
+      - name: Generate 30MB blob
+        run: dd if=/dev/urandom of=blob.bin bs=1M count=30 status=none
+
+      - name: PUT via presigned URL
+        id: put
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+        run: |
+          FILENAME=initcwnd-bump-${{ github.run_id }}.bin
+          RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+            "$API/releases/$TAG/upload_url?file_name=$FILENAME")
+          STATS=$(curl -sf --tcp-nodelay -H "Expect:" --speed-limit 1024 --speed-time 120 -m 3600 -X PUT "$(echo "$RESP" | jq -r .url)" \
+            -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
+            -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
+            -H "x-obs-callback: $(echo "$RESP" | jq -r '.headers["x-obs-callback"]')" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary "@blob.bin" -w "\n%{http_code} %{time_total} %{size_upload}")
+          echo "$STATS"
+          read -r CODE TIME SIZE <<< "$(echo "$STATS" | tail -1)"
+          KBS=$(awk -v s="$SIZE" -v t="$TIME" 'BEGIN { printf "%.2f", (s/1024)/t }')
+          echo "initcwnd-bump: ${KBS} KB/s (http=$CODE time=${TIME}s size=${SIZE}B)"
+          echo "speed_kbs=$KBS" >> "$GITHUB_OUTPUT"
+
+  parallel-16-tuned:
+    needs: setup
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    outputs:
+      aggregate_kbs: ${{ steps.put.outputs.aggregate_kbs }}
+      per_conn_kbs: ${{ steps.put.outputs.per_conn_kbs }}
+    steps:
+      - name: BBR + fq + big buffers (same stack as bbr-bigbuf, for ceiling comparison)
+        run: |
+          sudo modprobe tcp_bbr 2>&1 || true
+          sudo sysctl -w net.core.default_qdisc=fq net.ipv4.tcp_congestion_control=bbr \
+            net.core.wmem_max=134217728 net.core.rmem_max=134217728 \
+            net.ipv4.tcp_wmem='4096 262144 134217728' net.ipv4.tcp_rmem='4096 262144 134217728' 2>&1 || true
+          IFACE=$(ip route show default | awk '{print $5; exit}')
+          sudo tc qdisc replace dev "$IFACE" root fq 2>&1 || true
+
+      - name: Generate 16x 4MB blobs
+        run: |
+          for i in $(seq 1 16); do dd if=/dev/urandom of="blob$i.bin" bs=1M count=4 status=none; done
+
+      - name: 16 concurrent PUTs via presigned URLs
+        id: put
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+        run: |
+          upload_one() {
+            i=$1
+            FILENAME="parallel16-${i}-${{ github.run_id }}.bin"
+            RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+              "$API/releases/$TAG/upload_url?file_name=$FILENAME")
+            curl -sf --tcp-nodelay -H "Expect:" --speed-limit 1024 --speed-time 120 -m 3600 -X PUT "$(echo "$RESP" | jq -r .url)" \
+              -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
+              -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
+              -H "x-obs-callback: $(echo "$RESP" | jq -r '.headers["x-obs-callback"]')" \
+              -H "Content-Type: application/octet-stream" \
+              --data-binary "@blob$i.bin" -w "%{http_code} %{time_total} %{size_upload}\n" \
+              > "result$i.txt"
+          }
+          START=$(date +%s.%N)
+          for i in $(seq 1 16); do upload_one "$i" & done
+          wait
+          END=$(date +%s.%N)
+          WALL=$(awk -v a="$START" -v b="$END" 'BEGIN { printf "%.2f", b - a }')
+          TOTAL_BYTES=0
+          for i in $(seq 1 16); do
+            echo "-- result$i: $(cat "result$i.txt")"
+            SZ=$(awk '{print $3}' "result$i.txt")
+            TOTAL_BYTES=$((TOTAL_BYTES + SZ))
+          done
+          AGG_KBS=$(awk -v b="$TOTAL_BYTES" -v t="$WALL" 'BEGIN { printf "%.2f", (b/1024)/t }')
+          PER_CONN_KBS=$(awk -v k="$AGG_KBS" 'BEGIN { printf "%.2f", k/16 }')
+          echo "16x parallel (tuned): wall=${WALL}s total=${TOTAL_BYTES}B aggregate=${AGG_KBS}KB/s (~${PER_CONN_KBS}KB/s per connection)"
+          echo "aggregate_kbs=$AGG_KBS" >> "$GITHUB_OUTPUT"
+          echo "per_conn_kbs=$PER_CONN_KBS" >> "$GITHUB_OUTPUT"
+
+  report-and-cleanup:
+    needs: [setup, control-cubic, bbr-single, bbr-bigbuf, initcwnd-bump, parallel-16-tuned]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Summary
+        run: |
+          {
+            echo "## obs-upload-tune results (run ${{ github.run_id }})"
+            echo
+            echo "| test | result |"
+            echo "|---|---|"
+            echo "| control-cubic (default, single conn) | ${{ needs.control-cubic.outputs.speed_kbs }} KB/s |"
+            echo "| bbr-single (bbr+fq applied=${{ needs.bbr-single.outputs.bbr_applied }}) | ${{ needs.bbr-single.outputs.speed_kbs }} KB/s |"
+            echo "| bbr-bigbuf (bbr+fq+bigbuf applied=${{ needs.bbr-bigbuf.outputs.bbr_applied }}) | ${{ needs.bbr-bigbuf.outputs.speed_kbs }} KB/s |"
+            echo "| initcwnd-bump (bbr+fq+bigbuf+initcwnd applied=${{ needs.initcwnd-bump.outputs.bbr_applied }}) | ${{ needs.initcwnd-bump.outputs.speed_kbs }} KB/s |"
+            echo "| parallel-16-tuned aggregate (16 conns, bbr+fq+bigbuf) | ${{ needs.parallel-16-tuned.outputs.aggregate_kbs }} KB/s |"
+            echo "| parallel-16-tuned per-connection | ${{ needs.parallel-16-tuned.outputs.per_conn_kbs }} KB/s |"
+            echo
+            echo "Interpretation:"
+            echo "- any bbr-* row >> control-cubic → BBR closes the gap on a single stream, land it in publish.sh as-is."
+            echo "- bbr-* ≈ control-cubic (check applied=false) → sudo/CAP_NET_ADMIN blocked on this runner, tuning inside the job isn't viable; would need a self-hosted runner or GHA image change instead (out of scope for this plan)."
+            echo "- bbr-* ≈ control-cubic (applied=true, no gain) → BBR alone isn't the lever; the initcwnd/bigbuf rows tell us whether it's a windowing issue instead."
+            echo "- parallel-16-tuned aggregate close to single best bbr-* row → single-connection tuning already captures most of the available headroom."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Delete uploaded test assets (best-effort)
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+        run: |
+          ASSETS=$(curl -sf -H "Authorization: Bearer $ATOMGIT_TOKEN" "$API/releases/tags/$TAG" \
+            | jq -r '.assets[] | select(.type=="attach") | .id')
+          for id in $ASSETS; do
+            echo "deleting asset $id"
+            curl -s -X DELETE -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+              "$API/releases/$TAG/attach_files/$id" || true
+          done
+          echo "::notice::release object $TAG has no documented delete-by-tag endpoint; the now-empty test release must be removed manually via the atomgit web UI (https://atomgit.com/social4hyq/homebrew-core/releases)"
