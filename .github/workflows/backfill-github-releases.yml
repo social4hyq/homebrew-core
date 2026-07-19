@@ -57,11 +57,17 @@ jobs:
         run: |
           set -eo pipefail
           API=https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
-          # list release assets, pick the brewed bottle (skip source archives)
-          URL=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+          # discover the bottle asset name via the API (needs auth); skip source
+          # archives. The API's browser_download_url points at api.gitcode.com,
+          # which 404s on this path — so rebuild the URL on atomgit.com (the
+          # host the formula root_url + brew actually use, which 302s to the
+          # CDN). Do NOT send the bearer token on the download itself: the CDN
+          # redirect carries its own signed auth_key and a bearer header makes
+          # it return an empty body.
+          NAME=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
             "$API/releases/tags/${{ matrix.tag }}" \
-            | jq -r '.assets[] | select(.name | contains(".bottle.")) | .browser_download_url' | head -1)
-          NAME=$(basename "$URL")
+            | jq -r '.assets[] | select(.name | contains(".bottle.")) | .name' | head -1)
+          URL="https://atomgit.com/social4hyq/homebrew-core/releases/download/${{ matrix.tag }}/$NAME"
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
           echo "discovered: $NAME"
@@ -72,8 +78,9 @@ jobs:
           NAME: ${{ steps.asset.outputs.name }}
         run: |
           set -eo pipefail
-          [ -n "$URL" ] || { echo "::error::no bottle asset found for ${{ matrix.tag }}"; exit 1; }
-          # tolerant of slow transpacific leg (mirror primary's strategy)
+          [ -n "$NAME" ] || { echo "::error::no bottle asset found for ${{ matrix.tag }}"; exit 1; }
+          # tolerant of slow transpacific leg (mirror primary's strategy);
+          # no auth header — the CDN redirect signs itself
           curl -fL --speed-limit 1024 --speed-time 120 -m 1800 -o "$NAME" "$URL"
           ACTUAL=$(sha256sum "$NAME" | awk '{print $1}')
           [ "$ACTUAL" = "${{ matrix.sha }}" ] \
