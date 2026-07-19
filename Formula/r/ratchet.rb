@@ -1,8 +1,8 @@
 class Ratchet < Formula
   desc "Tool for securing CI/CD workflows with version pinning"
   homepage "https://github.com/sethvargo/ratchet"
-  url "https://github.com/sethvargo/ratchet/archive/refs/tags/v0.11.4.tar.gz"
-  sha256 "0f1a540f388d2b8633b8203670d6ec8722d47af40055ce79cd1743a731823b2e"
+  url "https://github.com/sethvargo/ratchet/archive/refs/tags/v0.12.0.tar.gz"
+  sha256 "7fe2adcf0f5eea0fdd80812d4a0bb20e0b7a4197b6c448191338214d94a8b594"
   license "Apache-2.0"
   head "https://github.com/sethvargo/ratchet.git", branch: "main"
 
