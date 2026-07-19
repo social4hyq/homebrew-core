@@ -1,42 +1,27 @@
 name: bottle-build
 
-# OHOS bottle 构建流水线：GitHub 托管 ARM runner（ubuntu-24.04-arm）+ OHOS 容器。
-# 用法：Actions → bottle-build → Run workflow → 填 formula
-# 另有 workflow_call 入口：auto-validate.yml 在 push main 后按改动 formula 矩阵调用
-# （固定 upload=false，只验证不发布）
-#   upload=false（默认）：构建 + 打 bottle + 传 workflow artifact（验证/调试，不改仓库）
-#   upload=true：上传到 atomgit releases（tag <formula>-v<ver>-r<N>，N 按现有最大
-#     值 +1）、brew bottle --merge --write 回写 formula、push GitHub main + atomgit
-#     main，最后卸载重装验证 poured_from_bottle
+# OHOS bottle pipeline: GitHub-hosted ARM runner + OHOS container.
+# Logic lives in .github/scripts/; this file is orchestration only.
 #
-# 质量门（brew test 必须通过才允许发布）：
-# - 构建后、打 bottle 前先跑 brew test：upload=true 时失败即中止，不产出 release；
-#   upload=false（调试）仅告警，不挡 artifact 出口
-# - 上传后对 poured bottle 再跑一次 brew test，失败同样阻断（拦 bottle 自身缺陷）
+# Manual: Actions → bottle-build → Run workflow
+#   upload=false (default): build + bottle + workflow artifact (no repo changes)
+#   upload=true: upload to atomgit release (tag <formula>-v<ver>-rN), merge the
+#     bottle block back, push GitHub + atomgit main, verify poured_from_bottle
+# Also callable via workflow_call: auto-validate.yml invokes this per changed
+# formula on push to main (always upload=false).
 #
-# 环境要点（全是实测踩过的坑，勿删）：
-# - seccomp=unconfined：docker 默认 profile 拦截 io_uring_setup(EPERM)，bun 启动即死
-# - /system/lib/ld-musl symlink：bottle 二进制的 PT_INTERP 是真机路径，镜像内没有
-# - brew trust：Harmonybrew fork 信任机制，formula 内容变化后不 trust 会静默 exit 0
-# - git safe.directory + identity：brew bottle --merge --write 会在容器内自动 commit tap
-# - brew install 失败 90s 重试一次：atomgit CDN 有瞬时 404
-# - cargo sparse：镜像内默认 git protocol，从 Azure 拉太慢
-#
-# TODO（2026-07 审视遗留，低优先级，未在本文件修复）：
-# - M3：release「GET 检查 || POST 创建」在 GET 网络抖动时会误走 POST 撞 409，报错有误导性
-# - M4：atomgit push 失败仅 ::warning::，双仓静默分叉；建议同时写 $GITHUB_STEP_SUMMARY
-# - L1：ci-runner 镜像 :latest 浮动，建议按 digest 钉版（@sha256:...）
-# - L2：upload=false 时 bottle.json 内 root-url 为虚构地址，artifact 仅供验证、勿手工 merge
+# TODO (low priority): M3 release GET||POST 409 race; L2 upload=false
+# artifacts have a fake root-url, never merge them manually.
 
 on:
   workflow_dispatch:
     inputs:
       formula:
-        description: 'Formula 名（如 icu4c@78 / bun / bun-webkit / llvm@21 / claude-code）'
+        description: 'Formula name (e.g. icu4c@78 / bun / llvm@21 / claude-code)'
         required: true
         type: string
       upload:
-        description: '上传 bottle 到 atomgit Release 并回写 formula（push 双 remote）'
+        description: 'Upload bottle to atomgit release and write back the bottle block (pushes both remotes)'
         required: true
         type: boolean
         default: false
@@ -54,155 +39,55 @@ permissions:
   contents: write
 
 concurrency:
-  # 按 event_name 分组：group 只保留 1 running + 1 pending，新 run 会顶掉旧 pending；
-  # 若 auto（push 触发的 workflow_call）与手动共用同组，排队中的手动 upload=true
-  # 发布会被连续 push 静默挤掉。分组后互不干扰，手动-手动仍按 formula 串行
+  # event_name in the group keeps auto (push) runs from evicting a queued
+  # manual publish run of the same formula
   group: bottle-build-${{ github.event_name }}-${{ inputs.formula }}
   cancel-in-progress: false
 
 env:
-  IMAGE: ghcr.io/social4hyq/ci-runner:latest
+  IMAGE: ghcr.io/social4hyq/ci-runner@sha256:38e740c8e355b2ccc9f34ba4bcab955a3fbc076278ae4bd3a07ea3707e90bb56 # :latest, 2026-07-19
   CONTAINER: ohos
-  BREW_ENV: HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+  # Inputs pass through env (never interpolated into shell) and a whitelist check
+  FORMULA: ${{ inputs.formula }}
+  UPLOAD: ${{ inputs.upload }}
+  RUN_NUMBER: ${{ github.run_number }}
 
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 360
-    env:
-      # 输入统一经 env 传入，先在「校验输入」步做白名单过滤，之后各步只用 "$FORMULA"，
-      # 不再把 ${{ inputs.formula }} 直接插值进 shell（GitHub 在 shell 解析前做文本替换，
-      # 直接插值 = 命令注入面，且该输入后续能接触 ATOMGIT_TOKEN / GITHUB_TOKEN）
-      FORMULA: ${{ inputs.formula }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: 校验输入（formula 名白名单）
+      - name: Validate input
         run: |
           [[ "$FORMULA" =~ ^[A-Za-z0-9@+._-]+$ ]] \
-            || { echo "::error::非法 formula 名: $FORMULA（仅允许 [A-Za-z0-9@+._-]）"; exit 1; }
+            || { echo "::error::invalid formula name: $FORMULA (allowed: [A-Za-z0-9@+._-])"; exit 1; }
 
-      - name: 拉取镜像并启动 OHOS 容器
-        run: |
-          docker pull "$IMAGE"
-          docker run -d --name "$CONTAINER" --init \
-            --security-opt seccomp=unconfined \
-            -v "$GITHUB_WORKSPACE:$TAP_IN_CONTAINER" \
-            "$IMAGE" sleep infinity
-          # 一次性容器配置（与服务器一致）：musl tmpfile() 硬编码路径 + /system/bin/sh
-          # + /system/lib/ld-musl（bottle 二进制的 PT_INTERP 是真机路径，镜像没有）
-          docker exec "$CONTAINER" bash -lc \
-            'mkdir -p /data/local/tmp /system/bin /system/lib && \
-             ln -sf /bin/sh /system/bin/sh && \
-             ln -sf /lib/ld-musl-aarch64.so.1 /system/lib/ld-musl-aarch64.so.1'
-          # CI 网络（Azure）下 cargo 走 sparse 直连 crates.io；镜像内默认 git protocol 太慢
-          docker exec "$CONTAINER" bash -lc \
-            'mkdir -p /root/.cargo && printf "[registries.crates-io]\nprotocol = \"sparse\"\n\n[net]\ngit-fetch-with-cli = true\nretry = 3\n" > /root/.cargo/config.toml'
-          docker exec "$CONTAINER" bash -lc 'brew --version && brew tap'
-          # Harmonybrew fork 的信任机制：formula 内容变化后需重新 trust，否则拒绝加载（静默 exit 0）
-          docker exec "$CONTAINER" bash -lc 'brew trust social4hyq/core'
-          # brew bottle --merge --write 在 fork 里会自动 git commit tap；容器内 root
-          # 操作挂载的 runner 目录会撞 git dubious ownership，且需要提交身份
-          docker exec "$CONTAINER" git config --global --add safe.directory "$TAP_IN_CONTAINER"
-          docker exec "$CONTAINER" git config --global user.name "github-actions[bot]"
-          docker exec "$CONTAINER" git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Start OHOS container
+        run: .github/scripts/setup-container.sh
 
-      - name: 源码构建 formula
-        run: |
-          # 显式 pipefail：失败判定依赖 `docker exec | tee` 的管道状态，
-          # 不能依赖 GitHub 默认 shell 的隐式 -eo pipefail（换 shell/迁移 runner 会静默失效）
-          set -eo pipefail
-          # atomgit CDN 有瞬时 404（实测 node bottle 连续 4 次 404，1 分钟后恢复 200）；
-          # 失败隔 90s 重试一次。brew 对已下载/已安装部分增量复用，重试成本低
-          for i in 1 2; do
-            if docker exec "$CONTAINER" bash -lc \
-              "$BREW_ENV brew install --build-bottle --verbose social4hyq/core/$FORMULA" 2>&1 | tee build.log; then
-              break
-            fi
-            [ "$i" = 2 ] && exit 1
-            echo "::warning::brew install 第 $i 次失败，90s 后重试（atomgit 瞬时 404 容错）"
-            sleep 90
-          done
-          # Harmonybrew 的 trust 拒绝会静默 exit 0，显式校验 keg 真的装上了
-          N=$(docker exec "$CONTAINER" bash -lc \
-            "$BREW_ENV brew info --json=v2 social4hyq/core/$FORMULA" \
-            | jq -r '.formulae[0].installed | length')
-          echo "installed_kegs=$N"
-          [ "$N" -ge 1 ] || { echo "::error::formula 未安装（疑似 brew 静默拒绝，检查 trust/依赖）"; exit 1; }
+      - name: Build from source
+        run: .github/scripts/build.sh
 
-      - name: brew test 质量门（发布前，upload=true 必须通过）
-        run: |
-          set -eo pipefail
-          # 在刚装好的源码构建 keg 上跑 test，早于打 bottle / 上传 / push：
-          # upload=true 时不通过即中止，保证「发布出去的版本必过 brew test」；
-          # upload=false 是调试通道，仅告警，不挡 artifact 出口
-          if docker exec "$CONTAINER" bash -lc "$BREW_ENV brew test $FORMULA"; then
-            echo "brew test 通过"
-          elif [ "${{ inputs.upload }}" = "true" ]; then
-            echo "::error::brew test $FORMULA 未通过，禁止发布。先修复 formula 的 test 块再重跑"
-            exit 1
-          else
-            echo "::warning::brew test $FORMULA 未通过（upload=false 不阻断；注意 upload=true 时会卡发布）"
-          fi
+      - name: brew test gate
+        run: .github/scripts/test-gate.sh
 
-      - name: 失败诊断（构建 / 质量门）
+      - name: Failure diagnostics
         if: failure()
         run: |
-          echo "== brew 日志 =="
+          echo "== brew logs =="
           docker exec "$CONTAINER" bash -lc \
             'for f in /root/.cache/Homebrew/Logs/*/*; do echo "--- $f"; tail -30 "$f"; done' || true
 
-      - name: 打 bottle（upload=true 时先定 atomgit tag）
+      - name: Bottle
         id: bottle
         env:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
-        run: |
-          set -eo pipefail
-          VER=$(docker exec "$CONTAINER" bash -lc \
-            "$BREW_ENV brew info --json=v2 social4hyq/core/$FORMULA" \
-            | jq -r '.formulae[0].versions.stable')
-          BASE="${FORMULA}-v${VER}"
-          if [ "${{ inputs.upload }}" = "true" ]; then
-            # tag 与现有约定一致（保留 @）：icu4c@78-v78.3-r2；N = 全部分页中现有最大 + 1。
-            # 必须分页遍历：per_page=100 只看第一页，release 超 100 后旧 tag 被漏算 → 撞号。
-            # API 任何一步失败都直接中止（curl -sf + pipefail），不静默降级为 -r1；
-            # 静默降级会把新 bottle 以同名文件 PUT 覆盖到旧 release，无声毁掉历史产物。
-            MAX=0
-            PAGE=1
-            while :; do
-              TAGS=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-                "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases?per_page=100&page=$PAGE")
-              NEW_MAX=$(echo "$TAGS" | jq -r '.[].tag_name' \
-                | { grep -E "^${BASE}-r[0-9]+$" || true; } \
-                | sed "s/^${BASE}-r//" | sort -n | tail -1)
-              [ -n "$NEW_MAX" ] && [ "$NEW_MAX" -gt "$MAX" ] && MAX=$NEW_MAX
-              [ "$(echo "$TAGS" | jq 'length')" -lt 100 ] && break
-              PAGE=$((PAGE + 1))
-            done
-            TAG="${BASE}-r$(( MAX + 1 ))"
-            # 二次确认：算出的 tag 必须不存在。已存在说明并发/状态异常，
-            # 宁可报错重跑也不复用旧 release（复用 = 覆盖历史 bottle）
-            if curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-              "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases/tags/$TAG" > /dev/null; then
-              echo "::error::tag $TAG 已存在，拒绝复用（防覆盖历史 bottle），请人工核查"
-              exit 1
-            fi
-            ROOT="https://atomgit.com/social4hyq/homebrew-core/releases/download/$TAG"
-          else
-            TAG="${BASE}-ci${{ github.run_number }}"
-            ROOT="https://github.com/social4hyq/homebrew-core/releases/download/$TAG"
-          fi
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "== version=$VER tag=$TAG =="
-          docker exec -w /root "$CONTAINER" bash -lc \
-            "$BREW_ENV brew bottle --json --root-url $ROOT social4hyq/core/$FORMULA"
-          mkdir -p bottle-out
-          docker exec "$CONTAINER" bash -lc \
-            "mv /root/*.bottle.tar.gz /root/*.bottle.json '$TAP_IN_CONTAINER/bottle-out/'"
-          ls -la bottle-out/
+        run: .github/scripts/bottle.sh
 
-      - name: 上传 bottle 为 artifact（upload=false 时的产物出口）
+      - name: Upload bottle as artifact
         if: success() && !inputs.upload
         uses: actions/upload-artifact@v4
         with:
@@ -210,83 +95,34 @@ jobs:
           path: bottle-out/
           retention-days: 14
 
-      - name: 上传 atomgit + 回写 formula + push（upload=true）
+      - name: Publish to atomgit and push
+        id: publish
         if: inputs.upload
         env:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -eo pipefail
-          TAG="${{ steps.bottle.outputs.tag }}"
-          BOTTLE=$(ls bottle-out/*.tar.gz | head -1)
-          FILENAME=$(basename "$BOTTLE")
-          # 1. 检查或创建 release（atomgit 不返回 release id，用 tag 标识）
-          # TODO(M3): GET 网络抖动会误走 POST 撞 409；必要时 POST 失败后再 GET 一次确认
-          curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-            "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases/tags/$TAG" \
-            || curl -sf -m 30 -X POST -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-                 -H "Content-Type: application/json" \
-                 -d "{\"tag_name\":\"$TAG\",\"name\":\"$TAG\",\"target_commitish\":\"main\",\"body\":\"$TAG bottle (CI run ${{ github.run_number }})\"}" \
-                 "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases"
-          # 2. 取预签名 upload URL（必须带 file_name）
-          RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-            "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases/$TAG/upload_url?file_name=$FILENAME")
-          UPLOAD_URL=$(echo "$RESP" | jq -r .url)
-          H_PROJECT=$(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')
-          H_ACL=$(echo "$RESP" | jq -r '.headers["x-obs-acl"]')
-          H_CALLBACK=$(echo "$RESP" | jq -r '.headers["x-obs-callback"]')
-          # 3. PUT 到预签名 URL（OBS 对象存储）
-          curl -sf -m 300 -X PUT "$UPLOAD_URL" \
-            -H "x-obs-meta-project-id: $H_PROJECT" \
-            -H "x-obs-acl: $H_ACL" \
-            -H "x-obs-callback: $H_CALLBACK" \
-            -H "Content-Type: application/octet-stream" \
-            --data-binary "@$BOTTLE" -w "HTTP=%{http_code}\n"
-          # 4. 回写 formula bottle 块（--merge 的参数是 json 文件，不是 formula 名）
-          docker exec -w "$TAP_IN_CONTAINER/bottle-out" "$CONTAINER" bash -lc \
-            "$BREW_ENV brew bottle --merge --write ./*.bottle.json"
-          # 4b. brew 以 root 身份在容器内自动 commit，.git 里留下 root 属主对象；
-          # 不交还给 runner 用户会导致 git add/push 报权限错误
-          sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
-          # 5. push 双 remote（atomgit push 失败不阻断；brew 已自动 commit 时跳过自己 commit）
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Formula/
-          git diff --cached --quiet || git commit -m "bottle($FORMULA): rebuild bottle $TAG"
-          # concurrency 按 formula 分组，不同 formula 并行 upload=true 会互相撞
-          # non-fast-forward。带 fetch + rebase 重试：不同 formula 改不同文件，
-          # rebase 不会冲突；真冲突说明状态异常，rebase 失败由 set -e 中止，不硬推。
-          for i in 1 2 3; do
-            if git push origin HEAD:main; then
-              break
-            fi
-            [ "$i" = 3 ] && { echo "::error::push origin 连续 3 次失败（并发竞争未解），atomgit release $TAG 已上传，需人工核对 formula 回写"; exit 1; }
-            echo "::warning::push origin 被拒（疑似其他 formula 并行 upload），fetch + rebase 后重试（$i/3）"
-            git fetch origin main
-            git rebase origin/main
-            sleep 5
-          done
-          # TODO(M4): 失败仅告警会造成双仓静默分叉，建议同时写 $GITHUB_STEP_SUMMARY
-          git push "https://social4hyq:${ATOMGIT_TOKEN}@atomgit.com/social4hyq/homebrew-core.git" HEAD:main \
-            || echo "::warning::atomgit push 失败，GitHub 已更新，atomgit 侧需手动同步"
+          TAG: ${{ steps.bottle.outputs.tag }}
+        run: .github/scripts/publish.sh
 
-      - name: poured + test 验证（upload=true）
+      - name: Verify poured bottle
+        id: verify
         if: inputs.upload
+        run: .github/scripts/verify-poured.sh
+
+      # publish failed before the bottle commit reached main → the release is
+      # orphaned and safe to delete
+      - name: Roll back atomgit release
+        if: failure() && inputs.upload && steps.publish.outcome == 'failure'
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+          TAG: ${{ steps.bottle.outputs.tag }}
+        run: .github/scripts/rollback-release.sh
+
+      # verify failed after main was pushed → main references the bad tag;
+      # auto-deleting would make it worse, needs a human decision
+      - name: Bad release advisory
+        if: failure() && inputs.upload && steps.verify.outcome == 'failure'
+        env:
+          TAG: ${{ steps.bottle.outputs.tag }}
         run: |
-          set -eo pipefail
-          # --merge --write 刚改过 formula 内容；按 fork 的 trust 语义（内容变化后需重新
-          # trust，否则静默拒装），重装前显式再 trust 一次，成本为零
-          docker exec "$CONTAINER" bash -lc 'brew trust social4hyq/core'
-          docker exec "$CONTAINER" bash -lc \
-            "$BREW_ENV brew uninstall --ignore-dependencies $FORMULA || true"
-          docker exec "$CONTAINER" bash -lc \
-            "$BREW_ENV brew install --verbose social4hyq/core/$FORMULA"
-          POURED=$(docker exec "$CONTAINER" bash -lc \
-            "$BREW_ENV brew info --json=v2 social4hyq/core/$FORMULA" \
-            | jq -r '.formulae[0].installed[0].poured_from_bottle')
-          echo "poured_from_bottle=$POURED"
-          [ "$POURED" = "true" ]
-          # 对 poured bottle 再跑一次 brew test，失败同样阻断（拦 bottle 自身的链接/
-          # cellar 等缺陷）。注意此时 release 已上传：此步变红 = 已发布的 tag 是坏的，
-          # 需人工下架该 release、修复后重跑
-          docker exec "$CONTAINER" bash -lc "$BREW_ENV brew test $FORMULA"
+          echo "- ❌ published tag $TAG failed verification: revert the bottle commit on main and delete the release, or fix forward and re-run" >> "$GITHUB_STEP_SUMMARY"

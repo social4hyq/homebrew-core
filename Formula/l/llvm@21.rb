@@ -148,8 +148,8 @@ class LlvmAT21 < Formula
                   "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib " \
                   "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib " \
                   "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zstd/lib"
-    args << "-Dzstd_ROOT=#{Formula["zstd"].opt_prefix}"
-    args << "-Dzstd_LIBRARY=#{Formula["zstd"].opt_lib}/libzstd.so"
+    args << "-Dzstd_ROOT=#{formula_opt_prefix("zstd")}"
+    args << "-Dzstd_LIBRARY=#{formula_opt_lib("zstd")}/libzstd.so"
     common_linker_flags = "-Wl,--code-sign -Wl,--build-id=sha1 " \
                           "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack #{rpath_flags}"
     args << "-DCMAKE_EXE_LINKER_FLAGS=#{common_linker_flags}"
@@ -172,20 +172,20 @@ class LlvmAT21 < Formula
     # them from the MSVC version-check block (not relevant for OHOS/clang).
     ccv = llvmpath/"cmake/modules/CheckCompilerVersion.cmake"
     s = File.read(ccv)
-    s.gsub!('if ((${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC) AND',
-            'if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC AND')
-    s.gsub!('    (19.24 VERSION_LESS_EQUAL ${CMAKE_CXX_COMPILER_VERSION}) AND',
-            '    19.24 VERSION_LESS_EQUAL CMAKE_CXX_COMPILER_VERSION AND')
-    s.gsub!('    (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 19.25))',
-            '    CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.25)')
+    s.gsub!("if ((${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC) AND",
+            "if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC AND")
+    s.gsub!("    (19.24 VERSION_LESS_EQUAL ${CMAKE_CXX_COMPILER_VERSION}) AND",
+            "    19.24 VERSION_LESS_EQUAL CMAKE_CXX_COMPILER_VERSION AND")
+    s.gsub!("    (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 19.25))",
+            "    CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.25)")
     File.write(ccv, s)
 
     # Fix cmake 4.x LINKER:--version-script → clang++ doesn't recognise the
     # bare --version-script flag that cmake 4 produces. Patch to raw -Wl, form.
     csl = buildpath/"clang/tools/clang-shlib/CMakeLists.txt"
     s2 = File.read(csl)
-    s2.gsub!('LINKER:--version-script,${CMAKE_CURRENT_BINARY_DIR}/simple_version_script.map',
-             '-Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/simple_version_script.map')
+    s2.gsub!("LINKER:--version-script,${CMAKE_CURRENT_BINARY_DIR}/simple_version_script.map",
+             "-Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/simple_version_script.map")
     File.write(csl, s2)
 
     mkdir "build" do

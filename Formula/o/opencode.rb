@@ -2,7 +2,6 @@ class Opencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64 (prebuilt musl binary)"
   homepage "https://github.com/anomalyco/opencode"
   url "https://registry.npmmirror.com/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-1.18.3.tgz"
-  version "1.18.3"
   sha256 "3431f5cbbc1e3b0b08d23b60746d4f855ca836c0e91a91a89017f2c0e60238fe"
   license "MIT"
   revision 1

@@ -24,7 +24,7 @@ class Icu4cAT78 < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "05fd5b075d4af6af9a0e056b63e2f18998ab33f7236d342b3e5a30b7709302da"
   end
 
-  keg_only "ABI-validation build pinned to llvm@21's libc++; linked in-tree by bun/bun-webkit, not system-wide"
+  keg_only "abi-validation build pinned to llvm@21's libc++; linked in-tree by bun/bun-webkit, not system-wide"
 
   depends_on "libxml2" => :build
 
