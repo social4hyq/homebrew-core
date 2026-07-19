@@ -1,0 +1,29 @@
+name: version-check
+
+# Weekly livecheck report: lists formulae whose upstream version is newer.
+# Report-only; bumping stays a deliberate manual edit (which auto-validate
+# then builds and tests on push).
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  IMAGE: ghcr.io/social4hyq/ci-runner@sha256:38e740c8e355b2ccc9f34ba4bcab955a3fbc076278ae4bd3a07ea3707e90bb56 # :latest, 2026-07-19
+  CONTAINER: ohos
+  TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+
+jobs:
+  livecheck:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start OHOS container
+        run: .github/scripts/setup-container.sh
+      - name: livecheck report
+        run: .github/scripts/version-check.sh

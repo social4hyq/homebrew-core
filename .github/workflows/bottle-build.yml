@@ -10,9 +10,8 @@ name: bottle-build
 # Also callable via workflow_call: auto-validate.yml invokes this per changed
 # formula on push to main (always upload=false).
 #
-# TODO (low priority): M3 release GET||POST 409 race; M4 atomgit push warn-only
-# divergence; L1 pin image by digest; L2 upload=false artifacts have a fake
-# root-url, never merge them manually.
+# TODO (low priority): M3 release GET||POST 409 race; L2 upload=false
+# artifacts have a fake root-url, never merge them manually.
 
 on:
   workflow_dispatch:
@@ -46,7 +45,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  IMAGE: ghcr.io/social4hyq/ci-runner:latest
+  IMAGE: ghcr.io/social4hyq/ci-runner@sha256:38e740c8e355b2ccc9f34ba4bcab955a3fbc076278ae4bd3a07ea3707e90bb56 # :latest, 2026-07-19
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
   # Inputs pass through env (never interpolated into shell) and a whitelist check
@@ -97,6 +96,7 @@ jobs:
           retention-days: 14
 
       - name: Publish to atomgit and push
+        id: publish
         if: inputs.upload
         env:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
@@ -105,5 +105,24 @@ jobs:
         run: .github/scripts/publish.sh
 
       - name: Verify poured bottle
+        id: verify
         if: inputs.upload
         run: .github/scripts/verify-poured.sh
+
+      # publish failed before the bottle commit reached main → the release is
+      # orphaned and safe to delete
+      - name: Roll back atomgit release
+        if: failure() && inputs.upload && steps.publish.outcome == 'failure'
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+          TAG: ${{ steps.bottle.outputs.tag }}
+        run: .github/scripts/rollback-release.sh
+
+      # verify failed after main was pushed → main references the bad tag;
+      # auto-deleting would make it worse, needs a human decision
+      - name: Bad release advisory
+        if: failure() && inputs.upload && steps.verify.outcome == 'failure'
+        env:
+          TAG: ${{ steps.bottle.outputs.tag }}
+        run: |
+          echo "- ❌ published tag $TAG failed verification: revert the bottle commit on main and delete the release, or fix forward and re-run" >> "$GITHUB_STEP_SUMMARY"

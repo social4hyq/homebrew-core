@@ -48,6 +48,8 @@ for i in 1 2 3; do
   git rebase origin/main
   sleep 5
 done
-# TODO(M4): warn-only leaves the two remotes silently diverged
 git push "https://social4hyq:${ATOMGIT_TOKEN}@atomgit.com/social4hyq/homebrew-core.git" HEAD:main \
-  || echo "::warning::atomgit push failed; GitHub updated, sync atomgit manually"
+  || {
+    echo "::warning::atomgit push failed; GitHub updated, sync atomgit manually"
+    echo "- ⚠️ atomgit push failed for $TAG — remotes diverged, sync atomgit manually" >> "$GITHUB_STEP_SUMMARY"
+  }
