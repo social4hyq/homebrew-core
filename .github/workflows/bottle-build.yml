@@ -2,6 +2,8 @@ name: bottle-build
 
 # OHOS bottle 构建流水线：GitHub 托管 ARM runner（ubuntu-24.04-arm）+ OHOS 容器。
 # 用法：Actions → bottle-build → Run workflow → 填 formula
+# 另有 workflow_call 入口：auto-validate.yml 在 push main 后按改动 formula 矩阵调用
+# （固定 upload=false，只验证不发布）
 #   upload=false（默认）：构建 + 打 bottle + 传 workflow artifact（验证/调试，不改仓库）
 #   upload=true：上传到 atomgit releases（tag <formula>-v<ver>-r<N>，N 按现有最大
 #     值 +1）、brew bottle --merge --write 回写 formula、push GitHub main + atomgit
@@ -23,7 +25,6 @@ name: bottle-build
 # TODO（2026-07 审视遗留，低优先级，未在本文件修复）：
 # - M3：release「GET 检查 || POST 创建」在 GET 网络抖动时会误走 POST 撞 409，报错有误导性
 # - M4：atomgit push 失败仅 ::warning::，双仓静默分叉；建议同时写 $GITHUB_STEP_SUMMARY
-# - M5：bottle-out/ 与 build.log 落在 tap 仓库工作区，建议仓库 .gitignore 加这两项兜底
 # - L1：ci-runner 镜像 :latest 浮动，建议按 digest 钉版（@sha256:...）
 # - L2：upload=false 时 bottle.json 内 root-url 为虚构地址，artifact 仅供验证、勿手工 merge
 
@@ -39,12 +40,24 @@ on:
         required: true
         type: boolean
         default: false
+  workflow_call:
+    inputs:
+      formula:
+        required: true
+        type: string
+      upload:
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
 
 concurrency:
-  group: bottle-build-${{ inputs.formula }}
+  # 按 event_name 分组：group 只保留 1 running + 1 pending，新 run 会顶掉旧 pending；
+  # 若 auto（push 触发的 workflow_call）与手动共用同组，排队中的手动 upload=true
+  # 发布会被连续 push 静默挤掉。分组后互不干扰，手动-手动仍按 formula 串行
+  group: bottle-build-${{ github.event_name }}-${{ inputs.formula }}
   cancel-in-progress: false
 
 env:

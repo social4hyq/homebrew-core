@@ -1,4 +1,6 @@
 # 构建产物 / 外部源码 / 大文件
+bottle-out/
+build.log
 bun-src/
 build/
 runs/
