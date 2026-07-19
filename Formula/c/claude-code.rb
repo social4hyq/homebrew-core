@@ -1,9 +1,9 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI — HarmonyOS (runtime-fetch stub; no binary in bottle)"
   homepage "https://docs.anthropic.com/en/docs/claude-code"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.214.tgz"
-  version "2.1.214"
-  sha256 "60eab462cea41c0b5d832646c0344e3f357442ba1bcb8a891bfef7c259172c98"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.215.tgz"
+  version "2.1.215"
+  sha256 "011be58b349f8abc786bc4e369c3376b345862ffd15819c5c5e10a0d46754771"
   license "Anthropic License"
   # Claude Code 2.1.113+ only ships Bun-compiled binaries (linux-arm64-musl,
   # musl ABI compatible with OHOS). The tgz is mirrored on npmmirror (Aliyun
