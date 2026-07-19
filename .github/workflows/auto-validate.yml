@@ -1,0 +1,153 @@
+name: auto-validate
+
+# 直推 main 后的自动验证（参考上游 Homebrew：push 只做轻检查 + 构建产物只进
+# artifact + 发布单独人工触发；把上游「PR 上构建」映射为「push main 上构建」）：
+# - detect：算出本次 push 改动的 formula；仅 bottle 块变化的跳过；按 HEAVY_FORMULAS 分流
+# - light-check：全部改动 formula（含重件）跑 brew readall + brew audit（≈上游 tap_syntax）
+# - build：轻量 formula 矩阵调用 bottle-build.yml（upload=false，源码构建 + brew test，
+#   artifact 出口，不写仓库不发布）
+# 发布仍然只走手动 bottle-build workflow_dispatch upload=true；
+# 重量级 formula 的完整构建也保持手动（本流水线只对它做轻量检查）。
+
+on:
+  push:
+    branches: [main]
+    paths: ['Formula/**']
+
+permissions:
+  contents: read # detect/light-check 只读；build job 单独授权，见下
+
+concurrency:
+  # 只有最新 commit 的验证有意义；upload=false 不写仓库，取消无害
+  group: auto-validate-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # 重量级 formula（空格分隔，改这一行即可调整名单）：单次构建数小时，
+  # 自动路径只做轻量检查，完整构建/发布请手动跑 bottle-build。
+  # bun 虽大但改动最频繁，暂留自动构建；实测过长再挪进来
+  HEAVY_FORMULAS: "llvm@21 bun-webkit"
+  IMAGE: ghcr.io/social4hyq/ci-runner:latest
+  CONTAINER: ohos
+  BREW_ENV: HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1
+  TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # GITHUB_TOKEN 的 push 本来就不触发 push workflow（GitHub 内建防环，
+    # bottle-build 的回写 commit 天然不会引发循环）；此守卫是兜底：
+    # 将来若改用 PAT 推送，actor 会变成 PAT 属主，届时需重新审视
+    if: github.actor != 'github-actions[bot]'
+    outputs:
+      build: ${{ steps.diff.outputs.build }} # 需要全量构建的轻量 formula（JSON 数组）
+      changed: ${{ steps.diff.outputs.changed }} # 全部改动 formula，含重件（JSON 数组）
+      heavy: ${{ steps.diff.outputs.heavy }} # 改动了的重件，仅轻检查（JSON 数组）
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 仓库极小，全量 clone 成本可忽略，diff 最稳
+      - name: 计算改动的 formula
+        id: diff
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -eo pipefail
+          # before 全零（新分支）或不可达（force push 丢弃旧提交）时退化为只看最后一次提交
+          if [[ "$BEFORE" =~ ^0+$ ]] || ! git cat-file -e "$BEFORE" 2>/dev/null; then
+            echo "::warning::event.before 不可用（新分支/force push），仅比较 HEAD^..HEAD"
+            BEFORE=$(git rev-parse "$AFTER^")
+          fi
+          # 全部 14 个 formula 的 bottle 块统一为 2 空格缩进的「  bottle do …   end」
+          strip_bottle() { sed '/^  bottle do$/,/^  end$/d'; }
+          mapfile -t FILES < <(git diff --name-status --no-renames "$BEFORE" "$AFTER" -- 'Formula/' \
+            | awk '$1 != "D" && $2 ~ /^Formula\/[^\/]+\/[^\/]+\.rb$/ {print $2}')
+          BUILD=(); HEAVY=(); CHANGED=()
+          for f in "${FILES[@]}"; do
+            name=$(basename "$f" .rb)
+            [[ "$name" =~ ^[A-Za-z0-9@+._-]+$ ]] \
+              || { echo "::error::非法 formula 名: $name"; exit 1; }
+            CHANGED+=("$name")
+            # 仅 bottle 块变化（如人工同步 bottle 回写）→ 构建输入没变，跳过；
+            # 新文件 cat-file 失败 → 视为需构建
+            if git cat-file -e "$BEFORE:$f" 2>/dev/null && \
+               diff <(git show "$BEFORE:$f" | strip_bottle) \
+                    <(git show "$AFTER:$f"  | strip_bottle) >/dev/null; then
+              echo "::notice::$name 仅 bottle 块变化，跳过构建"
+              continue
+            fi
+            if tr ' ' '\n' <<< "$HEAVY_FORMULAS" | grep -qx "$name"; then
+              HEAVY+=("$name")
+            else
+              BUILD+=("$name")
+            fi
+          done
+          {
+            echo "build=$(jq -cn '$ARGS.positional' --args "${BUILD[@]}")"
+            echo "changed=$(jq -cn '$ARGS.positional' --args "${CHANGED[@]}")"
+            echo "heavy=$(jq -cn '$ARGS.positional' --args "${HEAVY[@]}")"
+          } >> "$GITHUB_OUTPUT"
+          {
+            echo "### auto-validate 检测结果"
+            echo "- 全量构建: ${BUILD[*]:-（无）}"
+            echo "- 重量级（仅轻量检查，完整构建/发布请手动跑 bottle-build）: ${HEAVY[*]:-（无）}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  light-check:
+    needs: detect
+    if: needs.detect.outputs.changed != '[]'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    env:
+      CHANGED_JSON: ${{ needs.detect.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: 启动 OHOS 容器（仅挂载 tap，无需 seccomp/musl/cargo 等构建期配置）
+        run: |
+          docker pull "$IMAGE"
+          docker run -d --name "$CONTAINER" --init \
+            -v "$GITHUB_WORKSPACE:$TAP_IN_CONTAINER" "$IMAGE" sleep infinity
+          docker exec "$CONTAINER" git config --global --add safe.directory "$TAP_IN_CONTAINER"
+          # trust 不做会静默拒载（readall/audit 会看到旧内容或空结果）
+          docker exec "$CONTAINER" bash -lc 'brew trust social4hyq/core'
+      - name: readall + audit（全部改动 formula，含重量级）
+        run: |
+          set -eo pipefail
+          # readall 阻断：语法/加载错误没有任何借口
+          docker exec "$CONTAINER" bash -lc "$BREW_ENV brew readall social4hyq/core"
+          # audit 默认离线（--online 才联网）；首期不加 --strict，fork 特有写法会误伤。
+          # 暂为告警不阻断：存量 formula 有历史 audit 问题（如 claude-code 的
+          # version 冗余、非 SPDX license），阻断会永久卡死其自动构建；
+          # 存量清零后把 FAIL 判定改回 exit 1
+          FAIL=()
+          for name in $(jq -r '.[]' <<< "$CHANGED_JSON"); do
+            echo "== brew audit $name =="
+            docker exec "$CONTAINER" bash -lc "$BREW_ENV brew audit --formula social4hyq/core/$name" \
+              || FAIL+=("$name")
+          done
+          if [ "${#FAIL[@]}" -gt 0 ]; then
+            echo "::warning::brew audit 未通过（暂不阻断，建议尽快修复）: ${FAIL[*]}"
+            echo "- ⚠️ audit 未通过: ${FAIL[*]}" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  build:
+    # 先过轻检查再烧构建时长；audit/readall 挂了不值得烧 30-90 分钟
+    # 被调 workflow 的权限不能超过 caller（否则 startup_failure，实测踩过），
+    # 而 bottle-build 声明了 contents:write，故此 job 必须授满；
+    # upload=false 路径实际不写仓库
+    permissions:
+      contents: write
+    needs: [detect, light-check]
+    if: needs.detect.outputs.build != '[]'
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        formula: ${{ fromJSON(needs.detect.outputs.build) }}
+    uses: ./.github/workflows/bottle-build.yml
+    with:
+      formula: ${{ matrix.formula }}
+      upload: false
+    secrets: inherit
