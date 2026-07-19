@@ -6,7 +6,7 @@ name: auto-validate
 
 on:
   push:
-    branches: [main, claude/repository-ci-analysis-x0wmfg] # TODO: converge to [main] after live test
+    branches: [main]
     paths: ['Formula/**']
 
 permissions:
