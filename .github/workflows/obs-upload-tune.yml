@@ -25,9 +25,33 @@ name: obs-upload-tune
 # knobs and applies its sysctls best-effort (`|| true`) so a runner that
 # refuses (e.g. no CAP_NET_ADMIN) still completes and just reports "no
 # effect" instead of failing the job.
+#
+# Run 29704802480 (first attempt) caught the network at a fast moment —
+# control-cubic did 30MB in 5.9s (~5.2MB/s), so there was no slow baseline
+# to compare BBR against that day. It also surfaced a real bug: `tc qdisc
+# replace dev eth0 root fq` broke DNS resolution on 3 of 4 tuning jobs
+# within ~200ms of running (curl exit 6), before the PUT even started.
+# Fixed by dropping that line — BBR's in-kernel pacing fallback (present
+# on kernels this recent) works without an explicit fq qdisc swap, and not
+# touching the live interface's qdisc removes the crash risk entirely.
+#
+# Because GHA-to-OBS bandwidth seems to vary a lot run to run (the whole
+# point of this probe is to catch it in a bad moment), this now also runs
+# on a schedule so it fires across different times of day without anyone
+# needing to babysit it. TAG is a fixed name (not per-run) so scheduled
+# runs share one release object instead of leaving a new empty one behind
+# every few hours — each run still uploads/deletes its own uniquely-named
+# assets, so concurrent... well, `concurrency.cancel-in-progress: false`
+# below means runs queue instead of overlapping.
 
 on:
   workflow_dispatch: {}
+  schedule:
+    # every 4 hours, off the exact hour to dodge GH's scheduled-workflow
+    # pileup at :00. Spans both US-daytime and US-nighttime windows so it
+    # has a shot at catching whatever the GHA<->OBS path is doing at
+    # different points in the trans-Pacific day.
+    - cron: '17 */4 * * *'
 
 concurrency:
   group: obs-upload-tune
@@ -38,20 +62,21 @@ permissions:
 
 env:
   API: https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
-  TAG: obs-upload-tune-${{ github.run_id }}
+  TAG: obs-upload-tune
 
 jobs:
   setup:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Create throwaway atomgit release
+      - name: Get-or-create the shared throwaway atomgit release
         env:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
         run: |
-          curl -sf -X POST -H "Authorization: Bearer $ATOMGIT_TOKEN" -H "Content-Type: application/json" \
-            -d "{\"tag_name\":\"$TAG\",\"name\":\"$TAG\",\"target_commitish\":\"main\",\"body\":\"throwaway obs-upload-tune run ${{ github.run_id }}, safe to delete\"}" \
-            "$API/releases"
+          curl -sf -H "Authorization: Bearer $ATOMGIT_TOKEN" "$API/releases/tags/$TAG" \
+            || curl -sf -X POST -H "Authorization: Bearer $ATOMGIT_TOKEN" -H "Content-Type: application/json" \
+                 -d "{\"tag_name\":\"$TAG\",\"name\":\"$TAG\",\"target_commitish\":\"main\",\"body\":\"recurring throwaway release for obs-upload-tune probe runs, safe to delete\"}" \
+                 "$API/releases"
 
   control-cubic:
     needs: setup
@@ -101,9 +126,6 @@ jobs:
         run: |
           sudo modprobe tcp_bbr 2>&1 || true
           sudo sysctl -w net.core.default_qdisc=fq net.ipv4.tcp_congestion_control=bbr 2>&1 || true
-          IFACE=$(ip route show default | awk '{print $5; exit}')
-          echo "default iface: $IFACE"
-          sudo tc qdisc replace dev "$IFACE" root fq 2>&1 || true
           echo "== post-tune state =="
           sysctl net.ipv4.tcp_congestion_control net.ipv4.tcp_available_congestion_control net.core.default_qdisc
           ACTUAL=$(sysctl -n net.ipv4.tcp_congestion_control)
@@ -147,8 +169,6 @@ jobs:
           sudo sysctl -w net.core.default_qdisc=fq net.ipv4.tcp_congestion_control=bbr \
             net.core.wmem_max=134217728 net.core.rmem_max=134217728 \
             net.ipv4.tcp_wmem='4096 262144 134217728' net.ipv4.tcp_rmem='4096 262144 134217728' 2>&1 || true
-          IFACE=$(ip route show default | awk '{print $5; exit}')
-          sudo tc qdisc replace dev "$IFACE" root fq 2>&1 || true
           echo "== post-tune state =="
           sysctl net.ipv4.tcp_congestion_control net.core.wmem_max net.ipv4.tcp_wmem
           ACTUAL=$(sysctl -n net.ipv4.tcp_congestion_control)
@@ -192,8 +212,6 @@ jobs:
           sudo sysctl -w net.core.default_qdisc=fq net.ipv4.tcp_congestion_control=bbr \
             net.core.wmem_max=134217728 net.core.rmem_max=134217728 \
             net.ipv4.tcp_wmem='4096 262144 134217728' net.ipv4.tcp_rmem='4096 262144 134217728' 2>&1 || true
-          IFACE=$(ip route show default | awk '{print $5; exit}')
-          sudo tc qdisc replace dev "$IFACE" root fq 2>&1 || true
           DEFROUTE=$(ip route show default)
           echo "default route: $DEFROUTE"
           sudo ip route change $DEFROUTE initcwnd 64 initrwnd 64 2>&1 || true
@@ -240,8 +258,6 @@ jobs:
           sudo sysctl -w net.core.default_qdisc=fq net.ipv4.tcp_congestion_control=bbr \
             net.core.wmem_max=134217728 net.core.rmem_max=134217728 \
             net.ipv4.tcp_wmem='4096 262144 134217728' net.ipv4.tcp_rmem='4096 262144 134217728' 2>&1 || true
-          IFACE=$(ip route show default | awk '{print $5; exit}')
-          sudo tc qdisc replace dev "$IFACE" root fq 2>&1 || true
 
       - name: Generate 16x 4MB blobs
         run: |
