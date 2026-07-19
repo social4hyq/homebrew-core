@@ -1,4 +1,3 @@
-# ci-test: auto-validate live test (will be reverted)
 class OhosCompatShim < Formula
   desc "LD_PRELOAD compat shim for HarmonyOS-sandboxed aarch64/musl binaries"
   homepage "https://github.com/social4hyq/ohos-compat-shim"

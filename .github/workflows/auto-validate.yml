@@ -16,7 +16,7 @@ on:
     paths: ['Formula/**']
 
 permissions:
-  contents: read # 自动路径只读；被调用的 bottle-build 在 upload=false 下不需要写
+  contents: read # detect/light-check 只读；build job 单独授权，见下
 
 concurrency:
   # 只有最新 commit 的验证有意义；upload=false 不写仓库，取消无害
@@ -125,6 +125,11 @@ jobs:
 
   build:
     # 先过轻检查再烧构建时长；audit/readall 挂了不值得烧 30-90 分钟
+    # 被调 workflow 的权限不能超过 caller（否则 startup_failure，实测踩过），
+    # 而 bottle-build 声明了 contents:write，故此 job 必须授满；
+    # upload=false 路径实际不写仓库
+    permissions:
+      contents: write
     needs: [detect, light-check]
     if: needs.detect.outputs.build != '[]'
     strategy:
