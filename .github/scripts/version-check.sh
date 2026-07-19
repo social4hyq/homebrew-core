@@ -5,12 +5,19 @@ source "$(dirname "$0")/lib.sh"
 JSON=$(cbrew "livecheck --tap $TAP --json --newer-only") \
   || { echo "::error::brew livecheck failed"; exit 1; }
 
-COUNT=$(jq 'length' <<< "$JSON")
+OUTDATED=$(jq -r '.[] | select(.version.latest != null) | "- \(.formula): \(.version.current) → \(.version.latest)"' <<< "$JSON")
+UNCHECKABLE=$(jq -r '.[] | select(.version.latest == null) | "- \(.formula): unable to determine upstream version (add a livecheck block?)"' <<< "$JSON")
 {
   echo "### version-check"
-  if [ "$COUNT" -eq 0 ]; then
+  if [ -z "$OUTDATED" ] && [ -z "$UNCHECKABLE" ]; then
     echo "All formulae up to date ✅"
-  else
-    jq -r '.[] | "- \(.formula): \(.version.current) → \(.version.latest)"' <<< "$JSON"
+  fi
+  if [ -n "$OUTDATED" ]; then
+    echo "Outdated:"
+    echo "$OUTDATED"
+  fi
+  if [ -n "$UNCHECKABLE" ]; then
+    echo "Not checkable:"
+    echo "$UNCHECKABLE"
   fi
 } | tee -a "$GITHUB_STEP_SUMMARY"
