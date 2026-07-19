@@ -8,8 +8,7 @@ class InjectRunpath < Formula
   # repo; install() never reads anything from the checkout, it only exists
   # to satisfy that requirement.
   url "https://atomgit.com/social4hyq/homebrew-core.git",
-      revision: "d1fc7a588c1e040b8b34203784669a66731e43e7",
-      using:    :git
+      revision: "d1fc7a588c1e040b8b34203784669a66731e43e7"
   version "0.1.0"
   license "MIT"
 
