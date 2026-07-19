@@ -38,8 +38,14 @@ git config user.name "github-actions[bot]"
 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git add Formula/
 git diff --cached --quiet || git commit -m "bottle($FORMULA): rebuild bottle $TAG"
+
+# main requires PRs (ruleset); actions/checkout's ephemeral GITHUB_TOKEN
+# can't bypass that, so drop its extraheader and push with the admin PAT
+# below instead (an explicit bypass actor on the ruleset).
+git config --unset-all http.https://github.com/.extraheader || true
+GH_PUSH_URL="https://social4hyq:${BOT_PUSH_TOKEN}@github.com/social4hyq/homebrew-core.git"
 for i in 1 2 3; do
-  if git push origin HEAD:main; then
+  if git push "$GH_PUSH_URL" HEAD:main; then
     break
   fi
   [ "$i" = 3 ] && { echo "::error::push origin failed 3 times; atomgit release $TAG already uploaded, verify the bottle merge manually"; exit 1; }

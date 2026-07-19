@@ -101,6 +101,9 @@ jobs:
         env:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # main requires PRs; GITHUB_TOKEN can't bypass that ruleset, so the
+          # bottle commit pushes with an admin PAT instead (bypass actor).
+          BOT_PUSH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
           TAG: ${{ steps.bottle.outputs.tag }}
         run: .github/scripts/publish.sh
 
