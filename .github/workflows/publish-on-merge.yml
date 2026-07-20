@@ -34,9 +34,18 @@ jobs:
     # bottle-build's publish step now pushes bottle commits with an admin PAT
     # (main requires PRs; GITHUB_TOKEN can't bypass that ruleset), so
     # github.actor is no longer 'github-actions[bot]' for those pushes.
-    # Filter on the bottle commit's message prefix instead (set in
-    # .github/scripts/publish.sh) to avoid re-triggering on our own writes.
-    if: ${{ !startsWith(github.event.head_commit.message, 'bottle(') }}
+    # Filter on the bottle commit's message shape instead to avoid
+    # re-triggering on our own writes. `brew bottle --merge --write` commits
+    # with its own message ("<formula>: add/update <ver> bottle."), not the
+    # "bottle(<formula>): ..." this used to check for — that pattern never
+    # actually matched (verified 2026-07-20 via ci-smoke-test: its first
+    # bottle commit both slipped this filter AND slipped detect-changes.sh's
+    # bottle-block-only skip due to a separate bug there, triggering one
+    # extra full rebuild+republish cycle before the second bottle commit
+    # correctly stopped the loop). Both are fixed now; this is belt-and-
+    # suspenders — a cheap job-level skip on top of detect-changes.sh's
+    # correctness guarantee.
+    if: ${{ !endsWith(github.event.head_commit.message, ' bottle.') }}
     outputs:
       build: ${{ steps.diff.outputs.build }}
       changed: ${{ steps.diff.outputs.changed }}

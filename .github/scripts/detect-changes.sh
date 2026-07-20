@@ -9,7 +9,15 @@ if [[ "$BEFORE" =~ ^0+$ ]] || ! git cat-file -e "$BEFORE" 2>/dev/null; then
   BEFORE=$(git rev-parse "$AFTER^")
 fi
 
-strip_bottle() { sed '/^  bottle do$/,/^  end$/d'; }
+#  `brew bottle --write` inserts a blank line on both sides of a newly added
+# bottle block; stripping the block alone leaves a doubled blank line behind
+# that isn't in the pre-bottle version, so the very first bottle a formula
+# gets makes this comparison see a false non-bottle diff (verified 2026-07-20:
+# ci-smoke-test's first bottle commit triggered a spurious full rebuild).
+# `cat -s` squeezes consecutive blank lines on both sides of the diff so that
+# extra line washes out symmetrically without also hiding a real content
+# change (confirmed against icu4c@78's routine bottle-only update history).
+strip_bottle() { sed '/^  bottle do$/,/^  end$/d' | cat -s; }
 
 mapfile -t FILES < <(git diff --name-status --no-renames "$BEFORE" "$AFTER" -- 'Formula/' \
   | awk '$1 != "D" && $2 ~ /^Formula\/[^\/]+\/[^\/]+\.rb$/ {print $2}')
@@ -41,7 +49,7 @@ done
 } >> "$GITHUB_OUTPUT"
 
 {
-  echo "### auto-validate"
+  echo "### detect-changes"
   echo "- build: ${BUILD[*]:-(none)}"
   echo "- heavy (light-check only): ${HEAVY[*]:-(none)}"
 } >> "$GITHUB_STEP_SUMMARY"
