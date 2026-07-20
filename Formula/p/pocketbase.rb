@@ -1,12 +1,12 @@
 class Pocketbase < Formula
   desc "Open source backend for your next project in 1 file"
   homepage "https://pocketbase.io/"
-  url "https://github.com/pocketbase/pocketbase/archive/refs/tags/v0.39.7.tar.gz"
-  sha256 "0cb526ebc0f148329a30dcd8ff7cae128b531690c0ad8945bd71db88bbf79e77"
+  url "https://github.com/pocketbase/pocketbase/archive/refs/tags/v0.39.8.tar.gz"
+  sha256 "4cecdc89f86f19291dc5f5f4bb86707fff4fb5752bb269aa78348c1b4b37aa72"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f762d291d7fe7a3b0de599bdc8ec93d55cbf4980db8c79731bc5693177bf77e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1213e3eb61e7c994ed0613cdc947d747da58c91c00772aeafa24fc33f33d7b0e"
   end
 
   depends_on "go" => :build
