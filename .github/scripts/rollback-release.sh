@@ -14,13 +14,24 @@ if ! ag "$API/releases/tags/$TAG" > /dev/null; then
   exit 0
 fi
 
-# exact DELETE endpoint is undocumented; try both shapes
-ag -X DELETE "$API/releases/tags/$TAG" || ag -X DELETE "$API/releases/$TAG" || true
-
-if ag "$API/releases/tags/$TAG" > /dev/null; then
-  echo "::error::could not delete release $TAG — remove it manually before re-running"
+# atomgit has no standalone "delete release" endpoint (DELETE on both
+# /releases/tags/{tag} and /releases/{id} returns 405; also absent from the
+# official API reference). Deleting the underlying git tag cascades instead:
+# real-machine test 2026-07-20 confirmed DELETE /tags/{tag_name} removes both
+# the tag and its release — including an already-uploaded attach-type asset
+# — in one call, with GET /releases/tags/{tag} 404ing immediately after (no
+# polling needed).
+if ! ag -X DELETE "$API/tags/$TAG" > /dev/null; then
+  echo "::error::could not delete tag $TAG — remove it manually before re-running"
   echo "- ❌ failed publish left release $TAG behind; delete it manually" >> "$GITHUB_STEP_SUMMARY"
   exit 1
 fi
+
+if ag "$API/releases/tags/$TAG" > /dev/null; then
+  echo "::error::tag $TAG deleted but release still visible — remove it manually before re-running"
+  echo "- ❌ failed publish left release $TAG behind; delete it manually" >> "$GITHUB_STEP_SUMMARY"
+  exit 1
+fi
+
 echo "release $TAG deleted"
 echo "- 🧹 rolled back release $TAG after failed publish" >> "$GITHUB_STEP_SUMMARY"
