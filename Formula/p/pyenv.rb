@@ -14,7 +14,7 @@ class Pyenv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "62b0cb169de221eebe16e096be324a2830d2f0ffab4734f388bbe15c0ea85eed"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b8113c4a7a8f215c36cf409e49b31450763f7c22487b06ad11743f22d8a9fa2"
   end
 
   depends_on "autoconf"
