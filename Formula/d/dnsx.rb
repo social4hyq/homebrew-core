@@ -1,13 +1,13 @@
 class Dnsx < Formula
   desc "DNS query and resolution tool"
   homepage "https://github.com/projectdiscovery/dnsx"
-  url "https://github.com/projectdiscovery/dnsx/archive/refs/tags/v1.2.3.tar.gz"
-  sha256 "5de84e732cf5c8b31f481e9a98fc22025f402d3624a6b9a74c29bddacae155a1"
+  url "https://github.com/projectdiscovery/dnsx/archive/refs/tags/v1.3.0.tar.gz"
+  sha256 "b4b2d8505c2be30181060a05f126a90ef5211c489fa437236172046b38c6ce3b"
   license "MIT"
   head "https://github.com/projectdiscovery/dnsx.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "63c919b9dfb4cdbe03d745fc02241208ca21eb8e3ac8dc515a7e028b66a39f2d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0f80e3e0b738ca2986db2ab2fd7c35da6410bcec0f3c5105220d62410759405"
   end
 
   depends_on "go" => :build
