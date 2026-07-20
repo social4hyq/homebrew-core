@@ -1,0 +1,92 @@
+name: pr-validate
+
+# PR-driven CI: audit + source build + brew test for any formula added or
+# changed in a pull request (new formula and version bumps both land here).
+# On success, labels the PR ci-passed for human merge review — publishing
+# stays a separate step (publish-on-merge.yml, triggered by the merge push).
+
+on:
+  pull_request:
+    branches: [main]
+    paths: ['Formula/**']
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-validate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  # Space-separated; heavy formulae are light-checked in PRs but not built
+  # here — first real build happens post-merge in publish-on-merge.yml.
+  HEAVY_FORMULAS: "llvm@21 bun-webkit"
+  IMAGE: ghcr.io/social4hyq/ci-runner@sha256:38e740c8e355b2ccc9f34ba4bcab955a3fbc076278ae4bd3a07ea3707e90bb56 # :latest, 2026-07-19
+  CONTAINER: ohos
+  TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      build: ${{ steps.diff.outputs.build }}
+      changed: ${{ steps.diff.outputs.changed }}
+      heavy: ${{ steps.diff.outputs.heavy }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Detect changed formulae
+        id: diff
+        env:
+          BEFORE: ${{ github.event.pull_request.base.sha }}
+          AFTER: ${{ github.event.pull_request.head.sha }}
+        run: .github/scripts/detect-changes.sh
+
+  light-check:
+    needs: detect
+    if: needs.detect.outputs.changed != '[]'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    env:
+      CHANGED_JSON: ${{ needs.detect.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start OHOS container
+        run: .github/scripts/setup-container.sh
+      - name: readall + audit
+        run: .github/scripts/light-check.sh
+
+  build:
+    needs: detect
+    if: needs.detect.outputs.build != '[]'
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        formula: ${{ fromJSON(needs.detect.outputs.build) }}
+    uses: ./.github/workflows/bottle-build.yml
+    with:
+      formula: ${{ matrix.formula }}
+      upload: false
+    secrets: inherit
+
+  label:
+    needs: [detect, light-check, build]
+    # both needed jobs are conditionally skipped when their input list is
+    # empty; treat skipped as pass so a PR that only touches one category
+    # (e.g. light-check-only heavy formula) still gets labeled
+    if: |
+      always() &&
+      (needs.light-check.result == 'success' || needs.light-check.result == 'skipped') &&
+      (needs.build.result == 'success' || needs.build.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Label ci-passed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+        run: gh pr edit "$PR" --add-label ci-passed --repo "${{ github.repository }}"

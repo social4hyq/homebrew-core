@@ -7,8 +7,12 @@ name: bottle-build
 #   upload=false (default): build + bottle + workflow artifact (no repo changes)
 #   upload=true: upload to atomgit release (tag <formula>-v<ver>-rN), merge the
 #     bottle block back, push GitHub + atomgit main, verify poured_from_bottle
-# Also callable via workflow_call: auto-validate.yml invokes this per changed
-# formula on push to main (always upload=false).
+# Also callable via workflow_call:
+#   pr-validate.yml invokes this per changed formula on pull_request (always
+#     upload=false — build + test only, gates the ci-passed label)
+#   publish-on-merge.yml invokes this per changed formula on push to main
+#     (always upload=true — the PR already passed pr-validate, so a merge
+#     means "ready to publish")
 #
 # TODO (low priority): M3 release GET||POST 409 race; L2 upload=false
 # artifacts have a fake root-url, never merge them manually.

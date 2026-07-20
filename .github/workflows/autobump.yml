@@ -1,0 +1,52 @@
+name: autobump
+
+# Weekly: open a bump-formula-pr for each allowlisted formula whose upstream
+# livecheck version is newer than what's packaged. Feeds the same pipeline
+# as human-authored PRs — pr-validate.yml gates it with ci-passed, a human
+# merges, publish-on-merge.yml publishes.
+#
+# ALLOWLIST is deliberately narrow and explicit: most formulae in this tap
+# have a custom structure (bun's rN revision, pinned llvm@21/icu4c@78,
+# runtime-fetch stubs, shims with no upstream at all) that `bump-formula-pr`
+# can't rewrite cleanly. Only add a formula here after confirming
+# `brew bump-formula-pr --dry-run` produces a clean url/sha256 edit for it.
+# version-check.yml keeps reporting the full outdated list (allowlisted or
+# not) for humans deciding what to bump by hand or add here next.
+
+on:
+  schedule:
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+    inputs:
+      formula:
+        description: 'Restrict to a single allowlisted formula (optional; must still be outdated per livecheck)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  ALLOWLIST: "codex grok-build"
+  IMAGE: ghcr.io/social4hyq/ci-runner@sha256:38e740c8e355b2ccc9f34ba4bcab955a3fbc076278ae4bd3a07ea3707e90bb56 # :latest, 2026-07-19
+  CONTAINER: ohos
+  TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+
+jobs:
+  autobump:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start OHOS container
+        run: .github/scripts/setup-container.sh
+      - name: Open bump PRs
+        env:
+          # pushes the bump branch + opens the PR (same-repo, not main —
+          # doesn't need the protect-main bypass publish.sh uses)
+          BOT_PUSH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
+          # labels the opened PR
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ONLY_FORMULA: ${{ inputs.formula }}
+        run: .github/scripts/autobump.sh
