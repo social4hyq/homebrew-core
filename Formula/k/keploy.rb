@@ -1,13 +1,13 @@
 class Keploy < Formula
   desc "Testing Toolkit creates test-cases and data mocks from API calls, DB queries"
   homepage "https://keploy.io"
-  url "https://github.com/keploy/keploy/archive/refs/tags/v3.5.97.tar.gz"
-  sha256 "f46c4b6251fece1b151934001830451d794fcbeea75bd4c96c9188b4fefb2194"
+  url "https://github.com/keploy/keploy/archive/refs/tags/v3.6.1.tar.gz"
+  sha256 "0e2ae3b26e83ee93df1615294fc4655a2dd179bfa6d0119f111d24a73dcdd313"
   license "Apache-2.0"
   head "https://github.com/keploy/keploy.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "afb4a8e6e521dba80efcc3e3b1b8ac57a8210edbd544b5b9a0d78c441bbc0440"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "495be9e2eec8993383b1b1502a83e55d67846796430151ab3de8ab9b0d1f73dc"
   end
 
   depends_on "go" => :build
