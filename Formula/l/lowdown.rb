@@ -13,7 +13,7 @@ class Lowdown < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4746307ac0aecc7b1418a6dfbc5bed0abb530006b953558a594db81e31480250"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "02aa41fdb2d0b89518ac18d0617bae8b38f7af951f572461085fdaa65aac5ace"
   end
 
   depends_on "bmake" => :build
