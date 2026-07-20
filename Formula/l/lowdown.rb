@@ -1,8 +1,8 @@
 class Lowdown < Formula
   desc "Simple markdown translator"
   homepage "https://kristaps.bsd.lv/lowdown"
-  url "https://kristaps.bsd.lv/lowdown/snapshots/lowdown-3.0.1.tar.gz"
-  sha256 "ac9ea2b51c8bd59350c7bf8db5e2067e9d961b1f48d362cd8a56b022850e965c"
+  url "https://kristaps.bsd.lv/lowdown/snapshots/lowdown-3.1.1.tar.gz"
+  sha256 "59b2cf35bf32fe602c92f33ae917a71e0b2ea76a67bbe48fbae901a8efc6fef3"
   license "ISC"
   compatibility_version 1
   head "https://github.com/kristapsdz/lowdown.git", branch: "master"
@@ -13,7 +13,7 @@ class Lowdown < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4746307ac0aecc7b1418a6dfbc5bed0abb530006b953558a594db81e31480250"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "02aa41fdb2d0b89518ac18d0617bae8b38f7af951f572461085fdaa65aac5ace"
   end
 
   depends_on "bmake" => :build
