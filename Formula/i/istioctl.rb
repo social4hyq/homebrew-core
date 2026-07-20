@@ -12,8 +12,7 @@ class Istioctl < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b22170f9d02c6d52ac3d9d57884e92455b13f9095e90b0ea83c01428b57d9bb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1fadedc432a60608cb3378e5153a6017f132a1dbdbdad716a03f9b94d1beee7"
   end
 
   depends_on "go" => :build
