@@ -325,15 +325,16 @@ jobs:
             echo "- parallel-16-tuned aggregate close to single best bbr-* row → single-connection tuning already captures most of the available headroom."
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Delete uploaded test assets (best-effort)
+      - name: Delete the shared throwaway release entirely
         env:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
         run: |
-          ASSETS=$(curl -sf -H "Authorization: Bearer $ATOMGIT_TOKEN" "$API/releases/tags/$TAG" \
-            | jq -r '.assets[] | select(.type=="attach") | .id')
-          for id in $ASSETS; do
-            echo "deleting asset $id"
-            curl -s -X DELETE -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-              "$API/releases/$TAG/attach_files/$id" || true
-          done
-          echo "::notice::release object $TAG has no API delete endpoint (DELETE on both /releases/tags/{tag} and /releases/{id} returns 405, confirmed 2026-07-19), but that's fine: once a release has zero attach-type assets left it stops appearing in the API within a short window on its own (observed 2026-07-19 — no manual cleanup needed, nothing further to do here)"
+          # The real delete endpoint isn't under /releases/ at all (DELETE on
+          # both /releases/tags/{tag} and /releases/{id} returns 405) — it's
+          # DELETE /repos/{owner}/{repo}/tags/{tag_name}, which cascades to
+          # remove the release and every asset on it in one call (confirmed
+          # 2026-07-20, see rollback-release.sh). Deleting the tag here means
+          # the next scheduled run's setup job just recreates a fresh release
+          # via its get-or-create step.
+          curl -s -X DELETE -H "Authorization: Bearer $ATOMGIT_TOKEN" -w "HTTP=%{http_code}\n" \
+            "$API/tags/$TAG" || true
