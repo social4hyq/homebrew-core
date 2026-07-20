@@ -21,7 +21,7 @@ class Icu4cAT78 < Formula
   # is only for verifying ABI alignment.
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/icu4c@78-v78.3-r8"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f8b2e8251c0c59dd2444a55317dbb6a022ec7dbedd94b35c2481927fcf6b5cb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "611c9d4b6f7be05955c07c5b022ac98c2927fe1d237eb5e033824353a173f289"
   end
 
   keg_only "abi-validation build pinned to llvm@21's libc++; linked in-tree by bun/bun-webkit, not system-wide"
