@@ -1,8 +1,8 @@
 class Xwininfo < Formula
   desc "Print information about windows on an X server"
   homepage "https://gitlab.freedesktop.org/xorg/app/xwininfo"
-  url "https://www.x.org/archive/individual/app/xwininfo-1.1.6.tar.xz"
-  sha256 "3518897c17448df9ba99ad6d9bb1ca0f17bc0ed7c0fd61281b34ceed29a9253f"
+  url "https://www.x.org/archive/individual/app/xwininfo-1.1.7.tar.xz"
+  sha256 "bee14d594cc86cc59aae1015c1b452a71bf60c304131e2716ca1cf0df733b4ac"
   license "MIT"
 
   bottle do
