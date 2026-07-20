@@ -2,8 +2,8 @@ class Openbao < Formula
   desc "Provides a software solution to manage, store, and distribute sensitive data"
   homepage "https://openbao.org/"
   url "https://github.com/openbao/openbao.git",
-      tag:      "v2.5.5",
-      revision: "028992583c693c4de6350b8aa52ff85e30375a99"
+      tag:      "v2.6.0",
+      revision: "03e3a243b6f07d17c60ce0a182adee7cf4c424eb"
   license "MPL-2.0"
   head "https://github.com/openbao/openbao.git", branch: "main"
 
@@ -13,25 +13,24 @@ class Openbao < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "022e40d1374dcd8926a9e76bbfdf4e43bf2006f77ba699e2b70e6d480c063219"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "45a3a636dc933d4c738249112a84cb45e333b58e809efed1c63369ae0de867b6"
   end
 
   depends_on "go" => :build
   depends_on "node@22" => :build # failed to build with node 23, https://github.com/openbao/openbao/issues/731
-  depends_on "yarn" => :build
+  depends_on "pnpm" => :build
 
   conflicts_with "bao", because: "both install `bao` binaries"
 
   def install
     # Build ui assets
     cd "ui" do
-      ENV.prepend_path "PATH", Formula["node@22"].opt_libexec/"bin" # for npm
-      system "yarn", "install", "--immutable"
-      system "yarn", "build"
+      ENV.prepend_path "PATH", formula_opt_libexec("node@22")/"bin" # for pnpm
+      # Prevent pnpm from downloading another copy due to `packageManager` field
+      (buildpath/"ui/pnpm-workspace.yaml").append_lines "managePackageManagerVersions: false"
+      system "pnpm", "install", "--frozen-lockfile"
+      system "pnpm", "build"
     end
-
-    # Bootstrap go modules
-    system "go", "generate", "-tags", "tools", "tools/tools.go"
 
     ldflags = %W[
       -s -w
