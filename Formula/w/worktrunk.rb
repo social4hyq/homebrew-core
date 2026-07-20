@@ -1,13 +1,13 @@
 class Worktrunk < Formula
   desc "CLI for Git worktree management, designed for parallel AI agent workflows"
   homepage "https://worktrunk.dev"
-  url "https://github.com/max-sixty/worktrunk/archive/refs/tags/v0.67.0.tar.gz"
-  sha256 "2fc0890c78aec812ef07b247dbb67cc2d30571868e45c302e0df12cd98456467"
+  url "https://github.com/max-sixty/worktrunk/archive/refs/tags/v0.68.0.tar.gz"
+  sha256 "1c26e36b76307b45f19baeb87e09a49cfea281b83b04339bcbdb3115848fdac7"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/max-sixty/worktrunk.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f34f030b8c7909b942414c9b842004946b5e6bdde0a8e26e01609e9ad885be1d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "765bf855e60f742e4f1196ccdcab208f946da0036f52afee5c5467726bcae4ba"
   end
 
   depends_on "rust" => :build
@@ -30,7 +30,7 @@ class Worktrunk < Formula
       system "git", "commit", "--allow-empty", "-m", "Initial commit"
 
       # Test that wt can list worktrees (output includes worktree count)
-      output = shell_output("#{bin}/wt list")
+      output = shell_output("#{bin}/wt list 2>&1")
       assert_match "Showing 1 worktree", output
     end
   end
