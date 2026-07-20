@@ -87,13 +87,27 @@ done
 #    every root_url points there; this is disaster-recovery / future-switch
 #    material only, so a failure here never fails the publish and never
 #    triggers rollback-release.sh)
+#
+#    create and upload are checked separately on purpose: only a
+#    create-succeeded/upload-failed pair is "this run's own half-made
+#    release" and safe to clean up. A create failure (e.g. 422 tag already
+#    exists, which happens if atomgit's tag number gets reused after an
+#    out-of-band rollback while the old GitHub mirror release is untouched)
+#    means this run made nothing — the unconditional cleanup used to run
+#    here regardless, and on 2026-07-20 that deleted a perfectly good prior
+#    mirror release + tag from an earlier run. Leave existing releases
+#    alone when create itself fails.
 if gh release create "$TAG" -R social4hyq/homebrew-core \
-     --title "$TAG" --notes "$TAG bottle mirror (CI run $RUN_NUMBER); primary: atomgit release $TAG" \
-   && gh release upload "$TAG" -R social4hyq/homebrew-core "$BOTTLE"; then
-  echo "github mirror release $TAG done"
+     --title "$TAG" --notes "$TAG bottle mirror (CI run $RUN_NUMBER); primary: atomgit release $TAG"; then
+  if gh release upload "$TAG" -R social4hyq/homebrew-core "$BOTTLE"; then
+    echo "github mirror release $TAG done"
+  else
+    # create succeeded but upload didn't: genuinely this run's half-made release
+    gh release delete "$TAG" -R social4hyq/homebrew-core --yes --cleanup-tag 2>/dev/null || true
+    echo "::warning::github mirror release $TAG upload failed; atomgit publish is complete, backfill the mirror manually"
+    echo "- ⚠️ github mirror $TAG upload failed — backfill manually (atomgit publish OK)" >> "$GITHUB_STEP_SUMMARY"
+  fi
 else
-  # don't leave a half-made empty release behind
-  gh release delete "$TAG" -R social4hyq/homebrew-core --yes --cleanup-tag 2>/dev/null || true
-  echo "::warning::github mirror release $TAG failed; atomgit publish is complete, backfill the mirror manually"
-  echo "- ⚠️ github mirror $TAG failed — backfill manually (atomgit publish OK)" >> "$GITHUB_STEP_SUMMARY"
+  echo "::warning::github mirror release $TAG create failed (tag may already exist from an earlier run); atomgit publish is complete, check manually"
+  echo "- ⚠️ github mirror $TAG create failed — check manually (atomgit publish OK)" >> "$GITHUB_STEP_SUMMARY"
 fi
