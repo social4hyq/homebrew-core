@@ -7,7 +7,7 @@ class Getparty < Formula
   head "https://github.com/vbauerster/getparty.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ad983edb9059412f560f5e7bff543b4ff7d16e16e7322f579512eb63aa83003"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ce09d5c003b3a52d9322f5368c4619c57d8e900534cff6f5a30250bbe0a519a"
   end
 
   depends_on "go" => :build
