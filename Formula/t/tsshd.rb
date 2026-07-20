@@ -6,7 +6,7 @@ class Tsshd < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e4c58cc05076e986a59d0cc057e09564412878fb04a5db973e92e1f84fac35e9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11182d803635f1808ac10c4256cebf366129119ef0b0b7519fc68f3c502f23da"
   end
 
   depends_on "go" => :build
