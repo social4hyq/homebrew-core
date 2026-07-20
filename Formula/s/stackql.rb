@@ -1,8 +1,8 @@
 class Stackql < Formula
   desc "SQL interface for arbitrary resources with full CRUD support"
   homepage "https://stackql.io/"
-  url "https://github.com/stackql/stackql/archive/refs/tags/v0.10.542.tar.gz"
-  sha256 "ce3c15b1931b69d20682037d21bb7c2043eb100f66f28799d0af7dfc0891ec81"
+  url "https://github.com/stackql/stackql/archive/refs/tags/v0.10.557.tar.gz"
+  sha256 "3d13861945dba3f5df72522ef9c109ea39e84c4ddb7cea08ef02c58c71a58d7b"
   license "MIT"
   head "https://github.com/stackql/stackql.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Stackql < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61fe620e14d5a16313b42d7d5c66be88ad960c02f265d1a062635911ec7712a4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e449344b07531d0e6352a18b2c64df691f454d2211455bfb5646dfd7683ca50"
   end
 
   depends_on "go" => :build
