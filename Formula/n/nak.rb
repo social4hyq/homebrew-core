@@ -12,12 +12,7 @@ class Nak < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "9a858ae9e2dd05eb62ee8f9b59fc0e450ff9abd67710d4364a2e6ea89d0740f0"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "9a858ae9e2dd05eb62ee8f9b59fc0e450ff9abd67710d4364a2e6ea89d0740f0"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "9a858ae9e2dd05eb62ee8f9b59fc0e450ff9abd67710d4364a2e6ea89d0740f0"
-    sha256 cellar: :any_skip_relocation, sonoma:        "27b8bad92b6210d8fe7a7194b9ab17b82569447dd77cd2619c8e35d99a147cf8"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "57d3e0e3d2ac9e76cbfd982549e1523b8bce668776664d2e68546b0be2d9c4b4"
-    sha256 cellar: :any,                 x86_64_linux:  "a45fd597bb6155f3799f1249e676a8606be04239eb940ca22c49216491ac9e2c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ba73a94a5b4d4aa9e4f0450285d86453856b7c07d5ca509795551041ac4db55"
   end
 
   depends_on "go" => :build
