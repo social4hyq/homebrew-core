@@ -7,7 +7,7 @@ class Lightgbm < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fbd256d1164f494c52157b7cb52cbc2afea65c5855f9f8612b46daae15f7f266"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9563d41216dd4d3904643539d050c98ea502c77d71f6c2dbb086d01c75f65411"
   end
 
   depends_on "cmake" => :build
