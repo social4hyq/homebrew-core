@@ -6,7 +6,7 @@ class Jimtcl < Formula
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c63800ffadff75842fdcd9ec428931dad46af6d0c09b3a5b5d5004cdd5383e4c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eead4becd2b8d2f1fdcf084af359ce30436ffb86361f3314295d2e1f95f129fb"
   end
 
   depends_on "openssl@3"
