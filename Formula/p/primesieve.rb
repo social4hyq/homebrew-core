@@ -1,12 +1,12 @@
 class Primesieve < Formula
   desc "Fast C/C++ prime number generator"
   homepage "https://github.com/kimwalisch/primesieve"
-  url "https://github.com/kimwalisch/primesieve/archive/refs/tags/v12.14.tar.gz"
-  sha256 "65cf173e11bc9aff1b189f2cd19c6b6c502c30e966876b5c5ef71e138f49c8c9"
+  url "https://github.com/kimwalisch/primesieve/archive/refs/tags/v12.15.tar.gz"
+  sha256 "acaafd94cc30dbeef4808e682d0cb096c05d25f74eda5bacecefd323f697833f"
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7688fbf63f3a665314c01132771deb50f2e45456ad388ad36dd4cd90533615f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fdeef2f0831d6ee3949a7feada40c2cf5792c359a0468c6cc396396fd329e287"
   end
 
   depends_on "cmake" => :build
