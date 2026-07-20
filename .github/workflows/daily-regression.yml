@@ -1,0 +1,50 @@
+name: daily-regression
+
+# Daily cascading dependency regression test (idea from Harmonybrew/ci's
+# auto_dailytest.py). PR/publish CI only builds+tests the formula that
+# actually changed in that PR — it never re-verifies formulae that merely
+# *depend* on it. A change to a base formula (llvm@21) can silently break
+# a downstream one (icu4c@78 → bun-webkit → bun → ohos-opencode) without
+# anyone noticing until a user hits it.
+#
+# Scans formulae touched in the last 24h, expands to their transitive
+# dependents (within this tap only — see daily-regression.sh header for why
+# `brew uses --recursive` itself isn't used), and sequentially
+# install+test's the union in the shared CI container. Failures land in
+# $GITHUB_STEP_SUMMARY and open/update a tracking issue (a red scheduled
+# run nobody watches is not a notification).
+
+on:
+  schedule:
+    - cron: '30 20 * * *' # 04:30 CST
+  workflow_dispatch:
+    inputs:
+      since:
+        description: 'Look back window for git log --since (default: 24 hours ago)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  IMAGE: ghcr.io/social4hyq/ci-runner@sha256:38e740c8e355b2ccc9f34ba4bcab955a3fbc076278ae4bd3a07ea3707e90bb56 # :latest, 2026-07-19
+  CONTAINER: ohos
+  TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+
+jobs:
+  regression:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Start OHOS container
+        run: .github/scripts/setup-container.sh
+      - name: Cascading regression test
+        env:
+          SINCE: ${{ inputs.since }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: .github/scripts/daily-regression.sh
