@@ -7,7 +7,7 @@ class FakeGcsServer < Formula
   head "https://github.com/fsouza/fake-gcs-server.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "24d774f116745bb6eb9632ca7e44c5dfcc40c05cfc8927c6e5a7a7616fb7978a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "81f94294312d3166e354f30cfcb5bfb778409f16dacc600504b95b7d25444ed9"
   end
 
   depends_on "go" => :build
