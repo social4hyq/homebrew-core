@@ -12,7 +12,7 @@ class AliyunCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b588503fd3ca936724f4dcdae49eb2acdb9665e821f48e097194e19b9cea1a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9f5e0d6d62740926d28822bf144c03b1c931c05f12301c17d33fca7301a29cf"
   end
 
   depends_on "go" => :build
