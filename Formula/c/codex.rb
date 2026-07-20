@@ -28,9 +28,8 @@ class Codex < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-v0.144.5-r1"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "87cd0d8c630639eceef3bd154269fbd49bf549c041288ae2ce13abda248d7701"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-v0.144.6-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "38d0192b580fc58a9ef9492ebf346abf53b233661e856b24fa1c685060eab812"
   end
 
   depends_on "ohos-bst-light" => :build
