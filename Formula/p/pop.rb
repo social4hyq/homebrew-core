@@ -6,7 +6,7 @@ class Pop < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "08490ccab773c7c3ccb6a723aed9669e2ef36045150baa43a5e03c0a539be0df"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "51e521d5b87b99d5bedac2344261f191f53092c2024a2b7e5602863b638b3476"
   end
 
   depends_on "go" => :build
