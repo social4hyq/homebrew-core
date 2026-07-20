@@ -12,7 +12,7 @@ class Asio < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6319213a570609eed5768f61f81140d3321d7c69af45ead6fd385106e844d61"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "24f0375a0088112bc40bf09fe309bf7697b4bb63a6f7c09988706df74b21bd47"
   end
 
   head do
