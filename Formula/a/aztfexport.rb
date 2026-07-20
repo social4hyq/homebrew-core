@@ -8,7 +8,7 @@ class Aztfexport < Formula
   head "https://github.com/Azure/aztfexport.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5fd3ac7b758e9679858f95ff86a9a8d0c50cd4c44efd427c6859cf59bf5415b2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ed299a31d91dfa70cf44dfd280bc0b7a17554dea89de7a026dec381670fa2506"
   end
 
   depends_on "go" => :build
