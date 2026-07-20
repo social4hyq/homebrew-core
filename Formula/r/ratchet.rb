@@ -7,7 +7,7 @@ class Ratchet < Formula
   head "https://github.com/sethvargo/ratchet.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b858f0005e237b026327e6235e2da5e56ca80a67ad365714dc56e234c1bd350"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "da40b1b5ff715f65fa3f175dab3f1a74804dda8be09534de88724e582798e998"
   end
 
   depends_on "go" => :build
