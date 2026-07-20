@@ -1,8 +1,8 @@
 class Htop < Formula
   desc "Improved top (interactive process viewer)"
   homepage "https://htop.dev/"
-  url "https://github.com/htop-dev/htop/archive/refs/tags/3.5.1.tar.gz"
-  sha256 "dfc4a09845e9bc86f466a722e62b8f87d59028ff39689077ff2257a6a605061d"
+  url "https://github.com/htop-dev/htop/archive/refs/tags/3.5.2.tar.gz"
+  sha256 "a66a62bbd1eba59889c68f868b643e53320eea93da19f43ba13c822a826d82ba"
   license "GPL-2.0-or-later"
   head "https://github.com/htop-dev/htop.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Htop < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8cbbe32f5a6cd1e7bc8ac6bcbc858185df65e73e1c82c8f05d4255f72d1cf5c1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c143eca60227982db444e1dac3b20fc4b2c12689d492403aa746b75d511e407b"
   end
 
   depends_on "autoconf" => :build
