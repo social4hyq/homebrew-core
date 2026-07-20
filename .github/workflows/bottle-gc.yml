@@ -1,0 +1,43 @@
+name: bottle-gc
+
+# Weekly: delete atomgit (+ GitHub mirror) bottle releases that no formula's
+# current `bottle do` block references anymore — orphaned by version bumps,
+# revision bumps, or (2026-07-20) the squash-merge mishap that produced a
+# redundant ci-smoke-test-v0.1.0-r1 next to the -r2 that superseded it.
+# Adapted from Harmonybrew/ci's auto_clear.py; they compare against a
+# package-index JSON we don't have (no generate-formula-api here), so this
+# compares directly against each formula's own bottle block instead.
+#
+# Dry-run by default: schedule always dry-runs (report only, via job
+# summary); workflow_dispatch also defaults dry_run=true. Deletion is hard
+# to undo and this is new, unvalidated automation — pass dry_run=false
+# explicitly to actually delete anything.
+
+on:
+  schedule:
+    - cron: '0 5 * * 1'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Report only, do not delete'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  DRY_RUN: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run }}
+
+jobs:
+  gc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Garbage-collect orphaned bottle releases
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: .github/scripts/gc-old-bottles.sh
