@@ -2,8 +2,16 @@ name: pr-validate
 
 # PR-driven CI: audit + source build + brew test for any formula added or
 # changed in a pull request (new formula and version bumps both land here).
-# On success, labels the PR ci-passed for human merge review — publishing
-# stays a separate step (publish-on-merge.yml, triggered by the merge push).
+#
+# 2026-07-20: build now really publishes (upload=true) with the bottle
+# commit pushed back onto the PR's OWN branch (push_ref = head.ref), not
+# just a build+test dry run — so by the time a human merges the PR, main
+# already receives a formula that has its bottle. That push retriggers this
+# workflow (a new commit landed on the PR branch); detect-changes.sh
+# recognizes its own bottle write-back commit and short-circuits to an empty
+# build/changed/heavy set, so the second run is fast and does nothing.
+# Labels the PR ci-passed once light-check + build both pass (or are
+# skipped, e.g. self-triggered runs or heavy-formula-only PRs).
 
 on:
   pull_request:
@@ -16,11 +24,19 @@ permissions:
 
 concurrency:
   group: pr-validate-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  # false, not true: a multi-formula PR's build job pushes one bottle commit
+  # per formula, each retriggering this workflow (synchronize). With
+  # cancel-in-progress true, formula B's self-triggered run would cancel the
+  # still-running matrix job mid-flight while formula A's push landed and
+  # formula B's build was still going — corrupting the in-progress publish.
+  # Queuing instead of canceling costs a little CI time on rapid pushes but
+  # never kills a real build.
+  cancel-in-progress: false
 
 env:
-  # Space-separated; heavy formulae are light-checked in PRs but not built
-  # here — first real build happens post-merge in publish-on-merge.yml.
+  # Space-separated; heavy formulae are light-checked in PRs but never
+  # auto-built here (even post-merge) — publishing them stays a manual
+  # dispatch of bottle-build.yml, a 6h build isn't for unattended CI.
   HEAVY_FORMULAS: "llvm@21 bun-webkit"
   IMAGE: ghcr.io/social4hyq/ci-runner@sha256:38e740c8e355b2ccc9f34ba4bcab955a3fbc076278ae4bd3a07ea3707e90bb56 # :latest, 2026-07-19
   CONTAINER: ohos
@@ -62,9 +78,10 @@ jobs:
   build:
     # bottle-build declares contents:write at its top level; a called
     # workflow may not exceed the caller's permissions, so this must grant
-    # it even though upload=false never actually writes (2026-07-20: an
-    # omitted grant here causes a parse-time startup_failure with zero jobs
-    # created, not a runtime failure — verified via debug/pr-validate-startup)
+    # it (2026-07-20: an omitted grant here causes a parse-time
+    # startup_failure with zero jobs created, not a runtime failure —
+    # verified via a throwaway debug branch). Needed for real now too:
+    # upload=true pushes the bottle commit back to the PR branch.
     permissions:
       contents: write
     needs: detect
@@ -77,7 +94,8 @@ jobs:
     uses: ./.github/workflows/bottle-build.yml
     with:
       formula: ${{ matrix.formula }}
-      upload: false
+      upload: true
+      push_ref: ${{ github.event.pull_request.head.ref }}
     secrets: inherit
 
   label:

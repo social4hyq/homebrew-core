@@ -1,12 +1,17 @@
 name: publish-on-merge
 
-# Publish on merge to main: changed formulae already passed pr-validate.yml
-# (source build + brew test) before the PR was allowed to merge, so a push
-# to main here means "ready to publish" — build the bottle, upload it to
-# atomgit, and write the bottle block back (upload=true). Heavy formulae
-# still get light checks only; their bottle publish stays a manual dispatch
-# of bottle-build.yml (same conservative gate as before this workflow
-# existed — a 6h build isn't something to fire unattended on every merge).
+# Publish on merge to main.
+#
+# 2026-07-20: pr-validate.yml now publishes for real (upload=true) and
+# pushes the bottle commit back onto the PR's own branch before it's ever
+# merged — so for the common case, main already has a bottled formula by
+# the time this workflow's push event fires, and detect-changes.sh's
+# bottle-block-only skip makes this a fast no-op. This workflow is now
+# mostly a safety net for edge cases where that didn't happen (a heavy
+# formula's PR — pr-validate.yml never builds those — or a merge that
+# somehow landed without pr-validate.yml's build succeeding). Heavy
+# formulae's bottle publish stays a manual dispatch of bottle-build.yml
+# either way (a 6h build isn't for unattended CI, in a PR or after merge).
 
 on:
   push:

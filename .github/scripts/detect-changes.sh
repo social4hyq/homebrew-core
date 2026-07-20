@@ -9,6 +9,26 @@ if [[ "$BEFORE" =~ ^0+$ ]] || ! git cat-file -e "$BEFORE" 2>/dev/null; then
   BEFORE=$(git rev-parse "$AFTER^")
 fi
 
+# Skip entirely when $AFTER is our own bottle write-back commit
+# (`brew bottle --write` commits as "<formula>: add/update <ver> bottle.").
+# Reads the actual commit message rather than the triggering event's payload
+# shape, so the same check works for push (publish-on-merge.yml) and
+# pull_request (pr-validate.yml, which has no head_commit.message equivalent
+# to check at the job-`if:` level) alike — one guard instead of two
+# per-workflow, event-specific ones.
+HEAD_MSG=$(git log -1 --format=%s "$AFTER")
+if [[ "$HEAD_MSG" =~ ^[^[:space:]]+:\ (add|update)\ .+\ bottle\.$ ]]; then
+  echo "::notice::HEAD is a bottle write-back commit ($HEAD_MSG), skipping"
+  {
+    echo "build=[]"
+    echo "changed=[]"
+    echo "heavy=[]"
+  } >> "$GITHUB_OUTPUT"
+  echo "### detect-changes" >> "$GITHUB_STEP_SUMMARY"
+  echo "- skipped: HEAD is a bottle write-back commit ($HEAD_MSG)" >> "$GITHUB_STEP_SUMMARY"
+  exit 0
+fi
+
 #  `brew bottle --write` inserts a blank line on both sides of a newly added
 # bottle block; stripping the block alone leaves a doubled blank line behind
 # that isn't in the pre-bottle version, so the very first bottle a formula
