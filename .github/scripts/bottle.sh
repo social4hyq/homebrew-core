@@ -43,5 +43,10 @@ echo "== version=$VER tag=$TAG =="
 docker exec -w /root "$CONTAINER" bash -lc \
   "$BREW_ENV brew bottle --json --root-url $ROOT $TAP/$FORMULA"
 mkdir -p bottle-out
-cexec "mv /root/*.bottle.tar.gz /root/*.bottle.json '$TAP_IN_CONTAINER/bottle-out/'"
+# `brew bottle` inserts a rebuild number segment (e.g. codex-0.144.5.arm64_
+# ohos.bottle.2.tar.gz) whenever the keg's content-hash differs from what
+# the formula's already-committed bottle block records for the same
+# version — a plain *.bottle.tar.gz glob misses that "*.N." variant
+# entirely (confirmed 2026-07-20, codex's first automated rebuild).
+cexec "mv /root/*.bottle*.tar.gz /root/*.bottle*.json '$TAP_IN_CONTAINER/bottle-out/'"
 ls -la bottle-out/
