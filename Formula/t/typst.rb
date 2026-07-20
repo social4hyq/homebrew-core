@@ -1,8 +1,8 @@
 class Typst < Formula
   desc "Markup-based typesetting system"
   homepage "https://typst.app/"
-  url "https://github.com/typst/typst/archive/refs/tags/v0.15.0.tar.gz"
-  sha256 "5044bd12138491c6e880df0e09056a9ae4607d937c73962d5806402ae6ee96a6"
+  url "https://github.com/typst/typst/archive/refs/tags/v0.15.1.tar.gz"
+  sha256 "c07909e01a2a6941e52c9b616e48c209c755eed416d62bcf5583c37a4aca01a3"
   license "Apache-2.0"
   version_scheme 1
   head "https://github.com/typst/typst.git", branch: "main"
@@ -13,7 +13,7 @@ class Typst < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5387dfbce286fd94b86ce3f708d55c4e69eaa58ccd00d3ce4b7224e87581fc04"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "89c9a5e8f1e033611ed394e5adbff3ce3c0a9c22ffde724779de0b7b66db818b"
   end
 
   depends_on "pkgconf" => :build
