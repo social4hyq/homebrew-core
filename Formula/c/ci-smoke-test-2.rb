@@ -13,6 +13,11 @@ class CiSmokeTest2 < Formula
     skip "CI smoke-test formula, no upstream"
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ci-smoke-test-2-v0.2.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a38eee69d38780059c7842de2b618f7a9c8866f7edfe55c0584fa8b2af64a03"
+  end
+
   def install
     (bin/"ci-smoke-test-2").write "#!/bin/sh\necho ok\n"
     chmod 0755, bin/"ci-smoke-test-2"
