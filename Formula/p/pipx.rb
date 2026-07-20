@@ -3,25 +3,30 @@ class Pipx < Formula
 
   desc "Execute binaries from Python packages in isolated environments"
   homepage "https://pipx.pypa.io"
-  url "https://files.pythonhosted.org/packages/aa/8a/5d6f5ad6981a2d5091f366bc93cdf791e21e431befb92bf23454c8936dea/pipx-1.15.0.tar.gz"
-  sha256 "193aab4983b787903e389d623e6347f697026c0d7a2ba0b4fbd5189bed22f19d"
+  url "https://files.pythonhosted.org/packages/9e/b8/eb1d3331c614c10a93451634e83410cfeb4260d5386dd86a9a4e28f93444/pipx-1.16.0.tar.gz"
+  sha256 "a61a88c35ed68ea99d6046634e1577c456072abc984f15c27d594a423ef2ca01"
   license "MIT"
   head "https://github.com/pypa/pipx.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "75307e88852df0414994a34d9d59cab7c81029428ac55e21754decf687d6fca1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "50729f875d52e022b6729431967bd9a1840560159baf9b406c6c11c930cba3d8"
   end
 
   depends_on "python@3.14"
 
   resource "argcomplete" do
-    url "https://files.pythonhosted.org/packages/38/61/0b9ae6399dd4a58d8c1b1dc5a27d6f2808023d0b5dd3104bb99f45a33ff6/argcomplete-3.6.3.tar.gz"
-    sha256 "62e8ed4fd6a45864acc8235409461b72c9a28ee785a2011cc5eb78318786c89c"
+    url "https://files.pythonhosted.org/packages/95/c0/c8e94135e66fabf89a120d9b4b123fe6993506beca6c1938a74c24cfa5fd/argcomplete-3.7.0.tar.gz"
+    sha256 "afde224f753f874807b1dc1414e883ab8fe0cda9c04807b6047dcb8e1ac23913"
   end
 
   resource "click" do
     url "https://files.pythonhosted.org/packages/76/d4/81420972a676e8ffea40450d8c8c92943e7218a78fe9b64359836cc9876b/click-8.4.2.tar.gz"
     sha256 "9a6cea6e60b17ebe0a44c5cc636d94f09bd66142c1cd7d8b4cd731c4917a15f6"
+  end
+
+  resource "filelock" do
+    url "https://files.pythonhosted.org/packages/35/94/00f2059e4835eace3ae8fde680b932c496f8ec7bdc99168dfa53fb2e6b79/filelock-3.29.7.tar.gz"
+    sha256 "5b481979797ae69e72f0b389d89a80bdd585c260c5b3f1fb9c0a5ba9bb3f195d"
   end
 
   resource "packaging" do
@@ -46,18 +51,16 @@ class Pipx < Formula
 
   def install
     # Avoid Cellar path reference, which is only good for one version.
-    inreplace "src/pipx/interpreter.py",
-              "DEFAULT_PYTHON = _get_sys_executable()",
-              "DEFAULT_PYTHON = '#{python3.opt_libexec/"bin/python"}'"
+    inreplace "src/pipx/interpreter.py", "return _get_sys_executable()",
+                                         "return '#{python3.opt_libexec/"bin/python"}'"
 
-    virtualenv_install_with_resources
+    venv = virtualenv_install_with_resources
 
     generate_completions_from_executable(libexec/"bin/register-python-argcomplete", "pipx",
                                          shell_parameter_format: :arg)
 
     # Build an `:all` bottle by replacing comments
-    site_packages = libexec/Language::Python.site_packages("python3")
-    file = site_packages/"argcomplete-#{resource("argcomplete").version}.dist-info/METADATA"
+    file = venv.site_packages.glob("argcomplete-*.dist-info/METADATA")
     inreplace file, "/opt/homebrew/bin/bash", "$HOMEBREW_PREFIX/bin/bash"
   end
 
