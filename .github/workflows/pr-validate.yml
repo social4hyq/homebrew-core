@@ -60,6 +60,13 @@ jobs:
         run: .github/scripts/light-check.sh
 
   build:
+    # bottle-build declares contents:write at its top level; a called
+    # workflow may not exceed the caller's permissions, so this must grant
+    # it even though upload=false never actually writes (2026-07-20: an
+    # omitted grant here causes a parse-time startup_failure with zero jobs
+    # created, not a runtime failure — verified via debug/pr-validate-startup)
+    permissions:
+      contents: write
     needs: detect
     if: needs.detect.outputs.build != '[]'
     strategy:
