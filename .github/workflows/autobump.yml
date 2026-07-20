@@ -43,10 +43,14 @@ jobs:
         run: .github/scripts/setup-container.sh
       - name: Open bump PRs
         env:
-          # pushes the bump branch + opens the PR (same-repo, not main —
-          # doesn't need the protect-main bypass publish.sh uses)
+          # Pushes the bump branch. Also used for GH_TOKEN below (not
+          # secrets.GITHUB_TOKEN): this repo has "Allow GitHub Actions to
+          # create pull requests" disabled, so gh pr create with the
+          # ephemeral Actions token 403s with "GitHub Actions is not
+          # permitted to create or approve pull requests" regardless of the
+          # workflow's own permissions: block (confirmed 2026-07-20) — a
+          # personal PAT isn't subject to that repo setting.
           BOT_PUSH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
-          # labels the opened PR
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
           ONLY_FORMULA: ${{ inputs.formula }}
         run: .github/scripts/autobump.sh
