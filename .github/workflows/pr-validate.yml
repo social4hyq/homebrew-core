@@ -10,8 +10,14 @@ name: pr-validate
 # workflow (a new commit landed on the PR branch); detect-changes.sh
 # recognizes its own bottle write-back commit and short-circuits to an empty
 # build/changed/heavy set, so the second run is fast and does nothing.
-# Labels the PR ci-passed once light-check + build both pass (or are
-# skipped, e.g. self-triggered runs or heavy-formula-only PRs).
+# Labels the PR ci-passed once lint-commits + light-check + build all pass
+# (light-check/build tolerate skip, e.g. self-triggered runs or
+# heavy-formula-only PRs; lint-commits always actually runs and must pass).
+#
+# lint-commits (adapted from Harmonybrew/ci's _check_commit_message):
+# validates every human commit's first line against this tap's convention
+# (new formula / version bump / revision bump / fix — see
+# lint-commit-messages.sh), skipping CI's own bottle write-back commits.
 
 on:
   pull_request:
@@ -43,6 +49,21 @@ env:
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
 
 jobs:
+  lint-commits:
+    # Independent of detect: this checks commit-message hygiene, not which
+    # formulae changed, so it runs regardless of what detect finds.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Lint commit messages
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: .github/scripts/lint-commit-messages.sh
+
   detect:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -98,13 +119,43 @@ jobs:
       push_ref: ${{ github.event.pull_request.head.ref }}
     secrets: inherit
 
+  upstream-diff:
+    # Informational only (adapted from Harmonybrew/ci's
+    # _fetch_upstream_formula_diff, but pointed at Harmonybrew/homebrew-core
+    # — our actual migration target per README, not the official
+    # Homebrew/homebrew-core): for any formula in this PR that's genuinely
+    # new (didn't exist at base), fetch the same-named formula via the
+    # atomgit contents API and post a diff as a PR comment. Never gates
+    # ci-passed — not in label's needs.
+    needs: detect
+    if: needs.detect.outputs.changed != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Post upstream diff comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          CHANGED_JSON: ${{ needs.detect.outputs.changed }}
+        run: .github/scripts/upstream-diff-comment.sh
+
   label:
-    needs: [detect, light-check, build]
-    # both needed jobs are conditionally skipped when their input list is
+    needs: [lint-commits, detect, light-check, build]
+    # light-check/build are conditionally skipped when their input list is
     # empty; treat skipped as pass so a PR that only touches one category
-    # (e.g. light-check-only heavy formula) still gets labeled
+    # (e.g. light-check-only heavy formula) still gets labeled. lint-commits
+    # always actually runs, so it must be a hard 'success', not skip-tolerant.
     if: |
       always() &&
+      needs.lint-commits.result == 'success' &&
       (needs.light-check.result == 'success' || needs.light-check.result == 'skipped') &&
       (needs.build.result == 'success' || needs.build.result == 'skipped')
     runs-on: ubuntu-latest
