@@ -14,8 +14,8 @@ class CiSmokeTest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ci-smoke-test-v0.1.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "596e260ea9b9f681f50952d25ff6ef717a490e7f2b2ed63bd634c5bd5dbea37a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ci-smoke-test-v0.1.0-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c695e39a8e8fa7e2a38a2eeed139d9db0e1f8074046393cc27ca125bfaae721c"
   end
 
   def install
