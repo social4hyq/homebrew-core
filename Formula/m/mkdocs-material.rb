@@ -8,7 +8,7 @@ class MkdocsMaterial < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "27e04b8bf03a09eeb11e224f44161ba523a78f5e9899456bcaae4129a9648c28"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9fc4264d26735c80967a950638f99133ea6b53a62a81b19daa2f3d3f54ad595"
   end
 
   depends_on "certifi" => :no_linkage
