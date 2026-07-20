@@ -1,13 +1,13 @@
 class Hydra < Formula
   desc "Network logon cracker which supports many services"
   homepage "https://github.com/vanhauser-thc/thc-hydra"
-  url "https://github.com/vanhauser-thc/thc-hydra/archive/refs/tags/v9.6.tar.gz"
-  sha256 "c839e5c64ef60185c69a07a9a59831bd2cfe9ac2eac0c4d9e87fdf38dbf04c40"
+  url "https://github.com/vanhauser-thc/thc-hydra/archive/refs/tags/v9.7.tar.gz"
+  sha256 "8dbe11e5858b8c1aab7bd670bc39a3483accd09e147d3dd981fe11a7fa0d10de"
   license "AGPL-3.0-only"
   head "https://github.com/vanhauser-thc/thc-hydra.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4919a199fffa071f273ea720f3806848baa45ae415a27a6e59089d60d8a88d73"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "28fe86b047eaf8296299281c001b13ab2c5064390bebe584148331a3469c63d7"
   end
 
   depends_on "pkgconf" => :build
@@ -18,53 +18,57 @@ class Hydra < Formula
 
   uses_from_macos "ncurses"
 
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
+
   conflicts_with "ory-hydra", because: "both install `hydra` binaries"
 
   def install
+    # macOS auto-detects Homebrew library paths but not the system curses headers;
+    # Linux auto-detects neither. Point configure at the right paths per platform.
+    # https://github.com/vanhauser-thc/thc-hydra/issues/80
+    config = if OS.mac?
+      {
+        "CURSES_PATH"  => "#{MacOS.sdk_path}/usr/lib",
+        "CURSES_IPATH" => "#{MacOS.sdk_path}/usr/include",
+      }
+    else
+      {
+        "CRYPTO_PATH"  => formula_opt_lib("openssl@3"),
+        "CURSES_PATH"  => formula_opt_lib("ncurses"),
+        "CURSES_IPATH" => formula_opt_include("ncurses"),
+        "MYSQL_PATH"   => formula_opt_lib("mariadb-connector-c"),
+        "MYSQL_IPATH"  => "#{formula_opt_include("mariadb-connector-c")}/mariadb",
+        "PCRE_PATH"    => formula_opt_lib("pcre2"),
+        "PCRE_IPATH"   => formula_opt_include("pcre2"),
+        "SSL_PATH"     => formula_opt_lib("openssl@3"),
+        "SSL_IPATH"    => formula_opt_include("openssl@3"),
+        "SSH_PATH"     => formula_opt_lib("libssh"),
+        "SSH_IPATH"    => formula_opt_include("libssh"),
+        "SSLNEW"       => "YES",
+      }
+    end
+
     inreplace "configure" do |s|
-      # Link against our OpenSSL
-      # https://github.com/vanhauser-thc/thc-hydra/issues/80
-      s.gsub!(/^SSL_PATH=""$/, "SSL_PATH=#{Formula["openssl@3"].opt_lib}")
-      s.gsub!(/^SSL_IPATH=""$/, "SSL_IPATH=#{Formula["openssl@3"].opt_include}")
-      s.gsub!(/^SSLNEW=""$/, "SSLNEW=YES")
-      s.gsub!(/^CRYPTO_PATH=""$/, "CRYPTO_PATH=#{Formula["openssl@3"].opt_lib}")
-      s.gsub!(/^SSH_PATH=""$/, "SSH_PATH=#{Formula["libssh"].opt_lib}")
-      s.gsub!(/^SSH_IPATH=""$/, "SSH_IPATH=#{Formula["libssh"].opt_include}")
-      s.gsub!(/^MYSQL_PATH=""$/, "MYSQL_PATH=#{Formula["mariadb-connector-c"].opt_lib}")
-      s.gsub!(/^MYSQL_IPATH=""$/, "MYSQL_IPATH=#{Formula["mariadb-connector-c"].opt_include}/mariadb")
-      s.gsub!(/^PCRE_PATH=""$/, "PCRE_PATH=#{Formula["pcre2"].opt_lib}")
-      s.gsub!(/^PCRE_IPATH=""$/, "PCRE_IPATH=#{Formula["pcre2"].opt_include}")
-      if OS.mac?
-        s.gsub!(/^CURSES_PATH=""$/, "CURSES_PATH=#{MacOS.sdk_path_if_needed}/usr/lib")
-        s.gsub!(/^CURSES_IPATH=""$/, "CURSES_IPATH=#{MacOS.sdk_path_if_needed}/usr/include")
-      else
-        s.gsub!(/^CURSES_PATH=""$/, "CURSES_PATH=#{Formula["ncurses"].opt_lib}")
-        s.gsub!(/^CURSES_IPATH=""$/, "CURSES_IPATH=#{Formula["ncurses"].opt_include}")
-      end
+      config.each { |var, value| s.change_make_var!(var, value) }
+
       # Avoid opportunistic linking of everything
-      %w[
-        gtk+-2.0
-        libfreerdp2
-        libgcrypt
-        libidn
-        libmemcached
-        libmongoc
-        libpq
-        libsvn
-      ].each do |lib|
-        s.gsub! lib, "oh_no_you_dont"
-      end
+      avoid_libs = %w[libfreerdp libgcrypt libidn libmemcached libmongoc libpq libsvn sybdb sybfront]
+      avoid_libs.each { |lib| s.gsub!(lib, "oh_no_you_dont") }
     end
 
     # Having our gcc in the PATH first can cause issues. Monitor this.
     # https://github.com/vanhauser-thc/thc-hydra/issues/22
-    system "./configure", "--prefix=#{prefix}"
+    system "./configure", "--disable-xhydra", "--prefix=#{prefix}"
     bin.mkpath
     system "make", "all", "install"
     share.install prefix/"man" # Put man pages in correct place
   end
 
   test do
-    assert_match(/ mysql .* ssh /, shell_output(bin/"hydra", 255))
+    output = shell_output(bin/"hydra", 255)
+    assert_match "mysql", output
+    assert_match "ssh", output
   end
 end
