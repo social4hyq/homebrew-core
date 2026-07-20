@@ -7,7 +7,7 @@ class Aliae < Formula
   head "https://github.com/jandedobbeleer/aliae.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b77103d7445e4b691b447a69637bd3cda0675007e160f444470429959c263c6b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a3194a6af4704c43d0dfe6c8304e83881be519149145aeaf9c0ac1e0eecfd59c"
   end
 
   depends_on "go" => :build
