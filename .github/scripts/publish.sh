@@ -16,26 +16,47 @@ ag "$API/releases/tags/$TAG" \
        -d "{\"tag_name\":\"$TAG\",\"name\":\"$TAG\",\"target_commitish\":\"main\",\"body\":\"$TAG bottle (CI run $RUN_NUMBER)\"}" \
        "$API/releases"
 
-# 2. presigned upload URL (file_name required), then PUT to OBS object storage.
-#    GHA-to-OBS bandwidth can sink to ~18KB/s (measured 2026-07-19), so a hard
-#    -m 300 kills viable-but-slow uploads. Use low-speed detection instead:
-#    <1KB/s sustained for 120s = genuinely stalled; -m 7200 caps a 71MB
-#    llvm-sized bottle even at the observed worst-case rate.
+# 2. tune TCP for the trans-Pacific OBS upload. CUBIC's loss-based window
+#    never fills this long-fat path — obs-upload-tune (run 29714217969,
+#    2026-07-20) caught a slow window and measured 45.85 KB/s on unmodified
+#    CUBIC vs 4577 KB/s with BBR + fq pacing + larger send/receive buffers +
+#    a bumped initial congestion window (~100x). Best-effort: a runner
+#    without CAP_NET_ADMIN just keeps CUBIC and the PUT below still runs,
+#    only slower. Deliberately does NOT touch the live interface's qdisc
+#    (tc qdisc replace broke DNS resolution outright on 3 of 4 probe runs —
+#    see obs-upload-tune history) — BBR's in-kernel pacing fallback works
+#    without it.
+sudo modprobe tcp_bbr 2>/dev/null || true
+sudo sysctl -q -w net.core.default_qdisc=fq net.ipv4.tcp_congestion_control=bbr \
+  net.core.wmem_max=134217728 net.core.rmem_max=134217728 \
+  net.ipv4.tcp_wmem='4096 262144 134217728' net.ipv4.tcp_rmem='4096 262144 134217728' 2>/dev/null || true
+DEFROUTE=$(ip route show default 2>/dev/null)
+[ -n "$DEFROUTE" ] && { sudo ip route change $DEFROUTE initcwnd 64 initrwnd 64 2>/dev/null || true; }
+
+# 3. presigned upload URL (file_name required), then PUT to OBS object storage.
+#    GHA-to-OBS bandwidth can sink to ~15-18KB/s on a bad trans-Pacific
+#    window (measured 2026-07-19/20) even with the tuning above applied
+#    (e.g. no CAP_NET_ADMIN), so a hard -m 300 kills viable-but-slow
+#    uploads. Use low-speed detection instead: <1KB/s sustained for 120s =
+#    genuinely stalled; -m 7200 caps a 71MB llvm-sized bottle even at the
+#    observed worst-case rate. --tcp-nodelay + empty Expect: header were
+#    part of the validated fast configuration, keep them alongside the
+#    sysctl tuning above.
 RESP=$(ag "$API/releases/$TAG/upload_url?file_name=$FILENAME")
-curl -sf --speed-limit 1024 --speed-time 120 -m 7200 -X PUT "$(echo "$RESP" | jq -r .url)" \
+curl -sf --tcp-nodelay -H "Expect:" --speed-limit 1024 --speed-time 120 -m 7200 -X PUT "$(echo "$RESP" | jq -r .url)" \
   -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
   -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
   -H "x-obs-callback: $(echo "$RESP" | jq -r '.headers["x-obs-callback"]')" \
   -H "Content-Type: application/octet-stream" \
   --data-binary "@$BOTTLE" -w "HTTP=%{http_code}\n"
 
-# 3. merge bottle block back (--merge takes the json file, not the formula name)
+# 4. merge bottle block back (--merge takes the json file, not the formula name)
 docker exec -w "$TAP_IN_CONTAINER/bottle-out" "$CONTAINER" bash -lc \
   "$BREW_ENV brew bottle --merge --write ./*.bottle.json"
 # brew committed as root in-container; restore ownership before git push
 sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
 
-# 4. push both remotes. Concurrency is per-formula, so parallel uploads of
+# 5. push both remotes. Concurrency is per-formula, so parallel uploads of
 #    different formulae can race non-fast-forward: fetch+rebase and retry.
 #    A real rebase conflict aborts via set -e rather than force-pushing.
 git config user.name "github-actions[bot]"
@@ -62,7 +83,7 @@ done
 # GitHub push), which hard-fails visibly instead of the old warning-only push
 # here. No separate atomgit push in publish.sh anymore.
 
-# 5. GitHub release mirror copy, best-effort (atomgit stays the primary:
+# 6. GitHub release mirror copy, best-effort (atomgit stays the primary:
 #    every root_url points there; this is disaster-recovery / future-switch
 #    material only, so a failure here never fails the publish and never
 #    triggers rollback-release.sh)
