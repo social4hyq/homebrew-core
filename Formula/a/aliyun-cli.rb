@@ -1,8 +1,8 @@
 class AliyunCli < Formula
   desc "Universal Command-Line Interface for Alibaba Cloud"
   homepage "https://github.com/aliyun/aliyun-cli"
-  url "https://github.com/aliyun/aliyun-cli/archive/refs/tags/v3.4.7.tar.gz"
-  sha256 "12123fc7c860bec3c582bc9350237943a778d341a6f15b39652ae43add018898"
+  url "https://github.com/aliyun/aliyun-cli/archive/refs/tags/v3.4.8.tar.gz"
+  sha256 "1c0b01c6cd033e02efc94b324ee7930fc3bca738d5f6ab9c12280709b213fd01"
   license "Apache-2.0"
   head "https://github.com/aliyun/aliyun-cli.git", branch: "master"
 
@@ -12,7 +12,7 @@ class AliyunCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b588503fd3ca936724f4dcdae49eb2acdb9665e821f48e097194e19b9cea1a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9f5e0d6d62740926d28822bf144c03b1c931c05f12301c17d33fca7301a29cf"
   end
 
   depends_on "go" => :build
