@@ -7,7 +7,7 @@ class Sheets < Formula
   head "https://github.com/maaslalani/sheets.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8482c4a1700d5b7652f588d75558dcd614456275a1470075564638cee37c5c9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d44058ee8b21356b7a201e386d7f802e70c1f516ec3ebf0df1f239de89310ca5"
   end
 
   depends_on "go" => :build
