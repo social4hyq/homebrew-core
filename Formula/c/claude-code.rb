@@ -34,7 +34,13 @@ class ClaudeCode < Formula
   # have eval'd.
 
   livecheck do
-    url "https://www.npmjs.com/package/@anthropic-ai/claude-code-linux-arm64-musl"
+    # www.npmjs.com (the package *website*, not the registry API) 403s from
+    # this environment — confirmed 2026-07-20, different host from the
+    # registry.npmjs.org SIGILL issue described above (that one only bites
+    # on the ~120MB tarball GET; this small registry API JSON response is
+    # unaffected — confirmed reachable from the build container). Matches
+    # codex.rb's already-working livecheck pattern.
+    url "https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64-musl/latest"
     regex(/"version":\s*"(\d+(?:\.\d+)+)"/i)
   end
 
