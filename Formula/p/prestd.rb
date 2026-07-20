@@ -12,13 +12,7 @@ class Prestd < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "fc80ad9969b5f3e06708a857518e2573403e0eb44ee729025678ae4ed66531b9"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c83d6db4e738a71ba93dca32430f409c4cf1fa5f5ba766dc074dd4bba5dfa735"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "378162c3b6d551e8c8972df858fc7452c5bbc95257c08a13dda82ab9d4598a4f"
-    sha256 cellar: :any_skip_relocation, sonoma:        "a7bbe476358617f77298805d7432cd4c9e6765251b949e1ac9465343fe61aedf"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "053fed5b1a250757c68913d399d7add9e194158bf0e872fbe7f6fc7c5180137c"
-    sha256 cellar: :any,                 x86_64_linux:  "7357a218b66b1506aed7c30653ba15bc921ebdab82e3abd31dc3327e4ee56e80"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cb1824080d902af06e5ae0008a29a7fa555ab29a835d78df082d6c2c7b79085"
   end
 
   depends_on "go" => :build
