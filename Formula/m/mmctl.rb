@@ -1,8 +1,8 @@
 class Mmctl < Formula
   desc "Remote CLI tool for Mattermost server"
   homepage "https://github.com/mattermost/mattermost"
-  url "https://github.com/mattermost/mattermost/archive/refs/tags/v11.8.3.tar.gz"
-  sha256 "6460842e861a4b96d786845bf51b49ae72804346a10b5f5dbf8d5c288c3fceaa"
+  url "https://github.com/mattermost/mattermost/archive/refs/tags/v11.9.0.tar.gz"
+  sha256 "86a16933aa996c8ec2f19d672a743cb2c0be153617833873ede0f90c0e7399f4"
   license all_of: ["AGPL-3.0-only", "Apache-2.0"]
   head "https://github.com/mattermost/mattermost.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Mmctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "70efa60a77a3246c68d52c00fe487f7640291b46b925e42a7c96aa6539bc370e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7db1fab63a431a646699824584bc94b2f3336902311f2650a5e9774fb8a02b7"
   end
 
   depends_on "go" => :build
