@@ -6,7 +6,7 @@ class MarpCli < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae843558b271b102db07f0473e10686eebadd4323c16eb2e44aaeb2dc1259136"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f635d167ef35f1a234dc54e7fd3ade1200beadbb8bc483fe2ceddc41541025d"
   end
 
   depends_on "node"
