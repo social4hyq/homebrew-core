@@ -1,13 +1,13 @@
 class GitSync < Formula
   desc "Clones a git repository and keeps it synchronized with the upstream"
   homepage "https://github.com/kubernetes/git-sync"
-  url "https://github.com/kubernetes/git-sync/archive/refs/tags/v4.7.0.tar.gz"
-  sha256 "e63fba896f024f72849d134f0832dfca475126c90e8efd55ed5241fe57bf3a8a"
+  url "https://github.com/kubernetes/git-sync/archive/refs/tags/v4.7.1.tar.gz"
+  sha256 "e575e37581869cd31d4752f50365fc0a94c3f9f95fb70c8b2f98262776077a3c"
   license "Apache-2.0"
   head "https://github.com/kubernetes/git-sync.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d3fe33f7865e591a62537118bf089868a0abcd617ec37a7cbd8b2200d05024b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "82e578844a54213bdf594490081e8e687a6a5ad7c5b59e3efc595526f556054b"
   end
 
   depends_on "go" => :build
