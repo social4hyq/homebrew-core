@@ -6,7 +6,7 @@ class ZshHistoryEnquirer < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a3eaf01d0d2f115b14d28c94e7c92e8a785f6c2b9ba8e3255020720f738ae44"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "77d56624e35975a79d09d4dc2206cb26970d60096cb38b2b6303eeb31b0075fd"
   end
 
   depends_on "node"
