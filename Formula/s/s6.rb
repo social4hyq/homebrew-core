@@ -1,13 +1,13 @@
 class S6 < Formula
   desc "Small & secure supervision software suite"
   homepage "https://skarnet.org/software/s6/"
-  url "https://skarnet.org/software/s6/s6-2.15.0.0.tar.gz"
-  sha256 "27dff73d626285540133e075e75887087f5117fd51de59503ef7d29e96f69e4c"
+  url "https://skarnet.org/software/s6/s6-2.15.1.0.tar.gz"
+  sha256 "eab9c46e22b66b16135f9a05ec68a0ea287d9060b84d10defaaa2caad158ab52"
   license "ISC"
   head "git://git.skarnet.org/s6.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "efca80beeb47fdf0220e283763c6558dfd4dc8f49312707767a1ad9122fa92cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ebc6061de5a171ec87faba1430fe229f1f374be933eebea5d79066c770e202b8"
   end
 
   depends_on "pkgconf" => :build
@@ -19,8 +19,8 @@ class S6 < Formula
       --disable-silent-rules
       --enable-shared
       --enable-pkgconfig
-      --with-pkgconfig=#{Formula["pkgconf"].opt_bin}/pkg-config
-      --with-sysdeps=#{Formula["skalibs"].opt_lib}/skalibs/sysdeps
+      --with-pkgconfig=#{formula_opt_bin("pkgconf")}/pkg-config
+      --with-sysdeps=#{formula_opt_lib("skalibs")}/skalibs/sysdeps
     ]
     system "./configure", *args, *std_configure_args
     system "make", "install"
