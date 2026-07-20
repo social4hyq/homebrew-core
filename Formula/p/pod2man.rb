@@ -1,8 +1,8 @@
 class Pod2man < Formula
   desc "Perl documentation generator"
   homepage "https://www.eyrie.org/~eagle/software/podlators/"
-  url "https://archives.eyrie.org/software/perl/podlators-v6.0.2.tar.xz"
-  sha256 "22f5941c848756c05396356437dc799b32703f4fc282f0f281b9c83696500183"
+  url "https://archives.eyrie.org/software/perl/podlators-v6.1.0.tar.xz"
+  sha256 "6eb43a0fc8381969d5910f8c46ea11e8867e0862ff3c8a1ccda109894cb7de34"
   license any_of: ["Artistic-1.0-Perl", "GPL-1.0-or-later"]
 
   livecheck do
