@@ -6,9 +6,12 @@ name: autobump
 # merges, publish-on-merge.yml publishes.
 #
 # ALLOWLIST is deliberately narrow and explicit: most formulae in this tap
-# have a custom structure (bun's rN revision, pinned llvm@21/icu4c@78,
-# runtime-fetch stubs, shims with no upstream at all) that `bump-formula-pr`
-# can't rewrite cleanly. Only add a formula here after confirming
+# have a custom structure (bun's rN revision, pinned llvm@21/icu4c@78, shims
+# with no upstream at all) that `bump-formula-pr`'s url/sha256 gsub can't
+# rewrite cleanly. claude-code's runtime-fetch-stub install() doesn't matter
+# here — its formula-level url/version/sha256 shape (npmmirror tarball,
+# version embedded in the URL) is a plain, bump-formula-pr-compatible
+# pattern like codex/grok-build. Only add a formula here after confirming
 # `brew bump-formula-pr --dry-run` produces a clean url/sha256 edit for it.
 # version-check.yml keeps reporting the full outdated list (allowlisted or
 # not) for humans deciding what to bump by hand or add here next.
@@ -28,7 +31,7 @@ permissions:
   pull-requests: write
 
 env:
-  ALLOWLIST: "codex grok-build"
+  ALLOWLIST: "codex grok-build claude-code"
   IMAGE: ghcr.io/social4hyq/ci-runner@sha256:38e740c8e355b2ccc9f34ba4bcab955a3fbc076278ae4bd3a07ea3707e90bb56 # :latest, 2026-07-19
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
