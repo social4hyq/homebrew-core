@@ -1,13 +1,13 @@
 class S6Rc < Formula
   desc "Process supervision suite"
   homepage "https://skarnet.org/software/s6-rc/"
-  url "https://skarnet.org/software/s6-rc/s6-rc-0.6.1.1.tar.gz"
-  sha256 "b54f226a35be1ee56a228bf1a4c39437f072bc64e69dbf356e733e606a86402d"
+  url "https://skarnet.org/software/s6-rc/s6-rc-0.7.0.0.tar.gz"
+  sha256 "bf5b8ce0da5a4ee70d642b818b61d9916a7a9b64a457595f388113e54a188688"
   license "ISC"
   head "git://git.skarnet.org/s6-rc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "983f533c5a8bc2109077b08137b89bed388e6c12b77476951083fb30e543f3cb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab62ce50ace3203efa375427f7a521ae99b7062c799f057097be1c5552921bef"
   end
 
   depends_on "pkgconf" => :build
