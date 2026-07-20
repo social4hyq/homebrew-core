@@ -16,8 +16,10 @@ fi
 # pull_request (pr-validate.yml, which has no head_commit.message equivalent
 # to check at the job-`if:` level) alike — one guard instead of two
 # per-workflow, event-specific ones.
+BOTTLE_COMMIT_RE='^[^[:space:]]+: (add|update) .+ bottle\.$'
+
 HEAD_MSG=$(git log -1 --format=%s "$AFTER")
-if [[ "$HEAD_MSG" =~ ^[^[:space:]]+:\ (add|update)\ .+\ bottle\.$ ]]; then
+if [[ "$HEAD_MSG" =~ $BOTTLE_COMMIT_RE ]]; then
   echo "::notice::HEAD is a bottle write-back commit ($HEAD_MSG), skipping"
   {
     echo "build=[]"
@@ -48,7 +50,27 @@ for f in "${FILES[@]}"; do
   [[ "$name" =~ ^[A-Za-z0-9@+._-]+$ ]] \
     || { echo "::error::invalid formula name: $name"; exit 1; }
   CHANGED+=("$name")
-  # bottle-block-only changes don't need a rebuild
+
+  # already has a matching bottle: if the LAST commit to ever touch this
+  # specific file (as of $AFTER) is a bot write-back, someone (pr-validate.yml
+  # publishing from a PR branch, or a manual bottle-build.yml upload=true run)
+  # already built and published this exact content — skip regardless of what
+  # else is in the $BEFORE..$AFTER range. This is the common case now: a
+  # merged PR's cumulative diff always shows real non-bottle changes (the
+  # whole point of the PR), which defeats the plain before/after strip_bottle
+  # comparison below even though the file's bottle is already correct
+  # (confirmed 2026-07-20 via PR #31: a REGULAR, non-squash merge still
+  # triggered a redundant post-merge rebuild for exactly this reason — the
+  # squash-merge fix alone was incomplete).
+  LAST_TOUCH_MSG=$(git log -1 --format=%s "$AFTER" -- "$f")
+  if [[ "$LAST_TOUCH_MSG" =~ $BOTTLE_COMMIT_RE ]]; then
+    echo "::notice::$name: already has a bottle from its own last commit ($LAST_TOUCH_MSG), skipping build"
+    continue
+  fi
+
+  # bottle-block-only changes don't need a rebuild (the narrower case: a
+  # rebuild with no source change at all, e.g. a direct bottle-build.yml
+  # upload=true dispatch against main)
   if git cat-file -e "$BEFORE:$f" 2>/dev/null && \
      diff <(git show "$BEFORE:$f" | strip_bottle) \
           <(git show "$AFTER:$f"  | strip_bottle) >/dev/null; then
