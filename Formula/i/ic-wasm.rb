@@ -1,8 +1,8 @@
 class IcWasm < Formula
   desc "CLI tool for performing Wasm transformations specific to ICP canisters"
   homepage "https://github.com/dfinity/ic-wasm"
-  url "https://github.com/dfinity/ic-wasm/archive/refs/tags/0.9.11.tar.gz"
-  sha256 "579e8085c33b7cf37ed2ddc3b9a34dca5dca083201f7648c5d636bab80f75258"
+  url "https://github.com/dfinity/ic-wasm/archive/refs/tags/0.10.0.tar.gz"
+  sha256 "1c4b6c6f0235a3baecb7d568bbf3651c4a89cf9a376d746735e507ce0bdaa439"
   license "Apache-2.0"
 
   bottle do
