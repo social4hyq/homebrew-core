@@ -6,7 +6,7 @@ class Gurk < Formula
   license "AGPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aced43b2c6c955b4acb623257dc746c4d9682280c810b8ce71c9e95587fcf18b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4312c6a96876e09487a3dbef486b24c7ff44be3011cbada0ee335af0ea4d64e"
   end
 
   depends_on "pkgconf" => :build
