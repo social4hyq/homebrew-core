@@ -10,7 +10,7 @@ class MemtierBenchmark < Formula
   ]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4658cc17bb2f51b158d71da87c5f44cf1745f458fbb74fb7d58c9e4f3ede5c0e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f0ab31bbd2ab39e5bf9407a3e7852eb0c9e0f5b1d719f637a605d579a26f9986"
   end
 
   depends_on "autoconf" => :build
