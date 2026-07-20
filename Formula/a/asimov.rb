@@ -1,13 +1,13 @@
 class Asimov < Formula
   desc "Automatically exclude development dependencies from Time Machine backups"
   homepage "https://github.com/stevegrunwell/asimov"
-  url "https://github.com/stevegrunwell/asimov/archive/refs/tags/v0.3.0.tar.gz"
-  sha256 "77a0ef09c86d9d6ff146547902c749c43bc054f331a12ecb9992db9673469fab"
+  url "https://github.com/stevegrunwell/asimov/archive/refs/tags/v0.8.0.tar.gz"
+  sha256 "70799e8b9428fd320322cd24b50336890ed58e887a15e13af074a733db6e823b"
   license "MIT"
-  head "https://github.com/stevegrunwell/asimov.git", branch: "develop"
+  head "https://github.com/stevegrunwell/asimov.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "450314be4f4a24f80656aca7bdc2d4fceecad9b532e867138e380dc7079d583e"
+    sha256 cellar: :any_skip_relocation, all: "3b0cc2120e45618002a6af04f32c81a7b6e956cda2ba4cbc20c706585aaca465"
   end
 
   def install
@@ -18,12 +18,10 @@ class Asimov < Formula
   service do
     run opt_bin/"asimov"
     run_type :interval
-    require_root true
     interval 86400 # 24 hours = 60 * 60 * 24
   end
 
   test do
-    assert_match "Finding dependency directories with corresponding definition files…",
-                 shell_output(bin/"asimov")
+    assert_match "No new directories to exclude", shell_output(bin/"asimov")
   end
 end
