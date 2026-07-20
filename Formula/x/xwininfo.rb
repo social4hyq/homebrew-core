@@ -6,7 +6,7 @@ class Xwininfo < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "491496df7bc62969919d1e69a2ed7deec782a7134debf1c2e5c35bd2356795b3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eeadd8c6b7a4885e5469e69d1684cd4c2f63af273b763ee183fcac4aa1560701"
   end
 
   depends_on "pkgconf" => :build
