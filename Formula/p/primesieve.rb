@@ -6,7 +6,7 @@ class Primesieve < Formula
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7688fbf63f3a665314c01132771deb50f2e45456ad388ad36dd4cd90533615f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fdeef2f0831d6ee3949a7feada40c2cf5792c359a0468c6cc396396fd329e287"
   end
 
   depends_on "cmake" => :build
