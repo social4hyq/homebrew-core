@@ -5,17 +5,12 @@ class CiSmokeTest2 < Formula
   # install() never reads from the checkout, this only satisfies Homebrew's
   # url/resource requirement.
   url "https://atomgit.com/social4hyq/homebrew-core.git",
-      revision: "d85ed77f4c4523bdc8d4fd5d23c3ac3ff41f2459"
-  version "0.1.0"
+      revision: "8d3eef4e89cd872df39e3c263593a16259a36df1"
+  version "0.2.0"
   license "MIT"
 
   livecheck do
     skip "CI smoke-test formula, no upstream"
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ci-smoke-test-2-v0.1.0-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f269b5a005f7cf347cce20591411e9239ec8c3eae20eb05313bc12e831fd597e"
   end
 
   def install
