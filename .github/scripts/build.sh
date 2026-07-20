@@ -11,7 +11,12 @@ source "$(dirname "$0")/lib.sh"
 # first time either formula's automated build path (bottle-build.yml, now
 # reachable via pr-validate.yml's PR-branch build and via manual dispatch)
 # ran without a human remembering to unset it by hand (2026-07-20, PR #35).
-UNSET_SIGN_FORMULAS="codex opencode"
+# claude-code is a runtime-fetch stub (install() only writes a wrapper
+# script, no ELF in the bottle at all — see Formula/c/claude-code.rb) so it
+# has no odie guard and likely doesn't need this; included anyway since
+# it's now autobump-allowlisted too and the unset is a harmless no-op if
+# there's genuinely nothing for binary-sign-tool to touch.
+UNSET_SIGN_FORMULAS="codex opencode claude-code"
 ENV_PREFIX=""
 if tr ' ' '\n' <<< "$UNSET_SIGN_FORMULAS" | grep -qx "$FORMULA"; then
   ENV_PREFIX="env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN "
