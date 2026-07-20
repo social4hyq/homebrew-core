@@ -19,8 +19,6 @@ cexec 'mkdir -p /data/local/tmp /system/bin /system/lib &&
 cexec 'mkdir -p /root/.cargo && printf "[registries.crates-io]\nprotocol = \"sparse\"\n\n[net]\ngit-fetch-with-cli = true\nretry = 3\n" > /root/.cargo/config.toml'
 
 cexec 'brew --version && brew tap'
-# Harmonybrew silently rejects changed formulae (exit 0) without re-trust
-cexec "brew trust $TAP"
 
 # Needed for `brew bump-formula-pr` (autobump.yml): without a brew-installed
 # git, Homebrew's superenv git shim falls into a `whence -a git` fallback
@@ -76,3 +74,20 @@ docker exec "$CONTAINER" bash -lc \
 docker exec "$CONTAINER" bash -lc \
   "cd $TAP_IN_CONTAINER && git config --unset-all http.https://github.com/.extraheader" \
   || true
+
+# Harmonybrew silently rejects changed formulae (exit 0) without re-trust.
+# MUST run last, after every git-config fix above: `brew trust` persists the
+# tap's *current* Tap#reference (which for a custom (non-atomgit) remote IS
+# tap.remote, i.e. GitRepository#origin_url — the exact call the
+# safe.directory/GIT_CONFIG_GLOBAL dance above fixes). Trusting before that
+# fix landed stored a stale fallback reference (name-based, computed while
+# tap.remote still resolved nil), which the code path for any formula NOT
+# named literally on the command line (Trust.explicitly_allowed? checks
+# ARGV — dependencies loaded transitively never appear there) then failed to
+# match against the tap's now-correctly-resolved custom-remote identity:
+# "Refusing to load formula ... from untrusted tap" for codex's dependency
+# ohos-bst-light, even though codex itself (named directly in `brew install
+# codex`) loaded fine. Confirmed 2026-07-20 via PR #35: reordering this to
+# run after the git fixes resolves it — pure ordering bug, not a new
+# mechanism.
+cexec "brew trust $TAP"
