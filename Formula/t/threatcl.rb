@@ -1,13 +1,13 @@
 class Threatcl < Formula
   desc "Documenting your Threat Models with HCL"
   homepage "https://github.com/threatcl/threatcl"
-  url "https://github.com/threatcl/threatcl/archive/refs/tags/v0.6.2.tar.gz"
-  sha256 "d59afe8cae1c8152203a79bb2749be6aaf8011f889f22d664374409cb30a7dfe"
+  url "https://github.com/threatcl/threatcl/archive/refs/tags/v0.6.3.tar.gz"
+  sha256 "c921cfceec54d68bff0824cbe7e88ed1a791d4cdca26dcf83e326ff97a6e49b9"
   license "MIT"
   head "https://github.com/threatcl/threatcl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f511077168ce3af8ee0cc5014b1da8b035a4b72ca848bbb1bec2f0c5d7aeec0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "25b629a8985c68cca3cdcb539eb3151965b8d8b6e9b81b4b1a927590ebaed572"
   end
 
   depends_on "go" => :build
