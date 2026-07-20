@@ -6,7 +6,7 @@ class PhpantomLsp < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "53d0da55411c781e87887220ed2998926b85e6f6a22d99a27c66406b4c46414b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6853a56ea5cefcf8a4ebe053aa3b10a6ba8d39de3d4f7534c3cf1ff42ae2597b"
   end
 
   depends_on "rust" => :build
