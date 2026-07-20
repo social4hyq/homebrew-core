@@ -7,7 +7,7 @@ class Litmusctl < Formula
   head "https://github.com/litmuschaos/litmusctl.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5193665d42c0e2d07bb82508f557d1ed48ffaf67b22bf17cbfb4f4ef9101d64"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4902b9d6612eae21a4c43c0bfdb886394a2cb2d4b91a6d1a4b88251fd4d4f1f0"
   end
 
   depends_on "go" => :build
