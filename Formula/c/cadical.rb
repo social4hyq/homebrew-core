@@ -11,7 +11,7 @@ class Cadical < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "975ec4acc06d1e139c15f9dadcf7a447454a7e1a0587e8a19c3b67c5dad8a401"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc9f77aac90ebeb3050ef1420c24b04fdcfcde6d0d29fd1fbd7abc1a22a00523"
   end
 
   def install
