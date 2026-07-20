@@ -14,9 +14,15 @@ FILENAME=$(basename "$BOTTLE")
 
 # 1. get-or-create release (atomgit returns no release id; keyed by tag)
 # TODO(M3): a flaky GET falls through to POST and hits a confusing 409
+# target_commitish is always "main", never $PUSH_REF: atomgit only mirrors
+# GitHub main (sync-to-atomgit.yml), so a PR branch that hasn't merged yet
+# doesn't exist as a ref on atomgit at all — pointing target_commitish at it
+# 400s with "<branch> is not exist" (confirmed 2026-07-20). The release/tag
+# only hosts the uploaded bottle asset (addressed by root_url); it doesn't
+# need to correspond to a real commit on atomgit's side.
 ag "$API/releases/tags/$TAG" \
   || ag -X POST -H "Content-Type: application/json" \
-       -d "{\"tag_name\":\"$TAG\",\"name\":\"$TAG\",\"target_commitish\":\"$PUSH_REF\",\"body\":\"$TAG bottle (CI run $RUN_NUMBER)\"}" \
+       -d "{\"tag_name\":\"$TAG\",\"name\":\"$TAG\",\"target_commitish\":\"main\",\"body\":\"$TAG bottle (CI run $RUN_NUMBER)\"}" \
        "$API/releases"
 
 # 2. tune TCP for the trans-Pacific OBS upload. CUBIC's loss-based window
