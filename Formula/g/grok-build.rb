@@ -1,9 +1,9 @@
 class GrokBuild < Formula
   desc "XAI Grok coding agent CLI — HarmonyOS aarch64 (prebuilt static binary)"
   homepage "https://github.com/xai-org/grok-build"
-  url "https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-0.2.102-linux-aarch64"
-  version "0.2.102"
-  sha256 "7023007a2b541d88b046cbc7e8016a598a8683f79fe6bba14fad6606dfa3d1fc"
+  url "https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-0.2.106-linux-aarch64"
+  version "0.2.106"
+  sha256 "d12be1698d56d4543f1f1095c2c26cd3d17a64e88772629673740991c188e4ff"
   license "Apache-2.0"
   # Official release artifact, fetched directly (no npm wrapper involved).
   # The install.sh at https://x.ai/cli/install.sh resolves the download to
