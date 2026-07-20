@@ -7,7 +7,7 @@ class Kubevpn < Formula
   head "https://github.com/kubenetworks/kubevpn.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5cc091f06bdfa54383e5faf41f05ee1972ebcc79c9de0113f7c0c7336f3d5bf9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a54bc9ca06092576ad68edc2bb02a69a45a678f0167236d08f9e4dd336e5aeec"
   end
 
   depends_on "go" => :build
