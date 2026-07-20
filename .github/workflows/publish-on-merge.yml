@@ -12,6 +12,17 @@ name: publish-on-merge
 # somehow landed without pr-validate.yml's build succeeding). Heavy
 # formulae's bottle publish stays a manual dispatch of bottle-build.yml
 # either way (a 6h build isn't for unattended CI, in a PR or after merge).
+#
+# IMPORTANT — merge strategy: PRs touching Formula/** must merge with a
+# merge commit or rebase merge, never squash. Squash-merge collapses the
+# PR's "content change" and "bottle write-back" commits into one, so
+# detect-changes.sh's before/after diff can no longer tell "bottle-block-
+# only, already published from this branch" apart from "brand new content,
+# needs building" — it sees the whole squashed commit as new and rebuilds
+# for real, producing a redundant bottle release. Confirmed 2026-07-20 via
+# PR #29 (squash-merged by mistake): produced an orphaned -r1 release right
+# behind the -r2 this workflow generated. Squash-merge is now disabled at
+# the repo level for exactly this reason.
 
 on:
   push:
