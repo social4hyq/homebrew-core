@@ -1,13 +1,13 @@
 class Falcoctl < Formula
   desc "CLI tool for working with Falco and its ecosystem components"
   homepage "https://github.com/falcosecurity/falcoctl"
-  url "https://github.com/falcosecurity/falcoctl/archive/refs/tags/v0.12.2.tar.gz"
-  sha256 "05290a97ac6ac886fc4b34d157d533de37d5a1031f81cf4e6eb1f056c4015f49"
+  url "https://github.com/falcosecurity/falcoctl/archive/refs/tags/v0.13.0.tar.gz"
+  sha256 "804a37e6372201ee21d3bc99ffea6079484b557ece0aa17719dbc6e8cb2b5fec"
   license "Apache-2.0"
   head "https://github.com/falcosecurity/falcoctl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5fc39e2dd0331c93cd5bc9e8630958074f2abc756147c746da460beb51235867"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bfb465a55f35acbe970cc41c5c58503d948d64e90e6b6e0f01434216879d52df"
   end
 
   depends_on "go" => :build
@@ -27,9 +27,16 @@ class Falcoctl < Formula
   end
 
   test do
-    system bin/"falcoctl", "tls", "install"
-    assert_path_exists testpath/"ca.crt"
-    assert_path_exists testpath/"client.crt"
+    (testpath/"index.yaml").write <<~YAML
+      - name: test-artifact
+        type: rulesfile
+        registry: ghcr.io
+        repository: falcosecurity/rules/falco-rules
+    YAML
+
+    config = testpath/"falcoctl.yaml"
+    system bin/"falcoctl", "index", "add", "myindex", "file://#{testpath}/index.yaml", "--config", config
+    assert_match "myindex", shell_output("#{bin}/falcoctl index list --config #{config}")
 
     assert_match version.to_s, shell_output("#{bin}/falcoctl version")
   end
