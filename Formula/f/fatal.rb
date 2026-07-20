@@ -1,8 +1,8 @@
 class Fatal < Formula
   desc "Facebook Template Library"
   homepage "https://www.facebook.com/groups/libfatal/"
-  url "https://github.com/facebook/fatal/archive/refs/tags/v2026.07.13.00.tar.gz"
-  sha256 "96e5b3788bc5cdad65305b880fe09919ca3f851d6408e399239c75997c0bdd62"
+  url "https://github.com/facebook/fatal/archive/refs/tags/v2026.07.20.00.tar.gz"
+  sha256 "ad252a949fca1cd6603b8ee03dec45239adf1a2ce7aef4d96dcb747a67b64470"
   license "BSD-3-Clause"
   head "https://github.com/facebook/fatal.git", branch: "main"
 
