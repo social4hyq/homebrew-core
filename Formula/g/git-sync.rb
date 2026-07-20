@@ -7,7 +7,7 @@ class GitSync < Formula
   head "https://github.com/kubernetes/git-sync.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d3fe33f7865e591a62537118bf089868a0abcd617ec37a7cbd8b2200d05024b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "82e578844a54213bdf594490081e8e687a6a5ad7c5b59e3efc595526f556054b"
   end
 
   depends_on "go" => :build
