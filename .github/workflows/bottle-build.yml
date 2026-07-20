@@ -6,13 +6,19 @@ name: bottle-build
 # Manual: Actions → bottle-build → Run workflow
 #   upload=false (default): build + bottle + workflow artifact (no repo changes)
 #   upload=true: upload to atomgit release (tag <formula>-v<ver>-rN), merge the
-#     bottle block back, push GitHub + atomgit main, verify poured_from_bottle
+#     bottle block back, push to push_ref (default main) + atomgit main,
+#     verify poured_from_bottle
 # Also callable via workflow_call:
-#   pr-validate.yml invokes this per changed formula on pull_request (always
-#     upload=false — build + test only, gates the ci-passed label)
+#   pr-validate.yml invokes this per changed formula on pull_request, always
+#     upload=true with push_ref set to the PR's own head branch — the bottle
+#     is built and published DURING review and pushed back onto the PR
+#     branch itself, so by the time a human merges, main already contains a
+#     bottled formula (2026-07-20: replaces the old build-after-merge design,
+#     which had a self-trigger rebuild-loop bug — see detect-changes.sh).
 #   publish-on-merge.yml invokes this per changed formula on push to main
-#     (always upload=true — the PR already passed pr-validate, so a merge
-#     means "ready to publish")
+#     (upload=true, push_ref defaults to main) — now mostly a safety net for
+#     edge cases (e.g. a merge that landed without going through pr-validate)
+#     since the common case already has its bottle from the PR branch.
 #
 # TODO (low priority): M3 release GET||POST 409 race; L2 upload=false
 # artifacts have a fake root-url, never merge them manually.
@@ -29,6 +35,11 @@ on:
         required: true
         type: boolean
         default: false
+      push_ref:
+        description: 'Branch to push the bottle commit to (default: main)'
+        required: false
+        type: string
+        default: 'main'
   workflow_call:
     inputs:
       formula:
@@ -38,6 +49,10 @@ on:
         required: false
         type: boolean
         default: false
+      push_ref:
+        required: false
+        type: string
+        default: 'main'
 
 permissions:
   contents: write
@@ -55,6 +70,7 @@ env:
   # Inputs pass through env (never interpolated into shell) and a whitelist check
   FORMULA: ${{ inputs.formula }}
   UPLOAD: ${{ inputs.upload }}
+  PUSH_REF: ${{ inputs.push_ref }}
   RUN_NUMBER: ${{ github.run_number }}
 
 jobs:
@@ -62,7 +78,15 @@ jobs:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 360
     steps:
+      # pull_request's default checkout ref is the synthetic base+head merge
+      # commit; when we're about to push a bottle commit back (upload=true,
+      # push_ref = the PR's own branch), we need the actual branch tip
+      # instead so the push lands cleanly. Empty string falls back to
+      # actions/checkout's normal per-event default for every other trigger.
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
+          fetch-depth: 0
 
       - name: Validate input
         run: |
@@ -105,8 +129,9 @@ jobs:
         env:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # main requires PRs; GITHUB_TOKEN can't bypass that ruleset, so the
-          # bottle commit pushes with an admin PAT instead (bypass actor).
+          # main requires PRs and GITHUB_TOKEN can't bypass that ruleset, so
+          # every push (main or a PR branch) uses this admin PAT instead —
+          # one code path, no branching on which ref needs which token.
           BOT_PUSH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
           TAG: ${{ steps.bottle.outputs.tag }}
         run: .github/scripts/publish.sh

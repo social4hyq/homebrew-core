@@ -1,7 +1,10 @@
 #!/bin/bash
 # Upload the bottle to the atomgit release $TAG, merge the bottle block back
-# into the formula, and push both remotes.
+# into the formula, and push to $PUSH_REF (default main; a PR's own head
+# branch when called from pr-validate.yml — see bottle-build.yml).
 source "$(dirname "$0")/lib.sh"
+
+: "${PUSH_REF:=main}"
 
 API=https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
 ag() { curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" "$@"; }
@@ -11,6 +14,12 @@ FILENAME=$(basename "$BOTTLE")
 
 # 1. get-or-create release (atomgit returns no release id; keyed by tag)
 # TODO(M3): a flaky GET falls through to POST and hits a confusing 409
+# target_commitish is always "main", never $PUSH_REF: atomgit only mirrors
+# GitHub main (sync-to-atomgit.yml), so a PR branch that hasn't merged yet
+# doesn't exist as a ref on atomgit at all — pointing target_commitish at it
+# 400s with "<branch> is not exist" (confirmed 2026-07-20). The release/tag
+# only hosts the uploaded bottle asset (addressed by root_url); it doesn't
+# need to correspond to a real commit on atomgit's side.
 ag "$API/releases/tags/$TAG" \
   || ag -X POST -H "Content-Type: application/json" \
        -d "{\"tag_name\":\"$TAG\",\"name\":\"$TAG\",\"target_commitish\":\"main\",\"body\":\"$TAG bottle (CI run $RUN_NUMBER)\"}" \
@@ -56,7 +65,7 @@ docker exec -w "$TAP_IN_CONTAINER/bottle-out" "$CONTAINER" bash -lc \
 # brew committed as root in-container; restore ownership before git push
 sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
 
-# 5. push both remotes. Concurrency is per-formula, so parallel uploads of
+# 5. push to $PUSH_REF. Concurrency is per-formula, so parallel uploads of
 #    different formulae can race non-fast-forward: fetch+rebase and retry.
 #    A real rebase conflict aborts via set -e rather than force-pushing.
 git config user.name "github-actions[bot]"
@@ -66,22 +75,25 @@ git diff --cached --quiet || git commit -m "bottle($FORMULA): rebuild bottle $TA
 
 # main requires PRs (ruleset); actions/checkout's ephemeral GITHUB_TOKEN
 # can't bypass that, so drop its extraheader and push with the admin PAT
-# below instead (an explicit bypass actor on the ruleset).
+# below instead (an explicit bypass actor on the ruleset). Unconditional:
+# a PR branch push doesn't strictly need the bypass, but reusing one code
+# path for every $PUSH_REF avoids a second credential branch here.
 git config --unset-all http.https://github.com/.extraheader || true
 GH_PUSH_URL="https://social4hyq:${BOT_PUSH_TOKEN}@github.com/social4hyq/homebrew-core.git"
 for i in 1 2 3; do
-  if git push "$GH_PUSH_URL" HEAD:main; then
+  if git push "$GH_PUSH_URL" "HEAD:$PUSH_REF"; then
     break
   fi
-  [ "$i" = 3 ] && { echo "::error::push origin failed 3 times; atomgit release $TAG already uploaded, verify the bottle merge manually"; exit 1; }
-  echo "::warning::push origin rejected (concurrent upload?), fetch+rebase retry ($i/3)"
-  git fetch origin main
-  git rebase origin/main
+  [ "$i" = 3 ] && { echo "::error::push to $PUSH_REF failed 3 times; atomgit release $TAG already uploaded, verify the bottle merge manually"; exit 1; }
+  echo "::warning::push to $PUSH_REF rejected (concurrent update?), fetch+rebase retry ($i/3)"
+  git fetch origin "$PUSH_REF"
+  git rebase "origin/$PUSH_REF"
   sleep 5
 done
-# atomgit main is now synced by the sync-to-atomgit workflow (triggered by this
-# GitHub push), which hard-fails visibly instead of the old warning-only push
-# here. No separate atomgit push in publish.sh anymore.
+# atomgit main is kept in sync by the sync-to-atomgit workflow, triggered by
+# pushes to GitHub main — it hard-fails visibly instead of a silent warning.
+# A PR-branch push here isn't main, so it doesn't trigger that sync; atomgit
+# picks up the bottle once the PR merges to main like any other change.
 
 # 6. GitHub release mirror copy, best-effort (atomgit stays the primary:
 #    every root_url points there; this is disaster-recovery / future-switch
