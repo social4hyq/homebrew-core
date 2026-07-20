@@ -1,5 +1,5 @@
 class CiSmokeTest < Formula
-  desc "No-op formula that exists only to exercise pr-validate/publish-on-merge end-to-end; safe to delete once CI is confirmed"
+  desc "No-op formula to smoke-test the pr-validate/publish-on-merge CI"
   homepage "https://atomgit.com/social4hyq/homebrew-core"
   # No dedicated upstream repo, same pattern as dlopen-sign-shim/inject-runpath:
   # install() never reads from the checkout, this only satisfies Homebrew's
