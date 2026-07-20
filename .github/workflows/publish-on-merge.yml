@@ -1,8 +1,12 @@
-name: auto-validate
+name: publish-on-merge
 
-# Auto-validation on push to main: changed formulae get a source build +
-# brew test via bottle-build (artifact only, nothing published). Heavy
-# formulae get light checks only. Publishing stays manual (upload=true).
+# Publish on merge to main: changed formulae already passed pr-validate.yml
+# (source build + brew test) before the PR was allowed to merge, so a push
+# to main here means "ready to publish" — build the bottle, upload it to
+# atomgit, and write the bottle block back (upload=true). Heavy formulae
+# still get light checks only; their bottle publish stays a manual dispatch
+# of bottle-build.yml (same conservative gate as before this workflow
+# existed — a 6h build isn't something to fire unattended on every merge).
 
 on:
   push:
@@ -13,8 +17,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: auto-validate-${{ github.ref }}
-  cancel-in-progress: true
+  group: publish-on-merge-${{ github.ref }}
+  cancel-in-progress: false
 
 env:
   # Space-separated; heavy formulae are light-checked but not auto-built
@@ -64,7 +68,7 @@ jobs:
 
   build:
     # bottle-build declares contents:write, and a called workflow may not
-    # exceed the caller's permissions; upload=false never actually writes
+    # exceed the caller's permissions
     permissions:
       contents: write
     needs: [detect, light-check]
@@ -77,5 +81,5 @@ jobs:
     uses: ./.github/workflows/bottle-build.yml
     with:
       formula: ${{ matrix.formula }}
-      upload: false
+      upload: true
     secrets: inherit
