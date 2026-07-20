@@ -34,13 +34,20 @@ class ClaudeCode < Formula
   # have eval'd.
 
   livecheck do
-    url "https://www.npmjs.com/package/@anthropic-ai/claude-code-linux-arm64-musl"
+    # www.npmjs.com (the package *website*, not the registry API) 403s from
+    # this environment — confirmed 2026-07-20, different host from the
+    # registry.npmjs.org SIGILL issue described above (that one only bites
+    # on the ~120MB tarball GET; this small registry API JSON response is
+    # unaffected — confirmed reachable from the build container). Matches
+    # codex.rb's already-working livecheck pattern.
+    url "https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64-musl/latest"
     regex(/"version":\s*"(\d+(?:\.\d+)+)"/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.215-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "384ac5811a44350b4f7dcbd45b70cc32621e7b70655747a04921c0514a7fa206"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.215-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ff955d9027a6e791fd2537699e57977777c22bfe874f9e4959e8fa7985f8f7ab"
   end
 
   depends_on "ohos-bst-light"
