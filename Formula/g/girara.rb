@@ -11,7 +11,7 @@ class Girara < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "01720402d8afafc396eba206804c796c5740eb4300de6488c574c0c91b2c6921"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "563860d37cef9a164b1c99243cf20a65811ae0b1c089db88dfe7a6316da2d5ae"
   end
 
   depends_on "meson" => :build
