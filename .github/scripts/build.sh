@@ -2,9 +2,24 @@
 # Source-build $FORMULA and verify the keg actually installed.
 source "$(dirname "$0")/lib.sh"
 
+# The ci-runner image bakes HOMEBREW_OHOS_BOTTLE_BINARY_SIGN=1 by default
+# (most formulas want their poured binaries auto-signed), but codex and
+# opencode ship prebuilt binaries that segfault under that auto-sign pass
+# (binary-sign-tool corrupts their ELF layout) — both formulas guard
+# against this themselves with an odie in install() (see Formula/c/codex.rb,
+# Formula/o/opencode.rb), which is exactly what surfaced here: this is the
+# first time either formula's automated build path (bottle-build.yml, now
+# reachable via pr-validate.yml's PR-branch build and via manual dispatch)
+# ran without a human remembering to unset it by hand (2026-07-20, PR #35).
+UNSET_SIGN_FORMULAS="codex opencode"
+ENV_PREFIX=""
+if tr ' ' '\n' <<< "$UNSET_SIGN_FORMULAS" | grep -qx "$FORMULA"; then
+  ENV_PREFIX="env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN "
+fi
+
 # atomgit CDN has transient 404s: retry once after 90s; brew reuses partial work
 for i in 1 2; do
-  if cbrew "install --build-bottle --verbose $TAP/$FORMULA" 2>&1 | tee build.log; then
+  if cexec "${ENV_PREFIX}${BREW_ENV} brew install --build-bottle --verbose $TAP/$FORMULA" 2>&1 | tee build.log; then
     break
   fi
   [ "$i" = 2 ] && exit 1
