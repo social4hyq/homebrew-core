@@ -1,13 +1,13 @@
 class Difi < Formula
   desc "Pixel-perfect terminal diff viewer"
   homepage "https://github.com/oug-t/difi"
-  url "https://github.com/oug-t/difi/archive/refs/tags/v0.2.11.tar.gz"
-  sha256 "d0d598e9b13ca0dc9dd93d78a13500c322c6f1e35713dbbba070155f6c1ee393"
+  url "https://github.com/oug-t/difi/archive/refs/tags/v0.2.12.tar.gz"
+  sha256 "4b0b12334d0d11ed4dab5cefd3e8ada5a464b66871e15c9ac67761ea23b81c4a"
   license "MIT"
   head "https://github.com/oug-t/difi.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bec5e59f59d6d1dbdd792b4e5ef4e4f1cfba6e2873b9d0af18ee4ae5ceaed96d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c4e5fa7843fa44f05a7934bdcc32ab5df1457edbebf834f3bda4f5ee904f0384"
   end
 
   depends_on "go" => :build
