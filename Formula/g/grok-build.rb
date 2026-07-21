@@ -23,6 +23,12 @@ class GrokBuild < Formula
   # works via LD_PRELOAD, which cannot intercept anything in a statically
   # linked binary anyway, and `--version`/`--help` run clean without it on
   # the real OHOS container — verified 2026-07-17.
+  #
+  # Like codex/opencode, this must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN
+  # unset — install() below self-signs the binary, and CI's auto-sign pass
+  # re-signing it a second time corrupts the ELF (segfault on --version).
+  # build.sh's UNSET_SIGN_FORMULAS covers this in CI; the odie guard in
+  # install() catches any other build path. Confirmed 2026-07-21 (PR #42).
 
   livecheck do
     url "https://storage.googleapis.com/grok-build-public-artifacts/cli/stable"
@@ -38,6 +44,18 @@ class GrokBuild < Formula
   depends_on "ohos-bst-light" => :build
 
   def install
+    # Guard against the auto-sign pass corrupting this prebuilt binary — same
+    # class of bug as codex/opencode (see their install() for the fuller
+    # writeup): self-signing here, then letting HOMEBREW_OHOS_BOTTLE_BINARY_SIGN
+    # re-sign the same ELF a second time, segfaults it (confirmed 2026-07-21,
+    # PR #42's stuck `brew test` failure — the exact same 0.2.106 artifact ran
+    # clean outside CI with a single self-sign pass).
+    if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
+      odie "grok-build must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
+           "(env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN brew install ...): the " \
+           "binary-sign-tool pass double-signs and corrupts this prebuilt binary"
+    end
+
     src = buildpath/"grok-#{version}-linux-aarch64"
     odie "grok binary not found at #{src}" unless src.exist?
 
