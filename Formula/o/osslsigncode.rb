@@ -6,7 +6,7 @@ class Osslsigncode < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8e73f00c72ad2f6aef87e918d22153f9388c76c98b29d4a8147d323b8e3ebc5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "896b27a5d8b9716729a595bd88df6bcd082964ec7924323a2b849fa0b7b08935"
   end
 
   depends_on "cmake" => :build
