@@ -1,0 +1,32 @@
+name: label-formula-prs
+
+# Tags any PR touching Formula/** with a `formula` label on open, purely for
+# PR-list triage/visibility (distinguishing formula changes from
+# workflow-only or doc-only PRs at a glance). Adapted from
+# Homebrew/homebrew-core's manage-pull-request-labels.yml, but narrowed to
+# just this one label.
+#
+# NOTE: this does NOT replace the "must use merge commit, not squash" rule
+# from the #29 mishap (2026-07-20) — that risk is already closed off at the
+# repo-settings level (allow_squash_merge=false), not by a label a human
+# could ignore. This label is informational only.
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    branches: [main]
+    paths: ['Formula/**']
+
+permissions:
+  pull-requests: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Add formula label
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+        run: gh pr edit "$PR" --add-label formula --repo "${{ github.repository }}"
