@@ -18,7 +18,7 @@ on:
     - cron: '0 22 * * 1' # weekly, Monday 10pm UTC
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 concurrency:
@@ -34,5 +34,5 @@ jobs:
       - name: Find and remove unused patches
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BOT_PUSH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: .github/scripts/remove-unused-patches.sh

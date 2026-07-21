@@ -33,7 +33,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 env:
@@ -52,14 +52,16 @@ jobs:
         run: .github/scripts/setup-container.sh
       - name: Open bump PRs
         env:
-          # Pushes the bump branch. Also used for GH_TOKEN below (not
-          # secrets.GITHUB_TOKEN): this repo has "Allow GitHub Actions to
-          # create pull requests" disabled, so gh pr create with the
-          # ephemeral Actions token 403s with "GitHub Actions is not
-          # permitted to create or approve pull requests" regardless of the
-          # workflow's own permissions: block (confirmed 2026-07-20) — a
-          # personal PAT isn't subject to that repo setting.
-          BOT_PUSH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
-          GH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
+          # 2026-07-21: repo setting "Allow GitHub Actions to create and
+          # approve pull requests" (can_approve_pull_request_reviews) is now
+          # enabled, so the ephemeral Actions token can push the bump branch
+          # and open/label its own PR — no personal PAT needed here anymore
+          # (previously BOT_PUSH_TOKEN; spotted as a gap by comparing PR
+          # authorship against Homebrew/homebrew-core's BrewTestBot-authored
+          # PRs). BOT_PUSH_TOKEN stays reserved for pushing bottle commits
+          # directly to protected main (see publish.sh), which still needs
+          # the ruleset-bypass admin PAT.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ONLY_FORMULA: ${{ inputs.formula }}
         run: .github/scripts/autobump.sh
