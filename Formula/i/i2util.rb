@@ -1,8 +1,8 @@
 class I2util < Formula
   desc "Internet2 utility tools"
   homepage "https://github.com/perfsonar/i2util"
-  url "https://github.com/perfsonar/i2util/archive/refs/tags/v5.2.5.tar.gz"
-  sha256 "7a36fc5d645ee0d2803cddccdfebccb0dc874f809de7172302374c5537a8f289"
+  url "https://github.com/perfsonar/i2util/archive/refs/tags/v5.2.6.tar.gz"
+  sha256 "8e9e15f6ccf7b7c5edd509350de6f7507b3f8121f09d9f9de4439d18e4026ea0"
   license "Apache-2.0"
 
   livecheck do
