@@ -7,7 +7,7 @@ class Dblab < Formula
   head "https://github.com/danvergara/dblab.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1982214c02cf6fd241d58cac39b69402157dc0dac625dd516e7784f035b4114e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fefdc27981ad980f48b677cd778ba93dde382ddc3b71fd75d7b2347e180e30e4"
   end
 
   depends_on "go" => :build
