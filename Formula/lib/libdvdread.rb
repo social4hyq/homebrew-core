@@ -13,7 +13,7 @@ class Libdvdread < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad55931dc1cfa528c278f210f35d47fa9162519b6561e70ec6d13188756d9d7f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab89d9f304ec61918a0ee2f43fdb8e2aa07f5675f0bf6822b99f6c53f0d4c163"
   end
 
   depends_on "meson" => :build
