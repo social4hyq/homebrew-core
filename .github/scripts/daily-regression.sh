@@ -121,14 +121,30 @@ done
   printf '%s' "$TABLE"
 } | tee -a "$GITHUB_STEP_SUMMARY"
 
+TITLE="Daily regression: cascading test failures"
+RUN_URL="${GITHUB_SERVER_URL:-https://github.com}/${GITHUB_REPOSITORY:-social4hyq/homebrew-core}/actions/runs/${GITHUB_RUN_ID:-}"
+EXISTING=$(gh issue list --repo social4hyq/homebrew-core --search "in:title \"$TITLE\"" --state open --json number --jq '.[0].number // empty')
+
 if [ "${#FAILED[@]}" -gt 0 ]; then
-  TITLE="Daily regression: cascading test failures"
-  BODY=$'Auto-updated by daily-regression.yml. Do not edit by hand.\n\n'"Run: ${GITHUB_SERVER_URL:-https://github.com}/${GITHUB_REPOSITORY:-social4hyq/homebrew-core}/actions/runs/${GITHUB_RUN_ID:-}"$'\n\n'"$(printf -- '- %s\n' "${FAILED[@]}")"
-  EXISTING=$(gh issue list --repo social4hyq/homebrew-core --search "in:title \"$TITLE\"" --state open --json number --jq '.[0].number // empty')
+  BODY=$'Auto-updated by daily-regression.yml. Do not edit by hand.\n\n'"Run: $RUN_URL"$'\n\n'"$(printf -- '- %s\n' "${FAILED[@]}")"
   if [ -n "$EXISTING" ]; then
     gh issue comment "$EXISTING" --repo social4hyq/homebrew-core --body "$BODY"
   else
     gh issue create --repo social4hyq/homebrew-core --title "$TITLE" --body "$BODY"
   fi
   exit 1
+fi
+
+# Green run: close the tracking issue if one is open. Without this, a
+# transient failure (2026-07-20: codex's ripgrep dep 404'd on the upstream
+# harmonybrew.atomgit.com bottle CDN, issue #46) leaves the issue open
+# forever after things recover. Caveat stated in the closing comment: the
+# test set is last-24h-touched + dependents, so a green run means "no
+# current failures", not necessarily a re-test of the formula that failed —
+# a real recurrence just opens a fresh issue on the next failing run.
+if [ -n "$EXISTING" ]; then
+  gh issue close "$EXISTING" --repo social4hyq/homebrew-core --comment \
+    "Auto-closing on green run: $RUN_URL
+
+Note: the test set is last-24h-touched formulae + dependents, so this means \"no current failures\" — not necessarily a re-test of the formula that originally failed. A recurrence will open a fresh issue."
 fi
