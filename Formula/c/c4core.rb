@@ -1,8 +1,8 @@
 class C4core < Formula
   desc "C++ utilities"
   homepage "https://github.com/biojppm/c4core"
-  url "https://github.com/biojppm/c4core/releases/download/v0.5.0/c4core-0.5.0-src.tgz"
-  sha256 "ef017202e7c00ebf6cd4d20c767706e3a32d1f41daf58955888e27230e9940ba"
+  url "https://github.com/biojppm/c4core/releases/download/v0.6.0/c4core-0.6.0-src.tgz"
+  sha256 "fd0a3e2c39a5985c6699e306ead71e8a73a6ada2577c905734a2a6ba0a61c1b7"
   license all_of: ["MIT", "BSL-1.0"]
 
   bottle do
