@@ -12,7 +12,7 @@ class SentryCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2170bb1101f4654a2846f87fd31b481dae2add03ec493d9067569449710bed7a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11e577b6b749e4884b15caa618a9e4bddbca2209724134c49e9c40d4131e7903"
   end
 
   depends_on "pkgconf" => :build
