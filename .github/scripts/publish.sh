@@ -5,6 +5,7 @@
 source "$(dirname "$0")/lib.sh"
 
 : "${PUSH_REF:=main}"
+: "${REASON:=}"
 
 API=https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
 ag() { curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" "$@"; }
@@ -20,9 +21,12 @@ FILENAME=$(basename "$BOTTLE")
 # 400s with "<branch> is not exist" (confirmed 2026-07-20). The release/tag
 # only hosts the uploaded bottle asset (addressed by root_url); it doesn't
 # need to correspond to a real commit on atomgit's side.
+BODY="$TAG bottle (CI run $RUN_NUMBER)"
+[ -n "$REASON" ] && BODY="$BODY — $REASON"
 ag "$API/releases/tags/$TAG" \
   || ag -X POST -H "Content-Type: application/json" \
-       -d "{\"tag_name\":\"$TAG\",\"name\":\"$TAG\",\"target_commitish\":\"main\",\"body\":\"$TAG bottle (CI run $RUN_NUMBER)\"}" \
+       -d "$(jq -n --arg tag "$TAG" --arg body "$BODY" \
+             '{tag_name: $tag, name: $tag, target_commitish: "main", body: $body}')" \
        "$API/releases"
 
 # 2. tune TCP for the trans-Pacific OBS upload. CUBIC's loss-based window
@@ -71,7 +75,11 @@ sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
 git config user.name "github-actions[bot]"
 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git add Formula/
-git diff --cached --quiet || git commit -m "bottle($FORMULA): rebuild bottle $TAG"
+COMMIT_MSG="bottle($FORMULA): rebuild bottle $TAG"
+[ -n "$REASON" ] && COMMIT_MSG="$COMMIT_MSG
+
+$REASON"
+git diff --cached --quiet || git commit -m "$COMMIT_MSG"
 
 # main requires PRs (ruleset); actions/checkout's ephemeral GITHUB_TOKEN
 # can't bypass that, so drop its extraheader and push with the admin PAT

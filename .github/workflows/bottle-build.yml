@@ -8,6 +8,10 @@ name: bottle-build
 #   upload=true: upload to atomgit release (tag <formula>-v<ver>-rN), merge the
 #     bottle block back, push to push_ref (default main) + atomgit main,
 #     verify poured_from_bottle
+#   reason (optional): freeform note for a rebottle-only run (no version
+#     bump — bottle.sh's -rN auto-increment already handles that case, this
+#     just records *why*). Lands in the atomgit release body + commit
+#     message body. Not required for a normal version-bump build.
 # Also callable via workflow_call:
 #   pr-validate.yml invokes this per changed formula on pull_request, always
 #     upload=true with push_ref set to the PR's own head branch — the bottle
@@ -40,6 +44,11 @@ on:
         required: false
         type: string
         default: 'main'
+      reason:
+        description: 'Why (optional, e.g. "rebottle: runner image bump" — recorded in the atomgit release body + commit message, borrowed from upstream homebrew-core''s dispatch-rebottle.yml audit trail)'
+        required: false
+        type: string
+        default: ''
   workflow_call:
     inputs:
       formula:
@@ -53,6 +62,10 @@ on:
         required: false
         type: string
         default: 'main'
+      reason:
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: write
@@ -134,6 +147,7 @@ jobs:
           # one code path, no branching on which ref needs which token.
           BOT_PUSH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
           TAG: ${{ steps.bottle.outputs.tag }}
+          REASON: ${{ inputs.reason }}
         run: .github/scripts/publish.sh
 
       - name: Verify poured bottle
