@@ -36,6 +36,7 @@ jobs:
       github.event.label.name == 'ci-passed' &&
       contains(github.event.pull_request.labels.*.name, 'bump-formula-pr') &&
       (startsWith(github.event.pull_request.head.ref, 'bump-codex-') ||
+       startsWith(github.event.pull_request.head.ref, 'bump-opencode-') ||
        startsWith(github.event.pull_request.head.ref, 'bump-grok-build-') ||
        startsWith(github.event.pull_request.head.ref, 'bump-claude-code-'))
     runs-on: ubuntu-latest
