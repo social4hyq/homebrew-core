@@ -11,7 +11,7 @@ class Goaccess < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "96979f9a60ed6e61d739b61eb1e441a4131a0d581ea4bd0b723ae47b91b50615"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "582187fc9e4f00250afb6066a9fc4e58a0697cfa23a62cf0e69237ef7b85578d"
   end
 
   head do
