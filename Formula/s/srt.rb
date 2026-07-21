@@ -13,7 +13,7 @@ class Srt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d960d48cf0c869c9956e801ad42a09d5841011a83071039491e8e59c40a5e705"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "deb32b40cfd77a85fe189899947a0fda343bd0cbaa620b63adc571e792cb7e03"
   end
 
   depends_on "cmake" => :build
