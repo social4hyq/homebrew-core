@@ -7,7 +7,7 @@ class Ntfy < Formula
   head "https://github.com/binwiederhier/ntfy.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "22759889c794093b0baedad3ec0df38a1c3f5fab30a1f45994c18cbc5c4cfc17"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c4c599608fa542d46eb0e36660925daf4c65f8cc99161083b151d391157d63e9"
   end
 
   depends_on "go" => :build
