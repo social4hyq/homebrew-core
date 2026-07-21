@@ -1,8 +1,8 @@
 class Chezmoi < Formula
   desc "Manage your dotfiles across multiple diverse machines, securely"
   homepage "https://chezmoi.io/"
-  url "https://github.com/twpayne/chezmoi/releases/download/v2.71.0/chezmoi-2.71.0.tar.gz"
-  sha256 "6707ab8a4404fc02dcf610e84247ef23d9187fbcb11423ec67233b7a6d6c8ba4"
+  url "https://github.com/twpayne/chezmoi/releases/download/v2.71.1/chezmoi-2.71.1.tar.gz"
+  sha256 "701dd96e91ca58377cbcc2886b936b0e383df1865aa45172160b2c9329ccade4"
   license "MIT"
   head "https://github.com/twpayne/chezmoi.git", branch: "master"
 
@@ -14,7 +14,7 @@ class Chezmoi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "877460bb668026a1eaa7d5c0469bc7f19c0165840e65cdf5edda69c3aa559f41"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "56cc1206bf7cfee4afae9d0199ca7f60c400272f4f6227cccc96498fe647d3b6"
   end
 
   depends_on "go" => :build
