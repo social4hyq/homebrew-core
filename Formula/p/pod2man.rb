@@ -11,7 +11,7 @@ class Pod2man < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "847726789da9f54024fec7b8398311285d5674532e51df61984f52b21220ab27"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ebd22cc98ab30aea6160574d4258a9b226821975187d39d60225f49eb8a8842c"
   end
 
   keg_only "it conflicts with the pod2man that ships with Perl"
