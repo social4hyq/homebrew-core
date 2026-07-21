@@ -6,7 +6,7 @@ class Neonctl < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f0470eca6d63efec3e2bda96af8291d6322235217a8563da720adce60efc6e79"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cab705db341641ffc5f989c60c9b4a6ac051b1ff1ef786cca2bb4d5be363be06"
   end
 
   depends_on "node"
