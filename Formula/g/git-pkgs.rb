@@ -1,8 +1,8 @@
 class GitPkgs < Formula
   desc "Track package dependencies across git history"
   homepage "https://github.com/git-pkgs/git-pkgs"
-  url "https://github.com/git-pkgs/git-pkgs/archive/refs/tags/v0.17.0.tar.gz"
-  sha256 "3efc1a874c7f4d8db67cace07d46c10e91e8e77571f3e1eb547f17d951c47f80"
+  url "https://github.com/git-pkgs/git-pkgs/archive/refs/tags/v0.18.0.tar.gz"
+  sha256 "13ce4e7319aa6899cf2849ebf317aa99cd1c5a5d770a20198156a2f1be3d9b60"
   license "MIT"
   head "https://github.com/git-pkgs/git-pkgs.git", branch: "main"
 
