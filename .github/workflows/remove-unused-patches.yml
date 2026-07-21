@@ -1,0 +1,39 @@
+name: remove-unused-patches
+
+# Weekly: find files under Patches/ that no Formula/**/*.rb references (by
+# the literal `Patches/<formula>/<file>.patch` string every `patch :p1 do /
+# file "..."` block uses) and open a PR removing them. Borrowed from
+# Homebrew/homebrew-core's workflow of the same name; adapted since we don't
+# have generate-formula-api or the Homebrew/brew container — this just greps
+# Formula/ directly. Never deletes on main directly, mirrors autobump.sh's
+# "bot pushes a branch, gh pr create" shape — a human reviews and merges
+# (bump-formula-pr and ci-passed labels don't apply here since this never
+# touches Formula/**, so it won't trigger pr-validate.yml).
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/remove-unused-patches.yml', '.github/scripts/remove-unused-patches.sh']
+  schedule:
+    - cron: '0 22 * * 1' # weekly, Monday 10pm UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: remove-unused-patches
+  cancel-in-progress: true
+
+jobs:
+  remove-unused-patches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Find and remove unused patches
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: .github/scripts/remove-unused-patches.sh

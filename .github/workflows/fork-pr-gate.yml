@@ -1,0 +1,45 @@
+name: fork-pr-gate
+
+# Fork PRs get a read-only token and no secrets under plain `pull_request` —
+# pr-validate.yml silently can't comment/label/build for them (this tap's
+# PRs have so far all been same-repo branches, so this gap was deferred at
+# design time — see the original plan). `pull_request_target` runs with
+# base-repo permissions regardless of PR source, which is what's needed to
+# give external contributors feedback at all.
+#
+# SECURITY BOUNDARY: this workflow must NEVER check out and RUN fork code
+# with these elevated permissions/secrets. fork-pr-gate.sh only does git
+# metadata inspection (log/diff/diff-tree) and content copying (fetch+push)
+# — nothing from the fork is ever executed. The actual build/test happens
+# later, safely, in the replacement PR's normal same-repo pull_request run
+# via pr-validate.yml. Do not add an `actions/checkout` step with
+# `ref: pull_request.head.sha` to this workflow, and do not run any script
+# from the fork's tree.
+#
+# Idea adapted from Harmonybrew/ci's auto_bottle.py (validate_pr /
+# create_replacement_pr).
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+    branches: [main]
+    paths: ['Formula/**']
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  gate:
+    if: github.event.pull_request.head.repo.fork == true
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Gate fork PR and open replacement
+        env:
+          PR_NUM: ${{ github.event.pull_request.number }}
+          BOT_PUSH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
+        run: .github/scripts/fork-pr-gate.sh

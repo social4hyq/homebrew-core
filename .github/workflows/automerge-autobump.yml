@@ -1,0 +1,49 @@
+name: automerge-autobump
+
+# Auto-merges autobump.yml's own PRs once pr-validate.yml's ci-passed label
+# lands, so the only formulae still needing a manual merge click are the
+# ones autobump doesn't touch. Adapted (much narrower) from
+# Homebrew/homebrew-core's automerge.yml — that one handles arbitrary
+# community PRs with an approval/label/mergeable state machine; this only
+# ever looks at bot-authored bump PRs, so the gate is just "both labels
+# present and the branch name matches the same allowlist autobump.yml uses"
+# (keep ALLOWLIST_PREFIXES in sync with autobump.yml's ALLOWLIST — branch
+# names are `bump-<formula>-<version>`, matched by prefix since formula/
+# version can both contain '-').
+#
+# required_approving_review_count is 0 on this repo's ruleset (solo
+# maintainer, no one else to approve), so `gh pr merge` succeeds without a
+# review step. Uses --merge (merge commit): this repo has squash disabled
+# repo-wide already (2026-07-20, after the #29 squash mishap), so this
+# can't accidentally squash even if that setting ever drifts.
+
+on:
+  pull_request:
+    types: [labeled]
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: automerge-autobump-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    if: |
+      github.event.label.name == 'ci-passed' &&
+      contains(github.event.pull_request.labels.*.name, 'bump-formula-pr') &&
+      (startsWith(github.event.pull_request.head.ref, 'bump-codex-') ||
+       startsWith(github.event.pull_request.head.ref, 'bump-opencode-') ||
+       startsWith(github.event.pull_request.head.ref, 'bump-grok-build-') ||
+       startsWith(github.event.pull_request.head.ref, 'bump-claude-code-'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+        run: gh pr merge "$PR" --merge --repo "${{ github.repository }}"

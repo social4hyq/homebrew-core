@@ -8,13 +8,19 @@ name: autobump
 # ALLOWLIST is deliberately narrow and explicit: most formulae in this tap
 # have a custom structure (bun's rN revision, pinned llvm@21/icu4c@78, shims
 # with no upstream at all) that `bump-formula-pr`'s url/sha256 gsub can't
-# rewrite cleanly. claude-code's runtime-fetch-stub install() doesn't matter
-# here — its formula-level url/version/sha256 shape (npmmirror tarball,
-# version embedded in the URL) is a plain, bump-formula-pr-compatible
-# pattern like codex/grok-build. Only add a formula here after confirming
-# `brew bump-formula-pr --dry-run` produces a clean url/sha256 edit for it.
-# version-check.yml keeps reporting the full outdated list (allowlisted or
-# not) for humans deciding what to bump by hand or add here next.
+# rewrite cleanly. claude-code's and opencode's non-trivial install()
+# (signing, RUNPATH injection, bundled shim deps) don't matter here — their
+# formula-level url/version/sha256 shape (npmmirror tarball, version
+# embedded in the URL) is a plain, bump-formula-pr-compatible pattern like
+# codex/grok-build; install() logic is version-independent packaging that a
+# version bump never touches. opencode is the prebuilt-binary formula
+# (Formula/o/opencode.rb) — NOT ohos-opencode, the from-source formula with
+# 5 patches under Patches/ohos-opencode/ that need hand-regenerating from
+# the ohos-opencode dev branch on every bump; that one must stay manual.
+# Only add a formula here after confirming `brew bump-formula-pr --dry-run`
+# produces a clean url/sha256 edit for it. version-check.yml keeps reporting
+# the full outdated list (allowlisted or not) for humans deciding what to
+# bump by hand or add here next.
 
 on:
   schedule:
@@ -27,11 +33,11 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 env:
-  ALLOWLIST: "codex grok-build claude-code"
+  ALLOWLIST: "codex opencode grok-build claude-code"
   IMAGE: ghcr.io/social4hyq/ci-runner@sha256:38e740c8e355b2ccc9f34ba4bcab955a3fbc076278ae4bd3a07ea3707e90bb56 # :latest, 2026-07-19
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
@@ -46,14 +52,16 @@ jobs:
         run: .github/scripts/setup-container.sh
       - name: Open bump PRs
         env:
-          # Pushes the bump branch. Also used for GH_TOKEN below (not
-          # secrets.GITHUB_TOKEN): this repo has "Allow GitHub Actions to
-          # create pull requests" disabled, so gh pr create with the
-          # ephemeral Actions token 403s with "GitHub Actions is not
-          # permitted to create or approve pull requests" regardless of the
-          # workflow's own permissions: block (confirmed 2026-07-20) — a
-          # personal PAT isn't subject to that repo setting.
-          BOT_PUSH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
-          GH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
+          # 2026-07-21: repo setting "Allow GitHub Actions to create and
+          # approve pull requests" (can_approve_pull_request_reviews) is now
+          # enabled, so the ephemeral Actions token can push the bump branch
+          # and open/label its own PR — no personal PAT needed here anymore
+          # (previously BOT_PUSH_TOKEN; spotted as a gap by comparing PR
+          # authorship against Homebrew/homebrew-core's BrewTestBot-authored
+          # PRs). BOT_PUSH_TOKEN stays reserved for pushing bottle commits
+          # directly to protected main (see publish.sh), which still needs
+          # the ruleset-bypass admin PAT.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ONLY_FORMULA: ${{ inputs.formula }}
         run: .github/scripts/autobump.sh

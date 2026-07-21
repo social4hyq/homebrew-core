@@ -16,7 +16,14 @@ source "$(dirname "$0")/lib.sh"
 # has no odie guard and likely doesn't need this; included anyway since
 # it's now autobump-allowlisted too and the unset is a harmless no-op if
 # there's genuinely nothing for binary-sign-tool to touch.
-UNSET_SIGN_FORMULAS="codex opencode claude-code"
+#
+# grok-build hit the exact same corruption 2026-07-20/21 (PR #42, stuck on
+# a `brew test` segfault, exit 139): its install() self-signs the prebuilt
+# static ELF via ohos-bst-light, then the CI-only auto-sign pass re-signed
+# it a second time and broke it — confirmed by re-downloading + self-signing
+# (once) the same 0.2.106 artifact outside CI, which ran clean. Unlike
+# codex/opencode it had no odie guard yet (see Formula/g/grok-build.rb).
+UNSET_SIGN_FORMULAS="codex opencode claude-code grok-build"
 ENV_PREFIX=""
 if tr ' ' '\n' <<< "$UNSET_SIGN_FORMULAS" | grep -qx "$FORMULA"; then
   ENV_PREFIX="env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN "
