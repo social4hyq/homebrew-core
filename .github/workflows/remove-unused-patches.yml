@@ -16,6 +16,7 @@ on:
     paths: ['.github/workflows/remove-unused-patches.yml', '.github/scripts/remove-unused-patches.sh']
   schedule:
     - cron: '0 22 * * 1' # weekly, Monday 10pm UTC
+  workflow_dispatch: {}
 
 permissions:
   contents: write
