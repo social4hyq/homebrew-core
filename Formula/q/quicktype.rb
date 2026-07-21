@@ -1,12 +1,12 @@
 class Quicktype < Formula
   desc "Generate types and converters from JSON, Schema, and GraphQL"
   homepage "https://github.com/glideapps/quicktype"
-  url "https://registry.npmjs.org/quicktype/-/quicktype-25.0.0.tgz"
-  sha256 "f8f72d997b5ba60d02da3c0f49e7c167dc3fbfd86032cd751c9d5fc38a3e624f"
+  url "https://registry.npmjs.org/quicktype/-/quicktype-25.1.0.tgz"
+  sha256 "914fcddc444479a6ee5119fa19dda4e38eaadbb173c9d3acf1dd9b295a8f1670"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "76bf83fb96a83bda49fa70c0564079d4f06ae1a4f055418574c86132278cf368"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b296aab5e7aa9723b7f2485c9d159c6f554b2e08ada4df427a3dd6832c6381b6"
   end
 
   depends_on "node"
