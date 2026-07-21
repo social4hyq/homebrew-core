@@ -6,7 +6,7 @@ class Apktool < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb1d5d21559699fa12338793e3f54f678c9f092ccb40547b4e6c613311835818"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9215810a888f5055410f02497a2a81a62398596384f549da853a86c0d7204ce"
   end
 
   depends_on "openjdk"
