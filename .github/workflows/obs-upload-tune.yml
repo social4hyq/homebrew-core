@@ -99,8 +99,14 @@ jobs:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
         run: |
           FILENAME=control-cubic-${{ github.run_id }}.bin
-          RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-            "$API/releases/$TAG/upload_url?file_name=$FILENAME")
+          RESP=""
+          for attempt in 1 2 3; do
+            RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+              "$API/releases/$TAG/upload_url?file_name=$FILENAME") && break
+            echo "presigned URL fetch attempt $attempt failed, retrying in 5s..." >&2
+            sleep 5
+          done
+          [ -n "$RESP" ] || { echo "failed to get presigned URL after 3 attempts" >&2; exit 1; }
           STATS=$(curl -sf --speed-limit 1024 --speed-time 120 -m 3600 -X PUT "$(echo "$RESP" | jq -r .url)" \
             -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
             -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
@@ -140,8 +146,14 @@ jobs:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
         run: |
           FILENAME=bbr-single-${{ github.run_id }}.bin
-          RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-            "$API/releases/$TAG/upload_url?file_name=$FILENAME")
+          RESP=""
+          for attempt in 1 2 3; do
+            RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+              "$API/releases/$TAG/upload_url?file_name=$FILENAME") && break
+            echo "presigned URL fetch attempt $attempt failed, retrying in 5s..." >&2
+            sleep 5
+          done
+          [ -n "$RESP" ] || { echo "failed to get presigned URL after 3 attempts" >&2; exit 1; }
           STATS=$(curl -sf --tcp-nodelay -H "Expect:" --speed-limit 1024 --speed-time 120 -m 3600 -X PUT "$(echo "$RESP" | jq -r .url)" \
             -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
             -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
@@ -183,8 +195,14 @@ jobs:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
         run: |
           FILENAME=bbr-bigbuf-${{ github.run_id }}.bin
-          RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-            "$API/releases/$TAG/upload_url?file_name=$FILENAME")
+          RESP=""
+          for attempt in 1 2 3; do
+            RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+              "$API/releases/$TAG/upload_url?file_name=$FILENAME") && break
+            echo "presigned URL fetch attempt $attempt failed, retrying in 5s..." >&2
+            sleep 5
+          done
+          [ -n "$RESP" ] || { echo "failed to get presigned URL after 3 attempts" >&2; exit 1; }
           STATS=$(curl -sf --tcp-nodelay -H "Expect:" --speed-limit 1024 --speed-time 120 -m 3600 -X PUT "$(echo "$RESP" | jq -r .url)" \
             -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
             -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
@@ -230,8 +248,14 @@ jobs:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
         run: |
           FILENAME=initcwnd-bump-${{ github.run_id }}.bin
-          RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-            "$API/releases/$TAG/upload_url?file_name=$FILENAME")
+          RESP=""
+          for attempt in 1 2 3; do
+            RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+              "$API/releases/$TAG/upload_url?file_name=$FILENAME") && break
+            echo "presigned URL fetch attempt $attempt failed, retrying in 5s..." >&2
+            sleep 5
+          done
+          [ -n "$RESP" ] || { echo "failed to get presigned URL after 3 attempts" >&2; exit 1; }
           STATS=$(curl -sf --tcp-nodelay -H "Expect:" --speed-limit 1024 --speed-time 120 -m 3600 -X PUT "$(echo "$RESP" | jq -r .url)" \
             -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
             -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
@@ -271,8 +295,14 @@ jobs:
           upload_one() {
             i=$1
             FILENAME="parallel16-${i}-${{ github.run_id }}.bin"
-            RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
-              "$API/releases/$TAG/upload_url?file_name=$FILENAME")
+            RESP=""
+            for attempt in 1 2 3; do
+              RESP=$(curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" \
+                "$API/releases/$TAG/upload_url?file_name=$FILENAME") && break
+              echo "presigned URL fetch attempt $attempt failed (i=$i), retrying in 5s..." >&2
+              sleep 5
+            done
+            [ -n "$RESP" ] || { echo "failed to get presigned URL after 3 attempts (i=$i)" >&2; exit 1; }
             curl -sf --tcp-nodelay -H "Expect:" --speed-limit 1024 --speed-time 120 -m 3600 -X PUT "$(echo "$RESP" | jq -r .url)" \
               -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
               -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
