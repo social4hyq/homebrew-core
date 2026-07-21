@@ -1,0 +1,29 @@
+# Keep GitHub Actions dependencies fresh (borrowed from
+# Homebrew/homebrew-core's dependabot config). All action `uses:` in this
+# tap are pinned to commit SHAs with a version comment — dependabot updates
+# SHA pins too, bumping the SHA and the comment together. Grouped so the
+# weekly result is one PR, not one per action; 7-day cooldown skips
+# just-released versions that might get yanked.
+#
+# Motivation beyond upstream parity: 2026-07-21's CI logs were already
+# showing "Node.js 20 is deprecated... actions/checkout@v4 forced to run on
+# Node.js 24" warnings — floating major tags rot silently without this.
+---
+version: 2
+updates:
+- package-ecosystem: github-actions
+  directories:
+  - "/"
+  schedule:
+    interval: weekly
+    day: friday
+    time: '08:00'
+    timezone: Etc/UTC
+  groups:
+    github-actions:
+      patterns:
+      - "*"
+  allow:
+  - dependency-type: all
+  cooldown:
+    default-days: 7

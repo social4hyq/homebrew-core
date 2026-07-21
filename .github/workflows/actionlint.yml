@@ -17,6 +17,10 @@ on:
   pull_request:
     paths: ['.github/workflows/**']
 
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
 permissions:
   contents: read
 
@@ -29,8 +33,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: reviewdog/action-actionlint@v1
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: reviewdog/action-actionlint@01d2dd67e3525e5a0ce72e8fa38e5a3ab65e2ded # v1.72.1
         with:
           reporter: github-check
           fail_level: error

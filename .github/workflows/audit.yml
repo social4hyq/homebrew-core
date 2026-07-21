@@ -7,6 +7,14 @@ name: audit
 on:
   workflow_dispatch:
 
+concurrency:
+  group: audit
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
 permissions:
   contents: read
 
@@ -20,7 +28,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: Start OHOS container
         run: .github/scripts/setup-container.sh
       - name: readall + audit (all formulae)

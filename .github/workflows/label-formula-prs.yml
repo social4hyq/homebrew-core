@@ -17,6 +17,14 @@ on:
     branches: [main]
     paths: ['Formula/**']
 
+concurrency:
+  group: label-formula-prs-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
 permissions:
   pull-requests: write
 
