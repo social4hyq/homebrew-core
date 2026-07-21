@@ -16,17 +16,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.3-r1"
-    # `brew bottle` emits `cellar: "<HOMEBREW_CELLAR>"` (not :any_skip_relocation)
-    # for this formula: the RUNPATH injected into the ELF (via the
-    # inject-runpath formula) is an absolute HOMEBREW_PREFIX/opt/... path, and the bottle
-    # auditor flags any absolute-prefix reference in an ELF. We keep
-    # :any_skip_relocation anyway — every baked reference is opt/-relative (no
-    # Cellar path), the opt/<name> symlink is recreated on every pour, and
-    # HOMEBREW_PREFIX is constant across build/target machines — so the bottle
-    # pours identically regardless of the flat/nested HOMEBREW_CELLAR flip.
-    # Verified on the real machine for r5 (1.17.20), 1.18.1, and 1.18.3.
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "68d49e23f3b70282faa3faa1d9703e0230a3569ef2caf6a270e1c6bdaa7f108b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.4-r1"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "e69596130a96979329ec9af6a80d88f25b281a758f50799d5d8b4f6d7aba3c4b"
   end
 
   # r1 fixed a real portability bug (not just the `brew bottle` check below):
