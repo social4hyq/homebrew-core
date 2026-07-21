@@ -2,7 +2,11 @@
 # Find files under Patches/ that no Formula/**/*.rb references by literal
 # path (the only way this tap wires up a patch, see any `patch :p1 do / file
 # "Patches/..."` block) and open a PR removing them. Never deletes directly
-# on main — same "bot pushes a branch, gh pr create" shape as autobump.sh.
+# on main — same "bot pushes a branch, gh pr create" shape as autobump.sh,
+# including using GITHUB_TOKEN (github-actions[bot]) rather than a personal
+# PAT — this only pushes a fresh non-main branch and opens/labels a PR
+# against it, neither of which needs the ruleset-bypass admin PAT that
+# pushing bottle commits directly to main requires.
 set -euo pipefail
 
 UNUSED=()
@@ -25,8 +29,8 @@ for f in "${UNUSED[@]}"; do
   echo "- \`$f\`" >> "$GITHUB_STEP_SUMMARY"
 done
 
-git config user.name "social4hyq-bot"
-git config user.email "social4hyq@users.noreply.github.com"
+git config user.name "github-actions[bot]"
+git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
 # Stable branch name (not per-run, unlike RUN_ID) so a later run with the
 # same or a shrunk/grown finding set updates the existing PR instead of
@@ -47,7 +51,7 @@ git commit -q -m "chore: remove unused patch(es)
 
 $(printf '%s\n' "${UNUSED[@]}" | sed 's/^/- /')"
 
-git push -qf "https://social4hyq:${BOT_PUSH_TOKEN}@github.com/social4hyq/homebrew-core.git" "$BRANCH" \
+git push -qf "https://x-access-token:${GITHUB_TOKEN}@github.com/social4hyq/homebrew-core.git" "$BRANCH" \
   || { echo "::error::failed to push $BRANCH"; exit 1; }
 
 EXISTING=$(gh pr list --repo social4hyq/homebrew-core --head "$BRANCH" --state open --json url --jq '.[0].url // empty')

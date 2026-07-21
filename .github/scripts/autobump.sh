@@ -11,10 +11,20 @@
 # last step even on a fully successful run — expected, not an error. The
 # branch it already pushed to GitHub is what we actually care about; this
 # script opens the real GitHub PR itself once that branch exists.
+#
+# Uses GITHUB_TOKEN (github-actions[bot]), not a personal PAT: this only
+# ever pushes a fresh bump-<formula>-<version> branch and opens/labels a PR
+# against it, neither of which needs the ruleset-bypass admin PAT that
+# pushing bottle commits directly to protected main requires (see
+# publish.sh). Needs repo setting "Allow GitHub Actions to create and
+# approve pull requests" (can_approve_pull_request_reviews) enabled —
+# flipped on 2026-07-21, previously this whole script ran as social4hyq's
+# personal account instead of a bot identity (spotted by comparing PR
+# authorship against Homebrew/homebrew-core's BrewTestBot-authored PRs).
 source "$(dirname "$0")/lib.sh"
 
 : "${ALLOWLIST:?ALLOWLIST env var required (space-separated formula names)}"
-: "${BOT_PUSH_TOKEN:?BOT_PUSH_TOKEN env var required}"
+: "${GITHUB_TOKEN:?GITHUB_TOKEN env var required}"
 
 JSON=$(cbrew "livecheck --tap $TAP --json --newer-only") \
   || { echo "::error::brew livecheck failed"; exit 1; }
@@ -36,16 +46,17 @@ if [ "${#CANDIDATES[@]}" -eq 0 ]; then
   exit 0
 fi
 
-# setup-container.sh drops actions/checkout's ephemeral extraheader (it
-# authenticates as github-actions[bot], which can't push here — 403), but
-# bump-formula-pr's own `git push` doesn't inject HOMEBREW_GITHUB_API_TOKEN
-# into git's credentials itself; without a replacement it fails outright
-# ("could not read Username", confirmed 2026-07-20). Rewrite every
-# https://github.com/ URL to embed BOT_PUSH_TOKEN so any git push bump-
-# formula-pr constructs picks it up transparently, regardless of the exact
-# URL shape it builds.
+# setup-container.sh drops actions/checkout's ephemeral extraheader (its
+# credential helper config doesn't propagate into the container's separate
+# environment), but bump-formula-pr's own `git push` doesn't inject
+# HOMEBREW_GITHUB_API_TOKEN into git's credentials itself; without a
+# replacement it fails outright ("could not read Username", confirmed
+# 2026-07-20). Rewrite every https://github.com/ URL to embed GITHUB_TOKEN
+# (x-access-token is the standard username for the Actions token, same as
+# actions/checkout uses) so any git push bump-formula-pr constructs picks
+# it up transparently, regardless of the exact URL shape it builds.
 docker exec "$CONTAINER" bash -lc \
-  "git config --global url.\"https://social4hyq:${BOT_PUSH_TOKEN}@github.com/\".insteadOf \"https://github.com/\""
+  "git config --global url.\"https://x-access-token:${GITHUB_TOKEN}@github.com/\".insteadOf \"https://github.com/\""
 
 for line in "${CANDIDATES[@]}"; do
   FORMULA=$(cut -f1 <<< "$line")
@@ -57,7 +68,7 @@ for line in "${CANDIDATES[@]}"; do
   # fail this one formula fast, not silently burn the whole job's 30min
   # budget (happened during 2026-07-20 debugging of the remote-repository
   # issue this script used to hit)
-  OUT=$(timeout 300 docker exec -e HOMEBREW_GITHUB_API_TOKEN="$BOT_PUSH_TOKEN" "$CONTAINER" bash -lc \
+  OUT=$(timeout 300 docker exec -e HOMEBREW_GITHUB_API_TOKEN="$GITHUB_TOKEN" "$CONTAINER" bash -lc \
     "$BREW_ENV brew bump-formula-pr --no-audit --no-browse --no-fork --version=$LATEST $TAP/$FORMULA" 2>&1)
   STATUS=$?
   set -e
@@ -69,7 +80,7 @@ for line in "${CANDIDATES[@]}"; do
   BRANCH="bump-${FORMULA}-${LATEST}"
 
   if ! git ls-remote --exit-code --heads \
-       "https://social4hyq:${BOT_PUSH_TOKEN}@github.com/social4hyq/homebrew-core.git" "$BRANCH" \
+       "https://x-access-token:${GITHUB_TOKEN}@github.com/social4hyq/homebrew-core.git" "$BRANCH" \
        > /dev/null 2>&1; then
     echo "::warning::$FORMULA bump-formula-pr didn't push $BRANCH — a real failure (audit/fetch/checksum), see log above"
     echo "- ⚠️ $FORMULA $LATEST: no branch pushed, see job log" >> "$GITHUB_STEP_SUMMARY"
