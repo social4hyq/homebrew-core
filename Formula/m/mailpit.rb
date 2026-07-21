@@ -1,12 +1,12 @@
 class Mailpit < Formula
   desc "Web and API based SMTP testing"
   homepage "https://mailpit.axllent.org/"
-  url "https://github.com/axllent/mailpit/archive/refs/tags/v1.30.4.tar.gz"
-  sha256 "671f82ddaea0d74fdcb289b1f25ffbf506aebb7de35e596328a24c304a1d3194"
+  url "https://github.com/axllent/mailpit/archive/refs/tags/v1.30.5.tar.gz"
+  sha256 "0a115f7b378f73cf6bc1af14f5c4afd4510eda31aac531f15a4fec26d11a6bb9"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec16aec21d91f1635bcee33850123225dbda347e29e6d1e5ea37dbae31ad302b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e37155d520863b0f4ad716a06546df71d9951067c3b5198e8207137e69449a0"
   end
 
   depends_on "go" => :build
