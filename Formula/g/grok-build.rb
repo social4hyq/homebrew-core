@@ -23,6 +23,12 @@ class GrokBuild < Formula
   # works via LD_PRELOAD, which cannot intercept anything in a statically
   # linked binary anyway, and `--version`/`--help` run clean without it on
   # the real OHOS container — verified 2026-07-17.
+  #
+  # Like codex/opencode, this must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN
+  # unset — install() below self-signs the binary, and CI's auto-sign pass
+  # re-signing it a second time corrupts the ELF (segfault on --version).
+  # build.sh's UNSET_SIGN_FORMULAS covers this in CI; the odie guard in
+  # install() catches any other build path. Confirmed 2026-07-21 (PR #42).
 
   livecheck do
     url "https://storage.googleapis.com/grok-build-public-artifacts/cli/stable"
@@ -30,14 +36,26 @@ class GrokBuild < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/grok-build-v0.2.102-r1"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "929463671e303925dab8ea75f160be1ca3b7ce81cf77bc7157e56f51d2a4b682"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/grok-build-v0.2.102-r2"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c89db6d7127f41918d325acd9b076343b0aeea8c941b550ce6f2405ee045ae8"
   end
 
   depends_on "ohos-bst-light" => :build
 
   def install
+    # Guard against the auto-sign pass corrupting this prebuilt binary — same
+    # class of bug as codex/opencode (see their install() for the fuller
+    # writeup): self-signing here, then letting HOMEBREW_OHOS_BOTTLE_BINARY_SIGN
+    # re-sign the same ELF a second time, segfaults it (confirmed 2026-07-21,
+    # PR #42's stuck `brew test` failure — the exact same 0.2.106 artifact ran
+    # clean outside CI with a single self-sign pass).
+    if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
+      odie "grok-build must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
+           "(env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN brew install ...): the " \
+           "binary-sign-tool pass double-signs and corrupts this prebuilt binary"
+    end
+
     src = buildpath/"grok-#{version}-linux-aarch64"
     odie "grok binary not found at #{src}" unless src.exist?
 
