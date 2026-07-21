@@ -18,6 +18,10 @@ on:
     - cron: '0 22 * * 1' # weekly, Monday 10pm UTC
   workflow_dispatch: {}
 
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
 permissions:
   contents: write
   pull-requests: write
@@ -28,10 +32,12 @@ concurrency:
 
 jobs:
   remove-unused-patches:
+    # scheduled workflows shouldn't run (and fail on missing secrets) in forks
+    if: github.repository == 'social4hyq/homebrew-core'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: Find and remove unused patches
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

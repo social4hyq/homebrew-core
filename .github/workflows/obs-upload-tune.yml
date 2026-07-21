@@ -57,6 +57,10 @@ concurrency:
   group: obs-upload-tune
   cancel-in-progress: false
 
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
 permissions:
   contents: read
 
@@ -66,6 +70,8 @@ env:
 
 jobs:
   setup:
+    # scheduled workflows shouldn't run (and fail on missing secrets) in forks
+    if: github.repository == 'social4hyq/homebrew-core'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -330,7 +336,7 @@ jobs:
 
   report-and-cleanup:
     needs: [setup, control-cubic, bbr-single, bbr-bigbuf, initcwnd-bump, parallel-16-tuned]
-    if: always()
+    if: always() && needs.setup.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

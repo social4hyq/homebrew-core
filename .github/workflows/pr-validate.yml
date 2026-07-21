@@ -24,6 +24,10 @@ on:
     branches: [main]
     paths: ['Formula/**']
 
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
 permissions:
   contents: read
   pull-requests: write
@@ -55,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
       - name: Lint commit messages
@@ -72,7 +76,7 @@ jobs:
       changed: ${{ steps.diff.outputs.changed }}
       heavy: ${{ steps.diff.outputs.heavy }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
       - name: Detect changed formulae
@@ -90,7 +94,7 @@ jobs:
     env:
       CHANGED_JSON: ${{ needs.detect.outputs.changed }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: Start OHOS container
         run: .github/scripts/setup-container.sh
       - name: readall + audit
@@ -135,7 +139,7 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
       - name: Post upstream diff comment

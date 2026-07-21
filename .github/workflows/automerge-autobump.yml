@@ -2,14 +2,23 @@ name: automerge-autobump
 
 # Auto-merges autobump.yml's own PRs once pr-validate.yml's ci-passed label
 # lands, so the only formulae still needing a manual merge click are the
-# ones autobump doesn't touch. Adapted (much narrower) from
-# Homebrew/homebrew-core's automerge.yml — that one handles arbitrary
-# community PRs with an approval/label/mergeable state machine; this only
-# ever looks at bot-authored bump PRs, so the gate is just "both labels
-# present and the branch name matches the same allowlist autobump.yml uses"
-# (keep ALLOWLIST_PREFIXES in sync with autobump.yml's ALLOWLIST — branch
+# ones autobump doesn't touch. Adapted from Homebrew/homebrew-core's
+# automerge.yml — that one handles arbitrary community PRs with an
+# approval/label/mergeable state machine; this only ever looks at
+# bot-authored bump PRs, so the gate is just "both labels present and the
+# head branch matches the same allowlist autobump.yml uses" (keep the
+# BUMP_BRANCH_RE prefixes in sync with autobump.yml's ALLOWLIST — branch
 # names are `bump-<formula>-<version>`, matched by prefix since formula/
 # version can both contain '-').
+#
+# Two triggers, for the same reason upstream's automerge.yml listens on
+# workflow_run rather than label events (first observed here on PR #42,
+# 2026-07-21): pr-validate applies ci-passed with the ephemeral
+# GITHUB_TOKEN, and events caused by GITHUB_TOKEN never trigger other
+# workflows (GitHub's recursion guard) — so the `labeled` trigger alone is
+# dead for the exact label it gates on. workflow_run on pr-validate's
+# completion is the trigger that actually fires in the normal flow; the
+# `labeled` trigger still works when a human (PAT actor) applies the label.
 #
 # required_approving_review_count is 0 on this repo's ruleset (solo
 # maintainer, no one else to approve), so `gh pr merge` succeeds without a
@@ -21,29 +30,65 @@ on:
   pull_request:
     types: [labeled]
     branches: [main]
+  workflow_run:
+    workflows: [pr-validate]
+    types: [completed]
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
 
 permissions:
   contents: write
   pull-requests: write
 
 concurrency:
-  group: automerge-autobump-${{ github.event.pull_request.number }}
+  # workflow_run events carry no PR number; group per head branch instead,
+  # which is 1:1 with a bump PR in both event shapes.
+  group: automerge-autobump-${{ github.event.pull_request.head.ref || github.event.workflow_run.head_branch }}
   cancel-in-progress: false
 
 jobs:
   merge:
+    # Coarse event-shape gate only — label/branch verification for both
+    # shapes happens in the step below against live PR state, since a
+    # workflow_run payload has no labels and a labeled payload may be stale
+    # by the time we run.
     if: |
-      github.event.label.name == 'ci-passed' &&
-      contains(github.event.pull_request.labels.*.name, 'bump-formula-pr') &&
-      (startsWith(github.event.pull_request.head.ref, 'bump-codex-') ||
-       startsWith(github.event.pull_request.head.ref, 'bump-opencode-') ||
-       startsWith(github.event.pull_request.head.ref, 'bump-grok-build-') ||
-       startsWith(github.event.pull_request.head.ref, 'bump-claude-code-'))
+      github.event_name == 'pull_request' && github.event.label.name == 'ci-passed' ||
+      github.event_name == 'workflow_run' &&
+        github.event.workflow_run.conclusion == 'success' &&
+        startsWith(github.event.workflow_run.head_branch, 'bump-')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Merge
+      - name: Verify labels + allowlist and merge
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR: ${{ github.event.pull_request.number }}
-        run: gh pr merge "$PR" --merge --repo "${{ github.repository }}"
+          # BOT_PUSH_TOKEN, deliberately not GITHUB_TOKEN, for the merge
+          # itself: a GITHUB_TOKEN merge pushes main without triggering
+          # sync-to-atomgit.yml / publish-on-merge.yml (same recursion guard
+          # as above), silently breaking the atomgit mirror invariant.
+          # Upstream merges with a PAT for the identical reason.
+          GH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref || github.event.workflow_run.head_branch }}
+          REPO: ${{ github.repository }}
+        run: |
+          BUMP_BRANCH_RE='^bump-(codex|opencode|grok-build|claude-code)-'
+          if ! grep -qE "$BUMP_BRANCH_RE" <<< "$HEAD_REF"; then
+            echo "head branch $HEAD_REF not in the autobump allowlist, skipping"
+            exit 0
+          fi
+          PR=$(gh pr list --repo "$REPO" --head "$HEAD_REF" --state open --json number --jq '.[0].number // empty')
+          if [ -z "$PR" ]; then
+            echo "no open PR for $HEAD_REF (already merged or closed), skipping"
+            exit 0
+          fi
+          LABELS=$(gh pr view "$PR" --repo "$REPO" --json labels --jq '[.labels[].name] | join(" ")')
+          for required in ci-passed bump-formula-pr; do
+            if ! grep -qw "$required" <<< "$LABELS"; then
+              echo "PR #$PR missing label '$required' (has: $LABELS), skipping"
+              exit 0
+            fi
+          done
+          echo "merging PR #$PR ($HEAD_REF)"
+          gh pr merge "$PR" --merge --repo "$REPO"

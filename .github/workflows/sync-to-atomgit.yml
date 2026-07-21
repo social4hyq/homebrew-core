@@ -14,6 +14,17 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  # Queue, never cancel: each queued run mirrors the then-current main, and
+  # GitHub collapses extra pending runs in the group, so rapid pushes can't
+  # race two parallel ff-pushes against atomgit.
+  group: sync-to-atomgit
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
 permissions:
   contents: read
 
@@ -22,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0 # full history: any lag can fast-forward
       - name: Push main to atomgit
