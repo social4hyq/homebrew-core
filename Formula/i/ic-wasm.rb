@@ -6,7 +6,7 @@ class IcWasm < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d36b17cd359549b803f63d802eeeb55bc51d3c797379415ef73473a01b0862bd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "30d71bfed6c8c77e33a081bbf8a06982128a64d6409a92873c37bee0dc05276a"
   end
 
   depends_on "rust" => :build
