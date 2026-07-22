@@ -1,8 +1,8 @@
 class Scarb < Formula
   desc "Cairo package manager"
   homepage "https://docs.swmansion.com/scarb/"
-  url "https://github.com/software-mansion/scarb/archive/refs/tags/v2.19.3.tar.gz"
-  sha256 "9dc05b091f7a900f09974d09df7391695c0855c20bb6494295d2c6a65aa228ba"
+  url "https://github.com/software-mansion/scarb/archive/refs/tags/v2.19.4.tar.gz"
+  sha256 "cf98cc6a64de0748cf844de765a3eca775c27a4ce970b862eae3edef6714947c"
   license "MIT"
   head "https://github.com/software-mansion/scarb.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Scarb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0baa9dd703d62908060065b0f98f155ab73c2b04d0a6eb7aef20ce9ff6a9c862"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "daffec028d0140f4e988ea6231e4ff400ab0d4b4755f5aa77ac59c9c9d8c8523"
   end
 
   depends_on "rust" => :build
