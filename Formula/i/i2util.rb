@@ -11,7 +11,7 @@ class I2util < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "81cbcef1a5be1410ab5f557c592024ab59379f608d6e1a8577adfe1b5d063a9d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4f9e2d8c5cf230a756b4aef4fa8402eaf550e14bf050c0c98a7f070d0daadb9"
   end
 
   depends_on "autoconf" => :build
