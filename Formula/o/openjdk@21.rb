@@ -1,10 +1,9 @@
 class OpenjdkAT21 < Formula
   desc "Development kit for the Java programming language"
   homepage "https://openjdk.org/"
-  url "https://github.com/openjdk/jdk21u/archive/refs/tags/jdk-21.0.11-ga.tar.gz"
-  sha256 "76b8310966649ea8a6340f92d4f19f6f84e3083b682a514c8f1999c93373385f"
+  url "https://github.com/openjdk/jdk21u/archive/refs/tags/jdk-21.0.12-ga.tar.gz"
+  sha256 "1efd38fa2729d32cdf0ed4c9197c31ee31890ad1b7bff82984992e0c2c67c72b"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
-  revision 1
   compatibility_version 1
 
   livecheck do
@@ -13,7 +12,7 @@ class OpenjdkAT21 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c54c151cbc7c3d664262e6ef89f78e970e9d8236262c4bc3e1bf1a8c61a423a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3116b7ec981f5aadc198015cd0163194157b9c2349c89193c09375a1d3ec608"
   end
 
   keg_only :versioned_formula
