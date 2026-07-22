@@ -14,7 +14,7 @@ class Wayland < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "da8e388c2323127b12aa12d1ab32ce26d88f3fdd1d7aa4a98237fb0862c13a51"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "690fed8c618ac641523de013f0c63932585ae3abdfd3c9eece0b2458779cf676"
   end
 
   depends_on "meson" => :build
