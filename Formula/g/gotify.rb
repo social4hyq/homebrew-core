@@ -1,13 +1,13 @@
 class Gotify < Formula
   desc "Command-line interface for pushing messages to gotify/server"
   homepage "https://github.com/gotify/cli"
-  url "https://github.com/gotify/cli/archive/refs/tags/v2.3.2.tar.gz"
-  sha256 "e3b798d89138fdbc355a66d0fc2ca96676591366460f72c8f38b81365bebe5ba"
+  url "https://github.com/gotify/cli/archive/refs/tags/v2.4.0.tar.gz"
+  sha256 "d33622db87549355b8ccc3d4a4e342cfc769fa96c45213e682b53a0971c8c41d"
   license "MIT"
   head "https://github.com/gotify/cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8b66cfd8f291133b2cbd1a888e3a1073541ca5c93e945b157f435b136302a2a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a7792689ff39ccc60f121ee2a27a8ad2c9af15cef4b4dbc495bbaaf7465052b"
   end
 
   depends_on "go" => :build
