@@ -1,8 +1,8 @@
 class Ragel < Formula
   desc "State machine compiler"
   homepage "https://www.colm.net/open-source/ragel/"
-  url "https://www.colm.net/files/ragel/ragel-6.10.tar.gz"
-  sha256 "5f156edb65d20b856d638dd9ee2dfb43285914d9aa2b6ec779dac0270cd56c3f"
+  url "https://www.colm.net/files/ragel/ragel-6.11.tar.gz"
+  sha256 "47653e376554adbb617d2f1da15394b6a163264e2410c2bff3581347a14890e3"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class Ragel < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b812eca5a701e8d371b25c3633074e2bc38a2dc9807c9873b4ec96ef1702bb14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dfb9eb75dce8c71bc5c0203794f1814f5f3e866bd8214dca6761ae655b18392a"
   end
 
   resource "pdf" do
