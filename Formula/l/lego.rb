@@ -12,7 +12,7 @@ class Lego < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "192ce4a95794863ff6d21acfa9d8d4857bf60f4bab12779044da7fcf8d6f68a6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "70255c3e5e28cae37f32bcc1dd1953558eeeb1c7c9eac9eeadb29e89bc9a9f5c"
   end
 
   depends_on "go" => :build
