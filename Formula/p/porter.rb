@@ -12,7 +12,7 @@ class Porter < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b357301505ea56dc239246a3fb4f1f5836908414b9a9878a9e83e1cd9f301d1a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8976c927b72e03c7c8c3c60e4bcae4357960f01949c7f04212f247e96e35e78d"
   end
 
   depends_on "go" => :build
