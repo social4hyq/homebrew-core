@@ -1,0 +1,52 @@
+diff --git a/source_location b/source_location
+new file mode 100644
+index 0000000..8e0b7c3
+--- /dev/null
++++ b/source_location
+@@ -0,0 +1,46 @@
++// Minimal stub for <source_location> (C++20) for OHOS/OpenHarmony.
++// The OHOS SDK Clang 15 libc++ doesn't include this header yet,
++// but Node.js v26 V8 headers require it.
++//
++// This file should be placed in an include path when compiling
++// native Node.js addons with node-gyp on OHOS.
++
++#ifndef _OHOS_STUB_SOURCE_LOCATION
++#define _OHOS_STUB_SOURCE_LOCATION
++
++#include <cstddef>
++
++namespace std {
++
++class source_location {
++public:
++  static constexpr source_location current(
++      const char* file = __builtin_FILE(),
++      const char* func = __builtin_FUNCTION(),
++      int line = __builtin_LINE(),
++      int col = __builtin_COLUMN()) noexcept {
++    return source_location(file, func, line, col);
++  }
++
++  constexpr source_location() noexcept
++      : file_(""), func_(""), line_(0), col_(0) {}
++
++  constexpr const char* function_name() const noexcept { return func_; }
++  constexpr const char* file_name() const noexcept { return file_; }
++  constexpr size_t line() const noexcept { return line_; }
++  constexpr size_t column() const noexcept { return col_; }
++
++private:
++  constexpr source_location(const char* file, const char* func,
++                             int line, int col) noexcept
++      : file_(file), func_(func), line_(line), col_(col) {}
++
++  const char* file_;
++  const char* func_;
++  int line_;
++  int col_;
++};
++
++}  // namespace std
++
++#endif  // _OHOS_STUB_SOURCE_LOCATION
