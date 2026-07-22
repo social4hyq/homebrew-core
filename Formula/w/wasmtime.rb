@@ -16,7 +16,7 @@ class Wasmtime < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8681918ff5b28181a2a84c7eca203123dfb692e7dee02b8b1ca81933c7e42d9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9c97c1a895be704744047cfdde20fd73d2b5955c7416d1ef0025a55093f87d8"
   end
 
   depends_on "cmake" => :build
