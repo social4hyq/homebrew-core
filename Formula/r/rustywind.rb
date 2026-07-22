@@ -1,13 +1,13 @@
 class Rustywind < Formula
   desc "CLI for organizing Tailwind CSS classes"
   homepage "https://github.com/avencera/rustywind"
-  url "https://github.com/avencera/rustywind/archive/refs/tags/v0.25.2.tar.gz"
-  sha256 "ba241018078f91c0760de084c5e54a3ac528bb2c5ec3241081ec7b130f68b645"
+  url "https://github.com/avencera/rustywind/archive/refs/tags/v0.26.0.tar.gz"
+  sha256 "6ff79c08109d2e4b4c48a05a026a0f43977db1b272a9413e440625b7118575d3"
   license "Apache-2.0"
   head "https://github.com/avencera/rustywind.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "65c6a4d092ef2589ed86ab4e24a2c316fc13ca4aadb8648872240fd9ebb25a8c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "354a004f7e606ab66e72fe5b8d5cc410366e9db4193a37bd59e54f09df7e9424"
   end
 
   depends_on "rust" => :build
