@@ -1,9 +1,9 @@
 class Tika < Formula
   desc "Content analysis toolkit"
   homepage "https://tika.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=tika/3.3.1/tika-app-3.3.1.jar"
-  mirror "https://archive.apache.org/dist/tika/3.3.1/tika-app-3.3.1.jar"
-  sha256 "0e8ee9795ac4244feab466f4a5a9c3b94675af392848243842cb6e1e69d27103"
+  url "https://www.apache.org/dyn/closer.lua?path=tika/3.3.2/tika-app-3.3.2.jar"
+  mirror "https://archive.apache.org/dist/tika/3.3.2/tika-app-3.3.2.jar"
+  sha256 "71ca551380e5eab1add99101f4597a8a49a6a18c6143d6874ee9599ca10ae00e"
   license "Apache-2.0"
 
   bottle do
@@ -13,9 +13,9 @@ class Tika < Formula
   depends_on "openjdk"
 
   resource "server" do
-    url "https://www.apache.org/dyn/closer.lua?path=tika/3.3.1/tika-server-standard-3.3.1.jar"
-    mirror "https://archive.apache.org/dist/tika/3.3.1/tika-server-standard-3.3.1.jar"
-    sha256 "755d252de43a1995151db3a25c825332d2f27371272c41459bb5b78e21b028bd"
+    url "https://www.apache.org/dyn/closer.lua?path=tika/3.3.2/tika-server-standard-3.3.2.jar"
+    mirror "https://archive.apache.org/dist/tika/3.3.2/tika-server-standard-3.3.2.jar"
+    sha256 "cdbe7fde72583dec8528f9c0ed962cacb7f6624f9900b1f733df638410f77540"
 
     livecheck do
       formula :parent
