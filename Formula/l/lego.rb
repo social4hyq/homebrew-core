@@ -1,8 +1,8 @@
 class Lego < Formula
   desc "Let's Encrypt client and ACME library"
   homepage "https://go-acme.github.io/lego/"
-  url "https://github.com/go-acme/lego/archive/refs/tags/v5.2.2.tar.gz"
-  sha256 "8d8d51415e39a4d5377b6a8448b915d820f67caa148aa828d0f682744f872cc6"
+  url "https://github.com/go-acme/lego/archive/refs/tags/v5.3.1.tar.gz"
+  sha256 "4692d2481042349c758eb0f7ee04904c4e1c26afc145e25b0833a42777c5ee72"
   license "MIT"
   head "https://github.com/go-acme/lego.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Lego < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "192ce4a95794863ff6d21acfa9d8d4857bf60f4bab12779044da7fcf8d6f68a6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "70255c3e5e28cae37f32bcc1dd1953558eeeb1c7c9eac9eeadb29e89bc9a9f5c"
   end
 
   depends_on "go" => :build
