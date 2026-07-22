@@ -1,8 +1,8 @@
 class Juju < Formula
   desc "DevOps management tool"
   homepage "https://canonical.com/juju"
-  url "https://github.com/juju/juju/archive/refs/tags/v4.0.12.tar.gz"
-  sha256 "17ac67d184824c3f1fef6b0a7965cff7157bf57a5c25ed7d906fe800c74db0c6"
+  url "https://github.com/juju/juju/archive/refs/tags/v4.0.13.tar.gz"
+  sha256 "ea78f6f111f48c1429a2cd415a1867e07318581697ccefe9b525e462637271b4"
   license "AGPL-3.0-only"
   version_scheme 1
   head "https://github.com/juju/juju.git", branch: "main"
