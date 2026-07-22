@@ -13,8 +13,7 @@ class Perl < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "de1f69d4a01becb4f783c984a1ae9bc5e643c6cba912fc4d1471926d06d71b3b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e06d70c041462fc04aedbe489811e0d1f2a5d809d264e1b4ee494830e750a054"
   end
 
   depends_on "gdbm"
