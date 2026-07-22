@@ -1,8 +1,8 @@
 class Perl < Formula
   desc "Highly capable, feature-rich programming language"
   homepage "https://www.perl.org/"
-  url "https://www.cpan.org/src/5.0/perl-5.42.2.tar.xz"
-  sha256 "0a585eeb9e363c0f80482ddb3571625250c2c86aeb408853e8ea50805cfb14bb"
+  url "https://www.cpan.org/src/5.0/perl-5.44.0.tar.xz"
+  sha256 "505cf43912e9480495c344c70260452e32aa2a73c546a026b3f100053b23ce91"
   license any_of: ["Artistic-1.0-Perl", "GPL-1.0-or-later"]
   compatibility_version 1
   head "https://github.com/perl/perl5.git", branch: "blead"
@@ -13,8 +13,7 @@ class Perl < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "de1f69d4a01becb4f783c984a1ae9bc5e643c6cba912fc4d1471926d06d71b3b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e06d70c041462fc04aedbe489811e0d1f2a5d809d264e1b4ee494830e750a054"
   end
 
   depends_on "gdbm"
