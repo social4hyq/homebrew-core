@@ -7,7 +7,7 @@ class Gotify < Formula
   head "https://github.com/gotify/cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8b66cfd8f291133b2cbd1a888e3a1073541ca5c93e945b157f435b136302a2a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a7792689ff39ccc60f121ee2a27a8ad2c9af15cef4b4dbc495bbaaf7465052b"
   end
 
   depends_on "go" => :build
