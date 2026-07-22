@@ -1,8 +1,8 @@
 class Wayland < Formula
   desc "Protocol for a compositor to talk to its clients"
   homepage "https://wayland.freedesktop.org"
-  url "http://ftp.debian.org/debian/pool/main/w/wayland/wayland_1.25.0.orig.tar.xz"
-  sha256 "c065f040afdff3177680600f249727e41a1afc22fccf27222f15f5306faa1f03"
+  url "http://ftp.debian.org/debian/pool/main/w/wayland/wayland_1.26.0.orig.tar.xz"
+  sha256 "64176eaa46e4969903e286f8e5ef8331affc17fdf03ac9b58381d2b23162b7a3"
   license "MIT"
   compatibility_version 1
 
