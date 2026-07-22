@@ -12,7 +12,7 @@ class S2n < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "baa9f39a0e34f2147a8807789c679aa42d70fac1f1d1098402f254b567635aa6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f5722f0718e995646612d2347aca0cd2c3b544c7cb07f762a16b3d7fa1e3697b"
   end
 
   depends_on "cmake" => :build
