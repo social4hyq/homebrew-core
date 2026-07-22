@@ -7,7 +7,7 @@ class Rustywind < Formula
   head "https://github.com/avencera/rustywind.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "65c6a4d092ef2589ed86ab4e24a2c316fc13ca4aadb8648872240fd9ebb25a8c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "354a004f7e606ab66e72fe5b8d5cc410366e9db4193a37bd59e54f09df7e9424"
   end
 
   depends_on "rust" => :build
