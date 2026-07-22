@@ -1,8 +1,8 @@
 class Wayland < Formula
   desc "Protocol for a compositor to talk to its clients"
   homepage "https://wayland.freedesktop.org"
-  url "http://ftp.debian.org/debian/pool/main/w/wayland/wayland_1.25.0.orig.tar.xz"
-  sha256 "c065f040afdff3177680600f249727e41a1afc22fccf27222f15f5306faa1f03"
+  url "http://ftp.debian.org/debian/pool/main/w/wayland/wayland_1.26.0.orig.tar.xz"
+  sha256 "64176eaa46e4969903e286f8e5ef8331affc17fdf03ac9b58381d2b23162b7a3"
   license "MIT"
   compatibility_version 1
 
@@ -14,7 +14,7 @@ class Wayland < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "da8e388c2323127b12aa12d1ab32ce26d88f3fdd1d7aa4a98237fb0862c13a51"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "690fed8c618ac641523de013f0c63932585ae3abdfd3c9eece0b2458779cf676"
   end
 
   depends_on "meson" => :build
