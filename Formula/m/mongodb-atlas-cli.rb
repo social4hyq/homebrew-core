@@ -1,8 +1,8 @@
 class MongodbAtlasCli < Formula
   desc "Atlas CLI enables you to manage your MongoDB Atlas"
   homepage "https://www.mongodb.com/docs/atlas/cli/stable/"
-  url "https://github.com/mongodb/mongodb-atlas-cli/archive/refs/tags/atlascli/v1.56.0.tar.gz"
-  sha256 "d96f57047fe8cbab345f3967f13c0619eb79fd14535ad19bf112c86f98bace05"
+  url "https://github.com/mongodb/mongodb-atlas-cli/archive/refs/tags/atlascli/v1.57.0.tar.gz"
+  sha256 "a9bc0bb01dbf6ef5d72a79569f0c6026a0b4883dc55aa712bfc99b1e7591bedb"
   license "Apache-2.0"
   head "https://github.com/mongodb/mongodb-atlas-cli.git", branch: "master"
 
@@ -12,7 +12,7 @@ class MongodbAtlasCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "51bdcd64e7013341fa6a2f9fde1b69cb7581c1381fdafc5bb11ea4fcbbfd8cac"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65ba4a95204cb7a8b857d0e4fe44f3f98d4ac79872bbc275cc4dd4e4484eae8e"
   end
 
   depends_on "go" => :build
