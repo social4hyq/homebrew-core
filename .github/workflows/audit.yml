@@ -19,7 +19,7 @@ permissions:
   contents: read
 
 env:
-  IMAGE: ghcr.io/social4hyq/ci-runner@sha256:38e740c8e355b2ccc9f34ba4bcab955a3fbc076278ae4bd3a07ea3707e90bb56 # :latest, 2026-07-19
+  IMAGE: swr.cn-north-4.myhuaweicloud.com/harmonybrew/ci-runner@sha256:57ce4ca832d937dcc86abae6ec0e8fb6b34ac86aa8fdbe43548b6fe78d3438c1 # :latest, 2026-07-03 (SWR mirror, anon-pullable)
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
 
