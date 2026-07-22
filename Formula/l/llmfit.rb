@@ -7,7 +7,7 @@ class Llmfit < Formula
   head "https://github.com/AlexsJones/llmfit.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8438b482b43ecf24a688ecf4a0e1dbf7398c8d74d94e5cd9c2649dc70dc086c2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "85f71ef62cce56f9127a13f1d80f89f0a9affcf3ec67113e9f6bd1f49917b751"
   end
 
   depends_on "rust" => :build
