@@ -1,8 +1,8 @@
 class Massdriver < Formula
   desc "Manage applications and infrastructure on Massdriver Cloud"
   homepage "https://www.massdriver.cloud/"
-  url "https://github.com/massdriver-cloud/mass/archive/refs/tags/2.1.1.tar.gz"
-  sha256 "20b551a912f9d849d3f697fafcacb3edc7cc87037fc3847dca5d4e260a5be014"
+  url "https://github.com/massdriver-cloud/mass/archive/refs/tags/2.2.0.tar.gz"
+  sha256 "04fc9768ecde6353f118f2295eb5ca05ba4a01f4464ac4cc1200f9b0b1eaffb0"
   license "Apache-2.0"
   head "https://github.com/massdriver-cloud/mass.git", branch: "main"
 
@@ -15,7 +15,7 @@ class Massdriver < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e857e4352352eaf66a22368104feba91e13d7fdad380fce8a9ac6cef5bdd33fb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e5899df80c707107d9b85ac41acd700fe95e3e1331ebf38e40235110974aab91"
   end
 
   depends_on "go" => :build
