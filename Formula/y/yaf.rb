@@ -1,8 +1,8 @@
 class Yaf < Formula
   desc "Yet another flowmeter: processes packet data from pcap(3)"
   homepage "https://tools.netsa.cert.org/yaf/"
-  url "https://tools.netsa.cert.org/releases/yaf-2.19.3.tar.gz"
-  sha256 "6b03bc3d25495c01d8d8020b00a908ef1ed28b6edf78f631618208d81e809b30"
+  url "https://tools.netsa.cert.org/releases/yaf-2.19.4.tar.gz"
+  sha256 "300394f7ea7989e75db803d688e9396102b263734ebc12805ff1107526080d67"
   license "GPL-2.0-only"
 
   # NOTE: This should be updated to check the main `/yaf/download.html`
@@ -13,7 +13,7 @@ class Yaf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "13d1128c3237a5a3c3b6414845c0560f1556385f2cff40b8b337dffe0667b4b7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "27fd793a042eee8ef79ddd663ff18cf8170a803880cbd99d497a4eeefb0e759d"
   end
 
   depends_on "pkgconf" => :build
