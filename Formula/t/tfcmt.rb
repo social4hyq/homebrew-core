@@ -1,13 +1,13 @@
 class Tfcmt < Formula
   desc "Notify the execution result of terraform command"
   homepage "https://suzuki-shunsuke.github.io/tfcmt/"
-  url "https://github.com/suzuki-shunsuke/tfcmt/archive/refs/tags/v4.14.15.tar.gz"
-  sha256 "de5066d39c30deea6a32f237ce215a4cd9388ff69343649ad6a940db06debfb3"
+  url "https://github.com/suzuki-shunsuke/tfcmt/archive/refs/tags/v4.14.17.tar.gz"
+  sha256 "990119d00e30377e2a909529f55841443f1ebb49ef725b98c5c0dc28149edf84"
   license "MIT"
   head "https://github.com/suzuki-shunsuke/tfcmt.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "07928bc708177b3f98135be8d8e4bb5e87def2aba4bd8a67bfb91cc5f1c7b714"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bb75e7bf3d2fe726a3538a2b58179f31cc5fc99da854d779f4e6674f0e5ea0f1"
   end
 
   depends_on "go" => :build
