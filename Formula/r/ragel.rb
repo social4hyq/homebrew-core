@@ -11,7 +11,7 @@ class Ragel < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b812eca5a701e8d371b25c3633074e2bc38a2dc9807c9873b4ec96ef1702bb14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dfb9eb75dce8c71bc5c0203794f1814f5f3e866bd8214dca6761ae655b18392a"
   end
 
   resource "pdf" do
