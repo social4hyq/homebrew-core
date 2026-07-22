@@ -1,13 +1,13 @@
 class Doppler < Formula
   desc "CLI for interacting with Doppler secrets and configuration"
   homepage "https://docs.doppler.com/docs"
-  url "https://github.com/DopplerHQ/cli/archive/refs/tags/3.76.0.tar.gz"
-  sha256 "cc8c3a2abb9f7ade57cc42ba67cbe47ff6a35270b1f7e4af2277e7cd94dc72f8"
+  url "https://github.com/DopplerHQ/cli/archive/refs/tags/3.76.1.tar.gz"
+  sha256 "ea645c8ddd90f54255bcfb936d892681532c4ecdd7b538b000fd90662ddfaeba"
   license "Apache-2.0"
   head "https://github.com/DopplerHQ/cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "488adaf939a30af1fbbda09f3f2ad203d2bb13e47aed92baa0f9947c61d96474"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3336fb42b33657ab0a44cf6c4a6d9e9cc4b7e26fa538b27cfcbd156b4a8005f4"
   end
 
   depends_on "go" => :build
