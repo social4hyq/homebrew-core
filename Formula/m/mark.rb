@@ -1,13 +1,13 @@
 class Mark < Formula
   desc "Sync your markdown files with Confluence pages"
   homepage "https://github.com/kovetskiy/mark"
-  url "https://github.com/kovetskiy/mark/archive/refs/tags/v16.5.1.tar.gz"
-  sha256 "bd549148eb3f42ca1881230e95f4b3d0e5da8dcdd91f5d6fb8ca77f47146a40e"
+  url "https://github.com/kovetskiy/mark/archive/refs/tags/v16.6.0.tar.gz"
+  sha256 "2107f8eb7f253e771644e15dcac7c132df5a7b500da69ed9321f1877ea850b4f"
   license "Apache-2.0"
   head "https://github.com/kovetskiy/mark.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "04e268b2e9f4e1c90e245ed7f2c1a78cbb1fde606cb31fb1cd0820c22915b9d7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d2fb78a5963634a882496a943e00de7787549d19b9fce1875ae23a5f659339a"
   end
 
   depends_on "go" => :build
