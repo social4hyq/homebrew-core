@@ -1,12 +1,12 @@
 class Air < Formula
   desc "Fast and opinionated formatter for R code"
   homepage "https://github.com/posit-dev/air"
-  url "https://github.com/posit-dev/air/archive/refs/tags/0.10.0.tar.gz"
-  sha256 "4ef28a95df9c037aa6bdb9b36f94dcdcdbb64b469e49729268e2921d6d2e1968"
+  url "https://github.com/posit-dev/air/archive/refs/tags/0.11.0.tar.gz"
+  sha256 "07ce82c3200296afca23efdbc9aae1943c4d0b6dfd5aa3fa47353dd709dff648"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd0f334a198113141176a7b9833828e0a52a44bd83bdce9d5cc0eef8705dfc41"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3dc78e1d7a240da7ff33b9850b053e9387befa5d9b87ebbe73f882cf54ff8176"
   end
 
   depends_on "rust" => :build
