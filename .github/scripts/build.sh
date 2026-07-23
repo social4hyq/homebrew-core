@@ -23,7 +23,7 @@ source "$(dirname "$0")/lib.sh"
 # it a second time and broke it — confirmed by re-downloading + self-signing
 # (once) the same 0.2.106 artifact outside CI, which ran clean. Unlike
 # opencode it had no odie guard yet (see Formula/g/grok-build.rb).
-UNSET_SIGN_FORMULAS="opencode claude-code grok-build"
+UNSET_SIGN_FORMULAS="opencode claude-code grok-build cc-switch"
 ENV_PREFIX=""
 if tr ' ' '\n' <<< "$UNSET_SIGN_FORMULAS" | grep -qx "$FORMULA"; then
   ENV_PREFIX="env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN "
