@@ -1,8 +1,8 @@
 class Scarb < Formula
   desc "Cairo package manager"
   homepage "https://docs.swmansion.com/scarb/"
-  url "https://github.com/software-mansion/scarb/archive/refs/tags/v2.19.4.tar.gz"
-  sha256 "cf98cc6a64de0748cf844de765a3eca775c27a4ce970b862eae3edef6714947c"
+  url "https://github.com/software-mansion/scarb/archive/refs/tags/v2.20.0.tar.gz"
+  sha256 "5875dd0feb1e0eef7b5dea5823f1e960b71cabf5b76ef49270fe8d14a29f308a"
   license "MIT"
   head "https://github.com/software-mansion/scarb.git", branch: "main"
 
