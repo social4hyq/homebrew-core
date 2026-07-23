@@ -1,8 +1,8 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI — HarmonyOS (runtime-fetch stub; no binary in bottle)"
   homepage "https://docs.anthropic.com/en/docs/claude-code"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.216.tgz"
-  sha256 "50119621b375c7d19f334ae5082578e18ffdb1bb647a67a75e45994d40953efe"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.218.tgz"
+  sha256 "f2a3b0a4f4f761cc9954fd80c0b7e42fbdec187929ef9ab6bee6db348a285776"
   license :cannot_represent # Anthropic Commercial Terms of Service
   # Claude Code 2.1.113+ only ships Bun-compiled binaries (linux-arm64-musl,
   # musl ABI compatible with OHOS). The tgz is mirrored on npmmirror (Aliyun
@@ -45,8 +45,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.216-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c58b2b87b9af43995b235386430409298d7de7744bd86cd7f541d70ce3b7f37e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.218-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4429f81843c4d0cb2b1cc359ce5226c0cfd97c59bd9cb18728c8b85afc48718"
   end
 
   depends_on "ohos-bst-light"
