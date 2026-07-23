@@ -85,9 +85,9 @@ docker exec "$CONTAINER" bash -lc \
 # named literally on the command line (Trust.explicitly_allowed? checks
 # ARGV — dependencies loaded transitively never appear there) then failed to
 # match against the tap's now-correctly-resolved custom-remote identity:
-# "Refusing to load formula ... from untrusted tap" for codex's dependency
-# ohos-bst-light, even though codex itself (named directly in `brew install
-# codex`) loaded fine. Confirmed 2026-07-20 via PR #35: reordering this to
+# "Refusing to load formula ... from untrusted tap" for opencode's dependency
+# ohos-bst-light, even though opencode itself (named directly in `brew install
+# opencode`) loaded fine. Confirmed 2026-07-20 via PR #35: reordering this to
 # run after the git fixes resolves it — pure ordering bug, not a new
 # mechanism.
 cexec "brew trust $TAP"

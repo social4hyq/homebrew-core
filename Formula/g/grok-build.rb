@@ -67,7 +67,7 @@ class GrokBuild < Formula
 
     # Self-reference via opt_libexec (prefix-relative, stable) rather than
     # libexec (Cellar-relative) — same HOMEBREW_CELLAR-flip reasoning as the
-    # other OHOS CLI formulas in this tap (see opencode.rb / codex.rb).
+    # other OHOS CLI formulas in this tap (see opencode.rb).
     (bin/"grok").write <<~SH
       #!/bin/sh
       export TMPDIR="${GROK_TMPDIR:-/data/storage/el2/base/cache}"

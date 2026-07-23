@@ -12,7 +12,7 @@ name: autobump
 # (signing, RUNPATH injection, bundled shim deps) don't matter here — their
 # formula-level url/version/sha256 shape (npmmirror tarball, version
 # embedded in the URL) is a plain, bump-formula-pr-compatible pattern like
-# codex/grok-build; install() logic is version-independent packaging that a
+# grok-build; install() logic is version-independent packaging that a
 # version bump never touches. opencode is the prebuilt-binary formula
 # (Formula/o/opencode.rb) — NOT ohos-opencode, the from-source formula with
 # 5 patches under Patches/ohos-opencode/ that need hand-regenerating from
@@ -47,7 +47,7 @@ permissions:
   pull-requests: write
 
 env:
-  ALLOWLIST: "codex opencode grok-build claude-code"
+  ALLOWLIST: "opencode grok-build claude-code"
   IMAGE: swr.cn-north-4.myhuaweicloud.com/harmonybrew/ci-runner@sha256:57ce4ca832d937dcc86abae6ec0e8fb6b34ac86aa8fdbe43548b6fe78d3438c1 # :latest, 2026-07-03 (SWR mirror, anon-pullable)
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
