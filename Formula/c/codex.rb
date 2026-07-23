@@ -1,9 +1,9 @@
 class Codex < Formula
   desc "OpenAI Codex CLI — HarmonyOS aarch64 (Linux musl binary + OHOS signing)"
   homepage "https://github.com/openai/codex"
-  url "https://registry.npmmirror.com/@openai/codex/-/codex-0.144.6-linux-arm64.tgz"
-  version "0.144.6"
-  sha256 "19f0b01b33f273df94191670b2e0e5d0f624b0354e765bfdea5763920b713800"
+  url "https://registry.npmmirror.com/@openai/codex/-/codex-0.145.0-linux-arm64.tgz"
+  version "0.145.0"
+  sha256 "b78c57e172b2f18e5969ae26183253cd3cdd9abb3b424a8f7334f4b5530c2b27"
   license "Apache-2.0"
   # Codex ships a native Rust binary per platform. We fetch the linux-arm64
   # platform package directly — the @openai/codex JS wrapper throws
@@ -28,8 +28,8 @@ class Codex < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-v0.144.6-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "38d0192b580fc58a9ef9492ebf346abf53b233661e856b24fa1c685060eab812"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-v0.145.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e24b9c76516080b243ba6ff95ac683215c904d914d80f37f94609942de0411cf"
   end
 
   depends_on "ohos-bst-light" => :build
