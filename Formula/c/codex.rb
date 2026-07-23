@@ -1,9 +1,9 @@
 class Codex < Formula
   desc "OpenAI Codex CLI — HarmonyOS aarch64 (Linux musl binary + OHOS signing)"
   homepage "https://github.com/openai/codex"
-  url "https://registry.npmmirror.com/@openai/codex/-/codex-0.144.6-linux-arm64.tgz"
-  version "0.144.6"
-  sha256 "19f0b01b33f273df94191670b2e0e5d0f624b0354e765bfdea5763920b713800"
+  url "https://registry.npmmirror.com/@openai/codex/-/codex-0.145.0-linux-arm64.tgz"
+  version "0.145.0"
+  sha256 "b78c57e172b2f18e5969ae26183253cd3cdd9abb3b424a8f7334f4b5530c2b27"
   license "Apache-2.0"
   # Codex ships a native Rust binary per platform. We fetch the linux-arm64
   # platform package directly — the @openai/codex JS wrapper throws
