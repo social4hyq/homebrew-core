@@ -13,7 +13,7 @@
 - [ ] `brew audit <formula>` passes (`brew audit --new <formula>` for a new formula)
 - [ ] Prebuilt-binary formula? Confirmed whether it needs
       `HOMEBREW_OHOS_BOTTLE_BINARY_SIGN` unset (see `build.sh`'s
-      `UNSET_SIGN_FORMULAS` + the odie guards in codex/opencode/grok-build)
+      `UNSET_SIGN_FORMULAS` + the odie guards in opencode/grok-build)
 
 -----
 

@@ -38,15 +38,17 @@ class ClaudeCode < Formula
     # this environment — confirmed 2026-07-20, different host from the
     # registry.npmjs.org SIGILL issue described above (that one only bites
     # on the ~120MB tarball GET; this small registry API JSON response is
-    # unaffected — confirmed reachable from the build container). Matches
-    # codex.rb's already-working livecheck pattern.
+    # unaffected — confirmed reachable from the build container). Same
+    # livecheck pattern used elsewhere in this tap for npmmirror-sourced
+    # prebuilt-binary formulas.
     url "https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64-musl/latest"
     regex(/"version":\s*"(\d+(?:\.\d+)+)"/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.218-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4429f81843c4d0cb2b1cc359ce5226c0cfd97c59bd9cb18728c8b85afc48718"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.218-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a3a0e76c8bc604989bcd1db98533706d635f8f2d02e19c11f32fbb042873433f"
   end
 
   depends_on "ohos-bst-light"
