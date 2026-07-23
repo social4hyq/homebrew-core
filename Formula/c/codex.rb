@@ -11,6 +11,10 @@ class Codex < Formula
     strategy :github_latest
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8c92ab81e4bf30fa91ee9031a16fa58225e2c9ba3ea893c596df4949e5734b4"
+  end
+
   depends_on "cmake" => :build
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
