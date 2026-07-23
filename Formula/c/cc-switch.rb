@@ -4,6 +4,7 @@ class CcSwitch < Formula
   url "https://github.com/SaladDay/cc-switch-cli/releases/download/v5.9.2/cc-switch-cli-v5.9.2-linux-arm64-musl.tar.gz"
   sha256 "2a94b345dd19dd63d1f1c9069e511aa6e0e09381c6ddb209e699a939becec9e2"
   license "MIT"
+  revision 1
   # Official linux-arm64-musl release asset (Rust, fully static aarch64 ELF —
   # no INTERP/DYNAMIC segment per readelf -l). Named cc-switch, not
   # cc-switch-cli: official homebrew/core already ships a cc-switch-cli
@@ -35,8 +36,8 @@ class CcSwitch < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/cc-switch-v5.9.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "33d17ef3f0dd75abe855958b3fbdbc3e0d27f776e4797ca23f31be242b6ad6df"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/cc-switch-v5.9.2-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "40d1929fe028901d48f16707d6da8281102ee179d431e6cc397ead4a092fc6f8"
   end
 
   depends_on "ohos-bst-light" => :build
@@ -64,9 +65,17 @@ class CcSwitch < Formula
     # Self-reference via opt_libexec (prefix-relative, stable) rather than
     # libexec (Cellar-relative) — same HOMEBREW_CELLAR-flip reasoning as the
     # other OHOS CLI formulas in this tap (see opencode.rb).
+    #
+    # XDG_STATE_HOME: the proxy daemon binds a unix socket under
+    # $XDG_STATE_HOME/cc-switch/runtime/; the default ~/.local/state sits on
+    # hmdfs where unix sockets don't come up (daemon ensure worker times out
+    # after 5s — verified 2026-07-23). Point it at EL2, the standard
+    # owner-only-capable path on this platform.
     (bin/"cc-switch").write <<~SH
       #!/bin/sh
       export TMPDIR="${CC_SWITCH_TMPDIR:-/data/storage/el2/base/cache}"
+      export XDG_STATE_HOME="${CC_SWITCH_STATE_HOME:-/data/storage/el2/base/xdg-state}"
+      mkdir -p "$XDG_STATE_HOME"
       exec "#{opt_libexec}/bin/cc-switch" "$@"
     SH
     chmod 0755, bin/"cc-switch"
