@@ -2,8 +2,8 @@ class Openbao < Formula
   desc "Provides a software solution to manage, store, and distribute sensitive data"
   homepage "https://openbao.org/"
   url "https://github.com/openbao/openbao.git",
-      tag:      "v2.6.0",
-      revision: "03e3a243b6f07d17c60ce0a182adee7cf4c424eb"
+      tag:      "v2.6.1",
+      revision: "ba7ad8861d0578cd4da4f7b9e5a6756d30484f8f"
   license "MPL-2.0"
   head "https://github.com/openbao/openbao.git", branch: "main"
 
@@ -13,7 +13,7 @@ class Openbao < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "45a3a636dc933d4c738249112a84cb45e333b58e809efed1c63369ae0de867b6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4908a160e067b3d63ef0251e64b51a62aad775c87576bea990d25da46cc3d0df"
   end
 
   depends_on "go" => :build
