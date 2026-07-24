@@ -7,7 +7,7 @@ class Skeema < Formula
   head "https://github.com/skeema/skeema.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "296e32d3ec779e24d5bf8daf1d731c21309deba7b8885a74c8af5fe83856bf69"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdb2e06757f05314e6925796889c0f014fb81ceedb48bdef36e75cd9857fa6f4"
   end
 
   depends_on "go" => :build
