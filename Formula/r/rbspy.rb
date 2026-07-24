@@ -6,7 +6,7 @@ class Rbspy < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "79749de54805b553b6ecfa4c66dc869283c16ee695413f9d78d34b64d923a6f2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "234ca59fb184db8916f6b90cfd6959715cacc4b83895b65344b9acb054fc7893"
   end
 
   depends_on "rust" => :build
