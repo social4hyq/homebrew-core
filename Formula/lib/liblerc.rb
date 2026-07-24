@@ -12,7 +12,7 @@ class Liblerc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "79b06f63fb3b6401d03bcca60757c238fff92fad0874099546842a6ec6794212"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88ce2c67326b560c54d5f5cb726186e01803e68eb3e569279122ba00344d6f1a"
   end
 
   depends_on "cmake" => :build
