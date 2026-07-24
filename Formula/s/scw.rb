@@ -1,8 +1,8 @@
 class Scw < Formula
   desc "Command-line Interface for Scaleway"
   homepage "https://www.scaleway.com/en/cli/"
-  url "https://github.com/scaleway/scaleway-cli/archive/refs/tags/v2.58.3.tar.gz"
-  sha256 "1a9b2533a573309794276c8a862683a360408a35256a0da125d7f94c78a105c8"
+  url "https://github.com/scaleway/scaleway-cli/archive/refs/tags/v2.59.0.tar.gz"
+  sha256 "d3034477ccd0ccebf18a6bc72d0ba2fb09864eda8a967fabb104c65f2104d4bd"
   license "Apache-2.0"
 
   livecheck do
@@ -11,8 +11,7 @@ class Scw < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bf83c75c562a0eec9284c7cbf9c5cae2cfe73a34e3bbfbb96806f224ede782b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88c097e42497e2d2c5d3044759c77394745641e22709f1c109294beb5da1c95f"
   end
 
   depends_on "go" => :build
