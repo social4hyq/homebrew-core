@@ -12,7 +12,7 @@ class Xgo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c86a703d08925fb51d7045f3349ffd95767e6f879debb79d7bae1aec7998b090"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "99b19e2814c3956c93de96de1f6fd7ef91179a9d21ba1ced7437b925ebabb937"
   end
 
   depends_on "go"
