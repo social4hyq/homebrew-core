@@ -1,13 +1,13 @@
 class JqLsp < Formula
   desc "Jq language server"
   homepage "https://github.com/wader/jq-lsp"
-  url "https://github.com/wader/jq-lsp/archive/refs/tags/v0.1.17.tar.gz"
-  sha256 "899cd2dcd4838d21bab1d84f687cb4a907e0fce7702990dac342b9b6fd88b5a2"
+  url "https://github.com/wader/jq-lsp/archive/refs/tags/v0.1.18.tar.gz"
+  sha256 "186d36e92489304a46036ad51ddf411b7ae56a2fd8af8593cb6741c539634f3f"
   license "MIT"
   head "https://github.com/wader/jq-lsp.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0109b50bf4c91fc05fdcfabb90055824c170db9f5f0c583c0d36c7c6de2f6c82"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c39a7f3c9c8338fd507d05ad38f30233d2934ddb0875b2fc1ed684dbd756fc8"
   end
 
   depends_on "go" => :build
