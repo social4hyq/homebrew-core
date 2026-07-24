@@ -41,8 +41,9 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # Space-separated; heavy formulae are light-checked but not auto-built
-  HEAVY_FORMULAS: "llvm@21 bun-webkit"
+  # Space-separated; heavy formulae are light-checked but not auto-built.
+  # Reserved for llvm@21 only; bun-webkit now auto-builds (~14min).
+  HEAVY_FORMULAS: "llvm@21"
   IMAGE: swr.cn-north-4.myhuaweicloud.com/harmonybrew/ci-runner@sha256:57ce4ca832d937dcc86abae6ec0e8fb6b34ac86aa8fdbe43548b6fe78d3438c1 # :latest, 2026-07-03 (SWR mirror, anon-pullable)
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
