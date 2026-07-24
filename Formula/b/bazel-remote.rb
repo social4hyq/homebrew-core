@@ -1,13 +1,13 @@
 class BazelRemote < Formula
   desc "Remote cache for Bazel"
   homepage "https://github.com/buchgr/bazel-remote/"
-  url "https://github.com/buchgr/bazel-remote/archive/refs/tags/v2.6.1.tar.gz"
-  sha256 "7e554caa4c9c7033459acc053ee8470208012223e72c81aabe2b48fb0e6c3fbc"
+  url "https://github.com/buchgr/bazel-remote/archive/refs/tags/v2.6.2.tar.gz"
+  sha256 "3e8765b849996d073cc8e9a3bbd7d7575a49c041f01c9a8ae13725fc951142bc"
   license "Apache-2.0"
   head "https://github.com/buchgr/bazel-remote.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f44895c3aad6237a6a01342bad8d48aa8891af8ce0a21c6b3f9a231be66b6b59"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d54475b2ea2ec2c2f1e994645e4a499ce104d30beb9bf85d756227ece57af2df"
   end
 
   depends_on "go" => :build
