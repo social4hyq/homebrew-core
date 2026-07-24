@@ -7,7 +7,7 @@ class JqLsp < Formula
   head "https://github.com/wader/jq-lsp.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0109b50bf4c91fc05fdcfabb90055824c170db9f5f0c583c0d36c7c6de2f6c82"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c39a7f3c9c8338fd507d05ad38f30233d2934ddb0875b2fc1ed684dbd756fc8"
   end
 
   depends_on "go" => :build
