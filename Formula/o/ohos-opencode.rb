@@ -12,7 +12,7 @@ class OhosOpencode < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.4-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f80b7a665741d3e7115e9d1c65898d273a1571ca5d2bbca1f3f48554f26f28c"
   end
 
   # opencode is a `bun build --compile` single binary: OHOS bun runtime + JS
