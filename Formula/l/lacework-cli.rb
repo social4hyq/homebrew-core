@@ -2,8 +2,8 @@ class LaceworkCli < Formula
   desc "CLI for managing Lacework"
   homepage "https://docs.lacework.com/cli"
   url "https://github.com/lacework/go-sdk.git",
-      tag:      "v2.15.0",
-      revision: "7c33a4b638f22e96afc70494124a5e75e0377038"
+      tag:      "v2.15.1",
+      revision: "554a118f95baeaba249ae95d005735fdef951b5f"
   license "Apache-2.0"
   head "https://github.com/lacework/go-sdk.git", branch: "main"
 
@@ -16,7 +16,7 @@ class LaceworkCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb8ed40d4056283d70195adcb1aef44406e485f7a5556e0de51a1ba4f5fc18ae"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7e1cdc327dd7343c7d39a4b8a3fb7be1120ff369082306c0fe88aa870595efc"
   end
 
   depends_on "go" => :build
