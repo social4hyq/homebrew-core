@@ -1,13 +1,13 @@
 class FfcH < Formula
   desc "Single-header C99 accelerated float/double parsing"
   homepage "https://github.com/kolemannix/ffc.h"
-  url "https://github.com/kolemannix/ffc.h/archive/refs/tags/v26.04.01.tar.gz"
-  sha256 "bc36f6c95357b7da75b54fb794eb4272b0e53a867f48c8aab6c900941dfac170"
+  url "https://github.com/kolemannix/ffc.h/archive/refs/tags/v26.07.01.tar.gz"
+  sha256 "78bc47d4bd2cf28c1487134e428214cdd105757527897ff8cd1ad226d31e7890"
   license "Apache-2.0"
   head "https://github.com/kolemannix/ffc.h.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c59abc875deefac6288fd8010b028035f153fd4614e0fe30ccab1d54941b8d13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "74e6dfcd929d9fb689de6b9d57ae39623695fac7e9aa40dcc112688ddc286c1c"
   end
 
   depends_on "cmake" => [:build, :test]
