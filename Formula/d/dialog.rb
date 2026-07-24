@@ -12,7 +12,7 @@ class Dialog < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "33a38782d3cbe674cd274344fe0505001dfe2b0d816bccdb25359b4c060f65d0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5094c5a0bbcd2ecdac9fe63f26c1d81cb614411508b16f13607d0946e0829ea"
   end
 
   uses_from_macos "ncurses"
