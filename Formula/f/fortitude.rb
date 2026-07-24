@@ -1,13 +1,13 @@
 class Fortitude < Formula
   desc "Fortran linter"
   homepage "https://fortitude.readthedocs.io/en/stable/"
-  url "https://github.com/PlasmaFAIR/fortitude/archive/refs/tags/v0.9.0.tar.gz"
-  sha256 "04018554aadd9b846c99b5ffc218fe483c353020daefb777af39a75724a6338e"
+  url "https://github.com/PlasmaFAIR/fortitude/archive/refs/tags/v0.9.2.tar.gz"
+  sha256 "90ea53522c423380079a58e5f8c813d01d487756f25aa3cc1b40a2ce2f55e7d6"
   license "MIT"
   head "https://github.com/PlasmaFAIR/fortitude.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8807ac2fce8f0b23e9f465b20d23fc82f67ba84101c79557f3598fdc7e0af861"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7560276bbf4475945a90dfceb7e6471184b6e4f564a3a861c0e420a1b559e293"
   end
 
   depends_on "rust" => :build
