@@ -12,7 +12,7 @@ class Libosip < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a671c6204131c80ac44c398ff3afe6094af8c2741722d77c43fac77860f5c4b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bea91ac0090672815eb7e41c88e44969feaf004351193e84696bc74d6e04fbe7"
   end
 
   def install
