@@ -11,7 +11,7 @@ class Coturn < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e5872b21fb42dd27d2deba7b067b03d43fc0dc36f2f2d16936261805ea05d55"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "67eeefacc193a4b1b79bff3a96c41f165f84f5a113511e8b564888d7299184ff"
   end
 
   depends_on "pkgconf" => :build
