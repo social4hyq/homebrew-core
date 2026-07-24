@@ -10,8 +10,8 @@ class Bind < Formula
   version_scheme 1
 
   stable do
-    url "https://downloads.isc.org/isc/bind9/9.20.24/bind-9.20.24.tar.xz"
-    sha256 "989fef1fc88ea59d04cd86f854dca5a4616a20a9968bcdde3c1a3668ab36be08"
+    url "https://downloads.isc.org/isc/bind9/9.20.26/bind-9.20.26.tar.xz"
+    sha256 "55248def0f870c4c46b3de72978ea972615131516663188a4564dca1d20bf350"
 
     depends_on "readline" # TODO: Remove in 9.22
   end
@@ -24,7 +24,7 @@ class Bind < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "676569601ed68c53cf3d2167c63ecbcbdea80fd79cee709376a8cc49b96017e5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5089385781e41bc3905bebbccf47b8989f1d6cc352cd47366fad87efa4faf80b"
   end
 
   head do
