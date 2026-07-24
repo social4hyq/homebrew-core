@@ -7,7 +7,7 @@ class Texmath < Formula
   head "https://github.com/jgm/texmath.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b13eac1ee7d7f3284cfd02050e43890016c0f22f313d77cf9954d9531cbe1e5e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d799795f70f46a9829890a5b5fea534c52064937a9db25de1dcc2d73d88781d3"
   end
 
   depends_on "cabal-install" => :build
