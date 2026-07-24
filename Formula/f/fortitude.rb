@@ -7,7 +7,7 @@ class Fortitude < Formula
   head "https://github.com/PlasmaFAIR/fortitude.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8807ac2fce8f0b23e9f465b20d23fc82f67ba84101c79557f3598fdc7e0af861"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7560276bbf4475945a90dfceb7e6471184b6e4f564a3a861c0e420a1b559e293"
   end
 
   depends_on "rust" => :build
