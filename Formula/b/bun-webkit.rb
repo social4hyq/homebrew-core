@@ -20,8 +20,8 @@ class BunWebkit < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-webkit-v4895f45dfb-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9654b533ce43e8e1ac471562cf0b3a0c84f92c83e628adeb7b2072c82545d5f2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-webkit-v5491700992-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "674715a7ee997259043a9f407c109222588a14133a1e0851f55d25bdfa445363"
   end
 
   keg_only "webKit static archives are consumed in-tree by Bun, not linked system-wide"
