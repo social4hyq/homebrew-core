@@ -1,8 +1,8 @@
 class Libzdb < Formula
   desc "Database connection pool library"
   homepage "https://tildeslash.com/libzdb/"
-  url "https://tildeslash.com/libzdb/dist/libzdb-3.5.0.tar.gz"
-  sha256 "90c79bf23b0c8fcb6543634844d17c094a24a360c9d63ddf6efc3741ebec32c5"
+  url "https://tildeslash.com/libzdb/dist/libzdb-3.6.0.tar.gz"
+  sha256 "c29712aba58ce3c428e6fcf4c96f86c853dde5449da9adfaedbe69e6116e2e17"
   license "GPL-3.0-only"
 
   livecheck do
