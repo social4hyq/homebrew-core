@@ -9,7 +9,7 @@ class PreCommit < Formula
   head "https://github.com/pre-commit/pre-commit.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db8027ca4521cb19e05e4a7c5836179eb9c1205937c0abfd3710157fecae0770"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e25360900e6269f37cbb6569885eb4b686007a4af7376fc323ba8f0258ad1de"
   end
 
   depends_on "libyaml"
