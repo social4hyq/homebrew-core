@@ -7,7 +7,7 @@ class GitPkgs < Formula
   head "https://github.com/git-pkgs/git-pkgs.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9645f283a15ba814212f023bb8f07585bad090146b8ad8f85e483ac9b67a3c58"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11cf871acd7175beab5ae87aeb060816a4211c8e4fa8c5d0eda3f7849849e5e5"
   end
 
   depends_on "go" => :build
