@@ -1,13 +1,13 @@
 class Libraqm < Formula
   desc "Library for complex text layout"
   homepage "https://github.com/HOST-Oman/libraqm"
-  url "https://github.com/HOST-Oman/libraqm/archive/refs/tags/v0.10.5.tar.gz"
-  sha256 "7f3dd21b4b3bd28a36f2c911d31d91a9d69341697713923ef1aac65d56ebcafd"
+  url "https://github.com/HOST-Oman/libraqm/archive/refs/tags/v0.11.0.tar.gz"
+  sha256 "2ba3521d3f24e9696185a67a16f1a9643429d6c897d89d83dfb2aad3a398732a"
   license "MIT"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4bca6cfa8900b36338000b34287f444944c6b57d78b1827ba40ec8627e0c043c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0055931b0995c6592e8a84c904398c4f09bd6d355bc889c882c2a776bdd8b70"
   end
 
   depends_on "meson" => :build
