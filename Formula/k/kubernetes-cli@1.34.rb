@@ -12,7 +12,7 @@ class KubernetesCliAT134 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9391062eabd7c84b4d1a7111d6a859bd336ebe5d7a62461f2924e48f04715d1c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3b6dcde0da24178327d35a8b717c68931a306c5cf6904bc424f158f3f5916ac"
   end
 
   keg_only :versioned_formula
