@@ -1,8 +1,8 @@
 class Dnscontrol < Formula
   desc "Synchronize your DNS to multiple providers from a simple DSL"
   homepage "https://dnscontrol.org/"
-  url "https://github.com/DNSControl/dnscontrol/archive/refs/tags/v4.43.3.tar.gz"
-  sha256 "0a8027cb703ef2dd329b81794d2b64cd83edec9b1b60873109d5783c7289a9c6"
+  url "https://github.com/DNSControl/dnscontrol/archive/refs/tags/v4.44.1.tar.gz"
+  sha256 "5c58f8d7dff6463c2cd7cfdafd839f611de5c0ba77658b6cf0de3752a53298ed"
   license "MIT"
   version_scheme 1
   head "https://github.com/DNSControl/dnscontrol.git", branch: "main"
@@ -16,7 +16,7 @@ class Dnscontrol < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "960e403cd8a48ce94a4b9ca2f4a01471fdff1b0b808efcc1901324fcf705122c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5b902669955864d75e1d19d4d4b230686b2346a754cb187612ac83f4e2dcaf8d"
   end
 
   depends_on "go" => :build
