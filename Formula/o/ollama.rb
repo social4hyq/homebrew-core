@@ -16,7 +16,7 @@ class Ollama < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "030b6aef4468deeeef9662886224ae61c7cb14bbb622b0f8a375c5f99ae8cd49"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cfffc54e8e15833eabaec130bb6ff84565e081117992644c852313eae4689571"
   end
 
   depends_on "cmake" => :build
