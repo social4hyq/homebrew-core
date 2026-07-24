@@ -19,7 +19,7 @@ class Redis < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "94fbd1f15013ea0f295ff604e9b59b87c21dc28662f4003416eabfb85951409f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "071b15ca71845899020c79fb7319bbabae993f3f943dc7537b1f935459ca744e"
   end
 
   depends_on "openssl@3"
