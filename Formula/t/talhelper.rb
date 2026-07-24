@@ -7,7 +7,7 @@ class Talhelper < Formula
   head "https://github.com/budimanjojo/talhelper.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0e6ba4d5d1f4c731f4cedffa1e6fdbd7d2de1e1daaa4db196fc7f9a46dcd745"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6af87db7c804f6323662bb13be39353675bd0c9d0e029203cf981916d85a858f"
   end
 
   depends_on "go" => :build
