@@ -1,5 +1,5 @@
 diff --git a/packages/opencode/script/build.ts b/packages/opencode/script/build.ts
-index 236838dbd..e32a8a3e6 100755
+index ce45f770f0..22bf491631 100755
 --- a/packages/opencode/script/build.ts
 +++ b/packages/opencode/script/build.ts
 @@ -74,6 +74,11 @@ const allTargets: {
@@ -29,7 +29,7 @@ index 236838dbd..e32a8a3e6 100755
          return false
        }
  
-@@ -179,7 +188,11 @@ for (const item of targets) {
+@@ -174,7 +183,11 @@ for (const item of targets) {
        autoloadDotenv: false,
        autoloadTsconfig: true,
        autoloadPackageJson: true,
@@ -42,13 +42,13 @@ index 236838dbd..e32a8a3e6 100755
        outfile: `dist/${name}/bin/opencode`,
        execArgv: [`--user-agent=opencode/${Script.version}`, "--use-system-ca", "--"],
        windows: {},
-@@ -190,11 +203,11 @@ for (const item of targets) {
+@@ -193,11 +206,11 @@ for (const item of targets) {
        FFF_LIBC: JSON.stringify(item.abi === "musl" ? "musl" : "gnu"),
        OPENCODE_VERSION: `'${Script.version}'`,
        OPENCODE_MODELS_DEV: generated.modelsData,
--      OTUI_TREE_SITTER_WORKER_PATH: bunfsRoot + workerRelativePath,
+-      OTUI_TREE_SITTER_WORKER_PATH: bunfsRoot + treeSitterWorkerPath,
 -      OPENCODE_WORKER_PATH: workerPath,
-+      OTUI_TREE_SITTER_WORKER_PATH: JSON.stringify(bunfsRoot + workerRelativePath),
++      OTUI_TREE_SITTER_WORKER_PATH: JSON.stringify(bunfsRoot + treeSitterWorkerPath),
 +      OPENCODE_WORKER_PATH: JSON.stringify(workerPath),
        OPENCODE_CHANNEL: `'${Script.channel}'`,
 -      OPENCODE_LIBC: item.os === "linux" ? `'${item.abi ?? "glibc"}'` : "",

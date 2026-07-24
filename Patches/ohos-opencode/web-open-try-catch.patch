@@ -1,5 +1,5 @@
 diff --git a/packages/opencode/src/cli/cmd/web.ts b/packages/opencode/src/cli/cmd/web.ts
-index 69a981aad..6b586d51f 100644
+index 69a981aada..6b586d51f0 100644
 --- a/packages/opencode/src/cli/cmd/web.ts
 +++ b/packages/opencode/src/cli/cmd/web.ts
 @@ -72,11 +72,15 @@ export const WebCommand = effectCmd({

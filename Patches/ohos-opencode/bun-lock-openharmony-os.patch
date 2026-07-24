@@ -1,8 +1,8 @@
 diff --git a/bun.lock b/bun.lock
-index 3d8722b15..1e4510be5 100644
+index 5c7a792abc..ab4bec983c 100644
 --- a/bun.lock
 +++ b/bun.lock
-@@ -1590,7 +1593,7 @@
+@@ -1591,7 +1591,7 @@
  
      "@esbuild/openbsd-x64": ["@esbuild/openbsd-x64@0.25.12", "", { "os": "openbsd", "cpu": "x64" }, "sha512-MZyXUkZHjQxUvzK7rN8DJ3SRmrVrke8ZyRusHlP+kuwqTcfWLyqMOE3sScPPyeIXN/mDJIfGXvcMqCgYKekoQw=="],
  
@@ -11,7 +11,7 @@ index 3d8722b15..1e4510be5 100644
  
      "@esbuild/sunos-x64": ["@esbuild/sunos-x64@0.25.12", "", { "os": "sunos", "cpu": "x64" }, "sha512-3wGSCDyuTHQUzt0nV7bocDy72r2lI33QL3gkDNGkod22EsYl04sMf0qLb8luNKTOmgF/eDEDP5BFNwoBKH441w=="],
  
-@@ -2130,7 +2133,7 @@
+@@ -2131,7 +2131,7 @@
  
      "@oxc-parser/binding-linux-x64-musl": ["@oxc-parser/binding-linux-x64-musl@0.127.0", "", { "os": "linux", "cpu": "x64" }, "sha512-5eY0B/bxf1xIUxb4NOTvOI3KWtBQfPWYyKAzgcrCt0mDibSZygVpO1Pz8bkeiSZ5Jj9+M09dkggG3H8I5d0Uyg=="],
  
@@ -20,7 +20,7 @@ index 3d8722b15..1e4510be5 100644
  
      "@oxc-parser/binding-wasm32-wasi": ["@oxc-parser/binding-wasm32-wasi@0.127.0", "", { "dependencies": { "@emnapi/core": "1.9.2", "@emnapi/runtime": "1.9.2", "@napi-rs/wasm-runtime": "^1.1.4" }, "cpu": "none" }, "sha512-T6KVD7rhLzFlwGRXMnxUFfkCZD8FHnb968wVXW1mXzgRFc5RNXOBY2mPPDZ77x5Ln76ltLMgtPg0cOkU1NSrEQ=="],
  
-@@ -2172,7 +2175,7 @@
+@@ -2173,7 +2173,7 @@
  
      "@oxc-resolver/binding-linux-x64-musl": ["@oxc-resolver/binding-linux-x64-musl@11.20.0", "", { "os": "linux", "cpu": "x64" }, "sha512-kcRLEIxpZefeYfLChjpgFf3ilBzRDZ+yobMrpRsQlSrxuFGtm3U6PMU7AaEpMqo3NfDGVyJJseAjnRLzMFHjwQ=="],
  
@@ -29,7 +29,7 @@ index 3d8722b15..1e4510be5 100644
  
      "@oxc-resolver/binding-wasm32-wasi": ["@oxc-resolver/binding-wasm32-wasi@11.20.0", "", { "dependencies": { "@emnapi/core": "1.10.0", "@emnapi/runtime": "1.10.0", "@napi-rs/wasm-runtime": "^1.1.4" }, "cpu": "none" }, "sha512-Tn0y1XOFYHNfK1wp1Z5QK8Rcld/bsOwRISQXfqAZ5IBpv8Gz1IvV39fUWNprqNdRizgcvFhOzWwFun2zkJsyBg=="],
  
-@@ -2252,7 +2255,7 @@
+@@ -2253,7 +2253,7 @@
  
      "@oxlint/binding-linux-x64-musl": ["@oxlint/binding-linux-x64-musl@1.60.0", "", { "os": "linux", "cpu": "x64" }, "sha512-js29ZWIuPhNWzY8NC7KoffEMEeWG105vbmm+8EOJsC+T/jHBiKIJEUF78+F/IrgEWMMP9N0kRND4Pp75+xAhKg=="],
  
@@ -38,7 +38,7 @@ index 3d8722b15..1e4510be5 100644
  
      "@oxlint/binding-win32-arm64-msvc": ["@oxlint/binding-win32-arm64-msvc@1.60.0", "", { "os": "win32", "cpu": "arm64" }, "sha512-WA/yc7f7ZfCefBXVzNHn1Ztulb1EFwNBb4jMZ6pjML0zz6pHujlF3Q3jySluz3XHl/GNeMTntG1seUBWVMlMag=="],
  
-@@ -2472,7 +2475,7 @@
+@@ -2473,7 +2473,7 @@
  
      "@rollup/rollup-openbsd-x64": ["@rollup/rollup-openbsd-x64@4.60.4", "", { "os": "openbsd", "cpu": "x64" }, "sha512-VpTfOPHgVXEBeeR8hZ2O0F3aSso+JDWqTWmTmzcQKted54IAdUVbxE+j/MVxUsKa8L20HJhv3vUezVPoquqWjA=="],
  

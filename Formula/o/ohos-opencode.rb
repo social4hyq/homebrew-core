@@ -1,10 +1,9 @@
 class OhosOpencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.3.tar.gz"
-  sha256 "494041aedd7407079f91fd694de355f4ff022ba6bf876e09ff30983bbdc70ae1"
+  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.4.tar.gz"
+  sha256 "1425066f30aa8dd6047a982edcd8c5a6ebb8de0ab1c122dad8673810dc59c318"
   license "MIT"
-  revision 2
 
   livecheck do
     url "https://github.com/anomalyco/opencode/releases/latest"
@@ -12,8 +11,8 @@ class OhosOpencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.3-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ee3d32a1f7a1ca402430f90d2c2b4b878f422983e20d9d902189ff616b0a5e4"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.4-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
   # opencode is a `bun build --compile` single binary: OHOS bun runtime + JS
@@ -41,7 +40,7 @@ class OhosOpencode < Formula
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
 
   # OHOS adaptations, mirrored from social4hyq/ohos-opencode dev (patches are
-  # the `git diff v1.18.3..dev` for the respective files — regenerate there,
+  # the `git diff v1.18.4..dev` for the respective files — regenerate there,
   # never hand-edit hunks).
   patch :p1 do
     file "Patches/ohos-opencode/ohos-ports-deps.patch"
@@ -129,7 +128,7 @@ class OhosOpencode < Formula
     chmod 0755, bin/"ohos-opencode"
 
     # Static zsh completion: upstream has no completion generator. Top-level
-    # commands from packages/opencode/src/cli/cmd/*.ts (v1.18.3).
+    # commands from packages/opencode/src/cli/cmd/*.ts (v1.18.4).
     (zsh_completion/"_ohos-opencode").write <<~'ZSH'
       #compdef ohos-opencode
 

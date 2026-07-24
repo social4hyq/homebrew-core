@@ -1,5 +1,5 @@
 diff --git a/packages/core/src/project.ts b/packages/core/src/project.ts
-index 49e054d7c..43b186dda 100644
+index 49e054d7cc..43b186dda9 100644
 --- a/packages/core/src/project.ts
 +++ b/packages/core/src/project.ts
 @@ -2,6 +2,7 @@ export * as ProjectV2 from "./project"
@@ -20,7 +20,7 @@ index 49e054d7c..43b186dda 100644
        const previous = yield* cached(repo.commonDirectory)
        const id = (yield* remote(repo)) ?? previous ?? (yield* root(repo))
 diff --git a/packages/opencode/src/project/project.ts b/packages/opencode/src/project/project.ts
-index 9870377b2..35ffa3e9b 100644
+index 9870377b21..35ffa3e9b9 100644
 --- a/packages/opencode/src/project/project.ts
 +++ b/packages/opencode/src/project/project.ts
 @@ -214,7 +214,7 @@ const layer = Layer.effect(
