@@ -7,7 +7,7 @@ class BaconLs < Formula
   head "https://github.com/crisidev/bacon-ls.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5267398a54f268587db0b0c6cacc7ed827f5d543f15eb19ec49cc4a38d8744a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "341dd023152cb0ac91d16a66c450cc51f4b724d386d10564b798be3bef35c35a"
   end
 
   depends_on "rust" => :build
