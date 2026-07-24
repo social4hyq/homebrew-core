@@ -1,12 +1,12 @@
 class Vale < Formula
   desc "Syntax-aware linter for prose"
   homepage "https://vale.sh/"
-  url "https://github.com/errata-ai/vale/archive/refs/tags/v3.15.1.tar.gz"
-  sha256 "f2dc8fd38deb4789a780f5e2f1fbb8489c45333ccd6e923999e528d78efe297a"
+  url "https://github.com/errata-ai/vale/archive/refs/tags/v3.15.2.tar.gz"
+  sha256 "5774342156ff060ba8007b71d8f63f98daa9313ecfadea17aca34b272b16ff1a"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9dfd9b80c4712731e94d1ebffb18aa3ae07ecb0b3f4982f86827fbbfa9949cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5cf640a33f46ed9b8f3694ab05f5c3d3ade48ac5befb82d479ed3ee5989a984d"
   end
 
   depends_on "go" => :build
