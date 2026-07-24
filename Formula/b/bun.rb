@@ -6,7 +6,7 @@ class Bun < Formula
   # pre-populated WebKit cache, and a Rust nightly toolchain with -Zbuild-std.
   # All patches are pre-applied on the ohos-aarch64 branch of social4hyq/ohos-bun.
   # Upstream formula cannot accommodate these build requirements.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "577f1bf30225bed5aeb43cbfc79577e269630978", branch: "ohos-aarch64"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "adb57a212bb6a0ada35359fb590f3d6367a3729e", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
   revision 34
@@ -53,18 +53,18 @@ class Bun < Formula
   # (included in the full nightly host tarball).
   # Version aligned with the channel in bun-src/rust-toolchain.toml.
   resource "rust-nightly" do
-    url "https://static.rust-lang.org/dist/2026-05-06/rust-nightly-aarch64-unknown-linux-ohos.tar.gz"
-    version "nightly-2026-05-06"
-    sha256 "7e93009ca8eb40fa039ba7fce6d8d6e95646b6459a7582e4ea46308c7db00eb8"
+    url "https://static.rust-lang.org/dist/2026-07-20/rust-nightly-aarch64-unknown-linux-ohos.tar.gz"
+    version "nightly-2026-07-20"
+    sha256 "7d3dd4cc4f55ee8a7c7f09804b96fd52ef7ef598a935772091e80aa66869676e"
   end
 
   # rust-src is distributed separately from the host tarball; required by bun
   # -Zbuild-std (otherwise cargo reports
   # "library/Cargo.lock does not exist, unable to build with the standard library").
   resource "rust-src" do
-    url "https://static.rust-lang.org/dist/2026-05-06/rust-src-nightly.tar.gz"
-    version "nightly-2026-05-06"
-    sha256 "2bfd8eed73318df568cc5831083b11de986af6da5c66f140b73cf4ae365ceca3"
+    url "https://static.rust-lang.org/dist/2026-07-20/rust-src-nightly.tar.gz"
+    version "nightly-2026-07-20"
+    sha256 "2be85b655b99624bed0fb63a47e564abac07aa1fb5d0576abac5c42ef8c5316e"
   end
 
   # ── OHOS patches are pre-applied on the ohos-aarch64 branch of social4hyq/ohos-bun ──
