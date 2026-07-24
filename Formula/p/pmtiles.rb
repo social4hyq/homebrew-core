@@ -1,8 +1,8 @@
 class Pmtiles < Formula
   desc "Single-file executable tool for creating, reading and uploading PMTiles archives"
   homepage "https://protomaps.com/docs/pmtiles"
-  url "https://github.com/protomaps/go-pmtiles/archive/refs/tags/v1.31.1.tar.gz"
-  sha256 "1890ca1c2f0aff60097c69efb65b51249fee3e19ff0811affc06da9abf7144bd"
+  url "https://github.com/protomaps/go-pmtiles/archive/refs/tags/v1.31.2.tar.gz"
+  sha256 "022386795fae441dd35927e4061daaed8cda7e21ba0a2e2253c8fd0d85bc482f"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,7 +11,7 @@ class Pmtiles < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "19df1c7c4d9493d41791fb12106d7a8c70011d111eab314b67202ce281a34f26"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03499194368d414ac084b6d1b7012f995ee823becae61ecb3c69524076162c0b"
   end
 
   depends_on "go" => :build
