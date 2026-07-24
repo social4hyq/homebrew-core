@@ -1,12 +1,12 @@
 class Oxfmt < Formula
   desc "High-performance formatting tool for JavaScript and TypeScript"
   homepage "https://oxc.rs/"
-  url "https://registry.npmjs.org/oxfmt/-/oxfmt-0.59.0.tgz"
-  sha256 "e3ce67dba282b93fc3a43836d973d898e8f3ae5abacd5e6ef330c687952dcd17"
+  url "https://registry.npmjs.org/oxfmt/-/oxfmt-0.60.0.tgz"
+  sha256 "b4926144444c6282fdad21f8a9dc8d8d183c863f104a4a35e82c5867187ecf9c"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9aa8a742cf152b81f5f3ed26220916004c777def9b7cefbdf75a6d0914f29b7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0739b5bfe6f18c0731dd3bd97a54c71b824f0663c78df56a6118151aa5236e22"
   end
 
   depends_on "node"
