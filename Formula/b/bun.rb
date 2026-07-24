@@ -9,7 +9,7 @@ class Bun < Formula
   url "https://github.com/social4hyq/ohos-bun.git", revision: "adb57a212bb6a0ada35359fb590f3d6367a3729e", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
-  revision 34
+  revision 35
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
