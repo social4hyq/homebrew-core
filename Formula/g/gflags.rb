@@ -7,7 +7,7 @@ class Gflags < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e08494c7504fa5c7534547ee2a407404b22286f0f5a38cc70704a8771c3229d4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "448a2fb291120ac23112bf665da417ba3415c53282a9ce6241573726b6438552"
   end
 
   depends_on "cmake" => [:build, :test]
