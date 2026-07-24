@@ -1,8 +1,8 @@
 class Nelm < Formula
   desc "Kubernetes deployment tool that manages and deploys Helm Charts"
   homepage "https://github.com/werf/nelm"
-  url "https://github.com/werf/nelm/archive/refs/tags/v1.25.2.tar.gz"
-  sha256 "c3189decb979989ed864e20d0e9e884d0a7a2675d24b19414068b5662cb05349"
+  url "https://github.com/werf/nelm/archive/refs/tags/v1.25.3.tar.gz"
+  sha256 "0355888725e84e526ab92aec616a8c08b4d68b809db70ccbccd468f6a87c114a"
   license "Apache-2.0"
   head "https://github.com/werf/nelm.git", branch: "main"
 
@@ -14,8 +14,7 @@ class Nelm < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c2592fbdb4d9cdd16dea4ee969e38528150a1612592f755e74d50021d49519c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "519255f48cb5edf9540f95f16c9b91fbef27964adff667120727103653a4f1fe"
   end
 
   depends_on "go" => :build
