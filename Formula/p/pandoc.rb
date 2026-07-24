@@ -8,7 +8,7 @@ class Pandoc < Formula
   head "https://github.com/jgm/pandoc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e857f6aa0e5b73acf053dbb209cc51095249e352a52a795fd265b9a8f3c361ef"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3eed6cbd1d3185377ee0f26e05e0d1511c1cf951b42f85ed396234b890047db1"
   end
 
   depends_on "cabal-install" => :build
