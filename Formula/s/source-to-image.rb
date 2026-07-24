@@ -8,7 +8,7 @@ class SourceToImage < Formula
   head "https://github.com/openshift/source-to-image.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "58bb67cd5b7699c1bab286d4be94ee954b467bfb7b02c78d2652f0f65cc692ec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9668052adba374148d00411fe01be8e80ac7e0c44ad75c34685d8b27d19d64d7"
   end
 
   depends_on "go" => :build
