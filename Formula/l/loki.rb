@@ -1,8 +1,8 @@
 class Loki < Formula
   desc "Horizontally-scalable, highly-available log aggregation system"
   homepage "https://grafana.com/loki"
-  url "https://github.com/grafana/loki/archive/refs/tags/v3.7.3.tar.gz"
-  sha256 "1f74768fc476978796b49455fd962587a6b0e3b75212215ed8449f792aa5c776"
+  url "https://github.com/grafana/loki/archive/refs/tags/v3.7.4.tar.gz"
+  sha256 "22edd28b032b8c976a8ad971f8df378dbe614c39d0a2ad9663e629f4e21bdf37"
   license "AGPL-3.0-only"
   head "https://github.com/grafana/loki.git", branch: "main"
 
@@ -12,8 +12,7 @@ class Loki < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "48fda7405902fb0137d1316d09af4105949c50d50c8f4eba3e0baa9488c3ce06"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "85be3ec20678635e30687448161bf87ce6cf0571c7371c3f4a68de36a25b5fc8"
   end
 
   depends_on "go" => :build
