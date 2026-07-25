@@ -1,8 +1,8 @@
 class OhosOpencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.4.tar.gz"
-  sha256 "1425066f30aa8dd6047a982edcd8c5a6ebb8de0ab1c122dad8673810dc59c318"
+  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.5.tar.gz"
+  sha256 "eb3daee12da937a36c3276efda2ce1253d3c8fbe2828ebd581a39a2c2d3efdab"
   license "MIT"
 
   livecheck do
@@ -40,7 +40,7 @@ class OhosOpencode < Formula
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
 
   # OHOS adaptations, mirrored from social4hyq/ohos-opencode dev (patches are
-  # the `git diff v1.18.4..dev` for the respective files — regenerate there,
+  # the `git diff v1.18.5..dev` for the respective files — regenerate there,
   # never hand-edit hunks).
   patch :p1 do
     file "Patches/ohos-opencode/ohos-ports-deps.patch"
@@ -128,7 +128,8 @@ class OhosOpencode < Formula
     chmod 0755, bin/"ohos-opencode"
 
     # Static zsh completion: upstream has no completion generator. Top-level
-    # commands from packages/opencode/src/cli/cmd/*.ts (v1.18.4).
+    # commands from packages/opencode/src/cli/cmd/*.ts (v1.18.5; file list
+    # unchanged since v1.18.4, no regeneration needed).
     (zsh_completion/"_ohos-opencode").write <<~'ZSH'
       #compdef ohos-opencode
 
