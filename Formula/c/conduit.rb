@@ -1,8 +1,8 @@
 class Conduit < Formula
   desc "Streams data between data stores. Kafka Connect replacement. No JVM required"
   homepage "https://conduit.io/"
-  url "https://github.com/ConduitIO/conduit/archive/refs/tags/v0.18.0.tar.gz"
-  sha256 "fe52c1b067a793830ad8a7b00417f60736b06a42aae85994ff8f9a5dd1b295d2"
+  url "https://github.com/ConduitIO/conduit/archive/refs/tags/v0.19.0.tar.gz"
+  sha256 "5be3d85a87dda65e3b71af2163819206d04de91bf7cd821ac3f7a95000c4123a"
   license "Apache-2.0"
   head "https://github.com/ConduitIO/conduit.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Conduit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "05019a9fed8fee8fbc660bf909ebe27e7538ba4c793fd1629eca803da77c02b0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "af4553b1f84a1cef6b16a3aa9429f809d9b7f067b9089a8d70449ccf29bf4ad0"
   end
 
   depends_on "go" => :build
