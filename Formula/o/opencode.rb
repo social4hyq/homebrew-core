@@ -1,8 +1,8 @@
 class Opencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64 (prebuilt musl binary)"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://registry.npmmirror.com/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-1.18.4.tgz"
-  sha256 "07a5e82867152e062189ac1d100ec44a3e41a40322240c7c829b7b43edece219"
+  url "https://registry.npmmirror.com/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-1.18.5.tgz"
+  sha256 "bac0e17e5a7ca86a1c8d674327bbba9e41123ab63af2873ab5e87612b79edf2c"
   license "MIT"
   # opencode's official prebuilt linux-arm64-musl single binary (Bun --compile).
   # Bypasses the opencode-ai npm JS wrapper. The musl-ABI binary is
