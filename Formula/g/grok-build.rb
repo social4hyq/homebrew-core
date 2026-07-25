@@ -36,9 +36,8 @@ class GrokBuild < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/grok-build-v0.2.111-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0faf5f8b2a3680e19580c111e166e3e30164ab517dd894cab010143fe6e5d5ba"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/grok-build-v0.2.112-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c334d901b3a6ff62c97845dbf3e7a56c26d1a2e680b8f0283bbcc43a96437544"
   end
 
   depends_on "ohos-bst-light" => :build
