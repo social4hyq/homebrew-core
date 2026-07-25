@@ -7,7 +7,7 @@ class Oxker < Formula
   head "https://github.com/mrjackwills/oxker.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7e6fbe92e40529cf491a9f45314f4ae5faccadfb413cb1f6be7b1d43574be7e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd592c679cb6459ab1afa1f9570eaa1b8b8bd238310371f7767f24c188a795f6"
   end
 
   depends_on "rust" => :build
