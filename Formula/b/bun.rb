@@ -6,10 +6,10 @@ class Bun < Formula
   # pre-populated WebKit cache, and a Rust nightly toolchain with -Zbuild-std.
   # All patches are pre-applied on the ohos-aarch64 branch of social4hyq/ohos-bun.
   # Upstream formula cannot accommodate these build requirements.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "adb57a212bb6a0ada35359fb590f3d6367a3729e", branch: "ohos-aarch64"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "f6f6466289f1c22fadc5d7a7e86877b67aa2e76a", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
-  revision 35
+  revision 37
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -314,5 +314,66 @@ class Bun < Formula
   test do
     assert_match "4294967296", shell_output("#{bin}/bun -e 'console.log(2**32)'")
     assert_match version.to_s, shell_output("#{bin}/bun --version")
+
+    # `bun install` must self-sign the native binaries it materializes into
+    # node_modules: the OHOS kernel refuses to dlopen an ELF with no
+    # `.codesign` section, so an unsigned .node makes every native addon
+    # unusable (ERR_DLOPEN_FAILED, "Permission denied"). Regression test for
+    # r37, which shipped for several revisions unable to sign anything.
+    #
+    # The fixture installs from a local tarball, so it takes the same
+    # extraction path as a registry package with no network, and it is scoped
+    # so the binary lands nested at node_modules/@fixture/native/. Nesting is
+    # what makes this a regression test: a scan that joins the directory
+    # walker's basename instead of its root-relative path writes to a
+    # nonexistent path and silently leaves the binary unsigned.
+    shstrtab = "\0.text\0.shstrtab\0".b
+    text_off = 64
+    text_size = 16
+    shstr_off = text_off + text_size
+    sh_off = shstr_off + shstrtab.bytesize
+    sh_off += (8 - (sh_off % 8)) % 8
+    section = lambda do |name, type, offset, size, align|
+      [name, type, 0, 0, offset, size, 0, 0, align, 0].pack("L<L<Q<Q<Q<Q<L<L<Q<Q<")
+    end
+
+    # ELF64 aarch64 ET_DYN with a three-entry section header table — the
+    # minimum the signer parses and extends. Never dlopen'd by this test.
+    elf = [0x7f, 0x45, 0x4c, 0x46, 2, 1, 1, 0].pack("C8") + ("\0" * 8)
+    elf += [3, 183, 1].pack("S<S<L<")                 # ET_DYN, EM_AARCH64, EV_CURRENT
+    elf += [0, 0, sh_off, 0].pack("Q<Q<Q<L<")         # e_entry, e_phoff, e_shoff, e_flags
+    elf += [64, 0, 0, 64, 3, 2].pack("S<S<S<S<S<S<")  # e_ehsize .. e_shstrndx
+    elf += "\0" * text_size
+    elf += shstrtab
+    elf += "\0" * (sh_off - elf.bytesize)
+    elf += section.call(0, 0, 0, 0, 0)                          # SHT_NULL
+    elf += section.call(1, 1, text_off, text_size, 4)           # .text
+    elf += section.call(7, 3, shstr_off, shstrtab.bytesize, 1)  # .shstrtab
+
+    (testpath/"fixture").mkpath
+    (testpath/"fixture/package.json").write <<~JSON
+      {"name": "@fixture/native", "version": "1.0.0"}
+    JSON
+    (testpath/"fixture/binding.node").binwrite elf
+    refute_includes (testpath/"fixture/binding.node").binread, ".codesign"
+
+    cd testpath/"fixture" do
+      system bin/"bun", "pm", "pack"
+    end
+    tarball = Pathname.new(Dir[testpath/"fixture/*.tgz"].fetch(0)).basename
+
+    (testpath/"app").mkpath
+    (testpath/"app/package.json").write <<~JSON
+      {"name": "app", "private": true,
+       "dependencies": {"@fixture/native": "file:../fixture/#{tarball}"}}
+    JSON
+    cd testpath/"app" do
+      system bin/"bun", "install"
+    end
+
+    installed = testpath/"app/node_modules/@fixture/native/binding.node"
+    assert_path_exists installed
+    refute_predicate installed, :symlink?
+    assert_includes installed.binread, ".codesign"
   end
 end
