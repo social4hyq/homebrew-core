@@ -1,8 +1,8 @@
 class Shmcat < Formula
   desc "Tool that dumps shared memory segments (System V and POSIX)"
   homepage "https://shmcat.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/shmcat/shmcat-1.9.tar.xz"
-  sha256 "831f1671e737bed31de3721b861f3796461ebf3b05270cf4c938749120ca8e5b"
+  url "https://downloads.sourceforge.net/project/shmcat/shmcat-1.10.tar.xz"
+  sha256 "821212924bf9ef3fbd7a357b4f1065898c12635b86fa5d7bad259533d251076e"
   license "GPL-2.0-or-later"
 
   livecheck do
