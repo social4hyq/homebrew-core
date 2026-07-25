@@ -9,7 +9,7 @@ class Bun < Formula
   url "https://github.com/social4hyq/ohos-bun.git", revision: "adb57a212bb6a0ada35359fb590f3d6367a3729e", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
-  revision 34
+  revision 35
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -18,9 +18,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r35"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aeaf9ff9d028a6dc9cb7444bfb067a93b37dc80d4e3b32fbd428175162be38ab"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r36"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ed6bd3b6de5a281c1753e7a28ab348b32f3add58b4ad959107182560b2754cf3"
   end
 
   # ── Dependencies (bare names except icu4c@78 — the one name harmonybrew/core
