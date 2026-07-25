@@ -1,12 +1,12 @@
 class Wildmidi < Formula
   desc "Simple software midi player"
   homepage "https://github.com/Mindwerks/wildmidi"
-  url "https://github.com/Mindwerks/wildmidi/archive/refs/tags/wildmidi-0.4.6.tar.gz"
-  sha256 "051b8c51699af594ddd3e4e3b06bad3564e9499c3c6b9e6f880cb2f92bcfa9c8"
+  url "https://github.com/Mindwerks/wildmidi/archive/refs/tags/wildmidi-0.5.0.tar.gz"
+  sha256 "2164396d5fe80153fd2af9764fcd991883d06fbf1fdfd96efbc99eed21ed1a2f"
   license all_of: ["GPL-3.0-only", "LGPL-3.0-only"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "16ac3fb868ccb0254a8a1895fc1a8e8b73903a5cc239c4d93658ea0d2a34e8ed"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "99698eb5c917675419c433b1723f6bb6f50eccaf0703312a19e0496b8a14ed31"
   end
 
   depends_on "cmake" => :build
