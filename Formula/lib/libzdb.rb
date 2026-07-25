@@ -11,7 +11,7 @@ class Libzdb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "79937c510f73d2c114c9145cf4ea41cdefd150fbc672f04d1715e9b52a4370a4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d17a80fba901b20be6f7b8c4576db305299de094916bad248a1143b0f5099e11"
   end
 
   depends_on "libpq"
