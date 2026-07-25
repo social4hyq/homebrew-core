@@ -13,7 +13,7 @@ class Dcm2niix < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "006b45d0e4f06b7d8c4649364ce45ba25bbabec3654f45d3d70f0d6fe24382dd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07a1b1dee02fae39a956d51f6cc5278be0ccdfaa23d42169bf3771fdfd42f915"
   end
 
   depends_on "cmake" => :build
