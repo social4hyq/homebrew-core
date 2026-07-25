@@ -42,14 +42,14 @@ zsh 补全（`ohos-opencode` / `grok` / `cc-switch`）随 bottle 装入 `share/z
 
 | Formula | 版本 | 定位 |
 |---|---|---|
-| `ohos-opencode` | 1.18.4 | OpenCode AI 编码代理 CLI，**上游源码构建**（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；原生依赖走 `@ohos-ports/*` npm 包。命令名 `ohos-opencode`，与官方 `opencode-ai` npm 包区分 |
-| `opencode` | 1.18.4 | 同一 CLI 的**预编译 musl 二进制**路线（从 npmmirror 拉取 `opencode-linux-arm64-musl`）；注入 RUNPATH 补 Alpine libstdc++/libgcc，wrapper LD_PRELOAD `ohos-compat-shim` + `dlopen-sign-shim` |
-| `claude-code` | 2.1.218 | Anthropic Claude Code CLI；**runtime-fetch stub**（Anthropic License 不允许重分发官方二进制），首次运行拉取 + 校验 sha256 + 自签 + 缓存 |
-| `grok-build` | 0.2.111 | xAI Grok Build CLI；完全静态 ELF，仅 `ohos-bst-light` self-sign，无需 shim/RUNPATH；bash/zsh/fish 补全 |
+| `ohos-opencode` | 1.18.5 | OpenCode AI 编码代理 CLI，**上游源码构建**（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；原生依赖走 `@ohos-ports/*` npm 包。命令名 `ohos-opencode`，与官方 `opencode-ai` npm 包区分 |
+| `opencode` | 1.18.5 | 同一 CLI 的**预编译 musl 二进制**路线（从 npmmirror 拉取 `opencode-linux-arm64-musl`）；注入 RUNPATH 补 Alpine libstdc++/libgcc，wrapper LD_PRELOAD `ohos-compat-shim` + `dlopen-sign-shim` |
+| `claude-code` | 2.1.219 | Anthropic Claude Code CLI；**runtime-fetch stub**（Anthropic License 不允许重分发官方二进制），首次运行拉取 + 校验 sha256 + 自签 + 缓存 |
+| `grok-build` | 0.2.112 | xAI Grok Build CLI；完全静态 ELF，仅 `ohos-bst-light` self-sign，无需 shim/RUNPATH；bash/zsh/fish 补全 |
 | `cc-switch` | 5.9.2, revision 1 | AI coding CLI 供应商切换器 + 本地代理（预编译静态 ELF，仅 `ohos-bst-light` self-sign）；主要用于给 codex 桥接 Chat-Completions-only provider（Kimi/DeepSeek 等） |
-| `bun` | 1.4.0, revision 34 | Bun JavaScript runtime（`social4hyq/ohos-bun` 的 `ohos-aarch64` 分支）；`ohos-compat-shim` 已**静态内嵌**进可执行文件（覆盖 bun 及所有 `bun build --compile` 产物），无 LD_PRELOAD wrapper |
+| `bun` | 1.4.0, revision 35 | Bun JavaScript runtime（`social4hyq/ohos-bun` 的 `ohos-aarch64` 分支）；`ohos-compat-shim` 已**静态内嵌**进可执行文件（覆盖 bun 及所有 `bun build --compile` 产物），无 LD_PRELOAD wrapper |
 | `bun-bootstrap` | 1.4.0-5467a689 | 预编译 bun，用来启动 `bun bd` 自举本机 bun；已预签，无需 ohos-sdk（`keg_only`） |
-| `bun-webkit` | `4895f45dfb` | JavaScriptCore / WTF / bmalloc 静态库，bun 专用 WebKit fork（`keg_only`） |
+| `bun-webkit` | `5491700992` | JavaScriptCore / WTF / bmalloc 静态库，bun 专用 WebKit fork（`keg_only`） |
 | `llvm@21` | 21.1.8, revision 2 | OHOS 补丁版 clang + lld + multiarch runtime libs；链接期 LLD `--code-sign` 签名（裁剪版，`keg_only`） |
 | `icu4c@78` | 78.3, revision 1 | Unicode 库，用本仓库 llvm@21 重编以对齐 libc++ ABI（`keg_only`） |
 | `ohos-bst-light` | 1.0.0 | 轻量二进制自签工具，保留 ELF 结构不被破坏；预编译二进制 formula 的 self-sign 都靠它 |
