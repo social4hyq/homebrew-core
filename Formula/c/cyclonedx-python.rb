@@ -9,7 +9,7 @@ class CyclonedxPython < Formula
   head "https://github.com/CycloneDX/cyclonedx-python.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1b9f506f967cf11cd22cc0ef7bb53a976177e0b6d5749686acf072c4edf2a4a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "473dbc879c20d321ee3cd87a6cffe0b2189cd906f1237167b2df0a633e82d639"
   end
 
   depends_on "python@3.14"
