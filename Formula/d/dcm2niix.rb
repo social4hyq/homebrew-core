@@ -1,8 +1,8 @@
 class Dcm2niix < Formula
   desc "DICOM to NIfTI converter"
   homepage "https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage"
-  url "https://github.com/rordenlab/dcm2niix/archive/refs/tags/v1.0.20260416.tar.gz"
-  sha256 "dc87a34b8284df2700a5aee433c4ba7ea56b999ac774fcf684962de5e898670d"
+  url "https://github.com/rordenlab/dcm2niix/archive/refs/tags/v1.0.20260724.tar.gz"
+  sha256 "be6478b15aaf1e0c396df242e272a6a695966dc916672f519844ad1682b59e59"
   license "BSD-3-Clause"
   version_scheme 1
   head "https://github.com/rordenlab/dcm2niix.git", branch: "master"
@@ -13,7 +13,7 @@ class Dcm2niix < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "006b45d0e4f06b7d8c4649364ce45ba25bbabec3654f45d3d70f0d6fe24382dd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07a1b1dee02fae39a956d51f6cc5278be0ccdfaa23d42169bf3771fdfd42f915"
   end
 
   depends_on "cmake" => :build
