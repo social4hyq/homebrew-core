@@ -13,7 +13,7 @@ class Luau < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e847ed69ebce8c3b324d926d1a7ed97e69240849ddf91259786e270157d9abab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9e3197c48a57fa4b651a28f982ed6b5ed20ddb01fc18d0545536cfc5c3b2328"
   end
 
   depends_on "cmake" => :build
