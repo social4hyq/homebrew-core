@@ -12,7 +12,7 @@ index c506ff57c4..b41c6bda90 100644
  [test]
  root = "./do-not-run-tests-from-root"
 diff --git a/package.json b/package.json
-index 332d7520a6..bcfbc4e27b 100644
+index 5fd0f1d51a..acb164b34b 100644
 --- a/package.json
 +++ b/package.json
 @@ -136,11 +136,14 @@
