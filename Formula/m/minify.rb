@@ -1,13 +1,13 @@
 class Minify < Formula
   desc "Minifier for HTML, CSS, JS, JSON, SVG, and XML"
   homepage "https://go.tacodewolff.nl/minify"
-  url "https://github.com/tdewolff/minify/archive/refs/tags/v2.24.13.tar.gz"
-  sha256 "d81dc3e0793d9a69e24d3655f60cf19be8c5cb62f86f6c3a3a4e7b678bc9b31c"
+  url "https://github.com/tdewolff/minify/archive/refs/tags/v2.24.14.tar.gz"
+  sha256 "bb5b9bdf52ccd19a1d5e69f867fabf7355ae124ba114e933b72a88a8cea20d90"
   license "MIT"
   head "https://github.com/tdewolff/minify.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f7c29a2dd4fc533b463c982cf6fad0a9843c62c41dba5931d1c73a1e4593de4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8fcf195efedb748f775649b56d9dfa0a9a1fc2ce58ce22d1ea0254ecfb556522"
   end
 
   depends_on "go" => :build
