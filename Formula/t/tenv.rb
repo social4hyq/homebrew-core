@@ -12,7 +12,7 @@ class Tenv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e938b470092746a1222ef4d48cc08ccfc032d166f72606f4846ec1f022bd059"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cbd6e37e02247939cfd9d48df1c355626a9cc7b7b3530c8299b9cf22f2379f61"
   end
 
   depends_on "go" => :build
