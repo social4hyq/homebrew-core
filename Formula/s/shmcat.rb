@@ -11,7 +11,7 @@ class Shmcat < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd9405482822916c083125bbb2db569b10e39805cdc7d994be3444fba847bcdb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "32c3f94e660e86ff2731d003e7ef3bee87350919228e3588d690628c99d87419"
   end
 
   def install
