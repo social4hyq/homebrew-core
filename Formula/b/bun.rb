@@ -6,10 +6,10 @@ class Bun < Formula
   # pre-populated WebKit cache, and a Rust nightly toolchain with -Zbuild-std.
   # All patches are pre-applied on the ohos-aarch64 branch of social4hyq/ohos-bun.
   # Upstream formula cannot accommodate these build requirements.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "f6f6466289f1c22fadc5d7a7e86877b67aa2e76a", branch: "ohos-aarch64"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "f43c25719c5b4e2c59244586e3bb467eba92a836", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
-  revision 37
+  revision 38
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
@@ -18,8 +18,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r37"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3940e621a9c5e60de46db6a7698a3999ab35a80db6acb1ce58f16d994403ed9"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r38"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7b153cfb9d07b69fa5c51033e58c619d23b4770c4b4ffdd99ecd5f962616ce1"
   end
 
   # ── Dependencies (bare names except icu4c@78 — the one name harmonybrew/core
@@ -362,11 +362,13 @@ class Bun < Formula
     end
     tarball = Pathname.new(Dir[testpath/"fixture/*.tgz"].fetch(0)).basename
 
-    (testpath/"app").mkpath
-    (testpath/"app/package.json").write <<~JSON
+    manifest = <<~JSON
       {"name": "app", "private": true,
        "dependencies": {"@fixture/native": "file:../fixture/#{tarball}"}}
     JSON
+
+    (testpath/"app").mkpath
+    (testpath/"app/package.json").write manifest
     cd testpath/"app" do
       system bin/"bun", "install"
     end
@@ -375,5 +377,30 @@ class Bun < Formula
     assert_path_exists installed
     refute_predicate installed, :symlink?
     assert_includes installed.binread, ".codesign"
+
+    # Same check under the isolated linker, which materializes each package
+    # once in node_modules/.bun/ and symlinks node_modules/<pkg> at it. The
+    # hoisted scan must not follow those symlinks (`file:` and workspace deps
+    # resolve to the user's own sources), so store entries are signed where
+    # they are created — untested, that whole layout shipped unsigned.
+    # Glob rather than hardcode the store path, and require every copy found
+    # to be signed: Dir.glob does not descend into symlinks, so this sees the
+    # real store file. FNM_DOTMATCH is required — the store lives in the dot
+    # directory node_modules/.bun, which a plain ** will not enter, and
+    # refute_empty then turns any layout change into a loud failure.
+    (testpath/"app-isolated").mkpath
+    (testpath/"app-isolated/package.json").write manifest
+    cd testpath/"app-isolated" do
+      system bin/"bun", "install", "--linker", "isolated"
+    end
+
+    store_copies = Dir.glob(
+      testpath/"app-isolated/node_modules/**/binding.node",
+      File::FNM_DOTMATCH,
+    )
+    refute_empty store_copies
+    store_copies.each do |copy|
+      assert_includes File.binread(copy), ".codesign"
+    end
   end
 end
