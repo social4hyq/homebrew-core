@@ -1,8 +1,8 @@
 class AwsSdkCpp < Formula
   desc "AWS SDK for C++"
   homepage "https://github.com/aws/aws-sdk-cpp"
-  url "https://github.com/aws/aws-sdk-cpp/archive/refs/tags/1.11.840.tar.gz"
-  sha256 "98e1fbb9ba56d2a21ce9d07c456ebba04452d2f1c164207e5f1321ea5810d4be"
+  url "https://github.com/aws/aws-sdk-cpp/archive/refs/tags/1.11.855.tar.gz"
+  sha256 "d9cd0437601f56139bbd147461d22ffa9af5669259655b6a25502b2c782510cd"
   license "Apache-2.0"
   compatibility_version 1
   head "https://github.com/aws/aws-sdk-cpp.git", branch: "main"
@@ -12,7 +12,7 @@ class AwsSdkCpp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c4b813b73f02a8fc90774961a0b7506d4b91f99588e9aa03d940aa028a881243"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "617117e1b90f54bc6036622cb04619a0d916141ebba99be1c6dfebb1de07d47b"
   end
 
   depends_on "cmake" => :build
