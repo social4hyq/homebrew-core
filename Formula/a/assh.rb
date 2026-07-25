@@ -7,7 +7,7 @@ class Assh < Formula
   head "https://github.com/moul/assh.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b4e3b18148ab8fadc11044586e80f70f037f6de69007af689f05c457844693f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "31d8e6b3e7a4eaa1ac5ad613cc505101de5df3cf3da88be04c223df009bf1aa4"
   end
 
   depends_on "go" => :build
