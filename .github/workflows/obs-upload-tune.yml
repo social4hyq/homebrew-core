@@ -3,6 +3,21 @@ name: obs-upload-tune
 # THROWAWAY experiment — delete this file once the data is collected and
 # the winning config is landed in publish.sh.
 #
+# CONCLUSION (2026-07-26, 6 successful scheduled runs across 07-25/26):
+#   - control-cubic baseline: 13-75 KB/s in slow windows (30MB = ~29min),
+#     but 3.5-5 MB/s in fast windows — the GHA<->OBS path swings wildly by
+#     time of day, which is exactly why the tuning matters
+#   - bbr+fq+bigbuf: 2.5-8.2 MB/s in EVERY run (best worst-case) — this is
+#     the config already landed in publish.sh (plus an initcwnd bump)
+#   - initcwnd-bump: higher peaks (5.3 MB/s) but volatile (down to 713 KB/s)
+#   - parallel-16: diagnostic only — atomgit's presigned URL is single-PUT,
+#     one bottle object can't be split across connections anyway
+# The full 30MB control is therefore retired: control-cubic now uploads a
+# 512KB canary (~30-60s worst case) purely to tell "slow moment" runs from
+# "fast moment" runs. The workflow is kept on its schedule as a cheap
+# ongoing monitor of the trans-Pacific path; delete it outright if that
+# signal stops being useful.
+#
 # obs-upload-probe (see PR #16, run 29691270091) established:
 #   - single-connection PUT: ~14KB/s on both ARM and x86 runners (runner
 #     choice doesn't matter)
@@ -87,7 +102,7 @@ jobs:
   control-cubic:
     needs: setup
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 60
+    timeout-minutes: 10
     outputs:
       speed_kbs: ${{ steps.put.outputs.speed_kbs }}
     steps:
@@ -96,8 +111,12 @@ jobs:
           sysctl net.ipv4.tcp_congestion_control net.ipv4.tcp_available_congestion_control || true
           sysctl net.core.wmem_max net.ipv4.tcp_wmem || true
 
-      - name: Generate 30MB blob
-        run: dd if=/dev/urandom of=blob.bin bs=1M count=30 status=none
+      # Canary-sized blob: the 30MB baseline already proved its point (13-75
+      # KB/s in slow windows across 6 scheduled runs, 2026-07-25/26 — a ~29
+      # minute upload). 512KB keeps the per-run "did we catch a slow moment?"
+      # signal at ~30-60s worst case instead of half an hour.
+      - name: Generate 512KB blob
+        run: dd if=/dev/urandom of=blob.bin bs=512K count=1 status=none
 
       - name: PUT via presigned URL
         id: put
@@ -113,7 +132,7 @@ jobs:
             sleep 5
           done
           [ -n "$RESP" ] || { echo "failed to get presigned URL after 3 attempts" >&2; exit 1; }
-          STATS=$(curl -sf --speed-limit 1024 --speed-time 120 -m 3600 -X PUT "$(echo "$RESP" | jq -r .url)" \
+          STATS=$(curl -sf --speed-limit 1024 --speed-time 120 -m 300 -X PUT "$(echo "$RESP" | jq -r .url)" \
             -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
             -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
             -H "x-obs-callback: $(echo "$RESP" | jq -r '.headers["x-obs-callback"]')" \
