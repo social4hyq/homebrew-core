@@ -66,7 +66,7 @@ class OpencodeAT2 < Formula
            "binary-sign-tool pass double-signs and corrupts this prebuilt binary"
     end
 
-    src = buildpath.glob("package/bin/opencode2").first
+    src = buildpath.glob("package/bin/opencode2").first || buildpath.glob("**/opencode2").first
     odie "opencode2 binary not found in tarball" unless src
 
     libdir = libexec/"lib"
