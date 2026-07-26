@@ -1,8 +1,8 @@
 class TrzszSsh < Formula
   desc "Highly OpenSSH-compatible client with extended features"
   homepage "https://trzsz.github.io/tssh"
-  url "https://github.com/trzsz/trzsz-ssh/archive/refs/tags/v0.1.25.tar.gz"
-  sha256 "9a692854733333643b6108f68bed0239b266c461e15125781503d957c9b47842"
+  url "https://github.com/trzsz/trzsz-ssh/archive/refs/tags/v0.1.26.tar.gz"
+  sha256 "67c9082543e1785ece3f5ab09f6299cd655e3657593d55cc85751c097c1bb381"
   license "MIT"
 
   bottle do
