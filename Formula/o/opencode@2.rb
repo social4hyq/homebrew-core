@@ -26,6 +26,11 @@ class OpencodeAT2 < Formula
     regex(/"version":\s*"([^"]+)"/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-next-16231-r1"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "c2b311f1dc75601c2d55eb1e4eb160d990d7fb74b29c8d47de667aa603be6b86"
+  end
+
   # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
   # runtime), which OHOS does NOT ship (OHOS uses libc++). We bundle musl-aarch64
   # builds of both from Alpine and inject a DT_RUNPATH so the loader finds them.
