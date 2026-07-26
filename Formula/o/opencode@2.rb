@@ -1,5 +1,5 @@
 class OpencodeAT2 < Formula
-  desc "AI coding agent terminal UI — HarmonyOS aarch64 (prebuilt musl binary, v2/next preview channel)"
+  desc "AI coding agent terminal UI — HarmonyOS aarch64 (v2 preview, prebuilt)"
   homepage "https://github.com/anomalyco/opencode"
   # v2's prebuilt platform binary (@opencode-ai/cli-linux-arm64-musl) has not
   # synced onto registry.npmmirror.com as of this writing (the scope package
@@ -9,8 +9,8 @@ class OpencodeAT2 < Formula
   # documented for claude-code/codex (only affects local machine curl, not
   # bottle distribution or the CI runner that builds it).
   url "https://registry.npmjs.org/@opencode-ai/cli-linux-arm64-musl/-/cli-linux-arm64-musl-0.0.0-next-16231.tgz"
-  sha256 "a0f9109a6dd77ab994f338ad1246117882754cb5dfe1a20ac3c35daf8b057bba"
   version "0.0.0-next-16231"
+  sha256 "a0f9109a6dd77ab994f338ad1246117882754cb5dfe1a20ac3c35daf8b057bba"
   license "MIT"
   # opencode v2's official prebuilt linux-arm64-musl single binary (Bun
   # --compile, bin name changed from `opencode` to `opencode2`). Bypasses the
