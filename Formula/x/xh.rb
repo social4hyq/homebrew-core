@@ -1,13 +1,13 @@
 class Xh < Formula
   desc "Friendly and fast tool for sending HTTP requests"
   homepage "https://github.com/ducaale/xh"
-  url "https://github.com/ducaale/xh/archive/refs/tags/v0.26.1.tar.gz"
-  sha256 "6c4822374d3b9bacfc50719ffb5653a32fd84344e50fd88b499ed8fc9e52198b"
+  url "https://github.com/ducaale/xh/archive/refs/tags/v0.26.2.tar.gz"
+  sha256 "61a88a5b3beac225b75a11d6ed32659af78db7ff29c825def0ab7f4a2906cbd7"
   license "MIT"
   head "https://github.com/ducaale/xh.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "96bb166c24d3e75d6dbacf257a026815e34f05c686b9f9aff7a66b4d415717af"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6cbb44e4e353c1d717f7defdfcc463824d62632e897d3dd20ce41774bd9dd7c5"
   end
 
   depends_on "rust" => :build
