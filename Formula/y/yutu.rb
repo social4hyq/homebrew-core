@@ -12,7 +12,7 @@ class Yutu < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ce341eec0997ded188701215bb4a94a166d08fe83cd12936d272494f6c817fc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "afe64ce96cf6ff88cd4f33df005b98e0cc50a6bb416ee4ad023b7d41a562af9c"
   end
 
   depends_on "go" => :build
