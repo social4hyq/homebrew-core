@@ -1,8 +1,8 @@
 class Betterleaks < Formula
   desc "Secrets scanner built for configurability and speed"
   homepage "https://github.com/betterleaks/betterleaks"
-  url "https://github.com/betterleaks/betterleaks/archive/refs/tags/v1.7.0.tar.gz"
-  sha256 "4a9e5ae8f97dbc62d3d05f97dc94a07c380e804a4fbbc75039f8bce6bda8e156"
+  url "https://github.com/betterleaks/betterleaks/archive/refs/tags/v1.7.1.tar.gz"
+  sha256 "5af3deef521c925d492aecbcf645b18d738afc348d3e729b4e209a78a7798934"
   license "MIT"
   head "https://github.com/betterleaks/betterleaks.git", branch: "main"
 
