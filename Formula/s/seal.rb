@@ -1,12 +1,12 @@
 class Seal < Formula
   desc "Easy-to-use homomorphic encryption library"
   homepage "https://github.com/microsoft/SEAL"
-  url "https://github.com/microsoft/SEAL/archive/refs/tags/v4.3.3.tar.gz"
-  sha256 "423e5fde0e49c761785ebd849dc0c71fcd94ce2c663f1d52e0fe01a60e0fea80"
+  url "https://github.com/microsoft/SEAL/archive/refs/tags/v4.4.0.tar.gz"
+  sha256 "0946b267a436a85c3488fe433fb61e3fcded1232443602ce056c49eb960bcdb0"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6277e5ff8237170f07247d477cfa8f03b482e6bf04d4f933d1796dbe6c8d95d2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c2b1a0616705c3196d84861143e362fa9372f37fbf483db1c05682311161eee"
   end
 
   depends_on "cmake" => [:build, :test]
