@@ -4,17 +4,11 @@
 # still matches a known formula's tag shape (<formula>-v<ver>-r<N>).
 # Dry-run by default — pass DRY_RUN=false to actually delete.
 set -euo pipefail
+set -x
 source "$(dirname "$0")/lib.sh"
 
 API=https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
 ag() { curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" "$@"; }
-
-echo "DEBUG: token length=${#ATOMGIT_TOKEN}"
-echo "DEBUG: direct curl -v to list endpoint:"
-curl -sS -m 30 -v -H "Authorization: Bearer $ATOMGIT_TOKEN" "$API/releases?per_page=1&page=1" -o /tmp/debug_body.json -w "DEBUG_HTTP_CODE=%{http_code}\n" 2>&1 || echo "DEBUG: curl exit=$?"
-echo "DEBUG: body:"
-cat /tmp/debug_body.json || true
-exit 0
 
 DRY_RUN="${DRY_RUN:-true}"
 
