@@ -6,12 +6,7 @@ class Himalaya < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "16674e960b32ed7295279ce54484b5825af639d00c3099f0ba0d71266d5f044e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8f171ebf557234779dd24e5489aa3e404990862db994a2333e5b7fd136ffa19b"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "996494c7d83916dca29b1803eb7d0d4a5c357321821e90d10f639471fe3820fd"
-    sha256 cellar: :any_skip_relocation, sonoma:        "5815b6cf30fa22c6856e425a5863eeb14cf704bb54ed47ba7d84340ab5636adc"
-    sha256 cellar: :any,                 arm64_linux:   "9a86645a57a4f1d16c5d6f3893c944f9f846c6b8f3e3ff7cf460171236339c5e"
-    sha256 cellar: :any,                 x86_64_linux:  "f5268464cc2ca301ea468398c54d4f65d7c4391b53c039725b534fe565fcd22b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b8f7184a841aefdfeb886e6a6fe061c2a5f7a56fdee87433fbe6a28e15810910"
   end
 
   depends_on "pkgconf" => :build
