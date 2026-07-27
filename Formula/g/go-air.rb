@@ -7,7 +7,7 @@ class GoAir < Formula
   head "https://github.com/air-verse/air.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2758994c37a05869971a27792b6ac1f3e7c665e658e878eda7a28e9a5011a31a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea5ba0f2c1c10df5593a4ce879e8bf88abf819c742c2d327de1e4c6d939f6b98"
   end
 
   depends_on "go"
