@@ -6,7 +6,7 @@ class TrzszSsh < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7613bc8b5d38c52f56860f89d23cb76deea870c7a7c29263c5458a4782f08048"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3cfb76f8fb643678296bbcb851de0fc5d01dda105078c2b452ee58a2e25b049b"
   end
 
   depends_on "go" => :build
