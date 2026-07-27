@@ -7,7 +7,7 @@ class Gitlogue < Formula
   head "https://github.com/unhappychoice/gitlogue.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eff4964a1a0b19f6f61661167136924453b3ef5f29bba99cf3d0756b61bba743"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bcd1a4eed1d3a26cd01a294eb4fd1eaac02763299431bb6adb4f6c007714843e"
   end
 
   depends_on "pkgconf" => :build
