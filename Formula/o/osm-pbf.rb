@@ -1,13 +1,12 @@
 class OsmPbf < Formula
   desc "Tools related to PBF (an alternative to XML format)"
   homepage "https://wiki.openstreetmap.org/wiki/PBF_Format"
-  url "https://github.com/openstreetmap/OSM-binary/archive/refs/tags/v1.6.1.tar.gz"
-  sha256 "54e0f234ace310a4256dc7d4fc707837f532a509cc3ef2940dacbdc4ebd9ce15"
+  url "https://github.com/openstreetmap/OSM-binary/archive/refs/tags/v1.7.0.tar.gz"
+  sha256 "ac7aadc57d218a5186076f55255202ec7d0949c7f334b8b0cec8bdd196cd75d7"
   license "LGPL-3.0-or-later"
-  revision 5
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0e45b3745f1de3835d9fd75f8147ebc9b2dd6f0ccfcdf2fa67e06342f044b42"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "711f97ca5644b5e30392474ea267ac92e29f5c254b86810e6f05ca0d401f1f82"
   end
 
   depends_on "cmake" => :build
@@ -26,6 +25,32 @@ class OsmPbf < Formula
   end
 
   test do
-    assert_match "OSMHeader", shell_output("#{bin}/osmpbf-outline #{pkgshare}/sample.pbf")
+    (testpath/"test.cpp").write <<~CPP
+      #include <iostream>
+      #include <osmpbf/osmpbf.h>
+
+      int main() {
+        OSMPBF::BlobHeader header;
+        header.set_type("OSMHeader");
+        std::cout << header.type() << std::endl;
+        return 0;
+      }
+    CPP
+
+    system ENV.cxx, testpath/"test.cpp",
+           "-std=c++17",
+           "-I#{include}",
+           "-I#{formula_opt_include("protobuf")}",
+           "-I#{formula_opt_include("abseil")}",
+           "-L#{lib}",
+           "-L#{formula_opt_lib("protobuf")}",
+           "-L#{formula_opt_lib("abseil")}",
+           "-losmpbf",
+           "-lprotobuf",
+           "-labsl_log_internal_check_op",
+           "-labsl_log_internal_message",
+           "-o", testpath/"test"
+
+    assert_equal "OSMHeader", shell_output(testpath/"test").chomp
   end
 end
