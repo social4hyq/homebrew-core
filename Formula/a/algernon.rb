@@ -13,7 +13,7 @@ class Algernon < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "13683eee942b110fe58a3b9ecb7c8c07c0b549ccfa977d8ee44da3d30afdab86"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "97108c41b8cbc0f20de4c91c6ef6af12043d6870521637ce0ca75c0c69371add"
   end
 
   depends_on "go" => :build
