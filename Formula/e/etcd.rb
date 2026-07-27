@@ -2,13 +2,13 @@ class Etcd < Formula
   desc "Key value store for shared configuration and service discovery"
   homepage "https://github.com/etcd-io/etcd"
   url "https://github.com/etcd-io/etcd.git",
-      tag:      "v3.7.0",
-      revision: "4d71f7c83a2cef992d57abd3284edfaf66c91a4a"
+      tag:      "v3.7.1",
+      revision: "5e7fd0de9a57db03ecc11794dc40403a734c07bb"
   license "Apache-2.0"
   head "https://github.com/etcd-io/etcd.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "47e80633d997f44d6ffdb196c74f6f35b5cbc74933c6c82a098e879f29d7ba17"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be391d601578a3e207574cbb8e28afaba11f18a99268425c59458382a6f1da86"
   end
 
   depends_on "go" => :build
