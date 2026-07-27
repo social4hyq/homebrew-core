@@ -7,7 +7,7 @@ class Cminpack < Formula
   head "https://github.com/devernay/cminpack.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "16e7c4e5329b9a7bbd7bb16cbfc86532f08246db91d19971034938d9fa818afe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1951dc554a02edae98c6190968e4377e70460e4d69ef1899176f023d4f5fe4dc"
   end
 
   depends_on "cmake" => :build
