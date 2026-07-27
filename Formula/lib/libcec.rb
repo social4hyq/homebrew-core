@@ -6,12 +6,7 @@ class Libcec < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "8df50d2b4ae218661eb297d51dd67494dcbab5f0c79ff0c628ca27615bed2a35"
-    sha256 cellar: :any, arm64_sequoia: "0fe31286e1ee21ad365817c96f52abdfc8b10ab94d4725fc55d194f0205982fd"
-    sha256 cellar: :any, arm64_sonoma:  "38e3ff08f1cc8532e1b1d8d9118fcf67b8709cc09f666f7902842468a0436660"
-    sha256 cellar: :any, sonoma:        "49601b83a4e2b63eece3c49b643d0cf54c7f1b16ca95f45c7bba5ccce6994269"
-    sha256 cellar: :any, arm64_linux:   "e29af667948ce5aeaa077f3176a305df56996c64c87ac843abf2042665b35b33"
-    sha256 cellar: :any, x86_64_linux:  "c4df4c9c35a1a88627ed35be53fd3ba6dd3c813491d5205b744ae43c1438d909"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "071f6ca1dee53281e763d09e2b2999dc8a1714be871a4aa825a79262ed5a8f9f"
   end
 
   depends_on "cmake" => :build
