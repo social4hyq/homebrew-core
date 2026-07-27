@@ -1,13 +1,13 @@
 class Cminpack < Formula
   desc "Solves nonlinear equations and nonlinear least squares problems"
   homepage "http://devernay.free.fr/hacks/cminpack/cminpack.html"
-  url "https://github.com/devernay/cminpack/archive/refs/tags/v1.3.13.tar.gz"
-  sha256 "cf0d6cc654f8c63bb65979056ea5bcda1046768b1dfe83ceda504924d8331167"
+  url "https://github.com/devernay/cminpack/archive/refs/tags/v1.3.14.tar.gz"
+  sha256 "10a76d214e01baa0480828fa473c2ef6209983c80941eca10b5a69df4de02cee"
   license "Minpack"
   head "https://github.com/devernay/cminpack.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "16e7c4e5329b9a7bbd7bb16cbfc86532f08246db91d19971034938d9fa818afe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1951dc554a02edae98c6190968e4377e70460e4d69ef1899176f023d4f5fe4dc"
   end
 
   depends_on "cmake" => :build
