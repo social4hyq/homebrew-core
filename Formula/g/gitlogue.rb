@@ -1,13 +1,13 @@
 class Gitlogue < Formula
   desc "Cinematic Git commit replay tool"
   homepage "https://github.com/unhappychoice/gitlogue"
-  url "https://github.com/unhappychoice/gitlogue/archive/refs/tags/v0.9.0.tar.gz"
-  sha256 "e0e7c7def40757a41081b0e76daab0fd9f40af2840028b382e02728dcf3e9c8d"
+  url "https://github.com/unhappychoice/gitlogue/archive/refs/tags/v0.10.0.tar.gz"
+  sha256 "65c5043b81aed86aa6429c846d944c375b8d763e77071bb5444b72f5531e3845"
   license "ISC"
   head "https://github.com/unhappychoice/gitlogue.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eff4964a1a0b19f6f61661167136924453b3ef5f29bba99cf3d0756b61bba743"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bcd1a4eed1d3a26cd01a294eb4fd1eaac02763299431bb6adb4f6c007714843e"
   end
 
   depends_on "pkgconf" => :build
