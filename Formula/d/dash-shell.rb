@@ -1,9 +1,9 @@
 class DashShell < Formula
   desc "POSIX-compliant descendant of NetBSD's ash (the Almquist SHell)"
   homepage "http://gondor.apana.org.au/~herbert/dash/"
-  url "https://cdn.netbsd.org/pub/pkgsrc/distfiles/dash-0.5.13.4.tar.gz"
-  mirror "http://gondor.apana.org.au/~herbert/dash/files/dash-0.5.13.4.tar.gz"
-  sha256 "d10dfd41cda59165560db39ca915c2c4a7636fff04281d8d2df77ad92c753e2b"
+  url "https://cdn.netbsd.org/pub/pkgsrc/distfiles/dash-0.5.13.5.tar.gz"
+  mirror "http://gondor.apana.org.au/~herbert/dash/files/dash-0.5.13.5.tar.gz"
+  sha256 "40090101a2a491f13e901d3d48e90414f26634628b9bfff35ff540363c227a7d"
   license "BSD-3-Clause"
   head "https://git.kernel.org/pub/scm/utils/dash/dash.git", branch: "master"
 
@@ -13,7 +13,7 @@ class DashShell < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "37ff8e6580cb1faf79d5bd82c41fc3903e993575d32dcb255e853fc94985dfc7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "98d2a0a355c983dc395d97555ffde1c7efb6dcb8020b7b312c76c2e945f4d328"
   end
 
   depends_on "autoconf" => :build
