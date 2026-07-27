@@ -1,8 +1,8 @@
 class Yutu < Formula
   desc "MCP server and CLI for YouTube"
   homepage "https://github.com/eat-pray-ai/yutu"
-  url "https://github.com/eat-pray-ai/yutu/archive/refs/tags/v0.10.9.tar.gz"
-  sha256 "4d5481ce801f5747e5e518ad750d22eba2235d93627ddd2934d6f1c660b86bbc"
+  url "https://github.com/eat-pray-ai/yutu/archive/refs/tags/v0.10.10.tar.gz"
+  sha256 "1439e051f13b3471000400b714ee801170b68f255806c88fad1b7183dbe39ab7"
   license "Apache-2.0"
   head "https://github.com/eat-pray-ai/yutu.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Yutu < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ce341eec0997ded188701215bb4a94a166d08fe83cd12936d272494f6c817fc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "afe64ce96cf6ff88cd4f33df005b98e0cc50a6bb416ee4ad023b7d41a562af9c"
   end
 
   depends_on "go" => :build
