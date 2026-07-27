@@ -1,14 +1,13 @@
 class Garble < Formula
   desc "Obfuscate Go builds"
   homepage "https://github.com/burrowers/garble"
-  url "https://github.com/burrowers/garble/archive/refs/tags/v0.16.0.tar.gz"
-  sha256 "78b418d98b1d24549bf660a50054263206c3eeccf6820438f10e8568b81a1bfc"
+  url "https://github.com/burrowers/garble/archive/refs/tags/v0.17.0.tar.gz"
+  sha256 "feab001d7e9ff4ce66011ebd70791de93eb1554d34d3ea44c33d102a25c1be0a"
   license "BSD-3-Clause"
-  revision 1
   head "https://github.com/burrowers/garble.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec13327cc3d0363b6ed8bd6ad9fbf3499377a53bc61572d26fc9ddf1c443d0d1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "480e15ee0ae8621077cabf610a00a05ab56cece70506f482ffa29310d540aeaf"
   end
 
   depends_on "go" => [:build, :test]
