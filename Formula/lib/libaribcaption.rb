@@ -7,7 +7,7 @@ class Libaribcaption < Formula
   head "https://github.com/xqq/libaribcaption.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f4fc3af4cea9cb7235804853db7b55485096065c9d2ae935163f9743dccd96e3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "66fe66c63e179abc2e0e9f5ed9590e9b245756eb10219301989fd1456944e1c4"
   end
 
   depends_on "cmake" => :build
