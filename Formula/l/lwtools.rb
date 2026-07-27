@@ -11,7 +11,7 @@ class Lwtools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "758af3f5781943934d82835d487dc5571d1fe21a42309128764b182073bd9222"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c9abd15663c1dd71dbe965d46dc7858186e4f6a4b6c1718bf984598c9d021d6"
   end
 
   def install
