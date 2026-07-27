@@ -4,13 +4,13 @@ class MetaPackageManager < Formula
 
   desc "Wrapper around all package managers with a unifying CLI"
   homepage "https://kdeldycke.github.io/meta-package-manager/"
-  url "https://files.pythonhosted.org/packages/6d/c2/3978debb7dbca4c6f2a90732bffb4b7c62141a6d6b3d9c9ea54fab060a41/meta_package_manager-7.3.0.tar.gz"
-  sha256 "f540a4957ae2d3f702e97aa3217261b808e4b98233707c9f8c5f214c3dbfee91"
+  url "https://files.pythonhosted.org/packages/71/19/669a2b96118c56fff78abc6609a25b5c11176601545b831205101621dfca/meta_package_manager-7.4.0.tar.gz"
+  sha256 "2797e47bd4dba0a6b14995086361a45d5af04b1ac5716dbc8068b49fe72cdc2f"
   license "GPL-2.0-or-later"
   head "https://github.com/kdeldycke/meta-package-manager.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c58a6bd31a9829127137b00f58a2a5e587106b4d4d5ed308494d79ed711bb4f8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f41e206293e70df17ffba564a5b25cfef6903559d8634587a7d4f8c7a446c1a6"
   end
 
   depends_on "rust" => :build
@@ -31,8 +31,8 @@ class MetaPackageManager < Formula
   end
 
   resource "bracex" do
-    url "https://files.pythonhosted.org/packages/d0/f5/4473ad9b48cd0420a2d762a3750fa0e078e23e060b1af72662e5987e5530/bracex-3.0.tar.gz"
-    sha256 "b73f718d6bd98d8419e45df02426c86e9967c179949f779340d6c3a8c83b9111"
+    url "https://files.pythonhosted.org/packages/ac/01/5f394b8bcd6e5b92f73130990960423bbb19711f906bd9fe9ea5557c667c/bracex-3.0.1.tar.gz"
+    sha256 "4e38e32392e4a4780fe15d644bfc7c8514057cfc3861e060b11814ce829c25e4"
   end
 
   resource "click" do
@@ -41,8 +41,8 @@ class MetaPackageManager < Formula
   end
 
   resource "click-extra" do
-    url "https://files.pythonhosted.org/packages/9a/78/ff052a35e7b83a1b164e1eda3a5bdeedceeb60e44d2eca1d872312447cee/click_extra-8.4.0.tar.gz"
-    sha256 "92e5441824126248c61b05471ecacb6403e45a0b0b743f6babf425abb4c217de"
+    url "https://files.pythonhosted.org/packages/60/2f/27d20ac136d08bc95a759fb7c503a2d4cb3391461b9fb33ff32f1ddd014a/click_extra-8.6.0.tar.gz"
+    sha256 "63f739447522a6aa2d64d656aeb0f967826f2dfba774fc76e117b84717853733"
   end
 
   resource "cloup" do
