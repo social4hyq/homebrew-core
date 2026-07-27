@@ -7,7 +7,7 @@ class Asimov < Formula
   head "https://github.com/stevegrunwell/asimov.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9a8a59b91362f46fabede62b7949b629609f92abf23479471bd292bae326882"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ff3f9cd122962559b80193f4660ee8f0d22cac8a56e66922d96569c5622e847f"
   end
 
   def install
