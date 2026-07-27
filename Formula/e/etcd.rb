@@ -8,7 +8,7 @@ class Etcd < Formula
   head "https://github.com/etcd-io/etcd.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "47e80633d997f44d6ffdb196c74f6f35b5cbc74933c6c82a098e879f29d7ba17"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be391d601578a3e207574cbb8e28afaba11f18a99268425c59458382a6f1da86"
   end
 
   depends_on "go" => :build
