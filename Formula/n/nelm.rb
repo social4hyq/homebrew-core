@@ -14,7 +14,7 @@ class Nelm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "519255f48cb5edf9540f95f16c9b91fbef27964adff667120727103653a4f1fe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "890e2af86ad94ed0dff5a165a143421c904b3ed94b989c8c650a2df1a91d76a4"
   end
 
   depends_on "go" => :build
