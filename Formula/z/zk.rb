@@ -12,7 +12,7 @@ class Zk < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8aa349640287f9f600c21110737f93eb8ff64c7d0ee83d31efa3bcd9ea5c109e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "568c33177ed9b442501fc09d9183c010b18d5922b3011adb9f7083486fdfb08d"
   end
 
   depends_on "go" => :build
