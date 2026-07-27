@@ -44,7 +44,15 @@ while :; do
   set -e
   echo "DEBUG: curl rc=$RC page=$PAGE stderr=$(cat /tmp/curl_err.txt 2>/dev/null) body_len=${#TAGS_JSON}"
   [ "$RC" -ne 0 ] && { echo "DEBUG: FAILED, aborting debug run"; exit 0; }
-  COUNT=$(jq 'length' <<< "$TAGS_JSON")
+  echo "DEBUG: last 200 chars of body:"
+  echo "${TAGS_JSON: -200}"
+  echo "DEBUG: jq version: $(jq --version)"
+  set +e
+  COUNT=$(jq 'length' <<< "$TAGS_JSON" 2>/tmp/jq_err.txt)
+  JQRC=$?
+  set -e
+  echo "DEBUG: jq rc=$JQRC count=$COUNT jq_stderr=$(cat /tmp/jq_err.txt 2>/dev/null)"
+  [ "$JQRC" -ne 0 ] && { echo "DEBUG: jq FAILED, aborting debug run"; exit 0; }
   [ "$COUNT" -eq 0 ] && break
 
   while IFS= read -r tag; do
