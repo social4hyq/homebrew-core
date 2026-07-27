@@ -1,8 +1,8 @@
 class BibtexTidy < Formula
   desc "Cleaner and Formatter for BibTeX files"
   homepage "https://github.com/FlamingTempura/bibtex-tidy"
-  url "https://registry.npmjs.org/bibtex-tidy/-/bibtex-tidy-1.14.0.tgz"
-  sha256 "0a2c1bb73911a7cee36a30ce1fc86feffe39b2d39acd4c94d02aac6f84a00285"
+  url "https://registry.npmjs.org/bibtex-tidy/-/bibtex-tidy-1.15.0.tgz"
+  sha256 "cebe51d16c99a9881d33d52fbd477d4c2c808ca01cc33a04e0437e999a352e09"
   license "MIT"
 
   bottle do
