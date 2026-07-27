@@ -1,12 +1,12 @@
 class Himalaya < Formula
   desc "CLI email client written in Rust"
-  homepage "https://github.com/pimalaya/himalaya"
-  url "https://github.com/pimalaya/himalaya/archive/refs/tags/v1.2.0.tar.gz"
-  sha256 "3d04afdf6f753219c2203feb8094a2ec82c77bab7f9acbe1811773e2a4562877"
+  homepage "https://pimalaya.org"
+  url "https://github.com/pimalaya/himalaya/archive/refs/tags/v2.0.0.tar.gz"
+  sha256 "0f58a5761490c2a96105073358487fa6032c79c0f07e962a65f6e8aeef782fd9"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "72dc351f0169fe4576f588ef6a685978e1b24039f4a71ce59c6e03dc5aaf7f3c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b8f7184a841aefdfeb886e6a6fe061c2a5f7a56fdee87433fbe6a28e15810910"
   end
 
   depends_on "pkgconf" => :build
@@ -51,6 +51,6 @@ class Himalaya < Formula
       message.send.backend.auth.cmd = "*****"
     TOML
 
-    assert_match "cannot authenticate to IMAP server", shell_output("#{bin}/himalaya 2>&1", 1)
+    assert_match "gmail", shell_output("#{bin}/himalaya account list")
   end
 end
