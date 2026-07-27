@@ -1,8 +1,8 @@
 class Pnpm < Formula
   desc "Fast, disk space efficient package manager"
   homepage "https://pnpm.io/"
-  url "https://registry.npmjs.org/pnpm/-/pnpm-11.16.0.tgz"
-  sha256 "3f2a848545f82fce6966f3ecaa8b7d87b5563f901a170e2bd573b02296b382fa"
+  url "https://registry.npmjs.org/pnpm/-/pnpm-11.17.0.tgz"
+  sha256 "644eb5079654e87dae59a07e62d7f098162b9ce58f06077328b5ddefca1c8541"
   license "MIT"
   compatibility_version 1
 
@@ -14,7 +14,7 @@ class Pnpm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c538810ea8e3c1b4890957c30fca88722417ddb84bf7490de30d028602974741"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "525b4de41b88a1842e052517a5af76e70ee4945f5e88d26638cfb94dcd0e78aa"
   end
 
   depends_on "node" => [:build, :test]
