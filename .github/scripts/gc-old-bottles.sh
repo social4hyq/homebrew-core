@@ -9,15 +9,6 @@ source "$(dirname "$0")/lib.sh"
 API=https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
 ag() { curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" "$@"; }
 
-echo "DEBUG: exact real-script call, verbose:"
-curl -sS -m 30 -v -H "Authorization: Bearer $ATOMGIT_TOKEN" "$API/releases?per_page=100&page=1" -o /tmp/debug_body2.json -w "DEBUG_HTTP_CODE=%{http_code}\n"
-echo "DEBUG: body head:"
-head -c 2000 /tmp/debug_body2.json
-echo
-echo "DEBUG: body length:"
-wc -c /tmp/debug_body2.json
-exit 0
-
 DRY_RUN="${DRY_RUN:-true}"
 
 declare -A CURRENT_TAG
@@ -47,7 +38,12 @@ match_formula() {
 PAGE=1
 TO_DELETE=()
 while :; do
-  TAGS_JSON=$(ag "$API/releases?per_page=100&page=$PAGE")
+  set +e
+  TAGS_JSON=$(ag "$API/releases?per_page=100&page=$PAGE" 2>/tmp/curl_err.txt)
+  RC=$?
+  set -e
+  echo "DEBUG: curl rc=$RC page=$PAGE stderr=$(cat /tmp/curl_err.txt 2>/dev/null) body_len=${#TAGS_JSON}"
+  [ "$RC" -ne 0 ] && { echo "DEBUG: FAILED, aborting debug run"; exit 0; }
   COUNT=$(jq 'length' <<< "$TAGS_JSON")
   [ "$COUNT" -eq 0 ] && break
 
