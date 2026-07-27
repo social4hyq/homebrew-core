@@ -1,8 +1,8 @@
 class Jruby < Formula
   desc "Ruby implementation in pure Java"
   homepage "https://www.jruby.org/"
-  url "https://search.maven.org/remotecontent?filepath=org/jruby/jruby-dist/10.1.0.0/jruby-dist-10.1.0.0-src.zip"
-  sha256 "23fcd9ecbf3980f187d19b021d53dd71635b3e2e6ba7e9c2ccc92624240282d6"
+  url "https://search.maven.org/remotecontent?filepath=org/jruby/jruby-dist/10.1.1.0/jruby-dist-10.1.1.0-src.zip"
+  sha256 "825d47f43ef288b218b965406ef8a97117c9b080986b3ad9883e1850da312166"
   license any_of: ["EPL-2.0", "GPL-2.0-only", "LGPL-2.1-only"]
 
   livecheck do
@@ -11,7 +11,7 @@ class Jruby < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dfcf8d11a294616ffa0fc8dc2c8dab71137d0285dd3c70f45ce3c046882f618c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5c7a73df904f7e3247338715f6e4f26ced90e6f1810c6d95bcaa36f15ba5c0a"
   end
 
   depends_on "ant" => :build # for jffi
@@ -25,8 +25,8 @@ class Jruby < Formula
   uses_from_macos "libffi" # for jffi
 
   resource "jffi" do
-    url "https://github.com/jnr/jffi/archive/refs/tags/jffi-1.3.15.tar.gz"
-    sha256 "2f9dcdede918746c5784ba55c992214e30eaf62b23ad2609561730644917a189"
+    url "https://github.com/jnr/jffi/archive/refs/tags/1.4.0.tar.gz"
+    sha256 "1cc8174ca1fb86a3400da5838705d455c0be59fd93f2d675512dcb2f727fe45f"
 
     livecheck do
       url "https://raw.githubusercontent.com/jruby/jruby/refs/tags/#{LATEST_VERSION}/pom.xml"
@@ -47,11 +47,17 @@ class Jruby < Formula
       ENV["LIBFFI_LIBS"] = if OS.mac?
         MacOS.sdk_for_formula(self).path/"usr/lib/libffi.tbd"
       else
-        Formula["libffi"].opt_lib/shared_library("libffi")
+        formula_opt_lib("libffi")/shared_library("libffi")
       end
 
       # Avoid building universal binaries. Cannot use change_make_var! due to indentation
       inreplace "jni/GNUmakefile", "ARCHES = x86_64 arm64", "ARCHES = #{Hardware::CPU.arch}"
+
+      # Compile the sun.misc.Unsafe-using class with -source/-target (like jffi 1.3)
+      inreplace "pom.xml" do |s|
+        s.gsub!(%r{<configuration>(\s+)<jdkToolchain>\s+<version>8</version>\s+</jdkToolchain>},
+                "<configuration combine.self=\"override\">\\1<source>8</source>\\1<target>8</target>")
+      end
 
       system "ant", "-Duse.system.libffi=1", "jar"
       system "ant", "-Duse.system.libffi=1", "archive-platform-jar"
@@ -94,6 +100,8 @@ class Jruby < Formula
   end
 
   test do
+    ENV["JRUBY_JSA"] = testpath/"jruby.jsa"
+
     assert_equal "hello\n", shell_output("#{bin}/jruby -e 'puts :hello'")
 
     ENV["GEM_HOME"] = testpath
