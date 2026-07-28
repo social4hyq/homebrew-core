@@ -21,7 +21,7 @@ permissions:
   contents: read
 
 env:
-  IMAGE: swr.cn-north-4.myhuaweicloud.com/harmonybrew/ci-runner@sha256:57ce4ca832d937dcc86abae6ec0e8fb6b34ac86aa8fdbe43548b6fe78d3438c1 # :latest, 2026-07-03 (SWR mirror, anon-pullable)
+  IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
 

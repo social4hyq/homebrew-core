@@ -20,11 +20,12 @@ cexec 'mkdir -p /root/.cargo && printf "[registries.crates-io]\nprotocol = \"spa
 
 cexec 'brew --version && brew tap'
 
-# Needed for `brew bump-formula-pr` (autobump.yml): without a brew-installed
-# git, Homebrew's superenv git shim falls into a `whence -a git` fallback
-# loop with known bugs (broken stdin — see git commit history). With it,
-# the shim's fast path execs $HOMEBREW_PREFIX/bin/git directly.
-cexec 'brew install git'
+# NOTE: `brew install git` is baked into the image itself by sync-ci-image.yml
+# (~52s/run when it lived here). It is still required: without a brew-installed
+# git, Homebrew's superenv git shim falls into a `whence -a git` fallback loop
+# with known bugs (broken stdin — see git commit history). With it, the shim's
+# fast path execs $HOMEBREW_PREFIX/bin/git directly. If the image ever changes
+# back to one without brewed git, restore that step here.
 
 # brew bottle --merge --write auto-commits the tap in-container as root
 docker exec "$CONTAINER" git config --global --add safe.directory "$TAP_IN_CONTAINER"
