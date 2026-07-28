@@ -7,7 +7,7 @@ class RustAnalyzer < Formula
   license any_of: ["Apache-2.0", "MIT"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b668378d289c3b5d5e2c625950889fd06c5d472d93396798dac290e14ec68921"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e6fbf88704f40122d5ee901c43e5efcaab6820b3add2d1f480be9baa62cf2d6"
   end
 
   depends_on "rust" => :build
