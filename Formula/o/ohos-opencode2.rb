@@ -67,8 +67,13 @@ class OhosOpencode2 < Formula
     # lists explicit workspace entries ("packages/slack") and sub-globs
     # ("packages/console/*", "packages/stats/*") that bun install will hard-
     # error on if the directory is missing, so those stay.
+    # session-ui is deleted alongside app: it references app's vendored SDK
+    # tarball via file:../app/vendor/ (both have a file: dependency on a
+    # .tgz inside packages/app/vendor/). The CLI dep chain doesn't touch
+    # either.
     rm_r("packages/desktop")
     rm_r("packages/app")
+    rm_r("packages/session-ui")
     rm_r("packages/web")
     rm_r("packages/www")
     rm_r("packages/storybook")
