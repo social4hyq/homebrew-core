@@ -1,0 +1,51 @@
+name: sync-ci-image
+
+# On-demand: mirror the OHOS ci-runner image from Huawei Cloud SWR (cn-north-4)
+# to GHCR. Every workflow's "Start OHOS container" step used to pay a ~3.5min
+# cross-Pacific `docker pull` (SWR Beijing -> Azure-hosted runner, ~10MB/s on
+# the big layer); GHCR sits on the same Azure backbone as the runners, so the
+# pull drops to seconds. The derived image also bakes in `brew install git`
+# (another ~52s every run used to spend in setup-container.sh — git is
+# run-independent, so it belongs in the image, not the setup script).
+#
+# After pushing a new tag:
+#   gh variable set OHOS_CI_IMAGE --body ghcr.io/social4hyq/ci-runner:<tag>
+# (optionally digest-pinned, per `docker buildx imagetools inspect`). The
+# package must be public (package settings -> Change visibility) for the
+# anonymous pulls the workflows do, or setup-container.sh needs a docker login.
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: 'Source image on SWR (tag or @digest)'
+        required: true
+        default: 'swr.cn-north-4.myhuaweicloud.com/harmonybrew/ci-runner:latest'
+      tag:
+        description: 'Tag to push as ghcr.io/social4hyq/ci-runner:<tag>'
+        required: true
+
+permissions:
+  packages: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    steps:
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      # arm64 image + arm64 runner: the RUN layer executes natively, no qemu
+      - name: Build derived image (git baked in) and push
+        env:
+          SOURCE: ${{ inputs.source }}
+          DEST: ghcr.io/social4hyq/ci-runner:${{ inputs.tag }}
+        run: |
+          printf 'FROM %s\nRUN ["/bin/bash", "-lc", "HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1 brew install git && brew cleanup"]\n' "$SOURCE" > Dockerfile
+          cat Dockerfile
+          docker build -t "$DEST" -f Dockerfile .
+          docker push "$DEST"
+
+      - name: Show pushed digest
+        run: docker buildx imagetools inspect ghcr.io/social4hyq/ci-runner:${{ inputs.tag }}
