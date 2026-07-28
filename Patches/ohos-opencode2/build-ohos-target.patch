@@ -1,0 +1,51 @@
+diff --git a/packages/cli/script/build.ts b/packages/cli/script/build.ts
+index ca3b84bb06..5eda7c08c2 100755
+--- a/packages/cli/script/build.ts
++++ b/packages/cli/script/build.ts
+@@ -34,6 +34,11 @@ const allTargets: {
+   { os: "linux", arch: "x64" },
+   { os: "linux", arch: "x64", avx2: false },
+   { os: "linux", arch: "arm64", abi: "musl" },
++  {
++    os: "openharmony",
++    arch: "arm64",
++    abi: "musl",
++  },
+   { os: "linux", arch: "x64", abi: "musl" },
+   { os: "linux", arch: "x64", abi: "musl", avx2: false },
+   { os: "darwin", arch: "arm64" },
+@@ -48,6 +53,7 @@ const targets = singleFlag
+   ? allTargets.filter((item) => {
+       if (item.os !== process.platform || item.arch !== process.arch) return false
+       if (item.avx2 === false) return baselineFlag
++      if (process.platform === "openharmony") return true
+       return item.abi === undefined
+     })
+   : allTargets
+@@ -80,7 +86,11 @@ for (const item of targets) {
+       autoloadDotenv: false,
+       autoloadTsconfig: true,
+       autoloadPackageJson: true,
+-      target: target.replace(binary, "bun") as Bun.Build.CompileTarget,
++      // OHOS bun has Libc::Ohos as a distinct musl-based compile target
++      // (bun-linux-arm64-ohos), baking process.platform="openharmony" and
++      // equal to CompileTarget::default() on-device — bun embeds the running
++      // OHOS runtime directly, no local runtime file or download needed.
++      target: (item.os === "openharmony" ? "bun-linux-arm64-ohos" : target.replace(binary, "bun")) as Bun.Build.CompileTarget,
+       outfile: path.join(outdir, name, "bin", binary),
+       execArgv: [`--user-agent=${binary}/${Script.version}`, "--use-system-ca", "--"],
+       windows: {},
+@@ -90,10 +100,10 @@ for (const item of targets) {
+       OPENCODE_CLI_NAME: `'${binary}'`,
+       OPENCODE_MODELS_DEV: modelsData,
+       OPENCODE_CHANNEL: `'${Script.channel}'`,
+-      OPENCODE_LIBC: item.os === "linux" ? `'${item.abi ?? "glibc"}'` : "undefined",
++      OPENCODE_LIBC: (item.os === "linux" || item.os === "openharmony") ? `'${item.abi ?? "glibc"}'` : "undefined",
+       // FFF_LIBC selects the fff native lib variant: "musl" or "gnu".
+-      FFF_LIBC: item.os === "linux" ? `'${item.abi ?? "gnu"}'` : "undefined",
+-      ...(item.os === "linux" ? { "process.env.OPENTUI_LIBC": JSON.stringify(item.abi ?? "glibc") } : {}),
++      FFF_LIBC: (item.os === "linux" || item.os === "openharmony") ? `'${item.abi ?? "gnu"}'` : "undefined",
++      ...((item.os === "linux" || item.os === "openharmony") ? { "process.env.OPENTUI_LIBC": JSON.stringify(item.abi ?? "glibc") } : {}),
+     },
+   })
+ 
