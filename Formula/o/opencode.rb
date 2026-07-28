@@ -1,8 +1,8 @@
 class Opencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64 (prebuilt musl binary)"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://registry.npmmirror.com/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-1.18.7.tgz"
-  sha256 "6f5464a40422d420132ab56e459ed8b9016e5c736cc6918c00f27415ebb0e082"
+  url "https://registry.npmmirror.com/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-1.18.8.tgz"
+  sha256 "46dde4c5cb1cad98056e4ca5a23c783d7cd57e422b14b542174c11720f036718"
   license "MIT"
   # opencode's official prebuilt linux-arm64-musl single binary (Bun --compile).
   # Bypasses the opencode-ai npm JS wrapper. The musl-ABI binary is
@@ -16,8 +16,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.7-r1"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "9d3a1bab3af629a28b2f26759cc51f3845def5aedc1c11d04f82b774f43edbdc"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.8-r1"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "4f39203eb41a926ca6e011aa6b383810c4f242522cbe0fd0d4eba121e604d7f6"
   end
 
   # r1 fixed a real portability bug (not just the `brew bottle` check below):
