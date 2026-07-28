@@ -1,13 +1,13 @@
 class GitPkgs < Formula
   desc "Track package dependencies across git history"
   homepage "https://github.com/git-pkgs/git-pkgs"
-  url "https://github.com/git-pkgs/git-pkgs/archive/refs/tags/v0.18.1.tar.gz"
-  sha256 "1bc7f875fc3f15481a565233d73dd63e3b1a5dad7d382545cba0552e393939cc"
+  url "https://github.com/git-pkgs/git-pkgs/archive/refs/tags/v0.18.2.tar.gz"
+  sha256 "2180068ae055f8a670f09360e02d19e14120eeeeafc98a94e936dae7706ce2c1"
   license "MIT"
   head "https://github.com/git-pkgs/git-pkgs.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "11cf871acd7175beab5ae87aeb060816a4211c8e4fa8c5d0eda3f7849849e5e5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f022d75d517ed8577ac9b715e8cf0b4ffa0a5e6f48f251587c694d5f3fdd2024"
   end
 
   depends_on "go" => :build
