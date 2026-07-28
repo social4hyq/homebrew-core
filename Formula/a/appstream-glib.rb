@@ -1,8 +1,8 @@
 class AppstreamGlib < Formula
   desc "Helper library for reading and writing AppStream metadata"
   homepage "https://github.com/hughsie/appstream-glib"
-  url "https://github.com/hughsie/appstream-glib/archive/refs/tags/appstream_glib_0_8_3.tar.gz"
-  sha256 "15ad7690b0132d883bd066699a7b55f6cef4c0f266d18d781ce5d8112fb4ee63"
+  url "https://github.com/hughsie/appstream-glib/archive/refs/tags/appstream_glib_0_8_4.tar.gz"
+  sha256 "19798c8fbd2734554848817e52ef351d21253b1df9fff288b7cf91c10618415d"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -14,7 +14,7 @@ class AppstreamGlib < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b6732e82a75b519498d4f963f4c006d6e59788cc1ed8473d880dd2d768496566"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dc397d07a8f69588d5024e29d739c67cccc31dd7333dd74897678d31d1766b8"
   end
 
   depends_on "docbook" => :build
