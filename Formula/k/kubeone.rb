@@ -7,7 +7,7 @@ class Kubeone < Formula
   head "https://github.com/kubermatic/kubeone.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cee085611873ab4f7a594c23bf56c7102ef49c8aa2f66701d3850839fb0f9f49"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f7215e7996cbd059306c8d092c61ad38b4bce12a7d2cde7c9cef7ca594bde7b"
   end
 
   depends_on "go" => :build
