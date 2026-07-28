@@ -2,13 +2,13 @@ class Tea < Formula
   desc "Command-line tool to interact with Gitea servers"
   homepage "https://gitea.com/gitea/tea"
   url "https://gitea.com/gitea/tea.git",
-      tag:      "v0.14.2",
-      revision: "88f5cdcafadbafd992cbf6ea31f9f29512263452"
+      tag:      "v0.15.0",
+      revision: "61b8536e4a3e04d9db74b05b4d9cd489d07d8d50"
   license "MIT"
   head "https://gitea.com/gitea/tea.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f708ca30ceab239abd8586738e974aeb90bbf49d4fb9d1df3f530ebec987c861"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "16933c6d8566ae05c643cccd65882b10190dd571e41ca3b7cc84f0bcf66b5406"
   end
 
   depends_on "go" => :build
