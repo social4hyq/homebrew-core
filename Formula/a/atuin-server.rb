@@ -7,7 +7,7 @@ class AtuinServer < Formula
   head "https://github.com/atuinsh/atuin.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b91c83c07f83c1abc9b1b5215c66c41f79b379b30ec270061fbc5cd752e95f10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "32a3ff9204969c0c50b7c68cdd7c643d21e057f13cc3acb174fd9a4a3ccba53d"
   end
 
   depends_on "protobuf" => :build
