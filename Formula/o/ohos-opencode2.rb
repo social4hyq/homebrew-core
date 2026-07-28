@@ -71,12 +71,16 @@ class OhosOpencode2 < Formula
     # tarball via file:../app/vendor/ (both have a file: dependency on a
     # .tgz inside packages/app/vendor/). The CLI dep chain doesn't touch
     # either.
+    # enterprise is deleted alongside session-ui: it depends on
+    # @opencode-ai/session-ui (workspace:*), so leaving it in place makes
+    # bun install fail to resolve session-ui after its directory is gone.
     rm_r("packages/desktop")
     rm_r("packages/app")
     rm_r("packages/session-ui")
     rm_r("packages/web")
     rm_r("packages/www")
     rm_r("packages/storybook")
+    rm_r("packages/enterprise")
 
     system "bun", "install", "--ignore-scripts"
 
