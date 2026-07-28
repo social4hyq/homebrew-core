@@ -7,7 +7,7 @@ class Mkbrr < Formula
   head "https://github.com/autobrr/mkbrr.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9d2cd0322480abada1cb51bffe9c456ec61687006a377f297639ad56b1048a4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2a6614fb62569378d6df5a15442f1d013eeadc6365de31078a9acd9a0555a66"
   end
 
   depends_on "go" => :build
