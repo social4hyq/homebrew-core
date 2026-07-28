@@ -11,7 +11,7 @@ class TyposLsp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "266126b136e29aa7a7dadaa05142182b84e0113569fb49b87be4ec216b3b6796"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c954962169a4c94fdebe8d8ca4d296aa098dd6b943c453dcfcf01ea6990c35c8"
   end
 
   depends_on "rust" => :build
