@@ -1,9 +1,9 @@
 class Cproto < Formula
   desc "Generate function prototypes for functions in input files"
   homepage "https://invisible-island.net/cproto/"
-  url "https://invisible-mirror.net/archives/cproto/cproto-4.8.tgz"
-  mirror "https://deb.debian.org/debian/pool/main/c/cproto/cproto_4.8.orig.tar.gz"
-  sha256 "0cccb93447682c7fdb4f0bdbfbe05d52a827331e0a19a5215d2c3cb85ad29258"
+  url "https://invisible-mirror.net/archives/cproto/cproto-4.8a.tgz"
+  mirror "https://deb.debian.org/debian/pool/main/c/cproto/cproto_4.8a.orig.tar.gz"
+  sha256 "beb121e08c0d47b5bd719071c32a77edcc31dff992a84e3d9a59c0f7ec9fadd3"
   license :public_domain
 
   livecheck do
@@ -12,7 +12,7 @@ class Cproto < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a9459d78f51a3857f567ff241ad29cfccf087b968e18211a936afb1e547aa4d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "708d1b94773943e600e9fef9df082bf9fc3ae33ac7cceaf282aca9e3fb4a4748"
   end
 
   uses_from_macos "bison" => :build
