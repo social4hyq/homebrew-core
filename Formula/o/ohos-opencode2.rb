@@ -62,15 +62,16 @@ class OhosOpencode2 < Formula
     ENV["BUN_INSTALL_CACHE_DIR"] = (HOMEBREW_CACHE/"bun-install-cache").to_s
 
     # Workspace packages not needed for the CLI build (drops electron, web
-    # apps, storybook, etc. from the install set entirely).
+    # apps, storybook, etc. from the install set entirely). Only delete
+    # packages matched by the "packages/*" glob — v2's root package.json also
+    # lists explicit workspace entries ("packages/slack") and sub-globs
+    # ("packages/console/*", "packages/stats/*") that bun install will hard-
+    # error on if the directory is missing, so those stay.
     rm_r("packages/desktop")
     rm_r("packages/app")
     rm_r("packages/web")
     rm_r("packages/www")
     rm_r("packages/storybook")
-    rm_r("packages/console")
-    rm_r("packages/stats")
-    rm_r("packages/slack")
 
     system "bun", "install", "--ignore-scripts"
 
