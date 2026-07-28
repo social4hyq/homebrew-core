@@ -1,8 +1,8 @@
 class Zns < Formula
   desc "CLI tool for querying DNS records with readable, colored output"
   homepage "https://github.com/znscli/zns"
-  url "https://github.com/znscli/zns/archive/refs/tags/v0.4.0.tar.gz"
-  sha256 "ae3aebc174ee839168b6b91f37a082d3efe275202927aa87743b04b87a8d13d8"
+  url "https://github.com/znscli/zns/archive/refs/tags/v0.6.0.tar.gz"
+  sha256 "ca22ea3cdf0e46f79c64e5a7d442e4242d5d27acd6d4c031f677aabeac0c7b14"
   license "MIT"
   head "https://github.com/znscli/zns.git", branch: "main"
 
