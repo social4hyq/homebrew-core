@@ -2,8 +2,8 @@ class OhosCompatShim < Formula
   desc "LD_PRELOAD compat shim for HarmonyOS-sandboxed aarch64/musl binaries"
   homepage "https://github.com/social4hyq/ohos-compat-shim"
   url "https://github.com/social4hyq/ohos-compat-shim.git",
-      revision: "24c8aeeebcd11b01176ba9a83172057cba8d843d"
-  version "0.2.2"
+      revision: "225ecc58d8fcba6f9c113d34ac84448e091a5a75"
+  version "0.2.3"
   license "MIT"
 
   livecheck do
@@ -11,8 +11,8 @@ class OhosCompatShim < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.2.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "642fda3f97c6d9d7876eff0afa50736ac991d0a5724e92b78218a0e6697ee8ae"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.2.3-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8c981caca5e22f98409905eb5b17d9ddc3f64b7b2423ee8faada7fab129120c"
   end
 
   # HarmonyOS's application sandbox seccomp-filters several Linux syscalls
