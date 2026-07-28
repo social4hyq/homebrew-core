@@ -7,7 +7,7 @@ class SSearch < Formula
   head "https://github.com/zquestz/s.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5cd16da106589fa6bb26b8b468b1da4fe80f5e17f14e73af3926d694177052f3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d5b2ce999f701364a7b983b25cca459a36d71f55d02ffec0e6fb548068bfa16"
   end
 
   depends_on "go" => :build
