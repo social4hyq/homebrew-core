@@ -1,0 +1,21 @@
+diff --git a/packages/core/src/project.ts b/packages/core/src/project.ts
+index 2fb0aabc18..e8fc66f8f2 100644
+--- a/packages/core/src/project.ts
++++ b/packages/core/src/project.ts
+@@ -3,6 +3,7 @@ export * as Project from "./project"
+ import { Context, Effect, Layer, Schema } from "effect"
+ import { ChildProcess } from "effect/unstable/process"
+ import { asc, desc } from "drizzle-orm"
++import os from "os"
+ import path from "path"
+ import { AbsolutePath } from "./schema"
+ import { Database } from "./database/database"
+@@ -221,7 +222,7 @@ const layer = Layer.effect(
+ 
+       const hg = yield* hgDiscover(input)
+       if (hg) return hg
+-      return { id: ID.global, directory: AbsolutePath.make(path.parse(input).root), vcs: undefined }
++      return { id: ID.global, directory: AbsolutePath.make(os.homedir()), vcs: undefined }
+     })
+ 
+     const commit = Effect.fn("Project.commit")(function* (input: { store: AbsolutePath; id: ID }) {
