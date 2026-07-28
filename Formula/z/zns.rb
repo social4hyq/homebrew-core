@@ -7,7 +7,7 @@ class Zns < Formula
   head "https://github.com/znscli/zns.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "be514138b6bf567cacabfa4825b14f8740a104e815290b4d6c0c08989102baaa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f4f2927f86e6f670aa552c90814f7d965a6520e3e89a03adc9376d3b6bf3b198"
   end
 
   depends_on "go" => :build
