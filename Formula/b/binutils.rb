@@ -1,14 +1,14 @@
 class Binutils < Formula
   desc "GNU binary tools for native development"
   homepage "https://www.gnu.org/software/binutils/binutils.html"
-  url "https://ftpmirror.gnu.org/gnu/binutils/binutils-2.46.1.tar.bz2"
-  mirror "https://ftp.gnu.org/gnu/binutils/binutils-2.46.1.tar.bz2"
-  sha256 "324ed40ada2633a28eaa5d104ca5db165fd3cc3162cc1d48a7b7fa9c932da439"
+  url "https://ftpmirror.gnu.org/gnu/binutils/binutils-2.47.tar.bz2"
+  mirror "https://ftp.gnu.org/gnu/binutils/binutils-2.47.tar.bz2"
+  sha256 "3068128c75cda9f898ccb4211d360246e8e195ffcc9dfb655b23ae23a54800e8"
   license all_of: ["GPL-2.0-or-later", "GPL-3.0-or-later", "LGPL-2.0-or-later", "LGPL-3.0-only"]
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "592e900626db3983466ffcb226a80e023d799f97f7c6501e48d5623ec7e4ec4a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8919f27475e3a2c55cb22b11a91b0d5143e2a4aab3803a9850660c93ae17caa1"
   end
 
   keg_only "it shadows the host toolchain"
