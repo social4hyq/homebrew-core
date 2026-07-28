@@ -12,7 +12,7 @@ class Cproto < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a9459d78f51a3857f567ff241ad29cfccf087b968e18211a936afb1e547aa4d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "708d1b94773943e600e9fef9df082bf9fc3ae33ac7cceaf282aca9e3fb4a4748"
   end
 
   uses_from_macos "bison" => :build
