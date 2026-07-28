@@ -33,6 +33,11 @@ match_formula() {
       [[ "$rest" =~ -r[0-9]+$ ]] && { echo "$f"; return; }
     fi
   done
+  # MUST return 0 on no-match: the caller does formula=$(match_formula ...),
+  # and a non-zero substitution status trips set -e. Without this, a tag like
+  # "bun-v1.4.0" (prefix hits the LAST name tried but lacks -rN) made the
+  # function return 1 and silently killed the whole script (2026-07-27).
+  return 0
 }
 
 PAGE=1
