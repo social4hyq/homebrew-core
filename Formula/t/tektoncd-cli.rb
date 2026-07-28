@@ -11,7 +11,7 @@ class TektoncdCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "313bdfcfe8b92b6bf47026412bb212e13c8387d01177a776eca530cff97fc15d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e80e2fc8b0d1e6a1dcccdd13a051dbd4f8541f3530d98750949cc955468ee371"
   end
 
   depends_on "go" => :build
