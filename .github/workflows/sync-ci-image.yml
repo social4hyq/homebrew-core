@@ -41,6 +41,13 @@ permissions:
   packages: write
   issues: write
 
+# A scheduled and a manual sync (or two overlapping scheduled runs) building
+# the same image race and waste runner minutes; they also both re-pin the
+# variable. Serialize them per-workflow.
+concurrency:
+  group: sync-ci-image
+  cancel-in-progress: false
+
 env:
   # Rolling upstream tag the auto-check compares against.
   UPSTREAM: swr.cn-north-4.myhuaweicloud.com/harmonybrew/ci-runner:latest
@@ -101,7 +108,8 @@ jobs:
               printf 'changed=true\n'
               printf 'upstream_digest=%s\n' "$DIGEST"
               printf 'source=%s@%s\n' "$repo" "$DIGEST"
-              printf 'tag=auto-%s-%s\n' "$(date -u +%Y%m%d)" "${DIGEST#sha256:}"
+              short="${DIGEST#sha256:}"
+              printf 'tag=auto-%s-%s\n' "$(date -u +%Y%m%d)" "${short:0:12}"
             } >> "$GITHUB_OUTPUT"
           fi
 
@@ -122,8 +130,11 @@ jobs:
         run: |
           printf 'FROM %s\nRUN ["/bin/bash", "-lc", "HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1 brew install git && brew cleanup"]\n' "$SOURCE" > Dockerfile
           cat Dockerfile
-          docker build -t "$DEST" -f Dockerfile .
+          # --metadata-file writes the built image's digest as JSON, so the pin
+          # step below doesn't have to scrape `imagetools inspect` text output.
+          docker build -t "$DEST" --metadata-file image-metadata.json -f Dockerfile .
           docker push "$DEST"
+
 
       - name: Pin OHOS_CI_IMAGE + record upstream digest
         id: pin
@@ -133,9 +144,19 @@ jobs:
           UPSTREAM_DIGEST: ${{ needs.check.outputs.upstream_digest }}
         run: |
           set -euo pipefail
-          # Digest-pin the variable so every workflow pulls exactly this image.
-          DIGEST=$(docker buildx imagetools inspect "$DEST" \
-            | awk '/^Digest:[[:space:]]+sha256:/{print $2; exit}')
+          # Resolve the pushed image's manifest digest the SAME way the check job
+          # resolves the upstream one (docker manifest inspect --verbose + jq), so
+          # if one works the other does too. Falls back to the --metadata-file
+          # JSON if the registry lookup is somehow unavailable.
+          DIGEST=$(docker manifest inspect --verbose "$DEST" \
+            | jq -r 'if type=="array" then .[0] else . end | .Descriptor.digest // empty' || true)
+          if [ -z "$DIGEST" ]; then
+            DIGEST=$(jq -r '."containerimage.digest" // empty' image-metadata.json || true)
+          fi
+          if [ -z "$DIGEST" ]; then
+            echo "::error::could not determine pushed image digest; OHOS_CI_IMAGE left unchanged"
+            exit 1
+          fi
           echo "new GHCR digest: $DIGEST"
           gh variable set OHOS_CI_IMAGE --repo "$GITHUB_REPOSITORY" \
             --body "ghcr.io/social4hyq/ci-runner@${DIGEST}"
