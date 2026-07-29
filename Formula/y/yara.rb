@@ -15,7 +15,7 @@ class Yara < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b6dec681b3120c82e9174e97f5448dc9598927c2739ffa24d484b7f7ec3b04e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7ddb70dc4009d912ea485de7bfda4533ce9b9ef18ee0362d5b7ca250e7371c0"
   end
 
   depends_on "autoconf" => :build
