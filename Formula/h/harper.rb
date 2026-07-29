@@ -1,8 +1,8 @@
 class Harper < Formula
   desc "Grammar Checker for Developers"
   homepage "https://github.com/Automattic/harper"
-  url "https://github.com/Automattic/harper/archive/refs/tags/v2.6.0.tar.gz"
-  sha256 "9cd55f642eb17c2a1c7e8bfb9f958fe5ea165ec98264b7ce568bedbc32dc8b18"
+  url "https://github.com/Automattic/harper/archive/refs/tags/v2.7.0.tar.gz"
+  sha256 "7d74a92b61c88e708c52869c9ed398667040d2ca6d46070aab95a6b4fa04476d"
   license "Apache-2.0"
   head "https://github.com/Automattic/harper.git", branch: "master"
 
@@ -12,8 +12,7 @@ class Harper < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "576e3450ccd11a7c7630272790b791f263a62195adfe851c94ef210ca87ce30e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce783fbc13ab9a52f0d5c74b12c9c6d480f5d96b6444390a3f4286af40015746"
   end
 
   depends_on "rust" => :build
