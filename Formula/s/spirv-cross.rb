@@ -1,8 +1,8 @@
 class SpirvCross < Formula
   desc "Performing reflection and disassembling SPIR-V"
   homepage "https://github.com/KhronosGroup/SPIRV-Cross"
-  url "https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.4.350.1.tar.gz"
-  sha256 "21057934ede32fe90a63dc304fdce0f2a6cb4f0ca685a72ed36a73aac6f72ad5"
+  url "https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.4.357.0.tar.gz"
+  sha256 "97c910326afdd44d794ce8561326fa675fd1958b27142f03295403044d639639"
   license all_of: [
     "Apache-2.0",
     "MIT",
@@ -18,7 +18,7 @@ class SpirvCross < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e82b32ca708407a0b191a7525f697b29eafe83ca576e91a3ed44ca1febf531a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "275e92269c5fdc921d0e95659f8406fd5bbcc6db4b9f4e23d97880caccdc33fe"
   end
 
   depends_on "cmake" => :build
