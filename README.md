@@ -22,6 +22,9 @@ brew install opencode
 # opencode v2 预览渠道（next tag，命令名 opencode2，与 opencode/ohos-opencode 并存）：
 brew install opencode@2
 
+# 或装 v2 源码构建路线的 ohos-opencode2（从上游源码 bun build --compile，原生依赖走 @ohos-ports/* npm 包）：
+brew install ohos-opencode2
+
 # 只装 claude-code / grok-build / cc-switch（均从官方渠道拉取二进制 + 自签，依赖均已有 bottle）：
 brew install claude-code
 brew install grok-build
@@ -34,30 +37,33 @@ brew install cc-switch
 bun --version && bun -e 'console.log(2**32, Math.PI)'
 ohos-opencode --version
 opencode --version
+ohos-opencode2 --version
 claude --version
 grok --version
 cc-switch --version
 ```
 
-zsh 补全（`ohos-opencode` / `grok` / `cc-switch`）随 bottle 装入 `share/zsh/site-functions/`，brew 的 zsh 环境开箱即用。
+zsh 补全（`ohos-opencode` / `ohos-opencode2` / `grok` / `cc-switch`）随 bottle 装入 `share/zsh/site-functions/`，brew 的 zsh 环境开箱即用。
 
 ## Formulae
 
 | Formula | 版本 | 定位 |
 |---|---|---|
-| `ohos-opencode` | 1.18.5 | OpenCode AI 编码代理 CLI，**上游源码构建**（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；原生依赖走 `@ohos-ports/*` npm 包。命令名 `ohos-opencode`，与官方 `opencode-ai` npm 包区分 |
-| `opencode` | 1.18.5 | 同一 CLI 的**预编译 musl 二进制**路线（从 npmmirror 拉取 `opencode-linux-arm64-musl`）；注入 RUNPATH 补 Alpine libstdc++/libgcc，wrapper LD_PRELOAD `ohos-compat-shim` + `dlopen-sign-shim` |
-| `opencode@2` | 0.0.0-next-16231 | opencode **v2 预览渠道**（`@opencode-ai/cli` 的 npm `next` dist-tag），预编译二进制路线，与 `opencode`(v1) 处理方式相同；命令名 `opencode2`，与 `opencode`/`ohos-opencode` 并存不冲突；不进 autobump（next 一天多版，钉版本手动升级） |
-| `claude-code` | 2.1.219 | Anthropic Claude Code CLI；**runtime-fetch stub**（Anthropic License 不允许重分发官方二进制），首次运行拉取 + 校验 sha256 + 自签 + 缓存 |
+| `ohos-opencode` | 1.18.8 | OpenCode AI 编码代理 CLI，**上游源码构建**（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；原生依赖走 `@ohos-ports/*` npm 包。命令名 `ohos-opencode`，与官方 `opencode-ai` npm 包区分 |
+| `opencode` | 1.18.8 | 同一 CLI 的**预编译 musl 二进制**路线（从 npmmirror 拉取 `opencode-linux-arm64-musl`）；注入 RUNPATH 补 Alpine libstdc++/libgcc，wrapper LD_PRELOAD `ohos-compat-shim` + `dlopen-sign-shim` |
+| `opencode@2` | 0.0.0-next-16419 | opencode **v2 预览渠道**（`@opencode-ai/cli` 的 npm `next` dist-tag），预编译二进制路线，与 `opencode`(v1) 处理方式相同；命令名 `opencode2`，与 `opencode`/`ohos-opencode` 并存不冲突；不进 autobump（next 一天多版，钉版本手动升级） |
+| `ohos-opencode2` | 2.0.0-dev | opencode **v2 源码构建**路线（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；v2 monorepo 重构后 CLI 包从 `packages/opencode` 移至 `packages/cli`，原生依赖精简至 `@ohos-ports/opentui-core` + `@ohos-ports/bun-pty`；命令名 `ohos-opencode2`，与 `opencode@2`（预编译）和 `ohos-opencode`（v1 源码构建）并存 |
+| `claude-code` | 2.1.220 | Anthropic Claude Code CLI；**runtime-fetch stub**（Anthropic License 不允许重分发官方二进制），首次运行拉取 + 校验 sha256 + 自签 + 缓存 |
 | `grok-build` | 0.2.112 | xAI Grok Build CLI；完全静态 ELF，仅 `ohos-bst-light` self-sign，无需 shim/RUNPATH；bash/zsh/fish 补全 |
 | `cc-switch` | 5.9.2, revision 1 | AI coding CLI 供应商切换器 + 本地代理（预编译静态 ELF，仅 `ohos-bst-light` self-sign）；主要用于给 codex 桥接 Chat-Completions-only provider（Kimi/DeepSeek 等） |
-| `bun` | 1.4.0, revision 35 | Bun JavaScript runtime（`social4hyq/ohos-bun` 的 `ohos-aarch64` 分支）；`ohos-compat-shim` 已**静态内嵌**进可执行文件（覆盖 bun 及所有 `bun build --compile` 产物），无 LD_PRELOAD wrapper |
+| `bun` | 1.4.0, revision 39 | Bun JavaScript runtime（`social4hyq/ohos-bun` 的 `ohos-aarch64` 分支）；`ohos-compat-shim` 已**静态内嵌**进可执行文件（覆盖 bun 及所有 `bun build --compile` 产物），无 LD_PRELOAD wrapper |
 | `bun-bootstrap` | 1.4.0-5467a689 | 预编译 bun，用来启动 `bun bd` 自举本机 bun；已预签，无需 ohos-sdk（`keg_only`） |
 | `bun-webkit` | `5491700992` | JavaScriptCore / WTF / bmalloc 静态库，bun 专用 WebKit fork（`keg_only`） |
 | `llvm@21` | 21.1.8, revision 2 | OHOS 补丁版 clang + lld + multiarch runtime libs；链接期 LLD `--code-sign` 签名（裁剪版，`keg_only`） |
 | `icu4c@78` | 78.3, revision 1 | Unicode 库，用本仓库 llvm@21 重编以对齐 libc++ ABI（`keg_only`） |
 | `ohos-bst-light` | 1.0.0 | 轻量二进制自签工具，保留 ELF 结构不被破坏；预编译二进制 formula 的 self-sign 都靠它 |
-| `ohos-compat-shim` | 0.2.0 | LD_PRELOAD 兼容垫片：拦截鸿蒙缺失/异常的 syscall（`close_range`/`fchmodat2`/`getpwuid_r`/`tmpfile`/`getcwd`/`linkat`/`symlinkat` 等）；`opencode`/`claude-code` 共用 |
+| `ohos-compat-shim` | 0.2.3 | LD_PRELOAD 兼容垫片：拦截鸿蒙缺失/异常的 syscall（`close_range`/`fchmodat2`/`getpwuid_r`/`tmpfile`/`getcwd`/`linkat`/`symlinkat` 等）；`opencode`/`claude-code` 共用 |
+| `inject-runpath` | 0.1.0 | 就地注入 DT_RUNPATH 到 ELF（零偏移移动），不破坏 Bun 编译产物的追加模块图；预编译二进制 formula（`opencode`/`opencode@2`）的 RUNPATH 注入靠它（`keg_only`） |
 | `dlopen-sign-shim` | 0.1.0 | LD_PRELOAD 垫片：`dlopen`/`dlmopen` 前自动 self-sign 未签名 ELF，兜底运行时才解包落盘的原生模块 |
 
 > 已下线：`close-range-shim`（2026-07-15，并入 `ohos-compat-shim`）；`bun-pty` / `lightningcss` / `tailwindcss-oxide`（2026-07-18，`ohos-opencode` 改走 `@ohos-ports/*` npm 包后 formula 失去存在意义）；`codex`（2026-07-23，harmonybrew 官方已原生支持 codex，本 tap 自建 formula 失去存在意义）。
@@ -70,7 +76,7 @@ zsh 补全（`ohos-opencode` / `grok` / `cc-switch`）随 bottle 装入 `share/z
 
 ### 系统调用降级
 
-`ohos-compat-shim` 以两种形态生效：`opencode` / `claude-code` 经 wrapper LD_PRELOAD 它；bun（r31+）把它静态内嵌进可执行文件，覆盖所有 `bun build --compile` 产物（含 `ohos-opencode`）。使用者一般不用关心，极端场景下能感知到：
+`ohos-compat-shim` 以两种形态生效：`opencode` / `claude-code` 经 wrapper LD_PRELOAD 它；bun（r31+）把它静态内嵌进可执行文件，覆盖所有 `bun build --compile` 产物（含 `ohos-opencode` / `ohos-opencode2`）。使用者一般不用关心，极端场景下能感知到：
 
 | 类别 | 鸿蒙缺什么 | 降级方式 | 用户能感知到的影响 |
 |---|---|---|---|
@@ -81,7 +87,7 @@ zsh 补全（`ohos-opencode` / `grok` / `cc-switch`）随 bottle 装入 `share/z
 
 ### 其他
 
-- **签名按产物来源分四条路径**：bun 内置 `ohos_sign` crate（in-process，零 fork）；`llvm@21` 的 cc/c++ shim（LLD `--code-sign`，链接期）；预编译二进制（claude-code/grok-build/opencode/opencode@2/cc-switch）用 `ohos-bst-light` self-sign；运行时才解包的原生模块由 `dlopen-sign-shim` 兜底。
+- **签名按产物来源分四条路径**：bun 内置 `ohos_sign` crate（in-process，零 fork）；`llvm@21` 的 cc/c++ shim（LLD `--code-sign`，链接期）；预编译二进制（claude-code/grok-build/opencode/opencode@2/cc-switch）用 `ohos-bst-light` self-sign；`ohos-opencode` / `ohos-opencode2` 的 `.codesign` 段由 bun compile 直接产生（bun 内置 `ohos_sign`）；运行时才解包的原生模块由 `dlopen-sign-shim` 兜底。
 - `claude-code` 遵循 Anthropic License，不在 bottle 里重分发官方二进制：安装的是 runtime-fetch 包装脚本，首次运行下载、校验 sha256、自签并缓存。
 - `opencode`（prebuilt）动态链接的 GCC 运行时（`libstdc++.so.6`/`libgcc_s.so.1`）OHOS 不自带，靠 Alpine musl 静态资源 + 就地 RUNPATH 注入解决。
 - WebKit Inspector 走 socket 后端而非 glib 后端（OHOS 没有 GLib）。
