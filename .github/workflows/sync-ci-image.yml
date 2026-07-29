@@ -1,20 +1,31 @@
 name: sync-ci-image
 
-# On-demand: mirror the OHOS ci-runner image from Huawei Cloud SWR (cn-north-4)
-# to GHCR. Every workflow's "Start OHOS container" step used to pay a ~3.5min
+# Mirror the OHOS ci-runner image from Huawei Cloud SWR (cn-north-4) to GHCR.
+# Every workflow's "Start OHOS container" step used to pay a ~3.5min
 # cross-Pacific `docker pull` (SWR Beijing -> Azure-hosted runner, ~10MB/s on
 # the big layer); GHCR sits on the same Azure backbone as the runners, so the
 # pull drops to seconds. The derived image also bakes in `brew install git`
 # (another ~52s every run used to spend in setup-container.sh — git is
 # run-independent, so it belongs in the image, not the setup script).
 #
-# After pushing a new tag:
-#   gh variable set OHOS_CI_IMAGE --body ghcr.io/social4hyq/ci-runner:<tag>
-# (optionally digest-pinned, per `docker buildx imagetools inspect`). The
-# package must be public (package settings -> Change visibility) for the
-# anonymous pulls the workflows do, or setup-container.sh needs a docker login.
+# Runs two ways:
+#   - scheduled (daily): compares the upstream `latest` manifest digest to the
+#     CI_RUNNER_UPSTREAM_DIGEST variable, and only rebuilds when upstream moved.
+#     On a rebuild it auto-re-pins OHOS_CI_IMAGE (digest-pinned) and opens an
+#     issue so a silent image change is visible.
+#   - manual dispatch: force a rebuild from an explicit source/tag (the original
+#     on-demand path); it does NOT touch the tracking variable.
+#
+# Secrets used: BOT_PUSH_TOKEN (PAT with repo scope — needed because setting
+# repo variables / opening issues needs Administration, which the default
+# GITHUB_TOKEN can't be granted). GITHUB_TOKEN is enough for the GHCR push
+# itself (packages: write).
 
 on:
+  schedule:
+    # 02:30 CST daily — runs well before the 04:30 CST daily-regression so a
+    # freshly mirrored image is already in place if upstream changed.
+    - cron: '30 18 * * *'
   workflow_dispatch:
     inputs:
       source:
@@ -26,10 +37,73 @@ on:
         required: true
 
 permissions:
+  contents: read
   packages: write
+  issues: write
+
+env:
+  # Rolling upstream tag the auto-check compares against.
+  UPSTREAM: swr.cn-north-4.myhuaweicloud.com/harmonybrew/ci-runner:latest
 
 jobs:
+  # Decide whether a sync is needed. A manual dispatch always proceeds (using
+  # the supplied source/tag verbatim). The scheduled run compares the upstream
+  # `latest` manifest digest to the CI_RUNNER_UPSTREAM_DIGEST variable, which
+  # records the exact upstream digest we last built the GHCR image from. The
+  # GHCR image itself can't be compared directly — it's a derived image with an
+  # extra `brew install git` layer, so its digest never equals upstream's.
+  check:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    outputs:
+      changed: ${{ steps.cmp.outputs.changed }}
+      upstream_digest: ${{ steps.cmp.outputs.upstream_digest }}
+      source: ${{ steps.cmp.outputs.source }}
+      tag: ${{ steps.cmp.outputs.tag }}
+    steps:
+      - id: cmp
+        env:
+          GH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual dispatch; skipping digest check."
+            printf 'changed=true\n' >> "$GITHUB_OUTPUT"
+            printf 'source=${{ inputs.source }}\n' >> "$GITHUB_OUTPUT"
+            printf 'tag=${{ inputs.tag }}\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          DIGEST=$(docker manifest inspect --verbose "$UPSTREAM" \
+            | jq -r '.Descriptor.digest // empty')
+          if [ -z "$DIGEST" ]; then
+            echo "::warning::could not resolve upstream manifest digest; skipping"
+            printf 'changed=false\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "upstream latest digest: $DIGEST"
+
+          LAST=$(gh variable get CI_RUNNER_UPSTREAM_DIGEST --repo "$GITHUB_REPOSITORY" 2>/dev/null || true)
+          echo "last synced digest: ${LAST:-<none — first run, will bootstrap>}"
+
+          if [ "$DIGEST" = "$LAST" ]; then
+            echo "Upstream unchanged; nothing to sync."
+            printf 'changed=false\n' >> "$GITHUB_OUTPUT"
+          else
+            echo "Upstream changed ($LAST -> $DIGEST); will sync."
+            printf 'changed=true\n' >> "$GITHUB_OUTPUT"
+            printf 'upstream_digest=%s\n' "$DIGEST" >> "$GITHUB_OUTPUT"
+            # Pin the build to the exact verified digest, not the moving
+            # 'latest' tag, so it can't drift between this check and the pull.
+            repo="${UPSTREAM%:*}"
+            printf 'source=%s@%s\n' "$repo" "$DIGEST" >> "$GITHUB_OUTPUT"
+            printf 'tag=auto-%s-%s\n' "$(date -u +%Y%m%d)" "${DIGEST#sha256:}" >> "$GITHUB_OUTPUT"
+          fi
+
   sync:
+    needs: check
+    if: needs.check.outputs.changed == 'true'
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 60
     steps:
@@ -39,13 +113,52 @@ jobs:
       # arm64 image + arm64 runner: the RUN layer executes natively, no qemu
       - name: Build derived image (git baked in) and push
         env:
-          SOURCE: ${{ inputs.source }}
-          DEST: ghcr.io/social4hyq/ci-runner:${{ inputs.tag }}
+          SOURCE: ${{ needs.check.outputs.source }}
+          DEST: ghcr.io/social4hyq/ci-runner:${{ needs.check.outputs.tag }}
         run: |
           printf 'FROM %s\nRUN ["/bin/bash", "-lc", "HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1 brew install git && brew cleanup"]\n' "$SOURCE" > Dockerfile
           cat Dockerfile
           docker build -t "$DEST" -f Dockerfile .
           docker push "$DEST"
 
+      - name: Pin OHOS_CI_IMAGE + record upstream digest
+        id: pin
+        env:
+          GH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
+          DEST: ghcr.io/social4hyq/ci-runner:${{ needs.check.outputs.tag }}
+          UPSTREAM_DIGEST: ${{ needs.check.outputs.upstream_digest }}
+        run: |
+          set -euo pipefail
+          # Digest-pin the variable so every workflow pulls exactly this image.
+          DIGEST=$(docker buildx imagetools inspect "$DEST" \
+            | awk '/^Digest:[[:space:]]+sha256:/{print $2; exit}')
+          echo "new GHCR digest: $DIGEST"
+          gh variable set OHOS_CI_IMAGE --repo "$GITHUB_REPOSITORY" \
+            --body "ghcr.io/social4hyq/ci-runner@${DIGEST}"
+          # Only record the upstream digest on an auto (scheduled) run; a
+          # manual dispatch may build from an arbitrary tag/digest.
+          if [ -n "$UPSTREAM_DIGEST" ]; then
+            gh variable set CI_RUNNER_UPSTREAM_DIGEST --repo "$GITHUB_REPOSITORY" \
+              --body "$UPSTREAM_DIGEST"
+          fi
+          printf 'ghcr_digest=%s\n' "$DIGEST" >> "$GITHUB_OUTPUT"
+
       - name: Show pushed digest
-        run: docker buildx imagetools inspect ghcr.io/social4hyq/ci-runner:${{ inputs.tag }}
+        run: docker buildx imagetools inspect ghcr.io/social4hyq/ci-runner:${{ needs.check.outputs.tag }}
+
+      # Auto-syncs (and only those) open an issue so a silent image change is
+      # visible; manual dispatches don't, since the operator ran them directly.
+      - name: Notify on auto-sync
+        if: needs.check.outputs.upstream_digest != ''
+        env:
+          GH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
+        run: |
+          gh issue create --repo "$GITHUB_REPOSITORY" \
+            --title "ci-image auto-synced to ${{ needs.check.outputs.tag }}" \
+            --body "Upstream \`ci-runner\` changed; rebuilt the derived image and re-pinned \`OHOS_CI_IMAGE\`.
+
+          - upstream digest: \`${{ needs.check.outputs.upstream_digest }}\`
+          - new image: \`ghcr.io/social4hyq/ci-runner@${{ steps.pin.outputs.ghcr_digest }}\` (tag \`${{ needs.check.outputs.tag }}\`)
+          - run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          (Auto-generated by the sync-ci-image scheduled check.)"
