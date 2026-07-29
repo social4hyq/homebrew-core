@@ -6,6 +6,7 @@ class PortableRuby < PortableFormula
   url "https://cache.ruby-lang.org/pub/ruby/4.0/ruby-4.0.5.tar.gz"
   sha256 "7d6149079a63f8ae1d326c9fa65c6019ba2dc3155eae7b39159817911c88958e"
   license "Ruby"
+  revision 1
 
   # This regex restricts matching to versions other than X.Y.0.
   livecheck do
@@ -16,7 +17,7 @@ class PortableRuby < PortableFormula
   no_autobump! because: "this is a critical package so an auto bump might break Homebrew usability."
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3638b185399c589c8d585ee4dcf0632da45af4880ae8d3eab9eb55ccbdcbd0a5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eaef7ead2ce3d4f15e9060f566f17ea3391c65fbaacb82cc0ecd57e8f4eabffd"
   end
 
   depends_on "autoconf" => :build
@@ -174,6 +175,7 @@ class PortableRuby < PortableFormula
       inreplace lib/"ruby/#{abi_version}/#{abi_arch}/rbconfig.rb" do |s|
         s.gsub! ENV.cxx, "c++"
         s.gsub! ENV.cc, "cc"
+        s.gsub! "/usr/bin/install", "install"
       end
 
       # Ship libcrypt.a so that building native gems doesn't need system libcrypt installed.
