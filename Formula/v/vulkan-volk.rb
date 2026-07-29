@@ -1,8 +1,8 @@
 class VulkanVolk < Formula
   desc "Meta loader for Vulkan API"
   homepage "https://github.com/zeux/volk"
-  url "https://github.com/zeux/volk/archive/refs/tags/vulkan-sdk-1.4.350.1.tar.gz"
-  sha256 "078a9411298e4e0f60f5f5398c890783427c25a414619294ca8e69587bbd5eae"
+  url "https://github.com/zeux/volk/archive/refs/tags/vulkan-sdk-1.4.357.0.tar.gz"
+  sha256 "6400c7b23e24d17e4f04bac49b55b06c4e87677d33398e90344743ec73560ca6"
   license "MIT"
   head "https://github.com/zeux/volk.git", branch: "master"
 
@@ -12,7 +12,7 @@ class VulkanVolk < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a33420663f2c57b557a0e86422c51dbad877835bc90bceba1765370a1d7471e0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8dadaa27bbfb48c3c86fcf010c04366f15cc195143c250074cb29c2c03b1c50e"
   end
 
   depends_on "cmake" => :build
