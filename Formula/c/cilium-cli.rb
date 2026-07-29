@@ -1,8 +1,8 @@
 class CiliumCli < Formula
   desc "CLI to install, manage & troubleshoot Kubernetes clusters running Cilium"
   homepage "https://cilium.io"
-  url "https://github.com/cilium/cilium-cli/archive/refs/tags/v0.19.6.tar.gz"
-  sha256 "6be3f82ded39a567852d5f28c7e1ef9b26b2b31541edb62ed0c875af793d1d61"
+  url "https://github.com/cilium/cilium-cli/archive/refs/tags/v0.19.7.tar.gz"
+  sha256 "3bb9a91bbbede233cc5929208c6de1366b0d5df99a9d65728121589f7b1b81cf"
   license "Apache-2.0"
   head "https://github.com/cilium/cilium-cli.git", branch: "main"
 
@@ -15,7 +15,7 @@ class CiliumCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2cc140fed793bb7ce33ce7f11aba5351c98d205e745bde75784eec0a52c7365a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "260adb08e4d3869f042a1b84034fb6c43ef9a60251c4bc1e24c4676331c5e93c"
   end
 
   depends_on "go" => :build
