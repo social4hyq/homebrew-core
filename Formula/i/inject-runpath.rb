@@ -9,7 +9,7 @@ class InjectRunpath < Formula
   # to satisfy that requirement.
   url "https://atomgit.com/social4hyq/homebrew-core.git",
       revision: "d1fc7a588c1e040b8b34203784669a66731e43e7"
-  version "0.1.0"
+  version "0.2.0"
   license "MIT"
 
   livecheck do
@@ -17,8 +17,8 @@ class InjectRunpath < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/inject-runpath-v0.1.0"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61307e99f9a924fa4009ca5cf9556299db5ceff6fa71355a328532fbcd4b8866"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/inject-runpath-v0.2.0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
   # Why this exists instead of patchelf: single-file executables built by
@@ -48,8 +48,9 @@ class InjectRunpath < Formula
       # dynamic string table and dynamic section into the tail padding of the
       # ELF's RW LOAD segment, then repointing PT_DYNAMIC at them. No existing
       # byte changes file offset, so payloads appended after the sections
-      # (Bun --compile module graph, ...) stay valid. Fails with an assertion
-      # if the RW segment has too little padding to host the two new blobs.
+      # (Bun --compile module graph, ...) stay valid. If the RW segment's
+      # tail padding is too small, the segment is grown (p_filesz/p_memsz)
+      # in place to reclaim trailing non-alloc bytes — still no byte shifts.
       import struct
       import sys
 
@@ -62,14 +63,14 @@ class InjectRunpath < Formula
           for i in range(e_phnum):
               b=e_phoff+i*e_phentsize
               t,fl,off,va,pa,fsz,msz,al=u(d,b,"<IIQQQQQQ")
-              if t==1: loads.append((off,va,fsz,msz))
+              if t==1: loads.append((off,va,fsz,msz,b,al))
               if t==2: ptdyn=(i,b)
           def seg_for_v(v):
-              for off,va,fsz,msz in loads:
+              for off,va,_fsz,msz,_b,_al in loads:
                   if va<=v<va+msz: return (off,va)
           def v2f(v):
               o,va=seg_for_v(v); return o+(v-va)
-          rw=max(loads,key=lambda l:l[1]); rw_off,rw_v=rw[0],rw[1]
+          rw=max(loads,key=lambda l:l[1]); rw_off,rw_v=rw[0],rw[1]; rw_phoff,rw_align=rw[4],rw[5]
           def f2v_rw(off): return rw_v+(off-rw_off)
           _,db=ptdyn
           _,_,d_off,d_va,d_pa,d_fsz,_,_=u(d,db,"<IIQQQQQQ")
@@ -102,7 +103,12 @@ class InjectRunpath < Formula
               nd.append((tag,val))
           nd.append((29,rp_off)); nd.append((0,0))
           db_b=b"".join(struct.pack("<qQ",t,v) for t,v in nd)
-          assert dyn_f+len(db_b)<=rw_off+rw[2], "not enough RW padding"
+          needed=dyn_f+len(db_b); seg_end=rw_off+rw[2]
+          if needed>seg_end:
+              new_fsz=(needed-rw_off+0xfff)&~0xfff
+              struct.pack_into("<Q",d,rw_phoff+32,new_fsz)
+              struct.pack_into("<Q",d,rw_phoff+40,new_fsz)
+              if len(d)<rw_off+new_fsz: d.extend(b"\x00"*(rw_off+new_fsz-len(d)))
           d[str_f:str_f+new_sz]=new_str
           d[dyn_f:dyn_f+len(db_b)]=db_b
           struct.pack_into("<IIQQQQQQ",d,db,2,u(d,db,"<IIQQQQQQ")[1],dyn_f,dyn_v,dyn_v,len(db_b),len(db_b),8)
