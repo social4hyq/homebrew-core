@@ -6,10 +6,10 @@ class Bun < Formula
   # pre-populated WebKit cache, and a Rust nightly toolchain with -Zbuild-std.
   # All patches are pre-applied on the ohos-aarch64 branch of social4hyq/ohos-bun.
   # Upstream formula cannot accommodate these build requirements.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "3e233644d1e746784de8cf82637bd19c6c530340", branch: "ohos-aarch64"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "7a13ba8285d7d9ad8609b577b1a69f1b4f8e6013", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
-  revision 39
+  revision 40
   head "https://github.com/oven-sh/bun.git", branch: "main"
 
   livecheck do
