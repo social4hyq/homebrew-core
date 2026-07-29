@@ -7,7 +7,7 @@ class ApacheArrowAdbc < Formula
   head "https://github.com/apache/arrow-adbc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ee6cd6eca3885edf3ff6728a3ed4dc44a358081e849ad798631ed2cbe062026"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0c67aab4fe6ed9ca87d21cc91aace98554d4e431d4b9bcf2bf3200a79017fef"
   end
 
   depends_on "cmake" => :build
