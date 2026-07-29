@@ -7,7 +7,7 @@ class Kekkai < Formula
   head "https://github.com/catatsuy/kekkai.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fcce602d75624cb039638793919ebf63a258642f0161f541944768b19a859c8b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d498b97dada1e58fe2ef7a1b4a3099199359e42864e619c787e1cc76b5a2f47"
   end
 
   depends_on "go" => :build
