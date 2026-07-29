@@ -69,9 +69,11 @@ jobs:
 
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "Manual dispatch; skipping digest check."
-            printf 'changed=true\n' >> "$GITHUB_OUTPUT"
-            printf 'source=${{ inputs.source }}\n' >> "$GITHUB_OUTPUT"
-            printf 'tag=${{ inputs.tag }}\n' >> "$GITHUB_OUTPUT"
+            {
+              printf 'changed=true\n'
+              printf 'source=${{ inputs.source }}\n'
+              printf 'tag=${{ inputs.tag }}\n'
+            } >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -92,13 +94,15 @@ jobs:
             printf 'changed=false\n' >> "$GITHUB_OUTPUT"
           else
             echo "Upstream changed ($LAST -> $DIGEST); will sync."
-            printf 'changed=true\n' >> "$GITHUB_OUTPUT"
-            printf 'upstream_digest=%s\n' "$DIGEST" >> "$GITHUB_OUTPUT"
+            repo="${UPSTREAM%:*}"
             # Pin the build to the exact verified digest, not the moving
             # 'latest' tag, so it can't drift between this check and the pull.
-            repo="${UPSTREAM%:*}"
-            printf 'source=%s@%s\n' "$repo" "$DIGEST" >> "$GITHUB_OUTPUT"
-            printf 'tag=auto-%s-%s\n' "$(date -u +%Y%m%d)" "${DIGEST#sha256:}" >> "$GITHUB_OUTPUT"
+            {
+              printf 'changed=true\n'
+              printf 'upstream_digest=%s\n' "$DIGEST"
+              printf 'source=%s@%s\n' "$repo" "$DIGEST"
+              printf 'tag=auto-%s-%s\n' "$(date -u +%Y%m%d)" "${DIGEST#sha256:}"
+            } >> "$GITHUB_OUTPUT"
           fi
 
   sync:
