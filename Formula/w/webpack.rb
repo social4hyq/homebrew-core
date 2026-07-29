@@ -9,7 +9,7 @@ class Webpack < Formula
   head "https://github.com/webpack/webpack.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "31e09b2ea27d11d1c3d73097aad51681dd81386b2f8bb2d6fd9d12ae1bc402dc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "477feee734212c44b2a476ec5c92b72f90f088ee9b2aa0c2988f0df46f023c23"
   end
 
   depends_on "node"
