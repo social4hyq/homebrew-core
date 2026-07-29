@@ -76,6 +76,16 @@ FORMULAE=($(printf '%s\n' "${!TEST_SET[@]}" | sort))
 echo "Test set (${#FORMULAE[@]}): ${FORMULAE[*]}"
 
 # ── Step 4: sequential install + test in the shared container ─────────
+
+# The CI image bakes a Homebrew index that may resolve a dependency to a
+# version whose bottle the upstream CDN has pruned (e.g. node 26.4.0 → 404,
+# breaking bun). That is not a transient 404 the install retry could paper
+# over — it fails identically every run — so refresh the index first, the
+# same fix build.sh (PR #95) already applies before its install loop.
+# Non-fatal: a failed refresh degrades to the baked index instead of
+# blocking the run; the install below will surface any real breakage.
+cbrew "update --quiet" || echo "::warning::brew update failed; continuing with the image's baked index"
+
 declare -A RESULT=()
 for f in "${FORMULAE[@]}"; do
   echo "::group::$f"
