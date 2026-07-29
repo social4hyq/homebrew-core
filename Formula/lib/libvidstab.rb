@@ -1,8 +1,8 @@
 class Libvidstab < Formula
   desc "Transcode video stabilization plugin"
   homepage "https://github.com/georgmartius/vid.stab"
-  url "https://github.com/georgmartius/vid.stab/archive/refs/tags/v1.1.1.tar.gz"
-  sha256 "9001b6df73933555e56deac19a0f225aae152abbc0e97dc70034814a1943f3d4"
+  url "https://github.com/georgmartius/vid.stab/archive/refs/tags/v1.1.2.tar.gz"
+  sha256 "96db34d48a9e3aa13736a48744b56dfb76731ac9bb5193c716de8534c9fd709d"
   license "GPL-2.0-or-later"
   compatibility_version 1
 
