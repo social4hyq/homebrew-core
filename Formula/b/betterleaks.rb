@@ -1,13 +1,13 @@
 class Betterleaks < Formula
   desc "Secrets scanner built for configurability and speed"
   homepage "https://github.com/betterleaks/betterleaks"
-  url "https://github.com/betterleaks/betterleaks/archive/refs/tags/v1.7.1.tar.gz"
-  sha256 "5af3deef521c925d492aecbcf645b18d738afc348d3e729b4e209a78a7798934"
+  url "https://github.com/betterleaks/betterleaks/archive/refs/tags/v1.7.2.tar.gz"
+  sha256 "686b4f607f03838e0f98448c62627334ecc595762d7b3512df6bdeaeff68ff4d"
   license "MIT"
   head "https://github.com/betterleaks/betterleaks.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3125a67cf21722c3b5b93d213e0d03bfe39fc17d1ae7929a6eb74af339232a00"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d05115199879826aed8a757ce98f444decd0208ddc13e62114b65febccf2275c"
   end
 
   depends_on "go" => :build
