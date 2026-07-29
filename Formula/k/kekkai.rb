@@ -1,13 +1,13 @@
 class Kekkai < Formula
   desc "File integrity monitoring tool"
   homepage "https://github.com/catatsuy/kekkai"
-  url "https://github.com/catatsuy/kekkai/archive/refs/tags/v0.2.10.tar.gz"
-  sha256 "ab244e24bb957954a0911f0e67eaebc4424179dd4addb79aa31519e6c75a74d8"
+  url "https://github.com/catatsuy/kekkai/archive/refs/tags/v0.2.11.tar.gz"
+  sha256 "7b5a4fb71131880cc0ba37b2c8d40e7250b7228771e78c6b8a4b15e3d09aa84c"
   license "MIT"
   head "https://github.com/catatsuy/kekkai.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fcce602d75624cb039638793919ebf63a258642f0161f541944768b19a859c8b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d498b97dada1e58fe2ef7a1b4a3099199359e42864e619c787e1cc76b5a2f47"
   end
 
   depends_on "go" => :build
