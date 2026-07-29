@@ -1,8 +1,8 @@
 class Yara < Formula
   desc "Malware identification and classification tool"
   homepage "https://github.com/VirusTotal/yara/"
-  url "https://github.com/VirusTotal/yara/archive/refs/tags/v4.5.5.tar.gz"
-  sha256 "d38e30fd9c1e1c7921d1c4568262d94f5c2d6b5da139fe49572a43ffbc5c53f6"
+  url "https://github.com/VirusTotal/yara/archive/refs/tags/v4.5.8.tar.gz"
+  sha256 "c322414975ff6f701149856613afdcd92a7e6939c284c798ae3c85618197efaa"
   license "BSD-3-Clause"
   head "https://github.com/VirusTotal/yara.git", branch: "master"
 
@@ -15,7 +15,7 @@ class Yara < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b6dec681b3120c82e9174e97f5448dc9598927c2739ffa24d484b7f7ec3b04e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7ddb70dc4009d912ea485de7bfda4533ce9b9ef18ee0362d5b7ca250e7371c0"
   end
 
   depends_on "autoconf" => :build
