@@ -7,7 +7,7 @@ class Ldcli < Formula
   head "https://github.com/launchdarkly/ldcli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fdd0a67dc8ecdd14a5526aedeb245b58eeefc43a3b937ffd4a4c66a5bafb4388"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c005dc8f9ed8f6f773b21d52de2ce97687cf784a0c6e838d957568426895c004"
   end
 
   depends_on "go" => :build
