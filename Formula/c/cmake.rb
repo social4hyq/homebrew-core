@@ -1,12 +1,11 @@
 class Cmake < Formula
   desc "Cross-platform make"
   homepage "https://www.cmake.org/"
-  url "https://github.com/Kitware/CMake/releases/download/v4.4.0/cmake-4.4.0.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/cmake-4.4.0.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/legacy/cmake-4.4.0.tar.gz"
-  sha256 "65757f442fdd242e27f1728fc26dc0cba4164f7a0791a5c788631c00080369bc"
+  url "https://github.com/Kitware/CMake/releases/download/v4.4.1/cmake-4.4.1.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/cmake-4.4.1.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/legacy/cmake-4.4.1.tar.gz"
+  sha256 "95d4721f3625fb0d9d6ca480dd59a46c84b4c157f7fadd2e9b179ef9c871174d"
   license "BSD-3-Clause"
-  revision 1
   compatibility_version 1
   head "https://gitlab.kitware.com/cmake/cmake.git", branch: "master"
 
@@ -19,7 +18,7 @@ class Cmake < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "38c5b9c21005784161fea0be3a222e78a69bca9030eabf04d511fc392034a250"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c2182b2c1da88e0d8fc0348212d1699a52a5bb1cd383e35e0dccec50f6ae971"
   end
 
   uses_from_macos "ncurses"
