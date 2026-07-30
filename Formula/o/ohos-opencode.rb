@@ -1,8 +1,8 @@
 class OhosOpencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.8.tar.gz"
-  sha256 "1a998288639d9e8d5df4b6ad37762b9ccacac9f18d95651071e51fa97c76c720"
+  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.9.tar.gz"
+  sha256 "6f076b8b87a56b7a353d312c7be0449257c6fa18e963a4e10433fe35420de079"
   license "MIT"
 
   livecheck do
@@ -11,7 +11,7 @@ class OhosOpencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.8-r1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.9-r1"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "2a5669248396d624b80bba1fdc74a00c73d4c490cdc95930adf63b399350ef75"
   end
 
@@ -39,20 +39,18 @@ class OhosOpencode < Formula
   depends_on "bun" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
 
-  # OHOS adaptations, mirrored from social4hyq/ohos-opencode dev (patches are
-  # the `git diff v1.18.8..dev` for the respective files — regenerate there,
-  # never hand-edit hunks).
-  patch :p1 do
-    file "Patches/ohos-opencode/ohos-ports-deps.patch"
-  end
-  patch :p1 do
-    file "Patches/ohos-opencode/bun-lock-openharmony-os.patch"
-  end
+  # OHOS source adaptations (codex.rb pattern: inreplace over .patch where
+  # the change is a stable string/array edit; keep .patch only for the two
+  # structural changes that a string replace would make fragile):
+  #   - build-ohos-target.patch: inserts a new target object into an array
+  #   - web-open-try-catch.patch: wraps a call in a conditional block
+  # Everything else — openharmony os markers (bun.lock), @ohos-ports dep
+  # overrides (package.json/bunfig.toml), the project homedir fallback — is
+  # done at runtime via inreplace in install(), so a version bump only needs
+  # url + sha256 + bottle root_url. See social4hyq/ohos-opencode dev for the
+  # canonical diff these mirror (fork-diff invariant).
   patch :p1 do
     file "Patches/ohos-opencode/build-ohos-target.patch"
-  end
-  patch :p1 do
-    file "Patches/ohos-opencode/project-global-worktree.patch"
   end
   patch :p1 do
     file "Patches/ohos-opencode/web-open-try-catch.patch"
@@ -73,7 +71,52 @@ class OhosOpencode < Formula
     rm_r("packages/docs")
     rm_r("packages/storybook")
 
+    # Redirect native deps to the @ohos-ports/* musl builds (replaces
+    # ohos-ports-deps.patch). Pure string/array edits, version-independent.
+    inreplace "bunfig.toml",
+      '"@opentui/core-win32-x64", ',
+      '"@opentui/core-win32-x64", "@ohos-ports/opentui-core", "@ohos-ports/bun-pty", "@ohos-ports/lightningcss", "@ohos-ports/tailwindcss-oxide", '
+    inreplace "package.json" do |s|
+      s.gsub! '"@opentui/core": "catalog:",',
+              '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.5",'
+      # bun-pty/lightningcss/@tailwindcss/oxide have no upstream override entry,
+      # so add them after @types/node (the last key in the overrides object).
+      s.gsub! %(    "@types/node": "catalog:"\n  },),
+              %(    "@types/node": "catalog:",\n    "bun-pty": "npm:@ohos-ports/bun-pty@0.4.10",\n    "lightningcss": "npm:@ohos-ports/lightningcss@1.32.0",\n    "@tailwindcss/oxide": "npm:@ohos-ports/tailwindcss-oxide@4.3.1"\n  },)
+    end
+
+    # Project global dir: use $HOME instead of filesystem root when no git repo
+    # is found (replaces project-global-worktree.patch). on openharmony the root
+    # path is read-only, so a "global" project lands in the home dir.
+    inreplace "packages/core/src/project.ts" do |s|
+      s.sub! 'import path from "path"', %(import os from "os"\nimport path from "path")
+      s.sub! "path.parse(input).root", "os.homedir()"
+    end
+    inreplace "packages/opencode/src/project/project.ts",
+      "data.id === ProjectV2.ID.make(\"global\") && !data.vcs ? \"/\" : data.directory",
+      "data.directory"
+
     system "bun", "install", "--ignore-scripts"
+
+    # Inject openharmony os markers into bun.lock — replaces the old
+    # bun-lock-openharmony-os.patch (codex.rb pattern: inreplace instead of a
+    # .patch for a generated file). Version-independent; see note above.
+    lockfile = (buildpath/"bun.lock").read
+    # Upstream marks every *-openharmony-arm64 native binding definition as
+    # { "os": "none" } (unknown platform); bun won't resolve them on openharmony.
+    # Flip just that fragment to "openharmony" so build.ts's
+    # `bun install --os="*" --cpu="*"` picks them up. Version-independent: it
+    # never touches version or sha256 lines, only the os flag on binding defs.
+    injected = lockfile.gsub(
+      /("[^"]*openharmony-arm64@[^"]+", "", \{ )"os": "none"(, "cpu": "arm64" \})/,
+      %q(\1"os": "openharmony"\2),
+    )
+    if injected == lockfile
+      opoo "ohos-opencode: no openharmony-arm64 os:none markers found in bun.lock " \
+        "(upstream may have changed the lockfile format — verify the build)"
+    else
+      (buildpath/"bun.lock").atomic_write(injected)
+    end
 
     # Script.version short-circuits on OPENCODE_VERSION (no git / registry
     # lookup), which also flips Script.channel to "latest".
