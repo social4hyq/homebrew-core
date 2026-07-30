@@ -1,8 +1,8 @@
 class Sccache < Formula
   desc "Used as a compiler wrapper and avoids compilation when possible"
   homepage "https://github.com/mozilla/sccache"
-  url "https://github.com/mozilla/sccache/archive/refs/tags/v0.16.0.tar.gz"
-  sha256 "917fd4d7e584c23dd3cf9ca2f394c2ca03c57c73e2d6079770f07d9008176afe"
+  url "https://github.com/mozilla/sccache/archive/refs/tags/v0.17.0.tar.gz"
+  sha256 "49949ad1cf175c49da126dbb0c2e6a56bd9d1f626e8cc0be17b9668b914145c6"
   license "Apache-2.0"
   head "https://github.com/mozilla/sccache.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Sccache < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1ae5f03f66cb4ab31bc760385f46cbfb35ab1c9435c1f7ca215b9ee02e96a95"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "82c888fb11585b554a9bb99f8240dbb8c200aa20ca2c1cdb5ce3fbd567f49bc0"
   end
 
   depends_on "pkgconf" => :build
