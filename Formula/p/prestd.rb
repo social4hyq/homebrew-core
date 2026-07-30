@@ -12,7 +12,7 @@ class Prestd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f5b39fcbcba7316d134cfb309887c028fc6e663c69c51ebe53501789d478536"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d98abb5f71ed6045a5198dec7a0d74285c4bfca597eb14d1720986e81884380e"
   end
 
   depends_on "go" => :build
