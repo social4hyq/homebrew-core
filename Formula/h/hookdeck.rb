@@ -1,8 +1,8 @@
 class Hookdeck < Formula
   desc "Forward webhook events from Hookdeck to a local server"
   homepage "https://hookdeck.com"
-  url "https://github.com/hookdeck/hookdeck-cli/archive/refs/tags/v2.2.0.tar.gz"
-  sha256 "e869c5cccfb6e37d711add229ea14717516e61912af5a883e31a47588e4f61b6"
+  url "https://github.com/hookdeck/hookdeck-cli/archive/refs/tags/v2.3.1.tar.gz"
+  sha256 "0fdc0241f841795324bbfb29f93019f6ecace75bbe637bea7f677f31b01cf4a4"
   license "Apache-2.0"
   head "https://github.com/hookdeck/hookdeck-cli.git", branch: "main"
 
