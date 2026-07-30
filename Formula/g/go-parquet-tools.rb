@@ -7,7 +7,7 @@ class GoParquetTools < Formula
   head "https://github.com/hangxie/parquet-tools.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "df372c2aac7439b8a014180cfc2b99ba3dc89492937f48f0c85bda4149cd138b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c527f9b40ea02b0bdb3c31a9419eea36e811c8dc07f9469b3e5fda7a26749e7e"
   end
 
   depends_on "go" => :build
