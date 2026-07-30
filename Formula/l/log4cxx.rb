@@ -7,7 +7,7 @@ class Log4cxx < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d88f421f3b948bbed39e4c97e8eb5b8ee104ed3e82ab214c87bc9f681f04f31"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5634b253cee64f240f42855d9a1936bc487c94b2a8a82fc945120468f3bff77e"
   end
 
   depends_on "cmake" => :build
