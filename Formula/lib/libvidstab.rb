@@ -1,13 +1,13 @@
 class Libvidstab < Formula
   desc "Transcode video stabilization plugin"
   homepage "https://github.com/georgmartius/vid.stab"
-  url "https://github.com/georgmartius/vid.stab/archive/refs/tags/v1.1.1.tar.gz"
-  sha256 "9001b6df73933555e56deac19a0f225aae152abbc0e97dc70034814a1943f3d4"
+  url "https://github.com/georgmartius/vid.stab/archive/refs/tags/v1.1.2.tar.gz"
+  sha256 "96db34d48a9e3aa13736a48744b56dfb76731ac9bb5193c716de8534c9fd709d"
   license "GPL-2.0-or-later"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "352f8986eb6158319a727948ab1e56af7622f7deea4b7fe8ec6a2ba7a72dc149"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "773bba163aac0de88c4112905232216a5cf9e6c67a3224721c447b0f015a26b3"
   end
 
   depends_on "cmake" => :build
