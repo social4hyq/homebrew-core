@@ -9,7 +9,7 @@ class CryticCompile < Formula
   head "https://github.com/crytic/crytic-compile.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7efb0a5a4241b07f864a4a5e24ed551ab54238c67ed2d8d30f2d9ec8838f7623"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c37c5d31cc8bd0aab0f5a095394c0ed2cc2b1efa14298d9a785c10318da4491c"
   end
 
   depends_on "rust" => :build # for `cbor2`
