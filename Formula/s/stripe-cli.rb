@@ -1,12 +1,12 @@
 class StripeCli < Formula
   desc "Command-line tool for Stripe"
   homepage "https://docs.stripe.com/stripe-cli"
-  url "https://github.com/stripe/stripe-cli/archive/refs/tags/v1.44.0.tar.gz"
-  sha256 "37f127d8edf774bc8a8abb21546b37cfb943bb118ccde35bd24dcfe249647bc2"
+  url "https://github.com/stripe/stripe-cli/archive/refs/tags/v1.44.1.tar.gz"
+  sha256 "8071c03fa093dc9f4456970cf45c30eb325a48d0e820307cf4308d2541eeff5c"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ded28113067d865f876336da5ee92378e0c5a2c8c2a490423578d0560d848e9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "94c3dff2982224d571f9388abd102e5f9689ca426e7ee3c765119f92f15ab4db"
   end
 
   depends_on "go" => :build
