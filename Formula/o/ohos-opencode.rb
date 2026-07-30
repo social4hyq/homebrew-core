@@ -82,14 +82,17 @@ class OhosOpencode < Formula
     inreplace "package.json" do |s|
       s.gsub! '"@opentui/core": "catalog:",',
               '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.5",'
-      # bun-pty/lightningcss/@tailwindcss/oxide have no upstream override entry,
-      # so add them after @types/node (last key in the overrides object).
-      s.gsub! "    \"@types/node\": \"catalog:\"\n  },",
-              "    \"@types/node\": \"catalog:\",\n" \
-              "    \"bun-pty\": \"npm:@ohos-ports/bun-pty@0.4.10\",\n" \
-              "    \"lightningcss\": \"npm:@ohos-ports/lightningcss@1.32.0\",\n" \
-              "    \"@tailwindcss/oxide\": \"npm:@ohos-ports/tailwindcss-oxide@4.3.1\"\n" \
-              "  },"
+      # bun-pty/lightningcss/@tailwindcss/oxide have no upstream override
+      # entry, so add them after @types/node (last key in overrides).
+      node_old = %(    "@types/node": "catalog:"\n  },)
+      node_new = [
+        %(    "@types/node": "catalog:",),
+        %(    "bun-pty": "npm:@ohos-ports/bun-pty@0.4.10",),
+        %(    "lightningcss": "npm:@ohos-ports/lightningcss@1.32.0",),
+        %(    "@tailwindcss/oxide": "npm:@ohos-ports/tailwindcss-oxide@4.3.1"),
+        %(  },),
+      ].join("\n")
+      s.gsub!(node_old, node_new)
     end
 
     # Project global dir: use $HOME instead of filesystem root when no git repo
@@ -124,7 +127,6 @@ class OhosOpencode < Formula
     end
 
     system "bun", "install", "--ignore-scripts"
-
 
     # Script.version short-circuits on OPENCODE_VERSION (no git / registry
     # lookup), which also flips Script.channel to "latest".
