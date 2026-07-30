@@ -12,7 +12,7 @@ class Libaacs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd0094b0f334d48de0a2e6e1a15514c34b04562bea4e4b3d159e8acb969f2a9c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "557778c38d0bab97b695379135ce87797ae5810b7bb551d0cfcfc56c1625bf90"
   end
 
   head do
