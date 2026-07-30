@@ -1,13 +1,13 @@
 class Log4cxx < Formula
   desc "Library of C++ classes for flexible logging"
   homepage "https://logging.apache.org/log4cxx/index.html"
-  url "https://www.apache.org/dyn/closer.lua?path=logging/log4cxx/1.7.0/apache-log4cxx-1.7.0.tar.gz"
-  mirror "https://archive.apache.org/dist/logging/log4cxx/1.7.0/apache-log4cxx-1.7.0.tar.gz"
-  sha256 "b943ff170393e4ce381ab4c4914396127bf4d44fb8bd1f0e5ef8453f3c4d364c"
+  url "https://www.apache.org/dyn/closer.lua?path=logging/log4cxx/1.8.0/apache-log4cxx-1.8.0.tar.gz"
+  mirror "https://archive.apache.org/dist/logging/log4cxx/1.8.0/apache-log4cxx-1.8.0.tar.gz"
+  sha256 "6a2e40dfa6b81a9a814ef2083d181b254f88324efff678368e5e61188a58fd3d"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d88f421f3b948bbed39e4c97e8eb5b8ee104ed3e82ab214c87bc9f681f04f31"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5634b253cee64f240f42855d9a1936bc487c94b2a8a82fc945120468f3bff77e"
   end
 
   depends_on "cmake" => :build
