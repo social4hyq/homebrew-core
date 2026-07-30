@@ -9,7 +9,7 @@ class Azqr < Formula
   head "https://github.com/Azure/azqr.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5620030778988a01e10a70eb632871242d3b02f558e9246e1156822fd3df4cc7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca5f041027a8735f7f0643adbebb1b9aae038aac1cad7682def641aa13fc6f1a"
   end
 
   depends_on "go" => :build
