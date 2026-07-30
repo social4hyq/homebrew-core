@@ -1,13 +1,13 @@
 class GoParquetTools < Formula
   desc "Utility to deal with Parquet data"
   homepage "https://github.com/hangxie/parquet-tools"
-  url "https://github.com/hangxie/parquet-tools/archive/refs/tags/v1.52.3.tar.gz"
-  sha256 "384de964b9d66ad25e5c5ec598085386af4c8ffcc1d5ccdcd4d97cd1464fa14d"
+  url "https://github.com/hangxie/parquet-tools/archive/refs/tags/v1.53.0.tar.gz"
+  sha256 "7791a8b95020397c3b123c2ae4fef78c4768d26386d0c964523e0ca6c1df52f1"
   license "BSD-3-Clause"
   head "https://github.com/hangxie/parquet-tools.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "df372c2aac7439b8a014180cfc2b99ba3dc89492937f48f0c85bda4149cd138b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c527f9b40ea02b0bdb3c31a9419eea36e811c8dc07f9469b3e5fda7a26749e7e"
   end
 
   depends_on "go" => :build
