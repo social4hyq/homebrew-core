@@ -13,7 +13,7 @@ class Clusterawsadm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e769b8fc3e02bfeb2203af224f95ce392176ddd7dfd37848c6f11682194e266f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11bde427720b2719946b8fead0ec6190f0af351b3ce87f2d16de409d2292a8ed"
   end
 
   depends_on "go" => :build
