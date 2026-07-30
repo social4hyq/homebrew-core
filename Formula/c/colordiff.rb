@@ -10,6 +10,10 @@ class Colordiff < Formula
     regex(/href=.*?colordiff[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9fedbfdf8c80961a8f06dc3055eade076862f87eac66304ea31cb4b06478793"
+  end
+
   depends_on "coreutils" => :build # GNU install
   depends_on "perl"
 
