@@ -7,7 +7,7 @@ class LolHtml < Formula
   head "https://github.com/cloudflare/lol-html.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4fb79653ee7785ca0b3604f288a8042f1e738bb84bb85e3b62615c22ba1915d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "08ef84c602a7a61eb5fb27c7c251e0a0004bca8a3646b46283fecce9f47f3bff"
   end
 
   depends_on "cargo-c" => :build
