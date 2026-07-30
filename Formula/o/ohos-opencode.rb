@@ -81,10 +81,7 @@ class OhosOpencode < Formula
       '"@ohos-ports/lightningcss", "@ohos-ports/tailwindcss-oxide", '
     inreplace "package.json" do |s|
       s.gsub! '"@opentui/core": "catalog:",',
-              '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.4",'
-      # Pin 0.4.4, not latest: 0.4.5 runtime-plugin.js switched from
-      # "./index.js" to "@opentui/core" imports, which the npm alias
-      # override cannot self-resolve under bun isolated .bun store.
+              '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.5-patch.1",'
       # bun-pty/lightningcss/@tailwindcss/oxide have no upstream override
       # entry, so add them after @types/node (last key in overrides).
       node_old = %Q(    "@types/node": "catalog:"\n  },)
