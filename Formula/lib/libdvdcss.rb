@@ -1,8 +1,8 @@
 class Libdvdcss < Formula
   desc "Access DVDs as block devices without the decryption"
   homepage "https://www.videolan.org/developers/libdvdcss.html"
-  url "https://download.videolan.org/pub/videolan/libdvdcss/1.5.0/libdvdcss-1.5.0.tar.xz"
-  sha256 "529463e4d1befef82e5c6e470db7661a2db0343e092a2fb0d6c037cab8a5c399"
+  url "https://download.videolan.org/pub/videolan/libdvdcss/1.6.0/libdvdcss-1.6.0.tar.xz"
+  sha256 "7ea556c846b7bfc32d47b41cae56d1863a6b6d5f706bb162778d6f298490977c"
   license "GPL-2.0-or-later"
   head "https://code.videolan.org/videolan/libdvdcss.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Libdvdcss < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6111059e86978ad3da3788e4f37bb510a4fd98a0fcec71128ec9ca8cc9cc0799"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2177cbb6cceafa8e08d337b879ef6a48a1fe706461480260c44da6d919900aff"
   end
 
   depends_on "meson" => :build
