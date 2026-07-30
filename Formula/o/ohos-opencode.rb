@@ -4,6 +4,7 @@ class OhosOpencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.9.tar.gz"
   sha256 "6f076b8b87a56b7a353d312c7be0449257c6fa18e963a4e10433fe35420de079"
   license "MIT"
+  revision 1
 
   livecheck do
     url "https://github.com/anomalyco/opencode/releases/latest"
@@ -11,7 +12,7 @@ class OhosOpencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.9-r2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.9-r3"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "bc9fc6ffa6940adcb6a02d844c7729eb65becf2f20222b8ca3c1f13c1103db0d"
   end
 
@@ -22,7 +23,7 @@ class OhosOpencode < Formula
   #
   # Native deps come from @ohos-ports/* npm packages via package.json override
   # aliases (see Patches/ohos-opencode/ohos-ports-deps.patch): opentui-core
-  # (bundled musl libopentui.so via file-loader import, 0.4.4+), bun-pty,
+  # (bundled musl libopentui.so via file-loader import, 0.4.5-patch.1+), bun-pty,
   # lightningcss, tailwindcss-oxide. bun signs extracted .node/.so in-process
   # during `bun install`, and `bun build --compile` re-signs its output ELF
   # (bun.rb r16+), so no external signing pass is needed here — install()
@@ -81,10 +82,7 @@ class OhosOpencode < Formula
       '"@ohos-ports/lightningcss", "@ohos-ports/tailwindcss-oxide", '
     inreplace "package.json" do |s|
       s.gsub! '"@opentui/core": "catalog:",',
-              '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.4",'
-      # Pin 0.4.4, not latest: 0.4.5 runtime-plugin.js switched from
-      # "./index.js" to "@opentui/core" imports, which the npm alias
-      # override cannot self-resolve under bun isolated .bun store.
+              '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.5-patch.1",'
       # bun-pty/lightningcss/@tailwindcss/oxide have no upstream override
       # entry, so add them after @types/node (last key in overrides).
       node_old = %Q(    "@types/node": "catalog:"\n  },)
