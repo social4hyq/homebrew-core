@@ -7,7 +7,7 @@ class Libvidstab < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "352f8986eb6158319a727948ab1e56af7622f7deea4b7fe8ec6a2ba7a72dc149"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "773bba163aac0de88c4112905232216a5cf9e6c67a3224721c447b0f015a26b3"
   end
 
   depends_on "cmake" => :build
