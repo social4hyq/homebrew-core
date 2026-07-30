@@ -89,11 +89,11 @@ class OhosOpencode < Formula
       # entry, so add them after @types/node (last key in overrides).
       node_old = %Q(    "@types/node": "catalog:"\n  },)
       node_new = [
-        %Q(    "@types/node": "catalog:",),
-        %Q(    "bun-pty": "npm:@ohos-ports/bun-pty@0.4.10",),
-        %Q(    "lightningcss": "npm:@ohos-ports/lightningcss@1.32.0",),
-        %Q(    "@tailwindcss/oxide": "npm:@ohos-ports/tailwindcss-oxide@4.3.1"),
-        %Q(  },),
+        '    "@types/node": "catalog:",',
+        '    "bun-pty": "npm:@ohos-ports/bun-pty@0.4.10",',
+        '    "lightningcss": "npm:@ohos-ports/lightningcss@1.32.0",',
+        '    "@tailwindcss/oxide": "npm:@ohos-ports/tailwindcss-oxide@4.3.1"',
+        "  },",
       ].join("\n")
       s.gsub!(node_old, node_new)
     end
