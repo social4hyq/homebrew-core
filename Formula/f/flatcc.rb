@@ -7,7 +7,7 @@ class Flatcc < Formula
   head "https://github.com/dvidelabs/flatcc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abbaf36ca8da044fea8f3234859298e37d64dff61782070739767ef4a095862b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "206f78f4526a7209e941add7242ace7285aa2ab5024a3b03e93e6fd3a241178d"
   end
 
   depends_on "cmake" => :build
