@@ -12,8 +12,7 @@ class Libarchive < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "77dd786ea0e01a64e0674e613d98574804e4d7e5446ff0878067776fd829e246"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c3ada7109c7874dfbec3fed5489a292486d1d87d3d5552aef97537d8280035b"
   end
 
   keg_only :provided_by_macos
