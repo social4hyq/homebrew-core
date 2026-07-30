@@ -2,8 +2,8 @@ class Clusterawsadm < Formula
   desc "Home for bootstrapping, AMI, EKS, and other helpers in Cluster API Provider AWS"
   homepage "https://cluster-api-aws.sigs.k8s.io/clusterawsadm/clusterawsadm.html"
   url "https://github.com/kubernetes-sigs/cluster-api-provider-aws.git",
-      tag:      "v2.12.1",
-      revision: "13af0663710aa1f0c59575ec86e241afa4994f73"
+      tag:      "v2.13.0",
+      revision: "a84670fca02690c9e644fadcbbbf967a6e6f89d6"
   license "Apache-2.0"
   head "https://github.com/kubernetes-sigs/cluster-api-provider-aws.git", branch: "main"
 
@@ -13,7 +13,7 @@ class Clusterawsadm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e769b8fc3e02bfeb2203af224f95ce392176ddd7dfd37848c6f11682194e266f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11bde427720b2719946b8fead0ec6190f0af351b3ce87f2d16de409d2292a8ed"
   end
 
   depends_on "go" => :build
