@@ -1,13 +1,13 @@
 class DdnsGo < Formula
   desc "Simple and easy-to-use DDNS"
   homepage "https://github.com/jeessy2/ddns-go"
-  url "https://github.com/jeessy2/ddns-go/archive/refs/tags/v6.17.2.tar.gz"
-  sha256 "d7a8b098797171e715a20a1581b3f44c5c3a8514d93fe64e52ccde92f129bca3"
+  url "https://github.com/jeessy2/ddns-go/archive/refs/tags/v6.17.3.tar.gz"
+  sha256 "8d12594cd7a8b77effb068181b1a6d0a378e6321b5e4c3ec438e415de5fe4039"
   license "MIT"
   head "https://github.com/jeessy2/ddns-go.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "18795cb1f491e1be43a279631a461a371e5024c89460d62cbd6b1cb7feac0d6b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea94ff78aea82586843002c01e259486c315c0cb9838fedb73d7c84ce325ce5a"
   end
 
   depends_on "go" => :build
