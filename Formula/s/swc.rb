@@ -1,8 +1,8 @@
 class Swc < Formula
   desc "Super-fast Rust-based JavaScript/TypeScript compiler"
   homepage "https://swc.rs"
-  url "https://github.com/swc-project/swc/archive/refs/tags/v1.15.46.tar.gz"
-  sha256 "350a7e19747dd9bdb98d764cc72281849ae7e1e26c33a61ba6052404a1321d22"
+  url "https://github.com/swc-project/swc/archive/refs/tags/v1.15.47.tar.gz"
+  sha256 "a5471616d4648019865150b29f0b1c46755441777fd4d13a119c6dca1398e294"
   license "Apache-2.0"
   head "https://github.com/swc-project/swc.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Swc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "674487222196194e32e3b69fdf8ab0736bb832e3ed702b9c8070580c056fec42"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c2b96498aa54fb09b908e483b602a2107f947e334a3821fc2bbd591b8f61cc9a"
   end
 
   depends_on "rust" => :build
