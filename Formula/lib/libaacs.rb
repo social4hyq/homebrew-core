@@ -1,9 +1,9 @@
 class Libaacs < Formula
   desc "Implements the Advanced Access Content System specification"
   homepage "https://www.videolan.org/developers/libaacs.html"
-  url "https://get.videolan.org/libaacs/0.11.1/libaacs-0.11.1.tar.bz2"
-  mirror "https://download.videolan.org/pub/videolan/libaacs/0.11.1/libaacs-0.11.1.tar.bz2"
-  sha256 "a88aa0ebe4c98a77f7aeffd92ab3ef64ac548c6b822e8248a8b926725bea0a39"
+  url "https://get.videolan.org/libaacs/0.12.0/libaacs-0.12.0.tar.bz2"
+  mirror "https://download.videolan.org/pub/videolan/libaacs/0.12.0/libaacs-0.12.0.tar.bz2"
+  sha256 "1996673a9fc45ee4a364c66ffa84756629bf3923e52346c7358b71becb8e4419"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -12,7 +12,7 @@ class Libaacs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd0094b0f334d48de0a2e6e1a15514c34b04562bea4e4b3d159e8acb969f2a9c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "557778c38d0bab97b695379135ce87797ae5810b7bb551d0cfcfc56c1625bf90"
   end
 
   head do
