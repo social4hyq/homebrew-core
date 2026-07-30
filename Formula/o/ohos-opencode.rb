@@ -73,23 +73,30 @@ class OhosOpencode < Formula
 
     # Redirect native deps to the @ohos-ports/* musl builds (replaces
     # ohos-ports-deps.patch). Pure string/array edits, version-independent.
+    # Append the @ohos-ports/* entries to bunfig.toml's excludes array.
     inreplace "bunfig.toml",
       '"@opentui/core-win32-x64", ',
-      '"@opentui/core-win32-x64", "@ohos-ports/opentui-core", "@ohos-ports/bun-pty", "@ohos-ports/lightningcss", "@ohos-ports/tailwindcss-oxide", '
+      '"@opentui/core-win32-x64", ' \
+      '"@ohos-ports/opentui-core", "@ohos-ports/bun-pty", ' \
+      '"@ohos-ports/lightningcss", "@ohos-ports/tailwindcss-oxide", '
     inreplace "package.json" do |s|
       s.gsub! '"@opentui/core": "catalog:",',
               '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.5",'
       # bun-pty/lightningcss/@tailwindcss/oxide have no upstream override entry,
-      # so add them after @types/node (the last key in the overrides object).
-      s.gsub! %(    "@types/node": "catalog:"\n  },),
-              %(    "@types/node": "catalog:",\n    "bun-pty": "npm:@ohos-ports/bun-pty@0.4.10",\n    "lightningcss": "npm:@ohos-ports/lightningcss@1.32.0",\n    "@tailwindcss/oxide": "npm:@ohos-ports/tailwindcss-oxide@4.3.1"\n  },)
+      # so add them after @types/node (last key in the overrides object).
+      s.gsub! "    \"@types/node\": \"catalog:\"\n  },",
+              "    \"@types/node\": \"catalog:\",\n" \
+              "    \"bun-pty\": \"npm:@ohos-ports/bun-pty@0.4.10\",\n" \
+              "    \"lightningcss\": \"npm:@ohos-ports/lightningcss@1.32.0\",\n" \
+              "    \"@tailwindcss/oxide\": \"npm:@ohos-ports/tailwindcss-oxide@4.3.1\"\n" \
+              "  },"
     end
 
     # Project global dir: use $HOME instead of filesystem root when no git repo
     # is found (replaces project-global-worktree.patch). on openharmony the root
     # path is read-only, so a "global" project lands in the home dir.
     inreplace "packages/core/src/project.ts" do |s|
-      s.sub! 'import path from "path"', %(import os from "os"\nimport path from "path")
+      s.sub! 'import path from "path"', "import os from \"os\"\nimport path from \"path\""
       s.sub! "path.parse(input).root", "os.homedir()"
     end
     inreplace "packages/opencode/src/project/project.ts",
@@ -111,7 +118,7 @@ class OhosOpencode < Formula
     )
     if injected == lockfile
       opoo "ohos-opencode: no openharmony-arm64 os:none markers found in bun.lock " \
-        "(upstream may have changed the lockfile format — verify the build)"
+           "(upstream may have changed the lockfile format — verify the build)"
     else
       (buildpath/"bun.lock").atomic_write(injected)
     end
