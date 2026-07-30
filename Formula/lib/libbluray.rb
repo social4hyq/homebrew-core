@@ -13,7 +13,7 @@ class Libbluray < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "54ec56f59aca655fea2ceb45c79727c98a3128f46f02f36be47fe6445ad8a714"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "de2b345e17fa76d2629ed1380cce71b02897578f04f7ae90545e9e77a89256ff"
   end
 
   depends_on "meson" => :build
