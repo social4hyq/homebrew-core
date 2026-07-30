@@ -96,8 +96,6 @@ class OhosOpencode < Formula
       "data.id === ProjectV2.ID.make(\"global\") && !data.vcs ? \"/\" : data.directory",
       "data.directory"
 
-    system "bun", "install", "--ignore-scripts"
-
     # Inject openharmony os markers into bun.lock — replaces the old
     # bun-lock-openharmony-os.patch (codex.rb pattern: inreplace instead of a
     # .patch for a generated file). Version-independent; see note above.
@@ -117,6 +115,9 @@ class OhosOpencode < Formula
     else
       (buildpath/"bun.lock").atomic_write(injected)
     end
+
+    system "bun", "install", "--ignore-scripts"
+
 
     # Script.version short-circuits on OPENCODE_VERSION (no git / registry
     # lookup), which also flips Script.channel to "latest".
