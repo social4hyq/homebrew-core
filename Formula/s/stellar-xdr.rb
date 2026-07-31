@@ -7,7 +7,7 @@ class StellarXdr < Formula
   head "https://github.com/stellar/rs-stellar-xdr.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "729e32169c9a1e9b1a771fb44775e22ea48f9f06417475c167cc13ef75520812"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fea2145023b7e922f5509a53ea21bf51abbd6c5715ffff54b8ebff5cec38e63a"
   end
 
   depends_on "rust" => :build
