@@ -147,7 +147,7 @@ class Opencode < Formula
     # and differing HOMEBREW_PREFIX across machines. Together with the runtime
     # $HOMEBREW_PREFIX wrapper, this eliminates all HOMEBREW_PREFIX-shaped
     # strings from the bottle, allowing :any_skip_relocation.
-    system formula_opt_bin("inject-runpath")/"inject-runpath", src.to_s, '$ORIGIN/../lib'
+    system formula_opt_bin("inject-runpath")/"inject-runpath", src.to_s, "$ORIGIN/../lib"
 
     # Self-sign the patched binary.
     system sign, src.to_s
