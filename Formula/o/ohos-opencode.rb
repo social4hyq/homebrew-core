@@ -1,10 +1,9 @@
 class OhosOpencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.9.tar.gz"
-  sha256 "6f076b8b87a56b7a353d312c7be0449257c6fa18e963a4e10433fe35420de079"
+  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.10.tar.gz"
+  sha256 "3df0c573473d3492990bdeb69e6653eaab485394f95ad1c1a897329f4209f430"
   license "MIT"
-  revision 2
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
   # HTML page fetch), while api.github.com answers fast — same JSON strategy
