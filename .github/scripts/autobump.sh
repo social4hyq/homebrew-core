@@ -63,6 +63,94 @@ for line in "${CANDIDATES[@]}"; do
   LATEST=$(cut -f2 <<< "$line")
   echo "== $FORMULA -> $LATEST =="
 
+  # Git-revision formulae (stable url is a .git URL with a `revision:` pin,
+  # bun.rb pattern — version field fixed, e.g. ohos-opencode2's "2.0.0-beta")
+  # can't use bump-formula-pr: its version comparison (bump-formula-pr.rb:
+  # 302-314) hard-rejects "new version == old version" with no --force escape,
+  # and a fixed-version bump never changes the version. So we bump these
+  # ourselves: update the git revision pin, increment the brew `revision N`
+  # (effective version advances 2.0.0-beta_N, which is what drives the
+  # new-bottle pipeline in pr-validate), commit, push, open the PR — same
+  # ci-passed/bump-formula-pr labels + automerge path as a bump-formula-pr PR.
+  #
+  # Also defends against a livecheck quirk: for a fixed-version formula the
+  # commit SHA always sorts above the version string, so `--newer-only` keeps
+  # reporting it as outdated even when the pin is already at HEAD — compare the
+  # actual revision pin instead.
+  FORMULA_PATH=$(docker exec "$CONTAINER" bash -lc \
+    "ls \"$TAP_IN_CONTAINER\"/Formula/*/\"$FORMULA\".rb 2>/dev/null | head -1")
+  if [ -n "$FORMULA_PATH" ] && docker exec "$CONTAINER" grep -qE 'url .*\.git.*revision:' "$FORMULA_PATH"; then
+    CURRENT_REV=$(docker exec "$CONTAINER" grep -oE 'revision: "[0-9a-fA-F]{40}"' "$FORMULA_PATH" | head -1 | cut -d'"' -f2)
+    if [ -z "$CURRENT_REV" ]; then
+      echo "::error::$FORMULA: git-revision formula but no revision pin found"
+      echo "- ⚠️ $FORMULA: no revision pin found" >> "$GITHUB_STEP_SUMMARY"
+      continue
+    fi
+    if [ "$CURRENT_REV" = "$LATEST" ]; then
+      echo "::notice::$FORMULA: already at HEAD $LATEST (livecheck reports it anyway — commit SHA sorts above the fixed version), skipping"
+      echo "- ⏭️ $FORMULA: already at HEAD $LATEST" >> "$GITHUB_STEP_SUMMARY"
+      continue
+    fi
+
+    FORMULA_VERSION=$(docker exec "$CONTAINER" grep -oE '^  version "[^"]+"' "$FORMULA_PATH" | head -1 | cut -d'"' -f2)
+    REV_N=$(docker exec "$CONTAINER" grep -oE '^  revision [0-9]+' "$FORMULA_PATH" | grep -oE '[0-9]+' | head -1)
+    REV_N=${REV_N:-0}
+    NEXT_REV_N=$((REV_N + 1))
+    NEW_VERSION="${FORMULA_VERSION}_${NEXT_REV_N}"
+    BRANCH="bump-${FORMULA}-${NEW_VERSION}"
+    echo "git-revision formula: pin $CURRENT_REV -> $LATEST, brew revision $REV_N -> $NEXT_REV_N"
+
+    if ! docker exec "$CONTAINER" bash -lc "
+      set -euo pipefail
+      sed -i 's/revision: \"$CURRENT_REV\"/revision: \"$LATEST\"/' \"$FORMULA_PATH\"
+      sed -i 's/^  revision $REV_N\$/  revision $NEXT_REV_N/' \"$FORMULA_PATH\"
+      grep -q 'revision: \"$LATEST\"' \"$FORMULA_PATH\"
+      grep -q '^  revision $NEXT_REV_N' \"$FORMULA_PATH\"
+    "; then
+      echo "::error::$FORMULA: formula edit/verify failed"
+      echo "- ❌ $FORMULA: formula edit failed" >> "$GITHUB_STEP_SUMMARY"
+      continue
+    fi
+
+    set +e
+    OUT=$(timeout 120 docker exec "$CONTAINER" bash -lc "
+      cd \"$TAP_IN_CONTAINER\"
+      git checkout -b \"$BRANCH\" 2>&1 &&
+      git add \"$FORMULA_PATH\" 2>&1 &&
+      git commit -m \"$FORMULA: update $FORMULA_VERSION to $LATEST\" 2>&1 &&
+      git push -u origin \"$BRANCH\" 2>&1
+    " 2>&1)
+    STATUS=$?
+    set -e
+    [ "$STATUS" -eq 124 ] && echo "::warning::$FORMULA git push TIMED OUT after 120s"
+    echo "$OUT"
+
+    if ! git ls-remote --exit-code --heads \
+         "https://x-access-token:${GITHUB_TOKEN}@github.com/social4hyq/homebrew-core.git" "$BRANCH" \
+         > /dev/null 2>&1; then
+      echo "::warning::$FORMULA didn't push $BRANCH — see log above"
+      echo "- ⚠️ $FORMULA $LATEST: no branch pushed, see job log" >> "$GITHUB_STEP_SUMMARY"
+      continue
+    fi
+
+    EXISTING=$(gh pr list --repo social4hyq/homebrew-core --head "$BRANCH" --state open --json url --jq '.[0].url // empty')
+    if [ -n "$EXISTING" ]; then
+      echo "- ⏭️ $FORMULA $LATEST: PR already open: $EXISTING" >> "$GITHUB_STEP_SUMMARY"
+      continue
+    fi
+
+    PR_URL=$(gh pr create --repo social4hyq/homebrew-core \
+      --head "$BRANCH" --base main \
+      --title "$FORMULA $NEW_VERSION" \
+      --body "Automated commit-pin bump ($FORMULA v2 branch HEAD). Custom autobump path for git-revision formulae (bun.rb pattern): bump-formula-pr rejects fixed-version bumps, so this updates the git revision pin and increments the brew revision. CI builds the new commit and publishes the bottle.") \
+      || { echo "::error::$FORMULA: gh pr create failed after a successful push"; echo "- ❌ $FORMULA $LATEST: push OK, gh pr create failed" >> "$GITHUB_STEP_SUMMARY"; continue; }
+
+    PR_NUM="${PR_URL##*/}"
+    gh pr edit "$PR_NUM" --repo social4hyq/homebrew-core --add-label bump-formula-pr
+    echo "- ✅ $FORMULA $LATEST: $PR_URL" >> "$GITHUB_STEP_SUMMARY"
+    continue
+  fi
+
   set +e
   # timeout guard: a hang here (e.g. a future git-config regression) should
   # fail this one formula fast, not silently burn the whole job's 30min
