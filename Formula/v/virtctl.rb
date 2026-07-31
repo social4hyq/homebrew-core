@@ -1,8 +1,8 @@
 class Virtctl < Formula
   desc "Allows for using more advanced kubevirt features"
   homepage "https://kubevirt.io/"
-  url "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.8.4.tar.gz"
-  sha256 "5bfd1d3490b1abb0e9dfe43d4f7034f8e8e8a97cdc0889b8abf396a0fb77ee35"
+  url "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.9.0.tar.gz"
+  sha256 "5d2998666ce522d18dd157800cea22bbb15a2fbadc6e2130864ba869b2259588"
   license "Apache-2.0"
   head "https://github.com/kubevirt/kubevirt.git", branch: "main"
 
@@ -15,7 +15,7 @@ class Virtctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8287c1392b14c01c328d52816be7ec07b1b96cb8bcc5dd122f6510892f18d21"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3137a4167cd11a540c62302d117add1b7ad5a97cd14d12a5cdac318dd309808e"
   end
 
   depends_on "go" => :build
