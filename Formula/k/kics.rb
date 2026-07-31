@@ -12,7 +12,7 @@ class Kics < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d73bade610da7f2883c1202c28fcaf554a28fab3d9eb85b53396146e1f3aa041"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b805309e1400033e4069711b092fa79dbdc098e05ac0c5dcc1d7a9e0ded66542"
   end
 
   depends_on "go" => :build
