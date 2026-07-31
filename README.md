@@ -22,8 +22,8 @@ brew install opencode
 # opencode v2 预览渠道（next tag，命令名 opencode2，与 opencode/ohos-opencode 并存）：
 brew install opencode@2
 
-# 或装 v2 源码构建路线的 ohos-opencode2（从上游源码 bun build --compile，原生依赖走 @ohos-ports/* npm 包）：
-brew install ohos-opencode2
+# 或装 v2 源码构建路线的 ohos-opencode@2（从上游源码 bun build --compile，原生依赖走 @ohos-ports/* npm 包）：
+brew install ohos-opencode@2
 
 # 只装 claude-code / grok-build / cc-switch（均从官方渠道拉取二进制 + 自签，依赖均已有 bottle）：
 brew install claude-code
@@ -52,7 +52,7 @@ zsh 补全（`ohos-opencode` / `ohos-opencode2` / `grok` / `cc-switch`）随 bot
 | `ohos-opencode` | 1.18.8 | OpenCode AI 编码代理 CLI，**上游源码构建**（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；原生依赖走 `@ohos-ports/*` npm 包。命令名 `ohos-opencode`，与官方 `opencode-ai` npm 包区分 |
 | `opencode` | 1.18.8 | 同一 CLI 的**预编译 musl 二进制**路线（从 npmmirror 拉取 `opencode-linux-arm64-musl`）；注入 RUNPATH 补 Alpine libstdc++/libgcc，wrapper LD_PRELOAD `ohos-compat-shim` + `dlopen-sign-shim` |
 | `opencode@2` | 0.0.0-next-16419 | opencode **v2 预览渠道**（`@opencode-ai/cli` 的 npm `next` dist-tag），预编译二进制路线，与 `opencode`(v1) 处理方式相同；命令名 `opencode2`，与 `opencode`/`ohos-opencode` 并存不冲突；不进 autobump（next 一天多版，钉版本手动升级） |
-| `ohos-opencode2` | 2.0.0-dev | opencode **v2 源码构建**路线（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；v2 monorepo 重构后 CLI 包从 `packages/opencode` 移至 `packages/cli`，原生依赖精简至 `@ohos-ports/opentui-core` + `@ohos-ports/bun-pty`；命令名 `ohos-opencode2`，与 `opencode@2`（预编译）和 `ohos-opencode`（v1 源码构建）并存 |
+| `ohos-opencode@2` | 2.0.0-beta | opencode **v2 源码构建**路线（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；v2 monorepo 重构后 CLI 包从 `packages/opencode` 移至 `packages/cli`，原生依赖精简至 `@ohos-ports/opentui-core` + `@ohos-ports/bun-pty`；命令名 `ohos-opencode2`，与 `opencode@2`（预编译）和 `ohos-opencode`（v1 源码构建）并存 |
 | `claude-code` | 2.1.220 | Anthropic Claude Code CLI；**runtime-fetch stub**（Anthropic License 不允许重分发官方二进制），首次运行拉取 + 校验 sha256 + 自签 + 缓存 |
 | `grok-build` | 0.2.112 | xAI Grok Build CLI；完全静态 ELF，仅 `ohos-bst-light` self-sign，无需 shim/RUNPATH；bash/zsh/fish 补全 |
 | `cc-switch` | 5.9.2, revision 1 | AI coding CLI 供应商切换器 + 本地代理（预编译静态 ELF，仅 `ohos-bst-light` self-sign）；主要用于给 codex 桥接 Chat-Completions-only provider（Kimi/DeepSeek 等） |

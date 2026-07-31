@@ -1,4 +1,4 @@
-class OhosOpencode2 < Formula
+class OhosOpencodeAT2 < Formula
   desc "OpenCode v2 preview — AI coding agent CLI, HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
   # v2 is a live development branch (no release tags yet). URL pins the v2
@@ -111,7 +111,7 @@ class OhosOpencode2 < Formula
       %q(\1"os": "openharmony"\2),
     )
     if injected == lockfile
-      opoo "ohos-opencode2: no openharmony-arm64 os:none markers found in bun.lock " \
+      opoo "ohos-opencode@2: no openharmony-arm64 os:none markers found in bun.lock " \
            "(upstream may have changed the lockfile format — verify the build)"
     else
       (buildpath/"bun.lock").atomic_write(injected)

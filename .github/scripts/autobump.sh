@@ -64,7 +64,7 @@ for line in "${CANDIDATES[@]}"; do
   echo "== $FORMULA -> $LATEST =="
 
   # Git-revision formulae (stable url is a .git URL with a `revision:` pin,
-  # bun.rb pattern — version field fixed, e.g. ohos-opencode2's "2.0.0-beta")
+  # bun.rb pattern — version field fixed, e.g. ohos-opencode@2's "2.0.0-beta")
   # can't use bump-formula-pr: its version comparison (bump-formula-pr.rb:
   # 302-314) hard-rejects "new version == old version" with no --force escape,
   # and a fixed-version bump never changes the version. So we bump these
