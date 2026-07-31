@@ -139,16 +139,14 @@ class Opencode < Formula
     ln_sf "libstdc++.so.6.0.34", libdir/"libstdc++.so.6"
 
     # Inject DT_RUNPATH (in-place, zero offset shift) → libexec/lib.
-    # RUNPATH points at opt_libexec/lib (prefix-relative, stable), not
-    # libdir/libexec (Cellar-relative). HOMEBREW_CELLAR flips between
-    # HOMEBREW_PREFIX/Cellar and HOMEBREW_REPOSITORY/Cellar depending on
-    # which happens to exist at brew startup (see brew.sh) — a RUNPATH baked
-    # with the Cellar-absolute path breaks if poured on a machine where that
-    # resolved differently than the machine it was built on. opt/<name> is
-    # always HOMEBREW_PREFIX-relative and Homebrew re-links it correctly on
-    # every install, so it's stable across that flip, and the dynamic linker
-    # follows the opt/ symlink same as any other directory. Verified 2026-07-14.
-    system formula_opt_bin("inject-runpath")/"inject-runpath", src.to_s, (opt_libexec/"lib").to_s
+    # Uses $ORIGIN/../lib (relative to the binary directory) instead of an
+    # absolute path. The binary is at libexec/bin/opencode, the bundled GCC
+    # runtime libs are at libexec/lib/ — $ORIGIN/../lib resolves correctly
+    # regardless of install prefix, surviving both the HOMEBREW_CELLAR flip
+    # and differing HOMEBREW_PREFIX across machines. Together with the runtime
+    # $HOMEBREW_PREFIX wrapper, this eliminates all HOMEBREW_PREFIX-shaped
+    # strings from the bottle, allowing :any_skip_relocation.
+    system formula_opt_bin("inject-runpath")/"inject-runpath", src.to_s, '$ORIGIN/../lib'
 
     # Self-sign the patched binary.
     system sign, src.to_s
@@ -156,13 +154,19 @@ class Opencode < Formula
     libexec.install src => "bin/opencode"
     chmod 0755, libexec/"bin/opencode"
 
-    # Self-reference via opt_libexec (see RUNPATH comment above) rather than
-    # libexec, for the same portability reason.
+    # Wrapper resolves all paths at runtime via $HOMEBREW_PREFIX — no build-time
+    # Ruby path interpolation (see claude-code.rb for the same pattern). This
+    # avoids baking the build machine's HOMEBREW_PREFIX into the script, which
+    # lets `brew bottle` mark the bottle :any_skip_relocation (r1-r4 used
+    # opt_libexec / formula_opt_lib interpolation, which left absolute prefix
+    # strings in the wrapper → keg_contain?(prefix) → relocatable=false).
     (bin/"opencode").write <<~SH
       #!/bin/sh
-      export LD_PRELOAD="#{formula_opt_lib("dlopen-sign-shim")}/libdlopen_sign_shim.so:#{formula_opt_lib("ohos-compat-shim")}/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
+      : "${HOMEBREW_PREFIX:?opencode: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
+      HB="$HOMEBREW_PREFIX"
+      export LD_PRELOAD="$HB/opt/dlopen-sign-shim/lib/libdlopen_sign_shim.so:$HB/opt/ohos-compat-shim/lib/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
       export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
-      exec "#{opt_libexec}/bin/opencode" "$@"
+      exec "$HB/opt/opencode/libexec/bin/opencode" "$@"
     SH
     chmod 0755, bin/"opencode"
   end
