@@ -4,7 +4,7 @@ class OhosOpencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.9.tar.gz"
   sha256 "6f076b8b87a56b7a353d312c7be0449257c6fa18e963a4e10433fe35420de079"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://github.com/anomalyco/opencode/releases/latest"
@@ -40,22 +40,15 @@ class OhosOpencode < Formula
   depends_on "bun" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
 
-  # OHOS source adaptations (codex.rb pattern: inreplace over .patch where
-  # the change is a stable string/array edit; keep .patch only for the two
-  # structural changes that a string replace would make fragile):
-  #   - build-ohos-target.patch: inserts a new target object into an array
-  #   - web-open-try-catch.patch: wraps a call in a conditional block
-  # Everything else — openharmony os markers (bun.lock), @ohos-ports dep
-  # overrides (package.json/bunfig.toml), the project homedir fallback — is
-  # done at runtime via inreplace in install(), so a version bump only needs
-  # url + sha256 + bottle root_url. See social4hyq/ohos-opencode dev for the
-  # canonical diff these mirror (fork-diff invariant).
-  patch :p1 do
-    file "Patches/ohos-opencode/build-ohos-target.patch"
-  end
-  patch :p1 do
-    file "Patches/ohos-opencode/web-open-try-catch.patch"
-  end
+  # All OHOS source adaptations are done via inreplace in install() — zero
+  # .patch files. The "reuse musl slot" strategy hijacks the existing
+  # linux-arm64-musl target entry instead of adding a new one. Two filter
+  # checks must be modified: the os/platform guard AND the abi guard.
+  # (web-open-try-catch.patch → inreplace 2026-07-31;
+  #  build-ohos-target.patch → inreplace 2026-07-31.)
+  # Version bumps only need url + sha256 + bottle root_url.
+  # See social4hyq/ohos-opencode dev for the canonical diff these mirror
+  # (fork-diff invariant).
 
   def install
     ENV["BUN_TMPDIR"] = (buildpath/".bun-tmp").to_s
@@ -107,6 +100,17 @@ class OhosOpencode < Formula
       "data.id === ProjectV2.ID.make(\"global\") && !data.vcs ? \"/\" : data.directory",
       "data.directory"
 
+    # web.ts: skip open() on OHOS (no desktop browser). Upstream already has
+    # .catch(() => {}) for error tolerance, so this is a single-line platform
+    # guard — no DISPLAY/WAYLAND checks needed (unlike the old .patch).
+    # Replaces web-open-try-catch.patch.
+    inreplace "packages/opencode/src/cli/cmd/web.ts",
+      "open(localhostUrl).catch(() => {})",
+      "if (process.platform !== \"openharmony\") open(localhostUrl).catch(() => {})"
+    inreplace "packages/opencode/src/cli/cmd/web.ts",
+      "open(displayUrl).catch(() => {})",
+      "if (process.platform !== \"openharmony\") open(displayUrl).catch(() => {})"
+
     # Inject openharmony os markers into bun.lock — replaces the old
     # bun-lock-openharmony-os.patch (codex.rb pattern: inreplace instead of a
     # .patch for a generated file). Version-independent; see note above.
@@ -127,6 +131,29 @@ class OhosOpencode < Formula
       (buildpath/"bun.lock").atomic_write(injected)
     end
 
+    # build.ts adaptations (replaces build-ohos-target.patch). Reuse the
+    # existing linux-arm64-musl target slot — three inreplace calls:
+    #   1. os check: allow linux-arm64-musl through on OHOS
+    #   2. abi check: keep musl target on OHOS in single-flag mode
+    #   3. compile target: use bun-linux-arm64-ohos for musl on OHOS
+    inreplace "packages/opencode/script/build.ts" do |s|
+      # V1 filter checks item.os !== process.platform first — linux-os target
+      # would be rejected on OHOS before reaching the abi guard. Allow
+      # linux-arm64-musl to pass on OHOS.
+      s.sub! "if (item.os !== process.platform || item.arch !== process.arch) {",
+             "if ((item.os !== process.platform || item.arch !== process.arch) && " \
+             "!(process.platform === \"openharmony\" && " \
+             "item.os === \"linux\" && item.arch === \"arm64\" && " \
+             "item.abi === \"musl\")) {"
+      s.sub! "if (item.abi !== undefined) {",
+             "if (item.abi !== undefined && " \
+             "!(process.platform === \"openharmony\" && " \
+             "item.abi === \"musl\")) {"
+      s.sub! "target: name.replace(pkg.name, \"bun\") as any,",
+             "target: (process.platform === \"openharmony\" && " \
+             "item.abi === \"musl\" ? \"bun-linux-arm64-ohos\" : " \
+             "name.replace(pkg.name, \"bun\")) as any,"
+    end
     system "bun", "install", "--ignore-scripts"
 
     # Script.version short-circuits on OPENCODE_VERSION (no git / registry
@@ -147,7 +174,7 @@ class OhosOpencode < Formula
       system "bun", "run", "script/build.ts", "--single"
     end
 
-    out = "packages/opencode/dist/opencode-openharmony-arm64-musl/bin/opencode"
+    out = "packages/opencode/dist/opencode-linux-arm64-musl/bin/opencode"
     odie "opencode binary missing" unless File.exist?(out)
 
     # The device kernel refuses to exec unsigned ELFs; bun's compile step must
