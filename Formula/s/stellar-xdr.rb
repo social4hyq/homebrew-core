@@ -1,8 +1,8 @@
 class StellarXdr < Formula
   desc "Stellar command-line tool for encoding/decoding XDR for the Stellar network"
   homepage "https://developers.stellar.org"
-  url "https://static.crates.io/crates/stellar-xdr/stellar-xdr-27.0.0.crate"
-  sha256 "05ff843326969bdf1ef673dcdba94c08f4a3c8f1e58d6e6ef39b1bd4f749179a"
+  url "https://static.crates.io/crates/stellar-xdr/stellar-xdr-28.0.0.crate"
+  sha256 "f93d09ff8b9f919b084f664003c4c546ac66a76affd5429460dbe29f4b326f8e"
   license "Apache-2.0"
   head "https://github.com/stellar/rs-stellar-xdr.git", branch: "main"
 
