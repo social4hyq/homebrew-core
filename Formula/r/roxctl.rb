@@ -15,7 +15,7 @@ class Roxctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ed16dc314d759a0831abe5379a782a855eccc4c4f27b8d9ccb4ad6ef0910d5e9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2470e1bdb5dab92b2b8e1437ddaa02e327152fb1676769c73365a66ba197dec"
   end
 
   depends_on "go" => :build
