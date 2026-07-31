@@ -12,7 +12,7 @@ class WasmTools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6cd77b2f0d99abf0cadeb52433a6dfb0aa6eb2b6f35d83dcfbe25964876a666"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0c27a7fd332230d6c722c17d0b124e904daf58886f4a305722cd2c56fc4450b"
   end
 
   depends_on "rust" => :build
