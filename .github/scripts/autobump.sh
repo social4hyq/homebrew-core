@@ -63,6 +63,15 @@ for line in "${CANDIDATES[@]}"; do
   LATEST=$(cut -f2 <<< "$line")
   echo "== $FORMULA -> $LATEST =="
 
+  # Every iteration must branch off main, not whatever branch the previous
+  # formula left behind: bump-formula-pr (and the custom git-revision path
+  # below) `git checkout -b` from the current branch, so without this the
+  # 2nd/3rd formula's bump branch inherits the 1st's commits and its PR spans
+  # multiple formulae (observed 2026-07-31: PR #119/#120 both carried
+  # ohos-opencode's bump commit). Nothing is left uncommitted between
+  # iterations, so a plain checkout is safe.
+  docker exec "$CONTAINER" bash -lc "cd \"$TAP_IN_CONTAINER\" && git checkout -q main"
+
   # Git-revision formulae (stable url is a .git URL with a `revision:` pin,
   # bun.rb pattern — version field fixed, e.g. ohos-opencode@2's "2.0.0-beta")
   # can't use bump-formula-pr: its version comparison (bump-formula-pr.rb:
