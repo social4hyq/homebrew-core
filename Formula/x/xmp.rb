@@ -1,8 +1,8 @@
 class Xmp < Formula
   desc "Command-line player for module music formats (MOD, S3M, IT, etc)"
   homepage "https://xmp.sourceforge.net/"
-  url "https://github.com/libxmp/xmp-cli/releases/download/xmp-4.3.0/xmp-4.3.0.tar.gz"
-  sha256 "8c2bfeba91282bd79fbb3c9b90f9b0f6a7dc61f84c9a4fb2e4a01776ce0f81e1"
+  url "https://github.com/libxmp/xmp-cli/releases/download/xmp-4.3.1/xmp-4.3.1.tar.gz"
+  sha256 "cbfdab11233708c4de6ab965f64d96d4cb5b9d8e14d2d23df3b1b896386f870f"
   license "GPL-2.0-or-later"
 
   bottle do
