@@ -8,9 +8,9 @@ class OpencodeAT2 < Formula
   # registry.npmjs.org directly, same as the SIGILL-on-large-GET reason
   # documented for claude-code/codex (only affects local machine curl, not
   # bottle distribution or the CI runner that builds it).
-  url "https://registry.npmjs.org/@opencode-ai/cli-linux-arm64-musl/-/cli-linux-arm64-musl-0.0.0-next-16420.tgz"
-  version "0.0.0-next-16420"
-  sha256 "f424a9caa4e2fcc0d4a65797a4e3d7ec3631678ffcccef525ab9001b4bf5530e"
+  url "https://registry.npmjs.org/@opencode-ai/cli-linux-arm64-musl/-/cli-linux-arm64-musl-0.0.0-next-16620.tgz"
+  version "0.0.0-next-16620"
+  sha256 "9c2a36824288e88ad65115ce268209b75f4219413b70ad0430624ce69fc1e7ee"
   license "MIT"
   # opencode v2's official prebuilt linux-arm64-musl single binary (Bun
   # --compile, bin name changed from `opencode` to `opencode2`). Bypasses the
@@ -27,8 +27,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-next-16420-r1"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "68958f445d26633615cf584ec7c3ae166b4c6ba8f8be763cb71930ff1c6f8010"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-next-16620-r1"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "e34de658eb6a7324bc6faac9db96ff30fef85dd47d94d6b0950a291f12894ef2"
   end
 
   # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
