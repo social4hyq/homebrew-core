@@ -6,9 +6,14 @@ class OhosOpencode < Formula
   license "MIT"
   revision 2
 
+  # PageMatch on github.com/releases/latest times out from slow networks (the
+  # HTML page fetch), while api.github.com answers fast — same JSON strategy
+  # as ohos-opencode@2.
   livecheck do
-    url "https://github.com/anomalyco/opencode/releases/latest"
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    url "https://api.github.com/repos/anomalyco/opencode/releases/latest"
+    strategy :json do |json|
+      json["tag_name"]&.gsub(/^v/, "")
+    end
   end
 
   bottle do
