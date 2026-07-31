@@ -7,7 +7,7 @@ class VolcanoCli < Formula
   head "https://github.com/volcano-sh/volcano.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5fa4a6aad5f67d56564a221ca2eea4d9a530323437d7fcc18096289afa98d92e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "01f503c5ca5111d61e07234445f847bd6c72e2243f8921dc02b817bed6b9d091"
   end
 
   depends_on "go" => :build
