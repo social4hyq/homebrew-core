@@ -6,7 +6,7 @@ class Xmp < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2c5416e3ba6a1b6ef44e3cb55aab555e60511ec5bc7a433012d4d4dad488ad5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b58f0525481b985e817c14d90ac9d9c71b0a6a461e23ca5362cef2acaacee51d"
   end
 
   head do
