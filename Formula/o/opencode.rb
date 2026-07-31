@@ -16,8 +16,9 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.10-r1"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "c8b3a50fde23970035805b5956d71b62ed0515fdf431623bb1ea2a5e60fd737e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.10-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a1981eeba42d981ec73190e8827e5119780404ba772c52532a74a0896ed13a6"
   end
 
   # r1 fixed a real portability bug (not just the `brew bottle` check below):
