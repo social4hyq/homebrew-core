@@ -5,6 +5,7 @@ class OhosOpencode2 < Formula
   version "2.0.0-dev"
   sha256 "f2b23e5e1d7ea15eeb398312e0d0d1e24cc42226f99d1175ded7ce695cee53fc"
   license "MIT"
+  revision 1
 
   # v2 is a live development branch (no release tags yet). The URL pins to a
   # specific upstream commit on the `v2` branch; updates require changing both
@@ -15,8 +16,8 @@ class OhosOpencode2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode2-v2.0.0-dev-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa6d100938952583256905f6214d17fe2064d75db3c2868f9e5f346e98670e14"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode2-v2.0.0-dev-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "58a8e18b1e9c2a6196968558984398be0e76ce7b7afe43b5d43b49146d2535c9"
   end
 
   # opencode2 is a `bun build --compile` single binary: OHOS bun runtime + JS
@@ -40,21 +41,14 @@ class OhosOpencode2 < Formula
   depends_on "bun" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
 
-  # OHOS adaptations, mirrored from social4hyq/ohos-opencode2 dev (patches are
-  # the `git diff <pinned-commit>..dev` for the respective files — regenerate
-  # there, never hand-edit hunks).
-  patch :p1 do
-    file "Patches/ohos-opencode2/ohos-ports-deps.patch"
-  end
-  patch :p1 do
-    file "Patches/ohos-opencode2/bun-lock-openharmony-os.patch"
-  end
-  patch :p1 do
-    file "Patches/ohos-opencode2/build-ohos-target.patch"
-  end
-  patch :p1 do
-    file "Patches/ohos-opencode2/project-global-worktree.patch"
-  end
+  # All OHOS source adaptations are done via inreplace in install() — zero
+  # .patch files. The "reuse musl slot" strategy (hijack the existing
+  # linux-arm64-musl target entry instead of adding a new one) eliminates the
+  # structural array-insertion hunk, leaving only single-line string
+  # replacements. Version bumps only need url + sha256 + bottle root_url.
+  # See social4hyq/ohos-opencode2 dev for the canonical diff these mirror
+  # (fork-diff invariant).
+  # 4 patches → inreplace 2026-07-31.
 
   def install
     ENV["BUN_TMPDIR"] = (buildpath/".bun-tmp").to_s
@@ -82,27 +76,76 @@ class OhosOpencode2 < Formula
     rm_r("packages/storybook")
     rm_r("packages/enterprise")
 
+    # Native dep overrides (replaces ohos-ports-deps.patch). v2 only needs
+    # @ohos-ports/opentui-core + @ohos-ports/bun-pty (no lightningcss/
+    # tailwindcss-oxide in the CLI tree).
+    inreplace "bunfig.toml",
+      '"@opentui/core-win32-x64", ',
+      '"@opentui/core-win32-x64", ' \
+      '"@ohos-ports/opentui-core", "@ohos-ports/bun-pty", '
+    inreplace "package.json" do |s|
+      s.gsub! '"@opentui/core": "catalog:",',
+              '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.5-patch.1",'
+      s.gsub! %Q(    "effect": "catalog:"\n  },),
+              "    \"effect\": \"catalog:\",\n    " \
+              "\"bun-pty\": \"npm:@ohos-ports/bun-pty@0.4.10\"\n  " \
+              "},"
+    end
+
+    # Home dir fallback for global projects (replaces project-global-
+    # worktree.patch). v2 only touches packages/core/src/project.ts
+    # (no packages/opencode variant).
+    inreplace "packages/core/src/project.ts" do |s|
+      s.sub! 'import path from "path"', "import os from \"os\"\nimport path from \"path\""
+      s.sub! "path.parse(input).root", "os.homedir()"
+    end
+
+    # Flip openharmony-arm64 os markers in bun.lock (replaces
+    # bun-lock-openharmony-os.patch). Same regex as ohos-opencode.
+    lockfile = (buildpath/"bun.lock").read
+    injected = lockfile.gsub(
+      /("[^"]*openharmony-arm64@[^"]+", "", \{ )"os": "none"(, "cpu": "arm64" \})/,
+      %q(\1"os": "openharmony"\2),
+    )
+    if injected == lockfile
+      opoo "ohos-opencode2: no openharmony-arm64 os:none markers found in bun.lock " \
+           "(upstream may have changed the lockfile format — verify the build)"
+    else
+      (buildpath/"bun.lock").atomic_write(injected)
+    end
+
     system "bun", "install", "--ignore-scripts"
 
     # Script.version short-circuits on OPENCODE_VERSION (no git / registry
     # lookup), which also flips Script.channel to "latest".
     ENV["OPENCODE_VERSION"] = version.to_s
 
-    # build.ts (patched) compiles for bun-linux-arm64-ohos, which equals
-    # CompileTarget::default() on OHOS — bun embeds the running OHOS runtime
-    # directly (no local runtime file, no download) and bakes
-    # process.platform="openharmony" into the binary.
-    #
-    # No --skip-install: build.ts's internal `bun install --os="*" --cpu="*"`
-    # pass is required here. bun's bundler hard-errors on imports of platform
-    # packages matching the compile target (linux-arm64-musl), and the
-    # openharmony install filter skips exactly those (fff-bun, opentui,
-    # parcel-watcher variants are all os-gated to linux/darwin/win32).
+    # build.ts adaptations (replaces build-ohos-target.patch). Reuse the
+    # existing linux-arm64-musl target slot instead of adding a new one:
+    #   1. os check: allow linux-arm64-musl through on OHOS
+    #   2. abi check: keep musl target on OHOS in single-flag mode
+    #   3. compile target: use bun-linux-arm64-ohos for musl on OHOS
+    inreplace "packages/cli/script/build.ts",
+      "if (item.os !== process.platform || item.arch !== process.arch) return false",
+      "if ((item.os !== process.platform || item.arch !== process.arch) && " \
+      "!(process.platform === \"openharmony\" && " \
+      "item.os === \"linux\" && item.arch === \"arm64\" && " \
+      "item.abi === \"musl\")) return false"
+    inreplace "packages/cli/script/build.ts",
+      "return item.abi === undefined",
+      "return process.platform === \"openharmony\" || item.abi === undefined"
+    inreplace "packages/cli/script/build.ts" do |s|
+      s.sub! "target: target.replace(binary, \"bun\") as Bun.Build.CompileTarget,",
+             "target: (process.platform === \"openharmony\" && " \
+             "item.abi === \"musl\" ? \"bun-linux-arm64-ohos\" : " \
+             "target.replace(binary, \"bun\")) as Bun.Build.CompileTarget,"
+    end
+
     cd "packages/cli" do
       system "bun", "run", "script/build.ts", "--single"
     end
 
-    out = "packages/cli/dist/cli-openharmony-arm64-musl/bin/opencode2"
+    out = "packages/cli/dist/cli-linux-arm64-musl/bin/opencode2"
     odie "opencode2 binary missing" unless File.exist?(out)
 
     # The device kernel refuses to exec unsigned ELFs; bun's compile step must
