@@ -6,14 +6,20 @@ class OhosOpencode < Formula
   license "MIT"
   revision 2
 
+  # PageMatch on github.com/releases/latest times out from slow networks (the
+  # HTML page fetch), while api.github.com answers fast — same JSON strategy
+  # as ohos-opencode@2.
   livecheck do
-    url "https://github.com/anomalyco/opencode/releases/latest"
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    url "https://api.github.com/repos/anomalyco/opencode/releases/latest"
+    strategy :json do |json|
+      json["tag_name"]&.gsub(/^v/, "")
+    end
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.9-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "af0689a2e8fa431cfe5a3a0459a026d2b6b592aff857bd17dedac1e213e0c4be"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.9-r6"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29e96a82bc601f87c1bf25f882a8ea96c73a90eccadbcf4b49ae9d42a026313d"
   end
 
   # opencode is a `bun build --compile` single binary: OHOS bun runtime + JS

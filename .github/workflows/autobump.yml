@@ -14,9 +14,18 @@ name: autobump
 # embedded in the URL) is a plain, bump-formula-pr-compatible pattern like
 # grok-build; install() logic is version-independent packaging that a
 # version bump never touches. opencode is the prebuilt-binary formula
-# (Formula/o/opencode.rb) — NOT ohos-opencode, the from-source formula with
-# 5 patches under Patches/ohos-opencode/ that need hand-regenerating from
-# the ohos-opencode dev branch on every bump; that one must stay manual.
+# (Formula/o/opencode.rb) — NOT ohos-opencode or ohos-opencode@2, the
+# from-source formulae. opencode@2 (v2 preview prebuilt) is the same
+# version-embedded-URL pattern as opencode and grok-build — though its
+# 0.0.0-next-* rolling versions mean a weekly bump PR whenever upstream
+# publishes a new next build, which is expected (keeps the v2 preview
+# current). ohos-opencode (2026-07-31: patches converted to inreplace, zero
+# .patch files) is autobumpable — url/version/sha256 are plain
+# bump-formula-pr-compatible edits. ohos-opencode@2 is a git-revision
+# formula (bun.rb pattern, fixed version "2.0.0-beta", url pins the v2
+# branch HEAD via `revision:`); bump-formula-pr rejects fixed-version bumps,
+# so autobump.sh has a custom bump path for it (updates the revision pin +
+# increments brew revision) — see the comment in the loop body.
 # Only add a formula here after confirming `brew bump-formula-pr --dry-run`
 # produces a clean url/sha256 edit for it. version-check.yml keeps reporting
 # the full outdated list (allowlisted or not) for humans deciding what to
@@ -47,7 +56,7 @@ permissions:
   pull-requests: write
 
 env:
-  ALLOWLIST: "opencode grok-build claude-code"
+  ALLOWLIST: "opencode grok-build claude-code ohos-opencode ohos-opencode@2 opencode@2"
   IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core

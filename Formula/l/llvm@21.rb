@@ -9,9 +9,14 @@ class LlvmAT21 < Formula
   # OHOS code-sign patch (CodeSign.cpp in lld/ELF), config.guess stubbing,
   # and two separate runtime builds (compiler-rt + multiarch libc++/libcxxabi/libunwind).
 
+  # llvm@21 is pinned to the 21.x line (keg_only, links against bun's libc++
+  # ABI); the bare `^llvmorg...` regex matched every llvmorg tag and made
+  # livecheck report 21.1.8 ==> 22.1.8 — a version we must never bump to.
+  # Anchor the capture to a 21 prefix so livecheck only tracks 21.x point
+  # releases.
   livecheck do
     url :stable
-    regex(/^llvmorg[._-]v?(\d+(?:\.\d+)+)$/i)
+    regex(/^llvmorg[._-]v?(21(?:\.\d+)+)$/i)
   end
 
   bottle do

@@ -1,23 +1,26 @@
-class OhosOpencode2 < Formula
+class OhosOpencodeAT2 < Formula
   desc "OpenCode v2 preview — AI coding agent CLI, HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://github.com/anomalyco/opencode/archive/3b0d8f0e6f3d6f645b321b36686aa0288b3b5796.tar.gz"
-  version "2.0.0-dev"
-  sha256 "f2b23e5e1d7ea15eeb398312e0d0d1e24cc42226f99d1175ded7ce695cee53fc"
+  # v2 is a live development branch (no release tags yet). URL pins the v2
+  # branch HEAD via git revision (bun.rb pattern); version stays a
+  # human-readable beta tag so bump-formula-pr's version comparison doesn't
+  # fight the commit SHA. livecheck watches the v2 branch HEAD via GitHub API;
+  # autobump.yml opens a PR when a new commit lands.
+  url "https://github.com/anomalyco/opencode.git", revision: "3b0d8f0e6f3d6f645b321b36686aa0288b3b5796", branch: "v2"
+  version "2.0.0-beta"
   license "MIT"
   revision 1
 
-  # v2 is a live development branch (no release tags yet). The URL pins to a
-  # specific upstream commit on the `v2` branch; updates require changing both
-  # the url + sha256 AND regenerating patches from the fork's dev branch
-  # (social4hyq/ohos-opencode2, always manual — same invariant as ohos-opencode).
   livecheck do
-    skip "v2 has no release tags; update manually"
+    url "https://api.github.com/repos/anomalyco/opencode/commits?sha=v2&per_page=1"
+    strategy :json do |json|
+      json.first&.dig("sha")
+    end
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode2-v2.0.0-dev-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "58a8e18b1e9c2a6196968558984398be0e76ce7b7afe43b5d43b49146d2535c9"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode2-v2.0.0-beta-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "14d96052944fdc709f731fc03aaf9d914489b756e5a9c0173c1e4f59213bdedf"
   end
 
   # opencode2 is a `bun build --compile` single binary: OHOS bun runtime + JS
@@ -108,7 +111,7 @@ class OhosOpencode2 < Formula
       %q(\1"os": "openharmony"\2),
     )
     if injected == lockfile
-      opoo "ohos-opencode2: no openharmony-arm64 os:none markers found in bun.lock " \
+      opoo "ohos-opencode@2: no openharmony-arm64 os:none markers found in bun.lock " \
            "(upstream may have changed the lockfile format — verify the build)"
     else
       (buildpath/"bun.lock").atomic_write(injected)
