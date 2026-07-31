@@ -1,13 +1,13 @@
 class Kafkactl < Formula
   desc "CLI for managing Apache Kafka"
   homepage "https://deviceinsight.github.io/kafkactl/"
-  url "https://github.com/deviceinsight/kafkactl/archive/refs/tags/v5.19.0.tar.gz"
-  sha256 "e203210eb5b58d321bbb4e2a917bdbffbada0f213009e28f8f0705e633b9ce75"
+  url "https://github.com/deviceinsight/kafkactl/archive/refs/tags/v5.20.0.tar.gz"
+  sha256 "e120f614d52d4306c3093fdf2ac5ff84f7357e6423c95cb78a9b06ff56795de0"
   license "Apache-2.0"
   head "https://github.com/deviceinsight/kafkactl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "672364fdf764e6b2b6b3313c770972b771788f977d6dbae22af97878f5bc97e2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b0a1942d03f5cac24420ea91b6ba24aed8163b98117da829f73e94899184332"
   end
 
   depends_on "go" => :build
