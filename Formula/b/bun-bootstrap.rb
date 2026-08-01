@@ -16,8 +16,8 @@ class BunBootstrap < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-bootstrap-v1.4.0-5467a689"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "463b5efa40e04405914ae629e2762e6710defeeaae73bd6cdcc3d3892cb4d82a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-bootstrap-v1.4.0-5467a689-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "21e5b73a7250c207c4f95ed5fe02f8e1a9683c454158588564e2c43a8cef74ab"
   end
 
   # Prebuilt binary, no source build step; only referenced by the bun formula at build time, not at runtime.
