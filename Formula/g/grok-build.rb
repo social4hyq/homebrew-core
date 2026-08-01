@@ -5,6 +5,7 @@ class GrokBuild < Formula
   version "0.2.118"
   sha256 "54010e335aace6b5dedd022539ece7bc83f38253e8636aaf0796562aeecb2e67"
   license "Apache-2.0"
+  revision 1
   # Official release artifact, fetched directly (no npm wrapper involved).
   # The install.sh at https://x.ai/cli/install.sh resolves the download to
   # BASE_URL/grok-VERSION-PLATFORM, where BASE_URL is either the Cloudflare-
@@ -43,12 +44,9 @@ class GrokBuild < Formula
   depends_on "ohos-bst-light" => :build
 
   def install
-    # Guard against the auto-sign pass corrupting this prebuilt binary — same
-    # class of bug as codex/opencode (see their install() for the fuller
-    # writeup): self-signing here, then letting HOMEBREW_OHOS_BOTTLE_BINARY_SIGN
-    # re-sign the same ELF a second time, segfaults it (confirmed 2026-07-21,
-    # PR #42's stuck `brew test` failure — the exact same 0.2.106 artifact ran
-    # clean outside CI with a single self-sign pass).
+    # HOMEBREW_OHOS_BOTTLE_BINARY_SIGN must be unset for this prebuilt binary —
+    # the auto-sign pass double-signs and corrupts it (see the SIGNING note at
+    # the top of this file; build.sh's UNSET_SIGN_FORMULAS covers CI).
     if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
       odie "grok-build must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
            "(env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN brew install ...): the " \
