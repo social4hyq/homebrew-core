@@ -1,4 +1,4 @@
-class OhosOpencode < Formula
+class Opencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.10.tar.gz"
@@ -17,8 +17,8 @@ class OhosOpencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.10-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "de6b15c4b1b472c5baba5e0b9a4944d819a6b6a682bd2d62c2553cefb0ee0b7c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.10-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e823f5b8e3f996c160da2a7cbcd9d011404cc9e90b7e0c9b7bebb0e35d26e9eb"
   end
 
   # opencode is a `bun build --compile` single binary: OHOS bun runtime + JS
@@ -141,7 +141,7 @@ class OhosOpencode < Formula
       %q(\1"os": "openharmony"\2),
     )
     if injected == lockfile
-      opoo "ohos-opencode: no openharmony-arm64 os:none markers found in bun.lock " \
+      opoo "opencode: no openharmony-arm64 os:none markers found in bun.lock " \
            "(upstream may have changed the lockfile format — verify the build)"
     else
       (buildpath/"bun.lock").atomic_write(injected)
@@ -208,7 +208,7 @@ class OhosOpencode < Formula
     # output, so the interposer is already in the binary — no LD_PRELOAD of
     # libohos_compat.so is needed (that was the r1/r2 wrapper, now removed).
     #
-    # dlopen-sign-shim is NOT needed here, unlike opencode.rb: bun signs the
+    # dlopen-sign-shim is NOT needed here, unlike opencode-shim.rb: bun signs the
     # @ohos-ports native .so in-process during `bun install`, and the embed
     # (`with { type: "file" }`) preserves those bytes, so the runtime-extracted
     # libraries are already signed.
@@ -219,21 +219,21 @@ class OhosOpencode < Formula
     # baked path stays stable across the HOMEBREW_CELLAR flat/nested flip
     # (wrapper conventions: README "CLI wrapper 约定").
     mkdir_p libexec/"bin"
-    libexec.install out => "bin/ohos-opencode"
-    (bin/"ohos-opencode").write <<~SH
+    libexec.install out => "bin/opencode"
+    (bin/"opencode").write <<~SH
       #!/bin/sh
       export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
-      exec "#{opt_libexec}/bin/ohos-opencode" "$@"
+      exec "#{opt_libexec}/bin/opencode" "$@"
     SH
-    chmod 0755, bin/"ohos-opencode"
+    chmod 0755, bin/"opencode"
 
     # Static zsh completion: upstream has no completion generator. Top-level
     # commands from packages/opencode/src/cli/cmd/*.ts (v1.18.8; file list
     # unchanged since v1.18.4, no regeneration needed).
-    (zsh_completion/"_ohos-opencode").write <<~'ZSH'
-      #compdef ohos-opencode
+    (zsh_completion/"_opencode").write <<~'ZSH'
+      #compdef opencode
 
-      _ohos-opencode() {
+      _opencode() {
         local -a commands
         commands=(
           'acp:Start ACP (Agent Client Protocol) server'
@@ -266,7 +266,7 @@ class OhosOpencode < Formula
           '*::arg:->args'
         case $state in
           command)
-            _describe -t commands 'ohos-opencode command' commands
+            _describe -t commands 'opencode command' commands
             ;;
           args)
             case $words[1] in
@@ -295,11 +295,11 @@ class OhosOpencode < Formula
         esac
       }
 
-      _ohos-opencode "$@"
+      _opencode "$@"
     ZSH
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/ohos-opencode --version 2>&1")
+    assert_match version.to_s, shell_output("#{bin}/opencode --version 2>&1")
   end
 end

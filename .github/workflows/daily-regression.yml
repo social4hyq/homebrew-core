@@ -4,7 +4,7 @@ name: daily-regression
 # auto_dailytest.py). PR/publish CI only builds+tests the formula that
 # actually changed in that PR — it never re-verifies formulae that merely
 # *depend* on it. A change to a base formula (llvm@21) can silently break
-# a downstream one (icu4c@78 → bun-webkit → bun → ohos-opencode) without
+# a downstream one (icu4c@78 → bun-webkit → bun → opencode) without
 # anyone noticing until a user hits it.
 #
 # Scans formulae touched in the last 24h, expands to their transitive
