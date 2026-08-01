@@ -1,23 +1,22 @@
 class DlopenSignShim < Formula
   desc "LD_PRELOAD shim to self-sign unsigned ELFs before dlopen on HarmonyOS"
   homepage "https://atomgit.com/social4hyq/homebrew-core"
-  # No dedicated upstream repo — the C source is generated inline in
-  # install() below (originally written in-place inside opencode.rb before
-  # being extracted here). Homebrew requires a url/resource on every
-  # formula, so this pins to the tap's own repo; install() never reads
-  # anything from the checkout, it only exists to satisfy that requirement.
+  # No dedicated upstream repo — the C source is generated inline in install()
+  # below; the url only satisfies Homebrew's requirement that every formula
+  # have one (same rationale as inject-runpath.rb).
   url "https://atomgit.com/social4hyq/homebrew-core.git",
       revision: "f85bb6b03d69481502a275dd33b12e9ff213d7ed"
   version "0.1.0"
   license "MIT"
+  revision 1
 
   livecheck do
     skip "development tool, manually versioned"
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/dlopen-sign-shim-v0.1.0"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d95ad4fbcff79c20c47a0b10be676c12d6f1df14a4077b758d83622973703cd"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/dlopen-sign-shim-v0.1.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4370880b3e97e64a1ec7efdc1b74943e3198684c678d95406f3be755879dea29"
   end
 
   # Extracted from opencode.rb (originally written for its OpenTUI native
@@ -31,8 +30,8 @@ class DlopenSignShim < Formula
   #
   # No TMPDIR-prefix scoping: callers extracting embedded resources don't
   # reliably honor $TMPDIR (observed Bun landing files under an OHOS-patched
-  # musl libc default instead — see opencode.rb r2 history for the concrete
-  # bug this caused). Sign any unsigned ELF this process tries to dlopen,
+  # musl libc default instead — see git history of opencode.rb for the
+  # concrete bug). Sign any unsigned ELF this process tries to dlopen,
   # regardless of location — needs_signing() below already no-ops on non-ELF
   # and already-signed files, and a self-sign failure on a file we have no
   # business touching is silently discarded, so this is safe.
@@ -40,17 +39,33 @@ class DlopenSignShim < Formula
   depends_on "ohos-bst-light" # self-sign, invoked at runtime, not just build
 
   def install
-    signer_path = formula_opt_bin("ohos-bst-light")/"self-sign"
+    fallback_signer = formula_opt_bin("ohos-bst-light")/"self-sign"
     (buildpath/"dlopen_sign_shim.c").write <<~C
       #define _GNU_SOURCE
       #include <dlfcn.h>
       #include <elf.h>
       #include <fcntl.h>
+      #include <stdio.h>
       #include <stdlib.h>
       #include <string.h>
       #include <sys/wait.h>
       #include <unistd.h>
-      static const char SIGNER[] = "#{signer_path}";
+      static const char FALLBACK_SIGNER[] = "#{fallback_signer}";
+      /* Resolve self-sign at runtime so this :any_skip_relocation bottle works
+       * on a machine whose HOMEBREW_PREFIX differs from the build machine's:
+       * OHOS_SELF_SIGN wins, then $HOMEBREW_PREFIX/opt/..., then the
+       * build-time path compiled in above. */
+      static const char *signer_path(void) {
+        const char *p = getenv("OHOS_SELF_SIGN");
+        if (p && *p) return p;
+        p = getenv("HOMEBREW_PREFIX");
+        if (p && *p) {
+          static char buf[4096];
+          snprintf(buf, sizeof buf, "%s/opt/ohos-bst-light/bin/self-sign", p);
+          return buf;
+        }
+        return FALLBACK_SIGNER;
+      }
       /* Fail CLOSED (attempt to sign) on any open/read/parse error past the
        * point we know it's an ELF — a partially-written file mid-extraction
        * should not be silently treated as "already fine". The one exception
@@ -93,7 +108,7 @@ class DlopenSignShim < Formula
             dup2(devnull, STDERR_FILENO);
             close(devnull);
           }
-          execl(SIGNER, "self-sign", path, (char *)NULL);
+          execl(signer_path(), "self-sign", path, (char *)NULL);
           _exit(127);
         }
         if (p > 0) { int st; while (waitpid(p, &st, 0) < 0) {} }
