@@ -72,9 +72,6 @@ class BunWebkit < Formula
         -DCMAKE_INSTALL_PREFIX=#{prefix}
         -DCMAKE_C_COMPILER=#{clang}
         -DCMAKE_CXX_COMPILER=#{clangxx}
-        -DCMAKE_C_FLAGS=#{cflags}
-        -DCMAKE_CXX_FLAGS=#{cxxflags}
-        -DCMAKE_EXE_LINKER_FLAGS=-L#{formula_opt_lib("llvm@21")}/aarch64-linux-ohos -Wl,--code-sign
         -DPORT=JSCOnly
         -DENABLE_STATIC_JSC=ON
         -DUSE_THIN_ARCHIVES=OFF
@@ -98,6 +95,12 @@ class BunWebkit < Formula
         -DICU_INCLUDE_DIR=#{formula_opt_include("social4hyq/core/icu4c@78")}
         -DCMAKE_HAVE_THREADS_LIBRARY=1
       ]
+      # Multi-word flags must not go in %W[...] — %W splits on whitespace, and
+      # cmake 4 hard-errors on the resulting bare fragments ("Unknown argument"
+      # / unknown -W category). Append them as single argv elements instead.
+      args << "-DCMAKE_C_FLAGS=#{cflags}"
+      args << "-DCMAKE_CXX_FLAGS=#{cxxflags}"
+      args << "-DCMAKE_EXE_LINKER_FLAGS=-L#{formula_opt_lib("llvm@21")}/aarch64-linux-ohos -Wl,--code-sign"
       system "cmake", *args, buildpath.to_s
       system "ninja", "-j", ENV.make_jobs.to_s, "JavaScriptCore", "WTF", "bmalloc"
     end
