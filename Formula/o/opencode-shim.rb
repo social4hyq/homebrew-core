@@ -169,6 +169,15 @@ class OpencodeShim < Formula
       exec "$HB/opt/opencode-shim/libexec/bin/opencode-shim" "$@"
     SH
     chmod 0755, bin/"opencode-shim"
+
+    # Bash completion from the binary's own yargs generator (the zsh/fish args
+    # are ignored — bash-only, same as opencode.rb). The script bakes the
+    # upstream CLI name (opencode — compile-time, $0-independent), so rewrite
+    # it to the installed command name; otherwise bash binds the completion
+    # to `opencode` instead of `opencode-shim`.
+    generate_completions_from_executable(libexec/"bin/opencode-shim", "completion",
+                                         shells: [:bash], base_name: "opencode-shim")
+    inreplace bash_completion/"opencode-shim", "opencode", "opencode-shim"
   end
 
   def caveats
