@@ -1,16 +1,18 @@
 class Bun < Formula
-  desc "— JavaScript runtime for HarmonyOS aarch64 (stable)"
+  desc "JavaScript runtime for HarmonyOS aarch64 (stable)"
   homepage "https://github.com/oven-sh/bun"
   # This formula is fully rewritten from upstream because Bun on HarmonyOS requires
   # 50+ OHOS-specific patches, L4 self-bootstrap via bun-bootstrap, a
   # pre-populated WebKit cache, and a Rust nightly toolchain with -Zbuild-std.
   # All patches are pre-applied on the ohos-aarch64 branch of social4hyq/ohos-bun.
   # Upstream formula cannot accommodate these build requirements.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "e549b627c7ecb3ac46e6a540162341a118d0ea20", branch: "ohos-aarch64"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "d02021af5a49292eb0113bf48c4c0272d2ba69d1", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
-  revision 43
-  head "https://github.com/oven-sh/bun.git", branch: "main"
+  revision 44
+  # head tracks the same pre-patched fork branch as url — upstream oven-sh/bun
+  # main lacks the 50+ OHOS patches and cannot build for HarmonyOS.
+  head "https://github.com/social4hyq/ohos-bun.git", branch: "ohos-aarch64"
 
   livecheck do
     url :stable
@@ -18,9 +20,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r44"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a816ac6f32e47cf81fb425b2c4bde12255e32b106a3abc6cb0345b3d8a952889"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r45"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aea810ff10f966395758f10d0b266e9025af208d5d7c497ef35f9185b90bf3c0"
   end
 
   # ── Dependencies (bare names except icu4c@78 — the one name harmonybrew/core
@@ -33,12 +34,12 @@ class Bun < Formula
   depends_on "llvm@21" => :build
   depends_on "ninja" => :build
   depends_on "ohos-sdk" => :build
+  # only build-time rust-nightly cargo links libssl/libcrypto
   depends_on "openssl@3" => :build
   depends_on "perl" => :build
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
   depends_on "social4hyq/core/icu4c@78" => :build
-  # only build-time rust-nightly cargo links libssl/libcrypto
   depends_on "node"
   # No runtime ohos-compat-shim dependency since r31: a vendored copy of the
   # shim is statically linked into the executable (emitShims in the source
@@ -46,7 +47,7 @@ class Bun < Formula
   # `bun build --compile` output without LD_PRELOAD.
   # ohos-sdk is build-time only: used to sign rust-nightly binaries, the
   # clang-sign wrapper, and the final bun binary. Runtime signing (PackageInstaller
-  # .node/.so, dlopen, bun build --compile) is now handled in-process by ohos_sign.
+  # .node/.so, dlopen, bun build --compile) is handled in-process by ohos_sign.
 
   # Rust nightly (native OHOS host toolchain, needed by bun's libbun_rust.a).
   # OHOS is a Tier 3 target with no prebuilt rust-std, so bun uses -Zbuild-std
@@ -70,15 +71,13 @@ class Bun < Formula
 
   # ── OHOS patches are pre-applied on the ohos-aarch64 branch of social4hyq/ohos-bun ──
   # The branch is a linear series of feat/fix(ohos) commits kept in sync with
-  # upstream oven-sh/bun main via merge (last: 87e50375f, upstream 6618e7f7e).
+  # upstream oven-sh/bun main via merge.
   # Vendor patch files (patches/zstd/ohos-qsort-r.patch) are committed directly
   # in the source tree; ninja applies them during the build.
 
   def install
-    # buildpath = bun source root (patches already auto-applied by Homebrew).
-    # Build logic is fully inlined (mirroring git.rb in harmonybrew core — no external scripts).
-    # All dependencies are declared via depends_on: llvm@21 (signing clang/lld), icu4c@78,
-    # bun-webkit (JSC static libs), bun-bootstrap (L3 driver, bootstrap).
+    # buildpath = bun source root; OHOS patches come pre-applied on the ohos-aarch64 branch (see above).
+    # Build logic is fully inlined — no external scripts.
 
     llvm     = Formula["llvm@21"]
     webkit   = Formula["bun-webkit"]
@@ -147,11 +146,9 @@ class Bun < Formula
     # subsequent `bun install --frozen-lockfile` can verify without network.
     system "bun", "install", "--cwd", "src/node-fallbacks"
 
-    # ── Regenerate native binlink test packages with openharmony in os[] ──
-    # Upstream test packages (test-native-binlink-*-target) list os:["darwin","linux","win32"].
     # ── Rust nightly (persistent cache keyed by toolchain date; skips reinstall+signing if already done) ──
-    # OHOS is a Tier 3 target: bun uses -Zbuild-std to build std, which requires rust-src (in full tarball).
-    rust_ver = resource("rust-nightly").version.to_s # e.g. "nightly-2026-05-06"
+    # Tier-3 / -Zbuild-std / rust-src rationale: see the resource blocks above.
+    rust_ver = resource("rust-nightly").version.to_s # e.g. "nightly-2026-07-20"
     # rust_home must stay on EL2 (not HOMEBREW_CACHE/HOME): these binaries are
     # exec'd after signing, and the EL3 hmmac policy refuses to exec signed
     # ELFs outside EL2.
@@ -167,7 +164,6 @@ class Bun < Formula
       lock.flock(File::LOCK_EX)
       unless rust_ready.exist?
         resource("rust-nightly").stage do
-          # The host tarball contains rustc/cargo/rust-std; install via install.sh.
           # Use sh explicitly: OHOS superenv PATH has no bash for the shebang.
           system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
         end
@@ -210,11 +206,16 @@ class Bun < Formula
     (ohos_cross/"libcxxabi").mkpath
     ln_sf llvm.opt_include/"aarch64-linux-ohos/c++/v1", ohos_cross/"libcxx/include/v1"
     ln_sf llvm.opt_include/"aarch64-linux-ohos/c++/v1", ohos_cross/"libcxxabi/include"
-    %w[libcxx libcxxabi libunwind].each do |d|
+    # flags.ts links only `-lc++ -lc++abi -lunwind` across the three -L dirs
+    # (verified at ohos-aarch64 HEAD), so seed each dir with just its own
+    # archive instead of mirroring every *.a everywhere.
+    {
+      "libcxx"    => "libc++.a",
+      "libcxxabi" => "libc++abi.a",
+      "libunwind" => "libunwind.a",
+    }.each do |d, a|
       (ohos_cross/d/"lib").mkpath
-      Dir[llvm.opt_lib/"aarch64-linux-ohos/*.a"].each do |a|
-        ln_sf a, ohos_cross/d/"lib"/File.basename(a)
-      end
+      ln_sf llvm.opt_lib/"aarch64-linux-ohos"/a, ohos_cross/d/"lib"/a
     end
     # Use llvm@21's cc/c++ shims (HOMEBREW_PREFIX/bin/cc, c++) — they wrap clang 21
     # with LLD --code-sign. This replaces the legacy clang-sign wrapper that ran
@@ -266,11 +267,9 @@ class Bun < Formula
     system sign_tool, "sign", "-selfSign", "1", "-inFile", unsigned, "-outFile", out
     chmod 0755, out
     rm unsigned
-    # The compat shim is statically linked into the binary since r31 (source
-    # tree emitShims + workarounds.ts "ohos-compat-shim-embed"), so no
-    # LD_PRELOAD or OHOS_COMPAT_SHIM_ENABLE wrapper is needed — linkat and
-    # symlinkat are default-on in the shim since 0.2.0. The real ELF stays
-    # at libexec/bin/bun, symlinked from bin/bun.
+    # Compat shim is statically linked (see the Dependencies note above) —
+    # no LD_PRELOAD wrapper. The real ELF stays at libexec/bin/bun,
+    # symlinked from bin/bun.
     # The symlink MUST be relative and keg-internal: install_symlink with an
     # opt_libexec target resolves through the *previous* version's opt link
     # during upgrade installs (pathname.rb install_symlink_p realpaths src
@@ -278,8 +277,7 @@ class Bun < Formula
     # dangles — and vanishes — once cleanup removes that keg (this exact
     # failure shipped the r32 bottle without bin/bun).
     mkdir_p libexec/"bin"
-    libexec.install out => "bin/bun"
-    chmod 0755, libexec/"bin/bun"
+    libexec.install out => "bin/bun" # mv preserves the 0755 set above
     bin.mkpath
     (bin/"bun").make_symlink "../libexec/bin/bun"
 
