@@ -5,6 +5,7 @@ class CcSwitch < Formula
   sha256 "2a94b345dd19dd63d1f1c9069e511aa6e0e09381c6ddb209e699a939becec9e2"
   license "MIT"
   revision 1
+  revision 1
   # Official linux-arm64-musl release asset (Rust, fully static aarch64 ELF —
   # no INTERP/DYNAMIC segment per readelf -l). Named cc-switch, not
   # cc-switch-cli: official homebrew/core already ships a cc-switch-cli
@@ -43,9 +44,8 @@ class CcSwitch < Formula
   depends_on "ohos-bst-light" => :build
 
   def install
-    # Guard against the auto-sign pass corrupting this prebuilt binary —
-    # same class of bug as codex/opencode/grok-build (see their install()
-    # for the fuller writeup).
+    # HOMEBREW_OHOS_BOTTLE_BINARY_SIGN must be unset — see the SIGNING note at
+    # the top of this file.
     if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
       odie "cc-switch must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
            "(env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN brew install ...): the " \
