@@ -1,8 +1,8 @@
 class Ldcli < Formula
   desc "CLI for managing LaunchDarkly feature flags"
   homepage "https://launchdarkly.com/docs/home/getting-started/ldcli"
-  url "https://github.com/launchdarkly/ldcli/archive/refs/tags/v3.6.0.tar.gz"
-  sha256 "f16b53912eb32d94164032d391a52ea3f847334df25985121d6a53162d4c6a0f"
+  url "https://github.com/launchdarkly/ldcli/archive/refs/tags/v3.8.0.tar.gz"
+  sha256 "341ee1e2d460f80e7323ef3cd8dce2abb08ae27844c5ed72d90128b9f40eb48d"
   license "Apache-2.0"
   head "https://github.com/launchdarkly/ldcli.git", branch: "main"
 
