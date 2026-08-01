@@ -16,9 +16,8 @@ class OpencodeShim < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.10-r3"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "432f2e002cbfb5ce77a6070fc0f6be2c5455adf394568c9aa0c74b31e823c997"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim-v1.18.10-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a7091ab47f46d940db6ceba3cc1774965f96158561fc314c340481c3edc3400"
   end
 
   # r1 fixed a real portability bug (not just the `brew bottle` check below):
