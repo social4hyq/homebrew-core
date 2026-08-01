@@ -1,8 +1,8 @@
 class EslintD < Formula
   desc "Speed up eslint to accelerate your development workflow"
   homepage "https://github.com/mantoni/eslint_d.js"
-  url "https://registry.npmjs.org/eslint_d/-/eslint_d-15.0.2.tgz"
-  sha256 "b329300563f43d3bc3ed8b58e7341c85d670f806a719182a029e308966a1c6e3"
+  url "https://registry.npmjs.org/eslint_d/-/eslint_d-15.0.3.tgz"
+  sha256 "2d635c2a6037f2840cfb07804b729555222bfaa642dfbd1d3823447ece593e85"
   license "MIT"
 
   bottle do
