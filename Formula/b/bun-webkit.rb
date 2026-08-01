@@ -1,30 +1,28 @@
 class BunWebkit < Formula
   desc "JavaScriptCore/WTF/bmalloc static archives for Bun"
   homepage "https://github.com/oven-sh/bun"
-  url "https://gh-proxy.com/https://github.com/oven-sh/WebKit.git",
+  url "https://github.com/oven-sh/WebKit.git",
       revision: "549170099226f816a4b204ea1d8fa102fb79eefa"
   version "5491700992"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
+  revision 1
   # This formula is fully rewritten from upstream because it builds only the
   # JavaScriptCore/WTF/bmalloc static archives from oven-sh/WebKit, pinned to
   # bun's WEBKIT_VERSION. Upstream does not package WebKit this way.
 
-  # WebKit source (oven-sh/WebKit official repo).
-  # commit aligns with WEBKIT_VERSION in bun-src/scripts/build/deps/webkit.ts.
-  # OHOS adaptation is handled by bun-side webkit.ts.patch, no need to modify WebKit source.
-
-  # WebKit version must match WEBKIT_VERSION in bun-src/scripts/build/deps/webkit.ts,
-  # cannot auto-bump, otherwise ABI mismatch with bun.
+  # Pinned to WEBKIT_VERSION in bun-src/scripts/build/deps/webkit.ts — cannot
+  # auto-bump, otherwise ABI mismatch with bun. OHOS adaptation is handled
+  # bun-side (webkit.ts.patch); WebKit source itself is unmodified.
   livecheck do
     skip "pinned to bun's WEBKIT_VERSION"
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-webkit-v5491700992-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "674715a7ee997259043a9f407c109222588a14133a1e0851f55d25bdfa445363"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-webkit-v5491700992-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d77fff2cf3c2c402e96bb8d38d817811a4875e3b9d2ddf3c969928cf2784cdd"
   end
 
-  keg_only "webKit static archives are consumed in-tree by Bun, not linked system-wide"
+  keg_only "webkit static archives are consumed in-tree by Bun, not linked system-wide"
 
   depends_on "cmake"        => :build
   depends_on "gperf"        => :build
@@ -37,12 +35,12 @@ class BunWebkit < Formula
   depends_on "ruby" => :build
   depends_on "social4hyq/core/icu4c@78" => :build
   depends_on "zlib" => :build
-  # Outputs are static .a archives + headers — zero runtime linkage. # JSC cross-compilation uses its sysroot
-  # llvm@21's lld runtime depends on libxml2/zlib; explicitly declare so superenv injects library paths.
+  # Outputs are static .a archives + headers — zero runtime linkage.
+  # ohos-sdk is build-time only: JSC cross-compilation uses its sysroot.
 
   def install
     # llvm@21's lld runtime depends on libxml2/zlib, brew superenv may strip LD_LIBRARY_PATH,
-    # explicitly inject library search paths (per icu4c@78 experience).
+    # explicitly inject library search paths.
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("libxml2").to_s
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib").to_s
 
@@ -74,9 +72,6 @@ class BunWebkit < Formula
         -DCMAKE_INSTALL_PREFIX=#{prefix}
         -DCMAKE_C_COMPILER=#{clang}
         -DCMAKE_CXX_COMPILER=#{clangxx}
-        -DCMAKE_C_FLAGS=#{cflags}
-        -DCMAKE_CXX_FLAGS=#{cxxflags}
-        -DCMAKE_EXE_LINKER_FLAGS=-L#{formula_opt_lib("llvm@21")}/aarch64-linux-ohos -Wl,--code-sign
         -DPORT=JSCOnly
         -DENABLE_STATIC_JSC=ON
         -DUSE_THIN_ARCHIVES=OFF
@@ -100,6 +95,12 @@ class BunWebkit < Formula
         -DICU_INCLUDE_DIR=#{formula_opt_include("social4hyq/core/icu4c@78")}
         -DCMAKE_HAVE_THREADS_LIBRARY=1
       ]
+      # Multi-word flags must not go in %W[...] — %W splits on whitespace, and
+      # cmake 4 hard-errors on the resulting bare fragments ("Unknown argument"
+      # / unknown -W category). Append them as single argv elements instead.
+      args << "-DCMAKE_C_FLAGS=#{cflags}"
+      args << "-DCMAKE_CXX_FLAGS=#{cxxflags}"
+      args << "-DCMAKE_EXE_LINKER_FLAGS=-L#{formula_opt_lib("llvm@21")}/aarch64-linux-ohos -Wl,--code-sign"
       system "cmake", *args, buildpath.to_s
       system "ninja", "-j", ENV.make_jobs.to_s, "JavaScriptCore", "WTF", "bmalloc"
     end
@@ -149,7 +150,7 @@ class BunWebkit < Formula
   def caveats
     <<~EOS
       bun-webkit provides JSC/WTF/bmalloc static archives for Bun on HarmonyOS.
-      Pinned to WebKit commit c9ad5813fd (matches bun's WEBKIT_VERSION).
+      Pinned to WebKit commit #{version} (matches bun's WEBKIT_VERSION).
       Consumed in-tree by the `bun` formula; keg-only.
     EOS
   end
