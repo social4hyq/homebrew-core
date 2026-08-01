@@ -8,11 +8,10 @@ class OpencodeShimAT2 < Formula
   # registry.npmjs.org directly, same as the SIGILL-on-large-GET reason
   # documented for claude-code/codex (only affects local machine curl, not
   # bottle distribution or the CI runner that builds it).
-  url "https://registry.npmjs.org/@opencode-ai/cli-linux-arm64-musl/-/cli-linux-arm64-musl-0.0.0-next-16620.tgz"
-  version "0.0.0-next-16620"
-  sha256 "9c2a36824288e88ad65115ce268209b75f4219413b70ad0430624ce69fc1e7ee"
+  url "https://registry.npmjs.org/@opencode-ai/cli-linux-arm64-musl/-/cli-linux-arm64-musl-0.0.0-next-16650.tgz"
+  version "0.0.0-next-16650"
+  sha256 "3235834476a10d2c75f00593fb506f956fbce2869bac9324afba554a32557452"
   license "MIT"
-  revision 1
   # opencode v2's official prebuilt linux-arm64-musl single binary (Bun
   # --compile, bin name changed from `opencode` to `opencode2`). Bypasses the
   # @opencode-ai/cli npm JS wrapper. Same musl-ABI-compatible-with-OHOS
@@ -28,9 +27,8 @@ class OpencodeShimAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim@2-v0.0.0-next-16620-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6fbd243541861febe7f15b938e53d9f4a166375be0ed106e027990838b253545"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim@2-v0.0.0-next-16650-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c2060e2fd7d118bef8ae96e54c8e5f73ef3eef49fa371c387984ecc37625e049"
   end
 
   # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
