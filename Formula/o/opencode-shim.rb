@@ -16,8 +16,9 @@ class OpencodeShim < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim-v1.18.10-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a7091ab47f46d940db6ceba3cc1774965f96158561fc314c340481c3edc3400"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim-v1.18.10-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d42d731a404cd5032b237910884f0cb8f4ff70c536b5f60990ad8a782182aa1"
   end
 
   # r1 fixed a real portability bug (not just the `brew bottle` check below):
@@ -169,6 +170,15 @@ class OpencodeShim < Formula
       exec "$HB/opt/opencode-shim/libexec/bin/opencode-shim" "$@"
     SH
     chmod 0755, bin/"opencode-shim"
+
+    # Bash completion from the binary's own yargs generator (the zsh/fish args
+    # are ignored — bash-only, same as opencode.rb). The script bakes the
+    # upstream CLI name (opencode — compile-time, $0-independent), so rewrite
+    # it to the installed command name; otherwise bash binds the completion
+    # to `opencode` instead of `opencode-shim`.
+    generate_completions_from_executable(libexec/"bin/opencode-shim", "completion",
+                                         shells: [:bash], base_name: "opencode-shim")
+    inreplace bash_completion/"opencode-shim", "opencode", "opencode-shim"
   end
 
   def caveats
