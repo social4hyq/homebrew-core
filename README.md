@@ -61,6 +61,7 @@ shell 补全随 bottle 装入，开箱即用。以生成式为主（`generate_co
 | `claude-code` | 2.1.220, revision 1 | Anthropic Claude Code CLI；**runtime-fetch stub**（Anthropic License 不允许重分发官方二进制），首次运行拉取 + 校验 sha256 + 自签 + 缓存 |
 | `grok-build` | 0.2.118, revision 1 | xAI Grok Build CLI；完全静态 ELF，仅 `ohos-bst-light` self-sign，无需 shim/RUNPATH；bash/zsh/fish 补全 |
 | `cc-switch` | 5.9.2, revision 2 | AI coding CLI 供应商切换器 + 本地代理（预编译静态 ELF，仅 `ohos-bst-light` self-sign）；主要用于给 codex 桥接 Chat-Completions-only provider（Kimi/DeepSeek 等） |
+| ~~`codex`~~ | —（已下线 2026-07-23） | OpenAI Codex CLI。**已由 Harmonybrew 官方上游原生提供**，请直接 `brew install codex`（官方 core），本 tap 的自建 formula 已随之下线 |
 | `qemu-aarch64` | 11.0.1-r0 | QEMU 用户态 aarch64 模拟器（Alpine 全静态 musl 构建）；鸿蒙 6.1 下自签二进制无 ptrace 权限、strace 不可用，`-strace` 纯用户态实现，是 syscall 跟踪的替代品（非虚拟机，syscall 仍下发鸿蒙内核） |
 | `bun` | 1.4.0, revision 44 | Bun JavaScript runtime（`social4hyq/ohos-bun` 的 `ohos-aarch64` 分支）；`ohos-compat-shim` 已**静态内嵌**进可执行文件（覆盖 bun 及所有 `bun build --compile` 产物），无 LD_PRELOAD wrapper |
 | `bun-bootstrap` | 1.4.0-5467a689, revision 1 | 预编译 bun，用来启动 `bun bd` 自举本机 bun；已预签，无需 ohos-sdk（`keg_only`） |
@@ -72,7 +73,7 @@ shell 补全随 bottle 装入，开箱即用。以生成式为主（`generate_co
 | `inject-runpath` | 0.2.0, revision 1 | 就地注入 DT_RUNPATH 到 ELF（零偏移移动），不破坏 Bun 编译产物的追加模块图；预编译二进制 formula（`opencode-shim`/`opencode-shim@2`）的 RUNPATH 注入靠它（`keg_only`） |
 | `dlopen-sign-shim` | 0.1.0, revision 1 | LD_PRELOAD 垫片：`dlopen`/`dlmopen` 前自动 self-sign 未签名 ELF（运行时经 `$HOMEBREW_PREFIX` 解析 self-sign 路径），兜底运行时才解包落盘的原生模块 |
 
-> 已下线：`close-range-shim`（2026-07-15，并入 `ohos-compat-shim`）；`bun-pty` / `lightningcss` / `tailwindcss-oxide`（2026-07-18，`ohos-opencode` 改走 `@ohos-ports/*` npm 包后 formula 失去存在意义）；`codex`（2026-07-23，harmonybrew 官方已原生支持 codex，本 tap 自建 formula 失去存在意义）。
+> 已下线：`close-range-shim`（2026-07-15，并入 `ohos-compat-shim`）；`bun-pty` / `lightningcss` / `tailwindcss-oxide`（2026-07-18，`ohos-opencode` 改走 `@ohos-ports/*` npm 包后 formula 失去存在意义）；`codex`（2026-07-23，改由 Harmonybrew 官方上游提供，见上表）。
 >
 > 改名（2026-08-01）：`opencode` → `opencode-shim`、`opencode@2` → `opencode-shim@2`（预编译 shim 路线）；`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（源码构建路线，命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
 
