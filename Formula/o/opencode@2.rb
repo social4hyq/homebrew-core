@@ -1,4 +1,4 @@
-class OhosOpencodeAT2 < Formula
+class OpencodeAT2 < Formula
   desc "OpenCode v2 preview — AI coding agent CLI, HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
   # v2 is a live development branch (no release tags yet). URL pins the v2
@@ -112,14 +112,14 @@ class OhosOpencodeAT2 < Formula
       'if (process.platform === "linux" || process.platform === "openharmony") return "inotify"'
 
     # Flip openharmony-arm64 os markers in bun.lock (replaces
-    # bun-lock-openharmony-os.patch). Same regex as ohos-opencode.
+    # bun-lock-openharmony-os.patch). Same regex as opencode.
     lockfile = (buildpath/"bun.lock").read
     injected = lockfile.gsub(
       /("[^"]*openharmony-arm64@[^"]+", "", \{ )"os": "none"(, "cpu": "arm64" \})/,
       %q(\1"os": "openharmony"\2),
     )
     if injected == lockfile
-      opoo "ohos-opencode@2: no openharmony-arm64 os:none markers found in bun.lock " \
+      opoo "opencode@2: no openharmony-arm64 os:none markers found in bun.lock " \
            "(upstream may have changed the lockfile format — verify the build)"
     else
       (buildpath/"bun.lock").atomic_write(injected)
@@ -173,27 +173,27 @@ class OhosOpencodeAT2 < Formula
     # via opt_libexec (not libexec) so the baked path stays stable across the
     # HOMEBREW_CELLAR flat/nested flip.
     #
-    # The wrapper also isolates XDG_DATA_HOME: v2 and ohos-opencode (v1)
+    # The wrapper also isolates XDG_DATA_HOME: v2 and opencode (v1)
     # would otherwise share ~/.local/share/opencode/opencode.db, and v2's
     # migrations (e.g. event.created NOT NULL) break v1's session creation
     # ("creating a session failed"). v2 gets its own data root; an
     # explicitly-set XDG_DATA_HOME is still honored.
     mkdir_p libexec/"bin"
-    libexec.install out => "bin/ohos-opencode2"
-    (bin/"ohos-opencode2").write <<~SH
+    libexec.install out => "bin/opencode2"
+    (bin/"opencode2").write <<~SH
       #!/bin/sh
       export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
       export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share-v2}"
-      exec "#{opt_libexec}/bin/ohos-opencode2" "$@"
+      exec "#{opt_libexec}/bin/opencode2" "$@"
     SH
-    chmod 0755, bin/"ohos-opencode2"
+    chmod 0755, bin/"opencode2"
 
     # Static zsh completion: upstream has no completion generator. Top-level
     # commands from packages/cli/src/commands/commands.ts (v2 @ 3b0d8f0).
-    (zsh_completion/"_ohos-opencode2").write <<~'ZSH'
-      #compdef ohos-opencode2
+    (zsh_completion/"_opencode2").write <<~'ZSH'
+      #compdef opencode2
 
-      _ohos-opencode2() {
+      _opencode2() {
         local -a commands
         commands=(
           'acp:Start an Agent Client Protocol server'
@@ -217,7 +217,7 @@ class OhosOpencodeAT2 < Formula
           '*::arg:->args'
         case $state in
           command)
-            _describe -t commands 'ohos-opencode2 command' commands
+            _describe -t commands 'opencode2 command' commands
             ;;
           args)
             case $words[1] in
@@ -256,11 +256,11 @@ class OhosOpencodeAT2 < Formula
         esac
       }
 
-      _ohos-opencode2 "$@"
+      _opencode2 "$@"
     ZSH
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/ohos-opencode2 --version 2>&1")
+    assert_match version.to_s, shell_output("#{bin}/opencode2 --version 2>&1")
   end
 end
