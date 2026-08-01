@@ -17,8 +17,9 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.10-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e823f5b8e3f996c160da2a7cbcd9d011404cc9e90b7e0c9b7bebb0e35d26e9eb"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.10-r5"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e6b86ae20fdf5f3a1e8977360a32375002c902a34590171a350a6c63e0f5898"
   end
 
   # opencode is a `bun build --compile` single binary: OHOS bun runtime + JS
@@ -227,19 +228,22 @@ class Opencode < Formula
     SH
     chmod 0755, bin/"opencode"
 
-    # Static zsh completion: upstream has no completion generator. Top-level
-    # commands from packages/opencode/src/cli/cmd/*.ts (v1.18.8; file list
-    # unchanged since v1.18.4, no regeneration needed).
+    # Static zsh completion: upstream's own generator (`opencode completion`,
+    # yargs) only emits a bash-style script — the zsh/fish args are silently
+    # ignored — so zsh stays handwritten here. Command list synced with
+    # packages/opencode/src/index.ts @ v1.18.10 (note: `auth` is an alias of
+    # `providers` since v1.18.9; `account`/`tui` were added after v1.18.8).
     (zsh_completion/"_opencode").write <<~'ZSH'
       #compdef opencode
 
       _opencode() {
         local -a commands
         commands=(
+          'account:Manage OpenCode Console account'
           'acp:Start ACP (Agent Client Protocol) server'
           'agent:Manage agents'
           'attach:Attach to a running opencode server'
-          'auth:Manage provider credentials'
+          'auth:Alias for providers'
           'db:Database utilities'
           'debug:Debug utilities'
           'export:Export a session'
@@ -255,6 +259,7 @@ class Opencode < Formula
           'serve:Start the opencode server'
           'session:Manage sessions'
           'stats:Show usage statistics'
+          'tui:Start the TUI (default command)'
           'uninstall:Uninstall opencode'
           'upgrade:Upgrade opencode'
           'web:Start the web interface'
@@ -297,6 +302,12 @@ class Opencode < Formula
 
       _opencode "$@"
     ZSH
+
+    # Bash completion comes from the binary itself (yargs generator) — always
+    # in sync, unlike the handwritten zsh one above. Generate from the libexec
+    # binary: the bin/opencode wrapper execs opt_libexec, whose opt/ symlink
+    # only exists after install (same pattern as grok-build/cc-switch).
+    generate_completions_from_executable(libexec/"bin/opencode", "completion", shells: [:bash])
   end
 
   test do
