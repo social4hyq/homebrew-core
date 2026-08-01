@@ -4,7 +4,7 @@ class LlvmAT21 < Formula
   url "https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.8/llvm-project-21.1.8.src.tar.xz"
   sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
   license "Apache-2.0" => { with: "LLVM-exception" }
-  revision 3
+  revision 4
   # This formula is fully rewritten from upstream because HarmonyOS requires an
   # OHOS code-sign patch (CodeSign.cpp in lld/ELF), config.guess stubbing,
   # and two separate runtime builds (compiler-rt + multiarch libc++/libcxxabi/libunwind).
