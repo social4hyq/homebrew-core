@@ -9,7 +9,7 @@ class OpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "85ea15e56d18508ef47e712de8264f7748b228d5", branch: "v2"
   version "2.0.0-beta"
   license "MIT"
-  revision 4
+  revision 5
 
   livecheck do
     url "https://api.github.com/repos/anomalyco/opencode/commits?sha=v2&per_page=1"
@@ -19,8 +19,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fbf0f0278d537faa67b05684fca128034570bbfbd9964110c0ab597685f659f2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae6d50fbf415da023a3dcdd0c49c071a1fed7fff11184c4cc6e20e5e6fad0006"
   end
 
   # opencode2 is a `bun build --compile` single binary: OHOS bun runtime + JS
@@ -51,8 +51,7 @@ class OpencodeAT2 < Formula
   # structural array-insertion hunk, leaving only single-line string
   # replacements. Version bumps only need url + sha256 + bottle root_url.
   # See social4hyq/ohos-opencode2 dev for the canonical diff these mirror
-  # (fork-diff invariant).
-  # 4 patches → inreplace 2026-07-31.
+  # (fork-diff invariant; 4 patches → inreplace 2026-07-31).
 
   def install
     ENV["BUN_TMPDIR"] = (buildpath/".bun-tmp").to_s
@@ -72,37 +71,34 @@ class OpencodeAT2 < Formula
     # enterprise is deleted alongside session-ui: it depends on
     # @opencode-ai/session-ui (workspace:*), so leaving it in place makes
     # bun install fail to resolve session-ui after its directory is gone.
-    rm_r("packages/desktop")
-    rm_r("packages/app")
-    rm_r("packages/session-ui")
-    rm_r("packages/web")
-    rm_r("packages/www")
-    rm_r("packages/storybook")
-    rm_r("packages/enterprise")
+    rm_r %w[packages/desktop packages/app packages/session-ui packages/web
+            packages/www packages/storybook packages/enterprise]
 
     # Native dep overrides (replaces ohos-ports-deps.patch). v2 only needs
     # @ohos-ports/opentui-core + @ohos-ports/bun-pty (no lightningcss/
     # tailwindcss-oxide in the CLI tree).
-    inreplace "bunfig.toml",
-      '"@opentui/core-win32-x64", ',
-      '"@opentui/core-win32-x64", ' \
-      '"@ohos-ports/opentui-core", "@ohos-ports/bun-pty", '
+    # bun-pty/@parcel/watcher have no upstream override entry, so they are
+    # added right after the @opentui/core override this same replacement
+    # writes — no assumption about upstream's overrides key ordering. The nil
+    # check makes a vanished anchor fail loudly.
     inreplace "package.json" do |s|
-      s.gsub! '"@opentui/core": "catalog:",',
-              '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.5-patch.1",'
-      s.gsub! %Q(    "effect": "catalog:"\n  },),
-              "    \"effect\": \"catalog:\",\n    " \
-              "\"bun-pty\": \"npm:@ohos-ports/bun-pty@0.4.10\",\n    " \
-              "\"@parcel/watcher-linux-arm64-musl\": \"npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1\"\n  " \
-              "},"
+      overrides = [
+        '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.5-patch.1",',
+        '    "bun-pty": "npm:@ohos-ports/bun-pty@0.4.10",',
+        '    "@parcel/watcher-linux-arm64-musl": "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1",',
+      ]
+      s.gsub!('"@opentui/core": "catalog:",', overrides.join("\n")) ||
+        odie("opencode@2: @opentui/core override anchor not found in package.json")
     end
 
     # Home dir fallback for global projects (replaces project-global-
     # worktree.patch). v2 only touches packages/core/src/project.ts
     # (no packages/opencode variant).
     inreplace "packages/core/src/project.ts" do |s|
-      s.sub! 'import path from "path"', "import os from \"os\"\nimport path from \"path\""
-      s.sub! "path.parse(input).root", "os.homedir()"
+      s.sub!('import path from "path"', "import os from \"os\"\nimport path from \"path\"") ||
+        odie("opencode@2: project.ts import anchor not found")
+      s.sub!("path.parse(input).root", "os.homedir()") ||
+        odie("opencode@2: project.ts path.parse anchor not found")
     end
 
     # File watcher: add openharmony → inotify backend mapping so getBackend()
@@ -125,9 +121,13 @@ class OpencodeAT2 < Formula
       (buildpath/"bun.lock").atomic_write(injected)
     end
 
-    # Allow freshly-published @ohos-ports/* packages (npm anti-typosquatting
-    # minimum-release-age policy blocks packages < 3 days old by default).
-    (buildpath/"bunfig.toml").atomic_write("[install]\nminimumReleaseAgeMs = 0\n")
+    # Disable upstream's npm anti-typosquatting minimum-release-age policy: it
+    # blocks freshly-published @ohos-ports/* packages (< 3 days old). Removing
+    # the key restores bun's default (null = disabled). inreplace raises if
+    # upstream rewords or drops the line, so a bump can't silently re-enable
+    # the policy. (bun has no "minimumReleaseAgeMs" key — an unknown bunfig
+    # key is silently ignored, verified on bun 1.4.0.)
+    inreplace "bunfig.toml", "minimumReleaseAge = 259200\n", ""
     system "bun", "install", "--ignore-scripts"
 
     # Script.version short-circuits on OPENCODE_VERSION (no git / registry
@@ -145,14 +145,18 @@ class OpencodeAT2 < Formula
       "!(process.platform === \"openharmony\" && " \
       "item.os === \"linux\" && item.arch === \"arm64\" && " \
       "item.abi === \"musl\")) return false"
+    # The abi guard is anchored on the preceding avx2 line: the bare
+    # "return item.abi === undefined" string is short enough to collide with
+    # unrelated future code in this file (gsub! would rewrite every match).
     inreplace "packages/cli/script/build.ts",
-      "return item.abi === undefined",
-      "return process.platform === \"openharmony\" || item.abi === undefined"
+      /(if \(item\.avx2 === false\) return baselineFlag\n\s*)return item\.abi === undefined/,
+      '\1return process.platform === "openharmony" || item.abi === undefined'
     inreplace "packages/cli/script/build.ts" do |s|
-      s.sub! "target: target.replace(binary, \"bun\") as Bun.Build.CompileTarget,",
+      s.sub!("target: target.replace(binary, \"bun\") as Bun.Build.CompileTarget,",
              "target: (process.platform === \"openharmony\" && " \
              "item.abi === \"musl\" ? \"bun-linux-arm64-ohos\" : " \
-             "target.replace(binary, \"bun\")) as Bun.Build.CompileTarget,"
+             "target.replace(binary, \"bun\")) as Bun.Build.CompileTarget,") ||
+        odie("opencode@2: build.ts compile-target anchor not found")
     end
 
     cd "packages/cli" do
