@@ -9,7 +9,7 @@ class OhosOpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "56c6add5c3d69e33da95aae48f567899ebe9906e", branch: "v2"
   version "2.0.0-beta"
   license "MIT"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://api.github.com/repos/anomalyco/opencode/commits?sha=v2&per_page=1"
@@ -19,9 +19,8 @@ class OhosOpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode@2-v2.0.0-beta-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7a7605646cded4a6bfb4b0a8026d7d4814369220af0647c90ce9041fb81137e2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode@2-v2.0.0-beta-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "69def17f44dcf944bae619f61ed56094f5303a361412efce94f0aed88492a9f1"
   end
 
   # opencode2 is a `bun build --compile` single binary: OHOS bun runtime + JS
@@ -173,11 +172,18 @@ class OhosOpencodeAT2 < Formula
     # is read-only in app contexts); override via OPENCODE_TMPDIR. Self-reference
     # via opt_libexec (not libexec) so the baked path stays stable across the
     # HOMEBREW_CELLAR flat/nested flip.
+    #
+    # The wrapper also isolates XDG_DATA_HOME: v2 and ohos-opencode (v1)
+    # would otherwise share ~/.local/share/opencode/opencode.db, and v2's
+    # migrations (e.g. event.created NOT NULL) break v1's session creation
+    # ("creating a session failed"). v2 gets its own data root; an
+    # explicitly-set XDG_DATA_HOME is still honored.
     mkdir_p libexec/"bin"
     libexec.install out => "bin/ohos-opencode2"
     (bin/"ohos-opencode2").write <<~SH
       #!/bin/sh
       export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
+      export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share-v2}"
       exec "#{opt_libexec}/bin/ohos-opencode2" "$@"
     SH
     chmod 0755, bin/"ohos-opencode2"
