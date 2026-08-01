@@ -12,6 +12,7 @@ class OpencodeAT2 < Formula
   version "0.0.0-next-16620"
   sha256 "9c2a36824288e88ad65115ce268209b75f4219413b70ad0430624ce69fc1e7ee"
   license "MIT"
+  revision 1
   # opencode v2's official prebuilt linux-arm64-musl single binary (Bun
   # --compile, bin name changed from `opencode` to `opencode2`). Bypasses the
   # @opencode-ai/cli npm JS wrapper. Same musl-ABI-compatible-with-OHOS
@@ -122,10 +123,15 @@ class OpencodeAT2 < Formula
 
     # Self-reference via opt_libexec (see RUNPATH comment above) rather than
     # libexec, for the same portability reason.
+    #
+    # XDG_DATA_HOME is isolated for the same reason as ohos-opencode@2: v2
+    # must not share ~/.local/share/opencode/opencode.db with ohos-opencode
+    # (v1) — v2's migrations break v1's session creation.
     (bin/"opencode2").write <<~SH
       #!/bin/sh
       export LD_PRELOAD="#{formula_opt_lib("dlopen-sign-shim")}/libdlopen_sign_shim.so:#{formula_opt_lib("ohos-compat-shim")}/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
       export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
+      export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share-v2}"
       exec "#{opt_libexec}/bin/opencode2" "$@"
     SH
     chmod 0755, bin/"opencode2"
