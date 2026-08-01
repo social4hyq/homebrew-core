@@ -4,11 +4,11 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.10.tar.gz"
   sha256 "3df0c573473d3492990bdeb69e6653eaab485394f95ad1c1a897329f4209f430"
   license "MIT"
-  revision 1
+  revision 2
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
   # HTML page fetch), while api.github.com answers fast — same JSON strategy
-  # as ohos-opencode@2.
+  # as opencode@2.
   livecheck do
     url "https://api.github.com/repos/anomalyco/opencode/releases/latest"
     strategy :json do |json|
@@ -17,9 +17,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.10-r5"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e6b86ae20fdf5f3a1e8977360a32375002c902a34590171a350a6c63e0f5898"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.10-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e30df1cb53a94872dd16c8dfed038b0c2f435880557cdb77bc677914cda7a2b"
   end
 
   # opencode is a `bun build --compile` single binary: OHOS bun runtime + JS
@@ -28,7 +27,8 @@ class Opencode < Formula
   # dependency and no LD_PRELOAD wrapper (see below).
   #
   # Native deps come from @ohos-ports/* npm packages via package.json override
-  # aliases (see Patches/ohos-opencode/ohos-ports-deps.patch): opentui-core
+  # aliases (formerly Patches/ohos-opencode/ohos-ports-deps.patch, converted to
+  # inreplace): opentui-core
   # (bundled musl libopentui.so via file-loader import, 0.4.5-patch.1+), bun-pty,
   # lightningcss, tailwindcss-oxide. bun signs extracted .node/.so in-process
   # during `bun install`, and `bun build --compile` re-signs its output ELF
@@ -51,8 +51,6 @@ class Opencode < Formula
   # .patch files. The "reuse musl slot" strategy hijacks the existing
   # linux-arm64-musl target entry instead of adding a new one. Two filter
   # checks must be modified: the os/platform guard AND the abi guard.
-  # (web-open-try-catch.patch → inreplace 2026-07-31;
-  #  build-ohos-target.patch → inreplace 2026-07-31.)
   # Version bumps only need url + sha256 + bottle root_url.
   # See social4hyq/ohos-opencode dev for the canonical diff these mirror
   # (fork-diff invariant).
@@ -67,43 +65,36 @@ class Opencode < Formula
 
     # Workspace packages not needed for the CLI build (drops electron etc. from
     # the install set entirely).
-    rm_r("packages/desktop")
-    rm_r("packages/web")
-    rm_r("packages/docs")
-    rm_r("packages/storybook")
+    rm_r %w[packages/desktop packages/web packages/docs packages/storybook]
 
     # Redirect native deps to the @ohos-ports/* musl builds (replaces
     # ohos-ports-deps.patch). Pure string/array edits, version-independent.
-    # Append the @ohos-ports/* entries to bunfig.toml's excludes array.
-    inreplace "bunfig.toml",
-      '"@opentui/core-win32-x64", ',
-      '"@opentui/core-win32-x64", ' \
-      '"@ohos-ports/opentui-core", "@ohos-ports/bun-pty", ' \
-      '"@ohos-ports/lightningcss", "@ohos-ports/tailwindcss-oxide", '
+    # bun-pty/lightningcss/@tailwindcss/oxide/@parcel/watcher have no upstream
+    # override entry, so they are added right after the @opentui/core override
+    # this same replacement writes — no assumption about upstream's overrides
+    # key ordering. The nil check makes a vanished anchor fail loudly instead
+    # of silently shipping an unpatched package.json.
     inreplace "package.json" do |s|
-      s.gsub! '"@opentui/core": "catalog:",',
-              '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.5-patch.1",'
-      # bun-pty/lightningcss/@tailwindcss/oxide have no upstream override
-      # entry, so add them after @types/node (last key in overrides).
-      node_old = %Q(    "@types/node": "catalog:"\n  },)
-      node_new = [
-        '    "@types/node": "catalog:",',
+      overrides = [
+        '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.5-patch.1",',
         '    "bun-pty": "npm:@ohos-ports/bun-pty@0.4.10",',
         '    "lightningcss": "npm:@ohos-ports/lightningcss@1.32.0",',
         '    "@tailwindcss/oxide": "npm:@ohos-ports/tailwindcss-oxide@4.3.1",',
         '    "@parcel/watcher-linux-arm64-musl": "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1",',
-        '    "@parcel/watcher-openharmony-arm64": "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1"',
-        "  },",
-      ].join("\n")
-      s.gsub!(node_old, node_new)
+        '    "@parcel/watcher-openharmony-arm64": "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1",',
+      ]
+      s.gsub!('"@opentui/core": "catalog:",', overrides.join("\n")) ||
+        odie("opencode: @opentui/core override anchor not found in package.json")
     end
 
     # Project global dir: use $HOME instead of filesystem root when no git repo
     # is found (replaces project-global-worktree.patch). on openharmony the root
     # path is read-only, so a "global" project lands in the home dir.
     inreplace "packages/core/src/project.ts" do |s|
-      s.sub! 'import path from "path"', "import os from \"os\"\nimport path from \"path\""
-      s.sub! "path.parse(input).root", "os.homedir()"
+      s.sub!('import path from "path"', "import os from \"os\"\nimport path from \"path\"") ||
+        odie("opencode: project.ts import anchor not found")
+      s.sub!("path.parse(input).root", "os.homedir()") ||
+        odie("opencode: project.ts path.parse anchor not found")
     end
     inreplace "packages/opencode/src/project/project.ts",
       "data.id === ProjectV2.ID.make(\"global\") && !data.vcs ? \"/\" : data.directory",
@@ -129,7 +120,7 @@ class Opencode < Formula
       'if (process.platform === "linux" || process.platform === "openharmony") return "inotify"'
 
     # Inject openharmony os markers into bun.lock — replaces the old
-    # bun-lock-openharmony-os.patch (codex.rb pattern: inreplace instead of a
+    # bun-lock-openharmony-os.patch (inreplace instead of a
     # .patch for a generated file). Version-independent; see note above.
     lockfile = (buildpath/"bun.lock").read
     # Upstream marks every *-openharmony-arm64 native binding definition as
@@ -154,26 +145,33 @@ class Opencode < Formula
     #   2. abi check: keep musl target on OHOS in single-flag mode
     #   3. compile target: use bun-linux-arm64-ohos for musl on OHOS
     inreplace "packages/opencode/script/build.ts" do |s|
-      # V1 filter checks item.os !== process.platform first — linux-os target
+      # Upstream build.ts checks item.os !== process.platform first — linux-os target
       # would be rejected on OHOS before reaching the abi guard. Allow
       # linux-arm64-musl to pass on OHOS.
-      s.sub! "if (item.os !== process.platform || item.arch !== process.arch) {",
+      s.sub!("if (item.os !== process.platform || item.arch !== process.arch) {",
              "if ((item.os !== process.platform || item.arch !== process.arch) && " \
              "!(process.platform === \"openharmony\" && " \
              "item.os === \"linux\" && item.arch === \"arm64\" && " \
-             "item.abi === \"musl\")) {"
-      s.sub! "if (item.abi !== undefined) {",
+             "item.abi === \"musl\")) {") ||
+        odie("opencode: build.ts os-filter anchor not found")
+      s.sub!("if (item.abi !== undefined) {",
              "if (item.abi !== undefined && " \
              "!(process.platform === \"openharmony\" && " \
-             "item.abi === \"musl\")) {"
-      s.sub! "target: name.replace(pkg.name, \"bun\") as any,",
+             "item.abi === \"musl\")) {") ||
+        odie("opencode: build.ts abi-filter anchor not found")
+      s.sub!("target: name.replace(pkg.name, \"bun\") as any,",
              "target: (process.platform === \"openharmony\" && " \
              "item.abi === \"musl\" ? \"bun-linux-arm64-ohos\" : " \
-             "name.replace(pkg.name, \"bun\")) as any,"
+             "name.replace(pkg.name, \"bun\")) as any,") ||
+        odie("opencode: build.ts compile-target anchor not found")
     end
-    # Allow freshly-published @ohos-ports/* packages (npm anti-typosquatting
-    # minimum-release-age policy blocks packages < 3 days old by default).
-    (buildpath/"bunfig.toml").atomic_write("[install]\nminimumReleaseAgeMs = 0\n")
+    # Disable upstream's npm anti-typosquatting minimum-release-age policy: it
+    # blocks freshly-published @ohos-ports/* packages (< 3 days old). Removing
+    # the key restores bun's default (null = disabled). inreplace raises if
+    # upstream rewords or drops the line, so a version bump can't silently
+    # re-enable the policy. (bun has no "minimumReleaseAgeMs" key — an unknown
+    # bunfig key is silently ignored, verified on bun 1.4.0.)
+    inreplace "bunfig.toml", "minimumReleaseAge = 259200\n", ""
     system "bun", "install", "--ignore-scripts"
 
     # Script.version short-circuits on OPENCODE_VERSION (no git / registry
@@ -217,8 +215,7 @@ class Opencode < Formula
     # The launcher wrapper remains only to default TMPDIR to a writable EL2
     # path (OHOS /tmp is read-only in app contexts); override via
     # OPENCODE_TMPDIR. Self-reference via opt_libexec (not libexec) so the
-    # baked path stays stable across the HOMEBREW_CELLAR flat/nested flip
-    # (wrapper conventions: README "CLI wrapper 约定").
+    # baked path stays stable across the HOMEBREW_CELLAR flat/nested flip.
     mkdir_p libexec/"bin"
     libexec.install out => "bin/opencode"
     (bin/"opencode").write <<~SH
