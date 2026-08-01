@@ -1,4 +1,4 @@
-class OpencodeAT2 < Formula
+class OpencodeShimAT2 < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64 (v2 preview, prebuilt)"
   homepage "https://github.com/anomalyco/opencode"
   # v2's prebuilt platform binary (@opencode-ai/cli-linux-arm64-musl) has not
@@ -16,7 +16,7 @@ class OpencodeAT2 < Formula
   # opencode v2's official prebuilt linux-arm64-musl single binary (Bun
   # --compile, bin name changed from `opencode` to `opencode2`). Bypasses the
   # @opencode-ai/cli npm JS wrapper. Same musl-ABI-compatible-with-OHOS
-  # premise as opencode.rb (v1) — verified: readelf -d on the extracted
+  # premise as opencode-shim.rb (v1) — verified: readelf -d on the extracted
   # binary shows the identical NEEDED set (libstdc++.so.6,
   # libc.musl-aarch64.so.1, libgcc_s.so.1), no RUNPATH, no .codesign section,
   # so v1's whole treatment (RUNPATH injection + bundled musl GCC runtime +
@@ -28,8 +28,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-next-16620-r2"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "d7e7bdbbef623e8afa6a9112fe8b6b0b6372a4e7381c365d414c2d09d3c9fe9e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim@2-v0.0.0-next-16620-r1"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "a54cfc59a57a0bf5353853180802d000b123add74e89d5ae4da2110eaceb8e37"
   end
 
   # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
@@ -67,7 +67,7 @@ class OpencodeAT2 < Formula
     # builder to remember the env dance (build.sh's UNSET_SIGN_FORMULAS is
     # the CI-side half of this same guard).
     if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
-      odie "opencode@2 must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
+      odie "opencode-shim@2 must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
            "(env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN brew install ...): the " \
            "binary-sign-tool pass double-signs and corrupts this prebuilt binary"
     end
@@ -112,14 +112,14 @@ class OpencodeAT2 < Formula
     # libdir/libexec (Cellar-relative) — opt/<name> is always
     # HOMEBREW_PREFIX-relative and Homebrew re-links it correctly on every
     # install, so it stays stable across the HOMEBREW_CELLAR flat/nested flip
-    # (see opencode.rb's r1 history for why that distinction matters).
+    # (see opencode-shim.rb's r1 history for why that distinction matters).
     system formula_opt_bin("inject-runpath")/"inject-runpath", src.to_s, (opt_libexec/"lib").to_s
 
     # Self-sign the patched binary.
     system sign, src.to_s
     mkdir_p libexec/"bin"
-    libexec.install src => "bin/opencode2"
-    chmod 0755, libexec/"bin/opencode2"
+    libexec.install src => "bin/opencode-shim2"
+    chmod 0755, libexec/"bin/opencode-shim2"
 
     # Self-reference via opt_libexec (see RUNPATH comment above) rather than
     # libexec, for the same portability reason.
@@ -127,24 +127,24 @@ class OpencodeAT2 < Formula
     # XDG_DATA_HOME is isolated for the same reason as ohos-opencode@2: v2
     # must not share ~/.local/share/opencode/opencode.db with ohos-opencode
     # (v1) — v2's migrations break v1's session creation.
-    (bin/"opencode2").write <<~SH
+    (bin/"opencode-shim2").write <<~SH
       #!/bin/sh
       export LD_PRELOAD="#{formula_opt_lib("dlopen-sign-shim")}/libdlopen_sign_shim.so:#{formula_opt_lib("ohos-compat-shim")}/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
       export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
       export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share-v2}"
-      exec "#{opt_libexec}/bin/opencode2" "$@"
+      exec "#{opt_libexec}/bin/opencode-shim2" "$@"
     SH
-    chmod 0755, bin/"opencode2"
+    chmod 0755, bin/"opencode-shim2"
   end
 
   def caveats
     <<~EOS
-      opencode2 (v2 preview, prebuilt) is ready. Configure a provider, e.g.:
-        opencode2 auth
+      opencode-shim2 (v2 preview, prebuilt) is ready. Configure a provider, e.g.:
+        opencode-shim2 auth
 
       This is the "next" channel preview of opencode v2 — expect frequent,
-      unannounced breaking changes upstream. It installs alongside `opencode`
-      (v1, stable) without conflict: different binary name (opencode2), no
+      unannounced breaking changes upstream. It installs alongside `opencode-shim`
+      (v1, stable) without conflict: different binary name (opencode-shim2), no
       shared files.
 
       This build bundles musl libstdc++/libgcc_s (Alpine) and injects a
@@ -154,6 +154,6 @@ class OpencodeAT2 < Formula
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/opencode2 --version 2>&1")
+    assert_match version.to_s, shell_output("#{bin}/opencode-shim2 --version 2>&1")
   end
 end

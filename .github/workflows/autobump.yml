@@ -15,7 +15,7 @@ name: autobump
 # grok-build; install() logic is version-independent packaging that a
 # version bump never touches. opencode-shim is the prebuilt-binary formula
 # (Formula/o/opencode-shim.rb) — NOT ohos-opencode or ohos-opencode@2, the
-# from-source formulae. opencode@2 (v2 preview prebuilt) is the same
+# from-source formulae. opencode-shim@2 (v2 preview prebuilt) is the same
 # version-embedded-URL pattern as opencode-shim and grok-build — though its
 # 0.0.0-next-* rolling versions mean a weekly bump PR whenever upstream
 # publishes a new next build, which is expected (keeps the v2 preview
@@ -56,7 +56,7 @@ permissions:
   pull-requests: write
 
 env:
-  ALLOWLIST: "opencode-shim grok-build claude-code ohos-opencode ohos-opencode@2 opencode@2"
+  ALLOWLIST: "opencode-shim grok-build claude-code ohos-opencode ohos-opencode@2 opencode-shim@2"
   IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
