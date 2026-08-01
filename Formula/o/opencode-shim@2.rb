@@ -8,11 +8,10 @@ class OpencodeShimAT2 < Formula
   # registry.npmjs.org directly, same as the SIGILL-on-large-GET reason
   # documented for claude-code/codex (only affects local machine curl, not
   # bottle distribution or the CI runner that builds it).
-  url "https://registry.npmjs.org/@opencode-ai/cli-linux-arm64-musl/-/cli-linux-arm64-musl-0.0.0-next-16620.tgz"
-  version "0.0.0-next-16620"
-  sha256 "9c2a36824288e88ad65115ce268209b75f4219413b70ad0430624ce69fc1e7ee"
+  url "https://registry.npmjs.org/@opencode-ai/cli-linux-arm64-musl/-/cli-linux-arm64-musl-0.0.0-next-16650.tgz"
+  version "0.0.0-next-16650"
+  sha256 "3235834476a10d2c75f00593fb506f956fbce2869bac9324afba554a32557452"
   license "MIT"
-  revision 1
   # opencode v2's official prebuilt linux-arm64-musl single binary (Bun
   # --compile, bin name changed from `opencode` to `opencode2`). Bypasses the
   # @opencode-ai/cli npm JS wrapper. Same musl-ABI-compatible-with-OHOS
