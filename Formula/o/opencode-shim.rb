@@ -1,4 +1,4 @@
-class Opencode < Formula
+class OpencodeShim < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64 (prebuilt musl binary)"
   homepage "https://github.com/anomalyco/opencode"
   url "https://registry.npmmirror.com/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-1.18.10.tgz"
@@ -99,7 +99,7 @@ class Opencode < Formula
     # r4 note above) — enforce here instead of relying on the builder to
     # remember the env dance.
     if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
-      odie "opencode must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
+      odie "opencode-shim must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
            "(env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN brew install ...): the " \
            "binary-sign-tool pass double-signs and corrupts this prebuilt binary"
     end
@@ -141,7 +141,7 @@ class Opencode < Formula
 
     # Inject DT_RUNPATH (in-place, zero offset shift) → libexec/lib.
     # Uses $ORIGIN/../lib (relative to the binary directory) instead of an
-    # absolute path. The binary is at libexec/bin/opencode, the bundled GCC
+    # absolute path. The binary is at libexec/bin/opencode-shim, the bundled GCC
     # runtime libs are at libexec/lib/ — $ORIGIN/../lib resolves correctly
     # regardless of install prefix, surviving both the HOMEBREW_CELLAR flip
     # and differing HOMEBREW_PREFIX across machines. Together with the runtime
@@ -152,8 +152,8 @@ class Opencode < Formula
     # Self-sign the patched binary.
     system sign, src.to_s
     mkdir_p libexec/"bin"
-    libexec.install src => "bin/opencode"
-    chmod 0755, libexec/"bin/opencode"
+    libexec.install src => "bin/opencode-shim"
+    chmod 0755, libexec/"bin/opencode-shim"
 
     # Wrapper resolves all paths at runtime via $HOMEBREW_PREFIX — no build-time
     # Ruby path interpolation (see claude-code.rb for the same pattern). This
@@ -161,21 +161,21 @@ class Opencode < Formula
     # lets `brew bottle` mark the bottle :any_skip_relocation (r1-r4 used
     # opt_libexec / formula_opt_lib interpolation, which left absolute prefix
     # strings in the wrapper → keg_contain?(prefix) → relocatable=false).
-    (bin/"opencode").write <<~SH
+    (bin/"opencode-shim").write <<~SH
       #!/bin/sh
-      : "${HOMEBREW_PREFIX:?opencode: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
+      : "${HOMEBREW_PREFIX:?opencode-shim: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
       HB="$HOMEBREW_PREFIX"
       export LD_PRELOAD="$HB/opt/dlopen-sign-shim/lib/libdlopen_sign_shim.so:$HB/opt/ohos-compat-shim/lib/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
       export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
-      exec "$HB/opt/opencode/libexec/bin/opencode" "$@"
+      exec "$HB/opt/opencode-shim/libexec/bin/opencode-shim" "$@"
     SH
-    chmod 0755, bin/"opencode"
+    chmod 0755, bin/"opencode-shim"
   end
 
   def caveats
     <<~EOS
-      opencode (prebuilt) is ready. Configure a provider, e.g.:
-        opencode auth
+      opencode-shim (prebuilt) is ready. Configure a provider, e.g.:
+        opencode-shim auth
 
       This build bundles musl libstdc++/libgcc_s (Alpine) and injects a
       DT_RUNPATH at them, since OHOS lacks the GCC runtime. It also preloads
@@ -184,6 +184,6 @@ class Opencode < Formula
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/opencode --version 2>&1")
+    assert_match version.to_s, shell_output("#{bin}/opencode-shim --version 2>&1")
   end
 end
