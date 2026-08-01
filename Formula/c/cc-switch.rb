@@ -36,9 +36,8 @@ class CcSwitch < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/cc-switch-v5.9.2-r3"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7af661dac3e5ab46a1df3ef950cc7a6e78845cd99f5efb51cc7d0ed9901a204"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/cc-switch-v5.9.2-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d3bd7e35e52425ac04ba16519a890b7ca59802adefffbc4c83abe927cff6cce"
   end
 
   depends_on "ohos-bst-light" => :build
