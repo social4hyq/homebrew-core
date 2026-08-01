@@ -28,8 +28,9 @@ class OpencodeShimAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim@2-v0.0.0-next-16620-r1"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "a54cfc59a57a0bf5353853180802d000b123add74e89d5ae4da2110eaceb8e37"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim@2-v0.0.0-next-16620-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6fbd243541861febe7f15b938e53d9f4a166375be0ed106e027990838b253545"
   end
 
   # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
@@ -108,12 +109,13 @@ class OpencodeShimAT2 < Formula
     ln_sf "libstdc++.so.6.0.34", libdir/"libstdc++.so.6"
 
     # Inject DT_RUNPATH (in-place, zero offset shift) → libexec/lib.
-    # RUNPATH points at opt_libexec/lib (prefix-relative, stable), not
-    # libdir/libexec (Cellar-relative) — opt/<name> is always
-    # HOMEBREW_PREFIX-relative and Homebrew re-links it correctly on every
-    # install, so it stays stable across the HOMEBREW_CELLAR flat/nested flip
-    # (see opencode-shim.rb's r1 history for why that distinction matters).
-    system formula_opt_bin("inject-runpath")/"inject-runpath", src.to_s, (opt_libexec/"lib").to_s
+    # Uses $ORIGIN/../lib (relative to the binary directory), same as
+    # opencode-shim.rb: resolves regardless of install prefix (surviving the
+    # HOMEBREW_CELLAR flip), and — unlike an opt_libexec-absolute RUNPATH —
+    # works during build, when the opt/ symlink does not exist yet (the
+    # completion generation below runs the libexec binary directly; with an
+    # opt-shaped RUNPATH it fails to load libstdc++.so.6 at that point).
+    system formula_opt_bin("inject-runpath")/"inject-runpath", src.to_s, "$ORIGIN/../lib"
 
     # Self-sign the patched binary.
     system sign, src.to_s
@@ -135,6 +137,19 @@ class OpencodeShimAT2 < Formula
       exec "#{opt_libexec}/bin/opencode-shim2" "$@"
     SH
     chmod 0755, bin/"opencode-shim2"
+
+    # Shell completions from the binary itself (effect CLI built-in
+    # `--completions bash|zsh|fish`, same as opencode@2.rb). The scripts bake
+    # the upstream CLI name (opencode2 — compile-time, $0-independent), so
+    # rewrite it to the installed command name; otherwise zsh compinit binds
+    # via the #compdef line and bash/fish register for `opencode2` instead of
+    # `opencode-shim2`.
+    generate_completions_from_executable(libexec/"bin/opencode-shim2", "--completions",
+                                         base_name: "opencode-shim2")
+    inreplace [bash_completion/"opencode-shim2",
+               zsh_completion/"_opencode-shim2",
+               fish_completion/"opencode-shim2.fish"],
+              "opencode2", "opencode-shim2"
   end
 
   def caveats
