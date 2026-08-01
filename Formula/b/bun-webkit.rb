@@ -2,10 +2,9 @@ class BunWebkit < Formula
   desc "JavaScriptCore/WTF/bmalloc static archives for Bun"
   homepage "https://github.com/oven-sh/bun"
   url "https://github.com/oven-sh/WebKit.git",
-      revision: "549170099226f816a4b204ea1d8fa102fb79eefa"
-  version "5491700992"
+      revision: "34c01d13391e00c06862a3d2c5b7fff350ac87e0"
+  version "34c01d1339"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
-  revision 1
   # This formula is fully rewritten from upstream because it builds only the
   # JavaScriptCore/WTF/bmalloc static archives from oven-sh/WebKit, pinned to
   # bun's WEBKIT_VERSION. Upstream does not package WebKit this way.
@@ -18,8 +17,8 @@ class BunWebkit < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-webkit-v5491700992-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d77fff2cf3c2c402e96bb8d38d817811a4875e3b9d2ddf3c969928cf2784cdd"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-webkit-v34c01d1339-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "36b6abbc98949e25d7ecf4c0c2c73103821ffb0b37874593a7de5aa9d243fa5c"
   end
 
   keg_only "webkit static archives are consumed in-tree by Bun, not linked system-wide"
