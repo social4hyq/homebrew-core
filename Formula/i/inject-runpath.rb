@@ -18,8 +18,8 @@ class InjectRunpath < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/inject-runpath-v0.2.0-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a9f171f8f0e1ee3fe2558ec8f1a4b378383575851be063956daaf96cbaf5c5c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/inject-runpath-v0.2.0-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07db40188d8e1af6b8f30b373bfd70aabdc928f6c0396654cabc1596285dc26f"
   end
 
   # Why this exists instead of patchelf: single-file executables built by
