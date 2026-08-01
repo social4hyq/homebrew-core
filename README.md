@@ -44,7 +44,7 @@ grok --version
 cc-switch --version
 ```
 
-zsh 补全（`opencode` / `opencode2` / `grok` / `cc-switch`）随 bottle 装入 `share/zsh/site-functions/`，brew 的 zsh 环境开箱即用。
+shell 补全随 bottle 装入，开箱即用。以生成式为主（`generate_completions_from_executable`，跟随二进制不漂移）：`opencode2` / `opencode-shim2` / `grok` / `cc-switch` 三 shell（bash/zsh/fish）齐全；`bun` 装源码树自带的静态三 shell 补全（同官方 formula）；`opencode` / `opencode-shim` 的上游生成器（yargs）只产 bash 脚本，故 bash 用生成的、zsh 另有手写补全（仅 `opencode`）、fish 无。
 
 ## Formulae
 
