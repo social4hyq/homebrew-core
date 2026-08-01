@@ -5,6 +5,7 @@ class BunBootstrap < Formula
   version "1.4.0-5467a689"
   sha256 "7c1f187907eba7090c60e14dc1bc474fd62ec5b6273cc44c571cf18d35305a2b"
   license "MIT"
+  revision 1
 
   # Prebuilt tarball, hosted as a release asset of this repo (not committed to git).
   # Bootstrap chain: use this bun to run `bun bd` to compile the target bun.
@@ -19,11 +20,11 @@ class BunBootstrap < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "463b5efa40e04405914ae629e2762e6710defeeaae73bd6cdcc3d3892cb4d82a"
   end
 
-  # Prebuilt binary, no source build step; only referenced by bun/bun-canary at build time, not at runtime.
+  # Prebuilt binary, no source build step; only referenced by the bun formula at build time, not at runtime.
   keg_only "bootstrap only; not for direct use"
 
   def install
-    # Tarball contains bun already signed by binary-sign-tool (via bun.rb r16 install block).
+    # Tarball contains bun already signed by binary-sign-tool (signed at build time — see bun.rb's install).
     # No strip+resign needed here.
     libexec.install Dir["*"]
     bin.install_symlink libexec/"bun" => "bun"
