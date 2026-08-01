@@ -18,8 +18,9 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r43"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "206103ce06e0c7b2e852452561d4aa0f8950a71d5a47c230818324762009341a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r44"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a816ac6f32e47cf81fb425b2c4bde12255e32b106a3abc6cb0345b3d8a952889"
   end
 
   # ── Dependencies (bare names except icu4c@78 — the one name harmonybrew/core
@@ -281,6 +282,12 @@ class Bun < Formula
     chmod 0755, libexec/"bin/bun"
     bin.mkpath
     (bin/"bun").make_symlink "../libexec/bin/bun"
+
+    # Static shell completions shipped in the source tree (same as the
+    # official homebrew-core bun formula).
+    bash_completion.install "completions/bun.bash" => "bun"
+    fish_completion.install "completions/bun.fish"
+    zsh_completion.install "completions/bun.zsh" => "_bun"
   end
 
   def post_install
