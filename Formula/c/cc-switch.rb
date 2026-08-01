@@ -4,8 +4,7 @@ class CcSwitch < Formula
   url "https://github.com/SaladDay/cc-switch-cli/releases/download/v5.9.2/cc-switch-cli-v5.9.2-linux-arm64-musl.tar.gz"
   sha256 "2a94b345dd19dd63d1f1c9069e511aa6e0e09381c6ddb209e699a939becec9e2"
   license "MIT"
-  revision 1
-  revision 1
+  revision 2
   # Official linux-arm64-musl release asset (Rust, fully static aarch64 ELF —
   # no INTERP/DYNAMIC segment per readelf -l). Named cc-switch, not
   # cc-switch-cli: official homebrew/core already ships a cc-switch-cli
@@ -37,9 +36,8 @@ class CcSwitch < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/cc-switch-v5.9.2-r3"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7af661dac3e5ab46a1df3ef950cc7a6e78845cd99f5efb51cc7d0ed9901a204"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/cc-switch-v5.9.2-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d3bd7e35e52425ac04ba16519a890b7ca59802adefffbc4c83abe927cff6cce"
   end
 
   depends_on "ohos-bst-light" => :build
