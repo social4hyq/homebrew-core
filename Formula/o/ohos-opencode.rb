@@ -4,6 +4,7 @@ class OhosOpencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.10.tar.gz"
   sha256 "3df0c573473d3492990bdeb69e6653eaab485394f95ad1c1a897329f4209f430"
   license "MIT"
+  revision 1
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
   # HTML page fetch), while api.github.com answers fast — same JSON strategy
@@ -16,8 +17,8 @@ class OhosOpencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.10-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fc564032ecfe0b6644b307cb51b0c55ff873583a394cdc3faeab9e3b682d977b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-opencode-v1.18.10-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "de6b15c4b1b472c5baba5e0b9a4944d819a6b6a682bd2d62c2553cefb0ee0b7c"
   end
 
   # opencode is a `bun build --compile` single binary: OHOS bun runtime + JS
@@ -39,8 +40,9 @@ class OhosOpencode < Formula
   # openharmony (no prebuilds) for native bindings the app never loads —
   # opencode uses web-tree-sitter (wasm) at runtime.
   #
-  # @parcel/watcher needs no handling: opencode lazy-loads it with try/catch
-  # and degrades gracefully on openharmony (file watching disabled, no crash).
+  # @parcel/watcher: replaced linux-arm64-musl optional dep with @ohos-ports
+  # pre-signed binary + getBackend() openharmony → inotify patch. File
+  # watching is now functional on OHOS (inotify backend, no watchman).
   depends_on "bun" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
 
@@ -87,7 +89,9 @@ class OhosOpencode < Formula
         '    "@types/node": "catalog:",',
         '    "bun-pty": "npm:@ohos-ports/bun-pty@0.4.10",',
         '    "lightningcss": "npm:@ohos-ports/lightningcss@1.32.0",',
-        '    "@tailwindcss/oxide": "npm:@ohos-ports/tailwindcss-oxide@4.3.1"',
+        '    "@tailwindcss/oxide": "npm:@ohos-ports/tailwindcss-oxide@4.3.1",',
+        '    "@parcel/watcher-linux-arm64-musl": "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1",',
+        '    "@parcel/watcher-openharmony-arm64": "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1"',
         "  },",
       ].join("\n")
       s.gsub!(node_old, node_new)
@@ -114,6 +118,14 @@ class OhosOpencode < Formula
     inreplace "packages/opencode/src/cli/cmd/web.ts",
       "open(displayUrl).catch(() => {})",
       "if (process.platform !== \"openharmony\") open(displayUrl).catch(() => {})"
+
+    # File watcher: add openharmony → inotify backend mapping so getBackend()
+    # returns "inotify" instead of undefined on OHOS (enables native file watching).
+    # Runtime require path is handled by the package.json override above
+    # (@parcel/watcher-openharmony-arm64 → @ohos-ports).
+    inreplace "packages/core/src/filesystem/watcher.ts",
+      'if (process.platform === "linux") return "inotify"',
+      'if (process.platform === "linux" || process.platform === "openharmony") return "inotify"'
 
     # Inject openharmony os markers into bun.lock — replaces the old
     # bun-lock-openharmony-os.patch (codex.rb pattern: inreplace instead of a
@@ -158,6 +170,9 @@ class OhosOpencode < Formula
              "item.abi === \"musl\" ? \"bun-linux-arm64-ohos\" : " \
              "name.replace(pkg.name, \"bun\")) as any,"
     end
+    # Allow freshly-published @ohos-ports/* packages (npm anti-typosquatting
+    # minimum-release-age policy blocks packages < 3 days old by default).
+    (buildpath/"bunfig.toml").atomic_write("[install]\nminimumReleaseAgeMs = 0\n")
     system "bun", "install", "--ignore-scripts"
 
     # Script.version short-circuits on OPENCODE_VERSION (no git / registry
