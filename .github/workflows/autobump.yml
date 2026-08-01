@@ -14,14 +14,15 @@ name: autobump
 # embedded in the URL) is a plain, bump-formula-pr-compatible pattern like
 # grok-build; install() logic is version-independent packaging that a
 # version bump never touches. opencode-shim is the prebuilt-binary formula
-# (Formula/o/opencode-shim.rb) — NOT opencode or ohos-opencode@2, the
+# (Formula/o/opencode-shim.rb) — NOT opencode or opencode@2, the
 # from-source formulae. opencode-shim@2 (v2 preview prebuilt) is the same
 # version-embedded-URL pattern as opencode-shim and grok-build — though its
 # 0.0.0-next-* rolling versions mean a weekly bump PR whenever upstream
 # publishes a new next build, which is expected (keeps the v2 preview
 # current). opencode (formerly ohos-opencode; 2026-07-31: patches converted
 # to inreplace, zero .patch files) is autobumpable — url/version/sha256 are
-# plain bump-formula-pr-compatible edits. ohos-opencode@2 is a git-revision
+# plain bump-formula-pr-compatible edits. opencode@2 (formerly
+# ohos-opencode@2) is a git-revision
 # formula (bun.rb pattern, fixed version "2.0.0-beta", url pins the v2
 # branch HEAD via `revision:`); bump-formula-pr rejects fixed-version bumps,
 # so autobump.sh has a custom bump path for it (updates the revision pin +
@@ -56,7 +57,7 @@ permissions:
   pull-requests: write
 
 env:
-  ALLOWLIST: "opencode-shim grok-build claude-code opencode ohos-opencode@2 opencode-shim@2"
+  ALLOWLIST: "opencode-shim grok-build claude-code opencode opencode@2 opencode-shim@2"
   IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
