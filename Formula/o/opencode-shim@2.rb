@@ -2,16 +2,17 @@ class OpencodeShimAT2 < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64 (v2 preview, prebuilt)"
   homepage "https://github.com/anomalyco/opencode"
   # v2's prebuilt platform binary (@opencode-ai/cli-linux-arm64-musl) has not
-  # synced onto registry.npmmirror.com as of this writing (the scope package
+  # synced onto registry.npmmirror.com as of 2026-07 (the scope package
   # @opencode-ai/cli itself is mirrored; this per-platform subpackage isn't,
   # even after triggering an on-demand sync) — falls back to
   # registry.npmjs.org directly, same as the SIGILL-on-large-GET reason
-  # documented for claude-code/codex (only affects local machine curl, not
+  # documented in claude-code.rb (only affects local machine curl, not
   # bottle distribution or the CI runner that builds it).
   url "https://registry.npmjs.org/@opencode-ai/cli-linux-arm64-musl/-/cli-linux-arm64-musl-0.0.0-next-16650.tgz"
   version "0.0.0-next-16650"
   sha256 "3235834476a10d2c75f00593fb506f956fbce2869bac9324afba554a32557452"
   license "MIT"
+  revision 1
   # opencode v2's official prebuilt linux-arm64-musl single binary (Bun
   # --compile, bin name changed from `opencode` to `opencode2`). Bypasses the
   # @opencode-ai/cli npm JS wrapper. Same musl-ABI-compatible-with-OHOS
@@ -31,19 +32,8 @@ class OpencodeShimAT2 < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "c2060e2fd7d118bef8ae96e54c8e5f73ef3eef49fa371c387984ecc37625e049"
   end
 
-  # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
-  # runtime), which OHOS does NOT ship (OHOS uses libc++). We bundle musl-aarch64
-  # builds of both from Alpine and inject a DT_RUNPATH so the loader finds them.
-  # OHOS ignores LD_LIBRARY_PATH, and LD_PRELOAD cannot satisfy NEEDED entries,
-  # so RUNPATH (which the OHOS musl loader DOES honor) is the only mechanism.
-  # patchelf rewrites segment offsets and corrupts Bun's appended module graph,
-  # so RUNPATH is injected in-place (zero file-offset shift) via the
-  # inject-runpath tool (its own formula in this tap).
-  #
-  # The TUI also extracts its embedded native modules (libopentui.so, *.node,
-  # ...) to a scratch file at runtime and dlopens them. OHOS rejects unsigned
-  # .so with "Permission denied" — dlopen-sign-shim (below) handles this
-  # generically.
+  # Same GCC-runtime bundling + $ORIGIN RUNPATH + dlopen-sign-shim treatment
+  # as opencode-shim.rb — see its header comment for the full rationale.
   depends_on "inject-runpath" => :build
   depends_on "ohos-bst-light" => :build
   depends_on "dlopen-sign-shim"
@@ -60,9 +50,9 @@ class OpencodeShimAT2 < Formula
   end
 
   def install
-    # Guard against the auto-sign pass corrupting this prebuilt binary — see
-    # environment_bottle_binary_sign_breaks_prebuilt: double-signing a
-    # prebuilt ELF makes it exit 139. Enforce here instead of relying on the
+    # Guard against the auto-sign pass corrupting this prebuilt binary —
+    # double-signing a prebuilt ELF corrupts it (exit 139). Enforce here
+    # instead of relying on the
     # builder to remember the env dance (build.sh's UNSET_SIGN_FORMULAS is
     # the CI-side half of this same guard).
     if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
@@ -99,12 +89,14 @@ class OpencodeShimAT2 < Formula
     cp libgcc_dir/"usr/lib/libgcc_s.so.1", libdir/"libgcc_s.so.1"
     real = (libstdcxx_dir/"usr/lib").glob("libstdc++.so.6.0.*").first
     odie "libstdc++.so.6 missing in apk" unless real
-    cp real, libdir/"libstdc++.so.6.0.34"
+    # Keep the apk's own versioned name (follows Alpine bumps automatically);
+    # the libstdc++.so.6 symlink provides the SONAME the binary looks up.
+    cp real, libdir/real.basename
     chmod 0755, libdir/"libgcc_s.so.1"
-    chmod 0755, libdir/"libstdc++.so.6.0.34"
+    chmod 0755, libdir/real.basename
     system sign, (libdir/"libgcc_s.so.1").to_s
-    system sign, (libdir/"libstdc++.so.6.0.34").to_s
-    ln_sf "libstdc++.so.6.0.34", libdir/"libstdc++.so.6"
+    system sign, (libdir/real.basename).to_s
+    ln_sf real.basename, libdir/"libstdc++.so.6"
 
     # Inject DT_RUNPATH (in-place, zero offset shift) → libexec/lib.
     # Uses $ORIGIN/../lib (relative to the binary directory), same as
@@ -121,18 +113,23 @@ class OpencodeShimAT2 < Formula
     libexec.install src => "bin/opencode-shim2"
     chmod 0755, libexec/"bin/opencode-shim2"
 
-    # Self-reference via opt_libexec (see RUNPATH comment above) rather than
-    # libexec, for the same portability reason.
+    # Wrapper resolves all paths at runtime via $HOMEBREW_PREFIX — no build-time
+    # Ruby path interpolation (same as opencode-shim.rb; see claude-code.rb for
+    # the pattern). Baking the build machine's absolute opt/Cellar paths into
+    # the script breaks pouring on machines where HOMEBREW_CELLAR/HOMEBREW_PREFIX
+    # resolve differently, and would contradict :any_skip_relocation.
     #
-    # XDG_DATA_HOME is isolated for the same reason as ohos-opencode@2: v2
-    # must not share ~/.local/share/opencode/opencode.db with ohos-opencode
+    # XDG_DATA_HOME is isolated for the same reason as opencode@2: v2
+    # must not share ~/.local/share/opencode/opencode.db with opencode
     # (v1) — v2's migrations break v1's session creation.
     (bin/"opencode-shim2").write <<~SH
       #!/bin/sh
-      export LD_PRELOAD="#{formula_opt_lib("dlopen-sign-shim")}/libdlopen_sign_shim.so:#{formula_opt_lib("ohos-compat-shim")}/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
+      : "${HOMEBREW_PREFIX:?opencode-shim2: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
+      HB="$HOMEBREW_PREFIX"
+      export LD_PRELOAD="$HB/opt/dlopen-sign-shim/lib/libdlopen_sign_shim.so:$HB/opt/ohos-compat-shim/lib/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
       export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
       export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share-v2}"
-      exec "#{opt_libexec}/bin/opencode-shim2" "$@"
+      exec "$HB/opt/opencode-shim@2/libexec/bin/opencode-shim2" "$@"
     SH
     chmod 0755, bin/"opencode-shim2"
 
@@ -144,10 +141,13 @@ class OpencodeShimAT2 < Formula
     # `opencode-shim2`.
     generate_completions_from_executable(libexec/"bin/opencode-shim2", "--completions",
                                          base_name: "opencode-shim2")
+    # Identifier-anchored rewrite (same rationale as opencode-shim.rb): covers
+    # command name, function names, and begin/end markers, but not prose.
     inreplace [bash_completion/"opencode-shim2",
                zsh_completion/"_opencode-shim2",
-               fish_completion/"opencode-shim2.fish"],
-              "opencode2", "opencode-shim2"
+               fish_completion/"opencode-shim2.fish"] do |s|
+      s.gsub!(/(?<![a-zA-Z0-9.])opencode2(?![a-zA-Z0-9.])/, "opencode-shim2")
+    end
   end
 
   def caveats
