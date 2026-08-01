@@ -4,8 +4,7 @@ class CcSwitch < Formula
   url "https://github.com/SaladDay/cc-switch-cli/releases/download/v5.9.2/cc-switch-cli-v5.9.2-linux-arm64-musl.tar.gz"
   sha256 "2a94b345dd19dd63d1f1c9069e511aa6e0e09381c6ddb209e699a939becec9e2"
   license "MIT"
-  revision 1
-  revision 1
+  revision 2
   # Official linux-arm64-musl release asset (Rust, fully static aarch64 ELF —
   # no INTERP/DYNAMIC segment per readelf -l). Named cc-switch, not
   # cc-switch-cli: official homebrew/core already ships a cc-switch-cli
