@@ -1,15 +1,18 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI — HarmonyOS (runtime-fetch stub; no binary in bottle)"
-  homepage "https://docs.anthropic.com/en/docs/claude-code"
+  # code.claude.com/docs is the current official docs home; docs.anthropic.com
+  # is unreachable from OHOS networks (fails `brew audit --online`).
+  homepage "https://code.claude.com/docs/en/overview"
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.220.tgz"
   sha256 "0498d7967b0f704ed78917b2692366df30e8c0e56d1e4c51f0228f6a558b3a94"
   license :cannot_represent # Anthropic Commercial Terms of Service
+  revision 1
   # Claude Code 2.1.113+ only ships Bun-compiled binaries (linux-arm64-musl,
   # musl ABI compatible with OHOS). The tgz is mirrored on npmmirror (Aliyun
   # CDN): brew's curl 8.21 (OpenSSL 3.6) SIGILLs on bulk TLS GET from the
   # Cloudflare-fronted registry.npmjs.org on OHOS — its aarch64 SIMD AES bulk
-  # decrypt path is trapped by the kernel (verified: HEAD always succeeds, GET
-  # of the ~78MB body always SIGILLs, exit 132); Aliyun's CDN does not. The
+  # decrypt path is trapped by the kernel (verified: HEAD always succeeds,
+  # the tarball body GET always SIGILLs, exit 132); Aliyun's CDN does not. The
   # file is byte-identical on both (sha256 matches), so the wrapper tries
   # npmmirror first and falls back to registry.npmjs.org for non-buggy curl
   # builds or mirror lag on a freshly released version.
@@ -19,7 +22,7 @@ class ClaudeCode < Formula
   # the official binary is fetched at first run, sha256-checked, self-signed
   # and cached. The bottle therefore contains just the wrapper script.
   # That also makes `pour_bottle?` true, which bypasses Homebrew's
-  # DevelopmentTools requirement (formula_installer.rb:574 raises UnbottledError
+  # DevelopmentTools requirement (formula_installer.rb raises UnbottledError
   # when !pour_bottle? && !DevelopmentTools.installed?): claude-code doesn't
   # compile anything, but Homebrew demands a compiler for any bottle-less
   # formula regardless — and OHOS ships no /usr/bin/clang, so users without
@@ -37,7 +40,7 @@ class ClaudeCode < Formula
     # www.npmjs.com (the package *website*, not the registry API) 403s from
     # this environment — confirmed 2026-07-20, different host from the
     # registry.npmjs.org SIGILL issue described above (that one only bites
-    # on the ~120MB tarball GET; this small registry API JSON response is
+    # on the large tarball GET; this small registry API JSON response is
     # unaffected — confirmed reachable from the build container). Same
     # livecheck pattern used elsewhere in this tap for npmmirror-sourced
     # prebuilt-binary formulas.
@@ -46,8 +49,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.220-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b3052e9316a0264626df22cd2fcf48b8a1fb259a8e96a43a6f574b971ae35106"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.220-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2e398a15507686cb1987e1780b46e8ae76a420c7b52835c2c616885ab2d2d6a"
   end
 
   depends_on "ohos-bst-light"
@@ -81,8 +84,8 @@ class ClaudeCode < Formula
           curl -fL "$u" -o "$TMP/pkg.tgz" && { fetched=1; break; }
         done
         [ "$fetched" = 1 ] || { echo "claude-code: download failed from all mirrors" >&2; exit 1; }
-        # Fail closed: this is a runtime-downloaded executable — refusing to
-        # run unverified beats running unverified.
+        # Fail closed: a runtime-downloaded executable that fails checksum
+        # verification must never run.
         command -v sha256sum >/dev/null 2>&1 || {
           echo "claude-code: sha256sum not found; refusing to run an unverified download" >&2
           exit 1
