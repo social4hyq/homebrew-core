@@ -4,16 +4,14 @@ class LlvmAT21 < Formula
   url "https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.8/llvm-project-21.1.8.src.tar.xz"
   sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
   license "Apache-2.0" => { with: "LLVM-exception" }
-  revision 2
+  revision 3
   # This formula is fully rewritten from upstream because HarmonyOS requires an
   # OHOS code-sign patch (CodeSign.cpp in lld/ELF), config.guess stubbing,
   # and two separate runtime builds (compiler-rt + multiarch libc++/libcxxabi/libunwind).
 
-  # llvm@21 is pinned to the 21.x line (keg_only, links against bun's libc++
-  # ABI); the bare `^llvmorg...` regex matched every llvmorg tag and made
-  # livecheck report 21.1.8 ==> 22.1.8 — a version we must never bump to.
-  # Anchor the capture to a 21 prefix so livecheck only tracks 21.x point
-  # releases.
+  # Pinned to the 21.x line to keep the libc++ ABI compatible with bun.
+  # A bare ^llvmorg regex matches every tag and livecheck would propose
+  # 22.x; anchor the capture to 21 so only 21.x point releases are tracked.
   livecheck do
     url :stable
     regex(/^llvmorg[._-]v?(21(?:\.\d+)+)$/i)
@@ -31,10 +29,10 @@ class LlvmAT21 < Formula
   depends_on "cmake"    => :build
   depends_on "ninja"    => :build
   depends_on "python@3.14" => :build
-  depends_on "libxml2"
-  depends_on "ohos-sdk"
   # Runtime dependency: lld links against libxml2/zlib (must be declared explicitly in a keg_only
   # environment, otherwise the loader cannot find the .so).
+  depends_on "libxml2"
+  depends_on "ohos-sdk"
   depends_on "zlib"
   depends_on "zstd"
 
@@ -48,7 +46,8 @@ class LlvmAT21 < Formula
   COMPILERS     = %w[clang clang++].freeze
 
   # Tools borrowed from ohos-sdk (LLVM 15) via relative symlinks.
-  # ELF/DWARF/IR formats stable across LLVM 15-21. See slim-llvm21-bottle design §4.3.
+  # ELF/DWARF/IR formats stable across LLVM 15-21.
+  # See docs/superpowers/specs/2026-06-24-slim-llvm21-bottle-design.md (bin/ symlink list).
   KEEP_TOOLS_FROM_SDK = %w[
     llvm-ar llvm-ranlib llvm-nm llvm-objcopy llvm-objdump
     llvm-readelf llvm-readobj llvm-strip llvm-cxxfilt
@@ -147,14 +146,16 @@ class LlvmAT21 < Formula
     args << "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
     args << "-DCMAKE_C_FLAGS=-D__MUSL__ -fstack-protector-strong " \
             "-no-canonical-prefixes -ffunction-sections -fdata-sections"
-    args << "-DCMAKE_CXX_FLAGS=-D__MUSL__ -std=c++17 -fstack-protector-strong " \
+    args << "-DCMAKE_CXX_FLAGS=-D__MUSL__ -fstack-protector-strong " \
             "-no-canonical-prefixes -ffunction-sections -fdata-sections"
     rpath_flags = "-Wl,-rpath,$ORIGIN/../lib " \
                   "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib " \
                   "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib " \
                   "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zstd/lib"
     args << "-Dzstd_ROOT=#{formula_opt_prefix("zstd")}"
-    args << "-Dzstd_LIBRARY=#{formula_opt_lib("zstd")}/libzstd.so"
+    # Point at the static archive: LLVM_USE_STATIC_ZSTD=ON (above) links zstd
+    # statically; naming the .so here was silently overridden (r2 verification: git history).
+    args << "-Dzstd_LIBRARY=#{formula_opt_lib("zstd")}/libzstd.a"
     common_linker_flags = "-Wl,--code-sign -Wl,--build-id=sha1 " \
                           "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack #{rpath_flags}"
     args << "-DCMAKE_EXE_LINKER_FLAGS=#{common_linker_flags}"
@@ -175,23 +176,24 @@ class LlvmAT21 < Formula
     # Fix cmake 4.x compatibility: cmake 4's if() parser no longer
     # accepts inner parentheses or ${} dereferences.  Remove all of
     # them from the MSVC version-check block (not relevant for OHOS/clang).
+    # One inreplace per pattern so a changed/vanished upstream line raises
+    # here instead of silently no-op'ing (gsub! returns nil on no match).
     ccv = llvmpath/"cmake/modules/CheckCompilerVersion.cmake"
-    s = File.read(ccv)
-    s.gsub!("if ((${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC) AND",
-            "if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC AND")
-    s.gsub!("    (19.24 VERSION_LESS_EQUAL ${CMAKE_CXX_COMPILER_VERSION}) AND",
-            "    19.24 VERSION_LESS_EQUAL CMAKE_CXX_COMPILER_VERSION AND")
-    s.gsub!("    (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 19.25))",
-            "    CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.25)")
-    File.write(ccv, s)
+    inreplace ccv,
+      "if ((${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC) AND",
+      "if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC AND"
+    inreplace ccv,
+      "    (19.24 VERSION_LESS_EQUAL ${CMAKE_CXX_COMPILER_VERSION}) AND",
+      "    19.24 VERSION_LESS_EQUAL CMAKE_CXX_COMPILER_VERSION AND"
+    inreplace ccv,
+      "    (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 19.25))",
+      "    CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.25)"
 
     # Fix cmake 4.x LINKER:--version-script → clang++ doesn't recognise the
-    # bare --version-script flag that cmake 4 produces. Patch to raw -Wl, form.
-    csl = buildpath/"clang/tools/clang-shlib/CMakeLists.txt"
-    s2 = File.read(csl)
-    s2.gsub!("LINKER:--version-script,${CMAKE_CURRENT_BINARY_DIR}/simple_version_script.map",
-             "-Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/simple_version_script.map")
-    File.write(csl, s2)
+    # bare --version-script flag that cmake 4 produces. Patch to the raw -Wl,--version-script form.
+    inreplace buildpath/"clang/tools/clang-shlib/CMakeLists.txt",
+      "LINKER:--version-script,${CMAKE_CURRENT_BINARY_DIR}/simple_version_script.map",
+      "-Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/simple_version_script.map"
 
     mkdir "build" do
       system "cmake", "-G", "Ninja", llvmpath, *args
@@ -260,8 +262,11 @@ class LlvmAT21 < Formula
     %w[aarch64-unknown-linux-ohos aarch64-linux-ohos].each do |pfx|
       COMPILERS.each do |t|
         w = bin/"#{pfx}-#{t}"
-        # LLVM install already creates triple-prefix wrappers; bypass brew's
-        # Pathname#write safety check (refuses overwrite) via File.write.
+        # LLVM install already creates triple-prefix entries (symlinks to clang
+        # that derive the target from argv[0]); replace them with explicit
+        # --target= scripts — argv[0] derivation is fragile for a triple clang
+        # doesn't natively know.
+        # File.write bypasses brew's Pathname#write overwrite refusal (see patch_config_guess).
         File.write(w, <<~SH)
           #!/bin/sh
           exec "$(dirname "$0")/#{t}" --target=#{pfx} "$@"
@@ -345,7 +350,6 @@ class LlvmAT21 < Formula
              "-I#{sysroot}/usr/include -fPIC -fstack-protector-strong " \
              "-funwind-tables -fno-omit-frame-pointer"
     cxxflags_unwind   = "#{cflags} -I#{libcxxabi_inc} -I#{libcxx_ohos} -nostdinc++"
-    cxxflags_runtimes = cflags
 
     cmake_runtime = %W[
       -DCMAKE_SYSTEM_NAME=Linux
@@ -387,7 +391,7 @@ class LlvmAT21 < Formula
              "-DCMAKE_AR=#{ar}",
              "-DCMAKE_RANLIB=#{ranlib}",
              "-DCMAKE_C_FLAGS=#{cflags}",
-             "-DCMAKE_CXX_FLAGS=#{cxxflags_runtimes}",
+             "-DCMAKE_CXX_FLAGS=#{cflags}",
              "-DCMAKE_INSTALL_PREFIX=#{stage}/libcxx",
              "-DLLVM_ENABLE_RUNTIMES=libunwind;libcxxabi;libcxx",
              "-DLIBCXX_ENABLE_SHARED=OFF",
@@ -491,7 +495,6 @@ class LlvmAT21 < Formula
   def link_overlapping_tools
     # Build relative symlinks for binutils/diagnostic tools that downstream
     # cmake find_program / build scripts expect but we don't ship from v21.
-    # Targets are ohos-sdk LLVM 15 (formats stable across LLVM 15-21).
     sdk_bin = formula_opt_prefix("ohos-sdk")/"native/llvm/bin"
     KEEP_TOOLS_FROM_SDK.each do |t|
       src = sdk_bin/t
@@ -507,8 +510,9 @@ class LlvmAT21 < Formula
     # Generate cc/c++ shims in HOMEBREW_PREFIX/bin.
     # --code-sign is now LLD's default (Driver.cpp codeSign defaults ON), so
     # every link is auto-signed — no -Wl,--code-sign flag and no link-phase
-    # gating is needed here. The shim only sets LD_LIBRARY_PATH so lld finds
-    # its libxml2/zlib/libLLVM runtime deps.
+    # gating is needed here.
+    # The shim only sets LD_LIBRARY_PATH so lld finds libxml2 and its own libs
+    # (zlib/zstd are baked into RPATH at build time).
     shims = { "cc" => "clang", "c++" => "clang++" }
     shims.each do |shim_name, target|
       shim_path = HOMEBREW_PREFIX/"bin"/shim_name
