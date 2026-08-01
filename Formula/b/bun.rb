@@ -281,6 +281,12 @@ class Bun < Formula
     chmod 0755, libexec/"bin/bun"
     bin.mkpath
     (bin/"bun").make_symlink "../libexec/bin/bun"
+
+    # Static shell completions shipped in the source tree (same as the
+    # official homebrew-core bun formula).
+    bash_completion.install "completions/bun.bash" => "bun"
+    fish_completion.install "completions/bun.fish"
+    zsh_completion.install "completions/bun.zsh" => "_bun"
   end
 
   def post_install
