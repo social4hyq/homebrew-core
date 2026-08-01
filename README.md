@@ -94,6 +94,17 @@ shell 补全随 bottle 装入，开箱即用。以生成式为主（`generate_co
 | 进程模型 | `vfork` 在 OHOS 不可靠 | `vfork → fork` | spawn 比 Linux 略重，功能无差异 |
 | 平台名 | npm 生态没有 OHOS 概念 | `process.platform === "openharmony"`，`bun install --os=openharmony` 可用 | 三方包若 hard-code `linux` 需手动映射 |
 
+### 问题定位手段
+
+鸿蒙 PC 的安全管控使常规 UNIX-like 调试手段大部分不可用，当前可用路径：
+
+| 手段 | 状态 | 替代/用法 |
+|---|---|---|
+| 进程跟踪（ptrace） | **受限**：HarmonyOS 6.1 下自签名二进制无法持有 ptrace 权限，自编译的 gdb / lldb / strace 均不可用 | lldb 用 ohos-sdk 内置的**证书签名**版本（带 `ohos.permission.kernel.ALLOW_DEBUG` / `DEBUGGER`，`binary-sign-tool display-sign` 可验证）；strace 用本 tap 的 `qemu-aarch64 -strace` 替代（纯用户态拦截转发，非虚拟机，无需 ptrace） |
+| 内核日志 | `dmesg` / `/dev/kmsg` 存在但不向用户开放 | `hilog -t kmsg`；用进程名或安全模块名过滤：`avc`（selinux 拦截）/ `xpm`（验签不通过）/ `hmsecpt`（seccomp 拦截） |
+| proc 文件系统 | 部分开放 | `/proc/self/*` 几乎完全开放，其余路径自行尝试 |
+| 内核打点（ftrace / eBPF） | 不可用 | 需内核支持，当前无替代 |
+
 ### 其他
 
 - **签名按产物来源分四条路径**：bun 内置 `ohos_sign` crate（in-process，零 fork）；`llvm@21` 的 cc/c++ shim（LLD `--code-sign`，链接期）；预编译二进制（claude-code/grok-build/opencode-shim/opencode-shim@2/cc-switch/qemu-aarch64）用 `ohos-bst-light` self-sign；`opencode` / `opencode2` 的 `.codesign` 段由 bun compile 直接产生（bun 内置 `ohos_sign`）；运行时才解包的原生模块由 `dlopen-sign-shim` 兜底。
@@ -105,7 +116,7 @@ shell 补全随 bottle 装入，开箱即用。以生成式为主（`generate_co
 
 ## 核心能力确认
 
-以下能力已在 HarmonyOS aarch64 上验证通过（bun 1.4.0）：
+以下能力已在 HarmonyOS aarch64 上验证通过（bun 1.4.0 r44 / qemu-aarch64 11.0.1）：
 
 | 能力 | 状态 | 说明 |
 |------|------|------|
@@ -113,10 +124,15 @@ shell 补全随 bottle 装入，开箱即用。以生成式为主（`generate_co
 | **Wasm JIT** (BBQ + OMG) | 已启用 | `ENABLE_WEBASSEMBLY_BBQJIT=1`, `ENABLE_WEBASSEMBLY_OMGJIT=1` |
 | **NAPI** (node-gyp) | 100% 通过 | bun 自动配置 `CC=cc CXX=c++ LDFLAGS=-Wl,--code-sign`；需 `brew install llvm@21` |
 | **Workspace 签名** | 已修复 | `bun install` 对 hoisted + isolated linker 的 `.node`/`.so` 均自动签名 |
+| **Syscall 跟踪** | 可用 | `qemu-aarch64 -strace` 实测输出 strace 格式日志（纯用户态，无 ptrace 依赖） |
+| **进程调试 (lldb)** | 可用（限定版本） | ohos-sdk 证书签名版 lldb 可正常工作（自编译 lldb 无 ptrace 权限，见"已知限制"） |
+| **内核日志** | 可用 | `hilog -t kmsg` 可读内核日志（含 avc / xpm / hmsecpt 拦截记录） |
 
 ## 上游
 
-适配的长期目标是推回上游，消除 formula 层 workaround。当前 open：[lightningcss#1264](https://github.com/parcel-bundler/lightningcss/pull/1264)、[@tailwindcss/oxide#20276](https://github.com/tailwindlabs/tailwindcss/pull/20276)。合并并发布后，对应 `@ohos-ports/*` 包会 `npm deprecate`，`opencode` 的依赖 override 切回官方包。
+适配的长期目标是推回上游，消除 formula 层 workaround。当前仍 open（2026-08 未合并）：[lightningcss#1264](https://github.com/parcel-bundler/lightningcss/pull/1264)、[@tailwindcss/oxide#20276](https://github.com/tailwindlabs/tailwindcss/pull/20276)。合并并发布后，对应 `@ohos-ports/*` 包会 `npm deprecate`，`opencode` 的依赖 override 切回官方包。
+
+已有回流成果：`codex` 于 2026-07-23 起由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供，本 tap 的自建 formula 同步下线（见 Formulae 表）。
 
 ## 反馈
 
