@@ -11,14 +11,15 @@ class InjectRunpath < Formula
       revision: "d1fc7a588c1e040b8b34203784669a66731e43e7"
   version "0.2.0"
   license "MIT"
+  revision 1
 
   livecheck do
     skip "development tool, manually versioned"
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/inject-runpath-v0.2.0-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a9f171f8f0e1ee3fe2558ec8f1a4b378383575851be063956daaf96cbaf5c5c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/inject-runpath-v0.2.0-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07db40188d8e1af6b8f30b373bfd70aabdc928f6c0396654cabc1596285dc26f"
   end
 
   # Why this exists instead of patchelf: single-file executables built by
@@ -33,7 +34,8 @@ class InjectRunpath < Formula
   # It matters on OHOS specifically because the loader ignores
   # LD_LIBRARY_PATH and LD_PRELOAD cannot satisfy DT_NEEDED entries:
   # DT_RUNPATH is the only way to point a prebuilt binary at bundled
-  # replacement libraries (see opencode.rb for the original use case).
+  # replacement libraries (used by opencode-shim.rb and opencode-shim@2.rb;
+  # opencode.rb itself no longer needs this since bun r31+).
   depends_on "python@3.14"
 
   def install
