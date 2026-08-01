@@ -6,10 +6,10 @@ class Bun < Formula
   # pre-populated WebKit cache, and a Rust nightly toolchain with -Zbuild-std.
   # All patches are pre-applied on the ohos-aarch64 branch of social4hyq/ohos-bun.
   # Upstream formula cannot accommodate these build requirements.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "d02021af5a49292eb0113bf48c4c0272d2ba69d1", branch: "ohos-aarch64"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "785bb66cfb17bf62269ba5dbff5f3b9ae448bb78", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
-  revision 44
+  revision 45
   # head tracks the same pre-patched fork branch as url — upstream oven-sh/bun
   # main lacks the 50+ OHOS patches and cannot build for HarmonyOS.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "ohos-aarch64"
@@ -71,7 +71,7 @@ class Bun < Formula
 
   # ── OHOS patches are pre-applied on the ohos-aarch64 branch of social4hyq/ohos-bun ──
   # The branch is a linear series of feat/fix(ohos) commits kept in sync with
-  # upstream oven-sh/bun main via merge.
+  # upstream oven-sh/bun main via merge (last: 4968d8a80, upstream f91d5c95c).
   # Vendor patch files (patches/zstd/ohos-qsort-r.patch) are committed directly
   # in the source tree; ninja applies them during the build.
 
