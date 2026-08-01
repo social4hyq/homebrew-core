@@ -100,7 +100,7 @@ shell 补全随 bottle 装入，开箱即用。以生成式为主（`generate_co
 
 | 手段 | 状态 | 替代/用法 |
 |---|---|---|
-| 进程跟踪（ptrace） | **受限**：HarmonyOS 6.1 下自签名二进制无法持有 ptrace 权限，自编译的 gdb / lldb / strace 均不可用 | lldb 用 ohos-sdk 内置的**证书签名**版本（带 `ohos.permission.kernel.ALLOW_DEBUG` / `DEBUGGER`，`binary-sign-tool display-sign` 可验证）；strace 用本 tap 的 `qemu-aarch64 -strace` 替代（纯用户态拦截转发，非虚拟机，无需 ptrace） |
+| 进程跟踪（ptrace） | **受限**：HarmonyOS 6.1 下自签名二进制无法持有 ptrace 权限，自编译的 gdb / lldb / strace 均不可用 | lldb：需要**新版（日构建）ohos-sdk** 内置的证书签名 lldb（带 `ohos.permission.kernel.ALLOW_DEBUG` / `DEBUGGER`，`binary-sign-tool display-sign` 可验证）——⚠️ 本 tap 当前 ohos-sdk 的 lldb（llvm 15.0.4）**尚无该权限**，实测 `run` 报 `'A' packet returned an error: 8`，不可用；strace：用本 tap 的 `qemu-aarch64 -strace` 替代（纯用户态拦截转发，非虚拟机，无需 ptrace，已实测可用） |
 | 内核日志 | `dmesg` / `/dev/kmsg` 存在但不向用户开放 | `hilog -t kmsg`；用进程名或安全模块名过滤：`avc`（selinux 拦截）/ `xpm`（验签不通过）/ `hmsecpt`（seccomp 拦截） |
 | proc 文件系统 | 部分开放 | `/proc/self/*` 几乎完全开放，其余路径自行尝试 |
 | 内核打点（ftrace / eBPF） | 不可用 | 需内核支持，当前无替代 |
@@ -125,7 +125,7 @@ shell 补全随 bottle 装入，开箱即用。以生成式为主（`generate_co
 | **NAPI** (node-gyp) | 100% 通过 | bun 自动配置 `CC=cc CXX=c++ LDFLAGS=-Wl,--code-sign`；需 `brew install llvm@21` |
 | **Workspace 签名** | 已修复 | `bun install` 对 hoisted + isolated linker 的 `.node`/`.so` 均自动签名 |
 | **Syscall 跟踪** | 可用 | `qemu-aarch64 -strace` 实测输出 strace 格式日志（纯用户态，无 ptrace 依赖） |
-| **进程调试 (lldb)** | 可用（限定版本） | ohos-sdk 证书签名版 lldb 可正常工作（自编译 lldb 无 ptrace 权限，见"已知限制"） |
+| **进程调试 (lldb)** | 限新版 ohos-sdk | 日构建 ohos-sdk 的证书签名 lldb 可用；**本 tap 当前 ohos-sdk（llvm 15.0.4）的 lldb 无调试权限，实测无法启动被调试进程**（见"已知限制"） |
 | **内核日志** | 可用 | `hilog -t kmsg` 可读内核日志（含 avc / xpm / hmsecpt 拦截记录） |
 
 ## 上游
