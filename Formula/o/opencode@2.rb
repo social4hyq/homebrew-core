@@ -194,7 +194,13 @@ class OpencodeAT2 < Formula
     # to drift when autobump advances the revision pin. Generate from the
     # libexec binary: the bin/opencode2 wrapper execs opt_libexec, whose
     # opt/ symlink only exists after install.
-    generate_completions_from_executable(libexec/"bin/opencode2", "--completions")
+    # base_name must be the command name, not the formula name: without it
+    # the helper defaults to `name` (opencode@2 — the executable is under
+    # libexec, not bin, so the basename fallback doesn't apply), and bash/fish
+    # completions would be installed under a filename that never matches the
+    # `opencode2` command.
+    generate_completions_from_executable(libexec/"bin/opencode2", "--completions",
+                                         base_name: "opencode2")
   end
 
   test do
