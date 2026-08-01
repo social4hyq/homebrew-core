@@ -4,7 +4,7 @@ class LlvmAT21 < Formula
   url "https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.8/llvm-project-21.1.8.src.tar.xz"
   sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
   license "Apache-2.0" => { with: "LLVM-exception" }
-  revision 3
+  revision 4
   # This formula is fully rewritten from upstream because HarmonyOS requires an
   # OHOS code-sign patch (CodeSign.cpp in lld/ELF), config.guess stubbing,
   # and two separate runtime builds (compiler-rt + multiarch libc++/libcxxabi/libunwind).
@@ -18,10 +18,8 @@ class LlvmAT21 < Formula
   end
 
   bottle do
-    # Validation tap bottle; when merging into official core, change root_url → harmonybrew/homebrew-core releases.
-    # Tag name does not contain @ (avoids GitHub URL encoding causing brew parsing issues).
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm21-v21.1.8-pruned-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "843c1bc74097f3b2b17b99109e14051d88f98d1a9cb6adbb78d35eb0c5ba1f32"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm@21-v21.1.8-r1"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "603f8625e69691ead060413af1b2b05442ef45dcc2ccd5638769817377b97cb9"
   end
 
   keg_only "this is a versioned HarmonyOS bootstrap toolchain"
