@@ -1,9 +1,9 @@
 class GrokBuild < Formula
   desc "XAI Grok coding agent CLI — HarmonyOS aarch64 (prebuilt static binary)"
   homepage "https://github.com/xai-org/grok-build"
-  url "https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-0.2.117-linux-aarch64"
-  version "0.2.117"
-  sha256 "01ed7c8a4088617e1acacc49caa87f8c34daaf6bdbfb7f59e679fa261a8a8c84"
+  url "https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-0.2.118-linux-aarch64"
+  version "0.2.118"
+  sha256 "54010e335aace6b5dedd022539ece7bc83f38253e8636aaf0796562aeecb2e67"
   license "Apache-2.0"
   # Official release artifact, fetched directly (no npm wrapper involved).
   # The install.sh at https://x.ai/cli/install.sh resolves the download to
@@ -36,8 +36,8 @@ class GrokBuild < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/grok-build-v0.2.117-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d24e151d7699373f46fdec3a17e27b86416de7ed45fe7311e4fd1551a3f4e56"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/grok-build-v0.2.118-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "202470ac71e2cdef561a79a0a4170852279fe1e8604cdf0bdcc71fc6706763fa"
   end
 
   depends_on "ohos-bst-light" => :build
