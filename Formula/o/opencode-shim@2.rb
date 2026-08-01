@@ -27,9 +27,8 @@ class OpencodeShimAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim@2-v0.0.0-next-16620-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6fbd243541861febe7f15b938e53d9f4a166375be0ed106e027990838b253545"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim@2-v0.0.0-next-16650-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c2060e2fd7d118bef8ae96e54c8e5f73ef3eef49fa371c387984ecc37625e049"
   end
 
   # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
