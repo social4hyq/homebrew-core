@@ -135,6 +135,19 @@ class OpencodeShimAT2 < Formula
       exec "#{opt_libexec}/bin/opencode-shim2" "$@"
     SH
     chmod 0755, bin/"opencode-shim2"
+
+    # Shell completions from the binary itself (effect CLI built-in
+    # `--completions bash|zsh|fish`, same as opencode@2.rb). The scripts bake
+    # the upstream CLI name (opencode2 — compile-time, $0-independent), so
+    # rewrite it to the installed command name; otherwise zsh compinit binds
+    # via the #compdef line and bash/fish register for `opencode2` instead of
+    # `opencode-shim2`.
+    generate_completions_from_executable(libexec/"bin/opencode-shim2", "--completions",
+                                         base_name: "opencode-shim2")
+    inreplace [bash_completion/"opencode-shim2",
+               zsh_completion/"_opencode-shim2",
+               fish_completion/"opencode-shim2.fish"],
+              "opencode2", "opencode-shim2"
   end
 
   def caveats
