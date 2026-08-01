@@ -15,8 +15,8 @@ class DlopenSignShim < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/dlopen-sign-shim-v0.1.0"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d95ad4fbcff79c20c47a0b10be676c12d6f1df14a4077b758d83622973703cd"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/dlopen-sign-shim-v0.1.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4370880b3e97e64a1ec7efdc1b74943e3198684c678d95406f3be755879dea29"
   end
 
   # Extracted from opencode.rb (originally written for its OpenTUI native
