@@ -7,7 +7,7 @@ class Icu4cAT78 < Formula
   # This formula deviates from upstream because it requires a two-phase cross-compile
   # with OHOS-patched llvm@21 to align libc++ ABI (__h namespace). Upstream uses
   # system clang which produces incompatible ABI symbols.
-  revision 1
+  revision 2
   compatibility_version 1
 
   livecheck do
@@ -15,13 +15,13 @@ class Icu4cAT78 < Formula
     regex(/icu4c[._-](\d+(?:\.\d+)+)[._-]sources/i)
   end
 
-  # Built with the OHOS-patched llvm@21 so ICU's libc++ symbols land in the __1 namespace,
-  # matching the libc++ ABI linked by bun / WebKit (eliminates the stale bottle B9nqe220107 tag).
+  # Built with the OHOS-patched llvm@21 so ICU's libc++ symbols land in the __h namespace,
+  # matching the libc++ ABI linked by bun / WebKit.
   # When merging into official core: icu4c@78 can use system clang; this validation version
   # is only for verifying ABI alignment.
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/icu4c@78-v78.3-r9"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d627cb34ea0417ce696954c40337a48a843e3c0cb02bca413038a06aeb70c90"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/icu4c@78-v78.3-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f60360b1fda13e80fd537b4806a23f8889030ec641eb8311604fd7abae067ff"
   end
 
   keg_only "abi-validation build pinned to llvm@21's libc++; linked in-tree by bun/bun-webkit, not system-wide"
@@ -36,9 +36,6 @@ class Icu4cAT78 < Formula
   # test compiles+links+runs a smoke binary with llvm@21 against the ohos-sdk sysroot,
   # mirroring how bun/bun-webkit consume this formula (static ICU, __h libc++ ABI).
   depends_on "ohos-sdk" => :test
-
-  # bottle: validation version uses build-from-source first. Uncomment when publishing the
-  # bottle and re-build to fill in the sha256.
 
   def install
     odie "Major version bumps need a new formula!" if version.major.to_s != name[/@(\d+)$/, 1]
@@ -117,10 +114,9 @@ class Icu4cAT78 < Formula
       so_name = "libicudata.so.#{ver}"
       so_full = "libicudata.so.#{version}"
 
-      tmpdir = Pathname.new(Dir.mktmpdir("icudata"))
-      begin
+      mktemp do
         system clang, "-shared", "-fPIC",
-               "-o", tmpdir/so_full,
+               "-o", so_full,
                "-Wl,--whole-archive", lib/"libicudata.a",
                "-Wl,--no-whole-archive",
                "-Wl,-soname=#{so_name}",
@@ -128,11 +124,9 @@ class Icu4cAT78 < Formula
                "-Wl,--code-sign",
                "--target=aarch64-linux-ohos"
 
-        lib.install tmpdir/so_full
+        lib.install so_full
         lib.install_symlink so_full => so_name
         lib.install_symlink so_name => "libicudata.so"
-      ensure
-        rm_r(tmpdir) if tmpdir.exist?
       end
     end
   end
@@ -145,8 +139,7 @@ class Icu4cAT78 < Formula
     assert_path_exists lib/"libicudata.a"
     assert_path_exists lib/"libicui18n.a"
     assert_path_exists lib/"libicuuc.a"
-    # The stock libicudata.so is a pure-data ELF rejected by the OHOS loader;
-    # install re-links it from the .a as a real shared library. Assert it landed.
+    # Re-linked by install (stock libicudata.so is a pure-data ELF the OHOS loader rejects).
     assert_path_exists lib/"libicudata.so.#{version}"
 
     (testpath/"icu_smoke.cpp").write <<~CPP
