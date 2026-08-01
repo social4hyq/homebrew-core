@@ -17,9 +17,8 @@ class OpencodeShim < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim-v1.18.10-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d42d731a404cd5032b237910884f0cb8f4ff70c536b5f60990ad8a782182aa1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim-v1.18.10-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "62e71d499847388f44fd82ebe7d85742f5bc76fe932f397faeb8b6e43e02b26b"
   end
 
   # Portability design (r1-r4 archaeology is in git history): the bottle must
