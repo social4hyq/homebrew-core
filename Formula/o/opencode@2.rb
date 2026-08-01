@@ -19,9 +19,9 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba3d7777922e0baaf306a754f81064d359df821f9055d182746e900da36b1916"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r3"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4958ea9245c65735e5561b58a3dd5a0ecb3efb6b7ff90dd27c6c3d783cea3e25"
   end
 
   # opencode2 is a `bun build --compile` single binary: OHOS bun runtime + JS
@@ -194,7 +194,13 @@ class OpencodeAT2 < Formula
     # to drift when autobump advances the revision pin. Generate from the
     # libexec binary: the bin/opencode2 wrapper execs opt_libexec, whose
     # opt/ symlink only exists after install.
-    generate_completions_from_executable(libexec/"bin/opencode2", "--completions")
+    # base_name must be the command name, not the formula name: without it
+    # the helper defaults to `name` (opencode@2 — the executable is under
+    # libexec, not bin, so the basename fallback doesn't apply), and bash/fish
+    # completions would be installed under a filename that never matches the
+    # `opencode2` command.
+    generate_completions_from_executable(libexec/"bin/opencode2", "--completions",
+                                         base_name: "opencode2")
   end
 
   test do
