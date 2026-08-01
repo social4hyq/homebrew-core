@@ -188,76 +188,12 @@ class OpencodeAT2 < Formula
     SH
     chmod 0755, bin/"opencode2"
 
-    # Static zsh completion: upstream has no completion generator. Top-level
-    # commands from packages/cli/src/commands/commands.ts (v2 @ 3b0d8f0).
-    (zsh_completion/"_opencode2").write <<~'ZSH'
-      #compdef opencode2
-
-      _opencode2() {
-        local -a commands
-        commands=(
-          'acp:Start an Agent Client Protocol server'
-          'api:Make a request to the running server'
-          'auth:Manage authentication'
-          'console:Manage OpenCode Console access'
-          'debug:Debugging and troubleshooting tools'
-          'mcp:Manage MCP servers'
-          'migrate:Migrate v1 data to v2'
-          'mini:Start the minimal interactive interface'
-          'plugin:Manage plugins'
-          'run:Run OpenCode with a message'
-          'service:Manage the background server'
-          'pair:Show server pairing information'
-          'serve:Start the v2 API server'
-        )
-        _arguments -C \
-          '(-h --help)'{-h,--help}'[show help]' \
-          '(-v --version)'{-v,--version}'[show version]' \
-          '1:command:->command' \
-          '*::arg:->args'
-        case $state in
-          command)
-            _describe -t commands 'opencode2 command' commands
-            ;;
-          args)
-            case $words[1] in
-              mcp)
-                local -a mcp_cmds
-                mcp_cmds=('list:List MCP servers' 'add:Add an MCP server' 'auth:Authenticate an MCP server' 'logout:Remove MCP auth')
-                _describe -t commands 'mcp command' mcp_cmds
-                ;;
-              service)
-                local -a svc_cmds
-                svc_cmds=('start:Start the server' 'restart:Restart the server' 'status:Show server status' 'stop:Stop the server' 'get:Get config' 'set:Set config' 'unset:Unset config')
-                _describe -t commands 'service command' svc_cmds
-                ;;
-              debug)
-                local -a debug_cmds
-                debug_cmds=('agents:List all agents')
-                _describe -t commands 'debug command' debug_cmds
-                ;;
-              auth)
-                local -a auth_cmds
-                auth_cmds=('connect:Connect to an auth provider')
-                _describe -t commands 'auth command' auth_cmds
-                ;;
-              console)
-                local -a console_cmds
-                console_cmds=('login:Log in to Console')
-                _describe -t commands 'console command' console_cmds
-                ;;
-              plugin)
-                local -a plugin_cmds
-                plugin_cmds=('list:List active plugins')
-                _describe -t commands 'plugin command' plugin_cmds
-                ;;
-            esac
-            ;;
-        esac
-      }
-
-      _opencode2 "$@"
-    ZSH
+    # Shell completions come from the binary itself (effect CLI built-in
+    # `--completions bash|zsh|fish`) — always in sync, no handwritten list
+    # to drift when autobump advances the revision pin. Generate from the
+    # libexec binary: the bin/opencode2 wrapper execs opt_libexec, whose
+    # opt/ symlink only exists after install.
+    generate_completions_from_executable(libexec/"bin/opencode2", "--completions")
   end
 
   test do
