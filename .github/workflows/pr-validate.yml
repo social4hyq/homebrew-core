@@ -46,11 +46,10 @@ concurrency:
 env:
   # Space-separated; heavy formulae are light-checked in PRs but never
   # auto-built here (even post-merge) — publishing them stays a manual
-  # dispatch of bottle-build.yml. Reserved for llvm@21 (~62min, and LLVM's
-  # link peak can exhaust the free runner's RAM/disk). bun-webkit (~14min,
-  # verified to build cleanly unattended) was removed from this list so it
-  # auto-builds like every other formula.
-  HEAVY_FORMULAS: "llvm@21"
+  # dispatch of bottle-build.yml. Currently empty: every formula auto-builds
+  # in PRs like any other (llvm@21's ~62min build is accepted; keep this
+  # mechanism for future outliers).
+  HEAVY_FORMULAS: ""
   IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
