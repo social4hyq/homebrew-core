@@ -13,17 +13,17 @@ brew trust social4hyq/core         # Homebrew 6.0+ 必须显式信任第三方 t
 # 只装 bun：
 brew install bun
 
-# 装 ohos-opencode（上游源码构建的单体二进制，推荐）：
-brew install ohos-opencode
-
-# 或装预编译二进制路线的 opencode：
+# 装 opencode（上游源码构建的单体二进制，推荐）：
 brew install opencode
 
-# opencode v2 预览渠道（next tag，命令名 opencode2，与 opencode/ohos-opencode 并存）：
+# opencode v2 预览渠道（源码构建，命令名 opencode2，与 v1 并存）：
 brew install opencode@2
 
-# 或装 v2 源码构建路线的 ohos-opencode@2（从上游源码 bun build --compile，原生依赖走 @ohos-ports/* npm 包）：
-brew install ohos-opencode@2
+# 或装预编译二进制路线的 opencode-shim（从 npmmirror 拉取官方 musl 单体二进制 + shim 适配）：
+brew install opencode-shim
+
+# 或装 v2 预编译二进制路线的 opencode-shim@2（命令名 opencode-shim2）：
+brew install opencode-shim@2
 
 # 只装 claude-code / grok-build / cc-switch（均从官方渠道拉取二进制 + 自签，依赖均已有 bottle）：
 brew install claude-code
@@ -35,24 +35,25 @@ brew install cc-switch
 
 ```bash
 bun --version && bun -e 'console.log(2**32, Math.PI)'
-ohos-opencode --version
 opencode --version
-ohos-opencode2 --version
+opencode2 --version
+opencode-shim --version
+opencode-shim2 --version
 claude --version
 grok --version
 cc-switch --version
 ```
 
-zsh 补全（`ohos-opencode` / `ohos-opencode2` / `grok` / `cc-switch`）随 bottle 装入 `share/zsh/site-functions/`，brew 的 zsh 环境开箱即用。
+zsh 补全（`opencode` / `opencode2` / `grok` / `cc-switch`）随 bottle 装入 `share/zsh/site-functions/`，brew 的 zsh 环境开箱即用。
 
 ## Formulae
 
 | Formula | 版本 | 定位 |
 |---|---|---|
-| `ohos-opencode` | 1.18.8 | OpenCode AI 编码代理 CLI，**上游源码构建**（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；原生依赖走 `@ohos-ports/*` npm 包。命令名 `ohos-opencode`，与官方 `opencode-ai` npm 包区分 |
-| `opencode` | 1.18.8 | 同一 CLI 的**预编译 musl 二进制**路线（从 npmmirror 拉取 `opencode-linux-arm64-musl`）；注入 RUNPATH 补 Alpine libstdc++/libgcc，wrapper LD_PRELOAD `ohos-compat-shim` + `dlopen-sign-shim` |
-| `opencode@2` | 0.0.0-next-16419 | opencode **v2 预览渠道**（`@opencode-ai/cli` 的 npm `next` dist-tag），预编译二进制路线，与 `opencode`(v1) 处理方式相同；命令名 `opencode2`，与 `opencode`/`ohos-opencode` 并存不冲突；不进 autobump（next 一天多版，钉版本手动升级） |
-| `ohos-opencode@2` | 2.0.0-beta | opencode **v2 源码构建**路线（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；v2 monorepo 重构后 CLI 包从 `packages/opencode` 移至 `packages/cli`，原生依赖精简至 `@ohos-ports/opentui-core` + `@ohos-ports/bun-pty`；命令名 `ohos-opencode2`，与 `opencode@2`（预编译）和 `ohos-opencode`（v1 源码构建）并存 |
+| `opencode` | 1.18.10 | OpenCode AI 编码代理 CLI，**上游源码构建**（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；原生依赖走 `@ohos-ports/*` npm 包。命令名 `opencode`（2026-08-01 前为 `ohos-opencode`） |
+| `opencode@2` | 2.0.0-beta | opencode **v2 源码构建**预览路线（`bun build --compile` 单体二进制，compile target `bun-linux-arm64-ohos`）；v2 monorepo 重构后 CLI 包从 `packages/opencode` 移至 `packages/cli`，原生依赖精简至 `@ohos-ports/opentui-core` + `@ohos-ports/bun-pty`；命令名 `opencode2`，与 v1 并存（2026-08-01 前为 `ohos-opencode@2` / 命令 `ohos-opencode2`） |
+| `opencode-shim` | 1.18.10 | 同一 CLI 的**预编译 musl 二进制**路线（从 npmmirror 拉取 `opencode-linux-arm64-musl`）；注入 RUNPATH 补 Alpine libstdc++/libgcc，wrapper LD_PRELOAD `ohos-compat-shim` + `dlopen-sign-shim`；命令名 `opencode-shim`（2026-08-01 前为 `opencode`） |
+| `opencode-shim@2` | 0.0.0-next-16620 | opencode **v2 预览渠道**（`@opencode-ai/cli` 的 npm `next` dist-tag）的预编译二进制路线，处理方式与 `opencode-shim`(v1) 相同；命令名 `opencode-shim2`（2026-08-01 前为 `opencode@2` / 命令 `opencode2`） |
 | `claude-code` | 2.1.220 | Anthropic Claude Code CLI；**runtime-fetch stub**（Anthropic License 不允许重分发官方二进制），首次运行拉取 + 校验 sha256 + 自签 + 缓存 |
 | `grok-build` | 0.2.112 | xAI Grok Build CLI；完全静态 ELF，仅 `ohos-bst-light` self-sign，无需 shim/RUNPATH；bash/zsh/fish 补全 |
 | `cc-switch` | 5.9.2, revision 1 | AI coding CLI 供应商切换器 + 本地代理（预编译静态 ELF，仅 `ohos-bst-light` self-sign）；主要用于给 codex 桥接 Chat-Completions-only provider（Kimi/DeepSeek 等） |
@@ -62,11 +63,13 @@ zsh 补全（`ohos-opencode` / `ohos-opencode2` / `grok` / `cc-switch`）随 bot
 | `llvm@21` | 21.1.8, revision 2 | OHOS 补丁版 clang + lld + multiarch runtime libs；链接期 LLD `--code-sign` 签名（裁剪版，`keg_only`） |
 | `icu4c@78` | 78.3, revision 1 | Unicode 库，用本仓库 llvm@21 重编以对齐 libc++ ABI（`keg_only`） |
 | `ohos-bst-light` | 1.0.0 | 轻量二进制自签工具，保留 ELF 结构不被破坏；预编译二进制 formula 的 self-sign 都靠它 |
-| `ohos-compat-shim` | 0.2.3 | LD_PRELOAD 兼容垫片：拦截鸿蒙缺失/异常的 syscall（`close_range`/`fchmodat2`/`getpwuid_r`/`tmpfile`/`getcwd`/`linkat`/`symlinkat` 等）；`opencode`/`claude-code` 共用 |
-| `inject-runpath` | 0.1.0 | 就地注入 DT_RUNPATH 到 ELF（零偏移移动），不破坏 Bun 编译产物的追加模块图；预编译二进制 formula（`opencode`/`opencode@2`）的 RUNPATH 注入靠它（`keg_only`） |
+| `ohos-compat-shim` | 0.2.3 | LD_PRELOAD 兼容垫片：拦截鸿蒙缺失/异常的 syscall（`close_range`/`fchmodat2`/`getpwuid_r`/`tmpfile`/`getcwd`/`linkat`/`symlinkat` 等）；`opencode-shim`/`claude-code` 共用 |
+| `inject-runpath` | 0.1.0 | 就地注入 DT_RUNPATH 到 ELF（零偏移移动），不破坏 Bun 编译产物的追加模块图；预编译二进制 formula（`opencode-shim`/`opencode-shim@2`）的 RUNPATH 注入靠它（`keg_only`） |
 | `dlopen-sign-shim` | 0.1.0 | LD_PRELOAD 垫片：`dlopen`/`dlmopen` 前自动 self-sign 未签名 ELF，兜底运行时才解包落盘的原生模块 |
 
 > 已下线：`close-range-shim`（2026-07-15，并入 `ohos-compat-shim`）；`bun-pty` / `lightningcss` / `tailwindcss-oxide`（2026-07-18，`ohos-opencode` 改走 `@ohos-ports/*` npm 包后 formula 失去存在意义）；`codex`（2026-07-23，harmonybrew 官方已原生支持 codex，本 tap 自建 formula 失去存在意义）。
+>
+> 改名（2026-08-01）：`opencode` → `opencode-shim`、`opencode@2` → `opencode-shim@2`（预编译 shim 路线）；`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（源码构建路线，命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
 
 ## Bottle
 
@@ -76,7 +79,7 @@ zsh 补全（`ohos-opencode` / `ohos-opencode2` / `grok` / `cc-switch`）随 bot
 
 ### 系统调用降级
 
-`ohos-compat-shim` 以两种形态生效：`opencode` / `claude-code` 经 wrapper LD_PRELOAD 它；bun（r31+）把它静态内嵌进可执行文件，覆盖所有 `bun build --compile` 产物（含 `ohos-opencode` / `ohos-opencode2`）。使用者一般不用关心，极端场景下能感知到：
+`ohos-compat-shim` 以两种形态生效：`opencode-shim` / `opencode-shim@2` / `claude-code` 经 wrapper LD_PRELOAD 它；bun（r31+）把它静态内嵌进可执行文件，覆盖所有 `bun build --compile` 产物（含 `opencode` / `opencode2`）。使用者一般不用关心，极端场景下能感知到：
 
 | 类别 | 鸿蒙缺什么 | 降级方式 | 用户能感知到的影响 |
 |---|---|---|---|
@@ -87,9 +90,9 @@ zsh 补全（`ohos-opencode` / `ohos-opencode2` / `grok` / `cc-switch`）随 bot
 
 ### 其他
 
-- **签名按产物来源分四条路径**：bun 内置 `ohos_sign` crate（in-process，零 fork）；`llvm@21` 的 cc/c++ shim（LLD `--code-sign`，链接期）；预编译二进制（claude-code/grok-build/opencode/opencode@2/cc-switch）用 `ohos-bst-light` self-sign；`ohos-opencode` / `ohos-opencode2` 的 `.codesign` 段由 bun compile 直接产生（bun 内置 `ohos_sign`）；运行时才解包的原生模块由 `dlopen-sign-shim` 兜底。
+- **签名按产物来源分四条路径**：bun 内置 `ohos_sign` crate（in-process，零 fork）；`llvm@21` 的 cc/c++ shim（LLD `--code-sign`，链接期）；预编译二进制（claude-code/grok-build/opencode-shim/opencode-shim@2/cc-switch）用 `ohos-bst-light` self-sign；`opencode` / `opencode2` 的 `.codesign` 段由 bun compile 直接产生（bun 内置 `ohos_sign`）；运行时才解包的原生模块由 `dlopen-sign-shim` 兜底。
 - `claude-code` 遵循 Anthropic License，不在 bottle 里重分发官方二进制：安装的是 runtime-fetch 包装脚本，首次运行下载、校验 sha256、自签并缓存。
-- `opencode`（prebuilt）动态链接的 GCC 运行时（`libstdc++.so.6`/`libgcc_s.so.1`）OHOS 不自带，靠 Alpine musl 静态资源 + 就地 RUNPATH 注入解决。
+- `opencode-shim` / `opencode-shim@2`（prebuilt）动态链接的 GCC 运行时（`libstdc++.so.6`/`libgcc_s.so.1`）OHOS 不自带，靠 Alpine musl 静态资源 + 就地 RUNPATH 注入解决。
 - WebKit Inspector 走 socket 后端而非 glib 后端（OHOS 没有 GLib）。
 - `icu4c@78` 用本仓库的 `llvm@21` 重编，让 ICU 的 libc++ 符号和 `bun` / `bun-webkit` 用同一个 mangling。
 - bottle 只覆盖 `arm64_ohos`，不提供 macOS / x86_64 等其他平台产物。
@@ -107,7 +110,7 @@ zsh 补全（`ohos-opencode` / `ohos-opencode2` / `grok` / `cc-switch`）随 bot
 
 ## 上游
 
-适配的长期目标是推回上游，消除 formula 层 workaround。当前 open：[lightningcss#1264](https://github.com/parcel-bundler/lightningcss/pull/1264)、[@tailwindcss/oxide#20276](https://github.com/tailwindlabs/tailwindcss/pull/20276)。合并并发布后，对应 `@ohos-ports/*` 包会 `npm deprecate`，`ohos-opencode` 的依赖 override 切回官方包。
+适配的长期目标是推回上游，消除 formula 层 workaround。当前 open：[lightningcss#1264](https://github.com/parcel-bundler/lightningcss/pull/1264)、[@tailwindcss/oxide#20276](https://github.com/tailwindlabs/tailwindcss/pull/20276)。合并并发布后，对应 `@ohos-ports/*` 包会 `npm deprecate`，`opencode` 的依赖 override 切回官方包。
 
 ## 反馈
 
