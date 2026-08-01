@@ -1,8 +1,8 @@
 class StaticWebServer < Formula
   desc "High-performance and asynchronous web server for static files-serving"
   homepage "https://static-web-server.net"
-  url "https://github.com/static-web-server/static-web-server/archive/refs/tags/v2.43.0.tar.gz"
-  sha256 "bc88f3bf22fceab1eb49f8a81277f4d73348849fab7376fb746607e0063f0a73"
+  url "https://github.com/static-web-server/static-web-server/archive/refs/tags/v2.44.0.tar.gz"
+  sha256 "aaaab02eddb488a14f021cc29a169ed7921ef7e0fe7668f38cb281d2d04d190b"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/static-web-server/static-web-server.git", branch: "master"
 
