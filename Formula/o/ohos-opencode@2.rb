@@ -9,7 +9,7 @@ class OhosOpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "56c6add5c3d69e33da95aae48f567899ebe9906e", branch: "v2"
   version "2.0.0-beta"
   license "MIT"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://api.github.com/repos/anomalyco/opencode/commits?sha=v2&per_page=1"
@@ -173,11 +173,18 @@ class OhosOpencodeAT2 < Formula
     # is read-only in app contexts); override via OPENCODE_TMPDIR. Self-reference
     # via opt_libexec (not libexec) so the baked path stays stable across the
     # HOMEBREW_CELLAR flat/nested flip.
+    #
+    # The wrapper also isolates XDG_DATA_HOME: v2 and ohos-opencode (v1)
+    # would otherwise share ~/.local/share/opencode/opencode.db, and v2's
+    # migrations (e.g. event.created NOT NULL) break v1's session creation
+    # ("creating a session failed"). v2 gets its own data root; an
+    # explicitly-set XDG_DATA_HOME is still honored.
     mkdir_p libexec/"bin"
     libexec.install out => "bin/ohos-opencode2"
     (bin/"ohos-opencode2").write <<~SH
       #!/bin/sh
       export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
+      export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share-v2}"
       exec "#{opt_libexec}/bin/ohos-opencode2" "$@"
     SH
     chmod 0755, bin/"ohos-opencode2"
