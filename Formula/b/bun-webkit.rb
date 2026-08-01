@@ -1,20 +1,18 @@
 class BunWebkit < Formula
   desc "JavaScriptCore/WTF/bmalloc static archives for Bun"
   homepage "https://github.com/oven-sh/bun"
-  url "https://gh-proxy.com/https://github.com/oven-sh/WebKit.git",
+  url "https://github.com/oven-sh/WebKit.git",
       revision: "549170099226f816a4b204ea1d8fa102fb79eefa"
   version "5491700992"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
+  revision 1
   # This formula is fully rewritten from upstream because it builds only the
   # JavaScriptCore/WTF/bmalloc static archives from oven-sh/WebKit, pinned to
   # bun's WEBKIT_VERSION. Upstream does not package WebKit this way.
 
-  # WebKit source (oven-sh/WebKit official repo).
-  # commit aligns with WEBKIT_VERSION in bun-src/scripts/build/deps/webkit.ts.
-  # OHOS adaptation is handled by bun-side webkit.ts.patch, no need to modify WebKit source.
-
-  # WebKit version must match WEBKIT_VERSION in bun-src/scripts/build/deps/webkit.ts,
-  # cannot auto-bump, otherwise ABI mismatch with bun.
+  # Pinned to WEBKIT_VERSION in bun-src/scripts/build/deps/webkit.ts — cannot
+  # auto-bump, otherwise ABI mismatch with bun. OHOS adaptation is handled
+  # bun-side (webkit.ts.patch); WebKit source itself is unmodified.
   livecheck do
     skip "pinned to bun's WEBKIT_VERSION"
   end
@@ -24,7 +22,7 @@ class BunWebkit < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "674715a7ee997259043a9f407c109222588a14133a1e0851f55d25bdfa445363"
   end
 
-  keg_only "webKit static archives are consumed in-tree by Bun, not linked system-wide"
+  keg_only "webkit static archives are consumed in-tree by Bun, not linked system-wide"
 
   depends_on "cmake"        => :build
   depends_on "gperf"        => :build
@@ -37,12 +35,12 @@ class BunWebkit < Formula
   depends_on "ruby" => :build
   depends_on "social4hyq/core/icu4c@78" => :build
   depends_on "zlib" => :build
-  # Outputs are static .a archives + headers — zero runtime linkage. # JSC cross-compilation uses its sysroot
-  # llvm@21's lld runtime depends on libxml2/zlib; explicitly declare so superenv injects library paths.
+  # Outputs are static .a archives + headers — zero runtime linkage.
+  # ohos-sdk is build-time only: JSC cross-compilation uses its sysroot.
 
   def install
     # llvm@21's lld runtime depends on libxml2/zlib, brew superenv may strip LD_LIBRARY_PATH,
-    # explicitly inject library search paths (per icu4c@78 experience).
+    # explicitly inject library search paths.
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("libxml2").to_s
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib").to_s
 
@@ -149,7 +147,7 @@ class BunWebkit < Formula
   def caveats
     <<~EOS
       bun-webkit provides JSC/WTF/bmalloc static archives for Bun on HarmonyOS.
-      Pinned to WebKit commit c9ad5813fd (matches bun's WEBKIT_VERSION).
+      Pinned to WebKit commit #{version} (matches bun's WEBKIT_VERSION).
       Consumed in-tree by the `bun` formula; keg-only.
     EOS
   end
