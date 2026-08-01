@@ -108,12 +108,13 @@ class OpencodeShimAT2 < Formula
     ln_sf "libstdc++.so.6.0.34", libdir/"libstdc++.so.6"
 
     # Inject DT_RUNPATH (in-place, zero offset shift) → libexec/lib.
-    # RUNPATH points at opt_libexec/lib (prefix-relative, stable), not
-    # libdir/libexec (Cellar-relative) — opt/<name> is always
-    # HOMEBREW_PREFIX-relative and Homebrew re-links it correctly on every
-    # install, so it stays stable across the HOMEBREW_CELLAR flat/nested flip
-    # (see opencode-shim.rb's r1 history for why that distinction matters).
-    system formula_opt_bin("inject-runpath")/"inject-runpath", src.to_s, (opt_libexec/"lib").to_s
+    # Uses $ORIGIN/../lib (relative to the binary directory), same as
+    # opencode-shim.rb: resolves regardless of install prefix (surviving the
+    # HOMEBREW_CELLAR flip), and — unlike an opt_libexec-absolute RUNPATH —
+    # works during build, when the opt/ symlink does not exist yet (the
+    # completion generation below runs the libexec binary directly; with an
+    # opt-shaped RUNPATH it fails to load libstdc++.so.6 at that point).
+    system formula_opt_bin("inject-runpath")/"inject-runpath", src.to_s, "$ORIGIN/../lib"
 
     # Self-sign the patched binary.
     system sign, src.to_s
