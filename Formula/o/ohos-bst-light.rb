@@ -5,6 +5,7 @@ class OhosBstLight < Formula
       revision: "c4dfd71c869a0ca055d8b5ce4c3a9bf53735b2e1"
   version "1.0.0"
   license "MIT"
+  revision 1
 
   livecheck do
     skip "development tool, manually versioned"
@@ -21,6 +22,9 @@ class OhosBstLight < Formula
   depends_on "ohos-sdk" => :build
 
   def install
+    # ENV.cc (superenv) is fine here even though it embeds HOMEBREW_* RUNPATH
+    # entries in the binary: self-sign NEEDs only libc.so (verified via
+    # readelf), so those entries are never consulted at runtime.
     system ENV.cc, "self-sign.c", "-o", "self-sign"
     bin.install "self-sign"
   end
