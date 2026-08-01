@@ -28,8 +28,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-next-16620-r1"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "e34de658eb6a7324bc6faac9db96ff30fef85dd47d94d6b0950a291f12894ef2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-next-16620-r2"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "d7e7bdbbef623e8afa6a9112fe8b6b0b6372a4e7381c365d414c2d09d3c9fe9e"
   end
 
   # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
