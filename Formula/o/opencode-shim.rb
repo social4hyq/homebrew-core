@@ -4,11 +4,12 @@ class OpencodeShim < Formula
   url "https://registry.npmmirror.com/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-1.18.10.tgz"
   sha256 "ad67d34c1c0404a2ac33bea6d284e020a14da8a1eb2f6b14468ab22b4a1d953d"
   license "MIT"
+  revision 1
   # opencode's official prebuilt linux-arm64-musl single binary (Bun --compile).
   # Bypasses the opencode-ai npm JS wrapper. The musl-ABI binary is
   # OHOS-compatible once its GCC runtime deps are provided (see resources).
-  # Source mirrored on npmmirror for the same curl-SIGILL reason as codex /
-  # claude-code (see claude-code.rb); byte-identical on both mirrors.
+  # Source mirrored on npmmirror for the same curl-SIGILL reason documented
+  # in claude-code.rb; byte-identical on both mirrors.
 
   livecheck do
     url "https://registry.npmjs.org/opencode-ai/latest"
@@ -16,55 +17,17 @@ class OpencodeShim < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim-v1.18.10-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d42d731a404cd5032b237910884f0cb8f4ff70c536b5f60990ad8a782182aa1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim-v1.18.10-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "62e71d499847388f44fd82ebe7d85742f5bc76fe932f397faeb8b6e43e02b26b"
   end
 
-  # r1 fixed a real portability bug (not just the `brew bottle` check below):
+  # Portability design (r1-r4 archaeology is in git history): the bottle must
+  # contain no HOMEBREW_PREFIX/HOMEBREW_CELLAR-shaped strings, because
   # HOMEBREW_CELLAR flips between HOMEBREW_PREFIX/Cellar and
-  # HOMEBREW_REPOSITORY/Cellar depending on which happens to exist at brew
-  # startup (see brew.sh) — r0's DT_RUNPATH/wrapper baked in the Cellar-
-  # absolute path from the machine that built the bottle, so pouring it on a
-  # machine where HOMEBREW_CELLAR resolved the other way broke at runtime
-  # ("inaccessible or not found"). Fixed by pointing RUNPATH and the wrapper's
-  # self-reference at opt_libexec instead (see install() below) — opt/<name>
-  # is always HOMEBREW_PREFIX-relative, so it's stable across that flip. This
-  # also incidentally fixed the `brew bottle` "non-relocatable reference to
-  # HOMEBREW_REPOSITORY" odie() that r0 needed a temporary bottle.rb patch to
-  # get past — the RUNPATH no longer contains a HOMEBREW_REPOSITORY-shaped
-  # path at all, so that check just doesn't fire anymore. Verified 2026-07-14.
-  #
-  # r2 fixed dlopen_sign_shim: it only signed unsigned ELFs whose path was
-  # prefixed by $TMPDIR, but Bun's own extraction of embedded native modules
-  # (libopentui.so etc.) does not honor our exported TMPDIR at all — observed
-  # landing under /data/storage/el2/base/tmp (an OHOS-patched musl libc
-  # default, independent of the TMPDIR env var) instead of the
-  # /data/storage/el2/base/cache we export, so the prefix check always
-  # failed and the file was never signed → "Permission denied" on dlopen.
-  # r2 drops the path-prefix restriction entirely: sign any unsigned ELF
-  # this process tries to dlopen, regardless of location. needs_signing()
-  # already no-ops on non-ELF files and already-signed ones, and self-sign
-  # failing on a file we have no business touching is silently discarded
-  # (see ensure_signed), so this is safe. Also made needs_signing() fail
-  # closed (attempt to sign) instead of fail open (skip signing) on
-  # read/parse errors partway through the ELF, since a partially-written
-  # file mid-extraction should not be silently treated as "already fine".
-  # Verified 2026-07-14.
-  #
-  # r3 extracted dlopen_sign_shim into its own formula (dlopen-sign-shim) —
-  # it's a general OHOS compatibility shim, not opencode-specific (same
-  # category as ohos-bst-light in this tap), and this drops opencode's own
-  # ohos-sdk :build dependency entirely since compiling the shim was the
-  # only thing that needed it.
-  #
-  # r4: inject-runpath.py was likewise extracted into its own formula
-  # (inject-runpath) — it's a general fix-prebuilt-ELF-for-OHOS tool, not
-  # opencode-specific. This also moved the python@3.14 :build dep there.
-  # Rebuilt with `env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN` (see
-  # environment_bottle_binary_sign_breaks_prebuilt in project memory — that
-  # auto-sign pass double-signs and corrupts this prebuilt binary if left
-  # set during the build). Verified 2026-07-18.
+  # HOMEBREW_REPOSITORY/Cellar depending on which exists at brew startup.
+  # Hence the runtime-$HOMEBREW_PREFIX wrapper and $ORIGIN RUNPATH in
+  # install(), which is also what allows :any_skip_relocation. dlopen signing
+  # semantics live in the dlopen-sign-shim formula.
 
   # The prebuilt binary dynamically links libstdc++.so.6 + libgcc_s.so.1 (GCC
   # runtime), which OHOS does NOT ship (OHOS uses libc++). We bundle musl-aarch64
@@ -95,9 +58,9 @@ class OpencodeShim < Formula
   end
 
   def install
-    # Guard against the auto-sign pass corrupting this prebuilt binary (see
-    # r4 note above) — enforce here instead of relying on the builder to
-    # remember the env dance.
+    # Guard against the binary-sign-tool auto-sign pass: it double-signs and
+    # corrupts this prebuilt binary. Enforce here instead of relying on the
+    # builder to remember the env dance.
     if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
       odie "opencode-shim must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
            "(env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN brew install ...): the " \
@@ -132,12 +95,14 @@ class OpencodeShim < Formula
     cp libgcc_dir/"usr/lib/libgcc_s.so.1", libdir/"libgcc_s.so.1"
     real = (libstdcxx_dir/"usr/lib").glob("libstdc++.so.6.0.*").first
     odie "libstdc++.so.6 missing in apk" unless real
-    cp real, libdir/"libstdc++.so.6.0.34"
+    # Keep the apk's own versioned name (follows Alpine bumps automatically);
+    # the libstdc++.so.6 symlink provides the SONAME the binary looks up.
+    cp real, libdir/real.basename
     chmod 0755, libdir/"libgcc_s.so.1"
-    chmod 0755, libdir/"libstdc++.so.6.0.34"
+    chmod 0755, libdir/real.basename
     system sign, (libdir/"libgcc_s.so.1").to_s
-    system sign, (libdir/"libstdc++.so.6.0.34").to_s
-    ln_sf "libstdc++.so.6.0.34", libdir/"libstdc++.so.6"
+    system sign, (libdir/real.basename).to_s
+    ln_sf real.basename, libdir/"libstdc++.so.6"
 
     # Inject DT_RUNPATH (in-place, zero offset shift) → libexec/lib.
     # Uses $ORIGIN/../lib (relative to the binary directory) instead of an
@@ -158,9 +123,9 @@ class OpencodeShim < Formula
     # Wrapper resolves all paths at runtime via $HOMEBREW_PREFIX — no build-time
     # Ruby path interpolation (see claude-code.rb for the same pattern). This
     # avoids baking the build machine's HOMEBREW_PREFIX into the script, which
-    # lets `brew bottle` mark the bottle :any_skip_relocation (r1-r4 used
-    # opt_libexec / formula_opt_lib interpolation, which left absolute prefix
-    # strings in the wrapper → keg_contain?(prefix) → relocatable=false).
+    # lets `brew bottle` mark the bottle :any_skip_relocation (r1-r4
+    # interpolation left prefix-shaped strings in the bottle — see the header
+    # note).
     (bin/"opencode-shim").write <<~SH
       #!/bin/sh
       : "${HOMEBREW_PREFIX:?opencode-shim: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
@@ -178,7 +143,12 @@ class OpencodeShim < Formula
     # to `opencode` instead of `opencode-shim`.
     generate_completions_from_executable(libexec/"bin/opencode-shim", "completion",
                                          shells: [:bash], base_name: "opencode-shim")
-    inreplace bash_completion/"opencode-shim", "opencode", "opencode-shim"
+    # Identifier-anchored rewrite: covers command name, function names
+    # (_opencode...), and ###-begin/end-opencode-### markers, but leaves prose
+    # untouched if the generator ever emits e.g. an "opencode.ai" URL.
+    inreplace bash_completion/"opencode-shim" do |s|
+      s.gsub!(/(?<![a-zA-Z0-9.])opencode(?![a-zA-Z0-9.])/, "opencode-shim")
+    end
   end
 
   def caveats
