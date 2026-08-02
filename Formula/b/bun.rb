@@ -6,10 +6,10 @@ class Bun < Formula
   # pre-populated WebKit cache, and a Rust nightly toolchain with -Zbuild-std.
   # All patches are pre-applied on the ohos-aarch64 branch of social4hyq/ohos-bun.
   # Upstream formula cannot accommodate these build requirements.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "ef863e2b4e5e2cc49ae730ac068b59106ff976c1", branch: "ohos-aarch64"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "f8d5913cb45ac383100f4e5e38dbcc592b8d20bc", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
-  revision 46
+  revision 47
   # head tracks the same pre-patched fork branch as url — upstream oven-sh/bun
   # main lacks the 50+ OHOS patches and cannot build for HarmonyOS.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "ohos-aarch64"
@@ -20,8 +20,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r47"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c193ad6886a0658ddb32e833cb4ee1ef96d3c06d601d6c038b2bc8ce3f7813cd"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r48"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "30df9642f6fe8060454f0c01126eef36e2c066a4d688eb0442b1e31b33e6ffa7"
   end
 
   # ── Dependencies (bare names except icu4c@78 — the one name harmonybrew/core
