@@ -28,6 +28,11 @@ class Zsh < Formula
     url "https://sourceforge.net/projects/zsh/rss?path=/zsh"
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zsh-v5.9.2-r1"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "69fb8fa9174178f3775b2d17c72e3e1e69863e0593f147d2437860a6ffd1ca1b"
+  end
+
   head do
     url "https://git.code.sf.net/p/zsh/code.git", branch: "master"
     depends_on "autoconf" => :build
