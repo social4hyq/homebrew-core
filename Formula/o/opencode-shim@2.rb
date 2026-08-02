@@ -27,8 +27,8 @@ class OpencodeShimAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim@2-v0.0.0-next-16650-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "162412a5c438662f9d77fd4dd2f240970aaef8ac6632280b68d8bf6935757961"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim@2-v0.0.0-next-16676-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b1aff6d97b009aa31d91919b7090fb6787ba794735797c14e830e4cb9d45c68"
   end
 
   # Same GCC-runtime bundling + $ORIGIN RUNPATH + dlopen-sign-shim treatment
