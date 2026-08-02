@@ -10,6 +10,11 @@ class Sshport < Formula
     skip "development tool, manually versioned"
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/sshport-v0.1.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9e9c0a306833defc4b75b0467a14afcb8fd26d2da76b4c382373a30f993a4be"
+  end
+
   # sshport auto-forwards a remote Linux dev server's localhost:PORT
   # listeners to the identical localhost:PORT on this machine, tracked live
   # via a lightweight remote SSH polling loop — no ControlMaster/mux (this
