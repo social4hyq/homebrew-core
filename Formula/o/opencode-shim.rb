@@ -1,10 +1,9 @@
 class OpencodeShim < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64 (prebuilt musl binary)"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://registry.npmmirror.com/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-1.18.10.tgz"
-  sha256 "ad67d34c1c0404a2ac33bea6d284e020a14da8a1eb2f6b14468ab22b4a1d953d"
+  url "https://registry.npmmirror.com/opencode-linux-arm64-musl/-/opencode-linux-arm64-musl-1.18.11.tgz"
+  sha256 "db511fbc694a91dd89f6d9e2c86f44d7e7bee274ab9be5933369b1703abfacae"
   license "MIT"
-  revision 1
   # opencode's official prebuilt linux-arm64-musl single binary (Bun --compile).
   # Bypasses the opencode-ai npm JS wrapper. The musl-ABI binary is
   # OHOS-compatible once its GCC runtime deps are provided (see resources).
@@ -17,8 +16,8 @@ class OpencodeShim < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim-v1.18.10-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "62e71d499847388f44fd82ebe7d85742f5bc76fe932f397faeb8b6e43e02b26b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-shim-v1.18.11-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d8736b641b6568910564de9f5d27a8f3b2627d3e445e532e63bae2dcc8e46ca"
   end
 
   # Portability design (r1-r4 archaeology is in git history): the bottle must
