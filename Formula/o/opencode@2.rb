@@ -6,10 +6,10 @@ class OpencodeAT2 < Formula
   # human-readable beta tag so bump-formula-pr's version comparison doesn't
   # fight the commit SHA. livecheck watches the v2 branch HEAD via GitHub API;
   # autobump.yml opens a PR when a new commit lands.
-  url "https://github.com/anomalyco/opencode.git", revision: "85ea15e56d18508ef47e712de8264f7748b228d5", branch: "v2"
+  url "https://github.com/anomalyco/opencode.git", revision: "634b9b21dd424adfa7fca88cb0386c977f3d5a79", branch: "v2"
   version "2.0.0-beta"
   license "MIT"
-  revision 5
+  revision 6
 
   livecheck do
     url "https://api.github.com/repos/anomalyco/opencode/commits?sha=v2&per_page=1"
@@ -19,8 +19,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae6d50fbf415da023a3dcdd0c49c071a1fed7fff11184c4cc6e20e5e6fad0006"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22f0537d1840492a8c612383b8381c89105b57533ea3dd4b1a5b94fdddcf10e0"
   end
 
   # opencode2 is a `bun build --compile` single binary: OHOS bun runtime + JS
