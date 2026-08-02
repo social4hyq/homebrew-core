@@ -8,6 +8,8 @@ class Zsh < Formula
     "ISC", # Src/openssh_bsd_setres_id.c
   ]
 
+  revision 2
+
   stable do
     url "https://downloads.sourceforge.net/project/zsh/zsh/5.9.2/zsh-5.9.2.tar.xz"
     mirror "https://www.zsh.org/pub/zsh-5.9.2.tar.xz"
@@ -29,9 +31,8 @@ class Zsh < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zsh-v5.9.2-r2"
-    rebuild 1
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "7efe9c1c9b54cb9040ac5bddee9d16921225f423324b36fae0b3d0c387a99b3c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zsh-v5.9.2-r5"
+    rebuild 2
   end
 
   head do
@@ -39,6 +40,7 @@ class Zsh < Formula
     depends_on "autoconf" => :build
   end
 
+  depends_on "ohos-bst-light" => :build
   depends_on "ncurses"
   depends_on "pcre2"
 
@@ -98,11 +100,45 @@ class Zsh < Formula
         (pkgshare/"htmldoc").install Dir["Doc/*.html"]
       end
     end
+
+    # Debug: verify -rdynamic exported the symbol to .dynsym before signing
+    dynsym = Utils.safe_popen_read("llvm-readelf", "--dyn-syms", (bin/"zsh").to_s)
+    unless dynsym.include?("backwardmetafiedchar")
+      odie "-rdynamic failed: backwardmetafiedchar not in .dynsym of #{bin}/zsh. " \
+           "Link command had -rdynamic but symbol is missing from dynamic symbol table."
+    end
+
+    # OHOS 签名适配：自动签名管线的 llvm-strip（默认 --strip-all）会移除
+    # .dynsym 中 -rdynamic 导出的内部符号（backwardmetafiedchar 等），
+    # 导致 dlopen 模块加载失败。自己用 ohos-bst-light self-sign 签名
+    # （不做 strip），配合 build.sh UNSET_SIGN_FORMULAS 跳过自动签名。
+    odie_if_sign = ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
+    if odie_if_sign
+      odie "zsh must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
+           "(see build.sh UNSET_SIGN_FORMULAS): the auto-sign llvm-strip pass " \
+           "removes -rdynamic-exported .dynsym symbols that dlopen modules need"
+    end
+
+    prefix.find do |path|
+      next if path.directory? || path.symlink? || path.size < 18
+
+      header = path.read(18).dup.b
+      next if header[0..3] != "\x7fELF".b
+
+      # Skip files that already have a .codesign section (e.g. hardlinks
+      # like bin/zsh and bin/zsh-5.9.2 — signing one covers both).
+      sections = Utils.safe_popen_read("llvm-readelf", "-S", path.to_s).to_s
+      next if sections.include?(".codesign")
+
+      system formula_opt_bin("ohos-bst-light")/"self-sign", path.to_s
+    end
   end
 
   test do
     assert_equal "homebrew", shell_output("#{bin}/zsh -c 'echo homebrew'").chomp
     system bin/"zsh", "-c", "printf -v hello -- '%s'"
     system bin/"zsh", "-c", "zmodload zsh/pcre"
+    system bin/"zsh", "-c", "zmodload zsh/complete"
+    system bin/"zsh", "-c", "zmodload zsh/zleparameter"
   end
 end
