@@ -2,8 +2,8 @@ class Sshport < Formula
   desc "Forward a remote dev server's ports to identical local ports over SSH"
   homepage "https://github.com/social4hyq/ohos-sshport"
   url "https://github.com/social4hyq/ohos-sshport.git",
-      revision: "ce0d279f655af31b51e7a83c8fb5925837c4f36a"
-  version "0.1.3"
+      revision: "973397055c5dc114b7ec45f41d1b323c36ba5ee8"
+  version "0.1.4"
   license "MIT"
 
   livecheck do
