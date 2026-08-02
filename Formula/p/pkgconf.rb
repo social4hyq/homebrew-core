@@ -1,10 +1,10 @@
 class Pkgconf < Formula
   desc "Package compiler and linker metadata toolkit"
   homepage "https://github.com/pkgconf/pkgconf"
-  url "https://distfiles.ariadne.space/pkgconf/pkgconf-3.0.4.tar.xz"
-  mirror "https://fossies.org/linux/misc/pkgconf-3.0.4.tar.xz"
-  mirror "http://fresh-center.net/linux/misc/pkgconf-3.0.4.tar.xz"
-  sha256 "91ce346b47f46b87d680c6928e6c43240b9cdc7a31afbea19f2298de4dbe266d"
+  url "https://distfiles.ariadne.space/pkgconf/pkgconf-3.0.5.tar.xz"
+  mirror "https://fossies.org/linux/misc/pkgconf-3.0.5.tar.xz"
+  mirror "http://fresh-center.net/linux/misc/pkgconf-3.0.5.tar.xz"
+  sha256 "3acd3a8a3cce65a8d620321855d92fb602e026cbe8e13ee36bdec58483b59ace"
   license "ISC"
   compatibility_version 1
 
