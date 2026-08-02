@@ -56,7 +56,10 @@ class Zsh < Formula
     # 系统 /usr/bin/zsh 天然带 DF_SYMBOLIC（等效），brew 版需显式加。
     # zsh configure 有 -rdynamic 检测（zsh_cv_rdynamic_available），但在
     # OHOS 容器里该检测可能失败。直接预设 EXTRA_LDFLAGS 绕过检测。
+    # 同时覆盖 EXELDFLAGS：默认值含 -s（strip all），会移除 .dynsym 导出
+    # 符号，使 -rdynamic 失效。改为只用 -rdynamic，不 strip。
     ENV["EXTRA_LDFLAGS"] = "-rdynamic"
+    ENV["EXELDFLAGS"] = "-rdynamic"
 
     system "Util/preconfig" if build.head?
 
