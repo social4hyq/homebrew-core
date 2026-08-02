@@ -11,8 +11,8 @@ class Sshport < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/sshport-v0.1.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9e9c0a306833defc4b75b0467a14afcb8fd26d2da76b4c382373a30f993a4be"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/sshport-v0.1.1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "49d065f01652d0db4677addd8ebe530ad1e36b9fe9a6aa3bcc94abe00388e17a"
   end
 
   # sshport auto-forwards a remote Linux dev server's localhost:PORT
