@@ -61,8 +61,8 @@ class Zsh < Formula
     # OHOS 容器里该检测可能失败。直接预设 EXTRA_LDFLAGS 绕过检测。
     # 同时覆盖 EXELDFLAGS：默认值含 -s（strip all），会移除 .dynsym 导出
     # 符号，使 -rdynamic 失效。改为只用 -rdynamic，不 strip。
-    ENV["EXTRA_LDFLAGS"] = "-rdynamic"
-    ENV["EXELDFLAGS"] = "-rdynamic"
+    ENV["EXTRA_LDFLAGS"] = "-Wl,--export-dynamic"
+    ENV["EXELDFLAGS"] = "-Wl,--export-dynamic"
 
     system "Util/preconfig" if build.head?
 
