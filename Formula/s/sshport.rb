@@ -2,8 +2,8 @@ class Sshport < Formula
   desc "Forward a remote dev server's ports to identical local ports over SSH"
   homepage "https://github.com/social4hyq/ohos-sshport"
   url "https://github.com/social4hyq/ohos-sshport.git",
-      revision: "1690c06085ab4eb3b0564321bf2b6b59acb88f8f"
-  version "0.1.2"
+      revision: "ce0d279f655af31b51e7a83c8fb5925837c4f36a"
+  version "0.1.3"
   license "MIT"
 
   livecheck do
@@ -11,8 +11,8 @@ class Sshport < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/sshport-v0.1.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3098e7962ed870970a4fa9ac36659696b4bb01810b4a2664258c12c14be07e6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/sshport-v0.1.3-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b242bb2e2a42e67b282794e7f89ffdf90aa991449df8de7ade8b702565570260"
   end
 
   # sshport auto-forwards a remote Linux dev server's localhost:PORT
