@@ -29,9 +29,8 @@ class Zsh < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zsh-v5.9.2-r4"
-    rebuild 2
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "89786316c9445c1467f77c0444d7e34806f47e8c77c6d2ac70760d4c835487c4"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zsh-v5.9.2-r5"
+    rebuild 3
   end
 
   head do
