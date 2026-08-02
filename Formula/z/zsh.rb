@@ -29,8 +29,9 @@ class Zsh < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zsh-v5.9.2-r1"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "69fb8fa9174178f3775b2d17c72e3e1e69863e0593f147d2437860a6ffd1ca1b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zsh-v5.9.2-r2"
+    rebuild 1
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "7efe9c1c9b54cb9040ac5bddee9d16921225f423324b36fae0b3d0c387a99b3c"
   end
 
   head do
@@ -38,6 +39,7 @@ class Zsh < Formula
     depends_on "autoconf" => :build
   end
 
+  depends_on "ohos-bst-light" => :build
   depends_on "ncurses"
   depends_on "pcre2"
 
@@ -56,7 +58,10 @@ class Zsh < Formula
     # 系统 /usr/bin/zsh 天然带 DF_SYMBOLIC（等效），brew 版需显式加。
     # zsh configure 有 -rdynamic 检测（zsh_cv_rdynamic_available），但在
     # OHOS 容器里该检测可能失败。直接预设 EXTRA_LDFLAGS 绕过检测。
+    # 同时覆盖 EXELDFLAGS：默认值含 -s（strip all），会移除 .dynsym 导出
+    # 符号，使 -rdynamic 失效。改为只用 -rdynamic，不 strip。
     ENV["EXTRA_LDFLAGS"] = "-rdynamic"
+    ENV["EXELDFLAGS"] = "-rdynamic"
 
     system "Util/preconfig" if build.head?
 
@@ -94,11 +99,34 @@ class Zsh < Formula
         (pkgshare/"htmldoc").install Dir["Doc/*.html"]
       end
     end
+
+    # OHOS 签名适配：自动签名管线的 llvm-strip（不带 --no-strip-all，默认
+    # --strip-all）会移除 .dynsym 中 -rdynamic 导出的内部符号
+    # （backwardmetafiedchar / thingytab 等），导致 dlopen 模块加载失败。
+    # 这里自己用 ohos-bst-light self-sign 签名（不做 strip），配合
+    # build.sh 的 UNSET_SIGN_FORMULAS 跳过自动签名通道。
+    if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
+      odie "zsh must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
+           "(see build.sh UNSET_SIGN_FORMULAS): the auto-sign llvm-strip pass " \
+           "removes -rdynamic-exported .dynsym symbols that dlopen modules need"
+    end
+
+    prefix.find do |path|
+      next if path.directory? || path.symlink? || path.size < 18
+
+      header = path.read(18).dup.b
+      next if header[0..3] != "\x7fELF".b
+
+      system formula_opt_bin("ohos-bst-light")/"self-sign", path.to_s
+    end
   end
 
   test do
     assert_equal "homebrew", shell_output("#{bin}/zsh -c 'echo homebrew'").chomp
     system bin/"zsh", "-c", "printf -v hello -- '%s'"
     system bin/"zsh", "-c", "zmodload zsh/pcre"
+    # OHOS-specific: verify -rdynamic symbols survived signing (no llvm-strip)
+    system bin/"zsh", "-c", "zmodload zsh/complete"
+    system bin/"zsh", "-c", "zmodload zsh/zleparameter"
   end
 end

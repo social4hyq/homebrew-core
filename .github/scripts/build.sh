@@ -27,7 +27,7 @@ source "$(dirname "$0")/lib.sh"
 # opencode-shim@2 is the same prebuilt-binary treatment as opencode-shim (v1) —
 # same odie guard in install() (see Formula/o/opencode-shim@2.rb) — added
 # preemptively rather than waiting to hit the same corruption in CI.
-UNSET_SIGN_FORMULAS="opencode-shim opencode-shim@2 claude-code grok-build cc-switch qemu-aarch64"
+UNSET_SIGN_FORMULAS="opencode-shim opencode-shim@2 claude-code grok-build cc-switch qemu-aarch64 zsh"
 ENV_PREFIX=""
 if tr ' ' '\n' <<< "$UNSET_SIGN_FORMULAS" | grep -qx "$FORMULA"; then
   ENV_PREFIX="env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN "
