@@ -29,8 +29,9 @@ class Zsh < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zsh-v5.9.2-r1"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "69fb8fa9174178f3775b2d17c72e3e1e69863e0593f147d2437860a6ffd1ca1b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zsh-v5.9.2-r2"
+    rebuild 1
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "7efe9c1c9b54cb9040ac5bddee9d16921225f423324b36fae0b3d0c387a99b3c"
   end
 
   head do
@@ -56,7 +57,10 @@ class Zsh < Formula
     # 系统 /usr/bin/zsh 天然带 DF_SYMBOLIC（等效），brew 版需显式加。
     # zsh configure 有 -rdynamic 检测（zsh_cv_rdynamic_available），但在
     # OHOS 容器里该检测可能失败。直接预设 EXTRA_LDFLAGS 绕过检测。
+    # 同时覆盖 EXELDFLAGS：默认值含 -s（strip all），会移除 .dynsym 导出
+    # 符号，使 -rdynamic 失效。改为只用 -rdynamic，不 strip。
     ENV["EXTRA_LDFLAGS"] = "-rdynamic"
+    ENV["EXELDFLAGS"] = "-rdynamic"
 
     system "Util/preconfig" if build.head?
 
