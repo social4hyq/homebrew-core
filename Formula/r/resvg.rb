@@ -1,8 +1,8 @@
 class Resvg < Formula
   desc "SVG rendering tool and library"
   homepage "https://github.com/linebender/resvg"
-  url "https://github.com/linebender/resvg/archive/refs/tags/v0.47.0.tar.gz"
-  sha256 "7869119fd822983b0a0bc2469bc94d59e7908fc12165fa67a105a4fa25087f9a"
+  url "https://github.com/linebender/resvg/archive/refs/tags/v0.48.1.tar.gz"
+  sha256 "40dafea6b4b9d01e9d28b6d49f1e912daf3e9055676ad9179a5a2db6e7386945"
   license "MPL-2.0"
   compatibility_version 1
   head "https://github.com/linebender/resvg.git", branch: "main"
