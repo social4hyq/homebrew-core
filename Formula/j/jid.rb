@@ -7,7 +7,7 @@ class Jid < Formula
   head "https://github.com/simeji/jid.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7f8f4ac3a9c3e5f47967dd74f05a7f725ae1ef37e153b2acf575e62b6f451da"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "94e0cc47d3a931691918b62d3a947b906cb5fb258353cf54c51b1bd92e302e61"
   end
 
   depends_on "go" => :build
