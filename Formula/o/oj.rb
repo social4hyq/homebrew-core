@@ -1,13 +1,13 @@
 class Oj < Formula
   desc "JSON parser and visualization tool"
   homepage "https://github.com/ohler55/ojg"
-  url "https://github.com/ohler55/ojg/archive/refs/tags/v1.28.2.tar.gz"
-  sha256 "62bb13e53da917d2a19ec6dfaf03df738942a41f1591c6f96bf01cbec7f3ee32"
+  url "https://github.com/ohler55/ojg/archive/refs/tags/v1.28.3.tar.gz"
+  sha256 "6b0c0e9e37fce6a9a499842a0c886e8c2b67c32ffdceb0a491973c88b7db5d90"
   license "MIT"
   head "https://github.com/ohler55/ojg.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f0525d5d7346955c510266fa1753ea2b3786a9caa400b2d8836171f0fd3a4c0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a323c400601ccd4cdea16c78dbdd1cf7e58cf22b834d9bb0095ee6981cf4a6cc"
   end
 
   depends_on "go" => :build
