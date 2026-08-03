@@ -1,8 +1,8 @@
 class Tlsx < Formula
   desc "Fast and configurable TLS grabber focused on TLS based data collection"
   homepage "https://github.com/projectdiscovery/tlsx"
-  url "https://github.com/projectdiscovery/tlsx/archive/refs/tags/v1.2.2.tar.gz"
-  sha256 "f8f978b036b97b212ab4b954ba4a533adcb0425123d9dd8a4cde2d4948776628"
+  url "https://github.com/projectdiscovery/tlsx/archive/refs/tags/v1.3.0.tar.gz"
+  sha256 "c0aeb253d83f1c8ed261a135b19403caf46cee3066882056875a13d5b1a2a75a"
   license "MIT"
   head "https://github.com/projectdiscovery/tlsx.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Tlsx < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d15e26ba3604e9171837bfc843ec60f9d0e7be25f8ee8d77c66e5e2c9ba44e1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6d0b15a696dbcfa3b9a0a03989475aaba4ae5d49cbb9b77a990b4faa723c2a2"
   end
 
   depends_on "go" => :build
