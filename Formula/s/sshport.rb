@@ -36,11 +36,10 @@ class Sshport < Formula
     libexec.install "sshport.js"
 
     # $HOMEBREW_PREFIX is resolved at *runtime* inside the script, not
-    # interpolated at build time (same pattern as opencode-shim.rb's
-    # wrapper) — this is a plain shell script, not a binary being
-    # RUNPATH-patched, so baking the build machine's prefix in here would
-    # break portability the same way an absolute path would in any other
-    # relocatable bottle.
+    # interpolated at build time — this is a plain shell script, not a binary
+    # being RUNPATH-patched, so baking the build machine's prefix in here
+    # would break portability the same way an absolute path would in any
+    # other relocatable bottle.
     (bin/"sshport").write <<~SH
       #!/bin/sh
       : "${HOMEBREW_PREFIX:?sshport: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"

@@ -34,8 +34,7 @@ class InjectRunpath < Formula
   # It matters on OHOS specifically because the loader ignores
   # LD_LIBRARY_PATH and LD_PRELOAD cannot satisfy DT_NEEDED entries:
   # DT_RUNPATH is the only way to point a prebuilt binary at bundled
-  # replacement libraries (used by opencode-shim.rb and opencode-shim@2.rb;
-  # opencode.rb itself no longer needs this since bun r31+).
+  # replacement libraries.
   depends_on "python@3.14"
 
   def install

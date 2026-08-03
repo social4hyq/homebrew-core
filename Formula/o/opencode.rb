@@ -206,8 +206,8 @@ class Opencode < Formula
     # output, so the interposer is already in the binary — no LD_PRELOAD of
     # libohos_compat.so is needed (that was the r1/r2 wrapper, now removed).
     #
-    # dlopen-sign-shim is NOT needed here, unlike opencode-shim.rb: bun signs the
-    # @ohos-ports native .so in-process during `bun install`, and the embed
+    # dlopen-sign-shim is NOT needed here: bun signs the @ohos-ports native
+    # .so in-process during `bun install`, and the embed
     # (`with { type: "file" }`) preserves those bytes, so the runtime-extracted
     # libraries are already signed.
     #
