@@ -6,7 +6,7 @@ class Lerna < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3497f7e17c0c460d61c5df96dd7610cec6c0e70ef4443e7adee357c7f961a402"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5604690143226e84929dd39009a719131a76c87c9425ad6e461fe832cfcf2211"
   end
 
   depends_on "node"
