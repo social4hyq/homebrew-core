@@ -7,7 +7,7 @@ class WoodpeckerCli < Formula
   head "https://github.com/woodpecker-ci/woodpecker.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f77a1b5d44ae300291fdb77dedd75c6985002238648192b9dca07c0ac1286d76"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0947b011d8a818d98374b7f61cc4d6e126e9febe74201b80a2080f4070ea9eb9"
   end
 
   depends_on "go" => :build
