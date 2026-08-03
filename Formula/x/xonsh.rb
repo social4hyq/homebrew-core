@@ -9,7 +9,7 @@ class Xonsh < Formula
   head "https://github.com/xonsh/xonsh.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2798ebe69b51730e828b8f0f8a51f6c615645c9f1119503a9b6b62895b1dd9f8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "56113d7c3c1082d6f7ba28c394affeb716498748371d41f519096f87f226fe07"
   end
 
   depends_on "python@3.14"
