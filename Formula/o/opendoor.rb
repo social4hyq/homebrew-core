@@ -8,7 +8,7 @@ class Opendoor < Formula
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "829d6d38c0342de214490f44dfc3a1c61fafacbc062e37b4eeef47469a74585e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a98f7f455a7c93a9811d573c3ffb7297623facfbf86f862381e0fa3eaf0c5c2"
   end
 
   depends_on "python@3.14"
