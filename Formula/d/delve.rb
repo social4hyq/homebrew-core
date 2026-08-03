@@ -1,8 +1,8 @@
 class Delve < Formula
   desc "Debugger for the Go programming language"
   homepage "https://github.com/go-delve/delve"
-  url "https://github.com/go-delve/delve/archive/refs/tags/v1.27.0.tar.gz"
-  sha256 "84979ac689ba26dc0a086b245cb0a3f3e6a7a246a435b2c757867e76823187a5"
+  url "https://github.com/go-delve/delve/archive/refs/tags/v1.27.1.tar.gz"
+  sha256 "dca9ec6f2c392a00449ad748b3a229e92ba4efa67f4e7582f2cc45974429928f"
   license "MIT"
   head "https://github.com/go-delve/delve.git", branch: "master"
 
