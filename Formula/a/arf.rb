@@ -6,7 +6,7 @@ class Arf < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "37aad6dc9c2fbf8e939fba45ace5c2e9da3a6a5c18f2d407cf5fc4b93dba2a24"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a2a59a66d95f3113d896b158bcdf073b415d6f9a46d0cba6c119c010454850c"
   end
 
   depends_on "rust" => :build
