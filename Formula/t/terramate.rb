@@ -7,7 +7,7 @@ class Terramate < Formula
   head "https://github.com/terramate-io/terramate.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1bfda8f11669e1f6a9b9158af98af996dc4a2c9e2b8a6fa7073c9dde63329189"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72ee5a9f2537943bbe3cc2e6980e365f10007b0f3c77a364e496a01399f91ae8"
   end
 
   depends_on "go" => :build
