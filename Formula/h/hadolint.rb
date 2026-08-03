@@ -6,7 +6,7 @@ class Hadolint < Formula
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6021fc92e8765be403102bf1c664d5ef0bb5f8346272364b0b5e080dfd7f4b26"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b560a756b24da8c24bc722f0eba5b9810441f6b812ee94ce4645db796030bbfa"
   end
 
   depends_on "cabal-install" => :build
