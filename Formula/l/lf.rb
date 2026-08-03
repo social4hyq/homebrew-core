@@ -7,7 +7,7 @@ class Lf < Formula
   head "https://github.com/gokcehan/lf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fca6299983fe598ba533c3c152a588c050ad30748666bae70c81deace916f5a3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "15581af571f54c50d6bb3dfb6bf41d0b1323c077a5806e9f19b77ab35d3c89a3"
   end
 
   depends_on "go" => :build
