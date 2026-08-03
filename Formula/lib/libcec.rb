@@ -1,12 +1,12 @@
 class Libcec < Formula
   desc "Control devices with TV remote control and HDMI cabling"
   homepage "https://libcec.pulse-eight.com/"
-  url "https://github.com/Pulse-Eight/libcec/archive/refs/tags/libcec-8.1.1.tar.gz"
-  sha256 "0247a2e577cefceaa1932d9a2aec2b423e0ce9c77f90c2b8a99197fdd1a0b81d"
+  url "https://github.com/Pulse-Eight/libcec/archive/refs/tags/libcec-8.1.3.tar.gz"
+  sha256 "c7b208433418991a9ae7af1d43ffebf99ddc27ee7119a2794f19dcc02e4568b1"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "88870a6e2869fe2be6f0172cb55a582aaeed865d24621e9baf278ebda272b9c9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3890b040dccb0d8b6670e89445336ee0571dae492fc01f5a88cec85f626f96d2"
   end
 
   depends_on "cmake" => :build
