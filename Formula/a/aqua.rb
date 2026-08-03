@@ -1,8 +1,8 @@
 class Aqua < Formula
   desc "Declarative CLI Version manager"
   homepage "https://aquaproj.github.io/"
-  url "https://github.com/aquaproj/aqua/archive/refs/tags/v2.62.1.tar.gz"
-  sha256 "717a397c7d075424cbdb5256234514f5677683afa153610428f241138a363741"
+  url "https://github.com/aquaproj/aqua/archive/refs/tags/v2.62.3.tar.gz"
+  sha256 "fceb5a55a9e8dc7996ed8b6cafbb463997c82ba44e07c39ffc5f0b8fa3f67417"
   license "MIT"
   head "https://github.com/aquaproj/aqua.git", branch: "main"
 
@@ -15,7 +15,7 @@ class Aqua < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e636add9a94ad1fc22aeb889e5c5485cba3c8e12fb064e6dbfad71862f666c3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c94004d4284f14cd9be00025fb1f806655d4fe07a754a4cad08e00669d10b13"
   end
 
   depends_on "go" => :build
