@@ -12,7 +12,7 @@ class Tarlz < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "03f85bf1abcd70ed74b7f96aa019ee9983547e4722b303e0e35277229d6e2f97"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e4d96ef81e9448ca9fcc6e17648b54c0a0d367411ea0722a13afc66e49c93397"
   end
 
   depends_on "lzlib"
