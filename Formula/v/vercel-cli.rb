@@ -6,7 +6,7 @@ class VercelCli < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ae8263f5c306aed6dddaefb30be869dd6bbe98c9f24ccde62c9fffc593cc0b4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a0caff8213b5d42b4f3f382295c8b777a252bead6b2603893d46621bcd25097"
   end
 
   depends_on "node"
