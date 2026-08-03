@@ -1,8 +1,8 @@
 class Infracost < Formula
   desc "Cost estimates for Terraform, Terragrunt, and CloudFormation"
   homepage "https://www.infracost.io/docs/"
-  url "https://github.com/infracost/cli/archive/refs/tags/v2.14.1.tar.gz"
-  sha256 "ee542f551648cb2f203e777b34cbe18f426690c06d9127bc268053865bd7c8dc"
+  url "https://github.com/infracost/cli/archive/refs/tags/v2.14.2.tar.gz"
+  sha256 "1130b81f668d9ee0610061d8ce2bb8d7a3ea5fa84481e3ffa97ac260de9c261e"
   license "Apache-2.0"
   head "https://github.com/infracost/cli.git", branch: "main"
 
