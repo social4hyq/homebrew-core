@@ -12,7 +12,7 @@ class Goctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0199e820461b1c5e8533c900415971fe330f5e903f2edd538f96e4407eb83524"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b183f4ce82c2bd8104e69fcdffec80bd70fd6333e77cbaca849762ccfb2caf27"
   end
 
   depends_on "go" => :build
