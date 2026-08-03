@@ -20,8 +20,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r48"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "30df9642f6fe8060454f0c01126eef36e2c066a4d688eb0442b1e31b33e6ffa7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r49"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0ed12c3a865f515c7d9b644610d671302bdb335cdda69cbd7a688f787d46b8a"
   end
 
   # ── Dependencies (bare names except icu4c@78 — the one name harmonybrew/core
