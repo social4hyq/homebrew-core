@@ -6,7 +6,7 @@ class Killport < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b4cb010b730494db5b32437c5ba9a20a898e9df5812de9cc881ff3ac72e8b58"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cade6817844c1cbc69f6eba776650f877d50677b17efc0ac46f3291fb80fd724"
   end
 
   depends_on "rust" => :build
