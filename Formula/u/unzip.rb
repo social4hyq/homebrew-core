@@ -13,7 +13,8 @@ class Unzip < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0341f35f4ebe2f6b43efc7656c9dd5bf03431e54dc47575bb89aff9ad653ad27"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "898c2b94075386c797bf047636e84903f14325ac77801c6552571e3213ab3dff"
   end
 
   keg_only :provided_by_macos
