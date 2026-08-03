@@ -2,8 +2,8 @@ class OhosCompatShim < Formula
   desc "LD_PRELOAD compat shim for HarmonyOS-sandboxed aarch64/musl binaries"
   homepage "https://github.com/social4hyq/ohos-compat-shim"
   url "https://github.com/social4hyq/ohos-compat-shim.git",
-      revision: "dfda1d5e572dc50c4a7f6d2408966fd7c05455af"
-  version "0.2.6"
+      revision: "d5a9d08c61d572c3e3ba6f2b8ec8bda75d64f228"
+  version "0.2.7"
   license "MIT"
 
   livecheck do
