@@ -2,8 +2,8 @@ class Tea < Formula
   desc "Command-line tool to interact with Gitea servers"
   homepage "https://gitea.com/gitea/tea"
   url "https://gitea.com/gitea/tea.git",
-      tag:      "v0.15.0",
-      revision: "61b8536e4a3e04d9db74b05b4d9cd489d07d8d50"
+      tag:      "v0.15.1",
+      revision: "f34697c5ed65928e265d6f48e16928819ce0f332"
   license "MIT"
   head "https://gitea.com/gitea/tea.git", branch: "main"
 
