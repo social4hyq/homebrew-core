@@ -6,10 +6,10 @@ class OpencodeAT2 < Formula
   # human-readable beta tag so bump-formula-pr's version comparison doesn't
   # fight the commit SHA. livecheck watches the v2 branch HEAD via GitHub API;
   # autobump.yml opens a PR when a new commit lands.
-  url "https://github.com/anomalyco/opencode.git", revision: "634b9b21dd424adfa7fca88cb0386c977f3d5a79", branch: "v2"
+  url "https://github.com/anomalyco/opencode.git", revision: "3f30203b72412ba7b324e86cb2ebbf6208d152ac", branch: "v2"
   version "2.0.0-beta"
   license "MIT"
-  revision 6
+  revision 7
 
   livecheck do
     url "https://api.github.com/repos/anomalyco/opencode/commits?sha=v2&per_page=1"
