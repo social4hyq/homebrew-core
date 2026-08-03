@@ -11,8 +11,8 @@ class OhosCompatShim < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.2.5-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "87ed557f99054e2c48bf80cec1de8d6a4d0c72a5a4e0e455d000f14d3afea8c4"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.2.6-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8eae5dad7b91b4995c743b5db0cf37363c9d618610d3911d6707651da86d156a"
   end
 
   # HarmonyOS's application sandbox seccomp-filters several Linux syscalls
