@@ -61,8 +61,13 @@ class Zsh < Formula
     # OHOS 容器里该检测可能失败。直接预设 EXTRA_LDFLAGS 绕过检测。
     # 同时覆盖 EXELDFLAGS：默认值含 -s（strip all），会移除 .dynsym 导出
     # 符号，使 -rdynamic 失效。改为只用 -rdynamic，不 strip。
-    ENV["EXTRA_LDFLAGS"] = "-Wl,--export-dynamic"
-    ENV["EXELDFLAGS"] = "-Wl,--export-dynamic"
+    # OHOS 适配：zsh 模块（.bundle）在 dlopen 时需要从主二进制解析
+    # backwardmetafiedchar / thingytab 等内部符号。OHOS LLD 忽略 -rdynamic
+    # 和 --export-dynamic，必须用 --dynamic-list 显式导出全部全局符号。
+    dynlist = buildpath/"zsh_dynlist"
+    dynlist.write "{ *; };\n"
+    ENV["EXTRA_LDFLAGS"] = "-Wl,--dynamic-list=#{dynlist}"
+    ENV["EXELDFLAGS"] = "-Wl,--dynamic-list=#{dynlist}"
 
     system "Util/preconfig" if build.head?
 
