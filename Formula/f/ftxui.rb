@@ -7,7 +7,7 @@ class Ftxui < Formula
   head "https://github.com/ArthurSonzogni/FTXUI.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f88b4fafae20dbf7b952ba0d89ca8f2d54be9292a9a70e3ecf1dd7491b4cf8fe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c2b3a2d10481915adc3e67fb6b96e057c53884a13174d849e77f4c0df65cb365"
   end
 
   depends_on "cmake" => :build
