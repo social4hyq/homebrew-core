@@ -1,8 +1,8 @@
 class Secp256k1 < Formula
   desc "Optimized C library for EC operations on curve secp256k1"
   homepage "https://github.com/bitcoin-core/secp256k1"
-  url "https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.7.1.tar.gz"
-  sha256 "958f204dbafc117e73a2604285dc2eb2a5128344d3499c114dcba5de54cb7a9e"
+  url "https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.8.0.tar.gz"
+  sha256 "eb52b0e9239dff7dc26be5f9623567141b8720ec47da29eb3c1e0a660d17c8bb"
   license "MIT"
 
   bottle do
