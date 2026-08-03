@@ -12,10 +12,6 @@ class Unzip < Formula
     regex(%r{url=.*?(?:%20)?v?(\d+(?:\.\d+)+)/unzip\d+\.t}i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0341f35f4ebe2f6b43efc7656c9dd5bf03431e54dc47575bb89aff9ad653ad27"
-  end
-
   keg_only :provided_by_macos
 
   uses_from_macos "zip" => :test
