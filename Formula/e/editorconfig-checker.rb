@@ -7,7 +7,7 @@ class EditorconfigChecker < Formula
   head "https://github.com/editorconfig-checker/editorconfig-checker.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0298048fd8b80fec9e30a7879ba1e552c7bf4541819b49f0d06d639627a19d7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b08f1a8b3f16f7ef327b2a8f89d03b857b47b7ffac8584938d6ca9af31e5439"
   end
 
   depends_on "go" => :build
