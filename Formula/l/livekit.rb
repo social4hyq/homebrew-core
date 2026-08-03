@@ -15,7 +15,7 @@ class Livekit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7afebf8753bd5ba70cffbbfbba3272494ea09b6f86058e203bda1eb983dd59b9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e8510dd3215703497179664fe8affbc0f5e5e01db937d440d937a532dd47e2a"
   end
 
   depends_on "go" => :build
