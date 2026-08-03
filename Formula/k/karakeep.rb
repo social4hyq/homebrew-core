@@ -1,12 +1,12 @@
 class Karakeep < Formula
   desc "CLI tool for self-hostable bookmark-everything app karakeep"
   homepage "https://karakeep.app/"
-  url "https://registry.npmjs.org/@karakeep/cli/-/cli-0.32.0.tgz"
-  sha256 "082164b45ebad1f18fdfac023e6e800170faca2fdb6532a2ebe150758a60a77f"
+  url "https://registry.npmjs.org/@karakeep/cli/-/cli-0.33.0.tgz"
+  sha256 "dcd3add2372f5815a2b0a8586114fbcaa2b51b32cf4c7e9b20e5facf58a05314"
   license "AGPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "72382ef55aba48fec3b7ffadd3d51052d88532b79f5b06c155466f8260f1690e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e526a207c765f5da499082029dff38a8333fe1deea8a0850515aa28b0e570f8e"
   end
 
   depends_on "node"
