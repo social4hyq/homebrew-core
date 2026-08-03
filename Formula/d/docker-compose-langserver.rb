@@ -1,12 +1,12 @@
 class DockerComposeLangserver < Formula
   desc "Language service for Docker Compose documents"
   homepage "https://github.com/microsoft/compose-language-service"
-  url "https://registry.npmjs.org/@microsoft/compose-language-service/-/compose-language-service-0.5.0.tgz"
-  sha256 "2d6af41c4aabaa5c4fc89d2293eae6b561fc37b2c663a504000383394f715700"
+  url "https://registry.npmjs.org/@microsoft/compose-language-service/-/compose-language-service-1.0.0.tgz"
+  sha256 "a05c72415a94db9ebcbf51f99eca082f93d99e1e78ae4bd3d187eda6832c9d5f"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc0f311dc47cb15f9f8cc847c589644561b3dad566b44dd707d9f742cf6805ee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "da4c0db3b0a18bb88cb6cb2df8d512c1f4a8fbc46e4274fd32f847c6d3423a9f"
   end
 
   depends_on "node"
