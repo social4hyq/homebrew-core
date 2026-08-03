@@ -1,8 +1,8 @@
 class RailsMcpServer < Formula
   desc "MCP server for Rails applications"
   homepage "https://github.com/maquina-app/rails-mcp-server"
-  url "https://github.com/maquina-app/rails-mcp-server/archive/refs/tags/v1.5.1.tar.gz"
-  sha256 "136021dcfe11dcdd4a290e75cf682ea6638bb0bf503b75b9c455903d620d389b"
+  url "https://github.com/maquina-app/rails-mcp-server/archive/refs/tags/v1.6.0.tar.gz"
+  sha256 "2713a890adcbc86c0a4c277e00fcd950f8b4753da331e4306677384c87a24f18"
   license "MIT"
 
   bottle do
