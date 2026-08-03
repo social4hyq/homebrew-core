@@ -1,12 +1,12 @@
 class DuaCli < Formula
   desc "View disk space usage and delete unwanted data, fast"
   homepage "https://lib.rs/crates/dua-cli"
-  url "https://github.com/Byron/dua-cli/archive/refs/tags/v2.39.0.tar.gz"
-  sha256 "ee7e9e6a778b06796b4febbe0f71375789b5cc6d7e4aed9cc6d5326ad4b37064"
+  url "https://github.com/Byron/dua-cli/archive/refs/tags/v2.40.1.tar.gz"
+  sha256 "ca07ea73ad4ed66cbfd0e2d6b709ce2a90a319459582c807b9936a9bc2be1c18"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "76c6b326ef07971bf89e0813288da98335b6085f46d053b37a6ee7b9b87e2c05"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "49c53684e6ff090f2d77da8c31e8a50c77ba0f25f6de8a8bc7787654d36ad705"
   end
 
   depends_on "rust" => :build
