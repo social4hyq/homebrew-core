@@ -6,7 +6,7 @@ class Nessie < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a728a3c51eb5da34e589d7eb0f4146e5b3c6c9a26697aef0a639a2f3d8244576"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "08f3a725e07952572bef35f20fb62ee678983fc171750f0f6f585f559b3ec0e3"
   end
 
   depends_on "gradle" => :build
