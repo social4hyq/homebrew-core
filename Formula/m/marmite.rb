@@ -7,7 +7,7 @@ class Marmite < Formula
   head "https://github.com/rochacbruno/marmite.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e0b86a1c92f411ab4fb139efd7fdde423db1d2d18211ba30b02831eab4fe4ed"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8173272dbf41185e862dd997b92a6b48c6fe2cb8d58b4affd844c2944164dd17"
   end
 
   depends_on "rust" => :build
