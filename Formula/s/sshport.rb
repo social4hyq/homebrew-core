@@ -11,8 +11,9 @@ class Sshport < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/sshport-v0.2.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "309801bcdfe0c6397f67e6fbe42e0ae5900a929400a5ba83fe6fdeb0ce6dabc5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/sshport-v0.2.0-r3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6795ffd2f04721054013fec7635e7e04f67b167dd1e1ea418df5e4d3dec438d"
   end
 
   # sshport auto-forwards a remote Linux dev server's localhost:PORT
@@ -36,11 +37,10 @@ class Sshport < Formula
     libexec.install "sshport.js"
 
     # $HOMEBREW_PREFIX is resolved at *runtime* inside the script, not
-    # interpolated at build time (same pattern as opencode-shim.rb's
-    # wrapper) — this is a plain shell script, not a binary being
-    # RUNPATH-patched, so baking the build machine's prefix in here would
-    # break portability the same way an absolute path would in any other
-    # relocatable bottle.
+    # interpolated at build time — this is a plain shell script, not a binary
+    # being RUNPATH-patched, so baking the build machine's prefix in here
+    # would break portability the same way an absolute path would in any
+    # other relocatable bottle.
     (bin/"sshport").write <<~SH
       #!/bin/sh
       : "${HOMEBREW_PREFIX:?sshport: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"

@@ -8,25 +8,19 @@ name: autobump
 # ALLOWLIST is deliberately narrow and explicit: most formulae in this tap
 # have a custom structure (bun's rN revision, pinned llvm@21/icu4c@78, shims
 # with no upstream at all) that `bump-formula-pr`'s url/sha256 gsub can't
-# rewrite cleanly. claude-code's and opencode-shim's non-trivial install()
-# (signing, RUNPATH injection, bundled shim deps) don't matter here — their
-# formula-level url/version/sha256 shape (npmmirror tarball, version
-# embedded in the URL) is a plain, bump-formula-pr-compatible pattern like
-# grok-build; install() logic is version-independent packaging that a
-# version bump never touches. opencode-shim is the prebuilt-binary formula
-# (Formula/o/opencode-shim.rb) — NOT opencode or opencode@2, the
-# from-source formulae. opencode-shim@2 (v2 preview prebuilt) is the same
-# version-embedded-URL pattern as opencode-shim and grok-build — though its
-# 0.0.0-next-* rolling versions mean a weekly bump PR whenever upstream
-# publishes a new next build, which is expected (keeps the v2 preview
-# current). opencode (formerly ohos-opencode; 2026-07-31: patches converted
-# to inreplace, zero .patch files) is autobumpable — url/version/sha256 are
-# plain bump-formula-pr-compatible edits. opencode@2 (formerly
-# ohos-opencode@2) is a git-revision
-# formula (bun.rb pattern, fixed version "2.0.0-beta", url pins the v2
-# branch HEAD via `revision:`); bump-formula-pr rejects fixed-version bumps,
-# so autobump.sh has a custom bump path for it (updates the revision pin +
-# increments brew revision) — see the comment in the loop body.
+# rewrite cleanly. claude-code's non-trivial install() (signing, bundled
+# shim deps) doesn't matter here — its formula-level url/version/sha256
+# shape (npmmirror tarball, version embedded in the URL) is a plain,
+# bump-formula-pr-compatible pattern like grok-build; install() logic is
+# version-independent packaging that a version bump never touches. opencode
+# (formerly ohos-opencode; 2026-07-31: patches converted to inreplace, zero
+# .patch files) is autobumpable — url/version/sha256 are plain
+# bump-formula-pr-compatible edits. opencode@2 (formerly ohos-opencode@2)
+# is a git-revision formula (bun.rb pattern, fixed version "2.0.0-beta",
+# url pins the v2 branch HEAD via `revision:`); bump-formula-pr rejects
+# fixed-version bumps, so autobump.sh has a custom bump path for it (updates
+# the revision pin + increments brew revision) — see the comment in the
+# loop body.
 # Only add a formula here after confirming `brew bump-formula-pr --dry-run`
 # produces a clean url/sha256 edit for it. version-check.yml keeps reporting
 # the full outdated list (allowlisted or not) for humans deciding what to
@@ -57,7 +51,7 @@ permissions:
   pull-requests: write
 
 env:
-  ALLOWLIST: "opencode-shim grok-build claude-code opencode opencode@2 opencode-shim@2"
+  ALLOWLIST: "grok-build claude-code opencode opencode@2"
   IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core

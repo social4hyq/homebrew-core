@@ -16,8 +16,9 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.11-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6db4f97c644324e52c6dec4041b614181b45a024b104a40680f15f35178ebf7e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.11-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "15da42dd92ba4cf4eeade8ca47df219310cdce03e09a499072e3a09ac896a738"
   end
 
   # opencode is a `bun build --compile` single binary: OHOS bun runtime + JS
@@ -206,8 +207,8 @@ class Opencode < Formula
     # output, so the interposer is already in the binary — no LD_PRELOAD of
     # libohos_compat.so is needed (that was the r1/r2 wrapper, now removed).
     #
-    # dlopen-sign-shim is NOT needed here, unlike opencode-shim.rb: bun signs the
-    # @ohos-ports native .so in-process during `bun install`, and the embed
+    # dlopen-sign-shim is NOT needed here: bun signs the @ohos-ports native
+    # .so in-process during `bun install`, and the embed
     # (`with { type: "file" }`) preserves those bytes, so the runtime-extracted
     # libraries are already signed.
     #
