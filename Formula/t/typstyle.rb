@@ -1,13 +1,13 @@
 class Typstyle < Formula
   desc "Beautiful and reliable typst code formatter"
   homepage "https://typstyle-rs.github.io/typstyle/"
-  url "https://github.com/typstyle-rs/typstyle/archive/refs/tags/v0.15.0.tar.gz"
-  sha256 "23dd94b7a3f0e5ca40827d3998cc9669457a6aad80a6e70bbb886111734dab3f"
+  url "https://github.com/typstyle-rs/typstyle/archive/refs/tags/v0.15.1.tar.gz"
+  sha256 "0f1b86584a0eb93b0cef374ddcc62508c46ee76cd8b5ede31414260d29a38f12"
   license "Apache-2.0"
   head "https://github.com/typstyle-rs/typstyle.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b184c40b72d6dae9fbf86bf618b06ef090a92ab18b0da8d94b2d9d6495f68786"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "43a031659c759f41ae6afdbca06fbf602b74dc34e0119b90bd90840bba23221c"
   end
 
   depends_on "rust" => :build
