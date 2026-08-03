@@ -9,8 +9,7 @@ class Zuban < Formula
   head "https://github.com/zubanls/zuban.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9efdbca4c2fdb53a014062da53a6c44246108d37533747c1ea3efdf7b5711a66"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7867c342076aaed54f2a0fdb661669f8f244b69c98ab89b94a58c5064807a0c2"
   end
 
   depends_on "rust" => :build
