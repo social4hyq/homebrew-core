@@ -14,7 +14,7 @@ class Epinio < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5cafab1a0e669b51e3036a7a3bed5383e235cb0c0e66f3b8d364b4487214121d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5411f71dc31a421be6648d111e7517545bd7f9856d4353ade2c8596eac950da"
   end
 
   depends_on "go" => :build
