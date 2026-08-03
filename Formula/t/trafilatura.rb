@@ -8,7 +8,7 @@ class Trafilatura < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d519295acb4eea45aa410843c2ef7447756f4d9728936629a0bac1e7fa7a4f55"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e4521e6c4d152f28bcb6157b08c8147c8cb9d7f85e6b28a77650e0d9d045b3e1"
   end
 
   depends_on "certifi"
