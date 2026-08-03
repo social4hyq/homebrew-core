@@ -1,12 +1,12 @@
 class Hadolint < Formula
   desc "Smarter Dockerfile linter to validate best practices"
   homepage "https://github.com/hadolint/hadolint"
-  url "https://github.com/hadolint/hadolint/archive/refs/tags/v2.14.0.tar.gz"
-  sha256 "002a411ac608696327d65aaa6e77c8fafe2561429ce56cca0ccb67c2956f8dd5"
+  url "https://github.com/hadolint/hadolint/archive/refs/tags/v2.15.1.tar.gz"
+  sha256 "52fbc1c8a4558f89e3b0c9d905e62016cf58ae842f9fa3ac93c56bb45f8c9ddb"
   license "GPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6021fc92e8765be403102bf1c664d5ef0bb5f8346272364b0b5e080dfd7f4b26"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b560a756b24da8c24bc722f0eba5b9810441f6b812ee94ce4645db796030bbfa"
   end
 
   depends_on "cabal-install" => :build
