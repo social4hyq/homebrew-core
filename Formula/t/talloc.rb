@@ -12,7 +12,7 @@ class Talloc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "15765144fb4e122914a9a1a4b4841df722c2e177c7b47482597592875f02a9a8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f77fae9e24731f5ce05a487534cac148f8e12531f4ae3cf54509e737b67ec783"
   end
 
   uses_from_macos "python" => :build
