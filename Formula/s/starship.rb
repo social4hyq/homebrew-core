@@ -64,7 +64,7 @@ class Starship < Formula
             __starship_get_time() { typeset -gi STARSHIP_CAPTURED_TIME; (( STARSHIP_CAPTURED_TIME = EPOCHREALTIME * 1000 )) }
         fi
         # <<< starship ohos init <<<
-        EOF
+      EOF
 
       Then run: source ~/.zshrc
     CAVEATS
