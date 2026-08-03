@@ -1,14 +1,14 @@
 class Resvg < Formula
   desc "SVG rendering tool and library"
   homepage "https://github.com/linebender/resvg"
-  url "https://github.com/linebender/resvg/archive/refs/tags/v0.47.0.tar.gz"
-  sha256 "7869119fd822983b0a0bc2469bc94d59e7908fc12165fa67a105a4fa25087f9a"
+  url "https://github.com/linebender/resvg/archive/refs/tags/v0.48.1.tar.gz"
+  sha256 "40dafea6b4b9d01e9d28b6d49f1e912daf3e9055676ad9179a5a2db6e7386945"
   license "MPL-2.0"
   compatibility_version 1
   head "https://github.com/linebender/resvg.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "463a976448b750ebcb29f8d234817b52c1ff235f5890c10ce3c0fb5da410336e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e846f686a0fac16e0abff34fd536b7ad31b7007286f9b8be933b21df83997986"
   end
 
   depends_on "cargo-c" => :build
