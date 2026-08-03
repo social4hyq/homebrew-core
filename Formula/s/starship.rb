@@ -12,9 +12,9 @@ class Starship < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r2"
-    rebuild 1
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "86da96b06db71e1ad7bf6188883ada9b8d91bd9868adf3124287b18ecbceb169"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r3"
+    rebuild 2
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "d3c0dc62095844b245ebcb015f7a1394c6339fbbf6b3d7c6588e376f8bd7b259"
   end
 
   depends_on "rust" => :build
@@ -64,7 +64,7 @@ class Starship < Formula
             __starship_get_time() { typeset -gi STARSHIP_CAPTURED_TIME; (( STARSHIP_CAPTURED_TIME = EPOCHREALTIME * 1000 )) }
         fi
         # <<< starship ohos init <<<
-        EOF
+      EOF
 
       Then run: source ~/.zshrc
     CAVEATS
