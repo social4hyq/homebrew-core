@@ -7,7 +7,7 @@ class GiteaMcpServer < Formula
   head "https://gitea.com/gitea/gitea-mcp.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "75d27cbe8d1d04f1f85ea17dd4e654cdc705084cf6fef7509fb25afe4faaa034"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c190778bc83a337b6a542e83b963032aa9de69b6c2e3e93488446edd4379224"
   end
 
   depends_on "go" => :build
