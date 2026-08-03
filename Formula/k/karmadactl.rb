@@ -7,7 +7,7 @@ class Karmadactl < Formula
   head "https://github.com/karmada-io/karmada.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f328b0be175f8f6c67723cdf4085c97f8194afcc4c68ae1348a0df0574471152"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e45e5665457b46c0a87e7adf028b2991c604af8782028da0a8a403d80542387"
   end
 
   depends_on "go" => :build
