@@ -1,13 +1,13 @@
 class Lf < Formula
   desc "Terminal file manager"
   homepage "https://godoc.org/github.com/gokcehan/lf"
-  url "https://github.com/gokcehan/lf/archive/refs/tags/r41.tar.gz"
-  sha256 "55c556d53b5541d5f8691f1309a0166a7a0d8e06cb051c3030c2cd7d8abc6789"
+  url "https://github.com/gokcehan/lf/archive/refs/tags/r42.tar.gz"
+  sha256 "7a8f7c2c86419270b713b6235dced7b9d0e68732e74a1e0f375f774fff4023ca"
   license "MIT"
   head "https://github.com/gokcehan/lf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fca6299983fe598ba533c3c152a588c050ad30748666bae70c81deace916f5a3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "15581af571f54c50d6bb3dfb6bf41d0b1323c077a5806e9f19b77ab35d3c89a3"
   end
 
   depends_on "go" => :build
