@@ -1,8 +1,8 @@
 class Vcpkg < Formula
   desc "C++ Library Manager"
   homepage "https://github.com/microsoft/vcpkg"
-  url "https://github.com/microsoft/vcpkg-tool/archive/refs/tags/2026-07-13.tar.gz"
-  sha256 "f17b6d1100469a594ea6414f4a16bb22c485e99125ca5db8235dee28a95635e5"
+  url "https://github.com/microsoft/vcpkg-tool/archive/refs/tags/2026-07-27.tar.gz"
+  sha256 "cb2ac34ab85008876004b0817c0a82c96f773ce3aaedb9c35e8ebb523ef1754b"
   license "MIT"
   head "https://github.com/microsoft/vcpkg-tool.git", branch: "main"
 
@@ -20,7 +20,7 @@ class Vcpkg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "42375618cd1420cfab85f3b03d25b5c0c09b85123b1b498e8289de5b55113b87"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b83d90a8a334c4cfa91142448733f7c16ca9ee595c4e4422ffc31564356d6b75"
   end
 
   depends_on "cmake" => :build
