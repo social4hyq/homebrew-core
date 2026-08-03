@@ -12,7 +12,7 @@ class Juicefs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6eae958263bae28bcfda672746d60fab93020b6f61c6974955069c7d0a6949dd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "32c917e387f73bc4db3780e6e7b27a4ed9f922529c9069ec3b3659fafcb8e2b9"
   end
 
   depends_on "go" => :build
