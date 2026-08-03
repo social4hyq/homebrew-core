@@ -8,6 +8,8 @@ class Zsh < Formula
     "ISC", # Src/openssh_bsd_setres_id.c
   ]
 
+  revision 2
+
   stable do
     url "https://downloads.sourceforge.net/project/zsh/zsh/5.9.2/zsh-5.9.2.tar.xz"
     mirror "https://www.zsh.org/pub/zsh-5.9.2.tar.xz"
@@ -29,9 +31,8 @@ class Zsh < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zsh-v5.9.2-r2"
-    rebuild 1
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "7efe9c1c9b54cb9040ac5bddee9d16921225f423324b36fae0b3d0c387a99b3c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zsh-v5.9.2-r5"
+    rebuild 2
   end
 
   head do
@@ -51,20 +52,36 @@ class Zsh < Formula
     # Ref: https://sourceforge.net/p/zsh/code/ci/ab4d62eb975a4c4c51dd35822665050e2ddc6918/
     ENV.append_to_cflags "-Wno-implicit-int" if DevelopmentTools.clang_build_version >= 1403
 
-    # OHOS 适配：zsh 模块（.bundle）在 dlopen 时需要从主二进制解析
-    # backwardmetafiedchar / thingytab 等内部符号。-rdynamic 把全局符号
-    # 导出到 .dynsym，否则模块加载报 "symbol not found"。
-    # 系统 /usr/bin/zsh 天然带 DF_SYMBOLIC（等效），brew 版需显式加。
-    # zsh configure 有 -rdynamic 检测（zsh_cv_rdynamic_available），但在
-    # OHOS 容器里该检测可能失败。直接预设 EXTRA_LDFLAGS 绕过检测。
-    # 同时覆盖 EXELDFLAGS：默认值含 -s（strip all），会移除 .dynsym 导出
-    # 符号，使 -rdynamic 失效。改为只用 -rdynamic，不 strip。
-    ENV["EXTRA_LDFLAGS"] = "-rdynamic"
-    ENV["EXELDFLAGS"] = "-rdynamic"
+    # OHOS 适配：默认（dynamic）模式下 zsh 模块用 dlopen 加载，需要从主二进制
+    # 解析 backwardmetafiedchar / thingytab 等符号。但 OHOS 的 musl 动态链接器
+    # 在 dlopen 时不解析主二进制的 .dynsym（即使 -rdynamic/--export-dynamic
+    # 导出了符号），导致模块加载报 "symbol not found"。系统 /usr/bin/zsh 的
+    # 模块是静态内建的，能正常使用。--disable-dynamic 让所有模块静态链接进
+    # 主二进制，与系统 zsh 一致，绕开 OHOS dlopen 限制。
+    #
+    # 静态化处理：
+    # - 简单 `link=dynamic` 的模块改 `link=either`，否则 --disable-dynamic
+    #   会把它们降级为 link=no（禁用）。either 在静态模式变成 link=static。
+    #   条件式 link（`link='if test...`）不动，configure 会自行判断。
+    # - pcre.mdd 硬编码 dynamic，改 link=static 强制静态（需链接 libpcre2）。
+    # - mapfile 在 5.9.2 有上游 bug：引用 exec.c 的 static 函数 readoutput，
+    #   动态链接时可访问，静态链接时报 undefined symbol，故 link=no 禁用。
+    inreplace buildpath/"Src/Modules/pcre.mdd", /^link=.*?(?=^load=)/m, "link=static\n"
+    inreplace buildpath/"Src/Modules/mapfile.mdd", /^link=.*?(?=^load=)/m, "link=no\n"
+    excluded_mdds = %w[mapfile.mdd pcre.mdd]
+    Dir[buildpath/"Src/Modules/*.mdd", buildpath/"Src/Builtins/*.mdd",
+        buildpath/"Src/Zle/*.mdd"].each do |mdd|
+      next if excluded_mdds.include?(File.basename(mdd.to_s))
+
+      content = File.read(mdd)
+      content.sub!("link=dynamic", "link=either") if content.match?(/^link=dynamic/)
+      File.write(mdd, content)
+    end
 
     system "Util/preconfig" if build.head?
 
     system "./configure", "--prefix=#{prefix}",
+           "--disable-dynamic",
            "--enable-fndir=#{pkgshare}/functions",
            "--enable-scriptdir=#{pkgshare}/scripts",
            "--enable-site-fndir=#{HOMEBREW_PREFIX}/share/zsh/site-functions",
@@ -104,5 +121,7 @@ class Zsh < Formula
     assert_equal "homebrew", shell_output("#{bin}/zsh -c 'echo homebrew'").chomp
     system bin/"zsh", "-c", "printf -v hello -- '%s'"
     system bin/"zsh", "-c", "zmodload zsh/pcre"
+    system bin/"zsh", "-c", "zmodload zsh/complete"
+    system bin/"zsh", "-c", "zmodload zsh/zleparameter"
   end
 end
