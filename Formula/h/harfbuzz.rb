@@ -1,14 +1,14 @@
 class Harfbuzz < Formula
   desc "OpenType text shaping engine"
   homepage "https://github.com/harfbuzz/harfbuzz"
-  url "https://github.com/harfbuzz/harfbuzz/releases/download/14.2.1/harfbuzz-14.2.1.tar.xz"
-  sha256 "a54a5d8e9380a41fbb762ce367bcbf7704792dfca0d93f1bbca86c5a57902e0e"
+  url "https://github.com/harfbuzz/harfbuzz/releases/download/14.3.0/harfbuzz-14.3.0.tar.xz"
+  sha256 "16070d77cfc4ba1f1e7327e83bf9b3f55898081cabdb94e56a33e04fc8874eae"
   license "MIT"
   compatibility_version 1
   head "https://github.com/harfbuzz/harfbuzz.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b894cabdb75debf6fd9b2cc7756e118b4e20a8cefdfd1d793d5e7a033efb63ae"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7890889b2f840c8208e4d1c21424d331c5fa3cb55859f36150e1db09aa54e0a3"
   end
 
   depends_on "gobject-introspection" => :build
