@@ -3,12 +3,12 @@ class Diffoscope < Formula
 
   desc "In-depth comparison of files, archives, and directories"
   homepage "https://diffoscope.org"
-  url "https://files.pythonhosted.org/packages/43/f6/bbab2a5af7fb7ef42f586f24a076fc320ad3dc4ed17549bb399e796700fa/diffoscope-325.tar.gz"
-  sha256 "d74a2edb0555a9ee306d5362b921f80c144bb941c0a6d61794473d1540d729ad"
+  url "https://files.pythonhosted.org/packages/23/66/33c502a4a24ed94a676f6220225fe8da102bfc2c87d212d344de0f1eadde/diffoscope-326.tar.gz"
+  sha256 "21aaa977a9fbdf6e2b70b675a700ad1f80e878ac1dac59cf6fb0ba5f319616c7"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "48b05ff7d9dbb614f8d5b9e21b5bddc0b1bfc331ad825e9fe772c4f8fee3ae58"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3569cd56fc9c268893633e6df9930139f0d26a565279ecc7accd6b8bda6d32b"
   end
 
   depends_on "libarchive"
