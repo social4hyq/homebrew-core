@@ -7,7 +7,7 @@ class Mark < Formula
   head "https://github.com/kovetskiy/mark.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9192d47a30a2637dc99a5bfeadf62353199154c90acca7b854edcf49c6c11c31"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e36424a79722a313a41eb963eee91e086fbd6bded6540d6c4b1e12dba85ca258"
   end
 
   depends_on "go" => :build
