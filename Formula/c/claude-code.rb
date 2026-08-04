@@ -3,10 +3,9 @@ class ClaudeCode < Formula
   # code.claude.com/docs is the current official docs home; docs.anthropic.com
   # is unreachable from OHOS networks (fails `brew audit --online`).
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.220.tgz"
-  sha256 "0498d7967b0f704ed78917b2692366df30e8c0e56d1e4c51f0228f6a558b3a94"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.221.tgz"
+  sha256 "89ea3dce3b4731c3ec5cde42114209de4de7b9f86e03d39a36dd21d477bbc6e1"
   license :cannot_represent # Anthropic Commercial Terms of Service
-  revision 1
   # Claude Code 2.1.113+ only ships Bun-compiled binaries (linux-arm64-musl,
   # musl ABI compatible with OHOS). The tgz is mirrored on npmmirror (Aliyun
   # CDN): brew's curl 8.21 (OpenSSL 3.6) SIGILLs on bulk TLS GET from the
