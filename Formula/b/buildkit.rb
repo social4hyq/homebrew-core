@@ -1,8 +1,8 @@
 class Buildkit < Formula
   desc "Concurrent, cache-efficient, and Dockerfile-agnostic builder toolkit"
   homepage "https://github.com/moby/buildkit"
-  url "https://github.com/moby/buildkit/archive/refs/tags/v0.32.0.tar.gz"
-  sha256 "43a9144c2bb234683e798af23af64f5bc6499362f1b389eaf7c33573d9f59b80"
+  url "https://github.com/moby/buildkit/archive/refs/tags/v0.32.1.tar.gz"
+  sha256 "23370825c523e11655690818c7e9b571f9b7b498383b49f592791b64977265bb"
   license "Apache-2.0"
   head "https://github.com/moby/buildkit.git", branch: "master"
 
@@ -15,7 +15,7 @@ class Buildkit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c47a7fb2560f875ce3c3c20c812b699f6a3eb58920788d72f8defe2ce0a5bbb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07d3cdf88ab6f646639de004c8418d5bd84afca44bcd3d2288dab7ec39327dd9"
   end
 
   depends_on "go" => :build
