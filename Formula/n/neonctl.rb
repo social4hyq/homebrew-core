@@ -1,8 +1,8 @@
 class Neonctl < Formula
   desc "Neon CLI tool"
   homepage "https://neon.tech/docs/reference/neon-cli"
-  url "https://registry.npmjs.org/neonctl/-/neonctl-2.39.0.tgz"
-  sha256 "ebca747586d77de754778da164ce493f2bf93ab3962d423d2cc32e2e65d5ecfe"
+  url "https://registry.npmjs.org/neonctl/-/neonctl-2.43.0.tgz"
+  sha256 "7fc58dfcaecdf8cf7445f0ad26af40418aae49d0aa573c16ba865ae0e053785f"
   license "Apache-2.0"
 
   bottle do
