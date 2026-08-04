@@ -1,10 +1,20 @@
 class OhosCompatShim < Formula
   desc "LD_PRELOAD compat shim for HarmonyOS-sandboxed aarch64/musl binaries"
   homepage "https://github.com/social4hyq/ohos-compat-shim"
+  # `branch:` is required, not cosmetic: without it Homebrew's git downloader
+  # falls back to `default_refspec` -> `git remote set-head origin --auto`
+  # (GitHubGitDownloadStrategy#default_branch) to resolve which branch the
+  # revision lives on -- a network round-trip through the container's
+  # ghfast.top proxy, on every install, even when the revision is already
+  # cached locally. Naming the branch explicitly (this repo's default is
+  # `main`) skips that call entirely, same as bun.rb's `branch:
+  # "ohos-aarch64"`. Found 2026-08-04 when ghfast.top was down and installs
+  # failed here specifically, not at the actual clone/checkout.
   url "https://github.com/social4hyq/ohos-compat-shim.git",
-      revision: "d5a9d08c61d572c3e3ba6f2b8ec8bda75d64f228"
+      revision: "362bdf71e7b8c93db2dde1c01a0d334edbb36561", branch: "main"
   version "0.2.7"
   license "MIT"
+  revision 1
 
   livecheck do
     skip "development tool, manually versioned"
@@ -37,9 +47,17 @@ class OhosCompatShim < Formula
            "src/ohos_compat_shim.c",
            "-O2", "-Wall", "-Wextra", "-ldl"
     lib.install "libohos_compat.so"
+    # Generic launcher: `ohos-shim <command> [args...]` preloads the shim
+    # and execs. Resolves the .so via ../lib relative to itself (this
+    # formula's own bin+lib layout) with a $HOMEBREW_PREFIX fallback, so it
+    # works installed or copied standalone. Generalizes
+    # examples/opencode-wrapper.sh (one target hardcoded per copy) into a
+    # single reusable command.
+    bin.install "bin/ohos-shim"
   end
 
   test do
     assert_path_exists lib/"libohos_compat.so"
+    assert_match "usage: ohos-shim", shell_output("#{bin}/ohos-shim 2>&1", 64)
   end
 end
