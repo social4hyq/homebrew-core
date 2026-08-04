@@ -15,7 +15,7 @@ class Buildkit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c47a7fb2560f875ce3c3c20c812b699f6a3eb58920788d72f8defe2ce0a5bbb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07d3cdf88ab6f646639de004c8418d5bd84afca44bcd3d2288dab7ec39327dd9"
   end
 
   depends_on "go" => :build
