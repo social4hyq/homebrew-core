@@ -7,7 +7,7 @@ class Fn < Formula
   head "https://github.com/fnproject/cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e5eefcabde6c04a8489834da0d091bf6784008f974ea931d8cfda25816abc9a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bfbbc98910d33f329563853c07da273e26bf8f72bab2a6c44fc3eb4b3c612340"
   end
 
   depends_on "go" => :build
