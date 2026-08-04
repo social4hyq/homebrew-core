@@ -11,7 +11,7 @@ class TyposCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e006f0caba9cc0964a63df6fd1e4efade29648ddb47adccb21cc650c7203771"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "180b07b9b2c48c32b0098741c20214c71e45f8ca172355269558137af3e4634b"
   end
 
   depends_on "rust" => :build
