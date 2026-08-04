@@ -6,7 +6,7 @@ class Secp256k1 < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a35772bdef8410c1ce4d7546026368958c265bf02b7cfa1a4dad8cd919247990"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0951ba81fda8166e1028c56c4fbaeda4111305ac080fe496ab8f16519c06d7b4"
   end
 
   depends_on "autoconf" => [:build]
