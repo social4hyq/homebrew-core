@@ -1,13 +1,18 @@
 class Libextractor < Formula
   desc "Library to extract meta data from files"
   homepage "https://www.gnu.org/software/libextractor/"
-  url "https://ftpmirror.gnu.org/gnu/libextractor/libextractor-1.17.tar.gz"
-  mirror "https://ftp.gnu.org/gnu/libextractor/libextractor-1.17.tar.gz"
-  sha256 "215c7d8dc10e0d7644509da2b47a6fa1ba5ebad8ce02904864e54abfb4c3059a"
+  url "https://ftpmirror.gnu.org/gnu/libextractor/libextractor-1.19.tar.gz"
+  mirror "https://ftp.gnu.org/gnu/libextractor/libextractor-1.19.tar.gz"
+  sha256 "2d5b33cbdb21c88ae9360994d4e216627413ee9cb11b31b033c2d0cf42ef2700"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fad09739d424b959250d12649a1bcb0ea26119a00eed86df0296b744bd240ce8"
+    sha256 arm64_tahoe:   "564174280de333db8510933759534e69021b82f17f1be0689b82e155451ed76c"
+    sha256 arm64_sequoia: "8114de877b24ceec1b99fa25a63d88220595146c6f2782a407d1dc4252364938"
+    sha256 arm64_sonoma:  "79bf379f9180159cde5736457d053ee98bd59ec48817e80e9846909cce44873e"
+    sha256 sonoma:        "3f12e1073655ca34499d7f51bb0d24eab1de57b44aa32b05254494e48a35da98"
+    sha256 arm64_linux:   "cdd86c28507ed9b56d66d5e31107822e2f94cf35cac0792c92d23712eb1da019"
+    sha256 x86_64_linux:  "8648235d51ff13e908e9078653ebd7f5b8a0f325a629ac2653b8759a3083156c"
   end
 
   depends_on "pkgconf" => :build
@@ -26,11 +31,6 @@ class Libextractor < Formula
     inreplace "src/plugins/qt_extractor.c",
               "static uint64_t\nntohll (uint64_t n)",
               "#undef ntohll\n\\0"
-
-    # 1.17 uses glibc-only `secure_getenv` guarded by `#if _GNU_SOURCE`, which
-    # autoconf also defines on macOS and OHOS; use `getenv` there instead.
-    inreplace "src/main/extractor_plugpath.c",
-              "#if _GNU_SOURCE", "#if _GNU_SOURCE && !defined(__APPLE__) && !defined(__OHOS__)"
 
     system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
