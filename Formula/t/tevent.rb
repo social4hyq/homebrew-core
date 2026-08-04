@@ -1,8 +1,8 @@
 class Tevent < Formula
   desc "Event system based on the talloc memory management library"
   homepage "https://tevent.samba.org"
-  url "https://www.samba.org/ftp/tevent/tevent-0.17.1.tar.gz"
-  sha256 "1be2dea737cde25fe06621f84945e63eb71259e0c43e9f8f5da482dab1a7be92"
+  url "https://www.samba.org/ftp/tevent/tevent-0.17.2.tar.gz"
+  sha256 "e53b1ac288d017d66dde0471cd429a806168ecf07179d7f019572d7a7e05f0d6"
   license "LGPL-3.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class Tevent < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7262ced97fe303b00736be3cb4663120ddd10b90591ce6c2c0060ddcb717576"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "96e0e4f51191d19b889f5d4f21e3985f4eb8e5dfd3fabf99551dcef5f9a55c0a"
   end
 
   depends_on "cmocka" => :build
