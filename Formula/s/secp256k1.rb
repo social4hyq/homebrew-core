@@ -1,12 +1,12 @@
 class Secp256k1 < Formula
   desc "Optimized C library for EC operations on curve secp256k1"
   homepage "https://github.com/bitcoin-core/secp256k1"
-  url "https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.7.1.tar.gz"
-  sha256 "958f204dbafc117e73a2604285dc2eb2a5128344d3499c114dcba5de54cb7a9e"
+  url "https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.8.0.tar.gz"
+  sha256 "eb52b0e9239dff7dc26be5f9623567141b8720ec47da29eb3c1e0a660d17c8bb"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a35772bdef8410c1ce4d7546026368958c265bf02b7cfa1a4dad8cd919247990"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0951ba81fda8166e1028c56c4fbaeda4111305ac080fe496ab8f16519c06d7b4"
   end
 
   depends_on "autoconf" => [:build]
