@@ -6,7 +6,7 @@ class Libcec < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3890b040dccb0d8b6670e89445336ee0571dae492fc01f5a88cec85f626f96d2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6dfd6138eb5a14f67936a83e097d2f2cb65e9c7dda93918fc4bb5e2b6afdfe56"
   end
 
   depends_on "cmake" => :build
