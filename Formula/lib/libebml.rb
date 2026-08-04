@@ -1,8 +1,8 @@
 class Libebml < Formula
   desc "Sort of a sbinary version of XML"
   homepage "https://www.matroska.org/"
-  url "https://dl.matroska.org/downloads/libebml/libebml-1.4.6.tar.xz"
-  sha256 "d06cf1d5ad89390389eeb1eb7d50f70b55ac7538b19aeac8859eed3f2a9908dc"
+  url "https://dl.matroska.org/downloads/libebml/libebml-1.4.7.tar.xz"
+  sha256 "5b08214f929ee54c6187c370f84235fc9d0f2a2258c4d320d68eae6e2bdfd3f7"
   license "LGPL-2.1-or-later"
   head "https://github.com/Matroska-Org/libebml.git", branch: "master"
 
@@ -12,22 +12,13 @@ class Libebml < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a00dfbeb57ee70cf52b870f6c9d63fe56bdc18638b8c2c167c503a05b6923a10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "15486de65f803b4ac3405d10dbb8953d27e9a4a7966cdc177139f76a3186e9cd"
   end
 
   depends_on "cmake" => :build
   depends_on "utf8cpp" => :build
 
   def install
-    inreplace "CMakeLists.txt" do |s|
-      # Allow to use newer utf8cpp library
-      s.gsub! "find_package(utf8cpp 3.2.0)", "find_package(utf8cpp)"
-      # https://github.com/Matroska-Org/libebml/issues/344
-      s.gsub! "target_link_libraries(ebml PRIVATE $<BUILD_INTERFACE:utf8cpp>)", ""
-    end
-
-    ENV.append_to_cflags "-I#{formula_opt_include("utf8cpp")}/utf8cpp"
-
     args = %w[-DBUILD_SHARED_LIBS=ON]
     system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
@@ -48,7 +39,7 @@ class Libebml < Formula
       }
     CPP
 
-    system ENV.cxx, "-std=c++11", "test.cpp", "-o", "test", "-I#{include}", "-L#{lib}", "-lebml"
+    system ENV.cxx, "test.cpp", "-o", "test", "-I#{include}", "-L#{lib}", "-lebml"
     system "./test"
   end
 end
