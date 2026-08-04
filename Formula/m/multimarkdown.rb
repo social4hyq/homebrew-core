@@ -1,13 +1,18 @@
 class Multimarkdown < Formula
   desc "Turn marked-up plain text into well-formatted documents"
   homepage "https://fletcher.github.io/MultiMarkdown-6/"
-  url "https://github.com/fletcher/MultiMarkdown-6/archive/refs/tags/6.7.0.tar.gz"
-  sha256 "aa386f54631dbc4e0beeb6b9cf9eb769db95a3f505a69b663140a80008cf0595"
+  url "https://github.com/fletcher/MultiMarkdown-6/archive/refs/tags/6.8.0.tar.gz"
+  sha256 "6568d1e5ccaffab3a8689909fe21f64066c13d5716a0010a4c3fffcb308d3f9e"
   license "MIT"
   head "https://github.com/fletcher/MultiMarkdown-6.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ae4710c23f3128eb754e4d7a7d426ceb2a5c6ca60f624b89947edf46b6964de"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "8464a52cbbc398b38438e3da65b17cd346fb766477904d686c6cf9314f6d6798"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "96c714c15dfd86fbaed058206c70a57d56cdb88aa50640a7a65d9f9b8929e563"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "b75dbe8648f77c5b61c2be840157c8b60df53f87b9f7a6070c322308629ce9c5"
+    sha256 cellar: :any_skip_relocation, sonoma:        "3e9d7f695bca48fe2dcd296f69e6f68b47194e98da433da42d21b48417c0a55c"
+    sha256 cellar: :any,                 arm64_linux:   "a046aecc79a69c5554ba8d8fddeb1834e9c89187a112ae85a26e40bcb51b7297"
+    sha256 cellar: :any,                 x86_64_linux:  "3ce18f8985e0e2ea7fe49270fbc02c6a7ad1766fecd77fbedfb3079c78f43f6c"
   end
 
   depends_on "cmake" => :build
@@ -15,12 +20,6 @@ class Multimarkdown < Formula
   conflicts_with "mtools", because: "both install `mmd` binaries"
   conflicts_with "markdown", because: "both install `markdown` binaries"
   conflicts_with "discount", because: "both install `markdown` binaries"
-
-  # Workaround for CMake 4 compatibility
-  patch do
-    url "https://github.com/fletcher/MultiMarkdown-6/commit/655c0908155758e7c94858af2fb99dc992709075.patch?full_index=1"
-    sha256 "1ca4b7ea07c19981685786f8f469aad9c9d0d6af8394bc9d3b92608de929495c"
-  end
 
   def install
     system "cmake", "-S", ".", "-B", "build", *std_cmake_args
