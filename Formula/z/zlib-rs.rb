@@ -1,13 +1,13 @@
 class ZlibRs < Formula
   desc "C API for zlib-rs"
   homepage "https://github.com/trifectatechfoundation/zlib-rs/tree/main/libz-rs-sys-cdylib#libz-rs-sys-cdylib"
-  url "https://github.com/trifectatechfoundation/zlib-rs/archive/refs/tags/v0.6.6.tar.gz"
-  sha256 "e909a4fe6a67362e5a0db67114b69496a4572c0b99c26e7542638ec003fc11b2"
+  url "https://github.com/trifectatechfoundation/zlib-rs/archive/refs/tags/v0.6.7.tar.gz"
+  sha256 "a2dac1f1102f01a2da1ec5b708f8f3832cedad138a6732f241204fa0f3617b81"
   license "Zlib"
   head "https://github.com/trifectatechfoundation/zlib-rs.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "afcd25cfb4f8950108739dc5f63a51709c4f67845ccd22d3117d49efc4494795"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "90b4eeac5bc34295f42ae9ceacfb539d512902d2804883c350bdaad95d258993"
   end
 
   depends_on "cargo-c" => :build
