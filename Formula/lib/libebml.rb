@@ -12,12 +12,7 @@ class Libebml < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "7d5c5e9913544130b8d5b7eeb1ed4027a62520c07bb1546e43d16707a7386a2d"
-    sha256 cellar: :any, arm64_sequoia: "5b60dc631dd96becbdd1ef9aa17711697feb3cc57c478b8a1248600a2c7fddf3"
-    sha256 cellar: :any, arm64_sonoma:  "03cf729ca8007eea4bbb7130850137a392f15c22e25fa0b1b10dd6483e2ffef2"
-    sha256 cellar: :any, sonoma:        "039207dc37ef7ba4ba3cd16e88a6c306ea503976182d5c3af90bf1790b305354"
-    sha256 cellar: :any, arm64_linux:   "0a75bcd86d089f537a3671b2d528e135896f064134cbf59fb8aedaaddcd526bd"
-    sha256 cellar: :any, x86_64_linux:  "55442b033a637e363bd95d2582320402d886ff644e1dabd70f69161b14d1517a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "15486de65f803b4ac3405d10dbb8953d27e9a4a7966cdc177139f76a3186e9cd"
   end
 
   depends_on "cmake" => :build
