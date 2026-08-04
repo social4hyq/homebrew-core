@@ -15,7 +15,7 @@ class Kubo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8a5f15f43f31db90427bcc649b0b36a3bb695f6ff4579ebc3db8937e35f6af3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e5bca654fae496d99c0e5468da59602d90d3007d0dd7741d4cc96673be710d7"
   end
 
   depends_on "go" => :build
