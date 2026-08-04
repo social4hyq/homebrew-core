@@ -7,12 +7,7 @@ class Circumflex < Formula
   head "https://github.com/bensadeh/circumflex.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "52a406985c13e74222f443df5ec3dd2a471e073cee561e64986931aa022cdc86"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "9a6d9e1430cec0541cadf8a4ca9bc82a8d26a1921f5d4d9ef0760ef6f5f215f5"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "a3a0449698f6bee22c2594afa927764c244f6fe249ca7e6b9947c51862acc1a3"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e82108bea310080d50c8fce7a282296fc686108e796406561f3ddce461c1a78d"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "248b94fb84b73b09350e1310edec1d6e1ac8a1181a45c77cb592cbe4f73b6026"
-    sha256 cellar: :any,                 x86_64_linux:  "86dedca1fdb828ad049ffd3414da5c4505bcaaf14d8dc5bb4ac220e3e6a53666"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c5172fcf6aedec52524d879c68f6d19ae15c2fde0734f5d0293f668301368bd"
   end
 
   depends_on "go" => :build
