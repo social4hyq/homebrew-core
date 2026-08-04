@@ -6,7 +6,7 @@ class SofiaSip < Formula
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "11419a7f5d0fb410b88e237520aa32c9288bd5d8e7714de141cda18843024c14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9b400949d48feaba78a264d0903c1b0fd0d88b861750b8816154c80f56260eb"
   end
 
   depends_on "autoconf" => :build
