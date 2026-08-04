@@ -11,7 +11,7 @@ class Tevent < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7262ced97fe303b00736be3cb4663120ddd10b90591ce6c2c0060ddcb717576"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "96e0e4f51191d19b889f5d4f21e3985f4eb8e5dfd3fabf99551dcef5f9a55c0a"
   end
 
   depends_on "cmocka" => :build
