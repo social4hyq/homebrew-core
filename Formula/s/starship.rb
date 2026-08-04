@@ -4,7 +4,7 @@ class Starship < Formula
   url "https://github.com/starship/starship/archive/refs/tags/v1.26.0.tar.gz"
   sha256 "8c95e8a6c596b29ac192104eae00dd991e8c8fd66083fd2b34d6b223a5803a59"
   license "ISC"
-  revision 1
+  revision 2
   head "https://github.com/starship/starship.git", branch: "main"
 
   livecheck do
@@ -13,8 +13,8 @@ class Starship < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r4"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "aa8748783aa25ad7d4cfc91df90bb75a5779d403213701fd284c3cea5b8398d0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r5"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "54c2cdd11a360f18f1d37d8ecb7fa7c773d15ed1e58f4270531fdea9d57321d7"
   end
 
   depends_on "rust" => :build
@@ -87,29 +87,71 @@ class Starship < Formula
     system "cargo", "install", *std_cargo_args, "--no-default-features"
 
     generate_completions_from_executable(bin/"starship", "completions")
+
+    # OHOS shell 初始化胶水，打包成一个自带脚本而不是塞进 caveats 让用户手抄：
+    # 手抄的块一旦贴进各台机器的 dotfile 就冻结了，以后发现新坑得逐台改；装进
+    # formula 自己的 share/ 下，胶水随 `brew upgrade starship` 一起升级，新机
+    # ~/.zshrc 只需一行 `source`。三个坑各自带守卫，缺前提就跳过：
+    #   - TZ：本机没有 /etc/localtime、也没有逐时区 zoneinfo（只有 Android 格式
+    #     tzdata blob），IANA 名字不生效，只有 POSIX 偏移串管用，运行时用
+    #     `date +%z` 现推，取不到就不设（不比不 source 更糟）
+    #   - fpath：系统 zsh（HiShell）没把 zsh 自带函数目录接进 fpath，autoload
+    #     会找不到 add-zsh-hook；brew zsh 本来就有，这里幂等去重
+    #   - mathfunc：系统 zsh 无此模块，starship init 生成的 __starship_get_time
+    #     调 int(rint(...)) 会报错，改写成纯算术版本（必须放在 starship init
+    #     之后，否则会被 init 自己定义的版本覆盖回去）
+    pkgshare.mkpath
+    (pkgshare/"ohos-init.zsh").write <<~ZSH
+      # harmonybrew-core `starship` formula 自带的 OHOS shell 初始化胶水。
+      # 由 formula 生成，不要手改——升级走 `brew upgrade starship`。
+
+      _starship_ohos_setup_tz() {
+          [[ -n ${TZ:-} ]] && return
+          local off sign hh mm
+          off=$(date +%z 2>/dev/null) || return
+          [[ $off == [+-][0-9][0-9][0-9][0-9] ]] || return
+          sign=${off[1]} hh=${off[2,3]} mm=${off[4,5]}
+          hh=${hh#0}
+          [[ -z $hh ]] && hh=0
+          # POSIX TZ 的符号习惯是反的：本地时间 = UTC + 8 要写成 "UTC-8"。
+          [[ $sign == + ]] && sign=- || sign=+
+          if [[ $mm == 00 ]]; then
+              export TZ="UTC${sign}${hh}"
+          else
+              export TZ="UTC${sign}${hh}:${mm}"
+          fi
+      }
+      _starship_ohos_setup_tz
+      unset -f _starship_ohos_setup_tz
+
+      _starship_ohos_funcs="#{HOMEBREW_PREFIX}/share/zsh/functions"
+      if [[ -d $_starship_ohos_funcs ]] && (( ! ${fpath[(Ie)$_starship_ohos_funcs]} )); then
+          fpath=("$_starship_ohos_funcs" $fpath)
+      fi
+      unset _starship_ohos_funcs
+
+      autoload -Uz compinit && compinit -u 2>/dev/null
+      eval "$(starship init zsh)" 2>/dev/null
+
+      if ! zmodload -e zsh/mathfunc 2>/dev/null; then
+          zmodload zsh/datetime 2>/dev/null
+          __starship_get_time() {
+              typeset -gi STARSHIP_CAPTURED_TIME
+              (( STARSHIP_CAPTURED_TIME = EPOCHREALTIME * 1000 ))
+          }
+      fi
+    ZSH
   end
 
   def caveats
     <<~CAVEATS
-      Run this command to set up starship in ~/.zshrc:
+      Set up starship on OHOS (copy-paste this whole line):
 
-        cat >> ~/.zshrc << 'EOF'
+        echo 'source "#{opt_pkgshare}/ohos-init.zsh"' >> ~/.zshrc && source ~/.zshrc
 
-        # >>> starship ohos init >>>
-        export TZ=CST-8
-        _brew_zsh_funcs="#{HOMEBREW_PREFIX}/share/zsh/functions"
-        [ -d "$_brew_zsh_funcs" ] && fpath=("$_brew_zsh_funcs" $fpath)
-        unset _brew_zsh_funcs
-        autoload -Uz compinit && compinit -u 2>/dev/null
-        eval "$(starship init zsh)" 2>/dev/null
-        if ! zmodload -e zsh/mathfunc 2>/dev/null; then
-            zmodload zsh/datetime 2>/dev/null
-            __starship_get_time() { typeset -gi STARSHIP_CAPTURED_TIME; (( STARSHIP_CAPTURED_TIME = EPOCHREALTIME * 1000 )) }
-        fi
-        # <<< starship ohos init <<<
-      EOF
-
-      Then run: source ~/.zshrc
+      This one line replaces the old hand-copied OHOS init block — the glue
+      (timezone, fpath, mathfunc fallback) now lives in the keg and upgrades
+      with `brew upgrade starship`.
     CAVEATS
   end
 
