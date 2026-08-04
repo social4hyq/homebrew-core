@@ -6,7 +6,7 @@ class RailsMcpServer < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6158d9672bf1e4a9e2c731926713c3bb49b75578948df3cc3ba25fc0d22eaf0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d29dc8f4b27b87cd6222199b9e67a8c40d8ca91aa507f02867ce1354f94dd699"
   end
 
   depends_on "openssl@3"
