@@ -13,7 +13,7 @@ class VulkanLoader < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d57e42bff7fc8a0f183e8cf01d06aa648686757d7ac253d7ed94b2e57527cb0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce58ed3245580fbe5d3bafe2784a84baa9465c10e2809c0806136b4473d22e6e"
   end
 
   depends_on "cmake" => :build
