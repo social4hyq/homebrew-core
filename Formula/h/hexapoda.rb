@@ -1,13 +1,13 @@
 class Hexapoda < Formula
   desc "Colorful modal hex editor"
   homepage "https://simonomi.dev/hexapoda"
-  url "https://github.com/simonomi/hexapoda/archive/refs/tags/v0.2.4.tar.gz"
-  sha256 "3c205ee738d97743f48aa6d4190c3a2892766a07e7ceb80e09dfa5844c32a395"
+  url "https://github.com/simonomi/hexapoda/archive/refs/tags/v1.0.0.tar.gz"
+  sha256 "33c57a7bfbfab6401b94ef369262a8b8a9cde53371b032bb5c630677d26b0940"
   license "GPL-3.0-only"
   head "https://github.com/simonomi/hexapoda.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c10a209096f3793e4ad6cb0195b6e49a35d39ae100ae9e05d9776d38fa69ebf6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb1aeb948b703f297dd19a8fec2daadb2d602f8bbb09d816876c87671726e85b"
   end
 
   depends_on "rust" => :build
