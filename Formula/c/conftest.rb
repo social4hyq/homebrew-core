@@ -7,7 +7,7 @@ class Conftest < Formula
   head "https://github.com/open-policy-agent/conftest.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9974efa52bf8edec5f5950b79ea5c3bf6c03ce9448f3b1ee1ca63df52f6f693f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b6126ef67851c49b09304ea0432524cfd726c6585c4061d79584827bca54446"
   end
 
   depends_on "go" => :build
