@@ -16,7 +16,7 @@ class Vcluster < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7936d35942bb570411431fa8f82a8eb6d230fc79f056becedc78b749c016969"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fc89940b801799e8eb8e8c10bfccf51d19c854a1da04647306b7bd7d0b589195"
   end
 
   depends_on "go" => :build
