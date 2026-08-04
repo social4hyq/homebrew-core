@@ -4,6 +4,7 @@ class Starship < Formula
   url "https://github.com/starship/starship/archive/refs/tags/v1.26.0.tar.gz"
   sha256 "8c95e8a6c596b29ac192104eae00dd991e8c8fd66083fd2b34d6b223a5803a59"
   license "ISC"
+  revision 1
   head "https://github.com/starship/starship.git", branch: "main"
 
   livecheck do
@@ -40,6 +41,49 @@ class Starship < Formula
     system "rustc", "--edition", "2021", "--crate-type", "staticlib", "--emit", "obj",
            "-O", "strerror_shim.rs", "-o", "strerror_shim.o"
     ENV["RUSTFLAGS"] = "-C link-arg=#{buildpath}/strerror_shim.o"
+
+    # OHOS 应用沙箱：进程 uid 是沙箱 uid（2002xxxx），不在 /etc/passwd，username 模块
+    # 依赖的 whoami::username()（getpwuid 路径）拿不到真名，回退的 $USER 又被终端设成
+    # 数字（如 "100"），最终 prompt 显示成 uid。真实账户名只有系统库
+    # libos_account_ndk.so 的 OH_OsAccount_GetName（API 12+）能给。
+    #
+    # 两处 inreplace 都只锚定不易变的最小单元：插入点锚在 `pub fn module` 这个公开
+    # 函数签名上；替换点只换 `whoami::username()` 这一个调用表达式本身（返回类型
+    # 不变，靠类型推断跟 whoami 的 Result 错误类型对齐），后面 .inspect_err/.ok/
+    # .or_else 整条链原样不动。库/符号不存在时（如容器无 account 服务）返回
+    # None，透明回退到原有 whoami/$USER 逻辑，行为与打补丁前一致。
+    inreplace "src/modules/username.rs",
+      "pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {",
+      <<~RUST + "pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {"
+        fn ohos_account_username() -> Option<String> {
+            unsafe extern "C" {
+                fn dlopen(file: *const u8, flags: i32) -> *mut core::ffi::c_void;
+                fn dlsym(handle: *mut core::ffi::c_void, name: *const u8) -> *mut core::ffi::c_void;
+            }
+            unsafe {
+                let handle = dlopen(c"libos_account_ndk.so".as_ptr().cast(), 2 /* RTLD_NOW */);
+                if handle.is_null() {
+                    return None;
+                }
+                let sym = dlsym(handle, c"OH_OsAccount_GetName".as_ptr().cast());
+                if sym.is_null() {
+                    return None;
+                }
+                let get_name: extern "C" fn(*mut u8, usize) -> i32 = core::mem::transmute(sym);
+                let mut buf = [0u8; 256];
+                if get_name(buf.as_mut_ptr(), buf.len()) != 0 {
+                    return None;
+                }
+                let end = buf.iter().position(|&b| b == 0).unwrap_or(buf.len());
+                core::str::from_utf8(&buf[..end]).ok().filter(|s| !s.is_empty()).map(str::to_string)
+            }
+        }
+
+      RUST
+
+    inreplace "src/modules/username.rs",
+      "whoami::username()",
+      "ohos_account_username().map(Ok).unwrap_or_else(whoami::username)"
 
     system "cargo", "install", *std_cargo_args, "--no-default-features"
 
