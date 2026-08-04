@@ -1,8 +1,8 @@
 class Autocycler < Formula
   desc "Tool for generating consensus long-read assemblies for bacterial genomes"
   homepage "https://github.com/rrwick/Autocycler"
-  url "https://github.com/rrwick/Autocycler/archive/refs/tags/v0.6.2.tar.gz"
-  sha256 "5bb281c3216ac266fc17fcda74b99fea11fdf7b01b5e32656d515fe470109efa"
+  url "https://github.com/rrwick/Autocycler/archive/refs/tags/v0.6.3.tar.gz"
+  sha256 "8daa6f3a5e6cb74ab64e484ec49314a84577bcd469508d36d1d6cc8cfcb5687f"
   license "GPL-3.0-or-later"
   head "https://github.com/rrwick/Autocycler.git", branch: "main"
 
