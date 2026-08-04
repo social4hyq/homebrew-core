@@ -1,8 +1,8 @@
 class Kubo < Formula
   desc "Peer-to-peer hypermedia protocol"
   homepage "https://docs.ipfs.tech/how-to/command-line-quick-start/"
-  url "https://github.com/ipfs/kubo/archive/refs/tags/v0.42.0.tar.gz"
-  sha256 "8b80786f547b2afbfb0b52811462020f5c38c0887d067436238e4804f4727fc6"
+  url "https://github.com/ipfs/kubo/archive/refs/tags/v0.43.0.tar.gz"
+  sha256 "57045997c7f9d0c84c0707f09d26f171924342f1a3aaa7943e6115e6dfa5fe18"
   license all_of: [
     "MIT",
     any_of: ["MIT", "Apache-2.0"],
@@ -15,7 +15,7 @@ class Kubo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8a5f15f43f31db90427bcc649b0b36a3bb695f6ff4579ebc3db8937e35f6af3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e5bca654fae496d99c0e5468da59602d90d3007d0dd7741d4cc96673be710d7"
   end
 
   depends_on "go" => :build
