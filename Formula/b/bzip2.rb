@@ -11,11 +11,6 @@ class Bzip2 < Formula
     regex(/href=.*?bzip2[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "958c7316221dba51b82075b95f7948592f18268e510b4e119e76a4e5f7342945"
-  end
-
   keg_only :provided_by_macos
 
   def install
