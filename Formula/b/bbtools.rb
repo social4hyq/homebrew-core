@@ -12,7 +12,7 @@ class Bbtools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae8d9aa244bd69689c3407c001c97e06095a892026eaa87ec29bfdc27d77cad2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4c9222ab91f71ddf62b069f47ca6b24bec6117d6de5a625aed73d9ca2895b0b"
   end
 
   depends_on "openjdk"
