@@ -7,7 +7,7 @@ class Ipget < Formula
   head "https://github.com/ipfs/ipget.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f06c2148dda90dc34d42ac7f65f0c51230ef6f1a6a00d7e7814c3397ea7533a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "231e1163c39ddfc4b6f6f19ec33eefbeb7d2ff6cfe675770450c0a6a0eed66b0"
   end
 
   depends_on "go" => :build
