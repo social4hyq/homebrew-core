@@ -1,10 +1,10 @@
 class Libwebsockets < Formula
   desc "C websockets server library"
   homepage "https://github.com/warmcat/libwebsockets"
-  url "https://github.com/warmcat/libwebsockets/archive/refs/tags/v4.5.8.tar.gz"
-  sha256 "b6ade658f4af3a823d0dc806ae5ef0623f0f4f5e2aeb895a0f77c4783840c30e"
+  url "https://github.com/warmcat/libwebsockets/archive/refs/tags/v5.0.0.tar.gz"
+  sha256 "f853c6582101cfcee3a5a9e28ae92ab19d9735c5f31f0bb2e9794b5106123962"
   license "MIT"
-  compatibility_version 5
+  compatibility_version 6
   head "https://github.com/warmcat/libwebsockets.git", branch: "main"
 
   livecheck do
@@ -13,7 +13,7 @@ class Libwebsockets < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bb8aab02027f5c9159d43ad1bfe2105b7c5cdc272a6cd7e3be51398ea075d34e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eaf505a7ce1414a31ec585d2ea48fd16e37fb61e712c548e5b77cb6bbf9cf5eb"
   end
 
   depends_on "cmake" => :build
@@ -22,12 +22,13 @@ class Libwebsockets < Formula
   depends_on "openssl@3"
 
   def install
+    # HTTP/3 forces the GnuTLS backend from 5.0.0 onwards, which ttyd cannot build against.
     system "cmake", "-S", ".", "-B", "build",
                     "-DLWS_IPV6=ON",
                     "-DLWS_WITH_HTTP2=ON",
+                    "-DLWS_WITH_HTTP3=OFF",
                     "-DLWS_WITH_LIBEVENT=ON",
                     "-DLWS_WITH_LIBUV=ON",
-                    "-DLWS_WITH_PLUGINS=ON",
                     "-DLWS_WITHOUT_TESTAPPS=ON",
                     "-DLWS_UNIX_SOCK=ON",
                     *std_cmake_args
@@ -50,7 +51,7 @@ class Libwebsockets < Formula
         return 0;
       }
     C
-    system ENV.cc, "test.c", "-I#{Formula["openssl@3"].opt_prefix}/include",
+    system ENV.cc, "test.c", "-I#{formula_opt_prefix("openssl@3")}/include",
                    "-L#{lib}", "-lwebsockets", "-o", "test"
     system "./test"
   end
