@@ -12,8 +12,8 @@ class Bzip2 < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "958c7316221dba51b82075b95f7948592f18268e510b4e119e76a4e5f7342945"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2dd11c7a11e600b10942ae0361d3b6170f3069bfaf42611477d5ac61b6f19e84"
   end
 
   keg_only :provided_by_macos
