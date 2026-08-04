@@ -7,7 +7,7 @@ class FabricAi < Formula
   head "https://github.com/danielmiessler/fabric.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a50de027bbbf681c7d19ded5d26ed4266d0a1ad5804a70684ed7244e41539db"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "98235bae8c763a445781a0ae60a925620f4b9a752f662ce37a1cf278e90ca09a"
   end
 
   depends_on "go" => :build
