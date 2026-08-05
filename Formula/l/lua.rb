@@ -1,8 +1,8 @@
 class Lua < Formula
   desc "Powerful, lightweight programming language"
   homepage "https://www.lua.org/"
-  url "https://www.lua.org/ftp/lua-5.5.0.tar.gz"
-  sha256 "57ccc32bbbd005cab75bcc52444052535af691789dba2b9016d5c50640d68b3d"
+  url "https://www.lua.org/ftp/lua-5.5.1.tar.gz"
+  sha256 "1c4b4068d67061f2a2231ad2b5422e77acea1487ea9890f6320af614f4373dce"
   license "MIT"
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class Lua < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "65c7977ab6dd182030fb3dec6b109b6a6252191d25138a7d66eecebf89743df1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc79f9df2952ed9dede47fbcf5197b753f227f5b726b3f6606c0f76e89dfb6db"
   end
 
   # Be sure to build a dylib, or else runtime modules will pull in another static copy of liblua = crashy
