@@ -7,7 +7,7 @@ class TerraformMcpServer < Formula
   head "https://github.com/hashicorp/terraform-mcp-server.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8739630f2948933e00155a9077f64c66d51fcfb4e3a4ce12290bd8a2200dd64"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dcd13dbc35132e454b42d13460ff4d3d1eee92094b85bb0c5211090419477211"
   end
 
   depends_on "go" => :build
