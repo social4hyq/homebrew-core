@@ -1,8 +1,8 @@
 class PythonGdbmAT313 < Formula
   desc "Python interface to gdbm"
   homepage "https://www.python.org/"
-  url "https://www.python.org/ftp/python/3.13.14/Python-3.13.14.tgz"
-  sha256 "5ae535a36af0ebca6fca176ecb8197f5db9c1cb8c8f0cd12cdf1787046db1f41"
+  url "https://www.python.org/ftp/python/3.13.15/Python-3.13.15.tgz"
+  sha256 "c28d9d213c09b5b5ab2c29812950e12f746999e099b82894231be954b26baed9"
   license "Python-2.0"
 
   livecheck do
