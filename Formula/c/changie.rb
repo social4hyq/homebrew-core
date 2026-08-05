@@ -7,7 +7,7 @@ class Changie < Formula
   head "https://github.com/miniscruff/changie.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb6bf3cdb6f77a253af5059d73441d07afc4b9c99c4058e37fe7ae341233f605"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec8c332af6520ded20a0f3c7c9fbc700297a068a8587756c6bba4a8c707815fb"
   end
 
   depends_on "go" => :build
