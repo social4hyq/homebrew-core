@@ -1,13 +1,13 @@
 class TerraformMcpServer < Formula
   desc "MCP server for Terraform"
   homepage "https://github.com/hashicorp/terraform-mcp-server"
-  url "https://github.com/hashicorp/terraform-mcp-server/archive/refs/tags/v1.1.0.tar.gz"
-  sha256 "5173256844065808262ac9a22bb60793527f7840193aee68414dccf1c6dc4d93"
+  url "https://github.com/hashicorp/terraform-mcp-server/archive/refs/tags/v1.2.0.tar.gz"
+  sha256 "9a091a639d5b8e3de05e2d09ecb59d896d6946a57a8d97fc859427841718dd34"
   license "MPL-2.0"
   head "https://github.com/hashicorp/terraform-mcp-server.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8739630f2948933e00155a9077f64c66d51fcfb4e3a4ce12290bd8a2200dd64"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dcd13dbc35132e454b42d13460ff4d3d1eee92094b85bb0c5211090419477211"
   end
 
   depends_on "go" => :build
