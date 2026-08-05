@@ -7,7 +7,7 @@ class AwsCSdkutils < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "590f3c99a5e7a855491048e91cc3681f684b4bfaaaf6c40b4bef4f09e28556df"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7176917b256f90bb3c87e2e09f99e32dd11a84b0dbf2d6002c23b63d3417c95"
   end
 
   depends_on "cmake" => :build
