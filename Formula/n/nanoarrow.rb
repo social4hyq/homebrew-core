@@ -1,12 +1,12 @@
 class Nanoarrow < Formula
   desc "Helpers for Arrow C Data & Arrow C Stream interfaces"
   homepage "https://arrow.apache.org/nanoarrow"
-  url "https://github.com/apache/arrow-nanoarrow/archive/refs/tags/apache-arrow-nanoarrow-0.8.0.tar.gz"
-  sha256 "1c5136edf5c1e9cd8c47c4e31dfe07d0e09c25f27be20c8d6e78a0f4a4ed3fae"
+  url "https://github.com/apache/arrow-nanoarrow/archive/refs/tags/apache-arrow-nanoarrow-0.9.0.tar.gz"
+  sha256 "22c3edeaa5cb384c6da091f32a4e1c937779f2d62f84d646028de658b03d4385"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "480aef8eef98b6646b211ada1fbc6efd3078dd821d92427b0e370bda15b81521"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db4d5b7004da3674c21f4f9b486f1fbc709eaff91acbc79f0f874a3f054ee571"
   end
 
   depends_on "cmake" => :build
