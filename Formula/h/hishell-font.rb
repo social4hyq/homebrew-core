@@ -10,6 +10,11 @@ class HishellFont < Formula
     skip "development tool, manually versioned"
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hishell-font-v0.1.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e9ff638365a716f3cfde5f409484dd3dd3081d1952750feb5f6d4488548bce7"
+  end
+
   # hishell (com.huawei.hmos.hishell) is Alacritty's HarmonyOS port; its terminal core
   # (libalacritty_terminal.so) resolves fonts through a bundled fontconfig instance, and has
   # no ArkTS/UI-level way to choose a font family — the toml config's [font.normal] family
