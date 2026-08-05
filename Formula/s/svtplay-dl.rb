@@ -8,7 +8,7 @@ class SvtplayDl < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f395a0ec1820e8b381149163fcdbe9c446876f4ba5ecac5789a629829d563375"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d61e3bc1199103eab79aded521e0e67732e941b9e5324c8aae98324681335d8"
   end
 
   depends_on "certifi"
