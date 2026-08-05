@@ -12,7 +12,7 @@ class Duck < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f11bc6f1ee88b203bc63523b9f226f94f20baabf69237fc7835ab10ee1dc8c55"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9e94d1aac51ab604eab08669f730009530985b198efb5688df1a1a2e99595f1"
   end
 
   depends_on "ant" => :build
