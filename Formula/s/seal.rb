@@ -1,8 +1,8 @@
 class Seal < Formula
   desc "Easy-to-use homomorphic encryption library"
   homepage "https://github.com/microsoft/SEAL"
-  url "https://github.com/microsoft/SEAL/archive/refs/tags/v4.4.2.tar.gz"
-  sha256 "008c34afa40a2e69f201fd5f2991a7d649a055600f6f0c1a2e51b2e71fbb03d2"
+  url "https://github.com/microsoft/SEAL/archive/refs/tags/v4.4.3.tar.gz"
+  sha256 "3df1c6821fbdcd6122004abfef98428affb1b7c9751a6d63646742b1678f4e27"
   license "MIT"
 
   bottle do
