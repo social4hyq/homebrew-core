@@ -7,7 +7,7 @@ class Cffi < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8cd48b043626700582205412f18b3a9ca100a828e018bf8e2195400287c38a6b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "faa0c373b162e40135a8ccd1687a8e3d8ccbc4a2aaaf7c0853b405095bd81525"
   end
 
   depends_on "python@3.13" => [:build, :test]
