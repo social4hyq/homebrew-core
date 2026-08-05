@@ -6,7 +6,7 @@ class Nanoarrow < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "480aef8eef98b6646b211ada1fbc6efd3078dd821d92427b0e370bda15b81521"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db4d5b7004da3674c21f4f9b486f1fbc709eaff91acbc79f0f874a3f054ee571"
   end
 
   depends_on "cmake" => :build
