@@ -6,7 +6,7 @@ class Labctl < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a7209759a3ff2a2cfd5217c543bc6e76cb5cf09e3da0a2486c457e69ea93fa2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1939c69c2ab7ddc158ee01f9e9f3b05c5ff4a30f930320931555f25715ab74e4"
   end
 
   depends_on "go" => :build
