@@ -1,8 +1,8 @@
 class Weaviate < Formula
   desc "Open-source vector database that stores both objects and vectors"
   homepage "https://weaviate.io/developers/weaviate/"
-  url "https://github.com/weaviate/weaviate/archive/refs/tags/v1.38.8.tar.gz"
-  sha256 "9e86b1907d19ab5be36ed4e95d59bbb9e85e40e1fb823aaaa0e4d3c648a1b525"
+  url "https://github.com/weaviate/weaviate/archive/refs/tags/v1.39.0.tar.gz"
+  sha256 "33f277f2e2e09738ba8b247f53e7fca290fb736ca4d3c22d6bd8e2f78c1c89de"
   license "BSD-3-Clause"
 
   livecheck do
