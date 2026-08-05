@@ -1,12 +1,12 @@
 class RailsMcpServer < Formula
   desc "MCP server for Rails applications"
   homepage "https://github.com/maquina-app/rails-mcp-server"
-  url "https://github.com/maquina-app/rails-mcp-server/archive/refs/tags/v1.6.0.tar.gz"
-  sha256 "2713a890adcbc86c0a4c277e00fcd950f8b4753da331e4306677384c87a24f18"
+  url "https://github.com/maquina-app/rails-mcp-server/archive/refs/tags/v2.0.0.tar.gz"
+  sha256 "181ca5a798aa073048ab9bc171ba4107f35ec5a4ac9abacd29bdf54e935a9913"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d29dc8f4b27b87cd6222199b9e67a8c40d8ca91aa507f02867ce1354f94dd699"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "93b90c68ebd2ab4bc3a7fc76c6af79c73763bdc3f708d7719fffd9649d0b80e3"
   end
 
   depends_on "openssl@3"
