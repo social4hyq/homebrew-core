@@ -1,8 +1,8 @@
 class Jetty < Formula
   desc "Java servlet engine and webserver"
   homepage "https://jetty.org/"
-  url "https://search.maven.org/remotecontent?filepath=org/eclipse/jetty/jetty-home/12.1.11/jetty-home-12.1.11.tar.gz"
-  sha256 "7e45cf8f23bac4567faf94624b3ac43e0aeb4925cb925409e76040990a1cbe9c"
+  url "https://search.maven.org/remotecontent?filepath=org/eclipse/jetty/jetty-home/12.1.12/jetty-home-12.1.12.tar.gz"
+  sha256 "eec07131a682bcbfbb0411232932a72196b58f187412862962af07adebb777bc"
   license any_of: ["Apache-2.0", "EPL-2.0"]
 
   livecheck do
