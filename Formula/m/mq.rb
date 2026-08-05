@@ -7,7 +7,7 @@ class Mq < Formula
   head "https://github.com/harehare/mq.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c85a6db3b9b0d6a9d411aca04222f7518e5617718dff47c778cc37425de315ba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ae796abd97d0df1c0ddadb0c73fa48445f158e139927e6ca57a11ccd1e97eb9"
   end
 
   depends_on "rust" => :build
