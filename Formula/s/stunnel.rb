@@ -11,7 +11,7 @@ class Stunnel < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6eac8f2a61b1356a2c776ffc3cdbf307010064b79c7f704ff6975524c4d37a9a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eaf9e5487cc5a6cbbe3d0cb88e823ba8ee0b209215e37545456b5941b7f1765c"
   end
 
   depends_on "openssl@3"
