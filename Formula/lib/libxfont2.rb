@@ -6,7 +6,7 @@ class Libxfont2 < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1b77daf799aa36396afca8ca0d8dd75d48903a184a0a3bfce24bbfc80108740f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e2828ad29b24cadaa05ac505854def3e6ad377586a920f7cf6b0879b08159ed"
   end
 
   depends_on "pkgconf" => :build
