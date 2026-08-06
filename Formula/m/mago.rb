@@ -6,7 +6,7 @@ class Mago < Formula
   license any_of: ["Apache-2.0", "MIT"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "be4eedeed6384392246c19c6be7d32d677c5c1ab1d5b47a52b5e9f3ac62f2bd6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "51a5877423f91f3da4ee99a6aa5d3d857273252bd2cddad3bf47790753aef9f3"
   end
 
   depends_on "pkgconf" => :build
