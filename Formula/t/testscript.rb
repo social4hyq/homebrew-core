@@ -6,7 +6,7 @@ class Testscript < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8cc519b98f8364f93337a7cbbf4063060056d6d555d75ba2e45578da31ed7ae5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc9b1fd4c6689bdbd55e84ff4d27c0ca98d1e11d55b9edb18a9f8cb660b85885"
   end
 
   depends_on "go" => :build
