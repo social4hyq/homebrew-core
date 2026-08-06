@@ -1,8 +1,8 @@
 class Testscript < Formula
   desc "Integration tests for command-line applications in .txtar format"
   homepage "https://github.com/rogpeppe/go-internal/tree/master/cmd/testscript"
-  url "https://github.com/rogpeppe/go-internal/archive/refs/tags/v1.15.0.tar.gz"
-  sha256 "64d134a47c23f8bc4f11ce6048f676a360ab3c44129fc3bcff15cbbb3ae90f78"
+  url "https://github.com/rogpeppe/go-internal/archive/refs/tags/v1.16.0.tar.gz"
+  sha256 "78662c2e70976573ee61da4a050d1f10ca495ab35791b7be14d09badab28192f"
   license "BSD-3-Clause"
 
   bottle do
