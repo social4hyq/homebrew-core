@@ -12,7 +12,7 @@ class Kraftkit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bba855724e3f05b3ba85c04ec2f252a15ccae0f99ef8aed6b8825e01dad1c6ac"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "68b28427b8587571da1f3d0978533418ab584c85a51aadcf952d9618434ff46e"
   end
 
   depends_on "go" => :build
