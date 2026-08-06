@@ -8,7 +8,7 @@ class Solargraph < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb895a0fb18d71f97260f9917f7ca9e75fb6e312634bf466d411430f08716bf4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "da40cc9edf6bebc40ed00fe80a11f6a6d715d802b9d9ce171e1ad09e3b4b7a38"
   end
 
   depends_on "ruby"
