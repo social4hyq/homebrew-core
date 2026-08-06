@@ -18,6 +18,11 @@ class Reasonix < Formula
     regex(/\Av(\d+(?:\.\d+)+)\z/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/reasonix-v1.20.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ab0ccd4eaf00a353ebbb4f72a672c55281b85d62a4fe9fd029f28aea63408b8"
+  end
+
   # No `bottle do` block yet — bottle-build.yml publishes it and writes
   # root_url/sha256 back onto this file as part of the PR (see sshport's
   # initial commit, c51fb9f99, for the same shape).
