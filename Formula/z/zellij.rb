@@ -34,6 +34,7 @@ class Zellij < Formula
   depends_on "ohos-sdk" => :build
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
+  depends_on "ohos-compat-shim"
   depends_on "openssl@3"
   depends_on "zlib-ng-compat"
 
@@ -105,11 +106,42 @@ class Zellij < Formula
     # --check` panics on log file creation with ReadOnlyFilesystem (OHOS
     # /tmp is read-only). The wrapper defends that edge, mirroring
     # opencode@2.rb's pattern.
+    #
+    # LD_PRELOAD ohos-compat-shim is load-bearing, not defensive: without it,
+    # zellij intermittently fails to start with "Bye from Zellij!" printed
+    # within ~100ms (ExitReason::Normal) in a genuinely fresh top-level PTY
+    # (a brand new hishell terminal window/tab; not reproducible when nested
+    # under an already-running pty-owning process like tmux). Root-caused via
+    # zellij's --debug log: PtyInstruction spawns the first pane's PTY, then
+    # `terminal_bytes.rs: I/O error (os error 5)` (EIO — the standard "slave
+    # side's controlling process died" signal) immediately follows, cascading
+    # into `Failed to get CWD for pane Terminal(0)` and several plugin-thread
+    # panics before the session exits cleanly. zellij's PTY spawn
+    # (os_input_output_unix.rs) does `login_tty()` then
+    # `close_fds::close_open_fds(3, &[])` in a forked child's `pre_exec`; on
+    # Linux that crate's fast path is a raw `libc::syscall(SYS_CLOSE_RANGE,
+    # ...)` (436) with no availability probe (unlike its FreeBSD path, which
+    # explicitly guards against exactly this because an unrecognized syscall
+    # can get a process SIGSYS-killed by some kernels/sandboxes instead of
+    # cleanly returning ENOSYS).
+    #
+    # Confirmed empirically, not guessed: `libohos_compat.so` exports
+    # `close_range`, `syscall`, and `getcwd` — i.e. it's already
+    # LD_PRELOAD-interposing exactly the calls in this failure chain (the
+    # `getcwd` intercept is the same fix behind the historical OHOS
+    # EL2-sandbox chdir+exec getcwd bug documented for ohos-bun's
+    # Bun.spawn({cwd})). A same-machine A/B test replaying zellij's exact
+    # fork+login_tty+close_fds pattern (openpty, fork, login_tty, exec the
+    # real `zellij` binary, 20 iterations) went 20/20 clean with the shim
+    # preloaded and 12/20 clean (8 crashes, same "Bye from Zellij!"/EIO
+    # signature) with `LD_PRELOAD` unset — i.e. running exactly what a
+    # fresh, un-shimmed hishell shell gives you.
     mkdir_p libexec/"bin"
     mv bin/"zellij", libexec/"bin/zellij"
     (bin/"zellij").write <<~SH
       #!/bin/sh
       export TMPDIR="${TMPDIR:-/data/storage/el2/base/tmp}"
+      export LD_PRELOAD="#{formula_opt_prefix("ohos-compat-shim")}/lib/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
       exec "#{opt_libexec}/bin/zellij" "$@"
     SH
     chmod 0755, bin/"zellij"
