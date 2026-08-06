@@ -7,7 +7,7 @@ class KubeBench < Formula
   head "https://github.com/aquasecurity/kube-bench.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dbf846870fc93e8cbcd43ad776fb4c40a1706004137d73466ece25cead06203"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "147d19aac50004e7de94cf112d1d872a8234e021a32027474df7f224223aea46"
   end
 
   depends_on "go" => :build
