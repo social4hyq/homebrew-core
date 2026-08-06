@@ -68,6 +68,16 @@ shell 补全随 bottle 装入，开箱即用。以生成式为主（`generate_co
 >
 > 改名（2026-08-01）：`opencode` → `opencode-shim`、`opencode@2` → `opencode-shim@2`（预编译 shim 路线）；`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（源码构建路线，命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
 
+## 命名与冲突约定
+
+新增 formula 前，以及给某个 formula 写任何面向用户的引用（`depends_on`、`Formula[...]`、README/CLAUDE.md 里的 `brew install` 命令）时，遵守三条规则：
+
+1. **先探测是否与 harmonybrew/core 同名**：`brew info homebrew/core/<name>` 能解析出 stable 版本即为冲突（容器内跑要注意 `HOMEBREW_NO_INSTALL_FROM_API=1` 是常驻环境变量，会让这条探测静默失效，需要 `env -u HOMEBREW_NO_INSTALL_FROM_API` 先去掉它；`light-check.sh` 已经这样处理并在 PR 里自动跑这条探测，见下）。
+2. **同名则该 formula 的所有引用必须写 tap 全限定名** `social4hyq/core/<name>`，不能裸名。原因：Homebrew 的 `Formulary` 解析裸名优先走官方 API（`FromAPILoader` 先于 `FromTapLoader`/`FromNameLoader`），官方有同名 formula 就静默拿官方版，不报歧义、不报错——`brew install`（未装过）会中招，`brew upgrade`/`brew reinstall`（已装过，走 keg 自身 receipt）不受影响。当前冲突集合两个：`icu4c@78`、`zsh`（两者版本号都恰好和官方一致，尤其容易被当成同一个东西）。
+3. **两个 formula 装出同名 bin 时**，优先级 `keg_only` > 改名（如 `opencode@2` 的 `opencode2`）> `conflicts_with`。前两者已覆盖本 tap 当前全部重叠场景（`llvm@21`/`bun-webkit`/`bun-bootstrap` 均 `keg_only`；`opencode@2` 改名避让 `opencode`），`conflicts_with` 留作两个都必须 link 且无法改名时的最后手段。
+
+`.github/scripts/light-check.sh` 会对 PR 里改动的每个 formula 名跑规则 1 的探测，命中就在 PR 的 job summary 里给一条 warning（不 block，因为同名冲突本身是有意为之，要提醒的是"全部引用都限定了没有"）。
+
 ## Bottle
 
 所有 bottle 面向 `arm64_ohos`，托管在 atomgit releases，tag 以各 formula 的 `root_url` 为准；`bun-bootstrap` 为预编译 binary pour。
