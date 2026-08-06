@@ -1,13 +1,13 @@
 class KubeBench < Formula
   desc "Checks Kubernetes deployment against security best practices (CIS Benchmark)"
   homepage "https://github.com/aquasecurity/kube-bench"
-  url "https://github.com/aquasecurity/kube-bench/archive/refs/tags/v0.15.6.tar.gz"
-  sha256 "ba68fa0541902dd8be430ef05a1a39a978d6051e99386dd64c5babc50ec1dd58"
+  url "https://github.com/aquasecurity/kube-bench/archive/refs/tags/v0.16.0.tar.gz"
+  sha256 "41fb9a5db1030439270a6a969da49cccb5149bd760fa478c0ca8757d0ef7bcce"
   license "Apache-2.0"
   head "https://github.com/aquasecurity/kube-bench.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dbf846870fc93e8cbcd43ad776fb4c40a1706004137d73466ece25cead06203"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "147d19aac50004e7de94cf112d1d872a8234e021a32027474df7f224223aea46"
   end
 
   depends_on "go" => :build
