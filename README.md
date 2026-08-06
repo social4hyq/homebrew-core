@@ -85,6 +85,21 @@ HarmonyOS 与 Linux 存在少量系统调用差异，本 tap 通过 `ohos-compat
 
 > **上游推动**：上述差异正在推动 HarmonyOS 在后续版本中解决——缺失的 syscall（如 `close_range`、`fchmodat2`）争取随系统版本放行；沙箱受限项（可写临时目录、`linkat`/`symlinkat` 权限、用户信息解析）通过权限申请开放。平台放行后 shim 会自动切回原生实现（每次调用实时探测，无需重新安装或配置）。
 
+## 致谢
+
+感谢鸿蒙生态社区热心人士的分享与贡献，为本 tap 的移植工作提供了重要参考：
+
+- **hqzing**：《鸿蒙 PC 底层开发技术详解》系列作者（代码签名机制、二进制自签名算法、问题定位手段等），开源了二进制自签工具 `ohos-bst-light`（本 tap 的自签工具即来源于此），并在《鸿蒙 PC 上可用的 AI Agent 工具汇总》中推荐了本 tap 的 OpenCode 移植版。
+
+相关文章：
+
+- 《鸿蒙 PC 底层开发技术详解（八）：鸿蒙 PC 上的问题定位手段》 — https://blog.csdn.net/hqzing/article/details/163311519
+- 知乎专栏（作者：hqzing）：
+  - https://zhuanlan.zhihu.com/p/2034305137527755437
+  - https://zhuanlan.zhihu.com/p/2057577759229195597
+  - https://zhuanlan.zhihu.com/p/2058893291937173813
+  - https://zhuanlan.zhihu.com/p/2065872702842351983
+
 ## 反馈
 
 遇到功能差异或崩溃，请在 GitHub Issues 反馈，附：HarmonyOS 版本、`bun --version`、复现命令。
