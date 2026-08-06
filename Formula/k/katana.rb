@@ -1,13 +1,13 @@
 class Katana < Formula
   desc "Crawling and spidering framework"
   homepage "https://github.com/projectdiscovery/katana"
-  url "https://github.com/projectdiscovery/katana/archive/refs/tags/v1.6.1.tar.gz"
-  sha256 "81ce8b6047e9463c37e9cf7dd3bdcd30d8a61e2da9cf6c960ccd409b99c896ee"
+  url "https://github.com/projectdiscovery/katana/archive/refs/tags/v1.7.0.tar.gz"
+  sha256 "eface6334d46ad8235e647bc5c6853c4defd34dfc2c8703a5fb52824025a2d59"
   license "MIT"
   head "https://github.com/projectdiscovery/katana.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5e40ee200e2032959fa0271c9f4f7a7bff36185326754de9c0a94a6669d5387"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "24cf37133c7b3ac2b51cc9063aa22cbb23c026749ea5eab50167f816efe6468b"
   end
 
   depends_on "go" => :build
