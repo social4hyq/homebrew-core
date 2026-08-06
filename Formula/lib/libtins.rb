@@ -1,13 +1,13 @@
 class Libtins < Formula
   desc "C++ network packet sniffing and crafting library"
   homepage "https://libtins.github.io/"
-  url "https://github.com/mfontanini/libtins/archive/refs/tags/v4.5.tar.gz"
-  sha256 "6ff5fe1ada10daef8538743dccb9c9b3e19d05d028ffdc24838e62ff3fc55841"
+  url "https://github.com/mfontanini/libtins/archive/refs/tags/v4.6.tar.gz"
+  sha256 "37a9cc407929c56c2081e717347cac455287ba354016bad5bad6243d1f0a4a7a"
   license "BSD-2-Clause"
   head "https://github.com/mfontanini/libtins.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21561c0d900cacef2cbc0588cdf3129d292376025d1e01870a8bddbc32ac264c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "414d13f68406f116be7a77e60ce26c7d7b8cbfc6263ccb890966dcd633cd9088"
   end
 
   depends_on "cmake" => :build
