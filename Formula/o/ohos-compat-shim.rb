@@ -24,6 +24,11 @@ class OhosCompatShim < Formula
     skip "development tool, manually versioned"
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.2.8-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "93c37553a0bc9a6ef567e242f71473cdf7731b68beaecd4cd030e7e6c503e94e"
+  end
+
   # No `bottle do` block: 0.2.8 adds new build artifacts (ohos-compat-check,
   # libohos_compat_checkdep.so), so the 0.2.7 bottle's sha256 no longer
   # applies. CI's bottle-build.yml regenerates this block against the pushed
