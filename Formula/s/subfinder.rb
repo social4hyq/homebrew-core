@@ -7,7 +7,7 @@ class Subfinder < Formula
   head "https://github.com/projectdiscovery/subfinder.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ca352fc7a85c709329a48556c205f38db88ecb3b1ae21be191faf5b8ceca5b3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7db0e2e9b250e47ca8fcf1a244b0b90fb54ff4fbdf7dbff2dab86d1dd76b6b93"
   end
 
   depends_on "go" => :build
