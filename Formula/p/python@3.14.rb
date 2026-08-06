@@ -70,6 +70,10 @@ class PythonAT314 < Formula
   resource "pip" do
     url "https://files.pythonhosted.org/packages/ae/15/4500e320e6b101ec3b719ae85b697d9940b6cda672bc555bd6016fc60c6f/pip-26.2.1.tar.gz"
     sha256 "f6ad667e89a1fe78046c8f13232b247200f5258d7828f3f7883d660878e0813f"
+
+    patch do
+      file "Patches/python@3.14/0001-mock-abi-detection-for-pip.patch"
+    end
   end
 
   resource "wheel" do
