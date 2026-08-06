@@ -11,7 +11,7 @@ class AwsLc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6042944c3d7c6eb528138cc9de4a5e62563857ae08d432419a94db7c07cc2f0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "96861f0f9e8c6d02a4b7a7a408697edb63e77185768b78955608b7c839e0a589"
   end
 
   keg_only "it conflicts with OpenSSL"
