@@ -1,12 +1,12 @@
 class Libxfont2 < Formula
   desc "X11 font rasterisation library"
   homepage "https://www.x.org/"
-  url "https://xorg.freedesktop.org/archive/individual/lib/libXfont2-2.0.8.tar.gz"
-  sha256 "a53d621b6ceb1dcbd05a0b9bd7f13c34efa40401cd5c05af904035c567a30f18"
+  url "https://xorg.freedesktop.org/archive/individual/lib/libXfont2-2.0.9.tar.gz"
+  sha256 "8564b4df365bc5a6cb0c15900dc688f6e8f47b00a8571c6708c916dfb85066ba"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1b77daf799aa36396afca8ca0d8dd75d48903a184a0a3bfce24bbfc80108740f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e2828ad29b24cadaa05ac505854def3e6ad377586a920f7cf6b0879b08159ed"
   end
 
   depends_on "pkgconf" => :build
