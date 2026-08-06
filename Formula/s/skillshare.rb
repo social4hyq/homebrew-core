@@ -7,7 +7,7 @@ class Skillshare < Formula
   head "https://github.com/runkids/skillshare.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7a52536eca8e0a6a4cde0ad647c38800a014696dc5b5313dfe87ba5cfdbdccf3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29b278af7fd8dd97a18f4df1c5c6dd7aef602b919fca8a84c831fcf4e822a192"
   end
 
   depends_on "go" => :build
