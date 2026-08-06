@@ -1,13 +1,13 @@
 class Kubeone < Formula
   desc "Automate cluster operations on all your environments"
   homepage "https://kubeone.io"
-  url "https://github.com/kubermatic/kubeone/archive/refs/tags/v1.14.0.tar.gz"
-  sha256 "7d1e1b0a27a8fe652e0612d1b5827f1a7284a6e085339500be5e7769f17c1d3b"
+  url "https://github.com/kubermatic/kubeone/archive/refs/tags/v1.14.1.tar.gz"
+  sha256 "45fcd1b1f41b5dfe35843e2ca8d674ea3973be09c34fc2c542ee7322f7f8d002"
   license "Apache-2.0"
   head "https://github.com/kubermatic/kubeone.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f7215e7996cbd059306c8d092c61ad38b4bce12a7d2cde7c9cef7ca594bde7b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3ae805c1b03a30c65aaf2bbde1d220da6c3873dd690d310f3b81eb92d79485a"
   end
 
   depends_on "go" => :build
