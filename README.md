@@ -91,10 +91,14 @@ HarmonyOS 与 Linux 存在少量系统调用差异，本 tap 通过 `ohos-compat
 
 - **hqzing**：《鸿蒙 PC 底层开发技术详解》系列作者（代码签名机制、二进制自签名算法、问题定位手段等），开源了二进制自签工具 `ohos-bst-light`（本 tap 的自签工具即来源于此），并在《鸿蒙 PC 上可用的 AI Agent 工具汇总》中推荐了本 tap 的 OpenCode 移植版。
 
-相关文章：
+相关文章（CSDN，作者：hqzing）：
 
+- 《鸿蒙 PC 底层开发技术详解（四）：代码签名机制对我们的影响》 — https://blog.csdn.net/hqzing/article/details/160746583
+- 《鸿蒙 PC 底层开发技术详解（七）：二进制自签名算法的实现》 — https://blog.csdn.net/hqzing/article/details/162642397
 - 《鸿蒙 PC 底层开发技术详解（八）：鸿蒙 PC 上的问题定位手段》 — https://blog.csdn.net/hqzing/article/details/163311519
-- 知乎专栏（作者：hqzing）：
+- 《在鸿蒙 PC 上使用 Claude Code（最新的 Bun 版本）》 — https://blog.csdn.net/hqzing/article/details/162758675
+
+知乎专栏（作者：hqzing）：
   - https://zhuanlan.zhihu.com/p/2034305137527755437
   - https://zhuanlan.zhihu.com/p/2057577759229195597
   - https://zhuanlan.zhihu.com/p/2058893291937173813
