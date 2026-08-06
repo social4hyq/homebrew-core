@@ -1,21 +1,18 @@
 class BeadsViewer < Formula
   desc "Terminal-based UI for the Beads issue tracker"
   homepage "https://github.com/Dicklesworthstone/beads_viewer"
-  url "https://github.com/Dicklesworthstone/beads_viewer/archive/refs/tags/v0.18.0.tar.gz"
-  sha256 "c40173354f84df8301121a936b6347c3958430227c53d0ea47718507a104f5da"
+  url "https://github.com/Dicklesworthstone/beads_viewer/archive/refs/tags/v0.19.0.tar.gz"
+  sha256 "7459eeaa99976be78ea0a9f85f1db98e27011772a80ca5ec05d2125e0f86ce0a"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b6289a441de61dfc04c1af7aa6e89e60d6fefa431779f92257ba70023785c403"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b53a434fceca4940f5b5a85e1e307a9e0e0340c69eb9672cc9f502dae86faf5"
   end
 
   depends_on "go" => :build
 
   def install
-    ldflags = %W[
-      -s -w
-      -X github.com/Dicklesworthstone/beads_viewer/pkg/version.Version=v#{version}
-    ]
+    ldflags = %W[-X github.com/Dicklesworthstone/beads_viewer/pkg/version.version=v#{version}]
     system "go", "build", *std_go_args(ldflags:, output: bin/"bv"), "./cmd/bv"
   end
 
