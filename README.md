@@ -62,6 +62,16 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `zellij` | 0.45.0-dev | 终端复用器 + WASM 插件系统（wasmi 解释执行）；Rust 源码构建，跟踪 `main` 固定 revision，wrapper 内置 `ohos-compat-shim` |
 | `hishell-font` | 0.1.0 | hishell 终端 Nerd Font 安装配置；TS 源码构建（`bun build` 单 JS 文件） |
 
+## 已知限制
+
+HarmonyOS 与 Linux 存在少量系统调用差异，本 tap 通过 `ohos-compat-shim`（预加载兼容层，已内嵌进 bun 及所有 bun 编译产物）自动处理，使用者一般无需关心。极端场景下可能感知到：
+
+- **性能**：`close_range`/`fchmodat2` 等缺失的 syscall 由 shim 替换为兼容实现，高并发 IO 吞吐略低于 Linux 基线
+- **临时文件**：沙箱内 `/tmp` 只读，`tmpfile()` 类调用由 shim 改走 `$TMPDIR`——请确保 `$TMPDIR` 指向可写分区
+- **用户信息**：`getpwuid_r()` 由 shim 经 HarmonyOS 账号 API 兜底，`os.userInfo()` 等调用可用
+- **文件系统**：跨分区硬链接退化为原子复制（无残留）；cwd 被删除时 `getcwd()` 回退到 `/proc/self/cwd` 解析
+- **管道 I/O**：`splice()` 的 EOF 语义与 poll/epoll 唤醒问题已由 shim 修复，轮询型管道消费端不会死锁
+
 ## 反馈
 
 遇到功能差异或崩溃，请在 GitHub Issues 反馈，附：HarmonyOS 版本、`bun --version`、复现命令。
