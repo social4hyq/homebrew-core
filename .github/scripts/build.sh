@@ -16,7 +16,12 @@ source "$(dirname "$0")/lib.sh"
 # has no odie guard and likely doesn't need this; included anyway since
 # it's now autobump-allowlisted too and the unset is a harmless no-op if
 # there's genuinely nothing for binary-sign-tool to touch.
-UNSET_SIGN_FORMULAS="claude-code grok-build cc-switch qemu-aarch64"
+# reasonix is a from-source build, not a prebuilt binary, but hits the same
+# failure: CGO_ENABLED=0 go build emits a static ELF with no PT_INTERP/
+# PT_DYNAMIC segment — the same shape as grok-build's prebuilt binary, and
+# the auto-sign pass corrupts it identically. "Built from source" does not
+# exempt a formula from this list; what matters is the final ELF's shape.
+UNSET_SIGN_FORMULAS="claude-code grok-build cc-switch qemu-aarch64 reasonix"
 ENV_PREFIX=""
 if tr ' ' '\n' <<< "$UNSET_SIGN_FORMULAS" | grep -qx "$FORMULA"; then
   ENV_PREFIX="env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN "
