@@ -1,12 +1,12 @@
 class Libdpp < Formula
   desc "C++ Discord API Bot Library"
   homepage "https://github.com/brainboxdotcc/DPP"
-  url "https://github.com/brainboxdotcc/DPP/archive/refs/tags/v10.1.5.tar.gz"
-  sha256 "0446993c2bca5fc40882386804598b33652fc7ee466fa237f7846f2be0cb8a1e"
+  url "https://github.com/brainboxdotcc/DPP/archive/refs/tags/v10.1.6.tar.gz"
+  sha256 "65cf9e5fbc7b40e3fadaf742fa87da9cdede46651e35007c7b45cb765bfc17ba"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a38e45621a455605c18ef132136c2ffc4da9f6c7e5a14a71ca94f59cb9b9629"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2943e20801a163805215e9a5fdac418822f9e360ee927f55cc2d7597e1f312c7"
   end
 
   depends_on "cmake" => :build
