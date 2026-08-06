@@ -1,13 +1,13 @@
 class OsctrlCli < Formula
   desc "Fast and efficient osquery management"
   homepage "https://osctrl.net"
-  url "https://github.com/jmpsec/osctrl/archive/refs/tags/v0.5.4.tar.gz"
-  sha256 "1047424879652f42bd8b444859db0a965e55caa5fbae223be1ebefe9b2eb653a"
+  url "https://github.com/jmpsec/osctrl/archive/refs/tags/v0.5.5.tar.gz"
+  sha256 "c63b0e29f12068bd41fa573ed2169f74fe120bb01737173c348d07bfd8eb6a09"
   license "MIT"
   head "https://github.com/jmpsec/osctrl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e045323238f03e772324bbe1d8c344366444f1758661bca108a7e97732b6470"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d520f429606982aa603afbcda764537e8bca77bdc871a9c4f5c790847016aa58"
   end
 
   depends_on "go" => :build
