@@ -6,7 +6,7 @@ class Ugrep < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9a154f3b19af3b267cb9ffbbfa623d14d34e5d28c660add3d91468619bc539c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "69f4ddea1da6f28e7502367eae1202b02f28259d559bdbb51be3000136d378ba"
   end
 
   depends_on "brotli"
