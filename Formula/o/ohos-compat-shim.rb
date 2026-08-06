@@ -29,11 +29,6 @@ class OhosCompatShim < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "93c37553a0bc9a6ef567e242f71473cdf7731b68beaecd4cd030e7e6c503e94e"
   end
 
-  # No `bottle do` block: 0.2.8 adds new build artifacts (ohos-compat-check,
-  # libohos_compat_checkdep.so), so the 0.2.7 bottle's sha256 no longer
-  # applies. CI's bottle-build.yml regenerates this block against the pushed
-  # revision -- don't hand-guess a sha256 here.
-
   # HarmonyOS's application sandbox seccomp-filters several Linux syscalls
   # (close_range, fchmodat2) and returns unexpected errno from a few libc
   # calls (getpwuid_r, tmpfile, getcwd, splice) that prebuilt musl binaries
