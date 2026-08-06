@@ -1,8 +1,8 @@
 class PythonGdbmAT313 < Formula
   desc "Python interface to gdbm"
   homepage "https://www.python.org/"
-  url "https://www.python.org/ftp/python/3.13.14/Python-3.13.14.tgz"
-  sha256 "5ae535a36af0ebca6fca176ecb8197f5db9c1cb8c8f0cd12cdf1787046db1f41"
+  url "https://www.python.org/ftp/python/3.13.15/Python-3.13.15.tgz"
+  sha256 "c28d9d213c09b5b5ab2c29812950e12f746999e099b82894231be954b26baed9"
   license "Python-2.0"
 
   livecheck do
@@ -10,7 +10,7 @@ class PythonGdbmAT313 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "acf676169c5ddff590922a193ffdf91231c8fbf3ac8b38e2b3669a05f83b5b60"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "102a7f2e4bbbde0f0e3428a339d0b4b2c81168536b30918435dedfa80a3c94ae"
   end
 
   depends_on "gdbm"
