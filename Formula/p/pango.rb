@@ -16,7 +16,7 @@ class Pango < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a00c93e8d0dc223b03d864ab86e23eb2a3af79169b879a76d5b0c7ca3af557a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e03c19840d41c7f8f95e973c1a9518f6077db9c525637bf246f60120b8282938"
   end
 
   depends_on "gobject-introspection" => :build
