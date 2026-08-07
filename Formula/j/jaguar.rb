@@ -1,8 +1,8 @@
 class Jaguar < Formula
   desc "Live reloading for your ESP32"
   homepage "https://toitlang.org/"
-  url "https://github.com/toitlang/jaguar/archive/refs/tags/v1.69.0.tar.gz"
-  sha256 "6aeb83fbe5dff381d3d4e090343032c223766a74b8efcd9ccfb68b87b6f9bf3b"
+  url "https://github.com/toitlang/jaguar/archive/refs/tags/v1.70.0.tar.gz"
+  sha256 "72149d045f03492f317cc119738b6bae0d4f390d1ba9d645816d24b1bcd5fe1e"
   license "MIT"
   head "https://github.com/toitlang/jaguar.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Jaguar < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "566a0acd342bd28b979434163a614600edd2949ed06fa1bb84411d78b4c83704"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9923412d1a665b2312221609e739490c2c2aadf34115e2b631f8455616eb771"
   end
 
   depends_on "go" => :build
