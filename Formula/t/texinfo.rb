@@ -8,7 +8,8 @@ class Texinfo < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "15639ed8b51085217476d80441b9f974d4e4aa9ff07d6ae82b615ad48ef9963a"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a0bb6a9f3208116879be4d4c1c20fed8d99c435e25486caffa6d1c431638440"
   end
 
   uses_from_macos "ncurses"
