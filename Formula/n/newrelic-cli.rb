@@ -1,8 +1,8 @@
 class NewrelicCli < Formula
   desc "Command-line interface for New Relic"
   homepage "https://github.com/newrelic/newrelic-cli"
-  url "https://github.com/newrelic/newrelic-cli/archive/refs/tags/v0.113.3.tar.gz"
-  sha256 "bf55dc76e5a26d0a0579d3e036a0d2cd1f7b727a298aa721953583a55a2ec8bc"
+  url "https://github.com/newrelic/newrelic-cli/archive/refs/tags/v0.113.4.tar.gz"
+  sha256 "41586694106312babde101f4562272e77124dc71eaf847fdb4929e212be829a3"
   license "Apache-2.0"
   head "https://github.com/newrelic/newrelic-cli.git", branch: "main"
 
@@ -12,7 +12,7 @@ class NewrelicCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e28df3c306dbe8202a59937fe054544222a20c846047f8f8bcc7ccf6016f4ee8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3abbce03a20e196a30f05f58cf697eb81d76eb2fc1d50dfc7c70faa5a207fd28"
   end
 
   depends_on "go" => :build
