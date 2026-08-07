@@ -1,8 +1,8 @@
 class Lmdb < Formula
   desc "Lightning memory-mapped database: key-value data store"
   homepage "https://www.symas.com/symas-embedded-database-lmdb"
-  url "https://git.openldap.org/openldap/openldap/-/archive/LMDB_1.0.0/openldap-LMDB_1.0.0.tar.bz2"
-  sha256 "9ab73cda2ca2132d10256a63b655981af4860f6dc8315a933175ff9b598ffab2"
+  url "https://git.openldap.org/openldap/openldap/-/archive/LMDB_1.0.1/openldap-LMDB_1.0.1.tar.bz2"
+  sha256 "1ae17f11ebdeb0d69e53416bb6e0a7479a7d3d5b5ca443a474bff5b5f886a348"
   license "OLDAP-2.8"
   version_scheme 1
   compatibility_version 1
@@ -14,7 +14,7 @@ class Lmdb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "354a8432c89c3010f523b79aca937deb7ada9efc74b4a23ba95a2fa39fa19445"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "26f8961785406dc89f173803523b6ddbd66d698dfac83efbde59f5accb7a0403"
   end
 
   depends_on "pkgconf" => :test
