@@ -7,7 +7,7 @@ class Openexr < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac7899d2c631d9ce938ae134f89b3ee5506ecb003bc1d426be5ae12ecbba607e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f01ba7f178841e2afd0585ad861e2503ae83fd6af8ad9d11c9342309b2281e57"
   end
 
   depends_on "cmake" => :build
