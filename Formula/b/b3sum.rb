@@ -10,7 +10,7 @@ class B3sum < Formula
   ]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d24ae83fc8b47004d81fb3d2ade40087c9dccf76d1cac5c320c1c4465f0ed2a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "12bf6e415c9dfe1380bef0ebdbc9db2fb47cac7f69c98cbd672b536eb97c321d"
   end
 
   depends_on "rust" => :build
