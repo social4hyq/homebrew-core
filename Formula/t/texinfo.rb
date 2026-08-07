@@ -7,6 +7,11 @@ class Texinfo < Formula
   license "GPL-3.0-or-later"
   compatibility_version 1
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a0bb6a9f3208116879be4d4c1c20fed8d99c435e25486caffa6d1c431638440"
+  end
+
   uses_from_macos "ncurses"
   uses_from_macos "perl"
 
