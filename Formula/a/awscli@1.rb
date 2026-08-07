@@ -15,7 +15,7 @@ class AwscliAT1 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d9cc0de6a6af1cd10f612769cbc14e14eeb6b4f14f1750fc6e7f5e871534b32"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "51a70b0726d1f8460d740face57343984fae20cf4fd80a3f7a4c967309a3160b"
   end
 
   keg_only :versioned_formula
