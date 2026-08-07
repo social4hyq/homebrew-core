@@ -21,7 +21,9 @@ source "$(dirname "$0")/lib.sh"
 # PT_DYNAMIC segment — the same shape as grok-build's prebuilt binary, and
 # the auto-sign pass corrupts it identically. "Built from source" does not
 # exempt a formula from this list; what matters is the final ELF's shape.
-UNSET_SIGN_FORMULAS="claude-code grok-build cc-switch qemu-aarch64 reasonix"
+# zig@0.15 is another prebuilt static ELF (ziglang.org's aarch64-linux
+# release tarball, same shape as qemu-aarch64) — same corruption risk.
+UNSET_SIGN_FORMULAS="claude-code grok-build cc-switch qemu-aarch64 reasonix zig@0.15"
 ENV_PREFIX=""
 if tr ' ' '\n' <<< "$UNSET_SIGN_FORMULAS" | grep -qx "$FORMULA"; then
   ENV_PREFIX="env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN "
