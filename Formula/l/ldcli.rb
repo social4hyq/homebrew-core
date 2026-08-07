@@ -1,13 +1,13 @@
 class Ldcli < Formula
   desc "CLI for managing LaunchDarkly feature flags"
   homepage "https://launchdarkly.com/docs/home/getting-started/ldcli"
-  url "https://github.com/launchdarkly/ldcli/archive/refs/tags/v3.9.0.tar.gz"
-  sha256 "f2f78c3a19dde3e908814ea96b3ec18c841b67196f834ffc01ee1ddcf01efdff"
+  url "https://github.com/launchdarkly/ldcli/archive/refs/tags/v3.10.0.tar.gz"
+  sha256 "7f5abf6c6a9a6b8d2cb3004da030eab2dc1c97308f2fea9f40306b25ea415ab0"
   license "Apache-2.0"
   head "https://github.com/launchdarkly/ldcli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "052b3209526f335f9d773bce12922e23fbe4b61a729c34930c9c576312043475"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9c0009afadccfdc5b06dd4a0aa08a155d51401866c4a68a45f1a05414c30aa4"
   end
 
   depends_on "go" => :build
