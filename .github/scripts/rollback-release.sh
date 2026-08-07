@@ -7,7 +7,7 @@ source "$(dirname "$0")/lib.sh"
 [ -n "${TAG:-}" ] || { echo "no tag resolved, nothing to roll back"; exit 0; }
 
 API=https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
-ag() { curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" "$@"; }
+ag() { curl -sf -m 30 --retry 3 --retry-delay 5 --retry-connrefused -H "Authorization: Bearer $ATOMGIT_TOKEN" "$@"; }
 
 if ! ag "$API/releases/tags/$TAG" > /dev/null; then
   echo "release $TAG does not exist, nothing to roll back"

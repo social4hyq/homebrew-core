@@ -7,7 +7,7 @@ set -euo pipefail
 source "$(dirname "$0")/lib.sh"
 
 API=https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
-ag() { curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" "$@"; }
+ag() { curl -sf -m 30 --retry 3 --retry-delay 5 --retry-connrefused -H "Authorization: Bearer $ATOMGIT_TOKEN" "$@"; }
 
 DRY_RUN="${DRY_RUN:-true}"
 

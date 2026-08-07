@@ -5,7 +5,7 @@
 source "$(dirname "$0")/lib.sh"
 
 API=https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
-ag() { curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" "$@"; }
+ag() { curl -sf -m 30 --retry 3 --retry-delay 5 --retry-connrefused -H "Authorization: Bearer $ATOMGIT_TOKEN" "$@"; }
 
 VER=$(cbrew "info --json=v2 $TAP/$FORMULA" | jq -r '.formulae[0].versions.stable')
 BASE="${FORMULA}-v${VER}"

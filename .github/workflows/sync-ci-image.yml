@@ -180,6 +180,7 @@ jobs:
         run: |
           gh issue create --repo "$GITHUB_REPOSITORY" \
             --title "ci-image auto-synced to ${{ needs.check.outputs.tag }}" \
+            --label ci-image \
             --body "Upstream \`ci-runner\` changed; rebuilt the derived image and re-pinned \`OHOS_CI_IMAGE\`.
 
           - upstream digest: \`${{ needs.check.outputs.upstream_digest }}\`
