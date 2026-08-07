@@ -1,17 +1,22 @@
 class Atuin < Formula
   desc "Improved shell history for zsh, bash, fish and nushell"
   homepage "https://atuin.sh/"
-  url "https://github.com/atuinsh/atuin/releases/download/v18.18.1/source.tar.gz"
-  sha256 "ac3505b014a019ecb8657ba974c452b0068edf0c69962e3d677c4c49e9d7fe80"
+  url "https://github.com/atuinsh/atuin/releases/download/v18.19.0/source.tar.gz"
+  sha256 "02fc084a925824f9b8ad899803da4c895341a6ae2fcb585ca8eac4fbe1fb454e"
   license "MIT"
   head "https://github.com/atuinsh/atuin.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "41832c10449c338543fa600d73c4eecfac986f6d789f6a8185b96bda77bcceb1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1fc36618289db3812443637982cb2addc3d743ccb0aacf9a143d474431919bdb"
   end
 
+  depends_on "pkgconf" => :build
   depends_on "protobuf" => :build
   depends_on "rust" => :build
+
+  on_linux do
+    depends_on "openssl@3"
+  end
 
   def install
     system "cargo", "install", *std_cargo_args(path: "crates/atuin")
