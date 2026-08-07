@@ -8,7 +8,7 @@ class Libtool < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e254d807aa6283233f5dd3f58b2d02c65dd931bb2c6b721626156975b23eaf87"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c5b49bcb840111ad2bc197b29829b834ce8554730a97f98c1b38c6de4edcfcb"
   end
 
   depends_on "m4"
