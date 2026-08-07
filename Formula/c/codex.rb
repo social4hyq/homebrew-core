@@ -1,18 +1,17 @@
 class Codex < Formula
   desc "OpenAI's coding agent that runs in your terminal"
   homepage "https://github.com/openai/codex"
-  url "https://github.com/openai/codex/archive/refs/tags/rust-v0.145.0.tar.gz"
-  sha256 "7126822e9148f20297434f0e302b811f5eea8700879686a5960d4a6444c2e369"
+  url "https://github.com/openai/codex/archive/refs/tags/rust-v0.147.0.tar.gz"
+  sha256 "355bde4b40d5ba6deea2e469d36f91708315729f3e84c9c69cce6b041a5ba593"
   license "Apache-2.0"
 
   livecheck do
-    url :url
+    url :stable
     regex(/^rust[._-]v?(\d+(?:\.\d+)+)$/i)
-    strategy :github_latest
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8c92ab81e4bf30fa91ee9031a16fa58225e2c9ba3ea893c596df4949e5734b4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fbe498cac029c07e2562a81c645785180bfd8d4f543d8464f6aa9ce9667d6d61"
   end
 
   depends_on "cmake" => :build
@@ -21,13 +20,17 @@ class Codex < Formula
   depends_on "openssl@3"
   depends_on "ripgrep"
 
+  # Keep the v8 version here consistent with the v8 version in Cargo.toml:
+  #   https://github.com/openai/codex/blob/main/codex-rs/Cargo.toml
   resource "v8-archive" do
-    url "https://github.com/denoland/rusty_v8/releases/download/v150.2.0/librusty_v8_release_aarch64-unknown-linux-musl.a.gz"
-    sha256 "37bbd594303784d644abce3b1c19353a48d7b6ccee2771a4b0b6db748d2ed02e"
+    url "https://github.com/denoland/rusty_v8/releases/download/v150.4.0/librusty_v8_release_aarch64-unknown-linux-musl.a.gz"
+    sha256 "422555b85082bff3cdd8b05c30e710177191ce6fb1cb66cd036fac53240a1be8"
   end
 
+  # Keep the v8 version here consistent with the v8 version in Cargo.toml:
+  #   https://github.com/openai/codex/blob/main/codex-rs/Cargo.toml
   resource "v8-binding" do
-    url "https://github.com/denoland/rusty_v8/releases/download/v150.2.0/src_binding_release_aarch64-unknown-linux-musl.rs"
+    url "https://github.com/denoland/rusty_v8/releases/download/v150.4.0/src_binding_release_aarch64-unknown-linux-musl.rs"
     sha256 "7727826ae479bdb645e807239fb12d1f8e2e23de7a6cf16f5ee592690d1d8506"
   end
 
@@ -42,11 +45,6 @@ class Codex < Formula
       rm_r(Dir.glob("#{cache_dir}/nix-0.29.0"))
       rm_r(Dir.glob("#{cache_dir}/rustyline-14.0.0"))
       rm_r(Dir.glob("#{cache_dir}/v8-*"))
-
-      # Upgrade v8 crate to 150.2.0 (only version with aarch64-musl prebuilt)
-      inreplace "Cargo.toml",
-        'v8 = "=149.2.0"',
-        'v8 = "=150.2.0"'
 
       system "cargo", "fetch"
 
