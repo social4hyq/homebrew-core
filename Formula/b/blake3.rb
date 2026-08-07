@@ -7,7 +7,7 @@ class Blake3 < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2bb088a45df59f8f11b7f1c20b23e6c9c00297b49262601fe4ac9faf303c5e09"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c18a898b7690b57d2d6a71b0cc93e56df1934972db2d429a3e65b4d07d0276f2"
   end
 
   depends_on "cmake" => :build
