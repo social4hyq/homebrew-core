@@ -1,13 +1,13 @@
 class Blake3 < Formula
   desc "C implementation of the BLAKE3 cryptographic hash function"
   homepage "https://github.com/BLAKE3-team/BLAKE3"
-  url "https://github.com/BLAKE3-team/BLAKE3/archive/refs/tags/1.8.5.tar.gz"
-  sha256 "220bd81286e2a0585beac66d41ac3f4c2c33ae8a4e339fc88cf22d5e00514fe9"
+  url "https://github.com/BLAKE3-team/BLAKE3/archive/refs/tags/1.8.6.tar.gz"
+  sha256 "da7b5b0b6cf7106fe54b7d718d1ea371cce434cd15ebe5e56ca011b645cbef0e"
   license any_of: ["CC0-1.0", "Apache-2.0"]
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2bb088a45df59f8f11b7f1c20b23e6c9c00297b49262601fe4ac9faf303c5e09"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c18a898b7690b57d2d6a71b0cc93e56df1934972db2d429a3e65b4d07d0276f2"
   end
 
   depends_on "cmake" => :build
