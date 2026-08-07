@@ -1,8 +1,8 @@
 class Yaf < Formula
   desc "Yet another flowmeter: processes packet data from pcap(3)"
   homepage "https://tools.netsa.cert.org/yaf/"
-  url "https://tools.netsa.cert.org/releases/yaf-2.19.5.tar.gz"
-  sha256 "8fcfc4d8b8f52460784c3a44c99a3221341b3c2d780541bad2b4bee87ea0d834"
+  url "https://tools.netsa.cert.org/releases/yaf-2.20.1.tar.gz"
+  sha256 "fbcb2550a78c5427858abad53472fdde19c14f8b020aa0136e85db1cee62230a"
   license "GPL-2.0-only"
 
   # NOTE: This should be updated to check the main `/yaf/download.html`
