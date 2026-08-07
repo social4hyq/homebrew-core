@@ -6,7 +6,7 @@ class BibtexTidy < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a48a95c7bfaced4ff6519a4a9b2b9f1ea29983ffc04e303d99ad62c0b3f2602"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f900f3849ce409a5197b25f82c74f959e1724d9304dab62ff79e640c0a8f5c8"
   end
 
   depends_on "node"
