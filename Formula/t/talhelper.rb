@@ -1,13 +1,13 @@
 class Talhelper < Formula
   desc "Configuration helper for talos clusters"
   homepage "https://budimanjojo.github.io/talhelper/latest/"
-  url "https://github.com/budimanjojo/talhelper/archive/refs/tags/v3.1.15.tar.gz"
-  sha256 "700395da2f56a9636068fffc5c71fba8a0c3179dcfcff71953e3880d174b5dc5"
+  url "https://github.com/budimanjojo/talhelper/archive/refs/tags/v3.1.16.tar.gz"
+  sha256 "506b53442cbaa3ea34990f182d2db206d6987d7ae3652f91883ab6358af6b2ee"
   license "BSD-3-Clause"
   head "https://github.com/budimanjojo/talhelper.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6af87db7c804f6323662bb13be39353675bd0c9d0e029203cf981916d85a858f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9081270751253ce0db433c9d30cbba06b26441a0f6c00fa8132a49bf9d5cc55"
   end
 
   depends_on "go" => :build
