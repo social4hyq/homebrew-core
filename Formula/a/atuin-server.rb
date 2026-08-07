@@ -7,12 +7,7 @@ class AtuinServer < Formula
   head "https://github.com/atuinsh/atuin.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "37e39d03014b6bcb952d9c22121d8b62546dfed9eecd8858a248d782a72cc81d"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "5dc2a797a5da8e4cad6725d743d80aea25274165b2f310fa298abea502519c5d"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "080ba1313378855f680dc9ca1350f0f712902712d7a9511e5e72295b6b3e4a82"
-    sha256 cellar: :any_skip_relocation, sonoma:        "49ac5e1e8c58a36156612cc6b39e631775902c24089861f55b271a6a9f994ef4"
-    sha256 cellar: :any,                 arm64_linux:   "2e8111dea9ee8aa82275a137297e9747607c51976ff0671ee04b151e475aaf60"
-    sha256 cellar: :any,                 x86_64_linux:  "f13f1e4872e638dbdc0540f637c75a42580f79d97b5798e6c0b780f76875ea82"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fba9d726fb9f28f2a6b19b5a1eaa9a893136ff776d92ab12e316d069e8fcb67"
   end
 
   depends_on "pkgconf" => :build
