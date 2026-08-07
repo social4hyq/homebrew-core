@@ -8,7 +8,7 @@ class Jj < Formula
   head "https://github.com/jj-vcs/jj.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "77e08d80f4c34309170df706528abd50904b5789dc86fe85a4c30fe1b8dedd51"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "04e9574636820dc92384be7d40e1097444cb0d683fca95b36a69be91bd552507"
   end
 
   depends_on "rust" => :build
