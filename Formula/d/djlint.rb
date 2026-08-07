@@ -3,13 +3,13 @@ class Djlint < Formula
 
   desc "Lint & Format HTML Templates"
   homepage "https://djlint.com"
-  url "https://files.pythonhosted.org/packages/62/33/7efcde4581d1295c1e64a75b6d1ac444b4c2557b668e73032070ff5fc081/djlint-1.43.2.tar.gz"
-  sha256 "5a783d9b419b0833be1a13f213c0ea5e4a86aa505bd5d159884a2a349d06f7e8"
+  url "https://files.pythonhosted.org/packages/5d/24/8589327d057b67ebef2c775f9ddd2d44f8c7599f0a335bcdb0fc4b7bf3e1/djlint-1.44.0.tar.gz"
+  sha256 "9a52a3bafeff0eb6fb9a68798c9ea25c6522b40fba5c139ffef0dbc961ce0b59"
   license "GPL-3.0-or-later"
   head "https://github.com/djlint/djLint.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ba4823a8131c21d525cb08ced7d97ec62459c93711fdcb5ecd0d022e0bbc831"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "35d6e01d35c3e20c81b17204af2b8ad8f6ddc5bd83bc37fddff54c2076c7de85"
   end
 
   depends_on "libyaml"
