@@ -8,12 +8,7 @@ class Pillow < Formula
   head "https://github.com/python-pillow/Pillow.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "368dd59ca13924d5bb3389dbc251dddc0fa4bc931f8a723cfa132ce1d31055dc"
-    sha256 cellar: :any, arm64_sequoia: "3b3e8bfaa5ca2d7fc699923c86610e18c240bd8bab70e5f54bebfbdc0f7e5de1"
-    sha256 cellar: :any, arm64_sonoma:  "b3df9bfe1c2b7423a9cb2c6e3565bd17e9d4fdc7069e2c733414d46cc8f714e9"
-    sha256 cellar: :any, sonoma:        "5b5f330f08114aee902d719119fa41fd256064dfcde8c6f77690c18c8059009f"
-    sha256               arm64_linux:   "aa36b1124bca6af72026c6b6ab8e4155239f7c9d4a43a3da109aa082c6896878"
-    sha256               x86_64_linux:  "d7968166b5d2d7dba702ad5672f23100b47c876cfd0ef337863742894d649474"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "90175ac1167914659b405b70f46a70693e66b76ca513086131ec81bc34dda23d"
   end
 
   depends_on "cmake" => :build
