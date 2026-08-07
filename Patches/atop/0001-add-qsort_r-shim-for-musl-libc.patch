@@ -1,0 +1,50 @@
+diff --git a/Makefile b/Makefile
+index 3a73bd2..9fd2443 100644
+--- a/Makefile
++++ b/Makefile
+@@ -32,7 +32,7 @@ endif
+ override LDFLAGS := $(shell $(PKG_CONFIG) --libs glib-2.0) $(LDFLAGS)
+ 
+ OBJMOD0  = version.o
+-OBJMOD1  = various.o  deviate.o   procdbase.o
++OBJMOD1  = various.o  deviate.o   procdbase.o  qsort_r_compat.o
+ OBJMOD2  = acctproc.o photoproc.o photosyst.o cgroups.o rawlog.o ifprop.o parseable.o
+ OBJMOD3  = showgeneric.o drawbar.o showlinux.o  showsys.o showprocs.o
+ OBJMOD4  = atopsar.o  netatopif.o netatopbpfif.o gpucom.o  json.o utsnames.o
+diff --git a/qsort_r_compat.c b/qsort_r_compat.c
+new file mode 100644
+index 0000000..c113808
+--- /dev/null
++++ b/qsort_r_compat.c
+@@ -0,0 +1,31 @@
++/*
++** qsort_r compatibility shim for musl libc (OHOS).
++**
++** glibc provides qsort_r(base, nel, width, compar, arg) where the
++** comparison function receives the opaque argument as its third parameter.
++** musl libc only provides qsort(). This shim reimplements the glibc-style
++** qsort_r on top of qsort by stashing the user argument in a file-scope
++** variable that the wrapper comparator forwards to the real callback.
++*/
++#include <stddef.h>
++#include <stdlib.h>
++
++typedef int (*qsort_r_compar)(const void *, const void *, void *);
++
++static qsort_r_compar	qsort_r_real_compar;
++static void		*qsort_r_real_arg;
++
++static int
++qsort_r_shim(const void *a, const void *b)
++{
++	return qsort_r_real_compar(a, b, qsort_r_real_arg);
++}
++
++void
++qsort_r(void *base, size_t nel, size_t width,
++	qsort_r_compar compar, void *arg)
++{
++	qsort_r_real_compar = compar;
++	qsort_r_real_arg    = arg;
++	qsort(base, nel, width, qsort_r_shim);
++}

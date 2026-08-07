@@ -1,8 +1,8 @@
 class Atop < Formula
   desc "Advanced system and process monitor for Linux using process events"
   homepage "https://www.atoptool.nl"
-  url "https://github.com/Atoptool/atop/archive/refs/tags/v2.12.1.tar.gz"
-  sha256 "0f49f3aa5e3449f8c1cf10ac08036e2b67887640fe7980b8bc6ca9fd84d46fdf"
+  url "https://github.com/Atoptool/atop/archive/refs/tags/v2.13.0.tar.gz"
+  sha256 "5ee38c93afd64767a09a06698a0e90bfc390189a5058d245878a559d476d8572"
   license "GPL-2.0-or-later"
   head "https://github.com/Atoptool/atop.git", branch: "master"
 
@@ -15,6 +15,11 @@ class Atop < Formula
   depends_on :linux
   depends_on "ncurses"
   depends_on "zlib-ng-compat"
+
+  # musl libc (OHOS) lacks glibc's qsort_r; ship a shim reimplemented on qsort.
+  patch do
+    file "Patches/atop/0001-add-qsort_r-shim-for-musl-libc.patch"
+  end
 
   def install
     inreplace "version.h", /"$/, "-#{Utils.git_short_head}\"", global: false if build.head?
