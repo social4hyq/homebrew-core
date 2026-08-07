@@ -1,9 +1,9 @@
 class Openvpn < Formula
   desc "SSL/TLS VPN implementing OSI layer 2 or 3 secure network extension"
   homepage "https://openvpn.net/community/"
-  url "https://swupdate.openvpn.org/community/releases/openvpn-2.7.5.tar.gz"
-  mirror "https://build.openvpn.net/downloads/releases/openvpn-2.7.5.tar.gz"
-  sha256 "c6864b3c7d4e059c7d6ce22d1b5fa646c8b379a06af872eeb9792b6083a44ac4"
+  url "https://swupdate.openvpn.org/community/releases/openvpn-2.7.6.tar.gz"
+  mirror "https://build.openvpn.net/downloads/releases/openvpn-2.7.6.tar.gz"
+  sha256 "10e24a9385f23cc38cc5cf448f3ca0769f939bc4cbecc4f4647d7e006e52db74"
   license "GPL-2.0-only" => { with: "openvpn-openssl-exception" }
 
   livecheck do
@@ -12,7 +12,7 @@ class Openvpn < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "65dc25dfcd2c3f75b072b601eacb6a089405c1d19bad699bbfedf812d083e484"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "400944ae801f4912b57b775e3f49acb1a9d43d389537763822ce5ca08f8091c3"
   end
 
   depends_on "pkgconf" => :build
