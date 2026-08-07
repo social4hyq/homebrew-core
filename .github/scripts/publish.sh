@@ -8,7 +8,7 @@ source "$(dirname "$0")/lib.sh"
 : "${REASON:=}"
 
 API=https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
-ag() { curl -sf -m 30 -H "Authorization: Bearer $ATOMGIT_TOKEN" "$@"; }
+ag() { curl -sf -m 30 --retry 3 --retry-delay 5 --retry-connrefused -H "Authorization: Bearer $ATOMGIT_TOKEN" "$@"; }
 
 BOTTLE=$(ls bottle-out/*.tar.gz | head -1)
 FILENAME=$(basename "$BOTTLE")
