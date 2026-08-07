@@ -8,6 +8,7 @@ class Cmake < Formula
   license "BSD-3-Clause"
   compatibility_version 1
   head "https://gitlab.kitware.com/cmake/cmake.git", branch: "master"
+  revision 1
 
   # The "latest" release on GitHub has been an unstable version before, and
   # there have been delays between the creation of a tag and the corresponding
@@ -54,6 +55,7 @@ class Cmake < Formula
       -DCMake_INSTALL_BASH_COMP_DIR=#{bash_completion}
       -DCMake_INSTALL_EMACS_DIR=#{elisp}
       -DCMake_BUILD_LTO=OFF
+      -DCURL_CA_BUNDLE=/etc/ssl/certs/cacert.pem
     ]
     # On OHOS, headers and libs are in the SDK sysroot.
     # Tell find_* commands to also search there via FIND_ROOT_PATH.
