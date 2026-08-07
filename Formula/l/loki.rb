@@ -12,7 +12,7 @@ class Loki < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9340bc7e567a4e0d5043d4b1d4361ac71a0e6ec74481f129cfaa6ae68b4af8ea"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "39d6e1ea95d4302cdad60f54ce58766a3e9f49fffe31dca585296336b8aba78b"
   end
 
   depends_on "go" => :build
