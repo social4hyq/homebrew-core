@@ -7,6 +7,7 @@ class Zsh < Formula
     "GPL-2.0-or-later", # Completion/Unix/Command/_darcs
     "ISC", # Src/openssh_bsd_setres_id.c
   ]
+  revision 1
 
   stable do
     url "https://downloads.sourceforge.net/project/zsh/zsh/5.9.2/zsh-5.9.2.tar.xz"
@@ -29,7 +30,7 @@ class Zsh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5fcfe37f5734c96430c5f711ea0f6313adb28ed412c6b94af4bd234eec587780"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a30401cc1b87936e70bdb19fbb47ca43ab99977f094a289029f01f73c1e5af0"
   end
 
   head do
@@ -48,6 +49,12 @@ class Zsh < Formula
     # Fix compile with newer Clang. Remove in the next release
     # Ref: https://sourceforge.net/p/zsh/code/ci/ab4d62eb975a4c4c51dd35822665050e2ddc6918/
     ENV.append_to_cflags "-Wno-implicit-int" if DevelopmentTools.clang_build_version >= 1403
+
+    # OpenHarmony linker uses namespaced symbol resolution: dlopen'd zsh
+    # modules (e.g. complete.bundle) cannot resolve symbols back into the
+    # main zsh executable. Marking modules DF_1_GLOBAL restores the plain
+    # Linux global-namespace behavior.
+    ENV.append "LDFLAGS", "-Wl,-z,global"
 
     system "Util/preconfig" if build.head?
 
