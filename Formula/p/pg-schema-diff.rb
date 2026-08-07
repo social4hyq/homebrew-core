@@ -7,7 +7,7 @@ class PgSchemaDiff < Formula
   head "https://github.com/stripe/pg-schema-diff.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "602d2d0c35572926980da9c569cace01ee689062fd018322a58eca1e4d5aad26"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c2d48a9dbd2f7b9f80aed30a57e1814d203c7cbb9928d18695328bb3af8d316"
   end
 
   depends_on "go" => :build
