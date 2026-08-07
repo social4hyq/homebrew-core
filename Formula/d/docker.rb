@@ -2,8 +2,8 @@ class Docker < Formula
   desc "Pack, ship and run any application as a lightweight container"
   homepage "https://www.docker.com/"
   url "https://github.com/docker/cli.git",
-      tag:      "v29.7.1",
-      revision: "e9452d6e785f6e365712b9d71bd7517591773c86"
+      tag:      "v29.7.2",
+      revision: "a7dcaa6fdb6ed04aacbfdc76357fdae01605609e"
   license "Apache-2.0"
   head "https://github.com/docker/cli.git", branch: "master"
 
@@ -13,7 +13,7 @@ class Docker < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ec114a189d09e2b11a4af64fe09fb519b474b27598dc18ffbbafdf2fc85af57"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5630da3821367922c0e8d218b951cd837d1a8cec469f96039936d310ebebb1ee"
   end
 
   depends_on "go" => :build
