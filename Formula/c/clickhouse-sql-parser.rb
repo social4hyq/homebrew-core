@@ -7,7 +7,7 @@ class ClickhouseSqlParser < Formula
   head "https://github.com/AfterShip/clickhouse-sql-parser.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2897550a6d407757a872b0e7fe2a70cf639d23900f9d49ce79b712761fa718ae"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "04ba7fd2618a975f1e800ba3d521177c84c1cf6411db15d699580a3d52f089d2"
   end
 
   depends_on "go" => :build
