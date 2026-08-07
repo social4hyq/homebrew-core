@@ -1,14 +1,14 @@
 class Jj < Formula
   desc "Git-compatible distributed version control system"
   homepage "https://github.com/jj-vcs/jj"
-  url "https://github.com/jj-vcs/jj/archive/refs/tags/v0.43.0.tar.gz"
-  sha256 "5d230327737ee506b716c6ae5ac824c49951c34e117a024dc7aa38819809ea6c"
+  url "https://github.com/jj-vcs/jj/archive/refs/tags/v0.44.0.tar.gz"
+  sha256 "cd72ac1040c93d474dcafd8dd7f8d91d7407f9358bc9ffd4a6b72f4017112eab"
   license "Apache-2.0"
   compatibility_version 1
   head "https://github.com/jj-vcs/jj.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "77e08d80f4c34309170df706528abd50904b5789dc86fe85a4c30fe1b8dedd51"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "04e9574636820dc92384be7d40e1097444cb0d683fca95b36a69be91bd552507"
   end
 
   depends_on "rust" => :build
