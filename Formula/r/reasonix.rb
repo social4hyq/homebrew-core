@@ -19,8 +19,8 @@ class Reasonix < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/reasonix-v1.21.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "adce33f000765b2efd318fb7c0940a5817978f106fc7fca6d7cf4e4c52d99098"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/reasonix-v1.21.3-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc2371f1a437c710ffe22a6dc601b019b9c4a3cc58124063321628cd4abb8071"
   end
 
   # No `bottle do` block yet — bottle-build.yml publishes it and writes
