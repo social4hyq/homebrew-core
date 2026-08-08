@@ -1,8 +1,8 @@
 class Reasonix < Formula
   desc "DeepSeek-native AI coding agent for the terminal (HarmonyOS aarch64)"
   homepage "https://github.com/esengine/DeepSeek-Reasonix"
-  url "https://github.com/esengine/DeepSeek-Reasonix/archive/refs/tags/v1.21.1.tar.gz"
-  sha256 "dc800964ba1b878dfa4edd9eb6d7f31b8ee08f62169fe11ad35eb7c19518f695"
+  url "https://github.com/esengine/DeepSeek-Reasonix/archive/refs/tags/v1.21.2.tar.gz"
+  sha256 "bedf09b0f30df6f04dc61764a757d12d7e3d4335a0fc486bb7921585d81f6036"
   license "MIT"
 
   # The repo also ships a separate Electron-ish desktop app tagged
@@ -19,8 +19,8 @@ class Reasonix < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/reasonix-v1.21.1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ad95a07e6f4bafdad0558340a43d29c37c115011e2c67bdb3ff1cb362b57e18"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/reasonix-v1.21.2-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "adce33f000765b2efd318fb7c0940a5817978f106fc7fca6d7cf4e4c52d99098"
   end
 
   # No `bottle do` block yet — bottle-build.yml publishes it and writes
