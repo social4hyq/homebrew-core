@@ -1,8 +1,8 @@
 class Reasonix < Formula
   desc "DeepSeek-native AI coding agent for the terminal (HarmonyOS aarch64)"
   homepage "https://github.com/esengine/DeepSeek-Reasonix"
-  url "https://github.com/esengine/DeepSeek-Reasonix/archive/refs/tags/v1.21.1.tar.gz"
-  sha256 "dc800964ba1b878dfa4edd9eb6d7f31b8ee08f62169fe11ad35eb7c19518f695"
+  url "https://github.com/esengine/DeepSeek-Reasonix/archive/refs/tags/v1.21.2.tar.gz"
+  sha256 "bedf09b0f30df6f04dc61764a757d12d7e3d4335a0fc486bb7921585d81f6036"
   license "MIT"
 
   # The repo also ships a separate Electron-ish desktop app tagged
