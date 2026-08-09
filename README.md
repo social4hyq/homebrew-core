@@ -41,15 +41,16 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 
 | Formula | 版本 | 说明 |
 |---|---|---|
-| `opencode` | 1.18.14 | OpenCode AI 编码代理 CLI；上游源码构建（`bun build --compile` 单体二进制，原生依赖走 `@ohos-ports/*` npm 包） |
-| `opencode@2` | 2.0.0-beta, revision 9 | opencode v2 预览路线；源码构建（`bun build --compile` 单体二进制，原生依赖 `@ohos-ports/opentui-core` + `@ohos-ports/bun-pty`），命令名 `opencode2` |
-| `claude-code` | 2.1.223 | Anthropic Claude Code CLI；runtime-fetch stub（License 禁重分发），首次运行拉取 + 校验 sha256 + 自签 |
-| `grok-build` | 0.2.118, revision 1 | xAI Grok Build CLI；预编译静态 musl ELF，仅 `ohos-bst-light` self-sign |
-| `reasonix` | 1.20.0 | DeepSeek 原生终端 AI coding agent；Go 源码构建（`CGO_ENABLED=0` 静态 ELF），签名同 grok-build，`inreplace` 修 `/tmp` 锁目录 |
+| `opencode` | 1.18.15, revision 1 | OpenCode AI 编码代理 CLI；上游源码构建（`bun build --compile` 单体二进制，原生依赖走 `@ohos-ports/*` npm 包） |
+| `opencode@2` | 2.0.0-beta, revision 13 | opencode v2 预览路线；源码构建（`bun build --compile` 单体二进制，原生依赖 `@ohos-ports/opentui-core` + `@ohos-ports/bun-pty`），命令名 `opencode2` |
+| `warp-tui` | 0.0.0-dev | Warp 非 GUI 终端 agent TUI；固定 git revision 源码构建（Rust），运行时依赖 `ohos-compat-shim` |
+| `claude-code` | 2.1.226 | Anthropic Claude Code CLI；runtime-fetch stub（License 禁重分发），首次运行拉取 + 校验 sha256 + 自签 |
+| `grok-build` | 1.0.0 | xAI Grok Build CLI；预编译静态 musl ELF，仅 `ohos-bst-light` self-sign |
+| `reasonix` | 1.21.5 | DeepSeek 原生终端 AI coding agent；Go 源码构建（`CGO_ENABLED=0` 静态 ELF），签名同 grok-build，`inreplace` 修 `/tmp` 锁目录 |
 | `cc-switch` | 5.9.2, revision 2 | AI coding CLI 供应商切换器 + 本地代理；预编译静态 ELF（`ohos-bst-light` self-sign），给 codex 桥接 Chat-Completions-only provider |
-| `bun` | 1.4.0, revision 51 | Bun JavaScript runtime；**自举源码构建**（`bun bd`），`ohos-compat-shim` 静态内嵌进可执行文件 |
+| `bun` | 1.4.0, revision 56 | Bun JavaScript runtime；**自举源码构建**（`bun bd`），`ohos-compat-shim` 静态内嵌进可执行文件；libc++ ABI 已切 `__n1`（r56 起） |
 | `bun-bootstrap` | 1.4.0-5467a689, revision 1 | 预编译 bun，用于 `bun bd` 自举本机 bun；已预签（`keg_only`） |
-| `bun-webkit` | `34c01d1339` | bun 专用 WebKit fork 静态库（JSCore/WTF/bmalloc）；CMake 源码构建（`--target=aarch64-linux-ohos`，`keg_only`） |
+| `bun-webkit` | `ddea71318f`, revision 1 | bun 专用 WebKit fork 静态库（JSCore/WTF/bmalloc）；CMake 源码构建（`--target=aarch64-linux-ohos`，`keg_only`） |
 | `llvm@21` | 21.1.8, revision 5 | OHOS 补丁版 clang + lld + multiarch runtime libs（libc++ ABI `__n1`）；链接期 LLD `--code-sign` 签名（`keg_only`） |
 | `ohos-bst-light` | 1.0.0, revision 1 | 轻量二进制自签工具（保留 ELF 结构）；预编译二进制 formula 的 self-sign 都靠它 |
 | `ohos-compat-shim` | 0.2.8 | LD_PRELOAD 兼容垫片：拦截鸿蒙缺失/异常 syscall（`close_range`/`fchmodat2`/`getpwuid_r` 等）；C 源码直编；`claude-code` 共用 |
@@ -60,6 +61,8 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `starship` | 1.26.0, revision 2 | 跨 shell 提示符；Rust 源码构建 |
 | `zellij` | 0.45.0-dev | 终端复用器 + WASM 插件系统（wasmi 解释执行）；Rust 源码构建，跟踪 `main` 固定 revision，wrapper 内置 `ohos-compat-shim` |
 | `hishell-font` | 0.1.0 | hishell 终端 Nerd Font 安装配置；TS 源码构建（`bun build` 单 JS 文件） |
+| `herdr` | 0.8.0 | coding agent 终端会话持久化 runtime；Rust 源码构建（依赖 `zig@0.15` 编译 vendored libghostty-vt） |
+| `zig@0.15` | 0.15.2 | ziglang.org 官方 aarch64-linux 静态预编译二进制重打包；`ohos-bst-light` self-sign；herdr 的构建依赖 |
 
 ## 已下线 / 已迁移
 
@@ -69,6 +72,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `opencode-shim` / `opencode-shim@2` | 2026-08-02 下线 | 预编译 shim 路线已被源码构建路线取代，改用 `opencode` / `opencode@2` |
 | `close-range-shim` | 2026-07-15 下线 | 功能并入 `ohos-compat-shim` |
 | `bun-pty` / `lightningcss` / `tailwindcss-oxide` | 2026-07-18 下线 | 改走 `@ohos-ports/*` npm 包，无独立 formula 需求 |
+| `icu4c@78` | 2026-08-09 下线 | libc++ ABI `__n1` 迁移（#239-#241）后本 tap fork 冗余，直接用上游 harmonybrew/core 的 `icu4c@78`（同为 `__n1`） |
 
 > 改名提示（2026-08-01）：`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
 
