@@ -50,8 +50,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `bun` | 1.4.0, revision 51 | Bun JavaScript runtime；**自举源码构建**（`bun bd`），`ohos-compat-shim` 静态内嵌进可执行文件 |
 | `bun-bootstrap` | 1.4.0-5467a689, revision 1 | 预编译 bun，用于 `bun bd` 自举本机 bun；已预签（`keg_only`） |
 | `bun-webkit` | `34c01d1339` | bun 专用 WebKit fork 静态库（JSCore/WTF/bmalloc）；CMake 源码构建（`--target=aarch64-linux-ohos`，`keg_only`） |
-| `llvm@21` | 21.1.8, revision 4 | OHOS 补丁版 clang + lld + multiarch runtime libs；链接期 LLD `--code-sign` 签名（`keg_only`） |
-| `icu4c@78` | 78.3, revision 2 | Unicode 库；用本仓库 `llvm@21` 重编对齐 libc++ ABI（`keg_only`） |
+| `llvm@21` | 21.1.8, revision 5 | OHOS 补丁版 clang + lld + multiarch runtime libs（libc++ ABI `__n1`）；链接期 LLD `--code-sign` 签名（`keg_only`） |
 | `ohos-bst-light` | 1.0.0, revision 1 | 轻量二进制自签工具（保留 ELF 结构）；预编译二进制 formula 的 self-sign 都靠它 |
 | `ohos-compat-shim` | 0.2.8 | LD_PRELOAD 兼容垫片：拦截鸿蒙缺失/异常 syscall（`close_range`/`fchmodat2`/`getpwuid_r` 等）；C 源码直编；`claude-code` 共用 |
 | `inject-runpath` | 0.2.0, revision 1 | 就地注入 DT_RUNPATH 到 ELF（零偏移移动，不破坏 bun 产物模块图；`keg_only`） |

@@ -5,9 +5,9 @@
 # harmonybrew/core formula. `brew audit`'s own audit_name conflict check
 # (formula_auditor.rb) only fires with `--strict` on the *core* tap itself
 # (`return unless @core_tap`) — a third-party tap's plain `brew audit` never
-# runs it, so a collision like this tap's zsh/icu4c@78 vs harmonybrew/core's
-# same-named formulae is invisible to upstream tooling. A collision isn't
-# itself wrong (those two are deliberate OHOS-specific alternates) — what it
+# runs it, so a collision like this tap's zsh vs harmonybrew/core's
+# same-named formula is invisible to upstream tooling. A collision isn't
+# itself wrong (ours is a deliberate OHOS-specific alternate) — what it
 # flags is the follow-up requirement: every reference to that name (docs,
 # depends_on, install commands) must be tap-qualified (social4hyq/core/<name>),
 # see README "命名与冲突约定". `homebrew/core/<name>` is the alias this brew

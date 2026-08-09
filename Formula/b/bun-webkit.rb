@@ -5,6 +5,7 @@ class BunWebkit < Formula
       revision: "ddea71318fec9b923465c7c45ded8fa713ca3251"
   version "ddea71318f"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
+  revision 1
   # This formula is fully rewritten from upstream because it builds only the
   # JavaScriptCore/WTF/bmalloc static archives from oven-sh/WebKit, pinned to
   # bun's WEBKIT_VERSION. Upstream does not package WebKit this way.
@@ -25,6 +26,7 @@ class BunWebkit < Formula
 
   depends_on "cmake"        => :build
   depends_on "gperf"        => :build
+  depends_on "icu4c@78" => :build
   depends_on "libxml2" => :build
   depends_on "llvm@21"  => :build
   depends_on "ninja" => :build
@@ -32,7 +34,6 @@ class BunWebkit < Formula
   depends_on "perl" => :build
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
-  depends_on "social4hyq/core/icu4c@78" => :build
   depends_on "zlib" => :build
   # Outputs are static .a archives + headers — zero runtime linkage.
   # ohos-sdk is build-time only: JSC cross-compilation uses its sysroot.
@@ -50,7 +51,7 @@ class BunWebkit < Formula
     # OHOS cross-compilation flags (align with cfg.ohos branch in bun-src/scripts/build/deps/webkit.ts).
     target_flag = "--target=aarch64-linux-ohos"
     sysroot_flag = "--sysroot=#{sysroot}"
-    icu_include = "-I#{formula_opt_include("social4hyq/core/icu4c@78")}"
+    icu_include = "-I#{formula_opt_include("icu4c@78")}"
 
     cxxflags = [
       target_flag, sysroot_flag, "-D__MUSL__",
@@ -88,10 +89,10 @@ class BunWebkit < Formula
         -DCMAKE_SYSTEM_NAME=Linux
         -DCMAKE_SYSTEM_PROCESSOR=aarch64
         -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
-        -DCMAKE_FIND_ROOT_PATH=#{sysroot};#{formula_opt_prefix("social4hyq/core/icu4c@78")}
-        -DCMAKE_PREFIX_PATH=#{formula_opt_prefix("social4hyq/core/icu4c@78")}
-        -DICU_ROOT=#{formula_opt_prefix("social4hyq/core/icu4c@78")}
-        -DICU_INCLUDE_DIR=#{formula_opt_include("social4hyq/core/icu4c@78")}
+        -DCMAKE_FIND_ROOT_PATH=#{sysroot};#{formula_opt_prefix("icu4c@78")}
+        -DCMAKE_PREFIX_PATH=#{formula_opt_prefix("icu4c@78")}
+        -DICU_ROOT=#{formula_opt_prefix("icu4c@78")}
+        -DICU_INCLUDE_DIR=#{formula_opt_include("icu4c@78")}
         -DCMAKE_HAVE_THREADS_LIBRARY=1
       ]
       # Multi-word flags must not go in %W[...] — %W splits on whitespace, and

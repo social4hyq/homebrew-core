@@ -9,8 +9,8 @@
 # deterministic, and needs no live brew environment at all.
 #
 # Idea adapted from Harmonybrew/ci's auto_dailytest.py: catch a change to a
-# base formula (llvm@21) silently breaking a downstream one (icu4c@78 →
-# bun-webkit → bun → opencode) that a PR-scoped build would never touch.
+# base formula (llvm@21) silently breaking a downstream one (bun-webkit →
+# bun → opencode) that a PR-scoped build would never touch.
 source "$(dirname "$0")/lib.sh"
 
 TAP_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
