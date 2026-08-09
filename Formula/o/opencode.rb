@@ -4,6 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.15.tar.gz"
   sha256 "28cb44d59b455c6fdc5bc15328413f6c163291eefb5fb0535ea5ec57e4cc4b0f"
   license "MIT"
+  revision 1
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
   # HTML page fetch), while api.github.com answers fast — same JSON strategy
