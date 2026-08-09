@@ -312,6 +312,26 @@ class WarpTui < Formula
     # `--help`/`--version` on both the OHOS CI container and a real
     # HarmonyOS device).
 
+    # 0. Workspace-wide nix version bump: 0.26.4 (upstream's pin) has no
+    # OHOS support at all (no `target_env = "ohos"` branches anywhere in
+    # its own sys/statfs.rs etc.); 0.31+ added it. This one-line bump is
+    # what actually *requires* the fd-API migration patches further below
+    # — nix 0.26 used raw RawFd/i32 everywhere, 0.31 moved to the
+    # AsFd/OwnedFd/BorrowedFd I/O-safety types the whole Rust ecosystem
+    # adopted around 2023, and Warp's own terminal code predates that
+    # migration. A third-party dependency (`pprof`, pulled in only via the
+    # optional, not-enabled-here `pprof_cpu_profiling` feature) hard-pins
+    # `nix = "0.26"` in its own Cargo.toml; Cargo resolves that as an
+    # independent semver-incompatible 0.x line coexisting with our 0.31 in
+    # the same lockfile rather than a conflict, since nothing in this
+    # build ever enables that feature.
+    inreplace "Cargo.toml" do |s|
+      s.sub!(
+        "nix = { version = \"0.26.4\", default-features = false, features = [\"signal\"] }",
+        "nix = { version = \"0.31\", default-features = false, features = [\"signal\"] }",
+      ) || odie("warp-tui: workspace Cargo.toml nix version anchor not found")
+    end
+
     # 1. freedesktop-desktop-entry: pulls in gettext-sys -> a vendored
     # gnulib snapshot that hardcodes `NSIG <= 32`, which OHOS's 65-signal
     # NSIG violates at compile time. This dependency exists purely to
