@@ -9,7 +9,7 @@ class Bun < Formula
   url "https://github.com/social4hyq/ohos-bun.git", revision: "28ba33ca9c6ae2b14f74a5ee205b2591a608fe91", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
-  revision 55
+  revision 56
   # head tracks the same pre-patched fork branch as url — upstream oven-sh/bun
   # main lacks the 50+ OHOS patches and cannot build for HarmonyOS.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "ohos-aarch64"
@@ -24,13 +24,14 @@ class Bun < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "6a2f64bc1cf4db0cb62a5f60c650e5cba1579ef82db99f3f038814ff74a88399"
   end
 
-  # ── Dependencies (bare names except icu4c@78 — the one name harmonybrew/core
-  # also ships, which a bare reference would resolve to; see README "Formula
-  # 引用约定") ──
+  # ── Dependencies (all bare names; icu4c@78 resolves to harmonybrew/core —
+  # this tap's __h-era fork was dropped in the __n1 migration and the
+  # upstream __n1 build now matches bun's libc++ ABI) ──
   depends_on "bun-bootstrap" => :build # Bootstrap: `bun bd` itself is a bun script
   depends_on "bun-webkit" => :build
   depends_on "cmake" => :build
   depends_on "gperf" => :build
+  depends_on "icu4c@78" => :build
   depends_on "llvm@21" => :build
   depends_on "ninja" => :build
   depends_on "ohos-sdk" => :build
@@ -39,7 +40,6 @@ class Bun < Formula
   depends_on "perl" => :build
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
-  depends_on "social4hyq/core/icu4c@78" => :build
   depends_on "node"
   # No runtime ohos-compat-shim dependency since r31: a vendored copy of the
   # shim is statically linked into the executable (emitShims in the source
@@ -113,7 +113,7 @@ class Bun < Formula
       cp webkit.include/"webkit/cmakeconfig.h", "cmakeconfig.h"
     end
     %w[libicudata.a libicui18n.a libicuuc.a].each do |a|
-      ln_sf formula_opt_lib("social4hyq/core/icu4c@78")/a, wc/"lib"/a
+      ln_sf formula_opt_lib("icu4c@78")/a, wc/"lib"/a
     end
 
     # ── Scaffold build/ohos-icu/{target,host} layout for bun's config.ts ──
@@ -122,7 +122,7 @@ class Bun < Formula
     # build-icu.sh, so point this layout at icu4c@78 formula instead.
     # webkit.ts:472 also resolves hostBin = <ohosIcuDir>/../host/bin for ICU
     # data tools (genrb/genccode/gencmn/pkgdata) — symlink those too.
-    icu = Formula["social4hyq/core/icu4c@78"]
+    icu = Formula["icu4c@78"]
     (buildpath/"build/ohos-icu/target/include").mkpath
     ln_sf icu.opt_include/"unicode", buildpath/"build/ohos-icu/target/include/unicode"
     (buildpath/"build/ohos-icu/target/lib").mkpath
