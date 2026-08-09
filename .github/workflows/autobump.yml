@@ -6,7 +6,7 @@ name: autobump
 # merges, publish-on-merge.yml publishes.
 #
 # ALLOWLIST is deliberately narrow and explicit: most formulae in this tap
-# have a custom structure (bun's rN revision, pinned llvm@21/icu4c@78, shims
+# have a custom structure (bun's rN revision, pinned llvm@21, shims
 # with no upstream at all) that `bump-formula-pr`'s url/sha256 gsub can't
 # rewrite cleanly. claude-code's non-trivial install() (signing, bundled
 # shim deps) doesn't matter here — its formula-level url/version/sha256
