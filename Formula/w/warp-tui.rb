@@ -707,6 +707,26 @@ class WarpTui < Formula
       ) || odie("warp-tui: kitty.rs mmap anchor not found")
     end
 
+    # 4g. crates/mcp/src/runtime.rs: `server_info.map(|info| &info.capabilities)`
+    # takes `server_info: Option<ServerInfo>` *by value* into the closure,
+    # then tries to return a reference into that now-closure-local `info` —
+    # a real dangling-reference bug (E0515), not an OHOS-specific issue.
+    # Only surfaces with this formula's `default-features = false` patch to
+    # warp_tui's `warp` dependency (patch #3 above): upstream's default
+    # feature set pulls in a `mcp` build configuration where this exact
+    # function isn't part of the compiled closure graph the same way, so
+    # nothing upstream ever forces rustc to typecheck this call shape.
+    # `.as_ref()` first borrows the outer `server_info` (which outlives the
+    # closure) instead of moving it in, matching what the callee
+    # (`query_resources_for`/`query_tools_for`) already declares:
+    # `capabilities: Option<&rmcp::model::ServerCapabilities>`.
+    inreplace "crates/mcp/src/runtime.rs" do |s|
+      s.sub!(
+        "let capabilities = server_info.map(|info| &info.capabilities);",
+        "let capabilities = server_info.as_ref().map(|info| &info.capabilities);",
+      ) || odie("warp-tui: mcp/runtime.rs capabilities anchor not found")
+    end
+
     # interprocess crate's own build.rs detects Unix-domain-socket support
     # via a hardcoded target_env allowlist (gnu/musl/musleabi/musleabihf)
     # that doesn't include "ohos", even though OHOS's musl fully supports
