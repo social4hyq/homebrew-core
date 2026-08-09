@@ -4,7 +4,7 @@ class LlvmAT21 < Formula
   url "https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.8/llvm-project-21.1.8.src.tar.xz"
   sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
   license "Apache-2.0" => { with: "LLVM-exception" }
-  revision 4
+  revision 5
   # This formula is fully rewritten from upstream because HarmonyOS requires an
   # OHOS code-sign patch (CodeSign.cpp in lld/ELF), config.guess stubbing,
   # and two separate runtime builds (compiler-rt + multiarch libc++/libcxxabi/libunwind).
@@ -18,8 +18,8 @@ class LlvmAT21 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm@21-v21.1.8-r1"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "603f8625e69691ead060413af1b2b05442ef45dcc2ccd5638769817377b97cb9"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm@21-v21.1.8-r2"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "9b5e75cfe6d2ab28d662ab3ce464ade41e6900eb6537b733ccf6e9bdd3c5e97e"
   end
 
   keg_only "this is a versioned HarmonyOS bootstrap toolchain"
@@ -399,7 +399,16 @@ class LlvmAT21 < Formula
              "-DLIBCXXABI_USE_COMPILER_RT=ON",
              "-DLIBCXXABI_USE_LLVM_UNWINDER=ON",
              "-DLIBCXX_CXX_ABI=libcxxabi",
-             "-DLIBCXX_ABI_NAMESPACE=__h",
+             # __n1 is the only ABI namespace OpenHarmony sanctions for
+             # anything not baked into the OS image (llvm-build/build.py in
+             # third_party_llvm-project sets __h only for the system-image
+             # libc++.so, __n1 for NDK/third-party distribution including
+             # static libs). This toolchain previously used __h; switched
+             # after the three-round investigation recorded in the Workspace
+             # repo's docs/harmony-ohos-porting-guide.md §2.8. bun /
+             # bun-webkit / icu4c@78 are rebuilt in lockstep (same migration
+             # series) — a stale __h ICU bottle will not link against this.
+             "-DLIBCXX_ABI_NAMESPACE=__n1",
              "-DLIBCXX_HAS_MUSL_LIBC=ON",
              "-DLIBCXX_HAS_PTHREAD_API=ON",
              "-DLIBCXX_CXX_ABI_INCLUDE_PATHS=#{libcxxabi_inc}",
