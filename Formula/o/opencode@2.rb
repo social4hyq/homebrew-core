@@ -9,7 +9,7 @@ class OpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "84fd347afaed9617b7b29744086657fa029bbe68", branch: "v2"
   version "2.0.0-beta"
   license "MIT"
-  revision 12
+  revision 13
 
   livecheck do
     url "https://api.github.com/repos/anomalyco/opencode/commits?sha=v2&per_page=1"
@@ -19,8 +19,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r12"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1776d457b360aa431395904d4361be445c1a9cc5b3ba4b49fa8667e474311cd"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4f897cc13fb350023b6832ce3ec22262465117be14380fa9edd68dc585bfc781"
   end
 
   # opencode2 is a `bun build --compile` single binary: OHOS bun runtime + JS
