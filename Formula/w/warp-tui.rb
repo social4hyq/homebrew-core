@@ -26,7 +26,7 @@ class WarpTui < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/warp-tui-v0.0.0-dev-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "bf5cf0e2edbfbd9fcedc7b2c86b6efbe6e0cbbd4ae826bbfda0b9ef14f35a73b"
   end
 
   depends_on "cmake" => :build
