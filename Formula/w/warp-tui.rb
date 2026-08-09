@@ -743,16 +743,14 @@ class WarpTui < Formula
     ].map { |cfg| "--cfg #{cfg}" }.join(" ")
     ENV["RUSTFLAGS"] = "-L #{musl_compat_lib} -l static=musl_compat #{uds_cfgs}"
 
-    # release-tui's default profile (full-program single-codegen-unit LTO)
-    # is kept as-is here — a local-container test with 8GB then 16GB RAM
-    # OOM'd on it (kernel OOM killer, then LLVM's own allocator failing
-    # cleanly), but that container's memory ceiling isn't necessarily
-    # representative of the actual GitHub-hosted ubuntu-24.04-arm build
-    # runner. Building for real on CI (bottle-build.yml, 360min timeout)
-    # is the authoritative test; if it OOMs there too, the fix is
-    # `CARGO_PROFILE_RELEASE_TUI_LTO=false` + `..._CODEGEN_UNITS=16` (both
-    # verified to fit under 16GB peak RSS in the container test) rather
-    # than guessing at intermediate settings.
+    # release-tui's default profile keeps thin LTO but bumps codegen-units
+    # from 1 to 16: confirmed on real GitHub-hosted ubuntu-24.04-arm CI
+    # (bottle-build.yml run 31289028724) that codegen-units=1 gets SIGKILL'd
+    # (OOM) while linking the final warp-tui-oss binary. codegen-units=16
+    # was verified in the local-container spike to fit under 16GB peak RSS
+    # without disabling LTO entirely, so it's the smallest change that
+    # avoids the OOM.
+    ENV["CARGO_PROFILE_RELEASE_TUI_CODEGEN_UNITS"] = "16"
 
     # Not std_cargo_args: that helper hardcodes --locked, which this build
     # can't use (the nix-version-bump patch above changes what the
