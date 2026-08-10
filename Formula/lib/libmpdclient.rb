@@ -1,8 +1,8 @@
 class Libmpdclient < Formula
   desc "Library for MPD in the C, C++, and Objective-C languages"
   homepage "https://www.musicpd.org/libs/libmpdclient/"
-  url "https://www.musicpd.org/download/libmpdclient/2/libmpdclient-2.26.tar.xz"
-  sha256 "35785c6d6318ade47e2c27b00fc6938f5e09d04714080fea3f5e5c522ba3e036"
+  url "https://www.musicpd.org/download/libmpdclient/2/libmpdclient-2.27.tar.xz"
+  sha256 "88945b5abc11d8f4cea2bb7028e545024a6e060650bd65527a29bc9400daead8"
   license "BSD-3-Clause"
   compatibility_version 1
   head "https://github.com/MusicPlayerDaemon/libmpdclient.git", branch: "master"
@@ -13,7 +13,7 @@ class Libmpdclient < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b0aaac6c468bf0b045604ab5403452395eedc54944c53a38d0a2390840f0293"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "594792b11177a0041836de548ede60ae52c5c1a7dc3f752e943e5bca71c184a6"
   end
 
   depends_on "meson" => :build
