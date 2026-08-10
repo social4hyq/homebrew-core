@@ -1,0 +1,45 @@
+class CcSwitchCli < Formula
+  desc "All-in-one assistant tool for Claude Code, Codex, Gemini, OpenCode and OpenClaw"
+  homepage "https://github.com/SaladDay/cc-switch-cli"
+  url "https://github.com/SaladDay/cc-switch-cli/archive/refs/tags/v5.10.1.tar.gz"
+  sha256 "8e03202bb45255a52f74132bd7310f7db44bdb983fcb7737642d40af587776b2"
+  license "MIT"
+  head "https://github.com/SaladDay/cc-switch-cli.git", branch: "main"
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fdec8232333880081e40bffb5ec1197d6faf259ee9c31db558d0b3305f9863e3"
+  end
+
+  depends_on "rust" => :build
+
+  def install
+    # Fetch all dependencies first so rquickjs-sys sources exist in the cache
+    system "cargo", "fetch", "--manifest-path", "src-tauri/Cargo.toml"
+
+    # rquickjs-sys 0.8.1 does not ship pre-generated bindings for the OHOS
+    # target, so its build.rs prints a warning and lib.rs fails to include
+    # bindings/aarch64-unknown-linux-ohos.rs. OpenHarmony's libc is musl-based,
+    # so reuse the musl bindings, which are ABI-compatible.
+    bindings_dir = Pathname.glob(
+      "#{HOMEBREW_CACHE}/cargo_cache/registry/src/**/rquickjs-sys-0.8.1/src/bindings",
+    ).first
+    cp bindings_dir/"aarch64-unknown-linux-musl.rs", bindings_dir/"aarch64-unknown-linux-ohos.rs"
+
+    system "cargo", "install", *std_cargo_args(path: "src-tauri")
+    generate_completions_from_executable(bin/"cc-switch", "completions")
+  end
+
+  test do
+    ENV["HOME"] = testpath.to_s
+    ENV["XDG_CONFIG_HOME"] = (testpath/".config").to_s
+    ENV["CODEX_HOME"] = (testpath/".codex").to_s
+    ENV["CC_SWITCH_CONFIG_DIR"] = (testpath/"cc-switch").to_s
+    ENV["ANTHROPIC_API_KEY"] = "cc-switch-test-api-key"
+    ENV["CC_SWITCH_BREW_TEST"] = "1"
+
+    output = shell_output("#{bin}/cc-switch env check -a claude")
+    assert_match "ANTHROPIC_API_KEY", output
+    assert_match "cc-switch-test-api-key", output
+    assert_match "conflict", output
+  end
+end
