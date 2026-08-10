@@ -1,13 +1,13 @@
 class Try < Formula
   desc "Quickly manage and navigate project directories for experiments"
   homepage "https://github.com/tobi/try"
-  url "https://github.com/tobi/try/archive/refs/tags/v1.9.3.tar.gz"
-  sha256 "ae1917c7349d3ea41be829b21ef5e4a362e629a923a442d4da525b77cb3117c0"
+  url "https://github.com/tobi/try/archive/refs/tags/v1.10.1.tar.gz"
+  sha256 "4520a71a2485e04b09a93514d4818ad24800ea4738b8dceba24e941cbe2fc879"
   license "MIT"
   head "https://github.com/tobi/try.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "629fc53e283721cd565fc23d8b19882191e518bc55fb1c000df9f2d7583914e3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf108bcec2fae92efe9a35772ac942751f8ba95ba116a4a021637e9aaf0a990a"
   end
 
   depends_on "ruby"
