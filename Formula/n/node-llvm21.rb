@@ -17,6 +17,7 @@ class NodeLlvm21 < Formula
   # exists at all.
   depends_on "llvm@21" => :build
   depends_on "ohos-sdk" => :build
+  depends_on "pkgconf" => :build
   depends_on "python@3.14" => :build
 
   # Devendored libraries, mirroring upstream Homebrew/homebrew-core's own
@@ -86,6 +87,29 @@ class NodeLlvm21 < Formula
     # an `ar` alias).
     ENV["AR"] = (llvm.opt_bin/"llvm-ar").to_s
     ENV.prepend_path "LD_LIBRARY_PATH", llvm.opt_lib
+    # ICU is handled via --with-intl=system-icu below rather than the
+    # --shared-* devendor loop, so it needs the same node_js2c
+    # build-time-host-tool LD_LIBRARY_PATH treatment added separately.
+    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("icu4c@78")
+
+    # Same reasoning again, but for the *installed* `node` binary and
+    # libnode.so at run time, not just node_js2c during the build: every
+    # non-vendored dependency here is dynamically linked (--shared-*), so
+    # the resulting keg needs an explicit rpath to find them — node's own
+    # build system doesn't add one for --shared-*-libpath on its own, and
+    # without it every devendored .so fails to load with "Error loading
+    # shared library X: (needed by node)". This list is threaded through to
+    # common.gypi below rather than set via ENV["LDFLAGS"], because that's
+    # the only place a flag reliably reaches the *final* link step here:
+    # CC/CXX above are absolute paths to llvm@21 (to sidestep Homebrew's
+    # CompilerSelectionError, which only recognizes a bare `clang` on
+    # PATH), so `make` invokes the compiler directly and never goes through
+    # this tap's superenv shim — an ENV.append "LDFLAGS" would never reach
+    # the link command, and node's own configure.py doesn't read $LDFLAGS
+    # either. common.gypi's ldflags list is baked into the generated
+    # Makefiles at `./configure` time regardless of how the compiler is
+    # invoked, so it's the one mechanism guaranteed to land in every target.
+    rpath_flags = ["-Wl,-rpath,#{formula_opt_lib("icu4c@78")}"]
 
     # make sure subprocesses spawned by make are using our Python 3
     ENV["PYTHON"] = which("python3.14")
@@ -133,6 +157,14 @@ class NodeLlvm21 < Formula
       args << "--shared-#{flag}"
       args << "--shared-#{flag}-includes=#{formula_opt_include(formula)}"
       args << "--shared-#{flag}-libpath=#{formula_opt_lib(formula)}"
+      # gyp's "host" toolchain (codegen tools like node_js2c that the build
+      # itself compiles and runs, e.g. to embed JS as bytecode) doesn't get
+      # the same RPATH treatment --shared-*-libpath gives the final `node`
+      # binary — it fails to dlopen these at runtime *during the build*
+      # with "Error loading shared library" for every devendored lib unless
+      # they're all reachable via LD_LIBRARY_PATH directly.
+      ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib(formula)
+      rpath_flags << "-Wl,-rpath,#{formula_opt_lib(formula)}"
     end
 
     # - `--shared-ada` needs a harmonybrew ada-url formula that doesn't
@@ -158,6 +190,23 @@ class NodeLlvm21 < Formula
 
         odie "Unused `--shared-*` flag: #{flag}"
       end
+    end
+
+    # OHOS's dynamic linker uses namespace isolation: a module loaded via
+    # dlopen() (e.g. a nan/node-gyp native addon loaded through require())
+    # cannot resolve symbols back into libraries the process already has
+    # loaded (libnode.so, or any of the devendored deps above) unless those
+    # libraries were linked with -Wl,-z,global (DF_1_GLOBAL) — otherwise
+    # every such addon fails with "Error relocating ...: symbol not found"
+    # for perfectly-exported symbols like node::AddEnvironmentCleanupHook.
+    # Verified against a real nan-based addon (@datadog/pprof): it dlopens
+    # and profiles real data with this flag added, and fails without it.
+    inreplace "common.gypi" do |s|
+      s.sub!(
+        "'ldflags': [ '-rdynamic' ],",
+        "'ldflags': [ '-rdynamic', '-Wl,-z,global', " \
+        "#{rpath_flags.map { |f| "'#{f}'" }.join(", ")} ],",
+      ) || odie("node-llvm21: common.gypi OS-conditional ldflags anchor not found")
     end
 
     system "./configure", *args
