@@ -7,7 +7,7 @@ class Oj < Formula
   head "https://github.com/ohler55/ojg.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a323c400601ccd4cdea16c78dbdd1cf7e58cf22b834d9bb0095ee6981cf4a6cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c2cdfe61bda8dde4234bba7df79a428d9ed36a228e0eea2ff048fb9c3bc5c6b"
   end
 
   depends_on "go" => :build
