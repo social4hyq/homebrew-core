@@ -1,13 +1,13 @@
 class Hookdeck < Formula
   desc "Forward webhook events from Hookdeck to a local server"
   homepage "https://hookdeck.com"
-  url "https://github.com/hookdeck/hookdeck-cli/archive/refs/tags/v2.3.2.tar.gz"
-  sha256 "7604e97fbe4c9f3ec16ca9d17611deac93d8d0b10998c2386b042ff65a60feee"
+  url "https://github.com/hookdeck/hookdeck-cli/archive/refs/tags/v2.4.0.tar.gz"
+  sha256 "70a2356b906f2a5560360b1dc3eb3729041c016f1b046994ebb7c3fedfea512b"
   license "Apache-2.0"
   head "https://github.com/hookdeck/hookdeck-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "39a4d4f980bbe263f3a5aed203b2e8cb6a7658e856cbaf6b71cb60c90df4d18c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "39a2c052fc0376ce32ad6e0552a22fa6b25fedae4fe0ba70b2091efbe6307990"
   end
 
   depends_on "go" => :build
