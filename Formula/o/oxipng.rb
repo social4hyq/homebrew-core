@@ -6,7 +6,7 @@ class Oxipng < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fdf34e43ed1e83c6321494bb4c8773010fc883ae682b3566a2f41be5a08e32d5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "98e0b18e4e4b69bada1ed1889972f489c345e4b3084e76a2d44526f4342af457"
   end
 
   depends_on "rust" => :build
