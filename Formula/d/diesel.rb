@@ -7,7 +7,7 @@ class Diesel < Formula
   head "https://github.com/diesel-rs/diesel.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "595e71bd686355f0de477a552cd8f7ae452b98e313c7c838f925fcd9dac14850"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "940a13d7468feea642e1fd464ebfdb3bc71ecc39e8f09f11269b6d4dbcdc271c"
   end
 
   depends_on "rust" => [:build, :test]
