@@ -1,8 +1,8 @@
 class Cdncheck < Formula
   desc "Utility to detect various technology for a given IP address"
   homepage "https://projectdiscovery.io"
-  url "https://github.com/projectdiscovery/cdncheck/archive/refs/tags/v1.2.47.tar.gz"
-  sha256 "e807d23a8e63c31e6a125695d05e7631f9017daf28405573af50e59b38b85f4a"
+  url "https://github.com/projectdiscovery/cdncheck/archive/refs/tags/v1.2.48.tar.gz"
+  sha256 "fde4821501774a9768721525823bdc451c13ee23e99b3f70e3ca64b661e1e35f"
   license "MIT"
   head "https://github.com/projectdiscovery/cdncheck.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Cdncheck < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc890197ea16e055f920e8f43f21f21fb12935e5af7d0110ce77d048da9fe6b5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e394a673f6e294ebb99ce3cd6a2475a0699131e9682796f78ef486176c6de42"
   end
 
   depends_on "go" => :build
