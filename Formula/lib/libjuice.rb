@@ -6,7 +6,7 @@ class Libjuice < Formula
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "68b326c6732593f53e346d79c7ca07d98c25593ccda55c93f599dde28e8dacaa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5b9988f68500a111d4dae3771a7899d25ff5081b5bdc86ad833093a6eef09da"
   end
 
   depends_on "cmake" => :build
