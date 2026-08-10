@@ -62,6 +62,7 @@ class NodeLlvm21 < Formula
     # openssl@3 config (which does exist) via a wrapper instead of relying
     # on system state — same pattern warp-tui.rb already uses for its own
     # OpenSSL dependency.
+    libexec.mkpath
     mv bin/"node", libexec/"node-real"
     (bin/"node").write <<~SH
       #!/bin/sh
