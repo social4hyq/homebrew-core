@@ -1,13 +1,13 @@
 class Timoni < Formula
   desc "Package manager for Kubernetes, powered by CUE and inspired by Helm"
   homepage "https://timoni.sh/"
-  url "https://github.com/stefanprodan/timoni/archive/refs/tags/v0.29.0.tar.gz"
-  sha256 "357a971802cc518ed15f6fb5771c69b7f9c4569e8154f67562eb2e4c9c7e0993"
+  url "https://github.com/stefanprodan/timoni/archive/refs/tags/v0.30.0.tar.gz"
+  sha256 "4eb3631efa2d6f5f491181b1dc9210b4a68f7b7f0669947c11f73df85a9d5432"
   license "Apache-2.0"
   head "https://github.com/stefanprodan/timoni.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7d92e98e8fa427ae6030ea12f74cba0a1e0678c634a4cc1196a6fc0e99c99f0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "33985b8b962a57c8ae630b039b662e456fc59bdb494234b1e0d1ac9c651f0ad6"
   end
 
   depends_on "go" => :build
