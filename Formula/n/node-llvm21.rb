@@ -252,6 +252,14 @@ class NodeLlvm21 < Formula
   end
 
   test do
+    # Keg-only, so `bin` isn't on PATH by default. The explicit `#{bin}/...`
+    # invocations below don't need this, but npm's own install of itself
+    # spawns child processes/scripts with a bare `#!/usr/bin/env node`
+    # shebang that does need `node` resolvable via PATH — without this,
+    # `npm install npm@latest` fails with "env: 'node': No such file or
+    # directory" even though npm itself was invoked by full path.
+    ENV.prepend_path "PATH", bin
+
     path = testpath/"test.js"
     path.write "console.log('hello');"
 
