@@ -1,8 +1,8 @@
 class EditorconfigChecker < Formula
   desc "Tool to verify that your files are in harmony with your .editorconfig"
   homepage "https://github.com/editorconfig-checker/editorconfig-checker"
-  url "https://github.com/editorconfig-checker/editorconfig-checker/archive/refs/tags/v3.9.0.tar.gz"
-  sha256 "64b813bc0c50b09a6a3f754cca6bcda9c1c8fe6b0d6391e25f43856f1ec72ca5"
+  url "https://github.com/editorconfig-checker/editorconfig-checker/archive/refs/tags/v3.11.1.tar.gz"
+  sha256 "44d630c12d712cd132764582edb45a2e0db1600a47a87307ee747b4195d06278"
   license "MIT"
   head "https://github.com/editorconfig-checker/editorconfig-checker.git", branch: "main"
 
