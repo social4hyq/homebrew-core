@@ -12,7 +12,7 @@ class Anubis < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7b594c30132bea7db450601a5053c42510f27b6b9724c1ce71a47af69c576d1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "397f365a604f2bd77da86e4d3fb9b41eab83eb9fe715014da214bcd829bac26f"
   end
 
   depends_on "brotli" => :build
