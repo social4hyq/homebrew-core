@@ -3,13 +3,13 @@ class CheckJsonschema < Formula
 
   desc "JSON Schema CLI"
   homepage "https://github.com/python-jsonschema/check-jsonschema"
-  url "https://files.pythonhosted.org/packages/f3/dd/27b7f575586505c3d71b66b1fd60076feeba1ba7ffd1303fbf5a70cedad6/check_jsonschema-0.37.4.tar.gz"
-  sha256 "f933521f14cbeaaf113270751185b01379f453ac9ce9fb01d6190ce1352ccaa6"
+  url "https://files.pythonhosted.org/packages/a1/a0/d5ab25da3d4612a47b1e68cbbdffdc076ca3a9771027573d4ed9f4304d49/check_jsonschema-0.38.0.tar.gz"
+  sha256 "bb6899cc24ab0ced664e4646423d35b72db245cea75109c0b9e64d13087d1b8c"
   license "Apache-2.0"
   head "https://github.com/python-jsonschema/check-jsonschema.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc0900f3eeb18495c55849c611d62c506bbac8196ffafd918fda7be3094ffff9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "23186eef547c1143381b9f50fe45ba82e53b345a79407380177f777e26aa5eb1"
   end
 
   depends_on "rust" => :build # for regress
@@ -32,8 +32,8 @@ class CheckJsonschema < Formula
   end
 
   resource "charset-normalizer" do
-    url "https://files.pythonhosted.org/packages/e7/a1/67fe25fac3c7642725500a3f6cfe5821ad557c3abb11c9d20d12c7008d3e/charset_normalizer-3.4.7.tar.gz"
-    sha256 "ae89db9e5f98a11a4bf50407d4363e7b09b31e55bc117b4f7d80aab97ba009e5"
+    url "https://files.pythonhosted.org/packages/bd/2a/23f34ec9d04624958e137efdc394888716353190e75f25dd22c7a2c7a8aa/charset_normalizer-3.4.9.tar.gz"
+    sha256 "673611bbd43f0810bec0b0f028ddeaaa501190339cac411f347ac76917c3ae7b"
   end
 
   resource "click" do
@@ -112,8 +112,8 @@ class CheckJsonschema < Formula
   end
 
   resource "tzdata" do
-    url "https://files.pythonhosted.org/packages/ba/19/1b9b0e29f30c6d35cb345486df41110984ea67ae69dddbc0e8a100999493/tzdata-2026.2.tar.gz"
-    sha256 "9173fde7d80d9018e02a662e168e5a2d04f87c41ea174b139fbef642eda62d10"
+    url "https://files.pythonhosted.org/packages/92/ff/5a28bdfd8c3ebec42564ac7d0e54ca3db65044a9314a97f9564fa7a1e926/tzdata-2026.3.tar.gz"
+    sha256 "4a1518b8993086a7982523e071643f3c0e5f213e75b21318e78bcabfff9d1415"
   end
 
   resource "uri-template" do
