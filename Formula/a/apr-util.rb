@@ -7,7 +7,7 @@ class AprUtil < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab126258454a6c2292db462e0e16a6eb2b97b53c447a46783afa9202db9b382e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d70d2890d9dfaff643ffd6d000e9bc9f5b3e704fffada74ba95f606744a44bfb"
   end
 
   keg_only :shadowed_by_macos, "Apple's CLT provides apr (but not apr-util)"
