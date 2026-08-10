@@ -1,13 +1,13 @@
 class Py3cairo < Formula
   desc "Python 3 bindings for the Cairo graphics library"
   homepage "https://cairographics.org/pycairo/"
-  url "https://github.com/pygobject/pycairo/releases/download/v1.29.0/pycairo-1.29.0.tar.gz"
-  sha256 "f3f7fde97325cae80224c09f12564ef58d0d0f655da0e3b040f5807bd5bd3142"
+  url "https://github.com/pygobject/pycairo/releases/download/v1.29.1/pycairo-1.29.1.tar.gz"
+  sha256 "4fbd26b4af24c9787d84cf5448e34eb8dca064b732479aaecd03109520eebd5f"
   license any_of: ["LGPL-2.1-only", "MPL-1.1"]
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee379d49090df183f9f4ad8d9f3988d54902b75dc500ea0a53695be6c4ee505d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7a6c9d7d3890fa0703631a00a4ee9cec6856a3d19e5c17bb3906c7d1d39eb0e"
   end
 
   depends_on "meson" => :build
