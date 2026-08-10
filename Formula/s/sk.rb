@@ -1,8 +1,8 @@
 class Sk < Formula
   desc "Fuzzy Finder in rust!"
   homepage "https://github.com/skim-rs/skim"
-  url "https://github.com/skim-rs/skim/archive/refs/tags/v5.6.1.tar.gz"
-  sha256 "e85c921fee7513453b487d2f72b6f47e9ffdf95110dcd4c1af39a13bade65549"
+  url "https://github.com/skim-rs/skim/archive/refs/tags/v5.6.4.tar.gz"
+  sha256 "ccce90a00d03853833c4f8bea77749537e3650ccfc577f413a0b00b59b0390e3"
   license "MIT"
   head "https://github.com/skim-rs/skim.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Sk < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e917b9a05487cebb303fb8deb2189f6ea9ae0a64d454740e7eec25de7fdb547"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee09390144d07da723e8397d1f5b3439fc0a68809463135e4fcdf9918548a78d"
   end
 
   depends_on "rust" => :build
