@@ -7,7 +7,7 @@ class Fabio < Formula
   head "https://github.com/fabiolb/fabio.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "732fa217781b0ceec9b90b761399925988bc660e3400158f373d85b79c41b006"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb6511f8a303bce2d46d245408ee03447c3393c4a59f26736d5c76b900cb70cb"
   end
 
   depends_on "go" => :build
