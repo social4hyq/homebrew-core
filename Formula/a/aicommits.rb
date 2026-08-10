@@ -1,8 +1,8 @@
 class Aicommits < Formula
   desc "Writes your git commit messages for you with AI"
   homepage "https://github.com/Nutlope/aicommits"
-  url "https://registry.npmjs.org/aicommits/-/aicommits-4.0.0.tgz"
-  sha256 "ccd6abcf17724a6a4b5a895d23ceb901f78b46713d9e05e930d3465f27218949"
+  url "https://registry.npmjs.org/aicommits/-/aicommits-4.0.1.tgz"
+  sha256 "417102e3d98714ab73e3b6dc9bff28cbcd34e56a3134514e6cd34969afbd53da"
   license "MIT"
 
   bottle do
