@@ -1,8 +1,8 @@
 class Pdfcpu < Formula
   desc "PDF processor written in Go"
   homepage "https://pdfcpu.io"
-  url "https://github.com/pdfcpu/pdfcpu/archive/refs/tags/v0.13.0.tar.gz"
-  sha256 "d7e657051aef697d39da63a5366850d476485b33d5ad100b829b86153df8c094"
+  url "https://github.com/pdfcpu/pdfcpu/archive/refs/tags/v0.14.0.tar.gz"
+  sha256 "9e824957d847af70585e9b5c94070e3b78377c876adadc0b90e37afcf706ba69"
   license "Apache-2.0"
 
   livecheck do
@@ -11,14 +11,13 @@ class Pdfcpu < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b8ee1d8c064a03248ccec885ea6415734f84e3bc075c29e4333d4f5d8c868591"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "46037ecb4fbb49fc1b05a455f49206e9acefe9ed545c293006803bd386ee6a55"
   end
 
   depends_on "go" => :build
 
   def install
     ldflags = %W[
-      -s -w
       -X main.version=#{version}
       -X github.com/pdfcpu/pdfcpu/pkg/pdfcpu.VersionStr=#{version}
       -X main.commit=#{tap.user}
@@ -53,6 +52,6 @@ class Pdfcpu < Formula
                 Page sizes: 500.00 x 800.00 points
     EOS
 
-    assert_match "validation ok", shell_output("#{bin}/pdfcpu validate #{test_fixtures("test.pdf")}")
+    assert_match "validation ok", shell_output("#{bin}/pdfcpu validate #{test_fixtures("test.pdf")} 2>&1")
   end
 end
