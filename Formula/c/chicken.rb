@@ -1,8 +1,8 @@
 class Chicken < Formula
   desc "Compiler for the Scheme programming language"
   homepage "https://www.call-cc.org/"
-  url "https://code.call-cc.org/releases/5.4.0/chicken-5.4.0.tar.gz"
-  sha256 "3c5d4aa61c1167bf6d9bf9eaf891da7630ba9f5f3c15bf09515a7039bfcdec5f"
+  url "https://code.call-cc.org/releases/6.0.0/chicken-6.0.0.tar.gz"
+  sha256 "92835552b1b687ad26737e429b5aba36510bf429f8816ec0f6d336c8cb41f443"
   license "BSD-3-Clause"
   head "https://code.call-cc.org/git/chicken-core.git", branch: "master"
 
