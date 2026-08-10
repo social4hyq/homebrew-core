@@ -1,8 +1,8 @@
 class Tombi < Formula
   desc "TOML formatter, linter and language server"
   homepage "https://github.com/tombi-toml/tombi"
-  url "https://github.com/tombi-toml/tombi/archive/refs/tags/v1.2.7.tar.gz"
-  sha256 "8ef0fc5ca78e21ccfd36f6e4ebf3e224395b7e59c4ed30546196754baa91d099"
+  url "https://github.com/tombi-toml/tombi/archive/refs/tags/v1.2.10.tar.gz"
+  sha256 "48b1aa357b2b520cfcae02feefffc2384ed96a683fb34e290da955b60742abc7"
   license "MIT"
   head "https://github.com/tombi-toml/tombi.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Tombi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ce62e4f02f92aae6262d9fd9f4e4343bb2978119cec3b10200f04302e629209"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "105ddebd23080909b1b771a8afef01206290ce1d2454d64c03d1eac3e05c738d"
   end
 
   depends_on "rust" => :build
