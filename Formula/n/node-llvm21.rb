@@ -13,10 +13,51 @@ class NodeLlvm21 < Formula
   keg_only "alternate toolchain build of node; the harmonybrew/core node formula " \
            "is the default for general use"
 
+  # Compiler toolchain — see the long comment in install() for why this
+  # exists at all.
   depends_on "llvm@21" => :build
   depends_on "ohos-sdk" => :build
   depends_on "python@3.14" => :build
+
+  # Devendored libraries, mirroring upstream Homebrew/homebrew-core's own
+  # node.rb (which builds --shared against formula-provided copies instead
+  # of the versions vendored in deps/). ada-url isn't ported to harmonybrew
+  # yet, so it stays vendored/bundled — see ignored_shared_flags below.
+  depends_on "brotli"
+  depends_on "c-ares"
+  depends_on "hdrhistogram_c"
+  depends_on "icu4c@78"
+  depends_on "libffi"
+  depends_on "libnghttp2"
+  depends_on "libnghttp3"
+  depends_on "libngtcp2"
+  depends_on "libuv"
+  depends_on "llhttp"
+  depends_on "merve"
+  depends_on "nbytes"
   depends_on "openssl@3"
+  depends_on "simdjson"
+  depends_on "sqlite"
+  depends_on "uvwasi"
+  depends_on "zlib-ng-compat"
+  depends_on "zstd"
+
+  # We track major/minor from upstream Node releases, same as upstream's own
+  # node.rb — the version bundled in deps/npm is intentionally not used
+  # (--without-npm below).
+  resource "npm" do
+    url "https://registry.npmjs.org/npm/-/npm-11.19.0.tgz"
+    sha256 "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75"
+
+    livecheck do
+      url "https://raw.githubusercontent.com/nodejs/node/refs/tags/v#{LATEST_VERSION}/deps/npm/package.json"
+      strategy :json do |json|
+        json["version"]
+      end
+    end
+  end
+
+  deny_network_access! [:build, :postinstall]
 
   def install
     # harmonybrew/core's node formula builds Node.js/V8 in an Alpine Linux
@@ -39,37 +80,113 @@ class NodeLlvm21 < Formula
     llvm = Formula["llvm@21"]
     ENV["CC"]  = (llvm.opt_bin/"clang").to_s
     ENV["CXX"] = (llvm.opt_bin/"clang++").to_s
-    # gyp's static_library rule shells out to a bare `ar`, which superenv's
-    # restricted build PATH doesn't provide (only declared deps' opt/bin —
-    # llvm@21 only ships the real name `llvm-ar`, not an `ar` alias).
+    # gyp's static_library rule shells out to a bare `ar` for whatever stays
+    # vendored below (simdutf, gtest, ada); superenv's restricted build PATH
+    # doesn't provide one (llvm@21 only ships the real name `llvm-ar`, not
+    # an `ar` alias).
     ENV["AR"] = (llvm.opt_bin/"llvm-ar").to_s
     ENV.prepend_path "LD_LIBRARY_PATH", llvm.opt_lib
 
-    system "./configure",
-           "--prefix=#{prefix}",
-           "--dest-os=openharmony",
-           "--partly-static"
+    # make sure subprocesses spawned by make are using our Python 3
+    ENV["PYTHON"] = which("python3.14")
 
-    system "make", "-j#{ENV.make_jobs}"
+    # Ensure Homebrew deps are used
+    rm_r(["deps/icu-small", "deps/npm"])
+
+    # Never install the bundled "npm", always prefer our installation from
+    # tarball for better packaging control.
+    args = %W[
+      --prefix=#{prefix}
+      --dest-os=openharmony
+      --without-npm
+      --with-intl=system-icu
+      --shared
+      --openssl-use-def-ca-store
+      --disable-single-executable-application
+    ]
+
+    # Devendor libraries available as formulae, same mapping upstream's own
+    # node.rb uses (configure flag => [bundled subdirectory, formula name]).
+    # ada-url has no harmonybrew formula yet, so it's deliberately absent
+    # here and left in ignored_shared_flags below — everything else in this
+    # list is already bottled in this tap.
+    {
+      "brotli"        => ["brotli",          "brotli"],
+      "cares"         => ["cares",           "c-ares"],
+      "ffi"           => ["libffi",          "libffi"],
+      "hdr-histogram" => ["histogram",       "hdrhistogram_c"],
+      "http-parser"   => ["llhttp",          "llhttp"],
+      "libuv"         => ["uv",              "libuv"],
+      "merve"         => ["merve",           "merve"],
+      "nbytes"        => ["nbytes",          "nbytes"],
+      "nghttp2"       => ["nghttp2",         "libnghttp2"],
+      "nghttp3"       => ["ngtcp2/nghttp3",  "libnghttp3"],
+      "ngtcp2"        => ["ngtcp2",          "libngtcp2"],
+      "openssl"       => ["openssl/openssl", "openssl@3"],
+      "simdjson"      => ["simdjson",        "simdjson"],
+      "sqlite"        => ["sqlite",          "sqlite"],
+      "uvwasi"        => ["uvwasi",          "uvwasi"],
+      "zlib"          => ["zlib",            "zlib-ng-compat"],
+      "zstd"          => ["zstd",            "zstd"],
+    }.each do |flag, (subdir, formula)|
+      rm_r(buildpath/"deps"/subdir)
+      args << "--shared-#{flag}"
+      args << "--shared-#{flag}-includes=#{formula_opt_include(formula)}"
+      args << "--shared-#{flag}-libpath=#{formula_opt_lib(formula)}"
+    end
+
+    # - `--shared-ada` needs a harmonybrew ada-url formula that doesn't
+    #   exist yet — ada stays vendored/bundled.
+    # - `--shared-gtest` is only used for building the test suite, which we
+    #   don't run here.
+    # - `--shared-simdutf` seems to result in build failures upstream too.
+    # - `--shared-temporal_capi` is only used with --v8-enable-temporal-support.
+    # - `--shared-lief` is only used for the disabled SEA feature.
+    ignored_shared_flags = %w[
+      ada
+      gtest
+      simdutf
+      temporal_capi
+      lief
+    ].map { |library| "--shared-#{library}" }
+
+    configure_help = Utils.safe_popen_read("./configure", "--help")
+    shared_flag_regex = /\[(--shared-[^ \]]+)\]/
+    configure_help.scan(shared_flag_regex) do |matches|
+      matches.each do |flag|
+        next if args.include?(flag) || ignored_shared_flags.include?(flag)
+
+        odie "Unused `--shared-*` flag: #{flag}"
+      end
+    end
+
+    system "./configure", *args
     system "make", "install"
 
-    # Node's bundled OpenSSL 3.x tries to auto-load a config file at every
-    # process startup (provider initialization), and hard-fails if it's
-    # missing rather than tolerating its absence — confirmed fatal in an
-    # OpenHarmony docker container (fine on real hardware, so this wasn't
-    # caught until tested there). The compiled-in default is /etc/ssl,
-    # which this platform doesn't populate. Point at this tap's own
-    # openssl@3 config (which does exist) via a wrapper instead of relying
-    # on system state — same pattern warp-tui.rb already uses for its own
-    # OpenSSL dependency.
-    libexec.mkpath
-    mv bin/"node", libexec/"node-real"
-    (bin/"node").write <<~SH
-      #!/bin/sh
-      export OPENSSL_CONF="#{formula_opt_prefix("openssl@3")}/etc/openssl@3/openssl.cnf"
-      exec "#{libexec}/node-real" "$@"
-    SH
-    chmod 0755, bin/"node"
+    # Allow npm to find Node before installation has completed.
+    ENV.prepend_path "PATH", bin
+
+    bootstrap = buildpath/"npm_bootstrap"
+    bootstrap.install resource("npm")
+    # These dirs must exist before npm install.
+    (libexec/"lib").mkpath
+    system "node", bootstrap/"bin/npm-cli.js", "install", "--loglevel=silly", "--global",
+            "--prefix=#{libexec}", resource("npm").cached_download
+
+    # The `package.json` stores integrity information about the above
+    # passed-in `cached_download` npm resource, which breaks
+    # `npm -g outdated npm`. This copies back over the vanilla
+    # `package.json` to fix this issue.
+    (libexec/"lib/node_modules/npm").install bootstrap/"package.json"
+
+    rm_r libexec/"share" if (libexec/"share").exist?
+
+    # Keg-only: unlike the default node formula, this doesn't touch
+    # HOMEBREW_PREFIX/bin — npm/npx live only inside this keg.
+    bin.install_symlink libexec/"lib/node_modules/npm/bin/npm-cli.js" => "npm"
+    bin.install_symlink libexec/"lib/node_modules/npm/bin/npx-cli.js" => "npx"
+
+    (libexec/"lib/node_modules/npm/npmrc").write("prefix = #{opt_prefix}\n")
   end
 
   def caveats
@@ -82,10 +199,6 @@ class NodeLlvm21 < Formula
       against llvm@21's libc++ ABI (std::__n1::...) to dlopen successfully —
       the default node formula (Alpine GCC / GNU libstdc++) cannot load
       those addons regardless of how they were built.
-
-      #{bin}/node is a wrapper that points OPENSSL_CONF at this tap's own
-      openssl@3 config (the compiled-in default, /etc/ssl, isn't populated
-      on this platform) — invoke it directly rather than #{libexec}/node-real.
     EOS
   end
 
@@ -100,6 +213,15 @@ class NodeLlvm21 < Formula
 
     output = shell_output("#{bin}/node -e 'console.log(new Intl.NumberFormat(\"de-DE\").format(1234.56))'").strip
     assert_equal "1.234,56", output
+
+    assert_path_exists bin/"npm", "npm must exist"
+    assert_predicate bin/"npm", :executable?, "npm must be executable"
+    npm_args = ["-ddd", "--cache=#{HOMEBREW_CACHE}/npm_cache", "--build-from-source"]
+    system bin/"npm", *npm_args, "install", "npm@latest"
+    system bin/"npm", *npm_args, "install", "nan"
+    assert_path_exists bin/"npx", "npx must exist"
+    assert_predicate bin/"npx", :executable?, "npx must be executable"
+    assert_match "< hello >", shell_output("#{bin}/npx --yes cowsay hello")
 
     # Test `uvwasi` is linked correctly
     (testpath/"wasi-smoke-test.mjs").write <<~JAVASCRIPT
