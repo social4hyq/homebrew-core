@@ -1,12 +1,12 @@
 class Libnfs < Formula
   desc "C client library for NFS"
   homepage "https://github.com/sahlberg/libnfs"
-  url "https://github.com/sahlberg/libnfs/archive/refs/tags/libnfs-6.0.2.tar.gz"
-  sha256 "4e5459cc3e0242447879004e9ad28286d4d27daa42cbdcde423248fad911e747"
+  url "https://github.com/sahlberg/libnfs/archive/refs/tags/libnfs-7.0.0.tar.gz"
+  sha256 "d25c70537d60f1ab307b9cb5e9fb01acff71065fc9547b54dfaec109ba993003"
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "79a0a36c73f3ff954cdd0e594cd4399f7302059749c705c4174a63ebbd4badf4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e85dd18164ca9d9c1306d3d619daf6e2b9a2d34157c8e0cded5861dff3e4387"
   end
 
   depends_on "cmake" => :build
