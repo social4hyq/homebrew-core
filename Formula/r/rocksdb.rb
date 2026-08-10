@@ -8,7 +8,7 @@ class Rocksdb < Formula
   head "https://github.com/facebook/rocksdb.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0f995c75cad704815ce721f1d7cc40a884cb97c0d0666b6ea092d421e9d5250"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7a06e1759c08d1a128ac68d693ebd941e88a4ff36c2d52cc88107a804c53d9e"
   end
 
   depends_on "cmake" => :build
