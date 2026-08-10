@@ -1,8 +1,8 @@
 class SoftServe < Formula
   desc "Mighty, self-hostable Git server for the command-line"
   homepage "https://github.com/charmbracelet/soft-serve"
-  url "https://github.com/charmbracelet/soft-serve/releases/download/v0.12.1/soft-serve-0.12.1.tar.gz"
-  sha256 "e5b2bfc6e57856cf93bbef8973ff366609b3f9a82a346238ab372fcde760050b"
+  url "https://github.com/charmbracelet/soft-serve/releases/download/v0.12.2/soft-serve-0.12.2.tar.gz"
+  sha256 "b520cafe241855f3c9db34ede235ab8191c7f638e1bc7d34f5fb1b29a17e1345"
   license "MIT"
   head "https://github.com/charmbracelet/soft-serve.git", branch: "main"
 
