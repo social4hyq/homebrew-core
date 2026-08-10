@@ -1,12 +1,12 @@
 class Libjuice < Formula
   desc "UDP Interactive Connectivity Establishment (ICE) library"
   homepage "https://github.com/paullouisageneau/libjuice"
-  url "https://github.com/paullouisageneau/libjuice/archive/refs/tags/v1.7.2.tar.gz"
-  sha256 "75159867c4a5a689a6559e11aa0d30c9eba12ce73a4ae3d898b521467e1f635d"
+  url "https://github.com/paullouisageneau/libjuice/archive/refs/tags/v1.7.3.tar.gz"
+  sha256 "86e075ca4732882746b6d5733ff1b6090f942e5750df58630b191b5f00f30010"
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "68b326c6732593f53e346d79c7ca07d98c25593ccda55c93f599dde28e8dacaa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5b9988f68500a111d4dae3771a7899d25ff5081b5bdc86ad833093a6eef09da"
   end
 
   depends_on "cmake" => :build
