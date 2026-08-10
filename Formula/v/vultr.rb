@@ -7,7 +7,7 @@ class Vultr < Formula
   head "https://github.com/vultr/vultr-cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "73422b530f7354091379fe11e1196cfcc4cd678fc857b9c3670707453f6efc33"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7722487dc430cae834a861d38e4707dcce8bac245edc68c74f62272b25e9e880"
   end
 
   depends_on "go" => :build
