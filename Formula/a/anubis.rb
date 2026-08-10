@@ -1,8 +1,8 @@
 class Anubis < Formula
   desc "Protect resources from scraper bots"
   homepage "https://anubis.techaro.lol"
-  url "https://github.com/TecharoHQ/anubis/archive/refs/tags/v1.26.2.tar.gz"
-  sha256 "1a814ac0577f502a06664f49c6d659959a2428813c3e31bf33fc3038deeab700"
+  url "https://github.com/TecharoHQ/anubis/archive/refs/tags/v1.27.0.tar.gz"
+  sha256 "5a3f93d5b763283e2432f2574f30d30434befd5e1788990bd031bdf0696e78b3"
   license "MIT"
   head "https://github.com/TecharoHQ/anubis.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Anubis < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7b594c30132bea7db450601a5053c42510f27b6b9724c1ce71a47af69c576d1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "397f365a604f2bd77da86e4d3fb9b41eab83eb9fe715014da214bcd829bac26f"
   end
 
   depends_on "brotli" => :build
