@@ -1,0 +1,13 @@
+diff --git a/src-tauri/src/config.rs b/src-tauri/src/config.rs
+index d5508e9..a644b3d 100644
+--- a/src-tauri/src/config.rs
++++ b/src-tauri/src/config.rs
+@@ -636,7 +636,7 @@ fn validate_existing_managed_config_dir(path: &Path) -> Result<(), AppError> {
+     }
+ 
+     let mode = meta.permissions().mode() & 0o777;
+-    if mode & 0o022 != 0 {
++    if mode & 0o002 != 0 {
+         return Err(AppError::InvalidInput(format!(
+             "受管配置目录不能允许组或其他用户写入: {} ({mode:04o})",
+             path.display()

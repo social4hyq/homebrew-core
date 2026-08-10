@@ -5,12 +5,21 @@ class CcSwitchCli < Formula
   sha256 "8e03202bb45255a52f74132bd7310f7db44bdb983fcb7737642d40af587776b2"
   license "MIT"
   head "https://github.com/SaladDay/cc-switch-cli.git", branch: "main"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fdec8232333880081e40bffb5ec1197d6faf259ee9c31db558d0b3305f9863e3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9760de29625c26ee1243d3acdeb15d04367b21bbd0646dc6fb46d73318469248"
   end
 
   depends_on "rust" => :build
+
+  # Upstream rejects a managed config directory that is writable by group or
+  # other users. OpenHarmony user storage (/storage/Users/currentUser)
+  # creates directories group-writable, so cc-switch cannot run there; relax
+  # the check to only reject directories writable by other users.
+  patch do
+    file "Patches/cc-switch-cli/0001-relax-config-dir-permissions.patch"
+  end
 
   def install
     # Fetch all dependencies first so rquickjs-sys sources exist in the cache
