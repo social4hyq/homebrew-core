@@ -14,7 +14,7 @@ class Openrtsp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "76c85c16c3738569df9926ae00e5c5aa9e82315fbd254db4efc1ba66f83a7618"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "04c890609f40db9f9c7fdfe8e8142182261f05aec5182e0d75f52559c7421c61"
   end
 
   depends_on "openssl@3"
