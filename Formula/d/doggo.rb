@@ -7,8 +7,7 @@ class Doggo < Formula
   head "https://github.com/mr-karan/doggo.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "430af03e5665cc86b86cf7c81c9ca86a16089ecc1c8f17d35f75f213d8236d97"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad74209b78718b528379c85b41924bdd46051b211a5bde579ece51b2f569e929"
   end
 
   depends_on "go" => :build
