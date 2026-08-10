@@ -8,7 +8,7 @@ class Pygit2 < Formula
   head "https://github.com/libgit2/pygit2.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "64b999433607673dc30f30d6263fafdcd214e98286e6955716c50c9749be4427"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ded4a6c8c489745a87f05533207cd931ebc4d3ec4f4c92924e326a4131f6b227"
   end
 
   depends_on "python@3.13" => [:build, :test]
