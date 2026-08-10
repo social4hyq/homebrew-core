@@ -6,7 +6,7 @@ class Libnfs < Formula
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "79a0a36c73f3ff954cdd0e594cd4399f7302059749c705c4174a63ebbd4badf4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e85dd18164ca9d9c1306d3d619daf6e2b9a2d34157c8e0cded5861dff3e4387"
   end
 
   depends_on "cmake" => :build
