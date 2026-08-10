@@ -1,13 +1,13 @@
 class Gabo < Formula
   desc "Generates GitHub Actions boilerplate"
   homepage "https://github.com/ashishb/gabo"
-  url "https://github.com/ashishb/gabo/archive/refs/tags/v1.17.0.tar.gz"
-  sha256 "b19aa6ed7f0a1525fb8eca1c576d810ca39acfb5feac1acabd5d5af445ca4bb5"
+  url "https://github.com/ashishb/gabo/archive/refs/tags/v1.18.0.tar.gz"
+  sha256 "c3aa5177f3d2023d37da0e6266d67c38a1a8f8eb3f7f51567ade159306bc0711"
   license "Apache-2.0"
   head "https://github.com/ashishb/gabo.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a516865b626eda41ba842d201472f531f50d0aa286e3ad208bdc4c864272b7f2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "125f4ab6e23d626eb01b90c3b94fccd28de647712e667a179391be88f9641428"
   end
 
   depends_on "go" => :build
