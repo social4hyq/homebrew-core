@@ -1,13 +1,13 @@
 class D2 < Formula
   desc "Modern diagram scripting language that turns text to diagrams"
   homepage "https://d2lang.com/"
-  url "https://github.com/terrastruct/d2/archive/refs/tags/v0.7.1.tar.gz"
-  sha256 "b784d6472d53fdaaa7ecc9bdbe23456e2b4a90e18736828028b3f951537e56a1"
+  url "https://github.com/terrastruct/d2/archive/refs/tags/v0.8.1.tar.gz"
+  sha256 "e2fb1fe1d7b76196ee01a3a244356e7f22f7d3c30922f8d6a8a193ac05737172"
   license "MPL-2.0"
   head "https://github.com/terrastruct/d2.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "74fabe61f23d6ef991234ee01e3e5520a1831688d02f087293301cc4880fc773"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "336a7826033b66d99d661217775f9533805b0ed17bf4b24cc59948a46bdd4f3f"
   end
 
   depends_on "go" => :build
