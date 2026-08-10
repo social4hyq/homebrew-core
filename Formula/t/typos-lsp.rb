@@ -1,8 +1,8 @@
 class TyposLsp < Formula
   desc "Language Server for typos-cli"
   homepage "https://github.com/tekumara/typos-lsp"
-  url "https://github.com/tekumara/typos-lsp/archive/refs/tags/v0.1.54.tar.gz"
-  sha256 "adabdcba93f884cf100cbfeeaa4aa47548dc6e6b58e9978d947abdbadda2762d"
+  url "https://github.com/tekumara/typos-lsp/archive/refs/tags/v0.1.55.tar.gz"
+  sha256 "30ad727ea2321e3c0554329882e92d18f5596a7ada0d2878d15e7b43b2907443"
   license "MIT"
 
   livecheck do
@@ -11,7 +11,7 @@ class TyposLsp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c954962169a4c94fdebe8d8ca4d296aa098dd6b943c453dcfcf01ea6990c35c8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c535af2f0bb529970426705e78c5e0a1e6973bfc9616651c8e295010cbf2349"
   end
 
   depends_on "rust" => :build
