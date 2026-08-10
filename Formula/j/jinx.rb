@@ -7,7 +7,7 @@ class Jinx < Formula
   head "https://github.com/JamesBoer/Jinx.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db77fe0233126c703c68639a6a50f7c3e03badd26ec7c8e374a4c81c85cdfa77"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1ae27b5da77eb0099d60ec27a40eb603f0f5c941813094c8ba212eba13c6ca6"
   end
 
   depends_on "cmake" => :build
