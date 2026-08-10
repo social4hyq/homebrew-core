@@ -7,7 +7,7 @@ class Gnmic < Formula
   head "https://github.com/openconfig/gnmic.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a3f7ee4dd56fc096b7c39607577465aa19fd6237d1fa16c11a1b2dda7b9fefab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9038b17a3e8582bfafacd7a0a98150e376a836925b2c7c6d975fb32a71faa3e"
   end
 
   depends_on "go" => :build
