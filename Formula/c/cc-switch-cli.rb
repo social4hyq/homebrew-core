@@ -8,7 +8,7 @@ class CcSwitchCli < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fdec8232333880081e40bffb5ec1197d6faf259ee9c31db558d0b3305f9863e3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9760de29625c26ee1243d3acdeb15d04367b21bbd0646dc6fb46d73318469248"
   end
 
   depends_on "rust" => :build
