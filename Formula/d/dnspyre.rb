@@ -7,7 +7,7 @@ class Dnspyre < Formula
   head "https://github.com/Tantalor93/dnspyre.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a1de084a7708f381d5eaf66458f52aedc9678b4c210542b8065f9c4f34d5030"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "017a6a37a344d0509ef1ee3794f05bded0ef1d531ee4a2d0dbacc6571a3372ee"
   end
 
   depends_on "go" => :build
