@@ -1,4 +1,4 @@
-class NodeLlvm21 < Formula
+class NodeOhos < Formula
   desc "Node.js, built with llvm@21 for libc++ ABI compatibility with bun/nan addons"
   homepage "https://nodejs.org/"
   url "https://nodejs.org/dist/v26.7.0/node-v26.7.0.tar.xz"
@@ -17,15 +17,7 @@ class NodeLlvm21 < Formula
   # exists at all.
   depends_on "llvm@21" => :build
   depends_on "ohos-sdk" => :build
-  depends_on "pkgconf" => :build
   depends_on "python@3.14" => :build
-
-  # icu4c@78 is the one dependency still linked dynamically against a
-  # formula-provided copy (--with-intl=system-icu below) rather than
-  # letting node compile its own — see the long comment on
-  # ignored_shared_flags in install() for why it's the exception rather
-  # than the rule.
-  depends_on "icu4c@78"
 
   # We track major/minor from upstream Node releases, same as upstream's own
   # node.rb — the version bundled in deps/npm is intentionally not used
@@ -70,21 +62,23 @@ class NodeLlvm21 < Formula
     # real name `llvm-ar`, not an `ar` alias).
     ENV["AR"] = (llvm.opt_bin/"llvm-ar").to_s
     ENV.prepend_path "LD_LIBRARY_PATH", llvm.opt_lib
-    # gyp's "host" toolchain (codegen tools like node_js2c that the build
-    # itself compiles and runs, e.g. to embed JS as bytecode) doesn't get
-    # the same RPATH treatment the final `node` binary gets — it fails to
-    # dlopen icu4c@78 at runtime *during the build* with "Error loading
-    # shared library" unless it's reachable via LD_LIBRARY_PATH directly.
-    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("icu4c@78")
 
     # make sure subprocesses spawned by make are using our Python 3
     ENV["PYTHON"] = which("python3.14")
 
-    # Ensure Homebrew's npm/icu-small vendored copies aren't used. Every
-    # *other* deps/ subdirectory (uv, brotli, openssl, ...) is left alone
-    # and compiles from node's own bundled source — see the long comment
-    # on ignored_shared_flags below for why.
-    rm_r(["deps/icu-small", "deps/npm"])
+    # Only drop deps/npm — deps/icu-small is kept. Despite the legacy
+    # name, node's official release tarballs have shipped *full* ICU data
+    # there for years (confirmed: 34MB, marked by
+    # deps/icu-small/README-FULL-ICU.txt), and --with-intl defaults to
+    # full-icu using exactly that canned copy when no other ICU source is
+    # given — no network access needed, no external ICU dependency
+    # needed. An earlier version of this formula deleted deps/icu-small
+    # and linked against a formula-provided icu4c@78 instead
+    # (--with-intl=system-icu), which needed its own LD_PRELOAD wrapper
+    # (see the devendoring comment on ignored_shared_flags below for why)
+    # — entirely self-inflicted, once it turned out the bundled copy
+    # already did the job.
+    rm_r("deps/npm")
 
     # Never install the bundled "npm", always prefer our installation from
     # tarball for better packaging control.
@@ -92,7 +86,6 @@ class NodeLlvm21 < Formula
       --prefix=#{prefix}
       --dest-os=openharmony
       --without-npm
-      --with-intl=system-icu
       --shared
       --openssl-use-def-ca-store
       --disable-single-executable-application
@@ -115,15 +108,13 @@ class NodeLlvm21 < Formula
     # to dlopen on uv_async_init — from libuv, one of these devendored
     # deps — even with libnode.so correctly marked global.
     #
-    # So none of node's other deps are devendored anymore: without a
-    # --shared-* flag they compile from node's own bundled deps/ sources
+    # harmonybrew/core's own node/node@22/node@24 formulas independently
+    # arrived at the same answer: none of them devendor anything either
+    # (zero `depends_on` beyond their Alpine chroot build tools, plain
+    # `--partly-static`). So none of node's deps are devendored here: without
+    # a --shared-* flag they compile from node's own bundled deps/ sources
     # straight into libnode.so, inheriting its -Wl,-z,global instead of
-    # needing their own. icu4c@78 stays the one exception
-    # (--with-intl=system-icu above) — full-icu's data blob needs network
-    # access deny_network_access! forbids, and small-icu drops locale
-    # data this formula's own smoke test asserts on (Intl.NumberFormat
-    # de-DE) — so it keeps a small LD_PRELOAD wrapper below covering just
-    # its own .so's.
+    # needing their own.
     ignored_shared_flags = %w[
       ada
       brotli
@@ -172,43 +163,19 @@ class NodeLlvm21 < Formula
     # PATH), so `make` invokes the compiler directly and never goes
     # through this tap's superenv shim — an ENV.append "LDFLAGS" would
     # never reach the link command, and node's own configure.py doesn't
-    # read $LDFLAGS either.
+    # read $LDFLAGS either. harmonybrew/core's own python@3.12/3.13/3.14
+    # and zsh formulas rely on the same flag for the same reason (their
+    # own dlopen'd C-extension/module loaders), just via a plain LDFLAGS
+    # append since their build systems do read it.
     inreplace "common.gypi" do |s|
       s.sub!(
         "'ldflags': [ '-rdynamic' ],",
-        "'ldflags': [ '-rdynamic', '-Wl,-z,global', " \
-        "'-Wl,-rpath,#{formula_opt_lib("icu4c@78")}' ],",
-      ) || odie("node-llvm21: common.gypi OS-conditional ldflags anchor not found")
+        "'ldflags': [ '-rdynamic', '-Wl,-z,global' ],",
+      ) || odie("node-ohos: common.gypi OS-conditional ldflags anchor not found")
     end
 
     system "./configure", *args
     system "make", "install"
-
-    # icu4c@78 is still a separate, dynamically-linked bottle this formula
-    # doesn't control the build of (see ignored_shared_flags above), so it
-    # needs the same runtime-visibility treatment libnode.so gets from
-    # -Wl,-z,global: `bin/node` becomes a thin LD_PRELOAD wrapper around
-    # the real binary (moved to libexec/node-real). Libraries loaded via
-    # LD_PRELOAD are placed in the global scope by the dynamic linker
-    # regardless of their own DF_1_GLOBAL flag — the same trick this tap's
-    # own claude/ohos-shim wrappers use for unrelated OHOS runtime-linking
-    # quirks. Verified against @datadog/pprof on real hardware: dlopens
-    # and profiles real data through this wrapper with no LD_PRELOAD
-    # needed from the caller.
-    preload_libs = Dir["#{formula_opt_lib("icu4c@78")}/*.so*"].map { |so| File.realpath(so) }.uniq
-    node_lib = Dir["#{lib}/libnode.so.*"].first
-    odie("node-llvm21: libnode.so not found after install") unless node_lib
-    preload_libs << node_lib
-
-    libexec.mkpath
-    node_real = libexec/"node-real"
-    mv bin/"node", node_real
-    (bin/"node").write <<~SH
-      #!/bin/sh
-      export LD_PRELOAD="#{preload_libs.join(":")}${LD_PRELOAD:+:$LD_PRELOAD}"
-      exec "#{node_real}" "$@"
-    SH
-    (bin/"node").chmod 0755
 
     # Allow npm to find Node before installation has completed.
     ENV.prepend_path "PATH", bin
