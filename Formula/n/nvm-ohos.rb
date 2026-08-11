@@ -6,8 +6,9 @@ class NvmOhos < Formula
   license "MIT"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/nvm-ohos-v0.40.6-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "67b7524fd159a707b06c06c8aa8ba47e76eeeabc6bcdc073792bd543c71f7932"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/nvm-ohos-v0.40.6-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72349742423b870e3a2181409d676ea381f2221be4e7e70dad16c67e81ec2f1d"
   end
 
   # Upstream nvm downloads unsigned glibc binaries from nodejs.org — neither
