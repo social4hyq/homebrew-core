@@ -7,7 +7,7 @@ class Tinyice < Formula
   head "https://github.com/DatanoiseTV/tinyice.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d23a40c6f0d7bdfa72b603ca6179b354d1bd20950865fc85a8e6c0a2a4f7e16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5929251550e55992d962df6c541265dd7e98d5a824221d4789e7f4d43383a9d7"
   end
 
   depends_on "go" => :build
