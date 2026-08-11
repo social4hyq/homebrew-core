@@ -10,6 +10,11 @@ class NodeOhos < Formula
     regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/node-ohos-v26.7.0-r1"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "4116d48d1b96c89f7bb8f361246ce150f6f8432792a3ee83d65750786514f9b1"
+  end
+
   keg_only "alternate toolchain build of node; the harmonybrew/core node formula " \
            "is the default for general use"
 
