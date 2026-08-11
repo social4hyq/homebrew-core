@@ -115,6 +115,7 @@ class NodeLlvm21 < Formula
     # Makefiles at `./configure` time regardless of how the compiler is
     # invoked, so it's the one mechanism guaranteed to land in every target.
     rpath_flags = ["-Wl,-rpath,#{formula_opt_lib("icu4c@78")}"]
+    dep_lib_dirs = [formula_opt_lib("icu4c@78")]
 
     # make sure subprocesses spawned by make are using our Python 3
     ENV["PYTHON"] = which("python3.14")
@@ -170,6 +171,7 @@ class NodeLlvm21 < Formula
       # they're all reachable via LD_LIBRARY_PATH directly.
       ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib(formula)
       rpath_flags << "-Wl,-rpath,#{formula_opt_lib(formula)}"
+      dep_lib_dirs << formula_opt_lib(formula)
     end
 
     # - `--shared-ada` needs a harmonybrew ada-url formula that doesn't
@@ -216,6 +218,41 @@ class NodeLlvm21 < Formula
 
     system "./configure", *args
     system "make", "install"
+
+    # -Wl,-z,global above only makes symbols *exported by libnode.so*
+    # visible to a later dlopen(). Verified on real hardware that this
+    # isn't the whole story: a nan addon that got past
+    # node::AddEnvironmentCleanupHook (libnode.so's own symbol) still
+    # failed to dlopen on uv_async_init — from libuv, one of the
+    # devendored deps above. OHOS's dlopen() puts every loaded module in
+    # its own linker namespace, so it can't resolve symbols back into
+    # *any* already-loaded library unless that specific library was
+    # itself linked with -Wl,-z,global — and libuv/icu4c@78/etc. are
+    # harmonybrew/core's own bottles, not something this formula can add
+    # that flag to without rebuilding them ourselves. So `bin/node`
+    # becomes a thin LD_PRELOAD wrapper instead: libraries loaded via
+    # LD_PRELOAD are placed in the global scope by the dynamic linker
+    # regardless of their own DF_1_GLOBAL flag, the same trick this tap's
+    # own `claude`/`ohos-shim` wrappers use for unrelated OHOS
+    # runtime-linking quirks. Verified against @datadog/pprof on real
+    # hardware: dlopens and profiles real data through this wrapper with
+    # no LD_PRELOAD needed from the caller.
+    preload_libs = dep_lib_dirs.flat_map { |dir| Dir["#{dir}/*.so*"] }
+                               .map { |so| File.realpath(so) }
+                               .uniq
+    node_lib = Dir["#{lib}/libnode.so.*"].first
+    odie("node-llvm21: libnode.so not found after install") unless node_lib
+    preload_libs << node_lib
+
+    libexec.mkpath
+    node_real = libexec/"node-real"
+    mv bin/"node", node_real
+    (bin/"node").write <<~SH
+      #!/bin/sh
+      export LD_PRELOAD="#{preload_libs.join(":")}${LD_PRELOAD:+:$LD_PRELOAD}"
+      exec "#{node_real}" "$@"
+    SH
+    (bin/"node").chmod 0755
 
     # Allow npm to find Node before installation has completed.
     ENV.prepend_path "PATH", bin
