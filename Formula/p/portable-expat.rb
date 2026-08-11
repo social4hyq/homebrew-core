@@ -16,7 +16,7 @@ class PortableExpat < PortableFormula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f28a8b8997e0ab46281dbc3ceefd8ead6bbe14de052dd52a434ff689fddd221a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9199326ae3f2fef72565cfb471d920ee7780c6c9e5d02cbb9440a691f1387f49"
   end
 
   head do
