@@ -7,7 +7,7 @@ class Kargo < Formula
   head "https://github.com/akuity/kargo.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb9e7d14974848bf27d1e2a96e53fd5501f79f988eeedc9e383d8ad43795e868"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b36d91ac454d992ae657dfc9344e69b1827e908f37f9f81671ddf68f336005d"
   end
 
   depends_on "go" => :build
