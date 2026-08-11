@@ -1,13 +1,13 @@
 class Googletest < Formula
   desc "Google Testing and Mocking Framework"
   homepage "https://google.github.io/googletest/"
-  url "https://github.com/google/googletest/archive/refs/tags/v1.17.0.tar.gz"
-  sha256 "65fab701d9829d38cb77c14acdc431d2108bfdbf8979e40eb8ae567edf10b27c"
+  url "https://github.com/google/googletest/archive/refs/tags/v1.18.0.tar.gz"
+  sha256 "6e3191c1455468b3fc35a417fb565c1c5071aee1b7e7f85e30cf48a98d37d8b5"
   license "BSD-3-Clause"
   head "https://github.com/google/googletest.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d4072b7615bc5a050c30db88c0ac398e3925315b1f0d1db3c10b6a8f5e8e41e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4fa1cb0b2bf044548c8a7fa9e42b1ca0f42da11fa3556f9bb9702cdb32e898cd"
   end
 
   depends_on "cmake" => :build
