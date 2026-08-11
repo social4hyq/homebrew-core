@@ -11,7 +11,7 @@ class Libsidplayfp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5114484faf05784d9cc183ca57ec2963efc104ab1f1cd5342c4bb690b73e5c4a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "343383deb2c0046edeae28be5d9dbb7873a37fdd0ce8a0480550364d4a4d7e99"
   end
 
   head do
