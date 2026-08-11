@@ -10,11 +10,6 @@ class NodeLlvm21 < Formula
     regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/node-llvm21-v26.7.0-r1"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "3eee5e2061346cfb233a928ab0a75d4f501451185e5f6f616728ba26f787cbd2"
-  end
-
   keg_only "alternate toolchain build of node; the harmonybrew/core node formula " \
            "is the default for general use"
 
@@ -25,28 +20,12 @@ class NodeLlvm21 < Formula
   depends_on "pkgconf" => :build
   depends_on "python@3.14" => :build
 
-  # Devendored libraries, mirroring upstream Homebrew/homebrew-core's own
-  # node.rb (which builds --shared against formula-provided copies instead
-  # of the versions vendored in deps/). ada-url isn't ported to harmonybrew
-  # yet, so it stays vendored/bundled — see ignored_shared_flags below.
-  depends_on "brotli"
-  depends_on "c-ares"
-  depends_on "hdrhistogram_c"
+  # icu4c@78 is the one dependency still linked dynamically against a
+  # formula-provided copy (--with-intl=system-icu below) rather than
+  # letting node compile its own — see the long comment on
+  # ignored_shared_flags in install() for why it's the exception rather
+  # than the rule.
   depends_on "icu4c@78"
-  depends_on "libffi"
-  depends_on "libnghttp2"
-  depends_on "libnghttp3"
-  depends_on "libngtcp2"
-  depends_on "libuv"
-  depends_on "llhttp"
-  depends_on "merve"
-  depends_on "nbytes"
-  depends_on "openssl@3"
-  depends_on "simdjson"
-  depends_on "sqlite"
-  depends_on "uvwasi"
-  depends_on "zlib-ng-compat"
-  depends_on "zstd"
 
   # We track major/minor from upstream Node releases, same as upstream's own
   # node.rb — the version bundled in deps/npm is intentionally not used
@@ -79,48 +58,32 @@ class NodeLlvm21 < Formula
     # pieces (e.g. <source_location>) the OHOS SDK clang lacks, and its
     # exported symbols match what llvm@21-built native addons expect.
     #
-    # Verified on-device: full build compiles clean, passes this formula's
-    # own smoke tests (console.log, ICU/Intl, WASI), and a nan-style addon
-    # (@datadog/pprof) that fails to dlopen under the standard node formula
-    # dlopens and runs correctly against this build.
+    # Verified on real hardware: full build compiles clean, passes this
+    # formula's own smoke tests (console.log, ICU/Intl, WASI), and a
+    # nan-style addon (@datadog/pprof) dlopens and profiles real data
+    # against this build with no manual LD_PRELOAD needed by the caller.
     llvm = Formula["llvm@21"]
     ENV["CC"]  = (llvm.opt_bin/"clang").to_s
     ENV["CXX"] = (llvm.opt_bin/"clang++").to_s
-    # gyp's static_library rule shells out to a bare `ar` for whatever stays
-    # vendored below (simdutf, gtest, ada); superenv's restricted build PATH
-    # doesn't provide one (llvm@21 only ships the real name `llvm-ar`, not
-    # an `ar` alias).
+    # gyp's static_library rule shells out to a bare `ar`; superenv's
+    # restricted build PATH doesn't provide one (llvm@21 only ships the
+    # real name `llvm-ar`, not an `ar` alias).
     ENV["AR"] = (llvm.opt_bin/"llvm-ar").to_s
     ENV.prepend_path "LD_LIBRARY_PATH", llvm.opt_lib
-    # ICU is handled via --with-intl=system-icu below rather than the
-    # --shared-* devendor loop, so it needs the same node_js2c
-    # build-time-host-tool LD_LIBRARY_PATH treatment added separately.
+    # gyp's "host" toolchain (codegen tools like node_js2c that the build
+    # itself compiles and runs, e.g. to embed JS as bytecode) doesn't get
+    # the same RPATH treatment the final `node` binary gets — it fails to
+    # dlopen icu4c@78 at runtime *during the build* with "Error loading
+    # shared library" unless it's reachable via LD_LIBRARY_PATH directly.
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("icu4c@78")
-
-    # Same reasoning again, but for the *installed* `node` binary and
-    # libnode.so at run time, not just node_js2c during the build: every
-    # non-vendored dependency here is dynamically linked (--shared-*), so
-    # the resulting keg needs an explicit rpath to find them — node's own
-    # build system doesn't add one for --shared-*-libpath on its own, and
-    # without it every devendored .so fails to load with "Error loading
-    # shared library X: (needed by node)". This list is threaded through to
-    # common.gypi below rather than set via ENV["LDFLAGS"], because that's
-    # the only place a flag reliably reaches the *final* link step here:
-    # CC/CXX above are absolute paths to llvm@21 (to sidestep Homebrew's
-    # CompilerSelectionError, which only recognizes a bare `clang` on
-    # PATH), so `make` invokes the compiler directly and never goes through
-    # this tap's superenv shim — an ENV.append "LDFLAGS" would never reach
-    # the link command, and node's own configure.py doesn't read $LDFLAGS
-    # either. common.gypi's ldflags list is baked into the generated
-    # Makefiles at `./configure` time regardless of how the compiler is
-    # invoked, so it's the one mechanism guaranteed to land in every target.
-    rpath_flags = ["-Wl,-rpath,#{formula_opt_lib("icu4c@78")}"]
-    dep_lib_dirs = [formula_opt_lib("icu4c@78")]
 
     # make sure subprocesses spawned by make are using our Python 3
     ENV["PYTHON"] = which("python3.14")
 
-    # Ensure Homebrew deps are used
+    # Ensure Homebrew's npm/icu-small vendored copies aren't used. Every
+    # *other* deps/ subdirectory (uv, brotli, openssl, ...) is left alone
+    # and compiles from node's own bundled source — see the long comment
+    # on ignored_shared_flags below for why.
     rm_r(["deps/icu-small", "deps/npm"])
 
     # Never install the bundled "npm", always prefer our installation from
@@ -135,58 +98,55 @@ class NodeLlvm21 < Formula
       --disable-single-executable-application
     ]
 
-    # Devendor libraries available as formulae, same mapping upstream's own
-    # node.rb uses (configure flag => [bundled subdirectory, formula name]).
-    # ada-url has no harmonybrew formula yet, so it's deliberately absent
-    # here and left in ignored_shared_flags below — everything else in this
-    # list is already bottled in this tap.
-    {
-      "brotli"        => ["brotli",          "brotli"],
-      "cares"         => ["cares",           "c-ares"],
-      "ffi"           => ["libffi",          "libffi"],
-      "hdr-histogram" => ["histogram",       "hdrhistogram_c"],
-      "http-parser"   => ["llhttp",          "llhttp"],
-      "libuv"         => ["uv",              "libuv"],
-      "merve"         => ["merve",           "merve"],
-      "nbytes"        => ["nbytes",          "nbytes"],
-      "nghttp2"       => ["nghttp2",         "libnghttp2"],
-      "nghttp3"       => ["ngtcp2/nghttp3",  "libnghttp3"],
-      "ngtcp2"        => ["ngtcp2",          "libngtcp2"],
-      "openssl"       => ["openssl/openssl", "openssl@3"],
-      "simdjson"      => ["simdjson",        "simdjson"],
-      "sqlite"        => ["sqlite",          "sqlite"],
-      "uvwasi"        => ["uvwasi",          "uvwasi"],
-      "zlib"          => ["zlib",            "zlib-ng-compat"],
-      "zstd"          => ["zstd",            "zstd"],
-    }.each do |flag, (subdir, formula)|
-      rm_r(buildpath/"deps"/subdir)
-      args << "--shared-#{flag}"
-      args << "--shared-#{flag}-includes=#{formula_opt_include(formula)}"
-      args << "--shared-#{flag}-libpath=#{formula_opt_lib(formula)}"
-      # gyp's "host" toolchain (codegen tools like node_js2c that the build
-      # itself compiles and runs, e.g. to embed JS as bytecode) doesn't get
-      # the same RPATH treatment --shared-*-libpath gives the final `node`
-      # binary — it fails to dlopen these at runtime *during the build*
-      # with "Error loading shared library" for every devendored lib unless
-      # they're all reachable via LD_LIBRARY_PATH directly.
-      ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib(formula)
-      rpath_flags << "-Wl,-rpath,#{formula_opt_lib(formula)}"
-      dep_lib_dirs << formula_opt_lib(formula)
-    end
-
-    # - `--shared-ada` needs a harmonybrew ada-url formula that doesn't
-    #   exist yet — ada stays vendored/bundled.
-    # - `--shared-gtest` is only used for building the test suite, which we
-    #   don't run here.
-    # - `--shared-simdutf` seems to result in build failures upstream too.
-    # - `--shared-temporal_capi` is only used with --v8-enable-temporal-support.
-    # - `--shared-lief` is only used for the disabled SEA feature.
+    # An earlier version of this formula devendored every one of node's
+    # optional deps (--shared-uv, --shared-openssl, --shared-brotli, ...)
+    # against formula-provided copies, mirroring upstream
+    # Homebrew/homebrew-core's own node.rb. That turned out to be the
+    # wrong call for *this* formula specifically: OHOS's dlopen() puts
+    # every loaded module in its own linker namespace, so a nan/node-gyp
+    # addon loaded via require() can't resolve symbols back into any
+    # already-loaded library unless that specific library was itself
+    # linked with -Wl,-z,global (DF_1_GLOBAL) — true not just for
+    # libnode.so (fixed via common.gypi below) but for every one of those
+    # devendored .so's too. We can add that flag to libnode.so's own
+    # build, but not to harmonybrew/core's independently-built
+    # libuv/brotli/etc. bottles without rebuilding them ourselves.
+    # Verified on real hardware: a nan-based addon (@datadog/pprof) failed
+    # to dlopen on uv_async_init — from libuv, one of these devendored
+    # deps — even with libnode.so correctly marked global.
+    #
+    # So none of node's other deps are devendored anymore: without a
+    # --shared-* flag they compile from node's own bundled deps/ sources
+    # straight into libnode.so, inheriting its -Wl,-z,global instead of
+    # needing their own. icu4c@78 stays the one exception
+    # (--with-intl=system-icu above) — full-icu's data blob needs network
+    # access deny_network_access! forbids, and small-icu drops locale
+    # data this formula's own smoke test asserts on (Intl.NumberFormat
+    # de-DE) — so it keeps a small LD_PRELOAD wrapper below covering just
+    # its own .so's.
     ignored_shared_flags = %w[
       ada
+      brotli
+      cares
+      ffi
       gtest
-      simdutf
-      temporal_capi
+      hdr-histogram
+      http-parser
       lief
+      libuv
+      merve
+      nbytes
+      nghttp2
+      nghttp3
+      ngtcp2
+      openssl
+      simdjson
+      simdutf
+      sqlite
+      temporal_capi
+      uvwasi
+      zlib
+      zstd
     ].map { |library| "--shared-#{library}" }
 
     configure_help = Utils.safe_popen_read("./configure", "--help")
@@ -199,47 +159,43 @@ class NodeLlvm21 < Formula
       end
     end
 
-    # OHOS's dynamic linker uses namespace isolation: a module loaded via
-    # dlopen() (e.g. a nan/node-gyp native addon loaded through require())
-    # cannot resolve symbols back into libraries the process already has
-    # loaded (libnode.so, or any of the devendored deps above) unless those
-    # libraries were linked with -Wl,-z,global (DF_1_GLOBAL) — otherwise
-    # every such addon fails with "Error relocating ...: symbol not found"
-    # for perfectly-exported symbols like node::AddEnvironmentCleanupHook.
-    # Verified against a real nan-based addon (@datadog/pprof): it dlopens
-    # and profiles real data with this flag added, and fails without it.
+    # OHOS's dlopen() puts every loaded module in its own linker namespace,
+    # so a nan/node-gyp addon loaded via require() can't resolve symbols
+    # back into libnode.so unless it was itself linked with -Wl,-z,global
+    # (DF_1_GLOBAL) — otherwise every such addon fails with "Error
+    # relocating ...: symbol not found" for perfectly-exported symbols
+    # like node::AddEnvironmentCleanupHook. This is threaded through to
+    # common.gypi rather than set via ENV["LDFLAGS"], because that's the
+    # only place a flag reliably reaches the *final* link step here:
+    # CC/CXX above are absolute paths to llvm@21 (to sidestep Homebrew's
+    # CompilerSelectionError, which only recognizes a bare `clang` on
+    # PATH), so `make` invokes the compiler directly and never goes
+    # through this tap's superenv shim — an ENV.append "LDFLAGS" would
+    # never reach the link command, and node's own configure.py doesn't
+    # read $LDFLAGS either.
     inreplace "common.gypi" do |s|
       s.sub!(
         "'ldflags': [ '-rdynamic' ],",
         "'ldflags': [ '-rdynamic', '-Wl,-z,global', " \
-        "#{rpath_flags.map { |f| "'#{f}'" }.join(", ")} ],",
+        "'-Wl,-rpath,#{formula_opt_lib("icu4c@78")}' ],",
       ) || odie("node-llvm21: common.gypi OS-conditional ldflags anchor not found")
     end
 
     system "./configure", *args
     system "make", "install"
 
-    # -Wl,-z,global above only makes symbols *exported by libnode.so*
-    # visible to a later dlopen(). Verified on real hardware that this
-    # isn't the whole story: a nan addon that got past
-    # node::AddEnvironmentCleanupHook (libnode.so's own symbol) still
-    # failed to dlopen on uv_async_init — from libuv, one of the
-    # devendored deps above. OHOS's dlopen() puts every loaded module in
-    # its own linker namespace, so it can't resolve symbols back into
-    # *any* already-loaded library unless that specific library was
-    # itself linked with -Wl,-z,global — and libuv/icu4c@78/etc. are
-    # harmonybrew/core's own bottles, not something this formula can add
-    # that flag to without rebuilding them ourselves. So `bin/node`
-    # becomes a thin LD_PRELOAD wrapper instead: libraries loaded via
+    # icu4c@78 is still a separate, dynamically-linked bottle this formula
+    # doesn't control the build of (see ignored_shared_flags above), so it
+    # needs the same runtime-visibility treatment libnode.so gets from
+    # -Wl,-z,global: `bin/node` becomes a thin LD_PRELOAD wrapper around
+    # the real binary (moved to libexec/node-real). Libraries loaded via
     # LD_PRELOAD are placed in the global scope by the dynamic linker
-    # regardless of their own DF_1_GLOBAL flag, the same trick this tap's
-    # own `claude`/`ohos-shim` wrappers use for unrelated OHOS
-    # runtime-linking quirks. Verified against @datadog/pprof on real
-    # hardware: dlopens and profiles real data through this wrapper with
-    # no LD_PRELOAD needed from the caller.
-    preload_libs = dep_lib_dirs.flat_map { |dir| Dir["#{dir}/*.so*"] }
-                               .map { |so| File.realpath(so) }
-                               .uniq
+    # regardless of their own DF_1_GLOBAL flag — the same trick this tap's
+    # own claude/ohos-shim wrappers use for unrelated OHOS runtime-linking
+    # quirks. Verified against @datadog/pprof on real hardware: dlopens
+    # and profiles real data through this wrapper with no LD_PRELOAD
+    # needed from the caller.
+    preload_libs = Dir["#{formula_opt_lib("icu4c@78")}/*.so*"].map { |so| File.realpath(so) }.uniq
     node_lib = Dir["#{lib}/libnode.so.*"].first
     odie("node-llvm21: libnode.so not found after install") unless node_lib
     preload_libs << node_lib
