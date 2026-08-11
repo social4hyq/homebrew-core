@@ -5,6 +5,11 @@ class NvmOhos < Formula
   sha256 "17302cad7feedb1ad33ba738f93d2176a90970724f22de119603624fcbdec1a2"
   license "MIT"
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/nvm-ohos-v0.40.6-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "67b7524fd159a707b06c06c8aa8ba47e76eeeabc6bcdc073792bd543c71f7932"
+  end
+
   # Upstream nvm downloads unsigned glibc binaries from nodejs.org — neither
   # the libc nor the missing OHOS codesign survives contact with this OS.
   # This formula does NOT patch nvm.sh (kept byte-for-byte from upstream, so
