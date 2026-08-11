@@ -1,8 +1,8 @@
 class Tinyice < Formula
   desc "Modern, all-in-one Icecast-compatible audio/video streaming server"
   homepage "https://github.com/DatanoiseTV/tinyice"
-  url "https://github.com/DatanoiseTV/tinyice/archive/refs/tags/v2.6.3.tar.gz"
-  sha256 "24ced8022e42f900ada1471d7152dcc43552d8bce022efe216a7fa5eb5a55fcd"
+  url "https://github.com/DatanoiseTV/tinyice/archive/refs/tags/v2.7.0.tar.gz"
+  sha256 "492d1bf7ccfa1f4b63f3a75a25878f8b008c07f17f620f7e378893b560f6aa93"
   license "Apache-2.0"
   head "https://github.com/DatanoiseTV/tinyice.git", branch: "main"
 
