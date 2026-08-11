@@ -195,6 +195,51 @@ class NvmOhos < Formula
       [ -e "$NVM_DIR/nvm-exec" ] || ln -s #{opt_libexec}/nvm-exec "$NVM_DIR/nvm-exec"
     SH
     prefix.install_symlink libexec/"nvm-exec"
+
+    # Upstream's completion script uses bash's `==` inside a POSIX `[ ]`
+    # test. bashcompinit invokes completion functions under `emulate -L
+    # zsh`, where the builtin `[` doesn't understand `==` and errors out
+    # ("= not found") on every completion attempt that reaches this line
+    # — which is nearly all of them. `=` is the POSIX-standard operator
+    # and works identically in both bash and zsh.
+    inreplace "bash_completion",
+      "[ ${#COMP_WORDS[@]} == 4 ]",
+      "[ ${#COMP_WORDS[@]} = 4 ]"
+
+    # bashcompinit hands completion functions a native zsh array (1-indexed)
+    # into COMP_WORDS, but every lookup here that walks relative to
+    # COMP_CWORD (e.g. "what's the previous word") assumes bash's 0-indexed
+    # convention and is off by one as a result — `nvm use <Tab>` silently
+    # falls through to the generic subcommand list instead of the installed-
+    # versions list, with no error to notice. Wrap the zsh completion entry
+    # point so it runs under `ksh_arrays` (realigns indexing to 0-based) via
+    # `local_options` (scoped to the wrapper only, restored on return — never
+    # leaks into the user's interactive shell).
+    inreplace "bash_completion",
+      "  autoload -U +X bashcompinit && bashcompinit\nfi\n\ncomplete -o default -F __nvm nvm",
+      <<~ZSH_WRAPPER.chomp
+          autoload -U +X bashcompinit && bashcompinit
+
+          __nvm_ohos_zsh_complete() {
+            setopt local_options ksh_arrays
+            __nvm "$@"
+          }
+        fi
+
+        if [[ -n ${ZSH_VERSION-} ]]; then
+          complete -o default -F __nvm_ohos_zsh_complete nvm
+        else
+          complete -o default -F __nvm nvm
+        fi
+      ZSH_WRAPPER
+
+    # zsh's `command` builtin can't dispatch to `cd` (a special builtin) the
+    # way bash's can — harmless in bash (defensive against a user-defined
+    # `cd` function), but a hard "command not found" under zsh.
+    inreplace "bash_completion",
+      'command cd "${NVM_DIR}/alias"',
+      'cd "${NVM_DIR}/alias"'
+
     bash_completion.install "bash_completion" => "nvm-ohos"
   end
 
