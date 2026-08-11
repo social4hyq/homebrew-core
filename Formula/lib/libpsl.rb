@@ -1,13 +1,13 @@
 class Libpsl < Formula
   desc "C library for the Public Suffix List"
   homepage "https://rockdaboot.github.io/libpsl"
-  url "https://github.com/rockdaboot/libpsl/releases/download/0.23.1/libpsl-0.23.1.tar.gz"
-  sha256 "8fbb03054556498ba9c4cc48fcaa36a4483748c6504a65bdb9ba348f555b0e56"
+  url "https://github.com/rockdaboot/libpsl/releases/download/0.23.2/libpsl-0.23.2.tar.gz"
+  sha256 "f2ea0e59bffb36597a872f6ef89893ffa4c30196c87eff7aeb2c47e4e8c98133"
   license "MIT"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ccecffc3561d34bc4bb3e1b9d3a37102d4cfe5ccf755ea7bb47a896a4a8324b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d4429eeccdb813ac9f580081c19f642ec598ee6cd3f0485ed801a7cffc4a525"
   end
 
   depends_on "meson" => :build
