@@ -1,13 +1,13 @@
 class Runme < Formula
   desc "Execute commands inside your runbooks, docs, and READMEs"
   homepage "https://runme.dev/"
-  url "https://github.com/runmedev/runme/archive/refs/tags/v3.17.2.tar.gz"
-  sha256 "aa1ce0c70ed6f8d36e138b6fd3bed84a96f802c4704a9d62e08025634c34bf9f"
+  url "https://github.com/runmedev/runme/archive/refs/tags/v3.17.3.tar.gz"
+  sha256 "0245ae3f7bd1e664ffca5bfa6ade566feb62052cd232d118e22c2eeb0ba5d36a"
   license "Apache-2.0"
   head "https://github.com/runmedev/runme.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e4e2b89f5fb81ad21231063d0d1791530625978cb7baceeb1b8fdce8835af28"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c29d05e192dd6b487a77e42b7978c76a93f589aa17b0a213ecd08a9d292793ff"
   end
 
   depends_on "go" => :build
