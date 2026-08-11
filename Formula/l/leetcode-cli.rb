@@ -7,7 +7,7 @@ class LeetcodeCli < Formula
   head "https://github.com/clearloop/leetcode-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5a09ead9d666349b151f808179dec632802f4411ed86425d2bc36eb967992da"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e98853967a7356b2ebec127f1a5faa3bc4597d08bb1c457ed5c9d825429f2028"
   end
 
   depends_on "pkgconf" => :build
