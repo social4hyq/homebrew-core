@@ -1,8 +1,8 @@
 class Atomcode < Formula
   desc "Open-source alternative to Claude Code / Cursor Agent, living in your terminal"
   homepage "https://atomcode.atomgit.com/"
-  url "https://github.com/atomgit-atomcode/atomcode/archive/refs/tags/v5.0.5.tar.gz"
-  sha256 "4bf4ae97835c7c0338ec0eddb6a6912c20610b70321b2fc3533402b219a507e9"
+  url "https://github.com/atomgit-atomcode/atomcode/archive/refs/tags/v5.0.6.tar.gz"
+  sha256 "bcbb6e871650ea871fee795dfb8eaa38df02b5dd2e434b764ad345cb9181c1a2"
   license "MIT"
 
   livecheck do
