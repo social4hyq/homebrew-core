@@ -1,12 +1,12 @@
 class Libformfactor < Formula
   desc "C++ library for the efficient computation of scattering form factors"
   homepage "https://jugit.fz-juelich.de/mlz/libformfactor"
-  url "https://jugit.fz-juelich.de/mlz/libformfactor/-/archive/v0.5.0/libformfactor-v0.5.0.tar.bz2"
-  sha256 "1c363f70e14fc1328f6c49a35929d35491fc512b5f0a2112d2f11accddcd9029"
+  url "https://jugit.fz-juelich.de/mlz/libformfactor/-/archive/v0.5.1/libformfactor-v0.5.1.tar.bz2"
+  sha256 "b01b52157ccbb74a8711f9b935a5f6426603186756502aba6f31b5790107f978"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61d59f9e9a4d91d0dfb3bc33b42687087369b27d522c8706a9bb5e3940dd2a96"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5ecb28a20f4fcc0d5c888b1107d2e7d60be5437ad10a79ec2cd14b48a004a5c"
   end
 
   depends_on "cmake" => :build
