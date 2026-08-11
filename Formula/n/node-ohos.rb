@@ -82,12 +82,20 @@ class NodeOhos < Formula
 
     # Never install the bundled "npm", always prefer our installation from
     # tarball for better packaging control.
+    # No --openssl-use-def-ca-store: that flag makes node look for a CA
+    # bundle at OpenSSL's compiled-in *system* path at runtime, which
+    # isn't reliably populated on this platform — CI failed with
+    # "UNABLE_TO_GET_ISSUER_CERT_LOCALLY" the one time this was tried
+    # (npm install couldn't TLS-verify registry.npmjs.org). Omitting the
+    # flag falls back to node's default: a Mozilla CA bundle compiled
+    # directly into the binary, so there's no runtime file to be missing.
+    # harmonybrew/core's own node/node@22/node@24 formulas don't pass any
+    # openssl/CA flag either, for the same reason.
     args = %W[
       --prefix=#{prefix}
       --dest-os=openharmony
       --without-npm
       --shared
-      --openssl-use-def-ca-store
       --disable-single-executable-application
     ]
 
