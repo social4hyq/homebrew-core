@@ -12,7 +12,8 @@ class Aamath < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "55a733762ad52ba508de7479adfb0244e476efe97578a5220dbfbdf95151761d"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e4cd7a0174f0bb3d9f04faaf4010f123c499f7ac8470919142b201e8fe5a5dba"
   end
 
   uses_from_macos "bison" => :build # for yacc
