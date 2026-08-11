@@ -6,7 +6,7 @@ class Libformfactor < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61d59f9e9a4d91d0dfb3bc33b42687087369b27d522c8706a9bb5e3940dd2a96"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5ecb28a20f4fcc0d5c888b1107d2e7d60be5437ad10a79ec2cd14b48a004a5c"
   end
 
   depends_on "cmake" => :build
