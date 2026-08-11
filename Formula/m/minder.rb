@@ -1,13 +1,13 @@
 class Minder < Formula
   desc "CLI for interacting with Stacklok's Minder platform"
   homepage "https://mindersec.github.io/"
-  url "https://github.com/mindersec/minder/archive/refs/tags/v0.3.0.tar.gz"
-  sha256 "70a2830e7c06f28c7f71e9d5891b77419a5475c01704f5cc0f7b738a29ac7847"
+  url "https://github.com/mindersec/minder/archive/refs/tags/v0.3.1.tar.gz"
+  sha256 "f44e49a639b742937a3b3841ef5d9ae9181858ef9f793608fb00bc95985e2d77"
   license "Apache-2.0"
   head "https://github.com/mindersec/minder.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "58eb611539ec85c87a306220e6a08596072405e27b7596c9f3c4ec370b027838"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a3a5a4d1d96b03c745c2fb2f8e2bdcb2b94fa2d31cfaba728a63bdc441d86718"
   end
 
   depends_on "go" => :build
