@@ -7,7 +7,7 @@ class Minder < Formula
   head "https://github.com/mindersec/minder.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "58eb611539ec85c87a306220e6a08596072405e27b7596c9f3c4ec370b027838"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a3a5a4d1d96b03c745c2fb2f8e2bdcb2b94fa2d31cfaba728a63bdc441d86718"
   end
 
   depends_on "go" => :build
