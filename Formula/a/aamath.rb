@@ -1,6 +1,6 @@
 class Aamath < Formula
   desc "Renders mathematical expressions as ASCII art"
-  homepage "http://fuse.superglue.se/aamath/"
+  homepage "https://web.archive.org/web/20260501180020/http://fuse.superglue.se/aamath/"
   url "https://cdn.netbsd.org/pub/pkgsrc/distfiles/aamath-0.3.tar.gz"
   mirror "http://fuse.superglue.se/aamath/aamath-0.3.tar.gz"
   sha256 "9843f4588695e2cd55ce5d8f58921d4f255e0e65ed9569e1dcddf3f68f77b631"
@@ -12,7 +12,8 @@ class Aamath < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "55a733762ad52ba508de7479adfb0244e476efe97578a5220dbfbdf95151761d"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e4cd7a0174f0bb3d9f04faaf4010f123c499f7ac8470919142b201e8fe5a5dba"
   end
 
   uses_from_macos "bison" => :build # for yacc
