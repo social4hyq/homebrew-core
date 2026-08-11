@@ -12,7 +12,7 @@ class Chicken < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f092c8ee15172f4755746afb8af8170f26034175981f5fc92acaf8dac8713e4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "81d88d9867ce385bf295fa80dc592e50c526e2e5e44a94da1257f3de36bf8b9d"
   end
 
   conflicts_with "mono", because: "both install `csc`, `csi` binaries"
