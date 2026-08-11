@@ -10,6 +10,11 @@ class NodeLlvm21 < Formula
     regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/node-llvm21-v26.7.0-r1"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "3eee5e2061346cfb233a928ab0a75d4f501451185e5f6f616728ba26f787cbd2"
+  end
+
   keg_only "alternate toolchain build of node; the harmonybrew/core node formula " \
            "is the default for general use"
 
