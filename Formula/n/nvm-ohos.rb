@@ -49,7 +49,17 @@ class NvmOhos < Formula
         fi
 
         command mkdir -p "${VERSION_PATH}/bin" || return 1
-        command ln -sfn "${KEG_DIR}/bin/node" "${VERSION_PATH}/bin/node" || return 1
+        # A real copy, not a symlink: node resolves process.execPath via
+        # /proc/self/exe, which follows a symlink straight back to the
+        # brew keg — that then makes npm's own *default* global prefix
+        # (computed from execPath, used whenever nothing configures one)
+        # resolve to the brew keg instead of this nvm version dir. The
+        # signature survives a plain byte-for-byte copy (verified: OHOS
+        # codesign is content-based, not path-bound), so this costs the
+        # node binary's size (~100MB+) per installed major but is
+        # otherwise free.
+        command cp "${KEG_DIR}/bin/node" "${VERSION_PATH}/bin/node" || return 1
+        command chmod +x "${VERSION_PATH}/bin/node" || return 1
 
         local d
         for d in include share; do
@@ -73,25 +83,21 @@ class NvmOhos < Formula
           command mkdir -p "${VERSION_PATH}/lib/node_modules" || return 1
           command cp -R "${NPM_SRC}" "${VERSION_PATH}/lib/node_modules/npm" || return 1
 
-          # Two independent things push npm's global prefix back at the
-          # brew keg instead of this nvm version dir, and both must be
-          # overridden in OUR COPY of npmrc (the brew-owned original is
-          # never touched):
-          #   1. brew's post_install may have baked
-          #      "prefix = <HOMEBREW_PREFIX>" into npm's own npmrc.
-          #   2. bin/node here is a SYMLINK (kept that way to avoid
-          #      copying the ~100MB+ node binary per nvm version) —
-          #      Node resolves process.execPath through the symlink to
-          #      the real brew keg path, so npm's own *default* prefix
-          #      (used when nothing configures one) falls back to the
-          #      keg too, even with npmrc's brew-baked line removed.
-          # Deleting the line (rather than just stripping it) fixes (1)
-          # but not (2), so write our own value instead of merely
-          # stripping.
+          # brew's post_install may have baked "prefix = <HOMEBREW_PREFIX>"
+          # into npm's own npmrc so `npm -g` lands in the brew keg instead
+          # of this nvm version's private lib/node_modules. Strip it from
+          # OUR COPY only — the brew-owned original is never touched. Do
+          # NOT replace it with an explicit prefix pointing at
+          # VERSION_PATH instead: nvm itself actively checks the builtin
+          # npmrc for any `prefix`/`globalconfig` line on every `nvm use`
+          # and refuses (exit 10, "incompatible with nvm") if it finds
+          # one — with bin/node now a real copy (see above), npm's
+          # execPath-derived default prefix is already correct without
+          # any override, so the fix is leaving this file free of both.
           local NPMRC="${VERSION_PATH}/lib/node_modules/npm/npmrc"
-          command touch "${NPMRC}"
-          command sed -E -i '/^[[:space:]]*prefix[[:space:]]*=/d' "${NPMRC}"
-          command printf 'prefix = %s\n' "${VERSION_PATH}" >> "${NPMRC}"
+          if [ -f "${NPMRC}" ]; then
+            command sed -E -i '/^[[:space:]]*(prefix|globalconfig)[[:space:]]*=/d' "${NPMRC}"
+          fi
 
           command ln -sfn "../lib/node_modules/npm/bin/npm-cli.js" "${VERSION_PATH}/bin/npm"
           command ln -sfn "../lib/node_modules/npm/bin/npx-cli.js" "${VERSION_PATH}/bin/npx"
