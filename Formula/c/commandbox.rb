@@ -11,8 +11,7 @@ class Commandbox < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b57207a8dc32cdf5b88ba1603db3781ac35ac022c3fdd6fb96effa139ac304e4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ae7ed5dbc6c7c88dd0288f76faaef0242bd8c4d47b91e982942d1196837a0bf"
   end
 
   # Keep pinned to Java 21 until https://ortussolutions.atlassian.net/browse/COMMANDBOX-1685 is resolved
