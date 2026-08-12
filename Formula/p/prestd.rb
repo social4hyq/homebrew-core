@@ -1,8 +1,8 @@
 class Prestd < Formula
   desc "Simplify and accelerate development on any Postgres application, existing or new"
   homepage "https://github.com/prest/prest"
-  url "https://github.com/prest/prest/archive/refs/tags/v2.4.1.tar.gz"
-  sha256 "46b2642693ac7d1965fbc7a6896f2f6557cf1c1d83ec01e004c6ee5e78b27ed0"
+  url "https://github.com/prest/prest/archive/refs/tags/v2.4.2.tar.gz"
+  sha256 "08909fd777db13403f7c89bed65a88f540fd7b810f3c7140490c6d5bb34072bb"
   license "MIT"
   head "https://github.com/prest/prest.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Prestd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d98abb5f71ed6045a5198dec7a0d74285c4bfca597eb14d1720986e81884380e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7809f2ee9b6a2a71990e4610a965f8d50fd04495816cffb76453a3d491f4f29"
   end
 
   depends_on "go" => :build
