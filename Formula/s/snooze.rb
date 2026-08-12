@@ -6,7 +6,7 @@ class Snooze < Formula
   license :public_domain
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cfd29d3ff09edb1c237340563eac1e8c6003c5c153bdf241824b74b7cc9bb30d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "976d8ea233d626cb8d9da1a8e037bc69749fc6608f0f37257c066386bf6ea7ec"
   end
 
   def install
