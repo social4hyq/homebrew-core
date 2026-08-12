@@ -302,7 +302,7 @@ class Opencode < Formula
     # Bash completion comes from the binary itself (yargs generator) — always
     # in sync, unlike the handwritten zsh one above. Generate from the libexec
     # binary: the bin/opencode wrapper execs opt_libexec, whose opt/ symlink
-    # only exists after install (same pattern as cc-switch).
+    # only exists after install (same pattern as herdr.rb).
     generate_completions_from_executable(libexec/"bin/opencode", "completion", shells: [:bash])
   end
 

@@ -1,6 +1,6 @@
 # social4hyq/homebrew-core
 
-HarmonyOS（OHOS aarch64）的 Homebrew tap：提供已在真机验证的开发工具链——AI coding CLI（`opencode` / `claude-code` / `reasonix` / `cc-switch`）、Bun 运行时（`bun` / `bun-webkit` / `llvm@21` 等）、终端与调试工具（`qemu-aarch64` / `starship` / `zellij` / `sshport` 等）。所有二进制均已按 HarmonyOS 要求完成签名，安装后开箱即用。
+HarmonyOS（OHOS aarch64）的 Homebrew tap：提供已在真机验证的开发工具链——AI coding CLI（`opencode` / `claude-code` / `reasonix`）、Bun 运行时（`bun` / `bun-webkit` / `llvm@21` 等）、终端与调试工具（`qemu-aarch64` / `starship` / `zellij` / `sshport` 等）。所有二进制均已按 HarmonyOS 要求完成签名，安装后开箱即用。
 
 ## 安装
 
@@ -12,7 +12,6 @@ brew trust social4hyq/core   # Homebrew 6.0+ 必须显式信任第三方 tap
 brew install opencode        # AI 编码代理（v2 预览：brew install opencode@2）
 brew install claude-code     # Claude Code CLI
 brew install reasonix        # DeepSeek 终端 coding agent
-brew install cc-switch       # AI CLI 供应商切换器
 brew install bun             # Bun 运行时
 brew install starship        # 跨 shell 提示符
 brew install zellij          # 终端复用器
@@ -27,7 +26,6 @@ opencode --version
 opencode2 --version
 claude --version
 reasonix --version
-cc-switch --version
 starship --version
 zellij --version
 qemu-aarch64 --version && qemu-aarch64 -strace /bin/true
@@ -44,7 +42,6 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `warp-tui` | 0.0.0-dev | Warp 非 GUI 终端 agent TUI；固定 git revision 源码构建（Rust），运行时依赖 `ohos-compat-shim` |
 | `claude-code` | 2.1.226 | Anthropic Claude Code CLI；runtime-fetch stub（License 禁重分发），首次运行拉取 + 校验 sha256 + 自签 |
 | `reasonix` | 1.21.5 | DeepSeek 原生终端 AI coding agent；Go 源码构建（`CGO_ENABLED=0` 静态 ELF），签名同 qemu-aarch64，`inreplace` 修 `/tmp` 锁目录 |
-| `cc-switch` | 5.9.2, revision 2 | AI coding CLI 供应商切换器 + 本地代理；预编译静态 ELF（`ohos-bst-light` self-sign），给 codex 桥接 Chat-Completions-only provider |
 | `bun` | 1.4.0, revision 56 | Bun JavaScript runtime；**自举源码构建**（`bun bd`），`ohos-compat-shim` 静态内嵌进可执行文件；libc++ ABI 已切 `__n1`（r56 起） |
 | `bun-bootstrap` | 1.4.0-5467a689, revision 1 | 预编译 bun，用于 `bun bd` 自举本机 bun；已预签（`keg_only`） |
 | `bun-webkit` | `ddea71318f`, revision 1 | bun 专用 WebKit fork 静态库（JSCore/WTF/bmalloc）；CMake 源码构建（`--target=aarch64-linux-ohos`，`keg_only`） |
@@ -71,6 +68,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `bun-pty` / `lightningcss` / `tailwindcss-oxide` | 2026-07-18 下线 | 改走 `@ohos-ports/*` npm 包，无独立 formula 需求 |
 | `icu4c@78` | 2026-08-09 下线 | libc++ ABI `__n1` 迁移（#239-#241）后本 tap fork 冗余，直接用上游 harmonybrew/core 的 `icu4c@78`（同为 `__n1`） |
 | `grok-build` | 2026-08-12 下线 | 实际使用率低，维护成本不再合理；如需可从 tap git 历史恢复 formula |
+| `cc-switch` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（`cc-switch-cli`），直接 `brew install cc-switch-cli` |
 
 > 改名提示（2026-08-01）：`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
 

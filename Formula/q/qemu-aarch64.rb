@@ -30,8 +30,8 @@ class QemuAarch64 < Formula
 
   def install
     # Guard against the binary-sign-tool auto-sign pass: it double-signs and
-    # corrupts prebuilt binaries (see the SIGNING notes in cc-switch.rb /
-    # zig@0.15.rb; build.sh's UNSET_SIGN_FORMULAS covers CI).
+    # corrupts prebuilt binaries (see the SIGNING notes in zig@0.15.rb;
+    # build.sh's UNSET_SIGN_FORMULAS covers CI).
     if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
       odie "qemu-aarch64 must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
            "(env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN brew install ...): the " \
