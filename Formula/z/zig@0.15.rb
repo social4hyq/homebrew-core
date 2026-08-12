@@ -24,8 +24,9 @@ class ZigAT015 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zig@0.15-v0.15.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "36643e78697dc28ed2638610419ae42aa6bf40be264307da39d25d2ce3701112"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zig@0.15-v0.15.2-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e2dfbd31829f83d2802b272c9ae620d01915112be0a944727d6ee9d4006071a"
   end
 
   # No `bottle do` block yet — CI's pr-validate.yml builds from source,
