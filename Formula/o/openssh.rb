@@ -14,7 +14,7 @@ class Openssh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "51e1f16a750074f17bd4fae872fd6cba945bc5e2816fdf37874f84e99acb89d8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f5c36c4f3eb971973075e330ca58e3d176af9eecc4ff86a34818ee5439a5e44"
   end
 
   depends_on "pkgconf" => :build
