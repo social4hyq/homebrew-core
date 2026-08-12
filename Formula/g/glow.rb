@@ -7,7 +7,7 @@ class Glow < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac1040b2e1851988db3a8144349510afba9d82b97be3f18eb30aef09860c0f91"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ffdf326f03c13d8caeebc20173bf85c11630f769850501d9680c53b2ebb40f2"
   end
 
   depends_on "go" => :build
