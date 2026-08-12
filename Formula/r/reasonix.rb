@@ -13,6 +13,10 @@ class Reasonix < Formula
     regex(/\Av(\d+(?:\.\d+)+)\z/i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "849ce810468fad2bdf6e3909e1cd8c2f9f262fa3eaf79b2d6a2e09eb08919886"
+  end
+
   depends_on "go" => :build
 
   patch do
