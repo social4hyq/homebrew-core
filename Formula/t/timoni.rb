@@ -1,8 +1,8 @@
 class Timoni < Formula
   desc "Package manager for Kubernetes, powered by CUE and inspired by Helm"
   homepage "https://timoni.sh/"
-  url "https://github.com/stefanprodan/timoni/archive/refs/tags/v0.30.0.tar.gz"
-  sha256 "4eb3631efa2d6f5f491181b1dc9210b4a68f7b7f0669947c11f73df85a9d5432"
+  url "https://github.com/stefanprodan/timoni/archive/refs/tags/v0.31.0.tar.gz"
+  sha256 "4dd2cadf9ac85fa3f8044daf00df7f5e7e5224c17cfe289dc7b8b08137c75307"
   license "Apache-2.0"
   head "https://github.com/stefanprodan/timoni.git", branch: "main"
 
