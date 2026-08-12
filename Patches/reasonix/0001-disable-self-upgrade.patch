@@ -1,0 +1,13 @@
+diff --git a/internal/cli/upgrade.go b/internal/cli/upgrade.go
+index 35ab7a1..885c169 100644
+--- a/internal/cli/upgrade.go
++++ b/internal/cli/upgrade.go
+@@ -178,6 +178,8 @@ var loadCLIUpgradeConfig = config.Load
+ 
+ // upgradeCommand handles `reasonix upgrade` (and `reasonix update`).
+ func upgradeCommand(args []string, version string) int {
++	fmt.Fprintln(os.Stderr, "Error: the `upgrade`/`update` command is disabled in the Homebrew build; run `brew upgrade reasonix` instead.")
++	return 1
+ 	syntax, err := parseCLIUpgradeSyntax(args)
+ 	if err != nil {
+ 		fmt.Fprintln(os.Stderr, i18n.M.ErrorPrefix, err)
