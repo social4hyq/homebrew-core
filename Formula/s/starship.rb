@@ -20,16 +20,10 @@ class Starship < Formula
   depends_on "rust" => :build
 
   def install
-    # OHOS 适配：关闭 default features（battery + notify）。
-    # notify → notify-rust → dbus：OHOS 无 dbus 桌面通知服务，且 tap 无 dbus formula。
-    # battery：OHOS 电池 API 语义不同，终端 prompt 无需。
-    # 去掉两者后，全部依赖均为纯 Rust crate（gix 用 zlib-rs 纯 Rust 后端），无需系统库。
-    #
-    # OHOS 链接修复：rust libc crate 对 OHOS target 将 strerror_r 的 link_name
-    # 声明为 __xpg_strerror_r（glibc XPG 变体），但 OHOS musl 动态 libc 不导出
-    # 该符号（仅静态 libc.a 有弱别名），最终链接报 undefined。用 rustc 生成一个
-    # 转发到 strerror_r 的 .o，经 RUSTFLAGS 注入所有链接阶段（含 build script），
-    # 无需 C 编译器，也就不必引入 ohos-sdk build 依赖。
+    # Disable default features (battery/notify): OHOS has no dbus, no battery API.
+    # All remaining deps are pure Rust. strerror_r link fix: rust libc crate declares
+    # __xpg_strerror_r for OHOS but musl libc doesn't export it; provide a forwarding .o
+    # via RUSTFLAGS. See docs/harmonybrew-tap.md.
     (buildpath/"strerror_shim.rs").write <<~RUST
       #[no_mangle]
       pub extern "C" fn __xpg_strerror_r(errnum: i32, buf: *mut u8, buflen: usize) -> i32 {
@@ -41,16 +35,9 @@ class Starship < Formula
            "-O", "strerror_shim.rs", "-o", "strerror_shim.o"
     ENV["RUSTFLAGS"] = "-C link-arg=#{buildpath}/strerror_shim.o"
 
-    # OHOS 应用沙箱：进程 uid 是沙箱 uid（2002xxxx），不在 /etc/passwd，username 模块
-    # 依赖的 whoami::username()（getpwuid 路径）拿不到真名，回退的 $USER 又被终端设成
-    # 数字（如 "100"），最终 prompt 显示成 uid。真实账户名只有系统库
-    # libos_account_ndk.so 的 OH_OsAccount_GetName（API 12+）能给。
-    #
-    # 两处 inreplace 都只锚定不易变的最小单元：插入点锚在 `pub fn module` 这个公开
-    # 函数签名上；替换点只换 `whoami::username()` 这一个调用表达式本身（返回类型
-    # 不变，靠类型推断跟 whoami 的 Result 错误类型对齐），后面 .inspect_err/.ok/
-    # .or_else 整条链原样不动。库/符号不存在时（如容器无 account 服务）返回
-    # None，透明回退到原有 whoami/$USER 逻辑，行为与打补丁前一致。
+    # OHOS sandbox uid not in /etc/passwd; whoami::username() returns uid. Inject
+    # dlopen(libos_account_ndk.so) → OH_OsAccount_GetName fallback. Returns None
+    # transparently if lib/symbol unavailable (same behavior as unpatched).
     inreplace "src/modules/username.rs",
       "pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {",
       <<~RUST + "pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {"
@@ -88,18 +75,9 @@ class Starship < Formula
 
     generate_completions_from_executable(bin/"starship", "completions")
 
-    # OHOS shell 初始化胶水，打包成一个自带脚本而不是塞进 caveats 让用户手抄：
-    # 手抄的块一旦贴进各台机器的 dotfile 就冻结了，以后发现新坑得逐台改；装进
-    # formula 自己的 share/ 下，胶水随 `brew upgrade starship` 一起升级，新机
-    # ~/.zshrc 只需一行 `source`。三个坑各自带守卫，缺前提就跳过：
-    #   - TZ：本机没有 /etc/localtime、也没有逐时区 zoneinfo（只有 Android 格式
-    #     tzdata blob），IANA 名字不生效，只有 POSIX 偏移串管用，运行时用
-    #     `date +%z` 现推，取不到就不设（不比不 source 更糟）
-    #   - fpath：系统 zsh（HiShell）没把 zsh 自带函数目录接进 fpath，autoload
-    #     会找不到 add-zsh-hook；brew zsh 本来就有，这里幂等去重
-    #   - mathfunc：系统 zsh 无此模块，starship init 生成的 __starship_get_time
-    #     调 int(rint(...)) 会报错，改写成纯算术版本（必须放在 starship init
-    #     之后，否则会被 init 自己定义的版本覆盖回去）
+    # OHOS shell init glue bundled as a keg script (upgrades with brew upgrade starship).
+    # Guards: TZ (no /etc/localtime, use date +%z), fpath (autoload add-zsh-hook),
+    # mathfunc (system zsh lacks module, rewrite __starship_get_time).
     pkgshare.mkpath
     (pkgshare/"ohos-init.zsh").write <<~ZSH
       # harmonybrew-core `starship` formula 自带的 OHOS shell 初始化胶水。

@@ -1,48 +1,24 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI — HarmonyOS (runtime-fetch stub; no binary in bottle)"
-  # code.claude.com/docs is the current official docs home; docs.anthropic.com
-  # is unreachable from OHOS networks (fails `brew audit --online`).
   homepage "https://code.claude.com/docs/en/overview"
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.227.tgz"
   sha256 "08eb0f8c188f701b19a845b61ff0f89f48006f3ab06dccba7755d91b3df52fd6"
   license :cannot_represent # Anthropic Commercial Terms of Service
-  # Claude Code 2.1.113+ only ships Bun-compiled binaries (linux-arm64-musl,
-  # musl ABI compatible with OHOS). The tgz is mirrored on npmmirror (Aliyun
-  # CDN): brew's curl 8.21 (OpenSSL 3.6) SIGILLs on bulk TLS GET from the
-  # Cloudflare-fronted registry.npmjs.org on OHOS — its aarch64 SIMD AES bulk
-  # decrypt path is trapped by the kernel (verified: HEAD always succeeds,
-  # the tarball body GET always SIGILLs, exit 132); Aliyun's CDN does not. The
-  # file is byte-identical on both (sha256 matches), so the wrapper tries
-  # npmmirror first and falls back to registry.npmjs.org for non-buggy curl
-  # builds or mirror lag on a freshly released version.
+  # npmmirror mirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org
+  # (aarch64 SIMD AES path trapped by kernel); npmmirror (Aliyun CDN) doesn't.
+  # Files are byte-identical (sha256 matches); wrapper tries npmmirror first,
+  # falls back to registry.npmjs.org for non-buggy curl or mirror lag.
   #
-  # Why a stub bottle: Anthropic License does not allow redistributing the
-  # official binary inside a bottle, so install() writes ONLY a wrapper stub —
-  # the official binary is fetched at first run, sha256-checked, self-signed
-  # and cached. The bottle therefore contains just the wrapper script.
-  # That also makes `pour_bottle?` true, which bypasses Homebrew's
-  # DevelopmentTools requirement (formula_installer.rb raises UnbottledError
-  # when !pour_bottle? && !DevelopmentTools.installed?): claude-code doesn't
-  # compile anything, but Homebrew demands a compiler for any bottle-less
-  # formula regardless — and OHOS ships no /usr/bin/clang, so users without
-  # llvm hit a "missing toolchain" error. A bottle sidesteps that entirely.
+  # Stub bottle: Anthropic License prohibits redistributing the official binary,
+  # so install() writes only a wrapper — the binary is fetched, sha256-checked,
+  # and self-signed at first run. pour_bottle? also bypasses Homebrew's
+  # DevelopmentTools requirement (OHOS ships no /usr/bin/clang).
   #
-  # Relocatability: the wrapper references other formulae (ohos-bst-light,
-  # ohos-compat-shim) via the runtime $HOMEBREW_PREFIX env var only — NO
-  # build-time path interpolation. `brew bottle` rejects HOMEBREW_PREFIX/Cellar
-  # -shaped baked paths in skip_relocation bottles (opencode r0 hit this), so
-  # baking the build machine's absolute prefix would odie. $HOMEBREW_PREFIX is
-  # exported by Harmonybrew's `brew shellenv`, which every user is expected to
-  # have eval'd.
+  # Relocatability: wrapper uses runtime $HOMEBREW_PREFIX only — no build-time path interpolation.
 
   livecheck do
-    # www.npmjs.com (the package *website*, not the registry API) 403s from
-    # this environment — confirmed 2026-07-20, different host from the
-    # registry.npmjs.org SIGILL issue described above (that one only bites
-    # on the large tarball GET; this small registry API JSON response is
-    # unaffected — confirmed reachable from the build container). Same
-    # livecheck pattern used elsewhere in this tap for npmmirror-sourced
-    # prebuilt-binary formulas.
+    # www.npmjs.com 403s from this env; registry API JSON is reachable.
+    # Same npmmirror livecheck pattern used elsewhere in this tap.
     url "https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64-musl/latest"
     regex(/"version":\s*"(\d+(?:\.\d+)+)"/i)
   end
@@ -56,8 +32,7 @@ class ClaudeCode < Formula
   depends_on "ohos-compat-shim"
 
   def install
-    # install() never downloads or references the official binary from buildpath,
-    # so it cannot end up in the bottle (compliance). Only the wrapper is staged.
+    # install() never references the official binary — only the stub goes in the bottle.
     (bin/"claude").write <<~SH
       #!/bin/sh
       set -e
@@ -74,17 +49,14 @@ class ClaudeCode < Formula
         TMP="$(mktemp -d)"
         trap 'rm -rf "$TMP"' EXIT
         echo "claude-code: fetching official binary $VER..." >&2
-        # NPM_URL = npmmirror (primary, see top-of-file curl SIGILL note);
-        # FALLBACK = registry.npmjs.org (helps non-buggy curl or mirror lag).
-        # sha256 below verifies integrity regardless of which source served it.
+        # npmmirror primary (curl SIGILL on Cloudflare); sha256 verifies regardless of source.
         FALLBACK="https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-$VER.tgz"
         fetched=0
         for u in "$NPM_URL" "$FALLBACK"; do
           curl -fL "$u" -o "$TMP/pkg.tgz" && { fetched=1; break; }
         done
         [ "$fetched" = 1 ] || { echo "claude-code: download failed from all mirrors" >&2; exit 1; }
-        # Fail closed: a runtime-downloaded executable that fails checksum
-        # verification must never run.
+        # Fail closed: an unverified runtime-downloaded executable must never run.
         command -v sha256sum >/dev/null 2>&1 || {
           echo "claude-code: sha256sum not found; refusing to run an unverified download" >&2
           exit 1
@@ -133,8 +105,7 @@ class ClaudeCode < Formula
   end
 
   test do
-    # Don't run `claude --version` here: that would trigger the runtime fetch
-    # (network + signing) during `brew test`. Just assert the stub is installed.
+    # Assert stub only — `claude --version` would trigger the runtime fetch during `brew test`.
     assert_path_exists bin/"claude"
   end
 end

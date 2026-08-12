@@ -1,11 +1,8 @@
 class OpencodeAT2 < Formula
   desc "OpenCode v2 preview — AI coding agent CLI, HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
-  # v2 is a live development branch (no release tags yet). URL pins the v2
-  # branch HEAD via git revision (bun.rb pattern); version stays a
-  # human-readable beta tag so bump-formula-pr's version comparison doesn't
-  # fight the commit SHA. livecheck watches the v2 branch HEAD via GitHub API;
-  # autobump.yml opens a PR when a new commit lands.
+  # v2 is a live branch (no tags yet); pinned git revision + beta version tag.
+  # See social4hyq/ohos-opencode2 dev for canonical diff.
   url "https://github.com/anomalyco/opencode.git", revision: "84fd347afaed9617b7b29744086657fa029bbe68", branch: "v2"
   version "2.0.0-beta"
   license "MIT"
@@ -23,64 +20,32 @@ class OpencodeAT2 < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "4f897cc13fb350023b6832ce3ec22262465117be14380fa9edd68dc585bfc781"
   end
 
-  # opencode2 is a `bun build --compile` single binary: OHOS bun runtime + JS
-  # bundle + native .so all embedded. Since bun r31 the ohos-compat-shim is
-  # statically linked into every compile output, so there is NO runtime shim
-  # dependency and no LD_PRELOAD wrapper.
-  #
-  # v2 monorepo restructure vs v1: the CLI package moved from packages/opencode
-  # to packages/cli (binary renamed opencode -> opencode2). The build script is
-  # at packages/cli/script/build.ts (rewritten, no web-UI embedding step). The
-  # web.ts command was removed entirely (no patch needed). Native deps are
-  # fewer: only @opentui/core (0.4.5) and bun-pty (0.4.10) need @ohos-ports/*
-  # overrides; lightningcss/tailwindcss-oxide are gone from the CLI tree.
-  #
-  # `bun install --ignore-scripts` is intentional: lifecycle scripts are
-  # irrelevant to signing, and trustedDependencies would fall back to source
-  # builds on openharmony for native bindings the app never loads.
-  #
-  # @parcel/watcher: replaced linux-arm64-musl optional dep with @ohos-ports
-  # pre-signed binary + getBackend() openharmony → inotify patch. File
-  # watching is now functional on OHOS (inotify backend, no watchman).
+  # `bun build --compile` single binary: runtime + JS + .so embedded; since
+  # bun r31 ohos-compat-shim is statically linked (no runtime shim dep).
+  # v2 monorepo restructure: CLI moved packages/opencode → packages/cli
+  # (binary renamed opencode2). Build script: packages/cli/script/build.ts.
+  # Fewer native deps: only opentui-core + bun-pty. `bun install --ignore-scripts`
+  # (lifecycle scripts irrelevant to signing). @parcel/watcher: @ohos-ports binary.
   depends_on "bun" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
 
-  # All OHOS source adaptations are done via inreplace in install() — zero
-  # .patch files. The "reuse musl slot" strategy (hijack the existing
-  # linux-arm64-musl target entry instead of adding a new one) eliminates the
-  # structural array-insertion hunk, leaving only single-line string
-  # replacements. Version bumps only need url + sha256 + bottle root_url.
-  # See social4hyq/ohos-opencode2 dev for the canonical diff these mirror
-  # (fork-diff invariant; 4 patches → inreplace 2026-07-31).
+  # All OHOS adaptations via inreplace — zero .patch files.
+  # See opencode.rb for the same pattern.
 
   def install
     ENV["BUN_TMPDIR"] = (buildpath/".bun-tmp").to_s
     (buildpath/".bun-tmp").mkpath
     ENV["BUN_INSTALL_CACHE_DIR"] = (HOMEBREW_CACHE/"bun-install-cache").to_s
 
-    # Workspace packages not needed for the CLI build (drops electron, web
-    # apps, storybook, etc. from the install set entirely). Only delete
-    # packages matched by the "packages/*" glob — v2's root package.json also
-    # lists explicit workspace entries ("packages/slack") and sub-globs
-    # ("packages/console/*", "packages/stats/*") that bun install will hard-
-    # error on if the directory is missing, so those stay.
-    # session-ui is deleted alongside app: it references app's vendored SDK
-    # tarball via file:../app/vendor/ (both have a file: dependency on a
-    # .tgz inside packages/app/vendor/). The CLI dep chain doesn't touch
-    # either.
-    # enterprise is deleted alongside session-ui: it depends on
-    # @opencode-ai/session-ui (workspace:*), so leaving it in place makes
-    # bun install fail to resolve session-ui after its directory is gone.
+    # Drop workspace packages not needed for CLI build. Only delete packages/*
+    # glob entries, not explicit workspace entries or sub-globs (bun install
+    # errors on missing dirs).
+    # session-ui + enterprise deleted together (cross-dependencies).
     rm_r %w[packages/desktop packages/app packages/session-ui packages/web
             packages/www packages/storybook packages/enterprise]
 
-    # Native dep overrides (replaces ohos-ports-deps.patch). v2 only needs
-    # @ohos-ports/opentui-core + @ohos-ports/bun-pty (no lightningcss/
-    # tailwindcss-oxide in the CLI tree).
-    # bun-pty/@parcel/watcher have no upstream override entry, so they are
-    # added right after the @opentui/core override this same replacement
-    # writes — no assumption about upstream's overrides key ordering. The nil
-    # check makes a vanished anchor fail loudly.
+    # v2 needs fewer @ohos-ports overrides: opentui-core + bun-pty only.
+    # The nil check makes a vanished anchor fail loudly.
     inreplace "package.json" do |s|
       overrides = [
         '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.5-patch.1",',
@@ -91,9 +56,7 @@ class OpencodeAT2 < Formula
         odie("opencode@2: @opentui/core override anchor not found in package.json")
     end
 
-    # Home dir fallback for global projects (replaces project-global-
-    # worktree.patch). v2 only touches packages/core/src/project.ts
-    # (no packages/opencode variant).
+    # Home dir fallback for global projects. See opencode.rb.
     inreplace "packages/core/src/project.ts" do |s|
       s.sub!('import path from "path"', "import os from \"os\"\nimport path from \"path\"") ||
         odie("opencode@2: project.ts import anchor not found")
@@ -107,8 +70,7 @@ class OpencodeAT2 < Formula
       'if (process.platform === "linux") return "inotify"',
       'if (process.platform === "linux" || process.platform === "openharmony") return "inotify"'
 
-    # Flip openharmony-arm64 os markers in bun.lock (replaces
-    # bun-lock-openharmony-os.patch). Same regex as opencode.
+    # Flip openharmony-arm64 os markers. Same regex as opencode.rb.
     lockfile = (buildpath/"bun.lock").read
     injected = lockfile.gsub(
       /("[^"]*openharmony-arm64@[^"]+", "", \{ )"os": "none"(, "cpu": "arm64" \})/,
@@ -121,21 +83,14 @@ class OpencodeAT2 < Formula
       (buildpath/"bun.lock").atomic_write(injected)
     end
 
-    # Disable upstream's npm anti-typosquatting minimum-release-age policy: it
-    # blocks freshly-published @ohos-ports/* packages (< 3 days old). Removing
-    # the key restores bun's default (null = disabled). inreplace raises if
-    # upstream rewords or drops the line, so a bump can't silently re-enable
-    # the policy. (bun has no "minimumReleaseAgeMs" key — an unknown bunfig
-    # key is silently ignored, verified on bun 1.4.0.)
+    # Disable npm minimum-release-age. See opencode.rb for rationale.
     inreplace "bunfig.toml", "minimumReleaseAge = 259200\n", ""
     system "bun", "install", "--ignore-scripts"
 
-    # Script.version short-circuits on OPENCODE_VERSION (no git / registry
-    # lookup), which also flips Script.channel to "latest".
+    # Script.version short-circuits on OPENCODE_VERSION (no git/registry lookup).
     ENV["OPENCODE_VERSION"] = version.to_s
 
-    # build.ts adaptations (replaces build-ohos-target.patch). Reuse the
-    # existing linux-arm64-musl target slot instead of adding a new one:
+    # build.ts adaptations (reuse linux-arm64-musl target slot):
     #   1. os check: allow linux-arm64-musl through on OHOS
     #   2. abi check: keep musl target on OHOS in single-flag mode
     #   3. compile target: use bun-linux-arm64-ohos for musl on OHOS
@@ -145,9 +100,7 @@ class OpencodeAT2 < Formula
       "!(process.platform === \"openharmony\" && " \
       "item.os === \"linux\" && item.arch === \"arm64\" && " \
       "item.abi === \"musl\")) return false"
-    # The abi guard is anchored on the preceding avx2 line: the bare
-    # "return item.abi === undefined" string is short enough to collide with
-    # unrelated future code in this file (gsub! would rewrite every match).
+    # Anchor on preceding avx2 line to avoid gsub! matching unrelated code.
     inreplace "packages/cli/script/build.ts",
       /(if \(item\.avx2 === false\) return baselineFlag\n\s*)return item\.abi === undefined/,
       '\1return process.platform === "openharmony" || item.abi === undefined'
@@ -166,22 +119,14 @@ class OpencodeAT2 < Formula
     out = "packages/cli/dist/cli-linux-arm64-musl/bin/opencode2"
     odie "opencode2 binary missing" unless File.exist?(out)
 
-    # The device kernel refuses to exec unsigned ELFs; bun's compile step must
-    # have produced a .codesign section (ohos_sign, bun.rb r16+).
+    # Verify .codesign section present. See opencode.rb.
     readelf = formula_opt_prefix("ohos-sdk")/"native/llvm/bin/llvm-readelf"
     sections = Utils.safe_popen_read(readelf.to_s, "--section-headers", out)
     odie "compiled binary lacks .codesign section" unless sections.include?(".codesign")
 
-    # The launcher wrapper defaults TMPDIR to a writable EL2 path (OHOS /tmp
-    # is read-only in app contexts); override via OPENCODE_TMPDIR. Self-reference
-    # via opt_libexec (not libexec) so the baked path stays stable across the
-    # HOMEBREW_CELLAR flat/nested flip.
-    #
-    # The wrapper also isolates XDG_DATA_HOME: v2 and opencode (v1)
-    # would otherwise share ~/.local/share/opencode/opencode.db, and v2's
-    # migrations (e.g. event.created NOT NULL) break v1's session creation
-    # ("creating a session failed"). v2 gets its own data root; an
-    # explicitly-set XDG_DATA_HOME is still honored.
+    # Wrapper defaults TMPDIR to EL2 and isolates XDG_DATA_HOME ($HOME/.local/share-v2)
+    # so v2's DB migrations don't break v1's session creation. opt_libexec keeps
+    # baked path stable across flat/nested cellar flip.
     mkdir_p libexec/"bin"
     libexec.install out => "bin/opencode2"
     (bin/"opencode2").write <<~SH
@@ -192,16 +137,8 @@ class OpencodeAT2 < Formula
     SH
     chmod 0755, bin/"opencode2"
 
-    # Shell completions come from the binary itself (effect CLI built-in
-    # `--completions bash|zsh|fish`) — always in sync, no handwritten list
-    # to drift when autobump advances the revision pin. Generate from the
-    # libexec binary: the bin/opencode2 wrapper execs opt_libexec, whose
-    # opt/ symlink only exists after install.
-    # base_name must be the command name, not the formula name: without it
-    # the helper defaults to `name` (opencode@2 — the executable is under
-    # libexec, not bin, so the basename fallback doesn't apply), and bash/fish
-    # completions would be installed under a filename that never matches the
-    # `opencode2` command.
+    # Completions from binary's --completions (always in sync).
+    # base_name must be 'opencode2' not formula name (libexec binary).
     generate_completions_from_executable(libexec/"bin/opencode2", "--completions",
                                          base_name: "opencode2")
   end

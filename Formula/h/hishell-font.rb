@@ -15,16 +15,10 @@ class HishellFont < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "6e9ff638365a716f3cfde5f409484dd3dd3081d1952750feb5f6d4488548bce7"
   end
 
-  # hishell (com.huawei.hmos.hishell) is Alacritty's HarmonyOS port; its terminal core
-  # (libalacritty_terminal.so) resolves fonts through a bundled fontconfig instance, and has
-  # no ArkTS/UI-level way to choose a font family — the toml config's [font.normal] family
-  # field is parsed with a regex that only ever matches digits, never a real font name. This
-  # tool downloads a font from nerd-fonts.com's GitHub releases, installs it, and writes the
-  # fontconfig conf.d rule that's the only thing that actually works.
-  #
-  # fc-match/fc-scan (fontconfig) do the actual font lookup and self-verification; gnu-tar/xz
-  # extract the downloaded .tar.xz archive. All are runtime, not build, dependencies — this
-  # formula only builds a JS bundle, nothing native.
+  # hishell (Alacritty OHOS port) resolves fonts via bundled fontconfig — there's no
+  # UI-level font picker, the toml [font.normal] regex only matches digits. This tool
+  # installs a Nerd Font and writes the fontconfig conf.d rule. fc-match/gnu-tar/xz
+  # are runtime deps (this formula only builds a JS bundle).
   depends_on "bun"
   depends_on "fontconfig"
   depends_on "gnu-tar"
@@ -36,15 +30,8 @@ class HishellFont < Formula
     system "bun", "build", "--target=bun", "--outfile", "hishell-font.js", "src/cli.ts"
     libexec.install "hishell-font.js"
 
-    # $HOMEBREW_PREFIX is resolved at *runtime* inside the script, not interpolated at build
-    # time — this is a plain shell script, not a binary being RUNPATH-patched, so baking the
-    # build machine's prefix in here would break portability the same way an absolute path
-    # would in any other relocatable bottle. Same pattern as sshport.rb.
-    #
-    # fc-match/fc-scan/tar/xz are resolved via $HOMEBREW_PREFIX/opt/*/bin rather than PATH:
-    # PATH order at runtime isn't guaranteed to put this formula's own dependencies first
-    # (e.g. an OHOS-native tar could shadow gnu-tar), and download.ts/fontinstall.ts/doctor.ts
-    # all fall back to `Bun.which` only when these env vars are unset (see their tests).
+    # Same $HOMEBREW_PREFIX runtime pattern as sshport.rb. fc-match/tar/xz resolved via
+    # explicit opt/*/bin rather than PATH (OHOS-native tar could shadow gnu-tar).
     (bin/"hishell-font").write <<~SH
       #!/bin/sh
       : "${HOMEBREW_PREFIX:?hishell-font: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
@@ -56,10 +43,8 @@ class HishellFont < Formula
 
   test do
     assert_match version.to_s, shell_output("#{bin}/hishell-font --version 2>&1")
-    # `doctor`'s only I/O is filesystem probes + `Bun.which`-style PATH lookups (no network),
-    # so it's safe to run unconditionally — same rationale as sshport.rb's `doctor` test.
-    # Its exit code legitimately varies by machine (1 outside hishell's own app sandbox, which
-    # the CI build environment is), so only the header line is asserted, not the exit code.
+    # `doctor` is local-only (no network). Exit code varies by machine,
+    # so only assert the header line.
     assert_match "hishell-font doctor", shell_output("#{bin}/hishell-font doctor 2>&1", 1)
   end
 end

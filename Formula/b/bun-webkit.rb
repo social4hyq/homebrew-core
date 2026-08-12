@@ -5,13 +5,9 @@ class BunWebkit < Formula
       revision: "447082ab6897278727b44e1ba3c326ae6e1504c3"
   version "447082ab68"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
-  # This formula is fully rewritten from upstream because it builds only the
-  # JavaScriptCore/WTF/bmalloc static archives from oven-sh/WebKit, pinned to
-  # bun's WEBKIT_VERSION. Upstream does not package WebKit this way.
+  # Fully rewritten from upstream: builds only JSC/WTF/bmalloc static archives, pinned to bun's WEBKIT_VERSION.
 
-  # Pinned to WEBKIT_VERSION in bun-src/scripts/build/deps/webkit.ts — cannot
-  # auto-bump, otherwise ABI mismatch with bun. OHOS adaptation is handled
-  # bun-side (webkit.ts.patch); WebKit source itself is unmodified.
+  # Pinned to bun's WEBKIT_VERSION; OHOS adaptation handled bun-side (webkit.ts.patch).
   livecheck do
     skip "pinned to bun's WEBKIT_VERSION"
   end
@@ -38,8 +34,7 @@ class BunWebkit < Formula
   # ohos-sdk is build-time only: JSC cross-compilation uses its sysroot.
 
   def install
-    # llvm@21's lld runtime depends on libxml2/zlib, brew superenv may strip LD_LIBRARY_PATH,
-    # explicitly inject library search paths.
+    # llvm@21's lld runtime depends on libxml2/zlib; brew superenv may strip LD_LIBRARY_PATH, inject explicitly.
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("libxml2").to_s
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib").to_s
 
@@ -107,19 +102,16 @@ class BunWebkit < Formula
     # Output: libJavaScriptCore.a / libWTF.a / libbmalloc.a + headers
     # (cmake JSCOnly target output is in build/lib/)
     lib.install Dir["build/lib/libJavaScriptCore.a", "build/lib/libWTF.a", "build/lib/libbmalloc.a"]
-    # All three components' top-level dirs are named Headers, cannot install dirs directly (EEXIST),
-    # instead install the contents of each Headers, merged into include/webkit/.
+    # All three components' top-level dirs are named Headers; install contents merged
+    # into include/webkit/.
     (include/"webkit").install Dir["build/JavaScriptCore/Headers/*"]
     (include/"webkit").install Dir["build/WTF/Headers/*"]
     (include/"webkit").install Dir["build/bmalloc/Headers/*"]
-    # bun build needs this file to verify WebKit config completeness
+    # bun build needs cmakeconfig.h for config verification
     (include/"webkit").install "build/cmakeconfig.h" if File.exist?("build/cmakeconfig.h")
-    # JSC runtime headers (Source + DerivedSources) — needed by bun PCH,
-    # installed in flat layout under include/webkit/JavaScriptCore/ (consistent with setup-webkit-cache.sh).
+    # JSC runtime headers (Source + DerivedSources), flattened under include/webkit/JavaScriptCore/.
     jsc_inc = include/"webkit/JavaScriptCore"
-    # OHOS uses the socket-based remote inspector, not the glib one.
-    # Exclude inspector/remote/glib/ so the basename-flatten picks the socket variant
-    # of files that exist in both (notably RemoteInspectorServer.h).
+    # Exclude inspector/remote/glib/ (OHOS uses socket-based inspector).
     Dir.glob(buildpath.to_s + "/Source/JavaScriptCore/**/*.h").each do |h|
       next if h.include?("/inspector/remote/glib/")
 
@@ -128,9 +120,8 @@ class BunWebkit < Formula
     Dir.glob(buildpath.to_s + "/build/JavaScriptCore/DerivedSources/**/*.h").each do |h|
       cp h, jsc_inc/File.basename(h) unless File.exist?(jsc_inc/File.basename(h))
     end
-    # WTF platform subdirs (posix/cocoa/android/bun/…) are NOT in the cmake WTF/Headers
-    # export but bun source pulls them in. Overlay from Source/WTF/wtf/ to match
-    # setup-webkit-cache.sh. Skip glib/ (OHOS has no GLib).
+    # WTF platform subdirs not in cmake export but bun needs them.
+    # Overlay from Source/WTF/wtf/; skip glib/.
     wtf_inc = include/"webkit/wtf"
     Dir.glob(buildpath.to_s + "/Source/WTF/wtf/*").each do |entry|
       next unless File.directory?(entry)

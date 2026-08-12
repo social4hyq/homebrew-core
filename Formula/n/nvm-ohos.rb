@@ -11,21 +11,11 @@ class NvmOhos < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "4e6c5a3f1442fc2f14681cdd1f276676a29629d9bab0bb258801b6c582c4515a"
   end
 
-  # Upstream nvm downloads unsigned glibc binaries from nodejs.org — neither
-  # the libc nor the missing OHOS codesign survives contact with this OS.
-  # This formula does NOT patch nvm.sh (kept byte-for-byte from upstream, so
-  # bumping the version is a plain url/sha256 change); instead it installs a
-  # second script, nvm-ohos.sh, that plugs into nvm's own public extension
-  # point, $NVM_INSTALL_THIRD_PARTY_HOOK, to redirect `nvm install <major>`
-  # at the already-signed, already-musl node/node@22/node@24 kegs this tap
-  # builds (see node.rb: Alpine chroot + --dest-os=openharmony). A mirror
-  # source (unofficial-builds.nodejs.org linux-arm64-musl) was spiked and
-  # rejected: those tarballs dynamically link libgcc_s.so.1, which does not
-  # exist anywhere in the OHOS musl userland (this tap's own node avoids the
-  # dependency entirely via --partly-static). So coverage is exactly whatever
-  # `node@<major>` formulas this tap carries — currently 22, 24, 26 — not the
-  # full nodejs.org release matrix. See docs/harmonybrew-tap.md for the
-  # spike writeup.
+  # Upstream nvm downloads unsigned glibc binaries that can't run on OHOS.
+  # This formula does NOT patch nvm.sh (kept byte-for-byte); instead installs nvm-ohos.sh
+  # that plugs into nvm's $NVM_INSTALL_THIRD_PARTY_HOOK to redirect to brew-built kegs.
+  # unofficial-builds.nodejs.org musl spike rejected: dynamic libgcc_s.so.1 dependency.
+  # Coverage: node@22/24/26 only. See docs/harmonybrew-tap.md.
   def install
     libexec.install "nvm.sh", "nvm-exec"
 
@@ -49,15 +39,8 @@ class NvmOhos < Formula
         fi
 
         command mkdir -p "${VERSION_PATH}/bin" || return 1
-        # A real copy, not a symlink: node resolves process.execPath via
-        # /proc/self/exe, which follows a symlink straight back to the
-        # brew keg — that then makes npm's own *default* global prefix
-        # (computed from execPath, used whenever nothing configures one)
-        # resolve to the brew keg instead of this nvm version dir. The
-        # signature survives a plain byte-for-byte copy (verified: OHOS
-        # codesign is content-based, not path-bound), so this costs the
-        # node binary's size (~100MB+) per installed major but is
-        # otherwise free.
+        # Real copy, not symlink: node resolves process.execPath via /proc/self/exe which follows
+        # symlinks back to the brew keg, making npm's default prefix wrong. Signature survives copy.
         command cp "${KEG_DIR}/bin/node" "${VERSION_PATH}/bin/node" || return 1
         command chmod +x "${VERSION_PATH}/bin/node" || return 1
 
@@ -68,10 +51,7 @@ class NvmOhos < Formula
           fi
         done
 
-        # npm lives in one of two places depending on the formula:
-        #   node@N formulas keep it at <keg>/lib/node_modules/npm
-        #   the bare "node" formula relocates it to
-        #     <keg>/libexec/lib/node_modules/npm (see node.rb post_install)
+        # npm location varies: node@N puts it at lib/node_modules, bare node at libexec/lib.
         local NPM_SRC=""
         if [ -d "${KEG_DIR}/lib/node_modules/npm" ]; then
           NPM_SRC="${KEG_DIR}/lib/node_modules/npm"
@@ -83,17 +63,9 @@ class NvmOhos < Formula
           command mkdir -p "${VERSION_PATH}/lib/node_modules" || return 1
           command cp -R "${NPM_SRC}" "${VERSION_PATH}/lib/node_modules/npm" || return 1
 
-          # brew's post_install may have baked "prefix = <HOMEBREW_PREFIX>"
-          # into npm's own npmrc so `npm -g` lands in the brew keg instead
-          # of this nvm version's private lib/node_modules. Strip it from
-          # OUR COPY only — the brew-owned original is never touched. Do
-          # NOT replace it with an explicit prefix pointing at
-          # VERSION_PATH instead: nvm itself actively checks the builtin
-          # npmrc for any `prefix`/`globalconfig` line on every `nvm use`
-          # and refuses (exit 10, "incompatible with nvm") if it finds
-          # one — with bin/node now a real copy (see above), npm's
-          # execPath-derived default prefix is already correct without
-          # any override, so the fix is leaving this file free of both.
+          # Strip prefix/globalconfig lines from our npmrc copy only: nvm checks npmrc on every
+          # `nvm use` and refuses (exit 10) if it finds a prefix line. With bin/node as a real copy,
+          # npm's execPath-derived default prefix is already correct without override.
           local NPMRC="${VERSION_PATH}/lib/node_modules/npm/npmrc"
           if [ -f "${NPMRC}" ]; then
             command sed -E -i '/^[[:space:]]*(prefix|globalconfig)[[:space:]]*=/d' "${NPMRC}"
@@ -196,25 +168,14 @@ class NvmOhos < Formula
     SH
     prefix.install_symlink libexec/"nvm-exec"
 
-    # Upstream's completion script uses bash's `==` inside a POSIX `[ ]`
-    # test. bashcompinit invokes completion functions under `emulate -L
-    # zsh`, where the builtin `[` doesn't understand `==` and errors out
-    # ("= not found") on every completion attempt that reaches this line
-    # — which is nearly all of them. `=` is the POSIX-standard operator
-    # and works identically in both bash and zsh.
+    # bash's `==` in POSIX `[ ]` fails under zsh's `emulate -L zsh`.
+    # `=` is POSIX-standard, works in both.
     inreplace "bash_completion",
       "[ ${#COMP_WORDS[@]} == 4 ]",
       "[ ${#COMP_WORDS[@]} = 4 ]"
 
-    # bashcompinit hands completion functions a native zsh array (1-indexed)
-    # into COMP_WORDS, but every lookup here that walks relative to
-    # COMP_CWORD (e.g. "what's the previous word") assumes bash's 0-indexed
-    # convention and is off by one as a result — `nvm use <Tab>` silently
-    # falls through to the generic subcommand list instead of the installed-
-    # versions list, with no error to notice. Wrap the zsh completion entry
-    # point so it runs under `ksh_arrays` (realigns indexing to 0-based) via
-    # `local_options` (scoped to the wrapper only, restored on return — never
-    # leaks into the user's interactive shell).
+    # zsh gives completion functions a 1-indexed array; lookups assuming 0-indexed are off by one.
+    # Wrap under ksh_arrays (0-based) via local_options (scoped, never leaks).
     inreplace "bash_completion",
       "  autoload -U +X bashcompinit && bashcompinit\nfi\n\ncomplete -o default -F __nvm nvm",
       <<~ZSH_WRAPPER.chomp
@@ -233,9 +194,7 @@ class NvmOhos < Formula
         fi
       ZSH_WRAPPER
 
-    # zsh's `command` builtin can't dispatch to `cd` (a special builtin) the
-    # way bash's can — harmless in bash (defensive against a user-defined
-    # `cd` function), but a hard "command not found" under zsh.
+    # zsh's `command` can't dispatch to `cd` (special builtin).
     inreplace "bash_completion",
       'command cd "${NVM_DIR}/alias"',
       'cd "${NVM_DIR}/alias"'

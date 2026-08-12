@@ -16,15 +16,11 @@ class OhosBstLight < Formula
     sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "3698df835d0a44e2262cc111908f26064648f6f5e652f2944edf17eb17595932"
   end
 
-  # Unlike binary-sign-tool from ohos-sdk, self-sign preserves the ELF structure
-  # of Bun-built binaries. binary-sign-tool can corrupt ELF section layout,
-  # preventing Bun's runtime from finding embedded resources.
+  # self-sign preserves ELF structure (binary-sign-tool can corrupt Bun binaries).
   depends_on "ohos-sdk" => :build
 
   def install
-    # ENV.cc (superenv) is fine here even though it embeds HOMEBREW_* RUNPATH
-    # entries in the binary: self-sign NEEDs only libc.so (verified via
-    # readelf), so those entries are never consulted at runtime.
+    # ENV.cc (superenv) is fine: self-sign needs only libc.so.
     system ENV.cc, "self-sign.c", "-o", "self-sign"
     bin.install "self-sign"
   end
