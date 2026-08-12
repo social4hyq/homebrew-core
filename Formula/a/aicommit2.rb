@@ -6,7 +6,7 @@ class Aicommit2 < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c19c6c842b1a2a48aecf440310fe9fc15a5b97dfec60a07490134ad27acf89fd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "54c6cf4cbea91d56f00a1d56864f6031bfd7e5f8670c1310fcced5e56d852bc8"
   end
 
   depends_on "node"
