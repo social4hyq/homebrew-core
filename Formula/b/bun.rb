@@ -1,17 +1,13 @@
 class Bun < Formula
   desc "JavaScript runtime for HarmonyOS aarch64 (stable)"
   homepage "https://github.com/oven-sh/bun"
-  # This formula is fully rewritten from upstream because Bun on HarmonyOS requires
-  # 50+ OHOS-specific patches, L4 self-bootstrap via bun-bootstrap, a
-  # pre-populated WebKit cache, and a Rust nightly toolchain with -Zbuild-std.
-  # All patches are pre-applied on the ohos-aarch64 branch of social4hyq/ohos-bun.
-  # Upstream formula cannot accommodate these build requirements.
+  # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
+  # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
   url "https://github.com/social4hyq/ohos-bun.git", revision: "396027051187c12d1cc5bbdeb05e3d7dc984ad90", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
   revision 57
-  # head tracks the same pre-patched fork branch as url — upstream oven-sh/bun
-  # main lacks the 50+ OHOS patches and cannot build for HarmonyOS.
+  # head tracks the same pre-patched fork branch as url.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "ohos-aarch64"
 
   livecheck do
@@ -24,9 +20,7 @@ class Bun < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "9b2fdce666aa14ee5588cbf327f2c572e3aff580dd2670c6dbd4116901ab9515"
   end
 
-  # ── Dependencies (all bare names; icu4c@78 resolves to harmonybrew/core —
-  # this tap's __h-era fork was dropped in the __n1 migration and the
-  # upstream __n1 build now matches bun's libc++ ABI) ──
+  # icu4c@78 resolves to harmonybrew/core (this tap's __h fork was dropped in __n1 migration).
   depends_on "bun-bootstrap" => :build # Bootstrap: `bun bd` itself is a bun script
   depends_on "bun-webkit" => :build
   depends_on "cmake" => :build
@@ -41,62 +35,41 @@ class Bun < Formula
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
   depends_on "node"
-  # No runtime ohos-compat-shim dependency since r31: a vendored copy of the
-  # shim is statically linked into the executable (emitShims in the source
-  # tree, workarounds.ts "ohos-compat-shim-embed"), covering bun AND every
-  # `bun build --compile` output without LD_PRELOAD.
-  # ohos-sdk is build-time only: used to sign rust-nightly binaries, the
-  # clang-sign wrapper, and the final bun binary. Runtime signing (PackageInstaller
-  # .node/.so, dlopen, bun build --compile) is handled in-process by ohos_sign.
+  # No runtime ohos-compat-shim dependency since r31: vendored copy statically linked
+  # into the executable AND every `bun build --compile` output. ohos-sdk is build-time
+  # only: signs rust-nightly, clang-sign wrapper, and final binary.
 
-  # Rust nightly (native OHOS host toolchain, needed by bun's libbun_rust.a).
-  # OHOS is a Tier 3 target with no prebuilt rust-std, so bun uses -Zbuild-std
-  # to build std from source, hence the rust-src component is required
-  # (included in the full nightly host tarball).
-  # Version aligned with the channel in bun-src/rust-toolchain.toml.
+  # Rust nightly: OHOS is Tier 3 (no prebuilt rust-std), uses -Zbuild-std.
+  # Version aligned with bun-src/rust-toolchain.toml.
   resource "rust-nightly" do
     url "https://static.rust-lang.org/dist/2026-07-20/rust-nightly-aarch64-unknown-linux-ohos.tar.gz"
     version "nightly-2026-07-20"
     sha256 "7d3dd4cc4f55ee8a7c7f09804b96fd52ef7ef598a935772091e80aa66869676e"
   end
 
-  # rust-src is distributed separately from the host tarball; required by bun
-  # -Zbuild-std (otherwise cargo reports
-  # "library/Cargo.lock does not exist, unable to build with the standard library").
+  # rust-src required by -Zbuild-std.
   resource "rust-src" do
     url "https://static.rust-lang.org/dist/2026-07-20/rust-src-nightly.tar.gz"
     version "nightly-2026-07-20"
     sha256 "2be85b655b99624bed0fb63a47e564abac07aa1fb5d0576abac5c42ef8c5316e"
   end
 
-  # ── OHOS patches are pre-applied on the ohos-aarch64 branch of social4hyq/ohos-bun ──
-  # The branch is a linear series of feat/fix(ohos) commits kept in sync with
-  # upstream oven-sh/bun main via merge (last: 39602705, upstream da3851e5).
-  # Vendor patch files (patches/zstd/ohos-qsort-r.patch) are committed directly
-  # in the source tree; ninja applies them during the build.
+  # OHOS patches pre-applied on ohos-aarch64 branch, kept in sync with upstream via merge.
+  # Vendor patches committed directly in source tree.
 
   def install
-    # buildpath = bun source root; OHOS patches come pre-applied on the ohos-aarch64 branch (see above).
-    # Build logic is fully inlined — no external scripts.
+    # buildpath = bun source root; build logic fully inlined — no external scripts.
 
     llvm     = Formula["llvm@21"]
     webkit   = Formula["bun-webkit"]
     boot     = Formula["bun-bootstrap"]
 
-    # ── Persistent build cache (vendor tarballs + webkit) ──
-    # Default cacheDir is $HOME/.bun/build-cache, but brew's HOME is the
-    # per-build .brew_home — the cache would be wiped every run and every
-    # vendor tarball re-downloaded (GitHub is unreliable/blocked on OHOS).
-    # HOMEBREW_CACHE persists across runs (same convention as
-    # ohos-opencode.rb's bun-install-cache); pass --cache-dir so
-    # fetch-cli/webkit both hit it; pre-seed <cache_dir>/tarballs to build
-    # fully offline. Unlike rust_home below this holds no executables, so it
-    # does not need to live on EL2.
+    # Persistent build cache: brew's HOME is per-build .brew_home — cache would be wiped
+    # each run and every vendor tarball re-downloaded. HOMEBREW_CACHE persists across runs.
     cache_dir = HOMEBREW_CACHE/"bun-build-cache"
 
-    # ── Pre-populate WebKit cache (bun bd's fetch checks .identity to skip download) ──
-    # Single source of truth for the WebKit commit is bun-webkit.rb's pinned
-    # revision — read it from the formula instead of duplicating the hash here.
+    # Pre-populate WebKit cache from bun-webkit formula (single source of truth for the commit).
+    # bun bd checks .identity to skip download.
     webkit_ver = webkit.stable.specs[:revision]
     wc = cache_dir/"webkit-#{webkit_ver[0...16]}-ohos-arm64"
     wc.mkpath
@@ -116,12 +89,8 @@ class Bun < Formula
       ln_sf formula_opt_lib("icu4c@78")/a, wc/"lib"/a
     end
 
-    # ── Scaffold build/ohos-icu/{target,host} layout for bun's config.ts ──
-    # bun config.ts:1013 defaults ohosIcuDir = <cwd>/build/ohos-icu/target,
-    # which is the wrapper's build-icu.sh output path. Brew install never runs
-    # build-icu.sh, so point this layout at icu4c@78 formula instead.
-    # webkit.ts:472 also resolves hostBin = <ohosIcuDir>/../host/bin for ICU
-    # data tools (genrb/genccode/gencmn/pkgdata) — symlink those too.
+    # Scaffold build/ohos-icu layout for bun's config.ts (defaults to wrapper's build-icu.sh path).
+    # Point at icu4c@78 formula instead.
     icu = Formula["icu4c@78"]
     (buildpath/"build/ohos-icu/target/include").mkpath
     ln_sf icu.opt_include/"unicode", buildpath/"build/ohos-icu/target/include/unicode"
@@ -134,11 +103,8 @@ class Bun < Formula
       ln_sf icu.opt_bin/t, buildpath/"build/ohos-icu/host/bin"/t if (icu.opt_bin/t).exist?
     end
 
-    # ── bun install (bun.lock committed on ohos-aarch64 branch matches package.json) ──
-    # bun.lock was updated to remove ohos-signpost (replaced by in-process ohos_sign crate).
-    # bun install resolves all packages from ~/.bun/install/cache without network access.
-    # (bun-tracestrings: github-hosted dep; GitHub is blocked on OHOS but the package is pre-cached
-    # at @GH@oven-sh-bun.report-912ca63@@@1 so no download is attempted.)
+    # bun.lock on ohos-aarch64 branch matches package.json.
+    # All packages pre-cached, no network access needed.
     ENV.prepend_path "PATH", boot.opt_bin
     ENV.prepend_path "PATH", llvm.opt_bin
     system "bun", "install"
@@ -146,19 +112,12 @@ class Bun < Formula
     # subsequent `bun install --frozen-lockfile` can verify without network.
     system "bun", "install", "--cwd", "src/node-fallbacks"
 
-    # ── Rust nightly (persistent cache keyed by toolchain date; skips reinstall+signing if already done) ──
-    # Tier-3 / -Zbuild-std / rust-src rationale: see the resource blocks above.
     rust_ver = resource("rust-nightly").version.to_s # e.g. "nightly-2026-07-20"
-    # rust_home must stay on EL2 (not HOMEBREW_CACHE/HOME): these binaries are
-    # exec'd after signing, and the EL3 hmmac policy refuses to exec signed
-    # ELFs outside EL2.
+    # rust_home must stay on EL2 (exec'd after signing; EL3 hmmac refuses non-EL2 exec).
     rust_home = Pathname.new("/data/storage/el2/base/tmp/rust-#{rust_ver}")
     rust_ready = rust_home/"BREW_SIGNED_OK"
 
-    # The toolchain is shared mutable state outside the keg; concurrent brew
-    # sessions (a known failure mode on this tap) racing the install+sign
-    # sequence corrupt it — serialize via flock, re-checking the sentinel
-    # under the lock.
+    # Shared mutable state: flock serializes concurrent brew sessions.
     rust_home.mkpath
     File.open(rust_home/".brew-install-lock", File::CREAT | File::RDWR) do |lock|
       lock.flock(File::LOCK_EX)
@@ -171,7 +130,7 @@ class Bun < Formula
           system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
         end
 
-        # ── Sign the rust binaries (OHOS kernel refuses to exec unsigned ELF → cargo exits 127) ──
+        # Sign rust binaries (OHOS refuses to exec unsigned ELF).
         sign_tool = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
         Dir.glob(rust_home/"**/*").each do |f|
           next unless File.file?(f)
@@ -189,26 +148,21 @@ class Bun < Formula
       end
     end
 
-    # ── Build environment (PATH + env) ──
-    # lld from llvm@21 has runtime deps on libxml2/zlib; brew superenv strips system lib paths,
-    # so inject them explicitly so ld.lld can find them (consistent with bun-webkit).
+    # lld from llvm@21 needs libxml2/zlib; rust cargo needs libssl/libcrypto.
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("libxml2").to_s
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib").to_s
-    # rust-nightly cargo NEEDS libssl.so/libcrypto.so (brew openssl@3);
-    # without injecting, musl startup hits "Error relocating ... symbol not found" → exit 127.
+    # openssl@3 provides libssl/libcrypto for rust cargo.
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3").to_s
     # llvm@21 only ships llvm-strip; the bun build script needs strip.
     mkdir_p buildpath/".bin"
     ln_sf llvm.opt_bin/"llvm-strip", buildpath/".bin/strip"
-    # bun flags.ts expects ohosCrossLibs to contain libcxx/include/v1/ and libcxxabi/include/.
+    # Scaffold ohos-cross-libs layout for bun's flags.ts.
     ohos_cross = buildpath/"build/ohos-cross-libs"
     (ohos_cross/"libcxx/include").mkpath
     (ohos_cross/"libcxxabi").mkpath
     ln_sf llvm.opt_include/"aarch64-linux-ohos/c++/v1", ohos_cross/"libcxx/include/v1"
     ln_sf llvm.opt_include/"aarch64-linux-ohos/c++/v1", ohos_cross/"libcxxabi/include"
-    # flags.ts links only `-lc++ -lc++abi -lunwind` across the three -L dirs
-    # (verified at ohos-aarch64 HEAD), so seed each dir with just its own
-    # archive instead of mirroring every *.a everywhere.
+    # Each dir seeded with just its own archive; flags.ts links only -lc++ -lc++abi -lunwind.
     {
       "libcxx"    => "libc++.a",
       "libcxxabi" => "libc++abi.a",
@@ -217,10 +171,8 @@ class Bun < Formula
       (ohos_cross/d/"lib").mkpath
       ln_sf llvm.opt_lib/"aarch64-linux-ohos"/a, ohos_cross/d/"lib"/a
     end
-    # Use llvm@21's cc/c++ shims (HOMEBREW_PREFIX/bin/cc, c++) — they wrap clang 21
-    # with LLD --code-sign. This replaces the legacy clang-sign wrapper that ran
-    # binary-sign-tool after linking.
-    # Put bootstrap bun in PATH: `bun bd` is itself a bun script, so a working bun must exist first.
+    # llvm@21 cc/c++ shims wrap clang with LLD --code-sign (replaces legacy clang-sign wrapper).
+    # bootstrap bun in PATH: `bun bd` is itself a bun script.
     ENV.prepend_path "PATH", buildpath/".bin"
     ENV.prepend_path "PATH", boot.opt_bin
     ENV.prepend_path "PATH", llvm.opt_bin
@@ -234,16 +186,11 @@ class Bun < Formula
     ENV["RUSTUP_TOOLCHAIN"] = rust_ver
     ENV["OHOS_LLVM_PREFIX"]  = llvm.opt_prefix.to_s
     ENV["OHOS_WEBKIT_ROOT"]  = webkit.opt_prefix.to_s
-    # LLD --code-sign injects .codesign at link time (llvm@21 CodeSign patch).
-    # cc/c++ are llvm@21 shims that already pass -Wl,--code-sign; set them as
-    # CC/CXX so cargo build-script artifacts are signed on exec.
     ENV["OHOS_BUN_SIGNING_LINKER"] = (HOMEBREW_PREFIX/"bin/c++").to_s
     ENV["CC"]  = (HOMEBREW_PREFIX/"bin/cc").to_s
     ENV["CXX"] = (HOMEBREW_PREFIX/"bin/c++").to_s
-    # No CARGO_BUILD_JOBS cap: the historical ETXTBSY came from the llvm@21
-    # cc/c++ shims re-signing outputs in-place with no sync barrier; the shim
-    # now signs at link time only (LLD --code-sign). Verified zero ETXTBSY at
-    # full parallelism in CI (ohos-build.yml).
+    # No CARGO_BUILD_JOBS cap: the old ETXTBSY came from cc/c++ shims re-signing in-place;
+    # the shim now signs at link time only. Verified zero ETXTBSY in CI.
     ENV["TMPDIR"] = "/data/storage/el2/base/tmp"
 
     # ── Build: bun scripts/build.ts (equivalent to invoking `bun bd`) ──
@@ -259,40 +206,30 @@ class Bun < Formula
     # (stripped, ~105MB). Prefer the stripped version — smaller and ready-to-run.
     out = buildpath/"build/release/bun"
     odie "bun binary missing after build: #{out}" unless out.exist?
-    # The OHOS kernel refuses to exec unsigned ELF. The bun build system does not sign itself
-    # (the signing tool is OHOS-specific), so sign explicitly after install.
+    # Sign bun binary (OHOS refuses to exec unsigned ELF).
     sign_tool = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
     unsigned = "#{out}.unsigned"
     mv out, unsigned
     system sign_tool, "sign", "-selfSign", "1", "-inFile", unsigned, "-outFile", out
     chmod 0755, out
     rm unsigned
-    # Compat shim is statically linked (see the Dependencies note above) —
-    # no LD_PRELOAD wrapper. The real ELF stays at libexec/bin/bun,
-    # symlinked from bin/bun.
-    # The symlink MUST be relative and keg-internal: install_symlink with an
-    # opt_libexec target resolves through the *previous* version's opt link
-    # during upgrade installs (pathname.rb install_symlink_p realpaths src
-    # when its dirname exists), producing a symlink into the old keg that
-    # dangles — and vanishes — once cleanup removes that keg (this exact
-    # failure shipped the r32 bottle without bin/bun).
+    # Relative symlink (not install_symlink): the latter realpaths through the previous
+    # version's opt link during upgrades, producing a dangling symlink once cleanup removes
+    # the old keg (this shipped the r32 bottle without bin/bun).
     mkdir_p libexec/"bin"
     libexec.install out => "bin/bun" # mv preserves the 0755 set above
     bin.mkpath
     (bin/"bun").make_symlink "../libexec/bin/bun"
 
-    # Static shell completions shipped in the source tree (same as the
-    # official homebrew-core bun formula).
+    # Static shell completions shipped in source tree.
     bash_completion.install "completions/bun.bash" => "bun"
     fish_completion.install "completions/bun.fish"
     zsh_completion.install "completions/bun.zsh" => "_bun"
   end
 
   def post_install
-    # Pre-cache node-gyp@11 in bunx cache so napi tests don't timeout
-    # on first download when running in parallel.
-    # Brew sandbox may set a TMPDIR with mismatched ownership; use the
-    # standard EL2 tmp which the current user owns.
+    # Pre-cache node-gyp@11 so napi tests don't timeout on first download.
+    # Brew sandbox TMPDIR has mismatched ownership; use EL2 tmp.
     ENV["TMPDIR"] = "/data/storage/el2/base/tmp"
     ENV.prepend_path "PATH", formula_opt_bin("node")
     system bin/"bun", "--bun", "x", "node-gyp@11", "--version"
@@ -320,18 +257,8 @@ class Bun < Formula
     assert_match "4294967296", shell_output("#{bin}/bun -e 'console.log(2**32)'")
     assert_match version.to_s, shell_output("#{bin}/bun --version")
 
-    # `bun install` must self-sign the native binaries it materializes into
-    # node_modules: the OHOS kernel refuses to dlopen an ELF with no
-    # `.codesign` section, so an unsigned .node makes every native addon
-    # unusable (ERR_DLOPEN_FAILED, "Permission denied"). Regression test for
-    # r37, which shipped for several revisions unable to sign anything.
-    #
-    # The fixture installs from a local tarball, so it takes the same
-    # extraction path as a registry package with no network, and it is scoped
-    # so the binary lands nested at node_modules/@fixture/native/. Nesting is
-    # what makes this a regression test: a scan that joins the directory
-    # walker's basename instead of its root-relative path writes to a
-    # nonexistent path and silently leaves the binary unsigned.
+    # Regression test for r37: bun install must self-sign native .node files
+    # (unsigned → ERR_DLOPEN_FAILED). Tests both hoisted and isolated linker layouts.
     shstrtab = "\0.text\0.shstrtab\0".b
     text_off = 64
     text_size = 16
@@ -383,16 +310,8 @@ class Bun < Formula
     refute_predicate installed, :symlink?
     assert_includes installed.binread, ".codesign"
 
-    # Same check under the isolated linker, which materializes each package
-    # once in node_modules/.bun/ and symlinks node_modules/<pkg> at it. The
-    # hoisted scan must not follow those symlinks (`file:` and workspace deps
-    # resolve to the user's own sources), so store entries are signed where
-    # they are created — untested, that whole layout shipped unsigned.
-    # Glob rather than hardcode the store path, and require every copy found
-    # to be signed: Dir.glob does not descend into symlinks, so this sees the
-    # real store file. FNM_DOTMATCH is required — the store lives in the dot
-    # directory node_modules/.bun, which a plain ** will not enter, and
-    # refute_empty then turns any layout change into a loud failure.
+    # Isolated linker: each package materialized once in .bun/ store. Must sign
+    # store copies, not follow symlinks. FNM_DOTMATCH required for .bun dir.
     (testpath/"app-isolated").mkpath
     (testpath/"app-isolated/package.json").write manifest
     cd testpath/"app-isolated" do

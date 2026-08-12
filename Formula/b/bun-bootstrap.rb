@@ -24,8 +24,7 @@ class BunBootstrap < Formula
   keg_only "bootstrap only; not for direct use"
 
   def install
-    # Tarball contains bun already signed by binary-sign-tool (signed at build time — see bun.rb's install).
-    # No strip+resign needed here.
+    # Tarball contains pre-signed bun.
     libexec.install Dir["*"]
     bin.install_symlink libexec/"bun" => "bun"
   end

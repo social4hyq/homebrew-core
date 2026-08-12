@@ -18,15 +18,12 @@ class NodeOhos < Formula
   keg_only "alternate toolchain build of node; the harmonybrew/core node formula " \
            "is the default for general use"
 
-  # Compiler toolchain — see the long comment in install() for why this
-  # exists at all.
+  # Toolchain rationale: see the long comment in install().
   depends_on "llvm@21" => :build
   depends_on "ohos-sdk" => :build
   depends_on "python@3.14" => :build
 
-  # We track major/minor from upstream Node releases, same as upstream's own
-  # node.rb — the version bundled in deps/npm is intentionally not used
-  # (--without-npm below).
+  # Track npm version independently from node releases (--without-npm below).
   resource "npm" do
     url "https://registry.npmjs.org/npm/-/npm-11.19.0.tgz"
     sha256 "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75"
@@ -42,23 +39,9 @@ class NodeOhos < Formula
   deny_network_access! [:build, :postinstall]
 
   def install
-    # harmonybrew/core's node formula builds Node.js/V8 in an Alpine Linux
-    # chroot with Alpine's native GCC, statically linking GNU libstdc++ —
-    # a workaround for the OHOS SDK's bundled clang 15 being too old to
-    # compile Node 26, predating this tap's own llvm@21. That produces a
-    # binary whose exported v8:: symbols mangle with GNU libstdc++'s ABI
-    # (plain std::optional<...>, no inline namespace), permanently
-    # incompatible with nan/node-gyp addons built against llvm@21's libc++
-    # (std::__n1::optional<...>) — including addons that work fine under
-    # bun, which already links llvm@21. Building node itself against
-    # llvm@21 fixes both problems at once: llvm@21 has the C++20 stdlib
-    # pieces (e.g. <source_location>) the OHOS SDK clang lacks, and its
-    # exported symbols match what llvm@21-built native addons expect.
-    #
-    # Verified on real hardware: full build compiles clean, passes this
-    # formula's own smoke tests (console.log, ICU/Intl, WASI), and a
-    # nan-style addon (@datadog/pprof) dlopens and profiles real data
-    # against this build with no manual LD_PRELOAD needed by the caller.
+    # harmonybrew/core's node builds with Alpine GCC (GNU libstdc++ ABI), incompatible with
+    # llvm@21-built nan/node-gyp addons (libc++ __n1 ABI). Building node itself against llvm@21
+    # fixes both: C++20 stdlib pieces the SDK clang lacks, and matching exported symbols.
     llvm = Formula["llvm@21"]
     ENV["CC"]  = (llvm.opt_bin/"clang").to_s
     ENV["CXX"] = (llvm.opt_bin/"clang++").to_s
@@ -71,31 +54,14 @@ class NodeOhos < Formula
     # make sure subprocesses spawned by make are using our Python 3
     ENV["PYTHON"] = which("python3.14")
 
-    # Only drop deps/npm — deps/icu-small is kept. Despite the legacy
-    # name, node's official release tarballs have shipped *full* ICU data
-    # there for years (confirmed: 34MB, marked by
-    # deps/icu-small/README-FULL-ICU.txt), and --with-intl defaults to
-    # full-icu using exactly that canned copy when no other ICU source is
-    # given — no network access needed, no external ICU dependency
-    # needed. An earlier version of this formula deleted deps/icu-small
-    # and linked against a formula-provided icu4c@78 instead
-    # (--with-intl=system-icu), which needed its own LD_PRELOAD wrapper
-    # (see the devendoring comment on ignored_shared_flags below for why)
-    # — entirely self-inflicted, once it turned out the bundled copy
-    # already did the job.
+    # Keep deps/icu-small (ships full ICU data despite the name). --with-intl defaults to
+    # full-icu using the bundled copy — no external ICU dependency needed.
     rm_r("deps/npm")
 
     # Never install the bundled "npm", always prefer our installation from
     # tarball for better packaging control.
-    # No --openssl-use-def-ca-store: that flag makes node look for a CA
-    # bundle at OpenSSL's compiled-in *system* path at runtime, which
-    # isn't reliably populated on this platform — CI failed with
-    # "UNABLE_TO_GET_ISSUER_CERT_LOCALLY" the one time this was tried
-    # (npm install couldn't TLS-verify registry.npmjs.org). Omitting the
-    # flag falls back to node's default: a Mozilla CA bundle compiled
-    # directly into the binary, so there's no runtime file to be missing.
-    # harmonybrew/core's own node/node@22/node@24 formulas don't pass any
-    # openssl/CA flag either, for the same reason.
+    # No --openssl-use-def-ca-store: the compiled-in system CA path isn't populated on OHOS.
+    # Omitting it uses Mozilla CA bundle compiled into the binary (no runtime file).
     args = %W[
       --prefix=#{prefix}
       --dest-os=openharmony
@@ -104,30 +70,10 @@ class NodeOhos < Formula
       --disable-single-executable-application
     ]
 
-    # An earlier version of this formula devendored every one of node's
-    # optional deps (--shared-uv, --shared-openssl, --shared-brotli, ...)
-    # against formula-provided copies, mirroring upstream
-    # Homebrew/homebrew-core's own node.rb. That turned out to be the
-    # wrong call for *this* formula specifically: OHOS's dlopen() puts
-    # every loaded module in its own linker namespace, so a nan/node-gyp
-    # addon loaded via require() can't resolve symbols back into any
-    # already-loaded library unless that specific library was itself
-    # linked with -Wl,-z,global (DF_1_GLOBAL) — true not just for
-    # libnode.so (fixed via common.gypi below) but for every one of those
-    # devendored .so's too. We can add that flag to libnode.so's own
-    # build, but not to harmonybrew/core's independently-built
-    # libuv/brotli/etc. bottles without rebuilding them ourselves.
-    # Verified on real hardware: a nan-based addon (@datadog/pprof) failed
-    # to dlopen on uv_async_init — from libuv, one of these devendored
-    # deps — even with libnode.so correctly marked global.
-    #
-    # harmonybrew/core's own node/node@22/node@24 formulas independently
-    # arrived at the same answer: none of them devendor anything either
-    # (zero `depends_on` beyond their Alpine chroot build tools, plain
-    # `--partly-static`). So none of node's deps are devendored here: without
-    # a --shared-* flag they compile from node's own bundled deps/ sources
-    # straight into libnode.so, inheriting its -Wl,-z,global instead of
-    # needing their own.
+    # Don't devendor node's deps (--shared-uv, etc.): OHOS dlopen() namespace isolation means
+    # addons can't resolve symbols from independently-linked .so's without -Wl,-z,global on each.
+    # We can add that flag to libnode.so but not to harmonybrew/core's libuv/brotli bottles.
+    # harmonybrew/core's own node formulas independently arrived at the same answer (no devendoring).
     ignored_shared_flags = %w[
       ada
       brotli
@@ -163,23 +109,9 @@ class NodeOhos < Formula
       end
     end
 
-    # OHOS's dlopen() puts every loaded module in its own linker namespace,
-    # so a nan/node-gyp addon loaded via require() can't resolve symbols
-    # back into libnode.so unless it was itself linked with -Wl,-z,global
-    # (DF_1_GLOBAL) — otherwise every such addon fails with "Error
-    # relocating ...: symbol not found" for perfectly-exported symbols
-    # like node::AddEnvironmentCleanupHook. This is threaded through to
-    # common.gypi rather than set via ENV["LDFLAGS"], because that's the
-    # only place a flag reliably reaches the *final* link step here:
-    # CC/CXX above are absolute paths to llvm@21 (to sidestep Homebrew's
-    # CompilerSelectionError, which only recognizes a bare `clang` on
-    # PATH), so `make` invokes the compiler directly and never goes
-    # through this tap's superenv shim — an ENV.append "LDFLAGS" would
-    # never reach the link command, and node's own configure.py doesn't
-    # read $LDFLAGS either. harmonybrew/core's own python@3.12/3.13/3.14
-    # and zsh formulas rely on the same flag for the same reason (their
-    # own dlopen'd C-extension/module loaders), just via a plain LDFLAGS
-    # append since their build systems do read it.
+    # OHOS dlopen namespace isolation: addons can't resolve libnode.so symbols unless it's
+    # linked with -Wl,-z,global (DF_1_GLOBAL). Threaded through common.gypi (not LDFLAGS)
+    # because absolute CC/CXX paths bypass superenv. See CLAUDE.md OHOS dlopen note.
     inreplace "common.gypi" do |s|
       s.sub!(
         "'ldflags': [ '-rdynamic' ],",
@@ -230,12 +162,7 @@ class NodeOhos < Formula
   end
 
   test do
-    # Keg-only, so `bin` isn't on PATH by default. The explicit `#{bin}/...`
-    # invocations below don't need this, but npm's own install of itself
-    # spawns child processes/scripts with a bare `#!/usr/bin/env node`
-    # shebang that does need `node` resolvable via PATH — without this,
-    # `npm install npm@latest` fails with "env: 'node': No such file or
-    # directory" even though npm itself was invoked by full path.
+    # Keg-only: prepend bin to PATH for npm's bare `#!/usr/bin/env node` shebang.
     ENV.prepend_path "PATH", bin
 
     path = testpath/"test.js"

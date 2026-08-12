@@ -24,43 +24,19 @@ class Herdr < Formula
   def install
     ENV.prepend_path "PATH", formula_opt_bin("zig@0.15")
 
-    # herdr's build.rs invokes `zig build` (see below) to compile the
-    # vendored libghostty-vt (Ghostty's VT parser, in vendor/libghostty-vt)
-    # into a static lib that cargo then links in. libghostty-vt's
-    # build.zig.zon has one non-lazy dependency (uucode, for Unicode table
-    # generation) that zig fetches from deps.files.ghostty.org on a cache
-    # miss. This tap's local OHOS dev container couldn't reach that specific
-    # host at all (2026-08-07: plain TCP connect to its Cloudflare edge IP
-    # timed out, while github.com/crates.io/even other Cloudflare-fronted
-    # hosts worked fine from the same container — looks like an IP-range
-    # block on this one path, not a blanket Cloudflare/CDN restriction, and
-    # GitHub-hosted CI runners are on a completely different network so may
-    # well not hit this at all). Whether or not CI ever needs it, point the
-    # cache at a location that survives across builds (same "prewarm before
-    # building" shape as ohos-bun's BUN_INSTALL_CACHE_DIR/
-    # BUN_BUILD_PREFETCH_DIR, not a fresh buildpath-relative dir) so this
-    # verified-flaky fetch only has to succeed once per machine, not
-    # on every single build.
+    # libghostty-vt's build.zig.zon has a non-lazy dep (uucode) fetched from deps.files.ghostty.org,
+    # which is unreachable from this container. Persistent cache ensures the fetch only
+    # needs to succeed once per machine.
     ENV["ZIG_GLOBAL_CACHE_DIR"] = (HOMEBREW_CACHE/"herdr-zig-global-cache").to_s
 
-    # build.rs's zig_target() maps Rust's TARGET triple onto a zig -Dtarget
-    # string via a fixed match table, and panics on anything not in it.
-    # aarch64-unknown-linux-ohos (this tap's native rustc host triple — see
-    # the "OHOS 容器 cargo/napi 原生 host 编译" note; no cross-compiling
-    # involved) isn't in the table. OHOS is aarch64 + musl libc, same as the
-    # existing aarch64-unknown-linux-musl entry, so route it onto that same
-    # zig target: the resulting static lib is plain object code that gets
-    # linked into the final binary by rustc's own (OHOS-aware) linker, not
-    # by zig, so zig itself never needs to know "ohos" as a distinct target.
+    # build.rs maps Rust TARGET to zig -Dtarget via a fixed match table that panics on unknowns.
+    # aarch64-unknown-linux-ohos isn't in it; route onto aarch64-linux-musl (same libc/ABI).
+    # The static lib is plain object code linked by rustc's own linker, not zig.
     musl_arm = "\"aarch64-unknown-linux-musl\" => \"aarch64-linux-musl\","
     ohos_arm = "\"aarch64-unknown-linux-ohos\" => \"aarch64-linux-musl\","
     inreplace "build.rs", musl_arm, "#{musl_arm}\n        #{ohos_arm}"
 
-    # OHOS linking fix (same root cause as starship.rb/zellij.rb): rust libc
-    # crate declares strerror_r's link_name as __xpg_strerror_r (glibc XPG
-    # variant) for OHOS targets, but OHOS musl's dynamic libc doesn't export
-    # that symbol. Any std-using binary that formats an io::Error hits this
-    # at link time.
+    # OHOS strerror_r link fix — same approach as starship.rb.
     (buildpath/"strerror_shim.rs").write <<~RUST
       #[no_mangle]
       pub extern "C" fn __xpg_strerror_r(errnum: i32, buf: *mut u8, buflen: usize) -> i32 {
@@ -72,26 +48,10 @@ class Herdr < Formula
            "-O", "strerror_shim.rs", "-o", "strerror_shim.o"
     ENV["RUSTFLAGS"] = "-C link-arg=#{buildpath}/strerror_shim.o"
 
-    # zig's *own* bundled linker — not this tap's patched LLD, which is what
-    # normally stamps the OHOS CodeSign section onto everything built via
-    # the supervised rustc/cc pipeline (see CLAUDE.md's "签名两层" note) —
-    # produces several intermediate ELFs during `zig build` that zig then
-    # execs directly, itself: a "build runner", and (for libghostty-vt
-    # specifically) a chain of Unicode-table codegen tools
-    # (uucode_build_tables -> props-unigen/symbols-unigen -> combine_archives).
-    # None of those pass through the supervised toolchain, so none carry a
-    # codesign section, and OHOS refuses to exec them (AccessDenied). This
-    # is a zig-the-build-tool problem, not a herdr problem — it doesn't
-    # touch the final herdr binary at all, which rustc/lld link and sign
-    # normally. Verified empirically on real hardware 2026-08-07: `zig
-    # build-exe`/`build-obj` (single-artifact compiles) never hit this —
-    # only `zig build`'s multi-step orchestration does, because that's what
-    # spawns those intermediate tools. A cold `cargo build` (no warm zig
-    # cache at all) converges after self-signing ~6 such paths as they turn
-    # up, one AccessDenied at a time; self-sign (not binary-sign-tool — see
-    # ohos-bst-light.rb) preserves their ELF structure enough to run, and
-    # zig's own build cache (keyed by source hash, not output checksum)
-    # doesn't mind the external modification on replay.
+    # zig's own linker (not this tap's patched LLD) produces intermediate ELFs during `zig build`
+    # that it execs directly — these lack codesign sections, so OHOS refuses to exec them.
+    # self-sign each as AccessDenied errors surface; zig's cache (keyed by source hash) tolerates it.
+    # Cold build converges after ~6 self-sign retries. Doesn't affect the final herdr binary.
     self_sign = formula_opt_bin("ohos-bst-light")/"self-sign"
     zig_cache_glob = (buildpath/"vendor/libghostty-vt/.zig-cache/o/*").to_s
 
@@ -107,12 +67,8 @@ class Herdr < Formula
         output = e.output&.map(&:last)&.join.to_s
         odie "cargo install did not converge after #{max_attempts} attempts:\n#{output}" if attempts >= max_attempts
 
-        # Only the basename is reliable: the path zig prints is relative to
-        # whichever process's cwd emitted it (zig's own vs. cargo's build
-        # script sandbox), which varies. Signing every matching basename
-        # anywhere under .zig-cache/o/*/ sidesteps that entirely — zig
-        # build graphs run in parallel, so more than one tool can come up
-        # denied in a single attempt.
+        # Path zig prints varies by emitting process's cwd; sign every matching basename
+        # under .zig-cache/o/*/ (parallel build graph may produce multiple).
         basenames = output.scan(/([A-Za-z0-9_.-]+): AccessDenied/).flatten.uniq
         odie "cargo install failed (no AccessDenied path found):\n#{output}" if basenames.empty?
 

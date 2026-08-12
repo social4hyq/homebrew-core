@@ -5,13 +5,10 @@ class LlvmAT21 < Formula
   sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
   license "Apache-2.0" => { with: "LLVM-exception" }
   revision 5
-  # This formula is fully rewritten from upstream because HarmonyOS requires an
-  # OHOS code-sign patch (CodeSign.cpp in lld/ELF), config.guess stubbing,
-  # and two separate runtime builds (compiler-rt + multiarch libc++/libcxxabi/libunwind).
+  # Fully rewritten from upstream: OHOS code-sign patch, config.guess stub,
+  # two separate runtime builds (compiler-rt + multiarch libc++).
 
-  # Pinned to the 21.x line to keep the libc++ ABI compatible with bun.
-  # A bare ^llvmorg regex matches every tag and livecheck would propose
-  # 22.x; anchor the capture to 21 so only 21.x point releases are tracked.
+  # Pinned to 21.x for libc++ ABI compatibility with bun.
   livecheck do
     url :stable
     regex(/^llvmorg[._-]v?(21(?:\.\d+)+)$/i)
@@ -43,9 +40,7 @@ class LlvmAT21 < Formula
   TARGET_TRIPLE = "aarch64-linux-ohos".freeze
   COMPILERS     = %w[clang clang++].freeze
 
-  # Tools borrowed from ohos-sdk (LLVM 15) via relative symlinks.
-  # ELF/DWARF/IR formats stable across LLVM 15-21.
-  # See docs/superpowers/specs/2026-06-24-slim-llvm21-bottle-design.md (bin/ symlink list).
+  # Tools borrowed from ohos-sdk (LLVM 15) via relative symlinks; ELF/DWARF formats stable.
   KEEP_TOOLS_FROM_SDK = %w[
     llvm-ar llvm-ranlib llvm-nm llvm-objcopy llvm-objdump
     llvm-readelf llvm-readobj llvm-strip llvm-cxxfilt
@@ -151,8 +146,7 @@ class LlvmAT21 < Formula
                   "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib " \
                   "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zstd/lib"
     args << "-Dzstd_ROOT=#{formula_opt_prefix("zstd")}"
-    # Point at the static archive: LLVM_USE_STATIC_ZSTD=ON (above) links zstd
-    # statically; naming the .so here was silently overridden (r2 verification: git history).
+    # Point at the static archive: LLVM_USE_STATIC_ZSTD=ON (above) links zstd statically.
     args << "-Dzstd_LIBRARY=#{formula_opt_lib("zstd")}/libzstd.a"
     common_linker_flags = "-Wl,--code-sign -Wl,--build-id=sha1 " \
                           "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack #{rpath_flags}"
@@ -165,17 +159,12 @@ class LlvmAT21 < Formula
             ";-DCMAKE_CXX_FLAGS=-D__MUSL__ -isystem #{libcxx_ohos}"
 
     # --- Bootstrap slim mode (see docs/superpowers/specs/2026-06-24-slim-llvm21-bottle-design.md)
-    # Note: CLANG_BUILD_TOOLS=OFF / LLVM_BUILD_TOOLS=OFF would skip clang driver and
-    # llvm-config themselves (gates `add_clang_executable` / `add_llvm_tool`), so we
-    # keep them ON and prune post-install instead.
+    # CLANG_BUILD_TOOLS/LLVM_BUILD_TOOLS stay ON (gates llvm-config); prune post-install.
 
     llvmpath = buildpath/"llvm"
 
-    # Fix cmake 4.x compatibility: cmake 4's if() parser no longer
-    # accepts inner parentheses or ${} dereferences.  Remove all of
-    # them from the MSVC version-check block (not relevant for OHOS/clang).
-    # One inreplace per pattern so a changed/vanished upstream line raises
-    # here instead of silently no-op'ing (gsub! returns nil on no match).
+    # Fix cmake 4.x: if() parser rejects inner parens. One inreplace per pattern
+    # so a vanished upstream line raises instead of silently no-op'ing.
     ccv = llvmpath/"cmake/modules/CheckCompilerVersion.cmake"
     inreplace ccv,
       "if ((${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC) AND",
@@ -187,8 +176,7 @@ class LlvmAT21 < Formula
       "    (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 19.25))",
       "    CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.25)"
 
-    # Fix cmake 4.x LINKER:--version-script → clang++ doesn't recognise the
-    # bare --version-script flag that cmake 4 produces. Patch to the raw -Wl,--version-script form.
+    # Fix cmake 4.x LINKER:--version-script → -Wl,--version-script (clang++ doesn't recognize bare form).
     inreplace buildpath/"clang/tools/clang-shlib/CMakeLists.txt",
       "LINKER:--version-script,${CMAKE_CURRENT_BINARY_DIR}/simple_version_script.map",
       "-Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/simple_version_script.map"
@@ -216,8 +204,7 @@ class LlvmAT21 < Formula
     return if config_guess.read(64).include?("Stubbed for HarmonyOS")
 
     cp(config_guess, "#{config_guess}.orig")
-    # brew extends Pathname#write to refuse overwriting existing files —
-    # use File.write to bypass that safety check.
+    # brew extends Pathname#write to refuse overwriting existing files — use File.write to bypass.
     File.write(config_guess, <<~SH)
       #!/bin/sh
       # Stubbed for HarmonyOS host build — original at config.guess.orig
@@ -260,11 +247,8 @@ class LlvmAT21 < Formula
     %w[aarch64-unknown-linux-ohos aarch64-linux-ohos].each do |pfx|
       COMPILERS.each do |t|
         w = bin/"#{pfx}-#{t}"
-        # LLVM install already creates triple-prefix entries (symlinks to clang
-        # that derive the target from argv[0]); replace them with explicit
-        # --target= scripts — argv[0] derivation is fragile for a triple clang
-        # doesn't natively know.
-        # File.write bypasses brew's Pathname#write overwrite refusal (see patch_config_guess).
+        # LLVM creates triple-prefix symlinks (argv[0] derivation is fragile); replace with
+        # explicit --target= scripts. File.write bypasses brew's overwrite refusal.
         File.write(w, <<~SH)
           #!/bin/sh
           exec "$(dirname "$0")/#{t}" --target=#{pfx} "$@"
@@ -399,15 +383,9 @@ class LlvmAT21 < Formula
              "-DLIBCXXABI_USE_COMPILER_RT=ON",
              "-DLIBCXXABI_USE_LLVM_UNWINDER=ON",
              "-DLIBCXX_CXX_ABI=libcxxabi",
-             # __n1 is the only ABI namespace OpenHarmony sanctions for
-             # anything not baked into the OS image (llvm-build/build.py in
-             # third_party_llvm-project sets __h only for the system-image
-             # libc++.so, __n1 for NDK/third-party distribution including
-             # static libs). This toolchain previously used __h; switched
-             # after the three-round investigation recorded in the Workspace
-             # repo's docs/harmony-ohos-porting-guide.md §2.8. bun /
-             # bun-webkit / icu4c@78 are rebuilt in lockstep (same migration
-             # series) — a stale __h ICU bottle will not link against this.
+             # __n1 is the only ABI namespace OHOS sanctions for third-party distribution.
+             # This toolchain previously used __h; switched after porting-guide §2.8 investigation.
+             # bun/bun-webkit/icu4c@78 must match (stale __h won't link).
              "-DLIBCXX_ABI_NAMESPACE=__n1",
              "-DLIBCXX_HAS_MUSL_LIBC=ON",
              "-DLIBCXX_HAS_PTHREAD_API=ON",
@@ -454,11 +432,7 @@ class LlvmAT21 < Formula
     LDSCRIPT
   end
 
-  # bin/ entries preserved by prune_bootstrap_extras. Everything else LLVM
-  # installed (clang-format / clang-tidy / opt / llc / bugpoint / llvm-exegesis
-  # / analyze-build / scan-build / ...) is deleted to slim the bottle.
-  # Triple-prefix wrappers and KEEP_TOOLS_FROM_SDK (handled by
-  # link_overlapping_tools as symlinks) are also preserved.
+  # bin/ entries preserved by prune_bootstrap_extras; everything else deleted to slim bottle.
   KEEP_BIN_ENTRIES = %w[
     clang clang++ clang-21
     clang-cl clang-cpp
@@ -500,8 +474,7 @@ class LlvmAT21 < Formula
   end
 
   def link_overlapping_tools
-    # Build relative symlinks for binutils/diagnostic tools that downstream
-    # cmake find_program / build scripts expect but we don't ship from v21.
+    # Build relative symlinks for binutils/diagnostic tools that downstream expects but we don't ship from v21.
     sdk_bin = formula_opt_prefix("ohos-sdk")/"native/llvm/bin"
     KEEP_TOOLS_FROM_SDK.each do |t|
       src = sdk_bin/t
@@ -514,12 +487,8 @@ class LlvmAT21 < Formula
   end
 
   def post_install
-    # Generate cc/c++ shims in HOMEBREW_PREFIX/bin.
-    # --code-sign is now LLD's default (Driver.cpp codeSign defaults ON), so
-    # every link is auto-signed — no -Wl,--code-sign flag and no link-phase
-    # gating is needed here.
-    # The shim only sets LD_LIBRARY_PATH so lld finds libxml2 and its own libs
-    # (zlib/zstd are baked into RPATH at build time).
+    # Generate cc/c++ shims. --code-sign is LLD's default, so links are auto-signed.
+    # Shim only sets LD_LIBRARY_PATH for lld's libxml2/zlib deps.
     shims = { "cc" => "clang", "c++" => "clang++" }
     shims.each do |shim_name, target|
       shim_path = HOMEBREW_PREFIX/"bin"/shim_name

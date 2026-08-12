@@ -1,20 +1,14 @@
 class QemuAarch64 < Formula
   desc "QEMU user-mode aarch64 emulator — strace substitute for HarmonyOS"
   homepage "https://qemu.org/"
-  # Alpine's prebuilt qemu-aarch64 (user-mode emulator only, no system VM).
-  # Fully static musl binary: readelf shows zero NEEDED entries and no
-  # interpreter, so it runs as-is on OHOS. Official Alpine CDN (same source
-  # family as the libstdc++/libgcc resources in the shim formulae).
+  # Alpine prebuilt qemu-aarch64 (user-mode only). Fully static musl: zero NEEDED,
+  # no PT_INTERP — runs as-is on OHOS.
   url "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/aarch64/qemu-aarch64-11.0.1-r0.apk"
   version "11.0.1-r0"
   sha256 "c7f5a9821064c23f48916ea68dac44565fa961d49ff360fd12e1ea2fd9727a34"
   license all_of: ["GPL-2.0-only", "LGPL-2.1-only"]
-  # Why this exists: on HarmonyOS 6.1, self-signed binaries cannot hold the
-  # ptrace permission, so a self-built strace cannot work. QEMU's user-mode
-  # -strace is implemented purely in userspace (syscalls are intercepted and
-  # forwarded, not virtualized — no ptrace needed), making it the available
-  # syscall-tracing substitute. See:
-  # https://blog.csdn.net/hqzing/article/details/163311519
+  # OHOS refuses ptrace on self-signed binaries; qemu user-mode -strace is userspace
+  # (syscalls intercepted, no ptrace needed). See blog.csdn.net/hqzing/article/details/163311519.
 
   livecheck do
     url "https://pkgs.alpinelinux.org/package/v3.24/community/aarch64/qemu-aarch64"
@@ -30,16 +24,15 @@ class QemuAarch64 < Formula
   depends_on "ohos-bst-light" => :build # self-sign
 
   def install
-    # Guard against the binary-sign-tool auto-sign pass: it double-signs and
-    # corrupts prebuilt binaries (see the SIGNING notes in zig@0.15.rb;
-    # build.sh's UNSET_SIGN_FORMULAS covers CI).
+    # Guard against binary-sign-tool double-sign (corrupts prebuilt binaries).
     if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
       odie "qemu-aarch64 must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
            "(env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN brew install ...): the " \
            "binary-sign-tool pass double-signs and corrupts this prebuilt binary"
     end
 
-    # .apk is a gzip tar; brew may or may not have extracted it already.
+    # .apk is gzip tar; may or may not be pre-extracted. Extract if needed,
+    # then self-sign (preserves ELF structure).
     src = buildpath/"usr/bin/qemu-aarch64"
     unless src.exist?
       apk = buildpath.glob("*.apk").first
@@ -49,8 +42,6 @@ class QemuAarch64 < Formula
     end
     odie "qemu-aarch64 binary not found in apk" unless src.exist?
 
-    # OHOS refuses to exec unsigned ELFs. self-sign (not binary-sign-tool):
-    # it preserves the ELF structure (see ohos-bst-light.rb).
     system formula_opt_bin("ohos-bst-light")/"self-sign", src.to_s
 
     bin.install src
