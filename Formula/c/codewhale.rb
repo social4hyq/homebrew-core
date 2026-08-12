@@ -1,8 +1,8 @@
 class Codewhale < Formula
   desc "Local-first agent harness for DeepSeek V4 and open models"
   homepage "https://github.com/Hmbown/CodeWhale"
-  url "https://github.com/Hmbown/CodeWhale/archive/refs/tags/v0.9.5.tar.gz"
-  sha256 "57957264204f5b7136d64cf62bd11c47de0d0ec0d7eca218902f07712eab1a47"
+  url "https://github.com/Hmbown/CodeWhale/archive/refs/tags/v0.9.6.tar.gz"
+  sha256 "491dc46cfce76ff9bd4803ef99b6eb6c3c6c8293bb2e8a3afbb1877d5f0a2612"
   license "MIT"
   head "https://github.com/Hmbown/CodeWhale.git", branch: "main"
 
