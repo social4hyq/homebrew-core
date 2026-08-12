@@ -11,6 +11,11 @@ class Uv < Formula
     strategy :github_latest
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/uv-v0.12.3-r1"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "d828e4305b1ede83551f22d8d5cc7cf5b98cb49f7be40b4b790a23fd4591705d"
+  end
+
   depends_on "cmake" => :build
   depends_on "ohos-sdk" => :build
   depends_on "pkgconf" => :build
