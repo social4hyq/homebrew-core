@@ -1,8 +1,8 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI — HarmonyOS (runtime-fetch stub; no binary in bottle)"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.227.tgz"
-  sha256 "08eb0f8c188f701b19a845b61ff0f89f48006f3ab06dccba7755d91b3df52fd6"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.228.tgz"
+  sha256 "535e6daa6256689803cef88620e940924d00d274c2c293efe4a33590c2718cc9"
   license :cannot_represent # Anthropic Commercial Terms of Service
   # npmmirror mirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org
   # (aarch64 SIMD AES path trapped by kernel); npmmirror (Aliyun CDN) doesn't.
