@@ -1,8 +1,8 @@
 class Snooze < Formula
   desc "Run a command at a particular time"
   homepage "https://github.com/leahneukirchen/snooze"
-  url "https://github.com/leahneukirchen/snooze/archive/refs/tags/v0.5.1.tar.gz"
-  sha256 "abb0df288e8fe03ae25453d5f0b723b03a03bcc7afa41b9bec540a7a11a9f93e"
+  url "https://github.com/leahneukirchen/snooze/archive/refs/tags/v0.6.tar.gz"
+  sha256 "3a4a2f3f00d42e30647d9af79c8e417990ced6c3f0565474b1ca717938b1e2ab"
   license :public_domain
 
   bottle do
