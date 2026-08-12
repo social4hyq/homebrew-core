@@ -9,7 +9,7 @@ class Dnsrobocert < Formula
   head "https://github.com/adferrand/dnsrobocert.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7965b4e48d9961e77a34f6b82162a48b136777cb07d93099fe3ebdb291d23769"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be5ebf8dbe804b04b0be55ba2cd61a2295cbf02f69423503f2c02b967cff3a4c"
   end
 
   depends_on "rust" => :build
