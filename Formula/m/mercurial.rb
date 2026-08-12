@@ -3,8 +3,8 @@
 class Mercurial < Formula
   desc "Scalable distributed version control system"
   homepage "https://mercurial-scm.org/"
-  url "https://www.mercurial-scm.org/release/mercurial-7.2.3.tar.gz"
-  sha256 "1cb74ca95da021666b5a94a9bdc62f16255a6452f5a84cc2ae71bda8c7dbe36b"
+  url "https://www.mercurial-scm.org/release/mercurial-7.2.4.tar.gz"
+  sha256 "85839e0f39e6cb893a88932aa36ef661759f3c5c5de4551ad26bd9df53cb71a2"
   license "GPL-2.0-or-later"
   compatibility_version 1
 
@@ -14,7 +14,7 @@ class Mercurial < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a97f0fa8cdeb648f5f8320c68a4987194ec78a4ccb347f72da28e07b5546ccda"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3bc88933209f4a20d5b52fd7f08d86b5b25c14f0ee254ed666a16f0abcf025c"
   end
 
   depends_on "python@3.14"
