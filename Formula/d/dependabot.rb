@@ -1,13 +1,13 @@
 class Dependabot < Formula
   desc "Tool for testing and debugging Dependabot update jobs"
   homepage "https://github.com/dependabot/cli"
-  url "https://github.com/dependabot/cli/archive/refs/tags/v1.91.0.tar.gz"
-  sha256 "79b9dd669d39390fe8ea4c8376822774534f0234cffbe7db85bc28aebd23312b"
+  url "https://github.com/dependabot/cli/archive/refs/tags/v1.92.0.tar.gz"
+  sha256 "11a6cbbb69b75428a0abcd85f7e118c87ba18b2d00cc56b3dcf52379e0f54ca3"
   license "MIT"
   head "https://github.com/dependabot/cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f9103ae2b731fd699bf0eafc5fd6ad0f748488dbf960d2680612e54291183ed"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "114268ffe666a1b9a2b6491d298298409f46c5e1b53d1562aaf58fecf0050234"
   end
 
   depends_on "go" => :build
