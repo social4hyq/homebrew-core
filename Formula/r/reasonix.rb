@@ -19,8 +19,9 @@ class Reasonix < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/reasonix-v1.23.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "10a5e0a8f6667ad4bca8d2b9da8838d838939022225b27d1a25f0079a6fb45f9"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/reasonix-v1.23.0-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "219b29c90c38f5d716f6858e9d2da714017a6a47585187878c31534f8c7972be"
   end
 
   # No `bottle do` block yet — bottle-build.yml publishes it and writes
@@ -53,12 +54,12 @@ class Reasonix < Formula
     # binary-sign-tool corrupts genuinely static ELFs with no PT_INTERP/
     # PT_DYNAMIC segment (confirmed: exec → permission-denied/SIGSEGV on a
     # doubly-processed copy of this exact binary), the same failure mode
-    # documented for grok-build's prebuilt static release binary. A
+    # documented for qemu-aarch64's prebuilt static release binary. A
     # CGO_ENABLED=0 Go binary has that exact static shape, so it needs the
     # same treatment: build with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset
     # (UNSET_SIGN_FORMULAS in build.sh covers CI) and do the execution-
     # permission signing here instead, via ohos-bst-light's `self-sign`
-    # (proven safe on this exact static-ELF shape — see grok-build.rb).
+    # (proven safe on this exact static-ELF shape — see qemu-aarch64.rb).
     # self-sign itself refuses to touch a binary that already carries a
     # `.codesign` section ("this tool only adds a signature, it does not
     # strip old ones"), so the toolchain's own first-layer section has to
@@ -107,7 +108,7 @@ class Reasonix < Formula
 
     # Self-reference via opt_libexec (prefix-relative, stable across
     # Cellar/HOMEBREW_CELLAR relocation) rather than libexec — same
-    # reasoning as grok-build.rb / opencode@2.rb. TMPDIR is force-set
+    # reasoning as opencode@2.rb. TMPDIR is force-set
     # (not just defaulted) so every reasonix invocation on this machine
     # shares one config-lock registry path regardless of caller env.
     (bin/"reasonix").write <<~SH
@@ -125,8 +126,8 @@ class Reasonix < Formula
 
       `sandbox.bash` reports unavailable on HarmonyOS (`reasonix doctor --json`
       → sandbox.available: false) — OHOS provides no Landlock/namespace
-      primitive for it, same limitation as grok-build's sandbox modes. Bash
-      tool calls still run, just without that extra confinement layer.
+      primitive for it. Bash tool calls still run, just without that extra
+      confinement layer.
 
       Don't run `reasonix upgrade`: it would fetch an unsigned upstream
       binary and overwrite this Homebrew-managed, self-signed one. Use

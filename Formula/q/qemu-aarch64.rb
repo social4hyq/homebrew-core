@@ -22,16 +22,17 @@ class QemuAarch64 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qemu-aarch64-v11.0.1-r0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca7cf28f055e5542faecb7584aa546f4a6fb1903b6f756c949602fb27ec80f7f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qemu-aarch64-v11.0.1-r0-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0efec74ed85c2cbc49f76c27d38da6d3199343cc9e8e9d4d6c0b49b2a558ee47"
   end
 
   depends_on "ohos-bst-light" => :build # self-sign
 
   def install
     # Guard against the binary-sign-tool auto-sign pass: it double-signs and
-    # corrupts prebuilt binaries (see the SIGNING notes in grok-build.rb /
-    # cc-switch.rb; build.sh's UNSET_SIGN_FORMULAS covers CI).
+    # corrupts prebuilt binaries (see the SIGNING notes in zig@0.15.rb;
+    # build.sh's UNSET_SIGN_FORMULAS covers CI).
     if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
       odie "qemu-aarch64 must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
            "(env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN brew install ...): the " \

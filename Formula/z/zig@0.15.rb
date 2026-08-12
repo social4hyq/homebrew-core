@@ -9,7 +9,7 @@ class ZigAT015 < Formula
   # already ships a static musl aarch64-linux build. Verified 2026-08-07:
   # readelf -h shows a plain AArch64 EXEC, and `readelf -l | grep -i interp`
   # finds no PT_INTERP segment — it's fully static, same shape as
-  # qemu-aarch64/grok-build.
+  # qemu-aarch64.
   url "https://ziglang.org/download/0.15.2/zig-aarch64-linux-0.15.2.tar.xz"
   sha256 "958ed7d1e00d0ea76590d27666efbf7a932281b3d7ba0c6b01b0ff26498f667f"
   license "MIT"
@@ -24,8 +24,9 @@ class ZigAT015 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zig@0.15-v0.15.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "36643e78697dc28ed2638610419ae42aa6bf40be264307da39d25d2ce3701112"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zig@0.15-v0.15.2-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e2dfbd31829f83d2802b272c9ae620d01915112be0a944727d6ee9d4006071a"
   end
 
   # No `bottle do` block yet — CI's pr-validate.yml builds from source,
@@ -40,8 +41,8 @@ class ZigAT015 < Formula
   def install
     # Guard against the binary-sign-tool auto-sign pass: it double-signs and
     # corrupts prebuilt static ELF binaries (see the SIGNING notes in
-    # grok-build.rb / qemu-aarch64.rb; build.sh's UNSET_SIGN_FORMULAS covers
-    # CI). Confirmed 2026-08-07: the raw downloaded `zig` binary already ran
+    # qemu-aarch64.rb; build.sh's UNSET_SIGN_FORMULAS covers CI). Confirmed
+    # 2026-08-07: the raw downloaded `zig` binary already ran
     # clean after a single self-sign pass on real hardware.
     if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
       odie "zig@0.15 must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
@@ -73,9 +74,9 @@ class ZigAT015 < Formula
     libexec.install src.children
 
     # bin/zig execs the real libexec binary directly (opt_libexec, prefix-
-    # relative and stable — same self-reference pattern as grok-build.rb /
-    # zellij.rb), keeping lib/ as its sibling so self-exe-relative lookup
-    # still resolves.
+    # relative and stable — same self-reference pattern as zellij.rb),
+    # keeping lib/ as its sibling so self-exe-relative lookup still
+    # resolves.
     (bin/"zig").write <<~SH
       #!/bin/sh
       export TMPDIR="${TMPDIR:-/data/storage/el2/base/tmp}"
