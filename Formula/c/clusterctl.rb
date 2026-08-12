@@ -17,7 +17,7 @@ class Clusterctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4267c2ea05656e966bad86b1911927d5267596c63ba76e0dadedd39d94ec1b2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6fff0cc157c5fdafe039c858a9989b7fc250fe9d15464cca4fec0328ee3311df"
   end
 
   depends_on "go" => :build
