@@ -1,8 +1,8 @@
 class GlibmmAT266 < Formula
   desc "C++ interface to glib"
   homepage "https://gtkmm.gnome.org/"
-  url "https://download.gnome.org/sources/glibmm/2.66/glibmm-2.66.9.tar.xz"
-  sha256 "5a026e5602085307c7dcb72b71b07261c40f80914277bef5f8d7f2ecab739bec"
+  url "https://download.gnome.org/sources/glibmm/2.66/glibmm-2.66.10.tar.xz"
+  sha256 "2b61780203aed98e701d3ea57c8f353e7c8ada9706a79be782f6c5153dd035c0"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -12,7 +12,7 @@ class GlibmmAT266 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ae05847491e48b0462d5ff1eb3e77dc314585a7812b53123b23be12f9b72f61"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d5e517a93a88092bb631cae7129a3d80e01c7601c807225e3878ffb34b94285"
   end
 
   depends_on "meson" => :build
