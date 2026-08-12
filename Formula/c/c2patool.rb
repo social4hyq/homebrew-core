@@ -12,7 +12,7 @@ class C2patool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "256d64bfe36239affbbda0975b2d975351b8028a01db2dd812350adbd37fe782"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "73d74cebf74f76732a427622fbb03e7d0bed0e3c6a3a29df53d183d23ffce94c"
   end
 
   depends_on "pkgconf" => :build
