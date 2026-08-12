@@ -1,8 +1,8 @@
 class Doltgres < Formula
   desc "Dolt for Postgres"
   homepage "https://github.com/dolthub/doltgresql"
-  url "https://github.com/dolthub/doltgresql/archive/refs/tags/v1.0.0.tar.gz"
-  sha256 "fa463d4b4a3a950d32f6fe7eb2853800ce7027d5d3b830e01bd428c1daa8c440"
+  url "https://github.com/dolthub/doltgresql/archive/refs/tags/v1.1.0.tar.gz"
+  sha256 "d8bfe342ac10d15b8ca3473114bff6603209342555b9c5f0b58a5f8ce4d07fc5"
   license "Apache-2.0"
   head "https://github.com/dolthub/doltgresql.git", branch: "main"
 
