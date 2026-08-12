@@ -11,8 +11,9 @@ class Codegraph < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codegraph-v1.5.0-r1"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "4ac322a8fcd183a0e4a87f8fd93424bf853299ed3041a8d05efb2e5f8cbd86d2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codegraph-v1.5.0-r2"
+    rebuild 1
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "5fece8db60560761f6f7c0170fc42f6af297bc7825cd128e567f4724c4057882"
   end
 
   depends_on "rust" => :build
