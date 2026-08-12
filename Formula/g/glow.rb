@@ -1,13 +1,13 @@
 class Glow < Formula
   desc "Render markdown on the CLI"
   homepage "https://github.com/charmbracelet/glow"
-  url "https://github.com/charmbracelet/glow/archive/refs/tags/v2.1.2.tar.gz"
-  sha256 "1b933139da1d08647bf5b3f112cab9548fdc2b40c056c7fa3d84d8706de5265a"
+  url "https://github.com/charmbracelet/glow/archive/refs/tags/v3.0.0.tar.gz"
+  sha256 "18df6f3c09157021366b8c702b5badba405d37dbb42f132353eb50c1b0d3f464"
   license "MIT"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac1040b2e1851988db3a8144349510afba9d82b97be3f18eb30aef09860c0f91"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ffdf326f03c13d8caeebc20173bf85c11630f769850501d9680c53b2ebb40f2"
   end
 
   depends_on "go" => :build
