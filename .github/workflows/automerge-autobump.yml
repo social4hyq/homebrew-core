@@ -73,7 +73,7 @@ jobs:
           HEAD_REF: ${{ github.event.pull_request.head.ref || github.event.workflow_run.head_branch }}
           REPO: ${{ github.repository }}
         run: |
-          ALLOWLIST="grok-build claude-code opencode opencode@2 reasonix"
+          ALLOWLIST="claude-code opencode opencode@2 reasonix"
           BUMP_BRANCH_RE="^bump-($(echo "$ALLOWLIST" | tr ' ' '|'))-"
           if ! grep -qE "$BUMP_BRANCH_RE" <<< "$HEAD_REF"; then
             echo "head branch $HEAD_REF not in the autobump allowlist, skipping"

@@ -5,12 +5,12 @@ source "$(dirname "$0")/lib.sh"
 # The ci-runner image bakes HOMEBREW_OHOS_BOTTLE_BINARY_SIGN=1 by default
 # (most formulas want their poured binaries auto-signed), but prebuilt
 # static ELF binaries segfault under that auto-sign pass (binary-sign-tool
-# corrupts their ELF layout). grok-build hit this 2026-07-20/21 (PR #42,
-# stuck on a `brew test` segfault, exit 139): its install() self-signs the
-# prebuilt static ELF via ohos-bst-light, then the CI-only auto-sign pass
+# corrupts their ELF layout) — this first surfaced 2026-07-20/21 (PR #42,
+# stuck on a `brew test` segfault, exit 139) on a prebuilt static ELF whose
+# install() self-signs via ohos-bst-light: the CI-only auto-sign pass
 # re-signed it a second time and broke it — confirmed by re-downloading +
-# self-signing (once) the same 0.2.106 artifact outside CI, which ran
-# clean (see Formula/g/grok-build.rb).
+# self-signing (once) the same artifact outside CI, which ran clean (see
+# Formula/q/qemu-aarch64.rb).
 # claude-code is a runtime-fetch stub (install() only writes a wrapper
 # script, no ELF in the bottle at all — see Formula/c/claude-code.rb) so it
 # has no odie guard and likely doesn't need this; included anyway since
@@ -18,12 +18,12 @@ source "$(dirname "$0")/lib.sh"
 # there's genuinely nothing for binary-sign-tool to touch.
 # reasonix is a from-source build, not a prebuilt binary, but hits the same
 # failure: CGO_ENABLED=0 go build emits a static ELF with no PT_INTERP/
-# PT_DYNAMIC segment — the same shape as grok-build's prebuilt binary, and
+# PT_DYNAMIC segment — the same shape as qemu-aarch64's prebuilt binary, and
 # the auto-sign pass corrupts it identically. "Built from source" does not
 # exempt a formula from this list; what matters is the final ELF's shape.
 # zig@0.15 is another prebuilt static ELF (ziglang.org's aarch64-linux
 # release tarball, same shape as qemu-aarch64) — same corruption risk.
-UNSET_SIGN_FORMULAS="claude-code grok-build cc-switch qemu-aarch64 reasonix zig@0.15"
+UNSET_SIGN_FORMULAS="claude-code cc-switch qemu-aarch64 reasonix zig@0.15"
 ENV_PREFIX=""
 if tr ' ' '\n' <<< "$UNSET_SIGN_FORMULAS" | grep -qx "$FORMULA"; then
   ENV_PREFIX="env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN "
