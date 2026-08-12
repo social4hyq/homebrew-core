@@ -1,6 +1,6 @@
 # social4hyq/homebrew-core
 
-HarmonyOS（OHOS aarch64）的 Homebrew tap：提供已在真机验证的开发工具链——AI coding CLI（`opencode` / `claude-code` / `reasonix`）、Bun 运行时（`bun` / `bun-webkit` / `llvm@21` 等）、终端与调试工具（`qemu-aarch64` / `starship` / `zellij` / `sshport` 等）。所有二进制均已按 HarmonyOS 要求完成签名，安装后开箱即用。
+HarmonyOS（OHOS aarch64）的 Homebrew tap：提供已在真机验证的开发工具链——AI coding CLI（`opencode` / `claude-code`）、Bun 运行时（`bun` / `bun-webkit` / `llvm@21` 等）、终端与调试工具（`qemu-aarch64` / `starship` / `zellij` / `sshport` 等）。所有二进制均已按 HarmonyOS 要求完成签名，安装后开箱即用。
 
 ## 安装
 
@@ -11,7 +11,6 @@ brew trust social4hyq/core   # Homebrew 6.0+ 必须显式信任第三方 tap
 # 常用工具：
 brew install opencode        # AI 编码代理（v2 预览：brew install opencode@2）
 brew install claude-code     # Claude Code CLI
-brew install reasonix        # DeepSeek 终端 coding agent
 brew install bun             # Bun 运行时
 brew install starship        # 跨 shell 提示符
 brew install zellij          # 终端复用器
@@ -25,7 +24,6 @@ bun --version && bun -e 'console.log(2**32, Math.PI)'
 opencode --version
 opencode2 --version
 claude --version
-reasonix --version
 starship --version
 zellij --version
 qemu-aarch64 --version && qemu-aarch64 -strace /bin/true
@@ -39,17 +37,13 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 |---|---|---|
 | `opencode` | 1.18.15, revision 1 | OpenCode AI 编码代理 CLI；上游源码构建（`bun build --compile` 单体二进制，原生依赖走 `@ohos-ports/*` npm 包） |
 | `opencode@2` | 2.0.0-beta, revision 13 | opencode v2 预览路线；源码构建（`bun build --compile` 单体二进制，原生依赖 `@ohos-ports/opentui-core` + `@ohos-ports/bun-pty`），命令名 `opencode2` |
-| `warp-tui` | 0.0.0-dev | Warp 非 GUI 终端 agent TUI；固定 git revision 源码构建（Rust），运行时依赖 `ohos-compat-shim` |
 | `claude-code` | 2.1.226 | Anthropic Claude Code CLI；runtime-fetch stub（License 禁重分发），首次运行拉取 + 校验 sha256 + 自签 |
-| `reasonix` | 1.21.5 | DeepSeek 原生终端 AI coding agent；Go 源码构建（`CGO_ENABLED=0` 静态 ELF），签名同 qemu-aarch64，`inreplace` 修 `/tmp` 锁目录 |
 | `bun` | 1.4.0, revision 56 | Bun JavaScript runtime；**自举源码构建**（`bun bd`），`ohos-compat-shim` 静态内嵌进可执行文件；libc++ ABI 已切 `__n1`（r56 起） |
 | `bun-bootstrap` | 1.4.0-5467a689, revision 1 | 预编译 bun，用于 `bun bd` 自举本机 bun；已预签（`keg_only`） |
 | `bun-webkit` | `ddea71318f`, revision 1 | bun 专用 WebKit fork 静态库（JSCore/WTF/bmalloc）；CMake 源码构建（`--target=aarch64-linux-ohos`，`keg_only`） |
 | `llvm@21` | 21.1.8, revision 5 | OHOS 补丁版 clang + lld + multiarch runtime libs（libc++ ABI `__n1`）；链接期 LLD `--code-sign` 签名（`keg_only`） |
 | `ohos-bst-light` | 1.0.0, revision 1 | 轻量二进制自签工具（保留 ELF 结构）；预编译二进制 formula 的 self-sign 都靠它 |
 | `ohos-compat-shim` | 0.2.8 | LD_PRELOAD 兼容垫片：拦截鸿蒙缺失/异常 syscall（`close_range`/`fchmodat2`/`getpwuid_r` 等）；C 源码直编；`claude-code` 共用 |
-| `inject-runpath` | 0.2.0, revision 1 | 就地注入 DT_RUNPATH 到 ELF（零偏移移动，不破坏 bun 产物模块图；`keg_only`） |
-| `dlopen-sign-shim` | 0.1.0, revision 1 | LD_PRELOAD 垫片：`dlopen`/`dlmopen` 前自动 self-sign 未签名 ELF；C 源码直编，运行时调用 `ohos-bst-light` |
 | `qemu-aarch64` | 11.0.1-r0 | QEMU 用户态 aarch64 模拟器；Alpine 全静态 musl 构建，`-strace` 纯用户态 syscall 跟踪（替代 ptrace） |
 | `sshport` | 0.2.1 | SSH 端口转发：`sshport up <host>` 把远程端口同号映射到本机；TS 源码构建（`bun build` 单 JS 文件） |
 | `starship` | 1.26.0, revision 2 | 跨 shell 提示符；Rust 源码构建 |
@@ -69,6 +63,9 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `icu4c@78` | 2026-08-09 下线 | libc++ ABI `__n1` 迁移（#239-#241）后本 tap fork 冗余，直接用上游 harmonybrew/core 的 `icu4c@78`（同为 `__n1`） |
 | `grok-build` | 2026-08-12 下线 | 实际使用率低，维护成本不再合理；如需可从 tap git 历史恢复 formula |
 | `cc-switch` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（`cc-switch-cli`），直接 `brew install cc-switch-cli` |
+| `reasonix` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供，直接 `brew install reasonix` |
+| `warp-tui` | 2026-08-12 下线 | 实际使用率低，维护成本不再合理；如需可从 tap git 历史恢复 formula |
+| `inject-runpath` / `dlopen-sign-shim` | 2026-08-12 下线 | 已无 formula 依赖（原用途已被预签名 npm `.so` + bun r31 起静态内嵌的 `ohos-compat-shim` 取代）；如需可从 tap git 历史恢复 formula |
 
 > 改名提示（2026-08-01）：`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
 
