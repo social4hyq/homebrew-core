@@ -7,7 +7,7 @@ class Timoni < Formula
   head "https://github.com/stefanprodan/timoni.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "33985b8b962a57c8ae630b039b662e456fc59bdb494234b1e0d1ac9c651f0ad6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bbadf82ba488995b0ba37b2361e069727b2c5de8926975d22abed76b2550a9af"
   end
 
   depends_on "go" => :build
