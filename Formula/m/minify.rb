@@ -7,7 +7,7 @@ class Minify < Formula
   head "https://github.com/tdewolff/minify.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "065ddb7fb3dedb4851ed9865c697afe213e679df1ed3db29e9cba55b051bd4e2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6763f3cc73887c9b96b691887cae70b503eefcfef360aa211f33e4b94073fa1"
   end
 
   depends_on "go" => :build
