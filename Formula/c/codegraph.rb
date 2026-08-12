@@ -39,7 +39,6 @@ class Codegraph < Formula
     (bin/"codegraph").write <<~SH
       #!/bin/sh
       : "${HOMEBREW_PREFIX:?codegraph: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
-      export TMPDIR="${TMPDIR:-/data/storage/el2/base/cache}"
       export CODEGRAPH_KERNEL_PATH="$HOMEBREW_PREFIX/opt/codegraph/libexec/kernel/codegraph-kernel.node"
       exec "$HOMEBREW_PREFIX/opt/node@24/bin/node" \\
         --liftoff-only \\
