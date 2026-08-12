@@ -51,6 +51,8 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `hishell-font` | 0.1.0 | hishell 终端 Nerd Font 安装配置；TS 源码构建（`bun build` 单 JS 文件） |
 | `herdr` | 0.8.0 | coding agent 终端会话持久化 runtime；Rust 源码构建（依赖 `zig@0.15` 编译 vendored libghostty-vt） |
 | `zig@0.15` | 0.15.2 | ziglang.org 官方 aarch64-linux 静态预编译二进制重打包；`ohos-bst-light` self-sign；herdr 的构建依赖 |
+| `codegraph` | 1.5.0 | 代码知识图谱（MCP server），为 AI agent 提供语义检索；npm + Rust napi cdylib kernel（20 语言 tree-sitter），存储走 `node:sqlite` |
+| `uv` | 0.12.3 | 极速 Python 包管理器；Rust 源码构建，附 musl 检测补丁 + `python@3.14` 运行时依赖 |
 
 ## 已下线 / 已迁移
 
