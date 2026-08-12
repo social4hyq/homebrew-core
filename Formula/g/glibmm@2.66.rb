@@ -12,7 +12,7 @@ class GlibmmAT266 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ae05847491e48b0462d5ff1eb3e77dc314585a7812b53123b23be12f9b72f61"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d5e517a93a88092bb631cae7129a3d80e01c7601c807225e3878ffb34b94285"
   end
 
   depends_on "meson" => :build
