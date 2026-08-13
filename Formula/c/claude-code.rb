@@ -4,6 +4,7 @@ class ClaudeCode < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.228.tgz"
   sha256 "535e6daa6256689803cef88620e940924d00d274c2c293efe4a33590c2718cc9"
   license :cannot_represent # Anthropic Commercial Terms of Service
+  revision 1
   # npmmirror mirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org
   # (aarch64 SIMD AES path trapped by kernel); npmmirror (Aliyun CDN) doesn't.
   # Files are byte-identical (sha256 matches); wrapper tries npmmirror first,
@@ -11,8 +12,10 @@ class ClaudeCode < Formula
   #
   # Stub bottle: Anthropic License prohibits redistributing the official binary,
   # so install() writes only a wrapper — the binary is fetched, sha256-checked,
-  # and self-signed at first run. pour_bottle? also bypasses Homebrew's
-  # DevelopmentTools requirement (OHOS ships no /usr/bin/clang).
+  # and self-signed (ohos-bst-light) at first run: binary-sign-tool corrupts the
+  # embedded app and it degenerates to bare bun runtime (verified 2026-08-13).
+  # pour_bottle? also bypasses Homebrew's DevelopmentTools requirement
+  # (OHOS ships no /usr/bin/clang).
   #
   # Relocatability: wrapper uses runtime $HOMEBREW_PREFIX only — no build-time path interpolation.
 
@@ -24,8 +27,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.228-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "82313d42bbdc60214e3dea3c216b0e24a1e8a574ac79a078ee6150e426625197"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.228-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c825ca5944d5a774d41bfc14aa6b92fbbe9ac7f7d50203c088ba801d345878a9"
   end
 
   depends_on "ohos-bst-light"
@@ -71,9 +74,8 @@ class ClaudeCode < Formula
         chmod 0755 "$BIN"
       fi
 
-      export LD_PRELOAD="$HB/opt/ohos-compat-shim/lib/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
       export CLAUDE_CODE_TMPDIR="${CLAUDE_CODE_TMPDIR:-/data/storage/el2/base/cache}"
-      exec "$BIN" "$@"
+      exec "$HB/opt/ohos-compat-shim/bin/ohos-shim" "$BIN" "$@"
     SH
     chmod 0755, bin/"claude"
   end
