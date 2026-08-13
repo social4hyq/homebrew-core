@@ -4,15 +4,15 @@ class OhosCompatShim < Formula
   url "https://github.com/social4hyq/ohos-compat-shim.git",
       tag: "v0.2.9", revision: "54bbffbaa43f03ed765092c0f32be47962135e79"
   license "MIT"
+  revision 1
 
   livecheck do
     skip "development tool, manually versioned"
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.2.9-r5"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c70b6fb87207c654405a8b55431b081ff6747c6dc73e14d80b96e9294746bf37"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.2.9-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3698c9cd2857ce12b62bb5d10f8aa54eb7ebcae5e8c522984797d2c126ba3994"
   end
 
   # HarmonyOS sandbox seccomp-filters close_range/fchmodat2 and returns unexpected
