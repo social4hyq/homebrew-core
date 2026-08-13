@@ -2,17 +2,17 @@ class Sshport < Formula
   desc "Forward a remote dev server's ports to identical local ports over SSH"
   homepage "https://github.com/social4hyq/ohos-sshport"
   url "https://github.com/social4hyq/ohos-sshport.git",
-      revision: "33b51319e55186ef85c0add720b2d34797297c62"
-  version "0.2.1"
+      tag: "v0.2.1", revision: "33b51319e55186ef85c0add720b2d34797297c62"
   license "MIT"
+  revision 1
 
   livecheck do
     skip "development tool, manually versioned"
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/sshport-v0.2.1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c7e59378a4977d6d83879527f41c8561999588e3dd2a9fb7896e6c3e4562846"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/sshport-v0.2.1-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef4c2f84d82edc89d3911f68d03fa14ad45bca76e823454413c7691b4f497702"
   end
 
   # Auto-forwards a remote dev server's ports to identical local ports.
@@ -26,12 +26,7 @@ class Sshport < Formula
     system "bun", "build", "--target=bun", "--outfile", "sshport.js", "src/cli.ts"
     libexec.install "sshport.js"
 
-    # $HOMEBREW_PREFIX resolved at runtime (relocatable wrapper).
-    (bin/"sshport").write <<~SH
-      #!/bin/sh
-      : "${HOMEBREW_PREFIX:?sshport: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
-      exec "$HOMEBREW_PREFIX/opt/bun/bin/bun" "$HOMEBREW_PREFIX/opt/sshport/libexec/sshport.js" "$@"
-    SH
+    (bin/"sshport").write_env_script(formula_opt_bin("bun")/"bun", opt_libexec/"sshport.js", {})
     chmod 0755, bin/"sshport"
   end
 
