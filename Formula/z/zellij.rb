@@ -1,5 +1,5 @@
 class Zellij < Formula
-  desc "Pluggable terminal workspace — HarmonyOS aarch64, built from source"
+  desc "Pluggable terminal workspace"
   homepage "https://zellij.dev"
   # Tracks pinned `main` revision (not v0.44.3 tag): that tag pins nix 0.23.1 which
   # predates OHOS support (0.30+); main has the bump. Switch back to a tag at v0.45.0.
@@ -88,6 +88,6 @@ class Zellij < Formula
 
   test do
     assert_match "keybinds", shell_output("#{bin}/zellij setup --dump-config")
-    assert_match "zellij 0.45.0", shell_output("#{bin}/zellij --version")
+    assert_match(/^zellij #{Regexp.escape(version)}/, shell_output("#{bin}/zellij --version"))
   end
 end
