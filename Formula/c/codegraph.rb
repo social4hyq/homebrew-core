@@ -4,7 +4,7 @@ class Codegraph < Formula
   url "https://github.com/colbymchenry/codegraph/archive/refs/tags/v1.5.0.tar.gz"
   sha256 "319758918f58418a8a576d24c7829ecfa9e68eff78ddf49f52455a27a79ec621"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
