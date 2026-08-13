@@ -6,6 +6,7 @@ class ZigAT015 < Formula
   url "https://ziglang.org/download/0.15.2/zig-aarch64-linux-0.15.2.tar.xz"
   sha256 "958ed7d1e00d0ea76590d27666efbf7a932281b3d7ba0c6b01b0ff26498f667f"
   license "MIT"
+  revision 1
 
   # Version-pinned: herdr targets a specific minimum_zig_version.
   livecheck do
@@ -41,14 +42,10 @@ class ZigAT015 < Formula
     # Install the whole tree together, keeping lib/ as zig's sibling.
     libexec.install src.children
 
-    # bin/zig execs libexec/zig directly; opt_libexec is prefix-stable (same pattern as zellij.rb).
-    (bin/"zig").write <<~SH
-      #!/bin/sh
-      export TMPDIR="${TMPDIR:-/data/storage/el2/base/tmp}"
-      export ZIG_GLOBAL_CACHE_DIR="${ZIG_GLOBAL_CACHE_DIR:-/data/storage/el2/base/cache/zig}"
-      exec "#{opt_libexec}/zig" "$@"
-    SH
-    chmod 0755, bin/"zig"
+    # opt_libexec is prefix-stable (same pattern as zellij.rb).
+    (bin/"zig").write_env_script opt_libexec/"zig",
+                                  TMPDIR:               "${TMPDIR:-/data/storage/el2/base/tmp}",
+                                  ZIG_GLOBAL_CACHE_DIR: "${ZIG_GLOBAL_CACHE_DIR:-/data/storage/el2/base/cache/zig}"
   end
 
   test do

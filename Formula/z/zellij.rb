@@ -8,6 +8,7 @@ class Zellij < Formula
       revision: "5254e4fc1dd784ef872644190dc5e2bcb0981bed", branch: "main"
   version "0.45.0-dev"
   license "MIT"
+  revision 1
 
   livecheck do
     url "https://api.github.com/repos/zellij-org/zellij/commits?sha=main&per_page=1"
@@ -64,13 +65,10 @@ class Zellij < Formula
     # TMPDIR fallback: OHOS /tmp is read-only.
     mkdir_p libexec/"bin"
     mv bin/"zellij", libexec/"bin/zellij"
-    (bin/"zellij").write <<~SH
-      #!/bin/sh
-      export TMPDIR="${TMPDIR:-/data/storage/el2/base/tmp}"
-      export LD_PRELOAD="#{formula_opt_prefix("ohos-compat-shim")}/lib/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
-      exec "#{opt_libexec}/bin/zellij" "$@"
-    SH
-    chmod 0755, bin/"zellij"
+    (bin/"zellij").write_env_script opt_libexec/"bin/zellij",
+                                     TMPDIR:     "${TMPDIR:-/data/storage/el2/base/tmp}",
+                                     LD_PRELOAD: "#{formula_opt_prefix("ohos-compat-shim")}/lib/libohos_compat.so" \
+                                                 "${LD_PRELOAD:+:$LD_PRELOAD}"
 
     generate_completions_from_executable(libexec/"bin/zellij", "setup", "--generate-completion",
                                          base_name: "zellij")

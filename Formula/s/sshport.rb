@@ -4,6 +4,7 @@ class Sshport < Formula
   url "https://github.com/social4hyq/ohos-sshport/archive/refs/tags/v0.2.1.tar.gz"
   sha256 "5e8acfa659110daf8fe84e7fcc8242b0e03c746fc219d06c4b488d551e666821"
   license "MIT"
+  revision 1
 
   livecheck do
     skip "development tool, manually versioned"
@@ -25,13 +26,9 @@ class Sshport < Formula
     system "bun", "build", "--target=bun", "--outfile", "sshport.js", "src/cli.ts"
     libexec.install "sshport.js"
 
-    # $HOMEBREW_PREFIX resolved at runtime (relocatable wrapper).
-    (bin/"sshport").write <<~SH
-      #!/bin/sh
-      : "${HOMEBREW_PREFIX:?sshport: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
-      exec "$HOMEBREW_PREFIX/opt/bun/bin/bun" "$HOMEBREW_PREFIX/opt/sshport/libexec/sshport.js" "$@"
-    SH
-    chmod 0755, bin/"sshport"
+    # opt_libexec keeps the baked path stable across Cellar layout changes (same pattern
+    # used throughout this tap, e.g. zellij.rb).
+    (bin/"sshport").write_env_script formula_opt_bin("bun")/"bun", [opt_libexec/"sshport.js"], {}
   end
 
   test do

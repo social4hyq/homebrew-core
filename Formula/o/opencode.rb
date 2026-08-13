@@ -4,6 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.16.tar.gz"
   sha256 "4721cd5832cd0346b0ce66c0499543527e32af2ce4249732545eca9282d570b9"
   license "MIT"
+  revision 1
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
   # HTML page fetch), while api.github.com answers fast — same JSON strategy
@@ -137,18 +138,13 @@ class Opencode < Formula
     sections = Utils.safe_popen_read(readelf.to_s, "--section-headers", out)
     odie "compiled binary lacks .codesign section" unless sections.include?(".codesign")
 
-    # Shim statically linked since bun r31 — no LD_PRELOAD needed.
-    # bun signs .so in-process during install.
-    # Wrapper defaults TMPDIR to writable EL2 path (OHOS /tmp read-only).
-    # opt_libexec for stable path across Cellar layout changes.
+    # Shim statically linked since bun r31 — no LD_PRELOAD needed. bun signs .so
+    # in-process during install. opt_libexec for stable path across Cellar layout changes.
     mkdir_p libexec/"bin"
     libexec.install out => "bin/opencode"
-    (bin/"opencode").write <<~SH
-      #!/bin/sh
-      export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
-      exec "#{opt_libexec}/bin/opencode" "$@"
-    SH
-    chmod 0755, bin/"opencode"
+    # TMPDIR default: OHOS /tmp is read-only.
+    (bin/"opencode").write_env_script opt_libexec/"bin/opencode",
+                                       TMPDIR: "${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
 
     # Handwritten zsh completion (upstream yargs only emits bash).
     (zsh_completion/"_opencode").write <<~'ZSH'

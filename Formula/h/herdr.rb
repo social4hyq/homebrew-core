@@ -4,6 +4,7 @@ class Herdr < Formula
   url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.8.0.tar.gz"
   sha256 "47bdb0753beb8a6b157cf2fec26fbe6b787f85ffea0dde579b0001d6cd663572"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/herdrdev/herdr.git", branch: "master"
 
   livecheck do
@@ -87,13 +88,10 @@ class Herdr < Formula
 
     mkdir_p libexec/"bin"
     mv bin/"herdr", libexec/"bin/herdr"
-    (bin/"herdr").write <<~SH
-      #!/bin/sh
-      export TMPDIR="${TMPDIR:-/data/storage/el2/base/tmp}"
-      export LD_PRELOAD="#{formula_opt_prefix("ohos-compat-shim")}/lib/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
-      exec "#{opt_libexec}/bin/herdr" "$@"
-    SH
-    chmod 0755, bin/"herdr"
+    (bin/"herdr").write_env_script opt_libexec/"bin/herdr",
+                                    TMPDIR:     "${TMPDIR:-/data/storage/el2/base/tmp}",
+                                    LD_PRELOAD: "#{formula_opt_prefix("ohos-compat-shim")}/lib/libohos_compat.so" \
+                                                "${LD_PRELOAD:+:$LD_PRELOAD}"
 
     generate_completions_from_executable(libexec/"bin/herdr", "completion")
   end

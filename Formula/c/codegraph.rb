@@ -4,6 +4,7 @@ class Codegraph < Formula
   url "https://github.com/colbymchenry/codegraph/archive/refs/tags/v1.5.0.tar.gz"
   sha256 "319758918f58418a8a576d24c7829ecfa9e68eff78ddf49f52455a27a79ec621"
   license "MIT"
+  revision 1
 
   livecheck do
     url :stable
@@ -36,17 +37,11 @@ class Codegraph < Formula
     # CODEGRAPH_KERNEL_PATH bypasses the loader's platform path search
     # (process.platform is 'openharmony', not 'linux'). --liftoff-only
     # avoids a V8 turboshaft WASM OOM with tree-sitter grammars.
-    (bin/"codegraph").write <<~SH
-      #!/bin/sh
-      : "${HOMEBREW_PREFIX:?codegraph: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
-      export TMPDIR="${TMPDIR:-/data/storage/el2/base/cache}"
-      export CODEGRAPH_KERNEL_PATH="$HOMEBREW_PREFIX/opt/codegraph/libexec/kernel/codegraph-kernel.node"
-      exec "$HOMEBREW_PREFIX/opt/node@24/bin/node" \\
-        --liftoff-only \\
-        --disable-warning=ExperimentalWarning \\
-        "$HOMEBREW_PREFIX/opt/codegraph/libexec/dist/bin/codegraph.js" "$@"
-    SH
-    chmod 0755, bin/"codegraph"
+    (bin/"codegraph").write_env_script formula_opt_bin("node@24")/"node",
+                                        ["--liftoff-only", "--disable-warning=ExperimentalWarning",
+                                         opt_libexec/"dist/bin/codegraph.js"],
+                                        TMPDIR:                "${TMPDIR:-/data/storage/el2/base/cache}",
+                                        CODEGRAPH_KERNEL_PATH: opt_libexec/"kernel/codegraph-kernel.node"
   end
 
   test do
