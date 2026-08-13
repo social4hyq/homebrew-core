@@ -40,8 +40,12 @@ fi
 echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 echo "== version=$VER tag=$TAG =="
 
+# --skip-relocation: OHOS disables placeholder rewriting in both directions (bottle
+# packing and pour), so brew's relocatability probe only ever downgrades formulae to an
+# absolute-path cellar — never anything better. Matches upstream harmonybrew/core, whose
+# 4700+ formulae are uniformly :any_skip_relocation.
 docker exec -w /root "$CONTAINER" bash -lc \
-  "$BREW_ENV brew bottle --json --root-url $ROOT $TAP/$FORMULA"
+  "$BREW_ENV brew bottle --skip-relocation --json --root-url $ROOT $TAP/$FORMULA"
 mkdir -p bottle-out
 # `brew bottle` inserts a rebuild number segment (e.g. codex-0.144.5.arm64_
 # ohos.bottle.2.tar.gz) whenever the keg's content-hash differs from what
