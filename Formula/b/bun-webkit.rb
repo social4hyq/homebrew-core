@@ -5,6 +5,7 @@ class BunWebkit < Formula
       revision: "447082ab6897278727b44e1ba3c326ae6e1504c3"
   version "447082ab68"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
+  revision 1
   # Fully rewritten from upstream: builds only JSC/WTF/bmalloc static archives, pinned to bun's WEBKIT_VERSION.
 
   # Pinned to bun's WEBKIT_VERSION; OHOS adaptation handled bun-side (webkit.ts.patch).
@@ -13,8 +14,8 @@ class BunWebkit < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-webkit-v447082ab68-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7950303924ef90c86440ff7c7f2337086c76a41a0d5ac9670339f022690bc6c0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-webkit-v447082ab68-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "afcd3c1292827136f34ceb8bf623b3a7331d912e527f4351aff05fa0a7d9061c"
   end
 
   keg_only "webkit static archives are consumed in-tree by Bun, not linked system-wide"
