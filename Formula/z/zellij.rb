@@ -17,9 +17,9 @@ class Zellij < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zellij-v0.45.0-dev-r2"
-    rebuild 1
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "1575b2c17a18e7d8560adcc262cdeba6cb54486df71ea68f2a2de4526a3de375"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zellij-v0.45.0-dev-r3"
+    rebuild 2
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "d35159fb95f4f4f3619bd70700373e6e78608ceba08a09dc6d4a5fa6a4bb222c"
   end
 
   depends_on "cmake" => :build
