@@ -1,13 +1,13 @@
 class MinioWarp < Formula
   desc "S3 benchmarking tool"
   homepage "https://github.com/minio/warp"
-  url "https://github.com/minio/warp/archive/refs/tags/v1.5.0.tar.gz"
-  sha256 "cf1f16c612ca72af01b0de2b30a79486e7d03c4da7cfba49e142265eb550e0ba"
+  url "https://github.com/minio/warp/archive/refs/tags/v1.6.1.tar.gz"
+  sha256 "427c6bfa56517b40c5c8a150865bf3e5ae635c7141ef11e71e799ff882a44304"
   license "AGPL-3.0-or-later"
   head "https://github.com/minio/warp.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "12af55fca51e1a91231776832f32ab0ebf2b8e786184d2c2cb58492dec0ea8ba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d313cf797a5153c4bce7dff58ba1046d8ba8f413bf52c9e697be676562719bf"
   end
 
   depends_on "go" => :build
