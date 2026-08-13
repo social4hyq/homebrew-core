@@ -10,6 +10,11 @@ class Atomcode < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d557d33e1aeef77a9278958af770c010ce2e2f34339b4fd45e1f50c619d0f125"
+  end
+
   depends_on "node" => :build
   depends_on "rust" => :build
 
