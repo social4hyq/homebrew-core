@@ -12,8 +12,8 @@ class NodeOhos < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/node-ohos-v26.7.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4116d48d1b96c89f7bb8f361246ce150f6f8432792a3ee83d65750786514f9b1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/node-ohos-v26.7.0-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb5e919da7dcd7c522a5ef54552b135932d7ee34e7d5ac7a7240c9861abb969d"
   end
 
   keg_only "alternate toolchain build of node; the harmonybrew/core node formula " \
