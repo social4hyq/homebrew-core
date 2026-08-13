@@ -5,8 +5,8 @@ class OhosCompatShim < Formula
   # ghfast.top proxy on every install (found when proxy was down 2026-08-04).
   # 6349deb adds ohos-shim check subcommand.
   url "https://github.com/social4hyq/ohos-compat-shim.git",
-      revision: "6349deb19d3be02f86ad45220ee9eeb6a977595c", branch: "main"
-  version "0.2.8"
+      revision: "54bbffbaa43f03ed765092c0f32be47962135e79", branch: "main"
+  version "0.2.9"
   license "MIT"
   # No `revision N` — version bump starts fresh.
 
