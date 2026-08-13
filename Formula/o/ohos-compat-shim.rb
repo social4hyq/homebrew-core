@@ -4,6 +4,7 @@ class OhosCompatShim < Formula
   url "https://github.com/social4hyq/ohos-compat-shim.git",
       tag: "v0.2.9", revision: "54bbffbaa43f03ed765092c0f32be47962135e79"
   license "MIT"
+  revision 1
 
   livecheck do
     skip "development tool, manually versioned"
