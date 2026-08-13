@@ -6,7 +6,7 @@ class ZigAT015 < Formula
   url "https://ziglang.org/download/0.15.2/zig-aarch64-linux-0.15.2.tar.xz"
   sha256 "958ed7d1e00d0ea76590d27666efbf7a932281b3d7ba0c6b01b0ff26498f667f"
   license "MIT"
-  revision 1
+  revision 2
 
   # Version-pinned: herdr targets a specific minimum_zig_version.
   livecheck do
@@ -15,8 +15,8 @@ class ZigAT015 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zig@0.15-v0.15.2-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e5f06ddebeb7970abe4d02308cbe9d4e0bd1b8c43837e6fd130a298959111675"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zig@0.15-v0.15.2-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c7762e529bb250059b1e6f42cf6fbb665aa04f86cd974e75ff4dc9c8064b9ba"
   end
 
   depends_on "ohos-bst-light" => :build # self-sign
@@ -41,7 +41,10 @@ class ZigAT015 < Formula
     # Install the whole tree together, keeping lib/ as zig's sibling.
     libexec.install src.children
 
-    (bin/"zig").write_env_script(opt_libexec/"zig", "ZIG_GLOBAL_CACHE_DIR" => "/data/storage/el2/base/cache/zig")
+    (bin/"zig").write_env_script(
+      opt_libexec/"zig",
+      "ZIG_GLOBAL_CACHE_DIR" => "${ZIG_GLOBAL_CACHE_DIR:-/data/storage/el2/base/cache/zig}",
+    )
     chmod 0755, bin/"zig"
   end
 
