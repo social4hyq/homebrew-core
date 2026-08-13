@@ -4,6 +4,7 @@ class Herdr < Formula
   url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.8.0.tar.gz"
   sha256 "47bdb0753beb8a6b157cf2fec26fbe6b787f85ffea0dde579b0001d6cd663572"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/herdrdev/herdr.git", branch: "master"
 
   livecheck do
@@ -12,9 +13,8 @@ class Herdr < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.8.0-r3"
-    rebuild 1
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "f8ab1ede87c0e595f698d64c66bc2b7ecdb4aff9fdbf982b8d0b8d013d528077"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.8.0-r4"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "eac16c87d55de71183e40f60f775dca079cf4b36ae5a49a19c60257f0e9e10d5"
   end
 
   depends_on "ohos-bst-light" => :build # self-sign, see the zig-build note below
@@ -90,8 +90,7 @@ class Herdr < Formula
     mv bin/"herdr", libexec/"bin/herdr"
     (bin/"herdr").write <<~SH
       #!/bin/sh
-      export LD_PRELOAD="#{formula_opt_prefix("ohos-compat-shim")}/lib/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
-      exec "#{opt_libexec}/bin/herdr" "$@"
+      exec "#{formula_opt_bin("ohos-compat-shim")}/ohos-shim" "#{opt_libexec}/bin/herdr" "$@"
     SH
     chmod 0755, bin/"herdr"
 
