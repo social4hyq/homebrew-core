@@ -10,7 +10,7 @@ class MetaPackageManager < Formula
   head "https://github.com/kdeldycke/meta-package-manager.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "10a6388a26bc767262e4e227765e6cfe6c5adabf8b1ef24df2575405728cb2d3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "90fb53bca02a75cfab2de7ea056cb6340ba09148cd16b8ac0eb79f5778d9d808"
   end
 
   depends_on "rust" => :build
