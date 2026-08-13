@@ -80,9 +80,6 @@ class Starship < Formula
     # mathfunc (system zsh lacks module, rewrite __starship_get_time).
     pkgshare.mkpath
     (pkgshare/"ohos-init.zsh").write <<~ZSH
-      # harmonybrew-core `starship` formula 自带的 OHOS shell 初始化胶水。
-      # 由 formula 生成，不要手改——升级走 `brew upgrade starship`。
-
       _starship_ohos_setup_tz() {
           [[ -n ${TZ:-} ]] && return
           local off sign hh mm
@@ -91,7 +88,7 @@ class Starship < Formula
           sign=${off[1]} hh=${off[2,3]} mm=${off[4,5]}
           hh=${hh#0}
           [[ -z $hh ]] && hh=0
-          # POSIX TZ 的符号习惯是反的：本地时间 = UTC + 8 要写成 "UTC-8"。
+          # POSIX TZ sign is inverted: a UTC+8 local is written as "UTC-8".
           [[ $sign == + ]] && sign=- || sign=+
           if [[ $mm == 00 ]]; then
               export TZ="UTC${sign}${hh}"
@@ -126,10 +123,6 @@ class Starship < Formula
       Set up starship on OHOS (copy-paste this whole line):
 
         echo 'source "#{opt_pkgshare}/ohos-init.zsh"' >> ~/.zshrc && source ~/.zshrc
-
-      This one line replaces the old hand-copied OHOS init block — the glue
-      (timezone, fpath, mathfunc fallback) now lives in the keg and upgrades
-      with `brew upgrade starship`.
     CAVEATS
   end
 
