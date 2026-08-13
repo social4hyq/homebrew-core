@@ -1,14 +1,11 @@
 class OhosCompatShim < Formula
   desc "LD_PRELOAD compat shim for HarmonyOS-sandboxed aarch64/musl binaries"
   homepage "https://github.com/social4hyq/ohos-compat-shim"
-  # `branch:` avoids a network round-trip to resolve the default branch via
-  # ghfast.top proxy on every install (found when proxy was down 2026-08-04).
-  # 6349deb adds ohos-shim check subcommand.
+  # branch: pins the ref so brew skips the default-branch resolution round-trip.
   url "https://github.com/social4hyq/ohos-compat-shim.git",
       revision: "54bbffbaa43f03ed765092c0f32be47962135e79", branch: "main"
   version "0.2.9"
   license "MIT"
-  # No `revision N` — version bump starts fresh.
 
   livecheck do
     skip "development tool, manually versioned"
@@ -50,7 +47,6 @@ class OhosCompatShim < Formula
     libexec.install "ohos-compat-check"
 
     # Launcher: `ohos-shim <cmd>` preloads the shim; `ohos-shim check` runs the probe.
-    # Resolves .so/check binary via ../lib/../libexec relative to itself.
     bin.install "bin/ohos-shim"
 
     # Source-only install so check sources can be built on machines without harmonybrew.
