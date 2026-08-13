@@ -4,7 +4,7 @@ class LlvmAT21 < Formula
   url "https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.8/llvm-project-21.1.8.src.tar.xz"
   sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
   license "Apache-2.0" => { with: "LLVM-exception" }
-  revision 5
+  revision 6
   # Fully rewritten from upstream: OHOS code-sign patch, config.guess stub,
   # two separate runtime builds (compiler-rt + multiarch libc++).
 
