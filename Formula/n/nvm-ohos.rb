@@ -4,6 +4,7 @@ class NvmOhos < Formula
   url "https://github.com/nvm-sh/nvm/archive/refs/tags/v0.40.6.tar.gz"
   sha256 "17302cad7feedb1ad33ba738f93d2176a90970724f22de119603624fcbdec1a2"
   license "MIT"
+  revision 1
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/nvm-ohos-v0.40.6-r4"
