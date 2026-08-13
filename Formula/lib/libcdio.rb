@@ -12,7 +12,7 @@ class Libcdio < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "898d027ceedba5bdde07217ec12bf7e828c1ccdd8a68848f35ac6d8f603019c9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "68e4fe0d9754e9efc4de83f9ca1a8d9969f6f0264f6677de6bc429924ace4a59"
   end
 
   depends_on "pkgconf" => :build
