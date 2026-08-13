@@ -4,7 +4,7 @@ class Sshport < Formula
   url "https://github.com/social4hyq/ohos-sshport.git",
       tag: "v0.2.1", revision: "33b51319e55186ef85c0add720b2d34797297c62"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     skip "development tool, manually versioned"
