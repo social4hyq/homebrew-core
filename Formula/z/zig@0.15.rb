@@ -6,7 +6,7 @@ class ZigAT015 < Formula
   url "https://ziglang.org/download/0.15.2/zig-aarch64-linux-0.15.2.tar.xz"
   sha256 "958ed7d1e00d0ea76590d27666efbf7a932281b3d7ba0c6b01b0ff26498f667f"
   license "MIT"
-  revision 2
+  revision 3
 
   # Version-pinned: herdr targets a specific minimum_zig_version.
   livecheck do
