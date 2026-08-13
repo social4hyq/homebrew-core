@@ -19,17 +19,17 @@ class BunWebkit < Formula
 
   keg_only "webkit static archives are consumed in-tree by Bun, not linked system-wide"
 
-  depends_on "cmake"        => :build
-  depends_on "gperf"        => :build
-  depends_on "icu4c@78" => :build
-  depends_on "libxml2" => :build
-  depends_on "llvm@21"  => :build
-  depends_on "ninja" => :build
-  depends_on "ohos-sdk" => :build
-  depends_on "perl" => :build
+  depends_on "cmake"       => :build
+  depends_on "gperf"       => :build
+  depends_on "icu4c@78"    => :build
+  depends_on "libxml2"     => :build
+  depends_on "llvm@21"     => :build
+  depends_on "ninja"       => :build
+  depends_on "ohos-sdk"    => :build
+  depends_on "perl"        => :build
   depends_on "python@3.14" => :build
-  depends_on "ruby" => :build
-  depends_on "zlib" => :build
+  depends_on "ruby"        => :build
+  depends_on "zlib"        => :build
   # Outputs are static .a archives + headers — zero runtime linkage.
   # ohos-sdk is build-time only: JSC cross-compilation uses its sysroot.
 
@@ -135,14 +135,6 @@ class BunWebkit < Formula
     Dir.glob(buildpath.to_s + "/Source/WTF/wtf/*.h").each do |h|
       cp h, wtf_inc/File.basename(h) unless File.exist?(wtf_inc/File.basename(h))
     end
-  end
-
-  def caveats
-    <<~EOS
-      bun-webkit provides JSC/WTF/bmalloc static archives for Bun on HarmonyOS.
-      Pinned to WebKit commit #{version} (matches bun's WEBKIT_VERSION).
-      Consumed in-tree by the `bun` formula; keg-only.
-    EOS
   end
 
   test do
