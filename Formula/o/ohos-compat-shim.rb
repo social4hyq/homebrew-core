@@ -1,14 +1,11 @@
 class OhosCompatShim < Formula
   desc "LD_PRELOAD compat shim for HarmonyOS-sandboxed aarch64/musl binaries"
   homepage "https://github.com/social4hyq/ohos-compat-shim"
-  # `branch:` avoids a network round-trip to resolve the default branch via
-  # ghfast.top proxy on every install (found when proxy was down 2026-08-04).
-  # 6349deb adds ohos-shim check subcommand.
+  # `branch:` avoids a network round-trip to resolve the default branch on every install.
   url "https://github.com/social4hyq/ohos-compat-shim.git",
       revision: "54bbffbaa43f03ed765092c0f32be47962135e79", branch: "main"
   version "0.2.9"
   license "MIT"
-  # No `revision N` — version bump starts fresh.
 
   livecheck do
     skip "development tool, manually versioned"
