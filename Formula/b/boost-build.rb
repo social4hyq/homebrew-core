@@ -1,8 +1,8 @@
 class BoostBuild < Formula
   desc "C++ build system"
   homepage "https://www.boost.org/build/"
-  url "https://github.com/boostorg/build/archive/refs/tags/boost-1.91.0.tar.gz"
-  sha256 "98348affaad8041b940a99fe17211407b9ac6b2f46ca8ae0b8d9901bc8ebd9aa"
+  url "https://github.com/boostorg/build/archive/refs/tags/boost-1.92.0.tar.gz"
+  sha256 "bf2d9efb60cded0eca0c0be37e5c8a9fda7a3977a5c675b353aefced66ff3444"
   license "BSL-1.0"
   version_scheme 1
   head "https://github.com/boostorg/build.git", branch: "develop"
