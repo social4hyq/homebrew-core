@@ -1,13 +1,13 @@
 class GdkPixbuf < Formula
   desc "Toolkit for image loading and pixel buffer manipulation"
   homepage "https://gtk.org"
-  url "https://download.gnome.org/sources/gdk-pixbuf/2.44/gdk-pixbuf-2.44.7.tar.xz"
-  sha256 "172f80e3626ec31520a970400f1a3694e04718f6c2cd2885f75250fb5a6995a4"
+  url "https://download.gnome.org/sources/gdk-pixbuf/2.44/gdk-pixbuf-2.44.8.tar.xz"
+  sha256 "919f529512961a12e81cd4b4b466a48c3933469e7f9a310c6513cd4fb252ba3c"
   license "LGPL-2.1-or-later"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb9868ce1fa4446bf250f6acf415104d3e4f4e481800a27c47976205826743f6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ced6e5122d103fb2a4aed3e54d6f935347e20ff9c91df01aecb1ee625edeec95"
   end
 
   depends_on "docutils" => :build # for rst2man
