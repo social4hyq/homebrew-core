@@ -89,7 +89,6 @@ class Herdr < Formula
     mv bin/"herdr", libexec/"bin/herdr"
     (bin/"herdr").write <<~SH
       #!/bin/sh
-      export TMPDIR="${TMPDIR:-/data/storage/el2/base/tmp}"
       export LD_PRELOAD="#{formula_opt_prefix("ohos-compat-shim")}/lib/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
       exec "#{opt_libexec}/bin/herdr" "$@"
     SH
