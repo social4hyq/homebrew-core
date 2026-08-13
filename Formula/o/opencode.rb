@@ -1,5 +1,5 @@
 class Opencode < Formula
-  desc "AI coding agent terminal UI — HarmonyOS aarch64, built from source"
+  desc "AI coding agent terminal UI"
   homepage "https://github.com/anomalyco/opencode"
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.16.tar.gz"
   sha256 "4721cd5832cd0346b0ce66c0499543527e32af2ce4249732545eca9282d570b9"
@@ -22,17 +22,10 @@ class Opencode < Formula
   end
 
   # bun build --compile single binary: OHOS runtime + JS bundle + native .so embedded.
-  # ohos-compat-shim statically linked since bun r31 — no runtime shim dependency.
-  # Native deps via @ohos-ports/* package.json overrides (opentui-core, bun-pty,
-  #   lightningcss, tailwindcss-oxide, @parcel/watcher).
-  # bun install --ignore-scripts: tree-sitter-bash/-powershell would node-gyp build
-  #   native bindings the app never loads (opencode uses web-tree-sitter wasm).
-  # @parcel/watcher: inotify backend on OHOS via getBackend() openharmony patch.
   depends_on "bun" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
 
-  # All OHOS adaptations via inreplace — zero .patch files.
-  # Version bumps only need url + sha256 + bottle root_url.
+  # Version bumps only need url + sha256 + bottle root_url (all adaptations are inreplace, below).
 
   def install
     ENV["BUN_TMPDIR"] = (buildpath/".bun-tmp").to_s

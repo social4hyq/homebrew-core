@@ -1,5 +1,5 @@
 class ClaudeCode < Formula
-  desc "Anthropic Claude Code CLI — HarmonyOS (runtime-fetch stub; no binary in bottle)"
+  desc "Anthropic Claude Code CLI"
   homepage "https://code.claude.com/docs/en/overview"
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.228.tgz"
   sha256 "535e6daa6256689803cef88620e940924d00d274c2c293efe4a33590c2718cc9"

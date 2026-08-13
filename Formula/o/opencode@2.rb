@@ -1,5 +1,5 @@
 class OpencodeAT2 < Formula
-  desc "OpenCode v2 preview — AI coding agent CLI, HarmonyOS aarch64, built from source"
+  desc "OpenCode v2 preview — AI coding agent CLI"
   homepage "https://github.com/anomalyco/opencode"
   # v2 is a live branch (no tags yet); pinned git revision + beta version tag.
   # See social4hyq/ohos-opencode2 dev for canonical diff.

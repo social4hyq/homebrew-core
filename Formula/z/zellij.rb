@@ -1,5 +1,5 @@
 class Zellij < Formula
-  desc "Pluggable terminal workspace — HarmonyOS aarch64, built from source"
+  desc "Pluggable terminal workspace with terminal multiplexer as the base feature"
   homepage "https://zellij.dev"
   # Tracks pinned `main` revision (not v0.44.3 tag): that tag pins nix 0.23.1 which
   # predates OHOS support (0.30+); main has the bump. Switch back to a tag at v0.45.0.
@@ -59,10 +59,8 @@ class Zellij < Formula
     # vendored_curl/web_server_capability bundle their own C sources.
     system "cargo", "install", *std_cargo_args
 
-    # LD_PRELOAD ohos-compat-shim: fixes intermittent startup crash in fresh top-level PTY.
-    # Root cause: close_fds crate's fast path calls SYS_CLOSE_RANGE without availability probe;
-    # OHOS kernel SIGSYS-kills the process. Shim already intercepts close_range.
-    # A/B test: 20/20 clean with shim vs 12/20 without. See docs/harmonybrew-tap.md (PR #210).
+    # LD_PRELOAD ohos-compat-shim: fixes an intermittent startup crash in a fresh top-level
+    # PTY (PR #210, see docs/harmonybrew-tap.md for the root cause and A/B data).
     # TMPDIR fallback: OHOS /tmp is read-only.
     mkdir_p libexec/"bin"
     mv bin/"zellij", libexec/"bin/zellij"

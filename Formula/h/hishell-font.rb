@@ -1,9 +1,8 @@
 class HishellFont < Formula
   desc "Install and configure a Nerd Font (nerd-fonts.com) for hishell's terminal"
   homepage "https://github.com/social4hyq/ohos-hishell-font"
-  url "https://github.com/social4hyq/ohos-hishell-font.git",
-      revision: "ab256914f4ae5cb8fed99eddd8cdcdf1af993aa0"
-  version "0.1.0"
+  url "https://github.com/social4hyq/ohos-hishell-font/archive/refs/tags/v0.1.0.tar.gz"
+  sha256 "6569102dd4b56c7b657dce1a13e16cc3f56c6d42b9458d3cce1edce2e329d8b2"
   license "MIT"
 
   livecheck do

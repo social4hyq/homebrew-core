@@ -1,5 +1,5 @@
 class Bun < Formula
-  desc "JavaScript runtime for HarmonyOS aarch64 (stable)"
+  desc "Incredibly fast JavaScript runtime, bundler, test runner, and package manager"
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
