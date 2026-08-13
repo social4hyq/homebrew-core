@@ -63,12 +63,10 @@ class Zellij < Formula
     # Root cause: close_fds crate's fast path calls SYS_CLOSE_RANGE without availability probe;
     # OHOS kernel SIGSYS-kills the process. Shim already intercepts close_range.
     # A/B test: 20/20 clean with shim vs 12/20 without. See docs/harmonybrew-tap.md (PR #210).
-    # TMPDIR fallback: OHOS /tmp is read-only.
     mkdir_p libexec/"bin"
     mv bin/"zellij", libexec/"bin/zellij"
     (bin/"zellij").write <<~SH
       #!/bin/sh
-      export TMPDIR="${TMPDIR:-/data/storage/el2/base/tmp}"
       export LD_PRELOAD="#{formula_opt_prefix("ohos-compat-shim")}/lib/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
       exec "#{opt_libexec}/bin/zellij" "$@"
     SH
