@@ -12,7 +12,7 @@ class Uv < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/uv-v0.12.3-r1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/uv-v0.12.3-r2"
     sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "d828e4305b1ede83551f22d8d5cc7cf5b98cb49f7be40b4b790a23fd4591705d"
   end
 
@@ -37,6 +37,17 @@ class Uv < Formula
   patch do
     file "Patches/uv/0002-ohos-libc-detect-skip-ld-exec.patch"
   end
+  # 0003: OHOS auto-signing for wheel-bundled native modules. Vendors a
+  # pure-Rust OHOS ELF self-signer (the same crate ohos-bun embeds at
+  # src/ohos_sign/) and hooks it into link_wheel_files, the single chokepoint
+  # every wheel install (pip/add/sync/tool/uvx/venv seeding) funnels through.
+  # .so/.node files are signed in the unpacked-wheel cache before linking, so
+  # every link mode propagates signed bytes and the cache stays signed. The
+  # hook + helper are #[cfg(target_env = "ohos")]; the vendored crate compiles
+  # on every target so CI still type-checks it. Set OHOS_SIGN_DEBUG=1 to trace.
+  patch do
+    file "Patches/uv/0003-ohos-autosign-wheels.patch"
+  end
 
   def install
     # aws-lc-sys (via rustls/reqwest) needs its CMake+ohos.toolchain.cmake
@@ -53,13 +64,12 @@ class Uv < Formula
 
   def caveats
     <<~CAVEATS
-      Pure-Python packages work end to end (uv pip install/compile, uv venv).
-      Binary wheels resolve but land unsigned (Permission denied on import)
-      unless you sign them yourself.
+      Wheel .so files are now auto-signed on install (patch 0003), so binary
+      wheels import out of the box for uv pip/add/sync and uvx.
 
-      uv python install and uvx <tool-with-native-deps> fetch unsigned
-      ELFs/wheels that won't run here -- use brew install python@3.14, and
-      expect uvx to work reliably only for pure-Python tools.
+      uv python install still fetches unsigned standalone interpreter builds
+      whose own lib-dynload .so are NOT installed through the wheel path and
+      so are NOT auto-signed -- use `brew install python@3.14` instead.
     CAVEATS
   end
 
