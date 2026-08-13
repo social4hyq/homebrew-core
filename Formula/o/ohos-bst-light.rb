@@ -2,8 +2,7 @@ class OhosBstLight < Formula
   desc "Lightweight binary self-sign tool for HarmonyOS (preserves ELF structure)"
   homepage "https://github.com/hqzing/ohos-bst-light"
   url "https://github.com/hqzing/ohos-bst-light.git",
-      revision: "c4dfd71c869a0ca055d8b5ce4c3a9bf53735b2e1"
-  version "1.0.0"
+      tag: "v1.0.0", revision: "73382d75a6f1f18112ca5cdf0a30b1f89330d838"
   license "MIT"
   revision 1
 
@@ -12,8 +11,9 @@ class OhosBstLight < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-bst-light-v1.0.0-r1"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "3698df835d0a44e2262cc111908f26064648f6f5e652f2944edf17eb17595932"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-bst-light-v1.0.0-r3"
+    rebuild 1
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "6820f805e3023bb3cd44077ecb36be04beb711603b057a0651ed6acfc8981b80"
   end
 
   # self-sign preserves ELF structure (binary-sign-tool can corrupt Bun binaries).
