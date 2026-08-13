@@ -16,7 +16,7 @@ class LlvmAT21 < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm@21-v21.1.8-r2"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "9b5e75cfe6d2ab28d662ab3ce464ade41e6900eb6537b733ccf6e9bdd3c5e97e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b5e75cfe6d2ab28d662ab3ce464ade41e6900eb6537b733ccf6e9bdd3c5e97e"
   end
 
   keg_only "this is a versioned HarmonyOS bootstrap toolchain"
@@ -158,7 +158,7 @@ class LlvmAT21 < Formula
             ";-DCMAKE_C_FLAGS=-D__MUSL__" \
             ";-DCMAKE_CXX_FLAGS=-D__MUSL__ -isystem #{libcxx_ohos}"
 
-    # --- Bootstrap slim mode (see docs/superpowers/specs/2026-06-24-slim-llvm21-bottle-design.md)
+    # --- Bootstrap slim mode
     # CLANG_BUILD_TOOLS/LLVM_BUILD_TOOLS stay ON (gates llvm-config); prune post-install.
 
     llvmpath = buildpath/"llvm"
