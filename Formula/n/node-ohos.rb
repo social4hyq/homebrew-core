@@ -4,6 +4,7 @@ class NodeOhos < Formula
   url "https://nodejs.org/dist/v26.7.0/node-v26.7.0.tar.xz"
   sha256 "e6b182cbeeab032d1082ca4ac4fe15e3a57de691d3bde78ecf8a761fd56ee356"
   license "MIT"
+  revision 1
 
   livecheck do
     url "https://nodejs.org/dist/"
