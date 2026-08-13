@@ -6,8 +6,7 @@ class Mongoose < Formula
   license "GPL-2.0-only"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c453ad756b53a9fd25f397bf78592dabe03ac354a416ba389b200280f139ef8f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "83dce457f7a3f3e7c197413f8896a9a419cc6cb0b4306635cd86b382365a80ea"
   end
 
   def install
