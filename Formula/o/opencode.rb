@@ -1,9 +1,10 @@
 class Opencode < Formula
-  desc "AI coding agent terminal UI — HarmonyOS aarch64, built from source"
+  desc "AI coding agent terminal UI"
   homepage "https://github.com/anomalyco/opencode"
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.18.tar.gz"
   sha256 "9962680e6ea7b59e002b2940a1f33f31f147fea4e976df2ea5501bc70ed2fb83"
   license "MIT"
+  revision 1
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
   # HTML page fetch), while api.github.com answers fast — same JSON strategy
@@ -16,8 +17,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.18-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "28ea3f488bef73472a120b538c492ba967f8739c44032cd1f4071cbb2ba311d0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.18-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "05d1a058b29bf6b0aa73d8cd6f2817cae9d2e7b94b1381af97bc911f07f72eb6"
   end
 
   # bun build --compile single binary: OHOS runtime + JS bundle + native .so embedded.
@@ -29,9 +30,6 @@ class Opencode < Formula
   # @parcel/watcher: inotify backend on OHOS via getBackend() openharmony patch.
   depends_on "bun" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
-
-  # All OHOS adaptations via inreplace — zero .patch files.
-  # Version bumps only need url + sha256 + bottle root_url.
 
   def install
     ENV["BUN_TMPDIR"] = (buildpath/".bun-tmp").to_s
@@ -143,18 +141,7 @@ class Opencode < Formula
     sections = Utils.safe_popen_read(readelf.to_s, "--section-headers", out)
     odie "compiled binary lacks .codesign section" unless sections.include?(".codesign")
 
-    # Shim statically linked since bun r31 — no LD_PRELOAD needed.
-    # bun signs .so in-process during install.
-    # Wrapper defaults TMPDIR to writable EL2 path (OHOS /tmp read-only).
-    # opt_libexec for stable path across Cellar layout changes.
-    mkdir_p libexec/"bin"
-    libexec.install out => "bin/opencode"
-    (bin/"opencode").write <<~SH
-      #!/bin/sh
-      export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
-      exec "#{opt_libexec}/bin/opencode" "$@"
-    SH
-    chmod 0755, bin/"opencode"
+    bin.install out
 
     # Handwritten zsh completion (upstream yargs only emits bash).
     (zsh_completion/"_opencode").write <<~'ZSH'
@@ -228,7 +215,7 @@ class Opencode < Formula
     ZSH
 
     # Bash completion from the binary itself (yargs generator, always in sync).
-    generate_completions_from_executable(libexec/"bin/opencode", "completion", shells: [:bash])
+    generate_completions_from_executable(bin/"opencode", "completion", shells: [:bash])
   end
 
   test do
