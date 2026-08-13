@@ -4,15 +4,15 @@ class HishellFont < Formula
   url "https://github.com/social4hyq/ohos-hishell-font.git",
       tag: "v0.1.0", revision: "ab256914f4ae5cb8fed99eddd8cdcdf1af993aa0"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     skip "development tool, manually versioned"
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hishell-font-v0.1.0-r4"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "665f7b621a9bae5856bda18df4cbffc8d6bf3104fa426fb63f45bd206e7c7437"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hishell-font-v0.1.0-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b823bfc9cca8888555dd76a2b15d53f1cfc778f8f2eaf693e198dccd687b2d6e"
   end
 
   # hishell (Alacritty OHOS port) resolves fonts via bundled fontconfig — there's no
