@@ -2,17 +2,17 @@ class HishellFont < Formula
   desc "Install and configure a Nerd Font (nerd-fonts.com) for hishell's terminal"
   homepage "https://github.com/social4hyq/ohos-hishell-font"
   url "https://github.com/social4hyq/ohos-hishell-font.git",
-      revision: "ab256914f4ae5cb8fed99eddd8cdcdf1af993aa0"
-  version "0.1.0"
+      tag: "v0.1.0", revision: "ab256914f4ae5cb8fed99eddd8cdcdf1af993aa0"
   license "MIT"
+  revision 1
 
   livecheck do
     skip "development tool, manually versioned"
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hishell-font-v0.1.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e9ff638365a716f3cfde5f409484dd3dd3081d1952750feb5f6d4488548bce7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hishell-font-v0.1.0-r4"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "665f7b621a9bae5856bda18df4cbffc8d6bf3104fa426fb63f45bd206e7c7437"
   end
 
   # hishell (Alacritty OHOS port) resolves fonts via bundled fontconfig — there's no
@@ -30,14 +30,13 @@ class HishellFont < Formula
     system "bun", "build", "--target=bun", "--outfile", "hishell-font.js", "src/cli.ts"
     libexec.install "hishell-font.js"
 
-    # Same $HOMEBREW_PREFIX runtime pattern as sshport.rb. fc-match/tar/xz resolved via
-    # explicit opt/*/bin rather than PATH (OHOS-native tar could shadow gnu-tar).
-    (bin/"hishell-font").write <<~SH
-      #!/bin/sh
-      : "${HOMEBREW_PREFIX:?hishell-font: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
-      export PATH="$HOMEBREW_PREFIX/opt/fontconfig/bin:$HOMEBREW_PREFIX/opt/gnu-tar/bin:$HOMEBREW_PREFIX/opt/xz/bin:$PATH"
-      exec "$HOMEBREW_PREFIX/opt/bun/bin/bun" "$HOMEBREW_PREFIX/opt/hishell-font/libexec/hishell-font.js" "$@"
-    SH
+    bin_paths = [formula_opt_bin("fontconfig"), formula_opt_bin("gnu-tar"), formula_opt_bin("xz")].join(":") +
+                ":$PATH"
+    (bin/"hishell-font").write_env_script(
+      formula_opt_bin("bun")/"bun",
+      opt_libexec/"hishell-font.js",
+      "PATH" => bin_paths,
+    )
     chmod 0755, bin/"hishell-font"
   end
 
