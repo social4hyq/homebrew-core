@@ -1,5 +1,5 @@
 class QemuAarch64 < Formula
-  desc "QEMU user-mode aarch64 emulator — strace substitute for HarmonyOS"
+  desc "QEMU user-mode aarch64 emulator"
   homepage "https://qemu.org/"
   # Alpine prebuilt qemu-aarch64 (user-mode only). Fully static musl: zero NEEDED,
   # no PT_INTERP — runs as-is on OHOS.
@@ -7,8 +7,7 @@ class QemuAarch64 < Formula
   version "11.0.1-r0"
   sha256 "c7f5a9821064c23f48916ea68dac44565fa961d49ff360fd12e1ea2fd9727a34"
   license all_of: ["GPL-2.0-only", "LGPL-2.1-only"]
-  # OHOS refuses ptrace on self-signed binaries; qemu user-mode -strace is userspace
-  # (syscalls intercepted, no ptrace needed). See blog.csdn.net/hqzing/article/details/163311519.
+  # OHOS refuses ptrace on self-signed binaries; qemu -strace intercepts syscalls in userspace (no ptrace).
 
   livecheck do
     url "https://pkgs.alpinelinux.org/package/v3.24/community/aarch64/qemu-aarch64"
@@ -45,7 +44,6 @@ class QemuAarch64 < Formula
     system formula_opt_bin("ohos-bst-light")/"self-sign", src.to_s
 
     bin.install src
-    chmod 0755, bin/"qemu-aarch64"
   end
 
   def caveats
