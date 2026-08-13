@@ -15,7 +15,7 @@ class NvmOhos < Formula
   # This formula does NOT patch nvm.sh (kept byte-for-byte); instead installs nvm-ohos.sh
   # that plugs into nvm's $NVM_INSTALL_THIRD_PARTY_HOOK to redirect to brew-built kegs.
   # unofficial-builds.nodejs.org musl spike rejected: dynamic libgcc_s.so.1 dependency.
-  # Coverage: node@22/24/26 only. See docs/harmonybrew-tap.md.
+  # Coverage: node@22/24/26 only.
   def install
     libexec.install "nvm.sh", "nvm-exec"
 
