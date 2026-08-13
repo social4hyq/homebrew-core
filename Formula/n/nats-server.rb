@@ -12,7 +12,7 @@ class NatsServer < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "acd57d08ee2ce1877a83bb8b05feb9d49fdeb69fe32ca37420b6bc1547864ed1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4418b9a1bf7f9274c9d9158376c4f8dd8dea8022dad43780287004d73221154b"
   end
 
   depends_on "go" => :build
