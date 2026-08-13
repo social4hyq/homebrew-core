@@ -14,7 +14,7 @@ class Starship < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r5"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "54c2cdd11a360f18f1d37d8ecb7fa7c773d15ed1e58f4270531fdea9d57321d7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "54c2cdd11a360f18f1d37d8ecb7fa7c773d15ed1e58f4270531fdea9d57321d7"
   end
 
   depends_on "rust" => :build
@@ -23,7 +23,7 @@ class Starship < Formula
     # Disable default features (battery/notify): OHOS has no dbus, no battery API.
     # All remaining deps are pure Rust. strerror_r link fix: rust libc crate declares
     # __xpg_strerror_r for OHOS but musl libc doesn't export it; provide a forwarding .o
-    # via RUSTFLAGS. See docs/harmonybrew-tap.md.
+    # via RUSTFLAGS.
     (buildpath/"strerror_shim.rs").write <<~RUST
       #[no_mangle]
       pub extern "C" fn __xpg_strerror_r(errnum: i32, buf: *mut u8, buflen: usize) -> i32 {
