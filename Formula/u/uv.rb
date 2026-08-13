@@ -14,7 +14,7 @@ class Uv < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/uv-v0.12.3-r3"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "ad23eed372436697fb955410f5eb2f16a210cfd31b4379bfc83c99cbbdb905eb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad23eed372436697fb955410f5eb2f16a210cfd31b4379bfc83c99cbbdb905eb"
   end
 
   depends_on "cmake" => :build
