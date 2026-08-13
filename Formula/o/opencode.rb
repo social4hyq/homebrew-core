@@ -1,8 +1,8 @@
 class Opencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.16.tar.gz"
-  sha256 "4721cd5832cd0346b0ce66c0499543527e32af2ce4249732545eca9282d570b9"
+  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.18.tar.gz"
+  sha256 "9962680e6ea7b59e002b2940a1f33f31f147fea4e976df2ea5501bc70ed2fb83"
   license "MIT"
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
@@ -16,9 +16,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.16-r3"
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d90f250457d4fad49b99b9413766efe140139bdf63b8690a978cab71d6d5834e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.18-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "28ea3f488bef73472a120b538c492ba967f8739c44032cd1f4071cbb2ba311d0"
   end
 
   # bun build --compile single binary: OHOS runtime + JS bundle + native .so embedded.
