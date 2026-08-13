@@ -1,8 +1,8 @@
 class Codewhale < Formula
   desc "Local-first agent harness for DeepSeek V4 and open models"
   homepage "https://github.com/Hmbown/CodeWhale"
-  url "https://github.com/Hmbown/CodeWhale/archive/refs/tags/v0.9.5.tar.gz"
-  sha256 "57957264204f5b7136d64cf62bd11c47de0d0ec0d7eca218902f07712eab1a47"
+  url "https://github.com/Hmbown/CodeWhale/archive/refs/tags/v0.9.6.tar.gz"
+  sha256 "491dc46cfce76ff9bd4803ef99b6eb6c3c6c8293bb2e8a3afbb1877d5f0a2612"
   license "MIT"
   head "https://github.com/Hmbown/CodeWhale.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Codewhale < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c391b7cca796babb615c68ab1a5f3190596cd322755594d9e9d3b409b4201403"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7763ea83368cf1d46bee8df9d355dd5319029a731a2a75ce2b0b5326443076e9"
   end
 
   depends_on "rust" => :build
