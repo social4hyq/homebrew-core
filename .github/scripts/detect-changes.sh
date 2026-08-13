@@ -41,6 +41,43 @@ fi
 # change (confirmed against icu4c@78's routine bottle-only update history).
 strip_bottle() { sed '/^  bottle do$/,/^  end$/d' | cat -s; }
 
+# Strip full-line comments for the comment-only skip below, but leave heredoc
+# bodies verbatim: heredoc content (shell/CMake/Rust/zsh-completion wrapper
+# text) IS code that lands in the bottle, so `#`-prefixed lines inside `<<~EOS`
+# (e.g. `#!/bin/sh`, `#compdef`) must not be treated as comments — otherwise an
+# edit to a comment line inside a wrapper heredoc would be misread as
+# "comment-only" and its rebuild skipped. Delimiters seen in this tap: <<~EOS,
+# <<~SH, <<~'ZSH', … — the optional quote is matched via the '\'' in the
+# bracket class. Ruby `args << "-D..."` (Array#<<) is not a heredoc and is
+# ignored because the token after `<<` starts with `-`/`"`, not an identifier.
+strip_comments() {
+  awk '
+    function hd(line,   m, d) {
+      if (match(line, /<<[-~]?[[:space:]]*['\''"]?[A-Za-z_][A-Za-z0-9_]*/)) {
+        d = substr(line, RSTART, RLENGTH)
+        sub(/^<<[-~]?[[:space:]]*/, "", d)
+        gsub(/['\''"]/, "", d)
+        return d
+      }
+      return ""
+    }
+    {
+      if (here) {
+        print
+        t = $0
+        sub(/^[[:space:]]+/, "", t)
+        sub(/[[:space:]]+$/, "", t)
+        if (t == here) here = ""
+        next
+      }
+      d = hd($0)
+      if (d != "") { print; here = d; next }
+      if ($0 ~ /^[[:space:]]*#/) next
+      print
+    }
+  ' | cat -s
+}
+
 mapfile -t FILES < <(git diff --name-status --no-renames "$BEFORE" "$AFTER" -- 'Formula/' \
   | awk '$1 != "D" && $2 ~ /^Formula\/[^\/]+\/[^\/]+\.rb$/ {print $2}')
 
@@ -75,6 +112,18 @@ for f in "${FILES[@]}"; do
      diff <(git show "$BEFORE:$f" | strip_bottle) \
           <(git show "$AFTER:$f"  | strip_bottle) >/dev/null; then
     echo "::notice::$name: bottle block only, skipping build"
+    continue
+  fi
+
+  # comment-only changes don't need a rebuild either: stripping both the
+  # bottle block and full-line comments leaves nothing, so the install logic
+  # (and therefore the bottle content) is byte-for-byte identical. Wrapper
+  # edits still rebuild — heredoc bodies survive strip_comments, so a real
+  # wrapper change stays visible in the diff.
+  if git cat-file -e "$BEFORE:$f" 2>/dev/null && \
+     diff <(git show "$BEFORE:$f" | strip_bottle | strip_comments) \
+          <(git show "$AFTER:$f"  | strip_bottle | strip_comments) >/dev/null; then
+    echo "::notice::$name: comment only, skipping build"
     continue
   fi
   if tr ' ' '\n' <<< "$HEAVY_FORMULAS" | grep -qx "$name"; then
