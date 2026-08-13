@@ -13,8 +13,8 @@ class Starship < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "54c2cdd11a360f18f1d37d8ecb7fa7c773d15ed1e58f4270531fdea9d57321d7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c2e4e8e1075d0f22dd268cafb55901bf4d34e3be9aeeee4322cee04bc5dda0a"
   end
 
   depends_on "rust" => :build
