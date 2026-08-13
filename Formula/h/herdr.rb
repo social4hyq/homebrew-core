@@ -4,7 +4,7 @@ class Herdr < Formula
   url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.8.0.tar.gz"
   sha256 "47bdb0753beb8a6b157cf2fec26fbe6b787f85ffea0dde579b0001d6cd663572"
   license "Apache-2.0"
-  revision 1
+  revision 2
   head "https://github.com/herdrdev/herdr.git", branch: "master"
 
   livecheck do
@@ -13,8 +13,8 @@ class Herdr < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.8.0-r4"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "eac16c87d55de71183e40f60f775dca079cf4b36ae5a49a19c60257f0e9e10d5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.8.0-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4240009151d6b2f508567efb9828427f2207a8530128fd51842c334c8eb31bbe"
   end
 
   depends_on "ohos-bst-light" => :build # self-sign, see the zig-build note below
