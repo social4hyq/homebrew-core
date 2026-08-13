@@ -4,6 +4,7 @@ class Uv < Formula
   url "https://github.com/astral-sh/uv/archive/refs/tags/0.12.3.tar.gz"
   sha256 "7d95d35a941135b96cc344c63b8da427d456900f58621481b909eac00904db7f"
   license any_of: ["Apache-2.0", "MIT"]
+  revision 1
   head "https://github.com/astral-sh/uv.git", branch: "main"
 
   livecheck do
@@ -12,9 +13,8 @@ class Uv < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/uv-v0.12.3-r2"
-    rebuild 1
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "ddb40df7d9b42262b7be644ed9bba96dd85c467acac36433e3a00dc1d231bf9b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/uv-v0.12.3-r3"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "ad23eed372436697fb955410f5eb2f16a210cfd31b4379bfc83c99cbbdb905eb"
   end
 
   depends_on "cmake" => :build
@@ -38,14 +38,6 @@ class Uv < Formula
   patch do
     file "Patches/uv/0002-ohos-libc-detect-skip-ld-exec.patch"
   end
-  # 0003: OHOS auto-signing for wheel-bundled native modules. Vendors a
-  # pure-Rust OHOS ELF self-signer (the same crate ohos-bun embeds at
-  # src/ohos_sign/) and hooks it into link_wheel_files, the single chokepoint
-  # every wheel install (pip/add/sync/tool/uvx/venv seeding) funnels through.
-  # .so/.node files are signed in the unpacked-wheel cache before linking, so
-  # every link mode propagates signed bytes and the cache stays signed. The
-  # hook + helper are #[cfg(target_env = "ohos")]; the vendored crate compiles
-  # on every target so CI still type-checks it. Set OHOS_SIGN_DEBUG=1 to trace.
   patch do
     file "Patches/uv/0003-ohos-autosign-wheels.patch"
   end
