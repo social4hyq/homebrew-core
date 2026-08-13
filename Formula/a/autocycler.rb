@@ -7,7 +7,7 @@ class Autocycler < Formula
   head "https://github.com/rrwick/Autocycler.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0811f55f2c3747be4c62b287f804e984689d6f09c1053b92c55e99efa6812bc7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "621323c49e418cb2f9330f74684fd1f068a2cd5c2e6187d5a732a39259a96aaa"
   end
 
   depends_on "rust" => :build
