@@ -7,6 +7,7 @@ class QemuAarch64 < Formula
   version "11.0.1-r0"
   sha256 "c7f5a9821064c23f48916ea68dac44565fa961d49ff360fd12e1ea2fd9727a34"
   license all_of: ["GPL-2.0-only", "LGPL-2.1-only"]
+  revision 1
   # OHOS refuses ptrace on self-signed binaries; qemu user-mode -strace is userspace
   # (syscalls intercepted, no ptrace needed). See blog.csdn.net/hqzing/article/details/163311519.
 
@@ -16,9 +17,8 @@ class QemuAarch64 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qemu-aarch64-v11.0.1-r0-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0efec74ed85c2cbc49f76c27d38da6d3199343cc9e8e9d4d6c0b49b2a558ee47"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qemu-aarch64-v11.0.1-r0-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd76b18ae50e276070f48072a97a17a463eb114fabac5e51c6d4aa388516548d"
   end
 
   depends_on "ohos-bst-light" => :build # self-sign
