@@ -4,7 +4,7 @@ class Herdr < Formula
   url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.8.0.tar.gz"
   sha256 "47bdb0753beb8a6b157cf2fec26fbe6b787f85ffea0dde579b0001d6cd663572"
   license "Apache-2.0"
-  revision 2
+  revision 3
   head "https://github.com/herdrdev/herdr.git", branch: "master"
 
   livecheck do
