@@ -1,13 +1,13 @@
 class AvroTools < Formula
   desc "Avro command-line tools and utilities"
   homepage "https://avro.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=avro/avro-1.12.1/java/avro-tools-1.12.1.jar"
-  mirror "https://archive.apache.org/dist/avro/avro-1.12.1/java/avro-tools-1.12.1.jar"
-  sha256 "eb269df172ec96f6721bf9e56182e28afd9cd72d596d035c46561f6f70a69c36"
+  url "https://www.apache.org/dyn/closer.lua?path=avro/avro-1.12.2/java/avro-tools-1.12.2.jar"
+  mirror "https://archive.apache.org/dist/avro/avro-1.12.2/java/avro-tools-1.12.2.jar"
+  sha256 "6220e8bc089aaf917cdad4cd358bd651fc0394c0e5ddb8b36da402012c294a68"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4e8a34406c881b64969bf757e8476ee79a902c2ddfeb2e14f7f1ee6cf652365"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65fe1618d884a5658977ab2634034db14d1d272448c1a4b7341d99448efb5cd7"
   end
 
   depends_on "openjdk"
