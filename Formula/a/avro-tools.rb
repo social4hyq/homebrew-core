@@ -7,7 +7,7 @@ class AvroTools < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4e8a34406c881b64969bf757e8476ee79a902c2ddfeb2e14f7f1ee6cf652365"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65fe1618d884a5658977ab2634034db14d1d272448c1a4b7341d99448efb5cd7"
   end
 
   depends_on "openjdk"
