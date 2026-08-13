@@ -16,9 +16,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.16-r3"
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d90f250457d4fad49b99b9413766efe140139bdf63b8690a978cab71d6d5834e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.18-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "28ea3f488bef73472a120b538c492ba967f8739c44032cd1f4071cbb2ba311d0"
   end
 
   # bun build --compile single binary: OHOS runtime + JS bundle + native .so embedded.
