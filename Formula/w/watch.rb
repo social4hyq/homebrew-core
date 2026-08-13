@@ -6,7 +6,7 @@ class Watch < Formula
   license all_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "49245c93310a51a5acd50e3fc350bb59f0058953e1b0168f81304a834bcaacf0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e8a8422abf1d80ecedd455040d9c8818ad42c4c2f5d1746295f99add06bc20e"
   end
 
   head do
