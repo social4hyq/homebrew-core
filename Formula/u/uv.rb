@@ -4,7 +4,7 @@ class Uv < Formula
   url "https://github.com/astral-sh/uv/archive/refs/tags/0.12.3.tar.gz"
   sha256 "7d95d35a941135b96cc344c63b8da427d456900f58621481b909eac00904db7f"
   license any_of: ["Apache-2.0", "MIT"]
-  revision 1
+  revision 2
   head "https://github.com/astral-sh/uv.git", branch: "main"
 
   livecheck do
