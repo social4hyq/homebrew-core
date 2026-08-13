@@ -1,8 +1,8 @@
 class Opencode < Formula
   desc "AI coding agent terminal UI — HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.16.tar.gz"
-  sha256 "4721cd5832cd0346b0ce66c0499543527e32af2ce4249732545eca9282d570b9"
+  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.18.tar.gz"
+  sha256 "9962680e6ea7b59e002b2940a1f33f31f147fea4e976df2ea5501bc70ed2fb83"
   license "MIT"
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
