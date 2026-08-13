@@ -1,5 +1,5 @@
 class Herdr < Formula
-  desc "Terminal workspace runtime for AI coding agents (built from source)"
+  desc "Terminal workspace runtime for AI coding agents"
   homepage "https://herdr.dev"
   url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.8.0.tar.gz"
   sha256 "47bdb0753beb8a6b157cf2fec26fbe6b787f85ffea0dde579b0001d6cd663572"
