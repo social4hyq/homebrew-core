@@ -11,8 +11,8 @@ class HishellFont < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hishell-font-v0.1.0-r3"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "ffe76cfc939a334125d27e13249d2540960fcaebbbc179d8969b33fc58e0d43d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hishell-font-v0.1.0-r4"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "665f7b621a9bae5856bda18df4cbffc8d6bf3104fa426fb63f45bd206e7c7437"
   end
 
   # hishell (Alacritty OHOS port) resolves fonts via bundled fontconfig — there's no
