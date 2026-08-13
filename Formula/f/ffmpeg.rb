@@ -16,7 +16,7 @@ class Ffmpeg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e97163f5fa1541120d010a448b9dbdea387e8a44862317826b5a22769d6d6a4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "21e09b2352bb1d271c08336db73d492dc8a2275f841017989cd68845358a7669"
   end
 
   depends_on "pkgconf" => :build
