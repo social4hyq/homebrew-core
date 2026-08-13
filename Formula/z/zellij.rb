@@ -1,13 +1,13 @@
 class Zellij < Formula
-  desc "Pluggable terminal workspace — HarmonyOS aarch64, built from source"
+  desc "Pluggable terminal workspace"
   homepage "https://zellij.dev"
   # Tracks pinned `main` revision (not v0.44.3 tag): that tag pins nix 0.23.1 which
   # predates OHOS support (0.30+); main has the bump. Switch back to a tag at v0.45.0.
-  # See docs/harmonybrew-tap.md.
   url "https://github.com/zellij-org/zellij.git",
       revision: "5254e4fc1dd784ef872644190dc5e2bcb0981bed", branch: "main"
   version "0.45.0-dev"
   license "MIT"
+  revision 1
 
   livecheck do
     url "https://api.github.com/repos/zellij-org/zellij/commits?sha=main&per_page=1"
@@ -19,7 +19,7 @@ class Zellij < Formula
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zellij-v0.45.0-dev-r2"
     rebuild 1
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "1575b2c17a18e7d8560adcc262cdeba6cb54486df71ea68f2a2de4526a3de375"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1575b2c17a18e7d8560adcc262cdeba6cb54486df71ea68f2a2de4526a3de375"
   end
 
   depends_on "cmake" => :build
@@ -59,18 +59,14 @@ class Zellij < Formula
     # vendored_curl/web_server_capability bundle their own C sources.
     system "cargo", "install", *std_cargo_args
 
-    # LD_PRELOAD ohos-compat-shim: fixes intermittent startup crash in fresh top-level PTY.
-    # Root cause: close_fds crate's fast path calls SYS_CLOSE_RANGE without availability probe;
-    # OHOS kernel SIGSYS-kills the process. Shim already intercepts close_range.
-    # A/B test: 20/20 clean with shim vs 12/20 without. See docs/harmonybrew-tap.md (PR #210).
-    # TMPDIR fallback: OHOS /tmp is read-only.
+    # ohos-compat-shim fixes an intermittent startup crash in a fresh top-level PTY:
+    # close_fds's fast path calls SYS_CLOSE_RANGE without an availability probe, and the
+    # OHOS kernel SIGSYS-kills the process.
     mkdir_p libexec/"bin"
     mv bin/"zellij", libexec/"bin/zellij"
     (bin/"zellij").write <<~SH
       #!/bin/sh
-      export TMPDIR="${TMPDIR:-/data/storage/el2/base/tmp}"
-      export LD_PRELOAD="#{formula_opt_prefix("ohos-compat-shim")}/lib/libohos_compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
-      exec "#{opt_libexec}/bin/zellij" "$@"
+      exec "#{formula_opt_bin("ohos-compat-shim")}/ohos-shim" "#{opt_libexec}/bin/zellij" "$@"
     SH
     chmod 0755, bin/"zellij"
 
