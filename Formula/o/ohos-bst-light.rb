@@ -4,7 +4,7 @@ class OhosBstLight < Formula
   url "https://github.com/hqzing/ohos-bst-light.git",
       tag: "v1.0.0", revision: "73382d75a6f1f18112ca5cdf0a30b1f89330d838"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     skip "development tool, manually versioned"
