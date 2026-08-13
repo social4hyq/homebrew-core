@@ -2,8 +2,7 @@ class OhosBstLight < Formula
   desc "Lightweight binary self-sign tool for HarmonyOS (preserves ELF structure)"
   homepage "https://github.com/hqzing/ohos-bst-light"
   url "https://github.com/hqzing/ohos-bst-light.git",
-      revision: "c4dfd71c869a0ca055d8b5ce4c3a9bf53735b2e1"
-  version "1.0.0"
+      tag: "v1.0.0", revision: "73382d75a6f1f18112ca5cdf0a30b1f89330d838"
   license "MIT"
   revision 1
 
