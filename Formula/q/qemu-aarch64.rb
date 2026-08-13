@@ -7,6 +7,7 @@ class QemuAarch64 < Formula
   version "11.0.1-r0"
   sha256 "c7f5a9821064c23f48916ea68dac44565fa961d49ff360fd12e1ea2fd9727a34"
   license all_of: ["GPL-2.0-only", "LGPL-2.1-only"]
+  revision 1
   # OHOS refuses ptrace on self-signed binaries; qemu user-mode -strace is userspace
   # (syscalls intercepted, no ptrace needed). See blog.csdn.net/hqzing/article/details/163311519.
 
