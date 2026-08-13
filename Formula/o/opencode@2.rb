@@ -124,14 +124,13 @@ class OpencodeAT2 < Formula
     sections = Utils.safe_popen_read(readelf.to_s, "--section-headers", out)
     odie "compiled binary lacks .codesign section" unless sections.include?(".codesign")
 
-    # Wrapper defaults TMPDIR to EL2 and isolates XDG_DATA_HOME ($HOME/.local/share-v2)
-    # so v2's DB migrations don't break v1's session creation. opt_libexec keeps
-    # baked path stable across flat/nested cellar flip.
+    # Isolates XDG_DATA_HOME ($HOME/.local/share-v2) so v2's DB migrations don't
+    # break v1's session creation. opt_libexec keeps baked path stable across
+    # flat/nested cellar flip.
     mkdir_p libexec/"bin"
     libexec.install out => "bin/opencode2"
     (bin/"opencode2").write <<~SH
       #!/bin/sh
-      export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
       export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share-v2}"
       exec "#{opt_libexec}/bin/opencode2" "$@"
     SH
