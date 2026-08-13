@@ -158,8 +158,7 @@ class LlvmAT21 < Formula
             ";-DCMAKE_C_FLAGS=-D__MUSL__" \
             ";-DCMAKE_CXX_FLAGS=-D__MUSL__ -isystem #{libcxx_ohos}"
 
-    # --- Bootstrap slim mode (see docs/superpowers/specs/2026-06-24-slim-llvm21-bottle-design.md)
-    # CLANG_BUILD_TOOLS/LLVM_BUILD_TOOLS stay ON (gates llvm-config); prune post-install.
+    # Slim bootstrap: CLANG_BUILD_TOOLS/LLVM_BUILD_TOOLS stay ON (gates llvm-config), pruned post-install.
 
     llvmpath = buildpath/"llvm"
 
@@ -507,28 +506,17 @@ class LlvmAT21 < Formula
 
   def caveats
     <<~EOS
-      HarmonyOS LLVM 21 (slim bootstrap build) at:
-        #{opt_prefix}
+      HarmonyOS LLVM 21 (slim bootstrap) at #{opt_prefix}.
+      Target triple: #{HOST_TRIPLE}; runtime libs: #{TARGET_TRIPLE}.
 
-      Default target triple:      #{HOST_TRIPLE}
-      Runtime libs target triple: #{TARGET_TRIPLE}
-
-      This is a SLIM build — only what downstream C++23 bootstraps consume:
-        ✓ clang/clang++ v21, ld.lld v21 (CodeSign patch), llvm-config
-        ✓ multiarch libc++/libunwind/compiler-rt static libs + headers
-        ✗ libLLVM*.a / libclang*.a / libclang-cpp.so (use upstream for LLVM dev)
-        ✗ clang-format/tidy/clangd, scan-build (use ohos-sdk LLVM 15)
-
-      bin/ tools like llvm-ar/nm/objcopy/objdump/readelf/strip/cov/FileCheck
-      are relative symlinks to ohos-sdk LLVM 15 (formats stable across 15-21).
+      Slim build: clang/clang++/ld.lld (CodeSign patch), llvm-config, and
+      multiarch libc++/libunwind/compiler-rt static libs + headers. No
+      libLLVM/libclang static libs or clangd/format/tidy (bin/ llvm-ar/nm/
+      objdump/readelf/strip/etc. symlink to ohos-sdk LLVM 15 for those).
 
       Example:
         #{opt_bin}/aarch64-linux-ohos-clang++ -stdlib=libc++ \\
-          --sysroot=#{HOMEBREW_PREFIX}/opt/ohos-sdk/native/sysroot \\
-          hello.cpp -o hello
-
-      For a full LLVM 21 dev environment (all tools + static libs + headers),
-      track future `llvm@21-full` formula (not yet implemented).
+          --sysroot=#{HOMEBREW_PREFIX}/opt/ohos-sdk/native/sysroot hello.cpp -o hello
     EOS
   end
 
