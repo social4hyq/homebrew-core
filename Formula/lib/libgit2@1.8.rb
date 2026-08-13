@@ -1,8 +1,8 @@
 class Libgit2AT18 < Formula
   desc "C library of Git core methods that is re-entrant and linkable"
   homepage "https://libgit2.org/"
-  url "https://github.com/libgit2/libgit2/archive/refs/tags/v1.8.6.tar.gz"
-  sha256 "c171e9c6fcc33455e3df46d422f4e1b3ea7c049a645051664c9cdbdc081208e7"
+  url "https://github.com/libgit2/libgit2/archive/refs/tags/v1.8.7.tar.gz"
+  sha256 "a548a2209c3e99d6bb685d843396fff3a7d3ffd8340adb5d8851637cfe8cd134"
   license "GPL-2.0-only" => { with: "GCC-exception-2.0" }
 
   livecheck do
