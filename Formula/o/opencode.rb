@@ -5,9 +5,7 @@ class Opencode < Formula
   sha256 "9962680e6ea7b59e002b2940a1f33f31f147fea4e976df2ea5501bc70ed2fb83"
   license "MIT"
 
-  # PageMatch on github.com/releases/latest times out from slow networks (the
-  # HTML page fetch), while api.github.com answers fast — same JSON strategy
-  # as opencode@2.
+  # api.github.com JSON avoids the slow/timeout-prone releases/latest HTML fetch.
   livecheck do
     url "https://api.github.com/repos/anomalyco/opencode/releases/latest"
     strategy :json do |json|
@@ -20,18 +18,12 @@ class Opencode < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "28ea3f488bef73472a120b538c492ba967f8739c44032cd1f4071cbb2ba311d0"
   end
 
-  # bun build --compile single binary: OHOS runtime + JS bundle + native .so embedded.
-  # ohos-compat-shim statically linked since bun r31 — no runtime shim dependency.
-  # Native deps via @ohos-ports/* package.json overrides (opentui-core, bun-pty,
-  #   lightningcss, tailwindcss-oxide, @parcel/watcher).
-  # bun install --ignore-scripts: tree-sitter-bash/-powershell would node-gyp build
-  #   native bindings the app never loads (opencode uses web-tree-sitter wasm).
-  # @parcel/watcher: inotify backend on OHOS via getBackend() openharmony patch.
+  # `bun build --compile` single binary (shim statically linked since bun r31).
+  # --ignore-scripts: skip tree-sitter native node-gyp builds the app never loads.
   depends_on "bun" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
 
-  # All OHOS adaptations via inreplace — zero .patch files.
-  # Version bumps only need url + sha256 + bottle root_url.
+  # All OHOS adaptations via inreplace — version bumps only touch url/sha256/bottle.
 
   def install
     ENV["BUN_TMPDIR"] = (buildpath/".bun-tmp").to_s
