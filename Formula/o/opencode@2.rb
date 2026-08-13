@@ -2,7 +2,6 @@ class OpencodeAT2 < Formula
   desc "OpenCode v2 preview — AI coding agent CLI, HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
   # v2 is a live branch (no tags yet); pinned git revision + beta version tag.
-  # See social4hyq/ohos-opencode2 dev for canonical diff.
   url "https://github.com/anomalyco/opencode.git", revision: "84fd347afaed9617b7b29744086657fa029bbe68", branch: "v2"
   version "2.0.0-beta"
   license "MIT"
@@ -20,17 +19,12 @@ class OpencodeAT2 < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "4f897cc13fb350023b6832ce3ec22262465117be14380fa9edd68dc585bfc781"
   end
 
-  # `bun build --compile` single binary: runtime + JS + .so embedded; since
-  # bun r31 ohos-compat-shim is statically linked (no runtime shim dep).
-  # v2 monorepo restructure: CLI moved packages/opencode → packages/cli
-  # (binary renamed opencode2). Build script: packages/cli/script/build.ts.
-  # Fewer native deps: only opentui-core + bun-pty. `bun install --ignore-scripts`
-  # (lifecycle scripts irrelevant to signing). @parcel/watcher: @ohos-ports binary.
+  # `bun build --compile` single binary (shim statically linked since bun r31).
+  # v2 CLI lives in packages/cli (binary: opencode2); build script packages/cli/script/build.ts.
   depends_on "bun" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
 
-  # All OHOS adaptations via inreplace — zero .patch files.
-  # See opencode.rb for the same pattern.
+  # All OHOS adaptations via inreplace — same pattern as opencode.rb.
 
   def install
     ENV["BUN_TMPDIR"] = (buildpath/".bun-tmp").to_s
