@@ -1,13 +1,13 @@
 class LeafMd < Formula
   desc "Terminal Markdown previewer with a GUI-like experience"
   homepage "https://leaf.rivolink.mg/"
-  url "https://github.com/RivoLink/leaf/archive/refs/tags/1.27.0.tar.gz"
-  sha256 "e5b16179b756e42f78e76597f5e7356fc6f984a4bc7f3e274bd820cce5a8c7fc"
+  url "https://github.com/RivoLink/leaf/archive/refs/tags/1.27.1.tar.gz"
+  sha256 "17ef2e5ae0abac73e8ceb3da4b5756ef1153d001b234eed3df53d43c6cfa1ccf"
   license "MIT"
   head "https://github.com/RivoLink/leaf.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fc919006d3fa83ef09495301f93a4af15eae366e43f3e04ff52f1593edc1f045"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "262f11f76761277c1e8c4b383368230e4a1acac43c05126583618b48f3770f79"
   end
 
   depends_on "rust" => :build
