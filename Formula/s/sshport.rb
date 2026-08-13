@@ -5,6 +5,7 @@ class Sshport < Formula
       revision: "33b51319e55186ef85c0add720b2d34797297c62"
   version "0.2.1"
   license "MIT"
+  revision 1
 
   livecheck do
     skip "development tool, manually versioned"
@@ -26,12 +27,7 @@ class Sshport < Formula
     system "bun", "build", "--target=bun", "--outfile", "sshport.js", "src/cli.ts"
     libexec.install "sshport.js"
 
-    # $HOMEBREW_PREFIX resolved at runtime (relocatable wrapper).
-    (bin/"sshport").write <<~SH
-      #!/bin/sh
-      : "${HOMEBREW_PREFIX:?sshport: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
-      exec "$HOMEBREW_PREFIX/opt/bun/bin/bun" "$HOMEBREW_PREFIX/opt/sshport/libexec/sshport.js" "$@"
-    SH
+    (bin/"sshport").write_env_script(formula_opt_bin("bun")/"bun", opt_libexec/"sshport.js", {})
     chmod 0755, bin/"sshport"
   end
 
