@@ -1032,19 +1032,13 @@ diff --git a/crates/uv-install-wheel/src/linker.rs b/crates/uv-install-wheel/src
 index 8d442b5..c549538 100644
 --- a/crates/uv-install-wheel/src/linker.rs
 +++ b/crates/uv-install-wheel/src/linker.rs
-@@ -248,6 +248,58 @@ impl InstallState {
+@@ -248,6 +248,50 @@ impl InstallState {
      }
  }
  
-+/// OHOS-only: sign every `.so` ELF under the unpacked-wheel source directory
-+/// in place, before it is linked into site-packages.
-+///
-+/// The OHOS kernel refuses to `dlopen` an ELF with no `.codesign` section, so
-+/// wheel-bundled native modules are unusable without a signature. Signing the
-+/// unpacked-wheel source once means every link mode (clone/hardlink/copy/
-+/// symlink) propagates already-signed bytes, and the wheel cache stays signed
-+/// so re-installs are free. Idempotent: already-signed files are skipped.
-+/// Failures are non-fatal (matching ohos-bun's behaviour for `.node` addons).
++/// OHOS-only: sign every `.so` ELF in the unpacked wheel before linking.
++/// OHOS refuses to `dlopen` an unsigned ELF, so native modules need a .codesign
++/// section. Idempotent (skips already-signed); failures non-fatal.
 +#[cfg(target_env = "ohos")]
 +fn ohos_sign_wheel_files(wheel_src: &Path) {
 +    let debug = std::env::var_os("OHOS_SIGN_DEBUG").is_some();
@@ -1067,10 +1061,8 @@ index 8d442b5..c549538 100644
 +                }
 +            }
 +            Ok(_) => {
-+                // catch_unwind: an exotic/malformed ELF must never abort the
-+                // whole wheel install. A panic here is contained and the file
-+                // is simply left unsigned (clean Permission denied on import,
-+                // no crash), matching the non-fatal Err path below.
++                // catch_unwind: a malformed ELF must not abort the whole install —
++                // contain the panic, leave the file unsigned (clean failure on import).
 +                let result =
 +                    std::panic::catch_unwind(|| ohos_sign::sign_selfsign_inplace_with_strip(path));
 +                if debug {

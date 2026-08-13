@@ -1,12 +1,10 @@
 --- a/crates/uv-platform/src/libc.rs	2026-08-12 12:06:25.628000000 +0000
 +++ b/crates/uv-platform/src/libc.rs	2026-08-12 12:06:42.128000000 +0000
-@@ -248,6 +248,12 @@
+@@ -248,6 +248,10 @@
  /// ```
  fn detect_musl_version(ld_path: impl AsRef<Path>) -> Result<LibcVersion, LibcDetectionError> {
      let ld_path = ld_path.as_ref();
-+    // OHOS: sandboxed processes cannot execve() the dynamic linker directly.
-+    // The interpreter path itself already says "musl", so skip the exec and
-+    // use that directly instead of parsing a live "Version X.Y" banner.
++    // OHOS: sandbox can't execve() the linker; the path already says "musl", so infer from it.
 +    if ld_path.to_string_lossy().contains("musl") {
 +        return Ok(LibcVersion::Musllinux { major: 1, minor: 2 });
 +    }
