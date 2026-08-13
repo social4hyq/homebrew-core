@@ -15,8 +15,8 @@ class ZigAT015 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zig@0.15-v0.15.2-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c7762e529bb250059b1e6f42cf6fbb665aa04f86cd974e75ff4dc9c8064b9ba"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zig@0.15-v0.15.2-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce9160617a30410f6b276ecbe501b4f99d78f420abe21246a91f86e43d54574b"
   end
 
   depends_on "ohos-bst-light" => :build # self-sign
