@@ -7,7 +7,7 @@ class Zellij < Formula
       revision: "5254e4fc1dd784ef872644190dc5e2bcb0981bed", branch: "main"
   version "0.45.0-dev"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://api.github.com/repos/zellij-org/zellij/commits?sha=main&per_page=1"
@@ -17,8 +17,8 @@ class Zellij < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zellij-v0.45.0-dev-r5"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "63e82b5603ede905d7b821bb4c1993614a390a619cb4a1b8ba8ef4a9f2e133b2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zellij-v0.45.0-dev-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9dbc03f34a1bf6b4b17bb7f9094b7093650541f426619d1790b3ef4d92a9f7f5"
   end
 
   depends_on "cmake" => :build
