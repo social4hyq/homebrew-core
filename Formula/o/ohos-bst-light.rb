@@ -13,7 +13,7 @@ class OhosBstLight < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-bst-light-v1.0.0-r1"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "3698df835d0a44e2262cc111908f26064648f6f5e652f2944edf17eb17595932"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3698df835d0a44e2262cc111908f26064648f6f5e652f2944edf17eb17595932"
   end
 
   # self-sign preserves ELF structure (binary-sign-tool can corrupt Bun binaries).
