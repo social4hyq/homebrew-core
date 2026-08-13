@@ -11,6 +11,7 @@ app-with-resources
 hello-standalone*
 *.tar.gz
 prebuilt/
+.merkle-snapshot.json
 
 # 临时/验证产物
 .verify-wt/
