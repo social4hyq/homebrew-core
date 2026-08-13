@@ -1,14 +1,14 @@
 class Pandoc < Formula
   desc "Swiss-army knife of markup format conversion"
   homepage "https://pandoc.org/"
-  url "https://github.com/jgm/pandoc/archive/refs/tags/3.10.1.tar.gz"
-  sha256 "faee98f42ed1592b2feb8da7fdfa87a23b679ca27ff883e06030f89c25c91ba9"
+  url "https://github.com/jgm/pandoc/archive/refs/tags/3.10.2.tar.gz"
+  sha256 "ec4c5d36e355785802601986637369ada24079ac20af6c0ee85c79502d77b3f0"
   license "GPL-2.0-or-later"
   compatibility_version 3
   head "https://github.com/jgm/pandoc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3eed6cbd1d3185377ee0f26e05e0d1511c1cf951b42f85ed396234b890047db1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b63ff58be0ed782fea1279a05fe81d0f2dc04f87d1a56be637bb8e797609b39a"
   end
 
   depends_on "cabal-install" => :build
