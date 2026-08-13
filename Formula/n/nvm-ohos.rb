@@ -7,7 +7,7 @@ class NvmOhos < Formula
   revision 1
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/nvm-ohos-v0.40.6-r5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/nvm-ohos-v0.40.6-r6"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "61d5e03bc8112dea55074a614133d5a0fdf7154ef9af800c26ff7390069a68b7"
   end
 
