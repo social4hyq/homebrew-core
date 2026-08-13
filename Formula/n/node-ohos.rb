@@ -12,7 +12,7 @@ class NodeOhos < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/node-ohos-v26.7.0-r1"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "4116d48d1b96c89f7bb8f361246ce150f6f8432792a3ee83d65750786514f9b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4116d48d1b96c89f7bb8f361246ce150f6f8432792a3ee83d65750786514f9b1"
   end
 
   keg_only "alternate toolchain build of node; the harmonybrew/core node formula " \
@@ -111,7 +111,7 @@ class NodeOhos < Formula
 
     # OHOS dlopen namespace isolation: addons can't resolve libnode.so symbols unless it's
     # linked with -Wl,-z,global (DF_1_GLOBAL). Threaded through common.gypi (not LDFLAGS)
-    # because absolute CC/CXX paths bypass superenv. See CLAUDE.md OHOS dlopen note.
+    # because absolute CC/CXX paths bypass superenv.
     inreplace "common.gypi" do |s|
       s.sub!(
         "'ldflags': [ '-rdynamic' ],",
