@@ -4,7 +4,7 @@ class HishellFont < Formula
   url "https://github.com/social4hyq/ohos-hishell-font.git",
       tag: "v0.1.0", revision: "ab256914f4ae5cb8fed99eddd8cdcdf1af993aa0"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     skip "development tool, manually versioned"
