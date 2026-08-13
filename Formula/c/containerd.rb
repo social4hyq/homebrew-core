@@ -6,7 +6,7 @@ class Containerd < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "740987b3c88536289533f91e8dc2485277a2977070007f0e819fbe038284230a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b00950b56ffca5310335ee9255832c787639857c5d40817a2621d7f2d696f726"
   end
 
   depends_on "go" => :build
