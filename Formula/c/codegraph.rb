@@ -4,6 +4,7 @@ class Codegraph < Formula
   url "https://github.com/colbymchenry/codegraph/archive/refs/tags/v1.5.0.tar.gz"
   sha256 "319758918f58418a8a576d24c7829ecfa9e68eff78ddf49f52455a27a79ec621"
   license "MIT"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,8 +12,8 @@ class Codegraph < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codegraph-v1.5.0-r1"
-    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "4ac322a8fcd183a0e4a87f8fd93424bf853299ed3041a8d05efb2e5f8cbd86d2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codegraph-v1.5.0-r3"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "6f2b282674b1f22ea0f67ebb6a65405b72884662fe18c7c99fdbde2fd48b0cc8"
   end
 
   depends_on "rust" => :build
@@ -34,18 +35,13 @@ class Codegraph < Formula
     (libexec/"kernel").install "codegraph-kernel/prebuilds/openharmony-arm64/codegraph-kernel.node"
 
     # CODEGRAPH_KERNEL_PATH bypasses the loader's platform path search
-    # (process.platform is 'openharmony', not 'linux'). --liftoff-only
-    # avoids a V8 turboshaft WASM OOM with tree-sitter grammars.
-    (bin/"codegraph").write <<~SH
-      #!/bin/sh
-      : "${HOMEBREW_PREFIX:?codegraph: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
-      export TMPDIR="${TMPDIR:-/data/storage/el2/base/cache}"
-      export CODEGRAPH_KERNEL_PATH="$HOMEBREW_PREFIX/opt/codegraph/libexec/kernel/codegraph-kernel.node"
-      exec "$HOMEBREW_PREFIX/opt/node@24/bin/node" \\
-        --liftoff-only \\
-        --disable-warning=ExperimentalWarning \\
-        "$HOMEBREW_PREFIX/opt/codegraph/libexec/dist/bin/codegraph.js" "$@"
-    SH
+    # (process.platform is 'openharmony', not 'linux'); --liftoff-only avoids a
+    # V8 turboshaft WASM OOM with tree-sitter grammars.
+    (bin/"codegraph").write_env_script(
+      formula_opt_bin("node@24")/"node",
+      ["--liftoff-only", "--disable-warning=ExperimentalWarning", opt_libexec/"dist/bin/codegraph.js"],
+      "CODEGRAPH_KERNEL_PATH" => opt_libexec/"kernel/codegraph-kernel.node",
+    )
     chmod 0755, bin/"codegraph"
   end
 
