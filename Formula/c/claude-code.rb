@@ -5,19 +5,10 @@ class ClaudeCode < Formula
   sha256 "535e6daa6256689803cef88620e940924d00d274c2c293efe4a33590c2718cc9"
   license :cannot_represent # Anthropic Commercial Terms of Service
   revision 1
-  # npmmirror mirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org
-  # (aarch64 SIMD AES path trapped by kernel); npmmirror (Aliyun CDN) doesn't.
-  # Files are byte-identical (sha256 matches); wrapper tries npmmirror first,
-  # falls back to registry.npmjs.org for non-buggy curl or mirror lag.
-  #
-  # Stub bottle: Anthropic License prohibits redistributing the official binary,
-  # so install() writes only a wrapper — the binary is fetched, sha256-checked,
-  # and self-signed (ohos-bst-light) at first run: binary-sign-tool corrupts the
-  # embedded app and it degenerates to bare bun runtime (verified 2026-08-13).
-  # pour_bottle? also bypasses Homebrew's DevelopmentTools requirement
-  # (OHOS ships no /usr/bin/clang).
-  #
-  # Relocatability: wrapper uses runtime $HOMEBREW_PREFIX only — no build-time path interpolation.
+  # Stub bottle: Anthropic License forbids redistribution, so install() ships
+  # only a wrapper that fetches + sha256-checks + self-signs the binary at first
+  # run (binary-sign-tool corrupts it → ohos-bst-light self-sign instead).
+  # npmmirror mirror: brew's curl SIGILLs on the Cloudflare-fronted npmjs.org.
 
   livecheck do
     # www.npmjs.com 403s from this env; registry API JSON is reachable.
@@ -82,27 +73,12 @@ class ClaudeCode < Formula
 
   def caveats
     <<~EOS
-      claude-code is installed as a runtime-fetch stub: the official binary is
-      NOT in the bottle (Anthropic License). The first `claude` invocation
-      downloads it (via the npmmirror mirror), self-signs it, and caches it under
-      $HOMEBREW_CACHE/claude-code/#{version}/ (override with CLAUDE_CODE_CACHE).
+      claude-code is a runtime-fetch stub: the official binary is NOT in the
+      bottle (Anthropic License). The first `claude` invocation downloads it,
+      self-signs it, and caches it under $HOMEBREW_CACHE/claude-code/#{version}/
+      (override with CLAUDE_CODE_CACHE).
 
-      Claude Code requires API credentials. Configure via environment variables:
-
-        export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
-        export ANTHROPIC_AUTH_TOKEN=sk-xxx
-        export ANTHROPIC_MODEL=deepseek-v4-flash
-        export ANTHROPIC_DEFAULT_OPUS_MODEL=deepseek-v4-flash
-        export ANTHROPIC_DEFAULT_SONNET_MODEL=deepseek-v4-flash
-        export ANTHROPIC_DEFAULT_HAIKU_MODEL=deepseek-v4-flash
-        export CLAUDE_CODE_SUBAGENT_MODEL=deepseek-v4-flash
-        export CLAUDE_CODE_EFFORT_LEVEL=max
-
-      See https://api-docs.deepseek.com/zh-cn/quick_start/agent_integrations/claude_code
-      for DeepSeek integration details.
-
-      For OpenAI-format APIs, install claude-code-router:
-        brew install claude-code-router
+      Claude Code requires API credentials; see the Anthropic Claude Code docs.
     EOS
   end
 
