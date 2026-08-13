@@ -4,11 +4,11 @@ class NvmOhos < Formula
   url "https://github.com/nvm-sh/nvm/archive/refs/tags/v0.40.6.tar.gz"
   sha256 "17302cad7feedb1ad33ba738f93d2176a90970724f22de119603624fcbdec1a2"
   license "MIT"
-  revision 1
+  revision 3
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/nvm-ohos-v0.40.6-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61d5e03bc8112dea55074a614133d5a0fdf7154ef9af800c26ff7390069a68b7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/nvm-ohos-v0.40.6-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "268e572204f49897a99fcfb2500764f501fbbce87acecb075f5e51f0773c898c"
   end
 
   # Upstream nvm downloads unsigned glibc binaries that can't run on OHOS.
