@@ -4,7 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.18.tar.gz"
   sha256 "9962680e6ea7b59e002b2940a1f33f31f147fea4e976df2ea5501bc70ed2fb83"
   license "MIT"
-  revision 1
+  revision 2
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
   # HTML page fetch), while api.github.com answers fast — same JSON strategy
@@ -17,8 +17,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.18-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "05d1a058b29bf6b0aa73d8cd6f2817cae9d2e7b94b1381af97bc911f07f72eb6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.18-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a168516534726b1ee5d34a65eacbe137f1f4aba95ccae736247d8d80066698d8"
   end
 
   # bun build --compile single binary: OHOS runtime + JS bundle + native .so embedded.
