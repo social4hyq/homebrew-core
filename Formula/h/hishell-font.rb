@@ -5,6 +5,7 @@ class HishellFont < Formula
       revision: "ab256914f4ae5cb8fed99eddd8cdcdf1af993aa0"
   version "0.1.0"
   license "MIT"
+  revision 1
 
   livecheck do
     skip "development tool, manually versioned"
@@ -30,14 +31,13 @@ class HishellFont < Formula
     system "bun", "build", "--target=bun", "--outfile", "hishell-font.js", "src/cli.ts"
     libexec.install "hishell-font.js"
 
-    # Same $HOMEBREW_PREFIX runtime pattern as sshport.rb. fc-match/tar/xz resolved via
-    # explicit opt/*/bin rather than PATH (OHOS-native tar could shadow gnu-tar).
-    (bin/"hishell-font").write <<~SH
-      #!/bin/sh
-      : "${HOMEBREW_PREFIX:?hishell-font: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
-      export PATH="$HOMEBREW_PREFIX/opt/fontconfig/bin:$HOMEBREW_PREFIX/opt/gnu-tar/bin:$HOMEBREW_PREFIX/opt/xz/bin:$PATH"
-      exec "$HOMEBREW_PREFIX/opt/bun/bin/bun" "$HOMEBREW_PREFIX/opt/hishell-font/libexec/hishell-font.js" "$@"
-    SH
+    bin_paths = [formula_opt_bin("fontconfig"), formula_opt_bin("gnu-tar"), formula_opt_bin("xz")].join(":") +
+                ":$PATH"
+    (bin/"hishell-font").write_env_script(
+      formula_opt_bin("bun")/"bun",
+      opt_libexec/"hishell-font.js",
+      "PATH" => bin_paths,
+    )
     chmod 0755, bin/"hishell-font"
   end
 
