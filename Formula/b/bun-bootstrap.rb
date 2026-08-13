@@ -5,7 +5,7 @@ class BunBootstrap < Formula
   version "1.4.0-5467a689"
   sha256 "7c1f187907eba7090c60e14dc1bc474fd62ec5b6273cc44c571cf18d35305a2b"
   license "MIT"
-  revision 1
+  revision 2
 
   # Prebuilt tarball, hosted as a release asset of this repo (not committed to git).
   # Bootstrap chain: use this bun to run `bun bd` to compile the target bun.
