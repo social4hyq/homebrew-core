@@ -13,9 +13,8 @@ class Herdr < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.8.0-r3"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8ab1ede87c0e595f698d64c66bc2b7ecdb4aff9fdbf982b8d0b8d013d528077"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.8.0-r4"
+    sha256 cellar: "/storage/Users/currentUser/.harmonybrew/Cellar", arm64_ohos: "eac16c87d55de71183e40f60f775dca079cf4b36ae5a49a19c60257f0e9e10d5"
   end
 
   depends_on "ohos-bst-light" => :build # self-sign, see the zig-build note below
