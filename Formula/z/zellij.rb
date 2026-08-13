@@ -7,7 +7,7 @@ class Zellij < Formula
       revision: "5254e4fc1dd784ef872644190dc5e2bcb0981bed", branch: "main"
   version "0.45.0-dev"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://api.github.com/repos/zellij-org/zellij/commits?sha=main&per_page=1"
