@@ -1,9 +1,9 @@
 class Doxygen < Formula
   desc "Generate documentation for several programming languages"
   homepage "https://www.doxygen.nl/"
-  url "https://doxygen.nl/files/doxygen-1.17.0.src.tar.gz"
-  mirror "https://downloads.sourceforge.net/project/doxygen/rel-1.17.0/doxygen-1.17.0.src.tar.gz"
-  sha256 "fa4c3dd78785abc11ccc992bc9c01e7a8c3120fe14b8a8dfd7cefa7014530814"
+  url "https://doxygen.nl/files/doxygen-1.18.0.src.tar.gz"
+  mirror "https://downloads.sourceforge.net/project/doxygen/rel-1.18.0/doxygen-1.18.0.src.tar.gz"
+  sha256 "a1deed70a6785bbec95a2b2a9e419dc7f7b223a9d74a8644ae611c8e2dcdd354"
   license "GPL-2.0-only"
   compatibility_version 1
   head "https://github.com/doxygen/doxygen.git", branch: "master"
@@ -14,7 +14,7 @@ class Doxygen < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0efb22b675e8a0941d612dcda0f921702e19128e805f741d64ca2a23a76a9275"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d103ff2e1a342d7f2f64203082aba1830840384c67d6415df4a404bc9b367de6"
   end
 
   depends_on "bison" => :build
