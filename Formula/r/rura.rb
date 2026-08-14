@@ -1,12 +1,12 @@
 class Rura < Formula
   desc "Interactive TUI scratchpad for building shell pipelines"
   homepage "https://github.com/tlipinski/rura"
-  url "https://github.com/tlipinski/rura/archive/refs/tags/v1.11.0.tar.gz"
-  sha256 "af88f649ad0be5fd55639b50d3ebcd716afe1e6130fa52a21bb13f1727dbeaaa"
+  url "https://github.com/tlipinski/rura/archive/refs/tags/v1.12.0.tar.gz"
+  sha256 "b0a4126d515d9e48b3445dca5c6407e3b86a882398f0661f605a9e1a6e695bd8"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "340d5196dc72dfed2cef3204f7e31ae15be213853a573e6a6f9398bd472c5a79"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2690dbc365ecf2e421ee72ee2754a02d2d861f791de0903b5980c0d3506cfa96"
   end
 
   depends_on "rust" => :build
