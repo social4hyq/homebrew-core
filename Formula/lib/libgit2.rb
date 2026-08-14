@@ -1,8 +1,8 @@
 class Libgit2 < Formula
   desc "C library of Git core methods that is re-entrant and linkable"
   homepage "https://libgit2.org/"
-  url "https://github.com/libgit2/libgit2/archive/refs/tags/v1.9.6.tar.gz"
-  sha256 "a88a42a4ea9bdab7aa8686eead3bf7d9c6dd74529caca16ab22eaa92433d31d9"
+  url "https://github.com/libgit2/libgit2/archive/refs/tags/v1.9.7.tar.gz"
+  sha256 "1a4fbe7589e814777ae76b64734ad80f4ecad22cd33a22682a2aaea4ae5375e7"
   license "GPL-2.0-only" => { with: "GCC-exception-2.0" }
   compatibility_version 1
   head "https://github.com/libgit2/libgit2.git", branch: "main"
@@ -13,7 +13,7 @@ class Libgit2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e332ab0ddf6bc2cce5b228eadc037af6239416d249aefade9cb9a4bdb6e4521b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "644ce42c89bcd37b604488b5ea08de3d30c9ca7f67b3f96137d3b2817064624f"
   end
 
   depends_on "cmake" => :build
