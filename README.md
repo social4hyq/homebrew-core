@@ -1,6 +1,6 @@
 # social4hyq/homebrew-core
 
-HarmonyOS（OHOS aarch64）的 Homebrew tap：提供已在真机验证的开发工具链——AI coding CLI（`opencode` / `claude-code`）、Bun 运行时（`bun` / `bun-webkit` / `llvm@21` 等）、终端与调试工具（`qemu-aarch64` / `starship` / `zellij` / `sshport` 等）。所有二进制均已按 HarmonyOS 要求完成签名，安装后开箱即用。
+HarmonyOS（OHOS aarch64）的 Homebrew tap：提供已在真机验证的开发工具链——AI coding CLI（`opencode` / `claude-code` / `deepseek-harness`）、Bun 运行时（`bun` / `bun-webkit` / `llvm@21` 等）、Node 版本管理（`nvm`）、终端与调试工具（`qemu-aarch64` / `starship` / `zellij` / `sshport` 等）。所有二进制均已按 HarmonyOS 要求完成签名，安装后开箱即用。
 
 ## 安装
 
@@ -11,6 +11,7 @@ brew trust social4hyq/core   # Homebrew 6.0+ 必须显式信任第三方 tap
 # 常用工具：
 brew install opencode        # AI 编码代理（v2 预览：brew install opencode@2）
 brew install claude-code     # Claude Code CLI
+brew install deepseek-harness # DeepSeek Harness agent（bin: dsh）
 brew install bun             # Bun 运行时
 brew install starship        # 跨 shell 提示符
 brew install zellij          # 终端复用器
@@ -24,6 +25,7 @@ bun --version && bun -e 'console.log(2**32, Math.PI)'
 opencode --version
 opencode2 --version
 claude --version
+dsh -V && dsh --profile web --help
 starship --version
 zellij --version
 qemu-aarch64 --version && qemu-aarch64 -strace /bin/true
@@ -38,6 +40,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `opencode` | 1.18.15, revision 1 | OpenCode AI 编码代理 CLI；上游源码构建（`bun build --compile` 单体二进制，原生依赖走 `@ohos-ports/*` npm 包） |
 | `opencode@2` | 2.0.0-beta, revision 13 | opencode v2 预览路线；源码构建（`bun build --compile` 单体二进制，原生依赖 `@ohos-ports/opentui-core` + `@ohos-ports/bun-pty`），命令名 `opencode2` |
 | `claude-code` | 2.1.226 | Anthropic Claude Code CLI；runtime-fetch stub（License 禁重分发），首次运行拉取 + 校验 sha256 + 自签 |
+| `deepseek-harness` | 0.1.0-rc.6, revision 1 | DeepSeek Harness agent（bin `dsh`，web/headless/tui profiles）；npm 包 + bun 装依赖树（阻断 koffi 原生编译）+ windows-acl stub + sharp-wasm32，wrapper 内置 `ohos-compat-shim`（link() 拦截）+ `--expose-internals` |
 | `bun` | 1.4.0, revision 56 | Bun JavaScript runtime；**自举源码构建**（`bun bd`），`ohos-compat-shim` 静态内嵌进可执行文件；libc++ ABI 已切 `__n1`（r56 起） |
 | `bun-bootstrap` | 1.4.0-5467a689, revision 1 | 预编译 bun，用于 `bun bd` 自举本机 bun；已预签（`keg_only`） |
 | `bun-webkit` | `ddea71318f`, revision 1 | bun 专用 WebKit fork 静态库（JSCore/WTF/bmalloc）；CMake 源码构建（`--target=aarch64-linux-ohos`，`keg_only`） |
@@ -53,6 +56,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `zig@0.15` | 0.15.2 | ziglang.org 官方 aarch64-linux 静态预编译二进制重打包；`ohos-bst-light` self-sign；herdr 的构建依赖 |
 | `codegraph` | 1.5.0 | 代码知识图谱（MCP server），为 AI agent 提供语义检索；npm + Rust napi cdylib kernel（20 语言 tree-sitter），存储走 `node:sqlite` |
 | `uv` | 0.12.3 | 极速 Python 包管理器；Rust 源码构建，附 musl 检测补丁 + `python@3.14` 运行时依赖 |
+| `nvm` | 0.40.6, revision 1 | OHOS 适配版 nvm：`nvm_get_os()` 经 OHOS 参数系统识别 OpenHarmony，node dist 默认走 `ohos-node.com`（预签名预编译），`nvm install` 原生下载即可用 |
 
 ## 已下线 / 已迁移
 
