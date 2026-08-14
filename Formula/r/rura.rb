@@ -1,8 +1,8 @@
 class Rura < Formula
   desc "Interactive TUI scratchpad for building shell pipelines"
   homepage "https://github.com/tlipinski/rura"
-  url "https://github.com/tlipinski/rura/archive/refs/tags/v1.11.0.tar.gz"
-  sha256 "af88f649ad0be5fd55639b50d3ebcd716afe1e6130fa52a21bb13f1727dbeaaa"
+  url "https://github.com/tlipinski/rura/archive/refs/tags/v1.12.0.tar.gz"
+  sha256 "b0a4126d515d9e48b3445dca5c6407e3b86a882398f0661f605a9e1a6e695bd8"
   license "MIT"
 
   bottle do
