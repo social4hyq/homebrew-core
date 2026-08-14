@@ -1,12 +1,12 @@
 class Tldx < Formula
   desc "Domain Availability Research Tool"
   homepage "https://brandonyoung.dev/blog/introducing-tldx/"
-  url "https://github.com/brandonyoungdev/tldx/archive/refs/tags/v1.5.0.tar.gz"
-  sha256 "cfc51a5c0e64888b7ec81f98df4138cf96ea63f67696d915dbd47e0ae1303d10"
+  url "https://github.com/brandonyoungdev/tldx/archive/refs/tags/v1.6.0.tar.gz"
+  sha256 "dde3467c300872e0bfcafe472419d5c1152a30d29731f1e9ee7a9982f85074e8"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "99c7b7f93e7d8460514bc4c7bdfdfa792a82131c23b8baf20005e5cda87397d7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d06ac8759572cc4a543d9b1703c2682f26ccd5c54a26f1d7371392702b71745a"
   end
 
   depends_on "go" => :build
