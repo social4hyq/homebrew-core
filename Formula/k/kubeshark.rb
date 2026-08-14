@@ -1,8 +1,8 @@
 class Kubeshark < Formula
   desc "API Traffic Analyzer providing real-time visibility into Kubernetes network"
   homepage "https://kubeshark.com"
-  url "https://github.com/kubeshark/kubeshark/archive/refs/tags/v53.3.0.tar.gz"
-  sha256 "cea29386279ab0a9e73bb20002fc5387febc373692eb6047cb1d08c131431b2d"
+  url "https://github.com/kubeshark/kubeshark/archive/refs/tags/v53.4.0.tar.gz"
+  sha256 "cd1311df1ee5bb0da6a3b0ceb96b4553a50a3d830eb9fca3e09dbdadec214d22"
   license "Apache-2.0"
   head "https://github.com/kubeshark/kubeshark.git", branch: "master"
 
@@ -15,7 +15,7 @@ class Kubeshark < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "461b6a3fdaf77efbcfe91d9325ac9262103caf4845ba5e08f539f07e384503bc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd24e1138c8779c2a8e381d3eb635eece12696fe3556dd16b605adab4582a96c"
   end
 
   depends_on "go" => :build
