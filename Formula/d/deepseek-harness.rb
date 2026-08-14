@@ -13,51 +13,103 @@ class DeepseekHarness < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-v0.1.0-rc.6-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6657cb839c2413020904536b6ea9e08d2cc3e6cb816185c5069924764cc7ddf7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-v0.1.0-rc.6-r3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "adeb98605c71309b827a6ad813330e7e761ee77ffc0e1b2ee440e38ae7c4ea46"
   end
 
-  # bun: install-time dependency tree (blocks native postinstalls — koffi's
-  #      source build fails on OHOS; the windows-acl stub below makes it dead
-  #      code anyway). node: runtime. ohos-compat-shim: its link() hook covers
-  #      dsh's session-persistence hard-link (.tmp -> .zstd atomic replace),
-  #      which OHOS blocks globally (EPERM); also fixes os.userInfo() ENOENT.
-  depends_on "bun" => :build
   depends_on "node"
-  depends_on "ohos-compat-shim"
 
   def install
     cd buildpath do
-      system formula_opt_bin("bun")/"bun", "install"
-      system formula_opt_bin("bun")/"bun", "add", "@img/sharp-wasm32"
-      # dsh-sandbox-local unconditionally static-imports dsh-sandbox-windows-acl
-      # (Win32-only ACL code), which static-imports koffi — whose top-level
-      # native init crashes without an OHOS prebuilt. All koffi use is Win32-only
-      # (loads kernel32.dll/advapi32.dll), so on Linux/OHOS these symbols are
-      # never invoked. Replace the real module with a 4-symbol stub in the
-      # build tree before installing (File.write overwrites; Homebrew's
-      # Pathname#write refuses to overwrite an existing file).
+      ENV["npm_config_cache"] = (HOMEBREW_CACHE/"deepseek-harness-npm-cache").to_s
+      npm = formula_opt_bin("node")/"npm"
+      # --ignore-scripts blocks native postinstalls (koffi's build fails on
+      # OHOS; the stub below makes it dead code). Platform gating under
+      # process.platform=openharmony skips every os:["linux"] optional binary;
+      # sharp falls back to wasm (added here), esbuild to its openharmony pkg.
+      system npm, "install", "--ignore-scripts", "--no-audit", "--no-fund", "@img/sharp-wasm32"
+      system npm, "rebuild", "node-pty"
+      # dsh-sandbox-local unconditionally static-imports this Win32-only ACL
+      # module, which static-imports koffi. All its symbols are Win32 dead
+      # code on Linux/OHOS (File.write overwrites; Pathname#write refuses to).
       File.write("node_modules/@deepseek-ai/dsh-sandbox-windows-acl/lib/index.js", <<~JS)
-        // OHOS bypass stub: see deepseek-harness formula. Win32-only dead code.
         export const AclWriteGrant = undefined;
         export const assertTempRootOutsideWorkspace = () => {};
         export const tempWriteSid = () => undefined;
         export const workspaceWriteSid = () => undefined;
         export {};
       JS
+      File.write("ohos-preload.cjs", <<~JS)
+        // OHOS fallbacks for bare node; see deepseek-harness formula.
+        "use strict";
+        const os = require("node:os");
+        const fs = require("node:fs");
+        const fsp = fs.promises;
+
+        const origUserInfo = os.userInfo.bind(os);
+        os.userInfo = function userInfo(...args) {
+          try {
+            return origUserInfo(...args);
+          } catch (e) {
+            if (!/ENOENT/.test(String(e?.message ?? e))) throw e;
+            return {
+              uid: process.getuid?.() ?? -1,
+              gid: process.getgid?.() ?? -1,
+              username: process.env.USER || process.env.LOGNAME || "user",
+              homedir: os.homedir(),
+              shell: process.env.SHELL || "/bin/sh",
+            };
+          }
+        };
+
+        const linkFallback = (e) => e?.code === "EPERM" || e?.code === "EACCES" || e?.code === "EOPNOTSUPP";
+
+        const origLinkSync = fs.linkSync.bind(fs);
+        fs.linkSync = function linkSync(src, dest) {
+          try {
+            return origLinkSync(src, dest);
+          } catch (e) {
+            if (!linkFallback(e)) throw e;
+            const { mode } = fs.statSync(src);
+            const fd = fs.openSync(dest, "wx", mode);
+            try {
+              fs.writeFileSync(fd, fs.readFileSync(src));
+            } finally {
+              fs.closeSync(fd);
+            }
+          }
+        };
+
+        const origLink = fsp.link.bind(fsp);
+        fsp.link = async function link(src, dest) {
+          try {
+            return await origLink(src, dest);
+          } catch (e) {
+            if (!linkFallback(e)) throw e;
+            const { mode } = await fsp.stat(src);
+            const fh = await fsp.open(dest, "wx", mode);
+            try {
+              await fh.writeFile(await fsp.readFile(src));
+            } finally {
+              await fh.close();
+            }
+          }
+        };
+      JS
+      rm "package-lock.json"
       libexec.install Dir["*"]
     end
 
-    # bin/dsh wrapper: ohos-shim (LD_PRELOAD libohos_compat.so) + node
-    # --expose-internals (HMR plugin requires it; cannot go in NODE_OPTIONS).
-    # Runtime $HOMEBREW_PREFIX only — no build-time path interpolation
-    # (relocatability, same rationale as claude-code.rb).
+    # bin/dsh wrapper: node --require preload (OHOS fallbacks) +
+    # --expose-internals (HMR; cannot go in NODE_OPTIONS). Runtime
+    # $HOMEBREW_PREFIX only — relocatable (same rationale as claude-code.rb).
     (bin/"dsh").write <<~SH
       #!/bin/sh
       set -eu
       HB="${HOMEBREW_PREFIX:-$HOME/.harmonybrew}"
       NODE="$HB/opt/node/bin/node"
-      SHIM="$HB/opt/ohos-compat-shim/bin/ohos-shim"
+      PRELOAD="$HB/opt/#{name}/libexec/ohos-preload.cjs"
       DSH_BIN="$HB/opt/#{name}/libexec/lib/bin.js"
       PORT=3080
 
@@ -76,7 +128,7 @@ class DeepseekHarness < Formula
         exit 0
       fi
 
-      exec "$SHIM" "$NODE" --expose-internals "$DSH_BIN" "$@"
+      exec "$NODE" --require "$PRELOAD" --expose-internals "$DSH_BIN" "$@"
     SH
     chmod 0755, bin/"dsh"
   end
@@ -91,9 +143,8 @@ class DeepseekHarness < Formula
       One-shot: dsh --profile headless "..."
       Profiles: dsh --profile <name> --help
 
-      OHOS notes (handled by this formula): ohos-compat-shim covers OHOS's
-      global hard-link ban (session persistence .tmp->atomics) and the
-      os.userInfo() ENOENT quirk; a bundled stub neutralizes the Win32-only
+      OHOS notes (handled by this formula): a bundled preload patches
+      os.userInfo() and fs.link() fallbacks; a stub neutralizes the Win32-only
       koffi import; node runs with --expose-internals for HMR.
     EOS
   end
