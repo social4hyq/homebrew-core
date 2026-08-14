@@ -5,6 +5,7 @@ class Nvm < Formula
   sha256 "17302cad7feedb1ad33ba738f93d2176a90970724f22de119603624fcbdec1a2"
   license "MIT"
   head "https://github.com/nvm-sh/nvm.git", branch: "master"
+  revision 1
 
   livecheck do
     url :stable
@@ -17,7 +18,8 @@ class Nvm < Formula
   end
 
   # Two OHOS adaptations applied to upstream nvm.sh:
-  #   1. nvm_get_os() detects OpenHarmony via musl libc (uname is unreliable:
+  #   1. nvm_get_os() detects OpenHarmony via the OHOS parameter system
+  #      (`param get const.ohos.version.certified`; uname is unreliable:
   #      HongMeng kernel reports "Linux", OHOS container reports "HarmonyOS")
   #   2. Default node dist mirror redirected to https://ohos-node.com/dist
   # Binaries from ohos-node.com are pre-built with the OHOS SDK toolchain
