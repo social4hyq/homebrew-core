@@ -105,7 +105,8 @@ class DeepseekHarness < Formula
     (bin/"dsh").write <<~SH
       #!/bin/sh
       set -eu
-      HB="${HOMEBREW_PREFIX:-$HOME/.harmonybrew}"
+      : "${HOMEBREW_PREFIX:?dsh: HOMEBREW_PREFIX not set; run 'brew shellenv' first}"
+      HB="$HOMEBREW_PREFIX"
       DSH="$HB/opt/#{name}/libexec"
       PORT=3080
 
