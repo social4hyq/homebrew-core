@@ -2,13 +2,13 @@ class Helm < Formula
   desc "Kubernetes package manager"
   homepage "https://helm.sh/"
   url "https://github.com/helm/helm.git",
-      tag:      "v4.2.3",
-      revision: "43e8b7feece8beb0fcba47059ec9b522fd929a64"
+      tag:      "v4.2.4",
+      revision: "3900f434fd3ef2b84065dc04508df48f288dba00"
   license "Apache-2.0"
   head "https://github.com/helm/helm.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "236c66701f4884fae1248faf4974207d2cd9f7b8d6ab99ed8ed54203a0bb00f3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc4384ee1dd4e1fbe142aa327180bad45fa019eb355a90741ef4785974222b94"
   end
 
   depends_on "go" => :build
