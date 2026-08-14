@@ -11,6 +11,11 @@ class Nvm < Formula
     strategy :github_latest
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/nvm-v0.40.6-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "85fddabdfcf77871be3b15f3b16ac09c6e552a65d8d302e2bf08813965e47b51"
+  end
+
   # Two OHOS adaptations applied to upstream nvm.sh:
   #   1. nvm_get_os() detects OpenHarmony via musl libc (uname is unreliable:
   #      HongMeng kernel reports "Linux", OHOS container reports "HarmonyOS")
