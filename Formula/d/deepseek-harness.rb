@@ -8,13 +8,13 @@ class DeepseekHarness < Formula
   livecheck do
     # www.npmjs.com 403s from this env; registry API JSON is reachable (same
     # pattern as claude-code.rb).
+    url "https://registry.npmjs.org/@deepseek-ai/dsh/latest"
+    regex(/"version":\s*"([^"]+)"/i)
+  end
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-v0.1.0-rc.6-r1"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "afad392b0b54a51845028781454d43822d3fa85323f7bf9376b2fd541b45f4e4"
-  end
-    url "https://registry.npmjs.org/@deepseek-ai/dsh/latest"
-    regex(/"version":\s*"([^"]+)"/i)
   end
 
   # bun: install-time dependency tree (blocks native postinstalls — koffi's
