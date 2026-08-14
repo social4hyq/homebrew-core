@@ -7,7 +7,7 @@ class BackplaneCli < Formula
   head "https://github.com/openshift/backplane-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e1014f3fe6dc3a8b50cb4d91a2e6a0ddc8bdca0614b2b6d5b7d8330bc80d19e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e231a23f37dcc74ca106c6258ceefc795c5d5a706c0d820d0a799e19a383054"
   end
 
   depends_on "go" => :build
