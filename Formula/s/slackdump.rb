@@ -7,7 +7,7 @@ class Slackdump < Formula
   head "https://github.com/rusq/slackdump.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f2bba87f7688234b3f908e3b8be0041c7f799f6ff8c83b22a0666fb5eee11a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ae7e55266a50de40172578f1968a873c8980e5502e150525d46cecc31b758c9"
   end
 
   depends_on "go" => :build
