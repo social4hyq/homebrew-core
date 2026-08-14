@@ -1,12 +1,12 @@
 class Lmfit < Formula
   desc "C library for Levenberg-Marquardt minimization and least-squares fitting"
   homepage "https://jugit.fz-juelich.de/mlz/lmfit"
-  url "https://jugit.fz-juelich.de/mlz/lmfit/-/archive/v10.0/lmfit-v10.0.tar.bz2"
-  sha256 "232658736984365ad71ac76adf94d125ee0df1f570a6c69ce3a34f892be14150"
+  url "https://jugit.fz-juelich.de/mlz/lmfit/-/archive/v11.0/lmfit-v11.0.tar.bz2"
+  sha256 "5289b1264f82cd9a62d445848dc17d2fce1cdc0079b24594f52d87c12e1ac716"
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "af53b32779bc6b482d9dac7b9d46cf55f8d22a4486c532af299e86fba17b8402"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a7793b5dabb25806ed468e794157b0906b6d93840ee9b481b8302b403003d49"
   end
 
   depends_on "cmake" => :build
