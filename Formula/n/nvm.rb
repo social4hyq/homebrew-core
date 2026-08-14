@@ -4,8 +4,8 @@ class Nvm < Formula
   url "https://github.com/nvm-sh/nvm/archive/refs/tags/v0.40.6.tar.gz"
   sha256 "17302cad7feedb1ad33ba738f93d2176a90970724f22de119603624fcbdec1a2"
   license "MIT"
-  head "https://github.com/nvm-sh/nvm.git", branch: "master"
   revision 1
+  head "https://github.com/nvm-sh/nvm.git", branch: "master"
 
   livecheck do
     url :stable
