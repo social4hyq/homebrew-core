@@ -6,7 +6,7 @@ class Lmfit < Formula
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "af53b32779bc6b482d9dac7b9d46cf55f8d22a4486c532af299e86fba17b8402"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a7793b5dabb25806ed468e794157b0906b6d93840ee9b481b8302b403003d49"
   end
 
   depends_on "cmake" => :build
