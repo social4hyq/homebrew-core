@@ -1,9 +1,8 @@
 class DeepseekHarness < Formula
-  desc "DeepSeek Harness — profile-bootable agent (web/headless/tui)"
+  desc "Profile-bootable AI agent (web, headless and tui profiles)"
   homepage "https://github.com/deepseek-ai/deepseek-harness"
   url "https://registry.npmmirror.com/@deepseek-ai/dsh/-/dsh-0.1.0-rc.6.tgz"
   sha256 "1b8a9a0ad3c7feaece47926e0bd37ca151c7ccfa997953afa5fd01261784eadc"
-  version "0.1.0-rc.6"
   license "MIT"
 
   livecheck do
@@ -24,24 +23,25 @@ class DeepseekHarness < Formula
 
   def install
     cd buildpath do
-      system Formula["bun"].opt_bin/"bun", "install"
-      system Formula["bun"].opt_bin/"bun", "add", "@img/sharp-wasm32"
+      system formula_opt_bin("bun")/"bun", "install"
+      system formula_opt_bin("bun")/"bun", "add", "@img/sharp-wasm32"
+      # dsh-sandbox-local unconditionally static-imports dsh-sandbox-windows-acl
+      # (Win32-only ACL code), which static-imports koffi — whose top-level
+      # native init crashes without an OHOS prebuilt. All koffi use is Win32-only
+      # (loads kernel32.dll/advapi32.dll), so on Linux/OHOS these symbols are
+      # never invoked. Replace the real module with a 4-symbol stub in the
+      # build tree before installing (File.write overwrites; Homebrew's
+      # Pathname#write refuses to overwrite an existing file).
+      File.write("node_modules/@deepseek-ai/dsh-sandbox-windows-acl/lib/index.js", <<~JS)
+        // OHOS bypass stub: see deepseek-harness formula. Win32-only dead code.
+        export const AclWriteGrant = undefined;
+        export const assertTempRootOutsideWorkspace = () => {};
+        export const tempWriteSid = () => undefined;
+        export const workspaceWriteSid = () => undefined;
+        export {};
+      JS
       libexec.install Dir["*"]
     end
-
-    # dsh-sandbox-local unconditionally static-imports dsh-sandbox-windows-acl
-    # (Win32-only ACL code), which static-imports koffi — whose top-level
-    # native init crashes without an OHOS prebuilt. All koffi use is Win32-only
-    # (loads kernel32.dll/advapi32.dll), so on Linux/OHOS these symbols are
-    # never invoked. This 4-symbol stub makes the static import resolve.
-    (libexec/"node_modules/@deepseek-ai/dsh-sandbox-windows-acl/lib/index.js").write <<~'EOS'
-      // OHOS bypass stub: see deepseek-harness formula. Win32-only dead code.
-      export const AclWriteGrant = undefined;
-      export const assertTempRootOutsideWorkspace = () => {};
-      export const tempWriteSid = () => undefined;
-      export const workspaceWriteSid = () => undefined;
-      export {};
-    EOS
 
     # bin/dsh wrapper: ohos-shim (LD_PRELOAD libohos_compat.so) + node
     # --expose-internals (HMR plugin requires it; cannot go in NODE_OPTIONS).
@@ -62,8 +62,9 @@ class DeepseekHarness < Formula
         return 1
       }
       # OHOS sandbox hides the process from ps/netstat; probe the listen port.
+      # (-f: fail fast on HTTP errors so the exit code doubles as "is 200".)
       is_running() {
-        curl -s -m2 -o /dev/null -w "%{http_code}" "http://127.0.0.1:$PORT/" 2>/dev/null | grep -q "^200$"
+        curl -sf -o /dev/null -m2 "http://127.0.0.1:$PORT/" 2>/dev/null
       }
       if will_listen "$@" && is_running; then
         echo "dsh: already running at http://127.0.0.1:$PORT (stop it or use another profile)" >&2
