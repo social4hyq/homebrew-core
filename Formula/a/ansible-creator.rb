@@ -8,7 +8,7 @@ class AnsibleCreator < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "93471b8b3966901826dcc28f6d0a3f7d912a2ab60b6d52709a2149c134a34ab7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "28a27842cb1104b33e3b3a870f30c72c79bff4121daa80aa8f9bb649968d92ba"
   end
 
   depends_on "libyaml"
