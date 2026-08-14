@@ -4,6 +4,7 @@ class Nvm < Formula
   url "https://github.com/nvm-sh/nvm/archive/refs/tags/v0.40.6.tar.gz"
   sha256 "17302cad7feedb1ad33ba738f93d2176a90970724f22de119603624fcbdec1a2"
   license "MIT"
+  revision 1
   head "https://github.com/nvm-sh/nvm.git", branch: "master"
 
   livecheck do
@@ -12,12 +13,13 @@ class Nvm < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/nvm-v0.40.6-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "85fddabdfcf77871be3b15f3b16ac09c6e552a65d8d302e2bf08813965e47b51"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/nvm-v0.40.6-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c524b615352dfbfd378342ad56bed162513d994cf0f810757c9eba250a1cbec0"
   end
 
   # Two OHOS adaptations applied to upstream nvm.sh:
-  #   1. nvm_get_os() detects OpenHarmony via musl libc (uname is unreliable:
+  #   1. nvm_get_os() detects OpenHarmony via the OHOS parameter system
+  #      (`param get const.ohos.version.certified`; uname is unreliable:
   #      HongMeng kernel reports "Linux", OHOS container reports "HarmonyOS")
   #   2. Default node dist mirror redirected to https://ohos-node.com/dist
   # Binaries from ohos-node.com are pre-built with the OHOS SDK toolchain
