@@ -13,8 +13,8 @@ class Nvm < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/nvm-v0.40.6-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "85fddabdfcf77871be3b15f3b16ac09c6e552a65d8d302e2bf08813965e47b51"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/nvm-v0.40.6-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "01c45875e0cbadb3ca68f459e498dd544dda8edb858cb0258eb786773411eedc"
   end
 
   # Two OHOS adaptations applied to upstream nvm.sh:
