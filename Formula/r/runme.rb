@@ -7,7 +7,7 @@ class Runme < Formula
   head "https://github.com/runmedev/runme.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c29d05e192dd6b487a77e42b7978c76a93f589aa17b0a213ecd08a9d292793ff"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "972e8eb94fc6888ac39c06879d43cc55d2c9ffc0febe1fccccfdfeba7857c7da"
   end
 
   depends_on "go" => :build
