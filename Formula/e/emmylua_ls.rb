@@ -2,8 +2,8 @@ class EmmyluaLs < Formula
   desc "Lua Language Server"
   homepage "https://github.com/EmmyLuaLs/emmylua-analyzer-rust"
   # The project name is `emmylua-analyzer-rust`, but it contains several crates, not all of which we install.
-  url "https://github.com/EmmyLuaLs/emmylua-analyzer-rust/archive/refs/tags/0.25.0.tar.gz"
-  sha256 "dc58e6b3f268a9abed01c7fdab64934a45c6fbdcfcdfe703d7c4cddb601ada1b"
+  url "https://github.com/EmmyLuaLs/emmylua-analyzer-rust/archive/refs/tags/0.25.1.tar.gz"
+  sha256 "497b80cf970afbcced36d446a29bde2b59a86f10bbfa936d86f048450553fb0c"
   license "MIT"
   head "https://github.com/EmmyLuaLs/emmylua-analyzer-rust.git", branch: "main"
 
