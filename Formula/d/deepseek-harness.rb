@@ -101,34 +101,23 @@ class DeepseekHarness < Formula
       libexec.install Dir["*"]
     end
 
-    # bin/dsh wrapper: node --require preload (OHOS fallbacks) +
-    # --expose-internals (HMR; cannot go in NODE_OPTIONS). Runtime
-    # $HOMEBREW_PREFIX only — relocatable (same rationale as claude-code.rb).
+    # Wrapper: --require preload (OHOS fallbacks) + --expose-internals (HMR).
     (bin/"dsh").write <<~SH
       #!/bin/sh
       set -eu
       HB="${HOMEBREW_PREFIX:-$HOME/.harmonybrew}"
-      NODE="$HB/opt/node/bin/node"
-      PRELOAD="$HB/opt/#{name}/libexec/ohos-preload.cjs"
-      DSH_BIN="$HB/opt/#{name}/libexec/lib/bin.js"
+      DSH="$HB/opt/#{name}/libexec"
       PORT=3080
 
-      will_listen() {
-        [ "${1:-}" = "web" ] && return 0
-        [ "${1:-}" = "--profile" ] && [ "${2:-}" = "web" ] && return 0
-        return 1
-      }
-      # OHOS sandbox hides the process from ps/netstat; probe the listen port.
-      # (-f: fail fast on HTTP errors so the exit code doubles as "is 200".)
-      is_running() {
-        curl -sf -o /dev/null -m2 "http://127.0.0.1:$PORT/" 2>/dev/null
-      }
+      will_listen() { [ "${1:-}" = web ] || { [ "${1:-}" = --profile ] && [ "${2:-}" = web ]; }; }
+      # OHOS hides listeners from ps/netstat; probe the port instead.
+      is_running() { curl -sf -o /dev/null -m2 "http://127.0.0.1:$PORT/" 2>/dev/null; }
       if will_listen "$@" && is_running; then
         echo "dsh: already running at http://127.0.0.1:$PORT (stop it or use another profile)" >&2
         exit 0
       fi
 
-      exec "$NODE" --require "$PRELOAD" --expose-internals "$DSH_BIN" "$@"
+      exec "$HB/opt/node/bin/node" --require "$DSH/ohos-preload.cjs" --expose-internals "$DSH/lib/bin.js" "$@"
     SH
     chmod 0755, bin/"dsh"
   end
