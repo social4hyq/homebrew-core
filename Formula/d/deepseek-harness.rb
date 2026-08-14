@@ -1,13 +1,12 @@
 class DeepseekHarness < Formula
-  desc "Profile-bootable AI agent (web, headless and tui profiles)"
+  desc "DeepSeek coding agent with web, TUI and headless profiles"
   homepage "https://github.com/deepseek-ai/deepseek-harness"
-  url "https://registry.npmmirror.com/@deepseek-ai/dsh/-/dsh-0.1.0-rc.6.tgz"
+  url "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.1.0-rc.6.tgz"
   sha256 "1b8a9a0ad3c7feaece47926e0bd37ca151c7ccfa997953afa5fd01261784eadc"
   license "MIT"
+  revision 1
 
   livecheck do
-    # www.npmjs.com 403s from this env; registry API JSON is reachable (same
-    # pattern as claude-code.rb).
     url "https://registry.npmjs.org/@deepseek-ai/dsh/latest"
     regex(/"version":\s*"([^"]+)"/i)
   end
@@ -21,85 +20,89 @@ class DeepseekHarness < Formula
   depends_on "node"
 
   def install
-    cd buildpath do
-      ENV["npm_config_cache"] = (HOMEBREW_CACHE/"deepseek-harness-npm-cache").to_s
-      npm = formula_opt_bin("node")/"npm"
-      # --ignore-scripts blocks native postinstalls (koffi's build fails on
-      # OHOS; the stub below makes it dead code). Platform gating under
-      # process.platform=openharmony skips every os:["linux"] optional binary;
-      # sharp falls back to wasm (added here), esbuild to its openharmony pkg.
-      system npm, "install", "--ignore-scripts", "--no-audit", "--no-fund", "@img/sharp-wasm32"
-      system npm, "rebuild", "node-pty"
-      # dsh-sandbox-local unconditionally static-imports this Win32-only ACL
-      # module, which static-imports koffi. All its symbols are Win32 dead
-      # code on Linux/OHOS (File.write overwrites; Pathname#write refuses to).
-      File.write("node_modules/@deepseek-ai/dsh-sandbox-windows-acl/lib/index.js", <<~JS)
-        export const AclWriteGrant = undefined;
-        export const assertTempRootOutsideWorkspace = () => {};
-        export const tempWriteSid = () => undefined;
-        export const workspaceWriteSid = () => undefined;
-        export {};
-      JS
-      File.write("ohos-preload.cjs", <<~JS)
-        // OHOS fallbacks for bare node; see deepseek-harness formula.
-        "use strict";
-        const os = require("node:os");
-        const fs = require("node:fs");
-        const fsp = fs.promises;
+    # ~/.npm is unwritable inside build sandboxes.
+    ENV["npm_config_cache"] = (HOMEBREW_CACHE/"deepseek-harness-npm-cache").to_s
 
-        const origUserInfo = os.userInfo.bind(os);
-        os.userInfo = function userInfo(...args) {
+    # --ignore-scripts: koffi cannot build on OHOS (its only import site is
+    # stubbed out below) and node-pty is rebuilt separately. On openharmony
+    # npm skips every os:["linux"] optional binary, so install sharp's wasm
+    # fallback explicitly. prefix: false keeps node_modules in buildpath.
+    system "npm", "install", *std_npm_args(prefix: false), "--no-audit", "--no-fund", "@img/sharp-wasm32"
+
+    system "npm", "rebuild", "node-pty"
+
+    # dsh-sandbox-local static-imports this Win32-only module, which is the
+    # only reason koffi is in the tree. File.write overwrites; Pathname#write
+    # refuses to overwrite an existing file.
+    File.write("node_modules/@deepseek-ai/dsh-sandbox-windows-acl/lib/index.js", <<~JS)
+      export const AclWriteGrant = undefined;
+      export const assertTempRootOutsideWorkspace = () => {};
+      export const tempWriteSid = () => undefined;
+      export const workspaceWriteSid = () => undefined;
+      export {};
+    JS
+
+    # os.userInfo() ENOENT and fs.link() EPERM fallbacks, loaded via
+    # `node --require` by the bin wrapper below.
+    (buildpath/"ohos-preload.cjs").write <<~JS
+      "use strict";
+      const os = require("node:os");
+      const fs = require("node:fs");
+      const fsp = fs.promises;
+
+      const origUserInfo = os.userInfo.bind(os);
+      os.userInfo = function userInfo(...args) {
+        try {
+          return origUserInfo(...args);
+        } catch (e) {
+          if (!/ENOENT/.test(String(e?.message ?? e))) throw e;
+          return {
+            uid: process.getuid?.() ?? -1,
+            gid: process.getgid?.() ?? -1,
+            username: process.env.USER || process.env.LOGNAME || "user",
+            homedir: os.homedir(),
+            shell: process.env.SHELL || "/bin/sh",
+          };
+        }
+      };
+
+      const linkFallback = (e) => e?.code === "EPERM" || e?.code === "EACCES" || e?.code === "EOPNOTSUPP";
+
+      const origLinkSync = fs.linkSync.bind(fs);
+      fs.linkSync = function linkSync(src, dest) {
+        try {
+          return origLinkSync(src, dest);
+        } catch (e) {
+          if (!linkFallback(e)) throw e;
+          const { mode } = fs.statSync(src);
+          const fd = fs.openSync(dest, "wx", mode);
           try {
-            return origUserInfo(...args);
-          } catch (e) {
-            if (!/ENOENT/.test(String(e?.message ?? e))) throw e;
-            return {
-              uid: process.getuid?.() ?? -1,
-              gid: process.getgid?.() ?? -1,
-              username: process.env.USER || process.env.LOGNAME || "user",
-              homedir: os.homedir(),
-              shell: process.env.SHELL || "/bin/sh",
-            };
+            fs.writeFileSync(fd, fs.readFileSync(src));
+          } finally {
+            fs.closeSync(fd);
           }
-        };
+        }
+      };
 
-        const linkFallback = (e) => e?.code === "EPERM" || e?.code === "EACCES" || e?.code === "EOPNOTSUPP";
-
-        const origLinkSync = fs.linkSync.bind(fs);
-        fs.linkSync = function linkSync(src, dest) {
+      const origLink = fsp.link.bind(fsp);
+      fsp.link = async function link(src, dest) {
+        try {
+          return await origLink(src, dest);
+        } catch (e) {
+          if (!linkFallback(e)) throw e;
+          const { mode } = await fsp.stat(src);
+          const fh = await fsp.open(dest, "wx", mode);
           try {
-            return origLinkSync(src, dest);
-          } catch (e) {
-            if (!linkFallback(e)) throw e;
-            const { mode } = fs.statSync(src);
-            const fd = fs.openSync(dest, "wx", mode);
-            try {
-              fs.writeFileSync(fd, fs.readFileSync(src));
-            } finally {
-              fs.closeSync(fd);
-            }
+            await fh.writeFile(await fsp.readFile(src));
+          } finally {
+            await fh.close();
           }
-        };
+        }
+      };
+    JS
 
-        const origLink = fsp.link.bind(fsp);
-        fsp.link = async function link(src, dest) {
-          try {
-            return await origLink(src, dest);
-          } catch (e) {
-            if (!linkFallback(e)) throw e;
-            const { mode } = await fsp.stat(src);
-            const fh = await fsp.open(dest, "wx", mode);
-            try {
-              await fh.writeFile(await fsp.readFile(src));
-            } finally {
-              await fh.close();
-            }
-          }
-        };
-      JS
-      rm "package-lock.json"
-      libexec.install Dir["*"]
-    end
+    rm "package-lock.json"
+    libexec.install Dir["*"]
 
     # Wrapper: --require preload (OHOS fallbacks) + --expose-internals (HMR).
     (bin/"dsh").write <<~SH
@@ -125,21 +128,18 @@ class DeepseekHarness < Formula
 
   def caveats
     <<~EOS
-      dsh (DeepSeek Harness) needs model credentials — configure per the
-      upstream docs (https://github.com/deepseek-ai/deepseek-harness), typically
-      under ~/.dsh/ (dsh writes its profile tree there on first run).
+      dsh needs model credentials before first use; see the upstream docs
+      (https://github.com/deepseek-ai/deepseek-harness). Profiles and config
+      are written under ~/.dsh/ on first run.
 
       Web UI:   dsh web                       (http://127.0.0.1:3080)
       One-shot: dsh --profile headless "..."
       Profiles: dsh --profile <name> --help
-
-      OHOS notes (handled by this formula): a bundled preload patches
-      os.userInfo() and fs.link() fallbacks; a stub neutralizes the Win32-only
-      koffi import; node runs with --expose-internals for HMR.
     EOS
   end
 
   test do
     assert_match version.to_s, shell_output("#{bin}/dsh -V")
+    assert_match "Usage:", shell_output("#{bin}/dsh --help")
   end
 end
