@@ -1,8 +1,8 @@
 class LibpqAT16 < Formula
   desc "Postgres C API library"
   homepage "https://www.postgresql.org/docs/16/libpq.html"
-  url "https://ftp.postgresql.org/pub/source/v16.14/postgresql-16.14.tar.bz2"
-  sha256 "f6d077142737920858ce958ccdb75c6ee137a63b5b0853c70693d401ac7e3471"
+  url "https://ftp.postgresql.org/pub/source/v16.15/postgresql-16.15.tar.bz2"
+  sha256 "c1575341fa7bd40f5274ea465b34390f4dc64cdd0770af327005caaeb9f6b7ed"
   license "PostgreSQL"
 
   livecheck do
@@ -11,7 +11,7 @@ class LibpqAT16 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6fc05c3fa8c08979e0d7b9473f38468d2b755a6bd2c5e2df34ba6d4e3ef1ed4a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c88759bcbdcadad546db1e17dc105e61b59bfe9af619de7b178c7a6b571d44f"
   end
 
   keg_only :versioned_formula
