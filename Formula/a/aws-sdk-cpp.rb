@@ -12,7 +12,7 @@ class AwsSdkCpp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "617117e1b90f54bc6036622cb04619a0d916141ebba99be1c6dfebb1de07d47b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "300487fa09690e1f5a552671976436a7fe428d85693de6dfbccb2dc2541c4085"
   end
 
   depends_on "cmake" => :build
