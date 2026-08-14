@@ -1,0 +1,28 @@
+diff --git a/nvm.sh b/nvm.sh
+index 37a13a5..f5f626b 100755
+--- a/nvm.sh
++++ b/nvm.sh
+@@ -2207,6 +2207,14 @@ nvm_get_os() {
+     AIX\ *) NVM_OS=aix ;;
+     CYGWIN* | MSYS* | MINGW*) NVM_OS=win ;;
+   esac
++  # OpenHarmony cannot be reliably detected via `uname` because the device
++  # may run either a Linux kernel or a HarmonyOS kernel; detect it from the
++  # userland musl libc instead.
++  local MUSL_LIBC
++  MUSL_LIBC="/lib/ld-musl-aarch64.so.1"
++  if [ -f "${MUSL_LIBC}" ] && command strings "${MUSL_LIBC}" 2>/dev/null | command grep -q "OHOS"; then
++    NVM_OS=openharmony
++  fi
+   nvm_echo "${NVM_OS-}"
+ }
+ 
+@@ -2325,7 +2333,7 @@ nvm_get_mirror() {
+   local NVM_MIRROR
+   NVM_MIRROR=''
+   case "${1}-${2}" in
+-    node-std) NVM_MIRROR="${NVM_NODEJS_ORG_MIRROR:-https://nodejs.org/dist}" ;;
++    node-std) NVM_MIRROR="${NVM_NODEJS_ORG_MIRROR:-https://ohos-node.com/dist}" ;;
+     iojs-std) NVM_MIRROR="${NVM_IOJS_ORG_MIRROR:-https://iojs.org/dist}" ;;
+     *)
+       nvm_err 'unknown type of node.js or io.js release'
