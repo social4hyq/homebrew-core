@@ -7,7 +7,7 @@ class Libultrahdr < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "73045cddb3aac73011db225174a656a8e55fa0555081f2b50b26e54741fd6b65"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0bb259bb19303677f30cac92d81d9771babc5301448dbca32099f080204da90"
   end
 
   depends_on "cmake" => :build
