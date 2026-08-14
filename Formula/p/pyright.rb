@@ -1,12 +1,12 @@
 class Pyright < Formula
   desc "Static type checker for Python"
   homepage "https://github.com/microsoft/pyright"
-  url "https://registry.npmjs.org/pyright/-/pyright-1.1.411.tgz"
-  sha256 "bd5c488fc20fa237a944279bf32cae2f986cf10d5d5d9e8705819859daeb2f4a"
+  url "https://registry.npmjs.org/pyright/-/pyright-1.1.412.tgz"
+  sha256 "b6345cb7253d1f3e311caa0ef17581dbac5b125c42d148667c84d9dca2abd50a"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0e8f80c015c1d4c084b309bd716f36c1b18e81115711bca9779d12967bb4857"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9600a13f1d1cf2c6cc5a0bde3456ac220005fc0fe1be118657f2744c6fdf6b72"
   end
 
   depends_on "node"
