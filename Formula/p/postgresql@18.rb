@@ -1,10 +1,9 @@
 class PostgresqlAT18 < Formula
   desc "Object-relational database system"
   homepage "https://www.postgresql.org/"
-  url "https://ftp.postgresql.org/pub/source/v18.4/postgresql-18.4.tar.bz2"
-  sha256 "81a81ec695fb0c7901407defaa1d2f7973617154cf27ba74e3a7ab8e64436094"
+  url "https://ftp.postgresql.org/pub/source/v18.6/postgresql-18.6.tar.bz2"
+  sha256 "555610c24d53e4316da5b7d3fc25c279d96856d5e0e23ee308c328c5fa881d9f"
   license "PostgreSQL"
-  revision 1
 
   livecheck do
     url "https://ftp.postgresql.org/pub/source/"
@@ -12,7 +11,7 @@ class PostgresqlAT18 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "863677ec6cec91c7423842a6574d0998147378c71065ffd8f851877dea19469c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9697e52383c5c250fd6ccca9762b2c3d3fa0b00368e6738f43a42ba76dbb8fea"
   end
 
   keg_only :versioned_formula
