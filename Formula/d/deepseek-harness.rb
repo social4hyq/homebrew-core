@@ -4,7 +4,7 @@ class DeepseekHarness < Formula
   url "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.1.0-rc.6.tgz"
   sha256 "1b8a9a0ad3c7feaece47926e0bd37ca151c7ccfa997953afa5fd01261784eadc"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://registry.npmjs.org/@deepseek-ai/dsh/latest"
