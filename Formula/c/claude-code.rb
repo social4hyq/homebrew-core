@@ -106,7 +106,12 @@ class ClaudeCode < Formula
   end
 
   test do
-    # Assert stub only — `claude --version` would trigger the runtime fetch during `brew test`.
-    assert_path_exists bin/"claude"
+    # End-to-end: wrapper runtime-fetches, sha256-verifies, self-signs and
+    # RUNS the official binary. Embedded-Bun startup-abort regressions
+    # (2.1.229-2.1.233, crashes on this platform ~100ms after exec, before
+    # any JS) must fail here in pr-validate instead of reaching users via
+    # autobump+automerge (PR #272 shipped one and crashed every upgraded
+    # install). First run downloads the ~95MB tgz from npmmirror.
+    assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
   end
 end
