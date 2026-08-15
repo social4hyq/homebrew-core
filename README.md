@@ -12,7 +12,7 @@ brew trust social4hyq/core   # Homebrew 6.0+ 必须显式信任第三方 tap
 brew install opencode        # AI 编码代理（v2 预览：brew install opencode@2）
 brew install claude-code     # Claude Code CLI
 brew install bun             # Bun 运行时
-brew install starship        # 跨 shell 提示符
+brew install starship        # 终端提示符美化（主题化 prompt）
 brew install zellij          # 终端复用器
 brew install qemu-aarch64    # 用户态 QEMU（strace 替代品）
 ```
@@ -46,7 +46,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `ohos-compat-shim` | 0.3.0 | LD_PRELOAD 兼容垫片：拦截鸿蒙缺失/异常 syscall（`close_range`/`fchmodat2`/`getpwuid_r` 等）+ `link()` 拦截（v0.3.0，PR #336）；C 源码直编 |
 | `qemu-aarch64` | 11.0.1-r0 | QEMU 用户态 aarch64 模拟器；Alpine 全静态 musl 构建，`-strace` 纯用户态 syscall 跟踪（替代 ptrace） |
 | `sshport` | 0.2.1 | SSH 端口转发：`sshport up <host>` 把远程端口同号映射到本机；TS 源码构建（`bun build` 单 JS 文件） |
-| `starship` | 1.26.0 | 跨 shell 提示符；Rust 源码构建 |
+| `starship` | 1.26.0 | 终端提示符美化/定制工具（跨 shell，把默认 prompt 换成主题化、信息丰富的提示符，如 git 状态/目录等）；Rust 源码构建 |
 | `zellij` | 0.45.0-dev | 终端复用器 + WASM 插件系统（wasmi 解释执行）；Rust 源码构建，跟踪 `main` 固定 revision，wrapper 内置 `ohos-compat-shim` |
 | `hishell-font` | 0.1.0 | hishell 终端 Nerd Font 安装配置；TS 源码构建（`bun build` 单 JS 文件） |
 | `herdr` | 0.8.0 | coding agent 终端会话持久化 runtime；Rust 源码构建（依赖 `zig@0.15` 编译 vendored libghostty-vt） |
