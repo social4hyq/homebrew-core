@@ -4,7 +4,7 @@ class DeepseekHarness < Formula
   url "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.1.0-rc.6.tgz"
   sha256 "1b8a9a0ad3c7feaece47926e0bd37ca151c7ccfa997953afa5fd01261784eadc"
   license "MIT"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://registry.npmjs.org/@deepseek-ai/dsh/latest"
@@ -40,6 +40,40 @@ class DeepseekHarness < Formula
       export const workspaceWriteSid = () => undefined;
       export {};
     JS
+
+    # openharmony reports process.platform = "openharmony", so
+    # @vscode/ripgrep-<platform> never resolves (npm skips the os:["linux"]
+    # optional binary) and the grep/glob tools die with "ripgrep launch
+    # failed". Fall back to the tap's signed system rg at runtime.
+    inreplace "node_modules/@vscode/ripgrep/lib/index.js" do |s|
+      s.sub! <<~OLD, <<~NEW
+        } catch {
+            throw new Error(
+                `Could not find ${platformPkg}. ` +
+                `Ensure optionalDependencies are installed for this platform (${process.platform}-${arch}).`
+            );
+        }
+      OLD
+        } catch {
+            // openharmony reports process.platform = "openharmony", which has no
+            // @vscode/ripgrep-<platform> package (npm skips os:["linux"] optional
+            // binaries there). Fall back to the signed system rg so the grep/glob
+            // tools can launch; they keep their plain-argv spawn.
+            const { existsSync } = require("node:fs");
+            const candidates = [
+                `${process.env.HOMEBREW_PREFIX ?? ""}/bin/rg`,
+                ...(process.env.PATH ?? "").split(":").map((dir) => `${dir}/rg`),
+            ].filter(Boolean);
+            resolved = candidates.find((p) => existsSync(p));
+            if (!resolved) {
+                throw new Error(
+                    `Could not find ${platformPkg}. ` +
+                    `Ensure optionalDependencies are installed for this platform (${process.platform}-${arch}).`
+                );
+            }
+        }
+      NEW
+    end
 
     # os.userInfo() ENOENT and fs.link() EPERM fallbacks, loaded via
     # `node --require` by the bin wrapper below.
