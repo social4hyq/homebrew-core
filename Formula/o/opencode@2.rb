@@ -2,8 +2,13 @@ class OpencodeAT2 < Formula
   desc "OpenCode v2 preview — AI coding agent CLI, HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
   # v2 is a live branch (no tags yet); pinned git revision + beta version tag.
+  # Do NOT add `branch:` back: Homebrew's extract_ref prefers :branch over
+  # :revision, so `branch: "v2", revision: <sha>` silently builds the moving
+  # branch tip instead of the pin (the v2 tip has since dropped generate.ts
+  # and started building packages/app — both break this formula). Revision
+  # alone is honored.
   # See social4hyq/ohos-opencode2 dev for canonical diff.
-  url "https://github.com/anomalyco/opencode.git", revision: "84fd347afaed9617b7b29744086657fa029bbe68", branch: "v2"
+  url "https://github.com/anomalyco/opencode.git", revision: "84fd347afaed9617b7b29744086657fa029bbe68"
   version "2.0.0-beta"
   license "MIT"
   revision 14
