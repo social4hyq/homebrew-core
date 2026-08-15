@@ -112,6 +112,22 @@ class OpencodeAT2 < Formula
         odie("opencode@2: build.ts compile-target anchor not found")
     end
 
+    # Build-time models snapshot: generate.ts fetches models.dev/api.json at
+    # module load, which the CI container can't reach since the 2026-08-12
+    # ci-runner image rebuild (the old image could; the new image's bun fetch
+    # dies with ENOENT and aborts build.ts before any compile — PR #330).
+    # Fail soft: keep the snapshot when the fetch works, otherwise substitute
+    # the JS literal `undefined` — bun's define inserts the value as raw code,
+    # so OPENCODE_MODELS_DEV compiles to undefined and models-dev.ts falls
+    # through to the runtime fetch (models.dev is reachable from real
+    # devices). AbortSignal.timeout guards the hang case.
+    inreplace "packages/cli/script/generate.ts" do |s|
+      s.sub!(": await fetch(`${modelsUrl}/api.json`).then((response) => response.text())",
+             ": await fetch(`${modelsUrl}/api.json`, { signal: AbortSignal.timeout(20_000) })" \
+             ".then((response) => response.text()).catch(() => \"undefined\")") ||
+        odie("opencode@2: generate.ts models fetch anchor not found")
+    end
+
     cd "packages/cli" do
       system "bun", "run", "script/build.ts", "--single"
     end
