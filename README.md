@@ -35,25 +35,25 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 
 | Formula | 版本 | 说明 |
 |---|---|---|
-| `opencode` | 1.18.18, revision 2 | OpenCode AI 编码代理 CLI；上游源码构建（`bun build --compile` 单体二进制，原生依赖走 `@ohos-ports/*` npm 包） |
-| `opencode@2` | 2.0.0-beta, revision 14 | opencode v2 预览路线；源码构建（`bun build --compile` 单体二进制，git revision 固定 84fd347——勿加 `branch:`，brew 会忽略 revision 跟踪分支 tip；原生依赖 `@ohos-ports/opentui-core` + `@ohos-ports/bun-pty` + `@ohos-ports/parcel-watcher`），命令名 `opencode2` |
+| `opencode` | 1.18.18 | OpenCode AI 编码代理 CLI；上游源码构建（`bun build --compile` 单体二进制，原生依赖走 `@ohos-ports/*` npm 包） |
+| `opencode@2` | 2.0.0-beta | opencode v2 预览路线；源码构建（`bun build --compile` 单体二进制，git revision 固定 84fd347——勿加 `branch:`，brew 会忽略 revision 跟踪分支 tip；原生依赖 `@ohos-ports/opentui-core` + `@ohos-ports/bun-pty` + `@ohos-ports/parcel-watcher`），命令名 `opencode2` |
 | `claude-code` | 2.1.233 | Anthropic Claude Code CLI；runtime-fetch stub（License 禁重分发）：首次运行拉取官方 tarball（sha256 fail-closed）→ 解析 ELF `.bun` 段抽取 CLI bundle（官方二进制永不执行，其内嵌 bun 在 OHOS 上启动即崩）→ 跑在本 tap `bun` 上 |
-| `bun` | 1.4.0, revision 58 | Bun JavaScript runtime；**自举源码构建**（`bun bd`），`ohos-compat-shim` 静态内嵌进可执行文件；libc++ ABI 已切 `__n1`（r58 起） |
-| `bun-bootstrap` | 1.4.0-5467a689, revision 2 | 预编译 bun，用于 `bun bd` 自举本机 bun；已预签（`keg_only`） |
-| `bun-webkit` | `447082ab68`, revision 1 | bun 专用 WebKit fork 静态库（JSCore/WTF/bmalloc）；CMake 源码构建（`--target=aarch64-linux-ohos`，`keg_only`） |
-| `llvm@21` | 21.1.8, revision 6 | OHOS 补丁版 clang + lld + multiarch runtime libs（libc++ ABI `__n1`）；链接期 LLD `--code-sign` 签名（`keg_only`） |
-| `ohos-bst-light` | 1.0.0, revision 2 | 轻量二进制自签工具（保留 ELF 结构）；预编译二进制 formula 的 self-sign 都靠它 |
+| `bun` | 1.4.0 | Bun JavaScript runtime；**自举源码构建**（`bun bd`），`ohos-compat-shim` 静态内嵌进可执行文件；libc++ ABI 已切 `__n1`（r58 起） |
+| `bun-bootstrap` | 1.4.0-5467a689 | 预编译 bun，用于 `bun bd` 自举本机 bun；已预签（`keg_only`） |
+| `bun-webkit` | `447082ab68` | bun 专用 WebKit fork 静态库（JSCore/WTF/bmalloc）；CMake 源码构建（`--target=aarch64-linux-ohos`，`keg_only`） |
+| `llvm@21` | 21.1.8 | OHOS 补丁版 clang + lld + multiarch runtime libs（libc++ ABI `__n1`）；链接期 LLD `--code-sign` 签名（`keg_only`） |
+| `ohos-bst-light` | 1.0.0 | 轻量二进制自签工具（保留 ELF 结构）；预编译二进制 formula 的 self-sign 都靠它 |
 | `ohos-compat-shim` | 0.3.0 | LD_PRELOAD 兼容垫片：拦截鸿蒙缺失/异常 syscall（`close_range`/`fchmodat2`/`getpwuid_r` 等）+ `link()` 拦截（v0.3.0，PR #336）；C 源码直编 |
-| `qemu-aarch64` | 11.0.1-r0, revision 1 | QEMU 用户态 aarch64 模拟器；Alpine 全静态 musl 构建，`-strace` 纯用户态 syscall 跟踪（替代 ptrace） |
-| `sshport` | 0.2.1, revision 2 | SSH 端口转发：`sshport up <host>` 把远程端口同号映射到本机；TS 源码构建（`bun build` 单 JS 文件） |
-| `starship` | 1.26.0, revision 4 | 跨 shell 提示符；Rust 源码构建 |
-| `zellij` | 0.45.0-dev, revision 2 | 终端复用器 + WASM 插件系统（wasmi 解释执行）；Rust 源码构建，跟踪 `main` 固定 revision，wrapper 内置 `ohos-compat-shim` |
-| `hishell-font` | 0.1.0, revision 2 | hishell 终端 Nerd Font 安装配置；TS 源码构建（`bun build` 单 JS 文件） |
-| `herdr` | 0.8.0, revision 3 | coding agent 终端会话持久化 runtime；Rust 源码构建（依赖 `zig@0.15` 编译 vendored libghostty-vt） |
-| `zig@0.15` | 0.15.2, revision 3 | ziglang.org 官方 aarch64-linux 静态预编译二进制重打包；`ohos-bst-light` self-sign；herdr 的构建依赖 |
-| `codegraph` | 1.5.0, revision 2 | 代码知识图谱（MCP server），为 AI agent 提供语义检索；npm + Rust napi cdylib kernel（20 语言 tree-sitter），存储走 `node:sqlite` |
-| `uv` | 0.12.3, revision 2 | 极速 Python 包管理器；Rust 源码构建，附 musl 检测补丁 + `python@3.14` 运行时依赖 |
-| `nvm` | 0.40.6, revision 1 | OHOS 适配版 nvm（ohos-node.com 方案）：`nvm_get_os()` 经 OHOS 参数系统识别 OpenHarmony，node dist 默认走 `ohos-node.com`（预签名预编译），`nvm install` 原生下载即可用 |
+| `qemu-aarch64` | 11.0.1-r0 | QEMU 用户态 aarch64 模拟器；Alpine 全静态 musl 构建，`-strace` 纯用户态 syscall 跟踪（替代 ptrace） |
+| `sshport` | 0.2.1 | SSH 端口转发：`sshport up <host>` 把远程端口同号映射到本机；TS 源码构建（`bun build` 单 JS 文件） |
+| `starship` | 1.26.0 | 跨 shell 提示符；Rust 源码构建 |
+| `zellij` | 0.45.0-dev | 终端复用器 + WASM 插件系统（wasmi 解释执行）；Rust 源码构建，跟踪 `main` 固定 revision，wrapper 内置 `ohos-compat-shim` |
+| `hishell-font` | 0.1.0 | hishell 终端 Nerd Font 安装配置；TS 源码构建（`bun build` 单 JS 文件） |
+| `herdr` | 0.8.0 | coding agent 终端会话持久化 runtime；Rust 源码构建（依赖 `zig@0.15` 编译 vendored libghostty-vt） |
+| `zig@0.15` | 0.15.2 | ziglang.org 官方 aarch64-linux 静态预编译二进制重打包；`ohos-bst-light` self-sign；herdr 的构建依赖 |
+| `codegraph` | 1.5.0 | 代码知识图谱（MCP server），为 AI agent 提供语义检索；npm + Rust napi cdylib kernel（20 语言 tree-sitter），存储走 `node:sqlite` |
+| `uv` | 0.12.3 | 极速 Python 包管理器；Rust 源码构建，附 musl 检测补丁 + `python@3.14` 运行时依赖 |
+| `nvm` | 0.40.6 | OHOS 适配版 nvm（ohos-node.com 方案）：`nvm_get_os()` 经 OHOS 参数系统识别 OpenHarmony，node dist 默认走 `ohos-node.com`（预签名预编译），`nvm install` 原生下载即可用 |
 
 ## 已下线 / 已迁移
 
@@ -64,13 +64,13 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `close-range-shim` | 2026-07-15 下线 | 功能并入 `ohos-compat-shim` |
 | `bun-pty` / `lightningcss` / `tailwindcss-oxide` | 2026-07-18 下线 | 改走 `@ohos-ports/*` npm 包，无独立 formula 需求 |
 | `icu4c@78` | 2026-08-09 下线 | libc++ ABI `__n1` 迁移（#239-#241）后本 tap fork 冗余，直接用上游 harmonybrew/core 的 `icu4c@78`（同为 `__n1`） |
-| `grok-build` | 2026-08-12 下线 | 实际使用率低，维护成本不再合理；如需可从 tap git 历史恢复 formula |
+| `grok-build` | 2026-08-12 下线 | 已停止维护（使用率低）；可从 tap git 历史恢复 formula |
 | `cc-switch` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（`cc-switch-cli`），直接 `brew install cc-switch-cli` |
 | `reasonix` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供，直接 `brew install reasonix` |
 | `deepseek-harness` | 2026-08-15 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（含 OHOS 补丁集：link 兜底 / 凭据模式 / ripgrep 回退 / crypto polyfill / 无沙箱放行），直接 `brew install deepseek-harness`；已装本 tap 旧版的用户请先 `brew uninstall deepseek-harness` 再装上游版 |
-| `nvm-ohos` | 2026-08-15 下线 | 已被本 tap 保留的 `nvm`（ohos-node.com 方案）取代；如需可从 tap git 历史恢复 formula（旧实现：`NVM_INSTALL_THIRD_PARTY_HOOK` 重定向 `nvm install` 到 brew node keg） |
-| `warp-tui` | 2026-08-12 下线 | 实际使用率低，维护成本不再合理；如需可从 tap git 历史恢复 formula |
-| `inject-runpath` / `dlopen-sign-shim` | 2026-08-12 下线 | 已无 formula 依赖（原用途已被预签名 npm `.so` + bun r31 起静态内嵌的 `ohos-compat-shim` 取代）；如需可从 tap git 历史恢复 formula |
+| `nvm-ohos` | 2026-08-15 下线 | 已被本 tap 保留的 `nvm`（ohos-node.com 方案）取代；可从 tap git 历史恢复（旧实现：`NVM_INSTALL_THIRD_PARTY_HOOK` 重定向 `nvm install` 到 brew node keg） |
+| `warp-tui` | 2026-08-12 下线 | 已停止维护（使用率低）；可从 tap git 历史恢复 formula |
+| `inject-runpath` / `dlopen-sign-shim` | 2026-08-12 下线 | 已无 formula 依赖（原用途已被预签名 npm `.so` + bun r31 起静态内嵌的 `ohos-compat-shim` 取代）；可从 tap git 历史恢复 formula |
 
 > 改名提示（2026-08-01）：`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
 
