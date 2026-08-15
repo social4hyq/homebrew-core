@@ -1,6 +1,6 @@
 # social4hyq/homebrew-core
 
-HarmonyOS（OHOS aarch64）的 Homebrew tap：提供已在真机验证的开发工具链——AI coding CLI（`opencode` / `claude-code`）、Bun 运行时（`bun` / `bun-webkit` / `llvm@21` 等）、Node 版本管理（`nvm-ohos`）、终端与调试工具（`qemu-aarch64` / `starship` / `zellij` / `sshport` 等）。所有二进制均已按 HarmonyOS 要求完成签名，安装后开箱即用。
+HarmonyOS（OHOS aarch64）的 Homebrew tap：提供已在真机验证的开发工具链——AI coding CLI（`opencode` / `claude-code`）、Bun 运行时（`bun` / `bun-webkit` / `llvm@21` 等）、Node 版本管理（`nvm`）、终端与调试工具（`qemu-aarch64` / `starship` / `zellij` / `sshport` 等）。所有二进制均已按 HarmonyOS 要求完成签名，安装后开箱即用。
 
 ## 安装
 
@@ -53,7 +53,6 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `zig@0.15` | 0.15.2, revision 3 | ziglang.org 官方 aarch64-linux 静态预编译二进制重打包；`ohos-bst-light` self-sign；herdr 的构建依赖 |
 | `codegraph` | 1.5.0, revision 2 | 代码知识图谱（MCP server），为 AI agent 提供语义检索；npm + Rust napi cdylib kernel（20 语言 tree-sitter），存储走 `node:sqlite` |
 | `uv` | 0.12.3, revision 2 | 极速 Python 包管理器；Rust 源码构建，附 musl 检测补丁 + `python@3.14` 运行时依赖 |
-| `nvm-ohos` | 0.40.6, revision 3 | OHOS 适配版 nvm：不 patch 上游 `nvm.sh`，靠 nvm 官方扩展点 `NVM_INSTALL_THIRD_PARTY_HOOK` 把 `nvm install <major>` 重定向到本 tap 已签名的 `node`/`node@22`/`node@24` keg；`bin/node` 用拷贝而非 symlink（`process.execPath` 不穿透绕回 brew keg） |
 
 ## 已下线 / 已迁移
 
@@ -68,6 +67,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `cc-switch` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（`cc-switch-cli`），直接 `brew install cc-switch-cli` |
 | `reasonix` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供，直接 `brew install reasonix` |
 | `deepseek-harness` | 2026-08-15 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（含 OHOS 补丁集：link 兜底 / 凭据模式 / ripgrep 回退 / crypto polyfill / 无沙箱放行），直接 `brew install deepseek-harness`；已装本 tap 旧版的用户请先 `brew uninstall deepseek-harness` 再装上游版 |
+| `nvm-ohos` | 2026-08-15 下线 | 实际使用率低，维护成本不再合理；如需可从 tap git 历史恢复 formula（旧实现：`NVM_INSTALL_THIRD_PARTY_HOOK` 重定向 `nvm install` 到 brew node keg） |
 | `warp-tui` | 2026-08-12 下线 | 实际使用率低，维护成本不再合理；如需可从 tap git 历史恢复 formula |
 | `inject-runpath` / `dlopen-sign-shim` | 2026-08-12 下线 | 已无 formula 依赖（原用途已被预签名 npm `.so` + bun r31 起静态内嵌的 `ohos-compat-shim` 取代）；如需可从 tap git 历史恢复 formula |
 
