@@ -1,0 +1,11 @@
+--- a/dsh-tool-fs-search/lib/index.js
++++ b/dsh-tool-fs-search/lib/index.js
+@@ -118,7 +118,7 @@
+ *   when the platform package cannot be resolved.
+ */
+ function resolveRgPath() {
+-	rgPathPromise ??= import("@vscode/ripgrep").then((module) => module.rgPath);
++	rgPathPromise ??= import("@vscode/ripgrep").then((module) => module.rgPath).catch(() => "rg");
+ 	return rgPathPromise;
+ }
+ /**
