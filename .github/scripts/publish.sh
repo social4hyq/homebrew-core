@@ -96,14 +96,48 @@ git config --unset-all http.https://github.com/.extraheader || true
 GH_PUSH_URL="https://social4hyq:${BOT_PUSH_TOKEN}@github.com/social4hyq/homebrew-core.git"
 
 # Push HEAD to $1, fetch+rebase retrying on non-fast-forward (concurrent
-# per-formula publishes can race). A real conflict aborts via set -e.
+# per-formula publishes can race). The retry is strict by design:
+#   - never carry a half-done rebase into the next attempt (rebase --abort);
+#   - never merge in a remote tip that does not descend from our checkout
+#     base (a force-pushed / polluted branch would otherwise get replayed
+#     onto the PR — 2026-08-15: a stale-branch build matrix pushed foreign
+#     deepseek-harness commits onto rebump-opencode2 this way);
+#   - a content conflict (two jobs editing the same file) is a human problem:
+#     abort loudly instead of pushing a conflicted state;
+#   - after a clean rebase, HEAD must be exactly FETCH_HEAD + our own single
+#     bottle commit — anything else means foreign commits were replayed.
+# A real failure leaves the atomgit release uploaded but the branch untouched,
+# with an actionable error instead of a corrupted PR branch.
 push_bottle_commit() {  # $1 = destination ref (HEAD:$1)
+  # The bottle write-back is a single commit on the checkout base
+  # (pull_request.head.sha for PR runs; the pre-push HEAD for manual
+  # dispatches). Remember both before any retry mutates local state.
+  base_sha=$(git rev-parse "HEAD^" 2>/dev/null || git rev-parse HEAD)
   for i in 1 2 3; do
-    if git push "$GH_PUSH_URL" "HEAD:$1"; then return 0; fi
+    if git push "$GH_PUSH_URL" "HEAD:$1" 2>/dev/null; then return 0; fi
     [ "$i" = 3 ] && { echo "::error::push to $1 failed 3 times; atomgit release $TAG already uploaded, verify the bottle merge manually"; exit 1; }
     echo "::warning::push to $1 rejected (concurrent update?), fetch+rebase retry ($i/3)"
-    git fetch origin "$1" 2>/dev/null || true
-    git rebase "origin/$1" 2>/dev/null || true
+    # Clear any leftover rebase state from a previous failed attempt.
+    git rebase --abort 2>/dev/null || true
+    git fetch origin "$1" 2>/dev/null || {
+      echo "::error::fetch of origin/$1 failed; release $TAG already uploaded, verify the bottle merge manually"; exit 1; }
+    # The remote tip must descend from OUR base; otherwise the branch was
+    # rewritten under us (force-push/pollution) and rebasing would replay
+    # foreign commits onto it.
+    if ! git merge-base --is-ancestor "$base_sha" "FETCH_HEAD"; then
+      echo "::error::remote $1 does not descend from $(git rev-parse --short "$base_sha") (force-pushed or polluted?); release $TAG already uploaded, merge manually"
+      exit 1
+    fi
+    if ! git rebase "FETCH_HEAD"; then
+      git rebase --abort
+      echo "::error::rebase onto $1 conflicted (concurrent edit of the same file?); release $TAG already uploaded, merge manually"
+      exit 1
+    fi
+    # Sanity: only our own bottle commit may sit on top of the remote tip.
+    if [ "$(git rev-list --count "FETCH_HEAD..HEAD")" != "1" ]; then
+      echo "::error::rebase produced $(git rev-list --count "FETCH_HEAD..HEAD") commits on top of origin/$1 (expected 1); release $TAG already uploaded, merge manually"
+      exit 1
+    fi
     sleep 5
   done
 }
