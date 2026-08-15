@@ -1,32 +1,30 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.228.tgz"
-  sha256 "535e6daa6256689803cef88620e940924d00d274c2c293efe4a33590c2718cc9"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.233.tgz"
+  sha256 "14f3da88a0b6d4ecde3a73b7b26eba32174586190e2fe02c79b54c7d95610b76"
   license :cannot_represent # Anthropic Commercial Terms of Service
-  revision 3
   # npmmirror mirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org
   # (aarch64 SIMD AES path trapped by kernel); npmmirror (Aliyun CDN) doesn't.
   # Files are byte-identical (sha256 matches); wrapper tries npmmirror first,
   # falls back to registry.npmjs.org for non-buggy curl or mirror lag.
   #
-  # Stub bottle: Anthropic License prohibits redistributing the official binary,
-  # so install() writes only a wrapper — the binary is fetched, sha256-checked,
-  # and self-signed (ohos-bst-light) at first run: binary-sign-tool corrupts the
-  # embedded app and it degenerates to bare bun runtime.
-  # pour_bottle? also bypasses Homebrew's DevelopmentTools requirement
-  # (OHOS ships no /usr/bin/clang).
+  # Runtime-fetch stub: Anthropic License prohibits redistributing the official
+  # artifacts, so install() ships only a wrapper plus an extractor — the official
+  # tarball is fetched, sha256-checked and unpacked at first run. The official
+  # compiled binary is NEVER executed (see below), so nothing fetched is ever
+  # signed or run as code.
+  #
+  # Why not run the official binary: 2.1.229-2.1.233 abort ~100ms into startup
+  # on OHOS (embedded bun 8bb8d04c4/939d4325b panics inside a startup regex
+  # scan — regex-automata is_char_boundary — before any JS runs; deterministic
+  # on device, in the ci container and under qemu, any env/args). 2.1.228's
+  # bun (eb835313a, the same build our `bun` formula is based on) runs the
+  # same JS fine. So instead the wrapper extracts the standalone-module-graph
+  # CLI bundle from the fetched binary (pure data parsing, no execution) and
+  # runs it on our own bun: same JS, working runtime.
   #
   # Relocatability: wrapper uses runtime $HOMEBREW_PREFIX only — no build-time path interpolation.
-  #
-  # Version ceiling: 2.1.229-2.1.233 abort ~100ms into startup on OHOS
-  # (both bare and under ohos-shim, device and ci container, any env/args,
-  # before any JS runs). Anthropic bumped the embedded bun eb835313a ->
-  # 8bb8d04c4/939d4325b between 228 and 229; the new builds panic inside a
-  # startup regex scan (bun.report decodes the crash URLs to regex-automata
-  # is_char_boundary frames). Do not bump past 2.1.228 without first
-  # verifying `claude --version` on a real device — the runtime-fetch brew
-  # test below is the hard gate that catches this class of regression.
 
   livecheck do
     # www.npmjs.com 403s from this env; registry API JSON is reachable.
@@ -36,16 +34,83 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.228-r7"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "91d2906eaf057b86aced03a453df9acccc572336b77fb2a0bd2f0dcfadfd4d13"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.233-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "907a5c3a139fffa2d59c2deb156c3d6e8dd8dfd0cf901aafe61915778f877a4d"
   end
 
-  depends_on "ohos-bst-light"
-  depends_on "ohos-compat-shim"
+  depends_on "bun"
 
   def install
-    # install() never references the official binary — only the stub goes in the bottle.
+    # Extractor: parses the ELF ".bun" section of a `bun build --compile`
+    # executable, reads the StandaloneModuleGraph offsets from the section
+    # tail, scans the module record blob for the largest "// @bun" source
+    # payload and writes it as a standalone cli.js. Pure data processing.
+    (libexec/"extract-cli.mjs").write <<~JS
+      const [binPath, outPath] = Bun.argv.slice(2);
+      if (!binPath || !outPath) {
+        console.error("usage: bun extract-cli.mjs <compiled-binary> <out.js>");
+        process.exit(2);
+      }
+      const buf = new Uint8Array(await Bun.file(binPath).arrayBuffer());
+      const dv = (off) => new DataView(buf.buffer, off);
+      const u16 = (off) => dv(off).getUint16(0, true);
+      const u32 = (off) => dv(off).getUint32(0, true);
+      const u64 = (off) => Number(dv(off).getBigUint64(0, true));
+
+      const shoff = u64(0x28);
+      const shentsize = u16(0x3a);
+      const shnum = u16(0x3c);
+      const shstrndx = u16(0x3e);
+      const strOff = u64(shoff + shstrndx * shentsize + 0x18);
+      let bunOff = -1, bunSize = 0;
+      for (let i = 0; i < shnum; i++) {
+        const sh = shoff + i * shentsize;
+        const nameOff = strOff + u32(sh);
+        let end = nameOff;
+        while (buf[end] !== 0) end++;
+        if (new TextDecoder().decode(buf.subarray(nameOff, end)) === ".bun") {
+          bunOff = u64(sh + 0x18);
+          bunSize = u64(sh + 0x20);
+          break;
+        }
+      }
+      if (bunOff < 0) die("no .bun section (not a bun --compile binary?)");
+
+      if (new TextDecoder().decode(buf.subarray(bunOff + bunSize - 16, bunOff + bunSize)) !== "\\n---- Bun! ----\\n")
+        die("bad .bun trailer");
+      const o = bunOff + bunSize - 48;
+      const byteCount = u64(o);
+      const modPtrOff = u32(o + 8), modPtrLen = u32(o + 12);
+
+      let best = null;
+      const blobEnd = bunOff + modPtrOff + modPtrLen;
+      for (let p = bunOff + modPtrOff; p + 8 <= blobEnd; p++) {
+        const off = u32(p), len = u32(p + 4);
+        if (off === 0 || len < 1_000_000) continue; // main bundle is tens of MB
+        if (off + len > bunOff + byteCount) continue;
+        const win = new TextDecoder().decode(buf.subarray(bunOff + off, bunOff + off + 64));
+        const at = win.indexOf("// @bun");
+        if (at < 0) continue;
+        const realLen = len - at;
+        if (!best || realLen > best.len) best = { off: off + at, len: realLen };
+      }
+      if (!best) die("main bundle not found in module graph");
+
+      // The contents length may stop a few bytes short of the real bundle end
+      // (name-tail preamble artifact); JS source contains no NUL, so extend
+      // to the section's next NUL boundary.
+      let end = bunOff + best.off + best.len;
+      while (end < bunOff + bunSize && buf[end] !== 0) end++;
+      const src = buf.subarray(bunOff + best.off, end);
+      await Bun.write(outPath, src);
+      console.error(`claude-code: extracted ${src.length} bytes of CLI bundle`);
+
+      function die(msg) {
+        console.error(`extract-cli: ${msg}`);
+        process.exit(1);
+      }
+    JS
+
     (bin/"claude").write <<~SH
       #!/bin/sh
       set -e
@@ -55,9 +120,9 @@ class ClaudeCode < Formula
       NPM_URL="#{stable.url}"
       NPM_SHA="#{stable.checksum}"
       CACHE="${CLAUDE_CODE_CACHE:-${HOMEBREW_CACHE:-$HOME/.cache/homebrew}/claude-code/$VER}"
-      BIN="$CACHE/claude"
+      CLI="$CACHE/cli.js"
 
-      if [ ! -x "$BIN" ]; then
+      if [ ! -f "$CLI" ]; then
         mkdir -p "$CACHE"
         TMP="$(mktemp -d)"
         trap 'rm -rf "$TMP"' EXIT
@@ -66,35 +131,39 @@ class ClaudeCode < Formula
         FALLBACK="https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-$VER.tgz"
         fetched=0
         for u in "$NPM_URL" "$FALLBACK"; do
-          curl -fL "$u" -o "$TMP/pkg.tgz" && { fetched=1; break; }
+          # --retry: npmmirror long connections occasionally die mid-transfer
+          # (SSL unexpected eof); one retry has been enough in practice.
+          curl -fsSL --retry 3 --retry-all-errors --retry-delay 2 "$u" -o "$TMP/pkg.tgz" && { fetched=1; break; }
         done
         [ "$fetched" = 1 ] || { echo "claude-code: download failed from all mirrors" >&2; exit 1; }
-        # Fail closed: an unverified runtime-downloaded executable must never run.
+        # Fail closed: an unverified runtime download must never be trusted.
         command -v sha256sum >/dev/null 2>&1 || {
-          echo "claude-code: sha256sum not found; refusing to run an unverified download" >&2
+          echo "claude-code: sha256sum not found; refusing an unverified download" >&2
           exit 1
         }
         printf '%s  %s\\n' "$NPM_SHA" "$TMP/pkg.tgz" | sha256sum -c -
         tar -xzf "$TMP/pkg.tgz" -C "$TMP"
-        SRC="$TMP/package/claude"
-        [ -f "$SRC" ] || SRC="$(find "$TMP" -type f -name claude | head -n1)"
-        [ -f "$SRC" ] || { echo "claude-code: 'claude' binary not found in tarball" >&2; exit 1; }
-        "$HB/opt/ohos-bst-light/bin/self-sign" "$SRC"
-        mv "$SRC" "$BIN"
-        chmod 0755 "$BIN"
+        [ -f "$TMP/package/claude" ] || { echo "claude-code: 'claude' binary not found in tarball" >&2; exit 1; }
+        # Extract the CLI bundle; the official binary itself is never executed
+        # (its embedded bun aborts on OHOS — see formula comments).
+        "$HB/opt/bun/bin/bun" "$HB/opt/#{name}/libexec/extract-cli.mjs" "$TMP/package/claude" "$CLI" || {
+          echo "claude-code: bundle extraction failed" >&2; exit 1; }
       fi
 
-      exec "$HB/opt/ohos-compat-shim/bin/ohos-shim" "$BIN" "$@"
+      exec "$HB/opt/bun/bin/bun" "$CLI" "$@"
     SH
     chmod 0755, bin/"claude"
   end
 
   def caveats
     <<~EOS
-      claude-code is installed as a runtime-fetch stub: the official binary is
-      NOT in the bottle (Anthropic License). The first `claude` invocation
-      downloads it (via the npmmirror mirror), self-signs it, and caches it under
-      $HOMEBREW_CACHE/claude-code/#{version}/ (override with CLAUDE_CODE_CACHE).
+      claude-code is installed as a runtime-fetch stub: nothing of the official
+      release is in the bottle (Anthropic License). The first `claude` invocation
+      downloads the official tarball (via the npmmirror mirror), verifies its
+      sha256, extracts the CLI bundle from the compiled binary, and runs it on
+      this tap's bun. The official binary itself is never executed (its embedded
+      bun crashes on OHOS). Cached under $HOMEBREW_CACHE/claude-code/#{version}/
+      (override with CLAUDE_CODE_CACHE).
 
       Claude Code requires API credentials. Configure via environment variables:
 
@@ -116,12 +185,12 @@ class ClaudeCode < Formula
   end
 
   test do
-    # End-to-end: wrapper runtime-fetches, sha256-verifies, self-signs and
-    # RUNS the official binary. Embedded-Bun startup-abort regressions
-    # (2.1.229-2.1.233, crashes on this platform ~100ms after exec, before
-    # any JS) must fail here in pr-validate instead of reaching users via
-    # autobump+automerge (PR #272 shipped one and crashed every upgraded
-    # install). First run downloads the ~95MB tgz from npmmirror.
+    # End-to-end: wrapper runtime-fetches, sha256-verifies, extracts the CLI
+    # bundle and runs it on our bun. The embedded-bun startup abort that
+    # shipped in 2.1.229-2.1.233 (official binary aborts on OHOS before any
+    # JS runs) is exactly what this catches — the version must come out of
+    # the extracted bundle running on OUR runtime. First run downloads the
+    # ~95MB tgz from npmmirror.
     assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
   end
 end
