@@ -2,11 +2,16 @@ class OpencodeAT2 < Formula
   desc "OpenCode v2 preview — AI coding agent CLI, HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
   # v2 is a live branch (no tags yet); pinned git revision + beta version tag.
+  # Do NOT add `branch:` back: Homebrew's extract_ref prefers :branch over
+  # :revision, so `branch: "v2", revision: <sha>` silently builds the moving
+  # branch tip instead of the pin (the v2 tip has since dropped generate.ts
+  # and started building packages/app — both break this formula). Revision
+  # alone is honored.
   # See social4hyq/ohos-opencode2 dev for canonical diff.
-  url "https://github.com/anomalyco/opencode.git", revision: "84fd347afaed9617b7b29744086657fa029bbe68", branch: "v2"
+  url "https://github.com/anomalyco/opencode.git", revision: "84fd347afaed9617b7b29744086657fa029bbe68"
   version "2.0.0-beta"
   license "MIT"
-  revision 13
+  revision 14
 
   livecheck do
     url "https://api.github.com/repos/anomalyco/opencode/commits?sha=v2&per_page=1"
@@ -16,8 +21,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r13"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4f897cc13fb350023b6832ce3ec22262465117be14380fa9edd68dc585bfc781"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "883f0a165a6bc73e16f6f89d97f8056c38c6ffb65b918fe27f697f57a6953240"
   end
 
   # `bun build --compile` single binary: runtime + JS + .so embedded; since
@@ -112,6 +117,22 @@ class OpencodeAT2 < Formula
         odie("opencode@2: build.ts compile-target anchor not found")
     end
 
+    # Build-time models snapshot: generate.ts fetches models.dev/api.json at
+    # module load, which the CI container can't reach since the 2026-08-12
+    # ci-runner image rebuild (the old image could; the new image's bun fetch
+    # dies with ENOENT and aborts build.ts before any compile — PR #330).
+    # Fail soft: keep the snapshot when the fetch works, otherwise substitute
+    # the JS literal `undefined` — bun's define inserts the value as raw code,
+    # so OPENCODE_MODELS_DEV compiles to undefined and models-dev.ts falls
+    # through to the runtime fetch (models.dev is reachable from real
+    # devices). AbortSignal.timeout guards the hang case.
+    inreplace "packages/cli/script/generate.ts" do |s|
+      s.sub!(": await fetch(`${modelsUrl}/api.json`).then((response) => response.text())",
+             ": await fetch(`${modelsUrl}/api.json`, { signal: AbortSignal.timeout(20_000) })" \
+             ".then((response) => response.text()).catch(() => \"undefined\")") ||
+        odie("opencode@2: generate.ts models fetch anchor not found")
+    end
+
     cd "packages/cli" do
       system "bun", "run", "script/build.ts", "--single"
     end
@@ -124,14 +145,13 @@ class OpencodeAT2 < Formula
     sections = Utils.safe_popen_read(readelf.to_s, "--section-headers", out)
     odie "compiled binary lacks .codesign section" unless sections.include?(".codesign")
 
-    # Wrapper defaults TMPDIR to EL2 and isolates XDG_DATA_HOME ($HOME/.local/share-v2)
-    # so v2's DB migrations don't break v1's session creation. opt_libexec keeps
-    # baked path stable across flat/nested cellar flip.
+    # Isolates XDG_DATA_HOME ($HOME/.local/share-v2) so v2's DB migrations don't
+    # break v1's session creation. opt_libexec keeps baked path stable across
+    # flat/nested cellar flip.
     mkdir_p libexec/"bin"
     libexec.install out => "bin/opencode2"
     (bin/"opencode2").write <<~SH
       #!/bin/sh
-      export TMPDIR="${OPENCODE_TMPDIR:-/data/storage/el2/base/cache}"
       export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share-v2}"
       exec "#{opt_libexec}/bin/opencode2" "$@"
     SH
