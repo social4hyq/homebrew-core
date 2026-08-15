@@ -18,6 +18,15 @@ class ClaudeCode < Formula
   # (OHOS ships no /usr/bin/clang).
   #
   # Relocatability: wrapper uses runtime $HOMEBREW_PREFIX only — no build-time path interpolation.
+  #
+  # Version ceiling: 2.1.229-2.1.233 abort ~100ms into startup on OHOS
+  # (both bare and under ohos-shim, device and ci container, any env/args,
+  # before any JS runs). Anthropic bumped the embedded bun eb835313a ->
+  # 8bb8d04c4/939d4325b between 228 and 229; the new builds panic inside a
+  # startup regex scan (bun.report decodes the crash URLs to regex-automata
+  # is_char_boundary frames). Do not bump past 2.1.228 without first
+  # verifying `claude --version` on a real device — the runtime-fetch brew
+  # test below is the hard gate that catches this class of regression.
 
   livecheck do
     # www.npmjs.com 403s from this env; registry API JSON is reachable.

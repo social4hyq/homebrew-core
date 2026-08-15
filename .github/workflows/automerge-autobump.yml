@@ -73,7 +73,9 @@ jobs:
           HEAD_REF: ${{ github.event.pull_request.head.ref || github.event.workflow_run.head_branch }}
           REPO: ${{ github.repository }}
         run: |
-          ALLOWLIST="claude-code opencode opencode@2"
+          # Keep in sync with autobump.yml's ALLOWLIST (claude-code removed:
+          # 2.1.229+ abort on OHOS startup, see the note there)
+          ALLOWLIST="opencode opencode@2"
           BUMP_BRANCH_RE="^bump-($(echo "$ALLOWLIST" | tr ' ' '|'))-"
           if ! grep -qE "$BUMP_BRANCH_RE" <<< "$HEAD_REF"; then
             echo "head branch $HEAD_REF not in the autobump allowlist, skipping"
