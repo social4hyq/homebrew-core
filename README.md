@@ -53,6 +53,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `zig@0.15` | 0.15.2, revision 3 | ziglang.org 官方 aarch64-linux 静态预编译二进制重打包；`ohos-bst-light` self-sign；herdr 的构建依赖 |
 | `codegraph` | 1.5.0, revision 2 | 代码知识图谱（MCP server），为 AI agent 提供语义检索；npm + Rust napi cdylib kernel（20 语言 tree-sitter），存储走 `node:sqlite` |
 | `uv` | 0.12.3, revision 2 | 极速 Python 包管理器；Rust 源码构建，附 musl 检测补丁 + `python@3.14` 运行时依赖 |
+| `nvm` | 0.40.6, revision 1 | OHOS 适配版 nvm（`nvm-ohos` 下线后保留的旧方案）：`nvm_get_os()` 经 OHOS 参数系统识别 OpenHarmony，node dist 默认走 `ohos-node.com`（预签名预编译），`nvm install` 原生下载即可用 |
 
 ## 已下线 / 已迁移
 
