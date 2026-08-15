@@ -35,25 +35,25 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 
 | Formula | 版本 | 说明 |
 |---|---|---|
-| `opencode` | 1.18.18 | OpenCode AI 编码代理 CLI；上游源码构建（`bun build --compile` 单体二进制，原生依赖走 `@ohos-ports/*` npm 包） |
-| `opencode@2` | 2.0.0-beta | opencode v2 预览路线；源码构建（`bun build --compile` 单体二进制，git revision 固定 84fd347——勿加 `branch:`，brew 会忽略 revision 跟踪分支 tip；原生依赖 `@ohos-ports/opentui-core` + `@ohos-ports/bun-pty` + `@ohos-ports/parcel-watcher`），命令名 `opencode2` |
-| `claude-code` | 2.1.233 | Anthropic Claude Code CLI；runtime-fetch stub（License 禁重分发）：首次运行拉取官方 tarball（sha256 fail-closed）→ 解析 ELF `.bun` 段抽取 CLI bundle（官方二进制永不执行，其内嵌 bun 在 OHOS 上启动即崩）→ 跑在本 tap `bun` 上 |
-| `bun` | 1.4.0 | Bun JavaScript runtime；**自举源码构建**（`bun bd`），`ohos-compat-shim` 静态内嵌进可执行文件；libc++ ABI 已切 `__n1`（r58 起） |
-| `bun-bootstrap` | 1.4.0-5467a689 | 预编译 bun，用于 `bun bd` 自举本机 bun；已预签（`keg_only`） |
-| `bun-webkit` | `447082ab68` | bun 专用 WebKit fork 静态库（JSCore/WTF/bmalloc）；CMake 源码构建（`--target=aarch64-linux-ohos`，`keg_only`） |
-| `llvm@21` | 21.1.8 | OHOS 补丁版 clang + lld + multiarch runtime libs（libc++ ABI `__n1`）；链接期 LLD `--code-sign` 签名（`keg_only`） |
-| `ohos-bst-light` | 1.0.0 | 轻量二进制自签工具（保留 ELF 结构）；预编译二进制 formula 的 self-sign 都靠它 |
-| `ohos-compat-shim` | 0.3.0 | LD_PRELOAD 兼容垫片：拦截鸿蒙缺失/异常 syscall（`close_range`/`fchmodat2`/`getpwuid_r` 等）+ `link()` 拦截（v0.3.0，PR #336）；C 源码直编 |
-| `qemu-aarch64` | 11.0.1-r0 | QEMU 用户态 aarch64 模拟器；Alpine 全静态 musl 构建，`-strace` 纯用户态 syscall 跟踪（替代 ptrace） |
-| `sshport` | 0.2.1 | SSH 端口转发：`sshport up <host>` 把远程端口同号映射到本机；TS 源码构建（`bun build` 单 JS 文件） |
-| `starship` | 1.26.0 | 终端提示符美化/定制工具（跨 shell，把默认 prompt 换成主题化、信息丰富的提示符，如 git 状态/目录等）；Rust 源码构建 |
-| `zellij` | 0.45.0-dev | 终端复用器 + WASM 插件系统（wasmi 解释执行）；Rust 源码构建，跟踪 `main` 固定 revision，wrapper 内置 `ohos-compat-shim` |
-| `hishell-font` | 0.1.0 | hishell 终端 Nerd Font 安装配置；TS 源码构建（`bun build` 单 JS 文件） |
-| `herdr` | 0.8.0 | coding agent 终端会话持久化 runtime；Rust 源码构建（依赖 `zig@0.15` 编译 vendored libghostty-vt） |
-| `zig@0.15` | 0.15.2 | ziglang.org 官方 aarch64-linux 静态预编译二进制重打包；`ohos-bst-light` self-sign；herdr 的构建依赖 |
-| `codegraph` | 1.5.0 | 代码知识图谱（MCP server），为 AI agent 提供语义检索；npm + Rust napi cdylib kernel（20 语言 tree-sitter），存储走 `node:sqlite` |
-| `uv` | 0.12.3 | 极速 Python 包管理器；Rust 源码构建，附 musl 检测补丁 + `python@3.14` 运行时依赖 |
-| `nvm` | 0.40.6 | OHOS 适配版 nvm（ohos-node.com 方案）：`nvm_get_os()` 经 OHOS 参数系统识别 OpenHarmony，node dist 默认走 `ohos-node.com`（预签名预编译），`nvm install` 原生下载即可用 |
+| `opencode` | 1.18.18 | 终端 AI 编码助手：在命令行里让 AI 帮你读代码、改代码、跑命令、提 PR；对话式协作 |
+| `opencode@2` | 2.0.0-beta | opencode 的 v2 预览版（命令名 `opencode2`）：新架构、交互升级，仍在快速迭代 |
+| `claude-code` | 2.1.233 | Anthropic 的终端 AI 编码助手（Claude Code）：对话式写代码、改代码、执行命令；首次运行自动拉取官方版本并校验完整性（License 禁随包分发） |
+| `bun` | 1.4.0 | JavaScript/TypeScript 全家桶运行时：运行、打包、依赖管理一体化，启动极快 |
+| `bun-bootstrap` | 1.4.0-5467a689 | bun 自举构建用的预编译引导版（普通用户无需安装） |
+| `bun-webkit` | `447082ab68` | bun 运行时的浏览器引擎组件（内部依赖，普通用户无需关心） |
+| `llvm@21` | 21.1.8 | 本 tap 的编译器基石：几乎全部本地源码构建都依赖它，并负责给最终产物签名 |
+| `ohos-bst-light` | 1.0.0 | 二进制自签工具（开发向）：给本地编译的产物签名，使其能在 OHOS 上执行 |
+| `ohos-compat-shim` | 0.3.0 | 系统兼容层：自动兜底 OHOS 与标准 Linux 的底层行为差异，让软件开箱即用（多数用户无感） |
+| `qemu-aarch64` | 11.0.1-r0 | aarch64 程序运行/调试环境：在真机上运行 ARM Linux 程序，自带系统调用级跟踪（排查问题利器） |
+| `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机直接访问 |
+| `starship` | 1.26.0 | 终端提示符美化/定制工具：把默认 prompt 换成主题化、信息丰富的提示符（git 状态/目录等），跨 shell 生效 |
+| `zellij` | 0.45.0-dev | 终端复用器（类似 tmux）：一个窗口多窗格/标签页，会话可脱离重连，支持插件扩展 |
+| `hishell-font` | 0.1.0 | hishell 终端图标字体：装完终端里的图标、符号正常显示（配合主题使用） |
+| `herdr` | 0.8.0 | AI 编码助手会话持久化：让终端里的 agent 工作上下文跨会话保留、随时续上 |
+| `zig@0.15` | 0.15.2 | Zig 编程语言工具链（herdr 的构建依赖） |
+| `codegraph` | 1.5.0 | 代码知识图谱服务：为 AI agent 提供跨语言代码语义检索，快速理解代码库结构与调用关系 |
+| `uv` | 0.12.3 | 极速 Python 包管理器：装包、建虚拟环境一条龙，速度远超传统方案 |
+| `nvm` | 0.40.6 | Node.js 多版本管理：一条命令安装/切换任意 Node 版本（OHOS 适配，下载即用） |
 
 ## 已下线 / 已迁移
 
