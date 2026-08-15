@@ -53,7 +53,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `zig@0.15` | 0.15.2, revision 3 | ziglang.org 官方 aarch64-linux 静态预编译二进制重打包；`ohos-bst-light` self-sign；herdr 的构建依赖 |
 | `codegraph` | 1.5.0, revision 2 | 代码知识图谱（MCP server），为 AI agent 提供语义检索；npm + Rust napi cdylib kernel（20 语言 tree-sitter），存储走 `node:sqlite` |
 | `uv` | 0.12.3, revision 2 | 极速 Python 包管理器；Rust 源码构建，附 musl 检测补丁 + `python@3.14` 运行时依赖 |
-| `nvm` | 0.40.6, revision 1 | OHOS 适配版 nvm（`nvm-ohos` 下线后保留的旧方案）：`nvm_get_os()` 经 OHOS 参数系统识别 OpenHarmony，node dist 默认走 `ohos-node.com`（预签名预编译），`nvm install` 原生下载即可用 |
+| `nvm` | 0.40.6, revision 1 | OHOS 适配版 nvm（ohos-node.com 方案）：`nvm_get_os()` 经 OHOS 参数系统识别 OpenHarmony，node dist 默认走 `ohos-node.com`（预签名预编译），`nvm install` 原生下载即可用 |
 
 ## 已下线 / 已迁移
 
@@ -68,7 +68,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `cc-switch` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（`cc-switch-cli`），直接 `brew install cc-switch-cli` |
 | `reasonix` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供，直接 `brew install reasonix` |
 | `deepseek-harness` | 2026-08-15 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（含 OHOS 补丁集：link 兜底 / 凭据模式 / ripgrep 回退 / crypto polyfill / 无沙箱放行），直接 `brew install deepseek-harness`；已装本 tap 旧版的用户请先 `brew uninstall deepseek-harness` 再装上游版 |
-| `nvm-ohos` | 2026-08-15 下线 | 实际使用率低，维护成本不再合理；如需可从 tap git 历史恢复 formula（旧实现：`NVM_INSTALL_THIRD_PARTY_HOOK` 重定向 `nvm install` 到 brew node keg） |
+| `nvm-ohos` | 2026-08-15 下线 | 已被本 tap 保留的 `nvm`（ohos-node.com 方案）取代；如需可从 tap git 历史恢复 formula（旧实现：`NVM_INSTALL_THIRD_PARTY_HOOK` 重定向 `nvm install` 到 brew node keg） |
 | `warp-tui` | 2026-08-12 下线 | 实际使用率低，维护成本不再合理；如需可从 tap git 历史恢复 formula |
 | `inject-runpath` / `dlopen-sign-shim` | 2026-08-12 下线 | 已无 formula 依赖（原用途已被预签名 npm `.so` + bun r31 起静态内嵌的 `ohos-compat-shim` 取代）；如需可从 tap git 历史恢复 formula |
 
