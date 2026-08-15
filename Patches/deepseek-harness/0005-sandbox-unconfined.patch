@@ -1,0 +1,55 @@
+--- a/dsh-sandbox-local/lib/index.js
++++ b/dsh-sandbox-local/lib/index.js
+@@ -207,6 +207,7 @@
+ */
+ const DENIAL_SIGNATURES = {
+ 	bwrap: ["read-only file system"],
++	unconfined: [],
+ 	landlock: ["permission denied"],
+ 	seatbelt: ["operation not permitted"],
+ 	"windows-acl": [
+@@ -231,6 +232,7 @@
+ */
+ const RUNNER_FAILURE_RULES = {
+ 	bwrap: [{ fatalSignatures: ["bwrap: "] }],
++	unconfined: [],
+ 	landlock: [{
+ 		allowedExitCodes: [LAUNCHER_FAILURE_EXIT],
+ 		fatalSignatures: [`${LAUNCHER_BIN}: `],
+@@ -311,12 +313,10 @@
+ 			runnerFailureRules: [{ fatalSignatures: this.configuredRunnerFailureSignatures }]
+ 		};
+ 		const selected = this.selectRunner(policy.mode);
++		const runnerArgs = this.runnerArgv(selected.runner, policy);
+ 		return {
+-			argv: [
+-				...this.runnerArgv(selected.runner, policy),
+-				"--",
+-				...argv
+-			],
++			// An empty runner argv (unconfined) has no "--" separator.
++			argv: runnerArgs.length === 0 ? [...argv] : [...runnerArgs, "--", ...argv],
+ 			enforcement: selected.enforcement,
+ 			denialSignatures: DENIAL_SIGNATURES[selected.runner],
+ 			runnerFailureRules: RUNNER_FAILURE_RULES[selected.runner]
+@@ -329,6 +329,7 @@
+ 			case "landlock": return [this.landlockLauncher(), ...landlockProfileArgs(policy)];
+ 			case "seatbelt": return [this.seatbeltExec(), ...seatbeltProfileArgs(policy)];
+ 			case "windows-acl": return this.windowsAclRunnerArgv(policy);
++			case "unconfined": return [];
+ 			default: return assertNever(runner);
+ 		}
+ 	}
+@@ -484,8 +485,11 @@
+ 	}
+ 	/** Walk this platform's chain: sole candidate unprobed, several probed in order, none usable → unavailable. */
+ 	chainVerdict() {
+-		const chain = this.internals.chain ?? PLATFORM_CHAINS[this.internals.platform ?? process.platform] ?? [];
++		const platform = this.internals.platform ?? process.platform;
++		const chain = this.internals.chain ?? PLATFORM_CHAINS[platform] ?? [];
+ 		const [first, ...rest] = chain;
++		// OHOS has no sandbox backend; run unconfined instead of failing closed.
++		if (first === void 0 && platform === "openharmony") return { runner: "unconfined", enforcement: "none" };
+ 		if (first === void 0) return "unavailable";
+ 		if (rest.length === 0) return {
+ 			runner: first,
