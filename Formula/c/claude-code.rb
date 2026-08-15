@@ -18,6 +18,15 @@ class ClaudeCode < Formula
   # (OHOS ships no /usr/bin/clang).
   #
   # Relocatability: wrapper uses runtime $HOMEBREW_PREFIX only — no build-time path interpolation.
+  #
+  # Version ceiling: 2.1.229-2.1.233 abort ~100ms into startup on OHOS
+  # (both bare and under ohos-shim, device and ci container, any env/args,
+  # before any JS runs). Anthropic bumped the embedded bun eb835313a ->
+  # 8bb8d04c4/939d4325b between 228 and 229; the new builds panic inside a
+  # startup regex scan (bun.report decodes the crash URLs to regex-automata
+  # is_char_boundary frames). Do not bump past 2.1.228 without first
+  # verifying `claude --version` on a real device — the runtime-fetch brew
+  # test below is the hard gate that catches this class of regression.
 
   livecheck do
     # www.npmjs.com 403s from this env; registry API JSON is reachable.
@@ -27,8 +36,9 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.228-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1f9b711d9c4692f07b201193063f51bceab324268dd78ee91d1a92208792832"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.228-r7"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "91d2906eaf057b86aced03a453df9acccc572336b77fb2a0bd2f0dcfadfd4d13"
   end
 
   depends_on "ohos-bst-light"
@@ -106,7 +116,12 @@ class ClaudeCode < Formula
   end
 
   test do
-    # Assert stub only — `claude --version` would trigger the runtime fetch during `brew test`.
-    assert_path_exists bin/"claude"
+    # End-to-end: wrapper runtime-fetches, sha256-verifies, self-signs and
+    # RUNS the official binary. Embedded-Bun startup-abort regressions
+    # (2.1.229-2.1.233, crashes on this platform ~100ms after exec, before
+    # any JS) must fail here in pr-validate instead of reaching users via
+    # autobump+automerge (PR #272 shipped one and crashed every upgraded
+    # install). First run downloads the ~95MB tgz from npmmirror.
+    assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
   end
 end
