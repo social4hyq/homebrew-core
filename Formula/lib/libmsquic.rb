@@ -2,8 +2,8 @@ class Libmsquic < Formula
   desc "Cross-platform, C implementation of the IETF QUIC protocol"
   homepage "https://github.com/microsoft/msquic"
   url "https://github.com/microsoft/msquic.git",
-      tag:      "v2.5.10",
-      revision: "9ff06b71fd4b4d5258361598ada5b24cbc1beb20"
+      tag:      "v2.6.0",
+      revision: "e7e7a114e20a55ec2d5f723cf6bdf3bfb7b0b24a"
   license "MIT"
 
   livecheck do
@@ -12,7 +12,7 @@ class Libmsquic < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd59b0097471fb2c1bf4d3c0bb59aa8e80b317ae16347e8e09286494973db8e9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e37f952342539d69e69bf6edf3afd31a6a89c6fca58e1b2bdcbac6c64ea3e17"
   end
 
   depends_on "cmake" => :build
