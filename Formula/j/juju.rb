@@ -1,14 +1,14 @@
 class Juju < Formula
   desc "DevOps management tool"
   homepage "https://canonical.com/juju"
-  url "https://github.com/juju/juju/archive/refs/tags/v4.0.13.tar.gz"
-  sha256 "ea78f6f111f48c1429a2cd415a1867e07318581697ccefe9b525e462637271b4"
+  url "https://github.com/juju/juju/archive/refs/tags/v4.0.14.tar.gz"
+  sha256 "dd85e4297726c562fc6c693a0ee82aa9309e300d2be86f0dd16e47f99c9dd43d"
   license "AGPL-3.0-only"
   version_scheme 1
   head "https://github.com/juju/juju.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89d23bba6eaea9fd318db391e930e37da6a00940cc30a0705c542566c0be20c0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "74a7f004abac790fb8a82a792b064c3c50e5f2c8a4338f0fbe75b926328f5183"
   end
 
   depends_on "go" => :build
