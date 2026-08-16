@@ -124,6 +124,14 @@ class OpencodeAT2 < Formula
         odie("opencode@2: build.ts compile-target anchor not found")
     end
 
+    # compileExecutable() returns undefined when BUN_COMPILE_RELEASE is unset,
+    # and Bun.build rejects that (executablePath must be a Bun executable).
+    # Upstream pins a downloadable bun release; on OHOS there is none — use the
+    # bun running the build script (the tap's OHOS build) as the template.
+    inreplace "packages/cli/script/build.ts",
+      "const release = process.env.BUN_COMPILE_RELEASE\n  if (!release) return",
+      "const release = process.env.BUN_COMPILE_RELEASE\n  if (!release) return process.execPath"
+
     # Build-time models snapshot: none needed — upstream commits the models
     # data (packages/core/src/models-dev/snapshot.txt) since c254ba8a; no
     # fetch at build time.
