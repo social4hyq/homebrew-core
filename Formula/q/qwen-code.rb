@@ -1,12 +1,12 @@
 class QwenCode < Formula
   desc "AI-powered command-line workflow tool for developers"
   homepage "https://github.com/QwenLM/qwen-code"
-  url "https://registry.npmjs.org/@qwen-code/qwen-code/-/qwen-code-0.21.10.tgz"
-  sha256 "fbed92cb005b65a9b74fa140fd4d3bb0abd8505384c1c3c419600fbfe26cf4ee"
+  url "https://registry.npmjs.org/@qwen-code/qwen-code/-/qwen-code-0.21.12.tgz"
+  sha256 "44cd390a551d5342c82c7e16dd2cb6c82eca860aa4ee89b5e8d87ee1e0b151c4"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa0bc13c8317dd1dbe6ca7b5142a5b75c99dc9ea7b8c408e58740de615340f1d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9fd6e74317fec7da776627d90ab87d97fe023388033ff1b493e0f46027351f11"
   end
 
   depends_on "node"
