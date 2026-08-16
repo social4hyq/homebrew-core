@@ -1,8 +1,8 @@
 class Pdtm < Formula
   desc "ProjectDiscovery's Open Source Tool Manager"
   homepage "https://github.com/projectdiscovery/pdtm"
-  url "https://github.com/projectdiscovery/pdtm/archive/refs/tags/v0.1.3.tar.gz"
-  sha256 "5aa5611e3a61df37a2e4030fd8742d4a1278840fe91c1e1fde129aab81f4fe45"
+  url "https://github.com/projectdiscovery/pdtm/archive/refs/tags/v0.1.5.tar.gz"
+  sha256 "13746a1da82961dcfc9d797206abd6ba75336879f2292228e92a2813000d1654"
   license "MIT"
   head "https://github.com/projectdiscovery/pdtm.git", branch: "main"
 
