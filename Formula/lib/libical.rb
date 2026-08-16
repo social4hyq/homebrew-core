@@ -1,8 +1,8 @@
 class Libical < Formula
   desc "Implementation of iCalendar protocols and data formats"
   homepage "https://libical.github.io/libical/"
-  url "https://github.com/libical/libical/releases/download/v4.0.4/libical-4.0.4.tar.gz"
-  sha256 "c851cdb46da5e6397881dafaa592c5516fb49da05dd1bb095f711a6d20eac422"
+  url "https://github.com/libical/libical/releases/download/v4.0.5/libical-4.0.5.tar.gz"
+  sha256 "cc09a3ac41d60e6144e644bd3fcf97d47106d659c4a0b8965102581401e67c9c"
   license any_of: ["LGPL-2.1-or-later", "MPL-2.0"]
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class Libical < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa050750695b491b0ed7b454148e9ab90a6bb4750a7414dab1761122fe0f9cf2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dfcd8b23badb105f2c3af27acfb28e950f7fb8a0eac389fd21cadd6c7ee6a1c"
   end
 
   depends_on "cmake" => :build
