@@ -4,14 +4,18 @@ class OpencodeAT2 < Formula
   # v2 is a live branch (no tags yet); pinned git revision + beta version tag.
   # Do NOT add `branch:` back: Homebrew's extract_ref prefers :branch over
   # :revision, so `branch: "v2", revision: <sha>` silently builds the moving
-  # branch tip instead of the pin (the v2 tip has since dropped generate.ts
-  # and started building packages/app — both break this formula). Revision
-  # alone is honored.
+  # branch tip instead of the pin. The pinned tip (2026-08-15, 825193400773)
+  # dropped generate.ts (models snapshot is committed upstream as
+  # packages/core/src/models-dev/snapshot.txt — no build-time fetch) and
+  # restructured build.ts (app-assets; pass --skip-web-ui to skip the
+  # packages/app web build, which rm_r deletes). opentui is 0.5.3 now: its
+  # libopentui.so imports pthread_tryjoin_np, which OHOS musl lacks — the
+  # wrapper LD_PRELOADs a small shim providing it (see install).
   # See social4hyq/ohos-opencode2 dev for canonical diff.
-  url "https://github.com/anomalyco/opencode.git", revision: "84fd347afaed9617b7b29744086657fa029bbe68"
+  url "https://github.com/anomalyco/opencode.git", revision: "825193400773cceab9b92f6bc63247d6dde3d580"
   version "2.0.0-beta"
   license "MIT"
-  revision 14
+  revision 15
 
   livecheck do
     url "https://api.github.com/repos/anomalyco/opencode/commits?sha=v2&per_page=1"
@@ -21,16 +25,17 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r16"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "883f0a165a6bc73e16f6f89d97f8056c38c6ffb65b918fe27f697f57a6953240"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r17"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c47089311a554e63f3882fb15fd15f55e32ffbe78872af8ab6f7ec9f1b34b28a"
   end
 
   # `bun build --compile` single binary: runtime + JS + .so embedded; since
   # bun r31 ohos-compat-shim is statically linked (no runtime shim dep).
   # v2 monorepo restructure: CLI moved packages/opencode → packages/cli
   # (binary renamed opencode2). Build script: packages/cli/script/build.ts.
-  # Fewer native deps: only opentui-core + bun-pty. `bun install --ignore-scripts`
-  # (lifecycle scripts irrelevant to signing). @parcel/watcher: @ohos-ports binary.
+  # Native deps: opentui-core (@ohos-ports 0.5.3, needs pthread_tryjoin shim)
+  # + @parcel/watcher (@ohos-ports binary). `bun install --ignore-scripts`
+  # (lifecycle scripts irrelevant to signing).
   depends_on "bun" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
 
@@ -49,12 +54,14 @@ class OpencodeAT2 < Formula
     rm_r %w[packages/desktop packages/app packages/session-ui packages/web
             packages/www packages/storybook packages/enterprise]
 
-    # v2 needs fewer @ohos-ports overrides: opentui-core + bun-pty only.
+    # @ohos-ports overrides: opentui-core (0.5.3, dlopen loader patch +
+    # bundled libopentui.so) + parcel-watcher only. bun-pty is gone — the
+    # tip uses @lydell/node-pty, which the CLI graph never imports (no
+    # rebuild needed; verified against the pinned source).
     # The nil check makes a vanished anchor fail loudly.
     inreplace "package.json" do |s|
       overrides = [
-        '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.5-patch.1",',
-        '    "bun-pty": "npm:@ohos-ports/bun-pty@0.4.10",',
+        '"@opentui/core": "npm:@ohos-ports/opentui-core@0.5.3",',
         '    "@parcel/watcher-linux-arm64-musl": "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1",',
       ]
       s.gsub!('"@opentui/core": "catalog:",', overrides.join("\n")) ||
@@ -117,24 +124,23 @@ class OpencodeAT2 < Formula
         odie("opencode@2: build.ts compile-target anchor not found")
     end
 
-    # Build-time models snapshot: generate.ts fetches models.dev/api.json at
-    # module load, which the CI container can't reach since the 2026-08-12
-    # ci-runner image rebuild (the old image could; the new image's bun fetch
-    # dies with ENOENT and aborts build.ts before any compile — PR #330).
-    # Fail soft: keep the snapshot when the fetch works, otherwise substitute
-    # the JS literal `undefined` — bun's define inserts the value as raw code,
-    # so OPENCODE_MODELS_DEV compiles to undefined and models-dev.ts falls
-    # through to the runtime fetch (models.dev is reachable from real
-    # devices). AbortSignal.timeout guards the hang case.
-    inreplace "packages/cli/script/generate.ts" do |s|
-      s.sub!(": await fetch(`${modelsUrl}/api.json`).then((response) => response.text())",
-             ": await fetch(`${modelsUrl}/api.json`, { signal: AbortSignal.timeout(20_000) })" \
-             ".then((response) => response.text()).catch(() => \"undefined\")") ||
-        odie("opencode@2: generate.ts models fetch anchor not found")
-    end
+    # compileExecutable() returns undefined when BUN_COMPILE_RELEASE is unset,
+    # and Bun.build rejects that (executablePath must be a Bun executable).
+    # Upstream pins a downloadable bun release; on OHOS there is none — use the
+    # bun running the build script (the tap's OHOS build) as the template.
+    inreplace "packages/cli/script/build.ts",
+      "const release = process.env.BUN_COMPILE_RELEASE\n  if (!release) return",
+      "const release = process.env.BUN_COMPILE_RELEASE\n  if (!release) return process.execPath"
+
+    # Build-time models snapshot: none needed — upstream commits the models
+    # data (packages/core/src/models-dev/snapshot.txt) since c254ba8a; no
+    # fetch at build time.
 
     cd "packages/cli" do
-      system "bun", "run", "script/build.ts", "--single"
+      # --skip-web-ui: build.ts's buildAppArchive would otherwise run
+      # `bun run build` in packages/app (deleted by rm_r above) to embed the
+      # web UI archive; skipping leaves the archive empty and the TUI works.
+      system "bun", "run", "script/build.ts", "--single", "--skip-web-ui"
     end
 
     out = "packages/cli/dist/cli-linux-arm64-musl/bin/opencode2"
@@ -150,8 +156,36 @@ class OpencodeAT2 < Formula
     # flat/nested cellar flip.
     mkdir_p libexec/"bin"
     libexec.install out => "bin/opencode2"
+
+    # opentui 0.5.3's libopentui.so imports pthread_tryjoin_np, which OHOS musl
+    # lacks (musl < 1.2.5; symbol confirmed absent from the device libc). The
+    # compiled binary dlopens that .so, so the wrapper LD_PRELOADs this shim:
+    # EBUSY while the target thread is still running, join once it has exited.
+    # Verified on a real OHOS device: resolveRenderLib() dlopen passes both
+    # un-bundled and after `bun build --compile` embedding (2026-08-15).
+    clang = formula_opt_bin("ohos-sdk")/"clang"
+    (buildpath/"pthread_tryjoin_shim.c").write <<~C
+      #define _GNU_SOURCE
+      #include <pthread.h>
+      #include <errno.h>
+
+      /* OHOS SDK's pthread.h omits the declaration even though musl exports it. */
+      extern int pthread_kill(pthread_t, int);
+
+      int pthread_tryjoin_np(pthread_t thread, void **retval) {
+        int rc = pthread_kill(thread, 0);
+        if (rc == 0) return EBUSY;
+        if (rc == ESRCH) return pthread_join(thread, retval);
+        return rc;
+      }
+    C
+    system clang, "-shared", "-fPIC", "-O2",
+           "-o", "libpthread_tryjoin.so", "pthread_tryjoin_shim.c"
+    libexec.install "libpthread_tryjoin.so"
+
     (bin/"opencode2").write <<~SH
       #!/bin/sh
+      export LD_PRELOAD="#{opt_libexec}/libpthread_tryjoin.so${LD_PRELOAD:+:$LD_PRELOAD}"
       export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share-v2}"
       exec "#{opt_libexec}/bin/opencode2" "$@"
     SH
