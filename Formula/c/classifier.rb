@@ -1,12 +1,12 @@
 class Classifier < Formula
   desc "Text classification with Bayesian, LSI, Logistic Regression, and kNN"
   homepage "https://rubyclassifier.com"
-  url "https://github.com/cardmagic/classifier/archive/refs/tags/v2.6.0.tar.gz"
-  sha256 "ce136ed8722fbc3efe111235be0bf1e60e92d766a5591270d7aecbe4e426878d"
+  url "https://github.com/cardmagic/classifier/archive/refs/tags/v2.7.0.tar.gz"
+  sha256 "3e0cf89c758eb4e7cb96a24dd39a422ec55c742d9663ee5fbb7fc63433deb872"
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a345a6a0dc2dcdd299ee4c156099f36507e27366856e3450a3e65e7497047ca9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eab8706f4d2e68df7c6109f279361e801614783f31b2380e34b65e0b1200fa29"
   end
 
   depends_on "ruby"
