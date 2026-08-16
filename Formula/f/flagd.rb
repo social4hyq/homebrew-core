@@ -18,7 +18,7 @@ class Flagd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c6d6a807014e84f81641bdc84742558813bb68d1dd19f582b614f8001390a34"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2390eae45e43ea2e092a1ffae5f54ba243de6c38b6f66f674430e35a36b8945"
   end
 
   depends_on "go" => :build
