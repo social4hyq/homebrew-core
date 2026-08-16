@@ -6,7 +6,7 @@ class Tweakcc < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ba05af0dd61dbed1ced4ad019d31cf02b91859ff379dacd6b6fe5e767baec1c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8aac5404e177f379ff822de8346dd21928535ec4cfbae8c954f4f8d3063443fc"
   end
 
   depends_on "node"
