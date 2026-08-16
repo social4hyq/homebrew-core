@@ -7,7 +7,7 @@ class Protolint < Formula
   head "https://github.com/yoheimuta/protolint.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2972ba336f8ede59bfde8b7cdf324bc8cd35843698df1c031b48088ec050f82c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b42638ba35681043dfee9e60e484cfb1021162eef51e5f0cd522966e2420a45f"
   end
 
   depends_on "go" => :build
