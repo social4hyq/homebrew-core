@@ -6,7 +6,7 @@ class Dz6 < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a1f4505e9b43560a70ee7f51e5aa0a93fddfdc88a74dfcc430bf0101c90ead4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa21d1a0881d552c44d7835d9f23d92561f741695b07e809d0774042415a0e9f"
   end
 
   depends_on "rust" => :build
