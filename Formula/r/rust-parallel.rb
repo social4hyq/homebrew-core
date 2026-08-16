@@ -6,7 +6,7 @@ class RustParallel < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dba8d6b0ff54d9d13d21d4d75c268900524a5b2b893261e2df6896e565a06c50"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "57241d7382229ed23749fd2c16f7413fc9a2c2d3f7c23c57d3e3350eace8f7ce"
   end
 
   depends_on "rust" => :build
