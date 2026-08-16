@@ -1,13 +1,13 @@
 class Sqruff < Formula
   desc "Fast SQL formatter/linter"
   homepage "https://github.com/quarylabs/sqruff"
-  url "https://github.com/quarylabs/sqruff/archive/refs/tags/v0.39.0.tar.gz"
-  sha256 "af54cd921fa8565d69bec17678d6f38c6aa062acf5eb7d68fcdf9597d6372737"
+  url "https://github.com/quarylabs/sqruff/archive/refs/tags/v0.40.0.tar.gz"
+  sha256 "80bcfff3b0f4cf32c715ccfd129b006e729e1d5d7cbcdcd87118db51cd9e52ba"
   license "Apache-2.0"
   head "https://github.com/quarylabs/sqruff.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9eb15a44107b273f57a251127f3a5d305ac58158bd3f241d63d02de32f01646e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d643565dae984e94bd010b45ce0e2e642f0a5db6bac368d113e6c852d550cec"
   end
 
   depends_on "rust" => :build
