@@ -7,7 +7,7 @@ class CyclonedxGomod < Formula
   head "https://github.com/CycloneDX/cyclonedx-gomod.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "277c422f3bb0503fd46cab431ef36dcf739c237c7eda7ccec7ed3481863a9294"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d50b32c89884d79f33175156824b0bfd0631c73f471c08984bfe51400eb2efa5"
   end
 
   depends_on "go" => [:build, :test]
