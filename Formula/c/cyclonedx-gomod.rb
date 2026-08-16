@@ -1,13 +1,13 @@
 class CyclonedxGomod < Formula
   desc "Creates CycloneDX Software Bill of Materials (SBOM) from Go modules"
   homepage "https://cyclonedx.org/"
-  url "https://github.com/CycloneDX/cyclonedx-gomod/archive/refs/tags/v1.10.0.tar.gz"
-  sha256 "14d71dcce1164ada13832c6f61b6bb4f804e21966b03ff937b47609752b112f8"
+  url "https://github.com/CycloneDX/cyclonedx-gomod/archive/refs/tags/v1.11.0.tar.gz"
+  sha256 "f9aafa90bebb5cd6b347c06aba276c4a8277721fb89cbe0b082639602a7b2a3b"
   license "Apache-2.0"
   head "https://github.com/CycloneDX/cyclonedx-gomod.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "277c422f3bb0503fd46cab431ef36dcf739c237c7eda7ccec7ed3481863a9294"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d50b32c89884d79f33175156824b0bfd0631c73f471c08984bfe51400eb2efa5"
   end
 
   depends_on "go" => [:build, :test]
