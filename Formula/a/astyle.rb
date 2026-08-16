@@ -1,8 +1,8 @@
 class Astyle < Formula
   desc "Source code beautifier for C, C++, C#, and Java"
   homepage "https://astyle.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/astyle/astyle/astyle%203.6/astyle-3.6.17.tar.bz2"
-  sha256 "edc839b80077e60ed5786b6394d442b4eb10156ccbdd5944b4b360e125afb3e1"
+  url "https://downloads.sourceforge.net/project/astyle/astyle/astyle%203.6/astyle-3.6.18.tar.bz2"
+  sha256 "d4fc433cfeacc952de295961bc8ae9eab722e08580baa6c1e8e7b39a7a2fbb48"
   license "MIT"
   head "https://svn.code.sf.net/p/astyle/code/trunk/AStyle"
 
@@ -12,7 +12,7 @@ class Astyle < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2176c811ae05cca9f9c7542f26714b7dc83b964efdad5a8d2558401f49e8727"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d46ec37321ef7aab8b17d11faffa0d7326a28aaf4da6253ad9365dc67aa29e3d"
   end
 
   depends_on "cmake" => :build
