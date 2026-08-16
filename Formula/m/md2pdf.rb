@@ -1,8 +1,8 @@
 class Md2pdf < Formula
   desc "CLI utility that generates PDF from Markdown"
   homepage "https://github.com/solworktech/md2pdf"
-  url "https://github.com/solworktech/md2pdf/archive/refs/tags/v2.2.19.tar.gz"
-  sha256 "5e1c8edfd48a88679880817b243f0d2068a695143dbf31bdbb85dfbf2e6febee"
+  url "https://github.com/solworktech/md2pdf/archive/refs/tags/v2.2.20.tar.gz"
+  sha256 "7f33cd1ca648b081640ecbf654704fcbab9be78823dbb7e4aad3691bb0470648"
   license "MIT"
   head "https://github.com/solworktech/md2pdf.git", branch: "master"
 
