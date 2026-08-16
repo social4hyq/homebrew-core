@@ -1,12 +1,12 @@
 class RustParallel < Formula
   desc "Run commands in parallel with Rust's Tokio framework"
   homepage "https://github.com/aaronriekenberg/rust-parallel"
-  url "https://github.com/aaronriekenberg/rust-parallel/archive/refs/tags/v1.23.0.tar.gz"
-  sha256 "cc46ed110c3150d797ffbb3aa50209b93390beaef44f3b7c8fbd4adca46724ff"
+  url "https://github.com/aaronriekenberg/rust-parallel/archive/refs/tags/v1.24.0.tar.gz"
+  sha256 "9efb8f574ebbe82fad1b89cd94362f75c3b46e7bdf29fc5c640cb9dd10ce2852"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dba8d6b0ff54d9d13d21d4d75c268900524a5b2b893261e2df6896e565a06c50"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "57241d7382229ed23749fd2c16f7413fc9a2c2d3f7c23c57d3e3350eace8f7ce"
   end
 
   depends_on "rust" => :build
