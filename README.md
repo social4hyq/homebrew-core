@@ -12,7 +12,8 @@ brew trust social4hyq/core   # Homebrew 6.0+ 必须显式信任第三方 tap
 brew install opencode        # AI 编码代理（v2 预览：brew install opencode@2）
 brew install claude-code     # Claude Code CLI
 brew install bun             # Bun 运行时
-brew install starship        # 终端提示符美化（主题化 prompt）
+brew install hishell-font    # starship 图标字体（先装这个：提示符的图标/符号靠它渲染）
+brew install starship        # 终端提示符美化（主题化 prompt，配合 hishell-font）
 brew install zellij          # 终端复用器
 brew install qemu-aarch64    # 用户态 QEMU（strace 替代品）
 ```
@@ -46,9 +47,9 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `ohos-compat-shim` | 0.3.0 | 系统兼容层：自动兜底 OHOS 与标准 Linux 的底层行为差异，让软件开箱即用（多数用户无感） |
 | `qemu-aarch64` | 11.0.1-r0 | aarch64 程序运行/调试环境：在真机上运行 ARM Linux 程序，自带系统调用级跟踪（排查问题利器） |
 | `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机直接访问 |
-| `starship` | 1.26.0 | 终端提示符美化/定制工具：把默认 prompt 换成主题化、信息丰富的提示符（git 状态/目录等），跨 shell 生效 |
+| `starship` | 1.26.0 | 终端提示符美化/定制工具：把默认 prompt 换成主题化、信息丰富的提示符（git 状态/目录等），跨 shell 生效；**使用前先装 `hishell-font`**（图标字体），否则提示符里的图标显示为乱码 |
 | `zellij` | 0.45.0-dev | 终端复用器（类似 tmux）：一个窗口多窗格/标签页，会话可脱离重连，支持插件扩展 |
-| `hishell-font` | 0.1.0 | hishell 终端图标字体：装完终端里的图标、符号正常显示（配合主题使用） |
+| `hishell-font` | 0.1.0 | hishell 终端图标字体（Nerd Font 系）：`starship` 等带图标工具的字体前置——先装它，提示符里的图标、符号才正常显示 |
 | `herdr` | 0.8.0 | AI 编码助手会话持久化：让终端里的 agent 工作上下文跨会话保留、随时续上 |
 | `zig@0.15` | 0.15.2 | Zig 编程语言工具链（herdr 的构建依赖） |
 | `codegraph` | 1.5.0 | 代码知识图谱服务：为 AI agent 提供跨语言代码语义检索，快速理解代码库结构与调用关系 |
