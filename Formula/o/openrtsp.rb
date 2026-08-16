@@ -1,11 +1,11 @@
 class Openrtsp < Formula
   desc "Command-line RTSP client"
   homepage "http://www.live555.com/openRTSP"
-  url "https://download.live555.com/live.2026.08.07.tar.gz"
-  mirror "https://download.videolan.org/pub/videolan/testing/contrib/live555/live.2026.08.07.tar.gz"
-  mirror "https://pkg.freebsd.org/ports-distfiles/live.2026.08.07.tar.gz"
+  url "https://download.live555.com/live.2026.08.14.tar.gz"
+  mirror "https://download.videolan.org/pub/videolan/testing/contrib/live555/live.2026.08.14.tar.gz"
+  mirror "https://pkg.freebsd.org/ports-distfiles/live.2026.08.14.tar.gz"
   # Keep a mirror as upstream tarballs are removed after each version
-  sha256 "f215e4acee8dc8a1b583073e17de02bf2b05542368f918d8e72c4ae8a00d3e03"
+  sha256 "85848fb28df98a77a6e745959cc3ecf5f541f34c8ffef9021b9f1c2e682edee0"
   license "LGPL-3.0-or-later"
 
   livecheck do
@@ -14,7 +14,7 @@ class Openrtsp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "04c890609f40db9f9c7fdfe8e8142182261f05aec5182e0d75f52559c7421c61"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "80532e614dab87a0d1cd50053635c71a05c3a4c00cf1511f6ccf4df6f0df8e0e"
   end
 
   depends_on "openssl@3"
