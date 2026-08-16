@@ -8,7 +8,7 @@ class Juju < Formula
   head "https://github.com/juju/juju.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89d23bba6eaea9fd318db391e930e37da6a00940cc30a0705c542566c0be20c0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "74a7f004abac790fb8a82a792b064c3c50e5f2c8a4338f0fbe75b926328f5183"
   end
 
   depends_on "go" => :build
