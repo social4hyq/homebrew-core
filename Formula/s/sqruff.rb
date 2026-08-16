@@ -7,7 +7,7 @@ class Sqruff < Formula
   head "https://github.com/quarylabs/sqruff.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9eb15a44107b273f57a251127f3a5d305ac58158bd3f241d63d02de32f01646e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d643565dae984e94bd010b45ce0e2e642f0a5db6bac368d113e6c852d550cec"
   end
 
   depends_on "rust" => :build
