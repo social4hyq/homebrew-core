@@ -6,7 +6,7 @@ class Lla < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "66c11b50ae1e805a2df8e7ce795f438aea07512d612cc19c868278ea850f4139"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dd71aed1abfeaf2f14caa4670cd789d58e085b1907a542dd60a7bc9333d6419"
   end
 
   depends_on "protobuf" => :build
