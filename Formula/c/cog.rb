@@ -1,8 +1,8 @@
 class Cog < Formula
   desc "Containers for machine learning"
   homepage "https://cog.run/"
-  url "https://github.com/replicate/cog/archive/refs/tags/v0.21.0.tar.gz"
-  sha256 "f327885fa484656292c70dfbe71b4bf8e33343b3f751b0f5c976fc6bfb0453d0"
+  url "https://github.com/replicate/cog/archive/refs/tags/v0.22.0.tar.gz"
+  sha256 "1fff8e5d7c62ae14fcbc3e7fea9262e301a6adabd4c75e0f7fa28490e09db78e"
   license "Apache-2.0"
   head "https://github.com/replicate/cog.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Cog < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "38c6990e8ff6de635826e1ccf490bc36404a01116ba57c739cf7aa9abeb7a664"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dab14bd700fcbc21f9a23ef2e0c93e2bd0dcdab08b935d3af6ca2fd30826598f"
   end
 
   depends_on "go" => :build
