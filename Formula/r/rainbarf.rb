@@ -1,8 +1,8 @@
 class Rainbarf < Formula
   desc "CPU/RAM/battery stats chart bar for tmux (and GNU screen)"
   homepage "https://github.com/creaktive/rainbarf"
-  url "https://github.com/creaktive/rainbarf/archive/refs/tags/v1.4.tar.gz"
-  sha256 "066579c0805616075c49c705d1431fb4b7c94a08ef2b27dd8846bd3569a188a4"
+  url "https://github.com/creaktive/rainbarf/archive/refs/tags/v1.5.tar.gz"
+  sha256 "5fc96ffc16929e2158e82baf2a39f5573e6013a280ad66067e1eaee594be98df"
   license any_of: ["Artistic-1.0-Perl", "GPL-1.0-or-later"]
   head "https://github.com/creaktive/rainbarf.git", branch: "master"
 
