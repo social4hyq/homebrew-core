@@ -1,13 +1,13 @@
 class Frizbee < Formula
   desc "Throw a tag at and it comes back with a checksum"
   homepage "https://github.com/stacklok/frizbee"
-  url "https://github.com/stacklok/frizbee/archive/refs/tags/v0.1.10.tar.gz"
-  sha256 "e52ccdd77b3c6c71bf4b38163df451b550beda279643b071eae9df96b53a455e"
+  url "https://github.com/stacklok/frizbee/archive/refs/tags/v0.1.11.tar.gz"
+  sha256 "e340a92a712b5214e7e6cbf5c7b29c334012cb41d2607c9545106fc73c543546"
   license "Apache-2.0"
   head "https://github.com/stacklok/frizbee.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9521ad4119b2e3add3d48b7fbd1c852182cd4ddc0f6dbecc98bfa0e42caf33e6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0911854722a13868d49a560a1939fcd3f2185186c2607d856231c9e7fea55745"
   end
 
   depends_on "go" => :build
