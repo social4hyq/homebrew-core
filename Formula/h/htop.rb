@@ -12,7 +12,7 @@ class Htop < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c143eca60227982db444e1dac3b20fc4b2c12689d492403aa746b75d511e407b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d767a33037fb7472a9b9fa0425854a6e483d40d4c30414535d16895a5a3c1d1"
   end
 
   depends_on "autoconf" => :build
