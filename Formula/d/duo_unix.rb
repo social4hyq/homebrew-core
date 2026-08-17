@@ -5,10 +5,6 @@ class DuoUnix < Formula
   sha256 "f8c53a1beb54f40765c1f5708a6cf6fd4abd94c645d5fdc52e222223d2040092"
   license "GPL-2.0-or-later"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6e488270bd9ea5c8430aa1a764aae06dddc9bfb884442bfc09b73251c3aa363"
-  end
-
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
