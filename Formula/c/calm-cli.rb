@@ -5,6 +5,11 @@ class CalmCli < Formula
   sha256 "fcfcd6c35a54e92f5be31ce68f6b2c175c509fac6bc028d1e8faf6347cba56ea"
   license "Apache-2.0"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "43965fb5c4317610897a795800999117eea5e64c711ec1928a5c2617869bf040"
+  end
+
   depends_on "node"
 
   def install
