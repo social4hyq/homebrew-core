@@ -11,10 +11,6 @@ class C2patool < Formula
     regex(/^c2patool[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "613e456ccc5c7fd6a62025399b99516390150da10b3c0f97bc4e08024cc19f8a"
-  end
-
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
   depends_on "openssl@4"
