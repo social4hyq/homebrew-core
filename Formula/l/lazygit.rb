@@ -11,10 +11,6 @@ class Lazygit < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "906f151187d4aef6601d1da331f077ed72bfdc20fac63a5fe18af30731b0b3ef"
-  end
-
   depends_on "go" => :build
 
   def install
