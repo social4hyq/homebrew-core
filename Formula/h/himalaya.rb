@@ -1,12 +1,12 @@
 class Himalaya < Formula
   desc "CLI email client written in Rust"
   homepage "https://pimalaya.org"
-  url "https://github.com/pimalaya/himalaya/archive/refs/tags/v2.0.0.tar.gz"
-  sha256 "0f58a5761490c2a96105073358487fa6032c79c0f07e962a65f6e8aeef782fd9"
+  url "https://github.com/pimalaya/himalaya/archive/refs/tags/v2.1.0.tar.gz"
+  sha256 "491c7e51aa58874e2b70b4a0377e1770a1d3522392b9a9b867f965ac9d75aaa5"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b8f7184a841aefdfeb886e6a6fe061c2a5f7a56fdee87433fbe6a28e15810910"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d97cd3d8f1fc53f366a8e5c8c379e835992f1dbac780470bf6c5836c63470315"
   end
 
   depends_on "pkgconf" => :build
