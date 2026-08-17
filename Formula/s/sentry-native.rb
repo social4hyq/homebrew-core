@@ -5,6 +5,11 @@ class SentryNative < Formula
   sha256 "6fdf32c2d6dd6b121e43be4104b05e52f16329d801f3611fd0a08164f716418f"
   license "MIT"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9160bc89964bbc4036a0b11b8e6dbb04fc32dfa4e27a7c8ffc5783d75c9dbb4"
+  end
+
   depends_on "cmake" => :build
 
   uses_from_macos "curl"
