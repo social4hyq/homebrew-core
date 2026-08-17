@@ -6,6 +6,11 @@ class Slackdump < Formula
   license "AGPL-3.0-only"
   head "https://github.com/rusq/slackdump.git", branch: "master"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "787e64347f4fe5f6dc0b7850493f98f451c92da31cc5847c5aa629d32bacfe45"
+  end
+
   depends_on "go" => :build
 
   def install
