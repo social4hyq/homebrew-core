@@ -5,6 +5,11 @@ class Tldx < Formula
   sha256 "dde3467c300872e0bfcafe472419d5c1152a30d29731f1e9ee7a9982f85074e8"
   license "Apache-2.0"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ce5c2b1e7c9be870d3e2338e3f276ec333407666553d81c1b90b32bd31ade13"
+  end
+
   depends_on "go" => :build
 
   def install
