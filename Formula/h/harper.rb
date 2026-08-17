@@ -11,6 +11,11 @@ class Harper < Formula
     strategy :github_latest
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d064d620753774efcdd0d1f7de084d94c47cc7065347d3fb8a974ce1a15ece6f"
+  end
+
   depends_on "rust" => :build
 
   def install
