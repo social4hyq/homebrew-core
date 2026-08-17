@@ -5,10 +5,6 @@ class AwsCdk < Formula
   sha256 "4669cb9be1c57c774ae51ccc58e8958901f8479f45c0ab67517a45ea09cdd501"
   license "Apache-2.0"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c84744a763b158396b745fd93212c2ffe09725164b091eaa9fedb632482610f"
-  end
-
   depends_on "node"
 
   def install
