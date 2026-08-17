@@ -14,10 +14,6 @@ class Doltgres < Formula
     strategy :github_latest
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21f019e3f84ff7e75ca81c24c296a1699e6e893721bef823710f2a262b68e9c0"
-  end
-
   depends_on "go" => :build
   depends_on "libpq" => :test
   depends_on "icu4c@78"
