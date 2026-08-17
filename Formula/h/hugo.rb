@@ -12,7 +12,8 @@ class Hugo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "371cd3150f4b71514955802ab2c246c7fbd2d9888f57ecbe4a3d833c65aca213"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "75baedaab95cf120cb4210377141333c226a495eab821e31c8ef43df9248e60c"
   end
 
   depends_on "go" => :build
