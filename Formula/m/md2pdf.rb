@@ -1,13 +1,13 @@
 class Md2pdf < Formula
   desc "CLI utility that generates PDF from Markdown"
   homepage "https://github.com/solworktech/md2pdf"
-  url "https://github.com/solworktech/md2pdf/archive/refs/tags/v2.2.19.tar.gz"
-  sha256 "5e1c8edfd48a88679880817b243f0d2068a695143dbf31bdbb85dfbf2e6febee"
+  url "https://github.com/solworktech/md2pdf/archive/refs/tags/v2.2.20.tar.gz"
+  sha256 "7f33cd1ca648b081640ecbf654704fcbab9be78823dbb7e4aad3691bb0470648"
   license "MIT"
   head "https://github.com/solworktech/md2pdf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6150c162450f5982d4c4f38c273a57a9af30d8bd3d24445c2bacb8d9d71396ef"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2096223e4748d02f5ae740899bb893aa62f400f2109b8b1bc7840c2c180a06a6"
   end
 
   depends_on "go" => :build
