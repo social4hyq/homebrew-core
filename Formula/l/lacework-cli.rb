@@ -16,7 +16,8 @@ class LaceworkCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "40d317b4d7757ad2d499df47a94368054557c231da2fb2672330c27d6d37bae4"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61050817d691bc55236f8bbec4179268f80895a7b031f09bf26fcda158238016"
   end
 
   depends_on "go" => :build
