@@ -12,7 +12,7 @@ class Freetds < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5ba911e6431591432f40b8a912fd5c62ac6206a4bba186b7550d2fa0a02e58e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1c2c3feafe9ed1e6747012e2077efa4c0b10931ebe8955475404364b84edcc4"
   end
 
   head do
