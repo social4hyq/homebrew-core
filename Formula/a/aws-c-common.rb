@@ -6,10 +6,6 @@ class AwsCCommon < Formula
   license "Apache-2.0"
   compatibility_version 1
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "32135938c34f98d35a09ffe70ebadfea8ce816a8865e4d9e067a26e75f958852"
-  end
-
   depends_on "cmake" => :build
 
   def install
