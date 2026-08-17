@@ -13,10 +13,6 @@ class Terragrunt < Formula
     strategy :github_latest
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "85de57cfa57bd48e42a429e1086c59d84bb1c6276dff21afea12e22148bd6a98"
-  end
-
   depends_on "go" => :build
 
   conflicts_with "tenv", because: "both install terragrunt binary"
