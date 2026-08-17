@@ -4,6 +4,7 @@ class DeepseekHarness < Formula
   url "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.1.0-rc.6.tgz"
   sha256 "1b8a9a0ad3c7feaece47926e0bd37ca151c7ccfa997953afa5fd01261784eadc"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "b663e525d739595ef53d1a0c5fe06080f91e31420c01426cb2dbc8d3c8d4c752"
@@ -31,7 +32,7 @@ class DeepseekHarness < Formula
 
     (bin/"dsh").write <<~EOS
       #!/bin/sh
-      exec "#{formula_opt_bin("node")/"node"}" --expose-internals "#{libexec/"lib/node_modules/@deepseek-ai/dsh/lib/bin.js"}" "$@"
+      exec "#{formula_opt_bin("node")/"node"}" --expose-internals --tls-min-v1.2 --tls-max-v1.2 "#{libexec/"lib/node_modules/@deepseek-ai/dsh/lib/bin.js"}" "$@"
     EOS
     (bin/"dsh").chmod 0755
   end
