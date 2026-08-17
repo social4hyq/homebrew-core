@@ -6,6 +6,11 @@ class Autocycler < Formula
   license "GPL-3.0-or-later"
   head "https://github.com/rrwick/Autocycler.git", branch: "main"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5dce7e8bd1f1806484d71403837a753361446d9bfb42a49689c4abe39fe5c65"
+  end
+
   depends_on "rust" => :build
 
   def install
