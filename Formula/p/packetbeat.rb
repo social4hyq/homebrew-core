@@ -7,10 +7,6 @@ class Packetbeat < Formula
   license "Apache-2.0"
   head "https://github.com/elastic/beats.git", branch: "main"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d65f10229ed18bf9f6739e972e5e3a44892be69538497e5e589b5a28e58ad70"
-  end
-
   depends_on "go" => :build
   depends_on "mage" => :build
 
