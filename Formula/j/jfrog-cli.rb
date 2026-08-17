@@ -14,10 +14,6 @@ class JfrogCli < Formula
     strategy :github_latest
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7ed14ee6854cfcb0b1fdda115ccdad8938c217260bcc1856b5ad1fa4629506e"
-  end
-
   depends_on "go" => :build
 
   def install
