@@ -12,10 +12,6 @@ class Sf < Formula
     end
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0deb2eaafc18ac3c4e0ab25d5ba770f5bbcd7fd6ed93969b6851e6e8b5f32252"
-  end
-
   depends_on "node"
 
   def install
