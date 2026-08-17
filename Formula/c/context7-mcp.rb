@@ -5,10 +5,6 @@ class Context7Mcp < Formula
   sha256 "da9f9793678aa332cd9a74a9f118c638764ac69c34e95c1d139e7e7c15903071"
   license "MIT"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "63c89b0bda752804dd386eec093b52d1a307fee5450e1520d066cdffc26afcaa"
-  end
-
   depends_on "node"
 
   def install
