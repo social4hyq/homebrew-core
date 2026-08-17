@@ -14,6 +14,11 @@ class NewrelicInfraAgent < Formula
     strategy :github_latest
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "25da64f51da7c8c00ffd3fab178460f564d3cb74d8e30dcd6d8a8f26e03790d2"
+  end
+
   depends_on "go" => :build
 
   def install
