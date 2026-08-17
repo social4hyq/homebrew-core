@@ -6,6 +6,11 @@ class Libultrahdr < Formula
   license "Apache-2.0"
   compatibility_version 1
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4bb6b5c4e1e7d0beb03945f818599ab7cf931bb3cc4953ee0da3eba3d35013e8"
+  end
+
   depends_on "cmake" => :build
   depends_on "pkgconf" => :test
   depends_on "jpeg-turbo"
