@@ -11,7 +11,8 @@ class Libgit2AT18 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "99e746160f4d5d779fa143b22ad215dd47bf5f17f90221c7f8fb3524ed2286cc"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5161c3dda5197d9d686926cec76a4fd0a3ffc1feaf2214689cc507aa49b27102"
   end
 
   keg_only :versioned_formula
