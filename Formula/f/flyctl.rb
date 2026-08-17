@@ -17,6 +17,11 @@ class Flyctl < Formula
     strategy :github_latest
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf35d35d96b1af9437fee72c1045f48e61a94c49f888c64a424818f14db7b596"
+  end
+
   depends_on "go" => :build
 
   def install
