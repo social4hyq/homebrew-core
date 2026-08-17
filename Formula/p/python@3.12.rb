@@ -11,6 +11,11 @@ class PythonAT312 < Formula
     regex(%r{href=.*?/Python[._-]v?(3\.12(?:\.\d+)*)\.t}i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8bd2b2b88f93b797175061181a45d21a166745e1259cf739c859acd9b4a02c95"
+  end
+
   depends_on "pkgconf" => :build
   depends_on "mpdecimal"
   depends_on "openssl@3"
