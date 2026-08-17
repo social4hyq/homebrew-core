@@ -10,10 +10,6 @@ class Libupnp < Formula
     regex(/^release[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e61f21fd4d3443f0ce9f972e556505a3878bd1c38bcebac8671da78858f72dde"
-  end
-
   depends_on "cmake" => :build
 
   def install
