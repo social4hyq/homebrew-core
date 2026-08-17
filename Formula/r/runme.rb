@@ -6,10 +6,6 @@ class Runme < Formula
   license "Apache-2.0"
   head "https://github.com/runmedev/runme.git", branch: "main"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "972e8eb94fc6888ac39c06879d43cc55d2c9ffc0febe1fccccfdfeba7857c7da"
-  end
-
   depends_on "go" => :build
 
   def install
