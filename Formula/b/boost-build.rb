@@ -12,10 +12,6 @@ class BoostBuild < Formula
     regex(/^boost[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "608d067cc58966dfd00f707f0f32b8ccd30e37fb7fc94d1f6b8c7fdc89833d66"
-  end
-
   conflicts_with "b2-tools", because: "both install `b2` binaries"
 
   def install
