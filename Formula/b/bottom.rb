@@ -14,6 +14,11 @@ class Bottom < Formula
     strategy :github_latest
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "80535d4ceda3c9a171927da073e3022a4ded0039ecfdb356ea0089d7cb4377f7"
+  end
+
   depends_on "rust" => :build
 
   def install
