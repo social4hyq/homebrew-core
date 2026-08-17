@@ -6,10 +6,6 @@ class MinioWarp < Formula
   license "AGPL-3.0-or-later"
   head "https://github.com/minio/warp.git", branch: "master"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d313cf797a5153c4bce7dff58ba1046d8ba8f413bf52c9e697be676562719bf"
-  end
-
   depends_on "go" => :build
 
   def install
