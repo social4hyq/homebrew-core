@@ -6,6 +6,11 @@ class GdkPixbuf < Formula
   license "LGPL-2.1-or-later"
   compatibility_version 1
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eddf2ef8f9fbf1fcafc518a5d458676b2dc4e246d2c5177010adc30a64217830"
+  end
+
   depends_on "docutils" => :build # for rst2man
   depends_on "gettext" => :build
   depends_on "gobject-introspection" => :build
