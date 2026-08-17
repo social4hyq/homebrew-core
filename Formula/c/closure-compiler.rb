@@ -10,6 +10,11 @@ class ClosureCompiler < Formula
     regex(/href=.*?v?(\d{8})/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "106f4626bf89352fc0f1107119f2a56cb61566671d619c785e582c7829adc5a6"
+  end
+
   depends_on "openjdk"
 
   def install
