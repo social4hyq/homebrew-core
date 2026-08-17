@@ -4,6 +4,7 @@ class ClaudeCode < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.233.tgz"
   sha256 "14f3da88a0b6d4ecde3a73b7b26eba32174586190e2fe02c79b54c7d95610b76"
   license :cannot_represent # Anthropic Commercial Terms of Service
+  revision 1
   # npmmirror mirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org
   # (aarch64 SIMD AES path trapped by kernel); npmmirror (Aliyun CDN) doesn't.
   # Files are byte-identical (sha256 matches); wrapper tries npmmirror first,
@@ -15,14 +16,20 @@ class ClaudeCode < Formula
   # compiled binary is NEVER executed (see below), so nothing fetched is ever
   # signed or run as code.
   #
-  # Why not run the official binary: 2.1.229-2.1.233 abort ~100ms into startup
-  # on OHOS (embedded bun 8bb8d04c4/939d4325b panics inside a startup regex
-  # scan — regex-automata is_char_boundary — before any JS runs; deterministic
-  # on device, in the ci container and under qemu, any env/args). 2.1.228's
-  # bun (eb835313a, the same build our `bun` formula is based on) runs the
-  # same JS fine. So instead the wrapper extracts the standalone-module-graph
-  # CLI bundle from the fetched binary (pure data parsing, no execution) and
-  # runs it on our own bun: same JS, working runtime.
+  # Why not run the official binary: both bun builds Anthropic ships abort
+  # during early stdio init, before any JS runs (verified via OHOS faultlog
+  # backtrace + qemu strace + local disassembly; see memory note
+  # project_claude_embedded_bun_crash_diagnosis). 2.1.228's bun calls
+  # syscall(close_range, 4, ~0, flags=4), which the OHOS kernel seccomp-traps
+  # with SIGSYS; 2.1.229+ die earlier: the binary's own dynsym exports
+  # stdout/stderr (R_AARCH64_COPY relocs), OHOS musl's ld.so resolves the copy
+  # against the executable itself, leaving the slot NULL, and OHOS musl's
+  # hardened setvbuf("parameter is null") aborts. Neither path is shimmable,
+  # so the wrapper extracts the standalone-module-graph CLI bundle from the
+  # fetched binary (pure data parsing, no execution) and runs it on our own
+  # bun: same JS, working runtime. (Earlier note blaming a regex-automata
+  # panic was an artifact of symbolizing this custom build's addresses
+  # against official bun debug info — layout mismatch, disregard it.)
   #
   # Relocatability: wrapper uses runtime $HOMEBREW_PREFIX only — no build-time path interpolation.
 
@@ -121,6 +128,13 @@ class ClaudeCode < Formula
       NPM_SHA="#{stable.checksum}"
       CACHE="${CLAUDE_CODE_CACHE:-${HOMEBREW_CACHE:-$HOME/.cache/homebrew}/claude-code/$VER}"
       CLI="$CACHE/cli.js"
+
+      # /tmp is read-only here, so hand the CLI a writable scratch dir of its
+      # own. A caller-set value wins; an unusable fallback is left unset rather
+      # than failing the wrapper.
+      if [ -z "${CLAUDE_CODE_TMPDIR:-}" ] && [ -w /data/storage/el2/base/tmp ]; then
+        export CLAUDE_CODE_TMPDIR=/data/storage/el2/base/tmp
+      fi
 
       if [ ! -f "$CLI" ]; then
         mkdir -p "$CACHE"
