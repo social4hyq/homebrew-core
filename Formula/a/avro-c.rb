@@ -6,10 +6,6 @@ class AvroC < Formula
   sha256 "ccc85c5a967ca647fe0961ddeedf286cde00aacf87834d8ca552a0165ae4aa6d"
   license "Apache-2.0"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "39220b3ed5dad26880537380aff7b70dcd38d3499fd527741d46d11fb64a7611"
-  end
-
   depends_on "cmake" => :build
   depends_on "pkgconf" => :build
   depends_on "jansson"
