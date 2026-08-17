@@ -10,6 +10,11 @@ class PostgresqlAT18 < Formula
     regex(%r{href=["']?v?(18(?:\.\d+)+)/?["' >]}i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "857aa438bc6a203d9baf2b2bc5c75fb3863f71964ad0e8fcf6c00dc4583e62dc"
+  end
+
   keg_only :versioned_formula
 
   # https://www.postgresql.org/support/versioning/
