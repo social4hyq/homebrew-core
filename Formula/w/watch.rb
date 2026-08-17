@@ -5,10 +5,6 @@ class Watch < Formula
   sha256 "9d2021f47a4501c667862c9942a92d1953694b21d11bcd1702e83eb594e3d67d"
   license all_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"]
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e8a8422abf1d80ecedd455040d9c8818ad42c4c2f5d1746295f99add06bc20e"
-  end
-
   head do
     url "https://gitlab.com/procps-ng/procps.git", branch: "master"
 
