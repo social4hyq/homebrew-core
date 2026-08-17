@@ -5,10 +5,6 @@ class Ctx7 < Formula
   sha256 "73beb46e9ad854fc2bae3d89411cad4bd610308037fa1cccbf590f88e87e6c7b"
   license "MIT"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2afbb48dde622c609f5cc7b11fa8f48aabaffeb10d21edefdbaa8965478033aa"
-  end
-
   depends_on "node"
 
   def install
