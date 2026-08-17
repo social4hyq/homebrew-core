@@ -26,7 +26,7 @@ class Vim < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b5136d9e492b45e93f545ea0a8476cfe958c73091da6cd41bbe30f3dacbc59e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8671d15dc9d85351034f808955de40618c346a7487085baf4506c749677b5b8b"
   end
 
   depends_on "gettext" => :build
