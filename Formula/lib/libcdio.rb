@@ -11,6 +11,11 @@ class Libcdio < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "30a0770e479df67261c6db18de82500907be916e1e6aa3a7b2f959fc964fa66f"
+  end
+
   depends_on "pkgconf" => :build
 
   def install
