@@ -5,10 +5,6 @@ class Lmfit < Formula
   sha256 "5289b1264f82cd9a62d445848dc17d2fce1cdc0079b24594f52d87c12e1ac716"
   license "BSD-2-Clause"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a7793b5dabb25806ed468e794157b0906b6d93840ee9b481b8302b403003d49"
-  end
-
   depends_on "cmake" => :build
 
   def install
