@@ -5,10 +5,6 @@ class Vet < Formula
   sha256 "5078f963bd1613ad4c0c3d78e1efcb3e8446bc624463a931dc25e29d3d3c524e"
   license "Apache-2.0"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4d0ea4e9801312a9f92fa7d4fec01fc7a25f84e009ffde67f812807cd3ebd50"
-  end
-
   depends_on "go"
 
   def install
