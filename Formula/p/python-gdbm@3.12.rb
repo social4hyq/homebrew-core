@@ -9,6 +9,11 @@ class PythonGdbmAT312 < Formula
     formula "python@3.12"
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f319d40dc44403c71ed38cc8adb5ba0ec98dc9b9eda4d265110520d89a7c79b4"
+  end
+
   depends_on "gdbm"
   depends_on "python@3.12"
 
