@@ -5,6 +5,11 @@ class MercuryCli < Formula
   sha256 "954c4e088ea7d714abd215efeafc2161218bc5e5952ab8de30ae8701befcf801"
   license "Apache-2.0"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "13f81f31211d5b7e392efc4cef136d22209a1379d0eb8c714bbc7b7d965a34b0"
+  end
+
   depends_on "go" => :build
 
   def install
