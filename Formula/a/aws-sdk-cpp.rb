@@ -11,10 +11,6 @@ class AwsSdkCpp < Formula
     throttle 15
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "300487fa09690e1f5a552671976436a7fe428d85693de6dfbccb2dc2541c4085"
-  end
-
   depends_on "cmake" => :build
   depends_on "aws-c-auth"
   depends_on "aws-c-common"
