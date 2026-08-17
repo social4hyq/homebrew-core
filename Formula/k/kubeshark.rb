@@ -14,10 +14,6 @@ class Kubeshark < Formula
     strategy :github_latest
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd24e1138c8779c2a8e381d3eb635eece12696fe3556dd16b605adab4582a96c"
-  end
-
   depends_on "go" => :build
 
   def install
