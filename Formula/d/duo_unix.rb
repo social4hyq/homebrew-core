@@ -6,7 +6,8 @@ class DuoUnix < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6e488270bd9ea5c8430aa1a764aae06dddc9bfb884442bfc09b73251c3aa363"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a3e41ec83aa7d5c1279bbd3df090f3cb06f1f2e31e4624cda88b29bfd9c397a9"
   end
 
   depends_on "autoconf" => :build
