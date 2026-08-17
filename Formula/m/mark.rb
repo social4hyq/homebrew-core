@@ -6,6 +6,11 @@ class Mark < Formula
   license "Apache-2.0"
   head "https://github.com/kovetskiy/mark.git", branch: "master"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "faf111d54f7d02496146e596977a502b4b829d0e5d660fc825a26eb917fe9b74"
+  end
+
   depends_on "go" => :build
 
   def install
