@@ -7,6 +7,11 @@ class Helm < Formula
   license "Apache-2.0"
   head "https://github.com/helm/helm.git", branch: "main"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9916d14f13b17b529b88c6f97db6de604058db3537eda6c5c983f48dd2283caf"
+  end
+
   depends_on "go" => :build
 
   def install
