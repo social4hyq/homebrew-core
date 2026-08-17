@@ -12,6 +12,11 @@ class HelmAT3 < Formula
     regex(/^v?(3(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d328801f61cbbdfa0dd89f3a406afc93bba3b0b902fdf0bbdc913dbd8a82bfae"
+  end
+
   keg_only :versioned_formula
 
   depends_on "go" => :build
