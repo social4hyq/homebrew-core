@@ -12,10 +12,6 @@ class GitlabRunner < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a4faca115c505ddcc3128348159230550ef80febcd244f1ddc99e31b9e9f2fd"
-  end
-
   depends_on "go" => :build
 
   def install
