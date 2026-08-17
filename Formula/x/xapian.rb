@@ -13,7 +13,8 @@ class Xapian < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fc17c8680daeef87e875406a165b55b8ed10bd8e9bc868137ce8f9d1885fffb"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea4bdd6d59793883d41ce1d559a29b01236c5a0d5da2644211064a210adbfbc8"
   end
 
   depends_on "python@3.14" => [:build, :test]
