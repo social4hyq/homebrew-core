@@ -7,6 +7,11 @@ class Scons < Formula
   sha256 "5ba48f9e2eb6b9178cabdc9893792418e6970c84f43f4b027e4468e20616a89c"
   license "MIT"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2140684b205b8b0b97e4e6cff34cbe1c67a1f1284da0d3011302e864450f174a"
+  end
+
   depends_on "python@3.14"
 
   def install
