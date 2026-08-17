@@ -13,6 +13,11 @@ class Pyenv < Formula
     regex(/^v?(\d+(?:\.\d+)+(-\d+)?)$/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d56243c2788c218172e8d3d4e77c5bf186f877e77bc3e054482b6c9f71cfe459"
+  end
+
   depends_on "autoconf"
   depends_on "openssl@3"
   depends_on "pkgconf"
