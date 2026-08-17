@@ -8,7 +8,7 @@ class Picoruby < Formula
   head "https://github.com/picoruby/picoruby.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "afa25195d0398d8a3989359db98e16e7a8702cc42ad6d05c02d8c2cf883acbd5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c4e32ae4ea34660440dded7dea7d8b13d5e6fb582c9894b69ec96a6e72b50930"
   end
 
   depends_on "ruby" => :build # for numbered block parameter `_1'
