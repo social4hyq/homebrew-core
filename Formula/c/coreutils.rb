@@ -5,11 +5,11 @@ class Coreutils < Formula
   mirror "https://ftp.gnu.org/gnu/coreutils/coreutils-9.11.tar.xz"
   sha256 "394024eda0a5955217ceda9cd1201e65dc8fa3aa29c2951135a49521d57c3cc3"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 2
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "18920ea7de727c682e96127014552894568664ea2027e14adabe196c6d8dfe33"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "625576b003c86e35412110956b09ff0f3198d8d877f511f280fdeba6f216e13f"
   end
 
   head do
@@ -52,7 +52,8 @@ class Coreutils < Formula
       --prefix=#{prefix}
       --with-libgmp
       --without-selinux
-       FORCE_UNSAFE_CONFIGURE=1
+      ac_cv_func_vmsplice=no
+      FORCE_UNSAFE_CONFIGURE=1
     ]
 
     system "./configure", *args
