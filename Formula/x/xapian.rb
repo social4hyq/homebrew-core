@@ -12,10 +12,6 @@ class Xapian < Formula
     regex(/href=.*?xapian-core[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fc17c8680daeef87e875406a165b55b8ed10bd8e9bc868137ce8f9d1885fffb"
-  end
-
   depends_on "python@3.14" => [:build, :test]
   depends_on "sphinx-doc" => :build
 
