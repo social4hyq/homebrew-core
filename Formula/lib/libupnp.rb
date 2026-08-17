@@ -11,7 +11,8 @@ class Libupnp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e61f21fd4d3443f0ce9f972e556505a3878bd1c38bcebac8671da78858f72dde"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a99272fac99d357cf3a2c5205f33f77d6f7904623e2594f9be675278f102f02"
   end
 
   depends_on "cmake" => :build
