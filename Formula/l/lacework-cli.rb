@@ -15,6 +15,11 @@ class LaceworkCli < Formula
     strategy :github_latest
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61050817d691bc55236f8bbec4179268f80895a7b031f09bf26fcda158238016"
+  end
+
   depends_on "go" => :build
 
   def install
