@@ -7,6 +7,11 @@ class Metricbeat < Formula
   license "Apache-2.0"
   head "https://github.com/elastic/beats.git", branch: "main"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ad2cb33186b8b22ea42d84ff0d73a30920c35e4189e935eafbe93685b835c56"
+  end
+
   depends_on "go" => :build
   depends_on "mage" => :build
 
