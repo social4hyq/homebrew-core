@@ -14,7 +14,8 @@ class Terragrunt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "85de57cfa57bd48e42a429e1086c59d84bb1c6276dff21afea12e22148bd6a98"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "20cf9172f94b095bc6f7d255b6d75abfd35f044dc5001f541fc63e2efcb71201"
   end
 
   depends_on "go" => :build
