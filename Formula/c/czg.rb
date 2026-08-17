@@ -5,6 +5,11 @@ class Czg < Formula
   sha256 "0d25639921912ba15fa834e083b7b3a8d2b795134b6f44ece992a74ea8bdd834"
   license "MIT"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e442acd70797e6bd19aa4f42bf1c813961f3f1d9e84d394a39860bf70673a874"
+  end
+
   depends_on "node"
 
   def install
