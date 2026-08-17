@@ -5,6 +5,11 @@ class Jscpd < Formula
   sha256 "1796750a330412904294b5036a31677e670b596117c5986f1091a5b889ec348b"
   license "MIT"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f46cf2738b1ffe018ca7aedf60233110c66f4a6477696dd504a8d44519d4eef"
+  end
+
   depends_on "rust" => :build
 
   def install
