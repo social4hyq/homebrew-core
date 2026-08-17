@@ -11,10 +11,6 @@ class VespaCli < Formula
     strategy :github_latest
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b7a47f55383c381cbe29c9db51a5b6cd50b99a671a738620117d1b55e6364ec"
-  end
-
   depends_on "go" => :build
 
   def install
