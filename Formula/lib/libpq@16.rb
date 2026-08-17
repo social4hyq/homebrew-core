@@ -10,10 +10,6 @@ class LibpqAT16 < Formula
     regex(%r{href=["']?v?(16(?:\.\d+)+)/?["' >]}i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c88759bcbdcadad546db1e17dc105e61b59bfe9af619de7b178c7a6b571d44f"
-  end
-
   keg_only :versioned_formula
 
   # https://endoflife.date/postgresql
