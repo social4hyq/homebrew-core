@@ -11,6 +11,11 @@ class Goimports < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "afb7b12eb12b26f89c0facb3ee4921774b0fd07d4d1e8e694a48d26672e4588e"
+  end
+
   depends_on "go"
 
   def install
