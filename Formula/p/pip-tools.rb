@@ -8,10 +8,6 @@ class PipTools < Formula
   license "BSD-3-Clause"
   head "https://github.com/jazzband/pip-tools.git", branch: "main"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e530eb05d74c4499235b083139eb624897469c8e9a0e06eec9e9bb533077f58"
-  end
-
   depends_on "python@3.14"
 
   resource "build" do
