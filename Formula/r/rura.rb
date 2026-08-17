@@ -5,6 +5,11 @@ class Rura < Formula
   sha256 "b0a4126d515d9e48b3445dca5c6407e3b86a882398f0661f605a9e1a6e695bd8"
   license "MIT"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "51efbb051caa1b591011d72c877ce844da0558968a387c5435e07d6dafb47ca6"
+  end
+
   depends_on "rust" => :build
 
   def install
