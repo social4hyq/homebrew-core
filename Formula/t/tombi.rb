@@ -11,6 +11,11 @@ class Tombi < Formula
     strategy :github_releases
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a91e9632c10fcabf86f4f8b08ab68a718abb6f7388fad3305a506189776d6664"
+  end
+
   depends_on "rust" => :build
 
   def install
