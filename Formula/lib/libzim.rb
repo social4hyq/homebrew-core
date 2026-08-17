@@ -5,6 +5,11 @@ class Libzim < Formula
   sha256 "38f8e2139a089f00196f288f52f2d0677a6becc218f380b54ca70b6f162398bd"
   license "GPL-2.0-or-later"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "31a9d125af4fe6570ddd25f1ef14827a5d127e5647aa3affe31ce6518d0e30f6"
+  end
+
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkgconf" => :build
