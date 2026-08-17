@@ -11,10 +11,6 @@ class Binaryen < Formula
     regex(/^version[._-](\d+(?:\.\d+)*)$/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "899efeaa4d5c328b5164622dfad90c4d5e9d5c708ef197ea1c1128e4d2e33663"
-  end
-
   depends_on "cmake" => :build
 
   def install
