@@ -6,10 +6,6 @@ class CloudSqlProxy < Formula
   license "Apache-2.0"
   head "https://github.com/GoogleCloudPlatform/cloud-sql-proxy.git", branch: "main"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c50138e1d8024d205c377687c1e6a4ddb96db763121b12f6f70b4b901d26eab"
-  end
-
   depends_on "go" => :build
 
   def install
