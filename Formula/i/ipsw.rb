@@ -11,6 +11,11 @@ class Ipsw < Formula
     strategy :github_latest
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4af8cd65826cf7c0edac1fe9d051ad6f2655c70929be160751142faa9dd66f90"
+  end
+
   depends_on "go" => :build
 
   def install
