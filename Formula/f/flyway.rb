@@ -5,6 +5,11 @@ class Flyway < Formula
   sha256 "a68463f1bcb019ce1c46a283789c41ef33ca5d42aa1f02936e5650e4483ed476"
   license "Apache-2.0"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c28c25a7472a77223f4019dc941a7f88076ab2ee60962a4052148df60a22f04b"
+  end
+
   depends_on "openjdk"
 
   def install
