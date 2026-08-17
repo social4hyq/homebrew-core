@@ -13,7 +13,8 @@ class HelmAT3 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad1172b921d5e8647d1e5b730623deb3232f9fedd32a7ad6f87036ac2480787b"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d328801f61cbbdfa0dd89f3a406afc93bba3b0b902fdf0bbdc913dbd8a82bfae"
   end
 
   keg_only :versioned_formula
