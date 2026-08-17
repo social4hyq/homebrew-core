@@ -1,0 +1,29 @@
+diff -u -r a/src/copy-file-data.c b/src/copy-file-data.c
+--- a/src/copy-file-data.c	2026-01-19 22:10:57.000000000 +0000
++++ b/src/copy-file-data.c	2026-08-17 07:52:43.534433223 +0000
+@@ -50,7 +50,15 @@
+ # if defined FALLOC_FL_PUNCH_HOLE && defined FALLOC_FL_KEEP_SIZE
+   ret = fallocate (fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+                    offset, length);
+-  if (ret < 0 && (is_ENOTSUP (errno) || errno == ENOSYS))
++  /* Some operating systems (e.g., HarmonyOS) reject hole punching with
++     EPERM/EACCES even though the operation is simply not supported
++     there.  Treat those like ENOTSUP so that the copy still succeeds:
++     the hole is preserved anyway by merely not writing to that range.
++     Do not fail the whole copy just because the file cannot be made
++     sparse by deallocating preallocated space.  */
++  if (ret < 0
++      && (is_ENOTSUP (errno) || errno == ENOSYS
++          || errno == EPERM || errno == EACCES))
+     ret = 0;
+ # endif
+ #endif
+@@ -235,7 +243,7 @@
+               else if (prev_hole)
+                 {
+                   if (create_hole (dest_fd, dst_name, psize) < 0)
+-                    return false;
++                    return -1;
+                   pbuf = cbuf;
+                   psize = csize;
+                 }

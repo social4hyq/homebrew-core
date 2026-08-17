@@ -5,6 +5,7 @@ class Coreutils < Formula
   mirror "https://ftp.gnu.org/gnu/coreutils/coreutils-9.11.tar.xz"
   sha256 "394024eda0a5955217ceda9cd1201e65dc8fa3aa29c2951135a49521d57c3cc3"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
@@ -32,6 +33,10 @@ class Coreutils < Formula
 
   patch do
     file "Patches/coreutils/0001-port-gnulib-to-ohos.patch"
+  end
+
+  patch do
+    file "Patches/coreutils/0002-cp-ignore-hole-punch-eperm-eacces.patch"
   end
 
   # https://github.com/Homebrew/homebrew-core/pull/36494
