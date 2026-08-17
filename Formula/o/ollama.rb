@@ -2,8 +2,8 @@ class Ollama < Formula
   desc "Create, run, and share large language models (LLMs)"
   homepage "https://ollama.com/"
   url "https://github.com/ollama/ollama.git",
-      tag:      "v0.32.9",
-      revision: "1d5febee105f00c430e19214b7b7b620cf186f98"
+      tag:      "v0.32.14",
+      revision: "d67ad83426633195089509347ffd4fe795120198"
   license "MIT"
   head "https://github.com/ollama/ollama.git", branch: "main"
 
@@ -16,7 +16,7 @@ class Ollama < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "99b58315cdeec0d74e9995b0a7ce64ea49fd533bdd92a370021570b47490d39a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "818d1ebb13810df28d4dadf4106dcd6ad0ee737662bf103e3c18e770cf8f881a"
   end
 
   depends_on "cmake" => :build
@@ -33,8 +33,8 @@ class Ollama < Formula
   # Pinned dependency required by llama-server
   resource "llama.cpp" do
     url "https://github.com/ggml-org/llama.cpp.git",
-        tag:      "b10353",
-        revision: "f8def7fe168bab245fbf15d3f18b26dbb1ef73c8"
+        tag:      "b10434",
+        revision: "7e4c0a96880dae4fc4268ad441f8a6446bd5460a"
 
     livecheck do
       url "https://raw.githubusercontent.com/ollama/ollama/refs/tags/v#{LATEST_VERSION}/LLAMA_CPP_VERSION"
