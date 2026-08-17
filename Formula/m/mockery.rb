@@ -14,6 +14,11 @@ class Mockery < Formula
     strategy :github_latest
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1735cc18a1a853a2097354161eb6c9e9e63df4acd30e04db1be78e8b1d19de2"
+  end
+
   depends_on "go" => :build
 
   def install
