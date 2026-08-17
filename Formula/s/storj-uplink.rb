@@ -17,10 +17,6 @@ class StorjUplink < Formula
     strategy :github_releases
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c2c7bf18c3f5e06afaae034c3e243a28f255865e7ce5848532f2e3615ee8419b"
-  end
-
   depends_on "go" => :build
 
   def install
