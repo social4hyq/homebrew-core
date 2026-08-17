@@ -11,6 +11,11 @@ class Libpq < Formula
     regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1db6dbeac2513a51fdca2a4c2917e0b29b3d11f48e3ec7828a1bc14c9f426048"
+  end
+
   keg_only "it conflicts with PostgreSQL"
 
   depends_on "docbook" => :build
