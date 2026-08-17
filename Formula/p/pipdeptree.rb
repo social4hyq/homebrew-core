@@ -8,7 +8,7 @@ class Pipdeptree < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3398049b25aa8459f215e2e29c513b5744bd6281d254f302c748041ed5aa040"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0aeaa22a3c05a8718e3e2f23ccc203ea3ae2a37961a31ef07be2d255aa0b1b60"
   end
 
   depends_on "meson" => :build
