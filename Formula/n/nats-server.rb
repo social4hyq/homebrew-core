@@ -11,6 +11,11 @@ class NatsServer < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "929637a6296efb4ad2801e3dddc55b1fe79305366caa8dd4d7a22b8eee38039f"
+  end
+
   depends_on "go" => :build
 
   def install
