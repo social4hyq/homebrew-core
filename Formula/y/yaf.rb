@@ -13,7 +13,8 @@ class Yaf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5836c36397c2f0438d7727328261253b142e6d0d03d18fa5b0ac202f3652fd36"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "345b363a3603c187879c43c759be94f688a668b25ed5fb8f6672912d4dc44a4e"
   end
 
   depends_on "pkgconf" => :build
