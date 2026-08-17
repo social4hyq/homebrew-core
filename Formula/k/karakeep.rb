@@ -5,6 +5,11 @@ class Karakeep < Formula
   sha256 "2fecaf6629923bdc26a98a5abf1e8a6d866432c3a08dd53de34f020c75472c53"
   license "AGPL-3.0-only"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7b0941720810f6e11d5f85b3c152c0c64a5332ba7d25faec457a385759741e0"
+  end
+
   depends_on "node"
 
   def install
