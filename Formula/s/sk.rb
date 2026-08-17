@@ -12,7 +12,7 @@ class Sk < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee09390144d07da723e8397d1f5b3439fc0a68809463135e4fcdf9918548a78d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "de4a827a1761c56f7b9d38821b82946787ceb5175129c8b0cdb4254a01dea567"
   end
 
   depends_on "rust" => :build
