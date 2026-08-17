@@ -13,6 +13,11 @@ class Kubescape < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "01b34d2775590ea900b00094a7feb622e8c806cad3bf34848996565466ac0abf"
+  end
+
   depends_on "go" => :build
 
   def install
