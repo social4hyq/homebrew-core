@@ -14,10 +14,6 @@ class OhMyPosh < Formula
     strategy :github_latest
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9fdf715f7c0c369d9978767bf571eec2740cf5585b8960aef464b8b45b73009c"
-  end
-
   depends_on "go" => :build
 
   def install
