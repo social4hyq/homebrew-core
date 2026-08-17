@@ -11,6 +11,11 @@ class Azcopy < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "44c1540ee46ee9f01eff83d820c9b1a38ab36bd9a76905786c9e0314109fed99"
+  end
+
   depends_on "go" => :build
 
   def install
