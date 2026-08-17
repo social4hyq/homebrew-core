@@ -6,10 +6,6 @@ class Fallow < Formula
   license "MIT"
   head "https://github.com/fallow-rs/fallow.git", branch: "main"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "015b635315d612b0b6a74e9df8018cc0ed01fead484a7bc51d27b5a76fed99d8"
-  end
-
   depends_on "rust" => :build
 
   def install
