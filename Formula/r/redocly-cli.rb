@@ -5,10 +5,6 @@ class RedoclyCli < Formula
   sha256 "6d7caf02fb5e39f3d01db9fc6d14539230706a780dffdfed4a7cd9f1e03109e5"
   license "MIT"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2466583a5b1c8b4937ba8405054019711141624651bfbc418da88c168f5eaa79"
-  end
-
   depends_on "node"
 
   def install
