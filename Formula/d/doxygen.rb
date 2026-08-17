@@ -13,6 +13,11 @@ class Doxygen < Formula
     regex(/href=.*?doxygen[._-]v?(\d+(?:\.\d+)+)[._-]src\.t/i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2fb1fe74b85c3631e54806dc9a005d09d564335ae3e7f1a9896ef515a59203e9"
+  end
+
   depends_on "bison" => :build
   depends_on "cmake" => :build
 
