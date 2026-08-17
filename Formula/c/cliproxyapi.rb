@@ -12,6 +12,11 @@ class Cliproxyapi < Formula
     throttle 5
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dcc04c9b1094a7d31441b78674d82012caceab40e1c251f01e240191dafd3b4"
+  end
+
   depends_on "go" => :build
 
   def install
