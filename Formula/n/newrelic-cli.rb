@@ -11,10 +11,6 @@ class NewrelicCli < Formula
     strategy :github_latest
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fe41fa94edb05519f1748d5426569fa0a40e970ffa6207e5cbad61efaa35ffca"
-  end
-
   depends_on "go" => :build
 
   def install
