@@ -6,6 +6,11 @@ class TronbytServer < Formula
   license "Apache-2.0"
   head "https://github.com/tronbyt/server.git", branch: "main"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e07a73d634a0d9c4e8ef3040077b0fa242ad2c33d06a5c9c5e158998f9137b84"
+  end
+
   depends_on "go" => :build
   depends_on "pkgconf" => :build
   depends_on "webp"
