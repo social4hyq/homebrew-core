@@ -7,7 +7,7 @@ class Pdtm < Formula
   head "https://github.com/projectdiscovery/pdtm.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1fae4fc7499371d750301e7afe06711c3193dd60e3b0295bf5784433c74ae5fd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0f81640a3c96b7998e64c0e9a27b9b6e5534461f1965ad6a232abb36136a37c"
   end
 
   depends_on "go" => :build
