@@ -5,10 +5,6 @@ class Mongoose < Formula
   sha256 "93208f164038b05d156935b8b725063e1afb3984a362dbcf3a9ea37b6f1f2255"
   license "GPL-2.0-only"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "83dce457f7a3f3e7c197413f8896a9a419cc6cb0b4306635cd86b382365a80ea"
-  end
-
   def install
     # No Makefile but is an expectation upstream of binary creation
     # https://github.com/cesanta/mongoose/issues/326
