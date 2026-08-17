@@ -11,6 +11,11 @@ class MongodbAtlasCli < Formula
     regex(%r{^atlascli/v?(\d+(?:\.\d+)+)$}i)
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc56560ff955617c792397105b3d25ae4ef843c46dd868b88033d9febf3c5d21"
+  end
+
   depends_on "go" => :build
   depends_on "mongosh"
 
