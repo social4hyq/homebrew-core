@@ -6,10 +6,6 @@ class BackplaneCli < Formula
   license "Apache-2.0"
   head "https://github.com/openshift/backplane-cli.git", branch: "main"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e231a23f37dcc74ca106c6258ceefc795c5d5a706c0d820d0a799e19a383054"
-  end
-
   depends_on "go" => :build
 
   def install
