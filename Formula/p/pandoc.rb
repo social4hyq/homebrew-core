@@ -7,10 +7,6 @@ class Pandoc < Formula
   compatibility_version 3
   head "https://github.com/jgm/pandoc.git", branch: "main"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b63ff58be0ed782fea1279a05fe81d0f2dc04f87d1a56be637bb8e797609b39a"
-  end
-
   depends_on "cabal-install" => :build
   depends_on "ghc" => :build
   depends_on "gmp"
