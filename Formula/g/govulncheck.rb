@@ -6,6 +6,11 @@ class Govulncheck < Formula
   license "BSD-3-Clause"
   head "https://github.com/golang/vuln.git", branch: "master"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8d88976c09528430d982ee38309ece2cee512348262385b5b9dd2d54a0da66a"
+  end
+
   depends_on "go" => [:build, :test]
 
   def install
