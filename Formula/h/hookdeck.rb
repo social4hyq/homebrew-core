@@ -6,6 +6,11 @@ class Hookdeck < Formula
   license "Apache-2.0"
   head "https://github.com/hookdeck/hookdeck-cli.git", branch: "main"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f13a611b819944601cc7f6984779c18d2cf59e174889d64384304d1f40e2b805"
+  end
+
   depends_on "go" => :build
 
   def install
