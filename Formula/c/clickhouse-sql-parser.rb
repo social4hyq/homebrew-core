@@ -6,10 +6,6 @@ class ClickhouseSqlParser < Formula
   license "MIT"
   head "https://github.com/AfterShip/clickhouse-sql-parser.git", branch: "master"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d11f8f876cccc6e34576bd700844ca8211f54d3f01ae2df3fc42e0677d30865"
-  end
-
   depends_on "go" => :build
 
   def install
