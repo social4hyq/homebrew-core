@@ -11,7 +11,8 @@ class LibpqAT16 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c88759bcbdcadad546db1e17dc105e61b59bfe9af619de7b178c7a6b571d44f"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1228fd1ef77647c9dbfd6303e75dbf9439a998f9530a0e3bd918bea2c090a075"
   end
 
   keg_only :versioned_formula
