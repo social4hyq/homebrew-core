@@ -25,6 +25,10 @@ class Vim < Formula
     throttle 50
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8671d15dc9d85351034f808955de40618c346a7487085baf4506c749677b5b8b"
+  end
+
   depends_on "gettext" => :build
   depends_on "libsodium"
   depends_on "lua@5.4" # Lua 5.5 doesn't work for now, see https://github.com/vim/vim/issues/19639
