@@ -12,10 +12,6 @@ class Yaf < Formula
     regex(/".*?yaf[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5836c36397c2f0438d7727328261253b142e6d0d03d18fa5b0ac202f3652fd36"
-  end
-
   depends_on "pkgconf" => :build
   depends_on "glib"
   depends_on "libfixbuf"
