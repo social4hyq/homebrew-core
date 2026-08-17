@@ -15,7 +15,8 @@ class Kubeshark < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd24e1138c8779c2a8e381d3eb635eece12696fe3556dd16b605adab4582a96c"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "96dbcaf0e5bf218c14ec65fd6c3a473469df0d87b451a683ca33b4231b3386f0"
   end
 
   depends_on "go" => :build
