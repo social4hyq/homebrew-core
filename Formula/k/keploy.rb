@@ -6,6 +6,11 @@ class Keploy < Formula
   license "Apache-2.0"
   head "https://github.com/keploy/keploy.git", branch: "main"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e835111d631abd49688f46b0a901602d81245cc012756bc0ad92695df4e92d96"
+  end
+
   depends_on "go" => :build
 
   def install
