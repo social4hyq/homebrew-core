@@ -15,10 +15,6 @@ class Ffmpeg < Formula
     regex(/href=.*?ffmpeg[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21e09b2352bb1d271c08336db73d492dc8a2275f841017989cd68845358a7669"
-  end
-
   depends_on "pkgconf" => :build
 
   # Only add dependencies required for dependents in homebrew-core
