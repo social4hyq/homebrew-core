@@ -12,10 +12,6 @@ class Libgit2 < Formula
     strategy :github_latest
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "644ce42c89bcd37b604488b5ea08de3d30c9ca7f67b3f96137d3b2817064624f"
-  end
-
   depends_on "cmake" => :build
   depends_on "pkgconf" => :build
   depends_on "libssh2"
