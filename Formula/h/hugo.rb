@@ -11,10 +11,6 @@ class Hugo < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "371cd3150f4b71514955802ab2c246c7fbd2d9888f57ecbe4a3d833c65aca213"
-  end
-
   depends_on "go" => :build
 
   def install
