@@ -5,10 +5,6 @@ class Containerd < Formula
   sha256 "175bbf57d637c987fa742f846b43b1b8ba2c61af6a9eaec619c625e4a8a19b69"
   license "Apache-2.0"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b00950b56ffca5310335ee9255832c787639857c5d40817a2621d7f2d696f726"
-  end
-
   depends_on "go" => :build
   depends_on "go-md2man" => :build
 
