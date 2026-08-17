@@ -6,10 +6,6 @@ class Kubeone < Formula
   license "Apache-2.0"
   head "https://github.com/kubermatic/kubeone.git", branch: "main"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca48830f6bfbaa849bb700b93372b6cf31453c89da7d0509fa359b7dea6fc7f2"
-  end
-
   depends_on "go" => :build
 
   def install
