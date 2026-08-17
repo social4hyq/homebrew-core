@@ -1,8 +1,8 @@
 class Lndir < Formula
   desc "Create a shadow directory of symbolic links to another directory tree"
   homepage "https://gitlab.freedesktop.org/xorg/util/lndir"
-  url "https://www.x.org/releases/individual/util/lndir-1.0.5.tar.xz"
-  sha256 "3b65577a5575cce095664f5492164a96941800fe6290a123731d47f3e7104ddb"
+  url "https://www.x.org/releases/individual/util/lndir-1.0.6.tar.xz"
+  sha256 "18f6d664e52894b7dee0d2fc9b171e0e58566e5091e44f9535f10e6d941912a4"
   license "MIT-open-group"
 
   bottle do
