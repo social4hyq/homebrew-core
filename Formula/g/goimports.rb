@@ -12,7 +12,8 @@ class Goimports < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aae568f4df38449408051ff36a5d0bc3542e706cbd7ae29f544d52f6d4bbabde"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "afb7b12eb12b26f89c0facb3ee4921774b0fd07d4d1e8e694a48d26672e4588e"
   end
 
   depends_on "go"
