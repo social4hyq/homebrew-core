@@ -1,8 +1,8 @@
 class Mq < Formula
   desc "Jq-like command-line tool for markdown processing"
   homepage "https://mqlang.org/"
-  url "https://github.com/harehare/mq/archive/refs/tags/v0.8.2.tar.gz"
-  sha256 "68bba94b14048fc956b987e1b5dd7f8f94f175cdbea41e768247132c194f664c"
+  url "https://github.com/harehare/mq/archive/refs/tags/v0.8.3.tar.gz"
+  sha256 "c47874259da3fb1121887e05995ce5992e126d16aad1374f2128adb36b19198d"
   license "MIT"
   head "https://github.com/harehare/mq.git", branch: "main"
 
