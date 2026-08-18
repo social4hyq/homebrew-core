@@ -3,7 +3,7 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "9df36d87f915a7e9469182dc1fbb79e8f93a94ac", branch: "diag-spin-probe"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "26e790c9df95590d605e97ae7d7642ca37916152", branch: "diag-spin-probe"
   version "1.4.0"
   license "MIT"
   revision 62
