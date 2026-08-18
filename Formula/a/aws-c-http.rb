@@ -1,8 +1,8 @@
 class AwsCHttp < Formula
   desc "C99 implementation of the HTTP/1.1 and HTTP/2 specifications"
   homepage "https://github.com/awslabs/aws-c-http"
-  url "https://github.com/awslabs/aws-c-http/archive/refs/tags/v0.11.0.tar.gz"
-  sha256 "4ccbdd33c798b590288330dec9e93abe2ff6cfb198b7a4db036c9d362f2e6506"
+  url "https://github.com/awslabs/aws-c-http/archive/refs/tags/v0.11.1.tar.gz"
+  sha256 "2988843d5c95d92249d40e59480c2a4376533a91d8e38a5106dc4da5a8720ce5"
   license "Apache-2.0"
   compatibility_version 1
 
