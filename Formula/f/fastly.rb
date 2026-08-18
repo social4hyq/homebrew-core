@@ -6,6 +6,11 @@ class Fastly < Formula
   license "Apache-2.0"
   head "https://github.com/fastly/cli.git", branch: "main"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "823ede8029848d0dcc28b2d98d8478913b4f04cd7f1a987e5cdda8dd66eff916"
+  end
+
   depends_on "go" => :build
 
   def install
