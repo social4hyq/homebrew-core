@@ -1,8 +1,8 @@
 class AwsCAuth < Formula
   desc "C99 library implementation of AWS client-side authentication"
   homepage "https://github.com/awslabs/aws-c-auth"
-  url "https://github.com/awslabs/aws-c-auth/archive/refs/tags/v0.10.4.tar.gz"
-  sha256 "6fb567f496a450d4b6d3f5749d735977a0156957e8ccbca9af7a5ee15d1ffda7"
+  url "https://github.com/awslabs/aws-c-auth/archive/refs/tags/v0.10.5.tar.gz"
+  sha256 "1ddd1dc476debdbf9ff083e254396fdc3ea0846dccf7d5f983a6571303abcb35"
   license "Apache-2.0"
   compatibility_version 1
 
