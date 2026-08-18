@@ -3,12 +3,12 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "4340b6be36edb65e96cca24b16064fe8d9c1ac70", branch: "diag-spin-probe"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "155114e377fc15291b0eb3aac4db78f0449e5d53", branch: "fix-ohos-tty-writable-poll-storm"
   version "1.4.0"
   license "MIT"
   revision 62
   # head tracks the same pre-patched fork branch as url.
-  head "https://github.com/social4hyq/ohos-bun.git", branch: "diag-spin-probe"
+  head "https://github.com/social4hyq/ohos-bun.git", branch: "fix-ohos-tty-writable-poll-storm"
 
   livecheck do
     url :stable
