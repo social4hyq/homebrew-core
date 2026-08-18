@@ -53,15 +53,16 @@ permissions:
 
 env:
   # Keep in sync with automerge-autobump.yml's ALLOWLIST (branch-name gate).
-  # claude-code is NOT allowlisted: 2.1.229-2.1.233 abort on OHOS startup
-  # (Anthropic bumped the embedded bun eb835313a -> 8bb8d04c4/939d4325b; the
-  # new builds panic in a startup regex scan — bun.report L_18bb8d04AA+... /
-  # L_1939d432AA+... both decode to regex-automata is_char_boundary frames —
-  # before any JS runs; deterministic on device and in the ci container, any
-  # env/args). 2.1.228 (bun eb835313a) is the last working build. Bump
-  # manually only after `claude --version` passes on a real device; the
-  # runtime-fetch brew test in the formula gates the PR regardless.
-  ALLOWLIST: "opencode opencode@2"
+  # claude-code re-allowlisted (removed in PR #344 after the 2.1.229 incident,
+  # restored now): the official binary is no longer executed at all — the
+  # wrapper extracts the CLI bundle and runs it on this tap's bun — and the
+  # formula's brew test runs `claude --version` end-to-end (runtime fetch +
+  # extract + execute on our bun), so pr-validate gates every bump for real.
+  # Historical attribution fix: the 2.1.229-2.1.233 startup abort was later
+  # root-caused to stdout/stderr R_AARCH64_COPY relocs resolved to NULL by
+  # OHOS musl ld.so (fixed in ohos-compat-shim 3874ab4), not the
+  # regex-automata panic an earlier revision of this comment claimed.
+  ALLOWLIST: "opencode opencode@2 claude-code"
   IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
