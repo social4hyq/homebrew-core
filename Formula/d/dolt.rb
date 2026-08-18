@@ -12,6 +12,11 @@ class Dolt < Formula
     strategy :github_latest
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "759c201d729154152f58845258057f854229c749113c0f6783cc69f974b9618e"
+  end
+
   depends_on "go" => :build
   depends_on "icu4c@78"
 
