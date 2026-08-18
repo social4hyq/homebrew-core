@@ -3,12 +3,12 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "b94ab2a2db63b14fd02e421384e2facdb2d0687f", branch: "shim-poll-fix-and-sync"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "0039a1a4c0186d4cc996fcc1d82643bb0b09de56", branch: "sync-shim-v0.5.0-phase2-fixes"
   version "1.4.0"
   license "MIT"
   revision 62
   # head tracks the same pre-patched fork branch as url.
-  head "https://github.com/social4hyq/ohos-bun.git", branch: "shim-poll-fix-and-sync"
+  head "https://github.com/social4hyq/ohos-bun.git", branch: "sync-shim-v0.5.0-phase2-fixes"
 
   livecheck do
     url :stable
