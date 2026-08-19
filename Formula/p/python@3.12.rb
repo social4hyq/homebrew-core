@@ -5,6 +5,7 @@ class PythonAT312 < Formula
   sha256 "6c6df908d2c3fd24e6d76869e92542abd0f33aec9dfc18df8875f89660286d43"
   license "Python-2.0"
   compatibility_version 1
+  revision 1
 
   livecheck do
     url "https://www.python.org/downloads/source/"
@@ -133,7 +134,7 @@ class PythonAT312 < Formula
     # include path, we move them to [C|LD]FLAGS_NODIST.
     # Note: Changing CPPFLAGS causes issues with dbm, so we
     # leave it as-is.
-    cflags         = []
+    cflags         = ["-fno-emulated-tls"]
     cflags_nodist  = ["-I#{HOMEBREW_PREFIX}/include"]
     ldflags        = ["-lintl"]
     ldflags_nodist = ["-L#{HOMEBREW_PREFIX}/lib", "-Wl,-rpath,#{HOMEBREW_PREFIX}/lib", "-Wl,-z,global"]
