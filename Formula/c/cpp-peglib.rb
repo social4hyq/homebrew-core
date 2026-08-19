@@ -6,7 +6,7 @@ class CppPeglib < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "efbb76292b2cd561c471d559facb53b26ab02a69ec015a3d4130993ae057bbf0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b5f90e9c9e6edbd8966c48195156fa337565c1f4e8c58131f26800c1504cc63"
   end
 
   depends_on "cmake" => :build
