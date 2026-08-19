@@ -1,8 +1,8 @@
 class OpenjdkAT25 < Formula
   desc "Development kit for the Java programming language"
   homepage "https://openjdk.org/"
-  url "https://github.com/openjdk/jdk25u/archive/refs/tags/jdk-25.0.4-ga.tar.gz"
-  sha256 "85934f45ebfde0024a76e3dce86218236c3712687689bf00f24c559ac1ed0e6a"
+  url "https://github.com/openjdk/jdk25u/archive/refs/tags/jdk-25.0.4.1-ga.tar.gz"
+  sha256 "1e5908f90d732e0ed3f737aac7603863c2cc157e464e036ac0accadb87af4391"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class OpenjdkAT25 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "641dbe3f67d419fe2e679e6dd07de556c1bb321c36572286105e57b21a599725"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8380d17072a76e1a43294b06cf43a9f8c85dd42460b70773343bcb5d2fba228c"
   end
 
   keg_only :versioned_formula
