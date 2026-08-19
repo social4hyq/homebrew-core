@@ -6,14 +6,16 @@ class Rust < Formula
   license any_of: ["Apache-2.0", "MIT"]
   compatibility_version 1
   head "https://github.com/rust-lang/rust.git", branch: "main"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21b135fd7f403d08752a0fcc2bac70ee9a79909ad0e05e7c3ebbdd9afa66525e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a25c3baf041af26304250af07fa3c39ea3d8359b739e20830f6c03958485b4f6"
   end
 
   depends_on "patchelf" => :build
   depends_on "openssl@3"
   depends_on "zlib-ng-compat"
+  depends_on "llvm-gcc-compat"
 
   link_overwrite "etc/bash_completion.d/cargo"
   link_overwrite "bin/cargo-fmt", "bin/git-rustfmt", "bin/rustfmt", "bin/rustfmt-*"
