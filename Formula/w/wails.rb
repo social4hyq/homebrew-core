@@ -7,7 +7,7 @@ class Wails < Formula
   head "https://github.com/wailsapp/wails.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "06008f6f6074211ed1d8155627e5bdf4c5183e4470764f261995d4c91c8de697"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "37189bf26204771e7af6c441eb1e23dfde82c8f507e7f922043844f794bfc3eb"
   end
 
   depends_on "go"
