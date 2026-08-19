@@ -7,7 +7,7 @@ class AwsCAuth < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbf3662a97419d4fc4aac3006b48b4dd08f3bfc8d8131456a422367f64395f81"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c1a650f999f12c715db376d83c6d1b6b382c6dfda27564f8cea7ac49fcbf3bc"
   end
 
   depends_on "cmake" => :build
