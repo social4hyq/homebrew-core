@@ -1,10 +1,9 @@
 class Uv < Formula
   desc "Extremely fast Python package installer and resolver, written in Rust"
   homepage "https://docs.astral.sh/uv/"
-  url "https://github.com/astral-sh/uv/archive/refs/tags/0.12.3.tar.gz"
-  sha256 "7d95d35a941135b96cc344c63b8da427d456900f58621481b909eac00904db7f"
+  url "https://github.com/astral-sh/uv/archive/refs/tags/0.12.5.tar.gz"
+  sha256 "e349c9eb85876921895330f6fee5f01f109d5ec06dcd3b475fb7b4b8de75eac6"
   license any_of: ["Apache-2.0", "MIT"]
-  revision 3
   head "https://github.com/astral-sh/uv.git", branch: "main"
 
   livecheck do
@@ -13,8 +12,8 @@ class Uv < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/uv-v0.12.3-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f94777eea47617acf9445a1d2062ec1541e81ba786757aab9c134c498e76546d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/uv-v0.12.5-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "981e43af4d0d558a1fe54f50d196c94d409235c2a002d5433559bd4f4a709bfe"
   end
 
   depends_on "cmake" => :build
