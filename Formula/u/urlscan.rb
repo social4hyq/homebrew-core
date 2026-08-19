@@ -3,13 +3,13 @@ class Urlscan < Formula
 
   desc "View/select the URLs in an email message or file"
   homepage "https://github.com/firecat53/urlscan"
-  url "https://files.pythonhosted.org/packages/a1/d8/364987b50a3769063404e93babe664589f9899f621a367e05a69714dd997/urlscan-1.1.0.tar.gz"
-  sha256 "f7a8abdee47fbb62dee2d2484f526bb14d514d184a617ff98bd41d1102e59c35"
+  url "https://files.pythonhosted.org/packages/5c/d2/3e3923b54bd185352b68359f60728529c0eae30fcef8e01eee0e7c3978af/urlscan-1.1.2.tar.gz"
+  sha256 "e4f01037dcb84f0cc5733b9423732ebf368cb9b4c9714bdaf7dd336d883a78b2"
   license "GPL-2.0-or-later"
   head "https://github.com/firecat53/urlscan.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2f18ba64a587f1fded41e3b8de08c42c87061e9a1fd04ad238b7849913ced4a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3449ca62fc13e588010c53c92eb2e1738c702fc4e5ffbde80dccd519a1d264e8"
   end
 
   depends_on "python@3.14"
