@@ -13,7 +13,7 @@ class Simdutf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3aa84bd2c7ad3644a1a1ad233f12e2fd7a71ed07f37848b60a2adae478a5f84e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "518bdfd72ead74e0920f955f071b2d7bdd111a22eed30317e41f791232e421e7"
   end
 
   depends_on "aklomp-base64" => :build
