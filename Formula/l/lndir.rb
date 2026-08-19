@@ -6,7 +6,7 @@ class Lndir < Formula
   license "MIT-open-group"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5262c81e1211fa2e2d452dd4687c3004d2b72d354dd4810ac751b71241f67601"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03a957e18c454707b43cada5adc14ec234986bf1e3ba6d28f0bce3f5a8fe3d90"
   end
 
   depends_on "pkgconf" => :build
