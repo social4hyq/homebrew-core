@@ -6,7 +6,7 @@ class Wait4x < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b20bbfcfefad3254f19cc40e77f8fdd1dd5fe04ff05acd6f7dde4d88aaa0b2ff"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f8d25b33fffb94efab5e6773ad1bb43fa910b6ca614abb72f01d296c1c88293"
   end
 
   depends_on "go" => :build
