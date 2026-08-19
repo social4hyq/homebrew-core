@@ -7,6 +7,10 @@ class Rustup < Formula
   compatibility_version 1
   head "https://github.com/rust-lang/rustup.git", branch: "main"
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "92473c57a17a85bf534b9ebe394d8e9eb58e66dea48f8877075ff5c934b20146"
+  end
+
   keg_only "it conflicts with rust"
 
   depends_on "rust" => :build
