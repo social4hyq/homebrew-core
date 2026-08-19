@@ -6,7 +6,7 @@ class ZigAT015 < Formula
   url "https://ziglang.org/download/0.15.2/zig-aarch64-linux-0.15.2.tar.xz"
   sha256 "958ed7d1e00d0ea76590d27666efbf7a932281b3d7ba0c6b01b0ff26498f667f"
   license "MIT"
-  revision 3
+  revision 4
 
   # Version-pinned: herdr targets a specific minimum_zig_version.
   livecheck do
@@ -19,23 +19,19 @@ class ZigAT015 < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "ce9160617a30410f6b276ecbe501b4f99d78f420abe21246a91f86e43d54574b"
   end
 
-  depends_on "ohos-bst-light" => :build # self-sign
-
   def install
-    # Guard against binary-sign-tool double-sign (corrupts static ELF).
-    # See qemu-aarch64.rb; build.sh UNSET_SIGN_FORMULAS covers CI.
-    if ENV["HOMEBREW_OHOS_BOTTLE_BINARY_SIGN"]
-      odie "zig@0.15 must be built with HOMEBREW_OHOS_BOTTLE_BINARY_SIGN unset " \
-           "(env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN brew install ...): the " \
-           "binary-sign-tool pass double-signs and corrupts this prebuilt binary"
-    end
-
     # Homebrew strips the top-level dir; buildpath already has zig/lib/doc directly.
     src = buildpath
     odie "zig binary not found at #{src}/zig" unless (src/"zig").exist?
 
-    # self-sign preserves ELF structure (see ohos-bst-light.rb).
-    system formula_opt_bin("ohos-bst-light")/"self-sign", (src/"zig").to_s
+    # binary-sign-tool handles this prebuilt static ELF fine (verified on
+    # real hardware: single- and double-sign both produce a working zig) —
+    # the "corrupts static binaries" failure mode is specific to bun and
+    # CGO_ENABLED=0 Go outputs.
+    system "binary-sign-tool", "sign", "-selfSign", "1",
+           "-inFile", (src/"zig").to_s, "-outFile", (src/"zig.signed").to_s
+    mv src/"zig.signed", src/"zig"
+    chmod 0755, src/"zig"
 
     # zig resolves lib/ via self-exe-realpath (no env override in 0.15.x).
     # Install the whole tree together, keeping lib/ as zig's sibling.
