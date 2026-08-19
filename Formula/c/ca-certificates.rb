@@ -11,10 +11,6 @@ class CaCertificates < Formula
     regex(/href=.*?cacert[._-](\d{4}-\d{2}-\d{2})\.pem/i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2916654bf828a59e1fd9862299300b48c1e5e7cb09fef279d4f78aaf066cd006"
-  end
-
   def install
     pkgshare.install "cacert-#{version}.pem" => "cacert.pem"
   end
