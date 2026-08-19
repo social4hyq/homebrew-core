@@ -11,7 +11,7 @@ class Codex < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fbe498cac029c07e2562a81c645785180bfd8d4f543d8464f6aa9ce9667d6d61"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c09d959abec27d672a1d18340f8495f374b99008d24fcd4bcacdeec248e84781"
   end
 
   depends_on "cmake" => :build
