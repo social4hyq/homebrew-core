@@ -6,10 +6,10 @@ class Rustup < Formula
   license any_of: ["Apache-2.0", "MIT"]
   compatibility_version 1
   head "https://github.com/rust-lang/rustup.git", branch: "main"
-  revision 2
+  revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8bda4785ee65d6829f79a275b538db521bf4e55d98355dd8287dc033022c3870"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "901a837e818b7d1ee253820be50cfd264b9ee30f820e38b5025a65daf04df1a6"
   end
 
   keg_only "it conflicts with rust"
@@ -52,7 +52,7 @@ class Rustup < Formula
     #   RUSTUP_OVERRIDE_UNIX_FALLBACK_SETTINGS -> default toolchain = stable
     #   RUSTUP_OHOS_RPATH                      -> rpath dirs for post-processing
     #   RUSTUP_OHOS_SIGN_TOOL                  -> binary-sign-tool from ohos-sdk
-    #   RUSTUP_DIST_SERVER / RUSTUP_UPDATE_ROOT -> Huawei Cloud mirror
+    #   RUSTUP_DIST_SERVER / RUSTUP_UPDATE_ROOT -> Alibaba Cloud mirror
     libexec_bin = libexec/"bin"
     libexec_bin.install bin/"rustup"
 
@@ -65,9 +65,9 @@ class Rustup < Formula
       export RUSTUP_OVERRIDE_UNIX_FALLBACK_SETTINGS="${RUSTUP_OVERRIDE_UNIX_FALLBACK_SETTINGS:-#{pkgetc}/settings.toml}"
       export RUSTUP_OHOS_RPATH="#{rpath}"
       export RUSTUP_OHOS_SIGN_TOOL="#{Formula["ohos-sdk"].opt_bin}/binary-sign-tool"
-      # Use Chinese mirror by default (Huawei Cloud).
-      export RUSTUP_DIST_SERVER="${RUSTUP_DIST_SERVER:-https://mirrors.huaweicloud.com/rustup/}"
-      export RUSTUP_UPDATE_ROOT="${RUSTUP_UPDATE_ROOT:-https://mirrors.huaweicloud.com/rustup/rustup/}"
+      # Use Chinese mirror by default (Alibaba Cloud).
+      export RUSTUP_DIST_SERVER="${RUSTUP_DIST_SERVER:-https://mirrors.aliyun.com/rustup}"
+      export RUSTUP_UPDATE_ROOT="${RUSTUP_UPDATE_ROOT:-https://mirrors.aliyun.com/rustup/rustup}"
       # Preserve argv[0]: bin/cargo, bin/rustc ... symlink to this wrapper, and
       # rustup dispatches as a proxy based on the invoked name.
       exec -a "$0" "#{libexec_bin}/rustup" "$@"
