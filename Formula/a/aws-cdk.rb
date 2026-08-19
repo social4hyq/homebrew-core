@@ -1,13 +1,12 @@
 class AwsCdk < Formula
   desc "AWS Cloud Development Kit - framework for defining AWS infra as code"
   homepage "https://github.com/aws/aws-cdk"
-  url "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.1136.0.tgz"
-  sha256 "4669cb9be1c57c774ae51ccc58e8958901f8479f45c0ab67517a45ea09cdd501"
+  url "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.1137.0.tgz"
+  sha256 "e61006e25ea43491e66b02e8142d9eae96ba399342b9b31c86a884e762f05eb4"
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "34ab636f8010b971853661f6e60d6e3e2fb802a65511f298ce7b76c90736bf3e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ac1cd9f44305a6b28fd51c38016fcbf99dc102f1ebab935bc3eb80798f715fc"
   end
 
   depends_on "node"
