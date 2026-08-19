@@ -7,10 +7,6 @@ class Harfbuzz < Formula
   compatibility_version 1
   head "https://github.com/harfbuzz/harfbuzz.git", branch: "main"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0542963b7f8625e12fd815dd323cbf03e1e63ddd1c7d1fb7b49795b058075636"
-  end
-
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
