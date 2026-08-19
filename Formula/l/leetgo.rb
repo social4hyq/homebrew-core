@@ -7,7 +7,7 @@ class Leetgo < Formula
   head "https://github.com/j178/leetgo.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "97a3c6e31e781f21eb3c753dec7b0e2430a636da8cb7838057f3e0f1bd7bdd41"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "48ea0d02b3bdf3784df5f8ebb679f481774daf12194508c6265712039a4d6fce"
   end
 
   depends_on "go" => :build
