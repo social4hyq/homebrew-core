@@ -35,7 +35,24 @@ fi
 # covers — it fails identically on every attempt — so refresh the index first.
 # Non-fatal: if the refresh itself fails, the baked index may still be good
 # enough, and the install below will say so.
+#
+# `brew update` also "updates" the social4hyq/core tap — which is THIS
+# workspace, bind-mounted into the container, sitting at a detached HEAD on
+# the PR branch tip (actions/checkout). Harmonybrew's tap update rebases that
+# HEAD onto origin/main, leaving local-only ghost commits that were never
+# pushed: the bottle write-back then landed on the ghost (2026-08-17..19,
+# every opencode@2 PR build) and the publish push to the PR branch was
+# rejected as non-fast-forward, then misreported as "force-pushed or
+# polluted" by publish.sh's ancestry guard. Restore the checkout ref so the
+# bottle commit fast-forwards the PR branch instead. Run as root inside the
+# container: brew's rebase left root-owned git state on the bind mount.
+CHECKOUT_SHA=$(git rev-parse HEAD)
 cbrew "update --quiet" || echo "::warning::brew update failed; continuing with the image's baked index"
+if [ "$(git rev-parse HEAD)" != "$CHECKOUT_SHA" ]; then
+  echo "::warning::brew update rewrote the tap HEAD; resetting to checkout $CHECKOUT_SHA"
+  cexec "git -C $TAP_IN_CONTAINER rebase --quit 2>/dev/null || true"
+  cexec "git -C $TAP_IN_CONTAINER reset --hard $CHECKOUT_SHA"
+fi
 
 # atomgit CDN has transient 404s: retry once after 90s; brew reuses partial work
 for i in 1 2; do
