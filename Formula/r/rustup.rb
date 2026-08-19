@@ -6,10 +6,10 @@ class Rustup < Formula
   license any_of: ["Apache-2.0", "MIT"]
   compatibility_version 1
   head "https://github.com/rust-lang/rustup.git", branch: "main"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c415fcb0a34842a54ff715f00790856541b5f35555104744b450772d7d7f273b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8bda4785ee65d6829f79a275b538db521bf4e55d98355dd8287dc033022c3870"
   end
 
   keg_only "it conflicts with rust"
@@ -52,6 +52,7 @@ class Rustup < Formula
     #   RUSTUP_OVERRIDE_UNIX_FALLBACK_SETTINGS -> default toolchain = stable
     #   RUSTUP_OHOS_RPATH                      -> rpath dirs for post-processing
     #   RUSTUP_OHOS_SIGN_TOOL                  -> binary-sign-tool from ohos-sdk
+    #   RUSTUP_DIST_SERVER / RUSTUP_UPDATE_ROOT -> Huawei Cloud mirror
     libexec_bin = libexec/"bin"
     libexec_bin.install bin/"rustup"
 
@@ -64,6 +65,9 @@ class Rustup < Formula
       export RUSTUP_OVERRIDE_UNIX_FALLBACK_SETTINGS="${RUSTUP_OVERRIDE_UNIX_FALLBACK_SETTINGS:-#{pkgetc}/settings.toml}"
       export RUSTUP_OHOS_RPATH="#{rpath}"
       export RUSTUP_OHOS_SIGN_TOOL="#{Formula["ohos-sdk"].opt_bin}/binary-sign-tool"
+      # Use Chinese mirror by default (Huawei Cloud).
+      export RUSTUP_DIST_SERVER="${RUSTUP_DIST_SERVER:-https://mirrors.huaweicloud.com/rustup/}"
+      export RUSTUP_UPDATE_ROOT="${RUSTUP_UPDATE_ROOT:-https://mirrors.huaweicloud.com/rustup/rustup/}"
       # Preserve argv[0]: bin/cargo, bin/rustc ... symlink to this wrapper, and
       # rustup dispatches as a proxy based on the invoked name.
       exec -a "$0" "#{libexec_bin}/rustup" "$@"
@@ -130,8 +134,11 @@ class Rustup < Formula
     # Check that Homebrew only exposes the packaged `rustup` entrypoint.
     refute_path_exists bin/"rustup-init"
 
-    # Check for stale symlinks
-    testpath.install_symlink libexec/"bin/rustup" => "rustup-init"
+    # Check for stale symlinks.
+    # Symlink the wrapper (not the real binary) so the OHOS environment
+    # (host triple, rpath, mirror) is injected; otherwise rustup-init would
+    # detect the GNU host triple and pull the wrong toolchain.
+    testpath.install_symlink bin/"rustup" => "rustup-init"
     system testpath/"rustup-init", "-y"
     bins = bin.glob("*").to_set(&:basename)
     expected = testpath.glob(".cargo/bin/*").to_set(&:basename)
