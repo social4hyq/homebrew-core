@@ -7,7 +7,7 @@ class CcSwitchCli < Formula
   head "https://github.com/SaladDay/cc-switch-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9760de29625c26ee1243d3acdeb15d04367b21bbd0646dc6fb46d73318469248"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dfb6fe1a3ebe0b90d55f215241be19654a094f8be33704ea02adb6d20cbb058"
   end
 
   depends_on "rust" => :build
