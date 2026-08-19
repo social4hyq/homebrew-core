@@ -2,8 +2,8 @@ class Seaweedfs < Formula
   desc "Fast distributed storage system"
   homepage "https://seaweedfs.com"
   url "https://github.com/seaweedfs/seaweedfs.git",
-      tag:      "4.41",
-      revision: "de34a1a87c02893507f961cda9574172ee5064e9"
+      tag:      "4.42",
+      revision: "f04da8e9ad8db7ae06bd2caba1b6560b36e28e31"
   license "Apache-2.0"
   head "https://github.com/seaweedfs/seaweedfs.git", branch: "master"
 
@@ -13,7 +13,7 @@ class Seaweedfs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3ad1f9550a45344f57c460f999c41d904d7086ce48208f9f353db62422b77c7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c28f74c3f36b7fc5ebe1b981cb8ab3ac0adbb5d00deef533f0f1e151626a5d5"
   end
 
   depends_on "go" => :build
