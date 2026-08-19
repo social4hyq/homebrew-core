@@ -11,7 +11,7 @@ name: automerge-autobump
 # names are `bump-<formula>-<version>`, matched by prefix since formula/
 # version can both contain '-').
 #
-# Two triggers, for the same reason upstream's automerge.yml listens on
+# Two event triggers, for the same reason upstream's automerge.yml listens on
 # workflow_run rather than label events (first observed here on PR #42,
 # 2026-07-21): pr-validate applies ci-passed with the ephemeral
 # GITHUB_TOKEN, and events caused by GITHUB_TOKEN never trigger other
@@ -26,6 +26,11 @@ name: automerge-autobump
 # repo-wide already (2026-07-20, after the #29 squash mishap), so this
 # can't accidentally squash even if that setting ever drifts.
 
+# The daily schedule trigger is the safety net: a dropped workflow_run event
+# would otherwise leave a fully-green bump PR unmerged forever. The sweep
+# applies the exact same label/allowlist checks per PR, so it can only ever
+# merge what the event-driven path would have merged.
+
 on:
   pull_request:
     types: [labeled]
@@ -33,6 +38,8 @@ on:
   workflow_run:
     workflows: [pr-validate]
     types: [completed]
+  schedule:
+    - cron: '30 5 * * *' # 13:30 CST daily, ~90min after autobump's 12:00 CST
 
 defaults:
   run:
@@ -58,7 +65,8 @@ jobs:
       github.event_name == 'pull_request' && github.event.label.name == 'ci-passed' ||
       github.event_name == 'workflow_run' &&
         github.event.workflow_run.conclusion == 'success' &&
-        startsWith(github.event.workflow_run.head_branch, 'bump-')
+        startsWith(github.event.workflow_run.head_branch, 'bump-') ||
+      github.event_name == 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -70,6 +78,7 @@ jobs:
           # as above), silently breaking the atomgit mirror invariant.
           # Upstream merges with a PAT for the identical reason.
           GH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
           HEAD_REF: ${{ github.event.pull_request.head.ref || github.event.workflow_run.head_branch }}
           REPO: ${{ github.repository }}
         run: |
@@ -77,21 +86,32 @@ jobs:
           # re-allowlisted, see the note there)
           ALLOWLIST="opencode opencode@2 claude-code"
           BUMP_BRANCH_RE="^bump-($(echo "$ALLOWLIST" | tr ' ' '|'))-"
-          if ! grep -qE "$BUMP_BRANCH_RE" <<< "$HEAD_REF"; then
-            echo "head branch $HEAD_REF not in the autobump allowlist, skipping"
-            exit 0
-          fi
-          PR=$(gh pr list --repo "$REPO" --head "$HEAD_REF" --state open --json number --jq '.[0].number // empty')
-          if [ -z "$PR" ]; then
-            echo "no open PR for $HEAD_REF (already merged or closed), skipping"
-            exit 0
-          fi
-          LABELS=$(gh pr view "$PR" --repo "$REPO" --json labels --jq '[.labels[].name] | join(" ")')
-          for required in ci-passed bump-formula-pr; do
-            if ! grep -qw "$required" <<< "$LABELS"; then
-              echo "PR #$PR missing label '$required' (has: $LABELS), skipping"
-              exit 0
+
+          merge_pr() {
+            local ref="$1" PR LABELS
+            if ! grep -qE "$BUMP_BRANCH_RE" <<< "$ref"; then
+              echo "head branch $ref not in the autobump allowlist, skipping"
+              return 0
             fi
-          done
-          echo "merging PR #$PR ($HEAD_REF)"
-          gh pr merge "$PR" --merge --repo "$REPO"
+            PR=$(gh pr list --repo "$REPO" --head "$ref" --state open --json number --jq '.[0].number // empty')
+            if [ -z "$PR" ]; then
+              echo "no open PR for $ref (already merged or closed), skipping"
+              return 0
+            fi
+            LABELS=$(gh pr view "$PR" --repo "$REPO" --json labels --jq '[.labels[].name] | join(" ")')
+            for required in ci-passed bump-formula-pr; do
+              if ! grep -qw "$required" <<< "$LABELS"; then
+                echo "PR #$PR missing label '$required' (has: $LABELS), skipping"
+                return 0
+              fi
+            done
+            echo "merging PR #$PR ($ref)"
+            gh pr merge "$PR" --merge --repo "$REPO"
+          }
+
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            gh pr list --repo "$REPO" --state open --json headRefName --jq '.[].headRefName' |
+              while read -r ref; do merge_pr "$ref"; done
+          else
+            merge_pr "$HEAD_REF"
+          fi
