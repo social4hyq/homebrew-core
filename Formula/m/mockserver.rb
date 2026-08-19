@@ -1,8 +1,8 @@
 class Mockserver < Formula
   desc "Mock HTTP server and proxy"
   homepage "https://www.mock-server.com/"
-  url "https://search.maven.org/remotecontent?filepath=org/mock-server/mockserver-netty/7.5.0/mockserver-netty-7.5.0-brew-tar.tar"
-  sha256 "28b18cd524ed9623d2830a4c3ef356baffe95454e48c0306129ddcaea8e1940e"
+  url "https://search.maven.org/remotecontent?filepath=org/mock-server/mockserver-netty/7.6.0/mockserver-netty-7.6.0-brew-tar.tar"
+  sha256 "b678a541a384aa0e55296bc498f98067cc73b3e88f72acddf580f6f3ef970cda"
   license "Apache-2.0"
 
   livecheck do
@@ -11,7 +11,7 @@ class Mockserver < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e340e75ff3eabdc778250050cbc2bb828e0d3cc81e25664cfa4c25691baf1f0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "84d5b5d24f9596962f9d4f6b6b20a3dda4bdb6abaae30b970ae40e150f9409d5"
   end
 
   depends_on "openjdk"
