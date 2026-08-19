@@ -1,13 +1,13 @@
 class Rustic < Formula
   desc "Fast, encrypted, and deduplicated backups powered by Rust"
   homepage "https://rustic.cli.rs"
-  url "https://github.com/rustic-rs/rustic/archive/refs/tags/v0.11.3.tar.gz"
-  sha256 "abbafea18ea56f486a68f186bb139b0e8e8d002bb5cd897ed148cf7817a8ed73"
+  url "https://github.com/rustic-rs/rustic/archive/refs/tags/v0.11.4.tar.gz"
+  sha256 "ea1796a66c22e2cd0232ee4d3e18cf95c7eb8608a465481023a6422f4720d2c3"
   license "Apache-2.0"
   head "https://github.com/rustic-rs/rustic.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9324db5a205ec194701429d1b4e28c1eaa06db2ea7a935e7ab4dfca630565a9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb74c53925d4589b71a09382da446c2d742f877f9decd590c8643bfbcbb8ce3e"
   end
 
   depends_on "cmake" => :build
