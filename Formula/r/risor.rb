@@ -12,7 +12,7 @@ class Risor < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abcf49c1446caf051fe955fade67be4475835f81c8c1af7b6091a9f1f01f5e45"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1354d84dd909b34e2c0355798026f9cb0f971a878d974ddc8b572c0e15fe81a4"
   end
 
   depends_on "go" => :build
