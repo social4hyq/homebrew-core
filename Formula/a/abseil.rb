@@ -8,7 +8,7 @@ class Abseil < Formula
   head "https://github.com/abseil/abseil-cpp.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a1ec15d4c66a6ea1eaa482918bdafa624a870d2bade44c788d07c42cb20b46e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba33d5591aef7429164474f5aafe0d5d72d832da2a4f3329fc36e1673a9c16dd"
   end
 
   depends_on "cmake" => [:build, :test]
