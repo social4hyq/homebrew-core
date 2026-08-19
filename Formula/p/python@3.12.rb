@@ -5,6 +5,7 @@ class PythonAT312 < Formula
   sha256 "6c6df908d2c3fd24e6d76869e92542abd0f33aec9dfc18df8875f89660286d43"
   license "Python-2.0"
   compatibility_version 1
+  revision 1
 
   livecheck do
     url "https://www.python.org/downloads/source/"
@@ -12,8 +13,7 @@ class PythonAT312 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8bd2b2b88f93b797175061181a45d21a166745e1259cf739c859acd9b4a02c95"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b5e5586dcfe3720bc90e544454d3a78dfca627946472a18de7f56c67f0282bc"
   end
 
   depends_on "pkgconf" => :build
@@ -133,7 +133,7 @@ class PythonAT312 < Formula
     # include path, we move them to [C|LD]FLAGS_NODIST.
     # Note: Changing CPPFLAGS causes issues with dbm, so we
     # leave it as-is.
-    cflags         = []
+    cflags         = ["-fno-emulated-tls"]
     cflags_nodist  = ["-I#{HOMEBREW_PREFIX}/include"]
     ldflags        = ["-lintl"]
     ldflags_nodist = ["-L#{HOMEBREW_PREFIX}/lib", "-Wl,-rpath,#{HOMEBREW_PREFIX}/lib", "-Wl,-z,global"]
