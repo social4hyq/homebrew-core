@@ -9,7 +9,7 @@ class Rust < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21b135fd7f403d08752a0fcc2bac70ee9a79909ad0e05e7c3ebbdd9afa66525e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a25c3baf041af26304250af07fa3c39ea3d8359b739e20830f6c03958485b4f6"
   end
 
   depends_on "patchelf" => :build
