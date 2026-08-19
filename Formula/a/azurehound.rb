@@ -12,7 +12,7 @@ class Azurehound < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c848f93ef098d3cf698358469988a819b613e9758bbe11ecc36e98e335fa754c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ec9a2b1843f41762e55b5c128e7f0c1167d6ccab0fb9aa9d37f1339d1417edc"
   end
 
   depends_on "go" => :build
