@@ -15,7 +15,7 @@ class DockerCompose < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "17abde8f18ab78bdd6361aa8b612c72a7ca09a9f89ced45f80e4dda83f399ffd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c73bc3c09e1a06ea54a8486df0e2520f4a7a08328bd51caae0728d27f48bc082"
   end
 
   depends_on "go" => :build
