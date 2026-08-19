@@ -1,8 +1,8 @@
 class Arf < Formula
   desc "Modern R console with syntax highlighting and fuzzy search"
   homepage "https://github.com/eitsupi/arf"
-  url "https://github.com/eitsupi/arf/archive/refs/tags/v0.4.5.tar.gz"
-  sha256 "42f06bb7eae572bac427438e9c8bdd181f1666073e14014c61062ec6c92e3802"
+  url "https://github.com/eitsupi/arf/archive/refs/tags/v0.5.0.tar.gz"
+  sha256 "2be1bc8cd096791930d8c3a811b19992a681c2aef76b28276ecb39ac50732b03"
   license "MIT"
 
   bottle do
