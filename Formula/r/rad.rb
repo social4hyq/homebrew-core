@@ -1,13 +1,13 @@
 class Rad < Formula
   desc "Modern CLI scripts made easy"
   homepage "https://amterp.dev/rad/"
-  url "https://github.com/amterp/rad/archive/refs/tags/v0.11.0.tar.gz"
-  sha256 "feb31c9b8bb767c868cd67cedf52fc0fe609e549e835978f5c565d1432fa8167"
+  url "https://github.com/amterp/rad/archive/refs/tags/v0.12.1.tar.gz"
+  sha256 "db6d974c777017724272f34e6b1221746bb850c0859443b9bb9337e1dbcafc1d"
   license "Apache-2.0"
   head "https://github.com/amterp/rad.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f391a89d2376de532a28f5e2f5ffbbbe0562e5eb3a0bb795acc3adfec27a647"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "071750c53c98d513a765696673e981400c81ec2f7b755e4abd190866c5815e30"
   end
 
   depends_on "go" => :build
