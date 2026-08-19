@@ -3,12 +3,12 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "0039a1a4c0186d4cc996fcc1d82643bb0b09de56", branch: "sync-shim-v0.5.0-phase2-fixes"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "73d879c19409d1609c2ecdc8f7b4ff598755d44a", branch: "debug/bake-feature-flag-probe"
   version "1.4.0"
   license "MIT"
-  revision 62
+  revision 63
   # head tracks the same pre-patched fork branch as url.
-  head "https://github.com/social4hyq/ohos-bun.git", branch: "sync-shim-v0.5.0-phase2-fixes"
+  head "https://github.com/social4hyq/ohos-bun.git", branch: "debug/bake-feature-flag-probe"
 
   livecheck do
     url :stable
@@ -321,5 +321,49 @@ class BunProbe < Formula
     store_copies.each do |copy|
       assert_includes File.binread(copy), ".codesign"
     end
+
+    # ── claude-probe: diagnostic-only, not for merge ──
+    # Investigates why `Bun.serve({app: {framework}, routes: {...}})` silently
+    # drops the framework's own file-system router + internal /_bun/hmr WS
+    # route while the explicit `routes` entries still respond — confirmed by
+    # hand on-device (curl gets a clean fast 404 on both `/` and `/_bun/hmr`,
+    # while an explicit sibling route returns 200). Working theory: the
+    # release-channel build gates `app` behind FeatureFlags::bake()
+    # (IS_CANARY || IS_DEBUG || BUN_FEATURE_FLAG_EXPERIMENTAL_BAKE), and on
+    # this OHOS build the flag itself doesn't override it even when set —
+    # confirmed via `bun build --app` still printing the "upgrade to canary"
+    # error with the env var set. These probes (gated behind CLAUDE_PROBE_BAKE
+    # so they're inert without it) trace exactly where in that chain things
+    # diverge.
+    puts "=== CLAUDE PROBE 1: bun build --app, no flag ==="
+    (testpath/"probe1/src").mkpath
+    (testpath/"probe1/src/index.tsx").write "export default { app: { framework: \"react\" } };"
+    puts shell_output(
+      "cd #{testpath}/probe1 && CLAUDE_PROBE_BAKE=1 " \
+      "#{bin}/bun build --app ./src/index.tsx --outdir ./dist 2>&1; true",
+    )
+
+    puts "=== CLAUDE PROBE 2: bun build --app, BUN_FEATURE_FLAG_EXPERIMENTAL_BAKE=1 ==="
+    puts shell_output(
+      "cd #{testpath}/probe1 && CLAUDE_PROBE_BAKE=1 BUN_FEATURE_FLAG_EXPERIMENTAL_BAKE=1 " \
+      "#{bin}/bun build --app ./src/index.tsx --outdir ./dist 2>&1; true",
+    )
+
+    puts "=== CLAUDE PROBE 3: Bun.serve({app, routes}), flag on, traces DevServer chain ==="
+    (testpath/"probe2").mkpath
+    (testpath/"probe2/server.ts").write <<~JS
+      const server = Bun.serve({
+        app: { framework: "react" },
+        routes: { "/_ping": () => new Response("pong") },
+        port: 0,
+        development: true,
+      });
+      console.log("PROBE_SERVER_STARTED port=" + server.port);
+      process.exit(0);
+    JS
+    puts shell_output(
+      "cd #{testpath}/probe2 && CLAUDE_PROBE_BAKE=1 BUN_FEATURE_FLAG_EXPERIMENTAL_BAKE=1 " \
+      "#{bin}/bun run ./server.ts 2>&1; true",
+    )
   end
 end
