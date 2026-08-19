@@ -1,13 +1,13 @@
 class Mox < Formula
   desc "Modern full-featured open source secure mail server"
   homepage "https://www.xmox.nl"
-  url "https://github.com/mjl-/mox/archive/refs/tags/v0.0.15.tar.gz"
-  sha256 "21d56acb240458af5dfe31f91010f0e1bf5988d55d9c15d8c078440d7ce4b66a"
+  url "https://github.com/mjl-/mox/archive/refs/tags/v0.0.16.tar.gz"
+  sha256 "a75fab03842debd6f3b8820acf58e767f4b193b24393dd4ef4ad05c29f82ecef"
   license "MIT"
   head "https://github.com/mjl-/mox.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "305f1a7a16580f16b643a2a1de2953e29d8daead717a975fa21409c8630e2a0e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "942f67b4bdb0a7bb2f4d94b64454d9deba29486cba272b929e206e85ed2fde8d"
   end
 
   depends_on "go" => :build
