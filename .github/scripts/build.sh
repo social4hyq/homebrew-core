@@ -20,9 +20,11 @@ source "$(dirname "$0")/lib.sh"
 # matters is the final ELF's shape, not how it got built. A CGO_ENABLED=0 Go
 # build (or any other toolchain emitting a static ELF with no PT_INTERP/
 # PT_DYNAMIC segment) hits the same corruption.
-# zig@0.15 is another prebuilt static ELF (ziglang.org's aarch64-linux
-# release tarball, same shape as qemu-aarch64) — same corruption risk.
-UNSET_SIGN_FORMULAS="claude-code qemu-aarch64 zig@0.15"
+# zig@0.15 used to be on this list as a prebuilt static ELF, but
+# binary-sign-tool signing it (single or double) was verified harmless on
+# real hardware — the corruption mode is specific to bun and CGO_ENABLED=0
+# Go outputs.
+UNSET_SIGN_FORMULAS="claude-code qemu-aarch64"
 ENV_PREFIX=""
 if tr ' ' '\n' <<< "$UNSET_SIGN_FORMULAS" | grep -qx "$FORMULA"; then
   ENV_PREFIX="env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN "
