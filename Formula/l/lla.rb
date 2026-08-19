@@ -1,12 +1,12 @@
 class Lla < Formula
   desc "High-performance, extensible alternative to ls"
   homepage "https://github.com/chaqchase/lla"
-  url "https://github.com/chaqchase/lla/archive/refs/tags/v0.5.12.tar.gz"
-  sha256 "ea56bb27c2710da1fa0a771e8df05b52bbc3081cd5f7102ac19b4c313f7b0f8a"
+  url "https://github.com/chaqchase/lla/archive/refs/tags/v0.6.2.tar.gz"
+  sha256 "241b89106fe2c659f17aec7abe358d173f631a1963ba517f759bc7219aac0426"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dd71aed1abfeaf2f14caa4670cd789d58e085b1907a542dd60a7bc9333d6419"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d935f1331511a1da9ca283d2922bdcfb20b57b133ae1329ec1603d35b30fc34"
   end
 
   depends_on "protobuf" => :build
