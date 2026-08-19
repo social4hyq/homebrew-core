@@ -1,8 +1,8 @@
 class GhOst < Formula
   desc "Triggerless online schema migration solution for MySQL"
   homepage "https://github.com/github/gh-ost"
-  url "https://github.com/github/gh-ost/archive/refs/tags/v1.1.10.tar.gz"
-  sha256 "70222d979e6d442befbbc11cdb16d420bc84ae7be277d79648c420e4458251c4"
+  url "https://github.com/github/gh-ost/archive/refs/tags/v1.1.11.tar.gz"
+  sha256 "f1cf96257d3f29922a8bd5a906fd742d852cbfb43a0a607e778a9b135cf3133c"
   license "MIT"
   head "https://github.com/github/gh-ost.git", branch: "master"
 
@@ -12,7 +12,7 @@ class GhOst < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4dd5b2c15deb65a16dd333a876c2f0d1ef354cbd49117de340f6fff63d962ba2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5517c57262e1d753d50e2fec21863f89b2d7472ed5745a12b37eee1274a17839"
   end
 
   depends_on "go" => :build
