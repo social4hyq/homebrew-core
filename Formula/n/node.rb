@@ -5,6 +5,7 @@ class Node < Formula
   sha256 "e6b182cbeeab032d1082ca4ac4fe15e3a57de691d3bde78ecf8a761fd56ee356"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
+  revision 1
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -12,7 +13,7 @@ class Node < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c876afa1f7b9c259dbe8caab35cd8207de09e706fb03ba0b374bd2ce85af8094"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "81fcd28a6f5ee6979b7cd6b06a4e6abfd3b45f0af2f34e0e1657c9f0ff9274fe"
   end
 
   resource "alpine-rootfs" do
@@ -59,7 +60,8 @@ class Node < Formula
       ./configure \
         --prefix=#{prefix} \
         --dest-os=openharmony \
-        --partly-static
+        --partly-static \
+        --openssl-no-asm
 
       make -j$(nproc)
       mkdir -p /dest
