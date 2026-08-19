@@ -5,6 +5,7 @@ class Node < Formula
   sha256 "e6b182cbeeab032d1082ca4ac4fe15e3a57de691d3bde78ecf8a761fd56ee356"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
+  revision 1
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -59,7 +60,8 @@ class Node < Formula
       ./configure \
         --prefix=#{prefix} \
         --dest-os=openharmony \
-        --partly-static
+        --partly-static \
+        --openssl-no-asm
 
       make -j$(nproc)
       mkdir -p /dest
