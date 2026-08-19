@@ -1,8 +1,8 @@
 class Tmux < Formula
   desc "Terminal multiplexer"
   homepage "https://tmux.github.io/"
-  url "https://github.com/tmux/tmux/releases/download/3.7b/tmux-3.7b.tar.gz"
-  sha256 "87f2e99e3b685973f2ca002ffd6ed7e51a5744f7009daae5a15670b6d532db96"
+  url "https://github.com/tmux/tmux/releases/download/3.7c/tmux-3.7c.tar.gz"
+  sha256 "7c60cae9a0e25288e2e24750aafc9e8800fc7fd4555e447e1b29ee4201cfb3bf"
   license "ISC"
   compatibility_version 1
 
@@ -13,7 +13,7 @@ class Tmux < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ce2130ea0689d8fa97001a3b7ecf0e5f54affe03c8b2b3efc2a94b35b8ff002"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f1a9b79ca9aa20b2c8c344d5d2084e7071045df32b275bd973268658eecbc94"
   end
 
   head do
