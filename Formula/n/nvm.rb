@@ -1,13 +1,13 @@
 class Nvm < Formula
   desc "Manage multiple Node.js versions"
   homepage "https://github.com/nvm-sh/nvm"
-  url "https://github.com/nvm-sh/nvm/archive/refs/tags/v0.40.6.tar.gz"
-  sha256 "17302cad7feedb1ad33ba738f93d2176a90970724f22de119603624fcbdec1a2"
+  url "https://github.com/nvm-sh/nvm/archive/refs/tags/v0.40.7.tar.gz"
+  sha256 "d2fb84dba9914b02cd69b97df35dfca8695b8f22df6128667034d85b69b52d57"
   license "MIT"
   head "https://github.com/nvm-sh/nvm.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e224a724bd4c76ea2b3f39ee7492c346a0e292751dbd40bb1b56747081975a2c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf3ad819fad37fd759f0adfc294ebce05be5ad5b3c97f7a3b05d03362280d444"
   end
 
   def install
