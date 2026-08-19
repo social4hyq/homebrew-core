@@ -12,10 +12,6 @@ class Node < Formula
     regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "81fcd28a6f5ee6979b7cd6b06a4e6abfd3b45f0af2f34e0e1657c9f0ff9274fe"
-  end
-
   resource "alpine-rootfs" do
     url "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/aarch64/alpine-minirootfs-3.23.4-aarch64.tar.gz"
     sha256 "9250667a8affac8f1e98086392f80f43f086626701e9bce33398eb9b6c0bd64c"
