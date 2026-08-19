@@ -6,7 +6,7 @@ class Scalingo < Formula
   license "BSD-4-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "be768dc10465f108876e4ad0724c4f6c3cffdf1471e95acbada8a216a99bb034"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef1b1d995b72de46f3f5767ae1fa89f286ece89f221fa027713c09f1056e1285"
   end
 
   depends_on "go" => :build
