@@ -13,7 +13,7 @@ class Kubeseal < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1b42314dd3e5dd409f183d1323eb0bcd1aabcfc1c1ecdc843c45a627c057ffd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc9c066a0ad0a0c1d7b2f063d2427464fe94a3a2365279ea76cbd8df8cedf5f7"
   end
 
   depends_on "go" => :build
