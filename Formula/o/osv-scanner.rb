@@ -1,13 +1,13 @@
 class OsvScanner < Formula
   desc "Vulnerability scanner which uses the OSV database"
   homepage "https://github.com/google/osv-scanner"
-  url "https://github.com/google/osv-scanner/archive/refs/tags/v2.5.0.tar.gz"
-  sha256 "466d25bf7ab38a9f12d3d15ab0b94432c45849ac91580caa8475bb2ae41faa93"
+  url "https://github.com/google/osv-scanner/archive/refs/tags/v2.5.1.tar.gz"
+  sha256 "9a81d802aa0c0f667f8a80a045d4bab058fb9d9a6fb21f5cf2f1ea2007f73eef"
   license "Apache-2.0"
   head "https://github.com/google/osv-scanner.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "35e362b7301fcfcd69c4c7a4687477751431f8198a8436f5f192999010c48509"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1f3cd951ccfa3c1fc9625a85b2ca01c099d769b450586fe0bf8e9f802a14498"
   end
 
   depends_on "go" => [:build, :test]
