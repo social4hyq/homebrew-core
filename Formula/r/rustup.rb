@@ -6,6 +6,7 @@ class Rustup < Formula
   license any_of: ["Apache-2.0", "MIT"]
   compatibility_version 1
   head "https://github.com/rust-lang/rustup.git", branch: "main"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "92473c57a17a85bf534b9ebe394d8e9eb58e66dea48f8877075ff5c934b20146"
@@ -54,6 +55,8 @@ class Rustup < Formula
     libexec_bin = libexec/"bin"
     libexec_bin.install bin/"rustup"
 
+    rpath = [Formula["openssl@3"].opt_lib, Formula["zlib-ng-compat"].opt_lib].join(":")
+
     (bin/"rustup").write <<~EOS
       #!/bin/sh
       export RUSTUP_OVERRIDE_HOST_TRIPLE="${RUSTUP_OVERRIDE_HOST_TRIPLE:-aarch64-unknown-linux-ohos}"
@@ -77,10 +80,10 @@ class Rustup < Formula
     TOML
     pkgetc.install "settings.toml"
 
-    generate_completions_from_executable(libexec_bin/"rustup", "completions", shells: [:bash, :zsh, :fish, :pwsh])
+    generate_completions_from_executable(libexec/"bin/rustup", "completions", shells: [:bash, :zsh, :fish, :pwsh])
     [:bash, :zsh].each do |shell|
       generate_completions_from_executable(
-        libexec_bin/"rustup", "completions", shell.to_s, "cargo",
+        libexec/"bin/rustup", "completions", shell.to_s, "cargo",
         shells: [shell], base_name: "cargo", shell_parameter_format: :none
       )
     end
