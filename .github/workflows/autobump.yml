@@ -1,6 +1,6 @@
 name: autobump
 
-# Weekly: open a bump-formula-pr for each allowlisted formula whose upstream
+# Daily: open a bump-formula-pr for each allowlisted formula whose upstream
 # livecheck version is newer than what's packaged. Feeds the same pipeline
 # as human-authored PRs — pr-validate.yml gates it with ci-passed, a human
 # merges, publish-on-merge.yml publishes.
@@ -29,7 +29,7 @@ name: autobump
 
 on:
   schedule:
-    - cron: '0 4 * * 1'
+    - cron: '0 4 * * *' # 12:00 CST daily
   workflow_dispatch:
     inputs:
       formula:
