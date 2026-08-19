@@ -5,6 +5,7 @@ class NodeAT24 < Formula
   sha256 "f6d95e10a0431ee1067fc6aabe9f762908b4716dd35324e1ddb4b1466b76659f"
   license "MIT"
   compatibility_version 1
+  revision 1
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -65,7 +66,8 @@ class NodeAT24 < Formula
       ./configure \
         --prefix=#{prefix} \
         --dest-os=openharmony \
-        --partly-static
+        --partly-static \
+        --openssl-no-asm
 
       make -j$(nproc)
       mkdir -p /dest
