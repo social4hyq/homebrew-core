@@ -7,7 +7,7 @@ class AwsCEventStream < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c88e9c6e3dd9a3cfb3adbeae38c1de4a7ef6b603ccdaa498bd072ba5b498b20"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "74a1e4d1e82b37ccbb65e0537aa7ad13c25464aa5bddfb36c441ba0037747170"
   end
 
   depends_on "cmake" => :build
