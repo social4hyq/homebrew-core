@@ -7,6 +7,7 @@ class Go < Formula
   license "BSD-3-Clause"
   compatibility_version 4
   head "https://go.googlesource.com/go.git", branch: "master"
+  revision 1
 
   livecheck do
     url "https://go.dev/dl/?mode=json"
@@ -27,8 +28,8 @@ class Go < Formula
 
   depends_on macos: :monterey
 
-  # HarmonyOS: ohos-sdk provides binary-sign-tool for auto-signing ELF binaries.
   depends_on "ohos-sdk"
+  depends_on "llvm-gcc-compat"
 
   # Don't update this unless this version cannot bootstrap the new version.
   resource "gobootstrap" do
