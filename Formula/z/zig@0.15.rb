@@ -15,8 +15,8 @@ class ZigAT015 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zig@0.15-v0.15.2-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce9160617a30410f6b276ecbe501b4f99d78f420abe21246a91f86e43d54574b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zig@0.15-v0.15.2-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca2e910c27b30cbbce239cedc18cb7437b2869a77965c9d83f95376e5a68e4d3"
   end
 
   def install
