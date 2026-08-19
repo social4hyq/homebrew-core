@@ -1,8 +1,8 @@
 class Risor < Formula
   desc "Fast and flexible scripting for Go developers and DevOps"
   homepage "https://risor.io/"
-  url "https://github.com/deepnoodle-ai/risor/archive/refs/tags/v2.1.0.tar.gz"
-  sha256 "68aea48e715636482a24b1f5aa6505152c89f339374a4e8225cd1d83edc14ec7"
+  url "https://github.com/deepnoodle-ai/risor/archive/refs/tags/v2.2.0.tar.gz"
+  sha256 "9b6cbb53b629ec9cf7d0c6090c7f7df498f86ed86b8861403b00b1e57dd80ebc"
   license "Apache-2.0"
   head "https://github.com/deepnoodle-ai/risor.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Risor < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abcf49c1446caf051fe955fade67be4475835f81c8c1af7b6091a9f1f01f5e45"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1354d84dd909b34e2c0355798026f9cb0f971a878d974ddc8b572c0e15fe81a4"
   end
 
   depends_on "go" => :build
