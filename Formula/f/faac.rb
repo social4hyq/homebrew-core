@@ -8,7 +8,7 @@ class Faac < Formula
   head "https://github.com/knik0/faac.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a9caff1e62386e6daf4217f2c978ff5b57cb8eb7013019cc8aa19556ae1a39e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f12ceb5ad18eee434d92bbf2a797f30b6b50a4769b85aff49d95de856b8ce618"
   end
 
   depends_on "meson" => :build
