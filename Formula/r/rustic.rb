@@ -7,7 +7,7 @@ class Rustic < Formula
   head "https://github.com/rustic-rs/rustic.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9324db5a205ec194701429d1b4e28c1eaa06db2ea7a935e7ab4dfca630565a9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb74c53925d4589b71a09382da446c2d742f877f9decd590c8643bfbcbb8ce3e"
   end
 
   depends_on "cmake" => :build
