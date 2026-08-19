@@ -12,7 +12,7 @@ class GhOst < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4dd5b2c15deb65a16dd333a876c2f0d1ef354cbd49117de340f6fff63d962ba2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5517c57262e1d753d50e2fec21863f89b2d7472ed5745a12b37eee1274a17839"
   end
 
   depends_on "go" => :build
