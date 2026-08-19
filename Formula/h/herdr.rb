@@ -17,7 +17,6 @@ class Herdr < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "03d06df1abe0d7c8751c374fd364eae4ecff374c8f0e418cc77f00ad2aecafeb"
   end
 
-  depends_on "ohos-bst-light" => :build # self-sign, see the zig-build note below
   depends_on "rust" => :build
   depends_on "zig@0.15" => :build
   depends_on "ohos-compat-shim"
@@ -51,9 +50,8 @@ class Herdr < Formula
 
     # zig's own linker (not this tap's patched LLD) produces intermediate ELFs during `zig build`
     # that it execs directly — these lack codesign sections, so OHOS refuses to exec them.
-    # self-sign each as AccessDenied errors surface; zig's cache (keyed by source hash) tolerates it.
-    # Cold build converges after ~6 self-sign retries. Doesn't affect the final herdr binary.
-    self_sign = formula_opt_bin("ohos-bst-light")/"self-sign"
+    # binary-sign-tool each as AccessDenied errors surface; zig's cache (keyed by source hash)
+    # tolerates it. Cold build converges after ~6 sign retries. Doesn't affect the final binary.
     zig_cache_glob = (buildpath/"vendor/libghostty-vt/.zig-cache/o/*").to_s
 
     max_attempts = 20
@@ -78,7 +76,11 @@ class Herdr < Formula
           Dir.glob("#{zig_cache_glob}/#{basename}").each do |candidate|
             next unless File.file?(candidate)
 
-            system self_sign, candidate
+            next unless system "binary-sign-tool", "sign", "-selfSign", "1",
+                               "-inFile", candidate, "-outFile", "#{candidate}.signed"
+
+            mv "#{candidate}.signed", candidate
+            chmod 0755, candidate
             signed_any = true
           end
         end
