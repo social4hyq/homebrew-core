@@ -3,10 +3,10 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "429b9f03916bbaa5b3bc9c30b961196738ffbd2b", branch: "debug/bake-feature-flag-probe"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "5b23fc58e721c6a392cb8d287d497ddcf39a7969", branch: "debug/bake-feature-flag-probe"
   version "1.4.0"
   license "MIT"
-  revision 64
+  revision 65
   # head tracks the same pre-patched fork branch as url.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "debug/bake-feature-flag-probe"
 
