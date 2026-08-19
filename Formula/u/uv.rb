@@ -4,7 +4,7 @@ class Uv < Formula
   url "https://github.com/astral-sh/uv/archive/refs/tags/0.12.3.tar.gz"
   sha256 "7d95d35a941135b96cc344c63b8da427d456900f58621481b909eac00904db7f"
   license any_of: ["Apache-2.0", "MIT"]
-  revision 2
+  revision 3
   head "https://github.com/astral-sh/uv.git", branch: "main"
 
   livecheck do
@@ -21,17 +21,12 @@ class Uv < Formula
   depends_on "ohos-sdk" => :build
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
-  # uv python install fetches unsigned ELFs that won't run under the app
-  # sandbox (see caveats), so a brew-installed Python is the realistic way
-  # to use uv here -- not just a build-time or test-only dependency.
   depends_on "python@3.14"
 
-  # Both patches work around the same root cause: sandboxed processes can't
-  # execve() the dynamic linker to parse its "Version X.Y" banner, which is
-  # how upstream detects musl. 0001 fixes uv's own musl-version probe used
-  # for wheel-tag resolution (mirrors the same fix Harmonybrew's python@3.14
-  # already ships in pip's vendored copy of this file); 0002 fixes the
-  # equivalent Rust-side probe used for interpreter discovery.
+  # The sandbox cannot execve() the dynamic linker to probe for musl: 0001
+  # fixes the wheel-tag probe, 0002 the interpreter-discovery probe. 0003
+  # self-signs wheel-unpacked .so files (the kernel refuses to dlopen
+  # unsigned ELFs).
   patch do
     file "Patches/uv/0001-ohos-musllinux-skip-ld-exec.patch"
   end
@@ -43,12 +38,11 @@ class Uv < Formula
   end
 
   def install
-    # aws-lc-sys (via rustls/reqwest) needs its CMake+ohos.toolchain.cmake
-    # path on this target; keg root, build.rs appends native/ itself.
+    # aws-lc-sys only finds its CMake toolchain path on this target; must be
+    # the keg root, build.rs appends native/.
     ENV["OHOS_NDK_HOME"] = formula_opt_prefix("ohos-sdk")
 
-    # --no-default-features: drops jemalloc, unbuildable on this target and
-    # not needed.
+    # jemalloc is unbuildable on this target.
     system "cargo", "install", "--no-default-features", *std_cargo_args(path: "crates/uv")
 
     generate_completions_from_executable(bin/"uv", "generate-shell-completion")
