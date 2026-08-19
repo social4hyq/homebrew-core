@@ -1,8 +1,8 @@
 class Azurehound < Formula
   desc "Azure Data Exporter for BloodHound"
   homepage "https://github.com/SpecterOps/AzureHound"
-  url "https://github.com/SpecterOps/AzureHound/archive/refs/tags/v3.0.0.tar.gz"
-  sha256 "8f764670edb7c3bb79af0d82a2c329d0ebb689285b10725c357e0eea66e3bebf"
+  url "https://github.com/SpecterOps/AzureHound/archive/refs/tags/v3.1.0.tar.gz"
+  sha256 "d750284f75070218bcaceb604916f08f77b06191ce1372d7d3f54dc70e01df1c"
   license "GPL-3.0-or-later"
   head "https://github.com/SpecterOps/AzureHound.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Azurehound < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c848f93ef098d3cf698358469988a819b613e9758bbe11ecc36e98e335fa754c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ec9a2b1843f41762e55b5c128e7f0c1167d6ccab0fb9aa9d37f1339d1417edc"
   end
 
   depends_on "go" => :build
