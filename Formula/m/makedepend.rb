@@ -11,7 +11,7 @@ class Makedepend < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ffe33e664a9e6bab7f03bad86775ffe9beaa5604e1f6edc50bc917630c2598b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d011a7677f34bfa2b55d4d1721fdfb82d4c72c0ae295d8b7e4c0b44b1104751"
   end
 
   depends_on "pkgconf" => :build
