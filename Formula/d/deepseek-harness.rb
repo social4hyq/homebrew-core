@@ -4,7 +4,7 @@ class DeepseekHarness < Formula
   url "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.1.0-rc.6.tgz"
   sha256 "1b8a9a0ad3c7feaece47926e0bd37ca151c7ccfa997953afa5fd01261784eadc"
   license "MIT"
-  revision 1
+  revision 2
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "fb3cac83bdd0b9244adcc511843d7ee3f23d356b7cd3774bdbd3cfacca74e033"
@@ -23,16 +23,23 @@ class DeepseekHarness < Formula
       system "npm", "rebuild", "koffi", "node-pty"
     end
 
+    # Patches target the scoped sub-packages that `npm install` materialises under
+    # node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai. They cannot use the
+    # declarative `patch do; file; end` form: that runs against the freshly-unpacked
+    # source tree, before `npm install` creates these sub-package directories.
     patch_dir = File.expand_path("../../Patches/deepseek-harness", __dir__)
-    Dir[File.join(patch_dir, "*.patch")].each do |patch_file|
-      system "patch", "-p1", "-d",
-             libexec/"lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai",
-             "-i", patch_file
+    dsh_modules = libexec/"lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai"
+    Dir[File.join(patch_dir, "*.patch")].sort.each do |patch_file|
+      system "patch", "-p1", "-d", dsh_modules, "-i", patch_file
     end
 
     (bin/"dsh").write <<~EOS
       #!/bin/sh
-      exec "#{formula_opt_bin("node")/"node"}" --expose-internals --tls-min-v1.2 --tls-max-v1.2 "#{libexec/"lib/node_modules/@deepseek-ai/dsh/lib/bin.js"}" "$@"
+      export OPENSSL_armcap=0
+      exec "#{formula_opt_bin("node")/"node"}" \\
+        --expose-internals \\
+        "#{libexec/"lib/node_modules/@deepseek-ai/dsh/lib/bin.js"}" \\
+        "$@"
     EOS
     (bin/"dsh").chmod 0755
   end
