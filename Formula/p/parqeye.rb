@@ -7,7 +7,7 @@ class Parqeye < Formula
   head "https://github.com/kaushiksrini/parqeye.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9bfc15508b5e0e9f5753281ff8b4423b8843a9338b269d0fb026518a67b59bd5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec39931044e4425adde49fec0decfc8f1b7a53f76705ed07093d97e39ccdb1b3"
   end
 
   depends_on "rust" => :build
