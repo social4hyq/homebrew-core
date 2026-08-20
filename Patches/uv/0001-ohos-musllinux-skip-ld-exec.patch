@@ -1,0 +1,16 @@
+--- a/crates/uv-python/python/packaging/_musllinux.py	2026-08-12 12:06:25.636000000 +0000
++++ b/crates/uv-python/python/packaging/_musllinux.py	2026-08-12 12:06:35.844000000 +0000
+@@ -47,8 +47,11 @@
+         return None
+     if ld is None or "musl" not in ld:
+         return None
+-    proc = subprocess.run([ld], stderr=subprocess.PIPE, text=True)
+-    return _parse_musl_version(proc.stderr)
++    # OHOS: sandboxed processes cannot execve() the dynamic linker directly,
++    # so we cannot parse a live "Version X.Y" banner like upstream does here.
++    # Mirrors the same hardcoded-(1, 2) fallback Harmonybrew's python@3.14
++    # already ships in pip's vendored copy of this exact file.
++    return _MuslVersion(major=1, minor=2)
+ 
+ 
+ def platform_tags(archs: Sequence[str]) -> Iterator[str]:
