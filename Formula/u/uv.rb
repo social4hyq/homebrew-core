@@ -13,7 +13,7 @@ class Uv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ede2322e8214e8a66af5710af07e073b7c194f4de236fb4ae4d372925903da3c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b0761fef13cad1cd33c2e89c5fe23ce3f5f7b14574fce94b531080394f1f783"
   end
 
   depends_on "cmake" => :build
