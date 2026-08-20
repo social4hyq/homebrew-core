@@ -5,7 +5,7 @@ class Node < Formula
   sha256 "e6b182cbeeab032d1082ca4ac4fe15e3a57de691d3bde78ecf8a761fd56ee356"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
-  revision 3
+  revision 4
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -13,12 +13,16 @@ class Node < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fe8f903833e91594ea91dfba3718fc4f364a093a7d90addbb0cd864fb2a07ca8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "510770512f58886834b754bc7dd5874ec180c04ce6c7a1bd88466c31b21808ee"
   end
 
   resource "alpine-rootfs" do
     url "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/aarch64/alpine-minirootfs-3.23.4-aarch64.tar.gz"
     sha256 "9250667a8affac8f1e98086392f80f43f086626701e9bce33398eb9b6c0bd64c"
+  end
+
+  patch do
+    file "Patches/node/0001-openssl-armcap-disable-sve2.patch"
   end
 
   def install
@@ -60,8 +64,7 @@ class Node < Formula
       ./configure \
         --prefix=#{prefix} \
         --dest-os=openharmony \
-        --partly-static \
-        --openssl-no-asm
+        --partly-static
 
       make -j$(nproc)
       mkdir -p /dest
