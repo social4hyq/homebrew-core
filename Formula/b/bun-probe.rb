@@ -3,10 +3,10 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "7a8152576274405838ef3ebdb55fa90d433dc16d", branch: "debug/terminal-real-device-race"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "5ac432a423e4832178e9c52cac8fddde12158da5", branch: "debug/terminal-real-device-race"
   version "1.4.0"
   license "MIT"
-  revision 70
+  revision 71
   # head tracks the same pre-patched fork branch as url.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "debug/terminal-real-device-race"
 
@@ -323,23 +323,25 @@ class BunProbe < Formula
     end
 
     # ── claude-probe: diagnostic-only, not for merge ──
-    # This build carries CLAUDE_DEBUG_TERM-gated eprintln! instrumentation in
-    # Terminal.rs/PipeReader.rs (see the branch's commit message). The actual
-    # bug it's chasing (flaky data delivery for Bun.Terminal+Bun.spawn,
-    # test/regression/issue/26286.test.ts and a cluster of terminal.test.ts
-    # subprocess-attached-Terminal cases) does NOT reproduce in this CI
-    # container -- it's real-device-only. This probe just confirms the
-    # instrumented build compiles and the instrumentation doesn't crash/
-    # break anything when exercised; the actual debugging run happens on
-    # real hardware against the bottle this CI run produces (upload=false
-    # still writes a downloadable bottle-out artifact).
+    # This build adds a CLAUDE_REARM_WATCHDOG-gated experiment on top of the
+    # CLAUDE_DEBUG_TERM instrumentation: a second thread periodically
+    # re-issues a redundant epoll_ctl(CTL_MOD) on the last Readable
+    # registration, to test whether that unsticks the real-device-only
+    # kernel-epoll-starvation race (26286.test.ts and a cluster of
+    # terminal.test.ts subprocess-attached-Terminal cases). Does NOT
+    # reproduce in this CI container -- this probe only confirms the build
+    # compiles and the watchdog thread doesn't crash/break anything when
+    # exercised; the actual test happens on real hardware against the
+    # bottle this CI run produces (upload=false still writes a downloadable
+    # bottle-out artifact).
     src = testpath/"ohos-bun-src"
     system "git", "clone", "--depth", "1", "--branch", "debug/terminal-real-device-race",
            "https://github.com/social4hyq/ohos-bun.git", src.to_s
 
-    puts "=== CLAUDE PROBE: 26286.test.ts with CLAUDE_DEBUG_TERM=1 (in-container baseline trace) ==="
+    puts "=== CLAUDE PROBE: 26286.test.ts with CLAUDE_DEBUG_TERM=1 CLAUDE_REARM_WATCHDOG=1 (in-container baseline trace) ==="
     puts shell_output(
-      "cd #{src} && CI=1 CLAUDE_DEBUG_TERM=1 #{bin}/bun test test/regression/issue/26286.test.ts 2>&1; true",
+      "cd #{src} && CI=1 CLAUDE_DEBUG_TERM=1 CLAUDE_REARM_WATCHDOG=1 " \
+      "#{bin}/bun test test/regression/issue/26286.test.ts 2>&1; true",
     )
   end
 end
