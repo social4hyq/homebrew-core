@@ -6,7 +6,7 @@ class OpensslAT3 < Formula
   sha256 "243a86649cf6f23eeb6a2ff2456e09e5d77dd9018a54d3d96b0c6bdd6ba6c7f1"
   license "Apache-2.0"
   compatibility_version 1
-  revision 2
+  revision 3
 
   livecheck do
     url "https://openssl-library.org/source/"
@@ -14,7 +14,7 @@ class OpensslAT3 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "292db2ab89a0db58f313d8f8364b6b5f8e24877c49f6fce0b1beaa6e66b6af96"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8bf24b1a96b939661114ca94f275bdc7874e91be0e62a7044f7476bef1b8e21"
   end
 
   depends_on "ca-certificates"
@@ -43,11 +43,6 @@ class OpensslAT3 < Formula
   link_overwrite "lib/libcrypto*", "lib/libssl*"
   link_overwrite "lib/pkgconfig/libcrypto.pc", "lib/pkgconfig/libssl.pc", "lib/pkgconfig/openssl.pc"
   link_overwrite "share/doc/openssl/*", "share/man/man*/*ssl"
-
-  # Disable SVE2 on heterogeneous cores (some lack it).
-  patch do
-    file "Patches/openssl@3/0001-armcap-disable-sve2.patch"
-  end
 
   # SSLv2 died with 1.1.0, so no-ssl2 no longer required.
   # SSLv3 & zlib are off by default with 1.1.0 but this may not
