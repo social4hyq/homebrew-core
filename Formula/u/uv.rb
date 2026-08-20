@@ -5,7 +5,7 @@ class Uv < Formula
   sha256 "e349c9eb85876921895330f6fee5f01f109d5ec06dcd3b475fb7b4b8de75eac6"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/astral-sh/uv.git", branch: "main"
-  revision 5
+  revision 6
 
   livecheck do
     url :stable
@@ -13,7 +13,7 @@ class Uv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5b1012d0b22e43c7db3daf01768e6e338fb09b84f4833572dc734d0c11ae202c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce39dc6ea372c50893bdd0f3926bdd9522863c445c17a8cc64e0acf68ce6882a"
   end
 
   depends_on "cmake" => :build
@@ -74,8 +74,7 @@ class Uv < Formula
 
       The pip bundled inside uv-downloaded interpreters is disabled
       (`python -m pip` fails loudly): pip-installed wheels would bypass uv's
-      auto-signing and fail to dlopen on OHOS. Use `uv add` (preferred) or
-      `uv pip install` instead.
+      auto-signing. Use `uv add` (preferred) or `uv pip install` instead.
     EOS
   end
 
