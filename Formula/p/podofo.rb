@@ -23,7 +23,7 @@ class Podofo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d81344343278367171c1ba533794a1fa2b16e5a692270f73b82ced87814953ef"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b8f242d2d5ea7b28f4335f8bbf793dbe9c92430b785a805c97939b185ea10d9"
   end
 
   depends_on "cmake" => :build
