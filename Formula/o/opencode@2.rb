@@ -12,10 +12,10 @@ class OpencodeAT2 < Formula
   # libopentui.so imports pthread_tryjoin_np, which OHOS musl lacks — the
   # wrapper LD_PRELOADs a small shim providing it (see install).
   # See social4hyq/ohos-opencode2 dev for canonical diff.
-  url "https://github.com/anomalyco/opencode.git", revision: "16b77e5b50c420190c8718873784230c5327c9be"
+  url "https://github.com/anomalyco/opencode.git", revision: "838d74751412e0f9a38a2e3283fd867a36d76900"
   version "2.0.0-beta"
   license "MIT"
-  revision 21
+  revision 22
 
   livecheck do
     url "https://api.github.com/repos/anomalyco/opencode/commits?sha=v2&per_page=1"
@@ -25,8 +25,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r19"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f4a9e1cbecb1fc2e02d9d22f1df37d9a3b52dac0714a06259888611a7d4c751"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r20"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a029ed36edbee85a4890e1ce72b47c9e7bd68f9e1fa6c4dadf587186dd6fcb8"
   end
 
   # `bun build --compile` single binary: runtime + JS + .so embedded; since
