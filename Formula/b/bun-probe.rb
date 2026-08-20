@@ -3,10 +3,17 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "d36834e472eea33cecc7b31d00d235c31025afde", branch: "debug/rearm-add-retry"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "7f0e17079cf31c1dc7f20de7bded9bfe450b9352", branch: "debug/rearm-add-retry"
   version "1.4.0"
   license "MIT"
-  revision 75
+  revision 76
+
+  # Diagnostic-only local bottle block (real-device deploy of the CI artifact;
+  # never merged). Matches run 32388237388's bottle-out.
+  bottle do
+    root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-probe-v1.4.0-ci73"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbd799d23297cf6e545845cb05e4777ba1b6612998de31f3ba29bf94d1fae81f"
+  end
   # head tracks the same pre-patched fork branch as url.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "debug/rearm-add-retry"
 
