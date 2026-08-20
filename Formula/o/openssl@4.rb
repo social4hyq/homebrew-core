@@ -4,6 +4,7 @@ class OpensslAT4 < Formula
   url "https://github.com/openssl/openssl/releases/download/openssl-4.0.1/openssl-4.0.1.tar.gz"
   sha256 "2db3f3a0d6ea4b59e1f094ace2c8cd536dffb87cdc39084c5afa1e6f7f37dd09"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://openssl-library.org/source/"
@@ -12,6 +13,10 @@ class OpensslAT4 < Formula
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "5c0e79b951ed83545e909d25fa3566a89ce3ac59e5fb592cb1dc6188f29d1c66"
+  end
+
+  patch do
+    file "Patches/openssl@4/0001-armcap-disable-sve2.patch"
   end
 
   keg_only :versioned_formula
@@ -43,6 +48,7 @@ class OpensslAT4 < Formula
       --prefix=#{prefix}
       --openssldir=#{pkgetc}
       --libdir=lib
+      no-docs
     ]
     on_linux do
       args += (ENV.cflags || "").split
