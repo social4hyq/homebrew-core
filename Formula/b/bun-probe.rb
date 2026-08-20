@@ -331,22 +331,33 @@ class BunProbe < Formula
     # caused is the working theory for why a `data` callback's first byte
     # (regression/issue/26286.test.ts) never fires -- deferred_exit only
     # rescues *exit* notifications dropped this way, not `data`. Fix deletes
-    # the reintroduced early call. Runs straight from buildpath (the checked-
-    # out ohos-bun source tree) since these are ordinary `bun test` files,
-    # not something that needs a scratch fixture.
+    # the reintroduced early call.
+    #
+    # buildpath is empty by the time `test do` runs in this CI pipeline
+    # (brew test pours the bottle fresh in a later step, separate from
+    # install) -- first attempt at this probe silently no-op'd ("cd  &&",
+    # "11 files were searched", 0 real test files touched). Clone the exact
+    # branch fresh into testpath instead; these test files need the rest of
+    # test/harness.ts and friends, so a shallow full-repo clone (matching
+    # what the formula's own `url` does at build time) is simpler and safer
+    # than trying to vendor just the three files + their imports.
+    src = testpath/"ohos-bun-src"
+    system "git", "clone", "--depth", "1", "--branch", "fix-terminal-duplicate-early-read",
+           "https://github.com/social4hyq/ohos-bun.git", src.to_s
+
     puts "=== CLAUDE PROBE: terminal.test.ts (T03 regression guard) ==="
     puts shell_output(
-      "cd #{buildpath} && CI=1 #{bin}/bun test test/js/bun/terminal/terminal.test.ts 2>&1; true",
+      "cd #{src} && CI=1 #{bin}/bun test test/js/bun/terminal/terminal.test.ts 2>&1; true",
     )
 
     puts "=== CLAUDE PROBE: terminal-spawn.test.ts (T03 regression guard) ==="
     puts shell_output(
-      "cd #{buildpath} && CI=1 #{bin}/bun test test/js/bun/terminal/terminal-spawn.test.ts 2>&1; true",
+      "cd #{src} && CI=1 #{bin}/bun test test/js/bun/terminal/terminal-spawn.test.ts 2>&1; true",
     )
 
     puts "=== CLAUDE PROBE: regression/issue/26286.test.ts (the bug this branch fixes) ==="
     puts shell_output(
-      "cd #{buildpath} && CI=1 #{bin}/bun test test/regression/issue/26286.test.ts 2>&1; true",
+      "cd #{src} && CI=1 #{bin}/bun test test/regression/issue/26286.test.ts 2>&1; true",
     )
   end
 end
