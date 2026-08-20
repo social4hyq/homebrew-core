@@ -6,7 +6,7 @@ class Decasify < Formula
   license "LGPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7363f73c98ab339db4b124d39ffc53cbbab4f0f542cb20adb268e90b317d865"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3e326406ff9d95322afe3155f1318ec170d89e29bf4229288d944fe4a3ca5ff"
   end
 
   head do
