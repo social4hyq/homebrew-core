@@ -2,8 +2,8 @@ class Mimirtool < Formula
   desc "CLI for interacting with Grafana Mimir"
   homepage "https://grafana.com/docs/mimir/latest/operators-guide/tools/mimirtool/"
   url "https://github.com/grafana/mimir.git",
-        tag:      "mimir-3.1.4",
-        revision: "36ecba9d97d4fbc1f43ac4d21231fbca6f91b4cc"
+        tag:      "mimir-3.2.0",
+        revision: "9ab70ccf850c7f9cf06ccc42e28faf8d5bdaa70f"
   license "AGPL-3.0-only"
   head "https://github.com/grafana/mimir.git", branch: "main"
 
@@ -17,7 +17,7 @@ class Mimirtool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a83415e98811e822685e6755d8d9559281b09af1020acc65186350d54e53d61"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "77dc727c72836b8e2eaadad8416671e724753525fd7eb38e261cc8b65ad27850"
   end
 
   depends_on "go" => :build
