@@ -12,7 +12,7 @@ class Swc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0accca683ce6343ff32dfd9d220775c675986fbb868ed13dcd1add0eb9e8aa9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f4c2cddd2c8e851376d86407a2a9d3bcc73f0c0b048b52b828f8a46a708b56fa"
   end
 
   depends_on "rust" => :build
