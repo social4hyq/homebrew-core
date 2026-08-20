@@ -25,8 +25,9 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r21"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "33df395585c91ac0c89b08e38b91bd531a87fccecbf4b88e7b6dab786fdf4f6a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r22"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f637136543484a5fe2aa669998dadaed2c2160e3a34b5ccd4bd548422e08839"
   end
 
   # `bun build --compile` single binary: runtime + JS + .so embedded; since
@@ -213,29 +214,12 @@ class OpencodeAT2 < Formula
                                          base_name: "opencode2")
   end
 
-  def post_upgrade
-    # v2 runs an unmanaged background daemon (`opencode2 serve --service`) that
-    # outlives its keg: an upgrade deletes the binary the daemon still runs.
-    # The version gate self-heals on the next CLI use, but restart here so the
-    # daemon never runs a deleted binary at all. Only touch OUR registration —
-    # the state dir is shared with v1 and other channels (guard on version).
-    state = Pathname.new(ENV["XDG_STATE_HOME"] || "#{Dir.home}/.local/state")
-    registration = state/"opencode/service.json"
-    return unless registration.file?
-
-    require "json"
-    begin
-      info = JSON.parse(registration.read)
-    rescue JSON::ParserError
-      info = nil
-    end
-    return unless info.is_a?(Hash)
-    return unless info["version"].to_s.start_with?(version.to_s)
-
-    return if system opt_bin/"opencode2", "service", "restart"
-
-    opoo "opencode@2: background service restart failed; run `opencode2 service restart` manually"
-  end
+  # No post_upgrade here: this Harmonybrew fork never invokes it (post_install
+  # exists, post_upgrade has zero call sites), so such a hook would be dead
+  # code claiming to restart the background daemon on upgrade. The daemon is
+  # intentionally unmanaged — the version-gate flip above (mismatch "replace")
+  # already makes the first CLI use after an upgrade replace a daemon left
+  # running by a previous keg (verified on device 2026-08-20).
 
   test do
     assert_match version.to_s, shell_output("#{bin}/opencode2 --version 2>&1")
