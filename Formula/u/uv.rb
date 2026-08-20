@@ -5,7 +5,7 @@ class Uv < Formula
   sha256 "e349c9eb85876921895330f6fee5f01f109d5ec06dcd3b475fb7b4b8de75eac6"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/astral-sh/uv.git", branch: "main"
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
@@ -13,7 +13,7 @@ class Uv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b65fd5fdf96588e8d4c2a8c0c8e86ea2765abd8b3159c723607acf57a25d50c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5b1012d0b22e43c7db3daf01768e6e338fb09b84f4833572dc734d0c11ae202c"
   end
 
   depends_on "cmake" => :build
@@ -59,14 +59,23 @@ class Uv < Formula
 
   def caveats
     <<~EOS
-      Wheel .so files are auto-signed on install, so binary wheels
-      work normally.
+      uv resolves OHOS as linux-musl (musllinux), so both the Python
+      interpreters it downloads and the binary wheels it installs are musl
+      builds. Every ELF is auto-signed on install, so downloaded
+      interpreters and native modules work normally.
 
-      `uv python install` is supported: the fetched interpreter and its
-      lib-dynload .so files are auto-signed on install. The bundled pip
-      is disabled, however, since pip-installed wheels would bypass the
-      auto-signing and fail to dlopen on OHOS. Use `uv add` (preferred)
-      or `uv pip install` instead.
+      Interpreters still come from astral-sh/python-build-standalone (uv's
+      default source); on OHOS downloads prefer the Chinese mirror
+      https://registry.npmmirror.com/-/binary/python-build-standalone and
+      fall back to the official mirror / GitHub automatically.
+
+      Wheels come from PyPI, uv's default index. Change the index with
+      `uv pip install --index-url ...` or `UV_DEFAULT_INDEX=...`.
+
+      The pip bundled inside uv-downloaded interpreters is disabled
+      (`python -m pip` fails loudly): pip-installed wheels would bypass uv's
+      auto-signing and fail to dlopen on OHOS. Use `uv add` (preferred) or
+      `uv pip install` instead.
     EOS
   end
 
