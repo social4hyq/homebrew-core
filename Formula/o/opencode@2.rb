@@ -15,7 +15,7 @@ class OpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "838d74751412e0f9a38a2e3283fd867a36d76900"
   version "2.0.0-beta"
   license "MIT"
-  revision 22
+  revision 23
 
   livecheck do
     url "https://api.github.com/repos/anomalyco/opencode/commits?sha=v2&per_page=1"
@@ -25,8 +25,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r20"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a029ed36edbee85a4890e1ce72b47c9e7bd68f9e1fa6c4dadf587186dd6fcb8"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r21"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "33df395585c91ac0c89b08e38b91bd531a87fccecbf4b88e7b6dab786fdf4f6a"
   end
 
   # `bun build --compile` single binary: runtime + JS + .so embedded; since
@@ -82,6 +82,18 @@ class OpencodeAT2 < Formula
       'if (process.platform === "linux") return "inotify"',
       'if (process.platform === "linux" || process.platform === "openharmony") return "inotify"'
 
+    # Service discovery: default mismatch handling is "ignore" — any registered
+    # background daemon is reused regardless of version, so a daemon left
+    # running by a previous keg (its binary deleted on upgrade) keeps serving a
+    # new CLI until it is restarted by hand. With per-revision version strings
+    # (see OPENCODE_VERSION below) "replace" makes a client stop a mismatched
+    # daemon and spawn one from its own build — stale daemons self-heal on the
+    # next CLI use instead of answering 404s the client reports as
+    # UnsupportedContentType (observed 2026-08-20, beta_15 daemon vs beta_22 CLI).
+    inreplace "packages/cli/src/services/server-connection.ts",
+      'const mismatch = args.mismatch ?? "ignore"',
+      'const mismatch = args.mismatch ?? "replace"'
+
     # Flip openharmony-arm64 os markers. Same regex as opencode.rb.
     lockfile = (buildpath/"bun.lock").read
     injected = lockfile.gsub(
@@ -100,7 +112,11 @@ class OpencodeAT2 < Formula
     system "bun", "install", "--ignore-scripts"
 
     # Script.version short-circuits on OPENCODE_VERSION (no git/registry lookup).
-    ENV["OPENCODE_VERSION"] = version.to_s
+    # The revision suffix makes every rebuild's version string unique: service
+    # discovery gates client/daemon compatibility on this string, and without it
+    # all builds of "2.0.0-beta" look identical to the gate (see the mismatch
+    # flip above).
+    ENV["OPENCODE_VERSION"] = "#{version}_#{revision}"
 
     # build.ts adaptations (reuse linux-arm64-musl target slot):
     #   1. os check: allow linux-arm64-musl through on OHOS
@@ -195,6 +211,30 @@ class OpencodeAT2 < Formula
     # base_name must be 'opencode2' not formula name (libexec binary).
     generate_completions_from_executable(libexec/"bin/opencode2", "--completions",
                                          base_name: "opencode2")
+  end
+
+  def post_upgrade
+    # v2 runs an unmanaged background daemon (`opencode2 serve --service`) that
+    # outlives its keg: an upgrade deletes the binary the daemon still runs.
+    # The version gate self-heals on the next CLI use, but restart here so the
+    # daemon never runs a deleted binary at all. Only touch OUR registration —
+    # the state dir is shared with v1 and other channels (guard on version).
+    state = Pathname.new(ENV["XDG_STATE_HOME"] || "#{Dir.home}/.local/state")
+    registration = state/"opencode/service.json"
+    return unless registration.file?
+
+    require "json"
+    begin
+      info = JSON.parse(registration.read)
+    rescue JSON::ParserError
+      info = nil
+    end
+    return unless info.is_a?(Hash)
+    return unless info["version"].to_s.start_with?(version.to_s)
+
+    return if system opt_bin/"opencode2", "service", "restart"
+
+    opoo "opencode@2: background service restart failed; run `opencode2 service restart` manually"
   end
 
   test do
