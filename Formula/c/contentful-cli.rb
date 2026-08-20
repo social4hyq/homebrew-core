@@ -6,7 +6,7 @@ class ContentfulCli < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c18eaf98945eb4b2820b19989979b2744470af4314790d41f76df40cc3ab6f79"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "daf69060bd3f44658dc10f593f1a76d2c0118db772ea1c0eeb9e2586e1d1e76b"
   end
 
   depends_on "node"
