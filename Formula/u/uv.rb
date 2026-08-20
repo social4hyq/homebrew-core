@@ -5,6 +5,7 @@ class Uv < Formula
   sha256 "e349c9eb85876921895330f6fee5f01f109d5ec06dcd3b475fb7b4b8de75eac6"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/astral-sh/uv.git", branch: "main"
+  revision 1
 
   livecheck do
     url :stable
@@ -12,7 +13,7 @@ class Uv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ede2322e8214e8a66af5710af07e073b7c194f4de236fb4ae4d372925903da3c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b0761fef13cad1cd33c2e89c5fe23ce3f5f7b14574fce94b531080394f1f783"
   end
 
   depends_on "cmake" => :build
@@ -49,12 +50,11 @@ class Uv < Formula
 
   def caveats
     <<~EOS
-      Wheel .so files are auto-signed on install (patch 0003), so binary wheels
-      import out of the box for uv pip/add/sync and uvx.
+      Wheel .so files are auto-signed on install, so binary wheels
+      work normally.
 
-      uv python install still fetches unsigned standalone interpreter builds
-      whose lib-dynload .so are not installed through the wheel path and so
-      are not auto-signed -- use `brew install python@3.14` instead.
+      Note that the `uv python install` command is not supported.
+      Please use `brew install python@3.14` instead.
     EOS
   end
 
