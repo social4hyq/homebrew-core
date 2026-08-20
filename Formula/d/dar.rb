@@ -11,7 +11,7 @@ class Dar < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "63b3c016d6ff2418c920ea9b5e3abe07fa89b4b6506701d9c68a8e5c6b83c901"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f6cd15b325a5064636ac8c0e1c111903e79b547017fba5e7859a486863b03f8"
   end
 
   depends_on "argon2"
