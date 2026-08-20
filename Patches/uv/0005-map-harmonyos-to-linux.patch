@@ -1,0 +1,30 @@
+diff --git a/crates/uv-python/python/get_interpreter_info.py b/crates/uv-python/python/get_interpreter_info.py
+index f45580b..308595a 100644
+--- a/crates/uv-python/python/get_interpreter_info.py
++++ b/crates/uv-python/python/get_interpreter_info.py
+@@ -456,7 +456,11 @@ def get_operating_system_and_architecture():
+         )
+         sys.exit(0)
+ 
+-    if operating_system == "linux":
++    if operating_system in ("linux", "harmonyos"):
++        # OHOS: sysconfig.get_platform() reports "harmonyos-aarch64"; uv's
++        # Rust side only knows "linux". Treat it as Linux — the kernel is
++        # Linux-compatible and Harmonybrew's own python@3.14 does the same.
++        operating_system = "linux"
+         # noinspection PyProtectedMember
+         from .packaging._manylinux import _get_glibc_version
+ 
+@@ -618,7 +622,11 @@ def main() -> None:
+         "platform_machine": platform.machine(),
+         "platform_python_implementation": platform.python_implementation(),
+         "platform_release": platform.release(),
+-        "platform_system": platform.system(),
++        # OHOS: normalize the platform_system marker like the OS detection
++        # above, so `platform_system == 'Linux'` markers match on HarmonyOS.
++        "platform_system": "Linux"
++        if platform.system() == "HarmonyOS"
++        else platform.system(),
+         "platform_version": platform.version(),
+         "python_full_version": python_full_version,
+         "python_version": ".".join(platform.python_version_tuple()[:2]),

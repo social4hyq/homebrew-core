@@ -5,7 +5,7 @@ class Uv < Formula
   sha256 "e349c9eb85876921895330f6fee5f01f109d5ec06dcd3b475fb7b4b8de75eac6"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/astral-sh/uv.git", branch: "main"
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -13,7 +13,7 @@ class Uv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3313b9b10619d0eca38a3b718f9580e7412ede7fc8ebb2e8ba1831a9843c120f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b65fd5fdf96588e8d4c2a8c0c8e86ea2765abd8b3159c723607acf57a25d50c"
   end
 
   depends_on "cmake" => :build
@@ -25,21 +25,24 @@ class Uv < Formula
   depends_on "musl-compat"
   depends_on "openssl@3"
 
-  # The sandbox cannot execve() the dynamic linker to probe for musl: 0001
-  # fixes the wheel-tag probe, 0002 the interpreter-discovery probe. 0003
-  # self-signs wheel-unpacked .so files (the kernel refuses to dlopen
-  # unsigned ELFs).
   patch do
-    file "Patches/uv/0001-ohos-musllinux-skip-ld-exec.patch"
+    file "Patches/uv/0001-musllinux-skip-ld-exec.patch"
   end
+
   patch do
-    file "Patches/uv/0002-ohos-libc-detect-skip-ld-exec.patch"
+    file "Patches/uv/0002-libc-detect-skip-ld-exec.patch"
   end
+
   patch do
-    file "Patches/uv/0003-ohos-autosign-wheels.patch"
+    file "Patches/uv/0003-autosign-wheels.patch"
   end
+
   patch do
-    file "Patches/uv/0004-ohos-autosign-interpreters-and-disable-pip.patch"
+    file "Patches/uv/0004-autosign-interpreters-and-disable-pip.patch"
+  end
+
+  patch do
+    file "Patches/uv/0005-map-harmonyos-to-linux.patch"
   end
 
   def install
@@ -63,8 +66,7 @@ class Uv < Formula
       lib-dynload .so files are auto-signed on install. The bundled pip
       is disabled, however, since pip-installed wheels would bypass the
       auto-signing and fail to dlopen on OHOS. Use `uv add` (preferred)
-      or `uv pip install` instead, or `brew install python` for a full
-      python with pip.
+      or `uv pip install` instead.
     EOS
   end
 
