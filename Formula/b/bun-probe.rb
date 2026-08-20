@@ -3,10 +3,17 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "4bf9e69fe32d2fa09db2caa492623bbe38c77dd0", branch: "fionread-fallback"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "9d8de36d4df36abe250306f537e8b480a4646025", branch: "fionread-fallback"
   version "1.4.0"
   license "MIT"
-  revision 77
+  revision 80
+
+  # Diagnostic-only local bottle block (real-device deploy of run 32427176380's
+  # artifact, repacked so the internal path matches revision 80). Never merged.
+  bottle do
+    root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-probe-v1.4.0-ci77"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6087cbad1d7fd368acf285fb1996e4a1b72d40cc42ef0c5f990855d2268f17f2"
+  end
   # head tracks the same pre-patched fork branch as url.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "fionread-fallback"
 
