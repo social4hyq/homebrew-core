@@ -5,7 +5,7 @@ class NodeAT24 < Formula
   sha256 "f6d95e10a0431ee1067fc6aabe9f762908b4716dd35324e1ddb4b1466b76659f"
   license "MIT"
   compatibility_version 1
-  revision 1
+  revision 2
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -13,7 +13,11 @@ class NodeAT24 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f9c1a59efbefe8eda7293a98170ccfb2a98b30da7d32d53f3108b6a09493e68"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ed54beb1c6e9cb4b02f9bce3ce729a874f3658a1b52f1b4bdcb17ca204a2b0bf"
+  end
+
+  patch do
+    file "Patches/node@24/0001-openssl-armcap-disable-sve2.patch"
   end
 
   keg_only :versioned_formula
@@ -66,8 +70,7 @@ class NodeAT24 < Formula
       ./configure \
         --prefix=#{prefix} \
         --dest-os=openharmony \
-        --partly-static \
-        --openssl-no-asm
+        --partly-static
 
       make -j$(nproc)
       mkdir -p /dest
