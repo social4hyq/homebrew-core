@@ -5,7 +5,7 @@ class Uv < Formula
   sha256 "e349c9eb85876921895330f6fee5f01f109d5ec06dcd3b475fb7b4b8de75eac6"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/astral-sh/uv.git", branch: "main"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -54,7 +54,7 @@ class Uv < Formula
       work normally.
 
       Note that the `uv python install` command is not supported.
-      Please use `brew install python@3.14` instead.
+      Please use `brew install python` instead.
     EOS
   end
 
