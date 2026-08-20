@@ -5,7 +5,7 @@ class Uv < Formula
   sha256 "e349c9eb85876921895330f6fee5f01f109d5ec06dcd3b475fb7b4b8de75eac6"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/astral-sh/uv.git", branch: "main"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -13,7 +13,7 @@ class Uv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b0761fef13cad1cd33c2e89c5fe23ce3f5f7b14574fce94b531080394f1f783"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "743fd8e6bb1d6444fb971b6aa0d8c7e05c62cf6f68221631411009473ec003d7"
   end
 
   depends_on "cmake" => :build
@@ -54,7 +54,7 @@ class Uv < Formula
       work normally.
 
       Note that the `uv python install` command is not supported.
-      Please use `brew install python@3.14` instead.
+      Please use `brew install python` instead.
     EOS
   end
 
