@@ -3,12 +3,12 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "8c175f368a95358a0cd688e520b3f38430894b29", branch: "debug/terminal-real-device-race"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "8f39447952c76d13690cc39016d947b6e410dd9a", branch: "fix-epoll-rearm-watchdog-terminal"
   version "1.4.0"
   license "MIT"
-  revision 72
+  revision 73
   # head tracks the same pre-patched fork branch as url.
-  head "https://github.com/social4hyq/ohos-bun.git", branch: "debug/terminal-real-device-race"
+  head "https://github.com/social4hyq/ohos-bun.git", branch: "fix-epoll-rearm-watchdog-terminal"
 
   livecheck do
     url :stable
@@ -332,7 +332,7 @@ class BunProbe < Formula
     # run produces (upload=false still writes a downloadable bottle-out
     # artifact).
     src = testpath/"ohos-bun-src"
-    system "git", "clone", "--depth", "1", "--branch", "debug/terminal-real-device-race",
+    system "git", "clone", "--depth", "1", "--branch", "fix-epoll-rearm-watchdog-terminal",
            "https://github.com/social4hyq/ohos-bun.git", src.to_s
 
     puts "=== CLAUDE PROBE: 26286.test.ts + terminal.test.ts with CLAUDE_DEBUG_TERM=1 (in-container baseline trace) ==="
