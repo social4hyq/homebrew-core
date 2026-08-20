@@ -13,7 +13,7 @@ class Yq < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "20fbca2f498fb6a35418f7a23c9f9438c91bfe711d64bd99bea6a7b7ea4ece6a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "edf602041bdfc99d211f9c197040b785454922cf39edd4e8d3421b53c3185fe0"
   end
 
   depends_on "go" => :build
