@@ -3,19 +3,12 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "7f0e17079cf31c1dc7f20de7bded9bfe450b9352", branch: "debug/rearm-add-retry"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "4bf9e69fe32d2fa09db2caa492623bbe38c77dd0", branch: "fionread-fallback"
   version "1.4.0"
   license "MIT"
-  revision 76
-
-  # Diagnostic-only local bottle block (real-device deploy of the CI artifact;
-  # never merged). Matches run 32388237388's bottle-out.
-  bottle do
-    root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-probe-v1.4.0-ci73"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbd799d23297cf6e545845cb05e4777ba1b6612998de31f3ba29bf94d1fae81f"
-  end
+  revision 77
   # head tracks the same pre-patched fork branch as url.
-  head "https://github.com/social4hyq/ohos-bun.git", branch: "debug/rearm-add-retry"
+  head "https://github.com/social4hyq/ohos-bun.git", branch: "fionread-fallback"
 
   livecheck do
     url :stable
@@ -339,12 +332,12 @@ class BunProbe < Formula
     # run produces (upload=false still writes a downloadable bottle-out
     # artifact).
     src = testpath/"ohos-bun-src"
-    system "git", "clone", "--depth", "1", "--branch", "debug/rearm-add-retry",
+    system "git", "clone", "--depth", "1", "--branch", "fionread-fallback",
            "https://github.com/social4hyq/ohos-bun.git", src.to_s
 
-    puts "=== CLAUDE PROBE: 26286 + terminal with CLAUDE_DEBUG_REARM=1 (build sanity + trace lines present) ==="
+    puts "=== CLAUDE PROBE: 26286 + terminal with FIONREAD fallback on (in-container sanity; defect not reproducible here) ==="
     puts shell_output(
-      "cd #{src} && CI=1 CLAUDE_DEBUG_REARM=1 " \
+      "cd #{src} && CI=1 CLAUDE_REARM_FIONREAD=1 CLAUDE_DEBUG_REARM=1 " \
       "#{bin}/bun test test/regression/issue/26286.test.ts test/js/bun/terminal/terminal.test.ts 2>&1; true",
     )
   end
