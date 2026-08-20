@@ -7,7 +7,7 @@ class Chainsaw < Formula
   head "https://github.com/WithSecureLabs/chainsaw.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "32ff5784a21f4d62da127f8aac87558649566bb82bf83ddae8babd3d1757026f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "85b31e7c51c4faef4c839a9ddf211b50b6894574d184d8e6016be673dfdafd9c"
   end
 
   depends_on "rust" => :build
