@@ -5,6 +5,7 @@ class OpensslAT35 < Formula
   mirror "http://fresh-center.net/linux/misc/openssl-3.5.7.tar.gz"
   sha256 "a8c0d28a529ca480f9f36cf5792e2cd21984552a3c8e4aa11a24aa31aeac98e8"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://openssl-library.org/source/"
@@ -14,6 +15,10 @@ class OpensslAT35 < Formula
   bottle do
     rebuild 2
     sha256 cellar: :any_skip_relocation, arm64_ohos: "1f03f2b39d603518681dd178c76d1276edb466677fe0d3ba087219364275b80e"
+  end
+
+  patch do
+    file "Patches/openssl@3.5/0001-armcap-disable-sve2.patch"
   end
 
   keg_only :versioned_formula
@@ -52,6 +57,7 @@ class OpensslAT35 < Formula
       no-ssl3
       no-ssl3-method
       no-zlib
+      no-docs
     ]
     on_linux do
       args += (ENV.cflags || "").split
