@@ -3,12 +3,12 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "adfb0980649921d3a2d936126ae6559bd5925f79", branch: "fix-terminal-duplicate-early-read"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "39d9431c3494c25adf9eddb065e03d9fdd7c99fd", branch: "debug/terminal-real-device-race"
   version "1.4.0"
   license "MIT"
-  revision 67
+  revision 68
   # head tracks the same pre-patched fork branch as url.
-  head "https://github.com/social4hyq/ohos-bun.git", branch: "fix-terminal-duplicate-early-read"
+  head "https://github.com/social4hyq/ohos-bun.git", branch: "debug/terminal-real-device-race"
 
   livecheck do
     url :stable
@@ -323,41 +323,23 @@ class BunProbe < Formula
     end
 
     # ── claude-probe: diagnostic-only, not for merge ──
-    # Verifies the fix-terminal-duplicate-early-read branch: init_terminal
-    # used to call IOReader::read() twice (once before the JS wrapper/
-    # data/exit/drain callbacks existed, once after) because an upstream
-    # merge (bb6a9d9d36) reintroduced the early call our own OHOS fix
-    # (b8035437) had deliberately removed. The double register_poll() this
-    # caused is the working theory for why a `data` callback's first byte
-    # (regression/issue/26286.test.ts) never fires -- deferred_exit only
-    # rescues *exit* notifications dropped this way, not `data`. Fix deletes
-    # the reintroduced early call.
-    #
-    # buildpath is empty by the time `test do` runs in this CI pipeline
-    # (brew test pours the bottle fresh in a later step, separate from
-    # install) -- first attempt at this probe silently no-op'd ("cd  &&",
-    # "11 files were searched", 0 real test files touched). Clone the exact
-    # branch fresh into testpath instead; these test files need the rest of
-    # test/harness.ts and friends, so a shallow full-repo clone (matching
-    # what the formula's own `url` does at build time) is simpler and safer
-    # than trying to vendor just the three files + their imports.
+    # This build carries CLAUDE_DEBUG_TERM-gated eprintln! instrumentation in
+    # Terminal.rs/PipeReader.rs (see the branch's commit message). The actual
+    # bug it's chasing (flaky data delivery for Bun.Terminal+Bun.spawn,
+    # test/regression/issue/26286.test.ts and a cluster of terminal.test.ts
+    # subprocess-attached-Terminal cases) does NOT reproduce in this CI
+    # container -- it's real-device-only. This probe just confirms the
+    # instrumented build compiles and the instrumentation doesn't crash/
+    # break anything when exercised; the actual debugging run happens on
+    # real hardware against the bottle this CI run produces (upload=false
+    # still writes a downloadable bottle-out artifact).
     src = testpath/"ohos-bun-src"
-    system "git", "clone", "--depth", "1", "--branch", "fix-terminal-duplicate-early-read",
+    system "git", "clone", "--depth", "1", "--branch", "debug/terminal-real-device-race",
            "https://github.com/social4hyq/ohos-bun.git", src.to_s
 
-    puts "=== CLAUDE PROBE: terminal.test.ts (T03 regression guard) ==="
+    puts "=== CLAUDE PROBE: 26286.test.ts with CLAUDE_DEBUG_TERM=1 (in-container baseline trace) ==="
     puts shell_output(
-      "cd #{src} && CI=1 #{bin}/bun test test/js/bun/terminal/terminal.test.ts 2>&1; true",
-    )
-
-    puts "=== CLAUDE PROBE: terminal-spawn.test.ts (T03 regression guard) ==="
-    puts shell_output(
-      "cd #{src} && CI=1 #{bin}/bun test test/js/bun/terminal/terminal-spawn.test.ts 2>&1; true",
-    )
-
-    puts "=== CLAUDE PROBE: regression/issue/26286.test.ts (the bug this branch fixes) ==="
-    puts shell_output(
-      "cd #{src} && CI=1 #{bin}/bun test test/regression/issue/26286.test.ts 2>&1; true",
+      "cd #{src} && CI=1 CLAUDE_DEBUG_TERM=1 #{bin}/bun test test/regression/issue/26286.test.ts 2>&1; true",
     )
   end
 end
