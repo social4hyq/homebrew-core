@@ -6,7 +6,7 @@ class OpensslAT3 < Formula
   sha256 "243a86649cf6f23eeb6a2ff2456e09e5d77dd9018a54d3d96b0c6bdd6ba6c7f1"
   license "Apache-2.0"
   compatibility_version 1
-  revision 1
+  revision 2
 
   livecheck do
     url "https://openssl-library.org/source/"
@@ -14,7 +14,7 @@ class OpensslAT3 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "273277f06fca0339be48a648b6e8b5a95f6856a1c31c35d272b8c786e9813d53"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "292db2ab89a0db58f313d8f8364b6b5f8e24877c49f6fce0b1beaa6e66b6af96"
   end
 
   depends_on "ca-certificates"
@@ -61,6 +61,7 @@ class OpensslAT3 < Formula
       no-ssl3
       no-ssl3-method
       no-zlib
+      no-docs
     ]
     on_linux do
       args += (ENV.cflags || "").split
