@@ -3,12 +3,12 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "43c87baa3201c85f40697b4247cec30789e69f32", branch: "debug/bake-feature-flag-probe"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "adfb0980649921d3a2d936126ae6559bd5925f79", branch: "fix-terminal-duplicate-early-read"
   version "1.4.0"
   license "MIT"
-  revision 66
+  revision 67
   # head tracks the same pre-patched fork branch as url.
-  head "https://github.com/social4hyq/ohos-bun.git", branch: "debug/bake-feature-flag-probe"
+  head "https://github.com/social4hyq/ohos-bun.git", branch: "fix-terminal-duplicate-early-read"
 
   livecheck do
     url :stable
@@ -323,47 +323,30 @@ class BunProbe < Formula
     end
 
     # ── claude-probe: diagnostic-only, not for merge ──
-    # Investigates why `Bun.serve({app: {framework}, routes: {...}})` silently
-    # drops the framework's own file-system router + internal /_bun/hmr WS
-    # route while the explicit `routes` entries still respond — confirmed by
-    # hand on-device (curl gets a clean fast 404 on both `/` and `/_bun/hmr`,
-    # while an explicit sibling route returns 200). Working theory: the
-    # release-channel build gates `app` behind FeatureFlags::bake()
-    # (IS_CANARY || IS_DEBUG || BUN_FEATURE_FLAG_EXPERIMENTAL_BAKE), and on
-    # this OHOS build the flag itself doesn't override it even when set —
-    # confirmed via `bun build --app` still printing the "upgrade to canary"
-    # error with the env var set. These probes (gated behind CLAUDE_PROBE_BAKE
-    # so they're inert without it) trace exactly where in that chain things
-    # diverge.
-    puts "=== CLAUDE PROBE 1: bun build --app, no flag ==="
-    (testpath/"probe1/src").mkpath
-    (testpath/"probe1/src/index.tsx").write "export default { app: { framework: \"react\" } };"
+    # Verifies the fix-terminal-duplicate-early-read branch: init_terminal
+    # used to call IOReader::read() twice (once before the JS wrapper/
+    # data/exit/drain callbacks existed, once after) because an upstream
+    # merge (bb6a9d9d36) reintroduced the early call our own OHOS fix
+    # (b8035437) had deliberately removed. The double register_poll() this
+    # caused is the working theory for why a `data` callback's first byte
+    # (regression/issue/26286.test.ts) never fires -- deferred_exit only
+    # rescues *exit* notifications dropped this way, not `data`. Fix deletes
+    # the reintroduced early call. Runs straight from buildpath (the checked-
+    # out ohos-bun source tree) since these are ordinary `bun test` files,
+    # not something that needs a scratch fixture.
+    puts "=== CLAUDE PROBE: terminal.test.ts (T03 regression guard) ==="
     puts shell_output(
-      "cd #{testpath}/probe1 && CLAUDE_PROBE_BAKE=1 " \
-      "#{bin}/bun build --app ./src/index.tsx --outdir ./dist 2>&1; true",
+      "cd #{buildpath} && CI=1 #{bin}/bun test test/js/bun/terminal/terminal.test.ts 2>&1; true",
     )
 
-    puts "=== CLAUDE PROBE 2: bun build --app, BUN_FEATURE_FLAG_EXPERIMENTAL_BAKE=1 ==="
+    puts "=== CLAUDE PROBE: terminal-spawn.test.ts (T03 regression guard) ==="
     puts shell_output(
-      "cd #{testpath}/probe1 && CLAUDE_PROBE_BAKE=1 BUN_FEATURE_FLAG_EXPERIMENTAL_BAKE=1 " \
-      "#{bin}/bun build --app ./src/index.tsx --outdir ./dist 2>&1; true",
+      "cd #{buildpath} && CI=1 #{bin}/bun test test/js/bun/terminal/terminal-spawn.test.ts 2>&1; true",
     )
 
-    puts "=== CLAUDE PROBE 3: Bun.serve({app, routes}), flag on, traces DevServer chain ==="
-    (testpath/"probe2").mkpath
-    (testpath/"probe2/server.ts").write <<~JS
-      const server = Bun.serve({
-        app: { framework: "react" },
-        routes: { "/_ping": () => new Response("pong") },
-        port: 0,
-        development: true,
-      });
-      console.log("PROBE_SERVER_STARTED port=" + server.port);
-      process.exit(0);
-    JS
+    puts "=== CLAUDE PROBE: regression/issue/26286.test.ts (the bug this branch fixes) ==="
     puts shell_output(
-      "cd #{testpath}/probe2 && CLAUDE_PROBE_BAKE=1 BUN_FEATURE_FLAG_EXPERIMENTAL_BAKE=1 " \
-      "#{bin}/bun run ./server.ts 2>&1; true",
+      "cd #{buildpath} && CI=1 #{bin}/bun test test/regression/issue/26286.test.ts 2>&1; true",
     )
   end
 end
