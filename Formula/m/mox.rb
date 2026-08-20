@@ -7,7 +7,7 @@ class Mox < Formula
   head "https://github.com/mjl-/mox.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "942f67b4bdb0a7bb2f4d94b64454d9deba29486cba272b929e206e85ed2fde8d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c906edce6e7837dc5176a730987ebe8e08f320fb566877a3e5493e987bf7e6c"
   end
 
   depends_on "go" => :build
