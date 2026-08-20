@@ -6,7 +6,7 @@ class Faad2 < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "09abbbae322d34a11d939906a97285e0efe590f7338d879b96445016112cc295"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29b5a3d11c10691b171cc7578be4d1f0df7e379636448c03897a1fdc006c1082"
   end
 
   depends_on "cmake" => :build
