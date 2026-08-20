@@ -1,0 +1,16 @@
+--- a/deps/openssl/openssl/crypto/armcap.c
++++ b/deps/openssl/openssl/crypto/armcap.c
+@@ -419,3 +419,13 @@ void OPENSSL_cpuid_setup(void)
+         OPENSSL_armcap_P |= ARMV8_HAVE_SHA3_AND_WORTH_USING;
+ #endif
++#ifdef __aarch64__
++    /*
++     * Some OpenHarmony devices use heterogeneous cores where
++     * only part of the cores support SVE2. If OpenSSL probes CPU features
++     * on an SVE2-capable core but is then scheduled onto a core without
++     * SVE2 when the SVE2 assembly is executed, SIGILL is raised. Disable
++     * the SVE2 path.
++     */
++    OPENSSL_armcap_P &= ~ARMV8_SVE2;
++#endif
+ }
