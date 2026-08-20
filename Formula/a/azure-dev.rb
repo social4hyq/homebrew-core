@@ -1,13 +1,13 @@
 class AzureDev < Formula
   desc "Developer CLI that provides commands for working with Azure resources"
   homepage "https://aka.ms/azd"
-  url "https://github.com/Azure/azure-dev/archive/refs/tags/azure-dev-cli_1.31.1.tar.gz"
-  sha256 "35e076653208e858f33f32a32117d2b32cc843cefebaadc7441126fe093ece41"
+  url "https://github.com/Azure/azure-dev/archive/refs/tags/azure-dev-cli_1.31.2.tar.gz"
+  sha256 "7039fcb1696497f84972a21b282d3889fd60113bbf097767b71c488be8ca13c8"
   license "MIT"
   head "https://github.com/Azure/azure-dev.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a69d27f0f9a0b63245a7722d05108b3cc3f32357f346f6f170500e4283f419a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a52029f1147b902cc61e49c9aa018a3fbe9ade38af38463d2db7fc0c2b689941"
   end
 
   depends_on "go" => :build
