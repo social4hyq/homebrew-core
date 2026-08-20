@@ -5,7 +5,7 @@ class Node < Formula
   sha256 "e6b182cbeeab032d1082ca4ac4fe15e3a57de691d3bde78ecf8a761fd56ee356"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -13,13 +13,17 @@ class Node < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e14ea61f4218195e9d456923dc8b53f55bc1b3d317bb7224478801ed40c69f07"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "453d0f454e87d9da99d92652d51c29ceb91e3930a9950a803a7670895df6ddc2"
   end
 
   resource "alpine-rootfs" do
     url "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/aarch64/alpine-minirootfs-3.23.4-aarch64.tar.gz"
     sha256 "9250667a8affac8f1e98086392f80f43f086626701e9bce33398eb9b6c0bd64c"
+  end
+
+  # Disable SVE2 in bundled OpenSSL: some heterogeneous cores lack it.
+  patch do
+    file "Patches/node/0001-openssl-armcap-disable-sve2.patch"
   end
 
   def install
