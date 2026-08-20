@@ -11,6 +11,10 @@ class Uv < Formula
     strategy :github_latest
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ede2322e8214e8a66af5710af07e073b7c194f4de236fb4ae4d372925903da3c"
+  end
+
   depends_on "cmake" => :build
   depends_on "ohos-sdk" => :build
   depends_on "pkgconf" => :build
