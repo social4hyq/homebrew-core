@@ -1,8 +1,8 @@
 class Dust < Formula
   desc "More intuitive version of du in rust"
   homepage "https://github.com/bootandy/dust"
-  url "https://github.com/bootandy/dust/archive/refs/tags/v1.2.4.tar.gz"
-  sha256 "2f6768534bd01727234e67f1dd3754c9547aa18c715f6ee52094e881ebac50e3"
+  url "https://github.com/bootandy/dust/archive/refs/tags/v1.2.5.tar.gz"
+  sha256 "4445e61f1341ea567e9e49367f275a1f4b026a60526e60048265f7af4a4943fd"
   license "Apache-2.0"
   head "https://github.com/bootandy/dust.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Dust < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "43e240f6f5bb8b447e58c35a6fcd8661eda5b81cb702d7351d79d48ae82d478d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "31133a93a709ddf198f7ebde46e8ac86f87e0b4eff953e9ed11b7405ca63e716"
   end
 
   depends_on "rust" => :build
