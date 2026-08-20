@@ -1,0 +1,21 @@
+diff --git a/crypto/armcap.c b/crypto/armcap.c
+index e5ba213..d6590d6 100644
+--- a/crypto/armcap.c
++++ b/crypto/armcap.c
+@@ -424,6 +424,16 @@ void OPENSSL_cpuid_setup(void)
+         OPENSSL_armcap_P |= ARMV8_UNROLL12_EOR3;
+     if ((MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM) || MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM) || MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM_PRO) || MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM_PRO) || MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM_MAX) || MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM_MAX) || MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_AVALANCHE) || MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_BLIZZARD) || MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_AVALANCHE_PRO) || MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_BLIZZARD_PRO) || MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_AVALANCHE_MAX) || MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_BLIZZARD_MAX) || MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_QCOMM, QCOM_CPU_PART_ORYON_X1) || MIDR_IS_CPU_MODEL(OPENSSL_arm_midr, ARM_CPU_IMP_NVIDIA, NVIDIA_CPU_PART_OLYMPUS)) && (OPENSSL_armcap_P & ARMV8_SHA3))
+         OPENSSL_armcap_P |= ARMV8_HAVE_SHA3_AND_WORTH_USING;
++#ifdef __OHOS__
++    /*
++     * Some OpenHarmony devices use heterogeneous cores where
++     * only part of the cores support SVE2. If OpenSSL probes CPU features
++     * on an SVE2-capable core but is then scheduled onto a core without
++     * SVE2 when the SVE2 assembly is executed, SIGILL is raised. Disable
++     * the SVE2 path.
++     */
++    OPENSSL_armcap_P &= ~ARMV9_SVE2;
++#endif
+     if (OPENSSL_armcap_P & ARMV9_SVE2) {
+         uint64_t vl_bytes = _armv8_sve_get_vl_bytes();
+ 
