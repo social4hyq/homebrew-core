@@ -1,12 +1,12 @@
 class Faad2 < Formula
   desc "ISO AAC audio decoder"
   homepage "https://sourceforge.net/projects/faac/"
-  url "https://github.com/knik0/faad2/archive/refs/tags/2.11.2.tar.gz"
-  sha256 "3fcbd305e4abd34768c62050e18ca0986f7d9c5eca343fb98275418013065c0e"
+  url "https://github.com/knik0/faad2/archive/refs/tags/2.11.3.tar.gz"
+  sha256 "860ab62087e336c1844a70e33196c1790b525fb9a9e7b6ac4fab1a1a4e4d5ce8"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "09abbbae322d34a11d939906a97285e0efe590f7338d879b96445016112cc295"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29b5a3d11c10691b171cc7578be4d1f0df7e379636448c03897a1fdc006c1082"
   end
 
   depends_on "cmake" => :build
