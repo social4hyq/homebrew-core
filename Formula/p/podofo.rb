@@ -1,8 +1,8 @@
 class Podofo < Formula
   desc "Library to work with the PDF file format"
   homepage "https://github.com/podofo/podofo"
-  url "https://github.com/podofo/podofo/archive/refs/tags/1.1.1.tar.gz"
-  sha256 "16943528b37798d8663ffedc97190803e525d0a1dcb021fdbf9d35242831890a"
+  url "https://github.com/podofo/podofo/archive/refs/tags/1.1.2.tar.gz"
+  sha256 "d6ffe6fc173ac6d6e5b00f5cb9db01990cab1bdf7cc03bdeffce3013bc9ec63a"
   license all_of: [
     { any_of: ["LGPL-2.0-or-later", "MPL-2.0"] },
     "GPL-2.0-or-later", # tools/
@@ -23,7 +23,7 @@ class Podofo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d81344343278367171c1ba533794a1fa2b16e5a692270f73b82ced87814953ef"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b8f242d2d5ea7b28f4335f8bbf793dbe9c92430b785a805c97939b185ea10d9"
   end
 
   depends_on "cmake" => :build
