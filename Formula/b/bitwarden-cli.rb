@@ -1,8 +1,8 @@
 class BitwardenCli < Formula
   desc "Secure and free password manager for all of your devices"
   homepage "https://bitwarden.com/"
-  url "https://github.com/bitwarden/clients/archive/refs/tags/cli-v2026.7.0.tar.gz"
-  sha256 "cb5496999537d8b947bf8c995479be4055d1807f438e33f9a9fe2d38c5411343"
+  url "https://github.com/bitwarden/clients/archive/refs/tags/cli-v2026.8.0.tar.gz"
+  sha256 "3240867f6dbe4e2f7623c727bb61e8b1cb40ff78f627fcc504e22cb022c941b9"
   license "GPL-3.0-only"
   head "https://github.com/bitwarden/clients.git", branch: "main"
 
