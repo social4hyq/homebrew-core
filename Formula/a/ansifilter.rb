@@ -11,7 +11,7 @@ class Ansifilter < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea95047e036d4642316cc692ea2412c3ef3703e256c4e27df290fa7979363a61"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "92cafde1efd2d9029eb99158b6d13f03cd852ae717cd705fcb73555b87768a8e"
   end
 
   def install
