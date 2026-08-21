@@ -1,8 +1,8 @@
 class Pop < Formula
   desc "Send emails from your terminal"
   homepage "https://github.com/charmbracelet/pop"
-  url "https://github.com/charmbracelet/pop/archive/refs/tags/v0.4.0.tar.gz"
-  sha256 "1ac694148e286bf9bd75387a98ee66b41c554e989fae41314f4b762210e14436"
+  url "https://github.com/charmbracelet/pop/archive/refs/tags/v0.5.0.tar.gz"
+  sha256 "c577d4f3edf403e34832013b79ddc159c1eec938e0bd452b2623c853f752a75c"
   license "MIT"
 
   bottle do
