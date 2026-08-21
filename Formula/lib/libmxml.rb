@@ -7,7 +7,7 @@ class Libmxml < Formula
   head "https://github.com/michaelrsweet/mxml.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7460496773afa6b110d0e3df76099fb27dd6b7da027b517c8187283a56e6670"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "819b2694790dd9402ec3409796ee2f38c3dc04b0841dc661613fe8e4bb187ebf"
   end
 
   depends_on "pkgconf" => :test
