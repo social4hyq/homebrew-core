@@ -3,7 +3,7 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "fa890633477f6fc8c531fcc54041076c47bf5c78", branch: "fionread-fallback"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "d5c81d08d3e7d1651eab1c14a38bb53171c44a90", branch: "fionread-fallback"
   version "1.4.0"
   license "MIT"
   revision 81
