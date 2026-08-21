@@ -6,7 +6,7 @@ class Wgo < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dfea833dabb2ae5a1f05acaafd5417b51f44134502f7ae361cb5f1ffc86c7612"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ee7e1082e3cf7fde1ab7828cf38cc1c684d93e07c04f19352fdcb791c422fc7"
   end
 
   depends_on "go" => :build
