@@ -12,7 +12,7 @@ class Atlantis < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a63818ec36cfbcad205ac33b148e4326f3e41c2805ed11445fb6650a407f393"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc4b4ab620b159ebe14f1228e816b46d06f5584b3143a171bbc00ff8fe6c5a65"
   end
 
   depends_on "go" => :build
