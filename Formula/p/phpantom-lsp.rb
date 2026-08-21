@@ -1,12 +1,12 @@
 class PhpantomLsp < Formula
   desc "Fast PHP language server written in Rust"
   homepage "https://github.com/AJenbo/phpantom_lsp"
-  url "https://github.com/AJenbo/phpantom_lsp/archive/refs/tags/0.9.0.tar.gz"
-  sha256 "8b25c0fac83720759261a3b44bb3c95c2d55fb8cdadc051ea4b62fd0f3509ca9"
+  url "https://github.com/AJenbo/phpantom_lsp/archive/refs/tags/0.10.0.tar.gz"
+  sha256 "20db6d1a0e709ada6beee420323c979a5245ba1949c88824f1cc4d624b31bec7"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6853a56ea5cefcf8a4ebe053aa3b10a6ba8d39de3d4f7534c3cf1ff42ae2597b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c80a88c12c53cc0cdba336aa04760ef79e68e732682309911685c147aefacaab"
   end
 
   depends_on "rust" => :build
