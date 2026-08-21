@@ -3,23 +3,25 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "9d8de36d4df36abe250306f537e8b480a4646025", branch: "fionread-fallback"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "c17176efcb00357c764e896ae29ab98959b9563a", branch: "fionread-fallback"
   version "1.4.0"
   license "MIT"
-  revision 80
+  revision 81
 
-  # Diagnostic-only local bottle block (real-device deploy of run 32427176380's
-  # artifact, repacked so the internal path matches revision 80). Never merged.
-  bottle do
-    root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-probe-v1.4.0-ci77"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6087cbad1d7fd368acf285fb1996e4a1b72d40cc42ef0c5f990855d2268f17f2"
-  end
   # head tracks the same pre-patched fork branch as url.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "fionread-fallback"
 
+  # Diagnostic-only local bottle block (real-device deploy placeholder). The
+  # sha256 below is refreshed after the r81 bottle artifact is poured locally.
+  # Never merged.
   livecheck do
     url :stable
     regex(/^bun-v?(\d+(?:\.\d+)+)$/i)
+  end
+
+  bottle do
+    root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-probe-v1.4.0-ci78"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5a31a8223899bdbe22cf47efeeb4a4a7b4b37d2e0b98149ea64e9364c3971a3"
   end
 
   # icu4c@78 resolves to harmonybrew/core (this tap's __h fork was dropped in __n1 migration).
@@ -342,7 +344,7 @@ class BunProbe < Formula
     system "git", "clone", "--depth", "1", "--branch", "fionread-fallback",
            "https://github.com/social4hyq/ohos-bun.git", src.to_s
 
-    puts "=== CLAUDE PROBE: 26286 + terminal with FIONREAD fallback on (in-container sanity; defect not reproducible here) ==="
+    puts "=== CLAUDE PROBE: 26286 + terminal, FIONREAD fallback on (in-container sanity) ==="
     puts shell_output(
       "cd #{src} && CI=1 CLAUDE_REARM_FIONREAD=1 CLAUDE_DEBUG_REARM=1 " \
       "#{bin}/bun test test/regression/issue/26286.test.ts test/js/bun/terminal/terminal.test.ts 2>&1; true",
