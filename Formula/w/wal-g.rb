@@ -6,7 +6,7 @@ class WalG < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "851c6c7983f865780c507f013fcbfc4da2993fe2537b7441b76f2cd9eccbeb4b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e6fe1845794092c21e09d9c1aafb302ef1daffc68ae27a819b99d74ecd8f5d2"
   end
 
   depends_on "go" => :build
