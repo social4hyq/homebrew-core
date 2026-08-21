@@ -7,7 +7,7 @@ class Oauth2Proxy < Formula
   head "https://github.com/oauth2-proxy/oauth2-proxy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c55ec9aee10c37452303a12462bf91c71cf00c7de4a2fbe57d9cf00887ab980"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa4e0a5c1a75a1f1776db9d7a1e7aa8ced70dad8dc6cdb1bfdc0d2edea0477bb"
   end
 
   depends_on "go" => :build
