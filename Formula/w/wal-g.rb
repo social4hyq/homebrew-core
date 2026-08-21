@@ -1,12 +1,12 @@
 class WalG < Formula
   desc "Archival restoration tool for databases"
   homepage "https://github.com/wal-g/wal-g"
-  url "https://github.com/wal-g/wal-g/archive/refs/tags/v3.0.8.tar.gz"
-  sha256 "336c829714023d2f3fcfe9b3cab50bb76bc829229e33e87c859f43a21883e271"
+  url "https://github.com/wal-g/wal-g/archive/refs/tags/v3.0.9.tar.gz"
+  sha256 "b06bc26c4865c07d0c269101910f63c7eedd03790b7c054a7da0980a7a9cc31d"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "851c6c7983f865780c507f013fcbfc4da2993fe2537b7441b76f2cd9eccbeb4b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e6fe1845794092c21e09d9c1aafb302ef1daffc68ae27a819b99d74ecd8f5d2"
   end
 
   depends_on "go" => :build
