@@ -7,7 +7,7 @@ class OhosPipAutosign < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a138fc8f66b1f4f5eaf7da3d240b6208bae3d21164fde36f075d1890ef2d5e15"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d1178f40ce04e7645ff9addf53c996b9f5f23d3b54e194eefa6d02f60c0950d"
   end
 
   def install
