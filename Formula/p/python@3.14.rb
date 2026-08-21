@@ -5,7 +5,7 @@ class PythonAT314 < Formula
   sha256 "62859805f6fdf25e2bcbf3fa3217801e1996887ca33e6a2af80674bdfa2dbe07"
   license "Python-2.0"
   compatibility_version 1
-  revision 3
+  revision 4
 
   livecheck do
     url "https://www.python.org/downloads/source/"
@@ -71,6 +71,14 @@ class PythonAT314 < Formula
   resource "pip" do
     url "https://files.pythonhosted.org/packages/ae/15/4500e320e6b101ec3b719ae85b697d9940b6cda672bc555bd6016fc60c6f/pip-26.2.1.tar.gz"
     sha256 "f6ad667e89a1fe78046c8f13232b247200f5258d7828f3f7883d660878e0813f"
+
+    patch do
+      file "Patches/python@3.14/0001-add-self-sign-py.patch"
+    end
+
+    patch do
+      file "Patches/python@3.14/0002-pip-autosign-hook.patch"
+    end
   end
 
   resource "wheel" do
