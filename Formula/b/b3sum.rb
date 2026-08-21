@@ -1,8 +1,8 @@
 class B3sum < Formula
   desc "Command-line implementation of the BLAKE3 cryptographic hash function"
   homepage "https://github.com/BLAKE3-team/BLAKE3"
-  url "https://github.com/BLAKE3-team/BLAKE3/archive/refs/tags/1.8.6.tar.gz"
-  sha256 "da7b5b0b6cf7106fe54b7d718d1ea371cce434cd15ebe5e56ca011b645cbef0e"
+  url "https://github.com/BLAKE3-team/BLAKE3/archive/refs/tags/1.8.7.tar.gz"
+  sha256 "c6782a28842b1c0478524ac06a4f2ede784038ee298d6e2162c0b089c4306a3c"
   license any_of: [
     "CC0-1.0",
     "Apache-2.0",
@@ -10,7 +10,7 @@ class B3sum < Formula
   ]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "12bf6e415c9dfe1380bef0ebdbc9db2fb47cac7f69c98cbd672b536eb97c321d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "50e9d484780218d43f66612aad6d5549bd873b7710669cda9823dfaaa058b8ac"
   end
 
   depends_on "rust" => :build
