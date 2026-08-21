@@ -1,14 +1,13 @@
 class TronbytServer < Formula
   desc "Manage your apps on your Tronbyt (flashed Tidbyt) completely locally"
   homepage "https://github.com/tronbyt/server"
-  url "https://github.com/tronbyt/server/archive/refs/tags/v2.3.3.tar.gz"
-  sha256 "3f40e355844996551506944c159a34f7c8dd2950cbadf5a15960f30d51bf73ec"
+  url "https://github.com/tronbyt/server/archive/refs/tags/v2.3.4.tar.gz"
+  sha256 "2ce4b42d8fa6b6eb57115c2d35f3df13ffd06d36386f820c90295bb363eb6dce"
   license "Apache-2.0"
   head "https://github.com/tronbyt/server.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e07a73d634a0d9c4e8ef3040077b0fa242ad2c33d06a5c9c5e158998f9137b84"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cbe18cb0015e972aef4a1d95935e5c1ce59bcb2cfeadef7261f99b728de4f7b"
   end
 
   depends_on "go" => :build
