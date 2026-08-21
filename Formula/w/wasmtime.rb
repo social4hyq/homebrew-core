@@ -2,8 +2,8 @@ class Wasmtime < Formula
   desc "Standalone JIT-style runtime for WebAssembly, using Cranelift"
   homepage "https://wasmtime.dev/"
   url "https://github.com/bytecodealliance/wasmtime.git",
-      tag:      "v47.0.3",
-      revision: "5554cc1a651da536af2cc46c7324bdc085b162e3"
+      tag:      "v48.0.0",
+      revision: "f1412a598f96f3c261a19118d94caffcb0c36235"
   license "Apache-2.0" => { with: "LLVM-exception" }
   head "https://github.com/bytecodealliance/wasmtime.git", branch: "main"
 
@@ -16,7 +16,7 @@ class Wasmtime < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b16ef8f8d1ca94ee0a4af308c188f42e60adf369b869209b22d552c3d69de79e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4eaa658b4d7aaeb5277f76b45459e77a470c2092d64b3e5e36fcf3f57753b8fd"
   end
 
   depends_on "cmake" => :build
