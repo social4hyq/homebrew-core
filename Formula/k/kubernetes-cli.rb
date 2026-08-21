@@ -2,8 +2,8 @@ class KubernetesCli < Formula
   desc "Kubernetes command-line interface"
   homepage "https://kubernetes.io/docs/reference/kubectl/"
   url "https://github.com/kubernetes/kubernetes.git",
-      tag:      "v1.36.3",
-      revision: "0f29094e5b73085e3802ecc1298ecae13866bfe6"
+      tag:      "v1.36.4",
+      revision: "bb826b1d48562f110659e64e8ec444327433db95"
   license "Apache-2.0"
   head "https://github.com/kubernetes/kubernetes.git", branch: "master"
 
@@ -13,7 +13,7 @@ class KubernetesCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ac285bf8cd70ed3885c9c85316603f57742e3f716d6ad4fec67ec2fcfda256a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cfb7e3cc2e9c3721c029327c202237f14abd92a266267f2831bf32493825c145"
   end
 
   depends_on "go" => :build
