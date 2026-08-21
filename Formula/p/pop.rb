@@ -1,12 +1,12 @@
 class Pop < Formula
   desc "Send emails from your terminal"
   homepage "https://github.com/charmbracelet/pop"
-  url "https://github.com/charmbracelet/pop/archive/refs/tags/v0.4.0.tar.gz"
-  sha256 "1ac694148e286bf9bd75387a98ee66b41c554e989fae41314f4b762210e14436"
+  url "https://github.com/charmbracelet/pop/archive/refs/tags/v0.5.0.tar.gz"
+  sha256 "c577d4f3edf403e34832013b79ddc159c1eec938e0bd452b2623c853f752a75c"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "51e521d5b87b99d5bedac2344261f191f53092c2024a2b7e5602863b638b3476"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "91061c367ce220f625db9981f21b6c8f2f9b03385d11bd5119dc51e438b2c6f7"
   end
 
   depends_on "go" => :build
