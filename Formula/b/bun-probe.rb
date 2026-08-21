@@ -3,7 +3,7 @@ class BunProbe < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "d5c81d08d3e7d1651eab1c14a38bb53171c44a90", branch: "fionread-fallback"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "1d3269dae95fd0e9e86c8182b637c7a8379393f7", branch: "fionread-fallback"
   version "1.4.0"
   license "MIT"
   revision 81
@@ -21,7 +21,7 @@ class BunProbe < Formula
 
   bottle do
     root_url "https://github.com/social4hyq/homebrew-core/releases/download/bun-probe-v1.4.0-ci78"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5a31a8223899bdbe22cf47efeeb4a4a7b4b37d2e0b98149ea64e9364c3971a3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "35d8abffcc3c6309bef9947cedbc72716b3d8888deece2dd95f8d1f23af7dad2"
   end
 
   # icu4c@78 resolves to harmonybrew/core (this tap's __h fork was dropped in __n1 migration).
