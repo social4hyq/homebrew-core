@@ -13,7 +13,7 @@ class KubernetesCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ac285bf8cd70ed3885c9c85316603f57742e3f716d6ad4fec67ec2fcfda256a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cfb7e3cc2e9c3721c029327c202237f14abd92a266267f2831bf32493825c145"
   end
 
   depends_on "go" => :build
