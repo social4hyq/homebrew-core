@@ -8,7 +8,7 @@ class KeepSorted < Formula
   head "https://github.com/google/keep-sorted.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0020b9b85c7eeced6ad2b7315748c2228fa5956e85c933f1bca9fb9e084c51d6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ebddd254a017fe2dfd01b4d66f415d92c2e976cddd0a1e4b9b60862fe09d8b8"
   end
 
   depends_on "go" => :build
