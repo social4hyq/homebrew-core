@@ -5,7 +5,7 @@ class PythonAT312 < Formula
   sha256 "6c6df908d2c3fd24e6d76869e92542abd0f33aec9dfc18df8875f89660286d43"
   license "Python-2.0"
   compatibility_version 1
-  revision 2
+  revision 3
 
   livecheck do
     url "https://www.python.org/downloads/source/"
@@ -60,10 +60,6 @@ class PythonAT312 < Formula
   resource "pip" do
     url "https://files.pythonhosted.org/packages/ae/15/4500e320e6b101ec3b719ae85b697d9940b6cda672bc555bd6016fc60c6f/pip-26.2.1.tar.gz"
     sha256 "f6ad667e89a1fe78046c8f13232b247200f5258d7828f3f7883d660878e0813f"
-
-    patch do
-      file "Patches/python@3.14/0001-mock-abi-detection-for-pip.patch"
-    end
   end
 
   resource "wheel" do
@@ -459,6 +455,40 @@ class PythonAT312 < Formula
           split_prefix = f"#{HOMEBREW_PREFIX}/opt/python-{split_module}@#{version.major_minor}/libexec"
           if os.path.isdir(split_prefix):
               sys.path.append(split_prefix)
+      # OpenHarmony: some distributions refuse to execute the musl dynamic
+      # loader (/lib/ld-musl-aarch64.so.1) directly. pip, setuptools and
+      # packaging all spawn the bare loader to detect the musl version and
+      # would crash with PermissionError in that case. Intercept exactly
+      # that call and answer with the loader's regular banner (same format,
+      # on stderr); forward every other invocation unchanged.
+      # Pure stdlib, no side effects.
+      import subprocess as _subprocess
+      _MUSL_LOADER = "/lib/ld-musl-aarch64.so.1"
+      _MUSL_FAKE_STDERR = (
+          "musl libc (aarch64)\\n"
+          "Version 1.2.5\\n"
+          "Dynamic Program Loader\\n"
+          "Usage: /lib/ld-musl-aarch64.so.1 [options] [--] pathname [args]\\n"
+      )
+      _subprocess_run_orig = _subprocess.run
+
+      def _musl_run_wrapper(args, *rest, **kwargs):
+          argv = args if isinstance(args, (list, tuple)) else [args]
+          if len(argv) == 1 and argv[0] == _MUSL_LOADER:
+              text = kwargs.get("text", False) or kwargs.get("encoding") is not None
+              capture = kwargs.get("capture_output", False)
+              got_stdout = capture or kwargs.get("stdout") is _subprocess.PIPE
+              got_stderr = capture or kwargs.get("stderr") is _subprocess.PIPE
+              payload = _MUSL_FAKE_STDERR if text else _MUSL_FAKE_STDERR.encode()
+              # The real loader exits 1 when invoked without arguments.
+              return _subprocess.CompletedProcess(
+                  argv, 1,
+                  stdout=payload if got_stdout else None,
+                  stderr=payload if got_stderr else None,
+              )
+          return _subprocess_run_orig(args, *rest, **kwargs)
+
+      _subprocess.run = _musl_run_wrapper
     PYTHON
   end
 
