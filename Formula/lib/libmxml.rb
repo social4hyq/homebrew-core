@@ -1,13 +1,13 @@
 class Libmxml < Formula
   desc "Mini-XML library"
   homepage "https://michaelrsweet.github.io/mxml/"
-  url "https://github.com/michaelrsweet/mxml/releases/download/v4.0.4/mxml-4.0.4.tar.gz"
-  sha256 "c8d1728d6ccf71a862a1538bd5e132daa2181bb42fe14b078baa2ec1510c0150"
+  url "https://github.com/michaelrsweet/mxml/releases/download/v4.0.5/mxml-4.0.5.tar.gz"
+  sha256 "28ecade70e3481e726907e79f8816b9e77d03cb810bccc8535a7a32bb08740c0"
   license "Apache-2.0"
   head "https://github.com/michaelrsweet/mxml.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7460496773afa6b110d0e3df76099fb27dd6b7da027b517c8187283a56e6670"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "819b2694790dd9402ec3409796ee2f38c3dc04b0841dc661613fe8e4bb187ebf"
   end
 
   depends_on "pkgconf" => :test
