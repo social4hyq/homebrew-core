@@ -2,8 +2,8 @@ class BunWebkit < Formula
   desc "JavaScriptCore/WTF/bmalloc static archives for Bun"
   homepage "https://github.com/oven-sh/bun"
   url "https://github.com/oven-sh/WebKit.git",
-      revision: "f0f60fd2324817dae9656d8bf2fcae25ceaccc37"
-  version "f0f60fd232"
+      revision: "0f966e81b78c84bb23213e391bc679c4ef83e56b"
+  version "0f966e81b7"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
   # Fully rewritten from upstream: builds only JSC/WTF/bmalloc static archives, pinned to bun's WEBKIT_VERSION.
 
