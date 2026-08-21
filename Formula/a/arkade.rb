@@ -1,8 +1,8 @@
 class Arkade < Formula
   desc "Open Source Kubernetes Marketplace"
   homepage "https://blog.alexellis.io/kubernetes-marketplace-two-year-update/"
-  url "https://github.com/alexellis/arkade/archive/refs/tags/0.11.121.tar.gz"
-  sha256 "40b49129896efc89982636caa0c22df6f49fb427d5d689d5e2344151c2e24678"
+  url "https://github.com/alexellis/arkade/archive/refs/tags/0.11.122.tar.gz"
+  sha256 "0d9f0062e94d7c2eed4eefc9194c09377186efd7966a3c4291459cd3fb480421"
   license "MIT"
   head "https://github.com/alexellis/arkade.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Arkade < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d93d0836dcc9ded7580efbe075d37553fec42c1f909b9018c3b7c1c44cd618ec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4713af7dd445db22b9dbd34915f6b0e2bb695950c32fcd557e95251256b0d296"
   end
 
   depends_on "go" => :build
