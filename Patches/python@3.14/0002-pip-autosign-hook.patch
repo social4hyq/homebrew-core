@@ -1,0 +1,110 @@
+diff --git a/src/pip/_internal/autosign_hook.py b/src/pip/_internal/autosign_hook.py
+new file mode 100644
+index 0000000..26578f6
+--- /dev/null
++++ b/src/pip/_internal/autosign_hook.py
+@@ -0,0 +1,70 @@
++"""
++autosign_hook.py - post-install auto-signing entry for pip
++(kept separate from the signing algorithm).
++
++The signing algorithm itself lives in pip/_internal/self_sign.py,
++which is byte-identical to self-sign.py from the ohos-bst-light repo
++(this file does not modify it).
++
++This module only provides sign_site_packages(), the entry point called
++by pip's InstallCommand: it scans the current interpreter's
++site-packages and auto-signs unsigned ELF .so files.
++
++- Reuses has_codesign_section / sign_file_atomic from self_sign
++  (i.e. self-sign.py).
++- Only ELF-magic files are handled; files already carrying a
++  .codesign section are skipped (idempotent).
++- Symlinks are resolved via realpath and the real target file is
++  signed; the link itself is left untouched (never materialized). No
++  path-escape detection is performed: in normal wheel installs and
++  venv layouts symlinks always point inside the same site-packages,
++  so an extra containment check would only add false-positive risk.
++- No "pre-cleaning / normalization" steps are performed (no symbol
++  stripping, no 64KB alignment): the input ELF is kept as-is and only
++  gets an incremental .codesign injection.
++- Per-file failures are non-fatal and never affect the pip install
++  result.
++"""
++
++import os
++
++from pip._internal.self_sign import has_codesign_section, sign_file_atomic
++
++
++def sign_site_packages() -> None:
++    import site
++
++    sp_dirs = site.getsitepackages()
++    if not sp_dirs:
++        return
++
++    seen = set()
++    for sp in sp_dirs:
++        if not os.path.isdir(sp):
++            continue
++        for root, _dirs, files in os.walk(sp):
++            for filename in files:
++                if not (filename.endswith(".so") or ".so." in filename):
++                    continue
++                full = os.path.join(root, filename)
++                real = os.path.realpath(full)
++                if real in seen:
++                    continue
++                seen.add(real)
++
++                try:
++                    with open(real, "rb") as f:
++                        if f.read(4) != b"\x7fELF":
++                            continue
++                except OSError:
++                    continue
++
++                try:
++                    with open(real, "rb") as f:
++                        data = f.read()
++                    if has_codesign_section(data):
++                        continue
++                    sign_file_atomic(real, False)
++                except Exception:
++                    # Signing failure is non-fatal; keep the pip install result.
++                    continue
+diff --git a/src/pip/_internal/commands/install.py b/src/pip/_internal/commands/install.py
+index e1482b9..b261f21 100644
+--- a/src/pip/_internal/commands/install.py
++++ b/src/pip/_internal/commands/install.py
+@@ -43,6 +43,13 @@ from pip._internal.metadata import BaseEnvironment, get_environment
+ from pip._internal.models.installation_report import InstallationReport
+ from pip._internal.operations.build.build_tracker import get_build_tracker
+ from pip._internal.operations.check import ConflictDetails, check_install_conflicts
++
++# OHOS: eagerly import at module top to avoid importing new modules after
++# pip install has started (pip 26.3 warns/forbids importing pip internals
++# during install). The signing algorithm lives in self_sign
++# (byte-identical to self-sign.py from ohos-bst-light; never modified);
++# only the post-install auto-signing entry point is imported here.
++from pip._internal.autosign_hook import sign_site_packages  # noqa: E402
+ from pip._internal.req import InstallationResult, install_given_reqs
+ from pip._internal.req.req_install import (
+     InstallRequirement,
+@@ -599,6 +606,15 @@ class InstallCommand(RequirementCommand):
+             )
+         if options.root_user_action == "warn":
+             warn_if_run_as_root()
++
++        # OHOS: auto-sign ELF .so files in site-packages after a successful
++        # install. Idempotent and non-fatal: signing issues never roll back
++        # or interrupt the pip install itself.
++        try:
++            sign_site_packages()
++        except Exception:  # pragma: no cover - defensive
++            pass
++
+         return SUCCESS
+ 
+     def _handle_target_dir(
