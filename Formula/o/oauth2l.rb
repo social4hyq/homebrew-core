@@ -7,7 +7,7 @@ class Oauth2l < Formula
   head "https://github.com/google/oauth2l.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3fd3471555e079a6121fe71ff2fc6ad8d43fec4f19acf5be0e22d16cd72a802"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8ce837c606177ba2a48ed14c380515a0d3a841fd35976583275535e2abc5cce"
   end
 
   depends_on "go" => :build
