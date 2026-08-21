@@ -8,8 +8,7 @@ class Metricbeat < Formula
   head "https://github.com/elastic/beats.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ad2cb33186b8b22ea42d84ff0d73a30920c35e4189e935eafbe93685b835c56"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7182dcddcacf26e49ac9245d22b4145288c24c2f840874cf694eb8a2ec9c530c"
   end
 
   depends_on "go" => :build
