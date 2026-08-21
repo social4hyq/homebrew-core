@@ -1,13 +1,13 @@
 class Changie < Formula
   desc "Automated changelog tool for preparing releases"
   homepage "https://changie.dev/"
-  url "https://github.com/miniscruff/changie/archive/refs/tags/v1.25.2.tar.gz"
-  sha256 "6950c6a793c4e827348ae6e36ab681c361422613ac59819d516be52ccc1abbb7"
+  url "https://github.com/miniscruff/changie/archive/refs/tags/v1.26.0.tar.gz"
+  sha256 "dec4619b681ad0ad0a9e7b57c196fcaade2705fb086d1f2bbef13a5d2b33ed43"
   license "MIT"
   head "https://github.com/miniscruff/changie.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec8c332af6520ded20a0f3c7c9fbc700297a068a8587756c6bba4a8c707815fb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6cd02a6679e71530e81a7f13b25818592e9395e744da06c66cbbf0647f7fb4f"
   end
 
   depends_on "go" => :build
