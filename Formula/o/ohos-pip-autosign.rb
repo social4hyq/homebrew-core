@@ -4,7 +4,7 @@ class OhosPipAutosign < Formula
   url "https://atomgit.com/Harmonybrew/ohos-pip-autosign/releases/download/v1.0.0/ohos-pip-autosign-1.0.0.tar.gz"
   sha256 "c19145f6f52585746c0a75c2bdcd140c0ea732b904cce4e3a8d2a6265321381d"
   license "BSD-2-Clause"
-  revision 1
+  revision 2
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "a138fc8f66b1f4f5eaf7da3d240b6208bae3d21164fde36f075d1890ef2d5e15"
@@ -15,7 +15,7 @@ class OhosPipAutosign < Formula
       #!/bin/sh
       echo 'ohos-pip-autosign is no longer needed: the bundled pip' >&2
       echo 'of python@3.14, python@3.13 and python@3.12 now ships' >&2
-      echo 'auto-signing. Run `brew upgrade` to update your python' >&2
+      echo 'auto-signing. Run `brew upgrade` to upgrade your python' >&2
       echo 'and enjoy out-of-the-box auto-signing.' >&2
       exit 1
     EOS
