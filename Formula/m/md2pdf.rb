@@ -7,7 +7,7 @@ class Md2pdf < Formula
   head "https://github.com/solworktech/md2pdf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2096223e4748d02f5ae740899bb893aa62f400f2109b8b1bc7840c2c180a06a6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ad98bc35f4c0b6e954cb1bf744cf2c6273e7ee36ea24d49d2c82afeee3b2017"
   end
 
   depends_on "go" => :build
