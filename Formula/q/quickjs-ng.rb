@@ -1,13 +1,13 @@
 class QuickjsNg < Formula
   desc "QuickJS, the Next Generation: a mighty JavaScript engine"
   homepage "https://quickjs-ng.github.io/quickjs/"
-  url "https://github.com/quickjs-ng/quickjs/archive/refs/tags/v0.16.1.tar.gz"
-  sha256 "4b3c11f37dab2c58bdeccbaeb23b923fa4a9798a45e50be6af55f3e75b616ea0"
+  url "https://github.com/quickjs-ng/quickjs/archive/refs/tags/v0.16.2.tar.gz"
+  sha256 "97c80625b26775a4c7ca618c004d4ea24cf99cbf867e4eba78bd927a8b23d106"
   license "MIT"
   head "https://github.com/quickjs-ng/quickjs.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "98da80c775b6d3b3dd1819be2bad4212b4b67c55d57aeb9a63582878aa482148"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7e92ef3dc5b369b2eafab9ce63909c86cd3683f575c40348012a2460c59230a"
   end
 
   depends_on "cmake" => :build
