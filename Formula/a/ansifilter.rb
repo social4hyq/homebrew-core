@@ -1,8 +1,8 @@
 class Ansifilter < Formula
   desc "Strip or convert ANSI codes into HTML, (La)Tex, RTF, or BBCode"
   homepage "http://andre-simon.de/doku/ansifilter/en/ansifilter.php"
-  url "https://gitlab.com/saalen/ansifilter/-/archive/2.22/ansifilter-2.22.tar.bz2"
-  sha256 "ccff41ca740b813bf9103868b5000f4243d32a75304ea929a214c49b943ecc93"
+  url "https://gitlab.com/saalen/ansifilter/-/archive/2.23/ansifilter-2.23.tar.bz2"
+  sha256 "ff9efcfe8623593a54cd7bec2499711ec2a49a425ab50c61f2148c6d7450d525"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class Ansifilter < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea95047e036d4642316cc692ea2412c3ef3703e256c4e27df290fa7979363a61"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "92cafde1efd2d9029eb99158b6d13f03cd852ae717cd705fcb73555b87768a8e"
   end
 
   def install
