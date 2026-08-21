@@ -1,14 +1,14 @@
 class Gum < Formula
   desc "Tool for glamorous shell scripts"
   homepage "https://github.com/charmbracelet/gum"
-  url "https://github.com/charmbracelet/gum/archive/refs/tags/v0.17.0.tar.gz"
-  sha256 "763a7f89dfebf8e77f86e680bace48a09423cfb9e4b4f4ba22d2c9836d311f95"
+  url "https://github.com/charmbracelet/gum/archive/refs/tags/v2.0.0.tar.gz"
+  sha256 "8a5baa1e1647cdc3f7fdf91939de5372791ab133117416c8e3d944afbf0b3c9c"
   license "MIT"
   compatibility_version 1
   head "https://github.com/charmbracelet/gum.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "82f7b2e58f88757afd334b7e77f5a6451ca2d3676fc256753d79fea1bdebe727"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b64768dac1af9728a91f88a8090057263f26e96324251f28420aa43364ce43e4"
   end
 
   depends_on "go" => :build
