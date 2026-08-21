@@ -5,7 +5,7 @@ class PythonAT313 < Formula
   sha256 "c28d9d213c09b5b5ab2c29812950e12f746999e099b82894231be954b26baed9"
   license "Python-2.0"
   compatibility_version 1
-  revision 3
+  revision 4
 
   livecheck do
     url "https://www.python.org/downloads/source/"
@@ -13,7 +13,7 @@ class PythonAT313 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e1d386ff2dd726ebb51561c826b798500e85d99d6e35f6646bb1fe2763cc854"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9d884c49f4c855124c3ad78ce1eb089b4f869333fddf87159287c17e045ec88"
   end
 
   depends_on "pkgconf" => :build
@@ -56,6 +56,14 @@ class PythonAT313 < Formula
   resource "pip" do
     url "https://files.pythonhosted.org/packages/ae/15/4500e320e6b101ec3b719ae85b697d9940b6cda672bc555bd6016fc60c6f/pip-26.2.1.tar.gz"
     sha256 "f6ad667e89a1fe78046c8f13232b247200f5258d7828f3f7883d660878e0813f"
+
+    patch do
+      file "Patches/python@3.14/0001-add-self-sign-py.patch"
+    end
+
+    patch do
+      file "Patches/python@3.14/0002-pip-autosign-hook.patch"
+    end
   end
 
   resource "wheel" do
