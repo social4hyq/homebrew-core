@@ -3,10 +3,10 @@ class Bun < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "e915b503942a4949656015494503e1f6d876122d", branch: "ohos-aarch64"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "c9e4200e0e0f1af88a7b6b30f39f5c25e2b17bdd", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
-  revision 71
+  revision 72
   # head tracks the same pre-patched fork branch as url.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "ohos-aarch64"
 
@@ -16,8 +16,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r74"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "12649e1e2245a341448d542a130ead664484a795ce8870b109abab8709d60c68"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r75"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ec4ea7a4a7836a8c50c9709c2cb9bd6dbc594d1fcf30dfa7e6dd31aca62353d"
   end
 
   # icu4c@78 resolves to harmonybrew/core (this tap's __h fork was dropped in __n1 migration).
