@@ -1,8 +1,9 @@
 class Ktlint < Formula
   desc "Anti-bikeshedding Kotlin linter with built-in formatter"
   homepage "https://ktlint.github.io/"
-  url "https://github.com/pinterest/ktlint/releases/download/1.8.0/ktlint-1.8.0.zip"
-  sha256 "3722801dd119b96a2fbeda0b9d66f173994f249998c87bcf2274b51977aa8f77"
+  url "https://github.com/pinterest/ktlint/releases/download/2.0.0-ALPHA-4/ktlint-2.0.0-ALPHA-4.zip"
+  version "2.0.0-ALPHA-4"
+  sha256 "c84a64d424451392e939bf018fcbec7da7949fa734b613d828953a4140a926cc"
   license "MIT"
 
   bottle do
