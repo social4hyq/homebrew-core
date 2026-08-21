@@ -1,13 +1,13 @@
 class Oauth2Proxy < Formula
   desc "Reverse proxy for authenticating users via OAuth 2 providers"
   homepage "https://oauth2-proxy.github.io/oauth2-proxy/"
-  url "https://github.com/oauth2-proxy/oauth2-proxy/archive/refs/tags/v7.15.3.tar.gz"
-  sha256 "a13491bfd083e570d451275458728fb3f722b4d46657644df1ea90c676c552da"
+  url "https://github.com/oauth2-proxy/oauth2-proxy/archive/refs/tags/v7.15.4.tar.gz"
+  sha256 "52e46276359e8e06cc53e9636f605784b9d6f21819c2592d07f9cf5c1eb78779"
   license "MIT"
   head "https://github.com/oauth2-proxy/oauth2-proxy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c55ec9aee10c37452303a12462bf91c71cf00c7de4a2fbe57d9cf00887ab980"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa4e0a5c1a75a1f1776db9d7a1e7aa8ced70dad8dc6cdb1bfdc0d2edea0477bb"
   end
 
   depends_on "go" => :build
