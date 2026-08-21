@@ -1,8 +1,8 @@
 class Atomcode < Formula
   desc "Open-source alternative to Claude Code / Cursor Agent, living in your terminal"
   homepage "https://atomcode.atomgit.com/"
-  url "https://github.com/atomgit-atomcode/atomcode/archive/refs/tags/v5.0.7.tar.gz"
-  sha256 "1481ed69a50e534a7b3f471a15ebcfb4cf37fc2c5aca6ffe06e0938f7923e6ed"
+  url "https://github.com/atomgit-atomcode/atomcode/archive/refs/tags/v5.0.8.tar.gz"
+  sha256 "82fe57d7873c7193994c7fb424c3199ae9485f03f2b9eff4a11b78fbe58f92e1"
   license "MIT"
 
   livecheck do
@@ -11,7 +11,7 @@ class Atomcode < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fcefca55a0ac86cf3903976f39ce2f6b533ba4c218a0d5ef49fdfd500b4ede3b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ce6043cfff9aadb27cecef7d69a28212d5a556548f5d2daeb67045773db1f01"
   end
 
   depends_on "node" => :build
