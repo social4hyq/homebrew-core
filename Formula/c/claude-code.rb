@@ -1,8 +1,8 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.238.tgz"
-  sha256 "7f44408418b7ff85a1ba7b9a11280b475a200d45b7901d36d7160a7a1454754a"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.239.tgz"
+  sha256 "b722268e66773213614e5943430e8c46e6b34073cf1e7b8cb01b17d3adb86252"
   license :cannot_represent # Anthropic Commercial Terms of Service
   # npmmirror mirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org
   # (aarch64 SIMD AES path trapped by kernel); npmmirror (Aliyun CDN) doesn't.
@@ -40,8 +40,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.238-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a08d9166eb005a0bcd9701ddfe56b3c0b8b5c04c3f01d4869b8774fc2b7d3144"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.239-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "893b8efccc4a42c372f62498dfaaa1a086d6e6d58009b8bf2159b12199e22005"
   end
 
   depends_on "bun"
