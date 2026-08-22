@@ -15,7 +15,7 @@
 
 <!-- 勾选方法：将括号中的空格更改为小写字母x -->
 
-- [ ] 我已阅读 [贡献指南](https://atomgit.com/Harmonybrew/docs/blob/main/zh-CN/contributor/contributing.md)，并确认操作完全符合贡献指南。
+- [ ] 我已阅读[贡献指南](https://atomgit.com/Harmonybrew/docs/blob/main/zh-CN/contributor/contributing.md)，并确认操作完全遵循贡献指南。
 - [ ] 对于 AI 生成的代码，我已经进行人工审核。我知晓每一处修改点的作用，能确认每一处修改点的合理性。
 - [ ] 我确认这个 PR 是经过验证的。我会在 PR 描述中上传验证结果（Harmonybrew 官方维护团队可省略此步骤）。
 
