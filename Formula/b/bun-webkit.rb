@@ -5,6 +5,7 @@ class BunWebkit < Formula
       revision: "0f966e81b78c84bb23213e391bc679c4ef83e56b"
   version "0f966e81b7"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
+  revision 1
   # Fully rewritten from upstream: builds only JSC/WTF/bmalloc static archives, pinned to bun's WEBKIT_VERSION.
 
   # Pinned to bun's WEBKIT_VERSION; OHOS adaptation handled bun-side (webkit.ts.patch).
@@ -32,6 +33,15 @@ class BunWebkit < Formula
   depends_on "zlib" => :build
   # Outputs are static .a archives + headers — zero runtime linkage.
   # ohos-sdk is build-time only: JSC cross-compilation uses its sysroot.
+
+  # Signal-driven thread suspend/resume (GC stack scan, libpas scavenger TLC flush)
+  # deadlocks when the OHOS cgroup freezer swallows a handshake signal mid-sequence:
+  # the suspender parks in sem_wait holding global locks (pas_heap_lock et al.) and the
+  # whole process freezes. Drive the handshake with an atomic flag + bounded
+  # sigtimedwait instead, so a lost/coalesced signal self-heals.
+  patch :p1 do
+    file "Patches/bun-webkit/0001-suspend-resume-handshake-survives-signal-loss.patch"
+  end
 
   def install
     # llvm@21's lld runtime depends on libxml2/zlib; brew superenv may strip LD_LIBRARY_PATH, inject explicitly.
