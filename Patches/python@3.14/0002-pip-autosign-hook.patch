@@ -8,16 +8,16 @@ index 0000000..26578f6
 +autosign_hook.py - post-install auto-signing entry for pip
 +(kept separate from the signing algorithm).
 +
-+The signing algorithm itself lives in pip/_internal/self_sign.py,
-+which is byte-identical to self-sign.py from the ohos-bst-light repo
++The signing algorithm itself lives in pip/_internal/selfsign.py,
++which is byte-identical to selfsign.py from the ohos-bst-light repo
 +(this file does not modify it).
 +
 +This module only provides sign_site_packages(), the entry point called
 +by pip's InstallCommand: it scans the current interpreter's
 +site-packages and auto-signs unsigned ELF .so files.
 +
-+- Reuses has_codesign_section / sign_file_atomic from self_sign
-+  (i.e. self-sign.py).
++- Reuses has_codesign_section / sign_file_atomic from selfsign
++  (i.e. selfsign.py).
 +- Only ELF-magic files are handled; files already carrying a
 +  .codesign section are skipped (idempotent).
 +- Symlinks are resolved via realpath and the real target file is
@@ -34,7 +34,7 @@ index 0000000..26578f6
 +
 +import os
 +
-+from pip._internal.self_sign import has_codesign_section, sign_file_atomic
++from pip._internal.selfsign import has_codesign_section, sign_file_atomic
 +
 +
 +def sign_site_packages() -> None:
@@ -85,8 +85,8 @@ index e1482b9..b261f21 100644
 +
 +# OHOS: eagerly import at module top to avoid importing new modules after
 +# pip install has started (pip 26.3 warns/forbids importing pip internals
-+# during install). The signing algorithm lives in self_sign
-+# (byte-identical to self-sign.py from ohos-bst-light; never modified);
++# during install). The signing algorithm lives in selfsign
++# (byte-identical to selfsign.py from ohos-bst-light; never modified);
 +# only the post-install auto-signing entry point is imported here.
 +from pip._internal.autosign_hook import sign_site_packages  # noqa: E402
  from pip._internal.req import InstallationResult, install_given_reqs
