@@ -8,7 +8,7 @@ class Cfripper < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "65430bea16e5534d5f69cdcc3637c85fa44f76fb57f7e89a87dc585f929507db"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8722e920f6e69c1d5fbb78f4d6b13ef5ef79e3350fa0c12bdb8b0a6a9bdada4"
   end
 
   depends_on "libyaml"
