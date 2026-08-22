@@ -8,7 +8,7 @@ class Moto < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1b6d7d29465cf71626e0aa083d69504b3b866081acd530542280d1f98bcd0454"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03299415d0580aa7003bb3ed155453e109c9fa95ee28b3f6fc20907775f6c653"
   end
 
   depends_on "certifi" => :no_linkage
