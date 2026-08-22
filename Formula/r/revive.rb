@@ -8,7 +8,7 @@ class Revive < Formula
   head "https://github.com/mgechev/revive.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "709be8d4abbffc50a46cadfc2b7999ea4f171031223724620075d7fc331665b9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5885111ab42085ac6d18ad117647ceeac0f67031e0994b6878e6ee60382736e0"
   end
 
   depends_on "go" => [:build, :test]
