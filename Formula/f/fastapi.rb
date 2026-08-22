@@ -8,7 +8,7 @@ class Fastapi < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5bd2508835c8080663a395154a4272c36c0fdb345b9729183c0924006b37ec5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a533b2c87cb5b831711077b8e10da7a2dc09eb529d8dc73b3cacf310c5e58ff4"
   end
 
   depends_on "rust" => :build # for annotated-doc
