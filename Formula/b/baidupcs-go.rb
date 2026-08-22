@@ -12,7 +12,7 @@ class BaidupcsGo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "deb409fdfc1be170d968181859407e46f0ca56ad86cf6ce27f6cc7ce1dbaf8fd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d60ca580f94339e5f87e24533f93514fd8a603e7543aa45d79406bbc7365da55"
   end
 
   depends_on "go" => :build
