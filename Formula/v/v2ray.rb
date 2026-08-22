@@ -12,7 +12,7 @@ class V2ray < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "497b67fa303de8778542f19715e1d95220e4511b4869fe31cd3d112709fd8edb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2e1935fdde22efdd127bfe205943f7636fe5bc038d1e6f8e23efd6682670c6e"
   end
 
   depends_on "go" => :build
