@@ -5,6 +5,10 @@ class DeepseekHarness < Formula
   sha256 "47ec05f45ada5ab87779ae18a90456b5ebff5421dc0ff5c179677d65e1c16057"
   license "MIT"
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f83549a1a6dc78421c7e125013c24c59b94cc32632ce82f418ebbe69f4fab50c"
+  end
+
   depends_on "cmake" => :build
   depends_on "bash"
   depends_on "node"
