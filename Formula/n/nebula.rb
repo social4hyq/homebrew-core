@@ -7,7 +7,7 @@ class Nebula < Formula
   head "https://github.com/slackhq/nebula.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fdf2821f4e6a88548282eacf437a1f4823611e2b0137d8356119ef2ec516fecd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f7e724c01fba64b2ee78ec13d8181fdca34243c303368720c8a343667ccba01f"
   end
 
   depends_on "go" => :build
