@@ -1,0 +1,157 @@
+diff --git a/Source/WTF/wtf/Threading.h b/Source/WTF/wtf/Threading.h
+index 319a94f..48b55cf 100644
+--- a/Source/WTF/wtf/Threading.h
++++ b/Source/WTF/wtf/Threading.h
+@@ -407,6 +407,12 @@ protected:
+ #endif
+     PlatformRegisters* m_platformRegisters { nullptr };
+     unsigned m_suspendCount { 0 };
++#if defined(__OHOS__)
++    // Drives the suspend/resume handshake: the signal is only a wake-up hint,
++    // this flag is the actual state. See signalHandlerSuspendResume in
++    // ThreadingPOSIX.cpp.
++    std::atomic<bool> m_suspendRequested { false };
++#endif
+ #endif
+ 
+ #if OS(WINDOWS)
+diff --git a/Source/WTF/wtf/posix/ThreadingPOSIX.cpp b/Source/WTF/wtf/posix/ThreadingPOSIX.cpp
+index 9a4cd5b..b00d6df 100644
+--- a/Source/WTF/wtf/posix/ThreadingPOSIX.cpp
++++ b/Source/WTF/wtf/posix/ThreadingPOSIX.cpp
+@@ -103,6 +103,27 @@ public:
+         while (sem_wait(&m_platformSemaphore) == -1 && errno == EINTR) { }
+     }
+ 
++#if defined(__OHOS__)
++    // Bounded wait for the suspend/resume handshake: returns false on timeout so the
++    // suspender can re-drive the handshake instead of parking forever when a wake-up
++    // is lost or coalesced across an OHOS system suspend (cgroup freezer).
++    bool waitFor(double relativeSeconds)
++    {
++        struct timespec deadline;
++        clock_gettime(CLOCK_REALTIME, &deadline);
++        time_t wholeSeconds = static_cast<time_t>(relativeSeconds);
++        deadline.tv_sec += wholeSeconds;
++        deadline.tv_nsec += static_cast<long>((relativeSeconds - wholeSeconds) * 1e9);
++        if (deadline.tv_nsec >= 1000000000L) {
++            deadline.tv_sec += 1;
++            deadline.tv_nsec -= 1000000000L;
++        }
++        int rc;
++        while ((rc = sem_timedwait(&m_platformSemaphore, &deadline)) == -1 && errno == EINTR) { }
++        return rc == 0;
++    }
++#endif
++
+     void post()
+     {
+         sem_post(&m_platformSemaphore);
+@@ -120,6 +141,15 @@ void Thread::signalHandlerSuspendResume(int, siginfo_t*, void* ucontext)
+     // Touching a global variable atomic types from signal handlers is allowed.
+     Thread* thread = targetThread.load();
+ 
++#if defined(__OHOS__)
++    // The handshake is driven by m_suspendRequested; the signal is only a wake-up
++    // hint. Ignore stray or late signals (e.g. a resume pthread_kill delivered
++    // after the handshake completed). The pthread_equal check also rejects
++    // signals landing on a thread that is not the current suspend target:
++    // targetThread may already point at a newer target.
++    if (!thread->m_suspendRequested.load(std::memory_order_acquire) || !pthread_equal(thread->m_handle, pthread_self()))
++        return;
++#else
+     if (thread->m_suspendCount) {
+         // This is signal handler invocation that is intended to be used to resume sigsuspend.
+         // So this handler invocation itself should not process.
+@@ -129,6 +159,7 @@ void Thread::signalHandlerSuspendResume(int, siginfo_t*, void* ucontext)
+         // http://pubs.opengroup.org/onlinepubs/009695399/functions/sigsuspend.html
+         return;
+     }
++#endif
+ 
+     void* approximateStackPointer = currentStackPointer();
+     if (!thread->m_stack.contains(approximateStackPointer)) {
+@@ -160,12 +191,29 @@ void Thread::signalHandlerSuspendResume(int, siginfo_t*, void* ucontext)
+     // http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_11
+     globalSemaphoreForSuspendResume->post();
+ 
++#if defined(__OHOS__)
++    // Wait for release. Do not rely on a second signal being delivered: under
++    // OHOS system suspend (cgroup freezer) this thread can be frozen between
++    // post() and sigsuspend(), in which case the resume signal is consumed by
++    // this very handler invocation before the wait starts and sigsuspend()
++    // would sleep forever — while the suspender holds global locks (observed:
++    // the libpas scavenger holding pas_heap_lock, freezing the whole process).
++    // Poll m_suspendRequested via a bounded sigtimedwait so the wait terminates
++    // even if every wake-up signal is lost or coalesced.
++    sigset_t waitSet;
++    sigemptyset(&waitSet);
++    sigaddset(&waitSet, g_wtfConfig.sigThreadSuspendResume);
++    const timespec wakeInterval { 0, 100 * 1000 * 1000 };
++    while (thread->m_suspendRequested.load(std::memory_order_acquire))
++        sigtimedwait(&waitSet, nullptr, &wakeInterval);
++#else
+     // Reaching here, sigThreadSuspendResume is blocked in this handler (this is configured by sigaction's sa_mask).
+     // So before calling sigsuspend, sigThreadSuspendResume to this thread is deferred. This ensures that the handler is not executed recursively.
+     sigset_t blockedSignalSet;
+     sigfillset(&blockedSignalSet);
+     sigdelset(&blockedSignalSet, g_wtfConfig.sigThreadSuspendResume);
+     sigsuspend(&blockedSignalSet);
++#endif
+ 
+     thread->m_platformRegisters = nullptr;
+ 
+@@ -503,18 +551,38 @@ auto Thread::suspend(const ThreadSuspendLocker&) -> Expected<void, PlatformSuspe
+ #else
+     if (!m_suspendCount) {
+         targetThread.store(this);
++#if defined(__OHOS__)
++        m_suspendRequested.store(true, std::memory_order_release);
++#endif
+ 
+         while (true) {
+             // We must use pthread_kill to avoid queue-overflow problem with real-time signals.
+             int result = pthread_kill(m_handle, g_wtfConfig.sigThreadSuspendResume);
+-            if (result)
++            if (result) {
++#if defined(__OHOS__)
++                m_suspendRequested.store(false, std::memory_order_release);
++#endif
+                 return makeUnexpected(result);
++            }
++#if defined(__OHOS__)
++            // Bounded wait instead of an infinite one: if the signal or the
++            // handler's sem_post is lost or coalesced across an OHOS system
++            // freeze, resend instead of parking forever while holding global
++            // locks (e.g. the libpas heap lock).
++            globalSemaphoreForSuspendResume->waitFor(0.1);
++            if (m_platformRegisters)
++                break;
++            // Because of an alternative signal stack we failed to suspend this
++            // thread, or a wake-up was lost. Retry suspension after yielding.
++            Thread::yield();
++#else
+             globalSemaphoreForSuspendResume->wait();
+             if (m_platformRegisters)
+                 break;
+             // Because of an alternative signal stack, we failed to suspend this thread.
+             // Retry suspension again after yielding.
+             Thread::yield();
++#endif
+         }
+     }
+     ++m_suspendCount;
+@@ -537,6 +605,13 @@ void Thread::resume(const ThreadSuspendLocker&)
+         // In this implementaiton, we take (3). m_suspendCount is used to distinguish it.
+         // Note that we must use pthread_kill to avoid queue-overflow problem with real-time signals.
+         targetThread.store(this);
++#if defined(__OHOS__)
++        // Clear the flag before signaling: the handler's bounded wait loop exits
++        // on the flag alone, so the handshake completes even if this signal is
++        // consumed before the target reaches its wait (e.g. the target was
++        // frozen mid-handler by an OHOS system suspend).
++        m_suspendRequested.store(false, std::memory_order_release);
++#endif
+         if (pthread_kill(m_handle, g_wtfConfig.sigThreadSuspendResume) == ESRCH)
+             return;
+         globalSemaphoreForSuspendResume->wait();
