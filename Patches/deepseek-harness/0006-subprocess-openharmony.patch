@@ -1,0 +1,10 @@
+--- a/dsh-subprocess-local/lib/index.js
++++ b/dsh-subprocess-local/lib/index.js
+@@ -543,7 +543,7 @@
+ */
+ function createProcessInspector(platform = process.platform, arch = process.arch, internals = DEFAULT_INTERNALS) {
+-	if (platform === "linux") return new LinuxProcessInspector(arch, internals);
++	if (platform === "linux" || platform === "openharmony") return new LinuxProcessInspector(arch, internals);
+ 	if (platform === "darwin") return new MacProcessInspector(internals);
+ 	if (platform === "win32") return createWindowsProcessInspector();
+ 	throw new Error(`subprocess-local: terminal inspection is unsupported on platform ${platform}`);
