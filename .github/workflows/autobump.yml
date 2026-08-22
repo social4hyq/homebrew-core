@@ -17,11 +17,12 @@ name: autobump
 # .patch files) is autobumpable — url/version/sha256 are plain
 # bump-formula-pr-compatible edits. opencode@2
 # (formerly ohos-opencode@2)
-# is a git-revision formula (bun.rb pattern, fixed version "2.0.0-beta",
-# url pins the v2 branch HEAD via `revision:`); bump-formula-pr rejects
-# fixed-version bumps, so autobump.sh has a custom bump path for it (updates
-# the revision pin + increments brew revision) — see the comment in the
-# loop body.
+# is a git-revision formula (bun.rb pattern: url pins a branch tip via
+# `revision:`); bump-formula-pr can't rewrite the pin, so autobump.sh has a
+# custom bump path for it — since the npm version-scheme switch it livechecks
+# the @opencode-ai/cli beta dist-tag, mirrors that version into the formula,
+# and remaps the git pin to the branch tip at the npm publish timestamp (see
+# the comment in the loop body).
 # Only add a formula here after confirming `brew bump-formula-pr --dry-run`
 # produces a clean url/sha256 edit for it. version-check.yml keeps reporting
 # the full outdated list (allowlisted or not) for humans deciding what to

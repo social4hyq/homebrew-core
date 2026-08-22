@@ -73,19 +73,29 @@ for line in "${CANDIDATES[@]}"; do
   docker exec "$CONTAINER" bash -lc "cd \"$TAP_IN_CONTAINER\" && git checkout -q main"
 
   # Git-revision formulae (stable url is a .git URL with a `revision:` pin,
-  # bun.rb pattern — version field fixed, e.g. opencode@2's "2.0.0-beta")
-  # can't use bump-formula-pr: its version comparison (bump-formula-pr.rb:
-  # 302-314) hard-rejects "new version == old version" with no --force escape,
-  # and a fixed-version bump never changes the version. So we bump these
-  # ourselves: update the git revision pin, increment the brew `revision N`
-  # (effective version advances 2.0.0-beta_N, which is what drives the
-  # new-bottle pipeline in pr-validate), commit, push, open the PR — same
+  # bun.rb pattern) can't use bump-formula-pr: its version comparison
+  # (bump-formula-pr.rb: 302-314) hard-rejects "new version == old version"
+  # with no --force escape, and a fixed-version bump never changes the
+  # version. So we bump these ourselves — commit, push, open the PR — same
   # ci-passed/bump-formula-pr labels + automerge path as a bump-formula-pr PR.
   #
-  # Also defends against a livecheck quirk: for a fixed-version formula the
+  # Two sub-schemes, keyed on what livecheck reports:
+  #   a) a 40-hex commit sha (fixed version + commit-sha livecheck, e.g.
+  #      bun.rb): bump the git revision pin + increment the brew `revision N`
+  #      (effective version advances <ver>_N, which is what drives the
+  #      new-bottle pipeline in pr-validate).
+  #   b) an npm version (opencode@2: livecheck follows the npm beta dist-tag
+  #      and the formula `version` mirrors it): map the npm version to the
+  #      branch tip at its npm publish timestamp (upstream CI publishes the
+  #      tip per merge; npm metadata carries no gitHead — verified
+  #      2026-08-22: beta-17898 published 07:02Z, tip-at-that-time committed
+  #      06:53Z), then bump `version` + the pin and drop any brew `revision`
+  #      stanza (Homebrew convention: revision resets on version change).
+  #
+  # Also defends against a livecheck quirk: for a sha-scheme formula the
   # commit SHA always sorts above the version string, so `--newer-only` keeps
-  # reporting it as outdated even when the pin is already at HEAD — compare the
-  # actual revision pin instead.
+  # reporting it as outdated even when the pin is already at HEAD — compare
+  # the actual pin (sha scheme) / formula version (npm scheme) instead.
   FORMULA_PATH=$(docker exec "$CONTAINER" bash -lc \
     "ls \"$TAP_IN_CONTAINER\"/Formula/*/\"$FORMULA\".rb 2>/dev/null | head -1")
   if [ -n "$FORMULA_PATH" ] && docker exec "$CONTAINER" grep -qE 'url .*\.git.*revision:' "$FORMULA_PATH"; then
@@ -95,27 +105,88 @@ for line in "${CANDIDATES[@]}"; do
       echo "- ⚠️ $FORMULA: no revision pin found" >> "$GITHUB_STEP_SUMMARY"
       continue
     fi
-    if [ "$CURRENT_REV" = "$LATEST" ]; then
-      echo "::notice::$FORMULA: already at HEAD $LATEST (livecheck reports it anyway — commit SHA sorts above the fixed version), skipping"
-      echo "- ⏭️ $FORMULA: already at HEAD $LATEST" >> "$GITHUB_STEP_SUMMARY"
-      continue
-    fi
 
     FORMULA_VERSION=$(docker exec "$CONTAINER" grep -oE '^  version "[^"]+"' "$FORMULA_PATH" | head -1 | cut -d'"' -f2)
+
+    # npm-version scheme (opencode@2): resolve the git sha for LATEST.
+    # These lookups run on the runner host (not the OHOS container).
+    TARGET_SHA=""
+    NEW_VERSION="$FORMULA_VERSION"
+    EDIT_VERSION=false
+    if [[ "$LATEST" =~ ^[0-9a-fA-F]{40}$ ]]; then
+      if [ "$CURRENT_REV" = "$LATEST" ]; then
+        echo "::notice::$FORMULA: already at HEAD $LATEST (livecheck reports it anyway — commit SHA sorts above the fixed version), skipping"
+        echo "- ⏭️ $FORMULA: already at HEAD $LATEST" >> "$GITHUB_STEP_SUMMARY"
+        continue
+      fi
+      TARGET_SHA="$LATEST"
+    else
+      if [ "$FORMULA_VERSION" = "$LATEST" ]; then
+        echo "::notice::$FORMULA: already at $LATEST, skipping"
+        echo "- ⏭️ $FORMULA: already at $LATEST" >> "$GITHUB_STEP_SUMMARY"
+        continue
+      fi
+      # npm-scheme mapping is formula-specific (package, repo, branch).
+      case "$FORMULA" in
+        opencode@2)
+          NPM_PACKAGE="@opencode-ai/cli"
+          GIT_REPO="anomalyco/opencode"
+          GIT_BRANCH="v2"
+          ;;
+        *)
+          echo "::error::$FORMULA: livecheck returned a non-sha version '$LATEST' but no npm→git mapping is configured for it"
+          echo "- ❌ $FORMULA: no npm→git mapping" >> "$GITHUB_STEP_SUMMARY"
+          continue
+          ;;
+      esac
+      PUBLISHED=$(curl -fsSL "https://registry.npmjs.org/$NPM_PACKAGE" \
+        | jq -r --arg v "$LATEST" '.time[$v] // empty')
+      if [ -z "$PUBLISHED" ]; then
+        echo "::error::$FORMULA: npm has no publish timestamp for $LATEST"
+        echo "- ❌ $FORMULA: no npm timestamp for $LATEST" >> "$GITHUB_STEP_SUMMARY"
+        continue
+      fi
+      TARGET_SHA=$(curl -fsSL \
+        "https://api.github.com/repos/$GIT_REPO/commits?sha=$GIT_BRANCH&per_page=1&until=$PUBLISHED" \
+        | jq -r '.[0].sha // empty')
+      if [ -z "$TARGET_SHA" ]; then
+        echo "::error::$FORMULA: could not resolve a $GIT_BRANCH tip for $LATEST (published $PUBLISHED)"
+        echo "- ❌ $FORMULA: version→sha resolution failed" >> "$GITHUB_STEP_SUMMARY"
+        continue
+      fi
+      NEW_VERSION="$LATEST"
+      EDIT_VERSION=true
+    fi
+
     REV_N=$(docker exec "$CONTAINER" grep -oE '^  revision [0-9]+' "$FORMULA_PATH" | grep -oE '[0-9]+' | head -1)
     REV_N=${REV_N:-0}
-    NEXT_REV_N=$((REV_N + 1))
-    NEW_VERSION="${FORMULA_VERSION}_${NEXT_REV_N}"
-    BRANCH="bump-${FORMULA}-${NEW_VERSION}"
-    echo "git-revision formula: pin $CURRENT_REV -> $LATEST, brew revision $REV_N -> $NEXT_REV_N"
+    if [ "$EDIT_VERSION" = true ]; then
+      BRANCH="bump-${FORMULA}-${NEW_VERSION}"
+      echo "npm-version formula: version $FORMULA_VERSION -> $NEW_VERSION, pin $CURRENT_REV -> $TARGET_SHA (brew revision stanza dropped)"
+      EDIT_AND_VERIFY="
+        set -euo pipefail
+        sed -i 's/revision: \"$CURRENT_REV\"/revision: \"$TARGET_SHA\"/' \"$FORMULA_PATH\"
+        sed -i 's/^  version \"[^\"]*\"/  version \"$NEW_VERSION\"/' \"$FORMULA_PATH\"
+        sed -i '/^  revision [0-9][0-9]*$/d' \"$FORMULA_PATH\"
+        grep -q 'revision: \"$TARGET_SHA\"' \"$FORMULA_PATH\"
+        grep -q '^  version \"[^\"]*\"' \"$FORMULA_PATH\"
+        ! grep -qE '^  revision [0-9]' \"$FORMULA_PATH\"
+      "
+    else
+      NEXT_REV_N=$((REV_N + 1))
+      NEW_VERSION="${FORMULA_VERSION}_${NEXT_REV_N}"
+      BRANCH="bump-${FORMULA}-${NEW_VERSION}"
+      echo "git-revision formula: pin $CURRENT_REV -> $LATEST, brew revision $REV_N -> $NEXT_REV_N"
+      EDIT_AND_VERIFY="
+        set -euo pipefail
+        sed -i 's/revision: \"$CURRENT_REV\"/revision: \"$TARGET_SHA\"/' \"$FORMULA_PATH\"
+        sed -i 's/^  revision $REV_N\$/  revision $NEXT_REV_N/' \"$FORMULA_PATH\"
+        grep -q 'revision: \"$TARGET_SHA\"' \"$FORMULA_PATH\"
+        grep -q '^  revision $NEXT_REV_N' \"$FORMULA_PATH\"
+      "
+    fi
 
-    if ! docker exec "$CONTAINER" bash -lc "
-      set -euo pipefail
-      sed -i 's/revision: \"$CURRENT_REV\"/revision: \"$LATEST\"/' \"$FORMULA_PATH\"
-      sed -i 's/^  revision $REV_N\$/  revision $NEXT_REV_N/' \"$FORMULA_PATH\"
-      grep -q 'revision: \"$LATEST\"' \"$FORMULA_PATH\"
-      grep -q '^  revision $NEXT_REV_N' \"$FORMULA_PATH\"
-    "; then
+    if ! docker exec "$CONTAINER" bash -lc "$EDIT_AND_VERIFY"; then
       echo "::error::$FORMULA: formula edit/verify failed"
       echo "- ❌ $FORMULA: formula edit failed" >> "$GITHUB_STEP_SUMMARY"
       continue
@@ -126,7 +197,7 @@ for line in "${CANDIDATES[@]}"; do
       cd \"$TAP_IN_CONTAINER\"
       git checkout -b \"$BRANCH\" 2>&1 &&
       git add \"$FORMULA_PATH\" 2>&1 &&
-      git commit -m \"$FORMULA: update $FORMULA_VERSION to $LATEST\" 2>&1 &&
+      git commit -m \"$FORMULA: update to $LATEST\" 2>&1 &&
       git push -u origin \"$BRANCH\" 2>&1
     " 2>&1)
     STATUS=$?
@@ -148,11 +219,17 @@ for line in "${CANDIDATES[@]}"; do
       continue
     fi
 
+    if [ "$EDIT_VERSION" = true ]; then
+      PR_BODY="Automated npm-version bump ($FORMULA beta dist-tag). Custom autobump path: livecheck follows the npm beta dist-tag; the git pin is remapped to the branch tip at that npm release's publish timestamp (npm metadata has no gitHead). CI builds the new commit and publishes the bottle."
+    else
+      PR_BODY="Automated commit-pin bump ($FORMULA v2 branch HEAD). Custom autobump path for git-revision formulae (bun.rb pattern): bump-formula-pr rejects fixed-version bumps, so this updates the git revision pin and increments the brew revision. CI builds the new commit and publishes the bottle."
+    fi
+
     PR_URL=$(gh pr create --repo social4hyq/homebrew-core \
       --head "$BRANCH" --base main \
       --title "$FORMULA $NEW_VERSION" \
-      --body "Automated commit-pin bump ($FORMULA v2 branch HEAD). Custom autobump path for git-revision formulae (bun.rb pattern): bump-formula-pr rejects fixed-version bumps, so this updates the git revision pin and increments the brew revision. CI builds the new commit and publishes the bottle.") \
-      || { echo "::error::$FORMULA: gh pr create failed after a successful push"; echo "- ❌ $FORMULA $LATEST: push OK, gh pr create failed" >> "$GITHUB_STEP_SUMMARY"; continue; }
+      --body "$PR_BODY" \
+      ) || { echo "::error::$FORMULA: gh pr create failed after a successful push"; echo "- ❌ $FORMULA $LATEST: push OK, gh pr create failed" >> "$GITHUB_STEP_SUMMARY"; continue; }
 
     PR_NUM="${PR_URL##*/}"
     gh pr edit "$PR_NUM" --repo social4hyq/homebrew-core --add-label bump-formula-pr
