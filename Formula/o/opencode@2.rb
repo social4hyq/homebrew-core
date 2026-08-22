@@ -36,6 +36,11 @@ class OpencodeAT2 < Formula
     end
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-beta-17898-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7a8cee0d0a3652e71da9aa15c88e2b03fa25d8d7f6b60c272c546a7953d6f61d"
+  end
+
   # `bun build --compile` single binary: runtime + JS + .so embedded; since
   # bun r31 ohos-compat-shim is statically linked (no runtime shim dep).
   # v2 monorepo restructure: CLI moved packages/opencode → packages/cli
