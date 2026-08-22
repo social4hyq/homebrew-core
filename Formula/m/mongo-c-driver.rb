@@ -13,7 +13,7 @@ class MongoCDriver < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f57fd5c011b8fa93a0b14a2e8831dc7d59df47a82c4f2a8b76afa92d455cd02e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "92a5b8a471de5d3462be92442b55a1f2ebfeba1b56b2ef04a51f86323c2e7f90"
   end
 
   depends_on "cmake" => :build
