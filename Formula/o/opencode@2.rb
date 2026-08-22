@@ -1,32 +1,39 @@
 class OpencodeAT2 < Formula
   desc "OpenCode v2 preview — AI coding agent CLI, HarmonyOS aarch64, built from source"
   homepage "https://github.com/anomalyco/opencode"
-  # v2 is a live branch (no tags yet); pinned git revision + beta version tag.
+  # v2 is a live branch (no tags yet). Version scheme = npm: `version` mirrors
+  # the @opencode-ai/cli beta dist-tag (0.0.0-beta-<build>), and the git pin
+  # below is the v2 tip at that npm release's publish timestamp (upstream CI
+  # publishes the branch tip per merge; no gitHead in npm metadata, so the
+  # mapping is time-based — see autobump.sh's custom bump path). The tip that
+  # published beta-17898 (2026-08-22 07:02Z) committed at 06:53Z.
   # Do NOT add `branch:` back: Homebrew's extract_ref prefers :branch over
   # :revision, so `branch: "v2", revision: <sha>` silently builds the moving
-  # branch tip instead of the pin. The pinned tip (2026-08-15, 825193400773)
-  # dropped generate.ts (models snapshot is committed upstream as
+  # branch tip instead of the pin. That tip dropped generate.ts (models
+  # snapshot is committed upstream as
   # packages/core/src/models-dev/snapshot.txt — no build-time fetch) and
   # restructured build.ts (app-assets; pass --skip-web-ui to skip the
   # packages/app web build, which rm_r deletes). opentui is 0.5.3 now: its
   # libopentui.so imports pthread_tryjoin_np, which OHOS musl lacks — the
   # wrapper LD_PRELOADs a small shim providing it (see install).
   # See social4hyq/ohos-opencode2 dev for canonical diff.
-  url "https://github.com/anomalyco/opencode.git", revision: "07c2597558f75c77e04d68f73c9e524f26ac7921"
-  version "2.0.0-beta"
+  url "https://github.com/anomalyco/opencode.git", revision: "97536add75f8164f1320c3d3882fdbd5639f5240"
+  version "0.0.0-beta-17898"
   license "MIT"
-  revision 24
+  # Version scheme changed 2.0.0-beta_N → npm's 0.0.0-beta-<build>, which
+  # sorts BELOW the old string; version_scheme forces brew upgrade to treat
+  # any scheme-1 version as newer than every scheme-0 (2.0.0-beta_24) keg.
+  version_scheme 1
 
+  # Livecheck the npm beta dist-tag (published v2 builds). The formula's
+  # `version` uses the same scheme, so livecheck output is directly
+  # comparable; autobump.sh's custom path maps a new npm version to the git
+  # pin via the npm publish timestamp.
   livecheck do
-    url "https://api.github.com/repos/anomalyco/opencode/commits?sha=v2&per_page=1"
+    url "https://registry.npmjs.org/@opencode-ai/cli/beta"
     strategy :json do |json|
-      json.first&.dig("sha")
+      json["version"]
     end
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.0-beta-r23"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2b64ebca03b64c618adf71fb87e035dd86c3f91ca86595d543a114f9d19f507"
   end
 
   # `bun build --compile` single binary: runtime + JS + .so embedded; since
@@ -114,8 +121,8 @@ class OpencodeAT2 < Formula
     # Script.version short-circuits on OPENCODE_VERSION (no git/registry lookup).
     # The revision suffix makes every rebuild's version string unique: service
     # discovery gates client/daemon compatibility on this string, and without it
-    # all builds of "2.0.0-beta" look identical to the gate (see the mismatch
-    # flip above).
+    # rebuilds of the same npm build look identical to the gate (see the
+    # mismatch flip above).
     ENV["OPENCODE_VERSION"] = "#{version}_#{revision}"
 
     # build.ts adaptations (reuse linux-arm64-musl target slot):
