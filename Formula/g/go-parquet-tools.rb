@@ -1,8 +1,8 @@
 class GoParquetTools < Formula
   desc "Utility to deal with Parquet data"
   homepage "https://github.com/hangxie/parquet-tools"
-  url "https://github.com/hangxie/parquet-tools/archive/refs/tags/v1.54.3.tar.gz"
-  sha256 "ce5dbd0bcebebac2567e1bea80f709f9fd9b227e733d367b6db815dfacadb191"
+  url "https://github.com/hangxie/parquet-tools/archive/refs/tags/v1.54.4.tar.gz"
+  sha256 "2340563c68041cf07a27d4d031b10e95f9d7703a8ffa4e7b9636fa4e9686d641"
   license "BSD-3-Clause"
   head "https://github.com/hangxie/parquet-tools.git", branch: "main"
 
