@@ -6,7 +6,7 @@ class Bun < Formula
   url "https://github.com/social4hyq/ohos-bun.git", revision: "9b8d199f680d5ad05098f9dd7fe81638614e77ec", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
-  revision 73
+  revision 74
   # head tracks the same pre-patched fork branch as url.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "ohos-aarch64"
 
