@@ -3,14 +3,14 @@ class Awscli < Formula
 
   desc "Official Amazon AWS command-line interface"
   homepage "https://aws.amazon.com/cli/"
-  url "https://github.com/aws/aws-cli/archive/refs/tags/2.36.28.tar.gz"
-  sha256 "559dd065f5c388553cbc200d20f23be6f922c08e81a1526d1a43c427a5815a45"
+  url "https://github.com/aws/aws-cli/archive/refs/tags/2.36.29.tar.gz"
+  sha256 "4970bec7094595367f847f0010fa79743c269c7750112d91cca93a9c1f76cada"
   license "Apache-2.0"
   compatibility_version 1
   head "https://github.com/aws/aws-cli.git", branch: "v2"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c289cd13caf0441ede93df317cb377d4815c34d4b802d748755254cdd616f10c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d47f427a1bf67ad11964d2aeec2eb17c8d64a4315c3310dd0cafebd22ff9f417"
   end
 
   depends_on "cmake" => :build
