@@ -3,13 +3,13 @@ class Badkeys < Formula
 
   desc "Tool to find common vulnerabilities in cryptographic public keys"
   homepage "https://badkeys.info"
-  url "https://files.pythonhosted.org/packages/bd/a7/b222a5f0db2bc9e765252a109da1ab1baeed0da6e0b050e2baa3208650c4/badkeys-0.0.19.tar.gz"
-  sha256 "dc3c3431b79c11dbe54bcfbbdc1e263098136585a4f6f497d81636e55a5b7b5e"
+  url "https://files.pythonhosted.org/packages/43/71/e2a8f3e504f3cdaeded9c4726dff0929d38ec4ab447560019c690a4777a3/badkeys-0.0.20.tar.gz"
+  sha256 "b1cbf5722dd3daf34d7dd205b33d0a57650608ce7a3ce6d6be595c6cfa5d27f2"
   license "MIT"
   head "https://github.com/badkeys/badkeys.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e4d83c17485b6ff30758e7a7d22dd08102c88702253ae15bae68ffa0a76bc50"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "69c3f37f034ab71ca12bcf5d592831d3d0c6bcb4f508216f3fa509424cc31e85"
   end
 
   depends_on "cryptography" => :no_linkage
@@ -21,8 +21,8 @@ class Badkeys < Formula
   pypi_packages exclude_packages: "cryptography"
 
   resource "gmpy2" do
-    url "https://files.pythonhosted.org/packages/57/57/86fd2ed7722cddfc7b1aa87cc768ef89944aa759b019595765aff5ad96a7/gmpy2-2.3.0.tar.gz"
-    sha256 "2d943cc9051fcd6b15b2a09369e2f7e18c526bc04c210782e4da61b62495eb4a"
+    url "https://files.pythonhosted.org/packages/03/47/5c59682cd4d94291382f447dbe1f6229c8b8a144aa85d32d38ecaf8cfb73/gmpy2-2.3.1.tar.gz"
+    sha256 "313f35e9fe6b9ddf72759b14dac25166fe5757c970403e4bbf87a70ab2be07df"
   end
 
   def install
