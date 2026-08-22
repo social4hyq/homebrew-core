@@ -1,24 +1,24 @@
-diff --git a/src/pip/_internal/self_sign.py b/src/pip/_internal/self_sign.py
+diff --git a/src/pip/_internal/selfsign.py b/src/pip/_internal/selfsign.py
 new file mode 100644
-index 0000000..795f6d0
+index 0000000..6c60bff
 --- /dev/null
-+++ b/src/pip/_internal/self_sign.py
++++ b/src/pip/_internal/selfsign.py
 @@ -0,0 +1,533 @@
 +#!/usr/bin/env python3
-+# Copyright (c) 2026 hqzing
-+# SPDX-License-Identifier: MIT
++# Copyright (C) 2026 hqzing
++# SPDX-License-Identifier: 0BSD
 +# Repository: https://github.com/hqzing/ohos-bst-light
 +#
-+# Licensed under the MIT License.
++# Licensed under the BSD Zero Clause License.
 +
 +"""
-+self-sign.py — OpenHarmony 二进制自签名参考实现 (Python 3, 仅用标准库)
++selfsign.py — OpenHarmony 二进制自签名参考实现 (Python 3, 仅用标准库)
 +
 +ELF 解析做了健壮化 (显式边界检查 +
-+e_shentsize 校验, 对齐 C 版 self-sign.c 的结构).
++e_shentsize 校验, 对齐 C 版 selfsign.c 的结构).
 +
 +用法:
-+    python3 self-sign.py <input_elf> [output_elf] [--force] [--strip]
++    python3 selfsign.py <input_elf> [output_elf] [--force] [--strip]
 +        缺省 output 时, inplace 改写 input.
 +        --force : 若已含 .codesign 段, 先剥离再重签
 +        --strip : 仅剥离 .codesign 段, 不做签名
@@ -519,13 +519,13 @@ index 0000000..795f6d0
 +
 +        if in_path == out_path:
 +            sign_file_atomic(in_path, force)
-+            print(f"self-sign ok: {in_path} (in-place, {'force' if force else 'append-only'})")
++            print(f"selfsign ok: {in_path} (in-place, {'force' if force else 'append-only'})")
 +        else:
 +            raw = _read_file(in_path)
 +            signed = sign_elf(raw, force)
 +            with open(out_path, "wb") as f:
 +                f.write(signed)
-+            print(f"self-sign ok: {in_path} → {out_path} ({len(signed)} bytes)")
++            print(f"selfsign ok: {in_path} → {out_path} ({len(signed)} bytes)")
 +    except ValueError as e:
 +        sys.stderr.write(f"error: {e}\n")
 +        return 2
