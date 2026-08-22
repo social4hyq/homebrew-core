@@ -8,7 +8,7 @@ class Copier < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aaa1c379d483fd486055f50da6fe619514483e30023dda1ce763368a6b0a223b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "84709a36ba13f33b2cf0fe657e0cb7a2e82e1bd5ad1e8e4b135ebcfc52034f1b"
   end
 
   depends_on "libyaml"
