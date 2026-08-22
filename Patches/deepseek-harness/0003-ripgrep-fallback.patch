@@ -1,11 +1,13 @@
 --- a/dsh-tool-fs-search/lib/index.js
 +++ b/dsh-tool-fs-search/lib/index.js
-@@ -118,7 +118,7 @@
- *   when the platform package cannot be resolved.
- */
+@@ -120,9 +120,10 @@
  function resolveRgPath() {
--	rgPathPromise ??= import("@vscode/ripgrep").then((module) => module.rgPath);
-+	rgPathPromise ??= import("@vscode/ripgrep").then((module) => module.rgPath).catch(() => "rg");
+ 	rgPathPromise ??= Promise.resolve().then(async () => {
+ 		const executableSidecar = `${process.execPath}-rg`;
+ 		if ("pkg" in process && existsSync(executableSidecar)) return executableSidecar;
+-		return (await import("@vscode/ripgrep")).rgPath;
++		try { return (await import("@vscode/ripgrep")).rgPath; }
++		catch { return "rg"; }  /* openharmony: no @vscode/ripgrep platform package */
+ 	});
  	return rgPathPromise;
  }
- /**

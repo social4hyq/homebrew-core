@@ -59,8 +59,8 @@
  import { resolveDshHome } from "@deepseek-ai/dsh-home-paths";
  import { createHash, randomUUID } from "node:crypto";
  import { constants } from "node:fs";
--import { chmod, link, mkdir, open, readFile, unlink } from "node:fs/promises";
-+import { chmod, copyFile, link, mkdir, open, readFile, unlink } from "node:fs/promises";
+-import { chmod, link, mkdir, open, readFile, rename, rm, unlink, writeFile } from "node:fs/promises";
++import { chmod, copyFile, link, mkdir, open, readFile, rename, rm, unlink, writeFile } from "node:fs/promises";
  import sharp from "sharp";
  //#region lib/types/image.js
  /** Raster inspection: full decode at admission, header-only probe on verified reads. */

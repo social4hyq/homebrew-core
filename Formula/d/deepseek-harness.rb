@@ -1,14 +1,9 @@
 class DeepseekHarness < Formula
   desc "Open-source agent harness developed by DeepSeek AI"
   homepage "https://github.com/deepseek-ai/deepseek-harness"
-  url "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.1.0-rc.6.tgz"
-  sha256 "1b8a9a0ad3c7feaece47926e0bd37ca151c7ccfa997953afa5fd01261784eadc"
+  url "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.1.1-rc.2.tgz"
+  sha256 "47ec05f45ada5ab87779ae18a90456b5ebff5421dc0ff5c179677d65e1c16057"
   license "MIT"
-  revision 2
-
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "587e726c65b726dbe0be18bb26747a6741fa572e4cd03376cbd2e3c50708938c"
-  end
 
   depends_on "cmake" => :build
   depends_on "bash"
@@ -16,10 +11,21 @@ class DeepseekHarness < Formula
   depends_on "ripgrep"
 
   def install
-    system "npm", "install", *std_npm_args(ignore_scripts: true), "@img/sharp-wasm32"
+    # --min-release-age=0: Homebrew std_npm_args pins min-release-age=1 (1 day);
+    # dsh 0.1.1-rc.2 sub-packages were published the same day, so the default
+    # age gate rejects them (ETARGET). Freshly-released npm packages need this.
+    system "npm", "install", *std_npm_args(ignore_scripts: true), "--min-release-age=0", "@img/sharp-wasm32"
 
     Dir.chdir(libexec/"lib/node_modules/@deepseek-ai/dsh") do
-      system "npm", "install", "koffi@^3.1.5", "--no-save", "--prefer-online"
+      # OpenHarmony toolchain: CMake cannot identify clang, so koffi's
+      # CMAKE_CXX_STANDARD 20 is not injected (clang defaults to C++14) and
+      # -fno-emulated-tls breaks the OpenHarmony lld. Force both flags, and
+      # defer koffi's build until after patching (npm install would re-unpack
+      # and discard the inreplace below).
+      system "npm", "install", "koffi@^3.1.5", "--no-save", "--prefer-online", "--min-release-age=0", "--ignore-scripts"
+      koffi_cmake = "node_modules/koffi/src/koffi/CMakeLists.txt"
+      inreplace koffi_cmake, "set(CMAKE_CXX_STANDARD 20)",
+                "set(CMAKE_CXX_STANDARD 20)\nset(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std=c++20 -femulated-tls\")"
       system "npm", "rebuild", "koffi", "node-pty"
     end
 
