@@ -9,7 +9,7 @@ class Charmcraft < Formula
   head "https://github.com/canonical/charmcraft.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8709e7dd07d843d342dc4a20d269c2a66f0c9320b4e4eca24c13d41e74805a7f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5bf50c7791d5044b1bbb62842171bd031245d651050ac706214eb86903e9a8d5"
   end
 
   depends_on "certifi" => :no_linkage
