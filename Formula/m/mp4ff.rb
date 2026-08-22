@@ -1,8 +1,8 @@
 class Mp4ff < Formula
   desc "Tools for parsing and manipulating MP4/ISOBMFF files"
   homepage "https://github.com/Eyevinn/mp4ff"
-  url "https://github.com/Eyevinn/mp4ff/archive/refs/tags/v0.55.0.tar.gz"
-  sha256 "dc38edb7a28b091c4e9dc465e2a4356a50203cc01a92c09c1593c35c8c2b47e5"
+  url "https://github.com/Eyevinn/mp4ff/archive/refs/tags/v0.56.0.tar.gz"
+  sha256 "431a057ca003c2fcca81a9495792a833457e06c79fbc73c2aa6400b94d9f5008"
   license "MIT"
 
   bottle do
