@@ -1,0 +1,60 @@
+diff -ruN a/libmariadb/libmariadb/ma_context.c b/libmariadb/libmariadb/ma_context.c
+--- a/libmariadb/libmariadb/ma_context.c	2026-09-02 01:46:23.245328816 +0000
++++ b/libmariadb/libmariadb/ma_context.c	2026-09-02 01:46:23.368328225 +0000
+@@ -218,7 +218,7 @@
+     (
+      "movq %%rsp, (%[save])\n\t"
+      "movq %[stack], %%rsp\n\t"
+-#if defined(__GCC_HAVE_DWARF2_CFI_ASM) || (defined(__clang__) && __clang_major__ < 13)
++#if (defined(__GCC_HAVE_DWARF2_CFI_ASM) || (defined(__clang__) && __clang_major__ < 13)) && !defined(__OHOS__)
+      /*
+        This emits a DWARF DW_CFA_undefined directive to make the return address
+        undefined. This indicates that this is the top of the stack frame, and
+@@ -454,7 +454,7 @@
+     (
+      "movl %%esp, (%[save])\n\t"
+      "movl %[stack], %%esp\n\t"
+-#if defined(__GCC_HAVE_DWARF2_CFI_ASM) || (defined(__clang__) && __clang_major__ < 13)
++#if (defined(__GCC_HAVE_DWARF2_CFI_ASM) || (defined(__clang__) && __clang_major__ < 13)) && !defined(__OHOS__)
+      /*
+        This emits a DWARF DW_CFA_undefined directive to make the return address
+        undefined. This indicates that this is the top of the stack frame, and
+@@ -704,7 +704,7 @@
+     (
+      "mov x10, sp\n\t"
+      "mov sp, %[stack]\n\t"
+-#if defined(__GCC_HAVE_DWARF2_CFI_ASM) || (defined(__clang__) && __clang_major__ < 13)
++#if (defined(__GCC_HAVE_DWARF2_CFI_ASM) || (defined(__clang__) && __clang_major__ < 13)) && !defined(__OHOS__)
+      /*
+        This emits a DWARF DW_CFA_undefined directive to make the return address
+        (UNW_AARCH64_X30) undefined. This indicates that this is the top of the
+diff -ruN a/storage/duckdb/runtime/fiber_context.cpp b/storage/duckdb/runtime/fiber_context.cpp
+--- a/storage/duckdb/runtime/fiber_context.cpp	2026-09-02 01:46:23.247328807 +0000
++++ b/storage/duckdb/runtime/fiber_context.cpp	2026-09-02 01:46:23.368328225 +0000
+@@ -157,7 +157,7 @@
+     (
+      "movq %%rsp, (%[save])\n\t"
+      "movq %[stack], %%rsp\n\t"
+-#if defined(__GCC_HAVE_DWARF2_CFI_ASM) || (defined(__clang__) && __clang_major__ < 13)
++#if (defined(__GCC_HAVE_DWARF2_CFI_ASM) || (defined(__clang__) && __clang_major__ < 13)) && !defined(__OHOS__)
+      ".cfi_escape 0x07, 16\n\t"
+ #endif
+      "movq %%rbp, 8(%[save])\n\t"
+@@ -327,7 +327,7 @@
+     (
+      "movl %%esp, (%[save])\n\t"
+      "movl %[stack], %%esp\n\t"
+-#if defined(__GCC_HAVE_DWARF2_CFI_ASM) || (defined(__clang__) && __clang_major__ < 13)
++#if (defined(__GCC_HAVE_DWARF2_CFI_ASM) || (defined(__clang__) && __clang_major__ < 13)) && !defined(__OHOS__)
+      ".cfi_escape 0x07, 8\n\t"
+ #endif
+      "pushl %[d]\n\t"
+@@ -498,7 +498,7 @@
+     (
+      "mov x10, sp\n\t"
+      "mov sp, %[stack]\n\t"
+-#if defined(__GCC_HAVE_DWARF2_CFI_ASM) || (defined(__clang__) && __clang_major__ < 13)
++#if (defined(__GCC_HAVE_DWARF2_CFI_ASM) || (defined(__clang__) && __clang_major__ < 13)) && !defined(__OHOS__)
+      ".cfi_escape 0x07, 30\n\t"
+ #endif
+      "stp x19, x20, [%[save], #0]\n\t"

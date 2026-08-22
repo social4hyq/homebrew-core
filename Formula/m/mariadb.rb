@@ -1,8 +1,8 @@
 class Mariadb < Formula
   desc "Drop-in replacement for MySQL"
   homepage "https://mariadb.org/"
-  url "https://archive.mariadb.org/mariadb-12.3.2/source/mariadb-12.3.2.tar.gz"
-  sha256 "82798714baf2f3456ed2f311fc803dc120f2bf3b82358e773847d628cdb4b670"
+  url "https://archive.mariadb.org/mariadb-12.3.3/source/mariadb-12.3.3.tar.gz"
+  sha256 "e99d739fd4a55f9a11dea7bd2287a262673e287550af3071c8469dd2bec0c163"
   license "GPL-2.0-only"
 
   livecheck do
@@ -51,7 +51,21 @@ class Mariadb < Formula
   conflicts_with "mysql", "percona-server", because: "mariadb, mysql, and percona install the same binaries"
 
   patch do
-    file "Patches/mariadb/0001-add-ohos-support.patch"
+    file "Patches/mariadb/0001-wsrep-gtid-include-sys-types.patch"
+  end
+
+  patch do
+    # The OHOS clang toolchain compiles without unwind tables, so the
+    # .cfi_escape directives in the DuckDB/libmariadb fiber context asm
+    # land outside any .cfi_startproc frame and fail to assemble.
+    file "Patches/mariadb/0002-fix-fiber-context-cfi-on-ohos.patch"
+  end
+
+  patch do
+    # The DuckDB engine links -latomic for 16-byte atomics, but aarch64
+    # lowers them to native instructions and the OHOS toolchain ships no
+    # libatomic, so only link it on non-aarch64.
+    file "Patches/mariadb/0003-duckdb-skip-libatomic-on-aarch64.patch"
   end
 
   def install

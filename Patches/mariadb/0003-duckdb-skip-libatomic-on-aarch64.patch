@@ -1,0 +1,21 @@
+diff -ruN a/storage/duckdb/CMakeLists.txt b/storage/duckdb/CMakeLists.txt
+--- a/storage/duckdb/CMakeLists.txt	2026-09-02 03:54:41.710483338 +0000
++++ b/storage/duckdb/CMakeLists.txt	2026-09-02 03:54:41.762484080 +0000
+@@ -64,10 +64,15 @@
+   ADD_SUBDIRECTORY(runtime)
+ 
+   # atomic: GCC lowers the 16-byte atomic ops of the AUTO_INCREMENT block
+-  # cache (Duckdb_share::autoinc_range) to libatomic calls.
++  # cache (Duckdb_share::autoinc_range) to libatomic calls. On aarch64 these
++  # lower to native ldxp/stxp (LSE) instructions instead, so no libatomic is
++  # needed (and the OHOS toolchain does not ship one).
+   target_link_libraries(duckdb duckdb_runtime duckdb_convertor duckdb_common
+-    ${DUCKDB_LIBRARY} atomic
++    ${DUCKDB_LIBRARY}
+   )
++  IF(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
++    target_link_libraries(duckdb atomic)
++  ENDIF()
+ 
+   duckdb_setup_target(duckdb)
+   TARGET_INCLUDE_DIRECTORIES(duckdb PRIVATE
