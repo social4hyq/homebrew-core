@@ -5,7 +5,7 @@ class PythonAT312 < Formula
   sha256 "6c6df908d2c3fd24e6d76869e92542abd0f33aec9dfc18df8875f89660286d43"
   license "Python-2.0"
   compatibility_version 1
-  revision 4
+  revision 5
 
   livecheck do
     url "https://www.python.org/downloads/source/"
@@ -62,7 +62,7 @@ class PythonAT312 < Formula
     sha256 "f6ad667e89a1fe78046c8f13232b247200f5258d7828f3f7883d660878e0813f"
 
     patch do
-      file "Patches/python@3.14/0001-add-self-sign-py.patch"
+      file "Patches/python@3.14/0001-add-selfsign-py.patch"
     end
 
     patch do
