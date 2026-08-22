@@ -1,8 +1,8 @@
 class Opencc < Formula
   desc "Simplified-traditional Chinese conversion tool"
   homepage "https://github.com/BYVoid/OpenCC"
-  url "https://github.com/BYVoid/OpenCC/archive/refs/tags/ver.1.4.1.tar.gz"
-  sha256 "d4b94877c508a4774853f3b07330b3d25df00105c39dfba6ab9889d77946cc8a"
+  url "https://github.com/BYVoid/OpenCC/archive/refs/tags/ver.1.4.2.tar.gz"
+  sha256 "8e5f5cf7fe195bd9b9be851adc9738c1ef7dc5c24441dd5878a56db4087a9a70"
   license "Apache-2.0"
   compatibility_version 1
   head "https://github.com/BYVoid/OpenCC.git", branch: "master"
