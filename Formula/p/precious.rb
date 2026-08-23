@@ -1,13 +1,13 @@
 class Precious < Formula
   desc "One code quality tool to rule them all"
   homepage "https://github.com/houseabsolute/precious"
-  url "https://github.com/houseabsolute/precious/archive/refs/tags/v0.11.0.tar.gz"
-  sha256 "87b5c72e22f83ac502721da58d5560866a8efccefc6f55646d59ce7402d74d0a"
+  url "https://github.com/houseabsolute/precious/archive/refs/tags/v0.12.0.tar.gz"
+  sha256 "c3e10e136ded670bceb7cad93e95aad282355f728c5f5a1121af4ef1a7c50821"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/houseabsolute/precious.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb40dba085d12f99b84dba3b17862aeab9a832a2dc02edda4a483335a956d5ae"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d8007a3ac76ac5e1b9797672ab788939097193637211a60b394a50f0c419ba4"
   end
 
   depends_on "rust" => :build
