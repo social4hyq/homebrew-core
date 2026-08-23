@@ -1,0 +1,17 @@
+--- a/compat.h
++++ b/compat.h
+@@ -106,6 +106,14 @@
+ #define _PATH_BSHELL	"/bin/sh"
+ #endif
+ 
++#ifdef __OHOS__
++/* /tmp is read-only on HarmonyOS (OpenHarmony); use the app cache dir
++ * (/data/storage/el2/base/cache), the standard tmpfs-backed temp location
++ * already used by the existing OHOS patches. */
++#undef _PATH_TMP
++#define _PATH_TMP	"/data/storage/el2/base/cache/"
++#endif
++
+ #ifndef _PATH_TMP
+ #define _PATH_TMP	"/tmp/"
+ #endif
