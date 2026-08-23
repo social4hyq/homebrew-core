@@ -13,7 +13,7 @@ class Seaweedfs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "15bc9036fe74b1ce9beb195fac1fc8bc95be6f3c52b573577c860e749f4344e5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "95abb5d7eb9ed428e7ba5d9be1eda781bbe88934477011860492f47a74c98253"
   end
 
   depends_on "go" => :build
