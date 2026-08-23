@@ -116,27 +116,41 @@ jobs:
               fi
             done
             echo "merging PR #$PR ($ref)"
-            gh pr merge "$PR" --merge --repo "$REPO"
+            # --auto: enqueue the merge; GitHub performs it the moment the
+            # required checks go green. A direct merge races the approval
+            # above: the just-approved pr-validate run takes a few seconds to
+            # transition off action_required, and a merge attempt inside that
+            # window dies with "the base branch policy prohibits the merge"
+            # (observed 2026-08-23 05:57 sweep vs PR #412 — the identical
+            # 03:53 sweep won the same race against #406 by luck).
+            # Not fatal: one unmergeable PR must not kill the sweep loop
+            # before it reaches the other candidates.
+            gh pr merge "$PR" --merge --auto --repo "$REPO" ||
+              echo "::warning::merge enqueue failed for PR #$PR (dirty/unclean?); check manually"
           }
 
           if [ "$EVENT_NAME" = "schedule" ] || [ "$EVENT_NAME" = "workflow_dispatch" ]; then
             # Approve pr-validate runs parked action_required on allowlisted
             # bump-* branches (attempt 1 of a bot-authored PR never starts on
             # its own since GitHub's hardening). Approving unblocks the
-            # pipeline NOW; the next hourly sweep (or the workflow_run event
-            # the approved run's completion emits) picks up the merge.
+            # pipeline NOW; the enqueued --auto merge above fires as soon as
+            # the run's required `label` job reports green.
             # Branch filter is the SAME BUMP_BRANCH_RE allowlist as merge_pr:
             # stale action_required runs on human branches (add-uv-formula,
             # etc.) must stay parked — those are human review decisions.
-            gh run list --repo "$REPO" --workflow pr-validate.yml \
-              --status action_required --json databaseId,headBranch \
-              --jq '.[] | select(.headBranch | test("'"$BUMP_BRANCH_RE"'")) | .databaseId' |
-              while read -r run_id; do
-                [ -n "$run_id" ] || continue
-                echo "approving action_required pr-validate run $run_id"
-                gh api --method POST "repos/$REPO/actions/runs/$run_id/approve" || \
-                  echo "::warning::approve failed for run $run_id (already approved?)"
-              done
+            # label-formula-prs runs park the same way on bot PRs; approving
+            # them keeps the PR check panel truthful (harmless if redundant).
+            for wf in pr-validate.yml label-formula-prs.yml; do
+              gh run list --repo "$REPO" --workflow "$wf" \
+                --status action_required --json databaseId,headBranch \
+                --jq '.[] | select(.headBranch | test("'"$BUMP_BRANCH_RE"'")) | .databaseId' |
+                while read -r run_id; do
+                  [ -n "$run_id" ] || continue
+                  echo "approving action_required $wf run $run_id"
+                  gh api --method POST "repos/$REPO/actions/runs/$run_id/approve" || \
+                    echo "::warning::approve failed for run $run_id (already approved?)"
+                done
+            done
 
             gh pr list --repo "$REPO" --state open --json headRefName --jq '.[].headRefName' |
               while read -r ref; do merge_pr "$ref"; done
