@@ -7,7 +7,7 @@ class NagaCli < Formula
   head "https://github.com/gfx-rs/wgpu.git", branch: "trunk"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef93a6e5e39acb58d6d5f959464d37365216e0d64c6f3480ed38a77a0fedbf59"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f049e8982f81b3b43ad100b2c46190cbb82bbad857cfd03d59ba0f1cc76fa9d0"
   end
 
   depends_on "rust" => :build
