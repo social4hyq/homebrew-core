@@ -7,7 +7,7 @@ class Precious < Formula
   head "https://github.com/houseabsolute/precious.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb40dba085d12f99b84dba3b17862aeab9a832a2dc02edda4a483335a956d5ae"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d8007a3ac76ac5e1b9797672ab788939097193637211a60b394a50f0c419ba4"
   end
 
   depends_on "rust" => :build
