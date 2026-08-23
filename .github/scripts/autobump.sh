@@ -26,8 +26,21 @@ source "$(dirname "$0")/lib.sh"
 : "${ALLOWLIST:?ALLOWLIST env var required (space-separated formula names)}"
 : "${GITHUB_TOKEN:?GITHUB_TOKEN env var required}"
 
-JSON=$(cbrew "livecheck --tap $TAP --json --newer-only") \
-  || { echo "::error::brew livecheck failed"; exit 1; }
+# Retry: livecheck exits 1 (silently, in --json mode — the error only lands in
+# the JSON as a per-formula status) when a livecheck URL returns 200 with a
+# non-JSON body (observed 2026-08-23: a Cloudflare/npm interstitial during the
+# scheduled run; the retry 17min later was clean). Fetch failures that surface
+# as HTTP errors don't set Homebrew.failed (exit 0 + error status) — only the
+# strategy-block exceptions (JSON.parse on a 200) do.
+JSON=""
+for attempt in 1 2 3; do
+  if JSON=$(cbrew "livecheck --tap $TAP --json --newer-only"); then
+    break
+  fi
+  echo "::warning::brew livecheck failed (attempt $attempt/3)"
+  [ "$attempt" = 3 ] && { echo "::error::brew livecheck failed after 3 attempts"; exit 1; }
+  sleep 30
+done
 
 mapfile -t CANDIDATES < <(
   jq -r --arg allow "$ALLOWLIST" --arg only "${ONLY_FORMULA:-}" '
@@ -139,16 +152,24 @@ for line in "${CANDIDATES[@]}"; do
           continue
           ;;
       esac
-      PUBLISHED=$(curl -fsSL "https://registry.npmjs.org/$NPM_PACKAGE" \
-        | jq -r --arg v "$LATEST" '.time[$v] // empty')
+      # `|| true` inside the $(): this script runs `bash -euo pipefail`, so an
+      # unguarded `VAR=$(curl|jq)` whose pipeline fails (network, HTTP error)
+      # would kill the script AT THE ASSIGNMENT — silently, before the -z
+      # checks below can route it to a per-formula ::error:: (observed
+      # 2026-08-23 as a bare "exit code 1" with zero output). --retry rides
+      # out transient runner-network blips; -S surfaces curl errors in the
+      # log for diagnosis even though -s quiets the progress meter.
+      PUBLISHED=$(curl -fsSL --retry 3 --retry-delay 2 \
+        "https://registry.npmjs.org/$NPM_PACKAGE" \
+        | jq -r --arg v "$LATEST" '.time[$v] // empty' || true)
       if [ -z "$PUBLISHED" ]; then
         echo "::error::$FORMULA: npm has no publish timestamp for $LATEST"
         echo "- ❌ $FORMULA: no npm timestamp for $LATEST" >> "$GITHUB_STEP_SUMMARY"
         continue
       fi
-      TARGET_SHA=$(curl -fsSL \
+      TARGET_SHA=$(curl -fsSL --retry 3 --retry-delay 2 \
         "https://api.github.com/repos/$GIT_REPO/commits?sha=$GIT_BRANCH&per_page=1&until=$PUBLISHED" \
-        | jq -r '.[0].sha // empty')
+        | jq -r '.[0].sha // empty' || true)
       if [ -z "$TARGET_SHA" ]; then
         echo "::error::$FORMULA: could not resolve a $GIT_BRANCH tip for $LATEST (published $PUBLISHED)"
         echo "- ❌ $FORMULA: version→sha resolution failed" >> "$GITHUB_STEP_SUMMARY"
@@ -158,8 +179,6 @@ for line in "${CANDIDATES[@]}"; do
       EDIT_VERSION=true
     fi
 
-    REV_N=$(docker exec "$CONTAINER" grep -oE '^  revision [0-9]+' "$FORMULA_PATH" | grep -oE '[0-9]+' | head -1)
-    REV_N=${REV_N:-0}
     if [ "$EDIT_VERSION" = true ]; then
       BRANCH="bump-${FORMULA}-${NEW_VERSION}"
       echo "npm-version formula: version $FORMULA_VERSION -> $NEW_VERSION, pin $CURRENT_REV -> $TARGET_SHA (brew revision stanza dropped)"
@@ -173,6 +192,15 @@ for line in "${CANDIDATES[@]}"; do
         ! grep -qE '^  revision [0-9]' \"$FORMULA_PATH\"
       "
     else
+      # REV_N lives ONLY in the sha scheme: npm-scheme formulae have no
+      # `revision N` stanza, and an unguarded no-match grep kills this script
+      # at the assignment under `set -e + pipefail` (observed 2026-08-23:
+      # bare exit 1, zero output, 0.6s after the candidate echo). The
+      # trailing `|| true` tolerates both the no-match and docker hiccups;
+      # REV_N=${REV_N:-0} only runs once the assignment itself can't throw.
+      REV_N=$(docker exec "$CONTAINER" grep -oE '^  revision [0-9]+' "$FORMULA_PATH" \
+        | grep -oE '[0-9]+' | head -1 || true)
+      REV_N=${REV_N:-0}
       NEXT_REV_N=$((REV_N + 1))
       NEW_VERSION="${FORMULA_VERSION}_${NEXT_REV_N}"
       BRANCH="bump-${FORMULA}-${NEW_VERSION}"
