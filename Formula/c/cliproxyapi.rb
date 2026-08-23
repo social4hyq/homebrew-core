@@ -13,7 +13,7 @@ class Cliproxyapi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f30b5616c12ef0ceab962a52dc11870225788d670f5f7f97b2b93a1d83151f19"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "475b046d669d299e739d70f76fa14548493c4aa9a4b3ae4974ad6654b5dd4f2a"
   end
 
   depends_on "go" => :build
