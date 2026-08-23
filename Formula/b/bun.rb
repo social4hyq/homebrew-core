@@ -6,7 +6,7 @@ class Bun < Formula
   url "https://github.com/social4hyq/ohos-bun.git", revision: "9b8d199f680d5ad05098f9dd7fe81638614e77ec", branch: "ohos-aarch64"
   version "1.4.0"
   license "MIT"
-  revision 74
+  revision 75
   # head tracks the same pre-patched fork branch as url.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "ohos-aarch64"
 
@@ -218,6 +218,14 @@ class Bun < Formula
     # the old keg (this shipped the r32 bottle without bin/bun).
     mkdir_p libexec/"bin"
     libexec.install out => "bin/bun" # mv preserves the 0755 set above
+
+    # DIAGNOSTIC ONLY — do not merge: also ship the unstripped bun-profile so
+    # MallocCallTracker SIGUSR2 dumps (raw addresses) can be symbolized offline
+    # with llvm-addr2line. Not signed/linked: it is a symbolication input, not
+    # a runnable target.
+    profile = buildpath/"build/release/bun-profile"
+    libexec.install profile => "bin/bun-profile" if profile.exist?
+
     bin.mkpath
     (bin/"bun").make_symlink "../libexec/bin/bun"
 
