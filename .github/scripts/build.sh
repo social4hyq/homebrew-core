@@ -24,7 +24,7 @@ source "$(dirname "$0")/lib.sh"
 # binary-sign-tool signing it (single or double) was verified harmless on
 # real hardware — the corruption mode is specific to bun and CGO_ENABLED=0
 # Go outputs.
-UNSET_SIGN_FORMULAS="claude-code qemu-aarch64"
+UNSET_SIGN_FORMULAS="claude-code qemu-aarch64 bun"
 ENV_PREFIX=""
 if tr ' ' '\n' <<< "$UNSET_SIGN_FORMULAS" | grep -qx "$FORMULA"; then
   ENV_PREFIX="env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN "
