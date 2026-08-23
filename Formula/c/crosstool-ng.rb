@@ -1,8 +1,8 @@
 class CrosstoolNg < Formula
   desc "Tool for building toolchains"
   homepage "https://crosstool-ng.github.io/"
-  url "https://github.com/crosstool-ng/crosstool-ng/releases/download/crosstool-ng-1.28.0/crosstool-ng-1.28.0.tar.xz"
-  sha256 "5750e29a2bda5cd8d67900592576b1670a1987a4dcd5e4f6beae09138a1f5699"
+  url "https://github.com/crosstool-ng/crosstool-ng/releases/download/crosstool-ng-1.29.0/crosstool-ng-1.29.0.tar.xz"
+  sha256 "1e0c5efcf2af674993b74a1783fe78727c8d34b500ebab07eb1bb0a45c8fcc87"
   license "GPL-2.0-only"
   head "https://github.com/crosstool-ng/crosstool-ng.git", branch: "master"
 
