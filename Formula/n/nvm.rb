@@ -5,6 +5,13 @@ class Nvm < Formula
   sha256 "d2fb84dba9914b02cd69b97df35dfca8695b8f22df6128667034d85b69b52d57"
   license "MIT"
   head "https://github.com/nvm-sh/nvm.git", branch: "master"
+  revision 1
+
+  # TODO: drop this patch once
+  # https://github.com/nvm-sh/nvm/pull/3898 is merged upstream.
+  patch do
+    file "Patches/nvm/0001-add-ohos-support.patch"
+  end
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "cf3ad819fad37fd759f0adfc294ebce05be5ad5b3c97f7a3b05d03362280d444"
@@ -30,6 +37,19 @@ class Nvm < Formula
       Please note that upstream has asked us to make explicit managing
       nvm via Homebrew is unsupported by them and you should check any
       problems against the standard nvm install method prior to reporting.
+
+      On OpenHarmony, the support tier of Node.js is currently marked
+      as "Experimental", so the official distribution source
+      nodejs.org/dist does not publish OpenHarmony binaries. You must
+      specify a third-party distribution source to install OpenHarmony
+      builds via nvm:
+
+        export NVM_NODEJS_ORG_MIRROR="https://ohos-node.com/dist"
+
+      This distribution source is maintained by a third-party
+      developer. It is maintained neither by the official Node.js
+      project nor by the official Harmonybrew project, and Harmonybrew
+      makes no security guarantees about it. Please use it with caution.
 
       You should create NVM's working directory if it doesn't exist:
         mkdir ~/.nvm
