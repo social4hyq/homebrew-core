@@ -1,13 +1,13 @@
 class Hjson < Formula
   desc "Convert JSON to HJSON and vice versa"
   homepage "https://hjson.github.io/"
-  url "https://github.com/hjson/hjson-go/archive/refs/tags/v4.6.0.tar.gz"
-  sha256 "5ee5ab2b191f4464a9ac98c3047441d94bd9d5fdeb77f651f9d90f1dacd54f74"
+  url "https://github.com/hjson/hjson-go/archive/refs/tags/v4.7.0.tar.gz"
+  sha256 "800b8f511f503b75bf794db2b2709bc15e8ea9e461eecdb2408472fb363189c2"
   license "MIT"
   head "https://github.com/hjson/hjson-go.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7bcb2416407595a1756d3e20d5b05fce87421f4dca30b68b618b2bb824e514f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "072d4a5101a2fdd38263218e3e0773b681f5f807661a859dec01b90581bccfe4"
   end
 
   depends_on "go" => :build
