@@ -124,9 +124,11 @@ jobs:
             # (observed 2026-08-23 05:57 sweep vs PR #412 — the identical
             # 03:53 sweep won the same race against #406 by luck).
             # Not fatal: one unmergeable PR must not kill the sweep loop
-            # before it reaches the other candidates.
+            # before it reaches the other candidates. A transient BLOCKED
+            # state right after the approvals below self-heals: this sweep
+            # warns, the next hourly sweep enqueues cleanly.
             gh pr merge "$PR" --merge --auto --repo "$REPO" ||
-              echo "::warning::merge enqueue failed for PR #$PR (dirty/unclean?); check manually"
+              echo "::warning::merge enqueue failed for PR #$PR (mergeStateStatus=$(gh pr view "$PR" --repo "$REPO" --json mergeStateStatus --jq .mergeStateStatus)); next sweep retries"
           }
 
           if [ "$EVENT_NAME" = "schedule" ] || [ "$EVENT_NAME" = "workflow_dispatch" ]; then
@@ -151,6 +153,15 @@ jobs:
                     echo "::warning::approve failed for run $run_id (already approved?)"
                 done
             done
+
+            # Let the approvals land before merging: GitHub takes a few
+            # seconds to flip a just-approved run off action_required, and
+            # during that window the required `label` check still reads
+            # failed, which makes even --auto enqueue refuse the PR
+            # (observed 2026-08-23 06:11 sweep vs PR #411 — enqueued fine
+            # 90s later once the state was CLEAN). 20s on an hourly 5-min
+            # job is nothing.
+            sleep 20
 
             gh pr list --repo "$REPO" --state open --json headRefName --jq '.[].headRefName' |
               while read -r ref; do merge_pr "$ref"; done
