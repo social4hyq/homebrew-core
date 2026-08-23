@@ -1,8 +1,8 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.241.tgz"
-  sha256 "0ca54a7580af251a22ab62b2bacdd60f49e7717408627e38838ac2dc9997003a"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.239.tgz"
+  sha256 "b722268e66773213614e5943430e8c46e6b34073cf1e7b8cb01b17d3adb86252"
   license :cannot_represent # Anthropic Commercial Terms of Service
   # npmmirror mirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org
   # (aarch64 SIMD AES path trapped by kernel); npmmirror (Aliyun CDN) doesn't.
@@ -33,15 +33,19 @@ class ClaudeCode < Formula
   # Relocatability: wrapper uses runtime $HOMEBREW_PREFIX only — no build-time path interpolation.
 
   livecheck do
-    # www.npmjs.com 403s from this env; registry API JSON is reachable.
-    # Same npmmirror livecheck pattern used elsewhere in this tap.
-    url "https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64-musl/latest"
+    # npmmirror (Aliyun CDN): registry.npmjs.org is Cloudflare-fronted and
+    # intermittently serves CI runners a 200 non-JSON challenge page, which
+    # kills `brew livecheck` with a bare exit 1 (strategy JSON.parse raise;
+    # observed on scheduled autobump runs 2026-08-23). The mirror serves
+    # identical package metadata without CF. Downloads already prefer the
+    # mirror for the same reachability reason (see install).
+    url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/latest"
     regex(/"version":\s*"(\d+(?:\.\d+)+)"/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.241-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f52a08096b8564e413ddd32256372c0cd75bfd63e7c1b6bcc1bb381c3cdc399e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.239-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "893b8efccc4a42c372f62498dfaaa1a086d6e6d58009b8bf2159b12199e22005"
   end
 
   depends_on "bun"

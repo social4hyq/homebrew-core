@@ -171,8 +171,18 @@ for line in "${CANDIDATES[@]}"; do
       # 2026-08-23 as a bare "exit code 1" with zero output). --retry rides
       # out transient runner-network blips; -S surfaces curl errors in the
       # log for diagnosis even though -s quiets the progress meter.
-      PUBLISHED=$(curl -fsSL --retry 3 --retry-delay 2 \
-        "https://registry.npmjs.org/$NPM_PACKAGE" \
+      # `|| true` inside the $(): this script runs `bash -euo pipefail`, so an
+      # unguarded `VAR=$(curl|jq)` whose pipeline fails (network, HTTP error)
+      # would kill the script AT THE ASSIGNMENT — silently, before the -z
+      # checks below can route it to a per-formula ::error:: (observed
+      # 2026-08-23 as a bare "exit code 1" with zero output). --retry rides
+      # out transient runner-network blips; -S surfaces curl errors in the
+      # log for diagnosis even though -s quiets the progress meter.
+      # npmmirror for the same reason as the livecheck URLs: registry.npmjs.org
+      # is CF-fronted and intermittently challenges CI runner IPs; the mirror
+      # proxies identical time metadata (verified 2026-08-23).
+      PUBLISHED=$(curl -fsSL -S --retry 3 --retry-delay 2 \
+        "https://registry.npmmirror.com/$NPM_PACKAGE" \
         | jq -r --arg v "$LATEST" '.time[$v] // empty' || true)
       if [ -z "$PUBLISHED" ]; then
         echo "::error::$FORMULA: npm has no publish timestamp for $LATEST"

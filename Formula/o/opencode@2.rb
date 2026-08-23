@@ -17,8 +17,8 @@ class OpencodeAT2 < Formula
   # libopentui.so imports pthread_tryjoin_np, which OHOS musl lacks — the
   # wrapper LD_PRELOADs a small shim providing it (see install).
   # See social4hyq/ohos-opencode2 dev for canonical diff.
-  url "https://github.com/anomalyco/opencode.git", revision: "358a53cb1fd651efd4758a88c1ffdfbc183e6af2"
-  version "0.0.0-beta-17941"
+  url "https://github.com/anomalyco/opencode.git", revision: "97536add75f8164f1320c3d3882fdbd5639f5240"
+  version "0.0.0-beta-17898"
   license "MIT"
   # Version scheme changed 2.0.0-beta_N → npm's 0.0.0-beta-<build>, which
   # sorts BELOW the old string; version_scheme forces brew upgrade to treat
@@ -28,17 +28,20 @@ class OpencodeAT2 < Formula
   # Livecheck the npm beta dist-tag (published v2 builds). The formula's
   # `version` uses the same scheme, so livecheck output is directly
   # comparable; autobump.sh's custom path maps a new npm version to the git
-  # pin via the npm publish timestamp.
+  # pin via the npm publish timestamp. npmmirror, not registry.npmjs.org:
+  # Cloudflare intermittently serves CI runners a 200 non-JSON challenge
+  # that kills livecheck with a bare exit 1 (observed 2026-08-23); the
+  # mirror's dist-tag metadata is identical and CF-free.
   livecheck do
-    url "https://registry.npmjs.org/@opencode-ai/cli/beta"
+    url "https://registry.npmmirror.com/@opencode-ai/cli/beta"
     strategy :json do |json|
       json["version"]
     end
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-beta-17941-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a65812ee43784926804779f8fdc414db8ef43626d8e7f710d6a43cd2cf54df2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-beta-17898-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7a8cee0d0a3652e71da9aa15c88e2b03fa25d8d7f6b60c272c546a7953d6f61d"
   end
 
   # `bun build --compile` single binary: runtime + JS + .so embedded; since
