@@ -1,5 +1,5 @@
 diff --git a/Source/WTF/wtf/FastMalloc.cpp b/Source/WTF/wtf/FastMalloc.cpp
-index bb0e777..66cf105 100644
+index bb0e777..7caea28 100644
 --- a/Source/WTF/wtf/FastMalloc.cpp
 +++ b/Source/WTF/wtf/FastMalloc.cpp
 @@ -27,6 +27,7 @@
@@ -72,7 +72,7 @@ index bb0e777..66cf105 100644
  AvoidRecordingScope::AvoidRecordingScope()
  {
      static std::once_flag onceKey;
-@@ -215,12 +238,67 @@ MallocCallTracker& MallocCallTracker::singleton()
+@@ -215,12 +238,73 @@ MallocCallTracker& MallocCallTracker::singleton()
  
  MallocCallTracker::MallocCallTracker()
  {
@@ -85,8 +85,8 @@ index bb0e777..66cf105 100644
 +    // Non-Cocoa diagnostic triggers are installed by T35HandlerInstaller below,
 +    // unconditionally at static-init time, so they are live even when recording
 +    // is gated off via T35_FASTMALLOC_TRACK.
- }
- 
++}
++
 +#if !PLATFORM(COCOA) && !OS(WINDOWS)
 +namespace {
 +
@@ -109,14 +109,20 @@ index bb0e777..66cf105 100644
 +
 +// SIGUSR1 probe: is the bmalloc/libpas growth free-but-retained (scavenge
 +// reclaims it) or orphaned/live (scavenge cannot)? Send only while parked.
++extern "C" void bmallocDumpHeapCensusT35();
++
 +void t35ScavengeProbe()
 +{
++    WTFLogAlways("T35 heap census BEFORE scavenge:\n");
++    bmallocDumpHeapCensusT35();
 +    size_t before = t35CurrentRSS();
 +    bmalloc::api::scavenge();
 +    size_t after = t35CurrentRSS();
 +    WTFLogAlways("T35 scavenge probe: RSS %zu -> %zu bytes (reclaimed %zd)\n", before, after, static_cast<ssize_t>(before) - static_cast<ssize_t>(after));
-+}
-+
++    WTFLogAlways("T35 heap census AFTER scavenge:\n");
++    bmallocDumpHeapCensusT35();
+ }
+ 
 +struct T35HandlerInstaller {
 +    T35HandlerInstaller()
 +    {
@@ -140,7 +146,7 @@ index bb0e777..66cf105 100644
  void MallocCallTracker::recordMalloc(void* address, size_t allocationSize)
  {
      AvoidRecordingScope avoidRecording;
-@@ -318,7 +396,8 @@ void MallocCallTracker::dumpStats()
+@@ -318,7 +402,8 @@ void MallocCallTracker::dumpStats()
              // FIXME: Add a way to remove some entries in StackShot in a programable way.
              // https://bugs.webkit.org/show_bug.cgi?id=205701
              const size_t framesToSkip = 6;
@@ -150,7 +156,7 @@ index bb0e777..66cf105 100644
              WTFLogAlways("\n");
          }
      }
-@@ -343,8 +422,8 @@ PRESERVE_MOST void* fastMalloc(size_t size)
+@@ -343,8 +428,8 @@ PRESERVE_MOST void* fastMalloc(size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::malloc(size, bmalloc::CompactAllocationMode::NonCompact);
@@ -161,7 +167,7 @@ index bb0e777..66cf105 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_ALLOCATION(NON_JS_CELL, result, size);
-@@ -356,8 +435,8 @@ void* fastZeroedMalloc(size_t size)
+@@ -356,8 +441,8 @@ void* fastZeroedMalloc(size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::zeroedMalloc(size, bmalloc::CompactAllocationMode::NonCompact);
@@ -172,7 +178,7 @@ index bb0e777..66cf105 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_ALLOCATION(NON_JS_CELL, result, size);
-@@ -369,6 +448,12 @@ TryMallocReturnValue tryFastZeroedMalloc(size_t size)
+@@ -369,6 +454,12 @@ TryMallocReturnValue tryFastZeroedMalloc(size_t size)
      FAIL_IF_EXCEEDS_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::tryZeroedMalloc(size, bmalloc::CompactAllocationMode::NonCompact);
@@ -185,7 +191,7 @@ index bb0e777..66cf105 100644
      BPROFILE_TRY_ALLOCATION(NON_JS_CELL, result, size);
      return result;
  }
-@@ -390,8 +475,8 @@ void* fastRealloc(void* object, size_t size)
+@@ -390,8 +481,8 @@ void* fastRealloc(void* object, size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::realloc(object, size, bmalloc::CompactAllocationMode::NonCompact);
@@ -196,7 +202,7 @@ index bb0e777..66cf105 100644
          MallocCallTracker::singleton().recordRealloc(object, result, size);
  #endif
      BPROFILE_ALLOCATION(NON_JS_CELL, result, size);
-@@ -401,8 +486,8 @@ void* fastRealloc(void* object, size_t size)
+@@ -401,8 +492,8 @@ void* fastRealloc(void* object, size_t size)
  PRESERVE_MOST void fastFree(void* object)
  {
      bmalloc::api::free(object);
@@ -207,7 +213,7 @@ index bb0e777..66cf105 100644
          MallocCallTracker::singleton().recordFree(object);
  #endif
  }
-@@ -439,8 +524,8 @@ PRESERVE_MOST void* fastAlignedMalloc(size_t alignment, size_t size)
+@@ -439,8 +530,8 @@ PRESERVE_MOST void* fastAlignedMalloc(size_t alignment, size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::memalign(alignment, size, bmalloc::CompactAllocationMode::NonCompact);
@@ -218,7 +224,7 @@ index bb0e777..66cf105 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_ALLOCATION(NON_JS_CELL, result, size);
-@@ -452,8 +537,8 @@ PRESERVE_MOST void* tryFastAlignedMalloc(size_t alignment, size_t size)
+@@ -452,8 +543,8 @@ PRESERVE_MOST void* tryFastAlignedMalloc(size_t alignment, size_t size)
      FAIL_IF_EXCEEDS_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::tryMemalign(alignment, size, bmalloc::CompactAllocationMode::NonCompact);
@@ -229,7 +235,7 @@ index bb0e777..66cf105 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_TRY_ALLOCATION(NON_JS_CELL, result, size);
-@@ -465,6 +550,12 @@ PRESERVE_MOST TryMallocReturnValue tryFastMalloc(size_t size)
+@@ -465,6 +556,12 @@ PRESERVE_MOST TryMallocReturnValue tryFastMalloc(size_t size)
      FAIL_IF_EXCEEDS_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::tryMalloc(size, bmalloc::CompactAllocationMode::NonCompact);
@@ -242,7 +248,7 @@ index bb0e777..66cf105 100644
      BPROFILE_TRY_ALLOCATION(NON_JS_CELL, result, size);
      return result;
  }
-@@ -484,6 +575,16 @@ TryMallocReturnValue tryFastRealloc(void* object, size_t newSize)
+@@ -484,6 +581,16 @@ TryMallocReturnValue tryFastRealloc(void* object, size_t newSize)
      FAIL_IF_EXCEEDS_LIMIT(newSize);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::tryRealloc(object, newSize, bmalloc::CompactAllocationMode::NonCompact);
@@ -259,7 +265,7 @@ index bb0e777..66cf105 100644
      BPROFILE_TRY_ALLOCATION(NON_JS_CELL, result, newSize);
      return result;
  }
-@@ -493,8 +594,8 @@ PRESERVE_MOST void* fastCompactMalloc(size_t size)
+@@ -493,8 +600,8 @@ PRESERVE_MOST void* fastCompactMalloc(size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::malloc(size, bmalloc::CompactAllocationMode::Compact);
@@ -270,7 +276,7 @@ index bb0e777..66cf105 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_ALLOCATION(COMPACTIBLE, result, size);
-@@ -506,8 +607,8 @@ void* fastCompactZeroedMalloc(size_t size)
+@@ -506,8 +613,8 @@ void* fastCompactZeroedMalloc(size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::zeroedMalloc(size, bmalloc::CompactAllocationMode::Compact);
@@ -281,7 +287,7 @@ index bb0e777..66cf105 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_ALLOCATION(COMPACTIBLE, result, size);
-@@ -518,7 +619,14 @@ TryMallocReturnValue tryFastCompactZeroedMalloc(size_t size)
+@@ -518,7 +625,14 @@ TryMallocReturnValue tryFastCompactZeroedMalloc(size_t size)
  {
      FAIL_IF_EXCEEDS_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
@@ -297,7 +303,7 @@ index bb0e777..66cf105 100644
  }
  
  void* fastCompactCalloc(size_t numElements, size_t elementSize)
-@@ -538,8 +646,8 @@ void* fastCompactRealloc(void* object, size_t size)
+@@ -538,8 +652,8 @@ void* fastCompactRealloc(void* object, size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::realloc(object, size, bmalloc::CompactAllocationMode::Compact);
@@ -308,7 +314,7 @@ index bb0e777..66cf105 100644
          MallocCallTracker::singleton().recordRealloc(object, result, size);
  #endif
      BPROFILE_ALLOCATION(COMPACTIBLE, result, size);
-@@ -551,8 +659,8 @@ PRESERVE_MOST void* fastCompactAlignedMalloc(size_t alignment, size_t size)
+@@ -551,8 +665,8 @@ PRESERVE_MOST void* fastCompactAlignedMalloc(size_t alignment, size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::memalign(alignment, size, bmalloc::CompactAllocationMode::Compact);
@@ -319,7 +325,7 @@ index bb0e777..66cf105 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_ALLOCATION(COMPACTIBLE, result, size);
-@@ -564,8 +672,8 @@ PRESERVE_MOST void* tryFastCompactAlignedMalloc(size_t alignment, size_t size)
+@@ -564,8 +678,8 @@ PRESERVE_MOST void* tryFastCompactAlignedMalloc(size_t alignment, size_t size)
      FAIL_IF_EXCEEDS_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::tryMemalign(alignment, size, bmalloc::CompactAllocationMode::Compact);
@@ -330,7 +336,7 @@ index bb0e777..66cf105 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_ALLOCATION(COMPACTIBLE, result, size);
-@@ -577,6 +685,12 @@ PRESERVE_MOST TryMallocReturnValue tryFastCompactMalloc(size_t size)
+@@ -577,6 +691,12 @@ PRESERVE_MOST TryMallocReturnValue tryFastCompactMalloc(size_t size)
      FAIL_IF_EXCEEDS_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::tryMalloc(size, bmalloc::CompactAllocationMode::Compact);
@@ -343,7 +349,7 @@ index bb0e777..66cf105 100644
      BPROFILE_ALLOCATION(COMPACTIBLE, result, size);
      return result;
  }
-@@ -596,6 +710,16 @@ TryMallocReturnValue tryFastCompactRealloc(void* object, size_t newSize)
+@@ -596,6 +716,16 @@ TryMallocReturnValue tryFastCompactRealloc(void* object, size_t newSize)
      FAIL_IF_EXCEEDS_LIMIT(newSize);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::tryRealloc(object, newSize, bmalloc::CompactAllocationMode::Compact);
@@ -373,3 +379,32 @@ index 233b9bc..e7fe6e4 100644
  #define HAVE_BACKTRACE 1
  #define HAVE_BACKTRACE_SYMBOLS 1
  #endif
+diff --git a/Source/bmalloc/bmalloc/bmalloc.cpp b/Source/bmalloc/bmalloc/bmalloc.cpp
+index 02d1694..926bb2c 100644
+--- a/Source/bmalloc/bmalloc/bmalloc.cpp
++++ b/Source/bmalloc/bmalloc/bmalloc.cpp
+@@ -216,3 +216,24 @@ void forceEnablePGM(uint16_t guardMallocRate)
+ 
+ } } // namespace bmalloc::api
+ 
++
++// === T35 diagnostic (DNM): per-heap live/free census over all libpas heaps ===
++#include "pas_all_heaps.h"
++#include "pas_heap.h"
++#include "pas_heap_summary.h"
++
++#include <stdio.h>
++
++static bool t35CensusCallback(pas_heap* heap, void*)
++{
++    pas_heap_summary summary = pas_heap_compute_summary(heap, pas_lock_is_not_held);
++    fprintf(stderr, "T35HEAP type=%p objsize=%zu allocated=%zu free=%zu committed=%zu meta=%zu\n",
++            static_cast<const void*>(heap->type), pas_heap_get_type_size(heap),
++            summary.allocated, summary.free, summary.committed, summary.meta);
++    return true;
++}
++
++extern "C" void bmallocDumpHeapCensusT35()
++{
++    pas_all_heaps_for_each_heap(t35CensusCallback, nullptr);
++}
