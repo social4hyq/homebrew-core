@@ -471,3 +471,110 @@ index 02d1694..1bac9cd 100644
 +    }
 +    fprintf(stderr, "T35OBJLARGE-TOTAL count=%lu bytes=%llu\n", t35LargeCount, t35LargeBytes);
 +}
+diff --git a/Source/bmalloc/libpas/src/libpas/pas_fast_tls.h b/Source/bmalloc/libpas/src/libpas/pas_fast_tls.h
+index cd12a80..61b9246 100644
+--- a/Source/bmalloc/libpas/src/libpas/pas_fast_tls.h
++++ b/Source/bmalloc/libpas/src/libpas/pas_fast_tls.h
+@@ -28,6 +28,28 @@
+ 
+ #include "pas_utils.h"
+ 
++/* T35 diagnostic (DNM): surface pthread TLS registration failures. If
++   pthread_key_create fails (e.g. PTHREAD_KEYS_MAX exhaustion) libpas currently
++   proceeds with a garbage key, pthread_setspecific then no-ops, and the TLC
++   destructor never fires at thread exit — orphaning every freed object the
++   thread had cached. Log failures (rate-limited) so this is observable. */
++#include <stdio.h>
++#include <unistd.h>
++
++static inline void pas_fast_tls_t35_log_fail(const char* what, int rc)
++{
++    static int t35_tls_fail_logged;
++    if (t35_tls_fail_logged < 50) {
++        char t35_buf[96];
++        int t35_n = snprintf(t35_buf, sizeof(t35_buf), "T35TLS %s failed rc=%d\n", what, rc);
++        t35_tls_fail_logged++;
++        if (t35_n > 0) {
++            ssize_t t35_r = write(2, t35_buf, (size_t)t35_n);
++            (void)t35_r;
++        }
++    }
++}
++
+ PAS_BEGIN_EXTERN_C;
+ 
+ struct pas_fast_tls;
+@@ -110,7 +132,9 @@ struct pas_fast_tls {
+         void (*the_destructor)(void* arg) = (passed_destructor); \
+         pas_heap_lock_assert_held(); \
+         if (!fast_tls->is_initialized) { \
+-            pthread_key_create(&fast_tls->key, the_destructor); \
++            int t35_rc = pthread_key_create(&fast_tls->key, the_destructor); \
++            if (t35_rc) \
++                pas_fast_tls_t35_log_fail("key_create", t35_rc); \
+             fast_tls->is_initialized = true; \
+         } \
+     } while (false)
+@@ -155,7 +179,9 @@ struct pas_fast_tls {
+         static_key = value; \
+         if (((uintptr_t)value) != PAS_THREAD_LOCAL_CACHE_DESTROYED) { \
+             /* Using pthread_setspecific to configure callback for thread exit. */ \
+-            pthread_setspecific(fast_tls->key, value); \
++            int t35_rc = pthread_setspecific(fast_tls->key, value); \
++            if (t35_rc) \
++                pas_fast_tls_t35_log_fail("setspecific", t35_rc); \
+         } \
+     } while (false)
+ 
+diff --git a/Source/bmalloc/libpas/src/libpas/pas_thread_local_cache.c b/Source/bmalloc/libpas/src/libpas/pas_thread_local_cache.c
+index e10ec10..0603b3f 100644
+--- a/Source/bmalloc/libpas/src/libpas/pas_thread_local_cache.c
++++ b/Source/bmalloc/libpas/src/libpas/pas_thread_local_cache.c
+@@ -48,6 +48,7 @@
+ #if PAS_OS(WINDOWS)
+ #include <windows.h>
+ #else
++#include <stdio.h>
+ #include <unistd.h>
+ #endif
+ #if PAS_OS(DARWIN)
+@@ -159,6 +160,19 @@ static void destructor(void* arg)
+ 
+     thread_local_cache = (pas_thread_local_cache*)arg;
+ 
++    /* T35 diagnostic (DNM): record that the pthread-key destructor fired at
++       thread exit. Absence of this line for dead worker threads while the
++       common-primitive heap grows = the TLC was orphaned (key registration
++       never happened or was cleared). */
++    {
++        char t35_buf[96];
++        int t35_n = snprintf(t35_buf, sizeof(t35_buf), "T35TLCDTOR fired arg=%p\n", arg);
++        if (t35_n > 0) {
++            ssize_t t35_r = write(2, t35_buf, (size_t)t35_n);
++            (void)t35_r;
++        }
++    }
++
+     if (verbose)
+         pas_log("[%d] Destructor call for TLS %p\n", getpid(), thread_local_cache);
+ 
+@@ -308,7 +322,18 @@ pas_thread_local_cache* pas_thread_local_cache_create(void)
+     allocator_index_upper_bound = pas_thread_local_cache_layout_next_allocator_index;
+     
+     thread_local_cache = allocate_cache(allocator_index_upper_bound);
+-    
++
++    /* T35 diagnostic (DNM): pair with the destructor log — counts created vs
++       destroyed TLCs. */
++    {
++        char t35_buf[96];
++        int t35_n = snprintf(t35_buf, sizeof(t35_buf), "T35TLC created %p\n", (void*)thread_local_cache);
++        if (t35_n > 0) {
++            ssize_t t35_r = write(2, t35_buf, (size_t)t35_n);
++            (void)t35_r;
++        }
++    }
++
+     thread_local_cache->node = pas_thread_local_cache_node_allocate();
+ 
+     if (verbose) {
