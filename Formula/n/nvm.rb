@@ -5,16 +5,16 @@ class Nvm < Formula
   sha256 "d2fb84dba9914b02cd69b97df35dfca8695b8f22df6128667034d85b69b52d57"
   license "MIT"
   head "https://github.com/nvm-sh/nvm.git", branch: "master"
-  revision 1
+  revision 2
 
-  # TODO: drop this patch once
-  # https://github.com/nvm-sh/nvm/pull/3898 is merged upstream.
+  # Hardcode the platform identifier to ensure this nvm can run
+  # on any minimalist system environment (e.g., DockerHarmony).
   patch do
-    file "Patches/nvm/0001-add-ohos-support.patch"
+    file "Patches/nvm/0001-hardcode-platform.patch"
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f4a51cda65c773d5f78de96559da6ad3bf53f0c788b3729da75848814f2ed03"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b22bc1ecfda1ca10deadbfd75fb56610b3ae2ae287f096022e0aede91a3b481"
   end
 
   def install

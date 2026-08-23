@@ -1,0 +1,25 @@
+diff --git a/nvm.sh b/nvm.sh
+index 42a63ee..129d8dd 100755
+--- a/nvm.sh
++++ b/nvm.sh
+@@ -2241,19 +2241,7 @@ nvm_print_implicit_alias() {
+ }
+ 
+ nvm_get_os() {
+-  local NVM_UNAME
+-  NVM_UNAME="$(command uname -a)"
+-  local NVM_OS
+-  case "${NVM_UNAME}" in
+-    Linux\ *) NVM_OS=linux ;;
+-    Darwin\ *) NVM_OS=darwin ;;
+-    SunOS\ *) NVM_OS=sunos ;;
+-    FreeBSD\ *) NVM_OS=freebsd ;;
+-    OpenBSD\ *) NVM_OS=openbsd ;;
+-    AIX\ *) NVM_OS=aix ;;
+-    CYGWIN* | MSYS* | MINGW*) NVM_OS=win ;;
+-  esac
+-  nvm_echo "${NVM_OS-}"
++  nvm_echo "openharmony"
+ }
+ 
+ nvm_get_arch() {
