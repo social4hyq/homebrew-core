@@ -7,7 +7,7 @@ class Pacparser < Formula
   head "https://github.com/manugarg/pacparser.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce5e16aff9b3276040d2d9aa1df8a32ff94f8c4266898bb8014a7fcdd6ddac51"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd01dac5bf8e2c4ebce2519a36fc569fc946193df7213d7e6a48eff57ab627a3"
   end
 
   def install
