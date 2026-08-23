@@ -527,10 +527,23 @@ index cd12a80..61b9246 100644
      } while (false)
  
 diff --git a/Source/bmalloc/libpas/src/libpas/pas_thread_local_cache.c b/Source/bmalloc/libpas/src/libpas/pas_thread_local_cache.c
-index e10ec10..0603b3f 100644
+index e10ec10..8a37c27 100644
 --- a/Source/bmalloc/libpas/src/libpas/pas_thread_local_cache.c
 +++ b/Source/bmalloc/libpas/src/libpas/pas_thread_local_cache.c
-@@ -48,6 +48,7 @@
+@@ -32,7 +32,12 @@
+ #include "pas_all_heap_configs.h"
+ #include "pas_bitvector.h"
+ #include "pas_committed_pages_vector.h"
++#include "pas_heap.h"
+ #include "pas_heap_lock.h"
++#include "pas_heap_summary.h"
++#if PAS_ENABLE_BMALLOC
++#include "bmalloc_heap_innards.h"
++#endif
+ #include "pas_large_utility_free_heap.h"
+ #include "pas_log.h"
+ #include "pas_process.h"
+@@ -48,6 +53,7 @@
  #if PAS_OS(WINDOWS)
  #include <windows.h>
  #else
@@ -538,7 +551,7 @@ index e10ec10..0603b3f 100644
  #include <unistd.h>
  #endif
  #if PAS_OS(DARWIN)
-@@ -159,6 +160,19 @@ static void destructor(void* arg)
+@@ -159,6 +165,19 @@ static void destructor(void* arg)
  
      thread_local_cache = (pas_thread_local_cache*)arg;
  
@@ -558,7 +571,32 @@ index e10ec10..0603b3f 100644
      if (verbose)
          pas_log("[%d] Destructor call for TLS %p\n", getpid(), thread_local_cache);
  
-@@ -308,7 +322,18 @@ pas_thread_local_cache* pas_thread_local_cache_create(void)
+@@ -180,9 +199,22 @@ static void destructor(void* arg)
+     PAS_ASSERT(!pas_thread_local_cache_can_set());
+ #endif
+ 
+-    if (thread_local_cache && ((uintptr_t)thread_local_cache) != PAS_THREAD_LOCAL_CACHE_DESTROYED)
++    if (thread_local_cache && ((uintptr_t)thread_local_cache) != PAS_THREAD_LOCAL_CACHE_DESTROYED) {
++#if PAS_ENABLE_BMALLOC
++        /* T35 diagnostic v8 (DNM): does this thread's exit actually return
++           memory to the common primitive heap? Walk the heap summary before
++           and after destroy(); a working flush shows allocated dropping. */
++        unsigned t35_log_index = thread_local_cache->deallocation_log_index;
++        size_t t35_logged_bytes = thread_local_cache->num_logged_bytes;
++        pas_heap_summary t35_s0 = pas_heap_compute_summary(&bmalloc_common_primitive_heap, pas_lock_is_not_held);
+         destroy(thread_local_cache, pas_lock_is_not_held);
+-    else {
++        pas_heap_summary t35_s1 = pas_heap_compute_summary(&bmalloc_common_primitive_heap, pas_lock_is_not_held);
++        fprintf(stderr, "T35TLCDTOR done arg=%p logidx=%u loggedbytes=%zu commonprim_allocated %zu -> %zu\n",
++                arg, t35_log_index, t35_logged_bytes, t35_s0.allocated, t35_s1.allocated);
++#else
++        destroy(thread_local_cache, pas_lock_is_not_held);
++#endif
++    } else {
+         if (verbose)
+             pas_log("[%d] Repeated destructor call for TLS %p\n", getpid(), thread_local_cache);
+     }
+@@ -308,7 +340,18 @@ pas_thread_local_cache* pas_thread_local_cache_create(void)
      allocator_index_upper_bound = pas_thread_local_cache_layout_next_allocator_index;
      
      thread_local_cache = allocate_cache(allocator_index_upper_bound);
