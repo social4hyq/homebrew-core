@@ -1,13 +1,13 @@
 class Oxker < Formula
   desc "Terminal User Interface (TUI) to view & control docker containers"
   homepage "https://github.com/mrjackwills/oxker"
-  url "https://github.com/mrjackwills/oxker/archive/refs/tags/v0.13.3.tar.gz"
-  sha256 "e58c061519d4b5baade0651d18a0c0b7165dcaecf87db00f1d11c582e2dbea45"
+  url "https://github.com/mrjackwills/oxker/archive/refs/tags/v0.13.4.tar.gz"
+  sha256 "fbb3a24fbbc753054f5a60b2aba59539c9b9f34df4400b05e566c78cf30b0a92"
   license "MIT"
   head "https://github.com/mrjackwills/oxker.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd592c679cb6459ab1afa1f9570eaa1b8b8bd238310371f7767f24c188a795f6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee4de15c42ed274c91606550094800d42022f8e5f318e3c112417d93a399930b"
   end
 
   depends_on "rust" => :build
