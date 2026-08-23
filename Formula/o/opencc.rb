@@ -1,14 +1,14 @@
 class Opencc < Formula
   desc "Simplified-traditional Chinese conversion tool"
   homepage "https://github.com/BYVoid/OpenCC"
-  url "https://github.com/BYVoid/OpenCC/archive/refs/tags/ver.1.4.1.tar.gz"
-  sha256 "d4b94877c508a4774853f3b07330b3d25df00105c39dfba6ab9889d77946cc8a"
+  url "https://github.com/BYVoid/OpenCC/archive/refs/tags/ver.1.4.2.tar.gz"
+  sha256 "8e5f5cf7fe195bd9b9be851adc9738c1ef7dc5c24441dd5878a56db4087a9a70"
   license "Apache-2.0"
   compatibility_version 1
   head "https://github.com/BYVoid/OpenCC.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "40c0ee69359f293b17e70bc3f7dc9b1c6f8b519fa97c92a6fdbbd0449d5c1aa2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e41b8eecf2982f2989c128b2a6ab1609d4e2009c0b54220626e9a4c2bd12a892"
   end
 
   depends_on "cmake" => :build
