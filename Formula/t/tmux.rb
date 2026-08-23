@@ -5,6 +5,7 @@ class Tmux < Formula
   sha256 "7c60cae9a0e25288e2e24750aafc9e8800fc7fd4555e447e1b29ee4201cfb3bf"
   license "ISC"
   compatibility_version 1
+  revision 1
 
   livecheck do
     url :stable
@@ -13,7 +14,7 @@ class Tmux < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f1a9b79ca9aa20b2c8c344d5d2084e7071045df32b275bd973268658eecbc94"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9bb3198c5d7dc97cb00620d4e0dcda7015a984c074badb8f32710a1b951d6b7a"
   end
 
   head do
@@ -22,6 +23,10 @@ class Tmux < Formula
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool" => :build
+  end
+
+  patch do
+    file "Patches/tmux/0001-use-ohos-tempdir.patch"
   end
 
   depends_on "pkgconf" => :build
