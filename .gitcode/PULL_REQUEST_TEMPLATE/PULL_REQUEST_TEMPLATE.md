@@ -21,6 +21,6 @@
   以下几类 PR 可豁免，无需提供截图：
     Harmonybrew 官方维护者创建的 PR
     formula-migration-tool 自动创建的 PR
-    机器人创建的 PR
+    机器人 HarmonybrewBot 创建的 PR
 -->
 
