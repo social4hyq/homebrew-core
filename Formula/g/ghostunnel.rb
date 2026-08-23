@@ -1,13 +1,13 @@
 class Ghostunnel < Formula
   desc "Simple SSL/TLS proxy with mutual authentication"
   homepage "https://github.com/ghostunnel/ghostunnel"
-  url "https://github.com/ghostunnel/ghostunnel/archive/refs/tags/v1.11.2.tar.gz"
-  sha256 "77d369f25ec0f8439b198df7da4eae4aec901e16a8b39965a6fc14f15c80a002"
+  url "https://github.com/ghostunnel/ghostunnel/archive/refs/tags/v1.11.3.tar.gz"
+  sha256 "3b7221a474d39cd56598a874d5d9b27b20ebb857c655899b5c6960ccfa3b6a30"
   license "Apache-2.0"
   head "https://github.com/ghostunnel/ghostunnel.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "343603cb2dd20cab032d8fdc8cb6e074613a54e73e7502299e50f77ea15fceb4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "34d6fe4c9a2131f5799e020839a3d790e6720bc6f5e9541be5ac1379de602cad"
   end
 
   depends_on "go" => :build
