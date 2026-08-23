@@ -5,7 +5,7 @@ class BunWebkit < Formula
       revision: "0f966e81b78c84bb23213e391bc679c4ef83e56b"
   version "0f966e81b7"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
-  revision 3
+  revision 4
   # Fully rewritten from upstream: builds only JSC/WTF/bmalloc static archives, pinned to bun's WEBKIT_VERSION.
 
   # Pinned to bun's WEBKIT_VERSION; OHOS adaptation handled bun-side (webkit.ts.patch).
