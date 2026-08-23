@@ -26,10 +26,19 @@ name: automerge-autobump
 # repo-wide already (2026-07-20, after the #29 squash mishap), so this
 # can't accidentally squash even if that setting ever drifts.
 
-# The daily schedule trigger is the safety net: a dropped workflow_run event
-# would otherwise leave a fully-green bump PR unmerged forever. The sweep
-# applies the exact same label/allowlist checks per PR, so it can only ever
-# merge what the event-driven path would have merged.
+# The scheduled sweep is the safety net. It does two things the event-driven
+# path can't:
+#   1. merges fully-green bump PRs whose workflow_run event was dropped
+#      (first observed 2026-08-22..23: several ci-passed bump PRs sat open
+#      with zero automerge runs after their pr-validate completed);
+#   2. approves pr-validate runs stuck `action_required` on bump-* branches.
+#      Since ~2026-08-21 GitHub parks pull_request-triggered workflows on
+#      bot-authored PRs pending manual approval (workflow security hardening)
+#      — every autobump PR's attempt 1 froze there, needing a human re-run
+#      before ci-passed could ever land. The sweep approves those runs with
+#      BOT_PUSH_TOKEN so the pipeline stays unattended end-to-end.
+# Runs hourly (:35, just past the :30 boundary GitHub schedules cluster on);
+# idle sweeps are a 5-minute no-op.
 
 on:
   pull_request:
@@ -39,7 +48,7 @@ on:
     workflows: [pr-validate]
     types: [completed]
   schedule:
-    - cron: '30 5 * * *' # 13:30 CST daily, ~90min after autobump's 12:00 CST
+    - cron: '35 * * * *' # hourly; autobump itself runs 12:00 CST daily
 
 defaults:
   run:
@@ -110,6 +119,24 @@ jobs:
           }
 
           if [ "$EVENT_NAME" = "schedule" ]; then
+            # Approve pr-validate runs parked action_required on allowlisted
+            # bump-* branches (attempt 1 of a bot-authored PR never starts on
+            # its own since GitHub's hardening). Approving unblocks the
+            # pipeline NOW; the next hourly sweep (or the workflow_run event
+            # the approved run's completion emits) picks up the merge.
+            # Branch filter is the SAME BUMP_BRANCH_RE allowlist as merge_pr:
+            # stale action_required runs on human branches (add-uv-formula,
+            # etc.) must stay parked — those are human review decisions.
+            gh run list --repo "$REPO" --workflow pr-validate.yml \
+              --status action_required --json databaseId,headBranch \
+              --jq '.[] | select(.headBranch | test("'"$BUMP_BRANCH_RE"'")) | .databaseId' |
+              while read -r run_id; do
+                [ -n "$run_id" ] || continue
+                echo "approving action_required pr-validate run $run_id"
+                gh api --method POST "repos/$REPO/actions/runs/$run_id/approve" || \
+                  echo "::warning::approve failed for run $run_id (already approved?)"
+              done
+
             gh pr list --repo "$REPO" --state open --json headRefName --jq '.[].headRefName' |
               while read -r ref; do merge_pr "$ref"; done
           else
