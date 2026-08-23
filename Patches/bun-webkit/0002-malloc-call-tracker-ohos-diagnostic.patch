@@ -380,10 +380,10 @@ index 233b9bc..e7fe6e4 100644
  #define HAVE_BACKTRACE_SYMBOLS 1
  #endif
 diff --git a/Source/bmalloc/bmalloc/bmalloc.cpp b/Source/bmalloc/bmalloc/bmalloc.cpp
-index 02d1694..926bb2c 100644
+index 02d1694..1723ff3 100644
 --- a/Source/bmalloc/bmalloc/bmalloc.cpp
 +++ b/Source/bmalloc/bmalloc/bmalloc.cpp
-@@ -216,3 +216,24 @@ void forceEnablePGM(uint16_t guardMallocRate)
+@@ -216,3 +216,28 @@ void forceEnablePGM(uint16_t guardMallocRate)
  
  } } // namespace bmalloc::api
  
@@ -391,13 +391,14 @@ index 02d1694..926bb2c 100644
 +// === T35 diagnostic (DNM): per-heap live/free census over all libpas heaps ===
 +#include "pas_all_heaps.h"
 +#include "pas_heap.h"
++#include "pas_heap_lock.h"
 +#include "pas_heap_summary.h"
 +
 +#include <stdio.h>
 +
 +static bool t35CensusCallback(pas_heap* heap, void*)
 +{
-+    pas_heap_summary summary = pas_heap_compute_summary(heap, pas_lock_is_not_held);
++    pas_heap_summary summary = pas_heap_compute_summary(heap, pas_lock_is_held);
 +    fprintf(stderr, "T35HEAP type=%p objsize=%zu allocated=%zu free=%zu committed=%zu meta=%zu\n",
 +            static_cast<const void*>(heap->type), pas_heap_get_type_size(heap),
 +            summary.allocated, summary.free, summary.committed, summary.meta);
@@ -406,5 +407,8 @@ index 02d1694..926bb2c 100644
 +
 +extern "C" void bmallocDumpHeapCensusT35()
 +{
++    // pas_all_heaps_for_each_heap asserts pas_heap_lock held.
++    pas_heap_lock_lock();
 +    pas_all_heaps_for_each_heap(t35CensusCallback, nullptr);
++    pas_heap_lock_unlock();
 +}
