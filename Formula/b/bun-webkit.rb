@@ -5,7 +5,7 @@ class BunWebkit < Formula
       revision: "0f966e81b78c84bb23213e391bc679c4ef83e56b"
   version "0f966e81b7"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
-  revision 1
+  revision 2
   # Fully rewritten from upstream: builds only JSC/WTF/bmalloc static archives, pinned to bun's WEBKIT_VERSION.
 
   # Pinned to bun's WEBKIT_VERSION; OHOS adaptation handled bun-side (webkit.ts.patch).
@@ -41,6 +41,13 @@ class BunWebkit < Formula
   # sigtimedwait instead, so a lost/coalesced signal self-heals.
   patch :p1 do
     file "Patches/bun-webkit/0001-suspend-resume-handshake-survives-signal-loss.patch"
+  end
+
+  # DIAGNOSTIC ONLY — do not merge: enables FastMalloc's MallocCallTracker
+  # standalone (T35 worker-teardown leak). SIGUSR2 dumps top-100 live
+  # fastMalloc stacks to stderr.
+  patch :p1 do
+    file "Patches/bun-webkit/0002-malloc-call-tracker-ohos-diagnostic.patch"
   end
 
   def install

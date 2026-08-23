@@ -1,0 +1,182 @@
+diff --git a/Source/WTF/wtf/FastMalloc.cpp b/Source/WTF/wtf/FastMalloc.cpp
+index bb0e777..d1aea2d 100644
+--- a/Source/WTF/wtf/FastMalloc.cpp
++++ b/Source/WTF/wtf/FastMalloc.cpp
+@@ -48,7 +48,12 @@
+ #include <OS.h>
+ #endif
+ 
+-#if ENABLE(MALLOC_HEAP_BREAKDOWN)
++// T35 diagnostic: enable MallocCallTracker standalone (without the full
++// MALLOC_HEAP_BREAKDOWN feature, which would switch JSC to DebugHeap and
++// pull the Darwin-only <malloc/malloc.h> into bmalloc).
++#define TRACK_MALLOC_CALLSTACK 1
++
++#if TRACK_MALLOC_CALLSTACK
+ #include <wtf/Atomics.h>
+ #include <wtf/HashMap.h>
+ #include <wtf/Lock.h>
+@@ -58,6 +63,8 @@
+ 
+ #if PLATFORM(COCOA)
+ #include <notify.h>
++#else
++#include <signal.h>
+ #endif
+ 
+ #endif
+@@ -146,9 +153,7 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
+ 
+ namespace WTF {
+ 
+-#define TRACK_MALLOC_CALLSTACK 0
+-
+-#if ENABLE(MALLOC_HEAP_BREAKDOWN) && TRACK_MALLOC_CALLSTACK
++#if TRACK_MALLOC_CALLSTACK
+ 
+ static ThreadSpecificKey avoidRecordingCountKey { InvalidThreadSpecificKey };
+ class AvoidRecordingScope {
+@@ -215,10 +220,21 @@ MallocCallTracker& MallocCallTracker::singleton()
+ 
+ MallocCallTracker::MallocCallTracker()
+ {
++#if PLATFORM(COCOA)
+     int token;
+     notify_register_dispatch("com.apple.WebKit.dumpUntrackedMallocs", &token, mainDispatchQueueSingleton(), ^(int) {
+         MallocCallTracker::singleton().dumpStats();
+     });
++#elif !OS(WINDOWS)
++    // Diagnostic builds on non-Cocoa platforms have no notifyd; dump on SIGUSR2 instead.
++    // Send the signal only while the process is idle: dumpStats() takes the tracker
++    // lock and allocates, so it is not async-signal-safe mid-allocation.
++    struct sigaction action { };
++    sigemptyset(&action.sa_mask);
++    action.sa_handler = [](int) { MallocCallTracker::singleton().dumpStats(); };
++    action.sa_flags = SA_RESTART;
++    sigaction(SIGUSR2, &action, nullptr);
++#endif
+ }
+ 
+ void MallocCallTracker::recordMalloc(void* address, size_t allocationSize)
+@@ -318,7 +334,8 @@ void MallocCallTracker::dumpStats()
+             // FIXME: Add a way to remove some entries in StackShot in a programable way.
+             // https://bugs.webkit.org/show_bug.cgi?id=205701
+             const size_t framesToSkip = 6;
+-            WTFPrintBacktrace(mallocDataForStack->siteData[0]->stack.span().subspan(framesToSkip));
++            auto stackSpan = mallocDataForStack->siteData[0]->stack.span();
++            WTFPrintBacktrace(stackSpan.subspan(std::min(framesToSkip, stackSpan.size())));
+             WTFLogAlways("\n");
+         }
+     }
+@@ -343,7 +360,7 @@ PRESERVE_MOST void* fastMalloc(size_t size)
+     ASSERT_IS_WITHIN_LIMIT(size);
+     assertMallocRestrictionForCurrentThreadScope();
+     void* result = bmalloc::api::malloc(size, bmalloc::CompactAllocationMode::NonCompact);
+-#if ENABLE(MALLOC_HEAP_BREAKDOWN) && TRACK_MALLOC_CALLSTACK
++#if TRACK_MALLOC_CALLSTACK
+     if (!AvoidRecordingScope::avoidRecordingCount())
+         MallocCallTracker::singleton().recordMalloc(result, size);
+ #endif
+@@ -356,7 +373,7 @@ void* fastZeroedMalloc(size_t size)
+     ASSERT_IS_WITHIN_LIMIT(size);
+     assertMallocRestrictionForCurrentThreadScope();
+     void* result = bmalloc::api::zeroedMalloc(size, bmalloc::CompactAllocationMode::NonCompact);
+-#if ENABLE(MALLOC_HEAP_BREAKDOWN) && TRACK_MALLOC_CALLSTACK
++#if TRACK_MALLOC_CALLSTACK
+     if (!AvoidRecordingScope::avoidRecordingCount())
+         MallocCallTracker::singleton().recordMalloc(result, size);
+ #endif
+@@ -390,7 +407,7 @@ void* fastRealloc(void* object, size_t size)
+     ASSERT_IS_WITHIN_LIMIT(size);
+     assertMallocRestrictionForCurrentThreadScope();
+     void* result = bmalloc::api::realloc(object, size, bmalloc::CompactAllocationMode::NonCompact);
+-#if ENABLE(MALLOC_HEAP_BREAKDOWN) && TRACK_MALLOC_CALLSTACK
++#if TRACK_MALLOC_CALLSTACK
+     if (!AvoidRecordingScope::avoidRecordingCount())
+         MallocCallTracker::singleton().recordRealloc(object, result, size);
+ #endif
+@@ -401,7 +418,7 @@ void* fastRealloc(void* object, size_t size)
+ PRESERVE_MOST void fastFree(void* object)
+ {
+     bmalloc::api::free(object);
+-#if ENABLE(MALLOC_HEAP_BREAKDOWN) && TRACK_MALLOC_CALLSTACK
++#if TRACK_MALLOC_CALLSTACK
+     if (!AvoidRecordingScope::avoidRecordingCount())
+         MallocCallTracker::singleton().recordFree(object);
+ #endif
+@@ -439,7 +456,7 @@ PRESERVE_MOST void* fastAlignedMalloc(size_t alignment, size_t size)
+     ASSERT_IS_WITHIN_LIMIT(size);
+     assertMallocRestrictionForCurrentThreadScope();
+     void* result = bmalloc::api::memalign(alignment, size, bmalloc::CompactAllocationMode::NonCompact);
+-#if ENABLE(MALLOC_HEAP_BREAKDOWN) && TRACK_MALLOC_CALLSTACK
++#if TRACK_MALLOC_CALLSTACK
+     if (!AvoidRecordingScope::avoidRecordingCount())
+         MallocCallTracker::singleton().recordMalloc(result, size);
+ #endif
+@@ -452,7 +469,7 @@ PRESERVE_MOST void* tryFastAlignedMalloc(size_t alignment, size_t size)
+     FAIL_IF_EXCEEDS_LIMIT(size);
+     assertMallocRestrictionForCurrentThreadScope();
+     void* result = bmalloc::api::tryMemalign(alignment, size, bmalloc::CompactAllocationMode::NonCompact);
+-#if ENABLE(MALLOC_HEAP_BREAKDOWN) && TRACK_MALLOC_CALLSTACK
++#if TRACK_MALLOC_CALLSTACK
+     if (!AvoidRecordingScope::avoidRecordingCount())
+         MallocCallTracker::singleton().recordMalloc(result, size);
+ #endif
+@@ -493,7 +510,7 @@ PRESERVE_MOST void* fastCompactMalloc(size_t size)
+     ASSERT_IS_WITHIN_LIMIT(size);
+     assertMallocRestrictionForCurrentThreadScope();
+     void* result = bmalloc::api::malloc(size, bmalloc::CompactAllocationMode::Compact);
+-#if ENABLE(MALLOC_HEAP_BREAKDOWN) && TRACK_MALLOC_CALLSTACK
++#if TRACK_MALLOC_CALLSTACK
+     if (!AvoidRecordingScope::avoidRecordingCount())
+         MallocCallTracker::singleton().recordMalloc(result, size);
+ #endif
+@@ -506,7 +523,7 @@ void* fastCompactZeroedMalloc(size_t size)
+     ASSERT_IS_WITHIN_LIMIT(size);
+     assertMallocRestrictionForCurrentThreadScope();
+     void* result = bmalloc::api::zeroedMalloc(size, bmalloc::CompactAllocationMode::Compact);
+-#if ENABLE(MALLOC_HEAP_BREAKDOWN) && TRACK_MALLOC_CALLSTACK
++#if TRACK_MALLOC_CALLSTACK
+     if (!AvoidRecordingScope::avoidRecordingCount())
+         MallocCallTracker::singleton().recordMalloc(result, size);
+ #endif
+@@ -538,7 +555,7 @@ void* fastCompactRealloc(void* object, size_t size)
+     ASSERT_IS_WITHIN_LIMIT(size);
+     assertMallocRestrictionForCurrentThreadScope();
+     void* result = bmalloc::api::realloc(object, size, bmalloc::CompactAllocationMode::Compact);
+-#if ENABLE(MALLOC_HEAP_BREAKDOWN) && TRACK_MALLOC_CALLSTACK
++#if TRACK_MALLOC_CALLSTACK
+     if (!AvoidRecordingScope::avoidRecordingCount())
+         MallocCallTracker::singleton().recordRealloc(object, result, size);
+ #endif
+@@ -551,7 +568,7 @@ PRESERVE_MOST void* fastCompactAlignedMalloc(size_t alignment, size_t size)
+     ASSERT_IS_WITHIN_LIMIT(size);
+     assertMallocRestrictionForCurrentThreadScope();
+     void* result = bmalloc::api::memalign(alignment, size, bmalloc::CompactAllocationMode::Compact);
+-#if ENABLE(MALLOC_HEAP_BREAKDOWN) && TRACK_MALLOC_CALLSTACK
++#if TRACK_MALLOC_CALLSTACK
+     if (!AvoidRecordingScope::avoidRecordingCount())
+         MallocCallTracker::singleton().recordMalloc(result, size);
+ #endif
+@@ -564,7 +581,7 @@ PRESERVE_MOST void* tryFastCompactAlignedMalloc(size_t alignment, size_t size)
+     FAIL_IF_EXCEEDS_LIMIT(size);
+     assertMallocRestrictionForCurrentThreadScope();
+     void* result = bmalloc::api::tryMemalign(alignment, size, bmalloc::CompactAllocationMode::Compact);
+-#if ENABLE(MALLOC_HEAP_BREAKDOWN) && TRACK_MALLOC_CALLSTACK
++#if TRACK_MALLOC_CALLSTACK
+     if (!AvoidRecordingScope::avoidRecordingCount())
+         MallocCallTracker::singleton().recordMalloc(result, size);
+ #endif
+diff --git a/Source/WTF/wtf/PlatformHave.h b/Source/WTF/wtf/PlatformHave.h
+index 233b9bc..e7fe6e4 100644
+--- a/Source/WTF/wtf/PlatformHave.h
++++ b/Source/WTF/wtf/PlatformHave.h
+@@ -236,7 +236,7 @@
+ #define HAVE_MACHINE_CONTEXT 1
+ #endif
+ 
+-#if OS(DARWIN) || OS(HAIKU) || ((OS(LINUX) || OS(HURD)) && defined(__GLIBC__) && !defined(__UCLIBC__) && !CPU(MIPS))
++#if OS(DARWIN) || OS(HAIKU) || ((OS(LINUX) || OS(HURD)) && (defined(__GLIBC__) || defined(__OHOS__)) && !defined(__UCLIBC__) && !CPU(MIPS))
+ #define HAVE_BACKTRACE 1
+ #define HAVE_BACKTRACE_SYMBOLS 1
+ #endif
