@@ -1,0 +1,18 @@
+diff --git a/src/system_info.rs b/src/system_info.rs
+index 1d6665c..cfb2728 100644
+--- a/src/system_info.rs
++++ b/src/system_info.rs
+@@ -3,7 +3,12 @@ pub fn platform_name() -> &'static str {
+     "darwin"
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(all(target_os = "linux", target_env = "ohos"))]
++pub fn platform_name() -> &'static str {
++    "openharmony"
++}
++
++#[cfg(all(target_os = "linux", not(target_env = "ohos")))]
+ pub fn platform_name() -> &'static str {
+     "linux"
+ }
