@@ -1,5 +1,5 @@
 diff --git a/Source/WTF/wtf/FastMalloc.cpp b/Source/WTF/wtf/FastMalloc.cpp
-index bb0e777..13bdb3c 100644
+index bb0e777..f506715 100644
 --- a/Source/WTF/wtf/FastMalloc.cpp
 +++ b/Source/WTF/wtf/FastMalloc.cpp
 @@ -27,6 +27,7 @@
@@ -35,7 +35,7 @@ index bb0e777..13bdb3c 100644
  #endif
  
  #endif
-@@ -146,9 +156,7 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
+@@ -146,36 +156,32 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
  
  namespace WTF {
  
@@ -44,35 +44,49 @@ index bb0e777..13bdb3c 100644
 -#if ENABLE(MALLOC_HEAP_BREAKDOWN) && TRACK_MALLOC_CALLSTACK
 +#if TRACK_MALLOC_CALLSTACK
  
- static ThreadSpecificKey avoidRecordingCountKey { InvalidThreadSpecificKey };
+-static ThreadSpecificKey avoidRecordingCountKey { InvalidThreadSpecificKey };
++// T35 v9: worker 线程上 ThreadSpecific 读数不可靠（实测 worker 分配 90% 未记录），
++// 换成平凡 __thread 计数：无需 key 创建，任何线程（含正在退出的线程）都能用。
++static __thread int t35AvoidRecordingCount = 0;
  class AvoidRecordingScope {
-@@ -158,10 +166,25 @@ public:
+ public:
+-    AvoidRecordingScope();
+-    ~AvoidRecordingScope();
++    AvoidRecordingScope() { t35AvoidRecordingCount++; }
++    ~AvoidRecordingScope() { t35AvoidRecordingCount--; }
  
      static uintptr_t avoidRecordingCount()
      {
-+        // musl's pthread_getspecific does no bounds check, and
-+        // InvalidThreadSpecificKey == PTHREAD_KEYS_MAX reads past the tsd
-+        // array — on threads whose TLS block ends near a page boundary that
-+        // is a wild read. Treat "key not yet created" as zero instead.
-+        if (avoidRecordingCountKey == InvalidThreadSpecificKey)
-+            return 0;
-         return std::bit_cast<uintptr_t>(threadSpecificGet(avoidRecordingCountKey));
+-        return std::bit_cast<uintptr_t>(threadSpecificGet(avoidRecordingCountKey));
++        return static_cast<uintptr_t>(t35AvoidRecordingCount);
      }
  };
  
+-AvoidRecordingScope::AvoidRecordingScope()
 +// Diagnostic gate: recording starts only when T35_FASTMALLOC_TRACK is set in
 +// the environment, so an instrumented binary still behaves stock (and passes
 +// brew's post-install smoke) without it. SIGUSR2 dumps regardless.
 +static bool trackingEnabled()
-+{
+ {
+-    static std::once_flag onceKey;
+-    std::call_once(onceKey, [] {
+-        // The value stored in TLS is initially 0.
+-        threadSpecificKeyCreate(&avoidRecordingCountKey, [](void*) { });
+-    });
+-    threadSpecificSet(avoidRecordingCountKey, std::bit_cast<void*>(avoidRecordingCount() + 1));
 +    static const bool enabled = getenv("T35_FASTMALLOC_TRACK") != nullptr;
 +    return enabled;
-+}
-+
- AvoidRecordingScope::AvoidRecordingScope()
- {
-     static std::once_flag onceKey;
-@@ -215,12 +238,76 @@ MallocCallTracker& MallocCallTracker::singleton()
+ }
+ 
+-AvoidRecordingScope::~AvoidRecordingScope()
+-{
+-    threadSpecificSet(avoidRecordingCountKey, std::bit_cast<void*>(avoidRecordingCount() - 1));
+-}
++// v9: 构造/析构全部内联进类定义（__thread 计数器），这里不再需要。
+ 
+ class MallocCallTracker {
+ public:
+@@ -215,12 +221,76 @@ MallocCallTracker& MallocCallTracker::singleton()
  
  MallocCallTracker::MallocCallTracker()
  {
@@ -149,7 +163,7 @@ index bb0e777..13bdb3c 100644
  void MallocCallTracker::recordMalloc(void* address, size_t allocationSize)
  {
      AvoidRecordingScope avoidRecording;
-@@ -318,7 +405,8 @@ void MallocCallTracker::dumpStats()
+@@ -318,7 +388,8 @@ void MallocCallTracker::dumpStats()
              // FIXME: Add a way to remove some entries in StackShot in a programable way.
              // https://bugs.webkit.org/show_bug.cgi?id=205701
              const size_t framesToSkip = 6;
@@ -159,7 +173,7 @@ index bb0e777..13bdb3c 100644
              WTFLogAlways("\n");
          }
      }
-@@ -343,8 +431,8 @@ PRESERVE_MOST void* fastMalloc(size_t size)
+@@ -343,8 +414,8 @@ PRESERVE_MOST void* fastMalloc(size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::malloc(size, bmalloc::CompactAllocationMode::NonCompact);
@@ -170,7 +184,7 @@ index bb0e777..13bdb3c 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_ALLOCATION(NON_JS_CELL, result, size);
-@@ -356,8 +444,8 @@ void* fastZeroedMalloc(size_t size)
+@@ -356,8 +427,8 @@ void* fastZeroedMalloc(size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::zeroedMalloc(size, bmalloc::CompactAllocationMode::NonCompact);
@@ -181,7 +195,7 @@ index bb0e777..13bdb3c 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_ALLOCATION(NON_JS_CELL, result, size);
-@@ -369,6 +457,12 @@ TryMallocReturnValue tryFastZeroedMalloc(size_t size)
+@@ -369,6 +440,12 @@ TryMallocReturnValue tryFastZeroedMalloc(size_t size)
      FAIL_IF_EXCEEDS_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::tryZeroedMalloc(size, bmalloc::CompactAllocationMode::NonCompact);
@@ -194,7 +208,7 @@ index bb0e777..13bdb3c 100644
      BPROFILE_TRY_ALLOCATION(NON_JS_CELL, result, size);
      return result;
  }
-@@ -390,8 +484,8 @@ void* fastRealloc(void* object, size_t size)
+@@ -390,8 +467,8 @@ void* fastRealloc(void* object, size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::realloc(object, size, bmalloc::CompactAllocationMode::NonCompact);
@@ -205,7 +219,7 @@ index bb0e777..13bdb3c 100644
          MallocCallTracker::singleton().recordRealloc(object, result, size);
  #endif
      BPROFILE_ALLOCATION(NON_JS_CELL, result, size);
-@@ -401,8 +495,8 @@ void* fastRealloc(void* object, size_t size)
+@@ -401,8 +478,8 @@ void* fastRealloc(void* object, size_t size)
  PRESERVE_MOST void fastFree(void* object)
  {
      bmalloc::api::free(object);
@@ -216,7 +230,7 @@ index bb0e777..13bdb3c 100644
          MallocCallTracker::singleton().recordFree(object);
  #endif
  }
-@@ -439,8 +533,8 @@ PRESERVE_MOST void* fastAlignedMalloc(size_t alignment, size_t size)
+@@ -439,8 +516,8 @@ PRESERVE_MOST void* fastAlignedMalloc(size_t alignment, size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::memalign(alignment, size, bmalloc::CompactAllocationMode::NonCompact);
@@ -227,7 +241,7 @@ index bb0e777..13bdb3c 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_ALLOCATION(NON_JS_CELL, result, size);
-@@ -452,8 +546,8 @@ PRESERVE_MOST void* tryFastAlignedMalloc(size_t alignment, size_t size)
+@@ -452,8 +529,8 @@ PRESERVE_MOST void* tryFastAlignedMalloc(size_t alignment, size_t size)
      FAIL_IF_EXCEEDS_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::tryMemalign(alignment, size, bmalloc::CompactAllocationMode::NonCompact);
@@ -238,7 +252,7 @@ index bb0e777..13bdb3c 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_TRY_ALLOCATION(NON_JS_CELL, result, size);
-@@ -465,6 +559,12 @@ PRESERVE_MOST TryMallocReturnValue tryFastMalloc(size_t size)
+@@ -465,6 +542,12 @@ PRESERVE_MOST TryMallocReturnValue tryFastMalloc(size_t size)
      FAIL_IF_EXCEEDS_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::tryMalloc(size, bmalloc::CompactAllocationMode::NonCompact);
@@ -251,7 +265,7 @@ index bb0e777..13bdb3c 100644
      BPROFILE_TRY_ALLOCATION(NON_JS_CELL, result, size);
      return result;
  }
-@@ -484,6 +584,16 @@ TryMallocReturnValue tryFastRealloc(void* object, size_t newSize)
+@@ -484,6 +567,16 @@ TryMallocReturnValue tryFastRealloc(void* object, size_t newSize)
      FAIL_IF_EXCEEDS_LIMIT(newSize);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::tryRealloc(object, newSize, bmalloc::CompactAllocationMode::NonCompact);
@@ -268,7 +282,7 @@ index bb0e777..13bdb3c 100644
      BPROFILE_TRY_ALLOCATION(NON_JS_CELL, result, newSize);
      return result;
  }
-@@ -493,8 +603,8 @@ PRESERVE_MOST void* fastCompactMalloc(size_t size)
+@@ -493,8 +586,8 @@ PRESERVE_MOST void* fastCompactMalloc(size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::malloc(size, bmalloc::CompactAllocationMode::Compact);
@@ -279,7 +293,7 @@ index bb0e777..13bdb3c 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_ALLOCATION(COMPACTIBLE, result, size);
-@@ -506,8 +616,8 @@ void* fastCompactZeroedMalloc(size_t size)
+@@ -506,8 +599,8 @@ void* fastCompactZeroedMalloc(size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::zeroedMalloc(size, bmalloc::CompactAllocationMode::Compact);
@@ -290,7 +304,7 @@ index bb0e777..13bdb3c 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_ALLOCATION(COMPACTIBLE, result, size);
-@@ -518,7 +628,14 @@ TryMallocReturnValue tryFastCompactZeroedMalloc(size_t size)
+@@ -518,7 +611,14 @@ TryMallocReturnValue tryFastCompactZeroedMalloc(size_t size)
  {
      FAIL_IF_EXCEEDS_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
@@ -306,7 +320,7 @@ index bb0e777..13bdb3c 100644
  }
  
  void* fastCompactCalloc(size_t numElements, size_t elementSize)
-@@ -538,8 +655,8 @@ void* fastCompactRealloc(void* object, size_t size)
+@@ -538,8 +638,8 @@ void* fastCompactRealloc(void* object, size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::realloc(object, size, bmalloc::CompactAllocationMode::Compact);
@@ -317,7 +331,7 @@ index bb0e777..13bdb3c 100644
          MallocCallTracker::singleton().recordRealloc(object, result, size);
  #endif
      BPROFILE_ALLOCATION(COMPACTIBLE, result, size);
-@@ -551,8 +668,8 @@ PRESERVE_MOST void* fastCompactAlignedMalloc(size_t alignment, size_t size)
+@@ -551,8 +651,8 @@ PRESERVE_MOST void* fastCompactAlignedMalloc(size_t alignment, size_t size)
      ASSERT_IS_WITHIN_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::memalign(alignment, size, bmalloc::CompactAllocationMode::Compact);
@@ -328,7 +342,7 @@ index bb0e777..13bdb3c 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_ALLOCATION(COMPACTIBLE, result, size);
-@@ -564,8 +681,8 @@ PRESERVE_MOST void* tryFastCompactAlignedMalloc(size_t alignment, size_t size)
+@@ -564,8 +664,8 @@ PRESERVE_MOST void* tryFastCompactAlignedMalloc(size_t alignment, size_t size)
      FAIL_IF_EXCEEDS_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::tryMemalign(alignment, size, bmalloc::CompactAllocationMode::Compact);
@@ -339,7 +353,7 @@ index bb0e777..13bdb3c 100644
          MallocCallTracker::singleton().recordMalloc(result, size);
  #endif
      BPROFILE_ALLOCATION(COMPACTIBLE, result, size);
-@@ -577,6 +694,12 @@ PRESERVE_MOST TryMallocReturnValue tryFastCompactMalloc(size_t size)
+@@ -577,6 +677,12 @@ PRESERVE_MOST TryMallocReturnValue tryFastCompactMalloc(size_t size)
      FAIL_IF_EXCEEDS_LIMIT(size);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::tryMalloc(size, bmalloc::CompactAllocationMode::Compact);
@@ -352,7 +366,7 @@ index bb0e777..13bdb3c 100644
      BPROFILE_ALLOCATION(COMPACTIBLE, result, size);
      return result;
  }
-@@ -596,6 +719,16 @@ TryMallocReturnValue tryFastCompactRealloc(void* object, size_t newSize)
+@@ -596,6 +702,16 @@ TryMallocReturnValue tryFastCompactRealloc(void* object, size_t newSize)
      FAIL_IF_EXCEEDS_LIMIT(newSize);
      assertMallocRestrictionForCurrentThreadScope();
      void* result = bmalloc::api::tryRealloc(object, newSize, bmalloc::CompactAllocationMode::Compact);
@@ -383,10 +397,10 @@ index 233b9bc..e7fe6e4 100644
  #define HAVE_BACKTRACE_SYMBOLS 1
  #endif
 diff --git a/Source/bmalloc/bmalloc/bmalloc.cpp b/Source/bmalloc/bmalloc/bmalloc.cpp
-index 02d1694..1bac9cd 100644
+index 02d1694..fdaf4c1 100644
 --- a/Source/bmalloc/bmalloc/bmalloc.cpp
 +++ b/Source/bmalloc/bmalloc/bmalloc.cpp
-@@ -216,3 +216,84 @@ void forceEnablePGM(uint16_t guardMallocRate)
+@@ -216,3 +216,107 @@ void forceEnablePGM(uint16_t guardMallocRate)
  
  } } // namespace bmalloc::api
  
@@ -433,6 +447,23 @@ index 02d1694..1bac9cd 100644
 +static unsigned long t35LargeCount;
 +static unsigned long long t35LargeBytes;
 +
++// v9: hexdump 每种大对象尺寸的前 3 个样本的前 64 字节，用于肉眼识别内容
++//（字符串/结构体模式）。T35OBJHEX size=.. off=.. hex..
++#define T35_HEX_BYTES 64
++static unsigned long t35LargeDumpedPerSize[4096]; // size/16 为槽位，只统计 16 的倍数
++
++static void t35HexDump(size_t size, const unsigned char* p)
++{
++    char buf[192];
++    int n = snprintf(buf, sizeof buf, "T35OBJHEX size=%zu hex=", size);
++    size_t limit = size < T35_HEX_BYTES ? size : T35_HEX_BYTES;
++    for (size_t i = 0; i < limit && n < (int)sizeof buf - 3; i++)
++        n += snprintf(buf + n, sizeof buf - n, "%02x", p[i]);
++    buf[n++] = '\n';
++    ssize_t r = write(2, buf, (size_t)n);
++    (void)r;
++}
++
 +static bool t35ObjCensusCallback(pas_heap*, uintptr_t begin, size_t size, void*)
 +{
 +    if (size <= T35_OBJ_MAX_SMALL) {
@@ -443,6 +474,11 @@ index 02d1694..1bac9cd 100644
 +    } else {
 +        t35LargeCount++;
 +        t35LargeBytes += size;
++        // v9: 12800 字节那批是重点嫌疑；每种尺寸最多打 3 个样本
++        if (!(size & 15) && size / 16 < 4096 && t35LargeDumpedPerSize[size / 16] < 3) {
++            t35LargeDumpedPerSize[size / 16]++;
++            t35HexDump(size, reinterpret_cast<const unsigned char*>(begin));
++        }
 +        if (t35LargeCount <= T35_OBJ_MAX_LARGE_LINES) {
 +            uintptr_t v0 = *reinterpret_cast<uintptr_t*>(begin);
 +            uintptr_t v1 = *reinterpret_cast<uintptr_t*>(begin + 8);
@@ -458,6 +494,7 @@ index 02d1694..1bac9cd 100644
 +    memset(t35ObjCount, 0, sizeof(t35ObjCount));
 +    memset(t35ObjBytes, 0, sizeof(t35ObjBytes));
 +    memset(t35ObjSampleV0, 0, sizeof(t35ObjSampleV0));
++    memset(t35LargeDumpedPerSize, 0, sizeof(t35LargeDumpedPerSize));
 +    t35LargeCount = 0;
 +    t35LargeBytes = 0;
 +    pas_heap_lock_lock();
