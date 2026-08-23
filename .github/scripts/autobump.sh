@@ -32,13 +32,25 @@ source "$(dirname "$0")/lib.sh"
 # scheduled run; the retry 17min later was clean). Fetch failures that surface
 # as HTTP errors don't set Homebrew.failed (exit 0 + error status) — only the
 # strategy-block exceptions (JSON.parse on a 200) do.
+# On final failure, dump the per-formula error statuses from the LAST JSON
+# output before dying: the $() capture holds stdout even on exit 1, and that
+# JSON names the failing formula + reason — without this the failure is a
+# bare "exit code 1" with zero diagnostics (observed 2026-08-23, run 32618169431).
 JSON=""
 for attempt in 1 2 3; do
   if JSON=$(cbrew "livecheck --tap $TAP --json --newer-only"); then
     break
   fi
   echo "::warning::brew livecheck failed (attempt $attempt/3)"
-  [ "$attempt" = 3 ] && { echo "::error::brew livecheck failed after 3 attempts"; exit 1; }
+  if [ "$attempt" = 3 ]; then
+    echo "::error::brew livecheck failed after 3 attempts; per-formula errors from the last attempt:"
+    if [ -n "$JSON" ] && ERRORS=$(jq -r '.[] | select(.status == "error") | "\(.formula): \(.messages | join("; "))"' <<< "$JSON" 2>/dev/null) && [ -n "$ERRORS" ]; then
+      echo "$ERRORS"
+    else
+      echo "(no parseable JSON captured — stdout was empty or not JSON; likely a brew-level failure, not a livecheck strategy error)"
+    fi
+    exit 1
+  fi
   sleep 30
 done
 
