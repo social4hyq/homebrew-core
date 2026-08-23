@@ -7,7 +7,7 @@ class Hjson < Formula
   head "https://github.com/hjson/hjson-go.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7bcb2416407595a1756d3e20d5b05fce87421f4dca30b68b618b2bb824e514f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "072d4a5101a2fdd38263218e3e0773b681f5f807661a859dec01b90581bccfe4"
   end
 
   depends_on "go" => :build
