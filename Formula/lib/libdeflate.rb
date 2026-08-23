@@ -1,13 +1,13 @@
 class Libdeflate < Formula
   desc "Heavily optimized DEFLATE/zlib/gzip compression and decompression"
   homepage "https://github.com/ebiggers/libdeflate"
-  url "https://github.com/ebiggers/libdeflate/archive/refs/tags/v1.25.tar.gz"
-  sha256 "d11473c1ad4c57d874695e8026865e38b47116bbcb872bfc622ec8f37a86017d"
+  url "https://github.com/ebiggers/libdeflate/archive/refs/tags/v1.26.tar.gz"
+  sha256 "bba03fffc5538576213675ce6968fcff6ce2e67d82e4d5febea2d05f9f13cf85"
   license "MIT"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f875a0c66241f69952cef6be7820a1f40fe1c96b42044b4d5d1b8261ac0a0b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "35f0071b961aedf08736de6804049936749c3f136f5f502340dd7f8bed4e6a20"
   end
 
   depends_on "cmake" => :build
