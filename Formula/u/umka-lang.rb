@@ -7,7 +7,7 @@ class UmkaLang < Formula
   head "https://github.com/vtereshkov/umka-lang.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "09c62df78f99a70982e8e21c3a6312ed51fb43370bfc023030c7e8509d461cc2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6b80d6f2c12051d8365ed56cca011399d57982b364bae788cc9691968935791"
   end
 
   def install
