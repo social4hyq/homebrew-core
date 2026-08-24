@@ -249,7 +249,7 @@ class VitePlus < Formula
       #{patched_crates.map { |c| %Q(#{c} = { path = "#{buildpath}/vite-task/crates/#{c}" }) }.join("\n")}
     TOML
     cargo_toml = buildpath/"Cargo.toml"
-    cargo_toml.write("#{cargo_toml.read}\n#{patch_block}")
+    File.write(cargo_toml, "#{File.read(cargo_toml)}\n#{patch_block}")
 
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vite_global_cli")
