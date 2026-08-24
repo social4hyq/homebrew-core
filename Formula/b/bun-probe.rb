@@ -5,6 +5,11 @@ class BunProbe < Formula
   version "1.4.0-probe1"
   license "MIT"
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-probe-v1.4.0-probe1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b3c7128c8a4a55ee2cc3d998abb34a0552e3d3d57a194199293f190bf4f8454d"
+  end
+
   keg_only "diagnostic-only build, never the default `bun`"
 
   depends_on "bun-bootstrap" => :build
