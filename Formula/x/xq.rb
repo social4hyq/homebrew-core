@@ -2,8 +2,8 @@ class Xq < Formula
   desc "Command-line XML and HTML beautifier and content extractor"
   homepage "https://github.com/sibprogrammer/xq"
   url "https://github.com/sibprogrammer/xq.git",
-      tag:      "v1.5.0",
-      revision: "e1abbb35e250246385b942d055ba800fe04887d6"
+      tag:      "v1.5.1",
+      revision: "9803fc9565174eacc844319409688172ce1412aa"
   license "MIT"
 
   bottle do
