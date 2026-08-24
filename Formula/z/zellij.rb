@@ -1,19 +1,17 @@
 class Zellij < Formula
   desc "Pluggable terminal workspace"
   homepage "https://zellij.dev"
-  # Tracks pinned `main` revision (not v0.44.3 tag): that tag pins nix 0.23.1 which
-  # predates OHOS support (0.30+); main has the bump. Switch back to a tag at v0.45.0.
+  # v0.45.0 is the first tag with nix 0.30 (OHOS support; older tags pin 0.23).
+  # NOTE: never pair revision: with branch: here — Homebrew's extract_ref picks
+  # the first ref-type key present, so branch: silently wins and the pin is
+  # ignored (the build then tracks main HEAD).
   url "https://github.com/zellij-org/zellij.git",
-      revision: "5254e4fc1dd784ef872644190dc5e2bcb0981bed", branch: "main"
-  version "0.45.0-dev"
+      tag: "v0.45.0", revision: "13e1c25a2b1ef61d90ecd1765e660c575e90977b"
   license "MIT"
-  revision 3
 
   livecheck do
-    url "https://api.github.com/repos/zellij-org/zellij/commits?sha=main&per_page=1"
-    strategy :json do |json|
-      json.first&.dig("sha")
-    end
+    url :stable
+    strategy :github_latest
   end
 
   bottle do
@@ -30,7 +28,7 @@ class Zellij < Formula
   depends_on "zlib-ng-compat"
 
   resource "close_fds" do
-    url "https://crates.io/api/v1/crates/close_fds/0.3.2/download"
+    url "https://static.crates.io/crates/close_fds/close_fds-0.3.2.crate"
     sha256 "3bc416f33de9d59e79e57560f450d21ff8393adcf1cdfc3e6d8fb93d5f88a2ed"
   end
 
