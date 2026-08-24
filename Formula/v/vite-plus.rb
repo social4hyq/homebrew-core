@@ -293,9 +293,21 @@ class VitePlus < Formula
   test do
     assert_match version.to_s, shell_output("#{bin}/vp --version")
 
-    # TODO(debug): remove after porting converges
-    ENV["RUST_LOG"] = "debug"
-    system bin/"vp", "create", "vite:application", "--no-interactive", "--directory", "test-app"
+    # vp create/fmt hit transient exec/FS-settle ENOENTs on OHOS under load;
+    # retry before giving up (cf. herdr's sign-retry loop).
+    vp_with_retry = lambda do |*args|
+      max_attempts = 3
+      (1..max_attempts).each do |attempt|
+        system bin/"vp", *args
+        break
+      rescue ErrorDuringExecution => e
+        msg = e.output&.map(&:last)&.join.to_s.lines.last(5).join
+        odie "vp #{args.first} failed:\n#{msg}" if attempt == max_attempts
+        sleep 10
+      end
+    end
+
+    vp_with_retry.call "create", "vite:application", "--no-interactive", "--directory", "test-app"
     assert_path_exists testpath/"test-app/package.json"
 
     cd testpath/"test-app" do
