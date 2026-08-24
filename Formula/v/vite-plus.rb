@@ -256,6 +256,12 @@ class VitePlus < Formula
     File.write(cargo_toml, "#{File.read(cargo_toml)}\n#{patch_block}")
 
     odie "vite-task root manifest missing" unless (buildpath/"vite-task/Cargo.toml").exist?
+    # TODO(debug): remove after porting converges
+    ohai "vite-task staged commit: #{Utils.safe_popen_read("git", "-C", buildpath/"vite-task", "rev-parse",
+"HEAD").chomp}"
+    ohai "vite-task root manifest head:\n#{(buildpath/"vite-task/Cargo.toml").read.lines.first(6).join}"
+    ohai "bumpalo in workspace deps: #{(buildpath/"vite-task/Cargo.toml").read.include?("bumpalo")}"
+    ohai "root Cargo.toml tail:\n#{cargo_toml.read.lines.last(12).join}"
 
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vite_global_cli")
