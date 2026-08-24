@@ -1,8 +1,8 @@
 class Mockery < Formula
   desc "Mock code autogenerator for Golang"
   homepage "https://github.com/vektra/mockery"
-  url "https://github.com/vektra/mockery/archive/refs/tags/v3.7.3.tar.gz"
-  sha256 "16b9b8ec31e1a055a9ccd2b19fe0c635d182b202fcd5c4980f384d79bfa48201"
+  url "https://github.com/vektra/mockery/archive/refs/tags/v3.7.4.tar.gz"
+  sha256 "516ebae7641e373ce3d7d00fe1ab3df616baffd345f097081d0a4b0d1e3c21e8"
   license "BSD-3-Clause"
   head "https://github.com/vektra/mockery.git", branch: "v3"
 
@@ -15,8 +15,7 @@ class Mockery < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1735cc18a1a853a2097354161eb6c9e9e63df4acd30e04db1be78e8b1d19de2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "46382c24114eb2d95168ca96d7ab18a88d4274b2d793dc9785af814f871b9277"
   end
 
   depends_on "go" => :build
