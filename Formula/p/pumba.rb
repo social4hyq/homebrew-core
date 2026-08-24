@@ -12,7 +12,7 @@ class Pumba < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "20d89b1c63d702db6de3d40575ca53591283f42c39b67fd7af2ef52a29a3e7e4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "49b9fd2c821c53e41d35ed58c67ec30c8f34e3055f76d4b4148837e85b167528"
   end
 
   depends_on "go" => :build
