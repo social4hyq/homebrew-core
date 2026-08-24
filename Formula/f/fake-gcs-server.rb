@@ -1,8 +1,8 @@
 class FakeGcsServer < Formula
   desc "Emulator for Google Cloud Storage API"
   homepage "https://github.com/fsouza/fake-gcs-server"
-  url "https://github.com/fsouza/fake-gcs-server/archive/refs/tags/v1.56.0.tar.gz"
-  sha256 "cd4281c8164743a71bbcf83f6f9b8a0059bde175c65ac95cfc24d7dc5e8e7ef1"
+  url "https://github.com/fsouza/fake-gcs-server/archive/refs/tags/v1.56.1.tar.gz"
+  sha256 "a322297f949d5339a8e521eb15a35b80c8023f970b0f6511a7bb84e72932ca2c"
   license "BSD-2-Clause"
   head "https://github.com/fsouza/fake-gcs-server.git", branch: "main"
 
