@@ -125,6 +125,56 @@ class VitePlus < Formula
     # the SDK's native dir, not the SDK root).
     ENV["OHOS_SDK_NATIVE"] = formula_opt_prefix("ohos-sdk")/"native"
 
+    # yuku-codegen/yuku-parser (Zig napi packages used by rolldown-plugin-dts)
+    # publish no openharmony binding and no newer release adds one; reuse the
+    # linux-arm64-musl build (same libc/ABI family, cf. opentui-core) under
+    # the openharmony package name.
+    system "pnpm", "install"
+    sign_tool = formula_opt_prefix("ohos-sdk")/"bin/binary-sign-tool"
+    tars_cache = HOMEBREW_CACHE/"vite-plus-yuku-musl"
+    Dir.glob(buildpath.glob("node_modules/.pnpm/yuku-{codegen,parser}@*/node_modules/yuku-*")).each do |pkg_dir|
+      next unless File.directory?(pkg_dir)
+
+      manifest = JSON.parse(File.read(pkg_dir/"package.json"))
+      name = manifest.fetch("name")
+      version = manifest.fetch("version")
+
+      tgz = tars_cache/"#{name}-#{version}.tgz"
+      unless tgz.exist?
+        tgz.parent.mkpath
+        system "curl", "-fSL", "--retry", "5", "-o", tgz,
+               "https://registry.npmmirror.com/@#{name}/binding-linux-arm64-musl/-/binding-linux-arm64-musl-#{version}.tgz"
+      end
+      stage = mktemppath(name)
+      system "tar", "xzf", tgz, "-C", stage
+      node_src = Dir.glob("#{stage}/**/*.node").first
+      odie "no .node found in #{tgz}" if node_src.nil?
+
+      # The napi loader tries <yuku-pkg>/@<scope>/binding-openharmony-arm64/
+      # relative to its own dir, then plain module resolution from the parent;
+      # satisfy both.
+      [pkg_dir, pkg_dir.parent].each do |base|
+        dest = base/"@#{name}"/"binding-openharmony-arm64"
+        next if dest.exist?
+
+        dest.mkpath
+        cp node_src, dest/"#{name}.node"
+        (dest/"package.json").write <<~JSON
+          {
+            "name": "@#{name}/binding-openharmony-arm64",
+            "version": "#{version}",
+            "main": "index.js",
+            "os": ["openharmony"],
+            "cpu": ["arm64"]
+          }
+        JSON
+        # OHOS refuses to dlopen unsigned ELF shared objects.
+        system sign_tool, "sign", "-selfSign", "1",
+               "-inFile", dest/"#{name}.node",
+               "-outFile", dest/"#{name}.node"
+      end
+    end
+
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vite_global_cli")
 
