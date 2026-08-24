@@ -293,6 +293,8 @@ class VitePlus < Formula
   test do
     assert_match version.to_s, shell_output("#{bin}/vp --version")
 
+    # TODO(debug): remove after porting converges
+    ENV["RUST_LOG"] = "debug"
     system bin/"vp", "create", "vite:application", "--no-interactive", "--directory", "test-app"
     assert_path_exists testpath/"test-app/package.json"
 
