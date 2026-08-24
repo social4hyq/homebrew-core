@@ -124,9 +124,13 @@ class VitePlus < Formula
       end
     end
 
-    # Direct crates.io access stalls from this network; rsproxy mirrors both
-    # the sparse index and crate downloads.
-    ENV["CARGO_REGISTRIES_CRATES_IO_INDEX"] = "sparse+https://rsproxy.cn/index/"
+    # Direct crates.io access stalls on some networks (the local OHOS
+    # container); route through rsproxy there. Probe first so fast-network
+    # environments (CI runners) keep using crates.io directly.
+    unless system "curl", "-fsIL", "--max-time", "8", "-o", File::NULL,
+                  "https://index.crates.io/config.json"
+      ENV["CARGO_REGISTRIES_CRATES_IO_INDEX"] = "sparse+https://rsproxy.cn/index/"
+    end
 
     # @napi-rs/cli builds the ohos linker/cc/ar paths from this (must point at
     # the SDK's native dir, not the SDK root).
