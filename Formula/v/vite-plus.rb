@@ -56,7 +56,6 @@ class VitePlus < Formula
   def install
     resource("rolldown").stage buildpath/"rolldown"
     resource("vite").stage buildpath/"vite"
-    resource("vite-task").stage buildpath/"vite-task"
 
     # pnpm >= 11.20 verifies the engine binary against the env lockfile when
     # delegating to a packageManager-pinned version; no published @pnpm/exe
@@ -240,28 +239,33 @@ class VitePlus < Formula
     # seccomp alone handles access tracking; extend the exemption to ohos,
     # whose libc lacks the statx/execveat bindings it needs. Patched in via
     # the [patch] block upstream reserves for local vite-task development.
-    preload_lib = buildpath/"vite-task/crates/fspy_preload_unix/src/lib.rs"
-    inreplace preload_lib,
-              'all(unix, not(target_env = "musl"))',
-              'all(unix, not(target_env = "musl"), not(target_env = "ohos"))'
+    # Stage vite-task OUTSIDE the workspace dir (persistent cache): upstream's
+    # flow keeps it at ../vite-task, and a nested workspace inside the tree
+    # derails cargo's workspace-root selection for the patched members.
+    vt_dir = HOMEBREW_CACHE/"vite-plus-vite-task"
+    unless (vt_dir/".git").exist?
+      rm_r(vt_dir) if vt_dir.exist?
+      resource("vite-task").stage vt_dir
+    end
+    preload_lib = vt_dir/"crates/fspy_preload_unix/src/lib.rs"
+    ohos_exemption = 'all(unix, not(target_env = "musl"), not(target_env = "ohos"))'
+    unless preload_lib.read.include?(ohos_exemption)
+      inreplace preload_lib,
+                'all(unix, not(target_env = "musl"))',
+                ohos_exemption
+    end
     patched_crates = %w[
       fspy pty_terminal_test pty_terminal_test_client snapshot_test
       vite_path vite_powershell vite_select vite_str vite_task vite_workspace
     ]
     patch_block = <<~TOML
       [patch."https://github.com/voidzero-dev/vite-task.git"]
-      #{patched_crates.map { |c| %Q(#{c} = { path = "#{buildpath}/vite-task/crates/#{c}" }) }.join("\n")}
+      #{patched_crates.map { |c| %Q(#{c} = { path = "#{vt_dir}/crates/#{c}" }) }.join("\n")}
     TOML
     cargo_toml = buildpath/"Cargo.toml"
     File.write(cargo_toml, "#{File.read(cargo_toml)}\n#{patch_block}")
 
-    odie "vite-task root manifest missing" unless (buildpath/"vite-task/Cargo.toml").exist?
-    # TODO(debug): remove after porting converges
-    ohai "vite-task staged commit: #{Utils.safe_popen_read("git", "-C", buildpath/"vite-task", "rev-parse",
-"HEAD").chomp}"
-    ohai "vite-task root manifest head:\n#{(buildpath/"vite-task/Cargo.toml").read.lines.first(6).join}"
-    ohai "bumpalo in workspace deps: #{(buildpath/"vite-task/Cargo.toml").read.include?("bumpalo")}"
-    ohai "root Cargo.toml tail:\n#{cargo_toml.read.lines.last(12).join}"
+    odie "vite-task root manifest missing" unless (vt_dir/"Cargo.toml").exist?
 
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vite_global_cli")
