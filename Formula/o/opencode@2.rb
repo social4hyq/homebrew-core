@@ -20,6 +20,10 @@ class OpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "358a53cb1fd651efd4758a88c1ffdfbc183e6af2"
   version "0.0.0-beta-17941"
   license "MIT"
+  # Baked-in channel was empty (see OPENCODE_CHANNEL below) — TUI crashed on
+  # startup ("Invalid storage segment" segment-validates the channel), so the
+  # fix changes the installed binary.
+  revision 1
   # Version scheme changed 2.0.0-beta_N → npm's 0.0.0-beta-<build>, which
   # sorts BELOW the old string; version_scheme forces brew upgrade to treat
   # any scheme-1 version as newer than every scheme-0 (2.0.0-beta_24) keg.
@@ -132,6 +136,18 @@ class OpencodeAT2 < Formula
     # rebuilds of the same npm build look identical to the gate (see the
     # mismatch flip above).
     ENV["OPENCODE_VERSION"] = "#{version}_#{revision}"
+
+    # Script.channel falls through to `git branch --show-current` when
+    # OPENCODE_VERSION starts with "0.0.0-" (always true here) and
+    # OPENCODE_CHANNEL is unset — under brew's detached HEAD that yields "".
+    # The empty channel is baked into the binary and breaks two things at
+    # runtime: the TUI storage keys its state directory by channel and its
+    # segment validation (`^[a-zA-Z0-9][a-zA-Z0-9._-]*$`) crashes the TUI at
+    # startup ("Invalid storage segment"), and the updater pokes
+    # update.opencode.ai/api//cli/npm (404 spam every 10 min). "beta" matches
+    # the npm dist-tag this formula tracks; updater stays read-only either way
+    # (brew installs fail its npm/pnpm/bun/yarn method detection).
+    ENV["OPENCODE_CHANNEL"] = "beta"
 
     # build.ts adaptations (reuse linux-arm64-musl target slot):
     #   1. os check: allow linux-arm64-musl through on OHOS
