@@ -10,12 +10,16 @@ class VitePlus < Formula
 
   depends_on "cmake" => :build
   depends_on "just" => :build
+  depends_on "ohos-sdk" => :build
+  depends_on "patchelf" => :build
   depends_on "pnpm" => :build
   # rustup's ohos post-install needs it to rpath the downloaded cargo against
   # openssl@3 / zlib-ng-compat.
-  depends_on "patchelf" => :build
   depends_on "rustup" => :build # TODO: try to restore stable rust: https://github.com/voidzero-dev/vite-task/commit/db99ba4d5d33323cc9e7b329f11bdea0610fbc7f
   depends_on "node"
+  # @napi-rs/cli wires the ohos cross-linker from this SDK when
+  # process.platform == "openharmony" (it stringifies an unset path as
+  # `undefined` into the linker path otherwise).
 
   resource "rolldown" do
     url "https://github.com/rolldown/rolldown.git",
@@ -81,7 +85,7 @@ class VitePlus < Formula
     # even when the rustup post-install rpath pass didn't run (e.g. cached
     # toolchain installed before patchelf was available).
     %w[openssl@3 zlib-ng-compat].each do |dep|
-      ENV.prepend_path "LD_LIBRARY_PATH", Formula[dep].opt_lib
+      ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib(dep)
     end
 
     # Pre-install every pinned toolchain up front with retries: single
@@ -98,7 +102,7 @@ class VitePlus < Formula
       next if channel.nil? || channel == root_channel
 
       ohai "Repointing #{file} from #{channel} to #{root_channel}"
-      inreplace file, /channel\s*=\s*"[^"]+"/, %(channel = "#{root_channel}")
+      inreplace file, /channel\s*=\s*"[^"]+"/, %Q(channel = "#{root_channel}")
     end
 
     max_attempts = 10
@@ -116,6 +120,10 @@ class VitePlus < Formula
     # Direct crates.io access stalls from this network; rsproxy mirrors both
     # the sparse index and crate downloads.
     ENV["CARGO_REGISTRIES_CRATES_IO_INDEX"] = "sparse+https://rsproxy.cn/index/"
+
+    # @napi-rs/cli builds the ohos linker/cc/ar paths from this (must point at
+    # the SDK's native dir, not the SDK root).
+    ENV["OHOS_SDK_NATIVE"] = formula_opt_prefix("ohos-sdk")/"native"
 
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vite_global_cli")
