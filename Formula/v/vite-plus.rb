@@ -11,13 +11,15 @@ class VitePlus < Formula
   depends_on "cmake" => :build
   depends_on "just" => :build
   depends_on "ohos-sdk" => :build
-  # pnpm@11.23 regressed deploy --legacy (pnpm/pnpm#14130: crash on packages
-  # without peerDependencies); upstream pins the 10.x line anyway.
-  # Runtime dep (not :build): vp scaffolding/formatter shell out to a package
-  # manager, and brew test exercises those flows.
+  depends_on "pnpm@10" => :build
   depends_on "rust" => :build
+  # pnpm@11.23 regressed deploy --legacy (pnpm/pnpm#14130: crash on packages
+  # without peerDependencies); upstream pins the 10.x line anyway. Build-time
+  # work therefore runs under pnpm@10 (prepended onto PATH in install()).
+  # Runtime keeps the unversioned pnpm: vp scaffolding shells out to a package
+  # manager, and brew test exercises those flows.
   depends_on "node"
-  depends_on "pnpm@10"
+  depends_on "pnpm"
   # Upstream pins a nightly toolchain solely for `-Z bindeps` (fspy preload
   # artifact deps). RUSTC_BOOTSTRAP=1 unlocks that flag on harmonybrew's
   # native stable rust below, so no rustup/nightly download is needed.
@@ -77,6 +79,10 @@ class VitePlus < Formula
 
     ENV["NPM_CONFIG_MANAGE_PACKAGE_MANAGER_VERSIONS"] = "false"
     ENV["npm_config_manage_package_manager_versions"] = "false"
+
+    # Build-time work runs under pnpm@10 (see depends_on); the unversioned
+    # pnpm stays the runtime choice for vp.
+    ENV.prepend_path "PATH", formula_opt_bin("pnpm@10")
 
     # Unlocks `-Z bindeps` (fspy preload artifact deps) on the stable compiler.
     # The repo's rust-toolchain.toml nightly pin is inert here: plain cargo
@@ -258,16 +264,6 @@ class VitePlus < Formula
         break
       rescue BuildError => e
         msg = e.message.to_s.lines.last(5).join
-        ohai "test PATH=#{ENV["PATH"]}"
-        test_tools = %w[node npm pnpm corepack git sh]
-        test_tools.each do |tool|
-          found = begin
-            Utils.safe_popen_read("which", tool).strip
-          rescue
-            "MISSING"
-          end
-          ohai "#{tool}: #{found}"
-        end
         odie "vp #{args.first} failed (#{e.class}):\n#{msg}" if attempt == max_attempts
         sleep 10
       end
