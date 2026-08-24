@@ -196,7 +196,7 @@ class VitePlus < Formula
           }
         JSON
         if scope
-          pkg_leaf = ::Utils.name_from_full_name(name)
+          pkg_leaf = File.basename(name)
           bare = "#{pkg_leaf}.node"
           cp node_src, dest/bare
           node_files << (dest/bare)
@@ -204,7 +204,7 @@ class VitePlus < Formula
       end
 
       # 2) Files inside the package itself (__dirname-relative fallbacks):
-      pkg_leaf = ::Utils.name_from_full_name(name)
+      pkg_leaf = File.basename(name)
       cp node_src, pkg_dir/node_ohos_name
       node_files << (pkg_dir/node_ohos_name)
       cp node_src, pkg_dir/"#{pkg_leaf}.node"
