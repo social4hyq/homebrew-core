@@ -125,63 +125,98 @@ class VitePlus < Formula
     # the SDK's native dir, not the SDK root).
     ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
 
-    # yuku-* napi packages (Zig bindings used by rolldown-plugin-dts et al)
-    # publish no openharmony binding and no newer release adds one; reuse the
-    # linux-arm64-musl build (same libc/ABI family, cf. opentui-core) under
-    # the openharmony package name. Pure-JS yuku packages have no binding to
-    # substitute and are skipped.
+    # Upstream publishes no openharmony napi bindings; reuse linux-arm64-musl
+    # builds (same libc/ABI family, cf. opentui-core) under the openharmony
+    # package name. Covers every napi package in the store declaring a
+    # *-linux-arm64-musl optional dependency (yuku-*, @ast-grep/napi, ...);
+    # pure-JS packages declare none and are skipped.
     system "pnpm", "install"
     sign_tool = "#{formula_opt_prefix("ohos-sdk")}/bin/binary-sign-tool"
-    tars_cache = HOMEBREW_CACHE/"vite-plus-yuku-musl"
-    buildpath.glob("node_modules/.pnpm/yuku-*@*/node_modules/yuku-*").each do |pkg_dir|
+    tars_cache = HOMEBREW_CACHE/"vite-plus-musl-napi"
+    buildpath.glob("node_modules/.pnpm/*/node_modules/{*,*/*}").each do |pkg_dir|
       next unless File.directory?(pkg_dir)
 
-      manifest = JSON.parse(File.read(pkg_dir/"package.json"))
-      name = manifest.fetch("name")
-      musl_binding = manifest.fetch("optionalDependencies", {}).keys.find do |dep|
-        dep.end_with?("/binding-linux-arm64-musl")
-      end
-      next if musl_binding.nil?
+      manifest_path = pkg_dir/"package.json"
+      next unless manifest_path.exist?
 
-      scope, binding_base = musl_binding.split("/")
+      begin
+        manifest = JSON.parse(File.read(manifest_path))
+      rescue JSON::ParserError
+        next
+      end
+      name = manifest["name"]
+      next if name.nil? || !name.is_a?(String)
+
+      musl_dep = manifest.fetch("optionalDependencies", {}).keys.find do |dep|
+        dep.end_with?("-linux-arm64-musl")
+      end
+      next if musl_dep.nil?
+
+      scope = musl_dep.start_with?("@") ? musl_dep.split("/").first : nil
+      musl_base = musl_dep.split("/").last
+      ohos_base = musl_base.sub("linux-arm64-musl", "openharmony-arm64")
+      ohos_module = scope ? "#{scope}/#{ohos_base}" : ohos_base
       version = manifest.fetch("version")
 
-      tgz = tars_cache/"#{scope}-#{binding_base}-#{version}.tgz"
+      tgz = tars_cache/"#{musl_dep.tr("/", "-")}-#{version}.tgz"
       unless tgz.exist?
         tgz.parent.mkpath
         system "curl", "-fSL", "--retry", "5", "-o", tgz,
-               "https://registry.npmmirror.com/#{scope}/#{binding_base}/-/#{binding_base}-#{version}.tgz"
+               "https://registry.npmmirror.com/#{musl_dep}/-/#{musl_base}-#{version}.tgz"
       end
-      stage = buildpath/"yuku-musl-#{name}"
+      stage = buildpath/"musl-napi-#{name.tr("/@", "__")}"
       rm_r(stage) if stage.exist?
       stage.mkpath
       system "tar", "xzf", tgz, "-C", stage
       node_src = Dir.glob("#{stage}/**/*.node").first
       odie "no .node found in #{tgz}" if node_src.nil?
+      node_base = File.basename(node_src)
+      # Loader conventions differ across generators: yuku's loader wants a
+      # bare "<pkg>.node" file, ast-grep's wants "<bin>.openharmony-arm64.node".
+      node_ohos_name = node_base.sub("linux-arm64-musl", "openharmony-arm64")
 
-      # The napi loader tries <yuku-pkg>/@<scope>/binding-openharmony-arm64/
-      # relative to its own dir, then plain module resolution from the parent;
-      # satisfy both.
-      ohos_binding = binding_base.sub("linux-arm64-musl", "openharmony-arm64")
-      [pkg_dir, pkg_dir.parent].each do |base|
-        dest = base/scope/ohos_binding
-        next if dest.exist?
-
+      # 1) Fabricated module next to the package (module-resolution path):
+      #    main points straight at the .node so no JS loader platform check
+      #    can interfere.
+      node_files = []
+      store = pkg_dir.parent
+      dest = store/ohos_module
+      unless dest.exist?
         dest.mkpath
-        cp node_src, dest/"#{name}.node"
+        cp node_src, dest/node_base
+        node_files << (dest/node_base)
         (dest/"package.json").write <<~JSON
           {
-            "name": "#{scope}/#{ohos_binding}",
+            "name": "#{ohos_module}",
             "version": "#{version}",
-            "main": "index.js",
-            "os": ["openharmony"],
-            "cpu": ["arm64"]
+            "main": "#{node_base}"
           }
         JSON
-        # OHOS refuses to dlopen unsigned ELF shared objects.
-        system sign_tool, "sign", "-selfSign", "1",
-               "-inFile", dest/"#{name}.node",
-               "-outFile", dest/"#{name}.node"
+        if scope
+          bare = "#{::Utils.name_from_full_name(name)}.node"
+          cp node_src, dest/bare
+          node_files << (dest/bare)
+        end
+      end
+
+      # 2) Files inside the package itself (__dirname-relative fallbacks):
+      cp node_src, pkg_dir/node_ohos_name
+      node_files << (pkg_dir/node_ohos_name)
+      cp node_src, pkg_dir/"#{::Utils.name_from_full_name(name)}.node"
+      node_files << (pkg_dir/"#{::Utils.name_from_full_name(name)}.node")
+      if scope
+        inner = pkg_dir/scope/ohos_base
+        unless inner.exist?
+          inner.mkpath
+          cp node_src, inner/"#{::Utils.name_from_full_name(name)}.node"
+          node_files << (inner/"#{::Utils.name_from_full_name(name)}.node")
+        end
+      end
+
+      # OHOS refuses to dlopen unsigned ELF shared objects; the musl builds
+      # ship unsigned.
+      node_files.each do |file|
+        system sign_tool, "sign", "-selfSign", "1", "-inFile", file, "-outFile", file
       end
     end
 
