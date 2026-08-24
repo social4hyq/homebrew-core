@@ -14,11 +14,13 @@ class VitePlus < Formula
   depends_on "patchelf" => :build
   # pnpm@11.23 regressed deploy --legacy (pnpm/pnpm#14130: crash on packages
   # without peerDependencies); upstream pins the 10.x line anyway.
-  depends_on "pnpm@10" => :build
-  # rustup's ohos post-install needs it to rpath the downloaded cargo against
-  # openssl@3 / zlib-ng-compat.
-  depends_on "rustup" => :build # TODO: try to restore stable rust: https://github.com/voidzero-dev/vite-task/commit/db99ba4d5d33323cc9e7b329f11bdea0610fbc7f
+  # Runtime dep (not :build): vp scaffolding/formatter shell out to a package
+  # manager, and brew test exercises those flows.
+  depends_on "rustup" => :build
   depends_on "node"
+  depends_on "pnpm@10"
+  # rustup's ohos post-install needs it to rpath the downloaded cargo against
+  # openssl@3 / zlib-ng-compat. # TODO: try to restore stable rust: https://github.com/voidzero-dev/vite-task/commit/db99ba4d5d33323cc9e7b329f11bdea0610fbc7f
   # @napi-rs/cli wires the ohos cross-linker from this SDK when
   # process.platform == "openharmony" (it stringifies an unset path as
   # `undefined` into the linker path otherwise).
