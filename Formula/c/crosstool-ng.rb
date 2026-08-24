@@ -12,7 +12,7 @@ class CrosstoolNg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c190b44d0c10faf5b34c7df98c578c90ba68a87dc374547fe733db50e4c5bbfd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "08b83f60c85f4bb5bc94f80fcf13404b8a9ba8f9510a3d9c1eceebd959db86ac"
   end
 
   depends_on "help2man" => :build
