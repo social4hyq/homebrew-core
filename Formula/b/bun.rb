@@ -16,8 +16,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r87"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "55296fd96b67b46ef1ebe360329269c28fd2956f920dec516991d41537c9a1c6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.0-r88"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a1d802423ff21d4516a81294772c6253ff79adeb8d812c5cb1c0140a6501473"
   end
 
   # icu4c@78 resolves to harmonybrew/core (this tap's __h fork was dropped in __n1 migration).
