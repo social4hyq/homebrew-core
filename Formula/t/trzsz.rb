@@ -8,7 +8,7 @@ class Trzsz < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d736d99186513f085dbfd93a8c81d8e240e2c0c28cb944f3abd5e1f3a7d21155"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f0d3d29a454a53701fc322b7e0758d6fec9f2e9115d5a3009dc9c26e32edb0c"
   end
 
   depends_on "python@3.14"
