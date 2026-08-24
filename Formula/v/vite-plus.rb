@@ -12,7 +12,9 @@ class VitePlus < Formula
   depends_on "just" => :build
   depends_on "ohos-sdk" => :build
   depends_on "patchelf" => :build
-  depends_on "pnpm" => :build
+  # pnpm@11.23 regressed deploy --legacy (pnpm/pnpm#14130: crash on packages
+  # without peerDependencies); upstream pins the 10.x line anyway.
+  depends_on "pnpm@10" => :build
   # rustup's ohos post-install needs it to rpath the downloaded cargo against
   # openssl@3 / zlib-ng-compat.
   depends_on "rustup" => :build # TODO: try to restore stable rust: https://github.com/voidzero-dev/vite-task/commit/db99ba4d5d33323cc9e7b329f11bdea0610fbc7f
