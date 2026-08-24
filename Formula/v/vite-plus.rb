@@ -146,7 +146,9 @@ class VitePlus < Formula
         system "curl", "-fSL", "--retry", "5", "-o", tgz,
                "https://registry.npmmirror.com/@#{name}/binding-linux-arm64-musl/-/binding-linux-arm64-musl-#{version}.tgz"
       end
-      stage = mktemppath(name)
+      stage = buildpath/"yuku-musl-#{name}"
+      rm_r(stage) if stage.exist?
+      stage.mkpath
       system "tar", "xzf", tgz, "-C", stage
       node_src = Dir.glob("#{stage}/**/*.node").first
       odie "no .node found in #{tgz}" if node_src.nil?
