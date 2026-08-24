@@ -255,10 +255,7 @@ class VitePlus < Formula
     cargo_toml = buildpath/"Cargo.toml"
     File.write(cargo_toml, "#{File.read(cargo_toml)}\n#{patch_block}")
 
-    # Refresh resolution eagerly: surfaces any patch/path problem here with
-    # full context, and keeps later locked invocations consistent.
     odie "vite-task root manifest missing" unless (buildpath/"vite-task/Cargo.toml").exist?
-    system "cargo", "metadata", "--no-deps", "--format-version", "1"
 
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vite_global_cli")
