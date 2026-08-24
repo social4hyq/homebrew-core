@@ -1,14 +1,13 @@
 class Getparty < Formula
   desc "Multi-part HTTP download manager"
   homepage "https://github.com/vbauerster/getparty"
-  url "https://github.com/vbauerster/getparty/archive/refs/tags/v1.27.0.tar.gz"
-  sha256 "412cf32b07e26e932f8c51fab0f4534618e27b4b6e65a09f8335a5789b2acdea"
+  url "https://github.com/vbauerster/getparty/archive/refs/tags/v1.28.0.tar.gz"
+  sha256 "8d1cb5f778be6fd941184dec07e2c8255827442638c6311a11a32036902e2090"
   license "BSD-3-Clause"
   head "https://github.com/vbauerster/getparty.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b10904884fbe0db28287068ca2e90f850c5b4dd57712ed8f49ea3b1179fb34e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc3825e6c5de10ea1deaaa22f97d4250bc667143c337eb3b23cb17c0384baacd"
   end
 
   depends_on "go" => :build
