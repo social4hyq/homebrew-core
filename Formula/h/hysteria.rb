@@ -7,7 +7,7 @@ class Hysteria < Formula
   head "https://github.com/apernet/hysteria.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "30a49a6908257ee34bbc72a3d8c821999011559354273e32ace1c597c7411aed"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9edd406e1a23f4aca9168b64677202b7dd0610eea7b2276ced4932518457813"
   end
 
   depends_on "go" => :build
