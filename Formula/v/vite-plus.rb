@@ -132,7 +132,8 @@ class VitePlus < Formula
     system "pnpm", "install"
     sign_tool = "#{formula_opt_prefix("ohos-sdk")}/bin/binary-sign-tool"
     tars_cache = HOMEBREW_CACHE/"vite-plus-yuku-musl"
-    Dir.glob(buildpath.glob("node_modules/.pnpm/yuku-{codegen,parser}@*/node_modules/yuku-*")).each do |pkg_dir|
+    Dir.glob(buildpath.glob("node_modules/.pnpm/yuku-{codegen,parser}@*/node_modules/yuku-*")).each do |pkg_string|
+      pkg_dir = Pathname.new(pkg_string)
       next unless File.directory?(pkg_dir)
 
       manifest = JSON.parse(File.read(pkg_dir/"package.json"))
