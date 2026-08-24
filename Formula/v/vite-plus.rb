@@ -179,7 +179,10 @@ class VitePlus < Formula
       #    main points straight at the .node so no JS loader platform check
       #    can interfere.
       node_files = []
+      # Scoped packages nest one level deeper (@scope/pkg); walk up to the
+      # real store node_modules dir.
       store = pkg_dir.parent
+      store = store.parent if name.start_with?("@")
       dest = store/ohos_module
       unless dest.exist?
         dest.mkpath
@@ -193,23 +196,25 @@ class VitePlus < Formula
           }
         JSON
         if scope
-          bare = "#{::Utils.name_from_full_name(name)}.node"
+          pkg_leaf = ::Utils.name_from_full_name(name)
+          bare = "#{pkg_leaf}.node"
           cp node_src, dest/bare
           node_files << (dest/bare)
         end
       end
 
       # 2) Files inside the package itself (__dirname-relative fallbacks):
+      pkg_leaf = ::Utils.name_from_full_name(name)
       cp node_src, pkg_dir/node_ohos_name
       node_files << (pkg_dir/node_ohos_name)
-      cp node_src, pkg_dir/"#{::Utils.name_from_full_name(name)}.node"
-      node_files << (pkg_dir/"#{::Utils.name_from_full_name(name)}.node")
+      cp node_src, pkg_dir/"#{pkg_leaf}.node"
+      node_files << (pkg_dir/"#{pkg_leaf}.node")
       if scope
         inner = pkg_dir/scope/ohos_base
         unless inner.exist?
           inner.mkpath
-          cp node_src, inner/"#{::Utils.name_from_full_name(name)}.node"
-          node_files << (inner/"#{::Utils.name_from_full_name(name)}.node")
+          cp node_src, inner/"#{pkg_leaf}.node"
+          node_files << (inner/"#{pkg_leaf}.node")
         end
       end
 
