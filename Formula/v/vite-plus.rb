@@ -47,9 +47,16 @@ class VitePlus < Formula
     end
   end
 
+  resource "vite-task" do
+    url "https://github.com/voidzero-dev/vite-task.git",
+        revision: "5c1d02c750ac21c6f4cf0528062590a145e87fd1"
+    version "5c1d02c750ac21c6f4cf0528062590a145e87fd1"
+  end
+
   def install
     resource("rolldown").stage buildpath/"rolldown"
     resource("vite").stage buildpath/"vite"
+    resource("vite-task").stage buildpath/"vite-task"
 
     # pnpm >= 11.20 verifies the engine binary against the env lockfile when
     # delegating to a packageManager-pinned version; no published @pnpm/exe
@@ -224,6 +231,25 @@ class VitePlus < Formula
         system sign_tool, "sign", "-selfSign", "1", "-inFile", file, "-outFile", file
       end
     end
+
+    # fspy_preload_unix (git dep) compiles as an empty crate on musl, where
+    # seccomp alone handles access tracking; extend the exemption to ohos,
+    # whose libc lacks the statx/execveat bindings it needs. Patched in via
+    # the [patch] block upstream reserves for local vite-task development.
+    preload_lib = buildpath/"vite-task/crates/fspy_preload_unix/src/lib.rs"
+    inreplace preload_lib,
+              'all(unix, not(target_env = "musl"))',
+              'all(unix, not(target_env = "musl"), not(target_env = "ohos"))'
+    patched_crates = %w[
+      fspy pty_terminal_test pty_terminal_test_client snapshot_test
+      vite_path vite_powershell vite_select vite_str vite_task vite_workspace
+    ]
+    patch_block = <<~TOML
+      [patch."https://github.com/voidzero-dev/vite-task.git"]
+      #{patched_crates.map { |c| %Q(#{c} = { path = "#{buildpath}/vite-task/crates/#{c}" }) }.join("\n")}
+    TOML
+    cargo_toml = buildpath/"Cargo.toml"
+    cargo_toml.write("#{cargo_toml.read}\n#{patch_block}")
 
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vite_global_cli")
