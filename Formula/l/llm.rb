@@ -8,7 +8,7 @@ class Llm < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1120df22b41c381964d493ef840bc0d1a717ce9a36440bd6d04ec4c19ebba654"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "32a6d6ce35eb4237ad54926044eaaae1399605e955a7f107ccde93d0b2cb09b8"
   end
 
   depends_on "rust" => :build # for jiter
