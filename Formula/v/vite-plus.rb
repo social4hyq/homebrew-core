@@ -257,8 +257,18 @@ class VitePlus < Formula
         system bin/"vp", *args
         break
       rescue BuildError => e
-        msg = e.output&.map(&:last)&.join.to_s.lines.last(5).join
-        odie "vp #{args.first} failed:\n#{msg}" if attempt == max_attempts
+        msg = e.message.to_s.lines.last(5).join
+        ohai "test PATH=#{ENV["PATH"]}"
+        test_tools = %w[node npm pnpm corepack git sh]
+        test_tools.each do |tool|
+          found = begin
+            Utils.safe_popen_read("which", tool).strip
+          rescue
+            "MISSING"
+          end
+          ohai "#{tool}: #{found}"
+        end
+        odie "vp #{args.first} failed (#{e.class}):\n#{msg}" if attempt == max_attempts
         sleep 10
       end
     end
