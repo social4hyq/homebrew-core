@@ -1,14 +1,9 @@
 class BunProbe < Formula
   desc "DIAGNOSTIC ONLY bun build with WaiterThread wait4() tracing"
   homepage "https://github.com/oven-sh/bun"
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "4e6a6836e23a0e3cc33d87a22d6ac1a84ec1c24e", branch: "debug/waiter-thread-terminal-race"
-  version "1.4.0-probe1"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "f3088d4b4ee542179a8b18212218a7aac3af7a8b", branch: "debug/waiter-thread-terminal-race"
+  version "1.4.0-probe2"
   license "MIT"
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-probe-v1.4.0-probe1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b3c7128c8a4a55ee2cc3d998abb34a0552e3d3d57a194199293f190bf4f8454d"
-  end
 
   keg_only "diagnostic-only build, never the default `bun`"
 
@@ -172,8 +167,8 @@ class BunProbe < Formula
 
   def caveats
     <<~EOS
-      DIAGNOSTIC-ONLY build (keg-only, not linked). Investigating a
-      Bun.spawn({terminal}) premature-exit race:
+      DIAGNOSTIC-ONLY build (keg-only, not linked). probe2 adds a
+      kill(pid,0)-confirmation candidate fix on top of the wait4() tracer:
         BUN_DEBUG_WAITER_THREAD=1 #{opt_bin}/bun ...
     EOS
   end
