@@ -52,7 +52,6 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `hishell-font` | 0.1.0 | hishell 终端图标字体（Nerd Font 系）：`starship` 等带图标工具的字体前置——先装它，提示符里的图标、符号才正常显示 |
 | `herdr` | 0.8.0 | AI 编码助手会话持久化：让终端里的 agent 工作上下文跨会话保留、随时续上 |
 | `zig@0.15` | 0.15.2 | Zig 编程语言工具链（herdr 的构建依赖） |
-| `codegraph` | 1.5.0 | 代码知识图谱服务：为 AI agent 提供跨语言代码语义检索，快速理解代码库结构与调用关系 |
 | `nvm` | 0.40.6 | Node.js 多版本管理：一条命令安装/切换任意 Node 版本（OHOS 适配，下载即用） |
 | `node-ohos` | 26.7.0 | 用 llvm@21 构建的 Node.js：libc++ ABI 与 bun/nan 系原生插件兼容，需要跑 node 原生扩展时用它（开发者向） |
 
@@ -70,6 +69,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `reasonix` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供，直接 `brew install reasonix` |
 | `deepseek-harness` | 2026-08-15 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（含 OHOS 补丁集：link 兜底 / 凭据模式 / ripgrep 回退 / crypto polyfill / 无沙箱放行），直接 `brew install deepseek-harness`；已装本 tap 旧版的用户请先 `brew uninstall deepseek-harness` 再装上游版 |
 | `uv` | 2026-08-20 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（!17217，含全部三个 OHOS 补丁与 wheel 自动签名），直接 `brew install uv`；已装本 tap 旧版的用户请先 `brew uninstall uv` 再装上游版 |
+| `codegraph` | 2026-08-24 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（!17567，无补丁单文件），直接 `brew install codegraph`；已装本 tap 旧版的用户请先 `brew uninstall codegraph` 再装上游版 |
 | `nvm-ohos` | 2026-08-15 下线 | 已被本 tap 保留的 `nvm`（ohos-node.com 方案）取代；可从 tap git 历史恢复（旧实现：`NVM_INSTALL_THIRD_PARTY_HOOK` 重定向 `nvm install` 到 brew node keg） |
 | `warp-tui` | 2026-08-12 下线 | 已停止维护（使用率低）；可从 tap git 历史恢复 formula |
 | `inject-runpath` / `dlopen-sign-shim` | 2026-08-12 下线 | 已无 formula 依赖（原用途已被预签名 npm `.so` + bun r31 起静态内嵌的 `ohos-compat-shim` 取代）；可从 tap git 历史恢复 formula |
