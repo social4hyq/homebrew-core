@@ -1,12 +1,12 @@
 class Havn < Formula
   desc "Fast configurable port scanner with reasonable defaults"
   homepage "https://github.com/mrjackwills/havn"
-  url "https://github.com/mrjackwills/havn/archive/refs/tags/v0.3.8.tar.gz"
-  sha256 "9490f81539664dd7e9749c63866fb2892a7d4a55cc83002f17fbdb07e08b2c36"
+  url "https://github.com/mrjackwills/havn/archive/refs/tags/v0.3.9.tar.gz"
+  sha256 "83b1155d5215013c86a3cb808dcc27327e977c5086c8132976e5818b861ea517"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6acd50b2e44f2edd81d766c5e0ddab059fd574f7043b6d900e138779c9f03add"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec278f039483799e1a5d2d7ed311cae517f1193a23a90696093bc1f1285ea651"
   end
 
   depends_on "rust" => :build
