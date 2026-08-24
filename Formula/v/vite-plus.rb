@@ -123,14 +123,14 @@ class VitePlus < Formula
 
     # @napi-rs/cli builds the ohos linker/cc/ar paths from this (must point at
     # the SDK's native dir, not the SDK root).
-    ENV["OHOS_SDK_NATIVE"] = formula_opt_prefix("ohos-sdk")/"native"
+    ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
 
     # yuku-codegen/yuku-parser (Zig napi packages used by rolldown-plugin-dts)
     # publish no openharmony binding and no newer release adds one; reuse the
     # linux-arm64-musl build (same libc/ABI family, cf. opentui-core) under
     # the openharmony package name.
     system "pnpm", "install"
-    sign_tool = formula_opt_prefix("ohos-sdk")/"bin/binary-sign-tool"
+    sign_tool = "#{formula_opt_prefix("ohos-sdk")}/bin/binary-sign-tool"
     tars_cache = HOMEBREW_CACHE/"vite-plus-yuku-musl"
     Dir.glob(buildpath.glob("node_modules/.pnpm/yuku-{codegen,parser}@*/node_modules/yuku-*")).each do |pkg_dir|
       next unless File.directory?(pkg_dir)
