@@ -256,7 +256,7 @@ class VitePlus < Formula
       (1..max_attempts).each do |attempt|
         system bin/"vp", *args
         break
-      rescue ErrorDuringExecution => e
+      rescue BuildError => e
         msg = e.output&.map(&:last)&.join.to_s.lines.last(5).join
         odie "vp #{args.first} failed:\n#{msg}" if attempt == max_attempts
         sleep 10
