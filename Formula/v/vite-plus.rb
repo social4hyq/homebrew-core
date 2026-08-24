@@ -11,19 +11,16 @@ class VitePlus < Formula
   depends_on "cmake" => :build
   depends_on "just" => :build
   depends_on "ohos-sdk" => :build
-  depends_on "patchelf" => :build
   # pnpm@11.23 regressed deploy --legacy (pnpm/pnpm#14130: crash on packages
   # without peerDependencies); upstream pins the 10.x line anyway.
   # Runtime dep (not :build): vp scaffolding/formatter shell out to a package
   # manager, and brew test exercises those flows.
-  depends_on "rustup" => :build
+  depends_on "rust" => :build
   depends_on "node"
   depends_on "pnpm@10"
-  # rustup's ohos post-install needs it to rpath the downloaded cargo against
-  # openssl@3 / zlib-ng-compat. # TODO: try to restore stable rust: https://github.com/voidzero-dev/vite-task/commit/db99ba4d5d33323cc9e7b329f11bdea0610fbc7f
-  # @napi-rs/cli wires the ohos cross-linker from this SDK when
-  # process.platform == "openharmony" (it stringifies an unset path as
-  # `undefined` into the linker path otherwise).
+  # Upstream pins a nightly toolchain solely for `-Z bindeps` (fspy preload
+  # artifact deps). RUSTC_BOOTSTRAP=1 unlocks that flag on harmonybrew's
+  # native stable rust below, so no rustup/nightly download is needed.
 
   resource "rolldown" do
     url "https://github.com/rolldown/rolldown.git",
@@ -81,51 +78,10 @@ class VitePlus < Formula
     ENV["NPM_CONFIG_MANAGE_PACKAGE_MANAGER_VERSIONS"] = "false"
     ENV["npm_config_manage_package_manager_versions"] = "false"
 
-    # The Aliyun rustup mirror lags upstream (ohos host artifacts for newer
-    # stable pins 404) and static.rust-lang.org times out on this network;
-    # the USTC mirror carries current dist artifacts at usable speed.
-    ENV["RUSTUP_DIST_SERVER"] = "https://mirrors.ustc.edu.cn/rust-static"
-    ENV["RUSTUP_UPDATE_ROOT"] = "https://mirrors.ustc.edu.cn/rust-static/rustup"
-
-    # Persist the toolchain across build attempts: brew sandboxes HOME, so
-    # rustup would otherwise re-download hundreds of MB every attempt.
-    ENV["RUSTUP_HOME"] = (HOMEBREW_CACHE/"vite-plus-rustup").to_s
-
-    # The downloaded cargo links libssl/libcrypto/libz; make sure they resolve
-    # even when the rustup post-install rpath pass didn't run (e.g. cached
-    # toolchain installed before patchelf was available).
-    %w[openssl@3 zlib-ng-compat].each do |dep|
-      ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib(dep)
-    end
-
-    # Pre-install every pinned toolchain up front with retries: single
-    # component downloads can still drop mid-flight; rustup keeps partial
-    # files and resumes, so retries converge. Note Homebrew's system raises
-    # on failure instead of returning false, hence the rescue.
-    root_channel = File.read(buildpath/"rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
-    odie "no rust channel pin found in #{buildpath}/rust-toolchain.toml" if root_channel.nil?
-
-    # Vendored sub-repos can pin older nightlies that predate ohos host
-    # artifacts entirely; build everything with the root channel instead.
-    buildpath.glob("**/rust-toolchain.toml").each do |file|
-      channel = File.read(file)[/channel\s*=\s*"([^"]+)"/, 1]
-      next if channel.nil? || channel == root_channel
-
-      ohai "Repointing #{file} from #{channel} to #{root_channel}"
-      inreplace file, /channel\s*=\s*"[^"]+"/, %Q(channel = "#{root_channel}")
-    end
-
-    max_attempts = 10
-    toolchain = "#{root_channel}-aarch64-unknown-linux-ohos"
-    (1..max_attempts).each do |attempt|
-      ohai "Pre-installing rust toolchain #{toolchain} (attempt #{attempt}/#{max_attempts})"
-      begin
-        system "rustup", "toolchain", "install", toolchain
-        break
-      rescue ErrorDuringExecution
-        odie "rustup failed to install #{toolchain} after #{max_attempts} attempts" if attempt == max_attempts
-      end
-    end
+    # Unlocks `-Z bindeps` (fspy preload artifact deps) on the stable compiler.
+    # The repo's rust-toolchain.toml nightly pin is inert here: plain cargo
+    # (not a rustup proxy) ignores it.
+    ENV["RUSTC_BOOTSTRAP"] = "1"
 
     # Direct crates.io access stalls on some networks (the local OHOS
     # container); route through rsproxy there. Probe first so fast-network
