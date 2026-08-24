@@ -125,26 +125,32 @@ class VitePlus < Formula
     # the SDK's native dir, not the SDK root).
     ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
 
-    # yuku-codegen/yuku-parser (Zig napi packages used by rolldown-plugin-dts)
+    # yuku-* napi packages (Zig bindings used by rolldown-plugin-dts et al)
     # publish no openharmony binding and no newer release adds one; reuse the
     # linux-arm64-musl build (same libc/ABI family, cf. opentui-core) under
-    # the openharmony package name.
+    # the openharmony package name. Pure-JS yuku packages have no binding to
+    # substitute and are skipped.
     system "pnpm", "install"
     sign_tool = "#{formula_opt_prefix("ohos-sdk")}/bin/binary-sign-tool"
     tars_cache = HOMEBREW_CACHE/"vite-plus-yuku-musl"
-    Dir.glob(buildpath.glob("node_modules/.pnpm/yuku-{codegen,parser}@*/node_modules/yuku-*")).each do |pkg_string|
-      pkg_dir = Pathname.new(pkg_string)
+    buildpath.glob("node_modules/.pnpm/yuku-*@*/node_modules/yuku-*").each do |pkg_dir|
       next unless File.directory?(pkg_dir)
 
       manifest = JSON.parse(File.read(pkg_dir/"package.json"))
       name = manifest.fetch("name")
+      musl_binding = manifest.fetch("optionalDependencies", {}).keys.find do |dep|
+        dep.end_with?("/binding-linux-arm64-musl")
+      end
+      next if musl_binding.nil?
+
+      scope, binding_base = musl_binding.split("/")
       version = manifest.fetch("version")
 
-      tgz = tars_cache/"#{name}-#{version}.tgz"
+      tgz = tars_cache/"#{scope}-#{binding_base}-#{version}.tgz"
       unless tgz.exist?
         tgz.parent.mkpath
         system "curl", "-fSL", "--retry", "5", "-o", tgz,
-               "https://registry.npmmirror.com/@#{name}/binding-linux-arm64-musl/-/binding-linux-arm64-musl-#{version}.tgz"
+               "https://registry.npmmirror.com/#{scope}/#{binding_base}/-/#{binding_base}-#{version}.tgz"
       end
       stage = buildpath/"yuku-musl-#{name}"
       rm_r(stage) if stage.exist?
@@ -156,15 +162,16 @@ class VitePlus < Formula
       # The napi loader tries <yuku-pkg>/@<scope>/binding-openharmony-arm64/
       # relative to its own dir, then plain module resolution from the parent;
       # satisfy both.
+      ohos_binding = binding_base.sub("linux-arm64-musl", "openharmony-arm64")
       [pkg_dir, pkg_dir.parent].each do |base|
-        dest = base/"@#{name}"/"binding-openharmony-arm64"
+        dest = base/scope/ohos_binding
         next if dest.exist?
 
         dest.mkpath
         cp node_src, dest/"#{name}.node"
         (dest/"package.json").write <<~JSON
           {
-            "name": "@#{name}/binding-openharmony-arm64",
+            "name": "#{scope}/#{ohos_binding}",
             "version": "#{version}",
             "main": "index.js",
             "os": ["openharmony"],
