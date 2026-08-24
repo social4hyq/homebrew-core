@@ -7,7 +7,7 @@ class Ed < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f24564773f041914732b1098ae12cde11b9ef47cb7f8347f1b8ce555f880ea0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "343f1c41556c6c93e1abc169d17091f18a5271575ac3e9a252c340ba37ece99a"
   end
 
   keg_only :provided_by_macos
