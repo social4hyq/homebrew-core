@@ -2,12 +2,12 @@ class Xq < Formula
   desc "Command-line XML and HTML beautifier and content extractor"
   homepage "https://github.com/sibprogrammer/xq"
   url "https://github.com/sibprogrammer/xq.git",
-      tag:      "v1.5.0",
-      revision: "e1abbb35e250246385b942d055ba800fe04887d6"
+      tag:      "v1.5.1",
+      revision: "9803fc9565174eacc844319409688172ce1412aa"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "36472624fdddf86c4640dacd45738f2b5ba7dc5da37633ffe437b671f70f3441"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7814b74be35c0ace744470a4cc88f2b939e2ae0b2b881abdce7aefc540ca7393"
   end
 
   depends_on "go" => :build
