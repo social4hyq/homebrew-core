@@ -14,6 +14,10 @@ class Zellij < Formula
     strategy :github_latest
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "490f2e5a0b4c757832b8327f1f2f4c8a82b3bd2fadaff4a267c74ab22af99a47"
+  end
+
   depends_on "cmake" => :build
   depends_on "make" => :build
   depends_on "ohos-sdk" => :build
