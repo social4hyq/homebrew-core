@@ -1,13 +1,13 @@
 class AstGrep < Formula
   desc "Code searching, linting, rewriting"
   homepage "https://github.com/ast-grep/ast-grep"
-  url "https://github.com/ast-grep/ast-grep/archive/refs/tags/0.45.1.tar.gz"
-  sha256 "a3cf5afc5a7302c79df56c2d52762a70e8290ce86291050e3febe90abd388d6c"
+  url "https://github.com/ast-grep/ast-grep/archive/refs/tags/0.45.2.tar.gz"
+  sha256 "b372fdc542b050336c5491c5d7cc91e0648c107bba90c3ad8e02913e5cf2f4ab"
   license "MIT"
   head "https://github.com/ast-grep/ast-grep.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "117334d2841fab725108ed57f58da4e995f3f64a1d4c3d3e98338fefa54a55bd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07bed1be70f89c702755f904ba2acd0c0aad1f5c443ccce935e890106c8bc7ef"
   end
 
   depends_on "rust" => :build
