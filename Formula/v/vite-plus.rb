@@ -246,6 +246,8 @@ class VitePlus < Formula
     # TMPDIR (defaulting to /tmp) — wrap the real binary in libexec with a
     # cache-backed TMPDIR default, with VP_TMPDIR as the override hatch.
     libexec_bin = libexec/"bin"
+    mkdir_p libexec_bin
+    odie "cargo install did not produce bin/vp" unless (bin/"vp").exist?
     mv bin/"vp", libexec_bin/"vp"
     (bin/"vp").write <<~SH
       #!/bin/sh
