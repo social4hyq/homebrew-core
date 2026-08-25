@@ -7,7 +7,7 @@ class BashPreexec < Formula
   head "https://github.com/rcaloras/bash-preexec.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c2be624203f5fb240b41e7eef383a1ba2824b6880233103b80281458cf539f3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d6602752445ceec50bab87c55c874dcd0e1b5cf2e6fd704bbe14bc4b720ff3a"
   end
 
   def install
