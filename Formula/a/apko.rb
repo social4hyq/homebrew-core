@@ -15,7 +15,7 @@ class Apko < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea4656fc65020ac7a57b5afd19718f9dcdd742831cb042cfb4eaaab3f7e58990"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b515a60b47f8e77acdeb6f306b90b221028b927d47f3e6565566707ea9219157"
   end
 
   depends_on "go" => :build
