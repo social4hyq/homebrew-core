@@ -1,0 +1,30 @@
+--- a/dsh-attachment-local/lib/index.js
++++ b/dsh-attachment-local/lib/index.js
+@@ -370,11 +370,23 @@
+ 	/* v8 ignore next -- Windows cannot open directory handles; NTFS metadata journaling owns entry durability there. */
+ 	if (process.platform === "win32") return;
+ 	/* v8 ignore start -- Windows cannot exercise directory fsync; POSIX behavior tests enforce this peer. */
+-	const handle = await open(path, constants.O_RDONLY);
+ 	try {
+-		await handle.sync();
+-	} finally {
+-		await handle.close();
++		const handle = await open(path, constants.O_RDONLY);
++		try {
++			await handle.sync();
++		} finally {
++			await handle.close();
++		}
++	} catch (error) {
++		// hmfs/hmmac permission model denies O_RDONLY on ancestors above the
++		// user home (EPERM/EACCES); their entry durability is platform-owned,
++		// so this sync is best-effort only.
++		if (!(error instanceof Error && (
++			error.code === "EPERM" ||
++			error.code === "EACCES" ||
++			error.code === "ENOTSUP" ||
++			error.code === "ENOSYS"
++		))) throw error;
+ 	}
+ 	/* v8 ignore stop */
+ }
