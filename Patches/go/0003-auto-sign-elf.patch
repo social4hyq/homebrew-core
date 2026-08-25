@@ -1,6 +1,14 @@
---- go/src/cmd/go/internal/work/exec.go	2026-06-05 11:41:14.906038869 +0000
-+++ go/src/cmd/go/internal/work/exec.go	2026-06-05 11:41:23.017073556 +0000
-@@ -1628,10 +1628,59 @@
+--- go/src/cmd/go/internal/work/exec.go
++++ go/src/cmd/go/internal/work/exec.go
+@@ -41,6 +41,7 @@
+ 	"cmd/go/internal/load"
+ 	"cmd/go/internal/modinfo"
+ 	"cmd/go/internal/modload"
++	"cmd/go/internal/selfsign"
+ 	"cmd/go/internal/str"
+ 	"cmd/go/internal/trace"
+ 	"cmd/internal/buildid"
+@@ -1662,10 +1663,66 @@
  		return err
  	}
  
@@ -9,15 +17,26 @@
 +	if err := autoSignOutput(a.Target); err != nil {
 +		return err
 +	}
++	// 'go run' (and 'go test') set CacheExecutable, so updateBuildID already
++	// stored a copy of the executable in the build cache (GOCACHE) before this
++	// hook ran. Cache hits execute that cached copy directly without re-running
++	// link, so it must be signed too, otherwise a warm 'go run' runs an
++	// unsigned binary on the noexec filesystem.
++	if a.cachedExecutable != "" {
++		if err := autoSignOutput(a.cachedExecutable); err != nil {
++			return err
++		}
++	}
 +
  	a.built = a.Target
  	return nil
  }
  
-+// autoSignOutput signs the output ELF binary using binary-sign-tool.
++// autoSignOutput signs the output ELF binary using the vendored selfsign
++// implementation (from ohos-bst-light, see cmd/go/internal/selfsign).
 +// Only signs executable (ET_EXEC) and shared object (ET_DYN) ELF files,
-+// skipping relocatable (ET_REL, i.e. .o) files which would be corrupted by signing.
-+// On HarmonyOS, compiled ELF binaries require code signing to execute
++// skipping relocatable (ET_REL, i.e. .o) files which would be corrupted by
++// signing. On HarmonyOS, compiled ELF binaries require code signing to execute
 +// (noexec filesystem). This is called after the final build-ID write to
 +// ensure the signature is not overwritten.
 +func autoSignOutput(path string) error {
@@ -47,12 +66,8 @@
 +	if eType != 2 && eType != 3 {
 +		return nil
 +	}
-+	if _, err := exec.LookPath("binary-sign-tool"); err != nil {
-+		return nil
-+	}
-+	cmd := exec.Command("binary-sign-tool", "sign", "-inFile", path, "-outFile", path, "-selfSign", "1")
-+	if output, err := cmd.CombinedOutput(); err != nil {
-+		log.Printf("warning: binary-sign-tool failed: %v\n%s", err, output)
++	if err := selfsign.SignFileAtomic(path, false); err != nil {
++		log.Printf("warning: selfsign failed: %v", err)
 +	}
 +	return nil
 +}
@@ -60,3 +75,452 @@
  func (b *Builder) writeLinkImportcfg(a *Action, file string) error {
  	// Prepare Go import cfg.
  	var icfg bytes.Buffer
+--- /dev/null
++++ go/src/cmd/go/internal/selfsign/selfsign.go
+@@ -0,0 +1,446 @@
++// Copyright (C) 2026 hqzing
++// SPDX-License-Identifier: 0BSD
++// Repository: https://github.com/hqzing/ohos-bst-light
++//
++// Licensed under the BSD Zero Clause License.
++
++/*
++ * selfsign.go — OpenHarmony 二进制自签名参考实现 (Go, 仅用标准库)
++ *
++ * 用法:
++ *     go build -o selfsign selfsign.go
++ *     ./selfsign <input_elf> [output_elf] [--force] [--strip]
++ *         缺省 output 时, inplace 改写 input.
++ *         --force : 若已含 .codesign 段, 先剥离再重签
++ *         --strip : 仅剥离 .codesign 段, 不做签名
++ */
++package selfsign
++
++import (
++	"crypto/sha256"
++	"encoding/binary"
++	"errors"
++	"fmt"
++	"os"
++)
++
++const (
++	descSize               = 256
++	pageSize               = 4096
++	flagSelfSign           = 0x10
++	fsVerityDescriptorType = 1
++	hashOut                = 32 // SHA-256 输出字节数
++)
++
++// ELF64 header 字段偏移
++const (
++	eShOff     = 0x28
++	eShEntsize = 0x3a
++	eShNum     = 0x3c
++	eShStrndx  = 0x3e
++)
++
++var codesignName = []byte(".codesign\x00") // 含结尾 NUL, 共 10 字节
++
++// ─────────────────────── 字节读写工具 ───────────────────────
++func readU16(b []byte, off int) uint16 {
++	return binary.LittleEndian.Uint16(b[off : off+2])
++}
++func readU32(b []byte, off int) uint32 {
++	return binary.LittleEndian.Uint32(b[off : off+4])
++}
++func readU64(b []byte, off int) uint64 {
++	return binary.LittleEndian.Uint64(b[off : off+8])
++}
++func writeU16(b []byte, off int, v uint16) {
++	binary.LittleEndian.PutUint16(b[off:off+2], v)
++}
++func writeU32(b []byte, off int, v uint32) {
++	binary.LittleEndian.PutUint32(b[off:off+4], v)
++}
++func writeU64(b []byte, off int, v uint64) {
++	binary.LittleEndian.PutUint64(b[off:off+8], v)
++}
++
++func alignUp(v, a uint64) uint64 {
++	return ((v + a - 1) / a) * a
++}
++
++func doSha256(b []byte) [32]byte {
++	return sha256.Sum256(b)
++}
++
++// ─────────────────── ELF 预清洗/标准化 (非签名必需) ───────────────────
++type elfHeader struct {
++	eShOff    uint64
++	eShNum    uint16
++	eShStrndx uint16
++}
++
++func parseElfHeader(elf []byte) (*elfHeader, error) {
++	if len(elf) < 64 || elf[0] != 0x7f || elf[1] != 0x45 ||
++		elf[2] != 0x4c || elf[3] != 0x46 || elf[4] != 2 {
++		return nil, errors.New("not ELF64")
++	}
++	eShOff := readU64(elf, eShOff)
++	eShEntsize := readU16(elf, eShEntsize)
++	eShNum := readU16(elf, eShNum)
++	eShStrndx := readU16(elf, eShStrndx)
++	if eShEntsize != 64 || eShOff == 0 || eShNum == 0 || eShStrndx >= eShNum {
++		return nil, errors.New("ELF has no usable section header table")
++	}
++	if eShOff > uint64(len(elf)) || uint64(eShNum) > (uint64(len(elf))-eShOff)/64 {
++		return nil, errors.New("section header table out of bounds")
++	}
++	return &elfHeader{eShOff: eShOff, eShNum: eShNum, eShStrndx: eShStrndx}, nil
++}
++
++func findSectionByName(elf []byte, eShOff uint64, eShNum, eShStrndx uint16, name []byte) int64 {
++	nameLen := len(name)
++	shstrE := eShOff + uint64(eShStrndx)*64
++	shstrOff := readU64(elf, int(shstrE)+24)
++	shstrSz := readU64(elf, int(shstrE)+32)
++	if shstrOff > uint64(len(elf)) || shstrSz > uint64(len(elf))-shstrOff {
++		return -1
++	}
++	for i := uint16(0); i < eShNum; i++ {
++		e := eShOff + uint64(i)*64
++		nameOff := readU32(elf, int(e))
++		if uint64(nameOff)+uint64(nameLen) <= shstrSz {
++			start := int(shstrOff + uint64(nameOff))
++			if string(elf[start:start+nameLen]) == string(name) {
++				return int64(e)
++			}
++		}
++	}
++	return -1
++}
++
++func HasCodesignSection(elf []byte) bool {
++	h, err := parseElfHeader(elf)
++	if err != nil {
++		return false
++	}
++	return findSectionByName(elf, h.eShOff, h.eShNum, h.eShStrndx, codesignName) >= 0
++}
++
++func newShstrndx(oldShstrndx uint16, csIdx int) uint16 {
++	if uint16(csIdx) < oldShstrndx {
++		return oldShstrndx - 1
++	}
++	return oldShstrndx
++}
++
++func StripCodesign(buf []byte) (bool, []byte, error) {
++	elf := make([]byte, len(buf))
++	copy(elf, buf)
++	h, err := parseElfHeader(elf)
++	if err != nil {
++		return false, nil, err
++	}
++
++	csEntryOff := findSectionByName(elf, h.eShOff, h.eShNum, h.eShStrndx, codesignName)
++	if csEntryOff < 0 {
++		return false, elf, nil
++	}
++	csIdx := int((uint64(csEntryOff) - h.eShOff) / 64)
++
++	shstrE := h.eShOff + uint64(h.eShStrndx)*64
++	shstrOff := readU64(elf, int(shstrE)+24)
++	shstrSz := readU64(elf, int(shstrE)+32)
++	if shstrOff > uint64(len(elf)) || shstrSz > uint64(len(elf))-shstrOff {
++		return false, nil, errors.New("shstrtab out of bounds")
++	}
++
++	// 2. 新 shstrtab = 旧 shstrtab 删掉 ".codesign\0"
++	csNameOff := readU32(elf, int(csEntryOff))
++	csNameLen := len(codesignName) // 10, 含 NUL
++	shstrStart := int(shstrOff)
++	newShstr := make([]byte, shstrSz)
++	copy(newShstr, elf[shstrStart:shstrStart+int(shstrSz)])
++	newShstrSz := int(shstrSz)
++	if int(csNameOff)+csNameLen <= len(newShstr) {
++		newShstr = append(newShstr[:csNameOff], newShstr[int(csNameOff)+csNameLen:]...)
++		newShstrSz = len(newShstr)
++	}
++
++	// 3. 新 SHT = 旧 SHT 去掉 csIdx 条目
++	newShNum := h.eShNum - 1
++	newSht := make([]byte, 0, int(newShNum)*64)
++	for i := uint16(0); i < h.eShNum; i++ {
++		if int(i) == csIdx {
++			continue
++		}
++		e := int(h.eShOff) + int(i)*64
++		newSht = append(newSht, elf[e:e+64]...)
++	}
++
++	// 4. 截断到 .codesign 段文件偏移, 依次追加 新shstrtab / 8B对齐 新SHT
++	csSecOff := readU64(elf, int(csEntryOff)+24)
++	keepLen := int(csSecOff)
++	if keepLen > len(elf) {
++		keepLen = len(elf)
++	}
++	newShstrOff := keepLen
++	newShtOff := int(alignUp(uint64(newShstrOff+newShstrSz), 8))
++	newTotal := newShtOff + int(newShNum)*64
++
++	out := make([]byte, newTotal)
++	copy(out, elf[:keepLen])
++	copy(out[newShstrOff:], newShstr)
++	copy(out[newShtOff:], newSht)
++
++	// 5. 重写 shstrtab 条目
++	shstrEntryOffInNew := int(newShstrndx(h.eShStrndx, csIdx)) * 64
++	writeU64(out, newShtOff+shstrEntryOffInNew+24, uint64(newShstrOff))
++	writeU64(out, newShtOff+shstrEntryOffInNew+32, uint64(newShstrSz))
++
++	// 6. 所有 sh_name > cs_name_off 的段名偏移整体前移 cs_name_len
++	for i := 0; i < int(newShNum); i++ {
++		e := newShtOff + i*64
++		noff := readU32(out, e)
++		if noff > csNameOff {
++			writeU32(out, e, noff-uint32(csNameLen))
++		}
++	}
++
++	// 7. 更新 header
++	writeU64(out, eShOff, uint64(newShtOff))
++	writeU16(out, eShNum, newShNum)
++	if uint16(csIdx) < h.eShStrndx {
++		writeU16(out, eShStrndx, h.eShStrndx-1)
++	}
++
++	return true, out, nil
++}
++
++// ─────────────────── 签名必需的算法核心 ───────────────────
++func injectCodesignSection(elf []byte) ([]byte, int, error) {
++	h, err := parseElfHeader(elf)
++	if err != nil {
++		return nil, 0, err
++	}
++
++	shstrE := h.eShOff + uint64(h.eShStrndx)*64
++	shstrOff := readU64(elf, int(shstrE)+24)
++	shstrSz := readU64(elf, int(shstrE)+32)
++	if shstrOff > uint64(len(elf)) || shstrSz > uint64(len(elf))-shstrOff {
++		return nil, 0, errors.New("shstrtab out of bounds")
++	}
++
++	// 1. cur_end: SHT 末尾与各段 off+sz 的最大值 (SHT_NOBITS=8 不占文件)
++	curEnd := h.eShOff + uint64(h.eShNum)*64
++	for i := uint16(0); i < h.eShNum; i++ {
++		e := h.eShOff + uint64(i)*64
++		shType := readU32(elf, int(e)+4)
++		off := readU64(elf, int(e)+24)
++		var sz uint64
++		if shType != 8 {
++			sz = readU64(elf, int(e)+32)
++		}
++		if off+sz > curEnd {
++			curEnd = off + sz
++		}
++	}
++	csOff := int(alignUp(curEnd, pageSize))
++
++	// 2. 新 shstrtab = 旧 + ".codesign\0"
++	shstrStart := int(shstrOff)
++	newShstr := make([]byte, 0, shstrSz+uint64(len(codesignName)))
++	newShstr = append(newShstr, elf[shstrStart:shstrStart+int(shstrSz)]...)
++	newShstr = append(newShstr, codesignName...)
++	newShstrSz := len(newShstr)
++	csShname := uint32(shstrSz) // .codesign 在新 shstrtab 内的偏移
++
++	// 3. 新布局
++	newShstrOff := csOff + pageSize
++	newShtOff := int(alignUp(uint64(newShstrOff+newShstrSz), 8))
++	newShNum := h.eShNum + 1
++	newTotal := newShtOff + int(newShNum)*64
++
++	buf := make([]byte, newTotal)
++	// 4. 拷贝原内容: 只拷到 cs_off
++	copyLen := len(elf)
++	if copyLen > newTotal {
++		copyLen = newTotal
++	}
++	if copyLen > csOff {
++		copyLen = csOff
++	}
++	copy(buf, elf[:copyLen])
++
++	copy(buf[newShstrOff:], newShstr)
++	shtStart := int(h.eShOff)
++	copy(buf[newShtOff:newShtOff+int(h.eShNum)*64], elf[shtStart:shtStart+int(h.eShNum)*64])
++
++	// .codesign 段条目 (64B)
++	csE := newShtOff + int(h.eShNum)*64
++	writeU32(buf, csE, csShname)         // sh_name
++	writeU32(buf, csE+4, 1)              // sh_type = SHT_PROGBITS
++	writeU64(buf, csE+24, uint64(csOff)) // sh_offset
++	writeU64(buf, csE+32, pageSize)      // sh_size
++	writeU64(buf, csE+48, pageSize)      // sh_addralign
++
++	// 更新 shstrtab 条目偏移/大小
++	shstrENew := newShtOff + int(h.eShStrndx)*64
++	writeU64(buf, shstrENew+24, uint64(newShstrOff))
++	writeU64(buf, shstrENew+32, uint64(newShstrSz))
++
++	// 更新 header: e_shoff / e_shnum; e_shstrndx 不变
++	writeU64(buf, eShOff, uint64(newShtOff))
++	writeU16(buf, eShNum, newShNum)
++
++	return buf, csOff, nil
++}
++
++func merkleRootHash(data []byte, csOff, csLen int) [32]byte {
++	if len(data) == 0 {
++		return doSha256(make([]byte, pageSize))
++	}
++
++	npages := (len(data) + pageSize - 1) / pageSize
++	csPageBegin := csOff / pageSize
++	csPageEnd := (csOff + csLen + pageSize - 1) / pageSize
++
++	hashes := make([]byte, 0, npages*hashOut)
++	for i := 0; i < npages; i++ {
++		if csLen > 0 && i >= csPageBegin && i < csPageEnd {
++			hashes = append(hashes, make([]byte, hashOut)...) // 段所在页: 叶哈希置 0
++			continue
++		}
++		page := make([]byte, pageSize)
++		off := i * pageSize
++		n := pageSize
++		if off+pageSize > len(data) {
++			n = len(data) - off
++		}
++		copy(page, data[off:off+n])
++		sum := doSha256(page)
++		hashes = append(hashes, sum[:]...)
++	}
++
++	if npages == 1 {
++		var root [32]byte
++		copy(root[:], hashes[:hashOut])
++		return root
++	}
++
++	cur := hashes
++	for {
++		packed := len(cur)
++		if packed <= pageSize {
++			page := make([]byte, pageSize)
++			copy(page, cur)
++			return doSha256(page)
++		}
++		nextPages := (packed + pageSize - 1) / pageSize
++		next := make([]byte, 0, nextPages*hashOut)
++		for i := 0; i < nextPages; i++ {
++			page := make([]byte, pageSize)
++			off := i * pageSize
++			n := pageSize
++			if off+pageSize > packed {
++				n = packed - off
++			}
++			copy(page, cur[off:off+n])
++			sum := doSha256(page)
++			next = append(next, sum[:]...)
++		}
++		cur = next
++	}
++}
++
++func buildDescriptor(signSize uint32, fileSize uint64, root [32]byte, flags uint32) [descSize]byte {
++	var d [descSize]byte
++	d[0] = 1  // version
++	d[1] = 1  // hashAlgorithm = SHA-256
++	d[2] = 12 // log2BlockSize = 2^12 = 4096
++	d[3] = 0  // saltSize
++	binary.LittleEndian.PutUint32(d[4:8], signSize)
++	binary.LittleEndian.PutUint64(d[8:16], fileSize)
++	copy(d[16:48], root[:]) // rootHash 左对齐
++	binary.LittleEndian.PutUint32(d[112:116], flags)
++	d[255] = 3 // csVersion
++	return d
++}
++
++func SignElf(elf []byte, force bool) ([]byte, error) {
++	if len(elf) < 64 || elf[0] != 0x7f || elf[1] != 0x45 ||
++		elf[2] != 0x4c || elf[3] != 0x46 || elf[4] != 2 {
++		return nil, errors.New("not ELF64")
++	}
++
++	buf := make([]byte, len(elf))
++	copy(buf, elf)
++	if HasCodesignSection(buf) {
++		if !force {
++			return nil, errors.New("already has a .codesign section; strip first or use --force")
++		}
++		_, stripped, err := StripCodesign(buf)
++		if err != nil {
++			return nil, err
++		}
++		buf = stripped
++	}
++
++	// 1. 注入 4KB 占位 .codesign 段
++	tmp0, csOff, err := injectCodesignSection(buf)
++	if err != nil {
++		return nil, err
++	}
++	fileSize := uint64(len(tmp0))
++
++	// 2. merkle 根哈希
++	root := merkleRootHash(tmp0, csOff, pageSize)
++
++	// 3/4. descriptor(signSize=0) 用于摘要
++	descForDigest := buildDescriptor(0, fileSize, root, flagSelfSign)
++	// 5. signature = SHA256(descriptor)
++	signature := doSha256(descForDigest[:])
++	// 6. descriptor(signSize=32) 用于落盘
++	descOnDisk := buildDescriptor(32, fileSize, root, flagSelfSign)
++
++	// 7. ElfSignInfo: 8B 头 + descriptor 256B + signature 32B = 296B
++	payload := make([]byte, 4+4+descSize+hashOut)
++	writeU32(payload, 0, fsVerityDescriptorType)   // type
++	writeU32(payload, 4, uint32(descSize+hashOut)) // length = 288
++	copy(payload[8:], descOnDisk[:])
++	copy(payload[8+descSize:], signature[:])
++
++	// 8. 原地写入段内
++	tmp := tmp0
++	copy(tmp[csOff:], payload)
++	return tmp, nil
++}
++
++// ─────────────────── 文件 I/O 层 ───────────────────
++func SignFileAtomic(path string, force bool) error {
++	raw, err := os.ReadFile(path)
++	if err != nil {
++		return err
++	}
++	signed, err := SignElf(raw, force)
++	if err != nil {
++		return err
++	}
++
++	var mode os.FileMode = 0
++	if fi, err := os.Stat(path); err == nil {
++		mode = fi.Mode().Perm()
++	}
++
++	tmpPath := fmt.Sprintf("%s.ohos-signing.%d.tmp", path, os.Getpid())
++	os.Remove(tmpPath)
++	if err := os.WriteFile(tmpPath, signed, 0o600); err != nil {
++		return err
++	}
++	if mode != 0 {
++		os.Chmod(tmpPath, mode)
++	}
++	if err := os.Rename(tmpPath, path); err != nil {
++		os.Remove(tmpPath)
++		return err
++	}
++	return nil
++}
++
