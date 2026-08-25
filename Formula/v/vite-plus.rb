@@ -255,6 +255,12 @@ class VitePlus < Formula
       export TMPDIR="${TMPDIR:-$TMPDIR_DEFAULT}"
       export VP_TMPDIR="${VP_TMPDIR:-$TMPDIR}"
       mkdir -p "$TMPDIR" 2>/dev/null
+      # Default vp to the system Node.js: its managed-runtime fallback downloads
+      # official binaries that OHOS refuses to exec unsigned.
+      if [ -n "$HOME" ] && [ ! -f "$HOME/.vite-plus/config.json" ]; then
+        mkdir -p "$HOME/.vite-plus" 2>/dev/null &&
+          printf '{"shimMode":"system_first"}\\n' > "$HOME/.vite-plus/config.json" 2>/dev/null
+      fi
       exec "#{libexec_bin}/vp" "$@"
     SH
     chmod 0755, bin/"vp"
