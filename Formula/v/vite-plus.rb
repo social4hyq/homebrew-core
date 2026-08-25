@@ -242,6 +242,21 @@ class VitePlus < Formula
     rm_r node_modules.glob(".pnpm/*/node_modules/*/prebuilds/{darwin,ios}-x64*")
     rm_r node_modules.glob(".pnpm/fsevents@*/node_modules/fsevents")
 
+    # OHOS: /tmp is read-only and vp's Rust install path creates tempdirs via
+    # TMPDIR (defaulting to /tmp) — wrap the real binary in libexec with a
+    # cache-backed TMPDIR default, with VP_TMPDIR as the override hatch.
+    libexec_bin = libexec/"bin"
+    mv bin/"vp", libexec_bin/"vp"
+    (bin/"vp").write <<~SH
+      #!/bin/sh
+      TMPDIR_DEFAULT="#{HOMEBREW_PREFIX}/var/cache"
+      export TMPDIR="${TMPDIR:-$TMPDIR_DEFAULT}"
+      export VP_TMPDIR="${VP_TMPDIR:-$TMPDIR}"
+      mkdir -p "$TMPDIR" 2>/dev/null
+      exec "#{libexec_bin}/vp" "$@"
+    SH
+    chmod 0755, bin/"vp"
+
     # Symlink vp to vpr and vpx. These are detected at runtime by argv[0]
     bin.install_symlink bin/"vp" => "vpr"
     bin.install_symlink bin/"vp" => "vpx"
