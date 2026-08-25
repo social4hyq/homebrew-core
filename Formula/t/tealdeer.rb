@@ -1,13 +1,13 @@
 class Tealdeer < Formula
   desc "Very fast implementation of tldr in Rust"
   homepage "https://tealdeer-rs.github.io/tealdeer/"
-  url "https://github.com/tealdeer-rs/tealdeer/archive/refs/tags/v1.8.1.tar.gz"
-  sha256 "8b9ea7ef8dd594d6fb8b452733b0c883a68153cec266b23564ce185bdf22fcfa"
+  url "https://github.com/tealdeer-rs/tealdeer/archive/refs/tags/v1.9.0.tar.gz"
+  sha256 "1387a04ddba714668ff0925377a2de0d0ab14533d44dd0766d673fbbd71e3119"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/tealdeer-rs/tealdeer.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "163fa17a77547501333066646f1905e757ef6cb2e6f2d0e40192bff85cc35cce"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f38385341318c543eb3b6cfd573a35a691237cca435b7fececcf9086f58ed770"
   end
 
   depends_on "rust" => :build
