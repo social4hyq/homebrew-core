@@ -7,7 +7,7 @@ class OsctrlCli < Formula
   head "https://github.com/jmpsec/osctrl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7a29fcb387332e4ab3c22188d97bf036504115358329366437746a1363b3e3e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e3fb56995295e9ab0cb75185bd840fa7a1ae8ea140acd52cc9da10f991e6574"
   end
 
   depends_on "go" => :build
