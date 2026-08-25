@@ -1,12 +1,12 @@
 class Pkcs11Tools < Formula
   desc "Tools to manage objects on PKCS#11 crypotographic tokens"
   homepage "https://github.com/Mastercard/pkcs11-tools"
-  url "https://github.com/Mastercard/pkcs11-tools/releases/download/v3.0.0/pkcs11-tools-3.0.0.tar.gz"
-  sha256 "da87f7371be0c94e6ae11cb65c033fbdc9be5549430b7c6f7a90abca200dcfcf"
+  url "https://github.com/Mastercard/pkcs11-tools/releases/download/v3.1.0/pkcs11-tools-3.1.0.tar.gz"
+  sha256 "ef6d07b5527214cf8dcbed4f017569146f74dd6eb6aa9d5e7297418299b7947d"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "be588308c48e9e9b603716327362692cf882dab72fcd808e548df3d7f587c83e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9fb70067bf602aa7e564c176f74355fa7f7ccbc9a3a9488fb8296620455e5ae3"
   end
 
   depends_on "pkgconf" => :build
