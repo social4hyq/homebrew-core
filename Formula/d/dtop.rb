@@ -1,8 +1,8 @@
 class Dtop < Formula
   desc "Terminal dashboard for Docker monitoring across multiple hosts"
   homepage "https://dtop.dev/"
-  url "https://github.com/amir20/dtop/archive/refs/tags/v0.8.0.tar.gz"
-  sha256 "acc93fa712659b881d3038db8cfeee83e446fe65ae82b8ab2741c053dc66f1ec"
+  url "https://github.com/amir20/dtop/archive/refs/tags/v0.9.0.tar.gz"
+  sha256 "6ef13284e757379fcc2c6ebba5c9676338ac0ec3df629196896e63b2b4ffe063"
   license "MIT"
   head "https://github.com/amir20/dtop.git", branch: "master"
 
