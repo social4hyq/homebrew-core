@@ -1,8 +1,8 @@
 class Libvpx < Formula
   desc "VP8/VP9 video codec"
   homepage "https://www.webmproject.org/code/"
-  url "https://github.com/webmproject/libvpx/archive/refs/tags/v1.16.0.tar.gz"
-  sha256 "7a479a3c66b9f5d5542a4c6a1b7d3768a983b1e5c14c60a9396edc9b649e015c"
+  url "https://github.com/webmproject/libvpx/archive/refs/tags/v1.17.0.tar.gz"
+  sha256 "1020f184046187baa2985dbde38e0691f49c44088bca7a1842b0236c6081dc0a"
   license "BSD-3-Clause"
   compatibility_version 1
   head "https://chromium.googlesource.com/webm/libvpx.git", branch: "main"
