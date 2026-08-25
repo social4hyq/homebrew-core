@@ -11,7 +11,7 @@ class Scc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d083c984fc95d77c572a14835bf5f044c878fca63dc34de95911da232a5b50a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7c3587e69f0925baa74d6bf884cbb1525c53b0d465761c809493a0c6044feb6"
   end
 
   depends_on "go" => :build
