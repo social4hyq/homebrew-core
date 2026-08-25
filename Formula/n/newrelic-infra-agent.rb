@@ -2,8 +2,8 @@ class NewrelicInfraAgent < Formula
   desc "New Relic infrastructure agent"
   homepage "https://github.com/newrelic/infrastructure-agent"
   url "https://github.com/newrelic/infrastructure-agent.git",
-      tag:      "1.79.0",
-      revision: "d32b2ff13c9bedc336c3a30c172650f5d990fad6"
+      tag:      "1.80.0",
+      revision: "c00900385f98d2e4134f56f4d0d830e40b8c6ccb"
   license "Apache-2.0"
   head "https://github.com/newrelic/infrastructure-agent.git", branch: "master"
 
@@ -15,8 +15,7 @@ class NewrelicInfraAgent < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "25da64f51da7c8c00ffd3fab178460f564d3cb74d8e30dcd6d8a8f26e03790d2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8561329803abc4455facabfafbfb7e5be4e0d49dd61c0e6388a335155fe81be3"
   end
 
   depends_on "go" => :build
