@@ -236,9 +236,11 @@ class VitePlus < Formula
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vite_global_cli")
 
+    # Deploy next to the libexec'd vp binary: it resolves its JS entry
+    # relative to its own location (<dir>/../node_modules/vite-plus).
     system "pnpm", "--filter=vite-plus", "deploy", "--prod", "--legacy", "--no-optional",
-           prefix/"node_modules/vite-plus"
-    node_modules = prefix/"node_modules/vite-plus/node_modules"
+           libexec/"node_modules/vite-plus"
+    node_modules = libexec/"node_modules/vite-plus/node_modules"
     rm_r node_modules.glob(".pnpm/*/node_modules/*/prebuilds/{darwin,ios}-x64*")
     rm_r node_modules.glob(".pnpm/fsevents@*/node_modules/fsevents")
 
