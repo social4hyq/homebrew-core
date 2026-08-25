@@ -1,12 +1,12 @@
 class Defuddle < Formula
   desc "Extract article content and metadata from web pages"
   homepage "https://github.com/kepano/defuddle"
-  url "https://registry.npmjs.org/defuddle/-/defuddle-0.19.2.tgz"
-  sha256 "a97f05a2cb115454669200b97a11db8b515382887d23c6360330edf67de64591"
+  url "https://registry.npmjs.org/defuddle/-/defuddle-0.19.3.tgz"
+  sha256 "5ee0e894b27f8342975f7acbbb96dd31b79baa0e2f1bba47d0d25f16cc49d153"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f758c0731ac9b2a2ddb4d85bf72e2fd547982324e2523fac85bfe4dca043e258"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6cbf085c7980f453673462ec6b77caf1bf0160ca588967c0856b61fc83c30f3"
   end
 
   depends_on "node"
