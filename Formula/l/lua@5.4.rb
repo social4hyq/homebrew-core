@@ -1,8 +1,8 @@
 class LuaAT54 < Formula
   desc "Powerful, lightweight programming language"
   homepage "https://www.lua.org/"
-  url "https://www.lua.org/ftp/lua-5.4.8.tar.gz"
-  sha256 "4f18ddae154e793e46eeab727c59ef1c0c0c2b744e7b94219710d76f530629ae"
+  url "https://www.lua.org/ftp/lua-5.4.9.tar.gz"
+  sha256 "2335b6c582a52654f94612bf10d2f4672805d05329aa6568b1d8cd9e5c6fb8e6"
   license "MIT"
   compatibility_version 1
 
