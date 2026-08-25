@@ -12,7 +12,7 @@ class Libksba < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "522b6161947e4e274e3a5502541cf0461d75a7ecdadc1913e87db85119d3c101"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "30b666a293f4cc0ab4094f5245ff1d80873b90061245792126089a6c00174bed"
   end
 
   depends_on "libgpg-error"
