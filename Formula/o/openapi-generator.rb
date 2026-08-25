@@ -11,7 +11,7 @@ class OpenapiGenerator < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "82fc25e8d56a29e95a8daddabb81a4fe0382438e30f950c98627b83d7aa82f0d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "272f5567f9a2f33d9904523c3ec4bf42694f9999f435cd9ee96f451393e9c41a"
   end
 
   head do
