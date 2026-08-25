@@ -7,7 +7,7 @@ class DeepseekHarness < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ecdb454e8d41cbe779cdf60d775c279e5162cd7ff43b0cc5a1defb44b0296ed"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "046f496a27148970d723f71a366652ce5c3881f3e3731fffaa1f7a9ceb8a5b2e"
   end
 
   depends_on "cmake" => :build
