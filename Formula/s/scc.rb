@@ -1,8 +1,8 @@
 class Scc < Formula
   desc "Fast and accurate code counter with complexity and COCOMO estimates"
   homepage "https://github.com/boyter/scc/"
-  url "https://github.com/boyter/scc/archive/refs/tags/v3.7.0.tar.gz"
-  sha256 "447233f70ebcc24f1dafb27b093afdd17d3a1d662de96e8226130c5308b02d01"
+  url "https://github.com/boyter/scc/archive/refs/tags/v4.0.0.tar.gz"
+  sha256 "7e0418d7b6dfa881b2673e50d32da81e9abc34475a305b612b57600d85801abc"
   license any_of: ["MIT", "Unlicense"]
 
   livecheck do
@@ -11,7 +11,7 @@ class Scc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d083c984fc95d77c572a14835bf5f044c878fca63dc34de95911da232a5b50a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7c3587e69f0925baa74d6bf884cbb1525c53b0d465761c809493a0c6044feb6"
   end
 
   depends_on "go" => :build
