@@ -12,6 +12,7 @@ class Git < Formula
   ]
   compatibility_version 1
   head "https://github.com/git/git.git", branch: "master"
+  revision 1
 
   livecheck do
     url "https://mirrors.edge.kernel.org/pub/software/scm/git/"
@@ -25,6 +26,7 @@ class Git < Formula
   depends_on "gettext" => :build
   depends_on "pkgconf" => :build
   depends_on "pcre2"
+  depends_on "less"
 
   uses_from_macos "curl"
   uses_from_macos "expat"
