@@ -1,8 +1,8 @@
 class Codex < Formula
   desc "OpenAI's coding agent that runs in your terminal"
   homepage "https://github.com/openai/codex"
-  url "https://github.com/openai/codex/archive/refs/tags/rust-v0.148.0.tar.gz"
-  sha256 "a45e90403eb36b7d6093b167fe1c7dba9b36063bef6d39359eed52c47a21f94a"
+  url "https://github.com/openai/codex/archive/refs/tags/rust-v0.149.1.tar.gz"
+  sha256 "85139f405ce455bf14ff452615cdb2572d752e31a1e0da6891ac8325915d10ce"
   license "Apache-2.0"
 
   livecheck do
@@ -40,11 +40,13 @@ class Codex < Formula
       ENV["OPENSSL_NO_VENDOR"] = "1"
       ENV["OPENSSL_DIR"] = formula_opt_prefix("openssl@3")
 
-      # Clean cargo cache to ensure fresh patches
+      # Clean cargo cache to ensure fresh patches. rm_rf (force) so that
+      # partially-deleted dirs left by an interrupted build do not abort the
+      # install with Errno::ENOENT (e.g. a half-removed v8-150.4.0 tree).
       cache_dir = "#{HOMEBREW_CACHE}/cargo_cache/registry/src/**"
-      rm_r(Dir.glob("#{cache_dir}/nix-0.29.0"))
-      rm_r(Dir.glob("#{cache_dir}/rustyline-14.0.0"))
-      rm_r(Dir.glob("#{cache_dir}/v8-*"))
+      rm_rf(Dir.glob("#{cache_dir}/nix-0.29.0"))
+      rm_rf(Dir.glob("#{cache_dir}/rustyline-14.0.0"))
+      rm_rf(Dir.glob("#{cache_dir}/v8-*"))
 
       system "cargo", "fetch"
 
@@ -65,6 +67,18 @@ class Codex < Formula
         "unsafe fn win_size(fd: libc::c_int, data: *mut libc::winsize) -> nix::Result<libc::c_int> {
     nix::errno::Errno::result(libc::ioctl(fd, libc::TIOCGWINSZ as i32, data))
 }"
+
+      # Deep async nesting + tracing::instrument (exec, cli, app-server, ...)
+      # exceeds rustc's default recursion limit (128) on brew's newer rustc
+      # (1.98.0 vs upstream's pinned 1.95.0), failing with
+      # "error: queries overflow the depth limit!" (query depth 130+).
+      # Upstream only sets #![recursion_limit = "256"] in app-server/mcp-server,
+      # so raise it on every workspace crate root in one pass; otherwise each
+      # newly-compiled crate (exec, cli, code-mode-host, ...) fails in turn.
+      Dir.glob(["*/src/lib.rs", "*/src/main.rs", "ext/*/src/lib.rs", "ext/*/src/main.rs"]).each do |crate_root|
+        next if File.read(crate_root).include?("recursion_limit")
+        inreplace crate_root, /\A/, "#![recursion_limit = \"256\"]\n"
+      end
 
       ENV["RUSTY_V8_ARCHIVE"] = resource("v8-archive").cached_download
       ENV["RUSTY_V8_SRC_BINDING_PATH"] = resource("v8-binding").cached_download
@@ -87,16 +101,15 @@ class Codex < Formula
         #{jobs}
         --locked
         --root=#{prefix}
-        --path=cli
-        --bin
-        codex
       ]
 
-      system "cargo", "install", *cargo_args
+      system "cargo", "install", *cargo_args, "--path=cli", "--bin", "codex"
+      system "cargo", "install", *cargo_args, "--path=code-mode-host", "--bin", "codex-code-mode-host"
     end
   end
 
   test do
     system bin/"codex", "--help"
+    system bin/"codex-code-mode-host", "--help"
   end
 end
