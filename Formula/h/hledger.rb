@@ -1,8 +1,8 @@
 class Hledger < Formula
   desc "Easy plain text accounting with command-line, terminal and web UIs"
   homepage "https://hledger.org/"
-  url "https://github.com/simonmichael/hledger/archive/refs/tags/1.52.1.tar.gz"
-  sha256 "242ba652cb76b2ca5cab1ba7588d0c99c8b7ebb329d76785f1851f2d5e9e95f6"
+  url "https://github.com/simonmichael/hledger/archive/refs/tags/1.52.2.tar.gz"
+  sha256 "d42636b079b650fdc5f9e6bdcb0ba6dcbe4cb623e6d234e6a0cbc2485180d7ae"
   license "GPL-3.0-or-later"
   head "https://github.com/simonmichael/hledger.git", branch: "main"
 
@@ -15,7 +15,7 @@ class Hledger < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f99bd2824042756dd1bbc57300e77ce241efba7c466ef03b2e275ed5f53a014"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3002881d2f9432d5d6192431968d68fb114a2967d0963fee5adfd39613615b6c"
   end
 
   depends_on "ghc" => :build
