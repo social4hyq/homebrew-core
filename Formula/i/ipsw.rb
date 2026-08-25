@@ -12,7 +12,7 @@ class Ipsw < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac28e87ce59880129749aa2590dfac15639e11893c67cfc80ce75595a9b5ef19"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1ebf107e5f0b129dee3e8e506f0c061b487a0a81aee22aa0fc426222b5f44e4"
   end
 
   depends_on "go" => :build
