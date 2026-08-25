@@ -1,8 +1,8 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.241.tgz"
-  sha256 "0ca54a7580af251a22ab62b2bacdd60f49e7717408627e38838ac2dc9997003a"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.246.tgz"
+  sha256 "6ca69ca3bb56bbfabcf0239948e46a601fa1e7a96befbac15c342d617d0024d0"
   license :cannot_represent # Anthropic Commercial Terms of Service
   # npmmirror mirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org
   # (aarch64 SIMD AES path trapped by kernel); npmmirror (Aliyun CDN) doesn't.
