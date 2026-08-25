@@ -8,6 +8,11 @@ class VitePlus < Formula
   license "MIT"
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v0.2.8-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "556e285737efbc1453aff83cb91be1396fe627003622fc8e72656edd653119da"
+  end
+
   depends_on "cmake" => :build
   depends_on "just" => :build
   depends_on "ohos-sdk" => :build
