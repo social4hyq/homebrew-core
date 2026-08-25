@@ -1,14 +1,13 @@
 class Cmake < Formula
   desc "Cross-platform make"
   homepage "https://www.cmake.org/"
-  url "https://github.com/Kitware/CMake/releases/download/v4.4.2/cmake-4.4.2.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/cmake-4.4.2.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/legacy/cmake-4.4.2.tar.gz"
-  sha256 "1db9e61e60b6e0874c86386340b910382f3c5e75b9fbfb44d122063129a2789d"
+  url "https://github.com/Kitware/CMake/releases/download/v4.4.3/cmake-4.4.3.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/cmake-4.4.3.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/legacy/cmake-4.4.3.tar.gz"
+  sha256 "c46400618b4f1f2b43507f24fb22f3ae830c3416cf23b776e16e1d413aa892f0"
   license "BSD-3-Clause"
   compatibility_version 1
   head "https://gitlab.kitware.com/cmake/cmake.git", branch: "master"
-  revision 1
 
   # The "latest" release on GitHub has been an unstable version before, and
   # there have been delays between the creation of a tag and the corresponding
