@@ -1,13 +1,13 @@
 class WoodpeckerCli < Formula
   desc "CLI client for the Woodpecker Continuous Integration server"
   homepage "https://woodpecker-ci.org/"
-  url "https://github.com/woodpecker-ci/woodpecker/archive/refs/tags/v3.17.0.tar.gz"
-  sha256 "96682b33da65b3b743b5ba12c0bd3102858fd397c58fdb276fff8977a16ce492"
+  url "https://github.com/woodpecker-ci/woodpecker/archive/refs/tags/v3.18.0.tar.gz"
+  sha256 "1f715f5fb1c3346275231fb1edde1a77834fcd3e49602d014aa0bbee85200582"
   license "Apache-2.0"
   head "https://github.com/woodpecker-ci/woodpecker.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0947b011d8a818d98374b7f61cc4d6e126e9febe74201b80a2080f4070ea9eb9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2fcf0d3b81882d563d390927352d3935edea6ddc0ad608037eaef765989bd3f"
   end
 
   depends_on "go" => :build
