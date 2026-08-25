@@ -1,11 +1,10 @@
 --- a/dsh-client-ui-settings-general/lib/client.js
 +++ b/dsh-client-ui-settings-general/lib/client.js
-@@ -439,7 +439,7 @@
- 			"title": "设置",
- 			"close": "关闭",
- 			"openDocument": "打开配置文件",
--			"openDocument.error": "无法打开配置文件",
-+			"openDocument.error": "此功能不支持鸿蒙 PC，请手动编辑文件：~/.dsh/settings.yaml",
- 			"general.nav": "通用设置"
- 		};
- 		/** English dictionary, checked complete against the zh key set. */
+@@ -403,6 +403,7 @@
+ 					this.store.update((state) => {
+ 						state.error = messageOf(error);
+ 					});
++					alert("此功能不支持鸿蒙 PC，请手动编辑文件：~/.dsh/settings.yaml");
+ 				} finally {
+ 					this.store.update((state) => {
+ 						state.opening = false;
