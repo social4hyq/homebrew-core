@@ -4,10 +4,10 @@ class DeepseekHarness < Formula
   url "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.1.1-rc.2.tgz"
   sha256 "47ec05f45ada5ab87779ae18a90456b5ebff5421dc0ff5c179677d65e1c16057"
   license "MIT"
-  revision 2
+  revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "046f496a27148970d723f71a366652ce5c3881f3e3731fffaa1f7a9ceb8a5b2e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a941159151b5e39276b2d984b4132f9b254c0218c533d0ae9c33102dcc9232f"
   end
 
   depends_on "cmake" => :build
