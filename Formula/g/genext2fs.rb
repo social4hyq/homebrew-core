@@ -6,7 +6,7 @@ class Genext2fs < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4338025927ff8ab340e10866f4794829d5e83a2951bbcb28a79ab9a9f9dcfa37"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0106aa4c6423f53b8c9f641ff87361674352c0ef973ac1c03907e0927e8de8cf"
   end
 
   depends_on "autoconf" => :build
