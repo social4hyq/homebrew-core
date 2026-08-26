@@ -9,7 +9,8 @@ class Uv < Formula
   head "https://github.com/astral-sh/uv.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/uv-v0.12.6-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b1cebf28fd12b03dee95917456cb3125d84029ef85292eba5863fcefb934c0d"
   end
 
   depends_on "cmake" => :build
