@@ -1,0 +1,147 @@
+--- go/src/cmd/go/internal/selfsign/selfsign.go
++++ go/src/cmd/go/internal/selfsign/selfsign.go
+@@ -14,7 +14,7 @@
+  *         --force : 若已含 .codesign 段, 先剥离再重签
+  *         --strip : 仅剥离 .codesign 段, 不做签名
+  */
+-package main
++package selfsign
+ 
+ import (
+ 	"crypto/sha256"
+@@ -116,7 +116,7 @@
+ 	return -1
+ }
+ 
+-func hasCodesignSection(elf []byte) bool {
++func HasCodesignSection(elf []byte) bool {
+ 	h, err := parseElfHeader(elf)
+ 	if err != nil {
+ 		return false
+@@ -131,7 +131,7 @@
+ 	return oldShstrndx
+ }
+ 
+-func stripCodesign(buf []byte) (bool, []byte, error) {
++func StripCodesign(buf []byte) (bool, []byte, error) {
+ 	elf := make([]byte, len(buf))
+ 	copy(elf, buf)
+ 	h, err := parseElfHeader(elf)
+@@ -364,7 +364,7 @@
+ 	return d
+ }
+ 
+-func signElf(elf []byte, force bool) ([]byte, error) {
++func SignElf(elf []byte, force bool) ([]byte, error) {
+ 	if len(elf) < 64 || elf[0] != 0x7f || elf[1] != 0x45 ||
+ 		elf[2] != 0x4c || elf[3] != 0x46 || elf[4] != 2 {
+ 		return nil, errors.New("not ELF64")
+@@ -372,11 +372,11 @@
+ 
+ 	buf := make([]byte, len(elf))
+ 	copy(buf, elf)
+-	if hasCodesignSection(buf) {
++	if HasCodesignSection(buf) {
+ 		if !force {
+ 			return nil, errors.New("already has a .codesign section; strip first or use --force")
+ 		}
+-		_, stripped, err := stripCodesign(buf)
++		_, stripped, err := StripCodesign(buf)
+ 		if err != nil {
+ 			return nil, err
+ 		}
+@@ -414,12 +414,12 @@
+ }
+ 
+ // ─────────────────── 文件 I/O 层 ───────────────────
+-func signFileAtomic(path string, force bool) error {
++func SignFileAtomic(path string, force bool) error {
+ 	raw, err := os.ReadFile(path)
+ 	if err != nil {
+ 		return err
+ 	}
+-	signed, err := signElf(raw, force)
++	signed, err := SignElf(raw, force)
+ 	if err != nil {
+ 		return err
+ 	}
+@@ -443,79 +443,3 @@
+ 	}
+ 	return nil
+ }
+-
+-func main() {
+-	args := os.Args[1:]
+-	force := false
+-	stripOnly := false
+-	var positional []string
+-	for _, a := range args {
+-		if a == "--force" || a == "-f" {
+-			force = true
+-		} else if a == "--strip" {
+-			stripOnly = true
+-		} else {
+-			positional = append(positional, a)
+-		}
+-	}
+-	if len(positional) < 1 || len(positional) > 2 {
+-		fmt.Fprintf(os.Stderr, "usage: %s <input_elf> [output_elf] [--force] [--strip]\n  (output defaults to input, in-place)\n", os.Args[0])
+-		os.Exit(1)
+-	}
+-	inPath := positional[0]
+-	outPath := inPath
+-	if len(positional) == 2 {
+-		outPath = positional[1]
+-	}
+-
+-	if stripOnly {
+-		raw, err := os.ReadFile(inPath)
+-		if err != nil {
+-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+-			os.Exit(2)
+-		}
+-		removed, out, err := stripCodesign(raw)
+-		if err != nil {
+-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+-			os.Exit(2)
+-		}
+-		if !removed {
+-			fmt.Printf("no .codesign section to strip: %s\n", inPath)
+-			return
+-		}
+-		if err := os.WriteFile(outPath, out, 0o644); err != nil {
+-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+-			os.Exit(2)
+-		}
+-		fmt.Printf("strip ok: %s → %s (%d bytes)\n", inPath, outPath, len(out))
+-		return
+-	}
+-
+-	if inPath == outPath {
+-		if err := signFileAtomic(inPath, force); err != nil {
+-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+-			os.Exit(2)
+-		}
+-		mode := "append-only"
+-		if force {
+-			mode = "force"
+-		}
+-		fmt.Printf("selfsign ok: %s (in-place, %s)\n", inPath, mode)
+-	} else {
+-		raw, err := os.ReadFile(inPath)
+-		if err != nil {
+-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+-			os.Exit(2)
+-		}
+-		signed, err := signElf(raw, force)
+-		if err != nil {
+-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+-			os.Exit(2)
+-		}
+-		if err := os.WriteFile(outPath, signed, 0o644); err != nil {
+-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+-			os.Exit(2)
+-		}
+-		fmt.Printf("selfsign ok: %s → %s (%d bytes)\n", inPath, outPath, len(signed))
+-	}
+-}
