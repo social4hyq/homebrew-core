@@ -31,8 +31,8 @@ class Rustup < Formula
   # HarmonyOS patches
   #
   # Problem: On HarmonyOS PC, the kernel refuses to exec/dlopen an ELF
-  # without a .codesign section (noexec filesystem), so downloaded Rust
-  # toolchain binaries must be code-signed after install.
+  # without a .codesign section, so downloaded Rust toolchain binaries
+  # must be code-signed after install.
   #
   #   0001: Vendored selfsign.rs (byte-identical to ohos-bst-light, kept in
   #         its own patch so it can be upgraded independently)
