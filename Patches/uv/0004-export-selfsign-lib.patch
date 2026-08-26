@@ -1,0 +1,123 @@
+--- a/crates/ohos-sign/src/selfsign.rs
++++ b/crates/ohos-sign/src/selfsign.rs
+@@ -15,9 +15,7 @@
+  *         --strip : 仅剥离 .codesign 段, 不做签名
+  */
+ 
+-use std::env;
+ use std::fs;
+-use std::process;
+ 
+ const DESC_SIZE: usize = 256;
+ const PAGE_SIZE: usize = 4096;
+@@ -256,7 +254,7 @@
+     -1
+ }
+ 
+-fn has_codesign_section(elf: &[u8]) -> bool {
++pub fn has_codesign_section(elf: &[u8]) -> bool {
+     match parse_elf_header(elf) {
+         Ok((e_shoff, e_shnum, e_shstrndx)) => {
+             find_section_by_name(elf, e_shoff, e_shnum, e_shstrndx, CODESIGN_NAME) >= 0
+@@ -273,7 +271,7 @@
+     }
+ }
+ 
+-fn strip_codesign(buf: &[u8]) -> Result<(bool, Vec<u8>), String> {
++pub fn strip_codesign(buf: &[u8]) -> Result<(bool, Vec<u8>), String> {
+     let elf = buf.to_vec();
+     let (e_shoff, e_shnum, e_shstrndx) = parse_elf_header(&elf)?;
+ 
+@@ -503,7 +501,7 @@
+     d
+ }
+ 
+-fn sign_elf(elf: &[u8], force: bool) -> Result<Vec<u8>, String> {
++pub fn sign_elf(elf: &[u8], force: bool) -> Result<Vec<u8>, String> {
+     if elf.len() < 64 || &elf[0..4] != b"\x7fELF" || elf[4] != 2 {
+         return Err("not ELF64".to_string());
+     }
+@@ -544,7 +542,7 @@
+ }
+ 
+ /* ─────────────────── 文件 I/O 层 ─────────────────── */
+-fn sign_file_atomic(path: &str, force: bool) -> Result<(), String> {
++pub fn sign_file_atomic(path: &str, force: bool) -> Result<(), String> {
+     let raw = fs::read(path).map_err(|e| e.to_string())?;
+     let signed = sign_elf(&raw, force)?;
+ 
+@@ -574,74 +572,3 @@
+     fs::rename(&tmp_path, path).map_err(|e| e.to_string())?;
+     Ok(())
+ }
+-
+-fn main() {
+-    let args: Vec<String> = env::args().skip(1).collect();
+-    let mut force = false;
+-    let mut strip_only = false;
+-    let mut positional: Vec<&str> = Vec::new();
+-    for a in &args {
+-        if a == "--force" || a == "-f" {
+-            force = true;
+-        } else if a == "--strip" {
+-            strip_only = true;
+-        } else {
+-            positional.push(a);
+-        }
+-    }
+-    if positional.is_empty() || positional.len() > 2 {
+-        eprintln!(
+-            "usage: {} <input_elf> [output_elf] [--force] [--strip]\n  (output defaults to input, in-place)",
+-            env::args().next().unwrap_or_else(|| "selfsign".to_string())
+-        );
+-        process::exit(1);
+-    }
+-    let in_path = positional[0];
+-    let out_path = if positional.len() == 2 {
+-        positional[1]
+-    } else {
+-        in_path
+-    };
+-
+-    let result: Result<i32, String> = (|| {
+-        if strip_only {
+-            let raw = fs::read(in_path).map_err(|e| e.to_string())?;
+-            let (removed, out) = strip_codesign(&raw)?;
+-            if !removed {
+-                println!("no .codesign section to strip: {}", in_path);
+-                return Ok(0);
+-            }
+-            fs::write(out_path, &out).map_err(|e| e.to_string())?;
+-            println!("strip ok: {} → {} ({} bytes)", in_path, out_path, out.len());
+-            return Ok(0);
+-        }
+-
+-        if in_path == out_path {
+-            sign_file_atomic(in_path, force)?;
+-            println!(
+-                "selfsign ok: {} (in-place, {})",
+-                in_path,
+-                if force { "force" } else { "append-only" }
+-            );
+-        } else {
+-            let raw = fs::read(in_path).map_err(|e| e.to_string())?;
+-            let signed = sign_elf(&raw, force)?;
+-            fs::write(out_path, &signed).map_err(|e| e.to_string())?;
+-            println!(
+-                "selfsign ok: {} → {} ({} bytes)",
+-                in_path,
+-                out_path,
+-                signed.len()
+-            );
+-        }
+-        Ok(0)
+-    })();
+-
+-    match result {
+-        Ok(code) => process::exit(code),
+-        Err(e) => {
+-            eprintln!("error: {}", e);
+-            process::exit(2);
+-        }
+-    }
+-}

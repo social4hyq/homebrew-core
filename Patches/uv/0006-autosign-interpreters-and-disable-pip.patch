@@ -1,38 +1,3 @@
-diff --git a/crates/ohos-sign/src/lib.rs b/crates/ohos-sign/src/lib.rs
-index 01a6cd9..43536bb 100644
---- a/crates/ohos-sign/src/lib.rs
-+++ b/crates/ohos-sign/src/lib.rs
-@@ -44,11 +44,18 @@ pub fn strip_codesign(elf: &mut Vec<u8>) -> Result<bool, SignError> {
- 
- /// Sign a file in place atomically: signed bytes are written to a sibling
- /// temp file and renamed over the original, so a failure never corrupts
--/// the source.
-+/// the source. The original file's permission bits are preserved (the
-+/// temp file would otherwise default to 0644, stripping the exec bit from
-+/// binaries like `bin/python3.14`).
- fn sign_inplace_atomic(path: &std::path::Path, strip: bool) -> Result<(), elf::SignError> {
-     let bytes = std::fs::read(path)?;
-     let signed = elf::sign(&bytes, strip)?;
- 
-+    let mode = {
-+        use std::os::unix::fs::PermissionsExt;
-+        std::fs::metadata(path).ok().map(|m| m.permissions().mode())
-+    };
-+
-     let dir = path
-         .parent()
-         .filter(|p| !p.as_os_str().is_empty())
-@@ -64,6 +71,10 @@ fn sign_inplace_atomic(path: &std::path::Path, strip: bool) -> Result<(), elf::S
-     let _ = std::fs::remove_file(&tmp);
- 
-     std::fs::write(&tmp, &signed)?;
-+    if let Some(mode) = mode {
-+        use std::os::unix::fs::PermissionsExt;
-+        let _ = std::fs::set_permissions(&tmp, std::fs::Permissions::from_mode(mode));
-+    }
-     if let Err(e) = std::fs::rename(&tmp, path) {
-         let _ = std::fs::remove_file(&tmp);
-         return Err(elf::SignError::Io(e));
 diff --git a/crates/uv-python/Cargo.toml b/crates/uv-python/Cargo.toml
 index 6f70745..44c8f66 100644
 --- a/crates/uv-python/Cargo.toml
@@ -48,7 +13,7 @@ index 6f70745..44c8f66 100644
  clap = { workspace = true, optional = true }
  configparser = { workspace = true }
 diff --git a/crates/uv-python/src/downloads.rs b/crates/uv-python/src/downloads.rs
-index 3306015..c0bb5fa 100644
+index 3306015..a7677e9 100644
 --- a/crates/uv-python/src/downloads.rs
 +++ b/crates/uv-python/src/downloads.rs
 @@ -1169,6 +1169,265 @@ async fn fetch_downloads_from_url(
@@ -87,11 +52,11 @@ index 3306015..c0bb5fa 100644
 +                if bytes.len() < 4 || &bytes[..4] != b"\x7fELF" {
 +                    continue;
 +                }
-+                match ohos_sign::has_codesign(&bytes) {
++                match ohos_sign::has_codesign_section(&bytes) {
 +                    true => {}
 +                    false => {
 +                        let _ = std::panic::catch_unwind(|| {
-+                            let _ = ohos_sign::sign_selfsign_inplace_with_strip(&path);
++                            let _ = ohos_sign::sign_file_atomic(&path.to_string_lossy(), true);
 +                        });
 +                    }
 +                }
