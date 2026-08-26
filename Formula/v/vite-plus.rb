@@ -153,7 +153,7 @@ class VitePlus < Formula
           system "curl", "-fSL", "--retry", "5", "-o", tgz,
                  "https://registry.npmmirror.com/#{musl_dep}/-/#{musl_base}-#{version}.tgz"
         end
-        stage_name = "#{store_root.path.tr("/", "_").delete("^a-zA-Z0-9_@.-")}-#{name.tr("/@", "__")}"
+        stage_name = "#{store_root.to_s.tr("/", "_").delete("^a-zA-Z0-9_@.-")}-#{name.tr("/@", "__")}"
         stage = store_root/stage_name
         rm_r(stage) if stage.exist?
         stage.mkpath
