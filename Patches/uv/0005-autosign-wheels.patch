@@ -1,0 +1,80 @@
+diff --git a/crates/uv-install-wheel/Cargo.toml b/crates/uv-install-wheel/Cargo.toml
+index 4c418e2..7692d9f 100644
+--- a/crates/uv-install-wheel/Cargo.toml
++++ b/crates/uv-install-wheel/Cargo.toml
+@@ -30,6 +30,9 @@ uv-shell = { workspace = true }
+ uv-trampoline-builder = { workspace = true }
+ uv-warnings = { workspace = true }
+ 
++# OHOS-only wheel .so self-signing; gated at the call site, compiles everywhere.
++ohos-sign = { path = "../ohos-sign" }
++
+ configparser = { workspace = true }
+ csv = { workspace = true }
+ data-encoding = { workspace = true }
+diff --git a/crates/uv-install-wheel/src/linker.rs b/crates/uv-install-wheel/src/linker.rs
+index 8d442b5..9bc9c1e 100644
+--- a/crates/uv-install-wheel/src/linker.rs
++++ b/crates/uv-install-wheel/src/linker.rs
+@@ -248,6 +248,52 @@ impl InstallState {
+     }
+ }
+ 
++/// OHOS-only: the kernel refuses to `dlopen` an ELF with no `.codesign`
++/// section, so wheel-bundled native modules are unusable unsigned. Sign every
++/// `.so` under the unpacked-wheel source before linking: every link mode then
++/// propagates signed bytes and the wheel cache stays signed. Idempotent;
++/// failures are non-fatal.
++#[cfg(target_env = "ohos")]
++fn ohos_sign_wheel_files(wheel_src: &Path) {
++    let debug = std::env::var_os("OHOS_SIGN_DEBUG").is_some();
++    for entry in walkdir::WalkDir::new(wheel_src) {
++        let Ok(entry) = entry else { continue };
++        if !entry.file_type().is_file() {
++            continue;
++        }
++        let Some(name) = entry.file_name().to_str() else {
++            continue;
++        };
++        if !(name.ends_with(".so") || name.contains(".so.")) {
++            continue;
++        }
++        let path = entry.path();
++        match std::fs::read(path) {
++            Ok(bytes) if ohos_sign::has_codesign_section(&bytes) => {
++                if debug {
++                    eprintln!("[uv-ohos-sign] {}: already signed", path.display());
++                }
++            }
++            Ok(_) => {
++                let result =
++                    std::panic::catch_unwind(|| {
++                        ohos_sign::sign_file_atomic(&path.to_string_lossy(), true)
++                    });
++                if debug {
++                    match result {
++                        Ok(Ok(())) => eprintln!("[uv-ohos-sign] {}: signed", path.display()),
++                        Ok(Err(err)) => {
++                            eprintln!("[uv-ohos-sign] {}: sign failed: {err}", path.display())
++                        }
++                        Err(_) => eprintln!("[uv-ohos-sign] {}: sign panicked", path.display()),
++                    }
++                }
++            }
++            Err(_) => {}
++        }
++    }
++}
++
+ /// Extract a wheel by linking all of its files into site packages.
+ #[instrument(skip_all)]
+ pub(crate) fn link_wheel_files(
+@@ -259,6 +305,8 @@ pub(crate) fn link_wheel_files(
+ ) -> Result<(), Error> {
+     let wheel = wheel.as_path();
+     let site_packages = site_packages.as_ref();
++    #[cfg(target_env = "ohos")]
++    ohos_sign_wheel_files(wheel);
+     register_installed_paths(wheel, state, filename)?;
+ 
+     // The `RECORD` file is modified during installation, so it needs a real

@@ -1,0 +1,358 @@
+diff --git a/crates/uv-python/Cargo.toml b/crates/uv-python/Cargo.toml
+index 6f70745..44c8f66 100644
+--- a/crates/uv-python/Cargo.toml
++++ b/crates/uv-python/Cargo.toml
+@@ -39,6 +39,9 @@ uv-static = { workspace = true }
+ uv-trampoline-builder = { workspace = true }
+ uv-warnings = { workspace = true }
+ 
++# OHOS-only managed-Python ELF self-signing; gated at the call site, compiles everywhere.
++ohos-sign = { path = "../ohos-sign" }
++
+ anyhow = { workspace = true }
+ clap = { workspace = true, optional = true }
+ configparser = { workspace = true }
+diff --git a/crates/uv-python/src/downloads.rs b/crates/uv-python/src/downloads.rs
+index 3306015..a7677e9 100644
+--- a/crates/uv-python/src/downloads.rs
++++ b/crates/uv-python/src/downloads.rs
+@@ -1169,6 +1169,265 @@ async fn fetch_downloads_from_url(
+         })
+ }
+ 
++/// OHOS-only: the kernel refuses to `dlopen` an ELF with no `.codesign`
++/// section. `uv python install` fetches standalone interpreter builds whose
++/// `lib-dynload/*.so` are not installed through the wheel path, so they never
++/// pass through wheel auto-signing. Sign every ELF file (by magic, not just
++/// extension) under the managed installation, and disable the bundled pip:
++/// pip-installed wheels would bypass uv's auto-signing. This is idempotent;
++/// failures are non-fatal. Called from the download path and from
++/// `uv python install`'s satisfied-installation path.
++#[cfg(target_env = "ohos")]
++pub fn ohos_finalize_managed_python(root: &Path) {
++    // 0. Link musl-compat into the interpreter: inject `DT_NEEDED
++    //    libmusl_compat.so` with `patchelf --add-needed`. The standalone build
++    //    is linked against upstream musl and has no RUNPATH to the keg, so also
++    //    add the musl-compat lib dir to RUNPATH. Must happen before signing:
++    //    the fs-verity digest then covers the patched ELF. Runs only if
++    //    `patchelf` and the musl-compat keg are both present; non-fatal.
++    ohos_patch_musl_compat(root);
++
++    // Sign every ELF file under the installation.
++    let mut dirs = vec![root.to_path_buf()];
++    while let Some(dir) = dirs.pop() {
++        let Ok(entries) = std::fs::read_dir(&dir) else { continue };
++        for entry in entries.flatten() {
++            let path = entry.path();
++            let Ok(file_type) = entry.file_type() else { continue };
++            if file_type.is_dir() {
++                dirs.push(path);
++            } else if file_type.is_file() {
++                let Ok(bytes) = std::fs::read(&path) else { continue };
++                if bytes.len() < 4 || &bytes[..4] != b"\x7fELF" {
++                    continue;
++                }
++                match ohos_sign::has_codesign_section(&bytes) {
++                    true => {}
++                    false => {
++                        let _ = std::panic::catch_unwind(|| {
++                            let _ = ohos_sign::sign_file_atomic(&path.to_string_lossy(), true);
++                        });
++                    }
++                }
++            }
++        }
++    }
++
++    // Disable the bundled pip: replace the launcher scripts with stubs that
++    // point users at uv, and remove the pip module and ensurepip so that
++    // `python -m pip` fails loudly instead of installing unsigned wheels.
++    let bin = root.join("bin");
++    if let Ok(entries) = std::fs::read_dir(&bin) {
++        for entry in entries.flatten() {
++            let name = entry.file_name();
++            let Some(name) = name.to_str() else { continue };
++            if name != "pip" && !name.starts_with("pip3") {
++                continue;
++            }
++            let path = bin.join(name);
++            let stub = "#!/bin/sh\n\
++# pip is disabled in uv-managed Python installations on OHOS: pip-installed\n\
++# wheels bypass uv's auto-signing and cannot be dlopen()ed. Use `uv add` or\n\
++# `uv pip install` instead.\n\
++echo 'pip is not supported in uv downloaded Python on OHOS. Use `uv add` (preferred) or `uv pip install` instead.' >&2\n\
++exit 1\n";
++            let _ = std::fs::write(&path, stub);
++            #[cfg(unix)]
++            {
++                use std::os::unix::fs::PermissionsExt;
++                let _ = std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755));
++            }
++        }
++    }
++
++    // Remove the pip package and ensurepip from the stdlib.
++    if let Ok(lib_entries) = std::fs::read_dir(root.join("lib")) {
++        for entry in lib_entries.flatten() {
++            let path = entry.path();
++            let Some(name) = path.file_name().and_then(|n| n.to_str()) else { continue };
++            if !name.starts_with("python") {
++                continue;
++            }
++            let site_packages = path.join("site-packages");
++            if let Ok(sp_entries) = std::fs::read_dir(&site_packages) {
++                for sp in sp_entries.flatten() {
++                    let sp_path = sp.path();
++                    let Some(sp_name) = sp_path.file_name().and_then(|n| n.to_str()) else {
++                        continue;
++                    };
++                    if sp_name == "pip" || sp_name.starts_with("pip-") {
++                        let _ = std::fs::remove_dir_all(&sp_path);
++                    }
++                }
++            }
++            let _ = std::fs::remove_dir_all(path.join("ensurepip"));
++        }
++    }
++
++    // Install a CA bundle and a `sitecustomize.py` that points ssl at it. The
++    // standalone build defaults to `/etc/ssl/cert.pem`, which does not exist on
++    // OHOS (and `/etc/ssl/certs` only holds a non-hashed `cacert.pem` that the
++    // capath loader ignores), so HTTPS verification fails out of the box. Copy
++    // the brew openssl@3 bundle into the installation and have every
++    // interpreter — including venvs, which share this stdlib dir — set
++    // `SSL_CERT_FILE` via the stdlib `sitecustomize.py`. Idempotent; non-fatal.
++    if let Some(cert) = ohos_ca_cert_file() {
++        let etc_ssl = root.join("etc").join("ssl");
++        let _ = std::fs::create_dir_all(&etc_ssl);
++        let target = etc_ssl.join("cert.pem");
++        if !target.is_file() {
++            let _ = std::fs::copy(&cert, &target);
++        }
++        if let Ok(lib_entries) = std::fs::read_dir(root.join("lib")) {
++            for entry in lib_entries.flatten() {
++                let path = entry.path();
++                let Some(name) = path.file_name().and_then(|n| n.to_str()) else {
++                    continue;
++                };
++                if !name.starts_with("python") {
++                    continue;
++                }
++                let sitecustomize = path.join("sitecustomize.py");
++                // `concat!` (not `\`-continued string literals) so the leading
++                // indentation of the `os.environ` line is preserved exactly —
++                // a continuation backslash would eat the next line's whitespace.
++                let content = concat!(
++                    "# OHOS: the standalone build defaults to /etc/ssl/cert.pem, which does not\n",
++                    "# exist here, so HTTPS verification would fail. Point ssl at the CA bundle\n",
++                    "# installed alongside the interpreter.\n",
++                    "import os\n",
++                    "_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))\n",
++                    "_cert = os.path.join(_root, 'etc', 'ssl', 'cert.pem')\n",
++                    "if os.path.isfile(_cert):\n",
++                    "    os.environ.setdefault('SSL_CERT_FILE', _cert)\n",
++                );
++                let _ = std::fs::write(&sitecustomize, content);
++            }
++        }
++    }
++}
++
++/// Locate a CA bundle to install alongside a managed interpreter: the brew
++/// openssl@3 bundle, or the Harmonybrew default location.
++#[cfg(target_env = "ohos")]
++fn ohos_ca_cert_file() -> Option<std::path::PathBuf> {
++    if let Ok(out) = std::process::Command::new("brew")
++        .args(["--prefix", "openssl@3"])
++        .output()
++    {
++        if out.status.success() {
++            let prefix = String::from_utf8_lossy(&out.stdout).trim().to_string();
++            for candidate in [
++                std::path::PathBuf::from(&prefix).join("etc/openssl@3/cert.pem"),
++                std::path::PathBuf::from(&prefix).join("etc/ca-certificates/cert.pem"),
++            ] {
++                if candidate.is_file() {
++                    return Some(candidate);
++                }
++            }
++        }
++    }
++    let dir = std::path::PathBuf::from("/storage/Users/currentUser/.harmonybrew/etc/openssl@3/cert.pem");
++    if dir.is_file() {
++        return Some(dir);
++    }
++    None
++}
++
++/// OHOS-only: inject `DT_NEEDED libmusl_compat.so` into the main interpreter
++/// binary (`patchelf --add-needed`) and add the musl-compat keg lib dir to its
++/// `RUNPATH` (`patchelf --add-rpath`). The standalone build is linked against
++/// upstream musl and has no RUNPATH to the keg, so `--add-rpath` is also
++/// required or the loader cannot find the shim. Idempotent and non-fatal:
++/// silently does nothing when `patchelf` or the keg is unavailable, or when
++/// the binary is already linked.
++#[cfg(target_env = "ohos")]
++fn ohos_patch_musl_compat(root: &Path) {
++    // Find `patchelf` on PATH.
++    let Ok(version) = std::process::Command::new("patchelf").arg("--version").output() else {
++        return;
++    };
++    if !version.status.success() {
++        return;
++    }
++
++    // Locate the musl-compat lib directory.
++    let Some(musl_lib) = ohos_musl_compat_lib_dir() else {
++        return;
++    };
++
++    // Locate the real interpreter binary (not the `python`/`python3` symlinks,
++    // not the `-config` scripts).
++    let bin = root.join("bin");
++    let Ok(entries) = std::fs::read_dir(&bin) else { return };
++    let Some(python) = entries.flatten().find_map(|entry| {
++        let path = entry.path();
++        let file_name = entry.file_name();
++        let name = file_name.to_string_lossy();
++        if !(name.starts_with("python") && !name.contains("-config")) {
++            return None;
++        }
++        if !entry.file_type().map(|t| t.is_file()).unwrap_or(false) {
++            return None;
++        }
++        let Ok(bytes) = std::fs::read(&path) else { return None };
++        (bytes.len() >= 4 && &bytes[..4] == b"\x7fELF").then_some(path)
++    }) else {
++        return;
++    };
++
++    // Skip if already linked (idempotency).
++    if let Ok(out) = std::process::Command::new("patchelf")
++        .arg("--print-needed")
++        .arg(&python)
++        .output()
++    {
++        if String::from_utf8_lossy(&out.stdout).contains("libmusl_compat.so") {
++            return;
++        }
++    }
++
++    let _ = std::process::Command::new("patchelf")
++        .args(["--add-needed", "libmusl_compat.so"])
++        .arg(&python)
++        .output();
++    let _ = std::process::Command::new("patchelf")
++        .args(["--add-rpath", musl_lib.to_string_lossy().as_ref()])
++        .arg(&python)
++        .output();
++}
++
++/// Locate the directory containing `libmusl_compat.so`. Checks an explicit
++/// override, then `brew --prefix musl-compat`, then the Harmonybrew default.
++#[cfg(target_env = "ohos")]
++fn ohos_musl_compat_lib_dir() -> Option<std::path::PathBuf> {
++    if let Some(dir) = std::env::var_os("UV_OHOS_MUSL_COMPAT_DIR") {
++        let dir = std::path::PathBuf::from(dir);
++        if dir.join("libmusl_compat.so").is_file() {
++            return Some(dir);
++        }
++    }
++    if let Ok(out) = std::process::Command::new("brew")
++        .args(["--prefix", "musl-compat"])
++        .output()
++    {
++        if out.status.success() {
++            let prefix = String::from_utf8_lossy(&out.stdout).trim().to_string();
++            if !prefix.is_empty() {
++                let dir = std::path::PathBuf::from(prefix).join("lib");
++                if dir.join("libmusl_compat.so").is_file() {
++                    return Some(dir);
++                }
++            }
++        }
++    }
++    let dir = std::path::PathBuf::from("/storage/Users/currentUser/.harmonybrew/opt/musl-compat/lib");
++    if dir.join("libmusl_compat.so").is_file() {
++        return Some(dir);
++    }
++    None
++}
++
+ impl ManagedPythonDownload {
+     pub(crate) fn url(&self) -> &Cow<'static, str> {
+         &self.url
+@@ -1238,6 +1497,11 @@ impl ManagedPythonDownload {
+ 
+         // If it is not a reinstall and the dir already exists, return it.
+         if !reinstall && path.is_dir() {
++            // OHOS-only: re-sign a pre-existing installation (e.g. one fetched
++            // by an older uv that installed it without interpreter
++            // auto-signing) and disable its bundled pip. Idempotent.
++            #[cfg(target_env = "ohos")]
++            ohos_finalize_managed_python(&path);
+             return Ok(DownloadResult::AlreadyAvailable(path));
+         }
+ 
+@@ -1413,6 +1677,12 @@ impl ManagedPythonDownload {
+                 err,
+             })?;
+ 
++        // OHOS-only: the standalone interpreter and its lib-dynload `.so` were
++        // extracted verbatim, not linked from a wheel, so sign them and
++        // disable the bundled pip here.
++        #[cfg(target_env = "ohos")]
++        ohos_finalize_managed_python(&path);
++
+         Ok(DownloadResult::Fetched(path))
+     }
+ 
+@@ -1567,9 +1837,27 @@ impl ManagedPythonDownload {
+                     if astral_mirror_url.is_some() {
+                         return Ok(vec![mirror_url]);
+                     }
++                    // On OHOS, prefer the npmmirror mirror of python-build-standalone
++                    // for out-of-the-box downloads, falling back to the Astral
++                    // mirror and then the canonical GitHub URL. The npmmirror
++                    // layout uses the same `<date>/<file>` path scheme.
++                    #[cfg(target_env = "ohos")]
++                    {
++                        let npmmirror_url = DisplaySafeUrl::parse(
++                            format!(
++                                "https://registry.npmmirror.com/-/binary/python-build-standalone/{suffix}"
++                            )
++                            .as_str(),
++                        )?;
++                        let canonical_url = DisplaySafeUrl::parse(&self.url)?;
++                        return Ok(vec![npmmirror_url, mirror_url, canonical_url]);
++                    }
+                     // Otherwise fall back to the canonical GitHub URL.
+-                    let canonical_url = DisplaySafeUrl::parse(&self.url)?;
+-                    return Ok(vec![mirror_url, canonical_url]);
++                    #[cfg(not(target_env = "ohos"))]
++                    {
++                        let canonical_url = DisplaySafeUrl::parse(&self.url)?;
++                        return Ok(vec![mirror_url, canonical_url]);
++                    }
+                 }
+             }
+ 
+diff --git a/crates/uv/src/commands/python/install.rs b/crates/uv/src/commands/python/install.rs
+index 8940577..bb9c680 100644
+--- a/crates/uv/src/commands/python/install.rs
++++ b/crates/uv/src/commands/python/install.rs
+@@ -560,6 +560,14 @@ async fn perform_install(
+         (satisfied, unsatisfied)
+     };
+ 
++    // OHOS-only: re-sign satisfied installations too — they are reused without
++    // going through the download path, so an unsigned copy fetched by an older
++    // uv would otherwise stay unsigned. Idempotent; failures are non-fatal.
++    #[cfg(target_env = "ohos")]
++    for installation in &satisfied {
++        downloads::ohos_finalize_managed_python(installation.path());
++    }
++
+     // For all satisfied installs, bytecode compile them now before any future
+     // early return.
+     if let Some(ref sender) = bytecode_compilation_sender {
