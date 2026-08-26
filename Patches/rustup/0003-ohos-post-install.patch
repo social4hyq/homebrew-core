@@ -1,8 +1,17 @@
 diff --git a/src/dist/mod.rs b/src/dist/mod.rs
-index f348188..0653a3b 100644
+index c4981d5..6917527 100644
 --- a/src/dist/mod.rs
 +++ b/src/dist/mod.rs
-@@ -1102,10 +1102,162 @@ impl<'cfg, 'a> DistOptions<'cfg, 'a> {
+@@ -47,6 +47,8 @@ pub mod temp;
+ pub(crate) mod triple;
+ pub(crate) use triple::*;
+ 
++mod selfsign;
++
+ pub static DEFAULT_DIST_SERVER: &str = "https://static.rust-lang.org";
+ 
+ /// Returns a error message indicating that certain [`Component`]s are missing in a toolchain distribution.
+@@ -1106,10 +1108,128 @@ impl<'cfg, 'a> DistOptions<'cfg, 'a> {
              let _ = utils::remove_dir("toolchain", prefix.path());
          }
  
@@ -19,8 +28,8 @@ index f348188..0653a3b 100644
 +//   * `cargo` links libssl/libz that are not present; add an rpath pointing at
 +//     the Homebrew-provided openssl@3 / zlib-ng-compat libraries (patchelf);
 +//   * wrap `cargo` so `SSL_CERT_FILE` resolves to the provided cert.pem;
-+//   * self-sign every unsigned ELF executable / shared object with
-+//     `binary-sign-tool`.
++//   * self-sign every unsigned ELF executable / shared object with the
++//     vendored selfsign implementation (src/dist/selfsign.rs).
 +//
 +// Skipped when `RUSTUP_OHOS_RPATH` is unset (i.e. when not run through the
 +// Homebrew wrapper script), so non-Homebrew builds are unaffected.
@@ -74,58 +83,28 @@ index f348188..0653a3b 100644
 +    }
 +
 +    // 3) self-sign every unsigned ELF executable / shared object
-+    if let Some(sign_tool) = ohos_binary_sign_tool() {
-+        let mut stack = vec![prefix.path().to_path_buf()];
-+        while let Some(dir) = stack.pop() {
-+            let entries = match std::fs::read_dir(&dir) {
-+                Ok(e) => e,
-+                Err(_) => continue,
-+            };
-+            for entry in entries.flatten() {
-+                let path = entry.path();
-+                if path.is_dir() {
-+                    stack.push(path);
-+                } else if is_elf_signed_target(&path) && is_unsigned_elf(&path, &sign_tool) {
-+                    info!("ohos-post-install: signing {}", path.display());
-+                    let out = std::process::Command::new(&sign_tool)
-+                        .args(["sign", "-inFile"])
-+                        .arg(&path)
-+                        .arg("-outFile")
-+                        .arg(&path)
-+                        .args(["-selfSign", "1"])
-+                        .output();
-+                    if let Ok(o) = out {
-+                        if !o.status.success() {
-+                            warn!(
-+                                "ohos-post-install: signing failed for {}: {}",
-+                                path.display(),
-+                                String::from_utf8_lossy(&o.stderr)
-+                            );
-+                        }
-+                    }
++    let mut stack = vec![prefix.path().to_path_buf()];
++    while let Some(dir) = stack.pop() {
++        let entries = match std::fs::read_dir(&dir) {
++            Ok(e) => e,
++            Err(_) => continue,
++        };
++        for entry in entries.flatten() {
++            let path = entry.path();
++            if path.is_dir() {
++                stack.push(path);
++            } else if is_elf_signed_target(&path) && !is_signed_elf(&path) {
++                info!("ohos-post-install: signing {}", path.display());
++                if let Err(err) = selfsign::sign_file_atomic(&path.to_string_lossy(), false) {
++                    warn!(
++                        "ohos-post-install: signing failed for {}: {}",
++                        path.display(),
++                        err
++                    );
 +                }
 +            }
 +        }
 +    }
-+}
-+
-+// Resolve binary-sign-tool: RUSTUP_OHOS_SIGN_TOOL (set by the wrapper to the
-+// ohos-sdk keg tool), then PATH.
-+fn ohos_binary_sign_tool() -> Option<PathBuf> {
-+    if let Ok(tool) = env::var("RUSTUP_OHOS_SIGN_TOOL") {
-+        if !tool.is_empty() && Path::new(&tool).is_file() {
-+            return Some(PathBuf::from(tool));
-+        }
-+    }
-+    if let Some(path) = env::var_os("PATH") {
-+        for dir in env::split_paths(&path) {
-+            let candidate = dir.join("binary-sign-tool");
-+            if candidate.is_file() {
-+                return Some(candidate);
-+            }
-+        }
-+    }
-+    None
 +}
 +
 +fn is_elf_signed_target(path: &Path) -> bool {
@@ -146,20 +125,16 @@ index f348188..0653a3b 100644
 +    matches!(e_type, 2 | 3)
 +}
 +
-+fn is_unsigned_elf(path: &Path, sign_tool: &Path) -> bool {
-+    match std::process::Command::new(sign_tool)
-+        .args(["display-sign", "-inFile"])
-+        .arg(path)
-+        .output()
-+    {
-+        Ok(o) => {
-+            let stdout = String::from_utf8_lossy(&o.stdout);
-+            let stderr = String::from_utf8_lossy(&o.stderr);
-+            stdout.contains("code signature is not found")
-+                || stderr.contains("code signature is not found")
-+        }
-+        Err(_) => false,
++fn is_signed_elf(path: &Path) -> bool {
++    use std::io::Read;
++    let Ok(mut f) = std::fs::File::open(path) else {
++        return false;
++    };
++    let mut buf = Vec::new();
++    if f.read_to_end(&mut buf).is_err() {
++        return false;
 +    }
++    selfsign::has_codesign_section(&buf)
 +}
 +
  #[allow(clippy::too_many_arguments)]
