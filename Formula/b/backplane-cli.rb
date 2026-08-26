@@ -1,14 +1,13 @@
 class BackplaneCli < Formula
   desc "CLI for interacting with the OpenShift Backplane API"
   homepage "https://github.com/openshift/backplane-cli"
-  url "https://github.com/openshift/backplane-cli/archive/refs/tags/v0.11.1.tar.gz"
-  sha256 "72114ba643e3064ae96d143bb487e2feeaa17b5485396f3ca3d59de1547e022c"
+  url "https://github.com/openshift/backplane-cli/archive/refs/tags/v0.12.0.tar.gz"
+  sha256 "f07831763f7d0beb4f3522f5af8646a24abc61c392c7f354a5230c4a65637aec"
   license "Apache-2.0"
   head "https://github.com/openshift/backplane-cli.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dde5d6e14717840fad621bf3b10debb29464a75f83fae6b6b61a08715656aca5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd5bfe28b6484c6b304149d215736bad42f7ba46e1d908b804757cc848770e9a"
   end
 
   depends_on "go" => :build
