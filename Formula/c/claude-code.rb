@@ -30,6 +30,14 @@ class ClaudeCode < Formula
   # panic was an artifact of symbolizing this custom build's addresses
   # against official bun debug info — layout mismatch, disregard it.)
   #
+  # Since 2.1.246 the CLI is code-split: the module graph holds ~1500 files
+  # (entry "cli" plus chunk-*.js and embedded .md/.txt assets) that reference
+  # each other via "/$bunfs/root/…" — paths inside bun's embedded virtual
+  # filesystem. The extractor therefore dumps every module next to the entry
+  # and rewrites those specifiers to relative "./…" ones so the tree runs on
+  # our own bun. (2.1.245 and earlier were a single bundle; a largest-payload
+  # scan sufficed then.)
+  #
   # Relocatability: wrapper uses runtime $HOMEBREW_PREFIX only — no build-time path interpolation.
 
   livecheck do
@@ -53,12 +61,16 @@ class ClaudeCode < Formula
   def install
     # Extractor: parses the ELF ".bun" section of a `bun build --compile`
     # executable, reads the StandaloneModuleGraph offsets from the section
-    # tail, scans the module record blob for the largest "// @bun" source
-    # payload and writes it as a standalone cli.js. Pure data processing.
+    # tail, walks the CompiledModuleGraphFile record table and writes every
+    # module to disk (entry point "cli" plus all chunks/assets). Since
+    # 2.1.246 the CLI is code-split into ~1400 chunks; the entry references
+    # them via "/$bunfs/root/<chunk>.js" specifiers valid only inside bun's
+    # embedded virtual filesystem, so those are rewritten to relative paths.
+    # Pure data processing — nothing fetched is ever executed.
     (libexec/"extract-cli.mjs").write <<~JS
-      const [binPath, outPath] = Bun.argv.slice(2);
-      if (!binPath || !outPath) {
-        console.error("usage: bun extract-cli.mjs <compiled-binary> <out.js>");
+      const [binPath, outDir] = Bun.argv.slice(2);
+      if (!binPath || !outDir) {
+        console.error("usage: bun extract-cli.mjs <compiled-binary> <out-dir>");
         process.exit(2);
       }
       const buf = new Uint8Array(await Bun.file(binPath).arrayBuffer());
@@ -66,6 +78,7 @@ class ClaudeCode < Formula
       const u16 = (off) => dv(off).getUint16(0, true);
       const u32 = (off) => dv(off).getUint32(0, true);
       const u64 = (off) => Number(dv(off).getBigUint64(0, true));
+      const td = new TextDecoder();
 
       const shoff = u64(0x28);
       const shentsize = u16(0x3a);
@@ -78,7 +91,7 @@ class ClaudeCode < Formula
         const nameOff = strOff + u32(sh);
         let end = nameOff;
         while (buf[end] !== 0) end++;
-        if (new TextDecoder().decode(buf.subarray(nameOff, end)) === ".bun") {
+        if (td.decode(buf.subarray(nameOff, end)) === ".bun") {
           bunOff = u64(sh + 0x18);
           bunSize = u64(sh + 0x20);
           break;
@@ -86,34 +99,84 @@ class ClaudeCode < Formula
       }
       if (bunOff < 0) die("no .bun section (not a bun --compile binary?)");
 
-      if (new TextDecoder().decode(buf.subarray(bunOff + bunSize - 16, bunOff + bunSize)) !== "\\n---- Bun! ----\\n")
+      if (td.decode(buf.subarray(bunOff + bunSize - 16, bunOff + bunSize)) !== "\\n---- Bun! ----\\n")
         die("bad .bun trailer");
+
+      // Tail Offsets struct (StandaloneModuleGraph.rs in bun's source):
+      //   u64 byte_count; StringPointer modules {u32 off, u32 len}; u32 entry_id; ...
       const o = bunOff + bunSize - 48;
-      const byteCount = u64(o);
       const modPtrOff = u32(o + 8), modPtrLen = u32(o + 12);
 
-      let best = null;
-      const blobEnd = bunOff + modPtrOff + modPtrLen;
-      for (let p = bunOff + modPtrOff; p + 8 <= blobEnd; p++) {
-        const off = u32(p), len = u32(p + 4);
-        if (off === 0 || len < 1_000_000) continue; // main bundle is tens of MB
-        if (off + len > bunOff + byteCount) continue;
-        const win = new TextDecoder().decode(buf.subarray(bunOff + off, bunOff + off + 64));
-        const at = win.indexOf("// @bun");
-        if (at < 0) continue;
-        const realLen = len - at;
-        if (!best || realLen > best.len) best = { off: off + at, len: realLen };
-      }
-      if (!best) die("main bundle not found in module graph");
+      // All StringPointer offsets are relative to bunOff + 8: the appended-data
+      // segment carries a leading u64 length prefix that the section view keeps.
+      const BASE = bunOff + 8;
 
-      // The contents length may stop a few bytes short of the real bundle end
-      // (name-tail preamble artifact); JS source contains no NUL, so extend
-      // to the section's next NUL boundary.
-      let end = bunOff + best.off + best.len;
-      while (end < bunOff + bunSize && buf[end] !== 0) end++;
-      const src = buf.subarray(bunOff + best.off, end);
-      await Bun.write(outPath, src);
-      console.error(`claude-code: extracted ${src.length} bytes of CLI bundle`);
+      // modules region = [8-byte header] + N x CompiledModuleGraphFile records
+      // (52 bytes each): 6 x StringPointer (name@0, contents@8, sourcemap@16,
+      // bytecode@24, module_info@32, bytecode_origin_path@40) + 4 enum bytes@48.
+      // Names are stored as "/$bunfs/root/<file>\\0" — NUL-terminated.
+      const RECSIZE = 52;
+      function cstr(off, maxLen) {
+        const start = BASE + off;
+        let end = start;
+        const lim = Math.min(start + maxLen, bunOff + bunSize);
+        while (end < lim && buf[end] !== 0) end++;
+        return td.decode(buf.subarray(start, end));
+      }
+
+      const files = [];
+      for (let p = modPtrOff + 8; p + RECSIZE <= modPtrOff + modPtrLen; p += RECSIZE) {
+        const r = bunOff + p;
+        const sp = (k) => ({ off: u32(r + k), len: u32(r + k + 4) });
+        const name = sp(0), contents = sp(8);
+        if (name.len === 0 || name.off >= bunSize) break;
+        const nm = cstr(name.off, name.len);
+        if (!nm.startsWith("/$bunfs/root/")) break;
+        files.push({ name: nm.slice("/$bunfs/root/".length), contents });
+      }
+      console.error(`claude-code: module graph has ${files.length} files`);
+
+      // Entry point file ("cli" in claude-code builds)
+      const entry = files.find((f) => f.name === "cli");
+      if (!entry || entry.contents.len === 0) die("entry point 'cli' not found in module graph");
+
+      const latin1 = new TextDecoder("latin1");
+      function emit(f, outPath) {
+        // contents are Latin1-encoded; decode and write back out as UTF-8
+        const src = latin1.decode(buf.subarray(BASE + f.contents.off, BASE + f.contents.off + f.contents.len));
+        Bun.write(outPath, src);
+        return src;
+      }
+
+      // Extract every module-graph file next to the entry. Non-.js files keep
+      // their basename; .js chunks land beside the entry so its relative
+      // imports resolve. Bytecode-only records carry no JS payload.
+      for (const f of files) {
+        if (f.contents.len === 0) continue;
+        const base = f.name.split("/").pop();
+        if (f !== entry && !base.endsWith(".js") && !base.endsWith(".md") && !base.endsWith(".txt")) continue;
+        emit(f, `${outDir}/${base}`);
+      }
+
+      // The graph was built for bun's embedded virtual filesystem
+      // ("/$bunfs/root/…"). Rewrite every such specifier to a relative one so
+      // plain-bun execution resolves it against the extracted files on disk.
+      let rewritten = 0;
+      for (const f of files) {
+        if (f.contents.len === 0) continue;
+        const base = f.name.split("/").pop();
+        const isEntry = f === entry;
+        if (!isEntry && !base.endsWith(".js") && !base.endsWith(".md") && !base.endsWith(".txt")) continue;
+        const outPath = `${outDir}/${base}`;
+        const src = latin1.decode(buf.subarray(BASE + f.contents.off, BASE + f.contents.off + f.contents.len));
+        if (src.includes("/$bunfs/root/")) {
+          await Bun.write(outPath, src.replaceAll("/$bunfs/root/", "./"));
+          rewritten++;
+        } else if (!isEntry) {
+          await Bun.write(outPath, src); // re-emit as UTF-8
+        }
+      }
+      console.error(`claude-code: extracted ${files.length} files (rewrote ${rewritten} bunfs specifiers)`);
 
       function die(msg) {
         console.error(`extract-cli: ${msg}`);
@@ -130,7 +193,7 @@ class ClaudeCode < Formula
       NPM_URL="#{stable.url}"
       NPM_SHA="#{stable.checksum}"
       CACHE="${CLAUDE_CODE_CACHE:-${HOMEBREW_CACHE:-$HOME/.cache/homebrew}/claude-code/$VER}"
-      CLI="$CACHE/cli.js"
+      CLI="$CACHE/cli"
 
       # /tmp is read-only here, so hand the CLI a writable scratch dir of its
       # own. A caller-set value wins; an unusable fallback is left unset rather
@@ -140,6 +203,7 @@ class ClaudeCode < Formula
       fi
 
       if [ ! -f "$CLI" ]; then
+        rm -rf "$CACHE"
         mkdir -p "$CACHE"
         TMP="$(mktemp -d)"
         trap 'rm -rf "$TMP"' EXIT
@@ -161,9 +225,10 @@ class ClaudeCode < Formula
         printf '%s  %s\\n' "$NPM_SHA" "$TMP/pkg.tgz" | sha256sum -c -
         tar -xzf "$TMP/pkg.tgz" -C "$TMP"
         [ -f "$TMP/package/claude" ] || { echo "claude-code: 'claude' binary not found in tarball" >&2; exit 1; }
-        # Extract the CLI bundle; the official binary itself is never executed
-        # (its embedded bun aborts on OHOS — see formula comments).
-        "$HB/opt/bun/bin/bun" "$HB/opt/#{name}/libexec/extract-cli.mjs" "$TMP/package/claude" "$CLI" || {
+        # Extract the CLI module graph (entry + chunks); the official binary
+        # itself is never executed (its embedded bun aborts on OHOS — see
+        # formula comments).
+        "$HB/opt/bun/bin/bun" "$HB/opt/#{name}/libexec/extract-cli.mjs" "$TMP/package/claude" "$CACHE" || {
           echo "claude-code: bundle extraction failed" >&2; exit 1; }
       fi
 
@@ -177,10 +242,10 @@ class ClaudeCode < Formula
       claude-code is installed as a runtime-fetch stub: nothing of the official
       release is in the bottle (Anthropic License). The first `claude` invocation
       downloads the official tarball (via the npmmirror mirror), verifies its
-      sha256, extracts the CLI bundle from the compiled binary, and runs it on
-      this tap's bun. The official binary itself is never executed (its embedded
-      bun crashes on OHOS). Cached under $HOMEBREW_CACHE/claude-code/#{version}/
-      (override with CLAUDE_CODE_CACHE).
+      sha256, extracts the CLI module graph from the compiled binary, and runs
+      it on this tap's bun. The official binary itself is never executed (its
+      embedded bun crashes on OHOS). Cached under
+      $HOMEBREW_CACHE/claude-code/#{version}/ (override with CLAUDE_CODE_CACHE).
 
       Claude Code requires API credentials. Configure via environment variables:
 
