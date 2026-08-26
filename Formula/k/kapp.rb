@@ -12,7 +12,7 @@ class Kapp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3144f1018f49b8261471018e1696d0fc8eb3631cf04eae481319ac58a1d4a08"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6c23048651b8212ea2991f40c21e3f85e444499dc7ab6559ba1cd7356939a30"
   end
 
   depends_on "go" => :build
