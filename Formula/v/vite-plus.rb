@@ -224,6 +224,7 @@ class VitePlus < Formula
     # The real binary sits one level below prefix so <dir>/../node_modules
     # still resolves to the prefix/node_modules deploy target.
     odie "cargo install did not produce bin/vp" unless (bin/"vp").exist?
+    libexec.mkpath
     mv bin/"vp", libexec/"vp"
     (bin/"vp").write <<~SH
       #!/bin/sh
