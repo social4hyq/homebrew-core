@@ -14,11 +14,6 @@ class VitePlus < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "2091fab5bb77237256f488c80af44ddfa33003aa96a5e40f0dfed4c0fa073211"
   end
 
-  # r2: rebuild the bottle so the musl-napi injection actually lands in the
-  # deployed tree (r1 shipped without oxlint/oxfmt/yuku bindings, breaking
-  # `vp lint` outright), and pick up tsgolint via the registry port now that
-  # @ohos-npm-ports/oxlint-tsgolint is published (enables --type-aware).
-
   depends_on "cmake" => :build
   depends_on "just" => :build
   depends_on "ohos-sdk" => :build
@@ -252,30 +247,31 @@ class VitePlus < Formula
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vite_global_cli")
 
-    # Deploy next to the libexec'd vp binary: it resolves its JS entry
-    # relative to its own location (<dir>/../node_modules/vite-plus).
+    # Deploy to prefix/node_modules/vite-plus, same layout as upstream
+    # homebrew-core: the vp binary resolves its JS entry relative to its own
+    # location (<dir>/../node_modules/vite-plus).
     system "pnpm", "--filter=vite-plus", "deploy", "--prod", "--legacy", "--no-optional",
-           libexec/"node_modules/vite-plus"
-    node_modules = libexec/"node_modules/vite-plus/node_modules"
+           prefix/"node_modules/vite-plus"
+    node_modules = prefix/"node_modules/vite-plus/node_modules"
     rm_r node_modules.glob(".pnpm/*/node_modules/*/prebuilds/{darwin,ios}-x64*")
     rm_r node_modules.glob(".pnpm/fsevents@*/node_modules/fsevents")
 
     # Musl-napi injection, second pass: deploy rebuilt node_modules from
     # scratch, so re-run on the deployed tree (see comment above).
     inject_musl_napi.call node_modules
-    rm_r libexec.glob("musl-napi-*")
+    rm_r prefix.glob("musl-napi-*")
 
     # tsgolint (type-aware backend): upstream ships no openharmony binary;
     # the @ohos-npm-ports port does. Embed its signed binary into the
     # deployed oxlint-tsgolint package and teach the loader the
     # openharmony branch, same shape as our registry port.
-    tspkg = libexec/"node_modules/vite-plus/node_modules/oxlint-tsgolint"
+    tspkg = prefix/"node_modules/vite-plus/node_modules/oxlint-tsgolint"
     if (tspkg/"bin/tsgolint.js").exist?
       tsgo_port = JSON.parse(Utils.safe_popen_read("npm", "view",
         "@ohos-npm-ports/oxlint-tsgolint", "version", "--json"))
       system "curl", "-fSL", "--retry", "5", "-o", "#{tars_cache}/tsgo-port.tgz",
              "https://registry.npmjs.org/@ohos-npm-ports/oxlint-tsgolint/-/oxlint-tsgolint-#{tsgo_port}.tgz"
-      stage = libexec/"tsgolint-port"
+      stage = prefix/"tsgolint-port"
       rm_r(stage) if stage.exist?
       stage.mkpath
       system "tar", "xzf", "#{tars_cache}/tsgo-port.tgz", "-C", stage
@@ -302,29 +298,6 @@ class VitePlus < Formula
       rm_r(stage)
     end
 
-    # OHOS: /tmp is read-only and vp's Rust install path creates tempdirs via
-    # TMPDIR (defaulting to /tmp) — wrap the real binary in libexec with a
-    # cache-backed TMPDIR default, with VP_TMPDIR as the override hatch.
-    libexec_bin = libexec/"bin"
-    mkdir_p libexec_bin
-    odie "cargo install did not produce bin/vp" unless (bin/"vp").exist?
-    mv bin/"vp", libexec_bin/"vp"
-    (bin/"vp").write <<~SH
-      #!/bin/sh
-      TMPDIR_DEFAULT="#{HOMEBREW_PREFIX}/var/cache"
-      export TMPDIR="${TMPDIR:-$TMPDIR_DEFAULT}"
-      export VP_TMPDIR="${VP_TMPDIR:-$TMPDIR}"
-      mkdir -p "$TMPDIR" 2>/dev/null
-      # Default vp to the system Node.js: its managed-runtime fallback downloads
-      # official binaries that OHOS refuses to exec unsigned.
-      if [ -n "$HOME" ] && [ ! -f "$HOME/.vite-plus/config.json" ]; then
-        mkdir -p "$HOME/.vite-plus" 2>/dev/null &&
-          printf '{"shimMode":"system_first"}\\n' > "$HOME/.vite-plus/config.json" 2>/dev/null
-      fi
-      exec "#{libexec_bin}/vp" "$@"
-    SH
-    chmod 0755, bin/"vp"
-
     # Symlink vp to vpr and vpx. These are detected at runtime by argv[0]
     bin.install_symlink bin/"vp" => "vpr"
     bin.install_symlink bin/"vp" => "vpx"
@@ -335,7 +308,35 @@ class VitePlus < Formula
     (zsh_completion/"_vp").write Utils.safe_popen_read({ "VP_COMPLETE" => "zsh" }, bin/"vp")
   end
 
+  def caveats
+    <<~EOS
+      On OHOS, /tmp is read-only and vp's Rust install path creates tempdirs
+      via TMPDIR (defaulting to /tmp), so set it to a writable directory:
+
+        export TMPDIR=#{HOMEBREW_PREFIX}/var/cache
+
+      vp's managed Node.js runtime fallback downloads official binaries that
+      OHOS refuses to exec unsigned; vp defaults to the system Node.js when
+      ~/.vite-plus/config.json contains {"shimMode":"system_first"} (written
+      automatically on first run if the file does not exist).
+    EOS
+  end
+
   test do
+    # OHOS: /tmp is read-only and vp's Rust install path creates tempdirs
+    # via TMPDIR (defaulting to /tmp). See caveats — end users must set the
+    # same variable; the test environment provides it here.
+    ENV["TMPDIR"] = testpath/"tmp"
+    mkdir_p ENV["TMPDIR"]
+    # vp's managed Node.js runtime fallback downloads official glibc binaries
+    # that OHOS cannot exec. Point vp at the system Node.js the same way the
+    # caveats tell end users to.
+    (testpath/".vite-plus").mkpath
+    (testpath/".vite-plus/config.json").write <<~JSON
+      {"shimMode":"system_first"}
+    JSON
+    ENV["HOME"] = testpath.to_s
+
     assert_match version.to_s, shell_output("#{bin}/vp --version")
 
     # vp create/fmt hit transient exec/FS-settle ENOENTs on OHOS under load;
@@ -355,9 +356,66 @@ class VitePlus < Formula
     vp_with_retry.call "create", "vite:application", "--no-interactive", "--directory", "test-app"
     assert_path_exists testpath/"test-app/package.json"
 
-    # vp fmt is intentionally not exercised here: the scaffolded app pulls
-    # vite-plus from the npm registry, whose published builds ship no
-    # openharmony native binding, so the CLI aborts on load. Upstream would
-    # need to publish an openharmony binding first.
+    # The scaffolded app resolves vite-plus from the npm registry, whose
+    # published builds ship no openharmony bindings. Wire it to the
+    # @ohos-npm-ports ports (oxfmt/rolldown OHOS bindings ship natively from
+    # upstream; oxlint's starts at 1.78 while the catalog pins 1.76, but vp
+    # fmt does not touch oxlint; tsgolint has no openharmony binary at all
+    # and --type-aware needs it). The app carries an ohos-signpost
+    # postinstall hook, so pnpm-installed .node files get signed during
+    # install (OHOS refuses to dlopen unsigned binaries). The scaffold's
+    # workspace file already has an overrides section (vite: catalog:), so
+    # merge into it rather than appending a duplicate key.
+    pkg_json = testpath/"test-app/package.json"
+    manifest = JSON.parse(pkg_json.read)
+    manifest["devDependencies"]["ohos-signpost"] = "^1.0.2"
+    manifest["scripts"]["postinstall"] = "ohos-signpost"
+    # Pathname#write refuses to overwrite files vp create already wrote;
+    # use File.write to update them in place.
+    File.write(pkg_json, JSON.pretty_generate(manifest) << "\n")
+
+    workspace = testpath/"test-app/pnpm-workspace.yaml"
+    ws = YAML.safe_load(workspace.read)
+    ws["overrides"] = {
+      "vite"            => "catalog:",
+      "vite-plus"       => "npm:@ohos-npm-ports/vite-plus@0.2.8-1",
+      "oxlint-tsgolint" => "npm:@ohos-npm-ports/oxlint-tsgolint@7.0.2001-1",
+    }.merge(ws["overrides"] || {})
+    File.write(workspace, YAML.dump(ws))
+    vp_with_retry.call "--dir", "test-app", "install"
+
+    # vp fmt loads vite-plus-core's bundled rolldown binding copy from
+    # dist/rolldown/shared/ (outside package resolution); the bottle ships
+    # a signed copy — plant it in the app's store too.
+    bottle_core = Dir.glob(
+      "#{HOMEBREW_PREFIX}/Cellar/vite-plus/*/libexec/node_modules/vite-plus/" \
+      "node_modules/.pnpm/@voidzero-dev+vite-plus-core@*/node_modules/@voidzero-dev/vite-plus-core",
+    ).first
+    core_src = File.join(bottle_core, "dist/rolldown/rolldown-binding.openharmony-arm64.node")
+    shared_dirs = (testpath/"test-app/node_modules/.pnpm")
+                  .glob("**/@voidzero-dev/vite-plus-core/dist/rolldown/shared")
+    shared_dirs.each do |dir|
+      dst = dir/"rolldown-binding.openharmony-arm64.node"
+      next if dst.exist?
+
+      cp core_src, dst
+      chmod 0755, dst
+    end
+
+    cd testpath/"test-app" do
+      output = shell_output("#{bin}/vp fmt")
+      assert_match "Finished", output
+
+      # type-aware lint exercises the embedded tsgolint binary end to end.
+      (testpath/"test-app/fp.ts").write <<~TS
+        const p = new Promise<number>((resolve) => resolve(1));
+        async function main() {
+          p.then((v) => { console.log(v); });
+        }
+        main();
+      TS
+      output = shell_output("#{bin}/vp lint --type-aware fp.ts")
+      assert_match "no-floating-promises", output
+    end
   end
 end
