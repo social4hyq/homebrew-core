@@ -80,7 +80,7 @@ index 3306015..a7677e9 100644
 +# pip is disabled in uv-managed Python installations on OHOS: pip-installed\n\
 +# wheels bypass uv's auto-signing and cannot be dlopen()ed. Use `uv add` or\n\
 +# `uv pip install` instead.\n\
-+echo 'pip is not supported in uv downloaded Python on OHOS. Use `uv add` (preferred) or `uv pip install` instead.' >&2\n\
++echo 'pip is not supported in uv downloaded Python on OHOS. Use `uv add` or `uv pip install` instead.' >&2\n\
 +exit 1\n";
 +            let _ = std::fs::write(&path, stub);
 +            #[cfg(unix)]
