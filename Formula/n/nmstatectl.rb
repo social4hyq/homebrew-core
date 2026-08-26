@@ -1,8 +1,8 @@
 class Nmstatectl < Formula
   desc "Command-line tool that manages host networking settings in a declarative manner"
   homepage "https://nmstate.io/"
-  url "https://github.com/nmstate/nmstate/releases/download/v2.2.61/nmstate-2.2.61.tar.gz"
-  sha256 "25cb1b4055c3f1c9d6e98c7efd3084f09d38f105b34ce6d80132d4427a98ed16"
+  url "https://github.com/nmstate/nmstate/releases/download/v2.2.62/nmstate-2.2.62.tar.gz"
+  sha256 "37564cf14526037befcc919b72a715427ba3cb029e7d2de41f15b00268febc23"
   license "Apache-2.0"
   head "https://github.com/nmstate/nmstate.git", branch: "base"
 
@@ -12,7 +12,7 @@ class Nmstatectl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "997b375ce26df1e4e3852afc5a4c25e2eff12e8a170df61c87aef748f901d97c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "70aedb41060fc5b5b39c14e41d078058d5b2840f5ace452e030350b5efacec34"
   end
 
   depends_on "rust" => :build
