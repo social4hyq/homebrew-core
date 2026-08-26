@@ -11,7 +11,7 @@ class CargoC < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c5ac6d23e0b4b59bf86117e9874da4b616809e0b0651fa1064c3bed3862e9a1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd14134cf37243e105ed05c442cdff0356beb7b917ee18440608db1493f62c9c"
   end
 
   depends_on "pkgconf" => :build
