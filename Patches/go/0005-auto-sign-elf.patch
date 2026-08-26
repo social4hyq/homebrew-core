@@ -12,7 +12,7 @@
  		return err
  	}
  
-+	// HarmonyOS: auto-sign the ELF binary for execution on noexec filesystem.
++	// HarmonyOS: auto-sign the ELF binary for execution.
 +	// Must happen after buildid -w (updateBuildID), which would overwrite the signature.
 +	if err := autoSignOutput(a.Target); err != nil {
 +		return err
@@ -21,7 +21,7 @@
 +	// stored a copy of the executable in the build cache (GOCACHE) before this
 +	// hook ran. Cache hits execute that cached copy directly without re-running
 +	// link, so it must be signed too, otherwise a warm 'go run' runs an
-+	// unsigned binary on the noexec filesystem.
++	// unsigned binary on HarmonyOS.
 +	if a.cachedExecutable != "" {
 +		if err := autoSignOutput(a.cachedExecutable); err != nil {
 +			return err
@@ -36,9 +36,9 @@
 +// implementation (from ohos-bst-light, see cmd/go/internal/selfsign).
 +// Only signs executable (ET_EXEC) and shared object (ET_DYN) ELF files,
 +// skipping relocatable (ET_REL, i.e. .o) files which would be corrupted by
-+// signing. On HarmonyOS, compiled ELF binaries require code signing to execute
-+// (noexec filesystem). This is called after the final build-ID write to
-+// ensure the signature is not overwritten.
++// signing. On HarmonyOS, compiled ELF binaries require code signing to execute.
++// This is called after the final build-ID write to ensure the signature is not
++// overwritten.
 +func autoSignOutput(path string) error {
 +	if path == "" {
 +		return nil

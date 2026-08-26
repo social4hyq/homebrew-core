@@ -23,7 +23,8 @@ class Go < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4253b1dc8f0a7ce6c48a412a04e9187eaa884449bb9f3a8b5c70096c082be724"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db00551faa6d17b8c204cc9ae236c7941ccb27b6218223d026bf18eef85c08d0"
   end
 
   depends_on macos: :monterey
@@ -66,7 +67,7 @@ class Go < Formula
   #
   # Problem: On HarmonyOS PC, hmdfs does not support mmap(PROT_WRITE)
   # causing linker failures. Also, compiled ELF binaries require code
-  # signing to execute (noexec filesystem).
+  # signing to execute.
   #
   #   0001: Default GOCACHE → /data/storage/el2/base/files/go-build (hmfs)
   #   0002: Default GOTMPDIR → /data/storage/el2/base/cache (tmpfs)
