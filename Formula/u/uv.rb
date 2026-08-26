@@ -5,7 +5,7 @@ class Uv < Formula
   sha256 "e349c9eb85876921895330f6fee5f01f109d5ec06dcd3b475fb7b4b8de75eac6"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/astral-sh/uv.git", branch: "main"
-  revision 6
+  revision 7
 
   livecheck do
     url :stable
@@ -13,7 +13,7 @@ class Uv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce39dc6ea372c50893bdd0f3926bdd9522863c445c17a8cc64e0acf68ce6882a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72d17c51718d98f2da1be19d82f352af0b4fd4c5717d8de0f6513a27f6c16cfb"
   end
 
   depends_on "cmake" => :build
@@ -25,6 +25,24 @@ class Uv < Formula
   depends_on "musl-compat"
   depends_on "openssl@3"
 
+  # ═══════════════════════════════════════════════════════════════════
+  # HarmonyOS patches
+  #
+  # Problem: On HarmonyOS PC, the kernel refuses to dlopen an ELF without a
+  # .codesign section (noexec filesystem), so downloaded Python interpreters
+  # and installed wheel native modules must be code-signed.
+  #
+  #   0001: Skip ld --exec in musllinux detection
+  #   0002: Skip ld --exec in libc detection
+  #   0003: Vendored selfsign.rs (byte-identical to ohos-bst-light, kept in
+  #         its own patch so it can be upgraded independently)
+  #   0004: Adapt vendored selfsign.rs to an importable library
+  #         (drop main(), export API)
+  #   0005: Auto-sign wheel native modules on install (uv-install-wheel)
+  #   0006: Auto-sign downloaded interpreters + disable bundled pip
+  #   0007: Map HarmonyOS to linux (musllinux)
+  # ═══════════════════════════════════════════════════════════════════
+
   patch do
     file "Patches/uv/0001-musllinux-skip-ld-exec.patch"
   end
@@ -34,15 +52,23 @@ class Uv < Formula
   end
 
   patch do
-    file "Patches/uv/0003-autosign-wheels.patch"
+    file "Patches/uv/0003-vendor-selfsign-rs.patch"
   end
 
   patch do
-    file "Patches/uv/0004-autosign-interpreters-and-disable-pip.patch"
+    file "Patches/uv/0004-export-selfsign-lib.patch"
   end
 
   patch do
-    file "Patches/uv/0005-map-harmonyos-to-linux.patch"
+    file "Patches/uv/0005-autosign-wheels.patch"
+  end
+
+  patch do
+    file "Patches/uv/0006-autosign-interpreters-and-disable-pip.patch"
+  end
+
+  patch do
+    file "Patches/uv/0007-map-harmonyos-to-linux.patch"
   end
 
   def install
