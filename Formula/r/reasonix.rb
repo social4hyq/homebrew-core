@@ -1,8 +1,8 @@
 class Reasonix < Formula
   desc "Cache-first DeepSeek coding agent for the terminal"
   homepage "https://github.com/esengine/DeepSeek-Reasonix"
-  url "https://github.com/esengine/DeepSeek-Reasonix/archive/refs/tags/v1.31.3.tar.gz"
-  sha256 "937e75c6b2f15c21643d625554ba8e51c350481fc7ec06ac9b83e9660ba0c4da"
+  url "https://github.com/esengine/DeepSeek-Reasonix/archive/refs/tags/v1.31.4.tar.gz"
+  sha256 "463b3966ff5155ca8ac266d198549038d02b9f45e98a6c04461a62d1887ec14e"
   license "MIT"
 
   # CLI releases are tagged `v*` while desktop releases are tagged `desktop-v*`
@@ -14,7 +14,7 @@ class Reasonix < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e4bc003f047aefc247fc40e7cb797905748bcb304825a413735657a4e07bb7d2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2279542e0cbc3102f0001d9a0346acaeff0532c723e031896c3610d508b410b7"
   end
 
   depends_on "go" => :build
