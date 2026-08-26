@@ -1,39 +1,34 @@
 class VitePlus < Formula
   require "json"
+  require "yaml"
 
   desc "Unified toolchain and entry point for web development"
   homepage "https://viteplus.dev"
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v0.2.8.tar.gz"
   sha256 "c07ae8f828039fae32b791abcfc8f1d1b769024a2ae5c04bdc2946e8318615f4"
   license "MIT"
+
+  # OHOS delta vs upstream (everything else is verbatim):
+  # bottle block, depends_on swaps, native-binding wiring, build env,
+  # vite-task patch, bin/vp wrapper. See the fenced blocks in install.
+  revision 1
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v0.2.8-r3"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2091fab5bb77237256f488c80af44ddfa33003aa96a5e40f0dfed4c0fa073211"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v0.2.8-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a32184511675fa84129810a70bb90a9a4e40f0b0999c1c7f422c4e207606773"
   end
-
-  # r2: rebuild the bottle so the musl-napi injection actually lands in the
-  # deployed tree (r1 shipped without oxlint/oxfmt/yuku bindings, breaking
-  # `vp lint` outright), and pick up tsgolint via the registry port now that
-  # @ohos-npm-ports/oxlint-tsgolint is published (enables --type-aware).
 
   depends_on "cmake" => :build
   depends_on "just" => :build
+  # OHOS: no rustup formula; stable rust + RUSTC_BOOTSTRAP (see install).
   depends_on "ohos-sdk" => :build
   depends_on "pnpm@10" => :build
-  depends_on "rust" => :build
-  # pnpm@11.23 regressed deploy --legacy (pnpm/pnpm#14130: crash on packages
-  # without peerDependencies); upstream pins the 10.x line anyway. Build-time
-  # work therefore runs under pnpm@10 (prepended onto PATH in install()).
-  # Runtime keeps the unversioned pnpm: vp scaffolding shells out to a package
-  # manager, and brew test exercises those flows.
+  depends_on "rust" => :build # TODO: try to restore rustup: https://github.com/voidzero-dev/vite-task/commit/db99ba4d5d33323cc9e7b329f11bdea0610fbc7f
+  # OHOS: @napi-rs/cli cross-compiles the bundled bindings against the SDK.
+  # OHOS: pnpm >= 11.23 regressed `deploy --legacy` (pnpm/pnpm#14130); the
+  # build runs under pnpm@10, runtime keeps the unversioned pnpm.
   depends_on "node"
-  depends_on "pnpm"
-  # Upstream pins a nightly toolchain solely for `-Z bindeps` (fspy preload
-  # artifact deps). RUSTC_BOOTSTRAP=1 unlocks that flag on harmonybrew's
-  # native stable rust below, so no rustup/nightly download is needed.
 
   resource "rolldown" do
     url "https://github.com/rolldown/rolldown.git",
@@ -61,6 +56,7 @@ class VitePlus < Formula
     end
   end
 
+  # OHOS: vendored vite-task patched for the ohos target env (see install).
   resource "vite-task" do
     url "https://github.com/voidzero-dev/vite-task.git",
         revision: "5c1d02c750ac21c6f4cf0528062590a145e87fd1"
@@ -71,159 +67,119 @@ class VitePlus < Formula
     resource("rolldown").stage buildpath/"rolldown"
     resource("vite").stage buildpath/"vite"
 
-    # pnpm >= 11.20 verifies the engine binary against the env lockfile when
-    # delegating to a packageManager-pinned version; no published @pnpm/exe
-    # exists for the openharmony platform. Drop the pins everywhere (vite-plus,
-    # vendored rolldown and vite each declare their own) and use system pnpm
-    # (same workaround as Alpine packaging).
-    Dir.glob(buildpath.glob("**/package.json")).each do |path|
-      # Test fixtures may contain non-strict JSON; they never drive pnpm.
-      pkg = begin
-        JSON.parse(File.read(path))
-      rescue JSON::ParserError
-        next
+    # --- OHOS: native bindings ----------------------------------------------
+    # Registry audit (openharmony-arm64 availability at the versions this
+    # lockfile pins): @rolldown/binding 1.2.2, @oxfmt/binding 0.61.0,
+    # @oxlint/binding 1.76.0, @oxc-parser/binding 0.142.0,
+    # @oxc-resolver/binding 11.24.2 and @rollup/rollup 4.60.4 are published
+    # natively — pnpm installs those with no help. The rest:
+    #   * lightningcss has no openharmony build at any version, but the
+    #     @ohos-ports community port is a loader-patched drop-in.
+    #   * yuku-*, @ast-grep/napi and the @napi-rs/cli tool deps ship no
+    #     openharmony build anywhere. Their linux-arm64-musl twins run on
+    #     OHOS (same libc family), so fabricate local shim packages from
+    #     the musl tarballs: the binding file is renamed to what the
+    #     loaders require and `main` points straight at it, satisfying
+    #     both bare (`require('<ohos-name>')`) and subpath
+    #     (`require('<ohos-name>/<file>.node')`) loader conventions. The
+    #     shims are grafted into the graph with packageExtensions (adds
+    #     the openharmony optionalDependency the parents don't declare)
+    #     and overrides (remaps it to the local shim) — one mechanism,
+    #     applied identically to the build tree and, via pnpm deploy, to
+    #     the deployed tree. Bottle signing is fully automatic (pipeline
+    #     ELF pass); nothing signs here.
+    shims_dir = buildpath/"ohos-shims"
+    # [parent package, version, ohos binding package, musl binding package,
+    #  binding file name the loaders require]
+    shims = [
+      ["yuku-codegen",    "0.5.44", "@yuku-codegen/binding", "yuku-codegen.node"],
+      ["yuku-codegen",    "0.7.0",  "@yuku-codegen/binding", "yuku-codegen.node"],
+      ["yuku-codegen",    "0.8.3",  "@yuku-codegen/binding", "yuku-codegen.node"],
+      ["yuku-parser",     "0.5.44", "@yuku-parser/binding",  "yuku-parser.node"],
+      ["yuku-parser",     "0.7.0",  "@yuku-parser/binding",  "yuku-parser.node"],
+      ["yuku-parser",     "0.8.3",  "@yuku-parser/binding",  "yuku-parser.node"],
+      ["@ast-grep/napi",  "0.43.0", "@ast-grep/napi",        "ast-grep-napi.node"],
+      ["@napi-rs/wasm-tools", "1.0.1", "@napi-rs/wasm-tools", "wasm-tools.node"],
+      ["@napi-rs/lzma",       "1.4.5", "@napi-rs/lzma",       "lzma.node"],
+      ["@napi-rs/tar",        "1.1.0", "@napi-rs/tar",        "tar.node"],
+    ]
+    musl_tgz = lambda do |pkg, version|
+      leaf = pkg.split("/").last
+      tgz = HOMEBREW_CACHE/"vite-plus-musl-napi"/"#{pkg.tr("/", "-")}-#{version}.tgz"
+      tgz.parent.mkpath
+      unless tgz.exist?
+        system "curl", "-fSL", "--retry", "5", "-o", tgz,
+               "https://registry.npmmirror.com/#{pkg}-linux-arm64-musl/-/#{leaf}-linux-arm64-musl-#{version}.tgz"
       end
-      next unless pkg.delete("packageManager")
-
-      File.write(path, JSON.pretty_generate(pkg) << "\n")
+      tgz
     end
+    overrides = {
+      "lightningcss" => "npm:@ohos-ports/lightningcss@1.33.0-1",
+    }
+    extensions = {}
+    shims.each do |parent, version, binding_pkg, node_file|
+      ohos_name = "#{binding_pkg}-openharmony-arm64"
+      shim = shims_dir/"#{parent.tr("/", "@")}-#{version}"
+      next if shim.exist?
 
+      shim.mkpath
+      stage = shim/"stage"
+      stage.mkpath
+      system "tar", "xzf", musl_tgz.call(binding_pkg, version), "-C", stage
+      node_src = Dir.glob("#{stage}/**/*.node").first
+      odie "no .node in musl tarball for #{binding_pkg}@#{version}" if node_src.nil?
+      cp node_src, shim/node_file
+      rm_r stage
+      (shim/"package.json").write <<~JSON
+        {
+          "name": "#{ohos_name}",
+          "version": "#{version}",
+          "main": "#{node_file}"
+        }
+      JSON
+      extensions["#{parent}@#{version}"] = { "optionalDependencies" => { ohos_name => version } }
+      overrides["#{ohos_name}@#{version}"] = "link:#{shim}"
+    end
+    # @parcel/watcher: the @ohos-ports port ships the openharmony binding
+    # as a proper package (main points at the .node).
+    extensions["@parcel/watcher@2.5.1"] = {
+      "optionalDependencies" => { "@parcel/watcher-openharmony-arm64" => "2.5.1" },
+    }
+    overrides["@parcel/watcher-openharmony-arm64@2.5.1"] = "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1"
+
+    workspace_yaml = buildpath/"pnpm-workspace.yaml"
+    ws = YAML.safe_load(workspace_yaml.read)
+    ws["overrides"] = overrides.merge(ws["overrides"] || {})
+    ws["packageExtensions"] = extensions.merge(ws["packageExtensions"] || {})
+    File.write(workspace_yaml, YAML.dump(ws))
+    # -------------------------------------------------------------------------
+
+    # --- OHOS: build environment ---------------------------------------------
+    # pnpm >= 11.20 verifies the engine binary when delegating to a
+    # packageManager pin; no openharmony @pnpm/exe exists. Same workaround
+    # as Alpine packaging.
     ENV["NPM_CONFIG_MANAGE_PACKAGE_MANAGER_VERSIONS"] = "false"
     ENV["npm_config_manage_package_manager_versions"] = "false"
-
-    # Build-time work runs under pnpm@10 (see depends_on); the unversioned
-    # pnpm stays the runtime choice for vp.
     ENV.prepend_path "PATH", formula_opt_bin("pnpm@10")
-
-    # Unlocks `-Z bindeps` (fspy preload artifact deps) on the stable compiler.
-    # The repo's rust-toolchain.toml nightly pin is inert here: plain cargo
-    # (not a rustup proxy) ignores it.
+    # Unlocks `-Z bindeps` (fspy preload artifact deps) on the stable
+    # compiler; the repo's rust-toolchain.toml nightly pin is inert here.
     ENV["RUSTC_BOOTSTRAP"] = "1"
-
-    # Direct crates.io access stalls on some networks (the local OHOS
-    # container); route through rsproxy there. Probe first so fast-network
-    # environments (CI runners) keep using crates.io directly.
+    # Direct crates.io access stalls on some networks; probe and fall back
+    # to rsproxy only where needed (fast networks keep using crates.io).
     unless system "curl", "-fsIL", "--max-time", "8", "-o", File::NULL,
                   "https://index.crates.io/config.json"
       ENV["CARGO_REGISTRIES_CRATES_IO_INDEX"] = "sparse+https://rsproxy.cn/index/"
     end
-
-    # @napi-rs/cli builds the ohos linker/cc/ar paths from this (must point at
-    # the SDK's native dir, not the SDK root).
+    # @napi-rs/cli builds the ohos linker/cc/ar paths from this.
     ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
+    # -------------------------------------------------------------------------
 
-    # Upstream publishes no openharmony napi bindings; reuse linux-arm64-musl
-    # builds (same libc/ABI family, cf. opentui-core). Injection must happen
-    # TWICE: once right after `pnpm install` (just build's build-node step
-    # loads yuku-*/ast-grep bindings at build time), and once after
-    # `pnpm deploy` (deploy rebuilds node_modules and drops physically
-    # copied modules — r1 shipped without bindings for exactly this reason).
-    system "pnpm", "install"
-
-    sign_tool = "#{formula_opt_prefix("ohos-sdk")}/bin/binary-sign-tool"
-    tars_cache = HOMEBREW_CACHE/"vite-plus-musl-napi"
-    inject_musl_napi = lambda do |store_root|
-      store_root.glob(".pnpm/*/node_modules/{*,*/*}").each do |pkg_dir|
-        next unless File.directory?(pkg_dir)
-
-        manifest_path = pkg_dir/"package.json"
-        next unless manifest_path.exist?
-
-        begin
-          manifest = JSON.parse(File.read(manifest_path))
-        rescue JSON::ParserError
-          next
-        end
-        name = manifest["name"]
-        next if name.nil? || !name.is_a?(String)
-
-        musl_dep = manifest.fetch("optionalDependencies", {}).keys.find do |dep|
-          dep.end_with?("-linux-arm64-musl")
-        end
-        next if musl_dep.nil?
-
-        scope = musl_dep.start_with?("@") ? musl_dep.split("/").first : nil
-        musl_base = musl_dep.split("/").last
-        ohos_base = musl_base.sub("linux-arm64-musl", "openharmony-arm64")
-        ohos_module = scope ? "#{scope}/#{ohos_base}" : ohos_base
-        version = manifest.fetch("version")
-
-        tgz = tars_cache/"#{musl_dep.tr("/", "-")}-#{version}.tgz"
-        unless tgz.exist?
-          tgz.parent.mkpath
-          system "curl", "-fSL", "--retry", "5", "-o", tgz,
-                 "https://registry.npmmirror.com/#{musl_dep}/-/#{musl_base}-#{version}.tgz"
-        end
-        stage_name = "#{store_root.to_s.tr("/", "_").delete("^a-zA-Z0-9_@.-")}-#{name.tr("/@", "__")}"
-        stage = store_root/stage_name
-        rm_r(stage) if stage.exist?
-        stage.mkpath
-        system "tar", "xzf", tgz, "-C", stage
-        node_src = Dir.glob("#{stage}/**/*.node").first
-        odie "no .node found in #{tgz}" if node_src.nil?
-        node_base = File.basename(node_src)
-        # Loader conventions differ across generators: yuku's loader wants a
-        # bare "<pkg>.node" file, ast-grep's wants "<bin>.openharmony-arm64.node".
-        node_ohos_name = node_base.sub("linux-arm64-musl", "openharmony-arm64")
-
-        # 1) Fabricated module next to the package (module-resolution path):
-        #    main points straight at the .node so no JS loader platform check
-        #    can interfere.
-        node_files = []
-        store = pkg_dir.parent
-        store = store.parent if name.start_with?("@")
-        dest = store/ohos_module
-        unless dest.exist?
-          dest.mkpath
-          cp node_src, dest/node_base
-          node_files << (dest/node_base)
-          (dest/"package.json").write <<~JSON
-            {
-              "name": "#{ohos_module}",
-              "version": "#{version}",
-              "main": "#{node_base}"
-            }
-          JSON
-          if scope
-            pkg_leaf = File.basename(name)
-            bare = "#{pkg_leaf}.node"
-            cp node_src, dest/bare
-            node_files << (dest/bare)
-          end
-        end
-
-        # 2) Files inside the package itself (__dirname-relative fallbacks):
-        pkg_leaf = File.basename(name)
-        cp node_src, pkg_dir/node_ohos_name
-        node_files << (pkg_dir/node_ohos_name)
-        cp node_src, pkg_dir/"#{pkg_leaf}.node"
-        node_files << (pkg_dir/"#{pkg_leaf}.node")
-        if scope
-          inner = pkg_dir/scope/ohos_base
-          unless inner.exist?
-            inner.mkpath
-            cp node_src, inner/"#{pkg_leaf}.node"
-            node_files << (inner/"#{pkg_leaf}.node")
-          end
-        end
-
-        # OHOS refuses to dlopen unsigned ELF shared objects; the musl builds
-        # ship unsigned.
-        node_files.each do |file|
-          system sign_tool, "sign", "-selfSign", "1", "-inFile", file, "-outFile", file
-        end
-      end
-    end
-
-    inject_musl_napi.call buildpath/"node_modules"
-
+    # --- OHOS: vendored vite-task patch --------------------------------------
     # fspy_preload_unix (git dep) compiles as an empty crate on musl, where
     # seccomp alone handles access tracking; extend the exemption to ohos,
-    # whose libc lacks the statx/execveat bindings it needs. Patched in via
-    # the [patch] block upstream reserves for local vite-task development.
-    # Stage vite-task OUTSIDE the workspace dir (persistent cache): upstream's
-    # flow keeps it at ../vite-task, and a nested workspace inside the tree
-    # derails cargo's workspace-root selection for the patched members.
+    # whose libc lacks the statx/execveat bindings it needs. Staged outside
+    # the workspace dir: a nested workspace inside the tree derails cargo's
+    # workspace-root selection.
     vt_dir = HOMEBREW_CACHE/"vite-plus-vite-task"
     unless (vt_dir/".git").exist?
       rm_r(vt_dir) if vt_dir.exist?
@@ -246,84 +202,42 @@ class VitePlus < Formula
     TOML
     cargo_toml = buildpath/"Cargo.toml"
     File.write(cargo_toml, "#{File.read(cargo_toml)}\n#{patch_block}")
-
-    odie "vite-task root manifest missing" unless (vt_dir/"Cargo.toml").exist?
+    # ------------------------------------------------------------------------
 
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vite_global_cli")
 
-    # Deploy next to the libexec'd vp binary: it resolves its JS entry
-    # relative to its own location (<dir>/../node_modules/vite-plus).
     system "pnpm", "--filter=vite-plus", "deploy", "--prod", "--legacy", "--no-optional",
-           libexec/"node_modules/vite-plus"
-    node_modules = libexec/"node_modules/vite-plus/node_modules"
+           prefix/"node_modules/vite-plus"
+    node_modules = prefix/"node_modules/vite-plus/node_modules"
     rm_r node_modules.glob(".pnpm/*/node_modules/*/prebuilds/{darwin,ios}-x64*")
     rm_r node_modules.glob(".pnpm/fsevents@*/node_modules/fsevents")
 
-    # Musl-napi injection, second pass: deploy rebuilt node_modules from
-    # scratch, so re-run on the deployed tree (see comment above).
-    inject_musl_napi.call node_modules
-    rm_r libexec.glob("musl-napi-*")
-
-    # tsgolint (type-aware backend): upstream ships no openharmony binary;
-    # the @ohos-npm-ports port does. Embed its signed binary into the
-    # deployed oxlint-tsgolint package and teach the loader the
-    # openharmony branch, same shape as our registry port.
-    tspkg = libexec/"node_modules/vite-plus/node_modules/oxlint-tsgolint"
-    if (tspkg/"bin/tsgolint.js").exist?
-      tsgo_port = JSON.parse(Utils.safe_popen_read("npm", "view",
-        "@ohos-npm-ports/oxlint-tsgolint", "version", "--json"))
-      system "curl", "-fSL", "--retry", "5", "-o", "#{tars_cache}/tsgo-port.tgz",
-             "https://registry.npmjs.org/@ohos-npm-ports/oxlint-tsgolint/-/oxlint-tsgolint-#{tsgo_port}.tgz"
-      stage = libexec/"tsgolint-port"
-      rm_r(stage) if stage.exist?
-      stage.mkpath
-      system "tar", "xzf", "#{tars_cache}/tsgo-port.tgz", "-C", stage
-
-      ohos_dir = tspkg/"@oxlint-tsgolint/openharmony-arm64"
-      ohos_dir.mkpath
-      cp_r stage/"package/@oxlint-tsgolint/openharmony-arm64/.", ohos_dir
-      chmod 0755, ohos_dir/"tsgolint"
-
-      loader_old = <<~JS
-        const exePath = require.resolve(
-          `@oxlint-tsgolint/${process.platform}-${process.arch}/tsgolint${process.platform === 'win32' ? '.exe' : ''}`,
-        );
-      JS
-      loader_new = <<~JS
-        const exePath =
-          process.platform === 'openharmony'
-            ? require('node:path').join(__dirname, '..', '@oxlint-tsgolint', 'openharmony-arm64', 'tsgolint')
-            : require.resolve(
-                `@oxlint-tsgolint/${process.platform}-${process.arch}/tsgolint${process.platform === 'win32' ? '.exe' : ''}`,
-              );
-      JS
-      inreplace tspkg/"bin/tsgolint.js", loader_old.chomp, loader_new.chomp
-      rm_r(stage)
-    end
-
-    # OHOS: /tmp is read-only and vp's Rust install path creates tempdirs via
-    # TMPDIR (defaulting to /tmp) — wrap the real binary in libexec with a
-    # cache-backed TMPDIR default, with VP_TMPDIR as the override hatch.
-    libexec_bin = libexec/"bin"
-    mkdir_p libexec_bin
+    # --- OHOS: bin/vp wrapper ------------------------------------------------
+    # vp's Rust install path creates tempdirs via TMPDIR (defaults to the
+    # read-only /tmp), and its default ShimMode is "managed" — it downloads
+    # official glibc Node.js binaries that OHOS refuses to exec (verified
+    # EACCES with a raw binary and a fresh HOME). The wrapper defaults
+    # TMPDIR if unset and seeds the system_first config on first run;
+    # write_env_script cannot express either (unconditional exports only).
+    # The real binary sits one level below prefix so <dir>/../node_modules
+    # still resolves to the prefix/node_modules deploy target.
     odie "cargo install did not produce bin/vp" unless (bin/"vp").exist?
-    mv bin/"vp", libexec_bin/"vp"
+    libexec.mkpath
+    mv bin/"vp", libexec/"vp"
     (bin/"vp").write <<~SH
       #!/bin/sh
       TMPDIR_DEFAULT="#{HOMEBREW_PREFIX}/var/cache"
       export TMPDIR="${TMPDIR:-$TMPDIR_DEFAULT}"
-      export VP_TMPDIR="${VP_TMPDIR:-$TMPDIR}"
       mkdir -p "$TMPDIR" 2>/dev/null
-      # Default vp to the system Node.js: its managed-runtime fallback downloads
-      # official binaries that OHOS refuses to exec unsigned.
       if [ -n "$HOME" ] && [ ! -f "$HOME/.vite-plus/config.json" ]; then
         mkdir -p "$HOME/.vite-plus" 2>/dev/null &&
           printf '{"shimMode":"system_first"}\\n' > "$HOME/.vite-plus/config.json" 2>/dev/null
       fi
-      exec "#{libexec_bin}/vp" "$@"
+      exec "#{libexec}/vp" "$@"
     SH
     chmod 0755, bin/"vp"
+    # ----------------------------------------------------------------------
 
     # Symlink vp to vpr and vpx. These are detected at runtime by argv[0]
     bin.install_symlink bin/"vp" => "vpr"
@@ -335,10 +249,30 @@ class VitePlus < Formula
     (zsh_completion/"_vp").write Utils.safe_popen_read({ "VP_COMPLETE" => "zsh" }, bin/"vp")
   end
 
+  def caveats
+    <<~EOS
+      On OHOS, /tmp is read-only and vp's Rust install path creates tempdirs
+      via TMPDIR. bin/vp is a wrapper that defaults TMPDIR to
+      #{HOMEBREW_PREFIX}/var/cache when unset.
+
+      vp's default ShimMode is "managed" (downloads official glibc Node.js
+      binaries that OHOS refuses to exec). The wrapper seeds
+      ~/.vite-plus/config.json with {"shimMode":"system_first"} on first
+      run, so the system Node.js is preferred; delete that file to opt
+      back into managed runtimes.
+    EOS
+  end
+
   test do
+    # OHOS: writable TMPDIR (read-only /tmp) and HOME pointed at testpath so
+    # the wrapper's first-run config seeding lands here.
+    ENV["TMPDIR"] = testpath/"tmp"
+    mkdir_p ENV["TMPDIR"]
+    ENV["HOME"] = testpath.to_s
+
     assert_match version.to_s, shell_output("#{bin}/vp --version")
 
-    # vp create/fmt hit transient exec/FS-settle ENOENTs on OHOS under load;
+    # OHOS: vp create/fmt hit transient exec/FS-settle ENOENTs under load;
     # retry before giving up (cf. herdr's sign-retry loop).
     vp_with_retry = lambda do |*args|
       max_attempts = 3
@@ -355,9 +289,42 @@ class VitePlus < Formula
     vp_with_retry.call "create", "vite:application", "--no-interactive", "--directory", "test-app"
     assert_path_exists testpath/"test-app/package.json"
 
-    # vp fmt is intentionally not exercised here: the scaffolded app pulls
-    # vite-plus from the npm registry, whose published builds ship no
-    # openharmony native binding, so the CLI aborts on load. Upstream would
-    # need to publish an openharmony binding first.
+    # OHOS: the scaffolded app resolves vite-plus from the npm registry,
+    # which ships no openharmony bindings. Wire it the same way an end user
+    # would — pnpm-workspace override to the @ohos-npm-ports port (loader
+    # patched, prebuilt ohos binding in-package), packageExtensions to give
+    # the port's registry vite-plus-core dependency the @rolldown
+    # openharmony binding its bundled loader requires (published natively;
+    # core bundles the loader but never declares the platform package),
+    # ohos-signpost to sign the bindings pnpm fetched unsigned (the port's
+    # own binding ships signed, registry ones do not), and drop the
+    # scaffold's `prepare: vp config` hook, which runs before install can
+    # fetch bindings. The scaffold's workspace file already has an
+    # overrides section (vite: catalog:), so merge into it.
+    pkg_json = testpath/"test-app/package.json"
+    manifest = JSON.parse(pkg_json.read)
+    manifest["scripts"].delete("prepare")
+    manifest["devDependencies"] ||= {}
+    manifest["devDependencies"]["ohos-signpost"] = "^1.0.2"
+    manifest["scripts"]["postinstall"] = "ohos-signpost"
+    File.write(pkg_json, JSON.pretty_generate(manifest) << "\n")
+
+    workspace = testpath/"test-app/pnpm-workspace.yaml"
+    ws = YAML.safe_load(workspace.read)
+    ws["overrides"] = {
+      "vite-plus" => "npm:@ohos-npm-ports/vite-plus@0.2.8-1",
+    }.merge(ws["overrides"] || {})
+    ws["packageExtensions"] = {
+      "@voidzero-dev/vite-plus-core@0.2.8" => {
+        "optionalDependencies" => { "@rolldown/binding-openharmony-arm64" => "1.2.2" },
+      },
+    }.merge(ws["packageExtensions"] || {})
+    File.write(workspace, YAML.dump(ws))
+
+    cd testpath/"test-app" do
+      vp_with_retry.call "install"
+      output = shell_output("#{bin}/vp fmt")
+      assert_match "Finished", output
+    end
   end
 end
