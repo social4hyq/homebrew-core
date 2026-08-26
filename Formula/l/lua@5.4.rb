@@ -1,8 +1,8 @@
 class LuaAT54 < Formula
   desc "Powerful, lightweight programming language"
   homepage "https://www.lua.org/"
-  url "https://www.lua.org/ftp/lua-5.4.8.tar.gz"
-  sha256 "4f18ddae154e793e46eeab727c59ef1c0c0c2b744e7b94219710d76f530629ae"
+  url "https://www.lua.org/ftp/lua-5.4.9.tar.gz"
+  sha256 "2335b6c582a52654f94612bf10d2f4672805d05329aa6568b1d8cd9e5c6fb8e6"
   license "MIT"
   compatibility_version 1
 
@@ -14,7 +14,7 @@ class LuaAT54 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "345e5af8924020cfadbd11aed8603ee235f944b149dd9d71c581b39ebf786152"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8af0fa5b021124c56bf1cf6cf9b740293bc5f6d60d8d9145dc19c203ccbb971"
   end
 
   keg_only :versioned_formula
