@@ -8,7 +8,7 @@ class Libvpx < Formula
   head "https://chromium.googlesource.com/webm/libvpx.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e5f8fae29b2a482dd67ee1b8b72b1235d93f8754b4d568aa138d4aae26fea248"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "edeae2057ffcd19827c8365823167f843c14d1fca57dad6eff757cffd2074739"
   end
 
   on_intel do
