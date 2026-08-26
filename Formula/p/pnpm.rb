@@ -14,7 +14,7 @@ class Pnpm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e426fbc071b2d53f2a92cfca73351bf6a4a9883e4c2a5b6182abc253a60f8a44"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fe27b52351eb02ee393523bc855b6c25551cb62441bab50645373ec9a0deb37b"
   end
 
   depends_on "node" => [:build, :test]
