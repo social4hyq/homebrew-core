@@ -1,13 +1,13 @@
 class Rhai < Formula
   desc "Embedded scripting language for Rust"
   homepage "https://rhai.rs/"
-  url "https://github.com/rhaiscript/rhai/archive/refs/tags/v1.25.0.tar.gz"
-  sha256 "5862084ee0c55882b58cdbb9fbee66a5817eac8f4ef16e76e56bcb98b486e03f"
+  url "https://github.com/rhaiscript/rhai/archive/refs/tags/v1.26.0.tar.gz"
+  sha256 "8e9837c5910af447e4d3c700491db1dec02eea562561ff3b4cb0642ef11b5b29"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/rhaiscript/rhai.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "265aaa977bce1fbc984fb649cee258376b50218f8cdbf0f107ac8d82ac2dfc25"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f8d35e026d5dac792f6f5aa76af8a1399626b81bbdee695b02a5bb41089b6e6"
   end
 
   depends_on "rust" => :build
