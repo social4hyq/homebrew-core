@@ -1,13 +1,13 @@
 class Chainsaw < Formula
   desc "Rapidly Search and Hunt through Windows Forensic Artefacts"
   homepage "https://github.com/WithSecureLabs/chainsaw"
-  url "https://github.com/WithSecureLabs/chainsaw/archive/refs/tags/v2.16.4.tar.gz"
-  sha256 "6585bca782e316d0cec7d9cdaaf8e4fca19dc3231bbf1d53cd4d5a9e52bd6bf0"
+  url "https://github.com/WithSecureLabs/chainsaw/archive/refs/tags/v2.16.5.tar.gz"
+  sha256 "fa376e837cc2ebb830a0d59d1e6ab2adf60a2a85b1c2c71594bc3f41d6810aee"
   license "GPL-3.0-only"
   head "https://github.com/WithSecureLabs/chainsaw.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "85b31e7c51c4faef4c839a9ddf211b50b6894574d184d8e6016be673dfdafd9c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f3cd9447772a3565e8c3cbdd02c16d16dd9f7c43eea15b0579b9d0fce9d74b6"
   end
 
   depends_on "rust" => :build
