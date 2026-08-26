@@ -1,83 +1,6 @@
---- go/src/cmd/go/internal/work/exec.go
-+++ go/src/cmd/go/internal/work/exec.go
-@@ -41,6 +41,7 @@
- 	"cmd/go/internal/load"
- 	"cmd/go/internal/modinfo"
- 	"cmd/go/internal/modload"
-+	"cmd/go/internal/selfsign"
- 	"cmd/go/internal/str"
- 	"cmd/go/internal/trace"
- 	"cmd/internal/buildid"
-@@ -1662,10 +1663,66 @@
- 		return err
- 	}
- 
-+	// HarmonyOS: auto-sign the ELF binary for execution on noexec filesystem.
-+	// Must happen after buildid -w (updateBuildID), which would overwrite the signature.
-+	if err := autoSignOutput(a.Target); err != nil {
-+		return err
-+	}
-+	// 'go run' (and 'go test') set CacheExecutable, so updateBuildID already
-+	// stored a copy of the executable in the build cache (GOCACHE) before this
-+	// hook ran. Cache hits execute that cached copy directly without re-running
-+	// link, so it must be signed too, otherwise a warm 'go run' runs an
-+	// unsigned binary on the noexec filesystem.
-+	if a.cachedExecutable != "" {
-+		if err := autoSignOutput(a.cachedExecutable); err != nil {
-+			return err
-+		}
-+	}
-+
- 	a.built = a.Target
- 	return nil
- }
- 
-+// autoSignOutput signs the output ELF binary using the vendored selfsign
-+// implementation (from ohos-bst-light, see cmd/go/internal/selfsign).
-+// Only signs executable (ET_EXEC) and shared object (ET_DYN) ELF files,
-+// skipping relocatable (ET_REL, i.e. .o) files which would be corrupted by
-+// signing. On HarmonyOS, compiled ELF binaries require code signing to execute
-+// (noexec filesystem). This is called after the final build-ID write to
-+// ensure the signature is not overwritten.
-+func autoSignOutput(path string) error {
-+	if path == "" {
-+		return nil
-+	}
-+	f, err := os.Open(path)
-+	if err != nil {
-+		return nil
-+	}
-+	// Read ELF header: magic(4) + class/data/ver/pad(12) + e_type(2) = 18 bytes
-+	buf := make([]byte, 18)
-+	if _, err := f.Read(buf); err != nil {
-+		f.Close()
-+		return nil
-+	}
-+	f.Close()
-+	// Check ELF magic
-+	if buf[0] != 0x7f || buf[1] != 'E' || buf[2] != 'L' || buf[3] != 'F' {
-+		return nil
-+	}
-+	// Parse e_type at offset 16 (little-endian for both ELF32 and ELF64)
-+	eType := int(buf[16]) | int(buf[17])<<8
-+	// ET_REL (1) = .o relocatable -> skip (signing would corrupt it)
-+	// ET_EXEC (2) = executable -> sign
-+	// ET_DYN  (3) = shared object (.so) -> sign
-+	if eType != 2 && eType != 3 {
-+		return nil
-+	}
-+	if err := selfsign.SignFileAtomic(path, false); err != nil {
-+		log.Printf("warning: selfsign failed: %v", err)
-+	}
-+	return nil
-+}
-+
- func (b *Builder) writeLinkImportcfg(a *Action, file string) error {
- 	// Prepare Go import cfg.
- 	var icfg bytes.Buffer
---- /dev/null
-+++ go/src/cmd/go/internal/selfsign/selfsign.go
-@@ -0,0 +1,446 @@
+--- /dev/null	2026-08-26 01:24:18.610369105 +0000
++++ go/src/cmd/go/internal/selfsign/selfsign.go	2026-08-26 02:01:39.950364154 +0000
+@@ -0,0 +1,521 @@
 +// Copyright (C) 2026 hqzing
 +// SPDX-License-Identifier: 0BSD
 +// Repository: https://github.com/hqzing/ohos-bst-light
@@ -85,7 +8,7 @@
 +// Licensed under the BSD Zero Clause License.
 +
 +/*
-+ * selfsign.go — OpenHarmony 二进制自签名参考实现 (Go, 仅用标准库)
++ * selfsign.go — 轻量级 OpenHarmony 二进制自签名工具
 + *
 + * 用法:
 + *     go build -o selfsign selfsign.go
@@ -94,7 +17,7 @@
 + *         --force : 若已含 .codesign 段, 先剥离再重签
 + *         --strip : 仅剥离 .codesign 段, 不做签名
 + */
-+package selfsign
++package main
 +
 +import (
 +	"crypto/sha256"
@@ -196,7 +119,7 @@
 +	return -1
 +}
 +
-+func HasCodesignSection(elf []byte) bool {
++func hasCodesignSection(elf []byte) bool {
 +	h, err := parseElfHeader(elf)
 +	if err != nil {
 +		return false
@@ -211,7 +134,7 @@
 +	return oldShstrndx
 +}
 +
-+func StripCodesign(buf []byte) (bool, []byte, error) {
++func stripCodesign(buf []byte) (bool, []byte, error) {
 +	elf := make([]byte, len(buf))
 +	copy(elf, buf)
 +	h, err := parseElfHeader(elf)
@@ -444,7 +367,7 @@
 +	return d
 +}
 +
-+func SignElf(elf []byte, force bool) ([]byte, error) {
++func signElf(elf []byte, force bool) ([]byte, error) {
 +	if len(elf) < 64 || elf[0] != 0x7f || elf[1] != 0x45 ||
 +		elf[2] != 0x4c || elf[3] != 0x46 || elf[4] != 2 {
 +		return nil, errors.New("not ELF64")
@@ -452,11 +375,11 @@
 +
 +	buf := make([]byte, len(elf))
 +	copy(buf, elf)
-+	if HasCodesignSection(buf) {
++	if hasCodesignSection(buf) {
 +		if !force {
 +			return nil, errors.New("already has a .codesign section; strip first or use --force")
 +		}
-+		_, stripped, err := StripCodesign(buf)
++		_, stripped, err := stripCodesign(buf)
 +		if err != nil {
 +			return nil, err
 +		}
@@ -494,12 +417,12 @@
 +}
 +
 +// ─────────────────── 文件 I/O 层 ───────────────────
-+func SignFileAtomic(path string, force bool) error {
++func signFileAtomic(path string, force bool) error {
 +	raw, err := os.ReadFile(path)
 +	if err != nil {
 +		return err
 +	}
-+	signed, err := SignElf(raw, force)
++	signed, err := signElf(raw, force)
 +	if err != nil {
 +		return err
 +	}
@@ -524,3 +447,78 @@
 +	return nil
 +}
 +
++func main() {
++	args := os.Args[1:]
++	force := false
++	stripOnly := false
++	var positional []string
++	for _, a := range args {
++		if a == "--force" || a == "-f" {
++			force = true
++		} else if a == "--strip" {
++			stripOnly = true
++		} else {
++			positional = append(positional, a)
++		}
++	}
++	if len(positional) < 1 || len(positional) > 2 {
++		fmt.Fprintf(os.Stderr, "usage: %s <input_elf> [output_elf] [--force] [--strip]\n  (output defaults to input, in-place)\n", os.Args[0])
++		os.Exit(1)
++	}
++	inPath := positional[0]
++	outPath := inPath
++	if len(positional) == 2 {
++		outPath = positional[1]
++	}
++
++	if stripOnly {
++		raw, err := os.ReadFile(inPath)
++		if err != nil {
++			fmt.Fprintf(os.Stderr, "error: %v\n", err)
++			os.Exit(2)
++		}
++		removed, out, err := stripCodesign(raw)
++		if err != nil {
++			fmt.Fprintf(os.Stderr, "error: %v\n", err)
++			os.Exit(2)
++		}
++		if !removed {
++			fmt.Printf("no .codesign section to strip: %s\n", inPath)
++			return
++		}
++		if err := os.WriteFile(outPath, out, 0o644); err != nil {
++			fmt.Fprintf(os.Stderr, "error: %v\n", err)
++			os.Exit(2)
++		}
++		fmt.Printf("strip ok: %s → %s (%d bytes)\n", inPath, outPath, len(out))
++		return
++	}
++
++	if inPath == outPath {
++		if err := signFileAtomic(inPath, force); err != nil {
++			fmt.Fprintf(os.Stderr, "error: %v\n", err)
++			os.Exit(2)
++		}
++		mode := "append-only"
++		if force {
++			mode = "force"
++		}
++		fmt.Printf("selfsign ok: %s (in-place, %s)\n", inPath, mode)
++	} else {
++		raw, err := os.ReadFile(inPath)
++		if err != nil {
++			fmt.Fprintf(os.Stderr, "error: %v\n", err)
++			os.Exit(2)
++		}
++		signed, err := signElf(raw, force)
++		if err != nil {
++			fmt.Fprintf(os.Stderr, "error: %v\n", err)
++			os.Exit(2)
++		}
++		if err := os.WriteFile(outPath, signed, 0o644); err != nil {
++			fmt.Fprintf(os.Stderr, "error: %v\n", err)
++			os.Exit(2)
++		}
++		fmt.Printf("selfsign ok: %s → %s (%d bytes)\n", inPath, outPath, len(signed))
++	}
++}

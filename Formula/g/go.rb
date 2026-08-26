@@ -7,7 +7,7 @@ class Go < Formula
   license "BSD-3-Clause"
   compatibility_version 4
   head "https://go.googlesource.com/go.git", branch: "master"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://go.dev/dl/?mode=json"
@@ -23,7 +23,7 @@ class Go < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "11cda5d69dd73e393cf038fe2f51132ab896d2b3043820934fbbc8d8ee33e702"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4253b1dc8f0a7ce6c48a412a04e9187eaa884449bb9f3a8b5c70096c082be724"
   end
 
   depends_on macos: :monterey
@@ -70,7 +70,12 @@ class Go < Formula
   #
   #   0001: Default GOCACHE → /data/storage/el2/base/files/go-build (hmfs)
   #   0002: Default GOTMPDIR → /data/storage/el2/base/cache (tmpfs)
-  #   0003: Auto-sign ELF binaries after buildid -w (in cmd/go, not linker)
+  #   0003: Vendored selfsign.go (byte-identical to ohos-bst-light, kept
+  #         in its own patch so it can be upgraded independently)
+  #   0004: Adapt vendored selfsign.go to an importable library
+  #         (package main → selfsign, export API, drop main())
+  #   0005: Auto-sign ELF binaries after buildid -w (in cmd/go, not linker);
+  #         treats selfsign.go as a library (import + call)
   # ═══════════════════════════════════════════════════════════════════
 
   patch do
@@ -82,7 +87,15 @@ class Go < Formula
   end
 
   patch do
-    file "Patches/go/0003-auto-sign-elf.patch"
+    file "Patches/go/0003-vendor-selfsign-go.patch"
+  end
+
+  patch do
+    file "Patches/go/0004-export-selfsign-lib.patch"
+  end
+
+  patch do
+    file "Patches/go/0005-auto-sign-elf.patch"
   end
 
   def install
