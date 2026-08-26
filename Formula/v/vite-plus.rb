@@ -107,7 +107,7 @@ class VitePlus < Formula
     musl_tgz = lambda do |pkg, version|
       leaf = pkg.split("/").last
       tgz = HOMEBREW_CACHE/"vite-plus-musl-napi"/"#{pkg.tr("/", "-")}-#{version}.tgz"
-      tgz.mkpath
+      tgz.parent.mkpath
       unless tgz.exist?
         system "curl", "-fSL", "--retry", "5", "-o", tgz,
                "https://registry.npmmirror.com/#{pkg}-linux-arm64-musl/-/#{leaf}-linux-arm64-musl-#{version}.tgz"
