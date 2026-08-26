@@ -14,7 +14,7 @@ class LuaAT54 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "345e5af8924020cfadbd11aed8603ee235f944b149dd9d71c581b39ebf786152"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8af0fa5b021124c56bf1cf6cf9b740293bc5f6d60d8d9145dc19c203ccbb971"
   end
 
   keg_only :versioned_formula
