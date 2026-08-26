@@ -12,7 +12,7 @@ class OpensslAT35 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dee333dc1cbb8c102abda85c48733a0812906881b4d73e933858942a52ab3601"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "003bb1b819cecb6de1fa9eb45cc71bdc358475e6db32db460aeb557cc8bf4154"
   end
 
   patch do
