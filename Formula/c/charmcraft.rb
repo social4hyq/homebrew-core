@@ -3,13 +3,13 @@ class Charmcraft < Formula
 
   desc "Tool to build charms and publish them on Charmhub"
   homepage "https://charmhub.io"
-  url "https://files.pythonhosted.org/packages/21/6c/e371c19234296adf715b5bc3c2910786dc718ef5c6d0e67fe3cfdbfff155/charmcraft-4.4.0.tar.gz"
-  sha256 "776a2a36516be0e8943cd895bf460c2c2e17638cb798921310f1f15ede089986"
+  url "https://files.pythonhosted.org/packages/bc/14/ed6f26a4418998c9c50d0a3439c12def5b96c4c024f94b2164c76556149c/charmcraft-4.4.1.tar.gz"
+  sha256 "00228ffeaea667f7b775beb5a222606585150f1387d5edcdac108ac77b2a07fe"
   license "Apache-2.0"
   head "https://github.com/canonical/charmcraft.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5bf50c7791d5044b1bbb62842171bd031245d651050ac706214eb86903e9a8d5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "17504230a979240442afd9e19504e07448027b00da651ffdf7a9536b5228e3bd"
   end
 
   depends_on "certifi" => :no_linkage
@@ -213,8 +213,8 @@ class Charmcraft < Formula
   end
 
   resource "platformdirs" do
-    url "https://files.pythonhosted.org/packages/b8/d7/e7bfbc86e9f99ff7807e24de7703f032e9c9ba80bb355cf26e0e9bc5a75e/platformdirs-4.11.3.tar.gz"
-    sha256 "66a73d38a849810252df809a3d8bcbda8e26f6c189920e7535ad608a48dbb5ab"
+    url "https://files.pythonhosted.org/packages/50/bb/ebc6636e1ae41314f796ebb7215fd28febb45f9aac72f2b04cb74b5071dc/platformdirs-4.11.4.tar.gz"
+    sha256 "f3373be828247211d0febabea97e238c3dfde8a60b3c90c32756fb52cb21556d"
   end
 
   resource "protobuf" do
