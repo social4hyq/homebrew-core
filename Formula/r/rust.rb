@@ -8,13 +8,13 @@ class Rust < Formula
   head "https://github.com/rust-lang/rust.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bc8bd4aa7487ae02dd79061b314e3a580e58c81ff4e789312166688e9eb03b6"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "164accadff5f6d1274d6675a32082f5ef1a9fa66da9a466181f5d496635c8c92"
   end
 
   depends_on "patchelf" => :build
   depends_on "openssl@3"
   depends_on "zlib-ng-compat"
-  depends_on "llvm-gcc-compat"
 
   link_overwrite "etc/bash_completion.d/cargo"
   link_overwrite "bin/cargo-fmt", "bin/git-rustfmt", "bin/rustfmt", "bin/rustfmt-*"
