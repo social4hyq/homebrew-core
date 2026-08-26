@@ -291,16 +291,23 @@ class VitePlus < Formula
     assert_path_exists testpath/"test-app/package.json"
 
     # OHOS: the scaffolded app resolves vite-plus from the npm registry,
-    # which ships no openharmony bindings for its own binding package. Wire
-    # it the same way an end user would — pnpm-workspace override to the
-    # @ohos-npm-ports port (loader patched, prebuilt ohos binding
-    # in-package) — and drop the scaffold's `prepare: vp config` hook,
-    # which runs before install can fetch bindings. The scaffold's
-    # workspace file already has an overrides section (vite: catalog:),
-    # so merge into it.
+    # which ships no openharmony bindings. Wire it the same way an end user
+    # would — pnpm-workspace override to the @ohos-npm-ports port (loader
+    # patched, prebuilt ohos binding in-package), packageExtensions to give
+    # the port's registry vite-plus-core dependency the @rolldown
+    # openharmony binding its bundled loader requires (published natively;
+    # core bundles the loader but never declares the platform package),
+    # ohos-signpost to sign the bindings pnpm fetched unsigned (the port's
+    # own binding ships signed, registry ones do not), and drop the
+    # scaffold's `prepare: vp config` hook, which runs before install can
+    # fetch bindings. The scaffold's workspace file already has an
+    # overrides section (vite: catalog:), so merge into it.
     pkg_json = testpath/"test-app/package.json"
     manifest = JSON.parse(pkg_json.read)
     manifest["scripts"].delete("prepare")
+    manifest["devDependencies"] ||= {}
+    manifest["devDependencies"]["ohos-signpost"] = "^1.0.2"
+    manifest["scripts"]["postinstall"] = "ohos-signpost"
     File.write(pkg_json, JSON.pretty_generate(manifest) << "\n")
 
     workspace = testpath/"test-app/pnpm-workspace.yaml"
@@ -308,6 +315,11 @@ class VitePlus < Formula
     ws["overrides"] = {
       "vite-plus" => "npm:@ohos-npm-ports/vite-plus@0.2.8-1",
     }.merge(ws["overrides"] || {})
+    ws["packageExtensions"] = {
+      "@voidzero-dev/vite-plus-core@0.2.8" => {
+        "optionalDependencies" => { "@rolldown/binding-openharmony-arm64" => "1.2.2" },
+      },
+    }.merge(ws["packageExtensions"] || {})
     File.write(workspace, YAML.dump(ws))
 
     cd testpath/"test-app" do
