@@ -13,7 +13,7 @@ class OpensslAT3 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e89c43f355f12a0e69ec4e97484e79f53ebf7d2761bbdf12e0a1b334c981d204"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1be73c6c68e29c33ff43761045e43e23e7c369f0fb1a24f40e226ec5cb28f98"
   end
 
   depends_on "ca-certificates"
