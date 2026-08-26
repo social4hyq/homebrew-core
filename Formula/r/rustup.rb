@@ -9,7 +9,8 @@ class Rustup < Formula
   revision 4
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6297782dfca8f24c3aec6a39274a3cfdcc2be05d115b6a12c392715e041a21b2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "89d9caf725d4206a7b87b1f4ac9a8e343a2e72fb45b968cc93c2f98e51153789"
   end
 
   keg_only "it conflicts with rust"
@@ -31,8 +32,8 @@ class Rustup < Formula
   # HarmonyOS patches
   #
   # Problem: On HarmonyOS PC, the kernel refuses to exec/dlopen an ELF
-  # without a .codesign section (noexec filesystem), so downloaded Rust
-  # toolchain binaries must be code-signed after install.
+  # without a .codesign section, so downloaded Rust toolchain binaries
+  # must be code-signed after install.
   #
   #   0001: Vendored selfsign.rs (byte-identical to ohos-bst-light, kept in
   #         its own patch so it can be upgraded independently)
