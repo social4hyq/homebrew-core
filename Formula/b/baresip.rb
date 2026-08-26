@@ -1,12 +1,12 @@
 class Baresip < Formula
   desc "Modular SIP useragent"
   homepage "https://github.com/baresip/baresip"
-  url "https://github.com/baresip/baresip/archive/refs/tags/v4.10.0.tar.gz"
-  sha256 "f5d4a7d0723b468028dc7581708a660042c909b2cdda4f6ee977f583ddccbc3b"
+  url "https://github.com/baresip/baresip/archive/refs/tags/v4.11.0.tar.gz"
+  sha256 "e170ad5857994dfed0c84c4c04eb904fa410f3ec2d5a6c789b50b3fda47ba98c"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "940290060bd746be2c9e249bdb3bd239c4473590a7cd5c9e10c3062e03925b24"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "20c057357e2a58761f203ae5519dfb2e90ea777a9f3a3b48f82b9968d1317e97"
   end
 
   depends_on "cmake" => :build
