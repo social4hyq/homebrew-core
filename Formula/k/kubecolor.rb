@@ -7,7 +7,7 @@ class Kubecolor < Formula
   head "https://github.com/kubecolor/kubecolor.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9c0a95b445278b1ffb8ff49bdf63b5cb30d598cda437efb7268de61c55c1eab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f93e5cf3ca3b36bd2d53ce622b01e550dfcd194202a38c1b3c2feb9b9fd919c4"
   end
 
   depends_on "go" => :build
