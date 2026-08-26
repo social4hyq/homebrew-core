@@ -5,7 +5,7 @@ class PythonAT314 < Formula
   sha256 "62859805f6fdf25e2bcbf3fa3217801e1996887ca33e6a2af80674bdfa2dbe07"
   license "Python-2.0"
   compatibility_version 1
-  revision 5
+  revision 6
 
   livecheck do
     url "https://www.python.org/downloads/source/"
@@ -13,7 +13,7 @@ class PythonAT314 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ada7d2ae9caaa6a223c30faabdf9e743c11f3d2873602df96241d84275e078b6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e8db7e03e70ce91e8568b5844ab196189c8c0aa6ccc7dd0565072d9621b5df1"
   end
 
   depends_on "pkgconf" => :build
@@ -73,7 +73,7 @@ class PythonAT314 < Formula
     sha256 "f6ad667e89a1fe78046c8f13232b247200f5258d7828f3f7883d660878e0813f"
 
     patch do
-      file "Patches/python@3.14/0001-add-selfsign-py.patch"
+      file "Patches/python@3.14/0001-vendor-selfsign-py.patch"
     end
 
     patch do
