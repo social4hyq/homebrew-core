@@ -1,4 +1,5 @@
 class VitePlus < Formula
+  require "json"
   require "yaml"
 
   desc "Unified toolchain and entry point for web development"
@@ -8,7 +9,8 @@ class VitePlus < Formula
   license "MIT"
 
   # OHOS delta vs upstream (everything else is verbatim):
-  # bottle block, depends_on swaps, overrides/env/wrapper fences below.
+  # bottle block, depends_on swaps, native-binding wiring, build env,
+  # vite-task patch, bin/vp wrapper. See the fenced blocks in install.
   revision 1
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
@@ -66,34 +68,94 @@ class VitePlus < Formula
     resource("rolldown").stage buildpath/"rolldown"
     resource("vite").stage buildpath/"vite"
 
-    # --- OHOS: pnpm overrides for native bindings --------------------------
-    # Most napi packages now publish openharmony-arm64 builds at the exact
-    # versions this lockfile pins (rolldown/oxfmt/oxlint/oxc-*/rollup — pnpm
-    # installs those natively). The exceptions below are aliased: missing
-    # openharmony builds reuse the linux-arm64-musl twins (same libc/ABI
-    # family) or the @ohos-ports community ports. Bottle signing is handled
-    # by the pipeline's automatic ELF pass, not here.
+    # --- OHOS: native bindings ----------------------------------------------
+    # Registry audit (openharmony-arm64 availability at the versions this
+    # lockfile pins): @rolldown/binding 1.2.2, @oxfmt/binding 0.61.0,
+    # @oxlint/binding 1.76.0, @oxc-parser/binding 0.142.0,
+    # @oxc-resolver/binding 11.24.2 and @rollup/rollup 4.60.4 are published
+    # natively — pnpm installs those with no help. The rest:
+    #   * lightningcss has no openharmony build at any version, but the
+    #     @ohos-ports community port is a loader-patched drop-in.
+    #   * yuku-*, @ast-grep/napi and the @napi-rs/cli tool deps ship no
+    #     openharmony build anywhere. Their linux-arm64-musl twins run on
+    #     OHOS (same libc family), so fabricate local shim packages from
+    #     the musl tarballs: the binding file is renamed to what the
+    #     loaders require and `main` points straight at it, satisfying
+    #     both bare (`require('<ohos-name>')`) and subpath
+    #     (`require('<ohos-name>/<file>.node')`) loader conventions. The
+    #     shims are grafted into the graph with packageExtensions (adds
+    #     the openharmony optionalDependency the parents don't declare)
+    #     and overrides (remaps it to the local shim) — one mechanism,
+    #     applied identically to the build tree and, via pnpm deploy, to
+    #     the deployed tree. Bottle signing is fully automatic (pipeline
+    #     ELF pass); nothing signs here.
+    shims_dir = buildpath/"ohos-shims"
+    # [parent package, version, ohos binding package, musl binding package,
+    #  binding file name the loaders require]
+    shims = [
+      ["yuku-codegen",    "0.5.44", "@yuku-codegen/binding", "yuku-codegen.node"],
+      ["yuku-codegen",    "0.7.0",  "@yuku-codegen/binding", "yuku-codegen.node"],
+      ["yuku-codegen",    "0.8.3",  "@yuku-codegen/binding", "yuku-codegen.node"],
+      ["yuku-parser",     "0.5.44", "@yuku-parser/binding",  "yuku-parser.node"],
+      ["yuku-parser",     "0.7.0",  "@yuku-parser/binding",  "yuku-parser.node"],
+      ["yuku-parser",     "0.8.3",  "@yuku-parser/binding",  "yuku-parser.node"],
+      ["@ast-grep/napi",  "0.43.0", "@ast-grep/napi",        "ast-grep-napi.node"],
+      ["@napi-rs/wasm-tools", "1.0.1", "@napi-rs/wasm-tools", "wasm-tools.node"],
+      ["@napi-rs/lzma",       "1.4.5", "@napi-rs/lzma",       "lzma.node"],
+      ["@napi-rs/tar",        "1.1.0", "@napi-rs/tar",        "tar.node"],
+    ]
+    musl_tgz = lambda do |pkg, version|
+      leaf = pkg.split("/").last
+      tgz = HOMEBREW_CACHE/"vite-plus-musl-napi"/"#{pkg.tr("/", "-")}-#{version}.tgz"
+      tgz.mkpath
+      unless tgz.exist?
+        system "curl", "-fSL", "--retry", "5", "-o", tgz,
+               "https://registry.npmmirror.com/#{pkg}-linux-arm64-musl/-/#{leaf}-linux-arm64-musl-#{version}.tgz"
+      end
+      tgz
+    end
+    overrides = {
+      "lightningcss" => "npm:@ohos-ports/lightningcss@1.33.0-1",
+    }
+    extensions = {}
+    shims.each do |parent, version, binding_pkg, node_file|
+      ohos_name = "#{binding_pkg}-openharmony-arm64"
+      shim = shims_dir/"#{parent.tr("/", "@")}-#{version}"
+      next if shim.exist?
+
+      shim.mkpath
+      stage = shim/"stage"
+      stage.mkpath
+      system "tar", "xzf", musl_tgz.call(binding_pkg, version), "-C", stage
+      node_src = Dir.glob("#{stage}/**/*.node").first
+      odie "no .node in musl tarball for #{binding_pkg}@#{version}" if node_src.nil?
+      cp node_src, shim/node_file
+      rm_r stage
+      (shim/"package.json").write <<~JSON
+        {
+          "name": "#{ohos_name}",
+          "version": "#{version}",
+          "main": "#{node_file}"
+        }
+      JSON
+      extensions["#{parent}@#{version}"] = { "optionalDependencies" => { ohos_name => version } }
+      overrides["#{ohos_name}@#{version}"] = "link:#{shim}"
+    end
+    # @parcel/watcher: the @ohos-ports port ships the openharmony binding
+    # as a proper package (main points at the .node).
+    extensions["@parcel/watcher@2.5.1"] = {
+      "optionalDependencies" => { "@parcel/watcher-openharmony-arm64" => "2.5.1" },
+    }
+    overrides["@parcel/watcher-openharmony-arm64@2.5.1"] = "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1"
+
     workspace_yaml = buildpath/"pnpm-workspace.yaml"
     ws = YAML.safe_load(workspace_yaml.read)
-    ws["overrides"] = {
-      # loader-patched drop-in with a prebuilt ohos binding
-      "lightningcss"                             => "npm:@ohos-ports/lightningcss@1.33.0-1",
-      # bare-binding port packages (main points at the .node)
-      "@parcel/watcher-openharmony-arm64"        => "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1",
-      # musl twins for packages with no openharmony build at any version
-      "@yuku-codegen/binding-openharmony-arm64"  => "npm:@yuku-codegen/binding-linux-arm64-musl@0.5.44",
-      "@yuku-parser/binding-openharmony-arm64"   => "npm:@yuku-parser/binding-linux-arm64-musl@0.5.44",
-      "@ast-grep/napi-openharmony-arm64"         => "npm:@ast-grep/napi-linux-arm64-musl@0.43.0",
-      "@unrs/resolver-binding-openharmony-arm64" => "npm:@unrs/resolver-binding-linux-arm64-musl@1.11.1",
-      # @napi-rs/cli (build tooling) optional tool deps
-      "@napi-rs/wasm-tools-openharmony-arm64"    => "npm:@napi-rs/wasm-tools-linux-arm64-musl@1.0.1",
-      "@napi-rs/lzma-openharmony-arm64"          => "npm:@napi-rs/lzma-linux-arm64-musl@1.4.5",
-      "@napi-rs/tar-openharmony-arm64"           => "npm:@napi-rs/tar-linux-arm64-musl@1.1.0",
-    }.merge(ws["overrides"] || {})
+    ws["overrides"] = overrides.merge(ws["overrides"] || {})
+    ws["packageExtensions"] = extensions.merge(ws["packageExtensions"] || {})
     File.write(workspace_yaml, YAML.dump(ws))
-    # -----------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
-    # --- OHOS: build environment -------------------------------------------
+    # --- OHOS: build environment ---------------------------------------------
     # pnpm >= 11.20 verifies the engine binary when delegating to a
     # packageManager pin; no openharmony @pnpm/exe exists. Same workaround
     # as Alpine packaging.
@@ -111,9 +173,9 @@ class VitePlus < Formula
     end
     # @napi-rs/cli builds the ohos linker/cc/ar paths from this.
     ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
-    # -----------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
-    # --- OHOS: vendored vite-task patch ------------------------------------
+    # --- OHOS: vendored vite-task patch --------------------------------------
     # fspy_preload_unix (git dep) compiles as an empty crate on musl, where
     # seccomp alone handles access tracking; extend the exemption to ohos,
     # whose libc lacks the statx/execveat bindings it needs. Staged outside
@@ -141,7 +203,7 @@ class VitePlus < Formula
     TOML
     cargo_toml = buildpath/"Cargo.toml"
     File.write(cargo_toml, "#{File.read(cargo_toml)}\n#{patch_block}")
-    # ----------------------------------------------------------------------
+    # ------------------------------------------------------------------------
 
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vite_global_cli")
@@ -152,12 +214,12 @@ class VitePlus < Formula
     rm_r node_modules.glob(".pnpm/*/node_modules/*/prebuilds/{darwin,ios}-x64*")
     rm_r node_modules.glob(".pnpm/fsevents@*/node_modules/fsevents")
 
-    # --- OHOS: bin/vp wrapper ----------------------------------------------
+    # --- OHOS: bin/vp wrapper ------------------------------------------------
     # vp's Rust install path creates tempdirs via TMPDIR (defaults to the
     # read-only /tmp), and its default ShimMode is "managed" — it downloads
     # official glibc Node.js binaries that OHOS refuses to exec (verified
     # EACCES with a raw binary and a fresh HOME). The wrapper defaults
-    # TMPDIR if unset and seeds the system_first config on first run.
+    # TMPDIR if unset and seeds the system_first config on first run;
     # write_env_script cannot express either (unconditional exports only).
     # The real binary sits one level below prefix so <dir>/../node_modules
     # still resolves to the prefix/node_modules deploy target.
@@ -212,18 +274,29 @@ class VitePlus < Formula
 
     # OHOS: vp create/fmt hit transient exec/FS-settle ENOENTs under load;
     # retry before giving up (cf. herdr's sign-retry loop).
+    vp_with_retry = lambda do |*args|
+      max_attempts = 3
+      (1..max_attempts).each do |attempt|
+        system bin/"vp", *args
+        break
+      rescue BuildError => e
+        msg = e.message.to_s.lines.last(5).join
+        odie "vp #{args.first} failed (#{e.class}):\n#{msg}" if attempt == max_attempts
+        sleep 10
+      end
+    end
 
-    system bin/"vp", "create", "vite:application", "--no-interactive", "--directory", "test-app"
+    vp_with_retry.call "create", "vite:application", "--no-interactive", "--directory", "test-app"
     assert_path_exists testpath/"test-app/package.json"
 
     # OHOS: the scaffolded app resolves vite-plus from the npm registry,
-    # which ships no openharmony bindings. Wire it the same way an end user
-    # would — pnpm-workspace override to the @ohos-npm-ports port (loader
-    # patched, prebuilt ohos binding in-package) plus @rolldown's native
-    # openharmony binding for vite-plus-core's bundled loader, and drop the
-    # scaffold's `prepare: vp config` hook, which runs before install can
-    # fetch those bindings. The scaffold's workspace file already has an
-    # overrides section (vite: catalog:), so merge into it.
+    # which ships no openharmony bindings for its own binding package. Wire
+    # it the same way an end user would — pnpm-workspace override to the
+    # @ohos-npm-ports port (loader patched, prebuilt ohos binding
+    # in-package) — and drop the scaffold's `prepare: vp config` hook,
+    # which runs before install can fetch bindings. The scaffold's
+    # workspace file already has an overrides section (vite: catalog:),
+    # so merge into it.
     pkg_json = testpath/"test-app/package.json"
     manifest = JSON.parse(pkg_json.read)
     manifest["scripts"].delete("prepare")
@@ -232,12 +305,12 @@ class VitePlus < Formula
     workspace = testpath/"test-app/pnpm-workspace.yaml"
     ws = YAML.safe_load(workspace.read)
     ws["overrides"] = {
-      "vite-plus"                           => "npm:@ohos-npm-ports/vite-plus@0.2.8-1",
-      "@rolldown/binding-openharmony-arm64" => "npm:@rolldown/binding-openharmony-arm64@1.2.2",
+      "vite-plus" => "npm:@ohos-npm-ports/vite-plus@0.2.8-1",
     }.merge(ws["overrides"] || {})
     File.write(workspace, YAML.dump(ws))
 
     cd testpath/"test-app" do
+      vp_with_retry.call "install"
       output = shell_output("#{bin}/vp fmt")
       assert_match "Finished", output
     end
