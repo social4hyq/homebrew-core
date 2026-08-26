@@ -1,12 +1,11 @@
 class OpensslAT3 < Formula
   desc "Cryptography and SSL/TLS Toolkit"
   homepage "https://openssl-library.org"
-  url "https://github.com/openssl/openssl/releases/download/openssl-3.6.3/openssl-3.6.3.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/openssl-3.6.3.tar.gz"
-  sha256 "243a86649cf6f23eeb6a2ff2456e09e5d77dd9018a54d3d96b0c6bdd6ba6c7f1"
+  url "https://github.com/openssl/openssl/releases/download/openssl-3.6.4/openssl-3.6.4.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/openssl-3.6.4.tar.gz"
+  sha256 "9bffaa1ad1e07b354c21bd3324ec02fa15579f45a7d0494b3e74bc449b7333ef"
   license "Apache-2.0"
   compatibility_version 1
-  revision 4
 
   livecheck do
     url "https://openssl-library.org/source/"
@@ -14,7 +13,7 @@ class OpensslAT3 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e89c43f355f12a0e69ec4e97484e79f53ebf7d2761bbdf12e0a1b334c981d204"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1be73c6c68e29c33ff43761045e43e23e7c369f0fb1a24f40e226ec5cb28f98"
   end
 
   depends_on "ca-certificates"
