@@ -9,7 +9,7 @@ class Rustup < Formula
   revision 4
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "901a837e818b7d1ee253820be50cfd264b9ee30f820e38b5025a65daf04df1a6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6297782dfca8f24c3aec6a39274a3cfdcc2be05d115b6a12c392715e041a21b2"
   end
 
   keg_only "it conflicts with rust"
