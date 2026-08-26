@@ -1,11 +1,16 @@
 class VitePlus < Formula
   require "json"
+  require "yaml"
 
   desc "Unified toolchain and entry point for web development"
   homepage "https://viteplus.dev"
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v0.2.8.tar.gz"
   sha256 "c07ae8f828039fae32b791abcfc8f1d1b769024a2ae5c04bdc2946e8318615f4"
   license "MIT"
+
+  # Bottle content changed vs 0.2.8-r3 (deploy moved to prefix/node_modules,
+  # wrapper layout bin->libexec), so drive user upgrades with a revision.
+  revision 1
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
@@ -298,6 +303,34 @@ class VitePlus < Formula
       rm_r(stage)
     end
 
+    # OHOS wrapper (hand-rolled rather than write_env_script: the
+    # default-if-unset TMPDIR export and the first-run config seeding below
+    # cannot be expressed with write_env_script's unconditional exports).
+    # Two load-bearing behaviors, both verified on device: (1) vp's Rust
+    # install path creates tempdirs via TMPDIR, which defaults to the
+    # read-only /tmp; (2) with no ~/.vite-plus/config.json vp's default
+    # ShimMode is "managed" — it downloads official glibc Node.js binaries
+    # that OHOS refuses to exec (raw binary + fresh HOME fails with EACCES).
+    # The real binary must live exactly one level below prefix: it resolves
+    # its JS entry via <dir>/../node_modules, i.e. prefix/node_modules —
+    # the deploy target above. NOT libexec/bin (two levels would miss).
+    odie "cargo install did not produce bin/vp" unless (bin/"vp").exist?
+    mv bin/"vp", libexec/"vp"
+    (bin/"vp").write <<~SH
+      #!/bin/sh
+      TMPDIR_DEFAULT="#{HOMEBREW_PREFIX}/var/cache"
+      export TMPDIR="${TMPDIR:-$TMPDIR_DEFAULT}"
+      mkdir -p "$TMPDIR" 2>/dev/null
+      # Seed system_first so the managed-runtime downloader is never the
+      # default path on OHOS; delete ~/.vite-plus/config.json to opt out.
+      if [ -n "$HOME" ] && [ ! -f "$HOME/.vite-plus/config.json" ]; then
+        mkdir -p "$HOME/.vite-plus" 2>/dev/null &&
+          printf '{"shimMode":"system_first"}\\n' > "$HOME/.vite-plus/config.json" 2>/dev/null
+      fi
+      exec "#{libexec}/vp" "$@"
+    SH
+    chmod 0755, bin/"vp"
+
     # Symlink vp to vpr and vpx. These are detected at runtime by argv[0]
     bin.install_symlink bin/"vp" => "vpr"
     bin.install_symlink bin/"vp" => "vpx"
@@ -311,33 +344,32 @@ class VitePlus < Formula
   def caveats
     <<~EOS
       On OHOS, /tmp is read-only and vp's Rust install path creates tempdirs
-      via TMPDIR (defaulting to /tmp), so set it to a writable directory:
+      via TMPDIR. bin/vp is a wrapper that defaults TMPDIR to
+      #{HOMEBREW_PREFIX}/var/cache when unset.
 
-        export TMPDIR=#{HOMEBREW_PREFIX}/var/cache
-
-      vp's managed Node.js runtime fallback downloads official binaries that
-      OHOS refuses to exec unsigned; vp defaults to the system Node.js when
-      ~/.vite-plus/config.json contains {"shimMode":"system_first"} (written
-      automatically on first run if the file does not exist).
+      vp's default ShimMode is "managed" (downloads official glibc Node.js
+      binaries that OHOS refuses to exec). The wrapper seeds
+      ~/.vite-plus/config.json with {"shimMode":"system_first"} on first
+      run, so the system Node.js is preferred; delete that file to opt
+      back into managed runtimes.
     EOS
   end
 
   test do
     # OHOS: /tmp is read-only and vp's Rust install path creates tempdirs
-    # via TMPDIR (defaulting to /tmp). See caveats — end users must set the
-    # same variable; the test environment provides it here.
+    # via TMPDIR (defaulting to /tmp). bin/vp wraps the real binary with a
+    # writable-TMPDIR default; the test still sets it explicitly so temp
+    # files land inside testpath.
     ENV["TMPDIR"] = testpath/"tmp"
     mkdir_p ENV["TMPDIR"]
-    # vp's managed Node.js runtime fallback downloads official glibc binaries
-    # that OHOS cannot exec. Point vp at the system Node.js the same way the
-    # caveats tell end users to.
-    (testpath/".vite-plus").mkpath
-    (testpath/".vite-plus/config.json").write <<~JSON
-      {"shimMode":"system_first"}
-    JSON
+    # HOME is pointed at testpath so the wrapper's first-run seeding of
+    # shimMode=system_first (managed-Node downloads are glibc builds OHOS
+    # cannot exec) lands here instead of the real HOME.
     ENV["HOME"] = testpath.to_s
 
     assert_match version.to_s, shell_output("#{bin}/vp --version")
+    # The wrapper must have seeded the system_first config on first run.
+    assert_path_exists testpath/".vite-plus/config.json"
 
     # vp create/fmt hit transient exec/FS-settle ENOENTs on OHOS under load;
     # retry before giving up (cf. herdr's sign-retry loop).
@@ -370,6 +402,10 @@ class VitePlus < Formula
     manifest = JSON.parse(pkg_json.read)
     manifest["devDependencies"]["ohos-signpost"] = "^1.0.2"
     manifest["scripts"]["postinstall"] = "ohos-signpost"
+    # Drop the scaffold's `prepare: vp config` hook: it runs during install,
+    # before this test can plant the rolldown binding (below), and dies on
+    # the missing openharmony binding — failing the whole install.
+    manifest["scripts"].delete("prepare")
     # Pathname#write refuses to overwrite files vp create already wrote;
     # use File.write to update them in place.
     File.write(pkg_json, JSON.pretty_generate(manifest) << "\n")
@@ -382,13 +418,17 @@ class VitePlus < Formula
       "oxlint-tsgolint" => "npm:@ohos-npm-ports/oxlint-tsgolint@7.0.2001-1",
     }.merge(ws["overrides"] || {})
     File.write(workspace, YAML.dump(ws))
-    vp_with_retry.call "--dir", "test-app", "install"
+    # vp 0.2.8 has no global --dir flag (clap rejects it), so run install
+    # from inside the app directory.
+    cd testpath/"test-app" do
+      vp_with_retry.call "install"
+    end
 
     # vp fmt loads vite-plus-core's bundled rolldown binding copy from
     # dist/rolldown/shared/ (outside package resolution); the bottle ships
     # a signed copy — plant it in the app's store too.
     bottle_core = Dir.glob(
-      "#{HOMEBREW_PREFIX}/Cellar/vite-plus/*/libexec/node_modules/vite-plus/" \
+      "#{HOMEBREW_PREFIX}/Cellar/vite-plus/*/node_modules/vite-plus/" \
       "node_modules/.pnpm/@voidzero-dev+vite-plus-core@*/node_modules/@voidzero-dev/vite-plus-core",
     ).first
     core_src = File.join(bottle_core, "dist/rolldown/rolldown-binding.openharmony-arm64.node")
