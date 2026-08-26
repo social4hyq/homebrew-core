@@ -12,7 +12,7 @@ class Xmlsectool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3379c030cf1ef02db3259b649b9ac20f371a4485f311ad49fdc9d5b250aa368"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "046c397dfe1ab6f56a8de4326780e8c077f14da693fabef0141a267c39948aa7"
   end
 
   depends_on "openjdk"
