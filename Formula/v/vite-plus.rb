@@ -9,9 +9,14 @@ class VitePlus < Formula
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v0.2.8-r1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v0.2.8-r2"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "556e285737efbc1453aff83cb91be1396fe627003622fc8e72656edd653119da"
   end
+
+  # r2: rebuild the bottle so the musl-napi injection actually lands in the
+  # deployed tree (r1 shipped without oxlint/oxfmt/yuku bindings, breaking
+  # `vp lint` outright), and pick up tsgolint via the registry port now that
+  # @ohos-npm-ports/oxlint-tsgolint is published (enables --type-aware).
 
   depends_on "cmake" => :build
   depends_on "just" => :build
@@ -107,104 +112,13 @@ class VitePlus < Formula
     ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
 
     # Upstream publishes no openharmony napi bindings; reuse linux-arm64-musl
-    # builds (same libc/ABI family, cf. opentui-core) under the openharmony
-    # package name. Covers every napi package in the store declaring a
-    # *-linux-arm64-musl optional dependency (yuku-*, @ast-grep/napi, ...);
-    # pure-JS packages declare none and are skipped.
+    # builds (same libc/ABI family, cf. opentui-core). The injection must run
+    # AFTER `pnpm deploy` below: deploy rebuilds node_modules and would drop
+    # physically copied modules (r1 shipped without them for exactly this
+    # reason). Covers every deployed package declaring a
+    # *-linux-arm64-musl optional dependency (oxlint, oxfmt, yuku-*,
+    # @ast-grep/napi, ...); pure-JS packages declare none and are skipped.
     system "pnpm", "install"
-    sign_tool = "#{formula_opt_prefix("ohos-sdk")}/bin/binary-sign-tool"
-    tars_cache = HOMEBREW_CACHE/"vite-plus-musl-napi"
-    buildpath.glob("node_modules/.pnpm/*/node_modules/{*,*/*}").each do |pkg_dir|
-      next unless File.directory?(pkg_dir)
-
-      manifest_path = pkg_dir/"package.json"
-      next unless manifest_path.exist?
-
-      begin
-        manifest = JSON.parse(File.read(manifest_path))
-      rescue JSON::ParserError
-        next
-      end
-      name = manifest["name"]
-      next if name.nil? || !name.is_a?(String)
-
-      musl_dep = manifest.fetch("optionalDependencies", {}).keys.find do |dep|
-        dep.end_with?("-linux-arm64-musl")
-      end
-      next if musl_dep.nil?
-
-      scope = musl_dep.start_with?("@") ? musl_dep.split("/").first : nil
-      musl_base = musl_dep.split("/").last
-      ohos_base = musl_base.sub("linux-arm64-musl", "openharmony-arm64")
-      ohos_module = scope ? "#{scope}/#{ohos_base}" : ohos_base
-      version = manifest.fetch("version")
-
-      tgz = tars_cache/"#{musl_dep.tr("/", "-")}-#{version}.tgz"
-      unless tgz.exist?
-        tgz.parent.mkpath
-        system "curl", "-fSL", "--retry", "5", "-o", tgz,
-               "https://registry.npmmirror.com/#{musl_dep}/-/#{musl_base}-#{version}.tgz"
-      end
-      stage = buildpath/"musl-napi-#{name.tr("/@", "__")}"
-      rm_r(stage) if stage.exist?
-      stage.mkpath
-      system "tar", "xzf", tgz, "-C", stage
-      node_src = Dir.glob("#{stage}/**/*.node").first
-      odie "no .node found in #{tgz}" if node_src.nil?
-      node_base = File.basename(node_src)
-      # Loader conventions differ across generators: yuku's loader wants a
-      # bare "<pkg>.node" file, ast-grep's wants "<bin>.openharmony-arm64.node".
-      node_ohos_name = node_base.sub("linux-arm64-musl", "openharmony-arm64")
-
-      # 1) Fabricated module next to the package (module-resolution path):
-      #    main points straight at the .node so no JS loader platform check
-      #    can interfere.
-      node_files = []
-      # Scoped packages nest one level deeper (@scope/pkg); walk up to the
-      # real store node_modules dir.
-      store = pkg_dir.parent
-      store = store.parent if name.start_with?("@")
-      dest = store/ohos_module
-      unless dest.exist?
-        dest.mkpath
-        cp node_src, dest/node_base
-        node_files << (dest/node_base)
-        (dest/"package.json").write <<~JSON
-          {
-            "name": "#{ohos_module}",
-            "version": "#{version}",
-            "main": "#{node_base}"
-          }
-        JSON
-        if scope
-          pkg_leaf = File.basename(name)
-          bare = "#{pkg_leaf}.node"
-          cp node_src, dest/bare
-          node_files << (dest/bare)
-        end
-      end
-
-      # 2) Files inside the package itself (__dirname-relative fallbacks):
-      pkg_leaf = File.basename(name)
-      cp node_src, pkg_dir/node_ohos_name
-      node_files << (pkg_dir/node_ohos_name)
-      cp node_src, pkg_dir/"#{pkg_leaf}.node"
-      node_files << (pkg_dir/"#{pkg_leaf}.node")
-      if scope
-        inner = pkg_dir/scope/ohos_base
-        unless inner.exist?
-          inner.mkpath
-          cp node_src, inner/"#{pkg_leaf}.node"
-          node_files << (inner/"#{pkg_leaf}.node")
-        end
-      end
-
-      # OHOS refuses to dlopen unsigned ELF shared objects; the musl builds
-      # ship unsigned.
-      node_files.each do |file|
-        system sign_tool, "sign", "-selfSign", "1", "-inFile", file, "-outFile", file
-      end
-    end
 
     # fspy_preload_unix (git dep) compiles as an empty crate on musl, where
     # seccomp alone handles access tracking; extend the exemption to ohos,
@@ -248,6 +162,137 @@ class VitePlus < Formula
     node_modules = libexec/"node_modules/vite-plus/node_modules"
     rm_r node_modules.glob(".pnpm/*/node_modules/*/prebuilds/{darwin,ios}-x64*")
     rm_r node_modules.glob(".pnpm/fsevents@*/node_modules/fsevents")
+
+    # Musl-napi injection (see comment above): runs on the DEPLOYED tree.
+    sign_tool = "#{formula_opt_prefix("ohos-sdk")}/bin/binary-sign-tool"
+    tars_cache = HOMEBREW_CACHE/"vite-plus-musl-napi"
+    node_modules.glob(".pnpm/*/node_modules/{*,*/*}").each do |pkg_dir|
+      next unless File.directory?(pkg_dir)
+
+      manifest_path = pkg_dir/"package.json"
+      next unless manifest_path.exist?
+
+      begin
+        manifest = JSON.parse(File.read(manifest_path))
+      rescue JSON::ParserError
+        next
+      end
+      name = manifest["name"]
+      next if name.nil? || !name.is_a?(String)
+
+      musl_dep = manifest.fetch("optionalDependencies", {}).keys.find do |dep|
+        dep.end_with?("-linux-arm64-musl")
+      end
+      next if musl_dep.nil?
+
+      scope = musl_dep.start_with?("@") ? musl_dep.split("/").first : nil
+      musl_base = musl_dep.split("/").last
+      ohos_base = musl_base.sub("linux-arm64-musl", "openharmony-arm64")
+      ohos_module = scope ? "#{scope}/#{ohos_base}" : ohos_base
+      version = manifest.fetch("version")
+
+      tgz = tars_cache/"#{musl_dep.tr("/", "-")}-#{version}.tgz"
+      unless tgz.exist?
+        tgz.parent.mkpath
+        system "curl", "-fSL", "--retry", "5", "-o", tgz,
+               "https://registry.npmmirror.com/#{musl_dep}/-/#{musl_base}-#{version}.tgz"
+      end
+      stage = libexec/"musl-napi-#{name.tr("/@", "__")}"
+      rm_r(stage) if stage.exist?
+      stage.mkpath
+      system "tar", "xzf", tgz, "-C", stage
+      node_src = Dir.glob("#{stage}/**/*.node").first
+      odie "no .node found in #{tgz}" if node_src.nil?
+      node_base = File.basename(node_src)
+      # Loader conventions differ across generators: yuku's loader wants a
+      # bare "<pkg>.node" file, ast-grep's wants "<bin>.openharmony-arm64.node".
+      node_ohos_name = node_base.sub("linux-arm64-musl", "openharmony-arm64")
+
+      # 1) Fabricated module next to the package (module-resolution path):
+      #    main points straight at the .node so no JS loader platform check
+      #    can interfere.
+      node_files = []
+      store = pkg_dir.parent
+      store = store.parent if name.start_with?("@")
+      dest = store/ohos_module
+      unless dest.exist?
+        dest.mkpath
+        cp node_src, dest/node_base
+        node_files << (dest/node_base)
+        (dest/"package.json").write <<~JSON
+          {
+            "name": "#{ohos_module}",
+            "version": "#{version}",
+            "main": "#{node_base}"
+          }
+        JSON
+        if scope
+          pkg_leaf = File.basename(name)
+          bare = "#{pkg_leaf}.node"
+          cp node_src, dest/bare
+          node_files << (dest/bare)
+        end
+      end
+
+      # 2) Files inside the package itself (__dirname-relative fallbacks):
+      pkg_leaf = File.basename(name)
+      cp node_src, pkg_dir/node_ohos_name
+      node_files << (pkg_dir/node_ohos_name)
+      cp node_src, pkg_dir/"#{pkg_leaf}.node"
+      node_files << (pkg_dir/"#{pkg_leaf}.node")
+      if scope
+        inner = pkg_dir/scope/ohos_base
+        unless inner.exist?
+          inner.mkpath
+          cp node_src, inner/"#{pkg_leaf}.node"
+          node_files << (inner/"#{pkg_leaf}.node")
+        end
+      end
+
+      # OHOS refuses to dlopen unsigned ELF shared objects; the musl builds
+      # ship unsigned.
+      node_files.each do |file|
+        system sign_tool, "sign", "-selfSign", "1", "-inFile", file, "-outFile", file
+      end
+    end
+    rm_r libexec.glob("musl-napi-*")
+
+    # tsgolint (type-aware backend): upstream ships no openharmony binary;
+    # the @ohos-npm-ports port does. Embed its signed binary into the
+    # deployed oxlint-tsgolint package and teach the loader the
+    # openharmony branch, same shape as our registry port.
+    tspkg = libexec/"node_modules/vite-plus/node_modules/oxlint-tsgolint"
+    if (tspkg/"bin/tsgolint.js").exist?
+      tsgo_port = JSON.parse(Utils.safe_popen_read("npm", "view",
+        "@ohos-npm-ports/oxlint-tsgolint", "version", "--json"))
+      system "curl", "-fSL", "--retry", "5", "-o", "#{tars_cache}/tsgo-port.tgz",
+             "https://registry.npmjs.org/@ohos-npm-ports/oxlint-tsgolint/-/oxlint-tsgolint-#{tsgo_port}.tgz"
+      stage = libexec/"tsgolint-port"
+      rm_r(stage) if stage.exist?
+      stage.mkpath
+      system "tar", "xzf", "#{tars_cache}/tsgo-port.tgz", "-C", stage
+
+      ohos_dir = tspkg/"@oxlint-tsgolint/openharmony-arm64"
+      ohos_dir.mkpath
+      cp_r stage/"package/@oxlint-tsgolint/openharmony-arm64/.", ohos_dir
+      chmod 0755, ohos_dir/"tsgolint"
+
+      loader_old = <<~JS
+        const exePath = require.resolve(
+          `@oxlint-tsgolint/${process.platform}-${process.arch}/tsgolint${process.platform === 'win32' ? '.exe' : ''}`,
+        );
+      JS
+      loader_new = <<~JS
+        const exePath =
+          process.platform === 'openharmony'
+            ? require('node:path').join(__dirname, '..', '@oxlint-tsgolint', 'openharmony-arm64', 'tsgolint')
+            : require.resolve(
+                `@oxlint-tsgolint/${process.platform}-${process.arch}/tsgolint${process.platform === 'win32' ? '.exe' : ''}`,
+              );
+      JS
+      inreplace tspkg/"bin/tsgolint.js", loader_old.chomp, loader_new.chomp
+      rm_r(stage)
+    end
 
     # OHOS: /tmp is read-only and vp's Rust install path creates tempdirs via
     # TMPDIR (defaulting to /tmp) — wrap the real binary in libexec with a
