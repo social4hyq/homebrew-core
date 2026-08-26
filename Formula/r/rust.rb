@@ -14,7 +14,6 @@ class Rust < Formula
   depends_on "patchelf" => :build
   depends_on "openssl@3"
   depends_on "zlib-ng-compat"
-  depends_on "llvm-gcc-compat"
 
   link_overwrite "etc/bash_completion.d/cargo"
   link_overwrite "bin/cargo-fmt", "bin/git-rustfmt", "bin/rustfmt", "bin/rustfmt-*"
