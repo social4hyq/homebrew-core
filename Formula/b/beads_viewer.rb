@@ -6,7 +6,7 @@ class BeadsViewer < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb25a080a66dd790d0806a290eb21c7435faf1fd7fd2d7ae9cba9814d2c9f674"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e9c449879f11e9bcdcb6824b89e64c463229dfd08bf235859c3415a9e4d80bb"
   end
 
   depends_on "go" => :build
