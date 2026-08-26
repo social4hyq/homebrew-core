@@ -11,7 +11,7 @@ class Perltidy < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c966c1537175d0e7625391d5e62cfed86ba52333d3153ce62c1d6eda251a5d6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b53dea091bc52f6800c2d755d75c9d281e4b132a202783c17b827660d57c167c"
   end
 
   uses_from_macos "perl"
