@@ -66,7 +66,7 @@ class Go < Formula
   #
   # Problem: On HarmonyOS PC, hmdfs does not support mmap(PROT_WRITE)
   # causing linker failures. Also, compiled ELF binaries require code
-  # signing to execute (noexec filesystem).
+  # signing to execute.
   #
   #   0001: Default GOCACHE → /data/storage/el2/base/files/go-build (hmfs)
   #   0002: Default GOTMPDIR → /data/storage/el2/base/cache (tmpfs)
