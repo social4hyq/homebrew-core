@@ -6,7 +6,7 @@ class Rustup < Formula
   license any_of: ["Apache-2.0", "MIT"]
   compatibility_version 1
   head "https://github.com/rust-lang/rustup.git", branch: "main"
-  revision 3
+  revision 4
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "901a837e818b7d1ee253820be50cfd264b9ee30f820e38b5025a65daf04df1a6"
@@ -18,8 +18,6 @@ class Rustup < Formula
   depends_on "cmake" => :build
   depends_on "patchelf"
   depends_on "zlib-ng-compat"
-  depends_on "ohos-sdk"
-  depends_on "llvm-gcc-compat"
 
   uses_from_macos "curl"
   uses_from_macos "xz"
@@ -29,8 +27,31 @@ class Rustup < Formula
     depends_on "openssl@3"
   end
 
+  # ═══════════════════════════════════════════════════════════════════
+  # HarmonyOS patches
+  #
+  # Problem: On HarmonyOS PC, the kernel refuses to exec/dlopen an ELF
+  # without a .codesign section (noexec filesystem), so downloaded Rust
+  # toolchain binaries must be code-signed after install.
+  #
+  #   0001: Vendored selfsign.rs (byte-identical to ohos-bst-light, kept in
+  #         its own patch so it can be upgraded independently)
+  #   0002: Adapt vendored selfsign.rs to an importable library
+  #         (drop main(), export API)
+  #   0003: Post-install toolchain hook (rpath, SSL_CERT_FILE wrapper,
+  #         self-sign every ELF with the vendored selfsign)
+  # ═══════════════════════════════════════════════════════════════════
+
   patch do
-    file "Patches/rustup/0001-ohos-post-install.patch"
+    file "Patches/rustup/0001-vendor-selfsign-rs.patch"
+  end
+
+  patch do
+    file "Patches/rustup/0002-export-selfsign-lib.patch"
+  end
+
+  patch do
+    file "Patches/rustup/0003-ohos-post-install.patch"
   end
 
   def install
@@ -51,7 +72,6 @@ class Rustup < Formula
     #   SSL_CERT_FILE                          -> use the openssl@3 cert.pem
     #   RUSTUP_OVERRIDE_UNIX_FALLBACK_SETTINGS -> default toolchain = stable
     #   RUSTUP_OHOS_RPATH                      -> rpath dirs for post-processing
-    #   RUSTUP_OHOS_SIGN_TOOL                  -> binary-sign-tool from ohos-sdk
     #   RUSTUP_DIST_SERVER / RUSTUP_UPDATE_ROOT -> Alibaba Cloud mirror
     libexec_bin = libexec/"bin"
     libexec_bin.install bin/"rustup"
@@ -64,7 +84,6 @@ class Rustup < Formula
       export SSL_CERT_FILE="${SSL_CERT_FILE:-#{HOMEBREW_PREFIX}/etc/openssl@3/cert.pem}"
       export RUSTUP_OVERRIDE_UNIX_FALLBACK_SETTINGS="${RUSTUP_OVERRIDE_UNIX_FALLBACK_SETTINGS:-#{pkgetc}/settings.toml}"
       export RUSTUP_OHOS_RPATH="#{rpath}"
-      export RUSTUP_OHOS_SIGN_TOOL="#{Formula["ohos-sdk"].opt_bin}/binary-sign-tool"
       # Use Chinese mirror by default (Alibaba Cloud).
       export RUSTUP_DIST_SERVER="${RUSTUP_DIST_SERVER:-https://mirrors.aliyun.com/rustup}"
       export RUSTUP_UPDATE_ROOT="${RUSTUP_UPDATE_ROOT:-https://mirrors.aliyun.com/rustup/rustup}"
