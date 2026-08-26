@@ -6,7 +6,7 @@ class CloudformationGuard < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2dce3b84875ba3b52b272016eb35824c996abe41783088a3e0f30aaffa96a0f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f791cb110f9a22c3d16a5b39e3260507c8ca7723a36dfac717aa4fa86a861b98"
   end
 
   depends_on "rust" => :build
