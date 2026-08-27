@@ -17,8 +17,8 @@ class OpencodeAT2 < Formula
   # libopentui.so imports pthread_tryjoin_np, which OHOS musl lacks — the
   # wrapper LD_PRELOADs a small shim providing it (see install).
   # See social4hyq/ohos-opencode2 dev for canonical diff.
-  url "https://github.com/anomalyco/opencode.git", revision: "66a790c624255b538bbef315ad30257bd42be724"
-  version "0.0.0-beta-18230"
+  url "https://github.com/anomalyco/opencode.git", revision: "ab6a01d1358ceefaca6073ee03084bffe1826595"
+  version "0.0.0-beta-18314"
   license "MIT"
   # Baked-in channel was empty (see OPENCODE_CHANNEL below) — TUI crashed on
   # startup ("Invalid storage segment" segment-validates the channel), so the
