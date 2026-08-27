@@ -1,13 +1,13 @@
 class Dbmate < Formula
   desc "Lightweight, framework-agnostic database migration tool"
   homepage "https://github.com/amacneil/dbmate"
-  url "https://github.com/amacneil/dbmate/archive/refs/tags/v2.35.0.tar.gz"
-  sha256 "a5090797f7da35159e4454f0c532b055dfdb9a399a332bb3cfed9416142b7ec4"
+  url "https://github.com/amacneil/dbmate/archive/refs/tags/v2.35.1.tar.gz"
+  sha256 "2576832a3405c5011ad948cdf5a3c08e35158396bc1007cc95057047b68e81cd"
   license "MIT"
   head "https://github.com/amacneil/dbmate.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "42d4407f4cb03eb872a033901827bdf50c44e68011b3d4544323c529f455d1bb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6aa677aed0f7340f0ffed7ef9cae14d0689d1751a20cac618d071c8da5c2a4fb"
   end
 
   depends_on "go" => :build
