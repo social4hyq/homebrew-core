@@ -2,8 +2,8 @@ class TinyRemapper < Formula
   desc "Tiny, efficient tool for remapping JAR files using \"Tiny\"-format mappings"
   homepage "https://fabricmc.net/"
   # TODO: Check if we can use `openjdk` 25+ when bumping the version.
-  url "https://maven.fabricmc.net/net/fabricmc/tiny-remapper/0.14.0/tiny-remapper-0.14.0-fat.jar"
-  sha256 "9dbaf8030981338373abe029cd9c07732bff437887a56de1735ba2c3c76b0acf"
+  url "https://maven.fabricmc.net/net/fabricmc/tiny-remapper/0.14.1/tiny-remapper-0.14.1-fat.jar"
+  sha256 "3d54d68fc747e0799f1080833aad2196fae8007ee9d588e5663dbc1258ff544b"
   license "LGPL-3.0-only"
 
   livecheck do
@@ -12,7 +12,7 @@ class TinyRemapper < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e80eaa38c36cae194c99e0ee6d5378d53941b2501d87f01b242533abf2221223"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a67feef894f0a6c0376c50245a01806ae2719fa4d32de886fdb2b0016acfdca"
   end
 
   depends_on "openjdk@21"
