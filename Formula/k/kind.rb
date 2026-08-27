@@ -7,7 +7,7 @@ class Kind < Formula
   head "https://github.com/kubernetes-sigs/kind.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "565ad391b00a05362320e73f6b60b19ce944c366b9aab6fd0eb598a452f51516"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5bc3586d64ef078021842947a65340a7cdd0c78e761d122025d8b7b824ebe25e"
   end
 
   depends_on "go" => :build
