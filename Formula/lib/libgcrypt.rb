@@ -1,8 +1,8 @@
 class Libgcrypt < Formula
   desc "Cryptographic library based on the code from GnuPG"
   homepage "https://gnupg.org/related_software/libgcrypt/"
-  url "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.12.2.tar.bz2"
-  sha256 "7ce33c2492221a0436f96a8500215e9f3e3dcb5fd26a757cd415e7a843babd5e"
+  url "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.12.3.tar.bz2"
+  sha256 "98d1b0b3202d2b03fa754a35aa3cbbfcf526a3260d8d2ee213748001b1043006"
   license all_of: ["LGPL-2.1-or-later", "GPL-2.0-or-later"]
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class Libgcrypt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "caf686b739b3d251b0fba85c49a2cf7a77cf54b1b71cb87017c6704a99a200f3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b12725b1e4052779ecb29276abb0563b80d8fa7a78fcdf9c59d2b68669ec6e08"
   end
 
   depends_on "libgpg-error"
