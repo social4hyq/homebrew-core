@@ -1,8 +1,8 @@
 class Livekit < Formula
   desc "Scalable, high-performance WebRTC server"
   homepage "https://livekit.io"
-  url "https://github.com/livekit/livekit/archive/refs/tags/v1.13.5.tar.gz"
-  sha256 "50633b65316b0b8c854fb4bee4ae4040839fcf5c149bccb9ae2097fb7526991c"
+  url "https://github.com/livekit/livekit/archive/refs/tags/v1.13.6.tar.gz"
+  sha256 "7339d5b6f5bcc73579a516c7f18f803a708b9be7514b987a8445f2d06b4defd4"
   license "Apache-2.0"
   head "https://github.com/livekit/livekit.git", branch: "master"
 
@@ -15,7 +15,7 @@ class Livekit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e8510dd3215703497179664fe8affbc0f5e5e01db937d440d937a532dd47e2a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cff2f1d67ab456e7a5a96dfd1b0e40710e5c4077f243f2a6b603c14e16f876de"
   end
 
   depends_on "go" => :build
