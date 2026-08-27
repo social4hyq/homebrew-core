@@ -1,11 +1,10 @@
 class Node < Formula
   desc "Open-source, cross-platform JavaScript runtime environment"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v26.7.0/node-v26.7.0.tar.xz"
-  sha256 "e6b182cbeeab032d1082ca4ac4fe15e3a57de691d3bde78ecf8a761fd56ee356"
+  url "https://nodejs.org/dist/v26.8.1/node-v26.8.1.tar.xz"
+  sha256 "d1698832a1a10f050cdda044a3e3d6a748246811e2e7bc89ba9a8bd693dc45f2"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
-  revision 4
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -13,7 +12,7 @@ class Node < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "510770512f58886834b754bc7dd5874ec180c04ce6c7a1bd88466c31b21808ee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "46f6d5e101a2ec8ca9b2c42c22b9f05aa5c919092484ba6bc239aa6a0091befb"
   end
 
   resource "alpine-rootfs" do
