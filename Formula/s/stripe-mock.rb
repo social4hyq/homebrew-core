@@ -1,12 +1,12 @@
 class StripeMock < Formula
   desc "Mock HTTP server that responds like the real Stripe API"
   homepage "https://github.com/stripe/stripe-mock"
-  url "https://github.com/stripe/stripe-mock/archive/refs/tags/v0.202.0.tar.gz"
-  sha256 "163c3766c5ab332a8bf4e1a734ef7f8a329e0d56b1be07681272e7c98e030696"
+  url "https://github.com/stripe/stripe-mock/archive/refs/tags/v0.203.0.tar.gz"
+  sha256 "33a312e15291d77d8448fb4155bf6a9e606973795f22f52562b0fec3fcc3a12f"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0bc84b3224ee65e077ce07034ae09d40f87e5033d344283276208c4d52de4922"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "254727abbeda92cd1d394c63f7864903a56b5c215843068e28593faefe64db3f"
   end
 
   depends_on "go" => :build
