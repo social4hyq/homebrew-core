@@ -11,7 +11,7 @@ class VitePlus < Formula
   # OHOS delta vs upstream (everything else is verbatim):
   # bottle block, depends_on swaps, native-binding wiring, build env,
   # vite-task patch, bin/vp wrapper. See the fenced blocks in install.
-  revision 1
+  revision 2
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
@@ -73,32 +73,31 @@ class VitePlus < Formula
     # @oxlint/binding 1.76.0, @oxc-parser/binding 0.142.0,
     # @oxc-resolver/binding 11.24.2 and @rollup/rollup 4.60.4 are published
     # natively — pnpm installs those with no help. The rest:
-    #   * lightningcss has no openharmony build at any version, but the
-    #     @ohos-ports community port is a loader-patched drop-in.
-    #   * yuku-*, @ast-grep/napi and the @napi-rs/cli tool deps ship no
-    #     openharmony build anywhere. Their linux-arm64-musl twins run on
-    #     OHOS (same libc family), so fabricate local shim packages from
-    #     the musl tarballs: the binding file is renamed to what the
-    #     loaders require and `main` points straight at it, satisfying
-    #     both bare (`require('<ohos-name>')`) and subpath
+    #   * @ohos-npm-ports community forks embed the openharmony build in
+    #     the fork itself (yuku's loader already resolves the platform
+    #     suffix dynamically, so those forks carry no loader patch;
+    #     ast-grep and tsgolint add an openharmony branch). Wired via
+    #     overrides so the fork lands in the parent's slot — regular
+    #     dependencies (lightningcss, yuku, oxlint-tsgolint) then carry
+    #     their binding into the deployed tree past `deploy --no-optional`,
+    #     which strips the optionalDependency grafts below.
+    #   * @napi-rs/{wasm-tools,lzma,tar} ship no openharmony build anywhere
+    #     (napi-rs CLI 3.x supports the target; upstream just hasn't added
+    #     it to these packages' napi.targets yet). Their linux-arm64-musl
+    #     twins run on OHOS (same libc family), so fabricate local shim
+    #     packages from the musl tarballs: the binding file is renamed to
+    #     what the loaders require and `main` points straight at it,
+    #     satisfying both bare (`require('<ohos-name>')`) and subpath
     #     (`require('<ohos-name>/<file>.node')`) loader conventions. The
-    #     shims are grafted into the graph with packageExtensions (adds
-    #     the openharmony optionalDependency the parents don't declare)
-    #     and overrides (remaps it to the local shim) — one mechanism,
-    #     applied identically to the build tree and, via pnpm deploy, to
-    #     the deployed tree. Bottle signing is fully automatic (pipeline
-    #     ELF pass); nothing signs here.
+    #     shims are grafted into the build tree with packageExtensions
+    #     (adds the openharmony optionalDependency the parents don't
+    #     declare) and overrides (remaps it to the local shim). Bottle
+    #     signing is fully automatic (pipeline ELF pass); nothing signs
+    #     here.
     shims_dir = buildpath/"ohos-shims"
-    # [parent package, version, ohos binding package, musl binding package,
+    # [parent package, version, musl binding package,
     #  binding file name the loaders require]
     shims = [
-      ["yuku-codegen",    "0.5.44", "@yuku-codegen/binding", "yuku-codegen.node"],
-      ["yuku-codegen",    "0.7.0",  "@yuku-codegen/binding", "yuku-codegen.node"],
-      ["yuku-codegen",    "0.8.3",  "@yuku-codegen/binding", "yuku-codegen.node"],
-      ["yuku-parser",     "0.5.44", "@yuku-parser/binding",  "yuku-parser.node"],
-      ["yuku-parser",     "0.7.0",  "@yuku-parser/binding",  "yuku-parser.node"],
-      ["yuku-parser",     "0.8.3",  "@yuku-parser/binding",  "yuku-parser.node"],
-      ["@ast-grep/napi",  "0.43.0", "@ast-grep/napi",        "ast-grep-napi.node"],
       ["@napi-rs/wasm-tools", "1.0.1", "@napi-rs/wasm-tools", "wasm-tools.node"],
       ["@napi-rs/lzma",       "1.4.5", "@napi-rs/lzma",       "lzma.node"],
       ["@napi-rs/tar",        "1.1.0", "@napi-rs/tar",        "tar.node"],
@@ -114,7 +113,19 @@ class VitePlus < Formula
       tgz
     end
     overrides = {
-      "lightningcss" => "npm:@ohos-ports/lightningcss@1.33.0-1",
+      "lightningcss"             => "npm:@ohos-ports/lightningcss@1.33.0-1",
+      # yuku ships three versions in this graph, so each gets a qualified
+      # override; ast-grep/tsgolint have one.
+      "yuku-codegen@0.5.44"      => "npm:@ohos-npm-ports/yuku-codegen@0.5.44-1",
+      "yuku-codegen@0.7.0"       => "npm:@ohos-npm-ports/yuku-codegen@0.7.0-1",
+      "yuku-codegen@0.8.3"       => "npm:@ohos-npm-ports/yuku-codegen@0.8.3-1",
+      "yuku-parser@0.5.44"       => "npm:@ohos-npm-ports/yuku-parser@0.5.44-1",
+      "yuku-parser@0.7.0"        => "npm:@ohos-npm-ports/yuku-parser@0.7.0-1",
+      "yuku-parser@0.8.3"        => "npm:@ohos-npm-ports/yuku-parser@0.8.3-1",
+      "@ast-grep/napi@0.43.0"    => "npm:@ohos-npm-ports/ast-grep-napi@0.43.0-1",
+      # Type-aware lint backend — restores the wiring lost in the graph
+      # rewiring rework (deployed without it, `vp lint --type-aware` fails).
+      "oxlint-tsgolint@7.0.2001" => "npm:@ohos-npm-ports/oxlint-tsgolint@7.0.2001-1",
     }
     extensions = {}
     shims.each do |parent, version, binding_pkg, node_file|
