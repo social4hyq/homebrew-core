@@ -6,7 +6,7 @@ class SafCli < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abf411cf246e95303698595f9a8d5ee08143f42478aee37b76bc9527c79cc3d4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "68e82a56fea85f727a6cb32b5476d732e6110ce12c2a266c9d0f04404370e400"
   end
 
   depends_on "node"
