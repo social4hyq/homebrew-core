@@ -113,19 +113,22 @@ class VitePlus < Formula
       tgz
     end
     overrides = {
-      "lightningcss"             => "npm:@ohos-ports/lightningcss@1.33.0-1",
+      "lightningcss"          => "npm:@ohos-ports/lightningcss@1.33.0-1",
       # yuku ships three versions in this graph, so each gets a qualified
       # override; ast-grep/tsgolint have one.
-      "yuku-codegen@0.5.44"      => "npm:@ohos-npm-ports/yuku-codegen@0.5.44-1",
-      "yuku-codegen@0.7.0"       => "npm:@ohos-npm-ports/yuku-codegen@0.7.0-1",
-      "yuku-codegen@0.8.3"       => "npm:@ohos-npm-ports/yuku-codegen@0.8.3-1",
-      "yuku-parser@0.5.44"       => "npm:@ohos-npm-ports/yuku-parser@0.5.44-1",
-      "yuku-parser@0.7.0"        => "npm:@ohos-npm-ports/yuku-parser@0.7.0-1",
-      "yuku-parser@0.8.3"        => "npm:@ohos-npm-ports/yuku-parser@0.8.3-1",
-      "@ast-grep/napi@0.43.0"    => "npm:@ohos-npm-ports/ast-grep-napi@0.43.0-1",
+      "yuku-codegen@0.5.44"   => "npm:@ohos-npm-ports/yuku-codegen@0.5.44-1",
+      "yuku-codegen@0.7.0"    => "npm:@ohos-npm-ports/yuku-codegen@0.7.0-1",
+      "yuku-codegen@0.8.3"    => "npm:@ohos-npm-ports/yuku-codegen@0.8.3-1",
+      "yuku-parser@0.5.44"    => "npm:@ohos-npm-ports/yuku-parser@0.5.44-1",
+      "yuku-parser@0.7.0"     => "npm:@ohos-npm-ports/yuku-parser@0.7.0-1",
+      "yuku-parser@0.8.3"     => "npm:@ohos-npm-ports/yuku-parser@0.8.3-1",
+      "@ast-grep/napi@0.43.0" => "npm:@ohos-npm-ports/ast-grep-napi@0.43.0-1",
       # Type-aware lint backend — restores the wiring lost in the graph
       # rewiring rework (deployed without it, `vp lint --type-aware` fails).
-      "oxlint-tsgolint@7.0.2001" => "npm:@ohos-npm-ports/oxlint-tsgolint@7.0.2001-1",
+      # Bare key: packages/cli declares this via catalog:, and version-
+      # qualified selectors don't match catalog-resolved (=7.0.2001)
+      # specifiers — yuku/ast-grep above are plain ranges, which do.
+      "oxlint-tsgolint"       => "npm:@ohos-npm-ports/oxlint-tsgolint@7.0.2001-1",
     }
     extensions = {}
     shims.each do |parent, version, binding_pkg, node_file|
@@ -162,6 +165,10 @@ class VitePlus < Formula
     ws = YAML.safe_load(workspace_yaml.read)
     ws["overrides"] = overrides.merge(ws["overrides"] || {})
     ws["packageExtensions"] = extensions.merge(ws["packageExtensions"] || {})
+    # The workspace's minimumReleaseAge gate (24h) blocks freshly published
+    # community ports; the overrides above pin exact versions, so the pin
+    # itself is the trust decision — exempt both port scopes.
+    ws["minimumReleaseAgeExclude"] = (ws["minimumReleaseAgeExclude"] || []).push("@ohos-ports/*", "@ohos-npm-ports/*")
     File.write(workspace_yaml, YAML.dump(ws))
     # -------------------------------------------------------------------------
 
