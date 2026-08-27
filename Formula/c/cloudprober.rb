@@ -7,7 +7,7 @@ class Cloudprober < Formula
   head "https://github.com/cloudprober/cloudprober.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5b5f4d703b109ee6fa0b7099a672b5fa55c1daf6d398faf63f5714c613cd3905"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bcf1e73017961d67653986cfab1b4004be530ce1e6161314061dddf0d0ab39eb"
   end
 
   depends_on "go" => :build
