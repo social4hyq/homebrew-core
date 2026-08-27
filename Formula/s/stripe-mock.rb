@@ -1,8 +1,8 @@
 class StripeMock < Formula
   desc "Mock HTTP server that responds like the real Stripe API"
   homepage "https://github.com/stripe/stripe-mock"
-  url "https://github.com/stripe/stripe-mock/archive/refs/tags/v0.202.0.tar.gz"
-  sha256 "163c3766c5ab332a8bf4e1a734ef7f8a329e0d56b1be07681272e7c98e030696"
+  url "https://github.com/stripe/stripe-mock/archive/refs/tags/v0.203.0.tar.gz"
+  sha256 "33a312e15291d77d8448fb4155bf6a9e606973795f22f52562b0fec3fcc3a12f"
   license "MIT"
 
   bottle do
