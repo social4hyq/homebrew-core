@@ -6,7 +6,7 @@ class StripeMock < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0bc84b3224ee65e077ce07034ae09d40f87e5033d344283276208c4d52de4922"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "254727abbeda92cd1d394c63f7864903a56b5c215843068e28593faefe64db3f"
   end
 
   depends_on "go" => :build
