@@ -18,7 +18,7 @@ class Nsd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f59bd5cf6396c14ee59e54645ab39d95d8deb0a2aca087714e5b098df63b9e74"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bec05bace43e22c239bac4bd5309eada5e30c63cd050950b5571cb83640139d9"
   end
 
   depends_on "pkgconf" => :build
