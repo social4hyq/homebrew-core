@@ -86,13 +86,13 @@ class OpencodeAT2 < Formula
         odie("opencode@2: @opentui/core override anchor not found in package.json")
     end
 
-    # Home dir fallback for global projects. See opencode.rb.
-    inreplace "packages/core/src/project.ts" do |s|
-      s.sub!('import path from "path"', "import os from \"os\"\nimport path from \"path\"") ||
-        odie("opencode@2: project.ts import anchor not found")
-      s.sub!("path.parse(input).root", "os.homedir()") ||
-        odie("opencode@2: project.ts path.parse anchor not found")
-    end
+    # Home dir fallback for global projects — dropped. Upstream's
+    # effect/drizzle-orm rewrite removed the live path.parse(input).root
+    # fallback from project.ts's resolve() itself (non-VCS directories now
+    # resolve to their real path, never the filesystem root). The only
+    # remaining path.parse(...).root is in the one-time v1→v2 DB migration,
+    # gated behind an existing legacy `session` table — unreachable for this
+    # formula, which has always tracked the v2 preview branch directly.
 
     # File watcher: add openharmony → inotify backend mapping so getBackend()
     # returns "inotify" instead of undefined on OHOS (enables native file watching).
