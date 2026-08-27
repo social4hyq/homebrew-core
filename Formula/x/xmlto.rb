@@ -12,7 +12,7 @@ class Xmlto < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "94efd5f034d11dbf8b9e7303cc0b626e4f76ffe2748c9d14b3be00a2f1ec5379"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e96a42aaf71f603ac145a4955b06b9da2582fe5e9dc4da9f984d00a673ef7fe5"
   end
 
   depends_on "autoconf" => :build
