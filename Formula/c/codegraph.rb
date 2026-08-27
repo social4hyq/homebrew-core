@@ -11,7 +11,7 @@ class Codegraph < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b350c42dc5b33f6c34f4f0ac87aba45ca50a15d6061fdf4175ca8eb833655b03"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "da26ffbcf26390fed9d7cc1cb5f5b2f00efe4269ab6f79ff2c4feb2e8a69086e"
   end
 
   depends_on "rust" => :build
