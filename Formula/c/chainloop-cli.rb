@@ -12,7 +12,7 @@ class ChainloopCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4760103bde8dc40ad5f12db20e492db83146f40a09b01d9af3155db43b2cf60f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ba3e2bea36360fee18d812074ec92a89ec8d1784dca45804851020d971bed2d"
   end
 
   depends_on "go" => :build
