@@ -3,8 +3,8 @@ class Repren < Formula
 
   desc "Rename anything using powerful regex search and replace"
   homepage "https://github.com/jlevy/repren"
-  url "https://files.pythonhosted.org/packages/3b/1d/0ec2ddc7a18e40e3dae7ad538d531f85f16c0f8fb798b2e4b19cf0308540/repren-3.1.0.tar.gz"
-  sha256 "cb79c0d0e0fdc8f26d445e2828a161aab095067d3a580c71e9c1587b33548ee4"
+  url "https://files.pythonhosted.org/packages/8f/2b/74f60c028f4ad0d74b700e508486cf837749c9d1d5a12d56c6086942375e/repren-3.1.1.tar.gz"
+  sha256 "f0bf25b08824bc9e34f343aaf6bd1ae8a88b54efb3520de3beb366847e57e98a"
   license "MIT"
 
   bottle do
