@@ -3,13 +3,13 @@ class Azqr < Formula
   homepage "https://azure.github.io/azqr/"
   # pull from git tag to get submodules
   url "https://github.com/Azure/azqr.git",
-      tag:      "v.4.0.0",
-      revision: "ed6b95888a221c576b53ec39aeb441242112ef4d"
+      tag:      "v.4.0.1",
+      revision: "ffda262cbccc33bf4f472c07f81758839b165b1a"
   license "MIT"
   head "https://github.com/Azure/azqr.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca5f041027a8735f7f0643adbebb1b9aae038aac1cad7682def641aa13fc6f1a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b6f44f164501f8db9cbe5a70b58bff09164df3aa2284a4ebdaadcea22d4e4ab6"
   end
 
   depends_on "go" => :build
