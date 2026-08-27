@@ -8,8 +8,7 @@ class Harfbuzz < Formula
   head "https://github.com/harfbuzz/harfbuzz.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c93e3a9c85aa4ad65e86463a662e720c7fa373148628c4ec1771570b03e08c7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdb92181729ee4b348ff08b941dd36f9847ce9f8128270e7b5f3b563fff3d932"
   end
 
   depends_on "gobject-introspection" => :build
