@@ -7,7 +7,7 @@ class Spicedb < Formula
   head "https://github.com/authzed/spicedb.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d671fe428958539ce0a92d2b7118e1efa4d81a4af484fbc1925a4c59cff08e77"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ec8065b52e935cffaa0e97347f4ca7a66359a78dac9e28d9b5166a210b8826b"
   end
 
   depends_on "go" => :build
