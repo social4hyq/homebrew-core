@@ -9,7 +9,7 @@ class Yoke < Formula
   head "https://github.com/yokecd/yoke.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "38a290339ccab11650002ee959a819574aab215dd811f5657d7a23b3f5e31ac2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9093acbfbda59af46bc7ffd62ce5b667fb71a83f18f58837d7795998e8c4fc7a"
   end
 
   depends_on "go" => :build
