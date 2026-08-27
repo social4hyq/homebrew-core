@@ -1,8 +1,8 @@
 class Spicedb < Formula
   desc "Open Source, Google Zanzibar-inspired database"
   homepage "https://authzed.com/docs/spicedb/getting-started/discovering-spicedb"
-  url "https://github.com/authzed/spicedb/archive/refs/tags/v1.56.0.tar.gz"
-  sha256 "e8c15ecc241e3f50feeab0c63062c961e4558608f25376623ce38e44ec3897b1"
+  url "https://github.com/authzed/spicedb/archive/refs/tags/v1.56.1.tar.gz"
+  sha256 "23b1af438a187e232333591684a0da26dd4b687d07f8a1777c5e22d9567d4712"
   license "Apache-2.0"
   head "https://github.com/authzed/spicedb.git", branch: "main"
 
