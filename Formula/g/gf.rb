@@ -7,7 +7,7 @@ class Gf < Formula
   head "https://github.com/gogf/gf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4eeb45b20a909b767c884071d495d733f144fa1bc1fac728dacceeb9228485c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "26579e08e833c95b27d38ac5094f1ee0b64b10bbb05bdc4c0bba1ad3ff437849"
   end
 
   depends_on "go" => [:build, :test]
