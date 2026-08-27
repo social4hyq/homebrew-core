@@ -4,6 +4,7 @@ class Xmlto < Formula
   url "http://ftp.debian.org/debian/pool/main/x/xmlto/xmlto_0.0.29.orig.tar.bz2"
   sha256 "6000d8e8f0f9040426c4f85d7ad86789bc88d4aeaef585c4d4110adb0b214f21"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url "https://pagure.io/xmlto.git"
@@ -11,7 +12,7 @@ class Xmlto < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "94efd5f034d11dbf8b9e7303cc0b626e4f76ffe2748c9d14b3be00a2f1ec5379"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e96a42aaf71f603ac145a4955b06b9da2582fe5e9dc4da9f984d00a673ef7fe5"
   end
 
   depends_on "autoconf" => :build
@@ -20,6 +21,7 @@ class Xmlto < Formula
 
   depends_on "docbook"
   depends_on "docbook-xsl"
+  depends_on "bash"
 
   uses_from_macos "libxslt"
 
@@ -39,6 +41,11 @@ class Xmlto < Formula
     system "autoreconf", "--force", "--install", "--verbose"
     system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
+    # Fix shebang and BASH variable: ensure brew bash is used regardless of what configure detected
+    inreplace bin/"xmlto" do |s|
+      s.gsub!(/^#!.*\/bash/, "#!#{Formula["bash"].opt_bin}/bash")
+      s.gsub!(/^BASH=.*\/bash/, "BASH=#{Formula["bash"].opt_bin}/bash")
+    end
   end
 
   test do
