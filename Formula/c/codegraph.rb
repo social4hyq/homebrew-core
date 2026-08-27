@@ -1,8 +1,8 @@
 class Codegraph < Formula
   desc "Pre-indexed code knowledge graph for AI coding agents — 100% local"
   homepage "https://github.com/colbymchenry/codegraph"
-  url "https://github.com/colbymchenry/codegraph/archive/refs/tags/v1.5.0.tar.gz"
-  sha256 "319758918f58418a8a576d24c7829ecfa9e68eff78ddf49f52455a27a79ec621"
+  url "https://github.com/colbymchenry/codegraph/archive/refs/tags/v1.6.0.tar.gz"
+  sha256 "9b264c584395e69595d0b8c602a7f5c65a19d16a26673953721829f32cfda119"
   license "MIT"
 
   livecheck do
@@ -11,7 +11,7 @@ class Codegraph < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b350c42dc5b33f6c34f4f0ac87aba45ca50a15d6061fdf4175ca8eb833655b03"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "da26ffbcf26390fed9d7cc1cb5f5b2f00efe4269ab6f79ff2c4feb2e8a69086e"
   end
 
   depends_on "rust" => :build
