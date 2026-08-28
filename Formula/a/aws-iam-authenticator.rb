@@ -1,8 +1,8 @@
 class AwsIamAuthenticator < Formula
   desc "Use AWS IAM credentials to authenticate to Kubernetes"
   homepage "https://github.com/kubernetes-sigs/aws-iam-authenticator"
-  url "https://github.com/kubernetes-sigs/aws-iam-authenticator/archive/refs/tags/v0.7.19.tar.gz"
-  sha256 "82d69cd6ae7910d376e345f7c7dfdce2289a2534a495334623c7de0a86578177"
+  url "https://github.com/kubernetes-sigs/aws-iam-authenticator/archive/refs/tags/v0.7.20.tar.gz"
+  sha256 "3e0a6d95d43add722e8a0fb44d6149e99175792c66b3543b9790c6d32e06780c"
   license "Apache-2.0"
   head "https://github.com/kubernetes-sigs/aws-iam-authenticator.git", branch: "master"
 
@@ -16,7 +16,7 @@ class AwsIamAuthenticator < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5456a0d27ca8f6e217046317e6eec802b0c34490f7a4dab4f8ea7b8f9d03cfd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb77cd802469a9a470f42e12f785dca5afab837c4faecb9fa61d389d2a5214f2"
   end
 
   depends_on "go" => :build
