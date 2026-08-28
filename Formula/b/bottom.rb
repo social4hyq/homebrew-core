@@ -1,8 +1,8 @@
 class Bottom < Formula
   desc "Yet another cross-platform graphical process/system monitor"
   homepage "https://clementtsang.github.io/bottom/"
-  url "https://github.com/ClementTsang/bottom/archive/refs/tags/0.14.8.tar.gz"
-  sha256 "be10adada9ec1e5dd741dcb5581c4e0ebd45cb5bdae213dd296b29511363a770"
+  url "https://github.com/ClementTsang/bottom/archive/refs/tags/0.14.9.tar.gz"
+  sha256 "1dbb940c763fb583b7e1c7dfa165b73ed9a0ba712e72cc97311c5b1c098d5b72"
   license "MIT"
   head "https://github.com/ClementTsang/bottom.git", branch: "main"
 
@@ -15,8 +15,7 @@ class Bottom < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "80535d4ceda3c9a171927da073e3022a4ded0039ecfdb356ea0089d7cb4377f7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "edbc59e32505627f0d05917cfad08488675872d5a9b6d094a55c047d49f4b200"
   end
 
   depends_on "rust" => :build
