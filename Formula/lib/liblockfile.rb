@@ -18,7 +18,7 @@ class Liblockfile < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b804522566a6c6511887c5a5d9c037845de7c6d9e3ee2878ac81d85392ed4eac"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "114beebd25b3389c1984bd067130dc6539112648d2395f0f9702f1efa59f09a2"
   end
 
   def install
