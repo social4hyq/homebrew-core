@@ -7,7 +7,7 @@ class Gator < Formula
   head "https://github.com/open-policy-agent/gatekeeper.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7c369d414c24c6e827ed49ba31d3b9df1aa7aaf12602a00cbbc16773da9a55f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b666e43a2e766d5cafa5eddd364b1e33d33ff670f264dd899c23e67d0fec973d"
   end
 
   depends_on "go" => :build
