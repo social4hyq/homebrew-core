@@ -1,8 +1,8 @@
 class FirebaseCli < Formula
   desc "Firebase command-line tools"
   homepage "https://firebase.google.com/docs/cli/"
-  url "https://registry.npmjs.org/firebase-tools/-/firebase-tools-15.28.1.tgz"
-  sha256 "c4b6dec1e0a9effe4b7777ec4cd0e9dec516ebd744d37355ab8ed6a706530b64"
+  url "https://registry.npmjs.org/firebase-tools/-/firebase-tools-15.28.2.tgz"
+  sha256 "200d7ff9fdeb1b88446386b1b0f3d0b5d0739920e11ac0b5fdbcb13a42576b7d"
   license "MIT"
 
   bottle do
