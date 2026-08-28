@@ -1,0 +1,76 @@
+--- liblockfile-1.17-orig/lockfile.c	2026-08-28 07:31:28.504000000 +0000
++++ liblockfile-1.17/lockfile.c	2026-08-28 07:32:22.316000000 +0000
+@@ -312,45 +312,40 @@
+ 
+ 
+ 		/*
+-		 *	Now lock by linking the tempfile to the lock.
+-		 *
+-		 *	KLUDGE: some people say the return code of
+-		 *	link() over NFS can't be trusted.
+-		 *	EXTRA FIX: the value of the nlink field
+-		 *	can't be trusted (may be cached).
++		 *	Now try to create the lockfile atomically.
++		 *	Use open(O_CREAT|O_EXCL) instead of link() since
++		 *	some filesystems (e.g. HarmonyOS HMDFS) don't
++		 *	support hard links.
+ 		 */
+-		(void)!link(tmplock, lockfile);
+-
+-		if (lstat(tmplock, &st1) < 0) {
+-			tmplock[0] = 0;
+-			return L_ERROR; /* Can't happen */
+-		}
+-
+-		if (lstat(lockfile, &st) < 0) {
+-			if (statfailed++ > 5) {
+-				/*
+-				 *	Normally, this can't happen; either
+-				 *	another process holds the lockfile or
+-				 *	we do. So if this error pops up
+-				 *	repeatedly, just exit...
+-				 */
++		{
++			int lockfd = open(lockfile,
++				O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC, 0644);
++			if (lockfd >= 0) {
++				/* Lock acquired - write PID to lockfile */
++				if (write(lockfd, pidbuf, pidlen) != pidlen) {
++					e = errno;
++					close(lockfd);
++					(void)unlink(lockfile);
++					(void)unlink(tmplock);
++					tmplock[0] = 0;
++					errno = e;
++					return L_TMPWRITE;
++				}
++				close(lockfd);
++				(void)unlink(tmplock);
++				tmplock[0] = 0;
++				return L_SUCCESS;
++			}
++			if (errno != EEXIST) {
++				/* Unexpected error */
+ 				e = errno;
+ 				(void)unlink(tmplock);
+ 				tmplock[0] = 0;
+ 				errno = e;
+-				return L_MAXTRYS;
++				return L_ERROR;
+ 			}
+-			continue;
+-		}
+-
+-		/*
+-		 *	See if we got the lock.
+-		 */
+-		if (st.st_rdev == st1.st_rdev &&
+-		    st.st_ino  == st1.st_ino) {
+-			(void)unlink(tmplock);
+-			tmplock[0] = 0;
+-			return L_SUCCESS;
++			/* EEXIST: lock held by another process,
++			 * fall through to stale lock check */
+ 		}
+ 		statfailed = 0;
+ 

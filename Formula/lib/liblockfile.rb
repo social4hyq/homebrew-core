@@ -4,6 +4,13 @@ class Liblockfile < Formula
   url "https://deb.debian.org/debian/pool/main/libl/liblockfile/liblockfile_1.17.orig.tar.gz"
   sha256 "6e937f3650afab4aac198f348b89b1ca42edceb17fb6bb0918f642143ccfd15e"
   license "LGPL-2.0-or-later"
+  revision 1
+
+  # Use open(O_CREAT|O_EXCL) instead of link() for lockfile creation.
+  # HarmonyOS HMDFS doesn't support hard links (link() returns EPERM).
+  patch do
+    file "Patches/liblockfile/0001-use-open-excl-instead-of-link.patch"
+  end
 
   livecheck do
     url "https://deb.debian.org/debian/pool/main/libl/liblockfile/"
@@ -11,7 +18,7 @@ class Liblockfile < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b804522566a6c6511887c5a5d9c037845de7c6d9e3ee2878ac81d85392ed4eac"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "114beebd25b3389c1984bd067130dc6539112648d2395f0f9702f1efa59f09a2"
   end
 
   def install
