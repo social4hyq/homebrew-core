@@ -7,7 +7,7 @@ class Atuin < Formula
   head "https://github.com/atuinsh/atuin.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1fc36618289db3812443637982cb2addc3d743ccb0aacf9a143d474431919bdb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c6e7a9148f113ac2ad07c2d1860a54061bdace8860a549accd2a77ff0fb5014"
   end
 
   depends_on "pkgconf" => :build
