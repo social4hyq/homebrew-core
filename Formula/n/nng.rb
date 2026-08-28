@@ -11,7 +11,7 @@ class Nng < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "39f210d906c220d7aa4cdaac4f3b0218c8ea758842e0b8bf2ebc62f17e5b1ab5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab30d6a8199e98f9fd70bdf6c488ab1202ff580501aa4078073867b628be0f39"
   end
 
   depends_on "asciidoctor" => :build
