@@ -1,8 +1,8 @@
 class Azcopy < Formula
   desc "Azure Storage data transfer utility"
   homepage "https://github.com/Azure/azure-storage-azcopy"
-  url "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.32.7.tar.gz"
-  sha256 "94dafadafaed121ee3a5c0a487b9fd3331e8c4e676a623ad53041d1ae0cba7b2"
+  url "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.32.8.tar.gz"
+  sha256 "07b362e171e193993b1d0384215e7bef34bc7dadaf681ba4ef5e8a1154bd1556"
   license "MIT"
   head "https://github.com/Azure/azure-storage-azcopy.git", branch: "main"
 
@@ -12,8 +12,7 @@ class Azcopy < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "44c1540ee46ee9f01eff83d820c9b1a38ab36bd9a76905786c9e0314109fed99"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5554908cb288bd66e72a159a61e2bc55f6706f8f65da83e44d458ac299992d6f"
   end
 
   depends_on "go" => :build
