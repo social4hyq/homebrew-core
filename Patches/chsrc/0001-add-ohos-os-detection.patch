@@ -1,0 +1,15 @@
+--- chsrc-0.2.7-orig/lib/xy.h	2026-08-28 08:54:44.848000000 +0000
++++ chsrc-0.2.7/lib/xy.h	2026-08-28 08:55:37.724000000 +0000
+@@ -1546,6 +1546,12 @@
+ void
+ _xy_detect_os ()
+ {
++#ifdef __OHOS__
++  /* HarmonyOS: treat as Linux-compatible for mirror source switching */
++  xy.on_linux = true;
++  xy.os_family = "unix";
++  return;
++#endif
+   /**
+    * 首先判断是否为 Windows
+    *
