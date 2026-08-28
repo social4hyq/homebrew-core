@@ -1,13 +1,13 @@
 class Syft < Formula
   desc "CLI for generating a Software Bill of Materials from container images"
   homepage "https://github.com/anchore/syft"
-  url "https://github.com/anchore/syft/archive/refs/tags/v1.51.0.tar.gz"
-  sha256 "d48bca3091ec4862f5041af6cbdeedb3f2322ae7a059199a22d99e099cabd4ae"
+  url "https://github.com/anchore/syft/archive/refs/tags/v1.51.1.tar.gz"
+  sha256 "da8d83cdca78f2c553e08a5ecb9734016a05adb904168531f582bebfbb9bb2cf"
   license "Apache-2.0"
   head "https://github.com/anchore/syft.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7aea77872de2c55c186317d7eaed10bd1f1318111594261620eaf63d0042d8a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61b5037e6f3fbdd8d3257bad16a31ce631c60aa21008f949eb2ac1cb6ad1b18f"
   end
 
   depends_on "go" => :build
