@@ -7,7 +7,7 @@ class Upx < Formula
   head "https://github.com/upx/upx.git", branch: "devel"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6992e6ce24563368fd43667858c09e24d41970dd8e29fd72bea18bbdede7615"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b78a7df5dd62779c85c2710ab07c569e74ccc3305d8022fa3da5a92dd30591a"
   end
 
   depends_on "cmake" => :build
