@@ -13,9 +13,9 @@ class OpencodeAT2 < Formula
   # snapshot is committed upstream as
   # packages/core/src/models-dev/snapshot.txt — no build-time fetch) and
   # restructured build.ts (app-assets; pass --skip-web-ui to skip the
-  # packages/app web build, which rm_r deletes). opentui is 0.5.3 now: its
-  # libopentui.so imports pthread_tryjoin_np, which OHOS musl lacks — the
-  # wrapper LD_PRELOADs a small shim providing it (see install).
+  # packages/app web build, which rm_r deletes). opentui is 0.5.8 now:
+  # @ohos-npm-ports/opentui-core fixes libopentui.so's pthread_tryjoin_np
+  # dependency at the source level (weak symbol), no LD_PRELOAD shim needed.
   # See social4hyq/ohos-opencode2 dev for canonical diff.
   url "https://github.com/anomalyco/opencode.git", revision: "ab6a01d1358ceefaca6073ee03084bffe1826595"
   version "0.0.0-beta-18314"
@@ -51,8 +51,8 @@ class OpencodeAT2 < Formula
   # bun r31 ohos-compat-shim is statically linked (no runtime shim dep).
   # v2 monorepo restructure: CLI moved packages/opencode → packages/cli
   # (binary renamed opencode2). Build script: packages/cli/script/build.ts.
-  # Native deps: opentui-core (@ohos-ports 0.5.3, needs pthread_tryjoin shim)
-  # + @parcel/watcher (@ohos-ports binary). `bun install --ignore-scripts`
+  # Native deps: opentui-core (@ohos-npm-ports 0.5.8-1) + @parcel/watcher
+  # (@ohos-ports binary). `bun install --ignore-scripts`
   # (lifecycle scripts irrelevant to signing).
   depends_on "bun" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
@@ -72,14 +72,15 @@ class OpencodeAT2 < Formula
     rm_r %w[packages/desktop packages/app packages/session-ui packages/web
             packages/www packages/storybook packages/enterprise]
 
-    # @ohos-ports overrides: opentui-core (0.5.3, dlopen loader patch +
-    # bundled libopentui.so) + parcel-watcher only. bun-pty is gone — the
-    # tip uses @lydell/node-pty, which the CLI graph never imports (no
-    # rebuild needed; verified against the pinned source).
+    # opentui-core (@ohos-npm-ports 0.5.8-1, dlopen loader patch + bundled
+    # libopentui.so, source-level pthread_tryjoin_np fix) + parcel-watcher
+    # (@ohos-ports). bun-pty is gone — the tip uses @lydell/node-pty, which
+    # the CLI graph never imports (no rebuild needed; verified against the
+    # pinned source).
     # The nil check makes a vanished anchor fail loudly.
     inreplace "package.json" do |s|
       overrides = [
-        '"@opentui/core": "npm:@ohos-ports/opentui-core@0.5.3",',
+        '"@opentui/core": "npm:@ohos-npm-ports/opentui-core@0.5.8-1",',
         '    "@parcel/watcher-linux-arm64-musl": "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1",',
       ]
       s.gsub!('"@opentui/core": "catalog:",', overrides.join("\n")) ||
@@ -203,35 +204,8 @@ class OpencodeAT2 < Formula
     mkdir_p libexec/"bin"
     libexec.install out => "bin/opencode2"
 
-    # opentui 0.5.3's libopentui.so imports pthread_tryjoin_np, which OHOS musl
-    # lacks (musl < 1.2.5; symbol confirmed absent from the device libc). The
-    # compiled binary dlopens that .so, so the wrapper LD_PRELOADs this shim:
-    # EBUSY while the target thread is still running, join once it has exited.
-    # Verified on a real OHOS device: resolveRenderLib() dlopen passes both
-    # un-bundled and after `bun build --compile` embedding (2026-08-15).
-    clang = formula_opt_bin("ohos-sdk")/"clang"
-    (buildpath/"pthread_tryjoin_shim.c").write <<~C
-      #define _GNU_SOURCE
-      #include <pthread.h>
-      #include <errno.h>
-
-      /* OHOS SDK's pthread.h omits the declaration even though musl exports it. */
-      extern int pthread_kill(pthread_t, int);
-
-      int pthread_tryjoin_np(pthread_t thread, void **retval) {
-        int rc = pthread_kill(thread, 0);
-        if (rc == 0) return EBUSY;
-        if (rc == ESRCH) return pthread_join(thread, retval);
-        return rc;
-      }
-    C
-    system clang, "-shared", "-fPIC", "-O2",
-           "-o", "libpthread_tryjoin.so", "pthread_tryjoin_shim.c"
-    libexec.install "libpthread_tryjoin.so"
-
     (bin/"opencode2").write <<~SH
       #!/bin/sh
-      export LD_PRELOAD="#{opt_libexec}/libpthread_tryjoin.so${LD_PRELOAD:+:$LD_PRELOAD}"
       export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share-v2}"
       exec "#{opt_libexec}/bin/opencode2" "$@"
     SH
