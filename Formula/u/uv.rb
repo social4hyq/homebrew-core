@@ -8,7 +8,7 @@ class Uv < Formula
   head "https://github.com/astral-sh/uv.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dc2b451599715aa5a8dbf1dfed51f43421dca508ce2f999448e6ca125f6313a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7620bdcb58a6a3363765a6ccabfe6d347400767b7acfbe3cd2929534de9a85ae"
   end
 
   depends_on "cmake" => :build
