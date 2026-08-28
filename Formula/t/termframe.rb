@@ -1,14 +1,13 @@
 class Termframe < Formula
   desc "Terminal output SVG screenshot tool"
   homepage "https://github.com/pamburus/termframe"
-  url "https://github.com/pamburus/termframe/archive/refs/tags/v0.8.7.tar.gz"
-  sha256 "25d60c50c8f5022434ddd04ada7cd7334c61eb55efb735b052e1489e26293cde"
+  url "https://github.com/pamburus/termframe/archive/refs/tags/v0.8.8.tar.gz"
+  sha256 "da1ead7aec5b35f28325f64b4f521f1660b361e5e1386d2964ab216bcd6ccb03"
   license "MIT"
   head "https://github.com/pamburus/termframe.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b17160a99d8c198cdb8a84729f95d69718df581db8ea2fc9eb019f4d82fe58d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "53abddb2cec3341e6ecb16bbe1c63ea1b1193cf7b251cc3fa676e0afa1712219"
   end
 
   depends_on "rust" => :build
