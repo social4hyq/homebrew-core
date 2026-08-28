@@ -7,7 +7,7 @@ class TronbytServer < Formula
   head "https://github.com/tronbyt/server.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b9a2fda4ac53a45fd4aaaec1d5b78b0db2805b9b300697bd5cad4fc7fe351a6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc78774e05ebddb6801b182ce7ca651175bf82ec0a2aebebb700e1e03a185858"
   end
 
   depends_on "go" => :build
