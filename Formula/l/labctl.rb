@@ -1,12 +1,12 @@
 class Labctl < Formula
   desc "CLI tool for interacting with iximiuz labs and playgrounds"
   homepage "https://github.com/iximiuz/labctl"
-  url "https://github.com/iximiuz/labctl/archive/refs/tags/v0.1.107.tar.gz"
-  sha256 "a7ff23773d2e4efff8a93f6f8ed9e1e85f1cbf86b6aeae0f205a1874b2d47ed2"
+  url "https://github.com/iximiuz/labctl/archive/refs/tags/v0.1.109.tar.gz"
+  sha256 "56cf54c4630cda92bd6608ac3648b8fd67aabecab18510aa03773a21137515f6"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "446bbe0fe839f63ea6adf76b040626d9f0d9559e6070e2440093f63c8511672b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "30dda2bb2ac7fa038a29d3f1c4c62777fe809f875b09294443986c51d4050f8c"
   end
 
   depends_on "go" => :build
