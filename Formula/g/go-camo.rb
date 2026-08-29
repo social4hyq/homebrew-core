@@ -7,7 +7,7 @@ class GoCamo < Formula
   head "https://github.com/cactus/go-camo.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b017df5ee105a946cf6cfb9876453e0ed0316318dba6ef88ce359b833c8bc823"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f963c74a26facb713ab234ae59bea7ca30bfaf427230b32bfb892fa70e23a92e"
   end
 
   depends_on "go" => :build
