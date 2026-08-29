@@ -13,12 +13,7 @@ class NetSnmp < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "aa3127d38dc1d35626fe7bd3e53e66bd88adea6ed7aca814ba55adbe47b7fabb"
-    sha256 arm64_sequoia: "6a1db83d132177a261003a10ad4f9392ef532b0eade1b831af53d2cf388c5d20"
-    sha256 arm64_sonoma:  "43a5e2de2d18ee41c5517bd121f28881a2b5add0935277dd749704866d58fde5"
-    sha256 sonoma:        "0ef82db8c6d4236ce288931fcc5529632f3b9fdd6bc10eb7a77f1fe54d0e3cca"
-    sha256 arm64_linux:   "0ff9a48126694d8c8eac3e6a7d01bd013cb22db2e88b8cc91135fe3f0eec1c26"
-    sha256 x86_64_linux:  "1105287f2a864a6c66b750dae9ba98d7a6fae7a30a1a729a6c3d47cb88ac6d54"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "56f9ed165a5404d8b9cb81e4fe7de48a0bd9e72b6fcea584387770ed835ae824"
   end
 
   keg_only :provided_by_macos
