@@ -1,8 +1,8 @@
 class Discount < Formula
   desc "C implementation of Markdown"
   homepage "https://www.pell.portland.or.us/~orc/Code/discount/"
-  url "https://www.pell.portland.or.us/~orc/Code/discount/discount-3.0.1.3.tar.bz2"
-  sha256 "a4e3d4ead2412905b9d07954331cfde30c30743c5e0e4c57f40b3c2659efa30e"
+  url "https://www.pell.portland.or.us/~orc/Code/discount/discount-3.0.2.0.tar.bz2"
+  sha256 "4747d9e745c2bb6fc0f2cf24ebf27d8f5cc61d08c01fafa54db419b604f1b674"
   license "BSD-3-Clause"
   head "https://github.com/Orc/discount.git", branch: "main"
 
