@@ -7,7 +7,7 @@ class GoPassboltCli < Formula
   head "https://github.com/passbolt/go-passbolt-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "598de60b5c755e140c1d43bf8c4addde7d453235d66151ee4f64336f7732eeae"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a673a6131c9be46f6471fa06b2e6f54f1fc70b0c76dd5f1e219c7511d86175a1"
   end
 
   depends_on "go" => :build
