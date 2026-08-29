@@ -7,7 +7,7 @@ class Imlib2 < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "37c08bdcee5f548ee3a4f333e50e3f5d9495506ad8023df89f7e57ada8679be0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d3e05a3805125d2b36bf494ba10b7d40c998d6600ed4e85e7072c7ff8c5f3b9"
   end
 
   depends_on "pkgconf" => :build
