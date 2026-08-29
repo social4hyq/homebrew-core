@@ -11,7 +11,7 @@ class Feh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae034f4e49cb11ef51a238e93d1136d818087b57f2f7c720473722355b22ba02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7125e030fdca5232b4658f3b6109d6d67c632406220ad91cc7efe84015c212c6"
   end
 
   depends_on "imlib2"
