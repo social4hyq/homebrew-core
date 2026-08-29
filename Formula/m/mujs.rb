@@ -13,7 +13,7 @@ class Mujs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "970b607951aaeae274158b0f44e8873e148d584c34ad19525645274d5e534648"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5572de1ae80e38e02a02ce3a77142b87c9693327da94e7e7d4708a964160abd8"
   end
 
   depends_on "pkgconf" => :test
