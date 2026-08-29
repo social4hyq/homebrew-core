@@ -4,6 +4,9 @@ class ClaudeCode < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.251.tgz"
   sha256 "7d9000a724acffeda935bdbd370dd97d50705826a81ed4240d4d0aa5bfb44367"
   license :cannot_represent # Anthropic Commercial Terms of Service
+  # extract-cli.mjs content changed (zstd-compressed .md asset extraction
+  # fix) without a version bump.
+  revision 1
   # npmmirror mirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org
   # (aarch64 SIMD AES path trapped by kernel); npmmirror (Aliyun CDN) doesn't.
   # Files are byte-identical (sha256 matches); wrapper tries npmmirror first,
@@ -147,6 +150,20 @@ class ClaudeCode < Formula
         Bun.write(outPath, src);
         return src;
       }
+      function isTextAsset(base) {
+        return base.endsWith(".js") || base.endsWith(".md") || base.endsWith(".txt");
+      }
+      // Some .md/.txt assets are stored zstd-compressed with a ".zst" suffix
+      // appended (e.g. "plugin-eval-quickref-<hash>.md.zst"); the extracted
+      // CLI's own asset reader detects the zstd frame magic and decompresses
+      // on read (Bun.zstdDecompressSync), so these must be extracted as raw
+      // bytes, not decoded as Latin1 text and re-encoded as UTF-8 — that
+      // round-trip corrupts any byte >= 0x80, which compressed data is full
+      // of, leaving a payload the decompressor rejects (or worse, one that
+      // "successfully" inflates to garbage).
+      function isCompressedAsset(base) {
+        return base.endsWith(".zst");
+      }
 
       // Extract every module-graph file next to the entry. Non-.js files keep
       // their basename; .js chunks land beside the entry so its relative
@@ -154,19 +171,24 @@ class ClaudeCode < Formula
       for (const f of files) {
         if (f.contents.len === 0) continue;
         const base = f.name.split("/").pop();
-        if (f !== entry && !base.endsWith(".js") && !base.endsWith(".md") && !base.endsWith(".txt")) continue;
-        emit(f, `${outDir}/${base}`);
+        if (f === entry || isTextAsset(base)) {
+          emit(f, `${outDir}/${base}`);
+        } else if (isCompressedAsset(base)) {
+          await Bun.write(`${outDir}/${base}`, buf.subarray(BASE + f.contents.off, BASE + f.contents.off + f.contents.len));
+        }
       }
 
       // The graph was built for bun's embedded virtual filesystem
       // ("/$bunfs/root/…"). Rewrite every such specifier to a relative one so
       // plain-bun execution resolves it against the extracted files on disk.
+      // Compressed assets are skipped here: they're binary, already written
+      // correctly above, and can't contain a bunfs specifier to rewrite.
       let rewritten = 0;
       for (const f of files) {
         if (f.contents.len === 0) continue;
         const base = f.name.split("/").pop();
         const isEntry = f === entry;
-        if (!isEntry && !base.endsWith(".js") && !base.endsWith(".md") && !base.endsWith(".txt")) continue;
+        if (!isEntry && !isTextAsset(base)) continue;
         const outPath = `${outDir}/${base}`;
         const src = latin1.decode(buf.subarray(BASE + f.contents.off, BASE + f.contents.off + f.contents.len));
         if (src.includes("/$bunfs/root/")) {
