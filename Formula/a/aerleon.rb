@@ -8,8 +8,10 @@ class Aerleon < Formula
   license "Apache-2.0"
   head "https://github.com/aerleon/aerleon.git", branch: "main"
 
+  revision 1
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "98632532cb4832a330913dcfcfa11377327e2eaf6fe4db1974b7e629874e050f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "766c6753b5e31b9e32aa128970118e4b214f101815447a2c5f8a3a8e537bebef"
   end
 
   depends_on "libyaml"
@@ -30,6 +32,10 @@ class Aerleon < Formula
   resource "typing-extensions" do
     url "https://files.pythonhosted.org/packages/f6/cc/6253133b5bb138fc3306cebfbda2c520f545d36b5be2c7255cc528bb45d6/typing_extensions-4.16.0.tar.gz"
     sha256 "dc983d19a509c94dba722ee6abd33940f7c05a89e243c47e907eb4db6f1a43e5"
+  end
+
+  patch do
+    file "Patches/aerleon/0001-use-abstract-namespace-socket.patch"
   end
 
   def install
