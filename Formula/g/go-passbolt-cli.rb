@@ -1,13 +1,13 @@
 class GoPassboltCli < Formula
   desc "CLI for passbolt"
   homepage "https://www.passbolt.com/"
-  url "https://github.com/passbolt/go-passbolt-cli/archive/refs/tags/v0.5.1.tar.gz"
-  sha256 "845383bb8c33ec97d1e708a3e5a7a9475c970d977876faa307271d2d6ff77115"
+  url "https://github.com/passbolt/go-passbolt-cli/archive/refs/tags/v0.5.2.tar.gz"
+  sha256 "a1956f16f207ee63fa6f6373ec93c9e3e4f9fc406af6424ac3ddd6962de11d14"
   license "MIT"
   head "https://github.com/passbolt/go-passbolt-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "598de60b5c755e140c1d43bf8c4addde7d453235d66151ee4f64336f7732eeae"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a673a6131c9be46f6471fa06b2e6f54f1fc70b0c76dd5f1e219c7511d86175a1"
   end
 
   depends_on "go" => :build
