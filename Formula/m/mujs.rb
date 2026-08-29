@@ -1,8 +1,8 @@
 class Mujs < Formula
   desc "Embeddable Javascript interpreter"
   homepage "https://www.mujs.com/"
-  url "https://mujs.com/downloads/mujs-1.3.9.tar.gz"
-  sha256 "956d5a20dd4efe5aa58673558787b9e2539255f9bf62585e90e1921fa040d89d"
+  url "https://mujs.com/downloads/mujs-1.3.10.tar.gz"
+  sha256 "6e36c15dbb84ff859320297c900852f241b131a7b6ddaea669ac9a65bd75571c"
   license "ISC"
   compatibility_version 1
   head "https://codeberg.org/ccxvii/mujs.git", branch: "master"
@@ -13,7 +13,7 @@ class Mujs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "970b607951aaeae274158b0f44e8873e148d584c34ad19525645274d5e534648"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5572de1ae80e38e02a02ce3a77142b87c9693327da94e7e7d4708a964160abd8"
   end
 
   depends_on "pkgconf" => :test
