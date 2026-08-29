@@ -8,12 +8,7 @@ class Aspell < Formula
   compatibility_version 1
 
   bottle do
-    sha256 arm64_tahoe:   "1039dbbb1d5abd5d4f78a211fdcaa5657456a153b2282bda45ebffe6c0ab1b70"
-    sha256 arm64_sequoia: "f071da3a05bb8d84d2df84df586f0e1a940934e630010f77673339ef69ee867d"
-    sha256 arm64_sonoma:  "59b57e67fc77ef33808fe1f09068374e26bedf89d6ac1401c6c3d4ebf944b617"
-    sha256 sonoma:        "d67764dd08b363fcb93aaf020abb592a42f7c21756f657d041107e5f2c103ad5"
-    sha256 arm64_linux:   "d1fa3353d7b6b6bd701d26c1bf3aeaf08c5651d1627d8752b5c875c16d4722d6"
-    sha256 x86_64_linux:  "e45cb5f81053dc9584b97659e14aa7c5e4698aa807fa9739b97008a1a62d8792"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9c9343c8d0955ca145babd7adb16b16076752e39d4068236e501814436042f8"
   end
 
   uses_from_macos "ncurses"
