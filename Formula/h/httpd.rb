@@ -9,7 +9,7 @@ class Httpd < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "85c14a9a5626e122fb6ae80e75c124eb65e1324c615798b38159c3abb2f98f00"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "936c118fa737ec7a4d383d43c9d5f79a132f572f32e7b2d71cdac4adfdcf72f5"
   end
 
   depends_on "apr"
