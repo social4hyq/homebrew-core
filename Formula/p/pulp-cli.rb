@@ -9,7 +9,7 @@ class PulpCli < Formula
   head "https://github.com/pulp/pulp-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "46ab42b7547a3090ab1b41510d0f941abf8de8bba7b503ed91cc8dec9b54b31d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "567ac73b5bd6de6554e063fa3015c6b20748721667ba7ceecaa88ef20c26f6ee"
   end
 
   depends_on "certifi" => :no_linkage
