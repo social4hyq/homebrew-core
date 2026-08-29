@@ -5,10 +5,11 @@ class Httpd < Formula
   mirror "https://downloads.apache.org/httpd/httpd-2.4.68.tar.bz2"
   sha256 "68c74d4df38c26bed4dfbdb8f3baf1eb532f3872357becc1bba5d136f6b63c06"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "85c14a9a5626e122fb6ae80e75c124eb65e1324c615798b38159c3abb2f98f00"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "936c118fa737ec7a4d383d43c9d5f79a132f572f32e7b2d71cdac4adfdcf72f5"
   end
 
   depends_on "apr"
@@ -89,9 +90,16 @@ class Httpd < Formula
     # glibc but fails on the musl-based OHOS loader ("Error relocating
     # mod_*.so: apr_palloc: symbol not found"). Link APR into modules directly
     # so each module records a NEEDED dependency on libapr-1/libaprutil-1.
+    #
+    # Cross-module references (e.g. mod_proxy_fcgi -> mod_proxy, mod_heartbeat
+    # -> mod_watchdog) also rely on the dlopen global symbol scope, which the
+    # OHOS loader does not provide by default ("proxy_hook_scheme_handler:
+    # symbol not found"). Marking every module DF_1_GLOBAL restores the plain
+    # Linux global-namespace behavior.
     inreplace "build/config_vars.mk",
               /^SH_LDFLAGS =.*$/,
-              "SH_LDFLAGS = -L#{formula_opt_lib("apr")} -lapr-1 " \
+              "SH_LDFLAGS = -Wl,-z,global " \
+              "-L#{formula_opt_lib("apr")} -lapr-1 " \
               "-L#{formula_opt_lib("apr-util")} -laprutil-1"
     system "make"
     ENV.deparallelize if OS.linux?
