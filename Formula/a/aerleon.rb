@@ -11,7 +11,7 @@ class Aerleon < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "98632532cb4832a330913dcfcfa11377327e2eaf6fe4db1974b7e629874e050f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "766c6753b5e31b9e32aa128970118e4b214f101815447a2c5f8a3a8e537bebef"
   end
 
   depends_on "libyaml"
