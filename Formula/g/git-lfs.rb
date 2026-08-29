@@ -1,8 +1,8 @@
 class GitLfs < Formula
   desc "Git extension for versioning large files"
   homepage "https://git-lfs.com/"
-  url "https://github.com/git-lfs/git-lfs/releases/download/v3.7.1/git-lfs-v3.7.1.tar.gz"
-  sha256 "8f56058622edfea1d111e50e9844ef2f5ce670b2dbe4d55d48e765c943af4351"
+  url "https://github.com/git-lfs/git-lfs/releases/download/v3.8.0/git-lfs-v3.8.0.tar.gz"
+  sha256 "4f75492c6832038fa73d39a45316657208bb6caa23b273451cb4ec2358d42ccb"
   license "MIT"
   compatibility_version 1
 
@@ -14,7 +14,7 @@ class GitLfs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "088ef307cbd29f21975d60d8971616fd6d9d40bf9c295508ff2b9baa16c1a994"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29f0d0d49bb95ed9fc2d019ecdf602623dcf7b8eb105f91a2d705c6ab412a312"
   end
 
   depends_on "asciidoctor" => :build
