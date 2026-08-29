@@ -12,7 +12,7 @@ class Libmsquic < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e37f952342539d69e69bf6edf3afd31a6a89c6fca58e1b2bdcbac6c64ea3e17"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "43ecf030cb7c41ce45c3f1a6dea33ee82af066f855459fa87777d021f3437880"
   end
 
   depends_on "cmake" => :build
