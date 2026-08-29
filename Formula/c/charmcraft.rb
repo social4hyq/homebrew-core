@@ -3,13 +3,13 @@ class Charmcraft < Formula
 
   desc "Tool to build charms and publish them on Charmhub"
   homepage "https://charmhub.io"
-  url "https://files.pythonhosted.org/packages/bc/14/ed6f26a4418998c9c50d0a3439c12def5b96c4c024f94b2164c76556149c/charmcraft-4.4.1.tar.gz"
-  sha256 "00228ffeaea667f7b775beb5a222606585150f1387d5edcdac108ac77b2a07fe"
+  url "https://files.pythonhosted.org/packages/f0/69/5de016b09ea7ec5bfec15e14a791a1c8e48e6813e21ed6f6fc8f0e87658d/charmcraft-4.4.2.tar.gz"
+  sha256 "b65b8c3af08f64bfda0f4cf699769123f07914364395d2d9cd765a9e621377ac"
   license "Apache-2.0"
   head "https://github.com/canonical/charmcraft.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "17504230a979240442afd9e19504e07448027b00da651ffdf7a9536b5228e3bd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "24d692d7b84cc08111196c49af1bfe4c88f387d1ed7606c0ae5194ed644dff0d"
   end
 
   depends_on "certifi" => :no_linkage
@@ -63,8 +63,8 @@ class Charmcraft < Formula
   end
 
   resource "craft-parts" do
-    url "https://files.pythonhosted.org/packages/0c/c6/3cdccef7c6b5d268ec2ceac05aaa5707ed6a25af46df30fc105fa227f533/craft_parts-2.35.0.tar.gz"
-    sha256 "63a236a3a9518506498f7a8bc351145f587977649bab80b633813270b5011a5c"
+    url "https://files.pythonhosted.org/packages/0e/e8/436812aa3d486893af5c69f3373003e9b9015720fcef23383a829b028afe/craft_parts-2.35.1.tar.gz"
+    sha256 "2467399997544ec249c4499ecc622d029dd9609d395da1e6c03781f9d29589aa"
   end
 
   resource "craft-platforms" do
@@ -213,8 +213,8 @@ class Charmcraft < Formula
   end
 
   resource "platformdirs" do
-    url "https://files.pythonhosted.org/packages/50/bb/ebc6636e1ae41314f796ebb7215fd28febb45f9aac72f2b04cb74b5071dc/platformdirs-4.11.4.tar.gz"
-    sha256 "f3373be828247211d0febabea97e238c3dfde8a60b3c90c32756fb52cb21556d"
+    url "https://files.pythonhosted.org/packages/ea/06/cf1564dcc2e2261c8c8c6c05628dc8b418943bdae2a4e58640ceb2f770fa/platformdirs-4.11.5.tar.gz"
+    sha256 "e8b31f4f8bcbbedef91a6b57a706255e4f148d2a4e01648382a0a47342539173"
   end
 
   resource "protobuf" do
