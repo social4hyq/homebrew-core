@@ -35,12 +35,7 @@ class PhpAT83 < Formula
   end
 
   bottle do
-    sha256 arm64_tahoe:   "e2808123926bd2133ed9170bc984d31e78b6427ee6af850486d2b89ddb6c9877"
-    sha256 arm64_sequoia: "7f2ec11cd59bb8e825e517df73d4fd880983b7b9a62911dad2ec2be49de04ce9"
-    sha256 arm64_sonoma:  "1543b8d7c32ad17524c1e7dcaf8f058ab91ffc980baeea2e4673d1720cec0363"
-    sha256 sonoma:        "5c63c0f8e31c97b9224fa497884361f27611c0bdc0c23da6e205c40b289c22fc"
-    sha256 arm64_linux:   "9e70b2a2c7245e04d58dee8f4d1a8e4471f6c78d982fc6fa8a3402eae026441c"
-    sha256 x86_64_linux:  "6a7c2fe30286539becbe45363d347833b3101b4de339813f8e2a286ea07ba8f8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8857c337a2404da20a0d96285ac79a0705dbc8aad004e19dc51430434cab5a15"
   end
 
   keg_only :versioned_formula
