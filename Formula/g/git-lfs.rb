@@ -14,7 +14,7 @@ class GitLfs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "088ef307cbd29f21975d60d8971616fd6d9d40bf9c295508ff2b9baa16c1a994"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29f0d0d49bb95ed9fc2d019ecdf602623dcf7b8eb105f91a2d705c6ab412a312"
   end
 
   depends_on "asciidoctor" => :build
