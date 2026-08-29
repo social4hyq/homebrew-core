@@ -7,7 +7,7 @@ class Slowhttptest < Formula
   head "https://github.com/shekyan/slowhttptest.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3cd4d4b1f247aea8055ae8e455a365fd1576e6ea1aa2d983534d5fa2ed22386c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a4698cc2228f098e645822f19c98715fd4763b6381df8be58358fb5c3de1480"
   end
 
   depends_on "openssl@4"
