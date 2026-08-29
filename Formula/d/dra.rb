@@ -7,7 +7,7 @@ class Dra < Formula
   head "https://github.com/devmatteini/dra.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6218b5c71b8c4e019bdb811f32c34be52aabb26e08cfcee505e49fdddcbc89bf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f206e8a880a2b60b1bbd0cb76a37f53b72c3af482ed9126c5dbccc1e2839de92"
   end
 
   depends_on "rust" => :build
