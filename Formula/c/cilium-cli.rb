@@ -15,7 +15,7 @@ class CiliumCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "260adb08e4d3869f042a1b84034fb6c43ef9a60251c4bc1e24c4676331c5e93c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1ddfda7a4e5b8d7b8f99a4c20681335187f8d0d9743f52f09d1da32c382c2fb"
   end
 
   depends_on "go" => :build
