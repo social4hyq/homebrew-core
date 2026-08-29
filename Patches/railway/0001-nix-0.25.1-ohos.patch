@@ -1,0 +1,532 @@
+diff -ruN nix-0.25.1/src/fcntl.rs nix-0.25.1-ohos-fixed/src/fcntl.rs
+--- nix-0.25.1/src/fcntl.rs	2006-07-24 01:21:28.000000000 +0000
++++ nix-0.25.1-ohos-fixed/src/fcntl.rs	2026-09-01 03:18:03.872542676 +0000
+@@ -104,7 +104,7 @@
+         #[cfg(any(target_os = "dragonfly",
+                   target_os = "freebsd",
+                   target_os = "ios",
+-                  all(target_os = "linux", not(target_env = "musl")),
++                  all(target_os = "linux", not(any(target_env = "musl", target_env = "ohos"))),
+                   target_os = "macos",
+                   target_os = "netbsd",
+                   target_os = "openbsd",
+diff -ruN nix-0.25.1/src/lib.rs nix-0.25.1-ohos-fixed/src/lib.rs
+--- nix-0.25.1/src/lib.rs	2006-07-24 01:21:28.000000000 +0000
++++ nix-0.25.1-ohos-fixed/src/lib.rs	2026-09-01 03:20:03.026976361 +0000
+@@ -114,7 +114,7 @@
+ #[cfg(any(
+     target_os = "dragonfly",
+     target_os = "freebsd",
+-    target_os = "linux",
++    all(target_os = "linux", not(target_env = "ohos")),
+     target_os = "netbsd"
+ ))]
+ feature! {
+diff -ruN nix-0.25.1/src/sys/ioctl/linux.rs nix-0.25.1-ohos-fixed/src/sys/ioctl/linux.rs
+--- nix-0.25.1/src/sys/ioctl/linux.rs	2006-07-24 01:21:28.000000000 +0000
++++ nix-0.25.1-ohos-fixed/src/sys/ioctl/linux.rs	2026-09-01 03:18:03.877542653 +0000
+@@ -1,8 +1,8 @@
+ /// The datatype used for the ioctl number
+-#[cfg(any(target_os = "android", target_env = "musl"))]
++#[cfg(any(target_os = "android", any(target_env = "musl", target_env = "ohos")))]
+ #[doc(hidden)]
+ pub type ioctl_num_type = ::libc::c_int;
+-#[cfg(not(any(target_os = "android", target_env = "musl")))]
++#[cfg(not(any(target_os = "android", any(target_env = "musl", target_env = "ohos"))))]
+ #[doc(hidden)]
+ pub type ioctl_num_type = ::libc::c_ulong;
+ /// The datatype used for the 3rd argument
+diff -ruN nix-0.25.1/src/sys/mman.rs nix-0.25.1-ohos-fixed/src/sys/mman.rs
+--- nix-0.25.1/src/sys/mman.rs	2006-07-24 01:21:28.000000000 +0000
++++ nix-0.25.1-ohos-fixed/src/sys/mman.rs	2026-09-01 03:18:03.895542567 +0000
+@@ -59,7 +59,7 @@
+         /// Put the mapping into the first 2GB of the process address space.
+         #[cfg(any(all(any(target_os = "android", target_os = "linux"),
+                       any(target_arch = "x86", target_arch = "x86_64")),
+-                  all(target_os = "linux", target_env = "musl", any(target_arch = "x86", target_arch = "x86_64")),
++                  all(target_os = "linux", any(target_env = "musl", target_env = "ohos"), any(target_arch = "x86", target_arch = "x86_64")),
+                   all(target_os = "freebsd", target_pointer_width = "64")))]
+         #[cfg_attr(docsrs, doc(cfg(all())))]
+         MAP_32BIT;
+diff -ruN nix-0.25.1/src/sys/mod.rs nix-0.25.1-ohos-fixed/src/sys/mod.rs
+--- nix-0.25.1/src/sys/mod.rs	2006-07-24 01:21:28.000000000 +0000
++++ nix-0.25.1-ohos-fixed/src/sys/mod.rs	2026-09-01 03:19:27.263146339 +0000
+@@ -3,7 +3,7 @@
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "ios",
+-    all(target_os = "linux", not(target_env = "uclibc")),
++    all(target_os = "linux", not(any(target_env = "uclibc", target_env = "ohos"))),
+     target_os = "macos",
+     target_os = "netbsd"
+ ))]
+diff -ruN nix-0.25.1/src/sys/personality.rs nix-0.25.1-ohos-fixed/src/sys/personality.rs
+--- nix-0.25.1/src/sys/personality.rs	2006-07-24 01:21:28.000000000 +0000
++++ nix-0.25.1-ohos-fixed/src/sys/personality.rs	2026-09-01 03:18:03.885542615 +0000
+@@ -20,7 +20,7 @@
+         /// [`mmap(2)`]: https://man7.org/linux/man-pages/man2/mmap.2.html
+         ADDR_LIMIT_3GB;
+         /// User-space function pointers to signal handlers point to descriptors.
+-        #[cfg(not(any(target_env = "musl", target_env = "uclibc")))]
++        #[cfg(not(any(any(target_env = "musl", target_env = "ohos"), target_env = "uclibc")))]
+         #[cfg_attr(docsrs, doc(cfg(all())))]
+         FDPIC_FUNCPTRS;
+         /// Map page 0 as read-only.
+@@ -42,7 +42,7 @@
+         /// version number.
+         ///
+         /// [`uname(2)`]: https://man7.org/linux/man-pages/man2/uname.2.html
+-        #[cfg(not(any(target_env = "musl", target_env = "uclibc")))]
++        #[cfg(not(any(any(target_env = "musl", target_env = "ohos"), target_env = "uclibc")))]
+         #[cfg_attr(docsrs, doc(cfg(all())))]
+         UNAME26;
+         /// No effects.
+diff -ruN nix-0.25.1/src/sys/ptrace/linux.rs nix-0.25.1-ohos-fixed/src/sys/ptrace/linux.rs
+--- nix-0.25.1/src/sys/ptrace/linux.rs	2006-07-24 01:21:28.000000000 +0000
++++ nix-0.25.1-ohos-fixed/src/sys/ptrace/linux.rs	2026-09-01 03:18:03.893542577 +0000
+@@ -13,7 +13,7 @@
+ #[cfg(all(
+     target_os = "linux",
+     any(all(target_arch = "x86_64",
+-            any(target_env = "gnu", target_env = "musl")),
++            any(target_env = "gnu", any(target_env = "musl", target_env = "ohos"))),
+         all(target_arch = "x86", target_env = "gnu"))
+ ))]
+ use libc::user_regs_struct;
+@@ -31,8 +31,8 @@
+ }
+ 
+ libc_enum!{
+-    #[cfg_attr(not(any(target_env = "musl", target_env = "uclibc", target_os = "android")), repr(u32))]
+-    #[cfg_attr(any(target_env = "musl", target_env = "uclibc", target_os = "android"), repr(i32))]
++    #[cfg_attr(not(any(any(target_env = "musl", target_env = "ohos"), target_env = "uclibc", target_os = "android")), repr(u32))]
++    #[cfg_attr(any(any(target_env = "musl", target_env = "ohos"), target_env = "uclibc", target_os = "android"), repr(i32))]
+     /// Ptrace Request enum defining the action to be taken.
+     #[non_exhaustive]
+     pub enum Request {
+@@ -47,28 +47,28 @@
+         PTRACE_KILL,
+         PTRACE_SINGLESTEP,
+         #[cfg(any(all(target_os = "android", target_pointer_width = "32"),
+-                  all(target_os = "linux", any(target_env = "musl",
++                  all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"),
+                                                target_arch = "mips",
+                                                target_arch = "mips64",
+                                                target_arch = "x86_64",
+                                                target_pointer_width = "32"))))]
+         PTRACE_GETREGS,
+         #[cfg(any(all(target_os = "android", target_pointer_width = "32"),
+-                  all(target_os = "linux", any(target_env = "musl",
++                  all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"),
+                                                target_arch = "mips",
+                                                target_arch = "mips64",
+                                                target_arch = "x86_64",
+                                                target_pointer_width = "32"))))]
+         PTRACE_SETREGS,
+         #[cfg(any(all(target_os = "android", target_pointer_width = "32"),
+-                  all(target_os = "linux", any(target_env = "musl",
++                  all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"),
+                                                target_arch = "mips",
+                                                target_arch = "mips64",
+                                                target_arch = "x86_64",
+                                                target_pointer_width = "32"))))]
+         PTRACE_GETFPREGS,
+         #[cfg(any(all(target_os = "android", target_pointer_width = "32"),
+-                  all(target_os = "linux", any(target_env = "musl",
++                  all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"),
+                                                target_arch = "mips",
+                                                target_arch = "mips64",
+                                                target_arch = "x86_64",
+@@ -76,13 +76,13 @@
+         PTRACE_SETFPREGS,
+         PTRACE_ATTACH,
+         PTRACE_DETACH,
+-        #[cfg(all(target_os = "linux", any(target_env = "musl",
++        #[cfg(all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"),
+                                            target_arch = "mips",
+                                            target_arch = "mips64",
+                                            target_arch = "x86",
+                                            target_arch = "x86_64")))]
+         PTRACE_GETFPXREGS,
+-        #[cfg(all(target_os = "linux", any(target_env = "musl",
++        #[cfg(all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"),
+                                            target_arch = "mips",
+                                            target_arch = "mips64",
+                                            target_arch = "x86",
+@@ -193,7 +193,7 @@
+ #[cfg(all(
+     target_os = "linux",
+     any(all(target_arch = "x86_64",
+-            any(target_env = "gnu", target_env = "musl")),
++            any(target_env = "gnu", any(target_env = "musl", target_env = "ohos"))),
+         all(target_arch = "x86", target_env = "gnu"))
+ ))]
+ pub fn getregs(pid: Pid) -> Result<user_regs_struct> {
+@@ -204,7 +204,7 @@
+ #[cfg(all(
+     target_os = "linux",
+     any(all(target_arch = "x86_64",
+-            any(target_env = "gnu", target_env = "musl")),
++            any(target_env = "gnu", any(target_env = "musl", target_env = "ohos"))),
+         all(target_arch = "x86", target_env = "gnu"))
+ ))]
+ pub fn setregs(pid: Pid, regs: user_regs_struct) -> Result<()> {
+diff -ruN nix-0.25.1/src/sys/signal.rs nix-0.25.1-ohos-fixed/src/sys/signal.rs
+--- nix-0.25.1/src/sys/signal.rs	2006-07-24 01:21:28.000000000 +0000
++++ nix-0.25.1-ohos-fixed/src/sys/signal.rs	2026-09-01 03:18:03.890542591 +0000
+@@ -1068,7 +1068,7 @@
+                 SigevNotify::SigevThreadId{..} => libc::SIGEV_THREAD_ID,
+                 #[cfg(all(target_os = "linux", target_env = "uclibc"))]
+                 SigevNotify::SigevThreadId{..} => libc::SIGEV_THREAD_ID,
+-                #[cfg(any(all(target_os = "linux", target_env = "musl"), target_arch = "mips"))]
++                #[cfg(any(all(target_os = "linux", any(target_env = "musl", target_env = "ohos")), target_arch = "mips"))]
+                 SigevNotify::SigevThreadId{..} => 4  // No SIGEV_THREAD_ID defined
+             };
+             sev.sigev_signo = match sigev_notify {
+diff -ruN nix-0.25.1/src/sys/socket/mod.rs nix-0.25.1-ohos-fixed/src/sys/socket/mod.rs
+--- nix-0.25.1/src/sys/socket/mod.rs	2006-07-24 01:21:28.000000000 +0000
++++ nix-0.25.1-ohos-fixed/src/sys/socket/mod.rs	2026-09-01 03:18:03.880542638 +0000
+@@ -1181,13 +1181,13 @@
+     /// The value of CMSG_LEN on this message.
+     /// Safe because CMSG_LEN is always safe
+     #[cfg(any(target_os = "android",
+-              all(target_os = "linux", not(target_env = "musl"))))]
++              all(target_os = "linux", not(any(target_env = "musl", target_env = "ohos")))))]
+     fn cmsg_len(&self) -> usize {
+         unsafe{CMSG_LEN(self.len() as libc::c_uint) as usize}
+     }
+ 
+     #[cfg(not(any(target_os = "android",
+-                  all(target_os = "linux", not(target_env = "musl")))))]
++                  all(target_os = "linux", not(any(target_env = "musl", target_env = "ohos"))))))]
+     fn cmsg_len(&self) -> libc::c_uint {
+         unsafe{CMSG_LEN(self.len() as libc::c_uint)}
+     }
+diff -ruN nix-0.25.1/src/sys/statfs.rs nix-0.25.1-ohos-fixed/src/sys/statfs.rs
+--- nix-0.25.1/src/sys/statfs.rs	2006-07-24 01:21:28.000000000 +0000
++++ nix-0.25.1-ohos-fixed/src/sys/statfs.rs	2026-09-01 03:18:03.888542600 +0000
+@@ -29,11 +29,11 @@
+ type fs_type_t = libc::c_ulong;
+ #[cfg(all(target_os = "linux", target_arch = "s390x"))]
+ type fs_type_t = libc::c_uint;
+-#[cfg(all(target_os = "linux", target_env = "musl"))]
++#[cfg(all(target_os = "linux", any(target_env = "musl", target_env = "ohos")))]
+ type fs_type_t = libc::c_ulong;
+ #[cfg(all(target_os = "linux", target_env = "uclibc"))]
+ type fs_type_t = libc::c_int;
+-#[cfg(all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl", target_env = "uclibc"))))]
++#[cfg(all(target_os = "linux", not(any(target_arch = "s390x", any(target_env = "musl", target_env = "ohos"), target_env = "uclibc"))))]
+ type fs_type_t = libc::__fsword_t;
+ 
+ /// Describes the file system type as known by the operating system.
+@@ -41,8 +41,8 @@
+     target_os = "freebsd",
+     target_os = "android",
+     all(target_os = "linux", target_arch = "s390x"),
+-    all(target_os = "linux", target_env = "musl"),
+-    all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl"))),
++    all(target_os = "linux", any(target_env = "musl", target_env = "ohos")),
++    all(target_os = "linux", not(any(target_arch = "s390x", any(target_env = "musl", target_env = "ohos")))),
+ ))]
+ #[derive(Eq, Copy, Clone, PartialEq, Debug)]
+ pub struct FsType(pub fs_type_t);
+@@ -252,7 +252,7 @@
+     /// Optimal transfer block size
+     #[cfg(any(
+         target_os = "android",
+-        all(target_os = "linux", target_env = "musl")
++        all(target_os = "linux", any(target_env = "musl", target_env = "ohos"))
+     ))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn optimal_transfer_size(&self) -> libc::c_ulong {
+@@ -260,7 +260,7 @@
+     }
+ 
+     /// Optimal transfer block size
+-    #[cfg(all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl", target_env = "uclibc"))))]
++    #[cfg(all(target_os = "linux", not(any(target_arch = "s390x", any(target_env = "musl", target_env = "ohos"), target_env = "uclibc"))))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn optimal_transfer_size(&self) -> libc::__fsword_t {
+         self.0.f_bsize
+@@ -304,7 +304,7 @@
+ 
+     /// Size of a block
+     // f_bsize on linux: https://github.com/torvalds/linux/blob/master/fs/nfs/super.c#L471
+-    #[cfg(all(target_os = "linux", target_env = "musl"))]
++    #[cfg(all(target_os = "linux", any(target_env = "musl", target_env = "ohos")))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn block_size(&self) -> libc::c_ulong {
+         self.0.f_bsize
+@@ -320,7 +320,7 @@
+ 
+     /// Size of a block
+     // f_bsize on linux: https://github.com/torvalds/linux/blob/master/fs/nfs/super.c#L471
+-    #[cfg(all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl", target_env = "uclibc"))))]
++    #[cfg(all(target_os = "linux", not(any(target_arch = "s390x", any(target_env = "musl", target_env = "ohos"), target_env = "uclibc"))))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn block_size(&self) -> libc::__fsword_t {
+         self.0.f_bsize
+@@ -362,7 +362,7 @@
+     }
+ 
+     /// Maximum length of filenames
+-    #[cfg(all(target_os = "linux", target_env = "musl"))]
++    #[cfg(all(target_os = "linux", any(target_env = "musl", target_env = "ohos")))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn maximum_name_length(&self) -> libc::c_ulong {
+         self.0.f_namelen
+@@ -376,7 +376,7 @@
+     }
+ 
+     /// Maximum length of filenames
+-    #[cfg(all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl", target_env = "uclibc"))))]
++    #[cfg(all(target_os = "linux", not(any(target_arch = "s390x", any(target_env = "musl", target_env = "ohos"), target_env = "uclibc"))))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn maximum_name_length(&self) -> libc::__fsword_t {
+         self.0.f_namelen
+@@ -410,7 +410,7 @@
+     }
+ 
+     /// Total data blocks in filesystem
+-    #[cfg(all(target_os = "linux", any(target_env = "musl", target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32"))))]
++    #[cfg(all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"), target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32"))))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn blocks(&self) -> u64 {
+         self.0.f_blocks
+@@ -424,7 +424,7 @@
+         target_os = "freebsd",
+         target_os = "openbsd",
+         target_os = "dragonfly",
+-        all(target_os = "linux", any(target_env = "musl", target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32")))
++        all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"), target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32")))
+     )))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn blocks(&self) -> libc::c_ulong {
+@@ -452,7 +452,7 @@
+     }
+ 
+     /// Free blocks in filesystem
+-    #[cfg(all(target_os = "linux", any(target_env = "musl", target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32"))))]
++    #[cfg(all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"), target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32"))))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn blocks_free(&self) -> u64 {
+         self.0.f_bfree
+@@ -466,7 +466,7 @@
+         target_os = "freebsd",
+         target_os = "openbsd",
+         target_os = "dragonfly",
+-        all(target_os = "linux", any(target_env = "musl", target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32")))
++        all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"), target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32")))
+     )))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn blocks_free(&self) -> libc::c_ulong {
+@@ -495,7 +495,7 @@
+     }
+ 
+     /// Free blocks available to unprivileged user
+-    #[cfg(all(target_os = "linux", any(target_env = "musl", target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32"))))]
++    #[cfg(all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"), target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32"))))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn blocks_available(&self) -> u64 {
+         self.0.f_bavail
+@@ -509,7 +509,7 @@
+         target_os = "freebsd",
+         target_os = "openbsd",
+         target_os = "dragonfly",
+-        all(target_os = "linux", any(target_env = "musl", target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32")))
++        all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"), target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32")))
+     )))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn blocks_available(&self) -> libc::c_ulong {
+@@ -537,7 +537,7 @@
+     }
+ 
+     /// Total file nodes in filesystem
+-    #[cfg(all(target_os = "linux", any(target_env = "musl", target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32"))))]
++    #[cfg(all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"), target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32"))))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn files(&self) -> libc::fsfilcnt_t {
+         self.0.f_files
+@@ -551,7 +551,7 @@
+         target_os = "freebsd",
+         target_os = "openbsd",
+         target_os = "dragonfly",
+-        all(target_os = "linux", any(target_env = "musl", target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32")))
++        all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"), target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32")))
+     )))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn files(&self) -> libc::c_ulong {
+@@ -585,7 +585,7 @@
+     }
+ 
+     /// Free file nodes in filesystem
+-    #[cfg(all(target_os = "linux", any(target_env = "musl", target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32"))))]
++    #[cfg(all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"), target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32"))))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn files_free(&self) -> libc::fsfilcnt_t {
+         self.0.f_ffree
+@@ -599,7 +599,7 @@
+         target_os = "freebsd",
+         target_os = "openbsd",
+         target_os = "dragonfly",
+-        all(target_os = "linux", any(target_env = "musl", target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32")))
++        all(target_os = "linux", any(any(target_env = "musl", target_env = "ohos"), target_arch = "riscv32", all(target_arch = "x86_64", target_pointer_width = "32")))
+     )))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub fn files_free(&self) -> libc::c_ulong {
+diff -ruN nix-0.25.1/src/sys/statvfs.rs nix-0.25.1-ohos-fixed/src/sys/statvfs.rs
+--- nix-0.25.1/src/sys/statvfs.rs	2006-07-24 01:21:28.000000000 +0000
++++ nix-0.25.1-ohos-fixed/src/sys/statvfs.rs	2026-09-01 03:18:03.883542624 +0000
+@@ -58,7 +58,7 @@
+         #[cfg_attr(docsrs, doc(cfg(all())))]
+         ST_NODIRATIME;
+         /// Update access time relative to modify/change time
+-        #[cfg(any(target_os = "android", all(target_os = "linux", not(target_env = "musl"))))]
++        #[cfg(any(target_os = "android", all(target_os = "linux", not(any(target_env = "musl", target_env = "ohos")))))]
+         #[cfg_attr(docsrs, doc(cfg(all())))]
+         ST_RELATIME;
+     }
+diff -ruN nix-0.25.1/src/sys/time.rs nix-0.25.1-ohos-fixed/src/sys/time.rs
+--- nix-0.25.1/src/sys/time.rs	2006-07-24 01:21:28.000000000 +0000
++++ nix-0.25.1-ohos-fixed/src/sys/time.rs	2026-09-01 03:18:03.898542553 +0000
+@@ -1,4 +1,4 @@
+-#[cfg_attr(target_env = "musl", allow(deprecated))]
++#[cfg_attr(any(target_env = "musl", target_env = "ohos"), allow(deprecated))]
+ // https://github.com/rust-lang/libc/issues/1848
+ pub use libc::{suseconds_t, time_t};
+ use libc::{timespec, timeval};
+@@ -253,7 +253,7 @@
+ 
+ impl TimeValLike for TimeSpec {
+     #[inline]
+-    #[cfg_attr(target_env = "musl", allow(deprecated))]
++    #[cfg_attr(any(target_env = "musl", target_env = "ohos"), allow(deprecated))]
+     // https://github.com/rust-lang/libc/issues/1848
+     fn seconds(seconds: i64) -> TimeSpec {
+         assert!(
+@@ -288,7 +288,7 @@
+ 
+     /// Makes a new `TimeSpec` with given number of nanoseconds.
+     #[inline]
+-    #[cfg_attr(target_env = "musl", allow(deprecated))]
++    #[cfg_attr(any(target_env = "musl", target_env = "ohos"), allow(deprecated))]
+     // https://github.com/rust-lang/libc/issues/1848
+     fn nanoseconds(nanoseconds: i64) -> TimeSpec {
+         let (secs, nanos) = div_mod_floor_64(nanoseconds, NANOS_PER_SEC);
+@@ -331,7 +331,7 @@
+ 
+ impl TimeSpec {
+     /// Construct a new `TimeSpec` from its components
+-    #[cfg_attr(target_env = "musl", allow(deprecated))] // https://github.com/rust-lang/libc/issues/1848
++    #[cfg_attr(any(target_env = "musl", target_env = "ohos"), allow(deprecated))] // https://github.com/rust-lang/libc/issues/1848
+     pub const fn new(seconds: time_t, nanoseconds: timespec_tv_nsec_t) -> Self {
+         let mut ts = TIMESPEC_ZERO;
+         ts.tv_sec = seconds;
+@@ -347,7 +347,7 @@
+         }
+     }
+ 
+-    #[cfg_attr(target_env = "musl", allow(deprecated))] // https://github.com/rust-lang/libc/issues/1848
++    #[cfg_attr(any(target_env = "musl", target_env = "ohos"), allow(deprecated))] // https://github.com/rust-lang/libc/issues/1848
+     pub const fn tv_sec(&self) -> time_t {
+         self.0.tv_sec
+     }
+@@ -356,7 +356,7 @@
+         self.0.tv_nsec
+     }
+ 
+-    #[cfg_attr(target_env = "musl", allow(deprecated))]
++    #[cfg_attr(any(target_env = "musl", target_env = "ohos"), allow(deprecated))]
+     // https://github.com/rust-lang/libc/issues/1848
+     pub const fn from_duration(duration: Duration) -> Self {
+         let mut ts = TIMESPEC_ZERO;
+@@ -498,7 +498,7 @@
+             "TimeVal out of bounds; seconds={}",
+             seconds
+         );
+-        #[cfg_attr(target_env = "musl", allow(deprecated))]
++        #[cfg_attr(any(target_env = "musl", target_env = "ohos"), allow(deprecated))]
+         // https://github.com/rust-lang/libc/issues/1848
+         TimeVal(timeval {
+             tv_sec: seconds as time_t,
+@@ -523,7 +523,7 @@
+             (TV_MIN_SECONDS..=TV_MAX_SECONDS).contains(&secs),
+             "TimeVal out of bounds"
+         );
+-        #[cfg_attr(target_env = "musl", allow(deprecated))]
++        #[cfg_attr(any(target_env = "musl", target_env = "ohos"), allow(deprecated))]
+         // https://github.com/rust-lang/libc/issues/1848
+         TimeVal(timeval {
+             tv_sec: secs as time_t,
+@@ -541,7 +541,7 @@
+             (TV_MIN_SECONDS..=TV_MAX_SECONDS).contains(&secs),
+             "TimeVal out of bounds"
+         );
+-        #[cfg_attr(target_env = "musl", allow(deprecated))]
++        #[cfg_attr(any(target_env = "musl", target_env = "ohos"), allow(deprecated))]
+         // https://github.com/rust-lang/libc/issues/1848
+         TimeVal(timeval {
+             tv_sec: secs as time_t,
+@@ -578,7 +578,7 @@
+ 
+ impl TimeVal {
+     /// Construct a new `TimeVal` from its components
+-    #[cfg_attr(target_env = "musl", allow(deprecated))] // https://github.com/rust-lang/libc/issues/1848
++    #[cfg_attr(any(target_env = "musl", target_env = "ohos"), allow(deprecated))] // https://github.com/rust-lang/libc/issues/1848
+     pub const fn new(seconds: time_t, microseconds: suseconds_t) -> Self {
+         Self(timeval {
+             tv_sec: seconds,
+@@ -594,7 +594,7 @@
+         }
+     }
+ 
+-    #[cfg_attr(target_env = "musl", allow(deprecated))] // https://github.com/rust-lang/libc/issues/1848
++    #[cfg_attr(any(target_env = "musl", target_env = "ohos"), allow(deprecated))] // https://github.com/rust-lang/libc/issues/1848
+     pub const fn tv_sec(&self) -> time_t {
+         self.0.tv_sec
+     }
+diff -ruN nix-0.25.1/src/time.rs nix-0.25.1-ohos-fixed/src/time.rs
+--- nix-0.25.1/src/time.rs	2006-07-24 01:21:28.000000000 +0000
++++ nix-0.25.1-ohos-fixed/src/time.rs	2026-09-01 03:18:03.900542543 +0000
+@@ -154,7 +154,7 @@
+     #[cfg(any(
+         target_os = "emscripten",
+         target_os = "fuchsia",
+-        all(target_os = "linux", target_env = "musl")
++        all(target_os = "linux", any(target_env = "musl", target_env = "ohos"))
+     ))]
+     #[cfg_attr(docsrs, doc(cfg(all())))]
+     pub const CLOCK_SGI_CYCLE: ClockId = ClockId(libc::CLOCK_SGI_CYCLE);
+diff -ruN nix-0.25.1/src/ucontext.rs nix-0.25.1-ohos-fixed/src/ucontext.rs
+--- nix-0.25.1/src/ucontext.rs	2006-07-24 01:21:28.000000000 +0000
++++ nix-0.25.1-ohos-fixed/src/ucontext.rs	2026-09-01 03:18:03.875542662 +0000
+@@ -1,8 +1,8 @@
+-#[cfg(not(target_env = "musl"))]
++#[cfg(not(any(target_env = "musl", target_env = "ohos")))]
+ use crate::Result;
+-#[cfg(not(target_env = "musl"))]
++#[cfg(not(any(target_env = "musl", target_env = "ohos")))]
+ use crate::errno::Errno;
+-#[cfg(not(target_env = "musl"))]
++#[cfg(not(any(target_env = "musl", target_env = "ohos")))]
+ use std::mem;
+ use crate::sys::signal::SigSet;
+ 
+@@ -12,7 +12,7 @@
+ }
+ 
+ impl UContext {
+-    #[cfg(not(target_env = "musl"))]
++    #[cfg(not(any(target_env = "musl", target_env = "ohos")))]
+     pub fn get() -> Result<UContext> {
+         let mut context = mem::MaybeUninit::<libc::ucontext_t>::uninit();
+         let res = unsafe { libc::getcontext(context.as_mut_ptr()) };
+@@ -21,7 +21,7 @@
+         })
+     }
+ 
+-    #[cfg(not(target_env = "musl"))]
++    #[cfg(not(any(target_env = "musl", target_env = "ohos")))]
+     pub fn set(&self) -> Result<()> {
+         let res = unsafe {
+             libc::setcontext(&self.context as *const libc::ucontext_t)
