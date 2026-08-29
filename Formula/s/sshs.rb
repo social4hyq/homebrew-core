@@ -6,7 +6,7 @@ class Sshs < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "92597f66350954fc3f31e73ab50dbcef104713b2dee5a4024d6a09cc63115dcf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "99d5fe6efc83d69f80eceb9f38c7ea4f8f5b97fe893f0e5128d93f46ba3a7c7c"
   end
 
   depends_on "rust" => :build
