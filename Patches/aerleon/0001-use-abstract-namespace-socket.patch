@@ -1,0 +1,55 @@
+diff -ruN a/aerleon/aclgen.py b/aerleon/aclgen.py
+--- a/aerleon/aclgen.py	1970-01-01 08:00:00.000000000 +0800
++++ b/aerleon/aclgen.py	2026-08-29 17:20:44.396223125 +0800
+@@ -16,6 +16,7 @@
+ """Renders policy source files into actual Access Control Lists."""
+ 
+ import copy
++import os
+ import multiprocessing.context
+ import multiprocessing.managers
+ import multiprocessing.pool
+@@ -394,7 +395,10 @@
+         return  # static type analyzer can't detect that logging.fatal exits program
+ 
+     # thead-safe list for storing files to write
+-    manager: multiprocessing.managers.SyncManager = context.Manager()
++    manager: multiprocessing.managers.SyncManager = multiprocessing.managers.SyncManager(
++        address=f'\x00aerleon_aclgen_{os.getpid()}',
++        ctx=multiprocessing.get_context('fork'))
++    manager.start()
+     write_files: WriteList = manager.list()
+ 
+     with_errors = False
+@@ -487,7 +491,7 @@
+     )
+     logging.debug('aerleon configurations: %s', configs)
+ 
+-    context = multiprocessing.get_context()
++    context = multiprocessing.get_context('fork')
+     try:
+         Run(
+             configs['base_directory'],
+diff -ruN a/aerleon/api.py b/aerleon/api.py
+--- a/aerleon/api.py	1970-01-01 08:00:00.000000000 +0800
++++ b/aerleon/api.py	2026-08-29 17:20:44.400223593 +0800
+@@ -209,6 +209,7 @@
+ """
+ 
+ import copy
++import os
+ import multiprocessing.context
+ import multiprocessing.managers
+ import multiprocessing.pool
+@@ -317,7 +318,10 @@
+     max_renderers: int = 1,
+ ) -> MutableMapping[str, str] | None:
+     # thead-safe list for storing files to write
+-    manager: multiprocessing.managers.SyncManager = context.Manager()
++    manager: multiprocessing.managers.SyncManager = multiprocessing.managers.SyncManager(
++        address=f'\x00aerleon_api_{os.getpid()}',
++        ctx=multiprocessing.get_context('fork'))
++    manager.start()
+     write_files: WriteList = manager.list()
+     errors: MutableSequence = manager.list()
+     generated_configs: MutableMapping = manager.dict()
