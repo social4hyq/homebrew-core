@@ -12,7 +12,7 @@ class Orc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "477be688e07122d3b56eff5cc0e18df9db37e0909d4afc3fc2a3373a8a375e90"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c6cb8979fa09207a0f6ea746f01e6b9feb04bc2c499688f2aef46cf4f887504"
   end
 
   depends_on "meson" => :build
