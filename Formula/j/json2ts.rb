@@ -6,7 +6,7 @@ class Json2ts < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d098ffe18bd26ad89479d2d789c7a4918b7612ea5231a2125a1c038529bc40a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "758aa7e37d0c8b926555fb46e965905adbaa8e08e8195a328279a96a2ef34652"
   end
 
   depends_on "node"
