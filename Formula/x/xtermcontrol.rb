@@ -1,8 +1,8 @@
 class Xtermcontrol < Formula
   desc "Control xterm properties such as colors, title, font and geometry"
   homepage "https://thrysoee.dk/xtermcontrol/"
-  url "https://thrysoee.dk/xtermcontrol/xtermcontrol-3.10.tar.gz"
-  sha256 "3eb97b1d9d8aae1bad4fe2c41ca3a3dbb10d2d67e6ca4599aa1f631a40503dee"
+  url "https://thrysoee.dk/xtermcontrol/xtermcontrol-3.11.tar.gz"
+  sha256 "49ea6d3eda0dbcf875363763cefe1818ce6786b9910255ea641d9786bdafd44c"
   license "GPL-2.0-or-later"
 
   livecheck do
