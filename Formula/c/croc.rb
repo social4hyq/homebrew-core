@@ -7,7 +7,7 @@ class Croc < Formula
   head "https://github.com/schollz/croc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a2bdc5b5b75c883ab0f1cb32c941810b7f603f6566c4c5f5fc98cd2bc6ff726f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "188de7862255cfa3c15622e1760f789e8129addfd3400e5a7ba44b922d7ac978"
   end
 
   depends_on "go" => :build
