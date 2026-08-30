@@ -3,8 +3,8 @@ class Gixy < Formula
 
   desc "NGINX configuration static analyzer focused on security"
   homepage "https://gixy.getpagespeed.com/"
-  url "https://files.pythonhosted.org/packages/d0/83/cf79fd3f75709421718a530d9f1adce780791060e1d02eb2be890f77d73e/gixy_ng-0.2.51.tar.gz"
-  sha256 "55b7edf4c99cdacce07138435fa5ddb26e2fd53c8b05732d667758a27365431c"
+  url "https://files.pythonhosted.org/packages/44/9b/d16174a31be5a77742bb25bf738d8d43b1adbc8f6f6f0bf91a7797bdc58d/gixy_ng-0.2.52.tar.gz"
+  sha256 "6ff5f235d411d35eb8d4d33828389852ba4a27b77fbf0e1f49fd102e874afa78"
   license "MPL-2.0"
 
   bottle do
