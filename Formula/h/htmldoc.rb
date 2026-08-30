@@ -7,7 +7,7 @@ class Htmldoc < Formula
   head "https://github.com/michaelrsweet/htmldoc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7e2610f270ed2bc841a171ea39e541de97153d76a713bac23fd42367cca1747"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fe644a391d074f8f609806649767487fa50a2b0363a14897d23008dede845070"
   end
 
   depends_on "pkgconf" => :build
