@@ -16,7 +16,7 @@ class Fortio < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "581bc5e4e376f1de2d1b1f74ad9df0612936169b03a13d3c01ca47c75e3c7cfd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6295200f92334be351195c8102b5fff83ed2843a9821c566a0e1b0e84cabf2e7"
   end
 
   depends_on "go" => :build
