@@ -7,7 +7,7 @@ class Goat < Formula
   license any_of: ["MIT", "Apache-2.0"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9191f52c6005bab6b1993d8a3e094f749ece381f27aa96999dcfdec26af966ad"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "abf72ed4207d0b25d5f7def3cd586200df8cf97cb4022b2328e3a7a9dad08fb3"
   end
 
   depends_on "go" => :build
