@@ -6,7 +6,7 @@ class Corepack < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "27ca51e7e635f8cb0edd04bff6533f2dad2d7fb1943075bf48409cf08362c12d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f7d6e402672d292089ef2588fbf4e310aa8ae1922545cd11598aa3da76795d92"
   end
 
   depends_on "node"
