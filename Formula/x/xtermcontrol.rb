@@ -11,7 +11,7 @@ class Xtermcontrol < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9cc553f1f94613b10b94c79c7ee8d793d26e3075e4d9205aa3c0055857598e81"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3e7a93a9477ce5c6361e5e64fa5e3b618b02a068187851c8a7ee12816f089b2"
   end
 
   def install
