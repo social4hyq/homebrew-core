@@ -6,7 +6,7 @@ class Re2c < Formula
   license :public_domain
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4231c4a6d277b6f1133d979be425bbce26698ed7b85ca7a26481664e87764c70"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f734ab1c1fae6e83645ff63b375b971378abafd7c28e6e5ea097b2110dd45868"
   end
 
   uses_from_macos "python" => :build
