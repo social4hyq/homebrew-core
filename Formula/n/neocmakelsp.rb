@@ -7,7 +7,7 @@ class Neocmakelsp < Formula
   head "https://github.com/neocmakelsp/neocmakelsp.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9dfc363807c7a271e0cdbd2265cdf7052f9af6048cf0293b4baac3b05810516f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2f9d3caec19312903b49c1a4f7ced6b80be2e23bc6a67321c1a37efe3911234"
   end
 
   depends_on "rust" => :build
