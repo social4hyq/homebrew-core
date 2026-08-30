@@ -1,8 +1,8 @@
 class Gost < Formula
   desc "GO Simple Tunnel - a simple tunnel written in golang"
   homepage "https://gost.run/"
-  url "https://github.com/go-gost/gost/archive/refs/tags/v3.2.6.tar.gz"
-  sha256 "79874354530b899576dd4866d3b1400651d0b17c1e7a90ad30c44686a0642600"
+  url "https://github.com/go-gost/gost/archive/refs/tags/v3.3.0.tar.gz"
+  sha256 "2a65e2da14fef6b6da8d4e32a8bc62e39970dbb141db42bc6f5821f90ac1e9a3"
   license "MIT"
   head "https://github.com/go-gost/gost.git", branch: "master"
 
