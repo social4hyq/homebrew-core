@@ -7,7 +7,7 @@ class Age < Formula
   head "https://github.com/FiloSottile/age.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7225f9d6257409bfb6905d4a9f0cfb1cb37c9f4d61d91adc94f31311ecc3c5d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "80ba22fc32099a8a2fcf286c88ef42483cb9e066dbef2d680cbb29306fc64c81"
   end
 
   depends_on "go" => :build
