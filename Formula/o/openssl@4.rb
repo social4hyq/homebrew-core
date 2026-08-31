@@ -1,10 +1,9 @@
 class OpensslAT4 < Formula
   desc "Cryptography and SSL/TLS Toolkit"
   homepage "https://openssl-library.org"
-  url "https://github.com/openssl/openssl/releases/download/openssl-4.0.1/openssl-4.0.1.tar.gz"
-  sha256 "2db3f3a0d6ea4b59e1f094ace2c8cd536dffb87cdc39084c5afa1e6f7f37dd09"
+  url "https://github.com/openssl/openssl/releases/download/openssl-4.0.2/openssl-4.0.2.tar.gz"
+  sha256 "736b467530f916737b7031310ccb21d8218c6229e61e8e160cd1d3458cd543a8"
   license "Apache-2.0"
-  revision 1
 
   livecheck do
     url "https://openssl-library.org/source/"
@@ -12,7 +11,7 @@ class OpensslAT4 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "34f56ebd511fbf76e9637b3b5c8f321c04a1f29c502d9ce694f7bd4281e63a60"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1524fe3d1ec7cf178b9b8df563f5ddc3b52f512e87ed6d232a2973e0c19a8adf"
   end
 
   patch do
