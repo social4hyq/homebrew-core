@@ -1,13 +1,18 @@
 class GoLibrespot < Formula
   desc "Spotify client"
   homepage "https://github.com/devgianlu/go-librespot"
-  url "https://github.com/devgianlu/go-librespot/archive/refs/tags/v0.8.0.tar.gz"
-  sha256 "444e32986bf61a2b011bb672793d0d2ebcf07ccdcefab8dc8b99c618bd4ad6bc"
+  url "https://github.com/devgianlu/go-librespot/archive/refs/tags/v0.9.0.tar.gz"
+  sha256 "54f5edebeedf32785383b56be0c5f4c93fbbc4189e54812c9da0a0cbde607b7e"
   license "GPL-3.0-only"
   head "https://github.com/devgianlu/go-librespot.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "611d01b207e7d605428fb9c01b35f4fda5e8d411dd8c2514dada65dc009e07b7"
+    sha256 cellar: :any, arm64_tahoe:   "8142a70e2b53b8d4afc88fa9e4660d3bebdaec78820597500d142e0af9f58e0e"
+    sha256 cellar: :any, arm64_sequoia: "985958da0a233c8d60defe869e87763814bdcc37b3eb080c062b1616db35923e"
+    sha256 cellar: :any, arm64_sonoma:  "e52904211aa94a12cf447c7170943f094fc73f486ad7893d1266a7b0adcdb402"
+    sha256 cellar: :any, sonoma:        "eede32f9f6995a24584d4812bd7be44dd55058ed556529052c1e005f0d1db390"
+    sha256 cellar: :any, arm64_linux:   "02a54a8f020f615cc4bfec182f8b3a718eb161b58183f89149ed914fd3e8b9c5"
+    sha256 cellar: :any, x86_64_linux:  "1363b51e5176242e1165c9ba525b641dc5c60d87d3b809b9a64e84d85289f0c3"
   end
 
   depends_on "go" => :build
@@ -15,6 +20,7 @@ class GoLibrespot < Formula
   depends_on "flac"
   depends_on "libogg"
   depends_on "libvorbis"
+  depends_on "mpg123"
 
   on_linux do
     depends_on "alsa-lib"
@@ -23,14 +29,10 @@ class GoLibrespot < Formula
   def install
     ENV["CGO_ENABLED"] = "1" if OS.linux? && Hardware::CPU.arm?
 
-    ldflags = %W[
-      -s -w
-      -X github.com/devgianlu/go-librespot.version=#{version}
-    ]
+    ldflags = %W[-X github.com/devgianlu/go-librespot.version=#{version}]
     ldflags << "-X github.com/devgianlu/go-librespot.commit=#{Utils.git_short_head(length: 8)}" if build.head?
 
     system "go", "build", *std_go_args(output: bin/"go-librespot", ldflags:), "./cmd/daemon"
-    (var/"log").mkpath
 
     # On macOS, create a minimal config that selects the correct backend.
     return unless OS.mac?
