@@ -1,8 +1,8 @@
 class Nmap < Formula
   desc "Port scanning utility for large networks"
   homepage "https://nmap.org/"
-  url "https://nmap.org/dist/nmap-7.99.tar.bz2"
-  sha256 "df512492ffd108e53a27a06f26d8635bbe89e0e569455dc8ffef058c035d51b2"
+  url "https://nmap.org/dist/nmap-7.991.tar.bz2"
+  sha256 "a5d507f29437bef3bedd4771ff9aaa8fc1c2a109ddba1f5b1cf12027456929be"
   license :cannot_represent
   compatibility_version 1
   head "https://svn.nmap.org/nmap/"
@@ -13,7 +13,12 @@ class Nmap < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c9acdefef6965370cde3bbd8233b2746defb71faf7c3eb4066c06db7a247833"
+    sha256 arm64_tahoe:   "7b44210db7bec422a6db3551c6ce37c032d549c6e4b7c1fc73dfc3fd84ffcb61"
+    sha256 arm64_sequoia: "53af60fb8bc2a54c94d48522bec7b90c8de5843e1057203e56d5ed922ee05f5e"
+    sha256 arm64_sonoma:  "7f1314efd3f78af8cebad0f254de7c4a8d0b1f4f0e881f99f64bbc42d184d9aa"
+    sha256 sonoma:        "8e0cf28019b8f08cd0c861743fce47446e11197a1c0dd4fa5e6d930ef5c0c78a"
+    sha256 arm64_linux:   "1d20106da65dabc3c10921eac6666505c2433cc4d9646fefc4cfa6a2403fb547"
+    sha256 x86_64_linux:  "d3f0b702152aaba2e73585a51352ec2143ca9f1870f1849058de81fdfed7a116"
   end
 
   depends_on "python-setuptools" => :build
@@ -36,10 +41,6 @@ class Nmap < Formula
   conflicts_with "cern-ndiff", "ndiff", because: "both install `ndiff` binaries"
   conflicts_with cask: "zenmap", because: "both install `nmap` binaries"
 
-  patch do
-    file "Patches/nmap/pf_packet_check.patch"
-  end
-
   def install
     # Fix to missing VERSION file
     # https://github.com/nmap/nmap/pull/3111
@@ -50,13 +51,13 @@ class Nmap < Formula
     libpcap_path = if OS.mac?
       MacOS.sdk_path/"usr/"
     else
-      Formula["libpcap"].opt_prefix
+      formula_opt_prefix("libpcap")
     end
 
     args = %W[
-      --with-liblua=#{Formula["lua"].opt_prefix}
-      --with-libpcre=#{Formula["pcre2"].opt_prefix}
-      --with-openssl=#{Formula["openssl@3"].opt_prefix}
+      --with-liblua=#{formula_opt_prefix("lua")}
+      --with-libpcre=#{formula_opt_prefix("pcre2")}
+      --with-openssl=#{formula_opt_prefix("openssl@3")}
       --with-libpcap=#{libpcap_path}
       --without-nmap-update
       --disable-universal
