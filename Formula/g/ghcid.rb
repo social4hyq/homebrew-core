@@ -1,13 +1,13 @@
 class Ghcid < Formula
   desc "Very low feature GHCi based IDE"
   homepage "https://github.com/ndmitchell/ghcid"
-  url "https://github.com/ndmitchell/ghcid/archive/refs/tags/v0.8.9.tar.gz"
-  sha256 "8e6ba85ef6184020a6e11fac5226c6a13e905c44b2e56d288f1fd0b3f0b34038"
+  url "https://github.com/ndmitchell/ghcid/archive/refs/tags/v1.0.0.tar.gz"
+  sha256 "6317ed3a0c83c1d1d5b03ca40d7b6906d208850b46dd6a372ea90345946f3b4f"
   license "BSD-3-Clause"
   head "https://github.com/ndmitchell/ghcid.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "00d7a6a8a46346f4dbee1a5efe9695e909325c7ce2734abcee5dbd55bdbcd4eb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3b705c50a5e403d9295db403af041ac896afffa42c5b4cf881cc4d26947e7ed"
   end
 
   depends_on "cabal-install" => :build
@@ -33,7 +33,7 @@ class Ghcid < Formula
 
     PTY.spawn(bin/"ghcid", "--command=ghci Main.hs", "--clear") do |r, _w, pid|
       output = r.gets
-      assert_match "Loading ghci Main.hs", output
+      assert_match "Starting ghci command: ghci Main.hs", output
     ensure
       Process.kill "TERM", pid
       Process.wait pid
