@@ -1,13 +1,13 @@
 class CcSwitchCli < Formula
   desc "All-in-one assistant tool for Claude Code, Codex, Gemini, OpenCode and OpenClaw"
   homepage "https://github.com/SaladDay/cc-switch-cli"
-  url "https://github.com/SaladDay/cc-switch-cli/archive/refs/tags/v5.10.3.tar.gz"
-  sha256 "ad1e9d0295954325d7b348cdcdd9237e494aa4dd042b8f5039ec6ffa5b652147"
+  url "https://github.com/SaladDay/cc-switch-cli/archive/refs/tags/v5.10.4.tar.gz"
+  sha256 "cb10c2742b5552bb4de4cf58663afdf8d79e96e05ea68b5533489a6ba0583dcb"
   license "MIT"
   head "https://github.com/SaladDay/cc-switch-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1b4b32b760024cad479c622ca0e99bdf7f57fc046abbf945073c3c4122287574"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef150e8133be3e504b9ce4d20c0486e3665fb4c75faae5198b37c7405b4724fd"
   end
 
   depends_on "rust" => :build
