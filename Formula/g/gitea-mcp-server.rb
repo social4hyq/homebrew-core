@@ -1,19 +1,19 @@
 class GiteaMcpServer < Formula
   desc "Interactive with Gitea instances with MCP"
   homepage "https://gitea.com/gitea/gitea-mcp"
-  url "https://gitea.com/gitea/gitea-mcp/archive/v1.6.0.tar.gz"
-  sha256 "df3855dee0879e9a25df49f846331710898354d3e99a1ef097093e2115691f6a"
+  url "https://gitea.com/gitea/gitea-mcp/archive/v1.7.0.tar.gz"
+  sha256 "1ebf82dfc7ffafeadeec9bc8a28d628c86a440008f4f1b75678191bbeb074948"
   license "MIT"
   head "https://gitea.com/gitea/gitea-mcp.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c190778bc83a337b6a542e83b963032aa9de69b6c2e3e93488446edd4379224"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5dc10ee0ab8bbef3af7913236e2b0d8646cc24554ce7c466b33db527da7b56a9"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args(ldflags: "-s -w -X main.version=#{version}")
+    system "go", "build", *std_go_args(ldflags: "-X main.version=#{version}")
   end
 
   test do
@@ -22,6 +22,11 @@ class GiteaMcpServer < Formula
       {"jsonrpc":"2.0","id":2,"method":"tools/list"}
     JSON
 
-    assert_match "Gitea MCP Server", pipe_output("#{bin}/gitea-mcp-server stdio", json, 0)
+    # Read the reply before closing stdin: 1.7.0 exits non-zero on EOF without flushing
+    output = IO.popen("#{bin}/gitea-mcp-server stdio", "r+") do |io|
+      io.write json
+      io.readline
+    end
+    assert_match "Gitea MCP Server", output
   end
 end
