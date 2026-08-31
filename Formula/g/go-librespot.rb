@@ -1,13 +1,13 @@
 class GoLibrespot < Formula
   desc "Spotify client"
   homepage "https://github.com/devgianlu/go-librespot"
-  url "https://github.com/devgianlu/go-librespot/archive/refs/tags/v0.8.0.tar.gz"
-  sha256 "444e32986bf61a2b011bb672793d0d2ebcf07ccdcefab8dc8b99c618bd4ad6bc"
+  url "https://github.com/devgianlu/go-librespot/archive/refs/tags/v0.9.0.tar.gz"
+  sha256 "54f5edebeedf32785383b56be0c5f4c93fbbc4189e54812c9da0a0cbde607b7e"
   license "GPL-3.0-only"
   head "https://github.com/devgianlu/go-librespot.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "611d01b207e7d605428fb9c01b35f4fda5e8d411dd8c2514dada65dc009e07b7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d31eb6b7cc3d242daa7a1f73ce8fd7ea3c96cd0f6b49f6be32d34d27656ec1ae"
   end
 
   depends_on "go" => :build
@@ -15,6 +15,7 @@ class GoLibrespot < Formula
   depends_on "flac"
   depends_on "libogg"
   depends_on "libvorbis"
+  depends_on "mpg123"
 
   on_linux do
     depends_on "alsa-lib"
@@ -23,14 +24,10 @@ class GoLibrespot < Formula
   def install
     ENV["CGO_ENABLED"] = "1" if OS.linux? && Hardware::CPU.arm?
 
-    ldflags = %W[
-      -s -w
-      -X github.com/devgianlu/go-librespot.version=#{version}
-    ]
+    ldflags = %W[-X github.com/devgianlu/go-librespot.version=#{version}]
     ldflags << "-X github.com/devgianlu/go-librespot.commit=#{Utils.git_short_head(length: 8)}" if build.head?
 
     system "go", "build", *std_go_args(output: bin/"go-librespot", ldflags:), "./cmd/daemon"
-    (var/"log").mkpath
 
     # On macOS, create a minimal config that selects the correct backend.
     return unless OS.mac?
