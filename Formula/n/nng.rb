@@ -1,8 +1,8 @@
 class Nng < Formula
   desc "Nanomsg-next-generation -- light-weight brokerless messaging"
   homepage "https://nng.nanomsg.org/"
-  url "https://github.com/nanomsg/nng/archive/refs/tags/v1.12.3.tar.gz"
-  sha256 "036a925790034efdeef8a6803f3e4402c3ab509383326f8bc2f15ecee75a2fa2"
+  url "https://github.com/nanomsg/nng/archive/refs/tags/v1.12.4.tar.gz"
+  sha256 "93b177727ec5ea38af5c88ab297f732ef71ddc4700d2407c4f9c999b3a7310a0"
   license "MIT"
 
   livecheck do
@@ -11,7 +11,7 @@ class Nng < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab30d6a8199e98f9fd70bdf6c488ab1202ff580501aa4078073867b628be0f39"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8cf47698c43bbb6fb5d52d04e197d14ad01a53273a8eb9a37ba704c0a7e225e6"
   end
 
   depends_on "asciidoctor" => :build
