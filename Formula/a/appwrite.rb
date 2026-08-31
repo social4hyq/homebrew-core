@@ -6,12 +6,7 @@ class Appwrite < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "2ef802650b2861a3b3e1d91878f686781b797daed2519c3d7db7322d8e5707fb"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "2ef802650b2861a3b3e1d91878f686781b797daed2519c3d7db7322d8e5707fb"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2ef802650b2861a3b3e1d91878f686781b797daed2519c3d7db7322d8e5707fb"
-    sha256 cellar: :any_skip_relocation, sonoma:        "e72e2add3896a67a0d4b450dfae9fedac53d0d57a61ff8a3489e0f11284c11e0"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "030608a67b103f564f38e2a18ed30617c2573f30c12c668c7eace88f7e39584e"
-    sha256 cellar: :any,                 x86_64_linux:  "4bffac1ca9bb47a470213709eb74472e89e2e37335e4db9c95cd8e3058f8d827"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f06ce54d09691d53bfd4b2f7055e8c0447f406021e44be47221a89e5f53ddddf"
   end
 
   depends_on "go" => :build
