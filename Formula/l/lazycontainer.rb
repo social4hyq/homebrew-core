@@ -7,7 +7,7 @@ class Lazycontainer < Formula
   head "https://github.com/andreybleme/lazycontainer.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe: "94c0f11d36ebb2b1bbbb158570ea00e4d77aaa5524a8bae0814c81e3458c7417"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "23b30625c06c1c475b21bd2b553161130921c00cb227685b9bae293546073733"
   end
 
   depends_on "go" => :build
