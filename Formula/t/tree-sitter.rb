@@ -13,7 +13,7 @@ class TreeSitter < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "897ec86f1d4326f297feb161956ddfd3b1a1b706dd808ee945634c3526476594"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ca950ba77e86fcdf1f6951d3e6044781aa8f721291e21bfdcd75a78bb25ce7a"
   end
 
   def install
