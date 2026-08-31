@@ -13,7 +13,7 @@ class Clog < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "de67f4d6b431122f0968a5b5ef6c01be8863df8606e0aa5511f98fcb5c5054bc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "615eaa91ed81062b4872cbaf6d57395276fb44d1aeb09a8edea443815b3b619c"
   end
 
   depends_on "cmake" => :build
