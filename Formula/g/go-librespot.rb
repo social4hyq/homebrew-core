@@ -7,12 +7,7 @@ class GoLibrespot < Formula
   head "https://github.com/devgianlu/go-librespot.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "8142a70e2b53b8d4afc88fa9e4660d3bebdaec78820597500d142e0af9f58e0e"
-    sha256 cellar: :any, arm64_sequoia: "985958da0a233c8d60defe869e87763814bdcc37b3eb080c062b1616db35923e"
-    sha256 cellar: :any, arm64_sonoma:  "e52904211aa94a12cf447c7170943f094fc73f486ad7893d1266a7b0adcdb402"
-    sha256 cellar: :any, sonoma:        "eede32f9f6995a24584d4812bd7be44dd55058ed556529052c1e005f0d1db390"
-    sha256 cellar: :any, arm64_linux:   "02a54a8f020f615cc4bfec182f8b3a718eb161b58183f89149ed914fd3e8b9c5"
-    sha256 cellar: :any, x86_64_linux:  "1363b51e5176242e1165c9ba525b641dc5c60d87d3b809b9a64e84d85289f0c3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d31eb6b7cc3d242daa7a1f73ce8fd7ea3c96cd0f6b49f6be32d34d27656ec1ae"
   end
 
   depends_on "go" => :build
