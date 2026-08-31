@@ -12,7 +12,7 @@ class Gost < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6f943ce3f50f9e403d24a671b10882c2b001b27813ace2cd07420a6911164c5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7368f46cf47fbfdcfaf7dcd6f6675902b86604b8b085a029073b0e5e4e12f93d"
   end
 
   depends_on "go" => :build
