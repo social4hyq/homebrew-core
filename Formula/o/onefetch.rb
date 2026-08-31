@@ -7,7 +7,7 @@ class Onefetch < Formula
   head "https://github.com/o2sh/onefetch.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e13dd02ac9ec6e8fa7497f4dd3550bf157d90b7314f5ebcb88805581eb735aa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be516a403827e5b8f017bd9dea54aa72618a924efb05d44e1fde31bf692dd5d2"
   end
 
   # `cmake` is used to build `zlib`.
