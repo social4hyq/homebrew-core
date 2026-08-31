@@ -7,7 +7,7 @@ class Dprint < Formula
   head "https://github.com/dprint/dprint.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1eff834f35f9e7ec6b7fca4ffb9cf3e6313390effb46605a2010dbaea4040247"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d8c476096755e10941edc7d9e95df622634ae0d95c71bb7715e73c70da33c31"
   end
 
   depends_on "pkgconf" => :build
