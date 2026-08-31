@@ -8,7 +8,7 @@ class Pylint < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "5b2c69d4232e744a5b3904ee417a044d76768b1ac620f20a07898429c01d552e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c290a3f12c2346bfc1cd7d50fe4b6c9e86228b5482b9b0536ca53b963b3bf24"
   end
 
   depends_on "rust" => :build # for `isort`
