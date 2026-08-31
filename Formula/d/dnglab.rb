@@ -6,7 +6,7 @@ class Dnglab < Formula
   license "LGPL-2.1-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb956870a9fbc6e6f310a29f3b625f42fd86c6b9d0474c4c0522a1d342fe33bd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "caba6fdf34d647abb17116d60180e1602e7d779e7bd141559d3a6374c11129b5"
   end
 
   depends_on "rust" => :build
