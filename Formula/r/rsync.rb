@@ -7,12 +7,7 @@ class Rsync < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "267a8d2a1869759a804c85fbbb952cc6e928abf84f8d7bba15310212d9926eb1"
-    sha256 cellar: :any, arm64_sequoia: "58ecba02ba9759f536d3e0a2ac410b8b1a63f0752452fd6a71b57db98cf06c36"
-    sha256 cellar: :any, arm64_sonoma:  "abc49c88d924db85ebc70ccf41ae5f0d978e6a5a85fa7ef9b334a280e08825bb"
-    sha256 cellar: :any, sonoma:        "833347d4aadf2b3f1d2d5f104a7344170f481c6e957ee95cbda1bc41a05d736f"
-    sha256 cellar: :any, arm64_linux:   "afae3006ae0d7daf2e68345cd2273987937bc6702c679145bd71108b816817c2"
-    sha256 cellar: :any, x86_64_linux:  "b2f066bc10fc9ce26805f9792f12ea78c651cfbf8c0364d480610ee3d90c5ccb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eab2bf37456a2dd1e63bd47881cdff2d60501b9791fc0011f54ceaca708be611"
   end
 
   depends_on "lz4"
