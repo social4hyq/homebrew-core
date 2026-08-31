@@ -7,7 +7,7 @@ class AwsCS3 < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "193d7fc5f87e093000f14b83514bab4ca393cb4d8f56aa44d0e4856b5fbf2481"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "775c890f01ce205a72139e77e72239fd124a3d9b0238f3386a9dd5394a223629"
   end
 
   depends_on "cmake" => :build
