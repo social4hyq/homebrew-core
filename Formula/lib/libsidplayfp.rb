@@ -1,8 +1,8 @@
 class Libsidplayfp < Formula
   desc "Library to play Commodore 64 music"
   homepage "https://github.com/libsidplayfp/libsidplayfp"
-  url "https://github.com/libsidplayfp/libsidplayfp/releases/download/v3.1.0/libsidplayfp-3.1.0.tar.gz"
-  sha256 "12a7ba238a6f61a811134a31d494e251eba0dd8f1c03b627d2422d8133a3584b"
+  url "https://github.com/libsidplayfp/libsidplayfp/releases/download/v3.1.1/libsidplayfp-3.1.1.tar.gz"
+  sha256 "12b79190593bf480b2d11481b5c2de62bac07f344437a66cd8d887329875c626"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class Libsidplayfp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "343383deb2c0046edeae28be5d9dbb7873a37fdd0ce8a0480550364d4a4d7e99"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c4f368be7f32d98e917d8122ed4f0bad1bc35e9d1bc2903399a1ea22e74f6cf2"
   end
 
   head do
