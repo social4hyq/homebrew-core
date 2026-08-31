@@ -7,12 +7,7 @@ class D2 < Formula
   head "https://github.com/d2lang/d2.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "bb38fd85461f60aa45abb10e08c8dc87c55ab14eb9f5fbb3526a0b53f842d85e"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "bb38fd85461f60aa45abb10e08c8dc87c55ab14eb9f5fbb3526a0b53f842d85e"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "bb38fd85461f60aa45abb10e08c8dc87c55ab14eb9f5fbb3526a0b53f842d85e"
-    sha256 cellar: :any_skip_relocation, sonoma:        "29c5757d4a96b6680b5370054f7b414970c1bdec6b368cac50121f6cedf70a68"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "62eb05375b09bb37b72f6b511269a845eb5ace7df4885c0c829d14b8da8d3174"
-    sha256 cellar: :any,                 x86_64_linux:  "7efca8f1fa46aac1691221caf1123a40e9720bab5daec392b0f79599a6b87cd0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca900cf8227ab78e5aeb57a05f42f64f679d31529d808f7eaceceed571c2bbe7"
   end
 
   depends_on "go" => :build
