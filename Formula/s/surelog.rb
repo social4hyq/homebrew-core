@@ -1,14 +1,18 @@
 class Surelog < Formula
   desc "SystemVerilog Pre-processor, parser, elaborator, UHDM compiler"
   homepage "https://github.com/chipsalliance/Surelog"
-  url "https://github.com/chipsalliance/Surelog/archive/refs/tags/v1.86.tar.gz"
-  sha256 "5bffc61334f38b16b5dd57e5209d38bc1e07b0e0bda452e4580678aa3e9daf53"
+  url "https://github.com/chipsalliance/Surelog/archive/refs/tags/v1.87.tar.gz"
+  sha256 "5d3895ebaa08890db858988143264e2bc84c1dc6d36344628dc9f4a2aee2027b"
   license "Apache-2.0"
-  revision 2
   head "https://github.com/chipsalliance/Surelog.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "15ba438dfcdf8b4a500c8d5b8eed659440b0409f8b8d79e29e9e4b5f03a973d3"
+    sha256 cellar: :any, arm64_tahoe:   "547b3f5a886b3dcc10d263a695f2152995c537de2216e8395b4c43e8ad26a35c"
+    sha256 cellar: :any, arm64_sequoia: "de8bb0dc0784c3ef42a0722424bc6adcb82bb05224a2829d8d7191661b1481c1"
+    sha256 cellar: :any, arm64_sonoma:  "6fb741dd920be55b4406225fe0b09be7c5d3ed1b9c0a486ea59d9da5fc7b66ef"
+    sha256 cellar: :any, sonoma:        "f1fd02f85390a41a18e256426a2a413d54835b446120942ec205eb258494714c"
+    sha256 cellar: :any, arm64_linux:   "e1cc82bbb403c7151ae60ccae58bb734938a01c50426756abc23b9b86a9a3b8f"
+    sha256 cellar: :any, x86_64_linux:  "a4a163f552028171132efe8e46165bb09113d615f307d457df4176098b24d5ca"
   end
 
   depends_on "antlr" => :build
@@ -103,7 +107,7 @@ class Surelog < Formula
 
     flags = shell_output("pkgconf --cflags --libs Surelog").chomp.split
     system ENV.cxx, testpath/"test.cpp", "-o", "test",
-                    "-L#{Formula["antlr4-cpp-runtime"].opt_prefix}/lib",
+                    "-L#{formula_opt_prefix("antlr4-cpp-runtime")}/lib",
                     "-fPIC", "-std=c++17", *flags
     system testpath/"test"
   end
