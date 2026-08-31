@@ -7,7 +7,7 @@ class AwsCHttp < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f9559dd0cb2adc8c4319486b562a8fbb0b912547be54fdc9f4937d4af3db891"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "540f632efe9226ca43e0d497da6a542b45c73c089e54848455ba53c5362b691d"
   end
 
   depends_on "cmake" => :build
