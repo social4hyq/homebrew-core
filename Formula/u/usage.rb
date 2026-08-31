@@ -1,14 +1,14 @@
 class Usage < Formula
   desc "Tool for working with usage-spec CLIs"
   homepage "https://usage.jdx.dev/"
-  url "https://github.com/jdx/usage/archive/refs/tags/v5.1.0.tar.gz"
-  sha256 "2e5d498eda9338f9dc476f4fb722e81e6d7032f9186f24986b017b1b5a104061"
+  url "https://github.com/jdx/usage/archive/refs/tags/v6.6.0.tar.gz"
+  sha256 "92c0b0653bcda66db04b0cdb35697d8dddccd987dc17d84113260a681fd88dce"
   license "MIT"
   compatibility_version 1
   head "https://github.com/jdx/usage.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3fa2a71174bdbd317f223233239b1fe3b9651e311de12f51032e08e1c0373454"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bffeb4f3a107e5093588a4a0515c2ae72d72be600af56c34eaeb7c3ff87a377f"
   end
 
   depends_on "rust" => :build
@@ -20,7 +20,7 @@ class Usage < Formula
   end
 
   test do
-    assert_match "usage-cli", shell_output("#{bin}/usage --version").chomp
+    assert_match version.to_s, shell_output("#{bin}/usage --version").chomp
     assert_equal "--foo", shell_output("#{bin}/usage complete-word --spec 'flag \"--foo\"' -").chomp
   end
 end
