@@ -12,7 +12,7 @@ class AwsCMqtt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61ec00b14055589ac1fa0546487177bcdc6d90093c02f7856f9ed32bc4bf1e4d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a8313420faf3d77595312d618d6376bc69a864b2901217fe8e6f9427a082043"
   end
 
   depends_on "cmake" => :build
