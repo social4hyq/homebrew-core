@@ -1,27 +1,27 @@
 class Gif2png < Formula
   desc "Convert GIFs to PNGs"
   homepage "http://www.catb.org/~esr/gif2png/"
-  url "https://gitlab.com/esr/gif2png/-/archive/3.0.3/gif2png-3.0.3.tar.bz2"
-  sha256 "5d2770dce994e08ef54871ea4b0774e0ec0476aad5b3e47e21b4af59fdc8158b"
+  url "https://gitlab.com/esr/gif2png/-/archive/3.0.5/gif2png-3.0.5.tar.bz2"
+  sha256 "8cc0733ad5d48329da903d1a56e01adbaa4994181f5a12ce962fd4f2c504da22"
   license "BSD-2-Clause"
   head "https://gitlab.com/esr/gif2png.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2596628b32ff780331fc8c32d59034bc9cdb23dbf663040966110b72f32d3c29"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f772f55c5cedf41784f71036a0390c2be7b61c69e90152a354a4020433984335"
   end
 
+  depends_on "asciidoctor" => :build
   depends_on "go" => :build
-  depends_on "xmlto" => :build
 
   uses_from_macos "python" # for web2png
 
   def install
-    ENV["XML_CATALOG_FILES"] = "#{etc}/xml/catalog"
-
-    system "make", "install", "prefix=#{prefix}"
+    system "make", "install", "PREFIX=#{prefix}"
   end
 
   test do
-    pipe_output "#{bin}/gif2png -O", File.read(test_fixtures("test.gif"))
+    cp test_fixtures("test.gif"), testpath/"test.gif"
+    system bin/"gif2png", "test.gif"
+    assert_path_exists testpath/"test.png"
   end
 end
