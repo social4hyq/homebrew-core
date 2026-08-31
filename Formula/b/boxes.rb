@@ -7,7 +7,7 @@ class Boxes < Formula
   head "https://github.com/ascii-boxes/boxes.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9b9f8016762d42ed8a953926e3bfdd4079fb4a25a7587c0ec6afe2a3a7327f3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "57d01293e7a7dfd1ab780f0bbf819aac04ad3e6ea27ea5fa1350399bccba3b83"
   end
 
   depends_on "bison" => :build
