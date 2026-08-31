@@ -9,7 +9,7 @@ class Poetry < Formula
   head "https://github.com/python-poetry/poetry.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "66796b6ac63ee9dc7e07ba347911f3ea692b9addc348186621098d8665d3815b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db4f17163753830d5139ff906e0bf924f6a4a64dbfbb1b5d982053143e88195a"
   end
 
   depends_on "cmake" => :build # for rapidfuzz
