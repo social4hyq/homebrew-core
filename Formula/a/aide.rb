@@ -6,7 +6,7 @@ class Aide < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d126bdc7ac3f66e6ae7a956882585b078b12328d02c58574c3db10a86a78c89"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03a4d2026c86fc07d8b9bcfde4e31ff6bcd6609684398971c13215fce39f7dce"
   end
 
   head do
