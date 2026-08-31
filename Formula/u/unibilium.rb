@@ -1,12 +1,12 @@
 class Unibilium < Formula
   desc "Very basic terminfo library"
   homepage "https://github.com/neovim/unibilium"
-  url "https://github.com/neovim/unibilium/archive/refs/tags/v2.1.2.tar.gz"
-  sha256 "370ecb07fbbc20d91d1b350c55f1c806b06bf86797e164081ccc977fc9b3af7a"
+  url "https://github.com/neovim/unibilium/archive/refs/tags/v2.1.4.tar.gz"
+  sha256 "7360907bcf79ba49f6fc4a504767ff86e93ab9018477026fcc70d5ab77e1f2c1"
   license "LGPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "326816cc71108c2905c488da37756f27356d93fd486e78bc255eb810517d3e1c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b16c2b540cf89ceb234f699f123e0496a89fc62500a1cfaf670d8ddec5927209"
   end
 
   depends_on "autoconf" => :build
