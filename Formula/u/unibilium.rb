@@ -6,7 +6,7 @@ class Unibilium < Formula
   license "LGPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "326816cc71108c2905c488da37756f27356d93fd486e78bc255eb810517d3e1c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b16c2b540cf89ceb234f699f123e0496a89fc62500a1cfaf670d8ddec5927209"
   end
 
   depends_on "autoconf" => :build
