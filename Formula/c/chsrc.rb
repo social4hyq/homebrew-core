@@ -15,7 +15,7 @@ class Chsrc < Formula
   head "https://github.com/RubyMetric/chsrc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d9ab4a0bd09578536cfc4c46730730433571216e7534e99e6d8e502957b9904"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "13f36a29c65879d66097ca8b419d6f0efe763de86938531bfb24b9cba98d814a"
   end
 
   def install
