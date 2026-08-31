@@ -7,12 +7,7 @@ class Godap < Formula
   head "https://github.com/Macmod/godap.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "8dfffa83e0b66a22702b543ad5f55648e02e92b479924f488d447df36d1f13b7"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "8dfffa83e0b66a22702b543ad5f55648e02e92b479924f488d447df36d1f13b7"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "8dfffa83e0b66a22702b543ad5f55648e02e92b479924f488d447df36d1f13b7"
-    sha256 cellar: :any_skip_relocation, sonoma:        "bd9fe716f75539fa90f1703974e88587235c1480c4965812551f2cd9533fb099"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "ea3549974673835520c900004bcc822ed67822f13e813d14ef48fd0f9d37367c"
-    sha256 cellar: :any,                 x86_64_linux:  "29be9e66fbd194161d2c8aa537888a97f7fca555860be213cb9847341a252257"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3dc4375e33c4e245fb6fea6df7ec1cd511a50212e2335896b1e4d84dc0ddb70"
   end
 
   depends_on "go" => :build
