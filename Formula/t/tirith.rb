@@ -12,12 +12,7 @@ class Tirith < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "93e9c0c6e2169d6439da82d27f5f9bbf7c6444a48cf5fb0e5330d93bc4950b18"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7ab44118a940d58f3a95bb1b4fe0e001c32fed4b6766d0382c956d1088e624da"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "5583daa0f2f500db92388d0bac4b5dfc8ce6bec36f899ceda634d42ccbfa8ce8"
-    sha256 cellar: :any_skip_relocation, sonoma:        "ac5e07c69e018d6415227fb7fb9cd2f2b4b7ba56a16174c34aab26959a239257"
-    sha256 cellar: :any,                 arm64_linux:   "44254e0ac9b25bcc60e33abd43d0fa9b8cee704bcd00338b62e12f43449d5ecd"
-    sha256 cellar: :any,                 x86_64_linux:  "54e643d763acc4f03d10ee9d11551eb489f26376af093f57be1eb8f290be44de"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0979022997f21a387ff05f468e57309700ff9709f56f7d7ae0bd96790fe6366b"
   end
 
   depends_on "rust" => :build
