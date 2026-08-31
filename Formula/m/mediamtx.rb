@@ -9,12 +9,7 @@ class Mediamtx < Formula
   head "https://github.com/bluenviron/mediamtx.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "7a527f2842c0da5dcb41cbb24970df3aece1fdec09fdd4555b366231c9a20a23"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "7a527f2842c0da5dcb41cbb24970df3aece1fdec09fdd4555b366231c9a20a23"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "7a527f2842c0da5dcb41cbb24970df3aece1fdec09fdd4555b366231c9a20a23"
-    sha256 cellar: :any_skip_relocation, sonoma:        "04ce2887317af1e1a490ced085864c9bb796431fc4c54af3623ea09787681cac"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "bc6ee206b19b7d5ddf7c33fb32709847163d41e38e634cba08d3ab2e25a51d22"
-    sha256 cellar: :any,                 x86_64_linux:  "db3bf3e86e5738d7f752348f3fb0c4f24a35c6ce2167eec9a82a81071e299f76"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4133cd3baa1b8fc121c0c9f0d62636cde33b5fff4b021fb64a9b368cb4b3ff8f"
   end
 
   depends_on "go" => :build
