@@ -1,8 +1,8 @@
 class Pdfcpu < Formula
   desc "PDF processor written in Go"
   homepage "https://pdfcpu.io"
-  url "https://github.com/pdfcpu/pdfcpu/archive/refs/tags/v0.14.0.tar.gz"
-  sha256 "9e824957d847af70585e9b5c94070e3b78377c876adadc0b90e37afcf706ba69"
+  url "https://github.com/pdfcpu/pdfcpu/archive/refs/tags/v0.15.0.tar.gz"
+  sha256 "69924a7363ea19b4f3d4799ebf78bcabfec75a735c9569983a6e2834b5e8c6b3"
   license "Apache-2.0"
 
   livecheck do
@@ -11,7 +11,12 @@ class Pdfcpu < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "46037ecb4fbb49fc1b05a455f49206e9acefe9ed545c293006803bd386ee6a55"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "e9b49c8c5a894d6e6e80cfd9dbef28033d26fc83c497907625d012bfd8eb8ff2"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e9b49c8c5a894d6e6e80cfd9dbef28033d26fc83c497907625d012bfd8eb8ff2"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "e9b49c8c5a894d6e6e80cfd9dbef28033d26fc83c497907625d012bfd8eb8ff2"
+    sha256 cellar: :any_skip_relocation, sonoma:        "42c337d706a85d5577f81fd45abb9b3ad21226c9aefdf9092b75ff3a8cb03165"
+    sha256 cellar: :any_skip_relocation, arm64_linux:   "af3a53e00dc41d3ad9bb4ce473cb18c8af49ba38e4051ec7990ae559d3f446f1"
+    sha256 cellar: :any,                 x86_64_linux:  "86b1cd8dce6af8d0cba20388938747e408ac2309c108fe368f9a749663393eff"
   end
 
   depends_on "go" => :build
