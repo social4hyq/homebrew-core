@@ -8,7 +8,8 @@ class Ejdb < Formula
   head "https://github.com/Softmotions/ejdb.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "66f49bc4120fb662a133d2faa5d51754fdf3b240c1c744a233381fbff62199a9"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "66f5dafa3c65983f9cb5ebe8181de964641ac00a6b023ae1e46d94d455efc73a"
   end
 
   depends_on "cmake" => :build
@@ -24,11 +25,10 @@ class Ejdb < Formula
   end
 
   def install
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args
-      ENV.deparallelize # CMake Error: WSLAY Not Found
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    ENV.deparallelize # CMake Error: WSLAY Not Found
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
