@@ -1,8 +1,8 @@
 class Exiv2 < Formula
   desc "EXIF and IPTC metadata manipulation library and tools"
   homepage "https://exiv2.org/"
-  url "https://github.com/Exiv2/exiv2/archive/refs/tags/v0.28.8.tar.gz"
-  sha256 "ea51b0609f58a9afa063b60daa1539948b62247721e154f4fff0ad3aec9f9756"
+  url "https://github.com/Exiv2/exiv2/archive/refs/tags/v0.28.9.tar.gz"
+  sha256 "700b76b97695b2fab4ef8c79619c68ae57d09e0c130724791cafbd39e0eb4aef"
   license "GPL-2.0-or-later"
   compatibility_version 1
   head "https://github.com/Exiv2/exiv2.git", branch: "main"
@@ -13,7 +13,7 @@ class Exiv2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "038d6c7283c60a48023be22ba813d5519c56005c7cbc733fe8160aa5fd204721"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f03ba803a0859c11817df8f2aab3579ba5882c14d3ef0172f5e75ab0189781a"
   end
 
   depends_on "cmake" => :build
