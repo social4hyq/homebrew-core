@@ -7,7 +7,7 @@ class AwsChecksums < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7295ece25de35d53ab115ad71a9587332ea1892ef586720761ad3a3120f68e93"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "956a9945975438a6ec6e39e052dd2de15c6d4a20c5fe22923e47214e4ee96e33"
   end
 
   depends_on "cmake" => :build
