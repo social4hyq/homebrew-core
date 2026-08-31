@@ -1,8 +1,8 @@
 class Omega < Formula
   desc "Packaged search engine for websites, built on top of Xapian"
   homepage "https://xapian.org/"
-  url "https://oligarchy.co.uk/xapian/2.0.0/xapian-omega-2.0.0.tar.xz"
-  sha256 "85088a16cf64ea676d0856813244909f132e1b32013a56928c40a1e333a6734a"
+  url "https://oligarchy.co.uk/xapian/2.1.0/xapian-omega-2.1.0.tar.xz"
+  sha256 "e3bcf29b5fcb790c28c3e90624ff9297a9a44914f0ba566cb3ee677a015097be"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class Omega < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "79ab15a48a01a2f7e6afac5fda5f5078a56b098d9bcc81bb13968798a964d4ba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "63c06450dfe9e9c5d630f7f1bf20ff5153f39e0f582e5eae156ff7d39ad44165"
   end
 
   depends_on "pkgconf" => :build
