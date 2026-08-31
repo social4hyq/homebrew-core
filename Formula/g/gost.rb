@@ -1,8 +1,8 @@
 class Gost < Formula
   desc "GO Simple Tunnel - a simple tunnel written in golang"
   homepage "https://gost.run/"
-  url "https://github.com/go-gost/gost/archive/refs/tags/v3.2.6.tar.gz"
-  sha256 "79874354530b899576dd4866d3b1400651d0b17c1e7a90ad30c44686a0642600"
+  url "https://github.com/go-gost/gost/archive/refs/tags/v3.3.0.tar.gz"
+  sha256 "2a65e2da14fef6b6da8d4e32a8bc62e39970dbb141db42bc6f5821f90ac1e9a3"
   license "MIT"
   head "https://github.com/go-gost/gost.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Gost < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6f943ce3f50f9e403d24a671b10882c2b001b27813ace2cd07420a6911164c5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7368f46cf47fbfdcfaf7dcd6f6675902b86604b8b085a029073b0e5e4e12f93d"
   end
 
   depends_on "go" => :build
