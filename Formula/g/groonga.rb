@@ -13,7 +13,7 @@ class Groonga < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5bab50bd2e742be7454809841ebcb9c92ff426e9c26d70167141d01636b4815b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "968304321e6e3ae10dd22bdf2c8a278387fa97b85df3c2edc3c5e05807b66fa5"
   end
 
   depends_on "cmake" => :build
