@@ -1,8 +1,8 @@
 class Zsync < Formula
   desc "File transfer program"
   homepage "https://zsync.moria.org.uk/"
-  url "https://zsync.moria.org.uk/download/zsync-0.7.2.tar.gz"
-  sha256 "51a54a2bcf60311f108924b5f8795fb7a8eeeedd0b52f4f634842ea3470978a2"
+  url "https://zsync.moria.org.uk/download/zsync-0.8.0.tar.gz"
+  sha256 "58b02f27e14326b62b7fdd6ed431a3e243b1c5a3ea9e3c1678e136dbf00c238d"
   license "Artistic-2.0"
   head "https://github.com/cph6/zsync.git", branch: "master"
 
@@ -12,14 +12,14 @@ class Zsync < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3c3dfbfa62b845f971675efd71c5b47e7cece8f88a511e883d197407bea528b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "36d290525fbe34cba717e372cec3f22d2ee6907729a5acdc9d519443de1ee169"
   end
 
   depends_on "go" => :build
 
   def install
     (buildpath/"cmd").each_child(false) do |cmd|
-      system "go", "build", *std_go_args(ldflags: "-s -w", output: bin/cmd), "./cmd/#{cmd}"
+      system "go", "build", *std_go_args(output: bin/cmd), "./cmd/#{cmd}"
       man1.install "man/#{cmd}.1"
     end
   end
@@ -27,7 +27,7 @@ class Zsync < Formula
   test do
     touch testpath/"foo"
     system bin/"zsyncmake", "foo"
-    sha1 = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
-    assert_match "SHA-1: #{sha1}", (testpath/"foo.zsync").read
+    sha256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    assert_match "File-Hash: SHA-256:#{sha256}", (testpath/"foo.zsync").read
   end
 end
