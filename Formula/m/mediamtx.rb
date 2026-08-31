@@ -1,27 +1,25 @@
 class Mediamtx < Formula
   desc "Zero-dependency real-time media server and media proxy"
-  homepage "https://github.com/bluenviron/mediamtx"
+  homepage "https://mediamtx.org"
   # need to use the tag to generate the version info
   url "https://github.com/bluenviron/mediamtx.git",
-      tag:      "v1.20.0",
-      revision: "1b943637a4b5778bb929a7af7687b048fecaa03f"
+      tag:      "v1.20.1",
+      revision: "883194a19b7244355c9bc975c0574c9842733637"
   license "MIT"
   head "https://github.com/bluenviron/mediamtx.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "20de9489e0c8e2bdf8c2c53a8fafb29ba4a14e55314f187f133b7d99cbd82799"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4133cd3baa1b8fc121c0c9f0d62636cde33b5fff4b021fb64a9b368cb4b3ff8f"
   end
 
   depends_on "go" => :build
 
   def install
     system "go", "generate", "./..."
-    system "go", "build", *std_go_args(ldflags: "-s -w")
+    system "go", "build", *std_go_args
 
     # Install default config
     pkgetc.install "mediamtx.yml"
-
-    (var/"log/mediamtx").mkpath
   end
 
   service do
