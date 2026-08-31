@@ -1,0 +1,18 @@
+diff -ruN a/src/clog.cpp b/src/clog.cpp
+--- a/src/clog.cpp	2016-06-27 21:22:54.000000000 +0000
++++ b/src/clog.cpp	2026-08-31 07:11:33.440000000 +0000
+@@ -109,11 +109,12 @@
+   {
+     // Locate $HOME.
+     struct passwd* pw = getpwuid (getuid ());
+-    if (!pw)
++    const char* home = pw ? pw->pw_dir : getenv ("HOME");
++    if (!home)
+       throw std::string ("Could not determine the home directory.");
+ 
+     // Assume ~/.clogrc
+-    std::string rcFile = pw->pw_dir;
++    std::string rcFile = home;
+     rcFile += "/.clogrc";
+ 
+     // Process arguments.
