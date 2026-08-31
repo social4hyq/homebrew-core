@@ -1,0 +1,54 @@
+--- a/crates/tirith/src/cli/capsule.rs
++++ b/crates/tirith/src/cli/capsule.rs
+@@ -1234,11 +1234,12 @@
+ ///
+ /// libc 0.2 intentionally hides its musl statx bindings unless callers opt in
+ /// to an unstable, global musl-version cfg. The kernel interface itself is
+-/// architecture-stable. Keep a private output-only layout for the musl release
+-/// target so cleanup retains exact mount-ID evidence instead of weakening to
+-/// `st_dev` (which cannot distinguish same-device bind mounts). Any unsupported
+-/// syscall or missing result bit propagates as a fail-closed cleanup error.
+-#[cfg(all(target_os = "linux", target_env = "musl"))]
++/// architecture-stable. Keep a private output-only layout for the musl/OHOS
++/// release targets so cleanup retains exact mount-ID evidence instead of
++/// weakening to `st_dev` (which cannot distinguish same-device bind mounts).
++/// Any unsupported syscall or missing result bit propagates as a fail-closed
++/// cleanup error.
++#[cfg(all(target_os = "linux", any(target_env = "musl", target_env = "ohos")))]
+ #[repr(C)]
+ struct CleanupKernelStatx {
+     stx_mask: u32,
+@@ -1264,18 +1265,18 @@
+     _stx_spare: [u64; 12],
+ }
+ 
+-#[cfg(all(target_os = "linux", target_env = "musl"))]
++#[cfg(all(target_os = "linux", any(target_env = "musl", target_env = "ohos")))]
+ const _: [(); 256] = [(); std::mem::size_of::<CleanupKernelStatx>()];
+-#[cfg(all(target_os = "linux", target_env = "musl"))]
++#[cfg(all(target_os = "linux", any(target_env = "musl", target_env = "ohos")))]
+ const _: [(); 0] = [(); std::mem::offset_of!(CleanupKernelStatx, stx_mask)];
+-#[cfg(all(target_os = "linux", target_env = "musl"))]
++#[cfg(all(target_os = "linux", any(target_env = "musl", target_env = "ohos")))]
+ const _: [(); 28] = [(); std::mem::offset_of!(CleanupKernelStatx, stx_mode)];
+-#[cfg(all(target_os = "linux", target_env = "musl"))]
++#[cfg(all(target_os = "linux", any(target_env = "musl", target_env = "ohos")))]
+ const _: [(); 32] = [(); std::mem::offset_of!(CleanupKernelStatx, stx_ino)];
+-#[cfg(all(target_os = "linux", target_env = "musl"))]
++#[cfg(all(target_os = "linux", any(target_env = "musl", target_env = "ohos")))]
+ const _: [(); 144] = [(); std::mem::offset_of!(CleanupKernelStatx, stx_mnt_id)];
+ 
+-#[cfg(all(target_os = "linux", target_env = "musl"))]
++#[cfg(all(target_os = "linux", any(target_env = "musl", target_env = "ohos")))]
+ fn cleanup_fd_statx(fd: i32) -> std::io::Result<CleanupStatxEvidence> {
+     let mut statx = std::mem::MaybeUninit::<CleanupKernelStatx>::zeroed();
+     let result = unsafe {
+@@ -6759,7 +6760,7 @@
+         entries
+     }
+ 
+-    #[cfg(all(target_os = "linux", target_env = "musl"))]
++    #[cfg(all(target_os = "linux", any(target_env = "musl", target_env = "ohos")))]
+     #[test]
+     fn musl_cleanup_statx_binding_returns_exact_directory_identity() {
+         use std::os::fd::AsRawFd as _;
