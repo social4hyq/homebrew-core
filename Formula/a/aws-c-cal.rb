@@ -1,25 +1,30 @@
 class AwsCCal < Formula
   desc "AWS Crypto Abstraction Layer"
   homepage "https://github.com/awslabs/aws-c-cal"
-  url "https://github.com/awslabs/aws-c-cal/archive/refs/tags/v0.9.15.tar.gz"
-  sha256 "215dd31c12ea49c4f40aa7882a800f9648e4095cfcb2d6abdd27e957574ad6e2"
+  url "https://github.com/awslabs/aws-c-cal/archive/refs/tags/v1.0.0.tar.gz"
+  sha256 "9c6d424d206dd7822aa44fa39ce31575dcbaa83133620abdac8e56e4cea9667c"
   license "Apache-2.0"
-  compatibility_version 1
+  compatibility_version 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "51b03a8203325785f60f8fef140868927db8f73eb7b59f9c47c135f61fe29894"
+    sha256 cellar: :any, arm64_tahoe:   "dc874725a0fa415bd235f852c353f8d90de9e2e12c3fd3783ec9a79152d5be8c"
+    sha256 cellar: :any, arm64_sequoia: "f7bbcb8758802234d9d4003752cbc591f09a150dba7d57f0dba5df3fa3381ff1"
+    sha256 cellar: :any, arm64_sonoma:  "c767d2ed71a3268381bc1f5a2640f00de3c8d5b10505605e622ec171a079acad"
+    sha256 cellar: :any, arm64_linux:   "412c8abcfd0db18ae6d906e68041eda604588a85542b77a0c132954107da3be2"
+    sha256 cellar: :any, x86_64_linux:  "af1708f85c64e44c42c66b6087b42930f919758d18013f4a6f257093736b5ad4"
   end
 
   depends_on "cmake" => :build
   depends_on "aws-c-common"
-
-  on_linux do
-    depends_on "openssl@3"
-  end
+  depends_on "openssl@3"
 
   def install
-    args = ["-DBUILD_SHARED_LIBS=ON"]
-    args << "-DUSE_OPENSSL=ON" if OS.linux?
+    # ed25519 is needed by awscli
+    args = %w[
+      -DAWS_USE_LIBCRYPTO_TO_SUPPORT_ED25519_EVERYWHERE=ON
+      -DBUILD_SHARED_LIBS=ON
+      -DUSE_OPENSSL=ON
+    ]
 
     system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
@@ -68,7 +73,7 @@ class AwsCCal < Formula
       }
     C
     system ENV.cc, "test.c", "-o", "test", "-L#{lib}", "-laws-c-cal",
-                   "-L#{Formula["aws-c-common"].opt_lib}", "-laws-c-common"
+                   "-L#{formula_opt_lib("aws-c-common")}", "-laws-c-common"
     system "./test"
   end
 end
