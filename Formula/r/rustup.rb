@@ -9,8 +9,8 @@ class Rustup < Formula
   revision 4
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89d9caf725d4206a7b87b1f4ac9a8e343a2e72fb45b968cc93c2f98e51153789"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "36e538f09d61e0c9d0e4a09503d90d844f77ae7eae6d3ca0e43321151f860963"
   end
 
   keg_only "it conflicts with rust"
@@ -56,10 +56,8 @@ class Rustup < Formula
   end
 
   def install
-    # jitterentropy (vendored in aws-lc-sys) requires -O0; the compiler shim
-    # strips -O flags from the build and appends its own level, overriding
-    # CMake's per-file -O0 and tripping its #error. ENV.O0 pins the shim to -O0.
-    ENV.O0
+    # Work around superenv breaking aws-lc-sys `-O0` needed to build CPU Jitter RNG
+    ENV["AWS_LC_SYS_NO_JITTER_ENTROPY"] = "1"
 
     system "cargo", "install", *std_cargo_args(features: "no-self-update")
 
