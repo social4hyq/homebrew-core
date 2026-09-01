@@ -8,7 +8,8 @@ class Uv < Formula
   head "https://github.com/astral-sh/uv.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7620bdcb58a6a3363765a6ccabfe6d347400767b7acfbe3cd2929534de9a85ae"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c320185a68bedd90e3e3937c157d6a63f4e11a6acf8fa96f25f135007e5153da"
   end
 
   depends_on "cmake" => :build
@@ -69,10 +70,8 @@ class Uv < Formula
   end
 
   def install
-    # jitterentropy (vendored in aws-lc-sys) requires -O0; the compiler shim
-    # strips -O flags from the build and appends its own level, overriding
-    # CMake's per-file -O0 and tripping its #error. ENV.O0 pins the shim to -O0.
-    ENV.O0
+    # Work around superenv breaking aws-lc-sys `-O0` needed to build CPU Jitter RNG
+    ENV["AWS_LC_SYS_NO_JITTER_ENTROPY"] = "1"
 
     ENV["UV_COMMIT_HASH"] = ENV["UV_COMMIT_SHORT_HASH"] = tap.user
     ENV["UV_COMMIT_DATE"] = time.strftime("%F")
