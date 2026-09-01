@@ -4,6 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.25.tar.gz"
   sha256 "44e9530d7be172005c7d60aef317440eecb85d557d94cce7fa35c5a7b9d9da0b"
   license "MIT"
+  revision 1
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
   # HTML page fetch), while api.github.com answers fast — same JSON strategy
@@ -16,14 +17,15 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.25-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce3fe69ef0455f06b3bfc9c6a6a4ee22ce8278d32216cce682ef71263c75ef67"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.25-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "567ff9e1a58a30e1e5e4a72bc1d1d0c1629f7106c73eb12eecdff27c884e9122"
   end
 
   # bun build --compile single binary: OHOS runtime + JS bundle + native .so embedded.
   # ohos-compat-shim statically linked since bun r31 — no runtime shim dependency.
-  # Native deps via @ohos-ports/* package.json overrides (opentui-core, bun-pty,
-  #   lightningcss, tailwindcss-oxide, @parcel/watcher).
+  # Native deps via @ohos-npm-ports/* package.json overrides (opentui-core, bun-pty,
+  #   lightningcss, tailwindcss-oxide); @parcel/watcher stays on @ohos-ports
+  #   (no equivalent port published there yet).
   # bun install --ignore-scripts: tree-sitter-bash/-powershell would node-gyp build
   #   native bindings the app never loads (opencode uses web-tree-sitter wasm).
   # @parcel/watcher: inotify backend on OHOS via getBackend() openharmony patch.
@@ -40,14 +42,15 @@ class Opencode < Formula
     # the install set entirely).
     rm_r %w[packages/desktop packages/web packages/docs packages/storybook]
 
-    # Redirect native deps to @ohos-ports musl builds.
+    # Redirect native deps to @ohos-npm-ports builds; @parcel/watcher has no
+    #   @ohos-npm-ports equivalent yet, so it stays on @ohos-ports.
     # nil check makes a vanished anchor fail loudly.
     inreplace "package.json" do |s|
       overrides = [
-        '"@opentui/core": "npm:@ohos-ports/opentui-core@0.4.5-patch.1",',
-        '    "bun-pty": "npm:@ohos-ports/bun-pty@0.4.10",',
-        '    "lightningcss": "npm:@ohos-ports/lightningcss@1.32.0",',
-        '    "@tailwindcss/oxide": "npm:@ohos-ports/tailwindcss-oxide@4.3.1",',
+        '"@opentui/core": "npm:@ohos-npm-ports/opentui-core@0.4.5-1",',
+        '    "bun-pty": "npm:@ohos-npm-ports/bun-pty@0.4.10-1",',
+        '    "lightningcss": "npm:@ohos-npm-ports/lightningcss@1.33.0-1",',
+        '    "@tailwindcss/oxide": "npm:@ohos-npm-ports/tailwindcss-oxide@4.3.3-2",',
         '    "@parcel/watcher-linux-arm64-musl": "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1",',
         '    "@parcel/watcher-openharmony-arm64": "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1",',
       ]
@@ -116,7 +119,8 @@ class Opencode < Formula
              "name.replace(pkg.name, \"bun\")) as any,") ||
         odie("opencode: build.ts compile-target anchor not found")
     end
-    # Disable npm minimum-release-age policy (blocks fresh @ohos-ports packages).
+    # Disable npm minimum-release-age policy (blocks fresh @ohos-ports and
+    # @ohos-npm-ports packages).
     # inreplace raises on upstream reword; bun ignores unknown bunfig keys.
     inreplace "bunfig.toml", "minimumReleaseAge = 259200\n", ""
     system "bun", "install", "--ignore-scripts"
