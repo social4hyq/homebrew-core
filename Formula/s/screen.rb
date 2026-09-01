@@ -5,6 +5,7 @@ class Screen < Formula
   mirror "https://ftp.gnu.org/gnu/screen/screen-5.0.2.tar.gz"
   sha256 "ca9a2c7e240919bc7ac12124593ae4529bb4eb5f7349d8857829b7e3f0b3b332"
   license "GPL-3.0-or-later"
+  revision 1
   head "https://git.savannah.gnu.org/git/screen.git", branch: "master"
 
   bottle do
@@ -19,6 +20,10 @@ class Screen < Formula
 
   on_linux do
     depends_on "linux-pam"
+  end
+
+  patch do
+    file "Patches/screen/0001-fix-harmonyos.patch"
   end
 
   def install
