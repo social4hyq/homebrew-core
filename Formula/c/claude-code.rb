@@ -4,6 +4,9 @@ class ClaudeCode < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.252.tgz"
   sha256 "a95fff45e1174cb686c0d7fdfb8019a6b610ec2c912bbd86841e8471756c5841"
   license :cannot_represent # Anthropic Commercial Terms of Service
+  revision 1
+  # extract-cli.mjs content changed (binary-asset detection by magic bytes
+  # instead of filename suffix) without a version bump.
   # extract-cli.mjs content changed (zstd-compressed .md asset extraction
   # fix) without a version bump.
   # npmmirror mirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org
@@ -54,8 +57,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.252-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "68367944470f936d9f3c995460ea1323f0f8535788272408b7b08ee5848a5d43"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.252-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e350355e062a2c59c4eb461c7b6f23aac9cfdc5b6f6c281601cbdb213ff251a"
   end
 
   depends_on "bun"
@@ -152,16 +155,30 @@ class ClaudeCode < Formula
       function isTextAsset(base) {
         return base.endsWith(".js") || base.endsWith(".md") || base.endsWith(".txt");
       }
-      // Some .md/.txt assets are stored zstd-compressed with a ".zst" suffix
-      // appended (e.g. "plugin-eval-quickref-<hash>.md.zst"); the extracted
-      // CLI's own asset reader detects the zstd frame magic and decompresses
-      // on read (Bun.zstdDecompressSync), so these must be extracted as raw
-      // bytes, not decoded as Latin1 text and re-encoded as UTF-8 — that
-      // round-trip corrupts any byte >= 0x80, which compressed data is full
-      // of, leaving a payload the decompressor rejects (or worse, one that
-      // "successfully" inflates to garbage).
-      function isCompressedAsset(base) {
-        return base.endsWith(".zst");
+      // Some assets are binary under filenames the extractor has no fixed
+      // suffix list for: 2.1.251 added ".zst"-suffixed zstd-compressed .md
+      // files ("plugin-eval-quickref-<hash>.md.zst"); 2.1.252 added a
+      // zstd-compressed "payload.template.html.asset" (the /design canvas
+      // template) plus three native ".node" addons (image-processor,
+      // clipboard-napi, audio-capture) with no distinctive suffix at all.
+      // Matching by filename suffix is a losing game — Anthropic can (and
+      // did) rename the convention release to release. Sniff the leading
+      // magic bytes instead and write matches as raw bytes, never through
+      // the Latin1-decode/UTF-8-re-encode path used for text assets — that
+      // round-trip corrupts any byte >= 0x80, which both zstd frames and
+      // ELF binaries are full of. (The extracted CLI's own asset reader
+      // already does zstd-magic detection + Bun.zstdDecompressSync on read,
+      // regardless of what the extractor named the file on disk.)
+      const ZSTD_MAGIC = [0x28, 0xb5, 0x2f, 0xfd];
+      const ELF_MAGIC = [0x7f, 0x45, 0x4c, 0x46];
+      function hasMagic(f, magic) {
+        if (f.contents.len < magic.length) return false;
+        const start = BASE + f.contents.off;
+        for (let i = 0; i < magic.length; i++) if (buf[start + i] !== magic[i]) return false;
+        return true;
+      }
+      function isBinaryAsset(f) {
+        return hasMagic(f, ZSTD_MAGIC) || hasMagic(f, ELF_MAGIC);
       }
 
       // Extract every module-graph file next to the entry. Non-.js files keep
@@ -172,7 +189,7 @@ class ClaudeCode < Formula
         const base = f.name.split("/").pop();
         if (f === entry || isTextAsset(base)) {
           emit(f, `${outDir}/${base}`);
-        } else if (isCompressedAsset(base)) {
+        } else if (isBinaryAsset(f)) {
           await Bun.write(`${outDir}/${base}`, buf.subarray(BASE + f.contents.off, BASE + f.contents.off + f.contents.len));
         }
       }
@@ -180,8 +197,9 @@ class ClaudeCode < Formula
       // The graph was built for bun's embedded virtual filesystem
       // ("/$bunfs/root/…"). Rewrite every such specifier to a relative one so
       // plain-bun execution resolves it against the extracted files on disk.
-      // Compressed assets are skipped here: they're binary, already written
-      // correctly above, and can't contain a bunfs specifier to rewrite.
+      // Binary assets (zstd-compressed, native .node addons) are skipped
+      // here: they're already written correctly above, and being binary
+      // can't contain a bunfs specifier to rewrite.
       let rewritten = 0;
       for (const f of files) {
         if (f.contents.len === 0) continue;
