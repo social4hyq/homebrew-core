@@ -1,0 +1,211 @@
+--- a/ansi.c	2026-07-11 20:23:46.000000000 +0800
++++ b/ansi.c	2026-09-01 16:19:27.096318437 +0800
+@@ -40,6 +40,9 @@
+ #include "fileio.h"
+ #include "help.h"
+ #include "logfile.h"
++
++/* HarmonyOS: TIOCPKT not supported, use fallback */
++#undef TIOCPKT
+ #include "mark.h"
+ #include "misc.h"
+ #include "process.h"
+--- a/misc.c	2026-07-11 20:23:46.000000000 +0800
++++ b/misc.c	2026-09-01 16:19:27.092312969 +0800
+@@ -152,30 +152,14 @@
+ 
+ void closeallfiles(int except)
+ {
+-	struct pollfd pfd[1024];
+-	int maxfd, i, fd, ret, z;
++	int maxfd, fd;
+ 
+-	i = 3; /* skip stdin, stdout and stderr */
++	/* skip stdin, stdout and stderr */
+ 	maxfd = getdtablesize();
+ 
+-	while (i < maxfd) {
+-		memset(pfd, 0, sizeof(pfd));
+-
+-		z = 0;
+-		for (fd = i; fd < maxfd && fd < i + 1024; fd++)
+-			pfd[z++].fd = fd;
+-
+-		ret = poll(pfd, fd - i, 0);
+-		if (ret < 0)
+-			Panic(errno, "poll");
+-
+-		z = 0;
+-		for (fd = i; fd < maxfd && fd < i + 1024; fd++)
+-			if (!(pfd[z++].revents & POLLNVAL) && fd != except)
+-				close(fd);
+-
+-		i = fd;
+-	}
++	for (fd = 3; fd < maxfd; fd++)
++		if (fd != except && fcntl(fd, F_GETFD) != -1)
++			close(fd);
+ }
+ 
+ /*
+--- a/screen.c	2026-07-11 20:23:46.000000000 +0800
++++ b/screen.c	2026-09-01 16:19:27.092312969 +0800
+@@ -721,10 +721,24 @@
+ 	}
+ 	if (ppp == NULL) {
+ 		if ((ppp = getpwuid(real_uid)) == NULL) {
+-			Panic(0, "getpwuid() can't identify your account!");
+-			exit(1);
++			/* Fallback: use environment variables when user is not
++			 * in /etc/passwd (e.g. HarmonyOS) */
++			LoginName = getenv("USER");
++			if (!LoginName)
++				LoginName = getenv("LOGNAME");
++			if (!LoginName)
++				LoginName = "unknown";
++			static struct passwd pw_fallback;
++			pw_fallback.pw_name = LoginName;
++			pw_fallback.pw_uid = real_uid;
++			pw_fallback.pw_gid = real_gid;
++			pw_fallback.pw_dir = getenv("HOME") ? getenv("HOME") : "/";
++			pw_fallback.pw_shell = getenv("SHELL") ? getenv("SHELL") : "/bin/sh";
++			pw_fallback.pw_passwd = "";
++			ppp = &pw_fallback;
++		} else {
++			LoginName = ppp->pw_name;
+ 		}
+-		LoginName = ppp->pw_name;
+ 	}
+ 	LoginName = SaveStr(LoginName);
+ 
+@@ -895,12 +909,13 @@
+ 		}
+ #endif
+ 	}
+-	if ((st.st_mode & 0777) != 0700) {
+-		if (eff_uid == real_uid || st.st_uid == real_uid) {
+-			Panic(0, "Directory %s must have mode 700.", SocketPath);
+-		} else {
+-			Panic(0, "Error accessing %s", SocketPath);
+-		}
++	/* HarmonyOS: directory owner is not the current user (Homebrew
++	 * installs files as file_manager UID). The original mode 0700
++	 * check verifies owner bits, but current user accesses through
++	 * group permissions. Use access() to check actual permissions
++	 * for the current user instead of hardcoded mode check. */
++	if (access(SocketPath, R_OK | W_OK | X_OK) != 0) {
++		Panic(0, "Cannot access %s", SocketPath);
+ 	}
+ 	if (SocketMatch && strchr(SocketMatch, '/'))
+ 		Panic(0, "Bad session name '%s'", SocketMatch);
+--- a/socket.c	2026-07-11 20:23:46.000000000 +0800
++++ b/socket.c	2026-09-01 16:19:27.096318437 +0800
+@@ -56,6 +56,18 @@
+   #endif /* PWD_H */
+ #endif
+ 
++
++/* Helper: set abstract namespace socket address.
++ * Derives name from SocketPath's filename part.
++ * Abstract namespace does not create files on filesystem. */
++static void set_abstract_addr(struct sockaddr_un *a)
++{
++	char *sname = strrchr(SocketPath, '/');
++	sname = sname ? sname + 1 : SocketPath;
++	a->sun_path[0] = '\0';
++	snprintf(a->sun_path + 1, sizeof(a->sun_path) - 1, "sc-%s-%s", LoginName, sname);
++}
++
+ #include "screen.h"
+ 
+ #ifdef HAVE_DIRENT_H
+@@ -155,11 +167,10 @@
+ 	xsetegid(real_gid);
+ 
+ 	if ((dirp = opendir(SocketPath)) == NULL) {
+-		if (eff_uid == real_uid) {
+-			Panic(errno, "Cannot opendir %s", SocketPath);
+-		} else {
+-			Panic(0, "Error accessing %s", SocketPath);
+-		}
++		/* Directory not accessible, no sessions found */
++		*nfoundp = 0;
++		*notherp = 0;
++		return 0;
+ 	}
+ 
+ 	slist = NULL;
+@@ -208,7 +219,10 @@
+ 		if (st.st_uid != real_uid)
+ 			continue;
+ #endif
+-		mode = (int)st.st_mode & 0777;
++		/* HarmonyOS: chmod has limited effect, files get group
++		 * permissions added by filesystem. Check only owner bits
++		 * for session state (0600=detached, 0700=attached). */
++		mode = (int)st.st_mode & 0700;
+ 		if (multi && ((mode & 0677) != 0601)) {
+ 			if (strcmp(multi, LoginName)) {
+ 				mode = -4;
+@@ -370,11 +384,11 @@
+ 	if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
+ 		Panic(errno, "socket");
+ 	a.sun_family = AF_UNIX;
+-	strncpy(a.sun_path, SocketPath, ARRAY_SIZE(a.sun_path));
+-	a.sun_path[ARRAY_SIZE(a.sun_path) - 1] = 0;
++	set_abstract_addr(&a);
++	socklen_t addr_len = offsetof(struct sockaddr_un, sun_path) + 1 + strlen(a.sun_path + 1);
+ 	xseteuid(real_uid);
+ 	xsetegid(real_gid);
+-	if (connect(s, (struct sockaddr *)&a, strlen(SocketPath) + 2) != -1) {
++	if (connect(s, (struct sockaddr *)&a, addr_len) != -1) {
+ 		if (quietflag) {
+ 			Kill(D_userpid, SIG_BYE);
+ 			/*
+@@ -397,9 +411,15 @@
+ 			Panic(0, "It is not detached.");
+ 		/* NOTREACHED */
+ 	}
++	/* Remove old marker file from crashed session */
+ 	(void)unlink(SocketPath);
+-	if (bind(s, (struct sockaddr *)&a, strlen(SocketPath) + 2) == -1)
+-		Panic(errno, "bind (%s)", SocketPath);
++	/* Bind abstract namespace socket (no filesystem file created) */
++	if (bind(s, (struct sockaddr *)&a, addr_len) == -1)
++		Panic(errno, "bind");
++	/* Create marker file for session discovery (FindSocket uses opendir) */
++	int mfd = open(SocketPath, O_CREAT | O_WRONLY | O_TRUNC, SOCKMODE);
++	if (mfd >= 0)
++		close(mfd);
+ 	chmod(SocketPath, SOCKMODE);
+ 	if (chown(SocketPath, real_uid, real_gid))
+ 		Panic(errno, "chown");
+@@ -421,11 +441,11 @@
+ 	if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
+ 		Panic(errno, "socket");
+ 	a.sun_family = AF_UNIX;
+-	strncpy(a.sun_path, SocketPath, ARRAY_SIZE(a.sun_path));
+-	a.sun_path[ARRAY_SIZE(a.sun_path) - 1] = 0;
++	set_abstract_addr(&a);
++	socklen_t addr_len = offsetof(struct sockaddr_un, sun_path) + 1 + strlen(a.sun_path + 1);
+ 	xseteuid(real_uid);
+ 	xsetegid(real_gid);
+-	if (connect(s, (struct sockaddr *)&a, strlen(SocketPath) + 2) == -1) {
++	if (connect(s, (struct sockaddr *)&a, addr_len) == -1) {
+ 		if (err)
+ 			Msg(errno, "%s: connect", SocketPath);
+ 		close(s);
+--- a/window.c	2026-07-11 20:23:46.000000000 +0800
++++ b/window.c	2026-09-01 16:19:27.096318437 +0800
+@@ -42,6 +42,11 @@
+ #include <sys/ioctl.h>
+ #include <sys/wait.h>
+ 
++/* HarmonyOS: TIOCPKT is defined in system headers but the ioctl
++ * returns EPERM at runtime. Undefine to use screen built-in
++ * fallback (WNewAutoFlow) for flow control management. */
++#undef TIOCPKT
++
+ #include "fileio.h"
+ #include "help.h"
+ #include "input.h"
