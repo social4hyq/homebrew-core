@@ -1,8 +1,8 @@
 class Oasdiff < Formula
   desc "OpenAPI Diff and Breaking Changes"
   homepage "https://www.oasdiff.com/"
-  url "https://github.com/oasdiff/oasdiff/archive/refs/tags/v1.29.1.tar.gz"
-  sha256 "50cc87718af4f052cae19b9929b3a454bf60b6fb9573aa026d3c0490d894b363"
+  url "https://github.com/oasdiff/oasdiff/archive/refs/tags/v1.30.0.tar.gz"
+  sha256 "fe603d5fecb297dca0ac872061a7fd69460ec65da9483bce05085c99405a35eb"
   license "Apache-2.0"
   head "https://github.com/oasdiff/oasdiff.git", branch: "main"
 
@@ -13,13 +13,13 @@ class Oasdiff < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c51e872bdc4d148622783ec696cfe5879d49d53766fb14e1597dee872f6cf4bb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b827546ce25e15d2657bae68db07da169804cb810a78ad4a31e1e4f7a0861c8"
   end
 
   depends_on "go" => :build
 
   def install
-    ldflags = "-s -w -X github.com/oasdiff/oasdiff/build.Version=#{version}"
+    ldflags = "-X github.com/oasdiff/oasdiff/build.Version=#{version}"
     system "go", "build", *std_go_args(ldflags:)
 
     generate_completions_from_executable(bin/"oasdiff", shell_parameter_format: :cobra)
@@ -39,7 +39,7 @@ class Oasdiff < Formula
     testpath.install resource("homebrew-openapi-test1.yaml")
     testpath.install resource("homebrew-openapi-test5.yaml")
 
-    expected = "3 error, 2 warning"
+    expected = "3 error, 1 warning"
     assert_match expected, shell_output("#{bin}/oasdiff changelog openapi-test1.yaml openapi-test5.yaml")
 
     assert_match version.to_s, shell_output("#{bin}/oasdiff --version")
