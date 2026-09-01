@@ -1,8 +1,8 @@
 class Libomp < Formula
   desc "LLVM's OpenMP runtime library"
   homepage "https://openmp.llvm.org/"
-  url "https://github.com/llvm/llvm-project/releases/download/llvmorg-22.1.8/llvm-project-22.1.8.src.tar.xz"
-  sha256 "922f1817a0df7b1489272d18134ee0087a8b068828f87ac63b9861b1a9965888"
+  url "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.0/llvm-project-23.1.0.src.tar.xz"
+  sha256 "ab1f0e3ec52448c33e8782eaf0422504b87c7b016b22514653ee0d8fcee479ff"
   license "MIT"
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class Libomp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2fbbab2c1fe2a06408e55f9848cd1e2146bb207b86e543df5e846fc12579a913"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "590063ada5efa959dba786d8dc03106ada8702b6b0a8e22e3b5dac588b3789ac"
   end
 
   # Ref: https://github.com/Homebrew/homebrew-core/issues/112107
@@ -25,8 +25,6 @@ class Libomp < Formula
   end
 
   def install
-    inreplace "openmp/runtime/src/kmp.h", "#if defined(__ANDROID__)", "#if defined(__ANDROID__) || defined(__OHOS__)"
-
     # Disable LIBOMP_INSTALL_ALIASES, otherwise the library is installed as
     # libgomp alias which can conflict with GCC's libgomp.
     args = %w[
