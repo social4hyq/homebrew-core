@@ -5,21 +5,12 @@ class CabalInstall < Formula
   head "https://github.com/haskell/cabal.git", branch: "master"
 
   stable do
-    url "https://hackage.haskell.org/package/cabal-install-3.16.1.0/cabal-install-3.16.1.0.tar.gz"
-    sha256 "9d27bc22989f3933486a7bba6ac0a2d8fef16891bf46a973f4d80f429ae95120"
-
-    # Backport HTTP dependency update
-    patch :p2 do
-      url "https://github.com/haskell/cabal/commit/b49da958030b20554fedfacd612144e836ab3d52.patch?full_index=1"
-      sha256 "877b60af7dac4f5a0b5fd96bbdb8bab9407db3f5850264c336b193a42ee092a5"
-    end
-
-    # Backport https://github.com/haskell/cabal/commit/3a6a26f826f3a67d9f452418c8cd0daa0ca12d7c
-    patch :DATA
+    url "https://hackage.haskell.org/package/cabal-install-3.18.1.0/cabal-install-3.18.1.0.tar.gz"
+    sha256 "7e5c3f5e53f7c91f9ff8f0fb075574e772562d0eeb400c402c7d9277558f0821"
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc49e68b8945db0ec0088148da20128572ab9aba5cd2ed74781f486e145e4df0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4858e9298533b289a22fc2e32a39de611a52c17d6b5113b7c3adb9a74a5f1e83"
   end
 
   depends_on "ghc" => [:build, :test]
@@ -90,15 +81,3 @@ class CabalInstall < Formula
   end
 end
 
-__END__
---- a/cabal-install.cabal
-+++ b/cabal-install.cabal
-@@ -66,7 +66,7 @@ common warnings
-
- common base-dep
-     build-depends:
--      , base >=4.13 && <4.22
-+      , base >=4.13 && <4.23
-
- common cabal-dep
-     build-depends:
