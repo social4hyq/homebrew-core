@@ -10,7 +10,7 @@ class CabalInstall < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc49e68b8945db0ec0088148da20128572ab9aba5cd2ed74781f486e145e4df0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4858e9298533b289a22fc2e32a39de611a52c17d6b5113b7c3adb9a74a5f1e83"
   end
 
   depends_on "ghc" => [:build, :test]
