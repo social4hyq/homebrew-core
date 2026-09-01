@@ -15,7 +15,7 @@ class Zellij < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "490f2e5a0b4c757832b8327f1f2f4c8a82b3bd2fadaff4a267c74ab22af99a47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "25e7eb0d6e7392202acf85ab62a1e499d6eadf829505b944e0229481011b0d2b"
   end
 
   depends_on "cmake" => :build
