@@ -1,12 +1,12 @@
 class Azurite < Formula
   desc "Lightweight server clone of Azure Storage that simulates it locally"
   homepage "https://github.com/Azure/Azurite"
-  url "https://registry.npmjs.org/azurite/-/azurite-3.36.0.tgz"
-  sha256 "b33f3373449b0b9cc716cafe293a4d1ba6adfdad37ff2c816a3fafbdcbf50f9f"
+  url "https://registry.npmjs.org/azurite/-/azurite-3.37.0.tgz"
+  sha256 "991f93cbfd9006d61f8708a7ff78f4f76ce90ff8ee1dfb76ba47de2323170065"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc40aa851b15d056b7458c8ee41e6f23c10926b37bc37d41197779d1cb6f8c8d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "32fa6d394c0acae809cc5a713958d8a2697d7efbdae01008d0cde0ac3e92a21f"
   end
 
   depends_on "node"
@@ -29,7 +29,10 @@ class Azurite < Formula
                                "--queuePort", queue_port,
                                "--tablePort", table_port
 
-    sleep 2
+    # Azurite can take several seconds to start up and create its debug log,
+    # so poll for the log file instead of relying on a fixed sleep.
+    deadline = Time.now + 30
+    sleep 2 until Time.now > deadline || (testpath/"log.txt").exist?
 
     assert_match "Azurite Blob service is starting", (testpath/"log.txt").read
     assert_path_exists testpath/"log.txt"
