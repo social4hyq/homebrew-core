@@ -1,18 +1,47 @@
 class Railway < Formula
   desc "Develop and deploy code with zero configuration"
   homepage "https://railway.com/"
-  url "https://github.com/railwayapp/cli/archive/refs/tags/v5.31.0.tar.gz"
-  sha256 "5d2ddab41da248f73517867bc4a89334bb4dd2cef2b7459783cd2610e54fdf98"
+  url "https://github.com/railwayapp/cli/archive/refs/tags/v5.45.10.tar.gz"
+  sha256 "86b10a39fb776e86ac852b6531abb2e35b3629d14c7b98d17a1d3a66ec7632a7"
   license "MIT"
   head "https://github.com/railwayapp/cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "380cec76cfbf02b19f7aef9f0a6a235ecc84fcd8fb7274a99ee18aded0eb032b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac3c8fdb3e703dd2f920e84aa013636113f0fc0ab4e92e91656a270bcb1de982"
   end
 
   depends_on "rust" => :build
 
   def install
+    # nix 0.25.1 (via portable-pty, which pins nix = "0.25") does not support
+    # the OHOS target (aarch64-unknown-linux-ohos): libc treats target_env =
+    # "ohos" as musl, but nix 0.25.1 only excludes target_env = "musl", so it
+    # references symbols that libc does not provide on OHOS. Patch nix to
+    # treat OHOS like musl (same fix as upstream nix >= 0.30, cf.
+    # https://github.com/nix-rust/nix/pull/2587). The vendored path and patch
+    # file are version-specific (nix 0.25.1, pinned by portable-pty): update
+    # them together if the nix version ever changes.
+    #
+    # Vendor the dependency tree and make cargo fetch from vendor/.
+    system "cargo", "vendor", "--locked", "--versioned-dirs", "vendor"
+    (buildpath/".cargo").mkpath
+    File.write(buildpath/".cargo/config.toml", <<~EOS)
+      [source.crates-io]
+      replace-with = "vendored-sources"
+
+      [source.vendored-sources]
+      directory = "vendor"
+    EOS
+    # Patch nix for OHOS and mount it via [patch.crates-io] (a path source, so
+    # cargo skips .cargo-checksum.json verification), then sync Cargo.lock.
+    system "patch", "-p1", "-d", "vendor/nix-0.25.1",
+           "-i", tap.path/"Patches/railway/0001-nix-0.25.1-ohos.patch"
+    File.write(buildpath/"Cargo.toml", <<~EOS, mode: "a")
+      [patch.crates-io]
+      nix = { path = "vendor/nix-0.25.1" }
+    EOS
+    system "cargo", "update", "-p", "nix@0.25.1"
+
     system "cargo", "install", *std_cargo_args
 
     generate_completions_from_executable(bin/"railway", "completion")
