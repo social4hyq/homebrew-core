@@ -6,7 +6,7 @@ class Zellij < Formula
   # Do not add branch: alongside tag:/revision:: Homebrew picks the first
   # ref-type key present, so branch: would silently override the pin.
   url "https://github.com/zellij-org/zellij.git",
-      tag: "v0.45.0", revision: "13e1c25a2b1ef61d90ecd1765e660c575e90977b"
+      tag: "v0.45.1", revision: "efd8fd5a89a20c07a111d248ad7fce53848d2c18"
   license "MIT"
 
   livecheck do
@@ -15,7 +15,7 @@ class Zellij < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "490f2e5a0b4c757832b8327f1f2f4c8a82b3bd2fadaff4a267c74ab22af99a47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "25e7eb0d6e7392202acf85ab62a1e499d6eadf829505b944e0229481011b0d2b"
   end
 
   depends_on "cmake" => :build
@@ -87,6 +87,6 @@ class Zellij < Formula
 
   test do
     assert_match "keybinds", shell_output("#{bin}/zellij setup --dump-config")
-    assert_match "zellij 0.45.0", shell_output("#{bin}/zellij --version")
+    assert_match "zellij #{version}", shell_output("#{bin}/zellij --version")
   end
 end
