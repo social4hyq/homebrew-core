@@ -56,10 +56,8 @@ class Rustup < Formula
   end
 
   def install
-    # jitterentropy (vendored in aws-lc-sys) requires -O0; the compiler shim
-    # strips -O flags from the build and appends its own level, overriding
-    # CMake's per-file -O0 and tripping its #error. ENV.O0 pins the shim to -O0.
-    ENV.O0
+    # Work around superenv breaking aws-lc-sys `-O0` needed to build CPU Jitter RNG
+    ENV["AWS_LC_SYS_NO_JITTER_ENTROPY"] = "1"
 
     system "cargo", "install", *std_cargo_args(features: "no-self-update")
 
