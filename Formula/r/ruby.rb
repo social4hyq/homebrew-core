@@ -2,20 +2,20 @@ class Ruby < Formula
   desc "Powerful, clean, object-oriented scripting language"
   homepage "https://www.ruby-lang.org/"
   license "Ruby"
+  revision 1
   compatibility_version 1
-  head "https://github.com/ruby/ruby.git", branch: "master"
 
   stable do
     # TODO: enable default_user_install when updating to Ruby 4.1
-    url "https://cache.ruby-lang.org/pub/ruby/4.0/ruby-4.0.1.tar.gz"
-    sha256 "3924be2d05db30f4e35f859bf028be85f4b7dd01714142fd823e4af5de2faf9d"
+    url "https://cache.ruby-lang.org/pub/ruby/4.0/ruby-4.0.6.tar.gz"
+    sha256 "837d299e8f7ddf2be31a229a7a7e019d354979825117989acb3b32b1a9be262a"
 
     # Should be updated only when Ruby is updated (if an update is available).
     # The exception is Rubygem security fixes, which mandate updating this
     # formula & the versioned equivalents and bumping the revisions.
     resource "rubygems" do
-      url "https://rubygems.org/rubygems/rubygems-4.0.10.tgz"
-      sha256 "6a225b7a8883de45d90c9b3f7ee14391759b286030ba1d1d77588cd7282e6cc7"
+      url "https://rubygems.org/rubygems/rubygems-4.0.16.tgz"
+      sha256 "ea9c669526af82874f8f33f69bea1b6ddd99283756e598227a9a890035a5a06a"
 
       livecheck do
         url "https://rubygems.org/pages/download"
@@ -29,21 +29,20 @@ class Ruby < Formula
     regex(/href=.*?ruby[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  no_autobump! because: "this is a critical package so an auto bump might break Homebrew usability."
-
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5c8b481b0ec5e6ece9e82d4d3d3cfaac8a803c4b9637c40f3c3ee72873b1481"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f44c49c3b104e0e2c58b8dfb4eaacc14ba7f09fbdb3b71a1226b474c6106e01f"
   end
 
-  keg_only :provided_by_macos
+  head do
+    url "https://github.com/ruby/ruby.git", branch: "master"
+  end
 
   depends_on "autoconf" => :build
   depends_on "pkgconf" => :build
+  depends_on "rust" => :build
   depends_on "libyaml"
   depends_on "openssl@3"
 
-  uses_from_macos "gperf"
   uses_from_macos "libffi"
   uses_from_macos "libxcrypt"
 
@@ -58,6 +57,9 @@ class Ruby < Formula
   patch do
     file "Patches/ruby/0002-implement-pthread_cancel-stub.patch"
   end
+
+  # TODO: remove when enabling default_user_install
+  link_overwrite "bin/bundle", "bin/bundler"
 
   def determine_api_version
     Utils.safe_popen_read(bin/"ruby", "-e", "print Gem.ruby_api_version")
@@ -80,18 +82,15 @@ class Ruby < Formula
     HOMEBREW_PREFIX/"lib/ruby/gems/#{api_version}/bin"
   end
 
+  def versioned_opt_prefix
+    opt_prefix.dirname/"ruby@#{version.major_minor}"
+  end
+
   def install
-    # otherwise `gem` command breaks
-    ENV.delete("SDKROOT")
+    paths = %w[libyaml openssl@3].map { |f| formula_opt_prefix(f) }
+    # Add versioned Ruby RPATH so user-installed gems can work when user is switched to versioned Ruby
+    paths << versioned_opt_prefix if OS.linux? && !versioned_formula?
 
-    # Prevent `make` from trying to install headers into the SDK
-    # TODO: Remove this workaround when the following PR is merged/resolved:
-    #       https://github.com/Homebrew/brew/pull/12508
-    inreplace "tool/mkconfig.rb", /^(\s+val = )'"\$\(SDKROOT\)"'\+/, "\\1"
-
-    system "./autogen.sh" if build.head?
-
-    paths = %w[libyaml openssl@3].map { |f| Formula[f].opt_prefix }
     args = %W[
       --prefix=#{prefix}
       --enable-shared
@@ -106,15 +105,9 @@ class Ruby < Formula
     args << "--with-baseruby=#{RbConfig.ruby}" if build.head?
     args << "--disable-dtrace" if OS.mac? && !MacOS::CLT.installed?
 
-    # Correct MJIT_CC to not use superenv shim
-    args << "MJIT_CC=/usr/bin/#{DevelopmentTools.default_compiler}"
-
     # Avoid stdckdint.h on macOS 15 as it's not available in Xcode 16.0-16.2,
     # and if the build system picks it up it'll use it for runtime builds too.
     args << "ac_cv_header_stdckdint_h=no" if OS.mac? && MacOS.version == :sequoia
-
-    system "autoconf"
-    system "./configure", *args
 
     # Ruby has been configured to look in the HOMEBREW_PREFIX for the
     # sitedir and vendordir directories; however we don't actually want to create
@@ -129,20 +122,49 @@ class Ruby < Formula
       s.gsub! 'prepare "extension objects", vendorarchlibdir', ""
     end
 
+    system "./autogen.sh" if build.head?
+    # Regenerate configure: the OHOS patches modify configure.ac and the
+    # shipped configure is generated from it.
+    system "autoconf"
+    system "./configure", *args
     system "make"
     system "make", "install"
 
     # A newer version of ruby-mode.el is shipped with Emacs
     elisp.install Dir["misc/*.el"].reject { |f| f == "misc/ruby-mode.el" }
 
-    if OS.linux?
-      arch = Utils.safe_popen_read(
-        bin/"ruby", "-rrbconfig", "-e", 'print RbConfig::CONFIG["arch"]'
-      ).chomp
-      # Don't restrict to a specific GCC compiler binary we used (e.g. gcc-5).
-      inreplace lib/"ruby/#{api_version}/#{arch}/rbconfig.rb" do |s|
-        s.gsub! ENV.cxx, "c++"
-        s.gsub! ENV.cc, "cc"
+    if build.stable? # Use bundled RubyGems for --HEAD (will be newer)
+      # OHOS-only workaround: enc/ext .so RUNPATHs embed the build dir, and
+      # OHOS's linker loads that libruby copy ("linked to incompatible"),
+      # leaving ruby with no encodings. Remove once ruby stops embedding
+      # the build dir in those RUNPATHs.
+      rm Dir[buildpath/"libruby.so*"]
+
+      # This is easier than trying to keep both current & versioned Ruby
+      # formulae repeatedly updated with Rubygem patches.
+      resource("rubygems").stage do
+        ENV.prepend_path "PATH", bin
+
+        system bin/"ruby", "setup.rb", "--prefix=#{buildpath}/vendor_gem"
+        rg_in = lib/"ruby/#{api_version}"
+        rg_gems_in = lib/"ruby/gems/#{api_version}"
+
+        # Remove bundled Rubygem and Bundler
+        rm_r rg_in/"bundler"
+        rm rg_in/"bundler.rb"
+        rm_r Dir[rg_gems_in/"gems/bundler-*"]
+        rm Dir[rg_gems_in/"specifications/default/bundler-*.gemspec"]
+        rm_r rg_in/"rubygems"
+        rm rg_in/"rubygems.rb"
+        rm bin/"gem"
+
+        # Drop in the new version.
+        rg_in.install Dir[buildpath/"vendor_gem/lib/*"]
+        (rg_gems_in/"gems").install Dir[buildpath/"vendor_gem/gems/*"]
+        (rg_gems_in/"specifications/default").install Dir[buildpath/"vendor_gem/specifications/default/*"]
+        bin.install buildpath/"vendor_gem/bin/gem" => "gem"
+        bin.install buildpath/"vendor_gem/bin/bundle" => "bundle"
+        bin.install buildpath/"vendor_gem/bin/bundler" => "bundler"
       end
     end
 
@@ -152,16 +174,20 @@ class Ruby < Formula
     config_file.write rubygems_config
   end
 
-  # TODO: remove when enabling default_user_install
+  # Since Gem ships Bundle we want to provide that full/expected installation
+  # but to do so we need to handle the case where someone has previously
+  # installed bundle manually via `gem install`.
+  # TODO: switch to `post_install_steps` (remove/on_macos/if_path_exists DSL)
+  #       once the local brew fork catches up with upstream Homebrew.
   def post_install
-    # Since Gem ships Bundle we want to provide that full/expected installation
-    # but to do so we need to handle the case where someone has previously
-    # installed bundle manually via `gem install`.
-    rm(%W[
-      #{rubygems_bindir}/bundle
-      #{rubygems_bindir}/bundler
-    ].select { |file| File.exist?(file) })
     rm_r(Dir[HOMEBREW_PREFIX/"lib/ruby/gems/#{api_version}/gems/bundler-*"])
+
+    if OS.mac?
+      # Ensure user-installed gems link against the versioned Ruby dylib in opt
+      # rather than the Cellar path (which changes between versions).
+      dylib = HOMEBREW_PREFIX/"opt/ruby@#{version.major_minor}/lib/libruby.#{version.major_minor}.dylib"
+      MachO::Tools.change_dylib_id dylib.to_s, dylib.to_s if dylib.exist?
+    end
   end
 
   def rubygems_config
@@ -263,6 +289,10 @@ class Ruby < Formula
 
     ENV["GEM_HOME"] = testpath
     system bin/"gem", "install", "json"
+    if OS.mac?
+      parser = testpath.glob("gems/json-*/lib/json/ext/parser.bundle").first
+      assert_includes MachO::Tools.dylibs(parser), "#{versioned_opt_prefix}/lib/libruby.#{version.major_minor}.dylib"
+    end
 
     (testpath/"Gemfile").write <<~RUBY
       source 'https://rubygems.org'
