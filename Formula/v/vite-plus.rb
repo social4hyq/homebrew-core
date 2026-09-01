@@ -11,12 +11,12 @@ class VitePlus < Formula
   # OHOS delta vs upstream (everything else is verbatim):
   # bottle block, depends_on swaps, native-binding wiring, build env,
   # vite-task patch, bin/vp wrapper. See the fenced blocks in install.
-  revision 2
+  revision 3
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v0.2.8-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "acfbe8bcf63fe1126f55a08e4bf14f098348edc8c51b611f93de6b1cb55560db"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v0.2.8-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f0836f759ec58b9c987ff33d5f494b77770c8e150aeb61f3ef7840c20c5d4a5"
   end
 
   depends_on "cmake" => :build
@@ -113,7 +113,7 @@ class VitePlus < Formula
       tgz
     end
     overrides = {
-      "lightningcss"          => "npm:@ohos-ports/lightningcss@1.33.0-1",
+      "lightningcss"          => "npm:@ohos-npm-ports/lightningcss@1.33.0-1",
       # yuku ships three versions in this graph, so each gets a qualified
       # override; ast-grep/tsgolint have one.
       "yuku-codegen@0.5.44"   => "npm:@ohos-npm-ports/yuku-codegen@0.5.44-1",
@@ -154,8 +154,9 @@ class VitePlus < Formula
       extensions["#{parent}@#{version}"] = { "optionalDependencies" => { ohos_name => version } }
       overrides["#{ohos_name}@#{version}"] = "link:#{shim}"
     end
-    # @parcel/watcher: the @ohos-ports port ships the openharmony binding
-    # as a proper package (main points at the .node).
+    # @parcel/watcher: the @ohos-ports port (no @ohos-npm-ports equivalent
+    # published yet) ships the openharmony binding as a proper package
+    # (main points at the .node).
     extensions["@parcel/watcher@2.5.1"] = {
       "optionalDependencies" => { "@parcel/watcher-openharmony-arm64" => "2.5.1" },
     }
