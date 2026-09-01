@@ -1,12 +1,11 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.251.tgz"
-  sha256 "7d9000a724acffeda935bdbd370dd97d50705826a81ed4240d4d0aa5bfb44367"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.252.tgz"
+  sha256 "a95fff45e1174cb686c0d7fdfb8019a6b610ec2c912bbd86841e8471756c5841"
   license :cannot_represent # Anthropic Commercial Terms of Service
   # extract-cli.mjs content changed (zstd-compressed .md asset extraction
   # fix) without a version bump.
-  revision 1
   # npmmirror mirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org
   # (aarch64 SIMD AES path trapped by kernel); npmmirror (Aliyun CDN) doesn't.
   # Files are byte-identical (sha256 matches); wrapper tries npmmirror first,
