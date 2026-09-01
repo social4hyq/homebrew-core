@@ -1,0 +1,31 @@
+diff -ruN a/env.c b/env.c
+--- a/env.c	2026-08-29 11:19:49.000000000 +0000
++++ b/env.c	2026-09-01 02:26:28.172000000 +0000
+@@ -72,10 +72,13 @@
+ 
+     if (!(pwp = getpwuid(getuid())))
+     {
+-	fprintf(stderr,
+-		GT_("%s: You don't exist.  Go away.\n"),
+-		program_name);
+-	exit(PS_UNDEFINED);
++	/* HarmonyOS: user not in /etc/passwd, fall back to environment */
++	const char *env_user = getenv("USER");
++	if (!env_user)
++	    env_user = getenv("LOGNAME");
++	if (!env_user)
++	    env_user = "unknown";
++	user = xstrdup(env_user);
+     }
+     else
+     {
+@@ -121,7 +124,8 @@
+     if (!home)
+ 	home = getenv("HOME");
+     if (!home)
+-	home = xstrdup(pwp->pw_dir);
++	if (pwp)
++	    home = xstrdup(pwp->pw_dir);
+     /* and make it an absolute path, so we
+      * can optionally chdir("/") later in daemonize()
+      * without changing behaviour.

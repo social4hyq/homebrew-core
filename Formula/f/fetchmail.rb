@@ -10,6 +10,7 @@ class Fetchmail < Formula
     :public_domain,
     "GPL-2.0-or-later" => { with: "openvpn-openssl-exception" },
   ]
+  revision 1
 
   livecheck do
     url :stable
@@ -17,11 +18,15 @@ class Fetchmail < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ed2206d05c7090b792a6186dfa3ee5b3088c523fb6f1349d0678a8ab278a6a91"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc0cbff75fbdb93a6ff3ed80c293269b00a60a0e878b03a5da50d2e2b010aaf7"
   end
 
   depends_on "pkgconf" => :build
   depends_on "openssl@3"
+
+  patch do
+    file "Patches/fetchmail/0001-add-getenv-home-fallback.patch"
+  end
 
   def install
     system "./configure", "--disable-dependency-tracking",
