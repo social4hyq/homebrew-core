@@ -1,6 +1,7 @@
---- a/include/lttng/tracepoint.h	2026-02-13 18:56:45.000000000 +0000
-+++ b/include/lttng/tracepoint.h	2026-06-12 07:44:02.590565012 +0000
-@@ -497,11 +497,18 @@
+diff --git a/include/lttng/tracepoint.h b/include/lttng/tracepoint.h
+--- a/include/lttng/tracepoint.h	2026-09-01 09:29:51.984336508 +0000
++++ b/include/lttng/tracepoint.h	2026-09-01 09:29:51.986336498 +0000
+@@ -499,12 +499,19 @@
  		 */
  		return;
  	}
@@ -8,6 +9,7 @@
  	ret = dlclose(lttng_ust_tracepoint_dlopen_ptr->liblttngust_handle);
  	if (ret) {
  		fprintf(stderr, "Error (%d) in dlclose\n", ret);
+ 		fflush(stderr);
  		abort();
  	}
 +#endif /* __OHOS__ */
@@ -19,7 +21,7 @@
  	memset(lttng_ust_tracepoint_dlopen_ptr, 0, sizeof(*lttng_ust_tracepoint_dlopen_ptr));
  }
  
-@@ -665,11 +672,13 @@
+@@ -668,12 +675,14 @@
  			&& lttng_ust_tracepoint_destructors_syms_ptr->tracepoint_get_destructors_state
  			&& lttng_ust_tracepoint_destructors_syms_ptr->tracepoint_get_destructors_state()
  			&& !lttng_ust_tracepoint_ptrs_registered) {
@@ -27,6 +29,7 @@
  		ret = dlclose(lttng_ust_tracepoint_dlopen_ptr->liblttngust_handle);
  		if (ret) {
  			fprintf(stderr, "Error (%d) in dlclose\n", ret);
+ 			fflush(stderr);
  			abort();
  		}
 +#endif /* __OHOS__ */

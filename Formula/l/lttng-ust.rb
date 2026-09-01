@@ -1,8 +1,8 @@
 class LttngUst < Formula
   desc "Linux Trace Toolkit Next Generation Userspace Tracer"
   homepage "https://lttng.org/"
-  url "https://lttng.org/files/lttng-ust/lttng-ust-2.15.1.tar.bz2"
-  sha256 "37c9b58ea7aa7bc47d6630b52ba1a48ebce095b9a196eab4ddd273d78301792d"
+  url "https://lttng.org/files/lttng-ust/lttng-ust-2.16.0.tar.bz2"
+  sha256 "1e84e02fa1fc1261eb6cf3d14d64006506a29f7c605ac85de02180318c6aa38a"
   license all_of: ["LGPL-2.1-only", "MIT", "GPL-2.0-only", "BSD-3-Clause", "BSD-2-Clause", "GPL-3.0-or-later"]
 
   livecheck do
@@ -11,7 +11,7 @@ class LttngUst < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9bc9310dcdf05bc612fe9aa72a46f360c8e3ae3579f0ef4497503f92eefee9c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "60891e129c2f055b8d588a193dd1a37bd21f342a89b6dc2916a7df2fc7589bca"
   end
 
   depends_on "pkgconf" => :build
