@@ -8,7 +8,8 @@ class ZigAT015 < Formula
   license "MIT"
   revision 4
 
-  # Version-pinned: herdr targets a specific minimum_zig_version.
+  # Version-pinned to the 0.15.x line (libghostty-vt minimum_zig_version
+  # lineage; herdr now stages its own zig resource instead of this keg).
   livecheck do
     url "https://ziglang.org/download/index.json"
     regex(/"tarball":\s*".*?zig-aarch64-linux-(0\.15\.\d+)\.tar\.xz"/i)
