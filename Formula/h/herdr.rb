@@ -1,10 +1,9 @@
 class Herdr < Formula
   desc "Terminal workspace runtime for AI coding agents (built from source)"
   homepage "https://herdr.dev"
-  url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.8.0.tar.gz"
-  sha256 "47bdb0753beb8a6b157cf2fec26fbe6b787f85ffea0dde579b0001d6cd663572"
+  url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.8.2.tar.gz"
+  sha256 "60453051025ee44ebf055d26cdaf665a0accd99a992cddd22c166a26c49cd161"
   license "Apache-2.0"
-  revision 4
   head "https://github.com/herdrdev/herdr.git", branch: "master"
 
   livecheck do
@@ -91,9 +90,12 @@ class Herdr < Formula
     fg_basic_anchor = "            let foreground_pgid = (pid > 0)\n                " \
                       ".then(|| crate::detect::foreground_process_group_id(pid))\n                " \
                       ".flatten();"
-    fg_spawn_anchor = "                    let foreground_pgid = (pid > 0)\n                        " \
-                      ".then(|| detect::foreground_process_group_id(pid))\n                        " \
-                      ".flatten();"
+    # 0.8.2 reshaped the spawn task's foreground lookup into a match on
+    # (pid, foreground_observation_due); the fresh-lookup arm is the fallback site.
+    fg_spawn_anchor = "                        (_, true) => detect::foreground_process_group_id(pid),"
+    fg_spawn_patched = "                        (_, true) => " \
+                       "detect::foreground_process_group_id(pid)\n                            " \
+                       ".or_else(|| pty_actor_foreground_process_group(&pty_actor)),"
     callsite_anchor = "            terminal.clone(),\n            " \
                       "detection_content_seq.clone(),\n            " \
                       "full_lifecycle_authority_active.clone(),\n            " \
@@ -115,9 +117,7 @@ class Herdr < Formula
              "        };\n\n        let pty_actor = detection_pty_actor(&io);\n\n        " \
              "// --- Detection task ---\n") ||
         odie("herdr: pane.rs detection-task marker anchor not found")
-      s.sub!(fg_spawn_anchor, fg_spawn_anchor.sub(".flatten();",
-                                                  ".flatten()\n                        " \
-                                                  ".or_else(|| pty_actor_foreground_process_group(&pty_actor));")) ||
+      s.sub!(fg_spawn_anchor, fg_spawn_patched) ||
         odie("herdr: pane.rs spawn-task foreground anchor not found")
     end
 
