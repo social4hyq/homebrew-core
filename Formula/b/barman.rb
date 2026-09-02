@@ -8,11 +8,7 @@ class Barman < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "67aff887cf4c408e648b5956969a3d557ab52ee5efd472eccd7f18c4fc9fe018"
-    sha256 cellar: :any, arm64_sequoia: "7037114db5d16fd46256f06ae035f19e3fc0e259f9f2c5c7b5654e790fb2d23f"
-    sha256 cellar: :any, arm64_sonoma:  "caba2aa9a13c8d8bc8ea1bee54831afd7caa446ed86f96801312d258a2e1defe"
-    sha256 cellar: :any, arm64_linux:   "fbb8f2c4fb412734665d5238e4c40871b9dcc217baae3bb440535f5953c7da23"
-    sha256 cellar: :any, x86_64_linux:  "1044127050d0ee8ace9de1d208a5cb60d4beebf5cb02ccb4fd8a3123e036e59b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a8127ef80ed68e369377806aff839062d1eb65f6838d60f845b359e88299d7f"
   end
 
   depends_on "rust" => :build # for uv_build > maturin
