@@ -1,8 +1,8 @@
 class Zola < Formula
   desc "Fast static site generator in a single binary with everything built-in"
   homepage "https://www.getzola.org/"
-  url "https://github.com/getzola/zola/archive/refs/tags/v0.22.1.tar.gz"
-  sha256 "0f59479e05bce79e8d5860dc7e807ea818986094469ed8bf0bb46588ade95982"
+  url "https://github.com/getzola/zola/archive/refs/tags/v0.23.4.tar.gz"
+  sha256 "b8eb945dbafe1e73f1601c215ef1563b9b0a25097576ba48f646db8d75568e40"
   license "EUPL-1.2"
 
   bottle do
@@ -11,6 +11,7 @@ class Zola < Formula
 
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
+  depends_on "cmake"
   depends_on "oniguruma" # for onig_sys
 
   on_linux do
@@ -18,8 +19,11 @@ class Zola < Formula
   end
 
   def install
+    # Work around superenv breaking aws-lc-sys `-O0` needed to build CPU Jitter RNG
+    ENV["AWS_LC_SYS_NO_JITTER_ENTROPY"] = "1"
+
     ENV["RUSTONIG_SYSTEM_LIBONIG"] = "1"
-    system "cargo", "install", *std_cargo_args(features: "native-tls")
+    system "cargo", "install", *std_cargo_args
 
     generate_completions_from_executable(bin/"zola", "completion")
   end
