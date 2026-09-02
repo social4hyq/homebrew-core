@@ -7,7 +7,7 @@ class Go < Formula
   license "BSD-3-Clause"
   compatibility_version 4
   head "https://go.googlesource.com/go.git", branch: "master"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://go.dev/dl/?mode=json"
@@ -23,8 +23,7 @@ class Go < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db00551faa6d17b8c204cc9ae236c7941ccb27b6218223d026bf18eef85c08d0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d14d28d84a403859faffcbc969315c229cb2d45aada6d2b4c148e39ecb90d555"
   end
 
   depends_on macos: :monterey
