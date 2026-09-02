@@ -6,12 +6,7 @@ class Wasm3 < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any, arm64_tahoe:   "535442b0baca3955b8b1a2a863a3c1435ea6f95905c4d65bd986190a5c47d0fd"
-    sha256 cellar: :any, arm64_sequoia: "d7852e9d45aa2640f29069800eda68c8100238a6d09d89562e9a30b162d14a55"
-    sha256 cellar: :any, arm64_sonoma:  "333a6c7876562076b43d00bd81ac1f33589d87ba4fab58b35091e3411052c94d"
-    sha256 cellar: :any, sonoma:        "8de67257d87de88ccd2f8fb154e7115730bc9944b392e9639d7be967f4b80432"
-    sha256 cellar: :any, arm64_linux:   "6e341d6fed466a7ad6f4f0f2aff871ee29a5caa972336152b65f9da6cdb799ce"
-    sha256 cellar: :any, x86_64_linux:  "0fd6fcd632856e0c0c728afe74cbd7c4d87f1a243b0a1bedec5fb78ffc433b67"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "86ef8eed7daaf62d9eae91fee451b8df32ab06bc873c03d89a500fda5226103e"
   end
 
   depends_on "cmake" => :build
