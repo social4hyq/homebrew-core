@@ -1,10 +1,9 @@
 class Opencode < Formula
   desc "AI coding agent terminal UI"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.25.tar.gz"
-  sha256 "44e9530d7be172005c7d60aef317440eecb85d557d94cce7fa35c5a7b9d9da0b"
+  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.26.tar.gz"
+  sha256 "a2ff47601072064f04263a97cce014c5b8d0692f7beaa7c7427ac02362d6c3d0"
   license "MIT"
-  revision 1
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
   # HTML page fetch), while api.github.com answers fast — same JSON strategy
