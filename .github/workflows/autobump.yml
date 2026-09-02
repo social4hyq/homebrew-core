@@ -24,11 +24,13 @@ name: autobump
 # and remaps the git pin to the branch tip at the npm publish timestamp (see
 # the comment in the loop body). herdr: plain GitHub archive url + sha256,
 # bump-formula-pr-compatible (dry-run confirmed at the 0.8.2 bump). Its
-# install() carries version-sensitive inreplace anchors on pane.rs/build.rs,
-# but an upstream refactor that breaks one dies on the odie guard during
-# pr-validate's source build — a bad bump never earns ci-passed and never
-# automerges; the stuck open PR is the signal to adapt anchors by hand
-# (0.8.2's spawn-task reshape needed exactly that: #456).
+# OHOS adaptations live in Patches/herdr/*.patch — version-sensitive hunks
+# on pane.rs/build.rs; an upstream refactor that breaks one fails
+# pr-validate's source build (patch hunk failure, or install()'s marker
+# odie when toybox patch no-ops silently) — a bad bump never earns
+# ci-passed and never automerges; the stuck open PR is the signal to
+# regenerate the patch by hand (0.8.2's spawn-task reshape needed exactly
+# that: #456).
 # Only add a formula here after confirming `brew bump-formula-pr --dry-run`
 # produces a clean url/sha256 edit for it. version-check.yml keeps reporting
 # the full outdated list (allowlisted or not) for humans deciding what to
