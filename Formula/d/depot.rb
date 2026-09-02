@@ -1,8 +1,8 @@
 class Depot < Formula
   desc "Build your Docker images in the cloud"
   homepage "https://depot.dev/"
-  url "https://github.com/depot/cli/archive/refs/tags/v2.102.2.tar.gz"
-  sha256 "4df1ee17af91227db873a64901ab4ce2364a2a4852ad1a28c15ec56c2e43ad15"
+  url "https://github.com/depot/cli/archive/refs/tags/v2.102.7.tar.gz"
+  sha256 "9697ebe4cb50d7e25528ec54ea212a32a7a1da734fdb48a77c7c3a7ec92f3559"
   license "MIT"
   head "https://github.com/depot/cli.git", branch: "main"
 
@@ -14,14 +14,21 @@ class Depot < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "886ac6b49e64ca213c6a40a0cf1eaba0885bb57e24fc8195e45f9af90f4e5bd7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ed2b2e66701f9571bca5410f5341bb69fc54f0da87e2a3ca99a57fb55f14a0de"
   end
 
   depends_on "go" => :build
 
+  # Fix linking on Linux arm64 with Go 1.27, which rejects cpuid 2.0.4's linkname to `runtime.sched_getaffinity`.
+  patch do
+    url "https://github.com/depot/cli/commit/627f8a6dfad7e7f2f33c774d3aa22af9884f0ebb.patch?full_index=1"
+    sha256 "bffa3eaea34bebeeb3c27fb9ed326137b8824a1ded170eeeb2cdd91c30dd48ac"
+    type :unofficial
+    resolves "https://github.com/depot/cli/pull/570"
+  end
+
   def install
     ldflags = %W[
-      -s -w
       -X github.com/depot/cli/internal/build.Version=#{version}
       -X github.com/depot/cli/internal/build.Date=#{time.iso8601}
       -X github.com/depot/cli/internal/build.SentryEnvironment=release
