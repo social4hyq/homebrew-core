@@ -4,6 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.26.tar.gz"
   sha256 "a2ff47601072064f04263a97cce014c5b8d0692f7beaa7c7427ac02362d6c3d0"
   license "MIT"
+  revision 1
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
   # HTML page fetch), while api.github.com answers fast — same JSON strategy
@@ -23,8 +24,7 @@ class Opencode < Formula
   # bun build --compile single binary: OHOS runtime + JS bundle + native .so embedded.
   # ohos-compat-shim statically linked since bun r31 — no runtime shim dependency.
   # Native deps via @ohos-npm-ports/* package.json overrides (opentui-core, bun-pty,
-  #   lightningcss, tailwindcss-oxide); @parcel/watcher stays on @ohos-ports
-  #   (no equivalent port published there yet).
+  #   lightningcss, tailwindcss-oxide, @parcel/watcher).
   # bun install --ignore-scripts: tree-sitter-bash/-powershell would node-gyp build
   #   native bindings the app never loads (opencode uses web-tree-sitter wasm).
   # @parcel/watcher: inotify backend on OHOS via getBackend() openharmony patch.
@@ -41,8 +41,7 @@ class Opencode < Formula
     # the install set entirely).
     rm_r %w[packages/desktop packages/web packages/docs packages/storybook]
 
-    # Redirect native deps to @ohos-npm-ports builds; @parcel/watcher has no
-    #   @ohos-npm-ports equivalent yet, so it stays on @ohos-ports.
+    # Redirect native deps to @ohos-npm-ports builds.
     # nil check makes a vanished anchor fail loudly.
     inreplace "package.json" do |s|
       overrides = [
@@ -50,8 +49,7 @@ class Opencode < Formula
         '    "bun-pty": "npm:@ohos-npm-ports/bun-pty@0.4.10-1",',
         '    "lightningcss": "npm:@ohos-npm-ports/lightningcss@1.33.0-1",',
         '    "@tailwindcss/oxide": "npm:@ohos-npm-ports/tailwindcss-oxide@4.3.3-2",',
-        '    "@parcel/watcher-linux-arm64-musl": "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1",',
-        '    "@parcel/watcher-openharmony-arm64": "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1",',
+        '    "@parcel/watcher": "npm:@ohos-npm-ports/parcel-watcher@2.5.1-1",',
       ]
       s.gsub!('"@opentui/core": "catalog:",', overrides.join("\n")) ||
         odie("opencode: @opentui/core override anchor not found in package.json")
@@ -80,6 +78,33 @@ class Opencode < Formula
     inreplace "packages/core/src/filesystem/watcher.ts",
       'if (process.platform === "linux") return "inotify"',
       'if (process.platform === "linux" || process.platform === "openharmony") return "inotify"'
+
+    # Binding loader: the dynamic platform require compiles into a runtime
+    # throw inside a bun-compiled binary (there is no node_modules at
+    # runtime), which silently disabled file watching in every shipped
+    # bottle. Catch the throw and load the port's binding from the upstream
+    # literal fallback path instead — a literal require the bundler resolves
+    # and embeds as an asset (embedded load + inotify verified on device).
+    inreplace "packages/core/src/filesystem/watcher.ts" do |s|
+      anchor = [
+        "    const binding = require(",
+        "      `@parcel/watcher-${process.platform}-${process.arch}" \
+        '${process.platform === "linux" ? `-${libc || "glibc"}` : ""}`,',
+        "    )",
+      ].join("\n")
+      replacement = [
+        "    let binding",
+        "    try {",
+        "      binding = require(",
+        "        `@parcel/watcher-${process.platform}-${process.arch}" \
+        '${process.platform === "linux" ? `-${libc || "glibc"}` : ""}`,',
+        "      )",
+        "    } catch {",
+        '      binding = require("@parcel/watcher/build/Release/watcher.node")',
+        "    }",
+      ].join("\n")
+      s.sub!(anchor, replacement) || odie("opencode: watcher binding require anchor not found")
+    end
 
     # Flip openharmony-arm64 binding os:"none" → "openharmony" in bun.lock.
     # Version-independent: only touches os flag, not version/sha256 lines.
