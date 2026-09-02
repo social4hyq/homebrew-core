@@ -14,7 +14,7 @@ class Perl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e06d70c041462fc04aedbe489811e0d1f2a5d809d264e1b4ee494830e750a054"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "544d031401c4570a578a9f171f7797ab4ad0877d877ba24e0886b33eca802078"
   end
 
   depends_on "gdbm"
