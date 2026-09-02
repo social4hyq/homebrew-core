@@ -2,8 +2,8 @@ class Vim < Formula
   desc "Vi 'workalike' with many additional features"
   homepage "https://www.vim.org/"
   # vim should only be updated every 50 releases on multiples of 50
-  url "https://github.com/vim/vim/archive/refs/tags/v9.2.0950.tar.gz"
-  sha256 "5b8d49200fff3f486f28ae999f3ce7c269308ca4663c61f7b4efe61f918689b2"
+  url "https://github.com/vim/vim/archive/refs/tags/v9.2.1000.tar.gz"
+  sha256 "d5a07f8226d6f145a5bc602d48bea61fb141f7304176d6d4e8633979d67d292d"
   license "Vim"
   compatibility_version 1
   head "https://github.com/vim/vim.git", branch: "master"
@@ -26,40 +26,38 @@ class Vim < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8671d15dc9d85351034f808955de40618c346a7487085baf4506c749677b5b8b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f13ae2094a5c72a9a406538d788d7f03de4107a70351a20af417ba8210519b19"
   end
 
-  depends_on "gettext" => :build
-  depends_on "libsodium"
-  depends_on "lua@5.4" # Lua 5.5 doesn't work for now, see https://github.com/vim/vim/issues/19639
-  depends_on "ncurses"
-  depends_on "python@3.14"
-  depends_on "ruby"
-
-  uses_from_macos "perl"
-
   depends_on "gettext"
+  depends_on "lua" => [:build, :test]
+  depends_on "python@3.14" => [:build, :test]
+  depends_on "ruby" => [:build, :test]
+  depends_on "libsodium"
+  depends_on "ncurses"
+
+  uses_from_macos "perl" => [:build, :test]
 
   conflicts_with "ex-vi", because: "vim and ex-vi both install bin/ex and bin/view"
   conflicts_with "macvim", because: "vim and macvim both install vi* binaries"
+  conflicts_with "vim-classic", because: "vim and vim-classic both install vi* binaries"
+
+  def extra_deps = deps.select { |dep| dep.build? && dep.test? }
 
   def install
-    ENV.prepend_path "PATH", Formula["python@3.14"].opt_libexec/"bin"
+    ENV.prepend_path "PATH", formula_opt_libexec("python@3.14")/"bin"
 
-    # https://github.com/Homebrew/homebrew-core/pull/1046
-    ENV.delete("SDKROOT")
-
-    # vim doesn't require any Python package, unset PYTHONPATH.
-    ENV.delete("PYTHONPATH")
-
-    ENV.append_to_cflags "-mllvm -enable-constraint-elimination=0" if DevelopmentTools.clang_build_version == 1600
+    # Allow dynamically loading formulae libraries when not linked
+    extra_deps.each do |dep|
+      extra_rpath = dep.to_formula.opt_lib
+      extra_rpath = rpath(target: extra_rpath) if OS.mac? # cannot use $ORIGIN
+      ENV.append "LDFLAGS", "-Wl,-rpath,#{extra_rpath}"
+    end
 
     # We specify HOMEBREW_PREFIX as the prefix to make vim look in the
     # the right place (HOMEBREW_PREFIX/share/vim/{vimrc,vimfiles}) for
     # system vimscript files. We specify the normal installation prefix
     # when calling "make install".
-    # Homebrew will use the first suitable Perl & Ruby in your PATH if you
-    # build from source. Please don't attempt to hardcode either.
     system "./configure", "--prefix=#{HOMEBREW_PREFIX}",
                           "--mandir=#{man}",
                           "--enable-multibyte",
@@ -67,21 +65,18 @@ class Vim < Formula
                           "--with-compiledby=Homebrew",
                           "--enable-cscope",
                           "--enable-terminal",
-                          "--enable-perlinterp",
-                          "--enable-rubyinterp",
-                          "--enable-python3interp",
+                          "--enable-perlinterp#{"=dynamic" unless OS.mac?}",
+                          "--enable-python3interp=dynamic",
+                          "--enable-rubyinterp=dynamic",
                           "--disable-gui",
                           "--without-x",
-                          "--enable-luainterp",
-                          "--with-lua-prefix=#{Formula["lua@5.4"].opt_prefix}"
+                          "--enable-luainterp=dynamic",
+                          "--with-lua-prefix=#{formula_opt_prefix("lua")}"
     system "make"
     # Parallel install could miss some symlinks
     # https://github.com/vim/vim/issues/1031
     ENV.deparallelize
-    # If stripping the binaries is enabled, vim will segfault with
-    # statically-linked interpreters like ruby
-    # https://github.com/vim/vim/issues/114
-    system "make", "install", "prefix=#{prefix}", "STRIP=#{which "true"}"
+    system "make", "install", "prefix=#{prefix}"
     bin.install_symlink "vim" => "vi"
 
     inreplace share/"vim/vim92/defaults.vim" do |s|
@@ -90,13 +85,20 @@ class Vim < Formula
     end
   end
 
+  def caveats
+    "Additional features can be enabled by installing: #{extra_deps.map(&:name).join(", ")}"
+  end
+
   test do
     (testpath/"commands.vim").write <<~VIM
       :python3 import vim; vim.current.buffer[0] = 'hello python3'
+      :ruby Vim::Buffer.current.append(0, 'hello ruby')
+      :perl $curbuf->Append(0, "hello perl")
+      :lua vim.buffer():insert("hello lua")
       :wq
     VIM
     system bin/"vim", "-T", "dumb", "-s", "commands.vim", "test.txt"
-    assert_equal "hello python3", File.read("test.txt").chomp
+    assert_equal "hello perl\nhello ruby\nhello python3\nhello lua", File.read("test.txt").chomp
     assert_match "+gettext", shell_output("#{bin}/vim --version")
     assert_match "+sodium", shell_output("#{bin}/vim --version")
   end
