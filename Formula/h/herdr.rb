@@ -4,7 +4,7 @@ class Herdr < Formula
   url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.8.0.tar.gz"
   sha256 "47bdb0753beb8a6b157cf2fec26fbe6b787f85ffea0dde579b0001d6cd663572"
   license "Apache-2.0"
-  revision 3
+  revision 4
   head "https://github.com/herdrdev/herdr.git", branch: "master"
 
   livecheck do
@@ -36,6 +36,91 @@ class Herdr < Formula
     musl_arm = "\"aarch64-unknown-linux-musl\" => \"aarch64-linux-musl\","
     ohos_arm = "\"aarch64-unknown-linux-ohos\" => \"aarch64-linux-musl\","
     inreplace "build.rs", musl_arm, "#{musl_arm}\n        #{ohos_arm}"
+
+    # OHOS agent detection: procfs here reports tty_nr/tpgid as 0 for every
+    # process and lacks /proc/<pid>/task/<tid>/children, so neither the native
+    # foreground-process-group lookup nor the child-groups fallback can identify
+    # pane agents (lifecycle hook reports are gated on that identification too).
+    # Fall back to tcgetpgrp() on the pane's own PTY master fd, which the PTY
+    # actor already exposes for cwd tracking; job membership degrades to the
+    # group leader — enough for comm/argv matching and HERDR_AGENT env hints.
+    detection_fallback = <<~RUST
+      // OHOS: procfs reports tpgid as 0 for every process and lacks
+      // /proc/<pid>/task/<tid>/children, so neither the native foreground
+      // process-group lookup nor the child-groups fallback can identify pane
+      // agents. The pane's own PTY master fd still answers tcgetpgrp(); use it
+      // as a fallback. Job membership degrades to the group leader, which is
+      // enough for comm/argv matching and HERDR_AGENT environment hints.
+      #[cfg(unix)]
+      fn detection_pty_actor(io: &PaneRuntimeIo) -> Option<PtyIoActorHandle> {
+          match io {
+              PaneRuntimeIo::Actor(actor) => Some(actor.clone()),
+              #[cfg(test)]
+              PaneRuntimeIo::TestChannel { .. } => None,
+          }
+      }
+
+      #[cfg(not(unix))]
+      fn detection_pty_actor(_io: &PaneRuntimeIo) -> Option<PtyIoActorHandle> {
+          None
+      }
+
+      #[cfg(unix)]
+      fn pty_actor_foreground_process_group(actor: &Option<PtyIoActorHandle>) -> Option<u32> {
+          actor
+              .as_ref()
+              .and_then(PtyIoActorHandle::foreground_process_group_id)
+      }
+
+      #[cfg(not(unix))]
+      fn pty_actor_foreground_process_group(_actor: &Option<PtyIoActorHandle>) -> Option<u32> {
+          None
+      }
+
+    RUST
+    sig_anchor = "#[cfg(unix)]\n" \
+                 "fn spawn_basic_detection_task(\n    " \
+                 "pane_id: PaneId,\n    " \
+                 "child_pid: Arc<AtomicU32>,\n    " \
+                 "terminal: Arc<PaneTerminal>,\n"
+    sig_patched = "#{detection_fallback}#[cfg(unix)]\n" \
+                  "fn spawn_basic_detection_task(\n    " \
+                  "pane_id: PaneId,\n    " \
+                  "child_pid: Arc<AtomicU32>,\n    " \
+                  "terminal: Arc<PaneTerminal>,\n    " \
+                  "pty_actor: Option<PtyIoActorHandle>,\n"
+    fg_basic_anchor = "            let foreground_pgid = (pid > 0)\n                " \
+                      ".then(|| crate::detect::foreground_process_group_id(pid))\n                " \
+                      ".flatten();"
+    fg_spawn_anchor = "                    let foreground_pgid = (pid > 0)\n                        " \
+                      ".then(|| detect::foreground_process_group_id(pid))\n                        " \
+                      ".flatten();"
+    callsite_anchor = "            terminal.clone(),\n            " \
+                      "detection_content_seq.clone(),\n            " \
+                      "full_lifecycle_authority_active.clone(),\n            " \
+                      "events,\n        " \
+                      ");"
+    marker_anchor = "        };\n\n        // --- Detection task ---\n"
+    inreplace "src/pane.rs" do |s|
+      s.sub!(sig_anchor, sig_patched) ||
+        odie("herdr: pane.rs detection-task signature anchor not found")
+      s.sub!(fg_basic_anchor, fg_basic_anchor.sub(".flatten();",
+                                                  ".flatten()\n                " \
+                                                  ".or_else(|| pty_actor_foreground_process_group(&pty_actor));")) ||
+        odie("herdr: pane.rs handoff-task foreground anchor not found")
+      s.sub!(callsite_anchor,
+             callsite_anchor.sub("terminal.clone(),\n",
+                                 "terminal.clone(),\n            detection_pty_actor(&io),\n")) ||
+        odie("herdr: pane.rs handoff call-site anchor not found")
+      s.sub!(marker_anchor,
+             "        };\n\n        let pty_actor = detection_pty_actor(&io);\n\n        " \
+             "// --- Detection task ---\n") ||
+        odie("herdr: pane.rs detection-task marker anchor not found")
+      s.sub!(fg_spawn_anchor, fg_spawn_anchor.sub(".flatten();",
+                                                  ".flatten()\n                        " \
+                                                  ".or_else(|| pty_actor_foreground_process_group(&pty_actor));")) ||
+        odie("herdr: pane.rs spawn-task foreground anchor not found")
+    end
 
     # OHOS strerror_r link fix — same approach as starship.rb.
     (buildpath/"strerror_shim.rs").write <<~RUST
@@ -140,6 +225,26 @@ class Herdr < Formula
     output = shell_output("#{bin}/herdr workspace list")
     workspaces = JSON.parse(output).dig("result", "workspaces")
     assert_includes workspaces.map { |entry| entry["workspace_id"] }, workspace["workspace_id"]
+
+    # Agent detection on OHOS relies on the tcgetpgrp fallback patched in above
+    # (procfs reports no tty foreground group). A fake "opencode" process in a
+    # pane must show up in the agent list.
+    (testpath/"bin").mkpath
+    fake_agent = testpath/"bin/opencode"
+    fake_agent.write("#!/bin/sh\nsleep 60\n")
+    fake_agent.chmod 0755
+
+    output = shell_output("#{bin}/herdr pane list")
+    pane_id = JSON.parse(output).dig("result", "panes", 0, "pane_id")
+    shell_output("#{bin}/herdr pane run #{pane_id} #{fake_agent}")
+    agents = ""
+    20.times do
+      agents = shell_output("#{bin}/herdr agent list")
+      break if agents.include?('"opencode"')
+
+      sleep 1
+    end
+    assert_match '"opencode"', agents
   ensure
     Process.kill("TERM", pid)
     Process.wait(pid)
