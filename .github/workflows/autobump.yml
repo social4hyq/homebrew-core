@@ -22,7 +22,13 @@ name: autobump
 # custom bump path for it — since the npm version-scheme switch it livechecks
 # the @opencode-ai/cli beta dist-tag, mirrors that version into the formula,
 # and remaps the git pin to the branch tip at the npm publish timestamp (see
-# the comment in the loop body).
+# the comment in the loop body). herdr: plain GitHub archive url + sha256,
+# bump-formula-pr-compatible (dry-run confirmed at the 0.8.2 bump). Its
+# install() carries version-sensitive inreplace anchors on pane.rs/build.rs,
+# but an upstream refactor that breaks one dies on the odie guard during
+# pr-validate's source build — a bad bump never earns ci-passed and never
+# automerges; the stuck open PR is the signal to adapt anchors by hand
+# (0.8.2's spawn-task reshape needed exactly that: #456).
 # Only add a formula here after confirming `brew bump-formula-pr --dry-run`
 # produces a clean url/sha256 edit for it. version-check.yml keeps reporting
 # the full outdated list (allowlisted or not) for humans deciding what to
@@ -63,7 +69,7 @@ env:
   # root-caused to stdout/stderr R_AARCH64_COPY relocs resolved to NULL by
   # OHOS musl ld.so (fixed in ohos-compat-shim 3874ab4), not the
   # regex-automata panic an earlier revision of this comment claimed.
-  ALLOWLIST: "opencode opencode@2 claude-code"
+  ALLOWLIST: "opencode opencode@2 claude-code herdr"
   IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
