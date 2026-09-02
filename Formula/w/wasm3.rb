@@ -1,25 +1,22 @@
 class Wasm3 < Formula
   desc "High performance WebAssembly interpreter"
-  homepage "https://github.com/wasm3/wasm3"
-  url "https://github.com/wasm3/wasm3/archive/refs/tags/v0.5.0.tar.gz"
-  sha256 "b778dd72ee2251f4fe9e2666ee3fe1c26f06f517c3ffce572416db067546536c"
+  homepage "https://twitter.com/wasm3_engine"
+  url "https://github.com/wasm3/wasm3/archive/refs/tags/v0.9.0.tar.gz"
+  sha256 "cab79ce74bcac25bbf80b5ebe14af9795b9bac30b05ee8f620a3bc8002f3b8e6"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d120772037702c7be3e88c8a850e3fbca56a312d54f6093f7d99bebb6c3ec0ff"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "86ef8eed7daaf62d9eae91fee451b8df32ab06bc873c03d89a500fda5226103e"
   end
 
   depends_on "cmake" => :build
   depends_on "uvwasi"
 
   def install
-    # Unbundled uvwasi and link to shared library
-    inreplace "CMakeLists.txt" do |s|
-      s.gsub! "FetchContent_GetProperties(uvwasi)",
-              "FetchContent_MakeAvailable(uvwasi)"
-      s.gsub! "target_link_libraries(${OUT_FILE} uvwasi_a uv_a)",
+    # Unbundle uvwasi and link to shared library
+    inreplace "CMakeLists.txt",
+              "target_link_libraries(${OUT_FILE} uvwasi_a uv_a)",
               "target_link_libraries(${OUT_FILE} uvwasi::uvwasi)"
-    end
 
     # We bypass brew's dependency provider to set `FETCHCONTENT_TRY_FIND_PACKAGE_MODE`
     # which redirects FetchContent_Declare() to find_package() and helps find our `uvwasi`.
