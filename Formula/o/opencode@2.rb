@@ -20,6 +20,7 @@ class OpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "afd7492018c75a8cbc33821b8e2428ac5a3dcd32"
   version "0.0.0-beta-18743"
   license "MIT"
+  revision 1
   # Baked-in channel was empty (see OPENCODE_CHANNEL below) — TUI crashed on
   # startup ("Invalid storage segment" segment-validates the channel), so the
   # fix changes the installed binary.
@@ -43,8 +44,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-beta-18743-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "072a1f0328442ecad60b7f472e9d5e9dfead51f780cae99094a8bd65d1fb876c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-beta-18743-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa0c576a8f2508ce35990e424f7c519a6690410d81259b7e748ecf3c56ccd0d4"
   end
 
   # `bun build --compile` single binary: runtime + JS + .so embedded; since
@@ -52,7 +53,7 @@ class OpencodeAT2 < Formula
   # v2 monorepo restructure: CLI moved packages/opencode → packages/cli
   # (binary renamed opencode2). Build script: packages/cli/script/build.ts.
   # Native deps: opentui-core (@ohos-npm-ports 0.5.8-1) + @parcel/watcher
-  # (@ohos-ports binary). `bun install --ignore-scripts`
+  # (@ohos-npm-ports 2.5.1-1). `bun install --ignore-scripts`
   # (lifecycle scripts irrelevant to signing).
   depends_on "bun" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
@@ -74,14 +75,14 @@ class OpencodeAT2 < Formula
 
     # opentui-core (@ohos-npm-ports 0.5.8-1, dlopen loader patch + bundled
     # libopentui.so, source-level pthread_tryjoin_np fix) + parcel-watcher
-    # (@ohos-ports). bun-pty is gone — the tip uses @lydell/node-pty, which
+    # (@ohos-npm-ports 2.5.1-1). bun-pty is gone — the tip uses @lydell/node-pty, which
     # the CLI graph never imports (no rebuild needed; verified against the
     # pinned source).
     # The nil check makes a vanished anchor fail loudly.
     inreplace "package.json" do |s|
       overrides = [
         '"@opentui/core": "npm:@ohos-npm-ports/opentui-core@0.5.8-1",',
-        '    "@parcel/watcher-linux-arm64-musl": "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1",',
+        '    "@parcel/watcher": "npm:@ohos-npm-ports/parcel-watcher@2.5.1-1",',
       ]
       s.gsub!('"@opentui/core": "catalog:",', overrides.join("\n")) ||
         odie("opencode@2: @opentui/core override anchor not found in package.json")
@@ -100,6 +101,41 @@ class OpencodeAT2 < Formula
     inreplace "packages/core/src/filesystem/watcher.ts",
       'if (process.platform === "linux") return "inotify"',
       'if (process.platform === "linux" || process.platform === "openharmony") return "inotify"'
+
+    # Binding loader (watcher-binding.ts): the dynamic platform require
+    # compiles into a runtime throw inside a bun-compiled binary (there is no
+    # node_modules at runtime), which silently disabled file watching. Catch
+    # the throw and load the port's binding from the upstream literal fallback
+    # path instead — a literal require the bundler resolves and embeds as an
+    # asset. The createRequire local is renamed: a bare `require` lexically
+    # referencing it would not be bundler-visible (verified on device — the
+    # embedded load works, the shadowed shape silently falls back to runtime
+    # filesystem resolution).
+    inreplace "packages/core/src/filesystem/watcher-binding.ts" do |s|
+      anchor = [
+        "  const require = createRequire(import.meta.url)",
+        '  const libc = typeof OPENCODE_LIBC === "undefined" ? undefined : OPENCODE_LIBC',
+        "  return require(",
+        "    process.env.OPENCODE_PARCEL_WATCHER_PATH ??",
+        "      `@parcel/watcher-${process.platform}-${process.arch}" \
+        '${process.platform === "linux" ? `-${libc || "glibc"}` : ""}`,',
+        "  )",
+      ].join("\n")
+      replacement = [
+        "  const nodeRequire = createRequire(import.meta.url)",
+        '  const libc = typeof OPENCODE_LIBC === "undefined" ? undefined : OPENCODE_LIBC',
+        "  try {",
+        "    return nodeRequire(",
+        "      process.env.OPENCODE_PARCEL_WATCHER_PATH ??",
+        "        `@parcel/watcher-${process.platform}-${process.arch}" \
+        '${process.platform === "linux" ? `-${libc || "glibc"}` : ""}`,',
+        "    )",
+        "  } catch {",
+        '    return require("@parcel/watcher/build/Release/watcher.node")',
+        "  }",
+      ].join("\n")
+      s.sub!(anchor, replacement) || odie("opencode@2: watcher-binding require anchor not found")
+    end
 
     # Service discovery: default mismatch handling is "ignore" — any registered
     # background daemon is reused regardless of version, so a daemon left
