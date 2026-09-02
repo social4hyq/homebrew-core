@@ -1,10 +1,9 @@
 class Opencode < Formula
   desc "AI coding agent terminal UI"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.25.tar.gz"
-  sha256 "44e9530d7be172005c7d60aef317440eecb85d557d94cce7fa35c5a7b9d9da0b"
+  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.26.tar.gz"
+  sha256 "a2ff47601072064f04263a97cce014c5b8d0692f7beaa7c7427ac02362d6c3d0"
   license "MIT"
-  revision 1
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
   # HTML page fetch), while api.github.com answers fast — same JSON strategy
@@ -17,8 +16,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.25-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "567ff9e1a58a30e1e5e4a72bc1d1d0c1629f7106c73eb12eecdff27c884e9122"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.26-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "903b85bfac1c3dbbe09dfb8792f3de3563dee0fb0a605a3909ee2f97352f995a"
   end
 
   # bun build --compile single binary: OHOS runtime + JS bundle + native .so embedded.
