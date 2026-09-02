@@ -20,106 +20,34 @@ class Herdr < Formula
   depends_on "zig@0.15" => :build
   depends_on "ohos-compat-shim"
 
+  # build.rs's Rust-TARGET→zig-target table doesn't know OHOS; route onto musl.
+  patch :p1 do
+    file "Patches/herdr/build-rs-zig-target-ohos.patch"
+  end
+
+  # OHOS procfs gives no tty foreground process group and no task children, so
+  # agent detection falls back to tcgetpgrp() on the pane's own PTY master fd.
+  patch :p1 do
+    file "Patches/herdr/pane-agent-detection-tcgetpgrp.patch"
+  end
+
   def install
+    # toybox patch can print "Hunk N FAILED" yet exit 0 and apply nothing
+    # (observed with plain context drift) — never trust its exit code; verify
+    # one marker per patched file instead (application is atomic per file).
+    {
+      "build.rs"    => '"aarch64-unknown-linux-ohos" => "aarch64-linux-musl"',
+      "src/pane.rs" => "pty_actor_foreground_process_group(&pty_actor)",
+    }.each do |file, marker|
+      odie "herdr: #{file} OHOS patch not applied" unless File.read(file).include?(marker)
+    end
+
     ENV.prepend_path "PATH", formula_opt_bin("zig@0.15")
 
     # libghostty-vt's build.zig.zon has a non-lazy dep (uucode) fetched from deps.files.ghostty.org,
     # which is unreachable from this container. Persistent cache ensures the fetch only
     # needs to succeed once per machine.
     ENV["ZIG_GLOBAL_CACHE_DIR"] = (HOMEBREW_CACHE/"herdr-zig-global-cache").to_s
-
-    # build.rs maps Rust TARGET to zig -Dtarget via a fixed match table that panics on unknowns.
-    # aarch64-unknown-linux-ohos isn't in it; route onto aarch64-linux-musl (same libc/ABI).
-    # The static lib is plain object code linked by rustc's own linker, not zig.
-    musl_arm = "\"aarch64-unknown-linux-musl\" => \"aarch64-linux-musl\","
-    ohos_arm = "\"aarch64-unknown-linux-ohos\" => \"aarch64-linux-musl\","
-    inreplace "build.rs", musl_arm, "#{musl_arm}\n        #{ohos_arm}"
-
-    # OHOS agent detection: procfs here reports tty_nr/tpgid as 0 for every
-    # process and lacks /proc/<pid>/task/<tid>/children, so neither the native
-    # foreground-process-group lookup nor the child-groups fallback can identify
-    # pane agents (lifecycle hook reports are gated on that identification too).
-    # Fall back to tcgetpgrp() on the pane's own PTY master fd, which the PTY
-    # actor already exposes for cwd tracking; job membership degrades to the
-    # group leader — enough for comm/argv matching and HERDR_AGENT env hints.
-    detection_fallback = <<~RUST
-      // OHOS: procfs reports tpgid as 0 for every process and lacks
-      // /proc/<pid>/task/<tid>/children, so neither the native foreground
-      // process-group lookup nor the child-groups fallback can identify pane
-      // agents. The pane's own PTY master fd still answers tcgetpgrp(); use it
-      // as a fallback. Job membership degrades to the group leader, which is
-      // enough for comm/argv matching and HERDR_AGENT environment hints.
-      #[cfg(unix)]
-      fn detection_pty_actor(io: &PaneRuntimeIo) -> Option<PtyIoActorHandle> {
-          match io {
-              PaneRuntimeIo::Actor(actor) => Some(actor.clone()),
-              #[cfg(test)]
-              PaneRuntimeIo::TestChannel { .. } => None,
-          }
-      }
-
-      #[cfg(not(unix))]
-      fn detection_pty_actor(_io: &PaneRuntimeIo) -> Option<PtyIoActorHandle> {
-          None
-      }
-
-      #[cfg(unix)]
-      fn pty_actor_foreground_process_group(actor: &Option<PtyIoActorHandle>) -> Option<u32> {
-          actor
-              .as_ref()
-              .and_then(PtyIoActorHandle::foreground_process_group_id)
-      }
-
-      #[cfg(not(unix))]
-      fn pty_actor_foreground_process_group(_actor: &Option<PtyIoActorHandle>) -> Option<u32> {
-          None
-      }
-
-    RUST
-    sig_anchor = "#[cfg(unix)]\n" \
-                 "fn spawn_basic_detection_task(\n    " \
-                 "pane_id: PaneId,\n    " \
-                 "child_pid: Arc<AtomicU32>,\n    " \
-                 "terminal: Arc<PaneTerminal>,\n"
-    sig_patched = "#{detection_fallback}#[cfg(unix)]\n" \
-                  "fn spawn_basic_detection_task(\n    " \
-                  "pane_id: PaneId,\n    " \
-                  "child_pid: Arc<AtomicU32>,\n    " \
-                  "terminal: Arc<PaneTerminal>,\n    " \
-                  "pty_actor: Option<PtyIoActorHandle>,\n"
-    fg_basic_anchor = "            let foreground_pgid = (pid > 0)\n                " \
-                      ".then(|| crate::detect::foreground_process_group_id(pid))\n                " \
-                      ".flatten();"
-    # 0.8.2 reshaped the spawn task's foreground lookup into a match on
-    # (pid, foreground_observation_due); the fresh-lookup arm is the fallback site.
-    fg_spawn_anchor = "                        (_, true) => detect::foreground_process_group_id(pid),"
-    fg_spawn_patched = "                        (_, true) => " \
-                       "detect::foreground_process_group_id(pid)\n                            " \
-                       ".or_else(|| pty_actor_foreground_process_group(&pty_actor)),"
-    callsite_anchor = "            terminal.clone(),\n            " \
-                      "detection_content_seq.clone(),\n            " \
-                      "full_lifecycle_authority_active.clone(),\n            " \
-                      "events,\n        " \
-                      ");"
-    marker_anchor = "        };\n\n        // --- Detection task ---\n"
-    inreplace "src/pane.rs" do |s|
-      s.sub!(sig_anchor, sig_patched) ||
-        odie("herdr: pane.rs detection-task signature anchor not found")
-      s.sub!(fg_basic_anchor, fg_basic_anchor.sub(".flatten();",
-                                                  ".flatten()\n                " \
-                                                  ".or_else(|| pty_actor_foreground_process_group(&pty_actor));")) ||
-        odie("herdr: pane.rs handoff-task foreground anchor not found")
-      s.sub!(callsite_anchor,
-             callsite_anchor.sub("terminal.clone(),\n",
-                                 "terminal.clone(),\n            detection_pty_actor(&io),\n")) ||
-        odie("herdr: pane.rs handoff call-site anchor not found")
-      s.sub!(marker_anchor,
-             "        };\n\n        let pty_actor = detection_pty_actor(&io);\n\n        " \
-             "// --- Detection task ---\n") ||
-        odie("herdr: pane.rs detection-task marker anchor not found")
-      s.sub!(fg_spawn_anchor, fg_spawn_patched) ||
-        odie("herdr: pane.rs spawn-task foreground anchor not found")
-    end
 
     # OHOS strerror_r link fix — same approach as starship.rb.
     (buildpath/"strerror_shim.rs").write <<~RUST
