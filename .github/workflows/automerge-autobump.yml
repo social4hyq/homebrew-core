@@ -94,7 +94,7 @@ jobs:
         run: |
           # Keep in sync with autobump.yml's ALLOWLIST (claude-code
           # re-allowlisted, see the note there)
-          ALLOWLIST="opencode opencode@2 claude-code"
+          ALLOWLIST="opencode opencode@2 claude-code herdr"
           BUMP_BRANCH_RE="^bump-($(echo "$ALLOWLIST" | tr ' ' '|'))-"
 
           merge_pr() {
