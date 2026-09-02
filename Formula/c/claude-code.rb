@@ -4,6 +4,7 @@ class ClaudeCode < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.258.tgz"
   sha256 "550d60aa379305e3dd27853d8b97f3e76729d55937cdd6cf9e93390cb50e9f4f"
   license :cannot_represent # Anthropic Commercial Terms of Service
+  revision 1
   # extract-cli.mjs content changed (binary-asset detection by magic bytes
   # instead of filename suffix) without a version bump.
   # extract-cli.mjs content changed (zstd-compressed .md asset extraction
@@ -56,8 +57,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.258-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "da57d3fc04492030ffc219aa50250adc4a18103a9f3c1bd5f930d3166b90ed73"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.258-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "33e93adcb46d3603e40a184400009353cf6d3a6980758e529dbb92f26ed0b3c2"
   end
 
   depends_on "bun"
@@ -239,6 +240,11 @@ class ClaudeCode < Formula
       if [ -z "${CLAUDE_CODE_TMPDIR:-}" ] && [ -w /data/storage/el2/base/tmp ]; then
         export CLAUDE_CODE_TMPDIR=/data/storage/el2/base/tmp
       fi
+
+      # herdr picks the agent detection manifest from HERDR_AGENT in the
+      # foreground process's environ; the bun-exec'd CLI (basename "cli")
+      # is otherwise invisible to it.
+      export HERDR_AGENT="${HERDR_AGENT:-claude}"
 
       if [ ! -f "$CLI" ]; then
         rm -rf "$CACHE"
