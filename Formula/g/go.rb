@@ -7,7 +7,7 @@ class Go < Formula
   license "BSD-3-Clause"
   compatibility_version 4
   head "https://go.googlesource.com/go.git", branch: "master"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://go.dev/dl/?mode=json"
