@@ -4,6 +4,7 @@ class Herdr < Formula
   url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.8.2.tar.gz"
   sha256 "60453051025ee44ebf055d26cdaf665a0accd99a992cddd22c166a26c49cd161"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/herdrdev/herdr.git", branch: "master"
 
   livecheck do
@@ -12,14 +13,18 @@ class Herdr < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.8.2-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8eda9844b198a95c712b7f71b2345f68acbce796e083d919f1eec3f1af85edba"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.8.2-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "833020e902dd24e8f98bb9ce78b178fe78863d46873ad6dfcdc09150a040fc63"
   end
 
   depends_on "rust" => :build
-  depends_on "zig@0.15" => :build
-  depends_on "ohos-compat-shim"
+
+  # libghostty-vt pins minimum_zig_version 0.15.2; build with the official
+  # prebuilt static aarch64-linux zig instead of the zig@0.15 keg.
+  resource "zig" do
+    url "https://ziglang.org/download/0.15.2/zig-aarch64-linux-0.15.2.tar.xz"
+    sha256 "958ed7d1e00d0ea76590d27666efbf7a932281b3d7ba0c6b01b0ff26498f667f"
+  end
 
   # build.rs's Rust-TARGET→zig-target table doesn't know OHOS; route onto musl.
   patch :p1 do
@@ -43,7 +48,16 @@ class Herdr < Formula
       odie "herdr: #{file} OHOS patch not applied" unless File.read(file).include?(marker)
     end
 
-    ENV.prepend_path "PATH", formula_opt_bin("zig@0.15")
+    # Stage and sign the zig toolchain (official static build; binary-sign-tool
+    # is proven safe on it). zig resolves lib/ via self-exe-realpath, so keep
+    # the unpacked tree intact and put its dir on PATH for build.rs.
+    resource("zig").stage(buildpath/"zig-toolchain")
+    zig = buildpath/"zig-toolchain/zig"
+    system "binary-sign-tool", "sign", "-selfSign", "1",
+           "-inFile", zig.to_s, "-outFile", "#{zig}.signed"
+    mv "#{zig}.signed", zig
+    chmod 0755, zig
+    ENV.prepend_path "PATH", zig.dirname.to_s
 
     # libghostty-vt's build.zig.zon has a non-lazy dep (uucode) fetched from deps.files.ghostty.org,
     # which is unreachable from this container. Persistent cache ensures the fetch only
@@ -102,15 +116,11 @@ class Herdr < Formula
       end
     end
 
-    mkdir_p libexec/"bin"
-    mv bin/"herdr", libexec/"bin/herdr"
-    (bin/"herdr").write <<~SH
-      #!/bin/sh
-      exec "#{formula_opt_bin("ohos-compat-shim")}/ohos-shim" "#{opt_libexec}/bin/herdr" "$@"
-    SH
-    chmod 0755, bin/"herdr"
-
-    generate_completions_from_executable(libexec/"bin/herdr", "completion")
+    # No ohos-shim wrapper: verified on real hardware that the full flow
+    # (server, workspace/pane management, agent detection, session restart)
+    # works without any shim interception — herdr hits none of its intercept
+    # points (no temp_dir/hardlink/getpwuid/splice usage).
+    generate_completions_from_executable(bin/"herdr", "completion")
   end
 
   def caveats
