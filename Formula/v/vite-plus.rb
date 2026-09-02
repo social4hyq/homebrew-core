@@ -11,12 +11,12 @@ class VitePlus < Formula
   # OHOS delta vs upstream (everything else is verbatim):
   # bottle block, depends_on swaps, native-binding wiring, build env,
   # vite-task patch, bin/vp wrapper. See the fenced blocks in install.
-  revision 3
+  revision 4
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v0.2.8-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f0836f759ec58b9c987ff33d5f494b77770c8e150aeb61f3ef7840c20c5d4a5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v0.2.8-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0687a6e4272f7928a4641b3eced1370ae6e8156b10dfd3013a6b0e48529a11bc"
   end
 
   depends_on "cmake" => :build
@@ -154,13 +154,13 @@ class VitePlus < Formula
       extensions["#{parent}@#{version}"] = { "optionalDependencies" => { ohos_name => version } }
       overrides["#{ohos_name}@#{version}"] = "link:#{shim}"
     end
-    # @parcel/watcher: the @ohos-ports port (no @ohos-npm-ports equivalent
-    # published yet) ships the openharmony binding as a proper package
-    # (main points at the .node).
-    extensions["@parcel/watcher@2.5.1"] = {
-      "optionalDependencies" => { "@parcel/watcher-openharmony-arm64" => "2.5.1" },
-    }
-    overrides["@parcel/watcher-openharmony-arm64@2.5.1"] = "npm:@ohos-ports/parcel-watcher-openharmony-arm64@2.5.1"
+    # @parcel/watcher: the @ohos-npm-ports port embeds the openharmony binding
+    # in the package itself (at the upstream build/Release fallback path,
+    # which the unchanged loader requires when no platform package matches),
+    # so a plain override carries the binding into the deployed tree past
+    # deploy --no-optional like the forks above — no optionalDependency
+    # graft needed.
+    overrides["@parcel/watcher"] = "npm:@ohos-npm-ports/parcel-watcher@2.5.1-1"
 
     workspace_yaml = buildpath/"pnpm-workspace.yaml"
     ws = YAML.safe_load(workspace_yaml.read)
@@ -168,8 +168,8 @@ class VitePlus < Formula
     ws["packageExtensions"] = extensions.merge(ws["packageExtensions"] || {})
     # The workspace's minimumReleaseAge gate (24h) blocks freshly published
     # community ports; the overrides above pin exact versions, so the pin
-    # itself is the trust decision — exempt both port scopes.
-    ws["minimumReleaseAgeExclude"] = (ws["minimumReleaseAgeExclude"] || []).push("@ohos-ports/*", "@ohos-npm-ports/*")
+    # itself is the trust decision — exempt the port scope.
+    ws["minimumReleaseAgeExclude"] = (ws["minimumReleaseAgeExclude"] || []).push("@ohos-npm-ports/*")
     File.write(workspace_yaml, YAML.dump(ws))
     # -------------------------------------------------------------------------
 
