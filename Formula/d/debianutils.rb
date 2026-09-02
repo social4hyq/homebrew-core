@@ -11,7 +11,7 @@ class Debianutils < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e745db11305ce7c5265c72562f37927068e336d00bb2cdb642bf6d261b7fc935"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "df581b8da1a42dc070008b79e42ee4262db85ee0ab8374ce6610701c0edaca99"
   end
 
   depends_on "autoconf" => :build
