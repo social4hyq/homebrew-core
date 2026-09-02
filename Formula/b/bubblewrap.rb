@@ -1,13 +1,13 @@
 class Bubblewrap < Formula
   desc "Unprivileged sandboxing tool for Linux"
   homepage "https://github.com/containers/bubblewrap"
-  url "https://github.com/containers/bubblewrap/releases/download/v0.11.2/bubblewrap-0.11.2.tar.xz"
-  sha256 "69abc30005d2186baf7737feacd8da35633b93cf5af38838ecff17c5f8e924f6"
+  url "https://github.com/containers/bubblewrap/releases/download/v0.12.0/bubblewrap-0.12.0.tar.xz"
+  sha256 "9760d007363e3abba7c747489910f9f82d9fca53ba3bd3282e396fa3c97a3314"
   license "LGPL-2.0-or-later"
   head "https://github.com/containers/bubblewrap.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b4304e6740cd214616e116bceac433132f632a6f5515d533aa258bb17c6ce58"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7761758c2e865515fdd1e931c6571d9ce01b522c089c96747e09b80f1d0a2927"
   end
 
   depends_on "docbook-xsl" => :build
@@ -23,6 +23,10 @@ class Bubblewrap < Formula
     # get_current_dir_name() is a GNU extension, not available on musl.
     # Use the POSIX equivalent getcwd(NULL, 0) instead.
     inreplace "bubblewrap.c", "get_current_dir_name ()", "getcwd(NULL, 0)"
+    # PATH_MAX requires an explicit <limits.h> include; musl-based libcs do not
+    # pull it in transitively via other headers like glibc does.
+    inreplace "bubblewrap.c", "#include <sched.h>", "#include <sched.h>\n#include <limits.h>"
+    inreplace "safe_openat.c", "#include <sys/syscall.h>", "#include <sys/syscall.h>\n#include <limits.h>"
     # Meson modifies RPATHs during install but cannot handle paths injected by
     # our shim and results in a non-relocatable binary. Instead, we can remove
     # the shim RPATHs and pass them via the available meson option.
