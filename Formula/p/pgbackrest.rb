@@ -1,12 +1,12 @@
 class Pgbackrest < Formula
   desc "Reliable PostgreSQL Backup & Restore"
   homepage "https://pgbackrest.org"
-  url "https://github.com/pgbackrest/pgbackrest/archive/refs/tags/release/2.58.0.tar.gz"
-  sha256 "2517ec0a7f66be0f1bc77795c3a19cd41c4b106699321d3ac511bc539dd2bfca"
+  url "https://github.com/pgbackrest/pgbackrest/releases/download/release/2.59.1/pgbackrest-2.59.1.tar.gz"
+  sha256 "1cd522afc33b8ff846ef88c55dc238717c9c8817a4f6ca7c9f64887de9c7402d"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "41adb0380306bd5cea83b37fb0a0137af3845ebafa8e2c762c16dcbabc4fe9e0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d220805e7146ae622cc02bc23d3fc7df8f3d836b168727a9ae3fbf7bd1825ae5"
   end
 
   depends_on "cmake" => :build
@@ -15,7 +15,6 @@ class Pgbackrest < Formula
   depends_on "pkgconf" => :build
   depends_on "libpq"
   depends_on "libssh2"
-  depends_on "libyaml"
   depends_on "lz4"
   depends_on "openssl@3"
   depends_on "zstd"
@@ -36,7 +35,10 @@ class Pgbackrest < Formula
   end
 
   test do
-    output = shell_output("#{bin}/pgbackrest info")
+    # pgbackrest 2.59+ refuses to run the info command as root, which is the
+    # case in the OHOS build environment (only the root user exists).
+    args = Process.uid.zero? ? ["--allow-root"] : []
+    output = shell_output("#{bin}/pgbackrest info #{args.join(" ")}")
     assert_match "No stanzas exist in the repository.", output
   end
 end
