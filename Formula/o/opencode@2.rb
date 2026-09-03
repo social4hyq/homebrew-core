@@ -43,8 +43,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-beta-18955-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b9ff9b5f290f1a111b555727e5a7f13f6fda2e80d9e5558a0b857a1cd935a5c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-beta-18999-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d99996ffaf8cc69c66ab046a2ed4763e4c5f7028c48aedac638f5f770f23f75"
   end
 
   # `bun build --compile` single binary: runtime + JS + .so embedded; since
