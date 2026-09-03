@@ -1,0 +1,13 @@
+--- a/pkg/dirs/dirs.go	2025-11-08 07:53:41.000000000 +0000
++++ b/pkg/dirs/dirs.go	2026-09-02 01:24:24.768000000 +0000
+@@ -49,6 +49,10 @@
+ func getHomeDir() string {
+ 	usr, err := user.Current()
+ 	if err != nil {
++		// HarmonyOS: user not in /etc/passwd, fall back to $HOME
++		if home := os.Getenv("HOME"); home != "" {
++			return home
++		}
+ 		panic(errors.Wrap(err, "getting home dir"))
+ 	}
+ 

@@ -4,6 +4,7 @@ class Dnote < Formula
   url "https://github.com/dnote/dnote/archive/refs/tags/cli-v0.16.0.tar.gz"
   sha256 "fb63c6099ca441a2027a9e8ae2a3c38376e5c0950bef9e8028b96ca2b8b6427f"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/dnote/dnote.git", branch: "master"
 
   livecheck do
@@ -12,10 +13,14 @@ class Dnote < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a62f98f8dfceab61b8ae86721df185e3149089e47a6aff9328abb524576a1a08"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "534abe4fb9ec4f30d9ee91fe1ab3fbfb6b8c56919e249b4eacf9431edad1ac74"
   end
 
   depends_on "go" => :build
+
+  patch do
+    file "Patches/dnote/0001-add-getenv-home-fallback.patch"
+  end
 
   def install
     ENV["CGO_ENABLED"] = "1" if OS.linux? && Hardware::CPU.arm?
