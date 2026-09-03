@@ -20,6 +20,7 @@ class OpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "4beaffbda958c74a87ec0a677d69351a9fda8f2c"
   version "0.0.0-beta-18955"
   license "MIT"
+  revision 1
   # Baked-in channel was empty (see OPENCODE_CHANNEL below) — TUI crashed on
   # startup ("Invalid storage segment" segment-validates the channel), so the
   # fix changes the installed binary.
@@ -81,7 +82,7 @@ class OpencodeAT2 < Formula
     inreplace "package.json" do |s|
       overrides = [
         '"@opentui/core": "npm:@ohos-npm-ports/opentui-core@0.5.8-1",',
-        '    "@parcel/watcher": "npm:@ohos-npm-ports/parcel-watcher@2.5.1-1",',
+        '    "@parcel/watcher": "npm:@ohos-npm-ports/parcel-watcher@2.5.1-2",',
       ]
       s.gsub!('"@opentui/core": "catalog:",', overrides.join("\n")) ||
         odie("opencode@2: @opentui/core override anchor not found in package.json")
