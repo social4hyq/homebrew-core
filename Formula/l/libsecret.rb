@@ -29,18 +29,25 @@ class Libsecret < Formula
   def install
     ENV["XML_CATALOG_FILES"] = "#{etc}/xml/catalog"
 
+    # tool/secret-tool.c calls getpass() without including <unistd.h> or any
+    # header that pulls it in transitively on OHOS's glib. It builds on the
+    # official glibc bottle because something in that header chain declares
+    # it there, but on OHOS the call is an implicit int-returning
+    # declaration and Clang's -Wint-conversion (an error by default) rejects
+    # assigning it to gchar *. -D_GNU_SOURCE alone doesn't fix it -- the
+    # symbol is present in the OHOS libc (confirmed via nm -D on
+    # ld-musl-aarch64.so.1) but its prototype isn't reachable here, so
+    # declare it ourselves.
+    inreplace "tool/secret-tool.c",
+              "\tgchar *password;\n\n\tpassword = getpass (\"Password: \");\n",
+              "\tgchar *password;\n\textern char *getpass (const char *prompt);\n\n" \
+              "\tpassword = getpass (\"Password: \");\n"
+
     # No vala in this tap: skip generating the .vapi (Vala bindings aren't
     # consumed by anything this tap ports).
-    #
-    # OHOS musl's unistd.h only declares getpass() under _GNU_SOURCE (glibc
-    # declares it implicitly via _DEFAULT_SOURCE with no -std flag); without
-    # it, tool/secret-tool.c's `getpass()` call is an implicit int-returning
-    # declaration and Clang's -Wint-conversion (an error by default) rejects
-    # assigning it to gchar *. The symbol itself is present in the OHOS libc.
     system "meson", "setup", "build", "-Dbashcompdir=#{bash_completion}",
                                       "-Dgtk_doc=false",
                                       "-Dvapi=false",
-                                      "-Dc_args=-D_GNU_SOURCE",
                                       *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
