@@ -4,6 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.27.tar.gz"
   sha256 "3d3851762d41da2dafe3be39d3b17a222426747e9b49e5e87d2a88b46b0866f1"
   license "MIT"
+  revision 1
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
   # HTML page fetch), while api.github.com answers fast — same JSON strategy
@@ -48,7 +49,7 @@ class Opencode < Formula
         '    "bun-pty": "npm:@ohos-npm-ports/bun-pty@0.4.10-1",',
         '    "lightningcss": "npm:@ohos-npm-ports/lightningcss@1.33.0-1",',
         '    "@tailwindcss/oxide": "npm:@ohos-npm-ports/tailwindcss-oxide@4.3.3-2",',
-        '    "@parcel/watcher": "npm:@ohos-npm-ports/parcel-watcher@2.5.1-1",',
+        '    "@parcel/watcher": "npm:@ohos-npm-ports/parcel-watcher@2.5.1-2",',
       ]
       s.gsub!('"@opentui/core": "catalog:",', overrides.join("\n")) ||
         odie("opencode: @opentui/core override anchor not found in package.json")
@@ -77,33 +78,6 @@ class Opencode < Formula
     inreplace "packages/core/src/filesystem/watcher.ts",
       'if (process.platform === "linux") return "inotify"',
       'if (process.platform === "linux" || process.platform === "openharmony") return "inotify"'
-
-    # Binding loader: the dynamic platform require compiles into a runtime
-    # throw inside a bun-compiled binary (there is no node_modules at
-    # runtime), which silently disabled file watching in every shipped
-    # bottle. Catch the throw and load the port's binding from the upstream
-    # literal fallback path instead — a literal require the bundler resolves
-    # and embeds as an asset (embedded load + inotify verified on device).
-    inreplace "packages/core/src/filesystem/watcher.ts" do |s|
-      anchor = [
-        "    const binding = require(",
-        "      `@parcel/watcher-${process.platform}-${process.arch}" \
-        '${process.platform === "linux" ? `-${libc || "glibc"}` : ""}`,',
-        "    )",
-      ].join("\n")
-      replacement = [
-        "    let binding",
-        "    try {",
-        "      binding = require(",
-        "        `@parcel/watcher-${process.platform}-${process.arch}" \
-        '${process.platform === "linux" ? `-${libc || "glibc"}` : ""}`,',
-        "      )",
-        "    } catch {",
-        '      binding = require("@parcel/watcher/build/Release/watcher.node")',
-        "    }",
-      ].join("\n")
-      s.sub!(anchor, replacement) || odie("opencode: watcher binding require anchor not found")
-    end
 
     # Flip openharmony-arm64 binding os:"none" → "openharmony" in bun.lock.
     # Version-independent: only touches os flag, not version/sha256 lines.
