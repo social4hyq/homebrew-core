@@ -20,6 +20,7 @@ class OpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "4beaffbda958c74a87ec0a677d69351a9fda8f2c"
   version "0.0.0-beta-18955"
   license "MIT"
+  revision 1
   # Baked-in channel was empty (see OPENCODE_CHANNEL below) — TUI crashed on
   # startup ("Invalid storage segment" segment-validates the channel), so the
   # fix changes the installed binary.
@@ -43,8 +44,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-beta-18955-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3587de675ab2c4851f9a264be81847edd1cd997c3fd13b8db06cb3bfae72e15f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-beta-18955-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b9ff9b5f290f1a111b555727e5a7f13f6fda2e80d9e5558a0b857a1cd935a5c"
   end
 
   # `bun build --compile` single binary: runtime + JS + .so embedded; since
@@ -81,7 +82,7 @@ class OpencodeAT2 < Formula
     inreplace "package.json" do |s|
       overrides = [
         '"@opentui/core": "npm:@ohos-npm-ports/opentui-core@0.5.8-1",',
-        '    "@parcel/watcher": "npm:@ohos-npm-ports/parcel-watcher@2.5.1-1",',
+        '    "@parcel/watcher": "npm:@ohos-npm-ports/parcel-watcher@2.5.1-2",',
       ]
       s.gsub!('"@opentui/core": "catalog:",', overrides.join("\n")) ||
         odie("opencode@2: @opentui/core override anchor not found in package.json")
