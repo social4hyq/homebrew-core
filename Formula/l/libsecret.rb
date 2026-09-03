@@ -15,6 +15,11 @@ class Libsecret < Formula
     regex(/libsecret[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/libsecret-v0.21.7-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0f6ee93e7484166823d71a9e460b96c35b051b2343f47cdde9bf1b64222659b"
+  end
+
   depends_on "docbook-xsl" => :build
   depends_on "gettext" => :build
   depends_on "gobject-introspection" => :build
