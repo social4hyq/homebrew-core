@@ -5,6 +5,7 @@ class Hfsutils < Formula
   mirror "https://fossies.org/linux/misc/old/hfsutils-3.2.6.tar.gz"
   sha256 "bc9d22d6d252b920ec9cdf18e00b7655a6189b3f34f42e58d5bb152957289840"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url "https://ftp.mars.org/hfs/"
@@ -12,7 +13,11 @@ class Hfsutils < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ffaa900e8e01fb6affc87af9d2142824c17813f660c1f2703a8f9dcd61734f99"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f16f4939e6a669d83cd68db7d49df8150b55790f787cefd90836c2a6fe243d7"
+  end
+
+  patch do
+    file "Patches/hfsutils/0001-skip-setreuid-setregid.patch"
   end
 
   def install
