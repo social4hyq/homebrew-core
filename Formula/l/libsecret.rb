@@ -31,9 +31,16 @@ class Libsecret < Formula
 
     # No vala in this tap: skip generating the .vapi (Vala bindings aren't
     # consumed by anything this tap ports).
+    #
+    # OHOS musl's unistd.h only declares getpass() under _GNU_SOURCE (glibc
+    # declares it implicitly via _DEFAULT_SOURCE with no -std flag); without
+    # it, tool/secret-tool.c's `getpass()` call is an implicit int-returning
+    # declaration and Clang's -Wint-conversion (an error by default) rejects
+    # assigning it to gchar *. The symbol itself is present in the OHOS libc.
     system "meson", "setup", "build", "-Dbashcompdir=#{bash_completion}",
                                       "-Dgtk_doc=false",
                                       "-Dvapi=false",
+                                      "-Dc_args=-D_GNU_SOURCE",
                                       *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
