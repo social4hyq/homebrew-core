@@ -15,6 +15,8 @@ class Entt < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "51947b8e53695b63fc6f5c80bcdd0d3755fb87419e782823955507a836e2bd2f"
   end
 
+  no_autobump! because: "newer version requires c++20 support"
+
   depends_on "cmake" => :build
   depends_on "doxygen" => :build
   depends_on "pkgconf" => :test
