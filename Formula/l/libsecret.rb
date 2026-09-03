@@ -29,19 +29,60 @@ class Libsecret < Formula
   def install
     ENV["XML_CATALOG_FILES"] = "#{etc}/xml/catalog"
 
-    # tool/secret-tool.c calls getpass() without including <unistd.h> or any
-    # header that pulls it in transitively on OHOS's glib. It builds on the
-    # official glibc bottle because something in that header chain declares
-    # it there, but on OHOS the call is an implicit int-returning
-    # declaration and Clang's -Wint-conversion (an error by default) rejects
-    # assigning it to gchar *. -D_GNU_SOURCE alone doesn't fix it -- the
-    # symbol is present in the OHOS libc (confirmed via nm -D on
-    # ld-musl-aarch64.so.1) but its prototype isn't reachable here, so
-    # declare it ourselves.
+    # tool/secret-tool.c's one call to getpass() doesn't just need a
+    # prototype -- OHOS's musl doesn't export the symbol at all (this tap's
+    # build sysroot linker error: "undefined symbol: getpass"; a plain
+    # extern declaration compiles but fails at the final link step). It's
+    # not in musl-compat's ~36-symbol shim list either, and pulling in a
+    # whole extra runtime dependency for one legacy BSD call in a CLI tool
+    # isn't worth it, so replace the call site with a minimal termios-based
+    # reimplementation (disable echo, read a line, restore echo).
+    getpass_impl = <<~C
+      static char *
+      ohos_getpass (const char *prompt)
+      {
+        static char buf[256];
+        struct termios old_term, new_term;
+        int restore = 0;
+        size_t len;
+
+        fputs (prompt, stderr);
+        fflush (stderr);
+
+        if (tcgetattr (STDIN_FILENO, &old_term) == 0) {
+          new_term = old_term;
+          new_term.c_lflag &= ~ECHO;
+          if (tcsetattr (STDIN_FILENO, TCSAFLUSH, &new_term) == 0)
+            restore = 1;
+        }
+
+        if (!fgets (buf, sizeof (buf), stdin))
+          buf[0] = '\\0';
+
+        if (restore)
+          tcsetattr (STDIN_FILENO, TCSAFLUSH, &old_term);
+
+        fputc ('\\n', stderr);
+
+        len = strlen (buf);
+        if (len > 0 && buf[len - 1] == '\\n')
+          buf[len - 1] = '\\0';
+
+        return buf;
+      }
+
+    C
+
     inreplace "tool/secret-tool.c",
-              "\tgchar *password;\n\n\tpassword = getpass (\"Password: \");\n",
-              "\tgchar *password;\n\textern char *getpass (const char *prompt);\n\n" \
-              "\tpassword = getpass (\"Password: \");\n"
+              "#include <string.h>\n\n#define SECRET_ALIAS_PREFIX",
+              "#include <string.h>\n#include <stdio.h>\n#include <termios.h>\n#include <unistd.h>\n\n" \
+              "#define SECRET_ALIAS_PREFIX"
+
+    read_password_tty_old = "static SecretValue *\nread_password_tty (void)\n{\n\tgchar *password;\n\n" \
+                            "\tpassword = getpass (\"Password: \");\n"
+    read_password_tty_new = "#{getpass_impl}static SecretValue *\nread_password_tty (void)\n" \
+                            "{\n\tgchar *password;\n\n\tpassword = ohos_getpass (\"Password: \");\n"
+    inreplace "tool/secret-tool.c", read_password_tty_old, read_password_tty_new
 
     # No vala in this tap: skip generating the .vapi (Vala bindings aren't
     # consumed by anything this tap ports).
