@@ -4,6 +4,7 @@ class Dnote < Formula
   url "https://github.com/dnote/dnote/archive/refs/tags/cli-v0.16.0.tar.gz"
   sha256 "fb63c6099ca441a2027a9e8ae2a3c38376e5c0950bef9e8028b96ca2b8b6427f"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/dnote/dnote.git", branch: "master"
 
   livecheck do
@@ -16,6 +17,10 @@ class Dnote < Formula
   end
 
   depends_on "go" => :build
+
+  patch do
+    file "Patches/dnote/0001-add-getenv-home-fallback.patch"
+  end
 
   def install
     ENV["CGO_ENABLED"] = "1" if OS.linux? && Hardware::CPU.arm?
