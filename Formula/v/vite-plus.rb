@@ -11,12 +11,12 @@ class VitePlus < Formula
   # OHOS delta vs upstream (everything else is verbatim):
   # bottle block, depends_on swaps, native-binding wiring, build env,
   # vite-task patch, bin/vp wrapper. See the fenced blocks in install.
-  revision 4
+  revision 5
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v0.2.8-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0687a6e4272f7928a4641b3eced1370ae6e8156b10dfd3013a6b0e48529a11bc"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v0.2.8-r8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e921ba267cb38e151197b1cb16dfe6a7f8d073196e285ad26aa83305a1163849"
   end
 
   depends_on "cmake" => :build
@@ -160,7 +160,7 @@ class VitePlus < Formula
     # so a plain override carries the binding into the deployed tree past
     # deploy --no-optional like the forks above — no optionalDependency
     # graft needed.
-    overrides["@parcel/watcher"] = "npm:@ohos-npm-ports/parcel-watcher@2.5.1-1"
+    overrides["@parcel/watcher"] = "npm:@ohos-npm-ports/parcel-watcher@2.5.1-2"
 
     workspace_yaml = buildpath/"pnpm-workspace.yaml"
     ws = YAML.safe_load(workspace_yaml.read)
