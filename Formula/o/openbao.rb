@@ -2,8 +2,8 @@ class Openbao < Formula
   desc "Provides a software solution to manage, store, and distribute sensitive data"
   homepage "https://openbao.org/"
   url "https://github.com/openbao/openbao.git",
-      tag:      "v2.6.1",
-      revision: "ba7ad8861d0578cd4da4f7b9e5a6756d30484f8f"
+      tag:      "v2.6.2",
+      revision: "dd9c19c37a878cf4a81b18efb8d6f0599c7da923"
   license "MPL-2.0"
   head "https://github.com/openbao/openbao.git", branch: "main"
 
@@ -13,7 +13,7 @@ class Openbao < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4908a160e067b3d63ef0251e64b51a62aad775c87576bea990d25da46cc3d0df"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8868b3974fdebf84cf65b128bf2d7ba69cef71840b278367048d8ce57499d410"
   end
 
   depends_on "go" => :build
@@ -26,9 +26,23 @@ class Openbao < Formula
     # Build ui assets
     cd "ui" do
       ENV.prepend_path "PATH", formula_opt_libexec("node@22")/"bin" # for pnpm
-      # Prevent pnpm from downloading another copy due to `packageManager` field
-      (buildpath/"ui/pnpm-workspace.yaml").append_lines "managePackageManagerVersions: false"
-      system "pnpm", "install", "--frozen-lockfile"
+      # pnpm 11 no longer reads `packageManager` or `pnpm.overrides` from package.json.
+      # Move overrides to pnpm-workspace.yaml and strip stale fields to avoid
+      # identity-verification failures on platforms without @pnpm/exe binaries (e.g. openharmony).
+      # Ref: https://github.com/pnpm/pnpm/issues/13622
+      pkg_json = JSON.parse(File.read("package.json"))
+      if (overrides = pkg_json.dig("pnpm", "overrides"))
+        File.open("pnpm-workspace.yaml", "a") do |f|
+          f.puts
+          f.puts "overrides:"
+          overrides.each { |k, v| f.puts "  \"#{k}\": #{v}" }
+        end
+        pkg_json["pnpm"].delete("overrides")
+        pkg_json["pnpm"].empty? && pkg_json.delete("pnpm")
+      end
+      pkg_json.delete("packageManager")
+      File.write("package.json", JSON.pretty_generate(pkg_json) + "\n")
+      system "pnpm", "install", "--no-frozen-lockfile"
       system "pnpm", "build"
     end
 
