@@ -1,18 +1,19 @@
 class Gascity < Formula
   desc "Orchestration-builder SDK for multi-agent coding workflows"
   homepage "https://github.com/gastownhall/gascity"
-  url "https://github.com/gastownhall/gascity/archive/refs/tags/v1.4.0.tar.gz"
-  sha256 "e3c0e9e96e1eca637a894847e0525bcb5c46edcd68ce96c026d4b453e4604756"
+  url "https://github.com/gastownhall/gascity/archive/refs/tags/v1.4.1.tar.gz"
+  sha256 "2444a9ef08501b41eb20e5f7ad7dc84776d48f29b192e7a9fcd87409bcac9852"
   license "MIT"
   head "https://github.com/gastownhall/gascity.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21a8f2d9d35467ede21cf9274ed65cbe124ce3674c9949cfeb6b41163b194600"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6c5793e75d58e6b62b58e1fb340d6c58e0695bbaede0c98dc0966b29b0d938e"
   end
 
   depends_on "go" => :build
   depends_on "beads"
   depends_on "dolt"
+  depends_on "icu4c@78"
   depends_on "jq"
   depends_on "tmux"
 
@@ -21,11 +22,11 @@ class Gascity < Formula
   end
 
   def install
-    ldflags = %W[
-      -s -w
-      -X main.version=#{version}
-    ]
-    system "go", "build", *std_go_args(ldflags:, output: bin/"gc"), "./cmd/gc"
+    # grpc v1.82.1 uses http2.TrailerPrefix which is excluded in
+    # golang.org/x/net v0.54.0 on Go ≥1.27 (build constraint). Pin to v0.53.0.
+    inreplace "go.mod", /^go\s+\S+$/, "\\0\nreplace golang.org/x/net => golang.org/x/net v0.53.0"
+    system "go", "mod", "tidy"
+    system "go", "build", *std_go_args(ldflags: "-s -w -X main.version=#{version}", output: bin/"gc"), "./cmd/gc"
   end
 
   test do
