@@ -4,11 +4,12 @@ class Jadx < Formula
   url "https://github.com/skylot/jadx/archive/refs/tags/v1.5.6.tar.gz"
   sha256 "11bb5ebd8c3169ff3f87e6f928d60cff1545f0c55ba1f814ce67e43ba3f2a9e7"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
   head "https://github.com/skylot/jadx.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce1f26eda3180d197ae6f12a111e46746a1483dfd67d87aca25cd231b5526040"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa3277641766010eeaec697c4fd05ab213641482765091741ea8e73477444f12"
   end
 
   depends_on "gradle" => :build
@@ -19,6 +20,11 @@ class Jadx < Formula
 
     system "gradle", "clean", "dist"
     libexec.install Dir["build/jadx/*"]
+    # HarmonyOS: dev.dirs library doesn't recognize HarmonyOS, set os.name=Linux
+    inreplace [libexec/"bin/jadx", libexec/"bin/jadx-gui"] do |s|
+      s.gsub!(/^DEFAULT_JVM_OPTS='/, %q{DEFAULT_JVM_OPTS='"-Dos.name=Linux" })
+    end
+
     bin.install libexec/"bin/jadx"
     bin.install libexec/"bin/jadx-gui"
     bin.env_script_all_files libexec/"bin", Language::Java.overridable_java_home_env
