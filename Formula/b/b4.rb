@@ -8,7 +8,7 @@ class B4 < Formula
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1851f78bf6b57e234db3dfa0c8bacaa2c8d8683e8ef7d2bdeaec2c053107522"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f8034eaa644abd5a445bd54317bf7632ac21c3a7f9e844efca18cf0a6ca76c8"
   end
 
   depends_on "certifi" => :no_linkage
