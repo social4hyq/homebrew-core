@@ -12,7 +12,8 @@ class Entt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "51947b8e53695b63fc6f5c80bcdd0d3755fb87419e782823955507a836e2bd2f"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "85bc51632a4bd5d803acaa69a1a2ddb8c34f06ac5dbc9385410a340f112a23b4"
   end
 
   no_autobump! because: "newer version requires c++20 support"
