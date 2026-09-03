@@ -13,7 +13,7 @@ class Dnote < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a62f98f8dfceab61b8ae86721df185e3149089e47a6aff9328abb524576a1a08"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "534abe4fb9ec4f30d9ee91fe1ab3fbfb6b8c56919e249b4eacf9431edad1ac74"
   end
 
   depends_on "go" => :build
