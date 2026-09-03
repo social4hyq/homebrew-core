@@ -13,7 +13,7 @@ class Hfsutils < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ffaa900e8e01fb6affc87af9d2142824c17813f660c1f2703a8f9dcd61734f99"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f16f4939e6a669d83cd68db7d49df8150b55790f787cefd90836c2a6fe243d7"
   end
 
   patch do
