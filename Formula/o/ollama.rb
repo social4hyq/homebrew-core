@@ -2,8 +2,8 @@ class Ollama < Formula
   desc "Create, run, and share large language models (LLMs)"
   homepage "https://ollama.com/"
   url "https://github.com/ollama/ollama.git",
-      tag:      "v0.33.1",
-      revision: "13f2fb8c99278469b954429d5541019f4d83a4d0"
+      tag:      "v0.33.2",
+      revision: "f96e7aa0513b9973a0ccc71be414c2ecb9d65b1a"
   license "MIT"
   head "https://github.com/ollama/ollama.git", branch: "main"
 
@@ -16,7 +16,7 @@ class Ollama < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b45b6b3aa0b1750e42fcb23969b11727d16c5edae20572bd79e4c69dba2c469"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e005223a097fb71cbfc395ae894845247050225132f9625e32bf564c15b47c51"
   end
 
   depends_on "cmake" => :build
@@ -25,6 +25,10 @@ class Ollama < Formula
   on_macos do
     on_arm do
       depends_on "mlx-c" => :no_linkage
+
+      # Build with the mlx-c bindings for tagged MLX 0.32.1. Upstream targets a later MLX commit:
+      # https://github.com/ollama/ollama/commit/0bb09259203ff8f6d361faae1d40c4f83d2a99f7
+      patch :DATA
     end
   end
 
@@ -33,8 +37,8 @@ class Ollama < Formula
   # Pinned dependency required by llama-server
   resource "llama.cpp" do
     url "https://github.com/ggml-org/llama.cpp.git",
-        tag:      "b10434",
-        revision: "7e4c0a96880dae4fc4268ad441f8a6446bd5460a"
+        tag:      "b10630",
+        revision: "d222767c7a6516559a3f49e7721b6c6b1acc87b4"
 
     livecheck do
       url "https://raw.githubusercontent.com/ollama/ollama/refs/tags/v#{LATEST_VERSION}/LLAMA_CPP_VERSION"
@@ -49,6 +53,9 @@ class Ollama < Formula
     end
   end
 
+  # downloads go modules in install and runs a server in test
+  deny_network_access! :postinstall
+
   def install
     if OS.linux? && Hardware::CPU.arm?
       arch_flags = "-march=armv8.2-a+bf16"
@@ -59,6 +66,14 @@ class Ollama < Formula
     # Build llama-server
     llama_source_dir = buildpath/"llama.cpp"
     llama_source_dir.install resource("llama.cpp")
+
+    # b10630: tools/tuning hardcodes CMAKE_SOURCE_DIR, which is the ollama
+    # build root under FetchContent; retarget to llama.cpp's own ggml-metal dir.
+    # Remove when llama.cpp fixes it upstream:
+    # https://github.com/ggml-org/llama.cpp/issues/28114
+    inreplace llama_source_dir/"tools/tuning/CMakeLists.txt",
+              "${CMAKE_SOURCE_DIR}/ggml/src/ggml-metal",
+              "${CMAKE_CURRENT_SOURCE_DIR}/../../ggml/src/ggml-metal"
 
     preset = (OS.mac? && Hardware::CPU.arm?) ? "darwin" : "cpu"
 
@@ -177,3 +192,12 @@ class Ollama < Formula
     end
   end
 end
+
+__END__
+diff --git a/x/mlxrunner/mlx/fast.go b/x/mlxrunner/mlx/fast.go
+index 27d5724..f38a670 100644
+--- a/x/mlxrunner/mlx/fast.go
++++ b/x/mlxrunner/mlx/fast.go
+@@ -24 +24 @@ func FastScaledDotProductAttention(q, k, v *Array, scale float32, mode string, m
+-	C.mlx_fast_scaled_dot_product_attention(&out.ctx, q.ctx, k.ctx, v.ctx, C.float(scale), cMode, maskCtx, sinks.ctx, C.bool(false), DefaultStream().ctx)
++	C.mlx_fast_scaled_dot_product_attention(&out.ctx, q.ctx, k.ctx, v.ctx, C.float(scale), cMode, maskCtx, sinks.ctx, DefaultStream().ctx)
