@@ -6,7 +6,7 @@ class Pgbackrest < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "41adb0380306bd5cea83b37fb0a0137af3845ebafa8e2c762c16dcbabc4fe9e0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d220805e7146ae622cc02bc23d3fc7df8f3d836b168727a9ae3fbf7bd1825ae5"
   end
 
   depends_on "cmake" => :build
