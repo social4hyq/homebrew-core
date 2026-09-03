@@ -82,7 +82,15 @@ class Libsecret < Formula
                             "\tpassword = getpass (\"Password: \");\n"
     read_password_tty_new = "#{getpass_impl}static SecretValue *\nread_password_tty (void)\n" \
                             "{\n\tgchar *password;\n\n\tpassword = ohos_getpass (\"Password: \");\n"
-    inreplace "tool/secret-tool.c", read_password_tty_old, read_password_tty_new
+    # Plain inreplace(old, new) runs new through String#gsub, where a
+    # literal "\0"/"\n" in the replacement is a regex back-reference, not a
+    # literal backslash -- and getpass_impl is full of those (char literals
+    # like '\0'). Substitute on the raw string with a block instead so the
+    # replacement text is inserted verbatim.
+    inreplace "tool/secret-tool.c" do |s|
+      replaced = s.inreplace_string.sub!(read_password_tty_old) { read_password_tty_new }
+      odie "libsecret: read_password_tty patch anchor not found" if replaced.nil?
+    end
 
     # No vala in this tap: skip generating the .vapi (Vala bindings aren't
     # consumed by anything this tap ports).
