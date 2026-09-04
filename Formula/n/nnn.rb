@@ -7,7 +7,7 @@ class Nnn < Formula
   head "https://github.com/jarun/nnn.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d3f105462e015ff49a265c201067659e572cb7e0bfae1160cd95fd70d5807f5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "019c2eccfcca8f6ce1af73173c0ff06bfb5e2755c80972cea8604d4462614d77"
   end
 
   depends_on "gnu-sed"
