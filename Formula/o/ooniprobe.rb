@@ -1,8 +1,8 @@
 class Ooniprobe < Formula
   desc "Network interference detection tool"
   homepage "https://ooni.org/"
-  url "https://github.com/ooni/probe-cli/archive/refs/tags/v3.29.1.tar.gz"
-  sha256 "132323f69140316f012465f7a20571b563ebff952f2b1568f815755a62ab2fb5"
+  url "https://github.com/ooni/probe-cli/archive/refs/tags/v3.30.0.tar.gz"
+  sha256 "8ddd7bf5f831e635dada1f8eca2db688f8da9c37e06deed03fa94826d943315b"
   license "GPL-3.0-or-later"
   head "https://github.com/ooni/probe-cli.git", branch: "master"
 
@@ -12,16 +12,19 @@ class Ooniprobe < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac617278ca872e4a65a856ecebeaeceb3522bfe95593fef49d7cb9df5f8c20a8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d374d0dcf5876266330de0b976f67f771d34bc62ee0c52532b12bc3427798cf"
   end
 
   depends_on "go" => :build
   depends_on "tor"
 
   def install
-    ENV["CGO_ENABLED"] = "1" if OS.linux? && Hardware::CPU.arm?
+    ENV["CGO_ENABLED"] = "1"
 
-    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/ooniprobe"
+    # OHOS uses musl libc; the prebuilt libuniffi_ooniprobe.a bundled by
+    # `make userauth` is built against glibc and fails to link here. Build
+    # with the `nouserauth` tag to use the pure-Go stub instead.
+    system "go", "build", "-tags", "nouserauth", *std_go_args, "./cmd/ooniprobe"
     (var/"ooniprobe").mkpath
   end
 
