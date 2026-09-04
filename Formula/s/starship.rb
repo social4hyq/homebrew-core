@@ -21,19 +21,19 @@ class Starship < Formula
 
   def install
     # Disable default features (battery/notify): OHOS has no dbus, no battery API.
-    # All remaining deps are pure Rust. strerror_r link fix: rust libc crate declares
-    # __xpg_strerror_r for OHOS but musl libc doesn't export it; provide a forwarding .o
-    # via RUSTFLAGS.
-    (buildpath/"strerror_shim.rs").write <<~RUST
-      #[no_mangle]
-      pub extern "C" fn __xpg_strerror_r(errnum: i32, buf: *mut u8, buflen: usize) -> i32 {
-          extern "C" { fn strerror_r(errnum: i32, buf: *mut u8, buflen: usize) -> i32; }
-          unsafe { strerror_r(errnum, buf, buflen) }
-      }
-    RUST
-    system "rustc", "--edition", "2021", "--crate-type", "staticlib", "--emit", "obj",
-           "-O", "strerror_shim.rs", "-o", "strerror_shim.o"
-    ENV["RUSTFLAGS"] = "-C link-arg=#{buildpath}/strerror_shim.o"
+    # All remaining deps are pure Rust.
+    #
+    # EXPERIMENT (not for merge as-is): the strerror_r linking shim that used
+    # to live here is deliberately removed to test whether it's still needed.
+    # rust libc crate 0.2.176+ already special-cases target_env = "ohos" the
+    # same as "musl" for strerror_r's link_name (verified in upstream source),
+    # and this tap's current `rust` formula's sysroot libstd.so on real
+    # hardware only references plain `strerror_r`, not `__xpg_strerror_r`
+    # (checked via `nm -D`) — the shim may be a stale workaround from when
+    # these three formulae were first ported (2026-08-02/06/07), predating a
+    # later rust/OHOS-target update. If pr-validate's source build fails here
+    # with an undefined-symbol link error, the shim is still required and
+    # this PR gets closed without merging.
 
     # OHOS sandbox uid not in /etc/passwd; whoami::username() returns uid. Inject
     # dlopen(libos_account_ndk.so) → OH_OsAccount_GetName fallback. Returns None
