@@ -37,13 +37,6 @@ class LlvmAT21 < Formula
     resolves "https://github.com/llvm/llvm-project/pull/111397"
   end
 
-  # OHOS: `uname -s` reports "HarmonyOS", which llvm/cmake/config.guess doesn't
-  # recognize. GetHostTriple.cmake calls this script unconditionally to infer
-  # LLVM_HOST_TRIPLE and treats a non-zero exit as a fatal configure error.
-  patch do
-    file "Patches/llvm@21/0001-config-guess-harmonyos.patch"
-  end
-
   # cmake 4.x's if() parser rejects the extra parens this file wraps its
   # conditions in (CMake bug unrelated to platform, not OHOS-specific).
   patch do
@@ -56,8 +49,12 @@ class LlvmAT21 < Formula
   # this shorter form for resource-dir / runtime-library lookups (see
   # clang/lib/Driver/ToolChains/OHOS.cpp getMultiarchTriple()).
   TARGET_TRIPLE = "aarch64-linux-ohos".freeze
-  # For test assertions only; not passed to cmake — the config.guess patch
-  # above makes LLVM infer this on its own.
+  # HOST_TRIPLE must be passed explicitly (see install()) rather than left for
+  # LLVM to infer via config.guess/`uname -s`: every real build of this
+  # formula runs inside a Docker container (bare-metal builds are blocked by
+  # Homebrew itself), and containers share their host's kernel — `uname -s`
+  # there reports "Linux", not "HarmonyOS", even though the userland is
+  # OHOS/musl. Inference would silently produce aarch64-unknown-linux-*gnu*.
   HOST_TRIPLE = "aarch64-unknown-linux-ohos".freeze
 
   def python3
@@ -112,16 +109,6 @@ class LlvmAT21 < Formula
     odie "OHOS sysroot missing: #{sysroot}/usr/lib" unless File.directory?("#{sysroot}/usr/lib")
     odie "libcxx-ohos headers missing: #{libcxx_ohos}" unless File.directory?(libcxx_ohos)
 
-    # cmake has no Platform/HarmonyOS.cmake (CMAKE_SYSTEM_NAME defaults to
-    # `uname -s` for a native build); without it, shared libs lose SONAME,
-    # RUNPATH/RPATH flags, -Bstatic/-Bdynamic and --start-group/--end-group.
-    # `-DCMAKE_SYSTEM_NAME=Linux` isn't a substitute: setting it explicitly
-    # would make cmake think this is a cross-compile (CMAKE_CROSSCOMPILING=TRUE)
-    # and drag LLVM into its (much more expensive) cross-build path.
-    cmake_modules = buildpath/"cmake-modules"
-    (cmake_modules/"Platform").mkpath
-    (cmake_modules/"Platform/HarmonyOS.cmake").write "include(Platform/Linux)\n"
-
     args = %W[
       -DLLVM_ENABLE_PROJECTS=#{projects.join(";")}
       -DLLVM_ENABLE_RUNTIMES=#{runtimes.join(";")}
@@ -145,7 +132,6 @@ class LlvmAT21 < Formula
       -DCLANG_FORCE_MATCHING_LIBCLANG_SOVERSION=OFF
       -DCLANG_CONFIG_FILE_SYSTEM_DIR=#{clang_config_file_dir.relative_path_from(bin)}
       -DCLANG_CONFIG_FILE_USER_DIR=~/.config/clang
-      -DCMAKE_MODULE_PATH=#{cmake_modules}
     ]
 
     if tap.present?
@@ -156,7 +142,7 @@ class LlvmAT21 < Formula
       args << "-DCLANG_VENDOR_UTI=sh.brew.clang" if tap.official?
     end
 
-    runtimes_cmake_args = ["-DCMAKE_MODULE_PATH=#{cmake_modules}"]
+    runtimes_cmake_args = []
     builtins_cmake_args = []
 
     if OS.mac?
@@ -196,6 +182,13 @@ class LlvmAT21 < Formula
       # unset lets it fall back to whatever `ld.lld` is on PATH (ohos-sdk's,
       # if lld@21 isn't installed) instead of hard-failing.
       args << "-DDEFAULT_SYSROOT=#{sysroot}"
+      # Explicit, not inferred (see HOST_TRIPLE comment above): this also
+      # fixes the *target* triple LLVM_ENABLE_RUNTIMES' nested "runtimes-bins"
+      # sub-build uses for compiler-rt/libcxx/libunwind, which otherwise
+      # inherits whatever config.guess inferred and silently drifts to
+      # aarch64-unknown-linux-gnu inside a Linux-kernel container.
+      args << "-DLLVM_HOST_TRIPLE=#{HOST_TRIPLE}"
+      args << "-DLLVM_DEFAULT_TARGET_TRIPLE=#{HOST_TRIPLE}"
       # Parts of Polly fail to correctly build with PIC when being used for DSOs.
       args << "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
       # Overrides LLVM_TARGETS_TO_BUILD=all above (last -D wins): this is a
@@ -264,11 +257,9 @@ class LlvmAT21 < Formula
     args << "-DBUILTINS_CMAKE_ARGS=#{builtins_cmake_args.join(";")}" if builtins_cmake_args.present?
 
     # The clang-shlib LINKER:--version-script fix the old rewrite carried is
-    # not needed here: that codepath is gated by
-    # `CMAKE_SYSTEM_NAME STREQUAL "Linux"`, and CMAKE_SYSTEM_NAME on a native
-    # OHOS build is "HarmonyOS" (Platform/HarmonyOS.cmake only borrows Linux's
-    # *settings* via include(), it doesn't change CMAKE_SYSTEM_NAME itself) —
-    # so that branch never executes and never needed patching.
+    # not needed here: clang's own `LINKER:` driver syntax already expands it
+    # to `-Xlinker --version-script -Xlinker ...` correctly (verified in CI —
+    # libclang-cpp.so links fine without any inreplace for this).
     llvmpath = buildpath/"llvm"
 
     mkdir llvmpath/"build" do
