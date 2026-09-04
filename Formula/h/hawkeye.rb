@@ -6,7 +6,7 @@ class Hawkeye < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "370861c749d3b08e15c6fcea9986edd962d47edd6c3f4f22b8d2c97c1817cbdb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "594dd3e71810c4271785cd797c1378c155f53dc156925fc6b6cd843e1816eb32"
   end
 
   depends_on "rust" => :build
