@@ -8,7 +8,7 @@ class Beads < Formula
   head "https://github.com/gastownhall/beads.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "621b32e87458ac7273a6251f3dc9c1ab07b215dace344091274ad6546c21e184"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eeaca61db8f66f752497960849510ae5b46e5aeac13fd975cb9fef462b3406a5"
   end
 
   depends_on "go" => :build
