@@ -77,12 +77,16 @@ class LlvmAT21 < Formula
       mlir
       polly
     ]
-    # compiler-rt is deliberately absent here: OHOS's clang driver looks for
-    # it at lib/clang/<ver>/lib/aarch64-linux-ohos/ (no arch-triple subdir the
-    # way a normal host build produces), so a host-triple compiler-rt build
-    # would just sit unused. build_ohos_target_runtimes below builds and
-    # installs it at the path the driver actually searches.
+    # compiler-rt is upstream's unmodified list (host-triple, self-hosting):
+    # its CRT objects (crtbeginS.o etc.) are a hard link-time dependency of
+    # this same host build's own shared libunwind.so, built by this same
+    # LLVM_ENABLE_RUNTIMES step. It lands in lib/clang/<ver>/lib/<host-os>/,
+    # which OHOS's clang driver never searches for downstream use (it wants
+    # lib/clang/<ver>/lib/aarch64-linux-ohos/) — build_ohos_target_runtimes
+    # below builds and installs a *second*, target-triple copy at the path
+    # the driver actually searches; the two don't collide.
     runtimes = %w[
+      compiler-rt
       libcxx
       libcxxabi
       libunwind
