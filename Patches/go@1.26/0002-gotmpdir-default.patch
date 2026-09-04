@@ -1,0 +1,15 @@
+--- go/src/cmd/go/internal/work/action.go	2026-05-04 20:36:18.000000000 +0000
++++ go/src/cmd/go/internal/work/action.go	2026-06-05 10:24:06.730212978 +0000
+@@ -295,7 +295,11 @@
+ 		if !buildInitStarted {
+ 			panic("internal error: NewBuilder called before BuildInit")
+ 		}
+-		tmp, err := os.MkdirTemp(cfg.Getenv("GOTMPDIR"), "go-build")
++		tmpdir := cfg.Getenv("GOTMPDIR")
++		if tmpdir == "" {
++			tmpdir = "/data/storage/el2/base/cache"
++		}
++		tmp, err := os.MkdirTemp(tmpdir, "go-build")
+ 		if err != nil {
+ 			base.Fatalf("go: creating work dir: %v", err)
+ 		}
