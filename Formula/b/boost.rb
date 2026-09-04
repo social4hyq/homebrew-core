@@ -1,11 +1,10 @@
 class Boost < Formula
   desc "Collection of portable C++ source libraries"
   homepage "https://www.boost.org/"
-  url "https://github.com/boostorg/boost/releases/download/boost-1.90.0/boost-1.90.0-b2-nodocs.tar.xz"
-  sha256 "9e6bee9ab529fb2b0733049692d57d10a72202af085e553539a05b4204211a6f"
+  url "https://github.com/boostorg/boost/releases/download/boost-1.92.0/boost-1.92.0-b2-nodocs.tar.xz"
+  sha256 "ea7b982002cc9dfbe59b0b217b206f470dc75f3de0bb2973d844118934d82411"
   license "BSL-1.0"
-  revision 1
-  compatibility_version 1
+  compatibility_version 2
   head "https://github.com/boostorg/boost.git", branch: "master"
 
   livecheck do
@@ -17,7 +16,7 @@ class Boost < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d97ada8f4fbde911a56949af5e5404172908bd8837352c0acd55e84315650b4e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "31faef7ba4e262539af3d1d6084a94d166d6e5266be0f30d5a746dcab85721d1"
   end
 
   depends_on "icu4c@78"
@@ -28,13 +27,6 @@ class Boost < Formula
 
   on_linux do
     depends_on "zlib-ng-compat"
-  end
-
-  # Fix for `ncmpcpp`, pr ref: https://github.com/boostorg/range/pull/157
-  patch :p3 do
-    url "https://github.com/boostorg/range/commit/9ac89e9936b826c13e90611cb9a81a7aa0508d20.patch?full_index=1"
-    sha256 "914464ffa1d53b3bf56ee0ff1a78c25799170c99c9a1cda075e6298f730236ad"
-    directory "boost"
   end
 
   # Fix ARM unsigned char comparison with EOF (-1)
@@ -163,7 +155,7 @@ class Boost < Formula
       }
     CPP
     system ENV.cxx, "test.cpp", "-std=c++17", "-o", "test", "-L#{lib}", "-lboost_iostreams",
-                    "-L#{Formula["zstd"].opt_lib}", "-lzstd"
+                    "-L#{formula_opt_lib("zstd")}", "-lzstd"
     system "./test"
   end
 end
