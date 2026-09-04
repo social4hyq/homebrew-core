@@ -13,27 +13,42 @@ class Starship < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d86818030f4bd76cce21220dadfd0cce56fbaab327b1475038f437ad41a6617"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r8"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb7ecf7bfa4ce20a8853d99e9578847096d0c6c06f5ec5b91b8959a5b80d6904"
   end
 
   depends_on "rust" => :build
 
+  # Pulled in transitively (guess_host_triple -> errno 0.2.4, resolves to
+  # 0.2.8). This old errno release hand-rolls its own strerror_r FFI binding
+  # gated only on target_os = "linux" (not target_env), so it demands the
+  # glibc-only __xpg_strerror_r symbol on musl/OHOS too — a bug in errno
+  # 0.2.8 itself (last release of that line), unrelated to the libc crate,
+  # which already excludes both musl and ohos correctly. guess_host_triple
+  # pins `errno = "0.2.4"` (^0.2), so cargo can't be pointed at errno's newer
+  # 0.3.x rewrite (different API) via a plain version bump.
+  resource "errno" do
+    url "https://static.crates.io/crates/errno/errno-0.2.8.crate"
+    sha256 "f639046355ee4f37944e44f60642c6f3a7efa3cf6b78c78a0d989a8ce6c396a1"
+  end
+
   def install
     # Disable default features (battery/notify): OHOS has no dbus, no battery API.
-    # All remaining deps are pure Rust. strerror_r link fix: rust libc crate declares
-    # __xpg_strerror_r for OHOS but musl libc doesn't export it; provide a forwarding .o
-    # via RUSTFLAGS.
-    (buildpath/"strerror_shim.rs").write <<~RUST
-      #[no_mangle]
-      pub extern "C" fn __xpg_strerror_r(errnum: i32, buf: *mut u8, buflen: usize) -> i32 {
-          extern "C" { fn strerror_r(errnum: i32, buf: *mut u8, buflen: usize) -> i32; }
-          unsafe { strerror_r(errnum, buf, buflen) }
-      }
-    RUST
-    system "rustc", "--edition", "2021", "--crate-type", "staticlib", "--emit", "obj",
-           "-O", "strerror_shim.rs", "-o", "strerror_shim.o"
-    ENV["RUSTFLAGS"] = "-C link-arg=#{buildpath}/strerror_shim.o"
+    # All remaining deps are pure Rust.
+    resource("errno").stage do
+      inreplace "src/unix.rs",
+        "#[cfg_attr(target_os = \"linux\", link_name = \"__xpg_strerror_r\")]",
+        "#[cfg_attr(all(target_os = \"linux\", not(any(target_env = \"musl\", target_env = \"ohos\"))), " \
+        "link_name = \"__xpg_strerror_r\")]"
+      (buildpath/"vendor/errno").install Dir["*"]
+    end
+    open("Cargo.toml", "a") { |f| f.puts "[patch.crates-io]\nerrno = { path = \"vendor/errno\" }" }
+    # Re-resolve just this package so --locked accepts the patched source.
+    # errno@0.2.8, not bare "errno": the dependency tree also carries a
+    # separate errno 0.3.14 (a different crate elsewhere in the graph), so
+    # the bare name is ambiguous to cargo.
+    system "cargo", "update", "--package", "errno@0.2.8", "--precise", "0.2.8"
 
     # OHOS sandbox uid not in /etc/passwd; whoami::username() returns uid. Inject
     # dlopen(libos_account_ndk.so) → OH_OsAccount_GetName fallback. Returns None
