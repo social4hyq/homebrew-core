@@ -1,13 +1,13 @@
 class Nnn < Formula
   desc "Tiny, lightning fast, feature-packed file manager"
   homepage "https://github.com/jarun/nnn"
-  url "https://github.com/jarun/nnn/archive/refs/tags/v5.2.tar.gz"
-  sha256 "f166eda5093ac8dcf8cbbc6224123a32c53cf37b82c5c1cb48e2e23352754030"
+  url "https://github.com/jarun/nnn/archive/refs/tags/v5.3.tar.gz"
+  sha256 "79ee69f3ced7c0778d207df76b4d4d680636975ccda002eeb19d0917fcba3d36"
   license "BSD-2-Clause"
   head "https://github.com/jarun/nnn.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d3f105462e015ff49a265c201067659e572cb7e0bfae1160cd95fd70d5807f5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "019c2eccfcca8f6ce1af73173c0ff06bfb5e2755c80972cea8604d4462614d77"
   end
 
   depends_on "gnu-sed"
@@ -17,8 +17,8 @@ class Nnn < Formula
   def install
     inreplace "src/nnn.c", "#include <fts.h>\n", ""
     inreplace "src/nnn.c",
-              "#ifdef __linux__\n\t/* Pin thread to specific CPU core",
-              "#ifdef __GLIBC__\n\t/* Pin thread to specific CPU core"
+              "#ifdef __linux__\n#ifndef __TERMUX__\n\t/* Pin thread to specific CPU core",
+              "#ifdef __GLIBC__\n#ifndef __TERMUX__\n\t/* Pin thread to specific CPU core"
     system "make", "install", "PREFIX=#{prefix}"
 
     bash_completion.install "misc/auto-completion/bash/nnn-completion.bash" => "nnn"
@@ -31,6 +31,9 @@ class Nnn < Formula
   test do
     # Testing this curses app requires a pty
     require "pty"
+
+    # nnn 5.3 aborts if XDG_CONFIG_HOME is set but not an accessible directory
+    ENV["XDG_CONFIG_HOME"] = testpath
 
     (testpath/"testdir").mkdir
     PTY.spawn(bin/"nnn", testpath/"testdir") do |r, w, pid|
