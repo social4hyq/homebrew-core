@@ -30,7 +30,18 @@ name: autobump
 # odie when toybox patch no-ops silently) — a bad bump never earns
 # ci-passed and never automerges; the stuck open PR is the signal to
 # regenerate the patch by hand (0.8.2's spawn-task reshape needed exactly
-# that: #456).
+# that: #456). zellij: re-ported against upstream v0.45.1 (PR #475) onto the
+# same plain GitHub archive url + sha256 upstream itself uses — dry-run
+# confirmed at 0.45.1 (a same-version dry-run correctly reported "new URL
+# and old URL are both ..."; a downgrade probe to 0.45.0 correctly computed
+# that release's real sha256 before refusing the downgrade). Its OHOS fixes
+# live inline in install() (curl/socket2 precise bump, vendored close_fds
+# resource, strerror_r shim, OHOS_NDK_HOME for aws-lc-sys) rather than in
+# Patches/*.patch, but the failure mode is the same as herdr's: if a future
+# zellij bump moves the pinned curl/close_fds/aws-lc-sys versions out from
+# under these `cargo update --precise`/inreplace steps, the source build
+# fails in pr-validate, ci-passed never lands, and the stuck PR is the signal
+# to fix the pins by hand.
 # Only add a formula here after confirming `brew bump-formula-pr --dry-run`
 # produces a clean url/sha256 edit for it. version-check.yml keeps reporting
 # the full outdated list (allowlisted or not) for humans deciding what to
@@ -71,7 +82,7 @@ env:
   # root-caused to stdout/stderr R_AARCH64_COPY relocs resolved to NULL by
   # OHOS musl ld.so (fixed in ohos-compat-shim 3874ab4), not the
   # regex-automata panic an earlier revision of this comment claimed.
-  ALLOWLIST: "opencode opencode@2 claude-code herdr"
+  ALLOWLIST: "opencode opencode@2 claude-code herdr zellij"
   IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
