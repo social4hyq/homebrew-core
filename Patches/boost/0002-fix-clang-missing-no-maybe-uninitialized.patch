@@ -24,16 +24,3 @@ index 0ef57f79..f1a321a7 100644
          <known-warnings>hide,<toolset>msvc-$(9.0-14.0):<cxxflags>-wd4100  # unreferenced formal parameter
          <known-warnings>hide,<toolset>msvc-$(9.0-14.0):<cxxflags>-wd4512  # assignment operator could not be generated
          <known-warnings>hide,<toolset>msvc-$(9.0-14.0):<cxxflags>-wd4714  # function 'x' marked as __forceinline not inlined
-diff --git a/libs/url/build/Jamfile b/libs/url/build/Jamfile
-index bd4748fc..fe83d503 100644
---- a/libs/url/build/Jamfile
-+++ b/libs/url/build/Jamfile
-@@ -33,7 +33,7 @@ project
-       <define>BOOST_URL_SOURCE
-       <toolset>msvc-14.0:<build>no
-       # Warnings in dependencies
--      <toolset>gcc:<cxxflags>"-Wno-maybe-uninitialized"
-+      <toolset>gcc:<cxxflags>"-Wno-uninitialized"
-       <toolset>gcc,<target-os>windows:<cxxflags>"-Wno-error=array-bounds"
-     : common-requirements
-       <link>shared:<define>BOOST_URL_DYN_LINK=1
