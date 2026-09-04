@@ -56,8 +56,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.259-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b97b82b897f1a8955d20c40aa16b1b8719a975cd4330bc883b3181e27b9f4c66"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.260-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e1c548a759c6cd71fd1a44c7c79fc8e2cfe0bcfaa57da31b3d7f050a800bf8d"
   end
 
   depends_on "bun"
