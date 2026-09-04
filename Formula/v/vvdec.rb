@@ -7,7 +7,7 @@ class Vvdec < Formula
   head "https://github.com/fraunhoferhhi/vvdec.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1b36265c2ecedbb224943213745be11406df2fdf4f28844ef3c10fcceefb9645"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3779c16dc3086424233cc528bf0ac9ac51f6ffb2b2537b0b11ddc8d2547ee157"
   end
 
   depends_on "cmake" => :build
