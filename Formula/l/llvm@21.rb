@@ -232,6 +232,25 @@ class LlvmAT21 < Formula
         -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON
         -DCOMPILER_RT_USE_LLVM_UNWINDER=ON
       ]
+      # compiler-rt's non-builtins components (sanitizers/profile/xray/etc.)
+      # default ON here and each independently calls a configure-time
+      # `find_compiler_rt_library(builtins ...)` check — satisfied on
+      # upstream's platforms by some pre-existing system compiler-rt/libgcc,
+      # but OHOS has nothing to find (this bootstrap *is* the first-ever
+      # build of it), so the check hits its NOTFOUND branch and hard-errors
+      # (first observed via compiler-rt/lib/stats/CMakeLists.txt). None of
+      # these are needed for a bootstrap compiler — deliberately scoped down
+      # to just builtins+CRT, same as build_ohos_target_runtimes below.
+      # Downstream projects wanting sanitizers/PGO on OHOS need a fuller
+      # LLVM build; not a goal of this formula.
+      runtimes_cmake_args += %w[
+        -DCOMPILER_RT_BUILD_SANITIZERS=OFF
+        -DCOMPILER_RT_BUILD_MEMPROF=OFF
+        -DCOMPILER_RT_BUILD_PROFILE=OFF
+        -DCOMPILER_RT_BUILD_XRAY=OFF
+        -DCOMPILER_RT_BUILD_ORC=OFF
+        -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
+      ]
       runtimes_cmake_args += %w[
         -DLIBCXX_HAS_MUSL_LIBC=ON
         -DLIBCXX_HAS_PTHREAD_API=ON
