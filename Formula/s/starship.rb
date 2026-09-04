@@ -8,8 +8,9 @@ class Starship < Formula
   head "https://github.com/starship/starship.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r9"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5c5889608400efe58dce7599d2b3523e6c588849b724f52aea6e658a2bf54a3"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r10"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "df4602e927860527fac3ee0e1085ece70fbee2cdb6a21e444280813e7725a82f"
   end
 
   depends_on "rust" => :build
