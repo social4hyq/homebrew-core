@@ -9,7 +9,8 @@ class Qpdf < Formula
   no_autobump! because: "newer version requires c++20 support"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cb2b47aa9416e4956d226a0a3ea810baf2f0babafc72b8d8d619c80904ed30c"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7e92fdfbe6be3ffdf991a3e4076361999dd68f22cfd127592bf3cad67590795"
   end
 
   depends_on "cmake" => :build
