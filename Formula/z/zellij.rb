@@ -1,22 +1,14 @@
 class Zellij < Formula
-  desc "Pluggable terminal workspace"
+  desc "Pluggable terminal workspace, with terminal multiplexer as the base feature"
   homepage "https://zellij.dev"
-  # v0.45.0 is the first tag with nix 0.30 (OHOS support; older tags pin 0.23).
-  # NOTE: never pair revision: with branch: here — Homebrew's extract_ref picks
-  # the first ref-type key present, so branch: silently wins and the pin is
-  # ignored (the build then tracks main HEAD).
-  url "https://github.com/zellij-org/zellij.git",
-      tag: "v0.45.0", revision: "13e1c25a2b1ef61d90ecd1765e660c575e90977b"
+  url "https://github.com/zellij-org/zellij/archive/refs/tags/v0.45.1.tar.gz"
+  sha256 "5cbe711437d2a61afd9287165f6aca0bcccb9ab1473633665a5b11ed55467852"
   license "MIT"
-
-  livecheck do
-    url :stable
-    strategy :github_latest
-  end
+  head "https://github.com/zellij-org/zellij.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zellij-v0.45.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "59fd0cb4ac982882672aa53d24923151f6971724bd32864c4337f804c070ee38"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zellij-v0.45.1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa28295e9abafb7b34ebf671691e2356848db0bc65f9664a71442749c7c7dffd"
   end
 
   depends_on "cmake" => :build
@@ -32,7 +24,16 @@ class Zellij < Formula
     sha256 "3bc416f33de9d59e79e57560f450d21ff8393adcf1cdfc3e6d8fb93d5f88a2ed"
   end
 
+  service do
+    run [opt_bin/"zellij", "web"]
+    keep_alive true
+    environment_variables PATH: std_service_path_env
+    log_path var/"log/zellij.log"
+    error_log_path var/"log/zellij.log"
+  end
+
   def install
+    # Ensure that the `openssl` crate picks up the intended library.
     ENV["OPENSSL_DIR"] = formula_opt_prefix("openssl@3")
 
     # OHOS_NDK_HOME must point to ohos-sdk keg root (not native/): aws-lc-sys's
@@ -75,8 +76,7 @@ class Zellij < Formula
     # vendored_curl/web_server_capability bundle their own C sources.
     system "cargo", "install", *std_cargo_args
 
-    generate_completions_from_executable(bin/"zellij", "setup", "--generate-completion",
-                                         base_name: "zellij")
+    generate_completions_from_executable(bin/"zellij", "setup", "--generate-completion")
   end
 
   def caveats
@@ -89,6 +89,6 @@ class Zellij < Formula
 
   test do
     assert_match "keybinds", shell_output("#{bin}/zellij setup --dump-config")
-    assert_match "zellij 0.45.0", shell_output("#{bin}/zellij --version")
+    assert_match "zellij #{version}", shell_output("#{bin}/zellij --version")
   end
 end
