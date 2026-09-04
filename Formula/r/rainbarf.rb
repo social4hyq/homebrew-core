@@ -7,7 +7,7 @@ class Rainbarf < Formula
   head "https://github.com/creaktive/rainbarf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a8327d1ed7c13ef728f5a7862d2f7c46a10715a2009c950b3c99bd55a339fdb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "57fefe2896fff6d17b5f91dd297c952e1f2522d8343c68ee3e77379e3cc610e5"
   end
 
   depends_on "pod2man" => :build
