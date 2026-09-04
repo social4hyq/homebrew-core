@@ -1,14 +1,13 @@
 class Surelog < Formula
   desc "SystemVerilog Pre-processor, parser, elaborator, UHDM compiler"
   homepage "https://github.com/chipsalliance/Surelog"
-  url "https://github.com/chipsalliance/Surelog/archive/refs/tags/v1.86.tar.gz"
-  sha256 "5bffc61334f38b16b5dd57e5209d38bc1e07b0e0bda452e4580678aa3e9daf53"
+  url "https://github.com/chipsalliance/Surelog/archive/refs/tags/v1.87.tar.gz"
+  sha256 "5d3895ebaa08890db858988143264e2bc84c1dc6d36344628dc9f4a2aee2027b"
   license "Apache-2.0"
-  revision 2
   head "https://github.com/chipsalliance/Surelog.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "15ba438dfcdf8b4a500c8d5b8eed659440b0409f8b8d79e29e9e4b5f03a973d3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a35ca05a283abcd90fa8eebc1e56593f31bd8c8adc48bf9e0b1ba3652a1ecba"
   end
 
   depends_on "antlr" => :build
@@ -103,7 +102,7 @@ class Surelog < Formula
 
     flags = shell_output("pkgconf --cflags --libs Surelog").chomp.split
     system ENV.cxx, testpath/"test.cpp", "-o", "test",
-                    "-L#{Formula["antlr4-cpp-runtime"].opt_prefix}/lib",
+                    "-L#{formula_opt_prefix("antlr4-cpp-runtime")}/lib",
                     "-fPIC", "-std=c++17", *flags
     system testpath/"test"
   end
