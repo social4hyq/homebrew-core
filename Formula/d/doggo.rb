@@ -1,8 +1,8 @@
 class Doggo < Formula
   desc "Command-line DNS Client for Humans"
   homepage "https://doggo.mrkaran.dev/"
-  url "https://github.com/mr-karan/doggo/archive/refs/tags/v1.3.0.tar.gz"
-  sha256 "877f047fe81185d4fbeec870d54233f7ebf7c707a41cb98d023c34e089f9a0c0"
+  url "https://github.com/mr-karan/doggo/archive/refs/tags/v1.4.0.tar.gz"
+  sha256 "e0d043aa34fb8daa44df07558fd32fe2686eba6644d5f6834edbc8a789d42e1d"
   license "GPL-3.0-or-later"
   head "https://github.com/mr-karan/doggo.git", branch: "main"
 
