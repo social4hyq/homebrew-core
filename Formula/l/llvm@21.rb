@@ -198,10 +198,27 @@ class LlvmAT21 < Formula
       args << "-DDEFAULT_SYSROOT=#{sysroot}"
       # Parts of Polly fail to correctly build with PIC when being used for DSOs.
       args << "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+      # Overrides LLVM_TARGETS_TO_BUILD=all above (last -D wins): this is a
+      # bootstrap compiler for OHOS/aarch64 tooling, not a general multi-arch
+      # dev toolchain, and `all` roughly doubles build time for ~15 backends
+      # nothing downstream targets.
+      args << "-DLLVM_TARGETS_TO_BUILD=AArch64"
       runtimes_cmake_args += %w[
         -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-
+      ]
+      # OHOS has no system libc++ (or libstdc++) for the runtimes-configure
+      # sub-cmake's compiler-flag probes (check_cxx_compiler_flag etc.) to
+      # link a trial executable against — we're building libc++ itself in
+      # this very step. Without this, probes that need to *link* (most of
+      # them; a bare compile-only flag test like -funwind-tables still
+      # passes) fail, which cascades into libunwind/src/CMakeLists.txt's
+      # `NOT (CXX_SUPPORTS_FNO_EXCEPTIONS_FLAG AND ...)` hard error. Forcing
+      # try_compile to stop at a static archive (no link) is the standard
+      # workaround for probing a compiler against a runtime that doesn't
+      # exist yet.
+      runtimes_cmake_args << "-DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY"
+      runtimes_cmake_args += %w[
         -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
         -DLIBCXX_STATICALLY_LINK_ABI_IN_SHARED_LIBRARY=OFF
         -DLIBCXX_STATICALLY_LINK_ABI_IN_STATIC_LIBRARY=ON

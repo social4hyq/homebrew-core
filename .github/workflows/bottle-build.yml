@@ -98,7 +98,12 @@ env:
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 360
+    # Verification-branch-only bump (this file never merges): attempt 1 of
+    # the llvm@21/lld@21 upstream-align rewrite reached 89% of ninja targets
+    # in 4h17m before failing on an unrelated bootstrap issue, so 360 has no
+    # margin left for a clean full run (build + install + target-side extra
+    # runtimes + the full upstream test suite).
+    timeout-minutes: 600
     steps:
       # pull_request's default checkout ref is the synthetic base+head merge
       # commit; when we're about to push a bottle commit back (upload=true,
