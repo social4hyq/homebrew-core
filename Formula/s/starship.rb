@@ -28,7 +28,13 @@ class Starship < Formula
   end
 
   def install
-    # Disable default features (battery/notify): OHOS has no dbus, no battery API.
+    # Disable default features (battery/notify): both compile fine on OHOS
+    # (notify-rust defaults to zbus, a pure-Rust D-Bus client; starship-battery's
+    # linux backend is plain std::fs) but are useless at runtime — reading
+    # /sys/class/power_supply/* hits Permission denied under the OHOS sandbox
+    # even though the sysfs entries exist, and there's no D-Bus session bus to
+    # notify over. Both degrade gracefully (empty module / silent no-op, no
+    # panic) if left on, so this is a "not useful" cut, not a build fix.
     # All remaining deps are pure Rust.
     resource("errno").stage do
       inreplace "src/unix.rs",
