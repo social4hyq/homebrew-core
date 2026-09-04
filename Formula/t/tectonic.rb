@@ -15,7 +15,7 @@ class Tectonic < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8943576660b8e4cf8fc3e7d31a8fc17bbbc6c69ee47109a207517f0459e6716d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "41e92e07e211898318e3ad296160c4195ac0a6219a034c5e4051adc36722e1a8"
   end
 
   depends_on "cmake" => :build
