@@ -1,8 +1,8 @@
 class Dnsx < Formula
   desc "DNS query and resolution tool"
   homepage "https://github.com/projectdiscovery/dnsx"
-  url "https://github.com/projectdiscovery/dnsx/archive/refs/tags/v1.3.0.tar.gz"
-  sha256 "b4b2d8505c2be30181060a05f126a90ef5211c489fa437236172046b38c6ce3b"
+  url "https://github.com/projectdiscovery/dnsx/archive/refs/tags/v1.3.1.tar.gz"
+  sha256 "2c14a27b00e3215e1c0dc07afe9e5e5c3f0a3502852f1d5f497a92b5e6cb63db"
   license "MIT"
   head "https://github.com/projectdiscovery/dnsx.git", branch: "dev"
 
