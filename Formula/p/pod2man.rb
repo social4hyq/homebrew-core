@@ -4,6 +4,7 @@ class Pod2man < Formula
   url "https://archives.eyrie.org/software/perl/podlators-v6.1.0.tar.xz"
   sha256 "6eb43a0fc8381969d5910f8c46ea11e8867e0862ff3c8a1ccda109894cb7de34"
   license any_of: ["Artistic-1.0-Perl", "GPL-1.0-or-later"]
+  revision 1
 
   livecheck do
     url "https://archives.eyrie.org/software/perl/"
@@ -11,10 +12,12 @@ class Pod2man < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ebd22cc98ab30aea6160574d4258a9b226821975187d39d60225f49eb8a8842c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf8ca6407eec4ea645c88814cd736f55246a4f2d48ada06510cdb8d8f949926f"
   end
 
   keg_only "it conflicts with the pod2man that ships with Perl"
+
+  depends_on "perl"
 
   resource "Pod::Simple" do
     url "https://cpan.metacpan.org/authors/id/K/KH/KHW/Pod-Simple-3.45.tar.gz"
@@ -34,6 +37,15 @@ class Pod2man < Formula
     system "make"
     system "make", "install"
     bin.env_script_all_files libexec/"bin", PERL5LIB: "#{lib}/perl5:#{libexec}/lib/perl5"
+
+    # Rewrite the perl shebang so the installed scripts use the Homebrew perl
+    # instead of the absolute perl path baked in at build time (which may not
+    # exist on the install machine).
+    perl_bin = Formula["perl"].opt_bin/"perl"
+    libexec.glob("bin/*").each do |cmd|
+      next unless cmd.file? && cmd.executable?
+      inreplace cmd, %r{^#!.*perl\b}, "#!#{perl_bin}"
+    end
   end
 
   test do
