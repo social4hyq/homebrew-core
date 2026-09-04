@@ -36,23 +36,24 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 
 | Formula | 版本 | 说明 |
 |---|---|---|
-| `opencode` | 1.18.18 | 终端 AI 编码助手：在命令行里让 AI 帮你读代码、改代码、跑命令、提 PR；对话式协作 |
-| `opencode@2` | 2.0.0-beta | opencode 的 v2 预览版（命令名 `opencode2`）：新架构、交互升级，仍在快速迭代 |
-| `claude-code` | 2.1.235 | Anthropic 的终端 AI 编码助手（Claude Code）：对话式写代码、改代码、执行命令；首次运行自动拉取官方版本并校验完整性（License 禁随包分发） |
+| `opencode` | 1.18.27 | 终端 AI 编码助手：在命令行里让 AI 帮你读代码、改代码、跑命令、提 PR；对话式协作 |
+| `opencode@2` | 0.0.0-beta-18999 | opencode 的 v2 预览版（命令名 `opencode2`）：新架构、交互升级，仍在快速迭代 |
+| `claude-code` | 2.1.260 | Anthropic 的终端 AI 编码助手（Claude Code）：对话式写代码、改代码、执行命令；首次运行自动拉取官方版本并校验完整性（License 禁随包分发） |
 | `bun` | 1.4.0 | JavaScript/TypeScript 全家桶运行时：运行、打包、依赖管理一体化，启动极快 |
 | `bun-bootstrap` | 1.4.0-5467a689 | bun 自举构建用的预编译引导版（普通用户无需安装） |
-| `bun-webkit` | `f0f60fd232` | bun 运行时的浏览器引擎组件（内部依赖，普通用户无需关心） |
+| `bun-webkit` | `0f966e81b7` | bun 运行时的浏览器引擎组件（内部依赖，普通用户无需关心） |
 | `llvm@21` | 21.1.8 | 本 tap 的编译器基石：几乎全部本地源码构建都依赖它，并负责给最终产物签名 |
 | `ohos-bst-light` | 1.0.0 | 二进制自签工具（开发向）：给本地编译的产物签名，使其能在 OHOS 上执行 |
 | `ohos-compat-shim` | 0.5.0 | 系统兼容层：自动兜底 OHOS 与标准 Linux 的底层行为差异，让软件开箱即用（多数用户无感） |
 | `qemu-aarch64` | 11.0.1-r0 | aarch64 程序运行/调试环境：在真机上运行 ARM Linux 程序，自带系统调用级跟踪（排查问题利器） |
 | `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机直接访问 |
 | `starship` | 1.26.0 | 终端提示符美化/定制工具：把默认 prompt 换成主题化、信息丰富的提示符（git 状态/目录等），跨 shell 生效；**使用前先装 `hishell-font`**（图标字体），否则提示符里的图标显示为乱码 |
-| `zellij` | 0.45.0 | 终端复用器（类似 tmux）：一个窗口多窗格/标签页，会话可脱离重连，支持插件扩展 |
+| `zellij` | 0.45.1 | 终端复用器（类似 tmux）：一个窗口多窗格/标签页，会话可脱离重连，支持插件扩展 |
 | `hishell-font` | 0.1.0 | hishell 终端图标字体（Nerd Font 系）：`starship` 等带图标工具的字体前置——先装它，提示符里的图标、符号才正常显示 |
-| `herdr` | 0.8.0 | AI 编码助手会话持久化：让终端里的 agent 工作上下文跨会话保留、随时续上 |
-| `zig@0.15` | 0.15.2 | Zig 编程语言工具链（herdr 的构建依赖） |
+| `herdr` | 0.8.2 | AI 编码助手会话持久化：让终端里的 agent 工作上下文跨会话保留、随时续上 |
 | `node-ohos` | 26.7.0 | 用 llvm@21 构建的 Node.js：libc++ ABI 与 bun/nan 系原生插件兼容，需要跑 node 原生扩展时用它（开发者向） |
+| `libsecret` | 0.21.7 | GNOME 密码/凭据存储库（freedesktop Secret Service 规范），附 `secret-tool` 命令行工具；供需要系统级密钥存取的程序链接 |
+| `vite-plus` | 0.2.8 | voidzero 统一前端工具链（`vp` 命令）：lint/format/build 一体化入口，原生 binding 已接鸿蒙适配版 |
 
 ## 已下线 / 已迁移
 
@@ -73,6 +74,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `nvm-ohos` | 2026-08-15 下线 | 旧实现存档：`NVM_INSTALL_THIRD_PARTY_HOOK` 重定向 `nvm install` 到 brew node keg；其继任者本 tap `nvm` 也已于 2026-08-24 下线，统一改用官方 core 的 `nvm`；可从 tap git 历史恢复 |
 | `warp-tui` | 2026-08-12 下线 | 已停止维护（使用率低）；可从 tap git 历史恢复 formula |
 | `inject-runpath` / `dlopen-sign-shim` | 2026-08-12 下线 | 已无 formula 依赖（原用途已被预签名 npm `.so` + bun r31 起静态内嵌的 `ohos-compat-shim` 取代）；可从 tap git 历史恢复 formula |
+| `zig@0.15` | 2026-09-04 下线 | 唯一消费者 herdr 已改为 install() 内联官方预编译 zig（resource 下载 + binary-sign-tool 签名），独立 keg 无保留必要；可从 tap git 历史恢复 formula |
 
 > 改名提示（2026-08-01）：`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
 
