@@ -80,7 +80,9 @@ class Starship < Formula
       "whoami::username()",
       "ohos_account_username().map(Ok).unwrap_or_else(whoami::username)"
 
-    system "cargo", "install", *std_cargo_args, "--no-default-features"
+    # EXPERIMENT (not for merge): dropped --no-default-features to see
+    # exactly where battery/notify break on OHOS, instead of assuming.
+    system "cargo", "install", *std_cargo_args
 
     generate_completions_from_executable(bin/"starship", "completions")
 
