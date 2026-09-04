@@ -4,18 +4,12 @@ class Starship < Formula
   url "https://github.com/starship/starship/archive/refs/tags/v1.26.0.tar.gz"
   sha256 "8c95e8a6c596b29ac192104eae00dd991e8c8fd66083fd2b34d6b223a5803a59"
   license "ISC"
-  revision 4
+  revision 5
   head "https://github.com/starship/starship.git", branch: "main"
 
-  livecheck do
-    url :stable
-    strategy :github_latest
-  end
-
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r8"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb7ecf7bfa4ce20a8853d99e9578847096d0c6c06f5ec5b91b8959a5b80d6904"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5c5889608400efe58dce7599d2b3523e6c588849b724f52aea6e658a2bf54a3"
   end
 
   depends_on "rust" => :build
