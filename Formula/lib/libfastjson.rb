@@ -1,8 +1,8 @@
 class Libfastjson < Formula
   desc "Fast json library for C"
   homepage "https://github.com/rsyslog/libfastjson"
-  url "https://download.rsyslog.com/libfastjson/libfastjson-1.2304.0.tar.gz"
-  sha256 "ef30d1e57a18ec770f90056aaac77300270c6203bbe476f4181cc83a2d5dc80c"
+  url "https://download.rsyslog.com/libfastjson/libfastjson-1.2609.0.tar.gz"
+  sha256 "7cd6f78c1c07f4140f6976a9a0e0048bcaa7292329c6ac2c0e070383d83d8edd"
   license "BSD-2-Clause"
 
   livecheck do
