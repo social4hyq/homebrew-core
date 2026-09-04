@@ -1,272 +1,305 @@
 class LlvmAT21 < Formula
-  desc "LLVM 21 toolchain: clang, lld, OHOS multiarch runtime libs"
+  desc "Next-gen compiler infrastructure"
   homepage "https://llvm.org/"
   url "https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.8/llvm-project-21.1.8.src.tar.xz"
   sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
+  # The LLVM Project is under the Apache License v2.0 with LLVM Exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
-  revision 6
-  # Fully rewritten from upstream: OHOS code-sign patch, config.guess stub,
-  # two separate runtime builds (compiler-rt + multiarch libc++).
+  compatibility_version 1
 
-  # Pinned to 21.x for libc++ ABI compatibility with bun.
   livecheck do
     url :stable
     regex(/^llvmorg[._-]v?(21(?:\.\d+)+)$/i)
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm@21-v21.1.8-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d79b31b6f39bb0142fb761ca1bdb90950c55b61fe508f8d00e474bc09f1511ee"
-  end
+  keg_only :versioned_formula
 
-  keg_only "this is a versioned HarmonyOS bootstrap toolchain"
-
-  depends_on "cmake"    => :build
-  depends_on "ninja"    => :build
-  depends_on "python@3.14" => :build
-  # Runtime dependency: lld links against libxml2/zlib (must be declared explicitly in a keg_only
-  # environment, otherwise the loader cannot find the .so).
-  depends_on "libxml2"
-  depends_on "ohos-sdk"
-  depends_on "zlib"
+  # https://llvm.org/docs/GettingStarted.html#requirement
+  depends_on "cmake" => :build
+  depends_on "ninja" => :build
+  depends_on "python@3.14" => [:build, :test]
   depends_on "zstd"
 
-  # HarmonyOS code-sign support (adds CodeSign.cpp to lld/ELF).  Version-specific
-  patch :p1 do
-    file "Patches/llvm@21/code-sign.patch"
+  uses_from_macos "libedit"
+  uses_from_macos "libffi"
+
+  on_linux do
+    depends_on "pkgconf" => :build
+    depends_on "ohos-sdk" # sysroot + libcxx-ohos headers; see DEFAULT_SYSROOT below
+    depends_on "zlib-ng-compat"
   end
 
-  HOST_TRIPLE   = "aarch64-unknown-linux-ohos".freeze
-  TARGET_TRIPLE = "aarch64-linux-ohos".freeze
-  COMPILERS     = %w[clang clang++].freeze
+  # Fix triple config loading for clang-cl
+  patch do
+    url "https://github.com/llvm/llvm-project/compare/1381ad497b9a6d3da630cbef53cbfa9ddf117bb6...40a8c7c0ff3f688b690e4c74db734de67f0f89e9.diff"
+    sha256 "f6dafd762737eb79761ab7ef814a9fc802ec4bb8d20f46691f07178053b0eb36"
+    type :unofficial
+    resolves "https://github.com/llvm/llvm-project/pull/111397"
+  end
 
-  # Tools borrowed from ohos-sdk (LLVM 15) via relative symlinks; ELF/DWARF formats stable.
-  KEEP_TOOLS_FROM_SDK = %w[
-    llvm-ar llvm-ranlib llvm-nm llvm-objcopy llvm-objdump
-    llvm-readelf llvm-readobj llvm-strip llvm-cxxfilt
-    llvm-dwarfdump llvm-cov llvm-profdata llvm-symbolizer llvm-addr2line
-    FileCheck not count
-  ].freeze
+  # OHOS: `uname -s` reports "HarmonyOS", which llvm/cmake/config.guess doesn't
+  # recognize. GetHostTriple.cmake calls this script unconditionally to infer
+  # LLVM_HOST_TRIPLE and treats a non-zero exit as a fatal configure error.
+  patch do
+    file "Patches/llvm@21/0001-config-guess-harmonyos.patch"
+  end
+
+  # cmake 4.x's if() parser rejects the extra parens this file wraps its
+  # conditions in (CMake bug unrelated to platform, not OHOS-specific).
+  patch do
+    file "Patches/llvm@21/0002-cmake4-if-parser-compat.patch"
+  end
+
+  # TARGET_TRIPLE is what downstream projects pass as `--target=` when
+  # cross-building for OHOS on this same (aarch64) hardware; it differs from
+  # the host triple below because OHOS's clang driver always normalizes to
+  # this shorter form for resource-dir / runtime-library lookups (see
+  # clang/lib/Driver/ToolChains/OHOS.cpp getMultiarchTriple()).
+  TARGET_TRIPLE = "aarch64-linux-ohos".freeze
+  # For test assertions only; not passed to cmake — the config.guess patch
+  # above makes LLVM infer this on its own.
+  HOST_TRIPLE = "aarch64-unknown-linux-ohos".freeze
+
+  def python3
+    "python3.14"
+  end
+
+  def clang_config_file_dir
+    etc/"clang"
+  end
 
   def install
+    # The clang bindings need a little help finding our libclang.
+    inreplace "clang/bindings/python/clang/cindex.py",
+              /^(\s*library_path\s*=\s*)None$/,
+              "\\1'#{lib}'"
+
+    projects = %w[
+      clang
+      clang-tools-extra
+      mlir
+      polly
+    ]
+    # compiler-rt is deliberately absent here: OHOS's clang driver looks for
+    # it at lib/clang/<ver>/lib/aarch64-linux-ohos/ (no arch-triple subdir the
+    # way a normal host build produces), so a host-triple compiler-rt build
+    # would just sit unused. build_ohos_target_runtimes below builds and
+    # installs it at the path the driver actually searches.
+    runtimes = %w[
+      libcxx
+      libcxxabi
+      libunwind
+    ]
+
+    python_versions = Formula.names
+                             .select { |name| name.start_with? "python@" }
+                             .map { |py| py.delete_prefix("python@") }
+
+    # compiler-rt has some iOS simulator features that require i386 symbols
+    # I'm assuming the rest of clang needs support too for 32-bit compilation
+    # to work correctly, but if not, perhaps universal binaries could be
+    # limited to compiler-rt. llvm makes this somewhat easier because compiler-rt
+    # can almost be treated as an entirely different build from llvm.
+    ENV.permit_arch_flags
+
+    # OHOS is musl-based; upstream's `ENV.cflags` forwarding a few lines down
+    # (into args / runtimes_cmake_args / builtins_cmake_args) picks this up.
+    ENV.append_to_cflags "-D__MUSL__"
+
     ohos_sdk    = formula_opt_prefix("ohos-sdk")
     sysroot     = "#{ohos_sdk}/native/sysroot"
     libcxx_ohos = "#{ohos_sdk}/native/llvm/include/libcxx-ohos/include/c++/v1"
-
     odie "OHOS sysroot missing: #{sysroot}/usr/lib" unless File.directory?("#{sysroot}/usr/lib")
     odie "libcxx-ohos headers missing: #{libcxx_ohos}" unless File.directory?(libcxx_ohos)
 
-    patch_config_guess(buildpath/"llvm/cmake/config.guess")
-
+    # cmake has no Platform/HarmonyOS.cmake (CMAKE_SYSTEM_NAME defaults to
+    # `uname -s` for a native build); without it, shared libs lose SONAME,
+    # RUNPATH/RPATH flags, -Bstatic/-Bdynamic and --start-group/--end-group.
+    # `-DCMAKE_SYSTEM_NAME=Linux` isn't a substitute: setting it explicitly
+    # would make cmake think this is a cross-compile (CMAKE_CROSSCOMPILING=TRUE)
+    # and drag LLVM into its (much more expensive) cross-build path.
     cmake_modules = buildpath/"cmake-modules"
     (cmake_modules/"Platform").mkpath
-    (cmake_modules/"Platform/HarmonyOS.cmake").write <<~CMAKE
-      set(CMAKE_DL_LIBS "dl")
-      set(CMAKE_SHARED_LIBRARY_RUNTIME_C_FLAG "-Wl,-rpath,")
-      set(CMAKE_SHARED_LIBRARY_RUNTIME_C_FLAG_SEP ":")
-      set(CMAKE_SHARED_LIBRARY_RPATH_ORIGIN_TOKEN "\\$ORIGIN")
-      set(CMAKE_SHARED_LIBRARY_RPATH_LINK_C_FLAG "-Wl,-rpath-link,")
-      set(CMAKE_SHARED_LIBRARY_SONAME_C_FLAG "-Wl,-soname,")
-      set(CMAKE_EXE_EXPORTS_C_FLAG "-Wl,--export-dynamic")
-      set(CMAKE_PLATFORM_USES_PATH_WHEN_NO_SONAME 1)
-
-      foreach(type SHARED_LIBRARY SHARED_MODULE EXE)
-        set(CMAKE_${type}_LINK_STATIC_C_FLAGS "-Wl,-Bstatic")
-        set(CMAKE_${type}_LINK_DYNAMIC_C_FLAGS "-Wl,-Bdynamic")
-      endforeach()
-
-      set(CMAKE_LINK_GROUP_USING_RESCAN "LINKER:--start-group" "LINKER:--end-group")
-      set(CMAKE_LINK_GROUP_USING_RESCAN_SUPPORTED TRUE)
-
-      if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
-        set(CMAKE_INSTALL_SO_NO_EXE 0 CACHE INTERNAL
-          "Install .so files without execute permission.")
-      endif()
-
-      include(Platform/UnixPaths)
-    CMAKE
-
-    jobs      = ENV.make_jobs
-    link_jobs = [jobs / 4, 1].max
+    (cmake_modules/"Platform/HarmonyOS.cmake").write "include(Platform/Linux)\n"
 
     args = %W[
-      -DCMAKE_MODULE_PATH=#{cmake_modules}
-      -DLLVM_HOST_TRIPLE=#{HOST_TRIPLE}
-      -DCMAKE_BUILD_TYPE=Release
-      -DCMAKE_INSTALL_PREFIX=#{prefix}
-      -DCMAKE_C_COMPILER=clang
-      -DCMAKE_CXX_COMPILER=clang++
-      -DLLVM_ENABLE_PROJECTS=clang;lld
-      -DLLVM_ENABLE_RUNTIMES=libcxx;libcxxabi;libunwind
-      -DLLVM_TARGETS_TO_BUILD=AArch64
-      -DLLVM_DEFAULT_TARGET_TRIPLE=#{HOST_TRIPLE}
-      -DLLVM_ENABLE_ASSERTIONS=OFF
-      -DLLVM_PARALLEL_COMPILE_JOBS=#{jobs}
-      -DLLVM_PARALLEL_LINK_JOBS=#{link_jobs}
-      -DLLVM_ENABLE_LTO=OFF
-      -DLLVM_ENABLE_LLD=ON
-      -DLLVM_OPTIMIZED_TABLEGEN=ON
-      -DLLVM_INSTALL_UTILS=ON
+      -DLLVM_ENABLE_PROJECTS=#{projects.join(";")}
+      -DLLVM_ENABLE_RUNTIMES=#{runtimes.join(";")}
+      -DLLVM_POLLY_LINK_INTO_TOOLS=ON
+      -DLLVM_BUILD_EXTERNAL_COMPILER_RT=ON
+      -DLLVM_LINK_LLVM_DYLIB=ON
+      -DLLVM_ENABLE_EH=OFF
+      -DLLVM_ENABLE_FFI=ON
+      -DLLVM_ENABLE_RTTI=ON
+      -DLLVM_INCLUDE_DOCS=OFF
       -DLLVM_INCLUDE_TESTS=OFF
-      -DLLVM_INCLUDE_EXAMPLES=OFF
-      -DLLVM_INCLUDE_BENCHMARKS=OFF
-      -DLLVM_ENABLE_BINDINGS=OFF
-      -DLLVM_ENABLE_LIBCXX=ON
-      -DLIBCXX_ENABLE_ABI_LINKER_SCRIPT=OFF
-      -DLLVM_ENABLE_TERMINFO=OFF
-      -DLIBUNWIND_USE_FRAME_HEADER_CACHE=ON
-      -DCLANG_BUILD_EXAMPLES=OFF
-      -DCLANG_VENDOR=OHOS
-      -DLLVM_ENABLE_ZSTD=FORCE_ON
-      -DLLVM_USE_STATIC_ZSTD=ON
-      -DBUILD_SHARED_LIBS=OFF
-      -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON
-      -DHAVE_CXX_ATOMICS_WITHOUT_LIB=ON
-      -DHAVE_CXX_ATOMICS64_WITHOUT_LIB=ON
-      -DCMAKE_CXX_STANDARD=17
-      -DCMAKE_CXX_STANDARD_REQUIRED=ON
-      -DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON
-      -DLIBCXX_HAS_MUSL_LIBC=ON
-      -DLIBCXX_HAS_PTHREAD_API=ON
-      -DLIBCXX_USE_COMPILER_RT=ON
-      -DLIBCXXABI_USE_COMPILER_RT=ON
-      -DLIBCXXABI_USE_LLVM_UNWINDER=ON
-      -DLIBUNWIND_ENABLE_SHARED=OFF
-      -DLIBUNWIND_USE_COMPILER_RT=ON
-      -DDEFAULT_SYSROOT=#{sysroot}
+      -DLLVM_INSTALL_UTILS=ON
+      -DLLVM_ENABLE_Z3_SOLVER=OFF
+      -DLLVM_OPTIMIZED_TABLEGEN=ON
+      -DLLVM_TARGETS_TO_BUILD=all
+      -DLLVM_USE_RELATIVE_PATHS_IN_FILES=ON
+      -DLLVM_SOURCE_PREFIX=.
+      -DLIBCXX_INSTALL_MODULES=ON
+      -DCLANG_PYTHON_BINDINGS_VERSIONS=#{python_versions.join(";")}
+      -DLLVM_CREATE_XCODE_TOOLCHAIN=OFF
+      -DCLANG_FORCE_MATCHING_LIBCLANG_SOVERSION=OFF
+      -DCLANG_CONFIG_FILE_SYSTEM_DIR=#{clang_config_file_dir.relative_path_from(bin)}
+      -DCLANG_CONFIG_FILE_USER_DIR=~/.config/clang
+      -DCMAKE_MODULE_PATH=#{cmake_modules}
     ]
-    # Multi-word flags must not go in %W[...] — %W splits on whitespace.
-    args << "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
-    args << "-DCMAKE_C_FLAGS=-D__MUSL__ -fstack-protector-strong " \
-            "-no-canonical-prefixes -ffunction-sections -fdata-sections"
-    args << "-DCMAKE_CXX_FLAGS=-D__MUSL__ -fstack-protector-strong " \
-            "-no-canonical-prefixes -ffunction-sections -fdata-sections"
-    rpath_flags = "-Wl,-rpath,$ORIGIN/../lib " \
-                  "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/libxml2/lib " \
-                  "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zlib/lib " \
-                  "-Wl,-rpath,#{HOMEBREW_PREFIX}/opt/zstd/lib"
-    args << "-Dzstd_ROOT=#{formula_opt_prefix("zstd")}"
-    # Point at the static archive: LLVM_USE_STATIC_ZSTD=ON (above) links zstd statically.
-    args << "-Dzstd_LIBRARY=#{formula_opt_lib("zstd")}/libzstd.a"
-    common_linker_flags = "-Wl,--code-sign -Wl,--build-id=sha1 " \
-                          "-Wl,--gc-sections -Wl,-z,relro,-z,now -Wl,-z,noexecstack #{rpath_flags}"
-    args << "-DCMAKE_EXE_LINKER_FLAGS=#{common_linker_flags}"
-    args << "-DCMAKE_SHARED_LINKER_FLAGS=#{common_linker_flags}"
-    args << "-DCMAKE_MODULE_LINKER_FLAGS=#{common_linker_flags}"
-    args << "-DRUNTIMES_CMAKE_ARGS=-DCMAKE_MODULE_PATH=#{cmake_modules}" \
-            ";-DCMAKE_SYSROOT=#{sysroot}" \
-            ";-DCMAKE_C_FLAGS=-D__MUSL__" \
-            ";-DCMAKE_CXX_FLAGS=-D__MUSL__ -isystem #{libcxx_ohos}"
 
-    # --- Bootstrap slim mode
-    # CLANG_BUILD_TOOLS/LLVM_BUILD_TOOLS stay ON (gates llvm-config); prune post-install.
+    if tap.present?
+      args += %W[
+        -DPACKAGE_VENDOR=#{tap.user}
+        -DBUG_REPORT_URL=#{tap.issues_url}
+      ]
+      args << "-DCLANG_VENDOR_UTI=sh.brew.clang" if tap.official?
+    end
 
+    runtimes_cmake_args = ["-DCMAKE_MODULE_PATH=#{cmake_modules}"]
+    builtins_cmake_args = []
+
+    if OS.mac?
+      macos_sdk = MacOS.sdk_path
+      args << "-DFFI_INCLUDE_DIR=#{macos_sdk}/usr/include/ffi"
+      args << "-DFFI_LIBRARY_DIR=#{macos_sdk}/usr/lib"
+
+      libcxx_install_libdir = lib/"c++"
+      libunwind_install_libdir = lib/"unwind"
+      libcxx_rpaths = [loader_path, rpath(source: libcxx_install_libdir, target: libunwind_install_libdir)]
+
+      args << "-DLLVM_BUILD_LLVM_C_DYLIB=ON"
+      args << "-DLLVM_ENABLE_LIBCXX=ON"
+      args << "-DLIBCXX_ENABLE_VENDOR_AVAILABILITY_ANNOTATIONS=ON"
+      args << "-DLIBCXX_PSTL_BACKEND=libdispatch"
+      args << "-DLIBCXX_INSTALL_LIBRARY_DIR=#{libcxx_install_libdir}"
+      args << "-DLIBUNWIND_INSTALL_LIBRARY_DIR=#{libunwind_install_libdir}"
+      args << "-DLIBCXXABI_INSTALL_LIBRARY_DIR=#{libcxx_install_libdir}"
+      runtimes_cmake_args << "-DCMAKE_INSTALL_RPATH=#{libcxx_rpaths.join("|")}"
+
+      # Disable builds for OSes not supported by the CLT SDK.
+      clt_sdk_support_flags = %w[I WATCH TV].map { |os| "-DCOMPILER_RT_ENABLE_#{os}OS=OFF" }
+      builtins_cmake_args += clt_sdk_support_flags
+    else
+      args << "-DFFI_INCLUDE_DIR=#{formula_opt_include("libffi")}"
+      args << "-DFFI_LIBRARY_DIR=#{formula_opt_lib("libffi")}"
+
+      # Disable `libxml2` which isn't very useful.
+      args << "-DLLVM_ENABLE_LIBXML2=OFF"
+      # OHOS has no usable system libstdc++ (musl); libc++ is the only option.
+      args << "-DLLVM_ENABLE_LIBCXX=ON"
+      args << "-DCLANG_DEFAULT_CXX_STDLIB=libc++"
+      args << "-DCLANG_DEFAULT_RTLIB=compiler-rt"
+      args << "-DCLANG_DEFAULT_UNWINDLIB=libunwind"
+      # Not `-DCLANG_DEFAULT_LINKER=lld`: lld is a separate, optional formula
+      # (lld@21) here. OHOS's driver already defaults to lld; leaving this
+      # unset lets it fall back to whatever `ld.lld` is on PATH (ohos-sdk's,
+      # if lld@21 isn't installed) instead of hard-failing.
+      args << "-DDEFAULT_SYSROOT=#{sysroot}"
+      # Parts of Polly fail to correctly build with PIC when being used for DSOs.
+      args << "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+      runtimes_cmake_args += %w[
+        -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+
+        -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
+        -DLIBCXX_STATICALLY_LINK_ABI_IN_SHARED_LIBRARY=OFF
+        -DLIBCXX_STATICALLY_LINK_ABI_IN_STATIC_LIBRARY=ON
+        -DLIBCXX_USE_COMPILER_RT=ON
+        -DLIBCXX_HAS_ATOMIC_LIB=OFF
+
+        -DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON
+        -DLIBCXXABI_STATICALLY_LINK_UNWINDER_IN_SHARED_LIBRARY=OFF
+        -DLIBCXXABI_STATICALLY_LINK_UNWINDER_IN_STATIC_LIBRARY=ON
+        -DLIBCXXABI_USE_COMPILER_RT=ON
+        -DLIBCXXABI_USE_LLVM_UNWINDER=ON
+
+        -DLIBUNWIND_USE_COMPILER_RT=ON
+        -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON
+        -DCOMPILER_RT_USE_LLVM_UNWINDER=ON
+      ]
+      runtimes_cmake_args += %w[
+        -DLIBCXX_HAS_MUSL_LIBC=ON
+        -DLIBCXX_HAS_PTHREAD_API=ON
+        -DLIBCXX_ABI_NAMESPACE=__n1
+      ]
+      # __n1 is the only ABI namespace OHOS sanctions for third-party
+      # distribution. The OHOS target-side runtimes built below must match
+      # (a stale/default __1 won't link against these host libc++ headers).
+
+      # Prevent compiler-rt from building i386 targets, as this is not portable.
+      builtins_cmake_args << "-DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON"
+    end
+
+    if ENV.cflags.present?
+      args << "-DCMAKE_C_FLAGS=#{ENV.cflags}"
+      runtimes_cmake_args << "-DCMAKE_C_FLAGS=#{ENV.cflags}"
+      builtins_cmake_args << "-DCMAKE_C_FLAGS=#{ENV.cflags}"
+    end
+
+    if ENV.cxxflags.present?
+      args << "-DCMAKE_CXX_FLAGS=#{ENV.cxxflags}"
+      runtimes_cmake_args << "-DCMAKE_CXX_FLAGS=#{ENV.cxxflags}"
+      builtins_cmake_args << "-DCMAKE_CXX_FLAGS=#{ENV.cxxflags}"
+    end
+
+    args << "-DRUNTIMES_CMAKE_ARGS=#{runtimes_cmake_args.join(";")}" if runtimes_cmake_args.present?
+    args << "-DBUILTINS_CMAKE_ARGS=#{builtins_cmake_args.join(";")}" if builtins_cmake_args.present?
+
+    # The clang-shlib LINKER:--version-script fix the old rewrite carried is
+    # not needed here: that codepath is gated by
+    # `CMAKE_SYSTEM_NAME STREQUAL "Linux"`, and CMAKE_SYSTEM_NAME on a native
+    # OHOS build is "HarmonyOS" (Platform/HarmonyOS.cmake only borrows Linux's
+    # *settings* via include(), it doesn't change CMAKE_SYSTEM_NAME itself) —
+    # so that branch never executes and never needed patching.
     llvmpath = buildpath/"llvm"
 
-    # Fix cmake 4.x: if() parser rejects inner parens. One inreplace per pattern
-    # so a vanished upstream line raises instead of silently no-op'ing.
-    ccv = llvmpath/"cmake/modules/CheckCompilerVersion.cmake"
-    inreplace ccv,
-      "if ((${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC) AND",
-      "if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC AND"
-    inreplace ccv,
-      "    (19.24 VERSION_LESS_EQUAL ${CMAKE_CXX_COMPILER_VERSION}) AND",
-      "    19.24 VERSION_LESS_EQUAL CMAKE_CXX_COMPILER_VERSION AND"
-    inreplace ccv,
-      "    (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 19.25))",
-      "    CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.25)"
-
-    # Fix cmake 4.x LINKER:--version-script → -Wl,--version-script (clang++ doesn't recognize bare form).
-    inreplace buildpath/"clang/tools/clang-shlib/CMakeLists.txt",
-      "LINKER:--version-script,${CMAKE_CURRENT_BINARY_DIR}/simple_version_script.map",
-      "-Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/simple_version_script.map"
-
-    mkdir "build" do
-      system "cmake", "-G", "Ninja", llvmpath, *args
-      system "ninja", "-j", jobs.to_s, "clang", "lld"
-      system "cmake", llvmpath.to_s, "-ULLVM_ENABLE_RUNTIMES", "-DLLVM_ENABLE_RUNTIMES="
-      system "ninja", "-j", jobs.to_s, "install"
+    mkdir llvmpath/"build" do
+      system "cmake", "-G", "Ninja", "..", *(std_cmake_args + args)
+      system "cmake", "--build", "."
+      system "cmake", "--build", ".", "--target", "install"
     end
 
-    sign_dir(bin)
-    install_triple_wrappers
-    # Link BEFORE build_compiler_rt / build_multiarch_runtimes: symlink targets
-    # (ohos-sdk LLVM 15) are functionally equivalent for AR/RANLIB (format stable).
-    link_overlapping_tools
-    build_compiler_rt(sysroot: sysroot, jobs: jobs)
-    build_multiarch_runtimes(sysroot: sysroot, libcxx_ohos: libcxx_ohos, jobs: jobs)
+    # OHOS: the driver only looks for compiler-rt / libc++ / libunwind under
+    # this exact target-triple directory (see TARGET_TRIPLE comment above).
+    # No upstream equivalent — the host build above is self-hosting only.
+    build_ohos_target_runtimes(sysroot: sysroot, libcxx_ohos: libcxx_ohos)
 
-    prune_bootstrap_extras
-  end
-
-  def patch_config_guess(config_guess)
-    return unless config_guess.exist?
-    return if config_guess.read(64).include?("Stubbed for HarmonyOS")
-
-    cp(config_guess, "#{config_guess}.orig")
-    # brew extends Pathname#write to refuse overwriting existing files — use File.write to bypass.
-    File.write(config_guess, <<~SH)
-      #!/bin/sh
-      # Stubbed for HarmonyOS host build — original at config.guess.orig
-      echo "#{HOST_TRIPLE}"
-    SH
-    config_guess.chmod(0755)
-  end
-
-  def sign_dir(dir)
-    binary_sign = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
-    return opoo "binary-sign-tool not found; binaries left unsigned" unless binary_sign.exist?
-
-    signed = failed = skipped = 0
-    mktemp do
-      Pathname.glob(dir/"*").each do |f|
-        next unless f.file?
-        next if f.symlink?
-        next if f.binread(4) != "\x7fELF".b
-
-        skipped += 1
-
-        out = Pathname.pwd/f.basename
-        ok = quiet_system binary_sign, "sign", "-selfSign", "1",
-                          "-inFile", f.to_s, "-outFile", out.to_s
-        if ok && out.exist?
-          mv(out, f, force: true)
-          f.chmod(0755)
-          signed += 1
-        else
-          opoo "sign FAIL: #{f.basename}"
-          failed += 1
-        end
-      end
+    # Install Vim plugins
+    %w[ftdetect ftplugin indent syntax].each do |dir|
+      (share/"vim/vimfiles"/dir).install Pathname.glob("*/utils/vim/#{dir}/*.vim")
     end
-    ohai "binary-sign-tool: signed=#{signed} skipped=#{skipped} failed=#{failed}"
-    odie "#{failed} binary(ies) failed to sign" if failed.positive?
+
+    # Install Emacs modes
+    elisp.install llvmpath.glob("utils/emacs/*.el") + share.glob("clang/*.el")
+
+    # TODO: switch to `post_install_steps do configure_clang_system end` (the
+    # macOS Info.plist/xctoolchain install + per-macOS-version clang config
+    # file generation upstream does here) once the local brew fork catches up
+    # with upstream Homebrew — `post_install_steps` and `Utils::Clang` don't
+    # exist yet in this fork. Not relevant on OHOS regardless (macOS-only).
   end
 
-  def install_triple_wrappers
-    %w[aarch64-unknown-linux-ohos aarch64-linux-ohos].each do |pfx|
-      COMPILERS.each do |t|
-        w = bin/"#{pfx}-#{t}"
-        # LLVM creates triple-prefix symlinks (argv[0] derivation is fragile); replace with
-        # explicit --target= scripts. File.write bypasses brew's overwrite refusal.
-        File.write(w, <<~SH)
-          #!/bin/sh
-          exec "$(dirname "$0")/#{t}" --target=#{pfx} "$@"
-        SH
-        w.chmod(0755)
-      end
-    end
-  end
-
-  def build_compiler_rt(sysroot:, jobs:)
+  def build_ohos_target_runtimes(sysroot:, libcxx_ohos:)
+    jobs     = ENV.make_jobs
     cc       = bin/"clang"
     cxx      = bin/"clang++"
-    ar       = bin/"llvm-ar"
+    llvm_ar  = bin/"llvm-ar"
     ranlib   = bin/"llvm-ranlib"
     runtimes = buildpath/"runtimes"
 
-    cflags = "--target=#{TARGET_TRIPLE} --sysroot=#{sysroot} -D__MUSL__ -fPIC"
+    # Both cc/cxx below are invoked by absolute path (the freshly built
+    # keg's own clang), bypassing superenv's `cc` shim — which is what
+    # injects -fno-emulated-tls (native TLS is ~30% faster than clang's
+    # default emulated-TLS codegen for OHOS targets) for every other
+    # compiler invocation in this formula. Set it explicitly here.
+    cflags = "--target=#{TARGET_TRIPLE} --sysroot=#{sysroot} -D__MUSL__ -fPIC -fno-emulated-tls"
 
+    build_target_compiler_rt(cc:, cxx:, llvm_ar:, ranlib:, runtimes:, cflags:, jobs:)
+    build_target_multiarch_libcxx(cc:, cxx:, llvm_ar:, ranlib:, runtimes:, cflags:, sysroot:, libcxx_ohos:, jobs:)
+  end
+
+  def build_target_compiler_rt(cc:, cxx:, llvm_ar:, ranlib:, runtimes:, cflags:, jobs:)
     rt_root = Pathname.glob("#{lib}/clang/*").first
     odie "compiler-rt host dir missing: #{lib}/clang/<ver>" unless rt_root
     rt_tgt = rt_root/"lib"/TARGET_TRIPLE
@@ -283,7 +316,7 @@ class LlvmAT21 < Formula
              "-DCMAKE_C_COMPILER_TARGET=#{TARGET_TRIPLE}",
              "-DCMAKE_CXX_COMPILER_TARGET=#{TARGET_TRIPLE}",
              "-DCMAKE_ASM_COMPILER_TARGET=#{TARGET_TRIPLE}",
-             "-DCMAKE_AR=#{ar}",
+             "-DCMAKE_AR=#{llvm_ar}",
              "-DCMAKE_RANLIB=#{ranlib}",
              "-DCMAKE_C_FLAGS=#{cflags}",
              "-DCMAKE_CXX_FLAGS=#{cflags}",
@@ -320,18 +353,10 @@ class LlvmAT21 < Formula
     odie "libclang_rt.builtins.a missing in #{rt_tgt}" unless (rt_tgt/"libclang_rt.builtins.a").exist?
   end
 
-  def build_multiarch_runtimes(sysroot:, libcxx_ohos:, jobs:)
-    cc       = bin/"clang"
-    cxx      = bin/"clang++"
-    ar       = bin/"llvm-ar"
-    ranlib   = bin/"llvm-ranlib"
-    runtimes = buildpath/"runtimes"
+  def build_target_multiarch_libcxx(cc:, cxx:, llvm_ar:, ranlib:, runtimes:, cflags:, sysroot:, libcxx_ohos:, jobs:)
     libcxxabi_inc = buildpath/"libcxxabi/include"
-
-    cflags = "--target=#{TARGET_TRIPLE} --sysroot=#{sysroot} -D__MUSL__ " \
-             "-I#{sysroot}/usr/include -fPIC -fstack-protector-strong " \
-             "-funwind-tables -fno-omit-frame-pointer"
-    cxxflags_unwind   = "#{cflags} -I#{libcxxabi_inc} -I#{libcxx_ohos} -nostdinc++"
+    cxxflags_unwind = "#{cflags} -I#{sysroot}/usr/include -I#{libcxxabi_inc} -I#{libcxx_ohos} -nostdinc++"
+    cflags_full = "#{cflags} -I#{sysroot}/usr/include -funwind-tables -fno-omit-frame-pointer"
 
     cmake_runtime = %W[
       -DCMAKE_SYSTEM_NAME=Linux
@@ -350,11 +375,11 @@ class LlvmAT21 < Formula
              "-DCMAKE_C_COMPILER=#{cc}",
              "-DCMAKE_CXX_COMPILER=#{cxx}",
              "-DCMAKE_ASM_COMPILER=#{cc}",
-             "-DCMAKE_AR=#{ar}",
+             "-DCMAKE_AR=#{llvm_ar}",
              "-DCMAKE_RANLIB=#{ranlib}",
-             "-DCMAKE_C_FLAGS=#{cflags}",
+             "-DCMAKE_C_FLAGS=#{cflags_full}",
              "-DCMAKE_CXX_FLAGS=#{cxxflags_unwind}",
-             "-DCMAKE_ASM_FLAGS=#{cflags}",
+             "-DCMAKE_ASM_FLAGS=#{cflags_full}",
              "-DCMAKE_INSTALL_PREFIX=#{stage}/libunwind",
              "-DLLVM_ENABLE_RUNTIMES=libunwind",
              "-DLIBUNWIND_ENABLE_SHARED=OFF",
@@ -370,10 +395,10 @@ class LlvmAT21 < Formula
              "-DCMAKE_C_COMPILER=#{cc}",
              "-DCMAKE_CXX_COMPILER=#{cxx}",
              "-DCMAKE_ASM_COMPILER=#{cc}",
-             "-DCMAKE_AR=#{ar}",
+             "-DCMAKE_AR=#{llvm_ar}",
              "-DCMAKE_RANLIB=#{ranlib}",
-             "-DCMAKE_C_FLAGS=#{cflags}",
-             "-DCMAKE_CXX_FLAGS=#{cflags}",
+             "-DCMAKE_C_FLAGS=#{cflags_full}",
+             "-DCMAKE_CXX_FLAGS=#{cflags_full}",
              "-DCMAKE_INSTALL_PREFIX=#{stage}/libcxx",
              "-DLLVM_ENABLE_RUNTIMES=libunwind;libcxxabi;libcxx",
              "-DLIBCXX_ENABLE_SHARED=OFF",
@@ -383,9 +408,6 @@ class LlvmAT21 < Formula
              "-DLIBCXXABI_USE_COMPILER_RT=ON",
              "-DLIBCXXABI_USE_LLVM_UNWINDER=ON",
              "-DLIBCXX_CXX_ABI=libcxxabi",
-             # __n1 is the only ABI namespace OHOS sanctions for third-party distribution.
-             # This toolchain previously used __h; switched after porting-guide §2.8 investigation.
-             # bun/bun-webkit/icu4c@78 must match (stale __h won't link).
              "-DLIBCXX_ABI_NAMESPACE=__n1",
              "-DLIBCXX_HAS_MUSL_LIBC=ON",
              "-DLIBCXX_HAS_PTHREAD_API=ON",
@@ -401,166 +423,343 @@ class LlvmAT21 < Formula
 
     target_libdir = lib/TARGET_TRIPLE
     target_incdir = include/TARGET_TRIPLE/"c++/v1"
-    unwind_incdir = include
     target_libdir.mkpath
     target_incdir.dirname.mkpath
-    (share/"libc++").mkpath
 
     mv("#{stage}/libcxx/lib/libc++.a",             target_libdir/"libc++_static.a")
     mv("#{stage}/libcxx/lib/libc++abi.a",          target_libdir/"libc++abi.a")
     mv("#{stage}/libcxx/lib/libc++experimental.a", target_libdir/"libc++experimental.a")
-    mv("#{stage}/libcxx/lib/libc++.modules.json",  target_libdir/"libc++.modules.json")
-
-    rm("#{stage}/libcxx/lib/libunwind.a")
+    modules_json = stage/"libcxx/lib/libc++.modules.json"
+    mv(modules_json, target_libdir/"libc++.modules.json") if modules_json.exist?
     mv("#{stage}/libunwind/lib/libunwind.a", target_libdir/"libunwind.a")
-
     rm_r(target_incdir) if target_incdir.exist?
     mv("#{stage}/libcxx/include/c++/v1", target_incdir)
-
-    %w[__libunwind_config.h libunwind.h libunwind.modulemap
-       unwind_arm_ehabi.h unwind_itanium.h unwind.h].each do |h|
-      mv("#{stage}/libunwind/include/#{h}", unwind_incdir/h)
-    end
-    mv("#{stage}/libunwind/include/mach-o", unwind_incdir/"mach-o")
-
-    std_mod_dst = share/"libc++/v1"
-    rm_r(std_mod_dst) if std_mod_dst.exist?
-    mv("#{stage}/libcxx/share/libc++/v1", std_mod_dst)
 
     (target_libdir/"libc++.a").write <<~LDSCRIPT
       INPUT(-lc++_static -lc++abi -lunwind)
     LDSCRIPT
-  end
 
-  # bin/ entries preserved by prune_bootstrap_extras; everything else deleted to slim bottle.
-  KEEP_BIN_ENTRIES = %w[
-    clang clang++ clang-21
-    clang-cl clang-cpp
-    ld.lld lld ld64.lld lld-link
-    llvm-config
-    hmaptool
-    llvm-tblgen clang-tblgen
-  ].freeze
-
-  def prune_bootstrap_extras
-    # bin/: keep only KEEP_BIN_ENTRIES + triple wrappers + symlinks (ohos-sdk links).
-    Pathname.glob(bin/"*").each do |f|
-      name = f.basename.to_s
-      next if KEEP_BIN_ENTRIES.include?(name)
-      next if /\Aaarch64-(unknown-)?linux-ohos-(clang|clang\+\+)\z/.match?(name)
-      next if f.symlink? # preserve ohos-sdk symlinks created by link_overlapping_tools
-
-      rm(f)
-    end
-
-    # lib/: delete static libs and large .so (binaries statically link what they need).
-    %w[libLLVM*.a libclang*.a liblld*.a
-       libclang-cpp.so* libLTO.so* libclang.so*].each do |pat|
-      Dir.glob(lib/pat).each { |f| rm(f) }
-    end
-    rm_r(lib/"scanbuild") if (lib/"scanbuild").exist?
-
-    # include/: drop LLVM internal dev headers (downstream uses libc++ headers only).
-    %w[llvm llvm-c clang clang-c lld].each do |sub|
-      p = include/sub
-      rm_r(p) if p.exist?
-    end
-
-    # share/: drop IDE / analysis helpers.
-    %w[clang scan-build scan-view opt-viewer man].each do |sub|
-      p = share/sub
-      rm_r(p) if p.exist?
-    end
-  end
-
-  def link_overlapping_tools
-    # Build relative symlinks for binutils/diagnostic tools that downstream expects but we don't ship from v21.
-    sdk_bin = formula_opt_prefix("ohos-sdk")/"native/llvm/bin"
-    KEEP_TOOLS_FROM_SDK.each do |t|
-      src = sdk_bin/t
-      next unless src.exist?
-
-      target = bin/t
-      target.unlink if target.exist? || target.symlink?
-      target.make_symlink src.relative_path_from(bin)
-    end
-  end
-
-  def post_install
-    # Generate cc/c++ shims. --code-sign is LLD's default, so links are auto-signed.
-    # Shim only sets LD_LIBRARY_PATH for lld's libxml2/zlib deps.
-    shims = { "cc" => "clang", "c++" => "clang++" }
-    shims.each do |shim_name, target|
-      shim_path = HOMEBREW_PREFIX/"bin"/shim_name
-      File.write(shim_path, <<~SH)
-        #!/bin/sh
-        # Auto-generated by llvm@21 post_install. Edits will be lost on reinstall.
-        # --code-sign is LLD's default, so links are auto-signed — no flag needed.
-        export LD_LIBRARY_PATH="#{HOMEBREW_PREFIX}/opt/libxml2/lib:#{HOMEBREW_PREFIX}/opt/llvm@21/lib:$LD_LIBRARY_PATH"
-        exec "#{opt_bin}/#{target}" "$@"
-      SH
-      shim_path.chmod(0755)
-    end
-
-    ohai "Generated cc/c++ shims in #{HOMEBREW_PREFIX}/bin (LD_LIBRARY_PATH only; --code-sign is LLD default)"
+    odie "target libc++ missing" unless (target_libdir/"libc++_static.a").exist?
   end
 
   def caveats
-    <<~EOS
-      HarmonyOS LLVM 21 (slim bootstrap build) at:
-        #{opt_prefix}
+    s = <<~EOS
+      CLANG_CONFIG_FILE_SYSTEM_DIR: #{clang_config_file_dir}
+      CLANG_CONFIG_FILE_USER_DIR:   ~/.config/clang
 
-      Default target triple:      #{HOST_TRIPLE}
-      Runtime libs target triple: #{TARGET_TRIPLE}
+      LLD is now provided in a separate formula:
+        brew install lld@21
 
-      This is a SLIM build — only what downstream C++23 bootstraps consume:
-        ✓ clang/clang++ v21, ld.lld v21 (CodeSign patch), llvm-config
-        ✓ multiarch libc++/libunwind/compiler-rt static libs + headers
-        ✗ libLLVM*.a / libclang*.a / libclang-cpp.so (use upstream for LLVM dev)
-        ✗ clang-format/tidy/clangd, scan-build (use ohos-sdk LLVM 15)
-
-      bin/ tools like llvm-ar/nm/objcopy/objdump/readelf/strip/cov/FileCheck
-      are relative symlinks to ohos-sdk LLVM 15 (formats stable across 15-21).
+      OHOS-specific:
+        Default sysroot:            #{HOMEBREW_PREFIX}/opt/ohos-sdk/native/sysroot
+        Host triple:                #{HOST_TRIPLE}
+        Target-triple runtime libs: #{TARGET_TRIPLE} (compiler-rt/libc++/libunwind
+          statically linked into anything built with `--target=#{TARGET_TRIPLE}`)
+        libc++ ABI namespace is __n1 (OHOS's mandated third-party namespace) on
+          both host and target-triple builds — link against a matching one.
 
       Example:
-        #{opt_bin}/aarch64-linux-ohos-clang++ -stdlib=libc++ \\
+        #{opt_bin}/clang++ -stdlib=libc++ --target=#{TARGET_TRIPLE} \\
           --sysroot=#{HOMEBREW_PREFIX}/opt/ohos-sdk/native/sysroot \\
           hello.cpp -o hello
-
-      For a full LLVM 21 dev environment (all tools + static libs + headers),
-      track future `llvm@21-full` formula (not yet implemented).
     EOS
+
+    on_macos do
+      s += <<~EOS
+
+        Using `clang`, `clang++`, etc., requires a CLT installation at `/Library/Developer/CommandLineTools`.
+        If you don't want to install the CLT, you can write appropriate configuration files pointing to your
+        SDK at ~/.config/clang.
+
+        To use the bundled libunwind please use the following LDFLAGS:
+          LDFLAGS="-L#{opt_lib}/unwind -lunwind"
+
+        To use the bundled libc++ please use the following LDFLAGS:
+          LDFLAGS="-L#{opt_lib}/c++ -L#{opt_lib}/unwind -lunwind"
+        Features newer than system libc++ will require the following define to enable:
+          CPPFLAGS="-D_LIBCPP_DISABLE_AVAILABILITY"
+
+        NOTE: You probably want to use the libunwind and libc++ provided by macOS unless you know what you're doing.
+      EOS
+    end
+
+    s
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/clang --version")
-    assert_match HOST_TRIPLE,  shell_output("#{bin}/clang --version")
+    alt_location_libs = [
+      shared_library("libc++", "*"),
+      shared_library("libc++abi", "*"),
+      shared_library("libunwind", "*"),
+    ]
+    assert_empty lib.glob(alt_location_libs) if OS.mac?
 
-    %w[aarch64-unknown-linux-ohos aarch64-linux-ohos].each do |pfx|
-      COMPILERS.each do |t|
-        assert_path_exists bin/"#{pfx}-#{t}"
+    llvm_version = Utils.safe_popen_read(bin/"llvm-config", "--version").strip
+    llvm_version_major = Version.new(llvm_version).major.to_s
+    soversion = llvm_version_major.dup
+    assert_equal version, llvm_version
+
+    assert_equal prefix.to_s, shell_output("#{bin}/llvm-config --prefix").chomp
+    assert_equal "-lLLVM-#{soversion}", shell_output("#{bin}/llvm-config --libs").chomp
+    assert_equal (lib/shared_library("libLLVM-#{soversion}")).to_s,
+                 shell_output("#{bin}/llvm-config --libfiles").chomp
+
+    # OHOS: confirms the config.guess patch actually made LLVM infer the
+    # right host triple (this is the load-bearing regression test for it).
+    assert_match HOST_TRIPLE, shell_output("#{bin}/clang --version") if OS.linux?
+
+    (testpath/"test.c").write <<~C
+      #include <stdio.h>
+      int main()
+      {
+        printf("Hello World!\\n");
+        return 0;
+      }
+    C
+
+    (testpath/"test.cpp").write <<~CPP
+      #include <iostream>
+      #include <string>
+      int main()
+      {
+        std::string str = "Hello World!";
+        std::size_t str_hash = std::hash<std::string>{}(str);
+        std::cout << str << std::endl;
+        return 0;
+      }
+    CPP
+
+    system bin/"clang-cpp", "-v", "test.c"
+    system bin/"clang-cpp", "-v", "test.cpp"
+
+    # Testing default toolchain and SDK location.
+    system bin/"clang++", "-v",
+           "-std=c++11", "test.cpp", "-o", "test++"
+    assert_includes MachO::Tools.dylibs("test++"), "/usr/lib/libc++.1.dylib" if OS.mac?
+    assert_equal "Hello World!", shell_output("./test++").chomp
+    system bin/"clang", "-v", "test.c", "-o", "test"
+    assert_equal "Hello World!", shell_output("./test").chomp
+
+    # These tests should ignore the usual SDK includes
+    with_env(CPATH: nil) do
+      # Testing Command Line Tools
+      if OS.mac? && MacOS::CLT.installed?
+        toolchain_path = "/Library/Developer/CommandLineTools"
+        cpp_base = (MacOS.version >= :big_sur) ? MacOS::CLT.sdk_path : toolchain_path
+        system bin/"clang++", "-v",
+               "--no-default-config",
+               "-isysroot", MacOS::CLT.sdk_path,
+               "-isystem", "#{cpp_base}/usr/include/c++/v1",
+               "-isystem", "#{MacOS::CLT.sdk_path}/usr/include",
+               "-isystem", "#{toolchain_path}/usr/include",
+               "-std=c++11", "test.cpp", "-o", "testCLT++"
+        assert_includes MachO::Tools.dylibs("testCLT++"), "/usr/lib/libc++.1.dylib"
+        assert_equal "Hello World!", shell_output("./testCLT++").chomp
+        system bin/"clang", "-v", "test.c", "-o", "testCLT"
+        assert_equal "Hello World!", shell_output("./testCLT").chomp
+
+        targets = ["#{Hardware::CPU.arch}-apple-macosx#{MacOS.full_version}"]
+
+        # The test tends to time out on Intel, so let's do these only for ARM macOS.
+        if Hardware::CPU.arm?
+          old_macos_version = HOMEBREW_MACOS_OLDEST_SUPPORTED.to_i - 1
+          targets << "#{Hardware::CPU.arch}-apple-macosx#{old_macos_version}"
+
+          old_kernel_version = MacOSVersion.kernel_major_version(MacOSVersion.new(old_macos_version.to_s))
+          targets << "#{Hardware::CPU.arch}-apple-darwin#{old_kernel_version}"
+        end
+
+        targets.each do |target|
+          system bin/"clang-cpp", "-v", "--target=#{target}", "test.c"
+          system bin/"clang-cpp", "-v", "--target=#{target}", "test.cpp"
+
+          system bin/"clang", "-v", "--target=#{target}", "test.c", "-o", "test-macosx"
+          assert_equal "Hello World!", shell_output("./test-macosx").chomp
+
+          system bin/"clang++", "-v", "--target=#{target}", "-std=c++11", "test.cpp", "-o", "test++-macosx"
+          assert_equal "Hello World!", shell_output("./test++-macosx").chomp
+        end
       end
+
+      # Testing Xcode
+      if OS.mac? && MacOS::Xcode.installed?
+        cpp_base = (MacOS::Xcode.version >= "12.5") ? MacOS::Xcode.sdk_path : MacOS::Xcode.toolchain_path
+        system bin/"clang++", "-v",
+               "--no-default-config",
+               "-isysroot", MacOS::Xcode.sdk_path,
+               "-isystem", "#{cpp_base}/usr/include/c++/v1",
+               "-isystem", "#{MacOS::Xcode.sdk_path}/usr/include",
+               "-isystem", "#{MacOS::Xcode.toolchain_path}/usr/include",
+               "-std=c++11", "test.cpp", "-o", "testXC++"
+        assert_includes MachO::Tools.dylibs("testXC++"), "/usr/lib/libc++.1.dylib"
+        assert_equal "Hello World!", shell_output("./testXC++").chomp
+        system bin/"clang", "-v",
+               "-isysroot", MacOS.sdk_path,
+               "test.c", "-o", "testXC"
+        assert_equal "Hello World!", shell_output("./testXC").chomp
+      end
+
+      # link against installed libc++
+      # related to https://github.com/Homebrew/legacy-homebrew/issues/47149
+      cxx_libdir = OS.mac? ? opt_lib/"c++" : opt_lib
+      system bin/"clang++", "-v",
+             "-isystem", "#{opt_include}/c++/v1",
+             "-std=c++11", "-stdlib=libc++", "test.cpp", "-o", "testlibc++",
+             "-rtlib=compiler-rt", "-L#{cxx_libdir}", "-Wl,-rpath,#{cxx_libdir}"
+      assert_includes (testpath/"testlibc++").dynamically_linked_libraries,
+                      (cxx_libdir/shared_library("libc++", "1")).to_s
+      (testpath/"testlibc++").dynamically_linked_libraries.each do |lib|
+        refute_match(/libstdc\+\+/, lib)
+        refute_match(/libgcc/, lib)
+        refute_match(/libatomic/, lib)
+      end
+      assert_equal "Hello World!", shell_output("./testlibc++").chomp
     end
 
-    ohos_sdk = formula_opt_prefix("ohos-sdk")
-    sysroot  = "#{ohos_sdk}/native/sysroot"
+    if OS.linux?
+      # Link installed libc++, libc++abi, and libunwind archives both into
+      # a position independent executable (PIE), as well as into a fully
+      # position independent (PIC) DSO for things like plugins that export
+      # a C-only API but internally use C++.
+      #
+      # FIXME: It'd be nice to be able to use flags like `-static-libstdc++`
+      # together with `-stdlib=libc++` (the latter one we need anyways for
+      # headers) to achieve this but those flags don't set up the correct
+      # search paths or handle all of the libraries needed by `libc++` when
+      # linking statically.
 
-    rt_root = Pathname.glob("#{lib}/clang/*").first
-    assert_path_exists rt_root/"lib"/TARGET_TRIPLE/"libclang_rt.builtins.a"
-    assert_path_exists rt_root/"lib"/TARGET_TRIPLE/"clang_rt.crtbegin.o"
-    assert_path_exists rt_root/"lib"/TARGET_TRIPLE/"clang_rt.crtend.o"
-    assert_path_exists lib/TARGET_TRIPLE/"libc++_static.a"
-    assert_path_exists lib/TARGET_TRIPLE/"libc++abi.a"
-    assert_path_exists lib/TARGET_TRIPLE/"libunwind.a"
-    assert_path_exists lib/TARGET_TRIPLE/"libc++.a"
-    assert_path_exists include/TARGET_TRIPLE/"c++/v1/iostream"
+      system bin/"clang++", "-v", "-o", "test_pie_runtimes",
+                   "-pie", "-fPIC", "test.cpp", "-L#{opt_lib}",
+                   "-stdlib=libc++", "-rtlib=compiler-rt",
+                   "-static-libstdc++", "-lpthread", "-ldl"
+      assert_equal "Hello World!", shell_output("./test_pie_runtimes").chomp
+      (testpath/"test_pie_runtimes").dynamically_linked_libraries.each do |lib|
+        refute_match(/lib(std)?c\+\+/, lib)
+        refute_match(/libgcc/, lib)
+        refute_match(/libatomic/, lib)
+        refute_match(/libunwind/, lib)
+      end
 
-    (testpath/"hello.cpp").write <<~CPP
+      (testpath/"test_plugin.cpp").write <<~CPP
+        #include <iostream>
+        __attribute__((visibility("default")))
+        extern "C" void run_plugin() {
+          std::cout << "Hello Plugin World!" << std::endl;
+        }
+      CPP
+      (testpath/"test_plugin_main.c").write <<~C
+        extern void run_plugin();
+        int main() {
+          run_plugin();
+        }
+      C
+      system bin/"clang++", "-v", "-o", "test_plugin.so",
+             "-shared", "-fPIC", "test_plugin.cpp", "-L#{opt_lib}",
+             "-stdlib=libc++", "-rtlib=compiler-rt",
+             "-static-libstdc++", "-lpthread", "-ldl"
+      system bin/"clang", "-v",
+             "test_plugin_main.c", "-o", "test_plugin_libc++",
+             "test_plugin.so", "-Wl,-rpath=#{testpath}", "-rtlib=compiler-rt"
+      assert_equal "Hello Plugin World!", shell_output("./test_plugin_libc++").chomp
+      (testpath/"test_plugin.so").dynamically_linked_libraries.each do |lib|
+        refute_match(/lib(std)?c\+\+/, lib)
+        refute_match(/libgcc/, lib)
+        refute_match(/libatomic/, lib)
+        refute_match(/libunwind/, lib)
+      end
+
+      # OHOS-specific: target-triple runtime libs built by
+      # build_ohos_target_runtimes, and an end-to-end cross-compile+run using
+      # them (host and target triple share the same physical hardware here).
+      rt_root = Pathname.glob("#{lib}/clang/*").first
+      assert_path_exists rt_root/"lib"/TARGET_TRIPLE/"libclang_rt.builtins.a"
+      assert_path_exists rt_root/"lib"/TARGET_TRIPLE/"clang_rt.crtbegin.o"
+      assert_path_exists rt_root/"lib"/TARGET_TRIPLE/"clang_rt.crtend.o"
+      assert_path_exists lib/TARGET_TRIPLE/"libc++_static.a"
+      assert_path_exists lib/TARGET_TRIPLE/"libc++abi.a"
+      assert_path_exists lib/TARGET_TRIPLE/"libunwind.a"
+      assert_path_exists lib/TARGET_TRIPLE/"libc++.a"
+      assert_path_exists include/TARGET_TRIPLE/"c++/v1/iostream"
+
+      # __n1 is OHOS's mandated ABI namespace for third-party distribution —
+      # assert it directly rather than trusting the cmake flag took effect.
+      assert_match "_ZN4__n1", shell_output("#{bin}/llvm-nm #{lib/TARGET_TRIPLE}/libc++_static.a")
+
+      ohos_sdk = formula_opt_prefix("ohos-sdk")
+      target_sysroot = "#{ohos_sdk}/native/sysroot"
+      system bin/"clang++", "-stdlib=libc++", "--target=#{TARGET_TRIPLE}",
+             "--sysroot=#{target_sysroot}", "test.cpp", "-o", "test-ohos-target"
+      assert_equal "Hello World!", shell_output("./test-ohos-target").chomp
+    end
+
+    # Testing mlir
+    (testpath/"test.mlir").write <<~MLIR
+      func.func @main() {return}
+
+      // -----
+
+      // expected-note @+1 {{see existing symbol definition here}}
+      func.func @foo() { return }
+
+      // ----
+
+      // expected-error @+1 {{redefinition of symbol named 'foo'}}
+      func.func @foo() { return }
+    MLIR
+    system bin/"mlir-opt", "--split-input-file", "--verify-diagnostics", "test.mlir"
+
+    (testpath/"scanbuildtest.cpp").write <<~CPP
       #include <iostream>
-      int main() { std::cout << "hi\\n"; return 0; }
+      int main() {
+        int *i = new int;
+        *i = 1;
+        delete i;
+        std::cout << *i << std::endl;
+        return 0;
+      }
     CPP
-    system bin/"aarch64-linux-ohos-clang++", "-stdlib=libc++",
-           "--sysroot=#{sysroot}", "hello.cpp", "-o", "hello"
-    assert_path_exists testpath/"hello"
+    if OS.mac?
+      assert_includes shell_output("#{bin}/scan-build make scanbuildtest 2>&1"),
+                      "warning: Use of memory after it is freed"
+    else
+      # OHOS: neither `make` nor `perl` (which scan-build's driver needs) is a
+      # system tool here (both are formulae, not guaranteed on PATH in CI) —
+      # invoke the static analyzer directly instead, exercising the same
+      # clang-tools-extra codepath.
+      assert_includes shell_output("#{bin}/clang --analyze --analyzer-output=text scanbuildtest.cpp 2>&1"),
+                      "warning: Use of memory after it is freed"
+    end
+
+    (testpath/"clangformattest.c").write <<~C
+      int    main() {
+          printf("Hello world!"); }
+    C
+    assert_equal "int main() { printf(\"Hello world!\"); }\n",
+      shell_output("#{bin}/clang-format -style=google clangformattest.c")
+
+    # This will fail if the clang bindings cannot find `libclang`.
+    with_env(PYTHONPATH: prefix/Language::Python.site_packages(python3)) do
+      system python3, "-c", <<~PYTHON
+        from clang import cindex
+        cindex.Config().get_cindex_library()
+      PYTHON
+    end
+
+    # Ensure LLVM did not regress output of `llvm-config --system-libs` which for a time
+    # was known to output incorrect linker flags; e.g., `-llibxml2.tbd` instead of `-lxml2`.
+    # On the other hand, note that a fully qualified path to `dylib` or `tbd` is OK, e.g.,
+    # `/usr/local/lib/libxml2.tbd` or `/usr/local/lib/libxml2.dylib`.
+    abs_path_exts = [".tbd", ".dylib"]
+    shell_output("#{bin}/llvm-config --system-libs").chomp.strip.split.each do |lib|
+      if lib.start_with?("-l")
+        assert !lib.end_with?(".tbd"), "expected abs path when lib reported as .tbd"
+        assert !lib.end_with?(".dylib"), "expected abs path when lib reported as .dylib"
+      else
+        p = Pathname.new(lib)
+        if abs_path_exts.include?(p.extname)
+          assert p.absolute?, "expected abs path when lib reported as .tbd or .dylib"
+        end
+      end
+    end
   end
 end

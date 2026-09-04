@@ -1,0 +1,15 @@
+--- a/llvm/cmake/config.guess
++++ b/llvm/cmake/config.guess
+@@ -866,6 +866,12 @@
+     i*86:Minix:*:*)
+ 	echo ${UNAME_MACHINE}-pc-minix
+ 	exit ;;
++    aarch64:HarmonyOS:*:*)
++	# OHOS: uname -s reports "HarmonyOS", which none of the patterns
++	# above match; LLVM cmake treats a non-zero exit from this script as
++	# fatal (GetHostTriple.cmake), so this case is required.
++	echo ${UNAME_MACHINE}-unknown-linux-ohos
++	exit ;;
+     aarch64*:Linux:*)
+ 	    echo ${UNAME_MACHINE}-unknown-linux-gnu
+ 	exit ;;
