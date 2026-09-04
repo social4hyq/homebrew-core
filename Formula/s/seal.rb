@@ -1,12 +1,12 @@
 class Seal < Formula
   desc "Easy-to-use homomorphic encryption library"
   homepage "https://github.com/microsoft/SEAL"
-  url "https://github.com/microsoft/SEAL/archive/refs/tags/v4.4.3.tar.gz"
-  sha256 "3df1c6821fbdcd6122004abfef98428affb1b7c9751a6d63646742b1678f4e27"
+  url "https://github.com/microsoft/SEAL/archive/refs/tags/v4.4.4.tar.gz"
+  sha256 "0661a0dc5f385e44c9a69136c841985c2cd47e165aeab7be8aebecf58470b9ad"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a708d3562c50fa294ac68306ed74fc186c951aa3a88a2bfb141ffe32bd930633"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4897d303688c2ed49ada99d6950066cfc0dc7e1be302d6b54ef3264ce4728e70"
   end
 
   depends_on "cmake" => [:build, :test]
@@ -23,6 +23,9 @@ class Seal < Formula
   end
 
   def install
+    # Support Microsoft GSL 5.x, which upstream has not widened its version request to yet
+    inreplace "CMakeLists.txt", "Microsoft.GSL 4 CONFIG", "Microsoft.GSL 5 CONFIG"
+
     if Hardware::CPU.intel?
       resource("hexl").stage do
         hexl_args = %w[
