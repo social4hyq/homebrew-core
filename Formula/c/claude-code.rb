@@ -1,8 +1,8 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.259.tgz"
-  sha256 "1169c5f8c1576bc14ab951df1b3525d04edd8ac663ae2d04658d03ca7b40e5d2"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.260.tgz"
+  sha256 "b20054d917ac2faa1ed2d9cc2139924eeaed352d0193374886eb4eea6f1e7417"
   license :cannot_represent # Anthropic Commercial Terms of Service
   # extract-cli.mjs content changed (binary-asset detection by magic bytes
   # instead of filename suffix) without a version bump.
