@@ -1,8 +1,8 @@
 class Nsd < Formula
   desc "Name server daemon"
   homepage "https://www.nlnetlabs.nl/projects/nsd/"
-  url "https://www.nlnetlabs.nl/downloads/nsd/nsd-4.15.1.tar.gz"
-  sha256 "ce41e13317d35d7a5b3f34605487429391a41eca77b2006edd11e9453432c609"
+  url "https://www.nlnetlabs.nl/downloads/nsd/nsd-4.15.2.tar.gz"
+  sha256 "bb4d57753c2cc2a641c92dab1021016d25fb4b972920bf4f0bbb8c40c1a9cce2"
   license "BSD-3-Clause"
 
   # We check the GitHub repo tags instead of
@@ -18,7 +18,7 @@ class Nsd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bec05bace43e22c239bac4bd5309eada5e30c63cd050950b5571cb83640139d9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "28a09d7efbd68df66dc2340487fce437c5a9bebfc9a83b6c280c7f4cd4a595f5"
   end
 
   depends_on "pkgconf" => :build
