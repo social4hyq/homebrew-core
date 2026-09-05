@@ -232,6 +232,20 @@ class LlvmAT21 < Formula
         -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON
         -DCOMPILER_RT_USE_LLVM_UNWINDER=ON
       ]
+      # {LIBCXX,LIBCXXABI,LIBUNWIND}_ENABLE_SHARED all default ON upstream,
+      # but every .so these runtimes build needs OHOS-driver-specific
+      # crtbeginS.o/crtendS.o objects that compiler-rt's crt component
+      # doesn't produce under that name (only the non-S clang_rt.crtbegin/
+      # crtend used for non-shared links) — first hit trying to link
+      # libunwind.so. Same static-only choice build_ohos_target_runtimes
+      # below already makes for the target-triple copies; the host copies
+      # here are for this build's own internal self-hosting linkage only,
+      # so there's no shared-library consumer to lose.
+      runtimes_cmake_args += %w[
+        -DLIBCXX_ENABLE_SHARED=OFF
+        -DLIBCXXABI_ENABLE_SHARED=OFF
+        -DLIBUNWIND_ENABLE_SHARED=OFF
+      ]
       # compiler-rt's non-builtins components (sanitizers/profile/xray/etc.)
       # default ON here and each independently calls a configure-time
       # `find_compiler_rt_library(builtins ...)` check — satisfied on
@@ -488,6 +502,9 @@ class LlvmAT21 < Formula
           statically linked into anything built with `--target=#{TARGET_TRIPLE}`)
         libc++ ABI namespace is __n1 (OHOS's mandated third-party namespace) on
           both host and target-triple builds — link against a matching one.
+        `-shared` is not yet supported (needs crtbeginS.o/crtendS.o, which
+          nothing on this platform currently provides) — link executables,
+          not shared libraries, with this compiler.
 
       Example:
         #{opt_bin}/clang++ -stdlib=libc++ --target=#{TARGET_TRIPLE} \\
@@ -637,8 +654,17 @@ class LlvmAT21 < Formula
              "-isystem", "#{opt_include}/c++/v1",
              "-std=c++11", "-stdlib=libc++", "test.cpp", "-o", "testlibc++",
              "-rtlib=compiler-rt", "-L#{cxx_libdir}", "-Wl,-rpath,#{cxx_libdir}"
-      assert_includes (testpath/"testlibc++").dynamically_linked_libraries,
-                      (cxx_libdir/shared_library("libc++", "1")).to_s
+      if OS.mac?
+        assert_includes (testpath/"testlibc++").dynamically_linked_libraries,
+                        (cxx_libdir/shared_library("libc++", "1")).to_s
+      else
+        # OHOS: {LIBCXX,LIBCXXABI,LIBUNWIND}_ENABLE_SHARED=OFF above (no
+        # crtbeginS.o-equivalent for this driver to link a .so against) —
+        # libc++ is statically linked in, so assert its *absence* from the
+        # dynamic dependency list instead of presence.
+        refute_includes (testpath/"testlibc++").dynamically_linked_libraries,
+                        (cxx_libdir/shared_library("libc++", "1")).to_s
+      end
       (testpath/"testlibc++").dynamically_linked_libraries.each do |lib|
         refute_match(/libstdc\+\+/, lib)
         refute_match(/libgcc/, lib)
@@ -671,33 +697,15 @@ class LlvmAT21 < Formula
         refute_match(/libunwind/, lib)
       end
 
-      (testpath/"test_plugin.cpp").write <<~CPP
-        #include <iostream>
-        __attribute__((visibility("default")))
-        extern "C" void run_plugin() {
-          std::cout << "Hello Plugin World!" << std::endl;
-        }
-      CPP
-      (testpath/"test_plugin_main.c").write <<~C
-        extern void run_plugin();
-        int main() {
-          run_plugin();
-        }
-      C
-      system bin/"clang++", "-v", "-o", "test_plugin.so",
-             "-shared", "-fPIC", "test_plugin.cpp", "-L#{opt_lib}",
-             "-stdlib=libc++", "-rtlib=compiler-rt",
-             "-static-libstdc++", "-lpthread", "-ldl"
-      system bin/"clang", "-v",
-             "test_plugin_main.c", "-o", "test_plugin_libc++",
-             "test_plugin.so", "-Wl,-rpath=#{testpath}", "-rtlib=compiler-rt"
-      assert_equal "Hello Plugin World!", shell_output("./test_plugin_libc++").chomp
-      (testpath/"test_plugin.so").dynamically_linked_libraries.each do |lib|
-        refute_match(/lib(std)?c\+\+/, lib)
-        refute_match(/libgcc/, lib)
-        refute_match(/libatomic/, lib)
-        refute_match(/libunwind/, lib)
-      end
+      # Upstream also builds a -shared C++ plugin here. Skipped on OHOS:
+      # `-shared` needs crtbeginS.o/crtendS.o, which nothing on this platform
+      # provides — ohos-sdk's sysroot doesn't ship them, and compiler-rt's
+      # crt component (which supplies them on bare-metal-style targets)
+      # doesn't build here either (COMPILER_RT_BUILD_CRT is gated behind
+      # COMPILER_RT_HAS_CRT, which evaluates false for this target and
+      # can't be forced via a normal -D). Known gap, not exercised by
+      # anything this formula itself needs (self-hosting only needs
+      # executables); revisit if a downstream consumer needs `-shared`.
 
       # OHOS-specific: target-triple runtime libs built by
       # build_ohos_target_runtimes, and an end-to-end cross-compile+run using
