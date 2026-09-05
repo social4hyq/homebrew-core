@@ -1,8 +1,8 @@
 class Libwmf < Formula
   desc "Library for converting WMF (Window Metafile Format) files"
   homepage "https://github.com/caolanm/libwmf"
-  url "https://github.com/caolanm/libwmf/releases/download/v0.2.15/libwmf-0.2.15.tar.gz"
-  sha256 "bbc90f22b9e86d5f1890d7da11cf7a8e61f429d4c220d900c285021deabe7a52"
+  url "https://github.com/caolanm/libwmf/releases/download/v0.2.16/libwmf-0.2.16.tar.gz"
+  sha256 "e20a0bfc2550e779f5f2f13e1afd34cb3b3692954b7e2b73a25ac94c86cb484a"
   license all_of: [
     "LGPL-2.0-or-later",
     "GPL-2.0-or-later", # COPYING
@@ -10,7 +10,7 @@ class Libwmf < Formula
   ]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b4b1806d80197495597a1cd6f4719b9e01d3a09a85eda7b9305d4d5a4cb8077"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d18c53bce65c525392062201d7b5a8a668027a7e8baec5761572054e9d54ba9"
   end
 
   depends_on "pkgconf" => :build
