@@ -15,7 +15,7 @@ class Expat < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "309568db71fc132ba0520ee0c8ebd9bf7a6527a77512442600b21f6e54d6543d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "97fc6e5d34be99f0be998713c2edc77490b0a9773c67388d07312c805d323209"
   end
 
   head do
