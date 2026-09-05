@@ -1,6 +1,15 @@
 # social4hyq/homebrew-core
 
-HarmonyOS（OHOS aarch64）的 Homebrew tap：提供已在真机验证的开发工具链——AI coding CLI（`opencode` / `claude-code`）、Bun 运行时（`bun` / `bun-webkit` / `llvm@21` 等）、终端与调试工具（`qemu-aarch64` / `starship` / `zellij` / `sshport` 等）。所有二进制均已按 HarmonyOS 要求完成签名，安装后开箱即用。
+面向鸿蒙 PC（HarmonyOS，OHOS aarch64）的 [Harmonybrew](https://harmonybrew.atomgit.com)（Homebrew 的鸿蒙移植）第三方 tap。
+
+**这个 tap 解决什么问题**：鸿蒙 PC 的终端（HiShell）对每个可执行文件强制代码签名校验——直接下载或自行编译的 Linux 程序一律 `Permission denied`；同时不少常用开发工具尚未适配鸿蒙。本 tap 把一批常用开发工具逐一移植、签名、真机验证后打包成 bottle：`brew install` 一条命令装好即用，体验与 macOS/Linux 上的 Homebrew 一致。
+
+**装了能做什么**：
+
+- **让 AI 帮你写代码**：`opencode`（开源、自带 75+ 模型提供商接入）、`claude-code`（Anthropic 官方），配合 `herdr` 让 agent 会话断线不丢
+- **跑现代 JavaScript/前端工具链**：`bun` 运行时、`node-ohos`、`vite-plus` 统一前端工具链
+- **打造顺手的终端**：`starship` 提示符 + `hishell-font` 图标字体、`zellij` 终端工作区、`sshport` 远程端口转发
+- **本地构建与排障**：`llvm@21` 编译器、`ohos-bst-light` 自签工具、`ohos-compat-shim` 兼容层、`qemu-aarch64` 用户态仿真与系统调用跟踪
 
 ## 安装
 
@@ -36,24 +45,24 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 
 | Formula | 版本 | 说明 |
 |---|---|---|
-| `opencode` | 1.18.27 | 终端 AI 编码助手：在命令行里让 AI 帮你读代码、改代码、跑命令、提 PR；对话式协作 |
-| `opencode@2` | 0.0.0-beta-18999 | opencode 的 v2 预览版（命令名 `opencode2`）：新架构、交互升级，仍在快速迭代 |
-| `claude-code` | 2.1.260 | Anthropic 的终端 AI 编码助手（Claude Code）：对话式写代码、改代码、执行命令；首次运行自动拉取官方版本并校验完整性（License 禁随包分发） |
-| `bun` | 1.4.0 | JavaScript/TypeScript 全家桶运行时：运行、打包、依赖管理一体化，启动极快 |
+| `opencode` | 1.18.27 | 开源的终端 AI 编程助手：在终端里用自然语言让 AI 读代码、改文件、跑命令；自带 75+ 模型提供商接入，用自己的 API key 自由选模型（v1 稳定版） |
+| `opencode@2` | 0.0.0-beta-19124 | opencode 下一代 v2 的 Beta 尝鲜版（命令名 `opencode2`）：全新插件 API 与交互，与 v1 并存互不影响，版本号滚动跟进 beta 频道 |
+| `claude-code` | 2.1.260 | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号（License 禁随包分发，首次运行自动从官方拉取并校验完整性） |
+| `herdr` | 0.8.2 | AI 编程 agent 的终端会话管家：agent 会话后台常驻，断网、合盖、重启都不丢，随时接管回来；同时跑多个 agent 时工作状态（工作中/卡住/空闲）一屏总览 |
+| `bun` | 1.4.1 | 极速 JavaScript/TypeScript 一体化工具链：运行时、包管理、测试、打包四合一，可直接替代 Node.js；本 tap 多数工具的底座 |
 | `bun-bootstrap` | 1.4.0-5467a689 | bun 自举构建用的预编译引导版（普通用户无需安装） |
-| `bun-webkit` | `0f966e81b7` | bun 运行时的浏览器引擎组件（内部依赖，普通用户无需关心） |
-| `llvm@21` | 21.1.8 | 本 tap 的编译器基石：几乎全部本地源码构建都依赖它，并负责给最终产物签名 |
-| `ohos-bst-light` | 1.0.0 | 二进制自签工具（开发向）：给本地编译的产物签名，使其能在 OHOS 上执行 |
-| `ohos-compat-shim` | 0.5.0 | 系统兼容层：自动兜底 OHOS 与标准 Linux 的底层行为差异，让软件开箱即用（多数用户无感） |
-| `qemu-aarch64` | 11.0.1-r0 | aarch64 程序运行/调试环境：在真机上运行 ARM Linux 程序，自带系统调用级跟踪（排查问题利器） |
-| `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机直接访问 |
-| `starship` | 1.26.0 | 终端提示符美化/定制工具：把默认 prompt 换成主题化、信息丰富的提示符（git 状态/目录等），跨 shell 生效；**使用前先装 `hishell-font`**（图标字体），否则提示符里的图标显示为乱码 |
-| `zellij` | 0.45.1 | 终端复用器（类似 tmux）：一个窗口多窗格/标签页，会话可脱离重连，支持插件扩展 |
-| `hishell-font` | 0.1.0 | hishell 终端图标字体（Nerd Font 系）：`starship` 等带图标工具的字体前置——先装它，提示符里的图标、符号才正常显示 |
-| `herdr` | 0.8.2 | AI 编码助手会话持久化：让终端里的 agent 工作上下文跨会话保留、随时续上 |
-| `node-ohos` | 26.7.0 | 用 llvm@21 构建的 Node.js：libc++ ABI 与 bun/nan 系原生插件兼容，需要跑 node 原生扩展时用它（开发者向） |
-| `libsecret` | 0.21.7 | GNOME 密码/凭据存储库（freedesktop Secret Service 规范），附 `secret-tool` 命令行工具；供需要系统级密钥存取的程序链接 |
-| `vite-plus` | 0.2.8 | voidzero 统一前端工具链（`vp` 命令）：lint/format/build 一体化入口，原生 binding 已接鸿蒙适配版 |
+| `bun-webkit` | `6119947592` | bun 的浏览器引擎组件（内部依赖，普通用户无需关心） |
+| `node-ohos` | 26.7.0 | 用本 tap `llvm@21` 构建的 Node.js：与 bun 系原生插件 ABI 兼容，需要 node 跑原生扩展时选它（开发者向） |
+| `vite-plus` | 0.2.8 | VoidZero（Vue/Vite 作者团队）的 Web 统一工具链：一个 `vp` 命令包揽创建项目、开发调试、检查、格式化、测试、构建全流程（Beta） |
+| `starship` | 1.26.0 | 跨 shell 的极简高速提示符：git 状态、目录、语言版本一目了然，一套配置通吃 bash/zsh/fish；**需配合 `hishell-font`**（图标字体），否则图标显示为方框 |
+| `hishell-font` | 0.1.0 | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
+| `zellij` | 0.45.1 | 开箱即用的终端工作区（类似 tmux）：多窗格/标签页、会话断开重连不丢，键位提示直接显示在界面上不用背，支持布局与插件 |
+| `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
+| `llvm@21` | 21.1.8 | Clang/LLD 编译器工具链：在鸿蒙 PC 上源码构建 C/C++ 的基石，构建产物自动完成代码签名（普通用户无需直接安装） |
+| `ohos-bst-light` | 1.0.0 | 零依赖的鸿蒙二进制自签名工具（开发向）：鸿蒙 PC 强制验签，自己编译的程序没签名跑不起来，`self-sign <文件>` 原地签好即可执行 |
+| `ohos-compat-shim` | 0.5.0 | 系统兼容层：自动兜底鸿蒙与标准 Linux 的底层行为差异，让 Linux 生态软件开箱即用（已内嵌进本 tap 产物，无需单独配置） |
+| `qemu-aarch64` | 11.0.1-r0 | 用户态 QEMU：直接运行/调试 Linux aarch64 程序，自带系统调用跟踪（`-strace`），是鸿蒙无 root strace 环境下的排障替代品 |
+| `libsecret` | 0.21.7 | 系统密码保险柜的标准接口库（freedesktop Secret Service 规范），附 `secret-tool` 命令：脚本可用它把 API token 等机密存进密钥环，而不是明文写进配置文件 |
 
 ## 已下线 / 已迁移
 
