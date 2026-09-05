@@ -16,15 +16,28 @@ cexec "brew trust $TAP"
 # brew treat the formula as not-installed, so `install` pours the bottle.
 KEG=$(cexec "$BREW_ENV brew --cellar $FORMULA")
 cexec "rm -rf '$KEG'"
-# --build-bottle, not plain install: matches build.sh's own install flag.
-# A keg-only formula whose bin/ overlaps another installed formula's names
-# (e.g. llvm@21 vs ohos-sdk's bundled clang/llvm-*) hits benign "could not
-# symlink, belongs to X" warnings either way, but plain `brew install`
-# treats them as fatal (nonzero exit) while --build-bottle doesn't —
-# confirmed 2026-09-05 on llvm@21's own PR (build.sh's --build-bottle
-# install succeeded past this same warning in the same job; this line's
-# plain install then failed on it during reinstall-from-published-bottle).
-cbrew "install --build-bottle --verbose $TAP/$FORMULA"
+# Plain install, not --build-bottle: --build-bottle means "compile from
+# source in a bottle-friendly configuration" and skips pouring an existing
+# bottle outright, which defeats the entire point of this script (verified
+# 2026-09-05: with --build-bottle here, this reinstall took the same ~3
+# minutes as a real build and poured_from_bottle came back false).
+#
+# A keg-only formula whose bin/ overlaps another already-linked formula's
+# names (e.g. llvm@21/lld@21 vs ohos-sdk's bundled clang/ld.lld/...) makes
+# `brew install` exit nonzero here ("The `brew link` step did not complete
+# successfully") even though the keg itself pours fine — this fork
+# attempts (and reports conflicts on) linking a keg-only formula's bin/
+# instead of skipping it outright. build.sh's own install tolerates this
+# by accident (its 2-attempt retry loop's second attempt just finds the
+# keg "already installed" and no-ops, since it doesn't remove the keg
+# first) — this script removes the keg above specifically to force a
+# fresh pour, so that accident doesn't apply and every install with real
+# conflicts would otherwise hard-fail here every time. Confirmed
+# 2026-09-05 on both llvm@21 and lld@21's own PRs. Don't let this
+# link-only failure abort the script (`set -e` via lib.sh would); the
+# poured_from_bottle check right below is the real signal for "did this
+# actually work."
+cbrew "install --verbose $TAP/$FORMULA" || true
 
 POURED=$(cbrew "info --json=v2 $TAP/$FORMULA" | jq -r '.formulae[0].installed[0].poured_from_bottle')
 echo "poured_from_bottle=$POURED"
