@@ -799,9 +799,11 @@ class LlvmAT21 < Formula
       # OHOS: neither `make` nor `perl` (which scan-build's driver needs) is a
       # system tool here (both are formulae, not guaranteed on PATH in CI) —
       # invoke the static analyzer directly instead, exercising the same
-      # clang-tools-extra codepath.
+      # clang-tools-extra codepath. `--analyzer-output=text` (with `=`)
+      # mis-splits as `-analyzer-output =text` and fails to parse; the
+      # space-separated form works.
       assert_includes shell_output(
-        "#{bin}/clang --analyze --analyzer-output=text --sysroot=#{sysroot} scanbuildtest.cpp 2>&1",
+        "#{bin}/clang --analyze --analyzer-output text --sysroot=#{sysroot} scanbuildtest.cpp 2>&1",
       ), "warning: Use of memory after it is freed"
     end
 
