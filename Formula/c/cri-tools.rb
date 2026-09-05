@@ -7,7 +7,7 @@ class CriTools < Formula
   head "https://github.com/kubernetes-sigs/cri-tools.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "531e1a4e0415a68e3839c1dc1b0a95789e14c9f4b5ac501503f213f864baea24"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f34817f9839a667a4a18e8bc2b24e98e146b319d422849bf339d57ea9f1e88c1"
   end
 
   depends_on "go" => :build
