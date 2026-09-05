@@ -7,7 +7,7 @@ class AstGrep < Formula
   head "https://github.com/ast-grep/ast-grep.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "07bed1be70f89c702755f904ba2acd0c0aad1f5c443ccce935e890106c8bc7ef"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c740c8eaae7b6827fa3eb9ed30aa43d5b48ec48f0e289c2b44508ab4ed61ae6"
   end
 
   depends_on "rust" => :build
