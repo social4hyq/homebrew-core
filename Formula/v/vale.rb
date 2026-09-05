@@ -6,7 +6,7 @@ class Vale < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "710aa7589a527d7bef297094ec85f35cfb8f30e49f5e92ba59a8f414cf53f40e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f88e9b7e35e74cef3d653ce532d93d234d41d2f51987652a872318d87c2b7be4"
   end
 
   depends_on "go" => :build
