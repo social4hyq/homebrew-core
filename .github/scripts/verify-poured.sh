@@ -16,7 +16,15 @@ cexec "brew trust $TAP"
 # brew treat the formula as not-installed, so `install` pours the bottle.
 KEG=$(cexec "$BREW_ENV brew --cellar $FORMULA")
 cexec "rm -rf '$KEG'"
-cbrew "install --verbose $TAP/$FORMULA"
+# --build-bottle, not plain install: matches build.sh's own install flag.
+# A keg-only formula whose bin/ overlaps another installed formula's names
+# (e.g. llvm@21 vs ohos-sdk's bundled clang/llvm-*) hits benign "could not
+# symlink, belongs to X" warnings either way, but plain `brew install`
+# treats them as fatal (nonzero exit) while --build-bottle doesn't —
+# confirmed 2026-09-05 on llvm@21's own PR (build.sh's --build-bottle
+# install succeeded past this same warning in the same job; this line's
+# plain install then failed on it during reinstall-from-published-bottle).
+cbrew "install --build-bottle --verbose $TAP/$FORMULA"
 
 POURED=$(cbrew "info --json=v2 $TAP/$FORMULA" | jq -r '.formulae[0].installed[0].poured_from_bottle')
 echo "poured_from_bottle=$POURED"
