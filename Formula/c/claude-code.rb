@@ -1,8 +1,8 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.260.tgz"
-  sha256 "b20054d917ac2faa1ed2d9cc2139924eeaed352d0193374886eb4eea6f1e7417"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.261.tgz"
+  sha256 "280060533938158707ac3b952431713e3f20e02cc13b9259d59b941fd20a2593"
   license :cannot_represent # Anthropic Commercial Terms of Service
   # extract-cli.mjs content changed (binary-asset detection by magic bytes
   # instead of filename suffix) without a version bump.
@@ -56,8 +56,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.260-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e1c548a759c6cd71fd1a44c7c79fc8e2cfe0bcfaa57da31b3d7f050a800bf8d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.261-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07f757ce5541fb7d7091c5017b218d689d8c8b33b31280712ed6e84b5feb4d5b"
   end
 
   depends_on "bun"

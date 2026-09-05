@@ -4,7 +4,7 @@ class Herdr < Formula
   url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.8.2.tar.gz"
   sha256 "60453051025ee44ebf055d26cdaf665a0accd99a992cddd22c166a26c49cd161"
   license "Apache-2.0"
-  revision 1
+  revision 2
   head "https://github.com/herdrdev/herdr.git", branch: "master"
 
   livecheck do
@@ -13,8 +13,8 @@ class Herdr < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.8.2-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "833020e902dd24e8f98bb9ce78b178fe78863d46873ad6dfcdc09150a040fc63"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.8.2-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b5fc3731332200d954e33daed723def5e72698e67d81ac960a09cb7b45f6e3e"
   end
 
   depends_on "rust" => :build
@@ -63,18 +63,6 @@ class Herdr < Formula
     # which is unreachable from this container. Persistent cache ensures the fetch only
     # needs to succeed once per machine.
     ENV["ZIG_GLOBAL_CACHE_DIR"] = (HOMEBREW_CACHE/"herdr-zig-global-cache").to_s
-
-    # OHOS strerror_r link fix — same approach as starship.rb.
-    (buildpath/"strerror_shim.rs").write <<~RUST
-      #[no_mangle]
-      pub extern "C" fn __xpg_strerror_r(errnum: i32, buf: *mut u8, buflen: usize) -> i32 {
-          extern "C" { fn strerror_r(errnum: i32, buf: *mut u8, buflen: usize) -> i32; }
-          unsafe { strerror_r(errnum, buf, buflen) }
-      }
-    RUST
-    system "rustc", "--edition", "2021", "--crate-type", "staticlib", "--emit", "obj",
-           "-O", "strerror_shim.rs", "-o", "strerror_shim.o"
-    ENV["RUSTFLAGS"] = "-C link-arg=#{buildpath}/strerror_shim.o"
 
     # zig's own linker (not this tap's patched LLD) produces intermediate ELFs during `zig build`
     # that it execs directly — these lack codesign sections, so OHOS refuses to exec them.
