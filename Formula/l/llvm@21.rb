@@ -537,9 +537,19 @@ class LlvmAT21 < Formula
     assert_equal (lib/shared_library("libLLVM-#{soversion}")).to_s,
                  shell_output("#{bin}/llvm-config --libfiles").chomp
 
-    # OHOS: confirms the config.guess patch actually made LLVM infer the
-    # right host triple (this is the load-bearing regression test for it).
+    # OHOS: confirms LLVM_HOST_TRIPLE was actually honored (see install()).
     assert_match HOST_TRIPLE, shell_output("#{bin}/clang --version") if OS.linux?
+
+    # OHOS: OHOS::computeSysRoot() only consults Driver::SysRoot (set from
+    # DEFAULT_SYSROOT at driver construction) or falls back to
+    # <bin>/../../sysroot, which doesn't exist in this keg — and even when
+    # DEFAULT_SYSROOT does resolve, some driver codepaths (e.g. libc++'s
+    # `math.h` wrapper's `__has_include_next(<math.h>)`, which needs the
+    # sysroot's own usr/include on the system header search list to find
+    # anything to chain to) don't reliably pick it up without an explicit
+    # --sysroot= on the command line. Pass it explicitly everywhere below
+    # rather than relying on the compiled-in default.
+    sysroot = "#{formula_opt_prefix("ohos-sdk")}/native/sysroot" if OS.linux?
 
     (testpath/"test.c").write <<~C
       #include <stdio.h>
@@ -562,15 +572,19 @@ class LlvmAT21 < Formula
       }
     CPP
 
-    system bin/"clang-cpp", "-v", "test.c"
-    system bin/"clang-cpp", "-v", "test.cpp"
+    # See the OHOS sysroot comment above: pass it explicitly, don't rely on
+    # the compiled-in DEFAULT_SYSROOT alone.
+    sysroot_args = OS.linux? ? ["--sysroot=#{sysroot}"] : []
+
+    system bin/"clang-cpp", "-v", *sysroot_args, "test.c"
+    system bin/"clang-cpp", "-v", *sysroot_args, "test.cpp"
 
     # Testing default toolchain and SDK location.
-    system bin/"clang++", "-v",
+    system bin/"clang++", "-v", *sysroot_args,
            "-std=c++11", "test.cpp", "-o", "test++"
     assert_includes MachO::Tools.dylibs("test++"), "/usr/lib/libc++.1.dylib" if OS.mac?
     assert_equal "Hello World!", shell_output("./test++").chomp
-    system bin/"clang", "-v", "test.c", "-o", "test"
+    system bin/"clang", "-v", *sysroot_args, "test.c", "-o", "test"
     assert_equal "Hello World!", shell_output("./test").chomp
 
     # These tests should ignore the usual SDK includes
@@ -635,7 +649,7 @@ class LlvmAT21 < Formula
       # link against installed libc++
       # related to https://github.com/Homebrew/legacy-homebrew/issues/47149
       cxx_libdir = OS.mac? ? opt_lib/"c++" : opt_lib
-      system bin/"clang++", "-v",
+      system bin/"clang++", "-v", *sysroot_args,
              "-isystem", "#{opt_include}/c++/v1",
              "-std=c++11", "-stdlib=libc++", "test.cpp", "-o", "testlibc++",
              "-rtlib=compiler-rt", "-L#{cxx_libdir}", "-Wl,-rpath,#{cxx_libdir}"
@@ -670,7 +684,7 @@ class LlvmAT21 < Formula
       # search paths or handle all of the libraries needed by `libc++` when
       # linking statically.
 
-      system bin/"clang++", "-v", "-o", "test_pie_runtimes",
+      system bin/"clang++", "-v", *sysroot_args, "-o", "test_pie_runtimes",
                    "-pie", "-fPIC", "test.cpp", "-L#{opt_lib}",
                    "-stdlib=libc++", "-rtlib=compiler-rt",
                    "-static-libstdc++", "-lpthread", "-ldl"
@@ -709,10 +723,8 @@ class LlvmAT21 < Formula
       # assert it directly rather than trusting the cmake flag took effect.
       assert_match "_ZN4__n1", shell_output("#{bin}/llvm-nm #{lib/TARGET_TRIPLE}/libc++_static.a")
 
-      ohos_sdk = formula_opt_prefix("ohos-sdk")
-      target_sysroot = "#{ohos_sdk}/native/sysroot"
       system bin/"clang++", "-stdlib=libc++", "--target=#{TARGET_TRIPLE}",
-             "--sysroot=#{target_sysroot}", "test.cpp", "-o", "test-ohos-target"
+             "--sysroot=#{sysroot}", "test.cpp", "-o", "test-ohos-target"
       assert_equal "Hello World!", shell_output("./test-ohos-target").chomp
     end
 
@@ -750,8 +762,9 @@ class LlvmAT21 < Formula
       # system tool here (both are formulae, not guaranteed on PATH in CI) —
       # invoke the static analyzer directly instead, exercising the same
       # clang-tools-extra codepath.
-      assert_includes shell_output("#{bin}/clang --analyze --analyzer-output=text scanbuildtest.cpp 2>&1"),
-                      "warning: Use of memory after it is freed"
+      assert_includes shell_output(
+        "#{bin}/clang --analyze --analyzer-output=text --sysroot=#{sysroot} scanbuildtest.cpp 2>&1",
+      ), "warning: Use of memory after it is freed"
     end
 
     (testpath/"clangformattest.c").write <<~C
