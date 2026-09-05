@@ -3,8 +3,8 @@ class Nginx < Formula
   homepage "https://nginx.org/"
   # Use "mainline" releases only (odd minor version number), not "stable"
   # See https://www.nginx.com/blog/nginx-1-12-1-13-released/ for why
-  url "https://nginx.org/download/nginx-1.31.4.tar.gz"
-  sha256 "e6f20b644a17a643f059ae6467a1971fe2811587d025e071068753a1f1e3b3c3"
+  url "https://nginx.org/download/nginx-1.31.5.tar.gz"
+  sha256 "e951607d534836624bd36b6b45a71dbfb055237deae3738da6bbf3270dada279"
   license "BSD-2-Clause"
   compatibility_version 6
   head "https://github.com/nginx/nginx.git", branch: "master"
@@ -15,7 +15,7 @@ class Nginx < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "75bf478ca52a91802240008b8398610cf11cadaeb7bb863132e746977c673553"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6a6f2040ca1b4dca6e6aeb6bafaf94bf16862d14e06d72cbd8034e16a9d395b"
   end
 
   depends_on "openssl@3"
