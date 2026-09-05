@@ -6,7 +6,7 @@ class Jscpd < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8fe208afba8eab7d4b8302857919e7941c75e03aeda279b22e8fbe5c3e4f7149"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c56ce208f49e433e35556f7d8074814262268a537dfd6b3f3031554211199b3"
   end
 
   depends_on "rust" => :build
