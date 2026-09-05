@@ -1,8 +1,8 @@
 class Watchexec < Formula
   desc "Execute commands when watched files change"
   homepage "https://watchexec.github.io/"
-  url "https://github.com/watchexec/watchexec/archive/refs/tags/v2.7.0.tar.gz"
-  sha256 "b9860e46ed035ba870b309eea4151f29f9eddb6e168712112545bfda11acc594"
+  url "https://github.com/watchexec/watchexec/archive/refs/tags/v2.7.1.tar.gz"
+  sha256 "957e0a7373e02c561f49d66b0dfc7e0e7b4576d73f149eeb01c0f15643d358f0"
   license "Apache-2.0"
   head "https://github.com/watchexec/watchexec.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Watchexec < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "38eae1eb5ff1e208243f4618b7650c9517223c9fd8dc268efe2cb1fe4839a68e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a7ddc7eb47b1d7673c00d22a442b1497a077606bd62abf3a615d9fd3ec24f44"
   end
 
   depends_on "rust" => :build
