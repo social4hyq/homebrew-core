@@ -6,7 +6,7 @@ class OrocosKdl < Formula
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d38b5554752f3edd3a6784a8d4b21dc6d950fbc266f5c2fb0dac3294587c7fb1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f19318b6b42f4d592d1b224a13bff9a10f1aa438be5f1b775eb7ff66f3a7866"
   end
 
   depends_on "cmake" => :build
