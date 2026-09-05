@@ -8,7 +8,7 @@ class CBlosc2 < Formula
   head "https://github.com/Blosc/c-blosc2.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "56318c9b4eeb0f877a6d2989ed6b165dcc311b835991b84298a8fcb125c85943"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "121ef5d45afb6805f6548f2464eed1e80a707e7f15320744add6e00e84087ca1"
   end
 
   depends_on "cmake" => :build
