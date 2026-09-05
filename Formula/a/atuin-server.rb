@@ -1,13 +1,13 @@
 class AtuinServer < Formula
   desc "Sync server for atuin - Improved shell history for zsh, bash, fish and nushell"
   homepage "https://atuin.sh"
-  url "https://github.com/atuinsh/atuin/releases/download/v18.20.1/source.tar.gz"
-  sha256 "c4faccd208fe3b407e83c6943b2d81081a94fe836da9b67f1a7b4d4f4bbb0fab"
+  url "https://github.com/atuinsh/atuin/releases/download/v18.21.0/source.tar.gz"
+  sha256 "369dd1946133756e174d902008496585cfd04abe80f8e519bb57cec6c4283bd5"
   license "MIT"
   head "https://github.com/atuinsh/atuin.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "101c5792260b525b28bf9269a87c16071fa2f375988387cf1b57959c798a9a10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "38dfd1e96430a5f851e6bf9e6cdc32b0d603373fa393c1e03c02ba138e2e00f3"
   end
 
   depends_on "pkgconf" => :build
