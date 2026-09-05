@@ -4,6 +4,7 @@ class Zellij < Formula
   url "https://github.com/zellij-org/zellij/archive/refs/tags/v0.45.1.tar.gz"
   sha256 "5cbe711437d2a61afd9287165f6aca0bcccb9ab1473633665a5b11ed55467852"
   license "MIT"
+  revision 1
   head "https://github.com/zellij-org/zellij.git", branch: "main"
 
   bottle do
@@ -60,31 +61,11 @@ class Zellij < Formula
     # Re-resolve just this package so --locked accepts the patched source.
     system "cargo", "update", "--package", "close_fds", "--precise", "0.3.2"
 
-    # OHOS strerror_r link fix — same approach as starship.rb.
-    (buildpath/"strerror_shim.rs").write <<~RUST
-      #[no_mangle]
-      pub extern "C" fn __xpg_strerror_r(errnum: i32, buf: *mut u8, buflen: usize) -> i32 {
-          extern "C" { fn strerror_r(errnum: i32, buf: *mut u8, buflen: usize) -> i32; }
-          unsafe { strerror_r(errnum, buf, buflen) }
-      }
-    RUST
-    system "rustc", "--edition", "2021", "--crate-type", "staticlib", "--emit", "obj",
-           "-O", "strerror_shim.rs", "-o", "strerror_shim.o"
-    ENV["RUSTFLAGS"] = "-C link-arg=#{buildpath}/strerror_shim.o"
-
     # Default features kept: pre-built .wasm plugins ship via include_bytes!;
     # vendored_curl/web_server_capability bundle their own C sources.
     system "cargo", "install", *std_cargo_args
 
     generate_completions_from_executable(bin/"zellij", "setup", "--generate-completion")
-  end
-
-  def caveats
-    <<~CAVEATS
-      rustls-native-certs may not find a usable OHOS system CA store;
-      only affects TLS-verified outbound (remote plugins, web server HTTPS) —
-      not the local terminal multiplexer itself.
-    CAVEATS
   end
 
   test do
