@@ -7,7 +7,7 @@ class Dnsx < Formula
   head "https://github.com/projectdiscovery/dnsx.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0f80e3e0b738ca2986db2ab2fd7c35da6410bcec0f3c5105220d62410759405"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1b48f0e8366d670156d5152e4e8f2c365a1836f95737132e7ce6e72e126ac6f"
   end
 
   depends_on "go" => :build
