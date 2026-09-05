@@ -7,7 +7,7 @@ class Libheif < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca62e114b335f79102cfedfcee83353c90f383d4d8e5af31acd87237154540cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e351991822e3ba77f20af0c12916ff7d7569db06da1952bee4bb86da7fe7420"
   end
 
   depends_on "cmake" => :build
