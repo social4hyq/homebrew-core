@@ -11,6 +11,12 @@ class LldAT21 < Formula
     formula "llvm@21"
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/lld@21-v21.1.8-r3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9700602b106f2249faa0f0510a2e54e6ef1700584a46a0687b74bc87317c98cc"
+  end
+
   keg_only :versioned_formula
 
   depends_on "cmake" => :build
