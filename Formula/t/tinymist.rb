@@ -15,7 +15,7 @@ class Tinymist < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "35dce913f035a866c916c74fbbc77f566914089eb25eee44685623a769e6ae48"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0364fcca618739f02da9037319c6d3165cf6d056f979c6a8ef638e3581fd6fab"
   end
 
   depends_on "rust" => :build
