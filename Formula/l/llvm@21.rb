@@ -755,7 +755,11 @@ class LlvmAT21 < Formula
 
       # __n1 is OHOS's mandated ABI namespace for third-party distribution —
       # assert it directly rather than trusting the cmake flag took effect.
-      assert_match "_ZN4__n1", shell_output("#{bin}/llvm-nm #{lib/TARGET_TRIPLE}/libc++_static.a")
+      # It's an inline namespace *nested inside* std (mangled as `4__n1`
+      # right after std's `St` substitution, e.g. `_ZNSt4__n1...`), not a
+      # top-level namespace — don't anchor the match on `_ZN` immediately
+      # preceding it.
+      assert_match "4__n1", shell_output("#{bin}/llvm-nm #{lib/TARGET_TRIPLE}/libc++_static.a")
 
       system bin/"clang++", "-stdlib=libc++", "--target=#{TARGET_TRIPLE}",
              "--sysroot=#{sysroot}", "test.cpp", "-o", "test-ohos-target"
