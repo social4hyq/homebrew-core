@@ -1,13 +1,13 @@
 class Bstring < Formula
   desc "Fork of Paul Hsieh's Better String Library"
   homepage "https://mike.steinert.ca/bstring/"
-  url "https://github.com/msteinert/bstring/releases/download/v1.1.0/bstring-1.1.0.tar.xz"
-  sha256 "1b513965a658494193ab9431c229ea675a7b1c7c85de9d68b8cc089abfb82240"
+  url "https://github.com/msteinert/bstring/releases/download/v1.1.1/bstring-1.1.1.tar.xz"
+  sha256 "caaa9770c763dfc31a34e86d4afe50a9d3b3e6c43f9b410fa4f3130192ea47f1"
   license "BSD-3-Clause"
   head "https://github.com/msteinert/bstring.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "08381d08ce19a4db3d91a1fd8869507a9fb43730ec5f2ca5cfb6e114beb86452"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5fa3cf66aa717a2c781ff84db52b1c5949c2786825fb11eac647446b456d6f2e"
   end
 
   depends_on "meson" => :build
