@@ -8,7 +8,7 @@ class LicenseEye < Formula
   head "https://github.com/apache/skywalking-eyes.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "660011c392d67836f0e189a086ad0e430b3c20ce3de59a230bbe42ca3054f4cb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a738cdd85d2763d3661599f30c7786a01056cb0587c268ad01fb970f7d5ee6b9"
   end
 
   depends_on "go" => :build
