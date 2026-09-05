@@ -1,13 +1,13 @@
 class Cgif < Formula
   desc "GIF encoder written in C"
   homepage "https://github.com/dloebl/cgif"
-  url "https://github.com/dloebl/cgif/archive/refs/tags/v0.5.3.tar.gz"
-  sha256 "dcc7731e974ee77db75df26c99aca4d95f11ca2d267d870d42bce1e0d1e1e75f"
+  url "https://github.com/dloebl/cgif/archive/refs/tags/v0.5.4.tar.gz"
+  sha256 "83a70a15bc2da41f081a44ebc58ee48e2e1d524a6d3fdb4a24064afa08d5ad4d"
   license "MIT"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6aa03acb1fbe78a5fddc37abd1034af44d466490d7a36281e3d17f41b055e895"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "36a09a0f5711f07901f83709c270efda210e5a146db009855a50bfdf6239e0c1"
   end
 
   depends_on "meson" => :build
