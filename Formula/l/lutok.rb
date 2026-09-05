@@ -12,7 +12,7 @@ class Lutok < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "88a6fa3fed07cecf59b315998f64173d61e104f55fca85ddf72e3e78276402a0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d81589e99bbf4176f8e719ec33bde0a79857583cb049e7eb30460db43a52205"
   end
 
   depends_on "autoconf" => :build
