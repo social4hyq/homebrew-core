@@ -1,8 +1,8 @@
 class Triton < Formula
   desc "Joyent Triton CLI"
   homepage "https://www.npmjs.com/package/triton"
-  url "https://registry.npmjs.org/triton/-/triton-7.18.0.tgz"
-  sha256 "dfbecc0a7ff8ba4ebc3fccabe0db0457e135f4a03e04e653b2e415118ce0d823"
+  url "https://registry.npmjs.org/triton/-/triton-7.18.1.tgz"
+  sha256 "36804146e9df26ac633524c7d800500f02d9c0ba6b76eb9bd4b5738ca34cbc09"
   license "MPL-2.0"
 
   bottle do
