@@ -6,7 +6,7 @@ class Triton < Formula
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "26148789b49ce4f3c1e32f105a54ef0e4a53c3cbca93517937cd6b2b8c9dc67c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b28e6b934dd3fb1e780831804568b2c703f5113cbe6be5b02604840fcd8b064b"
   end
 
   depends_on "node"
