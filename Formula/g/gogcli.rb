@@ -1,8 +1,8 @@
 class Gogcli < Formula
   desc "Google Suite CLI"
   homepage "https://gogcli.sh"
-  url "https://github.com/steipete/gogcli/archive/refs/tags/v0.39.0.tar.gz"
-  sha256 "a0da5e6d582472b0d6164382d8307ede289cfbc51c329e9985a505a4c2d31a49"
+  url "https://github.com/steipete/gogcli/archive/refs/tags/v0.39.1.tar.gz"
+  sha256 "888ec3036e04e9b59e806b29bb0af95562d55f059008a78748d637ade9141538"
   license "MIT"
   head "https://github.com/steipete/gogcli.git", branch: "main"
 
