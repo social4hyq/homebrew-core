@@ -71,6 +71,22 @@ class LlvmAT21 < Formula
               /^(\s*library_path\s*=\s*)None$/,
               "\\1'#{lib}'"
 
+    # libc++'s locale_base_api dispatch picks support/linux.h (the glibc
+    # xlocale API) for any __linux__ target, musl included — OHOS defines
+    # __linux__ too. musl's isdigit_l/strcoll_l/etc are real symbols but
+    # their declarations in <ctype.h>/<string.h>/etc are gated behind
+    # _GNU_SOURCE/_BSD_SOURCE/_XOPEN_SOURCE, and something earlier in the
+    # libc++ header chain already pins those feature-test macros to a
+    # narrower POSIX profile before ctype.h is reached, so support/linux.h's
+    # unconditional calls hit "undeclared identifier" instead of a missing
+    # symbol. There's already a working fallback for this: the older
+    # __locale_dir/locale_base_api/musl.h path (calls the non-`_l` musl
+    # functions directly), reached only when __linux__ isn't matched here —
+    # route musl there instead of down the glibc-shaped path.
+    inreplace "libcxx/include/__locale_dir/locale_base_api.h",
+              "#  elif defined(__linux__)",
+              "#  elif defined(__linux__) && !_LIBCPP_HAS_MUSL_LIBC"
+
     projects = %w[
       clang
       clang-tools-extra
@@ -465,6 +481,25 @@ class LlvmAT21 < Formula
     rm_r(target_incdir) if target_incdir.exist?
     mv("#{stage}/libcxx/include/c++/v1", target_incdir)
 
+    # OHOS's clang driver always adds both include/c++/v1 (host) and this
+    # include/#{TARGET_TRIPLE}/c++/v1 dir to the system header search path,
+    # even for a plain host compile (getMultiarchTriple() normalizes
+    # aarch64 to this triple unconditionally, regardless of --target=).
+    # libc++'s C-library wrapper headers (ctype.h, math.h, string.h, ...)
+    # use __has_include_next(<foo.h>) to chain past themselves to the real
+    # musl header. With an identical wrapper also sitting in this second
+    # directory, the chain resolves to *that* wrapper instead (same
+    # _LIBCPP_*_H include guard already set, so it's a silent no-op) and
+    # never reaches the sysroot's real header — breaking FP_NORMAL,
+    # isdigit_l, wint_t and everything else musl's headers actually
+    # provide. Host and target headers are otherwise byte-identical (same
+    # libc, same ABI, only the triple string differs); drop just the
+    # chaining wrapper files here so both host and --target=#{TARGET_TRIPLE}
+    # compiles fall through to the sysroot instead of shadowing it.
+    target_incdir.glob("**/*.h").each do |f|
+      f.unlink if f.read.include?("__has_include_next")
+    end
+
     (target_libdir/"libc++.a").write <<~LDSCRIPT
       INPUT(-lc++_static -lc++abi -lunwind)
     LDSCRIPT
@@ -542,13 +577,12 @@ class LlvmAT21 < Formula
 
     # OHOS: OHOS::computeSysRoot() only consults Driver::SysRoot (set from
     # DEFAULT_SYSROOT at driver construction) or falls back to
-    # <bin>/../../sysroot, which doesn't exist in this keg — and even when
-    # DEFAULT_SYSROOT does resolve, some driver codepaths (e.g. libc++'s
-    # `math.h` wrapper's `__has_include_next(<math.h>)`, which needs the
-    # sysroot's own usr/include on the system header search list to find
-    # anything to chain to) don't reliably pick it up without an explicit
-    # --sysroot= on the command line. Pass it explicitly everywhere below
-    # rather than relying on the compiled-in default.
+    # <bin>/../../sysroot, which doesn't exist in this keg. Pass it
+    # explicitly everywhere below rather than relying on the compiled-in
+    # default. (This alone isn't sufficient for libc++'s C-header wrappers
+    # to see real musl declarations like FP_NORMAL/isdigit_l/wint_t — that
+    # required a separate fix in build_ohos_target_runtimes/install() to
+    # the __has_include_next chain; see the comment there.)
     sysroot = "#{formula_opt_prefix("ohos-sdk")}/native/sysroot" if OS.linux?
 
     (testpath/"test.c").write <<~C
