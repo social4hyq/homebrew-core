@@ -6,7 +6,7 @@ class Openlibm < Formula
   license all_of: ["MIT", "ISC", "BSD-2-Clause"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0fcf86790b517a81c8e69dd830ba3071f7d02a84d5a2441b904b2720c787d8fd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7f0600a02702ef4a04efcfae9b5e50fe938b7120670d1115d9e94e4a6ad5f45"
   end
 
   def install
