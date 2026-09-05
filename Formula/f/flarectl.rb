@@ -1,8 +1,8 @@
 class Flarectl < Formula
   desc "CLI application for interacting with a Cloudflare account"
   homepage "https://github.com/cloudflare/cloudflare-go/tree/v0/cmd/flarectl"
-  url "https://github.com/cloudflare/cloudflare-go/archive/refs/tags/v0.117.0.tar.gz"
-  sha256 "ae76bd5a05eb9f4f8971904377e9570c80a526d670b484d9a31ccd69638d256e"
+  url "https://github.com/cloudflare/cloudflare-go/archive/refs/tags/v0.118.0.tar.gz"
+  sha256 "6aa2194c7c6efcbac373e42e9130a03db4a515fe55e3c24406f748f93808e8d9"
   license "BSD-3-Clause"
   head "https://github.com/cloudflare/cloudflare-go.git", branch: "v0"
 
@@ -13,7 +13,7 @@ class Flarectl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c974ed07bfe97fc6bdfee5b0778cf6401a7b09fb6ac52467baeed758b632e224"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "41a2504694be16a51180801439994ec1c4544c3b4522b22f66046b60fec7119d"
   end
 
   depends_on "go" => :build
