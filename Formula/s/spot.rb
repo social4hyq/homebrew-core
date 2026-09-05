@@ -11,7 +11,7 @@ class Spot < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "be9d2388c97836f126272ba4c56275e5abe2e30c2d258fea6a49de16be615ee5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "435c8821db2cf9497a9f0c82ece250c9921a71f8758594c949e675a572e9e17d"
   end
 
   depends_on "python@3.14" => :build
