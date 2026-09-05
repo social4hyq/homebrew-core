@@ -7,7 +7,7 @@ class Tfcmt < Formula
   head "https://github.com/suzuki-shunsuke/tfcmt.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a0c31e2d28a75504ab00f61dac06f509f0eae57cc04eacc59671433418ad390"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7a3159f091b06d6eca568cfeea2a3a41258850bb69ded80283b5e88113721d01"
   end
 
   depends_on "go" => :build
