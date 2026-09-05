@@ -1,8 +1,8 @@
 class Epinio < Formula
   desc "CLI for Epinio, the Application Development Engine for Kubernetes"
   homepage "https://epinio.io/"
-  url "https://github.com/epinio/epinio/archive/refs/tags/v1.14.1.tar.gz"
-  sha256 "ce86eeb012189f7a03a204a07c03c785d279743c0a9bb3d8ff2beca6344310bd"
+  url "https://github.com/epinio/epinio/archive/refs/tags/v1.14.2.tar.gz"
+  sha256 "4f290987fe290c4a23f29b1c14b2f7bb703264ae173e1aade0f6550aead06774"
   license "Apache-2.0"
 
   # Upstream creates a stable version tag ahead of release but a version isn't
@@ -14,7 +14,7 @@ class Epinio < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5411f71dc31a421be6648d111e7517545bd7f9856d4353ade2c8596eac950da"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "25116c5a100ea7bf54d2959749d1f29022cd051285f22e77b52f94bcc9cec0e4"
   end
 
   depends_on "go" => :build
