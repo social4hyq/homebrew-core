@@ -1,8 +1,8 @@
 class Scamper < Formula
   desc "Advanced traceroute and network measurement utility"
   homepage "https://www.caida.org/catalog/software/scamper/"
-  url "https://www.caida.org/catalog/software/scamper/code/scamper-cvs-20260713.tar.gz"
-  sha256 "9fc67d6483e240dc38f098a3db13e99fcf678ad00667c6b32a0a2bedba7be697"
+  url "https://www.caida.org/catalog/software/scamper/code/scamper-cvs-20260902.tar.gz"
+  sha256 "a2c5bc636d6351a395f57e121b4d813f46c001e7b831b538fd467b9cbc7625de"
   license "GPL-2.0-only"
 
   livecheck do
@@ -11,7 +11,7 @@ class Scamper < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f59e3cc6e1f3acdb605cfca4069250de126eb87e79918d5dcf146b949df01e3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1b9a29a61a72026da21e95145e90cb3703cd11079847f3b5c179737d4b15eb47"
   end
 
   depends_on "pkgconf" => :build
