@@ -1,8 +1,8 @@
 class Atf < Formula
   desc "Automated testing framework"
   homepage "https://github.com/freebsd/atf"
-  url "https://github.com/freebsd/atf/releases/download/atf-0.23/atf-0.23.tar.gz"
-  sha256 "a64e2427d021297f25b3f2e1798f8ec4dc3061ffb01a1cd3f66cc4cee486b10f"
+  url "https://github.com/freebsd/atf/releases/download/atf-0.25/atf-0.25.tar.gz"
+  sha256 "a52be96b5565733e71df8d0ecc8a4255a495e45183de7e3657491e0a8069423f"
   license "BSD-2-Clause"
   head "https://github.com/freebsd/atf.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Atf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "de0b68beae3b78786aed4202ca48e48a8bc01e3fc307bf9c994b7e80ab9ed3b4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca856789869f83cec622fea79f1c801348dec8ee61d67998ccf43ae1b567dece"
   end
 
   depends_on "autoconf" => :build
