@@ -1,13 +1,12 @@
 class Go < Formula
   desc "Open source programming language to build simple/reliable/efficient software"
   homepage "https://go.dev/"
-  url "https://go.dev/dl/go1.27.0.src.tar.gz"
-  mirror "https://fossies.org/linux/misc/go1.27.0.src.tar.gz"
-  sha256 "7002403d7cc44529ef6d26f69a44818263395ead7c16c05a5808ae047ebeb0e5"
+  url "https://go.dev/dl/go1.27.1.src.tar.gz"
+  mirror "https://fossies.org/linux/misc/go1.27.1.src.tar.gz"
+  sha256 "4e408abae126d916b6164627193f2c54f0e3ca1312d693b86db45f862ab238b1"
   license "BSD-3-Clause"
   compatibility_version 4
   head "https://go.googlesource.com/go.git", branch: "master"
-  revision 3
 
   livecheck do
     url "https://go.dev/dl/?mode=json"
@@ -23,7 +22,7 @@ class Go < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d14d28d84a403859faffcbc969315c229cb2d45aada6d2b4c148e39ecb90d555"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c4aba871fb433e03b405211d7fe2c48315f3d8878da7e662406d5c433ef3c49"
   end
 
   depends_on macos: :monterey
