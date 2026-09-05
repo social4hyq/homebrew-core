@@ -1,16 +1,14 @@
 class Rustup < Formula
   desc "Rust toolchain installer"
   homepage "https://rust-lang.github.io/rustup/"
-  url "https://github.com/rust-lang/rustup/archive/refs/tags/1.29.0.tar.gz"
-  sha256 "de73d1a62f4d5409a2f6bdb1c523d8dc08aa6d9d63588db62493c19ca8f8bf55"
+  url "https://github.com/rust-lang/rustup/archive/refs/tags/1.29.1.tar.gz"
+  sha256 "00f79a02275fd0252be6928d7a44f96bfba706a0cc47a0c85557aa4a875d1181"
   license any_of: ["Apache-2.0", "MIT"]
   compatibility_version 1
   head "https://github.com/rust-lang/rustup.git", branch: "main"
-  revision 4
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "36e538f09d61e0c9d0e4a09503d90d844f77ae7eae6d3ca0e43321151f860963"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "019879ca047543562df65c507c0b2ee973cf811d1b03362cdee1812d4672a442"
   end
 
   keg_only "it conflicts with rust"
