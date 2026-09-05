@@ -1,8 +1,8 @@
 class Spot < Formula
   desc "Platform for LTL and ω-automata manipulation"
   homepage "https://spot.lre.epita.fr"
-  url "https://www.lrde.epita.fr/dload/spot/spot-2.15.1.tar.gz"
-  sha256 "65013a2edf3f314854d7619888145f52c8dd36bfd27894d9db9b272d9a16ce4b"
+  url "https://www.lrde.epita.fr/dload/spot/spot-2.16.tar.gz"
+  sha256 "688463cb2fa393c51d9cf938fb01a716b91e4c8122aeb52fd116a3bbfddab869"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class Spot < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "be9d2388c97836f126272ba4c56275e5abe2e30c2d258fea6a49de16be615ee5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "435c8821db2cf9497a9f0c82ece250c9921a71f8758594c949e675a572e9e17d"
   end
 
   depends_on "python@3.14" => :build
