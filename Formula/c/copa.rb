@@ -1,13 +1,13 @@
 class Copa < Formula
   desc "Tool to directly patch container images given the vulnerability scanning results"
   homepage "https://github.com/project-copacetic/copacetic"
-  url "https://github.com/project-copacetic/copacetic/archive/refs/tags/v0.14.2.tar.gz"
-  sha256 "035d87fb7589234102d17c354ab35e1f2c28f1f80df875bc9438b92a19a86804"
+  url "https://github.com/project-copacetic/copacetic/archive/refs/tags/v0.15.0.tar.gz"
+  sha256 "603d0882485fc41d27173a52b5d9c50c92223066bc40592cec2423f6da35d142"
   license "Apache-2.0"
   head "https://github.com/project-copacetic/copacetic.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0965b860c4cb4f406230e19c32c16132d7629af9849e60f6188d3746ee7407ed"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e8a77c4fc9285fbb0a6678ed2aba5313b9af17077b32dba88ceaf3358fa378e"
   end
 
   depends_on "go" => :build
