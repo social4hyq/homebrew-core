@@ -1,13 +1,13 @@
 class CriTools < Formula
   desc "CLI and validation tools for Kubelet Container Runtime Interface (CRI)"
   homepage "https://github.com/kubernetes-sigs/cri-tools"
-  url "https://github.com/kubernetes-sigs/cri-tools/archive/refs/tags/v1.36.0.tar.gz"
-  sha256 "e0433207c55e08ab9e42e2fa3b3df3769ebae7695c145b600d79878be599e08f"
+  url "https://github.com/kubernetes-sigs/cri-tools/archive/refs/tags/v1.37.0.tar.gz"
+  sha256 "ef81c240412a5b77b164ae6570857b7a0f347770031a697764ba5167389842d8"
   license "Apache-2.0"
   head "https://github.com/kubernetes-sigs/cri-tools.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "531e1a4e0415a68e3839c1dc1b0a95789e14c9f4b5ac501503f213f864baea24"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f34817f9839a667a4a18e8bc2b24e98e146b319d422849bf339d57ea9f1e88c1"
   end
 
   depends_on "go" => :build
