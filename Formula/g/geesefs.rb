@@ -1,13 +1,13 @@
 class Geesefs < Formula
   desc "FUSE FS implementation over S3"
   homepage "https://github.com/yandex-cloud/geesefs"
-  url "https://github.com/yandex-cloud/geesefs/archive/refs/tags/v0.43.8.tar.gz"
-  sha256 "66383e8a6162e389037135482e93ebe6d04fb0451f98e081d87b089c94fb7ec0"
+  url "https://github.com/yandex-cloud/geesefs/archive/refs/tags/v0.43.9.tar.gz"
+  sha256 "beee3771a2bbe652c49f9e8048b4f3e1ef2f606432d496e8de574c9355cb2dee"
   license "Apache-2.0"
   head "https://github.com/yandex-cloud/geesefs.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f111427fb52f618faae16b8d2942e0c4700d15a0b26e606cd75af3bc67f9e4a9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07105329f552269d957305f06b10246c67f4529fd6e42d075832907a4e7e81db"
   end
 
   depends_on "go" => :build
