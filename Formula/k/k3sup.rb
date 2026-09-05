@@ -13,7 +13,7 @@ class K3sup < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7237d878d660320d71b907449ef2072ece535f3fc85999e4f70b124ce3a1f8ec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f7dde91f618a70cf519b04742107cc6b821336adbddc0f18eb504a4c7076299"
   end
 
   depends_on "go" => :build
