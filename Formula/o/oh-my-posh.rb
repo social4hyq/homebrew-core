@@ -15,7 +15,7 @@ class OhMyPosh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0cfa58ac49198983828ca50d393b6f3a9a36e62858315c7116c192e868f2876f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "af18f9c9d03d691566ab72e320817f178f96d957d3e83dc11f258a78a7462468"
   end
 
   depends_on "go" => :build
