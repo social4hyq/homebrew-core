@@ -11,7 +11,7 @@ class Libfastjson < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5f4649eea5a06a7bf48891a353db8784abdb6e609f38b348db05057d8a3306d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4e1f5aea8b1f4bed47b9b0f1987336f2badde749c9a998b88fd4d93a855bd5c"
   end
 
   def install
