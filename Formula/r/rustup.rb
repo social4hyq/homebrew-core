@@ -8,8 +8,7 @@ class Rustup < Formula
   head "https://github.com/rust-lang/rustup.git", branch: "main"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "36e538f09d61e0c9d0e4a09503d90d844f77ae7eae6d3ca0e43321151f860963"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "019879ca047543562df65c507c0b2ee973cf811d1b03362cdee1812d4672a442"
   end
 
   keg_only "it conflicts with rust"
