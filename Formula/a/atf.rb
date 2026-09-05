@@ -12,7 +12,7 @@ class Atf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "de0b68beae3b78786aed4202ca48e48a8bc01e3fc307bf9c994b7e80ab9ed3b4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca856789869f83cec622fea79f1c801348dec8ee61d67998ccf43ae1b567dece"
   end
 
   depends_on "autoconf" => :build
