@@ -7,7 +7,7 @@ class Sesh < Formula
   head "https://github.com/joshmedeski/sesh.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fabee4d74ecff1ee9dd20a98ebf56f273d4accf60979c903f24a0d0afb108f77"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e01a8cd87562c7e01c0a7cbb4e446e1a2b7a2ca9fc59e92a4205f5a7db2e3e9"
   end
 
   depends_on "go" => :build
