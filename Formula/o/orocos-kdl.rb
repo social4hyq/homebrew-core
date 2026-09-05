@@ -1,13 +1,12 @@
 class OrocosKdl < Formula
   desc "Orocos Kinematics and Dynamics C++ library"
   homepage "https://orocos.org/"
-  url "https://github.com/orocos/orocos_kinematics_dynamics/archive/refs/tags/1.5.3.tar.gz"
-  sha256 "3895eed1b51a6803c79e7ac4acd6a2243d621b887ac26a1a6b82a86a1131c3b6"
+  url "https://github.com/orocos/orocos_kinematics_dynamics/archive/refs/tags/1.5.4.tar.gz"
+  sha256 "b47c75b03d5980a8b3a5382ab1176ae552f2f5418ad42b0e530a4178e3e1c301"
   license "LGPL-2.1-or-later"
-  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d38b5554752f3edd3a6784a8d4b21dc6d950fbc266f5c2fb0dac3294587c7fb1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f19318b6b42f4d592d1b224a13bff9a10f1aa438be5f1b775eb7ff66f3a7866"
   end
 
   depends_on "cmake" => :build
