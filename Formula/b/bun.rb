@@ -3,7 +3,7 @@ class Bun < Formula
   homepage "https://github.com/oven-sh/bun"
   # Fully rewritten from upstream: 50+ OHOS patches on ohos-aarch64 branch,
   # L4 self-bootstrap, pre-populated WebKit cache, Rust nightly -Zbuild-std.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "d4b280d0fae8ec51d897c0aef0de320bc4898120", branch: "ohos-aarch64"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "0fbaf1dcc5df33bf31dfe118ca8642828d599eff", branch: "ohos-aarch64"
   version "1.4.1"
   license "MIT"
   # head tracks the same pre-patched fork branch as url.
