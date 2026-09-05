@@ -2,13 +2,13 @@ class Packetbeat < Formula
   desc "Lightweight Shipper for Network Data"
   homepage "https://www.elastic.co/products/beats/packetbeat"
   url "https://github.com/elastic/beats.git",
-      tag:      "v9.5.2",
-      revision: "8f4fe1e5dec067a139dce33d3af88c24b58c3660"
+      tag:      "v9.5.3",
+      revision: "05460763bc6067b3a4708bc80219092eba134988"
   license "Apache-2.0"
   head "https://github.com/elastic/beats.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "844cd2e2baff16c84353ed7dc5702b3b382895cc934f4d035f4366f5c238af7c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3c3fbf1823df317231fee646a2784fce214a50543e794fa858c60bdabc429fc"
   end
 
   depends_on "go" => :build
