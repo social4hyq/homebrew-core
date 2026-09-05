@@ -1,8 +1,8 @@
 class McpRemote < Formula
   desc "Remote proxy for Model Context Protocol with OAuth support"
   homepage "https://github.com/geelen/mcp-remote"
-  url "https://registry.npmjs.org/mcp-remote/-/mcp-remote-0.8.2.tgz"
-  sha256 "3ebcee6ebd7fba095730123467be49d77726801e81e26dae1395901a7ed828d5"
+  url "https://registry.npmjs.org/mcp-remote/-/mcp-remote-0.8.3.tgz"
+  sha256 "c9162084cf9d6e2c9e9c31da483d57dce90a45fa7dc95042a02718f7ad94917c"
   license "MIT"
 
   bottle do
