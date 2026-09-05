@@ -1,8 +1,8 @@
 class Libxml2 < Formula
   desc "GNOME XML library"
   homepage "http://xmlsoft.org/"
-  url "https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.3.tar.xz"
-  sha256 "78262a6e7ac170d6528ebfe2efccdf220191a5af6a6cd61ea4a9a9a5042c7a07"
+  url "https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.4.tar.xz"
+  sha256 "98087fd181d9070724f3fbc65c7377db03038eb92bd882374daff44940138821"
   license "MIT"
   compatibility_version 1
 
@@ -14,7 +14,7 @@ class Libxml2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f898efe6c1c3869c116ec4a7eb3368ceb2feead46ab33617bbd8b19e6e8b2b9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2d38b3ad41ae76f999248d74c076eb9116ac37214c8f3a20741d54ce7d290df"
   end
 
   head do
