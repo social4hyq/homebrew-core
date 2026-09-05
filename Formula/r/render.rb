@@ -1,13 +1,13 @@
 class Render < Formula
   desc "Command-line interface for Render"
   homepage "https://render.com/docs/cli"
-  url "https://github.com/render-oss/cli/archive/refs/tags/v2.25.0.tar.gz"
-  sha256 "95989223db95ee484aa653130a20f92ea136b6a80af6aa5de1fd5beafd07f563"
+  url "https://github.com/render-oss/cli/archive/refs/tags/v2.26.0.tar.gz"
+  sha256 "f1934ac179570a37ef2986c0b792eb8b3bfaf97ae2f2d36d112cc2282a71fa22"
   license "Apache-2.0"
   head "https://github.com/render-oss/cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "28704422344cb5db3c065e3c63f95999efc266e4d3efd3509002092fce266ff1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "295f95a89631ebb1ada7c87c0e7b0a3d32cbcf98614160d0c21ca33bcd12ab45"
   end
 
   depends_on "go" => :build
