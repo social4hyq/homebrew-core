@@ -1,15 +1,14 @@
 class Rust < Formula
   desc "Safe, concurrent, practical language"
   homepage "https://www.rust-lang.org/"
-  url "https://static.rust-lang.org/dist/rust-1.98.0-aarch64-unknown-linux-ohos.tar.xz"
-  sha256 "bceb9fb7ff56c2e6b60fa12c6e831a4a60bd1b165527d3471122a04ce49b7beb"
+  url "https://static.rust-lang.org/dist/rust-1.98.1-aarch64-unknown-linux-ohos.tar.xz"
+  sha256 "80d115b5209fe56039f160d7aabe45f8f3dbf1e203f591b676136e05d33c1ba0"
   license any_of: ["Apache-2.0", "MIT"]
   compatibility_version 1
   head "https://github.com/rust-lang/rust.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "164accadff5f6d1274d6675a32082f5ef1a9fa66da9a466181f5d496635c8c92"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ce5959eab2c3f9d9ff4ef246fb69c3c54b6dfe7ded52f5d56ead5306464ac3b"
   end
 
   depends_on "patchelf" => :build
