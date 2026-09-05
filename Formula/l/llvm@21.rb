@@ -14,8 +14,8 @@ class LlvmAT21 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm@21-v21.1.8-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b299b178a5cd1f469b9cfa47e59be265fdafb8f5a6b209dfbe5696d29d94e467"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm@21-v21.1.8-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1dd9397b9f900c9b97643c616f7ed33b9d6ea5536c859efa5e769fffa0905b28"
   end
 
   keg_only :versioned_formula
