@@ -7,7 +7,7 @@ class Jet < Formula
   head "https://github.com/go-jet/jet.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f069798cb8460f2d4e16f7bae8da1d0c06eaf363f55498d1a2aab11df7c8dba8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "549d893a0a16b5bcb653cb379b37631b087d64d455ffad0f9200a51f75e3005b"
   end
 
   depends_on "go" => :build
