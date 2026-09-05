@@ -1,13 +1,13 @@
 class Favirecon < Formula
   desc "Uses favicon.ico to improve the target recon phase"
   homepage "https://github.com/edoardottt/favirecon"
-  url "https://github.com/edoardottt/favirecon/archive/refs/tags/v1.0.3.tar.gz"
-  sha256 "5cbf98b2874f1335ecac948be3fdef328cd3ab1b04706c761b79bbf8207bf19a"
+  url "https://github.com/edoardottt/favirecon/archive/refs/tags/v1.0.4.tar.gz"
+  sha256 "61ce4ceea1a11e1e39ec67dadafb4cf9b9749d18385a76774298e5441eca4391"
   license "MIT"
   head "https://github.com/edoardottt/favirecon.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "43cacfcf5c9b4c708a1668ff98eb037b67d47cde6b2a45068fc705dbb143f845"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb3ef8ebfa1d3f9b44ea569f3ec9eacafdf4bf1b5f0808a27e27a59f97456983"
   end
 
   depends_on "go" => :build
