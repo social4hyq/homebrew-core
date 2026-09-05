@@ -1,13 +1,13 @@
 class Gogcli < Formula
   desc "Google Suite CLI"
   homepage "https://gogcli.sh"
-  url "https://github.com/steipete/gogcli/archive/refs/tags/v0.38.1.tar.gz"
-  sha256 "d803a250e6aac385327e310097b535ce8aa0a979266f5d44580d595383088335"
+  url "https://github.com/steipete/gogcli/archive/refs/tags/v0.39.0.tar.gz"
+  sha256 "a0da5e6d582472b0d6164382d8307ede289cfbc51c329e9985a505a4c2d31a49"
   license "MIT"
   head "https://github.com/steipete/gogcli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bb64bc56ed71288941a54db5099f032ecd6b6efe3c157f6fb42ecb7a7fb19004"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d51fb39b00d8c96bfab0a696a65511dc04e2c97e06b958462d6fd42ba70528f"
   end
 
   depends_on "go" => :build
