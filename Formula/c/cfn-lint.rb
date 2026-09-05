@@ -8,7 +8,7 @@ class CfnLint < Formula
   license "MIT-0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f43550d4bc52641dd823ab8cacae1279eac83b05484ed0b3ac031a681778c49"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb785e00dd158cb6127e9b3d6463dab56cf237f6fff3a31cdeda44d5359fb663"
   end
 
   depends_on "libyaml"
