@@ -1,13 +1,13 @@
 class Ipatool < Formula
   desc "CLI tool for searching and downloading app packages from the iOS App Store"
   homepage "https://github.com/majd/ipatool"
-  url "https://github.com/majd/ipatool/archive/refs/tags/v2.4.0.tar.gz"
-  sha256 "95bb79d983b30a90d10bd4b326fc384ce7896abaf0626989ff463a36930c9f12"
+  url "https://github.com/majd/ipatool/archive/refs/tags/v2.5.0.tar.gz"
+  sha256 "c44b6bc36cef8364e685d7a290d10d0120f26f2bb3644ebad4cf28dafb417cd6"
   license "MIT"
   head "https://github.com/majd/ipatool.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b096bd3011d1cd1dc4e8192bf48fcd0567e0dfee6f1cf365e4ad895a5f561d3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "54ef1207c927d0c142d4a26058e805526ed96995d3bd9cfb31980f9c4df792aa"
   end
 
   depends_on "go" => :build
