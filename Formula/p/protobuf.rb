@@ -1,8 +1,8 @@
 class Protobuf < Formula
   desc "Protocol buffers (Google's data interchange format)"
   homepage "https://protobuf.dev/"
-  url "https://github.com/protocolbuffers/protobuf/releases/download/v36.0/protobuf-36.0.tar.gz"
-  sha256 "399931c793f4ac6db81045b00b06dd07c877b48aeecf36c797f65c541fb533e7"
+  url "https://github.com/protocolbuffers/protobuf/releases/download/v36.1/protobuf-36.1.tar.gz"
+  sha256 "dc74fa582f559cbd31614ddfefb4868f43c919d7184bde514bb47f90c6025eb8"
   license "BSD-3-Clause"
   compatibility_version 4
 
@@ -12,7 +12,7 @@ class Protobuf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d811257bc118d6b42a77abd3c7454d52222266fe19811965153c0acb16222a02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c16585c57e4b2b8d4a0af52badcdd73bb69da9ee1191f590d9cbed03d4bbe4b0"
   end
 
   depends_on "cmake" => :build
