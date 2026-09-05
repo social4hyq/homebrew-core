@@ -6,7 +6,7 @@ class Docuum < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9875cacb0ee437aecd99a94875241ef49eee5968d78e7669c8e3676a6e42f53d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a372c47363a3a3d5feea42407a1f9b39ccaf7604f575120db17d536b5b55c938"
   end
 
   depends_on "rust" => :build
