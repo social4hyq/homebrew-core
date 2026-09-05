@@ -6,7 +6,7 @@ class Jhipster < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "18463aa2c9b87070f5f19e6b9cdb1b5477758e662190440807e85c44ec754d9f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db86d7b68189260e1ecf1318a8e205e9b9791b7b5a06ed412afde47b5aae8046"
   end
 
   depends_on "node"
