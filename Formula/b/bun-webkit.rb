@@ -5,6 +5,7 @@ class BunWebkit < Formula
       revision: "2e2aa2290fac856d6f451ceacb58f7f5b44dd057"
   version "2e2aa2290f"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
+  revision 1
   # Fully rewritten from upstream: builds only JSC/WTF/bmalloc static archives, pinned to bun's WEBKIT_VERSION.
 
   # Pinned to bun's WEBKIT_VERSION; OHOS adaptation handled bun-side (webkit.ts.patch).
@@ -13,8 +14,8 @@ class BunWebkit < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-webkit-v2e2aa2290f-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "23dade1b4a1d95430d071b8ff9c48400aec0a70cf25c401111bfcd8c8edd56d0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-webkit-v2e2aa2290f-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1767b798ecd0045a949b964ee0e98ce10758dbe746268356bf96261d926b113"
   end
 
   keg_only "webkit static archives are consumed in-tree by Bun, not linked system-wide"
@@ -38,6 +39,17 @@ class BunWebkit < Formula
   # the suspender parks in sem_wait holding global locks (pas_heap_lock et al.) and the
   # whole process freezes. Drive the handshake with an atomic flag + bounded
   # sigtimedwait instead, so a lost/coalesced signal self-heals.
+  #
+  # Same handshake, a second disturbance source (r1): a real execve(2) syscall
+  # in flight on the process (even one that ends in ENOEXEC) can collide with
+  # this signal-based suspend on HongMeng's kernel, handing the collector a
+  # torn snapshot of a thread that was never actually suspended -- observed via
+  # real-device faultlog as an intermittent JIT-code null-pointer SIGSEGV under
+  # heavy concurrent execve()+pthread_create() load (bun's own
+  # test/js/node/process/process-execve.test.ts stress case). Bun's execve(2)
+  # interposer (c-bindings.cpp) now reports its in-flight window via
+  # WTF::reportExecveBegin/End, and Thread::suspend() waits it out (bounded,
+  # ~100ms) before starting the signal handshake.
   patch :p1 do
     file "Patches/bun-webkit/0001-suspend-resume-handshake-survives-signal-loss.patch"
   end
