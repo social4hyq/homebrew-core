@@ -77,16 +77,20 @@ class LlvmAT21 < Formula
       mlir
       polly
     ]
-    # compiler-rt is upstream's unmodified list (host-triple, self-hosting):
-    # its CRT objects (crtbeginS.o etc.) are a hard link-time dependency of
-    # this same host build's own shared libunwind.so, built by this same
-    # LLVM_ENABLE_RUNTIMES step. It lands in lib/clang/<ver>/lib/<host-os>/,
-    # which OHOS's clang driver never searches for downstream use (it wants
-    # lib/clang/<ver>/lib/aarch64-linux-ohos/) — build_ohos_target_runtimes
-    # below builds and installs a *second*, target-triple copy at the path
-    # the driver actually searches; the two don't collide.
+    # compiler-rt is deliberately absent here (unlike upstream's list): it
+    # was only needed as a link-time dependency (crtbeginS.o) of this same
+    # host build's own *shared* libunwind.so/libc++.so, but those are now
+    # built static-only (see LIBCXX_ENABLE_SHARED etc. below) — static
+    # archives don't need crtbegin/crtend at all. Building it here instead
+    # pulls in far more than builtins (GWP-ASan → sanitizer_common, which
+    # doesn't compile against this musl sysroot: linux/sysinfo.h and
+    # sys/sysinfo.h both define `struct sysinfo`, a known musl/kernel-UAPI
+    # header clash), for no benefit — OHOS's clang driver never searches
+    # this host-triple location anyway (it wants
+    # lib/clang/<ver>/lib/aarch64-linux-ohos/); build_ohos_target_runtimes
+    # below builds a target-triple compiler-rt at the path it actually
+    # searches, independently of this host bootstrap.
     runtimes = %w[
-      compiler-rt
       libcxx
       libcxxabi
       libunwind
@@ -245,25 +249,6 @@ class LlvmAT21 < Formula
         -DLIBCXX_ENABLE_SHARED=OFF
         -DLIBCXXABI_ENABLE_SHARED=OFF
         -DLIBUNWIND_ENABLE_SHARED=OFF
-      ]
-      # compiler-rt's non-builtins components (sanitizers/profile/xray/etc.)
-      # default ON here and each independently calls a configure-time
-      # `find_compiler_rt_library(builtins ...)` check — satisfied on
-      # upstream's platforms by some pre-existing system compiler-rt/libgcc,
-      # but OHOS has nothing to find (this bootstrap *is* the first-ever
-      # build of it), so the check hits its NOTFOUND branch and hard-errors
-      # (first observed via compiler-rt/lib/stats/CMakeLists.txt). None of
-      # these are needed for a bootstrap compiler — deliberately scoped down
-      # to just builtins+CRT, same as build_ohos_target_runtimes below.
-      # Downstream projects wanting sanitizers/PGO on OHOS need a fuller
-      # LLVM build; not a goal of this formula.
-      runtimes_cmake_args += %w[
-        -DCOMPILER_RT_BUILD_SANITIZERS=OFF
-        -DCOMPILER_RT_BUILD_MEMPROF=OFF
-        -DCOMPILER_RT_BUILD_PROFILE=OFF
-        -DCOMPILER_RT_BUILD_XRAY=OFF
-        -DCOMPILER_RT_BUILD_ORC=OFF
-        -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
       ]
       runtimes_cmake_args += %w[
         -DLIBCXX_HAS_MUSL_LIBC=ON
