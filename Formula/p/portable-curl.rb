@@ -4,11 +4,11 @@ class PortableCurl < PortableFormula
   desc "Get a file from an HTTP, HTTPS or FTP server"
   homepage "https://curl.se"
   # Don't forget to update both instances of the version in the GitHub mirror URL.
-  url "https://curl.se/download/curl-8.21.0.tar.bz2"
-  mirror "https://github.com/curl/curl/releases/download/curl-8_21_0/curl-8.21.0.tar.bz2"
-  mirror "http://fresh-center.net/linux/www/curl-8.21.0.tar.bz2"
-  mirror "http://fresh-center.net/linux/www/legacy/curl-8.21.0.tar.bz2"
-  sha256 "ad6f2f94934b38e31e48272833c99b891d045b4565fe942a53fbd27bd3910e16"
+  url "https://curl.se/download/curl-8.22.0.tar.bz2"
+  mirror "https://github.com/curl/curl/releases/download/curl-8_22_0/curl-8.22.0.tar.bz2"
+  mirror "http://fresh-center.net/linux/www/curl-8.22.0.tar.bz2"
+  mirror "http://fresh-center.net/linux/www/legacy/curl-8.22.0.tar.bz2"
+  sha256 "5d956a6a22b3c279f50c421ee5d3c9e9d660cb6f115dcf881b579e952130549c"
   license "curl"
 
   livecheck do
@@ -17,8 +17,7 @@ class PortableCurl < PortableFormula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "52ab2c1950df3768f988b862aaffdaa60ab257220812cbd8f2c0f12af40ea181"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d768fb5f8c4d06113f46fbd4a0922c729a2586b045ee2157e1fbdaa2b933c0b"
   end
 
   head do
