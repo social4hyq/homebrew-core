@@ -1,8 +1,8 @@
 class Reasonix < Formula
   desc "Cache-first DeepSeek coding agent for the terminal"
   homepage "https://github.com/esengine/DeepSeek-Reasonix"
-  url "https://github.com/esengine/DeepSeek-Reasonix/archive/refs/tags/v1.34.0.tar.gz"
-  sha256 "a089d0d0e592fe4e31026e9e86b901637d0a44d58ccdc4926a629b6fd7e457c8"
+  url "https://github.com/esengine/DeepSeek-Reasonix/archive/refs/tags/v1.37.0.tar.gz"
+  sha256 "1dcadd2fb37bcf67da7d1f5dd5ecf545680c4c05a61caaab620f57936e2c8d72"
   license "MIT"
 
   # CLI releases are tagged `v*` while desktop releases are tagged `desktop-v*`
