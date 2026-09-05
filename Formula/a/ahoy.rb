@@ -1,13 +1,13 @@
 class Ahoy < Formula
   desc "Creates self documenting CLI programs from commands in YAML files"
   homepage "https://github.com/ahoy-cli/ahoy/"
-  url "https://github.com/ahoy-cli/ahoy/archive/refs/tags/v3.0.0.tar.gz"
-  sha256 "3c9758dd49f635af85530a7763248e2f4532757fec0680ae6047d44fa518a45c"
+  url "https://github.com/ahoy-cli/ahoy/archive/refs/tags/v3.0.1.tar.gz"
+  sha256 "ed4d3b48784668dc48b81243125dbdeabecaab784b5e1c20f1608cacf83dc4ce"
   license "MIT"
   head "https://github.com/ahoy-cli/ahoy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a53967cb9d6afcf4d62b12c480b79b594f6bcb4e92f0af9ed243f69df18640f6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "124116cc6ba3c2ccd48ea5d456553d249e317c7707a8db8a99c0656da229ce34"
   end
 
   depends_on "go" => :build
