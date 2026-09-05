@@ -7,7 +7,7 @@ class Falcoctl < Formula
   head "https://github.com/falcosecurity/falcoctl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bfb465a55f35acbe970cc41c5c58503d948d64e90e6b6e0f01434216879d52df"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "116b9d4c9b5ba5706318d8c5f9e034aaff6581f19282b8e32f3929653d1a15ad"
   end
 
   depends_on "go" => :build
