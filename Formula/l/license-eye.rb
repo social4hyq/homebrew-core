@@ -1,14 +1,14 @@
 class LicenseEye < Formula
   desc "Tool to check and fix license headers and resolve dependency licenses"
   homepage "https://github.com/apache/skywalking-eyes"
-  url "https://www.apache.org/dyn/closer.lua?path=skywalking/eyes/0.8.0/skywalking-license-eye-0.8.0-src.tgz"
-  mirror "https://archive.apache.org/dist/skywalking/eyes/0.8.0/skywalking-license-eye-0.8.0-src.tgz"
-  sha256 "cd642a1090ad526fa6517c795c9360916bbb15ed483b3ebc3199ddb9a9821a65"
+  url "https://www.apache.org/dyn/closer.lua?path=skywalking/eyes/0.9.0/skywalking-license-eye-0.9.0-src.tgz"
+  mirror "https://archive.apache.org/dist/skywalking/eyes/0.9.0/skywalking-license-eye-0.9.0-src.tgz"
+  sha256 "59265a26cbf51f24eeace490eab59c82513c7428d7ca26e004df8e94756027e6"
   license "Apache-2.0"
   head "https://github.com/apache/skywalking-eyes.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "660011c392d67836f0e189a086ad0e430b3c20ce3de59a230bbe42ca3054f4cb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a738cdd85d2763d3661599f30c7786a01056cb0587c268ad01fb970f7d5ee6b9"
   end
 
   depends_on "go" => :build
