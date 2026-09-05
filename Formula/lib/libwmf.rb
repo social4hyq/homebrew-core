@@ -10,7 +10,7 @@ class Libwmf < Formula
   ]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b4b1806d80197495597a1cd6f4719b9e01d3a09a85eda7b9305d4d5a4cb8077"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d18c53bce65c525392062201d7b5a8a668027a7e8baec5761572054e9d54ba9"
   end
 
   depends_on "pkgconf" => :build
