@@ -7,7 +7,7 @@ class Kor < Formula
   head "https://github.com/yonahd/kor.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "71d24881244b2077045a399905259da60fc4f8f41d154896a3853ef3443ec95f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b49610b6d9e18e0fae45d9f40eaa9d05035b647cd99362309f37b561bc89fc3"
   end
 
   depends_on "go" => :build
