@@ -14,8 +14,7 @@ class Kubescape < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "01b34d2775590ea900b00094a7feb622e8c806cad3bf34848996565466ac0abf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "866224fce1af16b62610b73e7efb41e1ba468f2c9861679da48088392772a91a"
   end
 
   depends_on "go" => :build
