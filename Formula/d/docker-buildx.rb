@@ -7,7 +7,7 @@ class DockerBuildx < Formula
   head "https://github.com/docker/buildx.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2cd19648cd2d78aa2ecc58d240bfb43ff9f0fb648d8150f2e7fcbc579259794"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a2895a5a91964f68163ca0b02b5fe22b9411d50bb6aa3a9c393277631a9aca7f"
   end
 
   depends_on "go" => :build
