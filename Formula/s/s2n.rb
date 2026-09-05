@@ -1,8 +1,8 @@
 class S2n < Formula
   desc "Implementation of the TLS/SSL protocols"
   homepage "https://github.com/aws/s2n-tls"
-  url "https://github.com/aws/s2n-tls/archive/refs/tags/v1.7.8.tar.gz"
-  sha256 "90ec7934af222b0f58f1143dabe12358489f628956ec25fa1bf752b2a33bfd5a"
+  url "https://github.com/aws/s2n-tls/archive/refs/tags/v1.7.9.tar.gz"
+  sha256 "bf51b37dd04633bbb9e7fae67c208d33edf5a43785ef85df2fceb758152a5288"
   license "Apache-2.0"
   head "https://github.com/aws/s2n-tls.git", branch: "main"
 
@@ -12,7 +12,7 @@ class S2n < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6fb83f75006751cae7e13990c565d2569b7fc107bcc06f4cac5467c61310f96b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e9ddad3429d5e92cf3d9fd0b032fdf5559e5d3ebba04230f59ae78b422c26a9"
   end
 
   depends_on "cmake" => :build
