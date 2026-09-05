@@ -7,7 +7,7 @@ class Tbls < Formula
   head "https://github.com/k1LoW/tbls.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "569840b26b9d720a9f7c45a1f52153c737d258d9d15fa2e3cbe53777134e1896"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d18f766ef01a495d24a65e71ca114a60c96c1c708ba2a45dc5c6b6603f1afad"
   end
 
   depends_on "go" => :build
