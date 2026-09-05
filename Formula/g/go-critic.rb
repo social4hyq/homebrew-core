@@ -12,8 +12,7 @@ class GoCritic < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6753a91d65787e75e91ae3d3c74f27afc751dbf962a22dcddeb5fbc2048b56f1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f3d3e8a7fa19158d45f4d2c14239c16134dd7f663b1ba1067126423d8771ac5"
   end
 
   depends_on "go"
