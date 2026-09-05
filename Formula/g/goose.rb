@@ -7,7 +7,7 @@ class Goose < Formula
   head "https://github.com/pressly/goose.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b7afb1a68851348c171e243f3b087f27ba1aaf459b818d0034d5f2bf6feb523"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dc8fbdc69f6a94b44b8c7eb6bf48db0facbd8051acd29350bdb013aa3d1d3d2"
   end
 
   depends_on "go" => :build
