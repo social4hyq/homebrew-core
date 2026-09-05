@@ -1,8 +1,8 @@
 class Grpcui < Formula
   desc "Interactive web UI for gRPC, along the lines of postman"
   homepage "https://github.com/fullstorydev/grpcui"
-  url "https://github.com/fullstorydev/grpcui/archive/refs/tags/v1.5.2.tar.gz"
-  sha256 "43e127082396b1ea11f4687a6f69555579b34501538e7ca361c9db35e486139d"
+  url "https://github.com/fullstorydev/grpcui/archive/refs/tags/v1.5.4.tar.gz"
+  sha256 "664137b2982cad4bc5e8a8e5963fb46fe3686b6aff0f2f925172fd98d2f8a12f"
   license "MIT"
   head "https://github.com/fullstorydev/grpcui.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Grpcui < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d2aa6d2ad8ca92f1a69f9bc7d9bce1e1bc2018af1f7f7d2a5469c7ac7e0c59d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6fd5fee9decf4b48cdd30b607bc4b9ce08dbf73b88828d3d83c6dc3e753bea46"
   end
 
   depends_on "go" => :build
