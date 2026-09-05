@@ -17,8 +17,7 @@ class PortableCurl < PortableFormula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "52ab2c1950df3768f988b862aaffdaa60ab257220812cbd8f2c0f12af40ea181"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d768fb5f8c4d06113f46fbd4a0922c729a2586b045ee2157e1fbdaa2b933c0b"
   end
 
   head do
