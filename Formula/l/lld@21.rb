@@ -30,22 +30,12 @@ class LldAT21 < Formula
   end
 
   def install
-    # No Platform/HarmonyOS.cmake shipped by cmake for a native (non-cross)
-    # build (see llvm@21.rb's install() for the full explanation); needed
-    # here too since BUILD_SHARED_LIBS=ON and upstream already passes an
-    # explicit CMAKE_INSTALL_RPATH that a missing Platform module would
-    # silently drop.
-    cmake_modules = buildpath/"cmake-modules"
-    (cmake_modules/"Platform").mkpath
-    (cmake_modules/"Platform/HarmonyOS.cmake").write "include(Platform/Linux)\n"
-
     rpaths = [rpath]
     rpaths << formula_opt_lib("llvm@21").to_s if OS.linux?
 
     system "cmake", "-S", "lld", "-B", "build",
                     "-DBUILD_SHARED_LIBS=ON",
                     "-DCMAKE_INSTALL_RPATH=#{rpaths.join(";")}",
-                    "-DCMAKE_MODULE_PATH=#{cmake_modules}",
                     "-DLLD_BUILT_STANDALONE=ON",
                     "-DLLD_VENDOR=#{tap&.user}",
                     "-DLLVM_CMAKE_DIR=#{formula_opt_lib("llvm@21")}/cmake/llvm",
