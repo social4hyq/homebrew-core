@@ -7,7 +7,7 @@ class Ubi < Formula
   head "https://github.com/houseabsolute/ubi.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bab55ea9ef09377f89f3739bd950489473f583ae35bffca158b80ff1ad1c08f9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b03e5dce631347527acd4b331fabc1de0343226f298868445ad4bba38836fc6d"
   end
 
   depends_on "pkgconf" => :build
