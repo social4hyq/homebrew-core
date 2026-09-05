@@ -1,8 +1,8 @@
 class Texmath < Formula
   desc "Haskell library for converting LaTeX math to MathML"
   homepage "https://johnmacfarlane.net/texmath.html"
-  url "https://hackage.haskell.org/package/texmath-0.13.2.1/texmath-0.13.2.1.tar.gz"
-  sha256 "f22ada32a18d1b4a50b9636073eabacd2ec6c3c2e98aad7a5413b20f4e9ba26f"
+  url "https://hackage.haskell.org/package/texmath-0.13.2.2/texmath-0.13.2.2.tar.gz"
+  sha256 "27221986436d75b8464adf5f632ce55fa782de26a32d8362f509506531fa8e11"
   license "GPL-2.0-or-later"
   head "https://github.com/jgm/texmath.git", branch: "master"
 
