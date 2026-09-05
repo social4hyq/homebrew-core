@@ -1,8 +1,32 @@
 diff --git a/Source/WTF/wtf/Threading.h b/Source/WTF/wtf/Threading.h
-index 319a94f..48b55cf 100644
 --- a/Source/WTF/wtf/Threading.h
 +++ b/Source/WTF/wtf/Threading.h
-@@ -407,6 +407,12 @@ protected:
+@@ -88,6 +88,24 @@
+ 
+ WTF_EXPORT_PRIVATE bool processIsShuttingDown();
+ 
++#if defined(__OHOS__)
++// Reported by the embedding application (Bun's execve(2) interposer) so
++// Thread::suspend()'s signal-based handshake can wait out a real execve(2)
++// currently in flight on this process before starting it. The two can
++// otherwise collide on HongMeng's kernel: the kernel's own thread-group
++// bookkeeping during execve(2) (the same window Bun's execve wrapper already
++// retries a concurrent pthread_create's EAGAIN for) overlaps with this
++// handshake's signal delivery / register capture, observed (real-device
++// faultlog) to hand the collector a torn snapshot of a thread that was never
++// actually suspended, later crashing with a null-pointer dereference from
++// JIT-generated code. Backed by a count, not a flag: more than one thread can
++// have an execve(2) in flight at once (each call is independently
++// Begin-then-End, matching Bun's own threads_in_execve counter), so the
++// window is only closed once every in-flight execve has ended.
++WTF_EXPORT_PRIVATE void reportExecveBegin();
++WTF_EXPORT_PRIVATE void reportExecveEnd();
++#endif
++
+ class ThreadSuspendLocker {
+     WTF_MAKE_NONCOPYABLE(ThreadSuspendLocker);
+ public:
+@@ -420,7 +438,13 @@
  #endif
      PlatformRegisters* m_platformRegisters { nullptr };
      unsigned m_suspendCount { 0 };
@@ -11,15 +35,15 @@ index 319a94f..48b55cf 100644
 +    // this flag is the actual state. See signalHandlerSuspendResume in
 +    // ThreadingPOSIX.cpp.
 +    std::atomic<bool> m_suspendRequested { false };
-+#endif
  #endif
++#endif
  
  #if OS(WINDOWS)
+     SpecificStorage m_specificStorage;
 diff --git a/Source/WTF/wtf/posix/ThreadingPOSIX.cpp b/Source/WTF/wtf/posix/ThreadingPOSIX.cpp
-index 9a4cd5b..b00d6df 100644
 --- a/Source/WTF/wtf/posix/ThreadingPOSIX.cpp
 +++ b/Source/WTF/wtf/posix/ThreadingPOSIX.cpp
-@@ -103,6 +103,27 @@ public:
+@@ -118,6 +118,27 @@
          while (sem_wait(&m_platformSemaphore) == -1 && errno == EINTR) { }
      }
  
@@ -47,8 +71,32 @@ index 9a4cd5b..b00d6df 100644
      void post()
      {
          sem_post(&m_platformSemaphore);
-@@ -120,6 +141,15 @@ void Thread::signalHandlerSuspendResume(int, siginfo_t*, void* ucontext)
+@@ -130,6 +151,24 @@
+ 
+ static std::atomic<Thread*> targetThread { nullptr };
+ 
++#if defined(__OHOS__)
++// See reportExecveBegin/reportExecveEnd in Threading.h for the full rationale:
++// Bun's own execve(2) interposer (c-bindings.cpp) reports its in-flight window
++// here so Thread::suspend() can wait it out before starting the signal
++// handshake below.
++static std::atomic<int> g_execveInFlightCount { 0 };
++
++void reportExecveBegin()
++{
++    g_execveInFlightCount.fetch_add(1, std::memory_order_seq_cst);
++}
++
++void reportExecveEnd()
++{
++    g_execveInFlightCount.fetch_sub(1, std::memory_order_seq_cst);
++}
++#endif
++
+ void Thread::signalHandlerSuspendResume(int, siginfo_t*, void* ucontext)
+ {
      // Touching a global variable atomic types from signal handlers is allowed.
+@@ -136,5 +175,14 @@
      Thread* thread = targetThread.load();
  
 +#if defined(__OHOS__)
@@ -63,7 +111,7 @@ index 9a4cd5b..b00d6df 100644
      if (thread->m_suspendCount) {
          // This is signal handler invocation that is intended to be used to resume sigsuspend.
          // So this handler invocation itself should not process.
-@@ -129,6 +159,7 @@ void Thread::signalHandlerSuspendResume(int, siginfo_t*, void* ucontext)
+@@ -144,6 +192,7 @@
          // http://pubs.opengroup.org/onlinepubs/009695399/functions/sigsuspend.html
          return;
      }
@@ -71,7 +119,7 @@ index 9a4cd5b..b00d6df 100644
  
      void* approximateStackPointer = currentStackPointer();
      if (!thread->m_stack.contains(approximateStackPointer)) {
-@@ -160,12 +191,29 @@ void Thread::signalHandlerSuspendResume(int, siginfo_t*, void* ucontext)
+@@ -175,6 +224,22 @@
      // http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_11
      globalSemaphoreForSuspendResume->post();
  
@@ -94,6 +142,7 @@ index 9a4cd5b..b00d6df 100644
      // Reaching here, sigThreadSuspendResume is blocked in this handler (this is configured by sigaction's sa_mask).
      // So before calling sigsuspend, sigThreadSuspendResume to this thread is deferred. This ensures that the handler is not executed recursively.
      sigset_t blockedSignalSet;
+@@ -181,6 +246,7 @@
      sigfillset(&blockedSignalSet);
      sigdelset(&blockedSignalSet, g_wtfConfig.sigThreadSuspendResume);
      sigsuspend(&blockedSignalSet);
@@ -101,9 +150,21 @@ index 9a4cd5b..b00d6df 100644
  
      thread->m_platformRegisters = nullptr;
  
-@@ -503,18 +551,38 @@ auto Thread::suspend(const ThreadSuspendLocker&) -> Expected<void, PlatformSuspe
+@@ -606,7 +672,21 @@
+     return { };
  #else
      if (!m_suspendCount) {
++#if defined(__OHOS__)
++        // Wait out any execve(2) currently in flight on this process before
++        // starting the signal handshake below -- see reportExecveBegin/End in
++        // Threading.h for why the two can otherwise collide. Bounded: an
++        // execve that never completes (e.g. exec'ing a FIFO that blocks) must
++        // not deadlock the collector forever, so give up and proceed as
++        // usual after ~100ms -- the same risk already exists without this
++        // guard, this only narrows the window rather than claiming to close it.
++        for (int attempt = 0; g_execveInFlightCount.load(std::memory_order_seq_cst) > 0 && attempt < 100; attempt++)
++            usleep(1000);
++#endif
          targetThread.store(this);
 +#if defined(__OHOS__)
 +        m_suspendRequested.store(true, std::memory_order_release);
@@ -111,6 +172,7 @@ index 9a4cd5b..b00d6df 100644
  
          while (true) {
              // We must use pthread_kill to avoid queue-overflow problem with real-time signals.
+@@ -613,7 +693,19 @@
              int result = pthread_kill(m_handle, g_wtfConfig.sigThreadSuspendResume);
 -            if (result)
 +            if (result) {
@@ -125,23 +187,13 @@ index 9a4cd5b..b00d6df 100644
 +            // freeze, resend instead of parking forever while holding global
 +            // locks (e.g. the libpas heap lock).
 +            globalSemaphoreForSuspendResume->waitFor(0.1);
-+            if (m_platformRegisters)
-+                break;
-+            // Because of an alternative signal stack we failed to suspend this
-+            // thread, or a wake-up was lost. Retry suspension after yielding.
-+            Thread::yield();
 +#else
              globalSemaphoreForSuspendResume->wait();
++#endif
              if (m_platformRegisters)
                  break;
              // Because of an alternative signal stack, we failed to suspend this thread.
-             // Retry suspension again after yielding.
-             Thread::yield();
-+#endif
-         }
-     }
-     ++m_suspendCount;
-@@ -537,6 +605,13 @@ void Thread::resume(const ThreadSuspendLocker&)
+@@ -641,6 +733,13 @@
          // In this implementaiton, we take (3). m_suspendCount is used to distinguish it.
          // Note that we must use pthread_kill to avoid queue-overflow problem with real-time signals.
          targetThread.store(this);
