@@ -7,7 +7,7 @@ class CqlProxy < Formula
   head "https://github.com/datastax/cql-proxy.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c94a541fdf2ae641c28db5e9436e1873524559e8ec410d877f28c845310ffd3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f32cd18129a87e504602b6a5928ea67298c33601ed047138b1800b0ae0b6a0e"
   end
 
   depends_on "go" => :build
