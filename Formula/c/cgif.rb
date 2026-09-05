@@ -7,7 +7,7 @@ class Cgif < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6aa03acb1fbe78a5fddc37abd1034af44d466490d7a36281e3d17f41b055e895"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "36a09a0f5711f07901f83709c270efda210e5a146db009855a50bfdf6239e0c1"
   end
 
   depends_on "meson" => :build
