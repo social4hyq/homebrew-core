@@ -1,13 +1,13 @@
 class Ubi < Formula
   desc "Universal Binary Installer"
   homepage "https://github.com/houseabsolute/ubi"
-  url "https://github.com/houseabsolute/ubi/archive/refs/tags/v0.10.0.tar.gz"
-  sha256 "4d84b02d8f7f764209085674b95964702cbaa90bde731bc95fae43097f4df0e1"
+  url "https://github.com/houseabsolute/ubi/archive/refs/tags/v0.12.0.tar.gz"
+  sha256 "54cf1c32adfdf4cb51ca0839aeac4538705edcc7aec384bdcd70d5acd45ce7b6"
   license any_of: ["Apache-2.0", "MIT"]
   head "https://github.com/houseabsolute/ubi.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bab55ea9ef09377f89f3739bd950489473f583ae35bffca158b80ff1ad1c08f9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b03e5dce631347527acd4b331fabc1de0343226f298868445ad4bba38836fc6d"
   end
 
   depends_on "pkgconf" => :build
