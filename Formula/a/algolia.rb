@@ -7,7 +7,7 @@ class Algolia < Formula
   head "https://github.com/algolia/cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c2c708337f3a44cf7693138f61620bc05ba54e18260aed4c03bc8dba3d12e56"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9d9522adab55cf546cadc1f5edea2cd57298740a23486107d3d4058144f6fbc"
   end
 
   depends_on "go" => :build
