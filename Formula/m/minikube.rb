@@ -8,7 +8,7 @@ class Minikube < Formula
   head "https://github.com/kubernetes/minikube.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "69e0855d505f4434af4d6f4f05182759505949f6c027bb17b67317b7f422e4f5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4af141ee204d27d9fbb1c8fd4444eb670095e6c0a09274a9ef4c9a327a392251"
   end
 
   depends_on "go" => :build
