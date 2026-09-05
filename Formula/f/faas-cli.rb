@@ -1,8 +1,8 @@
 class FaasCli < Formula
   desc "CLI for templating and/or deploying FaaS functions"
   homepage "https://www.openfaas.com/"
-  url "https://github.com/openfaas/faas-cli/archive/refs/tags/0.18.12.tar.gz"
-  sha256 "8f2a3b8e4ab084f417e46c3b92a3a44affc086e948a52cf7ba3d84957c3ffda0"
+  url "https://github.com/openfaas/faas-cli/archive/refs/tags/0.18.13.tar.gz"
+  sha256 "ebb4958f5232ea3db870efcf953048bcd7be7e0231e3d1cdef38330e00e27d4c"
   license "MIT"
   head "https://github.com/openfaas/faas-cli.git", branch: "master"
 
@@ -12,7 +12,7 @@ class FaasCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "96846b9afccc56a3076fd7e03a9b303790f64d469145ee675524c86e6e878f32"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf78e53ed58125d061fa21cbcec80b78412e4ffc43d95aab7047f343b3f5aade"
   end
 
   depends_on "go" => :build
