@@ -3,13 +3,13 @@ class PulpCli < Formula
 
   desc "Command-line interface for Pulp 3"
   homepage "https://github.com/pulp/pulp-cli"
-  url "https://files.pythonhosted.org/packages/03/f3/ef7e996071a2ee2f34f9a954d63b2dc9f6ed0fe78cc70d84c891d77cb3cc/pulp_cli-0.40.5.tar.gz"
-  sha256 "bda5db7456dfb3a75df57b8eed1e191cc6fd9a9b172f3bff0dfcfc8dca150e4f"
+  url "https://files.pythonhosted.org/packages/af/e5/162985a5cb94d99fa5a37f57e944d4eaaad7c71f19293002de52043df577/pulp_cli-0.40.6.tar.gz"
+  sha256 "e31d187658829da7a6d308aff7862f50678da068c84a7cb454c58e381215dbf2"
   license "GPL-2.0-or-later"
   head "https://github.com/pulp/pulp-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "567ac73b5bd6de6554e063fa3015c6b20748721667ba7ceecaa88ef20c26f6ee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb90704387814ce850951d527c6a64a511ee622cbf65952fefa55628d942293f"
   end
 
   depends_on "certifi" => :no_linkage
@@ -25,8 +25,8 @@ class PulpCli < Formula
   end
 
   resource "click" do
-    url "https://files.pythonhosted.org/packages/76/d4/81420972a676e8ffea40450d8c8c92943e7218a78fe9b64359836cc9876b/click-8.4.2.tar.gz"
-    sha256 "9a6cea6e60b17ebe0a44c5cc636d94f09bd66142c1cd7d8b4cd731c4917a15f6"
+    url "https://files.pythonhosted.org/packages/c7/0e/7fa0ef50764b67090eca4114772a2abf8b6148198475e54c660b97caeee6/click-8.5.0.tar.gz"
+    sha256 "ba0d2089de75ea0310e2dde03160e6ca10009947fb95a182f9b54021bb272e34"
   end
 
   resource "idna" do
@@ -45,8 +45,8 @@ class PulpCli < Formula
   end
 
   resource "pulp-glue" do
-    url "https://files.pythonhosted.org/packages/88/c7/0387e1e1eeddb2f9b762f43a97052845d24bdd1ae86a84c13eeb2dbba6af/pulp_glue-0.40.5.tar.gz"
-    sha256 "de59141cb90e0e72342aa44eb938f5dbd587ed6471665edc231f509563c4e35c"
+    url "https://files.pythonhosted.org/packages/59/38/7b09b0c64483b55822a3445c34011f9c0d4399529deaddb5dfc459e4b4e5/pulp_glue-0.40.6.tar.gz"
+    sha256 "816a49743af9fc811e2225a7100a5691469e047eb12c6a3b620f8d15f2121da7"
   end
 
   resource "pyyaml" do
