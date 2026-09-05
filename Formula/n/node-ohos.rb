@@ -4,7 +4,7 @@ class NodeOhos < Formula
   url "https://nodejs.org/dist/v26.7.0/node-v26.7.0.tar.xz"
   sha256 "e6b182cbeeab032d1082ca4ac4fe15e3a57de691d3bde78ecf8a761fd56ee356"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -21,6 +21,10 @@ class NodeOhos < Formula
 
   # Toolchain rationale: see the long comment in install().
   depends_on "llvm@21" => :build
+  # llvm@21 no longer bundles lld (split into its own formula) — needed here
+  # so clang's driver finds the OHOS-codesigned ld.lld, not an unsigned
+  # fallback; without a signed ELF, the built node binary can't execute.
+  depends_on "lld@21" => :build
   depends_on "ohos-sdk" => :build
   depends_on "python@3.14" => :build
 
@@ -51,6 +55,9 @@ class NodeOhos < Formula
     # real name `llvm-ar`, not an `ar` alias).
     ENV["AR"] = (llvm.opt_bin/"llvm-ar").to_s
     ENV.prepend_path "LD_LIBRARY_PATH", llvm.opt_lib
+    # clang's driver falls back to PATH to find ld.lld since lld@21 isn't
+    # co-located in llvm@21's own bin/ (separate formula now).
+    ENV.prepend_path "PATH", formula_opt_bin("lld@21")
 
     # make sure subprocesses spawned by make are using our Python 3
     ENV["PYTHON"] = which("python3.14")

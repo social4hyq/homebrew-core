@@ -5,6 +5,7 @@ class BunWebkit < Formula
       revision: "2e2aa2290fac856d6f451ceacb58f7f5b44dd057"
   version "2e2aa2290f"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
+  revision 1
   # Fully rewritten from upstream: builds only JSC/WTF/bmalloc static archives, pinned to bun's WEBKIT_VERSION.
 
   # Pinned to bun's WEBKIT_VERSION; OHOS adaptation handled bun-side (webkit.ts.patch).
@@ -24,6 +25,10 @@ class BunWebkit < Formula
   depends_on "icu4c@78" => :build
   depends_on "libxml2" => :build
   depends_on "llvm@21"  => :build
+  # llvm@21 no longer bundles lld (split into its own formula) — needed so
+  # the -Wl,--code-sign linker flag below resolves against the
+  # OHOS-codesigned ld.lld, not an unsigned fallback.
+  depends_on "lld@21" => :build
   depends_on "ninja" => :build
   depends_on "ohos-sdk" => :build
   depends_on "perl" => :build
@@ -46,6 +51,9 @@ class BunWebkit < Formula
     # llvm@21's lld runtime depends on libxml2/zlib; brew superenv may strip LD_LIBRARY_PATH, inject explicitly.
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("libxml2").to_s
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib").to_s
+    # ld.lld isn't co-located with clang any more (separate lld@21 formula) —
+    # put it on PATH so clang's driver finds *this* (codesign-patched) one.
+    ENV.prepend_path "PATH", formula_opt_bin("lld@21")
 
     clang    = formula_opt_bin("llvm@21")/"clang"
     clangxx  = formula_opt_bin("llvm@21")/"clang++"

@@ -6,6 +6,7 @@ class Bun < Formula
   url "https://github.com/social4hyq/ohos-bun.git", revision: "3b12a48ffc573ac048059b8b472b6f72b57fdea4", branch: "ohos-aarch64"
   version "1.4.2"
   license "MIT"
+  revision 1
   # head tracks the same pre-patched fork branch as url.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "ohos-aarch64"
 
@@ -26,6 +27,9 @@ class Bun < Formula
   depends_on "gperf" => :build
   depends_on "icu4c@78" => :build
   depends_on "llvm@21" => :build
+  # llvm@21 no longer bundles lld or generates the cc/c++ codesign shims
+  # (split into its own formula) — needed for both, see install() below.
+  depends_on "lld@21" => :build
   depends_on "ninja" => :build
   depends_on "ohos-sdk" => :build
   # only build-time rust-nightly cargo links libssl/libcrypto
