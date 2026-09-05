@@ -13,7 +13,7 @@ class PortablePcre2 < PortableFormula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8b2c21252ddb1ca96d10c69b38e9e2715f79a3a40c192a679bd4f855667fcb8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "90405ed2a31be18788422486c5261479f5d17b6c5ff36ffda450b2193b879e20"
   end
 
   head do
