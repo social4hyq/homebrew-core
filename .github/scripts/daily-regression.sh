@@ -90,6 +90,32 @@ declare -A RESULT=()
 for f in "${FORMULAE[@]}"; do
   echo "::group::$f"
   if cexec "$BREW_ENV brew install --formula --include-test $TAP/$f" > install.log 2>&1; then
+    install_ok=1
+  else
+    install_ok=0
+    # This fork's `brew install` exits nonzero when a keg-only formula's
+    # bin/ overlaps an already-linked formula's names (llvm@21/lld@21 vs
+    # ohos-sdk's bundled clang/ld.lld/...) — the keg itself pours fine,
+    # only the optional top-level symlink step fails (same root cause
+    # verify-poured.sh works around, see PR #500/#505 investigation:
+    # issue #501). Don't trust the raw exit code here either; check
+    # whether the formula actually landed in the Cellar instead.
+    if cexec "$BREW_ENV brew list --formula --versions $TAP/$f" > /dev/null 2>&1; then
+      echo "::warning::$f: brew install exited nonzero but the keg is installed (known keg-only/link-conflict false failure, see install.log) — treating as installed"
+      install_ok=1
+    fi
+  fi
+
+  if [ "$install_ok" -eq 1 ]; then
+    # Backfill test dependencies before testing: if $f was already pulled
+    # in earlier this run as a plain (non-test) dependency of a formula
+    # tested before it alphabetically (e.g. lld@21/bun-webkit depending on
+    # llvm@21), `brew install --include-test` above just sees "already
+    # installed" and skips — it doesn't retroactively add test deps to an
+    # existing install. `brew test` then hard-errors with "missing test
+    # dependencies" instead of running. Idempotent no-op when deps are
+    # already present.
+    cexec "$BREW_ENV brew install --only-dependencies --include-test $TAP/$f" > /dev/null 2>&1 || true
     if timeout "$TEST_TIMEOUT" docker exec "$CONTAINER" bash -lc "$BREW_ENV brew test $TAP/$f" > test.log 2>&1; then
       RESULT["$f"]="pass"
     elif grep -qi "does not define tests\|defines no test" test.log; then
