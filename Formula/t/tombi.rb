@@ -12,7 +12,7 @@ class Tombi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aebbeb9381c936fc2a6b79f9717b33cf10e0f88150645ad8b9213b18f00498d1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5f1d46c6f67cffbbfa403e660ae19c6d571f4e1dcbaafbb7ad5ef4b979636ad"
   end
 
   depends_on "rust" => :build
