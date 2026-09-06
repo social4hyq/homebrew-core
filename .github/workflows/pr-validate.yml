@@ -18,6 +18,14 @@ name: pr-validate
 # validates every human commit's first line against this tap's convention
 # (new formula / version bump / revision bump / fix — see
 # lint-commit-messages.sh), skipping CI's own bottle write-back commits.
+#
+# gate-report (adapted from Harmonybrew/homebrew-core's HarmonybrewBot gate-
+# check report, see atomgit.com/Harmonybrew/homebrew-core/pull/18194): posts
+# one upfront PR comment with commit count / formula count / commit-message
+# format, so contributors get fast readable feedback instead of digging into
+# job summaries. Comment-only, never gates ci-passed on its own — but build
+# itself now waits on lint-commits (previously ran in parallel), so a bad
+# commit message skips the expensive build instead of burning CI on it.
 
 on:
   pull_request:
@@ -102,6 +110,32 @@ jobs:
       - name: readall + audit
         run: .github/scripts/light-check.sh
 
+  gate-report:
+    # Comment-only reflection of detect + lint-commits' output; runs
+    # regardless of lint-commits passing (always()) so the report itself
+    # shows up even on a failing PR.
+    needs: [detect, lint-commits]
+    if: always() && needs.detect.outputs.changed != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Post gate-check report comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          CHANGED_JSON: ${{ needs.detect.outputs.changed }}
+          LINT_RESULT: ${{ needs.lint-commits.result }}
+        run: .github/scripts/gate-report-comment.sh
+
   build:
     # bottle-build declares contents:write at its top level; a called
     # workflow may not exceed the caller's permissions, so this must grant
@@ -111,8 +145,8 @@ jobs:
     # upload=true pushes the bottle commit back to the PR branch.
     permissions:
       contents: write
-    needs: detect
-    if: needs.detect.outputs.build != '[]'
+    needs: [detect, lint-commits]
+    if: needs.detect.outputs.build != '[]' && needs.lint-commits.result == 'success'
     strategy:
       fail-fast: false
       max-parallel: 2
