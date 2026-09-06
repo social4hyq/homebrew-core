@@ -11,7 +11,7 @@ class Bcal < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "83fcb5b3caee649ec3bd5dfcb23e8edb25fab6e62b51cd76f1ae6d7a70714271"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1bdc84431beaa8cb78af5d8186dc995ad5583b53f6cf5717d5422606283a9ab2"
   end
 
   on_linux do
