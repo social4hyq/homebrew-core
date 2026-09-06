@@ -20,6 +20,7 @@ class OpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "7a4ad68af6577c5448a8395b0b95e24ceb623faf"
   version "0.0.0-beta-19157"
   license "MIT"
+  revision 1
   # Baked-in channel was empty (see OPENCODE_CHANNEL below) — TUI crashed on
   # startup ("Invalid storage segment" segment-validates the channel), so the
   # fix changes the installed binary.
