@@ -6,6 +6,7 @@ class Bun < Formula
   url "https://github.com/social4hyq/ohos-bun.git", revision: "3b12a48ffc573ac048059b8b472b6f72b57fdea4", branch: "ohos-aarch64"
   version "1.4.2"
   license "MIT"
+  revision 1
   # head tracks the same pre-patched fork branch as url.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "ohos-aarch64"
 
@@ -15,8 +16,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a64a50bd080a4dfd2035c14ad965e01fd3fd0302ab9034909862c13e3ca5d37e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "719a226f607d64242ba95cf6fea8b9ddbb1c8cfd80d3141badfb124145e665f6"
   end
 
   # icu4c@78 resolves to harmonybrew/core (this tap's __h fork was dropped in __n1 migration).
@@ -25,6 +26,9 @@ class Bun < Formula
   depends_on "cmake" => :build
   depends_on "gperf" => :build
   depends_on "icu4c@78" => :build
+  # llvm@21 no longer bundles lld or generates the cc/c++ codesign shims
+  # (split into its own formula) — needed for both, see install() below.
+  depends_on "lld@21" => :build
   depends_on "llvm@21" => :build
   depends_on "ninja" => :build
   depends_on "ohos-sdk" => :build
@@ -33,6 +37,7 @@ class Bun < Formula
   depends_on "perl" => :build
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
+  depends_on "zlib-ng-compat" => :build
   depends_on "node"
   # No runtime ohos-compat-shim dependency since r31: vendored copy statically linked
   # into the executable AND every `bun build --compile` output. ohos-sdk is build-time
@@ -147,9 +152,14 @@ class Bun < Formula
       end
     end
 
-    # lld from llvm@21 needs libxml2/zlib; rust cargo needs libssl/libcrypto.
+    # lld from llvm@21 needs libxml2/zlib-ng-compat; cargo itself (the vendored
+    # rust-nightly binary invoked below) also dynamically needs libz.so to run
+    # at all -- zlib-ng-compat provides that (same soname/symbols as zlib).
+    # Plain "zlib" was never a declared dependency here; it only ever worked
+    # by accident via llvm@21 pulling it in transitively, and broke outright
+    # once llvm@21/lld@21 switched to zlib-ng-compat (upstream's on_linux dep).
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("libxml2").to_s
-    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib").to_s
+    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat").to_s
     # openssl@3 provides libssl/libcrypto for rust cargo.
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3").to_s
     # llvm@21 only ships llvm-strip; the bun build script needs strip.
@@ -159,8 +169,14 @@ class Bun < Formula
     ohos_cross = buildpath/"build/ohos-cross-libs"
     (ohos_cross/"libcxx/include").mkpath
     (ohos_cross/"libcxxabi").mkpath
-    ln_sf llvm.opt_include/"aarch64-linux-ohos/c++/v1", ohos_cross/"libcxx/include/v1"
-    ln_sf llvm.opt_include/"aarch64-linux-ohos/c++/v1", ohos_cross/"libcxxabi/include"
+    # The flat host include dir, not include/aarch64-linux-ohos/c++/v1: see
+    # the identical note in bun-webkit.rb's install() -- the target-triple
+    # copy has its __has_include_next-chaining C-library wrapper headers
+    # stripped, so a build that points -nostdinc++/-I straight at it alone
+    # (as flags.ts does here) can't chain to the real musl headers. Host
+    # and target headers are otherwise byte-identical.
+    ln_sf llvm.opt_include/"c++/v1", ohos_cross/"libcxx/include/v1"
+    ln_sf llvm.opt_include/"c++/v1", ohos_cross/"libcxxabi/include"
     # Each dir seeded with just its own archive; flags.ts links only -lc++ -lc++abi -lunwind.
     {
       "libcxx"    => "libc++.a",
