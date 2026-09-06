@@ -1,8 +1,8 @@
 class Pulsarctl < Formula
   desc "CLI for Apache Pulsar written in Go"
   homepage "https://streamnative.io/"
-  url "https://github.com/streamnative/pulsarctl/archive/refs/tags/v4.2.1.13.tar.gz"
-  sha256 "34d2151785d0c958a8feab0efc8bb2d22f6de63ed07acc6d2651b2f87ef487c6"
+  url "https://github.com/streamnative/pulsarctl/archive/refs/tags/v4.2.1.14.tar.gz"
+  sha256 "83d61f2f4da1b57aa938eaed0f2b47bc7fef7395b6d734ac6f72b55a5b885029"
   license "Apache-2.0"
   head "https://github.com/streamnative/pulsarctl.git", branch: "master"
 
@@ -19,7 +19,7 @@ class Pulsarctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "66887cc3667b4cdaa7014b38556bf87b74f8ea8bdbda0a2a9fdcbe31aebda4aa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ae9e89c542fc5f0496a0c3fb64581e2264a673f946a51a0ada47d5447e79b33"
   end
 
   depends_on "go" => :build
