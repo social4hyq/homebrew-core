@@ -1,14 +1,14 @@
 class Taglib < Formula
   desc "Audio metadata library"
   homepage "https://taglib.org/"
-  url "https://taglib.github.io/releases/taglib-2.3.1.tar.gz"
-  sha256 "a19d90e6fd41d09a0281ec0fe762d51491d7a6ccffc923c4f7868c5e647ca230"
+  url "https://taglib.github.io/releases/taglib-2.3.2.tar.gz"
+  sha256 "3ca2d8afaa7f1cf7f6ed10e511ebc368bfacd6dcaa3dbfa690b89e502e8963dc"
   license any_of: ["LGPL-2.1-only", "MPL-1.1"]
   compatibility_version 1
   head "https://github.com/taglib/taglib.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4de6cc878363607930ef1decce247bd4132666e2cc6cece483397c213ff0dda"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ddc4fc06775eee26597c372b540efee03029752a08cd3da2e2546038636e1d0"
   end
 
   depends_on "cmake" => :build
