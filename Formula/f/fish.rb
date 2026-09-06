@@ -1,8 +1,8 @@
 class Fish < Formula
   desc "User-friendly command-line shell for UNIX-like operating systems"
   homepage "https://fishshell.com"
-  url "https://github.com/fish-shell/fish-shell/releases/download/4.9.1/fish-4.9.1.tar.xz"
-  sha256 "93400374bfdb73215cae43bdb09c724f1653f439a85dfc1fe2866639046c95f6"
+  url "https://github.com/fish-shell/fish-shell/releases/download/4.9.2/fish-4.9.2.tar.xz"
+  sha256 "26b95769ce17a8962b220ba3f20771117dbfe9cb2c3ba6f4ed139e0cbfdf02b1"
   license "GPL-2.0-only"
   compatibility_version 1
   head "https://github.com/fish-shell/fish-shell.git", branch: "master"
@@ -15,7 +15,7 @@ class Fish < Formula
   pour_bottle? only_if: :default_prefix
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d501c7d95a07c528855aa253dc53eea970fd23f230c0a72385bc5ed51cd2c9fa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29ffd6fcf132c5825afd1e7da80ffe4a9441a193b61db16fe078e98bef169b1b"
   end
 
   depends_on "cmake" => :build
