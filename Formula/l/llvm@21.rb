@@ -5,17 +5,12 @@ class LlvmAT21 < Formula
   sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
   # The LLVM Project is under the Apache License v2.0 with LLVM Exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
-  revision 7
+  revision 8
   compatibility_version 1
 
   livecheck do
     url :stable
     regex(/^llvmorg[._-]v?(21(?:\.\d+)+)$/i)
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm@21-v21.1.8-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b299b178a5cd1f469b9cfa47e59be265fdafb8f5a6b209dfbe5696d29d94e467"
   end
 
   keg_only :versioned_formula
@@ -521,21 +516,12 @@ class LlvmAT21 < Formula
       LLD is now provided in a separate formula:
         brew install lld@21
 
-      OHOS-specific:
-        Default sysroot:            #{HOMEBREW_PREFIX}/opt/ohos-sdk/native/sysroot
-        Host triple:                #{HOST_TRIPLE}
-        Target-triple runtime libs: #{TARGET_TRIPLE} (compiler-rt/libc++/libunwind
-          statically linked into anything built with `--target=#{TARGET_TRIPLE}`)
-        libc++ ABI namespace is __n1 (OHOS's mandated third-party namespace) on
-          both host and target-triple builds — link against a matching one.
-        `-shared` is not yet supported (needs crtbeginS.o/crtendS.o, which
-          nothing on this platform currently provides) — link executables,
-          not shared libraries, with this compiler.
+      This LLVM build is from upstream source code without deep
+      adaptation for OpenHarmony. Its stability is not guaranteed.
+      For production use, please use ohos-sdk first.
 
-      Example:
-        #{opt_bin}/clang++ -stdlib=libc++ --target=#{TARGET_TRIPLE} \\
-          --sysroot=#{HOMEBREW_PREFIX}/opt/ohos-sdk/native/sysroot \\
-          hello.cpp -o hello
+      To prevent conflicts with system runtime libraries, this LLVM
+      statically links all runtime libraries.
     EOS
 
     on_macos do
@@ -581,15 +567,13 @@ class LlvmAT21 < Formula
     # OHOS: confirms LLVM_HOST_TRIPLE was actually honored (see install()).
     assert_match HOST_TRIPLE, shell_output("#{bin}/clang --version") if OS.linux?
 
-    # OHOS: OHOS::computeSysRoot() only consults Driver::SysRoot (set from
-    # DEFAULT_SYSROOT at driver construction) or falls back to
-    # <bin>/../../sysroot, which doesn't exist in this keg. Pass it
-    # explicitly everywhere below rather than relying on the compiled-in
-    # default. (This alone isn't sufficient for libc++'s C-header wrappers
-    # to see real musl declarations like FP_NORMAL/isdigit_l/wint_t — that
-    # required a separate fix in build_ohos_target_runtimes/install() to
-    # the __has_include_next chain; see the comment there.)
-    sysroot = "#{formula_opt_prefix("ohos-sdk")}/native/sysroot" if OS.linux?
+    # OHOS: DEFAULT_SYSROOT is compiled into the driver (see install()), so
+    # Driver::SysRoot is populated at construction and OHOS::computeSysRoot()
+    # uses it automatically — no --sysroot= needed on any invocation below,
+    # host or --target=. (This alone isn't sufficient for libc++'s C-header
+    # wrappers to see real musl declarations like FP_NORMAL/isdigit_l/wint_t
+    # — that required a separate fix in build_ohos_target_runtimes/install()
+    # to the __has_include_next chain; see the comment there.)
 
     (testpath/"test.c").write <<~C
       #include <stdio.h>
@@ -612,19 +596,15 @@ class LlvmAT21 < Formula
       }
     CPP
 
-    # See the OHOS sysroot comment above: pass it explicitly, don't rely on
-    # the compiled-in DEFAULT_SYSROOT alone.
-    sysroot_args = OS.linux? ? ["--sysroot=#{sysroot}"] : []
-
-    system bin/"clang-cpp", "-v", *sysroot_args, "test.c"
-    system bin/"clang-cpp", "-v", *sysroot_args, "test.cpp"
+    system bin/"clang-cpp", "-v", "test.c"
+    system bin/"clang-cpp", "-v", "test.cpp"
 
     # Testing default toolchain and SDK location.
-    system bin/"clang++", "-v", *sysroot_args,
+    system bin/"clang++", "-v",
            "-std=c++11", "test.cpp", "-o", "test++"
     assert_includes MachO::Tools.dylibs("test++"), "/usr/lib/libc++.1.dylib" if OS.mac?
     assert_equal "Hello World!", shell_output("./test++").chomp
-    system bin/"clang", "-v", *sysroot_args, "test.c", "-o", "test"
+    system bin/"clang", "-v", "test.c", "-o", "test"
     assert_equal "Hello World!", shell_output("./test").chomp
 
     # These tests should ignore the usual SDK includes
@@ -689,7 +669,7 @@ class LlvmAT21 < Formula
       # link against installed libc++
       # related to https://github.com/Homebrew/legacy-homebrew/issues/47149
       cxx_libdir = OS.mac? ? opt_lib/"c++" : opt_lib
-      system bin/"clang++", "-v", *sysroot_args,
+      system bin/"clang++", "-v",
              "-isystem", "#{opt_include}/c++/v1",
              "-std=c++11", "-stdlib=libc++", "test.cpp", "-o", "testlibc++",
              "-rtlib=compiler-rt", "-L#{cxx_libdir}", "-Wl,-rpath,#{cxx_libdir}"
@@ -724,7 +704,7 @@ class LlvmAT21 < Formula
       # search paths or handle all of the libraries needed by `libc++` when
       # linking statically.
 
-      system bin/"clang++", "-v", *sysroot_args, "-o", "test_pie_runtimes",
+      system bin/"clang++", "-v", "-o", "test_pie_runtimes",
                    "-pie", "-fPIC", "test.cpp", "-L#{opt_lib}",
                    "-stdlib=libc++", "-rtlib=compiler-rt",
                    "-static-libstdc++", "-lpthread", "-ldl"
@@ -736,15 +716,37 @@ class LlvmAT21 < Formula
         refute_match(/libunwind/, lib)
       end
 
-      # Upstream also builds a -shared C++ plugin here. Skipped on OHOS:
-      # `-shared` needs crtbeginS.o/crtendS.o, which nothing on this platform
-      # provides — ohos-sdk's sysroot doesn't ship them, and compiler-rt's
-      # crt component (which supplies them on bare-metal-style targets)
-      # doesn't build here either (COMPILER_RT_BUILD_CRT is gated behind
-      # COMPILER_RT_HAS_CRT, which evaluates false for this target and
-      # can't be forced via a normal -D). Known gap, not exercised by
-      # anything this formula itself needs (self-hosting only needs
-      # executables); revisit if a downstream consumer needs `-shared`.
+      # Upstream also builds a -shared C++ plugin here, unmodified. `-shared`
+      # works fine on OHOS (musl's crti.o/crtn.o plus this formula's own
+      # clang_rt.crtbegin.o/crtend.o are enough — no separate crtbeginS.o/
+      # crtendS.o needed, unlike glibc).
+      (testpath/"test_plugin.cpp").write <<~CPP
+        #include <iostream>
+        __attribute__((visibility("default")))
+        extern "C" void run_plugin() {
+          std::cout << "Hello Plugin World!" << std::endl;
+        }
+      CPP
+      (testpath/"test_plugin_main.c").write <<~C
+        extern void run_plugin();
+        int main() {
+          run_plugin();
+        }
+      C
+      system bin/"clang++", "-v", "-o", "test_plugin.so",
+             "-shared", "-fPIC", "test_plugin.cpp", "-L#{opt_lib}",
+             "-stdlib=libc++", "-rtlib=compiler-rt",
+             "-static-libstdc++", "-lpthread", "-ldl"
+      system bin/"clang", "-v",
+             "test_plugin_main.c", "-o", "test_plugin_libc++",
+             "test_plugin.so", "-Wl,-rpath=#{testpath}", "-rtlib=compiler-rt"
+      assert_equal "Hello Plugin World!", shell_output("./test_plugin_libc++").chomp
+      (testpath/"test_plugin.so").dynamically_linked_libraries.each do |lib|
+        refute_match(/lib(std)?c\+\+/, lib)
+        refute_match(/libgcc/, lib)
+        refute_match(/libatomic/, lib)
+        refute_match(/libunwind/, lib)
+      end
 
       # OHOS-specific: target-triple runtime libs built by
       # build_ohos_target_runtimes, and an end-to-end cross-compile+run using
@@ -768,7 +770,7 @@ class LlvmAT21 < Formula
       assert_match "4__n1", shell_output("#{bin}/llvm-nm #{lib/TARGET_TRIPLE}/libc++_static.a")
 
       system bin/"clang++", "-stdlib=libc++", "--target=#{TARGET_TRIPLE}",
-             "--sysroot=#{sysroot}", "test.cpp", "-o", "test-ohos-target"
+             "test.cpp", "-o", "test-ohos-target"
       assert_equal "Hello World!", shell_output("./test-ohos-target").chomp
     end
 
@@ -809,7 +811,7 @@ class LlvmAT21 < Formula
       # mis-splits as `-analyzer-output =text` and fails to parse; the
       # space-separated form works.
       assert_includes shell_output(
-        "#{bin}/clang --analyze --analyzer-output text --sysroot=#{sysroot} scanbuildtest.cpp 2>&1",
+        "#{bin}/clang --analyze --analyzer-output text scanbuildtest.cpp 2>&1",
       ), "warning: Use of memory after it is freed"
     end
 
