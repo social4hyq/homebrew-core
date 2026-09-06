@@ -45,20 +45,21 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 
 | Formula | 版本 | 说明 |
 |---|---|---|
-| `opencode` | 1.18.27 | 开源的终端 AI 编程助手：在终端里用自然语言让 AI 读代码、改文件、跑命令；自带 75+ 模型提供商接入，用自己的 API key 自由选模型（v1 稳定版） |
-| `opencode@2` | 0.0.0-beta-19124 | opencode 下一代 v2 的 Beta 尝鲜版（命令名 `opencode2`）：全新插件 API 与交互，与 v1 并存互不影响，版本号滚动跟进 beta 频道 |
-| `claude-code` | 2.1.260 | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号（License 禁随包分发，首次运行自动从官方拉取并校验完整性） |
+| `opencode` | 1.18.29 | 开源的终端 AI 编程助手：在终端里用自然语言让 AI 读代码、改文件、跑命令；自带 75+ 模型提供商接入，用自己的 API key 自由选模型（v1 稳定版） |
+| `opencode@2` | 0.0.0-beta-19157 | opencode 下一代 v2 的 Beta 尝鲜版（命令名 `opencode2`）：全新插件 API 与交互，与 v1 并存互不影响，版本号滚动跟进 beta 频道 |
+| `claude-code` | 2.1.261 | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号（License 禁随包分发，首次运行自动从官方拉取并校验完整性） |
 | `herdr` | 0.8.2 | AI 编程 agent 的终端会话管家：agent 会话后台常驻，断网、合盖、重启都不丢，随时接管回来；同时跑多个 agent 时工作状态（工作中/卡住/空闲）一屏总览 |
-| `bun` | 1.4.1 | 极速 JavaScript/TypeScript 一体化工具链：运行时、包管理、测试、打包四合一，可直接替代 Node.js；本 tap 多数工具的底座 |
+| `bun` | 1.4.2 | 极速 JavaScript/TypeScript 一体化工具链：运行时、包管理、测试、打包四合一，可直接替代 Node.js；本 tap 多数工具的底座 |
 | `bun-bootstrap` | 1.4.0-5467a689 | bun 自举构建用的预编译引导版（普通用户无需安装） |
-| `bun-webkit` | `6119947592` | bun 的浏览器引擎组件（内部依赖，普通用户无需关心） |
+| `bun-webkit` | `2e2aa2290f` | bun 的浏览器引擎组件（内部依赖，普通用户无需关心） |
 | `node-ohos` | 26.7.0 | 用本 tap `llvm@21` 构建的 Node.js：与 bun 系原生插件 ABI 兼容，需要 node 跑原生扩展时选它（开发者向） |
 | `vite-plus` | 0.2.8 | VoidZero（Vue/Vite 作者团队）的 Web 统一工具链：一个 `vp` 命令包揽创建项目、开发调试、检查、格式化、测试、构建全流程（Beta） |
 | `starship` | 1.26.0 | 跨 shell 的极简高速提示符：git 状态、目录、语言版本一目了然，一套配置通吃 bash/zsh/fish；**需配合 `hishell-font`**（图标字体），否则图标显示为方框 |
 | `hishell-font` | 0.1.0 | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
 | `zellij` | 0.45.1 | 开箱即用的终端工作区（类似 tmux）：多窗格/标签页、会话断开重连不丢，键位提示直接显示在界面上不用背，支持布局与插件 |
 | `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
-| `llvm@21` | 21.1.8 | Clang/LLD 编译器工具链：在鸿蒙 PC 上源码构建 C/C++ 的基石，构建产物自动完成代码签名（普通用户无需直接安装） |
+| `llvm@21` | 21.1.8 | Clang 编译器工具链：在鸿蒙 PC 上源码构建 C/C++ 的基石，构建产物自动完成代码签名（普通用户无需直接安装） |
+| `lld@21` | 21.1.8 | LLVM 链接器（`ld.lld`），从 `llvm@21` 拆出的独立 formula：keg-only，默认不覆盖系统自带的 `ld.lld`，需要它自带的代码签名补丁时显式 `brew install lld@21`（普通用户无需直接安装） |
 | `ohos-bst-light` | 1.0.0 | 零依赖的鸿蒙二进制自签名工具（开发向）：鸿蒙 PC 强制验签，自己编译的程序没签名跑不起来，`self-sign <文件>` 原地签好即可执行 |
 | `ohos-compat-shim` | 0.5.0 | 系统兼容层：自动兜底鸿蒙与标准 Linux 的底层行为差异，让 Linux 生态软件开箱即用（已内嵌进本 tap 产物，无需单独配置） |
 | `qemu-aarch64` | 11.0.1-r0 | 用户态 QEMU：直接运行/调试 Linux aarch64 程序，自带系统调用跟踪（`-strace`），是鸿蒙无 root strace 环境下的排障替代品 |
