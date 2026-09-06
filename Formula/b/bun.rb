@@ -6,7 +6,7 @@ class Bun < Formula
   url "https://github.com/social4hyq/ohos-bun.git", revision: "3b12a48ffc573ac048059b8b472b6f72b57fdea4", branch: "ohos-aarch64"
   version "1.4.2"
   license "MIT"
-  revision 1
+  revision 2
   # head tracks the same pre-patched fork branch as url.
   head "https://github.com/social4hyq/ohos-bun.git", branch: "ohos-aarch64"
 
@@ -16,8 +16,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "719a226f607d64242ba95cf6fea8b9ddbb1c8cfd80d3141badfb124145e665f6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "70f4c6d812b1e37b534440ee52f32ab2180563646c4a0a35da3da450a9fe1d79"
   end
 
   # icu4c@78 resolves to harmonybrew/core (this tap's __h fork was dropped in __n1 migration).
@@ -26,8 +26,8 @@ class Bun < Formula
   depends_on "cmake" => :build
   depends_on "gperf" => :build
   depends_on "icu4c@78" => :build
-  # llvm@21 no longer bundles lld or generates the cc/c++ codesign shims
-  # (split into its own formula) — needed for both, see install() below.
+  # lld@21 provides the --code-sign-by-default ld.lld (split out of llvm@21);
+  # both are wired up directly in install() below (no global cc/c++ shim).
   depends_on "lld@21" => :build
   depends_on "llvm@21" => :build
   depends_on "ninja" => :build
@@ -65,6 +65,7 @@ class Bun < Formula
     # buildpath = bun source root; build logic fully inlined — no external scripts.
 
     llvm     = Formula["llvm@21"]
+    lld      = Formula["lld@21"]
     webkit   = Formula["bun-webkit"]
     boot     = Formula["bun-bootstrap"]
 
@@ -160,6 +161,8 @@ class Bun < Formula
     # once llvm@21/lld@21 switched to zlib-ng-compat (upstream's on_linux dep).
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("libxml2").to_s
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat").to_s
+    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zstd").to_s
+    ENV.prepend_path "LD_LIBRARY_PATH", llvm.opt_lib.to_s
     # openssl@3 provides libssl/libcrypto for rust cargo.
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3").to_s
     # llvm@21 only ships llvm-strip; the bun build script needs strip.
@@ -186,11 +189,16 @@ class Bun < Formula
       (ohos_cross/d/"lib").mkpath
       ln_sf llvm.opt_lib/"aarch64-linux-ohos"/a, ohos_cross/d/"lib"/a
     end
-    # llvm@21 cc/c++ shims wrap clang with LLD --code-sign (replaces legacy clang-sign wrapper).
     # bootstrap bun in PATH: `bun bd` is itself a bun script.
     ENV.prepend_path "PATH", buildpath/".bin"
     ENV.prepend_path "PATH", boot.opt_bin
     ENV.prepend_path "PATH", llvm.opt_bin
+    # lld@21's ld.lld carries the --code-sign-by-default patch (see lld@21.rb) —
+    # it must come first on PATH so clang's driver (which resolves a bare
+    # `ld.lld` via PATH, not via llvm@21's own bin/) finds *this* signed copy
+    # instead of ohos-sdk's bundled unsigned fallback. No global shim needed:
+    # CC/CXX below point straight at this keg's clang/clang++.
+    ENV.prepend_path "PATH", lld.opt_bin
     ENV.prepend_path "PATH", rust_home/"bin"
     ENV["CARGO_HOME"]    = (rust_home/"cargo").to_s
     ENV["RUSTUP_HOME"]   = rust_home.to_s
@@ -201,11 +209,12 @@ class Bun < Formula
     ENV["RUSTUP_TOOLCHAIN"] = rust_ver
     ENV["OHOS_LLVM_PREFIX"]  = llvm.opt_prefix.to_s
     ENV["OHOS_WEBKIT_ROOT"]  = webkit.opt_prefix.to_s
-    ENV["OHOS_BUN_SIGNING_LINKER"] = (HOMEBREW_PREFIX/"bin/c++").to_s
-    ENV["CC"]  = (HOMEBREW_PREFIX/"bin/cc").to_s
-    ENV["CXX"] = (HOMEBREW_PREFIX/"bin/c++").to_s
-    # No CARGO_BUILD_JOBS cap: the old ETXTBSY came from cc/c++ shims re-signing in-place;
-    # the shim now signs at link time only. Verified zero ETXTBSY in CI.
+    ENV["OHOS_BUN_SIGNING_LINKER"] = (llvm.opt_bin/"clang++").to_s
+    ENV["CC"]  = (llvm.opt_bin/"clang").to_s
+    ENV["CXX"] = (llvm.opt_bin/"clang++").to_s
+    # No CARGO_BUILD_JOBS cap: the old ETXTBSY came from the (now-removed)
+    # global cc/c++ shims re-signing in-place; lld's --code-sign default
+    # signs at link time only. Verified zero ETXTBSY in CI.
     ENV["TMPDIR"] = "/data/storage/el2/base/tmp"
 
     # ── Build: bun scripts/build.ts (equivalent to invoking `bun bd`) ──
@@ -255,10 +264,18 @@ class Bun < Formula
       Bun (stable, #{version}) for HarmonyOS aarch64.
       Built via L4 self-bootstrap (bun-bootstrap → bun bd).
 
-      Native addon support (node-gyp / N-API): bun auto-configures CC=cc,
-      CXX=c++, LDFLAGS=-Wl,--code-sign on OHOS. Install llvm@21 to provide
-      the signed toolchain (cc/c++ → clang + LLD --code-sign):
-        brew install llvm@21
+      Native addon support (node-gyp / N-API): bun defaults to bare CC=cc,
+      CXX=c++ on OHOS, but this formula no longer generates a global
+      cc/c++ shim (removed: it wrote untracked files straight into
+      #{HOMEBREW_PREFIX}/bin that `brew uninstall` couldn't clean up and
+      would conflict across multiple llvm@NN/lld@NN versions). Point CC/CXX
+      at llvm@21's clang directly, with lld@21 first on PATH so its
+      --code-sign-by-default ld.lld is picked up instead of ohos-sdk's
+      unsigned fallback:
+        brew install llvm@21 lld@21
+        export PATH="$(brew --prefix lld@21)/bin:$(brew --prefix llvm@21)/bin:$PATH"
+        export CC="$(brew --prefix llvm@21)/bin/clang"
+        export CXX="$(brew --prefix llvm@21)/bin/clang++"
 
       ohos-compat-shim is statically embedded in the binary (r31+): OHOS-blocked
       syscalls (close_range, fchmodat2, getcwd, ...) are covered without
