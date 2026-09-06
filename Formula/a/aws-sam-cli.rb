@@ -9,7 +9,7 @@ class AwsSamCli < Formula
   head "https://github.com/aws/aws-sam-cli.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c30ce3e23b69ede34f44cf05f097b75353d0aadea62532566cadaf7b6ec4c935"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "84f09f4a3a98571140d0b2e6b5ffcde9819a76eae94be9b6ae4a6e8cee32bce1"
   end
 
   depends_on "cmake" => :build # for `awscrt`
