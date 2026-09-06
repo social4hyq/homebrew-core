@@ -13,7 +13,7 @@ class Libpcap < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ccb2f15be04bdc82668fa5f33360247c82d4d60c573246118377682951c230a7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa85aa08c18f53360d39958c2f8ebbade9c5e243c46ccc86fe66ad88d6dfc725"
   end
 
   keg_only :provided_by_macos
