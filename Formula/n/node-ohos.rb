@@ -4,7 +4,7 @@ class NodeOhos < Formula
   url "https://nodejs.org/dist/v26.7.0/node-v26.7.0.tar.xz"
   sha256 "e6b182cbeeab032d1082ca4ac4fe15e3a57de691d3bde78ecf8a761fd56ee356"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -12,14 +12,18 @@ class NodeOhos < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/node-ohos-v26.7.0-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb5e919da7dcd7c522a5ef54552b135932d7ee34e7d5ac7a7240c9861abb969d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/node-ohos-v26.7.0-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1265bdeb2cc04cfb2bab0c0f58793a90ea4e86f29eb646bd129994019a9cb9cc"
   end
 
   keg_only "alternate toolchain build of node; the harmonybrew/core node formula " \
            "is the default for general use"
 
   # Toolchain rationale: see the long comment in install().
+  # llvm@21 no longer bundles lld (split into its own formula) — needed here
+  # so clang's driver finds the OHOS-codesigned ld.lld, not an unsigned
+  # fallback; without a signed ELF, the built node binary can't execute.
+  depends_on "lld@21" => :build
   depends_on "llvm@21" => :build
   depends_on "ohos-sdk" => :build
   depends_on "python@3.14" => :build
@@ -51,6 +55,9 @@ class NodeOhos < Formula
     # real name `llvm-ar`, not an `ar` alias).
     ENV["AR"] = (llvm.opt_bin/"llvm-ar").to_s
     ENV.prepend_path "LD_LIBRARY_PATH", llvm.opt_lib
+    # clang's driver falls back to PATH to find ld.lld since lld@21 isn't
+    # co-located in llvm@21's own bin/ (separate formula now).
+    ENV.prepend_path "PATH", formula_opt_bin("lld@21")
 
     # make sure subprocesses spawned by make are using our Python 3
     ENV["PYTHON"] = which("python3.14")
