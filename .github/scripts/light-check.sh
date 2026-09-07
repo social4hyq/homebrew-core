@@ -31,7 +31,23 @@ FAIL=()
 COLLIDE=()
 for name in $(jq -r '.[]' <<< "$CHANGED_JSON"); do
   echo "== brew audit $name =="
-  cbrew "audit --formula $TAP/$name" || FAIL+=("$name")
+
+  # rubygems mirror (mirrors.aliyun.com) can lag publishing a brand-new gem
+  # version by hours; audit's bundler dependency resolution still probes the
+  # full version index for every gem in the graph and 404s on the gap.
+  # Retry once after 90s for a short blip; a real multi-hour lag still needs
+  # a manual rerun later.
+  audit_ok=false
+  for i in 1 2; do
+    if cbrew "audit --formula $TAP/$name"; then
+      audit_ok=true
+      break
+    fi
+    [ "$i" = 2 ] && break
+    echo "::warning::brew audit $name attempt $i failed, retrying in 90s (rubygems mirror transient 404)"
+    sleep 90
+  done
+  [ "$audit_ok" = true ] || FAIL+=("$name")
 
   if cexec "env -u HOMEBREW_NO_INSTALL_FROM_API $BREW_ENV brew info --json=v2 homebrew/core/$name" >/dev/null 2>&1; then
     COLLIDE+=("$name")
