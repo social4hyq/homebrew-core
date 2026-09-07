@@ -12,7 +12,7 @@ class Nanomsg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8cf33fce8e1853c35f8f37b87fe5309db8932001bdc664d666ad8261e4d1fd0e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb09f7d3504ad813da4cd0adf7dddd7f1360cf552daf194e25e76174d80c5608"
   end
 
   depends_on "cmake" => :build
