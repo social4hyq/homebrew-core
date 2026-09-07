@@ -1,13 +1,13 @@
 class Shfmt < Formula
   desc "Autoformat shell script source code"
   homepage "https://github.com/mvdan/sh"
-  url "https://github.com/mvdan/sh/archive/refs/tags/v3.14.0.tar.gz"
-  sha256 "f193c946e2882c4fa04935cd583f60e2cab60344209bd982a3a5933c4192aad8"
+  url "https://github.com/mvdan/sh/archive/refs/tags/v3.14.1.tar.gz"
+  sha256 "ec4bdb88ab6c95686be3a4eeb4ad77d2b49d33d2ed7b0a65035cd52d2d87c443"
   license "BSD-3-Clause"
   head "https://github.com/mvdan/sh.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1dc2b93bf7d72916ea7f943ad518b23e8d60ab405df840145db621c494549925"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2fc7f84052a6a416b3e0aa9387f2e02305ee1539c88188e7d7acc72d95c74d68"
   end
 
   depends_on "go" => :build
