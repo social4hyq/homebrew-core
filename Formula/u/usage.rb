@@ -1,14 +1,14 @@
 class Usage < Formula
   desc "Tool for working with usage-spec CLIs"
   homepage "https://usage.jdx.dev/"
-  url "https://github.com/jdx/usage/archive/refs/tags/v6.7.1.tar.gz"
-  sha256 "cc0acd11a75634cf1fb110c1d93b9236a9f9187eb083856396d7f9cb2c19ac17"
+  url "https://github.com/jdx/usage/archive/refs/tags/v6.8.0.tar.gz"
+  sha256 "032842fa48ccfcd0c2ca854105c25184cf3ed17250f596f21c4448b0148100de"
   license "MIT"
   compatibility_version 1
   head "https://github.com/jdx/usage.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "62c2b59aa49397229ead0553af27b13fb6d74696b7de04d1ce0cd60ab5507bf4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a66e05b043398703f0e028894dc308a44154504aaf5ece338f1e6e687e8032f"
   end
 
   depends_on "rust" => :build
