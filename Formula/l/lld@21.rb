@@ -5,6 +5,7 @@ class LldAT21 < Formula
   sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
   # The LLVM Project is under the Apache License v2.0 with LLVM Exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -17,7 +18,10 @@ class LldAT21 < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "4e2ce066944393228f7ee0390e4d1e12f9d0d4e84fe5c016c0c2c02a5282caf8"
   end
 
-  keg_only :versioned_formula
+  # Not `:versioned_formula`: see the identical note in llvm@21.rb — avoids
+  # Homebrew auto-linking this keg into a PATH ohos-sdk's own ld.lld/lld
+  # already occupy under the same names.
+  keg_only "it conflicts with `ohos-sdk`"
 
   depends_on "cmake" => :build
   depends_on "llvm@21"
@@ -27,10 +31,9 @@ class LldAT21 < Formula
     depends_on "zlib-ng-compat"
   end
 
-  # OHOS code signing: adds a `.codesign` section to every ELF this linker
-  # produces, defaulting the equivalent of --code-sign to ON (every
-  # executable ELF on OHOS must carry one to run). Touches lld/ELF/* only —
-  # llvm@21 doesn't build lld at all, hence this being a separate formula.
+  # Adds a `.codesign` section to every ELF this linker produces,
+  # defaulting the equivalent of --code-sign to ON (every executable ELF
+  # on OHOS must carry one to run).
   patch do
     file "Patches/lld@21/0001-ohos-code-sign.patch"
   end
@@ -50,16 +53,13 @@ class LldAT21 < Formula
       -DLLVM_USE_SYMLINKS=ON
     ]
 
-    # llvm@21's libLLVM.so was built with OHOS's default TLS codegen
-    # (-femulated-tls: llvm::parallel::threadIndex is exported as
-    # __emutls_v.../__emutls_t..., not a real TLS symbol). This standalone
-    # LLD build links against that dylib but doesn't inherit its TLS
-    # codegen choice from anywhere (LLVMConfig.cmake doesn't re-export raw
-    # compiler flags) — without forcing the same choice here, LLD's own
-    # object files emit real ELF TLS relocations for the same symbol, and
-    # `ld.lld`/`liblldELF.so` fail at load time with "symbol not found:
-    # _ZN4llvm8parallel11threadIndexE" (real-TLS mangling, absent from a
-    # dylib that only exports the emulated-TLS variant).
+    # llvm@21's libLLVM.so was built with OHOS's default -femulated-tls
+    # codegen (llvm::parallel::threadIndex exports as __emutls_v.../
+    # __emutls_t..., not a real TLS symbol). This standalone LLD build
+    # doesn't inherit that choice from LLVMConfig.cmake — without it, LLD's
+    # own objects emit real TLS relocations for the same symbol, and
+    # ld.lld/liblldELF.so fail at load: "symbol not found:
+    # _ZN4llvm8parallel11threadIndexE".
     if OS.linux?
       cmake_args << "-DCMAKE_C_FLAGS=-femulated-tls"
       cmake_args << "-DCMAKE_CXX_FLAGS=-femulated-tls"
@@ -72,11 +72,8 @@ class LldAT21 < Formula
 
   test do
     if OS.linux?
-      # llvm@21 is keg-only and its bin/clang can lose the HOMEBREW_PREFIX/bin
-      # symlink race to ohos-sdk's own bundled clang (see the llvm@21 formula's
-      # caveats). ENV.cc below must be *this* keg's clang, not whatever
-      # ohos-sdk's older, differently-configured driver happens to occupy —
-      # the -fuse-ld= PATH-priority check just below depends on it.
+      # ENV.cc must be this keg's own clang, not ohos-sdk's — the
+      # -fuse-ld= PATH-priority check just below depends on it.
       llvm = Formula["llvm@21"]
       ENV["CC"] = (llvm.opt_bin/"clang").to_s
       ENV["CXX"] = (llvm.opt_bin/"clang++").to_s
@@ -116,8 +113,7 @@ class LldAT21 < Formula
     system ENV.cc, "-v", "-fuse-ld=lld", "test.c", "-o", "test"
     assert_match "hello, world!", shell_output("./test")
 
-    # OHOS: the whole point of this formula's patch — code-sign should be on
-    # by default (no --code-sign flag passed) and go away with --no-code-sign.
+    # Code-sign is this patch's default; --no-code-sign turns it off.
     if OS.linux?
       readelf = formula_opt_bin("llvm@21")/"llvm-readelf"
 
