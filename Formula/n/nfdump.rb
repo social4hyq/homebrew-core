@@ -7,7 +7,7 @@ class Nfdump < Formula
   head "https://github.com/phaag/nfdump.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "27d979812b7c66bb84d51c9eba6b4352ef20289742affd1f9f10862b645f4b2c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d2abe96b3cf5a98f1abd66ca2f92d2d72ed4cb27f0e9a41a53ba28ba2d93dd4"
   end
 
   depends_on "autoconf" => :build
