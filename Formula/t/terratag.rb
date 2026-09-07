@@ -7,7 +7,7 @@ class Terratag < Formula
   head "https://github.com/env0/terratag.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "080c67f95094bd3fe55adb8da009eb2a6fbc907c81b6e7b81e2ddce96b5fdaff"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a019536bf20d1757d5ef6280e56e80ea2fcf2195e77bbc0c34fb130e2a79b36"
   end
 
   depends_on "go" => :build
