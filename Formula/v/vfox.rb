@@ -1,8 +1,8 @@
 class Vfox < Formula
   desc "Version manager with support for Java, Node.js, Flutter, .NET & more"
   homepage "https://vfox.dev/"
-  url "https://github.com/version-fox/vfox/archive/refs/tags/v1.0.11.tar.gz"
-  sha256 "a201d35eec1465bf571f80ea65c27c74c61e2a5ce96c97b5f0e45f2dbfa86a34"
+  url "https://github.com/version-fox/vfox/archive/refs/tags/v1.0.12.tar.gz"
+  sha256 "9cb7449c09d30ec55760658674077ff1208c6408cfbc6aaf567a36407626a0ba"
   license "Apache-2.0"
   head "https://github.com/version-fox/vfox.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Vfox < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c111732e634b2be9c3018c86a82391d551dd4a782f44fb6a4756d007e905743d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e002e3682febaa88244179232e07eca4e2d5bc1169409476ba04c7de494b700"
   end
 
   depends_on "go" => :build
