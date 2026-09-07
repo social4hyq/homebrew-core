@@ -12,7 +12,7 @@ class Vfox < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c111732e634b2be9c3018c86a82391d551dd4a782f44fb6a4756d007e905743d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e002e3682febaa88244179232e07eca4e2d5bc1169409476ba04c7de494b700"
   end
 
   depends_on "go" => :build
