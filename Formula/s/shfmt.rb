@@ -7,7 +7,7 @@ class Shfmt < Formula
   head "https://github.com/mvdan/sh.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1dc2b93bf7d72916ea7f943ad518b23e8d60ab405df840145db621c494549925"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2fc7f84052a6a416b3e0aa9387f2e02305ee1539c88188e7d7acc72d95c74d68"
   end
 
   depends_on "go" => :build
