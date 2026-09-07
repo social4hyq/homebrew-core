@@ -11,6 +11,10 @@ class LldAT21 < Formula
     formula "llvm@21"
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c11ad7a117ec453d700766dfcfde3303e7c3fd75c225d1b865d4a600aa4c59ac"
+  end
+
   # Not `:versioned_formula`: see the identical note in llvm@21.rb — avoids
   # Homebrew auto-linking this keg into a PATH ohos-sdk's own ld.lld/lld
   # already occupy under the same names.
