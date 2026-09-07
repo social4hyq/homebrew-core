@@ -5,7 +5,7 @@ class LldAT21 < Formula
   sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
   # The LLVM Project is under the Apache License v2.0 with LLVM Exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
-  revision 1
+  revision 2
   compatibility_version 1
 
   livecheck do
@@ -41,30 +41,16 @@ class LldAT21 < Formula
     rpaths = [rpath]
     rpaths << formula_opt_lib("llvm@21").to_s if OS.linux?
 
-    cmake_args = %W[
-      -DBUILD_SHARED_LIBS=ON
-      -DCMAKE_INSTALL_RPATH=#{rpaths.join(";")}
-      -DLLD_BUILT_STANDALONE=ON
-      -DLLD_VENDOR=#{tap&.user}
-      -DLLVM_CMAKE_DIR=#{formula_opt_lib("llvm@21")}/cmake/llvm
-      -DLLVM_ENABLE_LTO=ON
-      -DLLVM_INCLUDE_TESTS=OFF
-      -DLLVM_USE_SYMLINKS=ON
-    ]
-
-    # llvm@21's libLLVM.so was built with OHOS's default -femulated-tls
-    # codegen (llvm::parallel::threadIndex exports as __emutls_v.../
-    # __emutls_t..., not a real TLS symbol). This standalone LLD build
-    # doesn't inherit that choice from LLVMConfig.cmake — without it, LLD's
-    # own objects emit real TLS relocations for the same symbol, and
-    # ld.lld/liblldELF.so fail at load: "symbol not found:
-    # _ZN4llvm8parallel11threadIndexE".
-    if OS.linux?
-      cmake_args << "-DCMAKE_C_FLAGS=-femulated-tls"
-      cmake_args << "-DCMAKE_CXX_FLAGS=-femulated-tls"
-    end
-
-    system "cmake", "-S", "lld", "-B", "build", *cmake_args, *std_cmake_args
+    system "cmake", "-S", "lld", "-B", "build",
+                    "-DBUILD_SHARED_LIBS=ON",
+                    "-DCMAKE_INSTALL_RPATH=#{rpaths.join(";")}",
+                    "-DLLD_BUILT_STANDALONE=ON",
+                    "-DLLD_VENDOR=#{tap&.user}",
+                    "-DLLVM_CMAKE_DIR=#{formula_opt_lib("llvm@21")}/cmake/llvm",
+                    "-DLLVM_ENABLE_LTO=ON",
+                    "-DLLVM_INCLUDE_TESTS=OFF",
+                    "-DLLVM_USE_SYMLINKS=ON",
+                    *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
