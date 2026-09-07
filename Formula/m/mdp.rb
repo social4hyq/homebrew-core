@@ -7,7 +7,7 @@ class Mdp < Formula
   head "https://github.com/visit1985/mdp.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a2ba34c43e0f334ad771d1640749312aa56dac3bb6170ccacb5a822656752f59"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c271e882680d12280c9d91b13d3addc220342d6d24e4156ab736454e7b501e0"
   end
 
   uses_from_macos "ncurses"
