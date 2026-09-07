@@ -6,7 +6,13 @@ name: sync-ci-image
 # the big layer); GHCR sits on the same Azure backbone as the runners, so the
 # pull drops to seconds. The derived image also bakes in `brew install git`
 # (another ~52s every run used to spend in setup-container.sh — git is
-# run-independent, so it belongs in the image, not the setup script).
+# run-independent, so it belongs in the image, not the setup script) and
+# `rust` (Cargo): Homebrew's own vendor Gemfile pulls in `rubydex`, a Rust
+# native extension with no precompiled binary, whenever anything requests
+# the `style` bundler group (e.g. `brew audit`, used by light-check.sh) —
+# without Cargo on PATH that install fails deterministically, not
+# intermittently (confirmed: `cargo`/`rustc` were completely absent from
+# this image, not just flaky to reach).
 #
 # Runs two ways:
 #   - scheduled (daily): compares the upstream `latest` manifest digest to the
@@ -123,12 +129,12 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       # arm64 image + arm64 runner: the RUN layer executes natively, no qemu
-      - name: Build derived image (git baked in) and push
+      - name: Build derived image (git + rust baked in) and push
         env:
           SOURCE: ${{ needs.check.outputs.source }}
           DEST: ghcr.io/social4hyq/ci-runner:${{ needs.check.outputs.tag }}
         run: |
-          printf 'FROM %s\nRUN ["/bin/bash", "-lc", "HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1 brew install git && brew cleanup"]\n' "$SOURCE" > Dockerfile
+          printf 'FROM %s\nRUN ["/bin/bash", "-lc", "HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1 brew install git rust && brew cleanup"]\n' "$SOURCE" > Dockerfile
           cat Dockerfile
           # --metadata-file writes the built image's digest as JSON, so the pin
           # step below doesn't have to scrape `imagetools inspect` text output.
