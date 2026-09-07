@@ -18,7 +18,7 @@ class OpencodeAT2 < Formula
   # dependency at the source level (weak symbol), no LD_PRELOAD shim needed.
   # See social4hyq/ohos-opencode2 dev for canonical diff.
   url "https://github.com/anomalyco/opencode.git", revision: "b2cecc6350d377c382e1ec32ee66ec63ad68f715"
-  version "0.0.0-beta-19187"
+  version "0.0.0-beta-19192"
   license "MIT"
   # Baked-in channel was empty (see OPENCODE_CHANNEL below) — TUI crashed on
   # startup ("Invalid storage segment" segment-validates the channel), so the
