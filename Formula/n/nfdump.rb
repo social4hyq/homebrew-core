@@ -1,13 +1,13 @@
 class Nfdump < Formula
   desc "Tools to collect and process netflow data on the command-line"
   homepage "https://github.com/phaag/nfdump"
-  url "https://github.com/phaag/nfdump/archive/refs/tags/v1.7.8.tar.gz"
-  sha256 "d9b881f7e3ecde281c1116e8330ae612d0e5adcd0e952f401b2045c6446a1232"
+  url "https://github.com/phaag/nfdump/archive/refs/tags/v1.7.9.tar.gz"
+  sha256 "cd15a3e0e0ec0b34c8dfc0c3202ce0d63a09a78341f533f3cbe8d69833927bbf"
   license "BSD-3-Clause"
   head "https://github.com/phaag/nfdump.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "27d979812b7c66bb84d51c9eba6b4352ef20289742affd1f9f10862b645f4b2c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d2abe96b3cf5a98f1abd66ca2f92d2d72ed4cb27f0e9a41a53ba28ba2d93dd4"
   end
 
   depends_on "autoconf" => :build
