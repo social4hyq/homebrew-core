@@ -12,6 +12,10 @@ class LlvmAT21 < Formula
     regex(/^llvmorg[._-]v?(21(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f2c5eebce0e75529ac446791ca9e7ab7440df4dd44db36d3fe41d64ead6ebfa"
+  end
+
   # Not `:versioned_formula`: that lets Homebrew auto-link this keg on a
   # direct `brew install llvm@21` (auto_link_versioned_keg_only? in
   # formula_installer.rb), which would collide with ohos-sdk's own
