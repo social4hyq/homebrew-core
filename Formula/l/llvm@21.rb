@@ -5,7 +5,7 @@ class LlvmAT21 < Formula
   sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
   # The LLVM Project is under the Apache License v2.0 with LLVM Exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
-  revision 7
+  revision 8
   compatibility_version 1
 
   livecheck do
@@ -14,11 +14,15 @@ class LlvmAT21 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm@21-v21.1.8-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b299b178a5cd1f469b9cfa47e59be265fdafb8f5a6b209dfbe5696d29d94e467"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/llvm@21-v21.1.8-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e386716d6bdd295d5ab324511519a834ada331bbc1907985dbccb8963fb42182"
   end
 
-  keg_only :versioned_formula
+  # Not `:versioned_formula`: that lets Homebrew auto-link this keg on a
+  # direct `brew install llvm@21` (auto_link_versioned_keg_only? in
+  # formula_installer.rb), which would collide with ohos-sdk's own
+  # unrelated clang/llvm-* binaries under the same names.
+  keg_only "it conflicts with `ohos-sdk`"
 
   # https://llvm.org/docs/GettingStarted.html#requirement
   depends_on "cmake" => :build
@@ -77,18 +81,10 @@ class LlvmAT21 < Formula
               /^(\s*library_path\s*=\s*)None$/,
               "\\1'#{lib}'"
 
-    # libc++'s locale_base_api dispatch picks support/linux.h (the glibc
-    # xlocale API) for any __linux__ target, musl included — OHOS defines
-    # __linux__ too. musl's isdigit_l/strcoll_l/etc are real symbols but
-    # their declarations in <ctype.h>/<string.h>/etc are gated behind
-    # _GNU_SOURCE/_BSD_SOURCE/_XOPEN_SOURCE, and something earlier in the
-    # libc++ header chain already pins those feature-test macros to a
-    # narrower POSIX profile before ctype.h is reached, so support/linux.h's
-    # unconditional calls hit "undeclared identifier" instead of a missing
-    # symbol. There's already a working fallback for this: the older
-    # __locale_dir/locale_base_api/musl.h path (calls the non-`_l` musl
-    # functions directly), reached only when __linux__ isn't matched here —
-    # route musl there instead of down the glibc-shaped path.
+    # musl also matches __linux__ here, but its ctype/string _l-suffixed
+    # declarations are gated behind _GNU_SOURCE/etc and unavailable by this
+    # point in the header chain — route musl to the existing
+    # locale_base_api/musl.h fallback instead of the glibc-shaped path.
     inreplace "libcxx/include/__locale_dir/locale_base_api.h",
               "#  elif defined(__linux__)",
               "#  elif defined(__linux__) && !_LIBCPP_HAS_MUSL_LIBC"
@@ -99,19 +95,13 @@ class LlvmAT21 < Formula
       mlir
       polly
     ]
-    # compiler-rt is deliberately absent here (unlike upstream's list): it
-    # was only needed as a link-time dependency (crtbeginS.o) of this same
-    # host build's own *shared* libunwind.so/libc++.so, but those are now
-    # built static-only (see LIBCXX_ENABLE_SHARED etc. below) — static
-    # archives don't need crtbegin/crtend at all. Building it here instead
-    # pulls in far more than builtins (GWP-ASan → sanitizer_common, which
-    # doesn't compile against this musl sysroot: linux/sysinfo.h and
-    # sys/sysinfo.h both define `struct sysinfo`, a known musl/kernel-UAPI
-    # header clash), for no benefit — OHOS's clang driver never searches
-    # this host-triple location anyway (it wants
-    # lib/clang/<ver>/lib/aarch64-linux-ohos/); build_ohos_target_runtimes
-    # below builds a target-triple compiler-rt at the path it actually
-    # searches, independently of this host bootstrap.
+    # compiler-rt omitted here (unlike upstream): only needed for this host
+    # build's own *shared* libc++/libunwind, now static-only (see
+    # LIBCXX_ENABLE_SHARED below); building it also pulls in
+    # sanitizer_common, which doesn't compile against this musl sysroot
+    # (struct sysinfo clash). The driver never searches this host-triple
+    # path anyway — build_ohos_target_runtimes below builds the
+    # target-triple compiler-rt it actually uses.
     runtimes = %w[
       libcxx
       libcxxabi
@@ -207,39 +197,28 @@ class LlvmAT21 < Formula
       args << "-DCLANG_DEFAULT_CXX_STDLIB=libc++"
       args << "-DCLANG_DEFAULT_RTLIB=compiler-rt"
       args << "-DCLANG_DEFAULT_UNWINDLIB=libunwind"
-      # Not `-DCLANG_DEFAULT_LINKER=lld`: lld is a separate, optional formula
-      # (lld@21) here. OHOS's driver already defaults to lld; leaving this
-      # unset lets it fall back to whatever `ld.lld` is on PATH (ohos-sdk's,
-      # if lld@21 isn't installed) instead of hard-failing.
+      # Not `-DCLANG_DEFAULT_LINKER=lld`: lld is a separate formula
+      # (lld@21); leaving this unset falls back to PATH's ld.lld instead of
+      # hard-failing if it's not installed.
       args << "-DDEFAULT_SYSROOT=#{sysroot}"
-      # Explicit, not inferred (see HOST_TRIPLE comment above): this also
-      # fixes the *target* triple LLVM_ENABLE_RUNTIMES' nested "runtimes-bins"
-      # sub-build uses for compiler-rt/libcxx/libunwind, which otherwise
-      # inherits whatever config.guess inferred and silently drifts to
+      # Explicit, not inferred (see HOST_TRIPLE above): also fixes the
+      # nested runtimes-bins sub-build, which otherwise drifts to
       # aarch64-unknown-linux-gnu inside a Linux-kernel container.
       args << "-DLLVM_HOST_TRIPLE=#{HOST_TRIPLE}"
       args << "-DLLVM_DEFAULT_TARGET_TRIPLE=#{HOST_TRIPLE}"
       # Parts of Polly fail to correctly build with PIC when being used for DSOs.
       args << "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
-      # Overrides LLVM_TARGETS_TO_BUILD=all above (last -D wins): this is a
-      # bootstrap compiler for OHOS/aarch64 tooling, not a general multi-arch
-      # dev toolchain, and `all` roughly doubles build time for ~15 backends
-      # nothing downstream targets.
+      # Overrides LLVM_TARGETS_TO_BUILD=all above (last -D wins): a
+      # bootstrap compiler for OHOS/aarch64 only, not a general toolchain.
       args << "-DLLVM_TARGETS_TO_BUILD=AArch64"
       runtimes_cmake_args += %w[
         -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
       ]
-      # OHOS has no system libc++ (or libstdc++) for the runtimes-configure
-      # sub-cmake's compiler-flag probes (check_cxx_compiler_flag etc.) to
-      # link a trial executable against — we're building libc++ itself in
-      # this very step. Without this, probes that need to *link* (most of
-      # them; a bare compile-only flag test like -funwind-tables still
-      # passes) fail, which cascades into libunwind/src/CMakeLists.txt's
-      # `NOT (CXX_SUPPORTS_FNO_EXCEPTIONS_FLAG AND ...)` hard error. Forcing
-      # try_compile to stop at a static archive (no link) is the standard
-      # workaround for probing a compiler against a runtime that doesn't
-      # exist yet.
+      # OHOS has no system libc++/libstdc++ for the runtimes-configure
+      # sub-cmake's compiler probes to link a trial executable against
+      # (libc++ itself is being built in this step) — forcing try_compile
+      # to stop at a static archive is the standard workaround.
       runtimes_cmake_args << "-DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY"
       runtimes_cmake_args += %w[
         -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
@@ -258,15 +237,12 @@ class LlvmAT21 < Formula
         -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON
         -DCOMPILER_RT_USE_LLVM_UNWINDER=ON
       ]
-      # {LIBCXX,LIBCXXABI,LIBUNWIND}_ENABLE_SHARED all default ON upstream,
-      # but every .so these runtimes build needs OHOS-driver-specific
-      # crtbeginS.o/crtendS.o objects that compiler-rt's crt component
-      # doesn't produce under that name (only the non-S clang_rt.crtbegin/
-      # crtend used for non-shared links) — first hit trying to link
-      # libunwind.so. Same static-only choice build_ohos_target_runtimes
-      # below already makes for the target-triple copies; the host copies
-      # here are for this build's own internal self-hosting linkage only,
-      # so there's no shared-library consumer to lose.
+      # {LIBCXX,LIBCXXABI,LIBUNWIND}_ENABLE_SHARED default ON upstream, but
+      # linking any of these .so needs crtbeginS.o/crtendS.o, which
+      # compiler-rt's crt component doesn't produce (only the non-S
+      # variant used for non-shared links). No consumer needs these as
+      # shared libs here — the host copies are for this build's own
+      # self-hosting linkage only.
       runtimes_cmake_args += %w[
         -DLIBCXX_ENABLE_SHARED=OFF
         -DLIBCXXABI_ENABLE_SHARED=OFF
@@ -300,10 +276,8 @@ class LlvmAT21 < Formula
     args << "-DRUNTIMES_CMAKE_ARGS=#{runtimes_cmake_args.join(";")}" if runtimes_cmake_args.present?
     args << "-DBUILTINS_CMAKE_ARGS=#{builtins_cmake_args.join(";")}" if builtins_cmake_args.present?
 
-    # The clang-shlib LINKER:--version-script fix the old rewrite carried is
-    # not needed here: clang's own `LINKER:` driver syntax already expands it
-    # to `-Xlinker --version-script -Xlinker ...` correctly (verified in CI —
-    # libclang-cpp.so links fine without any inreplace for this).
+    # clang's own `LINKER:` driver syntax handles the version-script flag
+    # correctly — libclang-cpp.so links fine without any extra inreplace.
     llvmpath = buildpath/"llvm"
 
     mkdir llvmpath/"build" do
@@ -340,11 +314,9 @@ class LlvmAT21 < Formula
     ranlib   = bin/"llvm-ranlib"
     runtimes = buildpath/"runtimes"
 
-    # Both cc/cxx below are invoked by absolute path (the freshly built
-    # keg's own clang), bypassing superenv's `cc` shim — which is what
-    # injects -fno-emulated-tls (native TLS is ~30% faster than clang's
-    # default emulated-TLS codegen for OHOS targets) for every other
-    # compiler invocation in this formula. Set it explicitly here.
+    # cc/cxx are invoked by absolute path, bypassing superenv's `cc` shim
+    # (which injects -fno-emulated-tls elsewhere) — set it explicitly here
+    # too, since native TLS is faster than clang's default emulated-TLS.
     cflags = "--target=#{TARGET_TRIPLE} --sysroot=#{sysroot} -D__MUSL__ -fPIC -fno-emulated-tls"
 
     build_target_compiler_rt(cc:, cxx:, llvm_ar:, ranlib:, runtimes:, cflags:, jobs:)
@@ -487,21 +459,15 @@ class LlvmAT21 < Formula
     rm_r(target_incdir) if target_incdir.exist?
     mv("#{stage}/libcxx/include/c++/v1", target_incdir)
 
-    # OHOS's clang driver always adds both include/c++/v1 (host) and this
-    # include/#{TARGET_TRIPLE}/c++/v1 dir to the system header search path,
-    # even for a plain host compile (getMultiarchTriple() normalizes
-    # aarch64 to this triple unconditionally, regardless of --target=).
-    # libc++'s C-library wrapper headers (ctype.h, math.h, string.h, ...)
-    # use __has_include_next(<foo.h>) to chain past themselves to the real
-    # musl header. With an identical wrapper also sitting in this second
-    # directory, the chain resolves to *that* wrapper instead (same
-    # _LIBCPP_*_H include guard already set, so it's a silent no-op) and
-    # never reaches the sysroot's real header — breaking FP_NORMAL,
-    # isdigit_l, wint_t and everything else musl's headers actually
-    # provide. Host and target headers are otherwise byte-identical (same
-    # libc, same ABI, only the triple string differs); drop just the
-    # chaining wrapper files here so both host and --target=#{TARGET_TRIPLE}
-    # compiles fall through to the sysroot instead of shadowing it.
+    # The clang driver always searches both include/c++/v1 (host) and this
+    # target dir, even for a plain host compile. libc++'s C-header
+    # wrappers chain to the real musl header via __has_include_next — with
+    # an identical wrapper sitting in this second dir too, the chain
+    # resolves to *that* wrapper instead (include guard already set,
+    # silent no-op) and never reaches the real header, breaking
+    # FP_NORMAL/isdigit_l/wint_t. Host and target headers are otherwise
+    # byte-identical; drop just the chaining wrapper files here so both
+    # paths fall through to the sysroot.
     target_incdir.glob("**/*.h").each do |f|
       f.unlink if f.read.include?("__has_include_next")
     end
@@ -521,21 +487,12 @@ class LlvmAT21 < Formula
       LLD is now provided in a separate formula:
         brew install lld@21
 
-      OHOS-specific:
-        Default sysroot:            #{HOMEBREW_PREFIX}/opt/ohos-sdk/native/sysroot
-        Host triple:                #{HOST_TRIPLE}
-        Target-triple runtime libs: #{TARGET_TRIPLE} (compiler-rt/libc++/libunwind
-          statically linked into anything built with `--target=#{TARGET_TRIPLE}`)
-        libc++ ABI namespace is __n1 (OHOS's mandated third-party namespace) on
-          both host and target-triple builds — link against a matching one.
-        `-shared` is not yet supported (needs crtbeginS.o/crtendS.o, which
-          nothing on this platform currently provides) — link executables,
-          not shared libraries, with this compiler.
+      This LLVM build is from upstream source code without deep
+      adaptation for OpenHarmony. Its stability is not guaranteed.
+      For production use, please use ohos-sdk first.
 
-      Example:
-        #{opt_bin}/clang++ -stdlib=libc++ --target=#{TARGET_TRIPLE} \\
-          --sysroot=#{HOMEBREW_PREFIX}/opt/ohos-sdk/native/sysroot \\
-          hello.cpp -o hello
+      To prevent conflicts with system runtime libraries, this LLVM
+      statically links all runtime libraries.
     EOS
 
     on_macos do
@@ -581,15 +538,13 @@ class LlvmAT21 < Formula
     # OHOS: confirms LLVM_HOST_TRIPLE was actually honored (see install()).
     assert_match HOST_TRIPLE, shell_output("#{bin}/clang --version") if OS.linux?
 
-    # OHOS: OHOS::computeSysRoot() only consults Driver::SysRoot (set from
-    # DEFAULT_SYSROOT at driver construction) or falls back to
-    # <bin>/../../sysroot, which doesn't exist in this keg. Pass it
-    # explicitly everywhere below rather than relying on the compiled-in
-    # default. (This alone isn't sufficient for libc++'s C-header wrappers
-    # to see real musl declarations like FP_NORMAL/isdigit_l/wint_t — that
-    # required a separate fix in build_ohos_target_runtimes/install() to
-    # the __has_include_next chain; see the comment there.)
-    sysroot = "#{formula_opt_prefix("ohos-sdk")}/native/sysroot" if OS.linux?
+    # OHOS: DEFAULT_SYSROOT is compiled into the driver (see install()), so
+    # Driver::SysRoot is populated at construction and OHOS::computeSysRoot()
+    # uses it automatically — no --sysroot= needed on any invocation below,
+    # host or --target=. (This alone isn't sufficient for libc++'s C-header
+    # wrappers to see real musl declarations like FP_NORMAL/isdigit_l/wint_t
+    # — that required a separate fix in build_ohos_target_runtimes/install()
+    # to the __has_include_next chain; see the comment there.)
 
     (testpath/"test.c").write <<~C
       #include <stdio.h>
@@ -612,19 +567,15 @@ class LlvmAT21 < Formula
       }
     CPP
 
-    # See the OHOS sysroot comment above: pass it explicitly, don't rely on
-    # the compiled-in DEFAULT_SYSROOT alone.
-    sysroot_args = OS.linux? ? ["--sysroot=#{sysroot}"] : []
-
-    system bin/"clang-cpp", "-v", *sysroot_args, "test.c"
-    system bin/"clang-cpp", "-v", *sysroot_args, "test.cpp"
+    system bin/"clang-cpp", "-v", "test.c"
+    system bin/"clang-cpp", "-v", "test.cpp"
 
     # Testing default toolchain and SDK location.
-    system bin/"clang++", "-v", *sysroot_args,
+    system bin/"clang++", "-v",
            "-std=c++11", "test.cpp", "-o", "test++"
     assert_includes MachO::Tools.dylibs("test++"), "/usr/lib/libc++.1.dylib" if OS.mac?
     assert_equal "Hello World!", shell_output("./test++").chomp
-    system bin/"clang", "-v", *sysroot_args, "test.c", "-o", "test"
+    system bin/"clang", "-v", "test.c", "-o", "test"
     assert_equal "Hello World!", shell_output("./test").chomp
 
     # These tests should ignore the usual SDK includes
@@ -689,7 +640,7 @@ class LlvmAT21 < Formula
       # link against installed libc++
       # related to https://github.com/Homebrew/legacy-homebrew/issues/47149
       cxx_libdir = OS.mac? ? opt_lib/"c++" : opt_lib
-      system bin/"clang++", "-v", *sysroot_args,
+      system bin/"clang++", "-v",
              "-isystem", "#{opt_include}/c++/v1",
              "-std=c++11", "-stdlib=libc++", "test.cpp", "-o", "testlibc++",
              "-rtlib=compiler-rt", "-L#{cxx_libdir}", "-Wl,-rpath,#{cxx_libdir}"
@@ -697,10 +648,8 @@ class LlvmAT21 < Formula
         assert_includes (testpath/"testlibc++").dynamically_linked_libraries,
                         (cxx_libdir/shared_library("libc++", "1")).to_s
       else
-        # OHOS: {LIBCXX,LIBCXXABI,LIBUNWIND}_ENABLE_SHARED=OFF above (no
-        # crtbeginS.o-equivalent for this driver to link a .so against) —
-        # libc++ is statically linked in, so assert its *absence* from the
-        # dynamic dependency list instead of presence.
+        # libc++ is statically linked (ENABLE_SHARED=OFF above) — assert
+        # its *absence* from the dynamic dependency list instead.
         refute_includes (testpath/"testlibc++").dynamically_linked_libraries,
                         (cxx_libdir/shared_library("libc++", "1")).to_s
       end
@@ -724,7 +673,7 @@ class LlvmAT21 < Formula
       # search paths or handle all of the libraries needed by `libc++` when
       # linking statically.
 
-      system bin/"clang++", "-v", *sysroot_args, "-o", "test_pie_runtimes",
+      system bin/"clang++", "-v", "-o", "test_pie_runtimes",
                    "-pie", "-fPIC", "test.cpp", "-L#{opt_lib}",
                    "-stdlib=libc++", "-rtlib=compiler-rt",
                    "-static-libstdc++", "-lpthread", "-ldl"
@@ -736,15 +685,36 @@ class LlvmAT21 < Formula
         refute_match(/libunwind/, lib)
       end
 
-      # Upstream also builds a -shared C++ plugin here. Skipped on OHOS:
-      # `-shared` needs crtbeginS.o/crtendS.o, which nothing on this platform
-      # provides — ohos-sdk's sysroot doesn't ship them, and compiler-rt's
-      # crt component (which supplies them on bare-metal-style targets)
-      # doesn't build here either (COMPILER_RT_BUILD_CRT is gated behind
-      # COMPILER_RT_HAS_CRT, which evaluates false for this target and
-      # can't be forced via a normal -D). Known gap, not exercised by
-      # anything this formula itself needs (self-hosting only needs
-      # executables); revisit if a downstream consumer needs `-shared`.
+      # -shared works fine on OHOS: musl's crti.o/crtn.o plus this
+      # formula's own clang_rt.crtbegin.o/crtend.o are enough, unlike
+      # glibc's crtbeginS.o/crtendS.o.
+      (testpath/"test_plugin.cpp").write <<~CPP
+        #include <iostream>
+        __attribute__((visibility("default")))
+        extern "C" void run_plugin() {
+          std::cout << "Hello Plugin World!" << std::endl;
+        }
+      CPP
+      (testpath/"test_plugin_main.c").write <<~C
+        extern void run_plugin();
+        int main() {
+          run_plugin();
+        }
+      C
+      system bin/"clang++", "-v", "-o", "test_plugin.so",
+             "-shared", "-fPIC", "test_plugin.cpp", "-L#{opt_lib}",
+             "-stdlib=libc++", "-rtlib=compiler-rt",
+             "-static-libstdc++", "-lpthread", "-ldl"
+      system bin/"clang", "-v",
+             "test_plugin_main.c", "-o", "test_plugin_libc++",
+             "test_plugin.so", "-Wl,-rpath=#{testpath}", "-rtlib=compiler-rt"
+      assert_equal "Hello Plugin World!", shell_output("./test_plugin_libc++").chomp
+      (testpath/"test_plugin.so").dynamically_linked_libraries.each do |lib|
+        refute_match(/lib(std)?c\+\+/, lib)
+        refute_match(/libgcc/, lib)
+        refute_match(/libatomic/, lib)
+        refute_match(/libunwind/, lib)
+      end
 
       # OHOS-specific: target-triple runtime libs built by
       # build_ohos_target_runtimes, and an end-to-end cross-compile+run using
@@ -759,16 +729,13 @@ class LlvmAT21 < Formula
       assert_path_exists lib/TARGET_TRIPLE/"libc++.a"
       assert_path_exists include/TARGET_TRIPLE/"c++/v1/iostream"
 
-      # __n1 is OHOS's mandated ABI namespace for third-party distribution —
-      # assert it directly rather than trusting the cmake flag took effect.
-      # It's an inline namespace *nested inside* std (mangled as `4__n1`
-      # right after std's `St` substitution, e.g. `_ZNSt4__n1...`), not a
-      # top-level namespace — don't anchor the match on `_ZN` immediately
-      # preceding it.
+      # __n1 is OHOS's mandated third-party ABI namespace — assert it
+      # directly. Mangled as `4__n1` nested inside std (e.g.
+      # `_ZNSt4__n1...`), not top-level, so don't anchor on `_ZN`.
       assert_match "4__n1", shell_output("#{bin}/llvm-nm #{lib/TARGET_TRIPLE}/libc++_static.a")
 
       system bin/"clang++", "-stdlib=libc++", "--target=#{TARGET_TRIPLE}",
-             "--sysroot=#{sysroot}", "test.cpp", "-o", "test-ohos-target"
+             "test.cpp", "-o", "test-ohos-target"
       assert_equal "Hello World!", shell_output("./test-ohos-target").chomp
     end
 
@@ -802,14 +769,11 @@ class LlvmAT21 < Formula
       assert_includes shell_output("#{bin}/scan-build make scanbuildtest 2>&1"),
                       "warning: Use of memory after it is freed"
     else
-      # OHOS: neither `make` nor `perl` (which scan-build's driver needs) is a
-      # system tool here (both are formulae, not guaranteed on PATH in CI) —
-      # invoke the static analyzer directly instead, exercising the same
-      # clang-tools-extra codepath. `--analyzer-output=text` (with `=`)
-      # mis-splits as `-analyzer-output =text` and fails to parse; the
-      # space-separated form works.
+      # make/perl aren't guaranteed on PATH here — invoke the static
+      # analyzer directly instead (same clang-tools-extra codepath).
+      # `--analyzer-output=text` (with `=`) mis-splits; space-separated works.
       assert_includes shell_output(
-        "#{bin}/clang --analyze --analyzer-output text --sysroot=#{sysroot} scanbuildtest.cpp 2>&1",
+        "#{bin}/clang --analyze --analyzer-output text scanbuildtest.cpp 2>&1",
       ), "warning: Use of memory after it is freed"
     end
 
