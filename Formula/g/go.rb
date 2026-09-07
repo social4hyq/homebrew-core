@@ -7,6 +7,7 @@ class Go < Formula
   license "BSD-3-Clause"
   compatibility_version 4
   head "https://go.googlesource.com/go.git", branch: "master"
+  revision 1
 
   livecheck do
     url "https://go.dev/dl/?mode=json"
@@ -25,7 +26,9 @@ class Go < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "3c4aba871fb433e03b405211d7fe2c48315f3d8878da7e662406d5c433ef3c49"
   end
 
-  depends_on macos: :monterey
+  on_macos do
+    depends_on macos: :monterey
+  end
 
   # Don't update this unless this version cannot bootstrap the new version.
   resource "gobootstrap" do
