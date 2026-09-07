@@ -13,8 +13,8 @@ class LldAT21 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/lld@21-v21.1.8-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9bf121dc29472c5b6f1b8542948d4ac3c9e77e06932858af48db0e4acc3f36ce"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/lld@21-v21.1.8-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e360d4f4b205049777135bfe887a6ce1a0db21f77cbfe21bd8a475b8a46a0405"
   end
 
   # Not `:versioned_formula`: see the identical note in llvm@21.rb — avoids
