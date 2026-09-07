@@ -1,8 +1,8 @@
 class Tinymist < Formula
   desc "Services for Typst"
   homepage "https://myriad-dreamin.github.io/tinymist/"
-  url "https://github.com/Myriad-Dreamin/tinymist/archive/refs/tags/v0.15.4.tar.gz"
-  sha256 "5dfdc9b055e39d4e645d778747b0e24a3395afaeb835603bfba8db9286a552cb"
+  url "https://github.com/Myriad-Dreamin/tinymist/archive/refs/tags/v0.15.6.tar.gz"
+  sha256 "03d49413dd70d06d670d3c1970b4a416201ca6076bc4a321d4ffbce9893096ee"
   license "Apache-2.0"
   head "https://github.com/Myriad-Dreamin/tinymist.git", branch: "main"
 
@@ -15,7 +15,7 @@ class Tinymist < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0364fcca618739f02da9037319c6d3165cf6d056f979c6a8ef638e3581fd6fab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6f2cf241f6186f24a21fdc51af12be32a7ae0a5366f3a03c5185bf5310f77b7"
   end
 
   depends_on "rust" => :build
