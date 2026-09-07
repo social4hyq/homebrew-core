@@ -12,7 +12,7 @@ class Tokei < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "667e471f1c5f8cd7de617de7fd4697350c642b441eb7cfb4ccbc6d2d749488e9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "55dcf87ba9c94da9ef8774bc590db819c8f16bd489b95e9bf0ea5df07061bab4"
   end
 
   depends_on "rust" => :build
