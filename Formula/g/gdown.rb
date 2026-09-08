@@ -3,8 +3,8 @@ class Gdown < Formula
 
   desc "Google Drive Public File Downloader when Curl/Wget Fails"
   homepage "https://github.com/wkentaro/gdown"
-  url "https://files.pythonhosted.org/packages/4e/2a/d25ab185c35c0875dd0fb1d869baae844e8662ee19ef82721dfa32bfc901/gdown-6.1.1.tar.gz"
-  sha256 "34cd14ac1280bc9085266e4771df2a3bea125e7853313d902e976640068389d5"
+  url "https://files.pythonhosted.org/packages/39/54/95355a2bce205f67276236a7469d12f90dbe4c5b155f163a5ea5bd2353bc/gdown-6.2.0.tar.gz"
+  sha256 "0bbf25d3761262263a2d9d4a6cb26ebc7e0f225ad8f13483209992508bccdc54"
   license "MIT"
   head "https://github.com/wkentaro/gdown.git", branch: "main"
 
