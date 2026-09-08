@@ -1,5 +1,5 @@
 class Herdr < Formula
-  desc "Terminal workspace runtime for AI coding agents (built from source)"
+  desc "Agent multiplexer that lives in your terminal"
   homepage "https://herdr.dev"
   url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "1e83bff4b05834ed8281e16f1680e8f3e58375a94b2e3f2b3d021e28e293ef9a"
