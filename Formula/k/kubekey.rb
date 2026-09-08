@@ -16,7 +16,7 @@ class Kubekey < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a84430385372329d5e1eac92af6ec2fa147f3a6cd9600c125ecf9c004d9185ca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "21c6f94aa42d8f9e9aaa7568fba3bdc294ea11ccd3a648c3be2bf3e747069318"
   end
 
   depends_on "go" => :build
