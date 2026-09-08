@@ -12,12 +12,7 @@ class Dagger < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "c006567c0c30ac15fa2ae409dc9038e775193e180d1ae9ce2c5c72b2f7376723"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "c006567c0c30ac15fa2ae409dc9038e775193e180d1ae9ce2c5c72b2f7376723"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "c006567c0c30ac15fa2ae409dc9038e775193e180d1ae9ce2c5c72b2f7376723"
-    sha256 cellar: :any_skip_relocation, sonoma:        "8af26bb659202fc0f636a248128080ae58d507f5eb82bc47e7146494cb2dc8ad"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "152fde54f74bfba2f50cf583263e309839d8fd73d6074a2a2a73dfbd7bc3f6b7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "010f907d51bbaa26e7d1ac8f1e10bb117532cb7f58c4406952f79ca795b23a47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c53fd1166670ea36e283837df80057c1fe38ebcaabebea6c97939ccb7fe33a20"
   end
 
   # TODO: switch back to `go` when x/net is bumped past v0.54.0 (broken with Go 1.27)
