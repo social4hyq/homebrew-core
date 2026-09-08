@@ -7,7 +7,7 @@ class Headson < Formula
   head "https://github.com/kantord/headson.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c595abcba84b9a249adb2cd72c7f7eb82d0afa206cf83dca5665c65e752b6e6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "077bd0ad07a43e67d87098a3d9931cec2a31150f5f6f38a6c4c9e6e21565aaf1"
   end
 
   depends_on "rust" => :build
