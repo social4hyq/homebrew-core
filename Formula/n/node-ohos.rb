@@ -20,9 +20,11 @@ class NodeOhos < Formula
            "is the default for general use"
 
   # Toolchain rationale: see the long comment in install().
-  # llvm@21 no longer bundles lld (split into its own formula) — needed here
-  # so clang's driver finds the OHOS-codesigned ld.lld, not an unsigned
-  # fallback; without a signed ELF, the built node binary can't execute.
+  # lld@21/llvm@21 resolve to harmonybrew/core (this tap's fork was retired
+  # once upstreamed). llvm@21 no longer bundles lld (split into its own
+  # formula) — needed here so clang's driver finds the OHOS-codesigned
+  # ld.lld, not an unsigned fallback; without a signed ELF, the built node
+  # binary can't execute.
   depends_on "lld@21" => :build
   depends_on "llvm@21" => :build
   depends_on "ohos-sdk" => :build

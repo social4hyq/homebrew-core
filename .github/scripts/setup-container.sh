@@ -20,6 +20,30 @@ cexec 'mkdir -p /root/.cargo && printf "[registries.crates-io]\nprotocol = \"spa
 
 cexec 'brew --version && brew tap'
 
+# harmonybrew/core is baked into the ci-runner image at whatever snapshot
+# Harmonybrew's own image build last had -- not kept current with their tap's
+# git history (confirmed 2026-09-08: a same-day upstream formula merge was
+# still missing after two consecutive ci-runner image resyncs on our side).
+# Formula dependency resolution against it (e.g. bare `llvm@21`/`lld@21` in
+# bun*/node-ohos, see #526) needs the live tip, so fast-forward it explicitly
+# instead of trusting the image bake. Retry: transient network blips on the
+# runner, same rationale as light-check.sh's rubygems-mirror retry.
+ff_ok=false
+for i in 1 2 3; do
+  if cexec 'git -C "$(brew --repo harmonybrew/core)" fetch origin main && \
+            git -C "$(brew --repo harmonybrew/core)" reset --hard origin/main'; then
+    ff_ok=true
+    break
+  fi
+  [ "$i" = 3 ] && break
+  echo "::warning::harmonybrew/core fast-forward attempt $i failed, retrying in 20s"
+  sleep 20
+done
+if [ "$ff_ok" = false ]; then
+  echo "::error::failed to fast-forward harmonybrew/core to origin/main after 3 attempts"
+  exit 1
+fi
+
 # NOTE: `brew install git` is baked into the image itself by sync-ci-image.yml
 # (~52s/run when it lived here). It is still required: without a brew-installed
 # git, Homebrew's superenv git shim falls into a `whence -a git` fallback loop

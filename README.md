@@ -9,7 +9,7 @@
 - **让 AI 帮你写代码**：`opencode`（开源、自带 75+ 模型提供商接入）、`claude-code`（Anthropic 官方），配合 `herdr` 让 agent 会话断线不丢
 - **跑现代 JavaScript/前端工具链**：`bun` 运行时、`node-ohos`、`vite-plus` 统一前端工具链
 - **打造顺手的终端**：`starship` 提示符 + `hishell-font` 图标字体、`zellij` 终端工作区、`sshport` 远程端口转发
-- **本地构建与排障**：`llvm@21` 编译器、`ohos-bst-light` 自签工具、`ohos-compat-shim` 兼容层、`qemu-aarch64` 用户态仿真与系统调用跟踪
+- **本地构建与排障**：`ohos-bst-light` 自签工具、`ohos-compat-shim` 兼容层、`qemu-aarch64` 用户态仿真与系统调用跟踪
 
 ## 安装
 
@@ -52,14 +52,12 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `bun` | 1.4.2 | 极速 JavaScript/TypeScript 一体化工具链：运行时、包管理、测试、打包四合一，可直接替代 Node.js；本 tap 多数工具的底座 |
 | `bun-bootstrap` | 1.4.0-5467a689 | bun 自举构建用的预编译引导版（普通用户无需安装） |
 | `bun-webkit` | `2e2aa2290f` | bun 的浏览器引擎组件（内部依赖，普通用户无需关心） |
-| `node-ohos` | 26.7.0 | 用本 tap `llvm@21` 构建的 Node.js：与 bun 系原生插件 ABI 兼容，需要 node 跑原生扩展时选它（开发者向） |
+| `node-ohos` | 26.7.0 | 用 `harmonybrew/core` 的 `llvm@21` 构建的 Node.js：与 bun 系原生插件 ABI 兼容，需要 node 跑原生扩展时选它（开发者向） |
 | `vite-plus` | 0.2.8 | VoidZero（Vue/Vite 作者团队）的 Web 统一工具链：一个 `vp` 命令包揽创建项目、开发调试、检查、格式化、测试、构建全流程（Beta） |
 | `starship` | 1.26.0 | 跨 shell 的极简高速提示符：git 状态、目录、语言版本一目了然，一套配置通吃 bash/zsh/fish；**需配合 `hishell-font`**（图标字体），否则图标显示为方框 |
 | `hishell-font` | 0.1.0 | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
 | `zellij` | 0.45.1 | 开箱即用的终端工作区（类似 tmux）：多窗格/标签页、会话断开重连不丢，键位提示直接显示在界面上不用背，支持布局与插件 |
 | `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
-| `llvm@21` | 21.1.8 | Clang 编译器工具链：在鸿蒙 PC 上源码构建 C/C++ 的基石，构建产物自动完成代码签名（普通用户无需直接安装） |
-| `lld@21` | 21.1.8 | LLVM 链接器（`ld.lld`），从 `llvm@21` 拆出的独立 formula：keg-only，默认不覆盖系统自带的 `ld.lld`，需要它自带的代码签名补丁时显式 `brew install lld@21`（普通用户无需直接安装） |
 | `ohos-bst-light` | 1.0.0 | 零依赖的鸿蒙二进制自签名工具（开发向）：鸿蒙 PC 强制验签，自己编译的程序没签名跑不起来，`self-sign <文件>` 原地签好即可执行 |
 | `ohos-compat-shim` | 0.5.0 | 系统兼容层：自动兜底鸿蒙与标准 Linux 的底层行为差异，让 Linux 生态软件开箱即用（已内嵌进本 tap 产物，无需单独配置） |
 | `qemu-aarch64` | 11.0.1-r0 | 用户态 QEMU：直接运行/调试 Linux aarch64 程序，自带系统调用跟踪（`-strace`），是鸿蒙无 root strace 环境下的排障替代品 |
@@ -85,6 +83,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `warp-tui` | 2026-08-12 下线 | 已停止维护（使用率低）；可从 tap git 历史恢复 formula |
 | `inject-runpath` / `dlopen-sign-shim` | 2026-08-12 下线 | 已无 formula 依赖（原用途已被预签名 npm `.so` + bun r31 起静态内嵌的 `ohos-compat-shim` 取代）；可从 tap git 历史恢复 formula |
 | `zig@0.15` | 2026-09-04 下线 | 唯一消费者 herdr 已改为 install() 内联官方预编译 zig（resource 下载 + binary-sign-tool 签名），独立 keg 无保留必要；可从 tap git 历史恢复 formula |
+| `llvm@21` / `lld@21` | 2026-09-08 下线 | 补丁已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install llvm@21 lld@21`；`bun`/`bun-webkit`/`node-ohos` 的构建依赖已随之改为解析上游同名 formula；已装本 tap 旧版的用户请先 `brew uninstall llvm@21 lld@21` 再装上游版 |
 
 > 改名提示（2026-08-01）：`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
 

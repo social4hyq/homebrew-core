@@ -24,9 +24,10 @@ class BunWebkit < Formula
   depends_on "gperf"        => :build
   depends_on "icu4c@78" => :build
   depends_on "libxml2" => :build
-  # llvm@21 no longer bundles lld (split into its own formula) — needed so
-  # the -Wl,--code-sign linker flag below resolves against the
-  # OHOS-codesigned ld.lld, not an unsigned fallback.
+  # lld@21/llvm@21 resolve to harmonybrew/core (this tap's fork was retired
+  # once upstreamed). llvm@21 no longer bundles lld (split into its own
+  # formula) — needed so the -Wl,--code-sign linker flag below resolves
+  # against the OHOS-codesigned ld.lld, not an unsigned fallback.
   depends_on "lld@21" => :build
   depends_on "llvm@21" => :build
   depends_on "ninja" => :build
