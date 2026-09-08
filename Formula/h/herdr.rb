@@ -1,10 +1,9 @@
 class Herdr < Formula
   desc "Terminal workspace runtime for AI coding agents (built from source)"
   homepage "https://herdr.dev"
-  url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.8.2.tar.gz"
-  sha256 "60453051025ee44ebf055d26cdaf665a0accd99a992cddd22c166a26c49cd161"
+  url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.9.0.tar.gz"
+  sha256 "1e83bff4b05834ed8281e16f1680e8f3e58375a94b2e3f2b3d021e28e293ef9a"
   license "Apache-2.0"
-  revision 2
   head "https://github.com/herdrdev/herdr.git", branch: "master"
 
   livecheck do
@@ -13,8 +12,8 @@ class Herdr < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.8.2-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b5fc3731332200d954e33daed723def5e72698e67d81ac960a09cb7b45f6e3e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.9.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3fc78dac04a3ed43b5259627f7a4fecc03dadebf2fd285cfed061ac79f761a24"
   end
 
   depends_on "rust" => :build
