@@ -24,6 +24,10 @@ class Llvm < Formula
     regex(/^llvmorg[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61462f478c9d879dccc3e9932732cb4d63fa96a61d8f410bd9fe80180a2d532f"
+  end
+
   # Upstream's `keg_only :provided_by_macos` links on Linux; OHOS keeps this
   # keg keg-only to avoid colliding with ohos-sdk's own clang/llvm-* binaries
   # on PATH.
