@@ -12,7 +12,7 @@ class VitePlus < Formula
   # bottle block, depends_on swaps, native-binding wiring, build env,
   # vite-task patch, bin/vp wrapper (see the fenced blocks in install), and
   # the package-manager platform-cfg + signing patches (Patches/vite-plus/).
-  revision 7
+  revision 8
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
@@ -66,6 +66,21 @@ class VitePlus < Formula
     version "5c1d02c750ac21c6f4cf0528062590a145e87fd1"
   end
 
+  resource "wasm-tools-linux-arm64-musl" do
+    url "https://registry.npmjs.org/@napi-rs/wasm-tools-linux-arm64-musl/-/wasm-tools-linux-arm64-musl-1.0.1.tgz"
+    sha256 "781d8d8a6b1eb9e408df384df842963a04d0c2cecafd776992dd94de920db0bb"
+  end
+
+  resource "lzma-linux-arm64-musl" do
+    url "https://registry.npmjs.org/@napi-rs/lzma-linux-arm64-musl/-/lzma-linux-arm64-musl-1.4.5.tgz"
+    sha256 "7b972be94dcada346a868a89fcd4808e93df1587d4f06666005073ffa2f62ebe"
+  end
+
+  resource "tar-linux-arm64-musl" do
+    url "https://registry.npmjs.org/@napi-rs/tar-linux-arm64-musl/-/tar-linux-arm64-musl-1.1.0.tgz"
+    sha256 "824ac914a4ef81cca48e97ddb2037dac318a3e0c563653c60ba2e6dfd7242f87"
+  end
+
   # OHOS: package-manager platform-cfg + downloaded-binary signing (see the
   # patch files themselves for the full rationale).
   patch :p1 do
@@ -108,22 +123,12 @@ class VitePlus < Formula
     #     here.
     shims_dir = buildpath/"ohos-shims"
     # [parent package, version, musl binding package,
-    #  binding file name the loaders require]
+    #  binding file name the loaders require, Homebrew resource]
     shims = [
-      ["@napi-rs/wasm-tools", "1.0.1", "@napi-rs/wasm-tools", "wasm-tools.node"],
-      ["@napi-rs/lzma",       "1.4.5", "@napi-rs/lzma",       "lzma.node"],
-      ["@napi-rs/tar",        "1.1.0", "@napi-rs/tar",        "tar.node"],
+      ["@napi-rs/wasm-tools", "1.0.1", "@napi-rs/wasm-tools", "wasm-tools.node", "wasm-tools-linux-arm64-musl"],
+      ["@napi-rs/lzma",       "1.4.5", "@napi-rs/lzma",       "lzma.node",       "lzma-linux-arm64-musl"],
+      ["@napi-rs/tar",        "1.1.0", "@napi-rs/tar",        "tar.node",        "tar-linux-arm64-musl"],
     ]
-    musl_tgz = lambda do |pkg, version|
-      leaf = pkg.split("/").last
-      tgz = HOMEBREW_CACHE/"vite-plus-musl-napi"/"#{pkg.tr("/", "-")}-#{version}.tgz"
-      tgz.parent.mkpath
-      unless tgz.exist?
-        system "curl", "-fSL", "--retry", "5", "-o", tgz,
-               "https://registry.npmmirror.com/#{pkg}-linux-arm64-musl/-/#{leaf}-linux-arm64-musl-#{version}.tgz"
-      end
-      tgz
-    end
     overrides = {
       "lightningcss"          => "npm:@ohos-npm-ports/lightningcss@1.33.0-1",
       # yuku ships three versions in this graph, so each gets a qualified
@@ -143,19 +148,16 @@ class VitePlus < Formula
       "oxlint-tsgolint"       => "npm:@ohos-npm-ports/oxlint-tsgolint@7.0.2001-1",
     }
     extensions = {}
-    shims.each do |parent, version, binding_pkg, node_file|
+    shims.each do |parent, version, binding_pkg, node_file, resource_name|
       ohos_name = "#{binding_pkg}-openharmony-arm64"
       shim = shims_dir/"#{parent.tr("/", "@")}-#{version}"
-      next if shim.exist?
 
       shim.mkpath
-      stage = shim/"stage"
-      stage.mkpath
-      system "tar", "xzf", musl_tgz.call(binding_pkg, version), "-C", stage
-      node_src = Dir.glob("#{stage}/**/*.node").first
-      odie "no .node in musl tarball for #{binding_pkg}@#{version}" if node_src.nil?
-      cp node_src, shim/node_file
-      rm_r stage
+      resource(resource_name).stage do
+        node_src = Dir.glob("**/*.node").first
+        odie "no .node in musl resource for #{binding_pkg}@#{version}" if node_src.nil?
+        cp node_src, shim/node_file
+      end
       (shim/"package.json").write <<~JSON
         {
           "name": "#{ohos_name}",
@@ -211,11 +213,9 @@ class VitePlus < Formula
     # whose libc lacks the statx/execveat bindings it needs. Staged outside
     # the workspace dir: a nested workspace inside the tree derails cargo's
     # workspace-root selection.
-    vt_dir = HOMEBREW_CACHE/"vite-plus-vite-task"
-    unless (vt_dir/".git").exist?
-      rm_r(vt_dir) if vt_dir.exist?
-      resource("vite-task").stage vt_dir
-    end
+    vt_dir = buildpath.parent/"vite-task"
+    rm_r vt_dir if vt_dir.exist?
+    resource("vite-task").stage vt_dir
     preload_lib = vt_dir/"crates/fspy_preload_unix/src/lib.rs"
     ohos_exemption = 'all(unix, not(target_env = "musl"), not(target_env = "ohos"))'
     unless preload_lib.read.include?(ohos_exemption)

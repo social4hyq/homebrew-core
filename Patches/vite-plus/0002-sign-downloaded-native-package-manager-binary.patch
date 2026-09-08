@@ -45,14 +45,14 @@ index 62c7c95..e32e9d5 100644
      }
 +    #[cfg(target_env = "ohos")]
 +    {
-+        let _ = std::process::Command::new("selfsign")
-+            .arg(&native_bin_dest)
-+            .status();
++        let status = std::process::Command::new("selfsign").arg(&native_bin_dest).status()?;
++        if !status.success() {
++            let msg = format!("selfsign failed for {}", native_bin_dest.display());
++            let err = std::io::Error::other(msg);
++            return Err(err.into());
++        }
 +        use std::os::unix::fs::PermissionsExt;
-+        let _ = std::fs::set_permissions(
-+            &native_bin_dest,
-+            std::fs::Permissions::from_mode(0o755),
-+        );
++        std::fs::set_permissions(&native_bin_dest, std::fs::Permissions::from_mode(0o755))?;
 +    }
 
      // Clean up the extracted package directory
@@ -63,14 +63,14 @@ index 62c7c95..e32e9d5 100644
      }
 +    #[cfg(target_env = "ohos")]
 +    {
-+        let _ = std::process::Command::new("selfsign")
-+            .arg(&native_bin_dest)
-+            .status();
++        let status = std::process::Command::new("selfsign").arg(&native_bin_dest).status()?;
++        if !status.success() {
++            let msg = format!("selfsign failed for {}", native_bin_dest.display());
++            let err = std::io::Error::other(msg);
++            return Err(err.into());
++        }
 +        use std::os::unix::fs::PermissionsExt;
-+        let _ = std::fs::set_permissions(
-+            &native_bin_dest,
-+            std::fs::Permissions::from_mode(0o755),
-+        );
++        std::fs::set_permissions(&native_bin_dest, std::fs::Permissions::from_mode(0o755))?;
 +    }
 
      // Clean up the extracted package directory
