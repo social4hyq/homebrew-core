@@ -7,7 +7,7 @@ class Rustypaste < Formula
   head "https://github.com/orhun/rustypaste.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c2ec952434a9e82e98914692ccc250269f8a2ad688143734055e7a7964a2c1c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72c589f375e58a74877ddc265ecef9e1f783d19b2a6f371ebb65b4fcf3e5663e"
   end
 
   depends_on "rust" => :build
