@@ -13,7 +13,8 @@
 - [ ] `brew audit <formula>` passes (`brew audit --new <formula>` for a new formula)
 - [ ] Prebuilt-binary formula? Confirmed whether it needs
       `HOMEBREW_OHOS_BOTTLE_BINARY_SIGN` unset (see `build.sh`'s
-      `UNSET_SIGN_FORMULAS` + the odie guard in qemu-aarch64)
+      `UNSET_SIGN_FORMULAS` + its comment for the double-sign-corruption
+      mechanism and how to add an odie guard in install())
 
 -----
 
