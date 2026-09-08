@@ -15,6 +15,10 @@ class Libsecret < Formula
     regex(/libsecret[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5043717c47bc05369b8091aa0e9a98e61f25c56e43399e5f7284edd40ed9ca3c"
+  end
+
   depends_on "docbook-xsl" => :build
   depends_on "gettext" => :build
   depends_on "gobject-introspection" => :build
