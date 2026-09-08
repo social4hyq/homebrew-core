@@ -1,8 +1,8 @@
 class Lesspipe < Formula
   desc "Input filter for the pager less"
   homepage "https://www-zeuthen.desy.de/~friebel/unix/lesspipe.html"
-  url "https://github.com/wofr06/lesspipe/archive/refs/tags/v2.27.tar.gz"
-  sha256 "75ed4ee02d90080636c069a33861701af0af23753bd5ce422830b06f9102f548"
+  url "https://github.com/wofr06/lesspipe/archive/refs/tags/v2.28.tar.gz"
+  sha256 "b4f65d054afdc5964bada9a91d0c65f0b9896024fdfbade4089e92e674d91142"
   license all_of: [
     "GPL-2.0-only",
     "GPL-2.0-or-later", # sxw2txt
