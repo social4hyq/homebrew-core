@@ -1,13 +1,13 @@
 class Headson < Formula
   desc "Head/tail for structured data"
   homepage "https://docs.rs/headson/latest/headson/"
-  url "https://github.com/kantord/headson/archive/refs/tags/headson-v0.17.0.tar.gz"
-  sha256 "9555186f0f79a8be725aec6a3d857ae6d2b58133e060b0b7eeeeb85715284dbf"
+  url "https://github.com/kantord/headson/archive/refs/tags/headson-v0.17.1.tar.gz"
+  sha256 "7c04dbe3d94c8e828d453cfe93b68f0dbd25a72ce3735fc43d71e3e0ea2b9b32"
   license "MIT"
   head "https://github.com/kantord/headson.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c595abcba84b9a249adb2cd72c7f7eb82d0afa206cf83dca5665c65e752b6e6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "077bd0ad07a43e67d87098a3d9931cec2a31150f5f6f38a6c4c9e6e21565aaf1"
   end
 
   depends_on "rust" => :build
