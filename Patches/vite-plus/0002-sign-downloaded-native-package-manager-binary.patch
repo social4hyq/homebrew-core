@@ -1,0 +1,72 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Claude Sonnet 5 <noreply@anthropic.com>
+Date: Tue, 8 Sep 2026 19:39:38 +0800
+Subject: [PATCH] OHOS: sign the downloaded native package-manager binary.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The platform-cfg patch (0001) only gets the *right* platform package
+downloaded — confirmed on real hardware that OHOS's exec() signature
+check still EACCESs the freshly-downloaded musl binary (unrelated to
+the unix mode bit set right after the rename; this device enforces
+code-signing on every exec regardless of ELF/libc correctness — the
+container this bottle is built in does not enforce it, so this branch
+is a no-op there). Sign in place right after the existing chmod;
+deliberately not probing the binary here (executing an unknown
+freshly-downloaded exe from inside the build turned out to be its own
+source of container failures) — the settle delay between signing and
+it being runnable is covered by the caller's own retry loop
+(`vp_with_retry` in the formula's test block, and any real invocation
+of `vp create`/`vp install`). Both download_*_package_manager
+functions share this exact set_permissions block verbatim.
+---
+ crates/vite_pm_cli/src/package_manager.rs | 28 +++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/crates/vite_pm_cli/src/package_manager.rs b/crates/vite_pm_cli/src/package_manager.rs
+index 62c7c95..0ceb65b 100644
+--- a/crates/vite_pm_cli/src/package_manager.rs
++++ b/crates/vite_pm_cli/src/package_manager.rs
+@@ -1053,6 +1053,20 @@ async fn download_bun_package_manager(
+         use std::os::unix::fs::PermissionsExt;
+         tokio::fs::set_permissions(&native_bin_dest, fs::Permissions::from_mode(0o755)).await?;
+     }
++    #[cfg(target_env = "ohos")]
++    {
++        let _ = std::process::Command::new("binary-sign-tool")
++            .args(["sign", "-selfSign", "1", "-inFile"])
++            .arg(&native_bin_dest)
++            .args(["-outFile"])
++            .arg(&native_bin_dest)
++            .status();
++        use std::os::unix::fs::PermissionsExt;
++        let _ = std::fs::set_permissions(
++            &native_bin_dest,
++            std::fs::Permissions::from_mode(0o755),
++        );
++    }
+ 
+     // Clean up the extracted package directory
+     remove_dir_all_force(&package_dir).await?;
+@@ -1239,6 +1253,20 @@ async fn download_pnpm_native_package_manager(
+         use std::os::unix::fs::PermissionsExt;
+         tokio::fs::set_permissions(&native_bin_dest, fs::Permissions::from_mode(0o755)).await?;
+     }
++    #[cfg(target_env = "ohos")]
++    {
++        let _ = std::process::Command::new("binary-sign-tool")
++            .args(["sign", "-selfSign", "1", "-inFile"])
++            .arg(&native_bin_dest)
++            .args(["-outFile"])
++            .arg(&native_bin_dest)
++            .status();
++        use std::os::unix::fs::PermissionsExt;
++        let _ = std::fs::set_permissions(
++            &native_bin_dest,
++            std::fs::Permissions::from_mode(0o755),
++        );
++    }
+ 
+     // Clean up the extracted package directory
+     remove_dir_all_force(&package_dir).await?;
