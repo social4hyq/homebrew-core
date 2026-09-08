@@ -12,7 +12,7 @@ class VitePlus < Formula
   # bottle block, depends_on swaps, native-binding wiring, build env,
   # vite-task patch, bin/vp wrapper (see the fenced blocks in install), and
   # the package-manager platform-cfg + signing patches (Patches/vite-plus/).
-  revision 6
+  revision 7
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
@@ -24,17 +24,11 @@ class VitePlus < Formula
   depends_on "just" => :build
   # OHOS: no rustup formula; stable rust + RUSTC_BOOTSTRAP (see install).
   depends_on "ohos-sdk" => :build
-  depends_on "pnpm@10" => :build
+  depends_on "pnpm" => :build
   depends_on "rust" => :build # TODO: try to restore rustup: https://github.com/voidzero-dev/vite-task/commit/db99ba4d5d33323cc9e7b329f11bdea0610fbc7f
   # OHOS: @napi-rs/cli cross-compiles the bundled bindings against the SDK.
-  # OHOS: pnpm >= 11.19 regressed `deploy --legacy` for workspace deps with
-  # peerDependencies (pnpm/pnpm#13618, fixed 2026-08-10); pin the build to
-  # pnpm@10. vp resolves its own pnpm at runtime (see the package-manager
-  # platform-cfg patch) — no runtime pnpm dependency needed.
   depends_on "node"
-  # OHOS: the package-manager platform-cfg patch signs the pnpm/bun binary
-  # it downloads at runtime via `selfsign` (binary-sign-tool corrupts this
-  # binary's ELF structure — see the patch itself).
+  # OHOS: selfsign for the pm binary the platform-cfg patch downloads (binary-sign-tool corrupts it).
   depends_on "ohos-bst-light"
 
   resource "rolldown" do
@@ -195,7 +189,7 @@ class VitePlus < Formula
     # as Alpine packaging.
     ENV["NPM_CONFIG_MANAGE_PACKAGE_MANAGER_VERSIONS"] = "false"
     ENV["npm_config_manage_package_manager_versions"] = "false"
-    ENV.prepend_path "PATH", formula_opt_bin("pnpm@10")
+    ENV.prepend_path "PATH", formula_opt_bin("pnpm")
     # Unlocks `-Z bindeps` (fspy preload artifact deps) on the stable
     # compiler; the repo's rust-toolchain.toml nightly pin is inert here.
     ENV["RUSTC_BOOTSTRAP"] = "1"
@@ -357,7 +351,7 @@ class VitePlus < Formula
     # OHOS: the graft above only matters if pnpm actually considers the
     # openharmony optional package installable. pnpm's own os-detection is
     # JS/Node-based (and this Node reports "openharmony", so build-time
-    # pnpm@10 matches optional packages tagged os:["openharmony"] with no
+    # pnpm matches optional packages tagged os:["openharmony"] with no
     # help — see the native-bindings comment in install). But `vp`'s own
     # package manager is now a standalone native pnpm executable (see
     # Patches/vite-plus/0001-package-manager-platform-cfg.patch) with no
