@@ -5,7 +5,7 @@ class NodeAT22 < Formula
   sha256 "bbe768df8d5815d7fa76124052985332452e0a4742d39f32027550d1aab8f6fb"
   license "MIT"
   compatibility_version 1
-  revision 2
+  revision 3
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -22,75 +22,23 @@ class NodeAT22 < Formula
 
   keg_only :versioned_formula
 
+  # The unversioned `llvm` (LLVM 23) is too new for node, which is not yet
+  # adapted to it. Lock to `llvm@22` for now.
+  depends_on "llvm@22" => :build
+
   # https://github.com/nodejs/release#release-schedule
   # disable! date: "2027-04-30", because: :unsupported
   deprecate! date: "2026-10-28", because: :unsupported
 
-  resource "alpine-rootfs" do
-    url "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/aarch64/alpine-minirootfs-3.23.4-aarch64.tar.gz"
-    sha256 "9250667a8affac8f1e98086392f80f43f086626701e9bce33398eb9b6c0bd64c"
-  end
-
   def install
-    # Although node@22 can be compiled with the ohos-sdk compiler (LLVM 15),
-    # we use the Alpine native GCC and static linking here instead.
-    # This maintains consistency with the node and node@24 formulae.
+    ENV["CC"] = "#{formula_opt_bin("llvm@22")}/clang -fno-emulated-tls"
+    ENV["CXX"] = "#{formula_opt_bin("llvm@22")}/clang++ -fno-emulated-tls"
 
-    chroot_dir = buildpath/"alpine-chroot"
-    chroot_dir.mkpath
+    inreplace "common_node.gypi", "linux ", "linux openharmony "
 
-    resource("alpine-rootfs").stage do
-      system "cp", "-a", ".", chroot_dir.to_s
-    end
+    system "./configure", "--prefix=#{prefix}", "--dest-os=openharmony"
+    system "make", "install"
 
-    if File.exist?("/etc/resolv.conf")
-      chroot_dir.join("etc/resolv.conf").write(File.read("/etc/resolv.conf"))
-    else
-      chroot_dir.join("etc/resolv.conf").write("nameserver 8.8.8.8\n")
-    end
-
-    chroot_build_dir = chroot_dir/"build"
-    chroot_build_dir.mkpath
-
-    Dir.glob("#{buildpath}/*").each do |file|
-      next if file == chroot_dir.to_s
-      FileUtils.mv(file, chroot_build_dir)
-    end
-
-    chroot_script = <<~SH
-      set -e
-      export PATH=/bin:/usr/bin:/usr:sbin
-      export HOME=/root
-
-      apk update
-      apk add build-base python3 linux-headers
-
-      cd /build
-      sed -i 's/linux /linux openharmony /g' common_node.gypi
-      export CC="gcc"
-      export CXX="g++"
-      ./configure \
-        --prefix=#{prefix} \
-        --dest-os=openharmony \
-        --partly-static
-
-      make -j$(nproc)
-      mkdir -p /dest
-      make install DESTDIR=/dest
-    SH
-
-    chroot_dir.join("build_node.sh").write(chroot_script)
-    system "chmod", "+x", "#{chroot_dir}/build_node.sh"
-
-    system "env", "-i", "chroot", chroot_dir.to_s, "/bin/sh", "/build_node.sh"
-
-    chroot_dest_target = chroot_dir/"dest#{prefix}"
-    cd chroot_dest_target do
-      prefix.install Dir["*"]
-    end
-  end
-
-  def post_install
     (lib/"node_modules/npm/npmrc").atomic_write("prefix = #{HOMEBREW_PREFIX}\n")
   end
 
