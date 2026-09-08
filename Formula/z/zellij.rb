@@ -8,7 +8,7 @@ class Zellij < Formula
   head "https://github.com/zellij-org/zellij.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "25e7eb0d6e7392202acf85ab62a1e499d6eadf829505b944e0229481011b0d2b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "565a6eab5ffd9169057604dd3097de0255e4a01f669293cd2a4e1ea2de073e17"
   end
 
   depends_on "cmake" => :build
