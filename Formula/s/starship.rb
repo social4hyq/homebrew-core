@@ -6,6 +6,10 @@ class Starship < Formula
   license "ISC"
   head "https://github.com/starship/starship.git", branch: "main"
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "45cbf2ee3cf2b809979071044c0a20f441a138c16615436ec99b7c5d83727270"
+  end
+
   depends_on "cmake" => :build
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
