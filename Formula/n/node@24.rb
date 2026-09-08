@@ -13,7 +13,8 @@ class NodeAT24 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "62e3f4805fa56689ca740e53cf2309abbc3ef3aea7967107f7832ce585272403"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b1ef59ec8eff118d8d068620fd8ecaf541a8118ff9dd5c354e6e9ecca92b6e4"
   end
 
   patch do
@@ -25,12 +26,18 @@ class NodeAT24 < Formula
   # The unversioned `llvm` (LLVM 23) is too new for node, which is not yet
   # adapted to it. Lock to `llvm@22` for now.
   depends_on "llvm@22" => :build
+  depends_on "python@3.14" => :build
 
   # https://github.com/nodejs/release#release-schedule
   # disable! date: "2028-04-30", because: :unsupported
   deprecate! date: "2027-04-30", because: :unsupported
 
   def install
+    # LLVM defaults to emulated TLS for aarch64-linux-ohos, which makes
+    # TLS-using programs ~30% slower. Harmonybrew's superenv injects
+    # -fno-emulated-tls globally (see https://atomgit.com/Harmonybrew/brew/pull/41),
+    # but CC/CXX here point at clang/clang++ by absolute path, bypassing the
+    # superenv `cc` shim, so the flag must be appended explicitly.
     ENV["CC"] = "#{formula_opt_bin("llvm@22")}/clang -fno-emulated-tls"
     ENV["CXX"] = "#{formula_opt_bin("llvm@22")}/clang++ -fno-emulated-tls"
 
