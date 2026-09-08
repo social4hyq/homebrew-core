@@ -13,7 +13,8 @@ class Node < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d09dc0484fda052fa85ff9eac32ba5191ae2b6c343280315d680949d1ee3d6b2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8fd4f666eaea068a0ed98e5131e122a19ab84ab42df4cbdda9ed7a1fae0bfa07"
   end
 
   # The unversioned `llvm` (LLVM 23) is too new for node, which is not yet
