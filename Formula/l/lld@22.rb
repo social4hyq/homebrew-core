@@ -10,6 +10,10 @@ class LldAT22 < Formula
     formula "llvm@22"
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9d2c352d94a396f175c282db68605f985321c563e02277572a3955d81f856df"
+  end
+
   # Not `:versioned_formula`: the fork auto-links versioned kegs on direct
   # install, colliding with ohos-sdk's own ld.lld/lld on PATH.
   keg_only "it conflicts with `ohos-sdk`"
