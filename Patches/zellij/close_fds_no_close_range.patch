@@ -1,0 +1,11 @@
+--- close_fds-0.3.2.orig/src/closefds/close.rs	1970-01-01 08:00:00.000000000 +0800
++++ close_fds-0.3.2/src/closefds/close.rs	2026-09-08 12:11:04.383992655 +0800
+@@ -94,7 +94,7 @@
+ }
+ 
+ #[cfg(target_os = "linux")]
+-static MAY_HAVE_CLOSE_RANGE: AtomicBool = AtomicBool::new(true);
++static MAY_HAVE_CLOSE_RANGE: AtomicBool = AtomicBool::new(false);
+ 
+ #[cfg(target_os = "linux")]
+ unsafe fn try_close_range(minfd: libc::c_uint, maxfd: libc::c_uint) -> Result<(), ()> {
