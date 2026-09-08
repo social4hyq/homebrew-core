@@ -1,9 +1,9 @@
 class Kamel < Formula
   desc "Apache Camel K CLI"
   homepage "https://camel.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=camel/camel-k/2.10.1/camel-k-sources-2.10.1.tar.gz"
-  mirror "https://archive.apache.org/dist/camel/camel-k/2.10.1/camel-k-sources-2.10.1.tar.gz"
-  sha256 "936fb5c9d5c1fd48f984cf9362dac4eb466543eef0a823917820402eebd2b941"
+  url "https://www.apache.org/dyn/closer.lua?path=camel/camel-k/2.11.0/camel-k-sources-2.11.0.tar.gz"
+  mirror "https://archive.apache.org/dist/camel/camel-k/2.11.0/camel-k-sources-2.11.0.tar.gz"
+  sha256 "aace4782b7f4fcb5ff7c49f8c4ead8a5d33b1139678c6f9253c6c37e83d4e78b"
   license "Apache-2.0"
   head "https://github.com/apache/camel-k.git", branch: "main"
 
