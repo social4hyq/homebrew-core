@@ -1,0 +1,15 @@
+# build.rs maps Rust TARGET to zig -Dtarget via a fixed match table that panics
+# on unknowns. aarch64-unknown-linux-ohos isn't in it; route onto
+# aarch64-linux-musl (same libc/ABI). The static lib is plain object code linked
+# by rustc's own OHOS-aware linker, not zig, so zig never needs to know "ohos".
+
+--- a/build.rs	2026-09-02 14:03:42.078609219 +0800
++++ b/build.rs	2026-09-02 14:03:42.102607969 +0800
+@@ -9,6 +9,7 @@
+         "aarch64-unknown-linux-gnu" => "aarch64-linux-gnu",
+         "x86_64-unknown-linux-musl" => "x86_64-linux-musl",
+         "aarch64-unknown-linux-musl" => "aarch64-linux-musl",
++        "aarch64-unknown-linux-ohos" => "aarch64-linux-musl",
+         "x86_64-apple-darwin" => "x86_64-macos",
+         "aarch64-apple-darwin" => "aarch64-macos",
+         "x86_64-pc-windows-msvc" => "x86_64-windows-msvc",

@@ -1,0 +1,97 @@
+# OHOS agent detection: procfs here reports tty_nr/tpgid as 0 for every process
+# and lacks /proc/<pid>/task/<tid>/children, so neither the native foreground
+# process-group lookup nor the child-groups fallback can identify pane agents
+# (lifecycle hook reports are gated on that identification too). Fall back to
+# tcgetpgrp() on the pane's own PTY master fd, which the PTY actor already
+# exposes for cwd tracking; job membership degrades to the group leader —
+# enough for comm/argv matching and HERDR_AGENT environment hints.
+#
+# Two sites: spawn_basic_detection_task (handoff path) and the inline
+# detection task (spawn path — hooks the `(_, true)` fresh-lookup arm of the
+# foreground match introduced in 0.8.2).
+
+--- a/src/pane.rs	2026-09-02 14:03:42.134609844 +0800
++++ b/src/pane.rs	2026-09-02 14:03:42.166607657 +0800
+@@ -675,7 +675,39 @@
+     )
+ }
+ 
++// OHOS: procfs reports tpgid as 0 for every process and lacks
++// /proc/<pid>/task/<tid>/children, so neither the native foreground
++// process-group lookup nor the child-groups fallback can identify pane
++// agents. The pane's own PTY master fd still answers tcgetpgrp(); use it
++// as a fallback. Job membership degrades to the group leader, which is
++// enough for comm/argv matching and HERDR_AGENT environment hints.
+ #[cfg(unix)]
++fn detection_pty_actor(io: &PaneRuntimeIo) -> Option<PtyIoActorHandle> {
++    match io {
++        PaneRuntimeIo::Actor(actor) => Some(actor.clone()),
++        #[cfg(test)]
++        PaneRuntimeIo::TestChannel { .. } => None,
++    }
++}
++
++#[cfg(not(unix))]
++fn detection_pty_actor(_io: &PaneRuntimeIo) -> Option<PtyIoActorHandle> {
++    None
++}
++
++#[cfg(unix)]
++fn pty_actor_foreground_process_group(actor: &Option<PtyIoActorHandle>) -> Option<u32> {
++    actor
++        .as_ref()
++        .and_then(PtyIoActorHandle::foreground_process_group_id)
++}
++
++#[cfg(not(unix))]
++fn pty_actor_foreground_process_group(_actor: &Option<PtyIoActorHandle>) -> Option<u32> {
++    None
++}
++
++#[cfg(unix)]
+ fn spawn_basic_detection_task(
+     pane_id: PaneId,
+     child_pid: Arc<AtomicU32>,
+@@ -682,4 +714,5 @@
+     terminal: Arc<PaneTerminal>,
++    pty_actor: Option<PtyIoActorHandle>,
+     detection_content_seq: Arc<AtomicU64>,
+     full_lifecycle_authority_active: Arc<AtomicBool>,
+     state_events: mpsc::Sender<AppEvent>,
+@@ -758,7 +791,8 @@
+                 full_lifecycle_authority_active.load(Ordering::Acquire);
+             let foreground_pgid = (pid > 0)
+                 .then(|| crate::detect::foreground_process_group_id(pid))
+-                .flatten();
++                .flatten()
++                .or_else(|| pty_actor_foreground_process_group(&pty_actor));
+             let process_group_changed =
+                 foreground_group_changed(foreground_pgid, last_foreground_pgid);
+             let should_check_process = pid > 0 && {
+@@ -1988,6 +2022,7 @@
+             pane_id,
+             child_pid.clone(),
+             terminal.clone(),
++            detection_pty_actor(&io),
+             detection_content_seq.clone(),
+             full_lifecycle_authority_active.clone(),
+             events,
+@@ -2152,6 +2187,8 @@
+             })?)
+         };
+ 
++        let pty_actor = detection_pty_actor(&io);
++
+         // --- Detection task ---
+         let (detect_handle, detect_reset_notify, pending_release) = if agent_detection
+             == AgentDetection::Enabled
+@@ -2280,7 +2317,8 @@
+                     let foreground_observation_due = true;
+                     let foreground_pgid = match (pid, foreground_observation_due) {
+                         (0, _) => None,
+-                        (_, true) => detect::foreground_process_group_id(pid),
++                        (_, true) => detect::foreground_process_group_id(pid)
++                            .or_else(|| pty_actor_foreground_process_group(&pty_actor)),
+                         _ => last_foreground_pgid,
+                     };
+                     #[cfg(windows)]
