@@ -1,10 +1,9 @@
 class Herdr < Formula
   desc "Terminal workspace runtime for AI coding agents (built from source)"
   homepage "https://herdr.dev"
-  url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.8.2.tar.gz"
-  sha256 "60453051025ee44ebf055d26cdaf665a0accd99a992cddd22c166a26c49cd161"
+  url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.9.0.tar.gz"
+  sha256 "1e83bff4b05834ed8281e16f1680e8f3e58375a94b2e3f2b3d021e28e293ef9a"
   license "Apache-2.0"
-  revision 2
   head "https://github.com/herdrdev/herdr.git", branch: "master"
 
   livecheck do
