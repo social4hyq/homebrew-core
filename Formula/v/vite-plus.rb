@@ -22,7 +22,9 @@ class VitePlus < Formula
 
   depends_on "cmake" => :build
   depends_on "just" => :build
-  # OHOS: rustup exists but untested for this host; stable rust + RUSTC_BOOTSTRAP is the verified path (see install).
+  # OHOS: rustup fetches stable/nightly fine for this host, but its mirror
+  # lacks the exact nightly this repo pins; stable rust + RUSTC_BOOTSTRAP
+  # is the verified path (see install).
   depends_on "ohos-sdk" => :build
   depends_on "pnpm@10" => :build
   depends_on "rust" => :build # TODO: try to restore rustup: https://github.com/voidzero-dev/vite-task/commit/db99ba4d5d33323cc9e7b329f11bdea0610fbc7f
