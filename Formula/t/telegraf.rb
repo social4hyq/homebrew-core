@@ -1,8 +1,8 @@
 class Telegraf < Formula
   desc "Plugin-driven server agent for collecting & reporting metrics"
   homepage "https://www.influxdata.com/time-series-platform/telegraf/"
-  url "https://github.com/influxdata/telegraf/archive/refs/tags/v1.39.3.tar.gz"
-  sha256 "13b4186fac9a9d29858c532b73efc41e0a1ac8ce93a615b59d5a6e589e71ab2f"
+  url "https://github.com/influxdata/telegraf/archive/refs/tags/v1.40.0.tar.gz"
+  sha256 "edef75c677e2c2d8b32848397fe9a4736a1b81e3c170b9bedf77d952ae5fa1db"
   license "MIT"
   head "https://github.com/influxdata/telegraf.git", branch: "master"
 
@@ -12,7 +12,7 @@ class Telegraf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "53ae4103d6901cf64f56704ec1cd45e9fe32ada1e4c6b519c11177a0e0d86f2a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c87df035d75a6ce9a9a66d3b533896feb55f711c78352613c98c8937ec3ae94"
   end
 
   depends_on "go" => :build
