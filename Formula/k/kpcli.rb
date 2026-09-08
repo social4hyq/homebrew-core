@@ -11,6 +11,10 @@ class Kpcli < Formula
     regex(%r{url=.*?/kpcli[._-]v?(\d+(?:\.\d+)+)\.pl}i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b630e179b9aea2dfefb6d7d2f5258e014e8ec56c2c7f13637d941c6f8c08b7e7"
+  end
+
   depends_on "readline"
 
   uses_from_macos "ncurses"
