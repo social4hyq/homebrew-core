@@ -17,8 +17,8 @@ class OpencodeAT2 < Formula
   # @ohos-npm-ports/opentui-core fixes libopentui.so's pthread_tryjoin_np
   # dependency at the source level (weak symbol), no LD_PRELOAD shim needed.
   # See social4hyq/ohos-opencode2 dev for canonical diff.
-  url "https://github.com/anomalyco/opencode.git", revision: "d86c3041c948f17a8a02d01d08925c893eaf1bdf"
-  version "0.0.0-beta-19234"
+  url "https://github.com/anomalyco/opencode.git", revision: "ad31bff969fe386266d3d1cd24d988651d3233af"
+  version "0.0.0-beta-19271"
   license "MIT"
   # Baked-in channel was empty (see OPENCODE_CHANNEL below) — TUI crashed on
   # startup ("Invalid storage segment" segment-validates the channel), so the
