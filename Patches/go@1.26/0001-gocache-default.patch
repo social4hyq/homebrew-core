@@ -1,0 +1,17 @@
+--- go/src/cmd/go/internal/cache/default.go	2026-05-04 20:36:18.000000000 +0000
++++ go/src/cmd/go/internal/cache/default.go	2026-06-05 10:24:06.620212505 +0000
+@@ -79,13 +79,7 @@
+ 
+ 	defaultDirOnce.Do(func() {
+ 		// Compute default location.
+-		dir, err := os.UserCacheDir()
+-		if err != nil {
+-			defaultDir = "off"
+-			defaultDirErr = fmt.Errorf("GOCACHE is not defined and %v", err)
+-		} else {
+-			defaultDir = filepath.Join(dir, "go-build")
+-		}
++		defaultDir = filepath.Join("/data/storage/el2/base/files", "go-build")
+ 
+ 		newDir := cfg.Getenv("GOCACHE")
+ 		if newDir != "" {

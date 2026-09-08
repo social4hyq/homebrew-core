@@ -1,0 +1,77 @@
+--- go/src/cmd/go/internal/work/exec.go
++++ go/src/cmd/go/internal/work/exec.go
+@@ -41,6 +41,7 @@
+ 	"cmd/go/internal/load"
+ 	"cmd/go/internal/modinfo"
+ 	"cmd/go/internal/modload"
++	"cmd/go/internal/selfsign"
+ 	"cmd/go/internal/str"
+ 	"cmd/go/internal/trace"
+ 	"cmd/internal/buildid"
+@@ -1662,10 +1663,66 @@
+ 		return err
+ 	}
+ 
++	// HarmonyOS: auto-sign the ELF binary for execution.
++	// Must happen after buildid -w (updateBuildID), which would overwrite the signature.
++	if err := autoSignOutput(a.Target); err != nil {
++		return err
++	}
++	// 'go run' (and 'go test') set CacheExecutable, so updateBuildID already
++	// stored a copy of the executable in the build cache (GOCACHE) before this
++	// hook ran. Cache hits execute that cached copy directly without re-running
++	// link, so it must be signed too, otherwise a warm 'go run' runs an
++	// unsigned binary on HarmonyOS.
++	if a.cachedExecutable != "" {
++		if err := autoSignOutput(a.cachedExecutable); err != nil {
++			return err
++		}
++	}
++
+ 	a.built = a.Target
+ 	return nil
+ }
+ 
++// autoSignOutput signs the output ELF binary using the vendored selfsign
++// implementation (from ohos-bst-light, see cmd/go/internal/selfsign).
++// Only signs executable (ET_EXEC) and shared object (ET_DYN) ELF files,
++// skipping relocatable (ET_REL, i.e. .o) files which would be corrupted by
++// signing. On HarmonyOS, compiled ELF binaries require code signing to execute.
++// This is called after the final build-ID write to ensure the signature is not
++// overwritten.
++func autoSignOutput(path string) error {
++	if path == "" {
++		return nil
++	}
++	f, err := os.Open(path)
++	if err != nil {
++		return nil
++	}
++	// Read ELF header: magic(4) + class/data/ver/pad(12) + e_type(2) = 18 bytes
++	buf := make([]byte, 18)
++	if _, err := f.Read(buf); err != nil {
++		f.Close()
++		return nil
++	}
++	f.Close()
++	// Check ELF magic
++	if buf[0] != 0x7f || buf[1] != 'E' || buf[2] != 'L' || buf[3] != 'F' {
++		return nil
++	}
++	// Parse e_type at offset 16 (little-endian for both ELF32 and ELF64)
++	eType := int(buf[16]) | int(buf[17])<<8
++	// ET_REL (1) = .o relocatable -> skip (signing would corrupt it)
++	// ET_EXEC (2) = executable -> sign
++	// ET_DYN  (3) = shared object (.so) -> sign
++	if eType != 2 && eType != 3 {
++		return nil
++	}
++	if err := selfsign.SignFileAtomic(path, true); err != nil {
++		log.Printf("warning: selfsign failed: %v", err)
++	}
++	return nil
++}
++
+ func (b *Builder) writeLinkImportcfg(a *Action, file string) error {
+ 	// Prepare Go import cfg.
+ 	var icfg bytes.Buffer
