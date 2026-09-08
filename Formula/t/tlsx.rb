@@ -12,7 +12,7 @@ class Tlsx < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6d0b15a696dbcfa3b9a0a03989475aaba4ae5d49cbb9b77a990b4faa723c2a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6cd9ddfb2120436b473d9215c80866d74b87200df68373165fafd71df7ae1f34"
   end
 
   depends_on "go" => :build
