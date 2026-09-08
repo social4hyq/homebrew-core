@@ -11,6 +11,10 @@ class LlvmAT22 < Formula
     regex(/^llvmorg[._-]v?(22(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e789e32664ef38ed17dc61d2107d9192164c12cf0564d3ad774dbe70fb39ecec"
+  end
+
   # Not `:versioned_formula`: the fork auto-links versioned kegs on direct
   # install, colliding with ohos-sdk's own clang/llvm-* binaries on PATH.
   keg_only "it conflicts with `ohos-sdk`"
