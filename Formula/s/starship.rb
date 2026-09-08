@@ -4,55 +4,40 @@ class Starship < Formula
   url "https://github.com/starship/starship/archive/refs/tags/v1.26.0.tar.gz"
   sha256 "8c95e8a6c596b29ac192104eae00dd991e8c8fd66083fd2b34d6b223a5803a59"
   license "ISC"
-  revision 5
+  revision 6
   head "https://github.com/starship/starship.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r9"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5c5889608400efe58dce7599d2b3523e6c588849b724f52aea6e658a2bf54a3"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
+  depends_on "cmake" => :build
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
 
-  # Pulled in transitively (guess_host_triple -> errno 0.2.4, resolves to
-  # 0.2.8). This old errno release hand-rolls its own strerror_r FFI binding
-  # gated only on target_os = "linux" (not target_env), so it demands the
-  # glibc-only __xpg_strerror_r symbol on musl/OHOS too — a bug in errno
-  # 0.2.8 itself (last release of that line), unrelated to the libc crate,
-  # which already excludes both musl and ohos correctly. guess_host_triple
-  # pins `errno = "0.2.4"` (^0.2), so cargo can't be pointed at errno's newer
-  # 0.3.x rewrite (different API) via a plain version bump.
+  on_linux do
+    depends_on "dbus"
+    depends_on "zlib-ng-compat"
+  end
+
+  # guess_host_triple's errno 0.2.8 dep wrongly demands glibc's __xpg_strerror_r on musl/OHOS.
   resource "errno" do
     url "https://static.crates.io/crates/errno/errno-0.2.8.crate"
     sha256 "f639046355ee4f37944e44f60642c6f3a7efa3cf6b78c78a0d989a8ce6c396a1"
   end
 
   def install
-    # Disable default features (battery/notify): both compile fine on OHOS
-    # (notify-rust defaults to zbus, a pure-Rust D-Bus client; starship-battery's
-    # linux backend is plain std::fs) but are useless at runtime — reading
-    # /sys/class/power_supply/* hits Permission denied under the OHOS sandbox
-    # even though the sysfs entries exist, and there's no D-Bus session bus to
-    # notify over. Both degrade gracefully (empty module / silent no-op, no
-    # panic) if left on, so this is a "not useful" cut, not a build fix.
-    # All remaining deps are pure Rust.
     resource("errno").stage do
-      inreplace "src/unix.rs",
-        "#[cfg_attr(target_os = \"linux\", link_name = \"__xpg_strerror_r\")]",
-        "#[cfg_attr(all(target_os = \"linux\", not(any(target_env = \"musl\", target_env = \"ohos\"))), " \
-        "link_name = \"__xpg_strerror_r\")]"
+      inreplace "src/unix.rs", 'target_os = "linux", link_name = "__xpg_strerror_r"',
+        'all(target_os = "linux", not(any(target_env = "musl", target_env = "ohos"))), link_name = "__xpg_strerror_r"'
       (buildpath/"vendor/errno").install Dir["*"]
     end
     open("Cargo.toml", "a") { |f| f.puts "[patch.crates-io]\nerrno = { path = \"vendor/errno\" }" }
-    # Re-resolve just this package so --locked accepts the patched source.
-    # errno@0.2.8, not bare "errno": the dependency tree also carries a
-    # separate errno 0.3.14 (a different crate elsewhere in the graph), so
-    # the bare name is ambiguous to cargo.
     system "cargo", "update", "--package", "errno@0.2.8", "--precise", "0.2.8"
 
-    # OHOS sandbox uid not in /etc/passwd; whoami::username() returns uid. Inject
-    # dlopen(libos_account_ndk.so) → OH_OsAccount_GetName fallback. Returns None
-    # transparently if lib/symbol unavailable (same behavior as unpatched).
+    # OHOS sandbox uid isn't in /etc/passwd, so whoami::username() only returns the
+    # numeric uid ("100"). Fall back to the real OS-account name via NDK dlopen.
     inreplace "src/modules/username.rs",
       "pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {",
       <<~RUST + "pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {"
@@ -86,71 +71,13 @@ class Starship < Formula
       "whoami::username()",
       "ohos_account_username().map(Ok).unwrap_or_else(whoami::username)"
 
-    system "cargo", "install", *std_cargo_args, "--no-default-features"
+    system "cargo", "install", *std_cargo_args
 
     generate_completions_from_executable(bin/"starship", "completions")
-
-    # OHOS shell init glue bundled as a keg script (upgrades with brew upgrade starship).
-    # Guards: TZ (no /etc/localtime, use date +%z), fpath (autoload add-zsh-hook),
-    # mathfunc (system zsh lacks module, rewrite __starship_get_time).
-    pkgshare.mkpath
-    (pkgshare/"ohos-init.zsh").write <<~ZSH
-      # harmonybrew-core `starship` formula 自带的 OHOS shell 初始化胶水。
-      # 由 formula 生成，不要手改——升级走 `brew upgrade starship`。
-
-      _starship_ohos_setup_tz() {
-          [[ -n ${TZ:-} ]] && return
-          local off sign hh mm
-          off=$(date +%z 2>/dev/null) || return
-          [[ $off == [+-][0-9][0-9][0-9][0-9] ]] || return
-          sign=${off[1]} hh=${off[2,3]} mm=${off[4,5]}
-          hh=${hh#0}
-          [[ -z $hh ]] && hh=0
-          # POSIX TZ 的符号习惯是反的：本地时间 = UTC + 8 要写成 "UTC-8"。
-          [[ $sign == + ]] && sign=- || sign=+
-          if [[ $mm == 00 ]]; then
-              export TZ="UTC${sign}${hh}"
-          else
-              export TZ="UTC${sign}${hh}:${mm}"
-          fi
-      }
-      _starship_ohos_setup_tz
-      unset -f _starship_ohos_setup_tz
-
-      _starship_ohos_funcs="#{HOMEBREW_PREFIX}/share/zsh/functions"
-      if [[ -d $_starship_ohos_funcs ]] && (( ! ${fpath[(Ie)$_starship_ohos_funcs]} )); then
-          fpath=("$_starship_ohos_funcs" $fpath)
-      fi
-      unset _starship_ohos_funcs
-
-      autoload -Uz compinit && compinit -u 2>/dev/null
-      eval "$(starship init zsh)" 2>/dev/null
-
-      if ! zmodload -e zsh/mathfunc 2>/dev/null; then
-          zmodload zsh/datetime 2>/dev/null
-          __starship_get_time() {
-              typeset -gi STARSHIP_CAPTURED_TIME
-              (( STARSHIP_CAPTURED_TIME = EPOCHREALTIME * 1000 ))
-          }
-      fi
-    ZSH
-  end
-
-  def caveats
-    <<~CAVEATS
-      Set up starship on OHOS (copy-paste this whole line):
-
-        echo 'source "#{opt_pkgshare}/ohos-init.zsh"' >> ~/.zshrc && source ~/.zshrc
-
-      This one line replaces the old hand-copied OHOS init block — the glue
-      (timezone, fpath, mathfunc fallback) now lives in the keg and upgrades
-      with `brew upgrade starship`.
-    CAVEATS
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/starship --version")
     ENV["STARSHIP_CONFIG"] = ""
-    assert_match "❯", shell_output("#{bin}/starship module character")
+    assert_equal "[1;32m❯[0m ", shell_output("#{bin}/starship module character")
   end
 end
