@@ -1,8 +1,8 @@
 class Feh < Formula
   desc "X11 image viewer"
   homepage "https://feh.finalrewind.org/"
-  url "https://feh.finalrewind.org/feh-3.12.4.tar.bz2"
-  sha256 "97e89bb2cf5ada41e8c8e916ea4d7d64c51faaae4847f00fcc088fa06e1b5ca1"
+  url "https://feh.finalrewind.org/feh-3.13.tar.bz2"
+  sha256 "dcbc79d4c00f8964eeed9edc82010eead8c1ed16c12e2ae116f2e7cc7cd94716"
   license "MIT-feh"
 
   livecheck do
@@ -11,7 +11,7 @@ class Feh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7125e030fdca5232b4658f3b6109d6d67c632406220ad91cc7efe84015c212c6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ed1fe193d115ab807b15832067bfcc0b2094c3037dca393d816447696718844"
   end
 
   depends_on "imlib2"
