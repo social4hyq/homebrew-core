@@ -11,7 +11,7 @@ class Graphqlite < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8d0a77dc0b9e5255d4be4e214e2480912ff39aadde8551cd719a9ff5a882ca7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7de27b090e5346be3438c29bad2b944b183fe40fd3c6e3449397265a4f2fc5b"
   end
 
   depends_on "bison" => :build # macOS bison is too old
