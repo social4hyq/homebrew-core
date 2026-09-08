@@ -51,6 +51,6 @@ class Starship < Formula
 
   test do
     ENV["STARSHIP_CONFIG"] = ""
-    assert_equal "[1;32m❯[0m ", shell_output("#{bin}/starship module character")
+    assert_equal "[1;32m❯[0m ", shell_output("#{bin}/starship module character")
   end
 end
