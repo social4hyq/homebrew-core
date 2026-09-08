@@ -26,8 +26,10 @@ class Bun < Formula
   depends_on "cmake" => :build
   depends_on "gperf" => :build
   depends_on "icu4c@78" => :build
-  # lld@21 provides the --code-sign-by-default ld.lld (split out of llvm@21);
-  # both are wired up directly in install() below (no global cc/c++ shim).
+  # lld@21/llvm@21 resolve to harmonybrew/core (this tap's fork was retired
+  # once upstreamed). lld@21 provides the --code-sign-by-default ld.lld
+  # (split out of llvm@21); both are wired up directly in install() below
+  # (no global cc/c++ shim).
   depends_on "lld@21" => :build
   depends_on "llvm@21" => :build
   depends_on "ninja" => :build
