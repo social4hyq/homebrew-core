@@ -1,12 +1,12 @@
 class Bzip3 < Formula
   desc "Better and stronger spiritual successor to BZip2"
   homepage "https://github.com/kspalaiologos/bzip3"
-  url "https://github.com/kspalaiologos/bzip3/releases/download/1.5.3/bzip3-1.5.3.tar.gz"
-  sha256 "c48823353084df2a5a0dba44fd5295abd078e40b49f09700d08af4d9b1e31d67"
+  url "https://github.com/kspalaiologos/bzip3/releases/download/1.5.4/bzip3-1.5.4.tar.gz"
+  sha256 "89a5e4bf29e4aae98b29bb1ef275addfa2d0806ba1ef60bf8a87263cdb21f581"
   license "LGPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9ec9802524e823a637986ed817afe78b8cbf5e5ecf450f8854a62b33740721c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7465913c39d1a5049897caa79d29ca1a907767a9ea61aaf309907093f709f897"
   end
 
   def install
