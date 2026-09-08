@@ -6,7 +6,7 @@ class Bzip3 < Formula
   license "LGPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9ec9802524e823a637986ed817afe78b8cbf5e5ecf450f8854a62b33740721c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7465913c39d1a5049897caa79d29ca1a907767a9ea61aaf309907093f709f897"
   end
 
   def install
