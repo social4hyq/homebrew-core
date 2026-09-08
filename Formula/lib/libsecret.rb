@@ -16,8 +16,8 @@ class Libsecret < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/libsecret-v0.21.7-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0f6ee93e7484166823d71a9e460b96c35b051b2343f47cdde9bf1b64222659b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/libsecret-v0.21.7-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c152c181dd4f58766fb6deacdfe6ac6afc0a787b9804bbcab514ff529b9d06a5"
   end
 
   depends_on "docbook-xsl" => :build
