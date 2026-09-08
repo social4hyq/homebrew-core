@@ -1,12 +1,12 @@
 class StyleDictionary < Formula
   desc "Build system for creating cross-platform styles"
   homepage "https://github.com/style-dictionary/style-dictionary"
-  url "https://registry.npmjs.org/style-dictionary/-/style-dictionary-5.5.2.tgz"
-  sha256 "4c0da3299001bc58d85bfb0405e89f247d78b07eede04827763a52529a30bd98"
+  url "https://registry.npmjs.org/style-dictionary/-/style-dictionary-5.5.3.tgz"
+  sha256 "7abdce80029652a95b53247e2faf03c59e9bee357d07decce9d93c89b5dd784d"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c98a057373548db1b65f22fcae69ec0f88b4022e738f3fc68db483d1ebc3672"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0863e3b8ad1d7475e4987f9d9287edd4e3a30abee21bd4347f7f7dd93e3deb5b"
   end
 
   depends_on "node"
