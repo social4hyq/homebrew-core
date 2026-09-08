@@ -4,7 +4,7 @@ class Kpcli < Formula
   url "https://downloads.sourceforge.net/project/kpcli/kpcli-4.1.3.pl"
   sha256 "c91363e4e07f3521a867f68db602c95b53dc167e4366ee7ff254252b4176c62f"
   license any_of: ["Artistic-1.0-Perl", "GPL-1.0-or-later"]
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -12,8 +12,7 @@ class Kpcli < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b660c24cd0b132b7dd3d8f4a7679ac05b775a1ddc46cec4699fd61eb04610d32"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b630e179b9aea2dfefb6d7d2f5258e014e8ec56c2c7f13637d941c6f8c08b7e7"
   end
 
   depends_on "readline"
