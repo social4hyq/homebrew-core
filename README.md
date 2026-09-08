@@ -21,6 +21,7 @@ brew trust social4hyq/core   # Homebrew 6.0+ 必须显式信任第三方 tap
 brew install opencode        # AI 编码代理（v2 预览：brew install opencode@2）
 brew install claude-code     # Claude Code CLI
 brew install bun             # Bun 运行时
+brew install vite-plus       # VoidZero 统一前端工具链（`vp` 命令）
 brew install hishell-font    # starship 图标字体（先装这个：提示符的图标/符号靠它渲染）
 brew install starship        # 终端提示符美化（主题化 prompt，配合 hishell-font）
 ```
@@ -32,6 +33,7 @@ bun --version && bun -e 'console.log(2**32, Math.PI)'
 opencode --version
 opencode2 --version
 claude --version
+vp --version
 starship --version
 ```
 
