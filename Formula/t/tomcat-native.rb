@@ -1,13 +1,13 @@
 class TomcatNative < Formula
   desc "Lets Tomcat use some native resources for performance"
   homepage "https://tomcat.apache.org/native-doc/"
-  url "https://www.apache.org/dyn/closer.lua?path=tomcat/tomcat-connectors/native/2.0.15/source/tomcat-native-2.0.15-src.tar.gz"
-  mirror "https://archive.apache.org/dist/tomcat/tomcat-connectors/native/2.0.15/source/tomcat-native-2.0.15-src.tar.gz"
-  sha256 "8dab09f21ad519c9e49e5287f8d8de89bb176a5e3968479f27948c31b2a3b6b4"
+  url "https://www.apache.org/dyn/closer.lua?path=tomcat/tomcat-connectors/native/2.0.16/source/tomcat-native-2.0.16-src.tar.gz"
+  mirror "https://archive.apache.org/dist/tomcat/tomcat-connectors/native/2.0.16/source/tomcat-native-2.0.16-src.tar.gz"
+  sha256 "785fdd99a202f442b085bc718d2fbeb393b85979aa4a2943302118c4acd68630"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6929da4426fdc908ad26b2aa85671b6ded74ce68538c6e1e14962a434b84e211"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ad7b4f032e4844b351bd91e4fce4951a5497154d8d2411d3ae771fb9b34daa8"
   end
 
   depends_on "tomcat" => :test
