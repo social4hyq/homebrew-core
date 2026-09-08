@@ -1,8 +1,8 @@
 class Graphqlite < Formula
   desc "SQLite graph database extension"
   homepage "https://colliery-io.github.io/graphqlite/"
-  url "https://github.com/colliery-io/graphqlite/archive/refs/tags/v0.7.0.tar.gz"
-  sha256 "f9813adfd38da67cdefcab96adfa91109c8cfb3269d04932c930d6914584ea4d"
+  url "https://github.com/colliery-io/graphqlite/archive/refs/tags/v0.8.0.tar.gz"
+  sha256 "736b1de695785761f998b20ff25e0284a3b5485f1c48a4741a7a3025410e348f"
   license "MIT"
 
   livecheck do
@@ -11,7 +11,7 @@ class Graphqlite < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8d0a77dc0b9e5255d4be4e214e2480912ff39aadde8551cd719a9ff5a882ca7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7de27b090e5346be3438c29bad2b944b183fe40fd3c6e3449397265a4f2fc5b"
   end
 
   depends_on "bison" => :build # macOS bison is too old
