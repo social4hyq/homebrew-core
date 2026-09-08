@@ -11,7 +11,7 @@ class Luit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0aaebb50a82e7b68e75286b4fe2a5e4624e435cb8e303002ec9f91f5fdd1800f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d83ffdace73292a766b97fd341afcefcf54bb75c0def5035e629f5ad0a62b37"
   end
 
   on_linux do
