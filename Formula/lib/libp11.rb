@@ -1,8 +1,8 @@
 class Libp11 < Formula
   desc "PKCS#11 wrapper library in C"
   homepage "https://github.com/OpenSC/libp11/wiki"
-  url "https://github.com/OpenSC/libp11/releases/download/libp11-0.4.20/libp11-0.4.20.tar.gz"
-  sha256 "a125e0310ff10c189fc1b32a9652101486ea94a6b07c677a30e90e3638d2db48"
+  url "https://github.com/OpenSC/libp11/releases/download/libp11-0.4.21/libp11-0.4.21.tar.gz"
+  sha256 "efdb523aef8613d447e6a2d38227d4b389866f4bcf4b503130acd7f759490847"
   license "LGPL-2.1-or-later"
 
   livecheck do
