@@ -12,7 +12,7 @@ class Stackql < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "87ea15967c721080ac78ddb87fd6754a5d6a9d4db57d68af1279f8509c534259"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "180887bf7f6490dd47054409f55434054053ac6183c545b2dbd08573219ead7f"
   end
 
   depends_on "go" => :build
