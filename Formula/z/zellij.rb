@@ -8,8 +8,9 @@ class Zellij < Formula
   head "https://github.com/zellij-org/zellij.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zellij-v0.45.1-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "82c4ee324f0b04cc6ebda7167620c91fdc9cfd2ce80048520ace3d355f72d692"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zellij-v0.45.1-r4"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ad6934b79fe09c3bb1751c94c891825a829421d2e243ecd2154cc2300d840e0"
   end
 
   depends_on "cmake" => :build
