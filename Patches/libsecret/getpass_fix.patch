@@ -1,0 +1,63 @@
+--- libsecret-0.21.7.orig/tool/secret-tool.c	2025-03-19 06:16:57.000000000 +0800
++++ libsecret-0.21.7/tool/secret-tool.c	2026-09-08 11:24:15.335985155 +0800
+@@ -28,6 +28,9 @@
+ #include <limits.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <stdio.h>
++#include <termios.h>
++#include <unistd.h>
+ 
+ #define SECRET_ALIAS_PREFIX "/org/freedesktop/secrets/aliases/"
+ #define SECRET_COLLECTION_PREFIX "/org/freedesktop/secrets/collection/"
+@@ -281,6 +284,42 @@
+ 	}
+ }
+ 
++/* OpenHarmony's musl doesn't export getpass(), so reimplement the one
++ * legacy BSD call this tool needs on top of termios (disable echo, read
++ * a line, restore echo). */
++static char *
++ohos_getpass (const char *prompt)
++{
++	static char buf[256];
++	struct termios old_term, new_term;
++	int restore = 0;
++	size_t len;
++
++	fputs (prompt, stderr);
++	fflush (stderr);
++
++	if (tcgetattr (STDIN_FILENO, &old_term) == 0) {
++		new_term = old_term;
++		new_term.c_lflag &= ~ECHO;
++		if (tcsetattr (STDIN_FILENO, TCSAFLUSH, &new_term) == 0)
++			restore = 1;
++	}
++
++	if (!fgets (buf, sizeof (buf), stdin))
++		buf[0] = '\0';
++
++	if (restore)
++		tcsetattr (STDIN_FILENO, TCSAFLUSH, &old_term);
++
++	fputc ('\n', stderr);
++
++	len = strlen (buf);
++	if (len > 0 && buf[len - 1] == '\n')
++		buf[len - 1] = '\0';
++
++	return buf;
++}
++
+ static SecretValue *
+ read_password_tty (void)
+ {
+@@ -287,6 +326,6 @@
+ 	gchar *password;
+ 
+-	password = getpass ("Password: ");
++	password = ohos_getpass ("Password: ");
+ 	return secret_value_new_full (password, -1, "text/plain",
+ 	                              (GDestroyNotify)secret_password_wipe);
+ }
