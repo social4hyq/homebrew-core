@@ -8,8 +8,9 @@ class Zellij < Formula
   head "https://github.com/zellij-org/zellij.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zellij-v0.45.1-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "82c4ee324f0b04cc6ebda7167620c91fdc9cfd2ce80048520ace3d355f72d692"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zellij-v0.45.1-r4"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ad6934b79fe09c3bb1751c94c891825a829421d2e243ecd2154cc2300d840e0"
   end
 
   depends_on "cmake" => :build
@@ -18,11 +19,23 @@ class Zellij < Formula
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
   depends_on "openssl@3"
-  depends_on "zlib-ng-compat"
+
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
 
   resource "close_fds" do
     url "https://static.crates.io/crates/close_fds/close_fds-0.3.2.crate"
     sha256 "3bc416f33de9d59e79e57560f450d21ff8393adcf1cdfc3e6d8fb93d5f88a2ed"
+
+    # close_fds 0.3.2 optimistically calls SYS_CLOSE_RANGE (436) on Linux and
+    # expects ENOSYS to fall back; the HarmonyOS sandbox seccomp answers SIGSYS
+    # instead, killing the process (intermittent startup crash in a fresh PTY).
+    # Flipping MAY_HAVE_CLOSE_RANGE to false keeps every code path inside the
+    # crate's /proc/self/fd + libc::close fallback, so no shim is needed.
+    patch do
+      file "Patches/zellij/close_fds_no_close_range.patch"
+    end
   end
 
   service do
@@ -46,17 +59,7 @@ class Zellij < Formula
     # (loose isahc requirement allows it) pulls socket2 0.6.5. `--locked` stays consistent.
     system "cargo", "update", "--package", "curl", "--precise", "0.4.50"
 
-    # close_fds 0.3.2 optimistically calls SYS_CLOSE_RANGE (436) on Linux and
-    # expects ENOSYS to fall back; the HarmonyOS sandbox seccomp answers SIGSYS
-    # instead, killing the process (intermittent startup crash in a fresh PTY).
-    # Flipping MAY_HAVE_CLOSE_RANGE to false keeps every code path inside the
-    # crate's /proc/self/fd + libc::close fallback, so no shim is needed.
-    resource("close_fds").stage do
-      inreplace "src/closefds/close.rs",
-                "static MAY_HAVE_CLOSE_RANGE: AtomicBool = AtomicBool::new(true);",
-                "static MAY_HAVE_CLOSE_RANGE: AtomicBool = AtomicBool::new(false);"
-      (buildpath/"vendor/close_fds").install Dir["*"]
-    end
+    resource("close_fds").stage { (buildpath/"vendor/close_fds").install Dir["*"] }
     open("Cargo.toml", "a") { |f| f.puts "[patch.crates-io]\nclose_fds = { path = \"vendor/close_fds\" }" }
     # Re-resolve just this package so --locked accepts the patched source.
     system "cargo", "update", "--package", "close_fds", "--precise", "0.3.2"
@@ -69,7 +72,7 @@ class Zellij < Formula
   end
 
   test do
-    assert_match "keybinds", shell_output("#{bin}/zellij setup --dump-config")
-    assert_match "zellij #{version}", shell_output("#{bin}/zellij --version")
+    assert_match("keybinds", shell_output("#{bin}/zellij setup --dump-config"))
+    assert_match("zellij #{version}", shell_output("#{bin}/zellij --version"))
   end
 end
