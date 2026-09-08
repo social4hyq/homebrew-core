@@ -1,0 +1,83 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Claude Sonnet 5 <noreply@anthropic.com>
+Date: Tue, 8 Sep 2026 19:39:38 +0800
+Subject: [PATCH] OHOS: package-manager platform-cfg patch.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+vp's own corepack-style package-manager fetcher picks the npm platform
+package to download when a project has no packageManager pin yet —
+e.g. `vp create` scaffolding a fresh app.
+get_{bun,pnpm}_platform_package_name() only special-case
+target_env=musl; on ohos that falls through to the glibc package (pnpm
+>= 12 switched to native-binary distribution on 2026-08-26), which
+can't run here (no /lib/ld-linux-aarch64.so.1, and OHOS's exec()
+signature check rejects it before that anyway) — verified EACCES via
+ohos-trace-shim on a fresh HOME once npm's pnpm "latest" tag crossed
+into 12.x. Same libc-family reasoning as the napi-rs shims in install:
+widen the musl branch to also match ohos, landing on the already-
+published *-musl platform packages instead (e.g.
+@pnpm/exe.linux-arm64-musl).
+---
+ crates/vite_pm_cli/src/package_manager.rs | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/crates/vite_pm_cli/src/package_manager.rs b/crates/vite_pm_cli/src/package_manager.rs
+index 6398e70..62c7c95 100644
+--- a/crates/vite_pm_cli/src/package_manager.rs
++++ b/crates/vite_pm_cli/src/package_manager.rs
+@@ -951,13 +951,13 @@ fn get_bun_platform_package_name() -> Result<&'static str, Error> {
+     let name = match (env::consts::OS, env::consts::ARCH) {
+         ("macos", "aarch64") => "@oven/bun-darwin-aarch64",
+         ("macos", "x86_64") => "@oven/bun-darwin-x64",
+-        #[cfg(target_env = "musl")]
++        #[cfg(any(target_env = "musl", target_env = "ohos"))]
+         ("linux", "aarch64") => "@oven/bun-linux-aarch64-musl",
+-        #[cfg(not(target_env = "musl"))]
++        #[cfg(not(any(target_env = "musl", target_env = "ohos")))]
+         ("linux", "aarch64") => "@oven/bun-linux-aarch64",
+-        #[cfg(target_env = "musl")]
++        #[cfg(any(target_env = "musl", target_env = "ohos"))]
+         ("linux", "x86_64") => "@oven/bun-linux-x64-musl",
+-        #[cfg(not(target_env = "musl"))]
++        #[cfg(not(any(target_env = "musl", target_env = "ohos")))]
+         ("linux", "x86_64") => "@oven/bun-linux-x64",
+         ("windows", "x86_64") => "@oven/bun-windows-x64",
+         ("windows", "aarch64") => "@oven/bun-windows-aarch64",
+@@ -1086,13 +1086,13 @@ fn get_pnpm_platform_package_name() -> Result<&'static str, Error> {
+     let name = match (env::consts::OS, env::consts::ARCH) {
+         ("macos", "aarch64") => "@pnpm/exe.darwin-arm64",
+         ("macos", "x86_64") => "@pnpm/exe.darwin-x64",
+-        #[cfg(target_env = "musl")]
++        #[cfg(any(target_env = "musl", target_env = "ohos"))]
+         ("linux", "aarch64") => "@pnpm/exe.linux-arm64-musl",
+-        #[cfg(not(target_env = "musl"))]
++        #[cfg(not(any(target_env = "musl", target_env = "ohos")))]
+         ("linux", "aarch64") => "@pnpm/exe.linux-arm64",
+-        #[cfg(target_env = "musl")]
++        #[cfg(any(target_env = "musl", target_env = "ohos"))]
+         ("linux", "x86_64") => "@pnpm/exe.linux-x64-musl",
+-        #[cfg(not(target_env = "musl"))]
++        #[cfg(not(any(target_env = "musl", target_env = "ohos")))]
+         ("linux", "x86_64") => "@pnpm/exe.linux-x64",
+         ("windows", "x86_64") => "@pnpm/exe.win32-x64",
+         ("windows", "aarch64") => "@pnpm/exe.win32-arm64",
+@@ -3669,7 +3669,7 @@ mod tests {
+             "Package name should start with @oven/bun-, got: {name}"
+         );
+         // On musl targets, the package name should contain "-musl"
+-        #[cfg(target_env = "musl")]
++        #[cfg(any(target_env = "musl", target_env = "ohos"))]
+         assert!(
+             name.ends_with("-musl"),
+             "On musl targets, package name should end with -musl, got: {name}"
+@@ -3685,7 +3685,7 @@ mod tests {
+             name.starts_with("@pnpm/exe."),
+             "Package name should start with @pnpm/exe., got: {name}"
+         );
+-        #[cfg(target_env = "musl")]
++        #[cfg(any(target_env = "musl", target_env = "ohos"))]
+         assert!(
+             name.ends_with("-musl"),
+             "On musl targets, package name should end with -musl, got: {name}"

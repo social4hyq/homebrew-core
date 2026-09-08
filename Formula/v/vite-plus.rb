@@ -10,13 +10,14 @@ class VitePlus < Formula
 
   # OHOS delta vs upstream (everything else is verbatim):
   # bottle block, depends_on swaps, native-binding wiring, build env,
-  # vite-task patch, bin/vp wrapper. See the fenced blocks in install.
-  revision 5
+  # vite-task patch, bin/vp wrapper (see the fenced blocks in install), and
+  # the package-manager platform-cfg + signing patches (Patches/vite-plus/).
+  revision 6
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v0.2.8-r8"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e921ba267cb38e151197b1cb16dfe6a7f8d073196e285ad26aa83305a1163849"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v0.2.8-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "caa0161019c126a8c293c67dd9f12af4bd254bcc21f57257c827c494c5d1e59d"
   end
 
   depends_on "cmake" => :build
@@ -26,9 +27,15 @@ class VitePlus < Formula
   depends_on "pnpm@10" => :build
   depends_on "rust" => :build # TODO: try to restore rustup: https://github.com/voidzero-dev/vite-task/commit/db99ba4d5d33323cc9e7b329f11bdea0610fbc7f
   # OHOS: @napi-rs/cli cross-compiles the bundled bindings against the SDK.
-  # OHOS: pnpm >= 11.23 regressed `deploy --legacy` (pnpm/pnpm#14130); the
-  # build runs under pnpm@10, runtime keeps the unversioned pnpm.
+  # OHOS: pnpm >= 11.19 regressed `deploy --legacy` for workspace deps with
+  # peerDependencies (pnpm/pnpm#13618, fixed 2026-08-10); pin the build to
+  # pnpm@10. vp resolves its own pnpm at runtime (see the package-manager
+  # platform-cfg patch) — no runtime pnpm dependency needed.
   depends_on "node"
+  # OHOS: the package-manager platform-cfg patch signs the pnpm/bun binary
+  # it downloads at runtime via `selfsign` (binary-sign-tool corrupts this
+  # binary's ELF structure — see the patch itself).
+  depends_on "ohos-bst-light"
 
   resource "rolldown" do
     url "https://github.com/rolldown/rolldown.git",
@@ -61,6 +68,15 @@ class VitePlus < Formula
     url "https://github.com/voidzero-dev/vite-task.git",
         revision: "5c1d02c750ac21c6f4cf0528062590a145e87fd1"
     version "5c1d02c750ac21c6f4cf0528062590a145e87fd1"
+  end
+
+  # OHOS: package-manager platform-cfg + downloaded-binary signing (see the
+  # patch files themselves for the full rationale).
+  patch :p1 do
+    file "Patches/vite-plus/0001-package-manager-platform-cfg.patch"
+  end
+  patch :p1 do
+    file "Patches/vite-plus/0002-sign-downloaded-native-package-manager-binary.patch"
   end
 
   def install
@@ -338,6 +354,22 @@ class VitePlus < Formula
         "optionalDependencies" => { "@rolldown/binding-openharmony-arm64" => "1.2.2" },
       },
     }.merge(ws["packageExtensions"] || {})
+    # OHOS: the graft above only matters if pnpm actually considers the
+    # openharmony optional package installable. pnpm's own os-detection is
+    # JS/Node-based (and this Node reports "openharmony", so build-time
+    # pnpm@10 matches optional packages tagged os:["openharmony"] with no
+    # help — see the native-bindings comment in install). But `vp`'s own
+    # package manager is now a standalone native pnpm executable (see
+    # Patches/vite-plus/0001-package-manager-platform-cfg.patch) with no
+    # Node.js involved at all, so it has no way to know it's running on openharmony
+    # and silently prunes the optional dependency as a platform mismatch —
+    # verified: `@rolldown/binding-openharmony-arm64` was absent from
+    # node_modules after `vp install`, `vp fmt` failed to require it.
+    # Force it in via supportedArchitectures, the standard pnpm escape
+    # hatch for optional packages the auto-detected platform can't match.
+    ws["supportedArchitectures"] = {
+      "os" => ["current", "openharmony"],
+    }.merge(ws["supportedArchitectures"] || {})
     File.write(workspace, YAML.dump(ws))
 
     cd testpath/"test-app" do
