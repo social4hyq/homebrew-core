@@ -12,7 +12,7 @@ class Telegraf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "53ae4103d6901cf64f56704ec1cd45e9fe32ada1e4c6b519c11177a0e0d86f2a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c87df035d75a6ce9a9a66d3b533896feb55f711c78352613c98c8937ec3ae94"
   end
 
   depends_on "go" => :build
