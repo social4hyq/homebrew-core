@@ -1,8 +1,8 @@
 class Mkbrr < Formula
   desc "Is a tool to create, modify and inspect torrent files. Fast"
   homepage "https://mkbrr.com/introduction"
-  url "https://github.com/autobrr/mkbrr/archive/refs/tags/v1.25.0.tar.gz"
-  sha256 "8ae71c48e7615b6753f3d10dc255ecc6a41985a000b263f2d69aac467afb4fdc"
+  url "https://github.com/autobrr/mkbrr/archive/refs/tags/v1.25.1.tar.gz"
+  sha256 "b6e7e1e1eb9ff9b730ad271e6d22dba298d13700fa46cc69da687a7c5ad47042"
   license "GPL-2.0-or-later"
   head "https://github.com/autobrr/mkbrr.git", branch: "main"
 
