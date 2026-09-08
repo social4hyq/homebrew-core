@@ -13,7 +13,7 @@ class NodeAT22 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "271b4c2814c8ac1ed365a27ce323d0019042e790ea06210562a0547ef3901edd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "68213477bf198f7fd1f83e27288d036a81604e83b2c268c43ce085ecbabd5930"
   end
 
   patch do
