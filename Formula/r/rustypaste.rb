@@ -1,8 +1,8 @@
 class Rustypaste < Formula
   desc "Minimal file upload/pastebin service"
   homepage "https://blog.orhun.dev/blazingly-fast-file-sharing"
-  url "https://github.com/orhun/rustypaste/archive/refs/tags/v0.18.0.tar.gz"
-  sha256 "53db137b8429f44d9bf700063fc42f1047460a60713cac801a5983946facb13f"
+  url "https://github.com/orhun/rustypaste/archive/refs/tags/v0.18.1.tar.gz"
+  sha256 "4b63be093e080d4a39e9ca03b378df96f0ae604e469a9c4d9bb437f9643524f0"
   license "MIT"
   head "https://github.com/orhun/rustypaste.git", branch: "master"
 
