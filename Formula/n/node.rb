@@ -5,6 +5,7 @@ class Node < Formula
   sha256 "d1698832a1a10f050cdda044a3e3d6a748246811e2e7bc89ba9a8bd693dc45f2"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
+  revision 1
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -15,106 +16,56 @@ class Node < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "46f6d5e101a2ec8ca9b2c42c22b9f05aa5c919092484ba6bc239aa6a0091befb"
   end
 
-  resource "alpine-rootfs" do
-    url "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/aarch64/alpine-minirootfs-3.23.4-aarch64.tar.gz"
-    sha256 "9250667a8affac8f1e98086392f80f43f086626701e9bce33398eb9b6c0bd64c"
-  end
+  # The unversioned `llvm` (LLVM 23) is too new for node, which is not yet
+  # adapted to it. Lock to `llvm@22` for now.
+  depends_on "llvm@22" => :build
 
   patch do
     file "Patches/node/0001-openssl-armcap-disable-sve2.patch"
   end
 
   def install
-    # The ohos-sdk compiler (LLVM 15) is outdated and cannot compile Node.js 26.
-    # Use Alpine native GCC and statically link libgcc and libstdc++.
+    ENV["CC"] = "#{formula_opt_bin("llvm@22")}/clang -fno-emulated-tls"
+    ENV["CXX"] = "#{formula_opt_bin("llvm@22")}/clang++ -fno-emulated-tls"
 
-    chroot_dir = buildpath/"alpine-chroot"
-    chroot_dir.mkpath
-
-    resource("alpine-rootfs").stage do
-      system "cp", "-a", ".", chroot_dir.to_s
-    end
-
-    if File.exist?("/etc/resolv.conf")
-      chroot_dir.join("etc/resolv.conf").write(File.read("/etc/resolv.conf"))
-    else
-      chroot_dir.join("etc/resolv.conf").write("nameserver 8.8.8.8\n")
-    end
-
-    chroot_build_dir = chroot_dir/"build"
-    chroot_build_dir.mkpath
-
-    Dir.glob("#{buildpath}/*").each do |file|
-      next if file == chroot_dir.to_s
-      FileUtils.mv(file, chroot_build_dir)
-    end
-
-    chroot_script = <<~SH
-      set -e
-      export PATH=/bin:/usr/bin:/usr:sbin
-      export HOME=/root
-
-      apk update
-      apk add build-base python3 linux-headers
-
-      cd /build
-      export CC="gcc"
-      export CXX="g++"
-      ./configure \
-        --prefix=#{prefix} \
-        --dest-os=openharmony \
-        --partly-static
-
-      make -j$(nproc)
-      mkdir -p /dest
-      make install DESTDIR=/dest
-    SH
-
-    chroot_dir.join("build_node.sh").write(chroot_script)
-    system "chmod", "+x", "#{chroot_dir}/build_node.sh"
-
-    system "env", "-i", "chroot", chroot_dir.to_s, "/bin/sh", "/build_node.sh"
-
-    chroot_dest_target = chroot_dir/"dest#{prefix}"
-    cd chroot_dest_target do
-      prefix.install Dir["*"]
-    end
+    system "./configure", "--prefix=#{prefix}", "--dest-os=openharmony"
+    system "make", "install"
 
     (libexec/"lib/node_modules").mkpath
     cp_r lib/"node_modules/npm", libexec/"lib/node_modules/npm"
     rm_r lib/"node_modules/npm"
     rm_f [bin/"npm", bin/"npx"]
-    ln_s libexec/"lib/node_modules/npm/bin/npm-cli.js", bin/"npm"
-    ln_s libexec/"lib/node_modules/npm/bin/npx-cli.js", bin/"npx"
+
+    # These symlinks are never used & they've caused issues in the past.
+    rm_r libexec/"share" if (libexec/"share").exist?
+
+    # Create temporary npm and npx symlinks until post_install is done.
+    bin.install_symlink libexec/"lib/node_modules/npm/bin/npm-cli.js" => "npm"
+    bin.install_symlink libexec/"lib/node_modules/npm/bin/npx-cli.js" => "npx"
+
+    (libexec/"lib/node_modules/npm/npmrc").write("prefix = #{HOMEBREW_PREFIX}\n")
   end
 
-  def post_install
-    node_modules = HOMEBREW_PREFIX/"lib/node_modules"
-    node_modules.mkpath
-    # Remove npm but preserve all other modules across node updates/upgrades.
-    rm_r node_modules/"npm" if (node_modules/"npm").exist?
-
-    cp_r libexec/"lib/node_modules/npm", node_modules
-    # This symlink doesn't hop into homebrew_prefix/bin automatically so
-    # we make our own. This is a small consequence of our
-    # bottle-npm-and-retain-a-private-copy-in-libexec setup
-    # All other installs **do** symlink to homebrew_prefix/bin correctly.
-    # We ln rather than cp this because doing so mimics npm's normal install.
-    ln_sf node_modules/"npm/bin/npm-cli.js", bin/"npm"
-    ln_sf node_modules/"npm/bin/npx-cli.js", bin/"npx"
-    ln_sf bin/"npm", HOMEBREW_PREFIX/"bin/npm"
-    ln_sf bin/"npx", HOMEBREW_PREFIX/"bin/npx"
-
-    # Create manpage symlinks (or overwrite the old ones)
-    %w[man1 man5 man7].each do |man|
-      # Dirs must exist first: https://github.com/Homebrew/legacy-homebrew/issues/35969
-      mkdir_p HOMEBREW_PREFIX/"share/man/#{man}"
-      # still needed to migrate from copied file manpages to symlink manpages
-      rm(Dir[HOMEBREW_PREFIX/"share/man/#{man}/{npm.,npm-,npmrc.,package.json.,npx.}*"])
-      ln_sf Dir[node_modules/"npm/man/#{man}/{npm,package-,shrinkwrap-,npx}*"], HOMEBREW_PREFIX/"share/man/#{man}"
+  # Replace npm but preserve all other modules across node updates/upgrades.
+  # The bin symlink is to overwrite the temporary npm and npx symlinks to use
+  # global path. Also create manpage symlinks (or overwrite the old ones).
+  post_install_steps do
+    mkdir_p "{{HOMEBREW_PREFIX}}/lib/node_modules"
+    mkdir_p "{{HOMEBREW_PREFIX}}/share/man/man1"
+    mkdir_p "{{HOMEBREW_PREFIX}}/share/man/man5"
+    mkdir_p "{{HOMEBREW_PREFIX}}/share/man/man7"
+    if_path_exists "{{HOMEBREW_PREFIX}}/lib/node_modules/npm" do
+      remove "{{HOMEBREW_PREFIX}}/lib/node_modules/npm", recursive: true
     end
-
-    (node_modules/"npm/npmrc").atomic_write("prefix = #{HOMEBREW_PREFIX}\n")
+    copy "{{libexec}}/lib/node_modules/npm", "{{HOMEBREW_PREFIX}}/lib/node_modules", recursive: true
+    symlink "{{HOMEBREW_PREFIX}}/lib/node_modules/npm/bin/npm-cli.js", "{{bin}}/npm", overwrite: true
+    symlink "{{HOMEBREW_PREFIX}}/lib/node_modules/npm/bin/npx-cli.js", "{{bin}}/npx", overwrite: true
+    symlink "{{HOMEBREW_PREFIX}}/lib/node_modules/npm/man/man1/{npm,npx,package-}*",
+            "{{HOMEBREW_PREFIX}}/share/man/man1", overwrite: true, source_glob: true
+    symlink "{{HOMEBREW_PREFIX}}/lib/node_modules/npm/man/man5/{npm,npx,package-}*",
+            "{{HOMEBREW_PREFIX}}/share/man/man5", overwrite: true, source_glob: true
+    symlink "{{HOMEBREW_PREFIX}}/lib/node_modules/npm/man/man7/{npm,npx,package-}*",
+            "{{HOMEBREW_PREFIX}}/share/man/man7", overwrite: true, source_glob: true
   end
 
   test do
