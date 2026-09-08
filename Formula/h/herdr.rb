@@ -1,5 +1,5 @@
 class Herdr < Formula
-  desc "Terminal workspace runtime for AI coding agents (built from source)"
+  desc "Agent multiplexer that lives in your terminal"
   homepage "https://herdr.dev"
   url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "1e83bff4b05834ed8281e16f1680e8f3e58375a94b2e3f2b3d021e28e293ef9a"
@@ -12,8 +12,9 @@ class Herdr < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.9.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3fc78dac04a3ed43b5259627f7a4fecc03dadebf2fd285cfed061ac79f761a24"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.9.0-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd219809e1c3a4235ad3a98853e5e6a4dc1230a06435b97a3df355ac34adea51"
   end
 
   depends_on "rust" => :build
