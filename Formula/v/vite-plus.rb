@@ -32,6 +32,10 @@ class VitePlus < Formula
   # pnpm@10. vp resolves its own pnpm at runtime (see the package-manager
   # platform-cfg patch) — no runtime pnpm dependency needed.
   depends_on "node"
+  # OHOS: the package-manager platform-cfg patch signs the pnpm/bun binary
+  # it downloads at runtime via `selfsign` (binary-sign-tool corrupts this
+  # binary's ELF structure — see the patch itself).
+  depends_on "ohos-bst-light"
 
   resource "rolldown" do
     url "https://github.com/rolldown/rolldown.git",

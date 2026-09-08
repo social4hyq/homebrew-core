@@ -12,32 +12,40 @@ check still EACCESs the freshly-downloaded musl binary (unrelated to
 the unix mode bit set right after the rename; this device enforces
 code-signing on every exec regardless of ELF/libc correctness — the
 container this bottle is built in does not enforce it, so this branch
-is a no-op there). Sign in place right after the existing chmod;
-deliberately not probing the binary here (executing an unknown
-freshly-downloaded exe from inside the build turned out to be its own
-source of container failures) — the settle delay between signing and
-it being runnable is covered by the caller's own retry loop
-(`vp_with_retry` in the formula's test block, and any real invocation
-of `vp create`/`vp install`). Both download_*_package_manager
-functions share this exact set_permissions block verbatim.
+would in principle be a no-op there). Sign in place right after the
+existing chmod; deliberately not probing the binary here (executing an
+unknown freshly-downloaded exe from inside the build turned out to be
+its own source of container failures) — the settle delay between
+signing and it being runnable is covered by the caller's own retry
+loop (`vp_with_retry` in the formula's test block, and any real
+invocation of `vp create`/`vp install`). Both download_*_package_manager
+functions share this exact block verbatim.
+
+Uses `selfsign` (ohos-bst-light), not the SDK's `binary-sign-tool`:
+verified on real hardware and in the OHOS CI container that
+binary-sign-tool corrupts this binary's ELF structure outright — a
+binary-sign-tool-signed copy of @pnpm/exe.linux-arm64-musl SIGSEGVs
+immediately on exec, even in the container, which doesn't enforce
+signatures at all (so this isn't a permission/signature-check failure,
+the file itself is broken). ohos-bst-light's selfsign preserves the
+ELF and the binary runs fine afterward. Same static-ELF class of bug
+as bun and CGO_ENABLED=0 Go binaries — see the tap's binary-sign-tool
+notes.
 ---
- crates/vite_pm_cli/src/package_manager.rs | 28 +++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ crates/vite_pm_cli/src/package_manager.rs | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
 diff --git a/crates/vite_pm_cli/src/package_manager.rs b/crates/vite_pm_cli/src/package_manager.rs
-index 62c7c95..0ceb65b 100644
+index 62c7c95..e32e9d5 100644
 --- a/crates/vite_pm_cli/src/package_manager.rs
 +++ b/crates/vite_pm_cli/src/package_manager.rs
-@@ -1053,6 +1053,20 @@ async fn download_bun_package_manager(
+@@ -1053,6 +1053,17 @@ async fn download_bun_package_manager(
          use std::os::unix::fs::PermissionsExt;
          tokio::fs::set_permissions(&native_bin_dest, fs::Permissions::from_mode(0o755)).await?;
      }
 +    #[cfg(target_env = "ohos")]
 +    {
-+        let _ = std::process::Command::new("binary-sign-tool")
-+            .args(["sign", "-selfSign", "1", "-inFile"])
-+            .arg(&native_bin_dest)
-+            .args(["-outFile"])
++        let _ = std::process::Command::new("selfsign")
 +            .arg(&native_bin_dest)
 +            .status();
 +        use std::os::unix::fs::PermissionsExt;
@@ -46,19 +54,16 @@ index 62c7c95..0ceb65b 100644
 +            std::fs::Permissions::from_mode(0o755),
 +        );
 +    }
- 
+
      // Clean up the extracted package directory
      remove_dir_all_force(&package_dir).await?;
-@@ -1239,6 +1253,20 @@ async fn download_pnpm_native_package_manager(
+@@ -1239,6 +1250,17 @@ async fn download_pnpm_native_package_manager(
          use std::os::unix::fs::PermissionsExt;
          tokio::fs::set_permissions(&native_bin_dest, fs::Permissions::from_mode(0o755)).await?;
      }
 +    #[cfg(target_env = "ohos")]
 +    {
-+        let _ = std::process::Command::new("binary-sign-tool")
-+            .args(["sign", "-selfSign", "1", "-inFile"])
-+            .arg(&native_bin_dest)
-+            .args(["-outFile"])
++        let _ = std::process::Command::new("selfsign")
 +            .arg(&native_bin_dest)
 +            .status();
 +        use std::os::unix::fs::PermissionsExt;
@@ -67,6 +72,6 @@ index 62c7c95..0ceb65b 100644
 +            std::fs::Permissions::from_mode(0o755),
 +        );
 +    }
- 
+
      // Clean up the extracted package directory
      remove_dir_all_force(&package_dir).await?;
