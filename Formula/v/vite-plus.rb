@@ -22,7 +22,9 @@ class VitePlus < Formula
 
   depends_on "cmake" => :build
   depends_on "just" => :build
-  # OHOS: no rustup formula; stable rust + RUSTC_BOOTSTRAP (see install).
+  # OHOS: rustup fetches stable/nightly fine for this host, but its mirror
+  # lacks the exact nightly this repo pins; stable rust + RUSTC_BOOTSTRAP
+  # is the verified path (see install).
   depends_on "ohos-sdk" => :build
   depends_on "pnpm" => :build
   depends_on "rust" => :build # TODO: try to restore rustup: https://github.com/voidzero-dev/vite-task/commit/db99ba4d5d33323cc9e7b329f11bdea0610fbc7f
@@ -302,7 +304,7 @@ class VitePlus < Formula
     assert_match version.to_s, shell_output("#{bin}/vp --version")
 
     # OHOS: vp create/fmt hit transient exec/FS-settle ENOENTs under load;
-    # retry before giving up (cf. herdr's sign-retry loop).
+    # retry before giving up.
     vp_with_retry = lambda do |*args|
       max_attempts = 3
       (1..max_attempts).each do |attempt|
