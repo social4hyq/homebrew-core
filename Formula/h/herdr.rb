@@ -11,6 +11,10 @@ class Herdr < Formula
     strategy :github_latest
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea2ce845dca3812f0e18626967e8c0b86aa7c398037db9a6d7ff172a88f19c56"
+  end
+
   depends_on "rust" => :build
 
   # zig 0.15.2 needs LLVM 20.x; this tap only has llvm@21. Stage the official
