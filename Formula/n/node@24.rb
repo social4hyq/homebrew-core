@@ -5,6 +5,7 @@ class NodeAT24 < Formula
   sha256 "2732fc3f588dd335cd6779c06864f7cd424bb1b5ff9a1743059a66c54f9ca4a1"
   license "MIT"
   compatibility_version 1
+  revision 1
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -12,7 +13,7 @@ class NodeAT24 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4437ae824b4b2f20ce3681b15c3f567d0910401f00ad77e631e13f1d9b1334ef"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "62e3f4805fa56689ca740e53cf2309abbc3ef3aea7967107f7832ce585272403"
   end
 
   patch do
@@ -21,73 +22,21 @@ class NodeAT24 < Formula
 
   keg_only :versioned_formula
 
+  # The unversioned `llvm` (LLVM 23) is too new for node, which is not yet
+  # adapted to it. Lock to `llvm@22` for now.
+  depends_on "llvm@22" => :build
+
   # https://github.com/nodejs/release#release-schedule
   # disable! date: "2028-04-30", because: :unsupported
   deprecate! date: "2027-04-30", because: :unsupported
 
-  resource "alpine-rootfs" do
-    url "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/aarch64/alpine-minirootfs-3.23.4-aarch64.tar.gz"
-    sha256 "9250667a8affac8f1e98086392f80f43f086626701e9bce33398eb9b6c0bd64c"
-  end
-
   def install
-    # The ohos-sdk compiler (LLVM 15) is outdated and cannot compile Node.js 24.
-    # Use Alpine native GCC and statically link libgcc and libstdc++.
+    ENV["CC"] = "#{formula_opt_bin("llvm@22")}/clang -fno-emulated-tls"
+    ENV["CXX"] = "#{formula_opt_bin("llvm@22")}/clang++ -fno-emulated-tls"
 
-    chroot_dir = buildpath/"alpine-chroot"
-    chroot_dir.mkpath
+    system "./configure", "--prefix=#{prefix}", "--dest-os=openharmony"
+    system "make", "install"
 
-    resource("alpine-rootfs").stage do
-      system "cp", "-a", ".", chroot_dir.to_s
-    end
-
-    if File.exist?("/etc/resolv.conf")
-      chroot_dir.join("etc/resolv.conf").write(File.read("/etc/resolv.conf"))
-    else
-      chroot_dir.join("etc/resolv.conf").write("nameserver 8.8.8.8\n")
-    end
-
-    chroot_build_dir = chroot_dir/"build"
-    chroot_build_dir.mkpath
-
-    Dir.glob("#{buildpath}/*").each do |file|
-      next if file == chroot_dir.to_s
-      FileUtils.mv(file, chroot_build_dir)
-    end
-
-    chroot_script = <<~SH
-      set -e
-      export PATH=/bin:/usr/bin:/usr:sbin
-      export HOME=/root
-
-      apk update
-      apk add build-base python3 linux-headers
-
-      cd /build
-      export CC="gcc"
-      export CXX="g++"
-      ./configure \
-        --prefix=#{prefix} \
-        --dest-os=openharmony \
-        --partly-static
-
-      make -j$(nproc)
-      mkdir -p /dest
-      make install DESTDIR=/dest
-    SH
-
-    chroot_dir.join("build_node.sh").write(chroot_script)
-    system "chmod", "+x", "#{chroot_dir}/build_node.sh"
-
-    system "env", "-i", "chroot", chroot_dir.to_s, "/bin/sh", "/build_node.sh"
-
-    chroot_dest_target = chroot_dir/"dest#{prefix}"
-    cd chroot_dest_target do
-      prefix.install Dir["*"]
-    end
-  end
-
-  def post_install
     (lib/"node_modules/npm/npmrc").atomic_write("prefix = #{HOMEBREW_PREFIX}\n")
   end
 
@@ -107,14 +56,16 @@ class NodeAT24 < Formula
     ENV.prepend_path "PATH", opt_bin
     ENV.delete "NVM_NODEJS_ORG_MIRROR"
     assert_equal which("node"), opt_bin/"node"
-    assert_path_exists HOMEBREW_PREFIX/"bin/npm", "npm must exist"
-    assert_predicate HOMEBREW_PREFIX/"bin/npm", :executable?, "npm must be executable"
+    assert_path_exists bin/"npm", "npm must exist"
+    assert_predicate bin/"npm", :executable?, "npm must be executable"
     npm_args = ["-ddd", "--cache=#{HOMEBREW_CACHE}/npm_cache", "--build-from-source"]
-    system HOMEBREW_PREFIX/"bin/npm", *npm_args, "install", "npm@latest"
-    system HOMEBREW_PREFIX/"bin/npm", *npm_args, "install", "nan"
-    assert_path_exists HOMEBREW_PREFIX/"bin/npx", "npx must exist"
-    assert_predicate HOMEBREW_PREFIX/"bin/npx", :executable?, "npx must be executable"
-    assert_match "< hello >", shell_output("#{HOMEBREW_PREFIX}/bin/npx --yes cowsay hello")
+    system bin/"npm", *npm_args, "install", "npm@latest"
+    system bin/"npm", *npm_args, "install", "nan"
+    assert_path_exists bin/"npx", "npx must exist"
+    assert_predicate bin/"npx", :executable?, "npx must be executable"
+    assert_match "< hello >", shell_output("#{bin}/npx --yes cowsay hello")
+
+    assert_equal HOMEBREW_PREFIX.to_s, shell_output("#{bin}/npm config get prefix").chomp
 
     # Test `uvwasi` is linked correctly
     (testpath/"wasi-smoke-test.mjs").write <<~JAVASCRIPT
