@@ -1,8 +1,8 @@
 class Iowow < Formula
   desc "C utility library and persistent key/value storage engine"
   homepage "https://github.com/Softmotions/iowow"
-  url "https://github.com/Softmotions/iowow/archive/refs/tags/v1.5.1.tar.gz"
-  sha256 "6a5205f36f502e03528e545c98df4f6996276418670ed0ff175cd71566ffea88"
+  url "https://github.com/Softmotions/iowow/archive/refs/tags/v1.5.2.tar.gz"
+  sha256 "24b91edcc69a48a752b2a1892a0b935e980afb8a04eb659c699e77d29253ab61"
   license "MIT"
   head "https://github.com/Softmotions/iowow.git", branch: "master"
 
