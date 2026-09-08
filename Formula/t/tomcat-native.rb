@@ -7,7 +7,7 @@ class TomcatNative < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6929da4426fdc908ad26b2aa85671b6ded74ce68538c6e1e14962a434b84e211"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ad7b4f032e4844b351bd91e4fce4951a5497154d8d2411d3ae771fb9b34daa8"
   end
 
   depends_on "tomcat" => :test
