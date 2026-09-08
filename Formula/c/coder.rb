@@ -15,11 +15,7 @@ class Coder < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "fbd3d40f8857fffaff7f7f2ac1cf2bd2b1a0cfba17ef47d1fbda2179fd5d25f3"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "336303f44942432b1147d978c1ca8189ffba4d10ada4c5a21517f9b5dfc1c950"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "50a38d27fe3ef118fbf42fc886620ca88e6c16429dcf0881d3a0698208675b39"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "6a1e5028640535bd33e2deeb078ab9b55dabee8fe2971f20818778e7da77c774"
-    sha256 cellar: :any,                 x86_64_linux:  "d9e3f188c86c8c7b6dc954b34b8675d1d8168888f02d07f302fde2a9409b7863"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ef5456ffb1e0f9e217d26fc50c4830851da88c72f02c87e186a547ec142fc15"
   end
 
   # TODO: unpin go@1.26 when coder supports go 1.27
