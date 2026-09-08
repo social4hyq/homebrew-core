@@ -12,7 +12,7 @@ class E1s < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fc3cfa743f66f40653d92085e5365e4be087afd1727845c1ddeae697f387eebf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4c0a5ce7acc74d8761967bbc532323111c87f1ddff0fba02377e6475a787bf2"
   end
 
   depends_on "go" => :build
