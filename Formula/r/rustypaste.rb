@@ -1,13 +1,13 @@
 class Rustypaste < Formula
   desc "Minimal file upload/pastebin service"
   homepage "https://blog.orhun.dev/blazingly-fast-file-sharing"
-  url "https://github.com/orhun/rustypaste/archive/refs/tags/v0.18.0.tar.gz"
-  sha256 "53db137b8429f44d9bf700063fc42f1047460a60713cac801a5983946facb13f"
+  url "https://github.com/orhun/rustypaste/archive/refs/tags/v0.18.1.tar.gz"
+  sha256 "4b63be093e080d4a39e9ca03b378df96f0ae604e469a9c4d9bb437f9643524f0"
   license "MIT"
   head "https://github.com/orhun/rustypaste.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c2ec952434a9e82e98914692ccc250269f8a2ad688143734055e7a7964a2c1c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72c589f375e58a74877ddc265ecef9e1f783d19b2a6f371ebb65b4fcf3e5663e"
   end
 
   depends_on "rust" => :build
