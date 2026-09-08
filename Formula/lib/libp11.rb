@@ -11,7 +11,7 @@ class Libp11 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d71ec8bac2b4892d3174a83a25592d17417943efaa4abf3c44f1edbd979ef9f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c7839867ada1332fb4fa4ba17d8e79427a1e96df0bff5705d79be2d9c71ae3b"
   end
 
   head do
