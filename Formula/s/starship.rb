@@ -8,9 +8,8 @@ class Starship < Formula
   head "https://github.com/starship/starship.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r14"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r15"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7a0343e5c801e7b8ed4927eb48bcfdac3e7126824894c0fcae1127e5d40bf044"
   end
 
   depends_on "cmake" => :build
