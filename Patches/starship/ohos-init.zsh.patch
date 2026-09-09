@@ -1,0 +1,43 @@
+diff --git a/ohos-init.zsh b/ohos-init.zsh
+new file mode 100644
+index 0000000..af2979f
+--- /dev/null
++++ b/ohos-init.zsh
+@@ -0,0 +1,37 @@
++# OHOS shell init glue from the starship formula; regenerated on upgrade.
++_starship_ohos_setup_tz() {
++    [[ -n ${TZ:-} ]] && return
++    local off sign hh mm
++    off=$(date +%z 2>/dev/null) || return
++    [[ $off == [+-][0-9][0-9][0-9][0-9] ]] || return
++    sign=${off[1]} hh=${off[2,3]} mm=${off[4,5]}
++    hh=${hh#0}
++    [[ -z $hh ]] && hh=0
++    # POSIX TZ sign is inverted: UTC+8 is written "UTC-8".
++    [[ $sign == + ]] && sign=- || sign=+
++    export TZ="UTC${sign}${hh}${mm:+:${mm}}"
++}
++_starship_ohos_setup_tz
++unset -f _starship_ohos_setup_tz
++
++_starship_ohos_brew="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null)}"
++_starship_ohos_f1="$_starship_ohos_brew/share/zsh/functions"
++_starship_ohos_f2="$_starship_ohos_brew/share/zsh/site-functions"
++if [[ -d $_starship_ohos_f1 ]] && (( ! ${fpath[(Ie)$_starship_ohos_f1]} )); then
++    fpath=("$_starship_ohos_f1" $fpath)
++fi
++if [[ -d $_starship_ohos_f2 ]] && (( ! ${fpath[(Ie)$_starship_ohos_f2]} )); then
++    fpath=("$_starship_ohos_f2" $fpath)
++fi
++
++autoload -Uz compinit && compinit -u 2>/dev/null
++# init unconditionally zmodload zsh/mathfunc (missing on OS zsh); fallback below overrides __starship_get_time.
++eval "$($_starship_ohos_brew/bin/starship init zsh)" 2>/dev/null
++if ! zmodload -e zsh/mathfunc 2>/dev/null; then
++    zmodload zsh/datetime 2>/dev/null
++    __starship_get_time() {
++        typeset -gi STARSHIP_CAPTURED_TIME
++        (( STARSHIP_CAPTURED_TIME = EPOCHREALTIME * 1000 ))
++    }
++fi
++unset _starship_ohos_brew _starship_ohos_f1 _starship_ohos_f2
