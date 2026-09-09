@@ -1,13 +1,13 @@
 class Broot < Formula
   desc "New way to see and navigate directory trees"
   homepage "https://dystroy.org/broot/"
-  url "https://github.com/Canop/broot/archive/refs/tags/v1.59.0.tar.gz"
-  sha256 "61cb29922ef3953bae7f696b9f33fef51d85b5a4d85075c3612fcc6824663c37"
+  url "https://github.com/Canop/broot/archive/refs/tags/v1.60.1.tar.gz"
+  sha256 "23f6c5caed90400b4a7a277501c3c6fb46bacd4be5250da9ea357822e5a504ca"
   license "MIT"
   head "https://github.com/Canop/broot.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dabebf494735a2cb605d4d08639914fbab5eb9c68c3fd3a11ace2dde1ca85e7f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "382dd8668ae08091c9d259f6f7c5d35e6ba55cf9fe2032f5e087515bcfc86210"
   end
 
   depends_on "rust" => :build
@@ -47,18 +47,20 @@ class Broot < Formula
     assert_match "lets you explore file hierarchies with a tree-like view", output
     assert_match version.to_s, shell_output("#{bin}/broot --version")
 
+    (testpath/"conf.hjson").write "enable_kitty_keyboard: false\n"
+    (testpath/"test.txt").write "Homebrew\n"
+
     require "pty"
     require "io/console"
-    PTY.spawn(bin/"broot", "-c", ":print_tree", "--color", "no", "--outcmd", testpath/"output.txt") do |r, w, pid|
+    PTY.spawn(bin/"broot", "--conf", testpath/"conf.hjson", "-c", ":print_tree", "--color", "no") do |r, _w, pid|
       r.winsize = [20, 80] # broot dependency terminal requires width > 2
-      w.write "n\r\n"
       output = ""
       begin
         r.each { |line| output += line }
       rescue Errno::EIO
         # GNU/Linux raises EIO when read is done on closed pty
       end
-      assert_match "New Configuration files written in", output
+      assert_match "test.txt", output
       assert_predicate Process::Status.wait(pid), :success?
     end
   end
