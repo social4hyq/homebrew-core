@@ -35,7 +35,8 @@ class PhpAT83 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8857c337a2404da20a0d96285ac79a0705dbc8aad004e19dc51430434cab5a15"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "71b5a8bfd20fe4b7578fd26775c05b8ac70c03bb04e2a42c94db944409e50927"
   end
 
   keg_only :versioned_formula
@@ -295,7 +296,7 @@ class PhpAT83 < Formula
     end
   end
 
-  def post_install
+  post_install_steps do
     configure_php
   end
 
@@ -420,70 +421,6 @@ class PhpAT83 < Formula
         Process.kill("TERM", fpm_pid)
         Process.wait(fpm_pid)
       end
-    end
-  end
-
-  # The harmonybrew fork's `InstallSteps::DSL` doesn't support the upstream
-  # `configure_php` step, so replicate it as a classic `post_install` method.
-  # Mirrors `Homebrew::InstallSteps::Runner#run_configure_php` from brew HEAD.
-  private
-
-  def configure_php
-    pear_prefix = pkgshare/"pear"
-    channels = [pear_prefix/".channels", pear_prefix/".channels/.alias"]
-    channels.select(&:directory?).each { |directory| chmod 0755, directory }
-    pear_files = %w[.depdblock .filemap .depdb .lock].map { |file| pear_prefix/file }.select(&:file?)
-    pear_files.concat(channels.flat_map do |directory|
-      directory.directory? ? directory.children.select(&:file?) : []
-    end)
-    chmod 0644, pear_files
-
-    # Allow pecl to install outside of Cellar.
-    pecl_path = HOMEBREW_PREFIX/"lib/php/pecl"
-    pecl_path.mkpath
-    prefix_pecl = prefix/"pecl"
-    prefix_pecl.unlink if prefix_pecl.symlink?
-    File.symlink pecl_path, prefix_pecl unless prefix_pecl.exist?
-    php_basename = File.basename(Utils.safe_popen_read(bin/"php-config", "--extension-dir").chomp)
-    (pecl_path/php_basename).mkpath
-
-    version_major_minor = version.major_minor
-    raise ArgumentError, "PHP configuration requires a version" if version_major_minor.nil?
-
-    # Share PEAR data across PHP versions.
-    pear_dir = (name == "php") ? "pear" : "pear@#{version_major_minor}"
-    pear_path = HOMEBREW_PREFIX/"share"/pear_dir
-    cp_r "#{pear_prefix}/.", pear_path
-    php_ext_dir = opt_prefix/"lib/php"/php_basename
-    {
-      "php_ini"  => etc/"php/#{version_major_minor}/php.ini",
-      "php_dir"  => pear_path,
-      "doc_dir"  => pear_path/"doc",
-      "ext_dir"  => pecl_path/php_basename,
-      "bin_dir"  => opt_prefix/"bin",
-      "data_dir" => pear_path/"data",
-      "cfg_dir"  => pear_path/"cfg",
-      "www_dir"  => pear_path/"htdocs",
-      "man_dir"  => HOMEBREW_PREFIX/"share/man",
-      "test_dir" => pear_path/"test",
-      "php_bin"  => opt_prefix/"bin/php",
-    }.each do |key, value|
-      value.mkpath if /(?<!bin|man)_dir$/.match?(key)
-      system bin/"pear", "config-set", key, value, "system"
-    end
-    system bin/"pear", "update-channels"
-    return if name == "php"
-
-    ext_config_path = etc/"php/#{version_major_minor}/conf.d/ext-opcache.ini"
-    ext_config_path.dirname.mkpath
-    zend_extension_line = %Q(zend_extension="#{php_ext_dir}/opcache.so")
-    if ext_config_path.exist?
-      inreplace ext_config_path, /^\s*zend_extension\s*=.*$/, zend_extension_line
-    else
-      ext_config_path.atomic_write <<~INI
-        [opcache]
-        #{zend_extension_line}
-      INI
     end
   end
 end
