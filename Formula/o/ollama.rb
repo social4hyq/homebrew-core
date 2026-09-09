@@ -2,8 +2,8 @@ class Ollama < Formula
   desc "Create, run, and share large language models (LLMs)"
   homepage "https://ollama.com/"
   url "https://github.com/ollama/ollama.git",
-      tag:      "v0.33.2",
-      revision: "f96e7aa0513b9973a0ccc71be414c2ecb9d65b1a"
+      tag:      "v0.33.3",
+      revision: "b79067b0db7417f20108363bc22adb97f35c966a"
   license "MIT"
   head "https://github.com/ollama/ollama.git", branch: "main"
 
@@ -28,6 +28,8 @@ class Ollama < Formula
 
       # Build with the mlx-c bindings for tagged MLX 0.32.1. Upstream targets a later MLX commit:
       # https://github.com/ollama/ollama/commit/0bb09259203ff8f6d361faae1d40c4f83d2a99f7
+      # `mlx_cumsum_axis` only exists after mlx-c commit for MLX 0.32.2:
+      # https://github.com/ml-explore/mlx-c/commit/d4afaec5cc5c9ffbe58f37fdc038b2faaedc6e70
       patch :DATA
     end
   end
@@ -37,8 +39,8 @@ class Ollama < Formula
   # Pinned dependency required by llama-server
   resource "llama.cpp" do
     url "https://github.com/ggml-org/llama.cpp.git",
-        tag:      "b10630",
-        revision: "d222767c7a6516559a3f49e7721b6c6b1acc87b4"
+        tag:      "b10760",
+        revision: "0f3a71be15af836d277c9f918adfafb45732677e"
 
     livecheck do
       url "https://raw.githubusercontent.com/ollama/ollama/refs/tags/v#{LATEST_VERSION}/LLAMA_CPP_VERSION"
@@ -199,5 +201,17 @@ index 27d5724..f38a670 100644
 --- a/x/mlxrunner/mlx/fast.go
 +++ b/x/mlxrunner/mlx/fast.go
 @@ -24 +24 @@ func FastScaledDotProductAttention(q, k, v *Array, scale float32, mode string, m
--	C.mlx_fast_scaled_dot_product_attention(&out.ctx, q.ctx, k.ctx, v.ctx, C.float(scale), cMode, maskCtx, sinks.ctx, C.bool(false), DefaultStream().ctx)
-+	C.mlx_fast_scaled_dot_product_attention(&out.ctx, q.ctx, k.ctx, v.ctx, C.float(scale), cMode, maskCtx, sinks.ctx, DefaultStream().ctx)
+-	mlxCheck(C.mlx_fast_scaled_dot_product_attention(&out.ctx, q.ctx, k.ctx, v.ctx, C.float(scale), cMode, maskCtx, sinks.ctx, C.bool(false), DefaultStream().ctx))
++	mlxCheck(C.mlx_fast_scaled_dot_product_attention(&out.ctx, q.ctx, k.ctx, v.ctx, C.float(scale), cMode, maskCtx, sinks.ctx, DefaultStream().ctx))
+diff --git a/x/mlxrunner/mlx/ops.go b/x/mlxrunner/mlx/ops.go
+--- a/x/mlxrunner/mlx/ops.go
++++ b/x/mlxrunner/mlx/ops.go
+@@ -103,8 +103,7 @@
+ 
+ func (t *Array) Cumsum(axis int, reverse, inclusive bool) *Array {
+ 	out := New("CUMSUM")
+-	optDtype := C.mlx_optional_dtype{has_value: false}
+-	mlxCheck(C.mlx_cumsum_axis(&out.ctx, t.ctx, C.int(axis), C.bool(reverse), C.bool(inclusive), optDtype, DefaultStream().ctx))
++	mlxCheck(C.mlx_cumsum(&out.ctx, t.ctx, C.int(axis), C.bool(reverse), C.bool(inclusive), DefaultStream().ctx))
+ 	return out
+ }
