@@ -37,7 +37,8 @@ class Php < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "223a111532a33b2e27d7e9911f840c951de0dca24bf9e1b49beb86c9ad2127b0"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "675b78cda8bc9a6f899dc3a836c86c8303f23f58c782dc6787675df7d47b0251"
   end
 
   head do
