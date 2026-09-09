@@ -1,8 +1,8 @@
 class Scilla < Formula
   desc "DNS, subdomain, port, directory enumeration tool"
   homepage "https://github.com/edoardottt/scilla"
-  url "https://github.com/edoardottt/scilla/archive/refs/tags/v1.3.3.tar.gz"
-  sha256 "d3d767422c371bdbeda0f674f658b22b538c5dbc88ae4b449d8bfcb351b734d4"
+  url "https://github.com/edoardottt/scilla/archive/refs/tags/v1.3.4.tar.gz"
+  sha256 "f1a738745a2b45aa1dd37e1754a186bc08fb186f01e241257c7ae5a176eb7d44"
   license "GPL-3.0-or-later"
   head "https://github.com/edoardottt/scilla.git", branch: "main"
 
