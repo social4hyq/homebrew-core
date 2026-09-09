@@ -10,6 +10,10 @@ class Traceroute < Formula
     regex(/traceroute[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca7a9ce789179a57fb228719f9f97dc3176a9e8df255a645255c66158a60f18d"
+  end
+
   def install
     # Make.rules leaks -l flags from LIBS into LIBDEPS, breaking the link.
     inreplace "Make.rules",
