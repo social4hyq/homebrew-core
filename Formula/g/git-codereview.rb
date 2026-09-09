@@ -7,7 +7,7 @@ class GitCodereview < Formula
   head "https://github.com/golang/review.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "18091657694545a80583bcb5a1a2aa26368898bfa2f44358c9d1a23666c75627"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "061bf569c668a1f9d41834f55300def6052102d147030a29562e8e4069fb6671"
   end
 
   depends_on "go" => :build
