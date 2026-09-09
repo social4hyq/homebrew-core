@@ -7,7 +7,7 @@ class Jql < Formula
   head "https://github.com/yamafaktory/jql.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dc69ac8cf943357d1cf4200a42c54e4428cb5c8fed1524fc20925755922688d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1859794d07090ddc7dad753fa44c5ee3a7340aa0930352778b9ce9594e3c9d27"
   end
 
   depends_on "rust" => :build
