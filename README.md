@@ -7,8 +7,8 @@
 **装了能做什么**：
 
 - **让 AI 帮你写代码**：`opencode`（开源、自带 75+ 模型提供商接入）、`claude-code`（Anthropic 官方）
-- **跑现代 JavaScript/前端工具链**：`bun` 运行时、`node-ohos`、`vite-plus` 统一前端工具链
-- **打造顺手的终端**：`starship` 提示符 + `hishell-font` 图标字体、`sshport` 远程端口转发
+- **跑现代 JavaScript/前端工具链**：`bun` 运行时、`vite-plus` 统一前端工具链
+- **打造顺手的终端**：`hishell-font` 图标字体（配合 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 的 `starship`）、`sshport` 远程端口转发
 - **本地构建与排障**：`ohos-compat-shim` 兼容层
 
 ## 安装
@@ -23,7 +23,7 @@ brew install claude-code     # Claude Code CLI
 brew install bun             # Bun 运行时
 brew install vite-plus       # VoidZero 统一前端工具链（`vp` 命令）
 brew install hishell-font    # starship 图标字体（先装这个：提示符的图标/符号靠它渲染）
-brew install starship        # 终端提示符美化（主题化 prompt，配合 hishell-font）
+brew install starship        # 终端提示符美化（Harmonybrew 官方 core 原生提供，主题化 prompt，配合 hishell-font）
 ```
 
 ## 验证安装
@@ -49,9 +49,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `bun` | 1.4.2 | 极速 JavaScript/TypeScript 一体化工具链：运行时、包管理、测试、打包四合一，可直接替代 Node.js；本 tap 多数工具的底座 |
 | `bun-bootstrap` | 1.4.0-5467a689 | bun 自举构建用的预编译引导版（普通用户无需安装） |
 | `bun-webkit` | `2e2aa2290f` | bun 的浏览器引擎组件（内部依赖，普通用户无需关心） |
-| `node-ohos` | 26.7.0 | 用 `harmonybrew/core` 的 `llvm@21` 构建的 Node.js：与 bun 系原生插件 ABI 兼容，需要 node 跑原生扩展时选它（开发者向） |
 | `vite-plus` | 0.2.8 | VoidZero（Vue/Vite 作者团队）的 Web 统一工具链：一个 `vp` 命令包揽创建项目、开发调试、检查、格式化、测试、构建全流程（Beta） |
-| `starship` | 1.26.0 | 跨 shell 的极简高速提示符：git 状态、目录、语言版本一目了然，一套配置通吃 bash/zsh/fish；**需配合 `hishell-font`**（图标字体），否则图标显示为方框 |
 | `hishell-font` | 0.1.0 | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
 | `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
 | `ohos-compat-shim` | 0.5.0 | 系统兼容层：自动兜底鸿蒙与标准 Linux 的底层行为差异，让 Linux 生态软件开箱即用（已内嵌进本 tap 产物，无需单独配置） |
@@ -82,6 +80,8 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `libsecret` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install libsecret`；已装本 tap 旧版的用户请先 `brew uninstall libsecret` 再装上游版 |
 | `zellij` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install zellij`；已装本 tap 旧版的用户请先 `brew uninstall zellij` 再装上游版 |
 | `herdr` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install herdr`；已装本 tap 旧版的用户请先 `brew uninstall herdr` 再装上游版 |
+| `starship` | 2026-09-09 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install starship`（配合 `hishell-font` 图标字体用法不变）；已装本 tap 旧版的用户请先 `brew uninstall starship` 再装上游版 |
+| `node-ohos` | 2026-09-09 下线 | [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 的 `node` 已改用 `llvm@22` 重编（原生 OHOS 支持，26.8.1），与本 tap 停留在 `llvm@21`/26.7.0 的自有版本相比无需再单独维护，直接 `brew install node`；已装本 tap 旧版的用户请先 `brew uninstall node-ohos` 再装上游 `node` |
 
 > 改名提示（2026-08-01）：`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
 
