@@ -9,7 +9,7 @@ class Starship < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r16"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc5bcbff6941a8aead10eb06c9cbfa8de5236259a69b6e7004555238b60fbf70"
   end
 
   depends_on "cmake" => :build
