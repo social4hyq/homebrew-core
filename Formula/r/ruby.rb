@@ -177,16 +177,17 @@ class Ruby < Formula
   # Since Gem ships Bundle we want to provide that full/expected installation
   # but to do so we need to handle the case where someone has previously
   # installed bundle manually via `gem install`.
-  # TODO: switch to `post_install_steps` (remove/on_macos/if_path_exists DSL)
-  #       once the local brew fork catches up with upstream Homebrew.
-  def post_install
-    rm_r(Dir[HOMEBREW_PREFIX/"lib/ruby/gems/#{api_version}/gems/bundler-*"])
-
-    if OS.mac?
-      # Ensure user-installed gems link against the versioned Ruby dylib in opt
-      # rather than the Cellar path (which changes between versions).
-      dylib = HOMEBREW_PREFIX/"opt/ruby@#{version.major_minor}/lib/libruby.#{version.major_minor}.dylib"
-      MachO::Tools.change_dylib_id dylib.to_s, dylib.to_s if dylib.exist?
+  # TODO: remove the `remove` step when enabling default_user_install
+  post_install_steps do
+    remove "{{HOMEBREW_PREFIX}}/lib/ruby/gems/{{version.major_minor}}.0/gems/bundler-*", recursive: true
+    on_macos do
+      if_path_exists "opt/ruby@{{version.major_minor}}/lib/libruby.{{version.major_minor}}.dylib",
+                     base: :homebrew_prefix do
+        change_dylib_id "lib/libruby.dylib",
+                        "{{HOMEBREW_PREFIX}}/opt/ruby@{{version.major_minor}}/" \
+                        "lib/libruby.{{version.major_minor}}.dylib",
+                        resolve_source: true
+      end
     end
   end
 
