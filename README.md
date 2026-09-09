@@ -2,7 +2,9 @@
 
 面向鸿蒙 PC（HarmonyOS，OHOS aarch64）的 [Harmonybrew](https://harmonybrew.atomgit.com)（Homebrew 的鸿蒙移植）第三方 tap。
 
-**这个 tap 解决什么问题**：鸿蒙 PC 的终端（HiShell）对每个可执行文件强制代码签名校验——直接下载或自行编译的 Linux 程序一律 `Permission denied`；同时不少常用开发工具尚未适配鸿蒙。本 tap 把一批常用开发工具逐一移植、签名、真机验证后打包成 bottle：`brew install` 一条命令装好即用，体验与 macOS/Linux 上的 Homebrew 一致。
+**这个 tap 解决什么问题**：鸿蒙 PC 终端（HiShell）强制代码签名——自行编译或直接下载的 Linux 程序一律 `Permission denied`，且不少常用工具还没适配鸿蒙。本 tap 逐一移植、签名、真机验证后打包成 bottle，`brew install` 一条命令装好即用，体验等同 macOS/Linux 上的 Homebrew。
+
+**这个 tap 的定位**：过渡区。formula 验证成熟后持续推动合并进 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，合入即下线自有版本（见下方「已下线 / 已迁移」表）——上游化是长期追求，不是事后收尾。
 
 **装了能做什么**：
 
