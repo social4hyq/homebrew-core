@@ -25,7 +25,7 @@ class Llvm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61462f478c9d879dccc3e9932732cb4d63fa96a61d8f410bd9fe80180a2d532f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5848819b87bf94a7205280113ebf63ca56e1ab875eef674c963b732f19e5bcd"
   end
 
   # Upstream's `keg_only :provided_by_macos` links on Linux; OHOS keeps this
