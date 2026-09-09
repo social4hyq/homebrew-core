@@ -25,13 +25,9 @@ class Llvm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5848819b87bf94a7205280113ebf63ca56e1ab875eef674c963b732f19e5bcd"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2bb3b8935a6fc9270155b4b4cd0abced85aeabdf4df3cdec4476e8e6130ac4c4"
   end
-
-  # Upstream's `keg_only :provided_by_macos` links on Linux; OHOS keeps this
-  # keg keg-only to avoid colliding with ohos-sdk's own clang/llvm-* binaries
-  # on PATH.
-  keg_only "it conflicts with `ohos-sdk`"
 
   # https://llvm.org/docs/GettingStarted.html#requirement
   depends_on "cmake" => :build
@@ -44,7 +40,7 @@ class Llvm < Formula
 
   on_linux do
     depends_on "pkgconf" => :build
-    depends_on "ohos-sdk" # sysroot + libcxx-ohos headers; see DEFAULT_SYSROOT below
+    depends_on "ohos-sdk@26.0.0.18" # sysroot + libcxx-ohos headers; see DEFAULT_SYSROOT below
     depends_on "zlib-ng-compat"
   end
 
@@ -127,7 +123,7 @@ class Llvm < Formula
     # (into args / runtimes_cmake_args / builtins_cmake_args) picks this up.
     ENV.append_to_cflags "-D__MUSL__"
 
-    ohos_sdk    = formula_opt_prefix("ohos-sdk")
+    ohos_sdk    = formula_opt_prefix("ohos-sdk@26.0.0.18")
     sysroot     = "#{ohos_sdk}/native/sysroot"
     libcxx_ohos = "#{ohos_sdk}/native/llvm/include/libcxx-ohos/include/c++/v1"
     odie "OHOS sysroot missing: #{sysroot}/usr/lib" unless File.directory?("#{sysroot}/usr/lib")
