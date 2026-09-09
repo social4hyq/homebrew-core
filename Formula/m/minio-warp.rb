@@ -1,8 +1,8 @@
 class MinioWarp < Formula
   desc "S3 benchmarking tool"
   homepage "https://github.com/minio/warp"
-  url "https://github.com/minio/warp/archive/refs/tags/v1.6.1.tar.gz"
-  sha256 "427c6bfa56517b40c5c8a150865bf3e5ae635c7141ef11e71e799ff882a44304"
+  url "https://github.com/minio/warp/archive/refs/tags/v1.7.0.tar.gz"
+  sha256 "c99bdb158e46e96aca9092b7d5fd6483e3901093045b1c8e987094d1fec94f2d"
   license "AGPL-3.0-or-later"
   head "https://github.com/minio/warp.git", branch: "master"
 
