@@ -1,10 +1,10 @@
 class Tor < Formula
   desc "Anonymizing overlay network for TCP"
   homepage "https://www.torproject.org/"
-  url "https://www.torproject.org/dist/tor-0.4.9.11.tar.gz"
-  mirror "https://www.torservers.net/mirrors/torproject.org/dist/tor-0.4.9.11.tar.gz"
-  mirror "https://fossies.org/linux/misc/tor-0.4.9.11.tar.gz"
-  sha256 "2e6c1720118c812acf0079fd47cf91b6bfaba5d766c321c4d3d2a28d6a11a8ed"
+  url "https://www.torproject.org/dist/tor-0.4.9.12.tar.gz"
+  mirror "https://www.torservers.net/mirrors/torproject.org/dist/tor-0.4.9.12.tar.gz"
+  mirror "https://fossies.org/linux/misc/tor-0.4.9.12.tar.gz"
+  sha256 "c0d307c9dcdaee4848a8ca53e9d6c4ec92823e4f30be12790b0fbddfc6515f5b"
   # Complete list of licenses:
   # https://gitweb.torproject.org/tor.git/plain/LICENSE
   license all_of: [
@@ -21,7 +21,7 @@ class Tor < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "896fb9fb1f45fe3b01abb3b8df07a944c3aaadfe2768b608d402527221174cb7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6304b0ca718f1bab660f30a0b6704d88597165e7e6da66d07f1ac8f315f5e268"
   end
 
   depends_on "pkgconf" => :build
