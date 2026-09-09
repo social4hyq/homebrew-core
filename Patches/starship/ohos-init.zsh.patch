@@ -4,7 +4,7 @@ index 0000000..af2979f
 --- /dev/null
 +++ b/ohos-init.zsh
 @@ -0,0 +1,37 @@
-+# OHOS shell init glue from the starship formula; regenerated on upgrade.
++# HarmonyOS PC shell init glue from the starship formula; regenerated on upgrade.
 +_starship_ohos_setup_tz() {
 +    [[ -n ${TZ:-} ]] && return
 +    local off sign hh mm
@@ -31,7 +31,7 @@ index 0000000..af2979f
 +fi
 +
 +autoload -Uz compinit && compinit -u 2>/dev/null
-+# init unconditionally zmodload zsh/mathfunc (missing on OS zsh); fallback below overrides __starship_get_time.
++# init unconditionally zmodload zsh/mathfunc (missing in the system zsh); fallback below overrides __starship_get_time.
 +eval "$($_starship_ohos_brew/bin/starship init zsh)" 2>/dev/null
 +if ! zmodload -e zsh/mathfunc 2>/dev/null; then
 +    zmodload zsh/datetime 2>/dev/null

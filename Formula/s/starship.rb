@@ -31,13 +31,13 @@ class Starship < Formula
     end
   end
 
-  # OHOS sandbox uid isn't in /etc/passwd, so whoami::username() only returns the
+  # HarmonyOS PC sandbox uid isn't in /etc/passwd, so whoami::username() only returns the
   # numeric uid ("100"). Fall back to the real OS-account name via NDK dlopen.
   patch do
     file "Patches/starship/username-ohos-account-fallback.patch"
   end
 
-  # New-file patch: OHOS shell init glue shipped as a keg script by install().
+  # New-file patch: HarmonyOS PC shell init glue shipped as a keg script by install().
   # The OS zsh (/usr/bin/zsh, a 5.9 CI build) lacks zsh/mathfunc and has no brew
   # function dirs in its compiled-in fpath; the device also has no /etc/localtime.
   patch do
@@ -55,7 +55,7 @@ class Starship < Formula
 
     generate_completions_from_executable(bin/"starship", "completions")
 
-    # Ship the OHOS shell-init glue (created by ohos-init.zsh.patch) as a keg
+    # Ship the HarmonyOS PC shell init glue (created by ohos-init.zsh.patch) as a keg
     # script; see caveats for the one-line .zshrc hookup.
     pkgshare.mkpath
     pkgshare.install buildpath/"ohos-init.zsh"
@@ -63,11 +63,11 @@ class Starship < Formula
 
   def caveats
     <<~CAVEATS
-      Set up starship on OHOS (add this line to ~/.zshrc):
+      Set up starship on HarmonyOS PC (add this line to ~/.zshrc):
 
         [ -f "$(brew --prefix)/opt/starship/share/starship/ohos-init.zsh" ] && source "$(brew --prefix)/opt/starship/share/starship/ohos-init.zsh"
 
-      The OHOS glue (timezone fallback, fpath, compinit, mathfunc fallback)
+      The HarmonyOS PC glue (timezone fallback, fpath, compinit, mathfunc fallback)
       lives in the keg and upgrades with `brew upgrade starship`.
     CAVEATS
   end
