@@ -6,6 +6,10 @@ class OhosSdkAT260018 < Formula
   sha256 "191094c9efcc4c0a6874aadaec5a1bf8b16f09f60c8f34a828d4ab0007356248"
   license "Apache-2.0"
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9f7c3c1b7b01241145d99b19aeaee698115880da533f5342a7bc0c89318712f"
+  end
+
   # This formula exists solely as a dependency of `llvm`, `llvm@21` and
   # `llvm@22`; they consume it via its Cellar path (`opt_prefix`), so it is
   # intentionally keg-only — it never needs to be linked into the default
