@@ -1,14 +1,13 @@
 class Govulncheck < Formula
   desc "Database client and tools for the Go vulnerability database"
   homepage "https://github.com/golang/vuln"
-  url "https://github.com/golang/vuln/archive/refs/tags/v1.7.0.tar.gz"
-  sha256 "4fb7f0204b7e039f550d8938b714c5218d870694895585e0e19b2c0c4700e4c7"
+  url "https://github.com/golang/vuln/archive/refs/tags/v1.8.0.tar.gz"
+  sha256 "f02847e4ab2d18159fd28d22a7001f2c1bbc2eb62ba884831ae35ea89f81b882"
   license "BSD-3-Clause"
   head "https://github.com/golang/vuln.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8d88976c09528430d982ee38309ece2cee512348262385b5b9dd2d54a0da66a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c092a558fd5468176449ab267381ee120ba07c1d8614086e4111692c5d5a41b7"
   end
 
   depends_on "go" => [:build, :test]
