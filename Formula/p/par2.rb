@@ -1,8 +1,8 @@
 class Par2 < Formula
   desc "Parchive: Parity Archive Volume Set for data recovery"
   homepage "https://github.com/Parchive/par2cmdline"
-  url "https://github.com/Parchive/par2cmdline/releases/download/v1.3.0/par2cmdline-1.3.0.tar.bz2"
-  sha256 "60fe185b7662004c658f9d17dc03e7422250ec7238329cf93189f2364cd0d560"
+  url "https://github.com/Parchive/par2cmdline/releases/download/v1.4.0/par2cmdline-1.4.0.tar.bz2"
+  sha256 "269aff9d49c6a0c0d1c394300d35c36229764588f56faad5850eaf36c7a298dc"
   license "GPL-2.0-or-later"
 
   livecheck do
