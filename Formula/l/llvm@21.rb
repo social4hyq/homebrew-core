@@ -13,14 +13,11 @@ class LlvmAT21 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f2c5eebce0e75529ac446791ca9e7ab7440df4dd44db36d3fe41d64ead6ebfa"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f06ff3edbd81734a5c637a4ab253651ed631d9495724bcbca1f319d4f71b7fe"
   end
 
-  # Not `:versioned_formula`: that lets Homebrew auto-link this keg on a
-  # direct `brew install llvm@21` (auto_link_versioned_keg_only? in
-  # formula_installer.rb), which would collide with ohos-sdk's own
-  # unrelated clang/llvm-* binaries under the same names.
-  keg_only "it conflicts with `ohos-sdk`"
+  keg_only :versioned_formula
 
   # https://llvm.org/docs/GettingStarted.html#requirement
   depends_on "cmake" => :build
@@ -33,7 +30,7 @@ class LlvmAT21 < Formula
 
   on_linux do
     depends_on "pkgconf" => :build
-    depends_on "ohos-sdk" # sysroot + libcxx-ohos headers; see DEFAULT_SYSROOT below
+    depends_on "ohos-sdk@26.0.0.18" # sysroot + libcxx-ohos headers; see DEFAULT_SYSROOT below
     depends_on "zlib-ng-compat"
   end
 
@@ -121,7 +118,7 @@ class LlvmAT21 < Formula
     # (into args / runtimes_cmake_args / builtins_cmake_args) picks this up.
     ENV.append_to_cflags "-D__MUSL__"
 
-    ohos_sdk    = formula_opt_prefix("ohos-sdk")
+    ohos_sdk    = formula_opt_prefix("ohos-sdk@26.0.0.18")
     sysroot     = "#{ohos_sdk}/native/sysroot"
     libcxx_ohos = "#{ohos_sdk}/native/llvm/include/libcxx-ohos/include/c++/v1"
     odie "OHOS sysroot missing: #{sysroot}/usr/lib" unless File.directory?("#{sysroot}/usr/lib")
