@@ -15,9 +15,7 @@ class LlvmAT22 < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "e789e32664ef38ed17dc61d2107d9192164c12cf0564d3ad774dbe70fb39ecec"
   end
 
-  # Not `:versioned_formula`: the fork auto-links versioned kegs on direct
-  # install, colliding with ohos-sdk's own clang/llvm-* binaries on PATH.
-  keg_only "it conflicts with `ohos-sdk`"
+  keg_only :versioned_formula
 
   # https://llvm.org/docs/GettingStarted.html#requirement
   depends_on "cmake" => :build
@@ -30,7 +28,7 @@ class LlvmAT22 < Formula
 
   on_linux do
     depends_on "pkgconf" => :build
-    depends_on "ohos-sdk" # sysroot + libcxx-ohos headers; see DEFAULT_SYSROOT below
+    depends_on "ohos-sdk@26.0.0.18" # sysroot + libcxx-ohos headers; see DEFAULT_SYSROOT below
     depends_on "zlib-ng-compat"
   end
 
@@ -113,7 +111,7 @@ class LlvmAT22 < Formula
     # (into args / runtimes_cmake_args / builtins_cmake_args) picks this up.
     ENV.append_to_cflags "-D__MUSL__"
 
-    ohos_sdk    = formula_opt_prefix("ohos-sdk")
+    ohos_sdk    = formula_opt_prefix("ohos-sdk@26.0.0.18")
     sysroot     = "#{ohos_sdk}/native/sysroot"
     libcxx_ohos = "#{ohos_sdk}/native/llvm/include/libcxx-ohos/include/c++/v1"
     odie "OHOS sysroot missing: #{sysroot}/usr/lib" unless File.directory?("#{sysroot}/usr/lib")
