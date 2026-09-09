@@ -8,7 +8,7 @@ class Help2man < Formula
   revision 5
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ffdf6dc6469293b9aa6fc621f507c5435165c2a211f425859e581bbb5fa1a99"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4dd30c45e82f1d2f6bb4e2a580f2620b787dc5e80ddf8e1ae2c7453e2bad28ce"
   end
 
   depends_on "gettext"
