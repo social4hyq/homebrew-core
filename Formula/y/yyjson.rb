@@ -8,7 +8,7 @@ class Yyjson < Formula
   head "https://github.com/ibireme/yyjson.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad0af79c2e56ae0d8a1214c474caedae18f667a27e744c1edbd71d1246301ad7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f39fd42cd2081236f316f5c0c2a6481d28f840989790a2bef4c9cffed84bf54"
   end
 
   depends_on "cmake" => :build
