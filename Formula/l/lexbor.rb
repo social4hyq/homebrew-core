@@ -1,12 +1,12 @@
 class Lexbor < Formula
   desc "Fast embeddable web browser engine written in C with no dependencies"
   homepage "https://lexbor.com/"
-  url "https://github.com/lexbor/lexbor/archive/refs/tags/v3.0.0.tar.gz"
-  sha256 "eafaa79ef9871f0bbb1978eda8677d184f7ecdcaa203d7cd25b3f86e32c014c2"
+  url "https://github.com/lexbor/lexbor/archive/refs/tags/v3.0.1.tar.gz"
+  sha256 "08ce3d18efdd09b8b3488779b97509f83cc181e09a5a4cd8162ac08d77266600"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89feded4f81e4c65c2a77e24f4fc20f78ae7e364b16a57b106383d5d41139586"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3dcd2e14a3592f79efa9cf0fbc2dde022d296bde665844bd790ba3e607dbc53b"
   end
 
   depends_on "cmake" => :build
