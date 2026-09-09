@@ -30,7 +30,8 @@ class Ruby < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f44c49c3b104e0e2c58b8dfb4eaacc14ba7f09fbdb3b71a1226b474c6106e01f"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2552f6f0cc3a3c5a7cfe32be6606a3881f0ca01d286e3b95c3eaa1630ed7ca5"
   end
 
   head do
