@@ -1,12 +1,12 @@
 class Nessie < Formula
   desc "Transactional Catalog for Data Lakes with Git-like semantics"
   homepage "https://projectnessie.org"
-  url "https://github.com/projectnessie/nessie/archive/refs/tags/nessie-0.108.4.tar.gz"
-  sha256 "af1501a93443d57fbe0c01d6882eecf0a279fe9741b21f7500e2f49e1c2dc113"
+  url "https://github.com/projectnessie/nessie/archive/refs/tags/nessie-0.108.5.tar.gz"
+  sha256 "6f430bc1530e63ee107b3dac3006eaf19dc8b7e4241e697a8ded2db04469a182"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "08f3a725e07952572bef35f20fb62ee678983fc171750f0f6f585f559b3ec0e3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9ac0d7d492962a96334a86b079a891a0244fbc29dec86c5e88a03ed408a6a32"
   end
 
   depends_on "gradle" => :build
