@@ -4,12 +4,12 @@ class Starship < Formula
   url "https://github.com/starship/starship/archive/refs/tags/v1.26.0.tar.gz"
   sha256 "8c95e8a6c596b29ac192104eae00dd991e8c8fd66083fd2b34d6b223a5803a59"
   license "ISC"
-  revision 7
+  revision 8
   head "https://github.com/starship/starship.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r15"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7a0343e5c801e7b8ed4927eb48bcfdac3e7126824894c0fcae1127e5d40bf044"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
   depends_on "cmake" => :build
@@ -58,7 +58,7 @@ class Starship < Formula
     # Ship the OHOS shell-init glue (created by ohos-init.zsh.patch) as a keg
     # script; see caveats for the one-line .zshrc hookup.
     pkgshare.mkpath
-    (pkgshare/"ohos-init.zsh").install buildpath/"ohos-init.zsh"
+    pkgshare.install buildpath/"ohos-init.zsh"
   end
 
   def caveats
@@ -73,7 +73,7 @@ class Starship < Formula
   end
 
   test do
-    assert_path_exists pkgshare/"ohos-init.zsh"
+    assert_predicate pkgshare/"ohos-init.zsh", :file?
     ENV["STARSHIP_CONFIG"] = ""
     assert_equal "[1;32m❯[0m ", shell_output("#{bin}/starship module character")
   end
