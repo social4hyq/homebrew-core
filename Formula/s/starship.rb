@@ -4,13 +4,13 @@ class Starship < Formula
   url "https://github.com/starship/starship/archive/refs/tags/v1.26.0.tar.gz"
   sha256 "8c95e8a6c596b29ac192104eae00dd991e8c8fd66083fd2b34d6b223a5803a59"
   license "ISC"
-  revision 6
+  revision 7
   head "https://github.com/starship/starship.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r13"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/starship-v1.26.0-r14"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca75266c53fb6a6180520c7089283fc92d00b5f0a8e2fae71778dd75f7beadce"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
   depends_on "cmake" => :build
@@ -38,6 +38,13 @@ class Starship < Formula
     file "Patches/starship/username-ohos-account-fallback.patch"
   end
 
+  # New-file patch: OHOS shell init glue shipped as a keg script by install().
+  # The OS zsh (/usr/bin/zsh, a 5.9 CI build) lacks zsh/mathfunc and has no brew
+  # function dirs in its compiled-in fpath; the device also has no /etc/localtime.
+  patch do
+    file "Patches/starship/ohos-init.zsh.patch"
+  end
+
   def install
     resource("errno").stage do
       (buildpath/"vendor/errno").install Dir["*"]
@@ -48,9 +55,26 @@ class Starship < Formula
     system "cargo", "install", *std_cargo_args
 
     generate_completions_from_executable(bin/"starship", "completions")
+
+    # Ship the OHOS shell-init glue (created by ohos-init.zsh.patch) as a keg
+    # script; see caveats for the one-line .zshrc hookup.
+    pkgshare.mkpath
+    (pkgshare/"ohos-init.zsh").install buildpath/"ohos-init.zsh"
+  end
+
+  def caveats
+    <<~CAVEATS
+      Set up starship on OHOS (add this line to ~/.zshrc):
+
+        [ -f "$(brew --prefix)/opt/starship/share/starship/ohos-init.zsh" ] && source "$(brew --prefix)/opt/starship/share/starship/ohos-init.zsh"
+
+      The OHOS glue (timezone fallback, fpath, compinit, mathfunc fallback)
+      lives in the keg and upgrades with `brew upgrade starship`.
+    CAVEATS
   end
 
   test do
+    assert_path_exists pkgshare/"ohos-init.zsh"
     ENV["STARSHIP_CONFIG"] = ""
     assert_equal "[1;32m❯[0m ", shell_output("#{bin}/starship module character")
   end
