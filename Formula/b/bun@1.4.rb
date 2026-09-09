@@ -25,6 +25,11 @@ class BunAT14 < Formula
     regex(/^bun-v?(1\.4(?:\.\d+)*)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "70592e128c592697b753091082a511ea25aab950c3c4e955c7665d79b32f71e0"
+  end
+
   keg_only :versioned_formula
 
   depends_on "bun-bootstrap" => :build # Bootstrap: `bun bd` itself is a bun script
