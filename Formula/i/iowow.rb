@@ -7,7 +7,7 @@ class Iowow < Formula
   head "https://github.com/Softmotions/iowow.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "75dcdc51d196fb0998b10f8feedf7c7af06229542204807b6385d62d6b40a684"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c741c2ea2f913e093d7ab61134e9b7da79f50659e48f11fdc499299169380207"
   end
 
   depends_on "pkgconf" => :build
