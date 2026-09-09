@@ -35,7 +35,8 @@ class PhpAT82 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "05832e2d7fa4913a9b3ad3daf21c99bca1e82a73b0ef911363a8b8e741e0ad5e"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22ddd2608d51b587d7cf09665019ce103e4607a051fb173f4138b3308b81f30b"
   end
 
   keg_only :versioned_formula
