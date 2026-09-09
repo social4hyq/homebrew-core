@@ -15,7 +15,7 @@ class Fish < Formula
   pour_bottle? only_if: :default_prefix
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "29ffd6fcf132c5825afd1e7da80ffe4a9441a193b61db16fe078e98bef169b1b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "13835028aa3f7f1f8da140618138a723ee7b775c31f1cc6a29450c4826bedb5e"
   end
 
   depends_on "cmake" => :build
