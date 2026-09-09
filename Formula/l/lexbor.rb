@@ -6,7 +6,7 @@ class Lexbor < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89feded4f81e4c65c2a77e24f4fc20f78ae7e364b16a57b106383d5d41139586"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3dcd2e14a3592f79efa9cf0fbc2dde022d296bde665844bd790ba3e607dbc53b"
   end
 
   depends_on "cmake" => :build
