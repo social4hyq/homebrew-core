@@ -33,10 +33,10 @@ class BunAT14 < Formula
   keg_only :versioned_formula
 
   depends_on "bun-bootstrap" => :build # Bootstrap: `bun bd` itself is a bun script
-  depends_on "bun-webkit" => :build
   depends_on "cmake" => :build
   depends_on "gperf" => :build
   depends_on "icu4c@78" => :build
+  depends_on "libxml2" => :build # lld link step for WebKit's nested-cmake build (see bun-webkit.rb history)
   # lld@21/llvm@21 resolve to harmonybrew/core (this tap's fork was retired
   # once upstreamed). lld@21 provides the --code-sign-by-default ld.lld
   # (split out of llvm@21); both are wired up directly in install() below
@@ -55,6 +55,13 @@ class BunAT14 < Formula
   # No runtime ohos-compat-shim dependency: vendored copy statically linked
   # into the executable AND every `bun build --compile` output. ohos-sdk is
   # build-time only: signs rust-nightly, clang-sign wrapper, and final binary.
+  #
+  # WebKit is built from source in install() (--webkit=local, matching
+  # upstream's fetch_webkit) instead of consuming a separate bun-webkit
+  # formula: bun's own scripts/build/deps/webkit.ts already wires OHOS
+  # cross-compilation for local-mode's nested cmake build (reads the same
+  # ohos-cross-libs/ohos-icu scaffold + CC/CXX this install() sets up for
+  # the main build), so no bun-side scaffolding is needed beyond that.
 
   fails_with :gcc do
     cause "uses clang-specific flags"
@@ -86,48 +93,38 @@ class BunAT14 < Formula
 
     llvm     = Formula["llvm@21"]
     lld      = Formula["lld@21"]
-    webkit   = Formula["bun-webkit"]
     boot     = Formula["bun-bootstrap"]
 
-    # Release SOP drift guards (openspec/specs/bun-upstream-bridge.md steps 2-3):
+    # Release SOP drift guard (openspec/specs/bun-upstream-bridge.md step 3):
     # fail the build instead of silently drifting if a merge forgot to bump
-    # the paired formula/resource.
+    # the rust-nightly resource.
     rust_toolchain_channel = (buildpath/"rust-toolchain.toml").read[/channel\s*=\s*"([^"]+)"/, 1]
     if rust_toolchain_channel != resource("rust-nightly").version.to_s
       odie "rust-toolchain.toml channel (#{rust_toolchain_channel}) != rust-nightly resource " \
            "(#{resource("rust-nightly").version}) — bump the resource or re-check the merge"
     end
 
+    # WebKit built from source (--webkit=local below), matching upstream's
+    # fetch_webkit: a full clone of oven-sh/WebKit is ~18GB and Homebrew's
+    # unpack strategy would duplicate a `resource` block's download, so
+    # shallow-clone the pinned autobuild tag directly instead.
     webkit_version = (buildpath/"scripts/build/deps/webkit.ts").read[/WEBKIT_VERSION = "(\h+)"/i, 1]
-    webkit_pin = webkit.stable.specs[:revision]
-    if webkit_version != webkit_pin
-      odie "scripts/build/deps/webkit.ts WEBKIT_VERSION (#{webkit_version}) != bun-webkit pin " \
-           "(#{webkit_pin}) — bump bun-webkit first (see Release SOP step 2)"
-    end
+    clone_args = %W[
+      --branch=autobuild-#{webkit_version}
+      --config=advice.detachedHead=false
+      --config=core.fsmonitor=false
+      --depth=1
+    ]
+    system "git", "clone", *clone_args, "https://github.com/oven-sh/WebKit.git", "vendor/WebKit"
+    # Same fix upstream's bun.rb applies on Linux: a Homebrew-shimmed swiftc
+    # found on PATH makes WebKit's cmake assume a real Swift toolchain is
+    # present, misconfiguring the build. Strip the probe outright.
+    inreplace "vendor/WebKit/Source/cmake/WebKitFeatures.cmake",
+              "find_program(_WEBKIT_PROBE_SWIFTC NAMES swiftc)", ""
 
     # Persistent build cache: brew's HOME is per-build .brew_home — cache would be wiped
     # each run and every vendor tarball re-downloaded. HOMEBREW_CACHE persists across runs.
     cache_dir = HOMEBREW_CACHE/"bun-build-cache"
-
-    # Pre-populate WebKit cache from bun-webkit formula (single source of truth for the commit).
-    # bun bd checks .identity to skip download.
-    wc = cache_dir/"webkit-#{webkit_pin[0...16]}-ohos-arm64"
-    wc.mkpath
-    File.write(wc/".identity", webkit_pin)
-    (wc/"lib").mkpath
-    %w[libJavaScriptCore.a libWTF.a libbmalloc.a].each do |a|
-      ln_sf webkit.lib/a, wc/"lib"/a
-    end
-    (wc/"include").mkpath
-    cd wc/"include" do
-      ln_sf webkit.include/"webkit/JavaScriptCore", "JavaScriptCore"
-      ln_sf webkit.include/"webkit/wtf", "wtf"
-      ln_sf webkit.include/"webkit/bmalloc", "bmalloc"
-      cp webkit.include/"webkit/cmakeconfig.h", "cmakeconfig.h"
-    end
-    %w[libicudata.a libicui18n.a libicuuc.a].each do |a|
-      ln_sf formula_opt_lib("icu4c@78")/a, wc/"lib"/a
-    end
 
     # Scaffold build/ohos-icu layout for bun's config.ts (defaults to wrapper's build-icu.sh path).
     # Point at icu4c@78 formula instead.
@@ -239,8 +236,7 @@ class BunAT14 < Formula
     ENV["SSL_CERT_FILE"]  = ca_bundle.to_s
     ENV["CURL_CA_BUNDLE"] = ca_bundle.to_s
     ENV["RUSTUP_TOOLCHAIN"] = rust_ver
-    ENV["OHOS_LLVM_PREFIX"]  = llvm.opt_prefix.to_s
-    ENV["OHOS_WEBKIT_ROOT"]  = webkit.opt_prefix.to_s
+    ENV["OHOS_LLVM_PREFIX"] = llvm.opt_prefix.to_s
     ENV["OHOS_BUN_SIGNING_LINKER"] = (llvm.opt_bin/"clang++").to_s
     ENV["CC"]  = (llvm.opt_bin/"clang").to_s
     ENV["CXX"] = (llvm.opt_bin/"clang++").to_s
@@ -254,13 +250,56 @@ class BunAT14 < Formula
     # is only the --build-dir it hardcodes). Equivalent to the old direct
     # `bun scripts/build.ts --profile=release` call; `bun run` forwards
     # trailing flags to the script unchanged. --os=ohos --arch=aarch64
-    # triggers the OHOS compile path in the bun source.
+    # triggers the OHOS compile path in the bun source. --webkit=local makes
+    # scripts/build/deps/webkit.ts nested-cmake-build the vendor/WebKit
+    # clone above instead of requiring OHOS_WEBKIT_ROOT from a prebuilt
+    # bun-webkit formula.
     sysroot = formula_opt_prefix("ohos-sdk")/"native/sysroot"
-    system "bun", "run", "build:release",
-           "--os=ohos", "--arch=aarch64", "--canary=off",
-           "--cache-dir=#{cache_dir}",
-           "--ohos-sdk-root=#{formula_opt_prefix("ohos-sdk")}",
-           "--ohos-sysroot=#{sysroot}"
+    # DEBUG (drop before merge): three earlier attempts (default buffered,
+    # VERBOSE=1 + CMAKE_BUILD_PARALLEL_LEVEL=1, with_context(verbose: true))
+    # all cut off at the *identical* byte position — right after WebKit
+    # dep #521 ("Generating .../wtf/Hasher.h"), mid-write into #522 — with
+    # nothing resembling ninja's usual multi-line "FAILED: <target>\n
+    # <command>\n<stderr>" report in between. That rules out CI log
+    # truncation (with_context's fork+pipe read loop prints line-by-line as
+    # bytes arrive, uncapped) — the subprocess itself is not writing
+    # anything more. Capture raw bytes ourselves into a file with no
+    # buffering assumptions, and dump a large tail plus the byte/line count
+    # on failure, so we can tell whether more content exists at all.
+    require "open3"
+    build_log = buildpath/"build-release-debug.log"
+    args = [
+      "bun", "run", "build:release",
+      "--os=ohos", "--arch=aarch64", "--canary=off", "--webkit=local",
+      "--cache-dir=#{cache_dir}",
+      "--ohos-sdk-root=#{formula_opt_prefix("ohos-sdk")}",
+      "--ohos-sysroot=#{sysroot}"
+    ]
+    status = File.open(build_log, "w") do |f|
+      Open3.popen2e(*args, chdir: buildpath.to_s) do |stdin, out, wait_thr|
+        stdin.close
+        IO.copy_stream(out, f) # raw byte copy, no line-buffering assumptions
+        wait_thr.value
+      end
+    end
+    unless status.success?
+      lines = File.readlines(build_log)
+      puts "=== build-release-debug.log: #{lines.size} lines, #{File.size(build_log)} bytes ==="
+      puts lines.last(500)
+      # DEBUG (drop before merge): distinguish a clean nonzero exit from a
+      # signal kill (e.g. OOM) — three prior attempts stopped mid-output
+      # with zero diagnostic text regardless of verbosity/parallelism,
+      # which only a signal death (no chance to print anything) explains.
+      puts "=== process status: exited=#{status.exited?} exitstatus=#{status.exitstatus.inspect} " \
+           "signaled=#{status.signaled?} termsig=#{status.termsig.inspect} ==="
+      # DEBUG (drop before merge): $stdout is fully buffered when piped
+      # (non-tty) — the 500-line dump above self-flushed by exceeding the
+      # buffer repeatedly, but this short line alone won't, and odie's own
+      # message goes through $stderr (unbuffered) and appeared even when
+      # this one didn't in the previous attempt. Force it out explicitly.
+      $stdout.flush
+      odie "bun run build:release failed (see build-release-debug.log dump above)"
+    end
 
     # The release profile produces `bun-profile` (unstripped, ~455MB) + `bun`
     # (stripped, ~105MB). Prefer the stripped version — smaller and ready-to-run.
