@@ -14,7 +14,8 @@ class Openldap < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "753cf85da2e2c52cdfa343284b8c6eac51ba9f8af54c92d76169b5bc1927ddd8"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e61289c9706f310b1eb66156738cf84d66254018177eecbd7dd1706e4997b97f"
   end
 
   no_autobump! because: "newer version requires C23 support"
