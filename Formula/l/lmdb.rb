@@ -14,7 +14,7 @@ class Lmdb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "26f8961785406dc89f173803523b6ddbd66d698dfac83efbde59f5accb7a0403"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "59e3929fc4ff5779f7ca75a154e34c3f4006f9433579099830bb4c21bbdd015c"
   end
 
   depends_on "pkgconf" => :test
