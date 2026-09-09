@@ -6,8 +6,8 @@ class Llvm < Formula
   head "https://github.com/llvm/llvm-project.git", branch: "main"
 
   stable do
-    url "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.0/llvm-project-23.1.0.src.tar.xz"
-    sha256 "ab1f0e3ec52448c33e8782eaf0422504b87c7b016b22514653ee0d8fcee479ff"
+    url "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.1/llvm-project-23.1.1.src.tar.xz"
+    sha256 "ebe9be46fe8756d58c5b198ffad0fa2a766257add81a4dc52179bfacc7888ee6"
 
     # Fix triple config loading for clang-cl. Scoped to `stable`: main already
     # contains the fix (a `--HEAD` build must not apply it again).
@@ -25,7 +25,7 @@ class Llvm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61462f478c9d879dccc3e9932732cb4d63fa96a61d8f410bd9fe80180a2d532f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5848819b87bf94a7205280113ebf63ca56e1ab875eef674c963b732f19e5bcd"
   end
 
   # Upstream's `keg_only :provided_by_macos` links on Linux; OHOS keeps this
