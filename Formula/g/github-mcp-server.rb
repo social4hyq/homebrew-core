@@ -1,8 +1,8 @@
 class GithubMcpServer < Formula
   desc "GitHub Model Context Protocol server for AI tools"
   homepage "https://github.com/github/github-mcp-server"
-  url "https://github.com/github/github-mcp-server/archive/refs/tags/v1.12.0.tar.gz"
-  sha256 "3d5c92c508a6e928a18405235b6dce5dacb3b4c23ff2ab6760666c560c9ab84d"
+  url "https://github.com/github/github-mcp-server/archive/refs/tags/v1.12.1.tar.gz"
+  sha256 "a826cff7ea6d895ace93836c5f3d453fed86ecfb607abf3957e235bcf391ae28"
   license "MIT"
   head "https://github.com/github/github-mcp-server.git", branch: "main"
 
@@ -12,7 +12,7 @@ class GithubMcpServer < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "304efb6f2a950fed739bd7b0ef5d9b61b74837e120574ba22463d9fd111d1d84"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bb5207125c8f3d97aa6d70d6c5402135beec1da99d3165fdc977e7073b5265fe"
   end
 
   depends_on "go" => :build
