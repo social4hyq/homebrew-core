@@ -7,7 +7,7 @@ class Abpoa < Formula
   head "https://github.com/yangao07/abPOA.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "afb158ea0927e79e285807183af163e2ad036002cdd3d4ffcbc90db57a2e706f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e3f61cf651b8f084694b4c5cc31b6cb603cc1870fff3fe3ceb011b34849e8c6"
   end
 
   on_linux do
