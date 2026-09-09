@@ -12,7 +12,7 @@ class NewrelicCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1769cb58a9253e611873728f26ae33b24f142d4f4cf2a5862bcabc95dcbe654"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "671cbd900903f5d2018ebca00ed13464745e4d90f6fa9df9915b330a8637f4a4"
   end
 
   depends_on "go" => :build
