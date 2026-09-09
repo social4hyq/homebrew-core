@@ -7,7 +7,8 @@ class PhpAT81 < Formula
   license "PHP-3.01"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "609fb00cd88c8a23f11c3fc9db2422f97a13d7610bc9dbb281edbf8537d0e741"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "71a207f9d12c6d6a872c73e926da06da2763fb2a7143642195d670ea871c6555"
   end
 
   keg_only :versioned_formula
