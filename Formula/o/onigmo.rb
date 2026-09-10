@@ -13,7 +13,7 @@ class Onigmo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2592053685f0ef2eb3b64eddb8572d7987dc4c2f209add1a6a2c0ad72aa69bb1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7baf44bbaee249d848c171de6fdfca83101d596ed4ceea4ccb102f64bb1a573"
   end
 
   def install
