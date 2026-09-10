@@ -4,6 +4,7 @@ class LlvmGccCompat < Formula
   url "https://atomgit.com/Harmonybrew/homebrew-core.git", revision: "a8784ea451ad819d27a548411b8853fca6de3124"
   version "1.0.0"
   license "BSD-2-Clause"
+  revision 1
 
   bottle do
     rebuild 1
