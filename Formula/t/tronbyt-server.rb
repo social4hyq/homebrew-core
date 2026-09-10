@@ -4,10 +4,11 @@ class TronbytServer < Formula
   url "https://github.com/tronbyt/server/archive/refs/tags/v2.3.7.tar.gz"
   sha256 "7518716f97ab0d44be35907b9d07c5f65fd73ac011ec7fe57ec180523cee0720"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/tronbyt/server.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d290024d55fda74c2177e74f111cd81ef0552e92e688013414d6824830fea22"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "86ba0f662efd7f5ebd129a4b04486fbc8566951e7174bbe49e38f5fbd8ee9834"
   end
 
   depends_on "go" => :build
