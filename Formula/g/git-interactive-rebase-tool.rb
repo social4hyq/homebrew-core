@@ -4,7 +4,7 @@ class GitInteractiveRebaseTool < Formula
   url "https://github.com/MitMaro/git-interactive-rebase-tool/archive/refs/tags/2.4.1.tar.gz"
   sha256 "0b1ba68a1ba1548f44209ce1228d17d6d5768d72ffa991909771df8e9d42d70d"
   license "GPL-3.0-or-later"
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
@@ -12,7 +12,7 @@ class GitInteractiveRebaseTool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c975fc100168c0fbed1dddbe1fb98695feabbcf4fb2fd57fee477792e1df674"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa3786cb6107800322a62038053d0efa482cc22d470143ee3d617fc413e1f56d"
   end
 
   depends_on "pkgconf" => :build
