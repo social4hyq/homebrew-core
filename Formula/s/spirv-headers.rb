@@ -13,7 +13,7 @@ class SpirvHeaders < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c374876d06a3a21470e6cae52b8059999484619d15bdbb65c0e0b15e7c897fc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1eb2c4e67dd205dc5d08b604fc63f547025c998f53ed3ae5d35344a0a903b01"
   end
 
   depends_on "cmake" => [:build, :test]
