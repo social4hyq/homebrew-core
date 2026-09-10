@@ -4,6 +4,7 @@ class Less < Formula
   url "https://www.greenwoodsoftware.com/less/less-704.tar.gz"
   sha256 "20a0b0a2bb2525fa53c7eee9beb854b4c9cf172eabb209af7020743547bfe9fb"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   livecheck do
