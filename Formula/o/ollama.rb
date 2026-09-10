@@ -5,6 +5,7 @@ class Ollama < Formula
       tag:      "v0.33.3",
       revision: "b79067b0db7417f20108363bc22adb97f35c966a"
   license "MIT"
+  revision 1
   head "https://github.com/ollama/ollama.git", branch: "main"
 
   # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
@@ -16,7 +17,7 @@ class Ollama < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2333970ad1c1a4f3a730a65ab910198ab442ede1eb4121333489178328fb18f6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "60ba9485b0ea50f002476bb9d110837743bb87be33fcde099a4f285581018ff7"
   end
 
   depends_on "cmake" => :build
