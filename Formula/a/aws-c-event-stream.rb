@@ -4,10 +4,11 @@ class AwsCEventStream < Formula
   url "https://github.com/awslabs/aws-c-event-stream/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "c3817ab04bf9c70fa3582a31243666a9a643ebe45f121f58d5fef5ff4787f8e0"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "326592a2086d78df739e222281bde418325658d016811b4ccf8b068d89ac8de5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00ddc98660c48230a1eb8e3b6f1bacd1c35f9731f944752038b13dba19d87b23"
   end
 
   depends_on "cmake" => :build
