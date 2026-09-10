@@ -4,7 +4,7 @@ class Docbook < Formula
   url "https://github.com/docbook/docbook/releases/download/5.2/docbook-5.2.zip"
   sha256 "11992554a884786f1b78c6b478d6cec90352caf00bef54731c8d54f26751f2c5"
   license :cannot_represent
-  revision 1
+  revision 2
   compatibility_version 1
 
   livecheck do
@@ -15,7 +15,7 @@ class Docbook < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac3f20bdee59568ae154c5e4747b6aa29caaa7cd2a3e06e7cbb0a0efe8ac2a25"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "99fb02a18cbfd389800addb942ddb27c5ecddebf00e0377e46f10e969cfb05cd"
   end
 
   uses_from_macos "libxml2"
