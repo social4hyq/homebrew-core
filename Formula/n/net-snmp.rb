@@ -4,6 +4,7 @@ class NetSnmp < Formula
   url "https://downloads.sourceforge.net/project/net-snmp/net-snmp/5.9.5.2/net-snmp-5.9.5.2.tar.gz"
   sha256 "16707719f833184a4b72835dac359ae188123b06b5e42817c00790d7dc1384bf"
   license all_of: ["MIT-CMU", "MIT", "BSD-3-Clause"]
+  revision 1
   compatibility_version 1
   head "https://github.com/net-snmp/net-snmp.git", branch: "master"
 
@@ -13,7 +14,7 @@ class NetSnmp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "56f9ed165a5404d8b9cb81e4fe7de48a0bd9e72b6fcea584387770ed835ae824"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ceaf019bc3cab5a6b93758e6054881d20cf82cd7ad59fdbdf7d2b9d347dc0d3b"
   end
 
   keg_only :provided_by_macos
