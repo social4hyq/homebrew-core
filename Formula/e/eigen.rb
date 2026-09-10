@@ -9,6 +9,7 @@ class Eigen < Formula
     "BSD-3-Clause", # bindings to BLAS, LAPACKe and MKL
     "Minpack",      # LevenbergMarquardt
   ]
+  revision 1
   compatibility_version 1
   head "https://gitlab.com/libeigen/eigen.git", branch: "master"
 
