@@ -4,6 +4,7 @@ class CcSwitchCli < Formula
   url "https://github.com/SaladDay/cc-switch-cli/archive/refs/tags/v5.10.4.tar.gz"
   sha256 "cb10c2742b5552bb4de4cf58663afdf8d79e96e05ea68b5533489a6ba0583dcb"
   license "MIT"
+  revision 1
   head "https://github.com/SaladDay/cc-switch-cli.git", branch: "main"
 
   bottle do
