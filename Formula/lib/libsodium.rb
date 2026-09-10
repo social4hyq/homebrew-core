@@ -4,6 +4,7 @@ class Libsodium < Formula
   url "https://download.libsodium.org/libsodium/releases/libsodium-1.0.22.tar.gz"
   sha256 "adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349"
   license "ISC"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Libsodium < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f31dda7cd1b800ec90ca599282f9092f61eb04898a553fb940649e0fef189a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "91578ccc2b8ed232ef7287d3f6a0dc5b529ff96f439553e7074370b58642c61f"
   end
 
   head do
