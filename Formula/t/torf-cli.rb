@@ -6,9 +6,10 @@ class TorfCli < Formula
   url "https://files.pythonhosted.org/packages/31/90/b67f5f73353f419b172c8d22ebaf744750fa22af9eb4b52adff52a7706f2/torf_cli-5.2.1.tar.gz"
   sha256 "96f64e3f2408e8ca5a3567ced9f5ad2e9ef1d63e13cfe8836145ac36bad8ed54"
   license "GPL-3.0-or-later"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a26628dd72afecc9a0f1e57bc6c2687ed4a7eed5028cd90a42832c8abf9bd6f7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9070ef3ade78cb3f885ae1cf20dd268091ac9c73e512b1d66bb3e6d94b64fc13"
   end
 
   depends_on "python@3.14"
