@@ -9,7 +9,7 @@ class CfnFlip < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0bf0177b38b291fd749a785fa8c4a20d8067de11b80a6b2afa7b7440fb4cc732"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b1e86f49a263f0d3217d5cc6f4f4da33baf1d71145cc2ac8b3cc39a7d44cedc"
   end
 
   depends_on "libyaml"
