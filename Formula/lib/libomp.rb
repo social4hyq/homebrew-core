@@ -4,6 +4,7 @@ class Libomp < Formula
   url "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.1/llvm-project-23.1.1.src.tar.xz"
   sha256 "ebe9be46fe8756d58c5b198ffad0fa2a766257add81a4dc52179bfacc7888ee6"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Libomp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89816a773e49985ddbe500b06d1a98c487192f50450c70430b78903e004f6593"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5783f71943daef630df79b0a8985fbef6ad47deaf55616c447ddabe5c76d994c"
   end
 
   # Ref: https://github.com/Homebrew/homebrew-core/issues/112107
