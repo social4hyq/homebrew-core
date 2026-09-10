@@ -4,6 +4,7 @@ class JiraCli < Formula
   url "https://github.com/ankitpokhrel/jira-cli/archive/refs/tags/v1.7.0.tar.gz"
   sha256 "6b1ecbd2228626cdc987548d8d83faae074c7a167cef737a9ac9180a03767154"
   license "MIT"
+  revision 1
   head "https://github.com/ankitpokhrel/jira-cli.git", branch: "main"
 
   bottle do
