@@ -4,6 +4,7 @@ class PythonGdbmAT314 < Formula
   url "https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tgz"
   sha256 "62859805f6fdf25e2bcbf3fa3217801e1996887ca33e6a2af80674bdfa2dbe07"
   license "Python-2.0"
+  revision 1
 
   livecheck do
     formula "python@3.14"
