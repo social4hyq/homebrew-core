@@ -8,6 +8,7 @@ class Libwmf < Formula
     "GPL-2.0-or-later", # COPYING
     "GD", # src/extra/gd
   ]
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "7d18c53bce65c525392062201d7b5a8a668027a7e8baec5761572054e9d54ba9"
