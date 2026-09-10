@@ -10,7 +10,7 @@ class Uhdm < Formula
   head "https://github.com/chipsalliance/UHDM.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "10bd742dc3973b14e6493d4c7a175b78fe4a56a14b26e3c8febff6aac3816af2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3fbb6172b55bf698655c8a47faba97d8e470e701cf3ab8aed3629505834ac448"
   end
 
   depends_on "cmake" => :build
