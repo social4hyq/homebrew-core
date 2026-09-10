@@ -4,6 +4,7 @@ class Libx11 < Formula
   url "https://www.x.org/archive/individual/lib/libX11-1.8.13.tar.gz"
   sha256 "acf0e7cd7541110e6330ecb539441a2d53061f386ec7be6906dfde0de2598470"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
