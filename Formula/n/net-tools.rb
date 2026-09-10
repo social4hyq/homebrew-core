@@ -7,7 +7,7 @@ class NetTools < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb6b4d3e2ad77c980037bb07a7cdaf1e38651ac75421b8c86727e0e0b43395de"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "41334c83070c1ffcd24bf7d9d9ab9059f586fc37bbf5b78e7cbb6527fc750dd8"
   end
 
   depends_on "libdnet"
