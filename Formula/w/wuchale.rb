@@ -4,6 +4,7 @@ class Wuchale < Formula
   url "https://registry.npmjs.org/wuchale/-/wuchale-0.26.6.tgz"
   sha256 "83f6720a8dd56b75c8224a87903a9c5864c9b67e8e6f1ac32996d5132166dc93"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "df36083d62c081f6ee83ec0ba6c2f033308958b70fe9e05c34c951bab4e48518"
