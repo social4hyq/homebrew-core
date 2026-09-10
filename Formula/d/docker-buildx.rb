@@ -4,6 +4,7 @@ class DockerBuildx < Formula
   url "https://github.com/docker/buildx/archive/refs/tags/v0.37.0.tar.gz"
   sha256 "c6e3efdfb9778d9ef69e005ea43abc3041511f088760c927637e3cf6be7cb410"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/docker/buildx.git", branch: "master"
 
   bottle do
