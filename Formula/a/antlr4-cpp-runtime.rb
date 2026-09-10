@@ -12,7 +12,7 @@ class Antlr4CppRuntime < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "576e64e959cba1dba9c97f83ea1f1009cdb4aa8cf2f7ca1770b576b5674ddfba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4ee79b3bda71cca1ea1338bfc38274fac794bcb4eb4d089fe3e9fa146112099"
   end
 
   depends_on "cmake" => :build
