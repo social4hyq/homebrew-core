@@ -1,13 +1,13 @@
 class Scilla < Formula
   desc "DNS, subdomain, port, directory enumeration tool"
   homepage "https://github.com/edoardottt/scilla"
-  url "https://github.com/edoardottt/scilla/archive/refs/tags/v1.3.3.tar.gz"
-  sha256 "d3d767422c371bdbeda0f674f658b22b538c5dbc88ae4b449d8bfcb351b734d4"
+  url "https://github.com/edoardottt/scilla/archive/refs/tags/v1.3.4.tar.gz"
+  sha256 "f1a738745a2b45aa1dd37e1754a186bc08fb186f01e241257c7ae5a176eb7d44"
   license "GPL-3.0-or-later"
   head "https://github.com/edoardottt/scilla.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac4afd77dee99e58c4ba38271d4156e92bb0d2341685392db7603960aefa3d1c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b45a9e46a1bfedd8e0767101a464581bad62cf9aa29a2b07175d268225d6fcd0"
   end
 
   depends_on "go" => :build
