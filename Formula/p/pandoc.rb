@@ -4,6 +4,7 @@ class Pandoc < Formula
   url "https://github.com/jgm/pandoc/archive/refs/tags/3.11.tar.gz"
   sha256 "61d05e7fc57e995a61367bee1bb73a8bb278cda3c787b7e4e27b30037e17aeed"
   license "GPL-2.0-or-later"
+  revision 1
   compatibility_version 3
   head "https://github.com/jgm/pandoc.git", branch: "main"
 
