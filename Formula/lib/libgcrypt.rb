@@ -4,6 +4,7 @@ class Libgcrypt < Formula
   url "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.12.3.tar.bz2"
   sha256 "98d1b0b3202d2b03fa754a35aa3cbbfcf526a3260d8d2ee213748001b1043006"
   license all_of: ["LGPL-2.1-or-later", "GPL-2.0-or-later"]
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Libgcrypt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b12725b1e4052779ecb29276abb0563b80d8fa7a78fcdf9c59d2b68669ec6e08"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef337bf253ca03804c80dffde1a0bf453e6f54fc889f59a6d5cdb3b7ba9109d6"
   end
 
   depends_on "libgpg-error"
