@@ -7,7 +7,7 @@ class Libre < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf46a1c73b29f181a3a3268787aae92156af194c4f6dbba23c262c3757574533"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0325a6f32e557f24be4612f98e4be4e772f8883dc93d940770e097afae70ae22"
   end
 
   depends_on "cmake" => :build
