@@ -4,6 +4,7 @@ class Sysstat < Formula
   url "https://github.com/sysstat/sysstat/archive/refs/tags/v12.8.0.tar.gz"
   sha256 "8aa2054c56c941ab30e1b14ad2e0076a7e6d6bf01f50e22d954885b8a7f9a679"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/sysstat/sysstat.git", branch: "master"
 
   bottle do
