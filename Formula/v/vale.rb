@@ -4,6 +4,7 @@ class Vale < Formula
   url "https://github.com/errata-ai/vale/archive/refs/tags/v3.21.0.tar.gz"
   sha256 "e069ec49e8870da8f099569b68a15e27f73f5dc5d53eb85e4c84365352c7e864"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "fcbe90d1609b5958385f8818cad91502a9d138a5c93693ab3bdaae7a8390769d"
