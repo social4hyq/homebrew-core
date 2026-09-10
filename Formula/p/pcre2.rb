@@ -13,7 +13,7 @@ class Pcre2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db0a3820ac718d90f9c39214dee9912232888b816d718303108fdb5bc57de313"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9fdfb3a712eb94b3827920852d9f5457d44765ce3c5763ea18b3d31e2fd4b3db"
   end
 
   head do
