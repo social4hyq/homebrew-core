@@ -4,10 +4,11 @@ class AzureDev < Formula
   url "https://github.com/Azure/azure-dev/archive/refs/tags/azure-dev-cli_1.33.0.tar.gz"
   sha256 "3ee85bdfbaaf7bf9646bb46ca6afc901ee2480668469a7fc11288c373b0b968d"
   license "MIT"
+  revision 1
   head "https://github.com/Azure/azure-dev.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce91109a0c180452f8d925116f81cc3bfcefc59ed017903d2530939d53ac1b94"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa343d1b74aa25749b00a3c4fdf3a67b01e5d0ef037d53d913af218b78fa01c8"
   end
 
   depends_on "go" => :build
