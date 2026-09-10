@@ -13,7 +13,7 @@ class LibgpgError < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a84f2c70a3903d10343ab94425039968d7b09cafef27a379977941d32b0f358"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9cc0bb39cf1a69acb56f3b7215566676c08e0c41cbecc61dca9092cc9490c355"
   end
 
   on_macos do
