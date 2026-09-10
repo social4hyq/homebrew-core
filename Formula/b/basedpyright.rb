@@ -4,6 +4,7 @@ class Basedpyright < Formula
   url "https://registry.npmjs.org/basedpyright/-/basedpyright-1.40.0.tgz"
   sha256 "c0b77ad073a62247fa9201403a2fcbaf4ee20afb400719052aa36079e5faf19e"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "4e29d6e4cb5cefe0ad2935de2513b463c3f9f92ea4c9c430923d33e6a0906bd8"
