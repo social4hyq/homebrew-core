@@ -6,10 +6,11 @@ class Mypy < Formula
   url "https://files.pythonhosted.org/packages/82/6a/878cc1097d4035f82bd516658d0c528d2a9955bc7b363afcbd0b07fea11b/mypy-2.3.1.tar.gz"
   sha256 "47c1b1207258513a9d93495f69c8be9de73916186f0e52703e8c461b7a623419"
   license "MIT"
+  revision 1
   head "https://github.com/python/mypy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b8e392e6d2d537f72fcca8582e52e68edb91f6e7f59caa4e2f6bc66a0fe8ebb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b85d8ca9c1a35a4f38fa9466bc6a8115184e9001712de62a8b1f5e5af2334a45"
   end
 
   depends_on "rust" => :build # `ast-serialize`
