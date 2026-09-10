@@ -2,6 +2,7 @@ class Bash < Formula
   desc "Bourne-Again SHell, a UNIX command interpreter"
   homepage "https://www.gnu.org/software/bash/"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
   head "https://git.savannah.gnu.org/git/bash.git", branch: "master"
 
@@ -83,7 +84,7 @@ class Bash < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "de0a0161bd09e14de6c9499026595d7ae8210e0e5d582f1185dea9e599a95e95"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f5c1a547facd1847ef571c163a56139100e851487fac23192f65c81f4dedd5ff"
   end
 
   # System ncurses lacks functionality
