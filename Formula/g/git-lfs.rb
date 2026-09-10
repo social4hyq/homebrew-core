@@ -4,6 +4,7 @@ class GitLfs < Formula
   url "https://github.com/git-lfs/git-lfs/releases/download/v3.8.0/git-lfs-v3.8.0.tar.gz"
   sha256 "4f75492c6832038fa73d39a45316657208bb6caa23b273451cb4ec2358d42ccb"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   # Upstream creates releases that are sometimes not the latest stable version,
