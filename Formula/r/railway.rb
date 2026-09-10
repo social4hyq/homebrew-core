@@ -4,10 +4,11 @@ class Railway < Formula
   url "https://github.com/railwayapp/cli/archive/refs/tags/v5.51.1.tar.gz"
   sha256 "4f028b3011f5412ba7e9c1dc43283fa67544c2648ee93aa1312d14b77f909824"
   license "MIT"
+  revision 1
   head "https://github.com/railwayapp/cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "44e129a6dc50ebe474fbdbc66af2fe4959ea53bdea385b7eac09852d719ec404"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b7d9f00a602280e81d23c7e94675b3a89808a792ddeecdc700e6b9982c1d5fd"
   end
 
   depends_on "rust" => :build
