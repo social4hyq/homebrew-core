@@ -4,6 +4,7 @@ class Groonga < Formula
   url "https://github.com/groonga/groonga/releases/download/v16.1.0/groonga-16.1.0.tar.gz"
   sha256 "e10370308607bc7b499f0ab880c4f97dd2ad89f85edcf1d2b534e301ae3fb7b3"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
   head "https://github.com/groonga/groonga.git", branch: "main"
 
@@ -13,7 +14,7 @@ class Groonga < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "968304321e6e3ae10dd22bdf2c8a278387fa97b85df3c2edc3c5e05807b66fa5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b23be21c17d950bbb0780e2b41c387b7f801144c686c4d8ec817477785bef7a"
   end
 
   depends_on "cmake" => :build
