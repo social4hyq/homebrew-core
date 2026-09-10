@@ -4,9 +4,10 @@ class Zoxide < Formula
   url "https://github.com/ajeetdsouza/zoxide/archive/refs/tags/v0.10.0.tar.gz"
   sha256 "4fcd4272b013a10b637dbcc299c58a9924b94470a9042677ca1a204cc2e9150e"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9a96a2a4663ca979c800b646132c53f51ea7f20cc56a2e82f44b49156fa9e24"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5603dec348fadac269dc82627779075f99599efd8aaebe568707a0e513a193cd"
   end
 
   depends_on "rust" => :build
