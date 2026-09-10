@@ -4,6 +4,7 @@ class Pyright < Formula
   url "https://registry.npmjs.org/pyright/-/pyright-1.1.413.tgz"
   sha256 "7322a75188e788f9fe7cbb71891af435a713bf8985141dc0d28e8ca243977bee"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "4de58a0756f1fa451d6056bc9a8c0eb4c89d7e96f04b516ca779279bf98ceb19"
