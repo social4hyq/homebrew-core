@@ -8,7 +8,7 @@ class GoBindata < Formula
   head "https://github.com/kevinburke/go-bindata.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "08e0a57dc4999742dbf05da8bf116fbb7c4ea6cf9c4cfb2d7e6019d3e78f4115"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65b254cb34e0d77e8462614b4206f7e39774c4d9e9c1806fd20024c1e0df11d9"
   end
 
   depends_on "go"
