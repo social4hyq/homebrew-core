@@ -4,6 +4,7 @@ class P11Kit < Formula
   url "https://github.com/p11-glue/p11-kit/releases/download/0.26.5/p11-kit-0.26.5.tar.xz"
   sha256 "f2cc09111e44bf3fea58f023180b33acea90aa82d042d6fbb623fbc5ba033bb7"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://github.com/p11-glue/p11-kit.git", branch: "master"
 
