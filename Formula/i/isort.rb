@@ -6,10 +6,11 @@ class Isort < Formula
   url "https://files.pythonhosted.org/packages/e6/43/067e17bfa10b6486b408d5294105ac894149a9abb94b338568b1f53a73c9/isort-9.0.1.tar.gz"
   sha256 "ba23db109e3e93ef1999f7209a651214994cd807801addd16ac485982eb4edd7"
   license "MIT"
+  revision 1
   head "https://github.com/PyCQA/isort.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "032de7048fef899bd9aef8fbb0bba353a08fc79e512d22b9bbe3b488cba09f50"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8bd28b19bbbf406ed40d9c464bf8d0caf12de899ea4db8b55bb88d6a4f9e8ac"
   end
 
   depends_on "rust" => :build
