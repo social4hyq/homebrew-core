@@ -10,7 +10,7 @@ class West < Formula
   head "https://github.com/zephyrproject-rtos/west.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "22a800d15101f51e35d0ff477698bae05c50638eb157d056baf0a145647aebe4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c4cc810b930989e70ff9374f1cd30e3c246789e4aada162b89c208ad57b6306b"
   end
 
   depends_on "libyaml"
