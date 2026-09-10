@@ -13,7 +13,7 @@ class Libxcrypt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c173cd0db1a96f61905f6f2e5322db67d66b3017c928b31bcc3890d61a4c3fc0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1bbe847d3c74d560b13a1922404595b8af7c68bf7bd09441d2f8ac79eafcee0b"
   end
 
   keg_only :provided_by_macos
