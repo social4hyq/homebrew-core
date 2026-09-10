@@ -4,6 +4,7 @@ class MuslCompat < Formula
   url "https://raw.atomgit.com/Harmonybrew/musl-compat/archive/refs/heads/v1.0.1.tar.gz"
   sha256 "b3e4d8da001019b09a2d7d15198000b0d6c00307f3857eb956f057cc6ec144bb"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "92a6c6a98c21677fb42ba13c875b3d0d4a92d89f3540279062697576d6213c60"
