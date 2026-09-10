@@ -9,7 +9,7 @@ class RdiffBackup < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4574716422e67a59621776dd6ece98ccb4be7008eea9000dd8f2627421dabb03"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "10b078ea601acbc32d3d3d6c25bdd60eaddda567ed800503d1cc45a7999a992a"
   end
 
   depends_on "librsync"
