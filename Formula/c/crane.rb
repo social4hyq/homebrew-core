@@ -4,10 +4,11 @@ class Crane < Formula
   url "https://github.com/google/go-containerregistry/archive/refs/tags/v0.22.1.tar.gz"
   sha256 "a52cc7d61f8b2f043b7f0be1febecead5fceb791543c4790d699440f12d6b370"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/google/go-containerregistry.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4f59e8b2a295e566324bf0e28a281e9c131b9eb12aee05d3c2d3dc04854dca2e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a542cd252a91c2f33953bcf858511737ee54c4e5e33517b446d391fcddcd91ba"
   end
 
   depends_on "go" => :build
