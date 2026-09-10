@@ -4,6 +4,7 @@ class Bitrise < Formula
   url "https://github.com/bitrise-io/bitrise/archive/refs/tags/v2.43.4.tar.gz"
   sha256 "5f1432c3c160878f56735d02f2f0c06c89fd0fa4223a75e90ec8aa71f390efca"
   license "MIT"
+  revision 1
   head "https://github.com/bitrise-io/bitrise.git", branch: "master"
 
   livecheck do
@@ -12,7 +13,7 @@ class Bitrise < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3bf84491b32c36396afd450e5e228d1e0f4c268cdf7e89123611340854f98828"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0e21e5db86b31c36465cf8d9b3743b31e8788fbf768fd9b24cfddbc0a6106e9"
   end
 
   depends_on "go" => [:build, :test]
