@@ -4,6 +4,7 @@ class Railway < Formula
   url "https://github.com/railwayapp/cli/archive/refs/tags/v5.51.1.tar.gz"
   sha256 "4f028b3011f5412ba7e9c1dc43283fa67544c2648ee93aa1312d14b77f909824"
   license "MIT"
+  revision 1
   head "https://github.com/railwayapp/cli.git", branch: "master"
 
   bottle do
