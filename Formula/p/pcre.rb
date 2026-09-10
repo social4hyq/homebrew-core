@@ -5,6 +5,7 @@ class Pcre < Formula
   mirror "https://www.mirrorservice.org/sites/ftp.exim.org/pub/pcre/pcre-8.45.tar.bz2"
   sha256 "4dae6fdcd2bb0bb6c37b5f97c33c2be954da743985369cddac3546e3218bffb8"
   license "BSD-3-Clause"
+  revision 1
 
   # From the PCRE homepage:
   # "The older, but still widely deployed PCRE library, originally released in
