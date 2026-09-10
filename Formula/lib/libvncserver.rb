@@ -4,7 +4,7 @@ class Libvncserver < Formula
   url "https://github.com/LibVNC/libvncserver/archive/refs/tags/LibVNCServer-0.9.15.tar.gz"
   sha256 "62352c7795e231dfce044beb96156065a05a05c974e5de9e023d688d8ff675d7"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 2
   head "https://github.com/LibVNC/libvncserver.git", branch: "master"
 
   livecheck do
