@@ -4,6 +4,7 @@ class Runc < Formula
   url "https://github.com/opencontainers/runc/releases/download/v1.4.3/runc.tar.xz"
   sha256 "13b8b214419e26466a2e0802a098f0759ef2b942880ec242786338b3b7534445"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/opencontainers/runc.git", branch: "main"
 
   bottle do
