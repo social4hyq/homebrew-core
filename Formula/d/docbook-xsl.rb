@@ -14,7 +14,7 @@ class DocbookXsl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aec62604e3857dd957db7f0bf70aee8de61f5125cf8e07dfe23613206c1e3dc3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "95b956c309c83ba3fa414649d05093264291f4710885247020b9d3ab7a625770"
   end
 
   depends_on "docbook"
