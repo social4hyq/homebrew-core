@@ -4,10 +4,11 @@ class Runc < Formula
   url "https://github.com/opencontainers/runc/releases/download/v1.4.3/runc.tar.xz"
   sha256 "13b8b214419e26466a2e0802a098f0759ef2b942880ec242786338b3b7534445"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/opencontainers/runc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8672e8b0aa825284a3540dfc8972763e6add7b1c251f4400fc19ca7dabb03aa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c093d7b37d2a0a16423bb46a27d160679c14266cbabe8333175d2d0555b2be0c"
   end
 
   depends_on "go" => :build
