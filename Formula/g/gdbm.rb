@@ -9,7 +9,7 @@ class Gdbm < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f7ece69bf2a1830d8e6159b2aa7850fa1a26e736d7cdd01c7d7fe0ab5a4939f4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d056a90ed37bb0146ae926a5d8944c415fd91725a8c03bf8ca5b535d9feead9e"
   end
 
   def install
