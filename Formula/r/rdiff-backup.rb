@@ -6,10 +6,10 @@ class RdiffBackup < Formula
   url "https://files.pythonhosted.org/packages/e9/9b/487229306904a54c33f485161105bb3f0a6c87951c90a54efdc0fc04a1c9/rdiff-backup-2.2.6.tar.gz"
   sha256 "d0778357266bc6513bb7f75a4570b29b24b2760348bbf607babfc3a6f09458cf"
   license "GPL-2.0-or-later"
-  revision 2
+  revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4574716422e67a59621776dd6ece98ccb4be7008eea9000dd8f2627421dabb03"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "10b078ea601acbc32d3d3d6c25bdd60eaddda567ed800503d1cc45a7999a992a"
   end
 
   depends_on "librsync"
