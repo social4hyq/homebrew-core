@@ -8,7 +8,7 @@ class Gpatch < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba4da0d400c0d88b14c4ecf24def01318c091ad5efb338cbc906ad4d817986de"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2554c2365222ebe990730fc5b21075a540e4331c1e5ae95742f91a3d2221bb45"
   end
 
   def install
