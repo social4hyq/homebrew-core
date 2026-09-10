@@ -9,11 +9,12 @@ class Xz < Formula
     "0BSD",
     "GPL-2.0-or-later",
   ]
+  revision 1
   version_scheme 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "94f94e040ca3df69234fcba6099fb17dc942f860d6b64d5eda7084625b34b871"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "44fbefc60347576b9f183e5dae4fe7e4bb9e702ca18b5b7ba54ef197fc553b3a"
   end
 
   deny_network_access! [:build, :postinstall]
