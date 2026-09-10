@@ -6,9 +6,10 @@ class GitDeleteMergedBranches < Formula
   url "https://files.pythonhosted.org/packages/4d/9e/538f1ed26a78b216fdd3aeae69385db83d2d4c21ca9894423eb709a86fa4/git_delete_merged_branches-7.6.1.tar.gz"
   sha256 "25dbf28cdf831cf1cf4639b55fa5b9166a1aa67f261da35cdbb2931dff53bf7b"
   license "GPL-3.0-or-later"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c440faed277bd0bc92db913f13a30ad737d173d93962b30dd0264283eb43ac8b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5aa6fa69c085c8df945e4942108091a4853a9df36be019247cd9a51a67dd4a3"
   end
 
   depends_on "python@3.14"
