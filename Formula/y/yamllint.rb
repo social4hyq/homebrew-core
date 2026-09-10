@@ -10,7 +10,7 @@ class Yamllint < Formula
   head "https://github.com/adrienverge/yamllint.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a076f3b4c84d554c553f479e1021090be7461165762989122760466197ffaa4d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e23d3333c4d48a517e58cee20c9095e7c65891cccd5031047f713d2c84b192ef"
   end
 
   depends_on "libyaml"
