@@ -5,10 +5,11 @@ class Gdbm < Formula
   mirror "https://ftp.gnu.org/gnu/gdbm/gdbm-1.26.tar.gz"
   sha256 "6a24504a14de4a744103dcb936be976df6fbe88ccff26065e54c1c47946f4a5e"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f7ece69bf2a1830d8e6159b2aa7850fa1a26e736d7cdd01c7d7fe0ab5a4939f4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d056a90ed37bb0146ae926a5d8944c415fd91725a8c03bf8ca5b535d9feead9e"
   end
 
   def install
