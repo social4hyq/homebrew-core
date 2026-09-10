@@ -9,7 +9,7 @@ class Xxh < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cda85ab96f97819e118e35edfd7ee1c009c5e1004102bd2abe9e1aef51b330bb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e760a11da8e6452dbac69741572aaef849a755ddf91ebfb74cbb7ccdfd472e9"
   end
 
   depends_on "libyaml"
