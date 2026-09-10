@@ -9,7 +9,7 @@ class TorfCli < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a26628dd72afecc9a0f1e57bc6c2687ed4a7eed5028cd90a42832c8abf9bd6f7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9070ef3ade78cb3f885ae1cf20dd268091ac9c73e512b1d66bb3e6d94b64fc13"
   end
 
   depends_on "python@3.14"
