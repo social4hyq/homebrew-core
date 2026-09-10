@@ -4,6 +4,7 @@ class Iamy < Formula
   url "https://github.com/99designs/iamy/archive/refs/tags/v2.4.0.tar.gz"
   sha256 "13bd9e66afbeb30d386aa132a4af5d2e9a231d2aadf54fe8e5dc325583379359"
   license "MIT"
+  revision 1
   head "https://github.com/99designs/iamy.git", branch: "master"
 
   bottle do
