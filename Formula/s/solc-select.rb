@@ -6,11 +6,11 @@ class SolcSelect < Formula
   url "https://files.pythonhosted.org/packages/62/89/51e614fdbf26f47268c18f8a3b6cf1cb67c9a8b48b7b7231c948cae97814/solc_select-1.2.0.tar.gz"
   sha256 "ad0a7afcae05061ce5e7632950b1fa0193ba9eaf05e4956f86effee024c6fb07"
   license "AGPL-3.0-only"
-  revision 4
+  revision 5
   head "https://github.com/crytic/solc-select.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b53f488b4017d19e9eb39a5a27f4fad53e5050bb6e9f89a66a7fcef818357a2d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7b788f28d48264d13136edec38f51ad32c6e09c6047f92e7f28e45a92fa15ef"
   end
 
   depends_on "certifi" => :no_linkage
