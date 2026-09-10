@@ -6,6 +6,7 @@ class Papis < Formula
   url "https://files.pythonhosted.org/packages/9e/7f/14f6f1a028be4927883edd7ecab4e27dc7f27f9ae2cb370dca08864264f8/papis-0.16.0.tar.gz"
   sha256 "a7ce419077bf50bd1db14618c0be971f325a0f331632d4729d5acf8239053c74"
   license "GPL-3.0-or-later"
+  revision 1
   head "https://github.com/papis/papis.git", branch: "main"
 
   bottle do
