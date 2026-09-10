@@ -4,6 +4,7 @@ class Libp11 < Formula
   url "https://github.com/OpenSC/libp11/releases/download/libp11-0.4.21/libp11-0.4.21.tar.gz"
   sha256 "efdb523aef8613d447e6a2d38227d4b389866f4bcf4b503130acd7f759490847"
   license "LGPL-2.1-or-later"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Libp11 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c7839867ada1332fb4fa4ba17d8e79427a1e96df0bff5705d79be2d9c71ae3b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "775df0cb64277963a1fe0ed722267c68f03f8d8789e58f99fbdbb21d6d82425f"
   end
 
   head do
