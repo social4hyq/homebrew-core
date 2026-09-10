@@ -29,6 +29,7 @@ class Php < Formula
     "TCL",                   # 7
     "Zlib",                  # 8
   ]
+  revision 1
   compatibility_version 1
 
   livecheck do
