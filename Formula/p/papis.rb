@@ -6,10 +6,11 @@ class Papis < Formula
   url "https://files.pythonhosted.org/packages/9e/7f/14f6f1a028be4927883edd7ecab4e27dc7f27f9ae2cb370dca08864264f8/papis-0.16.0.tar.gz"
   sha256 "a7ce419077bf50bd1db14618c0be971f325a0f331632d4729d5acf8239053c74"
   license "GPL-3.0-or-later"
+  revision 1
   head "https://github.com/papis/papis.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ff358af2568c2fbf2aff4f163afd35cd300590b4fc40508a8bebb8cc218eece1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e9c46b53216ffb1ce22b84166db046a10581563d0cbbea076210b8e5a1cac87"
   end
 
   depends_on "certifi" => :no_linkage
