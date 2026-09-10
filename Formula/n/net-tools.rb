@@ -4,9 +4,10 @@ class NetTools < Formula
   url "https://downloads.sourceforge.net/project/net-tools/net-tools-2.10.tar.xz"
   sha256 "b262435a5241e89bfa51c3cabd5133753952f7a7b7b93f32e08cb9d96f580d69"
   license "GPL-2.0-or-later"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb6b4d3e2ad77c980037bb07a7cdaf1e38651ac75421b8c86727e0e0b43395de"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "41334c83070c1ffcd24bf7d9d9ab9059f586fc37bbf5b78e7cbb6527fc750dd8"
   end
 
   depends_on "libdnet"
