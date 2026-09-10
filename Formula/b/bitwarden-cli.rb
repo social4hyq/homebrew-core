@@ -4,6 +4,7 @@ class BitwardenCli < Formula
   url "https://github.com/bitwarden/clients/archive/refs/tags/cli-v2026.8.0.tar.gz"
   sha256 "3240867f6dbe4e2f7623c727bb61e8b1cb40ff78f627fcc504e22cb022c941b9"
   license "GPL-3.0-only"
+  revision 1
   head "https://github.com/bitwarden/clients.git", branch: "main"
 
   livecheck do
