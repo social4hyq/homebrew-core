@@ -4,6 +4,7 @@ class Libunwind < Formula
   url "https://github.com/libunwind/libunwind/releases/download/v1.8.3/libunwind-1.8.3.tar.gz"
   sha256 "be30d910e67f58d82e753231f1357f326a1a088acf126b21ff77e60aab19b90b"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Libunwind < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "701baff4411aede21fea67053bf52ab3308d64360b4e005ba06ddd9083335ac0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "360fb56bf7ae65acf545eb2d12d375ce79c9e52307e4c32c65074e30511e023e"
   end
 
   keg_only "it conflicts with LLVM"
