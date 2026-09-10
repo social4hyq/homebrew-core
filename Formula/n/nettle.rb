@@ -5,10 +5,11 @@ class Nettle < Formula
   mirror "https://ftp.gnu.org/gnu/nettle/nettle-4.0.tar.gz"
   sha256 "3addbc00da01846b232fb3bc453538ea5468da43033f21bb345cb1e9073f5094"
   license any_of: ["GPL-2.0-or-later", "LGPL-3.0-or-later"]
+  revision 1
   compatibility_version 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8936c1da0c64c4ca44810cb6ffb1ab015a08f6ffe8e02a25bbd109f947cd2ed7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2b8abf292fe8aa4d4b1e5a02e1460e78014a23cd2a8581ec934db6e8f67581f"
   end
 
   depends_on "gmp"
