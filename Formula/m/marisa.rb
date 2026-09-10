@@ -7,7 +7,7 @@ class Marisa < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a734ee3e70a287dac8ad56b641ea64c6748521f2246b7a35a20cb9b9e6ba7f51"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d3782031f4b09080a62f3d42e932ac2354f6a00e7a89c650dda6dd8c7885522"
   end
 
   depends_on "cmake" => :build
