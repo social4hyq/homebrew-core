@@ -4,6 +4,7 @@ class CalmCli < Formula
   url "https://registry.npmjs.org/@finos/calm-cli/-/calm-cli-1.58.0.tgz"
   sha256 "3d7df535e55aada02f9787cfa68a493dd73a0cc4c6b29263c63e44a74e381eb3"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "8f6f60363162d2ec682874300f0781cd0abcc00aa917ab9c224154130350a738"
