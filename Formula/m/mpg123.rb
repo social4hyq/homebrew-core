@@ -5,6 +5,7 @@ class Mpg123 < Formula
   mirror "https://downloads.sourceforge.net/project/mpg123/mpg123/1.33.7/mpg123-1.33.7.tar.bz2"
   sha256 "31d0e35a4ca567ec9b5ebda6c3062bb4435d6d3eacd6ef0d95cadd7854dc03ee"
   license "LGPL-2.1-only"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -13,7 +14,7 @@ class Mpg123 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fc8c420516dde8476ca16ace855d4e18be4ae0f0e19f279c962d1daf0b4f1d76"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e741df86b9f76e2c76f14dbe802b7ef6f5dc5ae9f4c985eebc4f05b79bfa308"
   end
 
   def install
