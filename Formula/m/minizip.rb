@@ -4,7 +4,7 @@ class Minizip < Formula
   url "https://zlib.net/zlib-1.3.2.tar.gz"
   sha256 "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16"
   license "Zlib"
-  revision 1
+  revision 2
   compatibility_version 1
 
   livecheck do
@@ -12,7 +12,7 @@ class Minizip < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b854a533547e4f0bff45a981cca4aafff1221df944196456ca7ddb1083ff9f47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d11c8265289cf2ac1eaa1a226f6e367cbb1ea7ca7a17542f0bbe184e3340d33"
   end
 
   depends_on "autoconf" => :build
