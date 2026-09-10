@@ -7,7 +7,7 @@ class Tartufo < Formula
   url "https://github.com/godaddy/tartufo/archive/refs/tags/v6.0.0.tar.gz"
   sha256 "ba84bb6192a3647a0dd2f8b4c08c7aff46e8d5bc742e13ee1714477ae8ad7787"
   license "GPL-2.0-only"
-  revision 2
+  revision 3
   head "https://github.com/godaddy/tartufo.git", branch: "main"
 
   bottle do
