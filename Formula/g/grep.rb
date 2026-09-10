@@ -5,10 +5,11 @@ class Grep < Formula
   mirror "https://ftp.gnu.org/gnu/grep/grep-3.12.tar.xz"
   sha256 "2649b27c0e90e632eadcd757be06c6e9a4f48d941de51e7c0f83ff76408a07b9"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5666520c89915aa871ed1d6b969e3a0dab8429c9fd1ae891c1e008b4b0e42f47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "910887514a719318c23bebfddb3f2e497d94f627f51b789fbdea0ad69fe4928e"
   end
 
   head do
