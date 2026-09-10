@@ -16,7 +16,7 @@ class Openh264 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "251f8998725725bda9d1973733fa587e2ef1a34653a164bf6225c6e2fdfc64aa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ebfa5b6dab057a2804ff3a771665d2af4f7032881ec1f2cb5941636e381fde88"
   end
 
   depends_on "nasm" => :build
