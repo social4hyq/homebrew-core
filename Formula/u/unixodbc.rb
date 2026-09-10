@@ -8,6 +8,7 @@ class Unixodbc < Formula
     "LGPL-2.1-or-later", # libraries
     "GPL-2.0-or-later",  # programs
   ]
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -16,7 +17,7 @@ class Unixodbc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "12bb6ea3e405e9e12cffac5adce6d613cb160e654f9c0da356396bd13ca51c33"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4f64607f027b1f34da5d12f8397c9bf432c592d3a592fd2eb57b56ebf40e9eae"
   end
 
   depends_on "libtool"
