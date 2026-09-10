@@ -9,7 +9,7 @@ class GolangciLint < Formula
   head "https://github.com/golangci/golangci-lint.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "18023e8654c4aac229fd4f1ccc2e52682b12c293c28919570cf2361651db7017"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cec73026ec376dad369ba84b5ee010fbc312202856f9683a3c7f453c6853b78d"
   end
 
   depends_on "go"
