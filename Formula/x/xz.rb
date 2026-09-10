@@ -13,7 +13,7 @@ class Xz < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0a9fb55899b876928304a03d67c74548c21de02fa8951c0e92b19a96c7f9976"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "94f94e040ca3df69234fcba6099fb17dc942f860d6b64d5eda7084625b34b871"
   end
 
   deny_network_access! [:build, :postinstall]
