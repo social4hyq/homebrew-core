@@ -4,6 +4,7 @@ class Eslint < Formula
   url "https://registry.npmjs.org/eslint/-/eslint-10.10.0.tgz"
   sha256 "897c8ff1a16dbc0420d9815b59bfbad27d079c3ddaef6ee1099bb4b4593c0031"
   license "MIT"
+  revision 1
   head "https://github.com/eslint/eslint.git", branch: "main"
 
   bottle do
