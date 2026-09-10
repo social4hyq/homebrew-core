@@ -5,6 +5,7 @@ class Libpng < Formula
   mirror "https://sourceforge.mirrorservice.org/l/li/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz"
   sha256 "28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775"
   license "libpng-2.0"
+  revision 1
   compatibility_version 1
 
   livecheck do
