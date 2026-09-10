@@ -7,7 +7,7 @@ class Jbig2dec < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2c455e7c84f30a8c276cb4ec2f3eb9b5dac97da3bdd8e4326f5d7fcf4cf6ce1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2c5c9bab38f5a41a862be213f03bba66be390669ad0377b22416254cd60adf0"
   end
 
   depends_on "autoconf" => :build
