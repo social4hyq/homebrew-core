@@ -9,7 +9,7 @@ class OpentimestampsClient < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c7c75b0cb58d1c7c53caf89e335342a91a38f39b177b72d7a3937fcc99589f6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9edf40e4338d9e4d8ce888709722976f61b4cf947456963111775f0e0cb51fc"
   end
 
   depends_on "certifi" => :no_linkage
