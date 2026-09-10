@@ -1,13 +1,13 @@
 class Delve < Formula
   desc "Debugger for the Go programming language"
   homepage "https://github.com/go-delve/delve"
-  url "https://github.com/go-delve/delve/archive/refs/tags/v1.27.1.tar.gz"
-  sha256 "dca9ec6f2c392a00449ad748b3a229e92ba4efa67f4e7582f2cc45974429928f"
+  url "https://github.com/go-delve/delve/archive/refs/tags/v1.27.2.tar.gz"
+  sha256 "8ea5979dfc5978c9690dc1dd533a830815441dd33617f4a61bcdff7d2c3c7e90"
   license "MIT"
   head "https://github.com/go-delve/delve.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "371f2fcf2f757fe34d4993c60483ef4d9a2523489164c414a9c53e0d875e9473"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5719e0fa7ea560e6249cfab1067fbe62e17dffb41b6b37aa8721b4eea23bdf70"
   end
 
   depends_on "go" => :build
