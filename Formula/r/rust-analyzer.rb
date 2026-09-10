@@ -6,6 +6,7 @@ class RustAnalyzer < Formula
       revision: "bb3bbbd9e4529cbf1a6392d5953f03eb01af3792"
   version "2026-08-17.4"
   license any_of: ["Apache-2.0", "MIT"]
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "7063fbaab1ded88852a1e2c697395d3aaa8af72a2c1e3b95371c8474e9bc512e"
