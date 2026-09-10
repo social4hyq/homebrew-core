@@ -5,7 +5,7 @@ class Wv < Formula
   mirror "https://abisource.com/downloads/wv/1.2.9/wv-1.2.9.tar.gz"
   sha256 "4c730d3b325c0785450dd3a043eeb53e1518598c4f41f155558385dd2635c19d"
   license "GPL-2.0-or-later"
-  revision 2
+  revision 3
 
   livecheck do
     skip "Not actively developed or maintained"
@@ -32,10 +32,8 @@ class Wv < Formula
   end
 
   def install
-    # Work around build errors with newer Clang
-    if DevelopmentTools.clang_build_version >= 1500
-      ENV.append_to_cflags "-Wno-incompatible-function-pointer-types -Wno-int-conversion"
-    end
+    # Work around build errors
+    ENV.append_to_cflags "-Wno-incompatible-function-pointer-types -Wno-int-conversion"
 
     args = ["--mandir=#{man}"]
     # Help old config scripts identify arm64 linux
