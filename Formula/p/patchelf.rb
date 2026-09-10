@@ -4,6 +4,7 @@ class Patchelf < Formula
   url "https://github.com/NixOS/patchelf/releases/download/0.19.1/patchelf-0.19.1.tar.bz2"
   sha256 "2cce01de93653829f6ab68a20c2ec275e1c00a946110704a27e928d2e6e88716"
   license "GPL-3.0-or-later"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Patchelf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8d75ce4b0e5da93d45ebedc3e2d7c52c87a1d2312e0f8f3eba0e9b2b1077281"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "62e15560ab8e9b209659f270c2d5982b8ee92a5d70b1dcc47dcf1877cd9143eb"
   end
 
   head do
