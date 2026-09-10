@@ -4,6 +4,7 @@ class Girara < Formula
   url "https://pwmt.org/projects/girara/download/girara-2026.07.18.tar.xz"
   sha256 "d7255635776a45d42d1e555aa425ab96caf23755442474cf240cbac966d8502f"
   license "Zlib"
+  revision 1
 
   livecheck do
     url "https://pwmt.org/projects/girara/download/"
