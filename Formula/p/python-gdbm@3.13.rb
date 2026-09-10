@@ -4,6 +4,7 @@ class PythonGdbmAT313 < Formula
   url "https://www.python.org/ftp/python/3.13.15/Python-3.13.15.tgz"
   sha256 "c28d9d213c09b5b5ab2c29812950e12f746999e099b82894231be954b26baed9"
   license "Python-2.0"
+  revision 1
 
   livecheck do
     formula "python@3.13"
