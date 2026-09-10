@@ -13,7 +13,7 @@ class Libyaml < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "71e4fb100ef9798dcab6ce13bbfc2f61784b9b8bb72bda4999cfe234d9afdd9b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6a1de182134dccf206f5f1a12263745753741a128ad80a0de0dfbdd00d48eb1"
   end
 
   depends_on "autoconf" => :build
