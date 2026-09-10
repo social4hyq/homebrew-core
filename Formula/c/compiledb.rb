@@ -6,10 +6,11 @@ class Compiledb < Formula
   url "https://files.pythonhosted.org/packages/0e/62/d0fc807871757841c32e6fbe433ebad422528a468336a0cf82fea226f41d/compiledb-0.10.7.tar.gz"
   sha256 "97752d8810b6977654a11a22cdc41bf6b71473bcdb5da312bc135f36d6af8271"
   license "GPL-3.0-or-later"
+  revision 1
   head "https://github.com/nickdiego/compiledb.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "148fe6e1a2abbc3d3cac9a53b996958c3ac23c3e00666fd4c7b3f7434960c56f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c65de7bc01528c689723d9fcb07dfe54232cddf8fc4419602f9e91fe84331958"
   end
 
   depends_on "python@3.14"
