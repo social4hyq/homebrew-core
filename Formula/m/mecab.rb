@@ -13,7 +13,7 @@ class Mecab < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4355729ec8dae03503f755d1a79fedb8e27de3219d85b6a00a10f5643f9778e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c135834979b26b4f6174134145bff7e59937e82138a57f77e1d607208d564807"
   end
 
   conflicts_with "mecab-ko", because: "both install mecab binaries"
