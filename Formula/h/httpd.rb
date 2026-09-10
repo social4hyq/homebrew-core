@@ -5,11 +5,11 @@ class Httpd < Formula
   mirror "https://downloads.apache.org/httpd/httpd-2.4.68.tar.bz2"
   sha256 "68c74d4df38c26bed4dfbdb8f3baf1eb532f3872357becc1bba5d136f6b63c06"
   license "Apache-2.0"
-  revision 1
+  revision 2
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "936c118fa737ec7a4d383d43c9d5f79a132f572f32e7b2d71cdac4adfdcf72f5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d6e1ed152e5bfaa0522dbf260dc7a623e80e50a8b7be1b1445d87716efd87be"
   end
 
   depends_on "apr"
