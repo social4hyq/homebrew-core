@@ -5,6 +5,7 @@ class KubernetesCli < Formula
       tag:      "v1.37.0",
       revision: "f54c212e3a2f75d674b717a9b29052b20b60aefc"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/kubernetes/kubernetes.git", branch: "master"
 
   livecheck do
