@@ -4,6 +4,7 @@ class Libarchive < Formula
   url "https://www.libarchive.org/downloads/libarchive-3.8.9.tar.xz"
   sha256 "888c934f9d95648ecb9163dc8e23ab80a476ecb81a8f1154704a227b5b676dde"
   license "BSD-2-Clause"
+  revision 1
   compatibility_version 1
 
   livecheck do
