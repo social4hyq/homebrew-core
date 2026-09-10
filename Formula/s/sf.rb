@@ -4,6 +4,7 @@ class Sf < Formula
   url "https://registry.npmjs.org/@salesforce/cli/-/cli-2.150.6.tgz"
   sha256 "11ede48cb63d613d42acdb16b1622a047666a5cd80eefabdf612f9c53782d50e"
   license "BSD-3-Clause"
+  revision 1
 
   livecheck do
     url "https://registry.npmjs.org/@salesforce/cli/latest"
