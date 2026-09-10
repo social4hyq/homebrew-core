@@ -6,10 +6,11 @@ class Libunistring < Formula
   mirror "http://ftp.gnu.org/gnu/libunistring/libunistring-1.4.2.tar.gz"
   sha256 "e82664b170064e62331962126b259d452d53b227bb4a93ab20040d846fec01d8"
   license any_of: ["GPL-2.0-only", "LGPL-3.0-or-later"]
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c11893cfab68ca1f00c141fe75a61ca81265c7f3ce8971a0998843ec70797326"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9e62460f3669f03281a397ac9484a559d952728b583fc52c2aa8a3851d56d65"
   end
 
   def install
