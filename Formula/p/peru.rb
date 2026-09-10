@@ -11,7 +11,7 @@ class Peru < Formula
   head "https://github.com/buildinspace/peru.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "08008a3117bafba3ea2900ab9a2a0c2f819d1bdf413402838bc55cbd8244aad3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e49f2bf75315cee3d17c83976bc3372e4b48e15f694ed4819b7695f3a6f3e6a0"
   end
 
   depends_on "libyaml"
