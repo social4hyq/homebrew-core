@@ -4,6 +4,7 @@ class Nano < Formula
   url "https://www.nano-editor.org/dist/v9/nano-9.2.tar.xz"
   sha256 "05ecb99247b782e8a5b3a25ed4101dd034b0236902f7449bc9795b717642f7e9"
   license "GPL-3.0-or-later"
+  revision 1
 
   livecheck do
     url "https://www.nano-editor.org/download.php"
@@ -11,7 +12,7 @@ class Nano < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "879c8c420f78db956093e6b15d0ae0addc87d84dccbbee457f7b8e29cd410e23"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f242cfd4ece0a66370234d3a02ac483cf72e16ce7d244d33d4ae18f8346ab111"
   end
 
   depends_on "pkgconf" => :build
