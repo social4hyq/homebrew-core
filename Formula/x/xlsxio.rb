@@ -4,6 +4,7 @@ class Xlsxio < Formula
   url "https://github.com/brechtsanders/xlsxio/archive/refs/tags/0.2.36.tar.gz"
   sha256 "80d3df95a7a108a41f83f0ce4c6706873fd2afafd92424fcccea475a8acbd044"
   license "MIT"
+  revision 1
   head "https://github.com/brechtsanders/xlsxio.git", branch: "master"
 
   bottle do
