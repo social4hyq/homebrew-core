@@ -4,10 +4,11 @@ class Libx11 < Formula
   url "https://www.x.org/archive/individual/lib/libX11-1.8.13.tar.gz"
   sha256 "acf0e7cd7541110e6330ecb539441a2d53061f386ec7be6906dfde0de2598470"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd608b496e60bc7dcddd8fea3c7b6f290f8c1cb2abcaf4b117b0cd9938cdaa6e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3477f8a73eca2c42ed4a6d5254baaefbf92b055d754ce0ab29c8124db2b1fbd1"
   end
 
   depends_on "pkgconf" => :build
