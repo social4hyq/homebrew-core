@@ -6,11 +6,11 @@ class PolicySentry < Formula
   url "https://files.pythonhosted.org/packages/87/fb/1d8cd9672d757481f6ffbdb18ca92d628d8d2b08cbf1829a1c4d700bc1ab/policy_sentry-0.15.2.tar.gz"
   sha256 "6e16f059dde400c856815be9368052102993499e66754207f9a9a1cdcf996dd2"
   license "MIT"
-  revision 1
+  revision 2
   head "https://github.com/salesforce/policy_sentry.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7cb94e9f5bcb65678f0d98f86a6831bd19127680ead55347c7cd5a1c51bb4fe8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8247debd3a028099221736251d4d179dacc3137a1b12ee1c28bec1ffc1f40c0"
   end
 
   depends_on "rust" => :build # for orjson
