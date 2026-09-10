@@ -6,10 +6,10 @@ class SphinxDoc < Formula
   url "https://files.pythonhosted.org/packages/cd/bd/f08eb0f4eed5c83f1ba2a3bd18f7745a2b1525fad70660a1c00224ec468a/sphinx-9.1.0.tar.gz"
   sha256 "7741722357dd75f8190766926071fed3bdc211c74dd2d7d4df5404da95930ddb"
   license "BSD-2-Clause"
-  revision 3
+  revision 4
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abbc218620d94beebd8facdd192cde9d924f41aac661fcd6ce20749b527471f5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d8b03f71b815091ae0638cce11f21c764a7ac9d14c11800e4fffba8a20bacad"
   end
 
   depends_on "certifi"
