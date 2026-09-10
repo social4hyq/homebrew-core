@@ -5,6 +5,7 @@ class NewrelicInfraAgent < Formula
       tag:      "1.80.3",
       revision: "cba5a9988b484da06e150e8369c014bb21f2fc56"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/newrelic/infrastructure-agent.git", branch: "master"
 
   # Upstream sometimes creates a tag with a stable version format but marks it
