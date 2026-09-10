@@ -5,6 +5,7 @@ class JsonC < Formula
   version "0.18"
   sha256 "3112c1f25d39eca661fe3fc663431e130cc6e2f900c081738317fba49d29e298"
   license "MIT"
+  revision 1
   head "https://github.com/json-c/json-c.git", branch: "master"
 
   livecheck do
