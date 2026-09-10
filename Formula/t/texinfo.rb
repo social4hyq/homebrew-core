@@ -5,11 +5,11 @@ class Texinfo < Formula
   mirror "https://ftp.gnu.org/gnu/texinfo/texinfo-7.3.tar.xz"
   sha256 "51f74eb0f51cfa9873b85264dfdd5d46e8957ec95b88f0fb762f63d9e164c72e"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a0bb6a9f3208116879be4d4c1c20fed8d99c435e25486caffa6d1c431638440"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "817c842c69bf0b8fc9d48746c50f8ed6ec8483f4887213e1e42148fa8664677b"
   end
 
   uses_from_macos "ncurses"
