@@ -4,6 +4,7 @@ class Silk < Formula
   url "https://tools.netsa.cert.org/releases/silk-3.24.2.tar.gz"
   sha256 "9ea9c1391f9c1ba14394af68b2bd7e66bf73b664c3cee342c5a39e5b13e45398"
   license all_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"]
+  revision 1
 
   livecheck do
     url :homepage
