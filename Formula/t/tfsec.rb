@@ -4,6 +4,7 @@ class Tfsec < Formula
   url "https://github.com/aquasecurity/tfsec/archive/refs/tags/v1.28.14.tar.gz"
   sha256 "61fe8ee670cceaf45d85c2789da66616d0045f8dbba4ec2b9db453436f9b9804"
   license "MIT"
+  revision 1
   head "https://github.com/aquasecurity/tfsec.git", branch: "master"
 
   livecheck do
@@ -12,7 +13,7 @@ class Tfsec < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "96963916c0d0da20d599f244a0a8e208b52e327044a2abc71404c7714bd3c3e0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "059bf8b2dc360c9668322783050906d966b9d567d3e96619914d3d2608c42ef8"
   end
 
   depends_on "go" => :build
