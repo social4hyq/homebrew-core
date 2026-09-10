@@ -4,6 +4,7 @@ class Mpdecimal < Formula
   url "https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-4.0.1.tar.gz"
   sha256 "96d33abb4bb0070c7be0fed4246cd38416188325f820468214471938545b1ac8"
   license "BSD-2-Clause"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Mpdecimal < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7ce7e71e8326d4ef8e7a59bcfe08c59f4bde27a1545b412b3412013b1238658"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6378c84fbb0132a5d329b70074f70a86af44af162dfdddeb1050ba167fd27944"
   end
 
   def install
