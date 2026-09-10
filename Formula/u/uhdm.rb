@@ -6,10 +6,11 @@ class Uhdm < Formula
   url "https://github.com/chipsalliance/UHDM/archive/refs/tags/v1.87.tar.gz"
   sha256 "877b74bf1a0ad5fc64f46df9e2af47a088e50b362469a36c5da5f96dc3926045"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/chipsalliance/UHDM.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "10bd742dc3973b14e6493d4c7a175b78fe4a56a14b26e3c8febff6aac3816af2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3fbb6172b55bf698655c8a47faba97d8e470e701cf3ab8aed3629505834ac448"
   end
 
   depends_on "cmake" => :build
