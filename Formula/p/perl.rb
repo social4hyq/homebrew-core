@@ -6,7 +6,7 @@ class Perl < Formula
   license any_of: ["Artistic-1.0-Perl", "GPL-1.0-or-later"]
   compatibility_version 1
   head "https://github.com/perl/perl5.git", branch: "blead"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://www.cpan.org/src/#{version.major}.0/"
