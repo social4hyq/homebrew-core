@@ -13,7 +13,7 @@ class UserspaceRcu < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c8207e9292cd218d3e52bcf31fc4dfd64e446393fe1015675d98369f9b9bb52"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3713ed44aa6ccf8010af73a073c835e3b2d89485f146fa8c0887014d47921c4b"
   end
 
   def install
