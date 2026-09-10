@@ -4,6 +4,7 @@ class Resterm < Formula
   url "https://github.com/unkn0wn-root/resterm/archive/refs/tags/v1.7.2.tar.gz"
   sha256 "3c72153ae58d15d137330fc23ca2878a796f3e7ff9eb8c4505603906540594b4"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/unkn0wn-root/resterm.git", branch: "main"
 
   bottle do
