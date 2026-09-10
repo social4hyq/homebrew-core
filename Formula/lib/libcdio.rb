@@ -4,6 +4,7 @@ class Libcdio < Formula
   url "https://github.com/libcdio/libcdio/releases/download/2.4.0/libcdio-2.4.0.tar.gz"
   sha256 "bf7cde63762bb12db7755c395c441e49406fde7e1d9f9a9be7e3b940b1f405d7"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   livecheck do
