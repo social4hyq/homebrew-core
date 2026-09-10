@@ -6,7 +6,7 @@ class Iredis < Formula
   url "https://files.pythonhosted.org/packages/24/3c/9d26458a7e1a064f417fbdca8e9c0656c3c1a0afda225bf6ad76c3ff4f70/iredis-1.16.1.tar.gz"
   sha256 "862a67a59e05710cb6547bdff55e3b6801298578f78d39e7fa953424f68793df"
   license "BSD-3-Clause"
-  revision 2
+  revision 3
   head "https://github.com/laixintao/iredis.git", branch: "master"
 
   bottle do
