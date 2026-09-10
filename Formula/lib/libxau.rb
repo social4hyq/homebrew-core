@@ -4,10 +4,11 @@ class Libxau < Formula
   url "https://www.x.org/archive/individual/lib/libXau-1.0.12.tar.xz"
   sha256 "74d0e4dfa3d39ad8939e99bda37f5967aba528211076828464d2777d477fc0fb"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dc4beb4779f57fda3a3be2a7aad5c9c81d30abd0a077db2149531752f4601ef"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eff372251fbd52ea173a37ba76e99827300b4c685e9026cd80ec925ab98e2e94"
   end
 
   depends_on "pkgconf" => :build
