@@ -4,6 +4,7 @@ class Catch2 < Formula
   url "https://github.com/catchorg/Catch2/archive/refs/tags/v3.16.0.tar.gz"
   sha256 "0957cae5821b17ce07f0833aaa52b5137643a8382203221f363a8303c109af34"
   license "BSL-1.0"
+  revision 1
   head "https://github.com/catchorg/Catch2.git", branch: "devel"
 
   bottle do
