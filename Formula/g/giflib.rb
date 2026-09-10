@@ -4,6 +4,7 @@ class Giflib < Formula
   url "https://downloads.sourceforge.net/project/giflib/giflib-6.x/giflib-6.1.3.tar.gz"
   sha256 "b65b66b99f0424b93525f987386f22fc5efb9da2bfc92ad4a532249aaffbab0e"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Giflib < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9e576ce4e8b3496e601a09f683bc2073cd79009685fe3e173e5c84d7c4dec7b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9009e46719fb8071434b2f266fef099e4601c7747e6c304f8896d2ad7c9f22aa"
   end
 
   def install
