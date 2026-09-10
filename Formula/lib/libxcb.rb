@@ -8,7 +8,7 @@ class Libxcb < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "35b982f83db37e904a522906f3adba6458a02112685222648e21f474c094241d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "81daab8a2e49b14f132faa99e318d10f4a2a845d839f8262e5f70234f8208a65"
   end
 
   depends_on "pkgconf" => :build
