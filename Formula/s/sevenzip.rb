@@ -5,6 +5,7 @@ class Sevenzip < Formula
   version "26.01"
   sha256 "b2389e0e930b2f9a348cf0fe7d9870a46482a8ec044ee0bdf42e2136db31c3d6"
   license all_of: ["LGPL-2.1-or-later", "BSD-3-Clause"]
+  revision 1
   compatibility_version 1
   head "https://github.com/ip7z/7zip.git", branch: "main"
 
