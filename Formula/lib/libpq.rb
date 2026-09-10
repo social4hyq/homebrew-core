@@ -4,6 +4,7 @@ class Libpq < Formula
   url "https://ftp.postgresql.org/pub/source/v18.6/postgresql-18.6.tar.bz2"
   sha256 "555610c24d53e4316da5b7d3fc25c279d96856d5e0e23ee308c328c5fa881d9f"
   license "PostgreSQL"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,8 +13,7 @@ class Libpq < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1db6dbeac2513a51fdca2a4c2917e0b29b3d11f48e3ec7828a1bc14c9f426048"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d22fc10d8cd847b80e65c08199c02218acef8d6b56b8054bc223d35da490f257"
   end
 
   keg_only "it conflicts with PostgreSQL"
