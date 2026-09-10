@@ -7,7 +7,7 @@ class Strace < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf6db043193c64aa6b5c03d6e4bfad5206aa7fb5860976c3e433ec5a05cb7d64"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2458e3b91bf4a389aa67e7d16b37cf9230d92c5026a3ad0da0352fb6e43a056"
   end
 
   head do
