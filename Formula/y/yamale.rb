@@ -6,6 +6,7 @@ class Yamale < Formula
   url "https://files.pythonhosted.org/packages/da/64/9e5de0e829920b848dcf5fe3ff64936d83cc7471babd264588b08bca97e0/yamale-6.1.0.tar.gz"
   sha256 "fd435aa7b830c73e89a9ef548c0ace2d3d8dc3e5e180e6b57ff70b31495672fd"
   license "MIT"
+  revision 1
   head "https://github.com/23andMe/Yamale.git", branch: "master"
 
   bottle do
