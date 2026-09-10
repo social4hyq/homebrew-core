@@ -7,10 +7,11 @@ class Repo < Formula
       tag:      "v2.67",
       revision: "d27d6829a84f488b7253ea693dcc429076c33914"
   license "Apache-2.0"
+  revision 1
   version_scheme 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5bbe53d4279dfe09bf1af6c117440a65bac2d62973d8732f96380e0f978a3abf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f40a74d156f7740478954a8499e9c4445325c9d040225413d00465ac6138645c"
   end
 
   uses_from_macos "python"
