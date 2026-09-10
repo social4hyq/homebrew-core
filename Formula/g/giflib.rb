@@ -13,7 +13,7 @@ class Giflib < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9e576ce4e8b3496e601a09f683bc2073cd79009685fe3e173e5c84d7c4dec7b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9009e46719fb8071434b2f266fef099e4601c7747e6c304f8896d2ad7c9f22aa"
   end
 
   def install
