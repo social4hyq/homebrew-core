@@ -4,6 +4,7 @@ class GradleCompletion < Formula
   url "https://github.com/gradle/gradle-completion/archive/refs/tags/v9.7.1.tar.gz"
   sha256 "426036712f162960d5d63fced1d45c190a2fd46dafcc08aa508b5262ce04dcf5"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/gradle/gradle-completion.git", branch: "master"
 
