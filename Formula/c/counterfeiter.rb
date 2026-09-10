@@ -4,6 +4,7 @@ class Counterfeiter < Formula
   url "https://github.com/maxbrunsfeld/counterfeiter/archive/refs/tags/v6.12.2.tar.gz"
   sha256 "094811ab5e8f9e64aa7f7cdf832b3a7c9042ada2f60ba79d7d3cadff6e65565d"
   license "MIT"
+  revision 1
   head "https://github.com/maxbrunsfeld/counterfeiter.git", branch: "main"
 
   livecheck do
