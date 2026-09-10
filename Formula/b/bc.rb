@@ -5,6 +5,7 @@ class Bc < Formula
   mirror "https://ftp.gnu.org/gnu/bc/bc-1.08.2.tar.gz"
   sha256 "ae470fec429775653e042015edc928d07c8c3b2fc59765172a330d3d87785f86"
   license "GPL-3.0-or-later"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "f6bfa3f477e5615673071b6d60121de4c00865a0c2d79e1bc530bf32b7191e81"
