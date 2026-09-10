@@ -17,6 +17,7 @@ class Luajit < Formula
   version "2.1.1774896198"
   sha256 "88a592afa9907d6b0c6e1e7ac9b39982622e3ca086f0646d4ea89b0e4e81f093"
   license "MIT"
+  revision 1
   compatibility_version 7
   head "https://github.com/LuaJIT/LuaJIT.git", branch: "v2.1"
 
@@ -31,7 +32,7 @@ class Luajit < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd3497e4f565fd2ce6a120fc0504e857233c43feacb1ec149c7e64dd6daec8c3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "930c025270577b8da3b6937fd64c828e37ae29258790c05b1e169fd04774c77e"
   end
 
   def install
