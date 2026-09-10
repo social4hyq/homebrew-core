@@ -4,6 +4,7 @@ class Gofumpt < Formula
   url "https://github.com/mvdan/gofumpt/archive/refs/tags/v0.12.0.tar.gz"
   sha256 "b6d5d14692cad23996da4329bf24d30324af30125dd5261e6d9b0c5bc8b20b28"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/mvdan/gofumpt.git", branch: "master"
 
   bottle do
