@@ -16,7 +16,7 @@ class Gh < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5023c0713eabd67180a5256cd0039fbc26c28203cd9929807cde47b1a6e70ea0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88892b44f2b9053bed5808543e165bbf2780419f5c5217be740e37a9b6d48c4a"
   end
 
   depends_on "go" => :build
