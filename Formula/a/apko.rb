@@ -4,6 +4,7 @@ class Apko < Formula
   url "https://github.com/chainguard-dev/apko/archive/refs/tags/v1.3.0.tar.gz"
   sha256 "0f9e882489b04b3a36b2c620ab4df6ae485dd84dbed3cab742d70b2b56655ef9"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/chainguard-dev/apko.git", branch: "main"
 
   # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
