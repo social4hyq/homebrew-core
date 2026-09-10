@@ -4,11 +4,12 @@ class Libplist < Formula
   url "https://github.com/libimobiledevice/libplist/releases/download/2.7.0/libplist-2.7.0.tar.bz2"
   sha256 "7ac42301e896b1ebe3c654634780c82baa7cb70df8554e683ff89f7c2643eb8b"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
   head "https://github.com/libimobiledevice/libplist.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "91ce9159ec82d5a497e7b0d0f935fffb43f5cbbcbbaa81355d28ba902cb7d551"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b539f41dd86d7099557fa9cb177e0abeff03f37244a4ac320bf1c6e714de68b"
   end
 
   depends_on "autoconf" => :build
