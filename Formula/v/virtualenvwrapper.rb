@@ -6,10 +6,10 @@ class Virtualenvwrapper < Formula
   url "https://files.pythonhosted.org/packages/97/0b/1f6daec2e0bd25275953256f83f98fb337b78b9d03d44b7eb9619b72b046/virtualenvwrapper-6.1.1.tar.gz"
   sha256 "112e7ea34a9a3ce90aaea54182f0d3afef4d1a913eeb75e98a263b4978cd73c6"
   license "MIT"
-  revision 2
+  revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7cd1c7550e123207a5ecc3556a602c50598be7c2ac3e821914de69bbe4ecc059"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb3d635bf3443944329ef2c31899790d77bcac4a4df0a08b262670219d7dead9"
   end
 
   depends_on "python@3.14"
