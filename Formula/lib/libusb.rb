@@ -4,6 +4,7 @@ class Libusb < Formula
   url "https://github.com/libusb/libusb/releases/download/v1.0.30/libusb-1.0.30.tar.bz2"
   sha256 "fea36f34f9156400209595e300840767ab1a385ede1dc7ee893015aea9c6dbaf"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
 
   livecheck do
