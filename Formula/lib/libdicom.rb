@@ -4,6 +4,7 @@ class Libdicom < Formula
   url "https://github.com/ImagingDataCommons/libdicom/releases/download/v1.3.0/libdicom-1.3.0.tar.xz"
   sha256 "75f1167f5153c659cdd58f2b432d2592bf0477abe0087e195bc621b5594ef10a"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
