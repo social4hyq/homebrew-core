@@ -13,7 +13,7 @@ class Jpeg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "84fdb92cdec2338ca87941c637d5b5eb92f1befcc9c05604d912e5de7305befc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9447c20052656afea01f90156a49179cc76b089b498353e43c9845f697265eb"
   end
 
   keg_only "it conflicts with `jpeg-turbo`"
