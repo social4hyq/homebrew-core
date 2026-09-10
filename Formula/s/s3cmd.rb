@@ -6,11 +6,11 @@ class S3cmd < Formula
   url "https://files.pythonhosted.org/packages/b3/9c/ad4cd51328bd7a058bfda6739bc061c63ee3531ad2fbc6e672518a1eed01/s3cmd-2.4.0.tar.gz"
   sha256 "6b567521be1c151323f2059c8feec85ded96b6f184ff80535837fea33798b40b"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 2
   head "https://github.com/s3tools/s3cmd.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1d5496ed34e56e70cdb72bb03766a9b677601f9563027616c57b2990726836e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bb3b4a5a5f8936b6ccebd3f433bdadabf1bcf5545e5df8b087d6846d270b5734"
   end
 
   depends_on "libmagic" => :no_linkage # for python-magic
