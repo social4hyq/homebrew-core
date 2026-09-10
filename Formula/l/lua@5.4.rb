@@ -4,6 +4,7 @@ class LuaAT54 < Formula
   url "https://www.lua.org/ftp/lua-5.4.9.tar.gz"
   sha256 "2335b6c582a52654f94612bf10d2f4672805d05329aa6568b1d8cd9e5c6fb8e6"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   # Check for new releases until https://www.lua.org/versions.html#5.4
@@ -14,7 +15,7 @@ class LuaAT54 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8af0fa5b021124c56bf1cf6cf9b740293bc5f6d60d8d9145dc19c203ccbb971"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "988fb821d78f82710df64c5015a3bb820995af0219b0f7f54be3ff1855357a4f"
   end
 
   keg_only :versioned_formula
