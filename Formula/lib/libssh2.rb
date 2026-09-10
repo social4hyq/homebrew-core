@@ -15,7 +15,7 @@ class Libssh2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "632034ac7f62f8f909ffa9233a4fb83583e38314a9f14ca9506373a6e0474847"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f69baaa3fc44907342f0265b26625d0d156aeda8d3affcc68d017b194754816d"
   end
 
   head do
