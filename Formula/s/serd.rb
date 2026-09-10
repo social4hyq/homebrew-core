@@ -4,6 +4,7 @@ class Serd < Formula
   url "https://download.drobilla.net/serd-0.32.10.tar.xz"
   sha256 "b0e93b49e52f01a049475b7886ef140407115a32d3b1e5dc5f95141c88275d1c"
   license "ISC"
+  revision 1
   compatibility_version 1
 
   livecheck do
