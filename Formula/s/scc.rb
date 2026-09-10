@@ -4,6 +4,7 @@ class Scc < Formula
   url "https://github.com/boyter/scc/archive/refs/tags/v4.1.0.tar.gz"
   sha256 "4f3cf36010c542b10d5582afb91c668b26889160b184deee21b4319347030a7c"
   license any_of: ["MIT", "Unlicense"]
+  revision 1
 
   livecheck do
     url :homepage
@@ -11,7 +12,7 @@ class Scc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f2a51ff9c829e1a2a3478f63d204a864ccb4201e4db8667b6425ddecc04305b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4fb52101d35e21643149b0cdcc636826dbc04086600c2f53122f7745057d5a19"
   end
 
   depends_on "go" => :build
