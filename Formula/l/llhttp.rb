@@ -4,6 +4,7 @@ class Llhttp < Formula
   url "https://github.com/nodejs/llhttp/archive/refs/tags/release/v9.4.3.tar.gz"
   sha256 "1eb813c7437b31a87496a1cd3ed79f00746720f5e7e29c79b42c02cb69f36c39"
   license "MIT"
+  revision 1
   compatibility_version 2
 
   bottle do
