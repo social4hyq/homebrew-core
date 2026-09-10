@@ -12,7 +12,7 @@ class Minizip < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b854a533547e4f0bff45a981cca4aafff1221df944196456ca7ddb1083ff9f47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d11c8265289cf2ac1eaa1a226f6e367cbb1ea7ca7a17542f0bbe184e3340d33"
   end
 
   depends_on "autoconf" => :build
