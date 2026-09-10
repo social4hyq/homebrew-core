@@ -8,6 +8,7 @@ class PortableOpenssl < PortableFormula
   mirror "http://fresh-center.net/linux/misc/openssl-3.6.4.tar.gz"
   sha256 "9bffaa1ad1e07b354c21bd3324ec02fa15579f45a7d0494b3e74bc449b7333ef"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://openssl-library.org/source/"
@@ -15,7 +16,7 @@ class PortableOpenssl < PortableFormula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbe55955c0b5d8269b959b289ebf00e41d1bfe4955b0c65454d6a1866d1ac8df"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a93a162e913d55781f53565c38b1f58f29a811514abb506c7dcd7b2495762854"
   end
 
   resource "cacert" do
