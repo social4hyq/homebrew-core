@@ -8,7 +8,7 @@ class ProtobufC < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fdf94f73fb4ba8d4466ce66c4bbb06b438a7272c372eb282d29a8369ec2b5ca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "37cc8a54e4965fed677a91c936e059a222c8ebed90797d05a8e83248b069fa9e"
   end
 
   head do
