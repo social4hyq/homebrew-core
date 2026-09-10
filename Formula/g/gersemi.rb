@@ -9,7 +9,7 @@ class Gersemi < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e5a239fe89815f05aa5301ab4b57167dbd0c40f0d106822da687c32be1dbaeb1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "98294d88413ad19b01225bf2294f9694e0f9705c63d57b1e002523fec78590a3"
   end
 
   depends_on "rust" => :build
