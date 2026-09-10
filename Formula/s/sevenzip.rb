@@ -5,6 +5,7 @@ class Sevenzip < Formula
   version "26.01"
   sha256 "b2389e0e930b2f9a348cf0fe7d9870a46482a8ec044ee0bdf42e2136db31c3d6"
   license all_of: ["LGPL-2.1-or-later", "BSD-3-Clause"]
+  revision 1
   compatibility_version 1
   head "https://github.com/ip7z/7zip.git", branch: "main"
 
@@ -16,7 +17,7 @@ class Sevenzip < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa4905c755214a1e8e0e7e491d733695ae6748e8efe7b3c0ab6dab8c2be87aa0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f701b94e2bb4d1dc71e11d8e6e1c929c04fe0242caf3c6882a476cb555e3495a"
   end
 
   def install
