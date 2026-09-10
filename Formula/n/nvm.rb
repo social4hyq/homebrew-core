@@ -14,7 +14,7 @@ class Nvm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b22bc1ecfda1ca10deadbfd75fb56610b3ae2ae287f096022e0aede91a3b481"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "043a8cecca0e5a45d1feb00afc5a8d4460a327dcba2ce9bb415a91a23e798c3d"
   end
 
   def install
