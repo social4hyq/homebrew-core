@@ -12,7 +12,7 @@ class Cscope < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d58493f6a580adca38e14d56081b5180ac600d3d5604802f5496368b583fef6f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8744ba7d93128b00231b6b74e2bad2aa66a04e9ecd651700d7d5f72ace7f55d"
   end
 
   uses_from_macos "ncurses"
