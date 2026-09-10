@@ -4,6 +4,7 @@ class Openh264 < Formula
   url "https://github.com/cisco/openh264/archive/refs/tags/v2.6.0.tar.gz"
   sha256 "558544ad358283a7ab2930d69a9ceddf913f4a51ee9bf1bfb9e377322af81a69"
   license "BSD-2-Clause"
+  revision 1
   head "https://github.com/cisco/openh264.git", branch: "master"
 
   # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
