@@ -2,7 +2,7 @@ class Ponysay < Formula
   desc "Cowsay but with ponies"
   homepage "https://github.com/erkin/ponysay/"
   license "GPL-3.0-or-later"
-  revision 7
+  revision 8
   head "https://github.com/erkin/ponysay.git", branch: "master"
 
   stable do
@@ -17,7 +17,7 @@ class Ponysay < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aff7e651d4c8fdc0c8a91f7dbf22e70bfedb103dbab6dd153b90ca70d7a6024f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e53fa80de64abed920520118d11391192e4ba4577065bdec5a287fc2bb2a3b4"
   end
 
   depends_on "gzip" => :build
