@@ -4,6 +4,7 @@ class Dolt < Formula
   url "https://github.com/dolthub/dolt/archive/refs/tags/v2.3.3.tar.gz"
   sha256 "25977946bd39aaa94c63c3c7f081905994273da4d506036744caaea9d531183f"
   license "Apache-2.0"
+  revision 1
   version_scheme 1
   head "https://github.com/dolthub/dolt.git", branch: "main"
 
@@ -13,7 +14,7 @@ class Dolt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "32ec36e21f4bfee6ff2f9ec890f9de6b2b3b1447fbb564c30f90fd2cd7061861"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cc219eb4d6cf17047f826643ea4438dc0edeedcd346fdd961ab788d3863ef42"
   end
 
   depends_on "go" => :build
