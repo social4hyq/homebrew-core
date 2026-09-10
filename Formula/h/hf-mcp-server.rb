@@ -4,6 +4,7 @@ class HfMcpServer < Formula
   url "https://registry.npmjs.org/@llmindset/hf-mcp-server/-/hf-mcp-server-0.4.16.tgz"
   sha256 "0166059fcd06b788901c70c031294867273c34fd1d8f31d819824192c936f0d9"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "f476bfbed515f82c200ee52df1abbbc164cc29cb0d8dfd3460426e8ac7756695"
