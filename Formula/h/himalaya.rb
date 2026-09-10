@@ -4,6 +4,7 @@ class Himalaya < Formula
   url "https://github.com/pimalaya/himalaya/archive/refs/tags/v2.1.0.tar.gz"
   sha256 "491c7e51aa58874e2b70b4a0377e1770a1d3522392b9a9b867f965ac9d75aaa5"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "d97cd3d8f1fc53f366a8e5c8c379e835992f1dbac780470bf6c5836c63470315"
