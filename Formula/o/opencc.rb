@@ -4,11 +4,12 @@ class Opencc < Formula
   url "https://github.com/BYVoid/OpenCC/archive/refs/tags/ver.1.4.2.tar.gz"
   sha256 "8e5f5cf7fe195bd9b9be851adc9738c1ef7dc5c24441dd5878a56db4087a9a70"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
   head "https://github.com/BYVoid/OpenCC.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e41b8eecf2982f2989c128b2a6ab1609d4e2009c0b54220626e9a4c2bd12a892"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65e72626ac36751138e7b88bfa9d47659602744a342455f855bd1f6757fdb9f7"
   end
 
   depends_on "cmake" => :build
