@@ -4,6 +4,7 @@ class Panache < Formula
   url "https://github.com/jolars/panache/archive/refs/tags/v3.9.0.tar.gz"
   sha256 "e942f8e1405c7f09f1311d04095717c3bf0842e6f407208e631f19f6b79b9a0c"
   license "MIT"
+  revision 1
   head "https://github.com/jolars/panache.git", branch: "main"
 
   bottle do
