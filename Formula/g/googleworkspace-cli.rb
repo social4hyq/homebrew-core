@@ -8,7 +8,7 @@ class GoogleworkspaceCli < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "256bb4347287ce26e712cfa3a2b5c9a9c24fc037d482d366fdd4ebdfc637cb47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "31bce84c1f67d04485fe95349d3dcce09962d3344156584bf83cc8c633c2fd9b"
   end
 
   depends_on "rust" => :build
