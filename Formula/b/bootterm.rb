@@ -4,6 +4,7 @@ class Bootterm < Formula
   url "https://github.com/wtarreau/bootterm/archive/refs/tags/v0.5.tar.gz"
   sha256 "95cc154236655082fb60e8cdae15823e4624e108b8aead59498ac8f2263295ad"
   license "MIT"
+  revision 1
   head "https://github.com/wtarreau/bootterm.git", branch: "master"
 
   bottle do
