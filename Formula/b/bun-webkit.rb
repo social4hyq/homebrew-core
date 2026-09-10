@@ -5,7 +5,7 @@ class BunWebkit < Formula
       revision: "2e2aa2290fac856d6f451ceacb58f7f5b44dd057"
   version "2e2aa2290f"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
-  revision 1
+  revision 2
   # Fully rewritten from upstream: builds only JSC/WTF/bmalloc static archives, pinned to bun's WEBKIT_VERSION.
 
   # Pinned to bun's WEBKIT_VERSION; OHOS adaptation handled bun-side (webkit.ts.patch).
@@ -60,31 +60,34 @@ class BunWebkit < Formula
     clangxx  = formula_opt_bin("llvm@21")/"clang++"
     sysroot  = "#{formula_opt_prefix("ohos-sdk")}/native/sysroot"
 
-    # OHOS cross-compilation flags (align with cfg.ohos branch in bun-src/scripts/build/deps/webkit.ts).
-    target_flag = "--target=aarch64-linux-ohos"
-    sysroot_flag = "--sysroot=#{sysroot}"
+    # This tap's llvm@21 bakes DEFAULT_SYSROOT (this same ohos-sdk path) and
+    # LLVM_DEFAULT_TARGET_TRIPLE=aarch64-unknown-linux-ohos into the driver,
+    # so bare clang/clang++ are already OHOS cross-compilers — no
+    # --target=/--sysroot= needed (see llvm@21.rb install()/test do). `sysroot`
+    # is kept only for CMAKE_FIND_ROOT_PATH below, a CMake-side concern
+    # unrelated to the compiler's own default target/sysroot.
     icu_include = "-I#{formula_opt_include("icu4c@78")}"
 
     cxxflags = [
-      target_flag, sysroot_flag, "-D__MUSL__",
+      "-D__MUSL__",
       "-mbranch-protection=none", "-mno-outline-atomics",
       # The flat host include dir, not include/aarch64-linux-ohos/c++/v1:
       # llvm@21 only ships the __has_include_next-chaining C-library
       # wrapper headers (ctype.h, string.h, ...) in the host copy — the
       # target-triple copy has them stripped (they'd otherwise shadow the
-      # real musl headers when the driver auto-inserts both directories
-      # for host/--target= compiles that don't pass -nostdinc++). With
-      # -nostdinc++ and a single -I, there's no fallback directory for
-      # this build's own libc++ wrappers (<cstring>, <cerrno>, ...) to
-      # chain to, so they need to be pointed at the complete host copy —
-      # host and target headers are otherwise byte-identical (same libc,
-      # same ABI, only the triple string differs).
+      # real musl headers when the driver auto-inserts both directories,
+      # which it does for any OHOS-triple compile, default or --target=,
+      # that doesn't pass -nostdinc++). With -nostdinc++ and a single -I,
+      # there's no fallback directory for this build's own libc++ wrappers
+      # (<cstring>, <cerrno>, ...) to chain to, so they need to be pointed
+      # at the complete host copy — host and target headers are otherwise
+      # byte-identical (same libc, same ABI, only the triple string differs).
       "-nostdinc++ -I#{formula_opt_include("llvm@21")}/c++/v1",
       icu_include, "-fno-c++-static-destructors", "-std=gnu++23"
     ].join(" ")
 
     cflags = [
-      target_flag, sysroot_flag, "-D__MUSL__",
+      "-D__MUSL__",
       "-mbranch-protection=none", "-mno-outline-atomics", icu_include
     ].join(" ")
 
