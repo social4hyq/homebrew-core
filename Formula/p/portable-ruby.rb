@@ -6,7 +6,7 @@ class PortableRuby < PortableFormula
   url "https://cache.ruby-lang.org/pub/ruby/4.0/ruby-4.0.6.tar.gz"
   sha256 "837d299e8f7ddf2be31a229a7a7e019d354979825117989acb3b32b1a9be262a"
   license "Ruby"
-  revision 1
+  revision 2
 
   # This regex restricts matching to versions other than X.Y.0.
   livecheck do
@@ -17,7 +17,7 @@ class PortableRuby < PortableFormula
   no_autobump! because: "this is a critical package so an auto bump might break Homebrew usability."
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6b34cb545263baa0e5dc87f87de0aa29243adfc6e1ea6e5d504f83064570fb6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0bf6fedea8a656b10df6d118b9088af07d7f687fa3d0faa54838c67258afe515"
   end
 
   depends_on "autoconf" => :build
