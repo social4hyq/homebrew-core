@@ -4,6 +4,7 @@ class CAres < Formula
   url "https://github.com/c-ares/c-ares/releases/download/v1.34.8/c-ares-1.34.8.tar.gz"
   sha256 "c222b6d681096f9444d2c4863d2c1174019e27cacca0a4a5c114d36dd7d7bf78"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/c-ares/c-ares.git", branch: "main"
 
@@ -13,7 +14,7 @@ class CAres < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "481899f04830a692d266727a4f9ebf2be544537166ceebd8e03c56b582b89bf4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb16182441276abdc6d3ecb7d5250224755fbd32a9420ebefb14669a43ab9c51"
   end
 
   depends_on "cmake" => :build
