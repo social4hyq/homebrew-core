@@ -4,6 +4,7 @@ class Yajl < Formula
   url "https://github.com/lloyd/yajl/archive/refs/tags/2.1.0.tar.gz"
   sha256 "3fb73364a5a30efe615046d07e6db9d09fd2b41c763c5f7d3bfb121cd5c5ac5a"
   license "ISC"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "0ad53a9839abd4f9a625508c4e43b5f3ac7e44ee32eb1073de80f52234036cf7"
