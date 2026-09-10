@@ -12,7 +12,7 @@ class Git < Formula
   ]
   compatibility_version 1
   head "https://github.com/git/git.git", branch: "master"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://mirrors.edge.kernel.org/pub/software/scm/git/"
