@@ -4,6 +4,7 @@ class Atop < Formula
   url "https://github.com/Atoptool/atop/archive/refs/tags/v2.13.0.tar.gz"
   sha256 "5ee38c93afd64767a09a06698a0e90bfc390189a5058d245878a559d476d8572"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/Atoptool/atop.git", branch: "master"
 
   bottle do
