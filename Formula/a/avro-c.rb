@@ -8,8 +8,7 @@ class AvroC < Formula
   revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "69886e813af0a902973ffc9a6ccba93b23bf621f33dc4696bba70960a2a24676"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "910e281163af977cd0caced2454f67de8c631f496505be65980b155bd4007860"
   end
 
   depends_on "cmake" => :build
