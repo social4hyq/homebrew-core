@@ -7,6 +7,7 @@ class Zlib < Formula
   mirror "http://fresh-center.net/linux/misc/legacy/zlib-1.3.2.tar.gz"
   sha256 "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16"
   license "Zlib"
+  revision 1
   head "https://github.com/madler/zlib.git", branch: "develop"
 
   livecheck do
@@ -15,7 +16,7 @@ class Zlib < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "735b4221a04d47e38491b2b5c56c73fb9d6f9a0704a5db9bdadb5f7a35c4f8d3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "54a2a869296ac8572784483351c65ede1876cad5640184f6bb3f87529531fd0e"
   end
 
   keg_only :provided_by_macos
