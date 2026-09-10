@@ -6,10 +6,11 @@ class PythonBuild < Formula
   url "https://files.pythonhosted.org/packages/4d/b7/1db48a9ce2984842c8c886432ec8a2719613322e868a966ba82a28862f25/build-1.6.0.tar.gz"
   sha256 "bd2c8afc603e7a2e0ce70e2ea85f0a6d02043bafbd307f5bada0f98669eca5af"
   license "MIT"
+  revision 1
   head "https://github.com/pypa/build.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bbbeb1b773a186f21ca8f074a9c2388bf817f728a6cf79f6fe9a26ea8ae585d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f53ce06f60196f07639834cb60b8b372a80f8337edddcef7d20ac447bd28ba0"
   end
 
   depends_on "python@3.14"
