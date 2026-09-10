@@ -4,6 +4,7 @@ class Nudoku < Formula
   url "https://github.com/jubalh/nudoku/archive/refs/tags/8.0.1.tar.gz"
   sha256 "4e8a35950b7b7ce1e49f9457a8aceffbd21fb2b34aa8386847a7a158a2cab551"
   license "GPL-3.0-or-later"
+  revision 1
   head "https://github.com/jubalh/nudoku.git", branch: "master"
 
   bottle do
