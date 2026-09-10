@@ -4,6 +4,7 @@ class Libice < Formula
   url "https://www.x.org/archive/individual/lib/libICE-1.1.2.tar.xz"
   sha256 "974e4ed414225eb3c716985df9709f4da8d22a67a2890066bc6dfc89ad298625"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
