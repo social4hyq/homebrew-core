@@ -4,10 +4,11 @@ class AwsCSdkutils < Formula
   url "https://github.com/awslabs/aws-c-sdkutils/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "ddf9d09ba137ad0697afe1c09f5d778d6b2f1aadb277dffd231ff615ae34bc82"
   license "Apache-2.0"
+  revision 1
   compatibility_version 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "26659e79105d79165f8778ba9b047e2027a32e7f307c8c2c57f448ab83ead63d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "84f80cd3e4989044d80f803f00f85fd24dded737a6885ef481f4f389d639b916"
   end
 
   depends_on "cmake" => :build
