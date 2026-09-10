@@ -4,6 +4,7 @@ class Rbenv < Formula
   url "https://github.com/rbenv/rbenv/archive/refs/tags/v1.3.2.tar.gz"
   sha256 "e2104f6472d7a8477409c46d4de39562b4d01899148a3dbed73c1d99a0b4bb2a"
   license "MIT"
+  revision 1
   head "https://github.com/rbenv/rbenv.git", branch: "master"
 
   bottle do
