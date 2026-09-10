@@ -2,7 +2,7 @@ class Ruby < Formula
   desc "Powerful, clean, object-oriented scripting language"
   homepage "https://www.ruby-lang.org/"
   license "Ruby"
-  revision 1
+  revision 2
   compatibility_version 1
 
   stable do
@@ -55,10 +55,6 @@ class Ruby < Formula
     file "Patches/ruby/0001-add-target-os.patch"
   end
 
-  patch do
-    file "Patches/ruby/0002-implement-pthread_cancel-stub.patch"
-  end
-
   # TODO: remove when enabling default_user_install
   link_overwrite "bin/bundle", "bin/bundler"
 
@@ -100,11 +96,18 @@ class Ruby < Formula
       --with-vendordir=#{HOMEBREW_PREFIX}/lib/ruby/vendor_ruby
       --with-opt-dir=#{paths.join(":")}
       --without-gmp
-      --with-coroutine=pthread
-      ac_cv_func_sigaltstack=no
     ]
     args << "--with-baseruby=#{RbConfig.ruby}" if build.head?
     args << "--disable-dtrace" if OS.mac? && !MacOS::CLT.installed?
+
+    # Disable sigaltstack on OHOS (aarch64/musl) to prevent segmentation faults.
+    # Ruby's conservative GC scans the stack. On OHOS musl, malloc-allocated
+    # signal stacks only guarantee 8-byte alignment, whereas AArch64 signal
+    # frames (ucontext_t) require strict 16-byte alignment. This mismatch
+    # causes the GC to misinterpret non-pointer data as valid pointers, leading
+    # to a segmentation fault. Using the main thread stack (typically 8MB)
+    # avoids this alignment issue entirely.
+    args << "ac_cv_func_sigaltstack=no"
 
     # Avoid stdckdint.h on macOS 15 as it's not available in Xcode 16.0-16.2,
     # and if the build system picks it up it'll use it for runtime builds too.
