@@ -4,6 +4,7 @@ class Oxfmt < Formula
   url "https://registry.npmjs.org/oxfmt/-/oxfmt-0.67.0.tgz"
   sha256 "70d9fd9edf644a23f513a673e73a8ebe6e828e13adfaa1fc78b86fe13382ef1d"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "16b169ac48d11e860f9b398be7ef026e3760dba0eaf488af7ba806fb52edd4ef"
