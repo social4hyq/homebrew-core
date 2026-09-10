@@ -4,6 +4,7 @@ class Pscale < Formula
   url "https://github.com/planetscale/cli/archive/refs/tags/v0.330.0.tar.gz"
   sha256 "cc80ada8f549ec72a95073ab5b6e1286ff67889a6fc1aa581070cb070c7d17ee"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/planetscale/cli.git", branch: "main"
 
   bottle do
