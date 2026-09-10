@@ -16,7 +16,7 @@ class Yazi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e73537c2c9b3e7cd05bda260ab00894469856bee11bc823a33d3677be4849ca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "13ca293e94c27b68cbcc0c09d36ef28f7bc4d296cd46908a33d3d93aec3a598b"
   end
 
   depends_on "rust" => :build
