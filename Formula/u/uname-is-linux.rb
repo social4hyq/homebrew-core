@@ -7,7 +7,7 @@ class UnameIsLinux < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4be05bee0fafd83372348487f3a0f4bb9ecb4945d2772572949fb034757c6c6b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3080b6048c66e5a00933ebddb91cd09661cc43860fbc50de223269166ce87459"
   end
 
   keg_only "it is a library for explicit LD_PRELOAD injection and should not be linked globally"
