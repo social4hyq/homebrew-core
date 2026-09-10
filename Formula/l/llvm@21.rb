@@ -13,8 +13,8 @@ class LlvmAT21 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f06ff3edbd81734a5c637a4ab253651ed631d9495724bcbca1f319d4f71b7fe"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "58f5040d10c626879beed5246f2b0b70870cb7686f2a8b178087d412b5486d3e"
   end
 
   keg_only :versioned_formula
@@ -33,6 +33,8 @@ class LlvmAT21 < Formula
     depends_on "ohos-sdk@26.0.0.18" # sysroot + libcxx-ohos headers; see DEFAULT_SYSROOT below
     depends_on "zlib-ng-compat"
   end
+
+  conflicts_with "ohos-sdk", because: "both install `clang` binaries"
 
   # Fix triple config loading for clang-cl
   patch do
