@@ -8,7 +8,7 @@ class LmSensors < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a5b58e1ef4b22b676b21fbe68b1757b0ef25ebe79a75ddd69f7a49693ad4c1c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "12d9fadbed94baab4ac5b964aeae9997914bcb0da146d002f7000cb881432379"
   end
 
   depends_on "bison" => :build
