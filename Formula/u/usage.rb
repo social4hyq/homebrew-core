@@ -4,11 +4,12 @@ class Usage < Formula
   url "https://github.com/jdx/usage/archive/refs/tags/v6.8.0.tar.gz"
   sha256 "032842fa48ccfcd0c2ca854105c25184cf3ed17250f596f21c4448b0148100de"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/jdx/usage.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a66e05b043398703f0e028894dc308a44154504aaf5ece338f1e6e687e8032f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1dd549f47cba96838043ee80f88612c07606e27b9e38dd509aa5cce463bf1640"
   end
 
   depends_on "rust" => :build
