@@ -9,6 +9,7 @@ class Gettext < Formula
     "GPL-3.0-or-later",
     "LGPL-2.1-or-later", # libintl, libasprintf
   ]
+  revision 1
   compatibility_version 1
 
   bottle do
