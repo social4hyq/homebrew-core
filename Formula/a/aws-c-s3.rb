@@ -4,6 +4,7 @@ class AwsCS3 < Formula
   url "https://github.com/awslabs/aws-c-s3/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "3b76d8ff35201a892a5e9a9c523d1f4d05381b3132d4e60728c634efae142f12"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   bottle do
