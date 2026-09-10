@@ -4,10 +4,11 @@ class Fpp < Formula
   url "https://github.com/facebook/PathPicker/archive/refs/tags/0.9.5.tar.gz"
   sha256 "b0142676ed791085d619d9b3d28d28cab989ffc3b260016766841c70c97c2a52"
   license "MIT"
+  revision 1
   head "https://github.com/facebook/pathpicker.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "be11f277186a7753cd834e34b9a1b28e9bbc054527c6abc2b72f836bdee925cb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b228e41c635a1f42d84124a9a2b12036c117082fe305e8e569b0c77a8974625"
   end
 
   uses_from_macos "python"
