@@ -9,7 +9,7 @@ class Grep < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5666520c89915aa871ed1d6b969e3a0dab8429c9fd1ae891c1e008b4b0e42f47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "910887514a719318c23bebfddb3f2e497d94f627f51b789fbdea0ad69fe4928e"
   end
 
   head do
