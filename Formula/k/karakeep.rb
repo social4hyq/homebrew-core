@@ -4,6 +4,7 @@ class Karakeep < Formula
   url "https://registry.npmjs.org/@karakeep/cli/-/cli-0.33.2.tgz"
   sha256 "ec8981153d3348f5b5553141494b37f5d967ba207eafb050affaa6b15d0d0e5c"
   license "AGPL-3.0-only"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "70e652ac20049744d71dbb873fbf9fe4f87ed3c947aa5f69ccbe12b665afa7cb"
