@@ -4,10 +4,11 @@ class Meson < Formula
   url "https://github.com/mesonbuild/meson/releases/download/1.12.0/meson-1.12.0.tar.gz"
   sha256 "88afe0c20e52030218924ac37d0c81c59b4b5f3ae3752c8c6d7470c7d365886c"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/mesonbuild/meson.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2867d55d4e816094ccb3875abb97522915387506fd0e76980f5e99b3a4c2a364"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b823ac687bd23451042ebc0ff255ad306c50f81bfd9246f2c132cfa67845d552"
   end
 
   depends_on "ninja"
