@@ -10,7 +10,7 @@ class Libunistring < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c11893cfab68ca1f00c141fe75a61ca81265c7f3ce8971a0998843ec70797326"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9e62460f3669f03281a397ac9484a559d952728b583fc52c2aa8a3851d56d65"
   end
 
   def install
