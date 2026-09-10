@@ -15,7 +15,7 @@ class Mercurial < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3bc88933209f4a20d5b52fd7f08d86b5b25c14f0ee254ed666a16f0abcf025c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "35d165ebc4b1f9c09fdb42cc251a38037560cccae05bdc617a09e76170563a35"
   end
 
   depends_on "python@3.14"
