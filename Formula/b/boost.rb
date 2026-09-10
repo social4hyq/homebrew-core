@@ -17,7 +17,7 @@ class Boost < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "31faef7ba4e262539af3d1d6084a94d166d6e5266be0f30d5a746dcab85721d1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab746f6fe6fab670c2cd5a0f59585eda9175661d6205d0cd9f52a2eea1593596"
   end
 
   depends_on "icu4c@78"
