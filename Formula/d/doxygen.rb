@@ -5,6 +5,7 @@ class Doxygen < Formula
   mirror "https://downloads.sourceforge.net/project/doxygen/rel-1.18.0/doxygen-1.18.0.src.tar.gz"
   sha256 "a1deed70a6785bbec95a2b2a9e419dc7f7b223a9d74a8644ae611c8e2dcdd354"
   license "GPL-2.0-only"
+  revision 1
   compatibility_version 1
   head "https://github.com/doxygen/doxygen.git", branch: "master"
 
