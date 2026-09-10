@@ -4,6 +4,7 @@ class DockerAgent < Formula
   url "https://github.com/docker/docker-agent/archive/refs/tags/v1.137.0.tar.gz"
   sha256 "f7d697fa7950640d2efa533c508087f3073cd0cdb5b3a30cf7054d68cde97d77"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/docker/docker-agent.git", branch: "main"
 
   bottle do
