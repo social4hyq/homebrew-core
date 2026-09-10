@@ -4,6 +4,7 @@ class Libnxml < Formula
   url "https://github.com/bakulf/libnxml/archive/refs/tags/0.18.5.tar.gz"
   sha256 "263d6424db3cd5f17a9f6300594548e82449ed22af59e9e5534646fa0dabd6a7"
   license "LGPL-2.1-or-later"
+  revision 1
   head "https://github.com/bakulf/libnxml.git", branch: "master"
 
   bottle do
