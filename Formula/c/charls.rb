@@ -4,6 +4,7 @@ class Charls < Formula
   url "https://github.com/team-charls/charls/archive/refs/tags/2.4.4.tar.gz"
   sha256 "fbd712903d61306ad00d5fa5029a9882630c7311ca487f48d2d76000956e8ff9"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/team-charls/charls.git", branch: "main"
 
   bottle do
