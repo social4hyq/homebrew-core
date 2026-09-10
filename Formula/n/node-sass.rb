@@ -4,6 +4,7 @@ class NodeSass < Formula
   url "https://registry.npmjs.org/sass/-/sass-1.104.0.tgz"
   sha256 "38d27c532071b573b75498ca7ef61738d769f40a8ad6f8564cca28334473bba7"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "729f03dfc052a8d896a94ad27a62918060b3bcde89d3e7faf0f522dc0042a93d"
