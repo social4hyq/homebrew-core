@@ -4,10 +4,11 @@ class Graphite2 < Formula
   url "https://github.com/silnrsi/graphite/releases/download/1.3.15/graphite2-1.3.15.tgz"
   sha256 "c6bc8b4252724665297f7cad0c55897285c673f9b8e6db3522ace833593fe0b1"
   license any_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later", "MPL-1.1+"]
+  revision 1
   head "https://github.com/silnrsi/graphite.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2628854f64cd2edc5339a567bbbccbf138b56c1199e1fbda2e1e36941b19818"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65d295f75be25cc31db67e9201d09cfa9f13d4882da2c8331eddee39ab680791"
   end
 
   depends_on "cmake" => :build
