@@ -5,6 +5,7 @@ class Packetbeat < Formula
       tag:      "v9.5.3",
       revision: "05460763bc6067b3a4708bc80219092eba134988"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/elastic/beats.git", branch: "main"
 
   bottle do
