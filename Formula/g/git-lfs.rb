@@ -4,6 +4,7 @@ class GitLfs < Formula
   url "https://github.com/git-lfs/git-lfs/releases/download/v3.8.0/git-lfs-v3.8.0.tar.gz"
   sha256 "4f75492c6832038fa73d39a45316657208bb6caa23b273451cb4ec2358d42ccb"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   # Upstream creates releases that are sometimes not the latest stable version,
@@ -14,7 +15,7 @@ class GitLfs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "29f0d0d49bb95ed9fc2d019ecdf602623dcf7b8eb105f91a2d705c6ab412a312"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "907c502579ab99f259b5fca812db510e286f30eeeeac65b4f4cf1430959df4ce"
   end
 
   depends_on "asciidoctor" => :build
