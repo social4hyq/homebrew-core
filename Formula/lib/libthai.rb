@@ -13,7 +13,7 @@ class Libthai < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "20d28df8ae4a8f8b9039711709812bcbf0d033e2b18dfc589bf53b1305d34b43"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb776950288f91bd48f42cc7f0016303d9c06eda6484f85138fe0ce02de58d0e"
   end
 
   depends_on "pkgconf" => [:build, :test]
