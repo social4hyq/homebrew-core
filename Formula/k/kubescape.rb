@@ -3,8 +3,8 @@ class Kubescape < Formula
   homepage "https://kubescape.io"
   # Use GitHub repo URL because the version for the build will be automatically fetched from git.
   url "https://github.com/kubescape/kubescape.git",
-      tag:      "v4.0.13",
-      revision: "79734b8bcad5ba4265cd4046a4e42e218adadf8b"
+      tag:      "v4.0.14",
+      revision: "031cd40cc8de696fa30a648001853443019ec97a"
   license "Apache-2.0"
   head "https://github.com/kubescape/kubescape.git", branch: "master"
 
@@ -14,7 +14,7 @@ class Kubescape < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "866224fce1af16b62610b73e7efb41e1ba468f2c9861679da48088392772a91a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29ab6002c1b8edbb9ffbf3fe7bb02d186cb9ba683cc80ff2873def6403fce907"
   end
 
   depends_on "go" => :build
