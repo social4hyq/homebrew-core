@@ -6,7 +6,7 @@ class Jello < Formula
   url "https://files.pythonhosted.org/packages/fb/5e/fe41641ce367cb8b57a6514372fffd7aed4a8c916cd7dc0bb7e9ae8f6ae2/jello-1.6.1.tar.gz"
   sha256 "eee1d43f2d9bb3b3b8c857b713e56191badb9a03a2274defaad1e727fad35521"
   license "MIT"
-  revision 1
+  revision 2
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "b0081ad3fa7d72f5b447377c359c6d50a4aa2eb4d73e9b54e4d5bd8e4c787bdb"
