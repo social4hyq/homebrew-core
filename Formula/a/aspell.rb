@@ -9,7 +9,7 @@ class Aspell < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9c9343c8d0955ca145babd7adb16b16076752e39d4068236e501814436042f8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca4e82ff0ff63ce7657ab79dba67ad2bb7c9a7aa3494956e96f5ed206a2c1df4"
   end
 
   uses_from_macos "ncurses"
