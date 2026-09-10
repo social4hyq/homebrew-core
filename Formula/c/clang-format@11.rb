@@ -7,7 +7,7 @@ class ClangFormatAT11 < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0752fdc865b3c1e3d92c0c1af7af1b47b9cf76565e2ea4cfc382b2743a6e0693"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c6619c8dbd7d9cf7b2ca2664a988f201879fd1751e2d738239d697fdf989c2f"
   end
 
   deprecate! date: "2026-02-18", because: :unmaintained, replacement_formula: "clang-format"
