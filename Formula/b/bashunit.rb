@@ -7,7 +7,7 @@ class Bashunit < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e05879f534b492269455891299a88ca1ca1c0695be23aef1002f5b41d0947cb3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "13a706c4c0db53a0e0ebc3a87fedc170aab74f343a68fa0ab9ccb1279d5aaf8c"
   end
 
   def install
