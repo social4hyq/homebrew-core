@@ -4,6 +4,7 @@ class Bottom < Formula
   url "https://github.com/ClementTsang/bottom/archive/refs/tags/0.14.9.tar.gz"
   sha256 "1dbb940c763fb583b7e1c7dfa165b73ed9a0ba712e72cc97311c5b1c098d5b72"
   license "MIT"
+  revision 1
   head "https://github.com/ClementTsang/bottom.git", branch: "main"
 
   # There can be a notable gap between when a version is tagged and a
