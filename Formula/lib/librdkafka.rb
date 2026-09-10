@@ -4,6 +4,7 @@ class Librdkafka < Formula
   url "https://github.com/confluentinc/librdkafka/archive/refs/tags/v2.15.1.tar.gz"
   sha256 "23c8575c7d1ced07246cb9cf200c11325b72201fd4134a02414ca869fbdd8ed3"
   license "BSD-2-Clause"
+  revision 1
   compatibility_version 1
   head "https://github.com/confluentinc/librdkafka.git", branch: "master"
 
