@@ -4,19 +4,20 @@ class Opentofu < Formula
   url "https://github.com/opentofu/opentofu/archive/refs/tags/v1.12.6.tar.gz"
   sha256 "d6b49908a66ad277d7de33e9a218ae11b956cd094e39c82300b9b75cac2479ba"
   license "MPL-2.0"
+  revision 1
   head "https://github.com/opentofu/opentofu.git", branch: "main"
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "75000dbeef2a2d09548714a67b3967cd4c14fee02832ae06f16666d76f9b4957"
   end
 
-  depends_on "go" => :build
+  depends_on "go@1.26" => :build
 
   conflicts_with "tenv", "tofuenv", because: "both install tofu binary"
 
   def install
     ENV["CGO_ENABLED"] = OS.mac? ? "1" : "0"
-    ldflags = "-s -w -X github.com/opentofu/opentofu/version.dev=no"
+    ldflags = "-X github.com/opentofu/opentofu/version.dev=no"
     system "go", "build", *std_go_args(output: bin/"tofu", ldflags:), "./cmd/tofu"
   end
 
