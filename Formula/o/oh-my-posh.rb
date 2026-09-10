@@ -4,6 +4,7 @@ class OhMyPosh < Formula
   url "https://github.com/JanDeDobbeleer/oh-my-posh/archive/refs/tags/v31.2.1.tar.gz"
   sha256 "19d8d17995d01291c3bc922074cea973659b0899b5e4d6bf1e3dabe6691bcf4e"
   license "MIT"
+  revision 1
   head "https://github.com/JanDeDobbeleer/oh-my-posh.git", branch: "main"
 
   # There can be a notable gap between when a version is tagged and a
