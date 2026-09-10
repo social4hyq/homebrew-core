@@ -4,6 +4,7 @@ class Libxdamage < Formula
   url "https://www.x.org/archive/individual/lib/libXdamage-1.1.7.tar.xz"
   sha256 "127067f521d3ee467b97bcb145aeba1078e2454d448e8748eb984d5b397bde24"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "b44d4c698e645a940ab6ca7f3efaa222db245550f7346343d7ab3ac21987cf55"
