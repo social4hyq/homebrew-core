@@ -4,6 +4,7 @@ class Lame < Formula
   url "https://downloads.sourceforge.net/project/lame/lame/4.0/lame-4.0.tar.gz"
   sha256 "3df5124d5ad3a98312ffd7ba6a9b36230e4f8a3e66d3ce0f425e336c32d216eb"
   license "LGPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Lame < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ff81a2e367d9a2c21ea8347d0ec2b6d09ad517a38858c7ee2e69cb5f3772a09"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee2ea79b2c1e0578a5ffe9a2d9520c3b8f79fdd4636ddf31e16467ce4807ea7a"
   end
 
   depends_on "pkgconf" => :build
