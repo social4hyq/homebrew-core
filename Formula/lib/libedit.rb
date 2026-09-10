@@ -14,7 +14,7 @@ class Libedit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd9baff55438cc8272dacd073cf6733fda72480367d06ee3720f1e017662c503"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e09b52dbfa6cddc2a7de8b6fda0a7dfdb3960be3fb38d5bd653258e988b73832"
   end
 
   keg_only :provided_by_macos
