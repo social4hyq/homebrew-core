@@ -4,6 +4,7 @@ class Yq < Formula
   url "https://github.com/mikefarah/yq/archive/refs/tags/v4.53.6.tar.gz"
   sha256 "132a28a669526f99dba52486ac80de3bdafdf9a1a52a0c6bd6045301aca0cd25"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/mikefarah/yq.git", branch: "master"
 
