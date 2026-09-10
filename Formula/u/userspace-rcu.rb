@@ -4,6 +4,7 @@ class UserspaceRcu < Formula
   url "https://lttng.org/files/urcu/userspace-rcu-0.15.6.tar.bz2"
   sha256 "850b192096eb11ebf2c70e8f97bc7da7479ee41da1bebeb44e3986908bac414f"
   license all_of: ["LGPL-2.1-or-later", "MIT"]
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class UserspaceRcu < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c8207e9292cd218d3e52bcf31fc4dfd64e446393fe1015675d98369f9b9bb52"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3713ed44aa6ccf8010af73a073c835e3b2d89485f146fa8c0887014d47921c4b"
   end
 
   def install
