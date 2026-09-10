@@ -8,7 +8,7 @@ class Libfixposix < Formula
   head "https://github.com/sionescu/libfixposix.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d25a92f0cd6dc1171530a2f49663a761568cf8c8f90501a596a3054bdbaf3ab2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "48f040e39e77c4f79a650a0141a334fcb2600908490b35979e3591f9414ce4a4"
   end
 
   depends_on "autoconf" => :build
