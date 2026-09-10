@@ -12,6 +12,7 @@ class Libidn2 < Formula
     "LGPL-2.1-or-later", # parts of gnulib
     "FSFAP-no-warranty-disclaimer", # man3
   ]
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -20,7 +21,7 @@ class Libidn2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d4026f080c4f0db693cf34c11631cd799d03284c25d7131100604a99d9b9fdc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf5f5668d4210ebc12e1d035cac16e9cad15d20e47ba671bac1f91ff2460326d"
   end
 
   head do
