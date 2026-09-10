@@ -8,7 +8,7 @@ class Mitie < Formula
   head "https://github.com/mit-nlp/MITIE.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c2f051020dd92e8a915d5fed2b5e0682cb338b80cbc2fc4b549369365f507511"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba7143d24c6e8f905ad1899525d69dec52117e5df146715cbe97379947fad7fb"
   end
 
   depends_on "python@3.14"
