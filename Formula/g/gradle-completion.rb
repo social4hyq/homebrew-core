@@ -4,11 +4,12 @@ class GradleCompletion < Formula
   url "https://github.com/gradle/gradle-completion/archive/refs/tags/v9.7.1.tar.gz"
   sha256 "426036712f162960d5d63fced1d45c190a2fd46dafcc08aa508b5262ce04dcf5"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/gradle/gradle-completion.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cbd05066049871042afa24f9edae8362051c0e60cd7b514f91eca86c528ea357"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b42c33b2186c2e3069fef0cb0c2fb9640ed4f934dfe9109fbbc2725be897ed5"
   end
 
   def install
