@@ -4,6 +4,7 @@ class Asc < Formula
   url "https://github.com/rorkai/App-Store-Connect-CLI/archive/refs/tags/5.1.0.tar.gz"
   sha256 "29509591b2f559d20c449885df7605cebaa4dfd77b8822f4906a939776f5f980"
   license "MIT"
+  revision 1
   head "https://github.com/rorkai/App-Store-Connect-CLI.git", branch: "main"
 
   bottle do
