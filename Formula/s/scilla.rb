@@ -7,7 +7,7 @@ class Scilla < Formula
   head "https://github.com/edoardottt/scilla.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac4afd77dee99e58c4ba38271d4156e92bb0d2341685392db7603960aefa3d1c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b45a9e46a1bfedd8e0767101a464581bad62cf9aa29a2b07175d268225d6fcd0"
   end
 
   depends_on "go" => :build
