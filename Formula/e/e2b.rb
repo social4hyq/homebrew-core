@@ -4,6 +4,7 @@ class E2b < Formula
   url "https://registry.npmjs.org/@e2b/cli/-/cli-2.18.0.tgz"
   sha256 "c93e42f7aad758ab2ef8af8011ecb9fc002610daa17ea177b7c406fd89fd886f"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "c87c54b8095d0e44c4e1a3dc6bb027d5e3286110d32518b46a0d51fa7963b63c"
