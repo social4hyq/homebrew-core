@@ -4,6 +4,7 @@ class AzureDev < Formula
   url "https://github.com/Azure/azure-dev/archive/refs/tags/azure-dev-cli_1.33.0.tar.gz"
   sha256 "3ee85bdfbaaf7bf9646bb46ca6afc901ee2480668469a7fc11288c373b0b968d"
   license "MIT"
+  revision 1
   head "https://github.com/Azure/azure-dev.git", branch: "main"
 
   bottle do
