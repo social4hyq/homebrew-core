@@ -5,10 +5,11 @@ class Libiconv < Formula
   mirror "https://ftp.gnu.org/gnu/libiconv/libiconv-1.19.tar.gz"
   sha256 "88dd96a8c0464eca144fc791ae60cd31cd8ee78321e67397e25fc095c4a19aa6"
   license all_of: ["GPL-3.0-or-later", "LGPL-2.0-or-later"]
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5c63c77023881e2f78931af01c988098c5fe77024c45b6df7b7dce69d478e9c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9722aa6effcd7cfdd31119fc3b35d2dda462be8dd0a3e2d7306830c69611aafa"
   end
 
   keg_only :provided_by_macos
