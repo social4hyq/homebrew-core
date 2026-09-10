@@ -9,7 +9,7 @@ class SphinxDoc < Formula
   revision 4
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abbc218620d94beebd8facdd192cde9d924f41aac661fcd6ce20749b527471f5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d8b03f71b815091ae0638cce11f21c764a7ac9d14c11800e4fffba8a20bacad"
   end
 
   depends_on "certifi"
