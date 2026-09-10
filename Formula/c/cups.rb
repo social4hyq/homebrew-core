@@ -6,6 +6,7 @@ class Cups < Formula
   url "https://github.com/OpenPrinting/cups/releases/download/v2.4.19/cups-2.4.19-source.tar.gz"
   sha256 "820984b12a67f98705785aae2dd1347fe0ac097828001d4583ff64574aed6389"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/OpenPrinting/cups.git", branch: "master"
 
   livecheck do
