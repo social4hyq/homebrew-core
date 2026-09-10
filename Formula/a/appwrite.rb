@@ -7,7 +7,7 @@ class Appwrite < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "70b58d324c89b8a330b9e80a25949b692e10cf7c769175576df7d499e1b721f6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e785417cb4ed1f52a6ce737b9af4cac009cd2aa260244e057f492989d1da5549"
   end
 
   depends_on "go" => :build
