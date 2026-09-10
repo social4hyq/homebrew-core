@@ -9,7 +9,7 @@ class Gixy < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa40be12812e3a033c5ab3ed473f107329a7ff6e706213ac24259e0656bffb76"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "17ff91bc3dd922de65b910735f6c9be342ad72f172936ff06d30dfbcb272db36"
   end
 
   depends_on "python@3.14"
