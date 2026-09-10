@@ -6,10 +6,11 @@ class Ranger < Formula
   url "https://files.pythonhosted.org/packages/b6/57/c53a45928a3d6ac6a4b3d7a5d54af58a74592d4d405973d249268fc85157/ranger_fm-1.9.4.tar.gz"
   sha256 "bee308b636137b9135111fc795a57cdbb95257f2670101042ac3d7747dec32c8"
   license "GPL-3.0-or-later"
+  revision 1
   head "https://github.com/ranger/ranger.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c0a1d8d4cdf1243007c6de96bc8521813290995f2fde53db32deeed0999858a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab367b33a5ddbeff32d107da850f31b5e4e47b28d1c1039040c5ed02937eb13e"
   end
 
   depends_on "python@3.14"
