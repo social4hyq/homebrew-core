@@ -6,11 +6,11 @@ class Woof < Formula
   url "https://github.com/simon-budig/woof/archive/refs/tags/woof-20220202.tar.gz"
   sha256 "cf29214aca196a1778e2f5df1f5cc653da9bee8fc2b19f01439c750c41ae83c1"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 2
   head "https://github.com/simon-budig/woof.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dba22ac52982c33b7c1bac624bc048933fd34f86a9ce0a4f5b0ad2ac72603444"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d043e18c6a033687811edf058adecd6580632f4d828244c480ccaf9f2378a9c"
   end
 
   uses_from_macos "python"
