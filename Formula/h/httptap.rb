@@ -6,6 +6,7 @@ class Httptap < Formula
   url "https://files.pythonhosted.org/packages/ea/8c/50c975c1a20509c54c02843f52267bf6efec1c769514e005502c1b4f90f5/httptap-0.6.1.tar.gz"
   sha256 "17b38b9b5a3adc6ee419809cd01e4ff4e07939fa38dd73253e00a3a639a00402"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "a57dd122a32809a9101c925203f174242dedb577b4b66331f60b91a494556ebd"
