@@ -4,6 +4,7 @@ class Libp11 < Formula
   url "https://github.com/OpenSC/libp11/releases/download/libp11-0.4.21/libp11-0.4.21.tar.gz"
   sha256 "efdb523aef8613d447e6a2d38227d4b389866f4bcf4b503130acd7f759490847"
   license "LGPL-2.1-or-later"
+  revision 1
 
   livecheck do
     url :stable
