@@ -4,6 +4,7 @@ class Libjodycode < Formula
   url "https://ftp.debian.org/debian/pool/main/libj/libjodycode/libjodycode_4.1.2.orig.tar.gz"
   sha256 "a7085da591e0c314eb3442e7b258a6b6944e6978ecb2764ab33f3cb840f47ff4"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "febcc8c423d287f790724944b77a38da0074c46bcb027f547e226191e53cce80"
