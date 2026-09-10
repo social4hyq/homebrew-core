@@ -4,7 +4,7 @@ class Icu4cAT78 < Formula
   url "https://github.com/unicode-org/icu/releases/download/release-78.3/icu4c-78.3-sources.tgz"
   sha256 "3a2e7a47604ba702f345878308e6fefeca612ee895cf4a5f222e7955fabfe0c0"
   license "ICU"
-  revision 1
+  revision 2
   compatibility_version 1
 
   # We allow the livecheck to detect new `icu4c` major versions in order to
