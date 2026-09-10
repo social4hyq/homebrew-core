@@ -6,10 +6,11 @@ class Djlint < Formula
   url "https://files.pythonhosted.org/packages/e3/3e/e949e4ac8f08554035f32e5f99ab5c03ab6d3036e7a066c5b48ab119740a/djlint-1.46.1.tar.gz"
   sha256 "d7979d49c01d3cd352bad723dcf6e532caa5f920eb0d8f8786beba4650fb5427"
   license "GPL-3.0-or-later"
+  revision 1
   head "https://github.com/djlint/djLint.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c39a3d21f345620db862ae828f65492f6d909906b1e5ce78c07fb9558414c519"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "37350819c12beb4c314832124116da6ba1931cf2e0fc8fba05808bb1276b77bc"
   end
 
   depends_on "libyaml"
