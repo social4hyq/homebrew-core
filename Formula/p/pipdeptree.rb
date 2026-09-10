@@ -6,6 +6,7 @@ class Pipdeptree < Formula
   url "https://files.pythonhosted.org/packages/78/39/632ef8751bc0415c198b7a27aef7cc4fbef619a0b502fd491d70695d5587/pipdeptree-4.2.5.tar.gz"
   sha256 "0fafc3201c046e72913abb8a7a2b75cb17c3e15ebdd3ed546adf8fe9a9d4f54e"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "916fd81e39d352a8f7a80b347695aa9a0f0f591a5c4c3b6eefc8bf2fabdb47c2"
