@@ -5,6 +5,7 @@ class Docker < Formula
       tag:      "v29.8.0",
       revision: "88096ef00576baf72a9cb45caa45c0544c40e0a7"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/docker/cli.git", branch: "master"
 
   livecheck do
