@@ -5,7 +5,7 @@ class Nvm < Formula
   sha256 "d2fb84dba9914b02cd69b97df35dfca8695b8f22df6128667034d85b69b52d57"
   license "MIT"
   head "https://github.com/nvm-sh/nvm.git", branch: "master"
-  revision 2
+  revision 3
 
   # Hardcode the platform identifier to ensure this nvm can run
   # on any minimalist system environment (e.g., DockerHarmony).
