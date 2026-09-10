@@ -7,7 +7,7 @@ class Vale < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fcbe90d1609b5958385f8818cad91502a9d138a5c93693ab3bdaae7a8390769d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c9b4a02aadbf6a64042794d2d868917953b2a10705f7112171419b5df3d15af"
   end
 
   depends_on "go" => :build
