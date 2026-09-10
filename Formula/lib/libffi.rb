@@ -4,6 +4,7 @@ class Libffi < Formula
   url "https://github.com/libffi/libffi/releases/download/v3.8.0/libffi-3.8.0.tar.gz"
   sha256 "7da3e2d9a171eb0a038f592ecad3ff2bb2550f3496d87b3b29ad0cf4430c0db4"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Libffi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3da62064fab027772c8c6d3827f1ebe9be1a94486e71a209848f48417ebe5581"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "090c9bd1e069f6456bd7e2187387e0067eea5faa178aed4ce6363d6a94685a53"
   end
 
   head do
