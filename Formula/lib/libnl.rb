@@ -4,6 +4,7 @@ class Libnl < Formula
   url "https://github.com/thom311/libnl/releases/download/libnl3_12_0/libnl-3.12.0.tar.gz"
   sha256 "fc51ca7196f1a3f5fdf6ffd3864b50f4f9c02333be28be4eeca057e103c0dd18"
   license "LGPL-2.1-or-later"
+  revision 1
 
   livecheck do
     url :stable
@@ -14,7 +15,7 @@ class Libnl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d70c519fc9bc291df558f39d21eaf0a9c3aded57b1b0d4f2ca06a992ca0a1a3e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "74b399dd43ed563268b2b776e499e8d02dc6e89b5aec33faefa72d80b2e0fc00"
   end
 
   depends_on "bison" => :build
