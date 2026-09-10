@@ -9,7 +9,7 @@ class Twtxt < Formula
   revision 9
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "19ea976ec1d0549bde075f1c3e6261dfa8fa061ac1fd0fe1b7178b489f056da6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd3eccca284d76b76cbda63b97d184d90bffb519b9e487f95212f4ce50045842"
   end
 
   depends_on "python@3.14"
