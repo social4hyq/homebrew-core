@@ -8,6 +8,7 @@ class PortableOpenssl < PortableFormula
   mirror "http://fresh-center.net/linux/misc/openssl-3.6.4.tar.gz"
   sha256 "9bffaa1ad1e07b354c21bd3324ec02fa15579f45a7d0494b3e74bc449b7333ef"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://openssl-library.org/source/"
