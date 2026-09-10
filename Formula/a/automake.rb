@@ -5,6 +5,7 @@ class Automake < Formula
   mirror "https://ftp.gnu.org/gnu/automake/automake-1.18.1.tar.xz"
   sha256 "168aa363278351b89af56684448f525a5bce5079d0b6842bd910fdd3f1646887"
   license "GPL-2.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
