@@ -4,7 +4,7 @@ class Itstool < Formula
   url "https://files.itstool.org/itstool/itstool-2.0.7.tar.bz2"
   sha256 "6b9a7cd29a12bb95598f5750e8763cee78836a1a207f85b74d8b3275b27e87ca"
   license "GPL-3.0-or-later"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://itstool.org/download.html"
@@ -12,7 +12,7 @@ class Itstool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5de629de0ba8d268a69a3da63f47efa7f0695c5d14e921295e6cf526aa7a3551"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b70c1fc6aa9a7779d4e061f63290dd92cbee83365b741c53117d27627e21ba2"
   end
 
   head do
