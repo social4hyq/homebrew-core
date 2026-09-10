@@ -6,10 +6,11 @@ class Xml2rfc < Formula
   url "https://files.pythonhosted.org/packages/aa/c2/3f2420a11cac97c5e3ee3e04cc752f9018cf7ef97490e925498397a98aa1/xml2rfc-3.34.0.tar.gz"
   sha256 "173ad5cd21f7a2fddb0dbc19649bc8f73716dff5465e4e4fcd5bb21d5208ccf1"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/ietf-tools/xml2rfc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "46a6eefeeaf4d5f2984aa5e0ee2a08439b89d6b7a281f796f7e7a21568511333"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dff307e29cbd79514ed4bfd912660292d081979bdcf0c59fb3c7d8e8a9b33167"
   end
 
   depends_on "certifi" => :no_linkage
