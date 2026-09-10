@@ -5,6 +5,7 @@ class Libogg < Formula
   mirror "https://github.com/xiph/ogg/releases/download/v1.3.6/libogg-1.3.6.tar.gz"
   sha256 "83e6704730683d004d20e21b8f7f55dcb3383cdf84c0daedf30bde175f774638"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://gitlab.xiph.org/xiph/ogg.git", branch: "main"
 
@@ -14,7 +15,7 @@ class Libogg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "75f8144e3adc49d400d52622b8bd83292c0682010b7bae8c79bf02e5ca740ccb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "740a51770552905dcb3011bcef969d1663306c07865714400d4afaf463e1c9a0"
   end
 
   depends_on "cmake" => :build
