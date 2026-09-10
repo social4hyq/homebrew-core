@@ -2,6 +2,7 @@ class ProxychainsNg < Formula
   desc "Hook preloader"
   homepage "https://github.com/rofl0r/proxychains-ng"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/rofl0r/proxychains-ng.git", branch: "master"
 
   stable do
