@@ -4,11 +4,12 @@ class Fzf < Formula
   url "https://github.com/junegunn/fzf/archive/refs/tags/v0.74.3.tar.gz"
   sha256 "5b142217c3068647a7d8faa9c678cffada100b5f11a48609aa79c94ce04b28ef"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/junegunn/fzf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d59a58f1e9a5e1f70dba4faf3604f60b3a31906bd191d460599de210b67d409"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea02117160ee16a84fd9e3f2726c81601deba6af6a9656e4680a1bdcfb4b4d92"
   end
 
   depends_on "go" => :build
