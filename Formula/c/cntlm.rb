@@ -4,6 +4,7 @@ class Cntlm < Formula
   url "https://downloads.sourceforge.net/project/cntlm/cntlm/cntlm%200.92.3/cntlm-0.92.3.tar.bz2"
   sha256 "7b603d6200ab0b26034e9e200fab949cc0a8e5fdd4df2c80b8fc5b1c37e7b930"
   license "GPL-2.0-only"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Cntlm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b146c092f7d0360f6b8b184e9e0e7890648bac625f9ed0b52054ec1688c000c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7059086e9e0072fbdc5e0bdeea1396a98740693b311d61255863a82ceaaed11c"
   end
 
   def install
