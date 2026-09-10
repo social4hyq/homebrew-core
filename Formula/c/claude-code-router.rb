@@ -4,6 +4,7 @@ class ClaudeCodeRouter < Formula
   url "https://registry.npmjs.org/@musistudio/claude-code-router/-/claude-code-router-3.0.22.tgz"
   sha256 "a6de50b2e69a8510159c31f903af495850220b1d61f67b409ef0f3a6e4eb3a48"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "72966acee8593d225abaa9706366d63e9472e7ca9b5024f5040370872142ad65"
