@@ -3,12 +3,12 @@ class Pipdeptree < Formula
 
   desc "CLI to display dependency tree of the installed Python packages"
   homepage "https://github.com/tox-dev/pipdeptree"
-  url "https://files.pythonhosted.org/packages/a1/68/34d47650e9ad35b7f5beb4666c7a0e79fc2589a839116aadc2e4ab16d2bb/pipdeptree-4.2.3.tar.gz"
-  sha256 "f95876e4feddadeaffaeb579990bf94bd6035e7dc87569f5cba2ac6669ea3ebe"
+  url "https://files.pythonhosted.org/packages/78/39/632ef8751bc0415c198b7a27aef7cc4fbef619a0b502fd491d70695d5587/pipdeptree-4.2.5.tar.gz"
+  sha256 "0fafc3201c046e72913abb8a7a2b75cb17c3e15ebdd3ed546adf8fe9a9d4f54e"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd0622710ef91d51719a386318522684f5bc2f7a947a24bc8a2e1212f97a3679"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "916fd81e39d352a8f7a80b347695aa9a0f0f591a5c4c3b6eefc8bf2fabdb47c2"
   end
 
   depends_on "meson" => :build
@@ -30,33 +30,38 @@ class Pipdeptree < Formula
   end
 
   resource "meson-python" do
-    url "https://files.pythonhosted.org/packages/8b/f0/d794d7ed8a843a8a8947768f3b329d1e8601222dc95d930f4a5f9706cd6c/meson_python-0.20.0.tar.gz"
-    sha256 "6d9726ae6cd37e22f210c74b364b30180a68c20442e97ff09f3c566a414af738"
+    url "https://files.pythonhosted.org/packages/52/08/c57125a1d29b719aa4268df29fa41bb3d384d7751046624480bd8a094489/meson_python-0.21.0.tar.gz"
+    sha256 "595c2f40b76692c78274c87b733379d86562583e9ffb975487b9eafada03055b"
+  end
+
+  resource "nab" do
+    url "https://files.pythonhosted.org/packages/c2/8a/32bfa9daa9ba35e27b92c3d2196a0243d44437bd2b080bc929573843c9c3/nab-0.0.17.tar.gz"
+    sha256 "ac6adb24630140e32ad872413284199381f0b9d1ed758e3d98bda6cd42a160e2"
   end
 
   resource "nab-index" do
-    url "https://files.pythonhosted.org/packages/31/37/31463c5c5ddf949934ef965393dde6a923b3f75ed02e122d93862217d1c9/nab_index-0.0.16.tar.gz"
-    sha256 "4d11be68083431cc941fb5bd01d52557e47b0aa2405adee79fad36bc36b30cbd"
+    url "https://files.pythonhosted.org/packages/86/fc/886ecd2b68d2aa51273443c0b6cd4bf1872da57965a105809451515db825/nab_index-0.0.17.tar.gz"
+    sha256 "42fc55638c1f6a075707cd6aaa2fa4e7b04b093e24f29e0eb554db5beb0a7dc9"
   end
 
   resource "nab-markersets" do
-    url "https://files.pythonhosted.org/packages/bb/5b/d4e28f7deb79664930552fe13a2cd6745055b43e8e97d9c897c042349cbf/nab_markersets-0.0.16.tar.gz"
-    sha256 "5d4649567dcf03d565c5fba52afeddcdcf85818f1ce45279766c2db9fe25f5c8"
+    url "https://files.pythonhosted.org/packages/ec/6a/c4f7b21c80a2b5d7e740431f044755d3253648795f63ada3678c91c4f651/nab_markersets-0.0.17.tar.gz"
+    sha256 "ece0e926d39d1f77a39652cd87da95e425e2f02acbac20e692e8b3e593903f46"
   end
 
   resource "nab-project" do
-    url "https://files.pythonhosted.org/packages/c1/09/daaa422313ae401dddb50a6d141f840f10789cfd44449f2cd22ead1422d2/nab_project-0.0.16.tar.gz"
-    sha256 "43b94bb0eb9925d2786ef0259dc719249d0fd5d5351e4a5cc5dbc4478e487adc"
+    url "https://files.pythonhosted.org/packages/32/2b/6e491bb35b0833ff817cb802f828ca1f4273cc93724cf9aa96aabb6df7cd/nab_project-0.0.17.tar.gz"
+    sha256 "392a8bf8d7a708ddb47e8e7d3143ac9d53188be573bd69fbc2470b27eb7e7cb3"
   end
 
   resource "nab-provider" do
-    url "https://files.pythonhosted.org/packages/8e/6b/07c94dc10289c62cf81120852e9847fb56897feaeb0edb861ea4e8d2902f/nab_provider-0.0.16.tar.gz"
-    sha256 "de498dcd65015635755773c7cabfad857f2b99afdb7939b5f2836c1f1f0ca444"
+    url "https://files.pythonhosted.org/packages/da/47/e1c56ba2b1d53ede590c4df823d607aa52154ced2daabb16a281918c0e77/nab_provider-0.0.17.tar.gz"
+    sha256 "117b62614836240b68b5844673047252c6181b685aa09e7e7b612b83cc6decc9"
   end
 
   resource "nab-resolver" do
-    url "https://files.pythonhosted.org/packages/8a/ff/cef63ba1c7d47d9be040ae81f1bdae251dd906b7cd34b6fed616566deca7/nab_resolver-0.0.16.tar.gz"
-    sha256 "540316b26d92ba891adcc0c54c0dec2d79f859a3cc4a416aabd36d5fc5278c3e"
+    url "https://files.pythonhosted.org/packages/ad/07/9dc098e3a1f0332413b46c95158edbd09c7a73ccab8a225aab9e01644d3a/nab_resolver-0.0.17.tar.gz"
+    sha256 "523914553615f5c7427cf0fdf5bf95f3152d73affa0cbb57d40fb0a5983bcc5b"
   end
 
   resource "packaging" do
