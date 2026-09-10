@@ -4,7 +4,7 @@ class Zeromq < Formula
   url "https://github.com/zeromq/libzmq/releases/download/v4.3.5/zeromq-4.3.5.tar.gz"
   sha256 "6653ef5910f17954861fe72332e68b03ca6e4d9c7160eb3a8de5a5a913bfab43"
   license "MPL-2.0"
-  revision 2
+  revision 3
   compatibility_version 1
 
   livecheck do
