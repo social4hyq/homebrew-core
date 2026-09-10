@@ -5,6 +5,7 @@ class Jpeg < Formula
   mirror "https://fossies.org/linux/misc/jpegsrc.v10.tar.gz"
   sha256 "8b9eaa13242690ebd03e1728ab1edf97a81a78ed6e83624d493655f31ac95ab5"
   license "IJG"
+  revision 1
 
   livecheck do
     url "https://www.ijg.org/files/"
