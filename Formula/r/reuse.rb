@@ -15,7 +15,7 @@ class Reuse < Formula
   head "https://github.com/fsfe/reuse-tool.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "266c6fa00a6f636d88a41bc1a57d54f0ff67ffcf06cfbe8c7e5689d991d11869"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a3ae176b59b673397d68e939f0fc26ff15b9769121a0598e4dc985e11acbd99f"
   end
 
   depends_on "python@3.14"
