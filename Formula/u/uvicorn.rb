@@ -10,7 +10,7 @@ class Uvicorn < Formula
   head "https://github.com/encode/uvicorn.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7742e4b7fd2cab55849c50272fe8f0238813a2fd0db3570da4babbf13f118be4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3262bc28d421348502d3d8262b80d40a7a69a5115cb07ef3812e3419b5a7da67"
   end
 
   depends_on "rust" => :build
