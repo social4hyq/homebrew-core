@@ -6,7 +6,7 @@ class Grc < Formula
   url "https://github.com/garabik/grc/archive/refs/tags/v1.13.tar.gz"
   sha256 "a7b10d4316b59ca50f6b749f1d080cea0b41cb3b7258099c3eb195659d1f144f"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 2
   head "https://github.com/garabik/grc.git", branch: "master"
 
   bottle do
