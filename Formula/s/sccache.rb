@@ -4,6 +4,7 @@ class Sccache < Formula
   url "https://github.com/mozilla/sccache/archive/refs/tags/v0.17.0.tar.gz"
   sha256 "49949ad1cf175c49da126dbb0c2e6a56bd9d1f626e8cc0be17b9668b914145c6"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/mozilla/sccache.git", branch: "main"
 
   livecheck do
