@@ -10,7 +10,7 @@ class S3cmd < Formula
   head "https://github.com/s3tools/s3cmd.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1d5496ed34e56e70cdb72bb03766a9b677601f9563027616c57b2990726836e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bb3b4a5a5f8936b6ccebd3f433bdadabf1bcf5545e5df8b087d6846d270b5734"
   end
 
   depends_on "libmagic" => :no_linkage # for python-magic
