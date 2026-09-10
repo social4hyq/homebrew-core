@@ -4,6 +4,7 @@ class FernApi < Formula
   url "https://registry.npmjs.org/fern-api/-/fern-api-5.116.0.tgz"
   sha256 "8d6cbfd80102bdf06ca0064c0bdbf9d416ac3e6b3cf1415617e2aa798df8f626"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     throttle 5
