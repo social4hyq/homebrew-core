@@ -4,14 +4,17 @@ class Trivy < Formula
   url "https://github.com/aquasecurity/trivy/archive/refs/tags/v0.74.0.tar.gz"
   sha256 "04268af574690b84bc3474a5f19e002cd6da3e16899fac9fd39c6e84e7843940"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
   head "https://github.com/aquasecurity/trivy.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "56b081cdb2fb3714af52d7bd939d2063845ed4bf1dc3dabb76f01768715061ba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "71cb7a4a7473e46ff27d476c1303666b673b1530cb903b5a8f2e57257c153fd6"
   end
 
-  depends_on "go" => :build
+  # TODO: unpin go@1.26 when trivy supports go 1.27
+  # ref: https://github.com/aquasecurity/trivy/pull/11127
+  depends_on "go@1.26" => :build
 
   def install
     ENV["GOEXPERIMENT"] = "jsonv2"
