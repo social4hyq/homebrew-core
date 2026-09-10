@@ -13,6 +13,10 @@ class OhosSdk < Formula
 
   depends_on "unzip" => :build
 
+  conflicts_with "llvm", because: "both install `clang` binaries"
+  conflicts_with "llvm@22", because: "both install `clang` binaries"
+  conflicts_with "llvm@21", because: "both install `clang` binaries"
+
   def install
     cd "ohos" do
       Dir.glob("*.zip").each do |zip_file|
