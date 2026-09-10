@@ -6,10 +6,11 @@ class CmakeLanguageServer < Formula
   url "https://files.pythonhosted.org/packages/cf/ad/54c337fd2093a7c7c13528ac1393aeda009cdc16be954041834328845237/cmake_language_server-0.1.11.tar.gz"
   sha256 "005f48367ec569457a7229a58f6762044fddacac647858b39d725ae2b3cd695b"
   license "MIT"
+  revision 1
   head "https://github.com/regen100/cmake-language-server.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac1697f41d5ff72b39119eac7041df4f71431db1781edc247ade8c401f07c39a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd29ed8a0f37e0febd213dcc4ec5433f3589cd1f379ad65202d6ae9d0a271455"
   end
 
   depends_on "python@3.14"
