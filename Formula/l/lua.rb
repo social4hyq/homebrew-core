@@ -4,6 +4,7 @@ class Lua < Formula
   url "https://www.lua.org/ftp/lua-5.5.1.tar.gz"
   sha256 "1c4b4068d67061f2a2231ad2b5422e77acea1487ea9890f6320af614f4373dce"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
