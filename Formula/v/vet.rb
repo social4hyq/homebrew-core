@@ -4,6 +4,7 @@ class Vet < Formula
   url "https://github.com/safedep/vet/archive/refs/tags/v1.19.0.tar.gz"
   sha256 "cafa628de006e4c11d6fa5d884d8aafc2e38f7826feb50d309fc66edece5cefb"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "2502fa85816fda34a57f7ebd9e21c079e99b9764f9c1a58232441de883235c7b"
