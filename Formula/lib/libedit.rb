@@ -5,6 +5,7 @@ class Libedit < Formula
   version "20260512-3.1"
   sha256 "432d5e7ea8b0116dd39f2eca7bc11d0eed77faa6b77ea526ace89907c23ea4a0"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
 
   livecheck do
