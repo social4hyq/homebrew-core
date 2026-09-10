@@ -4,6 +4,7 @@ class Orc < Formula
   url "https://gstreamer.freedesktop.org/src/orc/orc-0.4.44.tar.xz"
   sha256 "4aeb97aea2b58224029dc2b23d7d064cfa990cb4fb8c4da440bcbe9c95bc5d2d"
   license all_of: ["BSD-2-Clause", "BSD-3-Clause"]
+  revision 1
   compatibility_version 1
 
   livecheck do
