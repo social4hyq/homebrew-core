@@ -4,6 +4,7 @@ class Libde265 < Formula
   url "https://github.com/strukturag/libde265/releases/download/v1.1.2/libde265-1.1.2.tar.gz"
   sha256 "eaacd1943ab0c452c19f6136a36ca227e6b761b39a81eaca8454d48c147e1f67"
   license "LGPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
