@@ -4,6 +4,7 @@ class Cln < Formula
   url "https://www.ginac.de/CLN/cln-1.3.7.tar.bz2"
   sha256 "7c7ed8474958337e4df5bb57ea5176ad0365004cbb98b621765bc4606a10d86b"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url :homepage
@@ -11,7 +12,7 @@ class Cln < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b11416aca186dcd8fe95aa57a45a35dce51aebce5c8b60ca6eb7f402de7a7e79"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f6510b6f749c72fe1cea6ac9e843ef1c8fbb5e68db4dd66893de7768e278926"
   end
 
   head do
