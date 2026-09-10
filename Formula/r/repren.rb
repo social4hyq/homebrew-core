@@ -6,9 +6,10 @@ class Repren < Formula
   url "https://files.pythonhosted.org/packages/8f/2b/74f60c028f4ad0d74b700e508486cf837749c9d1d5a12d56c6086942375e/repren-3.1.1.tar.gz"
   sha256 "f0bf25b08824bc9e34f343aaf6bd1ae8a88b54efb3520de3beb366847e57e98a"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "64b20709ada6f4bad3536dd9e4803f7965a1c2dc5e929a2ecf781f2e3ad83ed6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "12848fb342bd1de8864096ac666c5296c259c869946378a4963088aafe5cad00"
   end
 
   depends_on "python@3.14"
