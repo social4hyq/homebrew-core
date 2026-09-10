@@ -14,7 +14,7 @@ class NetSnmp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "56f9ed165a5404d8b9cb81e4fe7de48a0bd9e72b6fcea584387770ed835ae824"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ceaf019bc3cab5a6b93758e6054881d20cf82cd7ad59fdbdf7d2b9d347dc0d3b"
   end
 
   keg_only :provided_by_macos
