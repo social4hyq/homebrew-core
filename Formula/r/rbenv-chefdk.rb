@@ -4,7 +4,7 @@ class RbenvChefdk < Formula
   url "https://github.com/docwhat/rbenv-chefdk/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "79b48257f1a24085a680da18803ba6a94a1dd0cb25bd390629006a5fb67f3b69"
   license "MIT"
-  revision 1
+  revision 2
   head "https://github.com/docwhat/rbenv-chefdk.git", branch: "main"
 
   bottle do
