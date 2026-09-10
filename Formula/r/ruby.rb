@@ -2,7 +2,7 @@ class Ruby < Formula
   desc "Powerful, clean, object-oriented scripting language"
   homepage "https://www.ruby-lang.org/"
   license "Ruby"
-  revision 2
+  revision 3
   compatibility_version 1
 
   stable do
