@@ -4,7 +4,7 @@ class Antlr4CppRuntime < Formula
   url "https://www.antlr.org/download/antlr4-cpp-runtime-4.13.2-source.zip"
   sha256 "0ed13668906e86dbc0dcddf30fdee68c10203dea4e83852b4edb810821bee3c4"
   license "BSD-3-Clause"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://www.antlr.org/download.html"
@@ -12,7 +12,7 @@ class Antlr4CppRuntime < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "576e64e959cba1dba9c97f83ea1f1009cdb4aa8cf2f7ca1770b576b5674ddfba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4ee79b3bda71cca1ea1338bfc38274fac794bcb4eb4d089fe3e9fa146112099"
   end
 
   depends_on "cmake" => :build
