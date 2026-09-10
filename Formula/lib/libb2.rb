@@ -8,7 +8,7 @@ class Libb2 < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "54550a526664e9cd8eee0f06a4baa7f8f9d24d664028b1e5432140035deb3d5a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0e77ea119f668024f4e11137c4e84794772a771b0d4b1329d3c47f4951c3db5"
   end
 
   # Fix -flat_namespace being used on Big Sur and later.
