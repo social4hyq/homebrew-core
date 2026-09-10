@@ -6,6 +6,7 @@ class Openssh < Formula
   version "10.5p1"
   sha256 "d44d28a839ea9daf969cc69150fde59910b2b39361dad81a3bd6cbd19218db11"
   license "SSH-OpenSSH"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -14,7 +15,7 @@ class Openssh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f5c36c4f3eb971973075e330ca58e3d176af9eecc4ff86a34818ee5439a5e44"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c6540a14827a6025612f7f0114f726ac42bb38375bdc79b14ea5882acccb8c3"
   end
 
   depends_on "pkgconf" => :build
