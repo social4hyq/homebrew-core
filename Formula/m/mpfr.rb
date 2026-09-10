@@ -5,6 +5,7 @@ class Mpfr < Formula
   mirror "https://ftp.gnu.org/gnu/mpfr/mpfr-4.2.2.tar.xz"
   sha256 "b67ba0383ef7e8a8563734e2e889ef5ec3c3b898a01d00fa0a6869ad81c6ce01"
   license "LGPL-3.0-or-later"
+  revision 1
   compatibility_version 1
   head "https://gitlab.inria.fr/mpfr/mpfr.git", branch: "master"
 
@@ -26,7 +27,7 @@ class Mpfr < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b3f0da2ac6bfc5eb22d43d7d2daf2fb59978944f45dbeefc3c83598fb819588d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "38ced3fd70dec323a82cdc13cfe639716147d927d6d81d05544434442e705aab"
   end
 
   depends_on "autoconf" => :build
