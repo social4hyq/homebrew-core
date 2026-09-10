@@ -5,6 +5,7 @@ class OpensslAT3 < Formula
   mirror "http://fresh-center.net/linux/misc/openssl-3.6.4.tar.gz"
   sha256 "9bffaa1ad1e07b354c21bd3324ec02fa15579f45a7d0494b3e74bc449b7333ef"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -13,7 +14,7 @@ class OpensslAT3 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1be73c6c68e29c33ff43761045e43e23e7c369f0fb1a24f40e226ec5cb28f98"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29caefb982dc01671e67232f3862b50ce69a34a4f4135a1495078830bb12b81b"
   end
 
   depends_on "ca-certificates"
