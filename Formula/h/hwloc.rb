@@ -4,6 +4,7 @@ class Hwloc < Formula
   url "https://download.open-mpi.org/release/hwloc/v2.14/hwloc-2.14.0.tar.bz2"
   sha256 "966b9bb3e9f29f8d65ce8d106779e457f40e246a645e584b100772a42f9ae94b"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Hwloc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "553c67ae1cc017d783ed85738359d4803ad302ac80f660d5e600314c50be7633"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b6623a75f960f5fce7ff601f884e30c4442c394b56131fbe700f6ba6081c5f1d"
   end
 
   head do
