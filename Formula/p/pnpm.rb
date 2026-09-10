@@ -4,6 +4,7 @@ class Pnpm < Formula
   url "https://registry.npmjs.org/pnpm/-/pnpm-11.26.0.tgz"
   sha256 "c332207e738f84b7ccf95d5f21f6fdf10b0dc5b133f0a349834a26fd17abacd8"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
