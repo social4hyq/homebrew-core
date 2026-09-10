@@ -4,11 +4,12 @@ class Libvpx < Formula
   url "https://github.com/webmproject/libvpx/archive/refs/tags/v1.17.0.tar.gz"
   sha256 "1020f184046187baa2985dbde38e0691f49c44088bca7a1842b0236c6081dc0a"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://chromium.googlesource.com/webm/libvpx.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "edeae2057ffcd19827c8365823167f843c14d1fca57dad6eff757cffd2074739"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8dc01f579e04f6f6ca3e62c453545e8cb057a23b0982925a53ebfb5b925db65"
   end
 
   on_intel do
