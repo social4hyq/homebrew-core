@@ -4,6 +4,7 @@ class Libseccomp < Formula
   url "https://github.com/seccomp/libseccomp/releases/download/v2.6.1/libseccomp-2.6.1.tar.gz"
   sha256 "501f66c667225d53791b97e1d7cf85ab764c297d04881f60f38f451c4b0ee1be"
   license "LGPL-2.1-only"
+  revision 1
   compatibility_version 1
 
   livecheck do
