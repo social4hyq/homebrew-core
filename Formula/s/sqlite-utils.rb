@@ -9,7 +9,7 @@ class SqliteUtils < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eee187bc5955be4d904d5d51db987eb6e103bae3fbc3b3c5da6c53b99f8cb979"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f42f6fe7ae9cc0f7fa3c83a140d8e4b1d3f1925ff7011fa58f1dde14648c963"
   end
 
   depends_on "python@3.14"
