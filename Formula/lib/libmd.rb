@@ -13,7 +13,7 @@ class Libmd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c1dee4255859e2ba679847f88d3eb106d96a68fe1cb7de95f87dde3708b1649"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1a78b7b98a5f140ef9d65d69c259704e721ef14db247f2bd06d3e1886d1e24b"
   end
 
   head do
