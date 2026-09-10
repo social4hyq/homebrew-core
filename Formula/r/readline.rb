@@ -72,7 +72,7 @@ class Readline < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aac4c001226c2063845c3434dca9317e57bd1391c5163c75a705fd79ae5eb879"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "259441cef9467b6a7e244e76c3b637adacf31b721b9c3e00f50d658e11fe2e86"
   end
 
   keg_only :shadowed_by_macos, "macOS provides BSD libedit"
