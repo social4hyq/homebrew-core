@@ -4,6 +4,7 @@ class Expat < Formula
   url "https://github.com/libexpat/libexpat/releases/download/R_2_8_4/expat-2.8.4.tar.lz"
   sha256 "bd88c9cee01f45c2a813014acd759c5e211c1017d2650cb6c1220f90a3123d08"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
