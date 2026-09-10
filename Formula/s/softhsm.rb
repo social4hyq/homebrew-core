@@ -4,10 +4,11 @@ class Softhsm < Formula
   url "https://github.com/softhsm/SoftHSMv2/archive/refs/tags/2.7.0.tar.gz"
   sha256 "be14a5820ec457eac5154462ffae51ba5d8a643f6760514d4b4b83a77be91573"
   license "BSD-2-Clause"
+  revision 1
   head "https://github.com/opendnssec/SoftHSMv2.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "635b1eaf7ec80e28ccf34580b73e59d68cba7aa3445b26c8e119abe5beb1e7ba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61d0158c75c2bcc413277f1207d767ac6cb1b936353a08332b1e6da184cfddf7"
   end
 
   depends_on "autoconf" => :build
