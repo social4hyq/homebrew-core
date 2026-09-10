@@ -4,6 +4,7 @@ class VueLanguageServer < Formula
   url "https://registry.npmjs.org/@vue/language-server/-/language-server-3.3.11.tgz"
   sha256 "dbd73606bc0691431fceb5aa5d278af0178d39c1154ca6878c526e704cf00594"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "14acd14aeed681aa5022a76a30b44e2e8ef97396a7a4eb9348173a432a81cf44"
