@@ -4,6 +4,7 @@ class Libre < Formula
   url "https://github.com/baresip/re/archive/refs/tags/v4.11.0.tar.gz"
   sha256 "2a8cbf13719618d879464617512a80fe2c13fe63cd5461cf01a195fbe46b3ca4"
   license "BSD-3-Clause"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "bf46a1c73b29f181a3a3268787aae92156af194c4f6dbba23c262c3757574533"
