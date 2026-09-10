@@ -6,10 +6,10 @@ class Twtxt < Formula
   url "https://files.pythonhosted.org/packages/fc/4c/cff74642212dbca8d4d9059119555cd335324b3da0b52990a414a0257756/twtxt-1.3.1.tar.gz"
   sha256 "f15e580f8016071448b24048402b939b9e8dec07eabacd84b1f2878d751b71ff"
   license "MIT"
-  revision 8
+  revision 9
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "19ea976ec1d0549bde075f1c3e6261dfa8fa061ac1fd0fe1b7178b489f056da6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd3eccca284d76b76cbda63b97d184d90bffb519b9e487f95212f4ce50045842"
   end
 
   depends_on "python@3.14"
