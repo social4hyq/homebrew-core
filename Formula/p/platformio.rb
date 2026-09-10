@@ -6,10 +6,11 @@ class Platformio < Formula
   url "https://files.pythonhosted.org/packages/6d/97/b81e15f7ca42a8f9623b25d8962df31d34ddec006c033cad7b04a9819e29/platformio-6.2.0.tar.gz"
   sha256 "880ea06734908b3d6c0a96598ca7be572c2b6755585784aa63a201bbdfb8c59d"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/platformio/platformio-core.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e76efff63d179ceb930736f5594eb5d901be3edf96c899eec00296930c83a506"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "79f350756e5490b4b7d741aafabc05743bc316b346389e83400844fc2a30fde0"
   end
 
   depends_on "certifi" => :no_linkage
