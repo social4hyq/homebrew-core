@@ -5,6 +5,7 @@ class FileFormula < Formula
   url "https://astron.com/pub/file/file-5.48.tar.gz"
   sha256 "ed14656883b23a364b4057c05595d93252da9bc473d30106519519d0da141283"
   license "BSD-2-Clause-Darwin"
+  revision 1
   head "https://github.com/file/file.git", branch: "master"
 
   livecheck do
@@ -13,7 +14,7 @@ class FileFormula < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "73680c7b7e785ef35f29e247130ee15274937d8d21724f9f5e94efacb55502c4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1edf2c780b8afd0efecbc57b9c0f85ff41a1476ba811ecb02d92f1da5de412a1"
   end
 
   keg_only :provided_by_macos
