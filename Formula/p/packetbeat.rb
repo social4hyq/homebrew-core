@@ -9,7 +9,7 @@ class Packetbeat < Formula
   head "https://github.com/elastic/beats.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3c3fbf1823df317231fee646a2784fce214a50543e794fa858c60bdabc429fc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1fe22c046083afdc8baf2cf5977d0e50fa5a06cbacc12478ef840d09209c4de0"
   end
 
   depends_on "go" => :build
