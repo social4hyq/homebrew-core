@@ -9,7 +9,7 @@ class Hiredis < Formula
   head "https://github.com/redis/hiredis.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1175a282e95cc89bfe4043e6d7da3be2983093072c92abc68377aadb26c872cf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e16b23079f3a62f2ef5a5f07ae822e386a05fbe43f8c11ee6fae10131d5ccef3"
   end
 
   depends_on "openssl@3"
