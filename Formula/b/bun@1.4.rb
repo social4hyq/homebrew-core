@@ -1,11 +1,7 @@
 class BunAT14 < Formula
   desc "Incredibly fast JavaScript runtime, bundler, test runner, and package manager"
   homepage "https://bun.com/"
-  # Upstream oven-sh/bun has no OpenHarmony build target; this formula tracks
-  # social4hyq/ohos-bun's ohos-aarch64 branch (OHOS patches merged from
-  # upstream stable tags). See openspec/specs/bun-upstream-bridge.md for the
-  # bridge policy — fork-as-bridge is the long-term shape, not a stopgap.
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "36854e8e5bb06809fe6e669679d21aae5823e8a0", branch: "ohos-aarch64"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "36854e8e5bb06809fe6e669679d21aae5823e8a0"
   version "1.4.2"
   license all_of: [
     "MIT",
@@ -19,6 +15,7 @@ class BunAT14 < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
+  revision 1
 
   livecheck do
     url :stable
@@ -32,257 +29,109 @@ class BunAT14 < Formula
 
   keg_only :versioned_formula
 
-  depends_on "bun-bootstrap" => :build # Bootstrap: `bun bd` itself is a bun script
-  depends_on "bun-webkit" => :build
+  depends_on "bun-bootstrap" => :build
   depends_on "cmake" => :build
   depends_on "gperf" => :build
   depends_on "icu4c@78" => :build
-  # lld@21/llvm@21 resolve to harmonybrew/core (this tap's fork was retired
-  # once upstreamed). lld@21 provides the --code-sign-by-default ld.lld
-  # (split out of llvm@21); both are wired up directly in install() below
-  # (no global cc/c++ shim).
   depends_on "lld@21" => :build
   depends_on "llvm@21" => :build
   depends_on "ninja" => :build
-  depends_on "ohos-sdk" => :build
-  # only build-time rust-nightly cargo links libssl/libcrypto
+  depends_on "node" => :build
   depends_on "openssl@3" => :build
   depends_on "perl" => :build
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
   depends_on "zlib-ng-compat" => :build
-  depends_on "node"
-  # No runtime ohos-compat-shim dependency: vendored copy statically linked
-  # into the executable AND every `bun build --compile` output. ohos-sdk is
-  # build-time only: signs rust-nightly, clang-sign wrapper, and final binary.
 
   fails_with :gcc do
     cause "uses clang-specific flags"
   end
 
-  # Rust nightly: OHOS is Tier 3 (no prebuilt rust-std), uses -Zbuild-std.
-  # No "rustup" build dep (unlike upstream): OHOS's nightly target isn't in
-  # rustup's channel manifest, only published as a static.rust-lang.org
-  # tarball — same artifact rustup would fetch if it could resolve the
-  # target at all. Version aligned with bun-src/rust-toolchain.toml.
   resource "rust-nightly" do
     url "https://static.rust-lang.org/dist/2026-07-20/rust-nightly-aarch64-unknown-linux-ohos.tar.gz"
     version "nightly-2026-07-20"
     sha256 "7d3dd4cc4f55ee8a7c7f09804b96fd52ef7ef598a935772091e80aa66869676e"
   end
 
-  # rust-src required by -Zbuild-std.
   resource "rust-src" do
     url "https://static.rust-lang.org/dist/2026-07-20/rust-src-nightly.tar.gz"
     version "nightly-2026-07-20"
     sha256 "2be85b655b99624bed0fb63a47e564abac07aa1fb5d0576abac5c42ef8c5316e"
   end
 
-  # OHOS patches pre-applied on ohos-aarch64 branch, kept in sync with upstream via merge.
-  # Vendor patches committed directly in source tree.
+  resource "webkit-suspend-fix" do
+    url "https://raw.githubusercontent.com/social4hyq/homebrew-core/ad1c1f23f/Patches/bun-webkit/0001-suspend-resume-handshake-survives-signal-loss.patch"
+    sha256 "8a8dc62036979949277c83df3070d40b57a6a703ab872f6d1a96799e9e384f4a"
+  end
+
+  def fetch_webkit
+    webkit_version = File.read("scripts/build/deps/webkit.ts")[/WEBKIT_VERSION = "(\h+)"/i, 1]
+    odie "Unable to find WebKit version!" if webkit_version.blank?
+
+    system "git", "clone", "--branch=autobuild-#{webkit_version}",
+           "--config=advice.detachedHead=false", "--config=core.fsmonitor=false",
+           "--depth=1", "https://github.com/oven-sh/WebKit.git", "vendor/WebKit"
+
+    cd "vendor/WebKit" do
+      system "git", "apply", "--check", resource("webkit-suspend-fix").cached_download
+      system "git", "apply", resource("webkit-suspend-fix").cached_download
+      odie "WebKit suspend fix missing" unless File.read("Source/WTF/wtf/Threading.h").include?("m_suspendRequested")
+    end
+    inreplace "vendor/WebKit/Source/cmake/WebKitFeatures.cmake",
+              "find_program(_WEBKIT_PROBE_SWIFTC NAMES swiftc)", ""
+  end
 
   def install
-    # buildpath = bun source root; build logic fully inlined — no external scripts.
+    llvm = Formula["llvm@21"]
+    sdk = llvm.deps.find { |dep| dep.name.start_with?("ohos-sdk@") }.to_formula.opt_prefix
+    rust_home = buildpath/"rust"
+    channel = File.read("rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
+    odie "Update rust-nightly to #{channel}" if resource("rust-nightly").version.to_s != channel
 
-    llvm     = Formula["llvm@21"]
-    lld      = Formula["lld@21"]
-    webkit   = Formula["bun-webkit"]
-    boot     = Formula["bun-bootstrap"]
-
-    # Release SOP drift guards (openspec/specs/bun-upstream-bridge.md steps 2-3):
-    # fail the build instead of silently drifting if a merge forgot to bump
-    # the paired formula/resource.
-    rust_toolchain_channel = (buildpath/"rust-toolchain.toml").read[/channel\s*=\s*"([^"]+)"/, 1]
-    if rust_toolchain_channel != resource("rust-nightly").version.to_s
-      odie "rust-toolchain.toml channel (#{rust_toolchain_channel}) != rust-nightly resource " \
-           "(#{resource("rust-nightly").version}) — bump the resource or re-check the merge"
-    end
-
-    webkit_version = (buildpath/"scripts/build/deps/webkit.ts").read[/WEBKIT_VERSION = "(\h+)"/i, 1]
-    webkit_pin = webkit.stable.specs[:revision]
-    if webkit_version != webkit_pin
-      odie "scripts/build/deps/webkit.ts WEBKIT_VERSION (#{webkit_version}) != bun-webkit pin " \
-           "(#{webkit_pin}) — bump bun-webkit first (see Release SOP step 2)"
-    end
-
-    # Persistent build cache: brew's HOME is per-build .brew_home — cache would be wiped
-    # each run and every vendor tarball re-downloaded. HOMEBREW_CACHE persists across runs.
-    cache_dir = HOMEBREW_CACHE/"bun-build-cache"
-
-    # Pre-populate WebKit cache from bun-webkit formula (single source of truth for the commit).
-    # bun bd checks .identity to skip download.
-    wc = cache_dir/"webkit-#{webkit_pin[0...16]}-ohos-arm64"
-    wc.mkpath
-    File.write(wc/".identity", webkit_pin)
-    (wc/"lib").mkpath
-    %w[libJavaScriptCore.a libWTF.a libbmalloc.a].each do |a|
-      ln_sf webkit.lib/a, wc/"lib"/a
-    end
-    (wc/"include").mkpath
-    cd wc/"include" do
-      ln_sf webkit.include/"webkit/JavaScriptCore", "JavaScriptCore"
-      ln_sf webkit.include/"webkit/wtf", "wtf"
-      ln_sf webkit.include/"webkit/bmalloc", "bmalloc"
-      cp webkit.include/"webkit/cmakeconfig.h", "cmakeconfig.h"
-    end
-    %w[libicudata.a libicui18n.a libicuuc.a].each do |a|
-      ln_sf formula_opt_lib("icu4c@78")/a, wc/"lib"/a
-    end
-
-    # Scaffold build/ohos-icu layout for bun's config.ts (defaults to wrapper's build-icu.sh path).
-    # Point at icu4c@78 formula instead.
-    icu = Formula["icu4c@78"]
-    (buildpath/"build/ohos-icu/target/include").mkpath
-    ln_sf icu.opt_include/"unicode", buildpath/"build/ohos-icu/target/include/unicode"
-    (buildpath/"build/ohos-icu/target/lib").mkpath
-    %w[libicudata.a libicui18n.a libicuuc.a].each do |a|
-      ln_sf icu.opt_lib/a, buildpath/"build/ohos-icu/target/lib"/a
-    end
-    (buildpath/"build/ohos-icu/host/bin").mkpath
-    %w[genrb genccode gencmn pkgdata].each do |t|
-      ln_sf icu.opt_bin/t, buildpath/"build/ohos-icu/host/bin"/t if (icu.opt_bin/t).exist?
-    end
-
-    # bun.lock on ohos-aarch64 branch matches package.json.
-    # All packages pre-cached, no network access needed.
-    ENV.prepend_path "PATH", boot.opt_bin
-    ENV.prepend_path "PATH", llvm.opt_bin
-    system "bun", "install"
-    # node-fallbacks has its own bun.lock; pre-populate cache so ninja's
-    # subsequent `bun install --frozen-lockfile` can verify without network.
-    system "bun", "install", "--cwd", "src/node-fallbacks"
-
-    rust_ver = resource("rust-nightly").version.to_s # e.g. "nightly-2026-07-20"
-    # rust_home must stay on EL2 (exec'd after signing; EL3 hmmac refuses non-EL2 exec).
-    rust_home = Pathname.new("/data/storage/el2/base/tmp/rust-#{rust_ver}")
-    rust_ready = rust_home/"BREW_SIGNED_OK"
-
-    # Shared mutable state: flock serializes concurrent brew sessions.
-    rust_home.mkpath
-    File.open(rust_home/".brew-install-lock", File::CREAT | File::RDWR) do |lock|
-      lock.flock(File::LOCK_EX)
-      unless rust_ready.exist?
-        resource("rust-nightly").stage do
-          # Use sh explicitly: OHOS superenv PATH has no bash for the shebang.
-          system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
-        end
-        resource("rust-src").stage do
-          system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
-        end
-
-        # Sign rust binaries (OHOS refuses to exec unsigned ELF).
-        sign_tool = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
-        Dir.glob(rust_home/"**/*").each do |f|
-          next unless File.file?(f)
-          next if File.symlink?(f)
-          next if File.read(f, 4, mode: "rb") != "\x7fELF"
-
-          tmp = "#{f}.unsigned"
-          mv f, tmp
-          system sign_tool, "sign", "-selfSign", "1", "-inFile", tmp, "-outFile", f
-          chmod 0755, f
-          rm tmp
-        end
-
-        rust_ready.write("signed #{Time.now}\n")
+    %w[rust-nightly rust-src].each do |name|
+      resource(name).stage do
+        system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
       end
     end
-
-    # lld from llvm@21 needs libxml2/zlib-ng-compat; cargo itself (the vendored
-    # rust-nightly binary invoked below) also dynamically needs libz.so to run
-    # at all -- zlib-ng-compat provides that (same soname/symbols as zlib).
-    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("libxml2").to_s
-    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat").to_s
-    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zstd").to_s
-    ENV.prepend_path "LD_LIBRARY_PATH", llvm.opt_lib.to_s
-    # openssl@3 provides libssl/libcrypto for rust cargo.
-    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3").to_s
-    # llvm@21 only ships llvm-strip; the bun build script needs strip.
-    mkdir_p buildpath/".bin"
-    ln_sf llvm.opt_bin/"llvm-strip", buildpath/".bin/strip"
-    # Scaffold ohos-cross-libs layout for bun's flags.ts.
-    ohos_cross = buildpath/"build/ohos-cross-libs"
-    (ohos_cross/"libcxx/include").mkpath
-    (ohos_cross/"libcxxabi").mkpath
-    # The flat host include dir, not include/aarch64-linux-ohos/c++/v1: see
-    # the identical note in bun-webkit.rb's install() -- the target-triple
-    # copy has its __has_include_next-chaining C-library wrapper headers
-    # stripped, so a build that points -nostdinc++/-I straight at it alone
-    # (as flags.ts does here) can't chain to the real musl headers. Host
-    # and target headers are otherwise byte-identical.
-    ln_sf llvm.opt_include/"c++/v1", ohos_cross/"libcxx/include/v1"
-    ln_sf llvm.opt_include/"c++/v1", ohos_cross/"libcxxabi/include"
-    # Each dir seeded with just its own archive; flags.ts links only -lc++ -lc++abi -lunwind.
-    {
-      "libcxx"    => "libc++.a",
-      "libcxxabi" => "libc++abi.a",
-      "libunwind" => "libunwind.a",
-    }.each do |d, a|
-      (ohos_cross/d/"lib").mkpath
-      ln_sf llvm.opt_lib/"aarch64-linux-ohos"/a, ohos_cross/d/"lib"/a
-    end
-    # bootstrap bun in PATH: `bun bd` is itself a bun script.
-    ENV.prepend_path "PATH", buildpath/".bin"
-    ENV.prepend_path "PATH", boot.opt_bin
-    ENV.prepend_path "PATH", llvm.opt_bin
-    # lld@21's ld.lld carries the --code-sign-by-default patch (see lld@21.rb) —
-    # it must come first on PATH so clang's driver (which resolves a bare
-    # `ld.lld` via PATH, not via llvm@21's own bin/) finds *this* signed copy
-    # instead of ohos-sdk's bundled unsigned fallback. No global shim needed:
-    # CC/CXX below point straight at this keg's clang/clang++.
-    ENV.prepend_path "PATH", lld.opt_bin
+    ENV["BUN_TOOLCHAIN_RUST"] = rust_home
+    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3")
+    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
+    ENV["SSL_CERT_FILE"] = ENV["CURL_CA_BUNDLE"] = HOMEBREW_PREFIX/"etc/ca-certificates/cert.pem"
+    # CMake otherwise lets the inner WebKit Ninja use every CPU exposed by
+    # the CI container; that exhausts OHOS process resources during the
+    # OHOS's filesystem races when WebKit's generated-header copy rules run
+    # concurrently; serialize the nested build to make generation reliable.
+    ENV["CMAKE_BUILD_PARALLEL_LEVEL"] = "1"
+    inreplace "scripts/build/source.ts",
+      'command: `${stream} ${cmake} --build $builddir --config $buildtype $targets`,',
+      'command: `${stream} ${cmake} --build $builddir --config $buildtype --parallel 1 $targets`,'
     ENV.prepend_path "PATH", rust_home/"bin"
-    ENV["CARGO_HOME"]    = (rust_home/"cargo").to_s
-    ENV["RUSTUP_HOME"]   = rust_home.to_s
-    ENV.delete("RUSTC_WRAPPER")
-    ca_bundle = HOMEBREW_PREFIX/"etc/ca-certificates/cert.pem"
-    ENV["SSL_CERT_FILE"]  = ca_bundle.to_s
-    ENV["CURL_CA_BUNDLE"] = ca_bundle.to_s
-    ENV["RUSTUP_TOOLCHAIN"] = rust_ver
-    ENV["OHOS_LLVM_PREFIX"]  = llvm.opt_prefix.to_s
-    ENV["OHOS_WEBKIT_ROOT"]  = webkit.opt_prefix.to_s
-    ENV["OHOS_BUN_SIGNING_LINKER"] = (llvm.opt_bin/"clang++").to_s
-    ENV["CC"]  = (llvm.opt_bin/"clang").to_s
-    ENV["CXX"] = (llvm.opt_bin/"clang++").to_s
-    # No CARGO_BUILD_JOBS cap: the old ETXTBSY came from the (now-removed)
-    # global cc/c++ shims re-signing in-place; lld's --code-sign default
-    # signs at link time only. Verified zero ETXTBSY in CI.
-    ENV["TMPDIR"] = "/data/storage/el2/base/tmp"
+    ENV.prepend_path "PATH", llvm.opt_bin
+    ENV.prepend_path "PATH", formula_opt_bin("lld@21")
+    ENV.prepend_path "PATH", formula_opt_bin("bun-bootstrap")
 
-    # ── Build: `bun run build:release` (upstream's package.json script name;
-    # upstream itself invokes "build:release:local" — same script, difference
-    # is only the --build-dir it hardcodes). Equivalent to the old direct
-    # `bun scripts/build.ts --profile=release` call; `bun run` forwards
-    # trailing flags to the script unchanged. --os=ohos --arch=aarch64
-    # triggers the OHOS compile path in the bun source.
-    sysroot = formula_opt_prefix("ohos-sdk")/"native/sysroot"
-    system "bun", "run", "build:release",
-           "--os=ohos", "--arch=aarch64", "--canary=off",
-           "--cache-dir=#{cache_dir}",
-           "--ohos-sdk-root=#{formula_opt_prefix("ohos-sdk")}",
-           "--ohos-sysroot=#{sysroot}"
+    # The fork still expects separate libc++/libc++abi/libunwind directories.
+    cross_libs = buildpath/"build/ohos-cross-libs"
+    %w[libcxx libcxxabi libunwind].each do |name|
+      (cross_libs/name).mkpath
+      (cross_libs/name/"lib").make_symlink llvm.opt_lib/"aarch64-linux-ohos"
+    end
+    (cross_libs/"libcxx/include").mkpath
+    (cross_libs/"libcxx/include/v1").make_symlink llvm.opt_include/"c++/v1"
+    (cross_libs/"libcxxabi/include").make_symlink llvm.opt_include/"c++/v1"
+    (buildpath/"build/ohos-icu").mkpath
+    (buildpath/"build/ohos-icu/target").make_symlink formula_opt_prefix("icu4c@78")
 
-    # The release profile produces `bun-profile` (unstripped, ~455MB) + `bun`
-    # (stripped, ~105MB). Prefer the stripped version — smaller and ready-to-run.
-    out = buildpath/"build/release/bun"
-    odie "bun binary missing after build: #{out}" unless out.exist?
-    # Sign bun binary (OHOS refuses to exec unsigned ELF).
-    sign_tool = formula_opt_bin("ohos-sdk")/"binary-sign-tool"
-    unsigned = "#{out}.unsigned"
-    mv out, unsigned
-    system sign_tool, "sign", "-selfSign", "1", "-inFile", unsigned, "-outFile", out
-    chmod 0755, out
-    rm unsigned
-    # Relative symlink (not install_symlink): the latter realpaths through the previous
-    # version's opt link during upgrades, producing a dangling symlink once cleanup removes
-    # the old keg (this shipped the r32 bottle without bin/bun, see bun.rb history).
-    mkdir_p libexec/"bin"
-    libexec.install out => "bin/bun" # mv preserves the 0755 set above
-    bin.mkpath
-    (bin/"bun").make_symlink "../libexec/bin/bun"
+    inreplace "scripts/build/deps/webkit.ts", "ICU_ROOT: cfg.ohosIcuDir,",
+              "ICU_ROOT: cfg.ohosIcuDir, ICU_INCLUDE_DIR: \"#{formula_opt_include("icu4c@78")}\","
+
+    fetch_webkit
+    system "bun", "run", "build:release:local", "--canary=off",
+           "--os=ohos", "--arch=aarch64",
+           "--ohos-sdk-root=#{sdk}", "--ohos-sysroot=#{sdk}/native/sysroot"
+
+    bin.install "build/release-local/bun"
     (bin/"bunx").make_symlink "bun"
-
-    # Static shell completions shipped in source tree.
     bash_completion.install "completions/bun.bash" => "bun"
     fish_completion.install "completions/bun.fish"
     zsh_completion.install "completions/bun.zsh" => "_bun"
