@@ -6,13 +6,14 @@ class PortableLibffi < PortableFormula
   url "https://github.com/libffi/libffi/releases/download/v3.8.0/libffi-3.8.0.tar.gz"
   sha256 "7da3e2d9a171eb0a038f592ecad3ff2bb2550f3496d87b3b29ad0cf4430c0db4"
   license "MIT"
+  revision 1
 
   livecheck do
     formula "libffi"
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9612f19dfabded79a256bf22fdb59a229a84b1ab2968274be8b76a78dece999"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc36c13e091389a6984fdfe971f48db0c146d8ddac42deba9af2357f8f9bf1c3"
   end
 
   def install
