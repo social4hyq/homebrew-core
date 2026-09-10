@@ -4,6 +4,7 @@ class Htslib < Formula
   url "https://github.com/samtools/htslib/releases/download/1.24/htslib-1.24.tar.bz2"
   sha256 "28a8de191381c7a97a35675ceac76fa1ea95e7b678d6a2e9d600a7874e4077de"
   license all_of: ["MIT", "BSD-3-Clause"]
+  revision 1
   compatibility_version 1
 
   livecheck do
