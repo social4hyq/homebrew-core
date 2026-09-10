@@ -9,7 +9,7 @@ class GnuTar < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "df64ce2a6d1533dbd0816c46c71fc394dba7f74b6a1f30f8e19b57417a4591dc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "99ad644f1529a5492b9e0436138e9aced745bc58f5a08649a1b1cd8bce64683a"
   end
 
   head do
