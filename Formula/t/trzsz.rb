@@ -9,7 +9,7 @@ class Trzsz < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b161acb98c83a744b5ca01c6e14cf1a57744d0d2fd7ba8059234488516b87dcb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "df575f573c9bca3c5e826ecbd9a8f36817d67c49f733d7fe8a66470f3a41bf8b"
   end
 
   depends_on "python@3.14"
