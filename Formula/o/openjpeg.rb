@@ -9,7 +9,7 @@ class Openjpeg < Formula
   head "https://github.com/uclouvain/openjpeg.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f7d63490d663699a964f747ec68df7bf746f88a0fd0285fa3ed7ac289a5446b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "06109ff8e0e8f804ec06dcf4e0aa11a2fc4470eb04732f09704415852b268858"
   end
 
   depends_on "cmake" => :build
