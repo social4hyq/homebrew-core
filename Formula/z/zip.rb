@@ -5,7 +5,7 @@ class Zip < Formula
   version "3.0"
   sha256 "f0e8bb1f9b7eb0b01285495a2699df3a4b766784c1765a8f1aeedf63c0806369"
   license "Info-ZIP"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -13,7 +13,7 @@ class Zip < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5075a7c8e6ef6ab0c6df5b0022d31f3b94a71c9813a29c6b8a333ac4ea00ae97"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07cbf48b78446dbb3ebca52945f5ba2fac829d07d9c6dad1a7b9a37aba43664f"
   end
 
   keg_only :provided_by_macos
