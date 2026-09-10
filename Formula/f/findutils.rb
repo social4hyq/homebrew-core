@@ -8,7 +8,7 @@ class Findutils < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2dca7a7739679fecc0540dbb817df0c4edcb9369be6b4c139ee6c23ea829426c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e5e89c16942153c54a4d66bff08256aa8b5bd5df43d980b4c926b68faf4d458"
   end
 
   patch do
