@@ -4,6 +4,7 @@ class Lzip < Formula
   url "https://download-mirror.savannah.gnu.org/releases/lzip/lzip-1.26.tar.gz"
   sha256 "641cf30961525cbe3b340cc883436c8854e9f5032f459f444de4782b621e6572"
   license "GPL-2.0-or-later"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Lzip < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "307f2464fb46c5aef35d70488dc316ae974fa074e694a6234d070927f4096eb9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8442723a15be3ff1d9852c3bb26413c3571a2716634ac2f0b77f97496aad897"
   end
 
   def install
