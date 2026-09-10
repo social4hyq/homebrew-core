@@ -8,7 +8,7 @@ class JiraCli < Formula
   head "https://github.com/ankitpokhrel/jira-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "467183eb87c63699aa779ed3170440e09abf24bd1efaaacd9ed440668ca12a06"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5587574bac18aa7d402718a1f25a033baf9661a4405daf9045baa8a3e98eab93"
   end
 
   depends_on "go" => :build
