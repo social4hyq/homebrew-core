@@ -4,6 +4,7 @@ class Jansson < Formula
   url "https://github.com/akheron/jansson/releases/download/v2.15.1/jansson-2.15.1.tar.gz"
   sha256 "0c7114dc0b2d22a670724a1f95922029d7077c19dbf79a584cb8084d2f267f2f"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
