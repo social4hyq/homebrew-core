@@ -4,6 +4,7 @@ class FirebaseCli < Formula
   url "https://registry.npmjs.org/firebase-tools/-/firebase-tools-15.29.0.tgz"
   sha256 "e8cbd5e2f4fd329120e559c8288312abe1761571023a1a92aa621c3b7459b3de"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "3e00277c8f7053fefebf4b05c62f7c261a35350c4e16ae1760299ecaab487e58"
