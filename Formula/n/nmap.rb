@@ -4,6 +4,7 @@ class Nmap < Formula
   url "https://nmap.org/dist/nmap-7.991.tar.bz2"
   sha256 "a5d507f29437bef3bedd4771ff9aaa8fc1c2a109ddba1f5b1cf12027456929be"
   license :cannot_represent
+  revision 1
   compatibility_version 1
   head "https://svn.nmap.org/nmap/"
 
@@ -13,7 +14,7 @@ class Nmap < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "98e9a30773bd7838091dbde0d784f7be42d5560dc5d667dcead9d302a8d0cc57"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "013f4409fa0cd58bff3e5488da089667dad871971adee987eb795644d80fba20"
   end
 
   depends_on "python-setuptools" => :build
