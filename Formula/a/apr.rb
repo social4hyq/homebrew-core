@@ -5,6 +5,7 @@ class Apr < Formula
   mirror "https://archive.apache.org/dist/apr/apr-1.7.6.tar.bz2"
   sha256 "49030d92d2575da735791b496dc322f3ce5cff9494779ba8cc28c7f46c5deb32"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   bottle do
