@@ -4,6 +4,7 @@ class Src < Formula
   url "https://gitlab.com/esr/src/-/archive/1.45/src-1.45.tar.bz2"
   sha256 "05cc35c83dc84fbf72b83d2b4bfd7ed8c7eef0f9059e69a0de99247e3f451528"
   license "BSD-2-Clause"
+  revision 1
   head "https://gitlab.com/esr/src.git", branch: "master"
 
   # The homepage links to the `stable` tarball but it can take longer than the
