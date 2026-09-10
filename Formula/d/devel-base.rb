@@ -7,7 +7,7 @@ class DevelBase < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "357fb37802bfafda1bf719168301f3a8213ae531b024678e7e48d0e191e3dbea"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1ee6560bd9c325eb9f313c09d9193748fbc0e78e7b61fdda9dd08163c095bf9"
   end
 
   depends_on "coreutils"
