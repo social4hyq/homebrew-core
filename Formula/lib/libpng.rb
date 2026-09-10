@@ -5,6 +5,7 @@ class Libpng < Formula
   mirror "https://sourceforge.mirrorservice.org/l/li/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz"
   sha256 "28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775"
   license "libpng-2.0"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -13,7 +14,7 @@ class Libpng < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c917254553faf8ca45667be9c513a299544ad6e932976c89acda4d1e43887379"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d1fa5e7b1ef82eb91f99552489eabfe468a2c40eca9a8c87952bc0ed805dfc3"
   end
 
   head do
