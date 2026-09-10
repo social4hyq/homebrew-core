@@ -9,7 +9,7 @@ class Mpremote < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "10a8ebdf1e4898aa5d6a06c8198cdf91b9be1b5bd9dc3148c580207e7467042a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4f056828212b4a763787845b2d8e43dfd8b634d01a97062ecce138493b705132"
   end
 
   depends_on "python@3.14"
