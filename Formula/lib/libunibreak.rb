@@ -4,6 +4,7 @@ class Libunibreak < Formula
   url "https://github.com/adah1972/libunibreak/releases/download/libunibreak_7_0/libunibreak-7.0.tar.gz"
   sha256 "8c9a6e121736cd0d5c890ae3ae96f3f4010a19aa040f1dbded833a62a87717d3"
   license "Zlib"
+  revision 1
   compatibility_version 2
 
   livecheck do
@@ -15,7 +16,7 @@ class Libunibreak < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b06501b5b3e2fec80429f81dbccf0243738c4efc3d7d921b5e932b5d2b3fd44"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e43229f5019580255b7dc9ed537e67c41eeb59dd544c5c8cac667a760c68bb0b"
   end
 
   def install
