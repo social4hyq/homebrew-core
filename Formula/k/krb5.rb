@@ -24,6 +24,7 @@ class Krb5 < Formula
     "OpenVision",
     any_of: ["BSD-2-Clause", "GPL-2.0-or-later"],
   ]
+  revision 1
   compatibility_version 1
 
   livecheck do
