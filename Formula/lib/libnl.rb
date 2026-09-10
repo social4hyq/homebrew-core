@@ -15,7 +15,7 @@ class Libnl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d70c519fc9bc291df558f39d21eaf0a9c3aded57b1b0d4f2ca06a992ca0a1a3e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "74b399dd43ed563268b2b776e499e8d02dc6e89b5aec33faefa72d80b2e0fc00"
   end
 
   depends_on "bison" => :build
