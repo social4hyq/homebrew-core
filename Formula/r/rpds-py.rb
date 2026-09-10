@@ -10,7 +10,7 @@ class RpdsPy < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "57b3bad4462c337fb0abd1e8c73bba76af8a2e95d71f144a25a9e24752b76cde"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a305152feb029843eff53dfb58aa8cf68e6b56088a32f771db9082ad09bf02da"
   end
 
   depends_on "maturin" => :build
