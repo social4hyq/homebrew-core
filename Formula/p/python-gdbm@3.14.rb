@@ -4,13 +4,14 @@ class PythonGdbmAT314 < Formula
   url "https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tgz"
   sha256 "62859805f6fdf25e2bcbf3fa3217801e1996887ca33e6a2af80674bdfa2dbe07"
   license "Python-2.0"
+  revision 1
 
   livecheck do
     formula "python@3.14"
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ea5722d5d585c000a62ed7bd883c6bf5ebd9a80f26e644b6d761de3189d8d9f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "025d807a6fd45c9a0319b5c8c2e09d77918857246a162b6410eea095265ac829"
   end
 
   depends_on "gdbm"
