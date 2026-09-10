@@ -4,6 +4,7 @@ class Xsel < Formula
   url "https://github.com/kfish/xsel/archive/refs/tags/1.2.1.tar.gz"
   sha256 "18487761f5ca626a036d65ef2db8ad9923bf61685e06e7533676c56d7d60eb14"
   license "MIT"
+  revision 1
   head "https://github.com/kfish/xsel.git", branch: "master"
 
   bottle do
