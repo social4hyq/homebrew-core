@@ -6,7 +6,7 @@ class SpeedtestCli < Formula
   url "https://github.com/sivel/speedtest-cli/archive/refs/tags/v2.1.3.tar.gz"
   sha256 "45e3ca21c3ce3c339646100de18db8a26a27d240c29f1c9e07b6c13995a969be"
   license "Apache-2.0"
-  revision 2
+  revision 3
   head "https://github.com/sivel/speedtest-cli.git", branch: "master"
 
   bottle do
