@@ -4,6 +4,7 @@ class Codex < Formula
   url "https://github.com/openai/codex/archive/refs/tags/rust-v0.154.0.tar.gz"
   sha256 "1c4cdc3b87ba290b5d110425b4f6ff21663e236580bc760d1e149bd2d9f9519f"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
