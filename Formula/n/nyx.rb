@@ -6,7 +6,7 @@ class Nyx < Formula
   url "https://files.pythonhosted.org/packages/f4/da/68419425cb0f64f996e2150045c7043c2bb61f77b5928c2156c26a21db88/nyx-2.1.0.tar.gz"
   sha256 "88521488d1c9052e457b9e66498a4acfaaa3adf3adc5a199892632f129a5390b"
   license "GPL-3.0-only"
-  revision 3
+  revision 4
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "8eb0b7bcb1b664139aade59a2348fa7be599baf4cea312ace8fb6b3b91a6bf95"
