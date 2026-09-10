@@ -4,10 +4,11 @@ class Asc < Formula
   url "https://github.com/rorkai/App-Store-Connect-CLI/archive/refs/tags/5.1.0.tar.gz"
   sha256 "29509591b2f559d20c449885df7605cebaa4dfd77b8822f4906a939776f5f980"
   license "MIT"
+  revision 1
   head "https://github.com/rorkai/App-Store-Connect-CLI.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3174f55c0e5787a56c15e27c3d555bb108c162b4c7af1265ca7fdc841edee91"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac4c077b01587830b3fb26d654470728c223dcc6222de93eec5d0d3eafc30604"
   end
 
   depends_on "go" => :build
