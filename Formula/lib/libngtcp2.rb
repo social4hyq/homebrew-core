@@ -10,7 +10,7 @@ class Libngtcp2 < Formula
   head "https://github.com/ngtcp2/ngtcp2.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "429d6201e8da08fdbb4b6638289b1d86d314bd5b41e00e61f5491d4aeb8ffe14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "750ff65a599b89bc9b0fed3156f509a0cd21af3b8c526bda3e5b15f493abbfaf"
   end
 
   depends_on "pkgconf" => :build
