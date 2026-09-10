@@ -6,10 +6,11 @@ class Yamllint < Formula
   url "https://files.pythonhosted.org/packages/28/a0/8fc2d68e132cf918f18273fdc8a1b8432b60d75ac12fdae4b0ef5c9d2e8d/yamllint-1.38.0.tar.gz"
   sha256 "09e5f29531daab93366bb061e76019d5e91691ef0a40328f04c927387d1d364d"
   license "GPL-3.0-or-later"
+  revision 1
   head "https://github.com/adrienverge/yamllint.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a076f3b4c84d554c553f479e1021090be7461165762989122760466197ffaa4d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e23d3333c4d48a517e58cee20c9095e7c65891cccd5031047f713d2c84b192ef"
   end
 
   depends_on "libyaml"
