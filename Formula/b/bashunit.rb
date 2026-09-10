@@ -4,9 +4,10 @@ class Bashunit < Formula
   url "https://github.com/TypedDevs/bashunit/releases/download/0.50.1/bashunit"
   sha256 "18d83d590c5304f1853dd4fe4fec4ec6effbd9fe5a21831fe9f66f70afe17d93"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e05879f534b492269455891299a88ca1ca1c0695be23aef1002f5b41d0947cb3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "13a706c4c0db53a0e0ebc3a87fedc170aab74f343a68fa0ab9ccb1279d5aaf8c"
   end
 
   def install
