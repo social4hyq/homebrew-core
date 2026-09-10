@@ -4,10 +4,11 @@ class AwsCCal < Formula
   url "https://github.com/awslabs/aws-c-cal/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "9c6d424d206dd7822aa44fa39ce31575dcbaa83133620abdac8e56e4cea9667c"
   license "Apache-2.0"
+  revision 1
   compatibility_version 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c50f34d84ce7c3ba1e63a005fd50bcac0d01824884c7e4e0d181267a3e5b457c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "98959f32850a23883a03e123a0e58dc000dc90d7dd38699c2eaa2ca11fc56402"
   end
 
   depends_on "cmake" => :build
