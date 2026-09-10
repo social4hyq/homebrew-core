@@ -10,7 +10,7 @@ class Mypy < Formula
   head "https://github.com/python/mypy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b8e392e6d2d537f72fcca8582e52e68edb91f6e7f59caa4e2f6bc66a0fe8ebb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b85d8ca9c1a35a4f38fa9466bc6a8115184e9001712de62a8b1f5e5af2334a45"
   end
 
   depends_on "rust" => :build # `ast-serialize`
