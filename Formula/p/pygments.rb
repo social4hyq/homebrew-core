@@ -6,6 +6,7 @@ class Pygments < Formula
   url "https://files.pythonhosted.org/packages/49/2e/ced460408999b33da6b31b0021b0f37d329e202d4169aeb164493778f25b/pygments-2.21.0.tar.gz"
   sha256 "610ca751c9bc2492b38eb9a38a7fbc93edbbb2d7182edaf34e66ae493dee5c8c"
   license "BSD-2-Clause"
+  revision 1
   head "https://github.com/pygments/pygments.git", branch: "master"
 
   bottle do
