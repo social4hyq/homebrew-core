@@ -4,10 +4,11 @@ class Certifi < Formula
   url "https://files.pythonhosted.org/packages/a3/c2/24167ea9858356b47a87a50d39908bfdb72ceeefe0041586e704e5376b3a/certifi-2026.7.22.tar.gz"
   sha256 "741e2c3b351ddf169a738da9f2c048608ff7f2c5cc02f1ebc6b118bb090d5d55"
   license "MPL-2.0"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "67625265f35b52253bded8ac9c30a2ddaf5b4029be46eb81b1472599d1306d0e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e3b9d22b6315d697b5b266aa15beb3bc2516bda65424a12be9660d9b3c77255"
   end
 
   depends_on "python@3.14" => [:build, :test]
