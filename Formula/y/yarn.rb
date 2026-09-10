@@ -4,6 +4,7 @@ class Yarn < Formula
   url "https://yarnpkg.com/downloads/1.22.22/yarn-v1.22.22.tar.gz"
   sha256 "88268464199d1611fcf73ce9c0a6c4d44c7d5363682720d8506f6508addf36a0"
   license "BSD-2-Clause"
+  revision 1
 
   livecheck do
     skip("1.x line is frozen and features/bugfixes only happen on 2+")
