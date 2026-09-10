@@ -9,7 +9,7 @@ class Pawk < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8911acf751181aa90dcac28de64236c52885453d42f1f6d9bc7c1e9c577fffe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "49490344cc8b3a46d1495e57e8c194b6acd862a87a4a679a65d1a2dce2622183"
   end
 
   uses_from_macos "python"
