@@ -9,7 +9,7 @@ class Utf8proc < Formula
   head "https://github.com/JuliaStrings/utf8proc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef570f099586ea71ca3f668b3bb4d042fbaef0928056327795205c04c8f46981"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b3eec9f85e229b2b9b5a73960f9ba53cf44ec5a4ec1299f771b9f76ada06090b"
   end
 
   depends_on "cmake" => :build
