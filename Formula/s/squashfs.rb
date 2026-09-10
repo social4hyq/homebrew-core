@@ -4,6 +4,7 @@ class Squashfs < Formula
   url "https://github.com/plougher/squashfs-tools/archive/refs/tags/4.7.5.tar.gz"
   sha256 "547b7b7f4d2e44bf91b6fc554664850c69563701deab9fd9cd7e21f694c88ea6"
   license "GPL-2.0-or-later"
+  revision 1
   compatibility_version 1
   head "https://github.com/plougher/squashfs-tools.git", branch: "master"
 
@@ -14,7 +15,7 @@ class Squashfs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "14bddcb3555e9963161486534faa5385cea56c404abb5a3e3417ab099cd04e83"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "77bdbfe456df4dfbcd0b4ec8f4b16a3e983f53db7eea7455138503fa3ef9a6f1"
   end
 
   depends_on "gnu-sed" => :build
