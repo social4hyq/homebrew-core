@@ -18,7 +18,7 @@ class ApacheSerf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1147d6151520279c53fd9fac45f308c9c28e47ab6feb96aba333c7b9eaddc361"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a2dbefe06c6a9599720dc0e79381143548f817f505825426d953c6a5bf1f7e14"
   end
 
   depends_on "scons" => :build
