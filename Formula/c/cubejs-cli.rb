@@ -4,6 +4,7 @@ class CubejsCli < Formula
   url "https://registry.npmjs.org/cubejs-cli/-/cubejs-cli-1.7.35.tgz"
   sha256 "7ed13ad00105ab7cf4d52b62548a85a1b3518b47f567e567059b4007f98cdc8a"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "ae688497fb8ccaec596c4fbc8b9e108cc2cb9bd91d249775c554f35fa648fd3f"
