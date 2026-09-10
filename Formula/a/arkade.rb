@@ -4,6 +4,7 @@ class Arkade < Formula
   url "https://github.com/alexellis/arkade/archive/refs/tags/0.11.126.tar.gz"
   sha256 "53693acc51c48d23f199c1447973f0710976aa44e97b0a46d7123fd47213158b"
   license "MIT"
+  revision 1
   head "https://github.com/alexellis/arkade.git", branch: "master"
 
   livecheck do
