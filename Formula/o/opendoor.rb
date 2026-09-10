@@ -6,9 +6,10 @@ class Opendoor < Formula
   url "https://files.pythonhosted.org/packages/9b/67/f05f0d3a4c2aaea9651d348ddd196ecb84965e2d50586dc08e1a2f649b0d/opendoor-5.18.0.tar.gz"
   sha256 "f912e876b57b5416bcd1bb9423d74f7440f1366e0289877609e5dd0a8a2b3d67"
   license "GPL-3.0-only"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a98f7f455a7c93a9811d573c3ffb7297623facfbf86f862381e0fa3eaf0c5c2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "12cb5f20bf9c0c2e109437b3687f274c975ba75a527c294385a126e833a1757b"
   end
 
   depends_on "python@3.14"
