@@ -4,6 +4,7 @@ class Codewhale < Formula
   url "https://github.com/Hmbown/CodeWhale/archive/refs/tags/v0.9.12.tar.gz"
   sha256 "a5422b6c7a8434b12d5cd50a30485da36689804785241b89e886cd433b7ec48e"
   license "MIT"
+  revision 1
   head "https://github.com/Hmbown/CodeWhale.git", branch: "main"
 
   livecheck do
