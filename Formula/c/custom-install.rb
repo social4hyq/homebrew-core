@@ -6,6 +6,7 @@ class CustomInstall < Formula
   url "https://github.com/ihaveamac/custom-install/archive/refs/tags/v2.1.tar.gz"
   sha256 "35477355c8981d7aa55ace60fc3e43e1f96f762d141cf8773eb22df1ce4c50f8"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "6c9828528814edb2e92664c36bcbb9980e0769989a10c892d606a09f7f3b6431"
