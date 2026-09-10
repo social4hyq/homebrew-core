@@ -4,6 +4,7 @@ class Xbyak < Formula
   url "https://github.com/herumi/xbyak/archive/refs/tags/v7.41.1.tar.gz"
   sha256 "6b1271c45c2d76dfebb847782d2e191120b6f7aa3e93758b4fb80ebe7924b166"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/herumi/xbyak.git", branch: "master"
 
   livecheck do
