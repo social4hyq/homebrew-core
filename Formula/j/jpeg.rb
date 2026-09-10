@@ -5,6 +5,7 @@ class Jpeg < Formula
   mirror "https://fossies.org/linux/misc/jpegsrc.v10.tar.gz"
   sha256 "8b9eaa13242690ebd03e1728ab1edf97a81a78ed6e83624d493655f31ac95ab5"
   license "IJG"
+  revision 1
 
   livecheck do
     url "https://www.ijg.org/files/"
@@ -12,7 +13,7 @@ class Jpeg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "84fdb92cdec2338ca87941c637d5b5eb92f1befcc9c05604d912e5de7305befc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9447c20052656afea01f90156a49179cc76b089b498353e43c9845f697265eb"
   end
 
   keg_only "it conflicts with `jpeg-turbo`"
