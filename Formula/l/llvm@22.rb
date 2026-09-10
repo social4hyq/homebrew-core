@@ -5,6 +5,7 @@ class LlvmAT22 < Formula
   sha256 "922f1817a0df7b1489272d18134ee0087a8b068828f87ac63b9861b1a9965888"
   # The LLVM Project is under the Apache License v2.0 with LLVM Exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
+  revision 1
 
   livecheck do
     url :stable
@@ -12,8 +13,7 @@ class LlvmAT22 < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ba25563c925eb6814e247231fb55d2c70cf9609356ea6329a6ec552421c3d6c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bbb20a1f07b339ab8bd10a180cfd76594004747ca8df5dd8d84368668848356b"
   end
 
   keg_only :versioned_formula
