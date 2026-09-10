@@ -4,6 +4,7 @@ class Libpcap < Formula
   url "https://www.tcpdump.org/release/libpcap-1.10.7.tar.gz"
   sha256 "0b394ac90dbc0a9838ff97468e05c9c9a3e873dec2514cd58db65d859d296e31"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://github.com/the-tcpdump-group/libpcap.git", branch: "master"
 
@@ -13,7 +14,7 @@ class Libpcap < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa85aa08c18f53360d39958c2f8ebbade9c5e243c46ccc86fe66ad88d6dfc725"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03039c54e28298bf0bffc04c08d523db2c63bf3706a3270089bafeee768b6dbd"
   end
 
   keg_only :provided_by_macos
