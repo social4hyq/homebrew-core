@@ -4,10 +4,11 @@ class Imath < Formula
   url "https://github.com/AcademySoftwareFoundation/Imath/archive/refs/tags/v3.2.3.tar.gz"
   sha256 "e10c12b3f21f45bf08e09d4215d9c7691368d747beebd840de0b6fefed2df9f8"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abd7fe6f7339734c7a1b061fe03028ff2b44a4f4a4e4574e2440e56fa1ba2d36"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9751604c862989c8317eebbe8255acfd398eb2379cc1a482336dff2383acc75d"
   end
 
   depends_on "cmake" => :build
