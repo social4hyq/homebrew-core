@@ -8,7 +8,7 @@ class Xsv < Formula
   head "https://github.com/BurntSushi/xsv.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a124a2fca0b8691f54a005955bf7903ca8c2fdc52c8433049febb7290c9f8c04"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "24cf954a7427a0ce4dea6f514f5f648d80aa85b7190c2bd82b6b72ed21a50301"
   end
 
   deprecate! date: "2025-04-27", because: :repo_archived
