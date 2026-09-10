@@ -8,7 +8,7 @@ class Uthash < Formula
   head "https://github.com/troydhanson/uthash.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5221b42fc3fdee8ef4b3ff6b440e5f572dcfe0958f0a406a370ad2978b350dc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1dcc2c2526b2b6b7a31744d6b4999925649ebdcb1f862a666ba7769c4211163"
   end
 
   def install
