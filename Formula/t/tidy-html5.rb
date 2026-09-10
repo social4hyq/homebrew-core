@@ -4,6 +4,7 @@ class TidyHtml5 < Formula
   url "https://github.com/htacg/tidy-html5/archive/refs/tags/5.8.0.tar.gz"
   sha256 "59c86d5b2e452f63c5cdb29c866a12a4c55b1741d7025cf2f3ce0cde99b0660e"
   license "Zlib"
+  revision 1
   head "https://github.com/htacg/tidy-html5.git", branch: "next"
 
   livecheck do
@@ -12,7 +13,7 @@ class TidyHtml5 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "818a7d1b50c7954a1790883847fe283bf088b52911ac2adde9c9e09e8ea1653d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5570c86ceeb2c13162000d8ebd81cc2ee90675d108dce5be3682c07b79731a98"
   end
 
   depends_on "cmake" => :build
