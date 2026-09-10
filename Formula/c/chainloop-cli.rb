@@ -4,6 +4,7 @@ class ChainloopCli < Formula
   url "https://github.com/chainloop-dev/chainloop/archive/refs/tags/v1.108.6.tar.gz"
   sha256 "ab68c39a2f9719485003de829f0cf2e001ecd58ec9c0ebbc43c2259ff73dcfda"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/chainloop-dev/chainloop.git", branch: "main"
 
   livecheck do
@@ -12,7 +13,7 @@ class ChainloopCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cedb0568ad5a6a54c015133f894be6ed7afaaef0c20c6847afb52f094cd2c2a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ddee3927376922346c33fca5ef293d351813d83eae98162d9ce4798c029253b3"
   end
 
   depends_on "go" => :build
