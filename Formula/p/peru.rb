@@ -7,6 +7,7 @@ class Peru < Formula
   url "https://files.pythonhosted.org/packages/46/93/97b31e2052b4308cbc413d85b6b6b08a3beeeac81996b070723418a0c24e/peru-1.3.5.tar.gz"
   sha256 "2cc1a0d09c5d4fc28dda5c4bf87b4110ee2107e9ce7fb6a38f8d6f60a91af745"
   license "MIT"
+  revision 1
   head "https://github.com/buildinspace/peru.git", branch: "master"
 
   bottle do
