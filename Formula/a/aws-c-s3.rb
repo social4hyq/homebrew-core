@@ -4,10 +4,11 @@ class AwsCS3 < Formula
   url "https://github.com/awslabs/aws-c-s3/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "3b76d8ff35201a892a5e9a9c523d1f4d05381b3132d4e60728c634efae142f12"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "775c890f01ce205a72139e77e72239fd124a3d9b0238f3386a9dd5394a223629"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d0e02e5833942f606e8adefb1c7ecbd8a72b07f87a601f0a39c2a91e60d132b7"
   end
 
   depends_on "cmake" => :build
