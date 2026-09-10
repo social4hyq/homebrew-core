@@ -15,7 +15,7 @@ class Libxml2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2d38b3ad41ae76f999248d74c076eb9116ac37214c8f3a20741d54ce7d290df"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8aa7635a4d1af24e87ed0cab612978ef7a5bde5ee7ab50b087df3850d4e4bf04"
   end
 
   head do
