@@ -8,7 +8,7 @@ class Rcs < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a88fb79e82fd8e291c3baab160bc867a450740ac26acb3373dbf90f63c472b6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ed102460c47c4d93c8b9e0df3b9f9c4b8b8a9d01b2519bfb22538d2b83c7ddaa"
   end
 
   uses_from_macos "ed" => :build
