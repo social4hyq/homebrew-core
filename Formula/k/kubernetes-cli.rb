@@ -5,6 +5,7 @@ class KubernetesCli < Formula
       tag:      "v1.37.0",
       revision: "f54c212e3a2f75d674b717a9b29052b20b60aefc"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/kubernetes/kubernetes.git", branch: "master"
 
   livecheck do
@@ -13,7 +14,7 @@ class KubernetesCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9db854bf6dbd5eeac0894000c7f321d75f957743978815fe467dfaba6e77a8d5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7993cb13c24d0ab1839c4b0599ec41ce17b37b2dc8fcf6762a29ecc087b198d7"
   end
 
   depends_on "go" => :build
