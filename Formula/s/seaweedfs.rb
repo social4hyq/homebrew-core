@@ -5,6 +5,7 @@ class Seaweedfs < Formula
       tag:      "4.46",
       revision: "d997fba1575583a89cf0cc50dc0150642286c86d"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/seaweedfs/seaweedfs.git", branch: "master"
 
   livecheck do
