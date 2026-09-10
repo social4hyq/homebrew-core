@@ -10,7 +10,7 @@ class Ptpython < Formula
   head "https://github.com/prompt-toolkit/ptpython.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "13a0db37806d17d64acdec1bb0e6e1a9620947b61a9ef1c7532d1336ecef09ed"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a345e3b14cee0c53990e80121863f3ecdf41142cd8dd614c9a5445ceccdd9af"
   end
 
   depends_on "python@3.14"
