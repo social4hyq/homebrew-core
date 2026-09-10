@@ -5,7 +5,7 @@ class Unzip < Formula
   version "6.0"
   sha256 "036d96991646d0449ed0aa952e4fbe21b476ce994abc276e49d30e686708bd37"
   license "Info-ZIP"
-  revision 8
+  revision 9
 
   livecheck do
     url :stable
@@ -13,8 +13,7 @@ class Unzip < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1db0de1d82e2077cab6a7f0b2be5b5c5a3046b2c8aedb0e5b74fa8ec7792afe3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a99c695ff653c0ff1e5fc14549465bd5694a6969ce7e02757731b77219f3f01"
   end
 
   keg_only :provided_by_macos
