@@ -6,6 +6,7 @@ class Gmp < Formula
   mirror "https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz"
   sha256 "a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898"
   license any_of: ["LGPL-3.0-or-later", "GPL-2.0-or-later"]
+  revision 1
   compatibility_version 1
   head "https://gmplib.org/repo/gmp/", using: :hg
 
@@ -15,7 +16,7 @@ class Gmp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a123def7337b7939e1c63f80096a83c0f75b39762a043082e73f7f9149f8bb1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e795a4189c28c2f7ce434e26b5cb4df005ce483f5e2f71573156017f6f93901e"
   end
 
   depends_on "autoconf" => :build
