@@ -1,10 +1,10 @@
 class Xz < Formula
   desc "General-purpose data compression with high compression ratio"
   homepage "https://tukaani.org/xz/"
-  url "https://github.com/tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.gz"
-  mirror "https://downloads.sourceforge.net/project/lzmautils/xz-5.8.3.tar.gz"
-  mirror "http://downloads.sourceforge.net/project/lzmautils/xz-5.8.3.tar.gz"
-  sha256 "3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0"
+  url "https://github.com/tukaani-project/xz/releases/download/v5.8.4/xz-5.8.4.tar.gz"
+  mirror "https://downloads.sourceforge.net/project/lzmautils/xz-5.8.4.tar.gz"
+  mirror "http://downloads.sourceforge.net/project/lzmautils/xz-5.8.4.tar.gz"
+  sha256 "0014c7886930454fe8bd4228665b51af55eeae560ea135c9c4cd33f55b2591d9"
   license all_of: [
     "0BSD",
     "GPL-2.0-or-later",
@@ -13,7 +13,7 @@ class Xz < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0a9fb55899b876928304a03d67c74548c21de02fa8951c0e92b19a96c7f9976"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "94f94e040ca3df69234fcba6099fb17dc942f860d6b64d5eda7084625b34b871"
   end
 
   deny_network_access! [:build, :postinstall]
