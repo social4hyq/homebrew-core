@@ -4,6 +4,7 @@ class Pkcs11Helper < Formula
   url "https://github.com/OpenSC/pkcs11-helper/releases/download/pkcs11-helper-1.31.0/pkcs11-helper-1.31.0.tar.bz2"
   sha256 "46f0067bccd7be2c28f88b8bca775172b9e52fb6fc1280b44ca8bb831433fef9"
   license any_of: ["BSD-3-Clause", "GPL-2.0-or-later"]
+  revision 1
   compatibility_version 1
   head "https://github.com/OpenSC/pkcs11-helper.git", branch: "master"
 
@@ -14,7 +15,7 @@ class Pkcs11Helper < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d32e474fb9a8ec4bf721d9c6f4c5f60355a247d438359eb0963fab6d980ddbf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72a2af0aa51c38efc7e02ca26073262a18d0826f8530a1ef2f964981a0ae8937"
   end
 
   depends_on "autoconf" => :build
