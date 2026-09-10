@@ -10,7 +10,7 @@ class CmakeLanguageServer < Formula
   head "https://github.com/regen100/cmake-language-server.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac1697f41d5ff72b39119eac7041df4f71431db1781edc247ade8c401f07c39a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd29ed8a0f37e0febd213dcc4ec5433f3589cd1f379ad65202d6ae9d0a271455"
   end
 
   depends_on "python@3.14"
