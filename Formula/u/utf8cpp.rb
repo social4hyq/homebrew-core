@@ -4,6 +4,7 @@ class Utf8cpp < Formula
   url "https://github.com/nemtrif/utfcpp/archive/refs/tags/v4.2.0.tar.gz"
   sha256 "54a8e96ea835a7359e8e53d03e30e9833d51350cc4615ff53f8449ef19ee46ab"
   license "BSL-1.0"
+  revision 1
   version_scheme 1
   compatibility_version 1
 
