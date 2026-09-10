@@ -4,6 +4,7 @@ class Protobuf < Formula
   url "https://github.com/protocolbuffers/protobuf/releases/download/v36.1/protobuf-36.1.tar.gz"
   sha256 "dc74fa582f559cbd31614ddfefb4868f43c919d7184bde514bb47f90c6025eb8"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 4
 
   livecheck do
@@ -12,7 +13,7 @@ class Protobuf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c16585c57e4b2b8d4a0af52badcdd73bb69da9ee1191f590d9cbed03d4bbe4b0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b6fd005e55da72c33b07e52b8d6cb386f9058409d0cc10b919da33e2e2650ef4"
   end
 
   depends_on "cmake" => :build
