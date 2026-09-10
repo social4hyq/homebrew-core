@@ -4,6 +4,7 @@ class Pocketbase < Formula
   url "https://github.com/pocketbase/pocketbase/archive/refs/tags/v0.40.3.tar.gz"
   sha256 "b04d0eb802197ee8cf27adf207ed2f6fe032ddabe0752913a0e34f02cf897666"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "3a978c8535367ead4990c54056fb0b9e9866113925f71b26794809625d0a2caa"
