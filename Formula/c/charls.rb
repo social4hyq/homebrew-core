@@ -8,7 +8,7 @@ class Charls < Formula
   head "https://github.com/team-charls/charls.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "67895b18205f11dfa479dec053eca137550f421367b5b1b2473aa4337796feda"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "93d3e60b8ae52a4fc58349783a509c1dfd7121f5c5315c21d9614d0404f599b1"
   end
 
   depends_on "cmake" => :build
