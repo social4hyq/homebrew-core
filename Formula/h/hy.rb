@@ -6,6 +6,7 @@ class Hy < Formula
   url "https://files.pythonhosted.org/packages/91/1e/de3ff93dcb16de04b12b570742e03e4d741106e9721c1a5a0bb53d450e08/hy-1.3.1.tar.gz"
   sha256 "cf7b85fc59079b5da794c7ecaafc6a6e9140f73305af03836c3d52cf978b6645"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "229962c7108b444405808dd3584cbe7e12ba394d5bac121f3e4715c9d99af7f7"
