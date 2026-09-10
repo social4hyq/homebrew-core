@@ -4,6 +4,7 @@ class DockerCompletion < Formula
   url "https://github.com/docker/cli/archive/refs/tags/v29.8.0.tar.gz"
   sha256 "c5fadbc00c02dbecb1b7c9936e188baf9c80421a9107e7e9ad36a0923a0fc764"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
   head "https://github.com/docker/cli.git", branch: "master"
 
@@ -12,7 +13,7 @@ class DockerCompletion < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d03253bdadad21ee6b852dad9d59d0b3f3162635aa070c17d909bac19e20a473"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "615ddabfda321134a45c8167dba7c56e2bf5f2d7bd4101c36674101708a1c365"
   end
 
   conflicts_with cask: "docker-desktop"
