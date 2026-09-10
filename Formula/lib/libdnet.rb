@@ -13,7 +13,7 @@ class Libdnet < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4aaacd865bddef2fbe3e6937abb96ce38886a9c9912b18956860129d1cab1598"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b968a6977e6e016244045cf31f5f2a3b3fd7f24a2043b9e5e9c27fbb47a8eb2f"
   end
 
   depends_on "autoconf" => :build
