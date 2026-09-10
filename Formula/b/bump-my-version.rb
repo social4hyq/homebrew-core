@@ -6,6 +6,7 @@ class BumpMyVersion < Formula
   url "https://files.pythonhosted.org/packages/23/09/5b09ac74962eca809cbf7010a08ea6ad405852bdd53489209a9f473d775c/bump_my_version-1.5.1.tar.gz"
   sha256 "5079e443ab8c9a9903f140b427ff9f6fe8dd54013a55a4cf48b89326f3a71c07"
   license "MIT"
+  revision 1
   head "https://github.com/callowayproject/bump-my-version.git", branch: "master"
 
   bottle do
