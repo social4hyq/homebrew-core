@@ -1,13 +1,13 @@
 class Fn < Formula
   desc "Command-line tool for the fn project"
   homepage "https://fnproject.io"
-  url "https://github.com/fnproject/cli/archive/refs/tags/0.6.65.tar.gz"
-  sha256 "75bbd9969c19c8cfa5b61ea037820e65402ef490845a1dc20a9011091a2f2541"
+  url "https://github.com/fnproject/cli/archive/refs/tags/0.6.66.tar.gz"
+  sha256 "0cda5864146b7280b8c05f98590b3b5e2e025d19634094e2e445ed1d8326fb9c"
   license "Apache-2.0"
   head "https://github.com/fnproject/cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "662ea4963f892e7b8c5fe28cdcd10cb7748e04d09c3f14e76c42c538d7429950"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65648d4a70e1bb33b8aa9390d9c81eb77cabaa90b4c02edfe76d84f3b63c121d"
   end
 
   depends_on "go" => :build
