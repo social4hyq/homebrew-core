@@ -4,6 +4,7 @@ class SupabaseMcpServer < Formula
   url "https://registry.npmjs.org/@supabase/mcp-server-supabase/-/mcp-server-supabase-0.12.0.tgz"
   sha256 "adb305ef07a85a451998d9d446e0e6da7490f4443f923d74ff7548e14d400745"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "4d6cefba5c77dc78065c015f33f6455dc0b6187cd4edc684a7be6666e726834f"
