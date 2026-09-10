@@ -4,6 +4,7 @@ class Mihomo < Formula
   url "https://github.com/MetaCubeX/mihomo/archive/refs/tags/v1.19.30.tar.gz"
   sha256 "ee8a7107707e4bd485460139b1944e7be30016393783f2b4e928c14880c8ca8b"
   license "GPL-3.0-or-later"
+  revision 1
   head "https://github.com/MetaCubeX/mihomo.git", branch: "main"
 
   bottle do
