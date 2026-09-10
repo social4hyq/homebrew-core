@@ -4,6 +4,7 @@ class Opencc < Formula
   url "https://github.com/BYVoid/OpenCC/archive/refs/tags/ver.1.4.2.tar.gz"
   sha256 "8e5f5cf7fe195bd9b9be851adc9738c1ef7dc5c24441dd5878a56db4087a9a70"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
   head "https://github.com/BYVoid/OpenCC.git", branch: "master"
 
