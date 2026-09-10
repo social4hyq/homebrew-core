@@ -7,7 +7,7 @@ class Containerd < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ef017b95babcb373a90a178b258b7e8b7ea83b8825dbe17ab32da7de9cf3f76"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4e476129ee4d453ee4271c59440b0df5ddbb51f07c4e709735ae52d5d301e44"
   end
 
   depends_on "go" => :build
