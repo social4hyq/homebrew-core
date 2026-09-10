@@ -4,11 +4,12 @@ class Tinyxml2 < Formula
   url "https://github.com/leethomason/tinyxml2/archive/refs/tags/11.0.0.tar.gz"
   sha256 "5556deb5081fb246ee92afae73efd943c889cef0cafea92b0b82422d6a18f289"
   license "Zlib"
+  revision 1
   compatibility_version 1
   head "https://github.com/leethomason/tinyxml2.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "197252776b761fc24fb8a7680802f1ed225cb9b710c7437badc98dc05954558b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5fef045d0f7ef7623f420d5caedeefea8031ccfa23c5d8989bb9c95a17e33e51"
   end
 
   depends_on "cmake" => :build
