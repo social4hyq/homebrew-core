@@ -6,7 +6,7 @@ class GiDocgen < Formula
   url "https://files.pythonhosted.org/packages/43/23/386dad008d1f1dc3c7188db63ea5bf82ceb41a5914fb050e6e09a14a457a/gi_docgen-2026.1.tar.gz"
   sha256 "65ac3c4f2b4255d1c616fb8eae55139b6ca10071545ca2272759ffd2ccf2c7b5"
   license any_of: ["Apache-2.0", "GPL-3.0-or-later"]
-  revision 1
+  revision 2
   head "https://gitlab.gnome.org/GNOME/gi-docgen.git", branch: "main"
 
   bottle do
