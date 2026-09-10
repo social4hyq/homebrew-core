@@ -4,6 +4,7 @@ class Jj < Formula
   url "https://github.com/jj-vcs/jj/archive/refs/tags/v0.45.1.tar.gz"
   sha256 "72bf95905a92c592dd0e7316e2cbbad9a8f2ca04ca770cc4f4f7960495a44e15"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
   head "https://github.com/jj-vcs/jj.git", branch: "main"
 
