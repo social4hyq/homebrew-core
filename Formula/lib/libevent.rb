@@ -4,6 +4,7 @@ class Libevent < Formula
   url "https://github.com/libevent/libevent/archive/refs/tags/release-2.1.13-stable.tar.gz"
   sha256 "1a0885e17dc78afbaeddf13cf849f9238bbc24acdc178464a0d1934d7c5ffbd5"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
 
   livecheck do
