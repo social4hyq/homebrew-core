@@ -9,7 +9,7 @@ class Apprise < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd36a2337552e1b528d82cd6c90fd5a56b3b2e6d57c0c8db033d8621bdec3f5d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "380de558b7801b25a44307b9c537e897e476605f249f7c4d272e404350b45e3c"
   end
 
   depends_on "certifi"
