@@ -4,6 +4,7 @@ class Watchexec < Formula
   url "https://github.com/watchexec/watchexec/archive/refs/tags/v2.7.2.tar.gz"
   sha256 "ad87aac074e5d1b018bb50ef98240911cd31d96d68d9b8ac0f02c14879930f50"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/watchexec/watchexec.git", branch: "main"
 
   livecheck do
