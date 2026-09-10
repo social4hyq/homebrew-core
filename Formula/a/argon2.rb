@@ -4,11 +4,11 @@ class Argon2 < Formula
   url "https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/20190702.tar.gz"
   sha256 "daf972a89577f8772602bf2eb38b6a3dd3d922bf5724d45e7f9589b5e830442c"
   license "Apache-2.0"
-  revision 1
+  revision 2
   head "https://github.com/P-H-C/phc-winner-argon2.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "553c7c5b1271fb4a7752ca11ba4726a33402d4ca9a3c94727a869ed022ada53c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e514bfd86df48f9467839946cc34368faec62ca5c0aa1dc6875d529ed3316d8e"
   end
 
   def install
