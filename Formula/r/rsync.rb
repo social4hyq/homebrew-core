@@ -5,6 +5,7 @@ class Rsync < Formula
   mirror "https://rsync.samba.org/ftp/rsync/rsync-3.5.0.tar.gz"
   sha256 "c7ffd1ef653e99540f661e47cb00b7f9cad1ee6b972399b16f93d672656e0d33"
   license "GPL-3.0-or-later"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "eab2bf37456a2dd1e63bd47881cdff2d60501b9791fc0011f54ceaca708be611"
