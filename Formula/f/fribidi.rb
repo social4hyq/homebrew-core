@@ -7,7 +7,7 @@ class Fribidi < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "026b48c3b630648a47d9184e85d3c5cbf3a0bad1747859fc0e4b5aa114a5f4fe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "35c3e068c27ce5193a52e02d41ebd6150e286fffc7d1eeb3c5a3e99b486b66b1"
   end
 
   def install
