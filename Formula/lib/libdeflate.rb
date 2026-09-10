@@ -4,6 +4,7 @@ class Libdeflate < Formula
   url "https://github.com/ebiggers/libdeflate/archive/refs/tags/v1.26.tar.gz"
   sha256 "bba03fffc5538576213675ce6968fcff6ce2e67d82e4d5febea2d05f9f13cf85"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
