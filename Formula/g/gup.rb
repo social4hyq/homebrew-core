@@ -4,6 +4,7 @@ class Gup < Formula
   url "https://github.com/nao1215/gup/archive/refs/tags/v1.9.1.tar.gz"
   sha256 "bcfaa2db60f353b99939532b7464e1e9707b1594bad225a35a52f6b9a5f6d7be"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/nao1215/gup.git", branch: "main"
 
   bottle do
