@@ -4,6 +4,7 @@ class Ifacemaker < Formula
   url "https://github.com/vburenin/ifacemaker/archive/refs/tags/v1.4.0.tar.gz"
   sha256 "c14fb68397812f4ac487a2626262396d9f9a01a4da39023713795b04b5714a83"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/vburenin/ifacemaker.git", branch: "master"
 
   bottle do
