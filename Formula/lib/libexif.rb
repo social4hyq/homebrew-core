@@ -4,6 +4,7 @@ class Libexif < Formula
   url "https://github.com/libexif/libexif/releases/download/v0.6.26/libexif-0.6.26.tar.bz2"
   sha256 "0830ed253fceeb60444fb309598bc8a9491d3007dc054aad3a50a347c5597c57"
   license all_of: ["LGPL-2.1-or-later", "LGPL-2.0-or-later"]
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Libexif < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a69332ba121355a6fb1240d95ca939c31a7a3666b931bf5a65d7425f723ef85d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae7e53f224630c7cf2fd233f89eb41d6cca80db001cbec10aa4274467d33cafc"
   end
 
   head do
