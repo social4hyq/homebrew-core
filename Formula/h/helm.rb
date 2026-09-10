@@ -5,10 +5,11 @@ class Helm < Formula
       tag:      "v4.3.0",
       revision: "bec5b06ed841fe5269972d864d5177944fd5970f"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/helm/helm.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d38265e4cba30ff02cc5de349eb590b6780dbc82218c7264a98a880eb4a6c46c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d79a03340bb1695a7d12c82d20388fb8614283262617ade251345fd659d5173"
   end
 
   depends_on "go" => :build
