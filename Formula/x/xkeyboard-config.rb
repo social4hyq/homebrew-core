@@ -4,6 +4,7 @@ class XkeyboardConfig < Formula
   url "https://xorg.freedesktop.org/archive/individual/data/xkeyboard-config/xkeyboard-config-2.48.tar.xz"
   sha256 "b77041324f0109f77161ee43743fe04baa485866af8460d31e476ad3f7648fd5"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config.git", branch: "master"
 
