@@ -4,6 +4,7 @@ class Libarchive < Formula
   url "https://www.libarchive.org/downloads/libarchive-3.8.9.tar.xz"
   sha256 "888c934f9d95648ecb9163dc8e23ab80a476ecb81a8f1154704a227b5b676dde"
   license "BSD-2-Clause"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Libarchive < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c3ada7109c7874dfbec3fed5489a292486d1d87d3d5552aef97537d8280035b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "993e511a862799378aa8f214764b8ed5c7bf491ccc3a8e431087f409736ff1d0"
   end
 
   keg_only :provided_by_macos
