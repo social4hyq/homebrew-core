@@ -4,6 +4,7 @@ class Libpciaccess < Formula
   url "https://www.x.org/pub/individual/lib/libpciaccess-0.19.tar.xz"
   sha256 "3c55aa86c82e54a4e3109786f0463530d53b36b6d1cfd14616454f985dd2aa43"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
