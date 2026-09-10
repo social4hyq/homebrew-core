@@ -4,11 +4,12 @@ class Openjpeg < Formula
   url "https://github.com/uclouvain/openjpeg/archive/refs/tags/v2.5.4.tar.gz"
   sha256 "a695fbe19c0165f295a8531b1e4e855cd94d0875d2f88ec4b61080677e27188a"
   license "BSD-2-Clause"
+  revision 1
   compatibility_version 1
   head "https://github.com/uclouvain/openjpeg.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f7d63490d663699a964f747ec68df7bf746f88a0fd0285fa3ed7ac289a5446b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "06109ff8e0e8f804ec06dcf4e0aa11a2fc4470eb04732f09704415852b268858"
   end
 
   depends_on "cmake" => :build
