@@ -5,6 +5,7 @@ class Libnghttp3 < Formula
   mirror "http://fresh-center.net/linux/www/nghttp3-1.18.0.tar.xz"
   sha256 "aad782c23d3f01bd4bb52c8bac7a553b631ef8115fd1612703df6183449fef19"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/ngtcp2/nghttp3.git", branch: "main"
 
