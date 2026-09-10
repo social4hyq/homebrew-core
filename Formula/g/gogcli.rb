@@ -4,6 +4,7 @@ class Gogcli < Formula
   url "https://github.com/steipete/gogcli/archive/refs/tags/v0.39.1.tar.gz"
   sha256 "888ec3036e04e9b59e806b29bb0af95562d55f059008a78748d637ade9141538"
   license "MIT"
+  revision 1
   head "https://github.com/steipete/gogcli.git", branch: "main"
 
   bottle do
