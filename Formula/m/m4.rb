@@ -5,6 +5,7 @@ class M4 < Formula
   mirror "https://ftp.gnu.org/gnu/m4/m4-1.4.21.tar.xz"
   sha256 "f25c6ab51548a73a75558742fb031e0625d6485fe5f9155949d6486a2408ab66"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
