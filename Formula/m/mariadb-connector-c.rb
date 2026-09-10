@@ -6,6 +6,7 @@ class MariadbConnectorC < Formula
   mirror "https://fossies.org/linux/misc/mariadb-connector-c-3.4.9-src.tar.gz/"
   sha256 "a84bba97e59b6a322637a189964d4fd72bd8d92f2d22a9f8d6a5f0657c821e97"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
   head "https://github.com/mariadb-corporation/mariadb-connector-c.git", branch: "3.4"
 
