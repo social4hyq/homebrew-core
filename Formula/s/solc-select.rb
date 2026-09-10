@@ -6,7 +6,7 @@ class SolcSelect < Formula
   url "https://files.pythonhosted.org/packages/62/89/51e614fdbf26f47268c18f8a3b6cf1cb67c9a8b48b7b7231c948cae97814/solc_select-1.2.0.tar.gz"
   sha256 "ad0a7afcae05061ce5e7632950b1fa0193ba9eaf05e4956f86effee024c6fb07"
   license "AGPL-3.0-only"
-  revision 4
+  revision 5
   head "https://github.com/crytic/solc-select.git", branch: "dev"
 
   bottle do
