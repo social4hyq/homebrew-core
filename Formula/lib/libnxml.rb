@@ -8,7 +8,7 @@ class Libnxml < Formula
   head "https://github.com/bakulf/libnxml.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b86696ceb976d5a958f6cf5d10aec6ce45caee4c4423a688ab6948479ab74e85"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1b986d34631899985c420b5e7cc6033ea06cbf5556bbf074cba432be6ef3434b"
   end
 
   depends_on "autoconf" => :build
