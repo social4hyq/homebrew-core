@@ -9,7 +9,7 @@ class Khard < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e236a5a1b0290faf015cfefffebd19e6ea2e6c95ef7e242b7c7ebd1f37bae8bf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7eba1eff71821def41a9bd8fca526fa39a0b78272223b1d135c3b9f15dee62d"
   end
 
   depends_on "python@3.14"
