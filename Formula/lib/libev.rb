@@ -14,7 +14,7 @@ class Libev < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "180cf5693ea122ecaba1fd78190fc655a1193eaf36076e60a9f01be2bd1d9268"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0bfe878fb1d1b583d66275c7fa99cae23a63f3902138e2792ee485dc8cadd35f"
   end
 
   # Fix -flat_namespace being used on Big Sur and later.
