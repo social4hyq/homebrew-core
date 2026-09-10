@@ -4,6 +4,7 @@ class Openh264 < Formula
   url "https://github.com/cisco/openh264/archive/refs/tags/v2.6.0.tar.gz"
   sha256 "558544ad358283a7ab2930d69a9ceddf913f4a51ee9bf1bfb9e377322af81a69"
   license "BSD-2-Clause"
+  revision 1
   head "https://github.com/cisco/openh264.git", branch: "master"
 
   # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
@@ -15,7 +16,7 @@ class Openh264 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "251f8998725725bda9d1973733fa587e2ef1a34653a164bf6225c6e2fdfc64aa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ebfa5b6dab057a2804ff3a771665d2af4f7032881ec1f2cb5941636e381fde88"
   end
 
   depends_on "nasm" => :build
