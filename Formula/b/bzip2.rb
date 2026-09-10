@@ -5,6 +5,7 @@ class Bzip2 < Formula
   mirror "https://mirrors.kernel.org/sourceware/bzip2/bzip2-1.0.8.tar.gz"
   sha256 "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"
   license "bzip2-1.0.6"
+  revision 1
 
   livecheck do
     url "https://sourceware.org/pub/bzip2/"
@@ -12,8 +13,7 @@ class Bzip2 < Formula
   end
 
   bottle do
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2dd11c7a11e600b10942ae0361d3b6170f3069bfaf42611477d5ac61b6f19e84"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e43a640c8b39137d70cf801f007827d4419002b50a49dbc788f954a10e3c835c"
   end
 
   keg_only :provided_by_macos
