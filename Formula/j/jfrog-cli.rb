@@ -4,6 +4,7 @@ class JfrogCli < Formula
   url "https://github.com/jfrog/jfrog-cli/archive/refs/tags/v2.124.0.tar.gz"
   sha256 "05a232abe46627a40df4d509e8ab7da1d8532bd5f50317b9189ae26fa572e23b"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/jfrog/jfrog-cli.git", branch: "master"
 
   # There can be a notable gap between when a version is tagged and a
@@ -15,7 +16,7 @@ class JfrogCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "94155e8dc4dfcb0c56b8f4a770d101e19cf24c4f5235fb9ded27122cc6dfd92a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "74035ff4047f81e657737d3b542fb626dafe03f243f6a84d2979c5cc1a78f0fa"
   end
 
   depends_on "go" => :build
