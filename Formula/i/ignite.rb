@@ -4,6 +4,7 @@ class Ignite < Formula
   url "https://github.com/ignite/cli/archive/refs/tags/v29.10.1.tar.gz"
   sha256 "3d9edae9cc6b270a75f0bc4aa4a83326defe67126f509965bb2150e5530015a2"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/ignite/cli.git", branch: "main"
 
   bottle do
