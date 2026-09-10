@@ -4,6 +4,7 @@ class Glslang < Formula
   url "https://github.com/KhronosGroup/glslang/archive/refs/tags/16.5.0.tar.gz"
   sha256 "01af17195fbeb59e39e31e9506de35bb39dfd35807ea0c9a1a99d7d1183ddd45"
   license all_of: ["BSD-3-Clause", "GPL-3.0-or-later", "MIT", "Apache-2.0"]
+  revision 1
   compatibility_version 1
   head "https://github.com/KhronosGroup/glslang.git", branch: "main"
 
@@ -13,7 +14,7 @@ class Glslang < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5dcb3290fbba0c719a3cc644903ef919f8a5774a88a71c49ec935552a1eea57b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4114af3fe7bf4c55e5ab6029a0c7898b4006fb7541773474a8b0c086cb2b8899"
   end
 
   depends_on "cmake" => :build
