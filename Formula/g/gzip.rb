@@ -8,7 +8,7 @@ class Gzip < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "094736305e81702400933155de42fcae7a53e68cd85836b64974be1f6c045e77"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a2bcfe104e9336ca915f07a7b1284e1727605b2acb38dcb4984d34d5a37d3cf"
   end
 
   def install
