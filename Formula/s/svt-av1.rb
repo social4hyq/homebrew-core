@@ -5,11 +5,12 @@ class SvtAv1 < Formula
   version "4.2.0-cqp-extended"
   sha256 "7595ac70c08027075d48332587a1b0999f8cbb03d02d100dc053a8bd9f47d8ba"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://gitlab.com/AOMediaCodec/SVT-AV1.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7cff0e582e3473673501dedb2c1f64dbb9d2773766c5e880d457e03dd94a69b5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "02ed9b8d3eec2a41a83903623a5add6e340a723884221aa2d358364666c9969d"
   end
 
   depends_on "cmake" => :build
