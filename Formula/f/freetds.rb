@@ -4,6 +4,7 @@ class Freetds < Formula
   url "https://www.freetds.org/files/stable/freetds-1.5.19.tar.bz2"
   sha256 "0dc2df2fea9934e3a99e00d417f3d192e9897572f6aff3905bd48f2507d16dff"
   license "GPL-2.0-or-later"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Freetds < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1c2c3feafe9ed1e6747012e2077efa4c0b10931ebe8955475404364b84edcc4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f194a4c9cc9566e903b18fb1b567d6bbf4cd8e2d1a92250fd502bbfac26724d4"
   end
 
   head do
