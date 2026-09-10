@@ -6,6 +6,7 @@ class PortableGit < PortableFormula
   url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.55.0.tar.xz"
   sha256 "457fdb04dc8728e007d4688695e6912e6f680727920f2a40bf11eacc17505357"
   license "GPL-2.0-only"
+  revision 1
   head "https://github.com/git/git.git", branch: "master"
 
   livecheck do
@@ -16,7 +17,7 @@ class PortableGit < PortableFormula
   no_autobump! because: "this is a critical package so an auto bump might break Homebrew usability."
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ee6b4c698dfdcc528444e403ff636fb8a5dfb48be574df882db6a3bf5f1ec0f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "131f66b2171b688a958e7317c593e38d851386aef659abb1314bb4c6f198bac9"
   end
 
   patch do
