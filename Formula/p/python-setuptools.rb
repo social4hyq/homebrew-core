@@ -4,6 +4,7 @@ class PythonSetuptools < Formula
   url "https://files.pythonhosted.org/packages/6d/44/f5da03a8ef95d369145c5bb53050e7877c9f3d312e128605fd9504829143/setuptools-84.0.0.tar.gz"
   sha256 "f4695c21257f0d9b537ec2692c941d02ee143b7cc1276941349a546573b2ef73"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "2ecd4c4db571679ee341fd13871eca45fa455a5c4f6f4ec0fae6bf248f649ba4"
