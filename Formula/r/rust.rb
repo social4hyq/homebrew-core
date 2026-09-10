@@ -4,6 +4,7 @@ class Rust < Formula
   url "https://static.rust-lang.org/dist/rust-1.98.1-aarch64-unknown-linux-ohos.tar.xz"
   sha256 "80d115b5209fe56039f160d7aabe45f8f3dbf1e203f591b676136e05d33c1ba0"
   license any_of: ["Apache-2.0", "MIT"]
+  revision 1
   compatibility_version 1
   head "https://github.com/rust-lang/rust.git", branch: "main"
 
