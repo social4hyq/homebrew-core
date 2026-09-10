@@ -4,6 +4,7 @@ class Nmap < Formula
   url "https://nmap.org/dist/nmap-7.991.tar.bz2"
   sha256 "a5d507f29437bef3bedd4771ff9aaa8fc1c2a109ddba1f5b1cf12027456929be"
   license :cannot_represent
+  revision 1
   compatibility_version 1
   head "https://svn.nmap.org/nmap/"
 
