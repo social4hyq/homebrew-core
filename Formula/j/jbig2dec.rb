@@ -4,6 +4,7 @@ class Jbig2dec < Formula
   url "https://github.com/ArtifexSoftware/jbig2dec/archive/refs/tags/0.20.tar.gz"
   sha256 "a9705369a6633aba532693450ec802c562397e1b824662de809ede92f67aff21"
   license "AGPL-3.0-or-later"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "f2c455e7c84f30a8c276cb4ec2f3eb9b5dac97da3bdd8e4326f5d7fcf4cf6ce1"
