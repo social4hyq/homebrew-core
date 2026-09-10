@@ -12,7 +12,7 @@ class BatsCore < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca2560e709a9e5bedbf199e2df11f511a26d6c678845c103b33f5862231e1a4f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bb907d9cc6ccf7800b190fccf9a879fd3fa9e55008cf5d5231dd890c5bd0f11f"
   end
 
   def install
