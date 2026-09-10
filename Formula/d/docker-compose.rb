@@ -4,6 +4,7 @@ class DockerCompose < Formula
   url "https://github.com/docker/compose/archive/refs/tags/v5.5.1.tar.gz"
   sha256 "311077662698fd8e34769a894f9d5240befb1730990efa8ed58e0fa8725d2d84"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/docker/compose.git", branch: "main"
 
   # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
@@ -15,7 +16,7 @@ class DockerCompose < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a2007405374a138b357aaa0fceff9bee24d82f2e2184edc4622f8899afbfd74"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eedd7a06a38e99b7b750d94d12ef82fde2465cd5e5e7b4eaa454f64a40c15e19"
   end
 
   depends_on "go" => :build
