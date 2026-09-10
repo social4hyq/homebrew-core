@@ -15,7 +15,7 @@ class Cups < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "38bcc2d2a4f094d217867a6ce3f0f47929480b881fdfa4294d23c87358c59c4c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "caeefb7b8068a1d34d3ac47f248c7961da4098783d260549536fbeb51d6d8bda"
   end
 
   keg_only :provided_by_macos
