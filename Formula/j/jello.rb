@@ -9,7 +9,7 @@ class Jello < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0081ad3fa7d72f5b447377c359c6d50a4aa2eb4d73e9b54e4d5bd8e4c787bdb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "19d1162df36fac7a87027624fdbacee568f9939addc89845acd0b313fefcda08"
   end
 
   depends_on "python@3.14"
