@@ -13,7 +13,7 @@ class Xorgproto < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db9cf906ed7395dde0e4cc46e0ea24534cb26e0d9353dac8253ee569cf687d02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aeb0c31280d37f1fe8ac7797fdd225dee1515e341aa19948c1a3cecc0851d157"
   end
 
   depends_on "pkgconf" => [:build, :test]
