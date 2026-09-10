@@ -8,7 +8,7 @@ class Libnsl < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3342964815c67bbfa916956c423e80ef90e96f7f88d4dac0af509fc02c6977bc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f21bff6cdd522d90a19fa791b161fa40520b2556f083d01fddc86513e4f5fe39"
   end
 
   depends_on "pkgconf" => :build
