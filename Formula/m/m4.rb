@@ -5,11 +5,11 @@ class M4 < Formula
   mirror "https://ftp.gnu.org/gnu/m4/m4-1.4.21.tar.xz"
   sha256 "f25c6ab51548a73a75558742fb031e0625d6485fe5f9155949d6486a2408ab66"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "43e27d06206950e31aac25c1cc4596399dfcf350725fc459d9ff1e20be7d811a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "075f0b0c1438cb859fe745d7771b7ec9f35304d5f6d0109754f81548c3fee959"
   end
 
   keg_only :provided_by_macos
