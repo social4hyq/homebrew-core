@@ -6,6 +6,7 @@ class Gdown < Formula
   url "https://files.pythonhosted.org/packages/39/54/95355a2bce205f67276236a7469d12f90dbe4c5b155f163a5ea5bd2353bc/gdown-6.2.0.tar.gz"
   sha256 "0bbf25d3761262263a2d9d4a6cb26ebc7e0f225ad8f13483209992508bccdc54"
   license "MIT"
+  revision 1
   head "https://github.com/wkentaro/gdown.git", branch: "main"
 
   bottle do
