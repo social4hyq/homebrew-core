@@ -4,6 +4,7 @@ class CrosstoolNg < Formula
   url "https://github.com/crosstool-ng/crosstool-ng/releases/download/crosstool-ng-1.29.0/crosstool-ng-1.29.0.tar.xz"
   sha256 "1e0c5efcf2af674993b74a1783fe78727c8d34b500ebab07eb1bb0a45c8fcc87"
   license "GPL-2.0-only"
+  revision 1
   head "https://github.com/crosstool-ng/crosstool-ng.git", branch: "master"
 
   livecheck do
