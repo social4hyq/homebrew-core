@@ -4,6 +4,7 @@ class Patchelf < Formula
   url "https://github.com/NixOS/patchelf/releases/download/0.19.1/patchelf-0.19.1.tar.bz2"
   sha256 "2cce01de93653829f6ab68a20c2ec275e1c00a946110704a27e928d2e6e88716"
   license "GPL-3.0-or-later"
+  revision 1
 
   livecheck do
     url :stable
