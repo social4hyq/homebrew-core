@@ -4,6 +4,7 @@ class Libgsf < Formula
   url "https://download.gnome.org/sources/libgsf/1.14/libgsf-1.14.58.tar.xz"
   sha256 "06e07ea12b7a52b9e316faddfecb640b1717a4875c59f0efb3b0cec1e2ccf35a"
   license "LGPL-2.1-only"
+  revision 1
   compatibility_version 1
 
   bottle do
