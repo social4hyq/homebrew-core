@@ -4,6 +4,7 @@ class Libvmaf < Formula
   url "https://github.com/Netflix/vmaf/archive/refs/tags/v3.2.0.tar.gz"
   sha256 "a28f93f3b4fa65601be324587072e32a6a704a304ba7b1aec9b70b3f709bc1dc"
   license "BSD-2-Clause-Patent"
+  revision 1
   compatibility_version 1
 
   bottle do
