@@ -4,6 +4,7 @@ class Libxcursor < Formula
   url "https://www.x.org/archive/individual/lib/libXcursor-1.2.3.tar.xz"
   sha256 "fde9402dd4cfe79da71e2d96bb980afc5e6ff4f8a7d74c159e1966afb2b2c2c0"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
