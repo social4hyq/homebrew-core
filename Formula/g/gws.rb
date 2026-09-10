@@ -4,6 +4,7 @@ class Gws < Formula
   url "https://github.com/StreakyCobra/gws/archive/refs/tags/0.2.0.tar.gz"
   sha256 "f92b7693179c2522c57edd578abdb90b08f6e2075ed27abd4af56c1283deab1a"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "f309ec3c20263ed74b96798c465d01c644a24c07a7c141825c76ea3f387c4363"
