@@ -4,6 +4,7 @@ class Wabt < Formula
   url "https://github.com/WebAssembly/wabt/releases/download/1.0.41/wabt-1.0.41.tar.xz"
   sha256 "ca9e69cc1de13b4633a3c74fd697319303b21108529d4f10960af4e1f4a65893"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
