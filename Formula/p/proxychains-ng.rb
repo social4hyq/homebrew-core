@@ -2,6 +2,7 @@ class ProxychainsNg < Formula
   desc "Hook preloader"
   homepage "https://github.com/rofl0r/proxychains-ng"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/rofl0r/proxychains-ng.git", branch: "master"
 
   stable do
@@ -16,7 +17,7 @@ class ProxychainsNg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2668c5f3c20feaf839da113640e59119c361452e32257b07e79556dea7efd31"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "57919fbac627035882e39318994f8cf234a70f7951f6ecafbc08014f0e13c821"
   end
 
   def install
