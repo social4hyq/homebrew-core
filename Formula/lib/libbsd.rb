@@ -20,7 +20,7 @@ class Libbsd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0bb6f6d10e75cdc1c02f6ec0cfe5d6dacfb27e0dc56f271570478b00bc92b2b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c44771fa2ab85d11a0aca73484d4a11904500a838721babd3ab037241481d7d"
   end
 
   head do
