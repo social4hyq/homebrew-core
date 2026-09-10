@@ -6,7 +6,7 @@ class Redo < Formula
   url "https://github.com/apenwarr/redo/archive/refs/tags/redo-0.42d.tar.gz"
   sha256 "47056b429ff5f85f593dcba21bae7bc6a16208a56b189424eae3de5f2e79abc1"
   license "Apache-2.0"
-  revision 2
+  revision 3
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "c1d78199c37ab1961c80030b33009200719af93c548ad6e982356c42166ba072"
