@@ -4,6 +4,7 @@ class SpirvTools < Formula
   url "https://github.com/KhronosGroup/SPIRV-Tools/archive/refs/tags/vulkan-sdk-1.4.357.0.tar.gz"
   sha256 "d31e7109b6ef3559067e53e520870eafed7c9534d00db9728814b6df03fa4a5e"
   license "Apache-2.0"
+  revision 1
   version_scheme 1
   compatibility_version 1
   head "https://github.com/KhronosGroup/SPIRV-Tools.git", branch: "main"
@@ -14,7 +15,7 @@ class SpirvTools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a667bc1e95df572a5cf3327aafc88038d68b5f5a34ec76c93b543a1efaa1ff72"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a3c5c71c5987e0839c9134fa215dc6235c8bff0ab84984c33b9e2128cf782a4"
   end
 
   depends_on "cmake" => :build
