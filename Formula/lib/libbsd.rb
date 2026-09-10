@@ -12,6 +12,7 @@ class Libbsd < Formula
     "MIT",
     :public_domain,
   ]
+  revision 1
 
   livecheck do
     url "https://libbsd.freedesktop.org/releases/"
