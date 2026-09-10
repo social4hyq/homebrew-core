@@ -9,7 +9,7 @@ class GnuSed < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4680928ff40fa545b34102f83d357156740c230d10ce4bd63590dac807ce4cf2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce682c0cc37e3647c3587091e1e20432fcef0c9560056dd230d147d67d09b973"
   end
 
   def install
