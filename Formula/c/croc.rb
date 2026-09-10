@@ -4,10 +4,11 @@ class Croc < Formula
   url "https://github.com/schollz/croc/archive/refs/tags/v11.5.2.tar.gz"
   sha256 "2ceddb504be8b5912f4a3bfd76dc28bb18afda54191f2bebcf5b0fb24e63f774"
   license "MIT"
+  revision 1
   head "https://github.com/schollz/croc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8628067bce3790e00068f7b8fdc2c4e07d8e20f6b0866b15b15046bd79bcceca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "84686138f15f1a19504dd757084a94436f3d7a8a657a998704363b167369dec0"
   end
 
   depends_on "go" => :build
