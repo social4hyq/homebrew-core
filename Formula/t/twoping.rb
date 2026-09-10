@@ -6,6 +6,7 @@ class Twoping < Formula
   url "https://www.finnie.org/software/2ping/2ping-4.6.1.tar.gz"
   sha256 "c8352b6653c3194af1f869107655df3f98ab18b560e8bce86eabac08d73c72eb"
   license "MPL-2.0"
+  revision 1
   head "https://github.com/rfinnie/2ping.git", branch: "main"
 
   bottle do
