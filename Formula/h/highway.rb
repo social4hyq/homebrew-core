@@ -9,7 +9,7 @@ class Highway < Formula
   head "https://github.com/google/highway.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7d881b6ad332a60940bd04b3feaaf71ee3c4b54737a4a9ce24902300bfff109"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1d6ae57d003b9968d6834f1e57b9cd37846ae910ac72e57494f1889c504d354"
   end
 
   depends_on "cmake" => :build
