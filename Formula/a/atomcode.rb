@@ -4,6 +4,7 @@ class Atomcode < Formula
   url "https://github.com/atomgit-atomcode/atomcode/archive/refs/tags/v5.0.9.tar.gz"
   sha256 "771025a43ce861b8049d1cbbb37a5ae887ed2b8c252d0344cd07f9909d9813f9"
   license "MIT"
+  revision 1
 
   livecheck do
     url :stable
