@@ -13,7 +13,7 @@ class Libexif < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a69332ba121355a6fb1240d95ca939c31a7a3666b931bf5a65d7425f723ef85d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae7e53f224630c7cf2fd233f89eb41d6cca80db001cbec10aa4274467d33cafc"
   end
 
   head do
