@@ -13,8 +13,7 @@ class Libpq < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1db6dbeac2513a51fdca2a4c2917e0b29b3d11f48e3ec7828a1bc14c9f426048"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d22fc10d8cd847b80e65c08199c02218acef8d6b56b8054bc223d35da490f257"
   end
 
   keg_only "it conflicts with PostgreSQL"
