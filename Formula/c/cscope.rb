@@ -4,6 +4,7 @@ class Cscope < Formula
   url "https://downloads.sourceforge.net/project/cscope/cscope/v15.9/cscope-15.9.tar.gz"
   sha256 "c5505ae075a871a9cd8d9801859b0ff1c09782075df281c72c23e72115d9f159"
   license "BSD-3-Clause"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Cscope < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d58493f6a580adca38e14d56081b5180ac600d3d5604802f5496368b583fef6f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8744ba7d93128b00231b6b74e2bad2aa66a04e9ecd651700d7d5f72ace7f55d"
   end
 
   uses_from_macos "ncurses"
