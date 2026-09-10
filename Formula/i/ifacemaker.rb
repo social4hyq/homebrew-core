@@ -4,10 +4,11 @@ class Ifacemaker < Formula
   url "https://github.com/vburenin/ifacemaker/archive/refs/tags/v1.4.0.tar.gz"
   sha256 "c14fb68397812f4ac487a2626262396d9f9a01a4da39023713795b04b5714a83"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/vburenin/ifacemaker.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3a4a43721f5b510fb9cd0789305a06426bd49b83675251a02bea8069a298ee0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8297b47f0f07a3e162253cfcfa26b060c057302e7a894213753b6f9d3d927be7"
   end
 
   depends_on "go"
