@@ -4,6 +4,7 @@ class Swig < Formula
   url "https://downloads.sourceforge.net/project/swig/swig/swig-4.5.1/swig-4.5.1.tar.gz"
   sha256 "7fec50b27deddab5455a9633780b6341eddfb96215a7619e93a76eb27178f653"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Swig < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbd24f60584e30d09f233a02227c36814598fe052befc597ef8f372139545c53"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "34e085234c13d169d306c5e1307657914548913e71a1c3c44fa154738ecc55f0"
   end
 
   head do
