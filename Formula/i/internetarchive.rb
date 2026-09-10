@@ -6,6 +6,7 @@ class Internetarchive < Formula
   url "https://files.pythonhosted.org/packages/99/f7/86a84bfdc32c0b3d3fafe90a299a131d2aa661b57cab3d14a506f42405db/internetarchive-5.11.1.tar.gz"
   sha256 "2ae0a529ffe4195c5294a0277e0a9afb83fc00fee5695c6597f65c64e95da44a"
   license "AGPL-3.0-or-later"
+  revision 1
   head "https://github.com/jjjake/internetarchive.git", branch: "master"
 
   bottle do
