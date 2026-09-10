@@ -7,6 +7,7 @@ class Repo < Formula
       tag:      "v2.67",
       revision: "d27d6829a84f488b7253ea693dcc429076c33914"
   license "Apache-2.0"
+  revision 1
   version_scheme 1
 
   bottle do
