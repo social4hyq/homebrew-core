@@ -1,13 +1,13 @@
 class Croc < Formula
   desc "Securely send things from one computer to another"
   homepage "https://github.com/schollz/croc"
-  url "https://github.com/schollz/croc/archive/refs/tags/v11.5.1.tar.gz"
-  sha256 "7f1ff12d55ac971e7ab85e230313fc25a996ac4f4c103d6cf336edb23e0d63b4"
+  url "https://github.com/schollz/croc/archive/refs/tags/v11.5.2.tar.gz"
+  sha256 "2ceddb504be8b5912f4a3bfd76dc28bb18afda54191f2bebcf5b0fb24e63f774"
   license "MIT"
   head "https://github.com/schollz/croc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b61f37fbc52fa1d8daa0a2f10bd9dd8f27779c6348de33e5ed077cb734eb9a3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8628067bce3790e00068f7b8fdc2c4e07d8e20f6b0866b15b15046bd79bcceca"
   end
 
   depends_on "go" => :build
