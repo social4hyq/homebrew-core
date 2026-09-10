@@ -11,7 +11,7 @@ class Repo < Formula
   version_scheme 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5bbe53d4279dfe09bf1af6c117440a65bac2d62973d8732f96380e0f978a3abf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f40a74d156f7740478954a8499e9c4445325c9d040225413d00465ac6138645c"
   end
 
   uses_from_macos "python"
