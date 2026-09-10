@@ -6,10 +6,11 @@ class West < Formula
   url "https://files.pythonhosted.org/packages/54/8e/ddb81e2635e58d156092556934a2cffe245978c91e4a08e11d72591f46e4/west-1.5.0.tar.gz"
   sha256 "7088fe0e9afe0719ebee95c51c529149f7bcfc919d83a8206d35fa9c683ed0a5"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/zephyrproject-rtos/west.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "22a800d15101f51e35d0ff477698bae05c50638eb157d056baf0a145647aebe4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c4cc810b930989e70ff9374f1cd30e3c246789e4aada162b89c208ad57b6306b"
   end
 
   depends_on "libyaml"
