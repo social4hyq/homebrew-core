@@ -5,10 +5,10 @@ class AvroC < Formula
   mirror "https://archive.apache.org/dist/avro/avro-1.12.2/c/avro-c-1.12.2.tar.gz"
   sha256 "ccc85c5a967ca647fe0961ddeedf286cde00aacf87834d8ca552a0165ae4aa6d"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "69886e813af0a902973ffc9a6ccba93b23bf621f33dc4696bba70960a2a24676"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "910e281163af977cd0caced2454f67de8c631f496505be65980b155bd4007860"
   end
 
   depends_on "cmake" => :build
