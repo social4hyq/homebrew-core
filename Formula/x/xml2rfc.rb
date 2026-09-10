@@ -10,7 +10,7 @@ class Xml2rfc < Formula
   head "https://github.com/ietf-tools/xml2rfc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "46a6eefeeaf4d5f2984aa5e0ee2a08439b89d6b7a281f796f7e7a21568511333"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dff307e29cbd79514ed4bfd912660292d081979bdcf0c59fb3c7d8e8a9b33167"
   end
 
   depends_on "certifi" => :no_linkage
