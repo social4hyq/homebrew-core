@@ -15,7 +15,7 @@ class Pkcs11Helper < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d32e474fb9a8ec4bf721d9c6f4c5f60355a247d438359eb0963fab6d980ddbf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72a2af0aa51c38efc7e02ca26073262a18d0826f8530a1ef2f964981a0ae8937"
   end
 
   depends_on "autoconf" => :build
