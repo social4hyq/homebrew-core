@@ -9,7 +9,7 @@ class Diffoscope < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c4ce4b13443c09817683938d7b784a67125583c7ae7626350561f10664ca615d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "68e1f9a8beb136f1fa3bd2b1e2f54ea6145250b023f898810dcc047e92560512"
   end
 
   depends_on "libarchive"
