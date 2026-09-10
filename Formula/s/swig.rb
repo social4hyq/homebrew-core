@@ -13,7 +13,7 @@ class Swig < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbd24f60584e30d09f233a02227c36814598fe052befc597ef8f372139545c53"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "34e085234c13d169d306c5e1307657914548913e71a1c3c44fa154738ecc55f0"
   end
 
   head do
