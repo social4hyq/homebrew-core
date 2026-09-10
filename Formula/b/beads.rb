@@ -4,11 +4,12 @@ class Beads < Formula
   url "https://github.com/steveyegge/beads/archive/refs/tags/v1.2.2.tar.gz"
   sha256 "892b8b641d1f9eb3fa9f0cddf704f3f41aea0da872e546fe623ddec30b2ea9cf"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/gastownhall/beads.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eeaca61db8f66f752497960849510ae5b46e5aeac13fd975cb9fef462b3406a5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "401b3e064bc7de26953f77f8074cf565f4ddb48e71fb9f1ef830a13d36395cb5"
   end
 
   depends_on "go" => :build
