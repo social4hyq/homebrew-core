@@ -4,10 +4,11 @@ class Libde265 < Formula
   url "https://github.com/strukturag/libde265/releases/download/v1.1.2/libde265-1.1.2.tar.gz"
   sha256 "eaacd1943ab0c452c19f6136a36ca227e6b761b39a81eaca8454d48c147e1f67"
   license "LGPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "17b7e250f7ee26901cd32d997fde1303b93d5ea05e28ccebf1b1654f1981f777"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1ff149eb16c37f1a41ebcaa07d8dc5cb4f98733117ebf2549ccb1118b76bb89"
   end
 
   depends_on "cmake" => :build
