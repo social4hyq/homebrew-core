@@ -4,6 +4,7 @@ class Msgpack < Formula
   url "https://github.com/msgpack/msgpack-c/releases/download/c-7.0.2/msgpack-c-7.0.2.tar.gz"
   sha256 "6ae50f69612871aa01de76bec904165cd2a2fc30ff9f653f2f60a663c5c1a86c"
   license "BSL-1.0"
+  revision 1
   head "https://github.com/msgpack/msgpack-c.git", branch: "c_master"
 
   livecheck do
@@ -12,7 +13,7 @@ class Msgpack < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "622311c55ced691e557bb71c571cd0403495ce4713a75307fc08bde2a15952ec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03888e35edadef60e7b20f028b034b8257f670b80d36ec1d64b7aa46e2b2507f"
   end
 
   depends_on "cmake" => :build
