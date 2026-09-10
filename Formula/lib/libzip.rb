@@ -4,7 +4,7 @@ class Libzip < Formula
   url "https://libzip.org/download/libzip-1.11.4.tar.xz"
   sha256 "8a247f57d1e3e6f6d11413b12a6f28a9d388de110adc0ec608d893180ed7097b"
   license "BSD-3-Clause"
-  revision 1
+  revision 2
   compatibility_version 1
 
   livecheck do
@@ -13,7 +13,7 @@ class Libzip < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "38cf28cc081da0baa9cdfc2b780e80845cbf8f917419e2e20a02e716a31f0ffd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7b49bc8b0a20f22948136efa7faff552627e012166e4353b69901248f60b932"
   end
 
   depends_on "cmake" => :build
