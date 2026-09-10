@@ -8,6 +8,7 @@ class Curl < Formula
   mirror "http://fresh-center.net/linux/www/legacy/curl-8.22.0.tar.bz2"
   sha256 "5d956a6a22b3c279f50c421ee5d3c9e9d660cb6f115dcf881b579e952130549c"
   license "curl"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -16,7 +17,7 @@ class Curl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "925bcbd4bf04627857c1a42740af515d832d208364bed832f69b5a64b00e74e7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8caaf0f0431cbe4d2692390058934ea5c3e060d5e4d914d4cb53fe10d30dc832"
   end
 
   head do
