@@ -9,7 +9,7 @@ class Libtasn1 < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4fb20fc4e04b076da727c9fd64e672169e5a18b19993f78f94d24f980727882"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "de9d389aa68e4168c09c1075d83c62edb22eef5bd2e8a3ce32ab1c7a78ae0d7c"
   end
 
   def install
