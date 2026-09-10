@@ -4,10 +4,11 @@ class DockerGen < Formula
   url "https://github.com/nginx-proxy/docker-gen/archive/refs/tags/0.17.2.tar.gz"
   sha256 "dfea32f45e8b3f0c61f93927375d538de6bb94c2089b0fb4adbbbce3289df378"
   license "MIT"
+  revision 1
   head "https://github.com/nginx-proxy/docker-gen.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e3a9e691ad19a962dff32d87ce1dc5c3c07690b80b3d69f2465bd6319d4fe9b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ee8bb68e53dabf72f3a94300d0f693ef1222649a550ba2b57a184a218481569"
   end
 
   depends_on "go" => :build
