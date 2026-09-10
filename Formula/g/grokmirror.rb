@@ -6,7 +6,7 @@ class Grokmirror < Formula
   url "https://files.pythonhosted.org/packages/26/91/af8831185ef4e5bef5d210039ab67abdc8c27a09a585d3963a10cf774789/grokmirror-2.0.12.tar.gz"
   sha256 "5264b6b2030bcb48ff5610173dacaba227b77b6ed39b17fc473bed91d4eb218b"
   license "GPL-3.0-or-later"
-  revision 6
+  revision 7
   head "https://github.com/mricon/grokmirror.git", branch: "master"
 
   bottle do
