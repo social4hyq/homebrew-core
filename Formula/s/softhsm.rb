@@ -8,7 +8,7 @@ class Softhsm < Formula
   head "https://github.com/opendnssec/SoftHSMv2.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "635b1eaf7ec80e28ccf34580b73e59d68cba7aa3445b26c8e119abe5beb1e7ba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61d0158c75c2bcc413277f1207d767ac6cb1b936353a08332b1e6da184cfddf7"
   end
 
   depends_on "autoconf" => :build
