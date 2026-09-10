@@ -5,10 +5,11 @@ class Aspell < Formula
   mirror "https://ftp.gnu.org/gnu/aspell/aspell-0.60.8.2.tar.gz"
   sha256 "57fe4863eae6048f72245a8575b44b718fb85ca14b9f8c0afc41b254dfd76919"
   license "LGPL-2.1-only"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9c9343c8d0955ca145babd7adb16b16076752e39d4068236e501814436042f8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca4e82ff0ff63ce7657ab79dba67ad2bb7c9a7aa3494956e96f5ed206a2c1df4"
   end
 
   uses_from_macos "ncurses"
