@@ -9,7 +9,7 @@ class Mage < Formula
   head "https://github.com/magefile/mage.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e07ed6041cf82baf64e8ff74ae4330e39f8a9d0a8e2270d7199c76241b545bc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "48052ade5bd91adad631bf8af14e2e3af2d005bea6447582e0f58421d1751d70"
   end
 
   depends_on "go"
