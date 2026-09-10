@@ -8,8 +8,7 @@ class OhosSdk < Formula
   revision 2
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b9542812c4ecee08ad310e3bd48ead6b0bc2cbdbabf6863d89472c566b51439"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ba30fbe170387d947066287102f0aec7d26c49b6eadee50d925ae9969d30905"
   end
 
   depends_on "unzip" => :build
