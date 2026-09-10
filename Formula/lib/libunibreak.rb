@@ -16,7 +16,7 @@ class Libunibreak < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b06501b5b3e2fec80429f81dbccf0243738c4efc3d7d921b5e932b5d2b3fd44"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e43229f5019580255b7dc9ed537e67c41eeb59dd544c5c8cac667a760c68bb0b"
   end
 
   def install
