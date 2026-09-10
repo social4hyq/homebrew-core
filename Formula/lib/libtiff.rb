@@ -14,7 +14,7 @@ class Libtiff < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c90967d28bdaccb00269107cf908c0b488f286f81ed3fb7d92f0c2b21dfdd47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4f7bfb2c615fa0257b1c79e239c80053d72fdaa29f1187a07d6fc374051efa6e"
   end
 
   depends_on "jpeg-turbo"
