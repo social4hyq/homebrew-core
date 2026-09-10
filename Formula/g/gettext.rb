@@ -13,7 +13,7 @@ class Gettext < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8cd1125ddd96630870b4c63dd49ef63fc3be279b8fc6de92d5829b14f3ac7950"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "47c29749251a7be80ebb6c32c2e70db3d6c979c275e4d08d4f5cc3002ef4e3d6"
   end
 
   depends_on "libunistring"
