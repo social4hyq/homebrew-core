@@ -9,7 +9,7 @@ class Libmpc < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "df70b895fc004a151a53723ae3cb694c2afcb2c53811512b9517d78e9a59ca0b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8f7b346cd51ab795dca2c80909062967a1469e52927d96f787530478ab4577f"
   end
 
   head do
