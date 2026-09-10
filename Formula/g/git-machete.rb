@@ -9,7 +9,7 @@ class GitMachete < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "35b48451f336b884c58b840213f52be7d28df4e74af70346d3ae460861fc6670"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a526ee8da892fc4cc366e2fc5f5d112602d3883a0b67faec5ae3fcb6d9ab7c3"
   end
 
   depends_on "python@3.14"
