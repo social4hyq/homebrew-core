@@ -5,7 +5,7 @@ class PythonAT312 < Formula
   sha256 "6c6df908d2c3fd24e6d76869e92542abd0f33aec9dfc18df8875f89660286d43"
   license "Python-2.0"
   compatibility_version 1
-  revision 6
+  revision 7
 
   livecheck do
     url "https://www.python.org/downloads/source/"
@@ -13,7 +13,7 @@ class PythonAT312 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3107cd14afde804250bb010131650ec8c6c9764961345bdfd4fc897654050946"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dae17eec303ea31560fc713eb6e4431be4ea81e939c33bbe3e348a489e478504"
   end
 
   depends_on "pkgconf" => :build
