@@ -6,7 +6,7 @@ class Waybackpy < Formula
   url "https://files.pythonhosted.org/packages/34/ab/90085feb81e7fad7d00c736f98e74ec315159ebef2180a77c85a06b2f0aa/waybackpy-3.0.6.tar.gz"
   sha256 "497a371756aba7644eb7ada0ebd4edb15cb8c53bc134cc973bf023a12caff83f"
   license "MIT"
-  revision 12
+  revision 13
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "68884d014e3ec84d55662efc69ca436addd7498211e03dd16e25d7f7b230f9ba"
