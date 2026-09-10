@@ -6,9 +6,10 @@ class Gixy < Formula
   url "https://files.pythonhosted.org/packages/63/ea/0a3a38b9dfb53cf18efe3fea869f5360e81b37299fe5e86855afd88b8008/gixy_ng-0.2.53.tar.gz"
   sha256 "6dcc4175f48dd1edcc7a2a1def647f2689a465a511361b77b6f00c242f17c86a"
   license "MPL-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa40be12812e3a033c5ab3ed473f107329a7ff6e706213ac24259e0656bffb76"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "17ff91bc3dd922de65b910735f6c9be342ad72f172936ff06d30dfbcb272db36"
   end
 
   depends_on "python@3.14"
