@@ -7,7 +7,7 @@ class Libjodycode < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "febcc8c423d287f790724944b77a38da0074c46bcb027f547e226191e53cce80"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8040a210cb64c97fb4c65b1a1b2929cd7375cbae6ef22c0e9d2df985acce594d"
   end
 
   # These files used to be distributed as part of the jdupes formula
