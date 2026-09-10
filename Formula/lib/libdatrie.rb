@@ -8,7 +8,7 @@ class Libdatrie < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "81993163a7edfb8f657277cb0b25fa4c024a440608f5899d07e444c1c4c5094a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "074713b7fbb6b1cfc806d07c55079757b28953fd601a0b371ecd6480b2222001"
   end
 
   depends_on "pkgconf" => :build
