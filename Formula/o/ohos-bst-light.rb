@@ -4,6 +4,7 @@ class OhosBstLight < Formula
   url "https://github.com/hqzing/ohos-bst-light/archive/refs/tags/v2.1.2.tar.gz"
   sha256 "707296b7263a5be14d412db689be20c32c20483f0760268ebd95b7306e4b95be"
   license "0BSD"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "8fbf9c1f2c9a2617d2131cf37265ec3f7d04dfabb4a7fd793450452e1ce5f5fd"
