@@ -4,10 +4,11 @@ class Catch2 < Formula
   url "https://github.com/catchorg/Catch2/archive/refs/tags/v3.16.0.tar.gz"
   sha256 "0957cae5821b17ce07f0833aaa52b5137643a8382203221f363a8303c109af34"
   license "BSL-1.0"
+  revision 1
   head "https://github.com/catchorg/Catch2.git", branch: "devel"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c27bbbf90f2a11c8c228e7346124092758dc979a2c76834d7a6ab51fcb499f9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6fcd0e4959739c9c3ab3d257bd666c3078d81162eba697cabc7abf92bf832ca"
   end
 
   depends_on "cmake" => :build
