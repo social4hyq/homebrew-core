@@ -4,6 +4,7 @@ class Npq < Formula
   url "https://registry.npmjs.org/npq/-/npq-3.27.0.tgz"
   sha256 "36f2d1ba96ca4c44688c7f9f0ad5be6aea41545bb70549271236e421ef4a1ccf"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "104ad257799df959981b6d8ca10a60357d2b5275037c2132e430031481b6a994"
