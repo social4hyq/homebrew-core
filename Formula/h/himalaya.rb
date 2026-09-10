@@ -7,7 +7,7 @@ class Himalaya < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d97cd3d8f1fc53f366a8e5c8c379e835992f1dbac780470bf6c5836c63470315"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdc2acb2175912bcfaeb6ec453b38aa594c5bc3dfa620d377c4f253c507dae57"
   end
 
   depends_on "pkgconf" => :build
