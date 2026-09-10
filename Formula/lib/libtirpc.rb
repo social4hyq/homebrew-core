@@ -4,10 +4,11 @@ class Libtirpc < Formula
   url "https://downloads.sourceforge.net/project/libtirpc/libtirpc/1.3.7/libtirpc-1.3.7.tar.bz2"
   sha256 "b47d3ac19d3549e54a05d0019a6c400674da716123858cfdb6d3bdd70a66c702"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7eca67beecb5ae58463f9d4d1bca9ab483e2599cfd3fc403464903f264f07c9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa06386c2ae21638d02c13359e4bc6ac23ce8431720d823974bf495500bb0303"
   end
 
   depends_on "krb5"
