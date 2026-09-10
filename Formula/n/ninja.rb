@@ -14,7 +14,7 @@ class Ninja < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "97c2b9df27e935ce18c67f1cfca81da784ada7c49700a29c1042c4e19a20db13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9adc59ebbed4c1402c0486084080d98855653b450bbb242fb52458df03886532"
   end
 
   uses_from_macos "python" => [:build, :test]
