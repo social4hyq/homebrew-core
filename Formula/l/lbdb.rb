@@ -4,6 +4,7 @@ class Lbdb < Formula
   url "https://www.spinnaker.de/lbdb/download/lbdb-0.57.tar.gz"
   sha256 "212fe2e40df5ed3e5496bc5e821e4b0683a6c9523b8885e7e87b634bcf923a88"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url "https://www.spinnaker.de/lbdb/download/"
