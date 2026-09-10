@@ -6,6 +6,7 @@ class Cmake < Formula
   mirror "http://fresh-center.net/linux/misc/legacy/cmake-4.4.3.tar.gz"
   sha256 "c46400618b4f1f2b43507f24fb22f3ae830c3416cf23b776e16e1d413aa892f0"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://gitlab.kitware.com/cmake/cmake.git", branch: "master"
 
@@ -18,7 +19,7 @@ class Cmake < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b34b3f7935f2cb1f25048c3d99ad1fdfd1e064a3ac91a029df1b5338f34a017"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "92ebfa872b8fe77b143125d0cbfce9099f37a78bb7c110b766ec46fe12ef0589"
   end
 
   uses_from_macos "ncurses"
