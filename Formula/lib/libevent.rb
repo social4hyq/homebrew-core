@@ -4,6 +4,7 @@ class Libevent < Formula
   url "https://github.com/libevent/libevent/archive/refs/tags/release-2.1.13-stable.tar.gz"
   sha256 "1a0885e17dc78afbaeddf13cf849f9238bbc24acdc178464a0d1934d7c5ffbd5"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Libevent < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f30a9b84ea55aef0c3bbb2300920ead95b6888504bc6bd00ff45a056e5e8542"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c852ac76e619c08f9e6ff79338e10c2a08bf8c3a9db4eb3658ab84941462dfd"
   end
 
   depends_on "autoconf" => :build
