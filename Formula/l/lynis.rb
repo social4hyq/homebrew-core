@@ -4,9 +4,10 @@ class Lynis < Formula
   url "https://github.com/CISOfy/lynis/archive/refs/tags/3.1.7.tar.gz"
   sha256 "48d829d0dc2c583a3e838cc09a7190b69a3af844bcb913c7cf9c0226b04b95c5"
   license "GPL-3.0-only"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6eec01d69a347875fb4d9b390207207b9eb9a8ee366a1ed7c73761c1cbf20961"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae30a9dd1ab071e6ddf846fd2e3ea28e24eba23351009b1570124ff68de219ed"
   end
 
   def install
