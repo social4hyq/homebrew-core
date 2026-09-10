@@ -4,6 +4,7 @@ class GdkPixbuf < Formula
   url "https://download.gnome.org/sources/gdk-pixbuf/2.44/gdk-pixbuf-2.44.8.tar.xz"
   sha256 "919f529512961a12e81cd4b4b466a48c3933469e7f9a310c6513cd4fb252ba3c"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
