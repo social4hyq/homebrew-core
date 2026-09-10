@@ -4,10 +4,10 @@ class Krane < Formula
   url "https://rubygems.org/downloads/krane-3.9.1.gem"
   sha256 "eda88d26175aaf257df71b55b5df9d4868710a28df2b595bebadc1192a65bb8d"
   license "MIT"
+  revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a986e9e24d53bb2e1592a538bfd7aff0f2d259278c7bcae81d7891184be2167e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "12aa60b2bbb7c43e29aa318662e9ff528e00d972cddd4339814db3a419aa45b8"
   end
 
   depends_on "kubernetes-cli"
