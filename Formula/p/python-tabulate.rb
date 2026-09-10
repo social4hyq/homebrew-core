@@ -9,7 +9,7 @@ class PythonTabulate < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e48558048b9e50fae9f53b804916b345e5af491f478d5494235b5f329bd385c0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d37286c709c173b26a47adc604e0138aa00a832f2865037368d99d6f95a74ca"
   end
 
   depends_on "python@3.14"
