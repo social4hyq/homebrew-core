@@ -9,7 +9,7 @@ class Dotdrop < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c31eab4ccbbc70e426b6a5f33af89f9ace1ec386d71eaa908627bc73d7b0f43"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "21fdf22e3cd18132f6856303bd3b3af60dbab39f8e2f6b23faeca36f63c3d6eb"
   end
 
   depends_on "certifi" => :no_linkage
