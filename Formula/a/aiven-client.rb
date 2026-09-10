@@ -6,6 +6,7 @@ class AivenClient < Formula
   url "https://files.pythonhosted.org/packages/63/a4/bf49da7919bd5d021aa8912bd2def50ffb06f1fc4393ec1d1d5236666fe6/aiven_client-4.18.0.tar.gz"
   sha256 "bc79febb1fe87a3d95e8b4d6fd9a764c05e26bf7a9b9cb1121f2de48e61c4a14"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/aiven/aiven-client.git", branch: "main"
 
   bottle do
