@@ -4,7 +4,7 @@ class Libvncserver < Formula
   url "https://github.com/LibVNC/libvncserver/archive/refs/tags/LibVNCServer-0.9.15.tar.gz"
   sha256 "62352c7795e231dfce044beb96156065a05a05c974e5de9e023d688d8ff675d7"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 2
   head "https://github.com/LibVNC/libvncserver.git", branch: "master"
 
   livecheck do
@@ -13,7 +13,7 @@ class Libvncserver < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9844d6b1ea9ca39eb4baa2f1b144ccc3a63f583572bb04c86a81d765cf16a0e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8be6cc2bbc25649ab7a54bd70c4aa8aa046c087451a67c9e79c533bb609c7ea4"
   end
 
   depends_on "cmake" => :build
