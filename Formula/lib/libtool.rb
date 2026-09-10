@@ -5,10 +5,11 @@ class Libtool < Formula
   mirror "https://ftp.gnu.org/gnu/libtool/libtool-2.6.2.tar.xz"
   sha256 "2ef1067c16c97db930fd740cc9bc3d3ba9a583804ae5ac42cc3e8719e49e191e"
   license "GPL-2.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c5b49bcb840111ad2bc197b29829b834ce8554730a97f98c1b38c6de4edcfcb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eccba31a84c3a6512e54ea6f6d8ad8e06c1c0081a2ac6fcb7b9b54b54f11acd5"
   end
 
   depends_on "m4"
