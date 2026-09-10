@@ -4,6 +4,7 @@ class Taze < Formula
   url "https://registry.npmjs.org/taze/-/taze-21.1.0.tgz"
   sha256 "1bf46e8a0f36409a694cb22b8a01ca6506f19c8545b089eef601d952f68fa77e"
   license "MIT"
+  revision 1
   head "https://github.com/antfu-collective/taze.git", branch: "main"
 
   bottle do
