@@ -4,6 +4,7 @@ class Xorgproto < Formula
   url "https://xorg.freedesktop.org/archive/individual/proto/xorgproto-2025.1.tar.gz"
   sha256 "d6f89f65bafb8c9b735e0515882b8a1511e8e864dde5e9513e191629369f2256"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Xorgproto < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db9cf906ed7395dde0e4cc46e0ea24534cb26e0d9353dac8253ee569cf687d02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aeb0c31280d37f1fe8ac7797fdd225dee1515e341aa19948c1a3cecc0851d157"
   end
 
   depends_on "pkgconf" => [:build, :test]
