@@ -7,7 +7,7 @@ class Cython < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e393efc31abe654cc0ca7b59425a43d6e044ab74d02240b598dab36d54a24678"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ddae0123ffd20b708f0279c056a481d74ee602b5000d4559d8bc1108174802d"
   end
 
   keg_only <<~EOS
