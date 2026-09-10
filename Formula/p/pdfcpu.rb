@@ -4,6 +4,7 @@ class Pdfcpu < Formula
   url "https://github.com/pdfcpu/pdfcpu/archive/refs/tags/v0.15.0.tar.gz"
   sha256 "69924a7363ea19b4f3d4799ebf78bcabfec75a735c9569983a6e2834b5e8c6b3"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
