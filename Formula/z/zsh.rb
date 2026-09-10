@@ -30,7 +30,7 @@ class Zsh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a30401cc1b87936e70bdb19fbb47ca43ab99977f094a289029f01f73c1e5af0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2980686057af5e82b92c8ca91bdcb1a5e392f966eb0a60e03ae686b5b7183dc"
   end
 
   head do
