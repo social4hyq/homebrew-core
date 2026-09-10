@@ -5,9 +5,10 @@ class GoogleworkspaceCli < Formula
   url "https://github.com/googleworkspace/cli/archive/refs/tags/v0.22.5.tar.gz"
   sha256 "1e55ec8c6ee87fac7d422975604a2d546c35f6d687a1cfaba7c7cc0d3c05663f"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "256bb4347287ce26e712cfa3a2b5c9a9c24fc037d482d366fdd4ebdfc637cb47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "31bce84c1f67d04485fe95349d3dcce09962d3344156584bf83cc8c633c2fd9b"
   end
 
   depends_on "rust" => :build
