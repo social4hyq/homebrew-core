@@ -4,6 +4,7 @@ class Highway < Formula
   url "https://github.com/google/highway/archive/refs/tags/1.4.0.tar.gz"
   sha256 "e72241ac9524bb653ae52ced768b508045d4438726a303f10181a38f764a453c"
   license any_of: ["Apache-2.0", "BSD-3-Clause"]
+  revision 1
   compatibility_version 1
   head "https://github.com/google/highway.git", branch: "master"
 
