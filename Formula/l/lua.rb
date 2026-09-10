@@ -4,6 +4,7 @@ class Lua < Formula
   url "https://www.lua.org/ftp/lua-5.5.1.tar.gz"
   sha256 "1c4b4068d67061f2a2231ad2b5422e77acea1487ea9890f6320af614f4373dce"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Lua < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc79f9df2952ed9dede47fbcf5197b753f227f5b726b3f6606c0f76e89dfb6db"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "960fec74a44ad74f7a4abd80d3283bf4053870624279cf96c3bbfad5b6d34cf8"
   end
 
   # Be sure to build a dylib, or else runtime modules will pull in another static copy of liblua = crashy
