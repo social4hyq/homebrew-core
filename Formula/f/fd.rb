@@ -8,7 +8,7 @@ class Fd < Formula
   head "https://github.com/sharkdp/fd.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "adfe00e014a4e32d99f9b806db5b9ccb6ab3c84cae45e24f635596c277edb2e5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f820dcce011486b72cd2f9ff33d73ed7b74e2d84a60aee0ac6dec2efbdef859"
   end
 
   depends_on "rust" => :build
