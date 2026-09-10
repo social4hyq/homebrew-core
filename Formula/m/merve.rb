@@ -4,10 +4,10 @@ class Merve < Formula
   url "https://github.com/nodejs/merve/archive/refs/tags/v1.2.2.tar.gz"
   sha256 "8f19c2132447b9113545ffd399cb2bc1e61c6166743921b04883f8e1d778d69e"
   license "Apache-2.0"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d905d55475248551ce6458a546c3a92d1f6cacac6708b30e31b44175d4db28b8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1bc860f7d426b8c09fe1cf880a7c659732e0296e999c42f648f3b2cb5e7ede65"
   end
 
   depends_on "cmake" => :build
