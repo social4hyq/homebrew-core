@@ -4,6 +4,7 @@ class Cryptography < Formula
   url "https://files.pythonhosted.org/packages/bb/ad/5d6702db60b1e40b41ef513b6967ff5848f307d50f8449baf1634f5908f1/cryptography-50.0.1.tar.gz"
   sha256 "5dd9bda1c12b4162f6ff568eeb5e0ff956c28d14406e875cfe8a63a2d414ff20"
   license any_of: ["Apache-2.0", "BSD-3-Clause"]
+  revision 1
   compatibility_version 1
   head "https://github.com/pyca/cryptography.git", branch: "main"
 
