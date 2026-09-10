@@ -4,6 +4,7 @@ class StripeCli < Formula
   url "https://github.com/stripe/stripe-cli/archive/refs/tags/v1.50.10.tar.gz"
   sha256 "1dc53563d513575d614a038b38dbdbc04a057ccdde4af6ae281269e9c45c7581"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "4b0486fb2652e6b78a3151cea53b6fee5f6fb15eea6e1e340a425cab021b98a8"
