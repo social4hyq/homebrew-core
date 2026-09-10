@@ -10,7 +10,7 @@ class PyqtBuilder < Formula
   head "https://github.com/Python-PyQt/PyQt-builder.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4da3cae6c071414d4fdf162b6cb522257a6d7aef853cd557954d643faac16a20"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e02a0d9a27b7e782d743f643cc8d0f44312c8e356c0face48d5c7405e98470d5"
   end
 
   depends_on "python@3.14"
