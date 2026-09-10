@@ -4,6 +4,7 @@ class Libcap < Formula
   url "https://mirrors.edge.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.78.tar.xz"
   sha256 "0d621e562fd932ccf67b9660fb018e468a683d7b827541df27813228c996bb11"
   license all_of: ["BSD-3-Clause", "GPL-2.0-or-later"]
+  revision 1
   compatibility_version 1
 
   livecheck do
