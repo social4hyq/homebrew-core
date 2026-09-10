@@ -4,6 +4,7 @@ class RbenvBundler < Formula
   url "https://github.com/carsomyr/rbenv-bundler/archive/refs/tags/1.0.1.tar.gz"
   sha256 "6840d4165242da4606cd246ee77d484a91ee926331c5a6f840847ce189f54d74"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/carsomyr/rbenv-bundler.git", branch: "main"
 
   bottle do
