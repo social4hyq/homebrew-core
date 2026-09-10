@@ -5,6 +5,7 @@ class Gawk < Formula
   mirror "https://ftp.gnu.org/gnu/gawk/gawk-5.4.1.tar.xz"
   sha256 "07f6f7342b7febe4313fc2c2542ad93d64fe20ad8717200109f105a826f5fd37"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
   head "https://git.savannah.gnu.org/git/gawk.git", branch: "master"
 
