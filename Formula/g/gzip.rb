@@ -5,9 +5,10 @@ class Gzip < Formula
   mirror "https://ftp.gnu.org/gnu/gzip/gzip-1.14.tar.gz"
   sha256 "613d6ea44f1248d7370c7ccdeee0dd0017a09e6c39de894b3c6f03f981191c6b"
   license "GPL-3.0-or-later"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "094736305e81702400933155de42fcae7a53e68cd85836b64974be1f6c045e77"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a2bcfe104e9336ca915f07a7b1284e1727605b2acb38dcb4984d34d5a37d3cf"
   end
 
   def install
