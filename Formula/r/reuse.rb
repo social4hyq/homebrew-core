@@ -11,6 +11,7 @@ class Reuse < Formula
     "CC0-1.0",
     "Apache-2.0",
   ]
+  revision 1
   head "https://github.com/fsfe/reuse-tool.git", branch: "main"
 
   bottle do
