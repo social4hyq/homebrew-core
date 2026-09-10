@@ -4,6 +4,7 @@ class Libxtst < Formula
   url "https://www.x.org/archive/individual/lib/libXtst-1.2.5.tar.gz"
   sha256 "244ba6e1c5ffa44f1ba251affdfa984d55d99c94bb925a342657e5e7aaf6d39c"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
