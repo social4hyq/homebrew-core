@@ -4,11 +4,12 @@ class Rustup < Formula
   url "https://github.com/rust-lang/rustup/archive/refs/tags/1.29.1.tar.gz"
   sha256 "00f79a02275fd0252be6928d7a44f96bfba706a0cc47a0c85557aa4a875d1181"
   license any_of: ["Apache-2.0", "MIT"]
+  revision 1
   compatibility_version 1
   head "https://github.com/rust-lang/rustup.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "019879ca047543562df65c507c0b2ee973cf811d1b03362cdee1812d4672a442"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2925d137ae1d580b4add3a1cb001ce113a9341932064c6ca7d316aa2441595c1"
   end
 
   keg_only "it conflicts with rust"
