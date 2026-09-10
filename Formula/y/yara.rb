@@ -4,6 +4,7 @@ class Yara < Formula
   url "https://github.com/VirusTotal/yara/archive/refs/tags/v4.5.8.tar.gz"
   sha256 "c322414975ff6f701149856613afdcd92a7e6939c284c798ae3c85618197efaa"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/VirusTotal/yara.git", branch: "master"
 
   # Upstream sometimes creates releases that use a stable tag (e.g., `v1.2.3`)
@@ -15,7 +16,7 @@ class Yara < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7ddb70dc4009d912ea485de7bfda4533ce9b9ef18ee0362d5b7ca250e7371c0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "49a7ecce9c94b96242d1e9477ce5fed7de55695472608b2802e5fc1db18dbe12"
   end
 
   depends_on "autoconf" => :build
