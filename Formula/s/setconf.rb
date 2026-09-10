@@ -6,10 +6,11 @@ class Setconf < Formula
   url "https://setconf.roboticoverlords.org/setconf-0.7.7.tar.xz"
   sha256 "19315574540b3181fec31a4059b9e058381e0192317f153d181e7e7e2aa84d86"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/xyproto/setconf.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b227f96e77d41a180bb0c1f8deb00bee2b13eaee27842fcb6a2d3909ed73ba6b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "802e3c829fde4f16062297b2a24465e8fc0a7b11189e689e249b24507e6d4943"
   end
 
   uses_from_macos "python"
