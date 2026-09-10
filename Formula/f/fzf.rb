@@ -9,7 +9,7 @@ class Fzf < Formula
   head "https://github.com/junegunn/fzf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d59a58f1e9a5e1f70dba4faf3604f60b3a31906bd191d460599de210b67d409"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea02117160ee16a84fd9e3f2726c81601deba6af6a9656e4680a1bdcfb4b4d92"
   end
 
   depends_on "go" => :build
