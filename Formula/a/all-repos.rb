@@ -6,9 +6,10 @@ class AllRepos < Formula
   url "https://files.pythonhosted.org/packages/e2/ce/2b87583b0b56193c868eb246c6765660467f241d1c4d16e5e1229bac7dfd/all_repos-1.33.0.tar.gz"
   sha256 "420ee23a9ad825914700e511ba51b88780b1c69d24aa88506a2b2e6e8bc0eb20"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1162963156048a0c03e3a036d41bfb83abcbed7debe66106096ce451f5229a30"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "131706e7b34170a19657bda2676bc2c758da20964befebb0dc478d2028909a72"
   end
 
   depends_on "python@3.14"
