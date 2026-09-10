@@ -5,6 +5,7 @@ class Grep < Formula
   mirror "https://ftp.gnu.org/gnu/grep/grep-3.12.tar.xz"
   sha256 "2649b27c0e90e632eadcd757be06c6e9a4f48d941de51e7c0f83ff76408a07b9"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
