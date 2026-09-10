@@ -9,7 +9,7 @@ class Taglib < Formula
   head "https://github.com/taglib/taglib.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ddc4fc06775eee26597c372b540efee03029752a08cd3da2e2546038636e1d0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c36a8cfec5f84a542df1302819d631a483a2b696b0bfe6f66706db26a917b7dd"
   end
 
   depends_on "cmake" => :build
