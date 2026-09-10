@@ -6,6 +6,7 @@ class PortableRuby < PortableFormula
   url "https://cache.ruby-lang.org/pub/ruby/4.0/ruby-4.0.6.tar.gz"
   sha256 "837d299e8f7ddf2be31a229a7a7e019d354979825117989acb3b32b1a9be262a"
   license "Ruby"
+  revision 1
 
   # This regex restricts matching to versions other than X.Y.0.
   livecheck do
@@ -58,10 +59,6 @@ class PortableRuby < PortableFormula
     file "Patches/ruby/0001-add-target-os.patch"
   end
 
-  patch do
-    file "Patches/ruby/0002-implement-pthread_cancel-stub.patch"
-  end
-
   def install
     # Remove almost all bundled gems and replace with our own set.
     rm_r ".bundle"
@@ -103,9 +100,16 @@ class PortableRuby < PortableFormula
       --disable-install-doc
       --disable-install-rdoc
       --disable-dependency-tracking
-      --with-coroutine=pthread
-      ac_cv_func_sigaltstack=no
     ]
+
+    # Disable sigaltstack on OHOS (aarch64/musl) to prevent segmentation faults.
+    # Ruby's conservative GC scans the stack. On OHOS musl, malloc-allocated
+    # signal stacks only guarantee 8-byte alignment, whereas AArch64 signal
+    # frames (ucontext_t) require strict 16-byte alignment. This mismatch
+    # causes the GC to misinterpret non-pointer data as valid pointers, leading
+    # to a segmentation fault. Using the main thread stack (typically 8MB)
+    # avoids this alignment issue entirely.
+    args << "ac_cv_func_sigaltstack=no"
 
     # We don't specify OpenSSL as we want it to use the pkg-config, which `--with-openssl-dir` will disable
     args += %W[
