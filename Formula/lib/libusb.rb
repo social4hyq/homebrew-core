@@ -13,7 +13,7 @@ class Libusb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac25aa4a1b057ece24aa04a61a1d8200a9bb8b85dfb9d5553ec68d6376c24632"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b3e0d892da50f00a336bf41bb576efe1bcca84dd55a382216e0f6ef72899886d"
   end
 
   head do
