@@ -4,6 +4,7 @@ class Yazi < Formula
   url "https://github.com/sxyazi/yazi/archive/refs/tags/v26.9.1.tar.gz"
   sha256 "66857f1b670469daf258edd0bb2ea51d9ad3e2cab4eea9684028c80059fd6862"
   license "MIT"
+  revision 1
   head "https://github.com/sxyazi/yazi.git", branch: "main"
 
   # There can be a notable gap between when a version is tagged and a
@@ -15,7 +16,7 @@ class Yazi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e73537c2c9b3e7cd05bda260ab00894469856bee11bc823a33d3677be4849ca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "13ca293e94c27b68cbcc0c09d36ef28f7bc4d296cd46908a33d3d93aec3a598b"
   end
 
   depends_on "rust" => :build
