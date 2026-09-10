@@ -6,6 +6,7 @@ class Cups < Formula
   url "https://github.com/OpenPrinting/cups/releases/download/v2.4.19/cups-2.4.19-source.tar.gz"
   sha256 "820984b12a67f98705785aae2dd1347fe0ac097828001d4583ff64574aed6389"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/OpenPrinting/cups.git", branch: "master"
 
   livecheck do
@@ -14,7 +15,7 @@ class Cups < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "38bcc2d2a4f094d217867a6ce3f0f47929480b881fdfa4294d23c87358c59c4c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "caeefb7b8068a1d34d3ac47f248c7961da4098783d260549536fbeb51d6d8bda"
   end
 
   keg_only :provided_by_macos
