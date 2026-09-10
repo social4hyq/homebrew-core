@@ -8,10 +8,15 @@ class OhosSdk < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a38b192a13e6de838c15ba72441feb24f9f79ec89525d23a4455d93bc980c14"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b9542812c4ecee08ad310e3bd48ead6b0bc2cbdbabf6863d89472c566b51439"
   end
 
   depends_on "unzip" => :build
+
+  conflicts_with "llvm", because: "both install `clang` binaries"
+  conflicts_with "llvm@22", because: "both install `clang` binaries"
+  conflicts_with "llvm@21", because: "both install `clang` binaries"
 
   def install
     cd "ohos" do
