@@ -6,6 +6,7 @@ class Pipx < Formula
   url "https://files.pythonhosted.org/packages/42/93/06d1b5899ecd84cb952b21418939db6518ccb681881c1d1e3f1cb75fa213/pipx-1.17.2.tar.gz"
   sha256 "e29d68d05f5b4707d3d3dbddb0adfc4ca4ddcd77052dbb8f4e1b5ad31629a07c"
   license "MIT"
+  revision 1
   head "https://github.com/pypa/pipx.git", branch: "main"
 
   bottle do
