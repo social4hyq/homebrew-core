@@ -4,10 +4,11 @@ class Fallow < Formula
   url "https://github.com/fallow-rs/fallow/archive/refs/tags/v3.24.0.tar.gz"
   sha256 "824590209adb36c7cafef44bdfb89ddd1f4b9808983210b19a2a2d34094e5618"
   license "MIT"
+  revision 1
   head "https://github.com/fallow-rs/fallow.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5dc574ca4e1b455c5ec20291c6346dfe118517fda16a29c00548dc1d58753059"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "16b587b042b926ac16b7882740362fd7da3555841293e9e127033d01f0024888"
   end
 
   depends_on "rust" => :build
