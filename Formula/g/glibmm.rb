@@ -4,6 +4,7 @@ class Glibmm < Formula
   url "https://download.gnome.org/sources/glibmm/2.88/glibmm-2.88.1.tar.xz"
   sha256 "c139f962b1575c8827cd39d1ac21b7a367be3bda1409c0c7e21a29090f371506"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
