@@ -6,10 +6,11 @@ class PyqtBuilder < Formula
   url "https://files.pythonhosted.org/packages/61/f6/f3b504b4d55a7c4d3393cb90378501f1f5fc7f233bd85c0375674f84d2af/pyqt_builder-1.19.1.tar.gz"
   sha256 "6af6646ba29668751b039bfdced51642cb510e300796b58a4d68b7f956a024d8"
   license "BSD-2-Clause"
+  revision 1
   head "https://github.com/Python-PyQt/PyQt-builder.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4da3cae6c071414d4fdf162b6cb522257a6d7aef853cd557954d643faac16a20"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e02a0d9a27b7e782d743f643cc8d0f44312c8e356c0face48d5c7405e98470d5"
   end
 
   depends_on "python@3.14"
