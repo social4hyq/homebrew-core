@@ -4,6 +4,7 @@ class GoCritic < Formula
   url "https://github.com/go-critic/go-critic/archive/refs/tags/v0.15.0.tar.gz"
   sha256 "6cee82b801a849aef3adb714b7900d6df7b27213af984368be4c65db8400632e"
   license "MIT"
+  revision 1
   head "https://github.com/go-critic/go-critic.git", branch: "master"
 
   livecheck do
