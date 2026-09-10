@@ -4,6 +4,7 @@ class Goimports < Formula
   url "https://github.com/golang/tools/archive/refs/tags/v0.50.0.tar.gz"
   sha256 "22d397e6b0a3040aae4fbc6fccb7738b31575a86b754b8604892353f195368a2"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/golang/tools.git", branch: "master"
 
   livecheck do
@@ -12,7 +13,7 @@ class Goimports < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8114863a41c7c550afe48d1719e7d091b1c1b580388164f9088bd7b6ec22b1f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a89033c93b5f7e46ec3e7e591a68901f1eae0122e2d6769fa430a2807c388c71"
   end
 
   depends_on "go"
