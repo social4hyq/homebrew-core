@@ -6,10 +6,11 @@ class Conan < Formula
   url "https://files.pythonhosted.org/packages/39/aa/f21a687ac0fdd8261ba4ea727dabbe5e58f178278e17786e86c4793b7e70/conan-2.32.0.tar.gz"
   sha256 "59a033862bc46f99c4e4fd72c2741f44b8742377864ba33b28a698cd7361471e"
   license "MIT"
+  revision 1
   head "https://github.com/conan-io/conan.git", branch: "develop2"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6adfd24868a255f6f37c04dd04780ecd602b641a463708dd2afa9c1f822fb42"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c85924723f8bcf135c8f4246d45c8156b6af52a7a60af8a24bb14c6ecd7c75ae"
   end
 
   depends_on "pkgconf" => :build
