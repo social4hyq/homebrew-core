@@ -18,7 +18,7 @@ class Popt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb7b9a53fc16c53dbe5b6c388b2525abb538ea912a751027b22c95a80cab4699"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4af6da145ad1bb6f97c1b673f4261589af3c73d8b271ee82df8077763b6204e"
   end
 
   def install
