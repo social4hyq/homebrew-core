@@ -4,6 +4,7 @@ class Simdjson < Formula
   url "https://github.com/simdjson/simdjson/archive/refs/tags/v4.6.11.tar.gz"
   sha256 "61d948fc24f0d793829ad658058e7597d064988a89b4607ea02e401a82df98ff"
   license "Apache-2.0"
+  revision 1
   compatibility_version 3
   head "https://github.com/simdjson/simdjson.git", branch: "master"
 
