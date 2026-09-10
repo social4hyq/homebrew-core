@@ -4,6 +4,7 @@ class Libspng < Formula
   url "https://github.com/randy408/libspng/archive/refs/tags/v0.7.4.tar.gz"
   sha256 "47ec02be6c0a6323044600a9221b049f63e1953faf816903e7383d4dc4234487"
   license "BSD-2-Clause"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "8d31d707f0cf7b077156bd535b10b18e8c2fa3753fecb81a382d272be3e6b49e"
