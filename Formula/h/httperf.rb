@@ -2,7 +2,7 @@ class Httperf < Formula
   desc "Tool for measuring webserver performance"
   homepage "https://github.com/httperf/httperf"
   license "GPL-2.0-or-later"
-  revision 3
+  revision 4
 
   stable do
     url "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/httperf/httperf-0.9.0.tar.gz"
@@ -23,7 +23,7 @@ class Httperf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "282b4b6440ac69215f282500a7fa9a862cca810a124c3e1682b7591e8d58b1cd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4ea0adbd672bebd30880a5279684b1c1ded1a75d6dc6494e870b24665dcce3d"
   end
 
   head do
