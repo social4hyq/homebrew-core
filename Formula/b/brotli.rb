@@ -16,7 +16,7 @@ class Brotli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ffd1d8347cd46bb8b7e7d3ee583939bc80b132555c83a0570ac143beacde7886"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a4510195255d273ff2bdf6e948b8e756bcdc2c9d403ac6e5d63136e347d9a4f"
   end
 
   depends_on "cmake" => :build
