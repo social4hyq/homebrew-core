@@ -6,10 +6,11 @@ class Pdm < Formula
   url "https://files.pythonhosted.org/packages/1b/35/5e0d9a9b08c39a057f5a55b6b9bbdd5f5f0690e0390c1d193260c379966c/pdm-2.29.0.tar.gz"
   sha256 "28c520267a15d7a3921b934ec4bfc2d1dc18379fbb653bb20d8e840b2788be6b"
   license "MIT"
+  revision 1
   head "https://github.com/pdm-project/pdm.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "133cfd0852322540ec8e365164940775cda02aa45a6dd96ade10bc8909c1d1b2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a1d26389b4424cc2310634992a17910bae4b3e91416e3e0938955446abf403b"
   end
 
   depends_on "certifi" => :no_linkage
