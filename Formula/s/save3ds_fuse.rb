@@ -7,7 +7,7 @@ class Save3dsFuse < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db42aa3bfaa2435b16d6904a6f46ff82cd752f2bb4a03533fa51eac52ee70e64"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "77839e5b83cbf26e171a16cf20423dd325cfcacd3b379f00d5b5a7142fd1fc08"
   end
 
   depends_on "rust" => :build
