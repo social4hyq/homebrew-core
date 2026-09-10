@@ -14,7 +14,7 @@ class Liblinear < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cca353140c31072aa4cb64fc427d839ae94d4bf7ee331ff930f6a06f912a1a0c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bdd9ca4f6c41287bc9800d5c8e90079731b6f7470ad4844e17dc362a5cb07282"
   end
 
   # Fix sonames
