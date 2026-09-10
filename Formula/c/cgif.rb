@@ -4,6 +4,7 @@ class Cgif < Formula
   url "https://github.com/dloebl/cgif/archive/refs/tags/v0.5.4.tar.gz"
   sha256 "83a70a15bc2da41f081a44ebc58ee48e2e1d524a6d3fdb4a24064afa08d5ad4d"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
