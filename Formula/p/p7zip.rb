@@ -7,7 +7,7 @@ class P7zip < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b791ea40fbd8eb03564724d25a63b624ce438f78b08b2e82ca9b1ce73a93ab43"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee8035c7887318e9ccb94ded4ac7777465f25559e97f80f48605f49c1a535acf"
   end
 
   # Remove non-free RAR sources
