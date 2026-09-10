@@ -4,6 +4,7 @@ class Nsd < Formula
   url "https://www.nlnetlabs.nl/downloads/nsd/nsd-4.15.2.tar.gz"
   sha256 "bb4d57753c2cc2a641c92dab1021016d25fb4b972920bf4f0bbb8c40c1a9cce2"
   license "BSD-3-Clause"
+  revision 1
 
   # We check the GitHub repo tags instead of
   # https://www.nlnetlabs.nl/downloads/nsd/ since the first-party site has a
