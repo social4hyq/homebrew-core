@@ -4,6 +4,7 @@ class Fpp < Formula
   url "https://github.com/facebook/PathPicker/archive/refs/tags/0.9.5.tar.gz"
   sha256 "b0142676ed791085d619d9b3d28d28cab989ffc3b260016766841c70c97c2a52"
   license "MIT"
+  revision 1
   head "https://github.com/facebook/pathpicker.git", branch: "main"
 
   bottle do
