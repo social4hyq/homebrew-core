@@ -4,6 +4,7 @@ class Pyscn < Formula
   url "https://github.com/ludo-technologies/pyscn/archive/refs/tags/v1.31.1.tar.gz"
   sha256 "c30c4278ff6bec6a78b3f833bfb6d6047775f48f1af981c9ca440853661c9852"
   license "MIT"
+  revision 1
   head "https://github.com/ludo-technologies/pyscn.git", branch: "main"
 
   bottle do
