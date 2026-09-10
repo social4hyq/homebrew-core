@@ -5,6 +5,7 @@ class Helm < Formula
       tag:      "v4.3.0",
       revision: "bec5b06ed841fe5269972d864d5177944fd5970f"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/helm/helm.git", branch: "main"
 
   bottle do
