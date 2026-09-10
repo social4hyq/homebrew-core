@@ -2,6 +2,7 @@ class CabalInstall < Formula
   desc "Command-line interface for Cabal and Hackage"
   homepage "https://www.haskell.org/cabal/"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/haskell/cabal.git", branch: "master"
 
   stable do
