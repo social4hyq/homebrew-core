@@ -8,7 +8,7 @@ class Librsync < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0d49df429f66e4b710a9ba61c6d999bf8e910d01898b3228bf7a6af26a375cb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fe2c7b4e1616fdc5e3f78040c70b652515f8625b1dd6d3e199057fe3338bc06d"
   end
 
   depends_on "cmake" => :build
