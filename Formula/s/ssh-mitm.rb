@@ -6,7 +6,7 @@ class SshMitm < Formula
   url "https://files.pythonhosted.org/packages/f0/4e/c804d08c336bcff29fd665fdc3ff9d3698d529b1d75462b89bc53527862a/ssh_mitm-5.0.1.tar.gz"
   sha256 "221dafeed602c4cca7a3c7fb2eee55eb9725ea11d19a75fd13c9bc3a1cf274ed"
   license "GPL-3.0-only"
-  revision 4
+  revision 5
   head "https://github.com/ssh-mitm/ssh-mitm.git", branch: "master"
 
   bottle do
