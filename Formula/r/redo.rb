@@ -9,7 +9,7 @@ class Redo < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1d78199c37ab1961c80030b33009200719af93c548ad6e982356c42166ba072"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b74307cf56b89de11d723a9c3ceec85a811eb7b3933e4cbb52cb26fdff5e09a6"
   end
 
   depends_on "python@3.14"
