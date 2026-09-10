@@ -4,6 +4,7 @@ class Pygobject3 < Formula
   url "https://download.gnome.org/sources/pygobject/3.58/pygobject-3.58.0.tar.gz"
   sha256 "45068697de3ffe46840ca369705f23118b34db4f7deb63f6eff079a6734ddcca"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
