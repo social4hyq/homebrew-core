@@ -4,10 +4,11 @@ class Llhttp < Formula
   url "https://github.com/nodejs/llhttp/archive/refs/tags/release/v9.4.3.tar.gz"
   sha256 "1eb813c7437b31a87496a1cd3ed79f00746720f5e7e29c79b42c02cb69f36c39"
   license "MIT"
+  revision 1
   compatibility_version 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "22594f4ab155e0ed89bf6b8727e3ad5a491db1cb6d37418f6f83f1e517696118"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9ccdfa23eed0cbb1416ea1bc4bbe977e688c23f8e28d4870ae699e027ad13b01"
   end
 
   depends_on "cmake" => :build
