@@ -6,6 +6,7 @@ class Nginx < Formula
   url "https://nginx.org/download/nginx-1.31.5.tar.gz"
   sha256 "e951607d534836624bd36b6b45a71dbfb055237deae3738da6bbf3270dada279"
   license "BSD-2-Clause"
+  revision 1
   compatibility_version 6
   head "https://github.com/nginx/nginx.git", branch: "master"
 
@@ -15,7 +16,7 @@ class Nginx < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6a6f2040ca1b4dca6e6aeb6bafaf94bf16862d14e06d72cbd8034e16a9d395b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "59c26644e8993b20f37bbe9748c7d508d7230b2e6bac38123c13ff54bf7cecfc"
   end
 
   depends_on "openssl@3"
