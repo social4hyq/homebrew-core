@@ -9,7 +9,7 @@ class Libplist < Formula
   head "https://github.com/libimobiledevice/libplist.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "91ce9159ec82d5a497e7b0d0f935fffb43f5cbbcbbaa81355d28ba902cb7d551"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b539f41dd86d7099557fa9cb177e0abeff03f37244a4ac320bf1c6e714de68b"
   end
 
   depends_on "autoconf" => :build
