@@ -5,7 +5,7 @@ class Node < Formula
   sha256 "d1698832a1a10f050cdda044a3e3d6a748246811e2e7bc89ba9a8bd693dc45f2"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://nodejs.org/dist/"
