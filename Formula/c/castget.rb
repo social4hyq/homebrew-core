@@ -2,7 +2,7 @@ class Castget < Formula
   desc "Command-line podcast and RSS enclosure downloader"
   homepage "https://castget.johndal.com/"
   license "LGPL-2.1-only"
-  revision 1
+  revision 2
 
   stable do
     # Using git archive to backport upstream commits as release tarball excludes some files
