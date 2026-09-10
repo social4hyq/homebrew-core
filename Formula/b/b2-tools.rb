@@ -6,6 +6,7 @@ class B2Tools < Formula
   url "https://files.pythonhosted.org/packages/c9/81/d53f7f6826032f4a0e2e360de105d62b0be0a1a2ec6b69b7f7329caf7b0e/b2-4.7.1.tar.gz"
   sha256 "a6e571d01f559cd6baca822bcec17aba7326c9c878f34439fb590b717a1c6d60"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "7664e8542d686d35ca961f75007b3b1b931d3813ecd058b01d8f6d2e2b0dfe4a"
