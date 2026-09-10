@@ -8,7 +8,7 @@ class Libxdmcp < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abe87cfa9344e269542b9032235d172b1feee97aeab45066c005e2d46f45d4ca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3052193d4e8c75a9817d441bf53320529bbfdc34ab4db9afe60477d39e153ba7"
   end
 
   depends_on "pkgconf" => :build
