@@ -4,6 +4,7 @@ class AwsCCommon < Formula
   url "https://github.com/awslabs/aws-c-common/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "94de89f65d4917dd7381679ea3297d7304c43338158fa7bec190fa53c218ce90"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   bottle do
