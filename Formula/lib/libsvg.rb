@@ -13,7 +13,7 @@ class Libsvg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cda8242b0d8b1f7a65475e4ed3ad9643725599d509601299211bd9c856685fe0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce7c9f165338ffb94c0f973625032445c9be4ee5c487e60c330298fde0da0881"
   end
 
   depends_on "autoconf" => :build
