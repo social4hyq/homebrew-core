@@ -10,7 +10,7 @@ class Bpython < Formula
   head "https://github.com/bpython/bpython.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "22a3e253cb7d31c8da06c20fa47e120388e59e14ed4533b3af082c5c59486cc6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "439f97bb2e50bd3588f055e4e93937f0881ddc2dccde5c8536840ba9a2efe3a4"
   end
 
   depends_on "certifi" => :no_linkage
