@@ -7,7 +7,7 @@ class Yajl < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ad53a9839abd4f9a625508c4e43b5f3ac7e44ee32eb1073de80f52234036cf7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7913e818c9246ef9887b62fc52ba52a8060e6a3bf822c37fc4f0ac9c26722459"
   end
 
   depends_on "cmake" => :build
