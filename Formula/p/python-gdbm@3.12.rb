@@ -4,6 +4,7 @@ class PythonGdbmAT312 < Formula
   url "https://www.python.org/ftp/python/3.12.14/Python-3.12.14.tgz"
   sha256 "6c6df908d2c3fd24e6d76869e92542abd0f33aec9dfc18df8875f89660286d43"
   license "Python-2.0"
+  revision 1
 
   livecheck do
     formula "python@3.12"
