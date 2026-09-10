@@ -4,6 +4,7 @@ class X265 < Formula
   url "https://bitbucket.org/multicoreware/x265_git/downloads/x265_4.2.tar.gz"
   sha256 "40b1ea0453e0309f0eba934e0ddf533f8f6295966679e8894e8f1c1c8d5e1210"
   license "GPL-2.0-or-later"
+  revision 1
   compatibility_version 1
   head "https://bitbucket.org/multicoreware/x265_git.git", branch: "master"
 
