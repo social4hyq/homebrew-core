@@ -10,7 +10,7 @@ class Conan < Formula
   head "https://github.com/conan-io/conan.git", branch: "develop2"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6adfd24868a255f6f37c04dd04780ecd602b641a463708dd2afa9c1f822fb42"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c85924723f8bcf135c8f4246d45c8156b6af52a7a60af8a24bb14c6ecd7c75ae"
   end
 
   depends_on "pkgconf" => :build
