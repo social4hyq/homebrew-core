@@ -9,7 +9,7 @@ class LanggraphCli < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdcbc44368c8288972db2ae2ebf06af885581efddc2158272c26c342ded7442f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "668fb1b1feb451cf69e00ef38c7514b183272ce5b328272d67fd5f0c02d07d6b"
   end
 
   depends_on "rust" => :build # for orjson
