@@ -6,10 +6,10 @@ class Keepassc < Formula
   url "https://files.pythonhosted.org/packages/c8/87/a7d40d4a884039e9c967fb2289aa2aefe7165110a425c4fb74ea758e9074/keepassc-1.8.2.tar.gz"
   sha256 "2e1fc6ccd5325c6f745f2d0a3bb2be26851b90d2095402dd1481a5c197a7b24e"
   license "ISC"
-  revision 5
+  revision 6
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ec75fe3a43acaa71161b18eb0f0a779ce660ed9d7f09119d886fa7cf38eb26b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e2f79870be0529b3727ef682e5b42a1192ce6ed89da1c5d4ad769e31fe47a89"
   end
 
   depends_on "python@3.14"
