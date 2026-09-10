@@ -6,6 +6,7 @@ class Mercurial < Formula
   url "https://www.mercurial-scm.org/release/mercurial-7.2.4.tar.gz"
   sha256 "85839e0f39e6cb893a88932aa36ef661759f3c5c5de4551ad26bd9df53cb71a2"
   license "GPL-2.0-or-later"
+  revision 1
   compatibility_version 1
 
   livecheck do
