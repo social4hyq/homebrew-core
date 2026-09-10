@@ -9,8 +9,7 @@ class M4 < Formula
   compatibility_version 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "43e27d06206950e31aac25c1cc4596399dfcf350725fc459d9ff1e20be7d811a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "075f0b0c1438cb859fe745d7771b7ec9f35304d5f6d0109754f81548c3fee959"
   end
 
   keg_only :provided_by_macos
