@@ -14,7 +14,7 @@ class FileFormula < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "73680c7b7e785ef35f29e247130ee15274937d8d21724f9f5e94efacb55502c4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1edf2c780b8afd0efecbc57b9c0f85ff41a1476ba811ecb02d92f1da5de412a1"
   end
 
   keg_only :provided_by_macos
