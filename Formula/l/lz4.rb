@@ -15,7 +15,7 @@ class Lz4 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9be3f3dd83ec5813915be970556b221e915f107458a5ab616c26377c8a122bc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e18d96b6355e4314b8163a4070e0fe070d495f466f1126b71dc908ec3c057a5"
   end
 
   def install
