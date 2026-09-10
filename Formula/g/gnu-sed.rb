@@ -5,10 +5,11 @@ class GnuSed < Formula
   mirror "https://ftp.gnu.org/gnu/sed/sed-4.10.tar.xz"
   sha256 "b8e72182b2ec96a3574e2998c47b7aaa64cc20ce000d8e9ac313cc07cecf28c7"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4680928ff40fa545b34102f83d357156740c230d10ce4bd63590dac807ce4cf2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce682c0cc37e3647c3587091e1e20432fcef0c9560056dd230d147d67d09b973"
   end
 
   def install
