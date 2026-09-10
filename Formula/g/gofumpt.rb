@@ -8,7 +8,7 @@ class Gofumpt < Formula
   head "https://github.com/mvdan/gofumpt.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "624636a15c9b240d431fbb2e794aef07dc21e959f11bb2d71682aacb2f2261a7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f1683223c09d4cbb78fbaf2339f254de5d081a6a5385b8891fd34752cafcf52"
   end
 
   depends_on "go"
