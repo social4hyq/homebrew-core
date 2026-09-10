@@ -4,6 +4,7 @@ class Worktrunk < Formula
   url "https://github.com/max-sixty/worktrunk/archive/refs/tags/v0.77.0.tar.gz"
   sha256 "8160f0afe8287f3aad52e6ea1de7b0cfed01ad6d3d60ecdb952db6836775eda2"
   license any_of: ["Apache-2.0", "MIT"]
+  revision 1
   head "https://github.com/max-sixty/worktrunk.git", branch: "main"
 
   bottle do
