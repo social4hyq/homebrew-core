@@ -4,6 +4,7 @@ class JfrogCli < Formula
   url "https://github.com/jfrog/jfrog-cli/archive/refs/tags/v2.124.0.tar.gz"
   sha256 "05a232abe46627a40df4d509e8ab7da1d8532bd5f50317b9189ae26fa572e23b"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/jfrog/jfrog-cli.git", branch: "master"
 
   # There can be a notable gap between when a version is tagged and a
