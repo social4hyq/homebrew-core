@@ -4,6 +4,7 @@ class Usage < Formula
   url "https://github.com/jdx/usage/archive/refs/tags/v6.8.0.tar.gz"
   sha256 "032842fa48ccfcd0c2ca854105c25184cf3ed17250f596f21c4448b0148100de"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/jdx/usage.git", branch: "main"
 
