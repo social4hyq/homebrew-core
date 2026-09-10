@@ -4,6 +4,7 @@ class Cliproxyapi < Formula
   url "https://github.com/router-for-me/CLIProxyAPI/archive/refs/tags/v7.2.155.tar.gz"
   sha256 "217e8d72443918fba750e833a0c6f143f6b689df7f9bfda5afda84f1ad59d041"
   license "MIT"
+  revision 1
   head "https://github.com/router-for-me/CLIProxyAPI.git", branch: "main"
 
   livecheck do
@@ -13,7 +14,7 @@ class Cliproxyapi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ec4d1fba48458c4db22ec6b406e6738d178c8edce990bd4d30d42e2e2294c9e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bda0b874cb00d2850ec4ac82923bd53efb1442c56d5d39830631a845f816cc38"
   end
 
   depends_on "go" => :build
