@@ -4,6 +4,7 @@ class Gh < Formula
   url "https://github.com/cli/cli/archive/refs/tags/v2.92.0.tar.gz"
   sha256 "ad18928ce4e2695d7fc1adefa0f5e0496e570a430016cee4c22d7bf87e5d9c1d"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/cli/cli.git", branch: "trunk"
 
@@ -15,7 +16,7 @@ class Gh < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5023c0713eabd67180a5256cd0039fbc26c28203cd9929807cde47b1a6e70ea0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88892b44f2b9053bed5808543e165bbf2780419f5c5217be740e37a9b6d48c4a"
   end
 
   depends_on "go" => :build
