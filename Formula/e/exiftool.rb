@@ -16,7 +16,7 @@ class Exiftool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f0beba3047fa8557cfe769104374187e228a256f841c6dcfe6cdc1be57fc7b34"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "431db4a7c79f7a4e28c05b33be92da721084b6d44e012f6d715a0fbe1db66cd3"
   end
 
   depends_on "cmake" => :build
