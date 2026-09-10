@@ -12,7 +12,7 @@ class Itstool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5de629de0ba8d268a69a3da63f47efa7f0695c5d14e921295e6cf526aa7a3551"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b70c1fc6aa9a7779d4e061f63290dd92cbee83365b741c53117d27627e21ba2"
   end
 
   head do
