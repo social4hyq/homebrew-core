@@ -4,6 +4,7 @@ class Lazygit < Formula
   url "https://github.com/jesseduffield/lazygit/archive/refs/tags/v0.65.0.tar.gz"
   sha256 "972151d83d8fdfa5c7c881c34349ba4a38c37b7085667696b85c443d2fca97ed"
   license "MIT"
+  revision 1
   head "https://github.com/jesseduffield/lazygit.git", branch: "master"
 
   livecheck do
