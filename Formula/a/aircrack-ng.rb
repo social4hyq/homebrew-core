@@ -8,7 +8,7 @@ class AircrackNg < Formula
     "GPL-2.0-or-later",
     "GPL-2.0-or-later" => { with: "cryptsetup-OpenSSL-exception" },
   ]
-  revision 2
+  revision 3
 
   livecheck do
     url :homepage
