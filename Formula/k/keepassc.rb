@@ -9,7 +9,7 @@ class Keepassc < Formula
   revision 6
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ec75fe3a43acaa71161b18eb0f0a779ce660ed9d7f09119d886fa7cf38eb26b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e2f79870be0529b3727ef682e5b42a1192ce6ed89da1c5d4ad769e31fe47a89"
   end
 
   depends_on "python@3.14"
