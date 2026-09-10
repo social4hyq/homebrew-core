@@ -4,6 +4,7 @@ class Samtools < Formula
   url "https://github.com/samtools/samtools/releases/download/1.24/samtools-1.24.tar.bz2"
   sha256 "89b2a440123eeaa400392ce1736e7d60ce9041843027d76819753c5a8246bfdd"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "ac350844a4b840658ef17a157651ff34ad5b53e05b7ab38df1e68e77a2ca27bc"
