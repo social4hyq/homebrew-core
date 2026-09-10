@@ -4,6 +4,7 @@ class Negfix8 < Formula
   url "https://web.archive.org/web/20201022025021/https://sites.google.com/site/negfix/downloads/negfix8.3.tgz"
   sha256 "2f360b0dd16ca986fbaebf5873ee55044cae591546b573bb17797cbf569515bd"
   license "GPL-2.0-only"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "c6c6d3461812518483e0509770467b47be7a78ce36062ecf8e205703f032a836"
