@@ -4,6 +4,7 @@ class Fallow < Formula
   url "https://github.com/fallow-rs/fallow/archive/refs/tags/v3.24.0.tar.gz"
   sha256 "824590209adb36c7cafef44bdfb89ddd1f4b9808983210b19a2a2d34094e5618"
   license "MIT"
+  revision 1
   head "https://github.com/fallow-rs/fallow.git", branch: "main"
 
   bottle do
