@@ -5,7 +5,7 @@ class NodeAT22 < Formula
   sha256 "bbe768df8d5815d7fa76124052985332452e0a4742d39f32027550d1aab8f6fb"
   license "MIT"
   compatibility_version 1
-  revision 3
+  revision 4
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -13,8 +13,7 @@ class NodeAT22 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "86012e8899a459c6f99624dd4a7f5c6e07a601c06c20f446ab9a5933823ec0f0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c549238bbfc6126887c4b4f5a50aae64fd6fbb2125b0bc6742522b1aa935728f"
   end
 
   patch do
@@ -33,14 +32,6 @@ class NodeAT22 < Formula
   deprecate! date: "2026-10-28", because: :unsupported
 
   def install
-    # LLVM defaults to emulated TLS for aarch64-linux-ohos, which makes
-    # TLS-using programs ~30% slower. Harmonybrew's superenv injects
-    # -fno-emulated-tls globally (see https://atomgit.com/Harmonybrew/brew/pull/41),
-    # but CC/CXX here point at clang/clang++ by absolute path, bypassing the
-    # superenv `cc` shim, so the flag must be appended explicitly.
-    ENV["CC"] = "#{formula_opt_bin("llvm@22")}/clang -fno-emulated-tls"
-    ENV["CXX"] = "#{formula_opt_bin("llvm@22")}/clang++ -fno-emulated-tls"
-
     inreplace "common_node.gypi", "linux ", "linux openharmony "
 
     system "./configure", "--prefix=#{prefix}", "--dest-os=openharmony"
