@@ -5,7 +5,7 @@ class Fnm < Formula
   sha256 "224081a677a02acd9f972885e824a98fa3843f5b778b28400ad5af97752f6127"
   license "GPL-3.0-only"
   head "https://github.com/Schniz/fnm.git", branch: "master"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -13,7 +13,7 @@ class Fnm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7e75467f6fcbac0061a145539914710d99db166dcf60d6c88662b82fe99878d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab3fc16aef5b1f281a60f0b51996c2b2cecd7a0907410c281570e036b40adb10"
   end
 
   depends_on "rust" => :build
