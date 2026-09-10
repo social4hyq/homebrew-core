@@ -13,7 +13,7 @@ class Counterfeiter < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2c4e55acc2f509f18ee1752b50e7d73fc3b8e2c5c5921cedd4c6c1acb4440f3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4f78b1c5e38cd3adbbc8da97f64c35139c85988ed71c67baca1c9e48a9bb34e5"
   end
 
   depends_on "go"
