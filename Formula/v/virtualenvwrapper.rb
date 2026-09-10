@@ -9,7 +9,7 @@ class Virtualenvwrapper < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7cd1c7550e123207a5ecc3556a602c50598be7c2ac3e821914de69bbe4ecc059"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb3d635bf3443944329ef2c31899790d77bcac4a4df0a08b262670219d7dead9"
   end
 
   depends_on "python@3.14"
