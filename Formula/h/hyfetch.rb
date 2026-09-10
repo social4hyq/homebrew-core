@@ -6,6 +6,7 @@ class Hyfetch < Formula
   url "https://files.pythonhosted.org/packages/69/a8/df23913bb5e6791f339ca477558e14d1a43a23ebe72336e80001e188179e/hyfetch-2.1.0.tar.gz"
   sha256 "257eb5effcdd58bfaee9e7e6460e04c1fd5b5693385d6de1d32739085c44b4bf"
   license "MIT"
+  revision 1
   head "https://github.com/hykilpikonna/hyfetch.git", branch: "master"
 
   bottle do
