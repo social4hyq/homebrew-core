@@ -9,7 +9,7 @@ class Autopep8 < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f0890d0ed2d10688b299c8858ce19d790b2f005141dc539729fc04dcc2101147"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa17592fdd1ecb7dfcd094fb60d74e37e4e6fede312210872e8f2e237db27e3f"
   end
 
   depends_on "python@3.14"
