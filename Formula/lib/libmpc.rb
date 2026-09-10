@@ -5,10 +5,11 @@ class Libmpc < Formula
   mirror "https://ftp.gnu.org/gnu/mpc/mpc-1.4.1.tar.xz"
   sha256 "91204cd32f164bd3b7c992d4a6a8ce6519511aadab30f78b6982d0bf8d73e931"
   license "LGPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "df70b895fc004a151a53723ae3cb694c2afcb2c53811512b9517d78e9a59ca0b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8f7b346cd51ab795dca2c80909062967a1469e52927d96f787530478ab4577f"
   end
 
   head do
