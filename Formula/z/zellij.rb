@@ -4,11 +4,11 @@ class Zellij < Formula
   url "https://github.com/zellij-org/zellij/archive/refs/tags/v0.45.1.tar.gz"
   sha256 "5cbe711437d2a61afd9287165f6aca0bcccb9ab1473633665a5b11ed55467852"
   license "MIT"
-  revision 1
+  revision 2
   head "https://github.com/zellij-org/zellij.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "565a6eab5ffd9169057604dd3097de0255e4a01f669293cd2a4e1ea2de073e17"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "45b902390607a26cb68027fbbb1ce798745d4264a5734a7dfd5098b5bd850d10"
   end
 
   depends_on "cmake" => :build
