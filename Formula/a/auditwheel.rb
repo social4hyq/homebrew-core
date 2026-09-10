@@ -6,6 +6,7 @@ class Auditwheel < Formula
   url "https://files.pythonhosted.org/packages/4d/52/83393c50a4d497e6d2f62ddf0b439bf3a5eecd4e6b8ae43c219cb722224e/auditwheel-6.8.2.tar.gz"
   sha256 "d007c4fd8c9c4b5113690ab0b159e05c5aa9b2d31b69efc40875826cc095594b"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "b80541e43732a3a8fa059d71ac7c6cf09a4f55be98264dc9d06b198b7623b6f2"
