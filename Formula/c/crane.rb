@@ -4,6 +4,7 @@ class Crane < Formula
   url "https://github.com/google/go-containerregistry/archive/refs/tags/v0.22.1.tar.gz"
   sha256 "a52cc7d61f8b2f043b7f0be1febecead5fceb791543c4790d699440f12d6b370"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/google/go-containerregistry.git", branch: "main"
 
   bottle do
