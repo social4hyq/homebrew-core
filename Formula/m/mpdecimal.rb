@@ -13,7 +13,7 @@ class Mpdecimal < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7ce7e71e8326d4ef8e7a59bcfe08c59f4bde27a1545b412b3412013b1238658"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6378c84fbb0132a5d329b70074f70a86af44af162dfdddeb1050ba167fd27944"
   end
 
   def install
