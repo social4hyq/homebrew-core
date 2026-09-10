@@ -5,6 +5,7 @@ class ChartTesting < Formula
       tag:      "v3.14.0",
       revision: "2651b49048950c5473b1f533c900d17614bc6aa0"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/helm/chart-testing.git", branch: "main"
 
   bottle do
