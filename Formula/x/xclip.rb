@@ -4,7 +4,7 @@ class Xclip < Formula
   url "https://github.com/astrand/xclip/archive/refs/tags/0.13.tar.gz"
   sha256 "ca5b8804e3c910a66423a882d79bf3c9450b875ac8528791fb60ec9de667f758"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 2
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "b8f8bea85cabceea57d0786dbdb242938965adfd68c23ed030c252907f03a09d"
