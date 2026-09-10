@@ -9,7 +9,7 @@ class Auditwheel < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b80541e43732a3a8fa059d71ac7c6cf09a4f55be98264dc9d06b198b7623b6f2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4024d88f4ec8adcaa04d75388f8b33e9f498bc2e3bac90e11adaed916f221263"
   end
 
   depends_on :linux
