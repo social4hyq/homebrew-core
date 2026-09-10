@@ -15,7 +15,7 @@ class ZlibNgCompat < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c17a31f8104701bce6b471af8dbbd14bb67d16a504eec087018feb05493a430"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "99356b80ddb81e0b8267debb44df459f2b5e27e7800406d3b4cf7f8f744beb89"
   end
 
   keg_only :shadowed_by_macos, "macOS provides zlib"
