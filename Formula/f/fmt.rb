@@ -4,11 +4,12 @@ class Fmt < Formula
   url "https://github.com/fmtlib/fmt/releases/download/12.2.0/fmt-12.2.0.zip"
   sha256 "a2f4a8d51178f954e4c339007f77edd76ba0cb2e36f87a48e5a5403d9be5878f"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/fmtlib/fmt.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa4e77f2e36a4388b847eb776acfcb675b64a35733168db861688146c3c144d1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc12336fbd9da80dcd7d83bf892ddf2821d9c15d97471ff57db4b78c89282d6f"
   end
 
   depends_on "cmake" => :build
