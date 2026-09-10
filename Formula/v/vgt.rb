@@ -8,7 +8,7 @@ class Vgt < Formula
   head "https://github.com/roblaszczak/vgt.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a4c7843df0ec02957f2b22b20adb1bc6e550ea93546e99a769dd38fe0a319cd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f93d354168714272594462c283625c827054d197fc93d02bf1fa6c0937f1c0a"
   end
 
   depends_on "go"
