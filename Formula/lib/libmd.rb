@@ -5,6 +5,7 @@ class Libmd < Formula
   mirror "https://libbsd.freedesktop.org/releases/libmd-1.2.0.tar.xz"
   sha256 "ac15ffb8430502fbaccdec66c5a82ee0eab0b0f36220df56710feadfeb13d0a0"
   license all_of: ["BSD-3-Clause", "BSD-2-Clause", "ISC", "Beerware", :public_domain]
+  revision 1
 
   livecheck do
     url "https://archive.hadrons.org/software/libmd/"
@@ -12,7 +13,7 @@ class Libmd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c1dee4255859e2ba679847f88d3eb106d96a68fe1cb7de95f87dde3708b1649"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1a78b7b98a5f140ef9d65d69c259704e721ef14db247f2bd06d3e1886d1e24b"
   end
 
   head do
