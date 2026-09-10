@@ -13,7 +13,7 @@ class Tfsec < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "96963916c0d0da20d599f244a0a8e208b52e327044a2abc71404c7714bd3c3e0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "059bf8b2dc360c9668322783050906d966b9d567d3e96619914d3d2608c42ef8"
   end
 
   depends_on "go" => :build
