@@ -6,6 +6,7 @@ class Checkdmarc < Formula
   url "https://files.pythonhosted.org/packages/8f/31/4cb91fd6efe9e70487856a6daa19ce0c20387c3cbf357b0d66fb3e1e7143/checkdmarc-6.0.1.tar.gz"
   sha256 "b9ca2007bbc3587cd05791e09b2607213815e949b526d5f2927894eaed4f32af"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/domainaware/checkdmarc.git", branch: "main"
 
   bottle do
