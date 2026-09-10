@@ -6,7 +6,7 @@ class Gitingest < Formula
   url "https://files.pythonhosted.org/packages/d6/fe/a915f0c32a3d7920206a677f73c185b3eadf4ec151fb05aedd52e64713f7/gitingest-0.3.1.tar.gz"
   sha256 "4587cab873d4e08bdb16d612bb153c23e0ce59771a1d57a438239c5e39f05ebf"
   license "MIT"
-  revision 7
+  revision 8
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "230a6b53ccb1769067c62775e94c94e719bf981b1bb92aa400d42494ea6bd42d"
