@@ -4,10 +4,11 @@ class DockerBuildx < Formula
   url "https://github.com/docker/buildx/archive/refs/tags/v0.37.0.tar.gz"
   sha256 "c6e3efdfb9778d9ef69e005ea43abc3041511f088760c927637e3cf6be7cb410"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/docker/buildx.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a2895a5a91964f68163ca0b02b5fe22b9411d50bb6aa3a9c393277631a9aca7f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb2286c2a8b2e69b826c87ce3e945d1f482771f32d101ffca8de6761e241bb75"
   end
 
   depends_on "go" => :build
