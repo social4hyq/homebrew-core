@@ -4,10 +4,10 @@ class LlvmGccCompat < Formula
   url "https://atomgit.com/Harmonybrew/homebrew-core.git", revision: "a8784ea451ad819d27a548411b8853fca6de3124"
   version "1.0.0"
   license "BSD-2-Clause"
+  revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b81a6a3a682849c1788049fecef7650aa4b4b54cdb45cfc376318df31b47d914"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c5f687df7ad591e585c60ac921c61359159035da42beff60a5bb03bfd16df04"
   end
 
   depends_on "ohos-sdk"
