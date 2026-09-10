@@ -4,11 +4,12 @@ class Simdjson < Formula
   url "https://github.com/simdjson/simdjson/archive/refs/tags/v4.6.11.tar.gz"
   sha256 "61d948fc24f0d793829ad658058e7597d064988a89b4607ea02e401a82df98ff"
   license "Apache-2.0"
+  revision 1
   compatibility_version 3
   head "https://github.com/simdjson/simdjson.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "234f92d46ee3173196030752315308ddef6ca6bf748d3ceb9bb6300614f75cc2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "83e7ca7f51598013d1dc68967c37e03e5fafd2a4ec64a6f897880c1d16f836c1"
   end
 
   depends_on "cmake" => :build
