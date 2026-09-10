@@ -4,7 +4,7 @@ class Xmlto < Formula
   url "http://ftp.debian.org/debian/pool/main/x/xmlto/xmlto_0.0.29.orig.tar.bz2"
   sha256 "6000d8e8f0f9040426c4f85d7ad86789bc88d4aeaef585c4d4110adb0b214f21"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://pagure.io/xmlto.git"
