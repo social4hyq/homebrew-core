@@ -6,6 +6,7 @@ class Subliminal < Formula
   url "https://files.pythonhosted.org/packages/9f/08/f602bac8c35f04021e6dfcd0bebea917cd2b57116229a74a0b97e63c72ab/subliminal-2.7.1.tar.gz"
   sha256 "f2649914d3067904effa2b4ce8d83aae994cd47008253311d5ae7949f467939f"
   license "MIT"
+  revision 1
   head "https://github.com/Diaoul/subliminal.git", branch: "main"
 
   bottle do
