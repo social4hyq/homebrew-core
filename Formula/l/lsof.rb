@@ -4,6 +4,7 @@ class Lsof < Formula
   url "https://github.com/lsof-org/lsof/archive/refs/tags/4.99.7.tar.gz"
   sha256 "bac1b0acbc50aede42fc97dffaa0b0475e97973e36a6351de5f349c6155afc68"
   license "lsof"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "711c89bd0d60165a126fc6ef3a5a14c530544ffc39fb4093e32781294fd17197"
