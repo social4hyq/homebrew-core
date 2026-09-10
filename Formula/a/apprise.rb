@@ -6,9 +6,10 @@ class Apprise < Formula
   url "https://files.pythonhosted.org/packages/81/44/5965c245998c72022297e2b515d9594281a97ed1442b3fa022c2c2324102/apprise-1.13.1.tar.gz"
   sha256 "e7689dda71aaf739244d6c8690de13cb1361b8d0a79980fb48bb397455ca0bdd"
   license "BSD-3-Clause"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd36a2337552e1b528d82cd6c90fd5a56b3b2e6d57c0c8db033d8621bdec3f5d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "380de558b7801b25a44307b9c537e897e476605f249f7c4d272e404350b45e3c"
   end
 
   depends_on "certifi"
