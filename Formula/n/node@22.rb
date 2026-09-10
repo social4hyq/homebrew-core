@@ -5,7 +5,7 @@ class NodeAT22 < Formula
   sha256 "bbe768df8d5815d7fa76124052985332452e0a4742d39f32027550d1aab8f6fb"
   license "MIT"
   compatibility_version 1
-  revision 4
+  revision 5
 
   livecheck do
     url "https://nodejs.org/dist/"
