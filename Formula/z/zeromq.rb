@@ -4,7 +4,7 @@ class Zeromq < Formula
   url "https://github.com/zeromq/libzmq/releases/download/v4.3.5/zeromq-4.3.5.tar.gz"
   sha256 "6653ef5910f17954861fe72332e68b03ca6e4d9c7160eb3a8de5a5a913bfab43"
   license "MPL-2.0"
-  revision 2
+  revision 3
   compatibility_version 1
 
   livecheck do
@@ -13,7 +13,7 @@ class Zeromq < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fea6c9588cc75d2252ec8cde1218819ca61342c5da3e129109cc77c157cb0ff6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1c0a3c3a2b81a38bf4edc53fe72ceac47f92f79b70a0b0355d0fbde66993d5d"
   end
 
   head do
