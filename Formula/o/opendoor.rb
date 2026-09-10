@@ -9,7 +9,7 @@ class Opendoor < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a98f7f455a7c93a9811d573c3ffb7297623facfbf86f862381e0fa3eaf0c5c2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "12cb5f20bf9c0c2e109437b3687f274c975ba75a527c294385a126e833a1757b"
   end
 
   depends_on "python@3.14"
