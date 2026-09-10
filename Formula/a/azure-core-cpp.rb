@@ -4,6 +4,7 @@ class AzureCoreCpp < Formula
   url "https://github.com/Azure/azure-sdk-for-cpp/archive/refs/tags/azure-core_1.16.4.tar.gz"
   sha256 "25f8badf23c66ae82debd95e0d074d6269b276e5fa2ce5d4d3cff38fda9ab8c2"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
