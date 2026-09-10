@@ -4,7 +4,7 @@ class Mitie < Formula
   url "https://github.com/mit-nlp/MITIE/archive/refs/tags/v0.7.tar.gz"
   sha256 "0830955e64c2a4cceab803884355f090cf8e9086e68ac5df43058f05c34697e8"
   license "BSL-1.0"
-  revision 3
+  revision 4
   head "https://github.com/mit-nlp/MITIE.git", branch: "master"
 
   bottle do
