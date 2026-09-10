@@ -4,6 +4,7 @@ class AwsChecksums < Formula
   url "https://github.com/awslabs/aws-checksums/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "6c058812f5b537ce58eac1e529f441ff387a652ea62cbe9b844f9188339221b1"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   bottle do
