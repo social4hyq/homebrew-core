@@ -13,7 +13,7 @@ class Mandoc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a338eab843dbcda92c20409aa837f40302938faa5d8772a430ee27b91e0dc2c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6dc662c1ee01a7bf8288590181c4861b47ce79523dec10117c4e94bcb294b2b6"
   end
 
   on_linux do
