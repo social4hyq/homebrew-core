@@ -7,10 +7,11 @@ class Peru < Formula
   url "https://files.pythonhosted.org/packages/46/93/97b31e2052b4308cbc413d85b6b6b08a3beeeac81996b070723418a0c24e/peru-1.3.5.tar.gz"
   sha256 "2cc1a0d09c5d4fc28dda5c4bf87b4110ee2107e9ce7fb6a38f8d6f60a91af745"
   license "MIT"
+  revision 1
   head "https://github.com/buildinspace/peru.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "08008a3117bafba3ea2900ab9a2a0c2f819d1bdf413402838bc55cbd8244aad3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e49f2bf75315cee3d17c83976bc3372e4b48e15f694ed4819b7695f3a6f3e6a0"
   end
 
   depends_on "libyaml"
