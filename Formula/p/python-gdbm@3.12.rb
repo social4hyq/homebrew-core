@@ -11,8 +11,7 @@ class PythonGdbmAT312 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f319d40dc44403c71ed38cc8adb5ba0ec98dc9b9eda4d265110520d89a7c79b4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8002025e4e3f76341b5bbec271617084b5d2d508240a8fb7bd6512581df18517"
   end
 
   depends_on "gdbm"
