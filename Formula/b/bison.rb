@@ -11,7 +11,7 @@ class Bison < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6bf96884cf86152dc0b9f193acb24808ff2ff00e98ca5d1e2cd57693fc06d29"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d2ed46b3b73723383e211a856db74521f3fae2dbcb37e37f5e39608b71da71d"
   end
 
   keg_only :provided_by_macos
