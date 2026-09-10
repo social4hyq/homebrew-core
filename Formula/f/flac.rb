@@ -13,6 +13,7 @@ class Flac < Formula
     :public_domain,
     any_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"],
   ]
+  revision 1
 
   livecheck do
     url "https://ftp.osuosl.org/pub/xiph/releases/flac/?C=M&O=D"
@@ -20,7 +21,7 @@ class Flac < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a73f40974715baaf866d7be009cdf1d9d82a594ba91f78b8dd3a14eb6f62745"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f18f6d1edcec092a83a4367669a5817530f2263831ee16433b7e37ea1fd20efa"
   end
 
   head do
