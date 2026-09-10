@@ -4,6 +4,7 @@ class Staticcheck < Formula
   url "https://github.com/dominikh/go-tools/archive/refs/tags/2026.2.1.tar.gz"
   sha256 "8d807cd909f4481d6777f7707e5ae75dcc399e14d68ff14a3c814731826e0dfc"
   license "MIT"
+  revision 1
   head "https://github.com/dominikh/go-tools.git", branch: "master"
 
   bottle do
