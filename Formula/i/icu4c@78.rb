@@ -19,7 +19,7 @@ class Icu4cAT78 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2586e4f192c90480af64608337673ab19a0ac7cc76f472135f84cb5a1eada595"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c1ac7d25081bb1c69bd6732a1cbd1591a3432cd9ce70a0f094b0306a8106693"
   end
 
   keg_only :shadowed_by_macos, "macOS provides libicucore.dylib (but nothing else)"
