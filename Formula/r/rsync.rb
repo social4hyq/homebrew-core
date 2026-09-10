@@ -8,7 +8,7 @@ class Rsync < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eab2bf37456a2dd1e63bd47881cdff2d60501b9791fc0011f54ceaca708be611"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d28af2fdbca73c9602326f47ac80625a70abc2433a30f6311b695afc610c1ec"
   end
 
   depends_on "lz4"
