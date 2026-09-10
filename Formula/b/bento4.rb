@@ -13,7 +13,7 @@ class Bento4 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ddf723f2822cfa82e744d369abda988322107132d438274f0066b9f4c27db29d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "898b474a80dd272848ee0473e2e7d5302d661630e9bd1dfd0ce65e966969470a"
   end
 
   depends_on "cmake" => :build
