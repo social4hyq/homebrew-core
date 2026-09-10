@@ -10,7 +10,7 @@ class PolicySentry < Formula
   head "https://github.com/salesforce/policy_sentry.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7cb94e9f5bcb65678f0d98f86a6831bd19127680ead55347c7cd5a1c51bb4fe8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8247debd3a028099221736251d4d179dacc3137a1b12ee1c28bec1ffc1f40c0"
   end
 
   depends_on "rust" => :build # for orjson
