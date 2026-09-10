@@ -44,6 +44,8 @@ class Llvm < Formula
     depends_on "zlib-ng-compat"
   end
 
+  conflicts_with "ohos-sdk", because: "both install `clang` binaries"
+
   # cmake 4.x's if() parser rejects the extra parens this file wraps its
   # conditions in (CMake bug unrelated to platform, not OHOS-specific).
   patch do
