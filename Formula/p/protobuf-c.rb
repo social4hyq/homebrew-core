@@ -4,11 +4,11 @@ class ProtobufC < Formula
   url "https://github.com/protobuf-c/protobuf-c/releases/download/v1.5.2/protobuf-c-1.5.2.tar.gz"
   sha256 "e2c86271873a79c92b58fef7ebf8de1aa0df4738347a8bd5d4e65a80a16d0d24"
   license "BSD-2-Clause"
-  revision 14
+  revision 15
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fdf94f73fb4ba8d4466ce66c4bbb06b438a7272c372eb282d29a8369ec2b5ca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "37cc8a54e4965fed677a91c936e059a222c8ebed90797d05a8e83248b069fa9e"
   end
 
   head do
