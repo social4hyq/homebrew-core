@@ -16,7 +16,7 @@ class Zlib < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "735b4221a04d47e38491b2b5c56c73fb9d6f9a0704a5db9bdadb5f7a35c4f8d3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "54a2a869296ac8572784483351c65ede1876cad5640184f6bb3f87529531fd0e"
   end
 
   keg_only :provided_by_macos
