@@ -7,7 +7,7 @@ class Gws < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f309ec3c20263ed74b96798c465d01c644a24c07a7c141825c76ea3f387c4363"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "68294fd8e317ff3aa977084626c1f447f10d46cc7e1d05146f8b5e4f75ebbe5b"
   end
 
   on_macos do
