@@ -9,7 +9,7 @@ class Ykdl < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "82cf498103bf4076e691989e164882ac07e2029e71465d2805cb42c5a7e1dff6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "98ba00e5ac72112ab9736cdaed53c7b4623bf9048c256900484ee43e0d75bfc8"
   end
 
   depends_on "python@3.14"
