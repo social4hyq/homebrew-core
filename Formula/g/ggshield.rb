@@ -6,6 +6,7 @@ class Ggshield < Formula
   url "https://files.pythonhosted.org/packages/d8/3b/f78b04da02a8d7389fc9d13c154351cafdca34aa005559db3873029b6002/ggshield-1.54.0.tar.gz"
   sha256 "2861919706bb5fae2cffa8b1a26ac2643534388fb286818f9e6dace61692d65a"
   license "MIT"
+  revision 1
   head "https://github.com/GitGuardian/ggshield.git", branch: "main"
 
   bottle do
