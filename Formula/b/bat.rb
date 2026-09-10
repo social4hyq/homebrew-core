@@ -4,11 +4,12 @@ class Bat < Formula
   url "https://github.com/sharkdp/bat/archive/refs/tags/v0.26.1.tar.gz"
   sha256 "4474de87e084953eefc1120cf905a79f72bbbf85091e30cf37c9214eafcaa9c9"
   license any_of: ["Apache-2.0", "MIT"]
+  revision 1
   compatibility_version 1
   head "https://github.com/sharkdp/bat.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e954fc0a102aca6430324bbf7bf5013e526b9f02ae4cf0a0063f0147f4561fb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2910db5804229507999607541de0e46408cae53f08065e61fd2446238a100e00"
   end
 
   depends_on "pkgconf" => :build
