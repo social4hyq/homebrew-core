@@ -5,7 +5,7 @@ class PythonAT314 < Formula
   sha256 "62859805f6fdf25e2bcbf3fa3217801e1996887ca33e6a2af80674bdfa2dbe07"
   license "Python-2.0"
   compatibility_version 1
-  revision 6
+  revision 7
 
   livecheck do
     url "https://www.python.org/downloads/source/"
