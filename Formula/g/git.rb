@@ -12,7 +12,7 @@ class Git < Formula
   ]
   compatibility_version 1
   head "https://github.com/git/git.git", branch: "master"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://mirrors.edge.kernel.org/pub/software/scm/git/"
@@ -20,7 +20,7 @@ class Git < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "edfb5ca99d37bfe673a7cee407ef08ce14a64d48eb3c4400564b2144b429d34c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fb3d696cb18e65528f77b038a50db37f7a5d58793fb6d3571f2b318df9eca7e"
   end
 
   depends_on "gettext" => :build
