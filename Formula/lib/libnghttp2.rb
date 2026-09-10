@@ -8,6 +8,7 @@ class Libnghttp2 < Formula
   # see discussions in here, https://github.com/Homebrew/homebrew-core/pull/133078#discussion_r1221941917
   sha256 "c866b7477cbb7512ab6863a685027adbb1bb8da8fc3bab7429ed43d3281d5aa9"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
