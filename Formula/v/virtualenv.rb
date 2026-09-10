@@ -6,10 +6,11 @@ class Virtualenv < Formula
   url "https://files.pythonhosted.org/packages/08/1c/69faa2e6a83484e2a8227bce5cfaa183941c5720f99c48f204931d286b07/virtualenv-21.7.8.tar.gz"
   sha256 "1dc49c790072a9072cb1803f9bd62aa69cd583077cada32390f75505cdc64c9b"
   license "MIT"
+  revision 1
   head "https://github.com/pypa/virtualenv.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8bed4246e1d77d7219e4f573ef785cb590a01695136ed838e9e1e27f3bec7a9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "412935326460608635242e1620fdcb5d42146d365460d03760d68b1d62259a07"
   end
 
   depends_on "python@3.14"
