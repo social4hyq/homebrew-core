@@ -4,6 +4,7 @@ class ApifyCli < Formula
   url "https://registry.npmjs.org/apify-cli/-/apify-cli-1.6.1.tgz"
   sha256 "e2d248ff87a203aa86942921002b46a301f4b9d661bab2bfcb0a8e9fe3c4769e"
   license "Apache-2.0"
+  revision 1
 
   no_autobump! because: :bumped_by_upstream
 
