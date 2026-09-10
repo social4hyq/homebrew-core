@@ -17,7 +17,7 @@ class MecabIpadic < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f195da95274a44c9f765ca4684651760a961255d8d888cd77262c73c5532425c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a9809deb63f357cf1eaaec3dbe0e906505d2c62cac4773e5ea815e5356f3611"
   end
 
   depends_on "mecab"
