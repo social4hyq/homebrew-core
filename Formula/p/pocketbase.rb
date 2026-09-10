@@ -7,7 +7,7 @@ class Pocketbase < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a978c8535367ead4990c54056fb0b9e9866113925f71b26794809625d0a2caa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "91af279a16ce36da529c2d8c5416e98ae3301ab0e29dbd1b5b7a2f4cbd1a5f9d"
   end
 
   depends_on "go" => :build
