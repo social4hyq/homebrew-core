@@ -8,7 +8,7 @@ class Libxau < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dc4beb4779f57fda3a3be2a7aad5c9c81d30abd0a077db2149531752f4601ef"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eff372251fbd52ea173a37ba76e99827300b4c685e9026cd80ec925ab98e2e94"
   end
 
   depends_on "pkgconf" => :build
