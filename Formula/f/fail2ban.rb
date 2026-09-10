@@ -4,6 +4,7 @@ class Fail2ban < Formula
   url "https://github.com/fail2ban/fail2ban/archive/refs/tags/1.1.1.tar.gz"
   sha256 "4be0ea0488e32de260058462a44a040f0542cd26a9fb6fa6d2514f9dd8ec1609"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/fail2ban/fail2ban.git", branch: "master"
 
   livecheck do
