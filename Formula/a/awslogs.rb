@@ -6,11 +6,11 @@ class Awslogs < Formula
   url "https://files.pythonhosted.org/packages/15/f5/8f3bd0f4a927b1fbb3a5e6a5b036f29e4263977fb167b301bc4a5f4db2b9/awslogs-0.15.0.tar.gz"
   sha256 "19f223bb1c0703cea0689d94b1d293006529095e6ab8971f6b52289a2e545dd5"
   license "BSD-3-Clause"
-  revision 5
+  revision 6
   head "https://github.com/jorgebastida/awslogs.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "17f96df3f67928b08c2673c9dadba205126a590ccd60e6b710c0c85e4e49ab90"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "76ea85844a8c827c00e826e385982f8836baeee9e03b7f1ff2a72c1449f10b4a"
   end
 
   depends_on "python@3.14"
