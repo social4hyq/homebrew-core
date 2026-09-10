@@ -4,7 +4,7 @@ class Argon2 < Formula
   url "https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/20190702.tar.gz"
   sha256 "daf972a89577f8772602bf2eb38b6a3dd3d922bf5724d45e7f9589b5e830442c"
   license "Apache-2.0"
-  revision 1
+  revision 2
   head "https://github.com/P-H-C/phc-winner-argon2.git", branch: "master"
 
   bottle do
