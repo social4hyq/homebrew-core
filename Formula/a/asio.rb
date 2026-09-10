@@ -4,6 +4,7 @@ class Asio < Formula
   url "https://downloads.sourceforge.net/project/asio/asio/1.38.2%20%28Stable%29/asio-1.38.2.tar.bz2"
   sha256 "c04e0e66ac29741faad763a56f3c50196421d4b968009fc237c53314769bf8ad"
   license "BSL-1.0"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Asio < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "24f0375a0088112bc40bf09fe309bf7697b4bb63a6f7c09988706df74b21bd47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bb97c620ec7a5f7981b8a5a6b755eb8f9c1dbdec6db1414353f92191620806fe"
   end
 
   head do
