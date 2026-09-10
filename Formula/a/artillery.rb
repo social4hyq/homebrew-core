@@ -4,6 +4,7 @@ class Artillery < Formula
   url "https://registry.npmjs.org/artillery/-/artillery-2.0.34.tgz"
   sha256 "ed6ff0b9cec653120805889eb0504bde36e923fda24dea817f2691af4ccb1188"
   license "MPL-2.0"
+  revision 1
 
   livecheck do
     url "https://registry.npmjs.org/artillery/latest"
