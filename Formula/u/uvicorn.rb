@@ -6,10 +6,11 @@ class Uvicorn < Formula
   url "https://files.pythonhosted.org/packages/f2/0f/3f86e61397dd33bf2ccf28188c40db6a740658aeebbbf6e7dbc101a1f487/uvicorn-0.52.4.tar.gz"
   sha256 "73acfee47a0b133c5de13d219492d62d8a31e935f4fe6e41a232451a15379f86"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/encode/uvicorn.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7742e4b7fd2cab55849c50272fe8f0238813a2fd0db3570da4babbf13f118be4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3262bc28d421348502d3d8262b80d40a7a69a5115cb07ef3812e3419b5a7da67"
   end
 
   depends_on "rust" => :build
