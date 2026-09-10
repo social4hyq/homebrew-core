@@ -7,7 +7,7 @@ class AwsCrtCpp < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce2bb8a8b8f0a095762992a0c25324ee79e0466371b5beda73ced10b1afc1be3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "14da4f97dbaf33f500f0f25456abd4bcddcde0eeb5f281d445c3debe875f7cc7"
   end
 
   depends_on "cmake" => :build
