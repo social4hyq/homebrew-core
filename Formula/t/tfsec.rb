@@ -4,6 +4,7 @@ class Tfsec < Formula
   url "https://github.com/aquasecurity/tfsec/archive/refs/tags/v1.28.14.tar.gz"
   sha256 "61fe8ee670cceaf45d85c2789da66616d0045f8dbba4ec2b9db453436f9b9804"
   license "MIT"
+  revision 1
   head "https://github.com/aquasecurity/tfsec.git", branch: "master"
 
   livecheck do
