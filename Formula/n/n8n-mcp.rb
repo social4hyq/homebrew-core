@@ -4,6 +4,7 @@ class N8nMcp < Formula
   url "https://registry.npmjs.org/n8n-mcp/-/n8n-mcp-2.82.1.tgz"
   sha256 "c0262d9c73c11761937d764b2df7792a45e7022866d9e1f527fe26476b11065f"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "8728fc18d99ad9ead7999fa917e6a77ef30f8f8a0c39c7c60210c1c505635e94"
