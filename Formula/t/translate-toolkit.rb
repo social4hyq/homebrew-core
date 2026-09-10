@@ -6,6 +6,7 @@ class TranslateToolkit < Formula
   url "https://files.pythonhosted.org/packages/a3/65/72c1346001fc92f3b2f69d126918f5f7ef96c9ad439256b05a614ca7df1c/translate_toolkit-3.19.19.tar.gz"
   sha256 "f8099801886845f46f63457ceb312284421b76711e76e9053b9c1ae50b2faf16"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/translate/translate.git", branch: "master"
 
   bottle do
