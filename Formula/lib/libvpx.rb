@@ -4,6 +4,7 @@ class Libvpx < Formula
   url "https://github.com/webmproject/libvpx/archive/refs/tags/v1.17.0.tar.gz"
   sha256 "1020f184046187baa2985dbde38e0691f49c44088bca7a1842b0236c6081dc0a"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://chromium.googlesource.com/webm/libvpx.git", branch: "main"
 
