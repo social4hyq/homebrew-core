@@ -20,7 +20,7 @@ class LittleCms2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "25476ba204dc80994617d065d24d4d6cddb2b762be4a1486992becf2a57e2807"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f43ce993cbf3709d1df5b59d941fe163685d29bd20d9af7e4ab3560a13987a2e"
   end
 
   depends_on "jpeg-turbo"
