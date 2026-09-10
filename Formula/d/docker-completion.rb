@@ -4,6 +4,7 @@ class DockerCompletion < Formula
   url "https://github.com/docker/cli/archive/refs/tags/v29.8.0.tar.gz"
   sha256 "c5fadbc00c02dbecb1b7c9936e188baf9c80421a9107e7e9ad36a0923a0fc764"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
   head "https://github.com/docker/cli.git", branch: "master"
 
