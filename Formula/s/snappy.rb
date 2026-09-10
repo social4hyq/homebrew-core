@@ -4,6 +4,7 @@ class Snappy < Formula
   url "https://github.com/google/snappy/archive/refs/tags/1.2.2.tar.gz"
   sha256 "90f74bc1fbf78a6c56b3c4a082a05103b3a56bb17bca1a27e052ea11723292dc"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://github.com/google/snappy.git", branch: "main"
 
@@ -17,11 +18,6 @@ class Snappy < Formula
   # Fix issue where Mojave clang fails due to entering a __GNUC__ block
   on_macos do
     depends_on "llvm" => :build if DevelopmentTools.clang_build_version <= 1100
-  end
-
-  fails_with :clang do
-    build 1100
-    cause "error: invalid output constraint '=@ccz' in asm"
   end
 
   # Fix issue where `snappy` setting -fno-rtti causes build issues on `folly`
