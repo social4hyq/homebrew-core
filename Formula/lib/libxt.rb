@@ -4,6 +4,7 @@ class Libxt < Formula
   url "https://www.x.org/archive/individual/lib/libXt-1.3.1.tar.xz"
   sha256 "e0a774b33324f4d4c05b199ea45050f87206586d81655f8bef4dba434d931288"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
