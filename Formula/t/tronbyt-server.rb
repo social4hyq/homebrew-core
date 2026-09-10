@@ -4,6 +4,7 @@ class TronbytServer < Formula
   url "https://github.com/tronbyt/server/archive/refs/tags/v2.3.7.tar.gz"
   sha256 "7518716f97ab0d44be35907b9d07c5f65fd73ac011ec7fe57ec180523cee0720"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/tronbyt/server.git", branch: "main"
 
   bottle do
