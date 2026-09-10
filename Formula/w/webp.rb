@@ -14,7 +14,7 @@ class Webp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e5dae4101f7ce1e13fec1a0e39aea861768065cdb445e4c253e592d8eb49290"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "95ee6e576f8b184102b5c8a218f5228f25945abad4d3ecebb8b6e08b914b95e4"
   end
 
   depends_on "cmake" => :build
