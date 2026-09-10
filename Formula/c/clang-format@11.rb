@@ -4,6 +4,7 @@ class ClangFormatAT11 < Formula
   url "https://github.com/llvm/llvm-project/releases/download/llvmorg-11.1.0/llvm-11.1.0.src.tar.xz"
   sha256 "ce8508e318a01a63d4e8b3090ab2ded3c598a50258cc49e2625b9120d4c03ea5"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "0752fdc865b3c1e3d92c0c1af7af1b47b9cf76565e2ea4cfc382b2743a6e0693"
