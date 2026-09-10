@@ -8,7 +8,7 @@ class AprUtil < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d70d2890d9dfaff643ffd6d000e9bc9f5b3e704fffada74ba95f606744a44bfb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9929d23f3826ad4ebfaf317c135b2865ef012563f1195c5cf92f1688174340a0"
   end
 
   keg_only :shadowed_by_macos, "Apple's CLT provides apr (but not apr-util)"
