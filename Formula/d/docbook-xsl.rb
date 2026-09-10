@@ -6,7 +6,7 @@ class DocbookXsl < Formula
   # Except as otherwise noted, for example, under some of the /contrib/
   # directories, the DocBook XSLT 1.0 Stylesheets use The MIT License.
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url :homepage
