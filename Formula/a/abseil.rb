@@ -4,6 +4,7 @@ class Abseil < Formula
   url "https://github.com/abseil/abseil-cpp/archive/refs/tags/20260817.0.tar.gz"
   sha256 "f7e05179df39c45434cad433f5783840bb3788ef322976f9138bc6b72b3a107d"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
   head "https://github.com/abseil/abseil-cpp.git", branch: "master"
 
