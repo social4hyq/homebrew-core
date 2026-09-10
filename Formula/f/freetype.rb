@@ -14,7 +14,7 @@ class Freetype < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0988c23f30a7840e4b6e5857f51baddd8faf263fdebd527c2dd7b41a403a23a2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f65c39892ab6cecc376afa9d214b398a098ba60c2a934844e6a6216ba6a8278"
   end
 
   depends_on "pkgconf" => :build
