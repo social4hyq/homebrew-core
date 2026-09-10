@@ -5,9 +5,10 @@ class Duckdb < Formula
       tag:      "v1.5.5",
       revision: "d8cdaa33fda8df955cc76ef58a280f68f4cd43fa"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f7ad5d4df2627469d94445c47a283bd3ad021da57632f173473b163d615d2dfd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8d261ad46d30303f1bb5648e0c80226789647e730a0d71d317448bf78b9654a"
   end
 
   depends_on "cmake" => [:build, :test]
