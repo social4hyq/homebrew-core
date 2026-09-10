@@ -14,7 +14,7 @@ class Opus < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "71c9e640cd554710d28e4471c7ba4ded5e95f61ba77fb1aa82ab42c9db3a096f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e29f1274cf85eb56a590f23d71374376b596255b529ce96a5990f90a3395836"
   end
 
   head do
