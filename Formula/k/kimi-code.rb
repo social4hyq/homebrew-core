@@ -4,6 +4,7 @@ class KimiCode < Formula
   url "https://registry.npmjs.org/@moonshot-ai/kimi-code/-/kimi-code-0.41.0.tgz"
   sha256 "4421e1277bbfa5e46a8e1a863fd9ba4d1a3db8dd890d928f571171ac62a80c1e"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "512ffd715f5ec724959aad241af56e1b94a0c45c42241dc7d16f8bce4608e1c2"
