@@ -4,6 +4,7 @@ class Liblinear < Formula
   url "https://www.csie.ntu.edu.tw/~cjlin/liblinear/oldfiles/liblinear-2.50.tar.gz"
   sha256 "e5eeafe2159c41148b59304da2ba0ed12648e3d491ce2b9625058e174e96ca29"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://github.com/cjlin1/liblinear.git", branch: "master"
 
@@ -13,7 +14,7 @@ class Liblinear < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cca353140c31072aa4cb64fc427d839ae94d4bf7ee331ff930f6a06f912a1a0c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bdd9ca4f6c41287bc9800d5c8e90079731b6f7470ad4844e17dc362a5cb07282"
   end
 
   # Fix sonames
