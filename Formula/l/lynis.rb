@@ -7,7 +7,7 @@ class Lynis < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6eec01d69a347875fb4d9b390207207b9eb9a8ee366a1ed7c73761c1cbf20961"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae30a9dd1ab071e6ddf846fd2e3ea28e24eba23351009b1570124ff68de219ed"
   end
 
   def install
