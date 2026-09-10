@@ -5,10 +5,11 @@ class Binutils < Formula
   mirror "https://ftp.gnu.org/gnu/binutils/binutils-2.47.tar.bz2"
   sha256 "3068128c75cda9f898ccb4211d360246e8e195ffcc9dfb655b23ae23a54800e8"
   license all_of: ["GPL-2.0-or-later", "GPL-3.0-or-later", "LGPL-2.0-or-later", "LGPL-3.0-only"]
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8919f27475e3a2c55cb22b11a91b0d5143e2a4aab3803a9850660c93ae17caa1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "da58437e3109fdedc63c58edbcce3f87a9ebc6bdaf562003e8a5658a10b1c6d1"
   end
 
   keg_only "it shadows the host toolchain"
