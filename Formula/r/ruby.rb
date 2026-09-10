@@ -2,7 +2,7 @@ class Ruby < Formula
   desc "Powerful, clean, object-oriented scripting language"
   homepage "https://www.ruby-lang.org/"
   license "Ruby"
-  revision 2
+  revision 3
   compatibility_version 1
 
   stable do
@@ -30,7 +30,7 @@ class Ruby < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d23416c4f68e03823375c63cf60d1e27babdea73db1574dd15fcaed668f3a2b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a418e23ec3a4f55775d754c5a8a3b2817770fe91d6643ff3687f9343a9ed31c"
   end
 
   head do
