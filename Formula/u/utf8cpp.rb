@@ -4,11 +4,12 @@ class Utf8cpp < Formula
   url "https://github.com/nemtrif/utfcpp/archive/refs/tags/v4.2.0.tar.gz"
   sha256 "54a8e96ea835a7359e8e53d03e30e9833d51350cc4615ff53f8449ef19ee46ab"
   license "BSL-1.0"
+  revision 1
   version_scheme 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e4538278f7cd21aac775e8b3bc7155e46385c3c79e8ff0d0086483df1affedfc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f5cce1f7e4099e4348b1ac64500ff1cc869707b2eff509bdd6d1be6d13c6f8a3"
   end
 
   depends_on "cmake" => [:build, :test]
