@@ -5,6 +5,7 @@ class NewrelicInfraAgent < Formula
       tag:      "1.80.3",
       revision: "cba5a9988b484da06e150e8369c014bb21f2fc56"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/newrelic/infrastructure-agent.git", branch: "master"
 
   # Upstream sometimes creates a tag with a stable version format but marks it
@@ -15,7 +16,7 @@ class NewrelicInfraAgent < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "759e0315a61d5b416059c81d2115409df94904a0e0febbca01f2b903450f7d6a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "31f7f44e739f97907b50770002ebdc1af55881ae09491eb43b716b49a3f34f0a"
   end
 
   depends_on "go" => :build
