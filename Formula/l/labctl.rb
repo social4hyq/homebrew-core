@@ -4,6 +4,7 @@ class Labctl < Formula
   url "https://github.com/iximiuz/labctl/archive/refs/tags/v0.1.112.tar.gz"
   sha256 "3579988a92e6d75ca94c4ac4a58b92a791d0dfba87e146f5a32cdd7bb0c2a170"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "f915c2591bc8d2c91c08cc12a0c3284ecb3f4c3b3295730d1c7747350b53d483"
