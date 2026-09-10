@@ -4,6 +4,7 @@ class AlsaLib < Formula
   url "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.16.1.tar.bz2"
   sha256 "f740db7f488255944ffd4428416ee3390a96742856916433df468c281436480e"
   license all_of: ["LGPL-2.1-or-later", "GPL-2.0-or-later"]
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class AlsaLib < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e24d88c4e2bdf40538f2c9d0813b7bf9ae16622ede11ef4580a197b7beefbd0a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4204eb1001e98bf8121fcab22bc6c57259f29b5c2ef832f60d925253ccd6b584"
   end
 
   depends_on :linux
