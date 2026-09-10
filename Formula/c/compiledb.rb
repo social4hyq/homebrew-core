@@ -6,6 +6,7 @@ class Compiledb < Formula
   url "https://files.pythonhosted.org/packages/0e/62/d0fc807871757841c32e6fbe433ebad422528a468336a0cf82fea226f41d/compiledb-0.10.7.tar.gz"
   sha256 "97752d8810b6977654a11a22cdc41bf6b71473bcdb5da312bc135f36d6af8271"
   license "GPL-3.0-or-later"
+  revision 1
   head "https://github.com/nickdiego/compiledb.git", branch: "main"
 
   bottle do
