@@ -10,7 +10,7 @@ class SvtAv1 < Formula
   head "https://gitlab.com/AOMediaCodec/SVT-AV1.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7cff0e582e3473673501dedb2c1f64dbb9d2773766c5e880d457e03dd94a69b5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "02ed9b8d3eec2a41a83903623a5add6e340a723884221aa2d358364666c9969d"
   end
 
   depends_on "cmake" => :build
