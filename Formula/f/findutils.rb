@@ -5,6 +5,7 @@ class Findutils < Formula
   mirror "https://ftp.gnu.org/gnu/findutils/findutils-4.11.0.tar.xz"
   sha256 "bfd19cb06cc71f3352d567e90284d8cdac02ac89774bbeadf0b533b0c11432fd"
   license "GPL-3.0-or-later"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "2dca7a7739679fecc0540dbb817df0c4edcb9369be6b4c139ee6c23ea829426c"
