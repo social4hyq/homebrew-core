@@ -9,7 +9,7 @@ class Docutils < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "afc9784dc07928ed7396a79b81684b594c8c3edfe39b1ef9c936e2ec2dccc195"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d08dc977d0428b67f5807db348ab250cda969a1e6886907dc9f140f28b23b48"
   end
 
   depends_on "python@3.14"
