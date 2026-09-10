@@ -31,13 +31,11 @@ class BunWebkit < Formula
   depends_on "lld@21" => :build
   depends_on "llvm@21" => :build
   depends_on "ninja" => :build
-  depends_on "ohos-sdk" => :build
   depends_on "perl" => :build
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
   depends_on "zlib" => :build
   # Outputs are static .a archives + headers — zero runtime linkage.
-  # ohos-sdk is build-time only: JSC cross-compilation uses its sysroot.
 
   # Signal-driven thread suspend/resume (GC stack scan, libpas scavenger TLC flush)
   # deadlocks when the OHOS cgroup freezer swallows a handshake signal mid-sequence:
@@ -56,8 +54,6 @@ class BunWebkit < Formula
     # put it on PATH so clang's driver finds *this* (codesign-patched) one.
     ENV.prepend_path "PATH", formula_opt_bin("lld@21")
 
-    sysroot = "#{formula_opt_prefix("ohos-sdk")}/native/sysroot"
-
     # No -DCMAKE_C_COMPILER=/-DCMAKE_CXX_COMPILER= here: superenv sets
     # ENV["CC"]/["CXX"] to the bare names "clang"/"clang++", which CMake
     # reads on a fresh configure — PATH resolves them through the superenv
@@ -68,11 +64,12 @@ class BunWebkit < Formula
     # (see Harmonybrew/brew#41; node.rb dropped the same manual opt_bin
     # pin + explicit -fno-emulated-tls for this exact reason, 2026-09-10).
     #
-    # This tap's llvm@21 also bakes DEFAULT_SYSROOT (this same ohos-sdk
-    # path) and LLVM_DEFAULT_TARGET_TRIPLE=aarch64-unknown-linux-ohos into
-    # the driver, so no --target=/--sysroot= either (see llvm@21.rb
-    # install()/test do). `sysroot` is kept only for CMAKE_FIND_ROOT_PATH
-    # below, a CMake-side concern unrelated to the compiler's defaults.
+    # No ohos-sdk/--sysroot= either: this tap's llvm@21 bakes DEFAULT_SYSROOT
+    # and LLVM_DEFAULT_TARGET_TRIPLE=aarch64-unknown-linux-ohos into the
+    # driver (see llvm@21.rb install()/test do), so the compiler already
+    # finds musl headers/libs on its own. CMAKE_FIND_ROOT_PATH below is
+    # narrowed to just icu4c's prefix (the one thing this build still needs
+    # CMake's own find_*() machinery to locate).
     icu_include = "-I#{formula_opt_include("icu4c@78")}"
 
     cxxflags = [
@@ -122,7 +119,7 @@ class BunWebkit < Formula
         -DCMAKE_SYSTEM_NAME=Linux
         -DCMAKE_SYSTEM_PROCESSOR=aarch64
         -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
-        -DCMAKE_FIND_ROOT_PATH=#{sysroot};#{formula_opt_prefix("icu4c@78")}
+        -DCMAKE_FIND_ROOT_PATH=#{formula_opt_prefix("icu4c@78")}
         -DCMAKE_PREFIX_PATH=#{formula_opt_prefix("icu4c@78")}
         -DICU_ROOT=#{formula_opt_prefix("icu4c@78")}
         -DICU_INCLUDE_DIR=#{formula_opt_include("icu4c@78")}
