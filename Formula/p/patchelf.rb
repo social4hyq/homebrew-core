@@ -12,7 +12,7 @@ class Patchelf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8d75ce4b0e5da93d45ebedc3e2d7c52c87a1d2312e0f8f3eba0e9b2b1077281"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "62e15560ab8e9b209659f270c2d5982b8ee92a5d70b1dcc47dcf1877cd9143eb"
   end
 
   head do
