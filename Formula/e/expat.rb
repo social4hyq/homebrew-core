@@ -4,6 +4,7 @@ class Expat < Formula
   url "https://github.com/libexpat/libexpat/releases/download/R_2_8_4/expat-2.8.4.tar.lz"
   sha256 "bd88c9cee01f45c2a813014acd759c5e211c1017d2650cb6c1220f90a3123d08"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -15,7 +16,7 @@ class Expat < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "97fc6e5d34be99f0be998713c2edc77490b0a9773c67388d07312c805d323209"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cfae26f47e0bf46fd35b982c861b7bbe2ed4a0cf9d4004c66c178b1a8860e89b"
   end
 
   head do
