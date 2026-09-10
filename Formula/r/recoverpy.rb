@@ -6,7 +6,7 @@ class Recoverpy < Formula
   url "https://files.pythonhosted.org/packages/00/d0/2b19cad9334b3f10d60d8f50fbcec9780b144605ebd337e542558a41341f/recoverpy-2.3.0.tar.gz"
   sha256 "86244abf9db5eee5c002d603a8f88e30b162ac377130738393c18ed0a3991cc5"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 2
   head "https://github.com/PabloLec/recoverpy.git", branch: "main"
 
   bottle do
