@@ -1,12 +1,12 @@
 class FreshEditor < Formula
   desc "Text editor for your terminal: easy, powerful and fast"
   homepage "https://sinelaw.github.io/fresh/"
-  url "https://github.com/sinelaw/fresh/archive/refs/tags/v0.5.0.tar.gz"
-  sha256 "428690fc0eeb08f6f8b8513797a02ff6f623bec33942b31f46ccfd1750f7c953"
+  url "https://github.com/sinelaw/fresh/archive/refs/tags/v0.5.1.tar.gz"
+  sha256 "3472273fcf77b019922b32ddffad061cc068bfb260344865c239c8eb056d92bf"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "111d808904f48fc15c49964236ee3527487b1a4f4f196e69487ed1f822613522"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b6e070aa3e0062ecdde24c918a02d144de7381842e9181c4ada213236fff9bd"
   end
 
   depends_on "ohos-sdk" => :build
