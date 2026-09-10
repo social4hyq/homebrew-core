@@ -15,7 +15,7 @@ class Libogg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "75f8144e3adc49d400d52622b8bd83292c0682010b7bae8c79bf02e5ca740ccb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "740a51770552905dcb3011bcef969d1663306c07865714400d4afaf463e1c9a0"
   end
 
   depends_on "cmake" => :build
