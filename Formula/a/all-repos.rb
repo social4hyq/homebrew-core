@@ -9,7 +9,7 @@ class AllRepos < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1162963156048a0c03e3a036d41bfb83abcbed7debe66106096ce451f5229a30"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "131706e7b34170a19657bda2676bc2c758da20964befebb0dc478d2028909a72"
   end
 
   depends_on "python@3.14"
