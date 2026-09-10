@@ -4,11 +4,12 @@ class Rust < Formula
   url "https://static.rust-lang.org/dist/rust-1.98.1-aarch64-unknown-linux-ohos.tar.xz"
   sha256 "80d115b5209fe56039f160d7aabe45f8f3dbf1e203f591b676136e05d33c1ba0"
   license any_of: ["Apache-2.0", "MIT"]
+  revision 1
   compatibility_version 1
   head "https://github.com/rust-lang/rust.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ce5959eab2c3f9d9ff4ef246fb69c3c54b6dfe7ded52f5d56ead5306464ac3b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "939298bc198a169ea9d25bc2f882b6933388839c02f9b8d7ba56705e0cce8c8c"
   end
 
   depends_on "patchelf" => :build
