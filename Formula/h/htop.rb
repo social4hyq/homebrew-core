@@ -4,6 +4,7 @@ class Htop < Formula
   url "https://github.com/htop-dev/htop/archive/refs/tags/3.5.3.tar.gz"
   sha256 "edf25ee020a5263ffbef9eef5a8c14392bf74e78b3d5c8bc64d9343dd9a82605"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/htop-dev/htop.git", branch: "main"
 
   livecheck do
@@ -12,7 +13,7 @@ class Htop < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d767a33037fb7472a9b9fa0425854a6e483d40d4c30414535d16895a5a3c1d1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e1ae2b3457972085848696b3e8cef7a8c5a755d2a3d1b7cd460534eedfe6a02"
   end
 
   depends_on "autoconf" => :build
