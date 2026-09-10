@@ -5,6 +5,7 @@ class Mecab < Formula
   url "https://deb.debian.org/debian/pool/main/m/mecab/mecab_0.996.orig.tar.gz"
   sha256 "e073325783135b72e666145c781bb48fada583d5224fb2490fb6c1403ba69c59"
   license any_of: ["GPL-2.0-only", "LGPL-2.1-only", "BSD-3-Clause"]
+  revision 1
 
   livecheck do
     url :homepage
@@ -12,7 +13,7 @@ class Mecab < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4355729ec8dae03503f755d1a79fedb8e27de3219d85b6a00a10f5643f9778e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c135834979b26b4f6174134145bff7e59937e82138a57f77e1d607208d564807"
   end
 
   conflicts_with "mecab-ko", because: "both install mecab binaries"
