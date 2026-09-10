@@ -5,7 +5,7 @@ class OhosSdk < Formula
   version "26.0.0.18" # Keep the version number consistent with the one in the zip package name.
   sha256 "191094c9efcc4c0a6874aadaec5a1bf8b16f09f60c8f34a828d4ab0007356248"
   license "Apache-2.0"
-  revision 1
+  revision 2
 
   bottle do
     rebuild 1
