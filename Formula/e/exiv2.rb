@@ -4,6 +4,7 @@ class Exiv2 < Formula
   url "https://github.com/Exiv2/exiv2/archive/refs/tags/v0.28.9.tar.gz"
   sha256 "700b76b97695b2fab4ef8c79619c68ae57d09e0c130724791cafbd39e0eb4aef"
   license "GPL-2.0-or-later"
+  revision 1
   compatibility_version 1
   head "https://github.com/Exiv2/exiv2.git", branch: "main"
 
