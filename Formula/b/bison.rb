@@ -6,6 +6,7 @@ class Bison < Formula
   mirror "https://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.xz"
   sha256 "9bba0214ccf7f1079c5d59210045227bcf619519840ebfa80cd3849cff5a5bf2"
   license "GPL-3.0-or-later"
+  revision 1
   version_scheme 1
   compatibility_version 1
 
