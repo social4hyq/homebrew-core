@@ -6,11 +6,11 @@ class Trailscraper < Formula
   url "https://files.pythonhosted.org/packages/43/82/74344dd629ac17dc4b3906eb07a53a731c3ccc80913abdbbe378c658498f/trailscraper-0.10.0.tar.gz"
   sha256 "805994a27ebd3ecd9353cd85b54139822e73980b1da93f63fa0e5d42c8b67ec1"
   license "Apache-2.0"
-  revision 2
+  revision 3
   head "https://github.com/flosell/trailscraper.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3cdc1b1063832ddd258824c477add0b135119f0e8a96d5264f5a2cd99ce54e46"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "caaba5dfb24813643d1faa4bbbc4bdd15275104519d0cd4a87974788a2e62720"
   end
 
   depends_on "python@3.14"
