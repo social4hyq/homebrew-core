@@ -8,7 +8,7 @@ class Aerleon < Formula
   license "Apache-2.0"
   head "https://github.com/aerleon/aerleon.git", branch: "main"
 
-  revision 1
+  revision 2
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "766c6753b5e31b9e32aa128970118e4b214f101815447a2c5f8a3a8e537bebef"
