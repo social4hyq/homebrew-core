@@ -6,6 +6,7 @@ class SshCopyId < Formula
   version "10.5p1"
   sha256 "d44d28a839ea9daf969cc69150fde59910b2b39361dad81a3bd6cbd19218db11"
   license "SSH-OpenSSH"
+  revision 1
   head "https://github.com/openssh/openssh-portable.git", branch: "master"
 
   livecheck do
@@ -13,7 +14,7 @@ class SshCopyId < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb56232338f58c5a757fc260f97b74acfc03e76576af7faeb78c72ad19d5a744"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f776a81a0d4f0671f7e762e5161876aaf47eeaab3734ca9f7a84556974aeb58"
   end
 
   keg_only :provided_by_macos
