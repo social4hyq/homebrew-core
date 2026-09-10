@@ -4,10 +4,11 @@ class Gofumpt < Formula
   url "https://github.com/mvdan/gofumpt/archive/refs/tags/v0.12.0.tar.gz"
   sha256 "b6d5d14692cad23996da4329bf24d30324af30125dd5261e6d9b0c5bc8b20b28"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/mvdan/gofumpt.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "624636a15c9b240d431fbb2e794aef07dc21e959f11bb2d71682aacb2f2261a7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f1683223c09d4cbb78fbaf2339f254de5d081a6a5385b8891fd34752cafcf52"
   end
 
   depends_on "go"
