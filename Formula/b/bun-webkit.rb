@@ -5,7 +5,7 @@ class BunWebkit < Formula
       revision: "2e2aa2290fac856d6f451ceacb58f7f5b44dd057"
   version "2e2aa2290f"
   license "BSD-3-Clause" # JavaScriptCore (JSCOnly port)
-  revision 1
+  revision 2
   # Fully rewritten from upstream: builds only JSC/WTF/bmalloc static archives, pinned to bun's WEBKIT_VERSION.
 
   # Pinned to bun's WEBKIT_VERSION; OHOS adaptation handled bun-side (webkit.ts.patch).
@@ -56,35 +56,45 @@ class BunWebkit < Formula
     # put it on PATH so clang's driver finds *this* (codesign-patched) one.
     ENV.prepend_path "PATH", formula_opt_bin("lld@21")
 
-    clang    = formula_opt_bin("llvm@21")/"clang"
-    clangxx  = formula_opt_bin("llvm@21")/"clang++"
-    sysroot  = "#{formula_opt_prefix("ohos-sdk")}/native/sysroot"
+    sysroot = "#{formula_opt_prefix("ohos-sdk")}/native/sysroot"
 
-    # OHOS cross-compilation flags (align with cfg.ohos branch in bun-src/scripts/build/deps/webkit.ts).
-    target_flag = "--target=aarch64-linux-ohos"
-    sysroot_flag = "--sysroot=#{sysroot}"
+    # No -DCMAKE_C_COMPILER=/-DCMAKE_CXX_COMPILER= here: superenv sets
+    # ENV["CC"]/["CXX"] to the bare names "clang"/"clang++", which CMake
+    # reads on a fresh configure — PATH resolves them through the superenv
+    # shim to this formula's llvm@21 (the only "clang" among its deps),
+    # same as every other cmake/configure-based formula in this tap. Going
+    # through the shim (rather than the absolute opt_bin path this used to
+    # pin) also picks up its global -fno-emulated-tls injection for free
+    # (see Harmonybrew/brew#41; node.rb dropped the same manual opt_bin
+    # pin + explicit -fno-emulated-tls for this exact reason, 2026-09-10).
+    #
+    # This tap's llvm@21 also bakes DEFAULT_SYSROOT (this same ohos-sdk
+    # path) and LLVM_DEFAULT_TARGET_TRIPLE=aarch64-unknown-linux-ohos into
+    # the driver, so no --target=/--sysroot= either (see llvm@21.rb
+    # install()/test do). `sysroot` is kept only for CMAKE_FIND_ROOT_PATH
+    # below, a CMake-side concern unrelated to the compiler's defaults.
     icu_include = "-I#{formula_opt_include("icu4c@78")}"
 
     cxxflags = [
-      target_flag, sysroot_flag, "-D__MUSL__",
+      "-D__MUSL__",
       "-mbranch-protection=none", "-mno-outline-atomics",
       # The flat host include dir, not include/aarch64-linux-ohos/c++/v1:
       # llvm@21 only ships the __has_include_next-chaining C-library
       # wrapper headers (ctype.h, string.h, ...) in the host copy — the
       # target-triple copy has them stripped (they'd otherwise shadow the
-      # real musl headers when the driver auto-inserts both directories
-      # for host/--target= compiles that don't pass -nostdinc++). With
-      # -nostdinc++ and a single -I, there's no fallback directory for
-      # this build's own libc++ wrappers (<cstring>, <cerrno>, ...) to
-      # chain to, so they need to be pointed at the complete host copy —
-      # host and target headers are otherwise byte-identical (same libc,
-      # same ABI, only the triple string differs).
+      # real musl headers when the driver auto-inserts both directories,
+      # which it does for any OHOS-triple compile, default or --target=,
+      # that doesn't pass -nostdinc++). With -nostdinc++ and a single -I,
+      # there's no fallback directory for this build's own libc++ wrappers
+      # (<cstring>, <cerrno>, ...) to chain to, so they need to be pointed
+      # at the complete host copy — host and target headers are otherwise
+      # byte-identical (same libc, same ABI, only the triple string differs).
       "-nostdinc++ -I#{formula_opt_include("llvm@21")}/c++/v1",
       icu_include, "-fno-c++-static-destructors", "-std=gnu++23"
     ].join(" ")
 
     cflags = [
-      target_flag, sysroot_flag, "-D__MUSL__",
+      "-D__MUSL__",
       "-mbranch-protection=none", "-mno-outline-atomics", icu_include
     ].join(" ")
 
@@ -93,8 +103,6 @@ class BunWebkit < Formula
         -G Ninja
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=#{prefix}
-        -DCMAKE_C_COMPILER=#{clang}
-        -DCMAKE_CXX_COMPILER=#{clangxx}
         -DPORT=JSCOnly
         -DENABLE_STATIC_JSC=ON
         -DUSE_THIN_ARCHIVES=OFF
