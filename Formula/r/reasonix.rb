@@ -4,6 +4,7 @@ class Reasonix < Formula
   url "https://github.com/esengine/DeepSeek-Reasonix/archive/refs/tags/v1.38.3.tar.gz"
   sha256 "66142cdb64e195598710a2f0bfab55aa3b6b4b69d5acf4fda71340eb7cb74dc3"
   license "MIT"
+  revision 1
 
   # CLI releases are tagged `v*` while desktop releases are tagged `desktop-v*`
   # and are often published first, so only match the `v*` tags.
