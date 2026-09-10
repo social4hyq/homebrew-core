@@ -4,10 +4,11 @@ class Resterm < Formula
   url "https://github.com/unkn0wn-root/resterm/archive/refs/tags/v1.7.2.tar.gz"
   sha256 "3c72153ae58d15d137330fc23ca2878a796f3e7ff9eb8c4505603906540594b4"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/unkn0wn-root/resterm.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "65fc89a794f23dbc3f3827a2fe58436e545f718e34e5b8399ea9a4e36fbe229a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "63f53ad70275c1c43747ecd0986397aaa30582de01f335b48f9aa01feb776697"
   end
 
   depends_on "go" => :build
