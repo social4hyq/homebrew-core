@@ -19,7 +19,7 @@ class Sqlite < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9481fcb5d4bd328c8d682fc438bd76e25a06675eecbc3993995da05dedaa91b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8f1cc9479ebb9227ea1b86f8054b83fc4e29aeda6508712d5067ed096eba1e0"
   end
 
   keg_only :provided_by_macos
