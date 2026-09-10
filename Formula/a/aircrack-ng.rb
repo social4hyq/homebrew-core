@@ -16,7 +16,7 @@ class AircrackNg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1c144b583270876a7c57099649f542a0162990118c2f08abca6264621182e27"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f5e4056b00279a38807b76da1f8ebdaff1f072b0c5bb5b2a48756919964f2898"
   end
 
   depends_on "autoconf" => :build
