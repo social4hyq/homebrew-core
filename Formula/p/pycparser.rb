@@ -4,10 +4,11 @@ class Pycparser < Formula
   url "https://files.pythonhosted.org/packages/1b/7d/92392ff7815c21062bea51aa7b87d45576f649f16458d78b7cf94b9ab2e6/pycparser-3.0.tar.gz"
   sha256 "600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2cb147a74731ab0d99737203b7203a1b23199dbd9d7d79e07a073d5aa132634a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d263753c7a9f633ab3618c056315fc2f1b1cb1a1f32310a008a7e9f973e833bd"
   end
 
   depends_on "python@3.13" => [:build, :test]
