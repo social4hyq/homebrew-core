@@ -5,6 +5,7 @@ class Proj < Formula
   mirror "https://download.osgeo.org/proj/proj-9.8.1.tar.gz"
   sha256 "af5b731c145c1d13c4e3b4eeb7d167e94e845e440f71e3496b4ed8dae0291960"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/OSGeo/proj.git", branch: "master"
 
@@ -14,7 +15,7 @@ class Proj < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ef60d394befe99a136a64c52253952dbf27d0a6ae884d0487f2a3cb547996fe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d0841aa60588e14d49656a3d33cc44018645faeb40c4a49251c9b3cc9b7199d"
   end
 
   depends_on "cmake" => :build
