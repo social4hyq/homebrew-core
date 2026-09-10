@@ -4,6 +4,7 @@ class Terminalimageviewer < Formula
   url "https://github.com/stefanhaustein/TerminalImageViewer/archive/refs/tags/v1.2.1.tar.gz"
   sha256 "08d0c30e3ffa47b69d1bce07bea56f04b7deb4a8a79307ce435a4f0852fbcd5f"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/stefanhaustein/TerminalImageViewer.git", branch: "master"
 
   bottle do
