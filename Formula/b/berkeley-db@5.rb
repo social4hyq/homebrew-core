@@ -11,7 +11,7 @@ class BerkeleyDbAT5 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "35970c5b29242eb6b6dee25ca0b746b43c848b78e7af4881c478653078807c06"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f62e82d92717d2c29582869dc97d77bd35552216faa465fc56233c0b482e8460"
   end
 
   keg_only :versioned_formula
