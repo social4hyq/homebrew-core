@@ -4,6 +4,7 @@ class Fd < Formula
   url "https://github.com/sharkdp/fd/archive/refs/tags/v10.5.0.tar.gz"
   sha256 "e6d9e90730bf316101691e49d59cc02565278dc3779d33a77423801569484851"
   license any_of: ["Apache-2.0", "MIT"]
+  revision 1
   head "https://github.com/sharkdp/fd.git", branch: "master"
 
   bottle do
