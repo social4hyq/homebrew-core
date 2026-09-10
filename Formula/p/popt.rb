@@ -5,6 +5,7 @@ class Popt < Formula
   mirror "http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.19.tar.gz"
   sha256 "c25a4838fc8e4c1c8aacb8bd620edb3084a3d63bf8987fdad3ca2758c63240f9"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   # The stable archive is found at https://ftp.osuosl.org/pub/rpm/popt/releases/popt-1.x/
@@ -17,7 +18,7 @@ class Popt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb7b9a53fc16c53dbe5b6c388b2525abb538ea912a751027b22c95a80cab4699"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4af6da145ad1bb6f97c1b673f4261589af3c73d8b271ee82df8077763b6204e"
   end
 
   def install
