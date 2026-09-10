@@ -7,6 +7,7 @@ class Bind < Formula
   # "version_scheme" because someone upgraded to 9.15.0, and required a
   # downgrade.
   license "MPL-2.0"
+  revision 1
   version_scheme 1
 
   stable do
