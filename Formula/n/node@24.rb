@@ -5,7 +5,7 @@ class NodeAT24 < Formula
   sha256 "2732fc3f588dd335cd6779c06864f7cd424bb1b5ff9a1743059a66c54f9ca4a1"
   license "MIT"
   compatibility_version 1
-  revision 1
+  revision 2
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -33,14 +33,6 @@ class NodeAT24 < Formula
   deprecate! date: "2027-04-30", because: :unsupported
 
   def install
-    # LLVM defaults to emulated TLS for aarch64-linux-ohos, which makes
-    # TLS-using programs ~30% slower. Harmonybrew's superenv injects
-    # -fno-emulated-tls globally (see https://atomgit.com/Harmonybrew/brew/pull/41),
-    # but CC/CXX here point at clang/clang++ by absolute path, bypassing the
-    # superenv `cc` shim, so the flag must be appended explicitly.
-    ENV["CC"] = "#{formula_opt_bin("llvm@22")}/clang -fno-emulated-tls"
-    ENV["CXX"] = "#{formula_opt_bin("llvm@22")}/clang++ -fno-emulated-tls"
-
     system "./configure", "--prefix=#{prefix}", "--dest-os=openharmony"
     system "make", "install"
 
