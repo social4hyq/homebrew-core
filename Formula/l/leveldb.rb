@@ -7,7 +7,7 @@ class Leveldb < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f229a1e56a0973d03df4ead89fc53f127cb74ab7ce2905ef0350f8152a9aa08e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd6710313c40b90c201f08e02701c50b6ab06f45b46c318742e0cb7b3aa63ed7"
   end
 
   depends_on "cmake" => :build
