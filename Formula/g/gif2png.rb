@@ -4,6 +4,7 @@ class Gif2png < Formula
   url "https://gitlab.com/esr/gif2png/-/archive/3.0.5/gif2png-3.0.5.tar.bz2"
   sha256 "8cc0733ad5d48329da903d1a56e01adbaa4994181f5a12ce962fd4f2c504da22"
   license "BSD-2-Clause"
+  revision 1
   head "https://gitlab.com/esr/gif2png.git", branch: "master"
 
   bottle do
