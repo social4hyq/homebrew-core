@@ -10,7 +10,7 @@ class SolcSelect < Formula
   head "https://github.com/crytic/solc-select.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b53f488b4017d19e9eb39a5a27f4fad53e5050bb6e9f89a66a7fcef818357a2d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7b788f28d48264d13136edec38f51ad32c6e09c6047f92e7f28e45a92fa15ef"
   end
 
   depends_on "certifi" => :no_linkage
