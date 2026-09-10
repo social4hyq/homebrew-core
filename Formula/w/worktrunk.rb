@@ -4,10 +4,11 @@ class Worktrunk < Formula
   url "https://github.com/max-sixty/worktrunk/archive/refs/tags/v0.77.0.tar.gz"
   sha256 "8160f0afe8287f3aad52e6ea1de7b0cfed01ad6d3d60ecdb952db6836775eda2"
   license any_of: ["Apache-2.0", "MIT"]
+  revision 1
   head "https://github.com/max-sixty/worktrunk.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "242f439bda7164bda15d6a7fc7590132f01b388296e3427ac415b95ef99cc3fe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad8ad984821b4512952ed01e72398bf771ab90c48ce3208fbf6823da7c48b047"
   end
 
   depends_on "rust" => :build
