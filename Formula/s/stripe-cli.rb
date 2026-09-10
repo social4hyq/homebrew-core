@@ -7,7 +7,7 @@ class StripeCli < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b0486fb2652e6b78a3151cea53b6fee5f6fb15eea6e1e340a425cab021b98a8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "76b72701295eca9c239f3242c5070f3d8d0ce9b6e8c3dafc405593765e0479d8"
   end
 
   depends_on "go" => :build
