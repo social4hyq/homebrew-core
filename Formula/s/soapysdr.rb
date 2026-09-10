@@ -2,7 +2,7 @@ class Soapysdr < Formula
   desc "Vendor and platform neutral SDR support library"
   homepage "https://github.com/pothosware/SoapySDR/wiki"
   license "BSL-1.0"
-  revision 1
+  revision 2
   head "https://github.com/pothosware/SoapySDR.git", branch: "master"
 
   stable do
