@@ -7,7 +7,7 @@ class Libgit2AT17 < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "05fcc118bdd48caf93d55c9f9ae06131aacf19dbd5f8c240b61579827e118100"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b04bdde2a25d8a67489aa4395d5987cc2cd9c5663d863a2ac24dd13a0af159da"
   end
 
   keg_only :versioned_formula
