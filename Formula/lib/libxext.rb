@@ -4,6 +4,7 @@ class Libxext < Formula
   url "https://www.x.org/archive/individual/lib/libXext-1.3.7.tar.gz"
   sha256 "6564608dc3b816b0cfddf0c7ddc62bc579055dd70b2f28113a618df2acb64189"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
