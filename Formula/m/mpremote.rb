@@ -6,6 +6,7 @@ class Mpremote < Formula
   url "https://files.pythonhosted.org/packages/ac/b7/8c44eb606b0e53517fd6ddda3f598b3bdb180c181f4e0bcbb9b7743f4cb5/mpremote-1.29.0.tar.gz"
   sha256 "ab0b6f21059698e573ca076fe9a0299e5fe7bbc3ca3f5b2f00007e22e51c7b80"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "10a8ebdf1e4898aa5d6a06c8198cdf91b9be1b5bd9dc3148c580207e7467042a"
