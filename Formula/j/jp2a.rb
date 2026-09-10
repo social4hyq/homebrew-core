@@ -4,6 +4,7 @@ class Jp2a < Formula
   url "https://github.com/Talinx/jp2a/releases/download/v1.3.3/jp2a-1.3.3.tar.bz2"
   sha256 "8aa995f570235321c94dcf705ca12d3e499f2a6b78213698de3c152534e38c0e"
   license "GPL-2.0-or-later"
+  revision 1
   version_scheme 1
 
   bottle do
