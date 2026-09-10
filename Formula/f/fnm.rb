@@ -5,7 +5,7 @@ class Fnm < Formula
   sha256 "224081a677a02acd9f972885e824a98fa3843f5b778b28400ad5af97752f6127"
   license "GPL-3.0-only"
   head "https://github.com/Schniz/fnm.git", branch: "master"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
