@@ -4,10 +4,11 @@ class Keploy < Formula
   url "https://github.com/keploy/keploy/archive/refs/tags/v3.6.52.tar.gz"
   sha256 "f71c8c1ce939fcb1b652b5281110a9fe31e4fa297bdf5ca74a0ec8e43c9269ac"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/keploy/keploy.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa28cd96341e385974c8b9335952a3ac01aea0fe883533e0f84746bb3b16ab06"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8ea0ea6b3e0c3d916d8f6ccaaa28dcf996be7e29c471d4b9d2951fa4a5d2883"
   end
 
   depends_on "go" => :build
