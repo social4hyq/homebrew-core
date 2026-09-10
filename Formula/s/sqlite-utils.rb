@@ -6,9 +6,10 @@ class SqliteUtils < Formula
   url "https://files.pythonhosted.org/packages/7e/6b/4a7b3d20c92e6c7acedc96ef620df8e1ea8f94a26a41ab788c1c08055815/sqlite_utils-4.2.1.tar.gz"
   sha256 "76114b6a5414714e6c70e5fa5c4781b301b590f6951b5da39c8cc60c21382ba1"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eee187bc5955be4d904d5d51db987eb6e103bae3fbc3b3c5da6c53b99f8cb979"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f42f6fe7ae9cc0f7fa3c83a140d8e4b1d3f1925ff7011fa58f1dde14648c963"
   end
 
   depends_on "python@3.14"
