@@ -6,6 +6,7 @@ class Fastapi < Formula
   url "https://files.pythonhosted.org/packages/8a/02/91e3416a8fdd715abb903a952a6bec7cdd8d14eed55d415fc8595524c319/fastapi-0.141.1.tar.gz"
   sha256 "e8822fc40db1e1858054d7a949a888695bc9bdce70139178e33bd2871a453ca1"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "a533b2c87cb5b831711077b8e10da7a2dc09eb529d8dc73b3cacf310c5e58ff4"
