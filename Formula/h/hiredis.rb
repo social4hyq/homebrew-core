@@ -4,6 +4,7 @@ class Hiredis < Formula
   url "https://github.com/redis/hiredis/archive/refs/tags/v1.4.1.tar.gz"
   sha256 "ca3180359a8b1275838a45415851f8cd5c411e27bdbf18f4823012e45507d2e4"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://github.com/redis/hiredis.git", branch: "master"
 
