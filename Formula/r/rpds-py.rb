@@ -6,10 +6,11 @@ class RpdsPy < Formula
   url "https://files.pythonhosted.org/packages/aa/2a/9618a122aeb2a169a28b03889a2995fe297588964333d4a7d67bdf46e147/rpds_py-2026.6.3.tar.gz"
   sha256 "1cebd1337c242e4ec2293e541f712b2da849b29f48f0c293684b71c0632625d4"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "57b3bad4462c337fb0abd1e8c73bba76af8a2e95d71f144a25a9e24752b76cde"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a305152feb029843eff53dfb58aa8cf68e6b56088a32f771db9082ad09bf02da"
   end
 
   depends_on "maturin" => :build
