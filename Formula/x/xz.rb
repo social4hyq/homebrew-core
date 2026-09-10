@@ -9,6 +9,7 @@ class Xz < Formula
     "0BSD",
     "GPL-2.0-or-later",
   ]
+  revision 1
   version_scheme 1
   compatibility_version 1
 
