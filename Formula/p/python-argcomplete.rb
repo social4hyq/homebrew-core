@@ -9,7 +9,7 @@ class PythonArgcomplete < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "531df920e4a175be5bce30c1dd59f9c0661d07b56e74b5deab00983e5283d1ba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ff0a0f823780e3d858bf29213848fc052df5cb1c9fda2f293fb2ed5ed9b4c36"
   end
 
   deprecate! date: "2026-02-13", because: "does not meet homebrew/core's requirements for Python library formulae"
