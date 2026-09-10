@@ -9,7 +9,7 @@ class Libssh < Formula
   head "https://git.libssh.org/projects/libssh.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a85eedb6f503b26e927c0a32babd9dc43964037f3000293f3ef8fdee70294bbc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "37f8b8fff0a11965ec46bf2924782622d78c4d2b1f036dd737af244ada92b033"
   end
 
   depends_on "cmake" => :build
