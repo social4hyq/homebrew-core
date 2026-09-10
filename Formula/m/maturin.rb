@@ -4,6 +4,7 @@ class Maturin < Formula
   url "https://github.com/PyO3/maturin/archive/refs/tags/v1.15.0.tar.gz"
   sha256 "623111bddb2d7f6f4ba2e64038f91f8b673bd6f95dd6fcbaf334b7af7789b48d"
   license any_of: ["Apache-2.0", "MIT"]
+  revision 1
   head "https://github.com/PyO3/maturin.git", branch: "main"
 
   bottle do
