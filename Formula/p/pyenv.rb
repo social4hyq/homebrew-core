@@ -4,6 +4,7 @@ class Pyenv < Formula
   url "https://github.com/pyenv/pyenv/archive/refs/tags/v2.8.5.tar.gz"
   sha256 "1824f1d86ce1d722f092a2d5f9a1c916cfb76b58b8fdbb2a43be2f6d32de9a28"
   license "MIT"
+  revision 1
   version_scheme 1
   compatibility_version 1
   head "https://github.com/pyenv/pyenv.git", branch: "master"
