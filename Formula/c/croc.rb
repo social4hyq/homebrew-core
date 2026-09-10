@@ -4,6 +4,7 @@ class Croc < Formula
   url "https://github.com/schollz/croc/archive/refs/tags/v11.5.2.tar.gz"
   sha256 "2ceddb504be8b5912f4a3bfd76dc28bb18afda54191f2bebcf5b0fb24e63f774"
   license "MIT"
+  revision 1
   head "https://github.com/schollz/croc.git", branch: "main"
 
   bottle do
