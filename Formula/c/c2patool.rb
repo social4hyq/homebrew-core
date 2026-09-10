@@ -4,6 +4,7 @@ class C2patool < Formula
   url "https://github.com/contentauth/c2pa-rs/archive/refs/tags/c2patool-v0.27.21.tar.gz"
   sha256 "1f75efb9d9dc63b5d7b03e9c9e3d5ff89c3118701d92b8ea70e076389b8a59b3"
   license any_of: ["Apache-2.0", "MIT"]
+  revision 1
   head "https://github.com/contentauth/c2pa-rs.git", branch: "main"
 
   livecheck do
