@@ -4,6 +4,7 @@ class Fish < Formula
   url "https://github.com/fish-shell/fish-shell/releases/download/4.9.3/fish-4.9.3.tar.xz"
   sha256 "20998a25f73217ddcc19f499055fd587e9912d1ad6e7109120fbcf2871f0b98c"
   license "GPL-2.0-only"
+  revision 1
   compatibility_version 1
   head "https://github.com/fish-shell/fish-shell.git", branch: "master"
 
