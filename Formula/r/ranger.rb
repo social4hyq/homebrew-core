@@ -6,6 +6,7 @@ class Ranger < Formula
   url "https://files.pythonhosted.org/packages/b6/57/c53a45928a3d6ac6a4b3d7a5d54af58a74592d4d405973d249268fc85157/ranger_fm-1.9.4.tar.gz"
   sha256 "bee308b636137b9135111fc795a57cdbb95257f2670101042ac3d7747dec32c8"
   license "GPL-3.0-or-later"
+  revision 1
   head "https://github.com/ranger/ranger.git", branch: "master"
 
   bottle do
