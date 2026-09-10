@@ -9,7 +9,7 @@ class Automake < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "adc1d19b4b6009220fd2d52bdafd2c91eb962e9aa1b84506cb6ed110dc77195d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8022b3c4e25dcbe5448ffb094edd1e5d722b61eb2d041e72fc02da52962cedc4"
   end
 
   depends_on "autoconf"
