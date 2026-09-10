@@ -6,9 +6,10 @@ class LanggraphCli < Formula
   url "https://files.pythonhosted.org/packages/51/47/b436abcd95cdc0685e662b7b6670566fed6f96a6ebeb130ad20b9781cd45/langgraph_cli-0.4.31.tar.gz"
   sha256 "b35951d901bc8bcb998be6715ee3512a545182ddbb8f72702d0558fe39cea505"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdcbc44368c8288972db2ae2ebf06af885581efddc2158272c26c342ded7442f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "668fb1b1feb451cf69e00ef38c7514b183272ce5b328272d67fd5f0c02d07d6b"
   end
 
   depends_on "rust" => :build # for orjson
