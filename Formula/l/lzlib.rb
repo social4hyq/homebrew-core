@@ -5,6 +5,7 @@ class Lzlib < Formula
   mirror "https://download-mirror.savannah.gnu.org/releases/lzip/lzlib/lzlib-1.16.tar.gz"
   sha256 "203228de911780309dad6813e51541d7ea89469784f01cb661edba080ff1b038"
   license "BSD-2-Clause"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -13,7 +14,7 @@ class Lzlib < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "86f366a1e6b8635b24640ce71d3e95f819598a76e69f9501751b81cd5884f052"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c26454065cb00eda48bca0671fff57be2c7936429f71f7553fcb0711284b3763"
   end
 
   on_macos do
