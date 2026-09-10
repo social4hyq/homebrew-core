@@ -7,7 +7,7 @@ class Netcat < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d0833b6f948087d76713f2759fd22428a410b5c93fa125adc489c71dbb358500"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc4d2ac361f79b8f0c87e1c71661a7aa361e3adc6a656ba8e115b476c883fcd9"
   end
 
   depends_on "autoconf" => :build
