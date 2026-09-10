@@ -6,6 +6,7 @@ class Bagit < Formula
   url "https://files.pythonhosted.org/packages/a1/a0/8866b4c6f894af0eb10e4964157f3241dd4117700fc010e7825471d51a13/bagit-1.9.0.tar.gz"
   sha256 "9455006c2d1df88be95ec1fccabc5ea623389589ea4c85b3d85bd256f29d7656"
   license "CC0-1.0"
+  revision 1
   version_scheme 1
   head "https://github.com/LibraryOfCongress/bagit-python.git", branch: "master"
 
