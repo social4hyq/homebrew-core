@@ -1,8 +1,8 @@
 class Kraftkit < Formula
   desc "Build and use highly customized and ultra-lightweight unikernel VMs"
   homepage "https://unikraft.org/docs/cli"
-  url "https://github.com/unikraft/kraftkit/archive/refs/tags/v0.12.15.tar.gz"
-  sha256 "285028e9216723ba8b4ec1bf8ce2b4d121ba76f186519b6ebc2fa4b99e53c828"
+  url "https://github.com/unikraft/kraftkit/archive/refs/tags/v0.12.16.tar.gz"
+  sha256 "a7d26ba2a73583e0aaa5e027a09bf583b080cb2e60ccaba10e7a445eafd4fa22"
   license "BSD-3-Clause"
   head "https://github.com/unikraft/kraftkit.git", branch: "staging"
 
@@ -12,7 +12,7 @@ class Kraftkit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "68b28427b8587571da1f3d0978533418ab584c85a51aadcf952d9618434ff46e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "42562ff9e3c02d87d98ff90cac55afe419825fa2b7046eb05d647319c1b0514e"
   end
 
   depends_on "go" => :build
