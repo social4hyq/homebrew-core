@@ -4,10 +4,11 @@ class AwsChecksums < Formula
   url "https://github.com/awslabs/aws-checksums/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "6c058812f5b537ce58eac1e529f441ff387a652ea62cbe9b844f9188339221b1"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "956a9945975438a6ec6e39e052dd2de15c6d4a20c5fe22923e47214e4ee96e33"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "38ac2ac3e2a204cfec6b718b1a58f64d2b8a4cda8221bc29812256a5721f22dd"
   end
 
   depends_on "cmake" => :build
