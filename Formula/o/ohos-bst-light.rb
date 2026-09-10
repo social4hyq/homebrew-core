@@ -7,7 +7,7 @@ class OhosBstLight < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8fbf9c1f2c9a2617d2131cf37265ec3f7d04dfabb4a7fd793450452e1ce5f5fd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bed3601bdedc3187fff5a00fb1f671964c9f6378f88d65618227193e1d56cc7"
   end
 
   def install
