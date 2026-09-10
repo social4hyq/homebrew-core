@@ -5,7 +5,7 @@ class Nvm < Formula
   sha256 "d2fb84dba9914b02cd69b97df35dfca8695b8f22df6128667034d85b69b52d57"
   license "MIT"
   head "https://github.com/nvm-sh/nvm.git", branch: "master"
-  revision 2
+  revision 3
 
   # Hardcode the platform identifier to ensure this nvm can run
   # on any minimalist system environment (e.g., DockerHarmony).
@@ -14,7 +14,7 @@ class Nvm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b22bc1ecfda1ca10deadbfd75fb56610b3ae2ae287f096022e0aede91a3b481"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "043a8cecca0e5a45d1feb00afc5a8d4460a327dcba2ce9bb415a91a23e798c3d"
   end
 
   def install
