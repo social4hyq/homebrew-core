@@ -12,7 +12,7 @@ class Cntlm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b146c092f7d0360f6b8b184e9e0e7890648bac625f9ed0b52054ec1688c000c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7059086e9e0072fbdc5e0bdeea1396a98740693b311d61255863a82ceaaed11c"
   end
 
   def install
