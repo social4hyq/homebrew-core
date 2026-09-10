@@ -4,6 +4,7 @@ class Libmpdclient < Formula
   url "https://www.musicpd.org/download/libmpdclient/2/libmpdclient-2.27.tar.xz"
   sha256 "88945b5abc11d8f4cea2bb7028e545024a6e060650bd65527a29bc9400daead8"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://github.com/MusicPlayerDaemon/libmpdclient.git", branch: "master"
 
