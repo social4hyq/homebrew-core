@@ -6,11 +6,11 @@ class Grc < Formula
   url "https://github.com/garabik/grc/archive/refs/tags/v1.13.tar.gz"
   sha256 "a7b10d4316b59ca50f6b749f1d080cea0b41cb3b7258099c3eb195659d1f144f"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 2
   head "https://github.com/garabik/grc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0bc3ddec350226c2e0ef1a1c12dcb251487a81a458e08b3a3ba81ec129cb81f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2af5ca5d6c2f41a7470e3956ec6fe35b9e9845910989efe4999caf89949e8400"
   end
 
   depends_on "python@3.14"
