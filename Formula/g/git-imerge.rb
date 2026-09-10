@@ -4,7 +4,7 @@ class GitImerge < Formula
   desc "Incremental merge for git"
   homepage "https://github.com/mhagger/git-imerge"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 2
   head "https://github.com/mhagger/git-imerge.git", branch: "master"
 
   stable do
