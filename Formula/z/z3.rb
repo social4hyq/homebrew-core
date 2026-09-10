@@ -17,8 +17,7 @@ class Z3 < Formula
   no_autobump! because: "newer version requires c++20 support"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "77d58cafd137ad0560d846c36218dff8f8accba5e88d4f83481782237af81d42"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb810db2cda594268fd11199813e74a29f8d09c5cb9e857dc7d20a3a8f5b30ac"
   end
 
   depends_on "cmake" => :build
