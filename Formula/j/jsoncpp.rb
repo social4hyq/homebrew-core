@@ -4,6 +4,7 @@ class Jsoncpp < Formula
   url "https://github.com/open-source-parsers/jsoncpp/archive/refs/tags/1.9.8.tar.gz"
   sha256 "51828cf3574281d2b79ec2a1c56a9e4c20cc1103711321ea96384cffb8d2d904"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/open-source-parsers/jsoncpp.git", branch: "master"
 
