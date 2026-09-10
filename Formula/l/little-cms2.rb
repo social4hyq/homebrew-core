@@ -6,6 +6,7 @@ class LittleCms2 < Formula
   url "https://downloads.sourceforge.net/project/lcms/lcms/2.19/lcms2-2.19.tar.gz"
   sha256 "49e7e134e4299733dd0eda434fa468997a28ab3d33fa397c642b03644f552216"
   license "MIT"
+  revision 1
   version_scheme 1
   compatibility_version 1
 
@@ -19,7 +20,7 @@ class LittleCms2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "25476ba204dc80994617d065d24d4d6cddb2b762be4a1486992becf2a57e2807"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f43ce993cbf3709d1df5b59d941fe163685d29bd20d9af7e4ab3560a13987a2e"
   end
 
   depends_on "jpeg-turbo"
