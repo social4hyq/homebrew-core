@@ -6,6 +6,7 @@ class Readline < Formula
   version "8.3.3"
   sha256 "fe5383204467828cd495ee8d1d3c037a7eba1389c22bc6a041f627976f9061cc"
   license "GPL-3.0-or-later"
+  revision 1
 
   # Add new patches using this format:
   #
