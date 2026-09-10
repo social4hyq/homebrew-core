@@ -17,6 +17,7 @@ class Luajit < Formula
   version "2.1.1774896198"
   sha256 "88a592afa9907d6b0c6e1e7ac9b39982622e3ca086f0646d4ea89b0e4e81f093"
   license "MIT"
+  revision 1
   compatibility_version 7
   head "https://github.com/LuaJIT/LuaJIT.git", branch: "v2.1"
 
