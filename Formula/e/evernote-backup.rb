@@ -9,7 +9,7 @@ class EvernoteBackup < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "14e512885d10705d555ab9373514b85cb17c96ff1b4052934c4a78546712e1ec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2bba302a77e9320afa37f43415b749278c4283c13f059bd9962074055f66cde9"
   end
 
   depends_on "rust" => :build
