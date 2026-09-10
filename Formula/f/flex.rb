@@ -2,7 +2,7 @@ class Flex < Formula
   desc "Fast Lexical Analyzer, generates Scanners (tokenizers)"
   homepage "https://github.com/westes/flex"
   license "BSD-2-Clause"
-  revision 2
+  revision 3
 
   stable do
     url "https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz"
@@ -16,8 +16,7 @@ class Flex < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f68708d80b86442cc457080cc59cc9b2c630ce8b242716c094c5b2b37e33ac6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "764604e200abceb433be38a8c29df3a7399364e1a61018cb6814680ea3086598"
   end
 
   head do
