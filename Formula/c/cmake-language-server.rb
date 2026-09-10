@@ -6,6 +6,7 @@ class CmakeLanguageServer < Formula
   url "https://files.pythonhosted.org/packages/cf/ad/54c337fd2093a7c7c13528ac1393aeda009cdc16be954041834328845237/cmake_language_server-0.1.11.tar.gz"
   sha256 "005f48367ec569457a7229a58f6762044fddacac647858b39d725ae2b3cd695b"
   license "MIT"
+  revision 1
   head "https://github.com/regen100/cmake-language-server.git", branch: "master"
 
   bottle do
