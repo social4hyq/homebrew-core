@@ -6,6 +6,7 @@ class SlitherAnalyzer < Formula
   url "https://files.pythonhosted.org/packages/05/c2/01a0c06017ac631db4d37cc36dce18be2eabd80576270d356688e5121908/slither_analyzer-0.11.6.tar.gz"
   sha256 "72aff6c1924a8641c1c8e4d84f9a4e6c97b5bfb3221bf71a11ffaee46d2f7da2"
   license "AGPL-3.0-only"
+  revision 1
   head "https://github.com/crytic/slither.git", branch: "master"
 
   bottle do
