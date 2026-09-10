@@ -6,6 +6,7 @@ class MariadbConnectorC < Formula
   mirror "https://fossies.org/linux/misc/mariadb-connector-c-3.4.9-src.tar.gz/"
   sha256 "a84bba97e59b6a322637a189964d4fd72bd8d92f2d22a9f8d6a5f0657c821e97"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
   head "https://github.com/mariadb-corporation/mariadb-connector-c.git", branch: "3.4"
 
@@ -25,7 +26,7 @@ class MariadbConnectorC < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "46ca4a3baf66fd75a5e40171e8389c42ba5fe9f2736acb15696ecf6158a76d80"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "686fd0e316d7cc85b3cf641958a3a4003087a534766fbc50725f7174282831df"
   end
 
   keg_only "it conflicts with mariadb"
