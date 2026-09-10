@@ -9,7 +9,7 @@ class Scons < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f5631e1dc5278156ddc80c315a4c1a3b541126b30731829e4a3bd99357bac4a5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "323856d799452b6df63a91b6ceefaccdbf1800bcdca30c5cf50b11608d7602eb"
   end
 
   depends_on "python@3.14"
