@@ -4,6 +4,7 @@ class Aicommit2 < Formula
   url "https://registry.npmjs.org/aicommit2/-/aicommit2-2.11.1.tgz"
   sha256 "c60685e3f1f4e0d3f496b42980e7aebff87a654313fd32a6d08f2f6f3c77889f"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "3196126bfdb939a43b07172b9211a665895bcd14a6151fafb68e6ab8b578cfc6"
