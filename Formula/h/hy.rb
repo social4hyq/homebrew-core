@@ -9,7 +9,7 @@ class Hy < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "229962c7108b444405808dd3584cbe7e12ba394d5bac121f3e4715c9d99af7f7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f41431fe274e22a881a896fff6a3b3af51b9b8437e6ba1972ec813a8077a830e"
   end
 
   depends_on "python@3.14"
