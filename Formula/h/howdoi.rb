@@ -6,7 +6,7 @@ class Howdoi < Formula
   url "https://files.pythonhosted.org/packages/6d/43/0e8166583575bd500c0f8f1a4ab9429af9466feb6fcdc006e88de8fd23e9/howdoi-2.0.20.tar.gz"
   sha256 "51cd40c53e0c0f8f8da88f480eb7423183be2350ab4f0a4d9d4763ca6ac3e2a9"
   license "MIT"
-  revision 22
+  revision 23
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "d3137da132c89c5733804dc22823e1884c6c49f71f84ad1042c0173365953bc8"
