@@ -4,6 +4,7 @@ class Softhsm < Formula
   url "https://github.com/softhsm/SoftHSMv2/archive/refs/tags/2.7.0.tar.gz"
   sha256 "be14a5820ec457eac5154462ffae51ba5d8a643f6760514d4b4b83a77be91573"
   license "BSD-2-Clause"
+  revision 1
   head "https://github.com/opendnssec/SoftHSMv2.git", branch: "main"
 
   bottle do
