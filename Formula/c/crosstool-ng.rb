@@ -4,6 +4,7 @@ class CrosstoolNg < Formula
   url "https://github.com/crosstool-ng/crosstool-ng/releases/download/crosstool-ng-1.29.0/crosstool-ng-1.29.0.tar.xz"
   sha256 "1e0c5efcf2af674993b74a1783fe78727c8d34b500ebab07eb1bb0a45c8fcc87"
   license "GPL-2.0-only"
+  revision 1
   head "https://github.com/crosstool-ng/crosstool-ng.git", branch: "master"
 
   livecheck do
@@ -12,7 +13,7 @@ class CrosstoolNg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "08b83f60c85f4bb5bc94f80fcf13404b8a9ba8f9510a3d9c1eceebd959db86ac"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f14c3b076ea7c5176954fedfd79d850a3a39af72ba5f13320fa59b2f873dd46c"
   end
 
   depends_on "help2man" => :build
