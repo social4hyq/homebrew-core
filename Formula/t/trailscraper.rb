@@ -10,7 +10,7 @@ class Trailscraper < Formula
   head "https://github.com/flosell/trailscraper.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3cdc1b1063832ddd258824c477add0b135119f0e8a96d5264f5a2cd99ce54e46"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "caaba5dfb24813643d1faa4bbbc4bdd15275104519d0cd4a87974788a2e62720"
   end
 
   depends_on "python@3.14"
