@@ -6,7 +6,7 @@ class Woof < Formula
   url "https://github.com/simon-budig/woof/archive/refs/tags/woof-20220202.tar.gz"
   sha256 "cf29214aca196a1778e2f5df1f5cc653da9bee8fc2b19f01439c750c41ae83c1"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 2
   head "https://github.com/simon-budig/woof.git", branch: "master"
 
   bottle do
