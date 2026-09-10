@@ -1,13 +1,13 @@
 class Falcoctl < Formula
   desc "CLI tool for working with Falco and its ecosystem components"
   homepage "https://github.com/falcosecurity/falcoctl"
-  url "https://github.com/falcosecurity/falcoctl/archive/refs/tags/v0.14.0.tar.gz"
-  sha256 "aba711ad4b8e3095bba0f647811dcbbabe998218a38dd14cf132799e84537187"
+  url "https://github.com/falcosecurity/falcoctl/archive/refs/tags/v0.14.1.tar.gz"
+  sha256 "49a0e64c05444be12ec75507c069292d26c9057ed5353ea5d10f1e9b7d7ce0df"
   license "Apache-2.0"
   head "https://github.com/falcosecurity/falcoctl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "116b9d4c9b5ba5706318d8c5f9e034aaff6581f19282b8e32f3929653d1a15ad"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8df611b52ac3abf08fb3a9f93e7a97cbb78282d98e66970c42ae381a9528c50e"
   end
 
   depends_on "go" => :build
