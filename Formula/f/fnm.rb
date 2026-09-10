@@ -13,7 +13,7 @@ class Fnm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7e75467f6fcbac0061a145539914710d99db166dcf60d6c88662b82fe99878d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab3fc16aef5b1f281a60f0b51996c2b2cecd7a0907410c281570e036b40adb10"
   end
 
   depends_on "rust" => :build
