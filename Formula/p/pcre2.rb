@@ -4,6 +4,7 @@ class Pcre2 < Formula
   url "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.48/pcre2-10.48.tar.bz2"
   sha256 "b6c68fdf6f3ac31388b50aa89ff0fc49c00c987c16e7b5146491d12003f2c8ed"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Pcre2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db0a3820ac718d90f9c39214dee9912232888b816d718303108fdb5bc57de313"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9fdfb3a712eb94b3827920852d9f5457d44765ce3c5763ea18b3d31e2fd4b3db"
   end
 
   head do
