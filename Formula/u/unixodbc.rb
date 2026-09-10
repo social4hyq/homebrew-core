@@ -8,6 +8,7 @@ class Unixodbc < Formula
     "LGPL-2.1-or-later", # libraries
     "GPL-2.0-or-later",  # programs
   ]
+  revision 1
   compatibility_version 1
 
   livecheck do
