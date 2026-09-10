@@ -4,6 +4,7 @@ class Yazi < Formula
   url "https://github.com/sxyazi/yazi/archive/refs/tags/v26.9.1.tar.gz"
   sha256 "66857f1b670469daf258edd0bb2ea51d9ad3e2cab4eea9684028c80059fd6862"
   license "MIT"
+  revision 1
   head "https://github.com/sxyazi/yazi.git", branch: "main"
 
   # There can be a notable gap between when a version is tagged and a
