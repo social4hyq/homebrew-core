@@ -5,11 +5,10 @@ class OhosSdk < Formula
   version "26.0.0.18" # Keep the version number consistent with the one in the zip package name.
   sha256 "191094c9efcc4c0a6874aadaec5a1bf8b16f09f60c8f34a828d4ab0007356248"
   license "Apache-2.0"
-  revision 1
+  revision 2
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b9542812c4ecee08ad310e3bd48ead6b0bc2cbdbabf6863d89472c566b51439"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ba30fbe170387d947066287102f0aec7d26c49b6eadee50d925ae9969d30905"
   end
 
   depends_on "unzip" => :build
