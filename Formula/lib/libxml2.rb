@@ -4,6 +4,7 @@ class Libxml2 < Formula
   url "https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.4.tar.xz"
   sha256 "98087fd181d9070724f3fbc65c7377db03038eb92bd882374daff44940138821"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   # We use a common regex because libxml2 doesn't use GNOME's "even-numbered
@@ -14,7 +15,7 @@ class Libxml2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2d38b3ad41ae76f999248d74c076eb9116ac37214c8f3a20741d54ce7d290df"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8aa7635a4d1af24e87ed0cab612978ef7a5bde5ee7ab50b087df3850d4e4bf04"
   end
 
   head do
