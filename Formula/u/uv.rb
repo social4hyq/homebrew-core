@@ -4,11 +4,12 @@ class Uv < Formula
   url "https://github.com/astral-sh/uv/archive/refs/tags/0.12.12.tar.gz"
   sha256 "c4ea101a887bbbf2e882a05c70b747f275a5172fb9c3fa0bc0141b8c7cdf13b1"
   license any_of: ["Apache-2.0", "MIT"]
+  revision 1
   compatibility_version 1
   head "https://github.com/astral-sh/uv.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "06035ffa6c7de1fbd5272e2ec87f14dde379ef311d684964e20d9d1f7b7b8d86"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aed7edd089139bb30f9384a0678aa6b130917702e493fe0506112a3f499c4a83"
   end
 
   depends_on "cmake" => :build
