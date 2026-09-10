@@ -4,6 +4,7 @@ class Goimports < Formula
   url "https://github.com/golang/tools/archive/refs/tags/v0.50.0.tar.gz"
   sha256 "22d397e6b0a3040aae4fbc6fccb7738b31575a86b754b8604892353f195368a2"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/golang/tools.git", branch: "master"
 
   livecheck do
