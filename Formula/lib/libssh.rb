@@ -4,12 +4,12 @@ class Libssh < Formula
   url "https://www.libssh.org/files/0.12/libssh-0.12.0.tar.xz"
   sha256 "1a6af424d8327e5eedef4e5fe7f5b924226dd617ac9f3de80f217d82a36a7121"
   license "LGPL-2.1-or-later"
-  revision 1
+  revision 2
   compatibility_version 1
   head "https://git.libssh.org/projects/libssh.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a85eedb6f503b26e927c0a32babd9dc43964037f3000293f3ef8fdee70294bbc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "37f8b8fff0a11965ec46bf2924782622d78c4d2b1f036dd737af244ada92b033"
   end
 
   depends_on "cmake" => :build
