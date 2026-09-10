@@ -4,6 +4,7 @@ class Hwloc < Formula
   url "https://download.open-mpi.org/release/hwloc/v2.14/hwloc-2.14.0.tar.bz2"
   sha256 "966b9bb3e9f29f8d65ce8d106779e457f40e246a645e584b100772a42f9ae94b"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
 
   livecheck do
