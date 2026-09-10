@@ -4,6 +4,7 @@ class LibgpgError < Formula
   url "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.61.tar.bz2"
   sha256 "7a85413f2bc354f4f8aa832b718af122e48965e9e0eb9012ee659c13c6385c93"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class LibgpgError < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a84f2c70a3903d10343ab94425039968d7b09cafef27a379977941d32b0f358"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9cc0bb39cf1a69acb56f3b7215566676c08e0c41cbecc61dca9092cc9490c355"
   end
 
   on_macos do
