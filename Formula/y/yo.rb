@@ -4,6 +4,7 @@ class Yo < Formula
   url "https://registry.npmjs.org/yo/-/yo-7.0.1.tgz"
   sha256 "466f653547a99ae4cf0de84beac13b8a882804f56718d81df3a2327343bbf7f4"
   license "BSD-2-Clause"
+  revision 1
   head "https://github.com/yeoman/yo.git", branch: "main"
 
   bottle do
