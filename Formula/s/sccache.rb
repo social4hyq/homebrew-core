@@ -4,6 +4,7 @@ class Sccache < Formula
   url "https://github.com/mozilla/sccache/archive/refs/tags/v0.17.0.tar.gz"
   sha256 "49949ad1cf175c49da126dbb0c2e6a56bd9d1f626e8cc0be17b9668b914145c6"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/mozilla/sccache.git", branch: "main"
 
   livecheck do
@@ -12,7 +13,7 @@ class Sccache < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "82c888fb11585b554a9bb99f8240dbb8c200aa20ca2c1cdb5ce3fbd567f49bc0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "41f2474e4d36b1de33f2bc8f8cea13814be19ce047f2a1a64538c5876f800111"
   end
 
   depends_on "pkgconf" => :build
