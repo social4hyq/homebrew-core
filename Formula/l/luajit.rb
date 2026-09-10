@@ -32,7 +32,7 @@ class Luajit < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd3497e4f565fd2ce6a120fc0504e857233c43feacb1ec149c7e64dd6daec8c3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "930c025270577b8da3b6937fd64c828e37ae29258790c05b1e169fd04774c77e"
   end
 
   def install
