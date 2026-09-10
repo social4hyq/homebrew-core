@@ -4,6 +4,7 @@ class Xbyak < Formula
   url "https://github.com/herumi/xbyak/archive/refs/tags/v7.41.1.tar.gz"
   sha256 "6b1271c45c2d76dfebb847782d2e191120b6f7aa3e93758b4fb80ebe7924b166"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/herumi/xbyak.git", branch: "master"
 
   livecheck do
@@ -12,7 +13,7 @@ class Xbyak < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "546fc09f3ad0f39428a429a8d2cd8ca16c8bbf5ef86bd9a72a1a0c4b103cc1e8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "251bb17329a1ef5625b79af4c56c89be91f802ad8e059262f28dd3ad7e338521"
   end
 
   depends_on "cmake" => :build
