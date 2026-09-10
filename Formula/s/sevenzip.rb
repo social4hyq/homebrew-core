@@ -17,7 +17,7 @@ class Sevenzip < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa4905c755214a1e8e0e7e491d733695ae6748e8efe7b3c0ab6dab8c2be87aa0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f701b94e2bb4d1dc71e11d8e6e1c929c04fe0242caf3c6882a476cb555e3495a"
   end
 
   def install
