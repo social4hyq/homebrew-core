@@ -34,6 +34,8 @@ class LlvmAT21 < Formula
     depends_on "zlib-ng-compat"
   end
 
+  conflicts_with "ohos-sdk", because: "both install `clang` binaries"
+
   # Fix triple config loading for clang-cl
   patch do
     url "https://github.com/llvm/llvm-project/compare/1381ad497b9a6d3da630cbef53cbfa9ddf117bb6...40a8c7c0ff3f688b690e4c74db734de67f0f89e9.diff"
