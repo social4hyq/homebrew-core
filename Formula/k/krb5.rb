@@ -24,6 +24,7 @@ class Krb5 < Formula
     "OpenVision",
     any_of: ["BSD-2-Clause", "GPL-2.0-or-later"],
   ]
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -32,7 +33,7 @@ class Krb5 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cbc87e1f6694c37743152f71065362b31ea12604168604e6392ac82a0d419514"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6da03d36b3c30bb539eae65b1b6587f9221848a5833a1afddd91df080d80003d"
   end
 
   keg_only :provided_by_macos
