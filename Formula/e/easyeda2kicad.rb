@@ -6,6 +6,7 @@ class Easyeda2kicad < Formula
   url "https://files.pythonhosted.org/packages/ab/8b/9a7abcdbb2a3a86d55e40f59f7c28b24e7e8fe9fcc08949509fff386a9a5/easyeda2kicad-1.0.1.tar.gz"
   sha256 "122a48fafa3b918e730185c973dd342183928b8a0dbe24436d13d58b90290e84"
   license "AGPL-3.0-or-later"
+  revision 1
   head "https://github.com/uPesy/easyeda2kicad.py.git", branch: "master"
 
   bottle do
