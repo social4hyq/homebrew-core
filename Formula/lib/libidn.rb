@@ -9,7 +9,7 @@ class Libidn < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "420d5d9dad94bcbc68b4395b645a357d27a94d306e5a9152b7de15646e8c0cd6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6294e69813532432800a611c7a9b7dee13de5154e6ea6b7dd203dbf06474889d"
   end
 
   depends_on "pkgconf" => :build
