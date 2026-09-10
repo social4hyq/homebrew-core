@@ -7,7 +7,7 @@ class Labctl < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f915c2591bc8d2c91c08cc12a0c3284ecb3f4c3b3295730d1c7747350b53d483"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03253117a391db31472bf9787e35f955bb5524f30862648268dfae1f677d774a"
   end
 
   depends_on "go" => :build
