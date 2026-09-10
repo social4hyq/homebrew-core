@@ -6,9 +6,10 @@ class Gersemi < Formula
   url "https://files.pythonhosted.org/packages/24/e8/089e6b68a3640ca8e16ec99280a4f1b3504865d04f00179b0a1b58d64b43/gersemi-0.28.1.tar.gz"
   sha256 "a05086e4b975fd784d562b8053ddd96340cdc64ca092cc63a77c3e6be5a2c43f"
   license "MPL-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e5a239fe89815f05aa5301ab4b57167dbd0c40f0d106822da687c32be1dbaeb1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "98294d88413ad19b01225bf2294f9694e0f9705c63d57b1e002523fec78590a3"
   end
 
   depends_on "rust" => :build
