@@ -6,10 +6,11 @@ class Pyinvoke < Formula
   url "https://files.pythonhosted.org/packages/33/f6/227c48c5fe47fa178ccf1fda8f047d16c97ba926567b661e9ce2045c600c/invoke-3.0.3.tar.gz"
   sha256 "437b6a622223824380bfb4e64f612711a6b648c795f565efc8625af66fb57f0c"
   license "BSD-2-Clause"
+  revision 1
   head "https://github.com/pyinvoke/invoke.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abdde493e3b92a89357a3312d299051c834948b73fc57afe843f264913118943"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9194045780a51687c3eab2b964b1df62962c749d7916ac0de79ea8cf2edc9376"
   end
 
   depends_on "python@3.14" # Do not remove runtime dependency https://github.com/Homebrew/homebrew-core/issues/151248
