@@ -4,6 +4,7 @@ class StyleDictionary < Formula
   url "https://registry.npmjs.org/style-dictionary/-/style-dictionary-5.5.3.tgz"
   sha256 "7abdce80029652a95b53247e2faf03c59e9bee357d07decce9d93c89b5dd784d"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "0863e3b8ad1d7475e4987f9d9287edd4e3a30abee21bd4347f7f7dd93e3deb5b"
