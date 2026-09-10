@@ -22,8 +22,7 @@ class Zstd < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e9442520703307c9b4d272ace959065bedbe6a57f9715053119e938fdbf5861"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "709be2867d9afa4091f8dd16ad952ddfa1d1913b9ce99bda80b38c1800cd747c"
   end
 
   depends_on "cmake" => :build
