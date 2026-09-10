@@ -12,6 +12,7 @@ class Libidn2 < Formula
     "LGPL-2.1-or-later", # parts of gnulib
     "FSFAP-no-warranty-disclaimer", # man3
   ]
+  revision 1
   compatibility_version 1
 
   livecheck do
