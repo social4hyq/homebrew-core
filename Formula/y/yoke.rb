@@ -6,6 +6,7 @@ class Yoke < Formula
       tag:      "v0.21.1",
       revision: "407d6454a6a9e0130f230cac2614746509561eb7"
   license "MIT"
+  revision 1
   head "https://github.com/yokecd/yoke.git", branch: "main"
 
   bottle do
