@@ -6,9 +6,10 @@ class EcsDeploy < Formula
   url "https://files.pythonhosted.org/packages/d4/8c/a098b7e3d793b004d917d9a5fc9539eaec60653a1f61761d55a91d1d4f8c/ecs_deploy-1.17.0.tar.gz"
   sha256 "7f8be36edb2321e84c286fc2d9fd9295ff7063d901edffcbac0ce3d891081a9d"
   license "BSD-3-Clause"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c68863eb491006a7bd5eddb92bcd819ac218f2fdf303bdf600089b64aa745e5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "beb07d92891b471a34a9464f61e690a3f3bd55029e71c13707b4f261c0fef42a"
   end
 
   depends_on "certifi"
