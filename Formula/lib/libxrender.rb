@@ -4,6 +4,7 @@ class Libxrender < Formula
   url "https://www.x.org/archive/individual/lib/libXrender-0.9.12.tar.gz"
   sha256 "0fff64125819c02d1102b6236f3d7d861a07b5216d8eea336c3811d31494ecf7"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
