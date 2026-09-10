@@ -13,7 +13,7 @@ class Libseccomp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d54a6f4526de2653e9d1ae818f0b5788d0d11c7bdffbc1a9df8897a1e3c8ef73"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdb07e77bae3ebaa5baf762392a7534b7655434f10501013933477710eadf0e8"
   end
 
   head do
