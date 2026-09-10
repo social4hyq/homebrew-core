@@ -9,7 +9,7 @@ class Nyx < Formula
   revision 4
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8eb0b7bcb1b664139aade59a2348fa7be599baf4cea312ace8fb6b3b91a6bf95"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a08a11b9e24751b74fdf87b9b6663f169e0c11bc6c0fb2d30f0460feb90dbdf6"
   end
 
   # See https://gitlab.torproject.org/legacy/gitolite/nyx
