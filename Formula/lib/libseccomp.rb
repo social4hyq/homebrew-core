@@ -4,6 +4,7 @@ class Libseccomp < Formula
   url "https://github.com/seccomp/libseccomp/releases/download/v2.6.1/libseccomp-2.6.1.tar.gz"
   sha256 "501f66c667225d53791b97e1d7cf85ab764c297d04881f60f38f451c4b0ee1be"
   license "LGPL-2.1-only"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Libseccomp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d54a6f4526de2653e9d1ae818f0b5788d0d11c7bdffbc1a9df8897a1e3c8ef73"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdb07e77bae3ebaa5baf762392a7534b7655434f10501013933477710eadf0e8"
   end
 
   head do
