@@ -8,7 +8,7 @@ class AwsCCompression < Formula
   compatibility_version 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b003f2cdd6f467a02aea9ab78388e49ce2e383e61386b9d4b6b577b4fee101a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b5ce94395161a72f5eb36210b8a21352573def57066482e0e00274ef7613a86"
   end
 
   depends_on "cmake" => :build
