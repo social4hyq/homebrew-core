@@ -4,6 +4,7 @@ class Vcpkg < Formula
   url "https://github.com/microsoft/vcpkg-tool/archive/refs/tags/2026-07-27.tar.gz"
   sha256 "cb2ac34ab85008876004b0817c0a82c96f773ce3aaedb9c35e8ebb523ef1754b"
   license "MIT"
+  revision 1
   head "https://github.com/microsoft/vcpkg-tool.git", branch: "main"
 
   # The source repository has pre-release tags with the same
@@ -20,7 +21,7 @@ class Vcpkg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b83d90a8a334c4cfa91142448733f7c16ca9ee595c4e4422ffc31564356d6b75"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6557019efb8edcc32db1aea7647c9b211e39c36e018ac7800ad9c9f2639c4e2e"
   end
 
   depends_on "cmake" => :build
