@@ -5,6 +5,7 @@ class Trufflehog < Formula
   sha256 "b1346ded49f6283005284c56b98b5c3603c0f5077c0d4fcd083beda9dfba3268"
   # upstream license ask, https://github.com/trufflesecurity/trufflehog/issues/1446
   license "AGPL-3.0-only"
+  revision 1
   head "https://github.com/trufflesecurity/trufflehog.git", branch: "main"
 
   bottle do
