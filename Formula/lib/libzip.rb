@@ -13,7 +13,7 @@ class Libzip < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "38cf28cc081da0baa9cdfc2b780e80845cbf8f917419e2e20a02e716a31f0ffd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7b49bc8b0a20f22948136efa7faff552627e012166e4353b69901248f60b932"
   end
 
   depends_on "cmake" => :build
