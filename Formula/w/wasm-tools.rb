@@ -4,6 +4,7 @@ class WasmTools < Formula
   url "https://github.com/bytecodealliance/wasm-tools/archive/refs/tags/v1.258.0.tar.gz"
   sha256 "14a867a7f5ae233f27c6ad93c2ce6153afa43bf93b0a60450b8ba789d65f8ce4"
   license "Apache-2.0" => { with: "LLVM-exception" }
+  revision 1
   head "https://github.com/bytecodealliance/wasm-tools.git", branch: "main"
 
   livecheck do
@@ -12,7 +13,7 @@ class WasmTools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd08a29961ded200a8fade1bc9fb5f990c70d8d6c40adf7637a1808bc0d86b34"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fbd307cae3d80ca337eb96fffdba2b5b1e0558d1e51e9fa30610ac96fe3888fd"
   end
 
   depends_on "rust" => :build
