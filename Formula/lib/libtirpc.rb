@@ -8,7 +8,7 @@ class Libtirpc < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7eca67beecb5ae58463f9d4d1bca9ab483e2599cfd3fc403464903f264f07c9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa06386c2ae21638d02c13359e4bc6ac23ce8431720d823974bf495500bb0303"
   end
 
   depends_on "krb5"
