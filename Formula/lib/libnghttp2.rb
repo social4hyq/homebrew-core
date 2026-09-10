@@ -8,6 +8,7 @@ class Libnghttp2 < Formula
   # see discussions in here, https://github.com/Homebrew/homebrew-core/pull/133078#discussion_r1221941917
   sha256 "c866b7477cbb7512ab6863a685027adbb1bb8da8fc3bab7429ed43d3281d5aa9"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -15,7 +16,7 @@ class Libnghttp2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0385c93927fd1036441552f7d8372df8e7d2801b5bca00564b9bb7192d7eb9d6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1d9a62ab5758c5d485b90ea002d1642d147f0b03332e7004457e28f15a404c6"
   end
 
   head do
