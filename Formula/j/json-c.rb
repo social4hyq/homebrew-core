@@ -16,7 +16,7 @@ class JsonC < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d73d757384133fdb97ffe3c750f79d0f9d61c5bc14ec0fe71af886bf65ba2766"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c5d1112f414f53c34ce0cf12c6fcda9791a2705aa543dfde2cfa96078a5f1dd"
   end
 
   depends_on "cmake" => :build
