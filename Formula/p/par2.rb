@@ -1,8 +1,8 @@
 class Par2 < Formula
   desc "Parchive: Parity Archive Volume Set for data recovery"
   homepage "https://github.com/Parchive/par2cmdline"
-  url "https://github.com/Parchive/par2cmdline/releases/download/v1.3.0/par2cmdline-1.3.0.tar.bz2"
-  sha256 "60fe185b7662004c658f9d17dc03e7422250ec7238329cf93189f2364cd0d560"
+  url "https://github.com/Parchive/par2cmdline/releases/download/v1.4.0/par2cmdline-1.4.0.tar.bz2"
+  sha256 "269aff9d49c6a0c0d1c394300d35c36229764588f56faad5850eaf36c7a298dc"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class Par2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c989de2f24c59cd4b446c12fbc734ec94cb2ed7380291eb5530ec6eb3cf1f34"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7b214fe0a00017798a305dbe06ad57b218185606ff68d25bf4ec2f912de1b49"
   end
 
   on_macos do
