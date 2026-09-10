@@ -6,10 +6,11 @@ class SshAudit < Formula
   url "https://files.pythonhosted.org/packages/b4/95/0dc036428ef8d76e2c812cbec9e69c2020230da32ea0e699908735894a2f/ssh_audit-3.9.0.tar.gz"
   sha256 "f1225d0364b3cb61c7dfb1f5065a6958dbb814d98b2c1dd2a779ba2cdef41f61"
   license "MIT"
+  revision 1
   head "https://github.com/jtesta/ssh-audit.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "951608b424902bcef20e99026595e6be139451863dce0f23779626699aa2db56"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8bb6028bd95a287d70c0497b527b1ec8568ca76a307ca92c11b9bb1e3ec86e1b"
   end
 
   depends_on "python@3.14"
