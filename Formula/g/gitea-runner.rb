@@ -6,7 +6,7 @@ class GiteaRunner < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "97a3d8d39e433eeda953f5df423c8acdd529e2dd1bd40e2adb650df9320cec94"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eae54b9795c12a235f06b1b161babccd95bce27f66c88365848c5cd8d24d2a3b"
   end
 
   depends_on "go" => :build
