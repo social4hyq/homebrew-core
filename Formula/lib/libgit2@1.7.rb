@@ -4,6 +4,7 @@ class Libgit2AT17 < Formula
   url "https://github.com/libgit2/libgit2/archive/refs/tags/v1.7.2.tar.gz"
   sha256 "de384e29d7efc9330c6cdb126ebf88342b5025d920dcb7c645defad85195ea7f"
   license "GPL-2.0-only" => { with: "GCC-exception-2.0" }
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "05fcc118bdd48caf93d55c9f9ae06131aacf19dbd5f8c240b61579827e118100"
