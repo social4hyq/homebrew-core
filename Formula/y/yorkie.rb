@@ -4,6 +4,7 @@ class Yorkie < Formula
   url "https://github.com/yorkie-team/yorkie/archive/refs/tags/v0.7.20.tar.gz"
   sha256 "66aab86f3c10c93fdad6a936efb2ce76db8dc20936c0cb7070da7b3b3a029f12"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/yorkie-team/yorkie.git", branch: "main"
 
   livecheck do
