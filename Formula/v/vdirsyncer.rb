@@ -10,7 +10,7 @@ class Vdirsyncer < Formula
   head "https://github.com/pimutils/vdirsyncer.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f145d955055bf276b40b01ce72ea1a67753d05ad5a880af1a734e26f75ff7a68"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "56436248c271cb116b1c1b155bf4947fedf3cf03c75d4d4f95ad8b81c891abf2"
   end
 
   depends_on "certifi"
