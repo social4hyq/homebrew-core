@@ -4,6 +4,7 @@ class Swig < Formula
   url "https://downloads.sourceforge.net/project/swig/swig/swig-4.5.1/swig-4.5.1.tar.gz"
   sha256 "7fec50b27deddab5455a9633780b6341eddfb96215a7619e93a76eb27178f653"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   livecheck do
