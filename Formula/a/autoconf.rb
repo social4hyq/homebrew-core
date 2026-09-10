@@ -12,7 +12,7 @@ class Autoconf < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6555a91e0e5dd38269bebde063d6e9610fd1a0a599be3a0e404a37aaec4bcf0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb20ef37603aac5a10d3f1b02c5d4875b55853f731bdae7406cee8b8455a1613"
   end
 
   depends_on "m4"
