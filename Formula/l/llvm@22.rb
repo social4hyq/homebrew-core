@@ -12,8 +12,8 @@ class LlvmAT22 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1bfde6041e1f1e49a49102e5d01649073dfd5350319fa1112aaf367e210b2eed"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ba25563c925eb6814e247231fb55d2c70cf9609356ea6329a6ec552421c3d6c"
   end
 
   keg_only :versioned_formula
