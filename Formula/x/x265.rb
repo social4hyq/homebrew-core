@@ -4,11 +4,12 @@ class X265 < Formula
   url "https://bitbucket.org/multicoreware/x265_git/downloads/x265_4.2.tar.gz"
   sha256 "40b1ea0453e0309f0eba934e0ddf533f8f6295966679e8894e8f1c1c8d5e1210"
   license "GPL-2.0-or-later"
+  revision 1
   compatibility_version 1
   head "https://bitbucket.org/multicoreware/x265_git.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c3836debbc93edab1f082c294a8be032118cebecde2373e331f1f5e1f974984"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c4dc3f08321be9d77267ef93a52cc96baa78d518274c75ebfb3efaef108d03c"
   end
 
   depends_on "cmake" => :build
