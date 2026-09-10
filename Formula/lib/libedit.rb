@@ -5,6 +5,7 @@ class Libedit < Formula
   version "20260512-3.1"
   sha256 "432d5e7ea8b0116dd39f2eca7bc11d0eed77faa6b77ea526ace89907c23ea4a0"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -13,7 +14,7 @@ class Libedit < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd9baff55438cc8272dacd073cf6733fda72480367d06ee3720f1e017662c503"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e09b52dbfa6cddc2a7de8b6fda0a7dfdb3960be3fb38d5bd653258e988b73832"
   end
 
   keg_only :provided_by_macos
