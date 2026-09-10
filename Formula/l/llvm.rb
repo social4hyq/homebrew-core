@@ -25,8 +25,8 @@ class Llvm < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2bb3b8935a6fc9270155b4b4cd0abced85aeabdf4df3cdec4476e8e6130ac4c4"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "615f45bb4c0a1d7fe41dc5fb0856d18c1d74ec4c16f5297d56aa1248335d8421"
   end
 
   # https://llvm.org/docs/GettingStarted.html#requirement
@@ -43,6 +43,8 @@ class Llvm < Formula
     depends_on "ohos-sdk@26.0.0.18" # sysroot + libcxx-ohos headers; see DEFAULT_SYSROOT below
     depends_on "zlib-ng-compat"
   end
+
+  conflicts_with "ohos-sdk", because: "both install `clang` binaries"
 
   # cmake 4.x's if() parser rejects the extra parens this file wraps its
   # conditions in (CMake bug unrelated to platform, not OHOS-specific).
