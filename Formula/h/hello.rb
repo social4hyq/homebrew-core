@@ -7,7 +7,7 @@ class Hello < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "895b21c57ce40a73ad02896b90ed7a4f6653fcdb5a804e8927e94a9823929af9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d87cac72d074ae8fcd7e99d751d7468a00654809438b819869b0ec08ad78535"
   end
 
   def install
