@@ -17,7 +17,7 @@ class Curl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "925bcbd4bf04627857c1a42740af515d832d208364bed832f69b5a64b00e74e7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8caaf0f0431cbe4d2692390058934ea5c3e060d5e4d914d4cb53fe10d30dc832"
   end
 
   head do
