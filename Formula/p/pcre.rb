@@ -18,7 +18,7 @@ class Pcre < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "464f7d2883c7f60df23c2624825a292a0f3874f36f4bdc0a9fe674fff7fa4750"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a65f6b3dde602779466080f468acd06b5ea5c9b7f10d1d33e0cf7f9b63e90b94"
   end
 
   uses_from_macos "bzip2"
