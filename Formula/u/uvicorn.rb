@@ -6,6 +6,7 @@ class Uvicorn < Formula
   url "https://files.pythonhosted.org/packages/f2/0f/3f86e61397dd33bf2ccf28188c40db6a740658aeebbbf6e7dbc101a1f487/uvicorn-0.52.4.tar.gz"
   sha256 "73acfee47a0b133c5de13d219492d62d8a31e935f4fe6e41a232451a15379f86"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/encode/uvicorn.git", branch: "main"
 
   bottle do
