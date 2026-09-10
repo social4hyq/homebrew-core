@@ -5,6 +5,7 @@ class Freetype < Formula
   mirror "https://download.savannah.gnu.org/releases/freetype/freetype-2.14.3.tar.xz"
   sha256 "36bc4f1cc413335368ee656c42afca65c5a3987e8768cc28cf11ba775e785a5f"
   license "FTL"
+  revision 1
   compatibility_version 1
 
   livecheck do
