@@ -1,8 +1,8 @@
 class GolangMigrate < Formula
   desc "Database migrations CLI tool"
   homepage "https://github.com/golang-migrate/migrate"
-  url "https://github.com/golang-migrate/migrate/archive/refs/tags/v4.19.1.tar.gz"
-  sha256 "677bf03c19d684dc5bef47e981ec1b4564482cbf5f9b190cb48e110183fd6d25"
+  url "https://github.com/golang-migrate/migrate/archive/refs/tags/v4.20.1.tar.gz"
+  sha256 "365a1c5b517348301a540b04bda5d8778e61bff7e68583bcf2f278da570f4b46"
   license "MIT"
   head "https://github.com/golang-migrate/migrate.git", branch: "master"
 
@@ -15,7 +15,7 @@ class GolangMigrate < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "12d513c643872f37b820809e8231a5caff27f218417eacee17073f64461666a7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dced0f1352e66942f514e7e4a47313368564628c4c8f51c1d045e35331d2e3e3"
   end
 
   depends_on "go" => :build
