@@ -4,6 +4,7 @@ class Render < Formula
   url "https://github.com/render-oss/cli/archive/refs/tags/v2.26.0.tar.gz"
   sha256 "f1934ac179570a37ef2986c0b792eb8b3bfaf97ae2f2d36d112cc2282a71fa22"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/render-oss/cli.git", branch: "main"
 
   bottle do
