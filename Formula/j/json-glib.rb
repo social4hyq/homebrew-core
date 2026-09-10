@@ -4,6 +4,7 @@ class JsonGlib < Formula
   url "https://download.gnome.org/sources/json-glib/1.10/json-glib-1.10.8.tar.xz"
   sha256 "55c5c141a564245b8f8fbe7698663c87a45a7333c2a2c56f06f811ab73b212dd"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
