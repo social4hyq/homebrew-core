@@ -4,6 +4,7 @@ class Mongosh < Formula
   url "https://registry.npmjs.org/@mongosh/cli-repl/-/cli-repl-2.8.3.tgz"
   sha256 "ef22725d4efa1768e8316b6bc5aef9f8298136139dc1821719e239fa341cbfd6"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   no_autobump! because: :bumped_by_upstream
