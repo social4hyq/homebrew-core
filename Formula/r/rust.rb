@@ -9,7 +9,7 @@ class Rust < Formula
   head "https://github.com/rust-lang/rust.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ce5959eab2c3f9d9ff4ef246fb69c3c54b6dfe7ded52f5d56ead5306464ac3b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "939298bc198a169ea9d25bc2f882b6933388839c02f9b8d7ba56705e0cce8c8c"
   end
 
   depends_on "patchelf" => :build
