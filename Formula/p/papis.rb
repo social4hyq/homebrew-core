@@ -10,7 +10,7 @@ class Papis < Formula
   head "https://github.com/papis/papis.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ff358af2568c2fbf2aff4f163afd35cd300590b4fc40508a8bebb8cc218eece1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e9c46b53216ffb1ce22b84166db046a10581563d0cbbea076210b8e5a1cac87"
   end
 
   depends_on "certifi" => :no_linkage
