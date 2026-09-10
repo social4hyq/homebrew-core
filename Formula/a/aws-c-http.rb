@@ -4,6 +4,7 @@ class AwsCHttp < Formula
   url "https://github.com/awslabs/aws-c-http/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "ae992d9f24a88430cdd4b7538fab565e71faedb1f156f38d6a74f2a77269417f"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   bottle do
