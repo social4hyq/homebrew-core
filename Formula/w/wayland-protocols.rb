@@ -4,6 +4,7 @@ class WaylandProtocols < Formula
   url "http://ftp.debian.org/debian/pool/main/w/wayland-protocols/wayland-protocols_1.49.orig.tar.xz"
   sha256 "ec4c8f74942d6dff7ace8b4ce4764f0ef9ff618a935d974ea77edee2ad240b14"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
