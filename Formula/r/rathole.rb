@@ -4,6 +4,7 @@ class Rathole < Formula
   url "https://github.com/rathole-org/rathole/archive/refs/tags/v0.5.0.tar.gz"
   sha256 "c8698dc507c4c2f7e0032be24cac42dd6656ac1c52269875d17957001aa2de41"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "f45db37c4892fbb20846ec193396ad54ca9913140cf492241e49a53ca030fd2d"
@@ -59,13 +60,14 @@ class Rathole < Formula
       bind_addr = "127.0.0.1:#{service_port}"
     TOML
 
-    read, write = IO.pipe
+    # rathole logs its startup lines from two concurrent tasks, so match the whole log, not just the first line.
+    log = testpath/"rathole.log"
     fork do
-      exec bin/"rathole", "-s", testpath/"rathole.toml", out: write
+      exec bin/"rathole", "-s", testpath/"rathole.toml", out: log.to_s
     end
     sleep 5
 
-    output = read.gets
+    output = log.read
     assert_match(/Listening at 127.0.0.1:#{bind_port}/i, output)
 
     assert_match(/Build Version:\s*#{version}/, shell_output("#{bin}/rathole --version"))
