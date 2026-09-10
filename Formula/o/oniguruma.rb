@@ -12,7 +12,7 @@ class Oniguruma < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "070979fc026fcf13a90ce7de4019c5fa41d00f5c0ae179e7cde22b836d7577e2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a9c7d53957cc020ec6659ca59a7dfedfae526007964b202a52b2c819b4b3eb2"
   end
 
   depends_on "autoconf" => :build
