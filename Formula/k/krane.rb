@@ -4,6 +4,7 @@ class Krane < Formula
   url "https://rubygems.org/downloads/krane-3.9.1.gem"
   sha256 "eda88d26175aaf257df71b55b5df9d4868710a28df2b595bebadc1192a65bb8d"
   license "MIT"
+  revision 1
 
   bottle do
     rebuild 1
