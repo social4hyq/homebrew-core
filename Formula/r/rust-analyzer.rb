@@ -9,7 +9,7 @@ class RustAnalyzer < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7063fbaab1ded88852a1e2c697395d3aaa8af72a2c1e3b95371c8474e9bc512e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5678f10ce4cfe9b9eee73b67c0f868220748d8ccbf5a4e79ae6fc8bb1d97f9c9"
   end
 
   depends_on "rust" => :build
