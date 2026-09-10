@@ -4,10 +4,11 @@ class Libfixposix < Formula
   url "https://github.com/sionescu/libfixposix/archive/refs/tags/v0.5.1.tar.gz"
   sha256 "5d9d3d321d4c7302040389c43f966a70d180abb58d1d7df370f39e0d402d50d4"
   license "BSL-1.0"
+  revision 1
   head "https://github.com/sionescu/libfixposix.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d25a92f0cd6dc1171530a2f49663a761568cf8c8f90501a596a3054bdbaf3ab2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "48f040e39e77c4f79a650a0141a334fcb2600908490b35979e3591f9414ce4a4"
   end
 
   depends_on "autoconf" => :build
