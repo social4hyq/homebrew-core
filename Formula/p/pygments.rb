@@ -6,10 +6,11 @@ class Pygments < Formula
   url "https://files.pythonhosted.org/packages/49/2e/ced460408999b33da6b31b0021b0f37d329e202d4169aeb164493778f25b/pygments-2.21.0.tar.gz"
   sha256 "610ca751c9bc2492b38eb9a38a7fbc93edbbb2d7182edaf34e66ae493dee5c8c"
   license "BSD-2-Clause"
+  revision 1
   head "https://github.com/pygments/pygments.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac38aefd174f50457aa7922abe4d7fb34040a626eef25e9e0aeefa9982a241d1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e73dbbda97a0b8d892a5a80b9ff4537ad8c3212cc39a3608b185034c3a071da5"
   end
 
   depends_on "python@3.14"
