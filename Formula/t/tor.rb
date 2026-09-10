@@ -13,6 +13,7 @@ class Tor < Formula
     "MIT",
     "NCSA",
   ]
+  revision 1
   compatibility_version 1
 
   livecheck do
