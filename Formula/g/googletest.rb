@@ -8,7 +8,7 @@ class Googletest < Formula
   head "https://github.com/google/googletest.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4fa1cb0b2bf044548c8a7fa9e42b1ca0f42da11fa3556f9bb9702cdb32e898cd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d36b1baf0617b2834c2abeeb2ab5ffedc9af45c263f5af62c0792833f1dd104"
   end
 
   depends_on "cmake" => :build
