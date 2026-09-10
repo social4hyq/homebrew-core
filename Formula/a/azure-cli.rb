@@ -6,6 +6,7 @@ class AzureCli < Formula
   url "https://github.com/Azure/azure-cli/archive/refs/tags/azure-cli-2.86.0.tar.gz"
   sha256 "75cf6b4c6cf2a07e98e19bd279f456e1feb8c806d9c9b1f52ab841ca8d0bb1bd"
   license "MIT"
+  revision 1
   head "https://github.com/Azure/azure-cli.git", branch: "dev"
 
   livecheck do
@@ -17,7 +18,7 @@ class AzureCli < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1918e9c1ff4cb8f9fa62652fe6374bec51f922e02e0f022745e517c8b6bf321"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6ff1d7a78c1dd8bae3f4f581c6b880262abe81e170acfbf4ce30bb101905448"
   end
 
   # `pkgconf`, `rust`, and `openssl@3` are for bcrypt and cryptography.
