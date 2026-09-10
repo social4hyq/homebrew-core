@@ -4,6 +4,7 @@ class AwsCIo < Formula
   url "https://github.com/awslabs/aws-c-io/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "5fecb19c2c0a165687cdd94723943a02ab23a0270deade5661fd935a3cd55e78"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   bottle do
