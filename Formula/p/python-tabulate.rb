@@ -6,9 +6,10 @@ class PythonTabulate < Formula
   url "https://files.pythonhosted.org/packages/46/58/8c37dea7bbf769b20d58e7ace7e5edfe65b849442b00ffcdd56be88697c6/tabulate-0.10.0.tar.gz"
   sha256 "e2cfde8f79420f6deeffdeda9aaec3b6bc5abce947655d17ac662b126e48a60d"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e48558048b9e50fae9f53b804916b345e5af491f478d5494235b5f329bd385c0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d37286c709c173b26a47adc604e0138aa00a832f2865037368d99d6f95a74ca"
   end
 
   depends_on "python@3.14"
