@@ -6,6 +6,7 @@ class PulpCli < Formula
   url "https://files.pythonhosted.org/packages/af/e5/162985a5cb94d99fa5a37f57e944d4eaaad7c71f19293002de52043df577/pulp_cli-0.40.6.tar.gz"
   sha256 "e31d187658829da7a6d308aff7862f50678da068c84a7cb454c58e381215dbf2"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/pulp/pulp-cli.git", branch: "main"
 
   bottle do
