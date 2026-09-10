@@ -7,7 +7,7 @@ class Aria2 < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "355058bbba8b199b460f2ff702ff4485ca73d59a978a88b0320e7be464bfb32a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5fc37851b54a52876dff394a7f900a4a28606325e550b1c1643f97f06c2af2f"
   end
 
   depends_on "pkgconf" => :build
