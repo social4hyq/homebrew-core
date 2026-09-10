@@ -4,6 +4,7 @@ class Tombi < Formula
   url "https://github.com/tombi-toml/tombi/archive/refs/tags/v1.5.4.tar.gz"
   sha256 "baa1b914ce306c4b4361450fbf2101745e5411a978f68fc2d1a5c71241e24cf3"
   license "MIT"
+  revision 1
   head "https://github.com/tombi-toml/tombi.git", branch: "main"
 
   livecheck do
@@ -12,7 +13,7 @@ class Tombi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "80c748df6ca8662daca801b7fc24afdfcc7c98f57f84780f1e0cd281e3f78e1f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "66c65767c1cfa7ccd050e4b65f56a0b0c37d902a0033d4373d83b6c978641bf9"
   end
 
   depends_on "rust" => :build
