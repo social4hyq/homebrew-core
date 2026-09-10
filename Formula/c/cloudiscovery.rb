@@ -9,7 +9,7 @@ class Cloudiscovery < Formula
   revision 5
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9fddb8bd12641201cd74a83e8f8662bf12e6aaa515296ca201146eb925d0c366"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "26b7d494d1ccd8b968d2415097e0e5485f75741cbc0278ab6ea5cd7d157bb1ee"
   end
 
   deprecate! date: "2024-10-11", because: :unmaintained
