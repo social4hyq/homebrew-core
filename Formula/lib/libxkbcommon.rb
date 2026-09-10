@@ -4,6 +4,7 @@ class Libxkbcommon < Formula
   url "https://github.com/xkbcommon/libxkbcommon/archive/refs/tags/xkbcommon-1.13.2.tar.gz"
   sha256 "acc4d5f7c3cbba5f9f8d08d8bdbeede84ecede46792f47929aa9321873385528"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/xkbcommon/libxkbcommon.git", branch: "master"
 
