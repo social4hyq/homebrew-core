@@ -6,10 +6,11 @@ class Sip < Formula
   url "https://files.pythonhosted.org/packages/3c/ca/6b4861723d1bd92d0a21afece74fc63d9bd62fabb1dcc209113972505434/sip-6.16.1.tar.gz"
   sha256 "0a739c9cd2929de4e0884456d8caf3cfb22c10534757c7797bd8dc6bd9ed69bc"
   license "BSD-2-Clause"
+  revision 1
   head "https://github.com/Python-SIP/sip.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "687098905dd60954a6a0af0542bf8e170d522805c137fdc12b41673647458f5a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3da452bbd584cd5aa711702086f30f161e85a6a558859c0bee49dcf71a8f1ad"
   end
 
   depends_on "python@3.14"
