@@ -4,6 +4,7 @@ class Pyenv < Formula
   url "https://github.com/pyenv/pyenv/archive/refs/tags/v2.8.5.tar.gz"
   sha256 "1824f1d86ce1d722f092a2d5f9a1c916cfb76b58b8fdbb2a43be2f6d32de9a28"
   license "MIT"
+  revision 1
   version_scheme 1
   compatibility_version 1
   head "https://github.com/pyenv/pyenv.git", branch: "master"
@@ -14,7 +15,7 @@ class Pyenv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "da4c0b213a2f2d4a2ea40749382bd6e0dc808089e484af7a62462cca438e2aa6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0749cb8b25a5d719c4eba3cdcd9d8819c1289f7a6a4d43363e88e3327e3a7e2"
   end
 
   depends_on "autoconf"
