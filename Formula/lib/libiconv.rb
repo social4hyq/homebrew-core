@@ -9,7 +9,7 @@ class Libiconv < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5c63c77023881e2f78931af01c988098c5fe77024c45b6df7b7dce69d478e9c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9722aa6effcd7cfdd31119fc3b35d2dda462be8dd0a3e2d7306830c69611aafa"
   end
 
   keg_only :provided_by_macos
