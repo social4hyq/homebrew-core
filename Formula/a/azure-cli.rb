@@ -6,6 +6,7 @@ class AzureCli < Formula
   url "https://github.com/Azure/azure-cli/archive/refs/tags/azure-cli-2.86.0.tar.gz"
   sha256 "75cf6b4c6cf2a07e98e19bd279f456e1feb8c806d9c9b1f52ab841ca8d0bb1bd"
   license "MIT"
+  revision 1
   head "https://github.com/Azure/azure-cli.git", branch: "dev"
 
   livecheck do
