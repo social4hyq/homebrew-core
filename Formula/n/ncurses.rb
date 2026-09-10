@@ -7,10 +7,11 @@ class Ncurses < Formula
   mirror "https://ftp.gnu.org/gnu/ncurses/ncurses-6.6.tar.gz"
   sha256 "355b4cbbed880b0381a04c46617b7656e362585d52e9cf84a67e2009b749ff11"
   license "X11-distribute-modifications-variant"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f75321941185308e954063e12a19362851b85c5790d66aae10d4c6ba236d26b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c402a6553fa76fb954ca4c153a837d3c77baf1ea10ae9f7d71d4a5616f9cce5e"
   end
 
   keg_only :provided_by_macos
