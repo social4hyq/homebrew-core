@@ -4,13 +4,13 @@ class Qpdf < Formula
   url "https://github.com/qpdf/qpdf/releases/download/v12.3.2/qpdf-12.3.2.tar.gz"
   sha256 "6cba2f9f2cd887d905faeb99e0e51a307b217920d1bbf3e9cfbb2e8178a2deda"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   no_autobump! because: "newer version requires c++20 support"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7e92fdfbe6be3ffdf991a3e4076361999dd68f22cfd127592bf3cad67590795"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5197517b8c03906848e1dc183ac131db8b02e2ce959b14da9a5fca578564b2f1"
   end
 
   depends_on "cmake" => :build
