@@ -4,6 +4,7 @@ class BibtexTidy < Formula
   url "https://registry.npmjs.org/bibtex-tidy/-/bibtex-tidy-1.15.1.tgz"
   sha256 "f911be78ea301c6079f9a90c3c1a42b7c85d130dbbf73fd80a462532fc8b20b8"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "1f900f3849ce409a5197b25f82c74f959e1724d9304dab62ff79e640c0a8f5c8"
