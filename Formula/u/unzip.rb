@@ -5,7 +5,7 @@ class Unzip < Formula
   version "6.0"
   sha256 "036d96991646d0449ed0aa952e4fbe21b476ce994abc276e49d30e686708bd37"
   license "Info-ZIP"
-  revision 8
+  revision 9
 
   livecheck do
     url :stable
