@@ -7,6 +7,7 @@ class Exiftool < Formula
   mirror "https://cpan.metacpan.org/authors/id/E/EX/EXIFTOOL/Image-ExifTool-13.55.tar.gz"
   sha256 "5f4c81d34ad406538c2871ad72dbfceb5d9b412b2f16cbbeb4d712d270846667"
   license any_of: ["Artistic-1.0-Perl", "GPL-1.0-or-later"]
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -15,7 +16,7 @@ class Exiftool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f0beba3047fa8557cfe769104374187e228a256f841c6dcfe6cdc1be57fc7b34"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "431db4a7c79f7a4e28c05b33be92da721084b6d44e012f6d715a0fbe1db66cd3"
   end
 
   depends_on "cmake" => :build
