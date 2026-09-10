@@ -4,6 +4,7 @@ class Arkade < Formula
   url "https://github.com/alexellis/arkade/archive/refs/tags/0.11.126.tar.gz"
   sha256 "53693acc51c48d23f199c1447973f0710976aa44e97b0a46d7123fd47213158b"
   license "MIT"
+  revision 1
   head "https://github.com/alexellis/arkade.git", branch: "master"
 
   livecheck do
@@ -12,7 +13,7 @@ class Arkade < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "90215482dbeefed7fc0c37c81da35b851349872edf50ff57eca41ced8bb60424"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8df510bf440506ec331d61bd02d9d990b68118de77a4a6f22aa2ddee84e669d7"
   end
 
   depends_on "go" => :build
