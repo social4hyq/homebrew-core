@@ -4,6 +4,7 @@ class Libxrandr < Formula
   url "https://www.x.org/archive/individual/lib/libXrandr-1.5.5.tar.xz"
   sha256 "72b922c2e765434e9e9f0960148070bd4504b288263e2868a4ccce1b7cf2767a"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
