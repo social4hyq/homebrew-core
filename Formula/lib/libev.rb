@@ -5,6 +5,7 @@ class Libev < Formula
   mirror "https://fossies.org/linux/misc/libev-4.33.tar.gz"
   sha256 "507eb7b8d1015fbec5b935f34ebed15bf346bed04a11ab82b8eee848c4205aea"
   license any_of: ["BSD-2-Clause", "GPL-2.0-or-later"]
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -13,7 +14,7 @@ class Libev < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "180cf5693ea122ecaba1fd78190fc655a1193eaf36076e60a9f01be2bd1d9268"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0bfe878fb1d1b583d66275c7fa99cae23a63f3902138e2792ee485dc8cadd35f"
   end
 
   # Fix -flat_namespace being used on Big Sur and later.
