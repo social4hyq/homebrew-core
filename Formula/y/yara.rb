@@ -4,6 +4,7 @@ class Yara < Formula
   url "https://github.com/VirusTotal/yara/archive/refs/tags/v4.5.8.tar.gz"
   sha256 "c322414975ff6f701149856613afdcd92a7e6939c284c798ae3c85618197efaa"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/VirusTotal/yara.git", branch: "master"
 
   # Upstream sometimes creates releases that use a stable tag (e.g., `v1.2.3`)
