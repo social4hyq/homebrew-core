@@ -6,11 +6,11 @@ class Grokmirror < Formula
   url "https://files.pythonhosted.org/packages/26/91/af8831185ef4e5bef5d210039ab67abdc8c27a09a585d3963a10cf774789/grokmirror-2.0.12.tar.gz"
   sha256 "5264b6b2030bcb48ff5610173dacaba227b77b6ed39b17fc473bed91d4eb218b"
   license "GPL-3.0-or-later"
-  revision 6
+  revision 7
   head "https://github.com/mricon/grokmirror.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b6fdab162d49f0a60d8769d501d33677f2aad38771212bfade494a6fd01c6f2d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "14ee80f028bbb45c16c31957c6648d24ba8161beb12aedbdd24bb8e5fdbe9dde"
   end
 
   depends_on "certifi"
