@@ -5,6 +5,7 @@ class Opus < Formula
   mirror "https://github.com/xiph/opus/releases/download/v1.6.1/opus-1.6.1.tar.gz"
   sha256 "6ffcb593207be92584df15b32466ed64bbec99109f007c82205f0194572411a1"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -13,7 +14,7 @@ class Opus < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "71c9e640cd554710d28e4471c7ba4ded5e95f61ba77fb1aa82ab42c9db3a096f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e29f1274cf85eb56a590f23d71374376b596255b529ce96a5990f90a3395836"
   end
 
   head do
