@@ -6,6 +6,7 @@ class RpdsPy < Formula
   url "https://files.pythonhosted.org/packages/aa/2a/9618a122aeb2a169a28b03889a2995fe297588964333d4a7d67bdf46e147/rpds_py-2026.6.3.tar.gz"
   sha256 "1cebd1337c242e4ec2293e541f712b2da849b29f48f0c293684b71c0632625d4"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
