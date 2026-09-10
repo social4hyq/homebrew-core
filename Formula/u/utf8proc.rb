@@ -4,11 +4,12 @@ class Utf8proc < Formula
   url "https://github.com/JuliaStrings/utf8proc/archive/refs/tags/v2.11.3.tar.gz"
   sha256 "abfed50b6d4da51345713661370290f4f4747263ee73dc90356299dfc7990c78"
   license all_of: ["MIT", "Unicode-DFS-2015"]
+  revision 1
   compatibility_version 1
   head "https://github.com/JuliaStrings/utf8proc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef570f099586ea71ca3f668b3bb4d042fbaef0928056327795205c04c8f46981"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b3eec9f85e229b2b9b5a73960f9ba53cf44ec5a4ec1299f771b9f76ada06090b"
   end
 
   depends_on "cmake" => :build
