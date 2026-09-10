@@ -8,7 +8,7 @@ class Bootterm < Formula
   head "https://github.com/wtarreau/bootterm.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "885ab59c8c88e9230dcdaf7ae5591d0a086c4534f8fc2fdd0a9da2c8883f1095"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c9607b73df2b56dc9f61e67c1b0728e978bcd9cf003f5c4674da8edfbd4338f"
   end
 
   def install
