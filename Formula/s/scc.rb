@@ -4,6 +4,7 @@ class Scc < Formula
   url "https://github.com/boyter/scc/archive/refs/tags/v4.1.0.tar.gz"
   sha256 "4f3cf36010c542b10d5582afb91c668b26889160b184deee21b4319347030a7c"
   license any_of: ["MIT", "Unlicense"]
+  revision 1
 
   livecheck do
     url :homepage
