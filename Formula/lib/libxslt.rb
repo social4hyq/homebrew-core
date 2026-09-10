@@ -4,6 +4,7 @@ class Libxslt < Formula
   url "https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.45.tar.xz"
   sha256 "9acfe68419c4d06a45c550321b3212762d92f41465062ca4ea19e632ee5d216e"
   license "X11"
+  revision 1
   compatibility_version 1
 
   # We use a common regex because libxslt doesn't use GNOME's "even-numbered
@@ -14,7 +15,7 @@ class Libxslt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e92f8144427b7e694d3aede7bdce9e66c47d06a764ecdb28a2b46211f32a799"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "34bb07f946a7bc616ff7a1cca47d8e83d0691133515e043a5aed6b1f304892c6"
   end
 
   head do
