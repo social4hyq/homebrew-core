@@ -8,7 +8,7 @@ class Gperf < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "874090a3a960a5330a03c6f14560d6b7c5ea1870ffaff2c6e1fc8890dcc34c00"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a392cf3cdbf1af720b14dabe1a2609b33d0862648949fd79d0971a43d6672dc"
   end
 
   def install
