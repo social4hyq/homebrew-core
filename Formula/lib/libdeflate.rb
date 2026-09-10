@@ -8,7 +8,7 @@ class Libdeflate < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "35f0071b961aedf08736de6804049936749c3f136f5f502340dd7f8bed4e6a20"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1b933513bd58acf979637aad2299d96e74c16f627fa8f6417404188085e290a"
   end
 
   depends_on "cmake" => :build
