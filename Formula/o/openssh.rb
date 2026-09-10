@@ -6,6 +6,7 @@ class Openssh < Formula
   version "10.5p1"
   sha256 "d44d28a839ea9daf969cc69150fde59910b2b39361dad81a3bd6cbd19218db11"
   license "SSH-OpenSSH"
+  revision 1
   compatibility_version 1
 
   livecheck do
