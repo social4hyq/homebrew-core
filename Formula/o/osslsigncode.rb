@@ -7,7 +7,7 @@ class Osslsigncode < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "896b27a5d8b9716729a595bd88df6bcd082964ec7924323a2b849fa0b7b08935"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "995247315bdbb58845f1c30249c65ccb7cb72fd8613406da153389bb0d71ca97"
   end
 
   depends_on "cmake" => :build
