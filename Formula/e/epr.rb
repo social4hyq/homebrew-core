@@ -6,10 +6,11 @@ class Epr < Formula
   url "https://files.pythonhosted.org/packages/39/20/d647083aa86ec9da89b4f04b62dd6942aabb77528fd2efe018ff1cd145d2/epr-reader-2.4.15.tar.gz"
   sha256 "a5cd0fbab946c9a949a18d0cb48a5255b47e8efd08ddb804921aaaf0caa781cc"
   license "MIT"
+  revision 1
   head "https://github.com/wustho/epr.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ec70e43f114ba1e500ff16f77e6baba82a5d16fd48ac793865d438d318655d7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fadb386c6b745c9230713b54e78a5670c2c7635444bbd6f54bcded153a41a75e"
   end
 
   depends_on "python@3.14"
