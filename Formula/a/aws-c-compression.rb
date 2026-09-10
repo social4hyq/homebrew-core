@@ -4,10 +4,11 @@ class AwsCCompression < Formula
   url "https://github.com/awslabs/aws-c-compression/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "d8e934da2086bfec41f97a0cff749d926f66ccb90f2052f1d70841916c1bf4d7"
   license "Apache-2.0"
+  revision 1
   compatibility_version 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b003f2cdd6f467a02aea9ab78388e49ce2e383e61386b9d4b6b577b4fee101a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b5ce94395161a72f5eb36210b8a21352573def57066482e0e00274ef7613a86"
   end
 
   depends_on "cmake" => :build
