@@ -12,7 +12,7 @@ class Libmagic < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ed0d6bbc8d779b7d24ce63f0ada9b9f2ea6d1a841248e441529438fc03b4fe7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07c05eb44c30772ac6597e40f5fd01ca448616098b7dcd993b0bf6c3b546ab87"
   end
 
   depends_on "pkgconf" => :test
