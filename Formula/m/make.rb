@@ -5,10 +5,11 @@ class Make < Formula
   mirror "https://ftp.gnu.org/gnu/make/make-4.4.1.tar.lz"
   sha256 "8814ba072182b605d156d7589c19a43b89fc58ea479b9355146160946f8cf6e9"
   license "GPL-3.0-only"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aec502fb60af4dcd98a8696d4d5c1538638cbacda31bca8eb5e4f084809e7622"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7131812a97fb8aae0915acfb5e542745aa3b37a898c9f03c0b229ed0da734d2"
   end
 
   head do
