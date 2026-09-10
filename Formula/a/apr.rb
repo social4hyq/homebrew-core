@@ -5,10 +5,11 @@ class Apr < Formula
   mirror "https://archive.apache.org/dist/apr/apr-1.7.6.tar.bz2"
   sha256 "49030d92d2575da735791b496dc322f3ce5cff9494779ba8cc28c7f46c5deb32"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4efbcd4946d29b92d2de59a9d85e3dfcf299788ba018bbcf45228d2757ccc64"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "899011f0c9ec0c26974ee80018deffe1603d1c7d9c6df3cd71f314fd13426bc7"
   end
 
   keg_only :provided_by_macos, "Apple's CLT provides apr"
