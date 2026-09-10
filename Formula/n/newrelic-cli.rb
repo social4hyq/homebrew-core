@@ -4,6 +4,7 @@ class NewrelicCli < Formula
   url "https://github.com/newrelic/newrelic-cli/archive/refs/tags/v0.113.14.tar.gz"
   sha256 "c246355f6340b7ca94ef95e960ac469e866f1f145f55d8d67cbc674cf583ccd9"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/newrelic/newrelic-cli.git", branch: "main"
 
   livecheck do
