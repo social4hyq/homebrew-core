@@ -5,6 +5,7 @@ class Libvorbis < Formula
   mirror "https://github.com/xiph/vorbis/releases/download/v1.3.7/libvorbis-1.3.7.tar.xz"
   sha256 "b33cc4934322bcbf6efcbacf49e3ca01aadbea4114ec9589d1b1e9d20f72954b"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -13,7 +14,7 @@ class Libvorbis < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "741f01691fce5e77f6cec6dad4031ccf39c04815103943726716b74c0206c32b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c02ee51aeca2d0b7dded428ad9e4844cf49c97205c4c7de64aae1d219cfbe946"
   end
 
   head do
