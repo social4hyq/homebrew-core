@@ -10,7 +10,7 @@ class Pdm < Formula
   head "https://github.com/pdm-project/pdm.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "133cfd0852322540ec8e365164940775cda02aa45a6dd96ade10bc8909c1d1b2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a1d26389b4424cc2310634992a17910bae4b3e91416e3e0938955446abf403b"
   end
 
   depends_on "certifi" => :no_linkage
