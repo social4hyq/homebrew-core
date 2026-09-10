@@ -6,11 +6,11 @@ class Ptpython < Formula
   url "https://files.pythonhosted.org/packages/b6/8c/7e904ceeb512b4530c7ca1d918d3565d694a1fa7df337cdfc36a16347d68/ptpython-3.0.32.tar.gz"
   sha256 "11651778236de95c582b42737294e50a66ba4a21fa01c0090ea70815af478fe0"
   license "BSD-3-Clause"
-  revision 1
+  revision 2
   head "https://github.com/prompt-toolkit/ptpython.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "13a0db37806d17d64acdec1bb0e6e1a9620947b61a9ef1c7532d1336ecef09ed"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a345e3b14cee0c53990e80121863f3ecdf41142cd8dd614c9a5445ceccdd9af"
   end
 
   depends_on "python@3.14"
