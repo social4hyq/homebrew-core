@@ -25,7 +25,7 @@ class Abook < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4e7906dd7f6dfb7f7af0672c4dc3bdaaf872be4767b213a3de6d30392d1af3e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee8d29ec41908f8649d4412ed2915cc0ce5ecad5e70cabdc7cbb642aeda89798"
   end
 
   depends_on "autoconf" => :build
