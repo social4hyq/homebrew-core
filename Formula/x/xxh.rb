@@ -6,6 +6,7 @@ class Xxh < Formula
   url "https://files.pythonhosted.org/packages/d6/ac/fb40368ff37fbdd00d041e241cc0d7a50cdac7bc6ae54dcb9f1349acdde6/xxh-xxh-0.8.14.tar.gz"
   sha256 "7904c35efdff0a6f50f76b30879d3fbfe726cc765db47a1306ab2f19c03fdfae"
   license "BSD-2-Clause"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "cda85ab96f97819e118e35edfd7ee1c009c5e1004102bd2abe9e1aef51b330bb"
