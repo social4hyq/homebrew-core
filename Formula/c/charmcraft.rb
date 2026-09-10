@@ -6,6 +6,7 @@ class Charmcraft < Formula
   url "https://files.pythonhosted.org/packages/f0/69/5de016b09ea7ec5bfec15e14a791a1c8e48e6813e21ed6f6fc8f0e87658d/charmcraft-4.4.2.tar.gz"
   sha256 "b65b8c3af08f64bfda0f4cf699769123f07914364395d2d9cd765a9e621377ac"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/canonical/charmcraft.git", branch: "main"
 
   bottle do
