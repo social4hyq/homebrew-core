@@ -7,6 +7,7 @@ class Xxhash < Formula
     "BSD-2-Clause", # library
     "GPL-2.0-or-later", # `xxhsum` command line utility
   ]
+  revision 1
 
   livecheck do
     url :stable
@@ -14,7 +15,7 @@ class Xxhash < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f22f98733893aa74e0872be3b9848c04f91afc7ffe181f9f5cfd45bd22f3a158"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "54ca2d43ffd539324c0bbc2b0ac398763822b0a3131aedd0219132379dda9a7b"
   end
 
   depends_on "cmake" => [:build, :test]
