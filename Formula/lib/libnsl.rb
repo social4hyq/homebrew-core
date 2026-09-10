@@ -4,10 +4,11 @@ class Libnsl < Formula
   url "https://github.com/thkukuk/libnsl/releases/download/v2.0.1/libnsl-2.0.1.tar.xz"
   sha256 "5c9e470b232a7acd3433491ac5221b4832f0c71318618dc6aa04dd05ffcd8fd9"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3342964815c67bbfa916956c423e80ef90e96f7f88d4dac0af509fc02c6977bc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f21bff6cdd522d90a19fa791b161fa40520b2556f083d01fddc86513e4f5fe39"
   end
 
   depends_on "pkgconf" => :build
