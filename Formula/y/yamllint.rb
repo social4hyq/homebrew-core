@@ -6,6 +6,7 @@ class Yamllint < Formula
   url "https://files.pythonhosted.org/packages/28/a0/8fc2d68e132cf918f18273fdc8a1b8432b60d75ac12fdae4b0ef5c9d2e8d/yamllint-1.38.0.tar.gz"
   sha256 "09e5f29531daab93366bb061e76019d5e91691ef0a40328f04c927387d1d364d"
   license "GPL-3.0-or-later"
+  revision 1
   head "https://github.com/adrienverge/yamllint.git", branch: "master"
 
   bottle do
