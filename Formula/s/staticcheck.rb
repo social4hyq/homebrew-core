@@ -4,10 +4,11 @@ class Staticcheck < Formula
   url "https://github.com/dominikh/go-tools/archive/refs/tags/2026.2.1.tar.gz"
   sha256 "8d807cd909f4481d6777f7707e5ae75dcc399e14d68ff14a3c814731826e0dfc"
   license "MIT"
+  revision 1
   head "https://github.com/dominikh/go-tools.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "06bec5085557c5fbe015ba8e0ad2787b5308d71a49ddb65871bb282c82ad4217"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c1b9e45aecedfa52c53545992a314113ef8f71a45e93651711a7d96cf5a181c"
   end
 
   depends_on "go"
