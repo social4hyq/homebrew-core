@@ -6,7 +6,7 @@ class GorillaCli < Formula
   url "https://files.pythonhosted.org/packages/cd/2b/7a64f9ad59009e72ddf73d055195b4bf23e15599a61e66f1458b4025b9e5/gorilla-cli-0.0.10.tar.gz"
   sha256 "bf375230a06fac99ba56f14f49474466036f072751cd1d5a1908e8ace561856c"
   license "Apache-2.0"
-  revision 4
+  revision 5
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "af472536e6b50b400ea7742caedf6b7104760d1b75711fe444b093613b540aef"
