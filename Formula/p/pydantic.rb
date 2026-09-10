@@ -11,7 +11,7 @@ class Pydantic < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d45183cb4c44cdf3107192579a0cfa25ceaee89f0f614393cfe2f576d99c421"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0673cb24f390cc470cbbeedf153c39d131d8d323b029ef9e9e6988d2384c3d6b"
   end
 
   depends_on "maturin" => :build
