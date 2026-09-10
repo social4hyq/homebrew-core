@@ -9,7 +9,7 @@ class Bat < Formula
   head "https://github.com/sharkdp/bat.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e954fc0a102aca6430324bbf7bf5013e526b9f02ae4cf0a0063f0147f4561fb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2910db5804229507999607541de0e46408cae53f08065e61fd2446238a100e00"
   end
 
   depends_on "pkgconf" => :build
