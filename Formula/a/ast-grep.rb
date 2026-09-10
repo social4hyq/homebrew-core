@@ -4,6 +4,7 @@ class AstGrep < Formula
   url "https://github.com/ast-grep/ast-grep/archive/refs/tags/0.45.3.tar.gz"
   sha256 "0ad252ce2535493e105bd4b2dd6db2829439732d15599825aecb0b02fc9e606f"
   license "MIT"
+  revision 1
   head "https://github.com/ast-grep/ast-grep.git", branch: "main"
 
   bottle do
