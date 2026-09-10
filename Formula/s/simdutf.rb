@@ -4,6 +4,7 @@ class Simdutf < Formula
   url "https://github.com/simdutf/simdutf/archive/refs/tags/v9.1.1.tar.gz"
   sha256 "ec707f17e5083999efbdaf8a9a08d35e71e955b35dbf4b8307d14a7d31e9697f"
   license any_of: ["Apache-2.0", "MIT"]
+  revision 1
   compatibility_version 3
   head "https://github.com/simdutf/simdutf.git", branch: "master"
 
@@ -13,7 +14,7 @@ class Simdutf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3dbf61d477528420046619d95146a3fb99b6aaea3112782ecb90b068051a56d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4834f31d46fd8b595f844d1c5449760319e0ca2bc7b90f2c00552ec5ddf04967"
   end
 
   depends_on "aklomp-base64" => :build
