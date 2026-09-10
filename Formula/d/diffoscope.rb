@@ -6,6 +6,7 @@ class Diffoscope < Formula
   url "https://files.pythonhosted.org/packages/f5/e1/c8e6656893ca111fba107e03195930195e0105fa67b99919f0529b9fc520/diffoscope-329.tar.gz"
   sha256 "940ee30d8d98231f4d4855e36caf96e9eec9ec3d3cb359b744687b369b2b54d9"
   license "GPL-3.0-or-later"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "c4ce4b13443c09817683938d7b784a67125583c7ae7626350561f10664ca615d"
