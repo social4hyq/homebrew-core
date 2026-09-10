@@ -15,7 +15,7 @@ class Squashfs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "14bddcb3555e9963161486534faa5385cea56c404abb5a3e3417ab099cd04e83"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "77bdbfe456df4dfbcd0b4ec8f4b16a3e983f53db7eea7455138503fa3ef9a6f1"
   end
 
   depends_on "gnu-sed" => :build
