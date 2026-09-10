@@ -9,7 +9,7 @@ class Jsbeautifier < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bcf82096415d748f3f144362edf0e9cb78bfa74341977a2419a9d4a4dd96e006"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0c32fe8df75896ec197df037aefad6a6d1acd0e3c75da494c7293bc492c9efb"
   end
 
   depends_on "python@3.14"
