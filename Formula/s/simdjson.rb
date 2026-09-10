@@ -9,7 +9,7 @@ class Simdjson < Formula
   head "https://github.com/simdjson/simdjson.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "234f92d46ee3173196030752315308ddef6ca6bf748d3ceb9bb6300614f75cc2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "83e7ca7f51598013d1dc68967c37e03e5fafd2a4ec64a6f897880c1d16f836c1"
   end
 
   depends_on "cmake" => :build
