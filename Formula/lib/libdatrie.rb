@@ -4,10 +4,11 @@ class Libdatrie < Formula
   url "https://github.com/tlwg/libdatrie/releases/download/v0.2.14/libdatrie-0.2.14.tar.xz"
   sha256 "f04095010518635b51c2313efa4f290b7db828d6273e39b2b8858f859dfe81d5"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "81993163a7edfb8f657277cb0b25fa4c024a440608f5899d07e444c1c4c5094a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "074713b7fbb6b1cfc806d07c55079757b28953fd601a0b371ecd6480b2222001"
   end
 
   depends_on "pkgconf" => :build
