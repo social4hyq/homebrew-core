@@ -5,7 +5,7 @@ class Help2man < Formula
   mirror "https://ftp.gnu.org/gnu/help2man/help2man-1.49.3.tar.xz"
   sha256 "4d7e4fdef2eca6afe07a2682151cea78781e0a4e8f9622142d9f70c083a2fd4f"
   license "GPL-3.0-or-later"
-  revision 5
+  revision 6
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "4dd30c45e82f1d2f6bb4e2a580f2620b787dc5e80ddf8e1ae2c7453e2bad28ce"
