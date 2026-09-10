@@ -9,7 +9,7 @@ class Tmuxp < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "14b36e87964d9de078d255273b4ce5b963559677e94b64ab126f56a380838549"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "362a45ccae27615d670cc9175ec7d5e12a7b32f0a99ece85ca2298a972022b27"
   end
 
   depends_on "libyaml"
