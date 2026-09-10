@@ -6,6 +6,7 @@ class Tox < Formula
   url "https://files.pythonhosted.org/packages/4f/c2/00c120f553c7dbcf914304da733a93e6f05d899c176671d3afa5fc0d2d1c/tox-4.61.3.tar.gz"
   sha256 "908c5e12355ccb7b1ad088089a4be892ee2ee977ae0ca89e577ed8fc59c326fd"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "958ca519c19128bd18efc1ba0e7169be995a05b0efebe13dc9269477cd8e86d7"
