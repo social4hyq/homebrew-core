@@ -4,6 +4,7 @@ class Vgt < Formula
   url "https://github.com/roblaszczak/vgt/archive/refs/tags/v1.0.1.tar.gz"
   sha256 "c442980c2205d45d527205fc9f832f4d27f4d3e8c815f471f428266f6fcf33c6"
   license "MIT"
+  revision 1
   head "https://github.com/roblaszczak/vgt.git", branch: "main"
 
   bottle do
