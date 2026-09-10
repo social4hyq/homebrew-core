@@ -4,6 +4,7 @@ class Fzf < Formula
   url "https://github.com/junegunn/fzf/archive/refs/tags/v0.74.3.tar.gz"
   sha256 "5b142217c3068647a7d8faa9c678cffada100b5f11a48609aa79c94ce04b28ef"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/junegunn/fzf.git", branch: "master"
 
