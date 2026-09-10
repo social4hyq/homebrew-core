@@ -13,7 +13,7 @@ class TidyHtml5 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "818a7d1b50c7954a1790883847fe283bf088b52911ac2adde9c9e09e8ea1653d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5570c86ceeb2c13162000d8ebd81cc2ee90675d108dce5be3682c07b79731a98"
   end
 
   depends_on "cmake" => :build
