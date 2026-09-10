@@ -6,7 +6,7 @@ class ZlibNgCompat < Formula
   mirror "http://fresh-center.net/linux/misc/legacy/zlib-ng-2.3.3.tar.gz"
   sha256 "f9c65aa9c852eb8255b636fd9f07ce1c406f061ec19a2e7d508b318ca0c907d1"
   license "Zlib"
-  revision 1
+  revision 2
   compatibility_version 1
   head "https://github.com/zlib-ng/zlib-ng.git", branch: "develop"
 
@@ -15,7 +15,7 @@ class ZlibNgCompat < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c17a31f8104701bce6b471af8dbbd14bb67d16a504eec087018feb05493a430"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "99356b80ddb81e0b8267debb44df459f2b5e27e7800406d3b4cf7f8f744beb89"
   end
 
   keg_only :shadowed_by_macos, "macOS provides zlib"
