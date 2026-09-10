@@ -4,6 +4,7 @@ class Capnp < Formula
   url "https://github.com/capnproto/capnproto/archive/refs/tags/v1.5.0.tar.gz"
   sha256 "d5ebdf858e9885c33d4b3f765006d68bd66e9b002bf4d607ff4317ef9c1aac6a"
   license "MIT"
+  revision 1
   compatibility_version 2
   head "https://github.com/capnproto/capnproto.git", branch: "v2"
 
@@ -13,7 +14,7 @@ class Capnp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ba8b6ea6d62f8bb571e5b91920b7d2492ecc3f1635d17a6357d75bbc5ae9ef9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "978b354fdbe9d985a1ec2135c257b5d133cfe43f920dd0d3385cf5227f1c1695"
   end
 
   depends_on "cmake" => :build
