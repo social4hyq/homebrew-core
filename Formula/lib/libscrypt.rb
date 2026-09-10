@@ -4,9 +4,10 @@ class Libscrypt < Formula
   url "https://github.com/technion/libscrypt/archive/refs/tags/v1.22.tar.gz"
   sha256 "a2d30ea16e6d288772791de68be56153965fe4fd4bcd787777618b8048708936"
   license "BSD-2-Clause"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "159b7b4f7b7e59c0bb9b2dfa8478d730c49933cca9a4ed0fd116d26c699479dc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "869c9e0354223ef03f4b2d6ffe91dd701ec7780b08e95d6ad4263274eef9a268"
   end
 
   # Backport fix for aliasing violations
