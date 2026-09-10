@@ -8,7 +8,7 @@ class Imath < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abd7fe6f7339734c7a1b061fe03028ff2b44a4f4a4e4574e2440e56fa1ba2d36"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9751604c862989c8317eebbe8255acfd398eb2379cc1a482336dff2383acc75d"
   end
 
   depends_on "cmake" => :build
