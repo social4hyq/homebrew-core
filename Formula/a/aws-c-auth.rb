@@ -4,10 +4,11 @@ class AwsCAuth < Formula
   url "https://github.com/awslabs/aws-c-auth/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "12a29eb62c61cef4b38c90d4f0dd2657dc585a15c138d60941d6f20c1ad3b12d"
   license "Apache-2.0"
+  revision 1
   compatibility_version 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eab9c127ff79ef588852000c975ea630420a3a44384b2389b5dad415ced8e316"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9e86bd31dd8bb988babdc27eef07a0e1a4b0738360cb27a10176c4bdfb18efd"
   end
 
   depends_on "cmake" => :build
