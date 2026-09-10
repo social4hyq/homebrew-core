@@ -6,6 +6,7 @@ class GitMachete < Formula
   url "https://files.pythonhosted.org/packages/1c/12/c58bae8e3171831e0bf9f474434aad9860fad2ea0f228bc4c8d9586d527a/git_machete-3.45.0.tar.gz"
   sha256 "981d22bcaab519398332b57ab6a175fcdd668b657717f03d65d016b6cbea9c5e"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "35b48451f336b884c58b840213f52be7d28df4e74af70346d3ae460861fc6670"
