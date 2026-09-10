@@ -4,6 +4,7 @@ class Libdrm < Formula
   url "https://dri.freedesktop.org/libdrm/libdrm-2.4.134.tar.xz"
   sha256 "ac5e74d157830eb8bee44c6a6bf3ad49774ef0dd2a72bdad74a8f20308b52a95"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
