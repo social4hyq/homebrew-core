@@ -5,7 +5,7 @@ class Bento4 < Formula
   version "1.6.0-641"
   sha256 "8258faf0de7253f2aac016018f33d4a04c16d9060735e14ec8711f84aaedf0c8"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://www.bok.net/Bento4/source/"
