@@ -6,7 +6,7 @@ class Libssh2 < Formula
   mirror "http://download.openpkg.org/components/cache/libssh2/libssh2-1.11.1.tar.gz"
   sha256 "d9ec76cbe34db98eec3539fe2c899d26b0c837cb3eb466a56b0f109cabf658f7"
   license "BSD-3-Clause"
-  revision 1
+  revision 2
   compatibility_version 1
 
   livecheck do
@@ -15,7 +15,7 @@ class Libssh2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "632034ac7f62f8f909ffa9233a4fb83583e38314a9f14ca9506373a6e0474847"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f69baaa3fc44907342f0265b26625d0d156aeda8d3affcc68d017b194754816d"
   end
 
   head do
