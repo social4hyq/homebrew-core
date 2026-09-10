@@ -12,7 +12,7 @@ class Libsndfile < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6b4de70860ef5d39dc1a7571b52bf0e74f836136614cb1be5e18a6ef7313851"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "592112eb7f264b6a14b11523d32c82166a3ad4cf6f320184221c5e55bcc8d308"
   end
 
   depends_on "cmake" => :build
