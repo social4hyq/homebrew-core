@@ -4,6 +4,7 @@ class Wails < Formula
   url "https://github.com/wailsapp/wails/archive/refs/tags/v2.15.0.tar.gz"
   sha256 "4c865cbd5ab81401cf4557e54dfe517efc90d29980ccdaa54178b426fdd6d4a3"
   license "MIT"
+  revision 1
   head "https://github.com/wailsapp/wails.git", branch: "master"
 
   bottle do
