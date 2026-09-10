@@ -4,6 +4,7 @@ class DockerCompose < Formula
   url "https://github.com/docker/compose/archive/refs/tags/v5.5.1.tar.gz"
   sha256 "311077662698fd8e34769a894f9d5240befb1730990efa8ed58e0fa8725d2d84"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/docker/compose.git", branch: "main"
 
   # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
