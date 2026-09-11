@@ -7,7 +7,7 @@ class ClaudeCmd < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c0f01a76d63f6111fc6c2d5aa63f24d9c6fb5f1b674cb3a936d1438f5f04a54"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "495a8b7fa5be349235f0741c7c21dc874164be62cb0c547232fb951b064bfc92"
   end
 
   depends_on "node"
