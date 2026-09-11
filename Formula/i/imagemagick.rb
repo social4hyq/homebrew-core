@@ -4,6 +4,7 @@ class Imagemagick < Formula
   url "https://github.com/ImageMagick/ImageMagick/releases/download/7.1.2-31/ImageMagick-7.1.2-31.7z"
   sha256 "a050a1f6b632cf3a5b326fe6fb863790ce4d52d55fba9c6a7645b42599660e18"
   license "ImageMagick"
+  revision 1
   compatibility_version 1
   head "https://github.com/ImageMagick/ImageMagick.git", branch: "main"
 
@@ -14,7 +15,7 @@ class Imagemagick < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "feee036b896c5bde951e6180bc3a35ca2a6a71d2034c9c674bde81750585f99f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d5411be7d6d5ce3a90bfbe0de48e7fd4bb66cf7e0c79fc9de793dd284d6ade9"
   end
 
   depends_on "pkgconf" => :build
