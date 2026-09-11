@@ -4,9 +4,10 @@ class Apktool < Formula
   url "https://github.com/iBotPeaches/Apktool/releases/download/v3.0.3/apktool_3.0.3.jar"
   sha256 "dbf930b076c6b9be08d57c449cacefc3bdd6b71ebd59b3066fc0e1f5b14f9423"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9215810a888f5055410f02497a2a81a62398596384f549da853a86c0d7204ce"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2022318771dc84d471627680b0c30bd81abe7d0b2699a7ba23b091921358064"
   end
 
   depends_on "openjdk"
