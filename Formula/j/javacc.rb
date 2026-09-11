@@ -13,7 +13,7 @@ class Javacc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a36c4a2f2d95473d53fc47c8c54739c33ed9749c588f80b910e6e26aec8ca9e2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00925bbde32546362c39d7f5288fd1a5b0411e6b42410e6b419f0cf7a464ba9d"
   end
 
   depends_on "ant" => :build
