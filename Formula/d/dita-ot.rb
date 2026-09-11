@@ -4,6 +4,7 @@ class DitaOt < Formula
   url "https://github.com/dita-ot/dita-ot/releases/download/4.4.1/dita-ot-4.4.1.zip"
   sha256 "154414c1debb548e923bf77e9a09019e249a8887680ff4bfbd8e137de9e8e250"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class DitaOt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3936909edc24d565e72522ded74be4a0a6ccc757e632fed2a5dbd8900dd54b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2404cd9d995840490fb2bf202da2ddd42afba77fe26bb100a1b4cf97fc4e41a2"
   end
 
   depends_on "openjdk"
