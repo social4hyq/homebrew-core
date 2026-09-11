@@ -12,7 +12,7 @@ class Freexl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "123301fb27ce337334181539a1204d030606588ed03195f9a731e045f8e9aadd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e10b041fd58605560b368d264d28e4f8585ccc84d772bb42dd16fd599a73010a"
   end
 
   depends_on "doxygen" => :build
