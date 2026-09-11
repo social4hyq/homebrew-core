@@ -12,7 +12,7 @@ class Silk < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0a0eaae4dc61a7816af8ec86c1c4391d4bcf503b8f1278cb05dee5301c598b0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba9f5c5f961ef129d24d1ef9fea9980b6593f8b4e599c02335c3cf3ec85878e5"
   end
 
   depends_on "pkgconf" => :build
