@@ -6,10 +6,11 @@ class AwsSamCli < Formula
   url "https://files.pythonhosted.org/packages/9f/f8/af8a25e955ad132e346b1bf036fd479407de3d07fbf89c3e796bd19d39c2/aws_sam_cli-1.166.1.tar.gz"
   sha256 "32a4c5c1f03211d51d93b58e3cc5f4fb331c3dee4bff4105cbe0a24c71b770b3"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/aws/aws-sam-cli.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "84f09f4a3a98571140d0b2e6b5ffcde9819a76eae94be9b6ae4a6e8cee32bce1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5b6e116478fcd27264689140d4bc85cfd80638fa67d1aa5bb3796073e94f3cf"
   end
 
   depends_on "cmake" => :build # for `awscrt`
