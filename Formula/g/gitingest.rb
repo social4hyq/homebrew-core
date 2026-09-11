@@ -9,7 +9,7 @@ class Gitingest < Formula
   revision 8
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "230a6b53ccb1769067c62775e94c94e719bf981b1bb92aa400d42494ea6bd42d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ada2b3a66711abc8c33c9ee52445604fb9b2fca5bc2646b6e47c102537fc120b"
   end
 
   depends_on "rust" => :build # for tiktoken
