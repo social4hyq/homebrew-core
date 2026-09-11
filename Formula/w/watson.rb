@@ -6,11 +6,11 @@ class Watson < Formula
   url "https://files.pythonhosted.org/packages/a9/61/868892a19ad9f7e74f9821c259702c3630138ece45bab271e876b24bb381/td-watson-2.1.0.tar.gz"
   sha256 "204384dc04653e0dbe8f833243bb833beda3d79b387fe173bfd33faecdd087c8"
   license "MIT"
-  revision 12
+  revision 13
   head "https://github.com/jazzband/Watson.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "67cbcfedfa77c72d9557bb2908ef8177f6a603887927040455ea5f31d3e00e7b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a6656971d5a95fb54a81225a482eb9add7df3e89530a038eb9101e02096837a"
   end
 
   depends_on "certifi" => :no_linkage
