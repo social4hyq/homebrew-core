@@ -8,7 +8,7 @@ class Libxfixes < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1d19a244cae192d57c97b84bc56e4dab90099ccbe317549d737c3302bffbcc7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce64d82390736f581015e753e1d6f0f3ebfafc00bd60b5ec45d85794ad076583"
   end
 
   depends_on "pkgconf" => :build
