@@ -7,7 +7,7 @@ class CalmCli < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f6f60363162d2ec682874300f0781cd0abcc00aa917ab9c224154130350a738"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c9b013c0772a772247dd07162747fa56bd19edbf5de913151c46f61665cbb16"
   end
 
   depends_on "node"
