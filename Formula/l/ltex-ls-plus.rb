@@ -4,6 +4,7 @@ class LtexLsPlus < Formula
   url "https://github.com/ltex-plus/ltex-ls-plus/archive/refs/tags/18.7.0.tar.gz"
   sha256 "8c5ad69fdbf38061bc511439473b081f2b2db35b0f4788f3516c632345788d2f"
   license "MPL-2.0"
+  revision 1
   head "https://github.com/ltex-plus/ltex-ls-plus.git", branch: "develop"
 
   bottle do
