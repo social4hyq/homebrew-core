@@ -4,6 +4,7 @@ class Xapian < Formula
   url "https://oligarchy.co.uk/xapian/2.1.0/xapian-core-2.1.0.tar.xz"
   sha256 "8e1259586d342e3d12b5e1f772e9185a10f2ba16e541566b5c3c239f71b8aacc"
   license "GPL-2.0-or-later"
+  revision 1
   version_scheme 1
   compatibility_version 1
 
@@ -13,8 +14,7 @@ class Xapian < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea4bdd6d59793883d41ce1d559a29b01236c5a0d5da2644211064a210adbfbc8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "93be8522920b85a813df26bb582f39512e543dcfd35ae31cbf8df1c2980c16d1"
   end
 
   depends_on "python@3.14" => [:build, :test]
