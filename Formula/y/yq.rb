@@ -4,6 +4,7 @@ class Yq < Formula
   url "https://github.com/mikefarah/yq/archive/refs/tags/v4.53.6.tar.gz"
   sha256 "132a28a669526f99dba52486ac80de3bdafdf9a1a52a0c6bd6045301aca0cd25"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/mikefarah/yq.git", branch: "master"
 
@@ -13,7 +14,7 @@ class Yq < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1892274f848a930a9977d759d54acfa611f0870d1737f6bcd9a662169cf46cfe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a919b5433658f4acffaf1c1968d36db25b2a9adfdaefa3e7a9d75f3cae930aa"
   end
 
   depends_on "go" => :build
