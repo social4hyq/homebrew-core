@@ -9,7 +9,7 @@ class CfnLint < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7f0c3328b6f964b4e9a0a3d755bfcbcc9c6558174f54249d926f9e897829958"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f900720a8f122be2d53082de98a339898ae079dffe2a2f3adaafb6f46badf893"
   end
 
   depends_on "libyaml"
