@@ -5,6 +5,7 @@ class Basex < Formula
   version "12.3"
   sha256 "e412cabfa94d93b91e1ceff999c235f837426e025ae7f1ad9ef604cfb2ed4050"
   license "BSD-3-Clause"
+  revision 1
 
   livecheck do
     url "https://basex.org/download/"
