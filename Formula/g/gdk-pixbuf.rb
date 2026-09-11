@@ -8,8 +8,7 @@ class GdkPixbuf < Formula
   compatibility_version 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eddf2ef8f9fbf1fcafc518a5d458676b2dc4e246d2c5177010adc30a64217830"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f420ab7a3339bb7e0a5d09564c328b2cda0df11ca706a4b572dcc071a821605"
   end
 
   depends_on "docutils" => :build # for rst2man
