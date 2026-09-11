@@ -4,10 +4,10 @@ class StructurizrCli < Formula
   url "https://github.com/structurizr/cli/releases/download/v2025.11.09/structurizr-cli.zip"
   sha256 "f5365a463fc44d539ed19bec00c48ba1e1ecda0ccfd1ba40d2e7472d264eb79a"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2dc885b38c338cf6eaa453c33adb4810bb45aa3eec9364d611e093323d4dcec9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c64b41c9e7fba66b3d33cae0f87e8ad6106caaa66a2126fbd0c7e25609630f7"
   end
 
   deprecate! date: "2026-02-17", because: :repo_archived
