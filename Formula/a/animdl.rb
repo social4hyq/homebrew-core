@@ -11,7 +11,7 @@ class Animdl < Formula
   head "https://github.com/justfoolingaround/animdl.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a539836b97606032a15b934a439c0458a2b721ac6d1afe6f0672d64245f49994"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3acbe97732452f98f2fb1601138f08601fbc0031d58eb8b3f01e8a1dce721b17"
   end
 
   deprecate! date: "2026-04-27", because: :unmaintained
