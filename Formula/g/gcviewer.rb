@@ -4,6 +4,7 @@ class Gcviewer < Formula
   url "https://downloads.sourceforge.net/project/gcviewer/gcviewer-1.37.jar"
   sha256 "325a5f1a8f67588b6845c71eceb70c8b74c45930fd553ba2fc7b3b4118608e13"
   license "LGPL-2.1-or-later"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Gcviewer < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ebd94a8e78f6ce1c3f67ee50329086f0d5098b12b893760ce513119c57b6220"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e800d61c6b0c993f073360f9dedab0abed967c0d251a6ac81d9e878d0a0ee7aa"
   end
 
   depends_on "openjdk"
