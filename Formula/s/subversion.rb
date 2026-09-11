@@ -2,7 +2,7 @@ class Subversion < Formula
   desc "Version control system designed to be a better CVS"
   homepage "https://subversion.apache.org/"
   license "Apache-2.0"
-  revision 4
+  revision 5
   compatibility_version 1
 
   stable do
@@ -18,7 +18,7 @@ class Subversion < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "384be8ba5c1f9fd5fdf0b597625dbbb0a54ffc4855c1524916260eea38e17017"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4526c2667f3aceef14af3f3f0736bfc3a9e8c05172fc0646d588c6e4556ca695"
   end
 
   head do
