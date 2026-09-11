@@ -4,6 +4,7 @@ class OpenjdkAT21 < Formula
   url "https://github.com/openjdk/jdk21u/archive/refs/tags/jdk-21.0.12.1-ga.tar.gz"
   sha256 "9c719670e7be6080a46ebeb1223a375bd53818ba7c5ae11f11a02907b593775f"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class OpenjdkAT21 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fcc7d987d1f32901ac87f2d6593a412350caba176e12f6aa4ddf38f6e77ec5a8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "90347ea4182570f370aa1b216ef7a1006c02f3f51ba193dd377a40a57f4f0e39"
   end
 
   keg_only :versioned_formula
