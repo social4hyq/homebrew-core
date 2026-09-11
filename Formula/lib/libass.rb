@@ -8,8 +8,7 @@ class Libass < Formula
   compatibility_version 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "372623e2f212c9edbb0a68371152b92cef4cb5398780ac4132f0bfb900ff4458"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ad029bd4c88e372c0f4d1e118ba6caffffab87ac4b7d98948b5b57442ef7e70"
   end
 
   head do
