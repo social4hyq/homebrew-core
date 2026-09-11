@@ -4,6 +4,7 @@ class Sqlancer < Formula
   url "https://github.com/sqlancer/sqlancer/archive/refs/tags/v2.0.0.tar.gz"
   sha256 "4811fea3d08d668cd2a41086be049bdcf74c46a6bb714eb73cdf6ed19a013f41"
   license "MIT"
+  revision 1
   head "https://github.com/sqlancer/sqlancer.git", branch: "main"
 
   bottle do
