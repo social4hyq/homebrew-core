@@ -7,7 +7,7 @@ class Codeburn < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d26fd551d5269b842af2d903a8468d1cca64bf16ff91747dc9c44b82c86428f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ff9157a8e0b8910c14e18d9a0345d707b83e4e898ab894123286cb231a3a207a"
   end
 
   depends_on "node"
