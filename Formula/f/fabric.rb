@@ -6,11 +6,11 @@ class Fabric < Formula
   url "https://files.pythonhosted.org/packages/e3/7e/29cd6237c3b7ce79c3ca945eb99ab5affd101db54b2f7a78dde0cfa19fd4/fabric-3.2.3.tar.gz"
   sha256 "dcbd2c47ad87688facaef5cc11aab6d1ec9ed05645fed97a5de7204d5d17cc44"
   license "BSD-2-Clause"
-  revision 1
+  revision 2
   head "https://github.com/fabric/fabric.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a16b2949ea624233a241180c5f8299eed537f9d9148c4af38bdde6ea40d4482"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b19ac316cb74315e3b624a7222c4571545d708e5792a40f1a9f58194e2364e41"
   end
 
   # `pkgconf` and `rust` are for bcrypt
