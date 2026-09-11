@@ -5,10 +5,10 @@ class FregeRepl < Formula
   version "1.4-SNAPSHOT"
   sha256 "2ca5f13bc5efaf8515381e8cdf99b4d4017264a462a30366a873cb54cc4f4640"
   license "BSD-3-Clause"
-  revision 2
+  revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2983cf8dd83338c2eb933102768e01584b75de0c6a61b6a152d914cacfb50adb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a85339dbf405d4d4809ba00568f473c323d17818f738555a1a9a34a4f072b7dc"
   end
 
   # Last release on 2015-10-18, last commit on 2019-02-22.
