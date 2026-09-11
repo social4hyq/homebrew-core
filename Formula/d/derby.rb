@@ -5,6 +5,7 @@ class Derby < Formula
   mirror "https://archive.apache.org/dist/db/derby/db-derby-10.17.1.0/db-derby-10.17.1.0-bin.tar.gz"
   sha256 "cbcfe4a0f07aab943cf89978f38d9047a9783233a770c54074bf555a65bedd42"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "89e48383892ba5705f1ef24d2c637254ea8dac0ee1c4b015211158ecef48b5a7"
