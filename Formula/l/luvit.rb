@@ -8,7 +8,7 @@ class Luvit < Formula
   head "https://github.com/luvit/luvit.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "df9d48ad4a9309f489856d9aabaaaac001850a7a32964fd2a1744d6c15cf88e0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "451bf70def17cb77753808a6c878243cebeb565cb96e188cd5019df18ce059a1"
   end
 
   depends_on "cmake" => :build
