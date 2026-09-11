@@ -8,7 +8,7 @@ class Ttyd < Formula
   head "https://github.com/tsl0922/ttyd.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9ee698d7663b76a0d31c9918cf4b496d5745353043bf526ac12cd8c9a0844656"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4baf25558c4edbb21a736c50827947213bcf6219b4a13658291ace20d5dc2f98"
   end
 
   depends_on "cmake" => :build
