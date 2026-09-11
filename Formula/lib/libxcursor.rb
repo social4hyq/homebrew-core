@@ -8,7 +8,7 @@ class Libxcursor < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f391002b81eb8cf4569d90250410b874eaa79682ad31a857fc5ec1c2963d7f52"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bbc4db8c8cdf90a255218e1b387955357d9b46c98fe624a3426a432768685fcc"
   end
 
   depends_on "pkgconf" => :build
