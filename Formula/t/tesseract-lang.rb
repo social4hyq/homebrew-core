@@ -7,7 +7,7 @@ class TesseractLang < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ac7313146b4651df63270185cefc520d8bb8245f20500056d46f7a88d6e284b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "130b161d7d40612428f06a4f6a5e2314c57524e3598a82479aa699c5fd55d140"
   end
 
   depends_on "tesseract"
