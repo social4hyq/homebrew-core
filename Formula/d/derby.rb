@@ -8,7 +8,7 @@ class Derby < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89e48383892ba5705f1ef24d2c637254ea8dac0ee1c4b015211158ecef48b5a7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3891bbec23135dbf86c523ec12172a6c402774042795ca9bec5cb3db2bdb605"
   end
 
   # Project is retired and will have no further releases
