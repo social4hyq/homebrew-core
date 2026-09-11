@@ -12,7 +12,7 @@ class Yuicompressor < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "43830f2ccf7752901898f7f31a80b4b43a514f25b5fb479c743410fd3dd313b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b6c7609e0420ca763a868ecbb4e6751b2db2793df4c986527738b3f867a77476"
   end
 
   depends_on "openjdk"
