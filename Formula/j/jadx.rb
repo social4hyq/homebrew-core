@@ -4,7 +4,7 @@ class Jadx < Formula
   url "https://github.com/skylot/jadx/archive/refs/tags/v1.5.6.tar.gz"
   sha256 "11bb5ebd8c3169ff3f87e6f928d60cff1545f0c55ba1f814ce67e43ba3f2a9e7"
   license "Apache-2.0"
-  revision 1
+  revision 2
   compatibility_version 1
   head "https://github.com/skylot/jadx.git", branch: "master"
 
