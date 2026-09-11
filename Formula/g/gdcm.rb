@@ -4,6 +4,7 @@ class Gdcm < Formula
   url "https://github.com/malaterre/GDCM/archive/refs/tags/v3.2.7.tar.gz"
   sha256 "b7b17b70c009677cf244cc7837b88386441e097f8861fdeee83aa27d1bc1b090"
   license "BSD-3-Clause"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Gdcm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b81176ae222bb959b960f5483d356817b78a50994ec723ed3d808d01a9edb2b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d5edeb28596fe4475955fa290f96ed589c7009ee8b79a51d9e5923f19a356a1"
   end
 
   depends_on "cmake" => :build
@@ -33,6 +34,10 @@ class Gdcm < Formula
     depends_on "zlib-ng-compat"
   end
 
+  patch do
+    file "Patches/gdcm/0001-python3-swig-typemaps.patch"
+  end
+
   def python3
     which("python3.14")
   end
@@ -42,7 +47,7 @@ class Gdcm < Formula
     python_include = if OS.mac?
       Formula["python@#{xy}"].opt_frameworks/"Python.framework/Versions/#{xy}/include/python#{xy}"
     else
-      Formula["python@#{xy}"].opt_include/"python#{xy}"
+      formula_opt_include("python@#{xy}")/"python#{xy}"
     end
 
     prefix_site_packages = prefix/Language::Python.site_packages(python3)
