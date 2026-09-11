@@ -1,10 +1,21 @@
 class DeepseekHarness < Formula
   desc "Open-source agent harness developed by DeepSeek AI"
   homepage "https://github.com/deepseek-ai/deepseek-harness"
-  url "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.1.2-rc.1.tgz"
-  sha256 "ca370668053ad6d0ac325e919ef5f65de53de00b7bad78008e6fb422dfce3530"
+  url "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.1.5-rc.2.tgz"
+  sha256 "f4c54839d69e82bf1c3a5a41a910c3ce1405cd9e9d97d753c0c04f406c7d7480"
   license "MIT"
   revision 1
+
+  # The npm `next` dist-tag carries the rc line while `latest` lags behind it
+  # (it still points at 0.1.5-rc.1). Read the published version list instead
+  # and let livecheck pick the newest; alpha/beta builds are filtered out
+  # because this formula tracks rc releases.
+  livecheck do
+    url "https://registry.npmjs.org/@deepseek-ai/dsh"
+    strategy :json do |json|
+      json["versions"].keys.grep_v(/-(?:alpha|beta|dev)\./i)
+    end
+  end
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "f37554df7508acfc6bb67ee8738ff6ccba2b2c505d8b0a714c5bb1166afb05c1"
@@ -18,17 +29,16 @@ class DeepseekHarness < Formula
   def install
     require "json"
 
-    system "npm", "install", *std_npm_args(ignore_scripts: true), "@img/sharp-wasm32"
+    # --min-release-age=0: Homebrew std_npm_args pins min-release-age=1 (1 day);
+    # dsh sub-packages were published the same day, so the default age gate
+    # rejects them (ETARGET). Freshly-released npm packages need this.
+    system "npm", "install", *std_npm_args(ignore_scripts: true), "--min-release-age=0", "@img/sharp-wasm32"
 
     Dir.chdir(libexec/"lib/node_modules/@deepseek-ai/dsh") do
       # OpenHarmony toolchain: CMake cannot identify clang, so koffi's
       # CMAKE_CXX_STANDARD 20 is not injected (clang defaults to C++14);
-      # force -std=c++20. brew's superenv also injects -fno-emulated-tls,
-      # which previously broke the OpenHarmony lld and was countered with
-      # -femulated-tls; that counter-flag is no longer forced (koffi 3.2.1 +
-      # clang 15 links and loads fine with native TLS). Defer koffi's build
-      # until after this inreplace (npm install would re-unpack and discard
-      # the inreplace below).
+      # force -std=c++20. Defer koffi's build until after this inreplace
+      # (npm install would re-unpack and discard the inreplace below).
       #
       # This cwd is the dsh package root, so `npm install <pkg>` re-resolves
       # the whole project. dsh 0.1.2-rc.1's devDependencies reference
@@ -39,7 +49,7 @@ class DeepseekHarness < Formula
       manifest = JSON.parse(File.read("package.json"))
       manifest.delete("devDependencies")
       File.write("package.json", JSON.pretty_generate(manifest) + "\n")
-      system "npm", "install", "koffi@^3.1.5", "--no-save", "--prefer-online", "--ignore-scripts"
+      system "npm", "install", "--ignore-scripts"
       koffi_cmake = "node_modules/koffi/src/koffi/CMakeLists.txt"
       inreplace koffi_cmake, "set(CMAKE_CXX_STANDARD 20)",
                 "set(CMAKE_CXX_STANDARD 20)\nset(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std=c++20\")"

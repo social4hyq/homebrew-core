@@ -1,14 +1,15 @@
 --- a/dsh-session-persistence-jsonl/lib/index.js
 +++ b/dsh-session-persistence-jsonl/lib/index.js
-@@ -1,6 +1,6 @@
+@@ -1,7 +1,7 @@
  import z from "@deepseek-ai/schemastery";
+ import { SessionFormatUnsupportedMigrationError, sessionFormatCatalog } from "@deepseek-ai/dsh-session-format-catalog";
  import { readdirSync } from "node:fs";
--import { link, mkdir, mkdtemp, open, readFile, readdir, realpath, rm, stat, truncate } from "node:fs/promises";
-+import { link, mkdir, mkdtemp, open, readFile, readdir, realpath, rename, rm, stat, truncate } from "node:fs/promises";
- import { dirname, join, parse, resolve, toNamespacedPath } from "node:path";
+-import { link, lstat, mkdir, mkdtemp, open, readFile, readdir, realpath, rm, stat, truncate } from "node:fs/promises";
++import { link, lstat, mkdir, mkdtemp, open, readFile, readdir, realpath, rename, rm, stat, truncate } from "node:fs/promises";
+ import { basename, dirname, isAbsolute, join, parse, resolve, toNamespacedPath } from "node:path";
  import { performance } from "node:perf_hooks";
  import { scheduler } from "node:timers/promises";
-@@ -1125,7 +1125,14 @@
+@@ -2970,7 +2970,14 @@
  		const tmp = await this.writeSyncedTempFile(finalPath, content);
  		let linked = false;
  		try {
@@ -37,7 +38,7 @@
  import { TextDecoder } from "node:util";
  //#region lib/types/win32.js
  /**
-@@ -499,7 +499,14 @@
+@@ -532,7 +532,14 @@
  		if (createIfAbsent !== void 0) try {
  			await linkFile(tempPath, absolutePath);
  		} catch (error) {
@@ -58,25 +59,42 @@
 @@ -4,7 +4,7 @@
  import { resolveDshHome } from "@deepseek-ai/dsh-home-paths";
  import { createHash, randomUUID } from "node:crypto";
- import { constants } from "node:fs";
+ import { constants, createReadStream } from "node:fs";
 -import { chmod, link, mkdir, open, readFile, rename, rm, unlink, writeFile } from "node:fs/promises";
 +import { chmod, copyFile, link, mkdir, open, readFile, rename, rm, unlink, writeFile } from "node:fs/promises";
  import sharp from "sharp";
- //#region lib/types/image.js
- /** Raster inspection: full decode at admission, header-only probe on verified reads. */
-@@ -189,7 +189,15 @@
- 		await handle.close();
- 		handle = void 0;
+ //#region lib/types/compression-limiter.js
+ /** Instance-owned concurrency bound for native image transformations. */
+@@ -469,7 +469,15 @@
+ 	try {
+ 		await ensureDurableDirectory(parent, await ensureDurableHome(dirname(dirname(resolve(root)))));
  		try {
--			await link(temporary, target);
+-			await link(source, target);
 +			try {
-+				await link(temporary, target);
++				await link(source, target);
 +			} catch (error) {
 +				// hmdfs filesystem does not support hard links (EPERM); publish via copy. COPYFILE_EXCL
 +				// keeps EEXIST flowing into the outer catch, so a concurrent
 +				// duplicate still goes through the sha256 integrity check.
 +				if (!(error instanceof Error && (error.code === "EPERM" || error.code === "ENOTSUP" || error.code === "ENOSYS"))) throw error;
-+				await copyFile(temporary, target, constants.COPYFILE_EXCL);
++				await copyFile(source, target, constants.COPYFILE_EXCL);
++			}
+ 		} catch (error) {
+ 			/* v8 ignore next -- Private same-filesystem directories make EEXIST the only recoverable link race. */
+ 			if (!(error instanceof Error && "code" in error && error.code === "EEXIST")) throw error;
+@@ -530,7 +538,15 @@
+ 	try {
+ 		await ensureDurableDirectory(parent, staged.boundary);
+ 		try {
+-			await link(staged.path, target);
++			try {
++				await link(staged.path, target);
++			} catch (error) {
++				// hmdfs filesystem does not support hard links (EPERM); publish via copy. COPYFILE_EXCL
++				// keeps EEXIST flowing into the outer catch, so a concurrent
++				// duplicate still goes through the sha256 integrity check.
++				if (!(error instanceof Error && (error.code === "EPERM" || error.code === "ENOTSUP" || error.code === "ENOSYS"))) throw error;
++				await copyFile(staged.path, target, constants.COPYFILE_EXCL);
 +			}
  		} catch (error) {
  			/* v8 ignore next -- Private same-filesystem directories make EEXIST the only recoverable link race. */
