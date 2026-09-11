@@ -4,6 +4,7 @@ class JettyRunner < Formula
   url "https://search.maven.org/remotecontent?filepath=org/eclipse/jetty/jetty-runner/11.0.26/jetty-runner-11.0.26.jar"
   sha256 "b6403baf0782c2154231b23109fb84247e2ee95d295f4621ca9bdc75dfebc762"
   license any_of: ["Apache-2.0", "EPL-1.0"]
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=org/eclipse/jetty/jetty-runner/maven-metadata.xml"
@@ -11,8 +12,7 @@ class JettyRunner < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fca77b7a19f0797083b03d88d4ffcfea7d943f500b832ed9adae6c1e3af915b9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a88df253debd9fa3d0182d8ad9a6e2d4df61f6175e205f0d83a8364b7d5e3d42"
   end
 
   # See: https://github.com/jetty/jetty.project/issues/1905#issuecomment-409662335
