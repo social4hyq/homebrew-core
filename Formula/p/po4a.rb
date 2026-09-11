@@ -8,11 +8,11 @@ class Po4a < Formula
   url "https://github.com/mquinson/po4a/archive/refs/tags/v0.74.tar.gz"
   sha256 "6e390eb7707501a86f2e648d78fddb0d211d1e8699aa1ee201176e9f966a798b"
   license "GPL-2.0-or-later"
-  revision 2
+  revision 3
   head "https://github.com/mquinson/po4a.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a3f12413b3f9252bca6eac81933cde55ec81ba83be4d554e7c12de21085aeaec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e64c0f3303335f0b3213fb5260ea1f381436b6d27fbbf68a02dc03f2b8939d3b"
   end
 
   depends_on "docbook-xsl" => :build
