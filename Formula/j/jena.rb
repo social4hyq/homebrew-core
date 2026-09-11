@@ -8,7 +8,7 @@ class Jena < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "992179c22ed61fb1c8623b9a96b4f6c5d28f7971cea10592092ec007c8ce6997"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a70be913efd3813a7c3ad3aad6406f78183072fd6f4d4e8297799f700c10a65"
   end
 
   depends_on "openjdk"
