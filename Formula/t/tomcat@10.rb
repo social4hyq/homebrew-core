@@ -5,6 +5,7 @@ class TomcatAT10 < Formula
   mirror "https://archive.apache.org/dist/tomcat/tomcat-10/v10.1.59/bin/apache-tomcat-10.1.59.tar.gz"
   sha256 "15e435e8ecafd30e500dec7cd30fc289aed4cd8743db14d55024896be77d9241"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
