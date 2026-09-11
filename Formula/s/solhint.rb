@@ -7,7 +7,7 @@ class Solhint < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a51e546889973ddd77a9ab4d16c3a383912d77e43c0696e3490916690d76413"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c484c4403cf3b4bb132b10557b468be503ead487e1b6d111c1dd3234374e920"
   end
 
   depends_on "node"
