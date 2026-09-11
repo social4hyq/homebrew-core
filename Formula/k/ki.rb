@@ -4,10 +4,11 @@ class Ki < Formula
   url "https://github.com/Kotlin/kotlin-interactive-shell/archive/refs/tags/v0.5.2.tar.gz"
   sha256 "5b65d784a66b6e7aa7e6bc427e2886435747cb9b2969f239d3be1f2190929fe7"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/Kotlin/kotlin-interactive-shell.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4733f7eb1954e7d724dc4eff89ee71f84d06e18008b198ebdda8b2b523789b2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc547d627ddefe1293fc8c10078f47d7a0f3f3ac3d7d5ef241a5a891eba124f8"
   end
 
   # not compatible with kotlin 2.0+, https://github.com/Kotlin/kotlin-interactive-shell/issues/131
