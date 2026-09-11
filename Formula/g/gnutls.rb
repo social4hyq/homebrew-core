@@ -5,7 +5,7 @@ class Gnutls < Formula
   mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz"
   sha256 "ffed8ec1bf09c2426d4f14aae377de4753b53e537d685e604e99a8b16ca9c97e"
   license all_of: ["LGPL-2.1-or-later", "GPL-3.0-only"]
-  revision 2
+  revision 3
   compatibility_version 2
 
   # The download page links to the directory listing pages for the "Next" and
@@ -32,7 +32,7 @@ class Gnutls < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6d31bffc1ff71966fb096901e98ad592a24091f04bd060a298d559f5baa8181"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c68c2cb17385afb3b5d90f93316bebbf0db7308b3dbf72133868aaf7ee24bb0"
   end
 
   depends_on "pkgconf" => :build
