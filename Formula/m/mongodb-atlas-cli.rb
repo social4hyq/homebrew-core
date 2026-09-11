@@ -13,7 +13,7 @@ class MongodbAtlasCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1cde6d1bb9ecd065bfc40f55a4ca590ab2c5635277f4d41006d4117bf69afd7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11d3d54b5685841b25979fafc4659a6ecf992e3bd133903efb0e6b84583fea22"
   end
 
   depends_on "go" => :build
