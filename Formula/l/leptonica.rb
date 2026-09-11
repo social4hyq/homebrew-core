@@ -4,6 +4,7 @@ class Leptonica < Formula
   url "https://github.com/DanBloomberg/leptonica/releases/download/1.87.0/leptonica-1.87.0.tar.gz"
   sha256 "c73363397f96eb1295602bf44d708a994ad42046c791bf03ea0505d829bdb6a7"
   license "BSD-2-Clause"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Leptonica < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f5f76b43e1d710c6f3655fd080194fba19977995b2c75fa15c8a76a69eb4ca64"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "829c1b12594461ba93d990e382a46e036ce8b409e9c3fa2005d6bdbf908400dd"
   end
 
   depends_on "pkgconf" => :build
