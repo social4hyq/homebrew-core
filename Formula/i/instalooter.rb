@@ -6,10 +6,10 @@ class Instalooter < Formula
   url "https://files.pythonhosted.org/packages/30/13/907e6aaba6280e1001080ab47e750068ffc5fb7174203985b3c9d678e3f2/instalooter-2.4.4.tar.gz"
   sha256 "fb9b4a948702361a161cc42e58857e3a6c9dafd9e22568b07bc0d0b09c3c34a9"
   license "GPL-3.0-or-later"
-  revision 18
+  revision 19
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "31560ef6e2226bd5fa79179bb0a6e70913d8bb8bc27c82afc49b3d376b26c9b2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "66204017f7f8c95a4222f6022d5c9bcc98905ba9a5d59bd92f78e0a795fafe1f"
   end
 
   depends_on "certifi" => :no_linkage
