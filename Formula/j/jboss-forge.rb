@@ -19,7 +19,7 @@ class JbossForge < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "88a52fb5c156921a5e5376f749d00c29c6aa73589c961d32f9a7dbbdf5729728"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa87c72f8d9aa03de5cdbd0849b01765c41b4803e8779c66cff9dbc215d1de17"
   end
 
   depends_on "openjdk"
