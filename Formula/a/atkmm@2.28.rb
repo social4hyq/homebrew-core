@@ -12,7 +12,7 @@ class AtkmmAT228 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb2315af7ef783e7fb44a915897271cb0c3c57f8b7e15884b47f77e61f9c34b4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e72df358e170b061b6ed228fb5d510a870887745a84917396ea17ad782b3c5dc"
   end
 
   depends_on "meson" => :build
