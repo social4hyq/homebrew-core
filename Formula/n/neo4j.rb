@@ -4,6 +4,7 @@ class Neo4j < Formula
   url "https://neo4j.com/artifact.php?name=neo4j-community-2026.07.1-unix.tar.gz"
   sha256 "fbb3a11705cdbc87953242e3667dad37cd39f8d1e1168faa642c01a2fd1d144d"
   license "GPL-3.0-or-later"
+  revision 1
 
   livecheck do
     url "https://neo4j.com/deployment-center/"
