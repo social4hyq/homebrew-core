@@ -5,6 +5,7 @@ class Maven < Formula
   mirror "https://archive.apache.org/dist/maven/maven-3/3.9.16/binaries/apache-maven-3.9.16-bin.tar.gz"
   sha256 "80ffca22aed9e8b9713a232f3394fd81d7f20322df75efdb2b047dbd3e3a23bb"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   livecheck do
