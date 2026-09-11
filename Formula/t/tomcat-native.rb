@@ -5,6 +5,7 @@ class TomcatNative < Formula
   mirror "https://archive.apache.org/dist/tomcat/tomcat-connectors/native/2.0.16/source/tomcat-native-2.0.16-src.tar.gz"
   sha256 "785fdd99a202f442b085bc718d2fbeb393b85979aa4a2943302118c4acd68630"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "7ad7b4f032e4844b351bd91e4fce4951a5497154d8d2411d3ae771fb9b34daa8"
