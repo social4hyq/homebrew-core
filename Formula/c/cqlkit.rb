@@ -7,7 +7,7 @@ class Cqlkit < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "073f1c78875a0fc61cffe4e9e0583e78d0c1080d0fac4562b958e6f461d7e496"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1eac06ab9fdbe129aeb5c69d2e6a36fbad1b74f0ca7d8fefe378f1da0ed90356"
   end
 
   depends_on "openjdk"
