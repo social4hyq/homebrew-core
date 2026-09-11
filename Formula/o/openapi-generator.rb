@@ -4,6 +4,7 @@ class OpenapiGenerator < Formula
   url "https://search.maven.org/remotecontent?filepath=org/openapitools/openapi-generator-cli/7.25.0/openapi-generator-cli-7.25.0.jar"
   sha256 "41ce4f6b07f196676439d710759fa1ced7a08066d06ff1bf314681470289efae"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=org/openapitools/openapi-generator-cli/maven-metadata.xml"
