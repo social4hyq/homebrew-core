@@ -15,7 +15,7 @@ class Helidon < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "03d007c996780318d498a73b395a3526bab3f72bdee6bf3cc071711f3fb933f6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cea9c943e5da912d161133eef189a4a9ca41b46d023a2d1aaf435aa288c8046b"
   end
 
   depends_on "maven"
