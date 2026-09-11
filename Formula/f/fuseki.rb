@@ -5,6 +5,7 @@ class Fuseki < Formula
   mirror "https://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-6.2.0.tar.gz"
   sha256 "e3b8b033872cd2f24091603bec1e7eb21cc3e1def5b9572658c48143e86b977f"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "0f8a1f4388b3cb91ecbaa0f494ec4b2aad6974a9a7388f6bf4656901b182165e"
