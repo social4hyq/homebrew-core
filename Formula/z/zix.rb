@@ -4,10 +4,11 @@ class Zix < Formula
   url "https://gitlab.com/drobilla/zix/-/archive/v0.8.2/zix-v0.8.2.tar.gz"
   sha256 "a2464cdc11fa359b5e713b3c82bf0b476952efe397a02374ddbc1b62eee04f13"
   license "ISC"
+  revision 1
   head "https://gitlab.com/drobilla/zix.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d722b71f390bf315afd449a08f2b8bedfe9c59af5db5c448ac3150d4bf449e1a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8493edafc47114a20907257571d6b61583bcdde1dc3f9fc40ce56b0f215ac5c6"
   end
 
   depends_on "meson" => :build
