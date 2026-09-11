@@ -7,7 +7,7 @@ class Briss < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e3e95c00cd08b3cca1d218558278c4724ccd9ef19f2a48c2f02e1c0fbc6b357"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e0fddbcb7031af47d682eff08aca276b96b740bd467222f00a380619bd04ced"
   end
 
   depends_on "openjdk"
