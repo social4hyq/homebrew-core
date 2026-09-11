@@ -9,7 +9,7 @@ class Sgr < Formula
   revision 16
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b77d5e619bb15a33c3f2558031bc73a873bb1a4db522310c1d41b1a26c779c13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7b33ce325e1691f1ea553035fd4f08fe396374b42997c1b61d5bc91186f3de0"
   end
 
   deprecate! date: "2025-06-21", because: :unmaintained
