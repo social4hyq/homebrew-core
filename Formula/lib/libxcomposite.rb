@@ -7,7 +7,7 @@ class Libxcomposite < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8f3d05f5648e119c01e8d339128d4b307d527c41cab36280109ba09c37ad5d2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c365cf0e376faa6ede2efd8d7e02747f362c4267f015b6d6274e3f56634d39fc"
   end
 
   depends_on "pkgconf" => :build
