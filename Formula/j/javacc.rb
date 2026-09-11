@@ -4,6 +4,7 @@ class Javacc < Formula
   url "https://github.com/javacc/javacc/archive/refs/tags/javacc-7.0.13.tar.gz"
   sha256 "d1bfebb4ca9261c5c3b16b00280b3278a41b193ca8503f2987f72de453bf99c6"
   license "BSD-3-Clause"
+  revision 1
 
   livecheck do
     url :stable
