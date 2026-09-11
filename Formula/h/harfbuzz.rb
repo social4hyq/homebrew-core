@@ -4,11 +4,12 @@ class Harfbuzz < Formula
   url "https://github.com/harfbuzz/harfbuzz/releases/download/14.4.0/harfbuzz-14.4.0.tar.xz"
   sha256 "2357ed966c6ced7bfa720b0640c0231065af01158fbea215093ffa15aed44371"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/harfbuzz/harfbuzz.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdb92181729ee4b348ff08b941dd36f9847ce9f8128270e7b5f3b563fff3d932"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1850f150ed7376f2dc01b77ba4f182bd2da53dedecc207e23c6cc484a443b815"
   end
 
   depends_on "gobject-introspection" => :build
