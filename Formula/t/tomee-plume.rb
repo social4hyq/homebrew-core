@@ -5,6 +5,7 @@ class TomeePlume < Formula
   mirror "https://archive.apache.org/dist/tomee/tomee-10.2.0/apache-tomee-10.2.0-plume.tar.gz"
   sha256 "35a3debe0eb845b063f6f68c633bd14365a35f0c689d0780b1832c39bc83a78e"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "7f36bd146a08144631f8329da311f9c2a7400907efe318a5107a5f4d7cf4a2b0"
