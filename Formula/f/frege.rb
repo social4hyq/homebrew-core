@@ -4,7 +4,7 @@ class Frege < Formula
   url "https://github.com/Frege/frege/releases/download/3.24public/frege3.24.405.jar"
   sha256 "f5a6e40d1438a676de85620e3304ada4760878879e02dbb7c723164bd6087fc4"
   license "BSD-3-Clause"
-  revision 3
+  revision 4
 
   # The jar file versions in the GitHub release assets are often different
   # than the tag version, so we can't identify the latest version from the tag
@@ -23,8 +23,7 @@ class Frege < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5416d39ad64ee8c6d5e0e43d7e43dd47f9c245b5cb60e409f42cc98643c63cf3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f85ca8daac711acb96f0c8d2b0b1a4f5590d3693592ff9d8a2defca3ac643563"
   end
 
   depends_on "openjdk"
