@@ -1,8 +1,8 @@
 class Odpi < Formula
   desc "Oracle Database Programming Interface for Drivers and Applications"
   homepage "https://oracle.github.io/odpi/"
-  url "https://github.com/oracle/odpi/archive/refs/tags/v6.0.0.tar.gz"
-  sha256 "86c3ab03bb58efe259755db398962324e1401c1e2ea4c535fd47d236206e092b"
+  url "https://github.com/oracle/odpi/archive/refs/tags/v26.0.0.tar.gz"
+  sha256 "419cc5d64ad052261244a818d40beb135ce147480f9ef19acc105eba8a96d60d"
   license any_of: ["Apache-2.0", "UPL-1.0"]
 
   bottle do
