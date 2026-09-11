@@ -9,7 +9,7 @@ class Screen < Formula
   head "https://git.savannah.gnu.org/git/screen.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "221f1dc7e629913ad5a7484e2c1b865f5f3328fcd4f7b2d6e7729d8d419b8d6e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec4655d52313b56e2ab6c0280b14d96ac121823f1e61cf88da8a1da39a220689"
   end
 
   depends_on "autoconf" => :build
