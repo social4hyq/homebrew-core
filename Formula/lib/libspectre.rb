@@ -4,7 +4,7 @@ class Libspectre < Formula
   url "https://libspectre.freedesktop.org/releases/libspectre-0.2.12.tar.gz"
   sha256 "55a7517cd3572bd2565df0cf450944a04d5273b279ebb369a895391957f0f960"
   license "GPL-2.0-or-later"
-  revision 2
+  revision 3
   compatibility_version 1
 
   livecheck do
@@ -13,7 +13,7 @@ class Libspectre < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "11d594053cd142d013f7ab3ff5efb3651110b8fd23655a5720c1f7bbe9d6640e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "41e88140bf18ecef8c6e1119132e4a8024475514f942c480901ffab2edbe99e5"
   end
 
   depends_on "ghostscript"
