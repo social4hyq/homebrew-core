@@ -9,7 +9,7 @@ class B4 < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f8034eaa644abd5a445bd54317bf7632ac21c3a7f9e844efca18cf0a6ca76c8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ad03ab60a2072fd836fe395ff9f4a2dd97ab6d710b2e87125084422e8984e42"
   end
 
   depends_on "certifi" => :no_linkage
