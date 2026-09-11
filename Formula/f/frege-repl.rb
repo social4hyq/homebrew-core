@@ -5,7 +5,7 @@ class FregeRepl < Formula
   version "1.4-SNAPSHOT"
   sha256 "2ca5f13bc5efaf8515381e8cdf99b4d4017264a462a30366a873cb54cc4f4640"
   license "BSD-3-Clause"
-  revision 2
+  revision 3
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "2983cf8dd83338c2eb933102768e01584b75de0c6a61b6a152d914cacfb50adb"
