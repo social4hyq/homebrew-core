@@ -4,6 +4,7 @@ class Moco < Formula
   url "https://search.maven.org/remotecontent?filepath=com/github/dreamhead/moco-runner/1.6.1/moco-runner-1.6.1-standalone.jar"
   sha256 "f61ea62275e2b11590472b74de933a65f62ea05ff4de8b94f6b06173773301b1"
   license "MIT"
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=com/github/dreamhead/moco-runner/"
@@ -11,8 +12,7 @@ class Moco < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "abdd3bdebf776e3b27cf0547b5119535122d7a8aeff7da342cc637cd5d9fa3d4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b60393b105e599ee7cbea53dbfeaefed67683595292582b4ad71056474815541"
   end
 
   depends_on "openjdk"
