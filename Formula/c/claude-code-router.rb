@@ -7,7 +7,7 @@ class ClaudeCodeRouter < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "72966acee8593d225abaa9706366d63e9472e7ca9b5024f5040370872142ad65"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "995eee3fc707f3e63a5847017c8b82d0140566d7304d66d95ca317020f852edb"
   end
 
   depends_on "node"
