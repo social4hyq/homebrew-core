@@ -4,6 +4,7 @@ class Proguard < Formula
   url "https://github.com/Guardsquare/proguard/releases/download/v7.10.0/proguard-7.10.0.tar.gz"
   sha256 "fbff4dfe037d0724ff767ad555c06ebd14063ccf99a657cf05a69e6f2610da21"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url :stable
