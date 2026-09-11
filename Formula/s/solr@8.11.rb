@@ -5,9 +5,10 @@ class SolrAT811 < Formula
   mirror "https://archive.apache.org/dist/lucene/solr/8.11.4/solr-8.11.4.tgz"
   sha256 "163fbdf246bbd78910bc36c3257ad50cdf31ccc3329a5ef885c23c9ef69e0ebe"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a50c8b5dfe3475e36d102fef09eb1c05cca86f1742d74092102b79ae4b42d6d8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ef3adf31b9a6cabc298222b46c817d5a5b568c9ddd266c5106bcf10986077b3"
   end
 
   keg_only :versioned_formula
