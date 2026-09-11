@@ -7,7 +7,7 @@ class HfMcpServer < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f476bfbed515f82c200ee52df1abbbc164cc29cb0d8dfd3460426e8ac7756695"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e182966764020b078eb09eb30b55b256b0030317e7a899bfa8bfb8e3fc73c97b"
   end
 
   depends_on "node"
