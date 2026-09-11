@@ -5,7 +5,7 @@ class NodeAT24 < Formula
   sha256 "2732fc3f588dd335cd6779c06864f7cd424bb1b5ff9a1743059a66c54f9ca4a1"
   license "MIT"
   compatibility_version 1
-  revision 2
+  revision 3
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -13,7 +13,7 @@ class NodeAT24 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ab2b66dadaf8a6b1e27f7a983bbb04d28b9010957d2317b9aa2429c7ab50f9e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e75e26a48303286e27f3b446fcc9603b8d47911a51f53e947cd2c1bae259387"
   end
 
   patch do
