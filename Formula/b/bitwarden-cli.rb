@@ -4,6 +4,7 @@ class BitwardenCli < Formula
   url "https://github.com/bitwarden/clients/archive/refs/tags/cli-v2026.8.0.tar.gz"
   sha256 "3240867f6dbe4e2f7623c727bb61e8b1cb40ff78f627fcc504e22cb022c941b9"
   license "GPL-3.0-only"
+  revision 1
   head "https://github.com/bitwarden/clients.git", branch: "main"
 
   livecheck do
@@ -12,7 +13,7 @@ class BitwardenCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8eb500f18fc94a2091c5575222a689f2129aaa21fc1ed6def7313666813c3e96"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6503f9b336fee8ad073c2249d7efb0fa82192f231fa90e3934b0a57e5de351ad"
   end
 
   depends_on "node"
