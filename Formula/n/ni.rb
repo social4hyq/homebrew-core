@@ -7,7 +7,7 @@ class Ni < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "36e5e3a12289e4a0791aabba9e336577e9dec79fe5c07bbc94fcfd0ac910a105"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "246c0577a25015e0d2867cfaad072e02e113868b51b5877e690663ffbdec0a86"
   end
 
   depends_on "node"
