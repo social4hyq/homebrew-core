@@ -8,7 +8,7 @@ class Atop < Formula
   head "https://github.com/Atoptool/atop.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89fe68f3ca23cd68e56127cabc24358ef28023873c09115d67c7d32f2da0dc9a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d9ceb0018b5afb310476b630918ee5e537b8f7ebb3f1cd0d2623b059764c6cf"
   end
 
   depends_on "pkgconf" => :build
