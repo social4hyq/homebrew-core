@@ -4,9 +4,10 @@ class Libxdamage < Formula
   url "https://www.x.org/archive/individual/lib/libXdamage-1.1.7.tar.xz"
   sha256 "127067f521d3ee467b97bcb145aeba1078e2454d448e8748eb984d5b397bde24"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b44d4c698e645a940ab6ca7f3efaa222db245550f7346343d7ab3ac21987cf55"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07f2718e889a92e55c63e2106baddec998230c8ce51b55dd1ff064ad35b9cbd0"
   end
 
   depends_on "pkgconf" => :build
