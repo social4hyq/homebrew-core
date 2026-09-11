@@ -4,6 +4,7 @@ class Sf < Formula
   url "https://registry.npmjs.org/@salesforce/cli/-/cli-2.150.6.tgz"
   sha256 "11ede48cb63d613d42acdb16b1622a047666a5cd80eefabdf612f9c53782d50e"
   license "BSD-3-Clause"
+  revision 1
 
   livecheck do
     url "https://registry.npmjs.org/@salesforce/cli/latest"
@@ -13,7 +14,7 @@ class Sf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "682d3e2652ae9dc9714bcb56571b27f7e1150ddad033ec548b19fc2cd589b786"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "89025b2ac2e6e5517ca7803eff67b5873216f3e1dc8f21c9ba3d3d2cc3d3e7d9"
   end
 
   depends_on "node"
