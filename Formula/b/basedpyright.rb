@@ -7,7 +7,7 @@ class Basedpyright < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e29d6e4cb5cefe0ad2935de2513b463c3f9f92ea4c9c430923d33e6a0906bd8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "17fd082dfe6e995876074601f6a9103751b3b6aaaf3ffb97e3ce3d71d0395b6b"
   end
 
   depends_on "node"
