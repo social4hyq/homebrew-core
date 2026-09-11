@@ -14,7 +14,7 @@ class Tesseract < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b907506dcbb253384f240f705c0c24e97a27e3fc98c47ec11f13db1ac70a2839"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f64b7e25875021b1c49bfd10f0ef0d88f48a9a97540a0a57903cfab40c13db28"
   end
 
   depends_on "autoconf" => :build
