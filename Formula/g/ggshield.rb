@@ -10,7 +10,7 @@ class Ggshield < Formula
   head "https://github.com/GitGuardian/ggshield.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "95e0acf13e2a394f0eea4adaa1ccda4cf55403afd92ea07388797a8edc69227a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "112fdc4ab917733f7e140669eadee8d43a35d184d8aa72e89dd3acebf148f2cb"
   end
 
   depends_on "pkgconf" => :build # for `rfc3161_client`
