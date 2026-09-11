@@ -7,6 +7,7 @@ class Ffmpeg < Formula
   # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
   # Passing `--enable-version3` changes the license to GPL v3+.
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 2
   head "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
 
@@ -16,8 +17,7 @@ class Ffmpeg < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9dd0fa4041942a50b9dbdb7f72cd4927fe89336fecf7a117e68fa29a40599c61"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "060fc4a38f864eb1b7233f40f7477f21d16884cea5de88c04321998b90b43f36"
   end
 
   depends_on "pkgconf" => :build
