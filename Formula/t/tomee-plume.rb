@@ -8,7 +8,7 @@ class TomeePlume < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f36bd146a08144631f8329da311f9c2a7400907efe318a5107a5f4d7cf4a2b0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee603e9dcda618a73fd5c22fd979ed9cee4781c23201e19baace35388e197df6"
   end
 
   depends_on "openjdk"
