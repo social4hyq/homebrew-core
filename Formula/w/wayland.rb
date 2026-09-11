@@ -4,6 +4,7 @@ class Wayland < Formula
   url "http://ftp.debian.org/debian/pool/main/w/wayland/wayland_1.26.0.orig.tar.xz"
   sha256 "64176eaa46e4969903e286f8e5ef8331affc17fdf03ac9b58381d2b23162b7a3"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   # Versions with a 90+ patch are unstable (e.g., 1.21.91 is an alpha release)
@@ -14,7 +15,7 @@ class Wayland < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "690fed8c618ac641523de013f0c63932585ae3abdfd3c9eece0b2458779cf676"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7aa3e8cdbc9a99a42ace6a174cba28b2ec537b60bcbb57e551ab30a3f0ae59ae"
   end
 
   depends_on "meson" => :build
