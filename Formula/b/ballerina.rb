@@ -4,6 +4,7 @@ class Ballerina < Formula
   url "https://dist.ballerina.io/downloads/2201.13.6/ballerina-2201.13.6-swan-lake.zip"
   sha256 "1fbb2a607e5216b377b6c206f340a0d3070546265d5e83d3bbcbad7c610e4593"
   license "Apache-2.0"
+  revision 1
 
   # The Downloads and Installation Options pages don't include any version
   # information or download links in the HTML. This information is instead
@@ -18,7 +19,7 @@ class Ballerina < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c766a5bcbdca0cdc37f0fe6c7f358ef015a27147dea314994614b4c005ada55"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "80ae5ecc9b056fc184e6aa12795b7dcc4907d3cd3386cb5d8c9420093f09c002"
   end
 
   depends_on "openjdk"
