@@ -6,10 +6,10 @@ class Sysaidmin < Formula
   url "https://files.pythonhosted.org/packages/01/d8/f2b32cc85a544d1487bbdda7ec48d214c0e551d2d0ae6bbbb49d707fe297/sysaidmin-0.2.5.tar.gz"
   sha256 "77c40710cead7bdcc6cb98b38d74dd05e1e1c24dbc450e3b983869a7c06da91f"
   license "AGPL-3.0-or-later"
-  revision 18
+  revision 19
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a54eaaf17da698946807cdad1270cd427564febbbbf76c6aacc6487c29fa0e6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7f926d12f781861e9e5d6e62a5766a548ffa751b0617282230d8073f17fc908"
   end
 
   depends_on "rust" => :build # for jiter
