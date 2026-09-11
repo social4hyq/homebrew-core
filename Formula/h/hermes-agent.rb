@@ -6,6 +6,7 @@ class HermesAgent < Formula
   url "https://github.com/NousResearch/hermes-agent/archive/refs/tags/v2026.9.7.tar.gz"
   sha256 "907c2a72db1c5dd637ea8eeae97f4cb5b32cef615c17258f6b190924ec5bf688"
   license "MIT"
+  revision 1
   head "https://github.com/NousResearch/hermes-agent.git", branch: "main"
 
   livecheck do
@@ -14,7 +15,7 @@ class HermesAgent < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a3a88e81c3d39be768351adb10be1c422f976af0ae9838cb3330a8bc8ef569e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "31d5247073e0ec25cc947317536c3802ef13dc9b7064a1c96c6c2d25056e0249"
   end
 
   depends_on "pkgconf" => :build
