@@ -4,11 +4,11 @@ class Blockhash < Formula
   url "https://github.com/commonsmachinery/blockhash/archive/refs/tags/v0.3.3.tar.gz"
   sha256 "3c48af7bdb1f673b2f3c9f8c0bfa9107a7019b54ac3b4e30964bc0707debdd3a"
   license "MIT"
-  revision 4
+  revision 5
   head "https://github.com/commonsmachinery/blockhash.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "348a91dc62fa2624f704fc116e217380f43ed0d4bdbf089b1778e5228f4de668"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3023d7c3e2c9c864acd6a1da02118e41eeda643d49cc3f7be77688a380a13755"
   end
 
   depends_on "pkgconf" => :build
