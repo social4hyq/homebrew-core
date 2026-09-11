@@ -4,6 +4,7 @@ class Jetty < Formula
   url "https://search.maven.org/remotecontent?filepath=org/eclipse/jetty/jetty-home/12.1.13/jetty-home-12.1.13.tar.gz"
   sha256 "14179049118d492b6b91f52d0f0d7d26f26af747ac8defe7a41fdd0a1bbab775"
   license any_of: ["Apache-2.0", "EPL-2.0"]
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=org/eclipse/jetty/jetty-home/maven-metadata.xml"
@@ -11,7 +12,7 @@ class Jetty < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1077a83bb64a077fe39e8c5e38a2952fe21af982c6eb6e3ec93e9003d1a82278"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cfa248bf3582061531a4c070e150a7cced4d7b85df5fbcaa62c84a757ca19f82"
   end
 
   depends_on "openjdk"
