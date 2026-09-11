@@ -5,6 +5,7 @@ class TomcatAT9 < Formula
   mirror "https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.121/bin/apache-tomcat-9.0.121.tar.gz"
   sha256 "d1a804502cddfd1c1436c1c37809ed4cb807a9c64a8a35fe1747d3ba9a0edeab"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
