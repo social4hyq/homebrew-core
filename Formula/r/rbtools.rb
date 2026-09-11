@@ -6,10 +6,11 @@ class Rbtools < Formula
   url "https://files.pythonhosted.org/packages/47/45/e6d3e9e63416e8a820aefe09d46cccc931fc0705947361a67703a587e11e/rbtools-6.0.tar.gz"
   sha256 "6cef4170edafbb0d804c61b208dbc4d4685b8e654b98b667ae084ac610a66db4"
   license "MIT"
+  revision 1
   head "https://github.com/reviewboard/rbtools.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e0e205842386d675cc3f8f7787ce48cf714d5ad743f7bbd9ba4673132fac7b5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "110375b6fd709bd85165ae28d46d2354d466009cabd9f7a572cbbc0aa2bedd41"
   end
 
   depends_on "certifi" => :no_linkage
