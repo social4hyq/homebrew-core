@@ -9,7 +9,7 @@ class Barman < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a8127ef80ed68e369377806aff839062d1eb65f6838d60f845b359e88299d7f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "492a18159b6818582c9465197cb2a419a2598ded1a995bd21f6ccee4e8575ee5"
   end
 
   depends_on "rust" => :build # for uv_build > maturin
