@@ -4,7 +4,7 @@ class Libgxps < Formula
   url "https://download.gnome.org/sources/libgxps/0.3/libgxps-0.3.2.tar.xz"
   sha256 "6d27867256a35ccf9b69253eb2a88a32baca3b97d5f4ef7f82e3667fa435251c"
   license "LGPL-2.1-or-later"
-  revision 3
+  revision 4
   head "https://gitlab.gnome.org/GNOME/libgxps.git", branch: "master"
 
   livecheck do
@@ -13,7 +13,7 @@ class Libgxps < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac06f0be145a70c4393812f6cf5540d5a08ab36f12a826f472f4872fc221f898"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "35c6f3e5c8b59dda6018267ccd8b34738449d5236418ae29cd244d8a19fc95ba"
   end
 
   keg_only "it conflicts with `ghostscript`"
