@@ -15,7 +15,7 @@ class AppstreamGlib < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dc397d07a8f69588d5024e29d739c67cccc31dd7333dd74897678d31d1766b8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8964f0a212325e3decb3f7ad7a01e5f56ecec7b2d227b23f7fb52fbb0d3d843c"
   end
 
   depends_on "docbook" => :build
