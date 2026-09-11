@@ -7,7 +7,7 @@ class Npq < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "104ad257799df959981b6d8ca10a60357d2b5275037c2132e430031481b6a994"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "af77f4240d1ef7535987bc7346103e4ef59bd609acb702647cc83120d30f80dd"
   end
 
   depends_on "node"
