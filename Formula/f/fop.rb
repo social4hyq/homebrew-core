@@ -5,9 +5,10 @@ class Fop < Formula
   mirror "https://archive.apache.org/dist/xmlgraphics/fop/binaries/fop-2.11-bin.tar.gz"
   sha256 "b7e12dc8c96ce0087742757debad3798fa6f8778f8b8ed7acfbf6e405e4ede76"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5f501bb8a4784838d0791d6a69afa3af6aae086a3b42f6d1ed3305b071f03c2b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "87bc1da16dee6b6949f3e78d8fbf565802fc6162c4b4bb8bb4bccf48c786d91f"
   end
 
   depends_on "openjdk"
