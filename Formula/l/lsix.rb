@@ -8,7 +8,7 @@ class Lsix < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6653a3c0b730afa45dc0278912871c668a59752ba1ff1a3b5d36aa7430f8fd2f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b14eee3d40b13bdbbce2b0a7857153bd622b45e8eeec10b7e17f034ff15d22d9"
   end
 
   depends_on "imagemagick"
