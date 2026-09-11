@@ -10,7 +10,7 @@ class Iocextract < Formula
   head "https://github.com/InQuest/iocextract.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f439da95df479dec355ecf707eeae77cb2144f27b944d0b868cfc169d12bbd02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "47316c6b4ea491a5cf89dbcd1d4b4c34d709495096f61622e1d45429a8b7c039"
   end
 
   depends_on "certifi" => :no_linkage
