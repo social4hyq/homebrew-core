@@ -7,7 +7,7 @@ class FirebaseCli < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e00277c8f7053fefebf4b05c62f7c261a35350c4e16ae1760299ecaab487e58"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "10643f776f801ebf4f9082794b88efbbd562c9aede51021f1a6610a5a98e6d73"
   end
 
   depends_on "node"
