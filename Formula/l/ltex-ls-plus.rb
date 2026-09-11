@@ -8,7 +8,7 @@ class LtexLsPlus < Formula
   head "https://github.com/ltex-plus/ltex-ls-plus.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "53fd4f56739386bfb9fb0f8d366f287212be9509d040814a2735d06862630eab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3329fa7c965509e72585e6d8a8dfdf773a834c30ab008f04724021983deb7be"
   end
 
   depends_on "maven" => :build
