@@ -13,7 +13,7 @@ class Pixman < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89a4ee061de03a8dd91e9cd32499236c039f32edbec69b11a7bcf59f10c53890"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc13b46e629f90dcdc49cc02b96ff6b38b286cfac9e6e7c275e8b6eabde0dcd2"
   end
 
   depends_on "meson" => :build
