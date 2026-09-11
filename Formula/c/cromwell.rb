@@ -7,7 +7,7 @@ class Cromwell < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21efd10124a3bd3e7f18bc818f1758dbc327f1201b82daf3dec6ffc2d4a70bc1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9ade894b919e94334fd10a76e7adf0cc2a84116aa31497a9e33e56c7d3cdf10"
   end
 
   head do
