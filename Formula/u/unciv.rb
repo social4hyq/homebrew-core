@@ -4,6 +4,7 @@ class Unciv < Formula
   url "https://github.com/yairm210/Unciv/releases/download/4.20.6/Unciv.jar"
   sha256 "6b7e588d7ef218143957ffbe1eb1fd5e974cef787ecdc27a30a71319a284b2f3"
   license "MPL-2.0"
+  revision 1
 
   livecheck do
     url :stable
@@ -13,8 +14,7 @@ class Unciv < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "16f4b35048cec3fca763f57991955b6312073cb7d5562b5d9075c559a0b69086"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d192d6267e1923bc19e16003610760010594f0ad8cba8638dedbf801a698218"
   end
 
   depends_on "openjdk"
