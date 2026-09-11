@@ -8,7 +8,7 @@ class TomcatNative < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ad7b4f032e4844b351bd91e4fce4951a5497154d8d2411d3ae771fb9b34daa8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8976148b8c2f6d0155243367e63f7f81cbb9b0960f2056b113f11c353a586e6"
   end
 
   depends_on "tomcat" => :test
