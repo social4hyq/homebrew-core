@@ -4,6 +4,7 @@ class Jruby < Formula
   url "https://search.maven.org/remotecontent?filepath=org/jruby/jruby-dist/10.1.1.0/jruby-dist-10.1.1.0-src.zip"
   sha256 "825d47f43ef288b218b965406ef8a97117c9b080986b3ad9883e1850da312166"
   license any_of: ["EPL-2.0", "GPL-2.0-only", "LGPL-2.1-only"]
+  revision 1
 
   livecheck do
     url "https://www.jruby.org/download"
@@ -11,7 +12,7 @@ class Jruby < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5c7a73df904f7e3247338715f6e4f26ced90e6f1810c6d95bcaa36f15ba5c0a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "50be1b26ac5df458f3d9f4295e00ea2147c58ccbede6702800c07f9983101691"
   end
 
   depends_on "ant" => :build # for jffi
