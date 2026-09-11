@@ -4,6 +4,7 @@ class Orientdb < Formula
   url "https://search.maven.org/remotecontent?filepath=com/orientechnologies/orientdb-community/3.2.56/orientdb-community-3.2.56.zip"
   sha256 "d8695bfdd830504561d2e7ac0905cd6d4fbdfb25521d81c1691ef3bb14107e97"
   license "Apache-2.0"
+  revision 1
 
   # The GitHub release description contains links to files on Maven.
   livecheck do
