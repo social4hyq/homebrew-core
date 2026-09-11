@@ -4,10 +4,11 @@ class Ignite < Formula
   url "https://github.com/ignite/cli/archive/refs/tags/v29.10.1.tar.gz"
   sha256 "3d9edae9cc6b270a75f0bc4aa4a83326defe67126f509965bb2150e5530015a2"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/ignite/cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e206dc9deb9bc1287e18a053c511bc807232311755b4402928c416d343d9d9aa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2aa14d3d97b9eb3a781b712540d6abce0e37199012b4a540f3e773e30d6f56a3"
   end
 
   depends_on "go"
