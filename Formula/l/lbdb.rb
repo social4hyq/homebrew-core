@@ -4,6 +4,7 @@ class Lbdb < Formula
   url "https://www.spinnaker.de/lbdb/download/lbdb-0.57.tar.gz"
   sha256 "212fe2e40df5ed3e5496bc5e821e4b0683a6c9523b8885e7e87b634bcf923a88"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url "https://www.spinnaker.de/lbdb/download/"
@@ -11,7 +12,7 @@ class Lbdb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa64fced7b990544e79ca84c00a248c47b7dfa12fe482765da680be5abe72443"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a24fe81fdff56874f4b3943bac0c1d183471bcec7da31f3ab08cc511aa937617"
   end
 
   depends_on "abook"
