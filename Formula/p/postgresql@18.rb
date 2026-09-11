@@ -4,6 +4,7 @@ class PostgresqlAT18 < Formula
   url "https://ftp.postgresql.org/pub/source/v18.6/postgresql-18.6.tar.bz2"
   sha256 "555610c24d53e4316da5b7d3fc25c279d96856d5e0e23ee308c328c5fa881d9f"
   license "PostgreSQL"
+  revision 1
 
   livecheck do
     url "https://ftp.postgresql.org/pub/source/"
@@ -11,8 +12,7 @@ class PostgresqlAT18 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "857aa438bc6a203d9baf2b2bc5c75fb3863f71964ad0e8fcf6c00dc4583e62dc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6e317342769abd2275be1a48bcff0d12ccdc30516fbae047b13f48900b185b8"
   end
 
   keg_only :versioned_formula
