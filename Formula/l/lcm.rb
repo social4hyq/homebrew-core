@@ -13,7 +13,7 @@ class Lcm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "99cd2cbf6a5fe4365292fd1976dde37f278ec780425ee096af085c925f7e5247"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d66e880a7b1a9dcc23bacd8746984c198eee67d1b4f25dee5b5feb21d1f76ad"
   end
 
   depends_on "cmake" => :build
