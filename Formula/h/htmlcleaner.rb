@@ -4,10 +4,10 @@ class Htmlcleaner < Formula
   url "https://downloads.sourceforge.net/project/htmlcleaner/htmlcleaner/htmlcleaner%20v2.29/htmlcleaner-src-2.29.zip"
   sha256 "9fc68d7161be6f34f781e109bf63894d260428f186d88f315b1d2e3a33495350"
   license "BSD-3-Clause"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e248f5d36953bd0cf23d3140dec3fed38f35d5d9123abf6c6cc23e47522cadc5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "126553aa8af7f6e8fc9add9457d5d14a4b3f1dd9ae6e3e06a0d02aea2a4804be"
   end
 
   depends_on "maven" => :build
