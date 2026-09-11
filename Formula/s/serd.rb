@@ -13,7 +13,7 @@ class Serd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "92bb04470654f2564559a1d51203452f832fc80360274e8ba2460e6d1f335946"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "93faadb0a47864c0a3e9fd33ebadb7b6c451740e19dc6dd501ffa3f7d479c8b0"
   end
 
   depends_on "meson" => :build
