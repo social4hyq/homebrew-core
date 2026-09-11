@@ -6,11 +6,11 @@ class SshMitm < Formula
   url "https://files.pythonhosted.org/packages/f0/4e/c804d08c336bcff29fd665fdc3ff9d3698d529b1d75462b89bc53527862a/ssh_mitm-5.0.1.tar.gz"
   sha256 "221dafeed602c4cca7a3c7fb2eee55eb9725ea11d19a75fd13c9bc3a1cf274ed"
   license "GPL-3.0-only"
-  revision 4
+  revision 5
   head "https://github.com/ssh-mitm/ssh-mitm.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9bad8ca4e71fe1641312de07261b5dfc39a81cfe4e616fd2ff1bc59e128efda"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab3f79db0fc0af6ad16a00968d1779fd5f68be82f58fa3a3195d87b89c3ec367"
   end
 
   # `pkgconf` and `rust` are for bcrypt
