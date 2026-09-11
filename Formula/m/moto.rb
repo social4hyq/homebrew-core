@@ -9,7 +9,7 @@ class Moto < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7b05041b9121011cd3e89475aea6432041fbdbac27f500610f9a258e1871b39"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c15d6b8f3660e6477e48db3473870731a1205c20cf6ff4255d57c4beae28a3fd"
   end
 
   depends_on "certifi" => :no_linkage
