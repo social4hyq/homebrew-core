@@ -4,6 +4,7 @@ class CypherShell < Formula
   url "https://dist.neo4j.org/cypher-shell/cypher-shell-2026.07.1.zip"
   sha256 "beae24efc0bf4bff48498825ac497addce28d932d8c2cbe2e845c7f2fb761d41"
   license "GPL-3.0-only"
+  revision 1
   version_scheme 1
 
   livecheck do
@@ -12,7 +13,7 @@ class CypherShell < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b341f5539ed5b4e9ba63fa69d15320cebf0f7666a05606a08ea4763577e0a73a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "33d006501c68029fda26220c89c22ec261b9f9927a2c6965c093d5b3302bfa75"
   end
 
   depends_on "openjdk@21"
