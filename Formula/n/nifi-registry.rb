@@ -8,7 +8,7 @@ class NifiRegistry < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a320ddf03a870f8152846b2545cfba7b18e7291f2b72f964aa13da640879010c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "99bd78f10bfbb485bcea6896ad8972ae60838362fa530594728169df1a21a407"
   end
 
   depends_on "openjdk"
