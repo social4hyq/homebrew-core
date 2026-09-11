@@ -12,7 +12,7 @@ class Sord < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "294425ace01120ed271b461450f613f444f981aa6405bb77dc40aef528b9d5a6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae8dcbe53bc3ab5f16747c0b9bfe4fa83d34dc404410afd62eff4fc0d34f18ad"
   end
 
   depends_on "meson" => :build
