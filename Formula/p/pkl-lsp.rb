@@ -4,6 +4,7 @@ class PklLsp < Formula
   url "https://github.com/apple/pkl-lsp/releases/download/0.8.0/pkl-lsp-0.8.0.jar"
   sha256 "06f9de45a21aa7a16bf5c052513521f98793cd9c57036b9368fcad799e96a8ff"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class PklLsp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "58080c65f6029d199e4d10d6528c1a2116b925d0dbf993511895d31feaf71448"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5395aa980fe57746b2e0226c0772578e2b1dbe5a12d1e40b5ab7fe023b2eb144"
   end
 
   depends_on "openjdk"
