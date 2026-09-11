@@ -5,10 +5,11 @@ class Aom < Formula
       tag:      "v3.15.0",
       revision: "de4c1d1edc49723a78954d30a83690aa1937422f"
   license "BSD-2-Clause"
+  revision 1
   head "https://aomedia.googlesource.com/aom.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5deae66bf2230116a64b2d4d9fdab28d9c0b6d1c50463283d36efccf462cc74e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "24705353049d939dd2189ac27192c84ae337c5c6c444d13242b5ff69f35b5452"
   end
 
   depends_on "cmake" => :build
