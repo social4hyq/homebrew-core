@@ -10,7 +10,7 @@ class Watson < Formula
   head "https://github.com/jazzband/Watson.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "67cbcfedfa77c72d9557bb2908ef8177f6a603887927040455ea5f31d3e00e7b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a6656971d5a95fb54a81225a482eb9add7df3e89530a038eb9101e02096837a"
   end
 
   depends_on "certifi" => :no_linkage
