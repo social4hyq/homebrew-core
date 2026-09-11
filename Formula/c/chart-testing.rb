@@ -5,10 +5,11 @@ class ChartTesting < Formula
       tag:      "v3.14.0",
       revision: "2651b49048950c5473b1f533c900d17614bc6aa0"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/helm/chart-testing.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5aa6dbd9c7782b89801cfb31028c098857ed1f4dd22222971a3ce77ff7ff068d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "acff43f17ed07578b46b78ed773c1ea17c3650ec8fed90b6021ee2f5e83ca146"
   end
 
   depends_on "go" => :build
