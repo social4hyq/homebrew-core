@@ -4,10 +4,11 @@ class Py3cairo < Formula
   url "https://github.com/pygobject/pycairo/releases/download/v1.29.1/pycairo-1.29.1.tar.gz"
   sha256 "4fbd26b4af24c9787d84cf5448e34eb8dca064b732479aaecd03109520eebd5f"
   license any_of: ["LGPL-2.1-only", "MPL-1.1"]
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7a6c9d7d3890fa0703631a00a4ee9cec6856a3d19e5c17bb3906c7d1d39eb0e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "877299bcdc2071caf33b1b00ffdb9d0bc53ce658844563e6c99d765fa601bc42"
   end
 
   depends_on "meson" => :build
