@@ -4,10 +4,11 @@ class Libxmu < Formula
   url "https://www.x.org/archive/individual/lib/libXmu-1.3.1.tar.xz"
   sha256 "81a99e94c4501e81c427cbaa4a11748b584933e94b7a156830c3621256857bc4"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b56b535f234e47d4c961ff231edc31c26e44065a4d7dbc68067bc6b30df10b62"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0088cb378c58c8e06554cf8c72f02994c4fdee9a08d6741cb826775b464a7a91"
   end
 
   depends_on "pkgconf" => :build
