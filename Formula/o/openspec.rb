@@ -7,7 +7,7 @@ class Openspec < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2d2c723293e2c3094f91f06d4a5a8efdbd3b5877b85e276270a134a0eac9e22"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22f080a88efd459419130a1e5257c77af7a162bdd8a193adb0f25372ef2a4167"
   end
 
   depends_on "node"
