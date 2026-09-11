@@ -5,11 +5,11 @@ class Screen < Formula
   mirror "https://ftp.gnu.org/gnu/screen/screen-5.0.2.tar.gz"
   sha256 "ca9a2c7e240919bc7ac12124593ae4529bb4eb5f7349d8857829b7e3f0b3b332"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 2
   head "https://git.savannah.gnu.org/git/screen.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "221f1dc7e629913ad5a7484e2c1b865f5f3328fcd4f7b2d6e7729d8d419b8d6e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec4655d52313b56e2ab6c0280b14d96ac121823f1e61cf88da8a1da39a220689"
   end
 
   depends_on "autoconf" => :build
