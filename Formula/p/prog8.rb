@@ -4,6 +4,7 @@ class Prog8 < Formula
   url "https://github.com/irmen/prog8/archive/refs/tags/v12.3.3.tar.gz"
   sha256 "6cee4a7faa2596e3e83230e9219eb7ad195557dab66106dfe94fa7cf8c72c55c"
   license "GPL-3.0-only"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Prog8 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "56807479be09850808a37a511b3eddb34085267033a96e98fff161c2c531e021"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "985f4270641bb2c4c839ad0dc722e0be09f7b4c97dc85fd66d1360b975337a89"
   end
 
   depends_on "gradle" => :build
