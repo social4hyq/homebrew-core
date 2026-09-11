@@ -4,11 +4,12 @@ class P11Kit < Formula
   url "https://github.com/p11-glue/p11-kit/releases/download/0.26.5/p11-kit-0.26.5.tar.xz"
   sha256 "f2cc09111e44bf3fea58f023180b33acea90aa82d042d6fbb623fbc5ba033bb7"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
   head "https://github.com/p11-glue/p11-kit.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "96b73123e178cc515193b30a1f67ce67ae74a998fa3a9b055594107a985aa4ac"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c9adb3a7eda029430a44418239621415aab270b32997336f3b1a55209e2c004"
   end
 
   depends_on "meson" => :build
