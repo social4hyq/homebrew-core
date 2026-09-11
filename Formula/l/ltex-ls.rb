@@ -4,10 +4,11 @@ class LtexLs < Formula
   url "https://github.com/valentjn/ltex-ls/archive/refs/tags/16.0.0.tar.gz"
   sha256 "0cd67495ee4695493fc2a0b37d14146325aa6b9f45d767d16c60abdefdd2dc1d"
   license "MPL-2.0"
+  revision 1
   head "https://github.com/valentjn/ltex-ls.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b141518e39e8620e0c38f2b83b67b0f7b2a741cb32639a55d2b9dfdff450fc99"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b730448d319341815c3ba2ca19db72deb23d08cbcec69b7e2dc5e67a19585a1f"
   end
 
   depends_on "maven" => :build
