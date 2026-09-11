@@ -5,6 +5,7 @@ class Basex < Formula
   version "12.3"
   sha256 "e412cabfa94d93b91e1ceff999c235f837426e025ae7f1ad9ef604cfb2ed4050"
   license "BSD-3-Clause"
+  revision 1
 
   livecheck do
     url "https://basex.org/download/"
@@ -14,7 +15,7 @@ class Basex < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a3236640587fd1f7569078583fba8f34a2e13f83fb9c9c512ea90b42b3984a0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9303fc17adf897a0d50149f9f21313e88425ed0077781edf485a3e44ad1d9a6"
   end
 
   depends_on "openjdk"
