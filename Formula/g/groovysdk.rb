@@ -4,6 +4,7 @@ class Groovysdk < Formula
   url "https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-sdk-5.1.2.zip"
   sha256 "632bed81419e45fa237c37aa56087e27e74aee3ffd47b9c3995deb240e805cc5"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://groovy.apache.org/download.html"
