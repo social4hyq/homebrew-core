@@ -1,8 +1,8 @@
 class K0sctl < Formula
   desc "Bootstrapping and management tool for k0s clusters"
   homepage "https://github.com/k0sproject/k0sctl"
-  url "https://github.com/k0sproject/k0sctl/archive/refs/tags/v0.32.2.tar.gz"
-  sha256 "0df9d24cd7a04b039c31ed641983c41a8b23cd26e17288c9cda099f4f271ba54"
+  url "https://github.com/k0sproject/k0sctl/archive/refs/tags/v0.33.0.tar.gz"
+  sha256 "7e4e04ec24e2ba7376b8d4d03c1dd5c08955204c8b05ac6748787be23f25997d"
   license "Apache-2.0"
   head "https://github.com/k0sproject/k0sctl.git", branch: "main"
 
