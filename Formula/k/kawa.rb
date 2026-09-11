@@ -5,7 +5,7 @@ class Kawa < Formula
   mirror "https://ftp.gnu.org/gnu/kawa/kawa-3.1.1.zip"
   sha256 "dab1f41da968191fc68be856f133e3d02ce65d2dbd577a27e0490f18ca00fa22"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -13,7 +13,7 @@ class Kawa < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "79d2600c0613f37c3d1f45d3b12e7398f420f03e6079012206a4f3c9950d2e1d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6fa0f9283d8407db2e12fdab49435e00941367e21f0ab03b2fd1d9b029947b76"
   end
 
   depends_on "openjdk"
