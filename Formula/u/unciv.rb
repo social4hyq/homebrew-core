@@ -4,6 +4,7 @@ class Unciv < Formula
   url "https://github.com/yairm210/Unciv/releases/download/4.20.6/Unciv.jar"
   sha256 "6b7e588d7ef218143957ffbe1eb1fd5e974cef787ecdc27a30a71319a284b2f3"
   license "MPL-2.0"
+  revision 1
 
   livecheck do
     url :stable
