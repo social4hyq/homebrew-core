@@ -4,11 +4,11 @@ class Ttyd < Formula
   url "https://github.com/tsl0922/ttyd/archive/refs/tags/1.7.7.tar.gz"
   sha256 "039dd995229377caee919898b7bd54484accec3bba49c118e2d5cd6ec51e3650"
   license "MIT"
-  revision 11
+  revision 12
   head "https://github.com/tsl0922/ttyd.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9ee698d7663b76a0d31c9918cf4b496d5745353043bf526ac12cd8c9a0844656"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4baf25558c4edbb21a736c50827947213bcf6219b4a13658291ace20d5dc2f98"
   end
 
   depends_on "cmake" => :build
