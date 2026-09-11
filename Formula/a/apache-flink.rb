@@ -6,6 +6,7 @@ class ApacheFlink < Formula
   version "2.3.0"
   sha256 "b52864b0c42a3638adb0895b97542a3ca820a0c3defda99eba6e45c2f8ca496a"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/apache/flink.git", branch: "master"
 
   livecheck do
@@ -14,7 +15,7 @@ class ApacheFlink < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a5819c1b81fa900e67d75cbe502775923439ade3904b75dd04981059d94bc9a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c6281c9498e2764e38a383a4314f7d856eab14b2e12b49aa494ed712cec816e"
   end
 
   # Java 11, 17 (Default), and 21 are supported.
