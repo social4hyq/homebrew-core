@@ -4,6 +4,7 @@ class Osmosis < Formula
   url "https://github.com/openstreetmap/osmosis/releases/download/0.49.2/osmosis-0.49.2.tar"
   sha256 "2a23a7bf7499a0727ae6987cf66fcafc03b37379dc02177c730f352bd67a0b97"
   license :public_domain
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Osmosis < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "af027152878b178e742a7ea0885a17c9006cec6f198b06e5e4f8e719a2c5764c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "155c48f479fd426463a03c06173e800fc30bbc7496fed72818dd142493ba8d51"
   end
 
   depends_on "openjdk"
