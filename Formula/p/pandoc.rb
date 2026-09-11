@@ -4,11 +4,12 @@ class Pandoc < Formula
   url "https://github.com/jgm/pandoc/archive/refs/tags/3.11.tar.gz"
   sha256 "61d05e7fc57e995a61367bee1bb73a8bb278cda3c787b7e4e27b30037e17aeed"
   license "GPL-2.0-or-later"
+  revision 1
   compatibility_version 3
   head "https://github.com/jgm/pandoc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ee4b6911da189732a1b764263ea4709ae70ca9b10b2969325b25e3d3589aaaa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07e5cbb0c1f319ef4dc84d649f5432cb51ceb29dcc171bdff782938b51cf2346"
   end
 
   depends_on "cabal-install" => :build
