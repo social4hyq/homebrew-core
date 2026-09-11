@@ -3,8 +3,8 @@ class Jnethack < Formula
   homepage "https://github.com/jnethack/jnethack-release"
   # We use a git checkout to avoid patching the upstream NetHack tarball.
   url "https://github.com/jnethack/jnethack-release.git",
-      tag:      "v3.6.7-0.1",
-      revision: "3b3a9c4e25df60f9bce2ad09ce368410b4360e85"
+      tag:      "v3.6.7-0.2",
+      revision: "3f3a1afbdf51473d9c7a55f78d351b435707b751"
   license "NGPL"
   head "https://github.com/jnethack/jnethack-release.git", branch: "master"
 
