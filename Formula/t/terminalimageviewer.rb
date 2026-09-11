@@ -8,7 +8,7 @@ class Terminalimageviewer < Formula
   head "https://github.com/stefanhaustein/TerminalImageViewer.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "36855b28a5122babc27ff22c9cecec049e1fb96464eb006c29741311726b5d12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2fe07f38a9559f68186fd4010bb5042efab7a50a8aa60e60a2e182a677226a4"
   end
 
   depends_on "imagemagick"
