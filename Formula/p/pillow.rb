@@ -9,7 +9,7 @@ class Pillow < Formula
   head "https://github.com/python-pillow/Pillow.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "90175ac1167914659b405b70f46a70693e66b76ca513086131ec81bc34dda23d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7cd228c70f5bb19c93d44e87bed6551e74866831cca31e7bdc5580fc7c400ea"
   end
 
   depends_on "cmake" => :build
