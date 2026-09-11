@@ -5,12 +5,12 @@ class H2 < Formula
   version "2.4.240"
   sha256 "154d7aac3c33cae3dc361ad0c5296040be08ed0508acde6560c03842088d147e"
   license "MPL-2.0"
+  revision 1
 
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "10fadce73bc172b159bd99aeab3676cfb7617b80e438dcb779a6aa1caba5af93"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9937210d12bd4c6b7c4f13492a9f2c2d2d48d37670e47c77804b85e865ee4a34"
   end
 
   depends_on "openjdk"
