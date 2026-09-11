@@ -10,7 +10,7 @@ class Cookiecutter < Formula
   head "https://github.com/cookiecutter/cookiecutter.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2915c763ad1029692a829ecaf0d6590432808d5bc0f284a3bad927b92f8abcf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ad9117ceff127352af304ed24158048536b1331debb038fa99b7961f1533818"
   end
 
   depends_on "certifi" => :no_linkage
