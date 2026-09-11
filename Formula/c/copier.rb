@@ -9,7 +9,7 @@ class Copier < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "addd0983914ec78172027e2cfaa752537801947179c5bee8332a5467c343e378"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "05ee72741f7c038f3c25b16504a044e6633d13f9e8436f7ace4f3f259a5b97b0"
   end
 
   depends_on "libyaml"
