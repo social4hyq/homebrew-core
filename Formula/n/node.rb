@@ -5,7 +5,7 @@ class Node < Formula
   sha256 "d1698832a1a10f050cdda044a3e3d6a748246811e2e7bc89ba9a8bd693dc45f2"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -13,7 +13,7 @@ class Node < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "45ef522db16a820b8722be54dd6eddd4e9afdbaa15c22a8692b405f4b04389c8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b43d274a6a525f3feb040a4bc509a44a7f8300444b664cadc0ebba52870c40cb"
   end
 
   # The unversioned `llvm` (LLVM 23) is too new for node, which is not yet
