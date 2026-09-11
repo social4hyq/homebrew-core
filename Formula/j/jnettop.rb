@@ -4,7 +4,7 @@ class Jnettop < Formula
   url "https://downloads.sourceforge.net/project/jnettop/jnettop/0.13/jnettop-0.13.0.tar.gz"
   sha256 "a005d6fa775a85ff9ee91386e25505d8bdd93bc65033f1928327c98f5e099a62"
   license "GPL-2.0-or-later"
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -12,7 +12,7 @@ class Jnettop < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3547606348ca89ff570857f36db324c08a9868bb9e300e9f76e706d7470175a3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "210646bacff8f4120ebaa049f40e07b151762bde515bbc4f5692ef27df27e3f0"
   end
 
   depends_on "pkgconf" => :build
