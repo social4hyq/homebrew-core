@@ -7,7 +7,7 @@ class FaunaShell < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b8b3a18c217ea03088adfb6d54c214adf347dc8cb67963391f08fd3423d94f2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7a9453bc6c77d4205a2bb1d0da62cc65c94cf12431ee7aa474848b8f4d4e9b67"
   end
 
   # Fauna Service Winding Down, https://news.ycombinator.com/item?id=43414742
