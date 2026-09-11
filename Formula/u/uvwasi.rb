@@ -9,7 +9,7 @@ class Uvwasi < Formula
   head "https://github.com/nodejs/uvwasi.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb1692dbd7d4a17bc4bb1a0f4bd1133c3fa4fae0fe711bc1448e464b9be226d1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "003424b2b223124fbc1f0de71ac6c427fc5d30202536fe302c7b134469353483"
   end
 
   depends_on "cmake" => :build
