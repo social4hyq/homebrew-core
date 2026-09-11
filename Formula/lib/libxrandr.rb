@@ -4,10 +4,11 @@ class Libxrandr < Formula
   url "https://www.x.org/archive/individual/lib/libXrandr-1.5.5.tar.xz"
   sha256 "72b922c2e765434e9e9f0960148070bd4504b288263e2868a4ccce1b7cf2767a"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0946a3dc2238cf76259860a63f60c4015d556e20f920b94cc5556bc35e8b9b39"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "68e90b9afb3f5fd40a4dddfb832edf1c70a3bd6716547f8147e86094519b4c5d"
   end
 
   depends_on "pkgconf" => :build
