@@ -4,6 +4,7 @@ class Checkstyle < Formula
   url "https://github.com/checkstyle/checkstyle/releases/download/checkstyle-14.1.0/checkstyle-14.1.0-all.jar"
   sha256 "51e2bc7fed1bb56808aa39045f655a316194997acd24bac5195253dcf342b380"
   license "LGPL-2.1-or-later"
+  revision 1
 
   livecheck do
     url :stable
