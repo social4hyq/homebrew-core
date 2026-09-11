@@ -5,6 +5,7 @@ class ScalaAT213 < Formula
   mirror "https://www.scala-lang.org/files/archive/scala-2.13.18.tgz"
   sha256 "1834d09fd5c78ec77e9a933ab76c724280a8ec9595a332a6112823787a9ac3e6"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://www.scala-lang.org/download/"
