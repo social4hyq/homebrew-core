@@ -7,7 +7,7 @@ class AngularCli < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "da8ca4c6f66e7ee3c9d6e417a909b5b47a910b65cff3e9e6babae8b8fb8f159f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "479cb621251ffcfde300ccbb1a22ccac122143f8f42ccbde8648cfeebb5bd506"
   end
 
   depends_on "node"
