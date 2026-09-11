@@ -1,0 +1,64 @@
+diff --git a/src/runtime/dns_jsc/dns.rs b/src/runtime/dns_jsc/dns.rs
+index 31f95e7ab8..105a0c614e 100644
+--- a/src/runtime/dns_jsc/dns.rs
++++ b/src/runtime/dns_jsc/dns.rs
+@@ -5171,6 +5171,44 @@ impl Resolver {
+         resolver.do_lookup(name.slice(), port, options, global_this)
+     }
+ 
++    /// True if the host has a routable (non-link-local, non-loopback) IPv6
++    /// address. OHOS exposes only `fe80::/10` link-local and `::1` loopback in
++    /// `/proc/net/if_inet6`, so a dual-stack `getaddrinfo` issues an AAAA query
++    /// that times out (EAI_AGAIN → DNS_ETIMEOUT). Callers doing an AF_UNSPEC
++    /// lookup force IPv4 when this returns false.
++    #[cfg(target_env = "ohos")]
++    fn has_global_ipv6() -> bool {
++        const PATH: &[u8] = b"/proc/net/if_inet6\0";
++        let fd = unsafe {
++            libc::open(PATH.as_ptr().cast::<core::ffi::c_char>(), libc::O_RDONLY | libc::O_CLOEXEC)
++        };
++        if fd < 0 {
++            return false;
++        }
++        let mut buf = [0u8; 4096];
++        let n = unsafe { libc::read(fd, buf.as_mut_ptr().cast::<core::ffi::c_void>(), buf.len()) };
++        unsafe { libc::close(fd) };
++        if n <= 0 {
++            return false;
++        }
++        bun_core::strings::split(&buf[..n as usize], b"\n").any(|line| {
++            if line.is_empty() {
++                return false;
++            }
++            // Global unicast = 2000::/3 (first nibble '2' or '3'). Excludes
++            // ::1 loopback, fe80::/10 link-local, and fc00::/7 ULA — OHOS
++            // devices commonly report a ULA address on wlan0/vpn-tun, and
++            // treating that as "global" made dns.lookup({all:true}) still
++            // return AAAA on networks where it can't actually route.
++            matches!(line[0], b'2' | b'3')
++        })
++    }
++
++    #[cfg(not(target_env = "ohos"))]
++    fn has_global_ipv6() -> bool {
++        true
++    }
++
+     pub(crate) fn do_lookup(
+         &self,
+         name: &[u8],
+@@ -5192,6 +5230,14 @@ impl Resolver {
+         }
+ 
+         let mut opts = options;
++        // OHOS: no global IPv6 (only fe80::/10 link-local + ::1 loopback), so
++        // a dual-stack (AF_UNSPEC) getaddrinfo issues an AAAA query that times
++        // out (EAI_AGAIN → DNS_ETIMEOUT). Force IPv4 when the caller left the
++        // family unspecified and there is no routable IPv6 address.
++        #[cfg(target_env = "ohos")]
++        if opts.family == bun_dns::Family::Unspecified && !Self::has_global_ipv6() {
++            opts.family = bun_dns::Family::Inet;
++        }
+         let mut backend = opts.backend;
+         let normalized = normalize_dns_name(name, &mut backend);
+         opts.backend = backend;

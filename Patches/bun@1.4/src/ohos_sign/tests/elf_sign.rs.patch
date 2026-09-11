@@ -1,0 +1,190 @@
+diff --git a/src/ohos_sign/tests/elf_sign.rs b/src/ohos_sign/tests/elf_sign.rs
+new file mode 100644
+index 0000000000..f40abaf074
+--- /dev/null
++++ b/src/ohos_sign/tests/elf_sign.rs
+@@ -0,0 +1,184 @@
++// ELF signing and section injection tests.
++
++use ohos_sign::{has_codesign, sign_selfsign, sign_selfsign_with_strip, strip_codesign};
++
++/// Minimal valid ELF64 LE (no sections, just 64-byte ELF header with empty SHT).
++/// We'll use a real minimal ELF with a shstrtab so injection can work.
++fn tiny_elf64() -> Vec<u8> {
++    // ELF header (64 bytes) + one null section entry (64 bytes) + shstrtab (1 byte "\0")
++    // Build the raw bytes manually so we don't need an assembler in tests.
++    let shstrtab_off: u64 = 64 + 64; // after ELF header + null section
++    let shstrtab_sz: u64 = 1;
++    let sht_off: u64 = 64; // section header table starts right after ELF header
++    let shnum: u16 = 2; // null + shstrtab
++    let shstrndx: u16 = 1;
++
++    let mut elf = vec![0u8; 64 + 64 + 64 + 1]; // hdr + null_section + shstrtab_section + shstrtab_data
++
++    // ELF magic + class + data + version + OS/ABI + padding
++    elf[0..4].copy_from_slice(b"\x7fELF");
++    elf[4] = 2; // ELFCLASS64
++    elf[5] = 1; // ELFDATA2LSB
++    elf[6] = 1; // EV_CURRENT
++    // e_type = ET_EXEC at 0x10
++    elf[0x10..0x12].copy_from_slice(&2u16.to_le_bytes());
++    // e_machine = EM_AARCH64 = 183 at 0x12
++    elf[0x12..0x14].copy_from_slice(&183u16.to_le_bytes());
++    // e_version = 1 at 0x14
++    elf[0x14..0x18].copy_from_slice(&1u32.to_le_bytes());
++    // e_ehsize = 64 at 0x34
++    elf[0x34..0x36].copy_from_slice(&64u16.to_le_bytes());
++    // e_shentsize = 64 at 0x3a
++    elf[0x3a..0x3c].copy_from_slice(&64u16.to_le_bytes());
++    // e_shoff at 0x28
++    elf[0x28..0x30].copy_from_slice(&sht_off.to_le_bytes());
++    // e_shnum at 0x3c
++    elf[0x3c..0x3e].copy_from_slice(&shnum.to_le_bytes());
++    // e_shstrndx at 0x3e
++    elf[0x3e..0x40].copy_from_slice(&shstrndx.to_le_bytes());
++
++    // null section at offset 64 — all zeros (already zeroed)
++
++    // shstrtab section entry at offset 128 (64 + 64)
++    let shstrtab_entry_off = 64 + 64;
++    // sh_name = 0
++    elf[shstrtab_entry_off..shstrtab_entry_off + 4].copy_from_slice(&0u32.to_le_bytes());
++    // sh_type = SHT_STRTAB = 3
++    elf[shstrtab_entry_off + 4..shstrtab_entry_off + 8].copy_from_slice(&3u32.to_le_bytes());
++    // sh_offset at +24
++    elf[shstrtab_entry_off + 24..shstrtab_entry_off + 32]
++        .copy_from_slice(&shstrtab_off.to_le_bytes());
++    // sh_size at +32
++    elf[shstrtab_entry_off + 32..shstrtab_entry_off + 40]
++        .copy_from_slice(&shstrtab_sz.to_le_bytes());
++    // sh_addralign = 1 at +48
++    elf[shstrtab_entry_off + 48..shstrtab_entry_off + 56].copy_from_slice(&1u64.to_le_bytes());
++
++    // shstrtab data: single null byte (index 0 = empty string)
++    let shstrtab_data_off = (shstrtab_off) as usize;
++    elf[shstrtab_data_off] = 0;
++
++    elf
++}
++
++#[test]
++fn unsigned_elf_not_detected_as_signed() {
++    let elf = tiny_elf64();
++    assert!(!has_codesign(&elf));
++}
++
++#[test]
++fn sign_rejects_non_64byte_section_header_entries() {
++    let mut elf = tiny_elf64();
++    // Corrupt e_shentsize (offset 0x3a) — every downstream offset computation
++    // assumes 64-byte entries, so this must be rejected up front rather than
++    // silently misparsing the section header table.
++    elf[0x3a..0x3c].copy_from_slice(&40u16.to_le_bytes());
++    let result = sign_selfsign(&elf);
++    assert!(result.is_err(), "sign must reject a non-64-byte e_shentsize");
++}
++
++#[test]
++fn sign_rejects_truncated_section_header_table() {
++    let elf = tiny_elf64();
++    // tiny_elf64: e_shoff=64, e_shnum=2 -> the section header table needs
++    // 64 + 2*64 = 192 bytes. Truncate well below that so the second (shstrtab)
++    // entry is missing entirely — parse_header must reject this instead of a
++    // downstream read later panicking on an out-of-bounds slice.
++    let truncated = &elf[..150];
++    let result = sign_selfsign(truncated);
++    assert!(
++        result.is_err(),
++        "sign must reject a section header table that runs past the end of the buffer"
++    );
++}
++
++#[test]
++fn sign_adds_codesign_section() {
++    let elf = tiny_elf64();
++    let signed = sign_selfsign(&elf).expect("sign failed");
++    assert!(has_codesign(&signed), ".codesign section must be present after signing");
++}
++
++#[test]
++fn double_sign_fails_without_force() {
++    let elf = tiny_elf64();
++    let signed = sign_selfsign(&elf).expect("first sign failed");
++    let result = sign_selfsign(&signed);
++    assert!(
++        result.is_err(),
++        "signing an already-signed ELF without --force must fail"
++    );
++    matches!(result.unwrap_err(), ohos_sign::SignError::AlreadySigned);
++}
++
++#[test]
++fn sign_with_strip_handles_already_signed() {
++    let elf = tiny_elf64();
++    let signed = sign_selfsign(&elf).expect("first sign");
++    let re_signed = sign_selfsign_with_strip(&signed).expect("re-sign with strip");
++    assert!(has_codesign(&re_signed));
++}
++
++#[test]
++fn strip_removes_codesign_section() {
++    let elf = tiny_elf64();
++    let signed = sign_selfsign(&elf).expect("sign");
++    assert!(has_codesign(&signed));
++    let mut buf = signed;
++    let removed = strip_codesign(&mut buf).expect("strip");
++    assert!(removed, "strip should return true when section was present");
++    assert!(!has_codesign(&buf), "no .codesign after strip");
++}
++
++#[test]
++fn codesign_section_4kb_aligned() {
++    let elf = tiny_elf64();
++    let signed = sign_selfsign(&elf).expect("sign");
++    let cs_off = codesign_section_offset(&signed);
++    assert_eq!(cs_off % 4096, 0, ".codesign section must be 4KB-aligned");
++}
++
++#[test]
++fn codesign_payload_layout() {
++    // ElfSignInfo header: type=1 (4B LE) + length (4B LE) + descriptor (256B) + sig (32B)
++    let elf = tiny_elf64();
++    let signed = sign_selfsign(&elf).expect("sign");
++    let cs_off = codesign_section_offset(&signed) as usize;
++    let payload = &signed[cs_off..cs_off + 296];
++
++    // type = 1
++    let ty = u32::from_le_bytes(payload[0..4].try_into().unwrap());
++    assert_eq!(ty, 1, "ElfSignInfo.type must be 1");
++    // length = 256 + 32 = 288
++    let len = u32::from_le_bytes(payload[4..8].try_into().unwrap());
++    assert_eq!(len, 288, "ElfSignInfo.length must be 288");
++    // descriptor version = 1
++    assert_eq!(payload[8], 1, "descriptor.version");
++    // descriptor csVersion = 3 at offset 8+255
++    assert_eq!(payload[8 + 255], 3, "descriptor.csVersion");
++    // descriptor flags = 0x10 (self-sign) at offset 8+112
++    let flags = u32::from_le_bytes(payload[8 + 112..8 + 116].try_into().unwrap());
++    assert_eq!(flags, 0x10, "descriptor.flags must be FLAG_SELF_SIGN=0x10");
++}
++
++fn codesign_section_offset(elf: &[u8]) -> u64 {
++    let e_shoff = u64::from_le_bytes(elf[0x28..0x30].try_into().unwrap());
++    let e_shnum = u16::from_le_bytes(elf[0x3c..0x3e].try_into().unwrap());
++    let e_shstrndx = u16::from_le_bytes(elf[0x3e..0x40].try_into().unwrap()) as usize;
++    let shstr_e = e_shoff as usize + e_shstrndx * 64;
++    let shstr_off = u64::from_le_bytes(elf[shstr_e + 24..shstr_e + 32].try_into().unwrap());
++    let shstr_sz = u64::from_le_bytes(elf[shstr_e + 32..shstr_e + 40].try_into().unwrap());
++    for i in 0..e_shnum as usize {
++        let e = e_shoff as usize + i * 64;
++        let name_off = u32::from_le_bytes(elf[e..e + 4].try_into().unwrap()) as u64;
++        if name_off < shstr_sz {
++            let name_start = (shstr_off + name_off) as usize;
++            let name = elf[name_start..].iter().take_while(|&&b| b != 0).copied().collect::<Vec<_>>();
++            if name == b".codesign" {
++                return u64::from_le_bytes(elf[e + 24..e + 32].try_into().unwrap());
++            }
++        }
++    }
++    panic!(".codesign section not found");
++}

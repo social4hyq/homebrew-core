@@ -1,0 +1,141 @@
+diff --git a/src/install/PackageInstaller.rs b/src/install/PackageInstaller.rs
+index 40f7860838..4ffe32ae62 100644
+--- a/src/install/PackageInstaller.rs
++++ b/src/install/PackageInstaller.rs
+@@ -179,7 +179,7 @@ impl NodeModulesFolder {
+     ) -> crate::Result<bun_sys::file::ReadToEndResult> {
+         let file = self.open_file(root_node_modules_dir, file_path)?;
+         let res = file.read_to_end_small();
+-        let _ = file.close(); // close error is non-actionable
++        let _ = file.close(); // close error is non-actionable (Zig parity: discarded)
+         Ok(match res {
+             Ok(bytes) => bun_sys::file::ReadToEndResult { bytes, err: None },
+             Err(e) => bun_sys::file::ReadToEndResult {
+@@ -1913,6 +1913,41 @@ impl<'a> PackageInstaller<'a> {
+                 }
+             };
+ 
++            #[cfg(target_env = "ohos")]
++            if let package_install::InstallResult::Success = &install_result {
++                // Scan only the package that was just installed. This runs
++                // once per package, so scanning from the node_modules root
++                // made the work quadratic in package count and re-read every
++                // already-signed binary each time — a 47-package install
++                // re-read the 17MB rolldown binding ~47 times.
++                //
++                // `destination_dir_subpath` is where the installer actually
++                // put this package, relative to `destination_dir`, so this
++                // needs no assumption about the node_modules layout (bun
++                // falls back to isolated installs whenever hoisting hits a
++                // conflict, and a path reconstructed from
++                // `self.node_modules.path` would be wrong there).
++                //
++                // O_NOFOLLOW preserves the previous behaviour of never
++                // signing through a symlinked package: the recursive walk
++                // treated symlinks as `SymLink`, not `File`, so `file:` and
++                // workspace deps — which point at the user's own sources,
++                // and which bun must not rewrite — were skipped. They fail
++                // here with ELOOP instead. Isolated-store entries are also
++                // symlinks and are signed where they are materialized, in
++                // `isolated_install::Installer`.
++                let subpath = installer.destination_dir_subpath.as_bytes();
++                if let Ok(pkg_dir) = destination_dir.open_at_with(
++                    subpath,
++                    Syscall::O::NOFOLLOW | Syscall::O::CLOEXEC | Syscall::O::RDONLY,
++                ) {
++                    let mut fd_path_buf = PathBuffer::uninit();
++                    if let Ok(pkg_path) = pkg_dir.get_fd_path(&mut fd_path_buf) {
++                        ohos_sign_native_binaries(pkg_path);
++                    }
++                }
++            }
++
+             match install_result {
+                 package_install::InstallResult::Success => {
+                     let is_duplicate = self.successfully_installed.is_set(package_id as usize);
+@@ -2489,3 +2524,85 @@ impl<'a> PackageInstaller<'a> {
+         );
+     }
+ }
++
++// ───────────────────────────── OHOS install-time signing ─────────────────────────────
++
++/// On OHOS, recursively scan `root_dir` for native binaries (.so, .node) and
++/// sign any that are not already signed. The OHOS kernel refuses to `dlopen`
++/// an ELF with no `.codesign` section, so an unsigned binding is unusable.
++///
++/// Called with a single package's directory once that package is materialized
++/// and before its lifecycle scripts run — from the hoisted path above, and
++/// from `isolated_install::Installer` for store entries, which the hoisted
++/// scan cannot reach (they are symlinked, and signing must not follow
++/// symlinks).
++///
++/// Set `OHOS_SIGN_DEBUG` to trace what this scan finds and signs. Signing
++/// failures are otherwise non-fatal and silent — the reason the path bugs
++/// fixed here (see below) went unnoticed through several releases.
++#[cfg(target_env = "ohos")]
++pub(crate) fn ohos_sign_native_binaries(root_dir: &[u8]) {
++    let debug = std::env::var_os("OHOS_SIGN_DEBUG").is_some();
++    let dir = match Dir::open(root_dir) {
++        Ok(d) => d,
++        Err(e) => {
++            if debug {
++                eprintln!("[ohos-sign] open {:?} failed: {e:?}", bstr::BStr::new(root_dir));
++            }
++            return;
++        }
++    };
++    let mut w = match Syscall::walker_skippable::walk(dir.fd(), &[], &[]) {
++        Ok(w) => w,
++        Err(_) => return,
++    };
++    // hmdfs — the filesystem backing user directories on HarmonyOS — reports
++    // DT_UNKNOWN for every dirent. The walker then leaves `entry.kind` as
++    // `Unknown` (and does not recurse into directories) unless it is told to
++    // fall back to `lstatat`, so without this the scan below matches nothing
++    // and silently signs nothing. Every other `walker_skippable::walk` caller
++    // in this codebase sets this too.
++    w.resolve_unknown_entry_types = true;
++    while let Ok(Some(entry)) = w.next() {
++        if entry.kind != Syscall::EntryKind::File {
++            continue;
++        }
++        let name = entry.basename.as_bytes();
++        let needs_sign = if name.len() > 3 {
++            name.ends_with(b".so") || name.ends_with(b".node")
++        } else {
++            false
++        };
++        if !needs_sign {
++            continue;
++        }
++        // Join `entry.path` (relative to the walk root), not `entry.basename`:
++        // this walk is recursive and `root_dir` is the node_modules root, so
++        // native binaries live at `<scope>/<pkg>/…`. Joining the basename
++        // drops those intermediate components and yields a path that does not
++        // exist, which `std::fs::read` below turns into an empty buffer and
++        // `sign_selfsign_inplace` into a swallowed ENOENT.
++        let rel = entry.path.as_bytes();
++        let mut full = Vec::with_capacity(root_dir.len() + 1 + rel.len());
++        full.extend_from_slice(root_dir);
++        full.push(b'/');
++        full.extend_from_slice(rel);
++        let full_str = unsafe { core::str::from_utf8_unchecked(&full) };
++        let p = std::path::Path::new(full_str);
++        if ohos_sign::has_codesign(&std::fs::read(p).unwrap_or_default()) {
++            if debug {
++                eprintln!("[ohos-sign] {full_str}: already signed");
++            }
++            continue;
++        }
++        let result = ohos_sign::sign_selfsign_inplace(p);
++        if debug {
++            match &result {
++                Ok(()) => eprintln!("[ohos-sign] {full_str}: signed"),
++                Err(e) => eprintln!("[ohos-sign] {full_str}: sign failed: {e}"),
++            }
++        }
++    }
++}
++
++// ported from: src/install/PackageInstaller.zig

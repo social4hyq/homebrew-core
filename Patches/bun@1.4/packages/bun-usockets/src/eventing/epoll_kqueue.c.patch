@@ -1,0 +1,52 @@
+diff --git a/packages/bun-usockets/src/eventing/epoll_kqueue.c b/packages/bun-usockets/src/eventing/epoll_kqueue.c
+index cceccf1e90..a6c5a4143f 100644
+--- a/packages/bun-usockets/src/eventing/epoll_kqueue.c
++++ b/packages/bun-usockets/src/eventing/epoll_kqueue.c
+@@ -107,7 +107,15 @@ void us_internal_poll_set_type(struct us_poll_t *p, int poll_type) {
+ #include <errno.h>
+ #include <limits.h>
+ 
++// OHOS seccomp blocks epoll_pwait2 (441) via SECCOMP_RET_TRAP → SIGSYS,
++// which kills the process before this file's ENOSYS/EPERM/EACCES fallback
++// can trigger. Force the fallback path by pretending the probe already
++// failed at startup. Loses nanosecond timeout precision (millisecond only).
++#if defined(__OHOS__)
++static int has_epoll_pwait2 = 0;
++#else
+ static int has_epoll_pwait2 = -1;
++#endif
+ 
+ #ifndef SYS_epoll_pwait2
+ // It's consistent on multiple architectures
+@@ -503,7 +511,31 @@ void us_loop_run_bun_tick(struct us_loop_t *loop, const struct timespec* timeout
+      * _end. mimalloc paces the sweep itself, so this costs a compare-and-swap per tick.
+      * With no scavenger to hand off to, fall back to sweeping inline -- but only on a tick that
+      * really parks, and rate-limited, because doing it between ticks is what we are avoiding. */
++#if defined(__OHOS__)
++    /* OHOS: mi_on_thread_idle_start() is not a bare CAS here — it posts the scavenger
++     * futex on every call (the scavenger re-arms its wake word at the top of each
++     * cycle, so the 0->1 "coalescing" edge fires per park, not per burst of parks).
++     * On workloads whose event loop ticks without blocking (claude-code idle churn
++     * measured ~30k ticks/s) that is 30k FUTEX_WAKE/s on this thread plus a wake-
++     * sweep-repark cycle on the scavenger for every one of them, and each tick that
++     * returns before the scavenger finishes claiming the sweep makes the owner spin
++     * in _mi_park_leave's yield loop. Measured +0.5 core of scavenger and ~1/3 of
++     * the main thread's time in kernel. Gate the handoff on the tick really waiting
++     * (the same condition the inline fallback below already uses) and rate-limit to
++     * one handoff per millisecond; real blocking polls still hand off. Ticks with
++     * no JS clock reading (now_ns == 0, e.g. the HTTP thread's NULL-timeout park)
++     * cannot be rate-limited and always hand off, as before. */
++    static _Thread_local uint64_t last_park_handoff_ns = 0;
++    if (now_ns && now_ns < last_park_handoff_ns) last_park_handoff_ns = 0; /* clock went backwards: re-arm */
++    int handed_off = 0;
++    if (will_idle_inside_event_loop &&
++        (now_ns == 0 || now_ns >= last_park_handoff_ns + 1000000ULL)) {
++        if (now_ns) last_park_handoff_ns = now_ns;
++        handed_off = mi_on_thread_idle_start();
++    }
++#else
+     const int handed_off = mi_on_thread_idle_start();
++#endif
+     if (!handed_off && will_idle_inside_event_loop) {
+         static const uint64_t idle_sweep_interval_ns = 100 * 1000000ULL;
+         static _Thread_local uint64_t last_idle_sweep_ns = 0;

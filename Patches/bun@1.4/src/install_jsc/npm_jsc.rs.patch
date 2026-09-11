@@ -1,0 +1,16 @@
+diff --git a/src/install_jsc/npm_jsc.rs b/src/install_jsc/npm_jsc.rs
+index 81ac3831bf..01edac9feb 100644
+--- a/src/install_jsc/npm_jsc.rs
++++ b/src/install_jsc/npm_jsc.rs
+@@ -121,7 +121,10 @@ fn js_parse_manifest(global: &JSGlobalObject, frame: &CallFrame) -> JsResult<JSV
+     let package_manifest: npm::PackageManifest = match maybe_package_manifest {
+         Some(m) => m,
+         None => {
+-            return Err(global.throw(format_args!("manifest is invalid ")));
++            return Err(global.throw(format_args!(
++                "manifest is invalid (file: {})",
++                BStr::new(manifest_filename.slice()),
++            )));
+         }
+     };
+ 

@@ -1,0 +1,64 @@
+diff --git a/src/runtime/api/bun/spawn/stdio.rs b/src/runtime/api/bun/spawn/stdio.rs
+index 787aec56fc..ae8e337c17 100644
+--- a/src/runtime/api/bun/spawn/stdio.rs
++++ b/src/runtime/api/bun/spawn/stdio.rs
+@@ -36,8 +36,11 @@ pub struct Capture {
+     // BACKREF: raw pointer to a capture buffer owned by the shell interpreter.
+     // The shell keeps the buffer alive for the lifetime
+     // of the spawned process; this struct never frees it.
++    // OHOS: stays `pub` (not upstream's pub(crate)) — the only reader is
++    // `Stdio::byte_slice`, whose sole caller lives in the memfd path that is
++    // cfg'd out on OHOS; pub(crate) would trip -D dead-code.
+     #[cfg(any(target_os = "linux", target_os = "android"))]
+-    pub(crate) buf: *mut Vec<u8>,
++    pub buf: *mut Vec<u8>,
+ }
+ 
+ /// Payload of `Stdio::Dup2`.
+@@ -101,8 +104,10 @@ impl ToSpawnOptsError {
+ }
+ 
+ impl Stdio {
++    // OHOS: stays `pub` — the only caller is the memfd path in `use_memfd`,
++    // cfg'd out on OHOS; pub(crate) trips -D dead-code here.
+     #[cfg(any(target_os = "linux", target_os = "android"))]
+-    pub(crate) fn byte_slice(&self) -> &[u8] {
++    pub fn byte_slice(&self) -> &[u8] {
+         match self {
+             // SAFETY: `buf` is a live backref owned by the caller (shell); the
+             // returned slice borrows `self` and the caller guarantees the
+@@ -114,12 +119,13 @@ impl Stdio {
+     }
+ 
+     pub(crate) fn can_use_memfd(&self) -> bool {
+-        #[cfg(not(any(target_os = "linux", target_os = "android")))]
++        // OHOS: memfd writes not visible to fstat (see use_memfd).
++        #[cfg(not(all(any(target_os = "linux", target_os = "android"), not(target_env = "ohos"))))]
+         {
+             return false;
+         }
+ 
+-        #[cfg(any(target_os = "linux", target_os = "android"))]
++        #[cfg(all(any(target_os = "linux", target_os = "android"), not(target_env = "ohos")))]
+         match self {
+             Self::Blob(blob) => !blob.needs_to_read_file(),
+             Self::Memfd(_) => true,
+@@ -130,13 +136,16 @@ impl Stdio {
+     }
+ 
+     pub(crate) fn use_memfd(&mut self, index: u32) -> bool {
+-        #[cfg(not(any(target_os = "linux", target_os = "android")))]
++        // OHOS: memfd writes not visible to fstat after child exits
++        // (verified 2026-06-11: dup2(memfd,1/2) → child writes → fstat size=0).
++        // Fall through to socketpair on OHOS.
++        #[cfg(not(all(any(target_os = "linux", target_os = "android"), not(target_env = "ohos"))))]
+         {
+             let _ = index;
+             return false;
+         }
+ 
+-        #[cfg(any(target_os = "linux", target_os = "android"))]
++        #[cfg(all(any(target_os = "linux", target_os = "android"), not(target_env = "ohos")))]
+         {
+             use crate::api::bun_process::spawn_sys;
+             if !spawn_sys::can_use_memfd() {

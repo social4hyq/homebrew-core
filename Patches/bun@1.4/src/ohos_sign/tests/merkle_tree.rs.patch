@@ -1,0 +1,54 @@
+diff --git a/src/ohos_sign/tests/merkle_tree.rs b/src/ohos_sign/tests/merkle_tree.rs
+new file mode 100644
+index 0000000000..bfd755b8dc
+--- /dev/null
++++ b/src/ohos_sign/tests/merkle_tree.rs
+@@ -0,0 +1,48 @@
++// Merkle tree root hash tests — compared against self-sign.c reference output.
++// Golden values produced by running self-sign.c's merkle_root_hash() over the same inputs.
++
++use ohos_sign::__merkle_root_hash as merkle_root_hash;
++use ohos_sign::__sha256_hash as sha256;
++
++const PAGE: usize = 4096;
++
++#[test]
++fn empty_data() {
++    // empty file → one zero page → SHA-256 of 4096 zeros
++    let zeros = [0u8; PAGE];
++    let expected = sha256(&zeros);
++    let got = merkle_root_hash(&[], 0, 0);
++    assert_eq!(got, expected);
++}
++
++#[test]
++fn single_page_no_cs() {
++    // exactly one page of 0xAA bytes, no codesign section
++    let data = [0xAAu8; PAGE];
++    let expected = sha256(&data);
++    let got = merkle_root_hash(&data, 0, 0);
++    assert_eq!(got, expected);
++}
++
++#[test]
++fn single_page_with_cs_zeroes_leaf() {
++    // one page, codesign section covers the whole page.
++    // self-sign.c: cs-range leaf hash = all-zero bytes (not SHA-256 of zeros).
++    // Single-page fast-path returns leaf directly → root = [0u8; 32].
++    let data = [0xAAu8; PAGE];
++    let expected_no_cs = sha256(&data);
++    let got = merkle_root_hash(&data, 0, PAGE as u64);
++    assert_ne!(got, expected_no_cs, "cs section should affect result");
++    assert_eq!(got, [0u8; 32], "cs page leaf must be all-zero bytes");
++}
++
++#[test]
++fn partial_last_page_padded() {
++    // 5 bytes, should be padded to PAGE before hashing
++    let data = b"hello";
++    let mut padded = [0u8; PAGE];
++    padded[..5].copy_from_slice(data);
++    let expected = sha256(&padded);
++    let got = merkle_root_hash(data, 0, 0);
++    assert_eq!(got, expected);
++}

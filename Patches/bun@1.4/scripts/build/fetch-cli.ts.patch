@@ -1,0 +1,53 @@
+diff --git a/scripts/build/fetch-cli.ts b/scripts/build/fetch-cli.ts
+index c93691974a..70d2b33320 100644
+--- a/scripts/build/fetch-cli.ts
++++ b/scripts/build/fetch-cli.ts
+@@ -22,7 +22,7 @@
+ 
+ import { spawnSync } from "node:child_process";
+ import { createHash } from "node:crypto";
+-import { existsSync, readFileSync } from "node:fs";
++import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+ import { basename, join } from "node:path";
+ import { downloadWithRetry, extractTarGz, fetchPrebuilt } from "./download.ts";
+@@ -317,20 +317,28 @@ function normalizeLf(s: string): string {
+ }
+ 
+ /**
+- * Apply a patch via `git apply` over stdin.
++ * Apply a patch via `git apply` on a temp file (NOT stdin).
+  *
+- * Normalizes CRLF→LF (same as the identity hash — see computeSourceIdentity)
+- * so a CRLF-mangled checkout still applies cleanly. --no-index: dest/ is
+- * not a git repo. --ignore-whitespace / --ignore-space-change: patches are
+- * authored against upstream which may have different trailing whitespace.
++ * Historically this piped the patch over stdin (`git apply -`). That works
++ * under direct invocation and under podman, but when fetch-cli itself runs
++ * as a nested child (stream.ts → fetch-cli → git) inside a docker container
++ * on GitHub Actions runners, the piped input silently arrives empty and git
++ * reports "No valid patches in input". A plain file argument is reliable in
++ * every environment, at the cost of one temp file per patch.
+  */
+ function applyPatch(dest: string, patchPath: string, patchBody: string): void {
+-  const result = spawnSync("git", ["apply", "--ignore-whitespace", "--ignore-space-change", "--no-index", "-"], {
+-    cwd: dest,
+-    input: normalizeLf(patchBody),
+-    stdio: ["pipe", "ignore", "pipe"],
+-    encoding: "utf8",
+-  });
++  const tmp = join(dest, `.fetch-cli-${process.pid}-${basename(patchPath)}`);
++  writeFileSync(tmp, normalizeLf(patchBody));
++  let result: ReturnType<typeof spawnSync>;
++  try {
++    result = spawnSync("git", ["apply", "--ignore-whitespace", "--ignore-space-change", "--no-index", tmp], {
++      cwd: dest,
++      stdio: ["ignore", "ignore", "pipe"],
++      encoding: "utf8",
++    });
++  } finally {
++    rmSync(tmp, { force: true });
++  }
+ 
+   if (result.error) {
+     throw new BuildError(`Failed to spawn git apply`, { cause: result.error });

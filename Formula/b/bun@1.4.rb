@@ -1,8 +1,8 @@
 class BunAT14 < Formula
   desc "Incredibly fast JavaScript runtime, bundler, test runner, and package manager"
   homepage "https://bun.com/"
-  url "https://github.com/social4hyq/ohos-bun.git",
-      revision: "3565953f0eaa7b437c20e0e287896eade1405a21"
+  url "https://github.com/oven-sh/bun.git",
+      revision: "744846f844374847c902b5e7fd59b4342a51ef99" # bun-v1.4.2
   version "1.4.2"
   license all_of: [
     "MIT",
@@ -24,8 +24,9 @@ class BunAT14 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "11987652e778d21d4b098bb3ad52e8efd77adb90744024f827747deaf34c0ffb"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9dab216094df075aa30b64d052d40e73e914e8a79c0125996718e57ae9aac7fd"
   end
 
   keg_only :versioned_formula
@@ -48,6 +49,137 @@ class BunAT14 < Formula
     cause "uses clang-specific flags"
   end
 
+  # Per-file patches for OHOS portability, exported from the ohos-aarch64
+  # branch of social4hyq/ohos-bun (scripts/export-ohos-patches.sh; its
+  # replay check proves the series reproduces the branch tip bit-for-bit).
+  # Split per file so upstream version bumps only reject the affected
+  # file(s) instead of a multi-file mega-patch.
+  %w[
+    Cargo.lock
+    Cargo.toml
+    bun.lock
+    package.json
+    packages/bun-plugin-svelte/bun.lock
+    packages/bun-usockets/src/eventing/epoll_kqueue.c
+    patches/zstd/ohos-qsort-r.patch
+    scripts/build.ts
+    scripts/build/bun.ts
+    scripts/build/codegen.ts
+    scripts/build/config.ts
+    scripts/build/deps/cares.ts
+    scripts/build/deps/mimalloc.ts
+    scripts/build/deps/webkit.ts
+    scripts/build/deps/zstd.ts
+    scripts/build/fetch-cli.ts
+    scripts/build/flags.ts
+    scripts/build/rust.ts
+    scripts/build/shims.ts
+    scripts/build/shims/cpu_model/cpu_model.h
+    scripts/build/shims/cpu_model/x86.c
+    scripts/build/shims/ohos_compat_shim.c
+    scripts/build/source.ts
+    scripts/build/stream.ts
+    scripts/build/tools.ts
+    scripts/build/workarounds.ts
+    src/bun_core/Global.rs
+    src/bun_core/env.rs
+    src/bun_core/env_var.rs
+    src/bun_core/feature_flags.rs
+    src/bun_core/util.rs
+    src/crash_handler/lib.rs
+    src/dns/lib.rs
+    src/event_loop/SpawnSyncEventLoop.rs
+    src/exe_format/elf.rs
+    src/install/Cargo.toml
+    src/install/PackageInstall.rs
+    src/install/PackageInstaller.rs
+    src/install/PackageManager.rs
+    src/install/PackageManager/CommandLineArguments.rs
+    src/install/PackageManager/PackageManagerLifecycle.rs
+    src/install/isolated_install/Installer.rs
+    src/install/lib.rs
+    src/install/lockfile/bun.lockb.rs
+    src/install/npm.rs
+    src/install_jsc/npm_jsc.rs
+    src/install_types/resolver_hooks.rs
+    src/io/ParentDeathWatchdog.rs
+    src/io/PipeReader.rs
+    src/io/PipeWriter.rs
+    src/io/lib.rs
+    src/io/pipes.rs
+    src/io/posix_event_loop.rs
+    src/io/windows_event_loop.rs
+    src/js/node/os.ts
+    src/js/wasi-runner.js
+    src/jsc/bindings/BunProcess.cpp
+    src/jsc/bindings/bun-spawn.cpp
+    src/jsc/bindings/c-bindings.cpp
+    src/jsc/bindings/wtf-bindings.cpp
+    src/libarchive/lib.rs
+    src/linker.lds
+    src/node-fallbacks/bun.lock
+    src/node-fallbacks/package.json
+    src/ohos_sign/Cargo.lock
+    src/ohos_sign/Cargo.toml
+    src/ohos_sign/src/bin/ohos_selfsign.rs
+    src/ohos_sign/src/descriptor.rs
+    src/ohos_sign/src/elf.rs
+    src/ohos_sign/src/lib.rs
+    src/ohos_sign/src/merkle.rs
+    src/ohos_sign/src/sha256.rs
+    src/ohos_sign/tests/descriptor_layout.rs
+    src/ohos_sign/tests/elf_sign.rs
+    src/ohos_sign/tests/merkle_tree.rs
+    src/ohos_sign/tests/sha256_kat.rs
+    src/options_types/compile_target.rs
+    src/resolver/lib.rs
+    src/resolver/resolver.rs
+    src/runtime/Cargo.toml
+    src/runtime/api.rs
+    src/runtime/api/bun/Terminal.rs
+    src/runtime/api/bun/js_bun_spawn_bindings.rs
+    src/runtime/api/bun/ohos_node_userinfo.rs
+    src/runtime/api/bun/spawn/stdio.rs
+    src/runtime/api/bun/subprocess.rs
+    src/runtime/api/js_bundle_completion_task.rs
+    src/runtime/cli/Arguments.rs
+    src/runtime/cli/build_command.rs
+    src/runtime/cli/create/SourceFileProjectGenerator.rs
+    src/runtime/cli/filter_run.rs
+    src/runtime/cli/init/react-shadcn/bun.lock
+    src/runtime/cli/init/react-shadcn/package.json
+    src/runtime/cli/init/react-tailwind/bun.lock
+    src/runtime/cli/init/react-tailwind/package.json
+    src/runtime/cli/run_command.rs
+    src/runtime/cli/test/parallel/Coordinator.rs
+    src/runtime/cli/upgrade_command.rs
+    src/runtime/dns_jsc/dns.rs
+    src/runtime/error.rs
+    src/runtime/ffi/ffi_body.rs
+    src/runtime/napi/napi_body.rs
+    src/runtime/node/node_fs.rs
+    src/runtime/node/node_net_binding.rs
+    src/runtime/node/node_process.rs
+    src/runtime/node/path_watcher.rs
+    src/runtime/shell/builtin/echo.rs
+    src/runtime/shell/builtin/which.rs
+    src/runtime/shell/subproc.rs
+    src/runtime/socket/Listener.rs
+    src/runtime/socket/socket_body.rs
+    src/runtime/socket/system_certs.rs
+    src/runtime/webcore/blob/read_file.rs
+    src/spawn/process.rs
+    src/spawn_sys/lib.rs
+    src/spawn_sys/spawn_process.rs
+    src/standalone_graph/StandaloneModuleGraph.rs
+    src/sys/Cargo.toml
+    src/sys/lib.rs
+    src/sys/linux_syscall.rs
+  ].each do |p|
+    patch do
+      file "Patches/bun@1.4/#{p}.patch"
+    end
+  end
   resource "rust-nightly" do
     url "https://static.rust-lang.org/dist/2026-07-20/rust-nightly-aarch64-unknown-linux-ohos.tar.gz"
     version "nightly-2026-07-20"

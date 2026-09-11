@@ -1,0 +1,69 @@
+diff --git a/src/jsc/bindings/BunProcess.cpp b/src/jsc/bindings/BunProcess.cpp
+index 57f1b66e0e..463f10cdce 100644
+--- a/src/jsc/bindings/BunProcess.cpp
++++ b/src/jsc/bindings/BunProcess.cpp
+@@ -211,6 +211,8 @@ static JSValue constructPlatform(VM& vm, JSObject* processObject)
+ {
+ #if defined(__APPLE__)
+     return JSC::jsString(vm, makeAtomString("darwin"_s));
++#elif defined(__OHOS__)
++    return JSC::jsString(vm, makeAtomString("openharmony"_s));
+ #elif defined(__ANDROID__)
+     return JSC::jsString(vm, makeAtomString("android"_s));
+ #elif defined(__linux__)
+@@ -3340,11 +3342,30 @@ JSC_DEFINE_HOST_FUNCTION(Process_functiongetgroups, (JSGlobalObject * globalObje
+         throwSystemError(throwScope, globalObject, "getgroups"_s, errno);
+         return {};
+     }
+-    JSArray* groups = constructEmptyArray(globalObject, nullptr, ngroups);
+-    RETURN_IF_EXCEPTION(throwScope, {});
+-    Vector<gid_t> groupVector(ngroups);
++    Vector<gid_t> groupVector;
++    groupVector.resize(ngroups);
+     getgroups(ngroups, groupVector.begin());
+-    for (unsigned i = 0; i < ngroups; i++) {
++
++    // Node's documented behavior: "POSIX leaves it unspecified if the
++    // effective group ID is included, but Node.js ensures it is." A raw
++    // getgroups(2) returns only supplementary groups, and on platforms
++    // where the effective gid is not also in the supplementary list
++    // (observed on OHOS: egid 20020101 not in the list, while `id -G`
++    // reports it) this array disagrees with both Node and `id -G`.
++    const gid_t egid = getegid();
++    bool hasEgid = false;
++    for (unsigned i = 0; i < groupVector.size(); i++) {
++        if (groupVector[i] == egid) {
++            hasEgid = true;
++            break;
++        }
++    }
++    if (!hasEgid)
++        groupVector.append(egid);
++
++    JSArray* groups = constructEmptyArray(globalObject, nullptr, groupVector.size());
++    RETURN_IF_EXCEPTION(throwScope, {});
++    for (unsigned i = 0; i < groupVector.size(); i++) {
+         groups->putDirectIndex(globalObject, i, jsNumber(groupVector[i]));
+         RETURN_IF_EXCEPTION(throwScope, {});
+     }
+@@ -4692,16 +4713,13 @@ static inline JSValue getCachedCwd(JSC::JSGlobalObject* globalObject)
+     auto& vm = JSC::getVM(globalObject);
+     auto scope = DECLARE_THROW_SCOPE(vm);
+ 
+-    // https://github.com/nodejs/node/blob/2eff28fb7a93d3f672f80b582f664a7c701569fb/lib/internal/bootstrap/switches/does_own_process_state.js#L142-L146
+-    auto* processObject = defaultGlobalObject(globalObject)->processObject();
+-    if (auto* cached = processObject->cachedCwd()) {
+-        return cached;
+-    }
+-
++    // Do NOT cache the result: process.cwd() must re-query the syscall each
++    // call (like Node's uv_cwd()), so a cwd deleted via rmdir after chdir
++    // surfaces ENOENT. The Rust side (bun_sys::getcwd) already probes stat(".")
++    // on OHOS to detect the deleted-cwd case; caching here would hide it.
+     auto cwd = Bun__Process__getCwd(globalObject);
+     RETURN_IF_EXCEPTION(scope, {});
+     JSString* cwdStr = uncheckedDowncast<JSString>(JSValue::decode(cwd));
+-    processObject->setCachedCwd(vm, cwdStr);
+     RELEASE_AND_RETURN(scope, cwdStr);
+ }
+ 

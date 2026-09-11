@@ -1,0 +1,13 @@
+diff --git a/scripts/build.ts b/scripts/build.ts
+index 46e05970d6..bd2ad7774c 100644
+--- a/scripts/build.ts
++++ b/scripts/build.ts
+@@ -469,6 +469,8 @@ function parseArgs(argv: string[]): CliArgs {
+     "pgoGenerate",
+     "pgoUse",
+     "androidNdk",
++    "ohosSysroot",
++    "ohosSdkRoot",
+     "macosSdk",
+     "osxDeploymentTarget",
+     "winsysroot",

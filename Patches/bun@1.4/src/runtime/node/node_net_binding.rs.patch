@@ -1,0 +1,12 @@
+diff --git a/src/runtime/node/node_net_binding.rs b/src/runtime/node/node_net_binding.rs
+index e4ebc3d406..5730180578 100644
+--- a/src/runtime/node/node_net_binding.rs
++++ b/src/runtime/node/node_net_binding.rs
+@@ -152,6 +152,7 @@ pub(crate) fn new_detached_socket(global: &JSGlobalObject, frame: &CallFrame) ->
+             server_name: JsCell::new(None),
+             buffered_data_for_node_net: Default::default(),
+             bytes_written: Cell::new(0),
++            pending_fatal_send_errno: Cell::new(0),
+             native_callback: JsCell::new(NativeCallbacks::None),
+             twin: JsCell::new(None),
+             verify_error: JsCell::new(None),

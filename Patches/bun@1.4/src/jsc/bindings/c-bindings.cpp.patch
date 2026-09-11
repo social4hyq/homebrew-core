@@ -1,0 +1,201 @@
+diff --git a/src/jsc/bindings/c-bindings.cpp b/src/jsc/bindings/c-bindings.cpp
+index 481ccddda1..3afd97b900 100644
+--- a/src/jsc/bindings/c-bindings.cpp
++++ b/src/jsc/bindings/c-bindings.cpp
+@@ -16,6 +16,9 @@
+ #include <cstdint>
+ #include <cstdlib>
+ #include <pthread.h>
++#if OS(LINUX)
++#include <dlfcn.h>
++#endif
+ #include <termios.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+@@ -62,21 +65,35 @@ extern "C" int32_t set_process_priority(int32_t pid, int32_t priority)
+ #if !OS(WINDOWS)
+ extern "C" bool is_executable_file(const char* path)
+ {
+-#if defined(O_EXEC)
+-    // O_EXEC is macOS specific
++#if defined(__OHOS__)
++    // OHOS kernel bug: open(O_EXEC) doesn't check file x permission bit,
++    // so a 0660 file incorrectly succeeds. Use access(X_OK) instead.
++    // But access(X_OK) returns true for directories (x bit = traversal),
++    // so we must also verify it is a regular file, not a directory.
++    struct stat st;
++    if (stat(path, &st) != 0)
++        return false;
++    if (!S_ISREG(st.st_mode))
++        return false;
++    return access(path, X_OK) == 0;
++#elif defined(O_EXEC)
++    // macOS: O_EXEC correctly checks x permission.
+     int fd = open(path, O_EXEC | O_CLOEXEC | O_NONBLOCK | O_NOCTTY, 0);
+     if (fd < 0)
+         return false;
+     close(fd);
+     return true;
+-#endif // defined(O_EXEC)
+-
++#else
++    // Linux (no O_EXEC): use stat to check x bit. Directories also carry an
++    // x bit (traversal permission), so this must also reject non-regular
++    // files the same way the OHOS branch above does.
+     struct stat st;
+     if (stat(path, &st) != 0)
+         return false;
+-
+-    // regular file and user can execute
+-    return S_ISREG(st.st_mode) && (st.st_mode & S_IXUSR);
++    if (!S_ISREG(st.st_mode))
++        return false;
++    return (st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0;
++#endif
+ }
+ #endif
+ 
+@@ -358,20 +375,24 @@ extern "C" void on_before_reload_process_posix()
+ }
+ 
+ #if OS(LINUX)
+-// Linked in with -Wl,--wrap=execve -Wl,--wrap=pthread_create (scripts/build/flags.ts).
+ // While a thread is inside execve(2), until de_thread() has killed the other threads or the
+ // exec has failed, the kernel fails every clone(CLONE_FS) in the process with EAGAIN
+ // (fs/exec.c check_unsafe_exec, kernel/fork.c copy_fs). WTF::Thread::create aborts on a
+ // failed pthread_create, which killed --watch reloads. A pthread_create EAGAIN that overlaps
+ // an exec of this process is retried instead. `execve_generation` counts execs ever started
+ // so one that began and ended inside a single pthread_create is still seen; it is bumped
+-// after `threads_in_execve` and read before it.
++// after `threads_in_execve` and read before it. This state and the retry algorithm below are
++// shared by both platform variants; only how the real execve/pthread_create get called differs.
+ static std::atomic<int> threads_in_execve { 0 };
+ static std::atomic<unsigned> execve_generation { 0 };
+ // The clone(CLONE_VM) child of posix_spawn_bun execs in this address space and never returns
+ // to undo a count, so only the pid recorded in bun_initialize_process counts its execs.
+ static pid_t execve_counting_pid = 0;
+ 
++#if !defined(__OHOS__)
++// Linked in with -Wl,--wrap=execve -Wl,--wrap=pthread_create (scripts/build/flags.ts).
++// __real_execve/__real_pthread_create are aliased by the linker's --wrap to the
++// original symbols, which requires them to be visible at static-link time.
+ extern "C" int __real_execve(const char*, char* const[], char* const[]);
+ extern "C" int __real_pthread_create(pthread_t*, const pthread_attr_t*, void* (*)(void*), void*);
+ 
+@@ -404,6 +425,94 @@ extern "C" int __wrap_pthread_create(pthread_t* thread, const pthread_attr_t* at
+         usleep(1000);
+     }
+ }
++#else // defined(__OHOS__)
++// bun-ohos links dynamically against ld-musl.so, so execve/pthread_create live in a
++// shared object, not in any archive being linked — lld's --wrap only resolves
++// __real_* against a symbol definition visible at static-link time, so on OHOS
++// __real_execve/__real_pthread_create would be left as unresolved dynamic
++// relocations (the linker only warns; the musl loader hard-fails at process start,
++// "Error relocating ...: __real_execve: symbol not found"). --wrap is unusable
++// here, so this defines plain-named `execve`/`pthread_create` instead: for a
++// dynamically linked executable, symbols the executable itself exports take
++// priority over the same-named symbols in its shared-library dependencies for
++// every reference resolved through the executable's own symbol table — the same
++// rule LD_PRELOAD relies on, minus the injected library. Every pthread_create/
++// execve call compiled into bun itself (this file, WTF::Thread::create, JSC/WTF's
++// static WebKit archive, etc.) goes through that table and lands here; musl's own
++// internal callers bypass it via direct/hidden calls and are unaffected, which is
++// fine since only bun's own thread-spawning needs protecting. This is the exact
++// mechanism scripts/build/shims/ohos_compat_shim.c already uses for 18 other libc
++// symbols (close, dup2, getcwd, splice, ...), compiled straight into this binary.
++//
++// The real function pointers are resolved eagerly in bun_initialize_process(),
++// not lazily on first call: bun-spawn.cpp's posix_spawn_bun runs execve() from
++// inside a CLONE_VM|CLONE_VFORK child, where the parent is suspended until the
++// child execs. A lazy dlsym() on that child's first-ever execve could race the
++// parent for the dynamic linker's lock and deadlock the whole process. The lazy
++// fallback below only exists to be safe if something calls in before init.
++typedef int (*execve_fn)(const char*, char* const[], char* const[]);
++typedef int (*pthread_create_fn)(pthread_t*, const pthread_attr_t*, void* (*)(void*), void*);
++static std::atomic<execve_fn> real_execve_ptr { nullptr };
++static std::atomic<pthread_create_fn> real_pthread_create_ptr { nullptr };
++
++static execve_fn real_execve()
++{
++    execve_fn fn = real_execve_ptr.load(std::memory_order_acquire);
++    if (!fn) {
++        fn = reinterpret_cast<execve_fn>(dlsym(RTLD_NEXT, "execve"));
++        real_execve_ptr.store(fn, std::memory_order_release);
++    }
++    return fn;
++}
++
++static pthread_create_fn real_pthread_create()
++{
++    pthread_create_fn fn = real_pthread_create_ptr.load(std::memory_order_acquire);
++    if (!fn) {
++        fn = reinterpret_cast<pthread_create_fn>(dlsym(RTLD_NEXT, "pthread_create"));
++        real_pthread_create_ptr.store(fn, std::memory_order_release);
++    }
++    return fn;
++}
++
++// Called once from bun_initialize_process(), well before any vfork child could
++// call execve() and race a lazy dlsym() against a lock the suspended parent holds.
++static void resolveRealExecveAndPthreadCreateEagerly()
++{
++    real_execve_ptr.store(reinterpret_cast<execve_fn>(dlsym(RTLD_NEXT, "execve")), std::memory_order_release);
++    real_pthread_create_ptr.store(reinterpret_cast<pthread_create_fn>(dlsym(RTLD_NEXT, "pthread_create")), std::memory_order_release);
++}
++
++extern "C" int execve(const char* path, char* const argv[], char* const envp[])
++{
++    if (getpid() != execve_counting_pid)
++        return real_execve()(path, argv, envp);
++    threads_in_execve.fetch_add(1, std::memory_order_seq_cst);
++    execve_generation.fetch_add(1, std::memory_order_seq_cst);
++    int rc = real_execve()(path, argv, envp);
++    // Only reached when execve failed and the old image keeps running.
++    threads_in_execve.fetch_sub(1, std::memory_order_seq_cst);
++    return rc;
++}
++
++// The attempt bound keeps a real limit, hit while an exec never completes, from looping forever.
++extern "C" int pthread_create(pthread_t* thread, const pthread_attr_t* attr, void* (*start_routine)(void*), void* arg)
++{
++    for (int attempt = 0;; attempt++) {
++        unsigned generation = execve_generation.load(std::memory_order_seq_cst);
++        bool execInFlight = threads_in_execve.load(std::memory_order_seq_cst) > 0;
++        int rc = real_pthread_create()(thread, attr, start_routine, arg);
++        if (rc != EAGAIN || attempt >= 1000)
++            return rc;
++        if (!execInFlight && threads_in_execve.load(std::memory_order_seq_cst) == 0
++            && execve_generation.load(std::memory_order_seq_cst) == generation) {
++            // No exec overlapped this attempt: a real limit.
++            return rc;
++        }
++        usleep(1000);
++    }
++}
++#endif // defined(__OHOS__)
+ #endif // OS(LINUX)
+ 
+ #endif // !OS(WINDOWS)
+@@ -706,6 +815,9 @@ extern "C" void bun_initialize_process()
+     bun_close_range(4, ~0U, CLOSE_RANGE_CLOEXEC);
+ 
+     execve_counting_pid = getpid();
++#if defined(__OHOS__)
++    resolveRealExecveAndPthreadCreateEagerly();
++#endif
+ #endif
+ 
+ #if OS(LINUX) || OS(DARWIN) || OS(FREEBSD)
+@@ -1132,7 +1244,11 @@ extern "C" void Bun__unregisterSignalsForForwarding()
+ #if OS(LINUX) || OS(DARWIN) || OS(FREEBSD)
+ #include <paths.h>
+ 
++#if defined(__OHOS__)
++extern "C" const char* BUN_DEFAULT_PATH_FOR_SPAWN = "/usr/bin:/bin:/system/bin";
++#else
+ extern "C" const char* BUN_DEFAULT_PATH_FOR_SPAWN = _PATH_DEFPATH;
++#endif
+ #elif OS(WINDOWS)
+ extern "C" const char* BUN_DEFAULT_PATH_FOR_SPAWN = "C:\\Windows\\System32;C:\\Windows;";
+ #else
