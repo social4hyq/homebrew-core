@@ -12,7 +12,7 @@ class CairommAT114 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f391e9c9ad9c150d73b3a146a6ac585bd3f9bac178db704560dde22bf0858696"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f7edb3fa658c7d400989560349ed220b21667e872809dd5f2afe7f88c9f76e65"
   end
 
   depends_on "meson" => :build
