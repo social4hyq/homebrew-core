@@ -5,6 +5,7 @@ class Saxon < Formula
   version "12.9"
   sha256 "f2895bef3794112c650a158be27c39a86e88c1717ebb8e0e88067d1f07635d12"
   license all_of: ["BSD-3-Clause", "MIT", "MPL-2.0"]
+  revision 1
 
   livecheck do
     url :stable
@@ -20,7 +21,7 @@ class Saxon < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6deed0a3084f8cadc86922cf6e3bd964f3b3fe746a5bf8ff2c0ce9c8950baba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "131a2a5f8a8b8301134aafef73e6050ee912e48ad84d9e543db7cca53b3b9bbb"
   end
 
   depends_on "openjdk"
