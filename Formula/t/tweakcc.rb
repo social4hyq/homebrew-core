@@ -7,7 +7,7 @@ class Tweakcc < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8aac5404e177f379ff822de8346dd21928535ec4cfbae8c954f4f8d3063443fc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8928561725d1801e7f4cde15c6ddba901d8f90dcada6757304a3d28efdf2ab76"
   end
 
   depends_on "node"
