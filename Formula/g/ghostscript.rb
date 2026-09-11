@@ -21,7 +21,7 @@ class Ghostscript < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fbfdb26b13ab8fe9005a925ea14a12b383b2fc9e3039d36ca770ce3ede1ec12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1cefbd11c6b07951e0cebbc7161d43ac8ba9d7615d40c55a4b78184cebb62d5c"
   end
 
   head do
