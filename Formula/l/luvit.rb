@@ -4,11 +4,11 @@ class Luvit < Formula
   url "https://github.com/luvit/luvit/archive/refs/tags/2.18.1.tar.gz"
   sha256 "b792781d77028edb7e5761e96618c96162bd68747b8fced9a6fc52f123837c2c"
   license "Apache-2.0"
-  revision 9
+  revision 10
   head "https://github.com/luvit/luvit.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "df9d48ad4a9309f489856d9aabaaaac001850a7a32964fd2a1744d6c15cf88e0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "451bf70def17cb77753808a6c878243cebeb565cb96e188cd5019df18ce059a1"
   end
 
   depends_on "cmake" => :build
