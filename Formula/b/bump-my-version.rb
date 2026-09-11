@@ -6,10 +6,11 @@ class BumpMyVersion < Formula
   url "https://files.pythonhosted.org/packages/23/09/5b09ac74962eca809cbf7010a08ea6ad405852bdd53489209a9f473d775c/bump_my_version-1.5.1.tar.gz"
   sha256 "5079e443ab8c9a9903f140b427ff9f6fe8dd54013a55a4cf48b89326f3a71c07"
   license "MIT"
+  revision 1
   head "https://github.com/callowayproject/bump-my-version.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c20dfb44a9aa10e3a3ce5ee4fe0048cc100532b05471e690abb030e054d7a13d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29198f33f0220370219291a0265f58ebc843bd39a304f9c7e3726e61e75a3121"
   end
 
   depends_on "certifi" => :no_linkage
