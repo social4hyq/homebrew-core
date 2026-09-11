@@ -8,7 +8,7 @@ class Xsel < Formula
   head "https://github.com/kfish/xsel.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "827b11a094828750ba3bdb9fd811cd50149a7b9063bf51193fd4f52a3ba2f82a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2003407b88464361733fa60bd0f1e225aee5f01190e4da11fd93c51e4abca078"
   end
 
   depends_on "autoconf" => :build
