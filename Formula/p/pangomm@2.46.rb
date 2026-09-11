@@ -12,7 +12,7 @@ class PangommAT246 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "edbb9dad7c2688e971e6b44e6600447393c234106b2c7ba267a72c82065fd919"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c912d1b03b33f632b64df6c37806e24901111606e4247876db3b4614b99d9839"
   end
 
   depends_on "meson" => :build
