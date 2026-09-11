@@ -6,11 +6,11 @@ class Bpython < Formula
   url "https://files.pythonhosted.org/packages/44/29/cd80e9108a6fc6a925ffb915f8f69198a2bb2388e39167a41d743ac2a8f4/bpython-0.26.tar.gz"
   sha256 "f79083e1e3723be9b49c9994ad1dd3a19ccb4d0d4f9a6f5b3a73bef8bc327433"
   license "MIT"
-  revision 5
+  revision 6
   head "https://github.com/bpython/bpython.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "22a3e253cb7d31c8da06c20fa47e120388e59e14ed4533b3af082c5c59486cc6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "439f97bb2e50bd3588f055e4e93937f0881ddc2dccde5c8536840ba9a2efe3a4"
   end
 
   depends_on "certifi" => :no_linkage
