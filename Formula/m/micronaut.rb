@@ -4,6 +4,7 @@ class Micronaut < Formula
   url "https://github.com/micronaut-projects/micronaut-starter/archive/refs/tags/v5.1.3.tar.gz"
   sha256 "badc9e138949c36176df0ea29e68519dcfc33e85b71946a822ec958deb0f3742"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
