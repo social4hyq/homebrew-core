@@ -7,7 +7,7 @@ class E2b < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c87c54b8095d0e44c4e1a3dc6bb027d5e3286110d32518b46a0d51fa7963b63c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9dc8338216fab43c04d5023cc124609eabdcb48fea477288b573f9e9836f9d06"
   end
 
   depends_on "node"
