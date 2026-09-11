@@ -6,7 +6,7 @@ class GtkDoc < Formula
   url "https://download.gnome.org/sources/gtk-doc/1.36/gtk-doc-1.36.1.tar.xz"
   sha256 "0e517a5f97069831181be177516bde8aa8b3922398f2bdb09e265d22aecadbc5"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 2
 
   # We use a common regex because gtk-doc doesn't use GNOME's
   # "even-numbered minor is stable" version scheme.
@@ -16,7 +16,7 @@ class GtkDoc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21895eb2169d534774ac42154559a081298ba6adb63804374094f0b05d0a02e2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6977001d15268c8bdb98bd952567fec2d8330bc943c765d79359e1ce1e3aff1"
   end
 
   depends_on "meson" => :build
