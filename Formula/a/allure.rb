@@ -4,6 +4,7 @@ class Allure < Formula
   url "https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.46.1/allure-commandline-2.46.1.zip"
   sha256 "d25c519bbde940dc953cff8901130ce18b73013dc19a8f8b90b8b4b1c5eb252f"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=io/qameta/allure/allure-commandline/maven-metadata.xml"
@@ -11,7 +12,7 @@ class Allure < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca2ec6b91f160306070dfd4e06df5902dda4b332bc95056ff815083f080784c2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "803a4136ea72ed969e285166abd56d8bee35e25d07f2a061d95159223299f38d"
   end
 
   depends_on "openjdk"
