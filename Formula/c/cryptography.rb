@@ -4,11 +4,12 @@ class Cryptography < Formula
   url "https://files.pythonhosted.org/packages/bb/ad/5d6702db60b1e40b41ef513b6967ff5848f307d50f8449baf1634f5908f1/cryptography-50.0.1.tar.gz"
   sha256 "5dd9bda1c12b4162f6ff568eeb5e0ff956c28d14406e875cfe8a63a2d414ff20"
   license any_of: ["Apache-2.0", "BSD-3-Clause"]
+  revision 1
   compatibility_version 1
   head "https://github.com/pyca/cryptography.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a496e8580072e5901deab43292d2a66b08dd7ffc1f127880ac217d554147905c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "273fa1fa30745dc80beaa25f616dc04b18c7628ed9e402cede32f73dc625d55e"
   end
 
   depends_on "maturin" => :build
