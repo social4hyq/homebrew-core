@@ -4,6 +4,7 @@ class SonarScanner < Formula
   url "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-8.1.0.6389.zip"
   sha256 "ab76ab3c360025e9108be5b55be066f304a164f8b2850d2f2f333915db51bc1b"
   license "LGPL-3.0-or-later"
+  revision 1
   head "https://github.com/SonarSource/sonar-scanner-cli.git", branch: "master"
 
   bottle do
