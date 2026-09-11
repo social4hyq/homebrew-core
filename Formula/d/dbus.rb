@@ -6,7 +6,7 @@ class Dbus < Formula
   mirror "https://deb.debian.org/debian/pool/main/d/dbus/dbus_1.16.2.orig.tar.xz"
   sha256 "0ba2a1a4b16afe7bceb2c07e9ce99a8c2c3508e5dec290dbb643384bd6beb7e2"
   license any_of: ["AFL-2.1", "GPL-2.0-or-later"]
-  revision 1
+  revision 2
   compatibility_version 1
   head "https://gitlab.freedesktop.org/dbus/dbus.git", branch: "main"
 
@@ -16,7 +16,7 @@ class Dbus < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf0c452318f1853132603e3b2f92296929791a058423de0a2848aa02a83829d4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29e776a4b16923ae89eb33cb0ecd88020eb435cfe24126858295ea136a4b9d9f"
   end
 
   depends_on "docbook" => :build
