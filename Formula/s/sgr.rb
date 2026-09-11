@@ -6,10 +6,10 @@ class Sgr < Formula
   url "https://files.pythonhosted.org/packages/dd/61/7d6cf822edb39d2426f6f185c7fc4de0ad4b80e0da3e5f50d94952795c11/splitgraph-0.3.12.tar.gz"
   sha256 "76a4476002b5ac5a2b9fba36b6fcffd85b878bcc25f5aae411387e04a5532459"
   license "Apache-2.0"
-  revision 15
+  revision 16
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b77d5e619bb15a33c3f2558031bc73a873bb1a4db522310c1d41b1a26c779c13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7b33ce325e1691f1ea553035fd4f08fe396374b42997c1b61d5bc91186f3de0"
   end
 
   deprecate! date: "2025-06-21", because: :unmaintained
