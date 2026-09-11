@@ -4,10 +4,11 @@ class Libheif < Formula
   url "https://github.com/strukturag/libheif/releases/download/v1.23.4/libheif-1.23.4.tar.gz"
   sha256 "d0c02b4b0e978f34a1974b6f3eea7975a537bf7a9195ffeea38e7242ff316fdd"
   license "LGPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1911dcb71f670192416c4a8e26ca427115a1228ac42fdf5f45b182650fdf6d2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9af2364885635795401556792cbe7e1b5ff44bbe678a2ac61ce2bdef3dbef59"
   end
 
   depends_on "cmake" => :build
