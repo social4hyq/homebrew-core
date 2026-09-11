@@ -4,6 +4,7 @@ class Lilv < Formula
   url "https://download.drobilla.net/lilv-0.28.0.tar.xz"
   sha256 "8dcb70adb5cf072335115a6b091f4113710bdc73abaadaa3f9e9c1e55957b149"
   license "ISC"
+  revision 1
 
   livecheck do
     url "https://download.drobilla.net/"
@@ -11,7 +12,7 @@ class Lilv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3bda13dfcb8c82dbe72f0cb32b4dc758419435d0309314dfd6da1f916fe631a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b6a3cacdfd8dd713da508daf244d5ced03ccbe096a40a1f4820029c01b07ff1"
   end
 
   depends_on "meson" => :build
