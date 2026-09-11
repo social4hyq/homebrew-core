@@ -9,7 +9,7 @@ class Sail < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce37340cafc17f7e0e7fd5fa1a7bac23ad3df00910fd0737584b58c6063c9f24"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "38a332fb979bdb27e33236fcd719338d612b59dad135deed9059a0cba3e98686"
   end
 
   # `pkgconf` and `rust` are for bcrypt
