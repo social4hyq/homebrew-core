@@ -4,6 +4,7 @@ class Checkstyle < Formula
   url "https://github.com/checkstyle/checkstyle/releases/download/checkstyle-14.1.0/checkstyle-14.1.0-all.jar"
   sha256 "51e2bc7fed1bb56808aa39045f655a316194997acd24bac5195253dcf342b380"
   license "LGPL-2.1-or-later"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Checkstyle < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1a772f9ad529ff2a5f8a9a128dc1708a446149aa5d0856ffe5a86f08c9f506a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "59eec1b717acd4d1396f69ab6233bf835adb2626057b7a1bbc82855fc207e82a"
   end
 
   depends_on "openjdk"
