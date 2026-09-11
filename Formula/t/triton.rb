@@ -7,7 +7,7 @@ class Triton < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b28e6b934dd3fb1e780831804568b2c703f5113cbe6be5b02604840fcd8b064b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "26662e6244f521c3a2d80e3a95e1527d85f3bd5e30888e8667924531497a8f7a"
   end
 
   depends_on "node"
