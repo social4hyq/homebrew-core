@@ -5,6 +5,7 @@ class CfrDecompiler < Formula
       tag:      "0.152",
       revision: "68477be3ff7171ee17ddd1a26064b9b253f1604f"
   license "MIT"
+  revision 1
   head "https://github.com/leibnitz27/cfr.git", branch: "master"
 
   livecheck do
@@ -13,7 +14,7 @@ class CfrDecompiler < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c84bbcbe45637ac405146800ac749be06e58c2b8951d5dd2cbc126e4108faacb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fb155d6c83022720218c7d70e266796dad564ac7aaac38d4efd822839beaa2a"
   end
 
   depends_on "maven" => :build
