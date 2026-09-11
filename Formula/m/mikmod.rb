@@ -1,8 +1,8 @@
 class Mikmod < Formula
   desc "Portable tracked music player"
   homepage "https://mikmod.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/mikmod/mikmod/3.2.9/mikmod-3.2.9.tar.gz"
-  sha256 "214c10aa3019807a1eb26b2c709592f63dbcc00b72985aa86a4fb7ac3cd8b901"
+  url "https://downloads.sourceforge.net/project/mikmod/mikmod/3.2.10/mikmod-3.2.10.tar.gz"
+  sha256 "465e99d89d762608b7d0c0a103a58eec68c8c28ae6bbd196354c13433e40d20a"
   license "GPL-2.0-or-later"
 
   livecheck do
