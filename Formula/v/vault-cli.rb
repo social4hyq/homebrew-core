@@ -4,6 +4,7 @@ class VaultCli < Formula
   url "https://search.maven.org/remotecontent?filepath=org/apache/jackrabbit/vault/vault-cli/4.2.0/vault-cli-4.2.0-bin.tar.gz"
   sha256 "a8f8ef02b6b50fd4227ad320490a55cfd78630ff2c902f4af7b0be38dda36f68"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/apache/jackrabbit-filevault.git", branch: "master"
 
   livecheck do
@@ -12,7 +13,7 @@ class VaultCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf3cd4e4b32165070058714dac4ae0596681ddc4494cfc3c896f5254264aca68"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "20f698329c0a0967d94a94f2f906124582d797ee5e9b0d62cb75307ad9bc80f4"
   end
 
   depends_on "openjdk"
