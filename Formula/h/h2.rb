@@ -5,6 +5,7 @@ class H2 < Formula
   version "2.4.240"
   sha256 "154d7aac3c33cae3dc361ad0c5296040be08ed0508acde6560c03842088d147e"
   license "MPL-2.0"
+  revision 1
 
   no_autobump! because: :incompatible_version_format
 
