@@ -4,6 +4,7 @@ class Cairomm < Formula
   url "https://cairographics.org/releases/cairomm-1.18.1.tar.xz"
   sha256 "e0e996a979ee52c840dca3ee74f5d005e3259b94ddce58f255d3b6f47c8cb41d"
   license "LGPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url "https://cairographics.org/releases/?C=M&O=D"
@@ -11,7 +12,7 @@ class Cairomm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c29eafe01bc0fba1ae55495af83df30ff5a175220c85bfa03bd77c24c7499e1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "24cd264f80682eb6df22a929a7e834ed26494bacb52e48f7c931b6cf433e19d4"
   end
 
   depends_on "meson" => :build
