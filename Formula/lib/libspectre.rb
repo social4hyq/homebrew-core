@@ -13,7 +13,7 @@ class Libspectre < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "11d594053cd142d013f7ab3ff5efb3651110b8fd23655a5720c1f7bbe9d6640e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "41e88140bf18ecef8c6e1119132e4a8024475514f942c480901ffab2edbe99e5"
   end
 
   depends_on "ghostscript"
