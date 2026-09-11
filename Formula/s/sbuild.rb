@@ -4,7 +4,7 @@ class Sbuild < Formula
   url "https://github.com/SBuild-org/SBuild-org.github.io/raw/master/uploads/sbuild/0.7.7/sbuild-0.7.7-dist.zip"
   sha256 "606bc09603707f31d9ca5bc306ba01b171f8400e643261acd28da7a1a24dfb23"
   license "Apache-2.0"
-  revision 2
+  revision 3
 
   livecheck do
     url :homepage
@@ -12,7 +12,7 @@ class Sbuild < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d15b5fc885bfe1b47bbeac2b570e594eff649a88a933b9758fde80c9c8a50773"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd4b4e3965c1178d3992c634fd06551d92b1bbee3211700fd56d5e62d4b216c4"
   end
 
   # https://github.com/SBuild-org/sbuild
