@@ -4,10 +4,11 @@ class Cgif < Formula
   url "https://github.com/dloebl/cgif/archive/refs/tags/v0.5.4.tar.gz"
   sha256 "83a70a15bc2da41f081a44ebc58ee48e2e1d524a6d3fdb4a24064afa08d5ad4d"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "36a09a0f5711f07901f83709c270efda210e5a146db009855a50bfdf6239e0c1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "158449ac44d2002430eb646dcfe247ae021dcfa37c0ac4a22ab1006b04e506c2"
   end
 
   depends_on "meson" => :build
