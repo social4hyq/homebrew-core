@@ -8,7 +8,7 @@ class GsettingsDesktopSchemas < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "23c9655d3e7cdc110dffb80064ae651dc6aecd3f3f59f32a5ac27559ac3f5fc6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "199f5ff3f6c799430d1eddba0b71dd5eeb1b1e4471e1b9b6c3c40ce96f5751cf"
   end
 
   depends_on "gettext" => :build
