@@ -8,7 +8,7 @@ class Libxt < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "505e7e7a6a379b8fb8150f64df8c6b791f7bfbd2d88b2d10a813db2f4b548023"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "977283fe0cae6d31c9d1f8c82841d699cff8524d8bafebd2653ef35c855eca98"
   end
 
   depends_on "pkgconf" => :build
