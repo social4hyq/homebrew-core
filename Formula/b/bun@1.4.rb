@@ -59,7 +59,6 @@ class BunAT14 < Formula
     Cargo.toml
     bun.lock
     package.json
-    packages/bun-plugin-svelte/bun.lock
     packages/bun-usockets/src/eventing/epoll_kqueue.c
     patches/zstd/ohos-qsort-r.patch
     scripts/build.ts
@@ -74,8 +73,6 @@ class BunAT14 < Formula
     scripts/build/flags.ts
     scripts/build/rust.ts
     scripts/build/shims.ts
-    scripts/build/shims/cpu_model/cpu_model.h
-    scripts/build/shims/cpu_model/x86.c
     scripts/build/shims/ohos_compat_shim.c
     scripts/build/source.ts
     scripts/build/stream.ts
@@ -108,7 +105,6 @@ class BunAT14 < Formula
     src/io/lib.rs
     src/io/pipes.rs
     src/io/posix_event_loop.rs
-    src/io/windows_event_loop.rs
     src/js/node/os.ts
     src/js/wasi-runner.js
     src/jsc/bindings/BunProcess.cpp
@@ -127,10 +123,6 @@ class BunAT14 < Formula
     src/ohos_sign/src/lib.rs
     src/ohos_sign/src/merkle.rs
     src/ohos_sign/src/sha256.rs
-    src/ohos_sign/tests/descriptor_layout.rs
-    src/ohos_sign/tests/elf_sign.rs
-    src/ohos_sign/tests/merkle_tree.rs
-    src/ohos_sign/tests/sha256_kat.rs
     src/options_types/compile_target.rs
     src/resolver/lib.rs
     src/resolver/resolver.rs
@@ -146,9 +138,7 @@ class BunAT14 < Formula
     src/runtime/cli/build_command.rs
     src/runtime/cli/create/SourceFileProjectGenerator.rs
     src/runtime/cli/filter_run.rs
-    src/runtime/cli/init/react-shadcn/bun.lock
     src/runtime/cli/init/react-shadcn/package.json
-    src/runtime/cli/init/react-tailwind/bun.lock
     src/runtime/cli/init/react-tailwind/package.json
     src/runtime/cli/run_command.rs
     src/runtime/cli/test/parallel/Coordinator.rs
