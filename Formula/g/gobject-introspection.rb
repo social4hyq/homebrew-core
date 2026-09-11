@@ -7,11 +7,11 @@ class GobjectIntrospection < Formula
   url "https://download.gnome.org/sources/gobject-introspection/1.86/gobject-introspection-1.86.0.tar.xz"
   sha256 "920d1a3fcedeadc32acff95c2e203b319039dd4b4a08dd1a2dfd283d19c0b9ae"
   license all_of: ["GPL-2.0-or-later", "LGPL-2.0-or-later", "MIT"]
-  revision 2
+  revision 3
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4872f2071b99b7ed73c76b5775b87fbd1ec1da50fa268e2eeaeaf4c06e6d068"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e3d86fa50df8c44109a79af3684f5561c2603787be5166bbae5425613d47417"
   end
 
   depends_on "bison" => :build
