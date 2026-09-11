@@ -12,7 +12,7 @@ class Sratom < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "60e1e3c4fdc44863e071982be7bb948ba67b8a8afe33049d97d43c7b2203f498"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "117128cbc81b43840f6efac7f41f395a8f33aed3d6b590aec33e2952c6c432be"
   end
 
   depends_on "meson" => :build
