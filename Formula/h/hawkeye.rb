@@ -1,8 +1,8 @@
 class Hawkeye < Formula
   desc "Simple license header checker and formatter, in multiple distribution forms"
   homepage "https://github.com/korandoru/hawkeye"
-  url "https://github.com/korandoru/hawkeye/archive/refs/tags/v7.1.0.tar.gz"
-  sha256 "f74f5997a4d18595320a0d7aa63333268c9015000e93bfbd1aef7e74ea5769d1"
+  url "https://github.com/korandoru/hawkeye/archive/refs/tags/v7.2.0.tar.gz"
+  sha256 "d85bc32c3813040a83c72555998f74ca1e7218b6908faf1106d29af279e61e51"
   license "Apache-2.0"
 
   bottle do
