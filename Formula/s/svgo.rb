@@ -4,9 +4,10 @@ class Svgo < Formula
   url "https://github.com/svg/svgo/archive/refs/tags/v4.1.0.tar.gz"
   sha256 "8c9d43624e108eab29e369fdca68ea160e57b37a364907b499b5d6a4436cb59b"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "445bece893bb2507100fd16031f16ed0c5fdfee2176ac9bc1a1f11bb912293f6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dfffec20068c3243629151536fd5a9d391eabf5f6ae6f76e9985de2acdc25db6"
   end
 
   depends_on "node"
