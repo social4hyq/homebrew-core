@@ -17,7 +17,7 @@ class SharedMimeInfo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa58ddde4d585cae44f5989f8a6ccaabc583e1e57df9b726ac2cee5b51df337d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c34e8b62a718123fc8eba6514c7f0ae5029c73d529de80931f58b29cc688b39"
   end
 
   depends_on "gettext" => :build
