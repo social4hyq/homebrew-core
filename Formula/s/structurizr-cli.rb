@@ -4,6 +4,7 @@ class StructurizrCli < Formula
   url "https://github.com/structurizr/cli/releases/download/v2025.11.09/structurizr-cli.zip"
   sha256 "f5365a463fc44d539ed19bec00c48ba1e1ecda0ccfd1ba40d2e7472d264eb79a"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     rebuild 1
