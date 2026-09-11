@@ -4,10 +4,11 @@ class Inih < Formula
   url "https://github.com/benhoyt/inih/archive/refs/tags/r62.tar.gz"
   sha256 "9c15fa751bb8093d042dae1b9f125eb45198c32c6704cd5481ccde460d4f8151"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "017940b75410fe755f573decf36613841fcc559c3eb82b708ac2df6bdafa02aa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c514373a058dd5da8568edc9341a41076f5920db8efabd1c65aa69f7e5034ae1"
   end
 
   depends_on "meson" => :build
