@@ -8,7 +8,7 @@ class Libraqm < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0055931b0995c6592e8a84c904398c4f09bd6d355bc889c882c2a776bdd8b70"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5528e9bdbc2b8acc480231312aa8fd54ab33e8562caf3808a6b1b98856d596e5"
   end
 
   depends_on "meson" => :build
