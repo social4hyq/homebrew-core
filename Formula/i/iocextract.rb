@@ -6,11 +6,11 @@ class Iocextract < Formula
   url "https://files.pythonhosted.org/packages/ad/4b/19934df6cd6a0f6923aabae391a67b630fdd03c12c1226377c99a747a4f1/iocextract-1.16.1.tar.gz"
   sha256 "ec1389a76a5083f643652579610e8313d27ed5821fc57e7b046c23ddec181d44"
   license "GPL-2.0-only"
-  revision 12
+  revision 13
   head "https://github.com/InQuest/iocextract.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f439da95df479dec355ecf707eeae77cb2144f27b944d0b868cfc169d12bbd02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "47316c6b4ea491a5cf89dbcd1d4b4c34d709495096f61622e1d45429a8b7c039"
   end
 
   depends_on "certifi" => :no_linkage
