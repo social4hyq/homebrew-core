@@ -5,6 +5,7 @@ class Davmail < Formula
   version "6.7.0"
   sha256 "46203cbf37103092af904da8945d988bad39c7b325579df31310dee46ef75926"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url "https://sourceforge.net/projects/davmail/rss?path=/davmail"
