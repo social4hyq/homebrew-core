@@ -5,6 +5,7 @@ class AvroTools < Formula
   mirror "https://archive.apache.org/dist/avro/avro-1.12.2/java/avro-tools-1.12.2.jar"
   sha256 "6220e8bc089aaf917cdad4cd358bd651fc0394c0e5ddb8b36da402012c294a68"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     rebuild 1
