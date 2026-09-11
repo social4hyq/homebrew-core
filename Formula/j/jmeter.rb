@@ -5,9 +5,10 @@ class Jmeter < Formula
   mirror "https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz"
   sha256 "f68efc17fe060f698c48a6abe2599a933927486bda2924dbe14c74895318ddde"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "662d14aec94dd813f8db57ecbd5538fab2119aab358ea6a983fbe6c3d040f7c8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "545c8a30e31594e7214b4923cfe2c51c9d5ce90a2cfceedb7983075814d7af9f"
   end
 
   depends_on "openjdk@21"
