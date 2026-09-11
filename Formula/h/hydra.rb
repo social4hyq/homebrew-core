@@ -8,7 +8,7 @@ class Hydra < Formula
   head "https://github.com/vanhauser-thc/thc-hydra.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "28fe86b047eaf8296299281c001b13ab2c5064390bebe584148331a3469c63d7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e3b94b9ff5be22d7f5e80414095099e8fcf6eb2d1966907cd9e229b02f0344d1"
   end
 
   depends_on "pkgconf" => :build
