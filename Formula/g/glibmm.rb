@@ -4,10 +4,11 @@ class Glibmm < Formula
   url "https://download.gnome.org/sources/glibmm/2.88/glibmm-2.88.1.tar.xz"
   sha256 "c139f962b1575c8827cd39d1ac21b7a367be3bda1409c0c7e21a29090f371506"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f0403fa79a5bad5ae4f0392d6aeee46eae802399f1f9248e8c5e70a8111e4f2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "500f23cf91c464fd99f62d69a7ecbace1c6f0810245c7b4381c5b4ca7637f1c4"
   end
 
   depends_on "meson" => :build
