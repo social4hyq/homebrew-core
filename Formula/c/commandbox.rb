@@ -4,6 +4,7 @@ class Commandbox < Formula
   url "https://downloads.ortussolutions.com/ortussolutions/commandbox/6.3.4/commandbox-bin-6.3.4.zip"
   sha256 "266c21ca3d0ab46a8cbfcdbe4ffdb4f059fe439768f8fb5397e3a931a4623b4b"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :homepage
@@ -11,7 +12,7 @@ class Commandbox < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ae7ed5dbc6c7c88dd0288f76faaef0242bd8c4d47b91e982942d1196837a0bf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "69ac73db5ecf32774ad1c95428613c5d0e9da6714cc9bc2628a9c1ae585f3dd2"
   end
 
   # Keep pinned to Java 21 until https://ortussolutions.atlassian.net/browse/COMMANDBOX-1685 is resolved
