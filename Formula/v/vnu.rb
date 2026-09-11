@@ -4,6 +4,7 @@ class Vnu < Formula
   url "https://registry.npmjs.org/vnu-jar/-/vnu-jar-26.9.7.tgz"
   sha256 "cce367e472e80baa84211616dbb37a84155cf17dde9d30cd756cf319bb2d5903"
   license "MIT"
+  revision 1
   version_scheme 1
 
   bottle do
