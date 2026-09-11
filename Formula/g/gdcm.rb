@@ -12,7 +12,7 @@ class Gdcm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b81176ae222bb959b960f5483d356817b78a50994ec723ed3d808d01a9edb2b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d5edeb28596fe4475955fa290f96ed589c7009ee8b79a51d9e5923f19a356a1"
   end
 
   depends_on "cmake" => :build
