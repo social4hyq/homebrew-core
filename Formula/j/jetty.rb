@@ -4,6 +4,7 @@ class Jetty < Formula
   url "https://search.maven.org/remotecontent?filepath=org/eclipse/jetty/jetty-home/12.1.13/jetty-home-12.1.13.tar.gz"
   sha256 "14179049118d492b6b91f52d0f0d7d26f26af747ac8defe7a41fdd0a1bbab775"
   license any_of: ["Apache-2.0", "EPL-2.0"]
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=org/eclipse/jetty/jetty-home/maven-metadata.xml"
