@@ -4,10 +4,11 @@ class YelpXsl < Formula
   url "https://download.gnome.org/sources/yelp-xsl/49/yelp-xsl-49.0.tar.xz"
   sha256 "59d43a8f8fe67b784f14f9a04dd4a7a092a7f4a64a65e71b90fe02a47a50fbec"
   license all_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later", "MIT", "BSD-3-Clause"]
+  revision 1
   head "https://gitlab.gnome.org/GNOME/yelp-xsl.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f13f2463d5c8bc883b8d15a6be271e075553000f1b8992bf770a9455290c5469"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a3e809fb7a9b979516b38e845de033dc2324d131e967b892e66e2a0afec81f11"
   end
 
   depends_on "gettext" => :build
