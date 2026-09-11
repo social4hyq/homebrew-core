@@ -2,7 +2,7 @@ class Soapysdr < Formula
   desc "Vendor and platform neutral SDR support library"
   homepage "https://github.com/pothosware/SoapySDR/wiki"
   license "BSL-1.0"
-  revision 1
+  revision 2
   head "https://github.com/pothosware/SoapySDR.git", branch: "master"
 
   stable do
@@ -15,7 +15,7 @@ class Soapysdr < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ad3899893df686f56d1abda38320eff4ad6175f9968f8a5a0282daa2784f2f8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88f78172e0107d9655b143ae7af3236928def72e2f89c3acae22da193ff60490"
   end
 
   depends_on "cmake" => :build
