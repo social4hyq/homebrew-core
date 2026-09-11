@@ -5,6 +5,7 @@ class LldAT21 < Formula
   sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
   # The LLVM Project is under the Apache License v2.0 with LLVM Exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class LldAT21 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c11ad7a117ec453d700766dfcfde3303e7c3fd75c225d1b865d4a600aa4c59ac"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "547613613714fd277ef590c76c453d1f7c65054bbf2f4470e86875ec4e684523"
   end
 
   # Not `:versioned_formula`: see the identical note in llvm@21.rb — avoids
