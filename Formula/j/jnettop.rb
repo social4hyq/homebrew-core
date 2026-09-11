@@ -12,7 +12,7 @@ class Jnettop < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3547606348ca89ff570857f36db324c08a9868bb9e300e9f76e706d7470175a3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "210646bacff8f4120ebaa049f40e07b151762bde515bbc4f5692ef27df27e3f0"
   end
 
   depends_on "pkgconf" => :build
