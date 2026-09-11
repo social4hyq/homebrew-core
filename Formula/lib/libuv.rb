@@ -4,6 +4,7 @@ class Libuv < Formula
   url "https://dist.libuv.org/dist/v1.52.1/libuv-v1.52.1.tar.gz"
   sha256 "66d511b9e6e334c0e62279eb234fbfb2b3110b1479c09b95b44c7afca8cff9e7"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/libuv/libuv.git", branch: "v1.x"
 
@@ -13,7 +14,7 @@ class Libuv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a29bb244fe95ef5aa619b9915d2170a39b683af4f004b467382ad4491aa9b2f7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "93d1bab6c3f1bd6367779957bfb521857292a6f2161ad90c9279c33f0edac6b9"
   end
 
   depends_on "cmake" => :build
