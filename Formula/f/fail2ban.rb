@@ -4,6 +4,7 @@ class Fail2ban < Formula
   url "https://github.com/fail2ban/fail2ban/archive/refs/tags/1.1.1.tar.gz"
   sha256 "4be0ea0488e32de260058462a44a040f0542cd26a9fb6fa6d2514f9dd8ec1609"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/fail2ban/fail2ban.git", branch: "master"
 
   livecheck do
@@ -12,7 +13,7 @@ class Fail2ban < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b736ca6e2b128573c9084b75cdf26053a1c8d1449b59216080449b94e5051939"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a35baac03b86e2e4d05e99e623989cc448ad74bf604feff84ca3af73c3eb10f8"
   end
 
   depends_on "sphinx-doc" => :build
