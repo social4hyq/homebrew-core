@@ -10,7 +10,7 @@ class SshMitm < Formula
   head "https://github.com/ssh-mitm/ssh-mitm.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9bad8ca4e71fe1641312de07261b5dfc39a81cfe4e616fd2ff1bc59e128efda"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab3f79db0fc0af6ad16a00968d1779fd5f68be82f58fa3a3195d87b89c3ec367"
   end
 
   # `pkgconf` and `rust` are for bcrypt
