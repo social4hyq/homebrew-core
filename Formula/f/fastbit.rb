@@ -7,7 +7,7 @@ class Fastbit < Formula
   mirror "https://code.lbl.gov/frs/download.php/file/426/fastbit-2.0.3.tar.gz"
   sha256 "1ddb16d33d869894f8d8cd745cd3198974aabebca68fa2b83eb44d22339466ec"
   license "BSD-3-Clause"
-  revision 1
+  revision 2
 
   bottle do
     rebuild 1
