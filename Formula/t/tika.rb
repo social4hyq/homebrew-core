@@ -8,7 +8,7 @@ class Tika < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "38d2401b79370975b3d71fabf3a29c06d8f678c8dabaa1b7afa31732d9c21f85"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6c01d93cc1319b53735cca6e2dfbfd3353b014787e1d0ecaca842315ed8fcf3"
   end
 
   depends_on "openjdk"
