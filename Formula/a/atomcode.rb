@@ -4,6 +4,7 @@ class Atomcode < Formula
   url "https://github.com/atomgit-atomcode/atomcode/archive/refs/tags/v5.0.9.tar.gz"
   sha256 "771025a43ce861b8049d1cbbb37a5ae887ed2b8c252d0344cd07f9909d9813f9"
   license "MIT"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Atomcode < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3845eff8c23abc75968396a2b0c46fe0b60347ed843b29b67182c7a3ea19d788"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "da0cf40b4ebf20de56608a573e6ece8345a4ec3b7704bbebf7d97198367450b1"
   end
 
   depends_on "node" => :build
