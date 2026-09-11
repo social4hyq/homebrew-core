@@ -7,8 +7,7 @@ class Epubcheck < Formula
   revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1bb37e3b5bb6dcae20d9712d6de60b71f67868dbaafa142fdca647dc160e3c7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7009610782ae59cb3c0bce7d7f385be428d9c9d0851e81f7172702bc99b8dad4"
   end
 
   depends_on "openjdk"
