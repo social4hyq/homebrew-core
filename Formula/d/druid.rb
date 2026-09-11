@@ -5,6 +5,7 @@ class Druid < Formula
   mirror "https://archive.apache.org/dist/druid/37.0.0/apache-druid-37.0.0-bin.tar.gz"
   sha256 "c5e602be6ef435643bf5f58271353925798c818c23d79aac07766338c9ca0dd0"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://druid.apache.org/downloads/"
