@@ -6,10 +6,10 @@ class Sail < Formula
   url "https://files.pythonhosted.org/packages/1c/64/2af3a1a9dfa005dc91a22535a29071e9255efeacf7e61dbefee920d01571/sailed_io-0.10.9.tar.gz"
   sha256 "cae38b97fada34a7681872661342c82b317d877eab882830c59610734eb53bdf"
   license "GPL-3.0-only"
-  revision 2
+  revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce37340cafc17f7e0e7fd5fa1a7bac23ad3df00910fd0737584b58c6063c9f24"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "38a332fb979bdb27e33236fcd719338d612b59dad135deed9059a0cba3e98686"
   end
 
   # `pkgconf` and `rust` are for bcrypt
