@@ -7,7 +7,7 @@ class Samtools < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac350844a4b840658ef17a157651ff34ad5b53e05b7ab38df1e68e77a2ca27bc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e4e10f8548d7074d37b636078c007632223fee0dbf420c26ab382ab1d3e1eb7e"
   end
 
   depends_on "htslib"
