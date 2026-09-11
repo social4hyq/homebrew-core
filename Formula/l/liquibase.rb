@@ -5,7 +5,7 @@ class Liquibase < Formula
   url "https://github.com/liquibase/liquibase/releases/download/v4.33.0/liquibase-4.33.0.tar.gz"
   sha256 "689acfcdc97bad0d4c150d1efab9c851e251b398cb3d6326f75e8aafe40ed578"
   license "Apache-2.0"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://github.com/liquibase/liquibase.git"
@@ -14,7 +14,7 @@ class Liquibase < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb00184f52ba4fc57134b5ee95124837108bbaf02efca045945ed1a371bdb7a8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "32c9ce67cdb5d1a9dc9e08510de985b5b0d3f553a406b3cd048156a5eed7fa74"
   end
 
   depends_on "openjdk"
