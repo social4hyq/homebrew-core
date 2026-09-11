@@ -12,7 +12,7 @@ class Lilv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3bda13dfcb8c82dbe72f0cb32b4dc758419435d0309314dfd6da1f916fe631a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b6a3cacdfd8dd713da508daf244d5ced03ccbe096a40a1f4820029c01b07ff1"
   end
 
   depends_on "meson" => :build
