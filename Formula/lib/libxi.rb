@@ -8,7 +8,7 @@ class Libxi < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "81b3b41e3b7fa4984c8749186fccd4c0c8d5d23a6390e39d09dd05976677da33"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d0ef73dfb10cc771f568f119b8074071712cafbfb94cc436d313d1c4e4ee7d19"
   end
 
   depends_on "pkgconf" => :build
