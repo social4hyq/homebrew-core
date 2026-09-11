@@ -4,6 +4,7 @@ class Jhipster < Formula
   url "https://registry.npmjs.org/generator-jhipster/-/generator-jhipster-9.3.0.tgz"
   sha256 "d827aced52b59e50573c4c2f5d24a0bd6d875e1f0b4942c1437f4f1c9da6c412"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "db86d7b68189260e1ecf1318a8e205e9b9791b7b5a06ed412afde47b5aae8046"
