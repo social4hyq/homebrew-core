@@ -4,6 +4,7 @@ class WiremockStandalone < Formula
   url "https://search.maven.org/remotecontent?filepath=org/wiremock/wiremock-standalone/3.13.2/wiremock-standalone-3.13.2.jar"
   sha256 "d097b19bd483c5038479b13a5c71e9faf8f2f5106584f0c120a7770ab0bdb367"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=org/wiremock/wiremock-standalone/maven-metadata.xml"
