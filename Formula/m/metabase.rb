@@ -1,10 +1,9 @@
 class Metabase < Formula
   desc "Business intelligence report server"
   homepage "https://www.metabase.com/"
-  url "https://downloads.metabase.com/v0.63.16/metabase.jar"
-  sha256 "2e171aa7d03f10b57d92775428442203e2c5e70ecdcf781f53368e5d8f59af87"
+  url "https://downloads.metabase.com/v0.63.17/metabase.jar"
+  sha256 "7206c734c9b50b57b97a438e95ca92a3b5754b6d4dee5c5561c4467c5fbd447f"
   license "AGPL-3.0-only"
-  revision 1
 
   # The first-party download page only provides an unversioned link to the
   # latest OSS jar file. We check the "latest" GitHub release, as the release
