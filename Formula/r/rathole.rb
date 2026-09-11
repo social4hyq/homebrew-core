@@ -7,7 +7,7 @@ class Rathole < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f45db37c4892fbb20846ec193396ad54ca9913140cf492241e49a53ca030fd2d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3c3712da287f6c2c2c87c535b30c21a36e3b8031b58e9c898e1bb4d082190f5"
   end
 
   depends_on "pkgconf" => :build
