@@ -4,6 +4,7 @@ class Prog8 < Formula
   url "https://github.com/irmen/prog8/archive/refs/tags/v12.3.3.tar.gz"
   sha256 "6cee4a7faa2596e3e83230e9219eb7ad195557dab66106dfe94fa7cf8c72c55c"
   license "GPL-3.0-only"
+  revision 1
 
   livecheck do
     url :stable
