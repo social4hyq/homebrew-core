@@ -4,9 +4,10 @@ class ActionsUp < Formula
   url "https://registry.npmjs.org/actions-up/-/actions-up-1.19.0.tgz"
   sha256 "c9131501b65ea561cc38096e658f63210f26d80baffb8512835cec2f717aea6d"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ec0fcccf0716de64ad402d4090953a13e5054f5ee9e925af1de09ea92e3fa4e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e77dff389245ee0e1af18fbc8d0d574ae62aee2383cc9255ba61dd5e4461245"
   end
 
   depends_on "node"
