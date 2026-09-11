@@ -4,6 +4,7 @@ class Gwt < Formula
   url "https://github.com/gwtproject/gwt/releases/download/2.13.1/gwt-2.13.1.zip"
   sha256 "92610f2f9b929a8625b858fe394c15351357ba32733282e79e38168ecc0d131d"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Gwt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0352b5d7105fb1060f2bede4a0b983ff0f4afabbbe7fc1ed912548276f1cb2c0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "78e384ee0425a049f6e5bf025a97dc5f91c70a15bab39d634f9c8fee44c29579"
   end
 
   depends_on "openjdk"
