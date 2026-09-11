@@ -4,11 +4,12 @@ class Shellcheck < Formula
   url "https://github.com/koalaman/shellcheck/archive/refs/tags/v0.11.0.tar.gz"
   sha256 "8b07554f92e4fbfc33f1539a1f475f21c6503ceae8f806efcc518b1f529f7102"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
   head "https://github.com/koalaman/shellcheck.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0582888b613263f7b24c02c378646b569ad12ae409280e96fa6497e109da3267"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f057fd641cd857f6e0ab36ccc6f002e4bd449a1d43ea41b834c7acc383325b8"
   end
 
   depends_on "cabal-install" => :build
