@@ -6,9 +6,10 @@ class Cfripper < Formula
   url "https://files.pythonhosted.org/packages/ad/ab/cf03ff1c0e248e1a5de91b603a5dbba6855e6069670a390f139669f61e9c/cfripper-1.21.1.tar.gz"
   sha256 "e0f5f17e0869764d5ef6394a70898d9485c4d200b0b1e3b04e57e7c940bf9731"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8722e920f6e69c1d5fbb78f4d6b13ef5ef79e3350fa0c12bdb8b0a6a9bdada4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "21e4a28867961e6708957f174964498d4bb17b7faee614c2a3565d5c4d4e891d"
   end
 
   depends_on "libyaml"
