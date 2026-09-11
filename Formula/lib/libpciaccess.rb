@@ -4,10 +4,11 @@ class Libpciaccess < Formula
   url "https://www.x.org/pub/individual/lib/libpciaccess-0.19.tar.xz"
   sha256 "3c55aa86c82e54a4e3109786f0463530d53b36b6d1cfd14616454f985dd2aa43"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "478e20d642ddc3b6f4e03e370c030972becf455f14d2d77aad408390549f31f9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4ad157994bf7da2c646cb3fcee0b0b26b90d38779402e6cc89e85a8f537ed6e8"
   end
 
   depends_on "meson" => :build
