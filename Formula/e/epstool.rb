@@ -4,6 +4,7 @@ class Epstool < Formula
   url "https://deb.debian.org/debian/pool/main/e/epstool/epstool_3.09.orig.tar.xz"
   sha256 "1e85249d1a44f9418b1f95a3aebd8b0784dab8e49deb6417ac9b996ca08f6011"
   license "GPL-2.0-only"
+  revision 1
 
   livecheck do
     url :homepage
@@ -11,7 +12,7 @@ class Epstool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a05e0ded518600cd7a1f84afcaaf5eb4c994827b655355d2d0310d36dca9e577"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "749fde569a8a05772e687d39bf9d35264d559146ae2ba67aae05dc268ab5e783"
   end
 
   depends_on "ghostscript"
