@@ -4,10 +4,11 @@ class Libxrender < Formula
   url "https://www.x.org/archive/individual/lib/libXrender-0.9.12.tar.gz"
   sha256 "0fff64125819c02d1102b6236f3d7d861a07b5216d8eea336c3811d31494ecf7"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4991821e3db837bc08e9394b41ef078b5eebc0fbcd7d24c451894405ab38a5bc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8dfb71a79b61b329e08081c96c033935b1e5a29ac84b7f4743a6bf5b4ab78581"
   end
 
   depends_on "pkgconf" => :build
