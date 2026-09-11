@@ -4,6 +4,7 @@ class Moco < Formula
   url "https://search.maven.org/remotecontent?filepath=com/github/dreamhead/moco-runner/1.6.1/moco-runner-1.6.1-standalone.jar"
   sha256 "f61ea62275e2b11590472b74de933a65f62ea05ff4de8b94f6b06173773301b1"
   license "MIT"
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=com/github/dreamhead/moco-runner/"
