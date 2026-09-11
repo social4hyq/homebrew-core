@@ -4,6 +4,7 @@ class WaylandProtocols < Formula
   url "http://ftp.debian.org/debian/pool/main/w/wayland-protocols/wayland-protocols_1.49.orig.tar.xz"
   sha256 "ec4c8f74942d6dff7ace8b4ce4764f0ef9ff618a935d974ea77edee2ad240b14"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class WaylandProtocols < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61bd781d315fae42019535ed31e74753b6e779b336d1373fe1f8e1359b0f3e17"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5701c96b84f063ea86884a372816259e3ec64cea80907e7bc61bc82789624eb"
   end
 
   depends_on "meson" => :build
