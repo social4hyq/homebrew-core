@@ -10,7 +10,7 @@ class SlitherAnalyzer < Formula
   head "https://github.com/crytic/slither.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0bdec02f40ac9492614c05e41c0cec4f570adecbc669faa367c860df21f47f07"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5940f1edb020cbf6a418b9c78339b648bd435bf078fd1530f91a854ddcadddbe"
   end
 
   depends_on "rust" => :build # for cbor2
