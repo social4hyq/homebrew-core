@@ -6,6 +6,7 @@ class CmakeDocs < Formula
   mirror "http://fresh-center.net/linux/misc/legacy/cmake-4.4.3.tar.gz"
   sha256 "c46400618b4f1f2b43507f24fb22f3ae830c3416cf23b776e16e1d413aa892f0"
   license "BSD-3-Clause"
+  revision 1
   head "https://gitlab.kitware.com/cmake/cmake.git", branch: "master"
 
   livecheck do
@@ -13,7 +14,7 @@ class CmakeDocs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d0541e5c29ed552761af6ce2afd2da210f7afdc45f47cd9cacaa23f2899890c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd5ba0967bcbc383ce41f5c8114879d2be9c8ec99946e15c3128366304302602"
   end
 
   depends_on "cmake" => :build
