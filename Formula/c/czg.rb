@@ -4,9 +4,10 @@ class Czg < Formula
   url "https://registry.npmjs.org/czg/-/czg-1.14.0.tgz"
   sha256 "74a4c978a8fc8a1a1b11b4947a568a8693dde45cfb9d23bfde5a04c99a944a5a"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "98a2b53e161460e619185f654c01cf22a5bde568aadbc6974ef5ae58234e822d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd83399101caba9d31e660019627660b078ced311fcf683052f03d5eceb1a3b4"
   end
 
   depends_on "node"
