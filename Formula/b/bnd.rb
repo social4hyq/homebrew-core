@@ -4,6 +4,7 @@ class Bnd < Formula
   url "https://search.maven.org/remotecontent?filepath=biz/aQute/bnd/biz.aQute.bnd/7.4.0/biz.aQute.bnd-7.4.0.jar"
   sha256 "43c28b57fb2ee536fb4dfcf4af518243b4e2f940afc23f3c7e1d97401ed10826"
   license any_of: ["Apache-2.0", "EPL-2.0"]
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=biz/aQute/bnd/biz.aQute.bnd/maven-metadata.xml"
