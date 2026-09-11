@@ -6,10 +6,10 @@ class McpGoogleSheets < Formula
   url "https://files.pythonhosted.org/packages/b2/29/7f4c35619a25f39d27e133e39d0642fb9c9c44a419a9acc6fc2993b7a21d/mcp_google_sheets-0.6.3.tar.gz"
   sha256 "d41ca5b5367af1426a7db860010473d5c1a7f3df02e4f8db30f75f9c66030e18"
   license "MIT"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "047cae186f5de0509cd32f45d3f9fc8276fff807742487a0b4c5074f588cbea6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f6b7d8b99280294e3260101108a6384408de89f9386f8928b7543500ce8075c"
   end
 
   depends_on "certifi" => :no_linkage
