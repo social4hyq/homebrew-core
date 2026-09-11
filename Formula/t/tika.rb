@@ -5,9 +5,10 @@ class Tika < Formula
   mirror "https://archive.apache.org/dist/tika/3.3.2/tika-app-3.3.2.jar"
   sha256 "71ca551380e5eab1add99101f4597a8a49a6a18c6143d6874ee9599ca10ae00e"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "38d2401b79370975b3d71fabf3a29c06d8f678c8dabaa1b7afa31732d9c21f85"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6c01d93cc1319b53735cca6e2dfbfd3353b014787e1d0ecaca842315ed8fcf3"
   end
 
   depends_on "openjdk"
