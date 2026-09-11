@@ -7,7 +7,7 @@ class NodeSass < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "729f03dfc052a8d896a94ad27a62918060b3bcde89d3e7faf0f522dc0042a93d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "af7c5ddde003e7f97ae578c37c16c61e9a023eb3395541e4607bf80d19151c54"
   end
 
   depends_on "node"
