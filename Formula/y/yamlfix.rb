@@ -6,10 +6,10 @@ class Yamlfix < Formula
   url "https://files.pythonhosted.org/packages/93/1d/b60d4411ff495de9b7598cc041e29c661e8e2f9d476a8a09bad1f54c1bce/yamlfix-1.19.1.tar.gz"
   sha256 "05f6add13959637564f278e9237f6e201ff75e061a0a4cb9fc06fa95c3001a22"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5be86030955d05cbb94968ad01eb0c5157297aa8b0b60816799e9fd943982c2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c39baf8a727429cebe727a3544682addd94c1ef877c15ebe03c72fa737c807a"
   end
 
   depends_on "pydantic" => :no_linkage
