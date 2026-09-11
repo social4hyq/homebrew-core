@@ -7,7 +7,7 @@ class Czg < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "98a2b53e161460e619185f654c01cf22a5bde568aadbc6974ef5ae58234e822d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dd83399101caba9d31e660019627660b078ced311fcf683052f03d5eceb1a3b4"
   end
 
   depends_on "node"
