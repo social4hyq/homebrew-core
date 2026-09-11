@@ -8,7 +8,7 @@ class Py3cairo < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7a6c9d7d3890fa0703631a00a4ee9cec6856a3d19e5c17bb3906c7d1d39eb0e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "877299bcdc2071caf33b1b00ffdb9d0bc53ce658844563e6c99d765fa601bc42"
   end
 
   depends_on "meson" => :build
