@@ -7,7 +7,7 @@ class Commitlint < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e81184cad7f69662556b623e08604c22e625cf27deacf7f8d870901e689e986e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "83237fafb73b038a35fedcc60cb4caf2f93065796f40ca90794e2f5cfc32ccc2"
   end
 
   depends_on "node"
