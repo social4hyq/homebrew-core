@@ -4,10 +4,11 @@ class Pygobject3 < Formula
   url "https://download.gnome.org/sources/pygobject/3.58/pygobject-3.58.0.tar.gz"
   sha256 "45068697de3ffe46840ca369705f23118b34db4f7deb63f6eff079a6734ddcca"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "18795a1fa6ecb43b37f7fe2cb9897e6da808ea5698f2d14a2529875b8aa56da5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "51c2d93688033108256d686b0f6e8e181f6f6eb2f92cad09dc5eba3f20840f37"
   end
 
   depends_on "meson" => :build
