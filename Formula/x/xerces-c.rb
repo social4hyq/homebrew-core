@@ -5,9 +5,10 @@ class XercesC < Formula
   mirror "https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.3.0.tar.gz"
   sha256 "9555f1d06f82987fbb4658862705515740414fd34b4db6ad2ed76a2dc08d3bde"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac01eeaf78e883abdb3396135271cc0e6f4645c8c379d6de4f5fa98baad7e0b9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef8117d31e03b78ed52a1be79c92d3b5fb696978ce3a9da8934e892906ae5107"
   end
 
   depends_on "cmake" => :build
