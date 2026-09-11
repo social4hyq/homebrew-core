@@ -7,7 +7,7 @@ class Aicommits < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "50e32eaab0885434b3a4bcfa16bd49e4625e635b306d146d03ba3647511a7f85"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "84db082015662b5bc7b7ccb969c6d9c5afae3b467c558bd4eb3f1394264a150e"
   end
 
   depends_on "node"
