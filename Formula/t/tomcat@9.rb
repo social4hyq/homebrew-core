@@ -5,13 +5,14 @@ class TomcatAT9 < Formula
   mirror "https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.121/bin/apache-tomcat-9.0.121.tar.gz"
   sha256 "d1a804502cddfd1c1436c1c37809ed4cb807a9c64a8a35fe1747d3ba9a0edeab"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d5084e40ae30cb6a85f6a4912d85e7c59503b4b7cac3d63ac65aa1a38778b2b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "14266e90834938bd9ecd94b2021216b73b2dbbf18563af50323eff8c4764307f"
   end
 
   keg_only :versioned_formula
