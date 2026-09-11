@@ -5,9 +5,10 @@ class Jena < Formula
   mirror "https://archive.apache.org/dist/jena/binaries/apache-jena-6.2.0.tar.gz"
   sha256 "14c12ef4aa2f0078a473be4b10b015e0e0b85e767d6867e8581679de8fec3f6e"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "992179c22ed61fb1c8623b9a96b4f6c5d28f7971cea10592092ec007c8ce6997"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a70be913efd3813a7c3ad3aad6406f78183072fd6f4d4e8297799f700c10a65"
   end
 
   depends_on "openjdk"
