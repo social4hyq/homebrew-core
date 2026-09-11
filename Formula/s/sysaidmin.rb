@@ -9,7 +9,7 @@ class Sysaidmin < Formula
   revision 19
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a54eaaf17da698946807cdad1270cd427564febbbbf76c6aacc6487c29fa0e6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7f926d12f781861e9e5d6e62a5766a548ffa751b0617282230d8073f17fc908"
   end
 
   depends_on "rust" => :build # for jiter
