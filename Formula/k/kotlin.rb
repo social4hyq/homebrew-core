@@ -4,6 +4,7 @@ class Kotlin < Formula
   url "https://github.com/JetBrains/kotlin/releases/download/v2.4.20/kotlin-compiler-2.4.20.zip"
   sha256 "59e9ca74c7904ef2c122b12114937673ccce68de820a663f0ed66ccf8799e0b7"
   license "Apache-2.0"
+  revision 1
 
   # Upstream maintains multiple major/minor versions and the "latest" release
   # may be for a lower version, so we have to check multiple releases to
