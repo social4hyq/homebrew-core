@@ -4,6 +4,7 @@ class Yaf < Formula
   url "https://tools.netsa.cert.org/releases/yaf-2.20.3.tar.gz"
   sha256 "fb581317124a2a5064c17e211cc2a0226a41f606c2135a5a5c6f672ecf6e4c9f"
   license "GPL-2.0-only"
+  revision 1
 
   # NOTE: This should be updated to check the main `/yaf/download.html`
   # page when it links to a stable version again in the future.
@@ -13,8 +14,7 @@ class Yaf < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "345b363a3603c187879c43c759be94f688a668b25ed5fb8f6672912d4dc44a4e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "daf935ea27effedd2667a68b6b11da15fae7565dc69d6f7dc9cf5ee03d4a45dc"
   end
 
   depends_on "pkgconf" => :build
