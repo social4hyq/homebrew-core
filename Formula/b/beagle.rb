@@ -12,7 +12,7 @@ class Beagle < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2bcfdb4172c01d8c0909b918baa1364a73a12937c345673168e59ccb0f6b57e9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f06f87eabb06e87e0e2b127539f27e1bfecc0e772faadcaa5d6d911ec1a9a118"
   end
 
   depends_on "cmake" => :build
