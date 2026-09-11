@@ -4,9 +4,10 @@ class Vite < Formula
   url "https://registry.npmjs.org/vite/-/vite-8.2.2.tgz"
   sha256 "99df542e1d7267c0da524bdb216ebc32a4dfefc17f8fe830067b62a1042fbeb7"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "24adae6a50881d9f6c364c59ee0ddec8e20cc332e41a8d94091d82a645f70456"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cd6fa3fb412ea2124ab21e9cad1ca4e7d5e3c7ad2d7144b8baf53280eb359c6"
   end
 
   depends_on "node"
