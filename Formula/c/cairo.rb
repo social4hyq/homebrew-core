@@ -13,7 +13,7 @@ class Cairo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cc1fc90bc56a24bfb322eba66e9f827798bfc341a55482857f5f81df9a52080"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ad81e9a4af39c87dcefa1bcd7d82cc01c5cbf3c0294ef2365df6070a4e21a5f"
   end
 
   depends_on "meson" => :build
