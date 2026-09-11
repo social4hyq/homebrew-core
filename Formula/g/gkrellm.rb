@@ -12,7 +12,7 @@ class Gkrellm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3537929eb472b5995b05466df702f0ae0b7cba294669dc813ee7cd9e7e59310f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c30c65f9fc979756d68364e058571306b54cc95e1f35aad3a21c3042b5f513c6"
   end
 
   depends_on "gettext" => :build
