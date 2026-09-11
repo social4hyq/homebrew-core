@@ -1,5 +1,5 @@
 diff --git a/src/bun_core/util.rs b/src/bun_core/util.rs
-index 28006517b5..caf27d1191 100644
+index 28006517b5..3d3bf16c9f 100644
 --- a/src/bun_core/util.rs
 +++ b/src/bun_core/util.rs
 @@ -4100,13 +4100,44 @@ pub fn getcwd(buf: &mut PathBuffer) -> crate::CrateResult<&ZStr> {
@@ -50,16 +50,13 @@ index 28006517b5..caf27d1191 100644
              let dir: &[u8] = self_exe_path()
                  .ok()
                  .and_then(|p| dirname(p.as_bytes()))
-@@ -4122,6 +4153,33 @@ pub fn getcwd_or_exe_dir(buf: &mut PathBuffer) -> &ZStr {
+@@ -4122,6 +4153,30 @@ pub fn getcwd_or_exe_dir(buf: &mut PathBuffer) -> &ZStr {
      ZStr::from_buf(&buf.0, len)
  }
  
-+/// OHOS-only: honest deleted-cwd re-check bypassing ohos-compat-shim's
-+/// silent `$HOME` substitution in the plain `getcwd()` that `getcwd_len`
-+/// uses. Mirrors `bun_sys::posix::cwd_is_deleted` — duplicated rather than
-+/// shared, since `bun_sys` depends on `bun_core`, not the other way around.
++/// Bypass the embedded getcwd fallback when callers require ENOENT.
 +#[cfg(target_env = "ohos")]
-+fn cwd_is_deleted_ohos() -> bool {
++pub fn cwd_is_deleted_ohos() -> bool {
 +    let mut proc_buf = [0u8; 4096];
 +    // SAFETY: "/proc/self/cwd" is a valid NUL-terminated path literal;
 +    // proc_buf provides 4095 writable bytes + one reserved NUL slot.

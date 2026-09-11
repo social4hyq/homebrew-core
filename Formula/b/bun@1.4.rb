@@ -16,7 +16,7 @@ class BunAT14 < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -49,11 +49,7 @@ class BunAT14 < Formula
     cause "uses clang-specific flags"
   end
 
-  # Per-file patches for OHOS portability, exported from the ohos-aarch64
-  # branch of social4hyq/ohos-bun (scripts/export-ohos-patches.sh; its
-  # replay check proves the series reproduces the branch tip bit-for-bit).
-  # Split per file so upstream version bumps only reject the affected
-  # file(s) instead of a multi-file mega-patch.
+  # OHOS delta from social4hyq/ohos-bun, exported by scripts/export-ohos-patches.sh.
   %w[
     Cargo.lock
     Cargo.toml
@@ -157,7 +153,6 @@ class BunAT14 < Formula
     src/runtime/socket/Listener.rs
     src/runtime/socket/socket_body.rs
     src/runtime/socket/system_certs.rs
-    src/runtime/webcore/blob/read_file.rs
     src/spawn/process.rs
     src/spawn_sys/lib.rs
     src/spawn_sys/spawn_process.rs
