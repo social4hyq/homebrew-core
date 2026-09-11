@@ -4,6 +4,7 @@ class Jreleaser < Formula
   url "https://github.com/jreleaser/jreleaser/releases/download/v1.26.0/jreleaser-1.26.0.zip"
   sha256 "c821df22b1715a841024ba17c4b5233375c868e6c9dcc81612c38329c8dec628"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "8d9a5847a14ae77d0e6280d50e1e691c192f3fc65852a8d568ed93317b4b34ff"
