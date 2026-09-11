@@ -10,7 +10,7 @@ class YelpTools < Formula
   revision 4
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "315db2f6bd406b48e3d86cc45441af57071b9560105c0764e8da23276ad314cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ff9f10de2ffd2db8587d80e8314b7f5f8b78bc16b580ed5bdeb1ced25425c66"
   end
 
   depends_on "meson" => :build
