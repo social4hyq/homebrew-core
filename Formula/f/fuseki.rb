@@ -8,7 +8,7 @@ class Fuseki < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f8a1f4388b3cb91ecbaa0f494ec4b2aad6974a9a7388f6bf4656901b182165e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be1785ef43248358a00229a9706d1cf2a04dd7d584357a94f5e467a6514f54f6"
   end
 
   depends_on "openjdk"
