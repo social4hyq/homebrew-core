@@ -6,9 +6,10 @@ class StrandsAgentsSops < Formula
   url "https://files.pythonhosted.org/packages/a0/4d/5aa7f335ad0d73a13090fec1bc7ced3de110d0b3699b5e4728ce39c6cbb6/strands_agents_sops-1.1.3.tar.gz"
   sha256 "e4994dddc75b52e65881fe33cdbab753b3e2e6ba714e5792b60876ce4894ee84"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3fa5ee934c2f59727639ff2de1c4414a0a811b0046483cfcbe22468b6129861f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "441017a3eed8f6e8ee33f2573ea76b50b5c550ae7a9b4ed3ddaa083d68f82455"
   end
 
   depends_on "certifi" => :no_linkage
