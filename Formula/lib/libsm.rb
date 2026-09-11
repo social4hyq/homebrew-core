@@ -4,10 +4,11 @@ class Libsm < Formula
   url "https://www.x.org/archive/individual/lib/libSM-1.2.6.tar.xz"
   sha256 "be7c0abdb15cbfd29ac62573c1c82e877f9d4047ad15321e7ea97d1e43d835be"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1fcfc36181c7a80242d7ad636017a5c88d6c08ad6efb6127c46c997a7d718fb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f2ff9c068cca899edca0d8a11c54e60066e2fb5e2e7f79a9ed29db81e776f23"
   end
 
   depends_on "pkgconf" => :build
