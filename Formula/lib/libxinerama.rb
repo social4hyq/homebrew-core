@@ -8,7 +8,7 @@ class Libxinerama < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "05652945d46064122d1a7ce784a1955d03c680714e285e15d71263f8cd3536ab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3265c8615b4a2b90fe01c19d632ff982a7a4ee94ad82c8fcc691e6b591a3de5b"
   end
 
   depends_on "pkgconf" => :build
