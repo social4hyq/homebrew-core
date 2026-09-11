@@ -4,9 +4,10 @@ class Cromwell < Formula
   url "https://github.com/broadinstitute/cromwell/releases/download/92/cromwell-92.jar"
   sha256 "e0e3a050d4124e81369a79059e5774142b2f06bd89df4a0b035f559db85cedf5"
   license "BSD-3-Clause"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21efd10124a3bd3e7f18bc818f1758dbc327f1201b82daf3dec6ffc2d4a70bc1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9ade894b919e94334fd10a76e7adf0cc2a84116aa31497a9e33e56c7d3cdf10"
   end
 
   head do
