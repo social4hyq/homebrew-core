@@ -4,6 +4,7 @@ class XmlSecurityC < Formula
   url "https://shibboleth.net/downloads/xml-security-c/3.0.0/xml-security-c-3.0.0.tar.bz2"
   sha256 "a4c9e1ae3ed3e8dab5d82f4dbdb8414bcbd0199a562ad66cd7c0cd750804ff32"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://shibboleth.net/downloads/xml-security-c/"
@@ -11,7 +12,7 @@ class XmlSecurityC < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1bbefa4ad94d06d0211dc903bef682e96a1cf2b8c850aee4047003cb5fca094a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "77a440d831bdf05c334d2553a1e1ba5dcce1d6f670eb32a25a5e51d7b76ccbd9"
   end
 
   depends_on "pkgconf" => :build
