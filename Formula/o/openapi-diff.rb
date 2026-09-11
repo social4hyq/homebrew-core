@@ -7,7 +7,7 @@ class OpenapiDiff < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8bfca65188e8d82548c98b277b470c1254da231d14172a5927068d2dfbfb2f9f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f06e654ec5546c40a88677c616d591f6514e2b81e993a5f48fe4ffa82c915a90"
   end
 
   depends_on "maven" => :build
