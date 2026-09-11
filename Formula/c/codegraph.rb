@@ -4,6 +4,7 @@ class Codegraph < Formula
   url "https://github.com/colbymchenry/codegraph/archive/refs/tags/v1.6.0.tar.gz"
   sha256 "9b264c584395e69595d0b8c602a7f5c65a19d16a26673953721829f32cfda119"
   license "MIT"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Codegraph < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "da26ffbcf26390fed9d7cc1cb5f5b2f00efe4269ab6f79ff2c4feb2e8a69086e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "673ca8444524d1e57f3bf52f510d63a3b269cf524bd31bd84ba10098908c63e4"
   end
 
   depends_on "rust" => :build
