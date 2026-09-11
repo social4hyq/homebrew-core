@@ -7,7 +7,7 @@ class Pla < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "237b5e3055273f4b59f40ffbff90dacd5f1deee50733dd0c315dda4642152d28"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0b262010cdb91b3550ee0a1b8ea8f58ff340198fb5e407f2740e0ed1aaf4fdd"
   end
 
   depends_on "pkgconf" => :build
