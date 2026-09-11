@@ -7,7 +7,7 @@ class ReactNativeCli < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b48bf38f5fb30826990847618ead2d057e951c14c9c42bfccb9b20467d0cd86"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0a6d4b4c7b3f1c6138ac898142bd3cdef8e36be6ea20787f88cc05d3a660ccc"
   end
 
   depends_on "node"
