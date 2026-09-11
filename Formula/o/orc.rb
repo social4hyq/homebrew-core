@@ -4,6 +4,7 @@ class Orc < Formula
   url "https://gstreamer.freedesktop.org/src/orc/orc-0.4.44.tar.xz"
   sha256 "4aeb97aea2b58224029dc2b23d7d064cfa990cb4fb8c4da440bcbe9c95bc5d2d"
   license all_of: ["BSD-2-Clause", "BSD-3-Clause"]
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class Orc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3c6f2ce893c79f94afa913415e1fea2a07e457d230d73e6be0221d9fe61d4f3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eaab74813a3beed1771c20f04fee1820bdfdb75f5838ce2597d1432133a3c14b"
   end
 
   depends_on "meson" => :build
