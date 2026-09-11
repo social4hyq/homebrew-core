@@ -10,7 +10,7 @@ class Awscurl < Formula
   head "https://github.com/okigan/awscurl.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "838fdb153c3778badafb45dd0ee59b54e5bd7b6f8817da735f9d8d8ed5c40e80"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9e1add9fcbdfd8c7a195f578dcdf46ee380540528d2f7c590b955f27d55a2b5"
   end
 
   depends_on "cmake" => :build # for `awscrt`
