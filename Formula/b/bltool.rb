@@ -4,9 +4,10 @@ class Bltool < Formula
   url "https://github.com/ToxicFrog/bltool/releases/download/v0.2.4/bltool-0.2.4.zip"
   sha256 "5bef751aac7140f8a705b29edd35a7bfa9f87c36039d84d4001f16a307b64ef6"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ede7f3a28bafc60105626ecb6820d8b230714baf35e24f8abdd6907332a3d26"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "97b4c0e3eea8d14add5f57f890c2578f02b5705452e918dc1e7b54026d4aa8d0"
   end
 
   head do
