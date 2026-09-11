@@ -7,7 +7,7 @@ class Atkmm < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "04b21a92f5565372698f09d7b207ca5f3ef0c0f3b4b2c8dd359093382361da6c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "77ee96e1b700a303c0b52669598dd4ad3545cc6c027965e4132f344af4f16e27"
   end
 
   depends_on "meson" => :build
