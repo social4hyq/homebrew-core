@@ -4,10 +4,10 @@ class GnomeThemesExtra < Formula
   url "https://download.gnome.org/sources/gnome-themes-extra/3.28/gnome-themes-extra-3.28.tar.xz"
   sha256 "7c4ba0bff001f06d8983cfc105adaac42df1d1267a2591798a780bac557a5819"
   license "LGPL-2.1-or-later"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bca667c5addcc8e1bd5a51e567812878266910285f779b5d9d45127042cf556a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d8ce8dbc04d30e36ac0999c124443f5927d24d9827de7c51a72a74a8c4c6c6f"
   end
 
   deprecate! date: "2024-12-10", because: :repo_archived
