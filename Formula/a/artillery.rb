@@ -12,7 +12,7 @@ class Artillery < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdbccd24e97960c77abb66969b41ce838c7ddfa8cc7bd46539ddcb06f1f04c43"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "89972c230e21c3418afdac5d254857640b91d9e2bf81a4d9e89939b8161486c3"
   end
 
   depends_on "node"
