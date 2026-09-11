@@ -4,6 +4,7 @@ class OpenjdkAT25 < Formula
   url "https://github.com/openjdk/jdk25u/archive/refs/tags/jdk-25.0.4.1-ga.tar.gz"
   sha256 "1e5908f90d732e0ed3f737aac7603863c2cc157e464e036ac0accadb87af4391"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -12,7 +13,7 @@ class OpenjdkAT25 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8380d17072a76e1a43294b06cf43a9f8c85dd42460b70773343bcb5d2fba228c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6dfc90c1ffe45ca5629a985fb2a5869ffb12447ade569ed6be37b9502e4490c2"
   end
 
   keg_only :versioned_formula
