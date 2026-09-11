@@ -7,10 +7,10 @@ class YelpTools < Formula
   url "https://download.gnome.org/sources/yelp-tools/42/yelp-tools-42.1.tar.xz"
   sha256 "3e496a4020d4145b99fd508a25fa09336a503a4e8900028421e72c6a4b11f905"
   license "GPL-2.0-or-later"
-  revision 3
+  revision 4
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "315db2f6bd406b48e3d86cc45441af57071b9560105c0764e8da23276ad314cc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ff9f10de2ffd2db8587d80e8314b7f5f8b78bc16b580ed5bdeb1ced25425c66"
   end
 
   depends_on "meson" => :build
