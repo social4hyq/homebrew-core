@@ -8,7 +8,7 @@ class Ki < Formula
   head "https://github.com/Kotlin/kotlin-interactive-shell.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4733f7eb1954e7d724dc4eff89ee71f84d06e18008b198ebdda8b2b523789b2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc547d627ddefe1293fc8c10078f47d7a0f3f3ac3d7d5ef241a5a891eba124f8"
   end
 
   # not compatible with kotlin 2.0+, https://github.com/Kotlin/kotlin-interactive-shell/issues/131
