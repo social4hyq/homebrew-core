@@ -14,7 +14,7 @@ class Exiv2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f03ba803a0859c11817df8f2aab3579ba5882c14d3ef0172f5e75ab0189781a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "213d662919c6f6409ea6a36b87f693eea5c76523bcc33c648aef5bd9d544b4a6"
   end
 
   depends_on "cmake" => :build
