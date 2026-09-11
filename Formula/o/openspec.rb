@@ -4,9 +4,10 @@ class Openspec < Formula
   url "https://registry.npmjs.org/@fission-ai/openspec/-/openspec-1.12.0.tgz"
   sha256 "ec9737f8211099ef211f9bc7db195fb9a2afe95a52668670b61a5e8d16e1adcc"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2d2c723293e2c3094f91f06d4a5a8efdbd3b5877b85e276270a134a0eac9e22"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22f080a88efd459419130a1e5257c77af7a162bdd8a193adb0f25372ef2a4167"
   end
 
   depends_on "node"
