@@ -4,6 +4,7 @@ class Spotbugs < Formula
   url "https://repo.maven.apache.org/maven2/com/github/spotbugs/spotbugs/4.10.4/spotbugs-4.10.4.tgz"
   sha256 "72bc0d4edd686e462c0f71f42a049b27bf4da6708797ff7b2b56dd202714b4e5"
   license "LGPL-2.1-or-later"
+  revision 1
 
   livecheck do
     url "https://repo.maven.apache.org/maven2/com/github/spotbugs/spotbugs/"
