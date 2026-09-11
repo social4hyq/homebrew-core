@@ -4,11 +4,12 @@ class ApifyCli < Formula
   url "https://registry.npmjs.org/apify-cli/-/apify-cli-1.6.1.tgz"
   sha256 "e2d248ff87a203aa86942921002b46a301f4b9d661bab2bfcb0a8e9fe3c4769e"
   license "Apache-2.0"
+  revision 1
 
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "411d364d7c85c77420ac29ddc7a58d8b47827b6ca7671cb3e2f8c43911f38948"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e18d1b83870a5fe026c118f9eb9c3fde9c46835f3c733a06dfab661305900217"
   end
 
   depends_on "node"
