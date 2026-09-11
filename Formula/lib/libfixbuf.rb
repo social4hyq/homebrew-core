@@ -14,7 +14,7 @@ class Libfixbuf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "939714ed0a535f7dda61df9db8992d0422dc691b0dbe2b31df1637b3ce9b9c01"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f42da72cf031bb80ed9bc431adf6ecfc31abed0d47614fd1070b386563a21d0"
   end
 
   depends_on "pkgconf" => [:build, :test]
