@@ -2,12 +2,14 @@ class Wget < Formula
   desc "Internet file retriever"
   homepage "https://www.gnu.org/software/wget/"
   url "https://ftpmirror.gnu.org/gnu/wget/wget-1.25.0.tar.gz"
+  mirror "https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz"
   sha256 "766e48423e79359ea31e41db9e5c289675947a7fcf2efdcedb726ac9d0da3784"
   license "GPL-3.0-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "39b22b1f1f78bf34a7f3c1677501f8cd4f17877d33e0b013c0ba86f83a28ae4d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bfc19dc55ddbc5aff72b7704860447a194ed42decf9ca5000b6f2c55b933e6c"
   end
 
   head do
