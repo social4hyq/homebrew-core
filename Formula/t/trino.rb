@@ -6,6 +6,7 @@ class Trino < Formula
   url "https://search.maven.org/remotecontent?filepath=io/trino/trino-server/476/trino-server-476.tar.gz"
   sha256 "cfd5accde17e8ebd251eeeb78aed1f490e77bb3a164d95a0f454bf8a7c1cbd3f"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=io/trino/trino-server/"
