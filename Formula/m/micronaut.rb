@@ -4,6 +4,7 @@ class Micronaut < Formula
   url "https://github.com/micronaut-projects/micronaut-starter/archive/refs/tags/v5.1.3.tar.gz"
   sha256 "badc9e138949c36176df0ea29e68519dcfc33e85b71946a822ec958deb0f3742"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Micronaut < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc7be2242cb5fc95fee53e69e9bc48f3635ea0187c792034728e1bfca3b79e09"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4403671b8ded5e1f43fa5fea4f3bbeba158bcb62011da364e04021fa5891c2c9"
   end
 
   depends_on "gradle" => :build
