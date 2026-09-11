@@ -7,8 +7,7 @@ class StructurizrCli < Formula
   revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2dc885b38c338cf6eaa453c33adb4810bb45aa3eec9364d611e093323d4dcec9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c64b41c9e7fba66b3d33cae0f87e8ad6106caaa66a2126fbd0c7e25609630f7"
   end
 
   deprecate! date: "2026-02-17", because: :repo_archived
