@@ -1,7 +1,7 @@
 class BunAT14 < Formula
   desc "Incredibly fast JavaScript runtime, bundler, test runner, and package manager"
   homepage "https://bun.com/"
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "36854e8e5bb06809fe6e669679d21aae5823e8a0"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "487ab56cf6c587eb324a00f7d1164a07a2148aa8"
   version "1.4.2"
   license all_of: [
     "MIT",
@@ -97,14 +97,6 @@ class BunAT14 < Formula
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3")
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
     ENV["SSL_CERT_FILE"] = ENV["CURL_CA_BUNDLE"] = HOMEBREW_PREFIX/"etc/ca-certificates/cert.pem"
-    # CMake otherwise lets the inner WebKit Ninja use every CPU exposed by
-    # the CI container; that exhausts OHOS process resources during the
-    # OHOS's filesystem races when WebKit's generated-header copy rules run
-    # concurrently; serialize the nested build to make generation reliable.
-    ENV["CMAKE_BUILD_PARALLEL_LEVEL"] = "1"
-    inreplace "scripts/build/source.ts",
-      'command: `${stream} ${cmake} --build $builddir --config $buildtype $targets`,',
-      'command: `${stream} ${cmake} --build $builddir --config $buildtype --parallel 1 $targets`,'
     ENV.prepend_path "PATH", rust_home/"bin"
     ENV.prepend_path "PATH", llvm.opt_bin
     ENV.prepend_path "PATH", formula_opt_bin("lld@21")
@@ -121,9 +113,6 @@ class BunAT14 < Formula
     (cross_libs/"libcxxabi/include").make_symlink llvm.opt_include/"c++/v1"
     (buildpath/"build/ohos-icu").mkpath
     (buildpath/"build/ohos-icu/target").make_symlink formula_opt_prefix("icu4c@78")
-
-    inreplace "scripts/build/deps/webkit.ts", "ICU_ROOT: cfg.ohosIcuDir,",
-              "ICU_ROOT: cfg.ohosIcuDir, ICU_INCLUDE_DIR: \"#{formula_opt_include("icu4c@78")}\","
 
     fetch_webkit
     system "bun", "run", "build:release:local", "--canary=off",
