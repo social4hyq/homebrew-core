@@ -4,6 +4,7 @@ class OpenjdkAT17 < Formula
   url "https://github.com/openjdk/jdk17u/archive/refs/tags/jdk-17.0.20.1-ga.tar.gz"
   sha256 "8e5f18f6f75a759fc9584c3c2f8c44a5737692f3ea348cc1f9e63704b9dd81ee"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
+  revision 1
   compatibility_version 1
 
   livecheck do
