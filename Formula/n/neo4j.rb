@@ -4,6 +4,7 @@ class Neo4j < Formula
   url "https://neo4j.com/artifact.php?name=neo4j-community-2026.07.1-unix.tar.gz"
   sha256 "fbb3a11705cdbc87953242e3667dad37cd39f8d1e1168faa642c01a2fd1d144d"
   license "GPL-3.0-or-later"
+  revision 1
 
   livecheck do
     url "https://neo4j.com/deployment-center/"
@@ -12,7 +13,7 @@ class Neo4j < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e01baf064592a70b6ac3e3c1f1eff15198097df4b7a843ebd2cb409ee7d2851b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6435265d5c0761b69102f6169a62392d4c42bd7d490b3ed5c11a470f3b4a7ec"
   end
 
   depends_on "cypher-shell"
