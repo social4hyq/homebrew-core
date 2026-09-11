@@ -4,6 +4,7 @@ class ClosureCompiler < Formula
   url "https://search.maven.org/remotecontent?filepath=com/google/javascript/closure-compiler/v20260907/closure-compiler-v20260907.jar"
   sha256 "1689d45ccaa3aabae4a290e0a357d08ce56b08713a90b30e8a305c9bb21ef6eb"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=com/google/javascript/closure-compiler/"
