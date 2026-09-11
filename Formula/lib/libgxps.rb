@@ -13,7 +13,7 @@ class Libgxps < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac06f0be145a70c4393812f6cf5540d5a08ab36f12a826f472f4872fc221f898"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "35c6f3e5c8b59dda6018267ccd8b34738449d5236418ae29cd244d8a19fc95ba"
   end
 
   keg_only "it conflicts with `ghostscript`"
