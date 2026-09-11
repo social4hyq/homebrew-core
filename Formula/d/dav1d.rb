@@ -1,13 +1,13 @@
 class Dav1d < Formula
   desc "AV1 decoder targeted to be small and fast"
   homepage "https://code.videolan.org/videolan/dav1d"
-  url "http://ftp.debian.org/debian/pool/main/d/dav1d/dav1d_1.5.3.orig.tar.xz"
-  sha256 "732010aa5ef461fa93355ed2c6c5fedb48ddc4b74e697eaabe8907eaeb943011"
+  url "https://code.videolan.org/videolan/dav1d/-/archive/1.5.4/dav1d-1.5.4.tar.bz2"
+  sha256 "2abfb0c89212e6e4733a54e0ae509ec00a5b845a6360946f918806e14aedb011"
   license "BSD-2-Clause"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e979912353b4ac962459c16473859bdab102ddccf28083176c5b670930c2bf25"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a61ac866a695242e37587dab935bb7ae020485e5dfbb744caadf04d6a2ce8af"
   end
 
   depends_on "meson" => :build
@@ -24,6 +24,15 @@ class Dav1d < Formula
   end
 
   test do
-    system "true"
+    resource "homebrew-00000000.ivf" do
+      url "https://code.videolan.org/videolan/dav1d-test-data/raw/1.1.0/8-bit/data/00000000.ivf"
+      sha256 "52b4351f9bc8a876c8f3c9afc403d9e90f319c1882bfe44667d41c8c6f5486f3"
+    end
+
+    testpath.install resource("homebrew-00000000.ivf")
+    system bin/"dav1d", "-i", testpath/"00000000.ivf", "-o", testpath/"00000000.md5"
+
+    assert_path_exists (testpath/"00000000.md5")
+    assert_match "0b31f7ae90dfa22cefe0f2a1ad97c620", (testpath/"00000000.md5").read
   end
 end
