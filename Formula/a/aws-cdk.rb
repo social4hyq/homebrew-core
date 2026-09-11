@@ -4,9 +4,10 @@ class AwsCdk < Formula
   url "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.1140.0.tgz"
   sha256 "d4bf5a687fd440b7c2a4d3f74f9ebcea2d18ca6d6264e2a1b4f4fb2032007afc"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e35f46e2de247f489a2b5938e5efe829b268eec31cf97c0a772ebc13746e9cbb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "030b51f4437a1d4832202d7bd89596c6a5b8cb23161e54532733abba27578662"
   end
 
   depends_on "node"
