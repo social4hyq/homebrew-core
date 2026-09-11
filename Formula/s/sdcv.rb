@@ -4,11 +4,12 @@ class Sdcv < Formula
   url "https://github.com/Dushistov/sdcv/archive/refs/tags/v0.5.5.tar.gz"
   sha256 "4d2519e8f8479b9301dc91e9cda3e1eefef19970ece0e8c05f0c7b7ade5dc94b"
   license "GPL-2.0-or-later"
+  revision 1
   version_scheme 1
   head "https://github.com/Dushistov/sdcv.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f47b12e8f3a553a1cc87095a3a61b071ea43a5fd0f9d4b5da5cd6e5c0481333a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "66a0108f3907505d05dfc34a7f127d27da364c60c40503e49f5962f8779105d5"
   end
 
   depends_on "cmake" => :build
