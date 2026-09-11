@@ -1,0 +1,20 @@
+--- a/node-addon-system/lib/flock.js
++++ b/node-addon-system/lib/flock.js
+@@ -7,6 +7,17 @@
+     if (binding)
+         return binding;
+     const { platform, arch } = process;
++    // OpenHarmony: neither flock(2) nor a hmdfs-resident lock survives this
++    // platform's kernel/sandbox permission model, so acquisition is stubbed to
++    // immediate success and the harness keeps only its in-process write claim
++    // (one writer per session inside the owning backend). A single dsh process
++    // therefore still rejects a second writer, but cross-process exclusion
++    // against another dsh writing the same session is forfeited here — the
++    // same trade the browser worker already makes by stubbing this entry.
++    if (platform === 'openharmony') {
++        binding = { tryLock: (_fd, callback) => callback(0) };
++        return binding;
++    }
+     if (platform !== 'linux' && platform !== 'darwin') {
+         throw Object.assign(new Error(`flock is not supported on ${platform}-${arch}`), {
+             code: 'ERR_FLOCK_UNSUPPORTED_PLATFORM',
