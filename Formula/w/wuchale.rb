@@ -7,7 +7,7 @@ class Wuchale < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "df36083d62c081f6ee83ec0ba6c2f033308958b70fe9e05c34c951bab4e48518"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b4fb5a487b6b7bda1d408f1f869982552acf51a91a631b494ea0c72fb5a3d36"
   end
 
   depends_on "node"
