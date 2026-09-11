@@ -4,6 +4,7 @@ class CypherShell < Formula
   url "https://dist.neo4j.org/cypher-shell/cypher-shell-2026.07.1.zip"
   sha256 "beae24efc0bf4bff48498825ac497addce28d932d8c2cbe2e845c7f2fb761d41"
   license "GPL-3.0-only"
+  revision 1
   version_scheme 1
 
   livecheck do
