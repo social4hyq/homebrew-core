@@ -12,7 +12,7 @@ class Antlr < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "48c40d4aeedd4d1825abc8175cb1f9fad968af95e7727e39d4d1071ab413df48"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "85391df2a594d52c36900e87da5c09e6107a7fca38aacacbb22710f530d14dbb"
   end
 
   depends_on "openjdk"
