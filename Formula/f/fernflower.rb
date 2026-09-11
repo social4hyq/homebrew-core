@@ -5,6 +5,7 @@ class Fernflower < Formula
   url "https://www.jetbrains.com/intellij-repository/releases/com/jetbrains/intellij/java/java-decompiler-engine/262.10315.125/java-decompiler-engine-262.10315.125.jar"
   sha256 "2885f0ff6526eb5791367c21055f685b8f9010cb841666cccaec7fc248a6d5e7"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://www.jetbrains.com/intellij-repository/releases/com/jetbrains/intellij/java/java-decompiler-engine/maven-metadata.xml"
@@ -12,7 +13,7 @@ class Fernflower < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d622578987b1f51aefc073702fb287d8e58082d57e0cd19051eb239dafe0e6ba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "26bb35960ea784e5fb2f41cb353b033adf4ce5104d289f4ac3665bf6f498815a"
   end
 
   depends_on "openjdk"
