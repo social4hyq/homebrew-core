@@ -4,9 +4,10 @@ class WriteGood < Formula
   url "https://registry.npmjs.org/write-good/-/write-good-1.0.8.tgz"
   sha256 "f54db3db8db0076fd1c05411c7f3923f055176632c51dc4046ab216e51130221"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c4e36bd809958d6b67c65cc4a696debb30316855cfc1f28a1140f7698081a454"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "24276c0b6355f38e2720895c885b542de74e416276391ce959144f27c443125f"
   end
 
   depends_on "node"
