@@ -4,6 +4,7 @@ class Pmd < Formula
   url "https://github.com/pmd/pmd/releases/download/pmd_releases%2F7.27.0/pmd-dist-7.27.0-bin.zip"
   sha256 "4ae396ffaf2b0d3ef0b73a10b2925e77066f73d57a4ce9078c60e7302bcddec9"
   license "BSD-4-Clause"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Pmd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "50a939dcd99f8e7c89a562e07829e1fcf61c91a647eb2e799db18f211fdfd57a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8bb5394f3f73cfbf386289c5e372f26706d440c34b21706035bc0af61bfd672"
   end
 
   depends_on "openjdk"
