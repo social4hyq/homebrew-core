@@ -4,11 +4,11 @@ class Libass < Formula
   url "https://github.com/libass/libass/releases/download/0.17.5/libass-0.17.5.tar.xz"
   sha256 "2dca25c0e0c837ddf00b52011b3f82cac1e4ddd3ad018227806b0c2288864acc"
   license "ISC"
+  revision 1
   compatibility_version 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "372623e2f212c9edbb0a68371152b92cef4cb5398780ac4132f0bfb900ff4458"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ad029bd4c88e372c0f4d1e118ba6caffffab87ac4b7d98948b5b57442ef7e70"
   end
 
   head do
