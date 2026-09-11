@@ -1,6 +1,7 @@
---- a/dsh-subprocess-local/lib/index.js
-+++ b/dsh-subprocess-local/lib/index.js
-@@ -543,7 +543,7 @@
+--- a/dsh-subprocess-local/lib/runner-launch-COYGu0Dl.js
++++ b/dsh-subprocess-local/lib/runner-launch-COYGu0Dl.js
+@@ -622,7 +622,7 @@
+ * @returns Platform process inspector.
  */
  function createProcessInspector(platform = process.platform, arch = process.arch, internals = DEFAULT_INTERNALS) {
 -	if (platform === "linux") return new LinuxProcessInspector(arch, internals);
