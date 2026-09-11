@@ -4,6 +4,7 @@ class Maxwell < Formula
   url "https://github.com/zendesk/maxwell/releases/download/v1.45.0/maxwell-1.45.0.tar.gz"
   sha256 "772d8b75d4904d71999d7e3d1b2febcff2b5ab736bdedca0ec63c54d1c1e2e57"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
