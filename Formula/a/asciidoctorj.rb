@@ -4,6 +4,7 @@ class Asciidoctorj < Formula
   url "https://search.maven.org/remotecontent?filepath=org/asciidoctor/asciidoctorj/3.0.1/asciidoctorj-3.0.1-bin.zip"
   sha256 "18b085b7f67a7f872abe00352be5caacd9b436400aec27f838c6380077cb88bf"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=org/asciidoctor/asciidoctorj/maven-metadata.xml"
@@ -11,8 +12,7 @@ class Asciidoctorj < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "783778336d815fc9893c75dee199141943f914151edb94e27ca356fac4a04dd6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ecb52ecd8a3dc082f0ccfb06fbe6d77d626876b7dfbf5bf7a2636bea1b3ba363"
   end
 
   depends_on "openjdk"
