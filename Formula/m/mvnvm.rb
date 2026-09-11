@@ -5,10 +5,11 @@ class Mvnvm < Formula
   url "https://bitbucket.org/mjensen/mvnvm/get/mvnvm-1.0.29.tar.gz"
   sha256 "f3004baa68051fe64b2ab212fea57cb05dcc598e334f2529b9ca936a3b275b0e"
   license "Apache-2.0"
+  revision 1
   head "https://bitbucket.org/mjensen/mvnvm.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d28ab17690dc444a168afe9e5ba096577c2c8ec6f0487802b4158e131307d20c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7e793436ccf8e75b3bbfc72e331a06da16d3fdc93bcf252a5c54a84e680e5e6"
   end
 
   depends_on "openjdk"
