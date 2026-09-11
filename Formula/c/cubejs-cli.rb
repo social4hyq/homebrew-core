@@ -7,7 +7,7 @@ class CubejsCli < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae688497fb8ccaec596c4fbc8b9e108cc2cb9bd91d249775c554f35fa648fd3f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c32e689981641be7128aeba86fb10482e443fe7eb6e5a0c4d3237693c85e453c"
   end
 
   depends_on "node"
