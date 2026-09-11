@@ -11,7 +11,7 @@ class Tartufo < Formula
   head "https://github.com/godaddy/tartufo.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6360b9454858e6a07a61de016594e168d3810915b148a9c5d059c64b00ba52f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a3fc6f14acf3ba38809746069c843f117c06908cb72774b7f8f7c3235618474"
   end
 
   depends_on "pygit2" => :no_linkage
