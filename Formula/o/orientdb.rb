@@ -4,6 +4,7 @@ class Orientdb < Formula
   url "https://search.maven.org/remotecontent?filepath=com/orientechnologies/orientdb-community/3.2.56/orientdb-community-3.2.56.zip"
   sha256 "d8695bfdd830504561d2e7ac0905cd6d4fbdfb25521d81c1691ef3bb14107e97"
   license "Apache-2.0"
+  revision 1
 
   # The GitHub release description contains links to files on Maven.
   livecheck do
@@ -15,7 +16,7 @@ class Orientdb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "24bd6a42640b5564c6321790dfaa0ccc72518ffa4d17c00067f6a72830075f4f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0bb50e6c00b28f2cd68fc05b358c4d9ff4cb1f78c9b19d48765722803f02dcf5"
   end
 
   depends_on "maven" => :build
