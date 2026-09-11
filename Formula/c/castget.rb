@@ -54,7 +54,7 @@ class Castget < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac09b5665f6391614bc348e0cf3bdac8bde7f372b131327bc07f18c32dc50827"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dbc423401cc226083dceede3ca69e153df08784b2b5bdcd251c1fd9689d43020"
   end
 
   head do
