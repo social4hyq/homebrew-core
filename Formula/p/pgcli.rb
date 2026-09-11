@@ -6,9 +6,10 @@ class Pgcli < Formula
   url "https://files.pythonhosted.org/packages/97/5d/d6fcf98556e6089915e12af12c6189e9d774d82b473c4ce9e124a62ec235/pgcli-4.6.0.tar.gz"
   sha256 "4b0633a6ce753ea38fb1fe2dc54b66b732c4d0b29fadf48cad78b2e7f6636d9d"
   license "BSD-3-Clause"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d3bc38b5bbe4eb19a8edde70ffbfd36d5fe6cb84a4fb30732e930b15ce6f65f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "08d910682e07e60dd8b3c007b27db5504c8615d406491020132d210357f2cc06"
   end
 
   depends_on "libpq"
