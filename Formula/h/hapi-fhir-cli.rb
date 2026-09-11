@@ -4,6 +4,7 @@ class HapiFhirCli < Formula
   url "https://github.com/hapifhir/hapi-fhir/releases/download/v8.12.0/hapi-fhir-8.12.0-cli.zip"
   sha256 "80cad32b7680a81303329f2c65c56eb3f5989379193b67054ac8fce49a7891b9"
   license "Apache-2.0"
+  revision 1
 
   # The "latest" release on GitHub is sometimes for an older major/minor, so we
   # can't rely on it being the newest version. However, the formula's `stable`
