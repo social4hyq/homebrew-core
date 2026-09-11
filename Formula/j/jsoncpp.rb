@@ -4,6 +4,7 @@ class Jsoncpp < Formula
   url "https://github.com/open-source-parsers/jsoncpp/archive/refs/tags/1.9.8.tar.gz"
   sha256 "51828cf3574281d2b79ec2a1c56a9e4c20cc1103711321ea96384cffb8d2d904"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://github.com/open-source-parsers/jsoncpp.git", branch: "master"
 
@@ -13,7 +14,7 @@ class Jsoncpp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0eba82f31e705700ead0cface87d60377fb4ae211b2e7e0510896b768af116ea"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d16310e583b072f1fe35c474b7aec917a095c87022f3edf29f02608630a3c4ff"
   end
 
   # NOTE: Do not change this to use CMake, because the CMake build is deprecated.
