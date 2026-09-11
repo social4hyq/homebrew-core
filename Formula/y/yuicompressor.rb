@@ -4,7 +4,7 @@ class Yuicompressor < Formula
   url "https://github.com/yui/yuicompressor/releases/download/v2.4.8/yuicompressor-2.4.8.zip"
   sha256 "3243fd79cb68cc61a5278a8ff67a0ad6a2d825c36464594b66900ad8426a6a6e"
   license "BSD-3-Clause"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -12,7 +12,7 @@ class Yuicompressor < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "43830f2ccf7752901898f7f31a80b4b43a514f25b5fb479c743410fd3dd313b1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b6c7609e0420ca763a868ecbb4e6751b2db2793df4c986527738b3f867a77476"
   end
 
   depends_on "openjdk"
