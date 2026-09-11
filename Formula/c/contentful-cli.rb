@@ -4,9 +4,10 @@ class ContentfulCli < Formula
   url "https://registry.npmjs.org/contentful-cli/-/contentful-cli-4.0.10.tgz"
   sha256 "5943c8645e5b1edd2cc2599cddf19cb1097a4230373ef67c71764ece042712b8"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb35bae1423348e15b2c4a1c18221347fee5175747304fa7829889389d6b1740"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f0cca1939257348d87d3dc59192b86b6d713df153d8085c5ae4052522bad996"
   end
 
   depends_on "node"
