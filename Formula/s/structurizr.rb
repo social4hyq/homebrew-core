@@ -4,6 +4,7 @@ class Structurizr < Formula
   url "https://github.com/structurizr/structurizr/archive/refs/tags/v2026.06.28.tar.gz"
   sha256 "491a857f41b0378ee3c757e39a2fc45eb0fc4c22d48395b5e154380e478c828c"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "edee6a7c950dab5088d7ecee45ac0e9668a37bd319023b5c166a13baafae3086"
