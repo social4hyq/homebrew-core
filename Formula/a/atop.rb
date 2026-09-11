@@ -4,10 +4,11 @@ class Atop < Formula
   url "https://github.com/Atoptool/atop/archive/refs/tags/v2.13.0.tar.gz"
   sha256 "5ee38c93afd64767a09a06698a0e90bfc390189a5058d245878a559d476d8572"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/Atoptool/atop.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89fe68f3ca23cd68e56127cabc24358ef28023873c09115d67c7d32f2da0dc9a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d9ceb0018b5afb310476b630918ee5e537b8f7ebb3f1cd0d2623b059764c6cf"
   end
 
   depends_on "pkgconf" => :build
