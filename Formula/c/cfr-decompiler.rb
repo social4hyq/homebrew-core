@@ -5,6 +5,7 @@ class CfrDecompiler < Formula
       tag:      "0.152",
       revision: "68477be3ff7171ee17ddd1a26064b9b253f1604f"
   license "MIT"
+  revision 1
   head "https://github.com/leibnitz27/cfr.git", branch: "master"
 
   livecheck do
