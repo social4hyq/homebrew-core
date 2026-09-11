@@ -4,9 +4,10 @@ class Gitbucket < Formula
   url "https://github.com/gitbucket/gitbucket/releases/download/4.47.0/gitbucket.war"
   sha256 "7dd5c864e15eab9cd649694ceff541c5d2b053732619cdc9ea56c5bf63d276c2"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2533181bed4ac727bedc702b2e735e914cc5eeece204167cc8eab0e52d289676"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c29e04f18ddbf32429e92f5633131677a8c5fc48a2de0b32586fabb94bbe710"
   end
 
   head do
