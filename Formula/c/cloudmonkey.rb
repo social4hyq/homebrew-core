@@ -1,8 +1,8 @@
 class Cloudmonkey < Formula
   desc "Apache CloudStack CloudMonkey CLI"
   homepage "https://github.com/apache/cloudstack-cloudmonkey"
-  url "https://github.com/apache/cloudstack-cloudmonkey/archive/refs/tags/6.5.0.tar.gz"
-  sha256 "bb491140103f0d8c178966355114f0eb9b35ad64323fba7448d475112d8847fc"
+  url "https://github.com/apache/cloudstack-cloudmonkey/archive/refs/tags/6.6.0.tar.gz"
+  sha256 "fdebc87604f8047d9b88ed03b6a9b50bf039242726e5e8e80b42e82fd7d326e7"
   license "Apache-2.0"
   head "https://github.com/apache/cloudstack-cloudmonkey.git", branch: "main"
 
