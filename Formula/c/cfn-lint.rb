@@ -6,9 +6,10 @@ class CfnLint < Formula
   url "https://files.pythonhosted.org/packages/41/e5/a630d6aa68e4562d4978158068c4600939c7221141fe20bcc8ab41fae935/cfn_lint-1.56.1.tar.gz"
   sha256 "cf31b560ca71e3084b8ed3a573f7a7edd0b98a5517b71d15035ae172de9b2e78"
   license "MIT-0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7f0c3328b6f964b4e9a0a3d755bfcbcc9c6558174f54249d926f9e897829958"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f900720a8f122be2d53082de98a339898ae079dffe2a2f3adaafb6f46badf893"
   end
 
   depends_on "libyaml"
