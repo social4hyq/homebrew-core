@@ -7,7 +7,7 @@ class Libspng < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d31d707f0cf7b077156bd535b10b18e8c2fa3753fecb81a382d272be3e6b49e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac3492a41a7de552af55b2cced4866ea26fd2fe781e7b4cfd7094f97089b6bc6"
   end
 
   depends_on "meson" => :build
