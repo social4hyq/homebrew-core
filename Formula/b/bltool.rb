@@ -7,7 +7,7 @@ class Bltool < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ede7f3a28bafc60105626ecb6820d8b230714baf35e24f8abdd6907332a3d26"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "97b4c0e3eea8d14add5f57f890c2578f02b5705452e918dc1e7b54026d4aa8d0"
   end
 
   head do
