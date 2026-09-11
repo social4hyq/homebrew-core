@@ -5,9 +5,10 @@ class Tomcat < Formula
   mirror "https://archive.apache.org/dist/tomcat/tomcat-11/v11.0.25/bin/apache-tomcat-11.0.25.tar.gz"
   sha256 "071ae2c6213e3c02c58b8581113b7887a96ef2756439b3c5be36fa6aec350090"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "de3bf5ba332e7efd361574a2f16489966cd72463d7b4db45d925d8d05f21ea08"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "acb30ed66d93640c88cdf3a149ac9da77d14b3b3f225d0698682ffa526c40dbf"
   end
 
   depends_on "openjdk"
