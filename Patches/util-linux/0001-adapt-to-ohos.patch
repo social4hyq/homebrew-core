@@ -155,3 +155,40 @@ diff -ruN a/sys-utils/lsmem.c b/sys-utils/lsmem.c
  #include "cctype.h"
  #include "nls.h"
  #include "path.h"
+diff -ruN a/libmount/src/mountP.h b/libmount/src/mountP.h
+--- a/libmount/src/mountP.h	2026-05-18 10:00:03.398848604 +0000
++++ b/libmount/src/mountP.h	2026-06-03 06:39:00.258438873 +0000
+@@ -35,6 +35,33 @@
+ 
+ #include "mountutils.h"
+ 
++#ifdef __OHOS__
++/*
++ * OHOS compatibility: the OHOS libc does not provide the openat2() RESOLVE_*
++ * flags (glibc and musl expose them through <fcntl.h> when _GNU_SOURCE is
++ * defined). Use the kernel ABI values, so that mnt_open_tree() can pin a path
++ * with openat2() before opening the mount tree.
++ */
++# ifndef RESOLVE_NO_XDEV
++#  define RESOLVE_NO_XDEV	0x01
++# endif
++# ifndef RESOLVE_NO_MAGICLINKS
++#  define RESOLVE_NO_MAGICLINKS	0x02
++# endif
++# ifndef RESOLVE_NO_SYMLINKS
++#  define RESOLVE_NO_SYMLINKS	0x04
++# endif
++# ifndef RESOLVE_BENEATH
++#  define RESOLVE_BENEATH	0x08
++# endif
++# ifndef RESOLVE_IN_ROOT
++#  define RESOLVE_IN_ROOT	0x10
++# endif
++# ifndef RESOLVE_CACHED
++#  define RESOLVE_CACHED	0x20
++# endif
++#endif /* __OHOS__ */
++
+ /*
+  * Debug
+  */
