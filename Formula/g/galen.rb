@@ -4,10 +4,10 @@ class Galen < Formula
   url "https://github.com/galenframework/galen/releases/download/galen-2.4.4/galen-bin-2.4.4.zip"
   sha256 "b89ed0ccef4e5ea310563ab3220965f72d5fc182e89e6faadf44780f1c43b88d"
   license "Apache-2.0"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0aafa3045b20d8d6d88894a066b47168d5fb956b3ebe6f3050139fc5a7240dcc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2718ec7780f00d28ce041a1a40b520eebc23db2308e9cc9f13a83910a397a4fb"
   end
 
   depends_on "openjdk"
