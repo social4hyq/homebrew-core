@@ -4,10 +4,11 @@ class Libxfixes < Formula
   url "https://www.x.org/archive/individual/lib/libXfixes-6.0.2.tar.xz"
   sha256 "39f115d72d9c5f8111e4684164d3d68cc1fd21f9b27ff2401b08fddfc0f409ba"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1d19a244cae192d57c97b84bc56e4dab90099ccbe317549d737c3302bffbcc7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce64d82390736f581015e753e1d6f0f3ebfafc00bd60b5ec45d85794ad076583"
   end
 
   depends_on "pkgconf" => :build
