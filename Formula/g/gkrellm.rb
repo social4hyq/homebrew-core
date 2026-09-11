@@ -4,6 +4,7 @@ class Gkrellm < Formula
   url "https://gkrellm.srcbox.net/releases/gkrellm-2.5.1.tar.bz2"
   sha256 "089e3c1ed398482e682c9900b504ea166a6144a6c9fa041e70c5bbca6b177e63"
   license "GPL-3.0-or-later"
+  revision 1
 
   livecheck do
     url "https://gkrellm.srcbox.net/releases/"
