@@ -14,7 +14,7 @@ class Libuv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a29bb244fe95ef5aa619b9915d2170a39b683af4f004b467382ad4491aa9b2f7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "93d1bab6c3f1bd6367779957bfb521857292a6f2161ad90c9279c33f0edac6b9"
   end
 
   depends_on "cmake" => :build
