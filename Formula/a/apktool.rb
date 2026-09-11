@@ -7,7 +7,7 @@ class Apktool < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9215810a888f5055410f02497a2a81a62398596384f549da853a86c0d7204ce"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2022318771dc84d471627680b0c30bd81abe7d0b2699a7ba23b091921358064"
   end
 
   depends_on "openjdk"
