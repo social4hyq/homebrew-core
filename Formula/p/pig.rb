@@ -8,7 +8,7 @@ class Pig < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c899857176d974b52def53b217296b9f254022288248908dc0f9457ffeafdc14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "365d1fd3fd43b2803d21742fa711faa36842f7596104082353b26d3c3aea2bce"
   end
 
   depends_on "openjdk@21"
