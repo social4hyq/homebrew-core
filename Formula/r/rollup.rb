@@ -4,9 +4,10 @@ class Rollup < Formula
   url "https://registry.npmjs.org/rollup/-/rollup-4.63.1.tgz"
   sha256 "88b9180834f6d0472f49d379e13cb8d5d909eab28a34a4c766ec1676502e8f78"
   license all_of: ["ISC", "MIT"]
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c65a83ca0d52149191d6b4ce998fc922d4f0e11cec7634a0a74abef5c868cfad"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "368bb935d5fe0aad9cf473ce3bd021a5a1180f2c684438b78c91401a6d556dbf"
   end
 
   depends_on "node"
