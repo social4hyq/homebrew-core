@@ -4,6 +4,7 @@ class GlibmmAT266 < Formula
   url "https://download.gnome.org/sources/glibmm/2.66/glibmm-2.66.10.tar.xz"
   sha256 "2b61780203aed98e701d3ea57c8f353e7c8ada9706a79be782f6c5153dd035c0"
   license "LGPL-2.1-or-later"
+  revision 1
 
   livecheck do
     url "https://download.gnome.org/sources/glibmm/2.66/"
@@ -12,7 +13,7 @@ class GlibmmAT266 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d5e517a93a88092bb631cae7129a3d80e01c7601c807225e3878ffb34b94285"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88a78ef0778d953e401c3ad80ba57d374afca366f6ae9060827124a373ff4fb4"
   end
 
   depends_on "meson" => :build
