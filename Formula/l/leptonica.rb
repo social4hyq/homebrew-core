@@ -13,7 +13,7 @@ class Leptonica < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f5f76b43e1d710c6f3655fd080194fba19977995b2c75fa15c8a76a69eb4ca64"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "829c1b12594461ba93d990e382a46e036ce8b409e9c3fa2005d6bdbf908400dd"
   end
 
   depends_on "pkgconf" => :build
