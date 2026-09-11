@@ -4,7 +4,7 @@ class SharedMimeInfo < Formula
   url "https://ftp.debian.org/debian/pool/main/s/shared-mime-info/shared-mime-info_2.4.orig.tar.bz2"
   sha256 "32dc32ae39ff1c1bf8434dd3b36770b48538a1772bc0298509d034f057005992"
   license "GPL-2.0-only"
-  revision 1
+  revision 2
   compatibility_version 1
   head "https://gitlab.freedesktop.org/xdg/shared-mime-info.git", branch: "master"
 
@@ -17,7 +17,7 @@ class SharedMimeInfo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa58ddde4d585cae44f5989f8a6ccaabc583e1e57df9b726ac2cee5b51df337d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c34e8b62a718123fc8eba6514c7f0ae5029c73d529de80931f58b29cc688b39"
   end
 
   depends_on "gettext" => :build
