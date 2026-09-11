@@ -7,11 +7,10 @@ class Fastbit < Formula
   mirror "https://code.lbl.gov/frs/download.php/file/426/fastbit-2.0.3.tar.gz"
   sha256 "1ddb16d33d869894f8d8cd745cd3198974aabebca68fa2b83eb44d22339466ec"
   license "BSD-3-Clause"
-  revision 1
+  revision 2
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21b40c38e3b109039e9c2ee4cbe6d5eb9cefb713f1102108e1e54164d5982b39"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "231d09828fe38522b72d31e00cd9ef17ade4460b6699161014f059d3d9abac09"
   end
 
   deprecate! date: "2024-06-18", because: :unmaintained
