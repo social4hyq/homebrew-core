@@ -16,7 +16,7 @@ class GtkDoc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21895eb2169d534774ac42154559a081298ba6adb63804374094f0b05d0a02e2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6977001d15268c8bdb98bd952567fec2d8330bc943c765d79359e1ce1e3aff1"
   end
 
   depends_on "meson" => :build
