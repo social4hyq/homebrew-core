@@ -6,10 +6,11 @@ class Ggshield < Formula
   url "https://files.pythonhosted.org/packages/d8/3b/f78b04da02a8d7389fc9d13c154351cafdca34aa005559db3873029b6002/ggshield-1.54.0.tar.gz"
   sha256 "2861919706bb5fae2cffa8b1a26ac2643534388fb286818f9e6dace61692d65a"
   license "MIT"
+  revision 1
   head "https://github.com/GitGuardian/ggshield.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "95e0acf13e2a394f0eea4adaa1ccda4cf55403afd92ea07388797a8edc69227a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "112fdc4ab917733f7e140669eadee8d43a35d184d8aa72e89dd3acebf148f2cb"
   end
 
   depends_on "pkgconf" => :build # for `rfc3161_client`
