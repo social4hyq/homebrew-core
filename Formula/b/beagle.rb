@@ -4,6 +4,7 @@ class Beagle < Formula
   url "https://github.com/beagle-dev/beagle-lib/archive/refs/tags/v4.0.1.tar.gz"
   sha256 "9d258cd9bedd86d7c28b91587acd1132f4e01d4f095c657ad4dc93bd83d4f120"
   license "MIT"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Beagle < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2bcfdb4172c01d8c0909b918baa1364a73a12937c345673168e59ccb0f6b57e9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f06f87eabb06e87e0e2b127539f27e1bfecc0e772faadcaa5d6d911ec1a9a118"
   end
 
   depends_on "cmake" => :build
