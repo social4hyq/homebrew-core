@@ -7,7 +7,7 @@ class Pgbackrest < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d220805e7146ae622cc02bc23d3fc7df8f3d836b168727a9ae3fbf7bd1825ae5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3dd0e040aab92805fd692f77495c9a53e8c79a1bf935090f2308ce671b7f0a2"
   end
 
   depends_on "cmake" => :build
