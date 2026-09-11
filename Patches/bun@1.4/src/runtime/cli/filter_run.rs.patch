@@ -1,0 +1,58 @@
+diff --git a/src/runtime/cli/filter_run.rs b/src/runtime/cli/filter_run.rs
+index 29ef499666..36c29e17e5 100644
+--- a/src/runtime/cli/filter_run.rs
++++ b/src/runtime/cli/filter_run.rs
+@@ -15,6 +15,10 @@ use bun_core::{ZStr, strings};
+ use bun_event_loop::EventLoopHandle;
+ use bun_event_loop::MiniEventLoop::{self as MiniEventLoopMod, MiniEventLoop};
+ use bun_io::{BufferedReader, ReadState};
++#[cfg(unix)]
++use bun_io::FilePollFlag;
++#[cfg(unix)]
++use bun_io::PosixFlags;
+ use bun_sys as sys;
+ 
+ // The string fields below are owned boxes, except `combined` which is interned
+@@ -161,15 +165,34 @@ impl<'a> ProcessHandle<'a> {
+ 
+         #[cfg(unix)]
+         {
+-            if let Some(stdout) = stdout_fd {
+-                let _ = sys::set_nonblocking(stdout);
+-                handle.remaining_fds += 1;
+-                handle.stdout.start(stdout, true)?;
++            // Mark the BufferedReader as nonblocking + socket so it uses
++            // the same read strategy as Bun.spawn (SubprocessPipeReader).
++            // Required on OHOS (blocking pipe strategy causes infinite loop)
++            // and safe on other Unix platforms. remaining_fds must be
++            // incremented per started reader (upstream fix) — on_reader_done/
++            // on_reader_error decrement it and debug_assert it stays > 0.
++            let pipe_setup =
++                |reader: &mut BufferedReader,
++                 remaining_fds: &mut i8,
++                 fd: sys::Fd|
++                 -> crate::Result<()> {
++                    let _ = sys::set_nonblocking(fd);
++                    *remaining_fds += 1;
++                    reader.start(fd, true)?;
++                    reader.flags.insert(
++                        PosixFlags::SOCKET | PosixFlags::NONBLOCKING | PosixFlags::POLLABLE,
++                    );
++                    if let Some(poll) = reader.handle.get_poll() {
++                        poll.set_flag(FilePollFlag::Socket);
++                        poll.set_flag(FilePollFlag::Nonblocking);
++                    }
++                    Ok(())
++                };
++            if let Some(fd) = stdout_fd {
++                pipe_setup(&mut handle.stdout, &mut handle.remaining_fds, fd)?;
+             }
+-            if let Some(stderr) = stderr_fd {
+-                let _ = sys::set_nonblocking(stderr);
+-                handle.remaining_fds += 1;
+-                handle.stderr.start(stderr, true)?;
++            if let Some(fd) = stderr_fd {
++                pipe_setup(&mut handle.stderr, &mut handle.remaining_fds, fd)?;
+             }
+         }
+         #[cfg(not(unix))]

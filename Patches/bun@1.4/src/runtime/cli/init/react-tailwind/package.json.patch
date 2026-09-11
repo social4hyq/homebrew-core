@@ -1,0 +1,18 @@
+diff --git a/src/runtime/cli/init/react-tailwind/package.json b/src/runtime/cli/init/react-tailwind/package.json
+index 9e40660590..d81943f859 100644
+--- a/src/runtime/cli/init/react-tailwind/package.json
++++ b/src/runtime/cli/init/react-tailwind/package.json
+@@ -9,10 +9,11 @@
+     "build": "bun run build.ts"
+   },
+   "dependencies": {
+-    "bun-plugin-tailwind": "^0.1.2",
++    "bun-plugin-tailwind": "npm:@ohos-ports/bun-plugin-tailwind@0.1.2",
++    "lightningcss": "npm:@ohos-ports/lightningcss@1.32.0",
+     "react": "^19",
+     "react-dom": "^19",
+-    "tailwindcss": "^4.1.11"
++    "tailwindcss": "^4.3.0"
+   },
+   "devDependencies": {
+     "@types/react": "^19",

@@ -1,0 +1,24 @@
+diff --git a/src/runtime/cli/create/SourceFileProjectGenerator.rs b/src/runtime/cli/create/SourceFileProjectGenerator.rs
+index 3301ba5e05..f2ea4ccdf3 100644
+--- a/src/runtime/cli/create/SourceFileProjectGenerator.rs
++++ b/src/runtime/cli/create/SourceFileProjectGenerator.rs
+@@ -67,7 +67,18 @@ pub(crate) fn generate(
+     // Add Tailwind dependencies if needed
+     if needs_to_inject_tailwind {
+         result.dependencies.insert(b"tailwindcss")?;
+-        result.dependencies.insert(b"bun-plugin-tailwind")?;
++        // Upstream bun-plugin-tailwind@0.1.2 calls @tailwindcss/oxide's
++        // twctxCreate/twctxIsDirty/twctxToJs API and the tw_on_before_parse
++        // native symbol, both removed from oxide upstream (on every
++        // platform, not just OHOS — verified absent from oxide's own
++        // linux-x64-gnu binary). @ohos-ports/bun-plugin-tailwind is a
++        // from-source rewrite against current oxide (Scanner-based, see
++        // ohos-ports-release branch of social4hyq/tailwindcss), bundling
++        // the openharmony-arm64 oxide binding. It doesn't bundle
++        // lightningcss (loaded via a template-string require bundlers
++        // can't statically resolve), so lightningcss must be aliased too.
++        result.dependencies.insert(b"bun-plugin-tailwind@npm:@ohos-ports/bun-plugin-tailwind@0.1.2")?;
++        result.dependencies.insert(b"lightningcss@npm:@ohos-ports/lightningcss@1.32.0")?;
+     }
+ 
+     // Add shadcn-ui dependencies if needed

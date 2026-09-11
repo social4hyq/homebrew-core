@@ -1,0 +1,80 @@
+diff --git a/src/runtime/ffi/ffi_body.rs b/src/runtime/ffi/ffi_body.rs
+index 73f2322c51..873373dbd1 100644
+--- a/src/runtime/ffi/ffi_body.rs
++++ b/src/runtime/ffi/ffi_body.rs
+@@ -29,8 +29,9 @@ use bun_sys;
+ /// `bun_core::Fd` lacks an inherent forwarder.
+ #[cfg(unix)]
+ #[inline]
+-fn dir_exists(path: &'static [u8]) -> bool {
+-    // SAFETY: `path` is a NUL-free static literal; copy into a stack ZBox.
++fn dir_exists(path: &[u8]) -> bool {
++    // ZBox::from_bytes copies into an owned stack ZBox — `path` doesn't need
++    // to outlive this call.
+     let z = ZBox::from_bytes(path);
+     bun_sys::directory_exists_at(bun_sys::Fd::cwd(), &z).unwrap_or(false)
+ }
+@@ -730,6 +731,63 @@ impl CompileC {
+             }
+         }
+ 
++        #[cfg(target_env = "ohos")]
++        {
++            // OHOS: libc lives in the SDK sysroot, not in standard FHS paths.
++            // TCC needs libc to link; the SDK sysroot provides libc.so / libc.a.
++            // Read the sysroot from $OHOS_SYSROOT rather than a baked-in
++            // path — there is no single fixed SDK install location across
++            // OHOS devices.
++            // The sysroot is multiarch: anything arch-dependent lives under a
++            // <arch>-linux-ohos subdirectory of usr/lib and usr/include alike,
++            // and the SDK ships one per arch it supports. Naming the triplet
++            // once is the point — the library path below used to spell it out
++            // while the include path did not, which meant TCC could not
++            // compile a translation unit including anything as ordinary as
++            // <stdint.h>: the generic usr/include/stdint.h does
++            // `#include <bits/alltypes.h>` and bits/ exists only under the
++            // triplet directory.
++            #[cfg(target_arch = "aarch64")]
++            const TRIPLET: &str = "aarch64-linux-ohos";
++            #[cfg(target_arch = "x86_64")]
++            const TRIPLET: &str = "x86_64-linux-ohos";
++            #[cfg(target_arch = "arm")]
++            const TRIPLET: &str = "arm-linux-ohos";
++            #[cfg(target_arch = "x86")]
++            const TRIPLET: &str = "i686-linux-ohos";
++
++            if let Ok(sysroot) = std::env::var("OHOS_SYSROOT") {
++                let sdk_lib = format!("{sysroot}/usr/lib/{TRIPLET}");
++                if dir_exists(sdk_lib.as_bytes()) {
++                    let path_z = bun_core::ZBox::from_bytes(sdk_lib.as_bytes());
++                    if state.add_library_path(&path_z).is_err() {
++                        bun_output::scoped_log!(TCC, "TinyCC failed to add OHOS SDK library path");
++                    }
++                }
++                // Added before the generic directory to mirror the SDK's own
++                // clang, though the two never disagree: the triplet directory
++                // holds only asm/ and bits/, and usr/include has neither, so
++                // no header is reachable through both.
++                let sdk_include_arch = format!("{sysroot}/usr/include/{TRIPLET}");
++                if dir_exists(sdk_include_arch.as_bytes()) {
++                    let path_z = bun_core::ZBox::from_bytes(sdk_include_arch.as_bytes());
++                    if state.add_sys_include_path(&path_z).is_err() {
++                        bun_output::scoped_log!(
++                            TCC,
++                            "TinyCC failed to add OHOS SDK arch include path"
++                        );
++                    }
++                }
++                let sdk_include = format!("{sysroot}/usr/include");
++                if dir_exists(sdk_include.as_bytes()) {
++                    let path_z = bun_core::ZBox::from_bytes(sdk_include.as_bytes());
++                    if state.add_sys_include_path(&path_z).is_err() {
++                        bun_output::scoped_log!(TCC, "TinyCC failed to add OHOS SDK include path");
++                    }
++                }
++            }
++        }
++
+         #[cfg(unix)]
+         {
+             if dir_exists(b"/usr/local/include") {

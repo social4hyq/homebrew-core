@@ -1,0 +1,21 @@
+diff --git a/src/runtime/error.rs b/src/runtime/error.rs
+index e1f85f64a3..9d993e3ba6 100644
+--- a/src/runtime/error.rs
++++ b/src/runtime/error.rs
+@@ -70,6 +70,8 @@ pub enum Error {
+     FailedToBindPipe,
+     #[error("MissingPackageJSON")]
+     MissingPackageJSON,
++    #[error("InstallFailed")]
++    InstallFailed,
+     #[error("HTTPForbidden")]
+     HTTPForbidden,
+     #[error("ExampleNotFound")]
+@@ -427,6 +429,7 @@ impl Error {
+             Self::FailedToInitPipe => "FailedToInitPipe",
+             Self::FailedToBindPipe => "FailedToBindPipe",
+             Self::MissingPackageJSON => "MissingPackageJSON",
++            Self::InstallFailed => "InstallFailed",
+             Self::HTTPForbidden => "HTTPForbidden",
+             Self::ExampleNotFound => "ExampleNotFound",
+             Self::GitHubRepositoryNotFound => "GitHubRepositoryNotFound",

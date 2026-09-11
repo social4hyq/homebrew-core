@@ -1,0 +1,50 @@
+diff --git a/src/io/PipeReader.rs b/src/io/PipeReader.rs
+index 60e18aa01e..43c730a909 100644
+--- a/src/io/PipeReader.rs
++++ b/src/io/PipeReader.rs
+@@ -210,6 +210,12 @@ bitflags::bitflags! {
+         const USE_PREAD                = 1 << 8;
+         const IS_PAUSED                = 1 << 9;
+         const KEEP_ALIVE               = 1 << 10; // default true
++        /// Opt-in: enroll this reader's fd in `epoll_rearm_watchdog` (a
++        /// confirmed real-device OHOS kernel epoll defect recovery -- see
++        /// `Flags::EpollRearmWatch` in posix_event_loop.rs). Set before the
++        /// first `register_poll()`/`read()` call; currently only
++        /// `Bun.Terminal`'s PTY-master reader.
++        const EPOLL_REARM_WATCH        = 1 << 11;
+     }
+ }
+ 
+@@ -333,6 +339,21 @@ impl PosixBufferedReader {
+             if self.flags.contains(PosixFlags::CLOSE_HANDLE) {
+                 let owner = std::ptr::from_mut(self).cast::<c_void>();
+                 self.handle.close(Some(owner), None::<fn(*mut c_void)>);
++            } else if matches!(self.handle, PollOrFd::Poll(_)) {
++                // The fd belongs to whoever cleared `CLOSE_HANDLE`, but the
++                // FilePoll is ours and must not outlive us: the loop dispatches
++                // through the reader pointer it carries. A pipe at EOF stays
++                // readable (level-triggered), so a poll left registered here
++                // fires into freed memory and reaches `on_reader_done` a second
++                // time, tearing the parent down twice. `close_fd = false` leaves
++                // the fd alone. `IOReader` already does this by hand before its
++                // own `close`; doing it here covers every non-owning consumer,
++                // and its explicit call stays a no-op (handle is `Closed` by
++                // then). Note `Closer::close` is asynchronous, so a parent that
++                // closes the fd from its own `Drop` may get here after that was
++                // queued — unregistering a watch for an fd already closed is
++                // benign (epoll drops the registration with the fd).
++                self.handle.close_impl(None, None::<fn(*mut c_void)>, false);
+             }
+         }
+     }
+@@ -535,6 +556,10 @@ impl PosixBufferedReader {
+             poll.enable_keeping_process_alive(ev);
+         }
+ 
++        if self.flags.contains(PosixFlags::EPOLL_REARM_WATCH) {
++            poll.set_flag(FilePollFlag::EpollRearmWatch);
++        }
++
+         match poll.register_with_fd(lp.cast(), FilePollKind::Readable, poll.fd()) {
+             sys::Result::Err(err) => Err(err),
+             sys::Result::Ok(()) => Ok(()),

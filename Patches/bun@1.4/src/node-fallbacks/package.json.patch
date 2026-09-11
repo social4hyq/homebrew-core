@@ -1,0 +1,13 @@
+diff --git a/src/node-fallbacks/package.json b/src/node-fallbacks/package.json
+index e32c374041..be5d5e0077 100644
+--- a/src/node-fallbacks/package.json
++++ b/src/node-fallbacks/package.json
+@@ -15,6 +15,8 @@
+     "browserify-zlib": "^0.2.0",
+     "crypto-browserify": "^3.12.1",
+     "domain-browser": "^4.23.0",
++    "esbuild": "^0.28.1",
++    "events": "^3.3.0",
+     "https-browserify": "^1.0.0",
+     "punycode": "^2.3.1",
+     "querystring-es3": "^1.0.0-0",

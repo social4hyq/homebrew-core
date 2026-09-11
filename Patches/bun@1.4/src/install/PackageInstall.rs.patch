@@ -1,0 +1,14 @@
+diff --git a/src/install/PackageInstall.rs b/src/install/PackageInstall.rs
+index 8208925221..93fd372667 100644
+--- a/src/install/PackageInstall.rs
++++ b/src/install/PackageInstall.rs
+@@ -1619,6 +1619,9 @@ impl<'a> PackageInstall<'a> {
+                                 destination_dir.fd(),
+                                 entry.path,
+                             ) {
++                                // Map raw errno to the error names the caller's
++                                // `NotSameFileSystem` / `ENXIO` checks (and the
++                                // copyfile fallback in `install()`) expect.
+                                 if err.get_errno() == sys::E::EEXIST {
+                                     let _ = sys::unlinkat(destination_dir, entry.path);
+                                     sys::linkat(

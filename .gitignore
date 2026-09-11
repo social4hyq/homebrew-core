@@ -2,7 +2,7 @@
 bottle-out/
 build.log
 bun-src/
-build/
+/build/
 runs/
 logs/
 *.heapsnapshot

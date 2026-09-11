@@ -1,0 +1,191 @@
+diff --git a/src/runtime/webcore/blob/read_file.rs b/src/runtime/webcore/blob/read_file.rs
+index 788a13fe67..e6f4e6080a 100644
+--- a/src/runtime/webcore/blob/read_file.rs
++++ b/src/runtime/webcore/blob/read_file.rs
+@@ -297,6 +297,38 @@ pub struct ReadFile {
+     pub(crate) could_block: bool,
+     pub(crate) close_after_io: bool,
+     pub(crate) state: AtomicU8, // ClosingState
++    /// Serializes `do_read_loop` runs for this instance — see `read_loop_state`.
++    pub(crate) read_loop_state: AtomicU8,
++}
++
++/// States for `ReadFile::read_loop_state`.
++///
++/// `on_ready()` is called from the dedicated IO-watcher thread every time the
++/// fd reports readable, and used to *unconditionally* `WorkPool::schedule` a
++/// fresh `do_read_loop` task. Nothing stopped a second (third, sixth…) worker
++/// from picking one up while an earlier worker was still inside
++/// `do_read_loop` for the same `ReadFile`, so several threads ran the same
++/// read loop at once, each `recv()`ing from the same fd and appending to the
++/// same `self.buffer`/`read_off` with no synchronization. Observed on OHOS,
++/// where stdio is an `AF_UNIX SOCK_STREAM` socketpair: a >1 MB
++/// `Bun.stdin.arrayBuffer()` came back truncated to a random length, with up
++/// to six workers concurrently in the loop. Nothing about the race is
++/// OHOS-specific — see OHOS_TEST_TODO.md T24 for the full evidence trail.
++///
++/// Only one worker may own the read loop at a time. A readability wakeup that
++/// arrives while one is running is not dropped: it flips the owner's state to
++/// `RUNNING_PENDING`, and the owner re-schedules instead of going idle.
++// `dead_code`: the Windows build routes through `ReadFileUV` and never
++// constructs `ReadFile`, so none of these are referenced there.
++#[allow(dead_code)]
++mod read_loop_state {
++    /// No worker is running or queued to run `do_read_loop`.
++    pub(super) const IDLE: u8 = 0;
++    /// A worker owns the read loop (queued or running).
++    pub(super) const RUNNING: u8 = 1;
++    /// As `RUNNING`, plus a readability wakeup arrived mid-run that must not
++    /// be dropped — the owner re-schedules on exit rather than going idle.
++    pub(super) const RUNNING_PENDING: u8 = 2;
+ }
+ 
+ bun_threading::intrusive_work_task!(ReadFile, task);
+@@ -391,6 +423,7 @@ impl ReadFile {
+             could_block: false,
+             close_after_io: false,
+             state: AtomicU8::new(ClosingState::Running as u8),
++            read_loop_state: AtomicU8::new(read_loop_state::IDLE),
+         };
+         Ok(read_file)
+     }
+@@ -398,16 +431,83 @@ impl ReadFile {
+     #[cfg(not(windows))]
+     pub(crate) const IO_TAG: io::Tag = io::Tag::ReadFile;
+ 
++    /// Claim ownership of the read loop. `true` = the caller must schedule (or
++    /// directly run) `do_read_loop`; `false` = another worker already owns it
++    /// and has been told a wakeup is pending, so the caller must not schedule.
++    /// See the [`read_loop_state`] module docs for why this exists.
++    #[cfg(not(windows))]
++    fn try_begin_read_loop(&self) -> bool {
++        use read_loop_state::{IDLE, RUNNING, RUNNING_PENDING};
++        let mut cur = self.read_loop_state.load(Ordering::Acquire);
++        loop {
++            let next = match cur {
++                IDLE => RUNNING,
++                // Already owned: record that a wakeup landed mid-run so the
++                // owner re-schedules instead of going idle and losing it.
++                RUNNING => RUNNING_PENDING,
++                // A wakeup is already recorded; nothing more to do.
++                _ => return false,
++            };
++            match self.read_loop_state.compare_exchange_weak(
++                cur,
++                next,
++                Ordering::AcqRel,
++                Ordering::Acquire,
++            ) {
++                Ok(_) => return next == RUNNING,
++                Err(actual) => cur = actual,
++            }
++        }
++    }
++
++    /// Release ownership of the read loop. `true` = a wakeup arrived while we
++    /// were running, so the caller must schedule another `do_read_loop` run
++    /// (ownership stays with the caller); `false` = went idle cleanly.
++    ///
++    /// Must not be called after `on_finish()` — that path may complete and
++    /// free the object, and leaving the state at `RUNNING` there is exactly
++    /// right: the read is over, so no further run should ever be scheduled.
++    #[cfg(not(windows))]
++    fn end_read_loop(&self) -> bool {
++        use read_loop_state::{IDLE, RUNNING, RUNNING_PENDING};
++        let mut cur = self.read_loop_state.load(Ordering::Acquire);
++        loop {
++            let next = match cur {
++                RUNNING => IDLE,
++                // Keep ownership and tell the caller to run again.
++                RUNNING_PENDING => RUNNING,
++                _ => return false,
++            };
++            match self.read_loop_state.compare_exchange_weak(
++                cur,
++                next,
++                Ordering::AcqRel,
++                Ordering::Acquire,
++            ) {
++                Ok(_) => return next == RUNNING,
++                Err(actual) => cur = actual,
++            }
++        }
++    }
++
++    /// Queue `do_read_loop` on the work pool. Caller must already own the read
++    /// loop (via `try_begin_read_loop`/`end_read_loop` returning `true`).
++    #[cfg(not(windows))]
++    fn schedule_read_loop(&mut self) {
++        self.task = WorkPoolTask {
++            node: Default::default(),
++            callback: Self::do_read_loop_task,
++        };
++        WorkPool::schedule(&raw mut self.task);
++    }
++
+     pub fn on_ready(&mut self) {
+         bloblog!("ReadFile.onReady");
+         #[cfg(not(windows))]
+         if !self.io_parking.fire() {
+             return;
+         }
+-        self.task = WorkPoolTask {
+-            node: Default::default(),
+-            callback: Self::do_read_loop_task,
+-        };
++
+         // On kqueue platforms we use one-shot mode, so:
+         // - we don't need to unregister
+         // - we don't need to delete from kqueue
+@@ -416,7 +516,24 @@ impl ReadFile {
+             self.close_after_io = self.io_request.scheduled;
+         }
+ 
+-        WorkPool::schedule(&raw mut self.task);
++        #[cfg(not(windows))]
++        {
++            // A worker already inside `do_read_loop` will pick this data up
++            // itself (it reads until EAGAIN) or re-run via the pending-wakeup
++            // handshake; scheduling a second one would race it. See T24.
++            if !self.try_begin_read_loop() {
++                return;
++            }
++            self.schedule_read_loop();
++        }
++        #[cfg(windows)]
++        {
++            self.task = WorkPoolTask {
++                node: Default::default(),
++                callback: Self::do_read_loop_task,
++            };
++            WorkPool::schedule(&raw mut self.task);
++        }
+     }
+ 
+     pub(crate) fn on_io_error(&mut self, err: &bun_sys::Error) {
+@@ -788,6 +905,10 @@ impl ReadFile {
+             }
+         }
+ 
++        // Take ownership before the first run: once this loop arms epoll via
++        // `wait_for_readable`, `on_ready` can fire on the IO thread and must
++        // see the loop as owned rather than scheduling a racing second run.
++        self.try_begin_read_loop();
+         self.do_read_loop();
+     }
+ 
+@@ -893,6 +1014,14 @@ impl ReadFile {
+                         self.buffer = buffer;
+                         self.wait_for_readable();
+ 
++                        // Hand the read loop back. If a readability wakeup
++                        // landed while we were running (`on_ready` saw us as
++                        // the owner and recorded it instead of scheduling a
++                        // racing run), we keep ownership and go again — see
++                        // the `read_loop_state` module docs.
++                        if self.end_read_loop() {
++                            self.schedule_read_loop();
++                        }
+                         return;
+                     }
+ 

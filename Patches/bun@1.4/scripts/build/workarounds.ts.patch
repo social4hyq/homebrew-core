@@ -1,0 +1,81 @@
+diff --git a/scripts/build/workarounds.ts b/scripts/build/workarounds.ts
+index fd19077373..4d09262faa 100644
+--- a/scripts/build/workarounds.ts
++++ b/scripts/build/workarounds.ts
+@@ -65,6 +65,76 @@ export interface Workaround {
+ }
+ 
+ export const workarounds: Workaround[] = [
++  {
++    id: "ohos-compat-shim-embed",
++    issue: "https://github.com/social4hyq/ohos-compat-shim",
++    description:
++      "HarmonyOS app sandboxes SIGSYS-kill seccomp-filtered syscalls (close_range, fchmodat2) " +
++      "and return sandbox-specific errno from getpwuid_r/tmpfile/getcwd. A vendored copy of " +
++      "ohos-compat-shim's probe-then-fallback interposer (shims/ohos_compat_shim.c) is linked " +
++      "into the executable with its symbols re-exported, so bun and every `bun build --compile` " +
++      "output run without the LD_PRELOAD wrapper the harmonybrew formulas used to require.",
++    applies: cfg => cfg.ohos,
++    // Sandbox seccomp policy, not a toolchain bug — no toolchain bump fixes
++    // it. Re-evaluate only if HarmonyOS ever relaxes the app allowlist
++    // (probe: a plain close_range() call surviving in a hishell terminal).
++    expectedToBeFixed: () => false,
++    cleanup:
++      `Delete scripts/build/shims/ohos_compat_shim.c, needsOhosCompatShim() and its blocks in ` +
++      `scripts/build/shims.ts, the shim symbol block in src/linker.lds, restore the LD_PRELOAD ` +
++      `wrapper in the bun.rb formula, and this entry.`,
++  },
++  {
++    id: "ohos-node-userinfo-preload",
++    issue: "https://github.com/social4hyq/ohos-compat-shim",
++    description:
++      "The embedded ohos-compat-shim (see 'ohos-compat-shim-embed' above) only interposes " +
++      "getpwuid_r inside the bun process itself; an exec'd node child gets the raw musl libc " +
++      "and its os.userInfo() throws ERR_SYSTEM_ERROR (uv_os_get_passwd -> ENOENT) for " +
++      "HarmonyOS sandbox uids. Bun.spawn/node:child_process/the shell interpreter therefore " +
++      "materialize a tiny CJS preload on disk and append `--require <preload>` to a node-like " +
++      "child's NODE_OPTIONS, passing the shim-resolved username through BUN_OHOS_USERNAME.",
++    applies: cfg => cfg.ohos,
++    // Same sandbox policy as ohos-compat-shim-embed: no toolchain bump fixes
++    // it. Re-evaluate only if HarmonyOS ever adds sandbox uids to the
++    // passwd database (probe: `getent passwd $(id -u)` succeeding in a
++    // hishell terminal).
++    expectedToBeFixed: () => false,
++    cleanup:
++      `Delete src/runtime/api/bun/ohos_node_userinfo.rs, its #[cfg(target_env = "ohos")] mod ` +
++      `declaration in src/runtime/api.rs, the #[cfg(target_env = "ohos")] compute()/is_managed_key ` +
++      `call blocks in src/runtime/api/bun/js_bun_spawn_bindings.rs and ` +
++      `src/runtime/shell/subproc.rs, BUN_OHOS_USERNAME in src/bun_core/env_var.rs, ` +
++      `test/js/bun/spawn/spawn-ohos-node-userinfo.test.ts, and this entry.`,
++  },
++  {
++    id: "ohos-pthread-create-execve-interpose",
++    issue: "https://github.com/oven-sh/bun/pull/40978",
++    description:
++      "Upstream's fix for the kernel EAGAIN race (clone(CLONE_FS) failing every " +
++      "pthread_create while another thread of the process is inside execve(2), which " +
++      "killed --watch reloads and process.execve) links with -Wl,--wrap=execve " +
++      "-Wl,--wrap=pthread_create. bun-ohos links dynamically against ld-musl.so, so " +
++      "lld's --wrap can't resolve __real_execve/__real_pthread_create (only visible " +
++      "at static-link time, not in a shared object) — the linker only warns, and the " +
++      "musl loader hard-fails at process start. c-bindings.cpp's __OHOS__ branch " +
++      "reimplements the same retry algorithm as plain-named execve/pthread_create " +
++      "resolved via dlsym(RTLD_NEXT, ...), the same interposition mechanism " +
++      "ohos-compat-shim already uses for 18 other libc symbols (see " +
++      "'ohos-compat-shim-embed' above).",
++    applies: cfg => cfg.ohos,
++    // Not a toolchain version gap --wrap-against-shared-object support gaining a
++    // version threshold: it's an architectural mismatch (dynamic musl vs a
++    // linker feature built for static/versioned symbols). Re-evaluate only if
++    // bun-ohos ever links musl statically, or lld gains --wrap resolution
++    // against a symbol only present in a shared-object dependency.
++    expectedToBeFixed: () => false,
++    cleanup:
++      `Delete the #if defined(__OHOS__) branch (execve/pthread_create via dlsym) in ` +
++      `src/jsc/bindings/c-bindings.cpp, keeping only the __wrap_execve/__wrap_pthread_create ` +
++      `branch; change scripts/build/flags.ts's -Wl,--wrap=execve/pthread_create entry's ` +
++      `\`when\` back to \`c => c.linux\` (drop the !c.ohos); and remove this entry.`,
++  },
+   {
+     id: "asan-dyld-shim",
+     issue: "https://github.com/llvm/llvm-project/issues/182943",

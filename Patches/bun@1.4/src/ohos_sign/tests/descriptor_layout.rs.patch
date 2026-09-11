@@ -1,0 +1,57 @@
+diff --git a/src/ohos_sign/tests/descriptor_layout.rs b/src/ohos_sign/tests/descriptor_layout.rs
+new file mode 100644
+index 0000000000..aff2dc758a
+--- /dev/null
++++ b/src/ohos_sign/tests/descriptor_layout.rs
+@@ -0,0 +1,51 @@
++// Verify the 256-byte descriptor byte layout matches self-sign.c's build_descriptor().
++
++use ohos_sign::__descriptor_build as build_descriptor;
++
++#[test]
++fn fields_at_correct_offsets() {
++    let root = [0xABu8; 32];
++    let desc = build_descriptor(32, 0x1234_5678_9ABC_DEF0u64, &root);
++
++    assert_eq!(desc.len(), 256);
++    assert_eq!(desc[0], 1, "version");
++    assert_eq!(desc[1], 1, "hashAlgorithm = SHA-256");
++    assert_eq!(desc[2], 12, "log2BlockSize");
++    assert_eq!(desc[3], 0, "saltSize");
++
++    // sign_size = 32, little-endian at offset 4
++    assert_eq!(&desc[4..8], &[32, 0, 0, 0], "signSize LE");
++
++    // file_size little-endian at offset 8
++    let fs_bytes = 0x1234_5678_9ABC_DEF0u64.to_le_bytes();
++    assert_eq!(&desc[8..16], &fs_bytes, "fileSize LE");
++
++    // rootHash at offset 16, 32 bytes, followed by 32 zero bytes (64B field)
++    assert_eq!(&desc[16..48], &root, "rootHash");
++    assert_eq!(&desc[48..80], &[0u8; 32], "rootHash padding");
++
++    // salt (32 bytes) at offset 80 — all zero
++    assert_eq!(&desc[80..112], &[0u8; 32], "salt");
++
++    // flags = 0x10 (self-sign) at offset 112
++    assert_eq!(&desc[112..116], &[0x10, 0, 0, 0], "flags LE");
++
++    // reserved1 at 116 — zero
++    assert_eq!(&desc[116..120], &[0u8; 4], "reserved1");
++
++    // merkleTreeOffset at 120 — zero
++    assert_eq!(&desc[120..128], &[0u8; 8], "merkleTreeOffset");
++
++    // reserved2 at 128 — 127 zero bytes
++    assert_eq!(&desc[128..255], &[0u8; 127], "reserved2");
++
++    // csVersion = 3 at offset 255
++    assert_eq!(desc[255], 3, "csVersion");
++}
++
++#[test]
++fn sign_size_zero_for_digest() {
++    let root = [0u8; 32];
++    let desc = build_descriptor(0, 0, &root);
++    assert_eq!(&desc[4..8], &[0, 0, 0, 0], "signSize=0 for digest");
++}

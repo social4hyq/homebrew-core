@@ -1,0 +1,30 @@
+diff --git a/src/spawn_sys/lib.rs b/src/spawn_sys/lib.rs
+index ef83467c37..a1d4bc3365 100644
+--- a/src/spawn_sys/lib.rs
++++ b/src/spawn_sys/lib.rs
+@@ -119,7 +119,24 @@ pub mod ffi {
+ pub mod waiter_thread_flag {
+     use core::sync::atomic::{AtomicBool, Ordering};
+ 
+-    static SHOULD_USE_WAITER_THREAD: AtomicBool = AtomicBool::new(false);
++    // OHOS: default this on. `Process::watch()`'s async child-exit path
++    // (`pidfd_open()` + level-triggered epoll on the shared JS event loop)
++    // has no OHOS carve-out, unlike the synchronous spawnSync/no-orphans
++    // path which already avoids signalfd+pidfd here for a related reason
++    // (process.rs:3203, "signalfd+pidfd hangs"). Confirmed on-device: after
++    // `Bun.serve()` serves a FIFO-backed response and `server.stop(true)`
++    // resolves, `Bun.spawn(...).exited` for a process forked immediately
++    // afterward never resolves — the child exits cleanly (observed as a
++    // zombie via /proc/<pid>/stat) but the parent's event-loop thread never
++    // notices, spinning busy (`R` state, growing utime) instead of blocking
++    // cleanly. Forcing the waiter-thread fallback moves child-exit detection
++    // onto its own `poll(eventfd, POLLIN, INFTIM)` thread, off the shared
++    // epoll loop entirely, which sidesteps this regardless of whether the
++    // exact trigger is a lost pidfd wakeup or the shared-loop reentrancy
++    // hazard documented at process.rs:76-85. See OHOS_TEST_STATUS.md
++    // 2026-08-17 (bun-serve-file.test.ts framing→pending-body hang) for the
++    // full diagnosis.
++    static SHOULD_USE_WAITER_THREAD: AtomicBool = AtomicBool::new(cfg!(target_env = "ohos"));
+ 
+     /// The waiter thread is the fallback for Linux without pidfd. kqueue
+     /// platforms always have EVFILT_PROC, and the thread's loop has no wakeup
