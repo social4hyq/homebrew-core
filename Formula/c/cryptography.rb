@@ -9,7 +9,7 @@ class Cryptography < Formula
   head "https://github.com/pyca/cryptography.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a496e8580072e5901deab43292d2a66b08dd7ffc1f127880ac217d554147905c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "273fa1fa30745dc80beaa25f616dc04b18c7628ed9e402cede32f73dc625d55e"
   end
 
   depends_on "maturin" => :build
