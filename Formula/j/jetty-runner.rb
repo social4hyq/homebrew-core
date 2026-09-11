@@ -4,6 +4,7 @@ class JettyRunner < Formula
   url "https://search.maven.org/remotecontent?filepath=org/eclipse/jetty/jetty-runner/11.0.26/jetty-runner-11.0.26.jar"
   sha256 "b6403baf0782c2154231b23109fb84247e2ee95d295f4621ca9bdc75dfebc762"
   license any_of: ["Apache-2.0", "EPL-1.0"]
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=org/eclipse/jetty/jetty-runner/maven-metadata.xml"
