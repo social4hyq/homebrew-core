@@ -7,7 +7,7 @@ class Flyway < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "13e56acd06693fdf1d2b6fb65ebff8c783948e231d5e2f245005e88141bdca8d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c70df6becbd25b570b65758eac5e1fd37e9fff794b11b53b941aaa8f7a760146"
   end
 
   depends_on "openjdk"
