@@ -11,6 +11,10 @@ class Libslirp < Formula
     regex(/^v(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a3f027a7f7f879a5a5ea920040265912e3e9f0a94615dae101eb2b9e6c6ea390"
+  end
+
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkgconf" => :build
