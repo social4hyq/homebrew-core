@@ -6,10 +6,11 @@ class Subliminal < Formula
   url "https://files.pythonhosted.org/packages/9f/08/f602bac8c35f04021e6dfcd0bebea917cd2b57116229a74a0b97e63c72ab/subliminal-2.7.1.tar.gz"
   sha256 "f2649914d3067904effa2b4ce8d83aae994cd47008253311d5ae7949f467939f"
   license "MIT"
+  revision 1
   head "https://github.com/Diaoul/subliminal.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c4346df9283dfe57232d9425fb778ef62f2d0503cf6d3650baf92455b135668e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "743855b5d183ca38a87d64882ab12305f2ea166161c1873c177878d89c6bfca6"
   end
 
   depends_on "certifi" => :no_linkage
