@@ -7,7 +7,7 @@ class QwenCode < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7f33a8d6235704a2d0f9bd31a801d9103c13aa4fdcbc761d601360f2325bdbb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "796b6f17197b65d4c23d2f389cbb63aa928952f2d43ec0bb1ae5d41f60d85176"
   end
 
   depends_on "node"
