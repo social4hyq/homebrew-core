@@ -4,6 +4,7 @@ class Flyway < Formula
   url "https://github.com/flyway/flyway/releases/download/flyway-13.5.0/flyway-commandline-13.5.0.tar.gz"
   sha256 "5ec30849dc4ef9fc0883e50899cd5846b25aedcfe5fbca5ab6a791f901fe6ced"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "13e56acd06693fdf1d2b6fb65ebff8c783948e231d5e2f245005e88141bdca8d"
