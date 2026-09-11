@@ -6,10 +6,11 @@ class Glib < Formula
   url "https://download.gnome.org/sources/glib/2.88/glib-2.88.3.tar.xz"
   sha256 "ab24d24e698dfa1e408b7bcdb508f4aafc906185a8b8ce72fdf79bbbdc9b383b"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9351fece1730840bf29ac17cbfafdf16f4be056c050c584d8e1a0bf20c2574a1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9d0d3ba7edc1a6f6ce4e5c5ec6589063ad66da01f60337edda01bfdc333a326"
   end
 
   depends_on "bison" => :build # for gobject-introspection
