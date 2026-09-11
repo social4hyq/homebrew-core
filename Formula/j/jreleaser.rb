@@ -7,7 +7,7 @@ class Jreleaser < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d9a5847a14ae77d0e6280d50e1e691c192f3fc65852a8d568ed93317b4b34ff"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b44e722d5d8255a9884e66c43d8d7bfe07d4c85c494cdb14e453f7cf22f65e59"
   end
 
   depends_on "openjdk"
