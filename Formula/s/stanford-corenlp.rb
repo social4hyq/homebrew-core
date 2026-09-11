@@ -4,6 +4,7 @@ class StanfordCorenlp < Formula
   url "https://nlp.stanford.edu/software/stanford-corenlp-4.4.0.zip"
   sha256 "c04b07e8b539a00c0816f183ed1f55b79041641f5422fe943829fdabbee67e47"
   license "GPL-2.0-or-later"
+  revision 1
 
   # The first-party website only links to an unversioned archive file from
   # nlp.stanford.edu (stanford-corenlp-latest.zip), so we match the version
@@ -14,7 +15,7 @@ class StanfordCorenlp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "70d5fe630d64c44b3f35ea718ff988eee115f9b1e9e2735f45b9fb6a589a3000"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "89c0d8d5dce431167496b90bae3468eb737773eb153fbd551ab5c63b0832d47c"
   end
 
   depends_on "openjdk"
