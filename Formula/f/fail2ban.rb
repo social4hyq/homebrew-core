@@ -13,7 +13,7 @@ class Fail2ban < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b736ca6e2b128573c9084b75cdf26053a1c8d1449b59216080449b94e5051939"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a35baac03b86e2e4d05e99e623989cc448ad74bf604feff84ca3af73c3eb10f8"
   end
 
   depends_on "sphinx-doc" => :build
