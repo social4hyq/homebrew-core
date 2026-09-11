@@ -7,7 +7,7 @@ class ChromeDevtoolsMcp < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b669145150c67782974941e9275e61e377d7fc96ea2ab3269c3c66fb0a5c8d33"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8641ec63079aa326b785de5c92f90061e8cc59a3ade5351c66067c4e89ab41bf"
   end
 
   depends_on "node"
