@@ -6,11 +6,11 @@ class Pocsuite3 < Formula
   url "https://files.pythonhosted.org/packages/12/33/a9f77b222075f034c04c615de19c9ef0f93457d9b627e95cc40d07949e70/pocsuite3-2.1.0.tar.gz"
   sha256 "4107396b5fbbeeb65b27b574c6fb5a40831d1983ad4fd2f9a83c87006bed98e6"
   license "GPL-2.0-only"
-  revision 10
+  revision 11
   head "https://github.com/knownsec/pocsuite3.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "44ff1f12ecaffb61f35fb5614ff11fe25db7599a64b0c9ca6408c74b2c56524c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a22175875e8232de7ff09ce47d44dddebf5b2e590fb0dad2bf941d4db46b410a"
   end
 
   depends_on "pkgconf" => :build
