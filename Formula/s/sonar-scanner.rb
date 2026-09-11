@@ -4,10 +4,11 @@ class SonarScanner < Formula
   url "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-8.1.0.6389.zip"
   sha256 "ab76ab3c360025e9108be5b55be066f304a164f8b2850d2f2f333915db51bc1b"
   license "LGPL-3.0-or-later"
+  revision 1
   head "https://github.com/SonarSource/sonar-scanner-cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf65af4a0ed8b668d137a348004b3de687d50378ea5f258d89e1d47680443e16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "02020c0bb0d29b4e56cf9d82b60c08d682b9e4fa41e63e25fb3df572e5f3c2d6"
   end
 
   depends_on "openjdk"
