@@ -4,10 +4,11 @@ class GsettingsDesktopSchemas < Formula
   url "https://download.gnome.org/sources/gsettings-desktop-schemas/50/gsettings-desktop-schemas-50.1.tar.xz"
   sha256 "0a2aa25082672585d16fcdab61c7b0e33f035fb87476505c794f29565afa485b"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "23c9655d3e7cdc110dffb80064ae651dc6aecd3f3f59f32a5ac27559ac3f5fc6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "199f5ff3f6c799430d1eddba0b71dd5eeb1b1e4471e1b9b6c3c40ce96f5751cf"
   end
 
   depends_on "gettext" => :build
