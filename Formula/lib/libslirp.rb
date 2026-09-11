@@ -1,13 +1,18 @@
 class Libslirp < Formula
   desc "General purpose TCP-IP emulator"
   homepage "https://gitlab.freedesktop.org/slirp/libslirp"
-  url "http://ftp.debian.org/debian/pool/main/libs/libslirp/libslirp_4.9.1.orig.tar.bz2"
-  sha256 "3caff6e2de445f4995629d4929c55419f661b2b1d14f12481e155a71c1e8f811"
+  url "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.9.4/libslirp-v4.9.4.tar.gz"
+  sha256 "3998863b020aeda34bddc567097c6efba55a78cdf6eeee6bcd42c11ef23967da"
   license "BSD-3-Clause"
   compatibility_version 1
 
+  livecheck do
+    url :stable
+    regex(/^v(\d+(?:\.\d+)+)$/i)
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7ba6d236cf09522f3faa47363c8dfb2c14adb4962f028bedd8c8ee2399b5a8c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a3f027a7f7f879a5a5ea920040265912e3e9f0a94615dae101eb2b9e6c6ea390"
   end
 
   depends_on "meson" => :build
