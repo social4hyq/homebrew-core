@@ -7,7 +7,7 @@ class Fgbio < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "08d7eb247369772ff8faaf6bb68979e92563c38e2868e51ca1defdad6fae8bb1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e121a22874b114165b3e70d604521975a6ce4706c586dea7208b8a66e8c8532f"
   end
 
   depends_on "openjdk"
