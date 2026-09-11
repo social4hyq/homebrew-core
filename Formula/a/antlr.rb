@@ -4,6 +4,7 @@ class Antlr < Formula
   url "https://www.antlr.org/download/antlr-4.13.2-complete.jar"
   sha256 "eae2dfa119a64327444672aff63e9ec35a20180dc5b8090b7a6ab85125df4d76"
   license "BSD-3-Clause"
+  revision 1
 
   livecheck do
     url "https://www.antlr.org/download.html"
@@ -11,7 +12,7 @@ class Antlr < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "48c40d4aeedd4d1825abc8175cb1f9fad968af95e7727e39d4d1071ab413df48"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "85391df2a594d52c36900e87da5c09e6107a7fca38aacacbb22710f530d14dbb"
   end
 
   depends_on "openjdk"
