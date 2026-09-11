@@ -7,7 +7,7 @@ class AwsCdk < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e35f46e2de247f489a2b5938e5efe829b268eec31cf97c0a772ebc13746e9cbb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "030b51f4437a1d4832202d7bd89596c6a5b8cb23161e54532733abba27578662"
   end
 
   depends_on "node"
