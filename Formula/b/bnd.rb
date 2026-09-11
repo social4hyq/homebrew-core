@@ -4,6 +4,7 @@ class Bnd < Formula
   url "https://search.maven.org/remotecontent?filepath=biz/aQute/bnd/biz.aQute.bnd/7.4.0/biz.aQute.bnd-7.4.0.jar"
   sha256 "43c28b57fb2ee536fb4dfcf4af518243b4e2f940afc23f3c7e1d97401ed10826"
   license any_of: ["Apache-2.0", "EPL-2.0"]
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=biz/aQute/bnd/biz.aQute.bnd/maven-metadata.xml"
@@ -11,7 +12,7 @@ class Bnd < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "940c725eb9ef66db607be040a3a342505679575d78626888fb9efc7a91ab5f36"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b190c6bc90df736fa9f9de454c3971cd25cbfdedeef711ba0b8e8b96d4db993d"
   end
 
   depends_on "openjdk"
