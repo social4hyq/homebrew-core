@@ -4,10 +4,11 @@ class Openexr < Formula
   url "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v3.4.15.tar.gz"
   sha256 "445ed5b0ea4d9cf98be3a4f219e419628b123b61dec65ccb743ab9b07fbebdaa"
   license "BSD-3-Clause"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3171c9870be5d34f13350905ca616444bd6b46e01e9ab7fb9e9736df5468b607"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "348de5c7d0610913dfc3db3a1c8f143a3834b6cc7a0ebd30ddb68078e2ab1996"
   end
 
   depends_on "cmake" => :build
