@@ -4,6 +4,7 @@ class AtkmmAT228 < Formula
   url "https://download.gnome.org/sources/atkmm/2.28/atkmm-2.28.5.tar.xz"
   sha256 "ae449192a582a2582a95e0602b15d792bbd639e836339b81ef916aa87540ac5c"
   license "LGPL-2.1-or-later"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class AtkmmAT228 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb2315af7ef783e7fb44a915897271cb0c3c57f8b7e15884b47f77e61f9c34b4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e72df358e170b061b6ed228fb5d510a870887745a84917396ea17ad782b3c5dc"
   end
 
   depends_on "meson" => :build
