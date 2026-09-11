@@ -4,9 +4,10 @@ class Structurizr < Formula
   url "https://github.com/structurizr/structurizr/archive/refs/tags/v2026.06.28.tar.gz"
   sha256 "491a857f41b0378ee3c757e39a2fc45eb0fc4c22d48395b5e154380e478c828c"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "edee6a7c950dab5088d7ecee45ac0e9668a37bd319023b5c166a13baafae3086"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cee8e9aaa6133a34293f4a4763f576eaaff4253923f2ce50e6bb1804a7dd1cbe"
   end
 
   depends_on "maven" => :build
