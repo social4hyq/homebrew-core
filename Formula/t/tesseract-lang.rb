@@ -4,6 +4,7 @@ class TesseractLang < Formula
   url "https://github.com/tesseract-ocr/tessdata_fast/archive/refs/tags/4.1.0.tar.gz"
   sha256 "d0e3bb6f3b4e75748680524a1d116f2bfb145618f8ceed55b279d15098a530f9"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "2ac7313146b4651df63270185cefc520d8bb8245f20500056d46f7a88d6e284b"
