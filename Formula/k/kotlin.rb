@@ -4,6 +4,7 @@ class Kotlin < Formula
   url "https://github.com/JetBrains/kotlin/releases/download/v2.4.20/kotlin-compiler-2.4.20.zip"
   sha256 "59e9ca74c7904ef2c122b12114937673ccce68de820a663f0ed66ccf8799e0b7"
   license "Apache-2.0"
+  revision 1
 
   # Upstream maintains multiple major/minor versions and the "latest" release
   # may be for a lower version, so we have to check multiple releases to
@@ -14,7 +15,7 @@ class Kotlin < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f960da89aa47eba8598fc6a19dec246a4f32256e8f891edbca24ac0e0006db7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a53119a4d53db87fb6a711f5a272e650fbd8467c476e6d7ebf36bd26971009a"
   end
 
   depends_on "openjdk"
