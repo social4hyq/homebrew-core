@@ -1,7 +1,7 @@
 class BunAT14 < Formula
   desc "Incredibly fast JavaScript runtime, bundler, test runner, and package manager"
   homepage "https://bun.com/"
-  url "https://github.com/social4hyq/ohos-bun.git", revision: "487ab56cf6c587eb324a00f7d1164a07a2148aa8"
+  url "https://github.com/social4hyq/ohos-bun.git", revision: "03188eac62d7025793609148c26c46c70f5ef3d3"
   version "1.4.2"
   license all_of: [
     "MIT",
