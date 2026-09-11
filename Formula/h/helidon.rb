@@ -4,7 +4,7 @@ class Helidon < Formula
   url "https://github.com/helidon-io/helidon-build-tools/archive/refs/tags/3.0.6.tar.gz"
   sha256 "749cf3fd162bb9449ab57584c0bdf8874114d678499071ea522c047637de0f90"
   license "Apache-2.0"
-  revision 1
+  revision 2
 
   # There can be a notable gap between when a version is tagged and a
   # corresponding release is created, so we check the "latest" release instead
@@ -15,7 +15,7 @@ class Helidon < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "03d007c996780318d498a73b395a3526bab3f72bdee6bf3cc071711f3fb933f6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cea9c943e5da912d161133eef189a4a9ca41b46d023a2d1aaf435aa288c8046b"
   end
 
   depends_on "maven"
