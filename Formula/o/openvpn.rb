@@ -5,6 +5,7 @@ class Openvpn < Formula
   mirror "https://build.openvpn.net/downloads/releases/openvpn-2.7.7.tar.gz"
   sha256 "3ab8f48fd6c26d49ba2333a092433949afdb5c85c0e6a1ff265784fbc04a2463"
   license "GPL-2.0-only" => { with: "openvpn-openssl-exception" }
+  revision 1
 
   livecheck do
     url "https://openvpn.net/community-downloads/"
@@ -12,7 +13,7 @@ class Openvpn < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a1246d198fad59d08cb4d3bcad86056a43e9685f580191a2602a3a5f2f6e680"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8bb6ca5528379cf66394b990f7d3513d72eda2118a22bbe9584b79d99c6c8632"
   end
 
   depends_on "pkgconf" => :build
