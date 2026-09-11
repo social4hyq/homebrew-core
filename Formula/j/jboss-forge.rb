@@ -4,6 +4,7 @@ class JbossForge < Formula
   url "https://downloads.jboss.org/forge/releases/3.10.0.Final/forge-distribution-3.10.0.Final-offline.zip"
   sha256 "0c57ea7ad90cbc5e654dd09623f385c192c6fabe366a30c11597b49bb09f7fb3"
   license "EPL-1.0"
+  revision 1
 
   # The first-party download page (https://forge.jboss.org/download) uses
   # JavaScript to render the download links and the version information comes
@@ -18,7 +19,7 @@ class JbossForge < Formula
   no_autobump! because: :incompatible_version_format
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "88a52fb5c156921a5e5376f749d00c29c6aa73589c961d32f9a7dbbdf5729728"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa87c72f8d9aa03de5cdbd0849b01765c41b4803e8779c66cff9dbc215d1de17"
   end
 
   depends_on "openjdk"
