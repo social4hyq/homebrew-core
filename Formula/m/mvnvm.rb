@@ -5,6 +5,7 @@ class Mvnvm < Formula
   url "https://bitbucket.org/mjensen/mvnvm/get/mvnvm-1.0.29.tar.gz"
   sha256 "f3004baa68051fe64b2ab212fea57cb05dcc598e334f2529b9ca936a3b275b0e"
   license "Apache-2.0"
+  revision 1
   head "https://bitbucket.org/mjensen/mvnvm.git", branch: "master"
 
   bottle do
