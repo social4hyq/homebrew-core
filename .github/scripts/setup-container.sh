@@ -9,6 +9,11 @@ docker run -d --name "$CONTAINER" --init \
   -v "$GITHUB_WORKSPACE:$TAP_IN_CONTAINER" \
   "$IMAGE" sleep infinity
 
+# The self-hosted runner's umask creates the bind-mounted checkout as 660.
+# Homebrew audit requires formula files to be world-readable; normalize the
+# mounted tap before any brew readall/audit step runs.
+cexec "find '$TAP_IN_CONTAINER/Formula' -type f -name '*.rb' -exec chmod a+r {} +"
+
 # musl tmpfile() hardcoded path + /system/bin/sh + /system/lib/ld-musl
 # (bottle ELFs' PT_INTERP targets the real-device path)
 cexec 'mkdir -p /data/local/tmp /system/bin /system/lib &&
