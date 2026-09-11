@@ -4,10 +4,11 @@ class Libxtst < Formula
   url "https://www.x.org/archive/individual/lib/libXtst-1.2.5.tar.gz"
   sha256 "244ba6e1c5ffa44f1ba251affdfa984d55d99c94bb925a342657e5e7aaf6d39c"
   license "MIT"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "55186145d6a646950d1f1295e201faf8996829ffc5c35ccbb5d2125aa9816350"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "37768c4e81e22dc5761c1f7db54cb68f071c7cee9b022179115a530bd16f434a"
   end
 
   depends_on "pkgconf" => :build
