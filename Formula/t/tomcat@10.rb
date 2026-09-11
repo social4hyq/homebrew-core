@@ -12,7 +12,7 @@ class TomcatAT10 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8bce8157bb22f9647ad820a67adbb8c829408f038ba15ce8b15b4d7eeaf42b68"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "10aeadb5b551aa9b572a60f0386e36035ceb3f869e796034e80ded069eea64a2"
   end
 
   keg_only :versioned_formula
