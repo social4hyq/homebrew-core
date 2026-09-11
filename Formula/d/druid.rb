@@ -5,6 +5,7 @@ class Druid < Formula
   mirror "https://archive.apache.org/dist/druid/37.0.0/apache-druid-37.0.0-bin.tar.gz"
   sha256 "c5e602be6ef435643bf5f58271353925798c818c23d79aac07766338c9ca0dd0"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://druid.apache.org/downloads/"
@@ -12,7 +13,7 @@ class Druid < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "02554b6fdd52ef6d570f574cc49d2489d4d5e6ca28874ab590f0c04fc3289c5b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3b02f53856d0ab1cfa30a12ea8fe343cfd3d6e1a3cad6e28934bca3d90ecc09"
   end
 
   depends_on "zookeeper" => :test
