@@ -4,11 +4,12 @@ class Pillow < Formula
   url "https://files.pythonhosted.org/packages/1c/3d/bb7fca845737cf9d7dbde16ed1843984665ff2e0a518f5db43e77ec540b9/pillow-12.3.0.tar.gz"
   sha256 "3b8182a766685eaa002637e28b4ec8d6b18819a0c71f579bf0dbaa5830297cce"
   license "HPND"
+  revision 1
   compatibility_version 1
   head "https://github.com/python-pillow/Pillow.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "90175ac1167914659b405b70f46a70693e66b76ca513086131ec81bc34dda23d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7cd228c70f5bb19c93d44e87bed6551e74866831cca31e7bdc5580fc7c400ea"
   end
 
   depends_on "cmake" => :build
