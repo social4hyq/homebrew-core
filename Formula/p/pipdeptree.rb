@@ -9,7 +9,7 @@ class Pipdeptree < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "916fd81e39d352a8f7a80b347695aa9a0f0f591a5c4c3b6eefc8bf2fabdb47c2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5cd4f5e25bc1ea111b298d93e7b55b12c77278522665a69d68cea5984259c455"
   end
 
   depends_on "meson" => :build
