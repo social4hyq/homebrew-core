@@ -4,10 +4,11 @@ class Iamy < Formula
   url "https://github.com/99designs/iamy/archive/refs/tags/v2.4.0.tar.gz"
   sha256 "13bd9e66afbeb30d386aa132a4af5d2e9a231d2aadf54fe8e5dc325583379359"
   license "MIT"
+  revision 1
   head "https://github.com/99designs/iamy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c80195739f77b0322319a8b5cfcbdeac0dcdc2f4447f480363bb4f00816f1d7c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8257f51d7e4c5eb2508969a4e3662af365abe60da83455cbff1c8036bf0aa88e"
   end
 
   depends_on "go" => :build
