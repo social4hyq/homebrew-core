@@ -4,9 +4,10 @@ class ExcelCompare < Formula
   url "https://github.com/na-ka-na/ExcelCompare/releases/download/0.7.0/ExcelCompare-0.7.0.zip"
   sha256 "bf5709fc7c86a59f6f535685b0e08a7c8bcb73c48c4c03e4d54b1fd816c90825"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4bffa5c8bf9b5013c5ad9b04e0efc1e63ea4ff769e1c97cf68d23a5fca526809"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "79a0730cee0b5119279f2f280abac09037f20a1fba9e8cc55fd5ab88b28878b3"
   end
 
   depends_on "openjdk"
