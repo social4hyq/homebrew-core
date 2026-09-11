@@ -4,10 +4,11 @@ class Libgsf < Formula
   url "https://download.gnome.org/sources/libgsf/1.14/libgsf-1.14.58.tar.xz"
   sha256 "06e07ea12b7a52b9e316faddfecb640b1717a4875c59f0efb3b0cec1e2ccf35a"
   license "LGPL-2.1-only"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "43fe67058d04d343bd75f70bf3fb59964a38a0e2d859617beefc68c55b3e214b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "12fb45e5e05a9fa92aeb2070bd0e651bec15190a779e4260819e96e40972b2c6"
   end
 
   head do
