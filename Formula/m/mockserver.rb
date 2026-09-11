@@ -4,6 +4,7 @@ class Mockserver < Formula
   url "https://search.maven.org/remotecontent?filepath=org/mock-server/mockserver-netty/7.6.0/mockserver-netty-7.6.0-brew-tar.tar"
   sha256 "b678a541a384aa0e55296bc498f98067cc73b3e88f72acddf580f6f3ef970cda"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=org/mock-server/mockserver-netty/maven-metadata.xml"
@@ -11,7 +12,7 @@ class Mockserver < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "84d5b5d24f9596962f9d4f6b6b20a3dda4bdb6abaae30b970ae40e150f9409d5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e5216da596f37388b277e7cc83b09d45df837b01f4e7454d0fd9a1292f2a18a"
   end
 
   depends_on "openjdk"
