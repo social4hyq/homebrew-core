@@ -4,6 +4,7 @@ class OpenapiDiff < Formula
   url "https://github.com/OpenAPITools/openapi-diff/archive/refs/tags/2.1.7.tar.gz"
   sha256 "5e1ac21d4560b80606e315acaee217bfdfe84684407eaa978f97e2f96139befb"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "8bfca65188e8d82548c98b277b470c1254da231d14172a5927068d2dfbfb2f9f"
