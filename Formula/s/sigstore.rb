@@ -6,10 +6,11 @@ class Sigstore < Formula
   url "https://files.pythonhosted.org/packages/18/e0/279419065e2d7102413605b3456122adbbccbc42e010b499c7b882fc01f8/sigstore-4.5.0.tar.gz"
   sha256 "020d3e07f622b2916bf453e66ff6ff0711e1fdc5ab69e8bd8902f71d9fcb316f"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/sigstore/sigstore-python.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd889b183a372b09e3dcbcfa47c3cec9ef11af08011b9f39d8b8d0d307de2c8e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c68cec9f476e4c3848e0f52ef3c34572a31fdaba003567eb9030473b056ff8c"
   end
 
   depends_on "pkgconf" => :build # for rfc3161-client
