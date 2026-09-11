@@ -4,10 +4,11 @@ class JsonGlib < Formula
   url "https://download.gnome.org/sources/json-glib/1.10/json-glib-1.10.8.tar.xz"
   sha256 "55c5c141a564245b8f8fbe7698663c87a45a7333c2a2c56f06f811ab73b212dd"
   license "LGPL-2.1-or-later"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef53ebcfc7c5889d4c1df11dc2e6686c3b3ce5ea27c94c96827e182c320ba3c7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f8899064fc8c7603b0cf409510032f81b4754e0bd9be34e29da7c6edd13073e3"
   end
 
   depends_on "docutils" => :build # for rst2man
