@@ -12,7 +12,7 @@ class Apgdiff < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "45f2c03a824737d1aef5536c9f60ee235849ac05f7833eadc61fbddf3ba84b7e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "508e01b170e9d5f717f448b505104bf3972960f556d3e7084bfc2ba747277080"
   end
 
   head do
