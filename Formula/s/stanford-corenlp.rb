@@ -4,6 +4,7 @@ class StanfordCorenlp < Formula
   url "https://nlp.stanford.edu/software/stanford-corenlp-4.4.0.zip"
   sha256 "c04b07e8b539a00c0816f183ed1f55b79041641f5422fe943829fdabbee67e47"
   license "GPL-2.0-or-later"
+  revision 1
 
   # The first-party website only links to an unversioned archive file from
   # nlp.stanford.edu (stanford-corenlp-latest.zip), so we match the version
