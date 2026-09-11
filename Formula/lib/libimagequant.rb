@@ -8,7 +8,7 @@ class Libimagequant < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c7745646365d084b9f1d205a406871645a034b3b868b7dbc8a1b9beb2ef250f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c0214a220082c08709eb474441c37ff5d783aa91011560c733d0d2fa0fd2068"
   end
 
   depends_on "cargo-c" => :build
