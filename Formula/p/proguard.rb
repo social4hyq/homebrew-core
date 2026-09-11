@@ -4,6 +4,7 @@ class Proguard < Formula
   url "https://github.com/Guardsquare/proguard/releases/download/v7.10.0/proguard-7.10.0.tar.gz"
   sha256 "fbff4dfe037d0724ff767ad555c06ebd14063ccf99a657cf05a69e6f2610da21"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Proguard < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "08fadf63189cc4b0922a467a25155594def5e22da08cafc4be9a25a1c9c2d648"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b24e1e35e6a30c50ee95111c286fe379d7dc3a6aeba15aede921db386e1945e2"
   end
 
   depends_on "openjdk"
