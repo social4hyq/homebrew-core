@@ -4,7 +4,7 @@ class Xmlsectool < Formula
   url "https://shibboleth.net/downloads/tools/xmlsectool/4.0.0/xmlsectool-4.0.0-bin.zip"
   sha256 "32a5fd3c92cddb7833249e22c97253fbbf02ae2dc0a385896e6e7ac1d1a77de4"
   license "Apache-2.0"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://shibboleth.net/downloads/tools/xmlsectool/latest/"
@@ -12,7 +12,7 @@ class Xmlsectool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "046c397dfe1ab6f56a8de4326780e8c077f14da693fabef0141a267c39948aa7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d6804a03398a935e5b101ae696c3363a206915ba732d5695b046b1802cdecd8e"
   end
 
   depends_on "openjdk"
