@@ -7,7 +7,7 @@ class BibtexTidy < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f900f3849ce409a5197b25f82c74f959e1724d9304dab62ff79e640c0a8f5c8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9404291343bf03aa17f6b14b778d7cd311bc9d9257016146910db5a31fbe6a52"
   end
 
   depends_on "node"
