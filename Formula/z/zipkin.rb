@@ -4,6 +4,7 @@ class Zipkin < Formula
   url "https://search.maven.org/remotecontent?filepath=io/zipkin/zipkin-server/3.6.1/zipkin-server-3.6.1-exec.jar"
   sha256 "d8326e0ed4f43855dba81228f688554706e52578a7c782d9a90b73f8680654a1"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=io/zipkin/zipkin-server/maven-metadata.xml"
