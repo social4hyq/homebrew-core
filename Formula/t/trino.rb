@@ -14,7 +14,7 @@ class Trino < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fae18fc2382119d3bbdb0103814160206a6861a45123670e0967deb1ad897f57"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6ab539f6cc54c6e73e4025f4e75c8461e884001012e128e84d02ad82c5017654"
   end
 
   depends_on "go" => :build
