@@ -12,7 +12,7 @@ class LibsvgCairo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a14c64ce0cea39086746565ba6ff9f227d8a305882d00d42630ca380f3415ddb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7c02b387f439c53f1473518ee94f12e8416ca8395e672989613ce9ddec8e984"
   end
 
   depends_on "autoconf" => :build
