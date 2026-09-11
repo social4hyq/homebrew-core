@@ -4,6 +4,7 @@ class Tectonic < Formula
   url "https://github.com/tectonic-typesetting/tectonic/archive/refs/tags/tectonic@0.17.0.tar.gz"
   sha256 "30adda98f67dd5389844f6023adeeb54b5475c17a54b777900644468fbc9765d"
   license "MIT"
+  revision 1
   head "https://github.com/tectonic-typesetting/tectonic.git", branch: "master"
 
   # As of writing, only the tags starting with `tectonic@` are release versions.
