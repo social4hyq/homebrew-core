@@ -8,7 +8,7 @@ class Blockhash < Formula
   head "https://github.com/commonsmachinery/blockhash.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "348a91dc62fa2624f704fc116e217380f43ed0d4bdbf089b1778e5228f4de668"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3023d7c3e2c9c864acd6a1da02118e41eeda643d49cc3f7be77688a380a13755"
   end
 
   depends_on "pkgconf" => :build
