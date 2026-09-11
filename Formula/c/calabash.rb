@@ -4,6 +4,7 @@ class Calabash < Formula
   url "https://github.com/ndw/xmlcalabash1/releases/download/1.5.7-120/xmlcalabash-1.5.7-120.zip"
   sha256 "40a932910f36e78b445bd756acb405155d39b98541091298c0cf4971895cb8c3"
   license any_of: ["GPL-2.0-only", "CDDL-1.0"]
+  revision 1
 
   # According to ndw/xmlcalabash1#342, each release comes in "flavours" that
   # target different Saxon versions (e.g. 1.5.4-110 targets Saxon 11.x).
