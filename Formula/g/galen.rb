@@ -7,7 +7,7 @@ class Galen < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0aafa3045b20d8d6d88894a066b47168d5fb956b3ebe6f3050139fc5a7240dcc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2718ec7780f00d28ce041a1a40b520eebc23db2308e9cc9f13a83910a397a4fb"
   end
 
   depends_on "openjdk"
