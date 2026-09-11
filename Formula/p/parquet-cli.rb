@@ -4,10 +4,11 @@ class ParquetCli < Formula
   url "https://github.com/apache/parquet-java/archive/refs/tags/apache-parquet-1.18.1.tar.gz"
   sha256 "8c93ac92bd76f2167154ededcdb79b32d4725d9d940f9fedc84bef5103912546"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/apache/parquet-mr.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8dc6fe185332b7ceabe6d6a8a7eafa9b76b71bfe9b60b83b93841738fbefc004"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d583485daaff2a3c723932b76c489c794b86ddd39576913018871fcae9947314"
   end
 
   depends_on "maven" => :build
