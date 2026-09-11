@@ -10,7 +10,7 @@ class Mongosh < Formula
   no_autobump! because: :bumped_by_upstream
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd6b4d22856fef090c92e3cad7ce45d07bd6a36a91aacfad74a239d64116d6e4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f6ae3cc9d3a6a2511d875f6d3daacbc0818883d775ff03e007c309d43732a4f"
   end
 
   depends_on "node"
