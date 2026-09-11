@@ -4,6 +4,7 @@ class Jsonschema2pojo < Formula
   url "https://github.com/joelittlejohn/jsonschema2pojo/releases/download/jsonschema2pojo-1.3.3/jsonschema2pojo-1.3.3.tar.gz"
   sha256 "877924359f7f3faf4a95d95df1d9fd074ede64c0f982fa86408299e9442775c4"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
@@ -12,7 +13,7 @@ class Jsonschema2pojo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0bd94d781a3c0604bea78be15a850e25a2435de1eccbc764b4116ccfb7ac3390"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "df49c75162955d1c7bbdce99576f61a797fe0df40a82faf9c4ebb3e64d3bb01a"
   end
 
   depends_on "openjdk"
