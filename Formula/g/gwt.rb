@@ -4,6 +4,7 @@ class Gwt < Formula
   url "https://github.com/gwtproject/gwt/releases/download/2.13.1/gwt-2.13.1.zip"
   sha256 "92610f2f9b929a8625b858fe394c15351357ba32733282e79e38168ecc0d131d"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
