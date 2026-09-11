@@ -10,7 +10,7 @@ class Subliminal < Formula
   head "https://github.com/Diaoul/subliminal.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c4346df9283dfe57232d9425fb778ef62f2d0503cf6d3650baf92455b135668e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "743855b5d183ca38a87d64882ab12305f2ea166161c1873c177878d89c6bfca6"
   end
 
   depends_on "certifi" => :no_linkage
