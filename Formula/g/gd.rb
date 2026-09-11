@@ -7,7 +7,7 @@ class Gd < Formula
   revision 7
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dcd7589e13bca157eec33002d6639af5175655d47fd5f27cc54e02210a6a9bc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3875b4e88da245ce2f613cc1e066cbb708bee3f4cf4563c6e2a51776b22ae8e0"
   end
 
   head do
