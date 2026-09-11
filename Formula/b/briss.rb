@@ -4,9 +4,10 @@ class Briss < Formula
   url "https://downloads.sourceforge.net/project/briss/release%200.9/briss-0.9.tar.gz"
   sha256 "45dd668a9ceb9cd59529a9fefe422a002ee1554a61be07e6fc8b3baf33d733d9"
   license "GPL-3.0-or-later"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e3e95c00cd08b3cca1d218558278c4724ccd9ef19f2a48c2f02e1c0fbc6b357"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e0fddbcb7031af47d682eff08aca276b96b740bd467222f00a380619bd04ced"
   end
 
   depends_on "openjdk"
