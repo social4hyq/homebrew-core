@@ -7,7 +7,7 @@ class Pangomm < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e318c1c5264173e19fd52cac52411339b88ce9770b7d28d83560832fc67fd78"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f10405c383149cf9f3eac34dbcdd69ee645c33388e4bb7c3a04dc188765cce4"
   end
 
   depends_on "meson" => :build
