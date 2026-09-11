@@ -14,7 +14,7 @@ class Libwebsockets < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eaf505a7ce1414a31ec585d2ea48fd16e37fb61e712c548e5b77cb6bbf9cf5eb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a05069a4bbf46fe1153749d7cc33814530afd51395b4a1db5638c49a036124be"
   end
 
   depends_on "cmake" => :build
