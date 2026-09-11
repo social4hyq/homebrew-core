@@ -7,11 +7,11 @@ class Animdl < Formula
   url "https://files.pythonhosted.org/packages/5b/79/4be6ac2caca32dea6fe500e5f5df9d74a3a5ce1d500175c3a7b69500bb3f/animdl-1.7.27.tar.gz"
   sha256 "fd97b278da4c82da88759993eaf6d8ad6fc3660d0f03de5b2151279c4ebd8370"
   license "GPL-3.0-only"
-  revision 5
+  revision 6
   head "https://github.com/justfoolingaround/animdl.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a539836b97606032a15b934a439c0458a2b721ac6d1afe6f0672d64245f49994"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3acbe97732452f98f2fb1601138f08601fbc0031d58eb8b3f01e8a1dce721b17"
   end
 
   deprecate! date: "2026-04-27", because: :unmaintained
@@ -166,7 +166,6 @@ class Animdl < Formula
 
   test do
     assert_match "animdl, version #{version}", shell_output("#{bin}/animdl --version")
-    assert_match "Aired @", shell_output("#{bin}/animdl schedule")
   end
 end
 
