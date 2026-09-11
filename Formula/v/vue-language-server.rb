@@ -7,7 +7,7 @@ class VueLanguageServer < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "14acd14aeed681aa5022a76a30b44e2e8ef97396a7a4eb9348173a432a81cf44"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c94633604c2c3b37a274dcc71807f8184b31d28b597efef26cd8b35d83ea20b7"
   end
 
   depends_on "node"
