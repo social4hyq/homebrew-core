@@ -4,6 +4,7 @@ class AlloyAnalyzer < Formula
   url "https://search.maven.org/remotecontent?filepath=org/alloytools/org.alloytools.alloy.dist/6.2.0/org.alloytools.alloy.dist-6.2.0.jar"
   sha256 "6037cbeee0e8423c1c468447ed10f5fcf2f2743a2ffc39cb1c81f2905c0fdb9d"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=org/alloytools/org.alloytools.alloy.dist/maven-metadata.xml"
@@ -11,7 +12,7 @@ class AlloyAnalyzer < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "850d15f36040379d777fa6fb09b853d83ef98eaa2b9ebfbf02ddab5be350bd7f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f5b17e55cd4dd8b046d4f05a45e2d83141fe2010639ce044b03db4153c23ecf4"
   end
 
   depends_on "openjdk"
