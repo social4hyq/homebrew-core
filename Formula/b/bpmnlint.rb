@@ -4,9 +4,10 @@ class Bpmnlint < Formula
   url "https://registry.npmjs.org/bpmnlint/-/bpmnlint-11.13.0.tgz"
   sha256 "0ec3651cbe07545bf773f7a7108b2579301d47a29286703a1862f35f1db8464a"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f16a17928bf1f6ff1825417db45c66199d61e73009abfc584f6373c852f3b52"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "549cee35305ace18de319dc143de2c597fe937c9219a7b1cc27e5c895c5a08d7"
   end
 
   depends_on "node"
