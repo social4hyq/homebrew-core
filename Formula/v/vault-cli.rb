@@ -4,6 +4,7 @@ class VaultCli < Formula
   url "https://search.maven.org/remotecontent?filepath=org/apache/jackrabbit/vault/vault-cli/4.2.0/vault-cli-4.2.0-bin.tar.gz"
   sha256 "a8f8ef02b6b50fd4227ad320490a55cfd78630ff2c902f4af7b0be38dda36f68"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/apache/jackrabbit-filevault.git", branch: "master"
 
   livecheck do
