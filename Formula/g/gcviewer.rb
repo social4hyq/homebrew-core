@@ -4,6 +4,7 @@ class Gcviewer < Formula
   url "https://downloads.sourceforge.net/project/gcviewer/gcviewer-1.37.jar"
   sha256 "325a5f1a8f67588b6845c71eceb70c8b74c45930fd553ba2fc7b3b4118608e13"
   license "LGPL-2.1-or-later"
+  revision 1
 
   livecheck do
     url :stable
