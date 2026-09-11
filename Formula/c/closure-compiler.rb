@@ -4,6 +4,7 @@ class ClosureCompiler < Formula
   url "https://search.maven.org/remotecontent?filepath=com/google/javascript/closure-compiler/v20260907/closure-compiler-v20260907.jar"
   sha256 "1689d45ccaa3aabae4a290e0a357d08ce56b08713a90b30e8a305c9bb21ef6eb"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=com/google/javascript/closure-compiler/"
@@ -11,7 +12,7 @@ class ClosureCompiler < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "367e44d044d530ab1025e66f5d28a2564bafba6c1626a48faf1160a13f05c5f5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "81953208e06ddac0d3345b73fbdaac56350dad1d8dcba71afc2cfdfa787a25fc"
   end
 
   depends_on "openjdk"
