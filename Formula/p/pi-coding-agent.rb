@@ -7,7 +7,7 @@ class PiCodingAgent < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e6d84b5a0fd97f471618af049817ce71a74ba63942f0bf1f248480968a5f3cad"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a0d37eeead4a854eb72dce9abd95a2602cadb3d2387ac24ff9b81ed41224352"
   end
 
   depends_on "node"
