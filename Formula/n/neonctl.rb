@@ -7,7 +7,7 @@ class Neonctl < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3a1967c30cf3e3e5142d7cd461817acfaed3f13ce3c67be406e2d193471e532"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c7c2768dba1f6d1a09a0ba74a0fb109a18d8cf6d297935ab30cc4d82d306a03"
   end
 
   depends_on "node"
