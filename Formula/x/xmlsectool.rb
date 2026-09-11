@@ -4,7 +4,7 @@ class Xmlsectool < Formula
   url "https://shibboleth.net/downloads/tools/xmlsectool/4.0.0/xmlsectool-4.0.0-bin.zip"
   sha256 "32a5fd3c92cddb7833249e22c97253fbbf02ae2dc0a385896e6e7ac1d1a77de4"
   license "Apache-2.0"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://shibboleth.net/downloads/tools/xmlsectool/latest/"
