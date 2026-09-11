@@ -4,6 +4,7 @@ class ScalaAT33 < Formula
   url "https://github.com/scala/scala3/releases/download/3.3.8/scala3-3.3.8.tar.gz"
   sha256 "17a03dd9c2a790b4230a7d03b741cdedca6514096e50e7189bc5e2d299db250a"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://www.scala-lang.org/download/"
@@ -11,7 +12,7 @@ class ScalaAT33 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d01e29924d1376c420fd18890d71b77d4d5d5e997a41fab2fe6e96b8631c3fca"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9fceec4e4e472ae9a134bd25b745708ef8a20b7e07180178e2435cfd9904278"
   end
 
   keg_only :versioned_formula
