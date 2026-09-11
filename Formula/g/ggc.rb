@@ -4,10 +4,11 @@ class Ggc < Formula
   url "https://github.com/bmf-san/ggc/archive/refs/tags/v8.7.3.tar.gz"
   sha256 "b1ccfb7996670c1f176c96cb66877168c24a17a0da04d92f9d4a5fdfbaad48ae"
   license "MIT"
+  revision 1
   head "https://github.com/bmf-san/ggc.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "91e42f339cea04db8651653190955990225734d2df3bd6238992600fe0ef6ffa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2956e18bbcec2fcde5c8ae9e910319c65c785a8b27d3da88680564678d4ea9a"
   end
 
   depends_on "go" => :build
