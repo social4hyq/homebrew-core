@@ -9,7 +9,7 @@ class McpGoogleSheets < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "047cae186f5de0509cd32f45d3f9fc8276fff807742487a0b4c5074f588cbea6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f6b7d8b99280294e3260101108a6384408de89f9386f8928b7543500ce8075c"
   end
 
   depends_on "certifi" => :no_linkage
