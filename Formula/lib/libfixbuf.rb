@@ -4,6 +4,7 @@ class Libfixbuf < Formula
   url "https://tools.netsa.cert.org/releases/libfixbuf-2.5.4.tar.gz"
   sha256 "106b8e1e560928a4dc91d8264326bd2463767570d77417535964f450de1f972e"
   license "LGPL-3.0-only"
+  revision 1
 
   # NOTE: This should be updated to check the main `/fixbuf/download.html`
   # page when it links to a stable version again in the future.
@@ -13,7 +14,7 @@ class Libfixbuf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "939714ed0a535f7dda61df9db8992d0422dc691b0dbe2b31df1637b3ce9b9c01"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f42da72cf031bb80ed9bc431adf6ecfc31abed0d47614fd1070b386563a21d0"
   end
 
   depends_on "pkgconf" => [:build, :test]
