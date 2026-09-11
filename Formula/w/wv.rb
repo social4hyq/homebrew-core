@@ -12,7 +12,7 @@ class Wv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5cf2cf60d06b8fce3eceecbbd287f2a43473656490f3051f85440929d9af4f9f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "63a5de9903e70c868098222375bf318d5dfaed4f95e4933ca7e48bdc206f2195"
   end
 
   depends_on "pkgconf" => :build
