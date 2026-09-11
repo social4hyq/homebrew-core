@@ -7,7 +7,7 @@ class Xclip < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b8f8bea85cabceea57d0786dbdb242938965adfd68c23ed030c252907f03a09d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bdc7d86a27a9b232610c19710dd9aef6d17bcbfa8942be39206a34a0a407a0f3"
   end
 
   depends_on "autoconf" => :build
