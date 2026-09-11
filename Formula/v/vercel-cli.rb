@@ -4,9 +4,10 @@ class VercelCli < Formula
   url "https://registry.npmjs.org/vercel/-/vercel-59.12.0.tgz"
   sha256 "ab22d674f49873c8475d0ec2dd5aeef6e3306abdbc1f9a296d89fec3a11d1b52"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c7d0024349003954a8d78bc99fe1ad12a510e6200fecd3fe353c4b262e7cdb5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e125acd042cf8190b1d74bd6e7563389a6f9ea6a7246d8b00c2a9983ba1cea09"
   end
 
   depends_on "node"
