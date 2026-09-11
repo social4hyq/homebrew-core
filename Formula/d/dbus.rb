@@ -16,7 +16,7 @@ class Dbus < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf0c452318f1853132603e3b2f92296929791a058423de0a2848aa02a83829d4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29e776a4b16923ae89eb33cb0ecd88020eb435cfe24126858295ea136a4b9d9f"
   end
 
   depends_on "docbook" => :build
