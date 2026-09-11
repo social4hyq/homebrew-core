@@ -4,11 +4,12 @@ class XkeyboardConfig < Formula
   url "https://xorg.freedesktop.org/archive/individual/data/xkeyboard-config/xkeyboard-config-2.48.tar.xz"
   sha256 "b77041324f0109f77161ee43743fe04baa485866af8460d31e476ad3f7648fd5"
   license "MIT"
+  revision 1
   compatibility_version 1
   head "https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a27afd256a8cd72d72e322035de157aa645ebe6cfdd866a6cfc37bfcee0d427b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4dc03d7a04880042f484741767b1798e5e27d673a023efe6b2fc2c0e4209158"
   end
 
   depends_on "gettext" => :build
