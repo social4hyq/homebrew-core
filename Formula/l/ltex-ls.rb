@@ -4,6 +4,7 @@ class LtexLs < Formula
   url "https://github.com/valentjn/ltex-ls/archive/refs/tags/16.0.0.tar.gz"
   sha256 "0cd67495ee4695493fc2a0b37d14146325aa6b9f45d767d16c60abdefdd2dc1d"
   license "MPL-2.0"
+  revision 1
   head "https://github.com/valentjn/ltex-ls.git", branch: "develop"
 
   bottle do
