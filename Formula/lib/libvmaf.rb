@@ -8,7 +8,7 @@ class Libvmaf < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "489643c72a1b314c7691f4d5dc6d240569bf4e113fcee5cee2298968e387174e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5064864893e5ee2b01f6045492d162b9178115cca992854d2f1a470057534a3a"
   end
 
   depends_on "meson" => :build
