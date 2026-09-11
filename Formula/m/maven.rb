@@ -5,6 +5,7 @@ class Maven < Formula
   mirror "https://archive.apache.org/dist/maven/maven-3/3.9.16/binaries/apache-maven-3.9.16-bin.tar.gz"
   sha256 "80ffca22aed9e8b9713a232f3394fd81d7f20322df75efdb2b047dbd3e3a23bb"
   license "Apache-2.0"
+  revision 1
   compatibility_version 1
 
   livecheck do
@@ -13,7 +14,7 @@ class Maven < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "662f3a4f46858067ed56cb5868455ed31ecec7db1406b62b69b135c74d6c839a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7635b93dea8cf25fb2335b6329b7218701672e92f8cc7ab2b141eb361816c0b4"
   end
 
   depends_on "openjdk"
