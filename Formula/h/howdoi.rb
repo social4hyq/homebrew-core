@@ -9,7 +9,7 @@ class Howdoi < Formula
   revision 23
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3137da132c89c5733804dc22823e1884c6c49f71f84ad1042c0173365953bc8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "25ec13c46424fbe6fc04de1822455525d69befc629fa6518f25cee604b6b83fd"
   end
 
   depends_on "certifi" => :no_linkage
