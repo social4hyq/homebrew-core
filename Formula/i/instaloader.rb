@@ -6,9 +6,10 @@ class Instaloader < Formula
   url "https://files.pythonhosted.org/packages/ee/ea/bb89a72982bdb196f31291a361977c9ab718336e1980cb1c72d445036b6a/instaloader-4.15.3.tar.gz"
   sha256 "6df0d03397a9606d85930e5c45fe11cb87c07a7c992101247c339fa51f19fa6d"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "594469ad40deebd73242cd581ac77137cc7bafd65695317bc75577808cb58622"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4189ed855841dc5cb96c80f608f248ae6f75f8ec0e082269471344fe7c6baa0f"
   end
 
   depends_on "certifi" => :no_linkage
