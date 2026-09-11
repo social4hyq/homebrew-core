@@ -9,7 +9,7 @@ class Llm < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6e53bdf69639048b07273a0c2fa8a3e012b9ccb926b2bc1ed93a8070e70ccf47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "64669c43681795806e2f21e1ed89a4db70d84ce454f0058ee6dca81a83e0fd08"
   end
 
   depends_on "rust" => :build # for jiter
