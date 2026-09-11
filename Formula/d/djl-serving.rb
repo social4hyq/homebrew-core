@@ -4,6 +4,7 @@ class DjlServing < Formula
   url "https://publish.djl.ai/djl-serving/serving-0.36.0.tar"
   sha256 "f91e90522f38a8c86172c34620d88202e7222233804a240f05d10c51b72085c0"
   license "Apache-2.0"
+  revision 1
 
   # `djl-serving` versions aren't considered released until a corresponding
   # release is created in the main `deepjavalibrary/djl` repository.
@@ -16,7 +17,7 @@ class DjlServing < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0fc9761b6351be290af07f2dc8b7638e53682732c8441e595a40a257900e06fd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd577512efb720663fd7beab2510177426f5ce0d179d5fcb6b4a215870441a96"
   end
 
   depends_on "openjdk"
