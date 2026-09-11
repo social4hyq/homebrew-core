@@ -7,7 +7,7 @@ class Rollup < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c65a83ca0d52149191d6b4ce998fc922d4f0e11cec7634a0a74abef5c868cfad"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "368bb935d5fe0aad9cf473ce3bd021a5a1180f2c684438b78c91401a6d556dbf"
   end
 
   depends_on "node"
