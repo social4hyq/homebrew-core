@@ -4,6 +4,7 @@ class Sjk < Formula
   url "https://search.maven.org/remotecontent?filepath=org/gridkit/jvmtool/sjk-plus/0.23/sjk-plus-0.23.jar"
   sha256 "6aab07cdf0ecad394e225a1f47d7342cb23bfd8b7d5c65c945f81835363ec937"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     rebuild 1
