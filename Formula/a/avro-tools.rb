@@ -5,10 +5,10 @@ class AvroTools < Formula
   mirror "https://archive.apache.org/dist/avro/avro-1.12.2/java/avro-tools-1.12.2.jar"
   sha256 "6220e8bc089aaf917cdad4cd358bd651fc0394c0e5ddb8b36da402012c294a68"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1b19f2d60c0b7ec0e974dda5a841b617ea699d328cbf9bce5a41a0595210c5b5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8cea7ee34915fdc164372800efa5db029f410d0031c7b773e0a39550e2119ebc"
   end
 
   depends_on "openjdk"
