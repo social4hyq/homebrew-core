@@ -6,6 +6,7 @@ class HermesAgent < Formula
   url "https://github.com/NousResearch/hermes-agent/archive/refs/tags/v2026.9.7.tar.gz"
   sha256 "907c2a72db1c5dd637ea8eeae97f4cb5b32cef615c17258f6b190924ec5bf688"
   license "MIT"
+  revision 1
   head "https://github.com/NousResearch/hermes-agent.git", branch: "main"
 
   livecheck do
