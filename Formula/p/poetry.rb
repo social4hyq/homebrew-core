@@ -6,10 +6,11 @@ class Poetry < Formula
   url "https://files.pythonhosted.org/packages/50/49/04996ab642335863f7feb74fb81ddcaf633f6168d00dc0bc27da46bed539/poetry-2.4.3.tar.gz"
   sha256 "f5687e723512332ffe2469f81624d8c9ecbe69c16eb84889decbd85ecfc282e7"
   license "MIT"
+  revision 1
   head "https://github.com/python-poetry/poetry.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9efa7368140ed9ca031601568f0dd0603107866b709131da947483917e3b9ae1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad582c3f81110092a58bfeae9266b5eda4f37d74ebac8b7178be55174cd26f8f"
   end
 
   depends_on "cmake" => :build # for rapidfuzz
