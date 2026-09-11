@@ -12,7 +12,7 @@ class StanfordParser < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f47e2103bba75539ab270ed85cb9ab737a35e7c11149d50c48dce5150624a6c1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "478753c95980c2eb1b60d3931837070615bce293c6dd0c98c78a55499680e454"
   end
 
   depends_on "openjdk"
