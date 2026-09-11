@@ -4,6 +4,7 @@ class ParquetCli < Formula
   url "https://github.com/apache/parquet-java/archive/refs/tags/apache-parquet-1.18.1.tar.gz"
   sha256 "8c93ac92bd76f2167154ededcdb79b32d4725d9d940f9fedc84bef5103912546"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/apache/parquet-mr.git", branch: "master"
 
   bottle do
