@@ -4,14 +4,14 @@ class Yarn < Formula
   url "https://yarnpkg.com/downloads/1.22.22/yarn-v1.22.22.tar.gz"
   sha256 "88268464199d1611fcf73ce9c0a6c4d44c7d5363682720d8506f6508addf36a0"
   license "BSD-2-Clause"
+  revision 1
 
   livecheck do
     skip("1.x line is frozen and features/bugfixes only happen on 2+")
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a4615f75f08e361aec64ef02f223c343c7e18f3638b040280bb1aea71993d62"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e9b0c409ee585c51dae10775bf1520f91ba735318eca05d82f7fa5eca02aa78"
   end
 
   depends_on "node" => :test
