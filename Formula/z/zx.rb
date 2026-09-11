@@ -7,7 +7,7 @@ class Zx < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "79812604c680162fe7faf86ab99f7b6f7cc70d8d5e924bb0518f2f454741dc01"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9daa10c6faca15e318e688c0a6be677f62f100bd4871d64b5335dd497f59f70b"
   end
 
   depends_on "node"
