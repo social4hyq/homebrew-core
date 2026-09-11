@@ -4,9 +4,10 @@ class Ctx7 < Formula
   url "https://registry.npmjs.org/ctx7/-/ctx7-0.5.11.tgz"
   sha256 "05068b5b7593a67af4bb3ed4f458f0d56d2b92b9d01c1c40abe65376556fe3b8"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b78d1f6ca6537b169855c4f37f3300089ecf6f8083325d77b06f71f167608d93"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29293885d939e7ec5a449e299793841ed3f9999d394f939ab558db0a9730c70c"
   end
 
   depends_on "node"
