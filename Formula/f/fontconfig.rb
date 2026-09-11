@@ -10,6 +10,7 @@ class Fontconfig < Formula
     "MIT",                # src/fcfoundry.h
     :public_domain,       # src/fcmd5.h, src/ftglue.[ch]
   ]
+  revision 1
   compatibility_version 1
   head "https://gitlab.freedesktop.org/fontconfig/fontconfig.git", branch: "main"
 
@@ -19,7 +20,7 @@ class Fontconfig < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5efbc5c0f1c7ee6b387db66e599c414671c6d0aeaed8fb496a5d794f9a2e4501"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8604a62fa1b1fff170428f69daf892b3bf69e9a429d7da80849f08a27e11bb9f"
   end
 
   depends_on "gettext" => :build
