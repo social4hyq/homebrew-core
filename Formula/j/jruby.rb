@@ -4,6 +4,7 @@ class Jruby < Formula
   url "https://search.maven.org/remotecontent?filepath=org/jruby/jruby-dist/10.1.1.0/jruby-dist-10.1.1.0-src.zip"
   sha256 "825d47f43ef288b218b965406ef8a97117c9b080986b3ad9883e1850da312166"
   license any_of: ["EPL-2.0", "GPL-2.0-only", "LGPL-2.1-only"]
+  revision 1
 
   livecheck do
     url "https://www.jruby.org/download"
