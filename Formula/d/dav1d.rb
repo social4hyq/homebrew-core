@@ -6,6 +6,10 @@ class Dav1d < Formula
   license "BSD-2-Clause"
   compatibility_version 1
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a61ac866a695242e37587dab935bb7ae020485e5dfbb744caadf04d6a2ce8af"
+  end
+
   depends_on "meson" => :build
   depends_on "ninja" => :build
 
