@@ -4,6 +4,7 @@ class Libwebsockets < Formula
   url "https://github.com/warmcat/libwebsockets/archive/refs/tags/v5.0.0.tar.gz"
   sha256 "f853c6582101cfcee3a5a9e28ae92ab19d9735c5f31f0bb2e9794b5106123962"
   license "MIT"
+  revision 1
   compatibility_version 6
   head "https://github.com/warmcat/libwebsockets.git", branch: "main"
 
@@ -13,7 +14,7 @@ class Libwebsockets < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eaf505a7ce1414a31ec585d2ea48fd16e37fb61e712c548e5b77cb6bbf9cf5eb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a05069a4bbf46fe1153749d7cc33814530afd51395b4a1db5638c49a036124be"
   end
 
   depends_on "cmake" => :build
