@@ -6,6 +6,7 @@ class C7n < Formula
   url "https://github.com/cloud-custodian/cloud-custodian/archive/refs/tags/0.9.52.0.tar.gz"
   sha256 "0994149695058bf9ebfcd345ee8e9d9261de9366856696c582611690e89912be"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
@@ -13,7 +14,7 @@ class C7n < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0c10930444120a321110971d4fc2920e47dae992f3f4479e1ab5c7c44022a02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "484d064c51e29be9e3a41cb85337673ce6a9999562e1985d31a7f4f3c910de55"
   end
 
   depends_on "cryptography" => :no_linkage
