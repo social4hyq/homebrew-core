@@ -4,6 +4,7 @@ class Crowdin < Formula
   url "https://github.com/crowdin/crowdin-cli/releases/download/4.15.1/crowdin-cli.zip"
   sha256 "6e09860ecb127f05d6111b87ad3fb921e77e9d7dbac7f2d21f94b7519e160948"
   license "MIT"
+  revision 1
 
   livecheck do
     url :stable
