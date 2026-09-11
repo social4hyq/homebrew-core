@@ -4,6 +4,7 @@ class Groovy < Formula
   url "https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-5.1.2.zip"
   sha256 "19cd28c23c34f8b52f1bb602da9186792b7464e35dd8300d84f6735b8ad3965f"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/"
@@ -11,7 +12,7 @@ class Groovy < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "788f507641098b4357536ecf185ae2722c6d824653fd468d97cf9d9f4991b341"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b523160e743f4409f5839b6e610c5e3855c0c4ae5127c6caef6db37f1b087e6b"
   end
 
   depends_on "openjdk"
