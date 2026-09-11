@@ -4,7 +4,7 @@ class LibsvgCairo < Formula
   url "https://cairographics.org/snapshots/libsvg-cairo-0.1.6.tar.gz"
   sha256 "a380be6a78ec2938100ce904363815a94068fca372c666b8cc82aa8711a0215c"
   license "LGPL-2.1-or-later"
-  revision 3
+  revision 4
 
   livecheck do
     url "https://cairographics.org/snapshots/"
@@ -12,7 +12,7 @@ class LibsvgCairo < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a14c64ce0cea39086746565ba6ff9f227d8a305882d00d42630ca380f3415ddb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7c02b387f439c53f1473518ee94f12e8416ca8395e672989613ce9ddec8e984"
   end
 
   depends_on "autoconf" => :build
