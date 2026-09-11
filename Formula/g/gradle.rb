@@ -4,6 +4,7 @@ class Gradle < Formula
   url "https://services.gradle.org/distributions/gradle-9.7.1-all.zip"
   sha256 "92c1a136d76b5017732a66d2e0a648ebff00dd3687d8bff0d0047a1bd904fdf2"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://gradle.org/releases/"
@@ -11,7 +12,7 @@ class Gradle < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa8c0a09ede66bb6784864b0e71d7f877bca9d1dae24bb7dd97f7cf6c8a761f1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "baef71187620274b6a2c6feb7c9bc47accad77f9564ba92fecdfeb028d1d2387"
   end
 
   depends_on "gradle-completion"
