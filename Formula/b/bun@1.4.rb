@@ -159,7 +159,6 @@ class BunAT14 < Formula
     src/runtime/socket/system_certs.rs
     src/runtime/webcore/blob/read_file.rs
     src/spawn/process.rs
-    src/spawn_sys/lib.rs
     src/spawn_sys/spawn_process.rs
     src/standalone_graph/StandaloneModuleGraph.rs
     src/sys/Cargo.toml
