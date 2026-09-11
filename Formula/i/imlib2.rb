@@ -4,10 +4,11 @@ class Imlib2 < Formula
   url "https://downloads.sourceforge.net/project/enlightenment/imlib2-src/1.12.7/imlib2-1.12.7.tar.gz"
   sha256 "b863d4c7130261d5256471a15106feb57b53d15e15fc7f52ece9af92e291eec7"
   license "Imlib2"
+  revision 1
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d3e05a3805125d2b36bf494ba10b7d40c998d6600ed4e85e7072c7ff8c5f3b9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e1663f0bb7e16c76a02353568aecaedee8884313f1784c158d67ab0a0c4645d"
   end
 
   depends_on "pkgconf" => :build
