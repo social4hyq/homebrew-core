@@ -12,8 +12,7 @@ class Asciidoctorj < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "783778336d815fc9893c75dee199141943f914151edb94e27ca356fac4a04dd6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ecb52ecd8a3dc082f0ccfb06fbe6d77d626876b7dfbf5bf7a2636bea1b3ba363"
   end
 
   depends_on "openjdk"
