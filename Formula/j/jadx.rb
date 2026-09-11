@@ -4,12 +4,12 @@ class Jadx < Formula
   url "https://github.com/skylot/jadx/archive/refs/tags/v1.5.6.tar.gz"
   sha256 "11bb5ebd8c3169ff3f87e6f928d60cff1545f0c55ba1f814ce67e43ba3f2a9e7"
   license "Apache-2.0"
-  revision 1
+  revision 2
   compatibility_version 1
   head "https://github.com/skylot/jadx.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa3277641766010eeaec697c4fd05ab213641482765091741ea8e73477444f12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1b6c85e8ab4e8921661e4ac047c6277b74fd16c6fc128510bc7f29901afea24"
   end
 
   depends_on "gradle" => :build
