@@ -4,9 +4,10 @@ class Skinny < Formula
   url "https://github.com/skinny-framework/skinny-framework/releases/download/4.0.1/skinny-4.0.1.tar.gz"
   sha256 "2382ba97f799bfc772ee79b2c084c63a1278ddd89de8dacd4ba6433f41294812"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "218f30d0e973a3e7fcfddbcc4754c0602481960de0dc4e464e8aa318d8b48e7e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3097d6738b95393b126d758ada34eb89c03bbf666c62c40478a55b180b7f4a60"
   end
 
   depends_on "openjdk"
