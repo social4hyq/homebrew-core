@@ -6,9 +6,10 @@ class Copier < Formula
   url "https://files.pythonhosted.org/packages/f9/60/2fe1777b27f489450ed8ac5c75390caf91a175d647be05b4284bf515b413/copier-9.18.2.tar.gz"
   sha256 "0f97902fee79374551c9391fb1132f5a038079f3b497f4dad673295489fc032e"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "addd0983914ec78172027e2cfaa752537801947179c5bee8332a5467c343e378"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "05ee72741f7c038f3c25b16504a044e6633d13f9e8436f7ace4f3f259a5b97b0"
   end
 
   depends_on "libyaml"
