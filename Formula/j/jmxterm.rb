@@ -4,6 +4,7 @@ class Jmxterm < Formula
   url "https://github.com/jiaqi/jmxterm/releases/download/v1.0.4/jmxterm-1.0.4-uber.jar"
   sha256 "ce3e78c732a8632f084f8114d50ca5022cef4a69d68a74b45f5007d34349872b"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "2a5760f1be1969ba406329c59dc16394624f211b00cf40385b8baebd009025a6"
