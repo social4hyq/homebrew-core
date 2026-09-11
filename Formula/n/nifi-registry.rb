@@ -5,6 +5,7 @@ class NifiRegistry < Formula
   mirror "https://archive.apache.org/dist/nifi/2.11.0/nifi-registry-2.11.0-bin.zip"
   sha256 "7d8b9232088b60718010ddc48f6c0551bf52074eec48af51a62d24d420216c78"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "a320ddf03a870f8152846b2545cfba7b18e7291f2b72f964aa13da640879010c"
