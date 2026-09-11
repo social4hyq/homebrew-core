@@ -7,7 +7,7 @@ class Htmlcleaner < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e248f5d36953bd0cf23d3140dec3fed38f35d5d9123abf6c6cc23e47522cadc5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "126553aa8af7f6e8fc9add9457d5d14a4b3f1dd9ae6e3e06a0d02aea2a4804be"
   end
 
   depends_on "maven" => :build
