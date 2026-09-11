@@ -13,7 +13,7 @@ class Glassfish < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a76e5df70186e6ce41daa5a8ac37a77a8b15cf487ff5cbaed067b8ddb732e56"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "566f8776f11132cb32201c4eedcb38e57b7c82da280a2cf928409edb2b6cf564"
   end
 
   depends_on "openjdk@25"
