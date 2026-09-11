@@ -9,7 +9,7 @@ class Pgcli < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d3bc38b5bbe4eb19a8edde70ffbfd36d5fe6cb84a4fb30732e930b15ce6f65f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "08d910682e07e60dd8b3c007b27db5504c8615d406491020132d210357f2cc06"
   end
 
   depends_on "libpq"
