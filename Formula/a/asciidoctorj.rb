@@ -4,6 +4,7 @@ class Asciidoctorj < Formula
   url "https://search.maven.org/remotecontent?filepath=org/asciidoctor/asciidoctorj/3.0.1/asciidoctorj-3.0.1-bin.zip"
   sha256 "18b085b7f67a7f872abe00352be5caacd9b436400aec27f838c6380077cb88bf"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://search.maven.org/remotecontent?filepath=org/asciidoctor/asciidoctorj/maven-metadata.xml"
