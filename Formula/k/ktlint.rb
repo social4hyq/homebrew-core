@@ -5,6 +5,7 @@ class Ktlint < Formula
   version "2.0.0-ALPHA-4"
   sha256 "c84a64d424451392e939bf018fcbec7da7949fa734b613d828953a4140a926cc"
   license "MIT"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "ae711bedf79f53e53d0c30f339de0f63e5c21e3b37d8ee7dcb5db35c7a7e5e6d"
