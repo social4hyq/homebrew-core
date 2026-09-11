@@ -10,7 +10,7 @@ class Fabric < Formula
   head "https://github.com/fabric/fabric.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a16b2949ea624233a241180c5f8299eed537f9d9148c4af38bdde6ea40d4482"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b19ac316cb74315e3b624a7222c4571545d708e5792a40f1a9f58194e2364e41"
   end
 
   # `pkgconf` and `rust` are for bcrypt
