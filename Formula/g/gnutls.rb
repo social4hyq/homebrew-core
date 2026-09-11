@@ -32,7 +32,7 @@ class Gnutls < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6d31bffc1ff71966fb096901e98ad592a24091f04bd060a298d559f5baa8181"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6c68c2cb17385afb3b5d90f93316bebbf0db7308b3dbf72133868aaf7ee24bb0"
   end
 
   depends_on "pkgconf" => :build
