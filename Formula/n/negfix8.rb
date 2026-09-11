@@ -7,7 +7,7 @@ class Negfix8 < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6c6d3461812518483e0509770467b47be7a78ce36062ecf8e205703f032a836"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "66dbc40456c1c05b19238e897e40fb123ea992dabe730ca9feaec667c79ef41e"
   end
 
   # https://github.com/chrishunt/negfix8/pull/2#issuecomment-1956815369
