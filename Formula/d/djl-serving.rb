@@ -4,6 +4,7 @@ class DjlServing < Formula
   url "https://publish.djl.ai/djl-serving/serving-0.36.0.tar"
   sha256 "f91e90522f38a8c86172c34620d88202e7222233804a240f05d10c51b72085c0"
   license "Apache-2.0"
+  revision 1
 
   # `djl-serving` versions aren't considered released until a corresponding
   # release is created in the main `deepjavalibrary/djl` repository.
