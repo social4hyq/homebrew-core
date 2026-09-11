@@ -4,6 +4,7 @@ class ScalaAT33 < Formula
   url "https://github.com/scala/scala3/releases/download/3.3.8/scala3-3.3.8.tar.gz"
   sha256 "17a03dd9c2a790b4230a7d03b741cdedca6514096e50e7189bc5e2d299db250a"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://www.scala-lang.org/download/"
