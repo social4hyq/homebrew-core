@@ -13,7 +13,7 @@ class Beast < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db5eb3c7edffcef6cd77511fc698bc378f162e5da26feed93a58944dab033a13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dddd5131753be13e55c9967577082b6115d075f866cb4cf85bb721ac7d219a5a"
   end
 
   depends_on "ant" => :build
