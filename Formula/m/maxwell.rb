@@ -4,6 +4,7 @@ class Maxwell < Formula
   url "https://github.com/zendesk/maxwell/releases/download/v1.45.0/maxwell-1.45.0.tar.gz"
   sha256 "772d8b75d4904d71999d7e3d1b2febcff2b5ab736bdedca0ec63c54d1c1e2e57"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,7 +12,7 @@ class Maxwell < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c556ab19ae004cb187bf8a30c6eb0658de44213df734e89282b7e4674d502821"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "78357445a9af63f48ce6160929dae8ff851e56036b7fa522274efb0de3199d5e"
   end
 
   depends_on "openjdk"
