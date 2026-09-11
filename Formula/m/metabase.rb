@@ -4,6 +4,7 @@ class Metabase < Formula
   url "https://downloads.metabase.com/v0.63.16/metabase.jar"
   sha256 "2e171aa7d03f10b57d92775428442203e2c5e70ecdcf781f53368e5d8f59af87"
   license "AGPL-3.0-only"
+  revision 1
 
   # The first-party download page only provides an unversioned link to the
   # latest OSS jar file. We check the "latest" GitHub release, as the release
@@ -14,7 +15,7 @@ class Metabase < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e86b4784c4a21e8d95e56e612325b304a639951dbe365c6f59ffbaa8cf67c4d7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3825f1c2a9f8c82928725d7a4ddf8f231c8884594f8a16bbed73a3e933827c59"
   end
 
   head do
