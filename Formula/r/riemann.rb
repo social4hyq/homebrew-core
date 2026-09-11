@@ -4,9 +4,10 @@ class Riemann < Formula
   url "https://github.com/riemann/riemann/releases/download/0.3.12/riemann-0.3.12.tar.bz2"
   sha256 "82c24c7cba3bce96957f25661f39c6162a262ba76aef24e986e73dbf2a79b7a6"
   license "EPL-1.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "768ceedf4b830d5cab4f30c66fde5b9deba718f672e163c09eff5e965e270668"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cde9361750c22075a1470d26c3552feba069b5603e05120cdad7971c38835cc3"
   end
 
   depends_on "openjdk"
