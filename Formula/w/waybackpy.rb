@@ -9,7 +9,7 @@ class Waybackpy < Formula
   revision 13
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "68884d014e3ec84d55662efc69ca436addd7498211e03dd16e25d7f7b230f9ba"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e697e57bcd33834854d48418e323212a71f46afd33db984c17673249cd82d089"
   end
 
   depends_on "certifi"
