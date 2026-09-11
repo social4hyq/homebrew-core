@@ -11,7 +11,7 @@ class GobjectIntrospection < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4872f2071b99b7ed73c76b5775b87fbd1ec1da50fa268e2eeaeaf4c06e6d068"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e3d86fa50df8c44109a79af3684f5561c2603787be5166bbae5425613d47417"
   end
 
   depends_on "bison" => :build
