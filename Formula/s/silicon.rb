@@ -7,7 +7,7 @@ class Silicon < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2bc94cbd3a5ada7c71b8241467c8e0dbaa19506109f0ac968bd2d3706ae9e1e1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9d7ac3ffbbaaa5a128d211fddc63c78af0a91a786a25a1765fe3a4704ce3b31"
   end
 
   depends_on "pkgconf" => :build
