@@ -4,9 +4,10 @@ class Pangomm < Formula
   url "https://download.gnome.org/sources/pangomm/2.56/pangomm-2.56.2.tar.xz"
   sha256 "f1e984c85a85b6a0e61616366521f51dd8282a072bb45d15b5084762b62f4c0e"
   license "LGPL-2.1-only"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5e318c1c5264173e19fd52cac52411339b88ce9770b7d28d83560832fc67fd78"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f10405c383149cf9f3eac34dbcdd69ee645c33388e4bb7c3a04dc188765cce4"
   end
 
   depends_on "meson" => :build
