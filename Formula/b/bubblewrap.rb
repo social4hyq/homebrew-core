@@ -4,10 +4,11 @@ class Bubblewrap < Formula
   url "https://github.com/containers/bubblewrap/releases/download/v0.12.0/bubblewrap-0.12.0.tar.xz"
   sha256 "9760d007363e3abba7c747489910f9f82d9fca53ba3bd3282e396fa3c97a3314"
   license "LGPL-2.0-or-later"
+  revision 1
   head "https://github.com/containers/bubblewrap.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7761758c2e865515fdd1e931c6571d9ce01b522c089c96747e09b80f1d0a2927"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c591b1e13d5a50b26c2122b1541b26731ef25fcf11bcde6233b73f6b8d82b82"
   end
 
   depends_on "docbook-xsl" => :build
