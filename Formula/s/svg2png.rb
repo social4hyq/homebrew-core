@@ -4,7 +4,7 @@ class Svg2png < Formula
   url "https://cairographics.org/snapshots/svg2png-0.1.3.tar.gz"
   sha256 "e658fde141eb7ce981ad63d319339be5fa6d15e495d1315ee310079cbacae52b"
   license "LGPL-2.1-only"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://cairographics.org/snapshots/"
@@ -12,7 +12,7 @@ class Svg2png < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c59acd98eba9548fe2c2cfb8f460984bb3e7b924e5616a53232294aaee329967"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd5a15f907a84a0043d0d74aa3a7f88b812c5a1d97610db25dcfda43245880e6"
   end
 
   depends_on "pkgconf" => :build
