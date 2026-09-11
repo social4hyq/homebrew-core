@@ -5,6 +5,7 @@ class Pig < Formula
   mirror "https://archive.apache.org/dist/pig/pig-0.18.0/pig-0.18.0.tar.gz"
   sha256 "6845adb936a3c3bcc71451765953cae4103e410ba2f6c5a47cc9becade0a434a"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "c899857176d974b52def53b217296b9f254022288248908dc0f9457ffeafdc14"
