@@ -4,9 +4,10 @@ class NpmCheckUpdates < Formula
   url "https://registry.npmjs.org/npm-check-updates/-/npm-check-updates-23.1.0.tgz"
   sha256 "bc1a4b712c260f2bbf0f1bf3a4cbfdad8e56e35160e5573adcaa8fc0d01b5667"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b3e10b55cefaeece51b81c8dc67dfca647a241fed63d2f3b0adc4259c7021585"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "20a59675d64491ec4fd1363490ac7a6e67d57870676f0b032197bfbc8f1731c6"
   end
 
   depends_on "node"
