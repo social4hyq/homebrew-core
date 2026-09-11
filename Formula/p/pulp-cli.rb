@@ -6,10 +6,11 @@ class PulpCli < Formula
   url "https://files.pythonhosted.org/packages/af/e5/162985a5cb94d99fa5a37f57e944d4eaaad7c71f19293002de52043df577/pulp_cli-0.40.6.tar.gz"
   sha256 "e31d187658829da7a6d308aff7862f50678da068c84a7cb454c58e381215dbf2"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/pulp/pulp-cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb90704387814ce850951d527c6a64a511ee622cbf65952fefa55628d942293f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b5309eaeae10016f8fe83d9f6b4ec5c8d181ee207eb941ebb5cd314b11ecd546"
   end
 
   depends_on "certifi" => :no_linkage
