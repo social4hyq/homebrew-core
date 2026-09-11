@@ -8,7 +8,7 @@ class Libice < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dadbe9ea24521a88b95cf5ff6e09f1373949dffbb1c0fddff410760ea812bc01"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b0c5bf8dd9bbb60a817415b9c82fed70a3a9d752970c18e5acece8221e1e870"
   end
 
   depends_on "pkgconf" => :build
