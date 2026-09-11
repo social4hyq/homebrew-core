@@ -4,6 +4,7 @@ class Girara < Formula
   url "https://pwmt.org/projects/girara/download/girara-2026.07.18.tar.xz"
   sha256 "d7255635776a45d42d1e555aa425ab96caf23755442474cf240cbac966d8502f"
   license "Zlib"
+  revision 1
 
   livecheck do
     url "https://pwmt.org/projects/girara/download/"
@@ -11,7 +12,7 @@ class Girara < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "563860d37cef9a164b1c99243cf20a65811ae0b1c089db88dfe7a6316da2d5ae"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a9a0dc73c01b961394a32f59225a0d0eb019cb933c03972583df2b3f3224abe0"
   end
 
   depends_on "meson" => :build
