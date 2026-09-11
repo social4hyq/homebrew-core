@@ -7,7 +7,7 @@ class Vite < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "24adae6a50881d9f6c364c59ee0ddec8e20cc332e41a8d94091d82a645f70456"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cd6fa3fb412ea2124ab21e9cad1ca4e7d5e3c7ad2d7144b8baf53280eb359c6"
   end
 
   depends_on "node"
