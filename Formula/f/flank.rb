@@ -4,6 +4,7 @@ class Flank < Formula
   url "https://github.com/Flank/flank/releases/download/v23.10.1/flank.jar"
   sha256 "719ba0ca5744f571aad01fc61392b18990833ee9dd36e6b600ccdff614350d58"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
