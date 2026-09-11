@@ -7,7 +7,7 @@ class Cspell < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5edde2ffa923f30c8c0853e5236bff0ed728da7ae6791bcc5c8e43444c51abf8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "480ad916466c6c4c883f0d42ff20e0508a4b3fd61db32ebc45fcda3ec1dffbb0"
   end
 
   depends_on "node"
