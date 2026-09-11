@@ -7,11 +7,11 @@ class MetaPackageManager < Formula
   url "https://files.pythonhosted.org/packages/0c/d7/40a3c0ba8a2dbdc177ad3138d9862d3733e0f4356b13f81dcf7f30eb7041/meta_package_manager-7.6.1.tar.gz"
   sha256 "b504c57323c83dd545846abead91d1389cc843aa1ab01a20ac0eb96834f10344"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/kdeldycke/meta-package-manager.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fff81a95f37b4b00fc1c53cc45589950a22a4ef0faf1b0de9e5a44680760fa15"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ccdc1745f9b9c9f73c6553978472c8c51e0c7cc1d46e4a15cac61c75b252bce6"
   end
 
   depends_on "rust" => :build
