@@ -7,7 +7,7 @@ class Jmxterm < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a5760f1be1969ba406329c59dc16394624f211b00cf40385b8baebd009025a6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "08548814eb5246db1fa88cc8502fedb170f72f6a975c496b9e99ab85db04fb53"
   end
 
   depends_on "openjdk"
