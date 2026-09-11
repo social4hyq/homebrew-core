@@ -4,11 +4,12 @@ class Pygit2 < Formula
   url "https://files.pythonhosted.org/packages/f1/54/9273c78efd3d570091af585bdeb68a46089e80602dafe11989cca40c6d0f/pygit2-1.20.0.tar.gz"
   sha256 "7253735629c22fff412a72c48c204b19c206fda9fcb01e51113d9689194cb1cf"
   license "GPL-2.0-only" => { with: "GCC-exception-2.0" }
+  revision 1
   compatibility_version 1
   head "https://github.com/libgit2/pygit2.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ded4a6c8c489745a87f05533207cd931ebc4d3ec4f4c92924e326a4131f6b227"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "de5f5f3db9af88320659cecaa4ab2521e2109c0cf0e74e87bdc8b1b3a4180d4a"
   end
 
   depends_on "python@3.13" => [:build, :test]
