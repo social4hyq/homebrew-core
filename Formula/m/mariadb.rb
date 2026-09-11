@@ -4,6 +4,7 @@ class Mariadb < Formula
   url "https://archive.mariadb.org/mariadb-12.3.3/source/mariadb-12.3.3.tar.gz"
   sha256 "e99d739fd4a55f9a11dea7bd2287a262673e287550af3071c8469dd2bec0c163"
   license "GPL-2.0-only"
+  revision 1
 
   livecheck do
     url "https://downloads.mariadb.org/rest-api/mariadb/all-releases/?olderReleases=false"
@@ -17,7 +18,7 @@ class Mariadb < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5392ef1f8c364e8b9f38738efba0090177489c9f3c08c50965e4b70ba0e46d4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5ad82733c34a14b8b9f978ffaf4f70bf9dd4dcd6ce2f58eb517a1674d3a25c3"
   end
 
   depends_on "bison" => :build
