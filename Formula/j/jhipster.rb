@@ -7,7 +7,7 @@ class Jhipster < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db86d7b68189260e1ecf1318a8e205e9b9791b7b5a06ed412afde47b5aae8046"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "55472172e81f6d11c9d389185d5acabde7fea7c5b547bd95500bb74bfeb7051d"
   end
 
   depends_on "node"
