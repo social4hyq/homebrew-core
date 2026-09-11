@@ -4,9 +4,10 @@ class Varlock < Formula
   url "https://registry.npmjs.org/varlock/-/varlock-1.18.0.tgz"
   sha256 "22297d7da0cce18a7bfb676c1d8d9cf2827ca3ee9354b852bbfe8a9f501b85c1"
   license "MIT"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "93c05c56ca79bbfc37a376fe1234dc8b4b0479b08a5f375c419a2ef483455467"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f7abfce776a2125b6ee8a7bd9327b977936eec25bd09d863e09a9a773d0e71c"
   end
 
   depends_on "node"
