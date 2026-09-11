@@ -7,7 +7,7 @@ class SofiaSip < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9b400949d48feaba78a264d0903c1b0fd0d88b861750b8816154c80f56260eb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd63ebd4ceb75ce600d731f5b52811848efc41c96f482252e30e2c203685b53c"
   end
 
   depends_on "autoconf" => :build
