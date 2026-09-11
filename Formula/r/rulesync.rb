@@ -7,7 +7,7 @@ class Rulesync < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "47f9a2b3d5686908415fb60369f55cac860819b08ea01a877b26a1142cb47d16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dfae358dcdc2cd997ea21806a1199e5689e4758ee4fdaebd04d40d4af94fe856"
   end
 
   depends_on "node"
