@@ -5,6 +5,7 @@ class Zookeeper < Formula
   mirror "https://archive.apache.org/dist/zookeeper/zookeeper-3.9.5/apache-zookeeper-3.9.5.tar.gz"
   sha256 "0e2d7c487daeff75b38354b231a006caa14c4596ddc21fd37a840c078419357b"
   license "Apache-2.0"
+  revision 1
   head "https://gitbox.apache.org/repos/asf/zookeeper.git", branch: "master"
 
   bottle do
