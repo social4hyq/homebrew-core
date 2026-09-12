@@ -7,7 +7,7 @@ class McpGrafana < Formula
   head "https://github.com/grafana/mcp-grafana.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "197b5c89d5fa57e9f201b81f660140d676e529f9ebe73898d1232245740ff265"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "51af43662b5a4a9aa76e2b500a3574c9a842e79fe4f0c2cc1a42eaff993a3762"
   end
 
   depends_on "go" => :build
