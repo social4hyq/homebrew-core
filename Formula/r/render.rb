@@ -7,7 +7,7 @@ class Render < Formula
   head "https://github.com/render-oss/cli.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "97878e01472da6b802d29bf4d3e2c10e464f33ad3a78822e09e272572ad49196"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd8fe15d22d1990a7bdb5ca1369c526ca4cec66f58f802dabf82b37f083917a3"
   end
 
   depends_on "go" => :build
