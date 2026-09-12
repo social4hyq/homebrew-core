@@ -7,7 +7,7 @@ class Xan < Formula
   head "https://github.com/medialab/xan.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "90cc77d217d726305a72f73ebab648ec600ef17797b522df3b1fc06ee2bf78bf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "39b2f96014d6811970822a1269c0d3cdb0d1370487e6d49c0062c83e70a02a3d"
   end
 
   depends_on "rust" => :build
