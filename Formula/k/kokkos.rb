@@ -1,8 +1,8 @@
 class Kokkos < Formula
   desc "C++ Performance Portability Ecosystem for parallel execution and abstraction"
   homepage "https://kokkos.org"
-  url "https://github.com/kokkos/kokkos/releases/download/5.2.1/kokkos-5.2.1.tar.gz"
-  sha256 "3f754c99aa6130b1dd6520d904db7b2fd44ed618cd91e0dfd921956f23f6812d"
+  url "https://github.com/kokkos/kokkos/releases/download/5.2.2/kokkos-5.2.2.tar.gz"
+  sha256 "d6557aaef39302282a15f9c770433d1fcdf4e961dfd6d9ed726b9d0d0f546b9f"
   license "Apache-2.0"
   head "https://github.com/kokkos/kokkos.git", branch: "develop"
 
@@ -12,7 +12,7 @@ class Kokkos < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ea0bbb04933faf45d1c7acb67bb97ab1538e786a725bbee558a80ee6a9588b3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "243032f2ebade136a085ec7cfc15ae0638327776c15f9915d07ca87c693bd5c3"
   end
 
   depends_on "cmake" => :build
