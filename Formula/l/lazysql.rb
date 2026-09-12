@@ -12,7 +12,7 @@ class Lazysql < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8257b6662e521a1ab99bc727ed386356dfbf614a14acff037e7a7f497ce4fda8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "487fa1384a8a8a74b61f76a216df3dd96155a3e3ad12ba5e451fa450168d3e40"
   end
 
   depends_on "go" => :build
