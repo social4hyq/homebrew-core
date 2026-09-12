@@ -7,7 +7,7 @@ class Rhai < Formula
   head "https://github.com/rhaiscript/rhai.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f8d35e026d5dac792f6f5aa76af8a1399626b81bbdee695b02a5bb41089b6e6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "45b4d2b74f3b9ccea69d856e137005def434181de28f7652e178675be33d0916"
   end
 
   depends_on "rust" => :build
