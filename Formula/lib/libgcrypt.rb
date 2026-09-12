@@ -12,7 +12,7 @@ class Libgcrypt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef337bf253ca03804c80dffde1a0bf453e6f54fc889f59a6d5cdb3b7ba9109d6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "729e6d5a56ca73829e6cb325438912929516def481fb21e38e8a9b9cc485db93"
   end
 
   depends_on "libgpg-error"
