@@ -7,7 +7,7 @@ class Vals < Formula
   head "https://github.com/helmfile/vals.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8dc54c3319f959f88741065c3c58c6ec645bbdf3bf95a290b546788c263630fc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5e0d02b3e8fd8d87b1050088699f73fbb9b9c359ba32dba8f1c62edb28aa15d"
   end
 
   depends_on "go" => :build
