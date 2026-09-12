@@ -6,7 +6,7 @@ class Zola < Formula
   license "EUPL-1.2"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5cda74c4813109ea300defb792477e118b9ea6defd60ddd9dc206497cfcdbb06"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "786cae37850746afb52bb403823e111300806cbf410006a99ef69e2297cd50de"
   end
 
   depends_on "pkgconf" => :build
