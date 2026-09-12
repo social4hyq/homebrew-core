@@ -1,14 +1,13 @@
 class DockerBuildx < Formula
   desc "Docker CLI plugin for extended build capabilities with BuildKit"
   homepage "https://docs.docker.com/buildx/working-with-buildx/"
-  url "https://github.com/docker/buildx/archive/refs/tags/v0.37.0.tar.gz"
-  sha256 "c6e3efdfb9778d9ef69e005ea43abc3041511f088760c927637e3cf6be7cb410"
+  url "https://github.com/docker/buildx/archive/refs/tags/v0.37.1.tar.gz"
+  sha256 "c8eb34392910bf18a858d4099e841deec2f7ea433bb3ed230082f55b69f19118"
   license "Apache-2.0"
-  revision 1
   head "https://github.com/docker/buildx.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb2286c2a8b2e69b826c87ce3e945d1f482771f32d101ffca8de6761e241bb75"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2639f646f8a5d65fb75c3e7bcb5f62d616bacd8126448f97aa24d3abdd2185b9"
   end
 
   depends_on "go" => :build
