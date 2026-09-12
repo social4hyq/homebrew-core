@@ -7,7 +7,7 @@ class ConsulTemplate < Formula
   head "https://github.com/hashicorp/consul-template.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "636e5de3b7ee7f1af8db1f7703a1e628410f2ecfe58bbc1ee4c960ebd177971e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e648991312c60d7758adb075803006265205f41f732a5d16a118b85060057c3"
   end
 
   depends_on "go" => :build
