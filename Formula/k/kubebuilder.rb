@@ -8,7 +8,7 @@ class Kubebuilder < Formula
   head "https://github.com/kubernetes-sigs/kubebuilder.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db4d3692baf0e8cbf23db0f87e8d5647c5ba354e6154ac3b3abb093b8f35ec84"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "100e6f8d2fb8b70900ac63c49b1f74489868b7f995a19b1762e94282856fd746"
   end
 
   depends_on "go"
