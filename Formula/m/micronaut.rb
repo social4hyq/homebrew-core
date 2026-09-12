@@ -1,10 +1,9 @@
 class Micronaut < Formula
   desc "Modern JVM-based framework for building modular microservices"
   homepage "https://micronaut.io/"
-  url "https://github.com/micronaut-projects/micronaut-starter/archive/refs/tags/v5.1.3.tar.gz"
-  sha256 "badc9e138949c36176df0ea29e68519dcfc33e85b71946a822ec958deb0f3742"
+  url "https://github.com/micronaut-projects/micronaut-starter/archive/refs/tags/v5.1.5.tar.gz"
+  sha256 "d6fd459e43f41bad94188357fc21c84f20b7a2e92d290a203ae77c6f62507d8c"
   license "Apache-2.0"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,7 +11,7 @@ class Micronaut < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4403671b8ded5e1f43fa5fea4f3bbeba158bcb62011da364e04021fa5891c2c9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e43ee29e05672918c1c15a58f9c9d4071f6b3c128940bd93685a46da09901948"
   end
 
   depends_on "gradle" => :build
