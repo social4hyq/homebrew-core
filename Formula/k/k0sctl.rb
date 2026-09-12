@@ -7,7 +7,7 @@ class K0sctl < Formula
   head "https://github.com/k0sproject/k0sctl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4accbd4c98e1d7801df4770850fa5e15b24be7539aa990cc687b3e21711df75d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "78f16e20ae322d1af2f4b495c4fcf8d3219b2fd380ca2f31563649e05231e679"
   end
 
   depends_on "go" => :build
