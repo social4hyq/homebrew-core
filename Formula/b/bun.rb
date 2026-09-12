@@ -16,7 +16,7 @@ class Bun < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
@@ -24,8 +24,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "60b4ce54c5efacb348ea91417abaed87aa1844f0b078532b7bf52793b88d1672"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b59f3e9dc543a9c2d255655a95efa7e2304f33da642b97ed66a3fd0e7eb1b718"
   end
 
   depends_on "cmake" => :build
@@ -81,14 +81,11 @@ class Bun < Formula
     src/bun_core/Global.rs
     src/bun_core/env.rs
     src/bun_core/env_var.rs
-    src/bun_core/feature_flags.rs
     src/bun_core/util.rs
-    src/crash_handler/lib.rs
     src/dns/lib.rs
     src/event_loop/SpawnSyncEventLoop.rs
     src/exe_format/elf.rs
     src/install/Cargo.toml
-    src/install/PackageInstall.rs
     src/install/PackageInstaller.rs
     src/install/PackageManager.rs
     src/install/PackageManager/CommandLineArguments.rs
@@ -115,7 +112,6 @@ class Bun < Formula
     src/linker.lds
     src/node-fallbacks/bun.lock
     src/node-fallbacks/package.json
-    src/ohos_sign/Cargo.lock
     src/ohos_sign/Cargo.toml
     src/ohos_sign/src/bin/ohos_selfsign.rs
     src/ohos_sign/src/descriptor.rs

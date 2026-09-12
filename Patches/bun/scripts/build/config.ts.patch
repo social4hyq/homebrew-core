@@ -1,5 +1,5 @@
 diff --git a/scripts/build/config.ts b/scripts/build/config.ts
-index 671839b78c..de5d0f3b51 100644
+index 671839b78c..74bb9410e9 100644
 --- a/scripts/build/config.ts
 +++ b/scripts/build/config.ts
 @@ -17,7 +17,7 @@ import { resolveMacosSdkPath } from "./macos-sdk.ts";
@@ -62,7 +62,7 @@ index 671839b78c..de5d0f3b51 100644
        ? "linux"
        : plat === "darwin"
          ? "darwin"
-@@ -724,13 +745,15 @@ export function resolveConfig(partial: PartialConfig, toolchain: Toolchain): Con
+@@ -724,13 +745,14 @@ export function resolveConfig(partial: PartialConfig, toolchain: Toolchain): Con
    // skip this (the host clang-cl's default arch is just the host's).
    const compilerArch = os === "windows" && host.os === "windows" ? clangTargetArch(toolchain.cc) : undefined;
    const arch = partial.arch ?? compilerArch ?? host.arch;
@@ -76,11 +76,10 @@ index 671839b78c..de5d0f3b51 100644
 -  const unix = linux || darwin || freebsd;
 +  const ohos = os === "ohos";
 +  const unix = linux || darwin || freebsd || ohos;
-+  const kqueue = darwin || freebsd;
    const x64 = arch === "x64";
    const arm64 = arch === "aarch64";
    // Darwin target on a non-darwin host (Linux CI box building macOS
-@@ -1007,6 +1030,29 @@ export function resolveConfig(partial: PartialConfig, toolchain: Toolchain): Con
+@@ -1007,6 +1029,29 @@ export function resolveConfig(partial: PartialConfig, toolchain: Toolchain): Con
      }
    }
  
@@ -110,7 +109,7 @@ index 671839b78c..de5d0f3b51 100644
    // ─── Linux-gnu/musl sysroot + target ───
    // Every CI linux-gnu build (native AND cross-arch) uses the ubuntu:20.04 +
    // gcc-13 sysroot so the glibc verneed matches what the --wrap list covers
-@@ -1178,6 +1224,7 @@ export function resolveConfig(partial: PartialConfig, toolchain: Toolchain): Con
+@@ -1178,6 +1223,7 @@ export function resolveConfig(partial: PartialConfig, toolchain: Toolchain): Con
      darwin,
      windows,
      freebsd,
@@ -118,7 +117,7 @@ index 671839b78c..de5d0f3b51 100644
      unix,
      x64,
      arm64,
-@@ -1274,6 +1321,10 @@ export function resolveConfig(partial: PartialConfig, toolchain: Toolchain): Con
+@@ -1274,6 +1320,10 @@ export function resolveConfig(partial: PartialConfig, toolchain: Toolchain): Con
      sysroot,
      winsysroot,
      androidNdkRuntimeDir,
@@ -129,7 +128,7 @@ index 671839b78c..de5d0f3b51 100644
      version,
      revision,
      nodejsVersion,
-@@ -1540,6 +1591,23 @@ export function bunExeName(cfg: Config): string {
+@@ -1540,6 +1590,23 @@ export function bunExeName(cfg: Config): string {
    return "bun-profile";
  }
  
