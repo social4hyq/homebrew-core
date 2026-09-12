@@ -1,14 +1,13 @@
 diff --git a/src/dns/lib.rs b/src/dns/lib.rs
-index 8cec2841b1..58782c4f05 100644
+index 8cec2841b1..a09021bd14 100644
 --- a/src/dns/lib.rs
 +++ b/src/dns/lib.rs
-@@ -278,12 +278,21 @@ impl Backend {
+@@ -278,12 +278,20 @@ impl Backend {
      // Android: c-ares can't discover nameservers (no /etc/resolv.conf,
      // no JNI for ares_library_init_android). bionic getaddrinfo proxies
      // through netd which knows the real resolvers.
 -    #[cfg(all(not(any(target_os = "macos", windows)), target_os = "android"))]
-+    // OHOS: system getaddrinfo resolves via netsys IPC (private channel,
-+    // e.g. intranet domains); c-ares only sees /etc/resolv.conf.
++    // OHOS: system getaddrinfo resolves via netsys IPC; c-ares only sees /etc/resolv.conf.
 +    #[cfg(all(
 +        not(any(target_os = "macos", windows)),
 +        any(target_os = "android", target_env = "ohos")

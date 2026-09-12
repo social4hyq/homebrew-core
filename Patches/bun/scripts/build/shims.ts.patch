@@ -1,23 +1,12 @@
 diff --git a/scripts/build/shims.ts b/scripts/build/shims.ts
-index a2b28b029e..016ac3c7a8 100644
+index a2b28b029e..a3900d14c8 100644
 --- a/scripts/build/shims.ts
 +++ b/scripts/build/shims.ts
-@@ -119,6 +119,22 @@ export function elfDebugCompressPostlinkCommand(cfg: Config): string {
+@@ -119,6 +119,11 @@ export function elfDebugCompressPostlinkCommand(cfg: Config): string {
    return ` && ${quote(existsSync(llvmObjcopy) ? llvmObjcopy : "llvm-objcopy", false)} --compress-debug-sections=zlib $out`;
  }
  
-+/**
-+ * macOS-from-Linux cross links resolve compiler-rt builtins from the SDK's
-+ * libSystem reexport (libcompiler_rt.tbd), which covers the generic builtins
-+ * (__divti3 …) but NOT the x86 `__builtin_cpu_supports` support globals
-+ * (___cpu_model / ___cpu_indicator_init / ___cpu_features2) — on native
-+ * builds those come from Apple clang's static libclang_rt.osx.a, which the
-+ * Linux LLVM toolchain doesn't ship. Compile compiler-rt's own cpu_model
-+ * sources (vendored under shims/cpu_model/, Apache-2.0 WITH LLVM-exception)
-+ * into the link so the cross binary behaves exactly like the native one.
-+ * Tracked in workarounds.ts ("darwin-cross-cpu-model") so it self-obsoletes
-+ * if the SDK ever exports these symbols.
-+ */
++/** compiler-rt cpu_model sources (vendored under shims/cpu_model/, Apache-2.0 WITH LLVM-exception): the macOS SDK's libSystem reexport lacks the x86 __builtin_cpu_supports globals that native Apple clang pulls from libclang_rt.osx.a; tracked in workarounds.ts ("darwin-cross-cpu-model"). */
 +function needsDarwinCpuModelShim(cfg: Config): boolean {
 +  return cfg.darwin && cfg.crossTarget !== undefined && cfg.x64 && cfg.osxSysroot !== undefined;
 +}
@@ -25,52 +14,26 @@ index a2b28b029e..016ac3c7a8 100644
  /**
   * musl + rust-lld: Alpine ships the libc CRT objects (Scrt1.o, crti.o,
   * crtn.o) with ELFCOMPRESS_ZLIB debug sections, but rust-lang/llvm-project
-@@ -137,6 +153,38 @@ function needsMuslCrtDecompress(cfg: Config): boolean {
+@@ -137,6 +142,13 @@ function needsMuslCrtDecompress(cfg: Config): boolean {
  /** CRT objects clang's linux driver may pass. crt1/Scrt1 both covered so PIE-default changes don't matter. */
  const MUSL_CRT_OBJECTS = ["Scrt1.o", "crt1.o", "crti.o", "crtn.o"];
  
-+/**
-+ * HarmonyOS app sandboxes SIGSYS-kill several seccomp-filtered syscalls
-+ * (close_range, fchmodat2 — the kill fires before any errno fallback can
-+ * run) and return sandbox-specific errno from a few libc calls
-+ * (getpwuid_r, tmpfile, getcwd). ohos-compat-shim handles all of these
-+ * with a probe-then-fallback interposer, historically LD_PRELOAD'd by the
-+ * harmonybrew formula wrapper scripts. Linking a vendored copy
-+ * (shims/ohos_compat_shim.c) straight into the executable removes the
-+ * wrapper requirement — for bun itself AND for every `bun build --compile`
-+ * output, which embeds this runtime. Tracked in workarounds.ts
-+ * ("ohos-compat-shim-embed").
-+ */
++/** Embeds the vendored ohos-compat-shim (shims/ohos_compat_shim.c): HarmonyOS app sandboxes SIGSYS-kill close_range/fchmodat2 etc. before errno fallback can run, and linking it in removes the LD_PRELOAD wrapper requirement for bun AND every `bun build --compile` output; tracked in workarounds.ts ("ohos-compat-shim-embed"). */
 +function needsOhosCompatShim(cfg: Config): boolean {
 +  return cfg.ohos;
 +}
 +
-+/**
-+ * The shim's interposed symbols are re-exported from the executable via the
-+ * global list in src/linker.lds so dlopen'd native modules (.node/.so)
-+ * resolve them from the main binary too — the executable is first in the
-+ * loader's global lookup order, which matches LD_PRELOAD interposition
-+ * semantics. NOTE: the version script's `local: *` overrides
-+ * --export-dynamic-symbol/--dynamic-list in lld (verified empirically on
-+ * LLD 21), so linker.lds is the only working export mechanism here.
-+ * All 16 interposed symbols are default-on and can be disabled per-symbol
-+ * via OHOS_COMPAT_SHIM_DISABLE, same as the preload .so — but as of
-+ * 2026-08-18 only 14 are re-exported here (`poll`/`ppoll` intentionally
-+ * withheld pending a shim-side fix for their measured O(N) idle-fd cost;
-+ * see the comment block in linker.lds), so dlopen'd addons currently see
-+ * shim protection for everything except those two.
-+ */
++/** The shim's interposed symbols are re-exported from the executable via the global list in src/linker.lds so dlopen'd native modules resolve them from the main binary. NOTE: the version script's `local: *` overrides --export-dynamic-symbol/--dynamic-list in lld, so linker.lds is the only working export mechanism here. `poll`/`ppoll` are intentionally withheld — see the comment block in linker.lds. */
 +
  /**
   * Register shim compile rules. Call once from rules.ts alongside the
   * other registerXxxRules() calls.
-@@ -155,6 +203,15 @@ export function registerShimRules(n: Ninja, cfg: Config): void {
+@@ -155,6 +167,14 @@ export function registerShimRules(n: Ninja, cfg: Config): void {
      });
    }
  
 +  if (needsDarwinCpuModelShim(cfg) || needsOhosCompatShim(cfg)) {
-+    // Plain object compiled for the target; $flags carries the per-shim
-+    // --target/sysroot flags from emitShims().
++    // Plain object compiled for the target; $flags carries the per-shim --target/sysroot flags from emitShims().
 +    n.rule("shim_cc", {
 +      command: `${q(cfg.cc)} $flags -O2 -c $in -o $out`,
 +      description: "shim $out",
@@ -80,7 +43,7 @@ index a2b28b029e..016ac3c7a8 100644
    if (needsMachoPostlink(cfg)) {
      // Host tool — compiled for the BUILD machine (no --target/-isysroot),
      // since it runs as part of the link/strip commands on this host.
-@@ -200,6 +257,48 @@ export function emitShims(n: Ninja, cfg: Config): ShimLinkOpts {
+@@ -200,6 +220,45 @@ export function emitShims(n: Ninja, cfg: Config): ShimLinkOpts {
      implicitInputs.push(...machoPostlinkImplicitInputs(cfg));
    }
  
@@ -114,14 +77,11 @@ index a2b28b029e..016ac3c7a8 100644
 +      rule: "shim_cc",
 +      inputs: [src],
 +      vars: {
-+        // Same target/sysroot as the regular OHOS cc flags (flags.ts);
-+        // -fPIC because the .o's symbols land in the PIE's dynamic table.
++        // Same target/sysroot as the regular OHOS cc flags (flags.ts); -fPIC because the .o's symbols land in the PIE's dynamic table.
 +        flags: [`--target=aarch64-linux-ohos`, `--sysroot=${cfg.ohosSysroot!}`, "-fPIC"].join(" "),
 +      },
 +    });
-+    // A plain .o is always fully linked (no archive member selection), so
-+    // its definitions interpose libc's regardless of position in the line.
-+    // Dynamic-table export happens via src/linker.lds (see comment above).
++    // A plain .o is always fully linked (no archive member selection), so it interposes libc regardless of link-line position; export happens via src/linker.lds (see comment above).
 +    ldflags.push(out);
 +    implicitInputs.push(out);
 +  }

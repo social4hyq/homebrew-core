@@ -1,16 +1,14 @@
 diff --git a/src/ohos_sign/src/descriptor.rs b/src/ohos_sign/src/descriptor.rs
 new file mode 100644
-index 0000000000..e63dacdb95
+index 0000000000..87a53dfa76
 --- /dev/null
 +++ b/src/ohos_sign/src/descriptor.rs
-@@ -0,0 +1,25 @@
+@@ -0,0 +1,23 @@
 +pub const SIZE: usize = 256;
 +pub const FLAG_SELF_SIGN: u32 = 0x10;
 +pub const ELF_SIGN_INFO_TYPE: u32 = 1;
 +
-+/// Build the 256-byte fs-verity descriptor.
-+/// When computing the digest, pass `sign_size = 0`.
-+/// When writing to disk, pass `sign_size = 32`.
++/// Build the 256-byte fs-verity descriptor; digest uses `sign_size = 0`, on-disk layout uses 32.
 +pub fn build(sign_size: u32, file_size: u64, root_hash: &[u8; 32]) -> [u8; SIZE] {
 +    let mut out = [0u8; SIZE];
 +    out[0] = 1;   // version

@@ -1,45 +1,13 @@
 diff --git a/src/linker.lds b/src/linker.lds
-index 401cc35b60..b1e5ae13a4 100644
+index 401cc35b60..5443f695e6 100644
 --- a/src/linker.lds
 +++ b/src/linker.lds
-@@ -4,6 +4,59 @@ BUN_1.2 {
+@@ -4,6 +4,27 @@ BUN_1.2 {
  	node_api_*;
  	node_module_register;
  
-+	/* ohos-compat-shim interposers (shims/ohos_compat_shim.c, OHOS builds
-+	   only — see workarounds.ts "ohos-compat-shim-embed"). Exported so
-+	   dlopen'd native modules resolve them from the executable, matching
-+	   LD_PRELOAD semantics. The version script's `local: *` overrides
-+	   --export-dynamic-symbol/--dynamic-list in lld, so this global list
-+	   is the only way to export them. On non-OHOS targets these names are
-+	   undefined imports from libc and a version script has no effect on
-+	   undefined symbols — this block is a no-op there.
-+
-+	   2026-08-18 validation pass: the shim now interposes 18 symbols total
-+	   (`nm -D --defined-only libohos_compat.so`); this list had drifted to
-+	   9, silently leaving dlopen'd native addons (@ohos-ports/* —
-+	   opentui-core, bun-pty, lightningcss, tailwindcss-oxide) unprotected
-+	   for the missing ones. All 18 are exported here now:
-+	   `close`/`epoll_ctl`/`epoll_wait`/`epoll_pwait` are one cluster
-+	   sharing g_ep_pipes_lock's registry (ohos_compat_shim.c epoll_pipe
-+	   cluster) and must move together — exporting the epoll trio without
-+	   `close` would let a dlopen'd addon's close() bypass the shim's
-+	   cleanup hook and leave a stale registry entry that later
-+	   synthesizes EPOLLIN carrying a different consumer's udata on a
-+	   recycled fd number. `dup2`/`dup3` exist purely to close that same
-+	   staleness risk for fd-renumbering, not to fix a broken syscall.
-+
-+	   `poll`/`ppoll` were withheld from the first pass in this same
-+	   commit series: their per-idle-fd fstat() cost (ep_shim_patch_pollfds)
-+	   measured real and O(N) (128 idle fds: +115.7us/call for plain fds).
-+	   A same-day follow-up added a direct-mapped fd->is-fifo cache
-+	   (invalidated via close()/dup2()/dup3() and their raw-syscall
-+	   equivalents, all now covered above) that cut the idle-fd case to
-+	   +3.7% (was +710%) — see test/bench.c's poll_patch_idle_* numbers
-+	   and the shim repo's validation report. Registered-pipe fds still
-+	   pay a real, uncacheable ioctl(FIONREAD) per call (pending-byte
-+	   count isn't a static fact about the fd), but that's the epoll_pipe
-+	   repair doing its actual job, not overhead a cache could remove. */
++	/* 18 shim interposer symbols, exported so dlopen'd native addons resolve them from the executable; keep 1:1 with scripts/build/shims/ohos_compat_shim.c — a missing symbol means the addon bypasses the shim. */
++	/* close and the epoll trio share one shim-internal fd registry and must move together. */
 +	syscall;
 +	close_range;
 +	getcwd;

@@ -1,5 +1,5 @@
 diff --git a/src/jsc/bindings/bun-spawn.cpp b/src/jsc/bindings/bun-spawn.cpp
-index be91f7791c..5f7aea8703 100644
+index be91f7791c..e670554ae7 100644
 --- a/src/jsc/bindings/bun-spawn.cpp
 +++ b/src/jsc/bindings/bun-spawn.cpp
 @@ -5,6 +5,7 @@
@@ -22,7 +22,7 @@ index be91f7791c..5f7aea8703 100644
  extern char** environ;
  
  #ifndef CLOSE_RANGE_CLOEXEC
-@@ -117,11 +123,12 @@ typedef struct bun_spawn_request_t {
+@@ -117,11 +123,11 @@ typedef struct bun_spawn_request_t {
  // as _exit() may try to acquire locks held by threads that don't exist in the child.
  static inline void rawExit(int status)
  {
@@ -31,28 +31,25 @@ index be91f7791c..5f7aea8703 100644
 -#else
 -    _exit(status);
 +#if defined(__NR_exit_group)
-+    // Best-effort: try exit_group first (faster for multi-threaded processes).
-+    // If the syscall fails (e.g. blocked by seccomp), fall through to _exit().
++    // Best-effort: try exit_group first (faster for multi-threaded processes); if blocked (e.g. seccomp), fall through to _exit().
 +    (void)syscall(__NR_exit_group, status);
  #endif
 +    _exit(status);
  }
  
  #if OS(LINUX)
-@@ -233,9 +240,9 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -233,8 +239,8 @@ extern "C" ssize_t posix_spawn_bun(
      sigset_t blockall, oldmask;
      int res = 0, cs = 0;
  
 -#if OS(DARWIN) || OS(FREEBSD)
 -    // On macOS, we use fork() which requires a self-pipe trick to detect exec failures.
--    // Create a pipe for child-to-parent error communication.
 +#if OS(DARWIN) || OS(FREEBSD) || defined(__OHOS__)
-+    // On macOS/FreeBSD/OHOS, we use fork() which requires a self-pipe trick to
-+    // detect exec failures. Create a pipe for child-to-parent error communication.
++    // On macOS/FreeBSD/OHOS, we use fork() which requires a self-pipe trick to detect exec failures.
+     // Create a pipe for child-to-parent error communication.
      // The write end has O_CLOEXEC so it's automatically closed on successful exec.
      // If exec fails, child writes errno to the pipe.
-     int errpipe[2];
-@@ -248,12 +255,19 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -248,12 +254,14 @@ extern "C" ssize_t posix_spawn_bun(
  
      sigfillset(&blockall);
      sigprocmask(SIG_SETMASK, &blockall, &oldmask);
@@ -62,19 +59,14 @@ index be91f7791c..5f7aea8703 100644
  #endif
  
 -#if OS(LINUX)
-+    // On Linux (excluding OHOS), try to join the requested cgroup via clone3()
-+    // and otherwise vfork(), with a fallback to fork() if vfork() itself fails
-+    // (e.g. blocked by seccomp in some sandboxes). On OHOS specifically (SELinux
-+    // policy makes a vfork()'d shared-address-space child fragile there) and on
-+    // other Unix platforms (macOS, FreeBSD), use fork() directly with a
-+    // self-pipe for exec-failure detection.
++    // Linux (non-OHOS) keeps the clone3-cgroup + vfork path (fork fallback if vfork fails, e.g. seccomp-blocked); OHOS/macOS/FreeBSD use fork() + self-pipe directly — SELinux makes a vfork'd shared-address-space child fragile on OHOS.
 +#if OS(LINUX) && !defined(__OHOS__)
      volatile int child_errno = 0;
 +    bool use_fork_fallback = false;
      // The vfork child shares this mm, and set*id in the child resets the
      // mm-wide "dumpable" flag to /proc/sys/fs/suid_dumpable (commit_creds).
      // Save it so the parent can restore it once vfork returns, like Go's
-@@ -264,7 +278,7 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -264,7 +272,7 @@ extern "C" ssize_t posix_spawn_bun(
  #endif
      pid_t child = -1;
  
@@ -83,7 +75,7 @@ index be91f7791c..5f7aea8703 100644
      const auto childFailed = [&]() -> ssize_t {
          int err = errno;
          // Write errno to pipe so parent can read it
-@@ -299,7 +313,7 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -299,7 +307,7 @@ extern "C" ssize_t posix_spawn_bun(
              sigaction(i, &sa, 0);
          }
  
@@ -92,60 +84,26 @@ index be91f7791c..5f7aea8703 100644
          // cgroup v1 / pre-5.7 fallback. First, so every page the exec'd image
          // touches is charged to the cgroup. Writing "0" moves the writer.
          if (join_cgroup_in_child) {
-@@ -448,7 +462,70 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -448,7 +456,36 @@ extern "C" ssize_t posix_spawn_bun(
          if (!envp)
              envp = environ;
  
--        // Close all fds > current_max_fd, preferring cloexec if available
 +#if defined(__OHOS__)
-+        // chdir()-then-exec() into a different binary leaves that binary's
-+        // own getcwd() syscall broken for EL2-sandbox paths (EACCES walking
-+        // the parent chain) -- a real-device kernel/sandbox limitation
-+        // (confirmed with a from-scratch repro with no Bun involved at all;
-+        // does not reproduce in the CI container), not a bug in the
-+        // chdir/exec sequence above. Shells never hit the broken syscall:
-+        // they trust an inherited $PWD when stat($PWD) matches stat(".") and
-+        // skip calling getcwd() entirely. This process only chdir()'d above
-+        // without updating $PWD to match, so the exec'd program inherits a
-+        // stale $PWD (or none), fails that check, and falls through to the
-+        // broken kernel call. Fixed at this one shared funnel -- every spawn
-+        // call site (Bun.spawn, npm lifecycle scripts, `bun run`, ...) goes
-+        // through here -- rather than at any single JS-facing binding:
-+        // several call sites (e.g. PackageManagerLifecycle.rs, run_command.rs)
-+        // build envp directly against SpawnOptions and never touch
-+        // Bun.spawn's own env-handling code, so a fix scoped to just that one
-+        // binding would miss them.
-+        //
-+        // This is a forked (not vforked -- see the OS(LINUX) && !__OHOS__
-+        // branch above) child with its own address space, so plain stack
-+        // arrays here are safe; avoiding heap allocation (malloc/new) is
-+        // deliberate anyway, matching the rest of this function's
-+        // async-signal-safety discipline post-fork.
++        // OHOS: chdir()-then-exec leaves the child with a stale/absent $PWD, and its getcwd() hits EACCES on EL2-sandbox paths (shells trust $PWD when stat($PWD) matches stat("."), so set PWD=<chdir> here — this is the one funnel every spawn call site shares, and several build envp directly against SpawnOptions without touching Bun.spawn's env handling). Forked child with its own address space: stack arrays are safe; heap is still avoided per the function's async-signal-safety discipline.
 +        char pwdBuf[PATH_MAX + 5]; // "PWD=" + PATH_MAX + NUL
 +        constexpr size_t kMaxEnvEntries = 1024;
-+        // Declared here (not inside the `if` blocks below) so the array
-+        // outlives the assignment to `envp` all the way to execve() --
-+        // nesting it inside a block that closes before execve() would leave
-+        // `envp` dangling into reused stack space the instant anything else
-+        // (e.g. closeRangeOrLoop() below) pushes its own locals.
++        // Declared here so the array outlives the `envp` assignment until execve() — a narrower scope would leave `envp` dangling into reused stack space.
 +        char* newEnvp[kMaxEnvEntries + 2];
 +        if (request->chdir) {
 +            int n = snprintf(pwdBuf, sizeof(pwdBuf), "PWD=%s", request->chdir);
 +            if (n > 0 && static_cast<size_t>(n) < sizeof(pwdBuf)) {
 +                size_t count = 0;
 +                while (envp[count] && count < kMaxEnvEntries) count++;
-+                // Bails out (leaving the stale-$PWD bug in place rather than
-+                // risking anything) only past ~1024 env vars, far beyond any
-+                // real process; every ordinary caller is covered.
++                // Bails out (leaving the stale-$PWD bug in place) only past ~1024 env vars — beyond any real process.
 +                if (envp[count] == nullptr) {
 +                    size_t out = 0;
 +                    for (size_t i = 0; i < count; i++) {
-+                        // Drop any existing PWD -- it's either stale (the
-+                        // parent's cwd, which no longer matches after the
-+                        // chdir() above) or, if a caller set it to something
-+                        // else on purpose, it still has to lose: chdir()
-+                        // already changed the real cwd, so $PWD must track it
-+                        // or nothing here is self-consistent.
++                        // Drop any existing PWD — stale after the chdir() above, and a caller-set PWD must lose too: $PWD must track the real cwd.
 +                        if (strncmp(envp[i], "PWD=", 4) == 0) continue;
 +                        newEnvp[out++] = envp[i];
 +                    }
@@ -157,14 +115,13 @@ index be91f7791c..5f7aea8703 100644
 +        }
 +#endif
 +
-+        // Close all fds > current_max_fd, preferring cloexec if available.
-+        // On OHOS, fcntl(F_SETFD) is ignored in vfork children, so fd CLOEXEC
-+        // must be prevented by excluding stdio fds (0,1,2) from the range.
+         // Close all fds > current_max_fd, preferring cloexec if available
++        // On OHOS, fcntl(F_SETFD) is ignored post-fork, so CLOEXEC must be avoided by excluding stdio fds from the range.
 +        if (current_max_fd < 2) current_max_fd = 2;
          closeRangeOrLoop(current_max_fd + 1, INT_MAX, true);
  
          if (execve(path, argv, envp) == -1) {
-@@ -460,7 +537,7 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -460,7 +497,7 @@ extern "C" ssize_t posix_spawn_bun(
          return -1;
      };
  
@@ -173,7 +130,7 @@ index be91f7791c..5f7aea8703 100644
      if (request->cgroup_fd >= 0 && clone3Unavailable.load(std::memory_order_relaxed)) {
          join_cgroup_in_child = true;
      } else if (request->cgroup_fd >= 0) {
-@@ -505,6 +582,10 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -505,6 +542,10 @@ extern "C" ssize_t posix_spawn_bun(
      // Linux permits the setup we need (setsid, ioctl, dup2, ...) before exec.
      if (child == -1 && !cgroup_failed) {
          child = vfork();
@@ -184,7 +141,7 @@ index be91f7791c..5f7aea8703 100644
          if (child == 0) {
              return startChild();
          }
-@@ -520,8 +601,8 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -520,8 +561,8 @@ extern "C" ssize_t posix_spawn_bun(
      }
  #endif
  
@@ -195,28 +152,20 @@ index be91f7791c..5f7aea8703 100644
      // Parent: close write end
      close(errpipe[1]);
  
-@@ -564,10 +645,17 @@ extern "C" ssize_t posix_spawn_bun(
-     }
- #else
+@@ -566,7 +607,11 @@ extern "C" ssize_t posix_spawn_bun(
      // Linux vfork() path: parent resumes after child calls exec or _exit
--    // We can detect exec failure via the volatile child_errno variable
-+    // We can detect exec failure via the volatile child_errno variable.
-+    // When vfork() was not available and fork() was used instead, the
-+    // error comes through fork_errpipe.
+     // We can detect exec failure via the volatile child_errno variable
      if (child != -1) {
 -        if (child_errno != 0) {
--            // Child failed to exec - it set child_errno and called _exit()
 +        if (use_fork_fallback) {
-+            // Fork fallback: no shared memory, so exec failure detection
-+            // is best-effort. Assume exec succeeded.
++            // Fork fallback: no shared memory, so exec failure detection is best-effort; assume exec succeeded.
 +            res = 0;
 +            if (pid) *pid = child;
 +        } else if (child_errno != 0) {
-+            // Child failed to exec — it set child_errno and called _exit()
+             // Child failed to exec - it set child_errno and called _exit()
              // Reap the zombie child process
              wait4(child, NULL, 0, NULL);
-             res = child_errno;
-@@ -579,7 +667,7 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -579,7 +624,7 @@ extern "C" ssize_t posix_spawn_bun(
              }
          }
      } else {
@@ -225,7 +174,7 @@ index be91f7791c..5f7aea8703 100644
          res = errno;
      }
      // Negative: joining the cgroup failed, not the spawn proper.
-@@ -595,7 +683,7 @@ extern "C" ssize_t posix_spawn_bun(
+@@ -595,7 +640,7 @@ extern "C" ssize_t posix_spawn_bun(
  #endif
  
      sigprocmask(SIG_SETMASK, &oldmask, 0);

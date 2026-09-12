@@ -1,5 +1,5 @@
 diff --git a/src/runtime/socket/system_certs.rs b/src/runtime/socket/system_certs.rs
-index 325cb4b27e..4cb3010f8b 100644
+index 325cb4b27e..ce2a7bd57c 100644
 --- a/src/runtime/socket/system_certs.rs
 +++ b/src/runtime/socket/system_certs.rs
 @@ -16,7 +16,7 @@ use bun_boringssl_sys as boringssl;
@@ -20,14 +20,11 @@ index 325cb4b27e..4cb3010f8b 100644
  const WELL_KNOWN_DIRS: &[&[u8]] = &[
      b"/etc/ssl/certs",
      b"/etc/pki/tls/certs",
-@@ -50,6 +50,15 @@ const WELL_KNOWN_DIRS: &[&[u8]] = &[
+@@ -50,6 +50,12 @@ const WELL_KNOWN_DIRS: &[&[u8]] = &[
      b"/data/misc/user/0/cacerts-added",
  ];
  
-+// OHOS has no OpenSSL layout either: one system CA directory, hashed PEM files
-+// (c_rehash format `<hash>.0`, usually symlinks). `load_directory` doesn't do
-+// hash-indexed lookup — it just PEM-parses every regular file it finds after
-+// following links — so the hashed layout needs no special-casing here.
++// OHOS: single system CA directory of hashed PEM symlinks (c_rehash format); load_directory PEM-parses every file it finds, so the hashed layout needs no special-casing here.
 +#[cfg(target_env = "ohos")]
 +const WELL_KNOWN_BUNDLES: &[&[u8]] = &[];
 +#[cfg(target_env = "ohos")]
@@ -36,7 +33,7 @@ index 325cb4b27e..4cb3010f8b 100644
  struct Loader {
      /// One owned `CRYPTO_BUFFER` per distinct certificate, in discovery order.
      certs: Vec<*mut boringssl::CRYPTO_BUFFER>,
-@@ -224,7 +233,7 @@ extern "C" fn us_load_system_certificates_posix() -> *mut boringssl::X509_LAZY_C
+@@ -224,7 +230,7 @@ extern "C" fn us_load_system_certificates_posix() -> *mut boringssl::X509_LAZY_C
              }
          }
          None => {

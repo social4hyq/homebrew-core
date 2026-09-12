@@ -1,35 +1,16 @@
 diff --git a/src/io/PipeWriter.rs b/src/io/PipeWriter.rs
-index 70bee1bbd4..a383b1601f 100644
+index 70bee1bbd4..b33f0f24de 100644
 --- a/src/io/PipeWriter.rs
 +++ b/src/io/PipeWriter.rs
-@@ -136,6 +136,61 @@ pub trait PosixPipeWriter {
+@@ -136,6 +136,42 @@ pub trait PosixPipeWriter {
                      self_addr,
                      poll.is_registered()
                  );
-+                // Empty-buffer wake with nothing to write: drop the watch
-+                // explicitly instead of relying on the kernel's EPOLLONESHOT
-+                // auto-disarm. Kernels that lack it (HongMeng: a ONESHOT
-+                // registration fires EPOLLOUT forever on a writable pipe)
-+                // would otherwise wake the loop continuously at 100% CPU.
-+                // `force` because on such a kernel the fd is still armed —
-+                // the needs_rearm fast path skips the syscall entirely.
-+                // The next buffered write re-registers via register_poll().
++                // OHOS: no EPOLLONESHOT auto-disarm — without this force-unregister an empty-buffer wake re-fires EPOLLOUT forever and spins the loop.
 +                _ = poll.unregister(crate::Loop::get(), true);
 +            }
-+            // Some kernels (observed on HongMeng/OHOS) keep delivering ready
-+            // events for `fd` even after the CTL_DEL above reports success:
-+            // a *second*, unconditional CTL_DEL attempt on the very next
-+            // empty wake gets ENOENT ("not registered"), yet the fd is
-+            // reported ready again on the next epoll_pwait regardless.
-+            // Userspace cannot make the kernel actually stop, so detect the
-+            // storm -- the same fd hitting this branch repeatedly within a
-+            // few milliseconds -- and yield the core instead of hammering
-+            // epoll_pwait as fast as the syscall allows. A healthy
-+            // drain-then-idle cycle recurring over a long-running process's
-+            // lifetime is ms-to-seconds apart even when it happens many
-+            // times, so the time window keeps this from misfiring there.
-+            // Reduced idle CPU on an affected OHOS build from ~100% to
-+            // ~6-8% (measured via /proc/<pid>/stat ground truth).
++            // OHOS: some kernels keep firing EPOLLOUT even after CTL_DEL succeeds;
++            // without the streak backoff below the loop spins hot while idle.
 +            {
 +                use core::sync::atomic::{AtomicI32, AtomicU32, Ordering};
 +                use std::sync::Mutex;

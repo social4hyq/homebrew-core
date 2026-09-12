@@ -1,16 +1,12 @@
 diff --git a/src/libarchive/lib.rs b/src/libarchive/lib.rs
-index 8543bc6660..6c1141345f 100644
+index 8543bc6660..9deb73e9b2 100644
 --- a/src/libarchive/lib.rs
 +++ b/src/libarchive/lib.rs
-@@ -1067,6 +1067,24 @@ fn open_dir_with_stat(dir_fd: Fd, sub_path: &[u8]) -> Option<(Fd, bun_sys::Stat)
+@@ -1067,6 +1067,20 @@ fn open_dir_with_stat(dir_fd: Fd, sub_path: &[u8]) -> Option<(Fd, bun_sys::Stat)
      }
  }
  
-+/// `bun_sys::symlinkat`, retried once on OHOS SELinux's intermittent
-+/// EPERM/EACCES denial. The parent directory is already guaranteed to exist
-+/// by `create_deferred_symlinks`'s pre-pass below, so (unlike the
-+/// pre-refactor per-symlink code this replaces) no lazy `mkdir` is needed
-+/// before the retry.
++/// `bun_sys::symlinkat`, retried once on OHOS SELinux's intermittent EPERM/EACCES; parent dirs are pre-created by `create_deferred_symlinks`'s pre-pass, so no lazy `mkdir` is needed before the retry.
 +#[cfg(unix)]
 +fn symlinkat_ohos_retry(target: &ZStr, dirfd: Fd, dest: &ZStr) -> bun_sys::Maybe<()> {
 +    let result = bun_sys::symlinkat(target, dirfd, dest);
@@ -27,7 +23,7 @@ index 8543bc6660..6c1141345f 100644
  #[cfg(unix)]
  pub fn create_deferred_symlinks(dir_fd: Fd, symlinks: &[DeferredSymlink], log: bool) -> u32 {
      let mut parents: Vec<Option<bun_sys::Stat>> = Vec::with_capacity(symlinks.len());
-@@ -1088,7 +1106,7 @@ pub fn create_deferred_symlinks(dir_fd: Fd, symlinks: &[DeferredSymlink], log: b
+@@ -1088,7 +1102,7 @@ pub fn create_deferred_symlinks(dir_fd: Fd, symlinks: &[DeferredSymlink], log: b
          let dirname = bun_paths::dirname_simple(symlink.path.as_bytes());
          let target = symlink.target.as_zstr();
          let result = if dirname.is_empty() {
@@ -36,7 +32,7 @@ index 8543bc6660..6c1141345f 100644
          } else {
              let name =
                  ZStr::from_slice_with_nul(&symlink.path.as_bytes_with_nul()[dirname.len() + 1..]);
-@@ -1096,7 +1114,7 @@ pub fn create_deferred_symlinks(dir_fd: Fd, symlinks: &[DeferredSymlink], log: b
+@@ -1096,7 +1110,7 @@ pub fn create_deferred_symlinks(dir_fd: Fd, symlinks: &[DeferredSymlink], log: b
                  (Some((parent, st)), Some(expected))
                      if st.st_dev == expected.st_dev && st.st_ino == expected.st_ino =>
                  {

@@ -1,5 +1,5 @@
 diff --git a/src/install/lib.rs b/src/install/lib.rs
-index 314523ca5e..7ec5c56243 100644
+index 314523ca5e..9d17c67859 100644
 --- a/src/install/lib.rs
 +++ b/src/install/lib.rs
 @@ -418,6 +418,8 @@ impl RunCommand {
@@ -11,15 +11,13 @@ index 314523ca5e..7ec5c56243 100644
          } else {
              "/tmp"
          };
-@@ -590,13 +592,22 @@ impl RunCommand {
+@@ -590,13 +592,20 @@ impl RunCommand {
              // already exists, refuse to use it unless it's a directory we own
              // with no group/other write bits.
              match bun_sys::mkdir(DIR_Z, 0o700) {
 -                Ok(()) => {}
 +                Ok(()) => {
-+                    // OHOS tmpfs forces setgid + group-write on new
-+                    // directories; chmod back to 0700 so the EEXIST
-+                    // permission check below passes on re-entry.
++                    // OHOS tmpfs forces setgid+group-write on new dirs; chmod back to 0700 so the EEXIST re-entry check below passes.
 +                    #[cfg(target_env = "ohos")]
 +                    {
 +                        let _ = bun_sys::chmod(DIR_Z, 0o700);

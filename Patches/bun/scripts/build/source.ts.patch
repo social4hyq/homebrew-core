@@ -1,22 +1,19 @@
 diff --git a/scripts/build/source.ts b/scripts/build/source.ts
-index e57282be9a..b18fbe96de 100644
+index e57282be9a..730eb22dfc 100644
 --- a/scripts/build/source.ts
 +++ b/scripts/build/source.ts
-@@ -325,6 +325,13 @@ export interface NestedCmakeBuild {
+@@ -325,6 +325,10 @@ export interface NestedCmakeBuild {
     * Release (lshpack — its debug build exposes asan symbols we can't link).
     */
    buildType?: BuildType;
-+  /**
-+   * Limit the nested CMake build's worker count. Some cross-target
-+   * filesystems cannot safely run generated-header copy rules in parallel.
-+   */
++  /** Worker cap for the nested CMake build (some cross-target filesystems can't run generated-header copy rules in parallel). */
 +  parallel?: number;
 +  /** Print each inner build command (useful for diagnosing generator failures). */
 +  verbose?: boolean;
    /**
     * Subdirectory within the build dir where libraries land.
     * E.g. cares puts them in "lib/", hdrhistogram in "src/". Default: root.
-@@ -608,7 +615,7 @@ export function registerDepRules(n: Ninja, cfg: Config): void {
+@@ -608,7 +612,7 @@ export function registerDepRules(n: Ninja, cfg: Config): void {
    // the dep, cmake --build is a no-op (inner ninja re-stats), and our restat
    // prunes everything downstream.
    n.rule("dep_build", {
@@ -25,17 +22,14 @@ index e57282be9a..b18fbe96de 100644
      description: "build $name",
      restat: true,
      pool: "dep",
-@@ -1378,7 +1385,16 @@ function emitNestedCmake(
+@@ -1378,7 +1382,13 @@ function emitNestedCmake(
        name,
        builddir: buildDir,
        buildtype: buildType,
 +      parallel: spec.parallel === undefined ? "" : `--parallel ${spec.parallel}`,
 +      verbose: spec.verbose ? "--verbose" : "",
        targets: targets.map(t => `--target ${t}`).join(" "),
-+      // OHOS hosts ship no /usr/bin/{clang,gcc}. WebKit's preprocess.pl
-+      // (inspector protocol codegen) execs $ENV{CC} || /usr/bin/clang ||
-+      // /usr/bin/gcc for its preprocessed DSL, so the nested build must
-+      // carry CC/CXX explicitly. stream.ts merges --env=K=V over its env.
++      // OHOS hosts ship no /usr/bin/{clang,gcc} and WebKit's preprocess.pl execs $ENV{CC} || /usr/bin/clang || /usr/bin/gcc — stream.ts merges --env=K=V over its env.
 +      ...(cfg.ohos
 +        ? { toolEnv: `--env=CC=${quote(cfg.cc, hostWin)} --env=CXX=${quote(cfg.cxx, hostWin)}` }
 +        : { toolEnv: "" }),

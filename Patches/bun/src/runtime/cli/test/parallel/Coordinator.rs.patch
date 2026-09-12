@@ -1,20 +1,12 @@
 diff --git a/src/runtime/cli/test/parallel/Coordinator.rs b/src/runtime/cli/test/parallel/Coordinator.rs
-index 8fa2be22df..ddbfcbc25e 100644
+index 8fa2be22df..db9343f175 100644
 --- a/src/runtime/cli/test/parallel/Coordinator.rs
 +++ b/src/runtime/cli/test/parallel/Coordinator.rs
-@@ -124,6 +124,18 @@ impl<'a> Coordinator<'a> {
+@@ -124,6 +124,10 @@ impl<'a> Coordinator<'a> {
              // SAFETY: `v = base.add(i)` with `i < len` is in-bounds for
              // `self.workers`; field read through *mut so no `&mut Worker` is
              // formed that could alias the caller's live `w`.
-+            //
-+            // Skip workers that are spawned but have not yet sent their Ready
-+            // frame (alive=true, inflight=None). On OHOS, fork is slow (~200ms),
-+            // so a fast worker can finish its first file and call this function
-+            // before a just-spawned sibling initialises. Stealing its range
-+            // would cause it to re-steal when it finally does send Ready, running
-+            // files under the thief's worker-ID instead of its own (BUG-03).
-+            // Not-yet-spawned workers (alive=false) are fine to steal from —
-+            // their range is an unclaimed reservation with no process attached.
++            // Skip spawned-but-not-Ready workers (alive, no inflight): OHOS's slow fork lets a fast worker steal a just-spawned sibling's range, which it re-steals on Ready — running files under the thief's worker ID; alive=false is an unclaimed reservation, fine to steal.
 +            if unsafe { (*v).alive && (*v).inflight.is_none() } {
 +                continue;
 +            }
