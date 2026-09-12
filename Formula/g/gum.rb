@@ -8,7 +8,7 @@ class Gum < Formula
   head "https://github.com/charmbracelet/gum.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b64768dac1af9728a91f88a8090057263f26e96324251f28420aa43364ce43e4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1a553a06ecae1af23a55b6ec6aa9969338f055a5b21e6c29ae91bf71d530e5a"
   end
 
   depends_on "go" => :build
