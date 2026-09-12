@@ -1,13 +1,13 @@
 class Cloudmonkey < Formula
   desc "Apache CloudStack CloudMonkey CLI"
   homepage "https://github.com/apache/cloudstack-cloudmonkey"
-  url "https://github.com/apache/cloudstack-cloudmonkey/archive/refs/tags/6.5.0.tar.gz"
-  sha256 "bb491140103f0d8c178966355114f0eb9b35ad64323fba7448d475112d8847fc"
+  url "https://github.com/apache/cloudstack-cloudmonkey/archive/refs/tags/6.6.0.tar.gz"
+  sha256 "fdebc87604f8047d9b88ed03b6a9b50bf039242726e5e8e80b42e82fd7d326e7"
   license "Apache-2.0"
   head "https://github.com/apache/cloudstack-cloudmonkey.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf34cf564817c8973a3890d9d3efc239327ff08722ca7285b30d4cf04c40b75a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b93da6cd6981da942c4388fbeb75eba2de279ff378eb659e79d9dfd1000a6a7"
   end
 
   depends_on "go" => :build
