@@ -7,7 +7,7 @@ class Cloudmonkey < Formula
   head "https://github.com/apache/cloudstack-cloudmonkey.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf34cf564817c8973a3890d9d3efc239327ff08722ca7285b30d4cf04c40b75a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b93da6cd6981da942c4388fbeb75eba2de279ff378eb659e79d9dfd1000a6a7"
   end
 
   depends_on "go" => :build
