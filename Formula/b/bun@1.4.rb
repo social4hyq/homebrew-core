@@ -201,10 +201,10 @@ class BunAT14 < Formula
            "--depth=1", "https://github.com/oven-sh/WebKit.git", "vendor/WebKit"
 
     cd "vendor/WebKit" do
-      # The suspend patch lives in this tap (same file the bun-webkit
-      # formula applies); applied here rather than via a DSL patch because
-      # vendor/WebKit only exists after the clone above.
-      suspend_patch = tap.path/"Patches/bun-webkit/0001-suspend-resume-handshake-survives-signal-loss.patch"
+      # The suspend patch lives in this formula's patch directory
+      # (Patches/bun@1.4/); applied here rather than via a DSL patch
+      # because vendor/WebKit only exists after the clone above.
+      suspend_patch = tap.path/"Patches/bun@1.4/webkit-suspend-resume.patch"
       odie "WebKit suspend patch missing from tap: #{suspend_patch}" unless suspend_patch.file?
       system "git", "apply", "--check", suspend_patch
       system "git", "apply", suspend_patch
