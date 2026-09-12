@@ -9,7 +9,7 @@ class Jnethack < Formula
   head "https://github.com/jnethack/jnethack-release.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e17d9baf1f3f23cbf631e961f0357c49fec1dcba4705e43e1f1931d4a0b65289"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0491898454d95ef3155adde219970ddb3697351af5bb8e45873f43415eb0c697"
   end
 
   depends_on "nkf" => :build
