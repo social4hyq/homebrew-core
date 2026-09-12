@@ -1,10 +1,9 @@
 class Tirith < Formula
   desc "Detect terminal injection, homograph, and pipe-to-shell attacks"
   homepage "https://tirith.sh/"
-  url "https://github.com/sheeki03/tirith/archive/refs/tags/v0.4.1.tar.gz"
-  sha256 "0074778f56ec7ab4b4b64288db24b37c78cba2411adab926827d4ceb3ced49c1"
+  url "https://github.com/sheeki03/tirith/archive/refs/tags/v0.4.2.tar.gz"
+  sha256 "84e1fdc35e60d684ab932e73c342b71e27d575bc70defcec4989c36957153b0a"
   license "AGPL-3.0-only"
-  revision 1
   head "https://github.com/sheeki03/tirith.git", branch: "main"
 
   livecheck do
@@ -13,7 +12,7 @@ class Tirith < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "01eb662c89b91679a05bfc37f50c503e32478f49532c9799f3a526fc249e463f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e3b19287da09a881e519db6f64d74de67f009d7235dcceedadcc4e5b044bc84"
   end
 
   depends_on "rust" => :build
