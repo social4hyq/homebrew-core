@@ -1,12 +1,12 @@
 class Zola < Formula
   desc "Fast static site generator in a single binary with everything built-in"
   homepage "https://www.getzola.org/"
-  url "https://github.com/getzola/zola/archive/refs/tags/v0.23.4.tar.gz"
-  sha256 "b8eb945dbafe1e73f1601c215ef1563b9b0a25097576ba48f646db8d75568e40"
+  url "https://github.com/getzola/zola/archive/refs/tags/v0.23.5.tar.gz"
+  sha256 "3a41eeb41d4ad78ec67dc6636148e5c8be25d789b902439479b992f67e055c06"
   license "EUPL-1.2"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5cda74c4813109ea300defb792477e118b9ea6defd60ddd9dc206497cfcdbb06"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "786cae37850746afb52bb403823e111300806cbf410006a99ef69e2297cd50de"
   end
 
   depends_on "pkgconf" => :build
