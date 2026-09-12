@@ -15,7 +15,7 @@ class Hledger < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bb5dd7475e6f8813aa1096d90476bebc9359d41fe2f7dcdd473c977c5861eee6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3468a1a3a1dc02333172bf37ba141176c56e4e51d7a812f0cf41eb9c93a3cc76"
   end
 
   depends_on "ghc" => :build
