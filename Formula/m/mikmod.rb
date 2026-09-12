@@ -1,8 +1,8 @@
 class Mikmod < Formula
   desc "Portable tracked music player"
   homepage "https://mikmod.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/mikmod/mikmod/3.2.9/mikmod-3.2.9.tar.gz"
-  sha256 "214c10aa3019807a1eb26b2c709592f63dbcc00b72985aa86a4fb7ac3cd8b901"
+  url "https://downloads.sourceforge.net/project/mikmod/mikmod/3.2.10/mikmod-3.2.10.tar.gz"
+  sha256 "465e99d89d762608b7d0c0a103a58eec68c8c28ae6bbd196354c13433e40d20a"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class Mikmod < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "71bc20ad4f85ecddbb72f12653e7d1f3c99b7d7cc89e99b0b3600975450e88a4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "04bf3d6beb71988f19397b07aee1d5541e624fbd3926daeb82713fea6b28e970"
   end
 
   depends_on "libmikmod"
