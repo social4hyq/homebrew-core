@@ -1,8 +1,8 @@
 class BeadsViewer < Formula
   desc "Terminal-based UI for the Beads issue tracker"
   homepage "https://github.com/Dicklesworthstone/beads_viewer"
-  url "https://github.com/Dicklesworthstone/beads_viewer/archive/refs/tags/v0.24.1.tar.gz"
-  sha256 "b09713a0b58c5b1be7af1c8402db9855156f7b20594a9150333df9ae97fc0c4e"
+  url "https://github.com/Dicklesworthstone/beads_viewer/archive/refs/tags/v0.25.0.tar.gz"
+  sha256 "0967ce29a23a0b949862578a3a706ee4a0065f0988e0bc02f08e6e4de1500b85"
   license "MIT"
 
   bottle do
