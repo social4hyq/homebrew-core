@@ -45,7 +45,7 @@ class Shaderc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f73bd2334215fe47fb0ca9a6dc35f2f72f550108a8cc568c6383396bb16d71e1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3136a241949529f6fcd5c0a2af6166920d22abd9dd171c77b20f7acb2c6e2134"
   end
 
   head do
