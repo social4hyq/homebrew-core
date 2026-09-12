@@ -1,10 +1,9 @@
 class Pod2man < Formula
   desc "Perl documentation generator"
   homepage "https://www.eyrie.org/~eagle/software/podlators/"
-  url "https://archives.eyrie.org/software/perl/podlators-v6.1.0.tar.xz"
-  sha256 "6eb43a0fc8381969d5910f8c46ea11e8867e0862ff3c8a1ccda109894cb7de34"
+  url "https://archives.eyrie.org/software/perl/podlators-v6.1.1.tar.xz"
+  sha256 "a28027ac17848912ab2b14544fd457e28269e7b3f8423d72526556f9779b1807"
   license any_of: ["Artistic-1.0-Perl", "GPL-1.0-or-later"]
-  revision 1
 
   livecheck do
     url "https://archives.eyrie.org/software/perl/"
@@ -12,7 +11,7 @@ class Pod2man < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf8ca6407eec4ea645c88814cd736f55246a4f2d48ada06510cdb8d8f949926f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f85f42e18874be5083358f1477d035501152723f3efe65765f2c32398f6ee97c"
   end
 
   keg_only "it conflicts with the pod2man that ships with Perl"
