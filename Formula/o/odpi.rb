@@ -6,7 +6,7 @@ class Odpi < Formula
   license any_of: ["Apache-2.0", "UPL-1.0"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf5d10437a22fd6c1c20434b6b4697c182d21627d27375dfba1c373187efa54a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7d6313bd7c2711c65218023819319f4fa3645db17031cc20c9a04b7902b70e9"
   end
 
   def install
