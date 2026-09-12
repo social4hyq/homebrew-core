@@ -1,22 +1,12 @@
 diff --git a/src/exe_format/elf.rs b/src/exe_format/elf.rs
-index 9d231ec56e..e1df2be861 100644
+index 9d231ec56e..d87e573e2f 100644
 --- a/src/exe_format/elf.rs
 +++ b/src/exe_format/elf.rs
-@@ -403,6 +403,37 @@ impl ElfFile {
+@@ -403,6 +403,27 @@ impl ElfFile {
              );
          }
  
-+        // Fix up program headers whose p_offset pointed into the moved tail.
-+        // The shdr loop above only covers section headers; patchelf-built
-+        // templates (the #24742/#29290/#31023 shape) keep the relocated
-+        // PT_INTERP/PT_NOTE data — and an extra writable PT_LOAD — in that
-+        // tail, so without this the compiled output's PT_INTERP points at the
-+        // zero-filled gap and the loader reads an empty interpreter path.
-+        // A tail PT_LOAD additionally overlaps the extended RW segment's
-+        // vaddr range once we grow it; its content is only reached via
-+        // PT_INTERP's file offset (the kernel reads the interpreter path
-+        // directly, no runtime mapping is needed), so neutralize it to
-+        // PT_NULL to keep the load list disjoint.
++        // Fix up phdrs whose p_offset landed in the moved tail (patchelf-built templates keep PT_INTERP/PT_NOTE there — a stale offset makes the loader read an empty interpreter path) and neutralize an overlapping tail PT_LOAD to PT_NULL so the load list stays disjoint.
 +        {
 +            let move_delta = move_dst_start - move_src_start;
 +            for i in 0..ehdr.e_phnum as usize {

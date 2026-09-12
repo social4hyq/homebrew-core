@@ -1,5 +1,5 @@
 diff --git a/src/sys/linux_syscall.rs b/src/sys/linux_syscall.rs
-index ae5cc00417..4efa57a0d0 100644
+index ae5cc00417..25af709afa 100644
 --- a/src/sys/linux_syscall.rs
 +++ b/src/sys/linux_syscall.rs
 @@ -17,6 +17,7 @@
@@ -30,7 +30,7 @@ index ae5cc00417..4efa57a0d0 100644
      let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
      let mode = rustix::fs::Mode::from_raw_mode(mode);
      let dir = dir.as_borrowed_fd();
-@@ -91,36 +91,56 @@ pub(crate) fn openat(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd,
+@@ -91,36 +91,54 @@ pub(crate) fn openat(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd,
  
  #[inline]
  pub(crate) fn openat2_beneath(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd, i32> {
@@ -86,9 +86,7 @@ index ae5cc00417..4efa57a0d0 100644
 -        )
 -    })
 -    .map(own_fd)
-+    // OHOS seccomp blocks openat2 with uncatchable SIGSYS (same guard as
-+    // openat2_beneath above); returning ENOSYS lets the sys/lib.rs wrapper
-+    // cache UNAVAILABLE and fall back to plain openat.
++    // OHOS seccomp blocks openat2 with uncatchable SIGSYS; returning ENOSYS lets the sys/lib.rs wrapper fall back to plain openat.
 +    #[cfg(target_env = "ohos")]
 +    {
 +        let _ = (dir, path, flags, mode);
@@ -113,7 +111,7 @@ index ae5cc00417..4efa57a0d0 100644
  }
  
  #[inline]
-@@ -130,19 +150,19 @@ pub(crate) fn read(fd: Fd, buf: &mut [u8]) -> Result<usize, i32> {
+@@ -130,19 +148,19 @@ pub(crate) fn read(fd: Fd, buf: &mut [u8]) -> Result<usize, i32> {
  }
  
  #[inline]
@@ -136,7 +134,7 @@ index ae5cc00417..4efa57a0d0 100644
      let fd = fd.as_borrowed_fd();
      retry(|| rustix::io::pwrite(fd, buf, off as u64))
  }
-@@ -151,7 +171,7 @@ pub(crate) fn pwrite(fd: Fd, buf: &[u8], off: i64) -> Result<usize, i32> {
+@@ -151,7 +169,7 @@ pub(crate) fn pwrite(fd: Fd, buf: &[u8], off: i64) -> Result<usize, i32> {
  /// the fd on EINTR; retrying could close a racing thread's new fd). Returns
  /// `Err(EBADF)` etc. on failure; callers only surface `EBADF`.
  #[inline]
@@ -145,7 +143,7 @@ index ae5cc00417..4efa57a0d0 100644
      // rustix's safe `io::close(OwnedFd)` is infallible by design (it swallows
      // the rc because POSIX says "the fd is released regardless"), and
      // constructing an `OwnedFd` from a possibly-invalid int is UB — but we
-@@ -178,23 +198,23 @@ pub(crate) fn close(fd: i32) -> Result<(), i32> {
+@@ -178,23 +196,23 @@ pub(crate) fn close(fd: i32) -> Result<(), i32> {
  // ──────────────────────────────────────────────────────────────────────────
  
  #[inline]
@@ -173,7 +171,7 @@ index ae5cc00417..4efa57a0d0 100644
      // SAFETY: `dir` is caller-owned (or AT_FDCWD) for the call.
      let dir = unsafe { bfd(dir) };
      let at = rustix::fs::AtFlags::from_bits_retain(flags as u32);
-@@ -295,7 +315,7 @@ fn sys_retry(mut f: impl FnMut() -> libc::c_long) -> Result<usize, i32> {
+@@ -295,7 +313,7 @@ fn sys_retry(mut f: impl FnMut() -> libc::c_long) -> Result<usize, i32> {
  /// alias). The kernel reads the iovec array and writes through each
  /// `iov_base`; the array itself is never mutated.
  #[inline]
@@ -182,7 +180,7 @@ index ae5cc00417..4efa57a0d0 100644
      sys_retry(|| {
          // SAFETY: caller guarantees `vecs[..n]` are valid iovecs whose
          // `iov_base` are writable for `iov_len` bytes.
-@@ -305,7 +325,7 @@ pub(crate) unsafe fn readv(fd: Fd, vecs: *const libc::iovec, n: usize) -> Result
+@@ -305,7 +323,7 @@ pub(crate) unsafe fn readv(fd: Fd, vecs: *const libc::iovec, n: usize) -> Result
  
  /// Raw `writev(2)`.
  #[inline]
@@ -191,7 +189,7 @@ index ae5cc00417..4efa57a0d0 100644
      // Same shape as `readv` above: hand the raw `(iovec*, n)` pair straight to
      // the kernel rather than fabricating a `&[IoSlice]` just to satisfy
      // rustix's typed wrapper. The caller already owns a `&[PlatformIoVec]`;
-@@ -319,12 +339,7 @@ pub(crate) unsafe fn writev(fd: Fd, vecs: *const libc::iovec, n: usize) -> Resul
+@@ -319,12 +337,7 @@ pub(crate) unsafe fn writev(fd: Fd, vecs: *const libc::iovec, n: usize) -> Resul
  
  /// Raw `preadv(2)`.
  #[inline]
@@ -205,7 +203,7 @@ index ae5cc00417..4efa57a0d0 100644
      // The kernel `preadv` ABI splits the offset into (lo, hi) longs on every
      // arch; on LP64 the kernel's `pos_from_hilo` shifts `hi` out entirely, so
      // `lo` carries the full 64-bit offset. Mirror glibc's `LO_HI_LONG` for
-@@ -349,12 +364,7 @@ pub(crate) unsafe fn preadv(
+@@ -349,12 +362,7 @@ pub(crate) unsafe fn preadv(
  
  /// Raw `pwritev(2)`.
  #[inline]
@@ -219,7 +217,7 @@ index ae5cc00417..4efa57a0d0 100644
      // Mirror `preadv`: split offset per the kernel `pwritev` ABI and pass the
      // raw `(iovec*, n)` straight through instead of reconstructing a borrowed
      // `&[IoSlice]` for rustix's typed wrapper.
-@@ -396,7 +406,7 @@ pub(crate) unsafe fn pwritev(
+@@ -396,7 +404,7 @@ pub(crate) unsafe fn pwritev(
  /// references, identical semantics to the pre-refactor `libc::read` path
  /// minus the PLT hop and pthread cancellation point.
  #[inline]
@@ -228,7 +226,7 @@ index ae5cc00417..4efa57a0d0 100644
      // SAFETY: raw `read(2)`; kernel validates `fd`/`buf`/`count`.
      unsafe { libc::syscall(libc::SYS_read, fd, buf, count) as isize }
  }
-@@ -414,7 +424,7 @@ pub(crate) unsafe fn read_raw(fd: i32, buf: *mut u8, count: usize) -> isize {
+@@ -414,7 +422,7 @@ pub(crate) unsafe fn read_raw(fd: i32, buf: *mut u8, count: usize) -> isize {
  ///       letting the kernel reject them.
  /// Passing the raw quad straight through avoids all three.
  #[inline]
@@ -237,7 +235,7 @@ index ae5cc00417..4efa57a0d0 100644
      // SAFETY: raw `epoll_ctl(2)`; kernel validates `epfd`/`op`/`fd`; `event`
      // may be null for CTL_DEL (kernel ignores it).
      unsafe { libc::syscall(libc::SYS_epoll_ctl, epfd, op, fd, event) as i32 }
-@@ -427,7 +437,7 @@ pub(crate) unsafe fn epoll_ctl(epfd: i32, op: i32, fd: i32, event: *mut libc::ep
+@@ -427,7 +435,7 @@ pub(crate) unsafe fn epoll_ctl(epfd: i32, op: i32, fd: i32, event: *mut libc::ep
  /// constructing a niche-invalid `BorrowedFd`, and (b) `offset` stays a raw
  /// `*mut loff_t` with no `&mut u64` type-pun.
  #[inline]
@@ -246,7 +244,7 @@ index ae5cc00417..4efa57a0d0 100644
      // libc 0.2.186 omits `SYS_sendfile` from its aarch64 syscall tables (gnu,
      // musl, *and* android — every other arch has it). The
      // generic-syscall ABI (aarch64/riscv64/loongarch64) places `sendfile` at
-@@ -450,7 +460,7 @@ pub(crate) unsafe fn sendfile(out_fd: i32, in_fd: i32, offset: *mut i64, count:
+@@ -450,7 +458,7 @@ pub(crate) unsafe fn sendfile(out_fd: i32, in_fd: i32, offset: *mut i64, count:
  /// future flag bits; preserve that behavior exactly. Also avoids the `BorrowedFd` niche hazard
  /// and `*mut i64 → &mut u64` type-pun on the offset pointers.
  #[inline]
@@ -255,11 +253,8 @@ index ae5cc00417..4efa57a0d0 100644
      in_: i32,
      off_in: *mut i64,
      out: i32,
-@@ -458,25 +468,29 @@ pub(crate) unsafe fn copy_file_range(
-     len: usize,
-     flags: u32,
+@@ -460,23 +468,25 @@ pub(crate) unsafe fn copy_file_range(
  ) -> isize {
-+    // OHOS: copy_file_range verified available (rc=16 on 2026-06-07).
      // SAFETY: raw `copy_file_range(2)`; kernel validates fds; offset ptrs may
      // be null.
 -    unsafe {
@@ -288,7 +283,6 @@ index ae5cc00417..4efa57a0d0 100644
  }
  
  /// `pidfd_open(2)` — `Result` shape (caller maps to `bun_sys::Error`).
-+/// OHOS: verified available (returns fd) on 2026-06-07.
  #[inline]
  #[cfg(target_os = "linux")]
 -pub(crate) fn pidfd_open(pid: i32, flags: u32) -> Result<Fd, i32> {
@@ -296,11 +290,8 @@ index ae5cc00417..4efa57a0d0 100644
      let pid = rustix::process::Pid::from_raw(pid).ok_or(libc::EINVAL)?;
      let flags = rustix::process::PidfdFlags::from_bits_retain(flags);
      once(rustix::process::pidfd_open(pid, flags)).map(own_fd)
-@@ -485,9 +499,10 @@ pub(crate) fn pidfd_open(pid: i32, flags: u32) -> Result<Fd, i32> {
- /// `cfg(target_os = "linux")`, but the kernel ABI is identical (same generic
- /// syscall number 434 since Linux 5.3, before any Android NDK target shipped).
+@@ -487,7 +497,7 @@ pub(crate) fn pidfd_open(pid: i32, flags: u32) -> Result<Fd, i32> {
  /// Raw-syscall it like the other shims here.
-+/// OHOS: verified available (returns fd) on 2026-06-07.
  #[inline]
  #[cfg(target_os = "android")]
 -pub(crate) fn pidfd_open(pid: i32, flags: u32) -> Result<Fd, i32> {
@@ -308,7 +299,7 @@ index ae5cc00417..4efa57a0d0 100644
      if pid <= 0 {
          return Err(libc::EINVAL);
      }
-@@ -506,15 +521,13 @@ pub(crate) fn pidfd_open(pid: i32, flags: u32) -> Result<Fd, i32> {
+@@ -506,15 +516,13 @@ pub(crate) fn pidfd_open(pid: i32, flags: u32) -> Result<Fd, i32> {
  /// (matches the existing `WrappedIterator` parser which decodes the raw
  /// `linux_dirent64` records itself).
  #[inline]

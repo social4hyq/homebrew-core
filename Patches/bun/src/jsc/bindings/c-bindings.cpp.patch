@@ -1,5 +1,5 @@
 diff --git a/src/jsc/bindings/c-bindings.cpp b/src/jsc/bindings/c-bindings.cpp
-index 481ccddda1..3afd97b900 100644
+index 481ccddda1..2712007d11 100644
 --- a/src/jsc/bindings/c-bindings.cpp
 +++ b/src/jsc/bindings/c-bindings.cpp
 @@ -16,6 +16,9 @@
@@ -12,17 +12,14 @@ index 481ccddda1..3afd97b900 100644
  #include <termios.h>
  #include <sys/ioctl.h>
  #include <sys/socket.h>
-@@ -62,21 +65,35 @@ extern "C" int32_t set_process_priority(int32_t pid, int32_t priority)
+@@ -62,21 +65,30 @@ extern "C" int32_t set_process_priority(int32_t pid, int32_t priority)
  #if !OS(WINDOWS)
  extern "C" bool is_executable_file(const char* path)
  {
 -#if defined(O_EXEC)
 -    // O_EXEC is macOS specific
 +#if defined(__OHOS__)
-+    // OHOS kernel bug: open(O_EXEC) doesn't check file x permission bit,
-+    // so a 0660 file incorrectly succeeds. Use access(X_OK) instead.
-+    // But access(X_OK) returns true for directories (x bit = traversal),
-+    // so we must also verify it is a regular file, not a directory.
++    // OHOS: open(O_EXEC) skips the x-permission-bit check (kernel bug), so use access(X_OK); access passes directories too (x = traversal), so require S_ISREG first.
 +    struct stat st;
 +    if (stat(path, &st) != 0)
 +        return false;
@@ -39,9 +36,7 @@ index 481ccddda1..3afd97b900 100644
 -#endif // defined(O_EXEC)
 -
 +#else
-+    // Linux (no O_EXEC): use stat to check x bit. Directories also carry an
-+    // x bit (traversal permission), so this must also reject non-regular
-+    // files the same way the OHOS branch above does.
++    // Linux (no O_EXEC): stat + x-bit check; reject non-regular files like the OHOS branch above (directories carry an x bit).
      struct stat st;
      if (stat(path, &st) != 0)
          return false;
@@ -55,7 +50,7 @@ index 481ccddda1..3afd97b900 100644
  }
  #endif
  
-@@ -358,20 +375,24 @@ extern "C" void on_before_reload_process_posix()
+@@ -358,20 +370,22 @@ extern "C" void on_before_reload_process_posix()
  }
  
  #if OS(LINUX)
@@ -67,8 +62,7 @@ index 481ccddda1..3afd97b900 100644
  // an exec of this process is retried instead. `execve_generation` counts execs ever started
  // so one that began and ended inside a single pthread_create is still seen; it is bumped
 -// after `threads_in_execve` and read before it.
-+// after `threads_in_execve` and read before it. This state and the retry algorithm below are
-+// shared by both platform variants; only how the real execve/pthread_create get called differs.
++// after `threads_in_execve` and read before it. Shared by both platform variants below; only how the real execve/pthread_create get called differs.
  static std::atomic<int> threads_in_execve { 0 };
  static std::atomic<unsigned> execve_generation { 0 };
  // The clone(CLONE_VM) child of posix_spawn_bun execs in this address space and never returns
@@ -77,40 +71,17 @@ index 481ccddda1..3afd97b900 100644
  
 +#if !defined(__OHOS__)
 +// Linked in with -Wl,--wrap=execve -Wl,--wrap=pthread_create (scripts/build/flags.ts).
-+// __real_execve/__real_pthread_create are aliased by the linker's --wrap to the
-+// original symbols, which requires them to be visible at static-link time.
++// --wrap aliases __real_* to the originals, which must be visible at static-link time — see the __OHOS__ branch for why that fails on OHOS.
  extern "C" int __real_execve(const char*, char* const[], char* const[]);
  extern "C" int __real_pthread_create(pthread_t*, const pthread_attr_t*, void* (*)(void*), void*);
  
-@@ -404,6 +425,94 @@ extern "C" int __wrap_pthread_create(pthread_t* thread, const pthread_attr_t* at
+@@ -404,6 +418,71 @@ extern "C" int __wrap_pthread_create(pthread_t* thread, const pthread_attr_t* at
          usleep(1000);
      }
  }
 +#else // defined(__OHOS__)
-+// bun-ohos links dynamically against ld-musl.so, so execve/pthread_create live in a
-+// shared object, not in any archive being linked — lld's --wrap only resolves
-+// __real_* against a symbol definition visible at static-link time, so on OHOS
-+// __real_execve/__real_pthread_create would be left as unresolved dynamic
-+// relocations (the linker only warns; the musl loader hard-fails at process start,
-+// "Error relocating ...: __real_execve: symbol not found"). --wrap is unusable
-+// here, so this defines plain-named `execve`/`pthread_create` instead: for a
-+// dynamically linked executable, symbols the executable itself exports take
-+// priority over the same-named symbols in its shared-library dependencies for
-+// every reference resolved through the executable's own symbol table — the same
-+// rule LD_PRELOAD relies on, minus the injected library. Every pthread_create/
-+// execve call compiled into bun itself (this file, WTF::Thread::create, JSC/WTF's
-+// static WebKit archive, etc.) goes through that table and lands here; musl's own
-+// internal callers bypass it via direct/hidden calls and are unaffected, which is
-+// fine since only bun's own thread-spawning needs protecting. This is the exact
-+// mechanism scripts/build/shims/ohos_compat_shim.c already uses for 18 other libc
-+// symbols (close, dup2, getcwd, splice, ...), compiled straight into this binary.
-+//
-+// The real function pointers are resolved eagerly in bun_initialize_process(),
-+// not lazily on first call: bun-spawn.cpp's posix_spawn_bun runs execve() from
-+// inside a CLONE_VM|CLONE_VFORK child, where the parent is suspended until the
-+// child execs. A lazy dlsym() on that child's first-ever execve could race the
-+// parent for the dynamic linker's lock and deadlock the whole process. The lazy
-+// fallback below only exists to be safe if something calls in before init.
++// OHOS links dynamically against ld-musl.so, so lld's --wrap is unusable (__real_* left unresolved; the musl loader hard-fails at start) — instead plain-named execve/pthread_create interpose via the executable's export-priority over its shared-lib deps, the same mechanism ohos_compat_shim.c uses; see scripts/build/flags.ts's excluded --wrap entry.
++// The real pointers are resolved eagerly in bun_initialize_process(): a lazy dlsym() inside posix_spawn_bun's CLONE_VM|CLONE_VFORK child could race the suspended parent for the dynamic linker's lock and deadlock the process. The lazy fallback only covers calls before init.
 +typedef int (*execve_fn)(const char*, char* const[], char* const[]);
 +typedef int (*pthread_create_fn)(pthread_t*, const pthread_attr_t*, void* (*)(void*), void*);
 +static std::atomic<execve_fn> real_execve_ptr { nullptr };
@@ -136,8 +107,7 @@ index 481ccddda1..3afd97b900 100644
 +    return fn;
 +}
 +
-+// Called once from bun_initialize_process(), well before any vfork child could
-+// call execve() and race a lazy dlsym() against a lock the suspended parent holds.
++// Called once from bun_initialize_process() — see the block comment above for why this must be eager.
 +static void resolveRealExecveAndPthreadCreateEagerly()
 +{
 +    real_execve_ptr.store(reinterpret_cast<execve_fn>(dlsym(RTLD_NEXT, "execve")), std::memory_order_release);
@@ -177,7 +147,7 @@ index 481ccddda1..3afd97b900 100644
  #endif // OS(LINUX)
  
  #endif // !OS(WINDOWS)
-@@ -706,6 +815,9 @@ extern "C" void bun_initialize_process()
+@@ -706,6 +785,9 @@ extern "C" void bun_initialize_process()
      bun_close_range(4, ~0U, CLOSE_RANGE_CLOEXEC);
  
      execve_counting_pid = getpid();
@@ -187,7 +157,7 @@ index 481ccddda1..3afd97b900 100644
  #endif
  
  #if OS(LINUX) || OS(DARWIN) || OS(FREEBSD)
-@@ -1132,7 +1244,11 @@ extern "C" void Bun__unregisterSignalsForForwarding()
+@@ -1132,7 +1214,11 @@ extern "C" void Bun__unregisterSignalsForForwarding()
  #if OS(LINUX) || OS(DARWIN) || OS(FREEBSD)
  #include <paths.h>
  

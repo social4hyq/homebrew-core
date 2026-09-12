@@ -1,8 +1,8 @@
 diff --git a/scripts/build/workarounds.ts b/scripts/build/workarounds.ts
-index fd19077373..4d09262faa 100644
+index fd19077373..c567bc30dd 100644
 --- a/scripts/build/workarounds.ts
 +++ b/scripts/build/workarounds.ts
-@@ -65,6 +65,76 @@ export interface Workaround {
+@@ -65,6 +65,67 @@ export interface Workaround {
  }
  
  export const workarounds: Workaround[] = [
@@ -16,9 +16,7 @@ index fd19077373..4d09262faa 100644
 +      "into the executable with its symbols re-exported, so bun and every `bun build --compile` " +
 +      "output run without the LD_PRELOAD wrapper the harmonybrew formulas used to require.",
 +    applies: cfg => cfg.ohos,
-+    // Sandbox seccomp policy, not a toolchain bug — no toolchain bump fixes
-+    // it. Re-evaluate only if HarmonyOS ever relaxes the app allowlist
-+    // (probe: a plain close_range() call surviving in a hishell terminal).
++    // Sandbox seccomp policy, not a toolchain bug — re-evaluate only if HarmonyOS ever relaxes the app allowlist (probe: plain close_range() surviving in a hishell terminal).
 +    expectedToBeFixed: () => false,
 +    cleanup:
 +      `Delete scripts/build/shims/ohos_compat_shim.c, needsOhosCompatShim() and its blocks in ` +
@@ -36,10 +34,7 @@ index fd19077373..4d09262faa 100644
 +      "materialize a tiny CJS preload on disk and append `--require <preload>` to a node-like " +
 +      "child's NODE_OPTIONS, passing the shim-resolved username through BUN_OHOS_USERNAME.",
 +    applies: cfg => cfg.ohos,
-+    // Same sandbox policy as ohos-compat-shim-embed: no toolchain bump fixes
-+    // it. Re-evaluate only if HarmonyOS ever adds sandbox uids to the
-+    // passwd database (probe: `getent passwd $(id -u)` succeeding in a
-+    // hishell terminal).
++    // Same sandbox policy as ohos-compat-shim-embed — re-evaluate only if HarmonyOS ever adds sandbox uids to the passwd database (probe: `getent passwd $(id -u)` succeeding in a hishell terminal).
 +    expectedToBeFixed: () => false,
 +    cleanup:
 +      `Delete src/runtime/api/bun/ohos_node_userinfo.rs, its #[cfg(target_env = "ohos")] mod ` +
@@ -64,11 +59,7 @@ index fd19077373..4d09262faa 100644
 +      "ohos-compat-shim already uses for 18 other libc symbols (see " +
 +      "'ohos-compat-shim-embed' above).",
 +    applies: cfg => cfg.ohos,
-+    // Not a toolchain version gap --wrap-against-shared-object support gaining a
-+    // version threshold: it's an architectural mismatch (dynamic musl vs a
-+    // linker feature built for static/versioned symbols). Re-evaluate only if
-+    // bun-ohos ever links musl statically, or lld gains --wrap resolution
-+    // against a symbol only present in a shared-object dependency.
++    // Architectural mismatch (dynamic musl vs --wrap's static-link-time __real_* resolution), not a toolchain version gap — re-evaluate only if bun-ohos links musl statically or lld gains --wrap resolution against shared-object symbols.
 +    expectedToBeFixed: () => false,
 +    cleanup:
 +      `Delete the #if defined(__OHOS__) branch (execve/pthread_create via dlsym) in ` +

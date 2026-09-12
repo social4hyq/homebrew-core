@@ -1,9 +1,9 @@
 diff --git a/src/ohos_sign/src/elf.rs b/src/ohos_sign/src/elf.rs
 new file mode 100644
-index 0000000000..f879edcc48
+index 0000000000..84ff718d8f
 --- /dev/null
 +++ b/src/ohos_sign/src/elf.rs
-@@ -0,0 +1,322 @@
+@@ -0,0 +1,305 @@
 +use std::fmt;
 +
 +use crate::{descriptor, merkle, sha256};
@@ -77,15 +77,11 @@ index 0000000000..f879edcc48
 +    let e_shentsize = read_u16(elf, E_SHENTSIZE);
 +    let e_shnum = read_u16(elf, E_SHNUM);
 +    let e_shstrndx = read_u16(elf, E_SHSTRNDX);
-+    // Every offset computed downstream assumes a 64-byte ELF64 section header
-+    // entry (`e_shoff + i * 64`); reject anything else instead of silently
-+    // misreading the section header table.
++    // Downstream offsets assume 64-byte section header entries (`e_shoff + i * 64`); reject anything else.
 +    if e_shentsize != 64 || e_shoff == 0 || e_shnum == 0 || e_shstrndx as u64 >= e_shnum as u64 {
 +        return Err(SignError::NoSectionHeaders);
 +    }
-+    // Reject a section header table that runs past the end of the buffer —
-+    // downstream reads (find_section_by_name, strip) index into it assuming
-+    // this holds and would otherwise panic on a truncated/malformed ELF.
++    // Reject a section header table running past the buffer — downstream indexes assume it is in-bounds.
 +    let sht_end = (e_shoff as usize)
 +        .checked_add(e_shnum as usize * 64)
 +        .ok_or(SignError::NoSectionHeaders)?;
@@ -128,8 +124,7 @@ index 0000000000..f879edcc48
 +    find_section_by_name(elf, e_shoff, e_shnum, e_shstrndx, CODESIGN_NAME).is_some()
 +}
 +
-+/// Strip .codesign section. Returns true if a section was removed.
-+/// Rebuilds the ELF in-place by rewriting shstrtab and SHT without the removed entry.
++/// Strip the .codesign section by rebuilding shstrtab + SHT; returns true if one was removed.
 +pub fn strip(elf: &mut Vec<u8>) -> Result<bool, SignError> {
 +    let (e_shoff, e_shnum, e_shstrndx) = parse_header(elf)?;
 +    let Some(cs_entry_off) =
@@ -139,7 +134,6 @@ index 0000000000..f879edcc48
 +    };
 +    let cs_idx = (cs_entry_off - e_shoff as usize) / 64;
 +
-+    // Read shstrtab location
 +    let shstr_e = e_shoff as usize + e_shstrndx as usize * 64;
 +    let shstr_off = read_u64(elf, shstr_e + 24) as usize;
 +    let shstr_sz = read_u64(elf, shstr_e + 32) as usize;
@@ -167,26 +161,23 @@ index 0000000000..f879edcc48
 +        new_sht.extend_from_slice(&entry);
 +    }
 +
-+    // Place new shstrtab and SHT at end of file (after removing the .codesign section data)
++    // Place new shstrtab and SHT at end of file
 +    let cs_sec_off = read_u64(elf, cs_entry_off + 24) as usize;
 +    let cs_sec_sz = read_u64(elf, cs_entry_off + 32) as usize;
 +
-+    // Truncate the ELF to remove the .codesign section data.
-+    // Assumption: .codesign is at end of file (which it always is, since we append it).
++    // Truncate the .codesign section data; assumes .codesign sits at EOF (we always append it).
 +    let keep_len = cs_sec_off.min(elf.len());
 +    elf.truncate(keep_len);
 +
-+    // Append new shstrtab
 +    let new_shstr_off = elf.len() as u64;
 +    elf.extend_from_slice(&new_shstr);
 +
-+    // Align SHT to 8 bytes
 +    let new_sht_off = align_up(elf.len() as u64, 8);
 +    elf.resize(new_sht_off as usize, 0);
 +    let new_sht_off_usize = elf.len();
 +    elf.extend_from_slice(&new_sht);
 +
-+    // Update shstrtab entry (adjust name offsets for removed string)
++    // Relocate the shstrtab entry (its index shifts if it sat after the removed section).
 +    let new_shstrndx = e_shstrndx as usize;
 +    let shstr_entry_off_in_new = new_shstrndx * 64;
 +    if new_shstrndx < cs_idx {
@@ -222,8 +213,7 @@ index 0000000000..f879edcc48
 +    Ok(true)
 +}
 +
-+/// Inject a 4KB placeholder .codesign section.
-+/// Returns (new_elf_bytes, cs_section_file_offset).
++/// Inject a 4KB placeholder .codesign section; returns (new ELF bytes, its file offset).
 +fn inject_codesign_section(elf: &[u8]) -> Result<(Vec<u8>, u64), SignError> {
 +    let (e_shoff, e_shnum, e_shstrndx) = parse_header(elf)?;
 +
@@ -247,7 +237,6 @@ index 0000000000..f879edcc48
 +    }
 +    let cs_off = align_up(cur_end, PAGE as u64);
 +
-+    // new shstrtab = old shstrtab + ".codesign\0"
 +    let cs_shname = shstr_sz as u32;
 +    let mut new_shstr = elf[shstr_off as usize..shstr_off as usize + shstr_sz as usize].to_vec();
 +    new_shstr.extend_from_slice(CODESIGN_NAME);
@@ -259,17 +248,14 @@ index 0000000000..f879edcc48
 +    let new_total = new_sht_off as usize + new_shnum as usize * 64;
 +
 +    let mut buf = vec![0u8; new_total];
-+    // 1) original content (may be shorter than cs_off)
++    // original content may be shorter than cs_off
 +    let copy_len = elf.len().min(new_total);
 +    buf[..copy_len.min(cs_off as usize)].copy_from_slice(&elf[..copy_len.min(cs_off as usize)]);
-+    // 2) .codesign section (4KB zeros, already zero)
-+    // 3) new shstrtab
++    // .codesign section: 4KB zeros, already zero
 +    buf[new_shstr_off as usize..new_shstr_off as usize + new_shstr.len()]
 +        .copy_from_slice(&new_shstr);
-+    // 4) old SHT at new position
 +    buf[new_sht_off as usize..new_sht_off as usize + e_shnum as usize * 64]
 +        .copy_from_slice(&elf[e_shoff as usize..e_shoff as usize + e_shnum as usize * 64]);
-+    // 5) new .codesign SHT entry
 +    let cs_e = new_sht_off as usize + e_shnum as usize * 64;
 +    buf[cs_e..cs_e + 4].copy_from_slice(&cs_shname.to_le_bytes()); // sh_name
 +    buf[cs_e + 4..cs_e + 8].copy_from_slice(&1u32.to_le_bytes()); // sh_type = SHT_PROGBITS
@@ -277,12 +263,10 @@ index 0000000000..f879edcc48
 +    buf[cs_e + 24..cs_e + 32].copy_from_slice(&cs_off.to_le_bytes()); // sh_offset
 +    buf[cs_e + 32..cs_e + 40].copy_from_slice(&(PAGE as u64).to_le_bytes()); // sh_size
 +    buf[cs_e + 48..cs_e + 56].copy_from_slice(&(PAGE as u64).to_le_bytes()); // sh_addralign
-+    // 6) update shstrtab entry in new SHT
 +    let shstr_e_new = new_sht_off as usize + e_shstrndx as usize * 64;
 +    buf[shstr_e_new + 24..shstr_e_new + 32].copy_from_slice(&new_shstr_off.to_le_bytes());
 +    buf[shstr_e_new + 32..shstr_e_new + 40]
 +        .copy_from_slice(&(new_shstr.len() as u64).to_le_bytes());
-+    // 7) update ELF header
 +    write_u64(&mut buf, E_SHOFF, new_sht_off);
 +    write_u16(&mut buf, E_SHNUM, new_shnum);
 +    // e_shstrndx unchanged
@@ -321,7 +305,6 @@ index 0000000000..f879edcc48
 +    payload[8..8 + descriptor::SIZE].copy_from_slice(&desc_on_disk);
 +    payload[8 + descriptor::SIZE..].copy_from_slice(&signature);
 +
-+    // Write payload into the cs section
 +    tmp[cs_off as usize..cs_off as usize + payload.len()].copy_from_slice(&payload);
 +
 +    Ok(tmp)

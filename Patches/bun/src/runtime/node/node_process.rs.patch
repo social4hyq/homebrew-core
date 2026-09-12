@@ -1,15 +1,13 @@
 diff --git a/src/runtime/node/node_process.rs b/src/runtime/node/node_process.rs
-index 18643dcb20..2bccafc0fa 100644
+index 18643dcb20..95814c57d4 100644
 --- a/src/runtime/node/node_process.rs
 +++ b/src/runtime/node/node_process.rs
-@@ -444,7 +444,14 @@ mod _impl {
+@@ -444,7 +444,12 @@ mod _impl {
          // Real syscall (not the resolver's cached top_level_dir): Node's
          // process.cwd() calls uv_cwd() so a deleted cwd must surface here.
          let mut buf = PathBuffer::uninit();
 -        match bun_sys::getcwd(&mut buf[..]) {
-+        // OHOS: use process_cwd(), which surfaces a rmdir'd cwd as ENOENT
-+        // (Node's uv_cwd() contract) instead of the ohos-compat-shim's $HOME
-+        // fallback. Other platforms use the plain getcwd().
++        // OHOS: process_cwd() surfaces a rmdir'd cwd as ENOENT (Node's uv_cwd() contract) instead of the compat shim's $HOME fallback; other platforms use plain getcwd().
 +        #[cfg(target_env = "ohos")]
 +        let result = bun_sys::process_cwd(&mut buf[..]);
 +        #[cfg(not(target_env = "ohos"))]

@@ -1,8 +1,8 @@
 diff --git a/src/install/npm.rs b/src/install/npm.rs
-index 910f39f821..287e9c0b24 100644
+index 910f39f821..f24df86a26 100644
 --- a/src/install/npm.rs
 +++ b/src/install/npm.rs
-@@ -1180,11 +1180,32 @@ pub mod package_manifest {
+@@ -1180,11 +1180,26 @@ pub mod package_manifest {
              #[cfg(any(target_os = "linux", target_os = "android"))]
              if is_using_o_tmpfile {
                  // Attempt #1.
@@ -14,13 +14,7 @@ index 910f39f821..287e9c0b24 100644
 -                    bun_sys::linkat_tmpfile(file.handle, cache_dir, outpath)?;
 -                    // There is no attempt #3. This is a cache, so it's not essential.
 +                    let link_ok2 = bun_sys::linkat_tmpfile(file.handle, cache_dir, outpath);
-+                    // Attempt #3: linkat_tmpfile still failing. On OHOS the compat
-+                    // shim's linkat hook now materializes the O_TMPFILE via a
-+                    // /proc/self/fd copy, so attempt #1 usually succeeds; this is the
-+                    // last resort for any remaining linkat failure. Write to tmp_path
-+                    // then rename atomically so quick_exit cannot observe a 0-byte or
-+                    // partially-written .npm file ("manifest is invalid" on reload).
-+                    // Non-fatal: this is a cache, so a failure is just a lost entry.
++                    // Attempt #3: write tmp_path then rename so quick_exit never observes a partial .npm; it's a cache, so non-fatal.
 +                    if link_ok2.is_err() {
 +                        if let Ok(tmp_file) = File::openat(
 +                            tmpdir,

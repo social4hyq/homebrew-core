@@ -1,8 +1,8 @@
 diff --git a/src/runtime/node/node_fs.rs b/src/runtime/node/node_fs.rs
-index 96175454fe..f1cc555865 100644
+index 96175454fe..3b276af245 100644
 --- a/src/runtime/node/node_fs.rs
 +++ b/src/runtime/node/node_fs.rs
-@@ -4570,11 +4570,14 @@ impl NodeFS {
+@@ -4570,11 +4570,8 @@ impl NodeFS {
          // buf_to_free dropped at scope exit
  
          let mut remain = stat_size as u64;
@@ -11,18 +11,12 @@ index 96175454fe..f1cc555865 100644
 -        // `remain` had already saturated to 0 would still enter the else. Track
 -        // an explicit `broke` flag instead.
 -        let mut broke = false;
-+        // The "read until EOF" fallback below is only correct when the caller
-+        // did not specify a size (stat_size == 0 is the explicit "unknown"
-+        // sentinel used by every call site — see copy_file.rs and the fs.copyFile
-+        // paths). When stat_size > 0 it is a hard limit (e.g. a sliced
-+        // destination in `Bun.write(Bun.file(p).slice(0, N), ...)`), and falling
-+        // through to the EOF loop just because the first loop happened to hit
-+        // the limit without EOF would copy past the requested boundary.
++        // stat_size == 0 is the "unknown size" sentinel: only then may the read-until-EOF tail below run — a positive stat_size is a hard limit (e.g. `Bun.write(Bun.file(p).slice(0, N), ..)`), not a hint.
 +        let unknown_size = stat_size == 0;
          'toplevel: while remain > 0 {
              let read_len = (buf.len() as u64).min(remain) as usize;
              let amt = match Syscall::read(src_fd, &mut buf[..read_len]) {
-@@ -4589,7 +4592,6 @@ impl NodeFS {
+@@ -4589,7 +4586,6 @@ impl NodeFS {
              };
              // 0 == EOF
              if amt == 0 {
@@ -30,7 +24,7 @@ index 96175454fe..f1cc555865 100644
                  break 'toplevel;
              }
              *wrote += amt as u64;
-@@ -4608,13 +4610,12 @@ impl NodeFS {
+@@ -4608,13 +4604,12 @@ impl NodeFS {
                      }
                  };
                  if written == 0 {
@@ -45,20 +39,11 @@ index 96175454fe..f1cc555865 100644
              'outer: loop {
                  let amt = match Syscall::read(src_fd, buf) {
                      Ok(result) => result,
-@@ -5349,8 +5350,36 @@ impl NodeFS {
+@@ -5349,8 +5344,27 @@ impl NodeFS {
                  Ok(result) => Ok(result),
              };
          }
-+        // OHOS: go through `linkat` rather than `link`. The kernel refuses the
-+        // bare linkat syscall with EACCES, and ohos-compat-shim works around
-+        // that by interposing the libc *symbol* `linkat` (falling back to a
-+        // byte copy). musl implements `link(a, b)` as a direct
-+        // `syscall(SYS_linkat, AT_FDCWD, a, AT_FDCWD, b, 0)`, so it never
-+        // reaches that symbol and never gets the workaround. Measured
-+        // on-device: the libc `linkat` symbol succeeds where both `link()` and
-+        // the raw syscall return EACCES, and stripping the shim from
-+        // LD_PRELOAD makes `linkat` fail too. AT_FDCWD makes both paths
-+        // resolve exactly as `link` would.
++        // OHOS: musl's `link()` issues the raw `syscall(SYS_linkat, ..)`, which the kernel rejects with EACCES; only the shim-interposed libc `linkat` symbol works, so route through it.
 +        // SAFETY: `from`/`to` are NUL-terminated by `slice_z`.
 +        #[cfg(all(not(windows), target_env = "ohos"))]
 +        return Maybe::<ret::Link>::errno_sys_pd(
@@ -83,23 +68,12 @@ index 96175454fe..f1cc555865 100644
          Maybe::<ret::Link>::errno_sys_pd(
              unsafe { libc::link(from.as_ptr().cast(), to.as_ptr().cast()) },
              sys::Tag::link,
-@@ -6977,18 +7006,41 @@ impl NodeFS {
+@@ -6977,18 +6991,29 @@ impl NodeFS {
              return Err(abort_err());
          }
  
 -        let stat_ = Syscall::fstat(fd)?;
-+        // A descriptor that reads fine but refuses to describe itself is not a
-+        // fatal case. The HarmonyOS sandbox denies fstat/statx (and
-+        // stat("/proc/self/fd/N")) on memfd descriptors whose read() returns
-+        // the full contents — verified with a standalone C probe, which
-+        // passes unchanged inside the OpenHarmony container. Failing here
-+        // turned a readable fd into `EACCES: permission denied, fstat`.
-+        //
-+        // The size is only ever a hint: the loop below already has an
-+        // unbounded tail phase for files whose stat size is wrong or stale
-+        // (issue #1220), so an unknown size degrades to exactly that path.
-+        // Only metadata-permission errors fall back; EBADF and friends still
-+        // propagate, since a read would not be meaningful either.
++        // The HarmonyOS sandbox denies fstat on readable memfd descriptors: treat EACCES/EPERM as "size unknown" (the loop's unbounded tail covers it); other errnos still propagate.
 +        let stat_ = match Syscall::fstat(fd) {
 +            Ok(stat_) => Some(stat_),
 +            Err(err) if err.errno == E::EACCES as _ || err.errno == E::EPERM as _ => None,
@@ -124,8 +98,7 @@ index 96175454fe..f1cc555865 100644
 +                    .max(0) as u64
 +                    + (string_type == ReadFileStringType::NullTerminated) as u64
 +            }
-+            // Unknown: claim only what has already been read, so the loop
-+            // starts in its unbounded phase and grows as the reads land.
++            // Unknown size: claim only what has already been read, so the loop starts in its unbounded phase.
 +            None => total as u64,
 +        };
  

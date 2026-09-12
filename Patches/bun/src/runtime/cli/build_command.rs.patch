@@ -1,13 +1,12 @@
 diff --git a/src/runtime/cli/build_command.rs b/src/runtime/cli/build_command.rs
-index a175206c57..22884c1aad 100644
+index a175206c57..a6045de5d9 100644
 --- a/src/runtime/cli/build_command.rs
 +++ b/src/runtime/cli/build_command.rs
-@@ -1023,6 +1023,36 @@ impl BuildCommand {
+@@ -1023,6 +1023,35 @@ impl BuildCommand {
                      }
                  }
  
-+                // OHOS: strip stale .codesign (bun payload shifts alignment) and re-sign
-+                // in-process so the compiled binary can execute under the seccomp policy.
++                // OHOS: the appended payload invalidates the .codesign (shifts alignment), so strip it and re-sign in-process or the compiled binary can't execute.
 +                #[cfg(target_env = "ohos")]
 +                {
 +                    use std::os::unix::ffi::OsStrExt;

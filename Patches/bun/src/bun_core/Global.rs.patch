@@ -1,8 +1,8 @@
 diff --git a/src/bun_core/Global.rs b/src/bun_core/Global.rs
-index 3ac4e52ace..cc66ad8fef 100644
+index 3ac4e52ace..2774f9d0c0 100644
 --- a/src/bun_core/Global.rs
 +++ b/src/bun_core/Global.rs
-@@ -551,15 +551,19 @@ pub const package_json_version_with_revision: &str = if env::GIT_SHA.is_empty()
+@@ -551,15 +551,17 @@ pub const package_json_version_with_revision: &str = if env::GIT_SHA.is_empty()
  };
  
  // Node-style platform string. Distinct from Environment.os.nameString() on
@@ -10,9 +10,7 @@ index 3ac4e52ace..cc66ad8fef 100644
 -// working), but user-facing strings — npm user-agent, process.platform —
 -// must be "android" so native-addon postinstalls don't fetch glibc binaries.
 -pub const os_name: &str = if cfg!(target_os = "android") {
-+// Android + OHOS: the kernel-level OS enum stays .linux (so syscall switches
-+// keep working), but user-facing strings — npm user-agent, process.platform —
-+// must match Node.js so native-addon optional deps resolve correctly.
++// Android + OHOS: kernel OS enum stays .linux (syscall switches keep working); user-facing strings (npm UA, process.platform) must match Node so native-addon optional deps resolve.
 +pub const os_name: &str = if cfg!(target_env = "ohos") {
 +    "openharmony"
 +} else if cfg!(target_os = "android") {
