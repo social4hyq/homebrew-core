@@ -7,7 +7,7 @@ class Nixfmt < Formula
   head "https://github.com/NixOS/nixfmt.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4932b060489c3e072de42f1b2622a3b205878414685685c88454a7a585a3e84"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0daf360b450add8bcd1c4854441bc32ab9dfc438fa387668a403d788ceac53e0"
   end
 
   depends_on "cabal-install" => :build
