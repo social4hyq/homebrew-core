@@ -7,7 +7,7 @@ class Permify < Formula
   head "https://github.com/Permify/permify.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5d260b2ea28d948bdbc8e1f0fd28ce8d69a36c4a2699887fda4fbabfc858dcc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fadbf1d0e5de4fc607d6e94d41f0b3613fb5aaebe0e3690f0bdb300e05de65fb"
   end
 
   depends_on "go" => :build
