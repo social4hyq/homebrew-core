@@ -1,12 +1,12 @@
 class Arf < Formula
   desc "Modern R console with syntax highlighting and fuzzy search"
   homepage "https://github.com/eitsupi/arf"
-  url "https://github.com/eitsupi/arf/archive/refs/tags/v0.5.1.tar.gz"
-  sha256 "cc745c4a2411c9eee3eaeef31c70f7ebed75e28277624b95d602ac8efc068f93"
+  url "https://github.com/eitsupi/arf/archive/refs/tags/v0.5.2.tar.gz"
+  sha256 "34647ecda535521c18dd26dc2b609c390b02876f47e76d661750bb44ca9fc602"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "84a14ceaa475c4eb41c16fd5fa8706fb7ed695b9588c645f36675b7f11330f83"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2a922c226fe8794017d0f49e6f660e5324db5e4a75285a6a842b880991af49c"
   end
 
   depends_on "rust" => :build
