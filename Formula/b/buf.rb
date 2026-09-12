@@ -15,7 +15,7 @@ class Buf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4ca407bbf6194e45ae1b6518a6bcc572c223e56ed383f41c87205be760e68d0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "15acd196073f29c55093e5c7c1973aee9af0ecf7b1afdb64bd9404d7f17624ea"
   end
 
   depends_on "go" => :build
