@@ -1,13 +1,13 @@
 class Upterm < Formula
   desc "Instant terminal sharing"
   homepage "https://github.com/owenthereal/upterm"
-  url "https://github.com/owenthereal/upterm/archive/refs/tags/v0.24.0.tar.gz"
-  sha256 "263ef7af78f8fd0c6f480204b435ac4269b5baf04626c73ae92521b0c061a642"
+  url "https://github.com/owenthereal/upterm/archive/refs/tags/v0.26.0.tar.gz"
+  sha256 "2eee37b11631e7ecf2a51c94d7a5051fcdf5beebf0fd69f50c9272fb0252de55"
   license "Apache-2.0"
   head "https://github.com/owenthereal/upterm.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e2e88f98b2e244e8066bc01921c6e1d600bd9aded9621d8c5d4747fdafd2dfa7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f00cc4be77e88f0247f1679cc9ae9788bd7e979442a2ce75c892df8491391c14"
   end
 
   depends_on "go" => :build
