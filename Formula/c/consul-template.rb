@@ -1,13 +1,13 @@
 class ConsulTemplate < Formula
   desc "Generic template rendering and notifications with Consul"
   homepage "https://github.com/hashicorp/consul-template"
-  url "https://github.com/hashicorp/consul-template/archive/refs/tags/v0.42.1.tar.gz"
-  sha256 "def64b66c47dd38d98e37bfa1b571584ed9ab5f98be0dce09304c68b7ac966eb"
+  url "https://github.com/hashicorp/consul-template/archive/refs/tags/v0.43.0.tar.gz"
+  sha256 "95b2f441437ceafb8dadea03aa62589d78fd03d0dc31005cf51d4042c3d6fe74"
   license "MPL-2.0"
   head "https://github.com/hashicorp/consul-template.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "636e5de3b7ee7f1af8db1f7703a1e628410f2ecfe58bbc1ee4c960ebd177971e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e648991312c60d7758adb075803006265205f41f732a5d16a118b85060057c3"
   end
 
   depends_on "go" => :build
