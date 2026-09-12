@@ -3,14 +3,13 @@ class PythonBuild < Formula
 
   desc "Simple, correct PEP 517 build frontend"
   homepage "https://github.com/pypa/build"
-  url "https://files.pythonhosted.org/packages/4d/b7/1db48a9ce2984842c8c886432ec8a2719613322e868a966ba82a28862f25/build-1.6.0.tar.gz"
-  sha256 "bd2c8afc603e7a2e0ce70e2ea85f0a6d02043bafbd307f5bada0f98669eca5af"
+  url "https://files.pythonhosted.org/packages/bd/67/4898a44ea4f3f8e213b0954ec0aa0a16971d62a6212d6ea3931e97115b99/build-1.6.1.tar.gz"
+  sha256 "51cc11666391ab6f092070437ac747002ff46f3e4113a3622177ee6b488bfc53"
   license "MIT"
-  revision 1
   head "https://github.com/pypa/build.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f53ce06f60196f07639834cb60b8b372a80f8337edddcef7d20ac447bd28ba0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "943a8343ff05c8f0d03b4a1b67232c3618e79237274335434c17d48365e0519d"
   end
 
   depends_on "python@3.14"
