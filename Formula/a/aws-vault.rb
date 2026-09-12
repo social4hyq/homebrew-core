@@ -1,8 +1,8 @@
 class AwsVault < Formula
   desc "Securely store and access AWS credentials in development environments"
   homepage "https://github.com/ByteNess/aws-vault"
-  url "https://github.com/ByteNess/aws-vault/archive/refs/tags/v7.13.6.tar.gz"
-  sha256 "84d282802cd867ea37dde7824ec2628cbe19f599b3acd55e73cd3d6f6cf244de"
+  url "https://github.com/ByteNess/aws-vault/archive/refs/tags/v7.14.0.tar.gz"
+  sha256 "17c13c6d3335510cbd1d0603df67764b63c467eb46781307d12d2dc84bf5e82e"
   license "MIT"
   head "https://github.com/ByteNess/aws-vault.git", branch: "main"
 
@@ -12,7 +12,7 @@ class AwsVault < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8929508e04b590088515a5e3fefacefa1219ca99cebbc4475cd402862b2c0a3a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8688b1a5c8504dbb968d0779181aa0719eb99a2ce032ddc6b8108274afbd9a0c"
   end
 
   depends_on "go" => :build
