@@ -1,10 +1,9 @@
 class Vite < Formula
   desc "Next generation frontend tooling. It's fast!"
   homepage "https://vitejs.dev/"
-  url "https://registry.npmjs.org/vite/-/vite-8.2.2.tgz"
-  sha256 "99df542e1d7267c0da524bdb216ebc32a4dfefc17f8fe830067b62a1042fbeb7"
+  url "https://registry.npmjs.org/vite/-/vite-8.3.0.tgz"
+  sha256 "8341c0e40cf1700c68998ce5e7b1c715b9f89d700abf6c41f5d8af067a270a72"
   license "MIT"
-  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "4cd6fa3fb412ea2124ab21e9cad1ca4e7d5e3c7ad2d7144b8baf53280eb359c6"
