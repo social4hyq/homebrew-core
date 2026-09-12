@@ -9,7 +9,7 @@ class Fonttools < Formula
   head "https://github.com/fonttools/fonttools.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3f7101ae8c8a654cb4b2981bfbfee8c97bb2833f59528eaa7eac25b01692496e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aed977cc548f2e895d4f4e7c32a5136460ebe72d09580ae1c59e16a94f12e103"
   end
 
   depends_on "python@3.14"
