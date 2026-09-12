@@ -1,8 +1,8 @@
 class Libupnp < Formula
   desc "Portable UPnP development kit"
   homepage "https://pupnp.sourceforge.io/"
-  url "https://github.com/pupnp/pupnp/releases/download/release-22.0.6/libupnp-22.0.6.tar.bz2"
-  sha256 "7f4e1eed75d904180b705570c8c55d70a47885e46f702f4b96e4fac03159f5d7"
+  url "https://github.com/pupnp/pupnp/releases/download/release-22.1.0/libupnp-22.1.0.tar.bz2"
+  sha256 "238fd87f7173c1125dedd553193983c58a91d7fb1179358523cfe4fb2731577a"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,8 +11,7 @@ class Libupnp < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a99272fac99d357cf3a2c5205f33f77d6f7904623e2594f9be675278f102f02"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b1f19d5b684c684fe96bbd8cf084a35498dbce2a6d55de6ee1b3365b105f9a7"
   end
 
   depends_on "cmake" => :build
