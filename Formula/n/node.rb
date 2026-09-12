@@ -1,11 +1,10 @@
 class Node < Formula
   desc "Open-source, cross-platform JavaScript runtime environment"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v26.8.1/node-v26.8.1.tar.xz"
-  sha256 "d1698832a1a10f050cdda044a3e3d6a748246811e2e7bc89ba9a8bd693dc45f2"
+  url "https://nodejs.org/dist/v26.8.2/node-v26.8.2.tar.xz"
+  sha256 "36b37bf5ee4d092b9d9dff2d1a90b1444f8b453eddf6ff96cabdebb97d32f41d"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
-  revision 3
 
   livecheck do
     url "https://nodejs.org/dist/"
@@ -13,7 +12,7 @@ class Node < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b43d274a6a525f3feb040a4bc509a44a7f8300444b664cadc0ebba52870c40cb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0439048e7382543513446cd2dd2c89e066230776b32818622e63a62da7934dce"
   end
 
   # The unversioned `llvm` (LLVM 23) is too new for node, which is not yet
