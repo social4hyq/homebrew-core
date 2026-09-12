@@ -2,13 +2,13 @@ class Kubebuilder < Formula
   desc "SDK for building Kubernetes APIs using CRDs"
   homepage "https://github.com/kubernetes-sigs/kubebuilder"
   url "https://github.com/kubernetes-sigs/kubebuilder.git",
-      tag:      "v4.15.0",
-      revision: "034c380389c00396878da8b388d42b17d55f8dd8"
+      tag:      "v4.16.0",
+      revision: "4d01fcdf146e4d832fc973ef95684a00bcf0f0c0"
   license "Apache-2.0"
   head "https://github.com/kubernetes-sigs/kubebuilder.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db4d3692baf0e8cbf23db0f87e8d5647c5ba354e6154ac3b3abb093b8f35ec84"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "100e6f8d2fb8b70900ac63c49b1f74489868b7f995a19b1762e94282856fd746"
   end
 
   depends_on "go"
