@@ -16,7 +16,7 @@ class BunAT14 < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -24,14 +24,12 @@ class BunAT14 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r5"
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2130354d9095aa8b284298e7daab2867c9ac3020b9076d231265f5c3e829f9da"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "499c9107278d6fbbc6f29f1bb747f9b6d1a2c241c60b6facef541c96ca8af6a5"
   end
 
   keg_only :versioned_formula
 
-  depends_on "bun-bootstrap" => :build
   depends_on "cmake" => :build
   depends_on "gperf" => :build
   depends_on "icu4c@78" => :build
@@ -159,6 +157,7 @@ class BunAT14 < Formula
     src/runtime/socket/system_certs.rs
     src/runtime/webcore/blob/read_file.rs
     src/spawn/process.rs
+    src/spawn_sys/lib.rs
     src/spawn_sys/spawn_process.rs
     src/standalone_graph/StandaloneModuleGraph.rs
     src/sys/Cargo.toml
@@ -181,9 +180,15 @@ class BunAT14 < Formula
     sha256 "2be85b655b99624bed0fb63a47e564abac07aa1fb5d0576abac5c42ef8c5316e"
   end
 
-  resource "webkit-suspend-fix" do
-    url "https://raw.githubusercontent.com/social4hyq/homebrew-core/ad1c1f23f/Patches/bun-webkit/0001-suspend-resume-handshake-survives-signal-loss.patch"
-    sha256 "8a8dc62036979949277c83df3070d40b57a6a703ab872f6d1a96799e9e384f4a"
+  # L3 bootstrap: prebuilt OHOS bun used only to run the build scripts.
+  # Same pinned artifact the bun-bootstrap formula carried; inlined as a
+  # resource so the formula does not depend on a separate bootstrap
+  # formula. The official upstream linux binaries cannot run on OHOS
+  # (glibc build vs musl; the -musl build needs GNU libstdc++), so the
+  # bootstrap has to be an OHOS-targeted build.
+  resource "bootstrap" do
+    url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-bootstrap-v1.4.0-5467a689/bun-ohos-aarch64-1.4.0-5467a689.tar.gz"
+    sha256 "7c1f187907eba7090c60e14dc1bc474fd62ec5b6273cc44c571cf18d35305a2b"
   end
 
   def fetch_webkit
@@ -195,8 +200,13 @@ class BunAT14 < Formula
            "--depth=1", "https://github.com/oven-sh/WebKit.git", "vendor/WebKit"
 
     cd "vendor/WebKit" do
-      system "git", "apply", "--check", resource("webkit-suspend-fix").cached_download
-      system "git", "apply", resource("webkit-suspend-fix").cached_download
+      # The suspend patch lives in this formula's patch directory
+      # (Patches/bun@1.4/); applied here rather than via a DSL patch
+      # because vendor/WebKit only exists after the clone above.
+      suspend_patch = tap.path/"Patches/bun@1.4/webkit-suspend-resume.patch"
+      odie "WebKit suspend patch missing from tap: #{suspend_patch}" unless suspend_patch.file?
+      system "git", "apply", "--check", suspend_patch
+      system "git", "apply", suspend_patch
       odie "WebKit suspend fix missing" unless File.read("Source/WTF/wtf/Threading.h").include?("m_suspendRequested")
     end
     inreplace "vendor/WebKit/Source/cmake/WebKitFeatures.cmake",
@@ -222,7 +232,13 @@ class BunAT14 < Formula
     ENV.prepend_path "PATH", rust_home/"bin"
     ENV.prepend_path "PATH", llvm.opt_bin
     ENV.prepend_path "PATH", formula_opt_bin("lld@21")
-    ENV.prepend_path "PATH", formula_opt_bin("bun-bootstrap")
+    # L3 bootstrap bun (from the "bootstrap" resource): runs the build
+    # scripts. The tarball root carries the pre-signed binary.
+    (buildpath/"bootstrap").mkpath
+    resource("bootstrap").stage do
+      (buildpath/"bootstrap").install Dir["*"]
+    end
+    ENV.prepend_path "PATH", buildpath/"bootstrap"
 
     # The fork still expects separate libc++/libc++abi/libunwind directories.
     cross_libs = buildpath/"build/ohos-cross-libs"
