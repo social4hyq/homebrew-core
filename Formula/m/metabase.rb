@@ -1,10 +1,9 @@
 class Metabase < Formula
   desc "Business intelligence report server"
   homepage "https://www.metabase.com/"
-  url "https://downloads.metabase.com/v0.63.16/metabase.jar"
-  sha256 "2e171aa7d03f10b57d92775428442203e2c5e70ecdcf781f53368e5d8f59af87"
+  url "https://downloads.metabase.com/v0.63.17/metabase.jar"
+  sha256 "7206c734c9b50b57b97a438e95ca92a3b5754b6d4dee5c5561c4467c5fbd447f"
   license "AGPL-3.0-only"
-  revision 1
 
   # The first-party download page only provides an unversioned link to the
   # latest OSS jar file. We check the "latest" GitHub release, as the release
@@ -15,7 +14,7 @@ class Metabase < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3825f1c2a9f8c82928725d7a4ddf8f231c8884594f8a16bbed73a3e933827c59"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f4d9a0275f1b8fe5b589bdc8f18a041036b36733bb6b4c2ffb65d8a9ec56dadc"
   end
 
   head do
