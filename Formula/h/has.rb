@@ -7,7 +7,7 @@ class Has < Formula
   head "https://github.com/kdabir/has.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fcf5e155c34b54c4d360264c8b8c3c7d33e4a28bc7ed59b0297b5f7781663fa8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dc039a51f4ff6d18e544f1ada03f54827d8b86280b0da311cc19b86812c88a57"
   end
 
   def install
