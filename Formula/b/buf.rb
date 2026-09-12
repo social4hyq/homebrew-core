@@ -1,8 +1,8 @@
 class Buf < Formula
   desc "New way of working with Protocol Buffers"
   homepage "https://github.com/bufbuild/buf"
-  url "https://github.com/bufbuild/buf/archive/refs/tags/v1.72.0.tar.gz"
-  sha256 "52ee072d93e17adec529ca13dd701c0939b3a210a1c2803379007c7a830f502d"
+  url "https://github.com/bufbuild/buf/archive/refs/tags/v1.73.0.tar.gz"
+  sha256 "5b74e94416114ccfcef2692592150a5c8459a9cb6f94088d42341ac06c389a22"
   license "Apache-2.0"
   head "https://github.com/bufbuild/buf.git", branch: "main"
 
@@ -15,7 +15,7 @@ class Buf < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4ca407bbf6194e45ae1b6518a6bcc572c223e56ed383f41c87205be760e68d0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "15acd196073f29c55093e5c7c1973aee9af0ecf7b1afdb64bd9404d7f17624ea"
   end
 
   depends_on "go" => :build
