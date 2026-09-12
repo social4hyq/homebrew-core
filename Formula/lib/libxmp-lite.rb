@@ -1,12 +1,12 @@
 class LibxmpLite < Formula
   desc "Lite libxmp"
   homepage "https://xmp.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/xmp/libxmp/4.7.2/libxmp-lite-4.7.2.tar.gz"
-  sha256 "bace7f53248a2cd5adcf77f9402a8858fc0fec05f4e6d6436e3d2a28d68f640e"
+  url "https://downloads.sourceforge.net/project/xmp/libxmp/4.7.3/libxmp-lite-4.7.3.tar.gz"
+  sha256 "e199da3f7552f5ac688a091b8d28ea3c9ffd2beb845d15aac17d4d264f851d71"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7f61f6af8e75926833a34e7d6200c9494fcf0b5ce90dfd5c3e823dd3f0b577c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e03cfe78c6dceb1b2aa1b22f5d78ab4ed3604fe0887666b7c7a1c07505573686"
   end
 
   def install
