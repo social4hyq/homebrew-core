@@ -14,7 +14,7 @@ class Kyverno < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "60225e1b4209efca7010bf77b9efefc91ae39333778961bb416d21cae380893d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c4897be54480b86469b12ab12981d44be349718b4edae0e0a4ef24bb77ca5b9"
   end
 
   depends_on "go" => :build
