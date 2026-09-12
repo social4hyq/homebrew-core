@@ -12,7 +12,7 @@ class DoviTool < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "82738fda2383daba0960021f2c8feddf32f622481d0759beb0a825812037eb9d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a0ab3dc153dedcc0aad949439dc975890661dd24b8783739ffa9c13b28ff7f6"
   end
 
   depends_on "cargo-c" => :build
