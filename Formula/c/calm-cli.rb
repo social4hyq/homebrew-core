@@ -6,7 +6,7 @@ class CalmCli < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c9b013c0772a772247dd07162747fa56bd19edbf5de913151c46f61665cbb16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c640619edb11e32d0f99e83e370e8ab8dc3a5378d1df04c54a64f674c24723a8"
   end
 
   depends_on "node"
