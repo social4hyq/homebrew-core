@@ -11,7 +11,7 @@ class MongoCDriverAT1 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "28b6ad2d3abf896456179635aa93d9ae2ea4c8e8bb9ce44635f42f3985d4e7a8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "49c7d6d27d54d25162c3f8cc27f268fdd3207a27d98b5324204a5fa3ded07601"
   end
 
   keg_only :versioned_formula
