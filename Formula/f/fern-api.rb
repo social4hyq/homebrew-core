@@ -1,17 +1,16 @@
 class FernApi < Formula
   desc "Stripe-level SDKs and Docs for your API"
   homepage "https://buildwithfern.com/"
-  url "https://registry.npmjs.org/fern-api/-/fern-api-5.116.0.tgz"
-  sha256 "8d6cbfd80102bdf06ca0064c0bdbf9d416ac3e6b3cf1415617e2aa798df8f626"
+  url "https://registry.npmjs.org/fern-api/-/fern-api-5.121.0.tgz"
+  sha256 "2f239663bedb363de0fa9947c646e3cbb1c54b089ab5d5a605f133da35519415"
   license "Apache-2.0"
-  revision 1
 
   livecheck do
     throttle 5
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7366329a1be3d45f4c989868e80ebb80554759ee9f9707fc186932fc06734aaa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "33306751513341b0f316a58763a343c5cc22147daf9790918b3a16a6ba0cee87"
   end
 
   depends_on "node"
