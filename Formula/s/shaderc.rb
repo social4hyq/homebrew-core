@@ -4,8 +4,8 @@ class Shaderc < Formula
   license "Apache-2.0"
 
   stable do
-    url "https://github.com/google/shaderc/archive/refs/tags/v2026.3.tar.gz"
-    sha256 "ee493ccf1b3038b4ef2fe024664c5eb2dc4bcc1f6b05b33e3909de0e19c81024"
+    url "https://github.com/google/shaderc/archive/refs/tags/v2026.4.tar.gz"
+    sha256 "f06ce5bcca94e5df7f34e115743597d0ad2e13c5fe9213c67dc8c76031241947"
 
     resource "glslang" do
       # https://github.com/google/shaderc/blob/DEPS
@@ -45,7 +45,7 @@ class Shaderc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f73bd2334215fe47fb0ca9a6dc35f2f72f550108a8cc568c6383396bb16d71e1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3136a241949529f6fcd5c0a2af6166920d22abd9dd171c77b20f7acb2c6e2134"
   end
 
   head do
