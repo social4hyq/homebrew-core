@@ -11,7 +11,7 @@ class Mikmod < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "71bc20ad4f85ecddbb72f12653e7d1f3c99b7d7cc89e99b0b3600975450e88a4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "04bf3d6beb71988f19397b07aee1d5541e624fbd3926daeb82713fea6b28e970"
   end
 
   depends_on "libmikmod"
