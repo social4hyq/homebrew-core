@@ -13,7 +13,7 @@ class Glslang < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4114af3fe7bf4c55e5ab6029a0c7898b4006fb7541773474a8b0c086cb2b8899"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b87bcd727f0b7a7624b954e7b28d1d840933ffd896cb0fc1569321a66c4d32e6"
   end
 
   depends_on "cmake" => :build
