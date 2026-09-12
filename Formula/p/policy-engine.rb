@@ -7,7 +7,7 @@ class PolicyEngine < Formula
   head "https://github.com/snyk/policy-engine.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ebfa5c0b9e674ddf71563c21eef5ea452e162a799d71f399fc0e32ea7061830"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2001b0497820b39ed4aef1113e514b7de83aa7697b7762c516496ef32b381654"
   end
 
   depends_on "go" => :build
