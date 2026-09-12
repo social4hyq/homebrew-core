@@ -16,7 +16,7 @@ class Bun < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  revision 6
+  revision 7
 
   livecheck do
     url :stable
@@ -98,6 +98,7 @@ class Bun < Formula
     src/install_types/resolver_hooks.rs
     src/io/ParentDeathWatchdog.rs
     src/io/PipeReader.rs
+    src/io/PipeWriter.rs
     src/io/lib.rs
     src/io/pipes.rs
     src/io/posix_event_loop.rs
