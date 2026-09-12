@@ -1,13 +1,13 @@
 class Atuin < Formula
   desc "Improved shell history for zsh, bash, fish and nushell"
   homepage "https://atuin.sh/"
-  url "https://github.com/atuinsh/atuin/releases/download/v18.21.0/source.tar.gz"
-  sha256 "369dd1946133756e174d902008496585cfd04abe80f8e519bb57cec6c4283bd5"
+  url "https://github.com/atuinsh/atuin/releases/download/v18.22.0/source.tar.gz"
+  sha256 "46f9d940105791b09d870ca87e8952190dc69f968ea0036502a43840f83a56a0"
   license "MIT"
   head "https://github.com/atuinsh/atuin.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea3c2062703b9913c2251366570d042079cd8ba458832538a7bc4b66c91a1063"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61dcd6385ebb8858a2b6e20596cace4c5f756094b20ce89a10b429ffae089149"
   end
 
   depends_on "pkgconf" => :build
