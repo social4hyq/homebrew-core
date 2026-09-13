@@ -6,7 +6,7 @@ class Somo < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "18fa5ba0fe944a2ae4abed450f19ed8ce36218aac3637ddf282aff1da366d5c7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2b269cdc30c8ce8baffbe10896bccc1ea3580fadb75a792b6956b2b171849ce"
   end
 
   depends_on "rust" => :build
