@@ -1,10 +1,9 @@
 class OhMyPosh < Formula
   desc "Prompt theme engine for any shell"
   homepage "https://ohmyposh.dev"
-  url "https://github.com/JanDeDobbeleer/oh-my-posh/archive/refs/tags/v31.2.1.tar.gz"
-  sha256 "19d8d17995d01291c3bc922074cea973659b0899b5e4d6bf1e3dabe6691bcf4e"
+  url "https://github.com/JanDeDobbeleer/oh-my-posh/archive/refs/tags/v31.3.0.tar.gz"
+  sha256 "d5e9c7fc551cd7da96f4cdb0e067e58ca582e354bf9ff18755478456bac6540f"
   license "MIT"
-  revision 1
   head "https://github.com/JanDeDobbeleer/oh-my-posh.git", branch: "main"
 
   # There can be a notable gap between when a version is tagged and a
