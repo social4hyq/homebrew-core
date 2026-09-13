@@ -1,13 +1,13 @@
 class Conftest < Formula
   desc "Test your configuration files using Open Policy Agent"
   homepage "https://www.conftest.dev/"
-  url "https://github.com/open-policy-agent/conftest/archive/refs/tags/v0.69.0.tar.gz"
-  sha256 "91bba4a58039c8da1e318f927b42a6c227554623268e49b5c955078a3eb64d82"
+  url "https://github.com/open-policy-agent/conftest/archive/refs/tags/v0.70.0.tar.gz"
+  sha256 "cf491b8e398895a8e0dbec76486defab65d4ad9723b9a19af159c89f63676da5"
   license "Apache-2.0"
   head "https://github.com/open-policy-agent/conftest.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b6126ef67851c49b09304ea0432524cfd726c6585c4061d79584827bca54446"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "074c77303d8444f02d4bfae61f08a5aa8c5c8e86b155a2fe07a07dd255dc358a"
   end
 
   depends_on "go" => :build
