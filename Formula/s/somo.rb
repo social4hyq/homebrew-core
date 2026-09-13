@@ -1,12 +1,12 @@
 class Somo < Formula
   desc "Human-friendly alternative to netstat for socket and port monitoring"
   homepage "https://github.com/theopfr/somo"
-  url "https://github.com/theopfr/somo/archive/refs/tags/v1.3.4.tar.gz"
-  sha256 "3181a1bdc990bd26d7efe3e546d411cc9464203ca85b683e0b3647ba893cf7ab"
+  url "https://github.com/theopfr/somo/archive/refs/tags/v1.4.0.tar.gz"
+  sha256 "b084d1617055f39f17e3ae08fe1fdba023b43f8f928c8edf53af0f8ce8a2b14a"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "18fa5ba0fe944a2ae4abed450f19ed8ce36218aac3637ddf282aff1da366d5c7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2b269cdc30c8ce8baffbe10896bccc1ea3580fadb75a792b6956b2b171849ce"
   end
 
   depends_on "rust" => :build
