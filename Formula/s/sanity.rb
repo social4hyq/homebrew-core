@@ -6,7 +6,7 @@ class Sanity < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc07833713b126f760a77042b5b3391dc1d97dc82d12b685244d87f01df57b09"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c70816c06fe9be2c4ed5ca167651cfa61810e131ca7f3b3dc18e6e14229e706"
   end
 
   depends_on "node"
