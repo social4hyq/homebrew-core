@@ -10,8 +10,7 @@ source "$(dirname "$0")/lib.sh"
 # static ELF whose install() self-signs via ohos-bst-light): the CI-only
 # auto-sign pass re-signed it a second time and broke it — confirmed by
 # re-downloading + self-signing (once) the same artifact outside CI, which
-# ran clean. qemu-aarch64 itself was retired 2026-09-08 (low usage), but the
-# mechanism still applies to any future prebuilt-binary formula.
+# ran clean. The mechanism applies to any prebuilt-binary formula.
 # claude-code is a runtime-fetch stub (install() only writes a wrapper
 # script, no ELF in the bottle at all — see Formula/c/claude-code.rb) so it
 # has no odie guard and likely doesn't need this; included anyway since
@@ -25,7 +24,7 @@ source "$(dirname "$0")/lib.sh"
 # binary-sign-tool signing it (single or double) was verified harmless on
 # real hardware — the corruption mode is specific to bun and CGO_ENABLED=0
 # Go outputs.
-UNSET_SIGN_FORMULAS="claude-code"
+UNSET_SIGN_FORMULAS="claude-code qemu-aarch64"
 ENV_PREFIX=""
 if tr ' ' '\n' <<< "$UNSET_SIGN_FORMULAS" | grep -qx "$FORMULA"; then
   ENV_PREFIX="env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN "
