@@ -11,7 +11,7 @@
 - **让 AI 帮你写代码**：`opencode`（开源、自带 75+ 模型提供商接入）、`claude-code`（Anthropic 官方）
 - **跑现代 JavaScript/前端工具链**：`bun` 运行时、`vite-plus` 统一前端工具链
 - **打造顺手的终端**：`hishell-font` 图标字体（配合 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 的 `starship`）、`sshport` 远程端口转发
-- **本地构建与排障**：`ohos-compat-shim` 兼容层
+- **本地构建与排障**：`ohos-compat-shim` 兼容层、`qemu-aarch64` 用户态仿真与系统调用跟踪
 
 ## 安装
 
@@ -26,6 +26,7 @@ brew install bun             # Bun 运行时
 brew install vite-plus       # VoidZero 统一前端工具链（`vp` 命令）
 brew install hishell-font    # starship 图标字体（先装这个：提示符的图标/符号靠它渲染）
 brew install starship        # 终端提示符美化（Harmonybrew 官方 core 原生提供，主题化 prompt，配合 hishell-font）
+brew install qemu-aarch64    # 用户态 QEMU（strace 替代品）
 ```
 
 ## 验证安装
@@ -37,6 +38,7 @@ opencode2 --version
 claude --version
 vp --version
 starship --version
+qemu-aarch64 --version && qemu-aarch64 -strace /bin/true
 ```
 
 shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
@@ -55,6 +57,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `hishell-font` | 0.1.0 | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
 | `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
 | `ohos-compat-shim` | 0.5.0 | 系统兼容层：自动兜底鸿蒙与标准 Linux 的底层行为差异，让 Linux 生态软件开箱即用（已内嵌进本 tap 产物，无需单独配置） |
+| `qemu-aarch64` | 11.0.3-r0 | 用户态 QEMU：直接运行/调试 Linux aarch64 程序，自带系统调用跟踪（`-strace`），是鸿蒙无 root strace 环境下的排障替代品 |
 
 ## 已下线 / 已迁移
 
@@ -78,7 +81,6 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `zig@0.15` | 2026-09-04 下线 | 唯一消费者 herdr 已改为 install() 内联官方预编译 zig（resource 下载 + binary-sign-tool 签名），独立 keg 无保留必要；可从 tap git 历史恢复 formula |
 | `llvm@21` / `lld@21` | 2026-09-08 下线 | 补丁已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install llvm@21 lld@21`；`bun`/`bun-webkit`/`node-ohos` 的构建依赖已随之改为解析上游同名 formula；已装本 tap 旧版的用户请先 `brew uninstall llvm@21 lld@21` 再装上游版 |
 | `ohos-bst-light` | 2026-09-08 下线 | [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 已原生提供同名 formula，直接 `brew install ohos-bst-light`；**注意命令名变了**：本 tap 旧版（v1.0.0）装的是 `self-sign`，官方版（v2.1.2，hqzing/ohos-bst-light 上游最新版）装的是 `selfsign`（无连字符），参数/行为不变（`--force`/`--strip` 均保留）；已装本 tap 旧版的用户请先 `brew uninstall ohos-bst-light` 再装上游版，脚本里的 `self-sign` 调用改成 `selfsign` |
-| `qemu-aarch64` | 2026-09-08 下线 | 已停止维护（使用率低，[Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 未提供替代）；`-strace` 需求改用 `ohos-trace-shim`；可从 tap git 历史恢复 formula |
 | `libsecret` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install libsecret`；已装本 tap 旧版的用户请先 `brew uninstall libsecret` 再装上游版 |
 | `zellij` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install zellij`；已装本 tap 旧版的用户请先 `brew uninstall zellij` 再装上游版 |
 | `herdr` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install herdr`；已装本 tap 旧版的用户请先 `brew uninstall herdr` 再装上游版 |
