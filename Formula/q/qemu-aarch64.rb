@@ -15,6 +15,11 @@ class QemuAarch64 < Formula
     regex(%r{<strong>(\d+(?:\.\d+)+-r\d+)</strong>}i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qemu-aarch64-v11.0.3-r0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2a3ded14fa9df9f72eb5a36cc72b1fdb5c753e14410b0c407325024b3f02c45"
+  end
+
   depends_on "ohos-bst-light" => :build # selfsign
 
   def install
