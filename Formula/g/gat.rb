@@ -1,13 +1,13 @@
 class Gat < Formula
   desc "Cat alternative written in Go"
   homepage "https://github.com/koki-develop/gat"
-  url "https://github.com/koki-develop/gat/archive/refs/tags/v0.30.2.tar.gz"
-  sha256 "47e4c84f898fe0022f0add0fcd1649a1b77c0b6c452b4e022645523fb1955f57"
+  url "https://github.com/koki-develop/gat/archive/refs/tags/v0.31.0.tar.gz"
+  sha256 "424ad788c91081fe5db432f99d108802bb96ef5688b0ccb263cc4ca673efb155"
   license "MIT"
   head "https://github.com/koki-develop/gat.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "81dffb0d980daf229b3f2b92ace7b2cd62c4f87e16118f3cb186c7c089b813e1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e708abb427a177ce52daf63132dbc6ebde656333ffa433f3a08de33f977bec59"
   end
 
   depends_on "go" => :build
