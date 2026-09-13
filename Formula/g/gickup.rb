@@ -7,7 +7,7 @@ class Gickup < Formula
   head "https://github.com/cooperspencer/gickup.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "86e184cdbf0e211bea36e5ac47d7db9cf316a0c97b4c7d093b285dd76ef8d7e1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11cbad14bd82f43017fe793eed042f76dc1a13ece5259e16e6bc4b02018ffbee"
   end
 
   depends_on "go" => :build
