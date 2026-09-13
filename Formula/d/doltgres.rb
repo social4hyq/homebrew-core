@@ -15,7 +15,7 @@ class Doltgres < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "17d63c2a4223effafc5b30496564e914efd8151d7aca89d2e076102ae092e90f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "46a4201ab7a6b61f16b9f7faa6246fdfff63b9cbb1a8c8c94ba5397bbb81610c"
   end
 
   depends_on "go" => :build
