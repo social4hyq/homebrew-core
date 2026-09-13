@@ -1,10 +1,9 @@
 class Commandbox < Formula
   desc "CFML embedded server, package manager, and app scaffolding tools"
   homepage "https://www.ortussolutions.com/products/commandbox"
-  url "https://downloads.ortussolutions.com/ortussolutions/commandbox/6.3.4/commandbox-bin-6.3.4.zip"
-  sha256 "266c21ca3d0ab46a8cbfcdbe4ffdb4f059fe439768f8fb5397e3a931a4623b4b"
+  url "https://downloads.ortussolutions.com/ortussolutions/commandbox/6.3.5/commandbox-bin-6.3.5.zip"
+  sha256 "f8f5d31843724108f034a68d404d77a934d281108e1e21d510ae5b5a5db796f8"
   license "Apache-2.0"
-  revision 1
 
   livecheck do
     url :homepage
@@ -12,15 +11,15 @@ class Commandbox < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "69ac73db5ecf32774ad1c95428613c5d0e9da6714cc9bc2628a9c1ae585f3dd2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8fa6902208f2898720df4c1257c7eee4580f43d16e1fc4cd28e2c6b0c5ca0624"
   end
 
   # Keep pinned to Java 21 until https://ortussolutions.atlassian.net/browse/COMMANDBOX-1685 is resolved
   depends_on "openjdk@21"
 
   resource "apidocs" do
-    url "https://downloads.ortussolutions.com/ortussolutions/commandbox/6.3.4/commandbox-apidocs-6.3.4.zip"
-    sha256 "8be5b3181ecd66bc94a2a60936e00ca6d4011727b98234361aefd7add75c890c"
+    url "https://downloads.ortussolutions.com/ortussolutions/commandbox/6.3.5/commandbox-apidocs-6.3.5.zip"
+    sha256 "c3d45afc0e711b65b3b2c7d2b2a48d5a69d5e930fbab06491927c0c5968ef37f"
 
     livecheck do
       formula :parent
