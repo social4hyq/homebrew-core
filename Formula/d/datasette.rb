@@ -9,7 +9,7 @@ class Datasette < Formula
   head "https://github.com/simonw/datasette.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb96a330f463eb01245c9b0e30c8392feed0d0c9c3e9c4d33aa511684fd8a574"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c2793dd6deaecc528b3b1e82ff3ec198b0c52fb015e690d45b4982c1aedc74f3"
   end
 
   depends_on "certifi" => :no_linkage
