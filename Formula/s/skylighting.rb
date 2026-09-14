@@ -1,12 +1,12 @@
 class Skylighting < Formula
   desc "Flexible syntax highlighter using KDE XML syntax descriptions"
   homepage "https://github.com/jgm/skylighting"
-  url "https://hackage.haskell.org/package/skylighting-0.14.7/skylighting-0.14.7.tar.gz"
-  sha256 "05df6bce0aba5af7da7b618e1891cbe02833f6810b2405e96c254e9ff741001f"
+  url "https://hackage.haskell.org/package/skylighting-0.15/skylighting-0.15.tar.gz"
+  sha256 "2929c28a042453ee67785201dda234308ef19e068fb474cc1db69dd5f67c4dab"
   license "GPL-2.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c47642908d3350baf2c580adb4c241fb9bcc815ea73895f55b8d46dc9cde853b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9246c60efd7344baee27f9dbee4f29b5267139c450f2b46c8a65a1bfebd418b1"
   end
 
   depends_on "cabal-install" => :build
