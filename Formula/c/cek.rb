@@ -7,7 +7,7 @@ class Cek < Formula
   head "https://github.com/bschaatsbergen/cek.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7c58520f054b17173332c1b0de0015cde651d27d98bd3b6ad41544a94cb842f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "51cba0c0981d4cf077ff9a899c9208d2806d26704cb721706a273ba256c693ca"
   end
 
   depends_on "go" => :build
