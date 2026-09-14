@@ -1,10 +1,9 @@
 class Libpcap < Formula
   desc "Portable library for network traffic capture"
   homepage "https://www.tcpdump.org/"
-  url "https://www.tcpdump.org/release/libpcap-1.10.7.tar.gz"
-  sha256 "0b394ac90dbc0a9838ff97468e05c9c9a3e873dec2514cd58db65d859d296e31"
+  url "https://www.tcpdump.org/release/libpcap-1.11.0.tar.gz"
+  sha256 "596389bc8560ea027dff9db8aaf6c173d992366d9aef4baf5d7c6d180b4d49ad"
   license "BSD-3-Clause"
-  revision 1
   compatibility_version 1
   head "https://github.com/the-tcpdump-group/libpcap.git", branch: "master"
 
@@ -14,7 +13,7 @@ class Libpcap < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "03039c54e28298bf0bffc04c08d523db2c63bf3706a3270089bafeee768b6dbd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c55b8cc49f251a2870b81a62a09e7e4b72fdc84e56fc880bcee1fc2bcf47182c"
   end
 
   keg_only :provided_by_macos
