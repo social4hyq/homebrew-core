@@ -6,7 +6,7 @@ class Skylighting < Formula
   license "GPL-2.0-only"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c47642908d3350baf2c580adb4c241fb9bcc815ea73895f55b8d46dc9cde853b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9246c60efd7344baee27f9dbee4f29b5267139c450f2b46c8a65a1bfebd418b1"
   end
 
   depends_on "cabal-install" => :build
