@@ -1,9 +1,9 @@
 class NifiToolkit < Formula
   desc "Command-line utilities to setup and support NiFi"
   homepage "https://nifi.apache.org"
-  url "https://www.apache.org/dyn/closer.lua?path=nifi/2.11.0/nifi-toolkit-2.11.0-bin.zip"
-  mirror "https://archive.apache.org/dist/nifi/2.11.0/nifi-toolkit-2.11.0-bin.zip"
-  sha256 "1cbec3a56714609f377465e437f527b9c5ea1579564fba72bae6415025cdbeb6"
+  url "https://www.apache.org/dyn/closer.lua?path=nifi/2.12.0/nifi-toolkit-2.12.0-bin.zip"
+  mirror "https://archive.apache.org/dist/nifi/2.12.0/nifi-toolkit-2.12.0-bin.zip"
+  sha256 "c9bab9d8430c0a780691a45b2bdf197f1c939decb12b808453ceda62942385d8"
   license "Apache-2.0"
 
   bottle do
