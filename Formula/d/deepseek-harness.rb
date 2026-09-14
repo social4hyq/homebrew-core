@@ -4,7 +4,7 @@ class DeepseekHarness < Formula
   url "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.1.5-rc.2.tgz"
   sha256 "f4c54839d69e82bf1c3a5a41a910c3ce1405cd9e9d97d753c0c04f406c7d7480"
   license "MIT"
-  revision 2
+  revision 3
 
   # The npm `next` dist-tag carries the rc line while `latest` lags behind it
   # (it still points at 0.1.5-rc.1). Read the published version list instead
@@ -18,7 +18,7 @@ class DeepseekHarness < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "887f1343d9b6a9b0ea09d54058e794fedb981973ab5fbd2c035542acf6e4f0e3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "504767c4012653be8d11fd2e2dbc8bc9fb5eb684fdcfdfa9a167e3a551406572"
   end
 
   depends_on "cmake" => :build
