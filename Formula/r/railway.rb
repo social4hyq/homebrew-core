@@ -1,13 +1,13 @@
 class Railway < Formula
   desc "Develop and deploy code with zero configuration"
   homepage "https://railway.com/"
-  url "https://github.com/railwayapp/cli/archive/refs/tags/v5.54.0.tar.gz"
-  sha256 "49714fbc6bd33027ea7c7e9099984e94abd1c13d8128b18a716ba554fb2cc7fa"
+  url "https://github.com/railwayapp/cli/archive/refs/tags/v5.54.1.tar.gz"
+  sha256 "a8e25623cb10eda0a388c2a7af22c22175272bc45ebe44f1ff94b3f8c51b4f1b"
   license "MIT"
   head "https://github.com/railwayapp/cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "df57fc5d174242cf9e252f15a83d2b22e36ea5253b66148bf04902e8fd30823b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "76558d446e7b61514b6dbfbad0fa7da60695157dd4799c9a431e95c15b9bd4ea"
   end
 
   depends_on "rust" => :build
