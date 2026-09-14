@@ -1,0 +1,39 @@
+--- a/dsh-client-resources/lib/client.js
++++ b/dsh-client-resources/lib/client.js
+@@ -6,10 +6,15 @@
+ 		Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+ 		let _deepseek_ai_dsh_client_store = require("@deepseek-ai/dsh-client-store");
+ 		/**
+-		* The protocol key of one address: the host of a `dsh-resource://` URL, as the
+-		* URL parser reads it (lower-cased). Any other string — another scheme, or one
+-		* the URL parser rejects — names no protocol and is treated like an address
+-		* whose protocol has no provider.
++		* The protocol key of one address: the authority of a `dsh-resource://` URL,
++		* lower-cased. Any other string — another scheme, or one with no authority —
++		* names no protocol and is treated like an address whose protocol has no
++		* provider.
++		*
++		* OpenHarmony's ArkWeb URL parser drops the authority of non-special schemes
++		* (`new URL("dsh-resource://file/…").hostname` is "" there), which left every
++		* resource address provider-less on that browser; the authority is parsed
++		* with string operations instead of the URL parser.
+ 		* @param address - the full address.
+ 		* @returns the protocol key, or `undefined` when the address is not a resource address.
+ 		*/
+@@ -16,12 +21,8 @@
+ 		function protocolOf(address) {
+-			let parsed;
+-			try {
+-				parsed = new URL(address);
+-			} catch {
+-				return;
+-			}
+-			if (parsed.protocol !== `dsh-resource:`) return void 0;
+-			return parsed.hostname === "" ? void 0 : parsed.hostname.toLowerCase();
++			if (typeof address !== "string" || !address.startsWith("dsh-resource://")) return;
++			const authority = address.slice(15).split(/[\/?#]/, 1)[0];
++			const hostname = authority.slice(authority.lastIndexOf("@") + 1).split(":")[0];
++			return hostname === "" ? void 0 : hostname.toLowerCase();
+ 		}
+ 		function idle(status) {
+ 			return {
