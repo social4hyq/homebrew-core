@@ -7,7 +7,7 @@ class Brook < Formula
   head "https://github.com/txthinking/brook.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ebe2a5a1ef395c7118f1892e78122d9889a0b4aa52c6015501969722598d345"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7f56a876900acc6c235d59e3807f64ea2858a217ceb3481f77c052f8e453160"
   end
 
   depends_on "go" => :build
