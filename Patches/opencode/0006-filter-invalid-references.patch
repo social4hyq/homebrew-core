@@ -2,13 +2,10 @@ diff --git a/packages/opencode/src/session/system.ts b/packages/opencode/src/ses
 index 61ab74d..558b839 100644
 --- a/packages/opencode/src/session/system.ts
 +++ b/packages/opencode/src/session/system.ts
-@@ -69,7 +69,9 @@ const layer = Layer.effect(
-       environment: Effect.fn("SystemPrompt.environment")(function* (model: Provider.Model) {
-         const ctx = yield* InstanceState.context
+@@ -71,3 +71,5 @@ const layer = Layer.effect(
          const references = yield* Effect.gen(function* () {
 -          return (yield* (yield* Reference.Service).list()).filter((reference) => reference.description !== undefined)
 +          return (yield* (yield* Reference.Service).list()).filter(
 +            (reference) => reference?.name !== undefined && reference.description !== undefined,
 +          )
          }).pipe(Effect.provide(locations.get(Location.Ref.make({ directory: AbsolutePath.make(ctx.directory) }))))
-         return [

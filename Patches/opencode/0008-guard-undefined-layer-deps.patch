@@ -1,0 +1,29 @@
+diff --git a/packages/core/src/effect/layer-node.ts b/packages/core/src/effect/layer-node.ts
+index 9dbc3d5..7eb82f5 100644
+--- a/packages/core/src/effect/layer-node.ts
++++ b/packages/core/src/effect/layer-node.ts
+@@ -87,2 +87,3 @@ export function make<
+ ): Node<Layer.Success<Implementation>, Layer.Error<Implementation> | Error<Items[number]>, T> {
++  assertDependencies(input.service !== undefined ? input.service.key : input.name, input.deps)
+   return {
+@@ -107,2 +108,16 @@ export function unbound<R, Shape, const T extends Tag>(service: Context.Key<R, S
+ 
++// A dependency that is undefined here means a module export was read before it
++// was initialized (an import cycle the bundler reordered). Fail with a usable
++// message instead of crashing later inside the layer tree.
++function assertDependencies(name: string, dependencies: readonly AnyNode[]) {
++  for (const [index, dependency] of dependencies.entries()) {
++    if (dependency === undefined) {
++      throw new Error(
++        `Layer node "${name}" has an undefined dependency at deps[${index}]` +
++          ` — a module export was read before it was initialized (circular import).`,
++      )
++    }
++  }
++}
++
+ export function group<const Items extends readonly AnyNode[]>(
+@@ -110,2 +125,3 @@ export function group<const Items extends readonly AnyNode[]>(
+ ): Node<Output<Items[number]>, Error<Items[number]>, NodeTag<Items[number]>> {
++  assertDependencies("group", dependencies)
+   return { kind: "group", name: "group", dependencies }
