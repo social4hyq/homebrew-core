@@ -41,9 +41,6 @@ class Opencode < Formula
   deny_network_access! :test
 
   def install
-    ENV["BUN_TMPDIR"] = (buildpath/".bun-tmp").to_s
-    (buildpath/".bun-tmp").mkpath
-    ENV["BUN_INSTALL_CACHE_DIR"] = (HOMEBREW_CACHE/"bun-install-cache").to_s
     ENV["OPENCODE_VERSION"] = version.to_s
     ENV["OPENCODE_CHANNEL"] = "prod"
 
