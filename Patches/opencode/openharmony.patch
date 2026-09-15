@@ -1,0 +1,64 @@
+diff --git a/bunfig.toml b/bunfig.toml
+index c506ff5..35a82bc 100644
+--- a/bunfig.toml
++++ b/bunfig.toml
+@@ -4 +3,0 @@ exact = true
+-minimumReleaseAge = 259200
+diff --git a/package.json b/package.json
+index a3f9544..dc38286 100644
+--- a/package.json
++++ b/package.json
+@@ -141 +141,5 @@
+-    "@opentui/core": "catalog:",
++    "@opentui/core": "npm:@ohos-npm-ports/opentui-core@0.4.5-1",
++    "bun-pty": "npm:@ohos-npm-ports/bun-pty@0.4.10-1",
++    "lightningcss": "npm:@ohos-npm-ports/lightningcss@1.33.0-1",
++    "@tailwindcss/oxide": "npm:@ohos-npm-ports/tailwindcss-oxide@4.3.3-2",
++    "@parcel/watcher": "npm:@ohos-npm-ports/parcel-watcher@2.5.1-2",
+diff --git a/packages/core/src/filesystem/watcher.ts b/packages/core/src/filesystem/watcher.ts
+index c5e2063..10036ff 100644
+--- a/packages/core/src/filesystem/watcher.ts
++++ b/packages/core/src/filesystem/watcher.ts
+@@ -41 +41 @@ function getBackend() {
+-  if (process.platform === "linux") return "inotify"
++  if (process.platform === "linux" || process.platform === "openharmony") return "inotify"
+diff --git a/packages/core/src/project.ts b/packages/core/src/project.ts
+index 49e054d..43b186d 100644
+--- a/packages/core/src/project.ts
++++ b/packages/core/src/project.ts
+@@ -4,0 +5 @@ import { Context, Effect, Layer, Schema } from "effect"
++import os from "os"
+@@ -112 +113 @@ const layer = Layer.effect(
+-      if (!repo) return { id: ID.global, directory: AbsolutePath.make(path.parse(input).root), vcs: undefined }
++      if (!repo) return { id: ID.global, directory: AbsolutePath.make(os.homedir()), vcs: undefined }
+diff --git a/packages/opencode/script/build.ts b/packages/opencode/script/build.ts
+index ce45f77..999bd9b 100755
+--- a/packages/opencode/script/build.ts
++++ b/packages/opencode/script/build.ts
+@@ -118 +118,2 @@ const targets = singleFlag
+-      if (item.os !== process.platform || item.arch !== process.arch) {
++      if ((item.os !== process.platform || item.arch !== process.arch) &&
++          !(process.platform === "openharmony" && item.os === "linux" && item.arch === "arm64" && item.abi === "musl")) {
+@@ -129 +130 @@ const targets = singleFlag
+-      if (item.abi !== undefined) {
++      if (item.abi !== undefined && !(process.platform === "openharmony" && item.abi === "musl")) {
+@@ -177 +178 @@ for (const item of targets) {
+-      target: name.replace(pkg.name, "bun") as any,
++      target: (process.platform === "openharmony" && item.abi === "musl" ? "bun-linux-arm64-ohos" : name.replace(pkg.name, "bun")) as any,
+diff --git a/packages/opencode/src/cli/cmd/web.ts b/packages/opencode/src/cli/cmd/web.ts
+index 69a981a..c7901e1 100644
+--- a/packages/opencode/src/cli/cmd/web.ts
++++ b/packages/opencode/src/cli/cmd/web.ts
+@@ -75 +75 @@ export const WebCommand = effectCmd({
+-      open(localhostUrl).catch(() => {})
++      if (process.platform !== "openharmony") open(localhostUrl).catch(() => {})
+@@ -79 +79 @@ export const WebCommand = effectCmd({
+-      open(displayUrl).catch(() => {})
++      if (process.platform !== "openharmony") open(displayUrl).catch(() => {})
+diff --git a/packages/opencode/src/project/project.ts b/packages/opencode/src/project/project.ts
+index 9870377..35ffa3e 100644
+--- a/packages/opencode/src/project/project.ts
++++ b/packages/opencode/src/project/project.ts
+@@ -217 +217 @@ const layer = Layer.effect(
+-      const worktree = data.id === ProjectV2.ID.make("global") && !data.vcs ? "/" : data.directory
++      const worktree = data.directory
