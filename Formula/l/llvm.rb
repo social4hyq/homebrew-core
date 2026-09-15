@@ -26,7 +26,7 @@ class Llvm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "012ff1be8e5a3522fed64678488133ab1443e1c4a0a310e7192e079033827a04"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "971782ae64715ca15ab0de1841825d46f8f6f2839da7a0fbd151e10850504b85"
   end
 
   # https://llvm.org/docs/GettingStarted.html#requirement
