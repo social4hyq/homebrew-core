@@ -6,7 +6,7 @@ class Sylph < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f0e73ea39ad56e75f30b14c46601701d1ee8fa36ff43ad61f44914ea2676536f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b2b87d986c51959dd9a974b9577f9eec9921c94e89288b06167da5aff885c99"
   end
 
   depends_on "cmake" => :build
