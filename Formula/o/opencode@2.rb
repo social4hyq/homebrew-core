@@ -4,7 +4,7 @@ class OpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "ad31bff969fe386266d3d1cd24d988651d3233af"
   version "0.0.0-beta-19271"
   license "MIT"
-  revision 2
+  revision 4
   version_scheme 1
 
   livecheck do
@@ -21,6 +21,11 @@ class OpencodeAT2 < Formula
 
   depends_on "bun" => :build
   depends_on "node" => :build
+
+  resource "solidjs-start" do
+    url "https://pkg.pr.new/@solidjs/start@dfb2020"
+    sha256 "0c90be86818a667aa3b2dd5611c54f96d3451e1836f562ec2cecd99f7979e7e5"
+  end
 
   %w[
     0001-update-package-json.patch
@@ -44,6 +49,10 @@ class OpencodeAT2 < Formula
     ENV["OPENCODE_VERSION"] = "#{version}_#{revision}"
     ENV["OPENCODE_CHANNEL"] = "beta"
 
+    resource("solidjs-start").stage buildpath/"vendor/solidjs-start"
+    inreplace "package.json", "https://pkg.pr.new/@solidjs/start@dfb2020",
+              "file:./vendor/solidjs-start"
+
     system "bun", "install", "--ignore-scripts"
 
     cd "packages/cli" do
@@ -53,17 +62,9 @@ class OpencodeAT2 < Formula
     out = "packages/cli/dist/cli-linux-arm64-musl/bin/opencode2"
     odie "opencode2 binary missing" unless File.exist?(out)
 
-    mkdir_p libexec/"bin"
-    libexec.install out => "bin/opencode2"
+    bin.install out => "opencode2"
 
-    (bin/"opencode2").write <<~SH
-      #!/bin/sh
-      export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share-v2}"
-      exec "#{opt_libexec}/bin/opencode2" "$@"
-    SH
-    chmod 0755, bin/"opencode2"
-
-    generate_completions_from_executable(libexec/"bin/opencode2", "--completions",
+    generate_completions_from_executable(bin/"opencode2", "--completions",
                                          base_name: "opencode2")
   end
 
