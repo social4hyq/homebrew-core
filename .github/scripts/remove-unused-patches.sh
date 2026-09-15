@@ -1,8 +1,10 @@
 #!/bin/bash
-# Find files under Patches/ that no Formula/**/*.rb references by literal
-# path (the only way this tap wires up a patch, see any `patch :p1 do / file
-# "Patches/..."` block) and open a PR removing them. Never deletes directly
-# on main — same "bot pushes a branch, gh pr create" shape as autobump.sh,
+# Find files under Patches/ that no Formula/**/*.rb references and open a PR
+# removing them. Most formulae name each patch literally, but a formula may
+# apply a generated list through a dynamic path such as
+# `file "Patches/bun/#{p}.patch"`; every file beneath that static prefix is
+# intentionally retained. Never deletes directly on main — same "bot pushes
+# a branch, gh pr create" shape as autobump.sh,
 # including using GITHUB_TOKEN (github-actions[bot]) rather than a personal
 # PAT — this only pushes a fresh non-main branch and opens/labels a PR
 # against it, neither of which needs the ruleset-bypass admin PAT that
@@ -10,9 +12,33 @@
 set -euo pipefail
 
 UNUSED=()
+# A dynamic formula patch path cannot be matched against an individual patch
+# filename literally. Record its static directory prefix first. This is
+# deliberately conservative: if formula logic constructs a patch path, do not
+# propose deletion for files that could be selected by that logic.
+DYNAMIC_PREFIXES=()
+while IFS= read -r -d '' formula; do
+  while IFS= read -r line; do
+    if [[ "$line" =~ file[[:space:]]+\"(Patches/[^\"#]*)\#\{[^}]+\} ]]; then
+      DYNAMIC_PREFIXES+=("${BASH_REMATCH[1]}")
+    fi
+  done < "$formula"
+done < <(find Formula -type f -name '*.rb' -print0)
+
 while IFS= read -r -d '' patch; do
   rel="${patch#./}"
-  if ! grep -rqF "$rel" Formula/ 2>/dev/null; then
+  referenced=false
+  if grep -rqF "$rel" Formula/ 2>/dev/null; then
+    referenced=true
+  else
+    for prefix in "${DYNAMIC_PREFIXES[@]}"; do
+      if [[ "$rel" == "$prefix"* ]]; then
+        referenced=true
+        break
+      fi
+    done
+  fi
+  if ! "$referenced"; then
     UNUSED+=("$rel")
   fi
 done < <(find Patches -type f -print0 | sort -z)
@@ -28,6 +54,12 @@ echo "unused patch(es): ${#UNUSED[@]}" >> "$GITHUB_STEP_SUMMARY"
 for f in "${UNUSED[@]}"; do
   echo "- \`$f\`" >> "$GITHUB_STEP_SUMMARY"
 done
+
+# Allows validation of the classifier without deleting files, creating a
+# commit, or contacting GitHub.
+if [ "${DRY_RUN:-0}" = 1 ]; then
+  exit 0
+fi
 
 git config user.name "github-actions[bot]"
 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -67,7 +99,7 @@ PR_URL=$(gh pr create --repo social4hyq/homebrew-core \
 
 $(printf '%s\n' "${UNUSED[@]}" | sed 's/^/- `/;s/$/`/')
 
-Review before merging — a patch can be legitimately unreferenced for a moment mid-migration; this only checks the literal \`Patches/...\` string match, not formula logic.") \
+Review before merging — a patch can be legitimately unreferenced for a moment mid-migration. Dynamic formula patch paths are treated conservatively as references to their static directory prefix.") \
   || { echo "::error::gh pr create failed after a successful push"; exit 1; }
 
 echo "opened $PR_URL" >> "$GITHUB_STEP_SUMMARY"
