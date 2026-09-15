@@ -4,6 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.31.tar.gz"
   sha256 "76f69fe27ec2b44e23fa1749029e7c012eb7e975a0f0c7819e9458198dfd3896"
   license "MIT"
+  revision 1
 
   livecheck do
     throttle 5
@@ -11,7 +12,6 @@ class Opencode < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.31-r4"
-    rebuild 1
     sha256 cellar: :any_skip_relocation, arm64_ohos: "a39e1412009491d8e52547d01df8dc8abca85ff7b7fa95c32b2a738f95db4071"
   end
 
@@ -25,13 +25,11 @@ class Opencode < Formula
   end
 
   %w[
-    0001-remove-minimum-release-age.patch
-    0002-update-package-json.patch
-    0003-update-filesystem-watcher.patch
-    0004-update-project-root.patch
-    0005-update-build-target.patch
-    0006-update-web-command.patch
-    0007-update-project-worktree.patch
+    0001-update-package-json.patch
+    0002-update-filesystem-watcher.patch
+    0003-update-project-root.patch
+    0004-update-build-target.patch
+    0005-update-project-worktree.patch
   ].each do |p|
     patch do
       file "Patches/opencode/#{p}"
