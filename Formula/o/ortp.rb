@@ -2,13 +2,13 @@ class Ortp < Formula
   desc "Real-time transport protocol (RTP, RFC3550) library"
   homepage "https://linphone.org/"
   # TODO: Switch to monorepo in 5.5.x
-  url "https://gitlab.linphone.org/BC/public/ortp/-/archive/5.4.125/ortp-5.4.125.tar.bz2"
-  sha256 "c21e916587db732e42bfac913a9b088f47015a603b63f265d4ce65c5b7498cf9"
+  url "https://gitlab.linphone.org/BC/public/ortp/-/archive/5.4.126/ortp-5.4.126.tar.bz2"
+  sha256 "bfe68d8dd6add5410bd2bd76c7e30dc427d7af01734b47f0a7c91b2ce87a0e8f"
   license all_of: ["AGPL-3.0-or-later", "GPL-3.0-or-later"]
   head "https://gitlab.linphone.org/BC/public/linphone-sdk.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "afd003ea7474626ef3490c5d00b0f2ba60ceb09e202abc43f37c305a3cedabc5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dfbc251264068e086133e07f49af2d3a18fa6c5f67e9d3eb8684d388ebb179d5"
   end
 
   depends_on "cmake" => :build
@@ -16,8 +16,8 @@ class Ortp < Formula
   depends_on "openssl@4"
 
   resource "bctoolbox" do
-    url "https://gitlab.linphone.org/BC/public/bctoolbox/-/archive/5.4.125/bctoolbox-5.4.125.tar.bz2"
-    sha256 "03d389553f275defadbc577d7a78ac2eeb55ff057d76a5972e9b607c08f46a0d"
+    url "https://gitlab.linphone.org/BC/public/bctoolbox/-/archive/5.4.126/bctoolbox-5.4.126.tar.bz2"
+    sha256 "320c1ca0fd153d299ff4506f3ef1e62cd2eebcb08547001cbe90a0e1158a5b87"
 
     livecheck do
       formula :parent
