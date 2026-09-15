@@ -12,7 +12,7 @@ class Jaguar < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8fe7fae57428ceeeba3262fc46f81e29a1a0ad01c8678270a33be0cc4ac08d47"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "63bb4cee97749ac610472500b00e35542c189d9a6127504b8ad4d95b80f6417c"
   end
 
   depends_on "go" => :build
