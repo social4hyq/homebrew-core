@@ -122,7 +122,7 @@ index 0b37756202..12f54ab85e 100644
 +    desc: "OHOS linker tuning: 8MB stack (debug compression skipped — host LLVM lacks zlib)",
 +  },
 +  {
-+    flag: ["-pie", "-Wl,-dynamic-linker=/system/lib/ld-musl-aarch64.so.1"],
++    flag: ["-pie", "-Wl,-dynamic-linker=/lib/ld-musl-aarch64.so.1"],
 +    when: c => c.ohos,
 +    desc: "OHOS PIE: dynamic linking (allows fork/clone through seccomp)",
 +  },
