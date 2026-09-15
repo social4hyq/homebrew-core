@@ -1,45 +1,17 @@
 diff --git a/packages/core/src/filesystem/search.ts b/packages/core/src/filesystem/search.ts
-index c773838..03ca875 100644
+index c773838..e749ef5 100644
 --- a/packages/core/src/filesystem/search.ts
 +++ b/packages/core/src/filesystem/search.ts
 @@ -7,3 +7,4 @@ import { Fff } from "#fff"
  import fuzzysort from "fuzzysort"
 -import { FileSystem } from "../filesystem"
-+import type { FileSystem } from "../filesystem"
-+import { Entry, Match } from "@opencode-ai/schema/filesystem"
++import { FileSystem } from "@opencode-ai/schema/filesystem"
++import type { GlobInput, GrepInput } from "../filesystem"
  import { FSUtil } from "../fs-util"
-@@ -63,3 +64,3 @@ export const ripgrepLayer = Layer.effect(
-                 result.map((entry) =>
--                  FileSystem.Entry.make({
-+                  Entry.make({
-                     ...entry,
-@@ -88,5 +89,5 @@ export const ripgrepLayer = Layer.effect(
-                 result.map((match) =>
--                  FileSystem.Match.make({
-+                  Match.make({
-                     ...match,
--                    entry: FileSystem.Entry.make({
-+                    entry: Entry.make({
-                       ...match.entry,
-@@ -111,3 +112,3 @@ export const ripgrepLayer = Layer.effect(
-             const type = relative.endsWith(path.sep) ? ("directory" as const) : ("file" as const)
--            return FileSystem.Entry.make({
-+            return Entry.make({
-               path: RelativePath.make(relative),
-@@ -156,3 +157,3 @@ export const fffLayer = Layer.effect(
-           return found.value.items.map((item) =>
--            FileSystem.Entry.make({
-+            Entry.make({
-               path: RelativePath.make(item.relativePath.replaceAll("\\", "/")),
-@@ -174,4 +175,4 @@ export const fffLayer = Layer.effect(
-             const bytes = Buffer.from(match.lineContent)
--            return FileSystem.Match.make({
--              entry: FileSystem.Entry.make({
-+            return Match.make({
-+              entry: Entry.make({
-                 path: RelativePath.make(match.relativePath.replaceAll("\\", "/")),
-@@ -224,3 +225,3 @@ export const fffLayer = Layer.effect(
-               const relative = item.path.replaceAll("\\", "/").replace(/\/$/, "")
--              return FileSystem.Entry.make({
-+              return Entry.make({
-                 path: RelativePath.make(relative + (item.type === "directory" ? path.sep : "")),
+@@ -16,4 +17,4 @@ export interface Interface {
+   readonly find: (input: FileSystem.FindInput) => Effect.Effect<FileSystem.Entry[]>
+-  readonly glob: (input: FileSystem.GlobInput) => Effect.Effect<readonly FileSystem.Entry[]>
+-  readonly grep: (input: FileSystem.GrepInput) => Effect.Effect<readonly FileSystem.Match[]>
++  readonly glob: (input: GlobInput) => Effect.Effect<readonly FileSystem.Entry[]>
++  readonly grep: (input: GrepInput) => Effect.Effect<readonly FileSystem.Match[]>
+ }
