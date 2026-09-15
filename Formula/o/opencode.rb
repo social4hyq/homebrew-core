@@ -4,7 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.31.tar.gz"
   sha256 "76f69fe27ec2b44e23fa1749029e7c012eb7e975a0f0c7819e9458198dfd3896"
   license "MIT"
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -13,8 +13,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.31-r8"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d908486aa69ab2732f01683be092232d7014d9fb03536c57bf2bf043ed9ca35"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.31-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c56644a2088a1334e4a43d4bfa7dfddad923d375c80720209170df2f8c3de4ea"
   end
 
   depends_on "bun" => :build
@@ -33,6 +33,7 @@ class Opencode < Formula
     0004-update-build-target.patch
     0005-update-project-worktree.patch
     0006-filter-invalid-references.patch
+    0007-break-filesystem-search-import-cycle.patch
   ].each do |p|
     patch do
       file "Patches/opencode/#{p}"
