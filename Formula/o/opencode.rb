@@ -7,12 +7,15 @@ class Opencode < Formula
   revision 1
 
   livecheck do
+    url :stable
+    strategy :github_latest
     throttle 5
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.31-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ae04d6ec952a405436b227c7c723a88154007560f5e01d2c3e1f3580c6c7c9c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.31-r6"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7246cca2682a4a0c7a45376171dc32c0c068cfcbe3a538f693297a1671cb551c"
   end
 
   depends_on "bun" => :build
