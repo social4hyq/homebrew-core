@@ -1,12 +1,12 @@
 class UnorderedDense < Formula
   desc "Hashmap and hashset based on robin-hood backward shift deletion"
   homepage "https://github.com/martinus/unordered_dense"
-  url "https://github.com/martinus/unordered_dense/archive/refs/tags/v4.11.0.tar.gz"
-  sha256 "a232f7433b45872d43e4dc74a25cbd58effc0be76e3d704b34e5de3c637eed77"
+  url "https://github.com/martinus/unordered_dense/archive/refs/tags/v5.0.1.tar.gz"
+  sha256 "b79f46db45fd73310211429e5d33da4a579543ac544ae7dc12f8d9a31ad0aea4"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c2c56a2eeedccf262f521812289c533a97787eabe2a1655e33f9beb21192e13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a043d76859d19a91e2ff633920212de2e2d85f25e94a71ce31528f508dd3788"
   end
 
   depends_on "cmake" => :build
