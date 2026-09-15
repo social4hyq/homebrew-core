@@ -1,14 +1,13 @@
 class Wails < Formula
   desc "Create beautiful applications using Go"
   homepage "https://wails.io"
-  url "https://github.com/wailsapp/wails/archive/refs/tags/v2.15.0.tar.gz"
-  sha256 "4c865cbd5ab81401cf4557e54dfe517efc90d29980ccdaa54178b426fdd6d4a3"
+  url "https://github.com/wailsapp/wails/archive/refs/tags/v2.16.0.tar.gz"
+  sha256 "52f77b4dd53482e405d91fc42b587f6216b4f0beedb9ee919462e36357f10e3b"
   license "MIT"
-  revision 1
   head "https://github.com/wailsapp/wails.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3d49f9702e227c3d69434c9ccf8401deeb78fb69bee59035f477f2162280434"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4f17082613c1be01d40812ef73fd3cb6b291dfd7e01a3252c225f7568bc28811"
   end
 
   depends_on "go"
