@@ -1,0 +1,20 @@
+diff --git a/packages/opencode/script/build.ts b/packages/opencode/script/build.ts
+index ce45f77..999bd9b 100755
+--- a/packages/opencode/script/build.ts
++++ b/packages/opencode/script/build.ts
+@@ -117,3 +117,4 @@ const targets = singleFlag
+   ? allTargets.filter((item) => {
+-      if (item.os !== process.platform || item.arch !== process.arch) {
++      if ((item.os !== process.platform || item.arch !== process.arch) &&
++          !(process.platform === "openharmony" && item.os === "linux" && item.arch === "arm64" && item.abi === "musl")) {
+         return false
+@@ -128,3 +129,3 @@ const targets = singleFlag
+       // also skip abi-specific builds for the same reason
+-      if (item.abi !== undefined) {
++      if (item.abi !== undefined && !(process.platform === "openharmony" && item.abi === "musl")) {
+         return false
+@@ -176,3 +177,3 @@ for (const item of targets) {
+       autoloadPackageJson: true,
+-      target: name.replace(pkg.name, "bun") as any,
++      target: (process.platform === "openharmony" && item.abi === "musl" ? "bun-linux-arm64-ohos" : name.replace(pkg.name, "bun")) as any,
+       outfile: `dist/${name}/bin/opencode`,

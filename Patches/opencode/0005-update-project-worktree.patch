@@ -1,0 +1,9 @@
+diff --git a/packages/opencode/src/project/project.ts b/packages/opencode/src/project/project.ts
+index 9870377..35ffa3e 100644
+--- a/packages/opencode/src/project/project.ts
++++ b/packages/opencode/src/project/project.ts
+@@ -216,3 +216,3 @@ const layer = Layer.effect(
+       const data = yield* projectV2.resolve(AbsolutePath.make(directory))
+-      const worktree = data.id === ProjectV2.ID.make("global") && !data.vcs ? "/" : data.directory
++      const worktree = data.directory
+ 
