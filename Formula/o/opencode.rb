@@ -7,6 +7,8 @@ class Opencode < Formula
   revision 1
 
   livecheck do
+    url :stable
+    strategy :github_latest
     throttle 5
   end
 
