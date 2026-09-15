@@ -1,8 +1,8 @@
 class Psqlodbc < Formula
   desc "Official PostgreSQL ODBC driver"
   homepage "https://odbc.postgresql.org"
-  url "https://github.com/postgresql-interfaces/psqlodbc/archive/refs/tags/REL-18_00_0003.tar.gz"
-  sha256 "c99b58d3ee18343bb0394c3a0d2e49d80c1a466e6e1ef999e4201a8acdb3f14d"
+  url "https://github.com/postgresql-interfaces/psqlodbc/archive/refs/tags/REL-18_00_0004.tar.gz"
+  sha256 "af12354a5960846f5578e168b456cde3c21a11c4788277663bf9266b1de3adda"
   license "LGPL-2.0-or-later"
   head "https://github.com/postgresql-interfaces/psqlodbc.git", branch: "main"
 
@@ -15,7 +15,7 @@ class Psqlodbc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7805dcdd06192f06244f8c7ae6d07c2335219b69d74f43828e5ab572a679db0a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2eb5fe7a05f319180fbc36a918efd062a5b9262f91d5c6569ffdaeda46718fe3"
   end
 
   depends_on "autoconf" => :build
