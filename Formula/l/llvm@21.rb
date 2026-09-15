@@ -14,7 +14,7 @@ class LlvmAT21 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "05f11cb39603c7503632568f4f6de71e7afe48539f2a68dcbc60ebcb269fe768"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "34205a0692a3b50a97f5b23b4b7983a03c710d746bd1206f03513728e1b25455"
   end
 
   keg_only :versioned_formula
