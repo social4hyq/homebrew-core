@@ -1,0 +1,22 @@
+--- a/packages/core/src/filesystem/watcher-binding.ts
++++ b/packages/core/src/filesystem/watcher-binding.ts
+@@ -5,10 +5,14 @@
+ // Lazy: on workerd import.meta.url is undefined and the watcher is never
+ // loaded, so createRequire must not run at module scope.
+ export default function load() {
+-  const require = createRequire(import.meta.url)
++  const nodeRequire = createRequire(import.meta.url)
+   const libc = typeof OPENCODE_LIBC === "undefined" ? undefined : OPENCODE_LIBC
+-  return require(
+-    process.env.OPENCODE_PARCEL_WATCHER_PATH ??
+-      `@parcel/watcher-${process.platform}-${process.arch}${process.platform === "linux" ? `-${libc || "glibc"}` : ""}`,
+-  )
++  try {
++    return nodeRequire(
++      process.env.OPENCODE_PARCEL_WATCHER_PATH ??
++        `@parcel/watcher-${process.platform}-${process.arch}${process.platform === "linux" ? `-${libc || "glibc"}` : ""}`,
++    )
++  } catch {
++    return require("@parcel/watcher/build/Release/watcher.node")
++  }
+ }
