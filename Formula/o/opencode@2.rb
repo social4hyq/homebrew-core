@@ -4,7 +4,7 @@ class OpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "ad31bff969fe386266d3d1cd24d988651d3233af"
   version "0.0.0-beta-19271"
   license "MIT"
-  revision 5
+  revision 6
   version_scheme 1
 
   livecheck do
@@ -15,8 +15,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-beta-19271-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d789e0b6fbc9020eaeb769a0fac8640baa7b4d8ce5d86a43b53aab19887b9678"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-beta-19271-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "872f8a74ea288818d01c3c796cd861ae2510b22c6768747b5993b0391f185110"
   end
 
   depends_on "bun" => :build
