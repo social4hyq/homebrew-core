@@ -1,8 +1,8 @@
 class Melange < Formula
   desc "Build APKs from source code"
   homepage "https://github.com/chainguard-dev/melange"
-  url "https://github.com/chainguard-dev/melange/archive/refs/tags/v0.59.5.tar.gz"
-  sha256 "e53daa5ce969a90d40aaffca739015ab78ac7cc12330d66b6b61a4e381a42b21"
+  url "https://github.com/chainguard-dev/melange/archive/refs/tags/v0.60.0.tar.gz"
+  sha256 "ea5f9fbe5159420a37fef634ecb75c099b1417ac7d5f3ec10848601dbbc0f268"
   license "Apache-2.0"
   head "https://github.com/chainguard-dev/melange.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Melange < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b30a33177b86e69b3713af64e0516b7b0b4b1948469d1169710609af489113ee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "86523d010d7d477e92d773974c4ba7db0bb6488578f7bbba489f1656751c75f1"
   end
 
   depends_on "go" => :build
