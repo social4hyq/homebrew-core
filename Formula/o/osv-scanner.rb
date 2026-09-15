@@ -7,7 +7,7 @@ class OsvScanner < Formula
   head "https://github.com/google/osv-scanner.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1f3cd951ccfa3c1fc9625a85b2ca01c099d769b450586fe0bf8e9f802a14498"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c592b85b0aabf4a74fbbb39194517a0ec45bc74053d34e19fff896080ead0d6b"
   end
 
   depends_on "go" => [:build, :test]
