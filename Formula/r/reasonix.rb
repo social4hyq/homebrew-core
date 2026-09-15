@@ -14,7 +14,7 @@ class Reasonix < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "510ea16eb091ad27429d6bf2c8e69e78823c3dfde0ec7d9b4c452c615b5cf20a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "28e01d1249190781c79ec88d7580545f6cec6a6660ff3b9b7cc3030c270e3173"
   end
 
   depends_on "go" => :build
