@@ -1,8 +1,8 @@
 class LinuxHeadersAT515 < Formula
   desc "Header files of the Linux kernel"
   homepage "https://kernel.org/"
-  url "https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.15.220.tar.gz"
-  sha256 "71ab7732abebe565f133229871c4bee33c5b6d54279ef463c69cf980738ef8c8"
+  url "https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.15.221.tar.gz"
+  sha256 "966d6d93b6989fedde7dacbf12ed24c8cc5142896a7c4739a76d83a7be1a4787"
   license "GPL-2.0-only" => { with: "Linux-syscall-note" }
   compatibility_version 1
 
@@ -12,7 +12,7 @@ class LinuxHeadersAT515 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "43b10ba79250b34b22be141011ac65d561f5bb56cc543092e471ba67c440278e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "17e3a0a047cbd095246f8853c429957e34f49afef88a59a76230a57861bb5651"
   end
 
   keg_only :versioned_formula
