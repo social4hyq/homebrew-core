@@ -7,7 +7,7 @@ class K8sgpt < Formula
   head "https://github.com/k8sgpt-ai/k8sgpt.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "09dc3a031ca9044a27035d323c58a1cc9ebd058248a53334fa3ba5fef543befa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f6618b5de63f70bd77fca3772c2c59686315eb1da71c82c798ae1d65462f1b7d"
   end
 
   depends_on "go" => :build
