@@ -1,8 +1,8 @@
 class Opencode < Formula
   desc "AI coding agent terminal UI"
   homepage "https://github.com/anomalyco/opencode"
-  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.30.tar.gz"
-  sha256 "d54574de6a2b02d58fe4d403035103a08bdca0f4eafac63d3681cda774e85cd9"
+  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.31.tar.gz"
+  sha256 "76f69fe27ec2b44e23fa1749029e7c012eb7e975a0f0c7819e9458198dfd3896"
   license "MIT"
 
   # PageMatch on github.com/releases/latest times out from slow networks (the
@@ -16,8 +16,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.30-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4dcf3739e8893667fb119830d6a60f36d7bf2d246bbced1524ed57e342fdbd7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.31-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f332773917e68759132622638a4dc9be04680bc9244480cb54beb10fd9cbde26"
   end
 
   # bun build --compile single binary: OHOS runtime + JS bundle + native .so embedded.
@@ -28,6 +28,7 @@ class Opencode < Formula
   #   native bindings the app never loads (opencode uses web-tree-sitter wasm).
   # @parcel/watcher: inotify backend on OHOS via getBackend() openharmony patch.
   depends_on "bun" => :build
+  depends_on "node" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
 
   def install
