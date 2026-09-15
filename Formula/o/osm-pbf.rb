@@ -1,12 +1,12 @@
 class OsmPbf < Formula
   desc "Tools related to PBF (an alternative to XML format)"
   homepage "https://wiki.openstreetmap.org/wiki/PBF_Format"
-  url "https://github.com/openstreetmap/OSM-binary/archive/refs/tags/v1.7.0.tar.gz"
-  sha256 "ac7aadc57d218a5186076f55255202ec7d0949c7f334b8b0cec8bdd196cd75d7"
+  url "https://github.com/openstreetmap/OSM-binary/archive/refs/tags/v1.8.0.tar.gz"
+  sha256 "18ec63e28a42073db62e8fb59134b8bd410c29e8eb1d8ec1759efc9501fbf41a"
   license "LGPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "711f97ca5644b5e30392474ea267ac92e29f5c254b86810e6f05ca0d401f1f82"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ab37a06c6f93505a046f3ebdc04427e48bc06068e1bc3749f2e18eff0de02a1"
   end
 
   depends_on "cmake" => :build
