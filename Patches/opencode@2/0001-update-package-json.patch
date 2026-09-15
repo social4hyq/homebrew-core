@@ -9,8 +9,10 @@
      "@opentui/keymap": "catalog:",
      "@opentui/solid": "catalog:",
      "@effect/platform-node-shared": "catalog:",
-@@ -156,3 +156,4 @@
+@@ -156,3 +156,6 @@
 +    "@parcel/watcher": "npm:@ohos-npm-ports/parcel-watcher@2.5.1-2",
++    "lightningcss": "npm:@ohos-npm-ports/lightningcss@1.33.0-1",
++    "@tailwindcss/oxide": "npm:@ohos-npm-ports/tailwindcss-oxide@4.3.3-2",
      "@types/bun": "catalog:",
      "@types/node": "catalog:",
      "bun-types": "1.4.2",
