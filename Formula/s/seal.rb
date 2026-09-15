@@ -6,7 +6,7 @@ class Seal < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4897d303688c2ed49ada99d6950066cfc0dc7e1be302d6b54ef3264ce4728e70"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00f31c8765e01e51e7c2a0e8ac2e624659380940c7e03528924916eb875399e1"
   end
 
   depends_on "cmake" => [:build, :test]
