@@ -19,7 +19,7 @@ class LuajitOpenresty < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4cbadd92a9370dbbcfcd8f6fc74f7cdd696e1fca0b7fca345351492f4c4f1ed0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f83d8d5a6ba987c9c568ca18a97df8ce81fd7b7660aa7f03cda80cc846ad307a"
   end
 
   keg_only "it conflicts with the LuaJIT formula"
