@@ -7,7 +7,7 @@ class Upterm < Formula
   head "https://github.com/owenthereal/upterm.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c52753c7ba7a5b1b1ac6733c86c0ac3d92d611348eb8c7448e3424cec8f8e8c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88ae7d3661128840e52fcd9a2b2ce45698f85c40ffa80146f3ce84549b9cdfc2"
   end
 
   depends_on "go" => :build
