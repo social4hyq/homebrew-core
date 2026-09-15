@@ -16,7 +16,7 @@ class Bun < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  revision 8
+  revision 9
 
   livecheck do
     url :stable
@@ -24,8 +24,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r11"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d51b30e31c24549493d6345737db02cebda11d9681aa9010619009a9c668bcb"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8484745c1f04a610b6a6f226fea7e1005b79280ca26827ab3d8660699d9e98e0"
   end
 
   depends_on "cmake" => :build
