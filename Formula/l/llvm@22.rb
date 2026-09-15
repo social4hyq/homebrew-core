@@ -13,7 +13,7 @@ class LlvmAT22 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bbb20a1f07b339ab8bd10a180cfd76594004747ca8df5dd8d84368668848356b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c959b5243ec8947020c5b12af88fce03a736bf358b6e67ce9ee12f0712efbb1f"
   end
 
   keg_only :versioned_formula
