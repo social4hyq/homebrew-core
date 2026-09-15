@@ -15,7 +15,7 @@ class Psqlodbc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7805dcdd06192f06244f8c7ae6d07c2335219b69d74f43828e5ab572a679db0a"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2eb5fe7a05f319180fbc36a918efd062a5b9262f91d5c6569ffdaeda46718fe3"
   end
 
   depends_on "autoconf" => :build
