@@ -4,7 +4,7 @@ class OpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "ad31bff969fe386266d3d1cd24d988651d3233af"
   version "0.0.0-beta-19271"
   license "MIT"
-  revision 5
+  revision 6
   version_scheme 1
 
   livecheck do
