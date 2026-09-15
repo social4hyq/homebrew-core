@@ -4,7 +4,7 @@ class OpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "ad31bff969fe386266d3d1cd24d988651d3233af"
   version "0.0.0-beta-19271"
   license "MIT"
-  revision 1
+  revision 2
   version_scheme 1
 
   livecheck do
@@ -38,7 +38,7 @@ class OpencodeAT2 < Formula
   deny_network_access! :test
 
   def install
-    rm_r %w[packages/desktop packages/app packages/session-ui packages/web
+    rm_r %w[packages/web
             packages/www packages/storybook packages/enterprise]
 
     ENV["OPENCODE_VERSION"] = "#{version}_#{revision}"
@@ -47,7 +47,7 @@ class OpencodeAT2 < Formula
     system "bun", "install", "--ignore-scripts"
 
     cd "packages/cli" do
-      system "bun", "run", "script/build.ts", "--single", "--skip-web-ui"
+      system "bun", "run", "script/build.ts", "--single"
     end
 
     out = "packages/cli/dist/cli-linux-arm64-musl/bin/opencode2"
