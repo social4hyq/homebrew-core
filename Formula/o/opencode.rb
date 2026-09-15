@@ -13,8 +13,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.31-r11"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8cfcd5ff6af07b8e6e8901d214276cd57b0d872172094c3e44ca1e621caec743"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.31-r12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d4bbbe7cb8c7634cc495a3314d560ea3b186a72f5e394298ee88eef79a5fb73"
   end
 
   depends_on "bun" => :build
