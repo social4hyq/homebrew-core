@@ -1,15 +1,14 @@
 class Zookeeper < Formula
   desc "Centralized server for distributed coordination of services"
   homepage "https://zookeeper.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=zookeeper/zookeeper-3.9.5/apache-zookeeper-3.9.5.tar.gz"
-  mirror "https://archive.apache.org/dist/zookeeper/zookeeper-3.9.5/apache-zookeeper-3.9.5.tar.gz"
-  sha256 "0e2d7c487daeff75b38354b231a006caa14c4596ddc21fd37a840c078419357b"
+  url "https://www.apache.org/dyn/closer.lua?path=zookeeper/zookeeper-3.9.6/apache-zookeeper-3.9.6.tar.gz"
+  mirror "https://archive.apache.org/dist/zookeeper/zookeeper-3.9.6/apache-zookeeper-3.9.6.tar.gz"
+  sha256 "9277edd177f795c68b3a92cb411a79076b12ad3184fbf900c0d7cec9a0a52e0a"
   license "Apache-2.0"
-  revision 1
   head "https://gitbox.apache.org/repos/asf/zookeeper.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dde448c10eb2505c79bc1d0e69c17b94701d442910be2347613d6b84103add8b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc6d83d2ae9252ea0be294c35f3bdaed3206541181476cdfd0ce1af3270d091d"
   end
 
   depends_on "autoconf" => :build
