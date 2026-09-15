@@ -4,7 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.31.tar.gz"
   sha256 "76f69fe27ec2b44e23fa1749029e7c012eb7e975a0f0c7819e9458198dfd3896"
   license "MIT"
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -33,6 +33,7 @@ class Opencode < Formula
     0004-update-build-target.patch
     0005-update-project-worktree.patch
     0006-filter-invalid-references.patch
+    0007-avoid-reference-sort.patch
   ].each do |p|
     patch do
       file "Patches/opencode/#{p}"

@@ -1,0 +1,15 @@
+diff --git a/packages/opencode/src/session/system.ts b/packages/opencode/src/session/system.ts
+index 61ab74d..a6a5d55 100644
+--- a/packages/opencode/src/session/system.ts
++++ b/packages/opencode/src/session/system.ts
+@@ -88,9 +88,7 @@ const layer = Layer.effect(
+             : [
+                 "Project references provide additional directories that can be accessed when relevant.",
+                 "<available_references>",
+-                ...references
+-                  .toSorted((a, b) => a.name.localeCompare(b.name))
+-                  .flatMap((reference) => [
++                ...references.flatMap((reference) => [
+                     "  <reference>",
+                     `    <name>${reference.name}</name>`,
+                     `    <path>${reference.path}</path>`,
