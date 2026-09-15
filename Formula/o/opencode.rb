@@ -24,8 +24,18 @@ class Opencode < Formula
     depends_on "icu4c@78"
   end
 
-  patch do
-    file "Patches/opencode/openharmony.patch"
+  %w[
+    0001-remove-minimum-release-age.patch
+    0002-update-package-json.patch
+    0003-update-filesystem-watcher.patch
+    0004-update-project-root.patch
+    0005-update-build-target.patch
+    0006-update-web-command.patch
+    0007-update-project-worktree.patch
+  ].each do |p|
+    patch do
+      file "Patches/opencode/#{p}"
+    end
   end
 
   deny_network_access! :test

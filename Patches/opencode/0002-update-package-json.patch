@@ -1,0 +1,13 @@
+diff --git a/package.json b/package.json
+index a3f9544..dc38286 100644
+--- a/package.json
++++ b/package.json
+@@ -140,3 +140,7 @@
+     "@ai-sdk/anthropic": "3.0.111",
+-    "@opentui/core": "catalog:",
++    "@opentui/core": "npm:@ohos-npm-ports/opentui-core@0.4.5-1",
++    "bun-pty": "npm:@ohos-npm-ports/bun-pty@0.4.10-1",
++    "lightningcss": "npm:@ohos-npm-ports/lightningcss@1.33.0-1",
++    "@tailwindcss/oxide": "npm:@ohos-npm-ports/tailwindcss-oxide@4.3.3-2",
++    "@parcel/watcher": "npm:@ohos-npm-ports/parcel-watcher@2.5.1-2",
+     "@opentui/keymap": "catalog:",
