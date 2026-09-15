@@ -28,6 +28,7 @@ class Opencode < Formula
   #   native bindings the app never loads (opencode uses web-tree-sitter wasm).
   # @parcel/watcher: inotify backend on OHOS via getBackend() openharmony patch.
   depends_on "bun" => :build
+  depends_on "node" => :build
   depends_on "ohos-sdk" => :build # llvm-readelf (verify .codesign section)
 
   def install
