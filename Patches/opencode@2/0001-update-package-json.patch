@@ -1,0 +1,16 @@
+--- a/package.json
++++ b/package.json
+@@ -149,7 +149,7 @@
+     "electron"
+   ],
+   "overrides": {
+-    "@opentui/core": "catalog:",
++    "@opentui/core": "npm:@ohos-npm-ports/opentui-core@0.5.8-1",
+     "@opentui/keymap": "catalog:",
+     "@opentui/solid": "catalog:",
+     "@effect/platform-node-shared": "catalog:",
+@@ -156,3 +156,4 @@
++    "@parcel/watcher": "npm:@ohos-npm-ports/parcel-watcher@2.5.1-2",
+     "@types/bun": "catalog:",
+     "@types/node": "catalog:",
+     "bun-types": "1.4.2",

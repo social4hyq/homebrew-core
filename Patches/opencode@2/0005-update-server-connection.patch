@@ -1,0 +1,11 @@
+--- a/packages/cli/src/services/server-connection.ts
++++ b/packages/cli/src/services/server-connection.ts
+@@ -42,7 +42,7 @@
+     return { endpoint: yield* Standalone.start() } satisfies Resolved
+   }
+ 
+-  const mismatch = args.mismatch ?? "ignore"
++  const mismatch = args.mismatch ?? "replace"
+   const options = yield* ServiceConfig.options({ checkVersion: mismatch !== "ignore" })
+   return {
+     endpoint: yield* resolveManaged({ ...options, onStart: args.onStart }, mismatch),

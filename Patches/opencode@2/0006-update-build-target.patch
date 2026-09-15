@@ -1,0 +1,33 @@
+--- a/packages/cli/script/build.ts
++++ b/packages/cli/script/build.ts
+@@ -55,9 +55,10 @@
+     ? allTargets.filter((item) => targetName(item) === requestedTarget)
+     : singleFlag
+       ? allTargets.filter((item) => {
+-          if (item.os !== process.platform || item.arch !== process.arch) return false
++          if ((item.os !== process.platform || item.arch !== process.arch) &&
++              !(process.platform === "openharmony" && item.os === "linux" && item.arch === "arm64" && item.abi === "musl")) return false
+           if (item.avx2 === false) return baselineFlag
+-          return item.abi === undefined
++          return process.platform === "openharmony" || item.abi === undefined
+         })
+       : allTargets
+ if (!targets.length) throw new Error(`Unknown build target: ${requestedTarget}`)
+@@ -136,7 +137,7 @@
+       autoloadDotenv: false,
+       autoloadTsconfig: true,
+       autoloadPackageJson: true,
+-      target: target.replace(binary, "bun") as Bun.Build.CompileTarget,
++      target: (process.platform === "openharmony" && item.abi === "musl" ? "bun-linux-arm64-ohos" : target.replace(binary, "bun")) as Bun.Build.CompileTarget,
+       ...(executablePath ? { executablePath } : {}),
+       outfile: path.join(outdir, name, "bin", binary),
+       execArgv: [
+@@ -185,7 +186,7 @@
+ 
+ async function compileExecutable(item: (typeof allTargets)[number]) {
+   const release = process.env.BUN_COMPILE_RELEASE
+-  if (!release) return
++  if (!release) return process.execPath
+ 
+   const platform = item.os === "win32" ? "windows" : item.os
+   const name = [
