@@ -1,8 +1,9 @@
 name: remove-unused-patches
 
-# Weekly: find files under Patches/ that no Formula/**/*.rb references (by
-# the literal `Patches/<formula>/<file>.patch` string every `patch :p1 do /
-# file "..."` block uses) and open a PR removing them. Borrowed from
+# Weekly: find files under Patches/ that no Formula/**/*.rb references and
+# open a PR removing them. Literal paths are checked exactly; generated paths
+# such as `file "Patches/bun/#{p}.patch"` retain their static directory.
+# Borrowed from
 # Homebrew/homebrew-core's workflow of the same name; adapted since we don't
 # have generate-formula-api or the Homebrew/brew container — this just greps
 # Formula/ directly. Never deletes on main directly, mirrors autobump.sh's
