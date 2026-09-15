@@ -4,7 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.31.tar.gz"
   sha256 "76f69fe27ec2b44e23fa1749029e7c012eb7e975a0f0c7819e9458198dfd3896"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -13,9 +13,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.31-r6"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7246cca2682a4a0c7a45376171dc32c0c068cfcbe3a538f693297a1671cb551c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.31-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4a85266841fbcfcbada59913d6b11527893e204bdb968680abf0d11f4376f14"
   end
 
   depends_on "bun" => :build
