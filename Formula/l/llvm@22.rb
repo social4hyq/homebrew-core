@@ -5,7 +5,7 @@ class LlvmAT22 < Formula
   sha256 "922f1817a0df7b1489272d18134ee0087a8b068828f87ac63b9861b1a9965888"
   # The LLVM Project is under the Apache License v2.0 with LLVM Exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -13,7 +13,7 @@ class LlvmAT22 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bbb20a1f07b339ab8bd10a180cfd76594004747ca8df5dd8d84368668848356b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c959b5243ec8947020c5b12af88fce03a736bf358b6e67ce9ee12f0712efbb1f"
   end
 
   keg_only :versioned_formula
@@ -240,14 +240,16 @@ class LlvmAT22 < Formula
         -DLIBCXXABI_ENABLE_SHARED=OFF
         -DLIBUNWIND_ENABLE_SHARED=OFF
       ]
+      # OHOS libc.so doesn't export __cxa_thread_atexit_impl — keep libcxxabi's own list.
+      runtimes_cmake_args << "-DLIBCXXABI_HAS_CXA_THREAD_ATEXIT_IMPL=OFF"
+      # __n1 is the only ABI namespace OHOS sanctions for third-party
+      # distribution. The OHOS target-side runtimes built below must match
+      # (a stale/default __1 won't link against these host libc++ headers).
       runtimes_cmake_args += %w[
         -DLIBCXX_HAS_MUSL_LIBC=ON
         -DLIBCXX_HAS_PTHREAD_API=ON
         -DLIBCXX_ABI_NAMESPACE=__n1
       ]
-      # __n1 is the only ABI namespace OHOS sanctions for third-party
-      # distribution. The OHOS target-side runtimes built below must match
-      # (a stale/default __1 won't link against these host libc++ headers).
 
       # Prevent compiler-rt from building i386 targets, as this is not portable.
       builtins_cmake_args << "-DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON"
@@ -435,6 +437,7 @@ class LlvmAT22 < Formula
              "-DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON",
              "-DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON",
              "-DLIBCXXABI_STATICALLY_LINK_UNWINDER_IN_STATIC_LIBRARY=OFF",
+             # OHOS libc.so doesn't export __cxa_thread_atexit_impl — keep libcxxabi's own list.
              "-DLIBCXXABI_HAS_CXA_THREAD_ATEXIT_IMPL=OFF",
              runtimes.to_s
       system "ninja", "-j", jobs.to_s, "install"
