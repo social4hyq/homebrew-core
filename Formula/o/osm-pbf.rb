@@ -6,7 +6,7 @@ class OsmPbf < Formula
   license "LGPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "711f97ca5644b5e30392474ea267ac92e29f5c254b86810e6f05ca0d401f1f82"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ab37a06c6f93505a046f3ebdc04427e48bc06068e1bc3749f2e18eff0de02a1"
   end
 
   depends_on "cmake" => :build
