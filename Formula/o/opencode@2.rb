@@ -4,7 +4,7 @@ class OpencodeAT2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "ad31bff969fe386266d3d1cd24d988651d3233af"
   version "0.0.0-beta-19271"
   license "MIT"
-  revision 4
+  revision 5
   version_scheme 1
 
   livecheck do
@@ -34,6 +34,7 @@ class OpencodeAT2 < Formula
     0004-update-watcher-binding.patch
     0005-update-server-connection.patch
     0006-update-build-target.patch
+    0007-update-app-data-directory.patch
   ].each do |p|
     patch do
       file "Patches/opencode@2/#{p}"

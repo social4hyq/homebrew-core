@@ -1,0 +1,11 @@
+--- a/packages/util/src/global.ts
++++ b/packages/util/src/global.ts
+@@ -9,7 +9,7 @@
+ import { Flock } from "./flock.js"
+ import { makeGlobalNode } from "./effect/app-node.js"
+ 
+-const app = "opencode"
++const app = "opencode2"
+ const { data, cache, config, state, tmp } = roots(app)
+ 
+ const paths = {
