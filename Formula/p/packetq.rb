@@ -11,7 +11,7 @@ class Packetq < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8bd43b3d8590c7eebdb00a70e684fb8436a515d43a1b05577d64e383d29b97c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72d3a34528a5e9116cd72481626ad11bc14022ded43a4b7d939aa9af4cef0ef2"
   end
 
   on_linux do
