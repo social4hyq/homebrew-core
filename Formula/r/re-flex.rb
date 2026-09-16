@@ -6,7 +6,7 @@ class ReFlex < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec430e0ab60319aecf8216bb2fcb9784d252b29f1fa9e44e40fd435835ce3615"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "47d3dcb90006127d5a12bda87681e6370478e3eda387e55c0357ba1b971c67ab"
   end
 
   depends_on "pcre2"
