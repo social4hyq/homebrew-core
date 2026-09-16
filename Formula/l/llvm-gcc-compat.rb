@@ -12,6 +12,9 @@ class LlvmGccCompat < Formula
 
   depends_on "ohos-sdk"
 
+  conflicts_with "gcc", because: "both install `gcc` binaries"
+  conflicts_with "binutils", because: "both install `ld` binaries"
+
   def install
     ohos_bin = Formula["ohos-sdk"].opt_bin
     bin.mkpath
