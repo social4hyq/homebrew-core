@@ -12,7 +12,7 @@ class Mmctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "96cb8a2d8b26d5324a260ac31c111c25a85fe81fcbc70dc2298da7a658c3ef35"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "580a8177104aba2dc2ea264bd74570811d85f7100c42546e1e4acf868b4224cf"
   end
 
   depends_on "go" => :build
