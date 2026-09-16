@@ -6,6 +6,10 @@ class OhosSdkToolchains < Formula
   sha256 "191094c9efcc4c0a6874aadaec5a1bf8b16f09f60c8f34a828d4ab0007356248"
   license "Apache-2.0"
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "206c907c2ec8a6c0b9d4c4d6ea70c3fa62298fa8bface11eda856479ba609ee9"
+  end
+
   # This formula installs a single package of the official SDK, `ohos-sdk`
   # depends on all of them and stays the only formula exposing the SDK command
   # line tools. This keg is never linked: consume it through its `opt_prefix`.
