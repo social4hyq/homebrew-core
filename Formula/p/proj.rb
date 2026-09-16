@@ -1,11 +1,10 @@
 class Proj < Formula
   desc "Cartographic Projections Library"
   homepage "https://proj.org/"
-  url "https://github.com/OSGeo/PROJ/releases/download/9.8.1/proj-9.8.1.tar.gz"
-  mirror "https://download.osgeo.org/proj/proj-9.8.1.tar.gz"
-  sha256 "af5b731c145c1d13c4e3b4eeb7d167e94e845e440f71e3496b4ed8dae0291960"
+  url "https://github.com/OSGeo/PROJ/releases/download/9.9.0/proj-9.9.0.tar.gz"
+  mirror "https://download.osgeo.org/proj/proj-9.9.0.tar.gz"
+  sha256 "791a0610547eeabb17006cfd49cdbd2034f3240f47ed5e88a1031811f4e2bcf3"
   license "MIT"
-  revision 1
   compatibility_version 1
   head "https://github.com/OSGeo/proj.git", branch: "master"
 
@@ -15,7 +14,7 @@ class Proj < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d0841aa60588e14d49656a3d33cc44018645faeb40c4a49251c9b3cc9b7199d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d1e21c29709f3aee288481d6e49b13234d103f9004149b081e173c3a069bc39"
   end
 
   depends_on "cmake" => :build
