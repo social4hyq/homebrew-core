@@ -1,8 +1,8 @@
 class Testkube < Formula
   desc "Kubernetes-native framework for test definition and execution"
   homepage "https://testkube.io"
-  url "https://github.com/kubeshop/testkube/archive/refs/tags/2.13.1.tar.gz"
-  sha256 "1ce0f02021362eb7b6f046c89c5408828223b6d0ba2240543546ae477f76ad8c"
+  url "https://github.com/kubeshop/testkube/archive/refs/tags/2.13.2.tar.gz"
+  sha256 "8b0989e1a52494438cd7b3571f3d1beb9b27529229c6ebf72ea099ca8c6d5865"
   license "MIT"
   head "https://github.com/kubeshop/testkube.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Testkube < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dfeea0a9010a7321d742fe0e7b5e62ff6b481f287ae0613c73bf2df858a86090"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3583f4d2005964685e75145b72a3ceeae074e6f5979dd1506249d112dce5717"
   end
 
   depends_on "go" => :build
