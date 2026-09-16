@@ -1,8 +1,8 @@
 class Asc < Formula
   desc "Fast, lightweight CLI for App Store Connect"
   homepage "https://asccli.sh"
-  url "https://github.com/rorkai/App-Store-Connect-CLI/archive/refs/tags/5.3.3.tar.gz"
-  sha256 "c9518bfa076cbc13c385653c76ad5ed0bfa081fb14e99290f2ee685634a45720"
+  url "https://github.com/rorkai/App-Store-Connect-CLI/archive/refs/tags/5.3.4.tar.gz"
+  sha256 "1e58b2741cb82f2f8056de3838d0ca6f4cce9ad4a0469d4177324404673ba7bf"
   license "MIT"
   head "https://github.com/rorkai/App-Store-Connect-CLI.git", branch: "main"
 
