@@ -7,7 +7,7 @@ class RabbitmqC < Formula
   head "https://github.com/alanxz/rabbitmq-c.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c022c89031a33431594b83afdc08c204556c4a4f50ea211ab1ddfe49bc37882"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0a251e671b79bcbfece8dd6ec662fde67f5a6df40c71336efa15677cb9707a5"
   end
 
   depends_on "cmake" => :build
