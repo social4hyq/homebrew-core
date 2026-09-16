@@ -1,8 +1,8 @@
 class Packetq < Formula
   desc "SQL-like frontend to PCAP files"
   homepage "https://www.dns-oarc.net/tools/packetq"
-  url "https://www.dns-oarc.net/files/packetq/packetq-1.7.3.tar.gz"
-  sha256 "faa9a3700bf6010347fbfa595b7777d32059a77abbb027f6e070b419369d7718"
+  url "https://www.dns-oarc.net/files/packetq/packetq-1.7.4.tar.gz"
+  sha256 "9e2e72a37db9449aa0cae997b35ba7b80e4c1a88fc646e2299fd823769824929"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class Packetq < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8bd43b3d8590c7eebdb00a70e684fb8436a515d43a1b05577d64e383d29b97c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "72d3a34528a5e9116cd72481626ad11bc14022ded43a4b7d939aa9af4cef0ef2"
   end
 
   on_linux do
