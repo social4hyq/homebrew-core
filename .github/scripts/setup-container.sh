@@ -15,8 +15,19 @@ docker run -d --name "$CONTAINER" --init \
 cexec "find '$TAP_IN_CONTAINER/Formula' -type f -name '*.rb' -exec chmod a+r {} +"
 
 # musl tmpfile() hardcoded path + /system/bin/sh + /system/lib/ld-musl
-# (bottle ELFs' PT_INTERP targets the real-device path)
-cexec 'mkdir -p /data/local/tmp /system/bin /system/lib &&
+# (bottle ELFs' PT_INTERP targets the real-device path).
+#
+# /data/storage/el2/base/tmp is the app-sandbox scratch dir a real device
+# always has, but the image's build.sh only pre-creates base/{files,cache}.
+# bun's OHOS build hardcodes its `node` -> bun shim dir under it
+# (BUN_NODE_DIR=/data/storage/el2/base/tmp/bun-node-<sha>) and does NOT create
+# the parents: with the dir missing, bunx silently skips the shim and any
+# node-shebang CLI then dies with "env: node: No such file or directory"
+# (exit 127) -- which is what `bunx cowsay` in bun's test hits in the
+# bottle-only container (issue #593: a bottle install leaves no usable node
+# on the test PATH, so the shim is the only way that test can pass). Do not
+# drop without a daily-regression run.
+cexec 'mkdir -p /data/local/tmp /data/storage/el2/base/tmp /system/bin /system/lib &&
   ln -sf /bin/sh /system/bin/sh &&
   ln -sf /lib/ld-musl-aarch64.so.1 /system/lib/ld-musl-aarch64.so.1'
 
