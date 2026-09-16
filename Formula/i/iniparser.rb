@@ -1,13 +1,13 @@
 class Iniparser < Formula
   desc "Library for parsing ini files"
   homepage "https://gitlab.com/iniparser/iniparser"
-  url "https://gitlab.com/iniparser/iniparser/-/archive/v4.2.6/iniparser-v4.2.6.tar.bz2"
-  sha256 "30f8eaf74b8c4667f2adef4c6b5c50699d1fa6e3ad65b65b0993d414d7ee3118"
+  url "https://gitlab.com/iniparser/iniparser/-/archive/v4.3.0/iniparser-v4.3.0.tar.bz2"
+  sha256 "5516ed5ca9871531936af25764f3d3b4a8ed7d7d0ecfc314d23ba980450cc8d9"
   license "MIT"
   head "https://gitlab.com/iniparser/iniparser.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "747a68c8533881a79b1c204de6c0107529b2458214460f7b3205539c568bcbfe"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d83b50097fea7cb925d0070e67aa69abda66d9cb506a2f425d5ed355271fa761"
   end
 
   depends_on "cmake" => :build
