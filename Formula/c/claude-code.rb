@@ -3,7 +3,7 @@ class ClaudeCode < Formula
   homepage "https://code.claude.com/docs/en/overview"
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.267.tgz"
   sha256 "7eb3b730b2f9198f059b849acaa55f0f55f18608e5b3f876172b2baaa943bbed"
-  license :cannot_represent # Anthropic Commercial Terms of Service
+  license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
   # Stable release channel. Anthropic License forbids redistributing the
   # official artifacts, so this is a runtime-fetch stub: install() ships only a
   # wrapper plus an extractor that runs the CLI bundle on this tap's bun. The
@@ -27,6 +27,12 @@ class ClaudeCode < Formula
   conflicts_with "claude-code.latest", because: "both install the `claude` binary"
 
   def install
+    # Homebrew's build step auto-installs README/LICENSE metafiles from the
+    # staged tarball into the keg; drop them so the bottle carries no bytes of
+    # the official artifact (Anthropic License: all rights reserved).
+    require "metafiles"
+    buildpath.children.each { |p| p.unlink if p.file? && Metafiles.copy?(p.basename.to_s) }
+
     # Extractor: parses the ELF ".bun" section of a `bun build --compile`
     # executable, reads the StandaloneModuleGraph offsets from the section
     # tail, walks the CompiledModuleGraphFile record table and writes every
