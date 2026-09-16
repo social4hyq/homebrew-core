@@ -1,10 +1,9 @@
 class Wabt < Formula
   desc "Web Assembly Binary Toolkit"
   homepage "https://github.com/WebAssembly/wabt"
-  url "https://github.com/WebAssembly/wabt/releases/download/1.0.41/wabt-1.0.41.tar.xz"
-  sha256 "ca9e69cc1de13b4633a3c74fd697319303b21108529d4f10960af4e1f4a65893"
+  url "https://github.com/WebAssembly/wabt/releases/download/1.0.42/wabt-1.0.42.tar.xz"
+  sha256 "a76cda3c174a43097863a07fc0b0c202f770f53e21806ea2636f167d1ffb1e30"
   license "Apache-2.0"
-  revision 1
 
   livecheck do
     url :stable
