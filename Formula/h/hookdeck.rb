@@ -7,8 +7,7 @@ class Hookdeck < Formula
   head "https://github.com/hookdeck/hookdeck-cli.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f13a611b819944601cc7f6984779c18d2cf59e174889d64384304d1f40e2b805"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "474c789a9b9335142c178fd8ba8ad6eb8ef8e35cc551966d20f3b6f8d529e213"
   end
 
   depends_on "go" => :build
