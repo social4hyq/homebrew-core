@@ -19,13 +19,15 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.273-r3"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e4859aef2f89dc54163eefb2e829d06800eeae9f62f5da963ac37d98c17c8c8"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.273-r4"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e50c48c269793cc3681c34d754d248b97bd1204cb403f0809fb4996e70956fc"
   end
 
   depends_on "ohos-bst-light"
   depends_on "ohos-compat-shim"
+
+  conflicts_with "claude-code", because: "both install the `claude` binary"
 
   def install
     (bin/"claude").write <<~SH
@@ -61,14 +63,6 @@ class ClaudeCodeLatest < Formula
       exec "$HB/opt/ohos-compat-shim/bin/ohos-shim" "$BIN" "$@"
     SH
     chmod 0755, bin/"claude"
-  end
-
-  def caveats
-    <<~EOS
-      Claude Code needs a writable temp dir; this device's /tmp is read-only. Set:
-
-        export CLAUDE_CODE_TMPDIR=/data/storage/el2/base/tmp
-    EOS
   end
 
   test do
