@@ -24,6 +24,8 @@ class ClaudeCode < Formula
 
   depends_on "bun"
 
+  conflicts_with "claude-code.latest", because: "both install the `claude` binary"
+
   def install
     # Extractor: parses the ELF ".bun" section of a `bun build --compile`
     # executable, reads the StandaloneModuleGraph offsets from the section
@@ -236,14 +238,6 @@ class ClaudeCode < Formula
       exec "$HB/opt/bun/bin/bun" "$CLI" "$@"
     SH
     chmod 0755, bin/"claude"
-  end
-
-  def caveats
-    <<~EOS
-      Claude Code needs a writable temp dir; this device's /tmp is read-only. Set:
-
-        export CLAUDE_CODE_TMPDIR=/data/storage/el2/base/tmp
-    EOS
   end
 
   test do
