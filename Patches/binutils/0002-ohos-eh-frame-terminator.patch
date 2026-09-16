@@ -1,0 +1,98 @@
+diff -Naur a/bfd/elf-eh-frame.c b/bfd/elf-eh-frame.c
+--- a/bfd/elf-eh-frame.c	2026-09-16 07:48:12.301571206 +0000
++++ b/bfd/elf-eh-frame.c	2026-09-16 07:48:21.035624703 +0000
+@@ -660,7 +660,7 @@
+ 
+   sec_info = bfd_zalloc (abfd,
+ 			 (sizeof (struct eh_frame_sec_info)
+-			  + (num_entries - 1) * sizeof (struct eh_cie_fde)));
++			  + num_entries * sizeof (struct eh_cie_fde)));
+   REQUIRE (sec_info);
+ 
+   /* We need to have a "struct cie" for each CIE in this section.  */
+@@ -1509,6 +1509,7 @@
+   struct eh_frame_hdr_info *hdr_info;
+   unsigned int ptr_size, offset, eh_alignment;
+   int changed;
++  bool is_last_input;
+ 
+   if (sec->sec_info_type != SEC_INFO_TYPE_EH_FRAME)
+     return false;
+@@ -1521,11 +1522,22 @@
+ 	      ->elf_backend_eh_frame_address_size (sec->owner, sec));
+ 
+   hdr_info = &elf_hash_table (info)->eh_info;
++  {
++    /* OpenHarmony: the terminator to keep is the one that ends up last in
++       the output, and only the last input that actually contributes entries
++       can provide it.  Empty input sections stay in the map chain, so they
++       have to be skipped when looking for it.  */
++    asection *later = sec->map_head.s;
++
++    while (later != NULL && later->size == 0)
++      later = later->map_head.s;
++    is_last_input = later == NULL;
++  }
+   for (ent = sec_info->entry; ent < sec_info->entry + sec_info->count; ++ent)
+     if (ent->size == 4)
+       /* There should only be one zero terminator, on the last input
+ 	 file supplying .eh_frame (crtend.o).  Remove any others.  */
+-      ent->removed = sec->map_head.s != NULL;
++      ent->removed = !is_last_input;
+     else if (!ent->cie && ent->u.fde.cie_inf != NULL)
+       {
+ 	bool keep;
+@@ -1589,6 +1601,32 @@
+   free (sec_info->cies);
+   sec_info->cies = NULL;
+ 
++  /* OpenHarmony: a reader of .eh_frame (libgcc's frame registration, for one)
++     walks the section entry by entry and stops at a zero-length terminator, so
++     a section that ends with an FDE makes it read past the end of the section
++     and into whatever follows.  The terminator normally comes from crtend.o,
++     but on OpenHarmony that file is not the last input contributing to
++     .eh_frame (the C library's crtn.o comes after it and brings none of its
++     own), so add one at the end of the output when the last input does not
++     provide it.  */
++  if (is_last_input)
++    {
++      bool have_terminator = false;
++
++      for (ent = sec_info->entry; ent < sec_info->entry + sec_info->count; ++ent)
++	if (!ent->removed && ent->size == 4)
++	  have_terminator = true;
++
++      if (!have_terminator)
++	{
++	  struct eh_cie_fde *terminator = sec_info->entry + sec_info->count;
++
++	  memset (terminator, 0, sizeof (*terminator));
++	  terminator->size = 4;
++	  sec_info->count++;
++	}
++    }
++
+   /* It may be that some .eh_frame input section has greater alignment
+      than other .eh_frame sections.  In that case we run the risk of
+      padding with zeros before that section, which would be seen as a
+@@ -2285,9 +2323,19 @@
+ 		  write_value (abfd, buf, value, width);
+ 		}
+ 	    }
+-	}
++      }
+     }
+ 
++  /* Zero the terminator that may have been added above: it has no input data
++     of its own, so the pass just above would otherwise have copied whatever
++     sits at offset 0 into it.  */
++  if (sec_info->count != 0
++      && sec_info->entry[sec_info->count - 1].size == 4
++      && sec_info->entry[sec_info->count - 1].removed == 0
++      && (unsigned int) sec_info->entry[sec_info->count - 1].new_offset + 4
++	 <= (unsigned int) sec->size)
++    memset (contents + sec_info->entry[sec_info->count - 1].new_offset, 0, 4);
++
+   /* FIXME: octets_per_byte.  */
+   return bfd_set_section_contents (abfd, sec->output_section,
+ 				   contents, (file_ptr) sec->output_offset,
