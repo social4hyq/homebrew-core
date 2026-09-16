@@ -1,15 +1,14 @@
 class Coreutils < Formula
   desc "GNU File, Shell, and Text utilities"
   homepage "https://www.gnu.org/software/coreutils/"
-  url "https://ftpmirror.gnu.org/gnu/coreutils/coreutils-9.11.tar.xz"
-  mirror "https://ftp.gnu.org/gnu/coreutils/coreutils-9.11.tar.xz"
-  sha256 "394024eda0a5955217ceda9cd1201e65dc8fa3aa29c2951135a49521d57c3cc3"
+  url "https://ftpmirror.gnu.org/gnu/coreutils/coreutils-9.12.tar.xz"
+  mirror "https://ftp.gnu.org/gnu/coreutils/coreutils-9.12.tar.xz"
+  sha256 "a480198559733e9b3da999e90543ac6f888a2caa544d8d664c5a1f17e528e210"
   license "GPL-3.0-or-later"
-  revision 3
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ab5f866a64c0ab733ce541423df4fdad23c45cc2ce78fed08f42d6add8ef353"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5541d20cd090326f3522140e905429f8e15218050b812c21d886684b8ecae449"
   end
 
   head do
