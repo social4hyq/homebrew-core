@@ -14,7 +14,7 @@ class Proj < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d0841aa60588e14d49656a3d33cc44018645faeb40c4a49251c9b3cc9b7199d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8d1e21c29709f3aee288481d6e49b13234d103f9004149b081e173c3a069bc39"
   end
 
   depends_on "cmake" => :build
