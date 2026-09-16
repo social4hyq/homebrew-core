@@ -4,21 +4,14 @@ class ClaudeCode < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.267.tgz"
   sha256 "7eb3b730b2f9198f059b849acaa55f0f55f18608e5b3f876172b2baaa943bbed"
   license :cannot_represent # Anthropic Commercial Terms of Service
-  # Stable release channel. Anthropic License prohibits redistributing the
-  # official artifacts, so install() ships only a wrapper plus an extractor: the
-  # official tarball is fetched, sha256-checked and unpacked at first run. The
-  # official binary is never executed — the extractor pulls the CLI bundle out
-  # of it and runs it on this tap's bun, which carries the OHOS runtime fixes
-  # Anthropic's embedded bun lacks. Releases that need Anthropic's private bun
-  # internals (2.1.272 added Bun.ant.CellSegmenter) belong in claude-code.latest.
+  # Stable release channel. Anthropic License forbids redistributing the
+  # official artifacts, so this is a runtime-fetch stub: install() ships only a
+  # wrapper plus an extractor that runs the CLI bundle on this tap's bun. The
+  # latest channel is the separate claude-code.latest formula.
   #
-  # npmmirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org;
-  # the mirror avoids it. sha256 is verified regardless of source.
-  #
-  # Wrapper uses runtime $HOMEBREW_PREFIX only — no build-time path interpolation.
+  # npmmirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org.
 
   livecheck do
-    # Anthropic's stable release channel (plain-text version pointer).
     url "https://downloads.claude.ai/claude-code-releases/stable"
     regex(/(\d+(?:\.\d+)+)/i)
   end
@@ -246,40 +239,13 @@ class ClaudeCode < Formula
 
   def caveats
     <<~EOS
-      claude-code is installed as a runtime-fetch stub: nothing of the official
-      release is in the bottle (Anthropic License). The first `claude` invocation
-      downloads the official tarball (via the npmmirror mirror), verifies its
-      sha256, extracts the CLI module graph from the compiled binary, and runs
-      it on this tap's bun. The official binary itself is never executed.
-      Cached under
-      $HOMEBREW_CACHE/claude-code/#{version}/ (override with CLAUDE_CODE_CACHE).
+      Claude Code needs a writable temp dir; this device's /tmp is read-only. Set:
 
-      Claude Code requires API credentials. Configure via environment variables:
-
-        export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
-        export ANTHROPIC_AUTH_TOKEN=sk-xxx
-        export ANTHROPIC_MODEL=deepseek-v4-flash
-        export ANTHROPIC_DEFAULT_OPUS_MODEL=deepseek-v4-flash
-        export ANTHROPIC_DEFAULT_SONNET_MODEL=deepseek-v4-flash
-        export ANTHROPIC_DEFAULT_HAIKU_MODEL=deepseek-v4-flash
-        export CLAUDE_CODE_SUBAGENT_MODEL=deepseek-v4-flash
-        export CLAUDE_CODE_EFFORT_LEVEL=max
-
-      See https://api-docs.deepseek.com/zh-cn/quick_start/agent_integrations/claude_code
-      for DeepSeek integration details.
-
-      For OpenAI-format APIs, install claude-code-router:
-        brew install claude-code-router
+        export CLAUDE_CODE_TMPDIR=/data/storage/el2/base/tmp
     EOS
   end
 
   test do
-    # End-to-end: wrapper runtime-fetches, sha256-verifies, extracts the CLI
-    # bundle and runs it on our bun. The embedded-bun startup abort that
-    # shipped in 2.1.229-2.1.233 (official binary aborts on OHOS before any
-    # JS runs) is exactly what this catches — the version must come out of
-    # the extracted bundle running on OUR runtime. First run downloads the
-    # ~95MB tgz from npmmirror.
     assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
   end
 end
