@@ -1,8 +1,8 @@
 class Parqeye < Formula
   desc "Peek inside Parquet files right from your terminal"
   homepage "https://github.com/kaushiksrini/parqeye"
-  url "https://github.com/kaushiksrini/parqeye/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "2b8bc834d91594a708d2eea47f0e9ed2fe79b79dca1e9cad631d20b563a612c3"
+  url "https://github.com/kaushiksrini/parqeye/archive/refs/tags/v0.2.0.tar.gz"
+  sha256 "142fb53d92be4f65888cd463b2bae52d0aa23fab12aad2fbb2ae059f69b9978d"
   license "MIT"
   head "https://github.com/kaushiksrini/parqeye.git", branch: "main"
 
