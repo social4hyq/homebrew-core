@@ -72,5 +72,10 @@ class ClaudeCodeLatest < Formula
 
   test do
     assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
+
+    # --version never touches the renderer; start the real TUI under a pty and
+    # fail on the startup crash signature.
+    tui = shell_output("timeout 10 script -q -c '#{bin}/claude' /dev/null 2>&1; true")
+    refute_includes tui, "Uncaught exception", "claude's TUI crash-looped at startup"
   end
 end
