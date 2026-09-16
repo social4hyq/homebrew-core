@@ -11,7 +11,7 @@ class Wabt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "686a8912eb880e2eeae53d54c70afef86b491dcdd758a013decb1352d6ab2fab"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3a118c5fa004c0917cd66f50eafc560dbce57d25d2cc7bd6ae1596a1aa598cc"
   end
 
   depends_on "cmake" => :build
