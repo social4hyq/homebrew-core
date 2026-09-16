@@ -2,65 +2,38 @@ class OhosSdk < Formula
   desc "OpenHarmony SDK"
   homepage "https://gitcode.com/openharmony"
   url "https://cidownload.openharmony.cn/version/Master_Version/ohos-sdk-public_ohos/20260330_020501/version-Master_Version-ohos-sdk-public_ohos-20260330_020501-ohos-sdk-public_ohos.tar.gz"
-  version "26.0.0.18" # Keep the version number consistent with the one in the zip package name.
+  version "26.0.0.18"
   sha256 "191094c9efcc4c0a6874aadaec5a1bf8b16f09f60c8f34a828d4ab0007356248"
   license "Apache-2.0"
-  revision 2
+  revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ba30fbe170387d947066287102f0aec7d26c49b6eadee50d925ae9969d30905"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "477bc2b26c4d5cc5209aa2e2579babaf2398603c4fc82374be0c26bd0f23fd07"
   end
 
-  depends_on "unzip" => :build
+  # The SDK is distributed as one package per component, each of them packaged
+  # by its own formula. Those formulae are keg-only, this one is the only entry
+  # point of the SDK: it exposes the command line tools on PATH and keeps the
+  # components reachable under a single prefix.
+  depends_on "ohos-sdk-ets"
+  depends_on "ohos-sdk-js"
+  depends_on "ohos-sdk-native"
+  depends_on "ohos-sdk-previewer"
+  depends_on "ohos-sdk-toolchains"
 
   conflicts_with "llvm", because: "both install `clang` binaries"
   conflicts_with "llvm@22", because: "both install `clang` binaries"
   conflicts_with "llvm@21", because: "both install `clang` binaries"
 
   def install
-    cd "ohos" do
-      Dir.glob("*.zip").each do |zip_file|
-        system "unzip", "-q", zip_file
-        rm zip_file
-      end
+    # Symlink the components into this keg so that the SDK keeps the layout it
+    # had when it was a single formula (`native/`, `toolchains/`, ...).
+    %w[ets js native previewer toolchains].each do |component|
+      ln_s formula_opt_prefix("ohos-sdk-#{component}"), prefix/component
     end
 
-    prefix.install Dir["ohos/*"]
     llvm_bin_path = prefix/"native/llvm/bin"
     bin.mkpath
-
-    # Workaround for symbolic link materialization in official packages
-    # to prevent Homebrew bottle size bloating.
-    ln_map = {
-      "clang"          => "clang-15",
-      "clang++"        => "clang-15",
-      "clang-cl"       => "clang-15",
-      "clang-cpp"      => "clang-15",
-      "ld64.lld"       => "lld",
-      "ld.lld"         => "lld",
-      "lld-link"       => "lld",
-      "llvm-addr2line" => "llvm-symbolizer",
-      "llvm-lib"       => "llvm-ar",
-      "llvm-ranlib"    => "llvm-ar",
-      "llvm-readelf"   => "llvm-readobj",
-      "llvm-strip"     => "llvm-objcopy",
-    }
-    cd llvm_bin_path do
-      ln_map.each do |link, target|
-        rm link
-        ln_s target, link
-      end
-    end
-
-    # Replace ld.lld symlink with a wrapper script to enable default linker signing.
-    # Ref: https://gitcode.com/openharmony/third_party_llvm-project/pull/882
-    wrapper_content = <<~SH
-      #!/bin/sh
-      exec -a "$0" #{llvm_bin_path}/lld --code-sign "$@"
-    SH
-    rm llvm_bin_path/"ld.lld"
-    (llvm_bin_path/"ld.lld").write wrapper_content
-    chmod 0755, llvm_bin_path/"ld.lld"
 
     # Clang fails to resolve sysroot when invoked via symlinks;
     # using a wrapper script to ensure correct path resolution.
