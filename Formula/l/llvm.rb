@@ -2,7 +2,7 @@ class Llvm < Formula
   desc "Next-gen compiler infrastructure"
   homepage "https://llvm.org/"
   license "Apache-2.0" => { with: "LLVM-exception" }
-  revision 2
+  revision 3
   compatibility_version 2
   head "https://github.com/llvm/llvm-project.git", branch: "main"
 
@@ -26,7 +26,7 @@ class Llvm < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "971782ae64715ca15ab0de1841825d46f8f6f2839da7a0fbd151e10850504b85"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2efc5c12588fc4adf5ba924ad3ec6d71005373e40007f7b2d7359a79014d6b29"
   end
 
   # https://llvm.org/docs/GettingStarted.html#requirement
@@ -40,7 +40,7 @@ class Llvm < Formula
 
   on_linux do
     depends_on "pkgconf" => :build
-    depends_on "ohos-sdk@26.0.0.18" # sysroot + libcxx-ohos headers; see DEFAULT_SYSROOT below
+    depends_on "ohos-sdk-native" # sysroot + libcxx-ohos headers; see DEFAULT_SYSROOT below
     depends_on "zlib-ng-compat"
   end
 
@@ -125,9 +125,9 @@ class Llvm < Formula
     # (into args / runtimes_cmake_args / builtins_cmake_args) picks this up.
     ENV.append_to_cflags "-D__MUSL__"
 
-    ohos_sdk    = formula_opt_prefix("ohos-sdk@26.0.0.18")
-    sysroot     = "#{ohos_sdk}/native/sysroot"
-    libcxx_ohos = "#{ohos_sdk}/native/llvm/include/libcxx-ohos/include/c++/v1"
+    ohos_sdk_native = formula_opt_prefix("ohos-sdk-native")
+    sysroot         = "#{ohos_sdk_native}/sysroot"
+    libcxx_ohos     = "#{ohos_sdk_native}/llvm/include/libcxx-ohos/include/c++/v1"
     odie "OHOS sysroot missing: #{sysroot}/usr/lib" unless File.directory?("#{sysroot}/usr/lib")
     odie "libcxx-ohos headers missing: #{libcxx_ohos}" unless File.directory?(libcxx_ohos)
 
