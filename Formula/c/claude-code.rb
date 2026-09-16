@@ -248,5 +248,12 @@ class ClaudeCode < Formula
 
   test do
     assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
+
+    # --version never touches the renderer, so a bundle that only runs on
+    # Anthropic's private bun internals crash-loops at startup and slips
+    # through. Start the real TUI under a pty and fail on the crash signature.
+    tui = shell_output("timeout 10 script -q -c '#{bin}/claude' /dev/null 2>&1; true")
+    refute_includes tui, "Uncaught exception",
+                    "claude's TUI crash-looped at startup (this release may need claude-code.latest)"
   end
 end
