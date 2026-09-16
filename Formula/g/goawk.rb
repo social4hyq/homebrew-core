@@ -7,7 +7,7 @@ class Goawk < Formula
   head "https://github.com/benhoyt/goawk.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b38ce2c6f7160478abc17dc8ef324682d2a7ce11b386e52ed5a61747071f295"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d11f45c691945fa76ab74c6a9e87c591df96ec636d626763ffcdf8ad9ba93c3e"
   end
 
   depends_on "go" => :build
