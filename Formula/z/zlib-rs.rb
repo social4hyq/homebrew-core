@@ -7,7 +7,7 @@ class ZlibRs < Formula
   head "https://github.com/trifectatechfoundation/zlib-rs.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "90b4eeac5bc34295f42ae9ceacfb539d512902d2804883c350bdaad95d258993"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ed51cbc8f468ba42df3af2341940930a64b9d28b97f335ddbe17a6ab6b2bc2ff"
   end
 
   depends_on "cargo-c" => :build
