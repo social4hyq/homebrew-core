@@ -1,63 +1,31 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.272.tgz"
-  sha256 "49227c477c8b09f8dc5219b9069a6660af03d3ca8c96ce2aebcca32fe4073016"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.267.tgz"
+  sha256 "7eb3b730b2f9198f059b849acaa55f0f55f18608e5b3f876172b2baaa943bbed"
   license :cannot_represent # Anthropic Commercial Terms of Service
-  # extract-cli.mjs content changed (binary-asset detection by magic bytes
-  # instead of filename suffix) without a version bump.
-  # extract-cli.mjs content changed (zstd-compressed .md asset extraction
-  # fix) without a version bump.
-  # npmmirror mirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org
-  # (aarch64 SIMD AES path trapped by kernel); npmmirror (Aliyun CDN) doesn't.
-  # Files are byte-identical (sha256 matches); wrapper tries npmmirror first,
-  # falls back to registry.npmjs.org for non-buggy curl or mirror lag.
+  # Stable release channel. Anthropic License prohibits redistributing the
+  # official artifacts, so install() ships only a wrapper plus an extractor: the
+  # official tarball is fetched, sha256-checked and unpacked at first run. The
+  # official binary is never executed — the extractor pulls the CLI bundle out
+  # of it and runs it on this tap's bun, which carries the OHOS runtime fixes
+  # Anthropic's embedded bun lacks. Releases that need Anthropic's private bun
+  # internals (2.1.272 added Bun.ant.CellSegmenter) belong in claude-code.latest.
   #
-  # Runtime-fetch stub: Anthropic License prohibits redistributing the official
-  # artifacts, so install() ships only a wrapper plus an extractor — the official
-  # tarball is fetched, sha256-checked and unpacked at first run. The official
-  # compiled binary is NEVER executed (see below), so nothing fetched is ever
-  # signed or run as code.
+  # npmmirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org;
+  # the mirror avoids it. sha256 is verified regardless of source.
   #
-  # Why not run the official binary: both bun builds Anthropic ships abort
-  # during early stdio init, before any JS runs (verified via OHOS faultlog
-  # backtrace + qemu strace + local disassembly; see memory note
-  # project_claude_embedded_bun_crash_diagnosis). 2.1.228's bun calls
-  # syscall(close_range, 4, ~0, flags=4), which the OHOS kernel seccomp-traps
-  # with SIGSYS; 2.1.229+ die earlier: the binary's own dynsym exports
-  # stdout/stderr (R_AARCH64_COPY relocs), OHOS musl's ld.so resolves the copy
-  # against the executable itself, leaving the slot NULL, and OHOS musl's
-  # hardened setvbuf("parameter is null") aborts. Neither path is shimmable,
-  # so the wrapper extracts the standalone-module-graph CLI bundle from the
-  # fetched binary (pure data parsing, no execution) and runs it on our own
-  # bun: same JS, working runtime. (Earlier note blaming a regex-automata
-  # panic was an artifact of symbolizing this custom build's addresses
-  # against official bun debug info — layout mismatch, disregard it.)
-  #
-  # Since 2.1.246 the CLI is code-split: the module graph holds ~1500 files
-  # (entry "cli" plus chunk-*.js and embedded .md/.txt assets) that reference
-  # each other via "/$bunfs/root/…" — paths inside bun's embedded virtual
-  # filesystem. The extractor therefore dumps every module next to the entry
-  # and rewrites those specifiers to relative "./…" ones so the tree runs on
-  # our own bun. (2.1.245 and earlier were a single bundle; a largest-payload
-  # scan sufficed then.)
-  #
-  # Relocatability: wrapper uses runtime $HOMEBREW_PREFIX only — no build-time path interpolation.
+  # Wrapper uses runtime $HOMEBREW_PREFIX only — no build-time path interpolation.
 
   livecheck do
-    # npmmirror (Aliyun CDN): registry.npmjs.org is Cloudflare-fronted and
-    # intermittently serves CI runners a 200 non-JSON challenge page, which
-    # kills `brew livecheck` with a bare exit 1 (strategy JSON.parse raise;
-    # observed on scheduled autobump runs 2026-08-23). The mirror serves
-    # identical package metadata without CF. Downloads already prefer the
-    # mirror for the same reachability reason (see install).
-    url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/latest"
-    regex(/"version":\s*"(\d+(?:\.\d+)+)"/i)
+    # Anthropic's stable release channel (plain-text version pointer).
+    url "https://downloads.claude.ai/claude-code-releases/stable"
+    regex(/(\d+(?:\.\d+)+)/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.272-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b195b76accd1d219c4983a3560a76ada354be66e5eb22ba13fcece8566a60c8c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.267-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d78ac2990c9322ea64d9e6ee4752e6600a9e8975b6ae2a21d3cb0286c06c3a3d"
   end
 
   depends_on "bun"
@@ -251,12 +219,9 @@ class ClaudeCode < Formula
         TMP="$(mktemp -d)"
         trap 'rm -rf "$TMP"' EXIT
         echo "claude-code: fetching official binary $VER..." >&2
-        # npmmirror primary (curl SIGILL on Cloudflare); sha256 verifies regardless of source.
         FALLBACK="https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-$VER.tgz"
         fetched=0
         for u in "$NPM_URL" "$FALLBACK"; do
-          # --retry: npmmirror long connections occasionally die mid-transfer
-          # (SSL unexpected eof); one retry has been enough in practice.
           curl -fsSL --retry 3 --retry-all-errors --retry-delay 2 "$u" -o "$TMP/pkg.tgz" && { fetched=1; break; }
         done
         [ "$fetched" = 1 ] || { echo "claude-code: download failed from all mirrors" >&2; exit 1; }
@@ -269,8 +234,7 @@ class ClaudeCode < Formula
         tar -xzf "$TMP/pkg.tgz" -C "$TMP"
         [ -f "$TMP/package/claude" ] || { echo "claude-code: 'claude' binary not found in tarball" >&2; exit 1; }
         # Extract the CLI module graph (entry + chunks); the official binary
-        # itself is never executed (its embedded bun aborts on OHOS — see
-        # formula comments).
+        # itself is never executed.
         "$HB/opt/bun/bin/bun" "$HB/opt/#{name}/libexec/extract-cli.mjs" "$TMP/package/claude" "$CACHE" || {
           echo "claude-code: bundle extraction failed" >&2; exit 1; }
       fi
@@ -286,8 +250,8 @@ class ClaudeCode < Formula
       release is in the bottle (Anthropic License). The first `claude` invocation
       downloads the official tarball (via the npmmirror mirror), verifies its
       sha256, extracts the CLI module graph from the compiled binary, and runs
-      it on this tap's bun. The official binary itself is never executed (its
-      embedded bun crashes on OHOS). Cached under
+      it on this tap's bun. The official binary itself is never executed.
+      Cached under
       $HOMEBREW_CACHE/claude-code/#{version}/ (override with CLAUDE_CODE_CACHE).
 
       Claude Code requires API credentials. Configure via environment variables:
