@@ -19,8 +19,9 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.273-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bfcd7ab9c79154d0d5659390aabc349b9a84e29f6cc94fbf42c59e2ee935aeaa"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.273-r3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3e4859aef2f89dc54163eefb2e829d06800eeae9f62f5da963ac37d98c17c8c8"
   end
 
   depends_on "ohos-bst-light"
@@ -72,5 +73,10 @@ class ClaudeCodeLatest < Formula
 
   test do
     assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
+
+    # --version never touches the renderer; start the real TUI under a pty and
+    # fail on the startup crash signature.
+    tui = shell_output("timeout 10 script -q -c '#{bin}/claude' /dev/null 2>&1; true")
+    refute_includes tui, "Uncaught exception", "claude's TUI crash-looped at startup"
   end
 end

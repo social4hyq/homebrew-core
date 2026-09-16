@@ -17,9 +17,9 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.267-r3"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3bfb099eedc598c64447878ba244c0aff1e4ec277aa5dcd615dc749e4027199"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.267-r4"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c80457fe9415a8a76a1b6e99f1df1d09bcf2ced9f40e6f2d3f6f6774cfcf9613"
   end
 
   depends_on "bun"
@@ -248,5 +248,12 @@ class ClaudeCode < Formula
 
   test do
     assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
+
+    # --version never touches the renderer, so a bundle that only runs on
+    # Anthropic's private bun internals crash-loops at startup and slips
+    # through. Start the real TUI under a pty and fail on the crash signature.
+    tui = shell_output("timeout 10 script -q -c '#{bin}/claude' /dev/null 2>&1; true")
+    refute_includes tui, "Uncaught exception",
+                    "claude's TUI crash-looped at startup (this release may need claude-code.latest)"
   end
 end
