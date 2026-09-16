@@ -92,9 +92,9 @@ jobs:
           HEAD_REF: ${{ github.event.pull_request.head.ref || github.event.workflow_run.head_branch }}
           REPO: ${{ github.repository }}
         run: |
-          # Keep in sync with autobump.yml's ALLOWLIST (claude-code
-          # re-allowlisted, see the note there)
-          ALLOWLIST="opencode opencode@2 claude-code"
+          # Keep in sync with autobump.yml's ALLOWLIST (claude-code /
+          # claude-code.latest, see the note there)
+          ALLOWLIST="opencode opencode@2 claude-code claude-code.latest"
           BUMP_BRANCH_RE="^bump-($(echo "$ALLOWLIST" | tr ' ' '|'))-"
 
           merge_pr() {
