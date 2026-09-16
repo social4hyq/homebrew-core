@@ -6,7 +6,7 @@ class Rollup < Formula
   license all_of: ["ISC", "MIT"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5057d852c3a9b29be57aee773729f8b778862026b98df51601f958b1dfc2fca9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cbd94cf295367ad1123bd77ec3dd0a8c1110488636d500e8558ec06e4e29e0cd"
   end
 
   depends_on "node"
