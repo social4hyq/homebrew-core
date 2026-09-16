@@ -7,7 +7,8 @@ class LlvmGccCompat < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c5f687df7ad591e585c60ac921c61359159035da42beff60a5bb03bfd16df04"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "955022daa911ec2291b0eb14c77dac1af2249b1e44c1113ead74f18e35d44ee9"
   end
 
   depends_on "ohos-sdk"
