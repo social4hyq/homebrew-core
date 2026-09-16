@@ -94,5 +94,16 @@ jobs:
           # the ruleset-bypass admin PAT.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 2026-09-16: opencode's `strategy :github_latest` livecheck fetches
+          # api.github.com via GitHub::API.open_rest, which only picks up
+          # HOMEBREW_GITHUB_API_TOKEN — without it the call is anonymous from
+          # the shared runner egress IP and GitHub's edge closes the connection
+          # (Ruby net/http raises Errno::EPIPE, livecheck reports "Broken
+          # pipe", whole --tap run exits 1 and no formula gets bumped; runs
+          # 35041842164/35057241554). Authenticated calls sidestep the
+          # shared-IP throttling. The other allowlisted formulas don't touch
+          # the GitHub API (npmmirror / downloads.claude.ai), which is why
+          # only opencode ever tripped this.
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ONLY_FORMULA: ${{ inputs.formula }}
         run: .github/scripts/autobump.sh
