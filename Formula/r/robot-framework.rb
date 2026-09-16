@@ -9,7 +9,7 @@ class RobotFramework < Formula
   head "https://github.com/robotframework/robotframework.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b94597fe74563032c3036f82ab2a105e44b3feea1397c4a07a883e72c7528c5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f53cc339ae365555e4ded025a344bd863046c3193055a1c41d6335d2c3fb35bd"
   end
 
   # `pkgconf` and `rust` are for bcrypt
