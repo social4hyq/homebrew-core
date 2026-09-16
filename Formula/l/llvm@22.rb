@@ -5,7 +5,7 @@ class LlvmAT22 < Formula
   sha256 "922f1817a0df7b1489272d18134ee0087a8b068828f87ac63b9861b1a9965888"
   # The LLVM Project is under the Apache License v2.0 with LLVM Exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -29,7 +29,7 @@ class LlvmAT22 < Formula
 
   on_linux do
     depends_on "pkgconf" => :build
-    depends_on "ohos-sdk@26.0.0.18" # sysroot + libcxx-ohos headers; see DEFAULT_SYSROOT below
+    depends_on "ohos-sdk-native" # sysroot + libcxx-ohos headers; see DEFAULT_SYSROOT below
     depends_on "zlib-ng-compat"
   end
 
@@ -114,9 +114,9 @@ class LlvmAT22 < Formula
     # (into args / runtimes_cmake_args / builtins_cmake_args) picks this up.
     ENV.append_to_cflags "-D__MUSL__"
 
-    ohos_sdk    = formula_opt_prefix("ohos-sdk@26.0.0.18")
-    sysroot     = "#{ohos_sdk}/native/sysroot"
-    libcxx_ohos = "#{ohos_sdk}/native/llvm/include/libcxx-ohos/include/c++/v1"
+    ohos_sdk_native = formula_opt_prefix("ohos-sdk-native")
+    sysroot         = "#{ohos_sdk_native}/sysroot"
+    libcxx_ohos     = "#{ohos_sdk_native}/llvm/include/libcxx-ohos/include/c++/v1"
     odie "OHOS sysroot missing: #{sysroot}/usr/lib" unless File.directory?("#{sysroot}/usr/lib")
     odie "libcxx-ohos headers missing: #{libcxx_ohos}" unless File.directory?(libcxx_ohos)
 
