@@ -20,6 +20,11 @@ class ClaudeCodeLatest < Formula
 
   livecheck do
     # Anthropic's latest release channel (plain-text version pointer).
+
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.273-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "723769f620ff42a0c07a87b9f33569e731093b7ab677ac7d3b427f359062959c"
+  end
     url "https://downloads.claude.ai/claude-code-releases/latest"
     regex(/(\d+(?:\.\d+)+)/i)
   end
