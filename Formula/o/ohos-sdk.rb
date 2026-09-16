@@ -7,6 +7,10 @@ class OhosSdk < Formula
   license "Apache-2.0"
   revision 3
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "477bc2b26c4d5cc5209aa2e2579babaf2398603c4fc82374be0c26bd0f23fd07"
+  end
+
   # The SDK is distributed as one package per component, each of them packaged
   # by its own formula. Those formulae are keg-only, this one is the only entry
   # point of the SDK: it exposes the command line tools on PATH and keeps the
