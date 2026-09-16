@@ -8,7 +8,7 @@ class Opencode < Formula
 
   livecheck do
     url :stable
-    strategy :github_latest
+    regex(/^v(1\.\d+\.\d+)$/i)
     throttle 5
   end
 
