@@ -6,7 +6,7 @@ class Libaegis < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1586ec1cbcca14fee863e049cecfd727b0a0f53d48525a0b9fcd003598f1389"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8fd7d048c0fdaec7ab8bb0e5ede8bb04e30e37e4bf420cd5476ab83763cf6d29"
   end
 
   depends_on "cmake" => :build
