@@ -7,7 +7,7 @@ class Buildozer < Formula
   head "https://github.com/bazelbuild/buildtools.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aad771236ecd80e71a876606dff135e898fc9bb25cda486b45db6e1b1c96e5b5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11028e765673bce8343ac2e748aa12a23c2be94aa6cc74578fa2532c0d0d54d5"
   end
 
   depends_on "go" => :build
