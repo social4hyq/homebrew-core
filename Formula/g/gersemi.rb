@@ -3,12 +3,12 @@ class Gersemi < Formula
 
   desc "Formatter to make your CMake code the real treasure"
   homepage "https://github.com/BlankSpruce/gersemi"
-  url "https://files.pythonhosted.org/packages/ab/81/312386da943216127cfea5646a5f3e329afa27c6b777b35a41592a76f6bd/gersemi-0.29.0.tar.gz"
-  sha256 "6b6a41bea5fce42033d6330aa2a202b3564b44475050e26c03d65c44e1e3c05d"
+  url "https://files.pythonhosted.org/packages/30/dd/406b5940cc7d7ab791385fb9cac1d101f41dbdc45989d3dcb4a6972f28fb/gersemi-0.29.1.tar.gz"
+  sha256 "f40131536a42debab879448aa24c0bcac09ba792919bcaa605b11544b3b7f992"
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c05516236e412c78f76d4b4a74cd5c97105b1129a469c09f11f661a68088b0eb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9c139f07ee7627ef03b974b5f03661c0b030849e573f726844b327e1b62a606"
   end
 
   depends_on "rust" => :build
