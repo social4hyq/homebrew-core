@@ -2,10 +2,9 @@ class Ollama < Formula
   desc "Create, run, and share large language models (LLMs)"
   homepage "https://ollama.com/"
   url "https://github.com/ollama/ollama.git",
-      tag:      "v0.33.3",
-      revision: "b79067b0db7417f20108363bc22adb97f35c966a"
+      tag:      "v0.34.0",
+      revision: "d8ab4b4f0ca24b51d3a46b3bf4f462e58ce66b1f"
   license "MIT"
-  revision 1
   head "https://github.com/ollama/ollama.git", branch: "main"
 
   # Upstream creates releases that use a stable tag (e.g., `v1.2.3`) but are
@@ -17,7 +16,7 @@ class Ollama < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "60ba9485b0ea50f002476bb9d110837743bb87be33fcde099a4f285581018ff7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a614e7f774acf240270b3f332e91aa9a4eeda13d613d06c4f33d7a60896d800"
   end
 
   depends_on "cmake" => :build
@@ -34,8 +33,6 @@ class Ollama < Formula
       patch :DATA
     end
   end
-
-  conflicts_with cask: "ollama-app"
 
   # Pinned dependency required by llama-server
   resource "llama.cpp" do
@@ -140,6 +137,14 @@ class Ollama < Formula
     error_log_path var/"log/ollama.log"
     environment_variables OLLAMA_FLASH_ATTENTION: "1",
                           OLLAMA_KV_CACHE_TYPE:   "q8_0"
+  end
+
+  def caveats
+    on_linux do
+      <<~EOS
+        This formula only includes support for the CPU backend.
+      EOS
+    end
   end
 
   test do
