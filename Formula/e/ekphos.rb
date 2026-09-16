@@ -7,7 +7,7 @@ class Ekphos < Formula
   head "https://github.com/hanebox/ekphos.git", branch: "release"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "97d24d6fba5408a4773d0fbde8257d8b2417fd34a97045bcad97e87cbfb9ee1c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "62b6444b36fb1b944f82e92f1aa4b9caded7d183d1563aeb5f3e9fcccb03b4c0"
   end
 
   depends_on "rust" => :build
