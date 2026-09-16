@@ -27,6 +27,8 @@ class ClaudeCodeLatest < Formula
   depends_on "ohos-bst-light"
   depends_on "ohos-compat-shim"
 
+  conflicts_with "claude-code", because: "both install the `claude` binary"
+
   def install
     (bin/"claude").write <<~SH
       #!/bin/sh
@@ -61,14 +63,6 @@ class ClaudeCodeLatest < Formula
       exec "$HB/opt/ohos-compat-shim/bin/ohos-shim" "$BIN" "$@"
     SH
     chmod 0755, bin/"claude"
-  end
-
-  def caveats
-    <<~EOS
-      Claude Code needs a writable temp dir; this device's /tmp is read-only. Set:
-
-        export CLAUDE_CODE_TMPDIR=/data/storage/el2/base/tmp
-    EOS
   end
 
   test do
