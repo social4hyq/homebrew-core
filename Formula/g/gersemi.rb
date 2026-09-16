@@ -8,7 +8,7 @@ class Gersemi < Formula
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c05516236e412c78f76d4b4a74cd5c97105b1129a469c09f11f661a68088b0eb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9c139f07ee7627ef03b974b5f03661c0b030849e573f726844b327e1b62a606"
   end
 
   depends_on "rust" => :build
