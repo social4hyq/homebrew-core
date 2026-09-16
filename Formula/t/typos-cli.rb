@@ -1,8 +1,8 @@
 class TyposCli < Formula
   desc "Source code spell checker"
   homepage "https://github.com/crate-ci/typos"
-  url "https://github.com/crate-ci/typos/archive/refs/tags/v1.50.1.tar.gz"
-  sha256 "871533d5d4be599db158a2644b80da1b5e67d8793a19cf0d5635541f3ef3225a"
+  url "https://github.com/crate-ci/typos/archive/refs/tags/v1.50.2.tar.gz"
+  sha256 "412b161d33996e2c3c4a8b076e22183527f3420242975e868ba9968a3ce1727e"
   license any_of: ["Apache-2.0", "MIT"]
 
   livecheck do
@@ -11,7 +11,7 @@ class TyposCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "82a42c1de50f54a0e8db1805f9aec1181a0452df5668fc02c1aac9f42e07f821"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "06fcfb531067c9d2a41799b4993923f6e008dc1450607e56df20605aa84e0d82"
   end
 
   depends_on "rust" => :build
