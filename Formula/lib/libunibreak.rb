@@ -1,10 +1,9 @@
 class Libunibreak < Formula
   desc "Implementation of the Unicode line- and word-breaking algorithms"
   homepage "https://github.com/adah1972/libunibreak"
-  url "https://github.com/adah1972/libunibreak/releases/download/libunibreak_7_0/libunibreak-7.0.tar.gz"
-  sha256 "8c9a6e121736cd0d5c890ae3ae96f3f4010a19aa040f1dbded833a62a87717d3"
+  url "https://github.com/adah1972/libunibreak/releases/download/libunibreak_8_0/libunibreak-8.0.tar.gz"
+  sha256 "9c4fad6e517338a098373acc9f35579ae2c325e6446666fb9ac2666ba15ceba4"
   license "Zlib"
-  revision 1
   compatibility_version 2
 
   livecheck do
@@ -16,7 +15,7 @@ class Libunibreak < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e43229f5019580255b7dc9ed537e67c41eeb59dd544c5c8cac667a760c68bb0b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8a34781ef42e03e7c70e4c56eab8d9a735d55f95a75114c43dde556ffed1d62"
   end
 
   def install
