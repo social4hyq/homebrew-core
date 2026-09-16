@@ -103,6 +103,26 @@ for f in "${FORMULAE[@]}"; do
     if cexec "$BREW_ENV brew list --formula --versions $TAP/$f" > /dev/null 2>&1; then
       echo "::warning::$f: brew install exited nonzero but the keg is installed (known keg-only/link-conflict false failure, see install.log) — treating as installed"
       install_ok=1
+    else
+      # Genuine `conflicts_with` refusal, not a formula bug: an earlier
+      # iteration already installed the declared partner (claude-code <->
+      # claude-code.latest both ship `claude`, so whichever the set reaches
+      # second dies here even though the kegs coexist fine). Only the
+      # top-level symlinks collide, so follow brew's own hint — that message
+      # names the partners — unlink them and retry once. `brew test` execs the
+      # keg's own bin path, so an unlinked partner still tests fine.
+      # `.` where brew prints a backtick, so the sed pattern stays free of
+      # backticks (checks run on the host side too).
+      conflict_names=$(sed -n 's/^Please .brew unlink \(.*\). before continuing\.$/\1/p' install.log)
+      conflict_names="${conflict_names%%$'\n'*}"
+      if [ -n "$conflict_names" ]; then
+        echo "::warning::$f: conflicts_with an already-installed partner ($conflict_names); unlinking and retrying once"
+        # shellcheck disable=SC2086  # word-split is intended: brew prints them space-separated
+        cexec "$BREW_ENV brew unlink $conflict_names" || true
+        if cexec "$BREW_ENV brew install --formula --include-test $TAP/$f" >> install.log 2>&1; then
+          install_ok=1
+        fi
+      fi
     fi
   fi
 
