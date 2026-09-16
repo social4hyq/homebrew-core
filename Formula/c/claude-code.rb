@@ -3,7 +3,7 @@ class ClaudeCode < Formula
   homepage "https://code.claude.com/docs/en/overview"
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.267.tgz"
   sha256 "7eb3b730b2f9198f059b849acaa55f0f55f18608e5b3f876172b2baaa943bbed"
-  license :cannot_represent # Anthropic Commercial Terms of Service
+  license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
   # Stable release channel. Anthropic License forbids redistributing the
   # official artifacts, so this is a runtime-fetch stub: install() ships only a
   # wrapper plus an extractor that runs the CLI bundle on this tap's bun. The
@@ -17,9 +17,9 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.267-r5"
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61196057731a358587faacb18f3176e98768ac6527c65a37a8f081117ffd1817"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.267-r6"
+    rebuild 4
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c9885fcb4a18189df0611ae3988d45c0e9ef8635a6334cfd3cb8ed704633f6d"
   end
 
   depends_on "bun"
@@ -27,6 +27,12 @@ class ClaudeCode < Formula
   conflicts_with "claude-code.latest", because: "both install the `claude` binary"
 
   def install
+    # Homebrew's build step auto-installs README/LICENSE metafiles from the
+    # staged tarball into the keg; drop them so the bottle carries no bytes of
+    # the official artifact (Anthropic License: all rights reserved).
+    require "metafiles"
+    buildpath.children.each { |p| p.unlink if p.file? && Metafiles.copy?(p.basename.to_s) }
+
     # Extractor: parses the ELF ".bun" section of a `bun build --compile`
     # executable, reads the StandaloneModuleGraph offsets from the section
     # tail, walks the CompiledModuleGraphFile record table and writes every
