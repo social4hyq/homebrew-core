@@ -1,0 +1,70 @@
+diff --git a/libgfortran/configure b/libgfortran/configure
+index 75cf47e3a..b98a75c5f 100755
+--- a/libgfortran/configure
++++ b/libgfortran/configure
+@@ -18414,10 +18414,12 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
+ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ 
+ 
+-# caf_shmem needs process-shared pthread primitives that are visible through
+-# the default pthread headers.  AX_PTHREAD already established the baseline
+-# pthread flags; this additional check only verifies that the specific
+-# process-shared API surface is usable for caf/shmem/thread_support.c.
++# caf_shmem needs process-shared pthread primitives, and robust mutexes, that
++# are visible through the default pthread headers.  AX_PTHREAD already
++# established the baseline pthread flags; this additional check verifies the
++# specific API surface caf/shmem/thread_support.c uses.  The robust mutex API
++# is optional: OpenHarmony's headers, for example, declare no
++# pthread_mutexattr_setrobust().
+ if test x$enable_caf_shmem = xtrue; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for usable process-shared pthread support for caf_shmem" >&5
+ $as_echo_n "checking for usable process-shared pthread support for caf_shmem... " >&6; }
+@@ -18433,10 +18435,12 @@ pthread_mutexattr_t mattr;
+         pthread_condattr_t cattr;
+         (void) &pthread_mutexattr_setpshared;
+         (void) &pthread_condattr_setpshared;
++        (void) &pthread_mutexattr_setrobust;
+         return pthread_mutexattr_init (&mattr)
+           || pthread_condattr_init (&cattr)
+           || pthread_mutexattr_setpshared (&mattr, PTHREAD_PROCESS_SHARED)
+-          || pthread_condattr_setpshared (&cattr, PTHREAD_PROCESS_SHARED);
++          || pthread_condattr_setpshared (&cattr, PTHREAD_PROCESS_SHARED)
++          || pthread_mutexattr_setrobust (&mattr, PTHREAD_MUTEX_ROBUST);
+   ;
+   return 0;
+ }
+diff --git a/libgfortran/configure.ac b/libgfortran/configure.ac
+index da9ae604c..72eb2fbe7 100644
+--- a/libgfortran/configure.ac
++++ b/libgfortran/configure.ac
+@@ -351,10 +351,12 @@ AX_PTHREAD([
+   ], [
+   enable_caf_shmem=false
+   ])
+-# caf_shmem needs process-shared pthread primitives that are visible through
+-# the default pthread headers.  AX_PTHREAD already established the baseline
+-# pthread flags; this additional check only verifies that the specific
+-# process-shared API surface is usable for caf/shmem/thread_support.c.
++# caf_shmem needs process-shared pthread primitives, and robust mutexes, that
++# are visible through the default pthread headers.  AX_PTHREAD already
++# established the baseline pthread flags; this additional check verifies the
++# specific API surface caf/shmem/thread_support.c uses.  The robust mutex API
++# is optional: OpenHarmony's headers, for example, declare no
++# pthread_mutexattr_setrobust().
+ if test x$enable_caf_shmem = xtrue; then
+   AC_MSG_CHECKING([for usable process-shared pthread support for caf_shmem])
+   save_CFLAGS="$CFLAGS"
+@@ -366,10 +368,12 @@ if test x$enable_caf_shmem = xtrue; then
+         pthread_condattr_t cattr;
+         (void) &pthread_mutexattr_setpshared;
+         (void) &pthread_condattr_setpshared;
++        (void) &pthread_mutexattr_setrobust;
+         return pthread_mutexattr_init (&mattr)
+           || pthread_condattr_init (&cattr)
+           || pthread_mutexattr_setpshared (&mattr, PTHREAD_PROCESS_SHARED)
+-          || pthread_condattr_setpshared (&cattr, PTHREAD_PROCESS_SHARED);]])],
++          || pthread_condattr_setpshared (&cattr, PTHREAD_PROCESS_SHARED)
++          || pthread_mutexattr_setrobust (&mattr, PTHREAD_MUTEX_ROBUST);]])],
+     [AC_MSG_RESULT([yes])],
+     [AC_MSG_RESULT([no])
+      enable_caf_shmem=false])

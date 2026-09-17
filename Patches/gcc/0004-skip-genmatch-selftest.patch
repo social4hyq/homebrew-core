@@ -1,0 +1,17 @@
+diff --git a/gcc/genmatch.cc b/gcc/genmatch.cc
+index 633ff9e1d..3dac38a19 100644
+--- a/gcc/genmatch.cc
++++ b/gcc/genmatch.cc
+@@ -594,7 +594,11 @@ diag_vfprintf (FILE *f, int err_no, const char *msg, va_list *ap)
+   fprintf (f, "%s", q);
+ }
+ 
+-#if defined(GENMATCH_SELFTESTS) && HAVE_DECL_FMEMOPEN
++/* The self-tests below write into a fmemopen() stream and then inspect the
++   caller's buffer.  OpenHarmony's musl fmemopen() does not fill that buffer
++   in (writes only show up as a stream position, and fclose() even reports
++   EBADF), as the platform's own clang builds show too, so skip them.  */
++#if defined(GENMATCH_SELFTESTS) && HAVE_DECL_FMEMOPEN && !defined(__OHOS__)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wsuggest-attribute=format"
+ 
