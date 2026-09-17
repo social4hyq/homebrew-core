@@ -1,0 +1,70 @@
+diff -ruN a/nx.wasi.cjs b/nx.wasi.cjs
+--- a/nx.wasi.cjs	2026-09-17 09:34:37.188027657 +0800
++++ b/nx.wasi.cjs	2026-09-17 09:34:37.252027657 +0800
+@@ -13,7 +13,31 @@
+   createOnMessage: __wasmCreateOnMessageForFsProxy,
+ } = require('@napi-rs/wasm-runtime')
+ 
+-const __rootDir = __nodePath.parse(process.cwd()).root
++// OpenHarmony (HarmonyBrew): open('/') and other system-level paths return
++// EACCES on this platform, breaking uvwasi_init inside the WASI fallback
++// loader. Use the deepest accessible ancestor directory of cwd as the
++// preopen root instead, and fall back to the original behavior when probing
++// fails (no behavior change on regular Linux/macOS systems).
++let __rootDir = __nodePath.parse(process.cwd()).root
++{
++  let dir = process.cwd()
++  const candidates = []
++  for (;;) {
++    candidates.push(dir)
++    const parent = __nodePath.dirname(dir)
++    if (parent === dir) break
++    dir = parent
++  }
++  candidates.reverse()
++  for (const c of candidates) {
++    try {
++      const fd = __nodeFs.openSync(c, 'r')
++      __nodeFs.closeSync(fd)
++      __rootDir = c
++      break
++    } catch {}
++  }
++}
+ 
+ const __wasi = new __nodeWASI({
+   version: 'preview1',
+diff -ruN a/wasi-worker.mjs b/wasi-worker.mjs
+--- a/wasi-worker.mjs	2026-09-17 09:34:37.216027813 +0800
++++ b/wasi-worker.mjs	2026-09-17 09:34:37.276027813 +0800
+@@ -30,7 +30,29 @@
+ 
+ const emnapiContext = getDefaultContext();
+ 
+-const __rootDir = parse(process.cwd()).root;
++// OpenHarmony (HarmonyBrew): open('/') returns EACCES on this platform,
++// breaking uvwasi_init in worker threads too. Use the deepest accessible
++// ancestor directory of cwd as the preopen root (same fix as nx.wasi.cjs).
++let __rootDir = parse(process.cwd()).root;
++{
++  let dir = process.cwd();
++  const candidates = [];
++  for (;;) {
++    candidates.push(dir);
++    const parent = parse(dir).dir;
++    if (parent === dir) break;
++    dir = parent;
++  }
++  candidates.reverse();
++  for (const c of candidates) {
++    try {
++      const fd = fs.openSync(c, "r");
++      fs.closeSync(fd);
++      __rootDir = c;
++      break;
++    } catch {}
++  }
++}
+ 
+ const handler = new MessageHandler({
+   onLoad({ wasmModule, wasmMemory }) {
