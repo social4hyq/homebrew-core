@@ -24,7 +24,7 @@ class Bind < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c4bbf0134856682c986b6c536385f74d9e95924cec02ebdf4ee1af7a0773a28b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba9e25047cc460b772f1256e41f1deed179627f7ce300c84353e92b2b759c32a"
   end
 
   head do
