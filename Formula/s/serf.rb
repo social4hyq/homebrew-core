@@ -7,7 +7,7 @@ class Serf < Formula
   head "https://github.com/hashicorp/serf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9781cb178fbc8d50dc6a6399eb20e762fc76fe18c748ffde676d75255992fc78"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d6cbfd89cb7c6b9bf7c39c118d488e6def13bef6f2eb15a7f5c3d82d436545c"
   end
 
   depends_on "go" => :build
