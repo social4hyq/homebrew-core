@@ -4,6 +4,7 @@ class Pnpm < Formula
   url "https://github.com/pnpm/pnpm/archive/refs/tags/v12.4.2.tar.gz"
   sha256 "2fca2c303b978c8177c13550b2d0f8e442cf32b833bea7878421f90c18a7c612"
   license "MIT"
+  revision 1
 
   livecheck do
     url "https://registry.npmmirror.com/pnpm/latest"
@@ -32,6 +33,13 @@ class Pnpm < Formula
 
   patch do
     file "Patches/pnpm/0002-autosign-store-elf.patch"
+  end
+
+  # Rust models OHOS as a Linux variant (target_os "linux"), which made
+  # the default supportedArchitectures install linux-*-musl optional
+  # bindings that openharmony-aware napi-rs loaders never pick up.
+  patch do
+    file "Patches/pnpm/0003-host-platform-openharmony.patch"
   end
 
   deny_network_access!
