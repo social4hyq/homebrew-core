@@ -1,8 +1,8 @@
 class TwoMs < Formula
   desc "Detect secrets in files and communication platforms"
   homepage "https://github.com/Checkmarx/2ms"
-  url "https://github.com/Checkmarx/2ms/archive/refs/tags/v5.3.0.tar.gz"
-  sha256 "6f9fa42f8f8fcbfcb1b09c66775682a13c1d9eca2094ae80924c5ae4d779efd9"
+  url "https://github.com/Checkmarx/2ms/archive/refs/tags/v5.4.0.tar.gz"
+  sha256 "392938f0a55a0fcb30c537700d1b0ba37659d09bd52fac045d49e78248e17868"
   license "Apache-2.0"
   head "https://github.com/Checkmarx/2ms.git", branch: "master"
 
@@ -12,7 +12,7 @@ class TwoMs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0a8d71065d5145147217a4e4b2eda87e82020d58db55dbe60c44bcd5501a5e0"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c3eb5d54289ec25c5e6ca5d296c58d7a1d5fab0a3dd0cc5d72fe227ffd6da9e"
   end
 
   depends_on "go" => :build
