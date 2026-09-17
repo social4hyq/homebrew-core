@@ -12,7 +12,7 @@ class Dust < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "31133a93a709ddf198f7ebde46e8ac86f87e0b4eff953e9ed11b7405ca63e716"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "feaf52892ded1a4fb45f29d9c4154308991a47fd0bc52cf611af5f76e477895a"
   end
 
   depends_on "rust" => :build
