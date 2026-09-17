@@ -1,0 +1,56 @@
+diff -Naur a/gcc/c/c-decl.cc b/gcc/c/c-decl.cc
+--- a/gcc/c/c-decl.cc	2026-08-07 07:46:05.792684136 +0000
++++ b/gcc/c/c-decl.cc	2026-09-16 12:05:33.459374673 +0000
+@@ -8527,11 +8527,17 @@
+       tree parm, type, typelt;
+       unsigned int parmno;
+ 
+-      /* In C23, convert () to (void).  */
++      /* In C23, convert () to (void).  Declarations that come from a system
++	 header keep their old-style meaning instead: OpenHarmony's <string.h>
++	 declares `char *basename();`, and under C23 that becomes a function
++	 taking no arguments, so every call that passes one - which is how the
++	 whole of Linux user space calls it - stops compiling.  System headers
++	 already get this kind of latitude a few lines above.  */
+       if (flag_isoc23
+ 	  && !arg_types
+ 	  && !arg_info->parms
+-	  && !arg_info->no_named_args_stdarg_p)
++	  && !arg_info->no_named_args_stdarg_p
++	  && !in_system_header_at (input_location))
+ 	{
+ 	  arg_types = arg_info->types = void_list_node;
+ 	  arg_info->c23_empty_parens = 1;
+diff -Naur a/gcc/config/ohos.h b/gcc/config/ohos.h
+--- a/gcc/config/ohos.h
++++ b/gcc/config/ohos.h
+@@ -7,6 +7,21 @@
+    OHOS-specific to say about the C library itself; this file only adds the
+    predefined macros the platform's own toolchain defines.  */
+ 
++/* OpenHarmony's headers annotate almost every declaration with Clang's
++   availability attribute, naming the API level it first appeared in:
++
++     __attribute__((__availability__(ohos, introduced=12.0.0)))
++
++   GCC has no such attribute and cannot even parse the dotted version, so the
++   annotation has to be swallowed by the preprocessor.  That macro has to
++   take exactly two arguments rather than be variadic: `#define f(args...)`
++   is an error under `-pedantic-errors` in C89 and C++98 mode, reported at
++   <built-in> so that every pedantic compilation of anything fails, and the
++   preprocessor rejects variadic definitions outright in traditional mode,
++   which is the mode the Modula-2 driver preprocesses `-fcpp` sources in.
++   All 6670 uses in the headers of SDK 26.0.0.18 have this two-argument
++   shape.  */
++
+ #ifndef GCC_OHOS_H
+ #define GCC_OHOS_H
+ 
+@@ -15,6 +30,7 @@
+     {						\
+       builtin_define ("__OHOS__");		\
+       builtin_define ("__OHOS_FAMILY__");	\
++      builtin_define_with_value ("__availability__(platform, spec)", "", 0); \
+       builtin_assert ("system=ohos");		\
+     }						\
+   while (0)

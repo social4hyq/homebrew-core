@@ -1,0 +1,209 @@
+diff -Naur a/config.sub b/config.sub
+--- a/config.sub	2026-08-07 07:46:05.304676553 +0000
++++ b/config.sub	2026-09-16 12:05:29.189348041 +0000
+@@ -1749,6 +1749,7 @@
+ 	     | onefs* | tirtos* | phoenix* | fuchsia* | redox* | bme* \
+ 	     | midnightbsd* | amdhsa* | unleashed* | emscripten* | wasi* \
+ 	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx* | zephyr* \
++	     | ohos* \
+ 	     | fiwix* )
+ 		;;
+ 	# This one is extra strict with allowed versions
+@@ -1767,7 +1768,7 @@
+ # (given a valid OS), if there is a kernel.
+ case $kernel-$os in
+ 	linux-gnu* | linux-dietlibc* | linux-android* | linux-newlib* \
+-		   | linux-musl* | linux-relibc* | linux-uclibc* )
++		   | linux-musl* | linux-relibc* | linux-uclibc* | linux-ohos* )
+ 		;;
+ 	uclinux-uclibc* )
+ 		;;
+diff -Naur a/gcc/config/aarch64/aarch64-ohos.h b/gcc/config/aarch64/aarch64-ohos.h
+--- a/gcc/config/aarch64/aarch64-ohos.h	1970-01-01 00:00:00.000000000 +0000
++++ b/gcc/config/aarch64/aarch64-ohos.h	2026-09-16 12:05:33.448374604 +0000
+@@ -0,0 +1,47 @@
++/* Definitions for AArch64 running OpenHarmony (OHOS).
++
++   The AArch64 ABI itself (LP64, asynchronous unwind tables, the musl dynamic
++   linker) comes from aarch64-linux.h via DEFAULT_LIBC == LIBC_MUSL.  What is
++   left for this file is where the sysroot keeps the architecture's headers
++   and start files, the platform's predefined macros, and the one linker flag
++   OHOS needs.  */
++
++#ifndef GCC_AARCH64_OHOS_H
++#define GCC_AARCH64_OHOS_H
++
++/* OpenHarmony's sysroot keeps the architecture-specific files in a
++   Debian-style multiarch directory named after the target triple: asm/ and
++   bits/ (including the <bits/alltypes.h> that <stdint.h> and friends
++   include) live in usr/include/aarch64-linux-ohos, the libc and the crt*.o
++   start files in usr/lib/aarch64-linux-ohos.  Point the driver at both, the
++   way the platform's own clang driver does.  */
++#define OHOS_ARCH_DIR "aarch64-linux-ohos"
++
++#undef CPP_SPEC
++#define CPP_SPEC "%{pthread:-D_REENTRANT} %{!nostdinc:-isystem %R/usr/include/" OHOS_ARCH_DIR "}"
++
++/* The sysroot ships only stub libraries of the device's libc, and those stubs
++   do not export every symbol the real libraries do (rindex, used by libgm2's
++   libm2pim, for example).  GNU ld refuses undefined references from shared
++   libraries when it links an executable, which those stubs trip over; the
++   platform's own clang + ld.lld allows them, so ask GNU ld for the same.  */
++#undef LINK_SPEC
++#define LINK_SPEC LINUX_TARGET_LINK_SPEC AARCH64_ERRATA_LINK_SPEC \
++  "%{!static:--allow-shlib-undefined}"
++
++#undef STANDARD_STARTFILE_PREFIX_1
++#define STANDARD_STARTFILE_PREFIX_1 "/lib/" OHOS_ARCH_DIR "/"
++
++#undef STANDARD_STARTFILE_PREFIX_2
++#define STANDARD_STARTFILE_PREFIX_2 "/usr/lib/" OHOS_ARCH_DIR "/"
++
++#undef TARGET_OS_CPP_BUILTINS
++#define TARGET_OS_CPP_BUILTINS()		\
++  do						\
++    {						\
++      GNU_USER_TARGET_OS_CPP_BUILTINS();	\
++      OHOS_TARGET_OS_CPP_BUILTINS();		\
++    }						\
++  while (0)
++
++#endif /* GCC_AARCH64_OHOS_H */
+diff -Naur a/gcc/config/ohos.h b/gcc/config/ohos.h
+--- a/gcc/config/ohos.h	1970-01-01 00:00:00.000000000 +0000
++++ b/gcc/config/ohos.h
+@@ -0,0 +1,22 @@
++/* Definitions for OpenHarmony (OHOS) systems using the Linux kernel.
++
++   OpenHarmony is a Linux-based system that uses musl libc.  config.gcc sets
++   DEFAULT_LIBC to LIBC_MUSL for *-*-*ohos* targets, so linux.h selects the
++   musl dynamic linker (/lib/ld-musl-<cpu>.so.1, defined per architecture)
++   and the musl include directory layout.  There is therefore nothing
++   OHOS-specific to say about the C library itself; this file only adds the
++   predefined macros the platform's own toolchain defines.  */
++
++#ifndef GCC_OHOS_H
++#define GCC_OHOS_H
++
++#define OHOS_TARGET_OS_CPP_BUILTINS()		\
++  do						\
++    {						\
++      builtin_define ("__OHOS__");		\
++      builtin_define ("__OHOS_FAMILY__");	\
++      builtin_assert ("system=ohos");		\
++    }						\
++  while (0)
++
++#endif /* GCC_OHOS_H */
+diff -Naur a/gcc/config/t-ohos b/gcc/config/t-ohos
+--- a/gcc/config/t-ohos	1970-01-01 00:00:00.000000000 +0000
++++ b/gcc/config/t-ohos	2026-09-16 12:05:29.190348047 +0000
+@@ -0,0 +1,5 @@
++# OpenHarmony (OHOS) uses the linux-ohos triplet, so the multiarch directory
++# is aarch64-linux-ohos rather than the aarch64-linux-gnu that
++# t-aarch64-linux sets.
++MULTIARCH_DIRNAME := $(subst -linux-gnu,-linux-ohos,$(MULTIARCH_DIRNAME))
++MULTILIB_OSDIRNAMES := $(subst -linux-gnu,-linux-ohos,$(MULTILIB_OSDIRNAMES))
+diff -Naur a/gcc/config.gcc b/gcc/config.gcc
+--- a/gcc/config.gcc	2026-08-07 07:46:05.819684556 +0000
++++ b/gcc/config.gcc	2026-09-16 12:14:05.273566816 +0000
+@@ -973,6 +973,10 @@
+     *-*-*musl*)
+       tm_defines="$tm_defines DEFAULT_LIBC=LIBC_MUSL"
+       ;;
++    *-*-*ohos*)
++      # OpenHarmony (OHOS) uses musl libc.
++      tm_defines="$tm_defines DEFAULT_LIBC=LIBC_MUSL"
++      ;;
+     *)
+       tm_defines="$tm_defines DEFAULT_LIBC=LIBC_GLIBC"
+       ;;
+@@ -1286,6 +1290,14 @@
+ 	tmake_file="${tmake_file} aarch64/t-aarch64 aarch64/t-aarch64-netbsd"
+ 	extra_options="${extra_options} netbsd.opt netbsd-elf.opt"
+ 	;;
++aarch64*-*-linux-ohos*)
++	tm_file="${tm_file} elfos.h gnu-user.h linux.h ohos.h glibc-stdint.h"
++	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-errata.h aarch64/aarch64-linux.h"
++	tm_file="${tm_file} aarch64/aarch64-ohos.h"
++	tmake_file="${tmake_file} aarch64/t-aarch64 aarch64/t-aarch64-linux"
++	tm_defines="${tm_defines}  TARGET_DEFAULT_ASYNC_UNWIND_TABLES=1"
++	gas=yes gnu_ld=yes
++	;;
+ aarch64*-*-linux*)
+ 	tm_file="${tm_file} elfos.h gnu-user.h linux.h glibc-stdint.h"
+ 	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-errata.h aarch64/aarch64-linux.h"
+@@ -3731,6 +3743,9 @@
+ *-linux-musl*)
+ 	tmake_file="${tmake_file} t-musl"
+ 	;;
++*-linux-ohos*)
++	tmake_file="${tmake_file} t-ohos"
++	;;
+ *-linux-uclibc*)
+ 	tmake_file="${tmake_file} t-uclibc"
+ 	;;
+@@ -3757,7 +3772,7 @@
+ # Assume the existence of indirect function support and allow the use of the
+ # resolver attribute.
+ case ${target} in
+-*-*-linux*android*|*-*-linux*uclibc*|*-*-linux*musl*)
++*-*-linux*android*|*-*-linux*uclibc*|*-*-linux*musl*|*-*-linux*ohos*)
+         ;;
+ *-*-kfreebsd*-gnu | *-*-kopensolaris*-gnu)
+         ;;
+@@ -5272,6 +5287,7 @@
+ 		case ${target} in
+ 		  *-linux-gnu*) triplet_os="linux-gnu";;
+ 		  *-linux-musl*) triplet_os="linux-musl";;
++		  *-linux-ohos*) triplet_os="linux-ohos";;
+ 		  *-elf*) triplet_os="elf";;
+ 		  *)
+ 			  echo "Unsupported target ${target}." 1>&2
+diff -Naur a/libgcc/config.host b/libgcc/config.host
+--- a/libgcc/config.host	2026-08-07 07:46:09.988749343 +0000
++++ b/libgcc/config.host	2026-09-16 12:05:29.193348066 +0000
+@@ -1676,7 +1676,7 @@
+ esac
+ 
+ case ${host} in
+-*-*-musl*)
++*-*-musl* | *-*-ohos*)
+   # The gthr weak references are unsafe with static linking
+   tmake_file="$tmake_file t-gthr-noweak"
+   ;;
+diff -Naur a/libgcc/gthr-posix.h b/libgcc/gthr-posix.h
+--- a/libgcc/gthr-posix.h	2026-08-07 07:46:10.072750648 +0000
++++ b/libgcc/gthr-posix.h	2026-09-16 12:05:29.193348066 +0000
+@@ -129,7 +129,8 @@
+ __gthrw(pthread_equal)
+ __gthrw(pthread_self)
+ __gthrw(pthread_detach)
+-#ifndef __BIONIC__
++/* OpenHarmony's libc headers declare no pthread_cancel, like Bionic's.  */
++#if !defined(__BIONIC__) && !defined(__OHOS__)
+ __gthrw(pthread_cancel)
+ #endif
+ __gthrw(sched_yield)
+@@ -275,7 +276,7 @@
+ 	 __pthread_key_create,
+ 	 pthread_key_create)
+ # define GTHR_ACTIVE_PROXY	__gthrw_(__pthread_key_create)
+-#elif defined (__BIONIC__)
++#elif defined (__BIONIC__) || defined (__OHOS__)
+ # define GTHR_ACTIVE_PROXY	__gthrw_(pthread_create)
+ #else
+ # define GTHR_ACTIVE_PROXY	__gthrw_(pthread_cancel)
+diff -Naur a/libstdc++-v3/configure.host b/libstdc++-v3/configure.host
+--- a/libstdc++-v3/configure.host	2026-08-07 07:46:10.784761713 +0000
++++ b/libstdc++-v3/configure.host	2026-09-16 12:05:29.194348072 +0000
+@@ -268,6 +268,9 @@
+   linux-musl*)
+     os_include_dir="os/generic"
+     ;;
++  linux-ohos*)
++    os_include_dir="os/generic"
++    ;;
+   gnu* | linux* | kfreebsd*-gnu | uclinux*)
+     if [ "$uclibc" = "yes" ]; then
+       os_include_dir="os/uclibc"
