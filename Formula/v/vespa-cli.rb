@@ -1,8 +1,8 @@
 class VespaCli < Formula
   desc "Command-line tool for Vespa.ai"
   homepage "https://vespa.ai"
-  url "https://github.com/vespa-engine/vespa/archive/refs/tags/v8.751.13.tar.gz"
-  sha256 "bb5c59e62012bd0ce71bb0cdadb9a60ed9d7dde0662fdc942d81e0e4bd8feb53"
+  url "https://github.com/vespa-engine/vespa/archive/refs/tags/v8.753.16.tar.gz"
+  sha256 "38158f73e68b982e4a4d688d7a31333b03cae5ea2b67be64904d93c67f0d1114"
   license "Apache-2.0"
 
   livecheck do
@@ -12,7 +12,7 @@ class VespaCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ed1ad9b1566e41aadc2581e40fa1da30253c415e6a35c153aad7a55f2adf4aea"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4c527dc569f044dc77d22c50bb64dba35b9312bc480ff4c1d580e51069de899c"
   end
 
   depends_on "go" => :build
