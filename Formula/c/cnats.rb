@@ -1,8 +1,8 @@
 class Cnats < Formula
   desc "C client for the NATS messaging system"
   homepage "https://github.com/nats-io/nats.c"
-  url "https://github.com/nats-io/nats.c/archive/refs/tags/v3.13.0.tar.gz"
-  sha256 "f6ec9ee2ab367594b56dd3265e3561074ade7c3d7410a6f45a77704c5e537024"
+  url "https://github.com/nats-io/nats.c/archive/refs/tags/v3.14.0.tar.gz"
+  sha256 "1f8b450bc295d0c94be201e34713ca0b515aae2c0d1b279273c3e6e0e72fe005"
   license "Apache-2.0"
 
   bottle do
