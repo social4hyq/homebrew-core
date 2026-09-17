@@ -6,7 +6,7 @@ class Gitbucket < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c29e04f18ddbf32429e92f5633131677a8c5fc48a2de0b32586fabb94bbe710"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "31e5eedad52c276c8919c1335dd4a037dae5a553d78f345599462c8d542e1597"
   end
 
   head do
