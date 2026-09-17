@@ -6,7 +6,7 @@ class AtomicQueue < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "20af091a80486eaad961f0f9996504086b7706e47509f8c2db1720ca24da1858"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "264c380691055aad21e04a9fb442885949d5036343d8eeda2af6b4b1bf32db01"
   end
 
   depends_on "meson" => :build
