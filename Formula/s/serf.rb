@@ -1,13 +1,13 @@
 class Serf < Formula
   desc "Service orchestration and management tool"
   homepage "https://github.com/hashicorp/serf"
-  url "https://github.com/hashicorp/serf/archive/refs/tags/v0.10.4.tar.gz"
-  sha256 "14b667203f34dd0a2cb54fcf863cd91799268f8b20230ad893fc36c23a1c7a00"
+  url "https://github.com/hashicorp/serf/archive/refs/tags/v0.11.0.tar.gz"
+  sha256 "9b1705247d0e325d4050b79fb4ef05db899095d20ffbbf72f23161df6fd91143"
   license "MPL-2.0"
   head "https://github.com/hashicorp/serf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9781cb178fbc8d50dc6a6399eb20e762fc76fe18c748ffde676d75255992fc78"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d6cbfd89cb7c6b9bf7c39c118d488e6def13bef6f2eb15a7f5c3d82d436545c"
   end
 
   depends_on "go" => :build
