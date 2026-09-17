@@ -1,13 +1,12 @@
 class Containerd < Formula
   desc "Open and reliable container runtime"
   homepage "https://containerd.io"
-  url "https://github.com/containerd/containerd/archive/refs/tags/v2.3.5.tar.gz"
-  sha256 "a99a4dca98061064ff4cb35d27d1ec2345717e9108c822329fcec91dc72bff96"
+  url "https://github.com/containerd/containerd/archive/refs/tags/v2.4.0.tar.gz"
+  sha256 "01b8974eac869ee146b510af13b56653e4c3da16aa71342dd3ba244c1ac01ab0"
   license "Apache-2.0"
-  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4e476129ee4d453ee4271c59440b0df5ddbb51f07c4e709735ae52d5d301e44"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "dcff70c506b02415b46610d0ed7dd24a073b23060458d2d3bf631ac265600c41"
   end
 
   depends_on "go" => :build
