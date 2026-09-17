@@ -4,6 +4,7 @@ class Pnpm < Formula
   url "https://github.com/pnpm/pnpm/archive/refs/tags/v12.4.2.tar.gz"
   sha256 "2fca2c303b978c8177c13550b2d0f8e442cf32b833bea7878421f90c18a7c612"
   license "MIT"
+  revision 1
 
   livecheck do
     url "https://registry.npmmirror.com/pnpm/latest"
@@ -13,8 +14,8 @@ class Pnpm < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/pnpm-v12.4.2-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e47e532650cd269ddd40985f3359eb1090fc805980c812b0f52c3eeb0eba3a0d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/pnpm-v12.4.2-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d1e6fab1a11f13f8f6d3a04b04005c733a66697e6358bc1d145449fd7dcdd1d"
   end
 
   depends_on "cmake" => :build
@@ -32,6 +33,13 @@ class Pnpm < Formula
 
   patch do
     file "Patches/pnpm/0002-autosign-store-elf.patch"
+  end
+
+  # Rust models OHOS as a Linux variant (target_os "linux"), which made
+  # the default supportedArchitectures install linux-*-musl optional
+  # bindings that openharmony-aware napi-rs loaders never pick up.
+  patch do
+    file "Patches/pnpm/0003-host-platform-openharmony.patch"
   end
 
   deny_network_access!
