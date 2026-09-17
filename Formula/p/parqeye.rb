@@ -1,13 +1,13 @@
 class Parqeye < Formula
   desc "Peek inside Parquet files right from your terminal"
   homepage "https://github.com/kaushiksrini/parqeye"
-  url "https://github.com/kaushiksrini/parqeye/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "2b8bc834d91594a708d2eea47f0e9ed2fe79b79dca1e9cad631d20b563a612c3"
+  url "https://github.com/kaushiksrini/parqeye/archive/refs/tags/v0.2.0.tar.gz"
+  sha256 "142fb53d92be4f65888cd463b2bae52d0aa23fab12aad2fbb2ae059f69b9978d"
   license "MIT"
   head "https://github.com/kaushiksrini/parqeye.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec39931044e4425adde49fec0decfc8f1b7a53f76705ed07093d97e39ccdb1b3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f172ed2f89b06079b25a5147da1c29bc14b85d6c87cef76b15a69f6e2ade938b"
   end
 
   depends_on "rust" => :build
