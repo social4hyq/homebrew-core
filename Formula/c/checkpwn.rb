@@ -7,7 +7,7 @@ class Checkpwn < Formula
   head "https://github.com/brycx/checkpwn.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "625a9a6e822ddf370514117c9c0fbc408d702d26eef81422d11d8f4c5a169d97"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fdc9b35a00addb3f8b33cdd31f6d0bb95bfbc59e2795b5824dcc1e817a91631a"
   end
 
   depends_on "rust" => :build
