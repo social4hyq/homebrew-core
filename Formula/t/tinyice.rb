@@ -1,13 +1,13 @@
 class Tinyice < Formula
   desc "Modern, all-in-one Icecast-compatible audio/video streaming server"
   homepage "https://github.com/DatanoiseTV/tinyice"
-  url "https://github.com/DatanoiseTV/tinyice/archive/refs/tags/v2.8.2.tar.gz"
-  sha256 "2216adbfd529a2d0a80b2aa98753ef73fd7405f1706e5162a7540831e2705e39"
+  url "https://github.com/DatanoiseTV/tinyice/archive/refs/tags/v2.10.2.tar.gz"
+  sha256 "d3816726c366f0fbbe68a9a507d1a1053fbdecb8f4d0a1294335e63381692854"
   license "Apache-2.0"
   head "https://github.com/DatanoiseTV/tinyice.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc35a21f71f8d9e7ff10b6f6ec396ca3d64f3ae3a02fead4c08f21f5cce3291d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eee63cf632f4b97f4d6743266a9e68a666c72dbea1aa4ded83422c6442bb5819"
   end
 
   depends_on "go" => :build
