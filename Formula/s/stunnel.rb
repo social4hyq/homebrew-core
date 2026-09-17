@@ -1,8 +1,8 @@
 class Stunnel < Formula
   desc "SSL tunneling program"
   homepage "https://www.stunnel.org/"
-  url "https://www.stunnel.org/downloads/stunnel-5.80.tar.gz"
-  sha256 "6d0841d48de07cbbaf4a055919065bf7bb5ebc63cc15c97a2c76caa2bf285513"
+  url "https://www.stunnel.org/downloads/stunnel-5.81.tar.gz"
+  sha256 "1d1b48fa26a06a5a035ca5ddc7377c75d5d78ad6f3b4886352a84818c854f932"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,7 +11,7 @@ class Stunnel < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eaf9e5487cc5a6cbbe3d0cb88e823ba8ee0b209215e37545456b5941b7f1765c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4b40993238ac14a051ed2fbb9a4cf0d96834d66b0da9af9b29bf1772746f1a4"
   end
 
   depends_on "openssl@3"
