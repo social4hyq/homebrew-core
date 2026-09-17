@@ -12,7 +12,7 @@ class Yorkie < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d6226463d4c1139c51ba0ce008e2f26ca0f0a16c39dbdfd1d71e7f5b963a907"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c2e4256ae675e3c69fca518037057d90f000bc07763a98c18006f6a8a58b07bd"
   end
 
   depends_on "go" => :build
