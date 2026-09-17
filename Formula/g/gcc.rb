@@ -13,6 +13,10 @@ class Gcc < Formula
     regex(%r{href=["']?gcc[._-]v?(\d+(?:\.\d+)+)(?:/?["' >]|\.t)}i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c88a960c8e29339185708961efa24e3efed37413c2b0999aa0da4004364c104e"
+  end
+
   # The bottles are built on systems with the CLT installed, and do not work
   # out of the box on Xcode-only systems due to an incorrect sysroot.
   pour_bottle? only_if: :clt_installed
