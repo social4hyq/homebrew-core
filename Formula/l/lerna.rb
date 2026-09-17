@@ -8,7 +8,7 @@ class Lerna < Formula
   revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d8e236c9892bfa7436ce1ff5a355d5b5685847fc50787a437654a9e5dd95948"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ed6b14490f3bf4defcdc9991ddccd0d3b10680708c6a7e0a79ef15dee72dadd"
   end
 
   depends_on "node"
