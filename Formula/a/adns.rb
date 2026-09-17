@@ -12,7 +12,7 @@ class Adns < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3eee0e0c6c178c28236a684fb3cfd317b1292505e65bd25edbaad0cdd5ca5051"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8801c6578552e468403bb3104c4becbe9a2eb7a46b312aeb586f1ce8ee8a0b38"
   end
 
   uses_from_macos "m4" => :build
