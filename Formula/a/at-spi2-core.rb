@@ -7,7 +7,7 @@ class AtSpi2Core < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "17ad130b9d11ed8d00dfd75251eef3a2c7a7a5b535509d77e574fcc032f7368e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "34e379c0c2025f3632f9a95a1ab01b2e6a07dd89ee131585535126514ae5dd00"
   end
 
   depends_on "gettext" => :build
