@@ -16,7 +16,7 @@ class Dnscontrol < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1859306ee1536663690a31cc682b70a265ef928ec2d5a134b2c2a849cd64fb9b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3cfad4a96f17d84092a02dc8d800eafaf1dc61596abb7ae1b61640460134734"
   end
 
   depends_on "go" => :build
