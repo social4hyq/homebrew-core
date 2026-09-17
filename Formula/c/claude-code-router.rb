@@ -1,8 +1,8 @@
 class ClaudeCodeRouter < Formula
   desc "Tool to route Claude Code requests to different models and customize any request"
   homepage "https://github.com/musistudio/claude-code-router"
-  url "https://registry.npmjs.org/@musistudio/claude-code-router/-/claude-code-router-3.1.0.tgz"
-  sha256 "f9bc4a77a56d1d9a951889a60096c75b2212cfe6328f762fce5a9c071be2175a"
+  url "https://registry.npmjs.org/@musistudio/claude-code-router/-/claude-code-router-3.1.1.tgz"
+  sha256 "3a7cb06f392090ad77fa9174ed412c4e408b926c96bcb511b62140bd6bebba5a"
   license "MIT"
 
   bottle do
