@@ -7,7 +7,7 @@ class Asc < Formula
   head "https://github.com/rorkai/App-Store-Connect-CLI.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf4f833846b0e841f1b090f6b1e9ddc88756542bdf8ce2476d3b9cdfda89d834"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bc648dd9b4c76cd35480c9c313a4786efa25a803d22255c48bc7d74da6faa0e"
   end
 
   depends_on "go" => :build
