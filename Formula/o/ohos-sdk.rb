@@ -8,7 +8,8 @@ class OhosSdk < Formula
   revision 3
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "477bc2b26c4d5cc5209aa2e2579babaf2398603c4fc82374be0c26bd0f23fd07"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef6753c7c4b2a3d760d17774564917ce06bcf632700412c792f51a9731e3d1ae"
   end
 
   # The SDK is distributed as one package per component, each of them packaged
