@@ -2,8 +2,8 @@ class Goreleaser < Formula
   desc "Deliver Go binaries as fast and easily as possible"
   homepage "https://goreleaser.com/"
   url "https://github.com/goreleaser/goreleaser.git",
-      tag:      "v2.18.1",
-      revision: "9fa2a65578f357f21fc3f3035ff96ba9e2890ad9"
+      tag:      "v2.18.2",
+      revision: "25a52e520f9c993711b93ea1111ed90c024e0528"
   license "MIT"
   head "https://github.com/goreleaser/goreleaser.git", branch: "main"
 
@@ -13,7 +13,7 @@ class Goreleaser < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab6fbfdc678e83c686c2e7e6504d9c20ddbf061934062dae8ef90c5e1777b1ee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f328276658b2d0095f6c8ba3df0ca6a5c71dea241646dde670fd8193491a930"
   end
 
   depends_on "go" => :build
