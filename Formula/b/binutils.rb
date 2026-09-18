@@ -9,7 +9,8 @@ class Binutils < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5b109959aa37db07e21b39bcb85d3a646f556651eba5eb46fbe139fe43f9782"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0710135e4722ddd9672c7ccc0f37cb9f736a6bb9a5ca871c3e6497d3aa006f66"
   end
 
   keg_only :shadowed_by_macos, "Apple's CLT provides the same tools"
