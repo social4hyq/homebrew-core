@@ -8,13 +8,6 @@
 
 **仓库源头**：本仓库以 [GitHub](https://github.com/social4hyq/homebrew-core) 为唯一源头——源码托管、Issues、PR、CI 全部在 GitHub 进行。[atomgit 同名仓库](https://atomgit.com/social4hyq/homebrew-core) 是合并后自动同步的**单向镜像**（GitHub → atomgit，永不反向），存在意义是 bottle 二进制发布在 atomgit Releases 上、国内网络下载更快。反馈问题、提交贡献请认准 GitHub；请勿向 atomgit 推送代码或开 PR。
 
-**装了能做什么**：
-
-- **让 AI 帮你写代码**：`opencode`（开源、自带 75+ 模型提供商接入）、`claude-code`（Anthropic 官方）
-- **跑现代 JavaScript/前端工具链**：`bun` 运行时、`vite-plus` 统一前端工具链
-- **打造顺手的终端**：`hishell-font` 图标字体（配合 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 的 `starship`）、`sshport` 远程端口转发
-- **本地构建与排障**：`ohos-compat-shim` 兼容层、`qemu-aarch64` 用户态仿真与系统调用跟踪
-
 ## 安装
 
 ```bash
