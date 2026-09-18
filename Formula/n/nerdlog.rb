@@ -7,7 +7,7 @@ class Nerdlog < Formula
   head "https://github.com/dimonomid/nerdlog.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "87efc34b142e917d83158489ff1a6755215207b3d594f1a6939d9d6728bbe28e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "897b24d9b86bc45593cc400884791cb77cebe717d9d3937090dccb8c4526fb7a"
   end
 
   depends_on "go" => :build
