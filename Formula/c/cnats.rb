@@ -6,7 +6,7 @@ class Cnats < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e5caff8494266cde6a95d145c1975a9d7edc634942c62bd944d7b6da79f44c20"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "278c0531dcb90f22ebd201cf3ff88b01638a4322f209a60c9bb5668368a37378"
   end
 
   depends_on "cmake" => :build
