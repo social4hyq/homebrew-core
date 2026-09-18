@@ -117,13 +117,17 @@ for line in "${CANDIDATES[@]}"; do
   #      bun.rb): bump the git revision pin + increment the brew `revision N`
   #      (effective version advances <ver>_N, which is what drives the
   #      new-bottle pipeline in pr-validate).
-  #   b) an npm version (opencode@2: livecheck follows the npm beta dist-tag
-  #      and the formula `version` mirrors it): map the npm version to the
-  #      branch tip at its npm publish timestamp (upstream CI publishes the
-  #      tip per merge; npm metadata carries no gitHead — verified
-  #      2026-08-22: beta-17898 published 07:02Z, tip-at-that-time committed
-  #      06:53Z), then bump `version` + the pin and drop any brew `revision`
-  #      stanza (Homebrew convention: revision resets on version change).
+  #   b) a release version (opencode@2: livecheck follows upstream git tags
+  #      `v2.*` on the repo the formula clones): resolve the exact commit the
+  #      tag points at (peeled ref for annotated tags), then bump `version` +
+  #      the pin and drop any brew `revision` stanza (Homebrew convention:
+  #      revision resets on version change). Deterministic — the old
+  #      beta-channel scheme mapped an npm publish timestamp back to a branch
+  #      tip, which could miss the release commit when upstream tags minutes
+  #      after publishing (seen 2026-09-17: 2.0.7 published 19:26Z, tagged
+  #      19:29Z). Also immune to the npm side of upstream's package move
+  #      (@opencode-ai/cli → @opencode/cli, 2026-09-07..12): we follow git
+  #      tags, which kept their v2.* naming across the move.
   #
   # Also defends against a livecheck quirk: for a sha-scheme formula the
   # commit SHA always sorts above the version string, so `--newer-only` keeps
@@ -141,7 +145,7 @@ for line in "${CANDIDATES[@]}"; do
 
     FORMULA_VERSION=$(docker exec "$CONTAINER" grep -oE '^  version "[^"]+"' "$FORMULA_PATH" | head -1 | cut -d'"' -f2)
 
-    # npm-version scheme (opencode@2): resolve the git sha for LATEST.
+    # Release-version scheme (opencode@2): resolve the git sha for LATEST.
     # These lookups run on the runner host (not the OHOS container).
     TARGET_SHA=""
     NEW_VERSION="$FORMULA_VERSION"
@@ -159,50 +163,33 @@ for line in "${CANDIDATES[@]}"; do
         echo "- ⏭️ $FORMULA: already at $LATEST" >> "$GITHUB_STEP_SUMMARY"
         continue
       fi
-      # npm-scheme mapping is formula-specific (package, repo, branch).
+      # version→git mapping is formula-specific (repo, tag naming).
       case "$FORMULA" in
         opencode@2)
-          NPM_PACKAGE="@opencode-ai/cli"
           GIT_REPO="anomalyco/opencode"
-          GIT_BRANCH="v2"
           ;;
         *)
-          echo "::error::$FORMULA: livecheck returned a non-sha version '$LATEST' but no npm→git mapping is configured for it"
-          echo "- ❌ $FORMULA: no npm→git mapping" >> "$GITHUB_STEP_SUMMARY"
+          echo "::error::$FORMULA: livecheck returned a non-sha version '$LATEST' but no version→git mapping is configured for it"
+          echo "- ❌ $FORMULA: no version→git mapping" >> "$GITHUB_STEP_SUMMARY"
           continue
           ;;
       esac
       # `|| true` inside the $(): this script runs `bash -euo pipefail`, so an
-      # unguarded `VAR=$(curl|jq)` whose pipeline fails (network, HTTP error)
+      # unguarded `VAR=$(...)` whose command fails (network, HTTP error)
       # would kill the script AT THE ASSIGNMENT — silently, before the -z
       # checks below can route it to a per-formula ::error:: (observed
-      # 2026-08-23 as a bare "exit code 1" with zero output). --retry rides
-      # out transient runner-network blips; -S surfaces curl errors in the
-      # log for diagnosis even though -s quiets the progress meter.
-      # `|| true` inside the $(): this script runs `bash -euo pipefail`, so an
-      # unguarded `VAR=$(curl|jq)` whose pipeline fails (network, HTTP error)
-      # would kill the script AT THE ASSIGNMENT — silently, before the -z
-      # checks below can route it to a per-formula ::error:: (observed
-      # 2026-08-23 as a bare "exit code 1" with zero output). --retry rides
-      # out transient runner-network blips; -S surfaces curl errors in the
-      # log for diagnosis even though -s quiets the progress meter.
-      # npmmirror for the same reason as the livecheck URLs: registry.npmjs.org
-      # is CF-fronted and intermittently challenges CI runner IPs; the mirror
-      # proxies identical time metadata (verified 2026-08-23).
-      PUBLISHED=$(curl -fsSL -S --retry 3 --retry-delay 2 \
-        "https://registry.npmmirror.com/$NPM_PACKAGE" \
-        | jq -r --arg v "$LATEST" '.time[$v] // empty' || true)
-      if [ -z "$PUBLISHED" ]; then
-        echo "::error::$FORMULA: npm has no publish timestamp for $LATEST"
-        echo "- ❌ $FORMULA: no npm timestamp for $LATEST" >> "$GITHUB_STEP_SUMMARY"
-        continue
-      fi
-      TARGET_SHA=$(curl -fsSL --retry 3 --retry-delay 2 \
-        "https://api.github.com/repos/$GIT_REPO/commits?sha=$GIT_BRANCH&per_page=1&until=$PUBLISHED" \
-        | jq -r '.[0].sha // empty' || true)
+      # 2026-08-23 as a bare "exit code 1" with zero output).
+      # Prefer the peeled `^{}` ref (annotated tags); lightweight tags have
+      # no peeled ref, so fall back to the plain ref.
+      TAG_REFS=$(git ls-remote "https://github.com/$GIT_REPO.git" \
+        "refs/tags/v$LATEST^{}" "refs/tags/v$LATEST" 2>/dev/null || true)
+      TARGET_SHA=$(awk '$2 ~ /\^\{\}$/ {print $1; exit}' <<< "$TAG_REFS")
       if [ -z "$TARGET_SHA" ]; then
-        echo "::error::$FORMULA: could not resolve a $GIT_BRANCH tip for $LATEST (published $PUBLISHED)"
-        echo "- ❌ $FORMULA: version→sha resolution failed" >> "$GITHUB_STEP_SUMMARY"
+        TARGET_SHA=$(awk -v ref="refs/tags/v$LATEST" '$2 == ref {print $1; exit}' <<< "$TAG_REFS")
+      fi
+      if [ -z "$TARGET_SHA" ]; then
+        echo "::error::$FORMULA: no git tag v$LATEST in $GIT_REPO (livecheck regex and upstream tag naming out of sync?)"
+        echo "- ❌ $FORMULA: no git tag v$LATEST" >> "$GITHUB_STEP_SUMMARY"
         continue
       fi
       NEW_VERSION="$LATEST"
@@ -278,7 +265,7 @@ for line in "${CANDIDATES[@]}"; do
     fi
 
     if [ "$EDIT_VERSION" = true ]; then
-      PR_BODY="Automated npm-version bump ($FORMULA beta dist-tag). Custom autobump path: livecheck follows the npm beta dist-tag; the git pin is remapped to the branch tip at that npm release's publish timestamp (npm metadata has no gitHead). CI builds the new commit and publishes the bottle."
+      PR_BODY="Automated version bump ($FORMULA upstream git tag v$NEW_VERSION). Custom autobump path: livecheck follows upstream git tags; the git pin is the exact commit the release tag points at. CI builds the new commit and publishes the bottle."
     else
       PR_BODY="Automated commit-pin bump ($FORMULA v2 branch HEAD). Custom autobump path for git-revision formulae (bun.rb pattern): bump-formula-pr rejects fixed-version bumps, so this updates the git revision pin and increments the brew revision. CI builds the new commit and publishes the bottle."
     fi
