@@ -20,7 +20,7 @@ brew tap social4hyq/core https://atomgit.com/social4hyq/homebrew-core.git
 brew trust social4hyq/core   # Homebrew 6.0+ 必须显式信任第三方 tap
 
 # 常用工具：
-brew install opencode        # AI 编码代理（v2 预览：brew install opencode@2）
+brew install opencode        # AI 编码代理（v2：brew install opencode@2）
 brew install claude-code     # Claude Code CLI
 brew install bun             # Bun 运行时
 brew install vite-plus       # VoidZero 统一前端工具链（`vp` 命令）
@@ -47,13 +47,14 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 
 | Formula | 版本 | 说明 |
 |---|---|---|
-| `opencode` | 1.18.29 | 开源的终端 AI 编程助手：在终端里用自然语言让 AI 读代码、改文件、跑命令；自带 75+ 模型提供商接入，用自己的 API key 自由选模型（v1 稳定版） |
-| `opencode@2` | 0.0.0-beta-19157 | opencode 下一代 v2 的 Beta 尝鲜版（命令名 `opencode2`）：全新插件 API 与交互，与 v1 并存互不影响，版本号滚动跟进 beta 频道 |
-| `claude-code` | 2.1.261 | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号（License 禁随包分发，首次运行自动从官方拉取并校验完整性） |
+| `opencode` | 1.18.31 | 开源的终端 AI 编程助手：在终端里用自然语言让 AI 读代码、改文件、跑命令；自带 75+ 模型提供商接入，用自己的 API key 自由选模型（v1 稳定版） |
+| `opencode@2` | 2.0.7 | opencode v2 稳定版（命令名 `opencode2`）：全新插件 API 与交互，与 v1 并存互不影响，版本滚动跟进上游 v2 发布线（原 beta 尝鲜频道已随上游转稳定结束） |
+| `claude-code` | 2.1.267 | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号（License 禁随包分发，首次运行自动从官方拉取并校验完整性） |
 | `bun` | 1.4.2 | 极速 JavaScript/TypeScript 一体化工具链：运行时、包管理、测试、打包四合一，可直接替代 Node.js；本 tap 多数工具的底座 |
 | `bun-bootstrap` | 1.4.0-5467a689 | bun 自举构建用的预编译引导版（普通用户无需安装） |
 | `bun-webkit` | `2e2aa2290f` | bun 的浏览器引擎组件（内部依赖，普通用户无需关心） |
 | `vite-plus` | 0.2.8 | VoidZero（Vue/Vite 作者团队）的 Web 统一工具链：一个 `vp` 命令包揽创建项目、开发调试、检查、格式化、测试、构建全流程（Beta） |
+| `pnpm` | 12.4.2 | 快速、省磁盘的 Node 包管理器（npm 兼容，硬链接全局 store，monorepo 一流支持）；内置 npm 包内 ELF 自动签名与 OHOS 平台识别补丁 |
 | `hishell-font` | 0.1.0 | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
 | `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
 | `ohos-compat-shim` | 0.5.0 | 系统兼容层：自动兜底鸿蒙与标准 Linux 的底层行为差异，让 Linux 生态软件开箱即用（已内嵌进本 tap 产物，无需单独配置） |
