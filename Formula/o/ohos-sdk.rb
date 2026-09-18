@@ -24,6 +24,9 @@ class OhosSdk < Formula
   conflicts_with "llvm", because: "both install `clang` binaries"
   conflicts_with "llvm@22", because: "both install `clang` binaries"
   conflicts_with "llvm@21", because: "both install `clang` binaries"
+  conflicts_with "lld", because: "both install `lld` binaries"
+  conflicts_with "lld@22", because: "both install `lld` binaries"
+  conflicts_with "lld@21", because: "both install `lld` binaries"
 
   def install
     # Symlink the components into this keg so that the SDK keeps the layout it
