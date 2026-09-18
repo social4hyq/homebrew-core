@@ -39,7 +39,7 @@ diff -Naur a/ld/ldmain.c b/ld/ldmain.c
  
 +/* OpenHarmony binaries have to carry a `.codesign` section before the system
 +   will execute or dlopen them, so give the linked output one.  The signer is
-+   ohos-bst-light's selfsign (0BSD), vendored here and compiled as a library
++   ohos-selfsign's selfsign (0BSD), vendored here and compiled as a library
 +   so that no helper process is spawned per link.  */
 +
 +#define SELFSIGN_AS_LIBRARY
@@ -126,7 +126,7 @@ diff -Naur a/ld/ohos-selfsign.c b/ld/ohos-selfsign.c
 +/*
 + * Copyright (C) 2026 hqzing
 + * SPDX-License-Identifier: 0BSD
-+ * Repository: https://github.com/hqzing/ohos-bst-light
++ * Repository: https://github.com/hqzing/ohos-selfsign
 + *
 + * Licensed under the BSD Zero Clause License.
 + */

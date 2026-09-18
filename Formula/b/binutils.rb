@@ -34,7 +34,7 @@ class Binutils < Formula
   #
   #   0001: Give the linked output the `.codesign` section that OpenHarmony
   #         requires before it will execute or dlopen an ELF.  The signer is
-  #         ohos-bst-light's `selfsign` (0BSD), vendored into `ld` and called
+  #         ohos-selfsign's `selfsign` (0BSD), vendored into `ld` and called
   #         in-process, so nothing is spawned per link.  Signing is on by
   #         default and `--no-code-sign` turns it off.
   #
