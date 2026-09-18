@@ -54,7 +54,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `bun-bootstrap` | 1.4.0-5467a689 | bun 自举构建用的预编译引导版（普通用户无需安装） |
 | `bun-webkit` | `2e2aa2290f` | bun 的浏览器引擎组件（内部依赖，普通用户无需关心） |
 | `vite-plus` | 0.2.8 | VoidZero（Vue/Vite 作者团队）的 Web 统一工具链：一个 `vp` 命令包揽创建项目、开发调试、检查、格式化、测试、构建全流程（Beta） |
-| `pnpm` | 12.4.2 | 快速、省磁盘的 Node 包管理器（npm 兼容，硬链接全局 store，monorepo 一流支持）；内置 npm 包内 ELF 自动签名与 OHOS 平台识别补丁 |
+| `pnpm` | 12.4.2 | 快速、省磁盘的 Node 包管理器（npm 兼容，内容寻址全局 store，monorepo 一流支持）；本机文件系统不支持硬链接，store 导入自动退化为复制（无去重收益但功能完整）；内置 npm 包内 ELF 自动签名与 OHOS 平台识别补丁 |
 | `hishell-font` | 0.1.0 | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
 | `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
 | `ohos-compat-shim` | 0.5.0 | 系统兼容层：自动兜底鸿蒙与标准 Linux 的底层行为差异，让 Linux 生态软件开箱即用（已内嵌进本 tap 产物，无需单独配置） |
