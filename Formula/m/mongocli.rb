@@ -12,7 +12,7 @@ class Mongocli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21f8fe1144fce76b0230a5897e60bad765fedde9e481e83695dc03c468a8758d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f9642ab8e8fce83c33c583e27ff790ecc08d95ed14f7d95332dbfad288e9a2ea"
   end
 
   depends_on "go" => :build
