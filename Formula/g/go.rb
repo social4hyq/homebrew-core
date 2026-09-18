@@ -72,7 +72,7 @@ class Go < Formula
   #
   #   0001: Default GOCACHE → /data/storage/el2/base/files/go-build (hmfs)
   #   0002: Default GOTMPDIR → /data/storage/el2/base/cache (tmpfs)
-  #   0003: Vendored selfsign.go (byte-identical to ohos-bst-light, kept
+  #   0003: Vendored selfsign.go (byte-identical to ohos-selfsign, kept
   #         in its own patch so it can be upgraded independently)
   #   0004: Adapt vendored selfsign.go to an importable library
   #         (package main → selfsign, export API, drop main())
