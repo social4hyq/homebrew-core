@@ -42,8 +42,8 @@ class OpencodeAT2 < Formula
   deny_network_access! :test
 
   def install
-    rm_r %w[packages/web
-            packages/www packages/storybook packages/enterprise]
+    rm_rf %w[packages/web
+             packages/www packages/storybook packages/enterprise]
 
     ENV["OPENCODE_VERSION"] = "#{version}_#{revision}"
     ENV["OPENCODE_CHANNEL"] = "beta"
