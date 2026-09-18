@@ -3,14 +3,13 @@ class Pipx < Formula
 
   desc "Execute binaries from Python packages in isolated environments"
   homepage "https://pipx.pypa.io"
-  url "https://files.pythonhosted.org/packages/42/93/06d1b5899ecd84cb952b21418939db6518ccb681881c1d1e3f1cb75fa213/pipx-1.17.2.tar.gz"
-  sha256 "e29d68d05f5b4707d3d3dbddb0adfc4ca4ddcd77052dbb8f4e1b5ad31629a07c"
+  url "https://files.pythonhosted.org/packages/6e/cc/f10580f98f53806af7b9ea38cf1d9347c6c237ee6b892708c3cc866a4dbb/pipx-1.17.3.tar.gz"
+  sha256 "136b43c5c754c6644011a321102b6cf106e73fc48aaeb09c9cd608d1af10a9b8"
   license "MIT"
-  revision 1
   head "https://github.com/pypa/pipx.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "68c64de64fbaed0916066198db3f524c5ab1375723fffb55e931c55ea1d12b1e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "416b1717bb07a390d45671d7f0e081b3513048aafba91ad9f33c1fc11ba82c63"
   end
 
   depends_on "python@3.14"
@@ -26,8 +25,8 @@ class Pipx < Formula
   end
 
   resource "filelock" do
-    url "https://files.pythonhosted.org/packages/0a/a0/50c2c0ce5e74d7721bbb1b19a26ebd339aac5878553a6e35308c2f31f935/filelock-3.32.5.tar.gz"
-    sha256 "f6a6a28f743f9b95ce19db5abe0f376f75eb56517dff21e1a4751e2657d3e83d"
+    url "https://files.pythonhosted.org/packages/0f/59/e19834834cb01a32febfbb0f8a23a9088088f5d45991824ff2bc3b5e8acb/filelock-3.32.7.tar.gz"
+    sha256 "37b8a3d9811b0f9aef7e5ec5c71bb320de52df51e6ca9bcd6f5ad81187660da7"
   end
 
   resource "packaging" do
@@ -36,8 +35,8 @@ class Pipx < Formula
   end
 
   resource "platformdirs" do
-    url "https://files.pythonhosted.org/packages/69/b7/802a56eca9f2fac455b8bab5375a2647b0f0e14a2cd63ef077de3c4a7658/platformdirs-4.11.7.tar.gz"
-    sha256 "4f41487eeeeeb07f3a6625e61d9bc0ae6809f92d3386dbd74392fbb76108104d"
+    url "https://files.pythonhosted.org/packages/58/b9/8adc4e1b422b27fd88540ec7bf1f406f77ef393ec070e26fc430e914cde8/platformdirs-4.11.9.tar.gz"
+    sha256 "e2c66a8d384596cd98e3c4aea2d761df7bac95d9d8a2cc3946daa8cdafdaebc1"
   end
 
   resource "userpath" do
