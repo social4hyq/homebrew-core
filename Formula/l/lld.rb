@@ -14,7 +14,7 @@ class Lld < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a8c0b2e1e360f162856417f80411538d7eca17ee39d489cdc0c10964fe9bd12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a24139a6c1194d0ddb915c36221d396325907786439023f357beafa55e6826c"
   end
 
   conflicts_with "ohos-sdk", because: "both install `lld` binaries"
