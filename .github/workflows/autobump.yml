@@ -19,9 +19,10 @@ name: autobump
 # (formerly ohos-opencode@2)
 # is a git-revision formula (bun.rb pattern: url pins a branch tip via
 # `revision:`); bump-formula-pr can't rewrite the pin, so autobump.sh has a
-# custom bump path for it — since the npm version-scheme switch it livechecks
-# the @opencode-ai/cli beta dist-tag, mirrors that version into the formula,
-# and remaps the git pin to the branch tip at the npm publish timestamp (see
+# custom bump path for it — since PR #613 it livechecks upstream git tags
+# `v2.*` (the npm dist-tag scheme died when upstream moved the v2 package
+# from @opencode-ai/cli to @opencode/cli in 2026-09), mirrors that version
+# into the formula, and pins the exact commit the release tag points at (see
 # the comment in the loop body). herdr and zellij were allowlisted here too
 # until their 2026-09-08 removal — both are now provided natively by
 # Harmonybrew's official core (see README's 已下线 table); their
