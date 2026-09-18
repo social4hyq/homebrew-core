@@ -1,14 +1,13 @@
 class ProtocGenJs < Formula
   desc "Protocol buffers JavaScript generator plugin"
   homepage "https://github.com/protocolbuffers/protobuf-javascript"
-  url "https://github.com/protocolbuffers/protobuf-javascript/archive/refs/tags/v4.0.2.tar.gz"
-  sha256 "a08244115ed0535971ec894abf078da90ad2c0938700612f90dc550f218627ee"
+  url "https://github.com/protocolbuffers/protobuf-javascript/archive/refs/tags/v4.0.3.tar.gz"
+  sha256 "43ea40481e7b5efdeccf4a0926226b0bd4f61386cdb819a55ce55f5828e32025"
   license "BSD-3-Clause"
-  revision 2
   head "https://github.com/protocolbuffers/protobuf-javascript.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "42c4c56cbbcc1b40334f30464c9f4a596a02c434f9472782d1b2d1b3b7409b0f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7b9089c4aaebc9557f7ba9310470cc41dfaa6fd0c5b53be3946026662512181"
   end
 
   depends_on "pkgconf" => :build
