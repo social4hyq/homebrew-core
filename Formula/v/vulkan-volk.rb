@@ -12,7 +12,7 @@ class VulkanVolk < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8dadaa27bbfb48c3c86fcf010c04366f15cc195143c250074cb29c2c03b1c50e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e00d42bf77ee53a8a8d96a3721bf66e94d50f6578e6973f56d783cf6e270b7fc"
   end
 
   depends_on "cmake" => :build
