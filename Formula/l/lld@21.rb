@@ -5,7 +5,7 @@ class LldAT21 < Formula
   sha256 "4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142"
   # The LLVM Project is under the Apache License v2.0 with LLVM Exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
-  revision 1
+  revision 2
   compatibility_version 1
 
   livecheck do
@@ -16,10 +16,7 @@ class LldAT21 < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "547613613714fd277ef590c76c453d1f7c65054bbf2f4470e86875ec4e684523"
   end
 
-  # Not `:versioned_formula`: see the identical note in llvm@21.rb — avoids
-  # Homebrew auto-linking this keg into a PATH ohos-sdk's own ld.lld/lld
-  # already occupy under the same names.
-  keg_only "it conflicts with `ohos-sdk`"
+  keg_only :versioned_formula
 
   depends_on "cmake" => :build
   depends_on "llvm@21"
@@ -37,16 +34,21 @@ class LldAT21 < Formula
   end
 
   def install
-    rpaths = [rpath]
-    rpaths << formula_opt_lib("llvm@21").to_s if OS.linux?
-
     system "cmake", "-S", "lld", "-B", "build",
                     "-DBUILD_SHARED_LIBS=ON",
-                    "-DCMAKE_INSTALL_RPATH=#{rpaths.join(";")}",
-                    "-DLLD_BUILT_STANDALONE=ON",
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
                     "-DLLD_VENDOR=#{tap&.user}",
-                    "-DLLVM_CMAKE_DIR=#{formula_opt_lib("llvm@21")}/cmake/llvm",
-                    "-DLLVM_ENABLE_LTO=ON",
+                    # `find_package(LLVM)` resolves through
+                    # `CMAKE_PREFIX_PATH`, where the keg-only `ohos-sdk-native`
+                    # (pulled in by `llvm@21`) is searched ahead of `llvm@21`'s
+                    # prefix — the SDK's bundled LLVM 15 CMake package would win
+                    # the lookup. `LLVM_DIR` is checked first, so it pins the
+                    # intended keg.
+                    "-DLLVM_DIR=#{formula_opt_lib("llvm@21")}/cmake/llvm",
+                    # Upstream has this `ON`, but on OHOS clang's `-flto` bitcode
+                    # is rejected by the only linker on PATH, `ohos-sdk`'s LLD
+                    # 15.0.4.
+                    "-DLLVM_ENABLE_LTO=OFF",
                     "-DLLVM_INCLUDE_TESTS=OFF",
                     "-DLLVM_USE_SYMLINKS=ON",
                     *std_cmake_args
