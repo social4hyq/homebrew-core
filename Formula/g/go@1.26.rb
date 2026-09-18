@@ -21,7 +21,8 @@ class GoAT126 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5983a5668516795cb81ae4e4482d8a69df258a7951ebbf5ea73fb51d1348b571"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fab7d8b6a740dc4413457f8391fc9307329bdfdda8ac444474a9ed9d76624fe4"
   end
 
   keg_only :versioned_formula
