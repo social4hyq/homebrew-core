@@ -7,8 +7,8 @@ class Rex < Formula
   revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1812ed508b2177a3a63cdf907dc9965e678c13924fc33c5616f2b730c78fa97"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b55855458eaee8b3ca0e58dcf4ee41903580334dd1daca9580f8c7466c00064f"
   end
 
   uses_from_macos "expat"
