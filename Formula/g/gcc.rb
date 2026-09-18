@@ -254,11 +254,24 @@ class Gcc < Formula
       # opt_prefix as the prefix. Then we use DESTDIR to install into a
       # temporary location, then move into the cellar path.
       if OS.ohos?
-        # OpenHarmony's userland has no `gmake`, and both the top-level and the
-        # gcc configure script probe for an Ada compiler by compiling a file
-        # with `-x ada`, which re-executes clang there until it runs out of
-        # processes, so that probe is answered through a site file.
-        (buildpath/"ohos-config.site").write "acx_cv_cc_gcc_supports_ada=no\n"
+        # Two configure answers are given through a site file:
+        #
+        # * OpenHarmony's userland has no `gmake`, and both the top-level and
+        #   the gcc configure script probe for an Ada compiler by compiling a
+        #   file with `-x ada`, which re-executes clang there until it runs out
+        #   of processes.
+        #
+        # * `ac_cv_func_posix_fallocate=no` leaves HAVE_POSIX_FALLOCATE
+        #   undefined, so the C++ module writer sizes its output with
+        #   ftruncate() from the start.  Its ftruncate() fallback only runs when
+        #   posix_fallocate() reports EINVAL, and OpenHarmony's home directory
+        #   (hmdfs) answers EACCES instead - any other non-EINVAL answer would
+        #   do the same: the module output is left unmapped and writing it out
+        #   dereferences NULL, crashing cc1plus with SIGSEGV.
+        (buildpath/"ohos-config.site").write <<~EOS
+          acx_cv_cc_gcc_supports_ada=no
+          ac_cv_func_posix_fallocate=no
+        EOS
         with_env CONFIG_SITE: buildpath/"ohos-config.site" do
           system "../configure", *args
           system "make"
