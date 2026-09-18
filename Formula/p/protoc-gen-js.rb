@@ -7,7 +7,7 @@ class ProtocGenJs < Formula
   head "https://github.com/protocolbuffers/protobuf-javascript.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "42c4c56cbbcc1b40334f30464c9f4a596a02c434f9472782d1b2d1b3b7409b0f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c7b9089c4aaebc9557f7ba9310470cc41dfaa6fd0c5b53be3946026662512181"
   end
 
   depends_on "pkgconf" => :build
