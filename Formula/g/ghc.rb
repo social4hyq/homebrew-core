@@ -16,7 +16,7 @@ class Ghc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7424a049df11aa279c167456bf39caace7a2a26a505272dd13da1ef5815eb1fa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2dc3d69a7d2a9fe6c1fd4aab616dd0001b283a2eb5d2b690e40d571c8823067f"
   end
 
   depends_on "autoconf" => :build
@@ -29,11 +29,6 @@ class Ghc < Formula
   uses_from_macos "m4" => :build
   uses_from_macos "libffi"
   uses_from_macos "ncurses"
-
-  # Build uses sed -r option, which is not available in Catalina shipped sed.
-  on_catalina :or_older do
-    depends_on "gnu-sed" => :build
-  end
 
   # A binary of ghc is needed to bootstrap ghc
   # NOTE: GHC 9.12.3 fails https://gitlab.haskell.org/ghc/ghc/-/issues/26715
