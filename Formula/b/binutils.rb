@@ -9,7 +9,8 @@ class Binutils < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c5b109959aa37db07e21b39bcb85d3a646f556651eba5eb46fbe139fe43f9782"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0710135e4722ddd9672c7ccc0f37cb9f736a6bb9a5ca871c3e6497d3aa006f66"
   end
 
   keg_only :shadowed_by_macos, "Apple's CLT provides the same tools"
@@ -34,7 +35,7 @@ class Binutils < Formula
   #
   #   0001: Give the linked output the `.codesign` section that OpenHarmony
   #         requires before it will execute or dlopen an ELF.  The signer is
-  #         ohos-bst-light's `selfsign` (0BSD), vendored into `ld` and called
+  #         ohos-selfsign's `selfsign` (0BSD), vendored into `ld` and called
   #         in-process, so nothing is spawned per link.  Signing is on by
   #         default and `--no-code-sign` turns it off.
   #
