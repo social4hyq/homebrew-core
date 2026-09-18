@@ -31,7 +31,7 @@ class Uv < Formula
   #
   #   0001: Skip ld --exec in musllinux detection
   #   0002: Skip ld --exec in libc detection
-  #   0003: Vendored selfsign.rs (byte-identical to ohos-bst-light, kept in
+  #   0003: Vendored selfsign.rs (byte-identical to ohos-selfsign, kept in
   #         its own patch so it can be upgraded independently)
   #   0004: Adapt vendored selfsign.rs to an importable library
   #         (drop main(), export API)
