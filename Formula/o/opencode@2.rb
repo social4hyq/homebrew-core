@@ -8,10 +8,8 @@ class OpencodeAT2 < Formula
   version_scheme 1
 
   livecheck do
-    url "https://registry.npmjs.org/@opencode-ai/cli/beta"
-    strategy :json do |json|
-      json["version"]
-    end
+    url :stable
+    regex(/^v(2\.\d+\.\d+)$/i)
   end
 
   bottle do
