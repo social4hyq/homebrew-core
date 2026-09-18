@@ -30,11 +30,6 @@ class Ghc < Formula
   uses_from_macos "libffi"
   uses_from_macos "ncurses"
 
-  # Build uses sed -r option, which is not available in Catalina shipped sed.
-  on_catalina :or_older do
-    depends_on "gnu-sed" => :build
-  end
-
   # A binary of ghc is needed to bootstrap ghc
   # NOTE: GHC 9.12.3 fails https://gitlab.haskell.org/ghc/ghc/-/issues/26715
   resource "binary" do
