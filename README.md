@@ -6,6 +6,8 @@
 
 **这个 tap 的定位**：过渡区。formula 验证成熟后持续推动合并进 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，合入即下线自有版本（见下方「已下线 / 已迁移」表）——上游化是长期追求，不是事后收尾。
 
+**仓库源头**：本仓库以 [GitHub](https://github.com/social4hyq/homebrew-core) 为唯一源头——源码托管、Issues、PR、CI 全部在 GitHub 进行。[atomgit 同名仓库](https://atomgit.com/social4hyq/homebrew-core) 是合并后自动同步的**单向镜像**（GitHub → atomgit，永不反向），存在意义是 bottle 二进制发布在 atomgit Releases 上、国内网络下载更快。反馈问题、提交贡献请认准 GitHub；请勿向 atomgit 推送代码或开 PR。
+
 **装了能做什么**：
 
 - **让 AI 帮你写代码**：`opencode`（开源、自带 75+ 模型提供商接入）、`claude-code`（Anthropic 官方）
