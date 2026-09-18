@@ -5,18 +5,17 @@ class LldAT22 < Formula
   sha256 "922f1817a0df7b1489272d18134ee0087a8b068828f87ac63b9861b1a9965888"
   # The LLVM Project is under the Apache License v2.0 with LLVM Exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
+  revision 1
 
   livecheck do
     formula "llvm@22"
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9d2c352d94a396f175c282db68605f985321c563e02277572a3955d81f856df"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5526f53ae30d1cec6af03a5069836861a087d0cc0655250a40125c4b4c880961"
   end
 
-  # Not `:versioned_formula`: the fork auto-links versioned kegs on direct
-  # install, colliding with ohos-sdk's own ld.lld/lld on PATH.
-  keg_only "it conflicts with `ohos-sdk`"
+  keg_only :versioned_formula
 
   depends_on "cmake" => :build
   depends_on "llvm@22"
@@ -34,23 +33,23 @@ class LldAT22 < Formula
   end
 
   def install
-    rpaths = [rpath]
-    rpaths << formula_opt_lib("llvm@22").to_s if OS.linux?
-
     system "cmake", "-S", "lld", "-B", "build",
                     "-DBUILD_SHARED_LIBS=ON",
-                    "-DCMAKE_INSTALL_RPATH=#{rpaths.join(";")}",
-                    "-DLLD_BUILT_STANDALONE=ON",
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
                     "-DLLD_VENDOR=#{tap&.user}",
-                    "-DLLVM_CMAKE_DIR=#{formula_opt_lib("llvm@22")}/cmake/llvm",
-                    "-DLLVM_ENABLE_LTO=ON",
+                    # `find_package(LLVM)` resolves through
+                    # `CMAKE_PREFIX_PATH`, where the keg-only `ohos-sdk-native`
+                    # (pulled in by `llvm@22`) is searched ahead of `llvm@22`'s
+                    # prefix — the SDK's bundled LLVM 15 CMake package would win
+                    # the lookup. `LLVM_DIR` is checked first, so it pins the
+                    # intended keg.
+                    "-DLLVM_DIR=#{formula_opt_lib("llvm@22")}/cmake/llvm",
+                    # Upstream has this `ON`, but on OHOS clang's `-flto` bitcode
+                    # is rejected by the only linker on PATH, `ohos-sdk`'s LLD
+                    # 15.0.4.
+                    "-DLLVM_ENABLE_LTO=OFF",
                     "-DLLVM_INCLUDE_TESTS=OFF",
                     "-DLLVM_USE_SYMLINKS=ON",
-                    # The OHOS driver defaults executables to
-                    # `--no-allow-shlib-undefined`; liblldCommon.so ends up with
-                    # an unresolved `__cxa_thread_atexit_impl` (resolved at load
-                    # time from OHOS musl, which exports it) — tolerate it.
-                    "-DCMAKE_EXE_LINKER_FLAGS=-Wl,--allow-shlib-undefined",
                     *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
