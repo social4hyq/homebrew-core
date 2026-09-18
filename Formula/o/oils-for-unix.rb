@@ -11,7 +11,7 @@ class OilsForUnix < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "908edcdde4854bc2dee47a9b320e26596b4a5e0554546f72b5b473fd857eac55"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c319911cc804245e3afc3332c8a7888858847515befa7631089f435b704eb36b"
   end
 
   depends_on "readline"
