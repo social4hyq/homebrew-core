@@ -1,8 +1,8 @@
 class ClaudeCodeLatest < Formula
   desc "Anthropic Claude Code CLI (latest release channel)"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.274.tgz"
-  sha256 "dd66731ab73827cf56c8b7ddca6d2693667759d6a0cff0ba222d07e7b9a9b321"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.275.tgz"
+  sha256 "506ba2bb8336d0055eb04126fb0fb5023d95d900fc45913d40a1a5048b5908a9"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
   # Anthropic License forbids redistributing the official artifacts, so this is
   # a runtime-fetch stub: install() ships only a wrapper. It runs the official
@@ -19,8 +19,8 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.274-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e63fd20001e251f3e356864e7fd30f04055f1a6b7e109f7ae7fa537d087f23e5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.275-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1fe5a0637564ace179d49b96d14295faa8670dedc34262df9a7a1e23b2870473"
   end
 
   depends_on "ohos-bst-light"
