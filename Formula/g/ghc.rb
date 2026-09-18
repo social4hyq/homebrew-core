@@ -16,7 +16,7 @@ class Ghc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7424a049df11aa279c167456bf39caace7a2a26a505272dd13da1ef5815eb1fa"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2dc3d69a7d2a9fe6c1fd4aab616dd0001b283a2eb5d2b690e40d571c8823067f"
   end
 
   depends_on "autoconf" => :build
