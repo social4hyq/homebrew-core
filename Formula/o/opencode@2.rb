@@ -33,6 +33,7 @@ class OpencodeAT2 < Formula
     0005-update-server-connection.patch
     0006-update-build-target.patch
     0007-update-app-data-directory.patch
+    0008-restore-opencode2-binary-name.patch
   ].each do |p|
     patch do
       file "Patches/opencode@2/#{p}"
@@ -42,8 +43,12 @@ class OpencodeAT2 < Formula
   deny_network_access! :test
 
   def install
-    rm_rf %w[packages/web
-             packages/www packages/storybook packages/enterprise]
+    # prune web/ui packages unused by the CLI build; upstream drops/renames
+    # these between versions, so guard against missing paths (packages/www
+    # vanished in 2.0.7 — rm_r would raise ENOENT)
+    %w[packages/web packages/www packages/storybook packages/enterprise].each do |d|
+      rm_r d if File.directory?(d)
+    end
 
     ENV["OPENCODE_VERSION"] = "#{version}_#{revision}"
     ENV["OPENCODE_CHANNEL"] = "beta"
