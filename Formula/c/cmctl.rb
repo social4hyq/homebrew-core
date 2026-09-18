@@ -7,7 +7,7 @@ class Cmctl < Formula
   head "https://github.com/cert-manager/cmctl.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "373db1600782193f1f313f8fda8bcaad6a3b0c70c202597242126b12bca5d5ec"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f094fb45cbf74af941117985e6e2a0354799eb61395e1305644c6fc6186c5d2a"
   end
 
   depends_on "go" => :build
