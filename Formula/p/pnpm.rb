@@ -21,7 +21,6 @@ class Pnpm < Formula
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
 
-
   # Auto-sign package-shipped ELF binaries as they enter the CAFS store;
   # node_modules hardlinks then carry the .codesign section the OHOS
   # kernel requires for exec/dlopen.
@@ -39,12 +38,9 @@ class Pnpm < Formula
 
   deny_network_access!
 
-  def fetch
-    rm ".cargo/config.toml"
-    system "cargo", "fetch", "--locked"
-  end
-
   def install
+    rm ".cargo/config.toml"
+
     # Work around superenv breaking aws-lc-sys `-O0` needed to build CPU Jitter RNG
     ENV["AWS_LC_SYS_NO_JITTER_ENTROPY"] = "1"
 
