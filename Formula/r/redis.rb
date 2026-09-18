@@ -1,8 +1,8 @@
 class Redis < Formula
   desc "Persistent key-value database, with built-in net interface"
   homepage "https://redis.io/"
-  url "https://download.redis.io/releases/redis-8.10.1.tar.gz"
-  sha256 "60166c95ab7aedaa9dfe516de685be0a4dd87be95ded59ba429df14c13f1b663"
+  url "https://download.redis.io/releases/redis-8.10.2.tar.gz"
+  sha256 "b9ffee226b5eecdba98a679260dad764b2a4ebd90dce4ad5ac9e9f3eef9c02b3"
   license all_of: [
     "AGPL-3.0-only",
     "BSD-2-Clause", # deps/jemalloc, deps/linenoise, src/lzf*
@@ -10,7 +10,6 @@ class Redis < Formula
     "MIT", # deps/lua
     any_of: ["CC0-1.0", "BSD-2-Clause"], # deps/hdr_histogram
   ]
-  revision 1
   compatibility_version 1
   head "https://github.com/redis/redis.git", branch: "unstable"
 
@@ -20,7 +19,7 @@ class Redis < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "22e68a081489ceb95ecdc192b508472b30b56d4bcd6b4cc658a01332f502b658"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d778f3ece88c793edfdafcdd4e8c1543c83b8bcc22f70987273a3a8babd9ceff"
   end
 
   depends_on "openssl@3"
