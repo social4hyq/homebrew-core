@@ -4,54 +4,32 @@ class Pnpm < Formula
   url "https://github.com/pnpm/pnpm/archive/refs/tags/v12.4.2.tar.gz"
   sha256 "2fca2c303b978c8177c13550b2d0f8e442cf32b833bea7878421f90c18a7c612"
   license "MIT"
-  revision 1
 
   livecheck do
-    url "https://registry.npmmirror.com/pnpm/latest"
+    url "https://registry.npmjs.org/pnpm/latest"
     strategy :json do |json|
       json["version"]
     end
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/pnpm-v12.4.2-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d1e6fab1a11f13f8f6d3a04b04005c733a66697e6358bc1d145449fd7dcdd1d"
-  end
-
   depends_on "cmake" => :build
-  depends_on "lld@21" => :build
-  depends_on "ohos-sdk" => :build
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
 
-  # Auto-sign package-shipped ELF binaries as they enter the CAFS store
-  # (vendored ohos-bst-light selfsign); node_modules hardlinks then carry
-  # the .codesign section the OHOS kernel requires for exec/dlopen.
-  patch do
-    file "Patches/pnpm/0001-vendor-ohos-sign.patch"
-  end
 
   patch do
-    file "Patches/pnpm/0002-autosign-store-elf.patch"
-  end
-
-  # Rust models OHOS as a Linux variant (target_os "linux"), which made
-  # the default supportedArchitectures install linux-*-musl optional
-  # bindings that openharmony-aware napi-rs loaders never pick up.
-  patch do
-    file "Patches/pnpm/0003-host-platform-openharmony.patch"
+    file "Patches/pnpm/0001-host-platform-openharmony.patch"
   end
 
   deny_network_access!
 
-  def install
+  def fetch
     rm ".cargo/config.toml"
+    system "cargo", "fetch", "--locked"
+  end
 
-    # aws-lc-sys cmake needs the OHOS toolchain to select the aarch64 asm
-    # sources; without it ARCH detection falls back to generic and the link
-    # misses every aws_lc_* crypto symbol. Jitter entropy needs -O0 that
-    # superenv strips (same as upstream uv's OHOS build).
-    ENV["OHOS_SDK_NATIVE"] = formula_opt_prefix("ohos-sdk")/"native"
+  def install
+    # Work around superenv breaking aws-lc-sys `-O0` needed to build CPU Jitter RNG
     ENV["AWS_LC_SYS_NO_JITTER_ENTROPY"] = "1"
 
     system "cargo", "install", *std_cargo_args(path: "pnpm/crates/cli")
