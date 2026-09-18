@@ -1,8 +1,8 @@
 class Form < Formula
   desc "Symbolic manipulation system"
   homepage "https://www.nikhef.nl/~form/"
-  url "https://github.com/form-dev/form/releases/download/v5.0.1/form-5.0.1.tar.gz"
-  sha256 "ce62530a54e5232dfefb6c1ff0e7047372a43941b3c0e0db08b5714fd868722c"
+  url "https://github.com/form-dev/form/releases/download/v5.0.2/form-5.0.2.tar.gz"
+  sha256 "90a3fbc31a31de50a181e63ce222d0224642a5916fdbb25373913558a6d6921a"
   license "GPL-3.0-or-later"
 
   livecheck do
