@@ -2,8 +2,8 @@ class Ollama < Formula
   desc "Create, run, and share large language models (LLMs)"
   homepage "https://ollama.com/"
   url "https://github.com/ollama/ollama.git",
-      tag:      "v0.34.1",
-      revision: "38fdb5dd58c761f850cddd6ba1e78a7954646b4f"
+      tag:      "v0.34.2",
+      revision: "dfabde4539e42ba1e1eab50a3a50b88aea7958a0"
   license "MIT"
   head "https://github.com/ollama/ollama.git", branch: "main"
 
@@ -16,7 +16,7 @@ class Ollama < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2dc22499fc35925ae2ba3bd2f914a5766a2cd82dc38209e7fd20ee8c34da6750"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5b7a1604335faa0b62d9b591fdb7b659e9792641f191d62e283b1d94d96c251e"
   end
 
   depends_on "cmake" => :build
