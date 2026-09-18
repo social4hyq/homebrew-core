@@ -33,7 +33,7 @@
  }
  
 +// autoSignOutput signs the output ELF binary using the vendored selfsign
-+// implementation (from ohos-bst-light, see cmd/go/internal/selfsign).
++// implementation (from ohos-selfsign, see cmd/go/internal/selfsign).
 +// Only signs executable (ET_EXEC) and shared object (ET_DYN) ELF files,
 +// skipping relocatable (ET_REL, i.e. .o) files which would be corrupted by
 +// signing. On HarmonyOS, compiled ELF binaries require code signing to execute.
