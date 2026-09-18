@@ -11,7 +11,7 @@ class Pv < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ca72be5f69af57b33e2fa01b607349422d0cfabbb577c12015424b56555ac36"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "79fb8041882a79edd44aa123edcf927ac17cb2147d179efd4de83ccfaaf2a999"
   end
 
   uses_from_macos "ncurses"
