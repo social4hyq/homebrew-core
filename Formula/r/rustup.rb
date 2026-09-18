@@ -9,7 +9,8 @@ class Rustup < Formula
   head "https://github.com/rust-lang/rustup.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2925d137ae1d580b4add3a1cb001ce113a9341932064c6ca7d316aa2441595c1"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "018be5c3001e585e447ae1ce2c80cfe1368c39009f94ecdc3d1f875567631984"
   end
 
   keg_only "it conflicts with rust"
@@ -34,7 +35,7 @@ class Rustup < Formula
   # without a .codesign section, so downloaded Rust toolchain binaries
   # must be code-signed after install.
   #
-  #   0001: Vendored selfsign.rs (byte-identical to ohos-bst-light, kept in
+  #   0001: Vendored selfsign.rs (byte-identical to ohos-selfsign, kept in
   #         its own patch so it can be upgraded independently)
   #   0002: Adapt vendored selfsign.rs to an importable library
   #         (drop main(), export API)
