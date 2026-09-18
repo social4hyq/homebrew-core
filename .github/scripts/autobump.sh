@@ -198,7 +198,7 @@ for line in "${CANDIDATES[@]}"; do
 
     if [ "$EDIT_VERSION" = true ]; then
       BRANCH="bump-${FORMULA}-${NEW_VERSION}"
-      echo "npm-version formula: version $FORMULA_VERSION -> $NEW_VERSION, pin $CURRENT_REV -> $TARGET_SHA (brew revision stanza dropped)"
+      echo "release-version formula: version $FORMULA_VERSION -> $NEW_VERSION, pin $CURRENT_REV -> $TARGET_SHA (brew revision stanza dropped)"
       EDIT_AND_VERIFY="
         set -euo pipefail
         sed -i 's/revision: \"$CURRENT_REV\"/revision: \"$TARGET_SHA\"/' \"$FORMULA_PATH\"
