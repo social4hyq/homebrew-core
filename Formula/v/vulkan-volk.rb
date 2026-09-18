@@ -19,7 +19,7 @@ class VulkanVolk < Formula
   depends_on "vulkan-headers" => [:build, :test]
   depends_on "vulkan-loader"
 
-  conflicts_with "volk" => "both install volkConfig.cmake"
+  conflicts_with "volk", because: "both install volkConfig.cmake"
 
   def volk_static_defines
     res = ""
@@ -35,9 +35,9 @@ class VulkanVolk < Formula
   def install
     system "cmake", "-S", ".", "-B", "build",
            "-DVOLK_INSTALL=ON",
-           "-DVULKAN_HEADERS_INSTALL_DIR=#{Formula["vulkan-headers"].prefix}",
+           "-DVULKAN_HEADERS_INSTALL_DIR=#{formula_opt_prefix("vulkan-headers")}",
            "-DVOLK_STATIC_DEFINES=#{volk_static_defines}",
-           "-DCMAKE_INSTALL_RPATH=#{rpath(target: Formula["vulkan-loader"].opt_lib)}",
+           "-DCMAKE_INSTALL_RPATH=#{rpath(target: formula_opt_lib("vulkan-loader"))}",
            *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
@@ -61,9 +61,9 @@ class VulkanVolk < Formula
     C
     system ENV.cc, testpath/"test.c",
            "-I#{include}", "-L#{lib}",
-           "-I#{Formula["vulkan-headers"].include}",
+           "-I#{formula_opt_include("vulkan-headers")}",
            "-lvolk", "-D#{volk_static_defines}",
-           "-Wl,-rpath,#{Formula["vulkan-loader"].opt_lib}",
+           "-Wl,-rpath,#{formula_opt_lib("vulkan-loader")}",
            "-o", testpath/"test"
     system testpath/"test"
   end
