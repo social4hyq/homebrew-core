@@ -1,17 +1,14 @@
 diff --git a/pnpm/crates/detect-libc/src/lib.rs b/pnpm/crates/detect-libc/src/lib.rs
-index 78944ca..5206336 100644
+index 78944ca..113ca35 100644
 --- a/pnpm/crates/detect-libc/src/lib.rs
 +++ b/pnpm/crates/detect-libc/src/lib.rs
-@@ -77,8 +77,17 @@ fn detect_implementation() -> Option<Implementation> {
+@@ -77,8 +77,14 @@ fn detect_implementation() -> Option<Implementation> {
  /// `sunos` / `aix` / `android`. Rust uses `macos` / `linux` /
  /// `windows` / `freebsd` / `openbsd` / `solaris` / `aix` /
  /// `android`. Only `macos`, `windows`, and `solaris` differ.
 +///
-+/// OpenHarmony is the exception: Rust models it as a Linux variant
-+/// (`aarch64-linux-ohos`, `target_os = "linux"` + `target_env =
-+/// "ohos"`), while Node exposes it as its own `openharmony` platform.
-+/// Report Node's name so default platform selection matches the
-+/// loaders that branch on `process.platform`.
++/// OpenHarmony: Rust reports target_os "linux", Node reports "openharmony".
++/// Report Node's name so default platform selection matches napi-rs loaders.
  #[must_use]
  pub fn host_platform() -> &'static str {
 +    if cfg!(target_env = "ohos") {
