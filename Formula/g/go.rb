@@ -23,7 +23,8 @@ class Go < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e5e2cff48dd68afd3d942fa50f953e392f73a9ac8ea52c29bca1289cf1a66b5"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be709ec2f821124d9fb05ee9ac89cee8591729de3d7515635c48d10f152374c6"
   end
 
   on_macos do
@@ -72,7 +73,7 @@ class Go < Formula
   #
   #   0001: Default GOCACHE → /data/storage/el2/base/files/go-build (hmfs)
   #   0002: Default GOTMPDIR → /data/storage/el2/base/cache (tmpfs)
-  #   0003: Vendored selfsign.go (byte-identical to ohos-bst-light, kept
+  #   0003: Vendored selfsign.go (byte-identical to ohos-selfsign, kept
   #         in its own patch so it can be upgraded independently)
   #   0004: Adapt vendored selfsign.go to an importable library
   #         (package main → selfsign, export API, drop main())
