@@ -1,8 +1,8 @@
 class GoLibrespot < Formula
   desc "Spotify client"
   homepage "https://github.com/devgianlu/go-librespot"
-  url "https://github.com/devgianlu/go-librespot/archive/refs/tags/v0.9.1.tar.gz"
-  sha256 "f3c16d87728089778e48f9f16104c046bf77e855e4347f308b03ba38698314ed"
+  url "https://github.com/devgianlu/go-librespot/archive/refs/tags/v0.10.0.tar.gz"
+  sha256 "0d60022635f9658a454e4917e47c5bdf1689a6be6fd87ad067fde67233f8bfe4"
   license "GPL-3.0-only"
   head "https://github.com/devgianlu/go-librespot.git", branch: "master"
 
