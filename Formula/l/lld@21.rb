@@ -13,7 +13,7 @@ class LldAT21 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "547613613714fd277ef590c76c453d1f7c65054bbf2f4470e86875ec4e684523"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d5ba652b74c77b96d7690202d41229d2f389d74072fdbec899a6294563a6807"
   end
 
   keg_only :versioned_formula
