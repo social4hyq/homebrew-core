@@ -1,8 +1,8 @@
 class OilsForUnix < Formula
   desc "Bash-compatible Unix shell with more consistent syntax and semantics"
   homepage "https://oils.pub/"
-  url "https://oils.pub/download/oils-for-unix-0.37.0.tar.gz"
-  sha256 "f4d41d20a0523dbcfbd4ba231f82edf25b08d4965d65bc71fcb56666d6743000"
+  url "https://oils.pub/download/oils-for-unix-0.38.0.tar.gz"
+  sha256 "a33453722819b55ee552bfd7f3c2bab8f1940def55d5c8b46af16ce95bdf8803"
   license "Apache-2.0"
 
   livecheck do
@@ -11,7 +11,7 @@ class OilsForUnix < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "908edcdde4854bc2dee47a9b320e26596b4a5e0554546f72b5b473fd857eac55"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c319911cc804245e3afc3332c8a7888858847515befa7631089f435b704eb36b"
   end
 
   depends_on "readline"
