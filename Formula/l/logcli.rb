@@ -11,7 +11,7 @@ class Logcli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "589a9245adbfb572002561b73667e281f032f7769f5b3332e8a552cd1394aca3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f80b7d8afee3ca415bc2a8ccc6562ccc61d0347aebf4ef0686c283527ae71e6d"
   end
 
   depends_on "go" => :build
