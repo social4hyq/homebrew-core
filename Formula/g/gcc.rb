@@ -14,7 +14,8 @@ class Gcc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c88a960c8e29339185708961efa24e3efed37413c2b0999aa0da4004364c104e"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "42e1ca114c1b230aa42c0e3c2fef33a9f7596cfb7f1b3741869cd88303108933"
   end
 
   # The bottles are built on systems with the CLT installed, and do not work
@@ -366,11 +367,11 @@ class Gcc < Formula
       adaptation for OpenHarmony. Its stability is not guaranteed.
       For production use, please use ohos-sdk first.
 
-      Programs link this keg's runtimes (libgcc_s, libstdc++, libgfortran,
-      libgomp, ...) shared, and record its directory as an rpath, as they do
-      with Homebrew's GCC on Linux. To build a program that does not need this
-      keg, link the runtimes it uses statically - e.g. `-static-libgcc`,
-      `-static-libstdc++` or `-static-libgfortran`.
+      Programs link this keg's runtimes (libgcc_s, libstdc++, libgfortran, ...)
+      shared, and record its directory as an rpath, as they do with Homebrew's
+      GCC on Linux. To build a program that does not need this keg, link the
+      runtimes it uses statically - e.g. `-static-libgcc`, `-static-libstdc++`
+      or `-static-libgfortran`.
     EOS
   end
 
