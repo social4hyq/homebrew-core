@@ -11,6 +11,10 @@ class ProtocGenGrpcWeb < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f203dfd178c890bcafef36c71fdf13ca91b574366375b599f3b9166696170d84"
+  end
+
   depends_on "cmake" => :build
   depends_on "pkgconf" => :build
   depends_on "abseil"
