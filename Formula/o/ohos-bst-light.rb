@@ -1,10 +1,9 @@
 class OhosBstLight < Formula
   desc "Lightweight OpenHarmony binary self-signing tool"
   homepage "https://github.com/hqzing/ohos-bst-light"
-  url "https://github.com/hqzing/ohos-bst-light/archive/refs/tags/v2.1.2.tar.gz"
-  sha256 "707296b7263a5be14d412db689be20c32c20483f0760268ebd95b7306e4b95be"
+  url "https://github.com/hqzing/ohos-bst-light/archive/refs/tags/v3.0.0.tar.gz"
+  sha256 "d66c9ed4442aa876643a477db1fc77bb48f088b221f2bc3aee21861b937166c4"
   license "0BSD"
-  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "6bed3601bdedc3187fff5a00fb1f671964c9f6378f88d65618227193e1d56cc7"
