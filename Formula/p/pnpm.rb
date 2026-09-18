@@ -12,6 +12,11 @@ class Pnpm < Formula
     end
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/pnpm-v12.4.2-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5bd5947ae249cb39398c35ddf521db170cdac5220340bda0007439942996cd8a"
+  end
+
   depends_on "cmake" => :build
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
