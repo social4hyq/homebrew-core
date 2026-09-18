@@ -1,0 +1,20 @@
+--- a/packages/cli/script/build.ts
++++ b/packages/cli/script/build.ts
+@@ -12,7 +12,7 @@
+ import { resolveOpencodePty } from "./opencode-pty"
+ 
+ const dir = path.resolve(import.meta.dirname, "..")
+-const binary = "opencode"
++const binary = "opencode2"
+ const outdir = path.resolve(
+   dir,
+   process.argv.find((arg) => arg.startsWith("--outdir="))?.slice("--outdir=".length) ?? "dist",
+@@ -151,7 +151,7 @@
+     },
+     define: {
+       OPENCODE_VERSION: `'${Script.version}'`,
+-      OPENCODE_CLI_NAME: "'opencode'",
++      OPENCODE_CLI_NAME: "'opencode2'",
+       OPENCODE_CHANNEL: `'${Script.channel}'`,
+       OPENCODE_ARTIFACT: `'cli'`,
+       OPENCODE_LIBC: item.os === "linux" ? `'${item.abi ?? "glibc"}'` : "undefined",

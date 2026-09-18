@@ -1,10 +1,9 @@
 class OpencodeAT2 < Formula
   desc "AI coding agent, built for the terminal"
   homepage "https://opencode.ai"
-  url "https://github.com/anomalyco/opencode.git", revision: "ad31bff969fe386266d3d1cd24d988651d3233af"
-  version "0.0.0-beta-19271"
+  url "https://github.com/anomalyco/opencode.git", revision: "ca27d3328fcd0d470588149c902a963452f1abaf"
+  version "2.0.7"
   license "MIT"
-  revision 6
   version_scheme 1
 
   livecheck do
@@ -13,9 +12,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v0.0.0-beta-19271-r9"
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "34e691cdb8b5fe1734aa1df5e2e59ada298f759c1473aa783577c869f55b1d47"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.7-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6210331e04f44204dc133acc2614070ab720e83b2766f207f03951e33942fd9"
   end
 
   depends_on "bun" => :build
@@ -34,6 +32,7 @@ class OpencodeAT2 < Formula
     0005-update-server-connection.patch
     0006-update-build-target.patch
     0007-update-app-data-directory.patch
+    0008-restore-opencode2-binary-name.patch
   ].each do |p|
     patch do
       file "Patches/opencode@2/#{p}"
@@ -43,8 +42,12 @@ class OpencodeAT2 < Formula
   deny_network_access! :test
 
   def install
-    rm_r %w[packages/web
-            packages/www packages/storybook packages/enterprise]
+    # prune web/ui packages unused by the CLI build; upstream drops/renames
+    # these between versions, so guard against missing paths (packages/www
+    # vanished in 2.0.7 — rm_r would raise ENOENT)
+    %w[packages/web packages/www packages/storybook packages/enterprise].each do |d|
+      rm_r d if File.directory?(d)
+    end
 
     ENV["OPENCODE_VERSION"] = "#{version}_#{revision}"
     ENV["OPENCODE_CHANNEL"] = "beta"
