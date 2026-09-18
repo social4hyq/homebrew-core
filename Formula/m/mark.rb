@@ -1,8 +1,8 @@
 class Mark < Formula
   desc "Sync your markdown files with Confluence pages"
   homepage "https://samizdat.dev"
-  url "https://github.com/kovetskiy/mark/archive/refs/tags/v16.19.0.tar.gz"
-  sha256 "2fc172fe466510778437de38b94385226089f8a44243913a63b578bb382c163b"
+  url "https://github.com/kovetskiy/mark/archive/refs/tags/v16.19.1.tar.gz"
+  sha256 "4585c994b484a2c1d734c6258d201234101ddec87857059debe8e46360db2477"
   license "Apache-2.0"
   head "https://github.com/kovetskiy/mark.git", branch: "master"
 
