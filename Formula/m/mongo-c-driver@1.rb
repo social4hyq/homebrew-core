@@ -1,8 +1,8 @@
 class MongoCDriverAT1 < Formula
   desc "C driver for MongoDB"
   homepage "https://github.com/mongodb/mongo-c-driver"
-  url "https://github.com/mongodb/mongo-c-driver/archive/refs/tags/1.30.10.tar.gz"
-  sha256 "b66fe996492170059dd547f2a3469b819d86b13e819220a84d999bc20b84ed26"
+  url "https://github.com/mongodb/mongo-c-driver/archive/refs/tags/1.30.11.tar.gz"
+  sha256 "de539207f026108cdda053f774c647ef81f3cb65268c0380553a657368febe97"
   license "Apache-2.0"
 
   livecheck do
@@ -11,7 +11,7 @@ class MongoCDriverAT1 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "49c7d6d27d54d25162c3f8cc27f268fdd3207a27d98b5324204a5fa3ded07601"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd7c764221b438f33444f2589db705cbd97f4c861d2f54a77904057aa47de774"
   end
 
   keg_only :versioned_formula
