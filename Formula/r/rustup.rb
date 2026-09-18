@@ -34,7 +34,7 @@ class Rustup < Formula
   # without a .codesign section, so downloaded Rust toolchain binaries
   # must be code-signed after install.
   #
-  #   0001: Vendored selfsign.rs (byte-identical to ohos-bst-light, kept in
+  #   0001: Vendored selfsign.rs (byte-identical to ohos-selfsign, kept in
   #         its own patch so it can be upgraded independently)
   #   0002: Adapt vendored selfsign.rs to an importable library
   #         (drop main(), export API)
