@@ -4,7 +4,7 @@
 
 **这个 tap 解决什么问题**：鸿蒙 PC 终端（HiShell）强制代码签名——自行编译或直接下载的 Linux 程序一律 `Permission denied`，且不少常用工具还没适配鸿蒙。本 tap 逐一移植、签名、真机验证后打包成 bottle，`brew install` 一条命令装好即用，体验等同 macOS/Linux 上的 Homebrew。
 
-**这个 tap 的定位**：过渡区。formula 验证成熟后持续推动合并进 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，合入即下线自有版本（见下方「已下线 / 已迁移」表）——上游化是长期追求，不是事后收尾。
+**这个 tap 的定位**：过渡区——formula 从进入 tap 第一天起就以合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 为目标，验证成熟即推动合并、下线自有版本（见下方「已下线 / 已迁移」表）。
 
 **仓库源头**：本仓库以 [GitHub](https://github.com/social4hyq/homebrew-core) 为唯一源头——源码托管、Issues、PR、CI 全部在 GitHub 进行。[atomgit 同名仓库](https://atomgit.com/social4hyq/homebrew-core) 是合并后自动同步的**单向镜像**（GitHub → atomgit，永不反向），存在意义是 bottle 二进制发布在 atomgit Releases 上、国内网络下载更快。反馈问题、提交贡献请认准 GitHub；请勿向 atomgit 推送代码或开 PR。
 
