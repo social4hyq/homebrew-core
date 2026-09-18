@@ -17,8 +17,19 @@ class Pnpm < Formula
   depends_on "rust" => :build
 
 
+  # Auto-sign package-shipped ELF binaries as they enter the CAFS store;
+  # node_modules hardlinks then carry the .codesign section the OHOS
+  # kernel requires for exec/dlopen.
   patch do
-    file "Patches/pnpm/0001-host-platform-openharmony.patch"
+    file "Patches/pnpm/0001-vendor-ohos-sign.patch"
+  end
+
+  patch do
+    file "Patches/pnpm/0002-autosign-store-elf.patch"
+  end
+
+  patch do
+    file "Patches/pnpm/0003-host-platform-openharmony.patch"
   end
 
   deny_network_access!
