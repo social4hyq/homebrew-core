@@ -1,8 +1,8 @@
 class Thorvg < Formula
   desc "Lightweight portable library used for drawing vector-based scenes and animations"
   homepage "https://www.thorvg.org"
-  url "https://github.com/thorvg/thorvg/archive/refs/tags/v1.1.1.tar.gz"
-  sha256 "59c12500b7c2fc426e89667b3e4f3fdc2ff05a75cc12001a22c5f58fb1cdf592"
+  url "https://github.com/thorvg/thorvg/archive/refs/tags/v1.1.2.tar.gz"
+  sha256 "cd466f4abf2522a6dcdc1a69a75d04a214b7163c89731fb8481eceaa6cb73842"
   license "MIT"
   head "https://github.com/thorvg/thorvg.git", branch: "main"
 
