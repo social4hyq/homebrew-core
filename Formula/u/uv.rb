@@ -8,7 +8,8 @@ class Uv < Formula
   head "https://github.com/astral-sh/uv.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "494311b95bcd2941aad693dc77a0ea13f0498484db6d913825b76154695e8c65"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f07f633afb23f23cb55b60f167b43ef7bff30da7988d45fa4f0ba697391eaf8"
   end
 
   depends_on "cmake" => :build
@@ -31,7 +32,7 @@ class Uv < Formula
   #
   #   0001: Skip ld --exec in musllinux detection
   #   0002: Skip ld --exec in libc detection
-  #   0003: Vendored selfsign.rs (byte-identical to ohos-bst-light, kept in
+  #   0003: Vendored selfsign.rs (byte-identical to ohos-selfsign, kept in
   #         its own patch so it can be upgraded independently)
   #   0004: Adapt vendored selfsign.rs to an importable library
   #         (drop main(), export API)
