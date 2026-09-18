@@ -13,7 +13,7 @@ class Goreleaser < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab6fbfdc678e83c686c2e7e6504d9c20ddbf061934062dae8ef90c5e1777b1ee"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7f328276658b2d0095f6c8ba3df0ca6a5c71dea241646dde670fd8193491a930"
   end
 
   depends_on "go" => :build
