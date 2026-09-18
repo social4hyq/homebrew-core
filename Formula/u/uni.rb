@@ -6,7 +6,7 @@ class Uni < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cfc29899c59deaf19ff439fb4f1f8187e84ea7ce3e0a955cd928bf30315865e8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb74812c1e268acb12ca997f53aa4035da57212bb49510d78dc9081008710ab6"
   end
 
   depends_on "go" => :build
