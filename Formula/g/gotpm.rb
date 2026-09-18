@@ -7,7 +7,7 @@ class Gotpm < Formula
   head "https://github.com/google/go-tpm-tools.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "864d081ef6fb6b15331a7b8f63d787b315c1eb4115f6c929ed26a99b46bfd682"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "98555bc55acbd831c022f8605c4c071744a65d110e6ad39f1cb27452c598da2c"
   end
 
   depends_on "go" => :build
