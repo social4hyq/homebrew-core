@@ -21,7 +21,8 @@ class GoAT126 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5983a5668516795cb81ae4e4482d8a69df258a7951ebbf5ea73fb51d1348b571"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fab7d8b6a740dc4413457f8391fc9307329bdfdda8ac444474a9ed9d76624fe4"
   end
 
   keg_only :versioned_formula
@@ -37,7 +38,7 @@ class GoAT126 < Formula
   #
   #   0001: Default GOCACHE → /data/storage/el2/base/files/go-build (hmfs)
   #   0002: Default GOTMPDIR → /data/storage/el2/base/cache (tmpfs)
-  #   0003: Vendored selfsign.go (byte-identical to ohos-bst-light, kept
+  #   0003: Vendored selfsign.go (byte-identical to ohos-selfsign, kept
   #         in its own patch so it can be upgraded independently)
   #   0004: Adapt vendored selfsign.go to an importable library
   #         (package main → selfsign, export API, drop main())
