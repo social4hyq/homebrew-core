@@ -366,11 +366,11 @@ class Gcc < Formula
       adaptation for OpenHarmony. Its stability is not guaranteed.
       For production use, please use ohos-sdk first.
 
-      Programs link this keg's runtimes (libgcc_s, libstdc++, libgfortran,
-      libgomp, ...) shared, and record its directory as an rpath, as they do
-      with Homebrew's GCC on Linux. To build a program that does not need this
-      keg, link the runtimes it uses statically - e.g. `-static-libgcc`,
-      `-static-libstdc++` or `-static-libgfortran`.
+      Programs link this keg's runtimes (libgcc_s, libstdc++, libgfortran, ...)
+      shared, and record its directory as an rpath, as they do with Homebrew's
+      GCC on Linux. To build a program that does not need this keg, link the
+      runtimes it uses statically - e.g. `-static-libgcc`, `-static-libstdc++`
+      or `-static-libgfortran`.
     EOS
   end
 
