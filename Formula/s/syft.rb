@@ -7,7 +7,7 @@ class Syft < Formula
   head "https://github.com/anchore/syft.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61b5037e6f3fbdd8d3257bad16a31ce631c60aa21008f949eb2ac1cb6ad1b18f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8090b15fa1586cc696f62828753fb1587b6a328c7083a6bd1e257c1d12bcc6aa"
   end
 
   depends_on "go" => :build
