@@ -14,7 +14,8 @@ class Gcc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c88a960c8e29339185708961efa24e3efed37413c2b0999aa0da4004364c104e"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "42e1ca114c1b230aa42c0e3c2fef33a9f7596cfb7f1b3741869cd88303108933"
   end
 
   # The bottles are built on systems with the CLT installed, and do not work
