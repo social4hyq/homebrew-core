@@ -7,7 +7,7 @@ class Oauth2c < Formula
   head "https://github.com/cloudentity/oauth2c.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "97a0c7ad9fd4c01e9c3b1f389c43a29785af278249561d30d6efabda2ac2c34b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8444f8381b0b1169676757bd3942c8ac7e2f88290517ffb5af7c5fb2da1f9fba"
   end
 
   depends_on "go" => :build
