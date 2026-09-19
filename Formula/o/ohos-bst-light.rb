@@ -6,7 +6,7 @@ class OhosBstLight < Formula
   license "0BSD"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bed3601bdedc3187fff5a00fb1f671964c9f6378f88d65618227193e1d56cc7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "767611d8693175bd9e927c5cb137e6803ca46d2249e9db762e93f50ace6d7afc"
   end
 
   def install
