@@ -1,8 +1,8 @@
 class Glooctl < Formula
   desc "Envoy-Powered API Gateway"
   homepage "https://docs.solo.io/gloo-edge/main/reference/cli/glooctl/"
-  url "https://github.com/solo-io/gloo/archive/refs/tags/v1.22.3.tar.gz"
-  sha256 "69150674c01271cc1f9bd6b0970814f76e31d390d525a7662a5e983928ceb5d8"
+  url "https://github.com/solo-io/gloo/archive/refs/tags/v1.22.4.tar.gz"
+  sha256 "e3d4115038ac63e4fe2bcdfc6b6101c5620be2202c4fa170c07a336605a66fe7"
   license "Apache-2.0"
   head "https://github.com/solo-io/gloo.git", branch: "main"
 
@@ -16,7 +16,7 @@ class Glooctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0bb9a892b6afeb8459b3ab2af6f78f938ad7c2d73f4b12642bbb993313a2018"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c671f2d1fd9499cd13427bbbe0962859244657059b1b679ff225f13e890797e3"
   end
 
   depends_on "go" => :build
