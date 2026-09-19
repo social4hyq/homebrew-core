@@ -6,7 +6,7 @@ class SupabaseMcpServer < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6669893dd7f240da787c48c87b2a31d62ba29a4b4a6a9b503283158c94648d88"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00b2c5807f560deb585ce84b6dac4b16429812e35ad31868275f0738370149ec"
   end
 
   depends_on "node"
