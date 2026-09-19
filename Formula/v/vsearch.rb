@@ -6,7 +6,7 @@ class Vsearch < Formula
   license any_of: ["BSD-2-Clause", "GPL-3.0-or-later"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9aa612a377a57ad312ef0064c0c6d706d45cfa1784914a973a8243dd0f462a04"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d0855c049ec4f35a5aa4a4a2657b0bf7842556ad6c05be63f09d68061fc3a994"
   end
 
   depends_on "autoconf" => :build
