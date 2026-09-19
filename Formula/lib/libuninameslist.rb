@@ -12,7 +12,7 @@ class Libuninameslist < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4e21ddcb2d06af247a1647d1bb5ff592905548e4f0a57b9e93b43a2bf59fd793"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5321594efef6be37bf5257d637cb82ba3b70562742b9f9e0c163380dad80e950"
   end
 
   head do
