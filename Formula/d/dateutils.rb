@@ -6,7 +6,7 @@ class Dateutils < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1266234bbb0d32844c4bf9ee02e63b2cd3af7321206af5bb9a31488a98f02767"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3ff0f4d1b959cd4e728dd6d35135e0784f109e8035eb694ac54848b997d5981"
   end
 
   head do
