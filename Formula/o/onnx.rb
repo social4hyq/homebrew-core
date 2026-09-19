@@ -1,13 +1,13 @@
 class Onnx < Formula
   desc "Open standard for machine learning interoperability"
   homepage "https://onnx.ai/"
-  url "https://github.com/onnx/onnx/archive/refs/tags/v1.22.0.tar.gz"
-  sha256 "70bb8b25cf31ea9b1d9f94baacfdc8c4fa27a760f9a10f5d93881bc9eede5fbc"
+  url "https://github.com/onnx/onnx/archive/refs/tags/v1.23.0.tar.gz"
+  sha256 "b0ff8a948f6f2b8200493857e7549109f51a31ecbeb8a12c7e8c60c2c4fc93a4"
   license "Apache-2.0"
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1546f71a1a2a6b75018a441d0361b80e08bbe6a66d2cead7693626d63ea83e0f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1d7a057a1f874c850f337a36c86dcef2445314003018e7cdef44b1c0b75d44f"
   end
 
   depends_on "cmake" => [:build, :test]
