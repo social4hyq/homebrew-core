@@ -12,7 +12,7 @@ class Kumactl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d8531275e481a4705359d80ae62ba91526a12b3b380a4c841a87d27bcba74fac"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2872d80ebceb0864771c43e6ea91f4dfc243a80d904cfe47edbc972459c79c3a"
   end
 
   depends_on "go" => :build
