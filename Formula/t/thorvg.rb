@@ -12,7 +12,7 @@ class Thorvg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4355be0a59c2e78a393b4c78893752e50fcad8c07079c1b8d3ea272615ff6c66"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "58a149980c658f00e38a9714a05c299bb60a7157ccf81d65d3c6071d45619605"
   end
 
   depends_on "meson" => :build
