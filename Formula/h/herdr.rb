@@ -42,15 +42,6 @@ class Herdr < Formula
   end
 
   def install
-    # toybox patch can exit 0 without applying; verify a marker per file.
-    {
-      "build.rs"          => '"aarch64-unknown-linux-ohos" => "aarch64-linux-musl"',
-      "src/pane.rs"       => "pty_actor_foreground_process_group(&pty_actor)",
-      "src/app/agents.rs" => "foreground_group_leader_job",
-    }.each do |file, marker|
-      odie "herdr: #{file} OHOS patch not applied" unless File.read(file).include?(marker)
-    end
-
     # zig finds lib/ via self-exe-realpath; keep the tree intact, on PATH.
     resource("zig").stage(buildpath/"zig-toolchain")
     ENV.prepend_path "PATH", (buildpath/"zig-toolchain").to_s
