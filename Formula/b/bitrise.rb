@@ -12,7 +12,7 @@ class Bitrise < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0e21e5db86b31c36465cf8d9b3743b31e8788fbf768fd9b24cfddbc0a6106e9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f486108400774d8086b6fe74b00992445144660745775bff100db13c606b52d0"
   end
 
   depends_on "go" => [:build, :test]
