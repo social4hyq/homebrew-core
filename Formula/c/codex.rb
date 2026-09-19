@@ -1,8 +1,8 @@
 class Codex < Formula
   desc "OpenAI's coding agent that runs in your terminal"
   homepage "https://github.com/openai/codex"
-  url "https://github.com/openai/codex/archive/refs/tags/rust-v0.155.0.tar.gz"
-  sha256 "8bb3b5a5693492926b53c51ee2e68822b057d712b2ca1a0ae67878557fd6a2ea"
+  url "https://github.com/openai/codex/archive/refs/tags/rust-v0.155.1.tar.gz"
+  sha256 "b9e18d40d322586913e94d6747f3f934922c4f5130eb5a349ba019c57b83dad8"
   license "Apache-2.0"
 
   livecheck do
@@ -11,7 +11,7 @@ class Codex < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "01f3115034c79b605f1455883eb566cc488b3a6efc1a7aa1589c46c578fd5593"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b597acccf92a1b64b5019b79c881159f9ef3d1a7b8daf3417bd1e9b9c703430b"
   end
 
   depends_on "cmake" => :build
