@@ -1,8 +1,8 @@
 class Rbspy < Formula
   desc "Sampling profiler for Ruby"
   homepage "https://rbspy.github.io/"
-  url "https://github.com/rbspy/rbspy/archive/refs/tags/v0.51.0.tar.gz"
-  sha256 "56c574d1f3f1e57d961b6e2fd383497c68e7490c3968f6358e151645a3612eed"
+  url "https://github.com/rbspy/rbspy/archive/refs/tags/v0.52.1.tar.gz"
+  sha256 "e5bd0126e6585d57fcb8deee7db3b04ffbdfad36074eb1b799b48791f6219449"
   license "MIT"
 
   bottle do
@@ -10,6 +10,12 @@ class Rbspy < Formula
   end
 
   depends_on "rust" => :build
+
+  deny_network_access!
+
+  def fetch
+    system "cargo", "fetch", "--locked", "--target", "host-tuple"
+  end
 
   def install
     system "cargo", "install", *std_cargo_args
@@ -25,7 +31,7 @@ class Rbspy < Formula
       0lVreuqrlmTC/yPitZXK1rSlrbNV0U/ACePNHUiAwAA
     EOS
 
-    (testpath/"recording.gz").write Base64.decode64(recording.delete("\n"))
+    (testpath/"recording.gz").write recording.delete("\n").unpack1("m")
     system bin/"rbspy", "report", "-f", "summary", "-i", "recording.gz",
                         "-o", "result"
 
