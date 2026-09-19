@@ -4,6 +4,7 @@ class Herdr < Formula
   url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "1e83bff4b05834ed8281e16f1680e8f3e58375a94b2e3f2b3d021e28e293ef9a"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/herdrdev/herdr.git", branch: "master"
 
   livecheck do
@@ -12,7 +13,7 @@ class Herdr < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea2ce845dca3812f0e18626967e8c0b86aa7c398037db9a6d7ff172a88f19c56"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7fa14a8f2f18738f0bc1129fb554626334dd8a817b656110c5584aac99f0472"
   end
 
   depends_on "rust" => :build
@@ -35,15 +36,12 @@ class Herdr < Formula
     file "Patches/herdr/pane-agent-detection-tcgetpgrp.patch"
   end
 
-  def install
-    # toybox patch can exit 0 without applying; verify a marker per file.
-    {
-      "build.rs"    => '"aarch64-unknown-linux-ohos" => "aarch64-linux-musl"',
-      "src/pane.rs" => "pty_actor_foreground_process_group(&pty_actor)",
-    }.each do |file, marker|
-      odie "herdr: #{file} OHOS patch not applied" unless File.read(file).include?(marker)
-    end
+  # Same procfs gap in the agent start/prompt gates, which look it up themselves.
+  patch do
+    file "Patches/herdr/agent-gate-tty-foreground.patch"
+  end
 
+  def install
     # zig finds lib/ via self-exe-realpath; keep the tree intact, on PATH.
     resource("zig").stage(buildpath/"zig-toolchain")
     ENV.prepend_path "PATH", (buildpath/"zig-toolchain").to_s
@@ -117,6 +115,8 @@ class Herdr < Formula
       sleep 1
     end
     assert_match '"opencode"', agents
+
+    assert_match "agent_prompted", shell_output("#{bin}/herdr agent prompt #{pane_id} hello")
   ensure
     Process.kill("TERM", pid)
     Process.wait(pid)
