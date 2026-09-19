@@ -13,7 +13,7 @@ class Herdr < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea2ce845dca3812f0e18626967e8c0b86aa7c398037db9a6d7ff172a88f19c56"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7fa14a8f2f18738f0bc1129fb554626334dd8a817b656110c5584aac99f0472"
   end
 
   depends_on "rust" => :build
