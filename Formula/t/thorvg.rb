@@ -1,8 +1,8 @@
 class Thorvg < Formula
   desc "Lightweight portable library used for drawing vector-based scenes and animations"
   homepage "https://www.thorvg.org"
-  url "https://github.com/thorvg/thorvg/archive/refs/tags/v1.1.1.tar.gz"
-  sha256 "59c12500b7c2fc426e89667b3e4f3fdc2ff05a75cc12001a22c5f58fb1cdf592"
+  url "https://github.com/thorvg/thorvg/archive/refs/tags/v1.1.2.tar.gz"
+  sha256 "cd466f4abf2522a6dcdc1a69a75d04a214b7163c89731fb8481eceaa6cb73842"
   license "MIT"
   head "https://github.com/thorvg/thorvg.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Thorvg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4355be0a59c2e78a393b4c78893752e50fcad8c07079c1b8d3ea272615ff6c66"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "58a149980c658f00e38a9714a05c299bb60a7157ccf81d65d3c6071d45619605"
   end
 
   depends_on "meson" => :build
