@@ -1,8 +1,8 @@
 class Coder < Formula
   desc "Tool for provisioning self-hosted development environments with Terraform"
   homepage "https://coder.com"
-  url "https://github.com/coder/coder/archive/refs/tags/v2.36.5.tar.gz"
-  sha256 "50bb05d9e5e0d2cba499a7479b293e620cc868c5a1f58c1314d07648ae9daef3"
+  url "https://github.com/coder/coder/archive/refs/tags/v2.36.6.tar.gz"
+  sha256 "8608be7d0e14e4d7a38b3cc958a14fca18ec6d4adc509a8562f77fc7a35e7f3e"
   license "AGPL-3.0-only"
   head "https://github.com/coder/coder.git", branch: "main"
 
@@ -15,7 +15,7 @@ class Coder < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdcd4730e8e0ed3053fe12a22a3560a4deda85e32d651533a2b831058b0ed764"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "88970cc97af3068f5a1b9e5eefe8176e7fd4be7bb97655ba4a8c8ece3d9bcea4"
   end
 
   # TODO: unpin go@1.26 when coder supports go 1.27
