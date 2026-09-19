@@ -7,7 +7,7 @@ class Gascity < Formula
   head "https://github.com/gastownhall/gascity.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6c5793e75d58e6b62b58e1fb340d6c58e0695bbaede0c98dc0966b29b0d938e"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2bfc9f617ce052bf08eca6aebac56324253c68699b2c962f200bae6f3a2c24f8"
   end
 
   depends_on "go" => :build
