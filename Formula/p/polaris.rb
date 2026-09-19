@@ -7,7 +7,7 @@ class Polaris < Formula
   head "https://github.com/FairwindsOps/polaris.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "261a88d60aa6549a00f126e789116ba03a96deba702bc3b44acbd6c1e636ee79"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7bf193a9535a424803b3fb5ccb491fe893addafef595313dc876017be225386"
   end
 
   depends_on "go" => :build
