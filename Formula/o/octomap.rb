@@ -6,7 +6,7 @@ class Octomap < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8a7d05b7e8c27f4970628a2f1141f72bb03db00573d3f69dcdef1032b2d0977"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "37e14e97cf02b5113ce079be61bc82ce0880ba13c98fd088a22185c410f99a6e"
   end
 
   depends_on "cmake" => :build
