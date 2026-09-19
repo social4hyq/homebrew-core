@@ -7,7 +7,7 @@ class Onnx < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1546f71a1a2a6b75018a441d0361b80e08bbe6a66d2cead7693626d63ea83e0f"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1d7a057a1f874c850f337a36c86dcef2445314003018e7cdef44b1c0b75d44f"
   end
 
   depends_on "cmake" => [:build, :test]
