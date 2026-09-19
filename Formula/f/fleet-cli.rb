@@ -12,7 +12,7 @@ class FleetCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "be99fc526364c4ee5fb80fa370b34dba87b432384d0b35a6c3b9eafd9b976493"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b515ed7e4b5ab311f0dffb4e162a6cdce13d97ee9ac47da5b58000d6142167bf"
   end
 
   depends_on "go" => :build
