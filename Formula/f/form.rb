@@ -11,8 +11,7 @@ class Form < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac458fb1eb1ab6b771aee7621e4302e401e7ec4e4229755a9f4f75e3a41f212d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b1e9d31b7f2bed394cf750bd56b86deea42926d1a35b5159eaf15e5ccb5b490c"
   end
 
   depends_on "flint"
