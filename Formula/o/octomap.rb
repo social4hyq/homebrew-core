@@ -1,12 +1,12 @@
 class Octomap < Formula
   desc "Efficient probabilistic 3D mapping framework based on octrees"
   homepage "https://octomap.github.io/"
-  url "https://github.com/OctoMap/octomap/archive/refs/tags/v1.10.0.tar.gz"
-  sha256 "8da2576ec6a0993e8900db7f91083be8682d8397a7be0752c85d1b7dd1b8e992"
+  url "https://github.com/OctoMap/octomap/archive/refs/tags/v1.10.1.tar.gz"
+  sha256 "b6b6c10c99ab15701dd105840e7d4cf18e226eb68714dd4bdfe049dede5cd489"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8a7d05b7e8c27f4970628a2f1141f72bb03db00573d3f69dcdef1032b2d0977"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "37e14e97cf02b5113ce079be61bc82ce0880ba13c98fd088a22185c410f99a6e"
   end
 
   depends_on "cmake" => :build
