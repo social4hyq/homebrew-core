@@ -7,7 +7,7 @@ class KubernetesMcpServer < Formula
   head "https://github.com/containers/kubernetes-mcp-server.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61e9ddd68bc9cf73ab74dc41efa9fa55a314a97af28b95094c0005383531920d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "201b18f7338ccc0c3628fe31430f1317ebd12699a3b1459ef0c2e3c1e42a451a"
   end
 
   depends_on "go" => :build
