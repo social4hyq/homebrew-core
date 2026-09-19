@@ -1,8 +1,8 @@
 class AcmeSh < Formula
   desc "ACME client"
   homepage "https://github.com/acmesh-official/acme.sh"
-  url "https://github.com/acmesh-official/acme.sh/archive/refs/tags/3.1.4.tar.gz"
-  sha256 "e5f8e187bbf5251e0cd8891f2622daab9850366bd17bea9f92c2fe2ee091fd32"
+  url "https://github.com/acmesh-official/acme.sh/archive/refs/tags/3.1.5.tar.gz"
+  sha256 "a5e5b61bf98464fd7bf9925951b97e9ed8c127e041d3b8e9703d2360cd6e19b6"
   license "GPL-3.0-only"
 
   bottle do
