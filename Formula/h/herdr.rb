@@ -11,6 +11,11 @@ class Herdr < Formula
     strategy :github_latest
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-v0.9.0-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "10e2d521144e8541261a73170ae374b414e3a65ca9bbf5e7363e892ed8ad7d7a"
+  end
+
   depends_on "rust" => :build
 
   # zig 0.15.2 needs LLVM 20.x; this tap only has llvm@21. Stage the official
