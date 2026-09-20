@@ -1,0 +1,86 @@
+diff --git a/src/options_types/compile_target.rs b/src/options_types/compile_target.rs
+index e4ca61a31d..a95dc5bc08 100644
+--- a/src/options_types/compile_target.rs
++++ b/src/options_types/compile_target.rs
+@@ -37,7 +37,9 @@ impl Default for CompileTarget {
+                 tag: Default::default(),
+                 _tag_padding: Default::default(),
+             },
+-            libc: if Environment::IS_MUSL {
++            libc: if Environment::IS_OHOS {
++                Libc::Ohos
++            } else if Environment::IS_MUSL {
+                 Libc::Musl
+             } else if Environment::IS_ANDROID {
+                 Libc::Android
+@@ -58,6 +60,12 @@ pub enum Libc {
+     Musl,
+     /// bionic (Android)
+     Android,
++    /// hmusl (OpenHarmony) — only ever produced by `default()` for the
++    /// native host; no `--target=` string token maps to it (OHOS has no
++    /// published cross-compile npm target), so an explicit
++    /// `--target=bun-linux-x64-musl` built *from* an OHOS host correctly
++    /// stays plain `Musl`/"linux", not this variant.
++    Ohos,
+ }
+ 
+ impl Libc {
+@@ -67,6 +75,7 @@ impl Libc {
+             Libc::Default => "",
+             Libc::Musl => "-musl",
+             Libc::Android => "-android",
++            Libc::Ohos => "-ohos",
+         }
+     }
+ }
+@@ -240,6 +249,13 @@ impl CompileTarget {
+             OperatingSystem::Linux => true,
+             OperatingSystem::Freebsd => true,
+ 
++            // No published cross-compile npm target for OHOS (see the
++            // `Libc::Ohos` doc comment above) -- only reachable via an
++            // explicit `--target=bun-openharmony-...`, which correctly gets
++            // rejected here. The native default target on an OHOS host
++            // never calls `is_supported()` (see `exe_path`'s `is_default()`
++            // fast path), so this doesn't affect plain `bun build --compile`.
++            OperatingSystem::OpenHarmony => false,
+             OperatingSystem::Wasm => false,
+         }
+     }
+@@ -250,6 +266,14 @@ impl CompileTarget {
+         if input.is_empty() {
+             return Ok(this);
+         }
++        // `default()`'s `libc` reflects *this host* (e.g. `Ohos` on an OHOS
++        // build) — but from here on `this` describes an explicitly requested
++        // `--target=...` string, which may name a completely different
++        // platform. Start token parsing from a clean `Default` libc so e.g.
++        // `--target=bun-linux-x64` built from an OHOS host doesn't keep the
++        // host's `Ohos` tag (the `musl`/`android` token arms below still set
++        // it back correctly when present).
++        this.libc = Libc::Default;
+ 
+         let mut found_os = false;
+         let mut found_arch = false;
+@@ -423,11 +447,20 @@ impl CompileTarget {
+         let platform: &'static [u8] = match self.libc {
+             // process.platform: Node reports "android" on Android, not "linux".
+             Libc::Android => b"\"android\"",
++            // Same reasoning: real Node.js on OpenHarmony reports "openharmony",
++            // verified directly against this device's own Node build — not
++            // folded into the generic Linux case below.
++            Libc::Ohos => b"\"openharmony\"",
+             Libc::Default | Libc::Musl => match self.os {
+                 OperatingSystem::Mac => b"\"darwin\"",
+                 OperatingSystem::Linux => b"\"linux\"",
+                 OperatingSystem::Windows => b"\"win32\"",
+                 OperatingSystem::Freebsd => b"\"freebsd\"",
++                // Unreachable in practice: OHOS always pairs with
++                // `Libc::Ohos` (caught by the outer match above), never
++                // `Default`/`Musl`. Listed for the same exhaustiveness
++                // reason as the rest of this match.
++                OperatingSystem::OpenHarmony => b"\"openharmony\"",
+                 OperatingSystem::Wasm => b"\"wasm\"",
+             },
+         };

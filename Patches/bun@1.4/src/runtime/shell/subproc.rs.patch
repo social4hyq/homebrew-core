@@ -1,0 +1,51 @@
+diff --git a/src/runtime/shell/subproc.rs b/src/runtime/shell/subproc.rs
+index 8145a5fc84..05798d4230 100644
+--- a/src/runtime/shell/subproc.rs
++++ b/src/runtime/shell/subproc.rs
+@@ -658,6 +658,46 @@ impl ShellSubprocess {
+         // function never needs to borrow the `Cmd` arena slot.
+         debug_assert!(matches!(spawn_args.argv.last(), Some(p) if p.is_null()));
+ 
++        // OHOS: an exec'd `node` child gets the real musl libc, not the ohos-compat-shim symbols linked into *this* executable, so its os.userInfo() throws ENOENT for the app-sandbox uid -- see ohos_ld_preload.rs.
++        // Kept alive until `spawn_process` below returns (env_array borrows its bytes).
++        #[cfg(target_env = "ohos")]
++        let mut ld_preload_storage: Option<bun_core::ZBox> = None;
++        // SAFETY: `argv[0]` is non-null NUL-terminated storage owned by the
++        // caller (`Cmd.args`, see the struct field doc above), live for
++        // this call.
++        #[cfg(target_env = "ohos")]
++        let argv0_bytes = spawn_args
++            .argv
++            .first()
++            .copied()
++            .filter(|p| !p.is_null())
++            .map(|p| unsafe { core::ffi::CStr::from_ptr(p) }.to_bytes())
++            .unwrap_or(b"");
++        #[cfg(target_env = "ohos")]
++        if let Some(new_ld_preload) =
++            crate::api::ohos_ld_preload::compute(argv0_bytes, &spawn_args.env_array)
++        {
++            let is_ld_preload_key = |ptr: *const c_char| -> bool {
++                if ptr.is_null() {
++                    return false;
++                }
++                // SAFETY: every live entry in `env_array` at this point is NUL-terminated storage owned by the arena/inherited-env-map, both still alive here.
++                let bytes = unsafe { core::ffi::CStr::from_ptr(ptr) }.to_bytes();
++                let key_end = bun_core::strings::index_of_char_usize(bytes, b'=').unwrap_or(bytes.len());
++                &bytes[..key_end] == b"LD_PRELOAD"
++            };
++            spawn_args.env_array.retain(|&ptr| !is_ld_preload_key(ptr));
++            let line = bun_core::ZBox::from_vec(new_ld_preload);
++            spawn_args.env_array.push(line.as_ptr());
++            // SAFETY-relevant lifetime: leak into the arena-scoped storage isn't
++            // available here, so lean on the same pattern `inherited_env_storage`
++            // uses above -- keep the owner alive for the rest of this function via
++            // a local that outlives `spawn_process`.
++            ld_preload_storage = Some(line);
++        }
++        #[cfg(target_env = "ohos")]
++        let _ = &ld_preload_storage;
++
+         spawn_args.env_array.push(core::ptr::null());
+ 
+         // SAFETY: `interp` is the live owning interpreter (see `SpawnArgs::interp`).

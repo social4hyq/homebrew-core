@@ -1,0 +1,19 @@
+diff --git a/src/install/lib.rs b/src/install/lib.rs
+index 314523ca5e..39f69e8d34 100644
+--- a/src/install/lib.rs
++++ b/src/install/lib.rs
+@@ -418,6 +418,14 @@ impl RunCommand {
+             "/private/tmp"
+         } else if cfg!(target_os = "android") {
+             "/data/local/tmp"
++        } else if cfg!(target_env = "ohos") {
++            // OHOS app sandbox: `/tmp` exists but is a read-only bind mount
++            // (verified: `touch /tmp/x` -> "Read-only file system"). The only
++            // writable scratch dir is under the app's EL2 sandbox — see
++            // environment_tmp memory. Hardcoded like Android's own
++            // `/data/local/tmp` const above, for the same reason: this is a
++            // compile-time const, evaluated before any TMPDIR env lookup.
++            "/data/storage/el2/base/tmp"
+         } else {
+             "/tmp"
+         };

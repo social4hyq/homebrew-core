@@ -1,0 +1,32 @@
+diff --git a/patches/tinycc/tccgen.c.patch b/patches/tinycc/tccgen.c.patch
+new file mode 100644
+index 0000000000..3734b9fb24
+--- /dev/null
++++ b/patches/tinycc/tccgen.c.patch
+@@ -0,0 +1,26 @@
++--- a/vendor/tinycc/tccgen.c
+++++ b/vendor/tinycc/tccgen.c
++@@ -4121,7 +4121,15 @@
++             /* skip parameters */
++ skip_param:
++             if (tok == '(') {
+++                /* Skip the payload without converting pp-numbers: clang-only
+++                 * attribute syntax carries tokens tcc's numeric lexer rejects,
+++                 * e.g. availability(ohos, introduced=12.0.0) whose three-part
+++                 * version "12.0.0" hits tcc_error("invalid number") in
+++                 * parse_number() (tccpp.c) before we could ignore the
+++                 * attribute. Same trick as #line (tccpp.c, TOK_LINE). */
+++                int saved_parse_flags = parse_flags;
++                 int parenthesis = 0;
+++                parse_flags &= ~(PARSE_FLAG_TOK_NUM | PARSE_FLAG_TOK_STR);
++                 do {
++                     if (tok == '(') 
++                         parenthesis++;
++@@ -4129,6 +4137,7 @@
++                         parenthesis--;
++                     next();
++                 } while (parenthesis && tok != -1);
+++                parse_flags = saved_parse_flags;
++             }
++             break;
++         }

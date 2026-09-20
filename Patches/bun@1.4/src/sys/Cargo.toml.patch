@@ -1,0 +1,11 @@
+diff --git a/src/sys/Cargo.toml b/src/sys/Cargo.toml
+index 13333f01e2..6aa721353c 100644
+--- a/src/sys/Cargo.toml
++++ b/src/sys/Cargo.toml
+@@ -35,3 +35,6 @@ rustix = { workspace = true }
+ 
+ [target.'cfg(windows)'.dependencies]
+ bun_libuv_sys.workspace = true
++
++[target.'cfg(target_env = "ohos")'.dependencies]
++ohos_sign = { path = "../ohos_sign" }

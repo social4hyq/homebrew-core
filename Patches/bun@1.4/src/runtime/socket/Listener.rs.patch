@@ -1,0 +1,44 @@
+diff --git a/src/runtime/socket/Listener.rs b/src/runtime/socket/Listener.rs
+index 47a4e9db1e..f5be3ade23 100644
+--- a/src/runtime/socket/Listener.rs
++++ b/src/runtime/socket/Listener.rs
+@@ -646,6 +646,7 @@ impl Listener {
+             local_binding: JsCell::new(None),
+             server_name: JsCell::new(None),
+             buffered_data_for_node_net: Default::default(),
++            pending_fatal_send_errno: Cell::new(0),
+             bytes_written: Cell::new(0),
+             native_callback: JsCell::new(crate::socket::NativeCallbacks::None),
+             twin: JsCell::new(None),
+@@ -692,6 +693,7 @@ impl Listener {
+             local_binding: JsCell::new(None),
+             server_name: JsCell::new(None),
+             buffered_data_for_node_net: Default::default(),
++            pending_fatal_send_errno: Cell::new(0),
+             bytes_written: Cell::new(0),
+             native_callback: JsCell::new(crate::socket::NativeCallbacks::None),
+             twin: JsCell::new(None),
+@@ -1258,6 +1260,7 @@ impl Listener {
+                             poll_ref: JsCell::new(KeepAlive::init()),
+                             ref_pollref_on_connect: Cell::new(true),
+                             buffered_data_for_node_net: Default::default(),
++                            pending_fatal_send_errno: Cell::new(0),
+                             bytes_written: Cell::new(0),
+                             native_callback: JsCell::new(crate::socket::NativeCallbacks::None),
+                             twin: JsCell::new(None),
+@@ -1345,6 +1348,7 @@ impl Listener {
+                             poll_ref: JsCell::new(KeepAlive::init()),
+                             ref_pollref_on_connect: Cell::new(true),
+                             buffered_data_for_node_net: Default::default(),
++                            pending_fatal_send_errno: Cell::new(0),
+                             bytes_written: Cell::new(0),
+                             native_callback: JsCell::new(crate::socket::NativeCallbacks::None),
+                             twin: JsCell::new(None),
+@@ -1582,6 +1586,7 @@ fn connect_finish<const IS_SSL: bool>(
+             poll_ref: JsCell::new(KeepAlive::init()),
+             ref_pollref_on_connect: Cell::new(true),
+             buffered_data_for_node_net: Default::default(),
++            pending_fatal_send_errno: Cell::new(0),
+             bytes_written: Cell::new(0),
+             native_callback: JsCell::new(crate::socket::NativeCallbacks::None),
+             twin: JsCell::new(None),

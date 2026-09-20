@@ -1,0 +1,10 @@
+diff --git a/src/install/Cargo.toml b/src/install/Cargo.toml
+index a8a45c65c7..7887723b39 100644
+--- a/src/install/Cargo.toml
++++ b/src/install/Cargo.toml
+@@ -67,3 +67,5 @@ bun_url.workspace = true
+ bun_uws.workspace = true
+ bun_which.workspace = true
+ bun_wyhash.workspace = true
++[target.'cfg(target_env = "ohos")'.dependencies]
++ohos_sign = { path = "../ohos_sign" }

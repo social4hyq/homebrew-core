@@ -1,0 +1,325 @@
+diff --git a/src/sys/linux_syscall.rs b/src/sys/linux_syscall.rs
+index ae5cc00417..4436fb19a4 100644
+--- a/src/sys/linux_syscall.rs
++++ b/src/sys/linux_syscall.rs
+@@ -91,36 +91,295 @@ pub(crate) fn openat(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd,
+ 
+ #[inline]
+ pub(crate) fn openat2_beneath(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd, i32> {
+-    let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
+-    let mode = rustix::fs::Mode::from_raw_mode(mode);
+-    let dir = dir.as_borrowed_fd();
+-    retry(|| {
+-        rustix::fs::openat2(
+-            dir,
+-            path.as_cstr(),
+-            oflags,
+-            mode,
+-            rustix::fs::ResolveFlags::BENEATH,
+-        )
+-    })
+-    .map(own_fd)
++    // OHOS seccomp SIGSYS-kills openat2 unconditionally, uncatchably (unlike
++    // close_range's raw `syscall()` entry point, this goes through rustix's
++    // own inline-asm syscall backend, which no libc-symbol interposition —
++    // ohos_compat_shim.c included — can reach). Both call sites already
++    // treat ENOSYS/EPERM/EINVAL as "openat2 unavailable, fall back" for
++    // pre-5.6-kernel compatibility, so short-circuiting here needs no
++    // changes anywhere else.
++    #[cfg(target_env = "ohos")]
++    {
++        let _ = (dir, path, flags, mode);
++        return Err(libc::ENOSYS);
++    }
++    #[cfg(not(target_env = "ohos"))]
++    {
++        let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
++        let mode = rustix::fs::Mode::from_raw_mode(mode);
++        let dir = dir.as_borrowed_fd();
++        retry(|| {
++            rustix::fs::openat2(
++                dir,
++                path.as_cstr(),
++                oflags,
++                mode,
++                rustix::fs::ResolveFlags::BENEATH,
++            )
++        })
++        .map(own_fd)
++    }
+ }
+ 
+ #[inline]
+ pub(crate) fn openat2_in_root(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd, i32> {
+-    let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
+-    let mode = rustix::fs::Mode::from_raw_mode(mode);
+-    let dir = dir.as_borrowed_fd();
+-    retry(|| {
+-        rustix::fs::openat2(
+-            dir,
+-            path.as_cstr(),
+-            oflags,
+-            mode,
+-            rustix::fs::ResolveFlags::IN_ROOT | rustix::fs::ResolveFlags::NO_MAGICLINKS,
++    // See openat2_beneath above: OHOS seccomp kills this uncatchably, and
++    // sys/lib.rs's openat2_in_root() already falls back to plain openat on
++    // ENOSYS.
++    #[cfg(target_env = "ohos")]
++    {
++        let _ = (dir, path, flags, mode);
++        return Err(libc::ENOSYS);
++    }
++    #[cfg(not(target_env = "ohos"))]
++    {
++        let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
++        let mode = rustix::fs::Mode::from_raw_mode(mode);
++        let dir = dir.as_borrowed_fd();
++        retry(|| {
++            rustix::fs::openat2(
++                dir,
++                path.as_cstr(),
++                oflags,
++                mode,
++                rustix::fs::ResolveFlags::IN_ROOT | rustix::fs::ResolveFlags::NO_MAGICLINKS,
++            )
++        })
++        .map(own_fd)
++    }
++}
++
++// openat2(RESOLVE_IN_ROOT | RESOLVE_NO_MAGICLINKS) userspace emulation.
++//
++// Used by sys/lib.rs::openat2_in_root when the real syscall is unusable:
++// OHOS (app-sandbox seccomp SIGSYS-kills it uncatchably — see the
++// short-circuits above) and Linux < 5.6. The previous fallback was a plain
++// `openat`, which follows symlinks and let request paths escape the served
++// root (serve-directory-routes.test.ts "rejects symlink escapes").
++//
++// Per-component walk, in the style of the openat2 reference implementation
++// and Go os.Root:
++//   * every component is opened with O_NOFOLLOW (O_PATH probes for
++//     intermediates), so the kernel never resolves a link for us;
++//   * symlink payloads are spliced back into the component stream, capped
++//     at 40 expansions (kernel ELOOP threshold);
++//   * absolute symlink targets are re-rooted against `dir` (IN_ROOT);
++//   * `..` clamps at the root (depth == 0), and each climb verifies the
++//     parent's (st_dev, st_ino) against the recorded level — a racing
++//     rename/bind-mount of an intermediate directory fails closed (EAGAIN).
++//
++// Magic links (/proc/<pid>/fd/N) cannot escape either: their absolute
++// payloads are re-rooted and ENOENT. The kernel's NO_MAGICLINKS fails them
++// ELOOP instead — both surface as the same 404 through DirectoryRoute.
++//
++// Reuses module primitives: openat(Fd, &ZStr, i32, Mode), fstat(Fd),
++// close(i32), errno(), own_fd(). No new imports needed beyond what the
++// module already has.
++
++const IN_ROOT_MAX_SYMLINKS: usize = 40; // kernel ELOOP threshold
++const IN_ROOT_MAX_DEPTH: usize = 128; // fail closed on absurd in-root chains
++/// PATH_MAX. The kernel caps symlink targets below this, so a read that
++/// fills the buffer is not a target we can represent.
++const IN_ROOT_LINK_MAX: usize = 4096;
++
++/// `readlinkat(fd, "", buf)` — reads the link an O_PATH fd points at.
++#[inline]
++fn readlinkat_empty(fd: Fd, buf: &mut [u8]) -> Result<usize, i32> {
++    // SAFETY: `fd` is a valid descriptor (an O_PATH fd from `openat`);
++    // `buf[..buf.len()]` is writable for the duration of the call. The empty
++    // path makes the kernel operate on `fd` itself (required for O_PATH).
++    let rc = unsafe {
++        libc::readlinkat(
++            fd.native(),
++            b"\0".as_ptr().cast(),
++            buf.as_mut_ptr().cast(),
++            buf.len(),
+         )
+-    })
+-    .map(own_fd)
++    };
++    if rc < 0 {
++        Err(errno())
++    } else {
++        Ok(rc as usize)
++    }
++}
++
++pub(crate) fn openat2_in_root_clamped(
++    dir: Fd,
++    path: &ZStr,
++    flags: i32,
++    mode: Mode,
++) -> Result<Fd, i32> {
++    // Identity of the root (for verifying the depth-1 climb) and of each
++    // descended level: stack[k] is the (st_dev, st_ino) of directory level
++    // k+1. depth == 0 ⇔ `cur` is the root dirfd (`..` must clamp there).
++    let root_id = {
++        let st = fstat(dir)?;
++        (st.st_dev as u64, st.st_ino as u64)
++    };
++    let mut stack = [(0u64, 0u64); IN_ROOT_MAX_DEPTH];
++    let mut depth: usize = 0;
++    // Owned O_PATH fd of the current intermediate directory.
++    let mut owned: Option<Fd> = None;
++    let mut links: usize = 0;
++
++    // Unresolved component stream. Symlink payloads are spliced in place;
++    // 3*PATH_MAX bounds target(≤PATH_MAX-1) + '/' + tail(≤2*PATH_MAX-2).
++    let mut work = [0u8; 3 * IN_ROOT_LINK_MAX];
++    let plen = path.as_bytes().len();
++    if plen == 0 || plen >= work.len() {
++        return Err(libc::ENAMETOOLONG);
++    }
++    work[..plen].copy_from_slice(path.as_bytes());
++    let (mut rest_off, mut rest_len) = (0usize, plen);
++
++    // Per-component CStr scratch. A real component is ≤ NAME_MAX (255);
++    // anything longer is ENAMETOOLONG, same as the kernel reports.
++    let mut zbuf = [0u8; IN_ROOT_LINK_MAX + 1];
++
++    loop {
++        // Skip '/' runs and empty components ("//", trailing "/").
++        while rest_len > 0 && work[rest_off] == b'/' {
++            rest_off += 1;
++            rest_len -= 1;
++        }
++        if rest_len == 0 {
++            break;
++        }
++        let end = bun_core::strings::index_of_char_usize(
++            &work[rest_off..rest_off + rest_len],
++            b'/',
++        )
++        .unwrap_or(rest_len);
++        let comp = &work[rest_off..rest_off + end];
++        let (tail_off, tail_len) = (rest_off + end, rest_len - end);
++
++        if comp == b"." {
++            rest_off = tail_off;
++            rest_len = tail_len;
++            continue;
++        }
++        if comp == b".." {
++            if depth == 0 {
++                // Clamped at the root (RESOLVE_IN_ROOT).
++                rest_off = tail_off;
++                rest_len = tail_len;
++                continue;
++            }
++            if comp.len() > IN_ROOT_LINK_MAX {
++                return Err(libc::ENAMETOOLONG);
++            }
++            zbuf[..comp.len()].copy_from_slice(comp);
++            let z = ZStr::from_buf_mut(&mut zbuf, comp.len());
++            let fd = openat(
++                owned.expect("depth > 0 implies an owned intermediate fd"),
++                z,
++                libc::O_PATH | libc::O_DIRECTORY | libc::O_NOFOLLOW | libc::O_CLOEXEC,
++                0,
++            )?;
++            let st = fstat(fd)?;
++            let expected = if depth == 1 { root_id } else { stack[depth - 2] };
++            if (st.st_dev as u64, st.st_ino as u64) != expected {
++                let _ = close(fd.native());
++                // Raced intermediate swap; refuse rather than guess.
++                return Err(libc::EAGAIN);
++            }
++            let _ = close(owned.take().expect("depth > 0").native());
++            owned = Some(fd);
++            depth -= 1;
++            rest_off = tail_off;
++            rest_len = tail_len;
++            continue;
++        }
++
++        if comp.len() > IN_ROOT_LINK_MAX {
++            return Err(libc::ENAMETOOLONG);
++        }
++        zbuf[..comp.len()].copy_from_slice(comp);
++        let z = ZStr::from_buf_mut(&mut zbuf, comp.len());
++
++        // "Last component" = nothing but slashes remains after it.
++        let is_last = work[tail_off..tail_off + tail_len]
++            .iter()
++            .all(|&c| c == b'/');
++
++        let cur = owned.unwrap_or(dir);
++
++        if is_last {
++            // The real open, still O_NOFOLLOW: a final symlink is resolved
++            // by splicing its payload below, exactly like an intermediate.
++            match openat(cur, z, flags | libc::O_NOFOLLOW, mode) {
++                Ok(fd) => return Ok(fd),
++                Err(libc::ELOOP) => {} // final component is a symlink
++                Err(e) => return Err(e),
++            }
++        }
++
++        // Probe the component: O_PATH never reparses FIFOs/devices and,
++        // with NOFOLLOW, never follows a link; fstat tells us what it is.
++        let fd = openat(cur, z, libc::O_PATH | libc::O_NOFOLLOW | libc::O_CLOEXEC, 0)?;
++        let st = fstat(fd)?;
++
++        if (st.st_mode & libc::S_IFMT) == libc::S_IFLNK {
++            links += 1;
++            if links > IN_ROOT_MAX_SYMLINKS {
++                let _ = close(fd.native());
++                return Err(libc::ELOOP);
++            }
++            let mut tgt = [0u8; IN_ROOT_LINK_MAX];
++            let n = readlinkat_empty(fd, &mut tgt);
++            let _ = close(fd.native());
++            let n = n?;
++            if n == 0 || n >= IN_ROOT_LINK_MAX {
++                return Err(libc::ENAMETOOLONG);
++            }
++
++            // Splice: target + ("/" + tail | nothing), in place — memmove
++            // the tail right, then write the target at the front.
++            let absolute = tgt[0] == b'/';
++            let skip = usize::from(absolute); // drop the leading '/'
++            let t = n - skip;
++            if tail_len > 0 {
++                work.copy_within(tail_off..tail_off + tail_len, t + 1);
++                work[..t].copy_from_slice(&tgt[skip..n]);
++                work[t] = b'/';
++                rest_len = t + 1 + tail_len;
++            } else {
++                work[..t].copy_from_slice(&tgt[skip..n]);
++                rest_len = t;
++            }
++            rest_off = 0;
++            if absolute {
++                // Re-root (IN_ROOT): restart from `dir` at depth 0.
++                if let Some(o) = owned.take() {
++                    let _ = close(o.native());
++                }
++                depth = 0;
++            }
++            continue;
++        }
++
++        if is_last {
++            unreachable!("a non-link final component returned ELOOP");
++        }
++        if (st.st_mode & libc::S_IFMT) != libc::S_IFDIR {
++            let _ = close(fd.native());
++            return Err(libc::ENOTDIR);
++        }
++        if depth >= IN_ROOT_MAX_DEPTH {
++            let _ = close(fd.native());
++            return Err(libc::ENAMETOOLONG);
++        }
++        stack[depth] = (st.st_dev as u64, st.st_ino as u64);
++        depth += 1;
++        if let Some(o) = owned.replace(fd) {
++            let _ = close(o.native());
++        }
++        rest_off = tail_off;
++        rest_len = tail_len;
++    }
++
++    // Empty (or all-slash) component stream: openat2 gives ENOENT.
++    Err(libc::ENOENT)
+ }
+ 
+ #[inline]

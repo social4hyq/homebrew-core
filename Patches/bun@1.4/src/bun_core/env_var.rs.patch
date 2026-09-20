@@ -1,0 +1,15 @@
+diff --git a/src/bun_core/env_var.rs b/src/bun_core/env_var.rs
+index ece9747d32..d665d80fd5 100644
+--- a/src/bun_core/env_var.rs
++++ b/src/bun_core/env_var.rs
+@@ -175,6 +175,10 @@ new!(pub NODE_PENDING_DEPRECATION: string, "NODE_PENDING_DEPRECATION", {});
+ new!(pub NODE_PRESERVE_SYMLINKS_MAIN: boolean, "NODE_PRESERVE_SYMLINKS_MAIN", { default: false });
+ new!(pub NODE_USE_SYSTEM_CA: boolean, "NODE_USE_SYSTEM_CA", { default: false });
+ new!(pub npm_lifecycle_event: string, "npm_lifecycle_event", {});
++// OHOS SDK sysroot root (contains usr/{include,lib}/<triplet>-linux-ohos).
++// There is no FHS libc/headers on-device; bun:ffi's TinyCC integration reads
++// this to link -lc and find <stdint.h> and friends when a real SDK is present.
++new!(pub OHOS_SYSROOT: string, "OHOS_SYSROOT", {});
+ new!(pub PATH: string, "PATH", {});
+ new!(pub REPL_ID: boolean, "REPL_ID", { default: false });
+ new!(pub RUNNER_DEBUG: boolean, "RUNNER_DEBUG", { default: false });

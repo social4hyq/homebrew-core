@@ -1,0 +1,122 @@
+diff --git a/src/runtime/api/bun/ohos_ld_preload.rs b/src/runtime/api/bun/ohos_ld_preload.rs
+new file mode 100644
+index 0000000000..fb427f13d1
+--- /dev/null
++++ b/src/runtime/api/bun/ohos_ld_preload.rs
+@@ -0,0 +1,116 @@
++//! OHOS-only: gives an exec'd `node`-like child a working `os.userInfo()`
++//! (and `tmpfile()`/`getcwd()`) by preloading the already-built
++//! `ohos_compat_shim` `.so` via `LD_PRELOAD`. Node's own child process gets
++//! the real dynamic-musl libc, not the shim symbols linked directly into
++//! *this* executable (`ohos_compat_shim.c`'s embedded/`.o` form only covers
++//! bun's own process) -- see that file's header for the interposer design.
++//!
++//! Deliberately smaller than a JS-level `NODE_OPTIONS`/preload-file
++//! injection: the shim's `getpwuid_r()` interposer resolves the username
++//! itself, in the child process, via the exact same lookup it already uses
++//! for bun's own process -- no username plumbing, no preload file to
++//! generate/hash/self-heal on bun's side. See workarounds.ts
++//! "ohos-ld-preload-node".
++
++use core::ffi::{CStr, c_char};
++
++use bun_core::{Once, ZBox, strings};
++
++fn basename(path: &[u8]) -> &[u8] {
++    match strings::last_index_of_char(path, b'/') {
++        Some(i) => &path[i + 1..],
++        None => path,
++    }
++}
++
++/// `base` is already `basename(argv0)`: `node`/`nodejs`/`nodeNN` (version-suffixed shims; must reject `nodemon`), plus the CLI wrappers that are themselves node scripts.
++fn is_node_like(base: &[u8]) -> bool {
++    if base == b"node" || base == b"nodejs" {
++        return true;
++    }
++    if let Some(rest) = base.strip_prefix(b"node") {
++        if !rest.is_empty() && rest.iter().all(|&b| b.is_ascii_digit() || b == b'.' || b == b'-')
++        {
++            return true;
++        }
++    }
++    matches!(
++        base,
++        b"npm" | b"npx" | b"corepack" | b"yarn" | b"pnpm" | b"pnpx"
++    )
++}
++
++/// getenv() semantics: return the FIRST match, mirroring what the child would actually observe.
++fn find_env_value(env_array: &[*const c_char], key: &[u8]) -> Option<Vec<u8>> {
++    for &ptr in env_array {
++        if ptr.is_null() {
++            continue;
++        }
++        // SAFETY: every live entry in a spawn's env_array is `\0`-terminated storage owned by the caller's cstr_storage/inherited_env_storage (both still alive at this call site) or a `c"..."` literal.
++        let bytes = unsafe { CStr::from_ptr(ptr) }.to_bytes();
++        let key_end = strings::index_of_char_usize(bytes, b'=').unwrap_or(bytes.len());
++        if &bytes[..key_end] == key {
++            return Some(bytes[key_end + 1..].to_vec());
++        }
++    }
++    None
++}
++
++fn is_disabled(env_array: &[*const c_char]) -> bool {
++    find_env_value(env_array, b"BUN_OHOS_NO_LD_PRELOAD_NODE").is_some()
++        || std::env::var_os("BUN_OHOS_NO_LD_PRELOAD_NODE").is_some()
++}
++
++/// The shim `.so` bun's own build compiles alongside the executable
++/// (`scripts/build/shims.ts`'s `shim_cc_so` rule) -- same directory as
++/// `self_exe_path()`, verified to exist once per process lifetime. `None`
++/// if the sibling file is missing (e.g. a build predating this feature, or
++/// a formula install layout that hasn't copied it next to `bin/bun` yet).
++fn shim_so_path() -> Option<&'static [u8]> {
++    static ONCE: Once<Option<ZBox>> = Once::new();
++    ONCE.get_or_init(|| {
++        let exe = bun_core::self_exe_path().ok()?;
++        let dir = bun_core::dirname(exe.as_bytes())?;
++        let mut buf = Vec::with_capacity(dir.len() + 1 + "libohos_compat_preload.so".len());
++        buf.extend_from_slice(dir);
++        buf.push(b'/');
++        buf.extend_from_slice(b"libohos_compat_preload.so");
++        if !std::path::Path::new(std::str::from_utf8(&buf).ok()?).exists() {
++            return None;
++        }
++        Some(ZBox::from_vec(buf))
++    })
++    .as_ref()
++    .map(|z| z.as_bytes())
++}
++
++/// Returns the full `LD_PRELOAD=...` line to install into `env_array`
++/// (merging with any existing `LD_PRELOAD` the caller already set -- never
++/// drops it, since musl/glibc `getenv()` returns the first match and an
++/// appended second entry would silently lose). Caller is responsible for
++/// removing any existing `LD_PRELOAD=` entry from `env_array` before
++/// pushing this back in (same pattern as the `$PWD` fixup nearby).
++pub fn compute(argv0: &[u8], env_array: &[*const c_char]) -> Option<Vec<u8>> {
++    if is_disabled(env_array) {
++        return None;
++    }
++    if !is_node_like(basename(argv0)) {
++        return None;
++    }
++    let so_path = shim_so_path()?;
++    let existing = find_env_value(env_array, b"LD_PRELOAD");
++    if let Some(existing) = &existing {
++        if strings::split(existing, b":").any(|entry| entry == so_path) {
++            return None; // already present -- nothing to do.
++        }
++    }
++
++    let mut out = Vec::with_capacity(b"LD_PRELOAD=".len() + so_path.len() + 1 + existing.as_ref().map_or(0, |e| e.len() + 1));
++    out.extend_from_slice(b"LD_PRELOAD=");
++    if let Some(existing) = &existing {
++        out.extend_from_slice(existing);
++        out.push(b':');
++    }
++    out.extend_from_slice(so_path);
++    Some(out)
++}
