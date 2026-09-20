@@ -4,7 +4,7 @@ class Openjdk < Formula
   url "https://github.com/openjdk/jdk26u/archive/refs/tags/jdk-26.0.2.1-ga.tar.gz"
   sha256 "91dd5ddd93e156f00a12c28d9b74b5ee1704e9f12d323d412d158b12e91d56d0"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
-  revision 1
+  revision 2
   compatibility_version 1
 
   livecheck do
@@ -72,6 +72,24 @@ class Openjdk < Formula
 
   patch do
     file "Patches/openjdk/0001-support-ohos.patch"
+  end
+
+  # The OHOS musl linker ignores a bare RTLD_GLOBAL at dlopen time: a library
+  # only lands in the global symbol scope if it carries DF_1_GLOBAL itself
+  # (-Wl,-z,global). The launcher dlopens libjvm.so with RTLD_GLOBAL, so mark
+  # it to keep the JVM's symbols visible to native libraries dlopened later,
+  # as they are on Linux.
+  patch do
+    file "Patches/openjdk/0002-mark-libjvm-global.patch"
+  end
+
+  # Same rule for the AWT toolkit library: libawt.so dlopens
+  # libawt_headless.so with RTLD_GLOBAL, and libfontmanager.so carries no
+  # DT_NEEDED entry for it (JDK-8196516), relying on that global scope to
+  # resolve AWTFreeFont. Without DF_1_GLOBAL the toolkit library stays
+  # invisible and headless AWT fails to initialize.
+  patch do
+    file "Patches/openjdk/0003-mark-libawt-headless-global.patch"
   end
 
   def install
