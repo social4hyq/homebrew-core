@@ -1,15 +1,14 @@
 class Snappy < Formula
   desc "Compression/decompression library aiming for high speed"
   homepage "https://google.github.io/snappy/"
-  url "https://github.com/google/snappy/archive/refs/tags/1.2.2.tar.gz"
-  sha256 "90f74bc1fbf78a6c56b3c4a082a05103b3a56bb17bca1a27e052ea11723292dc"
+  url "https://github.com/google/snappy/archive/refs/tags/1.3.1.tar.gz"
+  sha256 "893f708a0bf4b5529d555ffcee390e940e932fcf90261f682604475a76cd0247"
   license "BSD-3-Clause"
-  revision 1
   compatibility_version 1
   head "https://github.com/google/snappy.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "98d83d7065e3121f1f493bdb912b64a458be26677ad8523b09543e27fbc3a889"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bfe815a5b16d29685010647685b79255b60c99e108f94f5c35238eb07dfcbd59"
   end
 
   depends_on "cmake" => :build
@@ -22,7 +21,9 @@ class Snappy < Formula
 
   # Fix issue where `snappy` setting -fno-rtti causes build issues on `folly`
   # `folly` issue ref: https://github.com/facebook/folly/issues/1583
-  patch :DATA
+  patch do
+    file "Patches/snappy/0001-do-not-disable-rtti.patch"
+  end
 
   def install
     args = %w[
@@ -62,31 +63,3 @@ class Snappy < Formula
     system "./test"
   end
 end
-
-__END__
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index cd71a47..ef040d1 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -51,10 +51,6 @@ if(MSVC)
-   string(REGEX REPLACE "/EH[a-z]+" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHs-c-")
-   add_definitions(-D_HAS_EXCEPTIONS=0)
--
--  # Disable RTTI.
--  string(REGEX REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
--  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR-")
- else(MSVC)
-   # Use -Wall for clang and gcc.
-   if(NOT CMAKE_CXX_FLAGS MATCHES "-Wall")
-@@ -81,10 +77,6 @@ else(MSVC)
-   # Disable C++ exceptions.
-   string(REGEX REPLACE "-fexceptions" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
--
--  # Disable RTTI.
--  string(REGEX REPLACE "-frtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
--  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
- endif(MSVC)
-
- # BUILD_SHARED_LIBS is a standard CMake variable, but we declare it here to make
