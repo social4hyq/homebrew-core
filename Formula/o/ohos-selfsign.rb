@@ -5,6 +5,10 @@ class OhosSelfsign < Formula
   sha256 "d66c9ed4442aa876643a477db1fc77bb48f088b221f2bc3aee21861b937166c4"
   license "0BSD"
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e92fefef6a5d9fdf9833614c33a677e2c0ec8acf58485cb0c5838e8541fd1fd8"
+  end
+
   def install
     system ENV.cc, "selfsign.c", "-o", "selfsign"
     bin.install "selfsign"
