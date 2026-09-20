@@ -15,7 +15,7 @@ class Librsvg < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6fb24e3fccf585ef538ef83e25910bfc8fb2599ee75f49ff6d871833d8364ded"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "622f2a507247160296e377146a738fe0f8d9de0b551fb01d4d75a3b5de509391"
   end
 
   depends_on "cargo-c" => :build
