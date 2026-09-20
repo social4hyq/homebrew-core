@@ -1,0 +1,90 @@
+name: ai-bump
+
+# AI-assisted fix for a PR whose build/test failed. Ported from
+# Harmonybrew/ci's src/ai_bump.py (AtomGit webhook + buildbot): a maintainer
+# labels the PR `request-ai-bump`, the workflow starts the OHOS container,
+# applies the PR branch onto main inside it, installs deepseek-harness (dsh)
+# and gives it a one-shot prompt to diagnose and fix the formula (brew install
+# + brew test must pass), then force-pushes the fix — amended into the PR's
+# tip commit, so the bump commit-message shape survives lint-commit-messages —
+# back to the PR branch, and posts the AI's report as a PR comment. Labels
+# track the outcome: ai-running -> ai-success / ai-failed.
+#
+# The push uses BOT_PUSH_TOKEN, not GITHUB_TOKEN: a GITHUB_TOKEN push triggers
+# no workflow (GitHub anti-recursion), and the AI-fixed head MUST go through
+# pr-validate again for a real gate verdict. bump-* branches authored by the
+# bot land in action_required on that re-run; automerge-autobump.yml's hourly
+# scanner auto-approves them (same fallback as bottle write-back pushes).
+#
+# SECURITY BOUNDARY (same as upstream ai_bump.py): the container runs
+# AI-generated commands plus PR-supplied code; the ONLY secret passed into it
+# is DEEPSEEK_API_KEY, which dsh needs, injected via a 0600 docker --env-file.
+# BOT_PUSH_TOKEN and GH_TOKEN stay host-side (push step / gh calls) and never
+# enter the container. Fork PRs are skipped — fork code never runs in a
+# secrets-carrying job (same rule as fork-pr-gate.yml); fork contributions
+# arrive via fork-pr-gate's same-repo replacement PRs, which run normally.
+#
+# Requires the DEEPSEEK_API_KEY repo secret. Nothing here runs on schedule;
+# the trigger is the label alone, so token burn is per explicit maintainer
+# action. request-ai-bump is consumed on start (removed), which also makes
+# re-running a matter of re-adding the label.
+
+on:
+  pull_request_target:
+    types: [labeled]
+    branches: [main]
+
+concurrency:
+  # a second labeled event (or a manual re-run) must not race the first run's
+  # force-push; queue instead of cancel — the in-flight AI fix wins
+  group: ai-bump-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write # gh label create (repo labels live under the issues API)
+
+env:
+  IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner — see sync-ci-image.yml
+  CONTAINER: ohos
+  TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+
+jobs:
+  ai-bump:
+    if: >-
+      github.repository == 'social4hyq/homebrew-core' &&
+      github.event.label.name == 'request-ai-bump' &&
+      github.event.pull_request.state == 'open' &&
+      github.event.pull_request.head.repo.fork == false
+    runs-on: ubuntu-24.04-arm
+    # one dsh session driving brew install/test cycles on a heavy formula can
+    # legitimately take a while (bun is ~18min per build attempt alone)
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        # pull_request_target: this checks out the BASE commit. The PR branch
+        # is only ever fetched inside the container for building — nothing
+        # from it is executed on the host (ai_bump.py itself ships in .github/
+        # on main, not from the PR tree).
+      - name: Ensure labels exist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for spec in "request-ai-bump:7057ff" "ai-running:fbca04" "ai-success:0e8a16" "ai-failed:d93f0b"; do
+            gh label create "${spec%%:*}" --color "${spec##*:}" --force
+          done
+      - name: Start OHOS container
+        run: .github/scripts/setup-container.sh
+      - name: Run AI fix and push result
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # PR labels/comments (bot identity)
+          BOT_PUSH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }} # force-push to the PR branch so pr-validate re-runs
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }} # only secret that enters the container
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python3 .github/scripts/ai_bump.py
