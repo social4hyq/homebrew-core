@@ -1,0 +1,22 @@
+diff --git a/src/uws_sys/libuwsockets.cpp b/src/uws_sys/libuwsockets.cpp
+index 5c1e40665e..77e895e8ef 100644
+--- a/src/uws_sys/libuwsockets.cpp
++++ b/src/uws_sys/libuwsockets.cpp
+@@ -35,6 +35,17 @@ extern "C"
+     loopData->updateDate();
+   }
+ 
++  // posix_event_loop's epoll-rearm watchdog: registers a per-iteration post
++  // handler used to dispatch PTY-master reads the kernel stopped reporting
++  // through the loop's shared epoll registration (observed on OHOS). `key`
++  // must stay unique and stable for the handler's lifetime; `fn` runs on the
++  // loop thread at the end of every iteration.
++  void uws_loop_add_post_handler(us_loop_t *loop, void *key,
++                                 void (*fn)(void *ctx, us_loop_t *loop), void *ctx) {
++    uWS::Loop *uwsLoop = (uWS::Loop *)loop;
++    uwsLoop->addPostHandler(key, [fn, ctx](uWS::Loop *l) { fn(ctx, (us_loop_t *)l); });
++  }
++
+   uws_app_t *uws_create_app(int ssl, struct us_bun_socket_context_options_t options)
+   {
+     uWS::SocketContextOptions socket_context_options;

@@ -1,0 +1,32 @@
+diff --git a/src/runtime/node/node_fs_watcher.rs b/src/runtime/node/node_fs_watcher.rs
+index d421793a0b..fb08bd291f 100644
+--- a/src/runtime/node/node_fs_watcher.rs
++++ b/src/runtime/node/node_fs_watcher.rs
+@@ -1118,6 +1118,27 @@ impl FSWatcher {
+         // SAFETY: `FileSystem::instance()` returns the process-global singleton
+         // initialized at startup; never null once init has run.
+         let cwd = bun_resolver::fs::FileSystem::get().top_level_dir;
++        // OpenHarmony's libc rejects paths beyond its 4096-byte PATH_MAX,
++        // while the generic resolver may accept the relative component before
++        // the cwd join. Reject the combined length up front so fs.watch
++        // reports the platform error instead of a misleading ENOENT from
++        // inotify_add_watch on a truncated/nonexistent path.
++        #[cfg(target_env = "ohos")]
++        // OHOS uses the Linux target OS ABI but its libc PATH_MAX is 1024,
++        // while bun_paths::MAX_PATH_BYTES follows target_os and therefore
++        // resolves to Linux's 4096. Validate against the actual OHOS limit
++        // before attempting the cwd join so an overlong relative path yields
++        // ENAMETOOLONG instead of falling through to an ENOENT from open().
++        if !slice.starts_with(b"/")
++            && (slice.len() >= 1024 - 2 || cwd.len() + 1 + slice.len() >= 1024)
++        {
++            return Err(bun_sys::Error {
++                errno: SystemErrno::ENAMETOOLONG as _,
++                syscall: bun_sys::Tag::watch,
++                path: args.path.slice().into(),
++                ..Default::default()
++            });
++        }
+         let joined_buf_len = joined_buf.len();
+         let Some(joined) = Path::join_abs_string_buf_checked::<platform::Auto>(
+             cwd,

@@ -1,0 +1,86 @@
+diff --git a/src/jsc/bindings/c-bindings.cpp b/src/jsc/bindings/c-bindings.cpp
+index 481ccddda1..cecebf40e9 100644
+--- a/src/jsc/bindings/c-bindings.cpp
++++ b/src/jsc/bindings/c-bindings.cpp
+@@ -16,6 +16,7 @@
+ #include <cstdint>
+ #include <cstdlib>
+ #include <pthread.h>
++#include <sched.h>
+ #include <termios.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+@@ -368,6 +369,18 @@ extern "C" void on_before_reload_process_posix()
+ // after `threads_in_execve` and read before it.
+ static std::atomic<int> threads_in_execve { 0 };
+ static std::atomic<unsigned> execve_generation { 0 };
++// Two-phase (register-then-verify) mutual exclusion between clone() and the
++// execve(2) bookkeeping window: each side only proceeds when it has registered
++// itself and then re-observed the other side absent. A check followed directly
++// by the syscall leaves a race where the other side starts in between (on OHOS
++// a clone that overlaps this window can corrupt the process instead of
++// reliably failing with EAGAIN), so a single-sided wait is not sufficient.
++static std::atomic<int> threads_creating { 0 };
++// An exec that is about to enter its window raises this flag first; thread
++// creation defers to it. Without the flag, back-to-back thread creations
++// pipeline the creating counter across zero so tightly that the exec side
++// starves retrying its register-then-verify.
++static std::atomic<int> execve_want { 0 };
+ // The clone(CLONE_VM) child of posix_spawn_bun execs in this address space and never returns
+ // to undo a count, so only the pid recorded in bun_initialize_process counts its execs.
+ static pid_t execve_counting_pid = 0;
+@@ -379,7 +392,18 @@ extern "C" int __wrap_execve(const char* path, char* const argv[], char* const e
+ {
+     if (getpid() != execve_counting_pid)
+         return __real_execve(path, argv, envp);
+-    threads_in_execve.fetch_add(1, std::memory_order_seq_cst);
++    execve_want.fetch_add(1, std::memory_order_seq_cst);
++    for (;;) {
++        while (threads_creating.load(std::memory_order_seq_cst) != 0)
++            sched_yield();
++        threads_in_execve.fetch_add(1, std::memory_order_seq_cst);
++        if (threads_creating.load(std::memory_order_seq_cst) == 0)
++            break;
++        // A creator registered before our want was visible; let it finish.
++        threads_in_execve.fetch_sub(1, std::memory_order_seq_cst);
++        sched_yield();
++    }
++    execve_want.fetch_sub(1, std::memory_order_seq_cst);
+     execve_generation.fetch_add(1, std::memory_order_seq_cst);
+     int rc = __real_execve(path, argv, envp);
+     // Only reached when execve failed and the old image keeps running.
+@@ -390,19 +414,31 @@ extern "C" int __wrap_execve(const char* path, char* const argv[], char* const e
+ // The attempt bound keeps a real limit, hit while an exec never completes, from looping forever.
+ extern "C" int __wrap_pthread_create(pthread_t* thread, const pthread_attr_t* attr, void* (*start_routine)(void*), void* arg)
+ {
++    int rc;
++    for (;;) {
++        threads_creating.fetch_add(1, std::memory_order_seq_cst);
++        if (threads_in_execve.load(std::memory_order_seq_cst) == 0
++            && execve_want.load(std::memory_order_seq_cst) == 0)
++            break;
++        // An exec is in or waiting for its window: yield the line to it.
++        threads_creating.fetch_sub(1, std::memory_order_seq_cst);
++        usleep(200);
++    }
+     for (int attempt = 0;; attempt++) {
+         unsigned generation = execve_generation.load(std::memory_order_seq_cst);
+         bool execInFlight = threads_in_execve.load(std::memory_order_seq_cst) > 0;
+-        int rc = __real_pthread_create(thread, attr, start_routine, arg);
++        rc = __real_pthread_create(thread, attr, start_routine, arg);
+         if (rc != EAGAIN || attempt >= 1000)
+-            return rc;
++            break;
+         if (!execInFlight && threads_in_execve.load(std::memory_order_seq_cst) == 0
+             && execve_generation.load(std::memory_order_seq_cst) == generation) {
+             // No exec overlapped this attempt: a real limit.
+-            return rc;
++            break;
+         }
+         usleep(1000);
+     }
++    threads_creating.fetch_sub(1, std::memory_order_seq_cst);
++    return rc;
+ }
+ #endif // OS(LINUX)
+ 

@@ -1,0 +1,17 @@
+diff --git a/scripts/build/bun.ts b/scripts/build/bun.ts
+index fc1a7481d7..2765626f70 100644
+--- a/scripts/build/bun.ts
++++ b/scripts/build/bun.ts
+@@ -72,7 +72,11 @@ function systemLibs(cfg: Config): string[] {
+       // The static path needs to be the actual file path for lld to find it;
+       // dynamic uses -l syntax. We emit what CMake does: bare libatomic.a gets
+       // found in lib search paths, -latomic.so doesn't exist so we use -latomic.
+-      if (cfg.staticLibatomic) {
++      // OHOS: like Android's bionic, there's no separate libatomic package —
++      // clang's compiler-rt builtins cover the atomics.
++      if (cfg.abi === "ohos") {
++        // no-op
++      } else if (cfg.staticLibatomic) {
+         libs.push("-l:libatomic.a");
+       } else {
+         libs.push("-latomic");
