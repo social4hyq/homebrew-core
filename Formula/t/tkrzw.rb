@@ -1,8 +1,8 @@
 class Tkrzw < Formula
   desc "Set of implementations of DBM"
   homepage "https://dbmx.net/tkrzw/"
-  url "https://dbmx.net/tkrzw/pkg/tkrzw-1.0.32.tar.gz"
-  sha256 "d3404dfac6898632b69780c0f0994c5f6ba962191a61c9b0f4b53ba8bb27731c"
+  url "https://dbmx.net/tkrzw/pkg/tkrzw-1.0.33.tar.gz"
+  sha256 "faa41fdad6a27ae11fbf29d185c142761ea8bad4ae89382d16ccc3f2fae0e39c"
   license "Apache-2.0"
 
   livecheck do
@@ -11,7 +11,7 @@ class Tkrzw < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f170432575ded546b9595124d961ea84296bb73eb5cf9f995c6cd5bfb1ecac64"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d961af1d669a144d4e89de423d841c600d475c03298928abe394f52932c8aa25"
   end
 
   depends_on "lz4"
