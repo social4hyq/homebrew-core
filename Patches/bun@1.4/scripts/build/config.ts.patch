@@ -1,0 +1,63 @@
+diff --git a/scripts/build/config.ts b/scripts/build/config.ts
+index 671839b78c..c6d9ee0ba5 100644
+--- a/scripts/build/config.ts
++++ b/scripts/build/config.ts
+@@ -19,7 +19,7 @@ import { cyan, dim, green } from "./tty.ts";
+ 
+ export type OS = "linux" | "darwin" | "windows" | "freebsd";
+ export type Arch = "x64" | "aarch64";
+-export type Abi = "gnu" | "musl" | "android";
++export type Abi = "gnu" | "musl" | "android" | "ohos";
+ export type BuildType = "Debug" | "Release" | "RelWithDebInfo" | "MinSizeRel";
+ export type BuildMode = "full" | "cpp-only" | "rust-only" | "link-only" | "rust-and-link" | "archive-link";
+ export type WebKitMode = "prebuilt" | "local";
+@@ -498,11 +498,16 @@ export function detectHost(): Host {
+           ? "windows"
+           : plat === "freebsd"
+             ? "freebsd"
+-            : (() => {
+-                throw new BuildError(`Unsupported host platform: ${plat}`, {
+-                  hint: "Bun builds on linux, darwin, windows, or freebsd",
+-                });
+-              })();
++            : // OHOS (HarmonyOS) reports its own platform name, not "linux" —
++              // but its kernel/syscalls are Linux's, so it's a Linux abi
++              // (detectLinuxAbi), not a distinct OS.
++              plat === "openharmony"
++              ? "linux"
++              : (() => {
++                  throw new BuildError(`Unsupported host platform: ${plat}`, {
++                    hint: "Bun builds on linux, darwin, windows, or freebsd",
++                  });
++                })();
+ 
+   const a = hostArch();
+   const arch: Arch =
+@@ -518,11 +523,15 @@ export function detectHost(): Host {
+ }
+ 
+ /**
+- * Detect linux ABI (gnu vs musl) by checking for /etc/alpine-release.
+- * Android is never auto-detected — it's always a cross-compile target,
+- * so it must be requested explicitly via --abi=android.
++ * Detect linux ABI (gnu vs musl vs ohos) by checking for /etc/alpine-release,
++ * then the running bun's own platform (set at compile time — see
++ * CompileTarget::Libc — so this is only ever "ohos" when a bun already built
++ * for OHOS is what's running scripts/build.ts, i.e. a native on-device
++ * build). Cross-compiling FOR ohos from a non-ohos host needs the explicit
++ * --abi=ohos override, same as android.
+  */
+ export function detectLinuxAbi(): Abi {
++  if (process.platform === "openharmony") return "ohos";
+   return existsSync("/etc/alpine-release") ? "musl" : "gnu";
+ }
+ 
+@@ -935,7 +944,7 @@ export function resolveConfig(partial: PartialConfig, toolchain: Toolchain): Con
+   assert(!baseline || x64, "baseline=true requires arch=x64 (baseline disables AVX which is x64-only)");
+   assert(!valgrind || linux, "valgrind=true requires os=linux");
+   assert(!(asan && valgrind), "Cannot enable both asan and valgrind simultaneously");
+-  assert(os !== "linux" || abi !== undefined, "Linux builds require an abi (gnu, musl, or android)");
++  assert(os !== "linux" || abi !== undefined, "Linux builds require an abi (gnu, musl, android, or ohos)");
+ 
+   // ─── Cross-compilation (Android) ───
+   // We keep using the host's clang (same version everywhere) and pass

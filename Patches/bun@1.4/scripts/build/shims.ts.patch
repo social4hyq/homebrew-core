@@ -1,0 +1,101 @@
+diff --git a/scripts/build/shims.ts b/scripts/build/shims.ts
+index a2b28b029e..54fc906394 100644
+--- a/scripts/build/shims.ts
++++ b/scripts/build/shims.ts
+@@ -14,7 +14,7 @@ import { spawnSync } from "node:child_process";
+ import { existsSync, mkdirSync } from "node:fs";
+ import { dirname, resolve } from "node:path";
+ import type { Config } from "./config.ts";
+-import { DARWIN_STACK_SIZE } from "./flags.ts";
++import { computeDepFlags, DARWIN_STACK_SIZE } from "./flags.ts";
+ import type { Ninja } from "./ninja.ts";
+ import { quote } from "./shell.ts";
+ 
+@@ -137,6 +137,20 @@ function needsMuslCrtDecompress(cfg: Config): boolean {
+ /** CRT objects clang's linux driver may pass. crt1/Scrt1 both covered so PIE-default changes don't matter. */
+ const MUSL_CRT_OBJECTS = ["Scrt1.o", "crt1.o", "crti.o", "crtn.o"];
+ 
++/**
++ * OHOS app sandbox seccomp-kills several syscalls (close_range, fchmodat2,
++ * ...) with SIGSYS instead of returning ENOSYS/EPERM — see
++ * shims/ohos_compat_shim.c. Linking its object directly into the executable
++ * (rather than requiring callers to LD_PRELOAD it) interposes both the named
++ * libc symbol AND bun's own internal callers, since a strong symbol defined
++ * in the same link unit wins over the dynamic libc one for calls resolved at
++ * link time — no wrapper script needed for bun or `bun build --compile`
++ * output. Tracked in workarounds.ts ("ohos-compat-shim-embed").
++ */
++function needsOhosCompatShim(cfg: Config): boolean {
++  return cfg.abi === "ohos";
++}
++
+ /**
+  * Register shim compile rules. Call once from rules.ts alongside the
+  * other registerXxxRules() calls.
+@@ -175,6 +189,31 @@ export function registerShimRules(n: Ninja, cfg: Config): void {
+       restat: true,
+     });
+   }
++
++  if (needsOhosCompatShim(cfg)) {
++    // Plain object, compiled with the same flags as every other C/C++ dep
++    // (computeDepFlags) so cross-target/--sysroot line up when this is
++    // built by a cross CI host; $flags also carries -fPIC since the
++    // interposed symbols must land in the PIE's dynamic symbol table.
++    n.rule("shim_cc", {
++      command: `${q(cfg.cc)} $flags -fPIC -O2 -c $in -o $out`,
++      description: "shim $out",
++    });
++
++    // Standalone `.so` build of the same source, for LD_PRELOAD onto an
++    // exec'd `node` child (see ohos_ld_preload.rs) -- the embedded .o above
++    // only interposes symbols *this* executable calls, never a spawned
++    // child's own dynamic-musl libc.
++    n.rule("shim_cc_so", {
++      // -fvisibility=default AFTER $flags overrides globalFlags'
++      // -fvisibility=hidden (see flags.ts) -- an LD_PRELOAD interposer's
++      // symbols must be default-visible in the dynamic symbol table for
++      // the loader to prefer them over libc's, unlike every other TU in
++      // this build where hidden visibility is the right default.
++      command: `${q(cfg.cc)} $flags -fvisibility=default -shared -fPIC -O2 $in -o $out -ldl`,
++      description: "shim-so $out",
++    });
++  }
+ }
+ 
+ /**
+@@ -244,5 +283,34 @@ export function emitShims(n: Ninja, cfg: Config): ShimLinkOpts {
+     ldflags.push(`-B${crtDir}`);
+   }
+ 
++  if (needsOhosCompatShim(cfg)) {
++    const src = resolve(cfg.cwd, "scripts", "build", "shims", "ohos_compat_shim.c");
++    const out = resolve(cfg.buildDir, "ohos_compat_shim.o");
++    n.build({
++      outputs: [out],
++      rule: "shim_cc",
++      inputs: [src],
++      vars: { flags: computeDepFlags(cfg).cflags.join(" ") },
++    });
++    // A plain .o is always fully linked (no archive member selection to skip
++    // it), so it interposes libc regardless of link-line position.
++    ldflags.push(out);
++    implicitInputs.push(out);
++
++    // Standalone `.so` sibling, for ohos_ld_preload.rs's LD_PRELOAD onto an
++    // exec'd `node` child. Not a link input (would duplicate-define every
++    // interposed symbol against the .o above) -- only an implicit build
++    // dependency, so `ninja <exe>` also produces it alongside the binary at
++    // a path ohos_ld_preload.rs's runtime lookup can find next to argv[0].
++    const soOut = resolve(cfg.buildDir, "libohos_compat_preload.so");
++    n.build({
++      outputs: [soOut],
++      rule: "shim_cc_so",
++      inputs: [src],
++      vars: { flags: computeDepFlags(cfg).cflags.join(" ") },
++    });
++    implicitInputs.push(soOut);
++  }
++
+   return { ldflags, implicitInputs };
+ }

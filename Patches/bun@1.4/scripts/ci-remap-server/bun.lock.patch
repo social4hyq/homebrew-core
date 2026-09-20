@@ -1,0 +1,13 @@
+diff --git a/scripts/ci-remap-server/bun.lock b/scripts/ci-remap-server/bun.lock
+index cb887e5bb4..6bd2a18de7 100644
+--- a/scripts/ci-remap-server/bun.lock
++++ b/scripts/ci-remap-server/bun.lock
+@@ -84,7 +84,7 @@
+ 
+     "buffer-equal-constant-time": ["buffer-equal-constant-time@1.0.1", "", {}, "sha512-zRpUiDwd/xk6ADqPMATG8vc9VPrkck7T07OIx0gnjmJAnHnTVXNQG3vfvWNuiZIkwu9KrKdA1iJKfsfTVxE6NA=="],
+ 
+-    "bun-tracestrings": ["bun-tracestrings@github:oven-sh/bun.report#912ca63", { "dependencies": { "@octokit/webhooks-methods": "^5.1.0", "@sentry/types": "^7.112.2", "@types/bun": "^1.2.6", "html-minifier": "^4.0.0", "lightningcss": "^1.24.1", "marked": "^12.0.1", "octokit": "^3.2.0", "prettier": "^3.2.5", "typescript": "^5.0.0" }, "bin": { "ci-remap-server": "./bin/ci-remap-server.ts" } }, "oven-sh-bun.report-912ca63"],
++    "bun-tracestrings": ["bun-tracestrings@github:oven-sh/bun.report#912ca63", { "dependencies": { "@octokit/webhooks-methods": "^5.1.0", "@sentry/types": "^7.112.2", "@types/bun": "^1.2.6", "html-minifier": "^4.0.0", "lightningcss": "^1.24.1", "marked": "^12.0.1", "octokit": "^3.2.0", "prettier": "^3.2.5", "typescript": "^5.0.0" }, "bin": { "ci-remap-server": "./bin/ci-remap-server.ts" } }, "oven-sh-bun.report-912ca63", "sha512-Pb+MoPoDObdKwuiTDTejT7iJp82uNIhSsaEhcdI+/bQ0G30BLKzUFQL0RnGPjTW1tN7ZZJW27rlKqzdJs+9g/Q=="],
+ 
+     "bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
+ 

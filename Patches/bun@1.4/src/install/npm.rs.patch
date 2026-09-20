@@ -1,0 +1,15 @@
+diff --git a/src/install/npm.rs b/src/install/npm.rs
+index 910f39f821..1a0fa0b934 100644
+--- a/src/install/npm.rs
++++ b/src/install/npm.rs
+@@ -933,8 +933,9 @@ pub mod package_manifest {
+         // - v0.0.5: added bundled dependencies
+         // - v0.0.6: changed semver major/minor/patch to each use u64 instead of u32
+         // - v0.0.7: added version publish times and extended manifest flag for minimum release age
++        // - v0.0.8: added the OpenHarmony operating-system bit
+         const HEADER_BYTES: &'static str =
+-            concat!("#!/usr/bin/env bun\n", "bun-npm-manifest-cache-v0.0.7\n");
++            concat!("#!/usr/bin/env bun\n", "bun-npm-manifest-cache-v0.0.8\n");
+ 
+         // Field order is hardcoded (descending alignment). Re-verify if the
+         // layout changes.

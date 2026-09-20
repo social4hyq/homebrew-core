@@ -1,0 +1,15 @@
+diff --git a/src/io/lib.rs b/src/io/lib.rs
+index 4df690e14b..2e1bd8a255 100644
+--- a/src/io/lib.rs
++++ b/src/io/lib.rs
+@@ -1832,6 +1832,10 @@ impl FilePollRef {
+     pub(crate) fn deinit_force_unregister(self) {
+         self.inner().deinit_force_unregister();
+     }
++    #[inline]
++    pub(crate) fn deinit_force_unregister_skip_ctl_del(self) {
++        self.inner().deinit_force_unregister_skip_ctl_del();
++    }
+     /// Single nonnull-asref accessor for the process-global uWS loop pointer.
+     ///
+     /// Type invariant (encapsulated `unsafe`): every caller of

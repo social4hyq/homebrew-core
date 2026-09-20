@@ -1,0 +1,25 @@
+diff --git a/scripts/build/deps/cares.ts b/scripts/build/deps/cares.ts
+index 38ac7cb52f..8e4db3eb8e 100644
+--- a/scripts/build/deps/cares.ts
++++ b/scripts/build/deps/cares.ts
+@@ -195,6 +195,11 @@ const ANDROID = def1([
+   "HAVE___SYSTEM_PROPERTY_GET",
+ ]);
+ 
++// OHOS's musl fork has getservbyname/getservbyport but not the GNU reentrant
++// _r variants LINUX_NETDB_R assumes every non-Android Linux libc has —
++// same gap as Android's bionic, just for a different libc.
++const OHOS = "";
++
+ // prettier-ignore
+ const DARWIN = def1([
+   "HAVE_SYS_EVENT_H", "HAVE_SYS_SOCKIO_H",
+@@ -288,7 +293,7 @@ function configH(cfg: Config): string {
+     platform = `${POSIX}\n${FREEBSD}`;
+     types = POSIX_SOCKET_TYPES;
+   } else {
+-    const abiExtra = cfg.abi === "android" ? ANDROID : LINUX_NETDB_R;
++    const abiExtra = cfg.abi === "android" ? ANDROID : cfg.abi === "ohos" ? OHOS : LINUX_NETDB_R;
+     platform = `${POSIX}\n${LINUX}\n${abiExtra}`;
+     types = POSIX_SOCKET_TYPES;
+   }

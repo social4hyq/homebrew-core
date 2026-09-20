@@ -1,0 +1,46 @@
+diff --git a/src/jsc/bindings/BunProcess.cpp b/src/jsc/bindings/BunProcess.cpp
+index 57f1b66e0e..fed26f28e9 100644
+--- a/src/jsc/bindings/BunProcess.cpp
++++ b/src/jsc/bindings/BunProcess.cpp
+@@ -213,6 +213,11 @@ static JSValue constructPlatform(VM& vm, JSObject* processObject)
+     return JSC::jsString(vm, makeAtomString("darwin"_s));
+ #elif defined(__ANDROID__)
+     return JSC::jsString(vm, makeAtomString("android"_s));
++#elif defined(__OHOS__)
++    // Match real Node.js on OpenHarmony, which reports "openharmony" here
++    // (verified against the device's own Node build) — not folded into the
++    // generic __linux__ case below, same as __ANDROID__ above.
++    return JSC::jsString(vm, makeAtomString("openharmony"_s));
+ #elif defined(__linux__)
+     return JSC::jsString(vm, makeAtomString("linux"_s));
+ #elif defined(__FreeBSD__)
+@@ -3340,11 +3345,26 @@ JSC_DEFINE_HOST_FUNCTION(Process_functiongetgroups, (JSGlobalObject * globalObje
+         throwSystemError(throwScope, globalObject, "getgroups"_s, errno);
+         return {};
+     }
+-    JSArray* groups = constructEmptyArray(globalObject, nullptr, ngroups);
+-    RETURN_IF_EXCEPTION(throwScope, {});
+     Vector<gid_t> groupVector(ngroups);
+     getgroups(ngroups, groupVector.begin());
+-    for (unsigned i = 0; i < ngroups; i++) {
++    // POSIX leaves it unspecified whether the effective gid is included in
++    // the supplementary-group list; Node's docs guarantee it always is
++    // (https://nodejs.org/api/process.html#processgetgroups). Some accounts'
++    // raw kernel group list omits it, so append it here if missing.
++    gid_t egid = getegid();
++    bool hasEgid = false;
++    for (gid_t g : groupVector) {
++        if (g == egid) {
++            hasEgid = true;
++            break;
++        }
++    }
++    if (!hasEgid) {
++        groupVector.append(egid);
++    }
++    JSArray* groups = constructEmptyArray(globalObject, nullptr, groupVector.size());
++    RETURN_IF_EXCEPTION(throwScope, {});
++    for (unsigned i = 0; i < groupVector.size(); i++) {
+         groups->putDirectIndex(globalObject, i, jsNumber(groupVector[i]));
+         RETURN_IF_EXCEPTION(throwScope, {});
+     }

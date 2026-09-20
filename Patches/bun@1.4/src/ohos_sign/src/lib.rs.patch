@@ -1,0 +1,115 @@
+diff --git a/src/ohos_sign/src/lib.rs b/src/ohos_sign/src/lib.rs
+new file mode 100644
+index 0000000000..1a0458b22f
+--- /dev/null
++++ b/src/ohos_sign/src/lib.rs
+@@ -0,0 +1,109 @@
++//! ELF self-signing for OHOS, backed by the canonical single-file
++//! implementation vendored from hqzing/ohos-selfsign (0BSD) — the same
++//! algorithm Harmonybrew's uv formula vendors. The vendored module keeps the
++//! algorithm; this file preserves the historical crate API.
++
++mod selfsign;
++
++use std::fmt;
++
++#[derive(Debug)]
++pub enum SignError {
++    NotElf64,
++    NoSectionHeaders,
++    ShstrtabOutOfBounds,
++    AlreadySigned,
++    Io(std::io::Error),
++}
++
++impl fmt::Display for SignError {
++    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
++        match self {
++            SignError::NotElf64 => write!(f, "not an ELF64 binary"),
++            SignError::NoSectionHeaders => write!(f, "ELF has no section header table"),
++            SignError::ShstrtabOutOfBounds => write!(f, "shstrtab out of bounds"),
++            SignError::AlreadySigned => {
++                write!(f, "already has .codesign section; strip first or use --force")
++            }
++            SignError::Io(e) => write!(f, "I/O error: {e}"),
++        }
++    }
++}
++
++impl std::error::Error for SignError {}
++
++impl From<std::io::Error> for SignError {
++    fn from(e: std::io::Error) -> Self {
++        SignError::Io(e)
++    }
++}
++
++// The vendored module reports errors as human-readable strings; map the
++// documented cases back onto the structured variants.
++fn map_err(e: String) -> SignError {
++    match e.as_str() {
++        "not ELF64" => SignError::NotElf64,
++        "shstrtab out of bounds" => SignError::ShstrtabOutOfBounds,
++        e if e.starts_with("already has a .codesign section") => SignError::AlreadySigned,
++        other => SignError::Io(std::io::Error::new(
++            std::io::ErrorKind::InvalidData,
++            other.to_string(),
++        )),
++    }
++}
++
++// `__` names expose internals to integration tests without becoming public API.
++#[doc(hidden)]
++pub fn __sha256_hash(data: &[u8]) -> [u8; 32] {
++    selfsign::sha256(data)
++}
++
++#[doc(hidden)]
++pub fn __merkle_root_hash(data: &[u8], cs_off: u64, cs_len: u64) -> [u8; 32] {
++    selfsign::merkle_root_hash(data, cs_off as usize, cs_len as usize)
++}
++
++#[doc(hidden)]
++pub fn __descriptor_build(sign_size: u32, file_size: u64, root_hash: &[u8; 32]) -> [u8; 256] {
++    selfsign::build_descriptor(sign_size, file_size, root_hash, selfsign::FLAG_SELF_SIGN)
++}
++
++/// Returns true if the ELF bytes already contain a `.codesign` section.
++pub fn has_codesign(elf: &[u8]) -> bool {
++    selfsign::has_codesign_section(elf)
++}
++
++/// Sign `elf` bytes with self-sign (flags=0x10). Fails if already signed.
++/// Use `sign_selfsign_with_strip` to strip-then-sign.
++pub fn sign_selfsign(elf: &[u8]) -> Result<Vec<u8>, SignError> {
++    selfsign::sign_elf(elf, false).map_err(map_err)
++}
++
++/// Strip existing `.codesign` section then sign.
++pub fn sign_selfsign_with_strip(elf: &[u8]) -> Result<Vec<u8>, SignError> {
++    selfsign::sign_elf(elf, true).map_err(map_err)
++}
++
++/// Strip `.codesign` section in-place in the buffer.
++/// Returns true if a section was removed, false if none present.
++pub fn strip_codesign(elf: &mut Vec<u8>) -> Result<bool, SignError> {
++    let (removed, out) = selfsign::strip_codesign(elf).map_err(map_err)?;
++    *elf = out;
++    Ok(removed)
++}
++
++/// Sign a file in-place.
++pub fn sign_selfsign_inplace(path: &std::path::Path) -> Result<(), SignError> {
++    let bytes = std::fs::read(path)?;
++    let signed = sign_selfsign(&bytes)?;
++    std::fs::write(path, &signed)?;
++    Ok(())
++}
++
++/// Sign a file in-place, stripping any existing `.codesign` section first.
++pub fn sign_selfsign_inplace_with_strip(path: &std::path::Path) -> Result<(), SignError> {
++    let bytes = std::fs::read(path)?;
++    let signed = sign_selfsign_with_strip(&bytes)?;
++    std::fs::write(path, &signed)?;
++    Ok(())
++}

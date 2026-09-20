@@ -1,0 +1,66 @@
+diff --git a/src/bun_core/util.rs b/src/bun_core/util.rs
+index 28006517b5..b733eb606a 100644
+--- a/src/bun_core/util.rs
++++ b/src/bun_core/util.rs
+@@ -4100,13 +4100,58 @@ pub fn getcwd(buf: &mut PathBuffer) -> crate::CrateResult<&ZStr> {
+     Ok(ZStr::from_buf(&buf.0, len))
+ }
+ 
++/// Like [`getcwd`], but on OHOS surfaces a deleted cwd as
++/// [`crate::CrateError::CurrentWorkingDirectoryUnlinked`] instead of the
++/// compat shim's silent `$HOME` substitution; for callers that must
++/// propagate a genuine failure.
++pub fn getcwd_honest(buf: &mut PathBuffer) -> crate::CrateResult<&ZStr> {
++    let len = getcwd_len(buf)?;
++    #[cfg(target_env = "ohos")]
++    if cwd_is_deleted_ohos() {
++        return Err(crate::CrateError::CurrentWorkingDirectoryUnlinked);
++    }
++    Ok(ZStr::from_buf(&buf.0, len))
++}
++
++/// OHOS-only deleted-cwd re-check bypassing the compat shim's silent `$HOME`
++/// substitution in plain `getcwd()`; mirrors `bun_sys::posix::cwd_is_deleted`
++/// (duplicated because `bun_sys` depends on `bun_core`).
++#[cfg(target_env = "ohos")]
++fn cwd_is_deleted_ohos() -> bool {
++    let mut proc_buf = [0u8; 4096];
++    // SAFETY: "/proc/self/cwd" is a valid NUL-terminated path literal;
++    // proc_buf provides 4095 writable bytes + one reserved NUL slot.
++    let n = unsafe {
++        libc::readlink(
++            b"/proc/self/cwd\0".as_ptr().cast(),
++            proc_buf.as_mut_ptr().cast(),
++            proc_buf.len() - 1,
++        )
++    };
++    if n > 0 {
++        proc_buf[n as usize] = 0;
++        // SAFETY: an all-zero `libc::stat` is a valid POD bit pattern.
++        let mut st: libc::stat = unsafe { core::mem::zeroed() };
++        // SAFETY: proc_buf is NUL-terminated by the assignment above.
++        return unsafe { libc::stat(proc_buf.as_ptr().cast(), &mut st) } < 0
++            && crate::ffi::errno() == libc::ENOENT;
++    }
++    n < 0 && crate::ffi::errno() == libc::ENOENT
++}
++
+ /// `getcwd` tolerating an unreachable cwd (e.g. deleted while we run): falls
+ /// back to the executable's directory like Node's `Environment::GetCwd`, so
+ /// startup proceeds and `process.cwd()` surfaces the real error later.
+ pub fn getcwd_or_exe_dir(buf: &mut PathBuffer) -> &ZStr {
+-    let len = match getcwd_len(buf) {
+-        Ok(n) => n,
+-        Err(_) => {
++    let ok_len = getcwd_len(buf).ok();
++    // OHOS: the compat shim's getcwd() silently substitutes $HOME for a
++    // deleted cwd, so re-check /proc/self/cwd here and fall through to the
++    // exe-dir fallback if it's really gone.
++    #[cfg(target_env = "ohos")]
++    let ok_len = ok_len.filter(|_| !cwd_is_deleted_ohos());
++    let len = match ok_len {
++        Some(n) => n,
++        None => {
+             let dir: &[u8] = self_exe_path()
+                 .ok()
+                 .and_then(|p| dirname(p.as_bytes()))

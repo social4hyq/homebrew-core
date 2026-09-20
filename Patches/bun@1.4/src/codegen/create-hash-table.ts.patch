@@ -1,0 +1,20 @@
+diff --git a/src/codegen/create-hash-table.ts b/src/codegen/create-hash-table.ts
+index 5e2ad58b95..d87a9d1918 100644
+--- a/src/codegen/create-hash-table.ts
++++ b/src/codegen/create-hash-table.ts
+@@ -12,7 +12,14 @@ export function createHashTable(input: string, output: string): void {
+   const input_text = readFileSync(input, "utf8");
+   const to_preprocess = [...input_text.matchAll(/@begin\s+.+?@end/gs)].map(m => m[0]).join("\n");
+ 
+-  const os = platform === "win32" ? "WINDOWS" : platform.toUpperCase();
++  // This drives WebKit's own `#if OS(...)` preprocessor guards, which only
++  // know the canonical WINDOWS/DARWIN/LINUX/FREEBSD names — not bun's
++  // Node-compat-facing `process.platform` string. OHOS is `OS(LINUX)` at
++  // this level (it's the actual C++/toolchain target), even though
++  // `process.platform` reports "openharmony" to JS for Node compat.
++  // Getting this wrong strips every `#if OS(LINUX)`-guarded JSC hash-table
++  // entry from the build, thinking it's a foreign platform.
++  const os = platform === "win32" ? "WINDOWS" : platform === "openharmony" ? "LINUX" : platform.toUpperCase();
+   const other_oses = ["WINDOWS", "DARWIN", "LINUX"].filter(x => x !== os);
+   const to_remove = new RegExp(`#if\\s+(!OS\\(${os}\\)|OS\\((${other_oses.join("|")})\\))\\n.*?#endif`, "gs");
+ 

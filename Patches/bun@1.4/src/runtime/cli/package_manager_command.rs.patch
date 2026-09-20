@@ -1,0 +1,59 @@
+diff --git a/src/runtime/cli/package_manager_command.rs b/src/runtime/cli/package_manager_command.rs
+index 7c66aafb46..691ffacd21 100644
+--- a/src/runtime/cli/package_manager_command.rs
++++ b/src/runtime/cli/package_manager_command.rs
+@@ -266,7 +266,14 @@ Learn more about these at <magenta>https://bun.com/docs/cli/pm<r>.\n";
+             Err(err) => {
+                 if err == bun_install::Error::MissingPackageJSON {
+                     let mut cwd_buf = PathBuffer::uninit();
+-                    match bun_sys::getcwd(&mut cwd_buf[..]) {
++                    // OHOS: process_cwd() surfaces a rmdir'd cwd as ENOENT instead
++                    // of the ohos-compat-shim's $HOME fallback; other platforms use
++                    // plain getcwd().
++                    #[cfg(target_env = "ohos")]
++                    let cwd_result = bun_sys::process_cwd(&mut cwd_buf[..]);
++                    #[cfg(not(target_env = "ohos"))]
++                    let cwd_result = bun_sys::getcwd(&mut cwd_buf[..]);
++                    match cwd_result {
+                         Ok(len) => {
+                             Output::err_generic(
+                                 "No package.json was found for directory \"{s}\"",
+@@ -620,7 +627,11 @@ Learn more about these at <magenta>https://bun.com/docs/cli/pm<r>.\n";
+                 }
+             } else {
+                 let mut cwd_buf = PathBuffer::uninit();
+-                let path = match bun_sys::getcwd(&mut cwd_buf[..]) {
++                #[cfg(target_env = "ohos")]
++                let cwd_result = bun_sys::process_cwd(&mut cwd_buf[..]);
++                #[cfg(not(target_env = "ohos"))]
++                let cwd_result = bun_sys::getcwd(&mut cwd_buf[..]);
++                let path = match cwd_result {
+                     Ok(len) => &cwd_buf[..len],
+                     Err(_) => {
+                         bun_core::pretty_errorln!(
+@@ -856,7 +867,11 @@ fn print_node_modules_folder_structure(
+             }
+         } else {
+             let mut cwd_buf = PathBuffer::uninit();
+-            let path = match bun_sys::getcwd(&mut cwd_buf[..]) {
++            #[cfg(target_env = "ohos")]
++            let cwd_result = bun_sys::process_cwd(&mut cwd_buf[..]);
++            #[cfg(not(target_env = "ohos"))]
++            let cwd_result = bun_sys::getcwd(&mut cwd_buf[..]);
++            let path = match cwd_result {
+                 Ok(len) => &cwd_buf[..len],
+                 Err(_) => {
+                     bun_core::pretty_errorln!(
+@@ -983,7 +998,11 @@ fn print_trusted_dependencies_flat(
+     lockfile: &Lockfile,
+ ) {
+     let mut cwd_buf = PathBuffer::uninit();
+-    let path = match bun_sys::getcwd(&mut cwd_buf[..]) {
++    #[cfg(target_env = "ohos")]
++    let cwd_result = bun_sys::process_cwd(&mut cwd_buf[..]);
++    #[cfg(not(target_env = "ohos"))]
++    let cwd_result = bun_sys::getcwd(&mut cwd_buf[..]);
++    let path = match cwd_result {
+         Ok(len) => &cwd_buf[..len],
+         Err(_) => {
+             bun_core::pretty_errorln!("<r><red>error<r>: Could not get current working directory",);
