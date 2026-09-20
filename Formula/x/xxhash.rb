@@ -1,13 +1,12 @@
 class Xxhash < Formula
   desc "Extremely fast non-cryptographic hash algorithm"
   homepage "https://xxhash.com"
-  url "https://github.com/Cyan4973/xxHash/archive/refs/tags/v0.8.3.tar.gz"
-  sha256 "aae608dfe8213dfd05d909a57718ef82f30722c392344583d3f39050c7f29a80"
+  url "https://github.com/Cyan4973/xxHash/archive/refs/tags/v0.8.4.tar.gz"
+  sha256 "5738270935e7c3d38a79b3adf7c9692566ce7895a25f67de43ad52ab504acd32"
   license all_of: [
     "BSD-2-Clause", # library
     "GPL-2.0-or-later", # `xxhsum` command line utility
   ]
-  revision 1
 
   livecheck do
     url :stable
@@ -19,6 +18,8 @@ class Xxhash < Formula
   end
 
   depends_on "cmake" => [:build, :test]
+
+  deny_network_access!
 
   def install
     ENV.O3
@@ -35,9 +36,9 @@ class Xxhash < Formula
     # We use CMake for package configuration files which are needed by `manticoresearch`.
     # The Makefile is used for everything else as it is the only officially supported way.
     ENV["DESTDIR"] = buildpath
-    system "cmake", "-S", "cmake_unofficial", "-B", "build", *std_cmake_args
-    system "cmake", "--build", "build" # needed to run `--install` which rewrites build path in .cmake file
-    system "cmake", "--install", "build"
+    system "cmake", "-S", "build/cmake", "-B", "_build", *std_cmake_args
+    system "cmake", "--build", "_build" # needed to run `--install` which rewrites build path in .cmake file
+    system "cmake", "--install", "_build"
     lib.install File.join(buildpath, lib, "cmake")
   end
 
