@@ -7,7 +7,7 @@ class Garble < Formula
   head "https://github.com/burrowers/garble.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "480e15ee0ae8621077cabf610a00a05ab56cece70506f482ffa29310d540aeaf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f263c3f86c0f6142ad3f710629a7ba99fa75d4670003006bb250e79fa4e1243d"
   end
 
   depends_on "go" => [:build, :test]
