@@ -8,7 +8,7 @@ class Usage < Formula
   head "https://github.com/jdx/usage.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c99e6d1a094e386fbfd9859c8ed3943b683030adf6083fe33ba6e9cff67aa75d"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9232c91e7e6db0b3f54a30112e6364d95acf7434f9d333877cf7cb05d2f0914b"
   end
 
   depends_on "rust" => :build
