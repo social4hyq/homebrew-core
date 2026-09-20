@@ -6,7 +6,7 @@ class CubejsCli < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "19cda8bc77a43d8e8183077f2e57ce531de5a6f540a288c4d814f0047b4de439"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a0737f1dbcce81e1cab770f5e832ec086550f66ac9cf8328eb76c20ba05a0b1"
   end
 
   depends_on "node"
