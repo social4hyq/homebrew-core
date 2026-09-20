@@ -7,7 +7,7 @@ class Firefoxpwa < Formula
   head "https://github.com/filips123/PWAsForFirefox.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "91d3ea57ff7607da51dc033de057d4493d37f25f3857cbe3f34d75664f3d71eb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "597f4e9916fbd3880952ab946281660e63c6474db0b88b564bc709fac30a52b3"
   end
 
   depends_on "pkgconf" => :build
