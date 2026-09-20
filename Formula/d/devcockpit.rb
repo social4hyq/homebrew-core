@@ -1,13 +1,13 @@
 class Devcockpit < Formula
   desc "TUI system monitor for Apple Silicon"
   homepage "https://devcockpit.app/"
-  url "https://github.com/caioricciuti/dev-cockpit/archive/refs/tags/v2.1.0.tar.gz"
-  sha256 "feb16115caf94b63b71a5c86ab47b10bee5009207790c99df52443fe4cdd4873"
+  url "https://github.com/caioricciuti/dev-cockpit/archive/refs/tags/v3.0.0.tar.gz"
+  sha256 "5f0c72cd82ce06b166ad92810d096507c9575350af058734c3c010408cf0e87c"
   license "GPL-3.0-only"
   head "https://github.com/caioricciuti/dev-cockpit.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2256747328ff749d514ed3dc4d787fdb4515470e01fccdc0fa8f04385fe5bdc"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b077e2d099148db14c88a883dec3647eb1e24a7c17a36bbfddcbb8cd5894f977"
   end
 
   depends_on "go" => :build
