@@ -1,0 +1,24 @@
+--- a/make/modules/java.desktop/lib/Awt2dLibraries.gmk
++++ b/make/modules/java.desktop/lib/Awt2dLibraries.gmk
+@@ -381,6 +381,13 @@
+   LIBAWT_HEADLESS_CFLAGS := $(CUPS_CFLAGS) $(FONTCONFIG_CFLAGS) $(X_CFLAGS) \
+       -DHEADLESS=true
+ 
++  # OpenHarmony's musl dynamic linker keeps a per-dlopen symbol scope: a shared
++  # library loaded with dlopen() is not visible to libraries dlopened later,
++  # even when RTLD_GLOBAL was requested. libawt.so loads libawt_headless.so at
++  # runtime and libfontmanager.so intentionally carries no DT_NEEDED entry for
++  # it (JDK-8196516), relying on ld.so's global scope to resolve AWTFreeFont.
++  # glibc is satisfied by RTLD_GLOBAL, musl/OHOS is not, so mark the toolkit
++  # library DF_1_GLOBAL to keep that cross-library symbol resolution working.
+   $(eval $(call SetupJdkLibrary, BUILD_LIBAWT_HEADLESS, \
+       NAME := awt_headless, \
+       EXTRA_SRC := $(LIBAWT_HEADLESS_EXTRA_SRC), \
+@@ -393,6 +400,7 @@
+       LDFLAGS := $(LDFLAGS_JDKLIB) \
+           $(call SET_SHARED_LIBRARY_ORIGIN), \
+       LDFLAGS_unix := -L$(INSTALL_LIBRARIES_HERE), \
++      LDFLAGS_linux := -Wl$(COMMA)-z$(COMMA)global, \
+       LIBS_unix := -lawt -ljvm -ljava, \
+       LIBS_linux := $(LIBM) $(LIBDL), \
+   ))

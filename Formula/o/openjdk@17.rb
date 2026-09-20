@@ -4,7 +4,7 @@ class OpenjdkAT17 < Formula
   url "https://github.com/openjdk/jdk17u/archive/refs/tags/jdk-17.0.20.1-ga.tar.gz"
   sha256 "8e5f18f6f75a759fc9584c3c2f8c44a5737692f3ea348cc1f9e63704b9dd81ee"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
-  revision 1
+  revision 2
   compatibility_version 1
 
   livecheck do
@@ -13,7 +13,7 @@ class OpenjdkAT17 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6014e27f7ee2e60aee77f88d35e4b59643991d2ab934903fcf17971666329eeb"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fa501f31014f76d33fdc1546fa3e8de7af6d2e60a0c1ccb93473afa931aff9bc"
   end
 
   keg_only :versioned_formula
@@ -76,6 +76,24 @@ class OpenjdkAT17 < Formula
 
   patch do
     file "Patches/openjdk@17/0001-support-ohos.patch"
+  end
+
+  # The OHOS musl linker ignores a bare RTLD_GLOBAL at dlopen time: a library
+  # only lands in the global symbol scope if it carries DF_1_GLOBAL itself
+  # (-Wl,-z,global). The launcher dlopens libjvm.so with RTLD_GLOBAL, so mark
+  # it to keep the JVM's symbols visible to native libraries dlopened later,
+  # as they are on Linux.
+  patch do
+    file "Patches/openjdk@17/0002-mark-libjvm-global.patch"
+  end
+
+  # Same rule for the AWT toolkit library: libawt.so dlopens
+  # libawt_headless.so with RTLD_GLOBAL, and libfontmanager.so carries no
+  # DT_NEEDED entry for it (JDK-8196516), relying on that global scope to
+  # resolve AWTFreeFont. Without DF_1_GLOBAL the toolkit library stays
+  # invisible and headless AWT fails to initialize.
+  patch do
+    file "Patches/openjdk@17/0003-mark-libawt-headless-global.patch"
   end
 
   def install
