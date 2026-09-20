@@ -1,0 +1,38 @@
+name: audit
+
+# Manual full-tap audit: brew readall + brew audit over every formula.
+# Used to enumerate/clear audit findings; light-check runs the same checks
+# per-push on changed formulae only.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: audit
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+permissions:
+  contents: read
+
+env:
+  IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
+  CONTAINER: ohos
+  TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Start OHOS container
+        run: .github/scripts/setup-container.sh
+      - name: readall + audit (all formulae)
+        run: |
+          CHANGED_JSON=$(find Formula -name '*.rb' | sed 's|.*/||; s|\.rb$||' | jq -Rnc '[inputs]')
+          export CHANGED_JSON
+          .github/scripts/light-check.sh

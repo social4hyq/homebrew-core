@@ -1,0 +1,40 @@
+name: actionlint
+
+# Static check of every .github/workflows/*.yml on push + PR — YAML syntax,
+# unknown context/expression typos, and (via the bundled shellcheck)
+# unquoted-variable / quoting bugs in `run:` blocks. Doesn't catch logic
+# bugs like obs-upload-tune.yml's control-cubic timeout (2026-07-21) — that
+# was a too-short -m 30 with no retry, not a syntax issue — but it's cheap
+# insurance against the class of bug it does catch. Borrowed from
+# Homebrew/homebrew-core's workflow of the same name; simplified to the
+# public rhysd/actionlint action instead of their internal
+# ghcr.io/homebrew/brew container, since we don't have that image.
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/**']
+  pull_request:
+    paths: ['.github/workflows/**']
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: actionlint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: reviewdog/action-actionlint@d290e336d5a743810aef4404f757dc862276d2ae # v1.73.4
+        with:
+          reporter: github-check
+          fail_level: error

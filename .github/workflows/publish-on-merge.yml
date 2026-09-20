@@ -1,0 +1,115 @@
+name: publish-on-merge
+
+# Publish on merge to main.
+#
+# 2026-07-20: pr-validate.yml now publishes for real (upload=true) and
+# pushes the bottle commit back onto the PR's own branch before it's ever
+# merged — so for the common case, main already has a bottled formula by
+# the time this workflow's push event fires, and detect-changes.sh's
+# bottle-block-only skip makes this a fast no-op. This workflow is now
+# mostly a safety net for edge cases where that didn't happen (a heavy
+# formula's PR — pr-validate.yml never builds those — or a merge that
+# somehow landed without pr-validate.yml's build succeeding). Heavy
+# formulae's bottle publish stays a manual dispatch of bottle-build.yml
+# either way (a 6h build isn't for unattended CI, in a PR or after merge).
+#
+# IMPORTANT — merge strategy: PRs touching Formula/** must merge with a
+# merge commit or rebase merge, never squash. Squash-merge collapses the
+# PR's "content change" and "bottle write-back" commits into one, so
+# detect-changes.sh's before/after diff can no longer tell "bottle-block-
+# only, already published from this branch" apart from "brand new content,
+# needs building" — it sees the whole squashed commit as new and rebuilds
+# for real, producing a redundant bottle release. Confirmed 2026-07-20 via
+# PR #29 (squash-merged by mistake): produced an orphaned -r1 release right
+# behind the -r2 this workflow generated. Squash-merge is now disabled at
+# the repo level for exactly this reason.
+
+on:
+  push:
+    branches: [main]
+    paths: ['Formula/**']
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-on-merge-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  # Space-separated; heavy formulae are light-checked but not auto-built.
+  # Currently empty: every formula auto-builds (see pr-validate.yml).
+  HEAVY_FORMULAS: ""
+  IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
+  CONTAINER: ohos
+  TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # bottle-build's publish step now pushes bottle commits with an admin PAT
+    # (main requires PRs; GITHUB_TOKEN can't bypass that ruleset), so
+    # github.actor is no longer 'github-actions[bot]' for those pushes.
+    # Filter on the bottle commit's message shape instead to avoid
+    # re-triggering on our own writes. `brew bottle --merge --write` commits
+    # with its own message ("<formula>: add/update <ver> bottle."), not the
+    # "bottle(<formula>): ..." this used to check for — that pattern never
+    # actually matched (verified 2026-07-20 via ci-smoke-test: its first
+    # bottle commit both slipped this filter AND slipped detect-changes.sh's
+    # bottle-block-only skip due to a separate bug there, triggering one
+    # extra full rebuild+republish cycle before the second bottle commit
+    # correctly stopped the loop). Both are fixed now; this is belt-and-
+    # suspenders — a cheap job-level skip on top of detect-changes.sh's
+    # correctness guarantee.
+    if: ${{ !endsWith(github.event.head_commit.message, ' bottle.') }}
+    outputs:
+      build: ${{ steps.diff.outputs.build }}
+      changed: ${{ steps.diff.outputs.changed }}
+      heavy: ${{ steps.diff.outputs.heavy }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Detect changed formulae
+        id: diff
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: .github/scripts/detect-changes.sh
+
+  light-check:
+    needs: detect
+    if: needs.detect.outputs.changed != '[]'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    env:
+      CHANGED_JSON: ${{ needs.detect.outputs.changed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Start OHOS container
+        run: .github/scripts/setup-container.sh
+      - name: readall + audit
+        run: .github/scripts/light-check.sh
+
+  build:
+    # bottle-build declares contents:write, and a called workflow may not
+    # exceed the caller's permissions
+    permissions:
+      contents: write
+    needs: [detect, light-check]
+    if: needs.detect.outputs.build != '[]'
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        formula: ${{ fromJSON(needs.detect.outputs.build) }}
+    uses: ./.github/workflows/bottle-build.yml
+    with:
+      formula: ${{ matrix.formula }}
+      upload: true
+    secrets: inherit

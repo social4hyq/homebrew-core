@@ -1,0 +1,39 @@
+name: version-check
+
+# Weekly livecheck report: lists formulae whose upstream version is newer.
+# Report-only; bumping stays a deliberate manual edit (which auto-validate
+# then builds and tests on push).
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: version-check
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+permissions:
+  contents: read
+
+env:
+  IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
+  CONTAINER: ohos
+  TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+
+jobs:
+  livecheck:
+    # scheduled workflows shouldn't run (and fail on missing secrets) in forks
+    if: github.repository == 'social4hyq/homebrew-core'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Start OHOS container
+        run: .github/scripts/setup-container.sh
+      - name: livecheck report
+        run: .github/scripts/version-check.sh

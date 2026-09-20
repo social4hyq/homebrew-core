@@ -45,91 +45,91 @@ class BunAT14 < Formula
   # Per-file OHOS patches, exported from social4hyq/ohos-bun
   # (scripts/export-ohos-patches.sh replays onto the tag bit-for-bit).
   %w[
-    "Cargo.lock"
-    "Cargo.toml"
-    "bun.lock"
-    "package.json"
-    "patches/tinycc/tccgen.c.patch"
-    "scripts/build/bun.ts"
-    "scripts/build/codegen.ts"
-    "scripts/build/config.ts"
-    "scripts/build/deps/cares.ts"
-    "scripts/build/deps/tinycc.ts"
-    "scripts/build/deps/webkit.ts"
-    "scripts/build/flags.ts"
-    "scripts/build/rust.ts"
-    "scripts/build/shims.ts"
-    "scripts/build/shims/ohos_compat_shim.c"
-    "scripts/build/workarounds.ts"
-    "scripts/ci-remap-server/bun.lock"
-    "src/bun_core/Global.rs"
-    "src/bun_core/env.rs"
-    "src/bun_core/env_var.rs"
-    "src/bun_core/util.rs"
-    "src/codegen/create-hash-table.ts"
-    "src/event_loop/SpawnSyncEventLoop.rs"
-    "src/install/Cargo.toml"
-    "src/install/PackageInstaller.rs"
-    "src/install/isolated_install/Installer.rs"
-    "src/install/lib.rs"
-    "src/install/lockfile/Package/Meta.rs"
-    "src/install/npm.rs"
-    "src/install_types/resolver_hooks.rs"
-    "src/io/ParentDeathWatchdog.rs"
-    "src/io/PipeReader.rs"
-    "src/io/PipeWriter.rs"
-    "src/io/lib.rs"
-    "src/io/pipes.rs"
-    "src/io/posix_event_loop.rs"
-    "src/js/node/child_process.ts"
-    "src/js/node/net.ts"
-    "src/js/node/os.ts"
-    "src/js/wasi-runner.js"
-    "src/jsc/bindings/BunProcess.cpp"
-    "src/jsc/bindings/bun-spawn.cpp"
-    "src/jsc/bindings/c-bindings.cpp"
-    "src/jsc/bindings/root.h"
-    "src/ohos_sign/Cargo.toml"
-    "src/ohos_sign/src/bin/ohos_selfsign.rs"
-    "src/ohos_sign/src/lib.rs"
-    "src/ohos_sign/src/selfsign.rs"
-    "src/options_types/compile_target.rs"
-    "src/resolver/lib.rs"
-    "src/runtime/Cargo.toml"
-    "src/runtime/api.rs"
-    "src/runtime/api/bun/Terminal.rs"
-    "src/runtime/api/bun/js_bun_spawn_bindings.rs"
-    "src/runtime/api/bun/ohos_ld_preload.rs"
-    "src/runtime/api/bun/spawn/stdio.rs"
-    "src/runtime/api/js_bundle_completion_task.rs"
-    "src/runtime/cli/Arguments.rs"
-    "src/runtime/cli/build_command.rs"
-    "src/runtime/cli/install_completions_command.rs"
-    "src/runtime/cli/package_manager_command.rs"
-    "src/runtime/cli/test/parallel/Coordinator.rs"
-    "src/runtime/ffi/ffi_body.rs"
-    "src/runtime/napi/libc_check.rs"
-    "src/runtime/napi/napi_body.rs"
-    "src/runtime/node/node_fs.rs"
-    "src/runtime/node/node_fs_watcher.rs"
-    "src/runtime/node/node_net_binding.rs"
-    "src/runtime/node/node_process.rs"
-    "src/runtime/node/path_watcher.rs"
-    "src/runtime/shell/IO.rs"
-    "src/runtime/shell/subproc.rs"
-    "src/runtime/socket/Listener.rs"
-    "src/runtime/socket/socket_body.rs"
-    "src/runtime/socket/system_certs.rs"
-    "src/runtime/webcore/FileReader.rs"
-    "src/spawn/process.rs"
-    "src/spawn_sys/lib.rs"
-    "src/spawn_sys/spawn_process.rs"
-    "src/standalone_graph/StandaloneModuleGraph.rs"
-    "src/sys/Cargo.toml"
-    "src/sys/file.rs"
-    "src/sys/lib.rs"
-    "src/sys/linux_syscall.rs"
-    "src/uws_sys/libuwsockets.cpp"
+    Cargo.lock
+    Cargo.toml
+    bun.lock
+    package.json
+    patches/tinycc/tccgen.c.patch
+    scripts/build/bun.ts
+    scripts/build/codegen.ts
+    scripts/build/config.ts
+    scripts/build/deps/cares.ts
+    scripts/build/deps/tinycc.ts
+    scripts/build/deps/webkit.ts
+    scripts/build/flags.ts
+    scripts/build/rust.ts
+    scripts/build/shims.ts
+    scripts/build/shims/ohos_compat_shim.c
+    scripts/build/workarounds.ts
+    scripts/ci-remap-server/bun.lock
+    src/bun_core/Global.rs
+    src/bun_core/env.rs
+    src/bun_core/env_var.rs
+    src/bun_core/util.rs
+    src/codegen/create-hash-table.ts
+    src/event_loop/SpawnSyncEventLoop.rs
+    src/install/Cargo.toml
+    src/install/PackageInstaller.rs
+    src/install/isolated_install/Installer.rs
+    src/install/lib.rs
+    src/install/lockfile/Package/Meta.rs
+    src/install/npm.rs
+    src/install_types/resolver_hooks.rs
+    src/io/ParentDeathWatchdog.rs
+    src/io/PipeReader.rs
+    src/io/PipeWriter.rs
+    src/io/lib.rs
+    src/io/pipes.rs
+    src/io/posix_event_loop.rs
+    src/js/node/child_process.ts
+    src/js/node/net.ts
+    src/js/node/os.ts
+    src/js/wasi-runner.js
+    src/jsc/bindings/BunProcess.cpp
+    src/jsc/bindings/bun-spawn.cpp
+    src/jsc/bindings/c-bindings.cpp
+    src/jsc/bindings/root.h
+    src/ohos_sign/Cargo.toml
+    src/ohos_sign/src/bin/ohos_selfsign.rs
+    src/ohos_sign/src/lib.rs
+    src/ohos_sign/src/selfsign.rs
+    src/options_types/compile_target.rs
+    src/resolver/lib.rs
+    src/runtime/Cargo.toml
+    src/runtime/api.rs
+    src/runtime/api/bun/Terminal.rs
+    src/runtime/api/bun/js_bun_spawn_bindings.rs
+    src/runtime/api/bun/ohos_ld_preload.rs
+    src/runtime/api/bun/spawn/stdio.rs
+    src/runtime/api/js_bundle_completion_task.rs
+    src/runtime/cli/Arguments.rs
+    src/runtime/cli/build_command.rs
+    src/runtime/cli/install_completions_command.rs
+    src/runtime/cli/package_manager_command.rs
+    src/runtime/cli/test/parallel/Coordinator.rs
+    src/runtime/ffi/ffi_body.rs
+    src/runtime/napi/libc_check.rs
+    src/runtime/napi/napi_body.rs
+    src/runtime/node/node_fs.rs
+    src/runtime/node/node_fs_watcher.rs
+    src/runtime/node/node_net_binding.rs
+    src/runtime/node/node_process.rs
+    src/runtime/node/path_watcher.rs
+    src/runtime/shell/IO.rs
+    src/runtime/shell/subproc.rs
+    src/runtime/socket/Listener.rs
+    src/runtime/socket/socket_body.rs
+    src/runtime/socket/system_certs.rs
+    src/runtime/webcore/FileReader.rs
+    src/spawn/process.rs
+    src/spawn_sys/lib.rs
+    src/spawn_sys/spawn_process.rs
+    src/standalone_graph/StandaloneModuleGraph.rs
+    src/sys/Cargo.toml
+    src/sys/file.rs
+    src/sys/lib.rs
+    src/sys/linux_syscall.rs
+    src/uws_sys/libuwsockets.cpp
   ].each do |p|
     patch do
       file "Patches/bun@1.4/#{p}.patch"
@@ -183,7 +183,6 @@ class BunAT14 < Formula
 
   def install
     llvm = Formula["llvm@21"]
-    sdk = llvm.deps.find { |dep| dep.name.start_with?("ohos-sdk@") }.to_formula.opt_prefix
     rust_home = buildpath/"rust"
     channel = File.read("rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
     odie "Update rust-nightly to #{channel}" if resource("rust-nightly").version.to_s != channel
@@ -221,9 +220,9 @@ class BunAT14 < Formula
     (buildpath/"build/ohos-icu/target").make_symlink formula_opt_prefix("icu4c@78")
 
     fetch_webkit
-    system "bun", "run", "build:release:local", "--canary=off",
-           "--os=ohos", "--arch=aarch64",
-           "--ohos-sdk-root=#{sdk}", "--ohos-sysroot=#{sdk}/native/sysroot"
+    # The ci-runner container is openharmony userspace: the build detects
+    # abi=ohos natively (no cross sysroot involved).
+    system "bun", "run", "build:release:local", "--canary=off"
 
     bin.install "build/release-local/bun"
     bin.install_symlink "bun" => "bunx"

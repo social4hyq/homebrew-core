@@ -1,0 +1,110 @@
+name: autobump
+
+# Daily: open a bump-formula-pr for each allowlisted formula whose upstream
+# livecheck version is newer than what's packaged. Feeds the same pipeline
+# as human-authored PRs — pr-validate.yml gates it with ci-passed, a human
+# merges, publish-on-merge.yml publishes.
+#
+# ALLOWLIST is deliberately narrow and explicit: most formulae in this tap
+# have a custom structure (bun's rN revision, pinned llvm@21, shims
+# with no upstream at all) that `bump-formula-pr`'s url/sha256 gsub can't
+# rewrite cleanly. claude-code's non-trivial install() (signing, bundled
+# shim deps) doesn't matter here — its formula-level url/version/sha256
+# shape (npmmirror tarball, version embedded in the URL) is a plain,
+# bump-formula-pr-compatible pattern; install() logic is version-independent
+# packaging that a version bump never touches. opencode
+# (formerly ohos-opencode; 2026-07-31: patches converted to inreplace, zero
+# .patch files) is autobumpable — url/version/sha256 are plain
+# bump-formula-pr-compatible edits. opencode@2
+# (formerly ohos-opencode@2)
+# is a git-revision formula (bun.rb pattern: url pins a branch tip via
+# `revision:`); bump-formula-pr can't rewrite the pin, so autobump.sh has a
+# custom bump path for it — since PR #613 it livechecks upstream git tags
+# `v2.*` (the npm dist-tag scheme died when upstream moved the v2 package
+# from @opencode-ai/cli to @opencode/cli in 2026-09), mirrors that version
+# into the formula, and pins the exact commit the release tag points at (see
+# the comment in the loop body). herdr and zellij were allowlisted here too
+# until their 2026-09-08 removal — both are now provided natively by
+# Harmonybrew's official core (see README's 已下线 table); their
+# autobump-shape notes went with them.
+# Only add a formula here after confirming `brew bump-formula-pr --dry-run`
+# produces a clean url/sha256 edit for it. version-check.yml keeps reporting
+# the full outdated list (allowlisted or not) for humans deciding what to
+# bump by hand or add here next.
+
+on:
+  schedule:
+    - cron: '0 23 * * *' # 07:00 CST daily
+  workflow_dispatch:
+    inputs:
+      formula:
+        description: 'Restrict to a single allowlisted formula (optional; must still be outdated per livecheck)'
+        required: false
+        type: string
+
+concurrency:
+  # schedule + manual dispatch can overlap; a second run mid-bump would race
+  # the same bump-<formula>-<version> branch push
+  group: autobump
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  # Keep in sync with automerge-autobump.yml's ALLOWLIST (branch-name gate).
+  # claude-code re-allowlisted (removed in PR #344 after the 2.1.229 incident,
+  # restored now): its wrapper extracts the CLI bundle and runs it on this
+  # tap's bun. claude-code.latest is the other track — it runs the official
+  # binary directly, self-signed and launched under ohos-compat-shim. Both run
+  # the binary end-to-end in brew test, so pr-validate gates every bump for real.
+  # Historical attribution fix: the 2.1.229-2.1.233 startup abort was later
+  # root-caused to stdout/stderr R_AARCH64_COPY relocs resolved to NULL by
+  # OHOS musl ld.so (fixed in ohos-compat-shim 3874ab4), not the
+  # regex-automata panic an earlier revision of this comment claimed.
+  ALLOWLIST: "opencode opencode@2 claude-code claude-code.latest"
+  IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
+  CONTAINER: ohos
+  TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+
+jobs:
+  autobump:
+    # scheduled workflows shouldn't run (and fail on missing secrets) in forks
+    if: github.repository == 'social4hyq/homebrew-core'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Start OHOS container
+        run: .github/scripts/setup-container.sh
+      - name: Open bump PRs
+        env:
+          # 2026-07-21: repo setting "Allow GitHub Actions to create and
+          # approve pull requests" (can_approve_pull_request_reviews) is now
+          # enabled, so the ephemeral Actions token can push the bump branch
+          # and open/label its own PR — no personal PAT needed here anymore
+          # (previously BOT_PUSH_TOKEN; spotted as a gap by comparing PR
+          # authorship against Homebrew/homebrew-core's BrewTestBot-authored
+          # PRs). BOT_PUSH_TOKEN stays reserved for pushing bottle commits
+          # directly to protected main (see publish.sh), which still needs
+          # the ruleset-bypass admin PAT.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 2026-09-16: opencode's `strategy :github_latest` livecheck fetches
+          # api.github.com via GitHub::API.open_rest, which only picks up
+          # HOMEBREW_GITHUB_API_TOKEN — without it the call is anonymous from
+          # the shared runner egress IP and GitHub's edge closes the connection
+          # (Ruby net/http raises Errno::EPIPE, livecheck reports "Broken
+          # pipe", whole --tap run exits 1 and no formula gets bumped; runs
+          # 35041842164/35057241554). Authenticated calls sidestep the
+          # shared-IP throttling. The other allowlisted formulas don't touch
+          # the GitHub API (npmmirror / downloads.claude.ai), which is why
+          # only opencode ever tripped this.
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ONLY_FORMULA: ${{ inputs.formula }}
+        run: .github/scripts/autobump.sh

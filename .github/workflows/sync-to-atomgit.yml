@@ -1,0 +1,47 @@
+name: sync-to-atomgit
+
+# Keep atomgit main mirrored to GitHub main. Every push to main (PR merges,
+# bottle write-back, anything) triggers a full-clone push to atomgit, so the
+# two remotes never silently diverge. Replaces the warning-only atomgit push
+# that used to live at the end of publish.sh (TODO M4).
+#
+# Hard-failing by design: if atomgit can't be fast-forwarded (network, token,
+# or an unexpected unique commit), this workflow goes red and is visible —
+# never a silent warning. No force-push: a diverged atomgit fails loudly for a
+# human rather than losing commits.
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  # Queue, never cancel: each queued run mirrors the then-current main, and
+  # GitHub collapses extra pending runs in the group, so rapid pushes can't
+  # race two parallel ff-pushes against atomgit.
+  group: sync-to-atomgit
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+permissions:
+  contents: read
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # full history: any lag can fast-forward
+      - name: Push main to atomgit
+        env:
+          ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
+        run: |
+          set -eo pipefail
+          git remote add atomgit "https://social4hyq:${ATOMGIT_TOKEN}@atomgit.com/social4hyq/homebrew-core.git"
+          # fast-forward or no-op; a diverged atomgit (unique commits) fails here on purpose
+          git push atomgit main
+          echo "✅ atomgit main synced to $(git rev-parse --short main)"

@@ -1,0 +1,170 @@
+name: automerge-autobump
+
+# Auto-merges autobump.yml's own PRs once pr-validate.yml's ci-passed label
+# lands, so the only formulae still needing a manual merge click are the
+# ones autobump doesn't touch. Adapted from Homebrew/homebrew-core's
+# automerge.yml — that one handles arbitrary community PRs with an
+# approval/label/mergeable state machine; this only ever looks at
+# bot-authored bump PRs, so the gate is just "both labels present and the
+# head branch matches the same allowlist autobump.yml uses" (keep the
+# BUMP_BRANCH_RE prefixes in sync with autobump.yml's ALLOWLIST — branch
+# names are `bump-<formula>-<version>`, matched by prefix since formula/
+# version can both contain '-').
+#
+# Two event triggers, for the same reason upstream's automerge.yml listens on
+# workflow_run rather than label events (first observed here on PR #42,
+# 2026-07-21): pr-validate applies ci-passed with the ephemeral
+# GITHUB_TOKEN, and events caused by GITHUB_TOKEN never trigger other
+# workflows (GitHub's recursion guard) — so the `labeled` trigger alone is
+# dead for the exact label it gates on. workflow_run on pr-validate's
+# completion is the trigger that actually fires in the normal flow; the
+# `labeled` trigger still works when a human (PAT actor) applies the label.
+#
+# required_approving_review_count is 0 on this repo's ruleset (solo
+# maintainer, no one else to approve), so `gh pr merge` succeeds without a
+# review step. Uses --merge (merge commit): this repo has squash disabled
+# repo-wide already (2026-07-20, after the #29 squash mishap), so this
+# can't accidentally squash even if that setting ever drifts.
+
+# The scheduled sweep is the safety net. It does two things the event-driven
+# path can't:
+#   1. merges fully-green bump PRs whose workflow_run event was dropped
+#      (first observed 2026-08-22..23: several ci-passed bump PRs sat open
+#      with zero automerge runs after their pr-validate completed);
+#   2. approves pr-validate runs stuck `action_required` on bump-* branches.
+#      Since ~2026-08-21 GitHub parks pull_request-triggered workflows on
+#      bot-authored PRs pending manual approval (workflow security hardening)
+#      — every autobump PR's attempt 1 froze there, needing a human re-run
+#      before ci-passed could ever land. The sweep approves those runs with
+#      BOT_PUSH_TOKEN so the pipeline stays unattended end-to-end.
+# Runs hourly (:35, just past the :30 boundary GitHub schedules cluster on);
+# idle sweeps are a 5-minute no-op.
+
+on:
+  pull_request:
+    types: [labeled]
+    branches: [main]
+  workflow_run:
+    workflows: [pr-validate]
+    types: [completed]
+  schedule:
+    - cron: '35 * * * *' # hourly; autobump itself runs 12:00 CST daily
+  workflow_dispatch: # manual sweep — same approve+merge pass as schedule
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  # workflow_run events carry no PR number; group per head branch instead,
+  # which is 1:1 with a bump PR in both event shapes.
+  group: automerge-autobump-${{ github.event.pull_request.head.ref || github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    # Coarse event-shape gate only — label/branch verification for both
+    # shapes happens in the step below against live PR state, since a
+    # workflow_run payload has no labels and a labeled payload may be stale
+    # by the time we run.
+    if: |
+      github.event_name == 'pull_request' && github.event.label.name == 'ci-passed' ||
+      github.event_name == 'workflow_run' &&
+        github.event.workflow_run.conclusion == 'success' &&
+        startsWith(github.event.workflow_run.head_branch, 'bump-') ||
+      github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify labels + allowlist and merge
+        env:
+          # BOT_PUSH_TOKEN, deliberately not GITHUB_TOKEN, for the merge
+          # itself: a GITHUB_TOKEN merge pushes main without triggering
+          # sync-to-atomgit.yml / publish-on-merge.yml (same recursion guard
+          # as above), silently breaking the atomgit mirror invariant.
+          # Upstream merges with a PAT for the identical reason.
+          GH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref || github.event.workflow_run.head_branch }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Keep in sync with autobump.yml's ALLOWLIST (claude-code /
+          # claude-code.latest, see the note there)
+          ALLOWLIST="opencode opencode@2 claude-code claude-code.latest"
+          BUMP_BRANCH_RE="^bump-($(echo "$ALLOWLIST" | tr ' ' '|'))-"
+
+          merge_pr() {
+            local ref="$1" PR LABELS
+            if ! grep -qE "$BUMP_BRANCH_RE" <<< "$ref"; then
+              echo "head branch $ref not in the autobump allowlist, skipping"
+              return 0
+            fi
+            PR=$(gh pr list --repo "$REPO" --head "$ref" --state open --json number --jq '.[0].number // empty')
+            if [ -z "$PR" ]; then
+              echo "no open PR for $ref (already merged or closed), skipping"
+              return 0
+            fi
+            LABELS=$(gh pr view "$PR" --repo "$REPO" --json labels --jq '[.labels[].name] | join(" ")')
+            for required in ci-passed bump-formula-pr; do
+              if ! grep -qw "$required" <<< "$LABELS"; then
+                echo "PR #$PR missing label '$required' (has: $LABELS), skipping"
+                return 0
+              fi
+            done
+            echo "merging PR #$PR ($ref)"
+            # --auto: enqueue the merge; GitHub performs it the moment the
+            # required checks go green. A direct merge races the approval
+            # above: the just-approved pr-validate run takes a few seconds to
+            # transition off action_required, and a merge attempt inside that
+            # window dies with "the base branch policy prohibits the merge"
+            # (observed 2026-08-23 05:57 sweep vs PR #412 — the identical
+            # 03:53 sweep won the same race against #406 by luck).
+            # Not fatal: one unmergeable PR must not kill the sweep loop
+            # before it reaches the other candidates. A transient BLOCKED
+            # state right after the approvals below self-heals: this sweep
+            # warns, the next hourly sweep enqueues cleanly.
+            gh pr merge "$PR" --merge --auto --repo "$REPO" ||
+              echo "::warning::merge enqueue failed for PR #$PR (mergeStateStatus=$(gh pr view "$PR" --repo "$REPO" --json mergeStateStatus --jq .mergeStateStatus)); next sweep retries"
+          }
+
+          if [ "$EVENT_NAME" = "schedule" ] || [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            # Approve pr-validate runs parked action_required on allowlisted
+            # bump-* branches (attempt 1 of a bot-authored PR never starts on
+            # its own since GitHub's hardening). Approving unblocks the
+            # pipeline NOW; the enqueued --auto merge above fires as soon as
+            # the run's required `label` job reports green.
+            # Branch filter is the SAME BUMP_BRANCH_RE allowlist as merge_pr:
+            # stale action_required runs on human branches (add-uv-formula,
+            # etc.) must stay parked — those are human review decisions.
+            # label-formula-prs runs park the same way on bot PRs; approving
+            # them keeps the PR check panel truthful (harmless if redundant).
+            for wf in pr-validate.yml label-formula-prs.yml; do
+              gh run list --repo "$REPO" --workflow "$wf" \
+                --status action_required --json databaseId,headBranch \
+                --jq '.[] | select(.headBranch | test("'"$BUMP_BRANCH_RE"'")) | .databaseId' |
+                while read -r run_id; do
+                  [ -n "$run_id" ] || continue
+                  echo "approving action_required $wf run $run_id"
+                  gh api --method POST "repos/$REPO/actions/runs/$run_id/approve" || \
+                    echo "::warning::approve failed for run $run_id (already approved?)"
+                done
+            done
+
+            # Let the approvals land before merging: GitHub takes a few
+            # seconds to flip a just-approved run off action_required, and
+            # during that window the required `label` check still reads
+            # failed, which makes even --auto enqueue refuse the PR
+            # (observed 2026-08-23 06:11 sweep vs PR #411 — enqueued fine
+            # 90s later once the state was CLEAN). 20s on an hourly 5-min
+            # job is nothing.
+            sleep 20
+
+            gh pr list --repo "$REPO" --state open --json headRefName --jq '.[].headRefName' |
+              while read -r ref; do merge_pr "$ref"; done
+          else
+            merge_pr "$HEAD_REF"
+          fi

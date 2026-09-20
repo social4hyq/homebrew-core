@@ -1,0 +1,60 @@
+name: daily-regression
+
+# Daily cascading dependency regression test (idea from Harmonybrew/ci's
+# auto_dailytest.py). PR/publish CI only builds+tests the formula that
+# actually changed in that PR — it never re-verifies formulae that merely
+# *depend* on it. A change to a base formula (llvm@21) can silently break
+# a downstream one (icu4c@78 → bun-webkit → bun → opencode) without
+# anyone noticing until a user hits it.
+#
+# Scans formulae touched in the last 24h, expands to their transitive
+# dependents (within this tap only — see daily-regression.sh header for why
+# `brew uses --recursive` itself isn't used), and sequentially
+# install+test's the union in the shared CI container. Failures land in
+# $GITHUB_STEP_SUMMARY and open/update a tracking issue (a red scheduled
+# run nobody watches is not a notification).
+
+on:
+  schedule:
+    - cron: '30 20 * * *' # 04:30 CST
+  workflow_dispatch:
+    inputs:
+      since:
+        description: 'Look back window for git log --since (default: 24 hours ago)'
+        required: false
+        type: string
+
+concurrency:
+  group: daily-regression
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
+  CONTAINER: ohos
+  TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+
+jobs:
+  regression:
+    # scheduled workflows shouldn't run (and fail on missing secrets) in forks
+    if: github.repository == 'social4hyq/homebrew-core'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Start OHOS container
+        run: .github/scripts/setup-container.sh
+      - name: Cascading regression test
+        env:
+          SINCE: ${{ inputs.since }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: .github/scripts/daily-regression.sh
