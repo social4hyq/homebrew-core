@@ -1,14 +1,22 @@
 class Gzip < Formula
   desc "Popular GNU data compression program"
   homepage "https://www.gnu.org/software/gzip/"
-  url "https://ftpmirror.gnu.org/gnu/gzip/gzip-1.14.tar.gz"
-  mirror "https://ftp.gnu.org/gnu/gzip/gzip-1.14.tar.gz"
-  sha256 "613d6ea44f1248d7370c7ccdeee0dd0017a09e6c39de894b3c6f03f981191c6b"
+  url "https://ftpmirror.gnu.org/gnu/gzip/gzip-1.15.tar.gz"
+  mirror "https://ftp.gnu.org/gnu/gzip/gzip-1.15.tar.gz"
+  sha256 "545886cf57fa88a65e967fbf705903d7fcb2567c82c7342493e82e8d7b1a210b"
   license "GPL-3.0-or-later"
-  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_ohos: "0a2bcfe104e9336ca915f07a7b1284e1727605b2acb38dcb4984d34d5a37d3cf"
+  end
+
+  # gzip 1.15 moved <signal.h> after "gzip.h", whose `head` macro then
+  # collides with `struct _aarch64_ctx head` in the aarch64 signal headers.
+  # Include <signal.h> first; matches upstream homebrew-core.
+  patch do
+    file "Patches/gzip/0001-aarch64-head-macro.patch"
+    type :unofficial
+    resolves "https://lists.gnu.org/archive/html/bug-gzip/2026-09/msg00031.html"
   end
 
   def install

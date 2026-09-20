@@ -1,0 +1,20 @@
+--- a/gzip.c
++++ b/gzip.c
+@@ -58,6 +58,9 @@
+ 
+ #include "tailor.h"
+ 
++/* Before gzip.h: #define head collides with aarch64 struct _aarch64_ctx. */
++#include <signal.h>
++
+ #include "gzip.h"
+ #include "lzw.h"
+ #include "revision.h"
+@@ -79,7 +82,6 @@
+ #include <inttypes.h>
+ #include <limits.h>
+ #include <locale.h>
+-#include <signal.h>
+ #include <stdcountof.h>
+ #include <stddef.h>
+ #include <stdlib.h>
