@@ -1,0 +1,28 @@
+--- a/make/hotspot/lib/CompileJvm.gmk
++++ b/make/hotspot/lib/CompileJvm.gmk
+@@ -177,6 +177,17 @@
+ ## Build libjvm
+ ################################################################################
+ 
++  # OpenHarmony's musl loader ignores a bare RTLD_GLOBAL at dlopen time; the
++  # library itself must carry DF_1_GLOBAL for its symbols to land in the
++  # global scope. libjli loads libjvm.so with RTLD_GLOBAL (see
++  # src/java.base/unix/native/libjli/java_md.c) and native libraries may rely
++  # on those symbols being globally visible, as they are on Linux.
++  # (LDFLAGS_<os> is not a SetupJdkLibrary parameter on this JDK version, and
++  # -z is not understood by the macOS linker, hence the explicit guard.)
++  ifeq ($(call isTargetOs, linux), true)
++    LIBJVM_EXTRA_LDFLAGS := -Wl$(COMMA)-z$(COMMA)global
++  endif
++
+ $(eval $(call SetupJdkLibrary, BUILD_LIBJVM, \
+     NAME := jvm, \
+     LINK_TYPE := C++, \
+@@ -234,6 +245,7 @@
+     LD_SET_ORIGIN := false, \
+     DEFAULT_LDFLAGS := false, \
+     LDFLAGS := $(JVM_LDFLAGS), \
++    APPEND_LDFLAGS := $(LIBJVM_EXTRA_LDFLAGS), \
+     LIBS := $(JVM_LIBS), \
+     OPTIMIZATION := $(JVM_OPTIMIZATION), \
+     LINK_TIME_OPTIMIZATION := $(JVM_LTO), \

@@ -1,0 +1,30 @@
+--- a/make/modules/java.desktop/lib/AwtLibraries.gmk
++++ b/make/modules/java.desktop/lib/AwtLibraries.gmk
+@@ -199,6 +199,19 @@
+     LIBAWT_HEADLESS_ONLY_EXPORTED := true
+   endif
+ 
++  # OpenHarmony's musl dynamic linker keeps a per-dlopen symbol scope: a shared
++  # library loaded with dlopen() is not visible to libraries dlopened later,
++  # even when RTLD_GLOBAL was requested. libawt.so loads libawt_headless.so at
++  # runtime and libfontmanager.so intentionally carries no DT_NEEDED entry for
++  # it (JDK-8196516), relying on ld.so's global scope to resolve AWTFreeFont.
++  # glibc is satisfied by RTLD_GLOBAL, musl/OHOS is not, so mark the toolkit
++  # library DF_1_GLOBAL to keep that cross-library symbol resolution working.
++  # (LDFLAGS_<os> is not a SetupJdkLibrary parameter on this JDK version, and
++  # -z is not understood by the macOS linker, hence the explicit guard.)
++  ifeq ($(call isTargetOs, linux), true)
++    LIBAWT_HEADLESS_EXTRA_LDFLAGS := -Wl$(COMMA)-z$(COMMA)global
++  endif
++
+   $(eval $(call SetupJdkLibrary, BUILD_LIBAWT_HEADLESS, \
+       NAME := awt_headless, \
+       EXTRA_SRC := $(LIBAWT_HEADLESS_EXTRA_SRC), \
+@@ -216,6 +229,7 @@
+       DISABLED_WARNINGS_clang_X11Renderer.c := unused-function, \
+       DISABLED_WARNINGS_clang_X11SurfaceData.c := unused-function, \
+       JDK_LIBS := libawt java.base:libjava, \
++      APPEND_LDFLAGS := $(LIBAWT_HEADLESS_EXTRA_LDFLAGS), \
+       LIBS_linux := $(LIBDL) $(LIBM), \
+       STATIC_LIB_EXCLUDE_OBJS := $(LIBAWT_HEADLESS_STATIC_EXCLUDE_OBJS), \
+   ))
