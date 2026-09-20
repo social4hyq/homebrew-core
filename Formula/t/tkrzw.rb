@@ -1,8 +1,8 @@
 class Tkrzw < Formula
   desc "Set of implementations of DBM"
   homepage "https://dbmx.net/tkrzw/"
-  url "https://dbmx.net/tkrzw/pkg/tkrzw-1.0.33.tar.gz"
-  sha256 "faa41fdad6a27ae11fbf29d185c142761ea8bad4ae89382d16ccc3f2fae0e39c"
+  url "https://dbmx.net/tkrzw/pkg/tkrzw-1.0.34.tar.gz"
+  sha256 "afe894c1532feda086b7a94672f412f801758cbe81431fd3c88514fa27ebe369"
   license "Apache-2.0"
 
   livecheck do
