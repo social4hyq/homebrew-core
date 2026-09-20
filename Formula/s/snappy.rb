@@ -8,7 +8,7 @@ class Snappy < Formula
   head "https://github.com/google/snappy.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "98d83d7065e3121f1f493bdb912b64a458be26677ad8523b09543e27fbc3a889"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bfe815a5b16d29685010647685b79255b60c99e108f94f5c35238eb07dfcbd59"
   end
 
   depends_on "cmake" => :build
