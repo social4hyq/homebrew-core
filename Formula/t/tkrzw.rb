@@ -11,7 +11,7 @@ class Tkrzw < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f170432575ded546b9595124d961ea84296bb73eb5cf9f995c6cd5bfb1ecac64"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d961af1d669a144d4e89de423d841c600d475c03298928abe394f52932c8aa25"
   end
 
   depends_on "lz4"
