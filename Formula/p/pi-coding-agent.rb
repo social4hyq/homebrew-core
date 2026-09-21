@@ -6,7 +6,7 @@ class PiCodingAgent < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a0d37eeead4a854eb72dce9abd95a2602cadb3d2387ac24ff9b81ed41224352"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "edd6e88b0f27b05fdb18a88f74028b4ea94ee0740e8359850619fffa847d53e2"
   end
 
   depends_on "node"
