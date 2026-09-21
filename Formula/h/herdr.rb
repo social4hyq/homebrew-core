@@ -4,7 +4,7 @@ class Herdr < Formula
   url "https://github.com/herdrdev/herdr/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "1e83bff4b05834ed8281e16f1680e8f3e58375a94b2e3f2b3d021e28e293ef9a"
   license "Apache-2.0"
-  revision 1
+  revision 2
   head "https://github.com/herdrdev/herdr.git", branch: "master"
 
   livecheck do
@@ -39,6 +39,12 @@ class Herdr < Formula
   # Same procfs gap in the agent start/prompt gates, which look it up themselves.
   patch do
     file "Patches/herdr/agent-gate-tty-foreground.patch"
+  end
+
+  # OHOS also never delivers SIGWINCH on PTY resize, so pane apps never learn
+  # about layout changes; notify the foreground group explicitly after resize.
+  patch do
+    file "Patches/herdr/pty-resize-notify-winch.patch"
   end
 
   def install
