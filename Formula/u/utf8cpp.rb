@@ -8,7 +8,7 @@ class Utf8cpp < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f5cce1f7e4099e4348b1ac64500ff1cc869707b2eff509bdd6d1be6d13c6f8a3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "39046fdae5e047a85b06fb731c738889cc0658f4d2d7050ff5de9a226fc6b26f"
   end
 
   depends_on "cmake" => [:build, :test]
