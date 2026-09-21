@@ -7,7 +7,7 @@ class PfetchRs < Formula
   head "https://github.com/Gobidev/pfetch-rs.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f527beea35ededf7bfde6c0235fdfc069af054848ed082fd90d2883e6a7493cd"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ee28b015404854a16eb4802fd23c541ecefb9b8b0cfa99b6ec637ffae10fc01"
   end
 
   depends_on "rust" => :build
