@@ -1,5 +1,4 @@
 class Zcode < Formula
-  require "json"
   require "yaml"
 
   desc "AI coding workbench: terminal agent with TUI and web IDE"
@@ -22,8 +21,6 @@ class Zcode < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "6efca1713a026ad3f20acd1aed8f6657e0f243a2331e5e12f923d685ba61c5fa"
   end
 
-  # OHOS delta: bun-default runtime, pnpm overrides to community OHOS
-  # builds, SEA patches (Patches/zcode/), turbo-free build steps.
   depends_on "bun"
   depends_on "node" # build tooling plus the ZCODE_RUNTIME=node fallback
 
@@ -60,8 +57,6 @@ class Zcode < Formula
 
     # OHOS: community ports for platform binaries the toolchain cannot
     # build here, and build-time natives that publish openharmony packages.
-    # @opentui/core must follow @mbears/opentui-core or the TUI loads two
-    # physical renderer copies and the reconciler's instanceof checks fail.
     pkg_json = JSON.parse(File.read("package.json"))
     pkg_json["pnpm"]["overrides"] = {
       "node-pty"              => "npm:@ohos-ports/node-pty@1.1.0-beta.4",
