@@ -1,5 +1,10 @@
 class Zcode < Formula
   require "json"
+
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.14.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "edbfc63f6cf62f7cd3a0ad48978431de83a4b7e4dc9d5f3e12851bd77366256a"
+  end
   require "yaml"
 
   desc "AI coding workbench: terminal agent with TUI and web IDE"
