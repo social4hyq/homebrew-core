@@ -16,14 +16,18 @@ class BunAT14 < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
+  # Batch-2 runtime fixes (port-adoption-analysis-20260920): the artifact
+  # changes with the same upstream version, so installed users must be
+  # offered the rebuild.
+  revision 1
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r8"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "18d1719ed4cd837230276fed1d07deaddf9f67086d867c6bf95909b92d260cf6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3703d2ea0aaafffafdf3e81dd5097ae837506182e57005c0267ae34480e2b1bf"
   end
 
   depends_on "cmake" => :build
@@ -54,15 +58,17 @@ class BunAT14 < Formula
     Cargo.toml
     bun.lock
     package.json
+    packages/bun-usockets/src/eventing/epoll_kqueue.c
     patches/tinycc/tccgen.c.patch
+    patches/webkit/suspend-resume.patch
     patches/zstd/ohos-qsort-r.patch
     scripts/build/bun.ts
     scripts/build/codegen.ts
     scripts/build/config.ts
     scripts/build/deps/cares.ts
     scripts/build/deps/tinycc.ts
-    scripts/build/deps/zstd.ts
     scripts/build/deps/webkit.ts
+    scripts/build/deps/zstd.ts
     scripts/build/flags.ts
     scripts/build/rust.ts
     scripts/build/shims.ts
@@ -96,6 +102,7 @@ class BunAT14 < Formula
     src/jsc/bindings/bun-spawn.cpp
     src/jsc/bindings/c-bindings.cpp
     src/jsc/bindings/root.h
+    src/jsc/bindings/wtf-bindings.cpp
     src/ohos_sign/Cargo.toml
     src/ohos_sign/src/bin/ohos_selfsign.rs
     src/ohos_sign/src/lib.rs
@@ -123,6 +130,8 @@ class BunAT14 < Formula
     src/runtime/node/node_process.rs
     src/runtime/node/path_watcher.rs
     src/runtime/shell/IO.rs
+    src/runtime/shell/builtin/echo.rs
+    src/runtime/shell/builtin/which.rs
     src/runtime/shell/subproc.rs
     src/runtime/socket/Listener.rs
     src/runtime/socket/socket_body.rs
@@ -178,8 +187,11 @@ class BunAT14 < Formula
       # The suspend patch lives in this formula's patch directory
       # (Patches/bun@1.4/); applied here rather than via a DSL patch
       # because vendor/WebKit only exists after the clone above.
-      suspend_patch = tap.path/"Patches/bun@1.4/webkit-suspend-resume.patch"
-      odie "WebKit suspend patch missing from tap: #{suspend_patch}" unless suspend_patch.file?
+      # The inner patch is materialized to the buildpath by the %w patch
+      # loop above (the exporter ships it double-suffixed; the DSL unwraps
+      # at staging), so it can be applied to the clone directly.
+      suspend_patch = buildpath/"patches/webkit/suspend-resume.patch"
+      odie "WebKit suspend patch missing: #{suspend_patch}" unless suspend_patch.file?
       system "git", "apply", "--check", suspend_patch
       system "git", "apply", suspend_patch
       odie "WebKit suspend fix missing" unless File.read("Source/WTF/wtf/Threading.h").include?("m_suspendRequested")
