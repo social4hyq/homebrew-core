@@ -8,7 +8,7 @@ class Ghr < Formula
   head "https://github.com/tcnksm/ghr.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ef875a83adf9d3669ca3943258fd79c781f3dd30e3bba089b724e46d0c4f6451"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e9c78f9bc1be0293b206bb6673aab73c2bac0144e4bfc35cf1e6848cfe31319"
   end
 
   depends_on "go" => :build
