@@ -17,9 +17,9 @@ class Zcode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.14.0-r2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.14.0-r3"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a42d9577c3f12cb7a83cf1077e6c99b9c25f7a73ba819034001473b202bc0c2b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6efca1713a026ad3f20acd1aed8f6657e0f243a2331e5e12f923d685ba61c5fa"
   end
 
   # OHOS delta: bun-default runtime, pnpm overrides to community OHOS
