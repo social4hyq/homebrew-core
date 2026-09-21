@@ -1,8 +1,8 @@
 class OpencodeAT2 < Formula
   desc "AI coding agent, built for the terminal"
   homepage "https://opencode.ai"
-  url "https://github.com/anomalyco/opencode.git", revision: "b8cedc1a7a5e2916bbb65dc1d4b620729c261638"
-  version "2.0.10"
+  url "https://github.com/anomalyco/opencode.git", revision: "9eb6902aaf3c35ce985b67c605a775992249066b"
+  version "2.0.11"
   license "MIT"
   version_scheme 1
 
@@ -12,8 +12,8 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.10-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "111a3aa6e037035c946840986f320a227b72388745b54cb15147d9a4114eb42c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.11-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "94f919b475bff6b192d30601d2e192d288f22965ba62a92cddda1eed1ad6b971"
   end
 
   depends_on "bun" => :build
