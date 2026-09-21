@@ -25,6 +25,11 @@ class BunAT14 < Formula
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3703d2ea0aaafffafdf3e81dd5097ae837506182e57005c0267ae34480e2b1bf"
+  end
+
   depends_on "cmake" => :build
   depends_on "gperf" => :build
   depends_on "icu4c@78" => :build
