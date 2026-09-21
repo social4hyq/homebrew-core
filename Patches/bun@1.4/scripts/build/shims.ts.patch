@@ -1,5 +1,5 @@
 diff --git a/scripts/build/shims.ts b/scripts/build/shims.ts
-index a2b28b029e..54fc906394 100644
+index a2b28b029e..91e5d11cba 100644
 --- a/scripts/build/shims.ts
 +++ b/scripts/build/shims.ts
 @@ -14,7 +14,7 @@ import { spawnSync } from "node:child_process";
@@ -32,7 +32,7 @@ index a2b28b029e..54fc906394 100644
  /**
   * Register shim compile rules. Call once from rules.ts alongside the
   * other registerXxxRules() calls.
-@@ -175,6 +189,31 @@ export function registerShimRules(n: Ninja, cfg: Config): void {
+@@ -175,6 +189,36 @@ export function registerShimRules(n: Ninja, cfg: Config): void {
        restat: true,
      });
    }
@@ -57,14 +57,19 @@ index a2b28b029e..54fc906394 100644
 +      // symbols must be default-visible in the dynamic symbol table for
 +      // the loader to prefer them over libc's, unlike every other TU in
 +      // this build where hidden visibility is the right default.
-+      command: `${q(cfg.cc)} $flags -fvisibility=default -shared -fPIC -O2 $in -o $out -ldl`,
++      // -gz=none AFTER $flags overrides the global -gz=zstd: this edge
++      // compiles AND links in one clang call, and the driver forwards -gz
++      // to lld as --compress-debug-sections, which the default lld rejects
++      // (no zstd, and no zlib fallback) -- the main link never hits this
++      // because it pins --ld-path to the zlib-capable lld@21.
++      command: `${q(cfg.cc)} $flags -gz=none -fvisibility=default -shared -fPIC -O2 $in -o $out -ldl`,
 +      description: "shim-so $out",
 +    });
 +  }
  }
  
  /**
-@@ -244,5 +283,34 @@ export function emitShims(n: Ninja, cfg: Config): ShimLinkOpts {
+@@ -244,5 +288,34 @@ export function emitShims(n: Ninja, cfg: Config): ShimLinkOpts {
      ldflags.push(`-B${crtDir}`);
    }
  

@@ -1,5 +1,5 @@
 diff --git a/src/sys/lib.rs b/src/sys/lib.rs
-index 21af7b0f9b..170292c29d 100644
+index 21af7b0f9b..ad9d20785c 100644
 --- a/src/sys/lib.rs
 +++ b/src/sys/lib.rs
 @@ -1933,8 +1933,14 @@ mod posix_impl {
@@ -90,7 +90,7 @@ index 21af7b0f9b..170292c29d 100644
                      SUPPORTS_STATX_ON_LINUX.store(false, Ordering::Relaxed);
                      return statx_fallback(fd, path, flags);
                  }
-@@ -2640,6 +2661,46 @@ mod posix_impl {
+@@ -2640,6 +2661,57 @@ mod posix_impl {
          Ok(unsafe { libc::strlen(p) })
      }
  
@@ -124,20 +124,31 @@ index 21af7b0f9b..170292c29d 100644
 +                proc_buf.len() - 1,
 +            )
 +        };
++        // `readlink` does not NUL-terminate when the target fills the buffer.
++        // A truncated path would stat() as ENOENT and be mistaken for a
++        // deleted cwd (the bunfig-errors >PATH_MAX cwd case), so a full buffer
++        // is inconclusive and reported as "not deleted".
++        if n < 0 {
++            return last_errno() == libc::ENOENT;
++        }
++        let n = n as usize;
++        if n >= proc_buf.len() - 1 {
++            return false;
++        }
 +        if n > 0 {
-+            proc_buf[n as usize] = 0;
++            proc_buf[n] = 0;
 +            let mut st: libc::stat = unsafe { core::mem::zeroed() };
 +            // SAFETY: proc_buf is NUL-terminated by the assignment above.
 +            return unsafe { libc::stat(proc_buf.as_ptr().cast(), &mut st) } < 0
 +                && last_errno() == libc::ENOENT;
 +        }
-+        n < 0 && last_errno() == libc::ENOENT
++        false
 +    }
 +
      // ── link/perm/time/access group ──
      pub fn linkat(src_dir: impl AsFd, src: &ZStr, dest_dir: impl AsFd, dest: &ZStr) -> Maybe<()> {
          let src_dir = src_dir.as_fd();
-@@ -5199,16 +5260,17 @@ pub mod linux {
+@@ -5199,16 +5271,17 @@ pub mod linux {
      pub use libc::epoll_event;
      pub use libc::pollfd;
  
@@ -164,7 +175,7 @@ index 21af7b0f9b..170292c29d 100644
      type time_t = libc::time_t;
  
      /// kernel-shaped timespec (`sec`/`nsec`, no `tv_` prefix).
-@@ -6010,12 +6072,33 @@ pub mod RTLD {
+@@ -6010,12 +6083,33 @@ pub mod RTLD {
  
  /// `dlopen(filename, flags)`. Windows → `LoadLibraryExW` (UTF-8 → UTF-16).
  pub fn dlopen(filename: &ZStr, flags: i32) -> Option<*mut c_void> {
@@ -199,7 +210,7 @@ index 21af7b0f9b..170292c29d 100644
      #[cfg(windows)]
      {
          let _ = flags;
-@@ -7310,6 +7393,19 @@ pub fn read_nonblocking(fd: Fd, buf: &mut [u8]) -> Maybe<usize> {
+@@ -7310,6 +7404,19 @@ pub fn read_nonblocking(fd: Fd, buf: &mut [u8]) -> Maybe<usize> {
                          _ => Err(Error::retry().with_fd(fd)),
                      };
                  }
@@ -219,7 +230,7 @@ index 21af7b0f9b..170292c29d 100644
                  libc::EINTR => continue,
                  _ => return Err(Error::from_code_int(e, Tag::read).with_fd(fd)),
              }
-@@ -7343,6 +7439,20 @@ pub fn write_nonblocking(fd: Fd, buf: &[u8]) -> Maybe<usize> {
+@@ -7343,6 +7450,20 @@ pub fn write_nonblocking(fd: Fd, buf: &[u8]) -> Maybe<usize> {
                          }
                      };
                  }

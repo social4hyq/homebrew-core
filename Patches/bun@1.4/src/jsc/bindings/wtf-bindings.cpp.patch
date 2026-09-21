@@ -1,0 +1,17 @@
+diff --git a/src/jsc/bindings/wtf-bindings.cpp b/src/jsc/bindings/wtf-bindings.cpp
+index 4c6344fe00..f5b5d59532 100644
+--- a/src/jsc/bindings/wtf-bindings.cpp
++++ b/src/jsc/bindings/wtf-bindings.cpp
+@@ -193,6 +193,12 @@ static int ttySetMode(int fd, int mode, BunTTYState& state, int action)
+     }
+ 
+     rc = uv__tcsetattr(fd, action, &tmp);
++#if defined(__OHOS__)
++    // OHOS refuses tcsetattr with drain/flush on a PTY *master* fd (TCSADRAIN and TCSAFLUSH fail EACCES, TCSANOW on the same fd succeeds), so fall back per-call — without this every Bun.Terminal setRawMode() throws on-device.
++    if (rc == EACCES) {
++        rc = uv__tcsetattr(fd, TCSANOW, &tmp);
++    }
++#endif
+     if (rc == 0) {
+         state.mode = mode;
+     }

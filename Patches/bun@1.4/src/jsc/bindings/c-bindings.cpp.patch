@@ -1,5 +1,5 @@
 diff --git a/src/jsc/bindings/c-bindings.cpp b/src/jsc/bindings/c-bindings.cpp
-index 481ccddda1..cecebf40e9 100644
+index 481ccddda1..603da1255e 100644
 --- a/src/jsc/bindings/c-bindings.cpp
 +++ b/src/jsc/bindings/c-bindings.cpp
 @@ -16,6 +16,7 @@
@@ -10,8 +10,57 @@ index 481ccddda1..cecebf40e9 100644
  #include <termios.h>
  #include <sys/ioctl.h>
  #include <sys/socket.h>
-@@ -368,6 +369,18 @@ extern "C" void on_before_reload_process_posix()
- // after `threads_in_execve` and read before it.
+@@ -62,21 +63,30 @@ extern "C" int32_t set_process_priority(int32_t pid, int32_t priority)
+ #if !OS(WINDOWS)
+ extern "C" bool is_executable_file(const char* path)
+ {
+-#if defined(O_EXEC)
+-    // O_EXEC is macOS specific
++#if defined(__OHOS__)
++    // OHOS: open(O_EXEC) skips the x-permission-bit check (kernel bug), so use access(X_OK); access passes directories too (x = traversal), so require S_ISREG first.
++    struct stat st;
++    if (stat(path, &st) != 0)
++        return false;
++    if (!S_ISREG(st.st_mode))
++        return false;
++    return access(path, X_OK) == 0;
++#elif defined(O_EXEC)
++    // macOS: O_EXEC correctly checks x permission.
+     int fd = open(path, O_EXEC | O_CLOEXEC | O_NONBLOCK | O_NOCTTY, 0);
+     if (fd < 0)
+         return false;
+     close(fd);
+     return true;
+-#endif // defined(O_EXEC)
+-
++#else
++    // Linux (no O_EXEC): stat + x-bit check; reject non-regular files like the OHOS branch above (directories carry an x bit).
+     struct stat st;
+     if (stat(path, &st) != 0)
+         return false;
+-
+-    // regular file and user can execute
+-    return S_ISREG(st.st_mode) && (st.st_mode & S_IXUSR);
++    if (!S_ISREG(st.st_mode))
++        return false;
++    return (st.st_mode & S_IXUSR) != 0;
++#endif
+ }
+ #endif
+ 
+@@ -358,20 +368,32 @@ extern "C" void on_before_reload_process_posix()
+ }
+ 
+ #if OS(LINUX)
+-// Linked in with -Wl,--wrap=execve -Wl,--wrap=pthread_create (scripts/build/flags.ts).
+ // While a thread is inside execve(2), until de_thread() has killed the other threads or the
+ // exec has failed, the kernel fails every clone(CLONE_FS) in the process with EAGAIN
+ // (fs/exec.c check_unsafe_exec, kernel/fork.c copy_fs). WTF::Thread::create aborts on a
+ // failed pthread_create, which killed --watch reloads. A pthread_create EAGAIN that overlaps
+ // an exec of this process is retried instead. `execve_generation` counts execs ever started
+ // so one that began and ended inside a single pthread_create is still seen; it is bumped
+-// after `threads_in_execve` and read before it.
++// after `threads_in_execve` and read before it. Shared by both platform variants below; only how the real execve/pthread_create get called differs.
  static std::atomic<int> threads_in_execve { 0 };
  static std::atomic<unsigned> execve_generation { 0 };
 +// Two-phase (register-then-verify) mutual exclusion between clone() and the
@@ -29,7 +78,12 @@ index 481ccddda1..cecebf40e9 100644
  // The clone(CLONE_VM) child of posix_spawn_bun execs in this address space and never returns
  // to undo a count, so only the pid recorded in bun_initialize_process counts its execs.
  static pid_t execve_counting_pid = 0;
-@@ -379,7 +392,18 @@ extern "C" int __wrap_execve(const char* path, char* const argv[], char* const e
+ 
++// Linked in with -Wl,--wrap=execve -Wl,--wrap=pthread_create (scripts/build/flags.ts).
+ extern "C" int __real_execve(const char*, char* const[], char* const[]);
+ extern "C" int __real_pthread_create(pthread_t*, const pthread_attr_t*, void* (*)(void*), void*);
+ 
+@@ -379,7 +401,18 @@ extern "C" int __wrap_execve(const char* path, char* const argv[], char* const e
  {
      if (getpid() != execve_counting_pid)
          return __real_execve(path, argv, envp);
@@ -49,7 +103,7 @@ index 481ccddda1..cecebf40e9 100644
      execve_generation.fetch_add(1, std::memory_order_seq_cst);
      int rc = __real_execve(path, argv, envp);
      // Only reached when execve failed and the old image keeps running.
-@@ -390,19 +414,31 @@ extern "C" int __wrap_execve(const char* path, char* const argv[], char* const e
+@@ -390,19 +423,31 @@ extern "C" int __wrap_execve(const char* path, char* const argv[], char* const e
  // The attempt bound keeps a real limit, hit while an exec never completes, from looping forever.
  extern "C" int __wrap_pthread_create(pthread_t* thread, const pthread_attr_t* attr, void* (*start_routine)(void*), void* arg)
  {
@@ -84,3 +138,15 @@ index 481ccddda1..cecebf40e9 100644
  }
  #endif // OS(LINUX)
  
+@@ -1132,7 +1177,11 @@ extern "C" void Bun__unregisterSignalsForForwarding()
+ #if OS(LINUX) || OS(DARWIN) || OS(FREEBSD)
+ #include <paths.h>
+ 
++#if defined(__OHOS__)
++extern "C" const char* BUN_DEFAULT_PATH_FOR_SPAWN = "/usr/bin:/bin:/system/bin";
++#else
+ extern "C" const char* BUN_DEFAULT_PATH_FOR_SPAWN = _PATH_DEFPATH;
++#endif
+ #elif OS(WINDOWS)
+ extern "C" const char* BUN_DEFAULT_PATH_FOR_SPAWN = "C:\\Windows\\System32;C:\\Windows;";
+ #else
