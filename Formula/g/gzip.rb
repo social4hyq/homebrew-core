@@ -7,7 +7,7 @@ class Gzip < Formula
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a2bcfe104e9336ca915f07a7b1284e1727605b2acb38dcb4984d34d5a37d3cf"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "33cf059d5ee476e7fff81fd079b1e946f30f28c697e9f1136f87617dd0be7e50"
   end
 
   # gzip 1.15 moved <signal.h> after "gzip.h", whose `head` macro then
