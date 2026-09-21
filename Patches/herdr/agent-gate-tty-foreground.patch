@@ -1,0 +1,75 @@
+# OHOS procfs reports no tpgid and no task children, so foreground_job() misses every
+# pane. The two gates behind `agent start` and `agent prompt`/`send-keys` resolve the
+# foreground job themselves, so route them through the PTY master's group as well.
+diff --git a/src/app/agents.rs b/src/app/agents.rs
+index 5033505..070de71 100644
+--- a/src/app/agents.rs
++++ b/src/app/agents.rs
+@@ -420,7 +420,20 @@ fn available_shell_name(runtime: &crate::terminal::TerminalRuntime) -> Option<St
+     if runtime.child_pid().is_none() {
+         return Some("sh".into());
+     }
+-    crate::platform::available_pane_shell(runtime.child_pid()?)
++    let child_pid = runtime.child_pid()?;
++    if let Some(shell) = crate::platform::available_pane_shell(child_pid) {
++        return Some(shell);
++    }
++    crate::platform::available_pane_shell_from_job(child_pid, foreground_job(runtime)?)
++}
++
++fn foreground_job(
++    runtime: &crate::terminal::TerminalRuntime,
++) -> Option<crate::platform::ForegroundJob> {
++    let child_pid = runtime.child_pid()?;
++    crate::detect::foreground_job(child_pid).or_else(|| {
++        crate::detect::foreground_group_leader_job(runtime.pty_foreground_process_group_id()?)
++    })
+ }
+ 
+ pub(super) fn runtime_hosts_agent(
+@@ -435,7 +448,7 @@ pub(super) fn runtime_hosts_agent(
+ }
+ 
+ fn live_runtime_agent(runtime: &crate::terminal::TerminalRuntime) -> Option<crate::detect::Agent> {
+-    let job = crate::detect::foreground_job(runtime.child_pid()?)?;
++    let job = foreground_job(runtime)?;
+     crate::detect::identify_agent_in_job(&job)
+         .map(|(agent, _)| agent)
+         .or_else(|| {
+diff --git a/src/pane.rs b/src/pane.rs
+index aa6acb5..5fe2ca9 100644
+--- a/src/pane.rs
++++ b/src/pane.rs
+@@ -3268,6 +3268,17 @@ impl PaneRuntime {
+         (pid > 0).then_some(pid)
+     }
+ 
++    pub(crate) fn pty_foreground_process_group_id(&self) -> Option<u32> {
++        #[cfg(unix)]
++        {
++            self.io.foreground_process_group_id()
++        }
++        #[cfg(not(unix))]
++        {
++            None
++        }
++    }
++
+     pub fn follow_cwd(&self) -> Option<std::path::PathBuf> {
+         #[cfg(unix)]
+         {
+diff --git a/src/terminal/runtime.rs b/src/terminal/runtime.rs
+index 57d45b9..edede8a 100644
+--- a/src/terminal/runtime.rs
++++ b/src/terminal/runtime.rs
+@@ -561,6 +561,10 @@ impl TerminalRuntime {
+         self.0.child_pid()
+     }
+ 
++    pub(crate) fn pty_foreground_process_group_id(&self) -> Option<u32> {
++        self.0.pty_foreground_process_group_id()
++    }
++
+     pub(crate) fn current_size(&self) -> (u16, u16) {
+         self.0.current_size()
+     }
