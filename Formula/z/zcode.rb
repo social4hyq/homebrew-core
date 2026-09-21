@@ -1,5 +1,4 @@
 class Zcode < Formula
-  require "json"
   require "yaml"
 
   desc "AI coding workbench: terminal agent with TUI and web IDE"
@@ -9,6 +8,7 @@ class Zcode < Formula
       revision: "872ad960de7ec172591f7e1952f7849229f94521"
   version "3.14.0"
   license "Apache-2.0"
+  revision 1
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
     strategy :json do |json|
@@ -17,22 +17,15 @@ class Zcode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.14.0-r3"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6efca1713a026ad3f20acd1aed8f6657e0f243a2331e5e12f923d685ba61c5fa"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.14.0-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "22f47f05a16fbc7c183ecf804ca9df5287b8e54826deab73105f0ede890d25d6"
   end
 
-  # OHOS delta: bun-default runtime, pnpm overrides to community OHOS
-  # builds, SEA patches (Patches/zcode/), turbo-free build steps.
-  depends_on "bun"
-  depends_on "node" # build tooling plus the ZCODE_RUNTIME=node fallback
-
-  # The repo pins pnpm 10.33.2 (packageManager); brew's pnpm 12 would fetch
-  # an @pnpm/exe build that does not exist for openharmony.
-  resource "pnpm" do
-    url "https://registry.npmjs.org/pnpm/-/pnpm-10.33.2.tgz"
-    sha256 "7a7bcf13d7f6ceb3946c03978373d99be9fde1cafc3000bdfed4c4f791167610"
-  end
+  # pnpm 12 acts as itself with delegation to the packageManager pin
+  # disabled (no openharmony @pnpm/exe exists).
+  depends_on "node" => :build
+  depends_on "pnpm" => :build
+  depends_on "bun" # pnpm/tsc/vite toolchain
 
   %w[
     0001-ohos-sea-targets.patch
@@ -46,22 +39,8 @@ class Zcode < Formula
   deny_network_access! :test
 
   def install
-    # The CI image's toybox patch fails hunks silently (exit 0), so verify
-    # every patched file carries its marker before building anything.
-    {
-      "apps/zcode-cli/packages/cli/scripts/sea-targets.mjs"       => 'Object.freeze(["openharmony-arm64"])',
-      "apps/zcode-cli/packages/cli/scripts/sea-tui-assets.mjs"    => "@opentui/core-openharmony-",
-      "apps/zcode-cli/packages/cli/src/sea-playwright-runtime.ts" => "importSea",
-      "apps/zcode-cli/packages/cli/src/tui-runtime-loader.ts"     => "importSea",
-      "apps/zcode-cli/packages/core/src/environment.ts"           => "getBuiltinModule",
-    }.each do |file, marker|
-      odie "patch marker missing in #{file}: #{marker}" unless File.read(file).include?(marker)
-    end
-
     # OHOS: community ports for platform binaries the toolchain cannot
     # build here, and build-time natives that publish openharmony packages.
-    # @opentui/core must follow @mbears/opentui-core or the TUI loads two
-    # physical renderer copies and the reconciler's instanceof checks fail.
     pkg_json = JSON.parse(File.read("package.json"))
     pkg_json["pnpm"]["overrides"] = {
       "node-pty"              => "npm:@ohos-ports/node-pty@1.1.0-beta.4",
@@ -81,14 +60,9 @@ class Zcode < Formula
     ws["allowBuilds"].delete("koffi")
     File.write("pnpm-workspace.yaml", YAML.dump(ws))
 
-    resource("pnpm").stage buildpath/"pnpm-pkg"
-    (buildpath/"pnpm-bin").mkpath
-    (buildpath/"pnpm-bin/pnpm").write <<~SH
-      #!/bin/sh
-      exec node "#{buildpath}/pnpm-pkg/bin/pnpm.cjs" "$@"
-    SH
-    chmod 0755, buildpath/"pnpm-bin/pnpm"
-    ENV.prepend_path "PATH", buildpath/"pnpm-bin"
+    ENV["NPM_CONFIG_MANAGE_PACKAGE_MANAGER_VERSIONS"] = "false"
+    ENV["npm_config_manage_package_manager_versions"] = "false"
+    ENV.prepend_path "PATH", formula_opt_bin("pnpm")
     ENV["ELECTRON_SKIP_BINARY_DOWNLOAD"] = "1"
 
     # Overrides re-resolve the lockfile; CI would freeze the stale one.
@@ -99,21 +73,16 @@ class Zcode < Formula
     esbuild_shim = buildpath/"node_modules/@esbuild/openharmony-arm64/bin/esbuild"
     if esbuild_shim.exist? && esbuild_shim.read.exclude?("SyncWriteStream")
       inreplace esbuild_shim,
-                "  if (fd === process.stdout.fd) return process.stdout.write(buf), buf.length;\n  " \
-                "if (fd === process.stderr.fd) return process.stderr.write(buf), buf.length;",
-                "  if (fd === process.stdout.fd && process.stdout.constructor.name !== \"SyncWriteStream\") " \
-                "return process.stdout.write(buf), buf.length;\n  " \
-                "if (fd === process.stderr.fd && process.stderr.constructor.name !== \"SyncWriteStream\") " \
-                "return process.stderr.write(buf), buf.length;"
+                /if \(fd === process\.(std(?:out|err))\.fd\) return/,
+                'if (fd === process.\1.fd && process.\1.constructor.name !== "SyncWriteStream") return'
     end
 
     # turbo ships no openharmony binary; run the build steps in order.
-    system "pnpm", "--filter", "@zcode/cli...", "--filter", "!@zcode/cli", "build"
+    system "pnpm", "--filter", "@zcode/cli...", "--filter", "@zcode/server",
+           "--filter", "@zcode/web", "--filter", "!@zcode/cli", "build"
     cd "apps/zcode-cli/packages/cli" do
       system "node", "scripts/build.mjs"
     end
-    system "pnpm", "--filter", "@zcode/server", "build"
-    system "pnpm", "--filter", "@zcode/web", "build"
     # packages/shared has no build script; SEA staging requires its dist.
     system "node_modules/.bin/tsc", "-p", "packages/shared"
 
@@ -132,34 +101,25 @@ class Zcode < Formula
     (app/"agent/node_modules/@opentui/core").make_symlink "../@mbears/opentui-core"
 
     libexec.install app
-    (bin/"zcode").write <<~SH
-      #!/bin/sh
-      case "${ZCODE_RUNTIME:-bun}" in
-        node) exec "#{formula_opt_bin("node")}/node" "#{libexec}/zcode/bin/zcode.mjs" "$@" ;;
-        *)    exec "#{formula_opt_bin("bun")}/bun" "#{libexec}/zcode/bin/zcode.mjs" "$@" ;;
-      esac
-    SH
-    chmod 0755, bin/"zcode"
+    (bin/"zcode").write_env_script formula_opt_bin("bun")/"bun", libexec/"zcode/bin/zcode.mjs", {}
   end
 
   def caveats
     <<~EOS
-      zcode runs on the bun runtime by default (full interactive TUI).
-      Set ZCODE_RUNTIME=node to switch to Node.js instead: the web IDE's
-      embedded terminal works there, but the TUI cannot start because
-      HarmonyOS denies libffi the executable anonymous memory its
-      JS-to-native callbacks need.
+      zcode runs on the bun runtime (full interactive TUI; Node.js cannot
+      run the TUI here because HarmonyOS denies libffi the executable
+      anonymous memory its JS-to-native callbacks need).
 
-      Browser automation (playwright-core) has no openharmony build in its
-      upstream loader, so browser-use skills are unavailable on this
-      platform regardless of runtime. CUA screen capture is disabled
-      (koffi does not build for OHOS arm64).
+      The web IDE's embedded terminal is unavailable because node-pty
+      cannot spawn child processes under bun on OpenHarmony. Browser
+      automation (playwright-core) has no openharmony build in its upstream
+      loader, so browser-use skills are unavailable on this platform. CUA
+      screen capture is disabled (koffi does not build for OHOS arm64).
     EOS
   end
 
   test do
     assert_match version.to_s, shell_output("#{bin}/zcode --version")
     assert_match "Usage:", shell_output("#{bin}/zcode --help")
-    assert_match version.to_s, shell_output("ZCODE_RUNTIME=node #{bin}/zcode --version")
   end
 end
