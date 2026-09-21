@@ -14,7 +14,7 @@ class Xxhash < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "54ca2d43ffd539324c0bbc2b0ac398763822b0a3131aedd0219132379dda9a7b"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5bda98148637bd4a0d3b0e92889a61e2ec333c531de90cd1910ca6e9fa56d936"
   end
 
   depends_on "cmake" => [:build, :test]
