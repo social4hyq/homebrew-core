@@ -1,13 +1,13 @@
 class Pyscn < Formula
   desc "Intelligent Python Code Quality Analyzer"
   homepage "https://github.com/ludo-technologies/pyscn"
-  url "https://github.com/ludo-technologies/pyscn/archive/refs/tags/v1.32.0.tar.gz"
-  sha256 "aaaf0c0a5e08bb7b5d4f94af8f39a0717b7394daba2151a0e05f282498ed0f6e"
+  url "https://github.com/ludo-technologies/pyscn/archive/refs/tags/v1.32.1.tar.gz"
+  sha256 "e63a1ed5c42d953ec2c40da341e897f2dee2eda44e70ab7a295d499523cc933a"
   license "MIT"
   head "https://github.com/ludo-technologies/pyscn.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7afcec8b93920506f02fe3db2472a82dfedb83377dda08436f0d61cb2177b266"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0ec89d5c68a48bd285498fe887c9807ae3d6b60ae834f10f08fc23027a2728d"
   end
 
   depends_on "go" => :build
