@@ -1,10 +1,5 @@
 class Zcode < Formula
   require "json"
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.14.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "edbfc63f6cf62f7cd3a0ad48978431de83a4b7e4dc9d5f3e12851bd77366256a"
-  end
   require "yaml"
 
   desc "AI coding workbench: terminal agent with TUI and web IDE"
@@ -14,12 +9,17 @@ class Zcode < Formula
       revision: "872ad960de7ec172591f7e1952f7849229f94521"
   version "3.14.0"
   license "Apache-2.0"
-
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
     strategy :json do |json|
       json["version"]
     end
+  end
+
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.14.0-r3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6efca1713a026ad3f20acd1aed8f6657e0f243a2331e5e12f923d685ba61c5fa"
   end
 
   # OHOS delta: bun-default runtime, pnpm overrides to community OHOS
@@ -46,6 +46,18 @@ class Zcode < Formula
   deny_network_access! :test
 
   def install
+    # The CI image's toybox patch fails hunks silently (exit 0), so verify
+    # every patched file carries its marker before building anything.
+    {
+      "apps/zcode-cli/packages/cli/scripts/sea-targets.mjs"       => 'Object.freeze(["openharmony-arm64"])',
+      "apps/zcode-cli/packages/cli/scripts/sea-tui-assets.mjs"    => "@opentui/core-openharmony-",
+      "apps/zcode-cli/packages/cli/src/sea-playwright-runtime.ts" => "importSea",
+      "apps/zcode-cli/packages/cli/src/tui-runtime-loader.ts"     => "importSea",
+      "apps/zcode-cli/packages/core/src/environment.ts"           => "getBuiltinModule",
+    }.each do |file, marker|
+      odie "patch marker missing in #{file}: #{marker}" unless File.read(file).include?(marker)
+    end
+
     # OHOS: community ports for platform binaries the toolchain cannot
     # build here, and build-time natives that publish openharmony packages.
     # @opentui/core must follow @mbears/opentui-core or the TUI loads two
