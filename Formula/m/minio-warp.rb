@@ -7,7 +7,7 @@ class MinioWarp < Formula
   head "https://github.com/minio/warp.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "60e8edfd0bdc3bca07e51a1e923d6bd04f8ab39b0c823c2d1c590a75e76b876c"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ca54cda0282ca90a5db8c1dba46901586e74117e59b66160660ffb1ba3665f2"
   end
 
   depends_on "go" => :build
