@@ -1,0 +1,40 @@
+diff --git a/apps/zcode-cli/packages/cli/scripts/sea-targets.mjs b/apps/zcode-cli/packages/cli/scripts/sea-targets.mjs
+index ea9711e..1457158 100644
+--- a/apps/zcode-cli/packages/cli/scripts/sea-targets.mjs
++++ b/apps/zcode-cli/packages/cli/scripts/sea-targets.mjs
+@@ -1,13 +1,10 @@
+ import { resolve } from "node:path";
+ 
+-export const supportedTargets = Object.freeze([
+-  "darwin-arm64",
+-  "darwin-x64",
+-  "linux-arm64",
+-  "linux-x64",
+-  "win-arm64",
+-  "win-x64",
+-]);
++// OHOS 移植：发行包只面向 OpenHarmony arm64 真机。上游 6 目标需要
++// @mbears/opentui-core-<plat>-<arch> 原生包，0.5.8 port（@ohos-npm-ports）不再携带
++// 这些名字，保留会在 stageTuiRuntime 解析时直接抛 Missing SEA TUI runtime package。
++// 只保留 openharmony-arm64；SEA 多目标打包在本移植范围之外。
++export const supportedTargets = Object.freeze(["openharmony-arm64"]);
+ 
+ const supportedTargetSet = new Set(supportedTargets);
+ 
+diff --git a/apps/zcode-cli/packages/cli/scripts/sea-tui-assets.mjs b/apps/zcode-cli/packages/cli/scripts/sea-tui-assets.mjs
+index dc536a5..c08c48c 100644
+--- a/apps/zcode-cli/packages/cli/scripts/sea-tui-assets.mjs
++++ b/apps/zcode-cli/packages/cli/scripts/sea-tui-assets.mjs
+@@ -19,6 +19,12 @@ const opentuiReactPackageName = "@mbears/opentui-react";
+ 
+ export const opentuiNativePackageForTarget = (target) => {
+   const { arch, releasePlatform } = targetParts(target);
++  // OHOS 移植：opentui 0.5.8 port 的原生包走 @opentui scope
++  //（@opentui/core-openharmony-arm64，由 @ohos-npm-ports 重打包提供），
++  // 不再是 @mbears/opentui-core-<plat>-<arch> 命名。
++  if (releasePlatform === "openharmony") {
++    return `@opentui/core-openharmony-${arch}`;
++  }
+   const packagePlatform = releasePlatform === "win" ? "win32" : releasePlatform;
+   return `@mbears/opentui-core-${packagePlatform}-${arch}`;
+ };
