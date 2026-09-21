@@ -1,0 +1,97 @@
+diff --git a/apps/zcode-cli/packages/cli/src/sea-playwright-runtime.ts b/apps/zcode-cli/packages/cli/src/sea-playwright-runtime.ts
+index 7585670..ba94dbf 100644
+--- a/apps/zcode-cli/packages/cli/src/sea-playwright-runtime.ts
++++ b/apps/zcode-cli/packages/cli/src/sea-playwright-runtime.ts
+@@ -30,8 +30,10 @@ const MARKER_FILE = "playwright-manifest.json";
+ const PACKAGE_JSON_PATH = "node_modules/playwright-core/package.json";
+ 
+ export async function loadCliPlaywrightChromium(): Promise<PlaywrightChromiumModule> {
+-  const sea = await import("node:sea");
+-  if (!sea.isSea()) {
++  // OHOS 移植：bun 运行时没有 node:sea 内建模块，import 会直接 throw；
++  // 捕获后按非 SEA 路径加载（等价于 isSea() === false）。
++  const sea = await importSea();
++  if (!sea?.isSea()) {
+     return (await import("playwright-core")) as PlaywrightChromiumModule;
+   }
+ 
+@@ -40,6 +42,14 @@ export async function loadCliPlaywrightChromium(): Promise<PlaywrightChromiumMod
+   return require("playwright-core") as PlaywrightChromiumModule;
+ }
+ 
++const importSea = async (): Promise<SeaModule | undefined> => {
++  try {
++    return await import("node:sea");
++  } catch {
++    return undefined;
++  }
++};
++
+ async function ensureSeaPlaywrightRuntime(sea: SeaModule): Promise<string> {
+   const manifest = readManifest(sea);
+   const cacheDirectory = join(
+diff --git a/apps/zcode-cli/packages/cli/src/tui-runtime-loader.ts b/apps/zcode-cli/packages/cli/src/tui-runtime-loader.ts
+index 6dd1570..7fb6f73 100644
+--- a/apps/zcode-cli/packages/cli/src/tui-runtime-loader.ts
++++ b/apps/zcode-cli/packages/cli/src/tui-runtime-loader.ts
+@@ -33,9 +33,10 @@ const packageEntryPath = "node_modules/@zcode/tui/dist/index.js";
+ const manifestFileName = "manifest.json";
+ 
+ export const loadTuiRuntime = async (): Promise<TuiRuntimeModule> => {
+-  const sea = await import("node:sea");
+-
+-  if (!sea.isSea()) {
++  // OHOS 移植：bun 运行时没有 node:sea 内建模块，import 会直接 throw；
++  // 捕获后按非 SEA 路径加载（等价于 isSea() === false）。
++  const sea = await importSea();
++  if (!sea?.isSea()) {
+     return await import("@zcode/tui");
+   }
+ 
+@@ -43,6 +44,14 @@ export const loadTuiRuntime = async (): Promise<TuiRuntimeModule> => {
+   return await import(pathToFileURL(join(runtimeDirectory, packageEntryPath)).href);
+ };
+ 
++const importSea = async (): Promise<SeaModule | undefined> => {
++  try {
++    return await import("node:sea");
++  } catch {
++    return undefined;
++  }
++};
++
+ const ensureSeaTuiRuntime = async (sea: SeaModule): Promise<string> => {
+   const manifest = readManifest(sea);
+   const cacheDirectory = join(
+diff --git a/apps/zcode-cli/packages/core/src/environment.ts b/apps/zcode-cli/packages/core/src/environment.ts
+index 05382a5..41ff23a 100644
+--- a/apps/zcode-cli/packages/core/src/environment.ts
++++ b/apps/zcode-cli/packages/core/src/environment.ts
+@@ -1,6 +1,11 @@
+-import { isSea } from "node:sea";
++// OHOS 移植：bun 运行时没有 node:sea 内建模块，静态 import 会让 esbuild
++// 打出的 CJS bundle 在 bun 下启动即崩（require("node:sea") → No such built-in
++// module）。与仓库其他 SEA 探测点（bundled-plugins.ts 等）保持一致，
++// 改用 process.getBuiltinModule 守卫式获取，缺失时按非 SEA 处理。
+ import type { RuntimeInfo } from "@zcode/shared-types";
+ 
++type SeaModule = typeof import("node:sea");
++
+ export { type RuntimeInfo };
+ 
+ export const getRuntimeInfo = (): RuntimeInfo => ({
+@@ -9,6 +14,13 @@ export const getRuntimeInfo = (): RuntimeInfo => ({
+   execPath: process.execPath,
+   node: process.version,
+   platform: process.platform,
+-  sea: isSea(),
++  sea: getSeaModule()?.isSea() === true,
+   versions: process.versions,
+ });
++
++function getSeaModule(): SeaModule | undefined {
++  const getBuiltinModule = process.getBuiltinModule as
++    | ((id: "node:sea") => SeaModule)
++    | undefined;
++  return getBuiltinModule?.("node:sea");
++}
