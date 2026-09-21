@@ -7,7 +7,7 @@ class Libgsf < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "12fb45e5e05a9fa92aeb2070bd0e651bec15190a779e4260819e96e40972b2c6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a90b827cd1564667374c4684bde947da4108b9b9018dad799e3b3285fe7d8231"
   end
 
   head do
