@@ -3,13 +3,13 @@ class Mediamtx < Formula
   homepage "https://mediamtx.org"
   # need to use the tag to generate the version info
   url "https://github.com/bluenviron/mediamtx.git",
-      tag:      "v1.21.0",
-      revision: "2c6727904fbf233615de74a6c54a9b94dbf6025d"
+      tag:      "v1.21.1",
+      revision: "048255986f7e04b859b4c4efe651448ec785ecd4"
   license "MIT"
   head "https://github.com/bluenviron/mediamtx.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "438b6221d602616051dd2ae374d451198e61681ad572cf9b05fb297b286ce773"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c8c5407ec9790e5a13aad2eb0467dba165241eaf5b96a398975bfa911210b7e"
   end
 
   depends_on "go" => :build
