@@ -1,5 +1,5 @@
 diff --git a/src/js/node/net.ts b/src/js/node/net.ts
-index 0609cd36d8..9c6c9d5932 100644
+index 0609cd36d8..fc7eaea641 100644
 --- a/src/js/node/net.ts
 +++ b/src/js/node/net.ts
 @@ -675,7 +675,13 @@ function SocketEmitEndNT(self, _err?) {
@@ -45,3 +45,14 @@ index 0609cd36d8..9c6c9d5932 100644
  
        // Match Node's listen() option normalization + validation.
        // https://github.com/nodejs/node/blob/614050b657e9757c1097aa85f92f2cb51149dc0d/lib/net.js#L2145
+@@ -4261,6 +4279,10 @@ function normalizeArgs(args: unknown[]): [options: Record<PropertyKey, any>, cb:
+     }
+   }
+ 
++  if (options.host === undefined && typeof options.address === "string") {
++    options.host = options.address;
++  }
++
+   const cb = args[args.length - 1];
+   if (typeof cb !== "function") arr = [options, null];
+   else arr = [options, cb];

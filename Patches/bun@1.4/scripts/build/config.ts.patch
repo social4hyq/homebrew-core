@@ -1,5 +1,5 @@
 diff --git a/scripts/build/config.ts b/scripts/build/config.ts
-index 671839b78c..c6d9ee0ba5 100644
+index 671839b78c..5a4f37b2cd 100644
 --- a/scripts/build/config.ts
 +++ b/scripts/build/config.ts
 @@ -19,7 +19,7 @@ import { cyan, dim, green } from "./tty.ts";
@@ -61,3 +61,26 @@ index 671839b78c..c6d9ee0ba5 100644
  
    // ─── Cross-compilation (Android) ───
    // We keep using the host's clang (same version everywhere) and pass
+@@ -1106,6 +1115,13 @@ export function resolveConfig(partial: PartialConfig, toolchain: Toolchain): Con
+   }
+   assert(packageManager === "bun" || toolchain.npm !== undefined, "packageManager=npm needs toolchain.npm");
+ 
++  const webkit = partial.webkit ?? (abi === "ohos" ? "local" : "prebuilt");
++  if (abi === "ohos" && webkit === "prebuilt") {
++    throw new BuildError("OHOS requires a local WebKit source build", {
++      hint: "Set BUN_WEBKIT_PATH to an OHOS-compatible WebKit checkout and use --webkit=local.",
++    });
++  }
++
+   // ─── macOS SDK ───
+   // Must be passed to nested cmake builds or they'll pick the wrong SDK.
+   // Native darwin: ask xcode-select/xcrun. Cross-compiling from a non-darwin
+@@ -1212,7 +1228,7 @@ export function resolveConfig(partial: PartialConfig, toolchain: Toolchain): Con
+     timeTrace: partial.timeTrace ?? false,
+     ci,
+     buildkite,
+-    webkit: partial.webkit ?? "prebuilt",
++    webkit,
+     localDeps: parseLocalDeps(partial.localDeps, cwd),
+     packageManager,
+     cwd,

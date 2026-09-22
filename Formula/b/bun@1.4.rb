@@ -19,15 +19,15 @@ class BunAT14 < Formula
   # Batch-2 runtime fixes (port-adoption-analysis-20260920): the artifact
   # changes with the same upstream version, so installed users must be
   # offered the rebuild.
-  revision 1
+  revision 2
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r9"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3703d2ea0aaafffafdf3e81dd5097ae837506182e57005c0267ae34480e2b1bf"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "703758fd17a5457068eb43b56f8a6e18aa3b98556f2d936b0e5a0df22c7d7f52"
   end
 
   depends_on "cmake" => :build
@@ -66,10 +66,12 @@ class BunAT14 < Formula
     scripts/build/codegen.ts
     scripts/build/config.ts
     scripts/build/deps/cares.ts
+    scripts/build/deps/mimalloc.ts
     scripts/build/deps/tinycc.ts
     scripts/build/deps/webkit.ts
     scripts/build/deps/zstd.ts
     scripts/build/flags.ts
+    scripts/build/profiles.ts
     scripts/build/rust.ts
     scripts/build/shims.ts
     scripts/build/shims/ohos_compat_shim.c
@@ -82,12 +84,14 @@ class BunAT14 < Formula
     src/codegen/create-hash-table.ts
     src/event_loop/SpawnSyncEventLoop.rs
     src/install/Cargo.toml
+    src/install/PackageManager/CommandLineArguments.rs
     src/install/PackageInstaller.rs
     src/install/isolated_install/Installer.rs
     src/install/lib.rs
     src/install/lockfile/Package/Meta.rs
     src/install/npm.rs
     src/install_types/resolver_hooks.rs
+    src/install_jsc/npm_jsc.rs
     src/io/ParentDeathWatchdog.rs
     src/io/PipeReader.rs
     src/io/PipeWriter.rs
@@ -98,6 +102,8 @@ class BunAT14 < Formula
     src/js/node/net.ts
     src/js/node/os.ts
     src/js/wasi-runner.js
+    src/libarchive/lib.rs
+    src/linker.lds
     src/jsc/bindings/BunProcess.cpp
     src/jsc/bindings/bun-spawn.cpp
     src/jsc/bindings/c-bindings.cpp
@@ -115,6 +121,7 @@ class BunAT14 < Formula
     src/runtime/api/bun/js_bun_spawn_bindings.rs
     src/runtime/api/bun/ohos_ld_preload.rs
     src/runtime/api/bun/spawn/stdio.rs
+    src/runtime/api/bun/subprocess.rs
     src/runtime/api/js_bundle_completion_task.rs
     src/runtime/cli/Arguments.rs
     src/runtime/cli/build_command.rs
@@ -137,6 +144,7 @@ class BunAT14 < Formula
     src/runtime/socket/socket_body.rs
     src/runtime/socket/system_certs.rs
     src/runtime/webcore/FileReader.rs
+    src/runtime/webcore/blob/read_file.rs
     src/spawn/process.rs
     src/spawn_sys/lib.rs
     src/spawn_sys/spawn_process.rs
