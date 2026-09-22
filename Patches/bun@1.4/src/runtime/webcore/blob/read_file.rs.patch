@@ -1,0 +1,116 @@
+diff --git a/src/runtime/webcore/blob/read_file.rs b/src/runtime/webcore/blob/read_file.rs
+index 788a13fe67..af8563c4aa 100644
+--- a/src/runtime/webcore/blob/read_file.rs
++++ b/src/runtime/webcore/blob/read_file.rs
+@@ -297,6 +297,14 @@ pub struct ReadFile {
+     pub(crate) could_block: bool,
+     pub(crate) close_after_io: bool,
+     pub(crate) state: AtomicU8, // ClosingState
++    pub(crate) read_loop_state: AtomicU8,
++}
++
++#[cfg(not(windows))]
++mod read_loop_state {
++    pub(super) const IDLE: u8 = 0;
++    pub(super) const RUNNING: u8 = 1;
++    pub(super) const RUNNING_PENDING: u8 = 2;
+ }
+ 
+ bun_threading::intrusive_work_task!(ReadFile, task);
+@@ -391,6 +399,7 @@ impl ReadFile {
+             could_block: false,
+             close_after_io: false,
+             state: AtomicU8::new(ClosingState::Running as u8),
++            read_loop_state: AtomicU8::new(read_loop_state::IDLE),
+         };
+         Ok(read_file)
+     }
+@@ -398,6 +407,59 @@ impl ReadFile {
+     #[cfg(not(windows))]
+     pub(crate) const IO_TAG: io::Tag = io::Tag::ReadFile;
+ 
++    #[cfg(not(windows))]
++    fn try_begin_read_loop(&self) -> bool {
++        use read_loop_state::{IDLE, RUNNING, RUNNING_PENDING};
++        let mut current = self.read_loop_state.load(Ordering::Acquire);
++        loop {
++            let next = match current {
++                IDLE => RUNNING,
++                RUNNING => RUNNING_PENDING,
++                _ => return false,
++            };
++            match self.read_loop_state.compare_exchange_weak(
++                current,
++                next,
++                Ordering::AcqRel,
++                Ordering::Acquire,
++            ) {
++                Ok(_) => return next == RUNNING,
++                Err(actual) => current = actual,
++            }
++        }
++    }
++
++    #[cfg(not(windows))]
++    fn end_read_loop(&self) -> bool {
++        use read_loop_state::{IDLE, RUNNING, RUNNING_PENDING};
++        let mut current = self.read_loop_state.load(Ordering::Acquire);
++        loop {
++            let next = match current {
++                RUNNING => IDLE,
++                RUNNING_PENDING => RUNNING,
++                _ => return false,
++            };
++            match self.read_loop_state.compare_exchange_weak(
++                current,
++                next,
++                Ordering::AcqRel,
++                Ordering::Acquire,
++            ) {
++                Ok(_) => return next == RUNNING,
++                Err(actual) => current = actual,
++            }
++        }
++    }
++
++    #[cfg(not(windows))]
++    fn schedule_read_loop(&mut self) {
++        self.task = WorkPoolTask {
++            node: Default::default(),
++            callback: Self::do_read_loop_task,
++        };
++        WorkPool::schedule(&raw mut self.task);
++    }
++
+     pub fn on_ready(&mut self) {
+         bloblog!("ReadFile.onReady");
+         #[cfg(not(windows))]
+@@ -416,6 +478,10 @@ impl ReadFile {
+             self.close_after_io = self.io_request.scheduled;
+         }
+ 
++        #[cfg(not(windows))]
++        if !self.try_begin_read_loop() {
++            return;
++        }
+         WorkPool::schedule(&raw mut self.task);
+     }
+ 
+@@ -788,6 +854,7 @@ impl ReadFile {
+             }
+         }
+ 
++        self.try_begin_read_loop();
+         self.do_read_loop();
+     }
+ 
+@@ -893,6 +960,9 @@ impl ReadFile {
+                         self.buffer = buffer;
+                         self.wait_for_readable();
+ 
++                        if self.end_read_loop() {
++                            self.schedule_read_loop();
++                        }
+                         return;
+                     }
+ 
