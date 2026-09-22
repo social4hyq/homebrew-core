@@ -27,6 +27,10 @@ class Opencode < Formula
     depends_on "icu4c@78"
   end
 
+  # opencode-v2 installs the same binary name; declared reciprocally
+  # (both formulae must conflicts_with each other for brew audit).
+  conflicts_with "opencode-v2", because: "both install an opencode binary"
+
   %w[
     0001-update-package-json.patch
     0002-update-filesystem-watcher.patch
