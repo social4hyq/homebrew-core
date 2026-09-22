@@ -54,7 +54,7 @@ class BunAT14 < Formula
   end
 
   # Apply all exported OHOS patches; the WebKit inner patch is staged here.
-  Dir["#{tap.path}/Patches/bun@1.4/**/*.patch"].sort.each do |path|
+  Dir[File.expand_path("../../Patches/bun@1.4/**/*.patch", __dir__)].sort.each do |path|
     patch do
       file path
     end
