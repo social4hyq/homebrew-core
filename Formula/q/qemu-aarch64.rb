@@ -20,7 +20,7 @@ class QemuAarch64 < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "b2a3ded14fa9df9f72eb5a36cc72b1fdb5c753e14410b0c407325024b3f02c45"
   end
 
-  depends_on "ohos-bst-light" => :build # selfsign
+  depends_on "ohos-selfsign" => :build # selfsign
 
   def install
     # Guard against binary-sign-tool double-sign (corrupts prebuilt binaries).
@@ -41,7 +41,7 @@ class QemuAarch64 < Formula
     end
     odie "qemu-aarch64 binary not found in apk" unless src.exist?
 
-    system formula_opt_bin("ohos-bst-light")/"selfsign", src.to_s
+    system formula_opt_bin("ohos-selfsign")/"selfsign", src.to_s
 
     bin.install src
     chmod 0755, bin/"qemu-aarch64"
