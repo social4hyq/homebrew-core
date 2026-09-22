@@ -14,7 +14,7 @@ index 84a87a76d5..068ea07850 100644
   *   release-local      → Release build, local WebKit
   *   release-assertions → Release + runtime assertions enabled
   *   release-asan       → Release + address sanitizer
-@@ -28,10 +28,9 @@ import { BuildError } from "./error.ts";
+@@ -28,10 +28,9 @@
  export type ProfileName = keyof typeof profiles;
  
  export const profiles = {
@@ -26,7 +26,7 @@ index 84a87a76d5..068ea07850 100644
    },
  
    /** Debug with local WebKit (user clones vendor/WebKit/). */
-@@ -43,7 +42,6 @@ export const profiles = {
+@@ -43,7 +42,6 @@
    /** Debug without ASAN — faster builds, less safety. */
    "debug-no-asan": {
      buildType: "Debug",
@@ -34,7 +34,7 @@ index 84a87a76d5..068ea07850 100644
      asan: false,
    },
  
-@@ -126,10 +124,9 @@ export const profiles = {
+@@ -126,10 +124,9 @@
      webkit: "prebuilt",
    },
  
@@ -46,7 +46,7 @@ index 84a87a76d5..068ea07850 100644
      lto: false,
    },
  
-@@ -146,7 +143,6 @@ export const profiles = {
+@@ -146,7 +143,6 @@
     */
    btg: {
      buildType: "Release",
@@ -54,7 +54,15 @@ index 84a87a76d5..068ea07850 100644
      lto: true,
      // Pin the build dir so `--profile=btg` alone lands here and can never
      // be confused with `--profile=release --build-dir=build/btg` (which
-@@ -168,7 +164,6 @@ export const profiles = {
+@@ -159,6 +155,7 @@
+     buildType: "Release",
+     webkit: "local",
+     lto: false,
++    abi: "ohos",
+   },
+ 
+   /**
+@@ -168,7 +165,6 @@
     */
    "release-assertions": {
      buildType: "RelWithDebInfo",
@@ -62,7 +70,7 @@ index 84a87a76d5..068ea07850 100644
      assertions: true,
      logs: true,
      lto: false,
-@@ -182,7 +177,6 @@ export const profiles = {
+@@ -182,7 +178,6 @@
     */
    "release-asan": {
      buildType: "Release",

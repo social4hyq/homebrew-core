@@ -2,20 +2,12 @@ diff --git a/src/runtime/ffi/ffi_body.rs b/src/runtime/ffi/ffi_body.rs
 index 73f2322c51..fb978e5b45 100644
 --- a/src/runtime/ffi/ffi_body.rs
 +++ b/src/runtime/ffi/ffi_body.rs
-@@ -730,6 +730,95 @@ impl CompileC {
+@@ -730,6 +730,84 @@ impl CompileC {
              }
          }
  
-+        // OHOS ships no FHS libc/headers for apps to link against (TinyCC's
-+        // own tcc_add_runtime() unconditionally does `-lc`, and even a bare
-+        // `#include <stdint.h>` needs bits/alltypes.h, which only exists
-+        // under the triplet subdirectory). Resolve the sysroot: `$OHOS_SYSROOT`
-+        // wins; otherwise probe Harmonybrew's two SDK formula layouts — the
-+        // full `ohos-sdk` (`opt/ohos-sdk/native/sysroot`) and the
-+        // `ohos-sdk-native` that llvm/llvm@N depend on
-+        // (`opt/ohos-sdk-native/sysroot`; the two formulae conflict, so an
-+        // llvm-only install only has the latter). Neither may exist — this
-+        // is a best-effort addition, not a guaranteed-present one.
++        // OHOS ships no FHS libc/headers for apps to link against. Resolve the
++        // sysroot from `$OHOS_SYSROOT`, or from Harmonybrew's SDK-native keg.
 +        #[cfg(all(target_env = "ohos", target_arch = "aarch64"))]
 +        {
 +            fn join(sysroot: &[u8], suffix: &[u8]) -> ZBox {
@@ -48,10 +40,7 @@ index 73f2322c51..fb978e5b45 100644
 +                            root.extend_from_slice(b"/.harmonybrew");
 +                            roots.push(root);
 +                        }
-+                        const SYSROOT_SUFFIXES: [&str; 2] = [
-+                            "/opt/ohos-sdk/native/sysroot",
-+                            "/opt/ohos-sdk-native/sysroot",
-+                        ];
++                        const SYSROOT_SUFFIXES: [&str; 1] = ["/opt/ohos-sdk-native/sysroot"];
 +                        for root in &roots {
 +                            for suffix in SYSROOT_SUFFIXES {
 +                                let mut candidate = root.clone();

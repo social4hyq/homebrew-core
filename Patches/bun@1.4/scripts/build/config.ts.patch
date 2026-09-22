@@ -33,7 +33,7 @@ index 671839b78c..5a4f37b2cd 100644
  
    const a = hostArch();
    const arch: Arch =
-@@ -518,11 +523,15 @@ export function detectHost(): Host {
+@@ -518,11 +523,16 @@ export function detectHost(): Host {
  }
  
  /**
@@ -48,6 +48,7 @@ index 671839b78c..5a4f37b2cd 100644
 + * --abi=ohos override, same as android.
   */
  export function detectLinuxAbi(): Abi {
++  if (process.env.BUN_BUILD_ABI === "ohos") return "ohos";
 +  if (process.platform === "openharmony") return "ohos";
    return existsSync("/etc/alpine-release") ? "musl" : "gnu";
  }

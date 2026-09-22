@@ -9,7 +9,7 @@ index 38ac7cb52f..8e4db3eb8e 100644
 +// OHOS's musl fork has getservbyname/getservbyport but not the GNU reentrant
 +// _r variants LINUX_NETDB_R assumes every non-Android Linux libc has —
 +// same gap as Android's bionic, just for a different libc.
-+const OHOS = "";
++const OHOS = "#undef HAVE_GETSERVBYPORT_R\n#undef HAVE_GETSERVBYNAME_R";
 +
  // prettier-ignore
  const DARWIN = def1([
