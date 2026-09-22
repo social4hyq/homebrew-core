@@ -1,15 +1,9 @@
 diff --git a/scripts/build/profiles.ts b/scripts/build/profiles.ts
-index 068ea07850..ohosabi0002 100644
 --- a/scripts/build/profiles.ts
 +++ b/scripts/build/profiles.ts
-@@ -154,5 +154,6 @@ export const profiles = {
--  "release-local": {
--    buildType: "Release",
--    webkit: "local",
--    lto: false,
-+  "release-local": {
-+    buildType: "Release",
-+    webkit: "local",
-+    lto: false,
+@@ -159,6 +159,7 @@
+     buildType: "Release",
+     webkit: "local",
+     lto: false,
 +    abi: "ohos",
-+  },
+   },
