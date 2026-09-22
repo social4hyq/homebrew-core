@@ -15,7 +15,7 @@ brew tap social4hyq/core https://atomgit.com/social4hyq/homebrew-core.git
 brew trust social4hyq/core   # Homebrew 6.0+ 必须显式信任第三方 tap
 
 # 常用工具：
-brew install opencode        # AI 编码代理（v2：brew install opencode@2）
+brew install opencode        # AI 编码代理（v2：brew install opencode-v2）
 brew install claude-code     # Claude Code CLI
 brew install bun             # Bun 运行时
 brew install vite-plus       # VoidZero 统一前端工具链（`vp` 命令）
@@ -29,7 +29,6 @@ brew install qemu-aarch64    # 用户态 QEMU（`qemu-aarch64 -strace` 系统调
 ```bash
 bun --version && bun -e 'console.log(2**32, Math.PI)'
 opencode --version
-opencode2 --version
 claude --version
 vp --version
 starship --version
@@ -43,7 +42,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | Formula | 版本 | 说明 |
 |---|---|---|
 | `opencode` | 1.18.31 | 开源的终端 AI 编程助手：在终端里用自然语言让 AI 读代码、改文件、跑命令；自带 75+ 模型提供商接入，用自己的 API key 自由选模型（v1 稳定版） |
-| `opencode@2` | 2.0.7 | opencode v2 稳定版（命令名 `opencode2`）：全新插件 API 与交互，与 v1 并存互不影响，版本滚动跟进上游 v2 发布线（原 beta 尝鲜频道已随上游转稳定结束） |
+| `opencode-v2` | 2.0.11 | opencode v2 稳定版：全新插件 API 与交互；**与 v1 互斥**（`conflicts_with "opencode"`，命令名同为 `opencode`，对齐上游官方同名 formula）：原位替代 v1，共享 `~/.config/opencode` 等目录，v1 的数据库自动迁移；版本滚动跟进上游 v2 发布线（原 `opencode@2`，见 `formula_renames.json`） |
 | `claude-code` | 2.1.267 | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号；License 禁止再分发官方产物，故安装时从官方 npm 包拉取 CLI、剥离元文件后在本 tap 的 bun 上运行 |
 | `claude-code.latest` | 2.1.275 | 同一 Claude Code 的 latest 滚动频道：直接运行官方 musl 二进制（自签名 + `ohos-compat-shim` 引导），跟进上游发版更快；与 `claude-code` 互斥（都装 `claude` 命令，二选一） |
 | `bun` | 1.4.2 | 极速 JavaScript/TypeScript 一体化工具链：运行时、包管理、测试、打包四合一，可直接替代 Node.js；本 tap 多数工具的底座 |
@@ -84,6 +83,8 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `bun-webkit` / `bun-bootstrap` | 2026-09-18 下线 | 随 bun 1.4 切换「上游源码 + 补丁」构建（2026-09-12），`bun.rb` 不再依赖独立 WebKit 组件 formula 与预编译引导包，二者失去唯一消费者；formula 暂留仓库无引用，可从 tap git 历史恢复 |
 
 > 改名提示（2026-08-01）：`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
+>
+> 语义变更（2026-09-22）：`opencode@2` 更名为 `opencode-v2`（对齐上游官方 formula 名，`formula_renames.json` 自动迁移已装用户），并对齐上游的**原位替代**语义——命令名从 `opencode2` 改回 `opencode`，新增 `conflicts_with "opencode"`（与 v1 不能同时安装），数据目录从独立的 `~/.config/opencode2` 等改回与 v1 共享的 `~/.config/opencode`（v1 的数据库会被 v2 自动迁移）。升级前请先 `brew uninstall opencode`（v1）与旧版 `brew uninstall opencode@2`；旧版遗留的 `~/.config/opencode2`、`~/.local/share/opencode2`、`~/.local/state/opencode2` 目录升级后可手动删除。
 
 ## 已知限制
 

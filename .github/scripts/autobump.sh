@@ -117,7 +117,7 @@ for line in "${CANDIDATES[@]}"; do
   #      bun.rb): bump the git revision pin + increment the brew `revision N`
   #      (effective version advances <ver>_N, which is what drives the
   #      new-bottle pipeline in pr-validate).
-  #   b) a release version (opencode@2: livecheck follows upstream git tags
+  #   b) a release version (opencode-v2: livecheck follows upstream git tags
   #      `v2.*` on the repo the formula clones): resolve the exact commit the
   #      tag points at (peeled ref for annotated tags), then bump `version` +
   #      the pin and drop any brew `revision` stanza (Homebrew convention:
@@ -145,7 +145,7 @@ for line in "${CANDIDATES[@]}"; do
 
     FORMULA_VERSION=$(docker exec "$CONTAINER" grep -oE '^  version "[^"]+"' "$FORMULA_PATH" | head -1 | cut -d'"' -f2)
 
-    # Release-version scheme (opencode@2): resolve the git sha for LATEST.
+    # Release-version scheme (opencode-v2): resolve the git sha for LATEST.
     # These lookups run on the runner host (not the OHOS container).
     TARGET_SHA=""
     NEW_VERSION="$FORMULA_VERSION"
@@ -165,7 +165,7 @@ for line in "${CANDIDATES[@]}"; do
       fi
       # version→git mapping is formula-specific (repo, tag naming).
       case "$FORMULA" in
-        opencode@2)
+        opencode-v2)
           GIT_REPO="anomalyco/opencode"
           ;;
         *)
