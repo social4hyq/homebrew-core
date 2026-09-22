@@ -46,7 +46,6 @@ class BunAT14 < Formula
   depends_on "perl" => :build
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
-  depends_on "rustup" => :build
   depends_on "zlib-ng-compat" => :build
 
   fails_with :gcc do
@@ -59,6 +58,18 @@ class BunAT14 < Formula
       file path
     end
   end
+  resource "rust-nightly" do
+    url "https://static.rust-lang.org/dist/2026-07-20/rust-nightly-aarch64-unknown-linux-ohos.tar.gz"
+    version "nightly-2026-07-20"
+    sha256 "7d3dd4cc4f55ee8a7c7f09804b96fd52ef7ef598a935772091e80aa66869676e"
+  end
+
+  resource "rust-src" do
+    url "https://static.rust-lang.org/dist/2026-07-20/rust-src-nightly.tar.gz"
+    version "nightly-2026-07-20"
+    sha256 "2be85b655b99624bed0fb63a47e564abac07aa1fb5d0576abac5c42ef8c5316e"
+  end
+
   # L3 bootstrap: upstream musl Bun used only to run the build scripts.
   # The OHOS userspace provides musl-compatible libc; the GNU C++ runtime is
   # supplied by the gcc dependency below.
@@ -94,13 +105,21 @@ class BunAT14 < Formula
 
   def install
     llvm = Formula["llvm@21"]
-    ENV["RUSTUP_HOME"] = buildpath/"rustup"
-    ENV["CARGO_HOME"] = buildpath/"cargo"
-    ENV.prepend_path "PATH", formula_opt_bin("rustup")
+    rust_home = buildpath/"rust"
+    channel = File.read("rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
+    odie "Update rust-nightly to #{channel}" if resource("rust-nightly").version.to_s != channel
+
+    %w[rust-nightly rust-src].each do |name|
+      resource(name).stage do
+        system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
+      end
+    end
+    ENV["BUN_TOOLCHAIN_RUST"] = rust_home
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3")
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
     ENV["SSL_CERT_FILE"] = ENV["CURL_CA_BUNDLE"] = HOMEBREW_PREFIX/"etc/ca-certificates/cert.pem"
+    ENV.prepend_path "PATH", rust_home/"bin"
     ENV.prepend_path "PATH", llvm.opt_bin
     ENV.prepend_path "PATH", formula_opt_bin("lld@21")
     # L3 bootstrap bun (from the "bootstrap" resource): runs the build
