@@ -16,9 +16,8 @@ class BunAT14 < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  # Batch-2 runtime fixes (port-adoption-analysis-20260920): the artifact
-  # changes with the same upstream version, so installed users must be
-  # offered the rebuild.
+  # OHOS patch-series refresh: the artifact changes with the same upstream
+  # version, so installed users must be offered the rebuild.
   revision 2
   livecheck do
     url :stable
@@ -26,8 +25,9 @@ class BunAT14 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r10"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "703758fd17a5457068eb43b56f8a6e18aa3b98556f2d936b0e5a0df22c7d7f52"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r11"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4d5c8fa98982ad93bf8a72559f4a6296057d2c6fbbf9a7fb8ae85ed68532e0e1"
   end
 
   depends_on "cmake" => :build
@@ -253,6 +253,8 @@ class BunAT14 < Formula
     system "bun", "run", "build:release:local", "--canary=off"
 
     bin.install "build/release-local/bun"
+    # Required beside bun for LD_PRELOAD in OHOS node child processes.
+    bin.install "build/release-local/libohos_compat_preload.so"
     bin.install_symlink "bun" => "bunx"
     bash_completion.install "completions/bun.bash" => "bun"
     fish_completion.install "completions/bun.fish"

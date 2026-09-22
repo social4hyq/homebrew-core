@@ -1,8 +1,8 @@
 diff --git a/src/linker.lds b/src/linker.lds
-index 401cc35b60..dd33049fee 100644
+index 401cc35b60..5220d70d42 100644
 --- a/src/linker.lds
 +++ b/src/linker.lds
-@@ -4,6 +4,24 @@ BUN_1.2 {
+@@ -4,6 +4,25 @@ BUN_1.2 {
  	node_api_*;
  	node_module_register;
  
@@ -21,6 +21,7 @@ index 401cc35b60..dd33049fee 100644
 +	poll;
 +	ppoll;
 +	splice;
++	syscall;
 +	symlinkat;
 +	tmpfile;
 +
