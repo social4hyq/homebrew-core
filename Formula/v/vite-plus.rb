@@ -31,7 +31,7 @@ class VitePlus < Formula
   # OHOS: @napi-rs/cli cross-compiles the bundled bindings against the SDK.
   depends_on "node"
   # OHOS: selfsign for the pm binary the platform-cfg patch downloads (binary-sign-tool corrupts it).
-  depends_on "ohos-bst-light"
+  depends_on "ohos-selfsign"
 
   resource "rolldown" do
     url "https://github.com/rolldown/rolldown.git",
