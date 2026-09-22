@@ -79,7 +79,7 @@ class BunAT14 < Formula
       # The suspend patch lives in this formula's patch directory
       # (Patches/bun@1.4/); applied here rather than via a DSL patch
       # because vendor/WebKit only exists after the clone above.
-      # The inner patch is materialized to the buildpath by the %w patch
+      # The inner patch is materialized to the buildpath by the patch
       # loop above (the exporter ships it double-suffixed; the DSL unwraps
       # at staging), so it can be applied to the clone directly.
       suspend_patch = buildpath/"patches/webkit/suspend-resume.patch"
