@@ -1,16 +1,21 @@
 diff --git a/src/install_types/resolver_hooks.rs b/src/install_types/resolver_hooks.rs
-index 53afb6708e..2bdb1fec3e 100644
+index 53afb6708e..5693a16afa 100644
 --- a/src/install_types/resolver_hooks.rs
 +++ b/src/install_types/resolver_hooks.rs
-@@ -805,6 +805,7 @@ impl OperatingSystem {
+@@ -805,6 +805,12 @@ impl OperatingSystem {
      pub(crate) const SUNOS: u16 = 1 << 6;
      pub const WIN32: u16 = 1 << 7;
      pub(crate) const ANDROID: u16 = 1 << 8;
 +    pub(crate) const OPENHARMONY: u16 = 1 << 9;
++
++    #[cfg(target_env = "ohos")]
++    pub(crate) const LINUX_AND_OPENHARMONY: u16 = Self::LINUX | Self::OPENHARMONY;
++    #[cfg(not(target_env = "ohos"))]
++    pub(crate) const LINUX_AND_OPENHARMONY: u16 = Self::LINUX;
  
      pub const ALL_VALUE: u16 = Self::AIX
          | Self::DARWIN
-@@ -813,10 +814,22 @@ impl OperatingSystem {
+@@ -813,10 +819,22 @@ impl OperatingSystem {
          | Self::OPENBSD
          | Self::SUNOS
          | Self::WIN32
@@ -36,9 +41,12 @@ index 53afb6708e..2bdb1fec3e 100644
      #[cfg(target_os = "android")]
      pub const CURRENT: Self = Self(Self::ANDROID);
      #[cfg(target_os = "macos")]
-@@ -854,6 +867,7 @@ impl OperatingSystem {
+@@ -852,8 +870,9 @@ impl OperatingSystem {
+ }
+ 
  negatable_names! { OperatingSystem: u16, OPERATING_SYSTEM_NAMES => [
-     b"aix" => AIX, b"linux" => LINUX, b"sunos" => SUNOS, b"win32" => WIN32,
+-    b"aix" => AIX, b"linux" => LINUX, b"sunos" => SUNOS, b"win32" => WIN32,
++    b"aix" => AIX, b"linux" => LINUX_AND_OPENHARMONY, b"sunos" => SUNOS, b"win32" => WIN32,
      b"darwin" => DARWIN, b"android" => ANDROID, b"freebsd" => FREEBSD, b"openbsd" => OPENBSD,
 +    b"openharmony" => OPENHARMONY,
  ] }

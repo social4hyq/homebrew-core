@@ -1,5 +1,5 @@
 diff --git a/scripts/build/shims.ts b/scripts/build/shims.ts
-index a2b28b029e..91e5d11cba 100644
+index a2b28b029e..c41778337d 100644
 --- a/scripts/build/shims.ts
 +++ b/scripts/build/shims.ts
 @@ -14,7 +14,7 @@ import { spawnSync } from "node:child_process";
@@ -43,7 +43,7 @@ index a2b28b029e..91e5d11cba 100644
 +    // built by a cross CI host; $flags also carries -fPIC since the
 +    // interposed symbols must land in the PIE's dynamic symbol table.
 +    n.rule("shim_cc", {
-+      command: `${q(cfg.cc)} $flags -fPIC -O2 -c $in -o $out`,
++      command: `${q(cfg.cc)} $flags -fvisibility=default -fPIC -O2 -c $in -o $out`,
 +      description: "shim $out",
 +    });
 +
