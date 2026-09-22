@@ -13,9 +13,9 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.31-r14"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "85bf8748905b637adb4b625c3743f04b1bf42cca8f32c1c0cedcdc24c051378e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.31-r15"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0282318161435b369270c6e2a29263aec854e8f34849ad2080348f087ebebfa1"
   end
 
   depends_on "bun" => :build
@@ -26,6 +26,10 @@ class Opencode < Formula
   on_linux do
     depends_on "icu4c@78"
   end
+
+  # opencode-v2 installs the same binary name; declared reciprocally
+  # (both formulae must conflicts_with each other for brew audit).
+  conflicts_with "opencode-v2", because: "both install an opencode binary"
 
   %w[
     0001-update-package-json.patch

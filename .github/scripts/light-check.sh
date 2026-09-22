@@ -2,12 +2,16 @@
 # brew readall + brew audit (both blocking) over $CHANGED_JSON.
 #
 # Also flags (non-blocking) any changed formula whose name collides with a
-# harmonybrew/core formula. `brew audit`'s own audit_name conflict check
-# (formula_auditor.rb) only fires with `--strict` on the *core* tap itself
-# (`return unless @core_tap`) — a third-party tap's plain `brew audit` never
-# runs it, so a collision like this tap's zsh vs harmonybrew/core's
-# same-named formula is invisible to upstream tooling. A collision isn't
-# itself wrong (ours is a deliberate OHOS-specific alternate) — what it
+# harmonybrew/core formula. Note brew audit's own audit_conflicts (the
+# RECIPROCAL conflicts_with check, formula_auditor.rb) runs on plain
+# `brew audit` for any tapped formula — no --strict, no @core_tap gate in
+# this brew version (verified 2026-09-22: opencode-v2's one-way
+# conflicts_with "opencode" failed audit with "Formula opencode should also
+# have a conflict declared with opencode-v2"). So conflicts declared in this
+# tap must always be symmetric. What plain audit does NOT catch is a name
+# collision with upstream homebrew/core itself (e.g. this tap's zsh vs
+# harmonybrew/core's same-named formula) — a collision isn't itself wrong
+# (ours is a deliberate OHOS-specific alternate) — what it
 # flags is the follow-up requirement: every reference to that name (docs,
 # depends_on, install commands) must be tap-qualified (social4hyq/core/<name>),
 # see README "命名与冲突约定". `homebrew/core/<name>` is the alias this brew
