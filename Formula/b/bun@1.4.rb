@@ -153,9 +153,8 @@ class BunAT14 < Formula
     ENV["BUN_OHOS_ICU_ROOT"] = icu_stage
 
     fetch_webkit
-    # The ci-runner container is openharmony userspace: the build detects
-    # abi=ohos natively (no cross sysroot involved).
-    system "bun", "scripts/build.ts", "--profile=release-local", "--build-dir=build/release-local", "--canary=off", "--abi=ohos"
+    # The dedicated profile selects the OHOS ABI without a cross sysroot.
+    system "bun", "scripts/build.ts", "--profile=ohos-release-local", "--build-dir=build/release-local", "--canary=off"
 
     bin.install "build/release-local/bun"
     # Required beside bun for LD_PRELOAD in OHOS node child processes.
