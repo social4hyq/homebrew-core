@@ -24,8 +24,8 @@ class ClaudeCodeLatest < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "ae10672a7f0f3071be4dc0f29fb95a08e3c6429af78385432faf68339d078841"
   end
 
-  depends_on "ohos-selfsign"
   depends_on "ohos-compat-shim"
+  depends_on "ohos-selfsign"
 
   conflicts_with "claude-code", because: "both install the `claude` binary"
 
