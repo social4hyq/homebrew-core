@@ -52,17 +52,6 @@ class BunAT14 < Formula
     cause "uses clang-specific flags"
   end
 
-  # Apply all exported OHOS patches; the WebKit inner patch is staged here.
-  Dir["Patches/bun@1.4/**/*.patch"].each do |path|
-    next if path.end_with?("suspend-resume.patch.patch")
-
-    patch do
-      file path
-    end
-  end
-  patch do
-    file "Patches/bun@1.4/patches/webkit/suspend-resume.patch.patch"
-  end
   resource "rust-nightly" do
     url "https://static.rust-lang.org/dist/2026-07-20/rust-nightly-aarch64-unknown-linux-ohos.tar.gz"
     version "nightly-2026-07-20"
@@ -81,6 +70,18 @@ class BunAT14 < Formula
   resource "bootstrap" do
     url "https://github.com/oven-sh/bun/releases/download/bun-v1.3.14/bun-linux-aarch64-musl.zip"
     sha256 "b98e0ad3625c5c00d1d5b5ff55605c7adddbfae151861e68ade57b2d3b8703bb"
+  end
+
+  # Apply all exported OHOS patches; the WebKit inner patch is staged here.
+  Dir["Patches/bun@1.4/**/*.patch"].each do |path|
+    next if path.end_with?("suspend-resume.patch.patch")
+
+    patch do
+      file path
+    end
+  end
+  patch do
+    file "Patches/bun@1.4/patches/webkit/suspend-resume.patch.patch"
   end
 
   def fetch_webkit
