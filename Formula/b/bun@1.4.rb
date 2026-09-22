@@ -54,9 +54,9 @@ class BunAT14 < Formula
   end
 
   # Apply all exported OHOS patches; the WebKit inner patch is staged here.
-  Dir[File.expand_path("../../Patches/bun@1.4/**/*.patch", __dir__)].sort.each do |path|
+  Dir["Patches/bun@1.4/**/*.patch"].each do |path|
     patch do
-      file Pathname(path).relative_path_from(Pathname(File.expand_path("../..", __dir__))).to_s
+      file path
     end
   end
   # L3 bootstrap: upstream musl Bun used only to run the build scripts.
@@ -96,7 +96,7 @@ class BunAT14 < Formula
     llvm = Formula["llvm@21"]
     ENV["RUSTUP_HOME"] = buildpath/"rustup"
     ENV["CARGO_HOME"] = buildpath/"cargo"
-    ENV.prepend_path "PATH", Formula["rustup"].opt_bin
+    ENV.prepend_path "PATH", formula_opt_bin("rustup")
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3")
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
