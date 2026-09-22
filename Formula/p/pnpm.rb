@@ -13,27 +13,17 @@ class Pnpm < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/pnpm-v12.4.2-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fffcd655519159d21f061697f165ed52e1b134bc92ec2023a88c259610d5bbe0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/pnpm-v12.4.2-r7"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "878054ad27592a303db776a1784b0d673c8be159192619071bea5ead12edc79e"
   end
 
   depends_on "cmake" => :build
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
 
-  # Auto-sign package-shipped ELF binaries as they enter the CAFS store;
-  # node_modules hardlinks then carry the .codesign section the OHOS
-  # kernel requires for exec/dlopen.
   patch do
-    file "Patches/pnpm/0001-vendor-ohos-sign.patch"
-  end
-
-  patch do
-    file "Patches/pnpm/0002-autosign-store-elf.patch"
-  end
-
-  patch do
-    file "Patches/pnpm/0003-host-platform-openharmony.patch"
+    file "Patches/pnpm/0001-host-platform-openharmony.patch"
   end
 
   deny_network_access!
