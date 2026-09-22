@@ -155,7 +155,7 @@ class BunAT14 < Formula
     fetch_webkit
     # The ci-runner container is openharmony userspace: the build detects
     # abi=ohos natively (no cross sysroot involved).
-    system "bun", "run", "build:release:local", "--canary=off"
+    system "bun", "run", "build:release:local", "--canary=off", "--abi=ohos"
 
     bin.install "build/release-local/bun"
     # Required beside bun for LD_PRELOAD in OHOS node child processes.
