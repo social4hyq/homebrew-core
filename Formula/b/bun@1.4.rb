@@ -153,7 +153,6 @@ class BunAT14 < Formula
     ENV["BUN_OHOS_ICU_ROOT"] = icu_stage
 
     fetch_webkit
-    ENV["BUN_BUILD_ABI"] = "ohos"
     # The ci-runner container is openharmony userspace: the build detects
     # abi=ohos natively (no cross sysroot involved).
     system "bun", "scripts/build.ts", "--profile=release-local", "--build-dir=build/release-local",
