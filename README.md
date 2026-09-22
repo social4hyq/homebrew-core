@@ -47,7 +47,6 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `claude-code.latest` | 2.1.275 | 同一 Claude Code 的 latest 滚动频道：直接运行官方 musl 二进制（自签名 + `ohos-compat-shim` 引导），跟进上游发版更快；与 `claude-code` 互斥（都装 `claude` 命令，二选一） |
 | `bun` | 1.4.2 | 极速 JavaScript/TypeScript 一体化工具链：运行时、包管理、测试、打包四合一，可直接替代 Node.js；本 tap 多数工具的底座 |
 | `vite-plus` | 0.2.8 | VoidZero（Vue/Vite 作者团队）的 Web 统一工具链：一个 `vp` 命令包揽创建项目、开发调试、检查、格式化、测试、构建全流程（Beta） |
-| `pnpm` | 12.4.2 | 快速、省磁盘的 Node 包管理器（npm 兼容，内容寻址全局 store，monorepo 一流支持）；当前 HarmonyOS 6.1/7.0 文件系统未开放硬链接，store 导入自动退化为复制（无去重收益但功能完整）；内置 npm 包内 ELF 自动签名与 OHOS 平台识别补丁 |
 | `hishell-font` | 0.1.0 | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
 | `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
 | `ohos-compat-shim` | 0.5.0 | 系统兼容层：自动兜底鸿蒙与标准 Linux 的底层行为差异，让 Linux 生态软件开箱即用（已内嵌进本 tap 产物，无需单独配置） |
