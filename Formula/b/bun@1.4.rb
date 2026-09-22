@@ -155,6 +155,7 @@ class BunAT14 < Formula
     fetch_webkit
     # The ci-runner container is openharmony userspace: the build detects
     # abi=ohos natively (no cross sysroot involved).
+    system "sed", "-n", "150,165p", "scripts/build/profiles.ts"
     system "bun", "scripts/build.ts", "--profile=release-local", "--build-dir=build/release-local",
            "--canary=off", "--abi=ohos"
 
