@@ -54,9 +54,14 @@ class BunAT14 < Formula
 
   # Apply all exported OHOS patches; the WebKit inner patch is staged here.
   Dir["Patches/bun@1.4/**/*.patch"].each do |path|
+    next if path.end_with?("suspend-resume.patch.patch")
+
     patch do
       file path
     end
+  end
+  patch do
+    file "Patches/bun@1.4/patches/webkit/suspend-resume.patch.patch"
   end
   resource "rust-nightly" do
     url "https://static.rust-lang.org/dist/2026-07-20/rust-nightly-aarch64-unknown-linux-ohos.tar.gz"
