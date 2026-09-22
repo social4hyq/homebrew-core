@@ -56,7 +56,7 @@ class BunAT14 < Formula
   # Apply all exported OHOS patches; the WebKit inner patch is staged here.
   Dir[File.expand_path("../../Patches/bun@1.4/**/*.patch", __dir__)].sort.each do |path|
     patch do
-      file path
+      file Pathname(path).relative_path_from(Pathname(File.expand_path("../..", __dir__))).to_s
     end
   end
   # L3 bootstrap: upstream musl Bun used only to run the build scripts.
