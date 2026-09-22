@@ -74,14 +74,16 @@ class BunAT14 < Formula
 
   # Apply all exported OHOS patches; the WebKit inner patch is staged here.
   Dir["Patches/bun@1.4/**/*.patch"].each do |path|
-    next if path.end_with?("suspend-resume.patch.patch")
+    next if path.end_with?(".patch.patch")
 
     patch do
       file path
     end
   end
-  patch do
-    file "Patches/bun@1.4/patches/webkit/suspend-resume.patch.patch"
+  %w[patches/tinycc/tccgen.c patches/webkit/suspend-resume patches/zstd/ohos-qsort-r].each do |path|
+    patch do
+      file "Patches/bun@1.4/#{path}.patch.patch"
+    end
   end
 
   def fetch_webkit
