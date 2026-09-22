@@ -14,7 +14,8 @@ class PnpmAT11 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b39acc1e12997a0a12bb4cc3c32c6fcb67f9ae4476291b8b443ec7639f85b9b5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/pnpm@11-v11.27.1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "90ea25809263ef0ee714b89fcf0ebec4205647b1432d1282b818320b56494451"
   end
 
   keg_only :versioned_formula
