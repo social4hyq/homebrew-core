@@ -16,8 +16,9 @@ class QemuAarch64 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qemu-aarch64-v11.0.3-r0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2a3ded14fa9df9f72eb5a36cc72b1fdb5c753e14410b0c407325024b3f02c45"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qemu-aarch64-v11.0.3-r0-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "192ed1c08f833e47732e424e42387b774215e0026c03c48e8bef217b09992fd5"
   end
 
   depends_on "ohos-selfsign" => :build # selfsign
