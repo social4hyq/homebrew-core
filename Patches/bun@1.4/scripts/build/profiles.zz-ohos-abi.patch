@@ -1,9 +1,0 @@
-diff --git a/scripts/build/profiles.ts b/scripts/build/profiles.ts
---- a/scripts/build/profiles.ts
-+++ b/scripts/build/profiles.ts
-@@ -159,6 +159,7 @@
-     buildType: "Release",
-     webkit: "local",
-     lto: false,
-+    abi: "ohos",
-   },
