@@ -46,132 +46,19 @@ class BunAT14 < Formula
   depends_on "perl" => :build
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
+  depends_on "rustup" => :build
   depends_on "zlib-ng-compat" => :build
 
   fails_with :gcc do
     cause "uses clang-specific flags"
   end
 
-  # Per-file OHOS patches, exported from social4hyq/ohos-bun
-  # (scripts/export-ohos-patches.sh replays onto the tag bit-for-bit).
-  %w[
-    Cargo.lock
-    Cargo.toml
-    bun.lock
-    package.json
-    packages/bun-usockets/src/eventing/epoll_kqueue.c
-    patches/tinycc/tccgen.c.patch
-    patches/webkit/suspend-resume.patch
-    patches/zstd/ohos-qsort-r.patch
-    scripts/build/bun.ts
-    scripts/build/codegen.ts
-    scripts/build/config.ts
-    scripts/build/deps/cares.ts
-    scripts/build/deps/mimalloc.ts
-    scripts/build/deps/tinycc.ts
-    scripts/build/deps/webkit.ts
-    scripts/build/deps/zstd.ts
-    scripts/build/flags.ts
-    scripts/build/profiles.ts
-    scripts/build/rust.ts
-    scripts/build/shims.ts
-    scripts/build/shims/ohos_compat_shim.c
-    scripts/build/workarounds.ts
-    scripts/ci-remap-server/bun.lock
-    src/bun_core/Global.rs
-    src/bun_core/env.rs
-    src/bun_core/env_var.rs
-    src/bun_core/util.rs
-    src/codegen/create-hash-table.ts
-    src/event_loop/SpawnSyncEventLoop.rs
-    src/install/Cargo.toml
-    src/install/PackageManager/CommandLineArguments.rs
-    src/install/PackageInstaller.rs
-    src/install/isolated_install/Installer.rs
-    src/install/lib.rs
-    src/install/lockfile/Package/Meta.rs
-    src/install/npm.rs
-    src/install_types/resolver_hooks.rs
-    src/install_jsc/npm_jsc.rs
-    src/io/ParentDeathWatchdog.rs
-    src/io/PipeReader.rs
-    src/io/PipeWriter.rs
-    src/io/lib.rs
-    src/io/pipes.rs
-    src/io/posix_event_loop.rs
-    src/js/node/child_process.ts
-    src/js/node/net.ts
-    src/js/node/os.ts
-    src/js/wasi-runner.js
-    src/libarchive/lib.rs
-    src/linker.lds
-    src/jsc/bindings/BunProcess.cpp
-    src/jsc/bindings/bun-spawn.cpp
-    src/jsc/bindings/c-bindings.cpp
-    src/jsc/bindings/root.h
-    src/jsc/bindings/wtf-bindings.cpp
-    src/ohos_sign/Cargo.toml
-    src/ohos_sign/src/bin/ohos_selfsign.rs
-    src/ohos_sign/src/lib.rs
-    src/ohos_sign/src/selfsign.rs
-    src/options_types/compile_target.rs
-    src/resolver/lib.rs
-    src/runtime/Cargo.toml
-    src/runtime/api.rs
-    src/runtime/api/bun/Terminal.rs
-    src/runtime/api/bun/js_bun_spawn_bindings.rs
-    src/runtime/api/bun/ohos_ld_preload.rs
-    src/runtime/api/bun/spawn/stdio.rs
-    src/runtime/api/bun/subprocess.rs
-    src/runtime/api/js_bundle_completion_task.rs
-    src/runtime/cli/Arguments.rs
-    src/runtime/cli/build_command.rs
-    src/runtime/cli/install_completions_command.rs
-    src/runtime/cli/package_manager_command.rs
-    src/runtime/cli/test/parallel/Coordinator.rs
-    src/runtime/ffi/ffi_body.rs
-    src/runtime/napi/libc_check.rs
-    src/runtime/napi/napi_body.rs
-    src/runtime/node/node_fs.rs
-    src/runtime/node/node_fs_watcher.rs
-    src/runtime/node/node_net_binding.rs
-    src/runtime/node/node_process.rs
-    src/runtime/node/path_watcher.rs
-    src/runtime/shell/IO.rs
-    src/runtime/shell/builtin/echo.rs
-    src/runtime/shell/builtin/which.rs
-    src/runtime/shell/subproc.rs
-    src/runtime/socket/Listener.rs
-    src/runtime/socket/socket_body.rs
-    src/runtime/socket/system_certs.rs
-    src/runtime/webcore/FileReader.rs
-    src/runtime/webcore/blob/read_file.rs
-    src/spawn/process.rs
-    src/spawn_sys/lib.rs
-    src/spawn_sys/spawn_process.rs
-    src/standalone_graph/StandaloneModuleGraph.rs
-    src/sys/Cargo.toml
-    src/sys/file.rs
-    src/sys/lib.rs
-    src/sys/linux_syscall.rs
-    src/uws_sys/libuwsockets.cpp
-  ].each do |p|
+  # Apply all exported OHOS patches; the WebKit inner patch is staged here.
+  Dir["#{tap.path}/Patches/bun@1.4/**/*.patch"].sort.each do |path|
     patch do
-      file "Patches/bun@1.4/#{p}.patch"
+      file path
     end
   end
-  resource "rust-nightly" do
-    url "https://static.rust-lang.org/dist/2026-07-20/rust-nightly-aarch64-unknown-linux-ohos.tar.gz"
-    version "nightly-2026-07-20"
-    sha256 "7d3dd4cc4f55ee8a7c7f09804b96fd52ef7ef598a935772091e80aa66869676e"
-  end
-
-  resource "rust-src" do
-    url "https://static.rust-lang.org/dist/2026-07-20/rust-src-nightly.tar.gz"
-    version "nightly-2026-07-20"
-    sha256 "2be85b655b99624bed0fb63a47e564abac07aa1fb5d0576abac5c42ef8c5316e"
-  end
-
   # L3 bootstrap: upstream musl Bun used only to run the build scripts.
   # The OHOS userspace provides musl-compatible libc; the GNU C++ runtime is
   # supplied by the gcc dependency below.
@@ -207,21 +94,13 @@ class BunAT14 < Formula
 
   def install
     llvm = Formula["llvm@21"]
-    rust_home = buildpath/"rust"
-    channel = File.read("rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
-    odie "Update rust-nightly to #{channel}" if resource("rust-nightly").version.to_s != channel
-
-    %w[rust-nightly rust-src].each do |name|
-      resource(name).stage do
-        system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
-      end
-    end
-    ENV["BUN_TOOLCHAIN_RUST"] = rust_home
+    ENV["RUSTUP_HOME"] = buildpath/"rustup"
+    ENV["CARGO_HOME"] = buildpath/"cargo"
+    ENV.prepend_path "PATH", Formula["rustup"].opt_bin
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3")
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
     ENV["SSL_CERT_FILE"] = ENV["CURL_CA_BUNDLE"] = HOMEBREW_PREFIX/"etc/ca-certificates/cert.pem"
-    ENV.prepend_path "PATH", rust_home/"bin"
     ENV.prepend_path "PATH", llvm.opt_bin
     ENV.prepend_path "PATH", formula_opt_bin("lld@21")
     # L3 bootstrap bun (from the "bootstrap" resource): runs the build
