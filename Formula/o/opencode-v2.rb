@@ -1,4 +1,4 @@
-class OpencodeAT2 < Formula
+class OpencodeV2 < Formula
   desc "AI coding agent, built for the terminal"
   homepage "https://opencode.ai"
   url "https://github.com/anomalyco/opencode.git", revision: "9eb6902aaf3c35ce985b67c605a775992249066b"
@@ -12,12 +12,16 @@ class OpencodeAT2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode@2-v2.0.11-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "94f919b475bff6b192d30601d2e192d288f22965ba62a92cddda1eed1ad6b971"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2-v2.0.11-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b08d34fcec682f094cdda84e8e85eb818d2f534b41122d484a14cd86eff8f64c"
   end
 
   depends_on "bun" => :build
   depends_on "node" => :build
+
+  # Officially v2 replaces v1 in place (same config/data dirs, binary name
+  # "opencode"); mirror the upstream anomalyco/tap/opencode-v2 formula.
+  conflicts_with "opencode", because: "both install an opencode binary"
 
   resource "solidjs-start" do
     url "https://pkg.pr.new/@solidjs/start@dfb2020"
@@ -31,11 +35,9 @@ class OpencodeAT2 < Formula
     0004-update-watcher-binding.patch
     0005-update-server-connection.patch
     0006-update-build-target.patch
-    0007-update-app-data-directory.patch
-    0008-restore-opencode2-binary-name.patch
   ].each do |p|
     patch do
-      file "Patches/opencode@2/#{p}"
+      file "Patches/opencode-v2/#{p}"
     end
   end
 
@@ -62,16 +64,16 @@ class OpencodeAT2 < Formula
       system "bun", "run", "script/build.ts", "--single"
     end
 
-    out = "packages/cli/dist/cli-linux-arm64-musl/bin/opencode2"
-    odie "opencode2 binary missing" unless File.exist?(out)
+    out = "packages/cli/dist/cli-linux-arm64-musl/bin/opencode"
+    odie "opencode binary missing" unless File.exist?(out)
 
-    bin.install out => "opencode2"
+    bin.install out
 
-    generate_completions_from_executable(bin/"opencode2", "--completions",
-                                         base_name: "opencode2")
+    generate_completions_from_executable(bin/"opencode", "--completions",
+                                         base_name: "opencode")
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/opencode2 --version 2>&1")
+    assert_match version.to_s, shell_output("#{bin}/opencode --version 2>&1")
   end
 end

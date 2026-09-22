@@ -67,7 +67,7 @@ env:
   # root-caused to stdout/stderr R_AARCH64_COPY relocs resolved to NULL by
   # OHOS musl ld.so (fixed in ohos-compat-shim 3874ab4), not the
   # regex-automata panic an earlier revision of this comment claimed.
-  ALLOWLIST: "opencode opencode@2 claude-code claude-code.latest"
+  ALLOWLIST: "opencode opencode-v2 claude-code claude-code.latest"
   IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core

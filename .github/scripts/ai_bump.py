@@ -201,7 +201,7 @@ status.json 的格式：
    - Homebrew 官方：https://github.com/Homebrew/homebrew-core/raw/refs/heads/main/Formula/{subdir}/{formula}.rb
    - Harmonybrew 官方（若存在同名 formula）：https://gitcode.com/Harmonybrew/homebrew-core/blob/main/Formula/{subdir}/{formula}.rb
 2. 升级过程不要抛弃掉原有的鸿蒙适配补丁或者鸿蒙适配的构建参数（部分软件包可能有，不是每个软件包都一定有）
-3. 如果需要制作补丁或新增补丁，请参考本 tap 的现有写法：Patches/<formula>/ 编号补丁文件 + formula 内 `patch do file` 挂载（可参考 bun、herdr、opencode@2 的现有补丁）
+3. 如果需要制作补丁或新增补丁，请参考本 tap 的现有写法：Patches/<formula>/ 编号补丁文件 + formula 内 `patch do file` 挂载（可参考 bun、herdr、opencode-v2 的现有补丁）
 4. 只允许修改 Formula/ 与 Patches/ 下的内容，不要动仓库里其他任何文件（包括 .github/）
 5. 这个报告用来展示在 PR 评论区，因此不宜过长
 6. report.md 会被嵌套在评论已有的一级标题之下，因此不要写总标题，也不要使用一级标题（#），正文直接从二级标题（##）开始分节，例如按 `## 现象`、`## 根因`、`## 修复`、`## 验证` 组织
