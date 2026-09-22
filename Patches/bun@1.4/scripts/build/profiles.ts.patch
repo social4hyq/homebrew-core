@@ -70,19 +70,3 @@ index 84a87a76d5..068ea07850 100644
      asan: true,
      assertions: true,
    },
-
-@@ -154,6 +154,15 @@ export const profiles = {
-   "release-local": {
-     buildType: "Release",
-     webkit: "local",
-     lto: false,
-   },
-+  /** Release build for the OHOS formula with source WebKit. */
-+  "ohos-release-local": {
-+    buildType: "Release",
-+    os: "linux",
-+    arch: "aarch64",
-+    abi: "ohos",
-+    webkit: "local",
-+    lto: false,
-+  },

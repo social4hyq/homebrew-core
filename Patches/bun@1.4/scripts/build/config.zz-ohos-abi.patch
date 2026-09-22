@@ -1,0 +1,11 @@
+diff --git a/scripts/build/config.ts b/scripts/build/config.ts
+index 671839b78c..ohosabi0001 100644
+--- a/scripts/build/config.ts
++++ b/scripts/build/config.ts
+@@ -734,5 +734,5 @@ export function resolveConfig(partial: PartialConfig, toolchain: Toolchain): Config {
+   const compilerArch = os === "windows" && host.os === "windows" ? clangTargetArch(toolchain.cc) : undefined;
+   const arch = partial.arch ?? compilerArch ?? host.arch;
+-  const abi: Abi | undefined = os === "linux" ? (partial.abi ?? detectLinuxAbi()) : undefined;
++  const abi: Abi | undefined = os === "linux" ? (partial.abi ?? (process.env.BUN_BUILD_ABI as Abi | undefined) ?? detectLinuxAbi()) : undefined;
+ 
+   const linux = os === "linux";
