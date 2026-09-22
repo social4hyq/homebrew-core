@@ -6,7 +6,7 @@ class ClaudeCodeLatest < Formula
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
   # Anthropic License forbids redistributing the official artifacts, so this is
   # a runtime-fetch stub: install() ships only a wrapper. It runs the official
-  # binary directly (self-signed with ohos-bst-light, launched through
+  # binary directly (self-signed with ohos-selfsign, launched through
   # ohos-compat-shim's ohos-shim) so it can follow the latest channel, including
   # releases that need Anthropic's private bun internals; the stable channel is
   # the separate claude-code formula.
@@ -19,11 +19,12 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.278-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "224a78b3f5889acf97281b6d1b080b967ba52a83a43a6037aa5e5c636aefea84"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.278-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ae10672a7f0f3071be4dc0f29fb95a08e3c6429af78385432faf68339d078841"
   end
 
-  depends_on "ohos-bst-light"
+  depends_on "ohos-selfsign"
   depends_on "ohos-compat-shim"
 
   conflicts_with "claude-code", because: "both install the `claude` binary"
@@ -60,7 +61,7 @@ class ClaudeCodeLatest < Formula
         done
         printf '%s  %s\\n' "#{stable.checksum}" "$TMP/pkg.tgz" | sha256sum -c -
         tar -xzf "$TMP/pkg.tgz" -C "$TMP"
-        "$HB/opt/ohos-bst-light/bin/selfsign" "$TMP/package/claude"
+        "$HB/opt/ohos-selfsign/bin/selfsign" "$TMP/package/claude"
         mv "$TMP/package/claude" "$BIN"
         chmod 0755 "$BIN"
       fi
