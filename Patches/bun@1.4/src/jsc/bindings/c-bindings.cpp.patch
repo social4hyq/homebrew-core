@@ -1,5 +1,5 @@
 diff --git a/src/jsc/bindings/c-bindings.cpp b/src/jsc/bindings/c-bindings.cpp
-index 481ccddda1..603da1255e 100644
+index 481ccddda14a78c4c9cc042622a938fe86961540..b9ab4bc95662ebe1791f40c109ffe689296f2a40 100644
 --- a/src/jsc/bindings/c-bindings.cpp
 +++ b/src/jsc/bindings/c-bindings.cpp
 @@ -16,6 +16,7 @@
@@ -48,7 +48,50 @@ index 481ccddda1..603da1255e 100644
  }
  #endif
  
-@@ -358,20 +368,32 @@ extern "C" void on_before_reload_process_posix()
+@@ -275,10 +285,42 @@ extern "C" void windows_enable_stdio_inheritance()
+ #define __NR_close_range 436
+ #endif
+ 
++#if defined(__OHOS__)
++extern "C" int bun_ohos_close_range_supported();
++#endif
++
+ // close_range is glibc > 2.33, which is very new
+ extern "C" ssize_t bun_close_range(unsigned int start, unsigned int end, unsigned int flags)
+ {
++#if defined(__OHOS__)
++    if (start > end || (flags & ~CLOSE_RANGE_CLOEXEC) != 0) {
++        errno = EINVAL;
++        return -1;
++    }
++
++    if (bun_ohos_close_range_supported()) {
++        const auto result = syscall(__NR_close_range, start, end, flags);
++        if (result >= 0 || (errno != ENOSYS && errno != EPERM && errno != EINVAL))
++            return result;
++    }
++
++    long limit = sysconf(_SC_OPEN_MAX);
++    if (limit < 0 || limit > 65536)
++        limit = 65536;
++    unsigned int last = end == ~0U ? static_cast<unsigned int>(limit - 1) : std::min(end, static_cast<unsigned int>(limit - 1));
++    for (unsigned int fd = start; fd <= last; fd++) {
++        if (flags & CLOSE_RANGE_CLOEXEC) {
++            int descriptorFlags = fcntl(static_cast<int>(fd), F_GETFD);
++            if (descriptorFlags >= 0)
++                fcntl(static_cast<int>(fd), F_SETFD, descriptorFlags | FD_CLOEXEC);
++        } else {
++            close(static_cast<int>(fd));
++        }
++    }
++    return 0;
++#else
+     return syscall(__NR_close_range, start, end, flags);
++#endif
+ }
+ #else // OS(FREEBSD)
+ // FreeBSD 12.2+ libc has close_range; 14.0+ supports CLOSE_RANGE_CLOEXEC
+@@ -358,20 +400,32 @@ extern "C" void on_before_reload_process_posix()
  }
  
  #if OS(LINUX)
@@ -83,7 +126,7 @@ index 481ccddda1..603da1255e 100644
  extern "C" int __real_execve(const char*, char* const[], char* const[]);
  extern "C" int __real_pthread_create(pthread_t*, const pthread_attr_t*, void* (*)(void*), void*);
  
-@@ -379,7 +401,18 @@ extern "C" int __wrap_execve(const char* path, char* const argv[], char* const e
+@@ -379,7 +433,18 @@ extern "C" int __wrap_execve(const char* path, char* const argv[], char* const e
  {
      if (getpid() != execve_counting_pid)
          return __real_execve(path, argv, envp);
@@ -103,7 +146,7 @@ index 481ccddda1..603da1255e 100644
      execve_generation.fetch_add(1, std::memory_order_seq_cst);
      int rc = __real_execve(path, argv, envp);
      // Only reached when execve failed and the old image keeps running.
-@@ -390,19 +423,31 @@ extern "C" int __wrap_execve(const char* path, char* const argv[], char* const e
+@@ -390,19 +455,31 @@ extern "C" int __wrap_execve(const char* path, char* const argv[], char* const e
  // The attempt bound keeps a real limit, hit while an exec never completes, from looping forever.
  extern "C" int __wrap_pthread_create(pthread_t* thread, const pthread_attr_t* attr, void* (*start_routine)(void*), void* arg)
  {
@@ -138,5 +181,15 @@ index 481ccddda1..603da1255e 100644
  }
  #endif // OS(LINUX)
  
+@@ -1132,7 +1209,11 @@ extern "C" void Bun__unregisterSignalsForForwarding()
+ #if OS(LINUX) || OS(DARWIN) || OS(FREEBSD)
+ #include <paths.h>
+ 
++#if defined(__OHOS__)
++extern "C" const char* BUN_DEFAULT_PATH_FOR_SPAWN = "/usr/bin:/bin:/system/bin";
++#else
+ extern "C" const char* BUN_DEFAULT_PATH_FOR_SPAWN = _PATH_DEFPATH;
++#endif
+ #elif OS(WINDOWS)
  extern "C" const char* BUN_DEFAULT_PATH_FOR_SPAWN = "C:\\Windows\\System32;C:\\Windows;";
  #else

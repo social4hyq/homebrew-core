@@ -1,97 +1,258 @@
 diff --git a/src/sys/linux_syscall.rs b/src/sys/linux_syscall.rs
-index ae5cc00417..4436fb19a4 100644
+index ae5cc0041722e39939949fa083eeab55bc91dac3..37495bd0880208edfa6b70a67ece96b48aa95746 100644
 --- a/src/sys/linux_syscall.rs
 +++ b/src/sys/linux_syscall.rs
-@@ -91,36 +91,295 @@ pub(crate) fn openat(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd,
+@@ -18,6 +18,8 @@
+ //! `linux`/`android`, so the gate must list both.
+ #![cfg(any(target_os = "linux", target_os = "android"))]
  
- #[inline]
- pub(crate) fn openat2_beneath(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd, i32> {
--    let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
--    let mode = rustix::fs::Mode::from_raw_mode(mode);
--    let dir = dir.as_borrowed_fd();
--    retry(|| {
--        rustix::fs::openat2(
--            dir,
--            path.as_cstr(),
--            oflags,
--            mode,
--            rustix::fs::ResolveFlags::BENEATH,
--        )
--    })
--    .map(own_fd)
-+    // OHOS seccomp SIGSYS-kills openat2 unconditionally, uncatchably (unlike
-+    // close_range's raw `syscall()` entry point, this goes through rustix's
-+    // own inline-asm syscall backend, which no libc-symbol interposition —
-+    // ohos_compat_shim.c included — can reach). Both call sites already
-+    // treat ENOSYS/EPERM/EINVAL as "openat2 unavailable, fall back" for
-+    // pre-5.6-kernel compatibility, so short-circuiting here needs no
-+    // changes anywhere else.
-+    #[cfg(target_env = "ohos")]
-+    {
-+        let _ = (dir, path, flags, mode);
-+        return Err(libc::ENOSYS);
-+    }
-+    #[cfg(not(target_env = "ohos"))]
-+    {
-+        let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
-+        let mode = rustix::fs::Mode::from_raw_mode(mode);
-+        let dir = dir.as_borrowed_fd();
-+        retry(|| {
-+            rustix::fs::openat2(
-+                dir,
-+                path.as_cstr(),
-+                oflags,
-+                mode,
-+                rustix::fs::ResolveFlags::BENEATH,
-+            )
-+        })
-+        .map(own_fd)
-+    }
++#[cfg(target_env = "ohos")]
++use core::sync::atomic::{AtomicU8, Ordering};
+ use rustix::fd::{BorrowedFd, IntoRawFd, OwnedFd};
+ use rustix::io::Errno;
+ 
+@@ -57,6 +59,210 @@ fn errno() -> i32 {
+     bun_core::ffi::errno()
  }
  
- #[inline]
- pub(crate) fn openat2_in_root(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd, i32> {
--    let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
--    let mode = rustix::fs::Mode::from_raw_mode(mode);
--    let dir = dir.as_borrowed_fd();
--    retry(|| {
--        rustix::fs::openat2(
--            dir,
--            path.as_cstr(),
--            oflags,
--            mode,
--            rustix::fs::ResolveFlags::IN_ROOT | rustix::fs::ResolveFlags::NO_MAGICLINKS,
-+    // See openat2_beneath above: OHOS seccomp kills this uncatchably, and
-+    // sys/lib.rs's openat2_in_root() already falls back to plain openat on
-+    // ENOSYS.
-+    #[cfg(target_env = "ohos")]
-+    {
-+        let _ = (dir, path, flags, mode);
-+        return Err(libc::ENOSYS);
++#[cfg(target_env = "ohos")]
++fn probe_in_child(cache: &AtomicU8, probe: impl FnOnce() -> bool) -> bool {
++    match cache.load(Ordering::Relaxed) {
++        1 => return true,
++        2 => return false,
++        _ => {}
 +    }
-+    #[cfg(not(target_env = "ohos"))]
-+    {
-+        let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
-+        let mode = rustix::fs::Mode::from_raw_mode(mode);
-+        let dir = dir.as_borrowed_fd();
-+        retry(|| {
-+            rustix::fs::openat2(
-+                dir,
-+                path.as_cstr(),
-+                oflags,
-+                mode,
-+                rustix::fs::ResolveFlags::IN_ROOT | rustix::fs::ResolveFlags::NO_MAGICLINKS,
-+            )
-+        })
-+        .map(own_fd)
++
++    // The sandbox may deliver SIGSYS instead of errno. Probe in a child so
++    // the signal cannot terminate Bun or replace its process-wide handler.
++    let child = unsafe { libc::fork() };
++    if child == 0 {
++        unsafe { libc::_exit(if probe() { 0 } else { 1 }) };
++    }
++    if child < 0 {
++        return false;
++    }
++
++    let mut status = 0;
++    loop {
++        let result = unsafe { libc::waitpid(child, &raw mut status, 0) };
++        if result == child {
++            let supported = status & 0x7f == 0 && (status >> 8) & 0xff == 0;
++            cache.store(if supported { 1 } else { 2 }, Ordering::Relaxed);
++            return supported;
++        }
++        if result < 0 && errno() != libc::EINTR {
++            return false;
++        }
 +    }
 +}
 +
++#[cfg(target_env = "ohos")]
++fn probe_syscall(cache: &AtomicU8, call: fn() -> libc::c_long) -> bool {
++    probe_in_child(cache, || {
++        let result = call();
++        result >= 0 || !matches!(errno(), libc::ENOSYS | libc::EPERM)
++    })
++}
++
++#[cfg(target_env = "ohos")]
++fn splice_pipe_semantics() -> bool {
++    let mut source = [-1; 2];
++    let mut destination = [-1; 2];
++    if unsafe { libc::pipe2(source.as_mut_ptr(), libc::O_CLOEXEC) } != 0
++        || unsafe { libc::pipe2(destination.as_mut_ptr(), libc::O_CLOEXEC) } != 0
++    {
++        return false;
++    }
++    unsafe { libc::close(source[1]) };
++    if unsafe {
++        libc::splice(
++            source[0],
++            core::ptr::null_mut(),
++            destination[1],
++            core::ptr::null_mut(),
++            1,
++            0,
++        )
++    } != 0
++    {
++        return false;
++    }
++
++    let poller = unsafe { libc::epoll_create1(libc::EPOLL_CLOEXEC) };
++    let mut event: libc::epoll_event = unsafe { core::mem::zeroed() };
++    event.events = libc::EPOLLIN as u32;
++    if poller < 0
++        || unsafe { libc::epoll_ctl(poller, libc::EPOLL_CTL_ADD, destination[0], &mut event) } != 0
++    {
++        return false;
++    }
++
++    let mut input = [-1; 2];
++    if unsafe { libc::pipe2(input.as_mut_ptr(), libc::O_CLOEXEC) } != 0 {
++        return false;
++    }
++    for _ in 0..2 {
++        if unsafe { libc::write(input[1], b"x".as_ptr().cast(), 1) } != 1 {
++            return false;
++        }
++        let mut ready = [-1; 2];
++        if unsafe { libc::pipe2(ready.as_mut_ptr(), libc::O_CLOEXEC) } != 0 {
++            return false;
++        }
++        let waiter = unsafe { libc::fork() };
++        if waiter == 0 {
++            unsafe { libc::close(ready[0]) };
++            let signalled = unsafe { libc::write(ready[1], b"x".as_ptr().cast(), 1) } == 1;
++            let mut fired: libc::epoll_event = unsafe { core::mem::zeroed() };
++            let result = if signalled {
++                unsafe { libc::epoll_wait(poller, &mut fired, 1, 250) }
++            } else {
++                -1
++            };
++            unsafe {
++                libc::_exit(if result == 1 && fired.events & libc::EPOLLIN as u32 != 0 {
++                    0
++                } else {
++                    1
++                })
++            };
++        }
++        if waiter < 0 {
++            return false;
++        }
++        unsafe { libc::close(ready[1]) };
++        let mut byte = 0u8;
++        let signalled = unsafe { libc::read(ready[0], (&raw mut byte).cast(), 1) } == 1;
++        unsafe { libc::close(ready[0]) };
++        if !signalled {
++            unsafe { libc::kill(waiter, libc::SIGKILL) };
++            unsafe { libc::waitpid(waiter, core::ptr::null_mut(), 0) };
++            return false;
++        }
++        unsafe { libc::usleep(25_000) };
++        let copied = unsafe {
++            libc::splice(
++                input[0],
++                core::ptr::null_mut(),
++                destination[1],
++                core::ptr::null_mut(),
++                1,
++                0,
++            )
++        } == 1;
++        let mut status = 0;
++        let waited = unsafe { libc::waitpid(waiter, &raw mut status, 0) } == waiter;
++        if !copied
++            || !waited
++            || status != 0
++            || unsafe { libc::read(destination[0], (&raw mut byte).cast(), 1) } != 1
++        {
++            return false;
++        }
++    }
++    true
++}
++
++#[cfg(target_env = "ohos")]
++pub(crate) fn supports_fifo_splice() -> bool {
++    static CACHE: AtomicU8 = AtomicU8::new(0);
++    probe_in_child(&CACHE, splice_pipe_semantics)
++}
++
++#[cfg(target_env = "ohos")]
++pub(crate) fn supports_openat2() -> bool {
++    static CACHE: AtomicU8 = AtomicU8::new(0);
++    probe_syscall(&CACHE, || {
++        #[repr(C)]
++        struct OpenHow {
++            flags: u64,
++            mode: u64,
++            resolve: u64,
++        }
++        let how = OpenHow {
++            flags: libc::O_PATH as u64,
++            mode: 0,
++            resolve: 0x08,
++        };
++        unsafe {
++            libc::syscall(
++                437,
++                libc::AT_FDCWD as libc::c_long,
++                c".".as_ptr(),
++                &raw const how,
++                core::mem::size_of::<OpenHow>(),
++            )
++        }
++    })
++}
++
++#[cfg(target_env = "ohos")]
++pub(crate) fn supports_fchmodat2() -> bool {
++    static CACHE: AtomicU8 = AtomicU8::new(0);
++    probe_syscall(&CACHE, || unsafe {
++        libc::syscall(
++            452,
++            libc::AT_FDCWD as libc::c_long,
++            c"".as_ptr(),
++            0 as libc::c_long,
++            libc::AT_SYMLINK_NOFOLLOW as libc::c_long,
++        )
++    })
++}
++
++#[cfg(target_env = "ohos")]
++#[unsafe(no_mangle)]
++pub(crate) extern "C" fn bun_ohos_close_range_supported() -> libc::c_int {
++    static CACHE: AtomicU8 = AtomicU8::new(0);
++    if probe_syscall(&CACHE, || unsafe {
++        libc::syscall(
++            436,
++            u32::MAX as libc::c_long,
++            u32::MAX as libc::c_long,
++            4 as libc::c_long,
++        )
++    }) {
++        1
++    } else {
++        0
++    }
++}
++
+ /// EINTR-retry a rustix call.
+ #[inline(always)]
+ fn retry<T>(mut f: impl FnMut() -> rustix::io::Result<T>) -> Result<T, i32> {
+@@ -91,6 +297,10 @@ pub(crate) fn openat(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd,
+ 
+ #[inline]
+ pub(crate) fn openat2_beneath(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd, i32> {
++    #[cfg(target_env = "ohos")]
++    if !supports_openat2() {
++        return Err(libc::ENOSYS);
++    }
+     let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
+     let mode = rustix::fs::Mode::from_raw_mode(mode);
+     let dir = dir.as_borrowed_fd();
+@@ -108,6 +318,10 @@ pub(crate) fn openat2_beneath(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> R
+ 
+ #[inline]
+ pub(crate) fn openat2_in_root(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd, i32> {
++    #[cfg(target_env = "ohos")]
++    if !supports_openat2() {
++        return Err(libc::ENOSYS);
++    }
+     let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
+     let mode = rustix::fs::Mode::from_raw_mode(mode);
+     let dir = dir.as_borrowed_fd();
+@@ -123,6 +337,241 @@ pub(crate) fn openat2_in_root(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> R
+     .map(own_fd)
+ }
+ 
 +// openat2(RESOLVE_IN_ROOT | RESOLVE_NO_MAGICLINKS) userspace emulation.
 +//
 +// Used by sys/lib.rs::openat2_in_root when the real syscall is unusable:
-+// OHOS (app-sandbox seccomp SIGSYS-kills it uncatchably — see the
-+// short-circuits above) and Linux < 5.6. The previous fallback was a plain
++// OHOS when its sandbox blocks the syscall and Linux < 5.6.
++// The previous fallback was a plain
 +// `openat`, which follows symlinks and let request paths escape the served
 +// root (serve-directory-routes.test.ts "rejects symlink escapes").
 +//
@@ -132,9 +293,7 @@ index ae5cc00417..4436fb19a4 100644
 +            b"\0".as_ptr().cast(),
 +            buf.as_mut_ptr().cast(),
 +            buf.len(),
-         )
--    })
--    .map(own_fd)
++        )
 +    };
 +    if rc < 0 {
 +        Err(errno())
@@ -209,6 +368,7 @@ index ae5cc00417..4436fb19a4 100644
 +                return Err(libc::ENAMETOOLONG);
 +            }
 +            zbuf[..comp.len()].copy_from_slice(comp);
++            zbuf[comp.len()] = 0;
 +            let z = ZStr::from_buf_mut(&mut zbuf, comp.len());
 +            let fd = openat(
 +                owned.expect("depth > 0 implies an owned intermediate fd"),
@@ -235,6 +395,7 @@ index ae5cc00417..4436fb19a4 100644
 +            return Err(libc::ENAMETOOLONG);
 +        }
 +        zbuf[..comp.len()].copy_from_slice(comp);
++        zbuf[comp.len()] = 0;
 +        let z = ZStr::from_buf_mut(&mut zbuf, comp.len());
 +
 +        // "Last component" = nothing but slashes remains after it.
@@ -320,6 +481,8 @@ index ae5cc00417..4436fb19a4 100644
 +
 +    // Empty (or all-slash) component stream: openat2 gives ENOENT.
 +    Err(libc::ENOENT)
- }
- 
++}
++
  #[inline]
+ pub(crate) fn read(fd: Fd, buf: &mut [u8]) -> Result<usize, i32> {
+     let fd = fd.as_borrowed_fd();

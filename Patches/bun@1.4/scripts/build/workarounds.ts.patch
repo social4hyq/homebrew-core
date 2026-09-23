@@ -1,8 +1,8 @@
 diff --git a/scripts/build/workarounds.ts b/scripts/build/workarounds.ts
-index fd19077373..d3d2e8d094 100644
+index fd1907737399d810a4937b4d4c2a476ded506ae4..063dd60b2506cb9971ecbaf009a2de5341ae8ee1 100644
 --- a/scripts/build/workarounds.ts
 +++ b/scripts/build/workarounds.ts
-@@ -177,6 +177,698 @@ export const workarounds: Workaround[] = [
+@@ -177,6 +177,587 @@ export const workarounds: Workaround[] = [
        `(options.detached block), replace the local 0x80 with libc::POSIX_SPAWN_SETSID, ` +
        `drop the explanatory comments, and delete this entry.`,
    },
@@ -31,57 +31,24 @@ index fd19077373..d3d2e8d094 100644
 +      `Delete the -fno-emulated-tls entry in globalFlags (scripts/build/flags.ts) and this entry.`,
 +  },
 +  {
-+    id: "ohos-compat-shim-embed",
++    id: "ohos-sigsys-syscall-probe",
 +    issue: "https://gitee.com/openharmony (no tracked issue — application-sandbox seccomp policy)",
 +    description:
-+      "The OHOS app sandbox's seccomp filter SIGSYS-kills several Linux syscalls the kernel and " +
-+      "OpenHarmony itself otherwise support (close_range, fchmodat2, ...) instead of returning " +
-+      "ENOSYS/EPERM, and a few libc calls assume a traditional /etc/passwd-backed uid or writable " +
-+      "P_tmpdir. shims/ohos_compat_shim.c interposes the libc-symbol level of these (both the named " +
-+      "function and bun's own internal syscall()/close_range() callers, since it's linked directly " +
-+      "into the executable rather than LD_PRELOAD'd) and falls back to a userspace-safe path. " +
-+      "Canonical source lives in the standalone ../ohos-compat-shim repo, synced in as-needed — " +
-+      "diff before resyncing to confirm no bun-side customization has drifted.",
++      "The current OHOS app sandbox can terminate close_range, openat2, and fchmodat2 with " +
++      "SIGSYS. src/sys/linux_syscall.rs probes each syscall once in a child process and caches " +
++      "the result, so a future OS that permits them uses the native path automatically. " +
++      "Blocked calls use source-level fallbacks: c-bindings.cpp closes descriptors individually, " +
++      "sys/lib.rs handles install-time chmod, and openat2_in_root_clamped preserves IN_ROOT " +
++      "semantics without following paths outside the root. FIFO splice uses read/write unless " +
++      "an isolated runtime probe confirms correct EOF and epoll wakeup behavior.",
 +    applies: cfg => cfg.abi === "ohos",
 +    expectedToBeFixed: () => {
-+      // Sandbox policy, not a toolchain/library version — no reliable
-+      // signal to check. Re-test by removing the shim and running the
-+      // pipe-idle/close_range-triggering smoke test (`bun-profile
-+      // --revision` forks and hits close_range during its crash-handler
-+      // self-registration) on a newer OHOS SDK/device; flip to a real
-+      // check only if a future SDK exposes a queryable capability flag.
++      // The runtime probe covers both current and future sandbox policies.
 +      return false;
 +    },
 +    cleanup:
-+      `Delete scripts/build/shims/ohos_compat_shim.c, the needsOhosCompatShim block in shims.ts ` +
-+      `(registerShimRules + emitShims), and this entry.`,
-+  },
-+  {
-+    id: "ohos-openat2-uncatchable-sigsys",
-+    issue: "https://gitee.com/openharmony (no tracked issue — application-sandbox seccomp policy)",
-+    description:
-+      "Unlike close_range (ohos-compat-shim-embed above), the OHOS app sandbox's seccomp filter " +
-+      "SIGSYS-kills openat2 in a way no libc-symbol interposition can catch: rustix's openat2 " +
-+      "backend issues the syscall via its own inline-asm trampoline, never touching a named libc " +
-+      "symbol a linked-in shim could interpose. src/sys/linux_syscall.rs short-circuits both " +
-+      "openat2_beneath and openat2_in_root to return ENOSYS on OHOS before ever attempting the " +
-+      "real syscall. Fallout note: src/install/bin.rs's openat2_beneath caller treats the Err as " +
-+      "a benign None sentinel (slow-path fallback), but sys/lib.rs's openat2_in_root previously " +
-+      "fell back to plain openat — which follows symlinks and was a directory-route escape hole " +
-+      "(serve-directory-routes.test.ts). The fallback is now a per-component clamped walk " +
-+      "(openat2_in_root_clamped) with RESOLVE_IN_ROOT semantics; see that function.",
-+    applies: cfg => cfg.abi === "ohos",
-+    expectedToBeFixed: () => {
-+      // Sandbox policy, not a toolchain/library version — no reliable
-+      // signal to check. Re-test by removing the two #[cfg(target_env =
-+      // "ohos")] short-circuits and running `bun install` on a newer OHOS
-+      // SDK/device; flip to a real check only if a future SDK exposes a
-+      // queryable capability flag.
-+      return false;
-+    },
-+    cleanup:
-+      `Remove the #[cfg(target_env = "ohos")] short-circuit blocks from openat2_beneath and ` +
-+      `openat2_in_root in src/sys/linux_syscall.rs, and this entry.`,
++      "Remove the isolated probes and fallbacks only when older affected OHOS releases " +
++      "are no longer supported.",
 +  },
 +  {
 +    id: "ohos-codesign-required",
@@ -435,38 +402,6 @@ index fd19077373..d3d2e8d094 100644
 +      "in src/io/PipeWriter.rs, and this entry.",
 +  },
 +  {
-+    id: "ohos-ld-preload-node",
-+    issue: "https://gitee.com/openharmony (no tracked issue — app-sandbox uid has no /etc/passwd entry)",
-+    description:
-+      "A `node`-like child exec'd by bun (Bun.spawn/Bun.$/bun run scripts) gets the app-sandbox " +
-+      "uid's real dynamic-musl libc, not the ohos-compat-shim symbols linked directly into bun's " +
-+      "own executable (see ohos-compat-shim-embed), so its os.userInfo() throws ENOENT (uids like " +
-+      "20020101 have no /etc/passwd record). Fixed by compiling ohos_compat_shim.c a second way " +
-+      "(-shared -fPIC, scripts/build/shims.ts's shim_cc_so rule) into a standalone " +
-+      "libohos_compat_preload.so next to the executable, and injecting LD_PRELOAD=<path> onto " +
-+      "node-like children (argv0 basename match: node/nodejs/nodeNN/npm/npx/corepack/yarn/pnpm/ " +
-+      "pnpx) in src/runtime/api/bun/ohos_ld_preload.rs, called from both js_bun_spawn_bindings.rs " +
-+      "and shell/subproc.rs. Needed an explicit -fvisibility=default override in the shim_cc_so " +
-+      "rule -- globalFlags' -fvisibility=hidden (correct default for every other translation unit " +
-+      "in this build) hides getpwuid_r from the .so's dynamic symbol table otherwise, silently " +
-+      "defeating the whole interposition (caught via llvm-nm -D showing a local `t` symbol instead " +
-+      "of global `T`). Escape hatch: BUN_OHOS_NO_LD_PRELOAD_NODE=1.",
-+    applies: cfg => cfg.abi === "ohos",
-+    expectedToBeFixed: () => {
-+      // Sandbox/kernel behavior (no /etc/passwd for app-sandbox uids), not a
-+      // toolchain/library version — no reliable signal to check. Re-test by
-+      // removing the LD_PRELOAD injection and running `Bun.spawnSync` (or
-+      // `Bun.$`) against the real installed node binary's
-+      // `os.userInfo()` on a newer OHOS SDK/device.
-+      return false;
-+    },
-+    cleanup:
-+      "Delete src/runtime/api/bun/ohos_ld_preload.rs, its two call sites in " +
-+      "js_bun_spawn_bindings.rs and shell/subproc.rs, the shim_cc_so rule " +
-+      "and libohos_compat_preload.so build edge in scripts/build/shims.ts, " +
-+      "and this entry.",
-+  },
-+  {
 +    id: "ohos-epoll-ctl-del-dup-corruption",
 +    issue: "https://gitee.com/openharmony (no tracked issue — kernel epoll keys by open file description, not (fd, file))",
 +    description:
@@ -621,52 +556,6 @@ index fd19077373..d3d2e8d094 100644
 +      "Revert wasi-runner.js's preopens construction to the unconditional " +
 +      '`{ ".": WASM_CWD || process.cwd(), "/": WASM_ROOT_DIR || "/" }` form, ' +
 +      "and this entry.",
-+  },
-+  {
-+    id: "ohos-getcwd-honest",
-+    issue: "https://gitee.com/openharmony (no tracked issue — ohos-compat-shim design tradeoff, not a kernel bug)",
-+    description:
-+      "ohos-compat-shim's getcwd() LD_PRELOAD interposer silently substitutes $HOME when the real " +
-+      "cwd has been rmdir'd out from under the process (a reasonable default for most callers, " +
-+      "keeping them from crashing on a bare ENOENT) -- but a few startup-path call sites need the " +
-+      "honest failure instead, so a deleted cwd can be reported as a clean error rather than " +
-+      "silently running with the wrong directory. Added bun_core::getcwd_honest() (re-checks via " +
-+      "readlink(\"/proc/self/cwd\") + stat(), since this kernel's readlink ENOENTs directly on a " +
-+      "deleted cwd rather than Linux's \" (deleted)\" suffix) and bun_sys::process_cwd() (same " +
-+      "check, duplicated because bun_sys depends on bun_core) and wired them into the eight call " +
-+      "sites that need them: resolver/lib.rs's FileSystem::init_with_force (Transpiler::init's " +
-+      "very first getcwd, exercised by a compiled standalone executable's startup), " +
-+      "runtime/cli/Arguments.rs's absolute_working_dir resolution (install/test/build via the " +
-+      "normal CLI), node_process.rs's process.cwd() JS binding, install_completions_command.rs's " +
-+      "one call site, and package_manager_command.rs's four call sites (all part of the same " +
-+      "\"report a deleted cwd as a fatal CLI error\" family -- found via " +
-+      "test/cli/bun.test.ts's \"reports that PowerShell completions do not exist when $SHELL is " +
-+      "pwsh\" sub-test, which explicitly rmdir's its cwd before exec'ing `bun completions` and " +
-+      "expects the honest \"Could not get current working directory\" error). Also added the same " +
-+      "re-check to the existing getcwd_or_exe_dir() fallback, which was tolerating a deleted cwd " +
-+      "via the shim's fake-success path instead of genuinely falling back to the executable's " +
-+      "directory. Deliberately NOT converted: ~14 other bun_sys::getcwd() call sites elsewhere " +
-+      "(glob, shell interpreter, workspace/lockfile resolution, standalone module graph, JSC VM, " +
-+      "markdown renderer, fetch, exec_command, bunfig/CLI arguments) -- those are best-effort " +
-+      "cwd-for-display or internal bookkeeping uses where the shim's tolerant fallback is the " +
-+      "correct behavior, not the \"report a fatal startup error\" pattern these eight share.",
-+    applies: cfg => cfg.abi === "ohos",
-+    expectedToBeFixed: () => {
-+      // Depends on ohos-compat-shim's own getcwd() interposer design, not a
-+      // kernel/toolchain version -- no reliable signal to check. Re-test by
-+      // reverting all eight call sites to plain bun_core::getcwd() /
-+      // bun_sys::getcwd() and running
-+      // test/bundler/bun-build-compile.test.ts -t "exits cleanly instead of
-+      // crashing" and test/cli/bun.test.ts -t "PowerShell completions do
-+      // not exist" on a newer ohos-compat-shim build.
-+      return false;
-+    },
-+    cleanup:
-+      "Remove getcwd_honest()/cwd_is_deleted_ohos() from src/bun_core/util.rs, " +
-+      "process_cwd()/cwd_is_deleted() from src/sys/lib.rs, revert the eight " +
-+      "call sites (resolver/lib.rs, runtime/cli/Arguments.rs, " +
-+      "runtime/node/node_process.rs, runtime/cli/install_completions_command.rs, " +
-+      "runtime/cli/package_manager_command.rs x4) back to plain getcwd(), and this entry.",
 +  },
 +  {
 +    id: "ohos-tcc-sysroot",

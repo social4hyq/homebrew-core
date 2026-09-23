@@ -18,7 +18,7 @@ class BunAT14 < Formula
   ]
   # OHOS patch-series refresh: the artifact changes with the same upstream
   # version, so installed users must be offered the rebuild.
-  revision 3
+  revision 4
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
@@ -159,8 +159,6 @@ class BunAT14 < Formula
            "--canary=off", "--abi=ohos"
 
     bin.install "build/release-local/bun"
-    # Required beside bun for LD_PRELOAD in OHOS node child processes.
-    bin.install "build/release-local/libohos_compat_preload.so"
     bin.install_symlink "bun" => "bunx"
     bash_completion.install "completions/bun.bash" => "bun"
     fish_completion.install "completions/bun.fish"
