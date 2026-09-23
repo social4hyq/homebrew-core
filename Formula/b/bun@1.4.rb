@@ -18,7 +18,7 @@ class BunAT14 < Formula
   ]
   # OHOS patch-series refresh: the artifact changes with the same upstream
   # version, so installed users must be offered the rebuild.
-  revision 4
+  revision 5
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
