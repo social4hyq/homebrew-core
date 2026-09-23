@@ -1,5 +1,5 @@
 diff --git a/src/jsc/bindings/c-bindings.cpp b/src/jsc/bindings/c-bindings.cpp
-index 481ccddda14a78c4c9cc042622a938fe86961540..b9ab4bc95662ebe1791f40c109ffe689296f2a40 100644
+index 481ccddda14a78c4c9cc042622a938fe86961540..75fe3f691fd08ff6d624d1186cff90bf5c254a1e 100644
 --- a/src/jsc/bindings/c-bindings.cpp
 +++ b/src/jsc/bindings/c-bindings.cpp
 @@ -16,6 +16,7 @@
@@ -181,15 +181,3 @@ index 481ccddda14a78c4c9cc042622a938fe86961540..b9ab4bc95662ebe1791f40c109ffe689
  }
  #endif // OS(LINUX)
  
-@@ -1132,7 +1209,11 @@ extern "C" void Bun__unregisterSignalsForForwarding()
- #if OS(LINUX) || OS(DARWIN) || OS(FREEBSD)
- #include <paths.h>
- 
-+#if defined(__OHOS__)
-+extern "C" const char* BUN_DEFAULT_PATH_FOR_SPAWN = "/usr/bin:/bin:/system/bin";
-+#else
- extern "C" const char* BUN_DEFAULT_PATH_FOR_SPAWN = _PATH_DEFPATH;
-+#endif
- #elif OS(WINDOWS)
- extern "C" const char* BUN_DEFAULT_PATH_FOR_SPAWN = "C:\\Windows\\System32;C:\\Windows;";
- #else
