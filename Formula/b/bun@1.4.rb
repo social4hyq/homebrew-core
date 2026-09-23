@@ -18,15 +18,15 @@ class BunAT14 < Formula
   ]
   # OHOS patch-series refresh: the artifact changes with the same upstream
   # version, so installed users must be offered the rebuild.
-  revision 3
+  revision 4
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r13"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca3e5038ed5762d4ab8d20de88383e9f2eab9d647052bcf8217c3b5cedb96a63"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0620993e2e52dba342ec5478366434d743ce27774e2a587392cc5e6cfbe125e"
   end
 
   depends_on "cmake" => :build
@@ -159,8 +159,6 @@ class BunAT14 < Formula
            "--canary=off", "--abi=ohos"
 
     bin.install "build/release-local/bun"
-    # Required beside bun for LD_PRELOAD in OHOS node child processes.
-    bin.install "build/release-local/libohos_compat_preload.so"
     bin.install_symlink "bun" => "bunx"
     bash_completion.install "completions/bun.bash" => "bun"
     fish_completion.install "completions/bun.fish"

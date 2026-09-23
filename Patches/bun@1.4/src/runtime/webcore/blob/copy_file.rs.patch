@@ -1,0 +1,39 @@
+diff --git a/src/runtime/webcore/blob/copy_file.rs b/src/runtime/webcore/blob/copy_file.rs
+index a54a12813a8ece76dfbf1a57002550143212d51e..749895918d133a6f84a90e64104b4981ac1e35f4 100644
+--- a/src/runtime/webcore/blob/copy_file.rs
++++ b/src/runtime/webcore/blob/copy_file.rs
+@@ -340,6 +340,22 @@ impl CopyFile {
+         }
+     }
+ 
++    #[cfg(any(target_os = "linux", target_os = "android"))]
++    fn do_fifo_copy(&mut self, clear_append: bool) {
++        #[cfg(target_env = "ohos")]
++        if !bun_sys::supports_fifo_splice() {
++            let mut total_written = 0;
++            let _ = self.fallback_read_write(MAX_SIZE as usize, true, &mut total_written);
++            self.read_len = total_written as SizeType;
++            return;
++        }
++        if clear_append {
++            let _ = self.do_copy_file_range::<{ TryWith::Splice }, true>();
++        } else {
++            let _ = self.do_copy_file_range::<{ TryWith::Splice }, false>();
++        }
++    }
++
+     #[cfg(any(target_os = "linux", target_os = "android"))]
+     pub(crate) fn do_copy_file_range<const USE: TryWith, const CLEAR_APPEND_IF_INVALID: bool>(
+         &mut self,
+@@ -836,9 +852,9 @@ impl CopyFile {
+                     && bun_sys::S::ISFIFO(self.destination_file_store.mode as _)
+                 {
+                     if self.destination_file_store.is_atty.unwrap_or(false) {
+-                        let _ = self.do_copy_file_range::<{ TryWith::Splice }, true>();
++                        self.do_fifo_copy(true);
+                     } else {
+-                        let _ = self.do_copy_file_range::<{ TryWith::Splice }, false>();
++                        self.do_fifo_copy(false);
+                     }
+ 
+                     self.do_close();

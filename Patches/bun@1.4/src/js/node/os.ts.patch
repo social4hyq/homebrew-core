@@ -2,6 +2,20 @@ diff --git a/src/js/node/os.ts b/src/js/node/os.ts
 index 3326d8093d..b3c13648c3 100644
 --- a/src/js/node/os.ts
 +++ b/src/js/node/os.ts
+@@ -13,7 +13,12 @@ var tmpdir = function () {
+       return path;
+     }
+     var path =
+-      env["TMPDIR"] || env["TMP"] || env["TEMP"] || (process.platform === "android" ? "/data/local/tmp" : "/tmp");
++      env["TMPDIR"] || env["TMP"] || env["TEMP"] ||
++      (process.platform === "android"
++        ? "/data/local/tmp"
++        : process.platform === "openharmony"
++          ? "/data/storage/el2/base/cache"
++          : "/tmp");
+     const length = path.length;
+     if (length > 1 && path[length - 1] === "/") path = path.slice(0, -1);
+     return path;
 @@ -121,11 +121,13 @@ function bound(binding) {
          ? "Windows_NT"
          : process.platform === "darwin"

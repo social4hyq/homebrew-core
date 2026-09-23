@@ -1,19 +1,8 @@
 diff --git a/src/resolver/lib.rs b/src/resolver/lib.rs
-index ed42cc00e7..dc5c104318 100644
+index ed42cc00e7bea52bd6a01b81da437a054f53443c..964823060dd1ecd3e347c482eabb68ddab34ef1c 100644
 --- a/src/resolver/lib.rs
 +++ b/src/resolver/lib.rs
-@@ -293,7 +293,9 @@ pub mod fs {
-                 Some(d) => DirnameStore::instance().append_slice(d)?,
-                 None => {
-                     let mut buf = bun_paths::PathBuffer::default();
--                    DirnameStore::instance().append_slice(bun_core::getcwd(&mut buf)?.as_bytes())?
-+                    // getcwd_honest: the ohos-compat-shim's getcwd hides a deleted cwd by substituting $HOME; this site wants the real error.
-+                    DirnameStore::instance()
-+                        .append_slice(bun_core::getcwd_honest(&mut buf)?.as_bytes())?
-                 }
-             };
-             // Seed the lower-tier `bun_paths::fs::FileSystem` singleton with the
-@@ -1098,9 +1100,9 @@ pub mod fs {
+@@ -1098,9 +1098,9 @@ pub mod fs {
                  // that read the limit into an int.
                  let target = {
                      // musl has extremely low defaults, so ensure at least 163840 there.
@@ -25,7 +14,7 @@ index ed42cc00e7..dc5c104318 100644
                      let max = lim.max;
                      max.min(1 << 20)
                  };
-@@ -1112,6 +1114,14 @@ pub mod fs {
+@@ -1112,6 +1112,14 @@ pub mod fs {
                      raised.max = lim.max.max(target);
                      if bun_sys::posix::setrlimit(resource, raised).is_ok() {
                          lim.cur = raised.cur;
