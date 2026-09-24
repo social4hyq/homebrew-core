@@ -56,6 +56,24 @@ if [ "$(git rev-parse HEAD)" != "$CHECKOUT_SHA" ]; then
   cexec "git -C $TAP_IN_CONTAINER reset --hard $CHECKOUT_SHA"
 fi
 
+# `brew update` above pulls Homebrew/brew itself, not just the tap, and can
+# bump Library/Homebrew/Gemfile.lock's BUNDLED WITH pin ahead of the
+# ci-runner image's baked ruby's default bundler gem. Every `brew test`/
+# `brew audit` unconditionally calls Utils::GemSetup.install_bundler_gems!,
+# which shells out to `bundle install`; on a version mismatch bundler
+# self-upgrades and re-execs itself, but that re-exec does not forward
+# BUNDLE_GEMFILE, so the re-exec'd process searches for a Gemfile from cwd
+# upward, finds none (brew test's cwd is not the Homebrew Library dir), and
+# dies with "Could not locate Gemfile" (confirmed 2026-09-24, PR #661: 3/3
+# `brew test bun@1.4` reproductions right after this brew update, while
+# light-check's `brew audit` in a separate job/container that never calls
+# `brew update` passed against the same still-unbumped baked lockfile).
+# Installing the latest bundler gem keeps the two in sync so bundler never
+# takes that self-upgrade path. Non-fatal: a rubygems.org blip here just
+# leaves the pre-existing mismatch, which is the status quo today.
+cexec "gem install bundler --no-document" \
+  || echo "::warning::gem install bundler failed; brew test/audit may hit the bundler self-upgrade Gemfile bug"
+
 # atomgit CDN has transient 404s: retry once after 90s; brew reuses partial work
 for i in 1 2; do
   if cexec "${ENV_PREFIX}${BREW_ENV} brew install --build-bottle --verbose $TAP/$FORMULA" 2>&1 | tee build.log; then

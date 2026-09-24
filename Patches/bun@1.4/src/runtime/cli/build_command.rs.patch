@@ -1,12 +1,10 @@
-diff --git a/src/runtime/cli/build_command.rs b/src/runtime/cli/build_command.rs
-index a175206c57..a6045de5d9 100644
---- a/src/runtime/cli/build_command.rs
-+++ b/src/runtime/cli/build_command.rs
-@@ -1023,6 +1023,41 @@ impl BuildCommand {
+--- a/src/runtime/cli/build_command.rs	2026-09-24 21:35:26.107666407 +0800
++++ b/src/runtime/cli/build_command.rs	2026-09-24 21:36:33.383668594 +0800
+@@ -1023,6 +1023,30 @@
                      }
                  }
  
-+                // OHOS: the appended payload invalidates the .codesign (shifts alignment), so strip it and re-sign in-process or the compiled binary can't execute.
++                // Sign the completed executable for OHOS.
 +                #[cfg(target_env = "ohos")]
 +                {
 +                    use std::os::unix::ffi::OsStrExt;
@@ -26,18 +24,7 @@ index a175206c57..a6045de5d9 100644
 +                    };
 +                    if !outfile_path.is_empty() {
 +                        let outfile_os = std::ffi::OsStr::from_bytes(&outfile_path[..]);
-+                        use std::os::unix::fs::PermissionsExt;
-+                        let mode = std::fs::metadata(outfile_os)
-+                            .map(|metadata| metadata.permissions().mode())
-+                            .ok();
-+                        let _ = std::fs::File::open(outfile_os).and_then(|f| f.sync_all());
 +                        let _ = ohos_sign::sign_selfsign_inplace_with_strip(std::path::Path::new(outfile_os));
-+                        if let Some(mode) = mode {
-+                            let _ = std::fs::set_permissions(
-+                                outfile_os,
-+                                std::fs::Permissions::from_mode(mode),
-+                            );
-+                        }
 +                    }
 +                }
 +

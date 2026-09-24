@@ -1,8 +1,6 @@
-diff --git a/src/runtime/ffi/ffi_body.rs b/src/runtime/ffi/ffi_body.rs
-index 73f2322c51..fb978e5b45 100644
---- a/src/runtime/ffi/ffi_body.rs
-+++ b/src/runtime/ffi/ffi_body.rs
-@@ -730,6 +730,84 @@ impl CompileC {
+--- a/src/runtime/ffi/ffi_body.rs	2026-09-24 21:35:26.267669844 +0800
++++ b/src/runtime/ffi/ffi_body.rs	2026-09-24 21:36:33.387666250 +0800
+@@ -730,6 +730,80 @@
              }
          }
  
@@ -35,11 +33,7 @@ index 73f2322c51..fb978e5b45 100644
 +                        if let Ok(prefix) = std::env::var("HOMEBREW_PREFIX") {
 +                            roots.push(prefix.into_bytes());
 +                        }
-+                        if let Some(home) = env_var::HOME.get() {
-+                            let mut root = home.to_vec();
-+                            root.extend_from_slice(b"/.harmonybrew");
-+                            roots.push(root);
-+                        }
++                        roots.push(b"/storage/Users/currentUser/.harmonybrew".to_vec());
 +                        const SYSROOT_SUFFIXES: [&str; 1] = ["/opt/ohos-sdk-native/sysroot"];
 +                        for root in &roots {
 +                            for suffix in SYSROOT_SUFFIXES {

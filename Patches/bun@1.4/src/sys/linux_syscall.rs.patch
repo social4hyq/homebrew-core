@@ -1,5 +1,3 @@
-diff --git a/src/sys/linux_syscall.rs b/src/sys/linux_syscall.rs
-index ae5cc0041722e39939949fa083eeab55bc91dac3..37495bd0880208edfa6b70a67ece96b48aa95746 100644
 --- a/src/sys/linux_syscall.rs
 +++ b/src/sys/linux_syscall.rs
 @@ -18,6 +18,8 @@
@@ -11,7 +9,7 @@ index ae5cc0041722e39939949fa083eeab55bc91dac3..37495bd0880208edfa6b70a67ece96b4
  use rustix::fd::{BorrowedFd, IntoRawFd, OwnedFd};
  use rustix::io::Errno;
  
-@@ -57,6 +59,210 @@ fn errno() -> i32 {
+@@ -57,6 +59,210 @@
      bun_core::ffi::errno()
  }
  
@@ -222,7 +220,7 @@ index ae5cc0041722e39939949fa083eeab55bc91dac3..37495bd0880208edfa6b70a67ece96b4
  /// EINTR-retry a rustix call.
  #[inline(always)]
  fn retry<T>(mut f: impl FnMut() -> rustix::io::Result<T>) -> Result<T, i32> {
-@@ -91,6 +297,10 @@ pub(crate) fn openat(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd,
+@@ -91,6 +297,10 @@
  
  #[inline]
  pub(crate) fn openat2_beneath(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd, i32> {
@@ -233,7 +231,7 @@ index ae5cc0041722e39939949fa083eeab55bc91dac3..37495bd0880208edfa6b70a67ece96b4
      let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
      let mode = rustix::fs::Mode::from_raw_mode(mode);
      let dir = dir.as_borrowed_fd();
-@@ -108,6 +318,10 @@ pub(crate) fn openat2_beneath(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> R
+@@ -108,6 +318,10 @@
  
  #[inline]
  pub(crate) fn openat2_in_root(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd, i32> {
@@ -244,7 +242,7 @@ index ae5cc0041722e39939949fa083eeab55bc91dac3..37495bd0880208edfa6b70a67ece96b4
      let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
      let mode = rustix::fs::Mode::from_raw_mode(mode);
      let dir = dir.as_borrowed_fd();
-@@ -123,6 +337,241 @@ pub(crate) fn openat2_in_root(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> R
+@@ -123,7 +337,255 @@
      .map(own_fd)
  }
  
@@ -281,8 +279,16 @@ index ae5cc0041722e39939949fa083eeab55bc91dac3..37495bd0880208edfa6b70a67ece96b4
 +/// fills the buffer is not a target we can represent.
 +const IN_ROOT_LINK_MAX: usize = 4096;
 +
++struct InRootFdGuard(Fd);
++
++impl Drop for InRootFdGuard {
++    fn drop(&mut self) {
++        let _ = close(self.0.native());
++    }
++}
++
 +/// `readlinkat(fd, "", buf)` — reads the link an O_PATH fd points at.
-+#[inline]
+ #[inline]
 +fn readlinkat_empty(fd: Fd, buf: &mut [u8]) -> Result<usize, i32> {
 +    // SAFETY: `fd` is a valid descriptor (an O_PATH fd from `openat`);
 +    // `buf[..buf.len()]` is writable for the duration of the call. The empty
@@ -318,7 +324,7 @@ index ae5cc0041722e39939949fa083eeab55bc91dac3..37495bd0880208edfa6b70a67ece96b4
 +    let mut stack = [(0u64, 0u64); IN_ROOT_MAX_DEPTH];
 +    let mut depth: usize = 0;
 +    // Owned O_PATH fd of the current intermediate directory.
-+    let mut owned: Option<Fd> = None;
++    let mut owned: Option<InRootFdGuard> = None;
 +    let mut links: usize = 0;
 +
 +    // Unresolved component stream. Symlink payloads are spliced in place;
@@ -370,20 +376,25 @@ index ae5cc0041722e39939949fa083eeab55bc91dac3..37495bd0880208edfa6b70a67ece96b4
 +            zbuf[..comp.len()].copy_from_slice(comp);
 +            zbuf[comp.len()] = 0;
 +            let z = ZStr::from_buf_mut(&mut zbuf, comp.len());
-+            let fd = openat(
-+                owned.expect("depth > 0 implies an owned intermediate fd"),
++            let fd = InRootFdGuard(openat(
++                owned
++                    .as_ref()
++                    .expect("depth > 0 implies an owned intermediate fd")
++                    .0,
 +                z,
 +                libc::O_PATH | libc::O_DIRECTORY | libc::O_NOFOLLOW | libc::O_CLOEXEC,
 +                0,
-+            )?;
-+            let st = fstat(fd)?;
-+            let expected = if depth == 1 { root_id } else { stack[depth - 2] };
++            )?);
++            let st = fstat(fd.0)?;
++            let expected = if depth == 1 {
++                root_id
++            } else {
++                stack[depth - 2]
++            };
 +            if (st.st_dev as u64, st.st_ino as u64) != expected {
-+                let _ = close(fd.native());
 +                // Raced intermediate swap; refuse rather than guess.
 +                return Err(libc::EAGAIN);
 +            }
-+            let _ = close(owned.take().expect("depth > 0").native());
 +            owned = Some(fd);
 +            depth -= 1;
 +            rest_off = tail_off;
@@ -403,7 +414,7 @@ index ae5cc0041722e39939949fa083eeab55bc91dac3..37495bd0880208edfa6b70a67ece96b4
 +            .iter()
 +            .all(|&c| c == b'/');
 +
-+        let cur = owned.unwrap_or(dir);
++        let cur = owned.as_ref().map_or(dir, |fd| fd.0);
 +
 +        if is_last {
 +            // The real open, still O_NOFOLLOW: a final symlink is resolved
@@ -417,19 +428,21 @@ index ae5cc0041722e39939949fa083eeab55bc91dac3..37495bd0880208edfa6b70a67ece96b4
 +
 +        // Probe the component: O_PATH never reparses FIFOs/devices and,
 +        // with NOFOLLOW, never follows a link; fstat tells us what it is.
-+        let fd = openat(cur, z, libc::O_PATH | libc::O_NOFOLLOW | libc::O_CLOEXEC, 0)?;
-+        let st = fstat(fd)?;
++        let fd = InRootFdGuard(openat(
++            cur,
++            z,
++            libc::O_PATH | libc::O_NOFOLLOW | libc::O_CLOEXEC,
++            0,
++        )?);
++        let st = fstat(fd.0)?;
 +
 +        if (st.st_mode & libc::S_IFMT) == libc::S_IFLNK {
 +            links += 1;
 +            if links > IN_ROOT_MAX_SYMLINKS {
-+                let _ = close(fd.native());
 +                return Err(libc::ELOOP);
 +            }
 +            let mut tgt = [0u8; IN_ROOT_LINK_MAX];
-+            let n = readlinkat_empty(fd, &mut tgt);
-+            let _ = close(fd.native());
-+            let n = n?;
++            let n = readlinkat_empty(fd.0, &mut tgt)?;
 +            if n == 0 || n >= IN_ROOT_LINK_MAX {
 +                return Err(libc::ENAMETOOLONG);
 +            }
@@ -439,21 +452,23 @@ index ae5cc0041722e39939949fa083eeab55bc91dac3..37495bd0880208edfa6b70a67ece96b4
 +            let absolute = tgt[0] == b'/';
 +            let skip = usize::from(absolute); // drop the leading '/'
 +            let t = n - skip;
++            let new_len = t
++                .checked_add(usize::from(tail_len > 0))
++                .and_then(|len| len.checked_add(tail_len))
++                .filter(|&len| len <= work.len())
++                .ok_or(libc::ENAMETOOLONG)?;
 +            if tail_len > 0 {
 +                work.copy_within(tail_off..tail_off + tail_len, t + 1);
 +                work[..t].copy_from_slice(&tgt[skip..n]);
 +                work[t] = b'/';
-+                rest_len = t + 1 + tail_len;
 +            } else {
 +                work[..t].copy_from_slice(&tgt[skip..n]);
-+                rest_len = t;
 +            }
 +            rest_off = 0;
++            rest_len = new_len;
 +            if absolute {
 +                // Re-root (IN_ROOT): restart from `dir` at depth 0.
-+                if let Some(o) = owned.take() {
-+                    let _ = close(o.native());
-+                }
++                owned = None;
 +                depth = 0;
 +            }
 +            continue;
@@ -463,18 +478,14 @@ index ae5cc0041722e39939949fa083eeab55bc91dac3..37495bd0880208edfa6b70a67ece96b4
 +            unreachable!("a non-link final component returned ELOOP");
 +        }
 +        if (st.st_mode & libc::S_IFMT) != libc::S_IFDIR {
-+            let _ = close(fd.native());
 +            return Err(libc::ENOTDIR);
 +        }
 +        if depth >= IN_ROOT_MAX_DEPTH {
-+            let _ = close(fd.native());
 +            return Err(libc::ENAMETOOLONG);
 +        }
 +        stack[depth] = (st.st_dev as u64, st.st_ino as u64);
 +        depth += 1;
-+        if let Some(o) = owned.replace(fd) {
-+            let _ = close(o.native());
-+        }
++        owned = Some(fd);
 +        rest_off = tail_off;
 +        rest_len = tail_len;
 +    }
@@ -483,6 +494,7 @@ index ae5cc0041722e39939949fa083eeab55bc91dac3..37495bd0880208edfa6b70a67ece96b4
 +    Err(libc::ENOENT)
 +}
 +
- #[inline]
++#[inline]
  pub(crate) fn read(fd: Fd, buf: &mut [u8]) -> Result<usize, i32> {
      let fd = fd.as_borrowed_fd();
+     retry(|| rustix::io::read(fd, buf))

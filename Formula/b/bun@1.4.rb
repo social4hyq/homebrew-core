@@ -16,17 +16,16 @@ class BunAT14 < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  # OHOS patch-series refresh: the artifact changes with the same upstream
-  # version, so installed users must be offered the rebuild.
-  revision 5
+  # OHOS patch audit fixes require rebuilding the same upstream version.
+  revision 7
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r15"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dde67099ecd64ba5ce569252103c5b9466a0543b1279f2baa1ba406af784c547"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b849221b3aaa5156494cc2aca6b9466f1a08a5591df423e1ac208b2125d1996"
   end
 
   depends_on "cmake" => :build
