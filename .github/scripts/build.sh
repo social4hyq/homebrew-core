@@ -69,9 +69,16 @@ fi
 # light-check's `brew audit` in a separate job/container that never calls
 # `brew update` passed against the same still-unbumped baked lockfile).
 # Installing the latest bundler gem keeps the two in sync so bundler never
-# takes that self-upgrade path. Non-fatal: a rubygems.org blip here just
-# leaves the pre-existing mismatch, which is the status quo today.
-cexec "gem install bundler --no-document" \
+# takes that self-upgrade path. --force is required, not cosmetic: ruby ships
+# bundler as a default gem, so a plain `gem install bundler` finds its
+# binstub already present and refuses with "bundle from bundler conflicts
+# with .../bin/bundle" EVERY time, silently falling into the warning branch
+# below and never actually installing anything (confirmed 2026-09-25 testing
+# locally against the current image — the version-matched image at the time
+# masked this, so the original fix looked like it worked but never ran).
+# Non-fatal: a rubygems.org blip here just leaves the pre-existing mismatch,
+# which is the status quo today.
+cexec "gem install bundler --no-document --force" \
   || echo "::warning::gem install bundler failed; brew test/audit may hit the bundler self-upgrade Gemfile bug"
 
 # atomgit CDN has transient 404s: retry once after 90s; brew reuses partial work
