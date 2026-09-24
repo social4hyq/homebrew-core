@@ -1,5 +1,3 @@
-diff --git a/scripts/build/profiles.ts b/scripts/build/profiles.ts
-index 84a87a76d5..068ea07850 100644
 --- a/scripts/build/profiles.ts
 +++ b/scripts/build/profiles.ts
 @@ -11,9 +11,9 @@
@@ -54,15 +52,7 @@ index 84a87a76d5..068ea07850 100644
      lto: true,
      // Pin the build dir so `--profile=btg` alone lands here and can never
      // be confused with `--profile=release --build-dir=build/btg` (which
-@@ -159,6 +155,7 @@
-     buildType: "Release",
-     webkit: "local",
-     lto: false,
-+    abi: "ohos",
-   },
- 
-   /**
-@@ -168,7 +165,6 @@
+@@ -168,7 +164,6 @@
     */
    "release-assertions": {
      buildType: "RelWithDebInfo",
@@ -70,7 +60,7 @@ index 84a87a76d5..068ea07850 100644
      assertions: true,
      logs: true,
      lto: false,
-@@ -182,7 +178,6 @@
+@@ -182,7 +177,6 @@
     */
    "release-asan": {
      buildType: "Release",

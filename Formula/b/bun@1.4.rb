@@ -16,9 +16,8 @@ class BunAT14 < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  # OHOS patch-series refresh: the artifact changes with the same upstream
-  # version, so installed users must be offered the rebuild.
-  revision 5
+  # OHOS patch audit fixes require rebuilding the same upstream version.
+  revision 7
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)

@@ -1,8 +1,6 @@
-diff --git a/src/event_loop/SpawnSyncEventLoop.rs b/src/event_loop/SpawnSyncEventLoop.rs
-index e3406117c5..659357520a 100644
 --- a/src/event_loop/SpawnSyncEventLoop.rs
 +++ b/src/event_loop/SpawnSyncEventLoop.rs
-@@ -377,8 +377,15 @@ impl SpawnSyncEventLoop {
+@@ -377,8 +377,15 @@
          let duration_storage: Option<Timespec>;
          let duration: Option<&Timespec> = match timeout {
              Some(ts) => {
@@ -13,7 +11,7 @@ index e3406117c5..659357520a 100644
 +                // epoll_wait duration, so clamp it; on other platforms
 +                // negative durations are handled and a cap would wrongly
 +                // clamp legitimate multi-day timeouts.
-+                if cfg!(target_env = "ohos") && (dur.sec < 0 || dur.sec > 86_400) {
++                if cfg!(target_env = "ohos") && dur.sec < 0 {
 +                    dur = bun_core::Timespec::EPOCH;
 +                }
 +                duration_storage = Some(dur);

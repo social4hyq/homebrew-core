@@ -1,8 +1,6 @@
-diff --git a/src/runtime/node/node_os.rs b/src/runtime/node/node_os.rs
-index 4ce266374cd05f0dcd65022b471f74eafd753b00..3ab070f051a42e81355183082d96331bed83dda1 100644
---- a/src/runtime/node/node_os.rs
-+++ b/src/runtime/node/node_os.rs
-@@ -724,6 +724,14 @@ mod _impl {
+--- a/src/runtime/node/node_os.rs	2026-09-24 21:35:26.423673750 +0800
++++ b/src/runtime/node/node_os.rs	2026-09-24 21:36:33.387666250 +0800
+@@ -724,6 +724,14 @@
              let _ = using_heap;
  
              if ret != 0 {
@@ -11,13 +9,13 @@ index 4ce266374cd05f0dcd65022b471f74eafd753b00..3ab070f051a42e81355183082d96331b
 +                    return Ok(BunString::from_bytes(
 +                        env_var::HOME
 +                            .get_not_empty()
-+                            .unwrap_or(b"/data/storage/el2/base"),
++                            .unwrap_or(b"/data/storage/el2/base/files"),
 +                    ));
 +                }
                  return Err(global.throw_value(
                      bun_sys::Error::from_code(
                          // `ret` is a libc errno; a code outside the table is `EUNKNOWN`.
-@@ -737,12 +745,20 @@ mod _impl {
+@@ -737,6 +745,14 @@
              if result.is_null() {
                  // bionic has no passwd entries for app uids; with HOME also unset
                  // (zygote/run-as), return a usable default rather than throwing.
@@ -26,12 +24,13 @@ index 4ce266374cd05f0dcd65022b471f74eafd753b00..3ab070f051a42e81355183082d96331b
 +                    return Ok(BunString::from_bytes(
 +                        env_var::HOME
 +                            .get_not_empty()
-+                            .unwrap_or(b"/data/storage/el2/base"),
++                            .unwrap_or(b"/data/storage/el2/base/files"),
 +                    ));
 +                }
                  #[cfg(target_os = "android")]
                  {
                      return Ok(BunString::static_("/data/local/tmp"));
+@@ -743,6 +759,6 @@
                  }
                  // in uv__getpwuid_r, null result throws UV_ENOENT.
 -                #[cfg(not(target_os = "android"))]

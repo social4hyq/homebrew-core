@@ -1,5 +1,3 @@
-diff --git a/src/jsc/bindings/c-bindings.cpp b/src/jsc/bindings/c-bindings.cpp
-index 481ccddda14a78c4c9cc042622a938fe86961540..75fe3f691fd08ff6d624d1186cff90bf5c254a1e 100644
 --- a/src/jsc/bindings/c-bindings.cpp
 +++ b/src/jsc/bindings/c-bindings.cpp
 @@ -16,6 +16,7 @@
@@ -10,7 +8,7 @@ index 481ccddda14a78c4c9cc042622a938fe86961540..75fe3f691fd08ff6d624d1186cff90bf
  #include <termios.h>
  #include <sys/ioctl.h>
  #include <sys/socket.h>
-@@ -62,21 +63,30 @@ extern "C" int32_t set_process_priority(int32_t pid, int32_t priority)
+@@ -62,8 +63,16 @@
  #if !OS(WINDOWS)
  extern "C" bool is_executable_file(const char* path)
  {
@@ -29,6 +27,7 @@ index 481ccddda14a78c4c9cc042622a938fe86961540..75fe3f691fd08ff6d624d1186cff90bf
      int fd = open(path, O_EXEC | O_CLOEXEC | O_NONBLOCK | O_NOCTTY, 0);
      if (fd < 0)
          return false;
+@@ -70,7 +79,7 @@
      close(fd);
      return true;
 -#endif // defined(O_EXEC)
@@ -38,6 +37,7 @@ index 481ccddda14a78c4c9cc042622a938fe86961540..75fe3f691fd08ff6d624d1186cff90bf
      struct stat st;
      if (stat(path, &st) != 0)
          return false;
+@@ -77,6 +86,7 @@
 -
 -    // regular file and user can execute
 -    return S_ISREG(st.st_mode) && (st.st_mode & S_IXUSR);
@@ -48,7 +48,7 @@ index 481ccddda14a78c4c9cc042622a938fe86961540..75fe3f691fd08ff6d624d1186cff90bf
  }
  #endif
  
-@@ -275,10 +285,42 @@ extern "C" void windows_enable_stdio_inheritance()
+@@ -275,6 +285,10 @@
  #define __NR_close_range 436
  #endif
  
@@ -59,6 +59,7 @@ index 481ccddda14a78c4c9cc042622a938fe86961540..75fe3f691fd08ff6d624d1186cff90bf
  // close_range is glibc > 2.33, which is very new
  extern "C" ssize_t bun_close_range(unsigned int start, unsigned int end, unsigned int flags)
  {
+@@ -281,4 +295,32 @@
 +#if defined(__OHOS__)
 +    if (start > end || (flags & ~CLOSE_RANGE_CLOEXEC) != 0) {
 +        errno = EINVAL;
@@ -72,7 +73,7 @@ index 481ccddda14a78c4c9cc042622a938fe86961540..75fe3f691fd08ff6d624d1186cff90bf
 +    }
 +
 +    long limit = sysconf(_SC_OPEN_MAX);
-+    if (limit < 0 || limit > 65536)
++    if (limit < 0)
 +        limit = 65536;
 +    unsigned int last = end == ~0U ? static_cast<unsigned int>(limit - 1) : std::min(end, static_cast<unsigned int>(limit - 1));
 +    for (unsigned int fd = start; fd <= last; fd++) {
@@ -91,7 +92,7 @@ index 481ccddda14a78c4c9cc042622a938fe86961540..75fe3f691fd08ff6d624d1186cff90bf
  }
  #else // OS(FREEBSD)
  // FreeBSD 12.2+ libc has close_range; 14.0+ supports CLOSE_RANGE_CLOEXEC
-@@ -358,20 +400,32 @@ extern "C" void on_before_reload_process_posix()
+@@ -358,7 +400,6 @@
  }
  
  #if OS(LINUX)
@@ -99,6 +100,7 @@ index 481ccddda14a78c4c9cc042622a938fe86961540..75fe3f691fd08ff6d624d1186cff90bf
  // While a thread is inside execve(2), until de_thread() has killed the other threads or the
  // exec has failed, the kernel fails every clone(CLONE_FS) in the process with EAGAIN
  // (fs/exec.c check_unsafe_exec, kernel/fork.c copy_fs). WTF::Thread::create aborts on a
+@@ -365,9 +406,21 @@
  // failed pthread_create, which killed --watch reloads. A pthread_create EAGAIN that overlaps
  // an exec of this process is retried instead. `execve_generation` counts execs ever started
  // so one that began and ended inside a single pthread_create is still seen; it is bumped
@@ -121,12 +123,13 @@ index 481ccddda14a78c4c9cc042622a938fe86961540..75fe3f691fd08ff6d624d1186cff90bf
  // The clone(CLONE_VM) child of posix_spawn_bun execs in this address space and never returns
  // to undo a count, so only the pid recorded in bun_initialize_process counts its execs.
  static pid_t execve_counting_pid = 0;
+@@ -374,4 +427,5 @@
  
 +// Linked in with -Wl,--wrap=execve -Wl,--wrap=pthread_create (scripts/build/flags.ts).
  extern "C" int __real_execve(const char*, char* const[], char* const[]);
  extern "C" int __real_pthread_create(pthread_t*, const pthread_attr_t*, void* (*)(void*), void*);
  
-@@ -379,7 +433,18 @@ extern "C" int __wrap_execve(const char* path, char* const argv[], char* const e
+@@ -379,7 +433,18 @@
  {
      if (getpid() != execve_counting_pid)
          return __real_execve(path, argv, envp);
@@ -146,7 +149,7 @@ index 481ccddda14a78c4c9cc042622a938fe86961540..75fe3f691fd08ff6d624d1186cff90bf
      execve_generation.fetch_add(1, std::memory_order_seq_cst);
      int rc = __real_execve(path, argv, envp);
      // Only reached when execve failed and the old image keeps running.
-@@ -390,19 +455,31 @@ extern "C" int __wrap_execve(const char* path, char* const argv[], char* const e
+@@ -390,6 +455,16 @@
  // The attempt bound keeps a real limit, hit while an exec never completes, from looping forever.
  extern "C" int __wrap_pthread_create(pthread_t* thread, const pthread_attr_t* attr, void* (*start_routine)(void*), void* arg)
  {
@@ -163,6 +166,7 @@ index 481ccddda14a78c4c9cc042622a938fe86961540..75fe3f691fd08ff6d624d1186cff90bf
      for (int attempt = 0;; attempt++) {
          unsigned generation = execve_generation.load(std::memory_order_seq_cst);
          bool execInFlight = threads_in_execve.load(std::memory_order_seq_cst) > 0;
+@@ -396,6 +471,6 @@
 -        int rc = __real_pthread_create(thread, attr, start_routine, arg);
 +        rc = __real_pthread_create(thread, attr, start_routine, arg);
          if (rc != EAGAIN || attempt >= 1000)
@@ -171,11 +175,13 @@ index 481ccddda14a78c4c9cc042622a938fe86961540..75fe3f691fd08ff6d624d1186cff90bf
          if (!execInFlight && threads_in_execve.load(std::memory_order_seq_cst) == 0
              && execve_generation.load(std::memory_order_seq_cst) == generation) {
              // No exec overlapped this attempt: a real limit.
+@@ -402,4 +477,4 @@
 -            return rc;
 +            break;
          }
          usleep(1000);
      }
+@@ -406,3 +481,5 @@
 +    threads_creating.fetch_sub(1, std::memory_order_seq_cst);
 +    return rc;
  }
