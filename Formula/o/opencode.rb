@@ -1,10 +1,9 @@
 class Opencode < Formula
   desc "AI coding agent, built for the terminal"
   homepage "https://opencode.ai"
-  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.31.tar.gz"
-  sha256 "76f69fe27ec2b44e23fa1749029e7c012eb7e975a0f0c7819e9458198dfd3896"
+  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.32.tar.gz"
+  sha256 "65e95c9a6666ca65bbd17de1e7cecddac1504e66eeebbcfaf5ac68f97e6f392b"
   license "MIT"
-  revision 6
 
   # No throttle: unlike upstream homebrew-core (which throttles to every 5th
   # release to limit their own CI churn), this tap wants opencode to autobump
@@ -40,7 +39,6 @@ class Opencode < Formula
     0004-update-build-target.patch
     0005-update-project-worktree.patch
     0006-filter-invalid-references.patch
-    0007-break-filesystem-search-import-cycle.patch
     0008-guard-undefined-layer-deps.patch
   ].each do |p|
     patch do
@@ -53,6 +51,11 @@ class Opencode < Formula
   def install
     ENV["OPENCODE_VERSION"] = version.to_s
     ENV["OPENCODE_CHANNEL"] = "prod"
+
+    # Fix server errors when building with Bun 1.4.2 by disabling splitting
+    # https://github.com/anomalyco/opencode/issues/48645
+    # https://github.com/NixOS/nixpkgs/issues/563241
+    inreplace "packages/opencode/script/build.ts", "splitting: true,", "splitting: false,"
 
     lockfile = (buildpath/"bun.lock").read
     injected = lockfile.gsub(
