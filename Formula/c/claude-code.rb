@@ -9,6 +9,11 @@ class ClaudeCode < Formula
   # wrapper plus an extractor that runs the CLI bundle on this tap's bun. The
   # latest channel is the separate claude-code.latest formula.
   #
+  # CLAUDE_CODE_RUNTIME=musl switches the wrapper from this tap's bun to the
+  # official prebuilt binary run as-is (signed, through ohos-compat-shim) — the
+  # escape hatch for a release that only runs on Anthropic's private bun
+  # internals.
+  #
   # npmmirror: brew's curl SIGILLs on the Cloudflare-fronted registry.npmjs.org.
 
   livecheck do
@@ -22,6 +27,8 @@ class ClaudeCode < Formula
   end
 
   depends_on "bun"
+  depends_on "ohos-compat-shim"
+  depends_on "ohos-selfsign"
 
   conflicts_with "claude-code.latest", because: "both install the `claude` binary"
 
@@ -199,8 +206,23 @@ class ClaudeCode < Formula
       VER="#{version}"
       NPM_URL="#{stable.url}"
       NPM_SHA="#{stable.checksum}"
-      CACHE="${CLAUDE_CODE_CACHE:-${HOMEBREW_CACHE:-$HOME/.cache/homebrew}/claude-code/$VER}"
-      CLI="$CACHE/cli"
+
+      # CLAUDE_CODE_RUNTIME picks how the official bundle is run:
+      #   bun (default) - extract the JS module graph and run it on this tap's bun
+      #   musl          - run the official prebuilt binary as-is, signed for this
+      #                   device and launched through ohos-compat-shim; the
+      #                   escape hatch for a release that only runs on
+      #                   Anthropic's private bun internals
+      RUNTIME="${CLAUDE_CODE_RUNTIME:-bun}"
+      case "$RUNTIME" in
+        bun|musl) ;;
+        *)
+          echo "claude-code: invalid CLAUDE_CODE_RUNTIME '$RUNTIME' (expected bun or musl)" >&2
+          exit 2
+          ;;
+      esac
+
+      CACHE="${CLAUDE_CODE_CACHE:-${HOMEBREW_CACHE:-$HOME/.cache/homebrew}/#{name}/$VER}/$RUNTIME"
 
       # /tmp is read-only here, so hand the CLI a writable scratch dir of its
       # own. A caller-set value wins; an unusable fallback is left unset rather
@@ -214,9 +236,9 @@ class ClaudeCode < Formula
       # is otherwise invisible to it.
       export HERDR_AGENT="${HERDR_AGENT:-claude}"
 
-      if [ ! -f "$CLI" ]; then
-        rm -rf "$CACHE"
-        mkdir -p "$CACHE"
+      # Download the official tarball into $TMP and fail closed: an unverified
+      # runtime download must never be trusted.
+      fetch_official() {
         TMP="$(mktemp -d)"
         trap 'rm -rf "$TMP"' EXIT
         echo "claude-code: fetching official binary $VER..." >&2
@@ -226,7 +248,6 @@ class ClaudeCode < Formula
           curl -fsSL --retry 3 --retry-all-errors --retry-delay 2 "$u" -o "$TMP/pkg.tgz" && { fetched=1; break; }
         done
         [ "$fetched" = 1 ] || { echo "claude-code: download failed from all mirrors" >&2; exit 1; }
-        # Fail closed: an unverified runtime download must never be trusted.
         command -v sha256sum >/dev/null 2>&1 || {
           echo "claude-code: sha256sum not found; refusing an unverified download" >&2
           exit 1
@@ -234,8 +255,30 @@ class ClaudeCode < Formula
         printf '%s  %s\\n' "$NPM_SHA" "$TMP/pkg.tgz" | sha256sum -c -
         tar -xzf "$TMP/pkg.tgz" -C "$TMP"
         [ -f "$TMP/package/claude" ] || { echo "claude-code: 'claude' binary not found in tarball" >&2; exit 1; }
-        # Extract the CLI module graph (entry + chunks); the official binary
-        # itself is never executed.
+      }
+
+      if [ "$RUNTIME" = "musl" ]; then
+        # Official prebuilt binary as-is: this device only execs signed ELFs, and
+        # ohos-compat-shim supplies the libc entry points OHOS lacks.
+        BIN="$CACHE/claude"
+        if [ ! -x "$BIN" ]; then
+          rm -rf "$CACHE"
+          mkdir -p "$CACHE"
+          fetch_official
+          "$HB/opt/ohos-selfsign/bin/selfsign" "$TMP/package/claude"
+          mv "$TMP/package/claude" "$BIN"
+          chmod 0755 "$BIN"
+        fi
+        exec "$HB/opt/ohos-compat-shim/bin/ohos-shim" "$BIN" "$@"
+      fi
+
+      # Default: extract the CLI module graph (entry + chunks) and run it on this
+      # tap's bun; the official binary itself is never executed.
+      CLI="$CACHE/cli"
+      if [ ! -f "$CLI" ]; then
+        rm -rf "$CACHE"
+        mkdir -p "$CACHE"
+        fetch_official
         "$HB/opt/bun/bin/bun" "$HB/opt/#{name}/libexec/extract-cli.mjs" "$TMP/package/claude" "$CACHE" || {
           echo "claude-code: bundle extraction failed" >&2; exit 1; }
       fi
@@ -247,6 +290,11 @@ class ClaudeCode < Formula
 
   test do
     assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
+
+    # The runtime switch must reject an unknown value rather than silently
+    # falling back to one of the two runtimes.
+    assert_match "invalid CLAUDE_CODE_RUNTIME",
+                 shell_output("CLAUDE_CODE_RUNTIME=bogus #{bin}/claude --version 2>&1", 2)
 
     # --version never touches the renderer, so a bundle that only runs on
     # Anthropic's private bun internals crash-loops at startup and slips
