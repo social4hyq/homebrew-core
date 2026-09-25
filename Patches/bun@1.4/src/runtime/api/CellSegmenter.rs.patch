@@ -1,0 +1,970 @@
+diff --git a/src/runtime/api/CellSegmenter.rs b/src/runtime/api/CellSegmenter.rs
+new file mode 100644
+index 0000000000..c492bb7586
+--- /dev/null
++++ b/src/runtime/api/CellSegmenter.rs
+@@ -0,0 +1,964 @@
++//! `Bun.ant.CellSegmenter` — the terminal-cell segmenter Claude Code's Ink
++//! renderer uses to turn styled/hyperlinked text into fixed-width terminal
++//! cells. This is a from-scratch reimplementation of Anthropic's private,
++//! undocumented `@anthropic-ai/bun-internal` native class, reverse-engineered
++//! from the real Claude Code 2.1.282 bundle's driver JS (there is no public
++//! spec). See the OHOS adaptation checklist for the full protocol writeup.
++//!
++//! Reuses this repo's own grapheme/width primitives (`Bun__graphemeBreak`,
++//! `Bun__codepointWidth`, `Bun__isEmojiPresentation` — the same C ABI
++//! `Bun.stringWidth` and `Bun.sliceAnsi` are built on) and ports the SGR
++//! close-code table + parameter parsing already proven in `sliceAnsi.cpp`.
++
++use core::cell::RefCell;
++use std::collections::HashMap;
++
++use bun_jsc::{CallFrame, JSGlobalObject, JSValue, JsResult, Strong, bun_string_jsc};
++
++// ─── C ABI (implemented in src/jsc/bindings/stringWidth.cpp) ───────────────
++
++unsafe extern "C" {
++    fn Bun__graphemeBreak(cp1: u32, cp2: u32, state: *mut u8) -> bool;
++    fn Bun__codepointWidth(cp: u32, ambiguous_as_wide: bool) -> u8;
++    fn Bun__isEmojiPresentation(cp: u32) -> bool;
++}
++
++// ─── Screen cell word packing (shared with the driver's own `Vn12`) ────────
++//
++// Screen cell word = styleId<<17 | hyperlinkId<<2 | width(2 bits) — already
++// packed by the caller for `setCell`/`paint`'s inputs. The segmenter's OWN
++// `cells`/`runs` output arrays use a different packing (see `segment`
++// below) — these two formats must not be confused. Only the low 2 width
++// bits are ever read/rewritten natively; `SCREEN_WIDTH_MASK` isolates them.
++
++const SCREEN_WIDTH_MASK: u32 = 0b11;
++
++// Damage/position return value shared by `setCell` and `paint`: a plain
++// (non-bitwise — the driver decodes it with `Math.floor`/`%`, not `>>`/`&`,
++// since it exceeds the 32-bit range bitwise ops truncate to) place-value
++// encoding: payload in the low 2^20, damage-start-x * 2^20, damage-end-x *
++// 2^36. Must come back to JS as a plain number, not a JS-int32.
++fn pack_return(payload: u32, start_x: u32, end_x: u32) -> f64 {
++    (payload as u64 + (start_x as u64) * (1u64 << 20) + (end_x as u64) * (1u64 << 36)) as f64
++}
++
++// ─── Segmenter cell/run word packing (segment()'s own output format) ───────
++//
++// cells[2i]   = grapheme-table index
++// cells[2i+1] = runIndex<<10 | tabFlag<<8 | width(low byte)
++
++const RUN_SHIFT: u32 = 10;
++const TAB_FLAG: u32 = 0x100;
++const WIDTH_BYTE_MASK: u32 = 0xFF;
++
++// ─── SGR close-code table (ported from src/jsc/bindings/ANSIHelpers.h,
++// `Bun::ANSI::sgrCloseCode`/`isSgrEndCode` — kept in sync by hand; both are
++// small, stable ECMA-48 tables unlikely to change) ──────────────────────────
++
++fn sgr_close_code(open_code: u32) -> u32 {
++    match open_code {
++        1 | 2 => 22,
++        3 | 20 => 23,
++        4 | 21 => 24,
++        5 | 6 => 25,
++        7 => 27,
++        8 => 28,
++        9 => 29,
++        30..=38 | 90..=97 => 39,
++        40..=48 | 100..=107 => 49,
++        51 | 52 => 54,
++        53 => 55,
++        58 => 59,
++        73 | 74 => 75,
++        _ => 0,
++    }
++}
++
++fn is_sgr_end_code(code: u32) -> bool {
++    matches!(code, 0 | 22 | 23 | 24 | 25 | 27 | 28 | 29 | 39 | 49 | 54 | 55 | 59 | 75)
++}
++
++fn sgr_slot(open_code: u32) -> u32 {
++    let close = sgr_close_code(open_code);
++    if matches!(close, 22 | 23 | 24 | 54) { open_code } else { close }
++}
++
++fn make_sgr_code(code: u32) -> Vec<u8> {
++    let mut out = Vec::with_capacity(8);
++    out.extend_from_slice(b"\x1b[");
++    out.extend_from_slice(code.to_string().as_bytes());
++    out.push(b'm');
++    out
++}
++
++fn make_sgr_code_multi(codes: &[u32]) -> Vec<u8> {
++    let mut out = Vec::with_capacity(16);
++    out.extend_from_slice(b"\x1b[");
++    for (i, c) in codes.iter().enumerate() {
++        if i > 0 {
++            out.push(b';');
++        }
++        out.extend_from_slice(c.to_string().as_bytes());
++    }
++    out.push(b'm');
++    out
++}
++
++/// Active SGR style state: an ordered set of active styles, one per
++/// attribute slot (ported from `sliceAnsi.cpp`'s `SgrStyleState`).
++#[derive(Default, Clone)]
++struct SgrState {
++    // (slot, open_bytes, close_bytes), insertion order.
++    entries: Vec<(u32, Vec<u8>, Vec<u8>)>,
++}
++
++impl SgrState {
++    fn apply_reset(&mut self) {
++        self.entries.clear();
++    }
++    fn apply_end(&mut self, end_code: &[u8]) {
++        self.entries.retain(|(_, _, close)| close.as_slice() != end_code);
++    }
++    fn apply_start(&mut self, slot: u32, open: Vec<u8>, close: Vec<u8>) {
++        self.entries.retain(|(s, _, _)| *s != slot);
++        self.entries.push((slot, open, close));
++    }
++    /// NUL-joined open codes, insertion order.
++    fn open_keys(&self) -> Vec<u8> {
++        let mut out = Vec::new();
++        for (i, (_, open, _)) in self.entries.iter().enumerate() {
++            if i > 0 {
++                out.push(0);
++            }
++            out.extend_from_slice(open);
++        }
++        out
++    }
++    /// NUL-joined close codes, reverse order, de-duplicated (a close shared
++    /// by several slots — e.g. 22 for bold+dim — is emitted once).
++    fn close_keys(&self) -> Vec<u8> {
++        let mut out = Vec::new();
++        let mut first = true;
++        for i in (0..self.entries.len()).rev() {
++            let close = &self.entries[i].2;
++            let already = self.entries[i + 1..].iter().any(|(_, _, c)| c == close);
++            if already {
++                continue;
++            }
++            if !first {
++                out.push(0);
++            }
++            out.extend_from_slice(close);
++            first = false;
++        }
++        out
++    }
++}
++
++/// Parse the parameter list of one SGR (`\x1b[...m`) sequence and apply it to
++/// `state` (ported from `sliceAnsi.cpp`'s `applySgrToState`). `params` is the
++/// bytes strictly between `\x1b[` and the trailing `m`.
++fn apply_sgr_to_state(state: &mut SgrState, params_bytes: &[u8]) {
++    let mut params: Vec<u32> = Vec::new();
++    let mut has_colon = false;
++    {
++        let mut current: u32 = 0;
++        let mut any = false;
++        for &b in params_bytes {
++            match b {
++                b'0'..=b'9' => {
++                    any = true;
++                    if current < 100_000 {
++                        current = current * 10 + (b - b'0') as u32;
++                    }
++                }
++                b';' | b':' => {
++                    if b == b':' {
++                        has_colon = true;
++                    }
++                    params.push(current);
++                    current = 0;
++                    any = true;
++                }
++                _ => break,
++            }
++        }
++        // ECMA-48 5.4.2: an empty parameter list is `[0]` ("\e[m" == "\e[0m").
++        params.push(current);
++        let _ = any;
++    }
++
++    if has_colon {
++        // Opaque colon-syntax sequence (e.g. `38:2:R:G:B`) — track as a
++        // single start entry closed by its first param's close code.
++        let first = params[0];
++        let close = sgr_close_code(first);
++        let end = if close != 0 { make_sgr_code(close) } else { b"\x1b[0m".to_vec() };
++        let mut open = Vec::with_capacity(params_bytes.len() + 3);
++        open.extend_from_slice(b"\x1b[");
++        open.extend_from_slice(params_bytes);
++        open.push(b'm');
++        state.apply_start(sgr_slot(first), open, end);
++        return;
++    }
++
++    let mut i = 0usize;
++    while i < params.len() {
++        let code = params[i];
++        if code == 0 {
++            state.apply_reset();
++            i += 1;
++            continue;
++        }
++        if code == 38 || code == 48 || code == 58 {
++            let slot = sgr_slot(code);
++            let end = make_sgr_code(sgr_close_code(code));
++            if i + 1 < params.len() {
++                let color_type = params[i + 1];
++                if color_type == 5 && i + 2 < params.len() {
++                    state.apply_start(slot, make_sgr_code_multi(&[code, 5, params[i + 2]]), end);
++                    i += 3;
++                    continue;
++                }
++                if color_type == 2 && i + 4 < params.len() {
++                    state.apply_start(
++                        slot,
++                        make_sgr_code_multi(&[code, 2, params[i + 2], params[i + 3], params[i + 4]]),
++                        end,
++                    );
++                    i += 5;
++                    continue;
++                }
++            }
++            state.apply_start(slot, make_sgr_code(code), end);
++            i += 1;
++            continue;
++        }
++        if is_sgr_end_code(code) {
++            state.apply_end(&make_sgr_code(code));
++            i += 1;
++            continue;
++        }
++        let close = sgr_close_code(code);
++        let end = if close != 0 { make_sgr_code(close) } else { b"\x1b[0m".to_vec() };
++        state.apply_start(sgr_slot(code), make_sgr_code(code), end);
++        i += 1;
++    }
++}
++
++// ─── Grapheme-cluster width (ported from sliceAnsi.cpp's `GraphemeWidthState`,
++// itself a mirror of stringWidth.cpp's `GraphemeState` — kept in sync by
++// hand; drift is caught the same way upstream catches it, by cross-checking
++// against `Bun.stringWidth`) ─────────────────────────────────────────────────
++
++#[derive(Default)]
++struct GraphemeWidthState {
++    first_cp: u32,
++    non_emoji_width: u16,
++    base_width: u8,
++    count: u8,
++    emoji_base: bool,
++    keycap: bool,
++    regional_indicator: bool,
++    skin_tone: bool,
++    zwj: bool,
++    vs15: bool,
++    vs16: bool,
++}
++
++impl GraphemeWidthState {
++    fn reset(&mut self, cp: u32, ambiguous_as_wide: bool) {
++        let w = unsafe { Bun__codepointWidth(cp, ambiguous_as_wide) };
++        *self = GraphemeWidthState {
++            first_cp: cp,
++            non_emoji_width: w as u16,
++            base_width: w,
++            count: 1,
++            emoji_base: unsafe { Bun__isEmojiPresentation(cp) },
++            keycap: cp == 0x20E3,
++            regional_indicator: (0x1F1E6..=0x1F1FF).contains(&cp),
++            skin_tone: (0x1F3FB..=0x1F3FF).contains(&cp),
++            zwj: cp == 0x200D,
++            vs15: false,
++            vs16: false,
++        };
++    }
++
++    fn add(&mut self, cp: u32, ambiguous_as_wide: bool) {
++        if self.count < 255 {
++            self.count += 1;
++        }
++        self.keycap |= cp == 0x20E3;
++        self.regional_indicator |= (0x1F1E6..=0x1F1FF).contains(&cp);
++        self.skin_tone |= (0x1F3FB..=0x1F3FF).contains(&cp);
++        self.zwj |= cp == 0x200D;
++        self.vs15 |= cp == 0xFE0E;
++        self.vs16 |= cp == 0xFE0F;
++        let w = unsafe { Bun__codepointWidth(cp, ambiguous_as_wide) };
++        if w > 0 {
++            self.non_emoji_width = (self.non_emoji_width + w as u16).min(1023);
++        }
++    }
++
++    fn width(&self) -> u8 {
++        if self.count == 0 {
++            return 0;
++        }
++        if self.regional_indicator && self.count >= 2 {
++            return 2;
++        }
++        if self.keycap {
++            return 2;
++        }
++        if self.regional_indicator {
++            return 1;
++        }
++        if self.emoji_base && (self.skin_tone || self.zwj) {
++            return 2;
++        }
++        if self.vs15 || self.vs16 {
++            if self.base_width == 2 || (self.vs16 && (self.emoji_base || self.first_cp == 0xA9 || self.first_cp == 0xAE)) {
++                return 2;
++            }
++            return self.base_width;
++        }
++        self.non_emoji_width.min(255) as u8
++    }
++}
++
++// ─── Interning tables ────────────────────────────────────────────────────
++
++/// Index 0 is reserved as `""` in every table (the driver's "none" sentinel).
++#[derive(Default)]
++struct Tables {
++    graphemes: Vec<Box<[u8]>>,
++    grapheme_ids: HashMap<Box<[u8]>, u32>,
++    // sgr_keys/sgr_close_keys are paired 1:1 by index; deduped on the open-keys string.
++    sgr_keys: Vec<Box<[u8]>>,
++    sgr_close_keys: Vec<Box<[u8]>>,
++    sgr_ids: HashMap<Box<[u8]>, u32>,
++    uris: Vec<Box<[u8]>>,
++    uri_ids: HashMap<Box<[u8]>, u32>,
++}
++
++impl Tables {
++    fn new() -> Self {
++        let mut t = Tables::default();
++        t.graphemes.push(Box::from(&b""[..]));
++        t.grapheme_ids.insert(Box::from(&b""[..]), 0);
++        t.sgr_keys.push(Box::from(&b""[..]));
++        t.sgr_close_keys.push(Box::from(&b""[..]));
++        t.sgr_ids.insert(Box::from(&b""[..]), 0);
++        t.uris.push(Box::from(&b""[..]));
++        t.uri_ids.insert(Box::from(&b""[..]), 0);
++        t
++    }
++
++    fn intern_grapheme(&mut self, key: &[u8]) -> u32 {
++        if let Some(&id) = self.grapheme_ids.get(key) {
++            return id;
++        }
++        let id = self.graphemes.len() as u32;
++        let boxed: Box<[u8]> = Box::from(key);
++        self.graphemes.push(boxed.clone());
++        self.grapheme_ids.insert(boxed, id);
++        id
++    }
++
++    fn intern_sgr(&mut self, open: &[u8], close: &[u8]) -> u32 {
++        if open.is_empty() {
++            return 0;
++        }
++        if let Some(&id) = self.sgr_ids.get(open) {
++            return id;
++        }
++        let id = self.sgr_keys.len() as u32;
++        let open_boxed: Box<[u8]> = Box::from(open);
++        self.sgr_keys.push(open_boxed.clone());
++        self.sgr_close_keys.push(Box::from(close));
++        self.sgr_ids.insert(open_boxed, id);
++        id
++    }
++
++    fn intern_uri(&mut self, uri: &[u8]) -> u32 {
++        if uri.is_empty() {
++            return 0;
++        }
++        if let Some(&id) = self.uri_ids.get(uri) {
++            return id;
++        }
++        let id = self.uris.len() as u32;
++        let boxed: Box<[u8]> = Box::from(uri);
++        self.uris.push(boxed.clone());
++        self.uri_ids.insert(boxed, id);
++        id
++    }
++}
++
++// ─── Screen codes (constructor's `screen` config) ───────────────────────────
++
++struct ScreenCodes {
++    narrow: u32,
++    wide: u32,
++    spacer_tail: u32,
++    empty_char_index: u32,
++    tab_width: i32,
++}
++
++impl Default for ScreenCodes {
++    fn default() -> Self {
++        Self { narrow: 0, wide: 1, spacer_tail: 2, empty_char_index: 0, tab_width: 8 }
++    }
++}
++
++fn get_u32(global: &JSGlobalObject, obj: JSValue, key: &[u8], default: u32) -> JsResult<u32> {
++    match obj.get(global, key)? {
++        Some(v) if !v.is_undefined_or_null() => Ok(v.to_int32() as u32),
++        _ => Ok(default),
++    }
++}
++
++// ─── CellSegmenter ──────────────────────────────────────────────────────────
++
++#[bun_jsc::JsClass]
++pub struct CellSegmenter {
++    ambiguous_is_narrow: bool,
++    /// `[start, end]` inclusive codepoint ranges (bidi Trojan-Source control
++    /// characters) that must never be allowed to silently merge into another
++    /// cluster or affect display ordering — see the constructor's
++    /// `substitute` option.
++    substitute: Vec<(u32, u32)>,
++    screen: ScreenCodes,
++    tables: RefCell<Tables>,
++    graphemes_array: RefCell<Option<Strong>>,
++    sgr_keys_array: RefCell<Option<Strong>>,
++    sgr_close_keys_array: RefCell<Option<Strong>>,
++    uris_array: RefCell<Option<Strong>>,
++}
++
++fn is_substituted(substitute: &[(u32, u32)], cp: u32) -> bool {
++    substitute.iter().any(|&(start, end)| cp >= start && cp <= end)
++}
++
++impl CellSegmenter {
++    pub fn constructor(global: &JSGlobalObject, frame: &CallFrame) -> JsResult<Box<Self>> {
++        let options = frame.argument(0);
++
++        let mut ambiguous_is_narrow = true;
++        let mut substitute = Vec::new();
++        let mut screen = ScreenCodes::default();
++
++        if options.is_object() {
++            if let Some(v) = options.get(global, b"ambiguousIsNarrow")? {
++                if !v.is_undefined_or_null() {
++                    ambiguous_is_narrow = v.to_boolean();
++                }
++            }
++            if let Some(sub) = options.get(global, b"substitute")? {
++                if sub.is_object() {
++                    let len = get_u32(global, sub, b"length", 0)?;
++                    for i in 0..len {
++                        if let Ok(range) = sub.get_index(global, i) {
++                            if range.is_object() {
++                                let start = range.get_index(global, 0)?.to_int32() as u32;
++                                let end = range.get_index(global, 1)?.to_int32() as u32;
++                                substitute.push((start, end));
++                            }
++                        }
++                    }
++                }
++            }
++            if let Some(s) = options.get(global, b"screen")? {
++                if s.is_object() {
++                    screen.narrow = get_u32(global, s, b"narrow", screen.narrow)?;
++                    screen.wide = get_u32(global, s, b"wide", screen.wide)?;
++                    screen.spacer_tail = get_u32(global, s, b"spacerTail", screen.spacer_tail)?;
++                    screen.empty_char_index = get_u32(global, s, b"emptyCharIndex", screen.empty_char_index)?;
++                    screen.tab_width = get_u32(global, s, b"tabWidth", screen.tab_width as u32)? as i32;
++                }
++            }
++        }
++
++        Ok(Box::new(CellSegmenter {
++            ambiguous_is_narrow,
++            substitute,
++            screen,
++            tables: RefCell::new(Tables::new()),
++            graphemes_array: RefCell::new(None),
++            sgr_keys_array: RefCell::new(None),
++            sgr_close_keys_array: RefCell::new(None),
++            uris_array: RefCell::new(None),
++        }))
++    }
++
++    // ─── segment ────────────────────────────────────────────────────────
++
++    pub fn segment(&self, global: &JSGlobalObject, frame: &CallFrame) -> JsResult<JSValue> {
++        let [text_val, cells_val, runs_val, reordered_val] = frame.arguments_as_array::<4>();
++
++        let text_string = text_val.to_bun_string(global)?;
++        let text = text_string.to_utf8();
++        let _reordered = reordered_val.to_boolean();
++
++        let (cell_count, cell_words, run_words) = self.segment_impl(&text)?;
++
++        if !cells_val.is_cell() || cells_val.js_type() != jsc::JSType::Int32Array {
++            return Err(global.throw_invalid_arguments(format_args!("CellSegmenter.segment: cells must be an Int32Array")));
++        }
++        if !runs_val.is_cell() || runs_val.js_type() != jsc::JSType::Int32Array {
++            return Err(global.throw_invalid_arguments(format_args!("CellSegmenter.segment: runs must be an Int32Array")));
++        }
++
++        let mut cells_buf = jsc::ArrayBuffer::from_typed_array(global, cells_val);
++        if cells_buf.len < cell_count * 2 {
++            return Ok(JSValue::js_number(-(cell_count as i64) as f64));
++        }
++        let mut runs_buf = jsc::ArrayBuffer::from_typed_array(global, runs_val);
++
++        {
++            let cells_i32 = cells_buf.as_u32();
++            for (i, w) in cell_words.iter().enumerate() {
++                cells_i32[i] = *w;
++            }
++        }
++        {
++            let runs_i32 = runs_buf.as_u32();
++            for (i, w) in run_words.iter().enumerate() {
++                runs_i32[i] = *w;
++            }
++        }
++
++        self.sync_arrays(global)?;
++
++        Ok(JSValue::js_number(cell_count as f64))
++    }
++
++    /// Walks `text`, stripping/tracking embedded SGR (`\x1b[...m`) and OSC 8
++    /// hyperlink escapes, grapheme-clustering the visible text, and interning
++    /// each distinct grapheme/SGR-pair/URI. Returns `(cellCount,
++    /// cells[2*cellCount], runs[2*runCount])` — `runs` is padded to
++    /// `2*cellCount` slots (matching the driver's own buffer sizing; actual
++    /// run count is always <= cell count).
++    fn segment_impl(&self, text: &[u8]) -> JsResult<(usize, Vec<u32>, Vec<u32>)> {
++        let mut tables = self.tables.borrow_mut();
++
++        let mut cell_words: Vec<u32> = Vec::new();
++        let mut cell_graphemes: Vec<u32> = Vec::new();
++        let mut runs: Vec<(u32, u32)> = Vec::new(); // (sgrId, uriId)
++
++        let mut sgr = SgrState::default();
++        let mut current_uri: Vec<u8> = Vec::new();
++
++        // (runIndex, sgrId, uriId) for the run currently being appended to.
++        let mut current_run: Option<(u32, u32, u32)> = None;
++
++        let mut pending: Option<(GraphemeWidthState, Vec<u8> /* utf8 bytes */, u32 /* runIndex */)> = None;
++        let mut break_state: u8 = 0u8;
++
++        macro_rules! run_index_for_current_state {
++            () => {{
++                let open = sgr.open_keys();
++                let close = sgr.close_keys();
++                let sgr_id = tables.intern_sgr(&open, &close);
++                let uri_id = tables.intern_uri(&current_uri);
++                match current_run {
++                    Some((idx, s, u)) if s == sgr_id && u == uri_id => idx,
++                    _ => {
++                        let idx = runs.len() as u32;
++                        runs.push((sgr_id, uri_id));
++                        current_run = Some((idx, sgr_id, uri_id));
++                        idx
++                    }
++                }
++            }};
++        }
++
++        macro_rules! flush_pending {
++            () => {
++                if let Some((state, bytes, run_idx)) = pending.take() {
++                    let width = state.width();
++                    let grapheme_id = tables.intern_grapheme(&bytes);
++                    cell_graphemes.push(grapheme_id);
++                    let is_tab = bytes.as_slice() == b"\t";
++                    let word = (run_idx << RUN_SHIFT)
++                        | (if is_tab { TAB_FLAG } else { 0 })
++                        | ((width as u32) & WIDTH_BYTE_MASK);
++                    cell_words.push(word);
++                }
++            };
++        }
++
++        let mut chars = std::str::from_utf8(text).unwrap_or("").char_indices().peekable();
++        while let Some((byte_pos, ch)) = chars.next() {
++            let bytes = &text[byte_pos..];
++
++            // ── ANSI escape? ──
++            if ch == '\u{1b}' {
++                // Try SGR: ESC [ <params> m
++                if bytes.len() >= 3 && bytes[1] == b'[' {
++                    if let Some(end) = find_sgr_terminator(&bytes[2..]) {
++                        let params = &bytes[2..2 + end];
++                        apply_sgr_to_state(&mut sgr, params);
++                        // Advance past the rest of the sequence: the outer
++                        // loop's `chars.next()` already consumed the leading
++                        // ESC, so skip `count_chars(..) - 1` more.
++                        for _ in 0..(count_chars(&bytes[..end + 3]) - 1) {
++                            chars.next();
++                        }
++                        continue;
++                    }
++                }
++                // Try OSC 8 hyperlink: ESC ] 8 ; <params> ; <uri> (BEL|ESC\)
++                if bytes.len() >= 4 && bytes[1] == b']' && bytes[2] == b'8' && bytes[3] == b';' {
++                    if let Some((uri, total_len)) = parse_osc8(bytes) {
++                        current_uri = uri;
++                        // Same off-by-one as the SGR branch above.
++                        for _ in 0..(count_chars(&bytes[..total_len]) - 1) {
++                            chars.next();
++                        }
++                        continue;
++                    }
++                }
++                // Unrecognized escape: not part of the narrow SGR/OSC8
++                // surface CellSegmenter's driver expects (`dC2`'s regex).
++                // Skip just the ESC itself as zero-width rather than
++                // clustering it as visible text.
++                continue;
++            }
++
++            // ── Substitute (bidi Trojan-Source) codepoint: isolate as its
++            // own single-codepoint cluster with a safe placeholder, breaking
++            // both before and after so it never merges into a neighbor. ──
++            let cp = ch as u32;
++            if is_substituted(&self.substitute, cp) {
++                flush_pending!();
++                let run_idx = run_index_for_current_state!();
++                let mut st = GraphemeWidthState::default();
++                st.reset('\u{FFFD}' as u32, self.ambiguous_is_narrow);
++                let mut placeholder = Vec::new();
++                placeholder.extend_from_slice("\u{FFFD}".as_bytes());
++                pending = Some((st, placeholder, run_idx));
++                flush_pending!();
++                continue;
++            }
++
++            match &mut pending {
++                None => {
++                    let run_idx = run_index_for_current_state!();
++                    let mut st = GraphemeWidthState::default();
++                    st.reset(cp, self.ambiguous_is_narrow);
++                    let mut buf = Vec::with_capacity(4);
++                    buf.extend_from_slice(ch.encode_utf8(&mut [0u8; 4]).as_bytes());
++                    pending = Some((st, buf, run_idx));
++                }
++                Some((state, buf, _run_idx)) => {
++                    let is_break = unsafe { Bun__graphemeBreak(state.first_cp, cp, &mut break_state) };
++                    if is_break {
++                        flush_pending!();
++                        let run_idx = run_index_for_current_state!();
++                        let mut st = GraphemeWidthState::default();
++                        st.reset(cp, self.ambiguous_is_narrow);
++                        let mut new_buf = Vec::with_capacity(4);
++                        new_buf.extend_from_slice(ch.encode_utf8(&mut [0u8; 4]).as_bytes());
++                        pending = Some((st, new_buf, run_idx));
++                    } else {
++                        state.add(cp, self.ambiguous_is_narrow);
++                        buf.extend_from_slice(ch.encode_utf8(&mut [0u8; 4]).as_bytes());
++                    }
++                }
++            }
++        }
++        flush_pending!();
++
++        let cell_count = cell_words.len();
++        let mut interleaved_cells = Vec::with_capacity(cell_count * 2);
++        for i in 0..cell_count {
++            interleaved_cells.push(cell_graphemes[i]);
++            interleaved_cells.push(cell_words[i]);
++        }
++        let mut interleaved_runs = Vec::with_capacity(cell_count * 2);
++        for (sgr_id, uri_id) in &runs {
++            interleaved_runs.push(*sgr_id);
++            interleaved_runs.push(*uri_id);
++        }
++        interleaved_runs.resize(cell_count * 2, 0);
++
++        Ok((cell_count, interleaved_cells, interleaved_runs))
++    }
++
++    // ─── setCell ────────────────────────────────────────────────────────
++
++    pub fn set_cell(&self, global: &JSGlobalObject, frame: &CallFrame) -> JsResult<JSValue> {
++        let [screen_cells_val, screen_width_val, x_val, y_val, char_index_val, packed_style_val] =
++            frame.arguments_as_array::<6>();
++
++        let screen_width = screen_width_val.to_int32();
++        let x = x_val.to_int32();
++        let y = y_val.to_int32();
++        if x < 0 || y < 0 || x >= screen_width {
++            return Ok(JSValue::js_number(pack_return(0, x.max(0) as u32, x.max(0) as u32)));
++        }
++        if !screen_cells_val.is_cell() || screen_cells_val.js_type() != jsc::JSType::Int32Array {
++            return Err(global.throw_invalid_arguments(format_args!("CellSegmenter.setCell: cells must be an Int32Array")));
++        }
++
++        let char_index = char_index_val.to_int32() as u32;
++        let packed_style = packed_style_val.to_int32() as u32;
++        let width_code = packed_style & SCREEN_WIDTH_MASK;
++
++        let mut screen = jsc::ArrayBuffer::from_typed_array(global, screen_cells_val);
++        let cells = screen.as_u32();
++        let idx = ((y as usize) * (screen_width as usize) + (x as usize)) * 2;
++        if idx + 1 >= cells.len() {
++            return Ok(JSValue::js_number(pack_return(0, x as u32, x as u32)));
++        }
++        cells[idx] = char_index;
++        cells[idx + 1] = packed_style;
++
++        let mut end_x = (x + 1) as u32;
++        // A wide primary cell auto-synthesizes its spacer-tail companion —
++        // the driver never emits one explicitly (see the adaptation
++        // checklist entry for why `screen.spacerHead` is unused here).
++        if width_code == self.screen.wide && x + 1 < screen_width {
++            let companion_idx = idx + 2;
++            if companion_idx + 1 < cells.len() {
++                let style_only = packed_style & !SCREEN_WIDTH_MASK;
++                cells[companion_idx] = self.screen.empty_char_index;
++                cells[companion_idx + 1] = style_only | self.screen.spacer_tail;
++                end_x = (x + 2) as u32;
++            }
++        }
++
++        Ok(JSValue::js_number(pack_return(0, x as u32, end_x)))
++    }
++
++    // ─── paint ──────────────────────────────────────────────────────────
++
++    pub fn paint(&self, global: &JSGlobalObject, frame: &CallFrame) -> JsResult<JSValue> {
++        let [screen_cells_val, screen_width_val, x_val, y_val, seg_cells_val, seg_count_val, _arg7, char_indices_val, run_words_val] =
++            frame.arguments_as_array::<9>();
++
++        let screen_width = screen_width_val.to_int32();
++        let x = x_val.to_int32();
++        let y = y_val.to_int32();
++        let seg_count = seg_count_val.to_int32().max(0) as usize;
++
++        if seg_count == 0 || x < 0 || y < 0 || x >= screen_width {
++            let cx = x.max(0) as u32;
++            return Ok(JSValue::js_number(pack_return(cx, cx, cx)));
++        }
++
++        for (name, v) in [
++            ("cells", screen_cells_val),
++            ("segmenterCells", seg_cells_val),
++            ("charIndices", char_indices_val),
++            ("runWords", run_words_val),
++        ] {
++            if !v.is_cell() || v.js_type() != jsc::JSType::Int32Array {
++                return Err(global.throw_invalid_arguments(format_args!(
++                    "CellSegmenter.paint: {} must be an Int32Array",
++                    name
++                )));
++            }
++        }
++
++        let seg_cells_buf = jsc::ArrayBuffer::from_typed_array(global, seg_cells_val);
++        let char_indices_buf = jsc::ArrayBuffer::from_typed_array(global, char_indices_val);
++        let run_words_buf = jsc::ArrayBuffer::from_typed_array(global, run_words_val);
++        let mut screen_buf = jsc::ArrayBuffer::from_typed_array(global, screen_cells_val);
++
++        // SAFETY: distinct JS typed-array-backed buffers; `screen_buf` is the
++        // only one mutated.
++        let seg_cells: &[u32] = bytemuck::cast_slice(seg_cells_buf.byte_slice());
++        let char_indices: &[u32] = bytemuck::cast_slice(char_indices_buf.byte_slice());
++        let run_words: &[u32] = bytemuck::cast_slice(run_words_buf.byte_slice());
++        let screen_cells = screen_buf.as_u32();
++
++        let tab_width = self.screen.tab_width.max(1) as u32;
++        let mut column = x as u32;
++        let width_u = screen_width as u32;
++
++        for i in 0..seg_count.min(seg_cells.len() / 2) {
++            if column >= width_u {
++                break;
++            }
++            let local_char_idx = seg_cells[2 * i] as usize;
++            let cell_word = seg_cells[2 * i + 1];
++            let run_idx = (cell_word >> RUN_SHIFT) as usize;
++            let is_tab = (cell_word & TAB_FLAG) != 0;
++            let width_byte = cell_word & WIDTH_BYTE_MASK;
++            let run_word = run_words.get(run_idx).copied().unwrap_or(self.screen.narrow);
++            let style_only = run_word & !SCREEN_WIDTH_MASK;
++
++            if is_tab {
++                let span = tab_width - (column % tab_width);
++                for _ in 0..span {
++                    if column >= width_u {
++                        break;
++                    }
++                    let idx = ((y as u32) * width_u + column) as usize * 2;
++                    if idx + 1 < screen_cells.len() {
++                        screen_cells[idx] = self.screen.empty_char_index;
++                        screen_cells[idx + 1] = style_only | self.screen.narrow;
++                    }
++                    column += 1;
++                }
++            } else {
++                let screen_char_idx = char_indices.get(local_char_idx).copied().unwrap_or(self.screen.empty_char_index);
++                let is_wide = width_byte >= 2;
++                let width_code = if is_wide { self.screen.wide } else { self.screen.narrow };
++                let idx = ((y as u32) * width_u + column) as usize * 2;
++                if idx + 1 < screen_cells.len() {
++                    screen_cells[idx] = screen_char_idx;
++                    screen_cells[idx + 1] = style_only | width_code;
++                }
++                column += 1;
++                if is_wide && column < width_u {
++                    let cidx = ((y as u32) * width_u + column) as usize * 2;
++                    if cidx + 1 < screen_cells.len() {
++                        screen_cells[cidx] = self.screen.empty_char_index;
++                        screen_cells[cidx + 1] = style_only | self.screen.spacer_tail;
++                    }
++                    column += 1;
++                }
++            }
++        }
++
++        Ok(JSValue::js_number(pack_return(column, x as u32, column)))
++    }
++
++    // ─── getters ────────────────────────────────────────────────────────
++
++    pub fn get_graphemes(this: &Self, global: &JSGlobalObject) -> JsResult<JSValue> {
++        this.array_getter(global, &this.graphemes_array, |t| &t.graphemes)
++    }
++
++    pub fn get_sgr_keys(this: &Self, global: &JSGlobalObject) -> JsResult<JSValue> {
++        this.array_getter(global, &this.sgr_keys_array, |t| &t.sgr_keys)
++    }
++
++    pub fn get_sgr_close_keys(this: &Self, global: &JSGlobalObject) -> JsResult<JSValue> {
++        this.array_getter(global, &this.sgr_close_keys_array, |t| &t.sgr_close_keys)
++    }
++
++    pub fn get_uris(this: &Self, global: &JSGlobalObject) -> JsResult<JSValue> {
++        this.array_getter(global, &this.uris_array, |t| &t.uris)
++    }
++
++    /// Lazily creates (on first access) a JS array mirroring one of the
++    /// interning tables, then keeps returning the *same* array object —
++    /// `segment()` pushes newly-interned entries into it in place via
++    /// `sync_arrays`, matching the driver's expectation that a table's
++    /// length grows without ever re-invoking the getter (see the
++    /// `charIndices()` call site in the reverse-engineered protocol notes).
++    fn array_getter(
++        &self,
++        global: &JSGlobalObject,
++        slot: &RefCell<Option<Strong>>,
++        table: impl FnOnce(&Tables) -> &Vec<Box<[u8]>>,
++    ) -> JsResult<JSValue> {
++        let mut slot = slot.borrow_mut();
++        if let Some(strong) = slot.as_ref() {
++            return Ok(strong.get());
++        }
++        let tables = self.tables.borrow();
++        let items = table(&tables);
++        let mut js_items = Vec::with_capacity(items.len());
++        for item in items {
++            js_items.push(bun_string_jsc::create_utf8_for_js(global, item)?);
++        }
++        drop(tables);
++        let arr = jsc::JSArray::create(global, &js_items)?;
++        *slot = Some(Strong::create(arr, global));
++        Ok(arr)
++    }
++
++    /// Pushes every table entry interned since the last call into its live
++    /// JS array (only entries beyond the array's current length — cheap
++    /// no-op when nothing new was interned, e.g. after `resetNative()`-style
++    /// re-segmentation of already-seen text).
++    fn sync_arrays(&self, global: &JSGlobalObject) -> JsResult<()> {
++        let tables = self.tables.borrow();
++        Self::sync_one(global, &self.graphemes_array, &tables.graphemes)?;
++        Self::sync_one(global, &self.sgr_keys_array, &tables.sgr_keys)?;
++        Self::sync_one(global, &self.sgr_close_keys_array, &tables.sgr_close_keys)?;
++        Self::sync_one(global, &self.uris_array, &tables.uris)?;
++        Ok(())
++    }
++
++    fn sync_one(global: &JSGlobalObject, slot: &RefCell<Option<Strong>>, items: &[Box<[u8]>]) -> JsResult<()> {
++        let slot = slot.borrow();
++        let Some(strong) = slot.as_ref() else {
++            // Getter never called yet — nothing holds a reference to sync.
++            return Ok(());
++        };
++        let arr = strong.get();
++        let current_len = arr.get(global, b"length")?.map(|v| v.to_int32() as usize).unwrap_or(0);
++        for (i, item) in items.iter().enumerate().skip(current_len) {
++            let js_str = bun_string_jsc::create_utf8_for_js(global, item)?;
++            arr.put_index(global, i as u32, js_str)?;
++        }
++        Ok(())
++    }
++}
++
++// ─── ANSI tokenizing helpers ─────────────────────────────────────────────
++
++/// Byte offset (relative to the start of `params`) of the `m` terminating an
++/// SGR sequence, or `None` if `params` doesn't contain one before something
++/// that isn't a digit/`;`/`:` (i.e. this CSI sequence isn't SGR — some other
++/// final byte — or params run off the end of the string unterminated).
++fn find_sgr_terminator(params: &[u8]) -> Option<usize> {
++    for (i, &b) in params.iter().enumerate() {
++        match b {
++            b'0'..=b'9' | b';' | b':' => continue,
++            b'm' => return Some(i),
++            _ => return None,
++        }
++    }
++    None
++}
++
++/// Number of UTF-8-decoded chars in `bytes` (used to advance the outer
++/// `char_indices()` iterator past a just-consumed escape sequence).
++fn count_chars(bytes: &[u8]) -> usize {
++    std::str::from_utf8(bytes).map(|s| s.chars().count()).unwrap_or(bytes.len())
++}
++
++/// Parses one OSC 8 hyperlink sequence starting at `bytes[0]` (`\x1b`).
++/// Returns `(uri, totalByteLen)` — `uri` is empty for a close
++/// (`\x1b]8;;<terminator>`). `None` if this isn't a well-formed OSC 8
++/// sequence (unterminated, or aborted by CAN/SUB/a bare ESC).
++fn parse_osc8(bytes: &[u8]) -> Option<(Vec<u8>, usize)> {
++    // Past "ESC]8;".
++    let mut i = 4;
++    // Params (skip to the ';' before the URI); an aborting byte inside means
++    // this isn't a hyperlink.
++    let params_start = i;
++    while i < bytes.len() && bytes[i] != b';' {
++        match bytes[i] {
++            0x07 | 0x9c | 0x1b | 0x18 | 0x1a => return None,
++            _ => i += 1,
++        }
++    }
++    if i >= bytes.len() {
++        return None;
++    }
++    let _params = &bytes[params_start..i];
++    i += 1; // past ';'
++    let uri_start = i;
++    while i < bytes.len() {
++        match bytes[i] {
++            0x07 => return Some((bytes[uri_start..i].to_vec(), i + 1)),
++            0x1b if i + 1 < bytes.len() && bytes[i + 1] == b'\\' => {
++                return Some((bytes[uri_start..i].to_vec(), i + 2));
++            }
++            0x9c => return Some((bytes[uri_start..i].to_vec(), i + 1)),
++            0x1b | 0x18 | 0x1a => return None,
++            _ => i += 1,
++        }
++    }
++    None
++}
++
++use bun_jsc as jsc;

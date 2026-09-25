@@ -1,0 +1,164 @@
+diff --git a/src/runtime/api/AntObject.rs b/src/runtime/api/AntObject.rs
+new file mode 100644
+index 0000000000..c7da693367
+--- /dev/null
++++ b/src/runtime/api/AntObject.rs
+@@ -0,0 +1,158 @@
++//! `Bun.ant` — compatibility shims for Anthropic's internal Bun build
++//! (`@anthropic-ai/bun-internal`) that Claude Code's bundle calls: the four
++//! functions below (`setDumpable`, `getPeerUid`/`getPeerPid`,
++//! `memoryPressureLevel`), called through `try`/`typeof` guards so a missing
++//! or platform-stubbed implementation degrades gracefully, plus
++//! `CellSegmenter` (see `CellSegmenter.rs`), the terminal-cell segmenter
++//! behind the fullscreen Ink renderer's hard, unguarded dependency.
++
++use bun_jsc::{self as jsc, CallFrame, JSGlobalObject, JSValue, JsResult};
++
++use crate::api::cell_segmenter::CellSegmenter;
++
++pub(crate) fn create(global: &JSGlobalObject) -> JSValue {
++    let object = jsc::create_host_function_object(
++        global,
++        &[
++            ("setDumpable", __jsc_host_set_dumpable, 1),
++            ("getPeerUid", __jsc_host_get_peer_uid, 1),
++            ("getPeerPid", __jsc_host_get_peer_pid, 1),
++            ("memoryPressureLevel", __jsc_host_memory_pressure_level, 0),
++        ],
++    );
++    object.put(global, b"CellSegmenter", jsc::codegen::js::get_constructor::<CellSegmenter>(global));
++    object
++}
++
++#[cfg(any(target_os = "linux", target_os = "android"))]
++mod os {
++    use core::ffi::c_void;
++
++    const PR_SET_DUMPABLE: i32 = 4;
++    const SOL_SOCKET: i32 = 1;
++    const SO_PEERCRED: i32 = 17;
++
++    pub(super) struct UCred {
++        pub(super) pid: i32,
++        pub(super) uid: u32,
++    }
++
++    unsafe extern "C" {
++        fn prctl(option: i32, arg2: u64, arg3: u64, arg4: u64, arg5: u64) -> i32;
++        fn getsockopt(
++            fd: i32,
++            level: i32,
++            optname: i32,
++            optval: *mut c_void,
++            optlen: *mut u32,
++        ) -> i32;
++    }
++
++    pub(super) fn set_dumpable(flag: bool) -> bool {
++        // SAFETY: plain libc call with scalar arguments, no memory involved.
++        unsafe { prctl(PR_SET_DUMPABLE, flag as u64, 0, 0, 0) == 0 }
++    }
++
++    pub(super) fn peer_cred(fd: i32) -> Option<UCred> {
++        #[repr(C)]
++        struct RawUCred {
++            pid: i32,
++            uid: u32,
++            gid: u32,
++        }
++        let mut cred = RawUCred { pid: 0, uid: 0, gid: 0 };
++        let mut len = core::mem::size_of::<RawUCred>() as u32;
++        // SAFETY: `cred`/`len` are valid for writes for the duration of the call.
++        let rc = unsafe {
++            getsockopt(
++                fd,
++                SOL_SOCKET,
++                SO_PEERCRED,
++                (&raw mut cred).cast::<c_void>(),
++                &raw mut len,
++            )
++        };
++        if rc == 0 {
++            Some(UCred { pid: cred.pid, uid: cred.uid })
++        } else {
++            None
++        }
++    }
++
++    /// Level codes mirror Node's `process.on("memoryPressure")`: 1 normal, 2
++    /// warning, 4 critical. `None` when PSI isn't available (no `/proc/pressure`,
++    /// e.g. old kernel or a container without the `cgroup2` PSI controller).
++    pub(super) fn memory_pressure_level() -> Option<i32> {
++        let file =
++            bun_sys::File::open(bun_core::zstr!("/proc/pressure/memory"), bun_sys::O::RDONLY, 0)
++                .ok()?;
++        let mut buf = [0u8; 256];
++        let n = file.read(&mut buf).ok()?;
++        let avg10 = parse_avg10(&buf[..n])?;
++        Some(if avg10 >= 50.0 {
++            4
++        } else if avg10 >= 10.0 {
++            2
++        } else {
++            1
++        })
++    }
++
++    fn parse_avg10(contents: &[u8]) -> Option<f64> {
++        let line = bun_core::strings::split(contents, b"\n").find(|line| line.starts_with(b"some "))?;
++        let at = bun_core::strings::index_of(line, b"avg10=")? + b"avg10=".len();
++        let rest = &line[at..];
++        let end = rest.iter().position(|b| !(b.is_ascii_digit() || *b == b'.')).unwrap_or(rest.len());
++        core::str::from_utf8(&rest[..end]).ok()?.parse().ok()
++    }
++}
++
++#[cfg(not(any(target_os = "linux", target_os = "android")))]
++mod os {
++    pub(super) struct UCred {
++        pub(super) pid: i32,
++        pub(super) uid: u32,
++    }
++    pub(super) fn set_dumpable(_flag: bool) -> bool {
++        false
++    }
++    pub(super) fn peer_cred(_fd: i32) -> Option<UCred> {
++        None
++    }
++    pub(super) fn memory_pressure_level() -> Option<i32> {
++        None
++    }
++}
++
++#[bun_jsc::host_fn]
++fn set_dumpable(_global: &JSGlobalObject, frame: &CallFrame) -> JsResult<JSValue> {
++    let [flag] = frame.arguments_as_array::<1>();
++    let flag = if flag.is_empty_or_undefined_or_null() { true } else { flag.to_boolean() };
++    Ok(JSValue::js_boolean(os::set_dumpable(flag)))
++}
++
++#[bun_jsc::host_fn]
++fn get_peer_uid(_global: &JSGlobalObject, frame: &CallFrame) -> JsResult<JSValue> {
++    let [fd] = frame.arguments_as_array::<1>();
++    match os::peer_cred(fd.to_int32()) {
++        Some(cred) => Ok(JSValue::js_number(cred.uid as f64)),
++        None => Ok(JSValue::NULL),
++    }
++}
++
++#[bun_jsc::host_fn]
++fn get_peer_pid(_global: &JSGlobalObject, frame: &CallFrame) -> JsResult<JSValue> {
++    let [fd] = frame.arguments_as_array::<1>();
++    match os::peer_cred(fd.to_int32()) {
++        Some(cred) if cred.pid > 0 => Ok(JSValue::js_number(cred.pid as f64)),
++        _ => Ok(JSValue::NULL),
++    }
++}
++
++#[bun_jsc::host_fn]
++fn memory_pressure_level(_global: &JSGlobalObject, _frame: &CallFrame) -> JsResult<JSValue> {
++    match os::memory_pressure_level() {
++        Some(level) => Ok(JSValue::js_number(level as f64)),
++        None => Ok(JSValue::NULL),
++    }
++}
