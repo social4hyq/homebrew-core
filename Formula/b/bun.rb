@@ -24,8 +24,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r13"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a06780e480bc856d30313ca96f015e642a289fff492d74e7b608050d1160780f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0c1335ff47dd51d8373738a5e4c55d63f7827dcc4f3f0171a85d5f8394fdc031"
   end
 
   depends_on "cmake" => :build
