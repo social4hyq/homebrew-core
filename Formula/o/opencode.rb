@@ -6,10 +6,12 @@ class Opencode < Formula
   license "MIT"
   revision 6
 
+  # No throttle: unlike upstream homebrew-core (which throttles to every 5th
+  # release to limit their own CI churn), this tap wants opencode to autobump
+  # on every upstream release, same as opencode-v2.
   livecheck do
     url :stable
     regex(/^v(1\.\d+\.\d+)$/i)
-    throttle 5
   end
 
   bottle do
