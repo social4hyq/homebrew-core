@@ -1,0 +1,12 @@
+diff --git a/src/jsc/bindings/BunObject+exports.h b/src/jsc/bindings/BunObject+exports.h
+index 4bb94394dd..0cff1efc4b 100644
+--- a/src/jsc/bindings/BunObject+exports.h
++++ b/src/jsc/bindings/BunObject+exports.h
+@@ -28,6 +28,7 @@
+     macro(Terminal) \
+     macro(Transpiler) \
+     macro(ValkeyClient) \
++    macro(ant) \
+     macro(argv) \
+     macro(cron) \
+     macro(cwd) \

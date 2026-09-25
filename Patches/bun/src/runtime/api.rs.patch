@@ -1,8 +1,23 @@
 diff --git a/src/runtime/api.rs b/src/runtime/api.rs
-index 3a3c08eef6..51785a4983 100644
+index 3a3c08eef6..602951427a 100644
 --- a/src/runtime/api.rs
 +++ b/src/runtime/api.rs
-@@ -97,6 +97,11 @@ pub mod bun_subprocess;
+@@ -29,10 +29,14 @@ pub use bun_jsc::BuildMessage;
+ pub use bun_jsc::ResolveMessage;
+ 
+ // ─── compiling submodules (api/ dir) ─────────────────────────────────────────
++#[path = "api/AntObject.rs"]
++pub mod ant_object;
+ #[path = "api/Archive.rs"]
+ pub mod archive;
+ #[path = "api/BunObject.rs"]
+ pub mod bun_object;
++#[path = "api/CellSegmenter.rs"]
++pub mod cell_segmenter;
+ #[path = "api/crash_handler_jsc.rs"]
+ pub mod crash_handler_jsc;
+ #[path = "api/cron.rs"]
+@@ -97,6 +101,11 @@ pub mod bun_subprocess;
  #[path = "api/bun/js_bun_spawn_bindings.rs"]
  pub mod js_bun_spawn_bindings;
  
@@ -14,3 +29,11 @@ index 3a3c08eef6..51785a4983 100644
  // Bun.Terminal — PTY/ConPTY. JsRef lifecycle + BufferedReader/StreamingWriter
  // generic owner wiring (~120 jsc refs).
  #[path = "api/bun/Terminal.rs"]
+@@ -147,6 +156,7 @@ pub use crate::api::js_bundler::BuildArtifact;
+ pub use crate::api::js_bundler::JSBundler;
+ pub use crate::api::json5_object as JSON5Object;
+ pub use crate::api::toml_object as TOMLObject;
++pub use crate::api::ant_object as AntObject;
+ pub use crate::api::unsafe_object as UnsafeObject;
+ pub use crate::api::xml_object as XMLObject;
+ pub use crate::api::yaml_object as YAMLObject;
