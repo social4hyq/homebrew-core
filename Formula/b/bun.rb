@@ -16,7 +16,7 @@ class Bun < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  revision 10
+  revision 11
 
   livecheck do
     url :stable
@@ -104,6 +104,8 @@ class Bun < Formula
     src/io/posix_event_loop.rs
     src/js/node/os.ts
     src/js/wasi-runner.js
+    src/jsc/bindings/BunObject+exports.h
+    src/jsc/bindings/BunObject.cpp
     src/jsc/bindings/BunProcess.cpp
     src/jsc/bindings/bun-spawn.cpp
     src/jsc/bindings/c-bindings.cpp
@@ -124,6 +126,10 @@ class Bun < Formula
     src/resolver/resolver.rs
     src/runtime/Cargo.toml
     src/runtime/api.rs
+    src/runtime/api/AntObject.rs
+    src/runtime/api/BunObject.rs
+    src/runtime/api/CellSegmenter.classes.ts
+    src/runtime/api/CellSegmenter.rs
     src/runtime/api/bun/Terminal.rs
     src/runtime/api/bun/js_bun_spawn_bindings.rs
     src/runtime/api/bun/ohos_node_userinfo.rs

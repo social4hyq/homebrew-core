@@ -1,0 +1,44 @@
+diff --git a/src/runtime/api/CellSegmenter.classes.ts b/src/runtime/api/CellSegmenter.classes.ts
+new file mode 100644
+index 0000000000..0e8b685043
+--- /dev/null
++++ b/src/runtime/api/CellSegmenter.classes.ts
+@@ -0,0 +1,38 @@
++import { define } from "../../codegen/class-definitions.ts";
++
++export default [
++  define({
++    name: "CellSegmenter",
++    construct: true,
++    finalize: true,
++    configurable: false,
++    klass: {},
++    JSType: "0b11101110",
++    proto: {
++      graphemes: {
++        getter: "getGraphemes",
++      },
++      sgrKeys: {
++        getter: "getSgrKeys",
++      },
++      sgrCloseKeys: {
++        getter: "getSgrCloseKeys",
++      },
++      uris: {
++        getter: "getUris",
++      },
++      segment: {
++        fn: "segment",
++        length: 4,
++      },
++      setCell: {
++        fn: "setCell",
++        length: 6,
++      },
++      paint: {
++        fn: "paint",
++        length: 9,
++      },
++    },
++  }),
++];
