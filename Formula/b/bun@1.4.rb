@@ -17,15 +17,15 @@ class BunAT14 < Formula
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
   # OHOS patch audit fixes require rebuilding the same upstream version.
-  revision 8
+  revision 9
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r17"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aed97533cf37fd4d16d9a514d8ed3424ffdb95a758e1d2227fe19c7e4c09d2e4"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r18"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc4432801dc2235323c95084cc44423751da4b6e51951e8deaada900fb643d93"
   end
 
   depends_on "cmake" => :build
@@ -44,22 +44,11 @@ class BunAT14 < Formula
   depends_on "perl" => :build
   depends_on "python@3.14" => :build
   depends_on "ruby" => :build
+  depends_on "rustup" => :build
   depends_on "zlib-ng-compat" => :build
 
   fails_with :gcc do
     cause "uses clang-specific flags"
-  end
-
-  resource "rust-nightly" do
-    url "https://static.rust-lang.org/dist/2026-07-20/rust-nightly-aarch64-unknown-linux-ohos.tar.gz"
-    version "nightly-2026-07-20"
-    sha256 "7d3dd4cc4f55ee8a7c7f09804b96fd52ef7ef598a935772091e80aa66869676e"
-  end
-
-  resource "rust-src" do
-    url "https://static.rust-lang.org/dist/2026-07-20/rust-src-nightly.tar.gz"
-    version "nightly-2026-07-20"
-    sha256 "2be85b655b99624bed0fb63a47e564abac07aa1fb5d0576abac5c42ef8c5316e"
   end
 
   # L3 bootstrap: upstream musl Bun used only to run the build scripts.
@@ -112,16 +101,15 @@ class BunAT14 < Formula
 
   def install
     llvm = Formula["llvm@21"]
-    rust_home = buildpath/"rust"
     channel = File.read("rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
-    odie "Update rust-nightly to #{channel}" if resource("rust-nightly").version.to_s != channel
-
-    %w[rust-nightly rust-src].each do |name|
-      resource(name).stage do
-        system "sh", "./install.sh", "--prefix=#{rust_home}", "--disable-ldconfig"
-      end
-    end
+    rust_toolchain = "#{channel}-aarch64-unknown-linux-ohos"
+    rustup_home = buildpath/"rustup"
+    ENV["RUSTUP_HOME"] = rustup_home
+    ENV["CARGO_HOME"] = buildpath/"cargo"
+    system "rustup", "toolchain", "install", rust_toolchain, "--profile", "minimal", "--component", "rust-src"
+    rust_home = rustup_home/"toolchains"/rust_toolchain
     ENV["BUN_TOOLCHAIN_RUST"] = rust_home
+    ENV["RUSTUP_TOOLCHAIN"] = rust_toolchain
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3")
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
@@ -136,6 +124,7 @@ class BunAT14 < Formula
       (buildpath/"bootstrap").install "bun"
     end
     ENV.prepend_path "PATH", buildpath/"bootstrap"
+    ENV["CMAKE_BUILD_PARALLEL_LEVEL"] = ENV.make_jobs.to_s
 
     # The build resolves ICU via BUN_OHOS_ICU_ROOT. The staging dir carries
     # the keg's headers plus ONLY the static archives, so the link is
