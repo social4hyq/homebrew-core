@@ -16,10 +16,19 @@ class Bun < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  # Fixes CellSegmenter's inverted ambiguous-width flag (box-drawing glyphs
-  # rendered at 2 cols instead of 1, halving Claude Code's fullscreen input
-  # box width) — same upstream tag, new patch content.
-  revision 12
+  # Closes an OHOS-only symlink-escape hole in Bun.serve() directory routes:
+  # openat2 is seccomp-blocked (uncatchable SIGSYS) on OHOS, and the fallback
+  # degraded to plain `openat`, which follows symlinks and lets requests
+  # escape the served root (serve-directory-routes.test.ts "rejects symlink
+  # escapes" fails under this fallback). Ports the openat2_in_root_clamped()
+  # userspace RESOLVE_IN_ROOT/NO_MAGICLINKS emulator — plus its
+  # checked-capacity bound and InRootFdGuard RAII cleanup for the two bugs
+  # found in it (long-symlink-chain buffer overflow panic, O_PATH
+  # intermediate-fd leak on every nested request) — from this tap's
+  # bun@1.4.rb revision 9 (commit 37ef7e730), which had the fix but was
+  # never carried over to this formula's Patches/bun/. Same upstream tag,
+  # new patch content.
+  revision 13
 
   livecheck do
     url :stable
@@ -27,8 +36,8 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r15"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "53b0535a161c7a9311fc3160fb63fd34e019b6111ae1bc0e5ebba5f6f17fa6ac"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b76e961e89861080f88fd8c7aa51a46c3ee53a6fc7ceca5b71be9db5e361edc"
   end
 
   depends_on "cmake" => :build
