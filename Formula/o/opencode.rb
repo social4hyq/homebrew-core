@@ -6,16 +6,18 @@ class Opencode < Formula
   license "MIT"
   revision 6
 
+  # No throttle: unlike upstream homebrew-core (which throttles to every 5th
+  # release to limit their own CI churn), this tap wants opencode to autobump
+  # on every upstream release, same as opencode-v2.
   livecheck do
     url :stable
     regex(/^v(1\.\d+\.\d+)$/i)
-    throttle 5
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.31-r15"
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0282318161435b369270c6e2a29263aec854e8f34849ad2080348f087ebebfa1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.31-r16"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be23d75829e8239a06469fcd476749c9eff756cb7773f82f3047e997dc5b5b7a"
   end
 
   depends_on "bun" => :build
