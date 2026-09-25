@@ -221,7 +221,10 @@ class Bun < Formula
   def install
     llvm = Formula["llvm@21"]
     # llvm@21's OHOS SDK dependency dropped its versioned "ohos-sdk@N" name
-    # in favor of the unversioned "ohos-sdk-native".
+    # in favor of the unversioned "ohos-sdk-native". Its keg layout also
+    # changed: it's the old bundle's "native/" subtree promoted to the keg
+    # root, so sysroot/ now sits directly under opt_prefix (not opt_prefix/
+    # native/sysroot as the old ohos-sdk@N bundle had it).
     sdk = llvm.deps.find { |dep| dep.name.start_with?("ohos-sdk") }.to_formula.opt_prefix
     rust_home = buildpath/"rust"
     channel = File.read("rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
@@ -262,7 +265,7 @@ class Bun < Formula
     fetch_webkit
     system "bun", "run", "build:release:local", "--canary=off",
            "--os=ohos", "--arch=aarch64",
-           "--ohos-sdk-root=#{sdk}", "--ohos-sysroot=#{sdk}/native/sysroot"
+           "--ohos-sdk-root=#{sdk}", "--ohos-sysroot=#{sdk}/sysroot"
 
     bin.install "build/release-local/bun"
     bin.install_symlink "bun" => "bunx"
