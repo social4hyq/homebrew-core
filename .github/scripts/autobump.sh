@@ -127,7 +127,10 @@ for line in "${CANDIDATES[@]}"; do
   #      after publishing (seen 2026-09-17: 2.0.7 published 19:26Z, tagged
   #      19:29Z). Also immune to the npm side of upstream's package move
   #      (@opencode-ai/cli → @opencode/cli, 2026-09-07..12): we follow git
-  #      tags, which kept their v2.* naming across the move.
+  #      tags, which kept their v2.* naming across the move. zcode is the same
+  #      sub-scheme with a different version→git mapping: upstream publishes no
+  #      tags at all (the version lives in package.json on main), so the pin is
+  #      main's tip, re-checked against package.json at that commit below.
   #
   # Also defends against a livecheck quirk: for a sha-scheme formula the
   # commit SHA always sorts above the version string, so `--newer-only` keeps
@@ -135,7 +138,13 @@ for line in "${CANDIDATES[@]}"; do
   # the actual pin (sha scheme) / formula version (npm scheme) instead.
   FORMULA_PATH=$(docker exec "$CONTAINER" bash -lc \
     "ls \"$TAP_IN_CONTAINER\"/Formula/*/\"$FORMULA\".rb 2>/dev/null | head -1")
-  if [ -n "$FORMULA_PATH" ] && docker exec "$CONTAINER" grep -qE 'url .*\.git.*revision:' "$FORMULA_PATH"; then
+  # Two separate line-based greps, not one `url .*\.git.*revision:`: zcode's
+  # url and its `revision:` pin sit on different lines (opencode-v2 keeps both
+  # on one). The single-line pattern silently missed zcode and sent it down the
+  # bump-formula-pr path, which cannot rewrite a git pin at all.
+  if [ -n "$FORMULA_PATH" ] \
+    && docker exec "$CONTAINER" grep -qE 'url .*\.git' "$FORMULA_PATH" \
+    && docker exec "$CONTAINER" grep -qE 'revision: "[0-9a-fA-F]{40}"' "$FORMULA_PATH"; then
     CURRENT_REV=$(docker exec "$CONTAINER" grep -oE 'revision: "[0-9a-fA-F]{40}"' "$FORMULA_PATH" | head -1 | cut -d'"' -f2)
     if [ -z "$CURRENT_REV" ]; then
       echo "::error::$FORMULA: git-revision formula but no revision pin found"
@@ -164,9 +173,22 @@ for line in "${CANDIDATES[@]}"; do
         continue
       fi
       # version→git mapping is formula-specific (repo, tag naming).
+      # Which ref the release version maps to, and (when that ref can move) the
+      # version file to re-check it against. opencode-v2 tags its releases
+      # `v<version>`; zcode tags nothing — main carries the version in
+      # package.json — so its pin is main's tip.
+      GIT_REPO=""
+      GIT_REF=""
+      GIT_VERSION_FILE=""
       case "$FORMULA" in
         opencode-v2)
           GIT_REPO="anomalyco/opencode"
+          GIT_REF="refs/tags/v$LATEST"
+          ;;
+        zcode)
+          GIT_REPO="zai-org/ZCode"
+          GIT_REF="refs/heads/main"
+          GIT_VERSION_FILE="package.json"
           ;;
         *)
           echo "::error::$FORMULA: livecheck returned a non-sha version '$LATEST' but no version→git mapping is configured for it"
@@ -179,18 +201,34 @@ for line in "${CANDIDATES[@]}"; do
       # would kill the script AT THE ASSIGNMENT — silently, before the -z
       # checks below can route it to a per-formula ::error:: (observed
       # 2026-08-23 as a bare "exit code 1" with zero output).
-      # Prefer the peeled `^{}` ref (annotated tags); lightweight tags have
-      # no peeled ref, so fall back to the plain ref.
-      TAG_REFS=$(git ls-remote "https://github.com/$GIT_REPO.git" \
-        "refs/tags/v$LATEST^{}" "refs/tags/v$LATEST" 2>/dev/null || true)
-      TARGET_SHA=$(awk '$2 ~ /\^\{\}$/ {print $1; exit}' <<< "$TAG_REFS")
+      # Prefer the peeled `^{}` ref (annotated tags); lightweight tags and
+      # branch refs have no peeled ref, so fall back to the plain ref.
+      REF_REFS=$(git ls-remote "https://github.com/$GIT_REPO.git" \
+        "$GIT_REF^{}" "$GIT_REF" 2>/dev/null || true)
+      TARGET_SHA=$(awk '$2 ~ /\^\{\}$/ {print $1; exit}' <<< "$REF_REFS")
       if [ -z "$TARGET_SHA" ]; then
-        TARGET_SHA=$(awk -v ref="refs/tags/v$LATEST" '$2 == ref {print $1; exit}' <<< "$TAG_REFS")
+        TARGET_SHA=$(awk -v ref="$GIT_REF" '$2 == ref {print $1; exit}' <<< "$REF_REFS")
       fi
       if [ -z "$TARGET_SHA" ]; then
-        echo "::error::$FORMULA: no git tag v$LATEST in $GIT_REPO (livecheck regex and upstream tag naming out of sync?)"
-        echo "- ❌ $FORMULA: no git tag v$LATEST" >> "$GITHUB_STEP_SUMMARY"
+        echo "::error::$FORMULA: $GIT_REF not found in $GIT_REPO (livecheck scheme and upstream ref naming out of sync?)"
+        echo "- ❌ $FORMULA: no $GIT_REF" >> "$GITHUB_STEP_SUMMARY"
         continue
+      fi
+      # A tag is fixed for a given release, but a branch ref keeps moving: main
+      # can advance between livecheck reading package.json and the ls-remote
+      # above, which would pin a commit whose package.json no longer matches the
+      # version we are about to write into the formula. Re-read it at the
+      # resolved commit and skip this run rather than ship the mismatch — the
+      # next run sees the newer version and bumps to that.
+      if [ -n "$GIT_VERSION_FILE" ]; then
+        TIP_VERSION=$(curl -fsSL \
+          "https://raw.githubusercontent.com/$GIT_REPO/$TARGET_SHA/$GIT_VERSION_FILE" 2>/dev/null \
+          | jq -r '.version // empty' 2>/dev/null || true)
+        if [ "$TIP_VERSION" != "$LATEST" ]; then
+          echo "::warning::$FORMULA: $GIT_REF moved to ${TIP_VERSION:-unknown} (expected $LATEST); skipping this run"
+          echo "- ⏭️ $FORMULA: $GIT_REF moved to ${TIP_VERSION:-unknown}, expected $LATEST" >> "$GITHUB_STEP_SUMMARY"
+          continue
+        fi
       fi
       NEW_VERSION="$LATEST"
       EDIT_VERSION=true
@@ -265,7 +303,7 @@ for line in "${CANDIDATES[@]}"; do
     fi
 
     if [ "$EDIT_VERSION" = true ]; then
-      PR_BODY="Automated version bump ($FORMULA upstream git tag v$NEW_VERSION). Custom autobump path: livecheck follows upstream git tags; the git pin is the exact commit the release tag points at. CI builds the new commit and publishes the bottle."
+      PR_BODY="Automated version bump ($FORMULA $NEW_VERSION). Custom autobump path for git-revision formulae: livecheck's version is mapped to $GIT_REF and the git pin is the commit that resolves to. CI builds the new commit and publishes the bottle."
     else
       PR_BODY="Automated commit-pin bump ($FORMULA v2 branch HEAD). Custom autobump path for git-revision formulae (bun.rb pattern): bump-formula-pr rejects fixed-version bumps, so this updates the git revision pin and increments the brew revision. CI builds the new commit and publishes the bottle."
     fi
