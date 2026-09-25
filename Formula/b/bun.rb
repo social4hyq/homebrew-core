@@ -220,7 +220,9 @@ class Bun < Formula
 
   def install
     llvm = Formula["llvm@21"]
-    sdk = llvm.deps.find { |dep| dep.name.start_with?("ohos-sdk@") }.to_formula.opt_prefix
+    # llvm@21's OHOS SDK dependency dropped its versioned "ohos-sdk@N" name
+    # in favor of the unversioned "ohos-sdk-native".
+    sdk = llvm.deps.find { |dep| dep.name.start_with?("ohos-sdk") }.to_formula.opt_prefix
     rust_home = buildpath/"rust"
     channel = File.read("rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
     odie "Update rust-nightly to #{channel}" if resource("rust-nightly").version.to_s != channel
