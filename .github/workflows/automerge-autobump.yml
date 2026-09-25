@@ -93,8 +93,8 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           # Keep in sync with autobump.yml's ALLOWLIST (claude-code /
-          # claude-code.latest, see the note there)
-          ALLOWLIST="opencode opencode-v2 claude-code claude-code.latest"
+          # claude-code.latest / zcode, see the note there)
+          ALLOWLIST="opencode opencode-v2 claude-code claude-code.latest zcode"
           BUMP_BRANCH_RE="^bump-($(echo "$ALLOWLIST" | tr ' ' '|'))-"
 
           merge_pr() {
