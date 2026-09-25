@@ -5,10 +5,9 @@ class Zcode < Formula
   homepage "https://github.com/zai-org/ZCode"
   # Upstream releases without git tags; version comes from package.json.
   url "https://github.com/zai-org/ZCode.git",
-      revision: "872ad960de7ec172591f7e1952f7849229f94521"
-  version "3.14.0"
+      revision: "29628c9acdb81b703bbd4080c207a0e7ce5e276e"
+  version "3.14.3"
   license "Apache-2.0"
-  revision 1
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
     strategy :json do |json|
@@ -17,8 +16,8 @@ class Zcode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.14.0-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "22f47f05a16fbc7c183ecf804ca9df5287b8e54826deab73105f0ede890d25d6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.14.3-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c12a3fd84e7033f687eb5f19f1bae3c47021d085b36d41004c4d925f3bebf865"
   end
 
   # pnpm 12 acts as itself with delegation to the packageManager pin
@@ -41,8 +40,16 @@ class Zcode < Formula
   def install
     # OHOS: community ports for platform binaries the toolchain cannot
     # build here, and build-time natives that publish openharmony packages.
+    # pnpm 12 no longer reads the legacy package.json "pnpm" field; overrides
+    # must live in pnpm-workspace.yaml or they are silently ignored and the
+    # stock natives (node-pty, esbuild, ...) fail to build on OHOS.
     pkg_json = JSON.parse(File.read("package.json"))
-    pkg_json["pnpm"]["overrides"] = {
+    ws = YAML.safe_load_file("pnpm-workspace.yaml")
+    # pnpm 11+ only reads registry/auth settings from .npmrc; carry the
+    # upstream `node-linker=hoisted` over or workspace packages lose access
+    # to hoisted transitive deps (web imports lucide-react via @zcode/ui).
+    ws["nodeLinker"] = "hoisted"
+    ws["overrides"] = {
       "node-pty"              => "npm:@ohos-ports/node-pty@1.1.0-beta.4",
       "@mbears/opentui-core"  => "npm:@ohos-npm-ports/opentui-core@0.5.8-2",
       "@mbears/opentui-react" => "npm:@opentui/react@0.5.8",
@@ -52,12 +59,14 @@ class Zcode < Formula
       "@tailwindcss/vite"     => "4.3.3",
       "@tailwindcss/oxide"    => "npm:@ohos-npm-ports/tailwindcss-oxide@4.3.3-2",
       "lightningcss"          => "npm:@ohos-npm-ports/lightningcss@1.33.0-1",
-    }.merge(pkg_json["pnpm"]["overrides"] || {})
-    File.write("package.json", JSON.pretty_generate(pkg_json) << "\n")
+    }.merge(pkg_json.dig("pnpm", "overrides") || {})
 
     # koffi miscompiles x64 assembly on arm64 and only serves CUA capture.
-    ws = YAML.safe_load_file("pnpm-workspace.yaml")
-    ws["allowBuilds"].delete("koffi")
+    # pnpm 11+ fails (strictDepBuilds) unless every blocked build is listed
+    # explicitly: `false` blocks it, and the node-pty override needs its own
+    # scoped entry because upstream only allowlists the bare `node-pty` name.
+    ws["allowBuilds"]["koffi"] = false
+    ws["allowBuilds"]["@ohos-ports/node-pty"] = true
     File.write("pnpm-workspace.yaml", YAML.dump(ws))
 
     ENV["NPM_CONFIG_MANAGE_PACKAGE_MANAGER_VERSIONS"] = "false"
