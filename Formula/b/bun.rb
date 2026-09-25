@@ -16,7 +16,10 @@ class Bun < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  revision 11
+  # Fixes CellSegmenter's inverted ambiguous-width flag (box-drawing glyphs
+  # rendered at 2 cols instead of 1, halving Claude Code's fullscreen input
+  # box width) — same upstream tag, new patch content.
+  revision 12
 
   livecheck do
     url :stable
