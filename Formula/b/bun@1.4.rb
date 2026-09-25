@@ -17,6 +17,10 @@ class BunAT14 < Formula
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
   # OHOS patch audit fixes require rebuilding the same upstream version.
+  # (One of those fixes — openat2_in_root_clamped(), closing an OHOS
+  # symlink-escape hole in Bun.serve() directory routes — was later ported
+  # to bun.rb as well; see that formula's revision 13 for the bare-named
+  # "brew install bun" target, PR #677.)
   revision 9
   livecheck do
     url :stable
