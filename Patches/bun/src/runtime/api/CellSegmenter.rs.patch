@@ -6,10 +6,10 @@ index 0000000000..94f7da7b27
 @@ -0,0 +1,968 @@
 +//! `Bun.ant.CellSegmenter` — the terminal-cell segmenter Claude Code's Ink
 +//! renderer uses to turn styled/hyperlinked text into fixed-width terminal
-+//! cells. This is a from-scratch reimplementation of Anthropic's private,
-+//! undocumented `@anthropic-ai/bun-internal` native class, reverse-engineered
-+//! from the real Claude Code 2.1.282 bundle's driver JS (there is no public
-+//! spec). See the OHOS adaptation checklist for the full protocol writeup.
++//! cells. This is a from-scratch reimplementation, independently written
++//! against the observed call signature and runtime behavior of Anthropic's
++//! private, undocumented `@anthropic-ai/bun-internal` native class (there
++//! is no public spec — see the OHOS adaptation notes for the protocol).
 +//!
 +//! Reuses this repo's own grapheme/width primitives (`Bun__graphemeBreak`,
 +//! `Bun__codepointWidth`, `Bun__isEmojiPresentation` — the same C ABI
@@ -860,7 +860,7 @@ index 0000000000..94f7da7b27
 +    /// `segment()` pushes newly-interned entries into it in place via
 +    /// `sync_arrays`, matching the driver's expectation that a table's
 +    /// length grows without ever re-invoking the getter (see the
-+    /// `charIndices()` call site in the reverse-engineered protocol notes).
++    /// `charIndices()` call site in the OHOS adaptation notes).
 +    fn array_getter(
 +        &self,
 +        global: &JSGlobalObject,
