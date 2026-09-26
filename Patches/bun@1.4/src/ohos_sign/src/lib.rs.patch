@@ -1,13 +1,13 @@
 diff --git a/src/ohos_sign/src/lib.rs b/src/ohos_sign/src/lib.rs
 new file mode 100644
-index 0000000000..1a0458b22f
+index 0000000000..07a920b4cc
 --- /dev/null
 +++ b/src/ohos_sign/src/lib.rs
-@@ -0,0 +1,109 @@
-+//! ELF self-signing for OHOS, backed by the canonical single-file
-+//! implementation vendored from hqzing/ohos-selfsign (0BSD) — the same
-+//! algorithm Harmonybrew's uv formula vendors. The vendored module keeps the
-+//! algorithm; this file preserves the historical crate API.
+@@ -0,0 +1,101 @@
++//! ELF self-signing for OHOS. `selfsign.rs` is vendored verbatim from
++//! hqzing/ohos-selfsign (0BSD, the same algorithm Harmonybrew's uv formula
++//! vendors) — see that file's header for the pinned commit. This file is
++//! the only adaptation: expose the pieces bun's install/build paths need.
 +
 +mod selfsign;
 +
@@ -16,7 +16,6 @@ index 0000000000..1a0458b22f
 +#[derive(Debug)]
 +pub enum SignError {
 +    NotElf64,
-+    NoSectionHeaders,
 +    ShstrtabOutOfBounds,
 +    AlreadySigned,
 +    Io(std::io::Error),
@@ -26,7 +25,6 @@ index 0000000000..1a0458b22f
 +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 +        match self {
 +            SignError::NotElf64 => write!(f, "not an ELF64 binary"),
-+            SignError::NoSectionHeaders => write!(f, "ELF has no section header table"),
 +            SignError::ShstrtabOutOfBounds => write!(f, "shstrtab out of bounds"),
 +            SignError::AlreadySigned => {
 +                write!(f, "already has .codesign section; strip first or use --force")
@@ -58,22 +56,6 @@ index 0000000000..1a0458b22f
 +    }
 +}
 +
-+// `__` names expose internals to integration tests without becoming public API.
-+#[doc(hidden)]
-+pub fn __sha256_hash(data: &[u8]) -> [u8; 32] {
-+    selfsign::sha256(data)
-+}
-+
-+#[doc(hidden)]
-+pub fn __merkle_root_hash(data: &[u8], cs_off: u64, cs_len: u64) -> [u8; 32] {
-+    selfsign::merkle_root_hash(data, cs_off as usize, cs_len as usize)
-+}
-+
-+#[doc(hidden)]
-+pub fn __descriptor_build(sign_size: u32, file_size: u64, root_hash: &[u8; 32]) -> [u8; 256] {
-+    selfsign::build_descriptor(sign_size, file_size, root_hash, selfsign::FLAG_SELF_SIGN)
-+}
-+
 +/// Returns true if the ELF bytes already contain a `.codesign` section.
 +pub fn has_codesign(elf: &[u8]) -> bool {
 +    selfsign::has_codesign_section(elf)
@@ -98,18 +80,28 @@ index 0000000000..1a0458b22f
 +    Ok(removed)
 +}
 +
-+/// Sign a file in-place.
++/// Sign a file in-place: write-to-temp-then-rename (atomic w.r.t. a reader
++/// racing the write) and preserves the original file's permission bits.
 +pub fn sign_selfsign_inplace(path: &std::path::Path) -> Result<(), SignError> {
-+    let bytes = std::fs::read(path)?;
-+    let signed = sign_selfsign(&bytes)?;
-+    std::fs::write(path, &signed)?;
-+    Ok(())
++    inplace(path, false)
 +}
 +
 +/// Sign a file in-place, stripping any existing `.codesign` section first.
 +pub fn sign_selfsign_inplace_with_strip(path: &std::path::Path) -> Result<(), SignError> {
-+    let bytes = std::fs::read(path)?;
-+    let signed = sign_selfsign_with_strip(&bytes)?;
-+    std::fs::write(path, &signed)?;
-+    Ok(())
++    inplace(path, true)
++}
++
++fn inplace(path: &std::path::Path, force: bool) -> Result<(), SignError> {
++    let path_str = path.to_str().ok_or_else(|| {
++        SignError::Io(std::io::Error::new(
++            std::io::ErrorKind::InvalidInput,
++            "path is not valid UTF-8",
++        ))
++    })?;
++    selfsign::sign_file_atomic(path_str, force).map_err(map_err)
++}
++
++/// Verify an existing self-sign, matching the upstream `--check` semantics.
++pub fn check_selfsign(elf: &[u8]) -> Result<(), &'static str> {
++    selfsign::check_selfsign(elf)
 +}

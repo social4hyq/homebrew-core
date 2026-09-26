@@ -17,15 +17,15 @@ class BunAT14 < Formula
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
   # OHOS patch audit fixes require rebuilding the same upstream version.
-  revision 9
+  revision 10
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r18"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc4432801dc2235323c95084cc44423751da4b6e51951e8deaada900fb643d93"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r19"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5fc92745eaa65b8d827aa3282a104e98aa0eb8e48401895c1ddc768996f3b9a"
   end
 
   depends_on "cmake" => :build
