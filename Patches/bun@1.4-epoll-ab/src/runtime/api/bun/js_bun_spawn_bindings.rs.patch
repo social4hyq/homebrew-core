@@ -1,0 +1,33 @@
+diff --git a/src/runtime/api/bun/js_bun_spawn_bindings.rs b/src/runtime/api/bun/js_bun_spawn_bindings.rs
+index d948fb8fd118d2e50ca8ca9be478e77893390c60..b989c1bf868f4a000c2b5bd6a0d1b479447070d7 100644
+--- a/src/runtime/api/bun/js_bun_spawn_bindings.rs
++++ b/src/runtime/api/bun/js_bun_spawn_bindings.rs
+@@ -356,6 +356,7 @@ fn spawn_maybe_sync(
+     let mut argv: Vec<CStrPtr> = Vec::new();
+     let cmd_value: JSValue;
+     let mut detached = false;
++    let mut new_process_group = false;
+     let mut args = args_;
+     let mut maybe_ipc_mode: Option<IPC::Mode> = None;
+     let mut ipc_callback: JSValue = JSValue::ZERO;
+@@ -656,6 +657,12 @@ fn spawn_maybe_sync(
+                 }
+             }
+ 
++            if let Some(value) = args.get(global_this, "newProcessGroup")? {
++                if value.is_boolean() {
++                    new_process_group = value.to_boolean();
++                }
++            }
++
+             // Node semantics: uid/gid are int32s passed through to the OS
+             // (negative values are cast to uid_t/gid_t, matching libuv).
+             if let Some(uid_value) = args.get(global_this, "uid")? {
+@@ -1099,6 +1106,7 @@ fn spawn_maybe_sync(
+             Box::default()
+         },
+         detached,
++        new_process_group,
+         uid,
+         gid,
+         stdin: match stdio[0].as_spawn_option(0) {

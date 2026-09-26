@@ -1,0 +1,40 @@
+--- a/src/runtime/node/node_os.rs	2026-09-24 21:35:26.423673750 +0800
++++ b/src/runtime/node/node_os.rs	2026-09-24 21:36:33.387666250 +0800
+@@ -724,6 +724,14 @@
+             let _ = using_heap;
+ 
+             if ret != 0 {
++                #[cfg(target_env = "ohos")]
++                if ret == bun_sys::E::ENOENT as c_int {
++                    return Ok(BunString::from_bytes(
++                        env_var::HOME
++                            .get_not_empty()
++                            .unwrap_or(b"/data/storage/el2/base/files"),
++                    ));
++                }
+                 return Err(global.throw_value(
+                     bun_sys::Error::from_code(
+                         // `ret` is a libc errno; a code outside the table is `EUNKNOWN`.
+@@ -737,6 +745,14 @@
+             if result.is_null() {
+                 // bionic has no passwd entries for app uids; with HOME also unset
+                 // (zygote/run-as), return a usable default rather than throwing.
++                #[cfg(target_env = "ohos")]
++                {
++                    return Ok(BunString::from_bytes(
++                        env_var::HOME
++                            .get_not_empty()
++                            .unwrap_or(b"/data/storage/el2/base/files"),
++                    ));
++                }
+                 #[cfg(target_os = "android")]
+                 {
+                     return Ok(BunString::static_("/data/local/tmp"));
+@@ -743,6 +759,6 @@
+                 }
+                 // in uv__getpwuid_r, null result throws UV_ENOENT.
+-                #[cfg(not(target_os = "android"))]
++                #[cfg(not(any(target_os = "android", target_env = "ohos")))]
+                 return Err(global.throw_value(
+                     bun_sys::Error::from_code(bun_sys::E::ENOENT, bun_sys::Tag::uv_os_homedir)
+                         .to_js(global),

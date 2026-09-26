@@ -1,0 +1,107 @@
+diff --git a/src/ohos_sign/src/lib.rs b/src/ohos_sign/src/lib.rs
+new file mode 100644
+index 0000000000..07a920b4cc
+--- /dev/null
++++ b/src/ohos_sign/src/lib.rs
+@@ -0,0 +1,101 @@
++//! ELF self-signing for OHOS. `selfsign.rs` is vendored verbatim from
++//! hqzing/ohos-selfsign (0BSD, the same algorithm Harmonybrew's uv formula
++//! vendors) — see that file's header for the pinned commit. This file is
++//! the only adaptation: expose the pieces bun's install/build paths need.
++
++mod selfsign;
++
++use std::fmt;
++
++#[derive(Debug)]
++pub enum SignError {
++    NotElf64,
++    ShstrtabOutOfBounds,
++    AlreadySigned,
++    Io(std::io::Error),
++}
++
++impl fmt::Display for SignError {
++    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
++        match self {
++            SignError::NotElf64 => write!(f, "not an ELF64 binary"),
++            SignError::ShstrtabOutOfBounds => write!(f, "shstrtab out of bounds"),
++            SignError::AlreadySigned => {
++                write!(f, "already has .codesign section; strip first or use --force")
++            }
++            SignError::Io(e) => write!(f, "I/O error: {e}"),
++        }
++    }
++}
++
++impl std::error::Error for SignError {}
++
++impl From<std::io::Error> for SignError {
++    fn from(e: std::io::Error) -> Self {
++        SignError::Io(e)
++    }
++}
++
++// The vendored module reports errors as human-readable strings; map the
++// documented cases back onto the structured variants.
++fn map_err(e: String) -> SignError {
++    match e.as_str() {
++        "not ELF64" => SignError::NotElf64,
++        "shstrtab out of bounds" => SignError::ShstrtabOutOfBounds,
++        e if e.starts_with("already has a .codesign section") => SignError::AlreadySigned,
++        other => SignError::Io(std::io::Error::new(
++            std::io::ErrorKind::InvalidData,
++            other.to_string(),
++        )),
++    }
++}
++
++/// Returns true if the ELF bytes already contain a `.codesign` section.
++pub fn has_codesign(elf: &[u8]) -> bool {
++    selfsign::has_codesign_section(elf)
++}
++
++/// Sign `elf` bytes with self-sign (flags=0x10). Fails if already signed.
++/// Use `sign_selfsign_with_strip` to strip-then-sign.
++pub fn sign_selfsign(elf: &[u8]) -> Result<Vec<u8>, SignError> {
++    selfsign::sign_elf(elf, false).map_err(map_err)
++}
++
++/// Strip existing `.codesign` section then sign.
++pub fn sign_selfsign_with_strip(elf: &[u8]) -> Result<Vec<u8>, SignError> {
++    selfsign::sign_elf(elf, true).map_err(map_err)
++}
++
++/// Strip `.codesign` section in-place in the buffer.
++/// Returns true if a section was removed, false if none present.
++pub fn strip_codesign(elf: &mut Vec<u8>) -> Result<bool, SignError> {
++    let (removed, out) = selfsign::strip_codesign(elf).map_err(map_err)?;
++    *elf = out;
++    Ok(removed)
++}
++
++/// Sign a file in-place: write-to-temp-then-rename (atomic w.r.t. a reader
++/// racing the write) and preserves the original file's permission bits.
++pub fn sign_selfsign_inplace(path: &std::path::Path) -> Result<(), SignError> {
++    inplace(path, false)
++}
++
++/// Sign a file in-place, stripping any existing `.codesign` section first.
++pub fn sign_selfsign_inplace_with_strip(path: &std::path::Path) -> Result<(), SignError> {
++    inplace(path, true)
++}
++
++fn inplace(path: &std::path::Path, force: bool) -> Result<(), SignError> {
++    let path_str = path.to_str().ok_or_else(|| {
++        SignError::Io(std::io::Error::new(
++            std::io::ErrorKind::InvalidInput,
++            "path is not valid UTF-8",
++        ))
++    })?;
++    selfsign::sign_file_atomic(path_str, force).map_err(map_err)
++}
++
++/// Verify an existing self-sign, matching the upstream `--check` semantics.
++pub fn check_selfsign(elf: &[u8]) -> Result<(), &'static str> {
++    selfsign::check_selfsign(elf)
++}

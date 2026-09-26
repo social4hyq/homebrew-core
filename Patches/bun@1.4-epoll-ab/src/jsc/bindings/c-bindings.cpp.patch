@@ -1,0 +1,189 @@
+--- a/src/jsc/bindings/c-bindings.cpp
++++ b/src/jsc/bindings/c-bindings.cpp
+@@ -16,6 +16,7 @@
+ #include <cstdint>
+ #include <cstdlib>
+ #include <pthread.h>
++#include <sched.h>
+ #include <termios.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+@@ -62,8 +63,16 @@
+ #if !OS(WINDOWS)
+ extern "C" bool is_executable_file(const char* path)
+ {
+-#if defined(O_EXEC)
+-    // O_EXEC is macOS specific
++#if defined(__OHOS__)
++    // OHOS: open(O_EXEC) skips the x-permission-bit check (kernel bug), so use access(X_OK); access passes directories too (x = traversal), so require S_ISREG first.
++    struct stat st;
++    if (stat(path, &st) != 0)
++        return false;
++    if (!S_ISREG(st.st_mode))
++        return false;
++    return access(path, X_OK) == 0;
++#elif defined(O_EXEC)
++    // macOS: O_EXEC correctly checks x permission.
+     int fd = open(path, O_EXEC | O_CLOEXEC | O_NONBLOCK | O_NOCTTY, 0);
+     if (fd < 0)
+         return false;
+@@ -70,7 +79,7 @@
+     close(fd);
+     return true;
+-#endif // defined(O_EXEC)
+-
++#else
++    // Linux (no O_EXEC): stat + x-bit check; reject non-regular files like the OHOS branch above (directories carry an x bit).
+     struct stat st;
+     if (stat(path, &st) != 0)
+         return false;
+@@ -77,6 +86,7 @@
+-
+-    // regular file and user can execute
+-    return S_ISREG(st.st_mode) && (st.st_mode & S_IXUSR);
++    if (!S_ISREG(st.st_mode))
++        return false;
++    return (st.st_mode & S_IXUSR) != 0;
++#endif
+ }
+ #endif
+ 
+@@ -275,6 +285,10 @@
+ #define __NR_close_range 436
+ #endif
+ 
++#if defined(__OHOS__)
++extern "C" int bun_ohos_close_range_supported();
++#endif
++
+ // close_range is glibc > 2.33, which is very new
+ extern "C" ssize_t bun_close_range(unsigned int start, unsigned int end, unsigned int flags)
+ {
+@@ -281,4 +295,32 @@
++#if defined(__OHOS__)
++    if (start > end || (flags & ~CLOSE_RANGE_CLOEXEC) != 0) {
++        errno = EINVAL;
++        return -1;
++    }
++
++    if (bun_ohos_close_range_supported()) {
++        const auto result = syscall(__NR_close_range, start, end, flags);
++        if (result >= 0 || (errno != ENOSYS && errno != EPERM && errno != EINVAL))
++            return result;
++    }
++
++    long limit = sysconf(_SC_OPEN_MAX);
++    if (limit < 0)
++        limit = 65536;
++    unsigned int last = end == ~0U ? static_cast<unsigned int>(limit - 1) : std::min(end, static_cast<unsigned int>(limit - 1));
++    for (unsigned int fd = start; fd <= last; fd++) {
++        if (flags & CLOSE_RANGE_CLOEXEC) {
++            int descriptorFlags = fcntl(static_cast<int>(fd), F_GETFD);
++            if (descriptorFlags >= 0)
++                fcntl(static_cast<int>(fd), F_SETFD, descriptorFlags | FD_CLOEXEC);
++        } else {
++            close(static_cast<int>(fd));
++        }
++    }
++    return 0;
++#else
+     return syscall(__NR_close_range, start, end, flags);
++#endif
+ }
+ #else // OS(FREEBSD)
+ // FreeBSD 12.2+ libc has close_range; 14.0+ supports CLOSE_RANGE_CLOEXEC
+@@ -358,7 +400,6 @@
+ }
+ 
+ #if OS(LINUX)
+-// Linked in with -Wl,--wrap=execve -Wl,--wrap=pthread_create (scripts/build/flags.ts).
+ // While a thread is inside execve(2), until de_thread() has killed the other threads or the
+ // exec has failed, the kernel fails every clone(CLONE_FS) in the process with EAGAIN
+ // (fs/exec.c check_unsafe_exec, kernel/fork.c copy_fs). WTF::Thread::create aborts on a
+@@ -365,9 +406,21 @@
+ // failed pthread_create, which killed --watch reloads. A pthread_create EAGAIN that overlaps
+ // an exec of this process is retried instead. `execve_generation` counts execs ever started
+ // so one that began and ended inside a single pthread_create is still seen; it is bumped
+-// after `threads_in_execve` and read before it.
++// after `threads_in_execve` and read before it. Shared by both platform variants below; only how the real execve/pthread_create get called differs.
+ static std::atomic<int> threads_in_execve { 0 };
+ static std::atomic<unsigned> execve_generation { 0 };
++// Two-phase (register-then-verify) mutual exclusion between clone() and the
++// execve(2) bookkeeping window: each side only proceeds when it has registered
++// itself and then re-observed the other side absent. A check followed directly
++// by the syscall leaves a race where the other side starts in between (on OHOS
++// a clone that overlaps this window can corrupt the process instead of
++// reliably failing with EAGAIN), so a single-sided wait is not sufficient.
++static std::atomic<int> threads_creating { 0 };
++// An exec that is about to enter its window raises this flag first; thread
++// creation defers to it. Without the flag, back-to-back thread creations
++// pipeline the creating counter across zero so tightly that the exec side
++// starves retrying its register-then-verify.
++static std::atomic<int> execve_want { 0 };
+ // The clone(CLONE_VM) child of posix_spawn_bun execs in this address space and never returns
+ // to undo a count, so only the pid recorded in bun_initialize_process counts its execs.
+ static pid_t execve_counting_pid = 0;
+@@ -374,4 +427,5 @@
+ 
++// Linked in with -Wl,--wrap=execve -Wl,--wrap=pthread_create (scripts/build/flags.ts).
+ extern "C" int __real_execve(const char*, char* const[], char* const[]);
+ extern "C" int __real_pthread_create(pthread_t*, const pthread_attr_t*, void* (*)(void*), void*);
+ 
+@@ -379,7 +433,18 @@
+ {
+     if (getpid() != execve_counting_pid)
+         return __real_execve(path, argv, envp);
+-    threads_in_execve.fetch_add(1, std::memory_order_seq_cst);
++    execve_want.fetch_add(1, std::memory_order_seq_cst);
++    for (;;) {
++        while (threads_creating.load(std::memory_order_seq_cst) != 0)
++            sched_yield();
++        threads_in_execve.fetch_add(1, std::memory_order_seq_cst);
++        if (threads_creating.load(std::memory_order_seq_cst) == 0)
++            break;
++        // A creator registered before our want was visible; let it finish.
++        threads_in_execve.fetch_sub(1, std::memory_order_seq_cst);
++        sched_yield();
++    }
++    execve_want.fetch_sub(1, std::memory_order_seq_cst);
+     execve_generation.fetch_add(1, std::memory_order_seq_cst);
+     int rc = __real_execve(path, argv, envp);
+     // Only reached when execve failed and the old image keeps running.
+@@ -390,6 +455,16 @@
+ // The attempt bound keeps a real limit, hit while an exec never completes, from looping forever.
+ extern "C" int __wrap_pthread_create(pthread_t* thread, const pthread_attr_t* attr, void* (*start_routine)(void*), void* arg)
+ {
++    int rc;
++    for (;;) {
++        threads_creating.fetch_add(1, std::memory_order_seq_cst);
++        if (threads_in_execve.load(std::memory_order_seq_cst) == 0
++            && execve_want.load(std::memory_order_seq_cst) == 0)
++            break;
++        // An exec is in or waiting for its window: yield the line to it.
++        threads_creating.fetch_sub(1, std::memory_order_seq_cst);
++        usleep(200);
++    }
+     for (int attempt = 0;; attempt++) {
+         unsigned generation = execve_generation.load(std::memory_order_seq_cst);
+         bool execInFlight = threads_in_execve.load(std::memory_order_seq_cst) > 0;
+@@ -396,6 +471,6 @@
+-        int rc = __real_pthread_create(thread, attr, start_routine, arg);
++        rc = __real_pthread_create(thread, attr, start_routine, arg);
+         if (rc != EAGAIN || attempt >= 1000)
+-            return rc;
++            break;
+         if (!execInFlight && threads_in_execve.load(std::memory_order_seq_cst) == 0
+             && execve_generation.load(std::memory_order_seq_cst) == generation) {
+             // No exec overlapped this attempt: a real limit.
+@@ -402,4 +477,4 @@
+-            return rc;
++            break;
+         }
+         usleep(1000);
+     }
+@@ -406,3 +481,5 @@
++    threads_creating.fetch_sub(1, std::memory_order_seq_cst);
++    return rc;
+ }
+ #endif // OS(LINUX)
+ 

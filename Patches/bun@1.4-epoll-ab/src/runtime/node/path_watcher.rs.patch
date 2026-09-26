@@ -1,0 +1,182 @@
+diff --git a/src/runtime/node/path_watcher.rs b/src/runtime/node/path_watcher.rs
+index fe5fb0f9b7..d2831efd8d 100644
+--- a/src/runtime/node/path_watcher.rs
++++ b/src/runtime/node/path_watcher.rs
+@@ -881,6 +881,96 @@ impl Linux {
+         watcher.platform.wds.clear();
+     }
+ 
++    /// Same-batch lookahead used by `thread_main`'s OHOS-only classification
++    /// upgrade: re-walks the just-read `base[0..n]` inotify buffer (the exact
++    /// same layout `thread_main`'s own loop parses) looking for another event
++    /// on the same `(wd, name)` whose mask is rename-worthy. `base` must be
++    /// the same 4-byte-aligned buffer `thread_main` read `n` bytes into.
++    #[cfg(target_env = "ohos")]
++    fn scan_for_rename_event(base: *const u8, n: usize, wd: core::ffi::c_int, name: &[u8]) -> bool {
++        use bun_sys::linux::IN;
++        const RENAME_BITS: u32 =
++            IN::CREATE | IN::DELETE | IN::DELETE_SELF | IN::MOVE_SELF | IN::MOVED_FROM | IN::MOVED_TO;
++        let mut j: usize = 0;
++        while j < n {
++            // SAFETY: same invariant as `thread_main`'s own walk — inotify
++            // guarantees whole, 4-byte-aligned events within `base[0..n]`.
++            let ev: &InotifyEvent = unsafe { &*base.byte_add(j).cast::<InotifyEvent>() };
++            let event_len = core::mem::size_of::<InotifyEvent>() + ev.name_len as usize;
++            if ev.watch_descriptor == wd && ev.mask & RENAME_BITS != 0 {
++                let ev_name: &[u8] = if ev.name_len > 0 {
++                    // SAFETY: kernel NUL-pads name within name_len bytes right
++                    // after the header, same as `thread_main`'s own read.
++                    unsafe {
++                        let name_ptr = base.byte_add(j + core::mem::size_of::<InotifyEvent>());
++                        bun_core::ffi::cstr(name_ptr.cast()).to_bytes()
++                    }
++                } else {
++                    b""
++                };
++                if ev_name == name {
++                    return true;
++                }
++            }
++            j += event_len;
++        }
++        false
++    }
++
++    /// `scan_for_rename_event` plus a cross-`read()` extension for `IN_ATTRIB`
++    /// specifically: the labeling `IN_CREATE` this is hunting for is queued by
++    /// the same kernel operation but can land in a separate `read()` from the
++    /// one that woke us on the `ATTRIB`, so a same-batch scan alone still
++    /// misses it sometimes. When the first scan comes up empty and `is_attrib`
++    /// is set, poll briefly and pull one more read into `buf[*n..]` — this
++    /// only fires for `ATTRIB` (the one mask this reordering ever affects),
++    /// not on every non-rename event, so `MODIFY`/`ACCESS`/etc. never pay for
++    /// a `poll()` they can't benefit from. `*n` grows in place so
++    /// `thread_main`'s own loop dispatches the newly-read bytes as real
++    /// events too, rather than losing them to the next full re-read.
++    #[cfg(target_env = "ohos")]
++    fn batch_has_rename_event(
++        fd: sys::Fd,
++        buf: &mut [u8],
++        n: &mut usize,
++        wd: core::ffi::c_int,
++        name: &[u8],
++        is_attrib: bool,
++    ) -> bool {
++        // Nameless IN_ATTRIB belongs to the watched inode itself (not a child
++        // create); do not let a queued DELETE_SELF/IN_IGNORED reclassify it.
++        if is_attrib && name.is_empty() {
++            return false;
++        }
++        if Self::scan_for_rename_event(buf.as_ptr(), *n, wd, name) {
++            return true;
++        }
++        if is_attrib && *n < buf.len() {
++            let mut pfd = [sys::posix::PollFd {
++                fd: fd.native(),
++                events: sys::posix::POLL_IN,
++                revents: 0,
++            }];
++            if matches!(sys::posix::poll(&mut pfd, 2), Ok(rc) if rc > 0) {
++                // SAFETY: `*n < buf.len()`, so `buf[*n..]` is a non-empty
++                // writable tail; disjoint from the `base[0..*n]` bytes the
++                // scan above (and any live event references) already read.
++                let rc2 = unsafe {
++                    sys::linux::read(fd.native(), buf.as_mut_ptr().add(*n), buf.len() - *n)
++                };
++                let got = match sys::get_errno(rc2) {
++                    E::SUCCESS => rc2 as usize,
++                    _ => 0,
++                };
++                if got > 0 {
++                    *n += got;
++                    return Self::scan_for_rename_event(buf.as_ptr(), *n, wd, name);
++                }
++            }
++        }
++        false
++    }
++
+     fn thread_main(manager: &'static PathWatcherManager) {
+         use bun_sys::linux::IN;
+         Output::Source::configure_named_thread(zstr!("fs.watch"));
+@@ -931,7 +1021,8 @@ impl Linux {
+                     return;
+                 }
+             }
+-            let n = rc as usize;
++            #[cfg_attr(not(target_env = "ohos"), allow(unused_mut))]
++            let mut n = rc as usize;
+             if n == 0 {
+                 continue;
+             }
+@@ -1020,18 +1111,58 @@ impl Linux {
+                 };
+ 
+                 let is_dir_child = ev.mask & IN::ISDIR != 0;
+-                let event_type: WatchEventKind = if ev.mask
+-                    & (IN::CREATE
+-                        | IN::DELETE
+-                        | IN::DELETE_SELF
+-                        | IN::MOVE_SELF
+-                        | IN::MOVED_FROM
+-                        | IN::MOVED_TO)
+-                    != 0
+-                {
+-                    WatchEventKind::Rename
+-                } else {
+-                    WatchEventKind::Change
++                let event_type: WatchEventKind = {
++                    let is_rename = ev.mask
++                        & (IN::CREATE
++                            | IN::DELETE
++                            | IN::DELETE_SELF
++                            | IN::MOVE_SELF
++                            | IN::MOVED_FROM
++                            | IN::MOVED_TO)
++                        != 0;
++                    // HongMeng's inotify occasionally delivers `IN_ATTRIB` for a
++                    // brand-new file *before* the `IN_CREATE` event for the same
++                    // name, in the same `read()` batch (verified via inline
++                    // tracing: `read()` returns both events together; ext4 on
++                    // mainline Linux always delivers `IN_CREATE` first). Scan the
++                    // rest of the already-in-memory batch for a rename-worthy
++                    // event with the same (wd, name) so Node's 'rename' semantics
++                    // still hold. The batch is a handful of events at most, so
++                    // this scan is free; gated to OHOS to leave other platforms'
++                    // classification untouched.
++                    #[cfg(target_env = "ohos")]
++                    let is_rename = is_rename
++                        || Self::batch_has_rename_event(
++                            fd,
++                            &mut buf.0[..],
++                            &mut n,
++                            wd,
++                            name,
++                            ev.mask & IN::ATTRIB != 0 && !name.is_empty(),
++                        );
++                    #[cfg(target_env = "ohos")]
++                    if ev.mask & IN::DELETE != 0
++                        && ev.mask & IN::DELETE_SELF == 0
++                        && name.is_empty()
++                    {
++                        // OHOS reports the unlink of the watched file itself as
++                        // a nameless DELETE before DELETE_SELF; this replaces
++                        // Linux's link-count ATTRIB change notification. Named
++                        // IN_DELETE events (a child removed from a watched
++                        // directory) keep the upstream "rename" classification
++                        // below.
++                        WatchEventKind::Change
++                    } else if is_rename {
++                        WatchEventKind::Rename
++                    } else {
++                        WatchEventKind::Change
++                    }
++                    #[cfg(not(target_env = "ohos"))]
++                    if is_rename {
++                        WatchEventKind::Rename
++                    } else {
++                        WatchEventKind::Change
++                    }
+                 };
+ 
+                 // Dispatch to every owner of this wd. The recursive branch below calls

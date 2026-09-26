@@ -1,0 +1,39 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index ba5adbb37b..f0d35b543f 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -751,6 +751,7 @@ dependencies = [
+  "bytemuck",
+  "const_format",
+  "enum-map",
++ "ohos_sign",
+  "scopeguard",
+  "strum",
+  "thiserror",
+@@ -1337,6 +1338,7 @@ dependencies = [
+  "getrandom",
+  "libc",
+  "lol_html",
++ "ohos_sign",
+  "rust-argon2",
+  "scopeguard",
+  "sha3",
+@@ -1600,6 +1602,7 @@ dependencies = [
+  "bytemuck",
+  "enum-map",
+  "libc",
++ "ohos_sign",
+  "rustix",
+  "scopeguard",
+  "strum",
+@@ -2434,6 +2437,10 @@ dependencies = [
+  "autocfg",
+ ]
+ 
++[[package]]
++name = "ohos_sign"
++version = "0.0.0"
++
+ [[package]]
+ name = "once_cell"
+ version = "1.21.4"

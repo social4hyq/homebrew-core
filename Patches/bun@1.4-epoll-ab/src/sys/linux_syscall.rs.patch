@@ -1,0 +1,500 @@
+--- a/src/sys/linux_syscall.rs
++++ b/src/sys/linux_syscall.rs
+@@ -18,6 +18,8 @@
+ //! `linux`/`android`, so the gate must list both.
+ #![cfg(any(target_os = "linux", target_os = "android"))]
+ 
++#[cfg(target_env = "ohos")]
++use core::sync::atomic::{AtomicU8, Ordering};
+ use rustix::fd::{BorrowedFd, IntoRawFd, OwnedFd};
+ use rustix::io::Errno;
+ 
+@@ -57,6 +59,210 @@
+     bun_core::ffi::errno()
+ }
+ 
++#[cfg(target_env = "ohos")]
++fn probe_in_child(cache: &AtomicU8, probe: impl FnOnce() -> bool) -> bool {
++    match cache.load(Ordering::Relaxed) {
++        1 => return true,
++        2 => return false,
++        _ => {}
++    }
++
++    // The sandbox may deliver SIGSYS instead of errno. Probe in a child so
++    // the signal cannot terminate Bun or replace its process-wide handler.
++    let child = unsafe { libc::fork() };
++    if child == 0 {
++        unsafe { libc::_exit(if probe() { 0 } else { 1 }) };
++    }
++    if child < 0 {
++        return false;
++    }
++
++    let mut status = 0;
++    loop {
++        let result = unsafe { libc::waitpid(child, &raw mut status, 0) };
++        if result == child {
++            let supported = status & 0x7f == 0 && (status >> 8) & 0xff == 0;
++            cache.store(if supported { 1 } else { 2 }, Ordering::Relaxed);
++            return supported;
++        }
++        if result < 0 && errno() != libc::EINTR {
++            return false;
++        }
++    }
++}
++
++#[cfg(target_env = "ohos")]
++fn probe_syscall(cache: &AtomicU8, call: fn() -> libc::c_long) -> bool {
++    probe_in_child(cache, || {
++        let result = call();
++        result >= 0 || !matches!(errno(), libc::ENOSYS | libc::EPERM)
++    })
++}
++
++#[cfg(target_env = "ohos")]
++fn splice_pipe_semantics() -> bool {
++    let mut source = [-1; 2];
++    let mut destination = [-1; 2];
++    if unsafe { libc::pipe2(source.as_mut_ptr(), libc::O_CLOEXEC) } != 0
++        || unsafe { libc::pipe2(destination.as_mut_ptr(), libc::O_CLOEXEC) } != 0
++    {
++        return false;
++    }
++    unsafe { libc::close(source[1]) };
++    if unsafe {
++        libc::splice(
++            source[0],
++            core::ptr::null_mut(),
++            destination[1],
++            core::ptr::null_mut(),
++            1,
++            0,
++        )
++    } != 0
++    {
++        return false;
++    }
++
++    let poller = unsafe { libc::epoll_create1(libc::EPOLL_CLOEXEC) };
++    let mut event: libc::epoll_event = unsafe { core::mem::zeroed() };
++    event.events = libc::EPOLLIN as u32;
++    if poller < 0
++        || unsafe { libc::epoll_ctl(poller, libc::EPOLL_CTL_ADD, destination[0], &mut event) } != 0
++    {
++        return false;
++    }
++
++    let mut input = [-1; 2];
++    if unsafe { libc::pipe2(input.as_mut_ptr(), libc::O_CLOEXEC) } != 0 {
++        return false;
++    }
++    for _ in 0..2 {
++        if unsafe { libc::write(input[1], b"x".as_ptr().cast(), 1) } != 1 {
++            return false;
++        }
++        let mut ready = [-1; 2];
++        if unsafe { libc::pipe2(ready.as_mut_ptr(), libc::O_CLOEXEC) } != 0 {
++            return false;
++        }
++        let waiter = unsafe { libc::fork() };
++        if waiter == 0 {
++            unsafe { libc::close(ready[0]) };
++            let signalled = unsafe { libc::write(ready[1], b"x".as_ptr().cast(), 1) } == 1;
++            let mut fired: libc::epoll_event = unsafe { core::mem::zeroed() };
++            let result = if signalled {
++                unsafe { libc::epoll_wait(poller, &mut fired, 1, 250) }
++            } else {
++                -1
++            };
++            unsafe {
++                libc::_exit(if result == 1 && fired.events & libc::EPOLLIN as u32 != 0 {
++                    0
++                } else {
++                    1
++                })
++            };
++        }
++        if waiter < 0 {
++            return false;
++        }
++        unsafe { libc::close(ready[1]) };
++        let mut byte = 0u8;
++        let signalled = unsafe { libc::read(ready[0], (&raw mut byte).cast(), 1) } == 1;
++        unsafe { libc::close(ready[0]) };
++        if !signalled {
++            unsafe { libc::kill(waiter, libc::SIGKILL) };
++            unsafe { libc::waitpid(waiter, core::ptr::null_mut(), 0) };
++            return false;
++        }
++        unsafe { libc::usleep(25_000) };
++        let copied = unsafe {
++            libc::splice(
++                input[0],
++                core::ptr::null_mut(),
++                destination[1],
++                core::ptr::null_mut(),
++                1,
++                0,
++            )
++        } == 1;
++        let mut status = 0;
++        let waited = unsafe { libc::waitpid(waiter, &raw mut status, 0) } == waiter;
++        if !copied
++            || !waited
++            || status != 0
++            || unsafe { libc::read(destination[0], (&raw mut byte).cast(), 1) } != 1
++        {
++            return false;
++        }
++    }
++    true
++}
++
++#[cfg(target_env = "ohos")]
++pub(crate) fn supports_fifo_splice() -> bool {
++    static CACHE: AtomicU8 = AtomicU8::new(0);
++    probe_in_child(&CACHE, splice_pipe_semantics)
++}
++
++#[cfg(target_env = "ohos")]
++pub(crate) fn supports_openat2() -> bool {
++    static CACHE: AtomicU8 = AtomicU8::new(0);
++    probe_syscall(&CACHE, || {
++        #[repr(C)]
++        struct OpenHow {
++            flags: u64,
++            mode: u64,
++            resolve: u64,
++        }
++        let how = OpenHow {
++            flags: libc::O_PATH as u64,
++            mode: 0,
++            resolve: 0x08,
++        };
++        unsafe {
++            libc::syscall(
++                437,
++                libc::AT_FDCWD as libc::c_long,
++                c".".as_ptr(),
++                &raw const how,
++                core::mem::size_of::<OpenHow>(),
++            )
++        }
++    })
++}
++
++#[cfg(target_env = "ohos")]
++pub(crate) fn supports_fchmodat2() -> bool {
++    static CACHE: AtomicU8 = AtomicU8::new(0);
++    probe_syscall(&CACHE, || unsafe {
++        libc::syscall(
++            452,
++            libc::AT_FDCWD as libc::c_long,
++            c"".as_ptr(),
++            0 as libc::c_long,
++            libc::AT_SYMLINK_NOFOLLOW as libc::c_long,
++        )
++    })
++}
++
++#[cfg(target_env = "ohos")]
++#[unsafe(no_mangle)]
++pub(crate) extern "C" fn bun_ohos_close_range_supported() -> libc::c_int {
++    static CACHE: AtomicU8 = AtomicU8::new(0);
++    if probe_syscall(&CACHE, || unsafe {
++        libc::syscall(
++            436,
++            u32::MAX as libc::c_long,
++            u32::MAX as libc::c_long,
++            4 as libc::c_long,
++        )
++    }) {
++        1
++    } else {
++        0
++    }
++}
++
+ /// EINTR-retry a rustix call.
+ #[inline(always)]
+ fn retry<T>(mut f: impl FnMut() -> rustix::io::Result<T>) -> Result<T, i32> {
+@@ -91,6 +297,10 @@
+ 
+ #[inline]
+ pub(crate) fn openat2_beneath(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd, i32> {
++    #[cfg(target_env = "ohos")]
++    if !supports_openat2() {
++        return Err(libc::ENOSYS);
++    }
+     let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
+     let mode = rustix::fs::Mode::from_raw_mode(mode);
+     let dir = dir.as_borrowed_fd();
+@@ -108,6 +318,10 @@
+ 
+ #[inline]
+ pub(crate) fn openat2_in_root(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd, i32> {
++    #[cfg(target_env = "ohos")]
++    if !supports_openat2() {
++        return Err(libc::ENOSYS);
++    }
+     let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
+     let mode = rustix::fs::Mode::from_raw_mode(mode);
+     let dir = dir.as_borrowed_fd();
+@@ -123,7 +337,255 @@
+     .map(own_fd)
+ }
+ 
++// openat2(RESOLVE_IN_ROOT | RESOLVE_NO_MAGICLINKS) userspace emulation.
++//
++// Used by sys/lib.rs::openat2_in_root when the real syscall is unusable:
++// OHOS when its sandbox blocks the syscall and Linux < 5.6.
++// The previous fallback was a plain
++// `openat`, which follows symlinks and let request paths escape the served
++// root (serve-directory-routes.test.ts "rejects symlink escapes").
++//
++// Per-component walk, in the style of the openat2 reference implementation
++// and Go os.Root:
++//   * every component is opened with O_NOFOLLOW (O_PATH probes for
++//     intermediates), so the kernel never resolves a link for us;
++//   * symlink payloads are spliced back into the component stream, capped
++//     at 40 expansions (kernel ELOOP threshold);
++//   * absolute symlink targets are re-rooted against `dir` (IN_ROOT);
++//   * `..` clamps at the root (depth == 0), and each climb verifies the
++//     parent's (st_dev, st_ino) against the recorded level — a racing
++//     rename/bind-mount of an intermediate directory fails closed (EAGAIN).
++//
++// Magic links (/proc/<pid>/fd/N) cannot escape either: their absolute
++// payloads are re-rooted and ENOENT. The kernel's NO_MAGICLINKS fails them
++// ELOOP instead — both surface as the same 404 through DirectoryRoute.
++//
++// Reuses module primitives: openat(Fd, &ZStr, i32, Mode), fstat(Fd),
++// close(i32), errno(), own_fd(). No new imports needed beyond what the
++// module already has.
++
++const IN_ROOT_MAX_SYMLINKS: usize = 40; // kernel ELOOP threshold
++const IN_ROOT_MAX_DEPTH: usize = 128; // fail closed on absurd in-root chains
++/// PATH_MAX. The kernel caps symlink targets below this, so a read that
++/// fills the buffer is not a target we can represent.
++const IN_ROOT_LINK_MAX: usize = 4096;
++
++struct InRootFdGuard(Fd);
++
++impl Drop for InRootFdGuard {
++    fn drop(&mut self) {
++        let _ = close(self.0.native());
++    }
++}
++
++/// `readlinkat(fd, "", buf)` — reads the link an O_PATH fd points at.
+ #[inline]
++fn readlinkat_empty(fd: Fd, buf: &mut [u8]) -> Result<usize, i32> {
++    // SAFETY: `fd` is a valid descriptor (an O_PATH fd from `openat`);
++    // `buf[..buf.len()]` is writable for the duration of the call. The empty
++    // path makes the kernel operate on `fd` itself (required for O_PATH).
++    let rc = unsafe {
++        libc::readlinkat(
++            fd.native(),
++            b"\0".as_ptr().cast(),
++            buf.as_mut_ptr().cast(),
++            buf.len(),
++        )
++    };
++    if rc < 0 {
++        Err(errno())
++    } else {
++        Ok(rc as usize)
++    }
++}
++
++pub(crate) fn openat2_in_root_clamped(
++    dir: Fd,
++    path: &ZStr,
++    flags: i32,
++    mode: Mode,
++) -> Result<Fd, i32> {
++    // Identity of the root (for verifying the depth-1 climb) and of each
++    // descended level: stack[k] is the (st_dev, st_ino) of directory level
++    // k+1. depth == 0 ⇔ `cur` is the root dirfd (`..` must clamp there).
++    let root_id = {
++        let st = fstat(dir)?;
++        (st.st_dev as u64, st.st_ino as u64)
++    };
++    let mut stack = [(0u64, 0u64); IN_ROOT_MAX_DEPTH];
++    let mut depth: usize = 0;
++    // Owned O_PATH fd of the current intermediate directory.
++    let mut owned: Option<InRootFdGuard> = None;
++    let mut links: usize = 0;
++
++    // Unresolved component stream. Symlink payloads are spliced in place;
++    // 3*PATH_MAX bounds target(≤PATH_MAX-1) + '/' + tail(≤2*PATH_MAX-2).
++    let mut work = [0u8; 3 * IN_ROOT_LINK_MAX];
++    let plen = path.as_bytes().len();
++    if plen == 0 || plen >= work.len() {
++        return Err(libc::ENAMETOOLONG);
++    }
++    work[..plen].copy_from_slice(path.as_bytes());
++    let (mut rest_off, mut rest_len) = (0usize, plen);
++
++    // Per-component CStr scratch. A real component is ≤ NAME_MAX (255);
++    // anything longer is ENAMETOOLONG, same as the kernel reports.
++    let mut zbuf = [0u8; IN_ROOT_LINK_MAX + 1];
++
++    loop {
++        // Skip '/' runs and empty components ("//", trailing "/").
++        while rest_len > 0 && work[rest_off] == b'/' {
++            rest_off += 1;
++            rest_len -= 1;
++        }
++        if rest_len == 0 {
++            break;
++        }
++        let end = bun_core::strings::index_of_char_usize(
++            &work[rest_off..rest_off + rest_len],
++            b'/',
++        )
++        .unwrap_or(rest_len);
++        let comp = &work[rest_off..rest_off + end];
++        let (tail_off, tail_len) = (rest_off + end, rest_len - end);
++
++        if comp == b"." {
++            rest_off = tail_off;
++            rest_len = tail_len;
++            continue;
++        }
++        if comp == b".." {
++            if depth == 0 {
++                // Clamped at the root (RESOLVE_IN_ROOT).
++                rest_off = tail_off;
++                rest_len = tail_len;
++                continue;
++            }
++            if comp.len() > IN_ROOT_LINK_MAX {
++                return Err(libc::ENAMETOOLONG);
++            }
++            zbuf[..comp.len()].copy_from_slice(comp);
++            zbuf[comp.len()] = 0;
++            let z = ZStr::from_buf_mut(&mut zbuf, comp.len());
++            let fd = InRootFdGuard(openat(
++                owned
++                    .as_ref()
++                    .expect("depth > 0 implies an owned intermediate fd")
++                    .0,
++                z,
++                libc::O_PATH | libc::O_DIRECTORY | libc::O_NOFOLLOW | libc::O_CLOEXEC,
++                0,
++            )?);
++            let st = fstat(fd.0)?;
++            let expected = if depth == 1 {
++                root_id
++            } else {
++                stack[depth - 2]
++            };
++            if (st.st_dev as u64, st.st_ino as u64) != expected {
++                // Raced intermediate swap; refuse rather than guess.
++                return Err(libc::EAGAIN);
++            }
++            owned = Some(fd);
++            depth -= 1;
++            rest_off = tail_off;
++            rest_len = tail_len;
++            continue;
++        }
++
++        if comp.len() > IN_ROOT_LINK_MAX {
++            return Err(libc::ENAMETOOLONG);
++        }
++        zbuf[..comp.len()].copy_from_slice(comp);
++        zbuf[comp.len()] = 0;
++        let z = ZStr::from_buf_mut(&mut zbuf, comp.len());
++
++        // "Last component" = nothing but slashes remains after it.
++        let is_last = work[tail_off..tail_off + tail_len]
++            .iter()
++            .all(|&c| c == b'/');
++
++        let cur = owned.as_ref().map_or(dir, |fd| fd.0);
++
++        if is_last {
++            // The real open, still O_NOFOLLOW: a final symlink is resolved
++            // by splicing its payload below, exactly like an intermediate.
++            match openat(cur, z, flags | libc::O_NOFOLLOW, mode) {
++                Ok(fd) => return Ok(fd),
++                Err(libc::ELOOP) => {} // final component is a symlink
++                Err(e) => return Err(e),
++            }
++        }
++
++        // Probe the component: O_PATH never reparses FIFOs/devices and,
++        // with NOFOLLOW, never follows a link; fstat tells us what it is.
++        let fd = InRootFdGuard(openat(
++            cur,
++            z,
++            libc::O_PATH | libc::O_NOFOLLOW | libc::O_CLOEXEC,
++            0,
++        )?);
++        let st = fstat(fd.0)?;
++
++        if (st.st_mode & libc::S_IFMT) == libc::S_IFLNK {
++            links += 1;
++            if links > IN_ROOT_MAX_SYMLINKS {
++                return Err(libc::ELOOP);
++            }
++            let mut tgt = [0u8; IN_ROOT_LINK_MAX];
++            let n = readlinkat_empty(fd.0, &mut tgt)?;
++            if n == 0 || n >= IN_ROOT_LINK_MAX {
++                return Err(libc::ENAMETOOLONG);
++            }
++
++            // Splice: target + ("/" + tail | nothing), in place — memmove
++            // the tail right, then write the target at the front.
++            let absolute = tgt[0] == b'/';
++            let skip = usize::from(absolute); // drop the leading '/'
++            let t = n - skip;
++            let new_len = t
++                .checked_add(usize::from(tail_len > 0))
++                .and_then(|len| len.checked_add(tail_len))
++                .filter(|&len| len <= work.len())
++                .ok_or(libc::ENAMETOOLONG)?;
++            if tail_len > 0 {
++                work.copy_within(tail_off..tail_off + tail_len, t + 1);
++                work[..t].copy_from_slice(&tgt[skip..n]);
++                work[t] = b'/';
++            } else {
++                work[..t].copy_from_slice(&tgt[skip..n]);
++            }
++            rest_off = 0;
++            rest_len = new_len;
++            if absolute {
++                // Re-root (IN_ROOT): restart from `dir` at depth 0.
++                owned = None;
++                depth = 0;
++            }
++            continue;
++        }
++
++        if is_last {
++            unreachable!("a non-link final component returned ELOOP");
++        }
++        if (st.st_mode & libc::S_IFMT) != libc::S_IFDIR {
++            return Err(libc::ENOTDIR);
++        }
++        if depth >= IN_ROOT_MAX_DEPTH {
++            return Err(libc::ENAMETOOLONG);
++        }
++        stack[depth] = (st.st_dev as u64, st.st_ino as u64);
++        depth += 1;
++        owned = Some(fd);
++        rest_off = tail_off;
++        rest_len = tail_len;
++    }
++
++    // Empty (or all-slash) component stream: openat2 gives ENOENT.
++    Err(libc::ENOENT)
++}
++
++#[inline]
+ pub(crate) fn read(fd: Fd, buf: &mut [u8]) -> Result<usize, i32> {
+     let fd = fd.as_borrowed_fd();
+     retry(|| rustix::io::read(fd, buf))

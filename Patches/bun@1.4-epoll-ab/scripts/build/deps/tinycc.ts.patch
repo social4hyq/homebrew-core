@@ -1,0 +1,13 @@
+diff --git a/scripts/build/deps/tinycc.ts b/scripts/build/deps/tinycc.ts
+index 7fa186cde0..cb13e1474b 100644
+--- a/scripts/build/deps/tinycc.ts
++++ b/scripts/build/deps/tinycc.ts
+@@ -27,7 +27,7 @@ export const tinycc: Dependency = {
+     commit: TINYCC_COMMIT,
+   }),
+ 
+-  patches: ["patches/tinycc/tcc.h.patch"],
++  patches: ["patches/tinycc/tcc.h.patch", "patches/tinycc/tccgen.c.patch"],
+ 
+   build: cfg => {
+     const sources = ["libtcc.c", "tccpp.c", "tccgen.c", "tccdbg.c", "tccelf.c", "tccasm.c", "tccrun.c"];

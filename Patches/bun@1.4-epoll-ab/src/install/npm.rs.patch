@@ -1,0 +1,46 @@
+diff --git a/src/install/npm.rs b/src/install/npm.rs
+index 910f39f821..763de1b8da 100644
+--- a/src/install/npm.rs
++++ b/src/install/npm.rs
+@@ -933,8 +933,9 @@ pub mod package_manifest {
+         // - v0.0.5: added bundled dependencies
+         // - v0.0.6: changed semver major/minor/patch to each use u64 instead of u32
+         // - v0.0.7: added version publish times and extended manifest flag for minimum release age
++        // - v0.0.8: added the OpenHarmony operating-system bit
+         const HEADER_BYTES: &'static str =
+-            concat!("#!/usr/bin/env bun\n", "bun-npm-manifest-cache-v0.0.7\n");
++            concat!("#!/usr/bin/env bun\n", "bun-npm-manifest-cache-v0.0.8\n");
+ 
+         // Field order is hardcoded (descending alignment). Re-verify if the
+         // layout changes.
+@@ -1180,11 +1181,27 @@ pub mod package_manifest {
+             #[cfg(any(target_os = "linux", target_os = "android"))]
+             if is_using_o_tmpfile {
+                 // Attempt #1.
+-                if bun_sys::linkat_tmpfile(file.handle, cache_dir, outpath).is_err() {
++                let link_ok = bun_sys::linkat_tmpfile(file.handle, cache_dir, outpath);
++                if link_ok.is_err() {
+                     // Attempt #2: the file may already exist. Let's unlink and try again.
+                     let _ = bun_sys::unlinkat(cache_dir, outpath);
+-                    bun_sys::linkat_tmpfile(file.handle, cache_dir, outpath)?;
+-                    // There is no attempt #3. This is a cache, so it's not essential.
++                    let link_ok2 = bun_sys::linkat_tmpfile(file.handle, cache_dir, outpath);
++                    // Attempt #3: fall back to a regular temporary file and atomic rename.
++                    // This cache is non-essential, so failures remain non-fatal.
++                    if link_ok2.is_err() {
++                        if let Ok(tmp_file) = File::openat(
++                            tmpdir,
++                            tmp_path,
++                            bun_sys::O::WRONLY | bun_sys::O::CREAT | bun_sys::O::TRUNC,
++                            0o664,
++                        ) {
++                            if tmp_file.write_all(&buffer).is_ok() {
++                                let _ = bun_sys::renameat(tmpdir, tmp_path, cache_dir, outpath);
++                            } else {
++                                let _ = bun_sys::unlinkat(tmpdir, tmp_path);
++                            }
++                        }
++                    }
+                 }
+                 return Ok(());
+             }

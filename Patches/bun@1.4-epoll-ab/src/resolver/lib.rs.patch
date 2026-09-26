@@ -1,0 +1,31 @@
+diff --git a/src/resolver/lib.rs b/src/resolver/lib.rs
+index ed42cc00e7bea52bd6a01b81da437a054f53443c..964823060dd1ecd3e347c482eabb68ddab34ef1c 100644
+--- a/src/resolver/lib.rs
++++ b/src/resolver/lib.rs
+@@ -1098,9 +1098,9 @@ pub mod fs {
+                 // that read the limit into an int.
+                 let target = {
+                     // musl has extremely low defaults, so ensure at least 163840 there.
+-                    #[cfg(target_env = "musl")]
++                    #[cfg(any(target_env = "musl", target_env = "ohos"))]
+                     let max = lim.max.max(163_840);
+-                    #[cfg(not(target_env = "musl"))]
++                    #[cfg(not(any(target_env = "musl", target_env = "ohos")))]
+                     let max = lim.max;
+                     max.min(1 << 20)
+                 };
+@@ -1112,6 +1112,14 @@ pub mod fs {
+                     raised.max = lim.max.max(target);
+                     if bun_sys::posix::setrlimit(resource, raised).is_ok() {
+                         lim.cur = raised.cur;
++                    } else {
++                        let mut clamped = lim;
++                        clamped.cur = lim.max.min(target);
++                        if clamped.cur > lim.cur
++                            && bun_sys::posix::setrlimit(resource, clamped).is_ok()
++                        {
++                            lim.cur = clamped.cur;
++                        }
+                     }
+                 }
+                 Ok(usize::try_from(lim.cur).expect("int cast"))

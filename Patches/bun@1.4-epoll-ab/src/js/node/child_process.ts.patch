@@ -1,0 +1,20 @@
+diff --git a/src/js/node/child_process.ts b/src/js/node/child_process.ts
+index 29eee5b7b3..332266d1b5 100644
+--- a/src/js/node/child_process.ts
++++ b/src/js/node/child_process.ts
+@@ -572,6 +572,7 @@ function spawnSync(file, args, options) {
+       cwd: options.cwd || undefined,
+       stdio: bunStdio,
+       detached: options.detached,
++      newProcessGroup: process.platform === "openharmony" && !!options.shell,
+       uid: options.uid,
+       gid: options.gid,
+       cgroup: options.cgroup,
+@@ -1415,6 +1416,7 @@ class ChildProcess extends EventEmitter {
+         cwd: options.cwd || undefined,
+         env: env,
+         detached: typeof detachedOption !== "undefined" ? !!detachedOption : false,
++        newProcessGroup: process.platform === "openharmony" && !!options.shell,
+         uid: options.uid,
+         gid: options.gid,
+         cgroup: options.cgroup,

@@ -1,0 +1,83 @@
+--- a/src/runtime/ffi/ffi_body.rs	2026-09-24 21:35:26.267669844 +0800
++++ b/src/runtime/ffi/ffi_body.rs	2026-09-24 21:36:33.387666250 +0800
+@@ -730,6 +730,80 @@
+             }
+         }
+ 
++        // OHOS ships no FHS libc/headers for apps to link against. Resolve the
++        // sysroot from `$OHOS_SYSROOT`, or from Harmonybrew's SDK-native keg.
++        #[cfg(all(target_env = "ohos", target_arch = "aarch64"))]
++        {
++            fn join(sysroot: &[u8], suffix: &[u8]) -> ZBox {
++                let mut v = Vec::with_capacity(sysroot.len() + 1 + suffix.len());
++                v.extend_from_slice(sysroot);
++                v.push(b'/');
++                v.extend_from_slice(suffix);
++                ZBox::from_bytes(v)
++            }
++            fn dir_exists_dyn(path: &ZStr) -> bool {
++                bun_sys::directory_exists_at(bun_sys::Fd::cwd(), path).unwrap_or(false)
++            }
++
++            // Process-lifetime cache, mirroring CACHED_DEFAULT_SYSTEM_* above:
++            // the probe is a handful of stat()s, but cc() can be hot in test
++            // suites that compile many fixtures.
++            fn resolve_ohos_sysroot() -> Option<&'static ZBox> {
++                static CACHED_OHOS_SYSROOT: OnceLock<Option<ZBox>> = OnceLock::new();
++                CACHED_OHOS_SYSROOT
++                    .get_or_init(|| {
++                        if let Some(sysroot) = env_var::OHOS_SYSROOT.get() {
++                            return Some(ZBox::from_bytes(sysroot));
++                        }
++                        let mut roots: Vec<Vec<u8>> = Vec::new();
++                        if let Ok(prefix) = std::env::var("HOMEBREW_PREFIX") {
++                            roots.push(prefix.into_bytes());
++                        }
++                        roots.push(b"/storage/Users/currentUser/.harmonybrew".to_vec());
++                        const SYSROOT_SUFFIXES: [&str; 1] = ["/opt/ohos-sdk-native/sysroot"];
++                        for root in &roots {
++                            for suffix in SYSROOT_SUFFIXES {
++                                let mut candidate = root.clone();
++                                candidate.extend_from_slice(suffix.as_bytes());
++                                let candidate = ZBox::from_bytes(candidate);
++                                if dir_exists_dyn(&candidate) {
++                                    return Some(candidate);
++                                }
++                            }
++                        }
++                        None
++                    })
++                    .as_ref()
++            }
++
++            if let Some(sysroot_box) = resolve_ohos_sysroot() {
++                let sysroot = sysroot_box.as_bytes();
++                let lib_dir = join(sysroot, b"usr/lib/aarch64-linux-ohos");
++                if dir_exists_dyn(&lib_dir) {
++                    if state.add_library_path(&lib_dir).is_err() {
++                        bun_output::scoped_log!(TCC, "TinyCC failed to add OHOS sysroot library path");
++                    }
++                }
++
++                let include_arch_dir = join(sysroot, b"usr/include/aarch64-linux-ohos");
++                if dir_exists_dyn(&include_arch_dir) {
++                    if state.add_sys_include_path(&include_arch_dir).is_err() {
++                        bun_output::scoped_log!(
++                            TCC,
++                            "TinyCC failed to add OHOS sysroot arch include path"
++                        );
++                    }
++                }
++
++                let include_dir = join(sysroot, b"usr/include");
++                if dir_exists_dyn(&include_dir) {
++                    if state.add_sys_include_path(&include_dir).is_err() {
++                        bun_output::scoped_log!(TCC, "TinyCC failed to add OHOS sysroot include path");
++                    }
++                }
++            }
++        }
++
+         #[cfg(unix)]
+         {
+             if dir_exists(b"/usr/local/include") {

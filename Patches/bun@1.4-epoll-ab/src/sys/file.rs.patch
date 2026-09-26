@@ -1,0 +1,23 @@
+diff --git a/src/sys/file.rs b/src/sys/file.rs
+index 691d97bd11..2a603e5396 100644
+--- a/src/sys/file.rs
++++ b/src/sys/file.rs
+@@ -206,8 +206,17 @@ impl File {
+                 // `st_size` is only a hint (sparse files, racing writers, /proc):
+                 // reserve fallibly so an absurd size surfaces as ENOMEM to the
+                 // caller instead of aborting the process in `handle_alloc_error`.
++                //
++                // The fstat() call itself can fail too — not just return a
++                // useless size — for a legitimately readable fd: verified on
++                // OHOS, fstat() on a memfd returns EACCES even though
++                // pread(2) on the same fd works fine. Since this is purely a
++                // capacity hint, a failed fstat degrades to the same small
++                // fallback reservation as `ProbablySmall` rather than
++                // aborting the read entirely.
+                 let want = self
+-                    .get_end_pos()?
++                    .get_end_pos()
++                    .unwrap_or(0)
+                     .saturating_add(16)
+                     .saturating_sub(list.len());
+                 if list.try_reserve_exact(want).is_err() {

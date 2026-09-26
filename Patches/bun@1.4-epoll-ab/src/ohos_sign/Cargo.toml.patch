@@ -1,0 +1,13 @@
+diff --git a/src/ohos_sign/Cargo.toml b/src/ohos_sign/Cargo.toml
+new file mode 100644
+index 0000000000..fa5881dfeb
+--- /dev/null
++++ b/src/ohos_sign/Cargo.toml
+@@ -0,0 +1,7 @@
++[package]
++name = "ohos_sign"
++version = "0.0.0"
++edition = "2024"
++
++[lib]
++path = "src/lib.rs"

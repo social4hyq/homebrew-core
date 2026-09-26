@@ -1,0 +1,18 @@
+diff --git a/src/install/lockfile/Package/Meta.rs b/src/install/lockfile/Package/Meta.rs
+index 2ac6e61275..05779ae02e 100644
+--- a/src/install/lockfile/Package/Meta.rs
++++ b/src/install/lockfile/Package/Meta.rs
+@@ -66,7 +66,12 @@ impl Meta {
+     /// Does the `cpu` arch and `os` match the requirements listed in the package?
+     /// This is completely unrelated to "devDependencies", "peerDependencies", "optionalDependencies" etc
+     pub fn is_disabled(&self, cpu: Architecture, os: OperatingSystem) -> bool {
+-        !self.arch.is_match(cpu) || !self.os.is_match(os)
++        // Lockfiles written before OpenHarmony was added encoded the
++        // universal OS mask without the OHOS bit. Preserve their universal
++        // dependency semantics without conflating that raw value with the
++        // negated `!openharmony` selector used by current manifests.
++        let os_matches = self.os.0 == OperatingSystem::LEGACY_ALL_VALUE || self.os.is_match(os);
++        !self.arch.is_match(cpu) || !os_matches
+     }
+ 
+     pub(crate) fn has_install_script(&self) -> bool {

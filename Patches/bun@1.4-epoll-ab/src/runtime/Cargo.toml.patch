@@ -1,0 +1,10 @@
+diff --git a/src/runtime/Cargo.toml b/src/runtime/Cargo.toml
+index 386634671a..a6ef43da4a 100644
+--- a/src/runtime/Cargo.toml
++++ b/src/runtime/Cargo.toml
+@@ -117,3 +117,5 @@ bun_css_jsc.workspace = true
+ 
+ [features]
+ default = []
++[target.'cfg(target_env = "ohos")'.dependencies]
++ohos_sign = { path = "../ohos_sign" }

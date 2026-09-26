@@ -1,0 +1,54 @@
+diff --git a/src/spawn_sys/spawn_process.rs b/src/spawn_sys/spawn_process.rs
+index f488edd2c6..c71c669ce5 100644
+--- a/src/spawn_sys/spawn_process.rs
++++ b/src/spawn_sys/spawn_process.rs
+@@ -2,7 +2,7 @@
+ //! `bun_spawn::process` so the fd/action plumbing has no event-loop
+ //! dependency. `Process`/`Poller`/`WaiterThread`/`sync` stay in `bun_spawn`.
+ 
+-#[cfg(any(target_os = "linux", target_os = "android"))]
++#[cfg(all(any(target_os = "linux", target_os = "android"), not(target_env = "ohos")))]
+ use core::ffi::CStr;
+ use core::ffi::c_char;
+ #[cfg(target_os = "macos")]
+@@ -459,6 +459,9 @@ impl PosixStdio {
+ 
+ #[derive(Default)]
+ pub struct PosixSpawnResult {
++    /// Whether the child leads a dedicated process group for descendant kills.
++    pub new_process_group: bool,
++
+     pub pid: PidT,
+     pub pidfd: Option<PidFdType>,
+     pub stdin: Option<Fd>,
+@@ -737,7 +740,7 @@ pub unsafe fn spawn_process_posix(
+ 
+     // The label is only referenced from the Linux memfd fast-path below.
+     #[cfg_attr(
+-        not(any(target_os = "linux", target_os = "android")),
++        not(all(any(target_os = "linux", target_os = "android"), not(target_env = "ohos"))),
+         allow(unused_labels)
+     )]
+     'stdio: for i in 0..3usize {
+@@ -778,7 +781,12 @@ pub unsafe fn spawn_process_posix(
+                 actions.open(fileno, path, flag | bun_sys::O::CREAT as u32, 0o664)?;
+             }
+             PosixStdio::Buffer => {
+-                #[cfg(any(target_os = "linux", target_os = "android"))]
++                // OHOS: a memfd-backed stdio fd reports EACCES from fstat(2) (kernel bug, see
++                // environment_ohos_fstat_eacces_on_memfd) -- a child that does its own fstat on
++                // an inherited stdio fd during startup (e.g. node/libuv's handle-type detection)
++                // can abort on that unexpected errno instead of the JS-facing spawn path's own
++                // hardened read-back. Fall through to the socketpair path below instead.
++                #[cfg(all(any(target_os = "linux", target_os = "android"), not(target_env = "ohos")))]
+                 'use_memfd: {
+                     if !options.stream && i > 0 && bun_sys::can_use_memfd() {
+                         // use memfd if we can
+@@ -978,6 +978,7 @@ pub unsafe fn spawn_process_posix(
+             return Ok(Err(err));
+         }
+         Ok(pid) => {
++            spawned.new_process_group = options.new_process_group;
+             spawned.pid = pid;
+             spawned.extra_pipes = extra_fds;
+ 

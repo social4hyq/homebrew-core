@@ -1,0 +1,179 @@
+diff --git a/src/runtime/api/bun/Terminal.rs b/src/runtime/api/bun/Terminal.rs
+index 1f8349d591..3591f1b12e 100644
+--- a/src/runtime/api/bun/Terminal.rs
++++ b/src/runtime/api/bun/Terminal.rs
+@@ -114,6 +114,13 @@ pub struct Terminal {
+     /// Duplicated master fd for writing (POSIX) / overlapped write pipe end (Windows)
+     write_fd: Cell<Fd>,
+ 
++    /// An exit notification that fired before the JS wrapper existed.
++    /// `on_reader_finished` is one-shot (guarded by `Flags::READER_DONE`), so
++    /// a read that completes synchronously inside `init_terminal` (already-
++    /// closed slave, or a read error) would otherwise drop the exit callback
++    /// forever; stashed here and replayed at the end of `init_terminal`.
++    deferred_exit: Cell<Option<i32>>,
++
+     /// The slave side of the PTY (used by child processes). Unused on Windows.
+     slave_fd: Cell<Fd>,
+ 
+@@ -416,6 +423,7 @@ impl Terminal {
+             master_fd: Cell::new(pty_result.master),
+             read_fd: Cell::new(pty_result.read_fd),
+             write_fd: Cell::new(pty_result.write_fd),
++            deferred_exit: Cell::new(None),
+             slave_fd: Cell::new(pty_result.slave),
+             #[cfg(windows)]
+             hpcon: Cell::new(Some(pty_result.hpcon)),
+@@ -474,7 +482,18 @@ impl Terminal {
+             }
+         }
+ 
+-        // Start reader with the read fd - adds a ref
++        // OHOS PTY dup fds can lose the read readiness edge when an
++        // initially-empty writer is also registered for level-triggered
++        // EPOLLOUT. Keep the writer poll object for later backpressure,
++        // but do not watch writable until Terminal.write has data.
++        #[cfg(target_env = "ohos")]
++        terminal.writer.with_mut(|w| w.unregister_poll());
++
++        // Start reader with the read fd - adds a ref. Set the OHOS watchdog
++        // flag before the initial poll registration; setting it afterwards
++        // misses the first epoll_ctl(ADD), which can lose fast-child output.
++        #[cfg(target_env = "ohos")]
++        terminal.reader.with_mut(|r| r.flags.insert(PosixFlags::EPOLL_REARM_WATCH));
+         match terminal
+             .reader
+             .with_mut(|r| r.start(pty_result.read_fd, true))
+@@ -506,11 +525,6 @@ impl Terminal {
+             }
+         }
+ 
+-        // Start reading data
+-        // SAFETY: the reader cell is live for the terminal's lifetime; `read`
+-        // is the raw re-entrancy-safe entry (its dispatch runs user JS).
+-        unsafe { IOReader::read(terminal.reader.as_ptr()) };
+-
+         // Get or create the JS wrapper
+         let this_value = existing_js_value.unwrap_or_else(|| js::to_js(parent_ptr, global_object));
+ 
+@@ -533,6 +547,21 @@ impl Terminal {
+             js::gc::set(js::GcValue::Drain, this_value, global_object, cb);
+         }
+ 
++        // Start reading data. Deliberately after the wrapper and callbacks
++        // above exist: a read that completes synchronously (already-closed
++        // slave, or a read error) drives on_reader_finished inline, and that
++        // one-shot path needs somewhere to dispatch the exit callback to.
++        // SAFETY: the reader cell is live for the terminal's lifetime; `read`
++        // is the raw re-entrancy-safe entry (its dispatch runs user JS).
++        unsafe { IOReader::read(terminal.reader.as_ptr()) };
++
++        // Replay an exit notification that fired before the wrapper and
++        // callbacks above existed (see `deferred_exit`'s doc comment).
++        if let Some(code) = terminal.deferred_exit.take() {
++            terminal.maybe_downgrade_after_eof();
++            terminal.call_exit_callback(code, None);
++        }
++
+         Ok(CreateResult {
+             // SAFETY: `parent_ptr` is the live `heap::into_raw` pointer above.
+             terminal: unsafe { bun_ptr::BackRef::from_raw_mut(parent_ptr) },
+@@ -840,11 +869,14 @@ mod lib_util {
+         }
+         LOADED.store(true, Relaxed);
+ 
+-        // Try libutil.so first (most common), then libutil.so.1
+-        const LIB_NAMES: [&ZStr; 3] = [
++        // Try libutil.so first (most common), then libutil.so.1, libc.so.6
++        // (glibc), libc.so (musl, including OHOS -- openpty lives in libc
++        // there, and OHOS's libc has no libc.so.6 alias).
++        const LIB_NAMES: [&ZStr; 4] = [
+             bun_core::zstr!("libutil.so"),
+             bun_core::zstr!("libutil.so.1"),
+             bun_core::zstr!("libc.so.6"),
++            bun_core::zstr!("libc.so"),
+         ];
+         for lib_name in LIB_NAMES {
+             if let Some(h) = sys::dlopen(lib_name, sys::RTLD::LAZY) {
+@@ -1654,6 +1686,8 @@ impl Terminal {
+     /// Close the terminal
+     #[bun_jsc::host_fn(method)]
+     pub(crate) fn close(&self, _g: &JSGlobalObject, _f: &CallFrame) -> JsResult<JSValue> {
++        #[cfg(target_env = "ohos")]
++        self.flush_kernel_buffered_output();
+         self.close_internal();
+         Ok(JSValue::UNDEFINED)
+     }
+@@ -1665,6 +1699,11 @@ impl Terminal {
+         global_object: &JSGlobalObject,
+         _f: &CallFrame,
+     ) -> JsResult<JSValue> {
++        // Deliver the kernel-buffered tail before the downgrade below silences
++        // the data callback (FINALIZED gates `on_read_chunk`) and
++        // close_internal closes the master fds.
++        #[cfg(target_env = "ohos")]
++        self.flush_kernel_buffered_output();
+         // After dispose the caller must not see further data/exit callbacks.
+         // closeInternal on Windows leaves the reader draining off-thread, so
+         // suppress callbacks and downgrade the JSRef so the wrapper is
+@@ -1678,6 +1717,40 @@ impl Terminal {
+         ))
+     }
+ 
++    /// OHOS: synchronously deliver the PTY master's kernel-buffered output
++    /// before the master fds are torn down. After a master-side write, the
++    /// OHOS kernel can leave the master's readiness flag permanently cleared,
++    /// so epoll never reports the slave→master data again; the epoll-rearm
++    /// watchdog's force-drain recovers this only on a 100ms tick, and `await
++    /// using` dispose closes the master fds as soon as `proc.exited` resolves
++    /// — bytes still in the kernel buffer are dropped with the fd. read(2) is
++    /// the only trusted source of truth: one `read()` runs the regular
++    /// read_loop (each chunk goes through the normal `data` callback path)
++    /// and stops at EAGAIN, since the Terminal reader is a NonblockingPipe and
++    /// skips the readability gate in `read()`.
++    ///
++    /// Must run before `FINALIZED` is set: `on_read_chunk` drops chunks once
++    /// that flag is up, and after `close_internal` the fds are gone.
++    #[cfg(target_env = "ohos")]
++    fn flush_kernel_buffered_output(&self) {
++        let flags = self.flags.get();
++        if flags.contains(Flags::CLOSED)
++            || !flags.contains(Flags::READER_STARTED)
++            || flags.contains(Flags::READER_DONE)
++        {
++            return;
++        }
++        // Both reader callbacks below re-enter user JS and may deref; hold a
++        // +1 so `self` stays live for the trailing field accesses. (Same
++        // pattern as `drain_and_close_slave_fd`.)
++        let guard = self.ref_guard();
++        // SAFETY: single JS thread; the reader cell is live for the terminal's
++        // lifetime, and re-entrant user JS (the data callback may call
++        // `terminal.close()`) is handled by `read`'s raw dispatch.
++        unsafe { IOReader::read(self.reader.as_ptr()) };
++        drop(guard);
++    }
++
+     fn close_internal(&self) {
+         if self.flags.get().contains(Flags::CLOSED) {
+             return;
+@@ -1809,8 +1882,17 @@ impl Terminal {
+         // EOF from master - downgrade to weak ref to allow GC.
+         // Skip JS interactions if already finalized (happens when close() is called during finalize)
+         if !self.flags.get().contains(Flags::FINALIZED) {
+-            self.maybe_downgrade_after_eof();
+-            self.call_exit_callback(exit_code, None);
++            if self.this_value.get().is_empty() {
++                // No JS wrapper yet: this is a synchronous read completion
++                // reached from inside init_terminal, before the wrapper and
++                // callbacks exist. Dispatching now would silently drop the
++                // one-shot exit notification -- stash it for init_terminal
++                // to replay once the wrapper exists.
++                self.deferred_exit.set(Some(exit_code));
++            } else {
++                self.maybe_downgrade_after_eof();
++                self.call_exit_callback(exit_code, None);
++            }
+         }
+         self.deref_();
+     }

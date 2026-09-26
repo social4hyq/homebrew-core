@@ -1,0 +1,60 @@
+diff --git a/src/runtime/napi/napi_body.rs b/src/runtime/napi/napi_body.rs
+index b0717f39c6..a6aeaf003e 100644
+--- a/src/runtime/napi/napi_body.rs
++++ b/src/runtime/napi/napi_body.rs
+@@ -4036,11 +4036,33 @@ mod posix_platform_specific_v8_apis {
+         -> *mut c_void;
+     }
+ }
++#[cfg(target_env = "ohos")]
++mod posix_platform_specific_v8_apis {
++    use core::ffi::c_void;
++    // OHOS links llvm@21's own libc++ (no libstdc++ available in the sysroot),
++    // which mangles as `std::__n1::` (that libc++'s current
++    // _LIBCPP_ABI_NAMESPACE) rather than bare `std::` (libstdc++, the
++    // fallback branch below's assumption) — same story as Android's
++    // `__ndk1`/Apple's `__1`, just a different inline namespace spelling.
++    // int64_t/uint64_t are `long`/`unsigned long` (m/l) as on every other
++    // 64-bit Linux ABI. Verified against this file's own compiled output
++    // (`nm obj/unified/UnifiedSource-src_jsc_bindings_v8-0.cpp.o`).
++    unsafe extern "C" {
++        pub(super) fn _ZN2v85Array3NewENS_5LocalINS_7ContextEEEmNSt4__n18functionIFNS_10MaybeLocalINS_5ValueEEEvEEE()
++        -> *mut c_void;
++        pub(super) fn _ZN2v811CpuProfiler13CollectSampleEPNS_7IsolateENSt4__n18optionalImEE()
++        -> *mut c_void;
++        pub(super) fn _ZN2v86BigInt3NewEPNS_7IsolateEl() -> *mut c_void;
++        pub(super) fn _ZN2v812HeapProfiler25StartSamplingHeapProfilerEmiNS0_13SamplingFlagsE()
++        -> *mut c_void;
++    }
++}
+ #[cfg(all(
+     not(windows),
+     not(target_os = "android"),
+     not(target_os = "macos"),
+-    not(target_os = "freebsd")
++    not(target_os = "freebsd"),
++    not(target_env = "ohos")
+ ))]
+ mod posix_platform_specific_v8_apis {
+     use core::ffi::c_void;
+@@ -5242,11 +5264,19 @@ pub(crate) fn fix_dead_code_elimination() {
+         posix_platform_specific_v8_apis::_ZN2v86BigInt3NewEPNS_7IsolateEl,
+         posix_platform_specific_v8_apis::_ZN2v812HeapProfiler25StartSamplingHeapProfilerEmiNS0_13SamplingFlagsE,
+     );
++    #[cfg(target_env = "ohos")]
++    keep_symbols!(
++        posix_platform_specific_v8_apis::_ZN2v85Array3NewENS_5LocalINS_7ContextEEEmNSt4__n18functionIFNS_10MaybeLocalINS_5ValueEEEvEEE,
++        posix_platform_specific_v8_apis::_ZN2v811CpuProfiler13CollectSampleEPNS_7IsolateENSt4__n18optionalImEE,
++        posix_platform_specific_v8_apis::_ZN2v86BigInt3NewEPNS_7IsolateEl,
++        posix_platform_specific_v8_apis::_ZN2v812HeapProfiler25StartSamplingHeapProfilerEmiNS0_13SamplingFlagsE,
++    );
+     #[cfg(all(
+         not(windows),
+         not(target_os = "android"),
+         not(target_os = "macos"),
+-        not(target_os = "freebsd")
++        not(target_os = "freebsd"),
++        not(target_env = "ohos")
+     ))]
+     keep_symbols!(
+         posix_platform_specific_v8_apis::_ZN2v85Array3NewENS_5LocalINS_7ContextEEEmSt8functionIFNS_10MaybeLocalINS_5ValueEEEvEE,

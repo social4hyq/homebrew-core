@@ -1,0 +1,49 @@
+diff --git a/src/runtime/node/node_fs.rs b/src/runtime/node/node_fs.rs
+index 96175454fe..c12b971cb6 100644
+--- a/src/runtime/node/node_fs.rs
++++ b/src/runtime/node/node_fs.rs
+@@ -4614,7 +4614,17 @@ impl NodeFS {
+                 slice = &slice[written..];
+             }
+         }
+-        if !broke {
++        // `stat_size == 0` is this function's "unknown size" sentinel (see the
++        // `remain = stat_size as u64` init above: it makes the capped loop a
++        // no-op and everything is copied here instead). For a real, known
++        // `stat_size`, once the capped loop above has copied exactly that many
++        // bytes (`remain` reached 0 without early EOF, so `broke` is false)
++        // there is nothing left to copy -- falling through to this "keep
++        // reading until true EOF" loop would copy the rest of a *longer*
++        // source past the caller's requested length. `broke` alone doesn't
++        // distinguish "finished the known cap" from "don't have a cap", so it
++        // must gate on `stat_size == 0`, not `!broke`.
++        if !broke && stat_size == 0 {
+             'outer: loop {
+                 let amt = match Syscall::read(src_fd, buf) {
+                     Ok(result) => result,
+@@ -6977,14 +6987,23 @@ impl NodeFS {
+             return Err(abort_err());
+         }
+ 
+-        let stat_ = Syscall::fstat(fd)?;
++        // OHOS: fstat() on a memfd can return EACCES even though pread(2) on
++        // the same fd works fine (same kernel quirk as
++        // read_to_end_with_array_list's SizeHint::UnknownSize handling in
++        // sys/file.rs). This is purely a size hint for how much more to
++        // read past the 256 KB already buffered above, so degrade to an
++        // unknown size (0) instead of failing the whole read.
++        let stat_st_size: i64 = match Syscall::fstat(fd) {
++            Ok(stat_) => stat_.st_size,
++            Err(_) => 0,
++        };
+ 
+         // For certain files, the size might be 0 but the file might still have contents.
+         // https://github.com/oven-sh/bun/issues/1220
+         let max_size: u64 = args.max_size.map(|v| v as u64).unwrap_or(BLOB_SIZE_MAX);
+         let has_max_size = args.max_size.is_some();
+ 
+-        let size: u64 = (stat_.st_size as i64)
++        let size: u64 = (stat_st_size as i64)
+             .min(max_size as i64) // Only used in DOMFormData
+             .max(total as i64)
+             .max(0) as u64

@@ -1,0 +1,27 @@
+diff --git a/scripts/build/rust.ts b/scripts/build/rust.ts
+index 5e4fa5c5f0..56a223786e 100644
+--- a/scripts/build/rust.ts
++++ b/scripts/build/rust.ts
+@@ -59,6 +59,7 @@ export function rustTriple(os: OS, arch: Arch, abi: Abi | undefined): string {
+   assert(abi !== undefined, "linux build missing abi");
+   if (abi === "android") return `${rustArch}-linux-android`;
+   if (abi === "musl") return `${rustArch}-unknown-linux-musl`;
++  if (abi === "ohos") return `${rustArch}-unknown-linux-ohos`;
+   return `${rustArch}-unknown-linux-gnu`;
+ }
+ 
+@@ -369,8 +370,12 @@ export function cargoBuildInvocation(cfg: Config): CargoInvocation {
+   // `--target` set, cargo does NOT apply it to host artifacts (proc-macro
+   // dylibs / build scripts), so those still build PIC. Darwin (Mach-O is
+   // always PIC), Android (bionic loader requires PIE — flags.ts:934), and
+-  // Windows (COFF has its own model) are excluded.
+-  if ((cfg.linux && cfg.abi !== "android") || cfg.freebsd) {
++  // Windows (COFF has its own model) are excluded. OHOS is excluded too,
++  // for the same reason as Android (flags.ts): PIC/PIE sidesteps a libc.so
++  // link-stub metadata bug on OHOS (see flags.ts's `-fPIC` entries for
++  // `abi === "ohos"`), and non-PIC absolute relocations against Rust's own
++  // `.rodata` constants fail lld's alignment/relocation checks the same way.
++  if ((cfg.linux && cfg.abi !== "android" && cfg.abi !== "ohos") || cfg.freebsd) {
+     rustflags.push("-Crelocation-model=static");
+   }
+   // Keep frame pointers — matches the C++ side's `-fno-omit-frame-pointer`

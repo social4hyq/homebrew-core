@@ -1,0 +1,53 @@
+diff --git a/src/io/PipeReader.rs b/src/io/PipeReader.rs
+index 60e18aa01e..e6f2ef731a 100644
+--- a/src/io/PipeReader.rs
++++ b/src/io/PipeReader.rs
+@@ -210,6 +210,11 @@ bitflags::bitflags! {
+         const USE_PREAD                = 1 << 8;
+         const IS_PAUSED                = 1 << 9;
+         const KEEP_ALIVE               = 1 << 10; // default true
++        /// Opt-in, set before the first `start()`: enrolls the underlying
++        /// `FilePoll` in `posix_event_loop`'s epoll-rearm watchdog (OHOS's
++        /// epoll can silently stop delivering events after a successful
++        /// CTL_ADD/CTL_MOD). Currently only Bun.Terminal's PTY master reader.
++        const EPOLL_REARM_WATCH        = 1 << 11;
+     }
+ }
+ 
+@@ -529,6 +534,10 @@ impl PosixBufferedReader {
+         };
+         poll.set_owner(Owner::new(PollTag::BufferedReader, owner_ptr.cast()));
+ 
++        if self.flags.contains(PosixFlags::EPOLL_REARM_WATCH) {
++            poll.set_flag(FilePollFlag::EpollRearmWatch);
++        }
++
+         if !poll.has_flag(FilePollFlag::WasEverRegistered)
+             && self.flags.contains(PosixFlags::KEEP_ALIVE)
+         {
+@@ -829,6 +838,25 @@ impl PosixBufferedReader {
+                     }
+                     return;
+                 }
++                // OHOS follows the Linux PTY convention of reporting EIO on
++                // the master after the last slave descriptor is closed. At
++                // because this reader is the Terminal PTY master, this is terminal
++                // EOF rather than an I/O failure. Restrict the conversion to
++                // Terminal's explicit epoll-watchdog flag; a standalone EIO
++                // from every other pipe/file remains an error.
++                Some(Stop::Error(err))
++                    if cfg!(target_env = "ohos")
++                        && unsafe { (*this).flags.contains(PosixFlags::EPOLL_REARM_WATCH) }
++                        && err.get_errno() == sys::E::EIO =>
++                {
++                    unsafe { Self::close_if_final(this, Some(&Stop::Eof)) };
++                    unsafe {
++                        if !(*this).flags.contains(PosixFlags::IS_DONE) {
++                            Self::done(this);
++                        }
++                    }
++                    return;
++                }
+                 Some(Stop::Error(err)) => {
+                     // SAFETY: caller contract; `on_error` is the tail.
+                     unsafe { Self::on_error(this, err) };

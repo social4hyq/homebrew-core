@@ -1,0 +1,16 @@
+diff --git a/src/runtime/napi/libc_check.rs b/src/runtime/napi/libc_check.rs
+index 1fee058550..433aee65e6 100644
+--- a/src/runtime/napi/libc_check.rs
++++ b/src/runtime/napi/libc_check.rs
+@@ -53,7 +53,11 @@ pub(crate) unsafe extern "C" fn Bun__addonNeedsGlibcOnMusl(
+ 
+ #[cfg(any(target_os = "linux", target_os = "android"))]
+ fn check_enabled() -> bool {
++    // OHOS uses a musl-derived libc but its target environment is not
++    // reported as `musl`; include it so glibc-linked addons are rejected
++    // before the platform loader returns an opaque Permission denied.
+     bun_core::Environment::IS_MUSL
++        || cfg!(target_env = "ohos")
+         || bun_core::env_var::BUN_INTERNAL_NAPI_FORCE_MUSL_CHECK.get() == Some(true)
+ }
+ 

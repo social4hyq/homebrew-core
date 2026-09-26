@@ -1,0 +1,12 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 8b967bd0e2..aeb0ecdb83 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -100,6 +100,7 @@ members = [
+   "src/spawn",
+   "src/spawn_sys",
+   "src/bunfig",
++  "src/ohos_sign",
+ ]
+ # `vendor/lolhtml` (the `lol_html` crate) is a non-member path dependency,
+ # fetched into `vendor/` by `scripts/build/deps/lolhtml.ts` before cargo runs.

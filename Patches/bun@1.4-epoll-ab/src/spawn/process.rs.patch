@@ -1,0 +1,153 @@
+diff --git a/src/spawn/process.rs b/src/spawn/process.rs
+index bb4f39e629..3f310ed90b 100644
+--- a/src/spawn/process.rs
++++ b/src/spawn/process.rs
+@@ -121,6 +121,9 @@ fn call_exit_handler(
+ // handles `poller.deinit()`.
+ #[derive(bun_ptr::ThreadSafeRefCounted)]
+ pub struct Process {
++    /// Child owns a dedicated process group; timeout kills the group.
++    #[cfg(unix)]
++    pub(crate) new_process_group: bool,
+     pub pid: PidT,
+     #[cfg(any(target_os = "linux", target_os = "android"))]
+     pub(crate) pidfd: PidFdType,
+@@ -291,6 +294,7 @@ impl Process {
+         bun_core::heap::into_raw(Box::new(Process {
+             ref_count: bun_ptr::ThreadSafeRefCount::init(),
+             pid: posix.pid,
++            new_process_group: posix.new_process_group,
+             #[cfg(any(target_os = "linux", target_os = "android"))]
+             pidfd: posix.pidfd.unwrap_or(0),
+             js_poster: event_loop.js_poster(),
+@@ -710,7 +714,8 @@ impl Process {
+                         #[link_name = "kill"]
+                         safe fn libc_kill(pid: libc::pid_t, sig: c_int) -> c_int;
+                     }
+-                    let err = libc_kill(self.pid, signal as c_int);
++                    let target_pid = if self.new_process_group { -self.pid } else { self.pid };
++                    let err = libc_kill(target_pid, signal as c_int);
+                     if err != 0 {
+                         let errno_ = bun_sys::get_errno(err as isize);
+                         // if the process was already killed don't throw
+@@ -3296,6 +3301,11 @@ mod spawn_process_body {
+                 if no_orphans
+                     && (cfg!(any(target_os = "linux", target_os = "android"))
+                         || cfg!(target_os = "macos"))
++                    // OHOS: wait_linux_signalfd's signalfd+pidfd path hangs (same
++                    // pidfd-readiness-notification gap as the async waiter-thread
++                    // fix); fall through to the plain poll+wait4 loop below,
++                    // which gets its own OHOS parent-watch replacement.
++                    && !cfg!(target_env = "ohos")
+                 {
+                     let ppid = ParentDeathWatchdog::ppid_to_watch().unwrap_or(0);
+                     #[cfg(target_os = "macos")]
+@@ -3340,6 +3350,35 @@ mod spawn_process_body {
+                     // plain poll() loop so `.buffer` stdio still drains instead
+                     // of being dropped (or deadlocking) in a blind `wait4()`.
+                 }
++                // OHOS no_orphans: watch parent death via pidfd + ppid polling
++                // (wait_linux_signalfd's pidfd-based path is skipped above
++                // because it hangs on this kernel).
++                #[cfg(target_env = "ohos")]
++                let (ohos_ppid, ohos_ppid_fd): (libc::pid_t, AutoCloseFd) = if no_orphans {
++                    // Only clear PDEATHSIG when the poll loop below will actually
++                    // run: with inherited stdio both fds are INVALID, the loop
++                    // never executes, and keeping the kernel signal is then the
++                    // only parent-death detection left.
++                    let will_watch_in_poll_loop = out_fds_to_wait_for[0] != Fd::INVALID
++                        || out_fds_to_wait_for[1] != Fd::INVALID;
++                    let ppid_from_watchdog = if will_watch_in_poll_loop {
++                        ParentDeathWatchdog::ppid_to_watch().unwrap_or(0)
++                    } else {
++                        0
++                    };
++                    if ppid_from_watchdog > 1 {
++                        // Clear PDEATHSIG — SIGKILL is uncatchable and would skip our cleanup defer.
++                        let _ = unsafe { libc::prctl(libc::PR_SET_PDEATHSIG, 0) };
++                        let fd = bun_sys::pidfd_open(ppid_from_watchdog, 0)
++                            .map(AutoCloseFd::new)
++                            .unwrap_or_else(|_| AutoCloseFd::invalid());
++                        (ppid_from_watchdog, fd)
++                    } else {
++                        (0, AutoCloseFd::invalid())
++                    }
++                } else {
++                    (0, AutoCloseFd::invalid())
++                };
+                 while out_fds_to_wait_for[0] != Fd::INVALID || out_fds_to_wait_for[1] != Fd::INVALID
+                 {
+                     for i in 0..2 {
+@@ -3351,10 +3390,18 @@ mod spawn_process_body {
+                         }
+                     }
+ 
++                    // OHOS no_orphans needs a 3rd slot for the pidfd parent monitor.
++                    #[cfg(target_env = "ohos")]
++                    let mut poll_fds_buf: [libc::pollfd; 3] =
++                    // SAFETY: zeroed pollfd is valid
++                    unsafe { bun_core::ffi::zeroed_unchecked() };
++                    #[cfg(not(target_env = "ohos"))]
+                     let mut poll_fds_buf: [libc::pollfd; 2] =
+                     // SAFETY: zeroed pollfd is valid
+                     unsafe { bun_core::ffi::zeroed_unchecked() };
+                     let mut poll_len: usize = 0;
++                    #[cfg(target_env = "ohos")]
++                    let mut ohos_pidfd_idx: usize = 0;
+                     for &fd in &out_fds_to_wait_for {
+                         if fd == Fd::INVALID {
+                             continue;
+@@ -3366,12 +3413,31 @@ mod spawn_process_body {
+                         };
+                         poll_len += 1;
+                     }
++                    // OHOS no_orphans: add pidfd for parent death detection.
++                    #[cfg(target_env = "ohos")]
++                    if ohos_ppid > 1 && ohos_ppid_fd.fd() != Fd::INVALID {
++                        ohos_pidfd_idx = poll_len;
++                        poll_fds_buf[poll_len] = libc::pollfd {
++                            fd: ohos_ppid_fd.fd().native(),
++                            events: libc::POLLIN | libc::POLLERR | libc::POLLHUP,
++                            revents: 0,
++                        };
++                        poll_len += 1;
++                    }
+                     if poll_len == 0 {
+                         break;
+                     }
+ 
++                    // OHOS: no pidfd -> poll with a 100ms timeout so each iteration can check getppid() for parent death.
++                    #[allow(unused_mut)]
++                    let mut poll_timeout: libc::c_int = -1;
++                    #[cfg(target_env = "ohos")]
++                    if ohos_ppid > 1 && ohos_ppid_fd.fd() == Fd::INVALID {
++                        poll_timeout = 100;
++                    }
++
+                     // SAFETY: valid pollfd array
+-                    let rc = unsafe { libc::poll(poll_fds_buf.as_mut_ptr(), poll_len as _, -1) };
++                    let rc = unsafe { libc::poll(poll_fds_buf.as_mut_ptr(), poll_len as _, poll_timeout) };
+                     match bun_sys::get_errno(rc as isize) {
+                         bun_sys::E::SUCCESS => {}
+                         bun_sys::E::EAGAIN | bun_sys::E::EINTR => continue,
+@@ -3380,6 +3446,20 @@ mod spawn_process_body {
+                             return Ok(Err(bun_sys::Error::from_code(err, bun_sys::Tag::poll)));
+                         }
+                     }
++
++                    // pidfd in the poll set fires on parent exit; getppid() covers the no-pidfd case.
++                    #[cfg(target_env = "ohos")]
++                    if ohos_ppid > 1 {
++                        let parent_dead = if ohos_ppid_fd.fd() != Fd::INVALID {
++                            poll_fds_buf[ohos_pidfd_idx].revents != 0
++                        } else {
++                            false
++                        };
++                        if parent_dead || getppid() != ohos_ppid {
++                            ParentDeathWatchdog::kill_sync_script_tree();
++                            Global::exit(ParentDeathWatchdog::EXIT_CODE as u32);
++                        }
++                    }
+                 }
+                 reap_child(process.pid)
+             };
