@@ -17,7 +17,7 @@ class BunAT14 < Formula
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
   # OHOS patch audit fixes require rebuilding the same upstream version.
-  revision 10
+  revision 11
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
