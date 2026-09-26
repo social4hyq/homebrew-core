@@ -4,6 +4,7 @@ class ClaudeCode < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.274.tgz"
   sha256 "dd66731ab73827cf56c8b7ddca6d2693667759d6a0cff0ba222d07e7b9a9b321"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
+  revision 1
   # Stable release channel. Anthropic License forbids redistributing the
   # official artifacts, so this is a runtime-fetch stub: install() ships only a
   # wrapper plus an extractor that runs the CLI bundle on this tap's bun. The
@@ -22,9 +23,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.274-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "80f205fc5d0c0c62f05bd3ab24677c9196c6e8635802639d5af9998d31a01b9f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.274-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f40dcc962415f3ff590b43db9ac6e621bc48b3c3ed79025f304b2d5a6f50069"
   end
 
   depends_on "bun"
@@ -49,6 +49,8 @@ class ClaudeCode < Formula
     # embedded virtual filesystem, so those are rewritten to relative paths.
     # Pure data processing — nothing fetched is ever executed.
     (libexec/"extract-cli.mjs").write <<~JS
+      import { resolve } from "path";
+
       const [binPath, outDir] = Bun.argv.slice(2);
       if (!binPath || !outDir) {
         console.error("usage: bun extract-cli.mjs <compiled-binary> <out-dir>");
@@ -113,7 +115,9 @@ class ClaudeCode < Formula
         if (name.len === 0 || name.off >= bunSize) break;
         const nm = cstr(name.off, name.len);
         if (!nm.startsWith("/$bunfs/root/")) break;
-        files.push({ name: nm.slice("/$bunfs/root/".length), contents });
+        const rel = nm.slice("/$bunfs/root/".length);
+        if (rel === "" || rel.startsWith("/") || rel.split("/").includes("..")) die(`unsafe module path: ${nm}`);
+        files.push({ name: rel, contents });
       }
       console.error(`claude-code: module graph has ${files.length} files`);
 
@@ -121,13 +125,8 @@ class ClaudeCode < Formula
       const entry = files.find((f) => f.name === "cli");
       if (!entry || entry.contents.len === 0) die("entry point 'cli' not found in module graph");
 
+      // Text contents are Latin1-encoded; decode and write back out as UTF-8.
       const latin1 = new TextDecoder("latin1");
-      function emit(f, outPath) {
-        // contents are Latin1-encoded; decode and write back out as UTF-8
-        const src = latin1.decode(buf.subarray(BASE + f.contents.off, BASE + f.contents.off + f.contents.len));
-        Bun.write(outPath, src);
-        return src;
-      }
       function isTextAsset(base) {
         return base.endsWith(".js") || base.endsWith(".md") || base.endsWith(".txt");
       }
@@ -157,41 +156,44 @@ class ClaudeCode < Formula
         return hasMagic(f, ZSTD_MAGIC) || hasMagic(f, ELF_MAGIC);
       }
 
-      // Extract every module-graph file next to the entry. Non-.js files keep
-      // their basename; .js chunks land beside the entry so its relative
-      // imports resolve. Bytecode-only records carry no JS payload.
-      for (const f of files) {
-        if (f.contents.len === 0) continue;
-        const base = f.name.split("/").pop();
-        if (f === entry || isTextAsset(base)) {
-          emit(f, `${outDir}/${base}`);
-        } else if (isBinaryAsset(f)) {
-          await Bun.write(`${outDir}/${base}`, buf.subarray(BASE + f.contents.off, BASE + f.contents.off + f.contents.len));
-        }
-      }
+      // Built-in plugins pick their hooks module by Bun.isStandaloneExecutable:
+      // the build-carried bundle when compiled, else a source-tree folder an
+      // extracted graph does not have (so AGENTS.md support silently never
+      // loads). Pin only that selector to the compiled branch; every other
+      // consumer (self-respawn argv, embedded ripgrep, updater) must still see
+      // plain bun.
+      const BUILTIN_HOOKS_SELECTOR =
+        /=\\(([\\w$]+),([\\w$]+),([\\w$]+)\\)=>[\\w$]+\\(\\)\\?([\\w$]+)\\(\\2,\\3\\(\\),\\1\\):\\{module:\\2,folder:\\1\\}/g;
 
-      // The graph was built for bun's embedded virtual filesystem
-      // ("/$bunfs/root/…"). Rewrite every such specifier to a relative one so
-      // plain-bun execution resolves it against the extracted files on disk.
-      // Binary assets (zstd-compressed, native .node addons) are skipped
-      // here: they're already written correctly above, and being binary
-      // can't contain a bunfs specifier to rewrite.
-      let rewritten = 0;
+      // Files keep their full graph path (the hooks worker lives under src/),
+      // and "/$bunfs/root/" becomes the absolute extraction root: identical to
+      // "./" for flat chunk imports, but also right for new URL()/fs uses,
+      // which "./" would resolve against the user's working directory.
+      // Bytecode-only records carry no JS payload.
+      const root = `${resolve(outDir)}/`;
+      let rewritten = 0, selectorPatched = 0;
       for (const f of files) {
         if (f.contents.len === 0) continue;
-        const base = f.name.split("/").pop();
-        const isEntry = f === entry;
-        if (!isEntry && !isTextAsset(base)) continue;
-        const outPath = `${outDir}/${base}`;
-        const src = latin1.decode(buf.subarray(BASE + f.contents.off, BASE + f.contents.off + f.contents.len));
-        if (src.includes("/$bunfs/root/")) {
-          await Bun.write(outPath, src.replaceAll("/$bunfs/root/", "./"));
-          rewritten++;
-        } else if (!isEntry) {
-          await Bun.write(outPath, src); // re-emit as UTF-8
+        const outPath = `${outDir}/${f.name}`;
+        const bytes = buf.subarray(BASE + f.contents.off, BASE + f.contents.off + f.contents.len);
+        if (f === entry || isTextAsset(f.name)) {
+          let src = latin1.decode(bytes);
+          if (src.includes("/$bunfs/root/")) {
+            src = src.replaceAll("/$bunfs/root/", root);
+            rewritten++;
+          }
+          src = src.replace(BUILTIN_HOOKS_SELECTOR, (_, a, b, c, kt) => {
+            selectorPatched++;
+            return `=(${a},${b},${c})=>${kt}(${b},${c}(),${a})`;
+          });
+          await Bun.write(outPath, src);
+        } else if (isBinaryAsset(f)) {
+          await Bun.write(outPath, bytes);
         }
       }
       console.error(`claude-code: extracted ${files.length} files (rewrote ${rewritten} bunfs specifiers)`);
+      if (selectorPatched !== 1)
+        console.error(`claude-code: built-in hooks selector matched ${selectorPatched} times (expected 1)`);
 
       function die(msg) {
         console.error(`extract-cli: ${msg}`);
@@ -274,7 +276,10 @@ class ClaudeCode < Formula
       fi
 
       # Default: extract the CLI module graph (entry + chunks) and run it on this
-      # tap's bun; the official binary itself is never executed.
+      # tap's bun; the official binary itself is never executed. The suffix is
+      # the extractor's output-layout generation: bump it when that changes, so
+      # a stale extraction is never reused nor rewritten under a live session.
+      CACHE="$CACHE.2"
       CLI="$CACHE/cli"
       if [ ! -f "$CLI" ]; then
         rm -rf "$CACHE"
@@ -303,5 +308,7 @@ class ClaudeCode < Formula
     tui = shell_output("timeout 10 script -q -c '#{bin}/claude' /dev/null 2>&1; true")
     refute_includes tui, "Uncaught exception",
                     "claude's TUI crash-looped at startup (this release may need claude-code.latest)"
+    refute_includes tui, "hooks module did not load",
+                    "a built-in plugin's hooks module did not load from the extracted bundle"
   end
 end
