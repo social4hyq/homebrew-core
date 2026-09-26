@@ -1,5 +1,5 @@
 diff --git a/src/install/lib.rs b/src/install/lib.rs
-index 314523ca5e..969e2553b7 100644
+index 314523ca5e..efccc7252e 100644
 --- a/src/install/lib.rs
 +++ b/src/install/lib.rs
 @@ -418,6 +418,10 @@ impl RunCommand {
@@ -13,17 +13,3 @@ index 314523ca5e..969e2553b7 100644
          } else {
              "/tmp"
          };
-@@ -590,7 +594,12 @@ impl RunCommand {
-             // already exists, refuse to use it unless it's a directory we own
-             // with no group/other write bits.
-             match bun_sys::mkdir(DIR_Z, 0o700) {
--                Ok(()) => {}
-+                Ok(()) => {
-+                    #[cfg(target_env = "ohos")]
-+                    {
-+                        let _ = bun_sys::chmod(DIR_Z, 0o700);
-+                    }
-+                }
-                 Err(e) if e.get_errno() == bun_sys::E::EEXIST => match bun_sys::lstat(DIR_Z) {
-                     Ok(st)
-                         if bun_sys::kind_from_mode(st.st_mode as bun_sys::Mode)
