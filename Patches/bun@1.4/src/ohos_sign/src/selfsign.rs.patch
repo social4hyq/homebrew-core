@@ -1,9 +1,12 @@
 diff --git a/src/ohos_sign/src/selfsign.rs b/src/ohos_sign/src/selfsign.rs
 new file mode 100644
-index 0000000000..5465e2458d
+index 0000000000..bd058fd0fa
 --- /dev/null
 +++ b/src/ohos_sign/src/selfsign.rs
-@@ -0,0 +1,541 @@
+@@ -0,0 +1,682 @@
++// Vendored verbatim (only the 6 pub(crate) markers below added; `fn main()` dropped —
++// this crate is a library, not the standalone `ohos-selfsign` CLI) from:
++//   https://github.com/hqzing/ohos-selfsign @ eee7eaf7ce18d6f5a543ac023df1d8b2a4a186a1
 +// Copyright (C) 2026 hqzing
 +// SPDX-License-Identifier: 0BSD
 +// Repository: https://github.com/hqzing/ohos-selfsign
@@ -15,16 +18,18 @@ index 0000000000..5465e2458d
 + *
 + * 用法:
 + *     rustc -O selfsign.rs -o selfsign
-+ *     ./selfsign <input_elf> [output_elf] [--force] [--strip]
++ *     ./selfsign <input_elf> [output_elf] [--force] [--strip] [--check]
 + *         缺省 output 时, inplace 改写 input.
 + *         --force : 若已含 .codesign 段, 先剥离再重签
 + *         --strip : 仅剥离 .codesign 段, 不做签名
++ *         --check : 只读校验已有自签名的有效性, 不写任何文件
 + */
 +
++use std::fs;
 +
 +const DESC_SIZE: usize = 256;
 +const PAGE_SIZE: usize = 4096;
-+pub const FLAG_SELF_SIGN: u32 = 0x10;
++pub(crate) const FLAG_SELF_SIGN: u32 = 0x10;
 +const FS_VERITY_DESCRIPTOR_TYPE: u32 = 1;
 +const HASH_OUT: usize = 32; // SHA-256 输出字节数
 +
@@ -172,7 +177,7 @@ index 0000000000..5465e2458d
 +    }
 +}
 +
-+pub fn sha256(data: &[u8]) -> [u8; 32] {
++fn sha256(data: &[u8]) -> [u8; 32] {
 +    let mut c = Sha256::new();
 +    c.update(data);
 +    c.finalize()
@@ -215,7 +220,9 @@ index 0000000000..5465e2458d
 +}
 +
 +/* ─────────────────── ELF 预清洗/标准化 (非签名必需) ─────────────────── */
-+fn parse_elf_header(elf: &[u8]) -> Result<(u64, u16, u16), String> {
++// ELF64 允许段表条目大于 64 字节 (携带扩展字段), 故只拒绝 e_shentsize < 64;
++// 实际条目大小随返回值传出, 后续所有 SHT 遍历/越界校验均按它步进.
++fn parse_elf_header(elf: &[u8]) -> Result<(u64, u16, u16, u16), String> {
 +    if elf.len() < 64 || &elf[0..4] != b"\x7fELF" || elf[4] != 2 {
 +        return Err("not ELF64".to_string());
 +    }
@@ -223,31 +230,34 @@ index 0000000000..5465e2458d
 +    let e_shentsize = read_u16(elf, E_SHENTSIZE);
 +    let e_shnum = read_u16(elf, E_SHNUM);
 +    let e_shstrndx = read_u16(elf, E_SHSTRNDX);
-+    if e_shentsize != 64 || e_shoff == 0 || e_shnum == 0 || e_shstrndx >= e_shnum {
++    if e_shentsize < 64 || e_shoff == 0 || e_shnum == 0 || e_shstrndx >= e_shnum {
 +        return Err("ELF has no usable section header table".to_string());
 +    }
-+    if e_shoff > elf.len() as u64 || (e_shnum as u64) > (elf.len() as u64 - e_shoff) / 64 {
++    if e_shoff > elf.len() as u64
++        || (e_shnum as u64) > (elf.len() as u64 - e_shoff) / (e_shentsize as u64)
++    {
 +        return Err("section header table out of bounds".to_string());
 +    }
-+    Ok((e_shoff, e_shnum, e_shstrndx))
++    Ok((e_shoff, e_shentsize, e_shnum, e_shstrndx))
 +}
 +
 +fn find_section_by_name(
 +    elf: &[u8],
 +    e_shoff: u64,
++    e_shentsize: u16,
 +    e_shnum: u16,
 +    e_shstrndx: u16,
 +    name: &[u8],
 +) -> i64 {
 +    let name_len = name.len();
-+    let shstr_e = e_shoff + (e_shstrndx as u64) * 64;
++    let shstr_e = e_shoff + (e_shstrndx as u64) * (e_shentsize as u64);
 +    let shstr_off = read_u64(elf, shstr_e as usize + 24);
 +    let shstr_sz = read_u64(elf, shstr_e as usize + 32);
 +    if shstr_off > elf.len() as u64 || shstr_sz > elf.len() as u64 - shstr_off {
 +        return -1;
 +    }
 +    for i in 0..e_shnum {
-+        let e = e_shoff + (i as u64) * 64;
++        let e = e_shoff + (i as u64) * (e_shentsize as u64);
 +        let name_off = read_u32(elf, e as usize);
 +        if (name_off as u64) + (name_len as u64) <= shstr_sz {
 +            let start = (shstr_off + name_off as u64) as usize;
@@ -259,10 +269,10 @@ index 0000000000..5465e2458d
 +    -1
 +}
 +
-+pub fn has_codesign_section(elf: &[u8]) -> bool {
++pub(crate) fn has_codesign_section(elf: &[u8]) -> bool {
 +    match parse_elf_header(elf) {
-+        Ok((e_shoff, e_shnum, e_shstrndx)) => {
-+            find_section_by_name(elf, e_shoff, e_shnum, e_shstrndx, CODESIGN_NAME) >= 0
++        Ok((e_shoff, e_shentsize, e_shnum, e_shstrndx)) => {
++            find_section_by_name(elf, e_shoff, e_shentsize, e_shnum, e_shstrndx, CODESIGN_NAME) >= 0
 +        }
 +        Err(_) => false,
 +    }
@@ -276,17 +286,19 @@ index 0000000000..5465e2458d
 +    }
 +}
 +
-+pub fn strip_codesign(buf: &[u8]) -> Result<(bool, Vec<u8>), String> {
++pub(crate) fn strip_codesign(buf: &[u8]) -> Result<(bool, Vec<u8>), String> {
 +    let elf = buf.to_vec();
-+    let (e_shoff, e_shnum, e_shstrndx) = parse_elf_header(&elf)?;
++    let (e_shoff, e_shentsize, e_shnum, e_shstrndx) = parse_elf_header(&elf)?;
 +
-+    let cs_entry_off = find_section_by_name(&elf, e_shoff, e_shnum, e_shstrndx, CODESIGN_NAME);
++    let cs_entry_off =
++        find_section_by_name(&elf, e_shoff, e_shentsize, e_shnum, e_shstrndx, CODESIGN_NAME);
 +    if cs_entry_off < 0 {
 +        return Ok((false, elf));
 +    }
-+    let cs_idx = ((cs_entry_off as u64 - e_shoff) / 64) as usize;
++    let shentsize = e_shentsize as usize;
++    let cs_idx = ((cs_entry_off as u64 - e_shoff) / (e_shentsize as u64)) as usize;
 +
-+    let shstr_e = e_shoff + (e_shstrndx as u64) * 64;
++    let shstr_e = e_shoff + (e_shstrndx as u64) * (e_shentsize as u64);
 +    let shstr_off = read_u64(&elf, shstr_e as usize + 24);
 +    let shstr_sz = read_u64(&elf, shstr_e as usize + 32);
 +    if shstr_off > elf.len() as u64 || shstr_sz > elf.len() as u64 - shstr_off {
@@ -304,15 +316,15 @@ index 0000000000..5465e2458d
 +        new_shstr_sz = new_shstr.len();
 +    }
 +
-+    // 3. 新 SHT = 旧 SHT 去掉 cs_idx 条目
++    // 3. 新 SHT = 旧 SHT 去掉 cs_idx 条目 (条目不压缩, 按原 e_shentsize 保留)
 +    let new_shnum = e_shnum - 1;
-+    let mut new_sht = Vec::with_capacity(new_shnum as usize * 64);
++    let mut new_sht = Vec::with_capacity(new_shnum as usize * shentsize);
 +    for i in 0..e_shnum {
 +        if i as usize == cs_idx {
 +            continue;
 +        }
-+        let e = e_shoff as usize + i as usize * 64;
-+        new_sht.extend_from_slice(&elf[e..e + 64]);
++        let e = e_shoff as usize + i as usize * shentsize;
++        new_sht.extend_from_slice(&elf[e..e + shentsize]);
 +    }
 +
 +    // 4. 截断到 .codesign 段文件偏移, 依次追加 新shstrtab / 8B对齐 新SHT
@@ -320,15 +332,15 @@ index 0000000000..5465e2458d
 +    let keep_len = (cs_sec_off as usize).min(elf.len());
 +    let new_shstr_off = keep_len;
 +    let new_sht_off = align_up((new_shstr_off + new_shstr_sz) as u64, 8) as usize;
-+    let new_total = new_sht_off + new_shnum as usize * 64;
++    let new_total = new_sht_off + new_shnum as usize * shentsize;
 +
 +    let mut out = vec![0u8; new_total];
 +    out[0..keep_len].copy_from_slice(&elf[0..keep_len]);
 +    out[new_shstr_off..new_shstr_off + new_shstr_sz].copy_from_slice(&new_shstr);
-+    out[new_sht_off..new_sht_off + new_shnum as usize * 64].copy_from_slice(&new_sht);
++    out[new_sht_off..new_sht_off + new_shnum as usize * shentsize].copy_from_slice(&new_sht);
 +
 +    // 5. 重写 shstrtab 条目
-+    let shstr_entry_off_in_new = new_shstrndx(e_shstrndx, cs_idx) as usize * 64;
++    let shstr_entry_off_in_new = new_shstrndx(e_shstrndx, cs_idx) as usize * shentsize;
 +    write_u64(
 +        &mut out,
 +        new_sht_off + shstr_entry_off_in_new + 24,
@@ -342,7 +354,7 @@ index 0000000000..5465e2458d
 +
 +    // 6. 所有 sh_name > cs_name_off 的段名偏移整体前移 cs_name_len
 +    for i in 0..new_shnum as usize {
-+        let e = new_sht_off + i * 64;
++        let e = new_sht_off + i * shentsize;
 +        let noff = read_u32(&out, e);
 +        if noff > cs_name_off {
 +            write_u32(&mut out, e, noff - cs_name_len as u32);
@@ -361,19 +373,21 @@ index 0000000000..5465e2458d
 +
 +/* ─────────────────── 签名必需的算法核心 ─────────────────── */
 +fn inject_codesign_section(elf: &[u8]) -> Result<(Vec<u8>, usize), String> {
-+    let (e_shoff, e_shnum, e_shstrndx) = parse_elf_header(elf)?;
++    let (e_shoff, e_shentsize, e_shnum, e_shstrndx) = parse_elf_header(elf)?;
 +
-+    let shstr_e = e_shoff + (e_shstrndx as u64) * 64;
++    let shstr_e = e_shoff + (e_shstrndx as u64) * (e_shentsize as u64);
 +    let shstr_off = read_u64(elf, shstr_e as usize + 24);
 +    let shstr_sz = read_u64(elf, shstr_e as usize + 32);
 +    if shstr_off > elf.len() as u64 || shstr_sz > elf.len() as u64 - shstr_off {
 +        return Err("shstrtab out of bounds".to_string());
 +    }
++    let shentsize = e_shentsize as usize;
 +
-+    // 1. cur_end: SHT 末尾与各段 off+sz 的最大值 (SHT_NOBITS=8 不占文件)
-+    let mut cur_end = e_shoff + (e_shnum as u64) * 64;
++    // 1. cur_end: SHT 末尾与各段 off+sz 的最大值 (SHT_NOBITS=8 不占文件),
++    // 且不小于文件实际长度 (段表之后可能拖着附加数据)
++    let mut cur_end = e_shoff + (e_shnum as u64) * (e_shentsize as u64);
 +    for i in 0..e_shnum {
-+        let e = e_shoff + (i as u64) * 64;
++        let e = e_shoff + (i as u64) * (e_shentsize as u64);
 +        let sh_type = read_u32(elf, e as usize + 4);
 +        let off = read_u64(elf, e as usize + 24);
 +        let sz = if sh_type == 8 {
@@ -384,6 +398,9 @@ index 0000000000..5465e2458d
 +        if off + sz > cur_end {
 +            cur_end = off + sz;
 +        }
++    }
++    if elf.len() as u64 > cur_end {
++        cur_end = elf.len() as u64;
 +    }
 +    let cs_off = align_up(cur_end, PAGE_SIZE as u64) as usize;
 +
@@ -398,7 +415,7 @@ index 0000000000..5465e2458d
 +    let new_shstr_off = cs_off + PAGE_SIZE;
 +    let new_sht_off = align_up((new_shstr_off + new_shstr_sz) as u64, 8) as usize;
 +    let new_shnum = e_shnum + 1;
-+    let new_total = new_sht_off + new_shnum as usize * 64;
++    let new_total = new_sht_off + new_shnum as usize * shentsize;
 +
 +    let mut buf = vec![0u8; new_total];
 +    // 4. 拷贝原内容: 只拷到 cs_off
@@ -407,11 +424,11 @@ index 0000000000..5465e2458d
 +
 +    buf[new_shstr_off..new_shstr_off + new_shstr_sz].copy_from_slice(&new_shstr);
 +    let sht_start = e_shoff as usize;
-+    buf[new_sht_off..new_sht_off + e_shnum as usize * 64]
-+        .copy_from_slice(&elf[sht_start..sht_start + e_shnum as usize * 64]);
++    buf[new_sht_off..new_sht_off + e_shnum as usize * shentsize]
++        .copy_from_slice(&elf[sht_start..sht_start + e_shnum as usize * shentsize]);
 +
-+    // .codesign 段条目 (64B)
-+    let cs_e = new_sht_off + e_shnum as usize * 64;
++    // .codesign 段条目 (前 64B 为标准字段, 超出 64B 的扩展部分保持 0)
++    let cs_e = new_sht_off + e_shnum as usize * shentsize;
 +    write_u32(&mut buf, cs_e, cs_shname); // sh_name
 +    write_u32(&mut buf, cs_e + 4, 1); // sh_type = SHT_PROGBITS
 +    write_u64(&mut buf, cs_e + 24, cs_off as u64); // sh_offset
@@ -419,7 +436,7 @@ index 0000000000..5465e2458d
 +    write_u64(&mut buf, cs_e + 48, PAGE_SIZE as u64); // sh_addralign
 +
 +    // 更新 shstrtab 条目偏移/大小
-+    let shstr_e_new = new_sht_off + e_shstrndx as usize * 64;
++    let shstr_e_new = new_sht_off + e_shstrndx as usize * shentsize;
 +    write_u64(&mut buf, shstr_e_new + 24, new_shstr_off as u64);
 +    write_u64(&mut buf, shstr_e_new + 32, new_shstr_sz as u64);
 +
@@ -430,9 +447,13 @@ index 0000000000..5465e2458d
 +    Ok((buf, cs_off))
 +}
 +
-+pub fn merkle_root_hash(data: &[u8], cs_off: usize, cs_len: usize) -> [u8; 32] {
++// merkle_root_hash — fs-verity Merkle 树根哈希 + 中间层哈希.
++// 返回 (根哈希, 中间层); 中间层 = 叶层与根所在层之间的所有层, 从低往高
++// 逐层把 32B 哈希按顺序拼接 (叶层 <= 4096B 时不存在中间层), 签名时写入
++// .codesign 段内 payload 之后.
++fn merkle_root_hash(data: &[u8], cs_off: usize, cs_len: usize) -> ([u8; 32], Vec<u8>) {
 +    if data.is_empty() {
-+        return sha256(&[0u8; PAGE_SIZE]);
++        return (sha256(&[0u8; PAGE_SIZE]), Vec::new());
 +    }
 +
 +    let npages = data.len().div_ceil(PAGE_SIZE);
@@ -459,17 +480,13 @@ index 0000000000..5465e2458d
 +    if npages == 1 {
 +        let mut root = [0u8; 32];
 +        root.copy_from_slice(&hashes[0..HASH_OUT]);
-+        return root;
++        return (root, Vec::new());
 +    }
 +
 +    let mut cur = hashes;
-+    loop {
++    let mut mid = Vec::new(); // 中间层暂存: 低于根所在层的各层, 从低往高拼接
++    while cur.len() > PAGE_SIZE {
 +        let packed = cur.len();
-+        if packed <= PAGE_SIZE {
-+            let mut page = vec![0u8; PAGE_SIZE];
-+            page[0..packed].copy_from_slice(&cur);
-+            return sha256(&page);
-+        }
 +        let next_pages = packed.div_ceil(PAGE_SIZE);
 +        let mut next = Vec::with_capacity(next_pages * HASH_OUT);
 +        for i in 0..next_pages {
@@ -483,11 +500,17 @@ index 0000000000..5465e2458d
 +            page[0..n].copy_from_slice(&cur[off..off + n]);
 +            next.extend_from_slice(&sha256(&page));
 +        }
++        if next.len() > PAGE_SIZE {
++            mid.extend_from_slice(&next); // 根所在层 (packed <= 4096) 不属于中间层
++        }
 +        cur = next;
 +    }
++    let mut page = vec![0u8; PAGE_SIZE];
++    page[0..cur.len()].copy_from_slice(&cur);
++    (sha256(&page), mid)
 +}
 +
-+pub fn build_descriptor(
++fn build_descriptor(
 +    sign_size: u32,
 +    file_size: u64,
 +    root: &[u8; 32],
@@ -506,7 +529,7 @@ index 0000000000..5465e2458d
 +    d
 +}
 +
-+pub fn sign_elf(elf: &[u8], force: bool) -> Result<Vec<u8>, String> {
++pub(crate) fn sign_elf(elf: &[u8], force: bool) -> Result<Vec<u8>, String> {
 +    if elf.len() < 64 || &elf[0..4] != b"\x7fELF" || elf[4] != 2 {
 +        return Err("not ELF64".to_string());
 +    }
@@ -523,8 +546,8 @@ index 0000000000..5465e2458d
 +    let (tmp0, cs_off) = inject_codesign_section(&buf)?;
 +    let file_size = tmp0.len() as u64;
 +
-+    // 2. merkle 根哈希
-+    let root = merkle_root_hash(&tmp0, cs_off, PAGE_SIZE);
++    // 2. merkle 根哈希; mid 为中间层哈希
++    let (root, mid) = merkle_root_hash(&tmp0, cs_off, PAGE_SIZE);
 +
 +    // 3/4. descriptor(signSize=0) 用于摘要
 +    let desc_for_digest = build_descriptor(0, file_size, &root, FLAG_SELF_SIGN);
@@ -540,8 +563,126 @@ index 0000000000..5465e2458d
 +    payload[8..8 + DESC_SIZE].copy_from_slice(&desc_on_disk);
 +    payload[8 + DESC_SIZE..8 + DESC_SIZE + HASH_OUT].copy_from_slice(&signature);
 +
-+    // 8. 原地写入段内
++    // 8. 原地写入段内: payload 之后紧跟中间层哈希, 可用容量
++    // 4096-296=3800B, 中间层更长时保留靠叶层一侧的前 3800B
 +    let mut tmp = tmp0;
 +    tmp[cs_off..cs_off + payload.len()].copy_from_slice(&payload);
++    let tail = mid.len().min(PAGE_SIZE - payload.len());
++    tmp[cs_off + payload.len()..cs_off + payload.len() + tail].copy_from_slice(&mid[..tail]);
 +    Ok(tmp)
 +}
++
++/* ─────────────────── 只读校验 (--check) ─────────────────── */
++
++// check_selfsign — 只读校验已有自签名的有效性 (--check 的实现).
++//
++// 校验项 (全部通过才算有效; 多项不符时按序报告第一个):
++//   1. 可解析的 ELF64 (走 parse_elf_header 的全部检查), 存在 .codesign 段,
++//      且段内 ElfSignInfo 头 type=1 / length=288
++//   2. descriptor 固定字段: version=1, hashAlgorithm=1, log2BlockSize=12,
++//      csVersion=3
++//   3. signSize=32 且 fileSize=文件实际大小
++//   4. 存储的 merkle 根哈希 == 对整个文件重算的根
++//   5. 存储的 signature == SHA256(signSize 置 0 后的 descriptor)
++//
++// 明确不校验 merkle 中间层 (payload 296B 之后的区域): .codesign 段覆盖
++// 的页在 merkle 叶层本来就置 0, 篡改中间层不影响根, 此类篡改下本校验
++// 仍通过 (预期行为).
++//
++// 返回 Ok(()) = 有效; Err(reason) = 无效, reason 为原因串 (文案五个实现统一).
++pub(crate) fn check_selfsign(elf: &[u8]) -> Result<(), &'static str> {
++    // 1a. ELF64 预检 (parse 失败含段表不可用)
++    let (e_shoff, e_shentsize, e_shnum, e_shstrndx) =
++        parse_elf_header(elf).map_err(|_| "not ELF64")?;
++
++    // 1b. 定位 .codesign 段, 段内至少要容得下 296B payload
++    let cs_entry_off =
++        find_section_by_name(elf, e_shoff, e_shentsize, e_shnum, e_shstrndx, CODESIGN_NAME);
++    if cs_entry_off < 0 {
++        return Err("no .codesign section");
++    }
++    let cs_off = read_u64(elf, cs_entry_off as usize + 24);
++    let cs_size = read_u64(elf, cs_entry_off as usize + 32);
++    let payload_len = 8 + DESC_SIZE + HASH_OUT;
++    if cs_size < payload_len as u64
++        || cs_off > elf.len() as u64
++        || (payload_len as u64) > elf.len() as u64 - cs_off
++    {
++        return Err("bad ElfSignInfo header");
++    }
++    let cs_off = cs_off as usize;
++
++    // 1c. ElfSignInfo 头: type=1, length=288
++    if read_u32(elf, cs_off) != FS_VERITY_DESCRIPTOR_TYPE
++        || read_u32(elf, cs_off + 4) != (DESC_SIZE + HASH_OUT) as u32
++    {
++        return Err("bad ElfSignInfo header");
++    }
++
++    let desc = &elf[cs_off + 8..cs_off + 8 + DESC_SIZE];
++    let sig = &elf[cs_off + 8 + DESC_SIZE..cs_off + payload_len];
++
++    // 2. descriptor 固定字段: version/hashAlgorithm/log2BlockSize/csVersion
++    if desc[0] != 1 || desc[1] != 1 || desc[2] != 12 || desc[255] != 3 {
++        return Err("unsupported descriptor fields");
++    }
++
++    // 3. signSize=32 且 fileSize=文件实际大小
++    if read_u32(desc, 4) != HASH_OUT as u32 {
++        return Err("signSize mismatch");
++    }
++    if read_u64(desc, 8) != elf.len() as u64 {
++        return Err("fileSize mismatch");
++    }
++
++    // 4. merkle 根哈希: 重算整个文件的根 (中间层忽略)
++    let (root, _mid) = merkle_root_hash(elf, cs_off, PAGE_SIZE);
++    if desc[16..16 + HASH_OUT] != root {
++        return Err("merkle root mismatch");
++    }
++
++    // 5. signature == SHA256(signSize 置 0 后的 descriptor)
++    let mut desc0 = [0u8; DESC_SIZE];
++    desc0.copy_from_slice(desc);
++    for b in &mut desc0[4..8] {
++        *b = 0;
++    }
++    if sig != sha256(&desc0) {
++        return Err("signature mismatch");
++    }
++
++    Ok(())
++}
++
++/* ─────────────────── 文件 I/O 层 ─────────────────── */
++pub(crate) fn sign_file_atomic(path: &str, force: bool) -> Result<(), String> {
++    let raw = fs::read(path).map_err(|e| e.to_string())?;
++    let signed = sign_elf(&raw, force)?;
++
++    let mode = fs::metadata(path)
++        .map(|m| {
++            #[cfg(unix)]
++            {
++                use std::os::unix::fs::PermissionsExt;
++                Some(m.permissions().mode() & 0o7777)
++            }
++            #[cfg(not(unix))]
++            {
++                let _ = m;
++                None
++            }
++        })
++        .unwrap_or(None);
++
++    let tmp_path = format!("{}.ohos-signing.{}.tmp", path, std::process::id());
++    let _ = fs::remove_file(&tmp_path);
++    fs::write(&tmp_path, &signed).map_err(|e| e.to_string())?;
++    #[cfg(unix)]
++    if let Some(m) = mode {
++        use std::os::unix::fs::PermissionsExt;
++        let _ = fs::set_permissions(&tmp_path, fs::Permissions::from_mode(m));
++    }
++    fs::rename(&tmp_path, path).map_err(|e| e.to_string())?;
++    Ok(())
++}
++

@@ -17,7 +17,7 @@ class BunAT14 < Formula
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
   # OHOS patch audit fixes require rebuilding the same upstream version.
-  revision 9
+  revision 10
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
@@ -46,6 +46,7 @@ class BunAT14 < Formula
   depends_on "ruby" => :build
   depends_on "rustup" => :build
   depends_on "zlib-ng-compat" => :build
+  depends_on "ohos-selfsign" => :test
 
   fails_with :gcc do
     cause "uses clang-specific flags"
@@ -247,5 +248,9 @@ class BunAT14 < Formula
     store_copies.each do |copy|
       assert_includes File.binread(copy), ".codesign"
     end
+
+    # Cross-validate: bun's embedded signer (vendored from hqzing/ohos-selfsign)
+    # must produce a signature the independently-installed official tool accepts.
+    system formula_opt_bin("ohos-selfsign")/"selfsign", "--check", installed
   end
 end
