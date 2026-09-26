@@ -28,7 +28,7 @@ class Bun < Formula
   # bun@1.4.rb revision 9 (commit 37ef7e730), which had the fix but was
   # never carried over to this formula's Patches/bun/. Same upstream tag,
   # new patch content.
-  revision 13
+  revision 14
 
   livecheck do
     url :stable
@@ -41,6 +41,7 @@ class Bun < Formula
   end
 
   depends_on "cmake" => :build
+  depends_on "gcc" => :build
   depends_on "gperf" => :build
   depends_on "icu4c@78" => :build
   depends_on "lld@21" => :build
@@ -196,16 +197,12 @@ class Bun < Formula
     sha256 "2be85b655b99624bed0fb63a47e564abac07aa1fb5d0576abac5c42ef8c5316e"
   end
 
-  # L3 bootstrap: prebuilt OHOS bun used only to run the build scripts.
-  # Same pinned artifact the bun-bootstrap formula carried; inlined as a
-  # resource so the formula does not depend on a separate bootstrap
-  # formula. The official upstream linux binaries cannot run on OHOS
-  # (glibc build vs musl; the -musl build needs GNU libstdc++), so the
-  # bootstrap has to be an OHOS-targeted build.
+  # L3 bootstrap: upstream musl Bun used only to run the build scripts.
+  # The OHOS userspace provides musl-compatible libc; the GNU C++ runtime is
+  # supplied by the gcc build dependency above.
   resource "bootstrap" do
-    url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-bootstrap-v1.4.0-5467a689/bun-ohos-aarch64-1.4.0-5467a689.tar.gz"
-    version "1.4.0"
-    sha256 "7c1f187907eba7090c60e14dc1bc474fd62ec5b6273cc44c571cf18d35305a2b"
+    url "https://github.com/oven-sh/bun/releases/download/bun-v1.3.14/bun-linux-aarch64-musl.zip"
+    sha256 "b98e0ad3625c5c00d1d5b5ff55605c7adddbfae151861e68ade57b2d3b8703bb"
   end
 
   def fetch_webkit
@@ -250,15 +247,16 @@ class Bun < Formula
     ENV["BUN_TOOLCHAIN_RUST"] = rust_home
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3")
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
+    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
     ENV["SSL_CERT_FILE"] = ENV["CURL_CA_BUNDLE"] = HOMEBREW_PREFIX/"etc/ca-certificates/cert.pem"
     ENV.prepend_path "PATH", rust_home/"bin"
     ENV.prepend_path "PATH", llvm.opt_bin
     ENV.prepend_path "PATH", formula_opt_bin("lld@21")
     # L3 bootstrap bun (from the "bootstrap" resource): runs the build
-    # scripts. The tarball root carries the pre-signed binary.
+    # scripts. The resource is an upstream Linux/musl archive.
     (buildpath/"bootstrap").mkpath
     resource("bootstrap").stage do
-      (buildpath/"bootstrap").install Dir["*"]
+      (buildpath/"bootstrap").install "bun"
     end
     ENV.prepend_path "PATH", buildpath/"bootstrap"
 
