@@ -28,7 +28,7 @@ class Bun < Formula
   # bun@1.4.rb revision 9 (commit 37ef7e730), which had the fix but was
   # never carried over to this formula's Patches/bun/. Same upstream tag,
   # new patch content.
-  revision 13
+  revision 14
 
   livecheck do
     url :stable
