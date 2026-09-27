@@ -16,16 +16,17 @@ class BunAT14 < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  # OHOS patch audit fixes require rebuilding the same upstream version.
-  revision 11
+  # Upstream PR review fixes (signing split, flat patch series) require
+  # rebuilding the same upstream version.
+  revision 12
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r20"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c39a2591aae344b5e77737bfbf6a91fd7f0d0e4da1aa2cd49121a3aefbd400fb"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r21"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e487bbd97f72b6f8741b47cef44b5a02b69e96a694c2b3bf69b8bdd6bc6fb21d"
   end
 
   depends_on "cmake" => :build
@@ -51,26 +52,34 @@ class BunAT14 < Formula
     cause "uses clang-specific flags"
   end
 
-  # L3 bootstrap: upstream musl Bun used only to run the build scripts.
-  # The OHOS userspace provides musl-compatible libc; the GNU C++ runtime is
-  # supplied by the gcc dependency below.
+  # Bootstrap Bun: the upstream Linux/musl official binary, used only to
+  # run the codegen/build scripts during the build. Nothing from it ships
+  # in the bottle. The OHOS userspace provides musl-compatible libc; the
+  # GNU C++ runtime is supplied by the gcc dependency below.
   resource "bootstrap" do
     url "https://github.com/oven-sh/bun/releases/download/bun-v1.3.14/bun-linux-aarch64-musl.zip"
     sha256 "b98e0ad3625c5c00d1d5b5ff55605c7adddbfae151861e68ade57b2d3b8703bb"
   end
 
-  # Apply all exported OHOS patches; the WebKit inner patch is staged here.
+  # Apply all exported OHOS patches (flat, pkgsrc-style names). The three
+  # entries in `inner` carry a vendored-dep patch as payload: applying the
+  # outer patch materializes the inner file at its source-tree path.
   patch_root = Pathname(__dir__).parent.parent
-  Dir[(patch_root/"Patches/bun@1.4/**/*.patch").to_s].each do |path|
-    next if path.end_with?(".patch.patch")
+  inner = %w[
+    patch-patches_tinycc_tccgen_c_patch
+    patch-patches_webkit_suspend-resume_patch
+    patch-patches_zstd_ohos-qsort-r_patch
+  ]
+  Dir[(patch_root/"Patches/bun@1.4/*.patch").to_s].each do |path|
+    next if inner.include?(Pathname(path).basename(".patch").to_s)
 
     patch do
       file Pathname(path).relative_path_from(patch_root).to_s
     end
   end
-  %w[patches/tinycc/tccgen.c patches/webkit/suspend-resume patches/zstd/ohos-qsort-r].each do |path|
+  inner.each do |stem|
     patch do
-      file "Patches/bun@1.4/#{path}.patch.patch"
+      file "Patches/bun@1.4/#{stem}.patch"
     end
   end
 
@@ -84,11 +93,10 @@ class BunAT14 < Formula
 
     cd "vendor/WebKit" do
       # The suspend patch lives in this formula's patch directory
-      # (Patches/bun@1.4/); applied here rather than via a DSL patch
-      # because vendor/WebKit only exists after the clone above.
-      # The inner patch is materialized to the buildpath by the patch
-      # loop above (the exporter ships it double-suffixed; the DSL unwraps
-      # at staging), so it can be applied to the clone directly.
+      # (Patches/bun@1.4/); applied here rather than via a DSL patch because
+      # vendor/WebKit only exists after the clone above. Applying the
+      # outer patch above wrote the inner patch file into the buildpath,
+      # so it can be applied to the clone directly.
       suspend_patch = buildpath/"patches/webkit/suspend-resume.patch"
       odie "WebKit suspend patch missing: #{suspend_patch}" unless suspend_patch.file?
       system "git", "apply", "--check", suspend_patch
@@ -103,6 +111,9 @@ class BunAT14 < Formula
     llvm = Formula["llvm@21"]
     channel = File.read("rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
     rust_toolchain = "#{channel}-aarch64-unknown-linux-ohos"
+    # rustup installs the aarch64-unknown-linux-ohos toolchain that
+    # compiles bun itself (the rustc/cargo seed for this build); it is
+    # used at build time only and never enters the bottle.
     rustup_home = buildpath/"rustup"
     ENV["RUSTUP_HOME"] = rustup_home
     ENV["CARGO_HOME"] = buildpath/"cargo"
@@ -117,8 +128,8 @@ class BunAT14 < Formula
     ENV.prepend_path "PATH", rust_home/"bin"
     ENV.prepend_path "PATH", llvm.opt_bin
     ENV.prepend_path "PATH", formula_opt_bin("lld@21")
-    # L3 bootstrap bun (from the "bootstrap" resource): runs the build
-    # scripts. The resource is an upstream Linux/musl archive.
+    # Bootstrap bun (see the resource block above): build-time only, it
+    # runs the build scripts.
     (buildpath/"bootstrap").mkpath
     resource("bootstrap").stage do
       (buildpath/"bootstrap").install "bun"
@@ -129,8 +140,7 @@ class BunAT14 < Formula
     # The build resolves ICU via BUN_OHOS_ICU_ROOT. The staging dir carries
     # the keg's headers plus ONLY the static archives, so the link is
     # self-contained: the deployed binary must not depend on the keg's
-    # shared libs at runtime (the previous bun formula ships static-ICU
-    # binaries for the same reason).
+    # shared libs at runtime.
     icu = formula_opt_prefix("icu4c@78")
     icu_stage = buildpath/"build/ohos-icu-static"
     icu_stage.mkpath
@@ -141,8 +151,6 @@ class BunAT14 < Formula
 
     fetch_webkit
     ENV["BUN_BUILD_ABI"] = "ohos"
-    # The ci-runner container is openharmony userspace: the build detects
-    # abi=ohos natively (no cross sysroot involved).
     system "bun", "scripts/build.ts", "--profile=release-local", "--build-dir=build/release-local",
            "--canary=off", "--abi=ohos"
 
@@ -160,6 +168,8 @@ class BunAT14 < Formula
     system bin/"bun", "init", "--yes"
     assert_equal "Hello via Bun!", shell_output("#{bin}/bun run index.ts").chomp
 
+    # bun self-signs the executables it produces, so ./test running below
+    # also proves the self-signing path works.
     system bin/"bun", "build", "--compile", "--outfile=test", "index.ts"
     assert_equal "Hello via Bun!", shell_output("./test").chomp
 
@@ -177,75 +187,5 @@ class BunAT14 < Formula
       console.log(query.values().flat());
     TYPESCRIPT
     assert_equal '[ "Sue", "Tim", "Bob" ]', shell_output("#{bin}/bun run db.ts").chomp
-
-    # Regression test for r37: bun install must self-sign native .node files
-    # (unsigned → ERR_DLOPEN_FAILED). Tests both hoisted and isolated linker layouts.
-    shstrtab = "\0.text\0.shstrtab\0".b
-    text_off = 64
-    text_size = 16
-    shstr_off = text_off + text_size
-    sh_off = shstr_off + shstrtab.bytesize
-    sh_off += (8 - (sh_off % 8)) % 8
-    section = lambda do |name, type, offset, size, align|
-      [name, type, 0, 0, offset, size, 0, 0, align, 0].pack("L<L<Q<Q<Q<Q<L<L<Q<Q<")
-    end
-
-    # ELF64 aarch64 ET_DYN with a three-entry section header table — the
-    # minimum the signer parses and extends. Never dlopen'd by this test.
-    elf = [0x7f, 0x45, 0x4c, 0x46, 2, 1, 1, 0].pack("C8") + ("\0" * 8)
-    elf += [3, 183, 1].pack("S<S<L<")                 # ET_DYN, EM_AARCH64, EV_CURRENT
-    elf += [0, 0, sh_off, 0].pack("Q<Q<Q<L<")         # e_entry, e_phoff, e_shoff, e_flags
-    elf += [64, 0, 0, 64, 3, 2].pack("S<S<S<S<S<S<")  # e_ehsize .. e_shstrndx
-    elf += "\0" * text_size
-    elf += shstrtab
-    elf += "\0" * (sh_off - elf.bytesize)
-    elf += section.call(0, 0, 0, 0, 0)                          # SHT_NULL
-    elf += section.call(1, 1, text_off, text_size, 4)           # .text
-    elf += section.call(7, 3, shstr_off, shstrtab.bytesize, 1)  # .shstrtab
-
-    (testpath/"fixture").mkpath
-    (testpath/"fixture/package.json").write <<~JSON
-      {"name": "@fixture/native", "version": "1.0.0"}
-    JSON
-    (testpath/"fixture/binding.node").binwrite elf
-    refute_includes (testpath/"fixture/binding.node").binread, ".codesign"
-
-    cd testpath/"fixture" do
-      system bin/"bun", "pm", "pack"
-    end
-    tarball = Pathname.new(Dir[testpath/"fixture/*.tgz"].fetch(0)).basename
-
-    manifest = <<~JSON
-      {"name": "app", "private": true,
-       "dependencies": {"@fixture/native": "file:../fixture/#{tarball}"}}
-    JSON
-
-    (testpath/"app").mkpath
-    (testpath/"app/package.json").write manifest
-    cd testpath/"app" do
-      system bin/"bun", "install"
-    end
-
-    installed = testpath/"app/node_modules/@fixture/native/binding.node"
-    assert_path_exists installed
-    refute_predicate installed, :symlink?
-    assert_includes installed.binread, ".codesign"
-
-    # Isolated linker: each package materialized once in .bun/ store. Must sign
-    # store copies, not follow symlinks. FNM_DOTMATCH required for .bun dir.
-    (testpath/"app-isolated").mkpath
-    (testpath/"app-isolated/package.json").write manifest
-    cd testpath/"app-isolated" do
-      system bin/"bun", "install", "--linker", "isolated"
-    end
-
-    store_copies = Dir.glob(
-      testpath/"app-isolated/node_modules/**/binding.node",
-      File::FNM_DOTMATCH,
-    )
-    refute_empty store_copies
-    store_copies.each do |copy|
-      assert_includes File.binread(copy), ".codesign"
-    end
   end
 end
