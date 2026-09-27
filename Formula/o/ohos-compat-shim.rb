@@ -2,16 +2,11 @@ class OhosCompatShim < Formula
   desc "LD_PRELOAD compat shim for HarmonyOS-sandboxed aarch64/musl binaries"
   homepage "https://github.com/social4hyq/ohos-compat-shim"
   url "https://github.com/social4hyq/ohos-compat-shim.git",
-      tag: "v0.6.1", revision: "b43551ce8c2b1b7f42bde9d564d60a29dbb4782e"
+      tag: "v0.6.2", revision: "cb2f1c85b8a66d1af9df3df007a13b6637993237"
   license "MIT"
 
   livecheck do
     skip "development tool, manually versioned"
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.6.1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "643b00fb2a3bb0e87acc0644f6533906a12eff4756e5b9774b54dde7277f06cc"
   end
 
   # HarmonyOS sandbox seccomp-filters close_range/fchmodat2 and returns unexpected
