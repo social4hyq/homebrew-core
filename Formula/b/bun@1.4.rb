@@ -35,24 +35,24 @@ class BunAT14 < Formula
   depends_on "cmake" => :build
   # Provides libstdc++ for the WebKit/JSC C++ toolchain (see LD_LIBRARY_PATH
   # in install below).
-  depends_on "gcc" => :build
+  depends_on "gcc" => :build if OS.ohos?
   # Required by the WebKit build (HTML/CSS name-table codegen); not on the
   # OHOS build image's PATH by default.
-  depends_on "gperf" => :build
+  depends_on "gperf" => :build if OS.ohos?
   depends_on "llvm@21" => :build # LLVM 22 PR: https://github.com/oven-sh/bun/pull/34299
   depends_on "ninja" => :build
   # Empirically required: without node on PATH the build's first ninja batch
   # dies with exit 127 (command not found) right after the WebKit configure;
   # the bootstrap bun covers the codegen jsRuntime, so some WebKit-phase
   # tooling execs node directly. Do not drop this dep without a full CI run.
-  depends_on "node" => :build
+  depends_on "node" => :build if OS.ohos?
   # libssl.so for rustup/cargo's TLS crate downloads (see LD_LIBRARY_PATH in
   # install below).
-  depends_on "openssl@3" => :build
+  depends_on "openssl@3" => :build if OS.ohos?
   depends_on "rustup" => :build # needs nightly as uses `-Z` flags and unstable `#![feature(...)]`
   # libz.so for build-time tools that dynamically link it (see
   # LD_LIBRARY_PATH in install below).
-  depends_on "zlib-ng-compat" => :build
+  depends_on "zlib-ng-compat" => :build if OS.ohos?
 
   uses_from_macos "perl" => :build # for webkit
   uses_from_macos "python" => :build # for webkit
@@ -60,10 +60,13 @@ class BunAT14 < Formula
   uses_from_macos "unzip" => :build
 
   on_linux do
-    # Upstream depends on icu4c@78 at runtime (dynamic link). OHOS statically
-    # links it instead (see BUN_OHOS_ICU_ROOT below), so it is :build-only.
-    depends_on "icu4c@78" => :build
     depends_on "lld@21" => :build
+    if OS.ohos?
+      # OHOS statically links ICU (see BUN_OHOS_ICU_ROOT below), so it's build-only.
+      depends_on "icu4c@78" => :build
+    else
+      depends_on "icu4c@78" # dynamic link, runtime dep
+    end
   end
 
   on_intel do
@@ -76,27 +79,63 @@ class BunAT14 < Formula
 
   # Bootstrap with the same Bun version as upstream CI,
   # https://github.com/oven-sh/bun/blob/bun-v#{version}/.buildkite/Dockerfile
-  # musl (not upstream's glibc build): OHOS userspace is musl-compatible, and
-  # this only runs codegen/build scripts — nothing from it ships in the bottle.
   resource "bootstrap" do
-    url "https://github.com/oven-sh/bun/releases/download/bun-v1.3.13/bun-linux-aarch64-musl.zip"
-    sha256 "5385e978107ce4934298d8d6afe9bfbb898683f6cc23e6753a0da60bc60c5b81"
+    on_macos do
+      on_arm do
+        url "https://github.com/oven-sh/bun/releases/download/bun-v1.3.13/bun-darwin-aarch64.zip"
+        version "1.3.13"
+        sha256 "5467e3f65dba526b9fea98f0cce04efafc0c63e169733ec27b876a3ad32da190"
+      end
+      on_intel do
+        url "https://github.com/oven-sh/bun/releases/download/bun-v1.3.13/bun-darwin-x64-baseline.zip"
+        sha256 "a98ba6a480f22fda9b343626b906a4e26aa53618bf85d2bc5928ecf2ba45f0ed"
+      end
+    end
+    on_linux do
+      on_arm do
+        if OS.ohos?
+          # OHOS userspace is musl-compatible; upstream's build here is a
+          # glibc binary (dynamic, /lib/ld-linux-aarch64.so.1), which cannot
+          # exec on OHOS (no such interpreter). Use the musl build instead
+          # (dynamic, /lib/ld-musl-aarch64.so.1) — verified by inspecting
+          # both binaries. Build-time only either way: nothing from this
+          # resource ships in the bottle.
+          url "https://github.com/oven-sh/bun/releases/download/bun-v1.3.13/bun-linux-aarch64-musl.zip"
+          version "1.3.13"
+          sha256 "5385e978107ce4934298d8d6afe9bfbb898683f6cc23e6753a0da60bc60c5b81"
+        else
+          url "https://github.com/oven-sh/bun/releases/download/bun-v1.3.13/bun-linux-aarch64.zip"
+          version "1.3.13"
+          sha256 "70bae41b3908b0a120e1e58c5c8af30e74afae3b8d11b0d3fdd8e787ddfb4b22"
+        end
+      end
+      on_intel do
+        url "https://github.com/oven-sh/bun/releases/download/bun-v1.3.13/bun-linux-x64-baseline.zip"
+        sha256 "9d8a24292a7068090205daac0a5a223f5f69736f5287e37bf88d3b4031edc750"
+      end
+    end
   end
 
   # Apply all OHOS patches. Filenames are the patched file's repo path with
   # "/" -> "_" (dots from the file's own extension are kept as dots), e.g.
-  # src/bun_core/Global.rs -> src_bun_core_Global.rs.patch. Three of these
-  # create a *new* file whose own path happens to end in .patch
-  # (patches/tinycc/tccgen.c.patch, patches/webkit/suspend-resume.patch,
-  # patches/zstd/ohos-qsort-r.patch) — those are vendored-dep patches
-  # consumed later by tinycc.ts/zstd.ts's own `patches:` array and by
-  # fetch_webkit below, not by this loop.
+  # src/bun_core/Global.rs -> src_bun_core_Global.rs.patch. These sit in one
+  # flat directory and go through this one loop — no per-file special-casing.
+  # Three of them end in a literal ".patch.patch": their *target* path is
+  # itself a .patch file inside bun's own vendored-dep `patches/` directory
+  # (unrelated to this tap's Patches/ directory) — e.g.
+  # patches/tinycc/tccgen.c.patch, consumed later by tinycc.ts's own
+  # `patches:` array — so this naming rule's trailing ".patch" lands on a
+  # name that already ends in ".patch".
   patch_root = Pathname(__dir__).parent.parent
   Dir[(patch_root/"Patches/bun@1.4/*.patch").to_s].each do |path|
     patch do
       file Pathname(path).relative_path_from(patch_root).to_s
     end
   end
+
+  # Build patches for clang 23 and the macOS 27 SDK,
+  # https://github.com/oven-sh/bun/issues/41141
+  patch :DATA
 
   # Performing a manual shallow git clone since a full clone of WebKit repo is ~18GB in size
   # and brew's unpack strategy will duplicate a resource requiring over 36GB of disk space.
@@ -119,6 +158,8 @@ class BunAT14 < Formula
                 "find_program(_WEBKIT_PROBE_SWIFTC NAMES swiftc)", ""
     end
 
+    return unless OS.ohos?
+
     cd "vendor/WebKit" do
       # patches/webkit/suspend-resume.patch was materialized into buildpath
       # by the DSL patch loop above; apply it to the freshly cloned WebKit
@@ -136,54 +177,76 @@ class BunAT14 < Formula
     bootstrap_version = File.read(".buildkite/Dockerfile")[/OLD_BUN_VERSION="v?(\d+(?:\.\d+)+)"/i, 1]
     odie "Update bootstrap to #{bootstrap_version}" if resource("bootstrap").version != bootstrap_version
 
-    llvm = Formula["llvm@21"]
-    channel = File.read("rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
-    rust_toolchain = "#{channel}-aarch64-unknown-linux-ohos"
-    # Keep rustup's own state inside buildpath rather than $HOME (sandboxed build).
-    rustup_home = buildpath/"rustup"
-    ENV["RUSTUP_HOME"] = rustup_home
-    ENV["CARGO_HOME"] = buildpath/"cargo"
-    system "rustup", "toolchain", "install", rust_toolchain, "--profile", "minimal", "--component", "rust-src"
-    rust_home = rustup_home/"toolchains"/rust_toolchain
-    # Tells the rustup proxy binaries (cargo/rustc on PATH below) which
-    # toolchain to use, since we never run `rustup default`.
-    ENV["RUSTUP_TOOLCHAIN"] = rust_toolchain
-    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3")
-    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
-    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
-    # rustup/cargo fetch crates over TLS; OHOS has no default system CA
-    # bundle path, so point both at Homebrew's own ca-certificates.
-    ENV["SSL_CERT_FILE"] = ENV["CURL_CA_BUNDLE"] = HOMEBREW_PREFIX/"etc/ca-certificates/cert.pem"
-    ENV.prepend_path "PATH", rust_home/"bin"
-    ENV.prepend_path "PATH", llvm.opt_bin
-    ENV.prepend_path "PATH", formula_opt_bin("lld@21")
+    # Upstream only allows building for specific microarchitectures they support
+    # so we need to patch build scripts to be compatible with our CPU targets
+    # as part of compilation occurs outside of our superenv.
+    if Hardware::CPU.intel?
+      inreplace "scripts/build/flags.ts", "-march=nehalem", ENV["HOMEBREW_OPTFLAGS"].to_s
+      # 1.4.1 raised libspng's x64 SIMD floor from SSE2 to SSE4.1 to match the
+      # nehalem target replaced above. Our baseline has no SSE4.1, and the
+      # defilter paths are `always_inline`, so drop back to the 1.4.0 level.
+      inreplace "scripts/build/deps/libspng.ts", "{ SPNG_SSE: 4 }", "{ SPNG_SSE: 1 }"
+    elsif OS.linux? && Hardware::CPU.arm64?
+      # Also covers OHOS (OS.linux? is true there too; see the OHOS
+      # toolchain setup below for the rest of the cross-compile environment).
+      inreplace "scripts/build/flags.ts", "-march=armv8-a+crc", ENV["HOMEBREW_OPTFLAGS"].to_s
+    end
+
+    if OS.ohos?
+      llvm = Formula["llvm@21"]
+      channel = File.read("rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
+      rust_toolchain = "#{channel}-aarch64-unknown-linux-ohos"
+      # Keep rustup's own state inside buildpath rather than $HOME (sandboxed build).
+      rustup_home = buildpath/"rustup"
+      ENV["RUSTUP_HOME"] = rustup_home
+      ENV["CARGO_HOME"] = buildpath/"cargo"
+      system "rustup", "toolchain", "install", rust_toolchain, "--profile", "minimal", "--component", "rust-src"
+      rust_home = rustup_home/"toolchains"/rust_toolchain
+      # Tells the rustup proxy binaries (cargo/rustc on PATH below) which
+      # toolchain to use, since we never run `rustup default`.
+      ENV["RUSTUP_TOOLCHAIN"] = rust_toolchain
+      ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3")
+      ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
+      ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
+      # cargo's own certificate-store lookup doesn't recognize OHOS's system
+      # CA path yet, so point both at Homebrew's own ca-certificates explicitly.
+      ENV["SSL_CERT_FILE"] = ENV["CURL_CA_BUNDLE"] = HOMEBREW_PREFIX/"etc/ca-certificates/cert.pem"
+      ENV.prepend_path "PATH", rust_home/"bin"
+      ENV.prepend_path "PATH", llvm.opt_bin
+      ENV.prepend_path "PATH", formula_opt_bin("lld@21")
+    end
 
     # Nested dep builds run `cmake --build` without `--parallel`, four at a time
     # (the `dep` ninja pool), so each one spawns its own core-count worth of
     # compilers on top of the outer build and Homebrew's job limit is ignored.
     ENV["CMAKE_BUILD_PARALLEL_LEVEL"] = ENV.make_jobs.to_s
 
-    # The build resolves ICU via BUN_OHOS_ICU_ROOT. The staging dir carries
-    # the keg's headers plus ONLY the static archives, so the link is
-    # self-contained: the deployed binary must not depend on the keg's
-    # shared libs at runtime.
-    icu = formula_opt_prefix("icu4c@78")
-    icu_stage = buildpath/"build/ohos-icu-static"
-    icu_stage.mkpath
-    (icu_stage/"include").make_symlink icu/"include"
-    (icu_stage/"lib").mkpath
-    Dir.glob("#{icu}/lib/*.a").each { |a| (icu_stage/"lib"/File.basename(a)).make_symlink a }
-    ENV["BUN_OHOS_ICU_ROOT"] = icu_stage
+    if OS.ohos?
+      # The build resolves ICU via BUN_OHOS_ICU_ROOT. The staging dir carries
+      # the keg's headers plus ONLY the static archives, so the link is
+      # self-contained: the deployed binary must not depend on the keg's
+      # shared libs at runtime.
+      icu = formula_opt_prefix("icu4c@78")
+      icu_stage = buildpath/"build/ohos-icu-static"
+      icu_stage.mkpath
+      (icu_stage/"include").make_symlink icu/"include"
+      (icu_stage/"lib").mkpath
+      Dir.glob("#{icu}/lib/*.a").each { |a| (icu_stage/"lib"/File.basename(a)).make_symlink a }
+      ENV["BUN_OHOS_ICU_ROOT"] = icu_stage
+    end
 
     fetch_webkit
-    # Bootstrap bun (see the resource block above): build-time only, it
-    # runs the build scripts.
     resource("bootstrap").stage("bootstrap")
     ENV.prepend_path "PATH", buildpath/"bootstrap"
 
-    system "bun", "scripts/build.ts", "--profile=release-local", "--build-dir=build/release-local",
-           "--canary=off", "--abi=ohos"
+    args = ["--canary=off"]
+    args << "--baseline=on" if Hardware::CPU.intel?
+    # Unless it detects CI, bun takes the deployment target from the SDK's major
+    # version, so Xcode 27 on macOS 26 would build everything `minos 27.0`.
+    args << "--osx-deployment-target=#{MacOS.version}" if OS.mac?
+    args << "--abi=ohos" if OS.ohos?
 
+    system "bun", "run", "build:release:local", *args
     bin.install "build/release-local/bun"
     bin.install_symlink bin/"bun" => "bunx"
 
@@ -220,3 +283,116 @@ class BunAT14 < Formula
     assert_equal '[ "Sue", "Tim", "Bob" ]', shell_output("#{bin}/bun run db.ts").chomp
   end
 end
+
+__END__
+diff --git a/src/jsc/bindings/JSCommonJSModule.cpp b/src/jsc/bindings/JSCommonJSModule.cpp
+index 484a719..7d43b31 100644
+--- a/src/jsc/bindings/JSCommonJSModule.cpp
++++ b/src/jsc/bindings/JSCommonJSModule.cpp
+@@ -1568,7 +1568,7 @@ static JSC::SourceCode commonJSModuleSyntheticSourceCode(const SourceOrigin& sou
+ 
+                 JSValue keyValue = identifierToJSValue(vm, moduleKey);
+                 JSValue entry = globalObject->requireMap()->get(globalObject, keyValue);
+-                RETURN_IF_EXCEPTION(scope, {});
++                RETURN_IF_EXCEPTION(scope, void());
+ 
+                 if (entry) {
+                     if (auto* moduleObject = dynamicDowncast<JSCommonJSModule>(entry)) {
+@@ -1587,7 +1587,7 @@ static JSC::SourceCode commonJSModuleSyntheticSourceCode(const SourceOrigin& sou
+                                 // On error, remove the module from the require map
+                                 // so that it can be re-evaluated on the next require.
+                                 globalObject->requireMap()->remove(globalObject, moduleObject->filename());
+-                                RETURN_IF_EXCEPTION(scope, {});
++                                RETURN_IF_EXCEPTION(scope, void());
+ 
+                                 scope.throwException(globalObject, exception);
+                                 return;
+@@ -1595,7 +1595,7 @@ static JSC::SourceCode commonJSModuleSyntheticSourceCode(const SourceOrigin& sou
+                         }
+ 
+                         moduleObject->toSyntheticSource(globalObject, moduleKey, exportNames, exportValues);
+-                        RETURN_IF_EXCEPTION(scope, {});
++                        RETURN_IF_EXCEPTION(scope, void());
+                     }
+                 } else {
+                     // require map was cleared of the entry
+diff --git a/src/jsc/bindings/JSMockFunction.cpp b/src/jsc/bindings/JSMockFunction.cpp
+index bc8f149..dfe5e15 100644
+--- a/src/jsc/bindings/JSMockFunction.cpp
++++ b/src/jsc/bindings/JSMockFunction.cpp
+@@ -897,7 +897,7 @@ JSC_DEFINE_HOST_FUNCTION(jsMockFunctionCall, (JSGlobalObject * lexicalGlobalObje
+     auto setReturnValue = [&](JSC::JSValue value) -> void {
+         if (auto* returnValuesArray = fn->returnValues.get()) {
+             returnValuesArray->push(globalObject, value);
+-            RETURN_IF_EXCEPTION(scope, {});
++            RETURN_IF_EXCEPTION(scope, void());
+             returnValueIndex = returnValuesArray->length() - 1;
+         } else {
+             JSC::ObjectInitializationScope object(vm);
+diff --git a/src/jsc/bindings/JSNodePerformanceHooksHistogram.cpp b/src/jsc/bindings/JSNodePerformanceHooksHistogram.cpp
+index 0f72fd6..7ab0c64 100644
+--- a/src/jsc/bindings/JSNodePerformanceHooksHistogram.cpp
++++ b/src/jsc/bindings/JSNodePerformanceHooksHistogram.cpp
+@@ -172,13 +172,13 @@ int64_t JSNodePerformanceHooksHistogram::getMax() const
+ 
+ double JSNodePerformanceHooksHistogram::getMean() const
+ {
+-    if (!m_histogramData.histogram) return NAN;
++    if (!m_histogramData.histogram) return std::numeric_limits<double>::quiet_NaN();
+     return hdr_mean(m_histogramData.histogram);
+ }
+ 
+ double JSNodePerformanceHooksHistogram::getStddev() const
+ {
+-    if (!m_histogramData.histogram) return NAN;
++    if (!m_histogramData.histogram) return std::numeric_limits<double>::quiet_NaN();
+     return hdr_stddev(m_histogramData.histogram);
+ }
+ 
+diff --git a/src/jsc/bindings/c-bindings.cpp b/src/jsc/bindings/c-bindings.cpp
+index 481ccdd..1ff80f1 100644
+--- a/src/jsc/bindings/c-bindings.cpp
++++ b/src/jsc/bindings/c-bindings.cpp
+@@ -1143,6 +1143,11 @@ extern "C" const char* BUN_DEFAULT_PATH_FOR_SPAWN = "/usr/bin:/bin";
+ #include <os/signpost.h>
+ #include "generated_perf_trace_events.h"
+ 
++// The SDK applies an Apple-clang-only attribute here, unguarded.
++// https://github.com/oven-sh/bun/issues/41141
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wunknown-attributes"
++
+ // The event names have to be compile-time constants.
+ // So we trick the compiler into thinking they are by using a macro.
+ extern "C" void Bun__signpost_emit(os_log_t log, os_signpost_type_t type, os_signpost_id_t spid, int trace_event_id)
+@@ -1160,6 +1165,8 @@ extern "C" void Bun__signpost_emit(os_log_t log, os_signpost_type_t type, os_sig
+     }
+ }
+ 
++#pragma clang diagnostic pop
++
+ #undef EMIT_SIGNPOST
+ #undef FOR_EACH_TRACE_EVENT
+ 
+diff --git a/src/jsc/modules/ObjectModule.cpp b/src/jsc/modules/ObjectModule.cpp
+index 5505408..4311d5b 100644
+--- a/src/jsc/modules/ObjectModule.cpp
++++ b/src/jsc/modules/ObjectModule.cpp
+@@ -47,7 +47,7 @@ generateObjectModuleSourceCodeForJSON(JSC::JSGlobalObject* globalObject,
+         PropertyNameArrayBuilder properties(vm, PropertyNameMode::Strings,
+             PrivateSymbolMode::Exclude);
+         object->getPropertyNames(globalObject, properties, DontEnumPropertiesMode::Exclude);
+-        RETURN_IF_EXCEPTION(scope, {});
++        RETURN_IF_EXCEPTION(scope, void());
+         gcUnprotectNullTolerant(object);
+ 
+         exportNames.append(vm.propertyNames->defaultKeyword);
+@@ -61,7 +61,7 @@ generateObjectModuleSourceCodeForJSON(JSC::JSGlobalObject* globalObject,
+             exportNames.append(entry);
+ 
+             JSValue value = object->get(globalObject, entry);
+-            RETURN_IF_EXCEPTION(scope, {});
++            RETURN_IF_EXCEPTION(scope, void());
+             exportValues.append(value);
+         }
+     };
