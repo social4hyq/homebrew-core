@@ -153,6 +153,8 @@ class BunAT14 < Formula
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3")
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
     ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
+    # rustup/cargo fetch crates over TLS; OHOS has no default system CA
+    # bundle path, so point both at Homebrew's own ca-certificates.
     ENV["SSL_CERT_FILE"] = ENV["CURL_CA_BUNDLE"] = HOMEBREW_PREFIX/"etc/ca-certificates/cert.pem"
     ENV.prepend_path "PATH", rust_home/"bin"
     ENV.prepend_path "PATH", llvm.opt_bin
