@@ -94,12 +94,9 @@ class BunAT14 < Formula
     on_linux do
       on_arm do
         if OS.ohos?
-          # OHOS userspace is musl-compatible; upstream's build here is a
-          # glibc binary (dynamic, /lib/ld-linux-aarch64.so.1), which cannot
-          # exec on OHOS (no such interpreter). Use the musl build instead
-          # (dynamic, /lib/ld-musl-aarch64.so.1) — verified by inspecting
-          # both binaries. Build-time only either way: nothing from this
-          # resource ships in the bottle.
+          # OHOS's musl userspace has no /lib/ld-linux-aarch64.so.1 (the
+          # glibc interpreter upstream's build here uses), so it can't exec
+          # there; use the musl build instead.
           url "https://github.com/oven-sh/bun/releases/download/bun-v1.3.13/bun-linux-aarch64-musl.zip"
           version "1.3.13"
           sha256 "5385e978107ce4934298d8d6afe9bfbb898683f6cc23e6753a0da60bc60c5b81"
