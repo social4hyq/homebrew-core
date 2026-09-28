@@ -21,8 +21,6 @@ class BunAT14 < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  # gitcode PR #21183 review round: dep/license/patch-naming cleanup requires
-  # rebuilding the same upstream version.
   revision 13
   livecheck do
     url :stable
@@ -38,8 +36,8 @@ class BunAT14 < Formula
   # Provides libstdc++ for the WebKit/JSC C++ toolchain (see LD_LIBRARY_PATH
   # in install below).
   depends_on "gcc" => :build
-  # Required by the WebKit build (HTML/CSS name-table codegen); not
-  # preinstalled on the OHOS build image the way it is on other CI runners.
+  # Required by the WebKit build (HTML/CSS name-table codegen); not on the
+  # OHOS build image's PATH by default.
   depends_on "gperf" => :build
   depends_on "llvm@21" => :build # LLVM 22 PR: https://github.com/oven-sh/bun/pull/34299
   depends_on "ninja" => :build
@@ -85,10 +83,10 @@ class BunAT14 < Formula
     sha256 "5385e978107ce4934298d8d6afe9bfbb898683f6cc23e6753a0da60bc60c5b81"
   end
 
-  # Apply all exported OHOS patches. Filenames are the patched file's repo
-  # path with "/" -> "_" (dots from the file's own extension are kept as
-  # dots), e.g. src/bun_core/Global.rs -> src_bun_core_Global.rs.patch. Three
-  # of these create a *new* file whose own path happens to end in .patch
+  # Apply all OHOS patches. Filenames are the patched file's repo path with
+  # "/" -> "_" (dots from the file's own extension are kept as dots), e.g.
+  # src/bun_core/Global.rs -> src_bun_core_Global.rs.patch. Three of these
+  # create a *new* file whose own path happens to end in .patch
   # (patches/tinycc/tccgen.c.patch, patches/webkit/suspend-resume.patch,
   # patches/zstd/ohos-qsort-r.patch) — those are vendored-dep patches
   # consumed later by tinycc.ts/zstd.ts's own `patches:` array and by
