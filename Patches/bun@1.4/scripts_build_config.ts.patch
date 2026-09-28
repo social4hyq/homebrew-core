@@ -1,5 +1,5 @@
 diff --git a/scripts/build/config.ts b/scripts/build/config.ts
-index 671839b78c..22aca2052a 100644
+index 671839b7..25bdfff4 100644
 --- a/scripts/build/config.ts
 +++ b/scripts/build/config.ts
 @@ -19,7 +19,7 @@ import { cyan, dim, green } from "./tty.ts";
@@ -62,3 +62,15 @@ index 671839b78c..22aca2052a 100644
  
    // ─── Cross-compilation (Android) ───
    // We keep using the host's clang (same version everywhere) and pass
+@@ -1012,7 +1022,10 @@ export function resolveConfig(partial: PartialConfig, toolchain: Toolchain): Con
+   // gcc-13 sysroot so the glibc verneed matches what the --wrap list covers
+   // and the libstdc++ ABI matches the WebKit prebuilt. musl uses an
+   // alpine-derived sysroot. Local dev without a sysroot builds native.
+-  if (linux && abi !== "android" && crossTarget === undefined) {
++  // OHOS supplies its own toolchain/sysroot (llvm@21 clang + lld@21, put on
++  // PATH by the formula's install method) and never needs this gnu/musl
++  // cross-sysroot machinery, so it's excluded here the same way android is.
++  if (linux && abi !== "android" && abi !== "ohos" && crossTarget === undefined) {
+     const llvmArch = x64 ? "x86_64" : "aarch64";
+     const hostAbi = host.os === "linux" ? detectLinuxAbi() : undefined;
+     const isCross = arch !== host.arch || abi !== hostAbi;
