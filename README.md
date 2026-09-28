@@ -42,15 +42,16 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | Formula | 版本 | 说明 |
 |---|---|---|
 | `opencode` | 1.18.32 | 开源的终端 AI 编程助手：在终端里用自然语言让 AI 读代码、改文件、跑命令；自带 75+ 模型提供商接入，用自己的 API key 自由选模型（v1 稳定版） |
-| `opencode-v2` | 2.0.17 | opencode v2 稳定版：全新插件 API 与交互；**与 v1 互斥**（`conflicts_with "opencode"`，命令名同为 `opencode`，对齐上游官方同名 formula）：原位替代 v1，共享 `~/.config/opencode` 等目录，v1 的数据库自动迁移；版本滚动跟进上游 v2 发布线（原 `opencode@2`，见 `formula_renames.json`） |
+| `opencode-v2` | 2.0.18 | opencode v2 稳定版：全新插件 API 与交互；**与 v1 互斥**（`conflicts_with "opencode"`，命令名同为 `opencode`，对齐上游官方同名 formula）：原位替代 v1，共享 `~/.config/opencode` 等目录，v1 的数据库自动迁移；版本滚动跟进上游 v2 发布线（原 `opencode@2`，见 `formula_renames.json`） |
 | `claude-code` | 2.1.274 | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号；License 禁止再分发官方产物，故安装时从官方 npm 包拉取 CLI、剥离元文件后在本 tap 的 bun 上运行 |
 | `claude-code.latest` | 2.1.283 | 同一 Claude Code 的 latest 滚动频道：抽出官方 CLI 的 JS 模块图、在本 tap 的 bun 上运行（与 `claude-code` 同一方案）；个别只跑得动 Anthropic 私有 bun 内部件的版本可设 `CLAUDE_CODE_RUNTIME=musl` 直跑官方二进制（自签名 + `ohos-compat-shim` 引导）；与 `claude-code` 互斥（都装 `claude` 命令，二选一） |
 | `zcode` | 3.14.3 | AI 编程工作台：终端 agent（TUI）与 Web IDE 双形态；上游不发 git tag，源码取自 GitHub main、用本 tap 的 bun/pnpm 工具链在本机构建 |
 | `bun` | 1.4.2 | 极速 JavaScript/TypeScript 一体化工具链：运行时、包管理、测试、打包四合一，可直接替代 Node.js；本 tap 多数工具的底座 |
+| `bun@1.4` | 1.4.2 | 与 `bun` 同一上游版本的**补丁审视沙盒**：改动先在这里审校、通过后再回填 `bun`，不影响用户日常消费的 `bun`；与 `bun` 装同一 `bin/bun`（二选一），日常使用请装 `bun` |
 | `vite-plus` | 0.2.8 | VoidZero（Vue/Vite 作者团队）的 Web 统一工具链：一个 `vp` 命令包揽创建项目、开发调试、检查、格式化、测试、构建全流程（Beta） |
 | `hishell-font` | 0.1.0 | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
 | `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
-| `ohos-compat-shim` | 0.5.0 | 系统兼容层：自动兜底鸿蒙与标准 Linux 的底层行为差异，让 Linux 生态软件开箱即用（已内嵌进本 tap 产物，无需单独配置） |
+| `ohos-compat-shim` | 0.6.2 | 系统兼容层：自动兜底鸿蒙与标准 Linux 的底层行为差异，让 Linux 生态软件开箱即用（已内嵌进本 tap 产物，无需单独配置） |
 | `qemu-aarch64` | 11.0.3-r0 | 用户态 QEMU：直接运行/调试 Linux aarch64 程序，自带系统调用跟踪（`-strace`），是鸿蒙无 root strace 环境下的排障替代品 |
 
 ## 已下线 / 已迁移
