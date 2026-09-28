@@ -2,20 +2,15 @@ class OhosCompatShim < Formula
   desc "LD_PRELOAD compat shim for HarmonyOS-sandboxed aarch64/musl binaries"
   homepage "https://github.com/social4hyq/ohos-compat-shim"
   url "https://github.com/social4hyq/ohos-compat-shim.git",
-      tag: "v0.6.2", revision: "cb2f1c85b8a66d1af9df3df007a13b6637993237"
+      tag: "v0.7.0", revision: "8525da867b0b7b00955b9637e6458d1d6fd999e7"
   license "MIT"
 
   livecheck do
     skip "development tool, manually versioned"
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.6.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a55427074c8cdef4f8a76c6dfc70fac862a6bb9b0c770d8026a38e0b5ca7fdec"
-  end
-
   # HarmonyOS sandbox seccomp-filters close_range/fchmodat2 and returns unexpected
-  # errno from getpwuid_r/tmpfile/getcwd/splice. Shim intercepts at libc-symbol level,
+  # errno from getpwuid_r/tmpfile/splice. Shim intercepts at libc-symbol level,
   # falls back only on the documented symptom (safe no-op elsewhere).
   depends_on "ohos-sdk" => :build
 
