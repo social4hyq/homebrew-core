@@ -10,12 +10,13 @@ class Bun < Formula
     "LGPL-2.0-or-later", # JavaScriptCore
 
     # Other libraries, https://github.com/oven-sh/bun/blob/main/LICENSE.md#linked-libraries
-    # Ignoring ICU which is dynamically linked and reducing dual licenses to minimal set:
+    # Unlike upstream, OHOS statically links ICU, so its license is included rather than ignored.
     "Apache-2.0",        # boringssl, simdutf, uSockets, highway, uWebsockets, Tigerbeetle
     "BSD-2-Clause",      # libarchive, libbase64, libspng
     "BSD-3-Clause",      # lol-html, libwebp, zstd
     "IJG",               # libjpeg-turbo
     "LGPL-2.1-or-later", # tinycc
+    "Unicode-3.0",       # ICU (statically linked on OHOS)
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
@@ -23,16 +24,10 @@ class Bun < Formula
   # bun-legacy; see docs/harmonybrew-tap.md for the rename history).
   # Bumped past that formula's last revision (13) so `brew upgrade bun`
   # moves already-installed users onto this upstream-aligned build.
-  revision 15
+  revision 16
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r20"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a837b5fa1512b54a078db04323aae33bdcc560442d98731ad3b0b02b645a09e8"
   end
 
   depends_on "cmake" => :build
@@ -59,7 +54,12 @@ class Bun < Formula
 
   on_linux do
     depends_on "lld@21" => :build
-    depends_on "icu4c@78"
+    if OS.ohos?
+      # Statically linked on OHOS (see install), so it is build-only there.
+      depends_on "icu4c@78" => :build
+    else
+      depends_on "icu4c@78"
+    end
   end
 
   on_intel do
@@ -174,6 +174,9 @@ class Bun < Formula
     end
 
     if OS.ohos?
+      inreplace "scripts/build/bun.ts",
+                '"-licudata", "-licui18n", "-licuuc"',
+                '"-l:libicui18n.a", "-l:libicuuc.a", "-l:libicudata.a"'
       channel = File.read("rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
       rust_toolchain = "#{channel}-aarch64-unknown-linux-ohos"
       system "rustup", "toolchain", "install", rust_toolchain, "--profile", "minimal", "--component", "rust-src"
