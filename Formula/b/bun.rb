@@ -10,14 +10,12 @@ class Bun < Formula
     "LGPL-2.0-or-later", # JavaScriptCore
 
     # Other libraries, https://github.com/oven-sh/bun/blob/main/LICENSE.md#linked-libraries
-    # Unlike upstream, OHOS statically links ICU (see BUN_OHOS_ICU_ROOT
-    # below), so its license is included rather than ignored.
+    # Ignoring ICU which is dynamically linked and reducing dual licenses to minimal set:
     "Apache-2.0",        # boringssl, simdutf, uSockets, highway, uWebsockets, Tigerbeetle
     "BSD-2-Clause",      # libarchive, libbase64, libspng
     "BSD-3-Clause",      # lol-html, libwebp, zstd
     "IJG",               # libjpeg-turbo
     "LGPL-2.1-or-later", # tinycc
-    "Unicode-3.0",       # ICU (statically linked on OHOS)
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
@@ -25,16 +23,15 @@ class Bun < Formula
   # bun-legacy; see docs/harmonybrew-tap.md for the rename history).
   # Bumped past that formula's last revision (13) so `brew upgrade bun`
   # moves already-installed users onto this upstream-aligned build.
-  revision 14
+  revision 15
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r18"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c00f7cca1b12f22176ae2470b370626b87f96af1b2a0c505bc06833f60b0b801"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r19"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db11d9bee7c4efd6134d31d7f1ce38bdb2046d1253162235f8a80b6d058d355c"
   end
 
   depends_on "cmake" => :build
@@ -66,12 +63,7 @@ class Bun < Formula
 
   on_linux do
     depends_on "lld@21" => :build
-    if OS.ohos?
-      # OHOS statically links ICU (see BUN_OHOS_ICU_ROOT below), so it's build-only.
-      depends_on "icu4c@78" => :build
-    else
-      depends_on "icu4c@78" # dynamic link, runtime dep
-    end
+    depends_on "icu4c@78"
   end
 
   on_intel do
@@ -186,7 +178,6 @@ class Bun < Formula
     end
 
     if OS.ohos?
-      llvm = Formula["llvm@21"]
       channel = File.read("rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
       rust_toolchain = "#{channel}-aarch64-unknown-linux-ohos"
       system "rustup", "toolchain", "install", rust_toolchain, "--profile", "minimal", "--component", "rust-src"
@@ -195,27 +186,12 @@ class Bun < Formula
       ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
       ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
       ENV.prepend_path "PATH", rust_home/"bin"
-      ENV.prepend_path "PATH", llvm.opt_bin
     end
 
     # Nested dep builds run `cmake --build` without `--parallel`, four at a time
     # (the `dep` ninja pool), so each one spawns its own core-count worth of
     # compilers on top of the outer build and Homebrew's job limit is ignored.
     ENV["CMAKE_BUILD_PARALLEL_LEVEL"] = ENV.make_jobs.to_s
-
-    if OS.ohos?
-      # The build resolves ICU via BUN_OHOS_ICU_ROOT. The staging dir carries
-      # the keg's headers plus ONLY the static archives, so the link is
-      # self-contained: the deployed binary must not depend on the keg's
-      # shared libs at runtime.
-      icu = formula_opt_prefix("icu4c@78")
-      icu_stage = buildpath/"build/ohos-icu-static"
-      icu_stage.mkpath
-      (icu_stage/"include").make_symlink icu/"include"
-      (icu_stage/"lib").mkpath
-      Dir.glob("#{icu}/lib/*.a").each { |a| (icu_stage/"lib"/File.basename(a)).make_symlink a }
-      ENV["BUN_OHOS_ICU_ROOT"] = icu_stage
-    end
 
     fetch_webkit
     resource("bootstrap").stage("bootstrap")
