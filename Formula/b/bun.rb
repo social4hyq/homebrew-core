@@ -186,7 +186,6 @@ class Bun < Formula
       ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
       ENV.prepend_path "PATH", rust_home/"bin"
       ENV.prepend_path "PATH", llvm.opt_bin
-      ENV.prepend_path "PATH", formula_opt_bin("lld@21")
     end
 
     # Nested dep builds run `cmake --build` without `--parallel`, four at a time
