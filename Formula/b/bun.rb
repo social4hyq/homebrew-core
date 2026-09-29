@@ -31,11 +31,6 @@ class Bun < Formula
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r17"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d64c392878f7580ac68b38ab50809d7f0389041fbcea5fdda16718cce535756"
-  end
-
   depends_on "cmake" => :build
   # Provides libstdc++ for the WebKit/JSC C++ toolchain (see LD_LIBRARY_PATH
   # in install below).
@@ -50,9 +45,6 @@ class Bun < Formula
   # the bootstrap bun covers the codegen jsRuntime, so some WebKit-phase
   # tooling execs node directly. Do not drop this dep without a full CI run.
   depends_on "node" => :build if OS.ohos?
-  # libssl.so for rustup/cargo's TLS crate downloads (see LD_LIBRARY_PATH in
-  # install below).
-  depends_on "openssl@3" => :build if OS.ohos?
   depends_on "rustup" => :build # needs nightly as uses `-Z` flags and unstable `#![feature(...)]`
   # libz.so for build-time tools that dynamically link it (see
   # LD_LIBRARY_PATH in install below).
@@ -188,21 +180,10 @@ class Bun < Formula
       llvm = Formula["llvm@21"]
       channel = File.read("rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
       rust_toolchain = "#{channel}-aarch64-unknown-linux-ohos"
-      # Keep rustup's own state inside buildpath rather than $HOME (sandboxed build).
-      rustup_home = buildpath/"rustup"
-      ENV["RUSTUP_HOME"] = rustup_home
-      ENV["CARGO_HOME"] = buildpath/"cargo"
       system "rustup", "toolchain", "install", rust_toolchain, "--profile", "minimal", "--component", "rust-src"
-      rust_home = rustup_home/"toolchains"/rust_toolchain
-      # Tells the rustup proxy binaries (cargo/rustc on PATH below) which
-      # toolchain to use, since we never run `rustup default`.
-      ENV["RUSTUP_TOOLCHAIN"] = rust_toolchain
-      ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3")
+      rust_home = Pathname(Dir.home)/".rustup/toolchains"/rust_toolchain
       ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
       ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
-      # cargo's own certificate-store lookup doesn't recognize OHOS's system
-      # CA path yet, so point both at Homebrew's own ca-certificates explicitly.
-      ENV["SSL_CERT_FILE"] = ENV["CURL_CA_BUNDLE"] = HOMEBREW_PREFIX/"etc/ca-certificates/cert.pem"
       ENV.prepend_path "PATH", rust_home/"bin"
       ENV.prepend_path "PATH", llvm.opt_bin
       ENV.prepend_path "PATH", formula_opt_bin("lld@21")
