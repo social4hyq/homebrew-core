@@ -4,16 +4,18 @@ class OpencodeV2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "cd9a14a6b688d4021bee381dfd39d2cef9c0f862"
   version "2.0.18"
   license "MIT"
+  # Rebuild against the tap's bun (social4hyq/homebrew-core#707 "second
+  # takeover": bun is now the upstream-structure-aligned reimplementation,
+  # not the fork-mechanical-export build it was pinned against before).
+  # `script/build.ts --single` compiles by copying bun's own executable
+  # and appending bytecode, so the installed opencode binary embeds
+  # whichever bun built it — this refreshes that embedded runtime.
+  revision 1
   version_scheme 1
 
   livecheck do
     url :stable
     regex(/^v(2\.\d+\.\d+)$/i)
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2-v2.0.18-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e4556fbbbec5a06010ca21584493358838ec008d7c8e1f3d86ebc800283d56b"
   end
 
   depends_on "bun" => :build
