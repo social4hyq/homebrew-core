@@ -20,16 +20,10 @@ class Bun < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  revision 16
+  revision 17
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r24"
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "34844dc4b1cf0501e9137cf55833089113e376ae5276a6c6e548ecb860fcc445"
   end
 
   depends_on "cmake" => :build
@@ -129,14 +123,7 @@ class Bun < Formula
 
     return unless OS.ohos?
 
-    cd "vendor/WebKit" do
-      # vendor/WebKit exists only after the clone, so apply the patch here.
-      suspend_patch = buildpath/"patches/webkit/suspend-resume.patch"
-      odie "WebKit suspend patch missing: #{suspend_patch}" unless suspend_patch.file?
-      system "git", "apply", "--check", suspend_patch
-      system "git", "apply", suspend_patch
-      odie "WebKit suspend fix missing" unless File.read("Source/WTF/wtf/Threading.h").include?("m_suspendRequested")
-    end
+    system "git", "-C", "vendor/WebKit", "apply", buildpath/"patches/webkit/suspend-resume.patch"
   end
 
   # Based on https://github.com/oven-sh/bun/blob/main/CONTRIBUTING.md#building-webkit-locally--debug-mode-of-jsc
