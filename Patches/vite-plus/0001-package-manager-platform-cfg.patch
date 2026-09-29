@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Claude Sonnet 5 <noreply@anthropic.com>
-Date: Tue, 8 Sep 2026 19:39:38 +0800
+From: social4hyq <social4hyq@users.noreply.github.com>
+Date: Tue, 29 Sep 2026 21:30:00 +0800
 Subject: [PATCH] OHOS: package-manager platform-cfg patch.
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -20,14 +20,12 @@ widen the musl branch to also match ohos, landing on the already-
 published *-musl platform packages instead (e.g.
 @pnpm/exe.linux-arm64-musl).
 ---
- crates/vite_pm_cli/src/package_manager.rs | 20 ++++++++++----------
+ crates/vp_pm_cli/src/package_manager.rs | 20 ++++++++++----------
  1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/crates/vite_pm_cli/src/package_manager.rs b/crates/vite_pm_cli/src/package_manager.rs
-index 6398e70..62c7c95 100644
---- a/crates/vite_pm_cli/src/package_manager.rs
-+++ b/crates/vite_pm_cli/src/package_manager.rs
-@@ -951,13 +951,13 @@ fn get_bun_platform_package_name() -> Result<&'static str, Error> {
+--- a/crates/vp_pm_cli/src/package_manager.rs
++++ b/crates/vp_pm_cli/src/package_manager.rs
+@@ -1387,13 +1387,13 @@
      let name = match (env::consts::OS, env::consts::ARCH) {
          ("macos", "aarch64") => "@oven/bun-darwin-aarch64",
          ("macos", "x86_64") => "@oven/bun-darwin-x64",
@@ -45,7 +43,7 @@ index 6398e70..62c7c95 100644
          ("linux", "x86_64") => "@oven/bun-linux-x64",
          ("windows", "x86_64") => "@oven/bun-windows-x64",
          ("windows", "aarch64") => "@oven/bun-windows-aarch64",
-@@ -1086,13 +1086,13 @@ fn get_pnpm_platform_package_name() -> Result<&'static str, Error> {
+@@ -1540,13 +1540,13 @@
      let name = match (env::consts::OS, env::consts::ARCH) {
          ("macos", "aarch64") => "@pnpm/exe.darwin-arm64",
          ("macos", "x86_64") => "@pnpm/exe.darwin-x64",
@@ -63,16 +61,16 @@ index 6398e70..62c7c95 100644
          ("linux", "x86_64") => "@pnpm/exe.linux-x64",
          ("windows", "x86_64") => "@pnpm/exe.win32-x64",
          ("windows", "aarch64") => "@pnpm/exe.win32-arm64",
-@@ -3669,7 +3669,7 @@ mod tests {
+@@ -4239,7 +4239,7 @@
              "Package name should start with @oven/bun-, got: {name}"
          );
          // On musl targets, the package name should contain "-musl"
 -        #[cfg(target_env = "musl")]
 +        #[cfg(any(target_env = "musl", target_env = "ohos"))]
          assert!(
-             name.ends_with("-musl"),
-             "On musl targets, package name should end with -musl, got: {name}"
-@@ -3685,7 +3685,7 @@ mod tests {
+             name.contains("-musl"),
+             "On musl targets, package name should contain -musl, got: {name}"
+@@ -4293,7 +4293,7 @@
              name.starts_with("@pnpm/exe."),
              "Package name should start with @pnpm/exe., got: {name}"
          );
