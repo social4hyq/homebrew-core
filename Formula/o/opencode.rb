@@ -4,7 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.33.tar.gz"
   sha256 "34a4b810f4e839f2c4ac62206bbc64d736006f3c96712b903cda83ca60271301"
   license "MIT"
-  revision 2
+  revision 3
 
   # No throttle: unlike upstream homebrew-core (which throttles to every 5th
   # release to limit their own CI churn), this tap wants opencode to autobump
@@ -15,19 +15,13 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.33-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0538d230ffa5bcf951395e9f23c4f3ea80a93e12604af822cf3b0e360ce1c3af"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.33-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d53a0de590da646fac5f9cf5c634deca57deadede332e94c249c05b3b78332f"
   end
-
   depends_on "bun" => :build
   depends_on "node" => :build
   depends_on "python@3.14" => :build
   depends_on "ripgrep"
-
-  on_linux do
-    depends_on "icu4c@78"
-  end
-
   # opencode-v2 installs the same binary name; declared reciprocally
   # (both formulae must conflicts_with each other for brew audit).
   conflicts_with "opencode-v2", because: "both install an opencode binary"
