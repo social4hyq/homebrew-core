@@ -37,8 +37,8 @@ class Bun < Formula
   end
 
   depends_on "cmake" => :build
-  # Provides libstdc++ for the WebKit/JSC C++ toolchain (see LD_LIBRARY_PATH
-  # in install below).
+  # Provides libstdc++ for the prebuilt bootstrap bun (see LD_LIBRARY_PATH in
+  # install below).
   depends_on "gcc" => :build if OS.ohos?
   # Required by the WebKit build (HTML/CSS name-table codegen); not on the
   # OHOS build image's PATH by default.
