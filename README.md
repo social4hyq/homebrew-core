@@ -46,8 +46,8 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `claude-code` | 2.1.274 | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号；License 禁止再分发官方产物，故安装时从官方 npm 包拉取 CLI、剥离元文件后在本 tap 的 bun 上运行 |
 | `claude-code.latest` | 2.1.283 | 同一 Claude Code 的 latest 滚动频道：抽出官方 CLI 的 JS 模块图、在本 tap 的 bun 上运行（与 `claude-code` 同一方案）；个别只跑得动 Anthropic 私有 bun 内部件的版本可设 `CLAUDE_CODE_RUNTIME=musl` 直跑官方二进制（自签名 + `ohos-compat-shim` 引导）；与 `claude-code` 互斥（都装 `claude` 命令，二选一） |
 | `zcode` | 3.14.3 | AI 编程工作台：终端 agent（TUI）与 Web IDE 双形态；上游不发 git tag，源码取自 GitHub main、用本 tap 的 bun/pnpm 工具链在本机构建 |
-| `bun` | 1.4.2 | 极速 JavaScript/TypeScript 一体化工具链：运行时、包管理、测试、打包四合一，可直接替代 Node.js；本 tap 多数工具的底座 |
-| `bun@1.4` | 1.4.2 | 与 `bun` 同一上游版本的**补丁审视沙盒**：改动先在这里审校、通过后再回填 `bun`，不影响用户日常消费的 `bun`；与 `bun` 装同一 `bin/bun`（二选一），日常使用请装 `bun` |
+| `bun` | 1.4.2 | 极速 JavaScript/TypeScript 一体化工具链：运行时、包管理、测试、打包四合一，可直接替代 Node.js；本 tap 多数工具的底座；结构上跟 Homebrew 上游 `bun.rb` 对齐重新移植（原 `bun@1.4` 接管本名） |
+| `bun-legacy` | 1.4.2 | 原 `bun` 的存档：fork 直构、113 个按文件补丁；`keg_only`，不随上游 bun 版本走 livecheck，仅供参考对比，日常使用请装 `bun` |
 | `vite-plus` | 0.2.8 | VoidZero（Vue/Vite 作者团队）的 Web 统一工具链：一个 `vp` 命令包揽创建项目、开发调试、检查、格式化、测试、构建全流程（Beta） |
 | `hishell-font` | 0.1.0 | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
 | `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
