@@ -3,11 +3,14 @@
 # removing them. Most formulae name each patch literally, but a formula may
 # apply a generated list through a dynamic path such as
 # `file "Patches/bun-legacy/#{p}.patch"`, or glob a directory at load time
-# such as `Dir[(patch_root/"Patches/bun/*.patch").to_s].each { patch { file
-# Pathname(path)... } }` (bun.rb's pattern — the per-file path passed to
-# `file` is computed, not a literal, so only the glob's own directory
-# fragment is visible to a static grep); every file beneath the resulting
-# static prefix is intentionally retained. Never deletes directly on main —
+# such as `Dir[patch_root/"Patches/bun/*.patch"].each { patch { file
+# Pathname(path)... } }` — either a single-level glob (bun.rb) or a
+# recursive one, `Patches/x/**/*.patch` (bun-legacy.rb, whose patches keep
+# their original nested directory layout). Either way the per-file path
+# passed to `file` is computed, not a literal, so only the glob's own
+# directory fragment is visible to a static grep; every file beneath the
+# resulting static prefix is intentionally retained. Never deletes directly
+# on main —
 # same "bot pushes a branch, gh pr create" shape as autobump.sh,
 # including using GITHUB_TOKEN (github-actions[bot]) rather than a personal
 # PAT — this only pushes a fresh non-main branch and opens/labels a PR
@@ -26,7 +29,7 @@ while IFS= read -r -d '' formula; do
     if [[ "$line" =~ file[[:space:]]+\"(Patches/[^\"#]*)\#\{[^}]+\} ]]; then
       DYNAMIC_PREFIXES+=("${BASH_REMATCH[1]}")
     fi
-    if [[ "$line" =~ (Patches/[^\"\'*]*/)\*\.patch ]]; then
+    if [[ "$line" =~ (Patches/[^\"\'*]*/)(\*\*/)?\*\.patch ]]; then
       DYNAMIC_PREFIXES+=("${BASH_REMATCH[1]}")
     fi
   done < "$formula"
