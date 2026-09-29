@@ -29,11 +29,6 @@ class Bun < Formula
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r19"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db11d9bee7c4efd6134d31d7f1ce38bdb2046d1253162235f8a80b6d058d355c"
-  end
-
   depends_on "cmake" => :build
   # Provides libstdc++ for the WebKit/JSC C++ toolchain (see LD_LIBRARY_PATH
   # in install below).
@@ -43,11 +38,6 @@ class Bun < Formula
   depends_on "gperf" => :build if OS.ohos?
   depends_on "llvm@21" => :build # LLVM 22 PR: https://github.com/oven-sh/bun/pull/34299
   depends_on "ninja" => :build
-  # Empirically required: without node on PATH the build's first ninja batch
-  # dies with exit 127 (command not found) right after the WebKit configure;
-  # the bootstrap bun covers the codegen jsRuntime, so some WebKit-phase
-  # tooling execs node directly. Do not drop this dep without a full CI run.
-  depends_on "node" => :build if OS.ohos?
   # libssl.so for rustup/cargo's TLS crate downloads (see LD_LIBRARY_PATH in
   # install below).
   depends_on "openssl@3" => :build if OS.ohos?
