@@ -27,18 +27,32 @@ class Opencode < Formula
   # (both formulae must conflicts_with each other for brew audit).
   conflicts_with "opencode-v2", because: "both install an opencode binary"
 
-  %w[
-    0001-update-package-json.patch
-    0002-update-filesystem-watcher.patch
-    0003-update-project-root.patch
-    0004-update-build-target.patch
-    0005-update-project-worktree.patch
-    0006-filter-invalid-references.patch
-    0008-guard-undefined-layer-deps.patch
-  ].each do |p|
-    patch do
-      file "Patches/opencode/#{p}"
-    end
+  patch do
+    file "Patches/opencode/0001-update-package-json.patch"
+  end
+
+  patch do
+    file "Patches/opencode/0002-update-filesystem-watcher.patch"
+  end
+
+  patch do
+    file "Patches/opencode/0003-update-project-root.patch"
+  end
+
+  patch do
+    file "Patches/opencode/0004-update-build-target.patch"
+  end
+
+  patch do
+    file "Patches/opencode/0005-update-project-worktree.patch"
+  end
+
+  patch do
+    file "Patches/opencode/0006-filter-invalid-references.patch"
+  end
+
+  patch do
+    file "Patches/opencode/0008-guard-undefined-layer-deps.patch"
   end
 
   deny_network_access! :test
