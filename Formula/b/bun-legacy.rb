@@ -41,8 +41,9 @@ class BunLegacy < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-legacy-v1.4.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3186ad6cc29017a0b3e4e566f9e3d98afa98c62780861b680c06786b340373db"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-legacy-v1.4.2-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ef5e779514664955c26f631673fb6b0e27cf4c4bf183c80796d6232f7114a6d"
   end
 
   keg_only "it is an archived reference build superseded by the bun formula"
