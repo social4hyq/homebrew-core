@@ -95,9 +95,6 @@ class BunAT14 < Formula
     on_linux do
       on_arm do
         if OS.ohos?
-          # OHOS's musl userspace has no /lib/ld-linux-aarch64.so.1 (the
-          # glibc interpreter upstream's build here uses), so it can't exec
-          # there; use the musl build instead.
           url "https://github.com/oven-sh/bun/releases/download/bun-v1.3.13/bun-linux-aarch64-musl.zip"
           sha256 "5385e978107ce4934298d8d6afe9bfbb898683f6cc23e6753a0da60bc60c5b81"
         else
@@ -113,16 +110,11 @@ class BunAT14 < Formula
     end
   end
 
-  # Apply all OHOS patches. Filenames are the patched file's repo path with
-  # "/" -> "_" (dots from the file's own extension are kept as dots), e.g.
-  # src/bun_core/Global.rs -> src_bun_core_Global.rs.patch. These sit in one
-  # flat directory and go through this one loop — no per-file special-casing.
-  # Three of them end in a literal ".patch.patch": their *target* path is
+  # Three of these end in a literal ".patch.patch": their *target* path is
   # itself a .patch file inside bun's own vendored-dep `patches/` directory
   # (unrelated to this tap's Patches/ directory) — e.g.
   # patches/tinycc/tccgen.c.patch, consumed later by tinycc.ts's own
-  # `patches:` array — so this naming rule's trailing ".patch" lands on a
-  # name that already ends in ".patch".
+  # `patches:` array.
   patch_root = Pathname(__dir__).parent.parent
   Dir[(patch_root/"Patches/bun@1.4/*.patch").to_s].each do |path|
     patch do
