@@ -1,4 +1,4 @@
-class Bun < Formula
+class BunLegacy < Formula
   desc "Incredibly fast JavaScript runtime, bundler, test runner, and package manager"
   homepage "https://bun.com/"
   url "https://github.com/oven-sh/bun.git",
@@ -24,21 +24,23 @@ class Bun < Formula
   # userspace RESOLVE_IN_ROOT/NO_MAGICLINKS emulator — plus its
   # checked-capacity bound and InRootFdGuard RAII cleanup for the two bugs
   # found in it (long-symlink-chain buffer overflow panic, O_PATH
-  # intermediate-fd leak on every nested request) — from this tap's
-  # bun@1.4.rb revision 9 (commit 37ef7e730), which had the fix but was
-  # never carried over to this formula's Patches/bun/. Same upstream tag,
+  # intermediate-fd leak on every nested request) — from this tap's `bun`
+  # formula (the upstream-aligned rebuild that has since taken over that
+  # name) revision 9 (commit 37ef7e730), which had the fix but was never
+  # carried over to this formula's Patches/bun-legacy/. Same upstream tag,
   # new patch content.
+  #
+  # Archived reference build: this is the original fork-direct port, kept
+  # installable for comparison against the upstream-aligned `bun` formula
+  # that now owns the `bun` name. See docs/harmonybrew-tap.md for the
+  # rename history. keg_only because both formulae install bin/bun.
   revision 13
 
   livecheck do
-    url :stable
-    regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
+    skip "archived reference build kept for comparison; does not track upstream"
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r16"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b76e961e89861080f88fd8c7aa51a46c3ee53a6fc7ceca5b71be9db5e361edc"
-  end
+  keg_only "it is an archived reference build superseded by the bun formula"
 
   depends_on "cmake" => :build
   depends_on "gperf" => :build
@@ -181,7 +183,7 @@ class Bun < Formula
     src/sys/linux_syscall.rs
   ].each do |p|
     patch do
-      file "Patches/bun/#{p}.patch"
+      file "Patches/bun-legacy/#{p}.patch"
     end
   end
   resource "rust-nightly" do
@@ -218,9 +220,9 @@ class Bun < Formula
 
     cd "vendor/WebKit" do
       # The suspend patch lives in this formula's patch directory
-      # (Patches/bun/); applied here rather than via a DSL patch
+      # (Patches/bun-legacy/); applied here rather than via a DSL patch
       # because vendor/WebKit only exists after the clone above.
-      suspend_patch = tap.path/"Patches/bun/webkit-suspend-resume.patch"
+      suspend_patch = tap.path/"Patches/bun-legacy/webkit-suspend-resume.patch"
       odie "WebKit suspend patch missing from tap: #{suspend_patch}" unless suspend_patch.file?
       system "git", "apply", "--check", suspend_patch
       system "git", "apply", suspend_patch
