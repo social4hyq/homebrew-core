@@ -24,6 +24,15 @@ class Zcode < Formula
   # disabled (no openharmony @pnpm/exe exists).
   depends_on "node" => :build
   depends_on "pnpm" => :build
+  # node-gyp (electron-rebuild's node-pty prebuild step, packages/desktop
+  # postinstall) needs a `python3` on PATH; superenv strips PATH down to
+  # declared deps, so without this node-gyp fails "Could not find any
+  # Python installation to use" when the desktop package's native rebuild
+  # runs. Only surfaces on a from-source (re)build, not a bottle pour,
+  # which is why it went unnoticed until brew's broken-linkage check
+  # forced a source reinstall. Version matches bun-legacy.rb/opencode.rb's
+  # existing python@3.14 build dep for consistency.
+  depends_on "python@3.14" => :build
   depends_on "bun" # pnpm/tsc/vite toolchain
 
   %w[
