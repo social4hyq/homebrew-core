@@ -30,15 +30,7 @@ class Bun < Formula
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r22"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "214aae5323ee70a0b2a5caedd4e9b2c4284a7500527245bb3f336af85a417b09"
-  end
   depends_on "cmake" => :build
-  # Provides libstdc++ for the WebKit/JSC C++ toolchain (see LD_LIBRARY_PATH
-  # in install below).
-  depends_on "gcc" => :build if OS.ohos?
   # Required by the WebKit build (HTML/CSS name-table codegen); not on the
   # OHOS build image's PATH by default.
   depends_on "gperf" => :build if OS.ohos?
@@ -187,7 +179,6 @@ class Bun < Formula
       system "rustup", "toolchain", "install", rust_toolchain, "--profile", "minimal", "--component", "rust-src"
       rust_home = Pathname(Dir.home)/".rustup/toolchains"/rust_toolchain
       ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
-      ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
       ENV.prepend_path "PATH", rust_home/"bin"
     end
 
