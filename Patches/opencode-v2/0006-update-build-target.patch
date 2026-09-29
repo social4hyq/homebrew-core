@@ -1,6 +1,8 @@
+diff --git a/packages/cli/script/build.ts b/packages/cli/script/build.ts
+index f55d890..3fa0ed9 100755
 --- a/packages/cli/script/build.ts
 +++ b/packages/cli/script/build.ts
-@@ -55,9 +55,10 @@
+@@ -55,9 +55,10 @@ const targets =
      ? allTargets.filter((item) => targetName(item) === requestedTarget)
      : singleFlag
        ? allTargets.filter((item) => {
@@ -13,16 +15,19 @@
          })
        : allTargets
  if (!targets.length) throw new Error(`Unknown build target: ${requestedTarget}`)
-@@ -136,7 +137,7 @@
+@@ -136,7 +137,10 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
        autoloadDotenv: false,
        autoloadTsconfig: true,
        autoloadPackageJson: true,
 -      target: target.replace(binary, "bun") as Bun.Build.CompileTarget,
-+      target: (process.platform === "openharmony" && item.abi === "musl" ? "bun-linux-arm64-ohos" : target.replace(binary, "bun")) as Bun.Build.CompileTarget,
++      // OHOS: omit target entirely rather than pass any string (see PR).
++      ...(process.platform === "openharmony" && item.abi === "musl"
++        ? {}
++        : { target: target.replace(binary, "bun") as Bun.Build.CompileTarget }),
        ...(executablePath ? { executablePath } : {}),
        outfile: path.join(outdir, name, "bin", binary),
        execArgv: [
-@@ -185,7 +186,7 @@
+@@ -186,7 +190,7 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
  
  async function compileExecutable(item: (typeof allTargets)[number]) {
    const release = process.env.BUN_COMPILE_RELEASE
