@@ -40,6 +40,11 @@ class BunLegacy < Formula
     skip "archived reference build kept for comparison; does not track upstream"
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-legacy-v1.4.2-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3186ad6cc29017a0b3e4e566f9e3d98afa98c62780861b680c06786b340373db"
+  end
+
   keg_only "it is an archived reference build superseded by the bun formula"
 
   depends_on "cmake" => :build
