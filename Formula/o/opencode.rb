@@ -1,8 +1,8 @@
 class Opencode < Formula
   desc "AI coding agent, built for the terminal"
   homepage "https://opencode.ai"
-  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.32.tar.gz"
-  sha256 "65e95c9a6666ca65bbd17de1e7cecddac1504e66eeebbcfaf5ac68f97e6f392b"
+  url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.33.tar.gz"
+  sha256 "34a4b810f4e839f2c4ac62206bbc64d736006f3c96712b903cda83ca60271301"
   license "MIT"
 
   # No throttle: unlike upstream homebrew-core (which throttles to every 5th
