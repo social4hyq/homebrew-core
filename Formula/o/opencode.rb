@@ -4,6 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.33.tar.gz"
   sha256 "34a4b810f4e839f2c4ac62206bbc64d736006f3c96712b903cda83ca60271301"
   license "MIT"
+  revision 1
 
   # No throttle: unlike upstream homebrew-core (which throttles to every 5th
   # release to limit their own CI churn), this tap wants opencode to autobump
@@ -14,8 +15,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.33-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c876252cffe22afda0e8db68177f64dc5de85930eb516ca3d013c991620125d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.33-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b777da1d907149518a58fc395494d877828e27061465e490f96073869fe8324"
   end
 
   depends_on "bun" => :build
@@ -31,18 +32,32 @@ class Opencode < Formula
   # (both formulae must conflicts_with each other for brew audit).
   conflicts_with "opencode-v2", because: "both install an opencode binary"
 
-  %w[
-    0001-update-package-json.patch
-    0002-update-filesystem-watcher.patch
-    0003-update-project-root.patch
-    0004-update-build-target.patch
-    0005-update-project-worktree.patch
-    0006-filter-invalid-references.patch
-    0008-guard-undefined-layer-deps.patch
-  ].each do |p|
-    patch do
-      file "Patches/opencode/#{p}"
-    end
+  patch do
+    file "Patches/opencode/0001-update-package-json.patch"
+  end
+
+  patch do
+    file "Patches/opencode/0002-update-filesystem-watcher.patch"
+  end
+
+  patch do
+    file "Patches/opencode/0003-update-project-root.patch"
+  end
+
+  patch do
+    file "Patches/opencode/0004-update-build-target.patch"
+  end
+
+  patch do
+    file "Patches/opencode/0005-update-project-worktree.patch"
+  end
+
+  patch do
+    file "Patches/opencode/0006-filter-invalid-references.patch"
+  end
+
+  patch do
+    file "Patches/opencode/0008-guard-undefined-layer-deps.patch"
   end
 
   deny_network_access! :test
