@@ -2,9 +2,13 @@
 # Find files under Patches/ that no Formula/**/*.rb references and open a PR
 # removing them. Most formulae name each patch literally, but a formula may
 # apply a generated list through a dynamic path such as
-# `file "Patches/bun/#{p}.patch"`; every file beneath that static prefix is
-# intentionally retained. Never deletes directly on main — same "bot pushes
-# a branch, gh pr create" shape as autobump.sh,
+# `file "Patches/bun-legacy/#{p}.patch"`, or glob a directory at load time
+# such as `Dir[(patch_root/"Patches/bun/*.patch").to_s].each { patch { file
+# Pathname(path)... } }` (bun.rb's pattern — the per-file path passed to
+# `file` is computed, not a literal, so only the glob's own directory
+# fragment is visible to a static grep); every file beneath the resulting
+# static prefix is intentionally retained. Never deletes directly on main —
+# same "bot pushes a branch, gh pr create" shape as autobump.sh,
 # including using GITHUB_TOKEN (github-actions[bot]) rather than a personal
 # PAT — this only pushes a fresh non-main branch and opens/labels a PR
 # against it, neither of which needs the ruleset-bypass admin PAT that
@@ -20,6 +24,9 @@ DYNAMIC_PREFIXES=()
 while IFS= read -r -d '' formula; do
   while IFS= read -r line; do
     if [[ "$line" =~ file[[:space:]]+\"(Patches/[^\"#]*)\#\{[^}]+\} ]]; then
+      DYNAMIC_PREFIXES+=("${BASH_REMATCH[1]}")
+    fi
+    if [[ "$line" =~ (Patches/[^\"\'*]*/)\*\.patch ]]; then
       DYNAMIC_PREFIXES+=("${BASH_REMATCH[1]}")
     fi
   done < "$formula"
