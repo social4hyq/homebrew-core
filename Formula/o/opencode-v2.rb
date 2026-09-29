@@ -4,12 +4,6 @@ class OpencodeV2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "cd9a14a6b688d4021bee381dfd39d2cef9c0f862"
   version "2.0.18"
   license "MIT"
-  # Rebuild against the tap's bun (social4hyq/homebrew-core#707 "second
-  # takeover": bun is now the upstream-structure-aligned reimplementation,
-  # not the fork-mechanical-export build it was pinned against before).
-  # `script/build.ts --single` compiles by copying bun's own executable
-  # and appending bytecode, so the installed opencode binary embeds
-  # whichever bun built it — this refreshes that embedded runtime.
   revision 1
   version_scheme 1
 
@@ -30,17 +24,28 @@ class OpencodeV2 < Formula
     sha256 "0c90be86818a667aa3b2dd5611c54f96d3451e1836f562ec2cecd99f7979e7e5"
   end
 
-  %w[
-    0001-update-package-json.patch
-    0002-update-bun-lock.patch
-    0003-update-filesystem-watcher.patch
-    0004-update-watcher-binding.patch
-    0005-update-server-connection.patch
-    0006-update-build-target.patch
-  ].each do |p|
-    patch do
-      file "Patches/opencode-v2/#{p}"
-    end
+  patch do
+    file "Patches/opencode-v2/0001-update-package-json.patch"
+  end
+
+  patch do
+    file "Patches/opencode-v2/0002-update-bun-lock.patch"
+  end
+
+  patch do
+    file "Patches/opencode-v2/0003-update-filesystem-watcher.patch"
+  end
+
+  patch do
+    file "Patches/opencode-v2/0004-update-watcher-binding.patch"
+  end
+
+  patch do
+    file "Patches/opencode-v2/0005-update-server-connection.patch"
+  end
+
+  patch do
+    file "Patches/opencode-v2/0006-update-build-target.patch"
   end
 
   deny_network_access! :test
