@@ -45,6 +45,9 @@ class Bun < Formula
   # the bootstrap bun covers the codegen jsRuntime, so some WebKit-phase
   # tooling execs node directly. Do not drop this dep without a full CI run.
   depends_on "node" => :build if OS.ohos?
+  # libssl.so for rustup/cargo's TLS crate downloads (see LD_LIBRARY_PATH in
+  # install below).
+  depends_on "openssl@3" => :build if OS.ohos?
   depends_on "rustup" => :build # needs nightly as uses `-Z` flags and unstable `#![feature(...)]`
   # libz.so for build-time tools that dynamically link it (see
   # LD_LIBRARY_PATH in install below).
@@ -182,6 +185,7 @@ class Bun < Formula
       rust_toolchain = "#{channel}-aarch64-unknown-linux-ohos"
       system "rustup", "toolchain", "install", rust_toolchain, "--profile", "minimal", "--component", "rust-src"
       rust_home = Pathname(Dir.home)/".rustup/toolchains"/rust_toolchain
+      ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3")
       ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
       ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
       ENV.prepend_path "PATH", rust_home/"bin"
