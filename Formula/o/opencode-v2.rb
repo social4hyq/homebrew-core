@@ -4,7 +4,7 @@ class OpencodeV2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "cd9a14a6b688d4021bee381dfd39d2cef9c0f862"
   version "2.0.18"
   license "MIT"
-  revision 1
+  revision 2
   version_scheme 1
 
   livecheck do
@@ -13,12 +13,16 @@ class OpencodeV2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2-v2.0.18-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a9e33d4b397d0e0bb060e43623694a2576e8023ab9fb5472fc588e42656a206"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2-v2.0.18-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce7ba9d20ee3b926caabfc44d42f19689e382670d66c54aea143c38d5e5a3ffc"
   end
 
   depends_on "bun" => :build
   depends_on "node" => :build
+
+  on_linux do
+    depends_on "icu4c@78"
+  end
 
   # Officially v2 replaces v1 in place (same config/data dirs, binary name
   # "opencode"); mirror the upstream anomalyco/tap/opencode-v2 formula.
