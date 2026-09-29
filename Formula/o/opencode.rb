@@ -4,6 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.33.tar.gz"
   sha256 "34a4b810f4e839f2c4ac62206bbc64d736006f3c96712b903cda83ca60271301"
   license "MIT"
+  revision 1
 
   # No throttle: unlike upstream homebrew-core (which throttles to every 5th
   # release to limit their own CI churn), this tap wants opencode to autobump
@@ -11,11 +12,6 @@ class Opencode < Formula
   livecheck do
     url :stable
     regex(/^v(1\.\d+\.\d+)$/i)
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.33-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5c876252cffe22afda0e8db68177f64dc5de85930eb516ca3d013c991620125d"
   end
 
   depends_on "bun" => :build
