@@ -30,11 +30,6 @@ class Bun < Formula
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r22"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "214aae5323ee70a0b2a5caedd4e9b2c4284a7500527245bb3f336af85a417b09"
-  end
   depends_on "cmake" => :build
   # Provides libstdc++ for the WebKit/JSC C++ toolchain (see LD_LIBRARY_PATH
   # in install below).
@@ -48,9 +43,6 @@ class Bun < Formula
   # cargo, but only direct dependencies are on the superenv PATH.
   depends_on "patchelf" => :build if OS.ohos?
   depends_on "rustup" => :build # needs nightly as uses `-Z` flags and unstable `#![feature(...)]`
-  # libz.so for build-time tools that dynamically link it (see
-  # LD_LIBRARY_PATH in install below).
-  depends_on "zlib-ng-compat" => :build if OS.ohos?
 
   uses_from_macos "perl" => :build # for webkit
   uses_from_macos "python" => :build # for webkit
@@ -186,7 +178,6 @@ class Bun < Formula
       rust_toolchain = "#{channel}-aarch64-unknown-linux-ohos"
       system "rustup", "toolchain", "install", rust_toolchain, "--profile", "minimal", "--component", "rust-src"
       rust_home = Pathname(Dir.home)/".rustup/toolchains"/rust_toolchain
-      ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
       ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
       ENV.prepend_path "PATH", rust_home/"bin"
     end
