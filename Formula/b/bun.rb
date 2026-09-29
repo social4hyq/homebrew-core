@@ -29,6 +29,11 @@ class Bun < Formula
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r19"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db11d9bee7c4efd6134d31d7f1ce38bdb2046d1253162235f8a80b6d058d355c"
+  end
+
   depends_on "cmake" => :build
   # Provides libstdc++ for the WebKit/JSC C++ toolchain (see LD_LIBRARY_PATH
   # in install below).
