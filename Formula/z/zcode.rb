@@ -16,9 +16,9 @@ class Zcode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.14.3-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f30c983e8385a33e17a0d120cca505b84e61ee7a8b9e67706ce0fb1ba6d4c92"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.14.3-r3"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "907951783545fb7b74ec5b8931f1297c6b844224b9e785031169057ad9ce2a1d"
   end
 
   # pnpm 12 acts as itself with delegation to the packageManager pin
