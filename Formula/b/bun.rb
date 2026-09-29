@@ -1,4 +1,4 @@
-class BunAT14 < Formula
+class Bun < Formula
   desc "Incredibly fast JavaScript runtime, bundler, test runner, and package manager"
   homepage "https://bun.com/"
   # Need git checkout to build. Alternatively could set GIT_SHA if we extract the commit.
@@ -21,16 +21,14 @@ class BunAT14 < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  revision 13
+  # Takes over the `bun` name from the fork-direct port (archived as
+  # bun-legacy; see docs/harmonybrew-tap.md for the rename history).
+  # Bumped past that formula's last revision (13) so `brew upgrade bun`
+  # moves already-installed users onto this upstream-aligned build.
+  revision 14
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun@1.4-v1.4.2-r25"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fc424627ba8fa6fcb8a7762c71a12cc68936d319ceb11478f6ed567983d7066c"
   end
 
   depends_on "cmake" => :build
@@ -116,7 +114,7 @@ class BunAT14 < Formula
   # patches/tinycc/tccgen.c.patch, consumed later by tinycc.ts's own
   # `patches:` array.
   patch_root = Pathname(__dir__).parent.parent
-  Dir[(patch_root/"Patches/bun@1.4/*.patch").to_s].each do |path|
+  Dir[(patch_root/"Patches/bun/*.patch").to_s].each do |path|
     patch do
       file Pathname(path).relative_path_from(patch_root).to_s
     end
