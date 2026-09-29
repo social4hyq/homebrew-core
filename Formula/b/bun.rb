@@ -29,12 +29,6 @@ class Bun < Formula
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r21"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "344bb83cc0c38eb9a5182d4cc7fbbb70d38fe888f0297deb89fb4c9cbc3d67d5"
-  end
-
   depends_on "cmake" => :build
   # Provides libstdc++ for the WebKit/JSC C++ toolchain (see LD_LIBRARY_PATH
   # in install below).
@@ -44,9 +38,9 @@ class Bun < Formula
   depends_on "gperf" => :build if OS.ohos?
   depends_on "llvm@21" => :build # LLVM 22 PR: https://github.com/oven-sh/bun/pull/34299
   depends_on "ninja" => :build
-  # libssl.so for rustup/cargo's TLS crate downloads (see LD_LIBRARY_PATH in
-  # install below).
-  depends_on "openssl@3" => :build if OS.ohos?
+  # rustup's post-install hook runs `patchelf` to add the openssl/zlib rpath to
+  # cargo, but only direct dependencies are on the superenv PATH.
+  depends_on "patchelf" => :build if OS.ohos?
   depends_on "rustup" => :build # needs nightly as uses `-Z` flags and unstable `#![feature(...)]`
   # libz.so for build-time tools that dynamically link it (see
   # LD_LIBRARY_PATH in install below).
@@ -186,7 +180,6 @@ class Bun < Formula
       rust_toolchain = "#{channel}-aarch64-unknown-linux-ohos"
       system "rustup", "toolchain", "install", rust_toolchain, "--profile", "minimal", "--component", "rust-src"
       rust_home = Pathname(Dir.home)/".rustup/toolchains"/rust_toolchain
-      ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("openssl@3")
       ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zlib-ng-compat")
       ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
       ENV.prepend_path "PATH", rust_home/"bin"
