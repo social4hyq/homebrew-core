@@ -36,13 +36,12 @@ class Zcode < Formula
   depends_on "python@3.14" => :build
   depends_on "bun" # pnpm/tsc/vite toolchain
 
-  %w[
-    0001-ohos-sea-targets.patch
-    0002-bun-node-sea-guards.patch
-  ].each do |p|
-    patch do
-      file "Patches/zcode/#{p}"
-    end
+  patch do
+    file "Patches/zcode/0001-ohos-sea-targets.patch"
+  end
+
+  patch do
+    file "Patches/zcode/0002-bun-node-sea-guards.patch"
   end
 
   deny_network_access! :test
