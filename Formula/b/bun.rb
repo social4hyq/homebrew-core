@@ -16,14 +16,10 @@ class Bun < Formula
     "BSD-3-Clause",      # lol-html, libwebp, zstd
     "IJG",               # libjpeg-turbo
     "LGPL-2.1-or-later", # tinycc
-    "Unicode-3.0",       # ICU (statically linked on OHOS)
+    "Unicode-3.0",       # ICU
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  # Takes over the `bun` name from the fork-direct port (archived as
-  # bun-legacy; see docs/harmonybrew-tap.md for the rename history).
-  # Bumped past that formula's last revision (13) so `brew upgrade bun`
-  # moves already-installed users onto this upstream-aligned build.
   revision 16
   livecheck do
     url :stable
@@ -37,16 +33,13 @@ class Bun < Formula
   end
 
   depends_on "cmake" => :build
-  # Provides libstdc++ for the prebuilt bootstrap bun (see LD_LIBRARY_PATH in
-  # install below).
+  # libstdc++ for the prebuilt bootstrap bun (see LD_LIBRARY_PATH in install)
   depends_on "gcc" => :build if OS.ohos?
-  # Required by the WebKit build (HTML/CSS name-table codegen); not on the
-  # OHOS build image's PATH by default.
+  # for the WebKit build
   depends_on "gperf" => :build if OS.ohos?
   depends_on "llvm@21" => :build # LLVM 22 PR: https://github.com/oven-sh/bun/pull/34299
   depends_on "ninja" => :build
-  # rustup's post-install hook runs `patchelf` to add the openssl/zlib rpath to
-  # cargo, but only direct dependencies are on the superenv PATH.
+  # rustup's post-install hook needs patchelf on PATH
   depends_on "patchelf" => :build if OS.ohos?
   depends_on "rustup" => :build # needs nightly as uses `-Z` flags and unstable `#![feature(...)]`
 
@@ -56,13 +49,9 @@ class Bun < Formula
   uses_from_macos "unzip" => :build
 
   on_linux do
+    depends_on "icu4c@78" => :build if OS.ohos?
     depends_on "lld@21" => :build
-    if OS.ohos?
-      # Statically linked on OHOS (see install), so it is build-only there.
-      depends_on "icu4c@78" => :build
-    else
-      depends_on "icu4c@78"
-    end
+    depends_on "icu4c@78" unless OS.ohos?
   end
 
   on_intel do
@@ -105,11 +94,7 @@ class Bun < Formula
     end
   end
 
-  # Three of these end in a literal ".patch.patch": their *target* path is
-  # itself a .patch file inside bun's own vendored-dep `patches/` directory
-  # (unrelated to this tap's Patches/ directory) — e.g.
-  # patches/tinycc/tccgen.c.patch, consumed later by tinycc.ts's own
-  # `patches:` array.
+  # Some patches target bun's own vendored-dep `patches/*.patch`, hence `.patch.patch`.
   patch_root = Pathname(__dir__).parent.parent
   Dir[(patch_root/"Patches/bun/*.patch").to_s].each do |path|
     patch do
@@ -145,9 +130,7 @@ class Bun < Formula
     return unless OS.ohos?
 
     cd "vendor/WebKit" do
-      # patches/webkit/suspend-resume.patch was materialized into buildpath
-      # by the DSL patch loop above; apply it to the freshly cloned WebKit
-      # checkout here, since vendor/WebKit only exists after the clone.
+      # vendor/WebKit exists only after the clone, so apply the patch here.
       suspend_patch = buildpath/"patches/webkit/suspend-resume.patch"
       odie "WebKit suspend patch missing: #{suspend_patch}" unless suspend_patch.file?
       system "git", "apply", "--check", suspend_patch
@@ -171,8 +154,6 @@ class Bun < Formula
       # defilter paths are `always_inline`, so drop back to the 1.4.0 level.
       inreplace "scripts/build/deps/libspng.ts", "{ SPNG_SSE: 4 }", "{ SPNG_SSE: 1 }"
     elsif OS.linux? && Hardware::CPU.arm64?
-      # Also covers OHOS (OS.linux? is true there too; see the OHOS
-      # toolchain setup below for the rest of the cross-compile environment).
       inreplace "scripts/build/flags.ts", "-march=armv8-a+crc", ENV["HOMEBREW_OPTFLAGS"].to_s
     end
 
@@ -220,8 +201,6 @@ class Bun < Formula
     system bin/"bun", "init", "--yes"
     assert_equal "Hello via Bun!", shell_output("#{bin}/bun run index.ts").chomp
 
-    # bun self-signs the executables it produces, so ./test running below
-    # also proves the self-signing path works.
     system bin/"bun", "build", "--compile", "--outfile=test", "index.ts"
     assert_equal "Hello via Bun!", shell_output("./test").chomp
 
