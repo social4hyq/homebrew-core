@@ -12,6 +12,11 @@ class OpencodeV2 < Formula
     regex(/^v(2\.\d+\.\d+)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2-v2.0.18-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ce7ba9d20ee3b926caabfc44d42f19689e382670d66c54aea143c38d5e5a3ffc"
+  end
+
   depends_on "bun" => :build
   depends_on "node" => :build
 
