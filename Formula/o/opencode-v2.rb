@@ -4,6 +4,7 @@ class OpencodeV2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "cd9a14a6b688d4021bee381dfd39d2cef9c0f862"
   version "2.0.18"
   license "MIT"
+  revision 1
   version_scheme 1
 
   livecheck do
@@ -12,8 +13,8 @@ class OpencodeV2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2-v2.0.18-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0e4556fbbbec5a06010ca21584493358838ec008d7c8e1f3d86ebc800283d56b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2-v2.0.18-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a9e33d4b397d0e0bb060e43623694a2576e8023ab9fb5472fc588e42656a206"
   end
 
   depends_on "bun" => :build
@@ -28,17 +29,28 @@ class OpencodeV2 < Formula
     sha256 "0c90be86818a667aa3b2dd5611c54f96d3451e1836f562ec2cecd99f7979e7e5"
   end
 
-  %w[
-    0001-update-package-json.patch
-    0002-update-bun-lock.patch
-    0003-update-filesystem-watcher.patch
-    0004-update-watcher-binding.patch
-    0005-update-server-connection.patch
-    0006-update-build-target.patch
-  ].each do |p|
-    patch do
-      file "Patches/opencode-v2/#{p}"
-    end
+  patch do
+    file "Patches/opencode-v2/0001-update-package-json.patch"
+  end
+
+  patch do
+    file "Patches/opencode-v2/0002-update-bun-lock.patch"
+  end
+
+  patch do
+    file "Patches/opencode-v2/0003-update-filesystem-watcher.patch"
+  end
+
+  patch do
+    file "Patches/opencode-v2/0004-update-watcher-binding.patch"
+  end
+
+  patch do
+    file "Patches/opencode-v2/0005-update-server-connection.patch"
+  end
+
+  patch do
+    file "Patches/opencode-v2/0006-update-build-target.patch"
   end
 
   deny_network_access! :test
