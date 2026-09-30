@@ -73,7 +73,13 @@ class OpencodeV2 < Formula
 
   def install
     resource("zig").stage(buildpath/"zig-toolchain")
-    ENV.prepend_path "PATH", buildpath/"zig-toolchain"
+    # Native zig picks the OHOS SDK sysroot (no bits/alltypes.h); use its bundled musl instead.
+    (buildpath/"zig-bin/zig").write <<~SH
+      #!/bin/sh
+      exec #{buildpath}/zig-toolchain/zig "$@" -Dtarget=aarch64-linux-musl
+    SH
+    chmod 0755, buildpath/"zig-bin/zig"
+    ENV.prepend_path "PATH", buildpath/"zig-bin"
     ENV["ZIG_GLOBAL_CACHE_DIR"] = (HOMEBREW_CACHE/"opencode-v2-zig-global-cache").to_s
 
     # Build the persistent PTY helper from source instead of embedding the prebuilt npm binary
@@ -86,7 +92,8 @@ class OpencodeV2 < Formula
         s.gsub! 'nix = { version = "0.28"', 'nix = { version = "0.31"'
         s.gsub! 'portable-pty = "0.9.0"', %Q(portable-pty = { path = "#{buildpath}/portable-pty" })
       end
-      system "cargo", "install", *std_cargo_args(root: buildpath/"opencode-pty").reject { |arg| arg == "--locked" }
+      system "cargo", "fetch"
+      system "cargo", "install", *std_cargo_args(root: buildpath/"opencode-pty")
     end
     ENV["OPENCODE_PTY_BIN"] = buildpath/"opencode-pty/bin/opencode-pty"
 
