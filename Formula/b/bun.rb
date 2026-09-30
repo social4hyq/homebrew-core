@@ -27,10 +27,11 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r27"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ba462592e8cef050b7477c16adf7cb6f220fd8f4ecaa6f7d9a27e4b662bbf7b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r28"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6dd626fb67eee35555a9191ac5da86ff5a7bc8ca2eac7c4918b9264d685ef706"
   end
+
   depends_on "cmake" => :build
   # libstdc++ for the prebuilt bootstrap bun (see LD_LIBRARY_PATH in install)
   depends_on "gcc" => :build if OS.ohos?
@@ -151,12 +152,7 @@ class Bun < Formula
       inreplace "scripts/build/bun.ts",
                 '"-licudata", "-licui18n", "-licuuc"',
                 '"-l:libicui18n.a", "-l:libicuuc.a", "-l:libicudata.a"'
-      channel = File.read("rust-toolchain.toml")[/channel\s*=\s*"([^"]+)"/, 1]
-      rust_toolchain = "#{channel}-aarch64-unknown-linux-ohos"
-      system "rustup", "toolchain", "install", rust_toolchain, "--profile", "minimal", "--component", "rust-src"
-      rust_home = Pathname(Dir.home)/".rustup/toolchains"/rust_toolchain
       ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("gcc")/"gcc/current"
-      ENV.prepend_path "PATH", rust_home/"bin"
     end
 
     # Nested dep builds run `cmake --build` without `--parallel`, four at a time
