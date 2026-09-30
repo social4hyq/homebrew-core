@@ -4,16 +4,11 @@ class ClaudeCodeLatest < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.285.tgz"
   sha256 "5c0017d0e0b9518417dfbf419d04d20c7637ee885600a63ea041e0ff57e4b0eb"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 2
+  revision 3
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/latest"
     regex(/(\d+(?:\.\d+)+)/i)
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.285-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3f21fa10ae13af9cf0d67cc520b7a1ceb4d41e4dc2d8770ae50d40519bb6b9b"
   end
 
   depends_on "ohos-compat-shim"
@@ -22,6 +17,7 @@ class ClaudeCodeLatest < Formula
   conflicts_with "claude-code", because: "both install the `claude` binary"
 
   def install
+    rm_r buildpath.children # keep the official README/LICENSE out of the bottle
     (bin/"claude").write <<~SH
       #!/bin/sh
       set -eu
