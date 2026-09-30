@@ -4,7 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v2.0.20.tar.gz"
   sha256 "e8bc8af7f8f2df976740fc0a3a0564d6d7b34b9389d921ae0007fa2f49c1c236"
   license "MIT"
-  revision 4
+  revision 5
   version_scheme 1
 
   livecheck do
@@ -102,7 +102,7 @@ class Opencode < Formula
     inreplace "packages/cli/script/build.ts", "splitting: true,", "splitting: false,"
 
     # 0001 swaps in @ohos-npm-ports overrides, so bun.lock can't stay frozen
-    system "bun", "install", "--ignore-scripts"
+    system "bun", "install"
 
     cd "packages/cli" do
       system "bun", "--bun", "./script/build.ts", "--single", "--skip-install"
