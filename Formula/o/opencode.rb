@@ -4,7 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v2.0.20.tar.gz"
   sha256 "e8bc8af7f8f2df976740fc0a3a0564d6d7b34b9389d921ae0007fa2f49c1c236"
   license "MIT"
-  revision 3
+  revision 4
   version_scheme 1
 
   livecheck do
@@ -13,8 +13,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2.0.20-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b3457e0d8172ab76770d247d33c6d6c54ad750fd6f15f2c41354d3cd5e57d225"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2.0.20-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "11b81627d6eb7676a65797c6b2f3a5fb286786468542f54939337c1ed8e8d9b7"
   end
 
   depends_on "bun" => :build
@@ -61,10 +61,6 @@ class Opencode < Formula
   end
 
   patch do
-    file "Patches/opencode/0005-update-server-connection.patch"
-  end
-
-  patch do
     file "Patches/opencode/0006-update-build-target.patch"
   end
 
@@ -81,7 +77,6 @@ class Opencode < Formula
     SH
     chmod 0755, buildpath/"zig-bin/zig"
     ENV.prepend_path "PATH", buildpath/"zig-bin"
-    ENV["ZIG_GLOBAL_CACHE_DIR"] = (HOMEBREW_CACHE/"opencode-zig-global-cache").to_s
 
     # Build the persistent PTY helper from source instead of embedding the prebuilt npm binary
     (buildpath/"ghostty").install resource("ghostty")
@@ -114,7 +109,7 @@ class Opencode < Formula
       bin.install Pathname.pwd.glob("dist/cli-*/bin/opencode").first
     end
 
-    generate_completions_from_executable(bin/"opencode", "--completions", base_name: "opencode")
+    generate_completions_from_executable(bin/"opencode", "--completions")
   end
 
   test do

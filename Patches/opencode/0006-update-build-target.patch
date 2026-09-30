@@ -1,8 +1,6 @@
-diff --git a/packages/cli/script/build.ts b/packages/cli/script/build.ts
-index f55d890..1a38ff4 100755
 --- a/packages/cli/script/build.ts
 +++ b/packages/cli/script/build.ts
-@@ -55,9 +55,10 @@ const targets =
+@@ -55,9 +55,10 @@
      ? allTargets.filter((item) => targetName(item) === requestedTarget)
      : singleFlag
        ? allTargets.filter((item) => {
@@ -15,7 +13,7 @@ index f55d890..1a38ff4 100755
          })
        : allTargets
  if (!targets.length) throw new Error(`Unknown build target: ${requestedTarget}`)
-@@ -107,7 +108,10 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
+@@ -107,7 +108,10 @@
        )
      },
    }
@@ -27,7 +25,7 @@ index f55d890..1a38ff4 100755
    const parcelWatcherPlugin: BunPlugin = {
      name: "parcel-watcher-binding",
      setup(build) {
-@@ -136,7 +140,10 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
+@@ -136,7 +140,10 @@
        autoloadDotenv: false,
        autoloadTsconfig: true,
        autoloadPackageJson: true,
@@ -39,12 +37,12 @@ index f55d890..1a38ff4 100755
        ...(executablePath ? { executablePath } : {}),
        outfile: path.join(outdir, name, "bin", binary),
        execArgv: [
-@@ -186,7 +193,7 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
+@@ -186,7 +193,7 @@
  
  async function compileExecutable(item: (typeof allTargets)[number]) {
    const release = process.env.BUN_COMPILE_RELEASE
 -  if (!release) return
-+  if (!release) return process.execPath
++  if (!release) return process.platform === "openharmony" ? process.execPath : undefined
  
    const platform = item.os === "win32" ? "windows" : item.os
    const name = [
