@@ -1,22 +1,13 @@
+diff --git a/packages/core/src/filesystem/watcher-binding.ts b/packages/core/src/filesystem/watcher-binding.ts
+index e36dbbd..263e5b7 100644
 --- a/packages/core/src/filesystem/watcher-binding.ts
 +++ b/packages/core/src/filesystem/watcher-binding.ts
-@@ -5,10 +5,14 @@
- // Lazy: on workerd import.meta.url is undefined and the watcher is never
+@@ -6,6 +6,8 @@ declare const OPENCODE_LIBC: string | undefined
  // loaded, so createRequire must not run at module scope.
  export default function load() {
--  const require = createRequire(import.meta.url)
-+  const nodeRequire = createRequire(import.meta.url)
+   const require = createRequire(import.meta.url)
++  // OHOS: the ohos-npm-ports build ships its own loader, no per-platform package
++  if (process.platform === "openharmony") return require("@parcel/watcher")
    const libc = typeof OPENCODE_LIBC === "undefined" ? undefined : OPENCODE_LIBC
--  return require(
--    process.env.OPENCODE_PARCEL_WATCHER_PATH ??
--      `@parcel/watcher-${process.platform}-${process.arch}${process.platform === "linux" ? `-${libc || "glibc"}` : ""}`,
--  )
-+  try {
-+    return nodeRequire(
-+      process.env.OPENCODE_PARCEL_WATCHER_PATH ??
-+        `@parcel/watcher-${process.platform}-${process.arch}${process.platform === "linux" ? `-${libc || "glibc"}` : ""}`,
-+    )
-+  } catch {
-+    return require("@parcel/watcher/build/Release/watcher.node")
-+  }
- }
+   return require(
+     process.env.OPENCODE_PARCEL_WATCHER_PATH ??

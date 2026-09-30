@@ -4,6 +4,7 @@ class OpencodeV2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "84c9be93a56304a108f1a22df0c5d62c26d5b6ca"
   version "2.0.20"
   license "MIT"
+  revision 1
   version_scheme 1
 
   livecheck do
@@ -11,10 +12,6 @@ class OpencodeV2 < Formula
     regex(/^v(2\.\d+\.\d+)$/i)
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2-v2.0.20-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c959fded5cd7a2dfd9429ebf00d05143912bc9a024a81c01b67f9000da2fc1c"
-  end
   depends_on "bun" => :build
   depends_on "node" => :build
   # Officially v2 replaces v1 in place (same config/data dirs, binary name
