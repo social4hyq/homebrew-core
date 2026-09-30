@@ -27,10 +27,10 @@ class Bun < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r26"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "11c5c34d591df05c6acd8b2b5746b36ae8005d2bb6b2c8d6b83af74a5224d88f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r27"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ba462592e8cef050b7477c16adf7cb6f220fd8f4ecaa6f7d9a27e4b662bbf7b"
   end
-
   depends_on "cmake" => :build
   # libstdc++ for the prebuilt bootstrap bun (see LD_LIBRARY_PATH in install)
   depends_on "gcc" => :build if OS.ohos?
@@ -38,8 +38,6 @@ class Bun < Formula
   depends_on "gperf" => :build if OS.ohos?
   depends_on "llvm@21" => :build # LLVM 22 PR: https://github.com/oven-sh/bun/pull/34299
   depends_on "ninja" => :build
-  # rustup's post-install hook needs patchelf on PATH
-  depends_on "patchelf" => :build if OS.ohos?
   depends_on "rustup" => :build # needs nightly as uses `-Z` flags and unstable `#![feature(...)]`
 
   uses_from_macos "perl" => :build # for webkit
