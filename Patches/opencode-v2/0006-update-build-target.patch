@@ -1,5 +1,5 @@
 diff --git a/packages/cli/script/build.ts b/packages/cli/script/build.ts
-index f55d890..3fa0ed9 100755
+index f55d890..1a38ff4 100755
 --- a/packages/cli/script/build.ts
 +++ b/packages/cli/script/build.ts
 @@ -55,9 +55,10 @@ const targets =
@@ -15,19 +15,31 @@ index f55d890..3fa0ed9 100755
          })
        : allTargets
  if (!targets.length) throw new Error(`Unknown build target: ${requestedTarget}`)
-@@ -136,7 +137,10 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
+@@ -107,7 +108,10 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
+       )
+     },
+   }
+-  const parcelWatcherPackage = `@parcel/watcher-${item.os}-${item.arch}${item.os === "linux" ? `-${item.abi ?? "glibc"}` : ""}`
++  const parcelWatcherPackage =
++    process.platform === "openharmony"
++      ? "@parcel/watcher"
++      : `@parcel/watcher-${item.os}-${item.arch}${item.os === "linux" ? `-${item.abi ?? "glibc"}` : ""}`
+   const parcelWatcherPlugin: BunPlugin = {
+     name: "parcel-watcher-binding",
+     setup(build) {
+@@ -136,7 +140,10 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
        autoloadDotenv: false,
        autoloadTsconfig: true,
        autoloadPackageJson: true,
 -      target: target.replace(binary, "bun") as Bun.Build.CompileTarget,
-+      // OHOS: omit target entirely rather than pass any string (see PR).
++      // OHOS: no bun target name matches the host, so leave it unset (host default).
 +      ...(process.platform === "openharmony" && item.abi === "musl"
 +        ? {}
 +        : { target: target.replace(binary, "bun") as Bun.Build.CompileTarget }),
        ...(executablePath ? { executablePath } : {}),
        outfile: path.join(outdir, name, "bin", binary),
        execArgv: [
-@@ -186,7 +190,7 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
+@@ -186,7 +193,7 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
  
  async function compileExecutable(item: (typeof allTargets)[number]) {
    const release = process.env.BUN_COMPILE_RELEASE

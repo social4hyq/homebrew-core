@@ -4,7 +4,7 @@ class OpencodeV2 < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v2.0.20.tar.gz"
   sha256 "e8bc8af7f8f2df976740fc0a3a0564d6d7b34b9389d921ae0007fa2f49c1c236"
   license "MIT"
-  revision 2
+  revision 3
   version_scheme 1
 
   livecheck do
@@ -53,10 +53,6 @@ class OpencodeV2 < Formula
 
   patch do
     file "Patches/opencode-v2/0003-update-filesystem-watcher.patch"
-  end
-
-  patch do
-    file "Patches/opencode-v2/0004-update-watcher-binding.patch"
   end
 
   patch do
