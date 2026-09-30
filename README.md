@@ -44,7 +44,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `opencode` | 1.18.32 | 开源的终端 AI 编程助手：在终端里用自然语言让 AI 读代码、改文件、跑命令；自带 75+ 模型提供商接入，用自己的 API key 自由选模型（v1 稳定版） |
 | `opencode-v2` | 2.0.18 | opencode v2 稳定版：全新插件 API 与交互；**与 v1 互斥**（`conflicts_with "opencode"`，命令名同为 `opencode`，对齐上游官方同名 formula）：原位替代 v1，共享 `~/.config/opencode` 等目录，v1 的数据库自动迁移；版本滚动跟进上游 v2 发布线（原 `opencode@2`，见 `formula_renames.json`） |
 | `claude-code` | 2.1.274 | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号；License 禁止再分发官方产物，故安装时从官方 npm 包拉取 CLI、剥离元文件后在本 tap 的 bun 上运行 |
-| `claude-code.latest` | 2.1.283 | 同一 Claude Code 的 latest 滚动频道：抽出官方 CLI 的 JS 模块图、在本 tap 的 bun 上运行（与 `claude-code` 同一方案）；个别只跑得动 Anthropic 私有 bun 内部件的版本可设 `CLAUDE_CODE_RUNTIME=musl` 直跑官方二进制（自签名 + `ohos-compat-shim` 引导）；与 `claude-code` 互斥（都装 `claude` 命令，二选一） |
+| `claude-code.latest` | 2.1.285 | 同一 Claude Code 的 latest 滚动频道：安装时拉取官方 musl 二进制，自签名后经 `ohos-compat-shim` 运行；与 `claude-code` 互斥（都装 `claude` 命令，二选一） |
 | `zcode` | 3.14.3 | AI 编程工作台：终端 agent（TUI）与 Web IDE 双形态；上游不发 git tag，源码取自 GitHub main、用本 tap 的 bun/pnpm 工具链在本机构建 |
 | `bun` | 1.4.2 | 极速 JavaScript/TypeScript 一体化工具链：运行时、包管理、测试、打包四合一，可直接替代 Node.js；本 tap 多数工具的底座；结构上跟 Homebrew 上游 `bun.rb` 对齐重新移植（原 `bun@1.4` 接管本名） |
 | `bun-legacy` | 1.4.2 | 原 `bun` 的存档：fork 直构、113 个按文件补丁；`keg_only`，不随上游 bun 版本走 livecheck，仅供参考对比，日常使用请装 `bun` |

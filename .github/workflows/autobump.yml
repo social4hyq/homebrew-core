@@ -60,10 +60,9 @@ env:
   # Keep in sync with automerge-autobump.yml's ALLOWLIST (branch-name gate).
   # claude-code re-allowlisted (removed in PR #344 after the 2.1.229 incident,
   # restored now): its wrapper extracts the CLI bundle and runs it on this
-  # tap's bun. claude-code.latest is the other track — same extract-and-run
-  # default, with CLAUDE_CODE_RUNTIME=musl as the escape hatch that runs the
-  # official binary self-signed under ohos-compat-shim. Both run the binary
-  # end-to-end in brew test, so pr-validate gates every bump for real.
+  # tap's bun. claude-code.latest is the other track — it runs the official
+  # binary self-signed under ohos-compat-shim. Both run the binary end-to-end
+  # in brew test, so pr-validate gates every bump for real.
   # zcode allowlisted too: it is a git-revision formula with no upstream tags
   # (its version lives in package.json on main), so autobump.sh has a custom
   # version→git path for it, the same shape as opencode-v2's.
