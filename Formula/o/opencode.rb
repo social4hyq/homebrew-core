@@ -4,7 +4,7 @@ class Opencode < Formula
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v2.0.20.tar.gz"
   sha256 "e8bc8af7f8f2df976740fc0a3a0564d6d7b34b9389d921ae0007fa2f49c1c236"
   license "MIT"
-  revision 4
+  revision 5
   version_scheme 1
 
   livecheck do
@@ -13,8 +13,8 @@ class Opencode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2.0.20-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "11b81627d6eb7676a65797c6b2f3a5fb286786468542f54939337c1ed8e8d9b7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2.0.20-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b2e356bf35f9bcff9fa34a3d601fb9fc38aeee66af57c405010419ebe536f54"
   end
 
   depends_on "bun" => :build
@@ -102,7 +102,7 @@ class Opencode < Formula
     inreplace "packages/cli/script/build.ts", "splitting: true,", "splitting: false,"
 
     # 0001 swaps in @ohos-npm-ports overrides, so bun.lock can't stay frozen
-    system "bun", "install", "--ignore-scripts"
+    system "bun", "install"
 
     cd "packages/cli" do
       system "bun", "--bun", "./script/build.ts", "--single", "--skip-install"
