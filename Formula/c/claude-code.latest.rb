@@ -4,7 +4,7 @@ class ClaudeCodeLatest < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.285.tgz"
   sha256 "5c0017d0e0b9518417dfbf419d04d20c7637ee885600a63ea041e0ff57e4b0eb"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 1
+  revision 2
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/latest"
@@ -12,8 +12,8 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.285-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a66392b5dd48fbc61662b1d79cc7c7ddab440a1df17c70f03c5cc45f20500c05"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.285-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d3f21fa10ae13af9cf0d67cc520b7a1ceb4d41e4dc2d8770ae50d40519bb6b9b"
   end
 
   depends_on "ohos-compat-shim"
@@ -28,8 +28,9 @@ class ClaudeCodeLatest < Formula
       export CLAUDE_CODE_TMPDIR="${CLAUDE_CODE_TMPDIR:-/data/storage/el2/base/cache}"
       BIN="${HOMEBREW_CACHE:-$HOME/.cache/homebrew}/#{name}/#{version}/claude"
       if [ ! -x "$BIN" ]; then
+        echo "First run: downloading Claude Code #{version} (~230 MB), one-time setup..." >&2
         TMP="$(mktemp -d -p "$CLAUDE_CODE_TMPDIR")" && trap 'rm -rf "$TMP"' EXIT
-        curl -fsSL --retry 3 "#{stable.url}" -o "$TMP/pkg.tgz"
+        curl -fL# --retry 3 "#{stable.url}" -o "$TMP/pkg.tgz"
         echo "#{stable.checksum}  $TMP/pkg.tgz" | sha256sum -c - >/dev/null
         tar -xzf "$TMP/pkg.tgz" -C "$TMP"
         "$HOMEBREW_PREFIX/opt/ohos-selfsign/bin/selfsign" "$TMP/package/claude"
