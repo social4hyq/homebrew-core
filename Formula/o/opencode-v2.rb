@@ -1,10 +1,9 @@
 class OpencodeV2 < Formula
   desc "AI coding agent, built for the terminal"
   homepage "https://opencode.ai"
-  url "https://github.com/anomalyco/opencode.git", revision: "cd9a14a6b688d4021bee381dfd39d2cef9c0f862"
-  version "2.0.18"
+  url "https://github.com/anomalyco/opencode.git", revision: "84c9be93a56304a108f1a22df0c5d62c26d5b6ca"
+  version "2.0.20"
   license "MIT"
-  revision 3
   version_scheme 1
 
   livecheck do
