@@ -15,7 +15,7 @@ brew tap social4hyq/core https://atomgit.com/social4hyq/homebrew-core.git
 brew trust social4hyq/core   # Homebrew 6.0+ 必须显式信任第三方 tap
 
 # 常用工具：
-brew install opencode        # AI 编码代理（v2：brew install opencode-v2）
+brew install opencode-v1     # AI 编码代理 v1（v2：brew install opencode-v2）
 brew install claude-code     # Claude Code CLI
 brew install bun             # Bun 运行时
 brew install vite-plus       # VoidZero 统一前端工具链（`vp` 命令）
@@ -41,8 +41,8 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 
 | Formula | 版本 | 说明 |
 |---|---|---|
-| `opencode` | 1.18.32 | 开源的终端 AI 编程助手：在终端里用自然语言让 AI 读代码、改文件、跑命令；自带 75+ 模型提供商接入，用自己的 API key 自由选模型（v1 稳定版） |
-| `opencode-v2` | 2.0.18 | opencode v2 稳定版：全新插件 API 与交互；**与 v1 互斥**（`conflicts_with "opencode"`，命令名同为 `opencode`，对齐上游官方同名 formula）：原位替代 v1，共享 `~/.config/opencode` 等目录，v1 的数据库自动迁移；版本滚动跟进上游 v2 发布线（原 `opencode@2`，见 `formula_renames.json`） |
+| `opencode-v1` | 1.18.33 | 开源的终端 AI 编程助手：在终端里用自然语言让 AI 读代码、改文件、跑命令；自带 75+ 模型提供商接入，用自己的 API key 自由选模型（v1 稳定版） |
+| `opencode-v2` | 2.0.20 | opencode v2 稳定版：全新插件 API 与交互；**与 v1 互斥**（`conflicts_with "opencode-v1"`，命令名同为 `opencode`，对齐上游官方同名 formula）：原位替代 v1，共享 `~/.config/opencode` 等目录，v1 的数据库自动迁移；版本滚动跟进上游 v2 发布线（原 `opencode@2`，见 `formula_renames.json`） |
 | `claude-code` | 2.1.274 | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号；License 禁止再分发官方产物，故安装时拉取官方 musl 二进制，自签名后经 `ohos-compat-shim` 运行 |
 | `claude-code.latest` | 2.1.285 | 同一 Claude Code 的 latest 滚动频道：安装时拉取官方 musl 二进制，自签名后经 `ohos-compat-shim` 运行；与 `claude-code` 互斥（都装 `claude` 命令，二选一） |
 | `zcode` | 3.14.3 | AI 编程工作台：终端 agent（TUI）与 Web IDE 双形态；上游不发 git tag，源码取自 GitHub main、用本 tap 的 bun/pnpm 工具链在本机构建 |
@@ -59,7 +59,7 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | Formula | 状态 | 替代方案 |
 |---|---|---|
 | `codex` | 2026-07-23 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供，直接 `brew install codex` |
-| `opencode-shim` / `opencode-shim@2` | 2026-08-02 下线 | 预编译 shim 路线已被源码构建路线取代，改用 `opencode` / `opencode@2` |
+| `opencode-shim` / `opencode-shim@2` | 2026-08-02 下线 | 预编译 shim 路线已被源码构建路线取代，改用 `opencode-v1` / `opencode-v2` |
 | `close-range-shim` | 2026-07-15 下线 | 功能并入 `ohos-compat-shim` |
 | `bun-pty` / `lightningcss` / `tailwindcss-oxide` | 2026-07-18 下线 | 改走 `@ohos-ports/*` npm 包，无独立 formula 需求 |
 | `icu4c@78` | 2026-08-09 下线 | libc++ ABI `__n1` 迁移（#239-#241）后本 tap fork 冗余，直接用上游 harmonybrew/core 的 `icu4c@78`（同为 `__n1`） |
@@ -86,6 +86,8 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 > 改名提示（2026-08-01）：`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
 >
 > 语义变更（2026-09-22）：`opencode@2` 更名为 `opencode-v2`（对齐上游官方 formula 名，`formula_renames.json` 自动迁移已装用户），并对齐上游的**原位替代**语义——命令名从 `opencode2` 改回 `opencode`，新增 `conflicts_with "opencode"`（与 v1 不能同时安装），数据目录从独立的 `~/.config/opencode2` 等改回与 v1 共享的 `~/.config/opencode`（v1 的数据库会被 v2 自动迁移）。升级前请先 `brew uninstall opencode`（v1）与旧版 `brew uninstall opencode@2`；旧版遗留的 `~/.config/opencode2`、`~/.local/share/opencode2`、`~/.local/state/opencode2` 目录升级后可手动删除。
+
+> 命名迁移第一步：v1 formula 现为 `opencode-v1`，仍跟进上游 v1 发布线。已有 `opencode` 安装暂不改名，后续由 v2 接管 `opencode` 名并自动升级；需要保留 v1 的用户可卸载旧 formula 后安装 `opencode-v1`。两个版本都提供 `opencode` 命令，不能同时链接。
 
 ## 已知限制
 

@@ -22,7 +22,7 @@ class OpencodeV2 < Formula
   depends_on "rust" => :build
   depends_on "ripgrep"
 
-  conflicts_with "opencode", because: "both install an opencode binary"
+  conflicts_with "opencode-v1", because: "both install an opencode binary"
 
   # Version must match `@opencode-ai/pty` in packages/cli/package.json
   resource "opencode-pty" do
