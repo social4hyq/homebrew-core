@@ -1,4 +1,4 @@
-class Opencode < Formula
+class OpencodeV1 < Formula
   desc "AI coding agent, built for the terminal"
   homepage "https://opencode.ai"
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v1.18.33.tar.gz"
@@ -6,52 +6,48 @@ class Opencode < Formula
   license "MIT"
   revision 3
 
-  # No throttle: unlike upstream homebrew-core (which throttles to every 5th
-  # release to limit their own CI churn), this tap wants opencode to autobump
-  # on every upstream release, same as opencode-v2.
   livecheck do
     url :stable
     regex(/^v(1\.\d+\.\d+)$/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1.18.33-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d53a0de590da646fac5f9cf5c634deca57deadede332e94c249c05b3b78332f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1-v1.18.33-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e8377a651b600c2057b6465e62a327ca928b7a375f181cbad3a2acf63e2ba10"
   end
+
   depends_on "bun" => :build
   depends_on "node" => :build
   depends_on "python@3.14" => :build
   depends_on "ripgrep"
-  # opencode-v2 installs the same binary name; declared reciprocally
-  # (both formulae must conflicts_with each other for brew audit).
   conflicts_with "opencode-v2", because: "both install an opencode binary"
 
   patch do
-    file "Patches/opencode/0001-update-package-json.patch"
+    file "Patches/opencode-v1/0001-update-package-json.patch"
   end
 
   patch do
-    file "Patches/opencode/0002-update-filesystem-watcher.patch"
+    file "Patches/opencode-v1/0002-update-filesystem-watcher.patch"
   end
 
   patch do
-    file "Patches/opencode/0003-update-project-root.patch"
+    file "Patches/opencode-v1/0003-update-project-root.patch"
   end
 
   patch do
-    file "Patches/opencode/0004-update-build-target.patch"
+    file "Patches/opencode-v1/0004-update-build-target.patch"
   end
 
   patch do
-    file "Patches/opencode/0005-update-project-worktree.patch"
+    file "Patches/opencode-v1/0005-update-project-worktree.patch"
   end
 
   patch do
-    file "Patches/opencode/0006-filter-invalid-references.patch"
+    file "Patches/opencode-v1/0006-filter-invalid-references.patch"
   end
 
   patch do
-    file "Patches/opencode/0008-guard-undefined-layer-deps.patch"
+    file "Patches/opencode-v1/0008-guard-undefined-layer-deps.patch"
   end
 
   deny_network_access! :test
@@ -70,7 +66,7 @@ class Opencode < Formula
       /("[^"]*openharmony-arm64@[^"]+", "", \{ )"os": "none"(, "cpu": "arm64" \})/,
       %q(\1"os": "openharmony"\2),
     )
-    odie "opencode: no openharmony-arm64 os:none markers found in bun.lock" if injected == lockfile
+    odie "opencode-v1: no openharmony-arm64 os:none markers found in bun.lock" if injected == lockfile
     (buildpath/"bun.lock").atomic_write(injected)
 
     system "bun", "install", "--ignore-scripts"
