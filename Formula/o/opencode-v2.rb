@@ -11,6 +11,11 @@ class OpencodeV2 < Formula
     url :stable
     regex(/^v(2\.\d+\.\d+)$/i)
   end
+
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2-v2.0.20-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7f64e30c3f44711ea4a841175e1a9c176b8814389697c4eb8bf39ae9d908867"
+  end
   depends_on "bun" => :build
   depends_on "node" => :build
   # Officially v2 replaces v1 in place (same config/data dirs, binary name
