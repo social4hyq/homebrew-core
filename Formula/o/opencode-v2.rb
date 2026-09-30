@@ -101,7 +101,8 @@ class OpencodeV2 < Formula
     # https://github.com/NixOS/nixpkgs/issues/563241
     inreplace "packages/cli/script/build.ts", "splitting: true,", "splitting: false,"
 
-    system "bun", "install", "--frozen-lockfile"
+    # 0001 swaps in @ohos-npm-ports overrides, so bun.lock can't stay frozen
+    system "bun", "install", "--ignore-scripts"
 
     cd "packages/cli" do
       system "bun", "--bun", "./script/build.ts", "--single", "--skip-install"
