@@ -4,19 +4,13 @@ class OpencodeV2 < Formula
   url "https://github.com/anomalyco/opencode.git", revision: "84c9be93a56304a108f1a22df0c5d62c26d5b6ca"
   version "2.0.20"
   license "MIT"
-  revision 1
+  revision 2
   version_scheme 1
 
   livecheck do
     url :stable
     regex(/^v(2\.\d+\.\d+)$/i)
   end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2-v2.0.20-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e67867643fb77c2983ba73ca5080fe5f93422ee516ff1595dcc0cdb855d8ee9d"
-  end
-
   depends_on "bun" => :build
   depends_on "node" => :build
   # Officially v2 replaces v1 in place (same config/data dirs, binary name
@@ -38,10 +32,6 @@ class OpencodeV2 < Formula
 
   patch do
     file "Patches/opencode-v2/0003-update-filesystem-watcher.patch"
-  end
-
-  patch do
-    file "Patches/opencode-v2/0004-update-watcher-binding.patch"
   end
 
   patch do
