@@ -25,6 +25,12 @@ class Bun < Formula
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
+
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r27"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ba462592e8cef050b7477c16adf7cb6f220fd8f4ecaa6f7d9a27e4b662bbf7b"
+  end
   depends_on "cmake" => :build
   # libstdc++ for the prebuilt bootstrap bun (see LD_LIBRARY_PATH in install)
   depends_on "gcc" => :build if OS.ohos?
