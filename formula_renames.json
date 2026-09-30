@@ -1,4 +1,5 @@
 {
-  "opencode@2": "opencode-v2",
+  "opencode@2": "opencode",
+  "opencode-v2": "opencode",
   "bun@1.4": "bun"
 }

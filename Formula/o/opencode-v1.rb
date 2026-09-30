@@ -20,7 +20,7 @@ class OpencodeV1 < Formula
   depends_on "node" => :build
   depends_on "python@3.14" => :build
   depends_on "ripgrep"
-  conflicts_with "opencode-v2", because: "both install an opencode binary"
+  conflicts_with "social4hyq/core/opencode", because: "both install an opencode binary"
 
   patch do
     file "Patches/opencode-v1/0001-update-package-json.patch"

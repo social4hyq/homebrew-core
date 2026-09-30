@@ -117,7 +117,7 @@ for line in "${CANDIDATES[@]}"; do
   #      bun.rb): bump the git revision pin + increment the brew `revision N`
   #      (effective version advances <ver>_N, which is what drives the
   #      new-bottle pipeline in pr-validate).
-  #   b) a release version (opencode-v2: livecheck follows upstream git tags
+  #   b) a release version (opencode: livecheck follows upstream git tags
   #      `v2.*` on the repo the formula clones): resolve the exact commit the
   #      tag points at (peeled ref for annotated tags), then bump `version` +
   #      the pin and drop any brew `revision` stanza (Homebrew convention:
@@ -139,7 +139,7 @@ for line in "${CANDIDATES[@]}"; do
   FORMULA_PATH=$(docker exec "$CONTAINER" bash -lc \
     "ls \"$TAP_IN_CONTAINER\"/Formula/*/\"$FORMULA\".rb 2>/dev/null | head -1")
   # Two separate line-based greps, not one `url .*\.git.*revision:`: zcode's
-  # url and its `revision:` pin sit on different lines (opencode-v2 keeps both
+  # url and its `revision:` pin sit on different lines (opencode keeps both
   # on one). The single-line pattern silently missed zcode and sent it down the
   # bump-formula-pr path, which cannot rewrite a git pin at all.
   if [ -n "$FORMULA_PATH" ] \
@@ -154,7 +154,7 @@ for line in "${CANDIDATES[@]}"; do
 
     FORMULA_VERSION=$(docker exec "$CONTAINER" grep -oE '^  version "[^"]+"' "$FORMULA_PATH" | head -1 | cut -d'"' -f2)
 
-    # Release-version scheme (opencode-v2): resolve the git sha for LATEST.
+    # Release-version scheme (opencode): resolve the git sha for LATEST.
     # These lookups run on the runner host (not the OHOS container).
     TARGET_SHA=""
     NEW_VERSION="$FORMULA_VERSION"
@@ -174,14 +174,14 @@ for line in "${CANDIDATES[@]}"; do
       fi
       # version→git mapping is formula-specific (repo, tag naming).
       # Which ref the release version maps to, and (when that ref can move) the
-      # version file to re-check it against. opencode-v2 tags its releases
+      # version file to re-check it against. opencode tags its releases
       # `v<version>`; zcode tags nothing — main carries the version in
       # package.json — so its pin is main's tip.
       GIT_REPO=""
       GIT_REF=""
       GIT_VERSION_FILE=""
       case "$FORMULA" in
-        opencode-v2)
+        opencode)
           GIT_REPO="anomalyco/opencode"
           GIT_REF="refs/tags/v$LATEST"
           ;;
