@@ -72,6 +72,11 @@ class VitePlus < Formula
     file "Patches/vite-plus/0001-package-manager-platform-cfg.patch"
   end
 
+  # OHOS: managed-Node platform string (see the patch file for the rationale).
+  patch :p1 do
+    file "Patches/vite-plus/0002-managed-node-openharmony-platform.patch"
+  end
+
   def install
     resource("rolldown").stage buildpath/"rolldown"
     resource("vite").stage buildpath/"vite"
