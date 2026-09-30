@@ -11,6 +11,11 @@ class ClaudeCode < Formula
     regex(/(\d+(?:\.\d+)+)/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.280-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "96f50c207457c9e3278e0b7f64c9ab56c967600a8a3810a58e505d5ba093c237"
+  end
+
   depends_on "ohos-compat-shim"
   depends_on "ohos-selfsign"
 
