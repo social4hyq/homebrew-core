@@ -11,6 +11,11 @@ class OpencodeV1 < Formula
     regex(/^v(1\.\d+\.\d+)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v1-v1.18.33-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9e8377a651b600c2057b6465e62a327ca928b7a375f181cbad3a2acf63e2ba10"
+  end
+
   depends_on "bun" => :build
   depends_on "node" => :build
   depends_on "python@3.14" => :build
