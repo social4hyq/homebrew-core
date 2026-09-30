@@ -1,4 +1,4 @@
-class OpencodeV2 < Formula
+class Opencode < Formula
   desc "AI coding agent, built for the terminal"
   homepage "https://opencode.ai"
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v2.0.20.tar.gz"
@@ -13,9 +13,8 @@ class OpencodeV2 < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2-v2.0.20-r5"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7a792ea812201fa77f24a973c200b3700598d57cb8c51e93a312ac964a7f046"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-v2.0.20-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b3457e0d8172ab76770d247d33c6d6c54ad750fd6f15f2c41354d3cd5e57d225"
   end
 
   depends_on "bun" => :build
@@ -50,27 +49,27 @@ class OpencodeV2 < Formula
   end
 
   patch do
-    file "Patches/opencode-v2/0001-update-package-json.patch"
+    file "Patches/opencode/0001-update-package-json.patch"
   end
 
   patch do
-    file "Patches/opencode-v2/0002-update-bun-lock.patch"
+    file "Patches/opencode/0002-update-bun-lock.patch"
   end
 
   patch do
-    file "Patches/opencode-v2/0003-update-filesystem-watcher.patch"
+    file "Patches/opencode/0003-update-filesystem-watcher.patch"
   end
 
   patch do
-    file "Patches/opencode-v2/0005-update-server-connection.patch"
+    file "Patches/opencode/0005-update-server-connection.patch"
   end
 
   patch do
-    file "Patches/opencode-v2/0006-update-build-target.patch"
+    file "Patches/opencode/0006-update-build-target.patch"
   end
 
   patch do
-    file "Patches/opencode-v2/0007-allow-local-pty-binary.patch"
+    file "Patches/opencode/0007-allow-local-pty-binary.patch"
   end
 
   def install
@@ -82,7 +81,7 @@ class OpencodeV2 < Formula
     SH
     chmod 0755, buildpath/"zig-bin/zig"
     ENV.prepend_path "PATH", buildpath/"zig-bin"
-    ENV["ZIG_GLOBAL_CACHE_DIR"] = (HOMEBREW_CACHE/"opencode-v2-zig-global-cache").to_s
+    ENV["ZIG_GLOBAL_CACHE_DIR"] = (HOMEBREW_CACHE/"opencode-zig-global-cache").to_s
 
     # Build the persistent PTY helper from source instead of embedding the prebuilt npm binary
     (buildpath/"ghostty").install resource("ghostty")
