@@ -382,32 +382,9 @@ class VitePlus < Formula
       end
     end
 
-    # The scaffold installs before the overrides below exist, so record what it
-    # put in the tree: whether vp fmt would already be looking at the registry
-    # copy, and whether the lockfile it left behind blocks reinstalling.
-    before = testpath/"scaffold-state.txt"
-    before.write(<<~STATE)
-      vite-plus resolved: #{`readlink node_modules/vite-plus 2>&1`}
-      binding entries: #{`ls node_modules/vite-plus/binding 2>&1`}
-      lockfile pins: #{`grep -c 'vite-plus' pnpm-lock.yaml 2>&1`}
-      lockfile head: #{`grep -A2 "'vite-plus@" pnpm-lock.yaml 2>&1 | head -6`}
-    STATE
-
     vp_with_retry.call "install"
 
     cd testpath/"test-app" do
-      # Report what actually landed before vp fmt, whose "Cannot find native
-      # binding" error does not say which package or file was missing.
-      unless Dir.exist?("node_modules/vite-plus")
-        odie "vite-plus not installed: #{`ls -d node_modules/vite-plus 2>&1`}"
-      end
-      if Dir.glob("node_modules/vite-plus/binding/*.node").none?
-        listing = `ls -l node_modules/vite-plus/binding 2>&1`
-        real = `readlink node_modules/vite-plus 2>&1`
-        store = `ls -l #{real}/binding 2>&1`
-        odie "no binding in vite-plus.\n  binding dir: #{listing}\n  real path: #{real}" \
-             "\n  there: #{store}\n  scaffold: #{before.read}"
-      end
       output = shell_output("#{bin}/vp fmt < /dev/null")
       assert_match "Finished", output
     end
