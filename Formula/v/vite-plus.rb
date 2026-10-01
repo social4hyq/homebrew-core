@@ -315,7 +315,13 @@ class VitePlus < Formula
     port_tarball = testpath/"vite-plus-ohos-port.tgz"
     port_url = "https://github.com/social4hyq/ohos-npm-ports/releases/download/vite-plus-1.0.0/" \
                "ohos-npm-ports-vite-plus-1.0.0-1.tgz"
-    curl port_tarball, port_url
+    system "curl", "-fsSL", "--retry", "3", "--retry-all-errors", "-o", port_tarball, port_url
+    # Verify the archive rather than just its existence: a truncated download
+    # installs a package with no binding and fails later with a confusing
+    # "Cannot find native binding".
+    odie "port tarball is not a readable gzip" unless system "tar", "-tzf", port_tarball, out: File::NULL
+    odie "port tarball has no package/package.json" unless system "tar", "-tzf", port_tarball,
+                                                                 "package/binding/vite-plus.openharmony-arm64.node"
 
     workspace = testpath/"test-app/pnpm-workspace.yaml"
     ws = YAML.safe_load(workspace.read)
