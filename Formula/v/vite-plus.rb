@@ -368,6 +368,14 @@ class VitePlus < Formula
     vp_with_retry.call "install"
 
     cd testpath/"test-app" do
+      # Report what actually landed before vp fmt, whose "Cannot find native
+      # binding" error does not say which package or file was missing.
+      unless Dir.exist?("node_modules/vite-plus")
+        odie "vite-plus not installed: #{`ls -d node_modules/vite-plus 2>&1`}"
+      end
+      if Dir.glob("node_modules/vite-plus/binding/*.node").none?
+        odie "no binding in vite-plus: #{`ls node_modules/vite-plus/binding 2>&1`}"
+      end
       output = shell_output("#{bin}/vp fmt < /dev/null")
       assert_match "Finished", output
     end
