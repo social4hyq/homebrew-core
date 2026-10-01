@@ -24,6 +24,9 @@ class VitePlus < Formula
   depends_on "pnpm" => :build
   depends_on "rustup" => :build # TODO: try to restore stable rust: https://github.com/voidzero-dev/vite-task/commit/db99ba4d5d33323cc9e7b329f11bdea0610fbc7f
   depends_on "node"
+  # vp shells out to selfsign for the package-manager binary it downloads at
+  # runtime (see Patches/vite-plus/0003-…patch), so this is a run-time dep.
+  depends_on "ohos-selfsign"
 
   resource "rolldown" do
     url "https://github.com/rolldown/rolldown.git",
@@ -81,6 +84,11 @@ class VitePlus < Formula
   # OHOS: managed-Node platform string (see the patch file for the rationale).
   patch :p1 do
     file "Patches/vite-plus/0002-managed-node-openharmony-platform.patch"
+  end
+
+  # OHOS: sign the package-manager binary vp downloads (see the patch file).
+  patch :p1 do
+    file "Patches/vite-plus/0003-sign-pnpm-native-ohos.patch"
   end
 
   def install
