@@ -103,8 +103,8 @@ class VitePlus < Formula
     # Two kinds of gaps, both filled by writing into pnpm-workspace.yaml:
     #   * Packages that ship their own openharmony build in-package
     #     (@ohos-npm-ports forks) are remapped in place by overrides. Being
-    #     regular dependencies, they keep their binding past
-    #     `deploy --no-optional`, unlike the optionalDependency grafts below.
+    #     regular dependencies, they keep their binding through the deploy
+    #     below, unlike the optionalDependency grafts after it.
     #   * @napi-rs/{wasm-tools,lzma,tar} publish no openharmony build, but
     #     their linux-arm64-musl twins share OHOS's libc family. The shim
     #     packages below rename the binding to what the loaders require and
@@ -137,9 +137,9 @@ class VitePlus < Formula
       # devDependency of packages/core, but packages/core's build loads it,
       # so it needs a binding just like the yuku versions above.
       "@ast-grep/napi@0.43.0" => "npm:@ohos-npm-ports/ast-grep-napi@0.43.0-1",
-      # Needed by `vp lint --type-aware`, dropped by `deploy --no-optional`
-      # otherwise. Bare key: packages/cli declares it via catalog:, and
-      # version-qualified selectors don't match catalog-resolved specifiers.
+      # Needed by `vp lint --type-aware`. Bare key: packages/cli declares it
+      # via catalog:, and version-qualified selectors don't match
+      # catalog-resolved specifiers.
       "oxlint-tsgolint"       => "npm:@ohos-npm-ports/oxlint-tsgolint@7.0.2003-1",
     }
     extensions = {}
@@ -225,7 +225,13 @@ class VitePlus < Formula
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vp_global_cli")
 
-    system "pnpm", "--filter=vite-plus", "deploy", "--prod", "--legacy", "--no-optional",
+    # No --no-optional: it pruned the platform optionalDependencies wholesale,
+    # which took oxfmt's and oxlint's openharmony bindings with them and left
+    # `vp fmt` dying with "Cannot find native binding". pnpm already filters
+    # optionalDependencies by os/cpu on its own -- a deploy of oxfmt+oxlint
+    # brought in @oxfmt/binding-openharmony-arm64 and nothing else, no darwin
+    # or win32 package. The bare-* sweep below still drops what does not run.
+    system "pnpm", "--filter=vite-plus", "deploy", "--prod", "--legacy",
            prefix/"node_modules/vite-plus"
     node_modules = prefix/"node_modules/vite-plus/node_modules"
     # Remove incompatible pre-built `bare-*` binaries. Recurse as `deploy --legacy` writes
