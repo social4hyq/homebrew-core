@@ -1,5 +1,10 @@
 class VitePlus < Formula
   require "json"
+
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ebc98444efa6b0a95f92716ed7de7171b59b244b95431029f31dc8193ad343e0"
+  end
   require "yaml"
 
   desc "Unified toolchain and entry point for web development"
