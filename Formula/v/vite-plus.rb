@@ -319,14 +319,14 @@ class VitePlus < Formula
     # Read the archive rather than just checking it exists: a failed or truncated
     # download installs a package with no binding and then fails with a
     # confusing "Cannot find native binding" that points nowhere near the cause.
-    begin
-      entries = []
-      Zlib::GzipReader.open(port_tarball) do |gz|
-        Gem::Package::TarReader.new(gz) { |tar| tar.each { |e| entries << e.full_name } }
-      end
-    rescue Zlib::Error, Gem::Package::FormatError => e
-      odie "port tarball is not a readable gzip (#{e.class})"
-    end
+    # One command string, not an argument list: system only goes through a shell
+    # in that form, and passing ">" as a separate argument makes tar ignore it
+    # while still exiting 0. Both paths come from testpath, so no quoting risk.
+    listing = testpath/"port-listing.txt"
+    listing.write("") # so a redirect that does not take effect leaves an empty file,
+    # which the assertions below reject rather than pass
+    odie "port tarball is not a readable gzip" unless system "tar -tzf #{port_tarball} > #{listing}"
+    entries = listing.read.lines(chomp: true)
     odie "port tarball carries no package.json" unless entries.include?("package/package.json")
     odie "port tarball carries no binding" unless entries.any? do |e|
       e.end_with?("vite-plus.openharmony-arm64.node")
