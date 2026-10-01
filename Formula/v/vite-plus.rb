@@ -1,10 +1,5 @@
 class VitePlus < Formula
   require "json"
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ebc98444efa6b0a95f92716ed7de7171b59b244b95431029f31dc8193ad343e0"
-  end
   require "yaml"
 
   desc "Unified toolchain and entry point for web development"
@@ -13,6 +8,12 @@ class VitePlus < Formula
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
+
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "279045ce915bd06f12169301746809a0ada6b573eca8b1b0e95f4e3f7d560520"
+  end
 
   # OHOS-only blocks are fenced below; everything else tracks upstream.
 
@@ -382,32 +383,9 @@ class VitePlus < Formula
       end
     end
 
-    # The scaffold installs before the overrides below exist, so record what it
-    # put in the tree: whether vp fmt would already be looking at the registry
-    # copy, and whether the lockfile it left behind blocks reinstalling.
-    before = testpath/"scaffold-state.txt"
-    before.write(<<~STATE)
-      vite-plus resolved: #{`readlink node_modules/vite-plus 2>&1`}
-      binding entries: #{`ls node_modules/vite-plus/binding 2>&1`}
-      lockfile pins: #{`grep -c 'vite-plus' pnpm-lock.yaml 2>&1`}
-      lockfile head: #{`grep -A2 "'vite-plus@" pnpm-lock.yaml 2>&1 | head -6`}
-    STATE
-
     vp_with_retry.call "install"
 
     cd testpath/"test-app" do
-      # Report what actually landed before vp fmt, whose "Cannot find native
-      # binding" error does not say which package or file was missing.
-      unless Dir.exist?("node_modules/vite-plus")
-        odie "vite-plus not installed: #{`ls -d node_modules/vite-plus 2>&1`}"
-      end
-      if Dir.glob("node_modules/vite-plus/binding/*.node").none?
-        listing = `ls -l node_modules/vite-plus/binding 2>&1`
-        real = `readlink node_modules/vite-plus 2>&1`
-        store = `ls -l #{real}/binding 2>&1`
-        odie "no binding in vite-plus.\n  binding dir: #{listing}\n  real path: #{real}" \
-             "\n  there: #{store}\n  scaffold: #{before.read}"
-      end
       output = shell_output("#{bin}/vp fmt < /dev/null")
       assert_match "Finished", output
     end
