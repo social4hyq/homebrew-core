@@ -363,13 +363,17 @@ class VitePlus < Formula
 
     vp_with_retry = lambda do |*args|
       max_attempts = 3
-      (1..max_attempts).each do |attempt|
-        system bin/"vp", *args
-        break
-      rescue BuildError => e
-        msg = e.message.to_s.lines.last(5).join
-        odie "vp #{args.first} failed (#{e.class}):\n#{msg}" if attempt == max_attempts
-        sleep 10
+      # Run inside the app: vp reads the pnpm-workspace.yaml holding our
+      # overrides, so it has to run where that file is.
+      cd testpath/"test-app" do
+        (1..max_attempts).each do |attempt|
+          system bin/"vp", *args
+          break
+        rescue BuildError => e
+          msg = e.message.to_s.lines.last(5).join
+          odie "vp #{args.first} failed (#{e.class}):\n#{msg}" if attempt == max_attempts
+          sleep 10
+        end
       end
     end
 
