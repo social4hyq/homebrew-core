@@ -334,24 +334,32 @@ class VitePlus < Formula
 
     workspace = testpath/"test-app/pnpm-workspace.yaml"
     ws = YAML.safe_load(workspace.read)
-    ws["overrides"] = {
+    ws["overrides"] = (ws["overrides"] || {}).merge(
       "vite-plus" => "file:#{port_tarball}",
-    }.merge(ws["overrides"] || {})
-    ws["packageExtensions"] = {
+    )
+    ws["packageExtensions"] = (ws["packageExtensions"] || {}).merge(
       "@voidzero-dev/vite-plus-core@1.0.0" => {
         "optionalDependencies" => { "@rolldown/binding-openharmony-arm64" => "1.2.11" },
       },
-    }.merge(ws["packageExtensions"] || {})
+    )
     # OHOS: the graft above only matters if pnpm treats the openharmony
     # optional package as installable. `vp`'s package manager is a standalone
     # native pnpm executable (see Patches/vite-plus/0001-…patch) with no
     # Node.js involved, so it cannot know it runs on openharmony and silently
     # prunes the optional dependency as a platform mismatch. Force it in via
     # supportedArchitectures, the standard pnpm escape hatch.
-    ws["supportedArchitectures"] = {
-      "os" => ["current", "openharmony"],
-    }.merge(ws["supportedArchitectures"] || {})
+    # Union, not override: the scaffold already declares supportedArchitectures
+    # with "os" => ["current"], and merging the other way round let that win,
+    # dropping "openharmony" -- which is what makes pnpm prune the binding.
+    ws["supportedArchitectures"] = ws["supportedArchitectures"] || {}
+    ws["supportedArchitectures"]["os"] =
+      ((ws["supportedArchitectures"]["os"] || []) + ["current", "openharmony"]).uniq
     File.write(workspace, YAML.dump(ws))
+    # The graft only helps if pnpm reads it, so confirm the file it will read.
+    reread = YAML.safe_load(workspace.read)
+    odie "supportedArchitectures lost: #{workspace.read}" unless
+      reread.dig("supportedArchitectures", "os")&.include?("openharmony")
+    odie "override lost: #{workspace.read}" unless reread.dig("overrides", "vite-plus")&.start_with?("file:")
 
     vp_with_retry = lambda do |*args|
       max_attempts = 3
@@ -374,7 +382,10 @@ class VitePlus < Formula
         odie "vite-plus not installed: #{`ls -d node_modules/vite-plus 2>&1`}"
       end
       if Dir.glob("node_modules/vite-plus/binding/*.node").none?
-        odie "no binding in vite-plus: #{`ls node_modules/vite-plus/binding 2>&1`}"
+        listing = `ls -l node_modules/vite-plus/binding 2>&1`
+        real = `readlink node_modules/vite-plus 2>&1`
+        store = `ls -l #{real}/binding 2>&1`
+        odie "no binding in vite-plus.\n  binding dir: #{listing}\n  real path: #{real}\n  there: #{store}"
       end
       output = shell_output("#{bin}/vp fmt < /dev/null")
       assert_match "Finished", output
