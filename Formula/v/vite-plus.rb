@@ -316,12 +316,21 @@ class VitePlus < Formula
     port_url = "https://github.com/social4hyq/ohos-npm-ports/releases/download/vite-plus-1.0.0/" \
                "ohos-npm-ports-vite-plus-1.0.0-1.tgz"
     system "curl", "-fsSL", "--retry", "3", "--retry-all-errors", "-o", port_tarball, port_url
-    # Verify the archive rather than just its existence: a truncated download
-    # installs a package with no binding and fails later with a confusing
-    # "Cannot find native binding".
-    odie "port tarball is not a readable gzip" unless system "tar", "-tzf", port_tarball, out: File::NULL
-    odie "port tarball has no package/package.json" unless system "tar", "-tzf", port_tarball,
-                                                                 "package/binding/vite-plus.openharmony-arm64.node"
+    # Read the archive rather than just checking it exists: a failed or truncated
+    # download installs a package with no binding and then fails with a
+    # confusing "Cannot find native binding" that points nowhere near the cause.
+    begin
+      entries = []
+      Zlib::GzipReader.open(port_tarball) do |gz|
+        Gem::Package::TarReader.new(gz) { |tar| tar.each { |e| entries << e.full_name } }
+      end
+    rescue Zlib::Error, Gem::Package::FormatError => e
+      odie "port tarball is not a readable gzip (#{e.class})"
+    end
+    odie "port tarball carries no package.json" unless entries.include?("package/package.json")
+    odie "port tarball carries no binding" unless entries.any? do |e|
+      e.end_with?("vite-plus.openharmony-arm64.node")
+    end
 
     workspace = testpath/"test-app/pnpm-workspace.yaml"
     ws = YAML.safe_load(workspace.read)
