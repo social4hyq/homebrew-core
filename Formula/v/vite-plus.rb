@@ -308,10 +308,19 @@ class VitePlus < Formula
     manifest["scripts"]["postinstall"] = "ohos-signpost"
     File.write(pkg_json, JSON.pretty_generate(manifest) << "\n")
 
+    # The port is not on npm yet (ohos-npm-ports#72 is unmerged), so take the
+    # tarball the fork's CI published to its release instead. Reachable without
+    # credentials, unlike a workflow artifact. Once the port reaches npm this
+    # becomes "npm:@ohos-npm-ports/vite-plus@1.0.0-1" and the download goes away.
+    port_tarball = testpath/"vite-plus-ohos-port.tgz"
+    port_url = "https://github.com/social4hyq/ohos-npm-ports/releases/download/vite-plus-1.0.0/" \
+               "ohos-npm-ports-vite-plus-1.0.0-1.tgz"
+    curl port_tarball, port_url
+
     workspace = testpath/"test-app/pnpm-workspace.yaml"
     ws = YAML.safe_load(workspace.read)
     ws["overrides"] = {
-      "vite-plus" => "npm:@ohos-npm-ports/vite-plus@1.0.0-1",
+      "vite-plus" => "file:#{port_tarball}",
     }.merge(ws["overrides"] || {})
     ws["packageExtensions"] = {
       "@voidzero-dev/vite-plus-core@1.0.0" => {
