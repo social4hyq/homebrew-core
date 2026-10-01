@@ -1,11 +1,5 @@
 class VitePlus < Formula
   require "json"
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "368abbd39f5f35ae5860a82a863300d25a4a31157fce559a2426fb77e0073b33"
-  end
   require "yaml"
 
   desc "Unified toolchain and entry point for web development"
@@ -14,6 +8,12 @@ class VitePlus < Formula
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
+
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "368abbd39f5f35ae5860a82a863300d25a4a31157fce559a2426fb77e0073b33"
+  end
 
   # OHOS-only blocks are fenced below; everything else tracks upstream.
 
