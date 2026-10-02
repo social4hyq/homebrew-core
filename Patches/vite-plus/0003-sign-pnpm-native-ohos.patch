@@ -1,0 +1,67 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: social4hyq <social4hyq@users.noreply.github.com>
+Date: Wed, 01 Oct 2026 23:40:00 +0800
+Subject: [PATCH] OHOS: sign the downloaded native package-manager binary.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The platform-cfg patch (0001) only gets the *right* platform package
+downloaded. On real hardware OHOS's exec() signature check still EACCESses
+the freshly-downloaded binary: `vp install` with pnpm pinned to 12.8.1 dies
+with "pnpm.native: Permission denied" right after the chmod, and setting the
+unix mode bit alone changes nothing. Sign in place after the existing chmod.
+
+Uses `selfsign` (ohos-selfsign), not the SDK's `binary-sign-tool`: verified
+on real hardware that binary-sign-tool corrupts this static ELF outright --
+a binary-sign-tool-signed @pnpm/exe.linux-arm64-musl SIGSEGVs immediately on
+exec. Same static-ELF class of bug as bun and CGO_ENABLED=0 Go binaries.
+selfsign preserves the ELF structure and the binary runs afterwards
+(confirmed: codesign section appears, `pnpm.native --version` prints 12.8.1
+and a subsequent `vp install` completes).
+
+Both download_*_package_manager functions share this block verbatim, so the
+hunk applies to each. Not probing the binary here; the settle delay between
+signing and first exec is covered by the caller's retry loop.
+--- 
+ crates/vp_pm_cli/src/package_manager.rs | 44 ++++++++++++++++
+ 1 file changed, 22 insertion(s)
+
+--- a/crates/vp_pm_cli/src/package_manager.rs
++++ b/crates/vp_pm_cli/src/package_manager.rs
+@@ -1507,6 +1507,17 @@
+         use std::os::unix::fs::PermissionsExt;
+         tokio::fs::set_permissions(&native_bin_dest, fs::Permissions::from_mode(0o755)).await?;
+     }
++    #[cfg(target_env = "ohos")]
++    {
++        let status = std::process::Command::new("selfsign").arg(&native_bin_dest).status()?;
++        if !status.success() {
++            let msg = format!("selfsign failed for {}", native_bin_dest.display());
++            let err = std::io::Error::other(msg);
++            return Err(err.into());
++        }
++        use std::os::unix::fs::PermissionsExt;
++        std::fs::set_permissions(&native_bin_dest, std::fs::Permissions::from_mode(0o755))?;
++    }
+ 
+     // Clean up the extracted package directory
+     remove_dir_all_force(&package_dir).await?;
+@@ -1704,6 +1715,17 @@
+         use std::os::unix::fs::PermissionsExt;
+         tokio::fs::set_permissions(&native_bin_dest, fs::Permissions::from_mode(0o755)).await?;
+     }
++    #[cfg(target_env = "ohos")]
++    {
++        let status = std::process::Command::new("selfsign").arg(&native_bin_dest).status()?;
++        if !status.success() {
++            let msg = format!("selfsign failed for {}", native_bin_dest.display());
++            let err = std::io::Error::other(msg);
++            return Err(err.into());
++        }
++        use std::os::unix::fs::PermissionsExt;
++        std::fs::set_permissions(&native_bin_dest, std::fs::Permissions::from_mode(0o755))?;
++    }
+ 
+     // Clean up the extracted package directory
+     remove_dir_all_force(&package_dir).await?;

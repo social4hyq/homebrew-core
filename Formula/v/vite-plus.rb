@@ -10,9 +10,9 @@ class VitePlus < Formula
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r3"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "279045ce915bd06f12169301746809a0ada6b573eca8b1b0e95f4e3f7d560520"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r4"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65ec1b373edb819eccc8a9645ba61dceeae2230d94a0cf625a63be551ed300c7"
   end
 
   # OHOS-only blocks are fenced below; everything else tracks upstream.
@@ -24,6 +24,9 @@ class VitePlus < Formula
   depends_on "pnpm" => :build
   depends_on "rustup" => :build # TODO: try to restore stable rust: https://github.com/voidzero-dev/vite-task/commit/db99ba4d5d33323cc9e7b329f11bdea0610fbc7f
   depends_on "node"
+  # vp shells out to selfsign for the package-manager binary it downloads at
+  # runtime (see Patches/vite-plus/0003-…patch), so this is a run-time dep.
+  depends_on "ohos-selfsign"
 
   resource "rolldown" do
     url "https://github.com/rolldown/rolldown.git",
@@ -83,6 +86,11 @@ class VitePlus < Formula
     file "Patches/vite-plus/0002-managed-node-openharmony-platform.patch"
   end
 
+  # OHOS: sign the package-manager binary vp downloads (see the patch file).
+  patch :p1 do
+    file "Patches/vite-plus/0003-sign-pnpm-native-ohos.patch"
+  end
+
   def install
     resource("rolldown").stage buildpath/"rolldown"
     resource("vite").stage buildpath/"vite"
@@ -103,8 +111,8 @@ class VitePlus < Formula
     # Two kinds of gaps, both filled by writing into pnpm-workspace.yaml:
     #   * Packages that ship their own openharmony build in-package
     #     (@ohos-npm-ports forks) are remapped in place by overrides. Being
-    #     regular dependencies, they keep their binding past
-    #     `deploy --no-optional`, unlike the optionalDependency grafts below.
+    #     regular dependencies, they keep their binding through the deploy
+    #     below, unlike the optionalDependency grafts after it.
     #   * @napi-rs/{wasm-tools,lzma,tar} publish no openharmony build, but
     #     their linux-arm64-musl twins share OHOS's libc family. The shim
     #     packages below rename the binding to what the loaders require and
@@ -137,9 +145,9 @@ class VitePlus < Formula
       # devDependency of packages/core, but packages/core's build loads it,
       # so it needs a binding just like the yuku versions above.
       "@ast-grep/napi@0.43.0" => "npm:@ohos-npm-ports/ast-grep-napi@0.43.0-1",
-      # Needed by `vp lint --type-aware`, dropped by `deploy --no-optional`
-      # otherwise. Bare key: packages/cli declares it via catalog:, and
-      # version-qualified selectors don't match catalog-resolved specifiers.
+      # Needed by `vp lint --type-aware`. Bare key: packages/cli declares it
+      # via catalog:, and version-qualified selectors don't match
+      # catalog-resolved specifiers.
       "oxlint-tsgolint"       => "npm:@ohos-npm-ports/oxlint-tsgolint@7.0.2003-1",
     }
     extensions = {}
@@ -225,7 +233,13 @@ class VitePlus < Formula
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vp_global_cli")
 
-    system "pnpm", "--filter=vite-plus", "deploy", "--prod", "--legacy", "--no-optional",
+    # No --no-optional: it pruned the platform optionalDependencies wholesale,
+    # which took oxfmt's and oxlint's openharmony bindings with them and left
+    # `vp fmt` dying with "Cannot find native binding". pnpm already filters
+    # optionalDependencies by os/cpu on its own -- a deploy of oxfmt+oxlint
+    # brought in @oxfmt/binding-openharmony-arm64 and nothing else, no darwin
+    # or win32 package. The bare-* sweep below still drops what does not run.
+    system "pnpm", "--filter=vite-plus", "deploy", "--prod", "--legacy",
            prefix/"node_modules/vite-plus"
     node_modules = prefix/"node_modules/vite-plus/node_modules"
     # Remove incompatible pre-built `bare-*` binaries. Recurse as `deploy --legacy` writes
