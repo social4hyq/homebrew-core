@@ -4,6 +4,7 @@ class ClaudeCode < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.285.tgz"
   sha256 "5c0017d0e0b9518417dfbf419d04d20c7637ee885600a63ea041e0ff57e4b0eb"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
+  revision 1
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/stable"
@@ -11,8 +12,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.285-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ddfa3fdb644aa62a15fa00f3954f290f4e2f5cb5c719fd299e1e716b4bbcbce9"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.285-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "047c91c15797085132f752672dd4d5fdc104dda55e4795c44ed206247c73a5c3"
   end
 
   depends_on "ohos-compat-shim"
@@ -28,13 +29,28 @@ class ClaudeCode < Formula
       export CLAUDE_CODE_TMPDIR="${CLAUDE_CODE_TMPDIR:-/data/storage/el2/base/cache}"
       BIN="${HOMEBREW_CACHE:-$HOME/.cache/homebrew}/#{name}/#{version}/claude"
       if [ ! -x "$BIN" ]; then
-        echo "First run: downloading Claude Code #{version} (~230 MB), one-time setup..." >&2
-        TMP="$(mktemp -d -p "$CLAUDE_CODE_TMPDIR")" && trap 'rm -rf "$TMP"' EXIT
-        curl -fL# --retry 3 "#{stable.url}" -o "$TMP/pkg.tgz"
-        echo "#{stable.checksum}  $TMP/pkg.tgz" | sha256sum -c - >/dev/null
-        tar -xzf "$TMP/pkg.tgz" -C "$TMP"
-        "$HOMEBREW_PREFIX/opt/ohos-selfsign/bin/selfsign" "$TMP/package/claude"
-        mkdir -p "${BIN%/*}" && mv "$TMP/package/claude" "$BIN"
+        LOCK="${BIN%/*}.lock"
+        HELD="" TMP=""
+        trap '[ -z "$HELD" ] || rm -rf "$LOCK"; [ -z "$TMP" ] || rm -rf "$TMP"' EXIT
+        mkdir -p "${LOCK%/*}"
+        [ ! -d "$LOCK" ] || echo "Another claude is installing #{version}, waiting..." >&2
+        until mkdir "$LOCK" 2>/dev/null && HELD=1; do
+          [ -x "$BIN" ] && break
+          OWNER="$(cat "$LOCK/pid" 2>/dev/null || true)"
+          if [ -n "$OWNER" ] && ! kill -0 "$OWNER" 2>/dev/null; then rm -rf "$LOCK"; fi
+          sleep 1
+        done
+        if [ -n "$HELD" ] && [ ! -x "$BIN" ]; then
+          echo $$ > "$LOCK/pid"
+          echo "First run: downloading Claude Code #{version} (~230 MB), one-time setup..." >&2
+          TMP="$(mktemp -d -p "$CLAUDE_CODE_TMPDIR")"
+          curl -fL# --retry 3 "#{stable.url}" -o "$TMP/pkg.tgz"
+          echo "#{stable.checksum}  $TMP/pkg.tgz" | sha256sum -c - >/dev/null
+          tar -xzf "$TMP/pkg.tgz" -C "$TMP"
+          "$HOMEBREW_PREFIX/opt/ohos-selfsign/bin/selfsign" "$TMP/package/claude"
+          mkdir -p "${BIN%/*}" && mv "$TMP/package/claude" "$BIN.part" && mv "$BIN.part" "$BIN"
+        fi
+        [ -z "$HELD" ] || rm -rf "$LOCK"
       fi
       exec "$HOMEBREW_PREFIX/opt/ohos-compat-shim/bin/ohos-shim" "$BIN" "$@"
     SH
