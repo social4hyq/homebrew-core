@@ -7,7 +7,7 @@
 - **终端与开发效率**：`starship`、`zellij`、`lazygit`、`yazi`、`hishell-font`、`sshport`、`qemu-aarch64`（系统调用跟踪）
 - **编译与语言基础**：`llvm@21`、`lld@21`、`uv`、`cryptography`、`libsecret`
 
-> 以上除 `opencode`、`claude-code`、`zcode`、`vite-plus`、`hishell-font`、`sshport`、`qemu-aarch64` 由本 tap 提供外，其余 14 个 formula（18 个 PR）已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，见「[贡献](#贡献)」。
+> 以上除 `opencode`、`claude-code`、`zcode`、`vite-plus`、`hishell-font`、`sshport`、`qemu-aarch64` 由本 tap 提供外，其余 14 个 formula（18 个 PR）已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，见「[贡献](#贡献)」；本 tap 自维护的见「[尚未合入官方 core](#尚未合入官方-core)」。
 >
 > npm 包的鸿蒙适配在社区仓 [ohos-npm-ports/ohos-npm-ports](https://github.com/ohos-npm-ports/ohos-npm-ports) 持续进行，项目里的 npm 包装不上或跑不起来，先到那里找适配包。
 
@@ -83,6 +83,22 @@ timeline
 上游 ⭐ 为 GitHub star 数（2026-10-02 取值）。
 
 formula 成熟后合入官方 core，本 tap 随之下线自有版本。
+
+## 尚未合入官方 core
+
+本 tap 目前仍自行维护的 formula，进度一览：
+
+| Formula | 状态 | 备注 |
+|---|---|---|
+| `opencode` | 审核中 [!21455](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21455) | v2；合入后本 tap 的版本随之下线 |
+| `opencode-v1` | 未提交 | v1 稳定版 |
+| `claude-code` / `claude-code.latest` | 未提交 | 闭源，License 禁止再分发官方产物，只能安装时拉取官方二进制，不符合官方准入规则 |
+| `zcode` | 未提交 | 上游不发 git tag，源码取自 main |
+| `vite-plus` | 未提交 | — |
+| `hishell-font` | 未提交 | — |
+| `sshport` | 未提交 | — |
+| `qemu-aarch64` | 未提交 | 基于 Alpine 预编译包，不符合官方准入规则 |
+| `ohos-compat-shim` | 未提交 | — |
 
 ## 已迁移到官方 core
 
