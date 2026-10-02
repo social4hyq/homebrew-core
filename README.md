@@ -7,7 +7,7 @@
 - **终端与开发效率**：`starship`、`zellij`、`lazygit`、`yazi`、`hishell-font`、`sshport`、`qemu-aarch64`（系统调用跟踪）
 - **编译与语言基础**：`llvm@21`、`lld@21`、`uv`、`cryptography`、`libsecret`
 
-> 以上除 `opencode`、`claude-code`、`zcode`、`vite-plus`、`hishell-font`、`sshport`、`qemu-aarch64` 由本 tap 提供外，其余 14 个 formula（18 个 PR）已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，见「[贡献](#贡献)」；本 tap 自维护的见「[尚未合入官方 core](#尚未合入官方-core)」。
+> 以上工具中，14 个（18 个 PR）已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，完整进度见「[合入进度](#合入进度)」。
 >
 > npm 包的鸿蒙适配在社区仓 [ohos-npm-ports/ohos-npm-ports](https://github.com/ohos-npm-ports/ohos-npm-ports) 持续进行，项目里的 npm 包装不上或跑不起来，先到那里找适配包。
 
@@ -49,9 +49,9 @@ brew install bun starship               # 官方 core：Bun 运行时、终端�
 
 - `ohos-compat-shim`：系统兼容层，兜底鸿蒙与标准 Linux 的底层差异；随 `claude-code` 自动安装，无需手动装
 
-## 贡献
+## 合入进度
 
-social4hyq 提交并已合入官方 core 的 formula：
+本 tap 的 formula 与 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 的合入情况。formula 成熟后合入官方 core，本 tap 随之下线自有版本。
 
 ```mermaid
 timeline
@@ -63,42 +63,33 @@ timeline
     2026-10 : bun
 ```
 
-| Formula | 作用 | 上游 ⭐ | PR |
-|---|---|---|---|
-| `lazygit` | Git 终端界面，在终端里用键盘完成暂存、提交、分支、rebase 等操作 | 83k | [!8586](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/8586) |
-| `cryptography` | Python 事实标准的加密库，SSH、TLS、证书、JWT 等大量 Python 库的底层依赖 | 7.8k | [!10480](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10480) |
-| `hermes-agent` | Nous Research 的自我进化 AI Agent，能从经验中沉淀出可复用的技能 | 251k | [!10485](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10485) |
-| `yazi` | Rust 编写、异步 I/O 的极速终端文件管理器，支持预览与插件 | 43k | [!10780](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10780) |
-| `uv` | Rust 编写的极速 Python 包安装器与解析器，可替代 pip、venv 等 | 90k | [!17130](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17130) |
-| `codegraph` | 面向 AI coding agent 的预索引代码知识图谱，全本地运行，让 agent 少读文件、省 token | 73k | [!17567](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17567) |
-| `zellij` | 可扩展的终端工作区，以终端复用器为基础，支持 WASM 插件 | 36k | [!17569](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17569)（[!18645](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18645)） |
-| `llvm@21` | 现代编译器基础设施（clang 等），C/C++ 等原生工具链的基础 | 41k | [!18194](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18194) |
-| `lld@21` | LLVM 的链接器，链接速度快 | 同上 | [!18536](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18536) |
-| `libsecret` | GNOME 的密钥存储库，不少 CLI 工具靠它安全保存密码和令牌 | — | [!18633](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18633) |
-| `herdr` | 住在终端里的 Agent 复用器，一个界面管理多个 coding agent 会话 | 42k | [!18651](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18651)（[!20617](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20617)、[!20719](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20719)） |
-| `starship` | 跨 shell 的极简、高度可定制的终端提示符 | 60k | [!18673](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18673)（[!18770](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18770)） |
-| `pnpm` | 快速、省磁盘的 Node 包管理器（v12 为 Rust 重写） | 37k | [!20806](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20806) |
-| `bun` | 集运行时、包管理、测试、打包于一体的极速 JavaScript 工具链 | 96k | [!21450](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21450) |
+| Formula | 作用 | 上游 ⭐ | 状态 | PR |
+|---|---|---|---|---|
+| `lazygit` | Git 终端界面，在终端里用键盘完成暂存、提交、分支、rebase 等操作 | 83k | ✅ 已合入 | [!8586](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/8586) |
+| `cryptography` | Python 事实标准的加密库，SSH、TLS、证书、JWT 等大量 Python 库的底层依赖 | 7.8k | ✅ 已合入 | [!10480](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10480) |
+| `hermes-agent` | Nous Research 的自我进化 AI Agent，能从经验中沉淀出可复用的技能 | 251k | ✅ 已合入 | [!10485](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10485) |
+| `yazi` | Rust 编写、异步 I/O 的极速终端文件管理器，支持预览与插件 | 43k | ✅ 已合入 | [!10780](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10780) |
+| `uv` | Rust 编写的极速 Python 包安装器与解析器，可替代 pip、venv 等 | 90k | ✅ 已合入 | [!17130](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17130) |
+| `codegraph` | 面向 AI coding agent 的预索引代码知识图谱，全本地运行，让 agent 少读文件、省 token | 73k | ✅ 已合入 | [!17567](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17567) |
+| `zellij` | 可扩展的终端工作区，以终端复用器为基础，支持 WASM 插件 | 36k | ✅ 已合入 | [!17569](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17569)（[!18645](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18645)） |
+| `llvm@21` | 现代编译器基础设施（clang 等），C/C++ 等原生工具链的基础 | 41k | ✅ 已合入 | [!18194](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18194) |
+| `lld@21` | LLVM 的链接器，链接速度快 | 同上 | ✅ 已合入 | [!18536](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18536) |
+| `libsecret` | GNOME 的密钥存储库，不少 CLI 工具靠它安全保存密码和令牌 | — | ✅ 已合入 | [!18633](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18633) |
+| `herdr` | 住在终端里的 Agent 复用器，一个界面管理多个 coding agent 会话 | 42k | ✅ 已合入 | [!18651](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18651)（[!20617](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20617)、[!20719](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20719)） |
+| `starship` | 跨 shell 的极简、高度可定制的终端提示符 | 60k | ✅ 已合入 | [!18673](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18673)（[!18770](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18770)） |
+| `pnpm` | 快速、省磁盘的 Node 包管理器（v12 为 Rust 重写） | 37k | ✅ 已合入 | [!20806](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20806) |
+| `bun` | 集运行时、包管理、测试、打包于一体的极速 JavaScript 工具链 | 96k | ✅ 已合入 | [!21450](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21450) |
+| `opencode` | 开源的终端 AI 编程助手，自带 75+ 模型提供商接入（v2） | 211k | ⏳ 审核中 | [!21455](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21455) |
+| `vite-plus` | VoidZero 的 Web 统一工具链，一个 `vp` 命令覆盖创建、开发、检查、格式化、测试、构建 | 5.9k | 计划合入 | — |
+| `zcode` | AI 编程工作台，终端 agent（TUI）与 Web IDE 双形态 | 7.3k | 计划合入 | — |
+| `ohos-compat-shim` | 兜底鸿蒙与标准 Linux 底层差异的 LD_PRELOAD 兼容层 | — | 待定 | — |
+| `qemu-aarch64` | 用户态 QEMU，直接运行 Linux aarch64 程序，自带 `-strace` 系统调用跟踪 | 14k | 期待官方 core 提供 | — |
+| `claude-code` / `claude-code.latest` | Anthropic 官方 Claude Code 终端版（stable / latest 两个频道） | 149k | 无计划（闭源，只能拉取官方二进制） | — |
+| `opencode-v1` | opencode 的 v1 稳定版 | 211k | 无计划 | — |
+| `sshport` | 把远程开发机的服务端口映射到本机同名端口 | — | 无计划（内部小工具） | — |
+| `hishell-font` | 为鸿蒙 PC 终端（HiShell）安装并配置 Nerd Font | — | 无计划（内部小工具） | — |
 
-上游 ⭐ 为 GitHub star 数（2026-10-02 取值）。
-
-formula 成熟后合入官方 core，本 tap 随之下线自有版本。
-
-## 尚未合入官方 core
-
-本 tap 目前仍自行维护的 formula，进度一览：
-
-| Formula | 状态 | 备注 |
-|---|---|---|
-| `opencode` | 审核中 [!21455](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21455) | v2；合入后本 tap 的版本随之下线 |
-| `vite-plus` | 计划合入 | — |
-| `zcode` | 计划合入 | 上游不发 git tag，源码取自 main |
-| `ohos-compat-shim` | 待定 | — |
-| `qemu-aarch64` | 期待官方 core 提供 | 本 tap 暂以 Alpine 预编译包提供 |
-| `claude-code` / `claude-code.latest` | 无计划 | 闭源，License 禁止再分发官方产物，只能安装时拉取官方二进制 |
-| `opencode-v1` | 无计划 | v1 稳定版 |
-| `sshport` | 无计划 | 内部使用的小工具 |
-| `hishell-font` | 无计划 | 内部使用的小工具 |
+上游 ⭐ 为 GitHub star 数（2026-10-02 取值）。括号内为后续修复 PR。
 
 ## 已迁移到官方 core
 
