@@ -12,7 +12,8 @@ brew install claude-code                # 本 tap：Claude Code CLI
 brew install vite-plus                  # 本 tap：前端工具链（`vp` 命令）
 brew install qemu-aarch64               # 本 tap：用户态 QEMU（含 `-strace`）
 brew install hishell-font               # 本 tap：终端图标字体
-brew install opencode starship          # 官方 core：AI 编码代理、终端提示符（配合 hishell-font）
+brew install opencode                   # 官方 core：AI 编码代理
+brew install starship                   # 官方 core：终端提示符（配合 hishell-font）
 ```
 
 ## 合入进度
