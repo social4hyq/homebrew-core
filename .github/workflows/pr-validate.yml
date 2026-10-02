@@ -58,7 +58,7 @@ env:
   # in PRs like any other (llvm@21's ~62min build is accepted; keep this
   # mechanism for future outliers).
   HEAVY_FORMULAS: ""
-  IMAGE: ${{ vars.OHOS_CI_IMAGE }} # ghcr.io mirror of the SWR ci-runner, git baked in — see sync-ci-image.yml (was a ~3.5min cross-Pacific SWR pull + ~52s in-container brew install git)
+  IMAGE: ${{ vars.OHOS_CI_IMAGE }} # unchanged mirror of the SWR ci-runner — see sync-ci-image.yml
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
 

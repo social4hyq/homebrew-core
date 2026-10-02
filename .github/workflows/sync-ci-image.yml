@@ -4,22 +4,15 @@ name: sync-ci-image
 # Every workflow's "Start OHOS container" step used to pay a ~3.5min
 # cross-Pacific `docker pull` (SWR Beijing -> Azure-hosted runner, ~10MB/s on
 # the big layer); GHCR sits on the same Azure backbone as the runners, so the
-# pull drops to seconds. The derived image also bakes in `brew install git`
-# (another ~52s every run used to spend in setup-container.sh — git is
-# run-independent, so it belongs in the image, not the setup script) and
-# `rust` (Cargo): Homebrew's own vendor Gemfile pulls in `rubydex`, a Rust
-# native extension with no precompiled binary, whenever anything requests
-# the `style` bundler group (e.g. `brew audit`, used by light-check.sh) —
-# without Cargo on PATH that install fails deterministically, not
-# intermittently (confirmed: `cargo`/`rustc` were completely absent from
-# this image, not just flaky to reach).
+# pull drops to seconds. Copy the upstream image without adding layers,
+# preserving its manifest digest and installed packages.
 #
 # Runs two ways:
 #   - scheduled (daily): compares the upstream `latest` manifest digest to the
-#     CI_RUNNER_UPSTREAM_DIGEST variable, and only rebuilds when upstream moved.
-#     On a rebuild it auto-re-pins OHOS_CI_IMAGE (digest-pinned) and opens an
+#     CI_RUNNER_UPSTREAM_DIGEST variable and the current mirror pin.
+#     On a sync it auto-re-pins OHOS_CI_IMAGE (digest-pinned) and opens an
 #     issue so a silent image change is visible.
-#   - manual dispatch: force a rebuild from an explicit source/tag (the original
+#   - manual dispatch: force a copy from an explicit source/tag (the original
 #     on-demand path); it does NOT touch the tracking variable.
 #
 # Secrets used: BOT_PUSH_TOKEN (PAT with repo scope — needed because setting
@@ -62,9 +55,9 @@ jobs:
   # Decide whether a sync is needed. A manual dispatch always proceeds (using
   # the supplied source/tag verbatim). The scheduled run compares the upstream
   # `latest` manifest digest to the CI_RUNNER_UPSTREAM_DIGEST variable, which
-  # records the exact upstream digest we last built the GHCR image from. The
-  # GHCR image itself can't be compared directly — it's a derived image with an
-  # extra `brew install git` layer, so its digest never equals upstream's.
+  # records the exact upstream digest last mirrored to GHCR.
+  # Check both variables so an existing derived image is replaced even
+  # when the recorded upstream digest has not changed.
   check:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 10
@@ -102,13 +95,14 @@ jobs:
           LAST=$(gh variable get CI_RUNNER_UPSTREAM_DIGEST --repo "$GITHUB_REPOSITORY" 2>/dev/null || true)
           echo "last synced digest: ${LAST:-<none — first run, will bootstrap>}"
 
-          if [ "$DIGEST" = "$LAST" ]; then
+          CURRENT=$(gh variable get OHOS_CI_IMAGE --repo "$GITHUB_REPOSITORY" 2>/dev/null || true)
+          if [ "$DIGEST" = "$LAST" ] && [ "$CURRENT" = "ghcr.io/social4hyq/ci-runner@$DIGEST" ]; then
             echo "Upstream unchanged; nothing to sync."
             printf 'changed=false\n' >> "$GITHUB_OUTPUT"
           else
             echo "Upstream changed ($LAST -> $DIGEST); will sync."
             repo="${UPSTREAM%:*}"
-            # Pin the build to the exact verified digest, not the moving
+            # Pin the copy to the exact verified digest, not the moving
             # 'latest' tag, so it can't drift between this check and the pull.
             {
               printf 'changed=true\n'
@@ -128,19 +122,20 @@ jobs:
       - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      # arm64 image + arm64 runner: the RUN layer executes natively, no qemu
-      - name: Build derived image (git + rust baked in) and push
+      - name: Install image copy tool
+        run: sudo apt-get update && sudo apt-get install -y skopeo
+
+      - name: Copy upstream image without changes
+        id: mirror
         env:
           SOURCE: ${{ needs.check.outputs.source }}
           DEST: ghcr.io/social4hyq/ci-runner:${{ needs.check.outputs.tag }}
         run: |
-          printf 'FROM %s\nRUN ["/bin/bash", "-lc", "HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1 brew install git rust && brew cleanup"]\n' "$SOURCE" > Dockerfile
-          cat Dockerfile
-          # --metadata-file writes the built image's digest as JSON, so the pin
-          # step below doesn't have to scrape `imagetools inspect` text output.
-          docker build -t "$DEST" --metadata-file image-metadata.json -f Dockerfile .
-          docker push "$DEST"
-
+          set -euo pipefail
+          DIGEST=$(skopeo inspect --raw "docker://$SOURCE" | sha256sum | cut -d ' ' -f 1)
+          skopeo copy --all --preserve-digests --authfile "$HOME/.docker/config.json" \
+            "docker://$SOURCE" "docker://$DEST"
+          printf 'source_digest=sha256:%s\n' "$DIGEST" >> "$GITHUB_OUTPUT"
 
       - name: Pin OHOS_CI_IMAGE + record upstream digest
         id: pin
@@ -148,26 +143,21 @@ jobs:
           GH_TOKEN: ${{ secrets.BOT_PUSH_TOKEN }}
           DEST: ghcr.io/social4hyq/ci-runner:${{ needs.check.outputs.tag }}
           UPSTREAM_DIGEST: ${{ needs.check.outputs.upstream_digest }}
+          SOURCE_DIGEST: ${{ steps.mirror.outputs.source_digest }}
         run: |
           set -euo pipefail
-          # Resolve the pushed image's manifest digest the SAME way the check job
-          # resolves the upstream one (docker manifest inspect --verbose + jq), so
-          # if one works the other does too. Falls back to the --metadata-file
-          # JSON if the registry lookup is somehow unavailable.
-          DIGEST=$(docker manifest inspect --verbose "$DEST" \
-            | jq -r 'if type=="array" then .[0] else . end | .Descriptor.digest // empty' || true)
-          if [ -z "$DIGEST" ]; then
-            DIGEST=$(jq -r '."containerimage.digest" // empty' image-metadata.json || true)
-          fi
-          if [ -z "$DIGEST" ]; then
-            echo "::error::could not determine pushed image digest; OHOS_CI_IMAGE left unchanged"
+          DIGEST=$(skopeo inspect --raw --authfile "$HOME/.docker/config.json" "docker://$DEST" \
+            | sha256sum | cut -d ' ' -f 1)
+          DIGEST="sha256:$DIGEST"
+          if [ "$DIGEST" != "$SOURCE_DIGEST" ]; then
+            echo "::error::source and mirror digests differ; OHOS_CI_IMAGE left unchanged"
             exit 1
           fi
           echo "new GHCR digest: $DIGEST"
           gh variable set OHOS_CI_IMAGE --repo "$GITHUB_REPOSITORY" \
             --body "ghcr.io/social4hyq/ci-runner@${DIGEST}"
           # Only record the upstream digest on an auto (scheduled) run; a
-          # manual dispatch may build from an arbitrary tag/digest.
+          # manual dispatch may copy from an arbitrary tag/digest.
           if [ -n "$UPSTREAM_DIGEST" ]; then
             gh variable set CI_RUNNER_UPSTREAM_DIGEST --repo "$GITHUB_REPOSITORY" \
               --body "$UPSTREAM_DIGEST"
@@ -187,7 +177,7 @@ jobs:
           gh issue create --repo "$GITHUB_REPOSITORY" \
             --title "ci-image auto-synced to ${{ needs.check.outputs.tag }}" \
             --label ci-image \
-            --body "Upstream \`ci-runner\` changed; rebuilt the derived image and re-pinned \`OHOS_CI_IMAGE\`.
+            --body "Upstream \`ci-runner\` changed; copied the upstream image unchanged and re-pinned \`OHOS_CI_IMAGE\`.
 
           - upstream digest: \`${{ needs.check.outputs.upstream_digest }}\`
           - new image: \`ghcr.io/social4hyq/ci-runner@${{ steps.pin.outputs.ghcr_digest }}\` (tag \`${{ needs.check.outputs.tag }}\`)
