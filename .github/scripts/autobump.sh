@@ -181,10 +181,6 @@ for line in "${CANDIDATES[@]}"; do
       GIT_REF=""
       GIT_VERSION_FILE=""
       case "$FORMULA" in
-        opencode)
-          GIT_REPO="anomalyco/opencode"
-          GIT_REF="refs/tags/v$LATEST"
-          ;;
         zcode)
           GIT_REPO="zai-org/ZCode"
           GIT_REF="refs/heads/main"

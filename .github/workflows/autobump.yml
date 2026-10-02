@@ -12,18 +12,11 @@ name: autobump
 # shim deps) doesn't matter here — its formula-level url/version/sha256
 # shape (npmmirror tarball, version embedded in the URL) is a plain,
 # bump-formula-pr-compatible pattern; install() logic is version-independent
-# packaging that a version bump never touches. opencode
-# (formerly ohos-opencode; 2026-07-31: patches converted to inreplace, zero
-# .patch files) is autobumpable — url/version/sha256 are plain
-# bump-formula-pr-compatible edits. opencode@2
-# (formerly ohos-opencode@2)
-# is a git-revision formula (bun.rb pattern: url pins a branch tip via
-# `revision:`); bump-formula-pr can't rewrite the pin, so autobump.sh has a
-# custom bump path for it — since PR #613 it livechecks upstream git tags
-# `v2.*` (the npm dist-tag scheme died when upstream moved the v2 package
-# from @opencode-ai/cli to @opencode/cli in 2026-09), mirrors that version
-# into the formula, and pins the exact commit the release tag points at (see
-# the comment in the loop body). herdr and zellij were allowlisted here too
+# packaging that a version bump never touches. zcode is a git-revision formula
+# (url pins a branch tip via `revision:`) whose pin bump-formula-pr can't
+# rewrite, so autobump.sh has a custom bump path for it. opencode (v2) and
+# opencode-v1 were allowlisted until their 2026-10-02 removal — v2 is now provided
+# natively by Harmonybrew's official core, v1 is retired. herdr and zellij were allowlisted here too
 # until their 2026-09-08 removal — both are now provided natively by
 # Harmonybrew's official core (see README's 已迁移 section); their
 # autobump-shape notes went with them.
@@ -69,7 +62,7 @@ env:
   # root-caused to stdout/stderr R_AARCH64_COPY relocs resolved to NULL by
   # OHOS musl ld.so (fixed in ohos-compat-shim 3874ab4), not the
   # regex-automata panic an earlier revision of this comment claimed.
-  ALLOWLIST: "opencode-v1 opencode claude-code claude-code.latest zcode"
+  ALLOWLIST: "claude-code claude-code.latest zcode"
   IMAGE: ${{ vars.OHOS_CI_IMAGE }} # unchanged mirror of the SWR ci-runner — see sync-ci-image.yml
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core

@@ -8,11 +8,12 @@
 brew tap social4hyq/core https://atomgit.com/social4hyq/homebrew-core.git
 brew trust social4hyq/core   # Homebrew 6.0+ 必须显式信任第三方 tap
 
-brew install social4hyq/core/opencode   # 本 tap：AI 编码代理（须全限定名；与 opencode-v1 互斥）
 brew install claude-code                # 本 tap：Claude Code CLI
 brew install vite-plus                  # 本 tap：前端工具链（`vp` 命令）
 brew install qemu-aarch64               # 本 tap：用户态 QEMU（含 `-strace`）
-brew install hishell-font starship      # 终端图标字体 + 提示符（starship 来自官方 core）
+brew install hishell-font               # 本 tap：终端图标字体
+brew install opencode                   # 官方 core：AI 编码代理
+brew install starship                   # 官方 core：终端提示符（配合 hishell-font）
 ```
 
 ## 合入进度
@@ -26,7 +27,7 @@ timeline
     2026-06 : cryptography : hermes-agent : yazi
     2026-08 : uv : codegraph : zellij
     2026-09 : llvm@21 : lld@21 : libsecret : herdr : starship : pnpm
-    2026-10 : bun
+    2026-10 : bun : opencode
 ```
 
 | Formula | 作用 | 上游 ⭐ | 状态 | PR |
@@ -45,13 +46,12 @@ timeline
 | `starship` | 跨 shell 的极简、高度可定制的终端提示符 | 60k | ✅ 已合入 | [!18673](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18673)（[!18770](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18770)） |
 | `pnpm` | 快速、省磁盘的 Node 包管理器（v12 为 Rust 重写） | 37k | ✅ 已合入 | [!20806](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20806) |
 | `bun` | 集运行时、包管理、测试、打包于一体的极速 JavaScript 工具链 | 96k | ✅ 已合入 | [!21450](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21450) |
-| `opencode` | 开源的终端 AI 编程助手，自带 75+ 模型提供商接入（v2） | 211k | ⏳ 审核中 | [!21455](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21455) |
+| `opencode` | 开源的终端 AI 编程助手，自带 75+ 模型提供商接入（v2） | 211k | ✅ 已合入 | [!21455](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21455) |
 | `vite-plus` | VoidZero 的 Web 统一工具链，一个 `vp` 命令覆盖创建、开发、检查、格式化、测试、构建 | 5.9k | 计划合入 | — |
 | `zcode` | AI 编程工作台，终端 agent（TUI）与 Web IDE 双形态 | 7.3k | 计划合入 | — |
 | `ohos-compat-shim` | 兜底鸿蒙与标准 Linux 底层差异的 LD_PRELOAD 兼容层，随 `claude-code` 自动安装 | — | 待定 | — |
 | `qemu-aarch64` | 用户态 QEMU，直接运行 Linux aarch64 程序，自带 `-strace` 系统调用跟踪 | 14k | 期待官方 core 提供 | — |
 | `claude-code` / `claude-code.latest` | Anthropic 官方 Claude Code 终端版（stable / latest 两个频道） | 149k | 无计划（闭源，只能拉取官方二进制） | — |
-| `opencode-v1` | opencode 的 v1 稳定版 | 211k | 无计划 | — |
 | `sshport` | 把远程开发机的服务端口映射到本机同名端口 | — | 无计划（内部小工具） | — |
 | `hishell-font` | 为鸿蒙 PC 终端（HiShell）安装并配置 Nerd Font | — | 无计划（内部小工具） | — |
 
@@ -59,7 +59,7 @@ timeline
 
 ## 迁移说明
 
-上表「已合入」的 formula，以及 `codex`、`cc-switch`、`reasonix`、`deepseek-harness`、`nvm`、`ohos-bst-light`、`node-ohos`，现已由官方 core 提供。已装本 tap 旧版的，先 `brew uninstall social4hyq/core/<名>`，再 `brew install <名>`。特例：`cc-switch` 在官方 core 叫 `cc-switch-cli`，`node-ohos` 叫 `node`，`ohos-bst-light` 的命令名由 `self-sign` 变为 `selfsign`。其余下线项与改名见 [docs/offline-history.md](docs/offline-history.md)。
+上表「已合入」的 formula，以及 `codex`、`cc-switch`、`reasonix`、`deepseek-harness`、`nvm`、`ohos-bst-light`、`node-ohos`，现已由官方 core 提供；`opencode` 同样已迁移，`opencode-v1` 已下线、无替代。已装本 tap 旧版的，先 `brew uninstall social4hyq/core/<名>`，再 `brew install <名>`。特例：`cc-switch` 在官方 core 叫 `cc-switch-cli`，`node-ohos` 叫 `node`，`ohos-bst-light` 的命令名由 `self-sign` 变为 `selfsign`。其余下线项与改名见 [docs/offline-history.md](docs/offline-history.md)。
 
 ## 已知限制
 
