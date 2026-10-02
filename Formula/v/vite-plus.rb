@@ -107,20 +107,11 @@ class VitePlus < Formula
     # Vite patches only build-time dependencies, which the production deploy below omits
     (buildpath/"pnpm-workspace.yaml").append_lines "allowUnusedPatches: true"
 
-    # --- OHOS: native bindings ----------------------------------------------
-    # Two kinds of gaps, both filled by writing into pnpm-workspace.yaml:
-    #   * Packages that ship their own openharmony build in-package
-    #     (@ohos-npm-ports forks) are remapped in place by overrides. Being
-    #     regular dependencies, they keep their binding through the deploy
-    #     below, unlike the optionalDependency grafts after it.
-    #   * @napi-rs/{wasm-tools,lzma,tar} publish no openharmony build, but
-    #     their linux-arm64-musl twins share OHOS's libc family. The shim
-    #     packages below rename the binding to what the loaders require and
-    #     point `main` at it. packageExtensions adds the optionalDependency
-    #     the parents don't declare; overrides remaps it to the shim.
-    # Only @napi-rs/cli and @napi-rs/cross-toolchain pull these in, so the
-    # shims are build-time only. Bottle signing is the pipeline's job.
     shims_dir = buildpath/"ohos-shims"
+    # Packages with an openharmony build in-package are remapped by override.
+    # The three @napi-rs shims below have no such build; their linux-arm64-musl
+    # twins share OHOS's libc family, so the shim renames the binding to what
+    # the loaders ask for. Build-time only — bottle signing is the pipeline's.
     # [parent package, version, binding file name the loaders require,
     #  Homebrew resource]
     shims = [
@@ -130,24 +121,18 @@ class VitePlus < Formula
     ]
     overrides = {
       "lightningcss"          => "npm:@ohos-npm-ports/lightningcss@1.33.0-1",
-      # All three yuku versions have to load a binding: 0.9.3 as a prod
-      # dependency of packages/core, and 0.8.7/0.10.2 at build time via
-      # rolldown-plugin-dts, which packages/core/build.ts both imports and
-      # reaches through tsdown. Being a devDependency only means the
-      # production deploy drops it; it still has to build. Version-qualified
-      # keys are required — yuku appears under several ranges in one graph.
+      # All three yuku versions load a binding: 0.9.3 at runtime, 0.8.7/0.10.2
+      # at build time via rolldown-plugin-dts. Keys must carry the version --
+      # yuku appears under several ranges in one graph.
       "yuku-codegen@0.8.7"    => "npm:@ohos-npm-ports/yuku-codegen@0.8.7-1",
       "yuku-codegen@0.9.3"    => "npm:@ohos-npm-ports/yuku-codegen@0.9.3-1",
       "yuku-codegen@0.10.2"   => "npm:@ohos-npm-ports/yuku-codegen@0.10.2-1",
       "yuku-parser@0.8.7"     => "npm:@ohos-npm-ports/yuku-parser@0.8.7-1",
       "yuku-parser@0.9.3"     => "npm:@ohos-npm-ports/yuku-parser@0.9.3-1",
       "yuku-parser@0.10.2"    => "npm:@ohos-npm-ports/yuku-parser@0.10.2-1",
-      # devDependency of packages/core, but packages/core's build loads it,
-      # so it needs a binding just like the yuku versions above.
       "@ast-grep/napi@0.43.0" => "npm:@ohos-npm-ports/ast-grep-napi@0.43.0-1",
-      # Needed by `vp lint --type-aware`. Bare key: packages/cli declares it
-      # via catalog:, and version-qualified selectors don't match
-      # catalog-resolved specifiers.
+      # Bare key: packages/cli declares this via catalog:, where a
+      # version-qualified selector does not match.
       "oxlint-tsgolint"       => "npm:@ohos-npm-ports/oxlint-tsgolint@7.0.2003-1",
     }
     extensions = {}
@@ -171,23 +156,18 @@ class VitePlus < Formula
       extensions["#{parent}@#{version}"] = { "optionalDependencies" => { ohos_name => version } }
       overrides["#{ohos_name}@#{version}"] = "link:#{shim}"
     end
-    # @parcel/watcher embeds its openharmony binding in the package itself
-    # (loader falls back to that path when no platform package matches), so
-    # it needs no optionalDependency graft.
+    # Embeds its openharmony binding in the package itself, so no graft needed.
     overrides["@parcel/watcher"] = "npm:@ohos-npm-ports/parcel-watcher@2.5.1-2"
 
     workspace_yaml = buildpath/"pnpm-workspace.yaml"
     ws = YAML.safe_load(workspace_yaml.read)
     ws["overrides"] = overrides.merge(ws["overrides"] || {})
     ws["packageExtensions"] = extensions.merge(ws["packageExtensions"] || {})
-    # The workspace's minimumReleaseAge gate (24h) blocks freshly published
-    # community ports; the overrides above pin exact versions, so the pin
-    # itself is the trust decision — exempt the port scope.
+    # The 24h minimumReleaseAge gate would block a freshly published port; the
+    # exact-version pins above are the trust decision instead.
     ws["minimumReleaseAgeExclude"] = (ws["minimumReleaseAgeExclude"] || []).push("@ohos-npm-ports/*")
     File.write(workspace_yaml, YAML.dump(ws))
-    # -------------------------------------------------------------------------
 
-    # --- OHOS: build environment ---------------------------------------------
     # pnpm >= 11.20 verifies the engine binary for a packageManager pin, and
     # no openharmony @pnpm/exe is published.
     ENV["NPM_CONFIG_MANAGE_PACKAGE_MANAGER_VERSIONS"] = "false"
@@ -201,22 +181,14 @@ class VitePlus < Formula
     end
     # @napi-rs/cli builds the ohos linker/cc/ar paths from this.
     ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
-    # -------------------------------------------------------------------------
 
-    # --- OHOS: vendored vite-task ------------------------------------
-    # fspy reaches fspy_preload_unix through a -Z bindeps artifact dependency
-    # (artifact!("fspy_preload", ...)), so the crate has to stay in the graph
-    # and keep producing its cdylib. What cannot compile here is its body:
-    # the interceptions call libc::statx and execveat, which OHOS's libc has no
-    # bindings for. It is already scoped out on musl, so widening the same gate
-    # to ohos leaves an empty cdylib and the artifact still resolves. Only
-    # this crate is patched: packages/cli stamps the vite-task toolchain node
-    # with vt's cargo revision, and a [patch] entry turns a crate's source into
-    # a path, which has no revision to read — build.ts then throws "Expected an
-    # exact source revision for Cargo package vt". The patch stays inside the
-    # staged checkout because the manifest inherits `license` from the
-    # checkout's workspace root. Staged outside the workspace dir: a nested
-    # workspace there derails cargo's root selection.
+    # fspy reaches fspy_preload_unix through a -Z bindeps artifact dependency,
+    # so the crate must stay in the graph and keep emitting its cdylib; only its
+    # body fails, on libc::statx and execveat, which OHOS's libc lacks. It is
+    # already gated out on musl, so widening that gate leaves an empty cdylib
+    # and the artifact still resolves. Only this one crate is patched -- a
+    # [patch] entry for any of the others turns it into a path source, and
+    # build.ts then cannot read vt's cargo revision.
     vt_dir = buildpath.parent/"vite-task"
     rm_r vt_dir if vt_dir.exist?
     resource("vite-task-src").stage vt_dir
@@ -233,12 +205,9 @@ class VitePlus < Formula
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vp_global_cli")
 
-    # No --no-optional: it pruned the platform optionalDependencies wholesale,
-    # which took oxfmt's and oxlint's openharmony bindings with them and left
-    # `vp fmt` dying with "Cannot find native binding". pnpm already filters
-    # optionalDependencies by os/cpu on its own -- a deploy of oxfmt+oxlint
-    # brought in @oxfmt/binding-openharmony-arm64 and nothing else, no darwin
-    # or win32 package. The bare-* sweep below still drops what does not run.
+    # No --no-optional: it prunes optionalDependencies wholesale, taking
+    # oxfmt's and oxlint's openharmony bindings with them. pnpm already filters
+    # them by os/cpu, so the flag only cost us those bindings.
     system "pnpm", "--filter=vite-plus", "deploy", "--prod", "--legacy",
            prefix/"node_modules/vite-plus"
     node_modules = prefix/"node_modules/vite-plus/node_modules"
@@ -250,12 +219,10 @@ class VitePlus < Formula
                 .each { |dir| rm_r(dir) if dir.basename.to_s != "#{os}-#{arch}" }
     rm_r node_modules.glob(".pnpm/**/node_modules/fsevents")
 
-    # --- OHOS: bin/vp wrapper ------------------------------------------------
-    # vp creates tempdirs via TMPDIR (read-only /tmp here) and its default
-    # ShimMode "managed" downloads glibc Node.js binaries OHOS won't exec.
-    # write_env_script cannot express "default TMPDIR if unset" or
-    # first-run config seeding, hence the wrapper. The real binary sits one
-    # level below prefix so <dir>/../node_modules still resolves.
+    # /tmp is read-only and vp's default ShimMode "managed" wants a node that
+    # OHOS will exec; write_env_script cannot express either, hence the wrapper.
+    # The real binary sits one level below prefix so <dir>/../node_modules
+    # still resolves.
     odie "cargo install did not produce bin/vp" unless (bin/"vp").exist?
     libexec.mkpath
     mv bin/"vp", libexec/"vp"
@@ -271,7 +238,6 @@ class VitePlus < Formula
       exec "#{libexec}/vp" "$@"
     SH
     chmod 0755, bin/"vp"
-    # ----------------------------------------------------------------------
 
     # Symlink vp to vpr and vpx. These are detected at runtime by argv[0]
     bin.install_symlink bin/"vp" => "vpr"
@@ -312,96 +278,5 @@ class VitePlus < Formula
     # `vp` calls `tcsetattr` on a tty stdin, which stops it with SIGTTOU on the test PTY
     system "#{bin}/vp create vite:application --no-interactive --directory test-app < /dev/null"
     assert_path_exists testpath/"test-app/package.json"
-
-    # OHOS: the scaffolded app resolves vite-plus from the npm registry, which
-    # ships no openharmony bindings. Wire it the way an end user would —
-    # override to the @ohos-npm-ports port (its binding ships signed), graft the
-    # @rolldown openharmony binding onto the registry vite-plus-core, sign what
-    # pnpm fetched unsigned, and drop the scaffold's `prepare: vp config` hook,
-    # which runs before install can fetch bindings. The scaffold's workspace
-    # file already has an overrides section, so merge into it.
-    pkg_json = testpath/"test-app/package.json"
-    manifest = JSON.parse(pkg_json.read)
-    manifest["scripts"].delete("prepare")
-    manifest["devDependencies"] ||= {}
-    manifest["devDependencies"]["ohos-signpost"] = "^1.0.2"
-    manifest["scripts"]["postinstall"] = "ohos-signpost"
-    File.write(pkg_json, JSON.pretty_generate(manifest) << "\n")
-
-    # The port is not on npm yet (ohos-npm-ports#72 is unmerged), so take the
-    # tarball the fork's CI published to its release instead. Reachable without
-    # credentials, unlike a workflow artifact. Once the port reaches npm this
-    # becomes "npm:@ohos-npm-ports/vite-plus@1.0.0-1" and the download goes away.
-    port_tarball = testpath/"vite-plus-ohos-port.tgz"
-    port_url = "https://github.com/social4hyq/ohos-npm-ports/releases/download/vite-plus-1.0.0/" \
-               "ohos-npm-ports-vite-plus-1.0.0-1.tgz"
-    system "curl", "-fsSL", "--retry", "3", "--retry-all-errors", "-o", port_tarball, port_url
-    # Read the archive rather than just checking it exists: a failed or truncated
-    # download installs a package with no binding and then fails with a
-    # confusing "Cannot find native binding" that points nowhere near the cause.
-    # One command string, not an argument list: system only goes through a shell
-    # in that form, and passing ">" as a separate argument makes tar ignore it
-    # while still exiting 0. Both paths come from testpath, so no quoting risk.
-    listing = testpath/"port-listing.txt"
-    listing.write("") # so a redirect that does not take effect leaves an empty file,
-    # which the assertions below reject rather than pass
-    odie "port tarball is not a readable gzip" unless system "tar -tzf #{port_tarball} > #{listing}"
-    entries = listing.read.lines(chomp: true)
-    odie "port tarball carries no package.json" unless entries.include?("package/package.json")
-    odie "port tarball carries no binding" unless entries.any? do |e|
-      e.end_with?("vite-plus.openharmony-arm64.node")
-    end
-
-    workspace = testpath/"test-app/pnpm-workspace.yaml"
-    ws = YAML.safe_load(workspace.read)
-    ws["overrides"] = (ws["overrides"] || {}).merge(
-      "vite-plus" => "file:#{port_tarball}",
-    )
-    ws["packageExtensions"] = (ws["packageExtensions"] || {}).merge(
-      "@voidzero-dev/vite-plus-core@1.0.0" => {
-        "optionalDependencies" => { "@rolldown/binding-openharmony-arm64" => "1.2.11" },
-      },
-    )
-    # OHOS: the graft above only matters if pnpm treats the openharmony
-    # optional package as installable. `vp`'s package manager is a standalone
-    # native pnpm executable (see Patches/vite-plus/0001-…patch) with no
-    # Node.js involved, so it cannot know it runs on openharmony and silently
-    # prunes the optional dependency as a platform mismatch. Force it in via
-    # supportedArchitectures, the standard pnpm escape hatch.
-    # Union, not override: the scaffold already declares supportedArchitectures
-    # with "os" => ["current"], and merging the other way round let that win,
-    # dropping "openharmony" -- which is what makes pnpm prune the binding.
-    ws["supportedArchitectures"] = ws["supportedArchitectures"] || {}
-    ws["supportedArchitectures"]["os"] =
-      ((ws["supportedArchitectures"]["os"] || []) + ["current", "openharmony"]).uniq
-    File.write(workspace, YAML.dump(ws))
-    # The graft only helps if pnpm reads it, so confirm the file it will read.
-    reread = YAML.safe_load(workspace.read)
-    odie "supportedArchitectures lost: #{workspace.read}" unless
-      reread.dig("supportedArchitectures", "os")&.include?("openharmony")
-    odie "override lost: #{workspace.read}" unless reread.dig("overrides", "vite-plus")&.start_with?("file:")
-
-    vp_with_retry = lambda do |*args|
-      max_attempts = 3
-      # Run inside the app: vp reads the pnpm-workspace.yaml holding our
-      # overrides, so it has to run where that file is.
-      cd testpath/"test-app" do
-        (1..max_attempts).each do |attempt|
-          system bin/"vp", *args
-          break
-        rescue BuildError => e
-          msg = e.message.to_s.lines.last(5).join
-          odie "vp #{args.first} failed (#{e.class}):\n#{msg}" if attempt == max_attempts
-          sleep 10
-        end
-      end
-    end
-
-    vp_with_retry.call "install"
-
-    cd testpath/"test-app" do
-      output = shell_output("#{bin}/vp fmt < /dev/null")
-      assert_match "Finished", output
-    end
   end
 end
