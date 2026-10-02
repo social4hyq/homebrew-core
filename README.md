@@ -1,4 +1,4 @@
-# 补齐鸿蒙PC的开发工具链，为鸿蒙生态添砖加瓦
+# social4hyq/homebrew-core
 
 `social4hyq/core` 是面向鸿蒙 PC（HarmonyOS，OHOS aarch64）的 [Harmonybrew](https://harmonybrew.atomgit.com)（Homebrew 的鸿蒙移植）第三方 tap：移植、签名、真机验证后打包成 bottle，`brew install` 一条命令装好即用。
 
