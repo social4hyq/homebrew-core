@@ -20,7 +20,7 @@ class Bun < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  revision 18
+  revision 19
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
@@ -33,6 +33,8 @@ class Bun < Formula
   depends_on "cmake" => :build
   # libstdc++ for the prebuilt bootstrap bun (see LD_LIBRARY_PATH in install)
   depends_on "gcc" => :build if OS.ohos?
+  # Homebrew's system Git fallback replaces stdin, breaking dependency patches.
+  depends_on "git" => :build if OS.ohos?
   # for the WebKit build
   depends_on "gperf" => :build if OS.ohos?
   depends_on "llvm@21" => :build # LLVM 22 PR: https://github.com/oven-sh/bun/pull/34299
