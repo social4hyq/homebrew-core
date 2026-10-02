@@ -1,6 +1,6 @@
-# social4hyq/homebrew-core
+# 补齐鸿蒙PC的开发工具链，为鸿蒙生态添砖加瓦
 
-面向鸿蒙 PC（HarmonyOS，OHOS aarch64）的 [Harmonybrew](https://harmonybrew.atomgit.com)（Homebrew 的鸿蒙移植）第三方 tap。
+面向鸿蒙 PC（HarmonyOS，OHOS aarch64）的 [Harmonybrew](https://harmonybrew.atomgit.com)（Homebrew 的鸿蒙移植）第三方 tap（`social4hyq/core`）。
 
 **出发点**：补齐鸿蒙 PC 的常用工具链——**Agent 工具**（opencode、Claude Code 等）、**前端构建工具**（vite-plus 等）和**效率工具**（终端字体、端口转发、系统调用跟踪等）。鸿蒙 PC 终端（HiShell）强制代码签名，自行编译或直接下载的 Linux 程序一律 `Permission denied`，不少常用工具也还没适配；本 tap 逐一移植、签名、真机验证后打包成 bottle，`brew install` 一条命令装好即用。
 
