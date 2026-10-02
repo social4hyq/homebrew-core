@@ -2,13 +2,12 @@
 
 面向鸿蒙 PC（HarmonyOS，OHOS aarch64）的 [Harmonybrew](https://harmonybrew.atomgit.com)（Homebrew 的鸿蒙移植）第三方 tap。
 
-**这个 tap 解决什么问题**：鸿蒙 PC 终端（HiShell）强制代码签名——自行编译或直接下载的 Linux 程序一律 `Permission denied`，且不少常用工具还没适配鸿蒙。本 tap 逐一移植、签名、真机验证后打包成 bottle，`brew install` 一条命令装好即用，体验等同 macOS/Linux 上的 Homebrew。
+**出发点**：补齐鸿蒙 PC 的常用工具链——**Agent 工具**（opencode、Claude Code 等）、**前端构建工具**（vite-plus 等）和**效率工具**（终端字体、端口转发、系统调用跟踪等）。鸿蒙 PC 终端（HiShell）强制代码签名，自行编译或直接下载的 Linux 程序一律 `Permission denied`，不少常用工具也还没适配；本 tap 逐一移植、签名、真机验证后打包成 bottle，`brew install` 一条命令装好即用。
 
-**这个 tap 的定位**：过渡区——formula 从进入 tap 第一天起就以合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 为目标，验证成熟即推动合并、下线自有版本（见下方「已下线 / 已迁移」表）。
+**分工**：
 
-**已合入 Harmonybrew 官方 core**（social4hyq 提交的 PR，按合入先后排列，其中部分未在本 tap 出现过；现直接 `brew install <名>` 即可）：[`lazygit`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/8586)、[`cryptography`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10480)、[`hermes-agent`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10485)、[`yazi`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10780)、[`uv`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17130)、[`codegraph`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17567)、[`zellij`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17569)（后续 [!18645](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18645)）、[`llvm@21`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18194)、[`lld@21`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18536)、[`libsecret`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18633)、[`herdr`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18651)（后续 [!20617](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20617) [!20719](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20719)）、[`starship`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18673)（后续 [!18770](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18770)）、[`pnpm`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20806)、[`bun`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21450)。其中曾在本 tap 提供过的见下方「已下线 / 已迁移」表。
-
-**仓库源头**：本仓库以 [GitHub](https://github.com/social4hyq/homebrew-core) 为唯一源头——源码托管、Issues、PR、CI 全部在 GitHub 进行。[atomgit 同名仓库](https://atomgit.com/social4hyq/homebrew-core) 是合并后自动同步的**单向镜像**（GitHub → atomgit，永不反向），存在意义是 bottle 二进制发布在 atomgit Releases 上、国内网络下载更快。反馈问题、提交贡献请认准 GitHub；请勿向 atomgit 推送代码或开 PR。
+- **本 tap**：命令行工具的 formula。从进入 tap 第一天起就以合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 为目标，验证成熟即推动合并、下线自有版本（见下方「已迁移到 Harmonybrew 官方 core」）。
+- **npm 包**：前端相关工具链和大多数 npm 包的鸿蒙适配，在社区仓 [ohos-npm-ports/ohos-npm-ports](https://github.com/ohos-npm-ports/ohos-npm-ports) 持续进行。项目里的 npm 包在鸿蒙上装不上或跑不起来时，先到那里找有没有适配包。
 
 ## 安装
 
@@ -19,10 +18,10 @@ brew trust social4hyq/core   # Homebrew 6.0+ 必须显式信任第三方 tap
 # 常用工具：
 brew install social4hyq/core/opencode # AI 编码代理 v2（v1：brew install opencode-v1）
 brew install claude-code     # Claude Code CLI
-brew install bun             # Bun 运行时（Harmonybrew 官方 core 提供）
+brew install bun             # Bun 运行时（官方 core 提供）
 brew install vite-plus       # VoidZero 统一前端工具链（`vp` 命令）
 brew install hishell-font    # starship 图标字体（先装这个：提示符的图标/符号靠它渲染）
-brew install starship        # 终端提示符美化（Harmonybrew 官方 core 原生提供，主题化 prompt，配合 hishell-font）
+brew install starship        # 终端提示符美化（官方 core 提供，配合 hishell-font）
 brew install qemu-aarch64    # 用户态 QEMU（`qemu-aarch64 -strace` 系统调用跟踪）
 ```
 
@@ -41,56 +40,46 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 
 ## Formulae
 
-| Formula | 版本 | 说明 |
-|---|---|---|
-| `opencode-v1` | 1.18.33 | 开源的终端 AI 编程助手：在终端里用自然语言让 AI 读代码、改文件、跑命令；自带 75+ 模型提供商接入，用自己的 API key 自由选模型（v1 稳定版） |
-| `social4hyq/core/opencode` | 2.0.20 | opencode v2 稳定版：全新插件 API 与交互；与 `opencode-v1` 互斥，命令名同为 `opencode`，共享 `~/.config/opencode` 等目录；跟进上游 v2 发布线。已有 `opencode` 随升级转为 v2，`opencode-v2` / `opencode@2` 通过 `formula_renames.json` 自动迁移 |
-| `claude-code` | 2.1.274 | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号；License 禁止再分发官方产物，故安装时拉取官方 musl 二进制，自签名后经 `ohos-compat-shim` 运行 |
-| `claude-code.latest` | 2.1.285 | 同一 Claude Code 的 latest 滚动频道：安装时拉取官方 musl 二进制，自签名后经 `ohos-compat-shim` 运行；与 `claude-code` 互斥（都装 `claude` 命令，二选一） |
-| `zcode` | 3.14.3 | AI 编程工作台：终端 agent（TUI）与 Web IDE 双形态；上游不发 git tag，源码取自 GitHub main、用本 tap 的 bun/pnpm 工具链在本机构建 |
-| `vite-plus` | 0.2.8 | VoidZero（Vue/Vite 作者团队）的 Web 统一工具链：一个 `vp` 命令包揽创建项目、开发调试、检查、格式化、测试、构建全流程（Beta） |
-| `hishell-font` | 0.1.0 | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
-| `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
-| `ohos-compat-shim` | 0.6.2 | 系统兼容层：自动兜底鸿蒙与标准 Linux 的底层行为差异，让 Linux 生态软件开箱即用（已内嵌进本 tap 产物，无需单独配置） |
-| `qemu-aarch64` | 11.0.3-r0 | 用户态 QEMU：直接运行/调试 Linux aarch64 程序，自带系统调用跟踪（`-strace`），是鸿蒙无 root strace 环境下的排障替代品 |
-
-## 已下线 / 已迁移
-
-| Formula | 状态 | 替代方案 | **我提交的 Harmonybrew PR** |
+| 类别 | Formula | 版本 | 说明 |
 |---|---|---|---|
-| `codex` | 2026-07-23 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供，直接 `brew install codex` | — |
-| `opencode-shim` / `opencode-shim@2` | 2026-08-02 下线 | 预编译 shim 路线已被源码构建路线取代，改用 `opencode-v1` / `social4hyq/core/opencode` | — |
-| `close-range-shim` | 2026-07-15 下线 | 功能并入 `ohos-compat-shim` | — |
-| `bun-pty` / `lightningcss` / `tailwindcss-oxide` | 2026-07-18 下线 | 改走 `@ohos-ports/*` npm 包，无独立 formula 需求 | — |
-| `icu4c@78` | 2026-08-09 下线 | libc++ ABI `__n1` 迁移（#239-#241）后本 tap fork 冗余，直接用上游 harmonybrew/core 的 `icu4c@78`（同为 `__n1`） | — |
-| `grok-build` | 2026-08-12 下线 | 已停止维护（使用率低）；可从 tap git 历史恢复 formula | — |
-| `cc-switch` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（`cc-switch-cli`），直接 `brew install cc-switch-cli` | — |
-| `reasonix` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供，直接 `brew install reasonix` | — |
-| `deepseek-harness` | 2026-08-15 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（含 OHOS 补丁集：link 兜底 / 凭据模式 / ripgrep 回退 / crypto polyfill / 无沙箱放行），直接 `brew install deepseek-harness`；已装本 tap 旧版的用户请先 `brew uninstall deepseek-harness` 再装上游版 | — |
-| `uv` | 2026-08-20 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（含全部三个 OHOS 补丁与 wheel 自动签名），直接 `brew install uv`；已装本 tap 旧版的用户请先 `brew uninstall uv` 再装上游版 | [!17130](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17130) |
-| `codegraph` | 2026-08-24 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（无补丁单文件），直接 `brew install codegraph`；已装本 tap 旧版的用户请先 `brew uninstall codegraph` 再装上游版 | [!17567](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17567) |
-| `nvm` | 2026-08-24 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（0.40.7，OHOS 平台补丁 + ohos-node.com 发行源），直接 `brew install nvm`；已装本 tap 旧版的用户请先 `brew uninstall nvm` 再装上游版 | — |
-| `nvm-ohos` | 2026-08-15 下线 | 旧实现存档：`NVM_INSTALL_THIRD_PARTY_HOOK` 重定向 `nvm install` 到 brew node keg；其继任者本 tap `nvm` 也已于 2026-08-24 下线，统一改用官方 core 的 `nvm`；可从 tap git 历史恢复 | — |
-| `warp-tui` | 2026-08-12 下线 | 已停止维护（使用率低）；可从 tap git 历史恢复 formula | — |
-| `inject-runpath` / `dlopen-sign-shim` | 2026-08-12 下线 | 已无 formula 依赖（原用途已被预签名 npm `.so` + bun r31 起静态内嵌的 `ohos-compat-shim` 取代）；可从 tap git 历史恢复 formula | — |
-| `zig@0.15` | 2026-09-04 下线 | 唯一消费者 herdr 已改为 install() 内联官方预编译 zig（resource 下载 + binary-sign-tool 签名），独立 keg 无保留必要；可从 tap git 历史恢复 formula | — |
-| `llvm@21` / `lld@21` | 2026-09-08 下线 | 补丁已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install llvm@21 lld@21`；`bun` 的构建依赖已随之改为解析上游同名 formula；已装本 tap 旧版的用户请先 `brew uninstall llvm@21 lld@21` 再装上游版 | [!18194](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18194) [!18536](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18536) |
-| `ohos-bst-light` | 2026-09-08 下线 | [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 已原生提供同名 formula，直接 `brew install ohos-bst-light`；**注意命令名变了**：本 tap 旧版（v1.0.0）装的是 `self-sign`，官方版（v2.1.2，hqzing/ohos-bst-light 上游最新版）装的是 `selfsign`（无连字符），参数/行为不变（`--force`/`--strip` 均保留）；已装本 tap 旧版的用户请先 `brew uninstall ohos-bst-light` 再装上游版，脚本里的 `self-sign` 调用改成 `selfsign` | — |
-| `libsecret` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install libsecret`；已装本 tap 旧版的用户请先 `brew uninstall libsecret` 再装上游版 | [!18633](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18633) |
-| `zellij` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install zellij`；已装本 tap 旧版的用户请先 `brew uninstall zellij` 再装上游版 | [!17569](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17569) [!18645](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18645) |
-| `herdr` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install herdr`；已装本 tap 旧版的用户请先 `brew uninstall herdr` 再装上游版 | [!18651](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18651) |
-| `starship` | 2026-09-09 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install starship`（配合 `hishell-font` 图标字体用法不变）；已装本 tap 旧版的用户请先 `brew uninstall starship` 再装上游版 | [!18673](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18673) |
-| `node-ohos` | 2026-09-09 下线 | [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 的 `node` 已改用 `llvm@22` 重编（原生 OHOS 支持，26.8.1），与本 tap 停留在 `llvm@21`/26.7.0 的自有版本相比无需再单独维护，直接 `brew install node`；已装本 tap 旧版的用户请先 `brew uninstall node-ohos` 再装上游 `node` | — |
-| `bun-webkit` / `bun-bootstrap` | 2026-09-18 下线 | 随 bun 1.4 切换「上游源码 + 补丁」构建（2026-09-12），`bun.rb` 不再依赖独立 WebKit 组件 formula 与预编译引导包，二者失去唯一消费者；formula 与 `Patches/bun-webkit/` 已从仓库删除（保留在 tap git 历史，可恢复） | — |
-| `bun` / `bun-legacy` | 2026-10-02 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（1.4.2，即本 tap `bun` 的上游化版本），直接 `brew install bun`；`bun-legacy`（fork 直构存档）随之一并删除，无替代；本 tap 内依赖 `bun` 的 formula（`opencode-v1`、`zcode`、`hishell-font`）自动改用官方版；已装本 tap 旧版的用户请先 `brew uninstall social4hyq/core/bun` 再装官方版 | [!21450](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21450) |
+| Agent 工具 | `opencode-v1` | 1.18.33 | 开源的终端 AI 编程助手：在终端里用自然语言让 AI 读代码、改文件、跑命令；自带 75+ 模型提供商接入，用自己的 API key 自由选模型（v1 稳定版） |
+| Agent 工具 | `social4hyq/core/opencode` | 2.0.20 | opencode v2 稳定版：全新插件 API 与交互；与 `opencode-v1` 互斥，命令名同为 `opencode`，共享 `~/.config/opencode` 等目录；跟进上游 v2 发布线（升级与回退 v1 见下方说明） |
+| Agent 工具 | `claude-code` | 2.1.274 | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号；License 禁止再分发官方产物，故安装时拉取官方 musl 二进制，自签名后经 `ohos-compat-shim` 运行 |
+| Agent 工具 | `claude-code.latest` | 2.1.285 | 同一 Claude Code 的 latest 滚动频道：安装时拉取官方 musl 二进制，自签名后经 `ohos-compat-shim` 运行；与 `claude-code` 互斥（都装 `claude` 命令，二选一） |
+| Agent 工具 | `zcode` | 3.14.3 | AI 编程工作台：终端 agent（TUI）与 Web IDE 双形态；上游不发 git tag，源码取自 GitHub main、用官方 core 的 bun/pnpm 工具链在本机构建 |
+| 前端构建 | `vite-plus` | 0.2.8 | VoidZero（Vue/Vite 作者团队）的 Web 统一工具链：一个 `vp` 命令包揽创建项目、开发调试、检查、格式化、测试、构建全流程（Beta） |
+| 效率工具 | `hishell-font` | 0.1.0 | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
+| 效率工具 | `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
+| 效率工具 | `qemu-aarch64` | 11.0.3-r0 | 用户态 QEMU：直接运行/调试 Linux aarch64 程序，自带系统调用跟踪（`-strace`），是鸿蒙无 root strace 环境下的排障替代品 |
+| 基础设施 | `ohos-compat-shim` | 0.6.2 | 系统兼容层：自动兜底鸿蒙与标准 Linux 的底层行为差异，让 Linux 生态软件开箱即用（已内嵌进本 tap 产物，无需单独配置） |
 
-> 改名提示（2026-08-01）：`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
->
-> 语义变更（2026-09-22）：`opencode@2` 更名为 `opencode-v2`（对齐上游官方 formula 名，`formula_renames.json` 自动迁移已装用户），并对齐上游的**原位替代**语义——命令名从 `opencode2` 改回 `opencode`，新增 `conflicts_with "opencode"`（与 v1 不能同时安装），数据目录从独立的 `~/.config/opencode2` 等改回与 v1 共享的 `~/.config/opencode`（v1 的数据库会被 v2 自动迁移）。旧版遗留的 `~/.config/opencode2`、`~/.local/share/opencode2`、`~/.local/state/opencode2` 目录升级后可手动删除。
+> `opencode` 现为 v2，v1 为 `opencode-v1`，两者互斥：都提供 `opencode` 命令，共享 `~/.config/opencode`，切换前先卸载当前版本。已有 `opencode` 用户 `brew update && brew upgrade social4hyq/core/opencode` 即升到 v2（`opencode-v2` / `opencode@2` 自动迁移）；要保留 v1：`brew uninstall social4hyq/core/opencode && brew install opencode-v1`。`opencode` 与官方 core 同名，请使用全限定名 `social4hyq/core/opencode`。
 
-> 当前命名：`opencode` 已由 v2 接管，v1 保留为 `opencode-v1`。已有本 tap 的 `opencode` 用户运行 `brew update && brew upgrade social4hyq/core/opencode` 即升级到 v2；`opencode-v2` 与 `opencode@2` 会自动迁移到 `opencode`，不需要卸载重装。需要保留 v1 的用户运行 `brew uninstall social4hyq/core/opencode && brew install opencode-v1`。两个版本都提供 `opencode` 命令，切换时先卸载或 unlink 当前版本；配置和数据目录由两个版本共享。
->
-> 与 Harmonybrew 官方 core 同名的本 tap formula 使用 `social4hyq/core/opencode` 全限定名安装或升级。
+## 已迁移到 Harmonybrew 官方 core
+
+下列 formula 曾在本 tap 提供，现已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供。已装本 tap 旧版的用户请先 `brew uninstall social4hyq/core/<名>`，再 `brew install <名>`（装的是官方版）。「我提交的 PR」列是 social4hyq 提交到官方 core 的 PR，按合入先后排列。
+
+| Formula | 备注 | 我提交的 PR |
+|---|---|---|
+| `codex` | — | — |
+| `cc-switch` | 官方名为 `cc-switch-cli`，装 `cc-switch-cli` | — |
+| `reasonix` | — | — |
+| `deepseek-harness` | — | — |
+| `uv` | — | [!17130](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17130) |
+| `codegraph` | — | [!17567](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17567) |
+| `nvm` | — | — |
+| `llvm@21` / `lld@21` | — | [!18194](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18194) [!18536](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18536) |
+| `ohos-bst-light` | **命令名变了**：本 tap 旧版装 `self-sign`，官方版装 `selfsign`（无连字符），参数不变；脚本里的调用要同步改 | — |
+| `libsecret` | — | [!18633](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18633) |
+| `zellij` | — | [!17569](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17569) [!18645](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18645) |
+| `herdr` | — | [!18651](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18651) [!20617](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20617) [!20719](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20719) |
+| `starship` | 配合 `hishell-font` 用法不变 | [!18673](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18673) [!18770](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18770) |
+| `node-ohos` | 官方 formula 名为 `node`，装 `node` | — |
+| `bun` | 本 tap 内依赖 `bun` 的 formula 自动改用官方版 | [!21450](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21450) |
+
+另有未在本 tap 出现过、直接提交到官方 core 的 formula：[`lazygit`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/8586)、[`cryptography`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10480)、[`hermes-agent`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10485)、[`yazi`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10780)、[`pnpm`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20806)。
+
+其余已下线（无官方替代）的 formula 与改名历史见 [docs/offline-history.md](docs/offline-history.md)。
 
 ## 已知限制
 
@@ -104,6 +93,12 @@ HarmonyOS 与 Linux 存在少量系统调用差异，本 tap 通过 `ohos-compat
 
 > **上游推动**：上述差异正在推动 HarmonyOS 在后续版本中解决——缺失的 syscall（如 `close_range`、`fchmodat2`）争取随系统版本放行；沙箱受限项（可写临时目录、`linkat`/`symlinkat` 权限、用户信息解析）通过权限申请开放。平台放行后 shim 会自动切回原生实现（每次调用实时探测，无需重新安装或配置）。
 
+## 反馈
+
+遇到功能差异或崩溃，请在 GitHub Issues 反馈，附：HarmonyOS 版本、`<工具> --version`、复现命令。
+
+**仓库源头**：本仓库以 [GitHub](https://github.com/social4hyq/homebrew-core) 为唯一源头——源码托管、Issues、PR、CI 全部在 GitHub 进行。[atomgit 同名仓库](https://atomgit.com/social4hyq/homebrew-core) 是合并后自动同步的**单向镜像**（GitHub → atomgit，永不反向），存在意义是 bottle 二进制发布在 atomgit Releases 上、国内网络下载更快。反馈问题、提交贡献请认准 GitHub；请勿向 atomgit 推送代码或开 PR。
+
 ## 致谢
 
 感谢鸿蒙生态社区热心人士的分享与贡献，为本 tap 的移植工作提供了重要参考：
@@ -116,7 +111,3 @@ HarmonyOS 与 Linux 存在少量系统调用差异，本 tap 通过 `ohos-compat
 - 《鸿蒙 PC 底层开发技术详解（七）：二进制自签名算法的实现》 — https://blog.csdn.net/hqzing/article/details/162642397
 - 《鸿蒙 PC 底层开发技术详解（八）：鸿蒙 PC 上的问题定位手段》 — https://blog.csdn.net/hqzing/article/details/163311519
 - 《在鸿蒙 PC 上使用 Claude Code（最新的 Bun 版本）》 — https://blog.csdn.net/hqzing/article/details/162758675
-
-## 反馈
-
-遇到功能差异或崩溃，请在 GitHub Issues 反馈，附：HarmonyOS 版本、`bun --version`、复现命令。
