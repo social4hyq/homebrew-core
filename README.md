@@ -7,7 +7,7 @@
 - **终端与开发效率**：`starship`、`zellij`、`lazygit`、`yazi`、`hishell-font`、`sshport`、`qemu-aarch64`（系统调用跟踪）
 - **编译与语言基础**：`llvm@21`、`lld@21`、`uv`、`cryptography`、`libsecret`
 
-> 以上除 `opencode`、`claude-code`、`zcode`、`vite-plus`、`hishell-font`、`sshport`、`qemu-aarch64` 由本 tap 提供外，其余 14 个 formula（18 个 PR）均由 social4hyq 贡献并合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，见「[贡献](#贡献)」。
+> 以上除 `opencode`、`claude-code`、`zcode`、`vite-plus`、`hishell-font`、`sshport`、`qemu-aarch64` 由本 tap 提供外，其余 14 个 formula（18 个 PR）已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，见「[贡献](#贡献)」。
 >
 > npm 包的鸿蒙适配在社区仓 [ohos-npm-ports/ohos-npm-ports](https://github.com/ohos-npm-ports/ohos-npm-ports) 持续进行，项目里的 npm 包装不上或跑不起来，先到那里找适配包。
 
