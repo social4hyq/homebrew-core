@@ -20,19 +20,21 @@ class Bun < Formula
     "Zlib",              # zlib-ng
     "Apache-2.0" => { with: "LLVM-exception" }, # __cxa_thread_atexit
   ]
-  revision 18
+  revision 19
   livecheck do
     url :stable
     regex(/^bun[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r29"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "adb03b4e67ab1ba069400381c35c73059410027f8646346956e145e16d0584e8"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bun-v1.4.2-r30"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "73a74503593a08e9ee0c5a20eec1bbfe03b18cce03a62638c8b208b6275a7141"
   end
   depends_on "cmake" => :build
   # libstdc++ for the prebuilt bootstrap bun (see LD_LIBRARY_PATH in install)
   depends_on "gcc" => :build if OS.ohos?
+  # Homebrew's system Git fallback replaces stdin, breaking dependency patches.
+  depends_on "git" => :build if OS.ohos?
   # for the WebKit build
   depends_on "gperf" => :build if OS.ohos?
   depends_on "llvm@21" => :build # LLVM 22 PR: https://github.com/oven-sh/bun/pull/34299

@@ -77,6 +77,7 @@ docker exec "$CONTAINER" git config --global user.email "41898282+github-actions
 # many hours of debugging). GIT_CONFIG_SYSTEM is NOT blanked by that
 # mechanism, so registering the same exception at the system level survives
 # it. Use the Git available in the upstream image.
+docker exec "$CONTAINER" bash -lc 'mkdir -p "$(git --exec-path)/../../etc"'
 docker exec "$CONTAINER" git config --system --add safe.directory "$TAP_IN_CONTAINER"
 
 # Also needed by bump-formula-pr (Homebrew::Bump.create_pr): it resolves the
