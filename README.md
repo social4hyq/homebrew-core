@@ -1,6 +1,6 @@
 # Harmonybrew 第三方 tap · 鸿蒙 PC 工具链
 
-致力于补齐鸿蒙 PC 工具链，覆盖 **Agent 工具**（opencode、Claude Code 等）、**前端构建**（vite-plus 等）和**效率工具**（终端字体、端口转发等），`brew install` 即装即用。[Harmonybrew](https://harmonybrew.atomgit.com) 是 Homebrew 的鸿蒙移植。
+致力于补齐鸿蒙 PC 工具链，覆盖 **Agent 工具**（opencode、Claude Code 等）、**前端构建**（vite-plus 等）和**终端与开发效率工具**（提示符与终端复用、Git / 文件管理、远程开发端口转发、系统调用跟踪排障等），`brew install` 即装即用。[Harmonybrew](https://harmonybrew.atomgit.com) 是 Homebrew 的鸿蒙移植。
 
 > 已向 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 贡献并合入 **14 个 formula（18 个 PR）**，见「[贡献](#贡献)」。
 >
@@ -34,7 +34,7 @@ brew install bun starship               # 官方 core：Bun 运行时、终端�
 
 - `vite-plus`：VoidZero 的 Web 统一工具链，一个 `vp` 命令覆盖创建、开发、检查、格式化、测试、构建（Beta）
 
-### 效率工具
+### 终端与开发效率
 
 - `hishell-font`：鸿蒙 PC 终端（HiShell）的 Nerd Font 图标字体，`starship` 等的图标靠它渲染
 - `sshport`：SSH 端口转发，把远程开发机的服务端口映射到本机同名端口
