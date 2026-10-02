@@ -60,13 +60,6 @@ if [ "$ff_ok" = false ]; then
   exit 1
 fi
 
-# NOTE: `brew install git` is baked into the image itself by sync-ci-image.yml
-# (~52s/run when it lived here). It is still required: without a brew-installed
-# git, Homebrew's superenv git shim falls into a `whence -a git` fallback loop
-# with known bugs (broken stdin — see git commit history). With it, the shim's
-# fast path execs $HOMEBREW_PREFIX/bin/git directly. If the image ever changes
-# back to one without brewed git, restore that step here.
-
 # brew bottle --merge --write auto-commits the tap in-container as root
 docker exec "$CONTAINER" git config --global --add safe.directory "$TAP_IN_CONTAINER"
 docker exec "$CONTAINER" git config --global user.name "github-actions[bot]"
@@ -83,11 +76,8 @@ docker exec "$CONTAINER" git config --global user.email "41898282+github-actions
 # what actually caused "does not have a remote repository!" (2026-07-20,
 # many hours of debugging). GIT_CONFIG_SYSTEM is NOT blanked by that
 # mechanism, so registering the same exception at the system level survives
-# it. Must use the brew-installed git specifically (not /usr/bin/git) since
-# that's the binary Utils::Git.git shim execs and each git version may
-# resolve --system to a different default path.
-docker exec "$CONTAINER" bash -lc \
-  "\$($BREW_ENV brew --prefix)/bin/git config --system --add safe.directory $TAP_IN_CONTAINER"
+# it. Use the Git available in the upstream image.
+docker exec "$CONTAINER" git config --system --add safe.directory "$TAP_IN_CONTAINER"
 
 # Also needed by bump-formula-pr (Homebrew::Bump.create_pr): it resolves the
 # tap's default branch via `git symbolic-ref refs/remotes/origin/HEAD`, which
