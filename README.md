@@ -58,22 +58,24 @@ timeline
     2026-10 : bun
 ```
 
-| Formula | 鸿蒙适配 | PR |
-|---|---|---|
-| `lazygit` | Git 终端界面；迁移自上游，无需补丁 | [!8586](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/8586) |
-| `cryptography` | Python 加密库；迁移自上游，无需补丁 | [!10480](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10480) |
-| `hermes-agent` | AI Agent；补 `psutil` 的 ioctl 兼容 | [!10485](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10485) |
-| `yazi` | 终端文件管理器；跳过 jemalloc | [!10780](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10780) |
-| `uv` | Python 包管理器；沙箱不能 `execve()` 动态链接器，musl 探测改为不 exec；wheel 内未签名的 `.so` 在安装时自动签名，二进制 wheel 开箱即用 | [!17130](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17130) |
-| `codegraph` | 面向 AI coding agent 的代码知识图谱；零补丁：直接指向 Rust kernel 绕开 loader 对 `openharmony` 平台目录的搜索，锁定 V8 Liftoff 避免 tree-sitter WASM 在 turboshaft 下 OOM | [!17567](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17567) |
-| `zellij` | 终端复用器；沙箱 seccomp 对 `close_range` 回 SIGSYS 会直接杀进程，补丁让 `close_fds` 不再调用；升级 curl 依赖以获得 socket2 的 OHOS 支持（0.45.1 对齐上游写法） | [!17569](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17569)（[!18645](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18645)） |
-| `llvm@21` | 编译器工具链；显式指定 host/target triple（容器与真机 `uname -s` 不一致，自动探测会得到错误 triple），去掉无用的 binutils 依赖 | [!18194](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18194) |
-| `lld@21` | LLVM 链接器；新增默认开启的 `--code-sign`，链接时写入签名段占位，再由 `binary-sign-tool` 签名，产物才能在鸿蒙上执行 | [!18536](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18536) |
-| `libsecret` | 密钥存储库；musl 没有 `getpass`，用 termios 重新实现；无 vala，关闭 vapi 生成 | [!18633](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18633) |
-| `herdr` | 面向 coding agent 的终端复用器；zig target 映射、procfs 缺 `tpgid` 时用 `tcgetpgrp` 回退（agent 检测 / 启动 / 提示可用）；resize 后补发 `SIGWINCH`，修复拖动窗口后内容错乱 | [!18651](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18651)（[!20617](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20617)、[!20719](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20719)） |
-| `starship` | 终端提示符；修复 `errno` 在 musl 上的 `strerror_r` 链接错误；沙箱 uid 不在 `/etc/passwd`，用户名模块经 NDK 回退；附 zsh 初始化脚本（时区兜底、fpath、补全） | [!18673](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18673)（[!18770](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18770)） |
-| `pnpm` | Node 包管理器；v12 Rust 源码构建，host 平台报 `openharmony`，使 rolldown / oxc 等装到正确的原生 binding | [!20806](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20806) |
-| `bun` | JavaScript 运行时；上游 tag 源码构建，鸿蒙差异按文件补丁携带；ICU 静态链接，`bun build --compile` 的产物只依赖系统 libc | [!21450](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21450) |
+| Formula | 作用 | 上游 ⭐ | PR |
+|---|---|---|---|
+| `lazygit` | Git 终端界面，在终端里用键盘完成暂存、提交、分支、rebase 等操作 | 83k | [!8586](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/8586) |
+| `cryptography` | Python 事实标准的加密库，SSH、TLS、证书、JWT 等大量 Python 库的底层依赖 | 7.8k | [!10480](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10480) |
+| `hermes-agent` | Nous Research 的自我进化 AI Agent，能从经验中沉淀出可复用的技能 | 251k | [!10485](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10485) |
+| `yazi` | Rust 编写、异步 I/O 的极速终端文件管理器，支持预览与插件 | 43k | [!10780](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10780) |
+| `uv` | Rust 编写的极速 Python 包安装器与解析器，可替代 pip、venv 等 | 90k | [!17130](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17130) |
+| `codegraph` | 面向 AI coding agent 的预索引代码知识图谱，全本地运行，让 agent 少读文件、省 token | 73k | [!17567](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17567) |
+| `zellij` | 可扩展的终端工作区，以终端复用器为基础，支持 WASM 插件 | 36k | [!17569](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17569)（[!18645](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18645)） |
+| `llvm@21` | 现代编译器基础设施（clang 等），C/C++ 等原生工具链的基础 | 41k | [!18194](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18194) |
+| `lld@21` | LLVM 的链接器，链接速度快 | 同上 | [!18536](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18536) |
+| `libsecret` | GNOME 的密钥存储库，不少 CLI 工具靠它安全保存密码和令牌 | — | [!18633](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18633) |
+| `herdr` | 住在终端里的 Agent 复用器，一个界面管理多个 coding agent 会话 | 42k | [!18651](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18651)（[!20617](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20617)、[!20719](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20719)） |
+| `starship` | 跨 shell 的极简、高度可定制的终端提示符 | 60k | [!18673](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18673)（[!18770](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18770)） |
+| `pnpm` | 快速、省磁盘的 Node 包管理器（v12 为 Rust 重写） | 37k | [!20806](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20806) |
+| `bun` | 集运行时、包管理、测试、打包于一体的极速 JavaScript 工具链 | 96k | [!21450](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21450) |
+
+上游 ⭐ 为 GitHub star 数（2026-10-02 取值）。
 
 formula 成熟后合入官方 core，本 tap 随之下线自有版本。
 
