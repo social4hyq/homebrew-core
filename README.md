@@ -42,35 +42,35 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 
 ### Agent 工具
 
-| Formula | 版本 | 说明 |
-|---|---|---|
-| `opencode-v1` | 1.18.33 | 开源的终端 AI 编程助手：在终端里用自然语言让 AI 读代码、改文件、跑命令；自带 75+ 模型提供商接入，用自己的 API key 自由选模型（v1 稳定版） |
-| `social4hyq/core/opencode` | 2.0.20 | opencode v2 稳定版：全新插件 API 与交互；与 `opencode-v1` 互斥，命令名同为 `opencode`，共享 `~/.config/opencode` 等目录；跟进上游 v2 发布线（升级与回退 v1 见下方说明） |
-| `claude-code` | 2.1.274 | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号；License 禁止再分发官方产物，故安装时拉取官方 musl 二进制，自签名后经 `ohos-compat-shim` 运行 |
-| `claude-code.latest` | 2.1.285 | 同一 Claude Code 的 latest 滚动频道：安装时拉取官方 musl 二进制，自签名后经 `ohos-compat-shim` 运行；与 `claude-code` 互斥（都装 `claude` 命令，二选一） |
-| `zcode` | 3.14.3 | AI 编程工作台：终端 agent（TUI）与 Web IDE 双形态；上游不发 git tag，源码取自 GitHub main、用官方 core 的 bun/pnpm 工具链在本机构建 |
+| Formula | 说明 |
+|---|---|
+| `opencode-v1` | 开源的终端 AI 编程助手：在终端里用自然语言让 AI 读代码、改文件、跑命令；自带 75+ 模型提供商接入，用自己的 API key 自由选模型（v1 稳定版） |
+| `social4hyq/core/opencode` | opencode v2 稳定版：全新插件 API 与交互；与 `opencode-v1` 互斥，命令名同为 `opencode`，共享 `~/.config/opencode` 等目录；跟进上游 v2 发布线（升级与回退 v1 见下方说明） |
+| `claude-code` | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号；License 禁止再分发官方产物，故安装时拉取官方 musl 二进制，自签名后经 `ohos-compat-shim` 运行 |
+| `claude-code.latest` | 同一 Claude Code 的 latest 滚动频道：安装时拉取官方 musl 二进制，自签名后经 `ohos-compat-shim` 运行；与 `claude-code` 互斥（都装 `claude` 命令，二选一） |
+| `zcode` | AI 编程工作台：终端 agent（TUI）与 Web IDE 双形态；上游不发 git tag，源码取自 GitHub main、用官方 core 的 bun/pnpm 工具链在本机构建 |
 
 > `opencode` 现为 v2，v1 为 `opencode-v1`，两者互斥（都提供 `opencode` 命令，共享 `~/.config/opencode`）。已有用户 `brew upgrade social4hyq/core/opencode` 即升到 v2；要保留 v1：`brew uninstall social4hyq/core/opencode && brew install opencode-v1`。`opencode` 与官方 core 同名，请使用全限定名。
 
 ### 前端构建
 
-| Formula | 版本 | 说明 |
-|---|---|---|
-| `vite-plus` | 0.2.8 | VoidZero（Vue/Vite 作者团队）的 Web 统一工具链：一个 `vp` 命令包揽创建项目、开发调试、检查、格式化、测试、构建全流程（Beta） |
+| Formula | 说明 |
+|---|---|
+| `vite-plus` | VoidZero（Vue/Vite 作者团队）的 Web 统一工具链：一个 `vp` 命令包揽创建项目、开发调试、检查、格式化、测试、构建全流程（Beta） |
 
 ### 效率工具
 
-| Formula | 版本 | 说明 |
-|---|---|---|
-| `hishell-font` | 0.1.0 | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
-| `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
-| `qemu-aarch64` | 11.0.3-r0 | 用户态 QEMU：直接运行/调试 Linux aarch64 程序，自带系统调用跟踪（`-strace`），是鸿蒙无 root strace 环境下的排障替代品 |
+| Formula | 说明 |
+|---|---|
+| `hishell-font` | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
+| `sshport` | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
+| `qemu-aarch64` | 用户态 QEMU：直接运行/调试 Linux aarch64 程序，自带系统调用跟踪（`-strace`），是鸿蒙无 root strace 环境下的排障替代品 |
 
 ### 基础设施
 
-| Formula | 版本 | 说明 |
-|---|---|---|
-| `ohos-compat-shim` | 0.6.2 | 系统兼容层：自动兜底鸿蒙与标准 Linux 的底层行为差异，让 Linux 生态软件开箱即用；作为依赖随 `claude-code` 自动安装，无需手动装、无需配置 |
+| Formula | 说明 |
+|---|---|
+| `ohos-compat-shim` | 系统兼容层：自动兜底鸿蒙与标准 Linux 的底层行为差异，让 Linux 生态软件开箱即用；作为依赖随 `claude-code` 自动安装，无需手动装、无需配置 |
 
 ## 已迁移到 Harmonybrew 官方 core
 

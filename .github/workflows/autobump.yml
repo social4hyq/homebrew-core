@@ -25,7 +25,7 @@ name: autobump
 # into the formula, and pins the exact commit the release tag points at (see
 # the comment in the loop body). herdr and zellij were allowlisted here too
 # until their 2026-09-08 removal — both are now provided natively by
-# Harmonybrew's official core (see README's 已下线 table); their
+# Harmonybrew's official core (see README's 已迁移 section); their
 # autobump-shape notes went with them.
 # Only add a formula here after confirming `brew bump-formula-pr --dry-run`
 # produces a clean url/sha256 edit for it. version-check.yml keeps reporting
