@@ -6,6 +6,8 @@
 
 **这个 tap 的定位**：过渡区——formula 从进入 tap 第一天起就以合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 为目标，验证成熟即推动合并、下线自有版本（见下方「已下线 / 已迁移」表）。
 
+**已合入 Harmonybrew 官方 core**（均由本 tap 孵化，PR 由 social4hyq 提交，现直接 `brew install <名>` 即可）：[`bun`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21450)、[`uv`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17130)、[`codegraph`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17567)、[`zellij`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17569)、[`herdr`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18651)、[`starship`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18673)、[`libsecret`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18633)、[`llvm@21`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18194) / [`lld@21`](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18536)。完整清单与说明见下方「已下线 / 已迁移」表。
+
 **仓库源头**：本仓库以 [GitHub](https://github.com/social4hyq/homebrew-core) 为唯一源头——源码托管、Issues、PR、CI 全部在 GitHub 进行。[atomgit 同名仓库](https://atomgit.com/social4hyq/homebrew-core) 是合并后自动同步的**单向镜像**（GitHub → atomgit，永不反向），存在意义是 bottle 二进制发布在 atomgit Releases 上、国内网络下载更快。反馈问题、提交贡献请认准 GitHub；请勿向 atomgit 推送代码或开 PR。
 
 ## 安装
