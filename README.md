@@ -91,14 +91,14 @@ formula 成熟后合入官方 core，本 tap 随之下线自有版本。
 | Formula | 状态 | 备注 |
 |---|---|---|
 | `opencode` | 审核中 [!21455](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21455) | v2；合入后本 tap 的版本随之下线 |
-| `opencode-v1` | 未提交 | v1 稳定版 |
-| `claude-code` / `claude-code.latest` | 未提交 | 闭源，License 禁止再分发官方产物，只能安装时拉取官方二进制，不符合官方准入规则 |
-| `zcode` | 未提交 | 上游不发 git tag，源码取自 main |
-| `vite-plus` | 未提交 | — |
-| `hishell-font` | 未提交 | — |
-| `sshport` | 未提交 | — |
-| `qemu-aarch64` | 未提交 | 基于 Alpine 预编译包，不符合官方准入规则 |
-| `ohos-compat-shim` | 未提交 | — |
+| `vite-plus` | 计划合入 | — |
+| `zcode` | 计划合入 | 上游不发 git tag，源码取自 main |
+| `ohos-compat-shim` | 待定 | — |
+| `qemu-aarch64` | 期待官方 core 提供 | 本 tap 暂以 Alpine 预编译包提供 |
+| `claude-code` / `claude-code.latest` | 无计划 | 闭源，License 禁止再分发官方产物，只能安装时拉取官方二进制 |
+| `opencode-v1` | 无计划 | v1 稳定版 |
+| `sshport` | 无计划 | 内部使用的小工具 |
+| `hishell-font` | 无计划 | 内部使用的小工具 |
 
 ## 已迁移到官方 core
 
