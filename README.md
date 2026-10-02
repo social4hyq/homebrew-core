@@ -17,7 +17,7 @@ brew trust social4hyq/core   # Homebrew 6.0+ 必须显式信任第三方 tap
 # 常用工具：
 brew install social4hyq/core/opencode # AI 编码代理 v2（v1：brew install opencode-v1）
 brew install claude-code     # Claude Code CLI
-brew install bun             # Bun 运行时
+brew install bun             # Bun 运行时（Harmonybrew 官方 core 提供）
 brew install vite-plus       # VoidZero 统一前端工具链（`vp` 命令）
 brew install hishell-font    # starship 图标字体（先装这个：提示符的图标/符号靠它渲染）
 brew install starship        # 终端提示符美化（Harmonybrew 官方 core 原生提供，主题化 prompt，配合 hishell-font）
@@ -46,8 +46,6 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 | `claude-code` | 2.1.274 | Anthropic 官方 AI 编程助手 Claude Code 的终端版：读懂整个代码库、跨文件改代码跑测试、提 PR；需 Claude 订阅或 API 账号；License 禁止再分发官方产物，故安装时拉取官方 musl 二进制，自签名后经 `ohos-compat-shim` 运行 |
 | `claude-code.latest` | 2.1.285 | 同一 Claude Code 的 latest 滚动频道：安装时拉取官方 musl 二进制，自签名后经 `ohos-compat-shim` 运行；与 `claude-code` 互斥（都装 `claude` 命令，二选一） |
 | `zcode` | 3.14.3 | AI 编程工作台：终端 agent（TUI）与 Web IDE 双形态；上游不发 git tag，源码取自 GitHub main、用本 tap 的 bun/pnpm 工具链在本机构建 |
-| `bun` | 1.4.2 | 极速 JavaScript/TypeScript 一体化工具链：运行时、包管理、测试、打包四合一，可直接替代 Node.js；本 tap 多数工具的底座；结构上跟 Homebrew 上游 `bun.rb` 对齐重新移植（原 `bun@1.4` 接管本名） |
-| `bun-legacy` | 1.4.2 | 原 `bun` 的存档：fork 直构、113 个按文件补丁；`keg_only`，不随上游 bun 版本走 livecheck，仅供参考对比，日常使用请装 `bun` |
 | `vite-plus` | 0.2.8 | VoidZero（Vue/Vite 作者团队）的 Web 统一工具链：一个 `vp` 命令包揽创建项目、开发调试、检查、格式化、测试、构建全流程（Beta） |
 | `hishell-font` | 0.1.0 | 鸿蒙 PC 自带终端（HiShell）的 Nerd Font 图标字体：`starship` 等现代终端工具的图标前置——先装它，提示符里的图标才不变方框 |
 | `sshport` | 0.2.1 | SSH 端口转发小工具：一条命令把远程开发机的服务端口映射到本机同名端口，直接访问 |
@@ -56,32 +54,33 @@ shell 补全随安装自动装入（bash / zsh / fish），开箱即用。
 
 ## 已下线 / 已迁移
 
-| Formula | 状态 | 替代方案 |
-|---|---|---|
-| `codex` | 2026-07-23 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供，直接 `brew install codex` |
-| `opencode-shim` / `opencode-shim@2` | 2026-08-02 下线 | 预编译 shim 路线已被源码构建路线取代，改用 `opencode-v1` / `social4hyq/core/opencode` |
-| `close-range-shim` | 2026-07-15 下线 | 功能并入 `ohos-compat-shim` |
-| `bun-pty` / `lightningcss` / `tailwindcss-oxide` | 2026-07-18 下线 | 改走 `@ohos-ports/*` npm 包，无独立 formula 需求 |
-| `icu4c@78` | 2026-08-09 下线 | libc++ ABI `__n1` 迁移（#239-#241）后本 tap fork 冗余，直接用上游 harmonybrew/core 的 `icu4c@78`（同为 `__n1`） |
-| `grok-build` | 2026-08-12 下线 | 已停止维护（使用率低）；可从 tap git 历史恢复 formula |
-| `cc-switch` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（`cc-switch-cli`），直接 `brew install cc-switch-cli` |
-| `reasonix` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供，直接 `brew install reasonix` |
-| `deepseek-harness` | 2026-08-15 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（含 OHOS 补丁集：link 兜底 / 凭据模式 / ripgrep 回退 / crypto polyfill / 无沙箱放行），直接 `brew install deepseek-harness`；已装本 tap 旧版的用户请先 `brew uninstall deepseek-harness` 再装上游版 |
-| `uv` | 2026-08-20 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（!17217，含全部三个 OHOS 补丁与 wheel 自动签名），直接 `brew install uv`；已装本 tap 旧版的用户请先 `brew uninstall uv` 再装上游版 |
-| `codegraph` | 2026-08-24 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（!17567，无补丁单文件），直接 `brew install codegraph`；已装本 tap 旧版的用户请先 `brew uninstall codegraph` 再装上游版 |
-| `nvm` | 2026-08-24 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（0.40.7，OHOS 平台补丁 + ohos-node.com 发行源），直接 `brew install nvm`；已装本 tap 旧版的用户请先 `brew uninstall nvm` 再装上游版 |
-| `nvm-ohos` | 2026-08-15 下线 | 旧实现存档：`NVM_INSTALL_THIRD_PARTY_HOOK` 重定向 `nvm install` 到 brew node keg；其继任者本 tap `nvm` 也已于 2026-08-24 下线，统一改用官方 core 的 `nvm`；可从 tap git 历史恢复 |
-| `warp-tui` | 2026-08-12 下线 | 已停止维护（使用率低）；可从 tap git 历史恢复 formula |
-| `inject-runpath` / `dlopen-sign-shim` | 2026-08-12 下线 | 已无 formula 依赖（原用途已被预签名 npm `.so` + bun r31 起静态内嵌的 `ohos-compat-shim` 取代）；可从 tap git 历史恢复 formula |
-| `zig@0.15` | 2026-09-04 下线 | 唯一消费者 herdr 已改为 install() 内联官方预编译 zig（resource 下载 + binary-sign-tool 签名），独立 keg 无保留必要；可从 tap git 历史恢复 formula |
-| `llvm@21` / `lld@21` | 2026-09-08 下线 | 补丁已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install llvm@21 lld@21`；`bun` 的构建依赖已随之改为解析上游同名 formula；已装本 tap 旧版的用户请先 `brew uninstall llvm@21 lld@21` 再装上游版 |
-| `ohos-bst-light` | 2026-09-08 下线 | [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 已原生提供同名 formula，直接 `brew install ohos-bst-light`；**注意命令名变了**：本 tap 旧版（v1.0.0）装的是 `self-sign`，官方版（v2.1.2，hqzing/ohos-bst-light 上游最新版）装的是 `selfsign`（无连字符），参数/行为不变（`--force`/`--strip` 均保留）；已装本 tap 旧版的用户请先 `brew uninstall ohos-bst-light` 再装上游版，脚本里的 `self-sign` 调用改成 `selfsign` |
-| `libsecret` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install libsecret`；已装本 tap 旧版的用户请先 `brew uninstall libsecret` 再装上游版 |
-| `zellij` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install zellij`；已装本 tap 旧版的用户请先 `brew uninstall zellij` 再装上游版 |
-| `herdr` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install herdr`；已装本 tap 旧版的用户请先 `brew uninstall herdr` 再装上游版 |
-| `starship` | 2026-09-09 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install starship`（配合 `hishell-font` 图标字体用法不变）；已装本 tap 旧版的用户请先 `brew uninstall starship` 再装上游版 |
-| `node-ohos` | 2026-09-09 下线 | [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 的 `node` 已改用 `llvm@22` 重编（原生 OHOS 支持，26.8.1），与本 tap 停留在 `llvm@21`/26.7.0 的自有版本相比无需再单独维护，直接 `brew install node`；已装本 tap 旧版的用户请先 `brew uninstall node-ohos` 再装上游 `node` |
-| `bun-webkit` / `bun-bootstrap` | 2026-09-18 下线 | 随 bun 1.4 切换「上游源码 + 补丁」构建（2026-09-12），`bun.rb` 不再依赖独立 WebKit 组件 formula 与预编译引导包，二者失去唯一消费者；formula 与 `Patches/bun-webkit/` 已从仓库删除（保留在 tap git 历史，可恢复） |
+| Formula | 状态 | 替代方案 | **我提交的 Harmonybrew PR** |
+|---|---|---|---|
+| `codex` | 2026-07-23 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供，直接 `brew install codex` | — |
+| `opencode-shim` / `opencode-shim@2` | 2026-08-02 下线 | 预编译 shim 路线已被源码构建路线取代，改用 `opencode-v1` / `social4hyq/core/opencode` | — |
+| `close-range-shim` | 2026-07-15 下线 | 功能并入 `ohos-compat-shim` | — |
+| `bun-pty` / `lightningcss` / `tailwindcss-oxide` | 2026-07-18 下线 | 改走 `@ohos-ports/*` npm 包，无独立 formula 需求 | — |
+| `icu4c@78` | 2026-08-09 下线 | libc++ ABI `__n1` 迁移（#239-#241）后本 tap fork 冗余，直接用上游 harmonybrew/core 的 `icu4c@78`（同为 `__n1`） | — |
+| `grok-build` | 2026-08-12 下线 | 已停止维护（使用率低）；可从 tap git 历史恢复 formula | — |
+| `cc-switch` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（`cc-switch-cli`），直接 `brew install cc-switch-cli` | — |
+| `reasonix` | 2026-08-12 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供，直接 `brew install reasonix` | — |
+| `deepseek-harness` | 2026-08-15 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（含 OHOS 补丁集：link 兜底 / 凭据模式 / ripgrep 回退 / crypto polyfill / 无沙箱放行），直接 `brew install deepseek-harness`；已装本 tap 旧版的用户请先 `brew uninstall deepseek-harness` 再装上游版 | — |
+| `uv` | 2026-08-20 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（含全部三个 OHOS 补丁与 wheel 自动签名），直接 `brew install uv`；已装本 tap 旧版的用户请先 `brew uninstall uv` 再装上游版 | [!17130](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17130) |
+| `codegraph` | 2026-08-24 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（无补丁单文件），直接 `brew install codegraph`；已装本 tap 旧版的用户请先 `brew uninstall codegraph` 再装上游版 | [!17567](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17567) |
+| `nvm` | 2026-08-24 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（0.40.7，OHOS 平台补丁 + ohos-node.com 发行源），直接 `brew install nvm`；已装本 tap 旧版的用户请先 `brew uninstall nvm` 再装上游版 | — |
+| `nvm-ohos` | 2026-08-15 下线 | 旧实现存档：`NVM_INSTALL_THIRD_PARTY_HOOK` 重定向 `nvm install` 到 brew node keg；其继任者本 tap `nvm` 也已于 2026-08-24 下线，统一改用官方 core 的 `nvm`；可从 tap git 历史恢复 | — |
+| `warp-tui` | 2026-08-12 下线 | 已停止维护（使用率低）；可从 tap git 历史恢复 formula | — |
+| `inject-runpath` / `dlopen-sign-shim` | 2026-08-12 下线 | 已无 formula 依赖（原用途已被预签名 npm `.so` + bun r31 起静态内嵌的 `ohos-compat-shim` 取代）；可从 tap git 历史恢复 formula | — |
+| `zig@0.15` | 2026-09-04 下线 | 唯一消费者 herdr 已改为 install() 内联官方预编译 zig（resource 下载 + binary-sign-tool 签名），独立 keg 无保留必要；可从 tap git 历史恢复 formula | — |
+| `llvm@21` / `lld@21` | 2026-09-08 下线 | 补丁已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install llvm@21 lld@21`；`bun` 的构建依赖已随之改为解析上游同名 formula；已装本 tap 旧版的用户请先 `brew uninstall llvm@21 lld@21` 再装上游版 | [!18194](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18194) [!18536](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18536) |
+| `ohos-bst-light` | 2026-09-08 下线 | [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 已原生提供同名 formula，直接 `brew install ohos-bst-light`；**注意命令名变了**：本 tap 旧版（v1.0.0）装的是 `self-sign`，官方版（v2.1.2，hqzing/ohos-bst-light 上游最新版）装的是 `selfsign`（无连字符），参数/行为不变（`--force`/`--strip` 均保留）；已装本 tap 旧版的用户请先 `brew uninstall ohos-bst-light` 再装上游版，脚本里的 `self-sign` 调用改成 `selfsign` | — |
+| `libsecret` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install libsecret`；已装本 tap 旧版的用户请先 `brew uninstall libsecret` 再装上游版 | [!18633](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18633) |
+| `zellij` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install zellij`；已装本 tap 旧版的用户请先 `brew uninstall zellij` 再装上游版 | [!17569](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17569) [!18645](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18645) |
+| `herdr` | 2026-09-08 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install herdr`；已装本 tap 旧版的用户请先 `brew uninstall herdr` 再装上游版 | [!18651](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18651) |
+| `starship` | 2026-09-09 下线 | OHOS 适配已合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，直接 `brew install starship`（配合 `hishell-font` 图标字体用法不变）；已装本 tap 旧版的用户请先 `brew uninstall starship` 再装上游版 | [!18673](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18673) |
+| `node-ohos` | 2026-09-09 下线 | [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 的 `node` 已改用 `llvm@22` 重编（原生 OHOS 支持，26.8.1），与本 tap 停留在 `llvm@21`/26.7.0 的自有版本相比无需再单独维护，直接 `brew install node`；已装本 tap 旧版的用户请先 `brew uninstall node-ohos` 再装上游 `node` | — |
+| `bun-webkit` / `bun-bootstrap` | 2026-09-18 下线 | 随 bun 1.4 切换「上游源码 + 补丁」构建（2026-09-12），`bun.rb` 不再依赖独立 WebKit 组件 formula 与预编译引导包，二者失去唯一消费者；formula 与 `Patches/bun-webkit/` 已从仓库删除（保留在 tap git 历史，可恢复） | — |
+| `bun` / `bun-legacy` | 2026-10-02 下线 | 已由 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 原生提供（1.4.2，即本 tap `bun` 的上游化版本），直接 `brew install bun`；`bun-legacy`（fork 直构存档）随之一并删除，无替代；本 tap 内依赖 `bun` 的 formula（`opencode-v1`、`zcode`、`hishell-font`）自动改用官方版；已装本 tap 旧版的用户请先 `brew uninstall social4hyq/core/bun` 再装官方版 | [!21450](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21450) |
 
 > 改名提示（2026-08-01）：`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
 >
