@@ -1,4 +1,4 @@
-# 鸿蒙 PC 工具链 tap
+# Harmonybrew 第三方 tap · 鸿蒙 PC 工具链
 
 [Harmonybrew](https://harmonybrew.atomgit.com)（Homebrew 的鸿蒙移植）的第三方 tap，致力于补齐鸿蒙 PC 工具链，覆盖 **Agent 工具**（opencode、Claude Code 等）、**前端构建工具**（vite-plus 等）和**效率工具**（终端字体、端口转发、系统调用跟踪等）。formula 经移植、签名、真机验证（HarmonyOS，OHOS aarch64）后打包成 bottle，`brew install` 一条命令装好即用。
 
