@@ -42,4 +42,4 @@
 
 - **2026-08-01**：`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
 - **2026-09-22**：`opencode@2` 更名为 `opencode-v2`（对齐上游官方 formula 名，`formula_renames.json` 自动迁移已装用户），并对齐上游的**原位替代**语义——命令名从 `opencode2` 改回 `opencode`，新增 `conflicts_with "opencode"`（与 v1 不能同时安装），数据目录从独立的 `~/.config/opencode2` 等改回与 v1 共享的 `~/.config/opencode`（v1 的数据库会被 v2 自动迁移）。旧版遗留的 `~/.config/opencode2`、`~/.local/share/opencode2`、`~/.local/state/opencode2` 目录升级后可手动删除。
-- **随后**：`opencode` 由 v2 接管，v1 保留为 `opencode-v1`；`opencode-v2` 与 `opencode@2` 经 `formula_renames.json` 自动迁移到 `opencode`。
+- **随后**：`opencode` 由 v2 接管，v1 保留为 `opencode-v1`；`opencode-v2` 与 `opencode@2` 经 `formula_renames.json` 自动迁移到 `opencode`。已有 `opencode` 的用户 `brew update && brew upgrade social4hyq/core/opencode` 即升到 v2；要保留 v1：`brew uninstall social4hyq/core/opencode && brew install opencode-v1`。两个版本都提供 `opencode` 命令、共享 `~/.config/opencode`，切换前先卸载当前版本；`opencode` 与官方 core 同名，须使用全限定名 `social4hyq/core/opencode`。
