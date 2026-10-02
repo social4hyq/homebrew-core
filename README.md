@@ -1,8 +1,13 @@
 # Harmonybrew 第三方 tap · 鸿蒙 PC 工具链
 
-致力于补齐鸿蒙 PC 工具链，覆盖 **Agent 工具**（opencode、Claude Code 等）、**前端构建**（vite-plus 等）和**终端与开发效率工具**（提示符与终端复用、Git / 文件管理、远程开发端口转发、系统调用跟踪排障等），`brew install` 即装即用。[Harmonybrew](https://harmonybrew.atomgit.com) 是 Homebrew 的鸿蒙移植。
+致力于补齐鸿蒙 PC 工具链，`brew install` 即装即用。[Harmonybrew](https://harmonybrew.atomgit.com) 是 Homebrew 的鸿蒙移植。
 
-> 已向 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core) 贡献并合入 **14 个 formula（18 个 PR）**，见「[贡献](#贡献)」。
+- **Agent 工具**：`opencode`、`claude-code`、`zcode`、`hermes-agent`、`codegraph`、`herdr`
+- **前端构建**：`vite-plus`、`bun`、`pnpm`
+- **终端与开发效率**：`starship`、`zellij`、`lazygit`、`yazi`、`hishell-font`、`sshport`、`qemu-aarch64`（系统调用跟踪）
+- **编译与语言基础**：`llvm@21`、`lld@21`、`uv`、`cryptography`、`libsecret`
+
+> 以上除 `opencode`、`claude-code`、`zcode`、`vite-plus`、`hishell-font`、`sshport`、`qemu-aarch64` 由本 tap 提供外，其余 14 个 formula（18 个 PR）均由 social4hyq 贡献并合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，见「[贡献](#贡献)」。
 >
 > npm 包的鸿蒙适配在社区仓 [ohos-npm-ports/ohos-npm-ports](https://github.com/ohos-npm-ports/ohos-npm-ports) 持续进行，项目里的 npm 包装不上或跑不起来，先到那里找适配包。
 
