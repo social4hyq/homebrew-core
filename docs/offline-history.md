@@ -16,6 +16,7 @@
 | `nvm-ohos` | 2026-08-15 | 旧实现存档：`NVM_INSTALL_THIRD_PARTY_HOOK` 重定向 `nvm install` 到 brew node keg；继任者 `nvm` 也已迁移到官方 core |
 | `zig@0.15` | 2026-09-04 | 唯一消费者 herdr 已改为 install() 内联官方预编译 zig（resource 下载 + binary-sign-tool 签名），独立 keg 无保留必要 |
 | `bun-webkit` / `bun-bootstrap` | 2026-09-18 | 随 bun 1.4 切换「上游源码 + 补丁」构建（2026-09-12），`bun.rb` 不再依赖独立 WebKit 组件 formula 与预编译引导包，二者失去唯一消费者；`Patches/bun-webkit/` 一并删除 |
+| `opencode-v1` | 2026-10-02 | 官方 core 已提供 `opencode`（v2），v1 不再维护，无替代 |
 | `bun-legacy` | 2026-10-02 | 原 `bun` 的 fork 直构存档（113 个按文件补丁，`keg_only`）；随 `bun` 迁移到官方 core 一并删除，无替代 |
 
 ## 已迁移到官方 core 的下线日期
@@ -37,10 +38,10 @@
 | `starship` | 2026-09-09 |
 | `node-ohos`（官方 `node` 已改用 `llvm@22` 重编，原生 OHOS 支持，26.8.1；本 tap 停留在 `llvm@21` / 26.7.0） | 2026-09-09 |
 | `bun` | 2026-10-02 |
-| `opencode`（v2；v1 保留为 `opencode-v1`，`opencode-v2` / `opencode@2` 的自动迁移随之取消） | 2026-10-02 |
+| `opencode`（v2；`opencode-v2` / `opencode@2` 的自动迁移随之取消） | 2026-10-02 |
 
 ## 改名
 
 - **2026-08-01**：`ohos-opencode` → `opencode`、`ohos-opencode@2` → `opencode@2`（命令名同步改为 `opencode` / `opencode2`）。bottle 不随改名自动迁移，已装旧名的用户请先 `brew uninstall <旧名>` 再 `brew install <新名>`。
 - **2026-09-22**：`opencode@2` 更名为 `opencode-v2`（对齐上游官方 formula 名，`formula_renames.json` 自动迁移已装用户），并对齐上游的**原位替代**语义——命令名从 `opencode2` 改回 `opencode`，新增 `conflicts_with "opencode"`（与 v1 不能同时安装），数据目录从独立的 `~/.config/opencode2` 等改回与 v1 共享的 `~/.config/opencode`（v1 的数据库会被 v2 自动迁移）。旧版遗留的 `~/.config/opencode2`、`~/.local/share/opencode2`、`~/.local/state/opencode2` 目录升级后可手动删除。
-- **随后**：`opencode` 由 v2 接管，v1 保留为 `opencode-v1`；`opencode-v2` 与 `opencode@2` 经 `formula_renames.json` 自动迁移到 `opencode`。已有 `opencode` 的用户 `brew update && brew upgrade social4hyq/core/opencode` 即升到 v2；要保留 v1：`brew uninstall social4hyq/core/opencode && brew install opencode-v1`。两个版本都提供 `opencode` 命令、共享 `~/.config/opencode`，切换前先卸载当前版本。**2026-10-02**：v2 已合入官方 core，本 tap 的 `opencode` 下线；已装本 tap 旧版（含 `opencode-v2` / `opencode@2`）的用户请 `brew uninstall social4hyq/core/opencode` 后 `brew install opencode`。
+- **随后**：`opencode` 由 v2 接管，v1 保留为 `opencode-v1`（已于 2026-10-02 下线）；`opencode-v2` 与 `opencode@2` 经 `formula_renames.json` 自动迁移到 `opencode`。已有 `opencode` 的用户 `brew update && brew upgrade social4hyq/core/opencode` 即升到 v2；要保留 v1：`brew uninstall social4hyq/core/opencode && brew install opencode-v1`。两个版本都提供 `opencode` 命令、共享 `~/.config/opencode`，切换前先卸载当前版本。**2026-10-02**：v2 已合入官方 core，本 tap 的 `opencode` 下线；已装本 tap 旧版（含 `opencode-v2` / `opencode@2`）的用户请 `brew uninstall social4hyq/core/opencode` 后 `brew install opencode`；`opencode-v1` 同日下线，已装的用户 `brew uninstall opencode-v1`（无替代）。

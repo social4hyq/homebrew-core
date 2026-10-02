@@ -51,7 +51,6 @@ timeline
 | `ohos-compat-shim` | 兜底鸿蒙与标准 Linux 底层差异的 LD_PRELOAD 兼容层，随 `claude-code` 自动安装 | — | 待定 | — |
 | `qemu-aarch64` | 用户态 QEMU，直接运行 Linux aarch64 程序，自带 `-strace` 系统调用跟踪 | 14k | 期待官方 core 提供 | — |
 | `claude-code` / `claude-code.latest` | Anthropic 官方 Claude Code 终端版（stable / latest 两个频道） | 149k | 无计划（闭源，只能拉取官方二进制） | — |
-| `opencode-v1` | opencode 的 v1 稳定版，与官方 `opencode` 都提供 `opencode` 命令，只装其一 | 211k | 无计划 | — |
 | `sshport` | 把远程开发机的服务端口映射到本机同名端口 | — | 无计划（内部小工具） | — |
 | `hishell-font` | 为鸿蒙 PC 终端（HiShell）安装并配置 Nerd Font | — | 无计划（内部小工具） | — |
 
@@ -59,7 +58,7 @@ timeline
 
 ## 迁移说明
 
-上表「已合入」的 formula，以及 `codex`、`cc-switch`、`reasonix`、`deepseek-harness`、`nvm`、`ohos-bst-light`、`node-ohos`，现已由官方 core 提供；`opencode` 同样已迁移（v1 保留为本 tap 的 `opencode-v1`，与官方 `opencode` 都提供 `opencode` 命令，只装其一）。已装本 tap 旧版的，先 `brew uninstall social4hyq/core/<名>`，再 `brew install <名>`。特例：`cc-switch` 在官方 core 叫 `cc-switch-cli`，`node-ohos` 叫 `node`，`ohos-bst-light` 的命令名由 `self-sign` 变为 `selfsign`。其余下线项与改名见 [docs/offline-history.md](docs/offline-history.md)。
+上表「已合入」的 formula，以及 `codex`、`cc-switch`、`reasonix`、`deepseek-harness`、`nvm`、`ohos-bst-light`、`node-ohos`，现已由官方 core 提供；`opencode` 同样已迁移，`opencode-v1` 已下线、无替代。已装本 tap 旧版的，先 `brew uninstall social4hyq/core/<名>`，再 `brew install <名>`。特例：`cc-switch` 在官方 core 叫 `cc-switch-cli`，`node-ohos` 叫 `node`，`ohos-bst-light` 的命令名由 `self-sign` 变为 `selfsign`。其余下线项与改名见 [docs/offline-history.md](docs/offline-history.md)。
 
 ## 已知限制
 
