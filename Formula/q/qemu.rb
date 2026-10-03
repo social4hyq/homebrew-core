@@ -14,8 +14,9 @@ class Qemu < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qemu-v11.1.2-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "69c0b79e32c23eca86a6bce33057a398698ff811273ca624ffe67b59fa91a085"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qemu-v11.1.2-r4"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bb9d0110c0edf661a9b5c6c1039557941c4062f74b82af7eb8c6e2d75f86a92"
   end
 
   depends_on "bison" => :build # >= 3.0
