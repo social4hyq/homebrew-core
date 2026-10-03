@@ -4,6 +4,7 @@ class Qemu < Formula
   url "https://download.qemu.org/qemu-11.1.2.tar.xz"
   sha256 "731b5681e4bb18be313231579b8efd0296c5b015fa36dc533874b639ba838016"
   license "GPL-2.0-only"
+  revision 1
   compatibility_version 1
   head "https://gitlab.com/qemu-project/qemu.git", branch: "master"
 
@@ -45,10 +46,10 @@ class Qemu < Formula
   uses_from_macos "flex" => :build
   uses_from_macos "bzip2"
 
-  # GTK, VDE, OpenGL, and host device discovery dependencies are unavailable on OHOS.
   on_linux do
     depends_on "attr"
     depends_on "libcap-ng"
+    depends_on "libxkbcommon"
     depends_on "zlib-ng-compat"
   end
 
@@ -72,6 +73,8 @@ class Qemu < Formula
 
   def install
     ENV["LIBTOOL"] = "glibtool"
+    # OHOS SDK keyctl and USB headers retain kernel-only __user annotations.
+    ENV.append "CFLAGS", "-D__user="
     # OHOS libc omits the POSIX message queue functions used by linux-user.
     ENV.append "LDFLAGS", "-L#{formula_opt_lib("musl-compat")} -lmusl_compat"
 
@@ -95,6 +98,7 @@ class Qemu < Formula
       --disable-vde
       --enable-virtfs
       --enable-zstd
+      --extra-cflags=-DNCURSES_WIDECHAR=1
       --disable-sdl
     ]
 
@@ -123,8 +127,6 @@ class Qemu < Formula
 
     # OHOS vhost.h conflicts with libvhost-user's bundled virtio ring declarations.
     args << "--disable-vhost-user"
-    # OHOS SDK keyctl and USB headers retain kernel-only __user annotations.
-    args << "--extra-cflags=-DNCURSES_WIDECHAR=1 -D__user="
 
     system "./configure", *args
     system "make", "V=1", "install"
@@ -147,6 +149,9 @@ class Qemu < Formula
     system bin/"qemu-img", "convert", "-O", "raw", "test.qcow2", "test.img"
     assert_match "file format: raw", shell_output("#{bin}/qemu-img info test.img")
     assert_equal "Z" * 4096, (testpath/"test.img").binread(4096)
+
+    system bin/"qemu-keymap", "-l", "us", "-f", "us.keymap"
+    assert_match "#    layout  : us", (testpath/"us.keymap").read
 
     # Boot a guest that writes to the debug console and exits through an ISA device.
     boot = [0xba, 0xe9, 0x00, 0xb0, 0x4f, 0xee, 0xb0, 0x4b, 0xee,
