@@ -12,6 +12,11 @@ class Dtc < Formula
     regex(/href=.*?dtc[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/dtc-v1.8.1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb8323d82f1b65d666905a02503bd25fee1fbe913a2d24b94972ee9c988a5c76"
+  end
+
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkgconf" => :build
