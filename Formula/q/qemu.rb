@@ -12,6 +12,11 @@ class Qemu < Formula
     regex(/href=.*?qemu[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qemu-v11.1.2-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b06591a4a82478199172446f251f334d96c3cd8b6a864705888df18f6252e94f"
+  end
+
   depends_on "bison" => :build # >= 3.0
   depends_on "libtool" => :build
   depends_on "meson" => :build
