@@ -4,18 +4,12 @@ class Qemu < Formula
   url "https://download.qemu.org/qemu-11.1.2.tar.xz"
   sha256 "731b5681e4bb18be313231579b8efd0296c5b015fa36dc533874b639ba838016"
   license "GPL-2.0-only"
-  revision 3
   compatibility_version 1
   head "https://gitlab.com/qemu-project/qemu.git", branch: "master"
 
   livecheck do
     url "https://www.qemu.org/download/"
     regex(/href=.*?qemu[._-]v?(\d+(?:\.\d+)+)\.t/i)
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qemu-v11.1.2-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "211cf03e2576f6bcf512abc4f597b1315ff3320476c9dcf8d322af09c8610f64"
   end
 
   depends_on "bison" => :build # >= 3.0
@@ -28,7 +22,6 @@ class Qemu < Formula
   depends_on "spice-protocol" => :build
 
   depends_on "capstone"
-  depends_on "curl"
   depends_on "dtc"
   depends_on "glib"
   depends_on "gnutls"
@@ -49,7 +42,6 @@ class Qemu < Formula
   on_linux do
     depends_on "attr"
     depends_on "libcap-ng"
-    depends_on "libseccomp"
     depends_on "libxkbcommon"
     depends_on "zlib-ng-compat"
   end
