@@ -4,7 +4,7 @@ class Qemu < Formula
   url "https://download.qemu.org/qemu-11.1.2.tar.xz"
   sha256 "731b5681e4bb18be313231579b8efd0296c5b015fa36dc533874b639ba838016"
   license "GPL-2.0-only"
-  revision 1
+  revision 2
   compatibility_version 1
   head "https://gitlab.com/qemu-project/qemu.git", branch: "master"
 
@@ -28,6 +28,7 @@ class Qemu < Formula
   depends_on "spice-protocol" => :build
 
   depends_on "capstone"
+  depends_on "curl"
   depends_on "dtc"
   depends_on "glib"
   depends_on "gnutls"
@@ -49,6 +50,7 @@ class Qemu < Formula
   on_linux do
     depends_on "attr"
     depends_on "libcap-ng"
+    depends_on "libseccomp"
     depends_on "libxkbcommon"
     depends_on "zlib-ng-compat"
   end
@@ -67,6 +69,10 @@ class Qemu < Formula
 
   patch do
     file "Patches/qemu/0004-provide-missing-host-signal-and-tty-functions.patch"
+  end
+
+  patch do
+    file "Patches/qemu/0005-use-ohos-virtio-headers.patch"
   end
 
   deny_network_access!
@@ -125,9 +131,6 @@ class Qemu < Formula
       ["--disable-gtk"]
     end
 
-    # OHOS vhost.h conflicts with libvhost-user's bundled virtio ring declarations.
-    args << "--disable-vhost-user"
-
     system "./configure", *args
     system "make", "V=1", "install"
   end
@@ -150,6 +153,43 @@ class Qemu < Formula
     assert_match "file format: raw", shell_output("#{bin}/qemu-img info test.img")
     assert_equal "Z" * 4096, (testpath/"test.img").binread(4096)
 
+    require "socket"
+    disk = (testpath/"test.img").binread
+    server = TCPServer.new("127.0.0.1", 0)
+    port = server.addr[1]
+    server_pid = fork do
+      loop do
+        client = server.accept
+        request = client.gets
+        headers = +""
+        while (line = client.gets) && line != "\r\n"
+          headers << line
+        end
+        range = headers.match(/Range: bytes=(\d+)-(\d*)/i)
+        first = range ? range[1].to_i : 0
+        last = (range && !range[2].empty?) ? range[2].to_i : disk.bytesize - 1
+        last = [last, disk.bytesize - 1].min
+        body = disk.byteslice(first..last)
+        client.write "HTTP/1.1 #{range ? "206 Partial Content" : "200 OK"}\r\n"
+        client.write "Content-Length: #{body.bytesize}\r\nAccept-Ranges: bytes\r\nConnection: close\r\n"
+        client.write "Content-Range: bytes #{first}-#{last}/#{disk.bytesize}\r\n" if range
+        client.write "\r\n"
+        client.write body unless request.start_with?("HEAD")
+        client.close
+      end
+    end
+    begin
+      server.close
+      system bin/"qemu-img", "convert", "-f", "raw", "-O", "raw",
+             "http://127.0.0.1:#{port}/test.img", "download.img"
+      assert_equal disk, (testpath/"download.img").binread
+    ensure
+      Process.kill("TERM", server_pid)
+      Process.wait(server_pid)
+    end
+
+    assert_match "chardev", shell_output("#{bin}/qemu-system-i386 -device vhost-user-blk-pci,help")
+
     system bin/"qemu-keymap", "-l", "us", "-f", "us.keymap"
     assert_match "#    layout  : us", (testpath/"us.keymap").read
 
@@ -159,7 +199,8 @@ class Qemu < Formula
     (testpath/"boot.img").binwrite boot.ljust(510, 0.chr) + [0x55, 0xaa].pack("C*")
     shell_output("#{bin}/qemu-system-i386 -accel tcg -display none -monitor none -serial none " \
                  "-drive file=boot.img,format=raw,if=floppy -boot a -no-reboot -nic user,model=e1000 " \
-                 "-debugcon file:debug.log -device isa-debug-exit,iobase=0xf4,iosize=0x04", 1)
+                 "-debugcon file:debug.log -device isa-debug-exit,iobase=0xf4,iosize=0x04 " \
+                 "-sandbox on,obsolete=deny,elevateprivileges=deny,spawn=deny,resourcecontrol=deny", 1)
     assert_equal "OK", (testpath/"debug.log").read
 
     if OS.linux? && Hardware::CPU.arm?

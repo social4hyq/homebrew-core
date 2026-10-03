@@ -1,0 +1,37 @@
+--- a/subprojects/libvhost-user/libvhost-user.c	2026-10-03 11:36:55.264888125 +0800
++++ b/subprojects/libvhost-user/libvhost-user.c	2026-10-03 11:36:55.264888125 +0800
+@@ -36,7 +36,11 @@
+  * with older linux headers. Must appear before
+  * <linux/vhost.h> below.
+  */
++#ifdef __OHOS__
++#include <linux/virtio_config.h>
++#else
+ #include "standard-headers/linux/virtio_config.h"
++#endif
+ 
+ #if defined(__linux__)
+ #include <sys/syscall.h>
+--- a/subprojects/libvhost-user/libvhost-user.h	2026-10-03 11:36:55.264888125 +0800
++++ b/subprojects/libvhost-user/libvhost-user.h	2026-10-03 11:36:55.264888125 +0800
+@@ -20,7 +20,20 @@
+ #include <poll.h>
+ #include <linux/vhost.h>
+ #include <pthread.h>
++#ifdef __OHOS__
++#include <linux/virtio_ring.h>
++
++/* OHOS SDK UAPI headers omit the ring notification helper. */
++#ifndef _LINUX_VIRTIO_RING_H
++static inline int vring_need_event(uint16_t event, uint16_t next,
++                                  uint16_t previous)
++{
++    return (uint16_t)(next - event - 1) < (uint16_t)(next - previous);
++}
++#endif
++#else
+ #include "standard-headers/linux/virtio_ring.h"
++#endif
+ 
+ /* Based on qemu/hw/virtio/vhost-user.c */
+ #define VHOST_USER_F_PROTOCOL_FEATURES 30
