@@ -4,7 +4,7 @@ class Qemu < Formula
   url "https://download.qemu.org/qemu-11.1.2.tar.xz"
   sha256 "731b5681e4bb18be313231579b8efd0296c5b015fa36dc533874b639ba838016"
   license "GPL-2.0-only"
-  revision 2
+  revision 3
   compatibility_version 1
   head "https://gitlab.com/qemu-project/qemu.git", branch: "master"
 
@@ -14,9 +14,8 @@ class Qemu < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qemu-v11.1.2-r4"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bb9d0110c0edf661a9b5c6c1039557941c4062f74b82af7eb8c6e2d75f86a92"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qemu-v11.1.2-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "211cf03e2576f6bcf512abc4f597b1315ff3320476c9dcf8d322af09c8610f64"
   end
 
   depends_on "bison" => :build # >= 3.0
@@ -39,7 +38,6 @@ class Qemu < Formula
   depends_on "libssh"
   depends_on "libusb"
   depends_on "lzo"
-  depends_on "musl-compat"
   depends_on "ncurses"
   depends_on "pixman"
   depends_on "snappy"
@@ -76,14 +74,16 @@ class Qemu < Formula
     file "Patches/qemu/0005-use-ohos-virtio-headers.patch"
   end
 
+  patch do
+    file "Patches/qemu/0006-use-syscalls-for-posix-message-queues.patch"
+  end
+
   deny_network_access!
 
   def install
     ENV["LIBTOOL"] = "glibtool"
     # OHOS SDK keyctl and USB headers retain kernel-only __user annotations.
     ENV.append "CFLAGS", "-D__user="
-    # OHOS libc omits the POSIX message queue functions used by linux-user.
-    ENV.append "LDFLAGS", "-L#{formula_opt_lib("musl-compat")} -lmusl_compat"
 
     # Remove wheels unless explicitly permitted. Currently this:
     # * removes `meson` so that brew `meson` is always used
