@@ -7,6 +7,7 @@ class VitePlus < Formula
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
+  revision 1
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
@@ -24,9 +25,6 @@ class VitePlus < Formula
   depends_on "pnpm" => :build
   depends_on "rustup" => :build # TODO: try to restore stable rust: https://github.com/voidzero-dev/vite-task/commit/db99ba4d5d33323cc9e7b329f11bdea0610fbc7f
   depends_on "node"
-  # vp shells out to selfsign for the package-manager binary it downloads at
-  # runtime (see Patches/vite-plus/0003-…patch), so this is a run-time dep.
-  depends_on "ohos-selfsign"
 
   resource "rolldown" do
     url "https://github.com/rolldown/rolldown.git",
@@ -76,19 +74,14 @@ class VitePlus < Formula
     sha256 "824ac914a4ef81cca48e97ddb2037dac318a3e0c563653c60ba2e6dfd7242f87"
   end
 
-  # OHOS: package-manager platform-cfg (see the patch file for the rationale).
+  # OHOS: download pnpm/bun from the @ohos-npm-ports ports (see the patch file).
   patch :p1 do
-    file "Patches/vite-plus/0001-package-manager-platform-cfg.patch"
+    file "Patches/vite-plus/0001-package-manager-ohos-ports.patch"
   end
 
   # OHOS: managed-Node platform string (see the patch file for the rationale).
   patch :p1 do
     file "Patches/vite-plus/0002-managed-node-openharmony-platform.patch"
-  end
-
-  # OHOS: sign the package-manager binary vp downloads (see the patch file).
-  patch :p1 do
-    file "Patches/vite-plus/0003-sign-pnpm-native-ohos.patch"
   end
 
   def install
