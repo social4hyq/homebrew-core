@@ -1,0 +1,144 @@
+--- a/musl_compat.c
++++ b/musl_compat.c
+@@ -112,6 +112,7 @@
+ #include <sys/types.h>
+ #include <sys/syscall.h>
+ #include <sys/stat.h>
++#include <sys/utsname.h>
+ #include <signal.h>
+ #include <limits.h>
+ #include <shadow.h>
+@@ -523,6 +524,16 @@
+  * Implemented via direct Linux syscalls (aarch64 compatible)
+  * ================================================================= */
+ 
++static int mq_host_supported(void)
++{
++	struct utsname host;
++	if (uname(&host) < 0 || !strcmp(host.sysname, "HarmonyOS")) {
++		errno = ENOSYS;
++		return 0;
++	}
++	return 1;
++}
++
+ /* Forward declarations */
+ int mq_setattr(mqd_t, const struct mq_attr *restrict,
+ 	       struct mq_attr *restrict);
+@@ -536,6 +547,8 @@
+ 	mode_t mode = 0;
+ 	struct mq_attr *attr = 0;
+ 
++	if (!mq_host_supported()) return -1;
++
+ 	/* Strip leading '/' (musl mq_open convention) */
+ 	if (name && *name == '/') name++;
+ 
+@@ -549,7 +562,6 @@
+ 
+ 	long ret = syscall(__NR_mq_open, name, flags, mode, attr);
+ 	if (ret < 0) {
+-		errno = -ret;
+ 		return (mqd_t)-1;
+ 	}
+ 	return (mqd_t)ret;
+@@ -559,7 +571,6 @@
+ {
+ 	long ret = syscall(__NR_close, mqd);
+ 	if (ret < 0) {
+-		errno = -ret;
+ 		return -1;
+ 	}
+ 	return (int)ret;
+@@ -567,12 +578,13 @@
+ 
+ int mq_unlink(const char *name)
+ {
++	if (!mq_host_supported()) return -1;
++
+ 	if (name && *name == '/') name++;
+ 	long ret = syscall(__NR_mq_unlink, name);
+ 	if (ret < 0) {
+ 		/* Map EPERM to EACCES (musl behavior) */
+-		if (ret == -EPERM) ret = -EACCES;
+-		errno = -ret;
++		if (errno == EPERM) errno = EACCES;
+ 		return -1;
+ 	}
+ 	return (int)ret;
+@@ -586,9 +598,10 @@
+ int mq_setattr(mqd_t mqd, const struct mq_attr *restrict new,
+ 	       struct mq_attr *restrict old)
+ {
++	if (!mq_host_supported()) return -1;
++
+ 	long ret = syscall(__NR_mq_getsetattr, mqd, new, old);
+ 	if (ret < 0) {
+-		errno = -ret;
+ 		return -1;
+ 	}
+ 	return (int)ret;
+@@ -596,9 +609,10 @@
+ 
+ int mq_notify(mqd_t mqd, const struct sigevent *sev)
+ {
++	if (!mq_host_supported()) return -1;
++
+ 	long ret = syscall(__NR_mq_notify, mqd, sev);
+ 	if (ret < 0) {
+-		errno = -ret;
+ 		return -1;
+ 	}
+ 	return (int)ret;
+@@ -618,6 +632,8 @@
+ 		 unsigned prio, const struct timespec *at)
+ {
+ 	long ret;
++
++	if (!mq_host_supported()) return -1;
+ 
+ #ifdef __NR_mq_timedsend_time64
+ 	/* 64-bit time handling (32-bit compat) */
+@@ -639,7 +655,7 @@
+ 		}
+ 		ret = syscall(__NR_mq_timedsend_time64,
+ 			      mqd, msg, len, prio, ts_arg);
+-		if (ret != -ENOSYS) goto done;
++		if (ret != -1 || errno != ENOSYS) goto done;
+ 	}
+ 	{
+ 		long ts32[2];
+@@ -658,7 +674,6 @@
+ #endif
+ 
+ 	if (ret < 0) {
+-		errno = -ret;
+ 		return -1;
+ 	}
+ 	return (int)ret;
+@@ -669,6 +684,8 @@
+ 			const struct timespec *restrict at)
+ {
+ 	long ret;
++
++	if (!mq_host_supported()) return -1;
+ 
+ #ifdef __NR_mq_timedreceive_time64
+ 	struct {
+@@ -689,7 +706,7 @@
+ 		}
+ 		ret = syscall(__NR_mq_timedreceive_time64,
+ 			      mqd, msg, len, prio, ts_arg);
+-		if (ret != -ENOSYS) goto done;
++		if (ret != -1 || errno != ENOSYS) goto done;
+ 	}
+ 	{
+ 		long ts32[2];
+@@ -709,7 +726,6 @@
+ #endif
+ 
+ 	if (ret < 0) {
+-		errno = -ret;
+ 		return -1;
+ 	}
+ 	return (ssize_t)ret;
