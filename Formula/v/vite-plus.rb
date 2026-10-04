@@ -7,7 +7,7 @@ class VitePlus < Formula
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
-  revision 3
+  revision 4
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
@@ -174,21 +174,38 @@ class VitePlus < Formula
     # @napi-rs/cli builds the ohos linker/cc/ar paths from this.
     ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
 
-    # fspy reaches fspy_preload_unix through a -Z bindeps artifact dependency,
-    # so the crate must stay in the graph and keep emitting its cdylib; only its
-    # body fails, on libc::statx and execveat, which OHOS's libc lacks. It is
-    # already gated out on musl, so widening that gate leaves an empty cdylib
-    # and the artifact still resolves. Only this one crate is patched -- a
-    # [patch] entry for any of the others turns it into a path source, and
-    # build.ts then cannot read vt's cargo revision.
+    # fspy records a task's file accesses so a changed input invalidates the
+    # cache. Its seccomp-unotify path cannot work here (HongMeng rejects
+    # SECCOMP_RET_USER_NOTIF), so tracking has to come from fspy_preload_unix,
+    # the LD_PRELOAD library fspy reaches through a -Z bindeps artifact
+    # dependency. It builds on OHOS except for libc::statx and execveat, which
+    # OHOS's libc lacks, so only those two interceptions are dropped (a libuv
+    # statx still goes through the intercepted syscall()). The variadic
+    # interceptions need c_variadic, stable on upstream's nightly but not on
+    # this toolchain. Only this one crate is patched -- a [patch] entry for any
+    # of the others turns it into a path source, and build.ts then cannot read
+    # vt's cargo revision.
     vt_dir = buildpath.parent/"vite-task"
     rm_r vt_dir if vt_dir.exist?
     resource("vite-task-src").stage vt_dir
     crate = vt_dir/"crates/fspy_preload_unix"
     odie "fspy_preload_unix not found in the staged checkout" unless crate.directory?
     inreplace crate/"src/lib.rs",
-              'all(unix, not(target_env = "musl"))',
-              'all(unix, not(target_env = "musl"), not(target_env = "ohos"))'
+              "#[cfg(all(unix, not(target_env = \"musl\")))]\nmod client;",
+              "#![cfg_attr(target_env = \"ohos\", feature(c_variadic))]\n\n" \
+              "#[cfg(all(unix, not(target_env = \"musl\")))]\nmod client;"
+    inreplace crate/"src/interceptions/stat.rs",
+              "#[cfg(target_os = \"linux\")]\nintercept!(statx:",
+              "#[cfg(all(target_os = \"linux\", not(target_env = \"ohos\")))]\nintercept!(statx:"
+    inreplace crate/"src/interceptions/stat.rs",
+              "#[cfg(target_os = \"linux\")]\nunsafe extern \"C\" fn statx(",
+              "#[cfg(all(target_os = \"linux\", not(target_env = \"ohos\")))]\nunsafe extern \"C\" fn statx("
+    inreplace crate/"src/interceptions/spawn/exec/mod.rs",
+              "    intercept!(execveat(64):",
+              "    #[cfg(not(target_env = \"ohos\"))]\n    intercept!(execveat(64):"
+    inreplace crate/"src/interceptions/spawn/exec/mod.rs",
+              "    unsafe extern \"C\" fn execveat(",
+              "    #[cfg(not(target_env = \"ohos\"))]\n    unsafe extern \"C\" fn execveat("
     cargo_toml = buildpath/"Cargo.toml"
     File.write(cargo_toml, "#{File.read(cargo_toml)}\n" \
                            "[patch.\"https://github.com/voidzero-dev/vite-task.git\"]\n" \
