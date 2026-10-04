@@ -4,18 +4,12 @@ class Qemu < Formula
   url "https://download.qemu.org/qemu-11.1.2.tar.xz"
   sha256 "731b5681e4bb18be313231579b8efd0296c5b015fa36dc533874b639ba838016"
   license "GPL-2.0-only"
-  revision 3
   compatibility_version 1
   head "https://gitlab.com/qemu-project/qemu.git", branch: "master"
 
   livecheck do
     url "https://www.qemu.org/download/"
     regex(/href=.*?qemu[._-]v?(\d+(?:\.\d+)+)\.t/i)
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qemu-v11.1.2-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "211cf03e2576f6bcf512abc4f597b1315ff3320476c9dcf8d322af09c8610f64"
   end
 
   depends_on "bison" => :build # >= 3.0
@@ -28,7 +22,6 @@ class Qemu < Formula
   depends_on "spice-protocol" => :build
 
   depends_on "capstone"
-  depends_on "curl"
   depends_on "dtc"
   depends_on "glib"
   depends_on "gnutls"
@@ -38,9 +31,11 @@ class Qemu < Formula
   depends_on "libssh"
   depends_on "libusb"
   depends_on "lzo"
+  depends_on "musl-compat"
   depends_on "ncurses"
   depends_on "pixman"
   depends_on "snappy"
+  depends_on "vde" unless OS.ohos? # Not yet available in Harmonybrew core.
   depends_on "zstd"
 
   uses_from_macos "flex" => :build
@@ -48,9 +43,17 @@ class Qemu < Formula
 
   on_linux do
     depends_on "attr"
+    depends_on "cairo" unless OS.ohos? # The GTK backend is disabled on OHOS.
+    depends_on "elfutils" unless OS.ohos? # Requires missing FTS and obstack interfaces.
+    depends_on "gdk-pixbuf" unless OS.ohos? # The GTK backend is disabled on OHOS.
+    depends_on "gtk+3" unless OS.ohos? # The GTK/OpenGL stack is not yet available.
+    depends_on "keyutils" unless OS.ohos? # Keyring syscalls trigger SIGSYS on the tested HarmonyOS PC.
     depends_on "libcap-ng"
-    depends_on "libseccomp"
+    depends_on "libepoxy" unless OS.ohos? # The GTK/OpenGL stack is not yet available.
+    depends_on "libx11" unless OS.ohos? # The GTK backend is disabled on OHOS.
     depends_on "libxkbcommon"
+    depends_on "mesa" unless OS.ohos? # The GTK/OpenGL stack is not yet available.
+    depends_on "systemd" unless OS.ohos? # libudev is not yet available in Harmonybrew core.
     depends_on "zlib-ng-compat"
   end
 
@@ -74,16 +77,14 @@ class Qemu < Formula
     file "Patches/qemu/0005-use-ohos-virtio-headers.patch"
   end
 
-  patch do
-    file "Patches/qemu/0006-use-syscalls-for-posix-message-queues.patch"
-  end
-
   deny_network_access!
 
   def install
     ENV["LIBTOOL"] = "glibtool"
     # OHOS SDK keyctl and USB headers retain kernel-only __user annotations.
     ENV.append "CFLAGS", "-D__user="
+    # OHOS libc omits the POSIX message queue functions used by linux-user.
+    ENV.append "LDFLAGS", "-L#{formula_opt_lib("musl-compat")} -lmusl_compat"
 
     # Remove wheels unless explicitly permitted. Currently this:
     # * removes `meson` so that brew `meson` is always used
@@ -102,7 +103,7 @@ class Qemu < Formula
       --enable-curses
       --enable-fdt=system
       --enable-libssh
-      --disable-vde
+      --#{OS.ohos? ? "disable" : "enable"}-vde
       --enable-virtfs
       --enable-zstd
       --extra-cflags=-DNCURSES_WIDECHAR=1
@@ -128,8 +129,10 @@ class Qemu < Formula
 
     args += if OS.mac?
       ["--disable-gtk", "--enable-cocoa"]
-    else
+    elsif OS.ohos?
       ["--disable-gtk"]
+    else
+      ["--enable-gtk"]
     end
 
     system "./configure", *args
