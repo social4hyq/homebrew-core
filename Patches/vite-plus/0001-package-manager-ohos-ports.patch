@@ -25,14 +25,16 @@ Port versions are `<upstream>-<revision>` (e.g. 12.8.1-2), so:
 - `latest` and range resolution on ohos only consider versions a port
   exists for (pnpm < 12 is plain JS and needs no port), instead of
   resolving a version that would 404;
+- a version no port exists for is rejected up front, naming the versions
+  that have been ported, instead of a bare "not found" on the metadata URL;
 - nothing signs the binary at runtime any more (the former 0003 shelled
   out to selfsign), as the ports ship signed.
 
 A `packageManager` hash still names the official pnpm main tarball and
 is verified against it unchanged.
 ---
- crates/vp_pm_cli/src/package_manager.rs | 373 ++++++++++++++++++++++++++++++-----
- 1 file changed, 364 insertions(+), 9 deletions(-)
+ crates/vp_pm_cli/src/package_manager.rs | 383 ++++++++++++++++++++++++++++++-----
+ 1 file changed, 374 insertions(+), 9 deletions(-)
 
 --- a/crates/vp_pm_cli/src/package_manager.rs
 +++ b/crates/vp_pm_cli/src/package_manager.rs
@@ -73,7 +75,7 @@ is verified against it unchanged.
  
      let best = versions
          .iter()
-@@ -1383,13 +1406,92 @@ fn open_lock_file(lock_path: &Path) -> io::Result<File> {
+@@ -1383,13 +1406,100 @@ fn open_lock_file(lock_path: &Path) -> io::Result<File> {
      fs::OpenOptions::new().read(true).write(true).create(true).truncate(false).open(lock_path)
  }
  
@@ -136,11 +138,19 @@ is verified against it unchanged.
 +) -> Result<Str, Error> {
 +    let published = fetch_registry_versions(platform_package_name).await?;
 +    pick_port_version(version, &published).map(|v| Str::from(v.to_string())).ok_or_else(|| {
-+        Error::PackageManagerVersionNotFound {
-+            name: bin_name.into(),
-+            version: version.clone(),
-+            url: get_npm_package_metadata_url(platform_package_name).into(),
-+        }
++        let mut ported: Vec<_> = published.iter().filter_map(port_upstream_version).collect();
++        ported.sort();
++        ported.dedup();
++        let ported = ported.iter().map(ToString::to_string).collect::<Vec<_>>().join(", ");
++        let available =
++            if ported.is_empty() { "no version has been ported yet".into() } else { ported };
++        Error::InvalidArgument(
++            format!(
++                "{bin_name}@{version} is not available on OpenHarmony: only versions ported to \
++                 {platform_package_name} can be installed ({available})"
++            )
++            .into(),
++        )
 +    })
 +}
 +
@@ -167,7 +177,7 @@ is verified against it unchanged.
          ("linux", "aarch64") => "@oven/bun-linux-aarch64",
          #[cfg(target_env = "musl")]
          ("linux", "x86_64") => "@oven/bun-linux-x64-musl",
-@@ -1446,13 +1548,15 @@ async fn download_bun_package_manager(
+@@ -1446,13 +1556,15 @@ async fn download_bun_package_manager(
      let platform_package_name = get_bun_platform_package_name()?;
      // The declared hash never covers the platform tarball, so verify it
      // against the registry's `dist.integrity` for the platform package.
@@ -185,7 +195,7 @@ is verified against it unchanged.
      // Keep the TempDir guard alive so a failure path cleans up the temp dir.
      let tmp_dir = tempfile::tempdir_in(parent_dir)?;
      let target_dir_tmp = tmp_dir.path().to_path_buf();
-@@ -1542,7 +1646,9 @@ fn get_pnpm_platform_package_name() -> Result<&'static str, Error> {
+@@ -1542,7 +1654,9 @@ fn get_pnpm_platform_package_name() -> Result<&'static str, Error> {
          ("macos", "x86_64") => "@pnpm/exe.darwin-x64",
          #[cfg(target_env = "musl")]
          ("linux", "aarch64") => "@pnpm/exe.linux-arm64-musl",
@@ -196,7 +206,7 @@ is verified against it unchanged.
          ("linux", "aarch64") => "@pnpm/exe.linux-arm64",
          #[cfg(target_env = "musl")]
          ("linux", "x86_64") => "@pnpm/exe.linux-x64-musl",
-@@ -1646,13 +1752,15 @@ async fn download_pnpm_native_package_manager(
+@@ -1646,13 +1760,15 @@ async fn download_pnpm_native_package_manager(
  
      // The declared hash never covers the platform tarball, so verify it
      // against the registry's `dist.integrity` for the platform package.
@@ -214,7 +224,7 @@ is verified against it unchanged.
      // Keep the TempDir guard alive so a failure path cleans up the temp dir.
      let tmp_dir = tempfile::tempdir_in(parent_dir)?;
      let target_dir_tmp = tmp_dir.path().to_path_buf();
-@@ -3665,8 +3773,19 @@ mod tests {
+@@ -3665,8 +3781,19 @@ mod tests {
          vp_shared::EnvConfig::with_vars_async(
              [(env_vars::VP_HOME, vp_home.as_os_str())],
              |_| async move {
@@ -235,7 +245,7 @@ is verified against it unchanged.
                  assert!(result.is_ok(), "{result:?}");
                  let (target_dir, package_name, version) = result.unwrap();
                  // native binary plus pnpm/pnpx shims, no JS entrypoint
-@@ -3677,11 +3796,11 @@ mod tests {
+@@ -3677,11 +3804,11 @@ mod tests {
                  assert!(is_exists_file(target_dir.join("bin/pnpm.cmd")).unwrap());
                  assert!(is_exists_file(target_dir.join("bin/pnpx")).unwrap());
                  assert_eq!(package_name, "pnpm");
@@ -249,7 +259,7 @@ is verified against it unchanged.
                  assert!(result.is_ok(), "{result:?}");
                  remove_dir_all_force(target_dir).await.unwrap();
              },
-@@ -4234,6 +4353,9 @@ mod tests {
+@@ -4234,6 +4361,9 @@ mod tests {
          let result = get_bun_platform_package_name();
          assert!(result.is_ok(), "Should return a platform package name");
          let name = result.unwrap();
@@ -259,7 +269,7 @@ is verified against it unchanged.
          assert!(
              name.starts_with("@oven/bun-"),
              "Package name should start with @oven/bun-, got: {name}"
-@@ -4289,6 +4411,9 @@ mod tests {
+@@ -4289,6 +4419,9 @@ mod tests {
          let result = get_pnpm_platform_package_name();
          assert!(result.is_ok(), "Should return a platform package name");
          let name = result.unwrap();
@@ -269,7 +279,7 @@ is verified against it unchanged.
          assert!(
              name.starts_with("@pnpm/exe."),
              "Package name should start with @pnpm/exe., got: {name}"
-@@ -4300,6 +4425,236 @@ mod tests {
+@@ -4300,6 +4433,238 @@ mod tests {
          );
      }
  
@@ -492,12 +502,14 @@ is verified against it unchanged.
 +                    resolve_package_manager_version(PackageManagerType::Bun, "latest").await;
 +                assert_eq!(latest.unwrap().as_str(), "1.4.3");
 +
-+                // a version without a port is reported, not 404'd on the tarball
++                // a version without a port is reported with the ported ones, not 404'd on the tarball
 +                let result = download_package_manager(PackageManagerType::Bun, "1.5.0", None).await;
-+                assert!(
-+                    matches!(result, Err(Error::PackageManagerVersionNotFound { .. })),
-+                    "{result:?}"
-+                );
++                let Err(error @ Error::InvalidArgument(_)) = result else {
++                    panic!("an unported version must be rejected: {result:?}");
++                };
++                let message = error.to_string();
++                assert!(message.contains("bun@1.5.0 is not available on OpenHarmony"), "{message}");
++                assert!(message.contains("(1.4.2, 1.4.3)"), "{message}");
 +            },
 +        )
 +        .await;
