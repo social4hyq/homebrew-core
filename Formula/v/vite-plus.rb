@@ -7,7 +7,7 @@ class VitePlus < Formula
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
-  revision 2
+  revision 3
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
@@ -193,6 +193,10 @@ class VitePlus < Formula
     File.write(cargo_toml, "#{File.read(cargo_toml)}\n" \
                            "[patch.\"https://github.com/voidzero-dev/vite-task.git\"]\n" \
                            "fspy_preload_unix = { path = \"#{crate}\" }\n")
+
+    # Upstream CI brands the staged Vite before building it; without this vp
+    # prints Vite's own native config loader notice and the VITE banner.
+    system "pnpm", "exec", "tool", "brand-vite"
 
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vp_global_cli")
