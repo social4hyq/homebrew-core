@@ -11,9 +11,8 @@ class VitePlus < Formula
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r5"
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e5e2052da662a2bd4c9d6ef4d499ed6aa63d247fd759cf9afa750398b4cde619"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "42b33f0b2f94be61dc0083fd712b9d518efa31c0749830e82a85eda31abcdde4"
   end
 
   # OHOS-only blocks are fenced below; everything else tracks upstream.
