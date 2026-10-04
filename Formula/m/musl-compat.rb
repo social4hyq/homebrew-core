@@ -7,7 +7,8 @@ class MuslCompat < Formula
   revision 2
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "44bfadd73c5a717a7405f3635e0eeaf8743d2471241f9b891196a5265a2927d1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/musl-compat-v1.0.1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c613eb479cb4a773569c880204e60c32c628d79de747ae144cb253937baf548a"
   end
 
   patch do
