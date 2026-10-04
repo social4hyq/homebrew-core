@@ -1,0 +1,62 @@
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -1302,6 +1302,19 @@
+ 
+ #if defined(TARGET_NR_mq_open) && defined(__NR_mq_open)
+ #include <mqueue.h>
++#include <sys/utsname.h>
++
++static bool host_mq_supported(void)
++{
++#ifdef __OHOS__
++    struct utsname host;
++
++    /* HarmonyOS PC terminates message queue syscalls with SIGSYS. */
++    return uname(&host) == 0 && strcmp(host.sysname, "HarmonyOS") != 0;
++#else
++    return true;
++#endif
++}
+ 
+ static inline abi_long copy_from_user_mq_attr(struct mq_attr *attr,
+                                               abi_ulong target_mq_attr_addr)
+@@ -13700,6 +13713,9 @@
+ 
+ #ifdef TARGET_NR_mq_timedsend
+     case TARGET_NR_mq_timedsend:
++        if (!host_mq_supported()) {
++            return -TARGET_ENOSYS;
++        }
+         {
+             struct timespec ts;
+ 
+@@ -13721,6 +13737,9 @@
+ #endif
+ #ifdef TARGET_NR_mq_timedsend_time64
+     case TARGET_NR_mq_timedsend_time64:
++        if (!host_mq_supported()) {
++            return -TARGET_ENOSYS;
++        }
+         {
+             struct timespec ts;
+ 
+@@ -13743,6 +13762,9 @@
+ 
+ #ifdef TARGET_NR_mq_timedreceive
+     case TARGET_NR_mq_timedreceive:
++        if (!host_mq_supported()) {
++            return -TARGET_ENOSYS;
++        }
+         {
+             struct timespec ts;
+             unsigned int prio;
+@@ -13769,6 +13791,9 @@
+ #endif
+ #ifdef TARGET_NR_mq_timedreceive_time64
+     case TARGET_NR_mq_timedreceive_time64:
++        if (!host_mq_supported()) {
++            return -TARGET_ENOSYS;
++        }
+         {
+             struct timespec ts;
+             unsigned int prio;

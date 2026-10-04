@@ -4,7 +4,7 @@ class Qemu < Formula
   url "https://download.qemu.org/qemu-11.1.2.tar.xz"
   sha256 "731b5681e4bb18be313231579b8efd0296c5b015fa36dc533874b639ba838016"
   license "GPL-2.0-only"
-  revision 4
+  revision 5
   compatibility_version 1
   head "https://gitlab.com/qemu-project/qemu.git", branch: "master"
 
@@ -37,10 +37,10 @@ class Qemu < Formula
   depends_on "libssh"
   depends_on "libusb"
   depends_on "lzo"
-  depends_on "musl-compat"
   depends_on "ncurses"
   depends_on "pixman"
   depends_on "snappy"
+  depends_on "social4hyq/core/musl-compat"
   depends_on "vde" unless OS.ohos? # Not yet available in Harmonybrew core.
   depends_on "zstd"
 
@@ -83,6 +83,10 @@ class Qemu < Formula
     file "Patches/qemu/0005-use-ohos-virtio-headers.patch"
   end
 
+  patch do
+    file "Patches/qemu/0006-guard-harmonyos-message-queue-syscalls.patch"
+  end
+
   deny_network_access!
 
   def install
@@ -90,7 +94,7 @@ class Qemu < Formula
     # OHOS SDK keyctl and USB headers retain kernel-only __user annotations.
     ENV.append "CFLAGS", "-D__user="
     # OHOS libc omits the POSIX message queue functions used by linux-user.
-    ENV.append "LDFLAGS", "-L#{formula_opt_lib("musl-compat")} -lmusl_compat"
+    ENV.append "LDFLAGS", "-L#{formula_opt_lib("social4hyq/core/musl-compat")} -lmusl_compat"
 
     # Remove wheels unless explicitly permitted. Currently this:
     # * removes `meson` so that brew `meson` is always used
