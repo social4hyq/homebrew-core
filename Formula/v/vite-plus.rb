@@ -7,7 +7,7 @@ class VitePlus < Formula
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
-  revision 4
+  revision 5
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
@@ -184,7 +184,8 @@ class VitePlus < Formula
     # interceptions need c_variadic, stable on upstream's nightly but not on
     # this toolchain. Only this one crate is patched -- a [patch] entry for any
     # of the others turns it into a path source, and build.ts then cannot read
-    # vt's cargo revision.
+    # vt's cargo revision. A statically linked child would need the seccomp
+    # path, so it is exec'd untracked instead of failing the exec.
     vt_dir = buildpath.parent/"vite-task"
     rm_r vt_dir if vt_dir.exist?
     resource("vite-task-src").stage vt_dir
@@ -206,6 +207,13 @@ class VitePlus < Formula
     inreplace crate/"src/interceptions/spawn/exec/mod.rs",
               "    unsafe extern \"C\" fn execveat(",
               "    #[cfg(not(target_env = \"ohos\"))]\n    unsafe extern \"C\" fn execveat("
+    inreplace crate/"src/interceptions/spawn/exec/mod.rs",
+              "                if let Some(pre_exec) = pre_exec {\n                    " \
+              "pre_exec.run()?;\n                }\n",
+              "                #[cfg(not(target_env = \"ohos\"))]\n                " \
+              "if let Some(pre_exec) = pre_exec {\n                    " \
+              "pre_exec.run()?;\n                }\n                " \
+              "#[cfg(target_env = \"ohos\")]\n                let _ = pre_exec;\n"
     cargo_toml = buildpath/"Cargo.toml"
     File.write(cargo_toml, "#{File.read(cargo_toml)}\n" \
                            "[patch.\"https://github.com/voidzero-dev/vite-task.git\"]\n" \
@@ -243,6 +251,7 @@ class VitePlus < Formula
       #!/bin/sh
       TMPDIR_DEFAULT="#{HOMEBREW_PREFIX}/var/cache"
       export TMPDIR="${TMPDIR:-$TMPDIR_DEFAULT}"
+      export TMP="${TMP:-$TMPDIR}"
       mkdir -p "$TMPDIR" 2>/dev/null
       if [ -n "$HOME" ] && [ ! -f "$HOME/.vite-plus/config.json" ]; then
         mkdir -p "$HOME/.vite-plus" 2>/dev/null &&
