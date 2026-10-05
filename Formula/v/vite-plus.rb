@@ -178,12 +178,6 @@ class VitePlus < Formula
   end
 
   def caveats
-    ohos_caveats
-  end
-
-  def ohos_caveats
-    return unless OS.ohos?
-
     <<~EOS
       On OpenHarmony, the first interactive start asks whether Vite+ should manage
       your Node.js; answer No to keep using the system Node.js. A managed Node.js
