@@ -15,8 +15,6 @@ class VitePlus < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "20aafd109f0fad3814aab35ecc2bd7977db44529c767975c4d5ba8f8d8402ad1"
   end
 
-  # OHOS-only blocks are fenced below; everything else tracks upstream.
-
   depends_on "cmake" => :build
   depends_on "just" => :build
   # OHOS: @napi-rs/cli cross-compiles the bundled bindings against the SDK.
@@ -51,7 +49,6 @@ class VitePlus < Formula
     end
   end
 
-  # OHOS: vendored vite-task, for the fspy_preload_unix gate (see install).
   resource "vite-task-src" do
     url "https://github.com/voidzero-dev/vite-task.git",
         revision: "7d69d6577ecf6bd83deee32186de59918a712873"
@@ -77,17 +74,14 @@ class VitePlus < Formula
     sha256 "824ac914a4ef81cca48e97ddb2037dac318a3e0c563653c60ba2e6dfd7242f87"
   end
 
-  # OHOS: download pnpm/bun from the @ohos-npm-ports ports (see the patch file).
   patch :p1 do
     file "Patches/vite-plus/0001-package-manager-ohos-ports.patch"
   end
 
-  # OHOS: managed-Node platform string (see the patch file for the rationale).
   patch :p1 do
     file "Patches/vite-plus/0002-managed-node-openharmony-platform.patch"
   end
 
-  # OHOS: use the patched vite-task fspy (see the vite-task-src resource).
   patch :p1 do
     file "Patches/vite-plus/0004-vite-task-patch-fspy.patch"
   end
