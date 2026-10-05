@@ -8,7 +8,7 @@ source "$(dirname "$0")/lib.sh"
 : "${REASON:=}"
 
 API=https://atomgit.com/api/v5/repos/social4hyq/homebrew-core
-ag() { curl -sf -m 30 --retry 3 --retry-delay 5 --retry-connrefused -H "Authorization: Bearer $ATOMGIT_TOKEN" "$@"; }
+ag() { curl -sS --fail-with-body -m 30 --retry 3 --retry-delay 5 --retry-connrefused -H "Authorization: Bearer $ATOMGIT_TOKEN" "$@"; }
 
 BOTTLE=$(ls bottle-out/*.tar.gz | head -1)
 FILENAME=$(basename "$BOTTLE")
@@ -56,12 +56,13 @@ DEFROUTE=$(ip route show default 2>/dev/null)
 #    part of the validated fast configuration, keep them alongside the
 #    sysctl tuning above.
 RESP=$(ag "$API/releases/$TAG/upload_url?file_name=$FILENAME")
-curl -sf --tcp-nodelay -H "Expect:" --speed-limit 1024 --speed-time 120 -m 7200 -X PUT "$(echo "$RESP" | jq -r .url)" \
+echo
+curl -sS --fail-with-body --tcp-nodelay -H "Expect:" --speed-limit 1024 --speed-time 120 -m 7200 -X PUT "$(echo "$RESP" | jq -r .url)" \
   -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
   -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
   -H "x-obs-callback: $(echo "$RESP" | jq -r '.headers["x-obs-callback"]')" \
   -H "Content-Type: application/octet-stream" \
-  --data-binary "@$BOTTLE" -w "HTTP=%{http_code}\n"
+  --data-binary "@$BOTTLE" -w "\nHTTP=%{http_code}\n"
 
 # 4. merge bottle block back (--merge takes the json file, not the formula name)
 docker exec -w "$TAP_IN_CONTAINER/bottle-out" "$CONTAINER" bash -lc \
