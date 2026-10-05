@@ -1,5 +1,5 @@
 diff --git a/crates/vp_global_cli/src/commands/env/config.rs b/crates/vp_global_cli/src/commands/env/config.rs
-index cdb370b..9225849 100644
+index cdb370b..d5b909f 100644
 --- a/crates/vp_global_cli/src/commands/env/config.rs
 +++ b/crates/vp_global_cli/src/commands/env/config.rs
 @@ -26,9 +26,11 @@ const CONFIG_FILE: &str = "config.json";
@@ -16,3 +16,12 @@ index cdb370b..9225849 100644
      SystemFirst,
  }
  
+@@ -143,7 +145,7 @@ where
+ 
+ /// Check if shim mode is the default (for skip_serializing_if)
+ fn is_default_shim_mode(mode: &ShimMode) -> bool {
+-    *mode == ShimMode::Managed
++    *mode == ShimMode::default()
+ }
+ 
+ /// Version resolution result
