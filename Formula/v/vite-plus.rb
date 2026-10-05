@@ -4,21 +4,23 @@ class VitePlus < Formula
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
-  revision 8
+  revision 9
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r13"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2c68a455a5d39430f53dd2d623b26c9221ad0b3d7135cb18c32ae05fe77d201"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ad247bb7cf09ed67c380ab58769d8f02ff686f0f28990338ddd35c6ad1441a9"
   end
 
   depends_on "cmake" => :build
   depends_on "just" => :build
   # OHOS: @napi-rs/cli cross-compiles the bundled bindings against the SDK.
   depends_on "ohos-sdk" => :build
+  depends_on "pkgconf" => :build
   depends_on "pnpm" => :build
-  depends_on "rustup" => :build # TODO: try to restore stable rust: https://github.com/voidzero-dev/vite-task/commit/db99ba4d5d33323cc9e7b329f11bdea0610fbc7f
+  depends_on "rust" => :build
   depends_on "node"
+  depends_on "sqlite"
 
   resource "rolldown" do
     url "https://github.com/rolldown/rolldown.git",
@@ -91,6 +93,9 @@ class VitePlus < Formula
     resource("rolldown").stage buildpath/"rolldown"
     resource("vite").stage buildpath/"vite"
 
+    ENV["LIBSQLITE3_SYS_USE_PKG_CONFIG"] = "1"
+    ENV["RUSTC_BOOTSTRAP"] = "1" # workaround to build with stable rust
+
     # Build with Homebrew pnpm. The staged resources pin their own versions too
     %w[package.json rolldown/package.json vite/package.json].each do |file|
       package_json = buildpath/file
@@ -117,17 +122,6 @@ class VitePlus < Formula
       end
     end
 
-    # pnpm >= 11.20 verifies the engine binary for a packageManager pin, and
-    # no openharmony @pnpm/exe is published.
-    ENV["NPM_CONFIG_MANAGE_PACKAGE_MANAGER_VERSIONS"] = "false"
-    ENV["npm_config_manage_package_manager_versions"] = "false"
-    ENV.prepend_path "PATH", formula_opt_bin("pnpm")
-    # Direct crates.io access stalls on some networks; probe and fall back
-    # to rsproxy only where needed (fast networks keep using crates.io).
-    unless system "curl", "-fsIL", "--max-time", "8", "-o", File::NULL,
-                  "https://index.crates.io/config.json"
-      ENV["CARGO_REGISTRIES_CRATES_IO_INDEX"] = "sparse+https://rsproxy.cn/index/"
-    end
     # @napi-rs/cli builds the ohos linker/cc/ar paths from this.
     ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
 
