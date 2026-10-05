@@ -8,8 +8,8 @@ class VitePlus < Formula
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r14"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ad247bb7cf09ed67c380ab58769d8f02ff686f0f28990338ddd35c6ad1441a9"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r15"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9bb6ff1e4aca4ed78563acd42f202aed69cf234a58c4f74621cb917bd4662fcd"
   end
 
   depends_on "cmake" => :build
