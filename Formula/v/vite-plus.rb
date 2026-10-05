@@ -178,6 +178,10 @@ class VitePlus < Formula
   end
 
   def caveats
+    ohos_caveats
+  end
+
+  def ohos_caveats
     return unless OS.ohos?
 
     <<~EOS
