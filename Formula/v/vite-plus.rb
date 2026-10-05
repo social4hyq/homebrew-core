@@ -4,13 +4,12 @@ class VitePlus < Formula
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
-  revision 13
+  revision 15
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r20"
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2cb66024f6207152c330a8c71996a8c1e42137b5e16067028d0e5df8f076b6c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r21"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "79a55944c998adc1255e9a4ec20be43a7f3a6f975f99e493d5595a16d4e79c39"
   end
 
   depends_on "cmake" => :build
@@ -49,7 +48,7 @@ class VitePlus < Formula
 
   if OS.ohos?
     # @napi-rs/cli cross-compiles the bundled bindings against the SDK.
-    depends_on "ohos-sdk" => :build
+    depends_on "ohos-sdk-native" => :build
 
     resource "vite-task-src" do
       url "https://github.com/voidzero-dev/vite-task.git",
@@ -136,7 +135,7 @@ class VitePlus < Formula
       end
 
       # @napi-rs/cli builds the ohos linker/cc/ar paths from this.
-      ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
+      ENV["OHOS_SDK_NATIVE"] = formula_opt_prefix("ohos-sdk-native").to_s
 
       # Patch 0005 points fspy at this checkout, at ../vite-task.
       resource("vite-task-src").stage buildpath.parent/"vite-task"
