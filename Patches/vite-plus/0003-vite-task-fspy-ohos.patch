@@ -1,0 +1,193 @@
+diff --git a/crates/fspy/src/unix/mod.rs b/crates/fspy/src/unix/mod.rs
+index 194cdd28..946b1b4d 100644
+--- a/crates/fspy/src/unix/mod.rs
++++ b/crates/fspy/src/unix/mod.rs
+@@ -4,6 +4,9 @@ mod syscall_handler;
+ #[cfg(target_os = "macos")]
+ mod macos_artifacts;
+ 
++#[cfg(target_env = "ohos")]
++mod untracked;
++
+ use std::{io, path::Path};
+ 
+ #[cfg(target_os = "linux")]
+@@ -125,6 +128,13 @@ impl SpyImpl {
+             },
+         )
+         .map_err(|err| SpawnError::Injection(err.into()))?;
++        #[cfg(target_env = "ohos")]
++        let pre_exec = if pre_exec.is_some() {
++            untracked::mark_tracking_lost(ipc_receiver.conf());
++            None
++        } else {
++            pre_exec
++        };
+         command.set_exec(exec);
+         command.env("FSPY", "1");
+ 
+diff --git a/crates/fspy/src/unix/untracked.rs b/crates/fspy/src/unix/untracked.rs
+new file mode 100644
+index 00000000..fe41a6b4
+--- /dev/null
++++ b/crates/fspy/src/unix/untracked.rs
+@@ -0,0 +1,29 @@
++//! A statically linked root command is spawned untracked (OHOS has no seccomp
++//! user-notification), so its file accesses are missing from the trace. A
++//! record too large for any frame makes the channel refuse the claim and set
++//! its CLOSED gate, which the receiver reports as lost records, so the task
++//! is not cached.
++
++use fspy_shared::ipc::channel::ChannelConf;
++use wincode::{SchemaWrite, config::DefaultConfig, error::WriteResult, io::Writer};
++
++struct Oversized;
++
++// SAFETY: the channel refuses a claim this large before `write` can run.
++unsafe impl SchemaWrite<DefaultConfig> for Oversized {
++    type Src = Self;
++
++    fn size_of(_src: &Self::Src) -> WriteResult<usize> {
++        Ok(u32::MAX as usize + 1)
++    }
++
++    fn write(_writer: impl Writer, _src: &Self::Src) -> WriteResult<()> {
++        Ok(())
++    }
++}
++
++pub fn mark_tracking_lost(conf: ChannelConf<'_>) {
++    if let Some(sender) = conf.sender(allocator_api2::alloc::Global) {
++        sender.send(&Oversized);
++    }
++}
+diff --git a/crates/fspy_preload_unix/Cargo.toml b/crates/fspy_preload_unix/Cargo.toml
+index e74c0d63..39352dec 100644
+--- a/crates/fspy_preload_unix/Cargo.toml
++++ b/crates/fspy_preload_unix/Cargo.toml
+@@ -18,6 +18,7 @@ fspy_nostd = { workspace = true }
+ allocator-api2 = { workspace = true }
+ fspy_nostd_alloc = { workspace = true }
+ static_cell = { workspace = true }
++wincode = { workspace = true }
+ 
+ [lints]
+ workspace = true
+diff --git a/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs b/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
+index 729162d0..69f46996 100644
+--- a/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
++++ b/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
+@@ -41,9 +41,14 @@ fn handle_exec(
+             RawExec { prog, argv, envp },
+             allocator,
+             |raw_command, pre_exec| {
++                #[cfg(not(target_env = "ohos"))]
+                 if let Some(pre_exec) = pre_exec {
+                     pre_exec.run()?;
+                 }
++                #[cfg(target_env = "ohos")]
++                if pre_exec.is_some() {
++                    crate::untracked::mark_tracking_lost();
++                }
+                 Ok(execve::original()(raw_command.prog, raw_command.argv, raw_command.envp))
+             },
+         )
+@@ -219,6 +224,7 @@ mod linux_only {
+             envp,
+         )
+     }
++    #[cfg(not(target_env = "ohos"))]
+     intercept!(execveat(64): unsafe extern "C" fn(
+         dirfd: c_int,
+         prog: *const libc::c_char,
+@@ -226,6 +232,7 @@ mod linux_only {
+         envp: *const *mut libc::c_char,
+         flags: c_int
+     ) -> libc::c_int);
++    #[cfg(not(target_env = "ohos"))]
+     unsafe extern "C" fn execveat(
+         dirfd: c_int,
+         pathname: *const libc::c_char,
+diff --git a/crates/fspy_preload_unix/src/interceptions/stat.rs b/crates/fspy_preload_unix/src/interceptions/stat.rs
+index ea34ceff..2c82f907 100644
+--- a/crates/fspy_preload_unix/src/interceptions/stat.rs
++++ b/crates/fspy_preload_unix/src/interceptions/stat.rs
+@@ -44,7 +44,7 @@ unsafe extern "C" fn fstatat(
+     unsafe { fstatat::original()(dirfd, pathname, buf, flags) }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(all(target_os = "linux", not(target_env = "ohos")))]
+ intercept!(statx: unsafe extern "C" fn(
+     dirfd: c_int,
+     pathname: *const c_char,
+@@ -52,7 +52,7 @@ intercept!(statx: unsafe extern "C" fn(
+     mask: libc::c_uint,
+     statxbuf: *mut libc::statx,
+ ) -> c_int);
+-#[cfg(target_os = "linux")]
++#[cfg(all(target_os = "linux", not(target_env = "ohos")))]
+ unsafe extern "C" fn statx(
+     dirfd: c_int,
+     pathname: *const c_char,
+diff --git a/crates/fspy_preload_unix/src/lib.rs b/crates/fspy_preload_unix/src/lib.rs
+index 6c4e10b3..416995a5 100644
+--- a/crates/fspy_preload_unix/src/lib.rs
++++ b/crates/fspy_preload_unix/src/lib.rs
+@@ -1,8 +1,12 @@
+ // Compile as an empty crate on non-unix targets and on musl (where seccomp
+ // alone handles access tracking).
+ 
++#![cfg_attr(target_env = "ohos", feature(c_variadic))]
++
+ #[cfg(all(unix, not(target_env = "musl")))]
+ mod client;
++#[cfg(target_env = "ohos")]
++mod untracked;
+ #[cfg(all(unix, not(target_env = "musl")))]
+ mod interceptions;
+ #[cfg(all(unix, not(target_env = "musl")))]
+diff --git a/crates/fspy_preload_unix/src/untracked.rs b/crates/fspy_preload_unix/src/untracked.rs
+new file mode 100644
+index 00000000..93863ea3
+--- /dev/null
++++ b/crates/fspy_preload_unix/src/untracked.rs
+@@ -0,0 +1,38 @@
++//! A statically linked child is exec'd untracked (OHOS has no seccomp
++//! user-notification), so its file accesses are missing from the trace.
++//! A record too large for any frame makes the channel refuse the claim and
++//! set its CLOSED gate, which the receiver reports as lost records, so the
++//! task is not cached.
++
++use fspy_nostd::env;
++use fspy_shared_unix::payload::decode_payload_from_env;
++use wincode::{SchemaWrite, config::DefaultConfig, error::WriteResult, io::Writer};
++
++struct Oversized;
++
++// SAFETY: the channel refuses a claim this large before `write` can run.
++unsafe impl SchemaWrite<DefaultConfig> for Oversized {
++    type Src = Self;
++
++    fn size_of(_src: &Self::Src) -> WriteResult<usize> {
++        Ok(u32::MAX as usize + 1)
++    }
++
++    fn write(_writer: impl Writer, _src: &Self::Src) -> WriteResult<()> {
++        Ok(())
++    }
++}
++
++pub fn mark_tracking_lost() {
++    // SAFETY: only reads the process environment while decoding.
++    let Ok(current) = (unsafe { env::current() }) else {
++        return;
++    };
++    let allocator = fspy_nostd_alloc::pooled_bump();
++    let Ok(payload) = decode_payload_from_env(current.envs(), &allocator) else {
++        return;
++    };
++    if let Some(sender) = payload.payload.ipc_channel_conf.sender(&allocator) {
++        sender.send(&Oversized);
++    }
++}

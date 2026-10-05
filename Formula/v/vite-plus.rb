@@ -7,7 +7,7 @@ class VitePlus < Formula
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
-  revision 6
+  revision 7
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
@@ -56,6 +56,10 @@ class VitePlus < Formula
     url "https://github.com/voidzero-dev/vite-task.git",
         revision: "7d69d6577ecf6bd83deee32186de59918a712873"
     version "7d69d6577ecf6bd83deee32186de59918a712873"
+
+    patch :p1 do
+      file "Patches/vite-plus/0003-vite-task-fspy-ohos.patch"
+    end
   end
 
   resource "wasm-tools-linux-arm64-musl" do
@@ -81,6 +85,11 @@ class VitePlus < Formula
   # OHOS: managed-Node platform string (see the patch file for the rationale).
   patch :p1 do
     file "Patches/vite-plus/0002-managed-node-openharmony-platform.patch"
+  end
+
+  # OHOS: use the patched vite-task fspy (see the vite-task-src resource).
+  patch :p1 do
+    file "Patches/vite-plus/0004-vite-task-patch-fspy.patch"
   end
 
   def install
@@ -174,90 +183,10 @@ class VitePlus < Formula
     # @napi-rs/cli builds the ohos linker/cc/ar paths from this.
     ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
 
-    # fspy records a task's file accesses so a changed input invalidates the
-    # cache. Its seccomp-unotify path cannot work here (HongMeng rejects
-    # SECCOMP_RET_USER_NOTIF), so tracking has to come from fspy_preload_unix,
-    # the LD_PRELOAD library fspy reaches through a -Z bindeps artifact
-    # dependency. It builds on OHOS except for libc::statx and execveat, which
-    # OHOS's libc lacks, so only those two interceptions are dropped (a libuv
-    # statx still goes through the intercepted syscall()). The variadic
-    # interceptions need c_variadic, stable on upstream's nightly but not on
-    # this toolchain. Only this one crate is patched -- a [patch] entry for any
-    # of the others turns it into a path source, and build.ts then cannot read
-    # vt's cargo revision. A statically linked child would need the seccomp
-    # path, so it is exec'd untracked and the task is marked as not fully
-    # tracked, which keeps it out of the cache.
+    # Patch 0004 points fspy at this checkout, at ../vite-task.
     vt_dir = buildpath.parent/"vite-task"
     rm_r vt_dir if vt_dir.exist?
     resource("vite-task-src").stage vt_dir
-    crate = vt_dir/"crates/fspy_preload_unix"
-    odie "fspy_preload_unix not found in the staged checkout" unless crate.directory?
-    inreplace crate/"src/lib.rs",
-              "#[cfg(all(unix, not(target_env = \"musl\")))]\nmod client;",
-              "#![cfg_attr(target_env = \"ohos\", feature(c_variadic))]\n\n" \
-              "#[cfg(all(unix, not(target_env = \"musl\")))]\nmod client;\n" \
-              "#[cfg(target_env = \"ohos\")]\nmod untracked;"
-    inreplace crate/"src/interceptions/stat.rs",
-              "#[cfg(target_os = \"linux\")]\nintercept!(statx:",
-              "#[cfg(all(target_os = \"linux\", not(target_env = \"ohos\")))]\nintercept!(statx:"
-    inreplace crate/"src/interceptions/stat.rs",
-              "#[cfg(target_os = \"linux\")]\nunsafe extern \"C\" fn statx(",
-              "#[cfg(all(target_os = \"linux\", not(target_env = \"ohos\")))]\nunsafe extern \"C\" fn statx("
-    inreplace crate/"src/interceptions/spawn/exec/mod.rs",
-              "    intercept!(execveat(64):",
-              "    #[cfg(not(target_env = \"ohos\"))]\n    intercept!(execveat(64):"
-    inreplace crate/"src/interceptions/spawn/exec/mod.rs",
-              "    unsafe extern \"C\" fn execveat(",
-              "    #[cfg(not(target_env = \"ohos\"))]\n    unsafe extern \"C\" fn execveat("
-    inreplace crate/"src/interceptions/spawn/exec/mod.rs",
-              "                if let Some(pre_exec) = pre_exec {\n                    " \
-              "pre_exec.run()?;\n                }\n",
-              "                #[cfg(not(target_env = \"ohos\"))]\n                " \
-              "if let Some(pre_exec) = pre_exec {\n                    " \
-              "pre_exec.run()?;\n                }\n                " \
-              "#[cfg(target_env = \"ohos\")]\n                if pre_exec.is_some() {\n                    " \
-              "crate::untracked::mark_tracking_lost();\n                }\n"
-    inreplace crate/"Cargo.toml",
-              "static_cell = { workspace = true }",
-              "static_cell = { workspace = true }\nwincode = { workspace = true }"
-    (crate/"src/untracked.rs").write <<~RUST
-      use fspy_nostd::env;
-      use fspy_shared_unix::payload::decode_payload_from_env;
-      use wincode::{SchemaWrite, config::DefaultConfig, error::WriteResult, io::Writer};
-
-      struct Oversized;
-
-      // SAFETY: the channel refuses a claim this large before `write` can run.
-      unsafe impl SchemaWrite<DefaultConfig> for Oversized {
-          type Src = Self;
-
-          fn size_of(_src: &Self::Src) -> WriteResult<usize> {
-              Ok(u32::MAX as usize + 1)
-          }
-
-          fn write(_writer: impl Writer, _src: &Self::Src) -> WriteResult<()> {
-              Ok(())
-          }
-      }
-
-      pub fn mark_tracking_lost() {
-          // SAFETY: only reads the process environment while decoding.
-          let Ok(current) = (unsafe { env::current() }) else {
-              return;
-          };
-          let allocator = fspy_nostd_alloc::pooled_bump();
-          let Ok(payload) = decode_payload_from_env(current.envs(), &allocator) else {
-              return;
-          };
-          if let Some(sender) = payload.payload.ipc_channel_conf.sender(&allocator) {
-              sender.send(&Oversized);
-          }
-      }
-    RUST
-    cargo_toml = buildpath/"Cargo.toml"
-    File.write(cargo_toml, "#{File.read(cargo_toml)}\n" \
-                           "[patch.\"https://github.com/voidzero-dev/vite-task.git\"]\n" \
-                           "fspy_preload_unix = { path = \"#{crate}\" }\n")
 
     # Upstream CI brands the staged Vite before building it; without this vp
     # prints Vite's own native config loader notice and the VITE banner.
