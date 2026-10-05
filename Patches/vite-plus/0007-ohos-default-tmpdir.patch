@@ -1,3 +1,5 @@
+OHOS: default TMPDIR/TMP when unset, since /tmp is read-only.
+
 diff --git a/crates/vp_global_cli/src/main.rs b/crates/vp_global_cli/src/main.rs
 index 441743a..9fde225 100644
 --- a/crates/vp_global_cli/src/main.rs

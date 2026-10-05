@@ -1,0 +1,57 @@
+OHOS: make fspy_preload_unix build (no statx/execveat in libc, c_variadic needs RUSTC_BOOTSTRAP).
+
+diff --git a/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs b/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
+index 729162d..0c05e32 100644
+--- a/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
++++ b/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
+@@ -219,6 +219,7 @@ mod linux_only {
+             envp,
+         )
+     }
++    #[cfg(not(target_env = "ohos"))]
+     intercept!(execveat(64): unsafe extern "C" fn(
+         dirfd: c_int,
+         prog: *const libc::c_char,
+@@ -226,6 +227,7 @@ mod linux_only {
+         envp: *const *mut libc::c_char,
+         flags: c_int
+     ) -> libc::c_int);
++    #[cfg(not(target_env = "ohos"))]
+     unsafe extern "C" fn execveat(
+         dirfd: c_int,
+         pathname: *const libc::c_char,
+diff --git a/crates/fspy_preload_unix/src/interceptions/stat.rs b/crates/fspy_preload_unix/src/interceptions/stat.rs
+index ea34cef..2c82f90 100644
+--- a/crates/fspy_preload_unix/src/interceptions/stat.rs
++++ b/crates/fspy_preload_unix/src/interceptions/stat.rs
+@@ -44,7 +44,7 @@ unsafe extern "C" fn fstatat(
+     unsafe { fstatat::original()(dirfd, pathname, buf, flags) }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(all(target_os = "linux", not(target_env = "ohos")))]
+ intercept!(statx: unsafe extern "C" fn(
+     dirfd: c_int,
+     pathname: *const c_char,
+@@ -52,7 +52,7 @@ intercept!(statx: unsafe extern "C" fn(
+     mask: libc::c_uint,
+     statxbuf: *mut libc::statx,
+ ) -> c_int);
+-#[cfg(target_os = "linux")]
++#[cfg(all(target_os = "linux", not(target_env = "ohos")))]
+ unsafe extern "C" fn statx(
+     dirfd: c_int,
+     pathname: *const c_char,
+diff --git a/crates/fspy_preload_unix/src/lib.rs b/crates/fspy_preload_unix/src/lib.rs
+index 6c4e10b..eefa17b 100644
+--- a/crates/fspy_preload_unix/src/lib.rs
++++ b/crates/fspy_preload_unix/src/lib.rs
+@@ -1,6 +1,8 @@
+ // Compile as an empty crate on non-unix targets and on musl (where seccomp
+ // alone handles access tracking).
+ 
++#![cfg_attr(target_env = "ohos", feature(c_variadic))]
++
+ #[cfg(all(unix, not(target_env = "musl")))]
+ mod client;
+ #[cfg(all(unix, not(target_env = "musl")))]

@@ -1,3 +1,5 @@
+OHOS: overrides for packages without an upstream openharmony binding; re-check on version bumps.
+
 diff --git a/ohos-shims/@napi-rs-lzma-1.4.5/package.json b/ohos-shims/@napi-rs-lzma-1.4.5/package.json
 new file mode 100644
 index 0000000..9952525

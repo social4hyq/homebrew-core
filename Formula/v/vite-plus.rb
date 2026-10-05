@@ -4,18 +4,16 @@ class VitePlus < Formula
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
-  revision 11
+  revision 12
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r16"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c33348dcff2559cab06b6aa24eb480fb813a9bc2af3594c75c4f688bceff5f65"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r17"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00fc108aa7a667eafd0206e6102101cb1966e6642614b6bcf6776797dbf500c2"
   end
 
   depends_on "cmake" => :build
   depends_on "just" => :build
-  # OHOS: @napi-rs/cli cross-compiles the bundled bindings against the SDK.
-  depends_on "ohos-sdk" => :build
   depends_on "pkgconf" => :build
   depends_on "pnpm" => :build
   depends_on "rust" => :build
@@ -48,53 +46,58 @@ class VitePlus < Formula
     end
   end
 
-  resource "vite-task-src" do
-    url "https://github.com/voidzero-dev/vite-task.git",
-        revision: "7d69d6577ecf6bd83deee32186de59918a712873"
-    version "7d69d6577ecf6bd83deee32186de59918a712873"
+  if OS.ohos?
+    # @napi-rs/cli cross-compiles the bundled bindings against the SDK.
+    depends_on "ohos-sdk" => :build
+
+    resource "vite-task-src" do
+      url "https://github.com/voidzero-dev/vite-task.git",
+          revision: "7d69d6577ecf6bd83deee32186de59918a712873"
+      version "7d69d6577ecf6bd83deee32186de59918a712873"
+
+      patch :p1 do
+        file "Patches/vite-plus/0003-vite-task-preload-ohos-build.patch"
+      end
+
+      patch :p1 do
+        file "Patches/vite-plus/0004-vite-task-static-children-untracked.patch"
+      end
+    end
+
+    resource "wasm-tools-linux-arm64-musl" do
+      url "https://registry.npmjs.org/@napi-rs/wasm-tools-linux-arm64-musl/-/wasm-tools-linux-arm64-musl-1.1.0.tgz"
+      sha256 "ebeb7f019264d53ec50392e8f550c15bf9f9b474687694c62d18119520ce93f4"
+    end
+
+    resource "lzma-linux-arm64-musl" do
+      url "https://registry.npmjs.org/@napi-rs/lzma-linux-arm64-musl/-/lzma-linux-arm64-musl-1.4.5.tgz"
+      sha256 "7b972be94dcada346a868a89fcd4808e93df1587d4f06666005073ffa2f62ebe"
+    end
+
+    resource "tar-linux-arm64-musl" do
+      url "https://registry.npmjs.org/@napi-rs/tar-linux-arm64-musl/-/tar-linux-arm64-musl-1.1.0.tgz"
+      sha256 "824ac914a4ef81cca48e97ddb2037dac318a3e0c563653c60ba2e6dfd7242f87"
+    end
 
     patch :p1 do
-      file "Patches/vite-plus/0003-vite-task-fspy-ohos.patch"
+      file "Patches/vite-plus/0001-package-manager-ohos-ports.patch"
     end
-  end
 
-  resource "wasm-tools-linux-arm64-musl" do
-    url "https://registry.npmjs.org/@napi-rs/wasm-tools-linux-arm64-musl/-/wasm-tools-linux-arm64-musl-1.1.0.tgz"
-    sha256 "ebeb7f019264d53ec50392e8f550c15bf9f9b474687694c62d18119520ce93f4"
-  end
+    patch :p1 do
+      file "Patches/vite-plus/0002-managed-node-openharmony-platform.patch"
+    end
 
-  resource "lzma-linux-arm64-musl" do
-    url "https://registry.npmjs.org/@napi-rs/lzma-linux-arm64-musl/-/lzma-linux-arm64-musl-1.4.5.tgz"
-    sha256 "7b972be94dcada346a868a89fcd4808e93df1587d4f06666005073ffa2f62ebe"
-  end
+    patch :p1 do
+      file "Patches/vite-plus/0005-vite-task-patch-fspy.patch"
+    end
 
-  resource "tar-linux-arm64-musl" do
-    url "https://registry.npmjs.org/@napi-rs/tar-linux-arm64-musl/-/tar-linux-arm64-musl-1.1.0.tgz"
-    sha256 "824ac914a4ef81cca48e97ddb2037dac318a3e0c563653c60ba2e6dfd7242f87"
-  end
+    patch :p1 do
+      file "Patches/vite-plus/0006-ohos-ports-overrides.patch"
+    end
 
-  patch :p1 do
-    file "Patches/vite-plus/0001-package-manager-ohos-ports.patch"
-  end
-
-  patch :p1 do
-    file "Patches/vite-plus/0002-managed-node-openharmony-platform.patch"
-  end
-
-  patch :p1 do
-    file "Patches/vite-plus/0004-vite-task-patch-fspy.patch"
-  end
-
-  patch :p1 do
-    file "Patches/vite-plus/0005-ohos-ports-overrides.patch"
-  end
-
-  patch :p1 do
-    file "Patches/vite-plus/0006-ohos-default-system-first-shim-mode.patch"
-  end
-
-  patch :p1 do
-    file "Patches/vite-plus/0007-ohos-default-tmpdir.patch"
+    patch :p1 do
+      file "Patches/vite-plus/0007-ohos-default-tmpdir.patch"
+    end
   end
 
   def install
@@ -116,39 +119,42 @@ class VitePlus < Formula
     # Vite patches only build-time dependencies, which the production deploy below omits
     (buildpath/"pnpm-workspace.yaml").append_lines "allowUnusedPatches: true"
 
-    # The @napi-rs shims (patch 0005) wrap their linux-arm64-musl twins, which
-    # share OHOS's libc family
-    {
-      "@napi-rs-wasm-tools-1.1.0" => ["wasm-tools.node", "wasm-tools-linux-arm64-musl"],
-      "@napi-rs-lzma-1.4.5"       => ["lzma.node", "lzma-linux-arm64-musl"],
-      "@napi-rs-tar-1.1.0"        => ["tar.node", "tar-linux-arm64-musl"],
-    }.each do |dir, (node_file, resource_name)|
-      resource(resource_name).stage do
-        node_src = Dir.glob("**/*.node").first
-        odie "no .node in the musl resource #{resource_name}" if node_src.nil?
-        cp node_src, buildpath/"ohos-shims"/dir/node_file
+    if OS.ohos?
+      # The @napi-rs shims (patch 0006) wrap their linux-arm64-musl twins, which
+      # share OHOS's libc family
+      {
+        "@napi-rs-wasm-tools-1.1.0" => ["wasm-tools.node", "wasm-tools-linux-arm64-musl"],
+        "@napi-rs-lzma-1.4.5"       => ["lzma.node", "lzma-linux-arm64-musl"],
+        "@napi-rs-tar-1.1.0"        => ["tar.node", "tar-linux-arm64-musl"],
+      }.each do |dir, (node_file, resource_name)|
+        resource(resource_name).stage do
+          node_src = Dir.glob("**/*.node").first
+          odie "no .node in the musl resource #{resource_name}" if node_src.nil?
+          cp node_src, buildpath/"ohos-shims"/dir/node_file
+        end
       end
+
+      # @napi-rs/cli builds the ohos linker/cc/ar paths from this.
+      ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
+
+      # Patch 0005 points fspy at this checkout, at ../vite-task.
+      vt_dir = buildpath.parent/"vite-task"
+      rm_r vt_dir if vt_dir.exist?
+      resource("vite-task-src").stage vt_dir
+
+      # Upstream CI brands the staged Vite before building it; without this vp
+      # prints Vite's own native config loader notice and the VITE banner.
+      system "pnpm", "exec", "tool", "brand-vite"
     end
-
-    # @napi-rs/cli builds the ohos linker/cc/ar paths from this.
-    ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
-
-    # Patch 0004 points fspy at this checkout, at ../vite-task.
-    vt_dir = buildpath.parent/"vite-task"
-    rm_r vt_dir if vt_dir.exist?
-    resource("vite-task-src").stage vt_dir
-
-    # Upstream CI brands the staged Vite before building it; without this vp
-    # prints Vite's own native config loader notice and the VITE banner.
-    system "pnpm", "exec", "tool", "brand-vite"
 
     system "just", "build"
     system "cargo", "install", *std_cargo_args(path: "crates/vp_global_cli")
 
-    # No --no-optional: it prunes optionalDependencies wholesale, taking
-    # oxfmt's and oxlint's openharmony bindings with them. pnpm already filters
-    # them by os/cpu, so the flag only cost us those bindings.
-    system "pnpm", "--filter=vite-plus", "deploy", "--prod", "--legacy",
+    deploy_args = %w[--prod --legacy]
+    # --no-optional prunes optionalDependencies wholesale, taking oxfmt's and
+    # oxlint's openharmony bindings with them
+    deploy_args << "--no-optional" unless OS.ohos?
+    system "pnpm", "--filter=vite-plus", "deploy", *deploy_args,
            prefix/"node_modules/vite-plus"
     node_modules = prefix/"node_modules/vite-plus/node_modules"
     # Remove incompatible pre-built `bare-*` binaries. Recurse as `deploy --legacy` writes
@@ -170,9 +176,11 @@ class VitePlus < Formula
   end
 
   test do
-    # OHOS: /tmp is read-only
-    ENV["TMPDIR"] = testpath/"tmp"
-    mkdir_p ENV["TMPDIR"]
+    if OS.ohos?
+      # /tmp is read-only
+      ENV["TMPDIR"] = testpath/"tmp"
+      mkdir_p ENV["TMPDIR"]
+    end
 
     # Use Homebrew node and skip the first-run setup prompt, which stops `vp` on the test PTY
     ENV["VP_NODE_MANAGER"] = "no"
@@ -182,5 +190,13 @@ class VitePlus < Formula
     # `vp` calls `tcsetattr` on a tty stdin, which stops it with SIGTTOU on the test PTY
     system "#{bin}/vp create vite:application --no-interactive --directory test-app < /dev/null"
     assert_path_exists testpath/"test-app/package.json"
+
+    # The scaffolded app installs vite-plus from npm, which has no openharmony binding
+    unless OS.ohos?
+      cd testpath/"test-app" do
+        output = shell_output("#{bin}/vp fmt < /dev/null")
+        assert_match "Finished", output
+      end
+    end
   end
 end
