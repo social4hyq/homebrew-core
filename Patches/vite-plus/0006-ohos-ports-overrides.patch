@@ -1,16 +1,4 @@
-OHOS: pnpm overrides for packages that have no upstream openharmony binding.
-
-- lightningcss, the yuku-* parsers/codegens, @ast-grep/napi, oxlint-tsgolint
-  and @parcel/watcher are replaced by their @ohos-npm-ports builds.
-- The three @napi-rs packages (wasm-tools, lzma, tar) have no OHOS build; the
-  ohos-shims directories wrap their linux-arm64-musl twins, which share OHOS's
-  libc family. The formula copies the .node files in at build time.
-- @ohos-npm-ports/* is excluded from the 24h minimumReleaseAge gate, which
-  would otherwise block a freshly published port.
-
-Keys must carry the version for the yuku packages (several ranges are in one
-graph), but bare for oxlint-tsgolint (packages/cli declares it via catalog:).
-Check the versions again whenever the source tag or a port is bumped.
+OHOS: overrides for packages without an upstream openharmony binding; re-check on version bumps.
 
 diff --git a/ohos-shims/@napi-rs-lzma-1.4.5/package.json b/ohos-shims/@napi-rs-lzma-1.4.5/package.json
 new file mode 100644

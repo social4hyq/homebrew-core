@@ -1,19 +1,4 @@
-OHOS: run statically linked programs untracked and keep their tasks out of the cache.
-
-Tracking a statically linked program needs seccomp user-notification, and
-HongMeng rejects SECCOMP_RET_USER_NOTIF (the pre_exec hook fails with EINVAL).
-Without this patch, exec'ing a static child from a tracked task fails, and so
-does spawning a task whose root command is static.
-
-The pre_exec hook is skipped on OHOS (in the preload for children, in fspy for
-the root command), and the loss is reported on the fspy channel by sending a
-record too large for any frame: the channel refuses the claim and sets its
-CLOSED gate, which vt already turns into TrackingIncomplete, so the task runs
-but is not cached. Otherwise the child's file reads would be missing from the
-trace and the cache would never be invalidated by them.
-
-The Oversized record exists in both fspy and fspy_preload_unix because the
-two crates do not depend on each other. Applies on top of 0003.
+OHOS: run static programs untracked (no seccomp user-notification) and keep their task out of the cache.
 
 diff --git a/crates/fspy/src/unix/mod.rs b/crates/fspy/src/unix/mod.rs
 index 194cdd2..946b1b4 100644

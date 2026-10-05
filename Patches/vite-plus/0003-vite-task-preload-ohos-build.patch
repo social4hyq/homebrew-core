@@ -1,18 +1,4 @@
-OHOS: make fspy_preload_unix build (vite-task, applied to the vite-task-src resource).
-
-fspy tracks file accesses through the LD_PRELOAD library fspy_preload_unix,
-which fspy reaches through a -Z bindeps artifact dependency. Two things in it
-do not build on OHOS:
-
-- libc::statx and execveat do not exist in OHOS's libc, so those two
-  interceptions are gated out (a libuv statx still goes through the
-  intercepted syscall()).
-- the variadic exec* interceptions need the c_variadic feature, which is
-  stable on upstream's pinned nightly but not on the stable toolchain built
-  with RUSTC_BOOTSTRAP=1.
-
-Only fspy_preload_unix is touched. Re-generate it against the new vite-task
-revision whenever the vite-task-src resource moves.
+OHOS: make fspy_preload_unix build (no statx/execveat in libc, c_variadic needs RUSTC_BOOTSTRAP).
 
 diff --git a/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs b/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
 index 729162d..0c05e32 100644
