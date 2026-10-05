@@ -4,7 +4,7 @@ class VitePlus < Formula
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
-  revision 9
+  revision 10
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
@@ -89,6 +89,14 @@ class VitePlus < Formula
     file "Patches/vite-plus/0005-ohos-ports-overrides.patch"
   end
 
+  patch :p1 do
+    file "Patches/vite-plus/0006-ohos-default-system-first-shim-mode.patch"
+  end
+
+  patch :p1 do
+    file "Patches/vite-plus/0007-ohos-default-tmpdir.patch"
+  end
+
   def install
     resource("rolldown").stage buildpath/"rolldown"
     resource("vite").stage buildpath/"vite"
@@ -151,27 +159,6 @@ class VitePlus < Formula
                 .each { |dir| rm_r(dir) if dir.basename.to_s != "#{os}-#{arch}" }
     rm_r node_modules.glob(".pnpm/**/node_modules/fsevents")
 
-    # /tmp is read-only and vp's default ShimMode "managed" wants a node that
-    # OHOS will exec; write_env_script cannot express either, hence the wrapper.
-    # The real binary sits one level below prefix so <dir>/../node_modules
-    # still resolves.
-    odie "cargo install did not produce bin/vp" unless (bin/"vp").exist?
-    libexec.mkpath
-    mv bin/"vp", libexec/"vp"
-    (bin/"vp").write <<~SH
-      #!/bin/sh
-      TMPDIR_DEFAULT="#{HOMEBREW_PREFIX}/var/cache"
-      export TMPDIR="${TMPDIR:-$TMPDIR_DEFAULT}"
-      export TMP="${TMP:-$TMPDIR}"
-      mkdir -p "$TMPDIR" 2>/dev/null
-      if [ -n "$HOME" ] && [ ! -f "$HOME/.vite-plus/config.json" ]; then
-        mkdir -p "$HOME/.vite-plus" 2>/dev/null &&
-          printf '{"shimMode":"system_first"}\\n' > "$HOME/.vite-plus/config.json" 2>/dev/null
-      fi
-      exec "#{libexec}/vp" "$@"
-    SH
-    chmod 0755, bin/"vp"
-
     # Symlink vp to vpr and vpx. These are detected at runtime by argv[0]
     bin.install_symlink bin/"vp" => "vpr"
     bin.install_symlink bin/"vp" => "vpx"
@@ -182,26 +169,10 @@ class VitePlus < Formula
     (zsh_completion/"_vp").write Utils.safe_popen_read({ "VP_COMPLETE" => "zsh" }, bin/"vp")
   end
 
-  def caveats
-    <<~EOS
-      On OHOS, /tmp is read-only and vp's Rust install path creates tempdirs
-      via TMPDIR. bin/vp is a wrapper that defaults TMPDIR to
-      #{HOMEBREW_PREFIX}/var/cache when unset.
-
-      vp's default ShimMode is "managed" (downloads official glibc Node.js
-      binaries that OHOS refuses to exec). The wrapper seeds
-      ~/.vite-plus/config.json with {"shimMode":"system_first"} on first
-      run, so the system Node.js is preferred; delete that file to opt
-      back into managed runtimes.
-    EOS
-  end
-
   test do
-    # OHOS: /tmp is read-only, and HOME must point at testpath so the
-    # wrapper's first-run config seeding lands here
+    # OHOS: /tmp is read-only
     ENV["TMPDIR"] = testpath/"tmp"
     mkdir_p ENV["TMPDIR"]
-    ENV["HOME"] = testpath.to_s
 
     # Use Homebrew node and skip the first-run setup prompt, which stops `vp` on the test PTY
     ENV["VP_NODE_MANAGER"] = "no"
