@@ -1,0 +1,78 @@
+diff --git a/ohos-shims/@napi-rs-lzma-1.4.5/package.json b/ohos-shims/@napi-rs-lzma-1.4.5/package.json
+new file mode 100644
+index 0000000..9952525
+--- /dev/null
++++ b/ohos-shims/@napi-rs-lzma-1.4.5/package.json
+@@ -0,0 +1,5 @@
++{
++  "name": "@napi-rs/lzma-openharmony-arm64",
++  "version": "1.4.5",
++  "main": "lzma.node"
++}
+diff --git a/ohos-shims/@napi-rs-tar-1.1.0/package.json b/ohos-shims/@napi-rs-tar-1.1.0/package.json
+new file mode 100644
+index 0000000..532271b
+--- /dev/null
++++ b/ohos-shims/@napi-rs-tar-1.1.0/package.json
+@@ -0,0 +1,5 @@
++{
++  "name": "@napi-rs/tar-openharmony-arm64",
++  "version": "1.1.0",
++  "main": "tar.node"
++}
+diff --git a/ohos-shims/@napi-rs-wasm-tools-1.1.0/package.json b/ohos-shims/@napi-rs-wasm-tools-1.1.0/package.json
+new file mode 100644
+index 0000000..df6cc50
+--- /dev/null
++++ b/ohos-shims/@napi-rs-wasm-tools-1.1.0/package.json
+@@ -0,0 +1,5 @@
++{
++  "name": "@napi-rs/wasm-tools-openharmony-arm64",
++  "version": "1.1.0",
++  "main": "wasm-tools.node"
++}
+diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
+index df14865..6d43512 100644
+--- a/pnpm-workspace.yaml
++++ b/pnpm-workspace.yaml
+@@ -147,6 +147,7 @@ catalogMode: prefer
+ ignoreScripts: true
+ minimumReleaseAge: 1440
+ minimumReleaseAgeExclude:
++  - '@ohos-npm-ports/*'
+   - '@babel/*'
+   - '@devframes/*'
+   - '@napi-rs/*'
+@@ -207,10 +208,32 @@ minimumReleaseAgeExclude:
+   - '@vitejs/devtools'
+   - '@vitejs/devtools-*'
+ overrides:
++  'lightningcss': npm:@ohos-npm-ports/lightningcss@1.33.0-1
++  'yuku-codegen@0.8.7': npm:@ohos-npm-ports/yuku-codegen@0.8.7-1
++  'yuku-codegen@0.9.3': npm:@ohos-npm-ports/yuku-codegen@0.9.3-1
++  'yuku-codegen@0.10.2': npm:@ohos-npm-ports/yuku-codegen@0.10.2-1
++  'yuku-parser@0.8.7': npm:@ohos-npm-ports/yuku-parser@0.8.7-1
++  'yuku-parser@0.9.3': npm:@ohos-npm-ports/yuku-parser@0.9.3-1
++  'yuku-parser@0.10.2': npm:@ohos-npm-ports/yuku-parser@0.10.2-1
++  '@ast-grep/napi@0.43.0': npm:@ohos-npm-ports/ast-grep-napi@0.43.0-1
++  'oxlint-tsgolint': npm:@ohos-npm-ports/oxlint-tsgolint@7.0.2003-1
++  '@napi-rs/wasm-tools-openharmony-arm64@1.1.0': link:./ohos-shims/@napi-rs-wasm-tools-1.1.0
++  '@napi-rs/lzma-openharmony-arm64@1.4.5': link:./ohos-shims/@napi-rs-lzma-1.4.5
++  '@napi-rs/tar-openharmony-arm64@1.1.0': link:./ohos-shims/@napi-rs-tar-1.1.0
++  '@parcel/watcher': npm:@ohos-npm-ports/parcel-watcher@2.5.1-2
+   rolldown: workspace:rolldown@*
+   vite: workspace:@voidzero-dev/vite-plus-core@*
+   vite-plus: workspace:vite-plus@*
+ packageExtensions:
++  '@napi-rs/wasm-tools@1.1.0':
++    optionalDependencies:
++      '@napi-rs/wasm-tools-openharmony-arm64': 1.1.0
++  '@napi-rs/lzma@1.4.5':
++    optionalDependencies:
++      '@napi-rs/lzma-openharmony-arm64': 1.4.5
++  '@napi-rs/tar@1.1.0':
++    optionalDependencies:
++      '@napi-rs/tar-openharmony-arm64': 1.1.0
+   '@rollup/plugin-dynamic-import-vars':
+     dependencies:
+       '@types/estree': ^1.0.0
