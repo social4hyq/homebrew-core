@@ -4,7 +4,7 @@ class VitePlus < Formula
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
-  revision 12
+  revision 13
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
@@ -18,7 +18,7 @@ class VitePlus < Formula
   depends_on "pnpm" => :build
   depends_on "rust" => :build
   depends_on "node"
-  depends_on "sqlite"
+  depends_on "sqlite" unless OS.ohos?
 
   resource "rolldown" do
     url "https://github.com/rolldown/rolldown.git",
@@ -104,7 +104,9 @@ class VitePlus < Formula
     resource("rolldown").stage buildpath/"rolldown"
     resource("vite").stage buildpath/"vite"
 
-    ENV["LIBSQLITE3_SYS_USE_PKG_CONFIG"] = "1"
+    # The binding is dlopen'ed by whichever Node.js runs vp, which may not search the
+    # Homebrew lib directory, so on OHOS sqlite stays bundled in it
+    ENV["LIBSQLITE3_SYS_USE_PKG_CONFIG"] = "1" unless OS.ohos?
     ENV["RUSTC_BOOTSTRAP"] = "1" # workaround to build with stable rust
 
     # Build with Homebrew pnpm. The staged resources pin their own versions too
@@ -173,6 +175,17 @@ class VitePlus < Formula
     (bash_completion/"vp").write Utils.safe_popen_read({ "VP_COMPLETE" => "bash" }, bin/"vp")
     (fish_completion/"vp.fish").write Utils.safe_popen_read({ "VP_COMPLETE" => "fish" }, bin/"vp")
     (zsh_completion/"_vp").write Utils.safe_popen_read({ "VP_COMPLETE" => "zsh" }, bin/"vp")
+  end
+
+  def caveats
+    return unless OS.ohos?
+
+    <<~EOS
+      On OpenHarmony, the first interactive start asks whether Vite+ should manage
+      your Node.js; answer No to keep using the system Node.js. A managed Node.js
+      needs a mirror that has OpenHarmony builds, as nodejs.org has none:
+        export VP_NODE_DIST_MIRROR=https://ohos-node.com/dist
+    EOS
   end
 
   test do
