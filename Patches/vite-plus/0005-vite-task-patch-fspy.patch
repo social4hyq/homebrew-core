@@ -1,3 +1,9 @@
+OHOS: point fspy and fspy_preload_unix at the patched vite-task checkout.
+
+The formula stages the vite-task-src resource at ../vite-task. vt is
+deliberately not patched: packages/cli/build.ts stamps the toolchain node with
+the exact git revision of the vt package, and a path source has none.
+
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -442,3 +442,7 @@

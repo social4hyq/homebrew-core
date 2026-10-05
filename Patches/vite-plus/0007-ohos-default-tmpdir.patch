@@ -1,3 +1,10 @@
+OHOS: default TMPDIR (and TMP) when unset.
+
+/tmp is read-only on OHOS, so a process without TMPDIR cannot create
+temporary files. Default it to $VP_HOME/tmp (or $HOME/.vite-plus/tmp) and set
+TMP to match: Vite Task passes TMP through to cached tasks but drops TMPDIR.
+Values that are already set are left alone.
+
 diff --git a/crates/vp_global_cli/src/main.rs b/crates/vp_global_cli/src/main.rs
 index 441743a..9fde225 100644
 --- a/crates/vp_global_cli/src/main.rs

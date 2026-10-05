@@ -4,7 +4,7 @@ class VitePlus < Formula
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
-  revision 11
+  revision 12
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
@@ -54,7 +54,11 @@ class VitePlus < Formula
     version "7d69d6577ecf6bd83deee32186de59918a712873"
 
     patch :p1 do
-      file "Patches/vite-plus/0003-vite-task-fspy-ohos.patch"
+      file "Patches/vite-plus/0003-vite-task-preload-ohos-build.patch"
+    end
+
+    patch :p1 do
+      file "Patches/vite-plus/0004-vite-task-static-children-untracked.patch"
     end
   end
 
@@ -82,15 +86,11 @@ class VitePlus < Formula
   end
 
   patch :p1 do
-    file "Patches/vite-plus/0004-vite-task-patch-fspy.patch"
+    file "Patches/vite-plus/0005-vite-task-patch-fspy.patch"
   end
 
   patch :p1 do
-    file "Patches/vite-plus/0005-ohos-ports-overrides.patch"
-  end
-
-  patch :p1 do
-    file "Patches/vite-plus/0006-ohos-default-system-first-shim-mode.patch"
+    file "Patches/vite-plus/0006-ohos-ports-overrides.patch"
   end
 
   patch :p1 do
@@ -116,7 +116,7 @@ class VitePlus < Formula
     # Vite patches only build-time dependencies, which the production deploy below omits
     (buildpath/"pnpm-workspace.yaml").append_lines "allowUnusedPatches: true"
 
-    # The @napi-rs shims (patch 0005) wrap their linux-arm64-musl twins, which
+    # The @napi-rs shims (patch 0006) wrap their linux-arm64-musl twins, which
     # share OHOS's libc family
     {
       "@napi-rs-wasm-tools-1.1.0" => ["wasm-tools.node", "wasm-tools-linux-arm64-musl"],
@@ -133,7 +133,7 @@ class VitePlus < Formula
     # @napi-rs/cli builds the ohos linker/cc/ar paths from this.
     ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
 
-    # Patch 0004 points fspy at this checkout, at ../vite-task.
+    # Patch 0005 points fspy at this checkout, at ../vite-task.
     vt_dir = buildpath.parent/"vite-task"
     rm_r vt_dir if vt_dir.exist?
     resource("vite-task-src").stage vt_dir
