@@ -1,0 +1,47 @@
+diff --git a/crates/vp_global_cli/src/main.rs b/crates/vp_global_cli/src/main.rs
+index 441743a..9fde225 100644
+--- a/crates/vp_global_cli/src/main.rs
++++ b/crates/vp_global_cli/src/main.rs
+@@ -390,6 +390,33 @@ fn dump_dirs_from_env_config() -> bool {
+     true
+ }
+ 
++/// OHOS has a read-only `/tmp`, so a process without `TMPDIR` cannot create
++/// temporary files. Default it to a directory under `VP_HOME`, and set `TMP`
++/// to match: Vite Task passes `TMP` through to cached tasks but drops `TMPDIR`.
++#[cfg(target_env = "ohos")]
++fn ensure_tmpdir() {
++    use std::path::PathBuf;
++
++    if env::var_os("TMPDIR").is_none() {
++        let root = env::var_os(vp_shared::env_vars::VP_HOME)
++            .map(PathBuf::from)
++            .or_else(|| env::var_os("HOME").map(|home| PathBuf::from(home).join(".vite-plus")));
++        if let Some(dir) = root.map(|root| root.join("tmp"))
++            && std::fs::create_dir_all(&dir).is_ok()
++        {
++            // SAFETY: called first thing in `main`, before any task runs, so
++            // no other thread is reading the environment.
++            unsafe { env::set_var("TMPDIR", dir) };
++        }
++    }
++    if env::var_os("TMP").is_none()
++        && let Some(tmpdir) = env::var_os("TMPDIR")
++    {
++        // SAFETY: as above.
++        unsafe { env::set_var("TMP", tmpdir) };
++    }
++}
++
+ #[tokio::main]
+ async fn main() -> ExitCode {
+     // Probe before tracing, directory resolution, or argument dispatch can emit output.
+@@ -405,6 +432,8 @@ async fn main() -> ExitCode {
+ 
+     vp_shared::ensure_blocking_stdio();
+     vp_shared::ensure_windows_pathext();
++    #[cfg(target_env = "ohos")]
++    ensure_tmpdir();
+ 
+     // Initialize tracing
+     vp_shared::init_tracing();
