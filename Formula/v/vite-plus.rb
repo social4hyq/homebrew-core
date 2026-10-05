@@ -1,18 +1,15 @@
 class VitePlus < Formula
-  require "json"
-  require "yaml"
-
   desc "Unified toolchain and entry point for web development"
   homepage "https://viteplus.dev"
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
-  revision 7
+  revision 8
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r12"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c5eb20841bfe5f1459ad1d76ea8a4e92e7c5494285a83172978595f198fdca7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b2c68a455a5d39430f53dd2d623b26c9221ad0b3d7135cb18c32ae05fe77d201"
   end
 
   depends_on "cmake" => :build
@@ -86,6 +83,10 @@ class VitePlus < Formula
     file "Patches/vite-plus/0004-vite-task-patch-fspy.patch"
   end
 
+  patch :p1 do
+    file "Patches/vite-plus/0005-ohos-ports-overrides.patch"
+  end
+
   def install
     resource("rolldown").stage buildpath/"rolldown"
     resource("vite").stage buildpath/"vite"
@@ -102,66 +103,19 @@ class VitePlus < Formula
     # Vite patches only build-time dependencies, which the production deploy below omits
     (buildpath/"pnpm-workspace.yaml").append_lines "allowUnusedPatches: true"
 
-    shims_dir = buildpath/"ohos-shims"
-    # Packages with an openharmony build in-package are remapped by override.
-    # The three @napi-rs shims below have no such build; their linux-arm64-musl
-    # twins share OHOS's libc family, so the shim renames the binding to what
-    # the loaders ask for. Build-time only — bottle signing is the pipeline's.
-    # [parent package, version, binding file name the loaders require,
-    #  Homebrew resource]
-    shims = [
-      ["@napi-rs/wasm-tools", "1.1.0", "wasm-tools.node", "wasm-tools-linux-arm64-musl"],
-      ["@napi-rs/lzma",       "1.4.5", "lzma.node",       "lzma-linux-arm64-musl"],
-      ["@napi-rs/tar",        "1.1.0", "tar.node",        "tar-linux-arm64-musl"],
-    ]
-    overrides = {
-      "lightningcss"          => "npm:@ohos-npm-ports/lightningcss@1.33.0-1",
-      # All three yuku versions load a binding: 0.9.3 at runtime, 0.8.7/0.10.2
-      # at build time via rolldown-plugin-dts. Keys must carry the version --
-      # yuku appears under several ranges in one graph.
-      "yuku-codegen@0.8.7"    => "npm:@ohos-npm-ports/yuku-codegen@0.8.7-1",
-      "yuku-codegen@0.9.3"    => "npm:@ohos-npm-ports/yuku-codegen@0.9.3-1",
-      "yuku-codegen@0.10.2"   => "npm:@ohos-npm-ports/yuku-codegen@0.10.2-1",
-      "yuku-parser@0.8.7"     => "npm:@ohos-npm-ports/yuku-parser@0.8.7-1",
-      "yuku-parser@0.9.3"     => "npm:@ohos-npm-ports/yuku-parser@0.9.3-1",
-      "yuku-parser@0.10.2"    => "npm:@ohos-npm-ports/yuku-parser@0.10.2-1",
-      "@ast-grep/napi@0.43.0" => "npm:@ohos-npm-ports/ast-grep-napi@0.43.0-1",
-      # Bare key: packages/cli declares this via catalog:, where a
-      # version-qualified selector does not match.
-      "oxlint-tsgolint"       => "npm:@ohos-npm-ports/oxlint-tsgolint@7.0.2003-1",
-    }
-    extensions = {}
-    shims.each do |parent, version, node_file, resource_name|
-      ohos_name = "#{parent}-openharmony-arm64"
-      shim = shims_dir/"#{parent.tr("/", "-")}-#{version}"
-
-      shim.mkpath
+    # The @napi-rs shims (patch 0005) wrap their linux-arm64-musl twins, which
+    # share OHOS's libc family
+    {
+      "@napi-rs-wasm-tools-1.1.0" => ["wasm-tools.node", "wasm-tools-linux-arm64-musl"],
+      "@napi-rs-lzma-1.4.5"       => ["lzma.node", "lzma-linux-arm64-musl"],
+      "@napi-rs-tar-1.1.0"        => ["tar.node", "tar-linux-arm64-musl"],
+    }.each do |dir, (node_file, resource_name)|
       resource(resource_name).stage do
         node_src = Dir.glob("**/*.node").first
-        odie "no .node in musl resource for #{parent}@#{version}" if node_src.nil?
-        cp node_src, shim/node_file
+        odie "no .node in the musl resource #{resource_name}" if node_src.nil?
+        cp node_src, buildpath/"ohos-shims"/dir/node_file
       end
-      (shim/"package.json").write <<~JSON
-        {
-          "name": "#{ohos_name}",
-          "version": "#{version}",
-          "main": "#{node_file}"
-        }
-      JSON
-      extensions["#{parent}@#{version}"] = { "optionalDependencies" => { ohos_name => version } }
-      overrides["#{ohos_name}@#{version}"] = "link:#{shim}"
     end
-    # Embeds its openharmony binding in the package itself, so no graft needed.
-    overrides["@parcel/watcher"] = "npm:@ohos-npm-ports/parcel-watcher@2.5.1-2"
-
-    workspace_yaml = buildpath/"pnpm-workspace.yaml"
-    ws = YAML.safe_load(workspace_yaml.read)
-    ws["overrides"] = overrides.merge(ws["overrides"] || {})
-    ws["packageExtensions"] = extensions.merge(ws["packageExtensions"] || {})
-    # The 24h minimumReleaseAge gate would block a freshly published port; the
-    # exact-version pins above are the trust decision instead.
-    ws["minimumReleaseAgeExclude"] = (ws["minimumReleaseAgeExclude"] || []).push("@ohos-npm-ports/*")
-    File.write(workspace_yaml, YAML.dump(ws))
 
     # pnpm >= 11.20 verifies the engine binary for a packageManager pin, and
     # no openharmony @pnpm/exe is published.
