@@ -1,25 +1,4 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: social4hyq <social4hyq@users.noreply.github.com>
-Date: Wed, 30 Sep 2026 22:30:00 +0800
-Subject: [PATCH] OHOS: managed-Node platform string.
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-platform_string() maps Os::Linux to "linux" and only appends a suffix for
-target_env=musl. OpenHarmony reports target_os="linux" with
-target_env="ohos", so it fell through to "linux-arm64" -- a name the OHOS
-Node.js mirror does not publish, making every managed-runtime download a
-404. It serves "node-v<version>-openharmony-<arch>" instead, so name that
-explicitly.
-
-The mirror is otherwise usable: its binaries are OpenHarmony musl builds
-(INTERP /lib/ld-musl-aarch64.so.1, NEEDED libc++_shared.so + libc.so) that
-run unsigned, and archive_format, binary_relative_path and SHASUMS256.txt
-all match what it serves.
----
- crates/vp_js_runtime/src/providers/node.rs | 33 +++++++++++++++-----
- 1 file changed, 32 insertions(+), 1 deletion(-)
+OHOS: the managed Node.js platform string is openharmony-<arch>.
 
 --- a/crates/vp_js_runtime/src/providers/node.rs
 +++ b/crates/vp_js_runtime/src/providers/node.rs
