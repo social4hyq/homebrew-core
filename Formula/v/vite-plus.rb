@@ -105,8 +105,7 @@ class VitePlus < Formula
     resource("rolldown").stage buildpath/"rolldown"
     resource("vite").stage buildpath/"vite"
 
-    # The binding is dlopen'ed by whichever Node.js runs vp, which may not search the
-    # Homebrew lib directory, so on OHOS sqlite stays bundled in it
+    # Any Node.js may load the binding, so on OHOS sqlite stays bundled in it
     ENV["LIBSQLITE3_SYS_USE_PKG_CONFIG"] = "1" unless OS.ohos?
     ENV["RUSTC_BOOTSTRAP"] = "1" # workaround to build with stable rust
 
@@ -123,8 +122,7 @@ class VitePlus < Formula
     (buildpath/"pnpm-workspace.yaml").append_lines "allowUnusedPatches: true"
 
     if OS.ohos?
-      # The @napi-rs shims (patch 0006) wrap their linux-arm64-musl twins, which
-      # share OHOS's libc family
+      # Shims (patch 0006) around the linux-arm64-musl builds of these packages
       {
         "@napi-rs-wasm-tools-1.1.0" => ["wasm-tools.node", "wasm-tools-linux-arm64-musl"],
         "@napi-rs-lzma-1.4.5"       => ["lzma.node", "lzma-linux-arm64-musl"],
@@ -141,12 +139,9 @@ class VitePlus < Formula
       ENV["OHOS_SDK_NATIVE"] = "#{formula_opt_prefix("ohos-sdk")}/native"
 
       # Patch 0005 points fspy at this checkout, at ../vite-task.
-      vt_dir = buildpath.parent/"vite-task"
-      rm_r vt_dir if vt_dir.exist?
-      resource("vite-task-src").stage vt_dir
+      resource("vite-task-src").stage buildpath.parent/"vite-task"
 
-      # Upstream CI brands the staged Vite before building it; without this vp
-      # prints Vite's own native config loader notice and the VITE banner.
+      # Upstream CI brands the staged Vite before building it
       system "pnpm", "exec", "tool", "brand-vite"
     end
 
@@ -154,8 +149,7 @@ class VitePlus < Formula
     system "cargo", "install", *std_cargo_args(path: "crates/vp_global_cli")
 
     deploy_args = %w[--prod --legacy]
-    # --no-optional prunes optionalDependencies wholesale, taking oxfmt's and
-    # oxlint's openharmony bindings with them
+    # --no-optional would drop the oxfmt and oxlint openharmony bindings
     deploy_args << "--no-optional" unless OS.ohos?
     system "pnpm", "--filter=vite-plus", "deploy", *deploy_args,
            prefix/"node_modules/vite-plus"
@@ -188,12 +182,6 @@ class VitePlus < Formula
   end
 
   test do
-    if OS.ohos?
-      # /tmp is read-only
-      ENV["TMPDIR"] = testpath/"tmp"
-      mkdir_p ENV["TMPDIR"]
-    end
-
     # Use Homebrew node and skip the first-run setup prompt, which stops `vp` on the test PTY
     ENV["VP_NODE_MANAGER"] = "no"
 
