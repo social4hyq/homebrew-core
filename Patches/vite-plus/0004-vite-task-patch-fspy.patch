@@ -1,0 +1,10 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -442,3 +442,7 @@
+ # The installer binary is downloaded by users, so optimize for size.
+ [profile.release.package.vp_installer]
+ opt-level = "z"
++
++[patch."https://github.com/voidzero-dev/vite-task.git"]
++fspy = { path = "../vite-task/crates/fspy" }
++fspy_preload_unix = { path = "../vite-task/crates/fspy_preload_unix" }
