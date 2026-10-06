@@ -1,0 +1,107 @@
+OHOS: managed Node.js uses the openharmony-<arch> platform string and the ohos-node.com mirror by default.
+
+diff --git a/crates/vp_js_runtime/src/providers/node.rs b/crates/vp_js_runtime/src/providers/node.rs
+index abb9789..284a499 100644
+--- a/crates/vp_js_runtime/src/providers/node.rs
++++ b/crates/vp_js_runtime/src/providers/node.rs
+@@ -18,9 +18,13 @@ use crate::{
+ };
+ 
+ /// Default Node.js distribution base URL
+-#[cfg(not(target_env = "musl"))]
++#[cfg(not(any(target_env = "musl", target_env = "ohos")))]
+ const DEFAULT_NODE_DIST_URL: &str = "https://nodejs.org/dist";
+ 
++/// nodejs.org has no OpenHarmony builds; the community mirror serves them
++#[cfg(target_env = "ohos")]
++const DEFAULT_NODE_DIST_URL: &str = "https://ohos-node.com/dist";
++
+ /// Unofficial builds URL for musl (official nodejs.org only provides glibc binaries)
+ #[cfg(target_env = "musl")]
+ const DEFAULT_NODE_DIST_URL: &str = "https://unofficial-builds.nodejs.org/download/release";
+@@ -610,6 +614,12 @@ impl JsRuntimeProvider for NodeProvider {
+         if platform.os == Os::Linux {
+             return vt_str::format!("{os}-{arch}-musl");
+         }
++        // OpenHarmony ships Node.js as "node-v<version>-openharmony-<arch>";
++        // there is no "linux-arm64" build to fall back to.
++        #[cfg(target_env = "ohos")]
++        if platform.os == Os::Linux {
++            return vt_str::format!("openharmony-{arch}");
++        }
+         vt_str::format!("{os}-{arch}")
+     }
+ 
+@@ -719,6 +729,15 @@ mod tests {
+             (Platform { os: Os::Windows, arch: Arch::X64 }, "win-x64"),
+             (Platform { os: Os::Windows, arch: Arch::Arm64 }, "win-arm64"),
+         ];
++        #[cfg(target_env = "ohos")]
++        let cases = [
++            (Platform { os: Os::Linux, arch: Arch::X64 }, "openharmony-x64"),
++            (Platform { os: Os::Linux, arch: Arch::Arm64 }, "openharmony-arm64"),
++            (Platform { os: Os::Darwin, arch: Arch::X64 }, "darwin-x64"),
++            (Platform { os: Os::Darwin, arch: Arch::Arm64 }, "darwin-arm64"),
++            (Platform { os: Os::Windows, arch: Arch::X64 }, "win-x64"),
++            (Platform { os: Os::Windows, arch: Arch::Arm64 }, "win-arm64"),
++        ];
+ 
+         for (platform, expected) in cases {
+             assert_eq!(provider.platform_string(platform), expected);
+@@ -737,7 +756,7 @@ mod tests {
+                 provider.get_download_info("22.13.1", platform)
+             });
+ 
+-        #[cfg(not(target_env = "musl"))]
++        #[cfg(all(not(target_env = "musl"), not(target_env = "ohos")))]
+         {
+             assert_eq!(info.archive_filename, "node-v22.13.1-linux-x64.tar.gz");
+             assert_eq!(
+@@ -754,6 +773,23 @@ mod tests {
+                 panic!("Expected ShasumsFile verification");
+             }
+         }
++        #[cfg(target_env = "ohos")]
++        {
++            assert_eq!(info.archive_filename, "node-v22.13.1-openharmony-x64.tar.gz");
++            assert_eq!(
++                info.archive_url,
++                "https://ohos-node.com/dist/v22.13.1/node-v22.13.1-openharmony-x64.tar.gz"
++            );
++            assert_eq!(info.extracted_dir_name, "node-v22.13.1-openharmony-x64");
++            if let HashVerification::ShasumsFile { url, signature } = &info.hash_verification {
++                assert_eq!(url, "https://ohos-node.com/dist/v22.13.1/SHASUMS256.txt");
++                // The community mirror is not nodejs.org, so the signature is best-effort.
++                let signature = signature.as_ref().expect("signature URL is still provided");
++                assert!(!signature.required, "mirror signature must be best-effort");
++            } else {
++                panic!("Expected ShasumsFile verification");
++            }
++        }
+         #[cfg(target_env = "musl")]
+         {
+             assert_eq!(info.archive_filename, "node-v22.13.1-linux-x64-musl.tar.gz");
+@@ -970,6 +1006,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
+     }
+ 
+     #[tokio::test]
++    #[cfg_attr(target_env = "ohos", ignore = "ohos-node.com has no v20")]
+     async fn test_fetch_version_index() {
+         let vp_home = shared_vp_home();
+         vp_shared::EnvConfig::with_vars_async(
+@@ -1485,6 +1522,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
+     }
+ 
+     #[tokio::test]
++    #[cfg_attr(target_env = "ohos", ignore = "ohos-node.com has no v20")]
+     async fn test_resolve_lts_alias_codename_iron() {
+         let vp_home = shared_vp_home();
+         vp_shared::EnvConfig::with_vars_async(
+@@ -1519,6 +1557,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
+     }
+ 
+     #[tokio::test]
++    #[cfg_attr(target_env = "ohos", ignore = "ohos-node.com has no v20")]
+     async fn test_resolve_lts_alias_codename_case_insensitive() {
+         let vp_home = shared_vp_home();
+         vp_shared::EnvConfig::with_vars_async(

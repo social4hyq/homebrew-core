@@ -4,12 +4,12 @@ class VitePlus < Formula
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.0.0.tar.gz"
   sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
   license "MIT"
-  revision 15
+  revision 16
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r21"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "79a55944c998adc1255e9a4ec20be43a7f3a6f975f99e493d5595a16d4e79c39"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r23"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "31bb619431fd08987111455ea166ca887d8fdc7e0c092703545244441bcae366"
   end
 
   depends_on "cmake" => :build
@@ -84,7 +84,7 @@ class VitePlus < Formula
     end
 
     patch :p1 do
-      file "Patches/vite-plus/0002-managed-node-openharmony-platform.patch"
+      file "Patches/vite-plus/0002-managed-node-ohos.patch"
     end
 
     patch :p1 do
@@ -173,10 +173,10 @@ class VitePlus < Formula
 
   def caveats
     <<~EOS
-      On OpenHarmony, the first interactive start asks whether Vite+ should manage
-      your Node.js; answer No to keep using the system Node.js. A managed Node.js
-      needs a mirror that has OpenHarmony builds, as nodejs.org has none:
-        export VP_NODE_DIST_MIRROR=https://ohos-node.com/dist
+      On OpenHarmony, a managed Node.js is downloaded from the community mirror
+      ohos-node.com, as nodejs.org has no OpenHarmony builds. Downloads are checked
+      against its SHASUMS256.txt only, not a signature. To use another mirror:
+        export VP_NODE_DIST_MIRROR=https://example.com/dist
     EOS
   end
 
