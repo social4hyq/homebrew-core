@@ -1,0 +1,63 @@
+# OHOS never delivers SIGWINCH when a pane PTY is resized: TIOCSWINSZ succeeds
+# (herdr's own size bookkeeping stays correct), but the foreground app is
+# never notified — verified on-device with a foreground probe process that
+# its SIGWINCH handler never fires on herdr pane resize, while a manual
+# `kill -WINCH` redraws the app correctly. Kernels that do auto-deliver are
+# unaffected by an explicit signal (tmux does the same), so after every
+# resize notify the pane's foreground process group via tcgetpgrp() on the
+# PTY master fd — the same OHOS-proven primitive the agent-detection patches
+# use. Two sites: the plain resize path and the nudge path (which resizes
+# twice to force a redraw, so notify around both ioctls).
+diff --git a/src/pty/actor/unix.rs b/src/pty/actor/unix.rs
+index 4d57dd1..47979e8 100644
+--- a/src/pty/actor/unix.rs
++++ b/src/pty/actor/unix.rs
+@@ -971,6 +971,7 @@ impl PtyIoActorRunner {
+             resize.cell_width_px,
+             resize.cell_height_px,
+         ));
++        fd::notify_pty_resized(self.file.as_raw_fd());
+     }
+ 
+     fn nudge(&mut self, resize: PtyResize) {
+@@ -1009,6 +1010,7 @@ impl PtyIoActorRunner {
+             nudge.2,
+             nudge.3,
+         ));
++        fd::notify_pty_resized(self.file.as_raw_fd());
+         std::thread::sleep(Duration::from_millis(30));
+         self.log_resize_result(fd::resize_pty_fd(
+             self.file.as_raw_fd(),
+@@ -1017,6 +1019,7 @@ impl PtyIoActorRunner {
+             resize.cell_width_px,
+             resize.cell_height_px,
+         ));
++        fd::notify_pty_resized(self.file.as_raw_fd());
+     }
+ 
+     fn log_resize_result(&self, result: std::io::Result<()>) {
+diff --git a/src/pty/fd.rs b/src/pty/fd.rs
+index d3b730c..435f121 100644
+--- a/src/pty/fd.rs
++++ b/src/pty/fd.rs
+@@ -239,3 +239,20 @@ pub(crate) fn resize_pty_fd(
+     }
+     Ok(())
+ }
++
++/// Notify the pane's foreground process group that the terminal size changed.
++///
++/// Some kernels do not deliver SIGWINCH in response to TIOCSWINSZ (observed on
++/// HarmonyOS: no notification reaches the foreground group in the shell
++/// job-control topology), so the kernel notification cannot be relied on.
++/// Signal the foreground group explicitly after every resize instead, the
++/// same approach tmux uses. Best effort: a dead group is not an error.
++#[cfg(unix)]
++pub(crate) fn notify_pty_resized(fd: RawFd) {
++    let pgid = unsafe { libc::tcgetpgrp(fd) };
++    if pgid > 0 {
++        unsafe {
++            libc::kill(-pgid, libc::SIGWINCH);
++        }
++    }
++}

@@ -1,0 +1,80 @@
+# OHOS: a pane program that exits without resetting terminal mouse tracking
+# leaves the pane forwarding pointer reports into the shell prompt; clear them
+# when the agent process exits and the pane hands the terminal back to its shell.
+diff --git a/src/pane.rs b/src/pane.rs
+index f50fbf3..b86bc8a 100644
+--- a/src/pane.rs
++++ b/src/pane.rs
+@@ -486,6 +486,18 @@ fn clear_osc_evidence_for_agent_transition(terminal: &PaneTerminal, previous_age
+     }
+ }
+ 
++/// Clears mouse tracking when an agent process exits and the pane hands the
++/// terminal back to its shell. Programs that exit without resetting mouse
++/// reporting leave the pane forwarding pointer reports into the shell prompt.
++fn clear_mouse_reporting_for_agent_exit(
++    terminal: &PaneTerminal,
++    action: ForegroundShellAgentAction,
++) {
++    if action == ForegroundShellAgentAction::ReportProcessExit {
++        terminal.clear_mouse_reporting();
++    }
++}
++
+ fn apply_foreground_shell_agent_action(
+     agent_presence: &mut AgentDetectionPresence,
+     action: ForegroundShellAgentAction,
+@@ -967,6 +979,7 @@ fn spawn_basic_detection_task(
+                     foreground_is_pane_shell,
+                     foreground_shell_exit_reported,
+                 );
++                clear_mouse_reporting_for_agent_exit(&terminal, foreground_action);
+                 let changed = apply_foreground_shell_agent_action(
+                     &mut agent_presence,
+                     foreground_action,
+@@ -2933,6 +2946,7 @@ impl PaneRuntime {
+                                 foreground_is_pane_shell,
+                                 foreground_shell_exit_reported,
+                             );
++                            clear_mouse_reporting_for_agent_exit(&terminal, foreground_action);
+                             let changed = apply_foreground_shell_agent_action(
+                                 &mut agent_presence,
+                                 foreground_action,
+diff --git a/src/pane/terminal.rs b/src/pane/terminal.rs
+index 24379d2..1718830 100644
+--- a/src/pane/terminal.rs
++++ b/src/pane/terminal.rs
+@@ -445,6 +445,10 @@ impl PaneTerminal {
+         self.ghostty.mouse_reporting_enabled()
+     }
+ 
++    pub fn clear_mouse_reporting(&self) {
++        self.ghostty.clear_mouse_reporting();
++    }
++
+     pub fn modify_other_keys_level(&self) -> u8 {
+         self.ghostty.modify_other_keys_level()
+     }
+@@ -1847,6 +1851,22 @@ impl GhosttyPaneTerminal {
+             .is_ok_and(|core| core.terminal.mouse_tracking_enabled().unwrap_or(false))
+     }
+ 
++    /// Clears mouse tracking left enabled by a pane program that exited without
++    /// restoring it, so reports stop reaching the shell that follows it.
++    pub fn clear_mouse_reporting(&self) {
++        let Ok(mut core) = self.core.lock() else {
++            return;
++        };
++        for mode in [
++            MODE_MOUSE_X10,
++            MODE_MOUSE_PRESS_RELEASE,
++            MODE_MOUSE_BUTTON_MOTION,
++            MODE_MOUSE_ANY_MOTION,
++        ] {
++            let _ = core.terminal.mode_set(mode, false);
++        }
++    }
++
+     pub fn modify_other_keys_level(&self) -> u8 {
+         self.core
+             .lock()
