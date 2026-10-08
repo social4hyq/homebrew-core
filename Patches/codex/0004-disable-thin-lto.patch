@@ -1,0 +1,11 @@
+--- a/codex-rs/Cargo.toml
++++ b/codex-rs/Cargo.toml
+@@ -610,7 +610,7 @@
+ strip = "symbols"
+ 
+ [profile.release]
+-lto = "thin"
++lto = false
+ debug = "line-tables-only"
+ split-debuginfo = "off"
+ # Keep release binaries symbolicateable until packaging has archived the

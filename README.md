@@ -59,7 +59,7 @@ timeline
 
 ## 迁移说明
 
-上表「已合入」的 formula，以及 `codex`、`cc-switch`、`reasonix`、`deepseek-harness`、`nvm`、`ohos-bst-light`、`node-ohos`，现已由官方 core 提供；`opencode` 同样已迁移，`opencode-v1` 已下线、无替代。已装本 tap 旧版的，先 `brew uninstall social4hyq/core/<名>`，再 `brew install <名>`。特例：`cc-switch` 在官方 core 叫 `cc-switch-cli`，`node-ohos` 叫 `node`，`ohos-bst-light` 的命令名由 `self-sign` 变为 `selfsign`。其余下线项与改名见 [docs/offline-history.md](docs/offline-history.md)。
+上表「已合入」的 formula，以及 `cc-switch`、`reasonix`、`deepseek-harness`、`nvm`、`ohos-bst-light`、`node-ohos`，现已由官方 core 提供；`opencode` 同样已迁移，`opencode-v1` 已下线、无替代。`codex` 例外：本 tap 曾随上游化下线，现为承载待上游的 OHOS `close_range` 修复而临时并行维护（本 tap 版本以限定名 `social4hyq/core/codex` 安装，验证后随上游合并再次下线）。已装本 tap 旧版的，先 `brew uninstall social4hyq/core/<名>`，再 `brew install <名>`。特例：`cc-switch` 在官方 core 叫 `cc-switch-cli`，`node-ohos` 叫 `node`，`ohos-bst-light` 的命令名由 `self-sign` 变为 `selfsign`。其余下线项与改名见 [docs/offline-history.md](docs/offline-history.md)。
 
 `qemu-aarch64` 独立包已由本 tap 的完整 `qemu` 替代。迁移前先执行 `brew uninstall social4hyq/core/qemu-aarch64`，再执行 `brew install social4hyq/core/qemu`，避免同名命令链接冲突；原有 `qemu-aarch64 -strace <程序>` 用法保持可用。
 

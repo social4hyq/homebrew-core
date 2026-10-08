@@ -1,0 +1,11 @@
+--- a/codex-rs/utils/pty/src/posix_child.rs
++++ b/codex-rs/utils/pty/src/posix_child.rs
+@@ -110,7 +110,7 @@
+             ChildDropPolicy::ReapOnly => Some(reaper::sender()?),
+         };
+ 
+-        #[cfg(all(target_os = "linux", target_env = "gnu"))]
++        #[cfg(all(target_os = "linux", any(target_env = "gnu", target_env = "ohos")))]
+         let addchdir = {
+             // SAFETY: dlsym returns the documented function signature when present.
+             let symbol = unsafe {

@@ -1,0 +1,19 @@
+--- a/codex-rs/utils/pty/src/linux_fds.rs
++++ b/codex-rs/utils/pty/src/linux_fds.rs
+@@ -8,6 +8,16 @@
+ use std::os::fd::RawFd;
+ 
+ pub(crate) fn close_inherited_fds_except(preserved_fds: &[RawFd]) {
++    // OpenHarmony/HarmonyOS (target_env = "ohos"): the kernel's seccomp policy
++    // terminates the process with SIGSYS when close_range is invoked, instead
++    // of returning an error, so the best-effort fallback below never gets a
++    // chance to run. Skip the close_range fast path entirely and go straight
++    // to the /proc/self/fd sweep.
++    if cfg!(target_env = "ohos") {
++        close_from_proc(preserved_fds);
++        return;
++    }
++
+     // Mark rather than close: std::process still needs its CLOEXEC error
+     // pipe if exec fails. Do not alter flags on explicitly preserved FDs.
+     let mut first = 3_u32;

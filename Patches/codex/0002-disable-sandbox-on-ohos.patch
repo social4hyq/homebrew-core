@@ -1,0 +1,11 @@
+--- a/codex-rs/sandboxing/src/manager.rs
++++ b/codex-rs/sandboxing/src/manager.rs
+@@ -49,7 +49,7 @@
+ pub fn get_platform_sandbox(windows_sandbox_enabled: bool) -> Option<SandboxType> {
+     if cfg!(target_os = "macos") {
+         Some(SandboxType::MacosSeatbelt)
+-    } else if cfg!(target_os = "linux") {
++    } else if cfg!(target_os = "linux") && !cfg!(target_env = "ohos") {
+         Some(SandboxType::LinuxSeccomp)
+     } else if cfg!(target_os = "windows") {
+         if windows_sandbox_enabled {
