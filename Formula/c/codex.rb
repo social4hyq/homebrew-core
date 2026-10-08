@@ -10,6 +10,11 @@ class Codex < Formula
     regex(/^rust[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-v0.159.1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "18cc128204f0c28d8d3f41a22b6d05bdef662553030f08e4e2e9a5eff9575acd"
+  end
+
   depends_on "cmake" => :build
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
