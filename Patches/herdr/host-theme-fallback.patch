@@ -1,0 +1,220 @@
+# Some host terminals never answer the OSC 10/11 default-color queries (observed
+# on the OHOS terminal). Panes then keep the VT library's built-in
+# white-on-black defaults, so reverse video (SGR 7) resolves to black-on-white
+# and becomes invisible on a light terminal — a TUI that highlights its mouse
+# selection that way (e.g. codex) looks like it has no selection at all.
+# Resolve reverse video against an app-palette fallback in that case, without
+# changing the pane's reported default colors (applications infer light/dark
+# from those, and a wrong guess re-themes the whole app).
+--- a/src/terminal_theme.rs
++++ b/src/terminal_theme.rs
+@@ -36,6 +36,12 @@
+     pub foreground: Option<RgbColor>,
+     pub background: Option<RgbColor>,
+     pub palette: [Option<RgbColor>; 256],
++    /// App-palette (foreground, background) used to resolve reverse video
++    /// (SGR 7) when the host terminal never reports its own default colors.
++    /// Kept separate from `foreground`/`background` so it never changes the
++    /// pane's reported default colors: applications infer light/dark from
++    /// those, and a wrong guess re-themes the whole app.
++    pub inverse_fallback: Option<(RgbColor, RgbColor)>,
+ }
+ 
+ impl Default for TerminalTheme {
+@@ -44,6 +50,7 @@
+             foreground: None,
+             background: None,
+             palette: [None; 256],
++            inverse_fallback: None,
+         }
+     }
+ }
+@@ -77,6 +84,12 @@
+     pub fn is_empty(self) -> bool {
+         self.foreground.is_none() && self.background.is_none()
+     }
++
++    /// Attach (or clear) the reverse-video fallback colors.
++    pub fn with_inverse_fallback(mut self, fallback: Option<(RgbColor, RgbColor)>) -> Self {
++        self.inverse_fallback = fallback;
++        self
++    }
+ }
+ 
+ pub fn host_terminal_theme_query_sequence(include_palette: bool) -> String {
+--- a/src/app/theme_sync.rs
++++ b/src/app/theme_sync.rs
+@@ -21,6 +21,7 @@
+         &mut self,
+         theme: crate::terminal_theme::TerminalTheme,
+     ) -> bool {
++        let theme = theme.with_inverse_fallback(palette_inverse_fallback(&self.state.palette));
+         if theme == self.state.host_terminal_theme {
+             return false;
+         }
+@@ -39,6 +40,7 @@
+         }
+         self.state.theme_name = theme_name;
+         self.state.palette = palette;
++        self.refresh_pane_inverse_fallback();
+         self.render_dirty.request_generic();
+         self.render_notify.notify_one();
+         true
+@@ -45,5 +47,19 @@
+     }
+ 
++    // Keep the reverse-video fallback (used when the host terminal never
++    // reports its own default colors) in sync with the palette.
++    fn refresh_pane_inverse_fallback(&mut self) {
++        let theme = self
++            .state
++            .host_terminal_theme
++            .with_inverse_fallback(palette_inverse_fallback(&self.state.palette));
++        if theme == self.state.host_terminal_theme {
++            return;
++        }
++        self.state.host_terminal_theme = theme;
++        self.apply_host_terminal_theme_to_panes();
++    }
++
+     fn apply_host_terminal_appearance_to_panes(&self) {
+         for runtime in self.terminal_runtimes.values() {
+             runtime.apply_host_terminal_appearance(self.state.host_terminal_appearance);
+@@ -59,3 +75,30 @@
+         self.render_notify.notify_one();
+     }
+ }
++
++fn palette_default_color(color: ratatui::style::Color) -> Option<crate::terminal_theme::RgbColor> {
++    match color {
++        ratatui::style::Color::Rgb(r, g, b) => Some(crate::terminal_theme::RgbColor { r, g, b }),
++        _ => None,
++    }
++}
++
++/// Palette (foreground, background) used to resolve reverse video (SGR 7)
++/// when the host terminal never reports its own default colors. Consumed only
++/// by the pane renderer; it is never written into the pane as its default
++/// colors, so applications keep inferring the terminal appearance as before.
++pub(super) fn palette_inverse_fallback(
++    palette: &crate::app::state::Palette,
++) -> Option<(
++    crate::terminal_theme::RgbColor,
++    crate::terminal_theme::RgbColor,
++)> {
++    let background = match palette.panel_bg {
++        ratatui::style::Color::Reset => palette.surface_dim,
++        color => color,
++    };
++    Some((
++        palette_default_color(palette.text)?,
++        palette_default_color(background)?,
++    ))
++}
+--- a/src/app/mod.rs
++++ b/src/app/mod.rs
+@@ -442,6 +442,9 @@
+         let agent_manifest_summaries = Vec::new();
+         let theme_runtime = theme_runtime_config(config, true);
+         let (theme_palette, theme_name) = resolve_effective_theme(&theme_runtime, None);
++        // Used only to resolve reverse video when the host terminal reports no
++        // default colors; never applied as the pane's default colors.
++        let pane_inverse_fallback = theme_sync::palette_inverse_fallback(&theme_palette);
+ 
+         let mut state = AppState {
+             terminals: std::collections::HashMap::new(),
+@@ -520,7 +523,8 @@
+             plugin_command_logs: Vec::new(),
+             next_plugin_command_log_id: 1,
+             plugin_commands_in_flight: 0,
+-            host_terminal_theme: crate::terminal_theme::TerminalTheme::default(),
++            host_terminal_theme: crate::terminal_theme::TerminalTheme::default()
++                .with_inverse_fallback(pane_inverse_fallback),
+             host_cell_size: crate::kitty_graphics::HostCellSize::default(),
+             session_dirty: false,
+             terminal_runtime_shutdowns: Vec::new(),
+--- a/src/pane/terminal.rs
++++ b/src/pane/terminal.rs
+@@ -2391,6 +2391,14 @@
+             .and_then(|c| ghostty_default_fg(c.foreground, host_theme, initial_default_foreground));
+         let resolved_fg = colors.map(|c| ghostty_color(c.foreground));
+         let resolved_bg = colors.map(|c| ghostty_color(c.background));
++        let inverse_fallback = host_theme
++            .inverse_fallback
++            .map_or((None, None), |(fg, bg)| {
++                (
++                    host_theme.foreground.is_none().then(|| theme_color(fg)),
++                    host_theme.background.is_none().then(|| theme_color(bg)),
++                )
++            });
+         let palette_overrides = colors
+             .zip(terminal.default_palette().ok())
+             .and_then(|(colors, default)| PaletteOverrides::new(&colors.palette, &default));
+@@ -2428,6 +2436,7 @@
+                         default_bg,
+                         resolved_fg,
+                         resolved_bg,
++                        inverse_fallback,
+                         palette_overrides.as_ref(),
+                     );
+                     let symbol = match ghostty_buffer_symbol_into(
+@@ -2660,6 +2669,14 @@
+         .and_then(|c| ghostty_default_fg(c.foreground, host_theme, initial_default_foreground));
+     let resolved_fg = colors.map(|c| ghostty_color(c.foreground));
+     let resolved_bg = colors.map(|c| ghostty_color(c.background));
++    let inverse_fallback = host_theme
++        .inverse_fallback
++        .map_or((None, None), |(fg, bg)| {
++            (
++                host_theme.foreground.is_none().then(|| theme_color(fg)),
++                host_theme.background.is_none().then(|| theme_color(bg)),
++            )
++        });
+     let palette_overrides = colors
+         .zip(terminal.default_palette().ok())
+         .and_then(|(colors, default)| PaletteOverrides::new(&colors.palette, &default));
+@@ -2715,6 +2732,7 @@
+                 default_bg,
+                 resolved_fg,
+                 resolved_bg,
++                inverse_fallback,
+                 palette_overrides.as_ref(),
+             );
+             let symbol = match ghostty_buffer_symbol_into(
+@@ -3270,6 +3288,7 @@
+     default_bg: Option<Color>,
+     resolved_fg: Option<Color>,
+     resolved_bg: Option<Color>,
++    inverse_fallback: (Option<Color>, Option<Color>),
+     palette_overrides: Option<&PaletteOverrides>,
+ ) -> Style {
+     let mut fg = basic
+@@ -3294,12 +3313,14 @@
+         // actual terminal background color before swapping.  Otherwise
+         // the swapped fg becomes None (Color::Reset) which the host
+         // terminal renders as its default foreground — the same hue as
+-        // the new bg, making inverse text invisible.
++        // the new bg, making inverse text invisible.  When the host never
++        // reported its own default colors, prefer the app-palette fallback
++        // so the swapped pair still contrasts with what the user sees.
+         if bg.is_none() {
+-            bg = resolved_bg;
++            bg = inverse_fallback.1.or(resolved_bg);
+         }
+         if fg.is_none() {
+-            fg = resolved_fg;
++            fg = inverse_fallback.0.or(resolved_fg);
+         }
+         std::mem::swap(&mut fg, &mut bg);
+     }
+@@ -3587,6 +3608,10 @@
+     Color::Rgb(color.r, color.g, color.b)
+ }
+ 
++fn theme_color(color: crate::terminal_theme::RgbColor) -> Color {
++    Color::Rgb(color.r, color.g, color.b)
++}
++
+ fn lines_to_text(lines: Vec<String>) -> String {
+     let text = lines.join("\n");
+     if text.is_empty() {
