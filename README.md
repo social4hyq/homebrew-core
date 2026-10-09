@@ -10,7 +10,6 @@ brew trust social4hyq/core   # Homebrew 6.0+ 必须显式信任第三方 tap
 
 brew install claude-code                # 本 tap：Claude Code CLI
 brew install vite-plus                  # 本 tap：前端工具链（`vp` 命令）
-brew install social4hyq/core/qemu       # 本 tap：完整 QEMU（含 qemu-aarch64 和 -strace）
 brew install hishell-font               # 本 tap：终端图标字体
 brew install opencode                   # 官方 core：AI 编码代理
 brew install starship                   # 官方 core：终端提示符（配合 hishell-font）
@@ -27,7 +26,7 @@ timeline
     2026-06 : cryptography : hermes-agent : yazi
     2026-08 : uv : codegraph : zellij
     2026-09 : llvm@21 : lld@21 : libsecret : herdr : starship : pnpm
-    2026-10 : bun : opencode
+    2026-10 : bun : opencode : dtc : vde : qemu
 ```
 
 | Formula | 作用 | 上游 ⭐ | 状态 | PR |
@@ -47,10 +46,12 @@ timeline
 | `pnpm` | 快速、省磁盘的 Node 包管理器（v12 为 Rust 重写） | 37k | ✅ 已合入 | [!20806](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20806) |
 | `bun` | 集运行时、包管理、测试、打包于一体的极速 JavaScript 工具链 | 96k | ✅ 已合入 | [!21450](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21450) |
 | `opencode` | 开源的终端 AI 编程助手，自带 75+ 模型提供商接入（v2） | 211k | ✅ 已合入 | [!21455](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21455) |
+| `dtc` | 设备树工具链：编译、反编译 DTS/DTB，并提供 libfdt 与配套操作工具 | — | ✅ 已合入 | — |
+| `vde` | 用户态虚拟以太网交换与连接工具，可将虚拟机、进程和网络命名空间接入虚拟网络 | — | ✅ 已合入 | — |
+| `qemu` | 通用机器模拟器与虚拟化器：可运行完整客户机系统或跨架构用户态程序，并提供磁盘镜像工具 | — | ✅ 已合入 | — |
 | `vite-plus` | VoidZero 的 Web 统一工具链，一个 `vp` 命令覆盖创建、开发、检查、格式化、测试、构建 | 5.9k | 计划合入 | — |
-| `zcode` | AI 编程工作台，终端 agent（TUI）与 Web IDE 双形态 | 7.3k | 待定（刚开源，尚不稳定） | — |
+| `zcode` | AI 编程工作台，终端 agent（TUI）与 Web IDE 双形态 | 7.3k | 已下线（公开源码更新滞后于产品发布，维护投入与收益不匹配） | — |
 | `ohos-compat-shim` | 兜底鸿蒙与标准 Linux 底层差异的 LD_PRELOAD 兼容层，随 `claude-code` 自动安装 | — | 待定 | — |
-| `qemu` | 多架构系统与用户态模拟、磁盘工具，包含 `qemu-aarch64 -strace` | — | 本 tap 提供 | — |
 | `claude-code` / `claude-code.latest` | Anthropic 官方 Claude Code 终端版（stable / latest 两个频道） | 149k | 无计划（闭源，只能拉取官方二进制） | — |
 | `sshport` | 把远程开发机的服务端口映射到本机同名端口 | — | 无计划（内部小工具） | — |
 | `hishell-font` | 为鸿蒙 PC 终端（HiShell）安装并配置 Nerd Font | — | 无计划（内部小工具） | — |
@@ -61,7 +62,7 @@ timeline
 
 上表「已合入」的 formula，以及 `codex`、`cc-switch`、`reasonix`、`deepseek-harness`、`nvm`、`ohos-bst-light`、`node-ohos`，现已由官方 core 提供；`opencode` 同样已迁移，`opencode-v1` 已下线、无替代。已装本 tap 旧版的，先 `brew uninstall social4hyq/core/<名>`，再 `brew install <名>`。特例：`cc-switch` 在官方 core 叫 `cc-switch-cli`，`node-ohos` 叫 `node`，`ohos-bst-light` 的命令名由 `self-sign` 变为 `selfsign`。其余下线项与改名见 [docs/offline-history.md](docs/offline-history.md)。
 
-`qemu-aarch64` 独立包已由本 tap 的完整 `qemu` 替代。迁移前先执行 `brew uninstall social4hyq/core/qemu-aarch64`，再执行 `brew install social4hyq/core/qemu`，避免同名命令链接冲突；原有 `qemu-aarch64 -strace <程序>` 用法保持可用。
+`dtc`、`vde`、`qemu` 已合入 Harmonybrew 官方 core。已安装本 tap 旧版的用户，请先执行 `brew uninstall social4hyq/core/dtc social4hyq/core/vde social4hyq/core/qemu`，再执行 `brew install dtc vde qemu`。
 
 ## 已知限制
 
