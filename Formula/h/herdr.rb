@@ -33,24 +33,24 @@ class Herdr < Formula
 
     # crates/ghostty-vt/build.rs's Rust-TARGET→zig-target table doesn't know OHOS; route onto musl.
     patch do
-      file "Patches/herdr/build-rs-zig-target-ohos.patch"
+      file "Patches/herdr/0001-build-rs-zig-target-ohos.patch"
     end
 
     # OHOS procfs has no tty foreground group/task children; fall back to
     # tcgetpgrp() on the pane's own PTY master fd for agent detection.
     patch do
-      file "Patches/herdr/pane-agent-detection-tcgetpgrp.patch"
+      file "Patches/herdr/0002-pane-agent-detection-tcgetpgrp.patch"
     end
 
     # Same procfs gap in the agent start/prompt gates, which look it up themselves.
     patch do
-      file "Patches/herdr/agent-gate-tty-foreground.patch"
+      file "Patches/herdr/0003-agent-gate-tty-foreground.patch"
     end
 
     # OHOS also never delivers SIGWINCH on PTY resize, so pane apps never learn
     # about layout changes; notify the foreground group explicitly after resize.
     patch do
-      file "Patches/herdr/pty-resize-notify-winch.patch"
+      file "Patches/herdr/0004-pty-resize-notify-winch.patch"
     end
 
     # The OHOS terminal never answers the OSC 10/11 color queries, so pane
@@ -58,7 +58,7 @@ class Herdr < Formula
     # selection highlight) resolves to black-on-white and disappears on a light
     # terminal; fall back to the configured app palette instead.
     patch do
-      file "Patches/herdr/host-theme-fallback.patch"
+      file "Patches/herdr/0005-host-theme-fallback.patch"
     end
   end
 
