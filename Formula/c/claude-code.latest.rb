@@ -1,10 +1,10 @@
 class ClaudeCodeLatest < Formula
   desc "Anthropic Claude Code CLI (latest release channel)"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.300.tgz"
-  sha256 "9fc567977a0f445cb15f8f5d038c3d0e3ef49a8644c6b10aa050cbabefa6bb25"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.300.tgz"
+  sha256 "10d8c7045093d74b35238daf2a19eef16465d99eb6f8ac7e9eeaa2aee917fb29"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 3
+  revision 4
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/latest"
@@ -12,13 +12,15 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.300-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a079926c7035db09c9bab025e50c3cfe9dd5df8ea2f03cae7feec86ebaf54c3b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.300-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f743a819f64041f068ffc69751404d4cb0e61c14905f81d4a080161719fc29bc"
   end
 
+  depends_on "glibc"
   depends_on "node"
   depends_on "ohos-compat-shim"
   depends_on "ohos-selfsign"
+  depends_on "patchelf"
 
   conflicts_with "claude-code", because: "both install the `claude` binary"
 
@@ -46,15 +48,24 @@ class ClaudeCodeLatest < Formula
           echo "First run: downloading Claude Code #{version} (~230 MB), one-time setup..." >&2
           TMP="$(mktemp -d -p "$CLAUDE_CODE_TMPDIR")"
           PATH="$HOMEBREW_PREFIX/opt/node/bin:$PATH" npm install --prefix "$TMP" --force --no-save --no-audit --no-fund \
-            --ignore-scripts --loglevel=error --fetch-retries=5 "@anthropic-ai/claude-code-linux-arm64-musl@#{version}" >&2
-          PKG="$TMP/node_modules/@anthropic-ai/claude-code-linux-arm64-musl/claude"
+            --ignore-scripts --loglevel=error --fetch-retries=5 "@anthropic-ai/claude-code-linux-arm64@#{version}" >&2
+          PKG="$TMP/node_modules/@anthropic-ai/claude-code-linux-arm64/claude"
+          "$HOMEBREW_PREFIX/opt/patchelf/bin/patchelf" \
+            --set-interpreter "$HOMEBREW_PREFIX/opt/glibc/lib/ld-linux-aarch64.so.1" "$PKG"
           "$HOMEBREW_PREFIX/opt/ohos-selfsign/bin/selfsign" "$PKG"
           mkdir -p "${BIN%/*}" && mv "$PKG" "$BIN.part" && mv "$BIN.part" "$BIN"
           rm -rf "$TMP" # the final exec skips the EXIT trap
         fi
         [ -z "$HELD" ] || rm -rf "$LOCK"
       fi
-      exec "$HOMEBREW_PREFIX/opt/ohos-compat-shim/bin/ohos-shim" "$BIN" "$@"
+      SHIM="$HOMEBREW_PREFIX/opt/ohos-compat-shim/lib/libohos_compat_glibc.so"
+      if [ -f "$SHIM" ]; then
+        export LD_PRELOAD="$SHIM"
+      else
+        unset LD_PRELOAD
+        echo "claude: $SHIM not found (needs ohos-compat-shim >= 0.8.0), idle CPU will be high" >&2
+      fi
+      exec "$BIN" "$@"
     SH
     chmod 0755, bin/"claude"
   end
