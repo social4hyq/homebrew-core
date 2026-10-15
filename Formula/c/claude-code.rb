@@ -1,9 +1,10 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.292.tgz"
-  sha256 "c8c6e7c69b15d5fca64d346c57a1975f32e6013e4e00d2d52afc1091573e344b"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.292.tgz"
+  sha256 "763250852824215ac3b02a5985688a742a243899ef689dd66c5b99a01f270003"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
+  revision 1
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/stable"
@@ -11,12 +12,13 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.292-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f88b881100c689d30d3d499ad67df16aa247167d96b54220240a4d444172f6c4"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.292-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1e8607c5cdfff5bc88bf2cac0dbaee657298c0729530a26d378aa1bf287bbb1"
   end
 
-  depends_on "ohos-compat-shim"
+  depends_on "glibc"
   depends_on "ohos-selfsign"
+  depends_on "patchelf"
 
   conflicts_with "claude-code.latest", because: "both install the `claude` binary"
 
@@ -26,7 +28,7 @@ class ClaudeCode < Formula
       #!/bin/sh
       set -eu
       export CLAUDE_CODE_TMPDIR="${CLAUDE_CODE_TMPDIR:-/data/storage/el2/base/cache}"
-      BIN="${HOMEBREW_CACHE:-$HOME/.cache/homebrew}/#{name}/#{version}/claude"
+      BIN="${HOMEBREW_CACHE:-$HOME/.cache/homebrew}/#{name}/#{pkg_version}/claude"
       if [ ! -x "$BIN" ]; then
         LOCK="${BIN%/*}.lock"
         HELD="" TMP=""
@@ -46,12 +48,15 @@ class ClaudeCode < Formula
           curl -fL# --retry 3 "#{stable.url}" -o "$TMP/pkg.tgz"
           echo "#{stable.checksum}  $TMP/pkg.tgz" | sha256sum -c - >/dev/null
           tar -xzf "$TMP/pkg.tgz" -C "$TMP"
+          "$HOMEBREW_PREFIX/opt/patchelf/bin/patchelf" \
+            --set-interpreter "$HOMEBREW_PREFIX/opt/glibc/lib/ld-linux-aarch64.so.1" "$TMP/package/claude"
           "$HOMEBREW_PREFIX/opt/ohos-selfsign/bin/selfsign" "$TMP/package/claude"
           mkdir -p "${BIN%/*}" && mv "$TMP/package/claude" "$BIN.part" && mv "$BIN.part" "$BIN"
         fi
         [ -z "$HELD" ] || rm -rf "$LOCK"
       fi
-      exec "$HOMEBREW_PREFIX/opt/ohos-compat-shim/bin/ohos-shim" "$BIN" "$@"
+      unset LD_PRELOAD
+      exec "$BIN" "$@"
     SH
     chmod 0755, bin/"claude"
   end
