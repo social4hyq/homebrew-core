@@ -2,7 +2,7 @@ class OhosCompatShim < Formula
   desc "LD_PRELOAD compat shim for HarmonyOS-sandboxed aarch64/musl binaries"
   homepage "https://github.com/social4hyq/ohos-compat-shim"
   url "https://github.com/social4hyq/ohos-compat-shim.git",
-      tag: "v0.7.0", revision: "8525da867b0b7b00955b9637e6458d1d6fd999e7"
+      tag: "v0.8.0", revision: "d6c323788f8972560ed23f46c65ce16050d16a1e"
   license "MIT"
 
   livecheck do
@@ -10,14 +10,16 @@ class OhosCompatShim < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.7.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2da381516c12285b5b2393ff2e708d86114a144fa399cecc40771977249d35a4"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.8.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "95c36ce01b343e8902f5bbe6e79dbb41780ea180d7f9df179e8f0d8138e4f329"
   end
 
   # HarmonyOS sandbox seccomp-filters close_range/fchmodat2 and returns unexpected
   # errno from getpwuid_r/tmpfile/splice. Shim intercepts at libc-symbol level,
   # falls back only on the documented symptom (safe no-op elsewhere).
+  depends_on "glibc" => :build
   depends_on "ohos-sdk" => :build
+  depends_on "glibc" => :test
 
   def install
     # Bypass superenv cc shim (injects DT_RUNPATH making bottle non-relocatable);
@@ -28,6 +30,13 @@ class OhosCompatShim < Formula
            "src/ohos_compat_shim.c",
            "-O2", "-Wall", "-Wextra", "-ldl"
     lib.install "libohos_compat.so"
+
+    # Same source built for processes running on Harmonybrew's glibc, whose ld.so
+    # cannot load the musl preload above.
+    system "make", "libohos_compat_glibc.so", "CFLAGS=-O2 -Wall -Wextra",
+           "OHOS_NDK_HOME=#{formula_opt_prefix("ohos-sdk")}/native",
+           "GLIBC_PREFIX=#{formula_opt_prefix("glibc")}"
+    lib.install "libohos_compat_glibc.so"
 
     # Companion .so for ohos-compat-check's dlopen/.dynsym probe (see src/checkdep.c).
     system clang, "-shared", "-fPIC",
@@ -54,6 +63,10 @@ class OhosCompatShim < Formula
 
   test do
     assert_path_exists lib/"libohos_compat.so"
+    assert_path_exists lib/"libohos_compat_glibc.so"
+    ld_so = formula_opt_prefix("glibc")/"lib/ld-linux-aarch64.so.1"
+    assert_match "glibc", shell_output("#{ld_so} --preload #{lib}/libohos_compat_glibc.so " \
+                                       "#{formula_opt_bin("glibc")}/getconf GNU_LIBC_VERSION")
     assert_path_exists lib/"libohos_compat_checkdep.so"
     assert_path_exists libexec/"ohos-compat-check"
     assert_match "usage: ohos-shim", shell_output("#{bin}/ohos-shim 2>&1", 64)
