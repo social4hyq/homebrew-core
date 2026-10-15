@@ -1,10 +1,10 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.292.tgz"
-  sha256 "763250852824215ac3b02a5985688a742a243899ef689dd66c5b99a01f270003"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.292.tgz"
+  sha256 "c8c6e7c69b15d5fca64d346c57a1975f32e6013e4e00d2d52afc1091573e344b"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 1
+  revision 2
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/stable"
@@ -16,9 +16,8 @@ class ClaudeCode < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "e1e8607c5cdfff5bc88bf2cac0dbaee657298c0729530a26d378aa1bf287bbb1"
   end
 
-  depends_on "glibc"
+  depends_on "ohos-compat-shim"
   depends_on "ohos-selfsign"
-  depends_on "patchelf"
 
   conflicts_with "claude-code.latest", because: "both install the `claude` binary"
 
@@ -48,15 +47,12 @@ class ClaudeCode < Formula
           curl -fL# --retry 3 "#{stable.url}" -o "$TMP/pkg.tgz"
           echo "#{stable.checksum}  $TMP/pkg.tgz" | sha256sum -c - >/dev/null
           tar -xzf "$TMP/pkg.tgz" -C "$TMP"
-          "$HOMEBREW_PREFIX/opt/patchelf/bin/patchelf" \
-            --set-interpreter "$HOMEBREW_PREFIX/opt/glibc/lib/ld-linux-aarch64.so.1" "$TMP/package/claude"
           "$HOMEBREW_PREFIX/opt/ohos-selfsign/bin/selfsign" "$TMP/package/claude"
           mkdir -p "${BIN%/*}" && mv "$TMP/package/claude" "$BIN.part" && mv "$BIN.part" "$BIN"
         fi
         [ -z "$HELD" ] || rm -rf "$LOCK"
       fi
-      unset LD_PRELOAD
-      exec "$BIN" "$@"
+      exec "$HOMEBREW_PREFIX/opt/ohos-compat-shim/bin/ohos-shim" "$BIN" "$@"
     SH
     chmod 0755, bin/"claude"
   end
