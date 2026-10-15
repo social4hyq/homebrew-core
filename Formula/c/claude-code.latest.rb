@@ -4,7 +4,7 @@ class ClaudeCodeLatest < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.300.tgz"
   sha256 "9fc567977a0f445cb15f8f5d038c3d0e3ef49a8644c6b10aa050cbabefa6bb25"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 2
+  revision 3
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/latest"
@@ -12,10 +12,11 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.300-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "507356e0dc464ddc9b72351e827d1658328cabf0a4180e69806007619235ac5f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.300-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a079926c7035db09c9bab025e50c3cfe9dd5df8ea2f03cae7feec86ebaf54c3b"
   end
 
+  depends_on "node"
   depends_on "ohos-compat-shim"
   depends_on "ohos-selfsign"
 
@@ -44,11 +45,12 @@ class ClaudeCodeLatest < Formula
           echo $$ > "$LOCK/pid"
           echo "First run: downloading Claude Code #{version} (~230 MB), one-time setup..." >&2
           TMP="$(mktemp -d -p "$CLAUDE_CODE_TMPDIR")"
-          curl -fL# --retry 3 "#{stable.url}" -o "$TMP/pkg.tgz"
-          echo "#{stable.checksum}  $TMP/pkg.tgz" | sha256sum -c - >/dev/null
-          tar -xzf "$TMP/pkg.tgz" -C "$TMP"
-          "$HOMEBREW_PREFIX/opt/ohos-selfsign/bin/selfsign" "$TMP/package/claude"
-          mkdir -p "${BIN%/*}" && mv "$TMP/package/claude" "$BIN.part" && mv "$BIN.part" "$BIN"
+          PATH="$HOMEBREW_PREFIX/opt/node/bin:$PATH" npm install --prefix "$TMP" --force --no-save --no-audit --no-fund \
+            --ignore-scripts --loglevel=error --fetch-retries=5 "@anthropic-ai/claude-code-linux-arm64-musl@#{version}" >&2
+          PKG="$TMP/node_modules/@anthropic-ai/claude-code-linux-arm64-musl/claude"
+          "$HOMEBREW_PREFIX/opt/ohos-selfsign/bin/selfsign" "$PKG"
+          mkdir -p "${BIN%/*}" && mv "$PKG" "$BIN.part" && mv "$BIN.part" "$BIN"
+          rm -rf "$TMP" # the final exec skips the EXIT trap
         fi
         [ -z "$HELD" ] || rm -rf "$LOCK"
       fi
