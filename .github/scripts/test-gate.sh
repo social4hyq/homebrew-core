@@ -9,7 +9,7 @@ source "$(dirname "$0")/lib.sh"
 # timeout instead of failing fast with a diagnosable message.
 if timeout 180 docker exec "$CONTAINER" bash -lc "$BREW_ENV brew test $FORMULA"; then
   echo "brew test passed"
-elif [ "$UPLOAD" = "true" ]; then
+elif [ "$UPLOAD" = "true" ] || [ "${SOURCE_ONLY:-false}" = "true" ]; then
   echo "::error::brew test $FORMULA failed or timed out after 180s, refusing to publish. Fix the formula's test block first"
   exit 1
 else

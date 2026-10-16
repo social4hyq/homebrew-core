@@ -81,9 +81,15 @@ fi
 cexec "gem install bundler --no-document --force" \
   || echo "::warning::gem install bundler failed; brew test/audit may hit the bundler self-upgrade Gemfile bug"
 
+BUILD_FLAG=--build-bottle
+if [ "${SOURCE_ONLY:-false}" = "true" ]; then
+  BUILD_FLAG=--build-from-source
+  ENV_PREFIX="env -u HOMEBREW_OHOS_BOTTLE_BINARY_SIGN "
+fi
+
 # atomgit CDN has transient 404s: retry once after 90s; brew reuses partial work
 for i in 1 2; do
-  if cexec "${ENV_PREFIX}${BREW_ENV} brew install --build-bottle --verbose $TAP/$FORMULA" 2>&1 | tee build.log; then
+  if cexec "${ENV_PREFIX}${BREW_ENV} brew install $BUILD_FLAG --verbose $TAP/$FORMULA" 2>&1 | tee build.log; then
     break
   fi
   [ "$i" = 2 ] && exit 1

@@ -91,6 +91,7 @@ env:
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
   # Inputs pass through env (never interpolated into shell) and a whitelist check
   FORMULA: ${{ inputs.formula }}
+  SOURCE_ONLY: ${{ inputs.formula == 'claude-code.latest' }}
   UPLOAD: ${{ inputs.upload }}
   PUSH_REF: ${{ inputs.push_ref }}
   RUN_NUMBER: ${{ github.run_number }}
@@ -115,6 +116,9 @@ jobs:
           [[ "$FORMULA" =~ ^[A-Za-z0-9@+._-]+$ ]] \
             || { echo "::error::invalid formula name: $FORMULA (allowed: [A-Za-z0-9@+._-])"; exit 1; }
 
+      - name: Source-only policy tests
+        run: python3 .github/scripts/tests/test_source_only.py
+
       - name: Start OHOS container
         run: .github/scripts/setup-container.sh
 
@@ -132,13 +136,14 @@ jobs:
             'for f in /root/.cache/Homebrew/Logs/*/*; do echo "--- $f"; tail -30 "$f"; done' || true
 
       - name: Bottle
+        if: env.SOURCE_ONLY != 'true'
         id: bottle
         env:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
         run: .github/scripts/bottle.sh
 
       - name: Upload bottle as artifact
-        if: success() && !inputs.upload
+        if: success() && !inputs.upload && env.SOURCE_ONLY != 'true'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: bottle-${{ inputs.formula }}-run${{ github.run_number }}
@@ -147,7 +152,7 @@ jobs:
 
       - name: Publish to atomgit and push
         id: publish
-        if: inputs.upload
+        if: inputs.upload && env.SOURCE_ONLY != 'true'
         env:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -161,13 +166,13 @@ jobs:
 
       - name: Verify poured bottle
         id: verify
-        if: inputs.upload
+        if: inputs.upload && env.SOURCE_ONLY != 'true'
         run: .github/scripts/verify-poured.sh
 
       # publish failed before the bottle commit reached main → the release is
       # orphaned and safe to delete
       - name: Roll back atomgit release
-        if: failure() && inputs.upload && steps.publish.outcome == 'failure'
+        if: failure() && inputs.upload && env.SOURCE_ONLY != 'true' && steps.publish.outcome == 'failure'
         env:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
           TAG: ${{ steps.bottle.outputs.tag }}
@@ -176,7 +181,7 @@ jobs:
       # verify failed after main was pushed → main references the bad tag;
       # auto-deleting would make it worse, needs a human decision
       - name: Bad release advisory
-        if: failure() && inputs.upload && steps.verify.outcome == 'failure'
+        if: failure() && inputs.upload && env.SOURCE_ONLY != 'true' && steps.verify.outcome == 'failure'
         env:
           TAG: ${{ steps.bottle.outputs.tag }}
         run: |
