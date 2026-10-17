@@ -35,6 +35,14 @@ FAIL=()
 COLLIDE=()
 for name in $(jq -r '.[]' <<< "$CHANGED_JSON"); do
   echo "== brew audit $name =="
+  audit_cops=$(jq -r --arg name "$name" '.[$name] // [] | join(",")' \
+    "$(dirname "$0")/../audit-exceptions.json")
+  audit_options=""
+  if [ -n "$audit_cops" ]; then
+    # Preserve audit's default strict-cop exclusion when adding a formula exception.
+    audit_options=" --except-cops FormulaAuditStrict,$audit_cops"
+    echo "Audit exceptions for $name: $audit_cops"
+  fi
 
   # rubygems mirror (mirrors.aliyun.com) can lag publishing a brand-new gem
   # version by hours; audit's bundler dependency resolution still probes the
@@ -43,7 +51,7 @@ for name in $(jq -r '.[]' <<< "$CHANGED_JSON"); do
   # a manual rerun later.
   audit_ok=false
   for i in 1 2; do
-    if cbrew "audit --formula $TAP/$name"; then
+    if cbrew "audit --formula$audit_options $TAP/$name"; then
       audit_ok=true
       break
     fi
