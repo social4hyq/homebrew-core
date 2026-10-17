@@ -1,10 +1,9 @@
 class ClaudeCodeLatest < Formula
   desc "Anthropic Claude Code CLI (latest release channel)"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.301.tgz"
-  sha256 "d27ad4a8b40f52ddb9ad7952fda14f794198740980b2f5a133d8e8d5f7a5068e"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.302.tgz"
+  sha256 "ee76ceb9b79b3b975f86c2726b9f57ed216916de1d78d54daa5cd5ec9374c568"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 2
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/latest"
@@ -12,8 +11,8 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.301-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "63e44447e72f3376009cd6d257af315838e5f8780452aa2f638c5523b3574e34"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.302-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f626897051e087cba921ddc431aa9ca7e0c5141e15a147866a2cc3555bd73696"
   end
 
   depends_on "ohos-compat-shim"
@@ -23,20 +22,38 @@ class ClaudeCodeLatest < Formula
 
   def install
     rm_r buildpath.children # keep the official README/LICENSE out of the bottle
+    (libexec/"install-claude").write <<~SH
+      #!/bin/sh
+      set -eu
+      dest="$1"
+      signer="$2"
+      work=$(mktemp -d)
+      trap 'rm -rf "$work"' EXIT HUP INT TERM
+      curl -fL --retry 3 -o "$work/package.tgz" "#{stable.url}"
+      echo "#{stable.checksum}  $work/package.tgz" | sha256sum -c -
+      tar -xzf "$work/package.tgz" -C "$work"
+      "$signer" "$work/package/claude"
+      mkdir -p "$dest"
+      cp "$work/package/claude" "$dest/claude.new"
+      chmod +x "$dest/claude.new"
+      mv -f "$dest/claude.new" "$dest/claude"
+    SH
+    chmod 0755, libexec/"install-claude"
     (bin/"claude").write_env_script formula_opt_bin("ohos-compat-shim")/"ohos-shim",
                                   ["--", var/name/pkg_version/"claude"],
                                   CLAUDE_CODE_TMPDIR: "${CLAUDE_CODE_TMPDIR:-/data/storage/el2/base/cache}"
   end
 
-  def post_install
-    stable.stage do
-      system formula_opt_bin("ohos-selfsign")/"selfsign", "claude"
-      (var/name/pkg_version).install "claude"
-    end
+  post_install_steps do
+    run "install-claude", base: :libexec,
+                          args: ["{{var}}/claude-code.latest/{{version}}",
+                                 "{{HOMEBREW_PREFIX}}/opt/ohos-selfsign/bin/selfsign"],
+                          writable_paths: ["claude-code.latest"], writable_base: :var,
+                          network_access: true
   end
 
   test do
-    post_install unless (var/name/pkg_version/"claude").executable?
+    run_post_install_steps unless (var/name/pkg_version/"claude").executable?
     assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
   end
 end
