@@ -62,7 +62,9 @@ env:
   # root-caused to stdout/stderr R_AARCH64_COPY relocs resolved to NULL by
   # OHOS musl ld.so (fixed in ohos-compat-shim 3874ab4), not the
   # regex-automata panic an earlier revision of this comment claimed.
-  ALLOWLIST: "claude-code claude-code.latest zcode"
+  # vite-plus allowlisted too: tag tarball plus version-locked rolldown/vite/
+  # vite-task git pins, synced by a custom path in autobump.sh.
+  ALLOWLIST: "claude-code claude-code.latest zcode vite-plus"
   IMAGE: ${{ vars.OHOS_CI_IMAGE }} # unchanged mirror of the SWR ci-runner — see sync-ci-image.yml
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
