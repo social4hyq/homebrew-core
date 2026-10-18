@@ -1,36 +1,38 @@
 OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package names and `<upstream>-<N>` versions).
 
+diff --git a/crates/vp_pm_cli/src/package_manager.rs b/crates/vp_pm_cli/src/package_manager.rs
+index 43b78bd..9bc1085 100644
 --- a/crates/vp_pm_cli/src/package_manager.rs
 +++ b/crates/vp_pm_cli/src/package_manager.rs
-@@ -937,6 +937,21 @@ fn write_latest_version_cache(path: &AbsolutePath, version: &str) -> io::Result<
- }
- 
- async fn get_latest_version(package_manager_type: PackageManagerType) -> Result<Str, Error> {
+@@ -1041,6 +1041,21 @@ async fn resolve_dist_tag(
+     tag: &str,
+     npm_config: &NpmConfig,
+ ) -> Result<Str, Error> {
 +    // The registry's `latest` may not be ported to OHOS yet; use the newest ported version.
 +    #[cfg(target_env = "ohos")]
-+    if let Some(ported) = fetch_ported_versions(package_manager_type).await? {
++    if tag == "latest"
++        && let Some(ported) = fetch_ported_versions(package_manager_type, npm_config).await?
++    {
++        let package = ohos_port_package(package_manager_type).unwrap_or_default();
 +        return ported.iter().max().map(|v| Str::from(v.to_string())).ok_or_else(|| {
 +            Error::PackageManagerVersionNotFound {
 +                name: package_manager_type.to_string().into(),
-+                version: "latest".into(),
-+                url: get_npm_package_metadata_url(
-+                    ohos_port_package(package_manager_type).unwrap_or_default(),
-+                )
-+                .into(),
++                version: tag.into(),
++                url: npm_config.package_metadata_url(package).into(),
 +            }
 +        });
 +    }
 +
-     let cache_path = latest_version_cache_path(package_manager_type)?;
-     let cached = read_latest_version_cache(&cache_path);
-     if let Some((version, true)) = &cached {
-@@ -1051,6 +1066,14 @@ async fn resolve_latest_satisfying_version(
+     let urls = dist_tag_packages(package_manager_type)
+         .iter()
+         .map(|package_name| npm_config.package_version_url(package_name, tag))
+@@ -1224,6 +1239,14 @@ async fn resolve_latest_satisfying_version(
      if matches!(package_manager_type, PackageManagerType::Yarn) {
-         versions.extend(fetch_registry_versions("@yarnpkg/cli-dist").await?);
+         versions.extend(fetch_registry_versions("@yarnpkg/cli-dist", npm_config).await?);
      }
 +    // Only versions ported to OHOS can be installed; pnpm < 12 is plain JS and needs no port.
 +    #[cfg(target_env = "ohos")]
-+    if let Some(ported) = fetch_ported_versions(package_manager_type).await? {
++    if let Some(ported) = fetch_ported_versions(package_manager_type, npm_config).await? {
 +        versions.retain(|v| {
 +            (matches!(package_manager_type, PackageManagerType::Pnpm) && v.major < 12)
 +                || ported.contains(v)
@@ -39,7 +41,7 @@ OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package 
  
      let best = versions
          .iter()
-@@ -1383,13 +1406,100 @@ fn open_lock_file(lock_path: &Path) -> io::Result<File> {
+@@ -1658,13 +1681,102 @@ fn open_lock_file(lock_path: &Path) -> io::Result<File> {
      fs::OpenOptions::new().read(true).write(true).create(true).truncate(false).open(lock_path)
  }
  
@@ -61,22 +63,21 @@ OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package 
 +
 +/// The upstream `X.Y.Z` that a port version `X.Y.Z-<revision>` republishes.
 +#[cfg(target_env = "ohos")]
-+fn port_upstream_version(version: &node_semver::Version) -> Option<node_semver::Version> {
-+    match version.pre_release.as_slice() {
-+        [node_semver::Identifier::Numeric(_)] => {
-+            Some(node_semver::Version::new(version.major, version.minor, version.patch))
-+        }
-+        _ => None,
++fn port_upstream_version(version: &js_semver::Version) -> Option<js_semver::Version> {
++    let revision = version.pre_release.to_string();
++    if revision.is_empty() || !revision.bytes().all(|byte| byte.is_ascii_digit()) {
++        return None;
 +    }
++    Some(js_semver::Version::new(version.major, version.minor, version.patch))
 +}
 +
 +/// The highest published port revision of `upstream`.
 +#[cfg(target_env = "ohos")]
 +fn pick_port_version(
 +    upstream: &str,
-+    published: &[node_semver::Version],
-+) -> Option<node_semver::Version> {
-+    let upstream = node_semver::Version::parse(upstream).ok()?;
++    published: &[js_semver::Version],
++) -> Option<js_semver::Version> {
++    let upstream = js_semver::Version::parse(upstream).ok()?;
 +    published.iter().filter(|v| port_upstream_version(v).as_ref() == Some(&upstream)).max().cloned()
 +}
 +
@@ -84,9 +85,10 @@ OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package 
 +#[cfg(target_env = "ohos")]
 +async fn fetch_ported_versions(
 +    package_manager_type: PackageManagerType,
-+) -> Result<Option<Vec<node_semver::Version>>, Error> {
++    npm_config: &NpmConfig,
++) -> Result<Option<Vec<js_semver::Version>>, Error> {
 +    let Some(package) = ohos_port_package(package_manager_type) else { return Ok(None) };
-+    let published = fetch_registry_versions(package).await?;
++    let published = fetch_registry_versions(package, npm_config).await?;
 +    let mut versions: Vec<_> = published.iter().filter_map(port_upstream_version).collect();
 +    versions.sort();
 +    versions.dedup();
@@ -99,8 +101,9 @@ OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package 
 +    bin_name: &str,
 +    platform_package_name: &str,
 +    version: &Str,
++    npm_config: &NpmConfig,
 +) -> Result<Str, Error> {
-+    let published = fetch_registry_versions(platform_package_name).await?;
++    let published = fetch_registry_versions(platform_package_name, npm_config).await?;
 +    pick_port_version(version, &published).map(|v| Str::from(v.to_string())).ok_or_else(|| {
 +        let mut ported: Vec<_> = published.iter().filter_map(port_upstream_version).collect();
 +        ported.sort();
@@ -124,6 +127,7 @@ OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package 
 +    _bin_name: &str,
 +    _platform_package_name: &str,
 +    version: &Str,
++    _npm_config: &NpmConfig,
 +) -> Result<Str, Error> {
 +    Ok(version.clone())
 +}
@@ -141,25 +145,27 @@ OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package 
          ("linux", "aarch64") => "@oven/bun-linux-aarch64",
          #[cfg(target_env = "musl")]
          ("linux", "x86_64") => "@oven/bun-linux-x64-musl",
-@@ -1446,13 +1556,15 @@ async fn download_bun_package_manager(
+@@ -1722,14 +1834,17 @@ async fn download_bun_package_manager(
      let platform_package_name = get_bun_platform_package_name()?;
      // The declared hash never covers the platform tarball, so verify it
      // against the registry's `dist.integrity` for the platform package.
--    let platform_hash = fetch_platform_integrity("bun", &platform_package_name, version).await?;
-+    let platform_version = platform_package_version("bun", &platform_package_name, version).await?;
-+    let platform_hash =
-+        fetch_platform_integrity("bun", &platform_package_name, &platform_version).await?;
++    let platform_version =
++        platform_package_version("bun", &platform_package_name, version, npm_config).await?;
+     let platform_hash =
+-        fetch_platform_integrity("bun", &platform_package_name, version, npm_config).await?;
++        fetch_platform_integrity("bun", &platform_package_name, &platform_version, npm_config)
++            .await?;
  
      let parent_dir = target_dir.parent().unwrap();
      tokio::fs::create_dir_all(parent_dir).await?;
  
      // Download the platform-specific package directly
--    let platform_tgz_url = get_npm_package_tgz_url(&platform_package_name, version);
-+    let platform_tgz_url = get_npm_package_tgz_url(&platform_package_name, &platform_version);
+-    let platform_tgz_url = npm_config.package_tgz_url(&platform_package_name, version);
++    let platform_tgz_url = npm_config.package_tgz_url(&platform_package_name, &platform_version);
      // Keep the TempDir guard alive so a failure path cleans up the temp dir.
      let tmp_dir = tempfile::tempdir_in(parent_dir)?;
      let target_dir_tmp = tmp_dir.path().to_path_buf();
-@@ -1542,7 +1654,9 @@ fn get_pnpm_platform_package_name() -> Result<&'static str, Error> {
+@@ -1820,7 +1935,9 @@ fn get_pnpm_platform_package_name() -> Result<&'static str, Error> {
          ("macos", "x86_64") => "@pnpm/exe.darwin-x64",
          #[cfg(target_env = "musl")]
          ("linux", "aarch64") => "@pnpm/exe.linux-arm64-musl",
@@ -170,36 +176,41 @@ OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package 
          ("linux", "aarch64") => "@pnpm/exe.linux-arm64",
          #[cfg(target_env = "musl")]
          ("linux", "x86_64") => "@pnpm/exe.linux-x64-musl",
-@@ -1646,13 +1760,15 @@ async fn download_pnpm_native_package_manager(
+@@ -1929,14 +2046,17 @@ async fn download_pnpm_native_package_manager(
  
      // The declared hash never covers the platform tarball, so verify it
      // against the registry's `dist.integrity` for the platform package.
--    let platform_hash = fetch_platform_integrity("pnpm", platform_package_name, version).await?;
-+    let platform_version = platform_package_version("pnpm", platform_package_name, version).await?;
-+    let platform_hash =
-+        fetch_platform_integrity("pnpm", platform_package_name, &platform_version).await?;
++    let platform_version =
++        platform_package_version("pnpm", platform_package_name, version, npm_config).await?;
+     let platform_hash =
+-        fetch_platform_integrity("pnpm", platform_package_name, version, npm_config).await?;
++        fetch_platform_integrity("pnpm", platform_package_name, &platform_version, npm_config)
++            .await?;
  
      let parent_dir = target_dir.parent().unwrap();
      tokio::fs::create_dir_all(parent_dir).await?;
  
      // Download the platform-specific package directly
--    let platform_tgz_url = get_npm_package_tgz_url(platform_package_name, version);
-+    let platform_tgz_url = get_npm_package_tgz_url(platform_package_name, &platform_version);
+-    let platform_tgz_url = npm_config.package_tgz_url(platform_package_name, version);
++    let platform_tgz_url = npm_config.package_tgz_url(platform_package_name, &platform_version);
      // Keep the TempDir guard alive so a failure path cleans up the temp dir.
      let tmp_dir = tempfile::tempdir_in(parent_dir)?;
      let target_dir_tmp = tmp_dir.path().to_path_buf();
-@@ -3665,8 +3781,19 @@ mod tests {
+@@ -4414,8 +4534,22 @@ mod tests {
          vp_shared::EnvConfig::with_vars_async(
              [(env_vars::VP_HOME, vp_home.as_os_str())],
              |_| async move {
 +                // OHOS only has the versions ohos-npm-ports has ported: use the newest one
 +                #[cfg(target_env = "ohos")]
-+                let pnpm_version = fetch_ported_versions(PackageManagerType::Pnpm)
-+                    .await
-+                    .unwrap()
-+                    .and_then(|versions| versions.into_iter().max())
-+                    .expect("no pnpm version ported to OHOS")
-+                    .to_string();
++                let pnpm_version = fetch_ported_versions(
++                    PackageManagerType::Pnpm,
++                    &NpmConfig::load(),
++                )
++                .await
++                .unwrap()
++                .and_then(|versions| versions.into_iter().max())
++                .expect("no pnpm version ported to OHOS")
++                .to_string();
 +                #[cfg(not(target_env = "ohos"))]
 +                let pnpm_version = "12.0.0-beta.0".to_string();
 +                let pnpm_version = pnpm_version.as_str();
@@ -209,7 +220,7 @@ OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package 
                  assert!(result.is_ok(), "{result:?}");
                  let (target_dir, package_name, version) = result.unwrap();
                  // native binary plus pnpm/pnpx shims, no JS entrypoint
-@@ -3677,11 +3804,11 @@ mod tests {
+@@ -4426,11 +4560,11 @@ mod tests {
                  assert!(is_exists_file(target_dir.join("bin/pnpm.cmd")).unwrap());
                  assert!(is_exists_file(target_dir.join("bin/pnpx")).unwrap());
                  assert_eq!(package_name, "pnpm");
@@ -223,7 +234,7 @@ OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package 
                  assert!(result.is_ok(), "{result:?}");
                  remove_dir_all_force(target_dir).await.unwrap();
              },
-@@ -4234,6 +4361,9 @@ mod tests {
+@@ -4984,6 +5118,9 @@ mod tests {
          let result = get_bun_platform_package_name();
          assert!(result.is_ok(), "Should return a platform package name");
          let name = result.unwrap();
@@ -233,7 +244,7 @@ OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package 
          assert!(
              name.starts_with("@oven/bun-"),
              "Package name should start with @oven/bun-, got: {name}"
-@@ -4289,6 +4419,9 @@ mod tests {
+@@ -5039,6 +5176,9 @@ mod tests {
          let result = get_pnpm_platform_package_name();
          assert!(result.is_ok(), "Should return a platform package name");
          let name = result.unwrap();
@@ -243,242 +254,3 @@ OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package 
          assert!(
              name.starts_with("@pnpm/exe."),
              "Package name should start with @pnpm/exe., got: {name}"
-@@ -4300,6 +4433,238 @@ mod tests {
-         );
-     }
- 
-+    #[cfg(target_env = "ohos")]
-+    fn versions(list: &[&str]) -> Vec<node_semver::Version> {
-+        list.iter().map(|v| node_semver::Version::parse(v).unwrap()).collect()
-+    }
-+
-+    #[test]
-+    #[cfg(target_env = "ohos")]
-+    fn test_pick_port_version_takes_highest_revision() {
-+        let published = versions(&["1.4.2-1", "1.4.2-10", "1.4.2-2", "1.4.3-1", "1.4.1-7"]);
-+        assert_eq!(pick_port_version("1.4.2", &published).unwrap().to_string(), "1.4.2-10");
-+        assert_eq!(pick_port_version("1.4.3", &published).unwrap().to_string(), "1.4.3-1");
-+    }
-+
-+    #[test]
-+    #[cfg(target_env = "ohos")]
-+    fn test_pick_port_version_ignores_unported_and_non_revision_versions() {
-+        // a prerelease tag is not a port revision; `1.4.2` itself is the upstream version
-+        let published = versions(&["1.4.2", "1.4.2-beta.1", "1.4.2-rc", "1.4.2+build"]);
-+        assert!(pick_port_version("1.4.2", &published).is_none());
-+        assert!(pick_port_version("9.9.9", &versions(&["1.4.2-1"])).is_none());
-+        assert!(pick_port_version("not-a-version", &versions(&["1.4.2-1"])).is_none());
-+    }
-+
-+    #[test]
-+    #[cfg(target_env = "ohos")]
-+    fn test_port_upstream_version_strips_revision() {
-+        let v = node_semver::Version::parse("12.8.1-2").unwrap();
-+        assert_eq!(port_upstream_version(&v).unwrap().to_string(), "12.8.1");
-+        assert!(port_upstream_version(&node_semver::Version::parse("12.8.1").unwrap()).is_none());
-+        assert!(
-+            port_upstream_version(&node_semver::Version::parse("12.8.1-beta.0").unwrap()).is_none()
-+        );
-+    }
-+
-+    #[test]
-+    #[cfg(target_env = "ohos")]
-+    fn test_ohos_port_package_only_for_native_managers() {
-+        assert_eq!(ohos_port_package(PackageManagerType::Bun), Some(OHOS_BUN_PACKAGE));
-+        assert_eq!(ohos_port_package(PackageManagerType::Pnpm), Some(OHOS_PNPM_PACKAGE));
-+        assert_eq!(ohos_port_package(PackageManagerType::Npm), None);
-+        assert_eq!(ohos_port_package(PackageManagerType::Yarn), None);
-+    }
-+
-+    /// A registry that only serves the OHOS port of `package` with the given port versions.
-+    #[cfg(target_env = "ohos")]
-+    fn mock_port_registry<'a>(
-+        server: &'a httpmock::MockServer,
-+        package: &str,
-+        binary_path: &str,
-+        revisions: &[&str],
-+    ) -> Vec<httpmock::Mock<'a>> {
-+        use sha2::{Digest, Sha512};
-+
-+        let packument: serde_json::Map<String, serde_json::Value> =
-+            revisions.iter().map(|v| ((*v).to_string(), serde_json::json!({}))).collect();
-+        let mut mocks = vec![server.mock(|when, then| {
-+            when.method(httpmock::Method::GET).path(format!("/{package}"));
-+            then.status(200).json_body(serde_json::json!({ "versions": packument }));
-+        })];
-+        let filename = package.rsplit('/').next().unwrap();
-+        for revision in revisions {
-+            let tgz = create_native_package_tgz(binary_path, revision.as_bytes());
-+            let integrity =
-+                format!("sha512-{}", base64_simd::STANDARD.encode_to_string(Sha512::digest(&tgz)));
-+            mocks.push(server.mock(|when, then| {
-+                when.method(httpmock::Method::GET).path(format!("/{package}/{revision}"));
-+                then.status(200)
-+                    .json_body(serde_json::json!({ "dist": { "integrity": integrity } }));
-+            }));
-+            mocks.push(server.mock(|when, then| {
-+                when.method(httpmock::Method::GET)
-+                    .path(format!("/{package}/-/{filename}-{revision}.tgz"));
-+                then.status(200).header("content-type", "application/octet-stream").body(tgz);
-+            }));
-+        }
-+        mocks
-+    }
-+
-+    #[cfg(target_env = "ohos")]
-+    fn create_native_package_tgz(binary_path: &str, content: &[u8]) -> Vec<u8> {
-+        let mut tar_builder = tar::Builder::new(Vec::new());
-+        let mut header = tar::Header::new_gnu();
-+        header.set_size(content.len() as u64);
-+        header.set_mode(0o755);
-+        tar_builder
-+            .append_data(
-+                &mut header,
-+                format!("package/{binary_path}"),
-+                std::io::Cursor::new(content),
-+            )
-+            .unwrap();
-+        let mut gz_data = Vec::new();
-+        {
-+            let mut encoder =
-+                flate2::write::GzEncoder::new(&mut gz_data, flate2::Compression::default());
-+            std::io::copy(
-+                &mut std::io::Cursor::new(tar_builder.into_inner().unwrap()),
-+                &mut encoder,
-+            )
-+            .unwrap();
-+        }
-+        gz_data
-+    }
-+
-+    #[tokio::test]
-+    #[cfg(target_env = "ohos")]
-+    async fn test_download_bun_from_ohos_port_picks_highest_revision() {
-+        let vp_home = create_temp_dir();
-+        let server = httpmock::MockServer::start();
-+        let mocks = mock_port_registry(
-+            &server,
-+            OHOS_BUN_PACKAGE,
-+            "bin/bun",
-+            &["1.4.2-1", "1.4.2-2", "1.4.3-1"],
-+        );
-+
-+        vp_shared::EnvConfig::with_vars_async(
-+            [
-+                (env_vars::VP_HOME, vp_home.path().as_os_str()),
-+                (env_vars::NPM_CONFIG_REGISTRY, std::ffi::OsStr::new(&server.base_url())),
-+            ],
-+            |_| async {
-+                let (install_dir, name, version) =
-+                    download_package_manager(PackageManagerType::Bun, "1.4.2", None)
-+                        .await
-+                        .expect("the ported bun should download");
-+                assert_eq!((name.as_str(), version.as_str()), ("bun", "1.4.2"));
-+                // the cache keeps the upstream version, the payload is the highest revision
-+                assert!(install_dir.as_path().to_string_lossy().contains("/bun/1.4.2/bun"));
-+                assert_eq!(fs::read(install_dir.join("bin/bun.native")).unwrap(), b"1.4.2-2");
-+                assert!(is_exists_file(install_dir.join("bin/bun")).unwrap());
-+            },
-+        )
-+        .await;
-+        // metadata, version metadata and tarball of revision 2 only
-+        let hits: Vec<usize> = mocks.iter().map(httpmock::Mock::hits).collect();
-+        assert_eq!(hits, vec![1, 0, 0, 1, 1, 0, 0]);
-+    }
-+
-+    #[tokio::test]
-+    #[cfg(target_env = "ohos")]
-+    async fn test_download_pnpm_from_ohos_port_verifies_integrity() {
-+        let vp_home = create_temp_dir();
-+        let server = httpmock::MockServer::start();
-+        mock_port_registry(&server, OHOS_PNPM_PACKAGE, "pnpm", &["12.8.1-1", "12.8.1-2"]);
-+
-+        vp_shared::EnvConfig::with_vars_async(
-+            [
-+                (env_vars::VP_HOME, vp_home.path().as_os_str()),
-+                (env_vars::NPM_CONFIG_REGISTRY, std::ffi::OsStr::new(&server.base_url())),
-+            ],
-+            |_| async {
-+                let (install_dir, _, version) =
-+                    download_package_manager(PackageManagerType::Pnpm, "12.8.1", None)
-+                        .await
-+                        .expect("the ported pnpm should download");
-+                assert_eq!(version.as_str(), "12.8.1");
-+                assert_eq!(fs::read(install_dir.join("bin/pnpm.native")).unwrap(), b"12.8.1-2");
-+                assert!(is_exists_file(install_dir.join("bin/pnpx")).unwrap());
-+            },
-+        )
-+        .await;
-+
-+        // a registry whose tarball does not match its dist.integrity must be rejected
-+        let tampered_home = create_temp_dir();
-+        let tampered = httpmock::MockServer::start();
-+        let tgz = create_native_package_tgz("pnpm", b"tampered");
-+        tampered.mock(|when, then| {
-+            when.method(httpmock::Method::GET).path(format!("/{OHOS_PNPM_PACKAGE}"));
-+            then.status(200).json_body(serde_json::json!({ "versions": { "12.8.1-1": {} } }));
-+        });
-+        tampered.mock(|when, then| {
-+            when.method(httpmock::Method::GET).path(format!("/{OHOS_PNPM_PACKAGE}/12.8.1-1"));
-+            then.status(200).json_body(serde_json::json!({
-+                "dist": { "integrity": format!("sha512-{}", base64_simd::STANDARD.encode_to_string([0u8; 64])) }
-+            }));
-+        });
-+        tampered.mock(|when, then| {
-+            when.method(httpmock::Method::GET)
-+                .path(format!("/{OHOS_PNPM_PACKAGE}/-/pnpm-exe.openharmony-arm64-12.8.1-1.tgz"));
-+            then.status(200).body(tgz);
-+        });
-+        vp_shared::EnvConfig::with_vars_async(
-+            [
-+                (env_vars::VP_HOME, tampered_home.path().as_os_str()),
-+                (env_vars::NPM_CONFIG_REGISTRY, std::ffi::OsStr::new(&tampered.base_url())),
-+            ],
-+            |_| async {
-+                let result =
-+                    download_package_manager(PackageManagerType::Pnpm, "12.8.1", None).await;
-+                assert!(matches!(result, Err(Error::HashMismatch { .. })), "{result:?}");
-+            },
-+        )
-+        .await;
-+    }
-+
-+    #[tokio::test]
-+    #[cfg(target_env = "ohos")]
-+    async fn test_ohos_port_resolution_only_considers_ported_versions() {
-+        let vp_home = create_temp_dir();
-+        let server = httpmock::MockServer::start();
-+        // note: no `/bun` or `/bun/latest` is served, so the official registry data is not used
-+        mock_port_registry(
-+            &server,
-+            OHOS_BUN_PACKAGE,
-+            "bin/bun",
-+            &["1.4.2-1", "1.4.2-2", "1.4.3-1"],
-+        );
-+
-+        vp_shared::EnvConfig::with_vars_async(
-+            [
-+                (env_vars::VP_HOME, vp_home.path().as_os_str()),
-+                (env_vars::NPM_CONFIG_REGISTRY, std::ffi::OsStr::new(&server.base_url())),
-+            ],
-+            |_| async {
-+                let latest =
-+                    resolve_package_manager_version(PackageManagerType::Bun, "latest").await;
-+                assert_eq!(latest.unwrap().as_str(), "1.4.3");
-+
-+                // a version without a port is reported with the ported ones, not 404'd on the tarball
-+                let result = download_package_manager(PackageManagerType::Bun, "1.5.0", None).await;
-+                let Err(error @ Error::InvalidArgument(_)) = result else {
-+                    panic!("an unported version must be rejected: {result:?}");
-+                };
-+                let message = error.to_string();
-+                assert!(message.contains("bun@1.5.0 is not available on OpenHarmony"), "{message}");
-+                assert!(message.contains("(1.4.2, 1.4.3)"), "{message}");
-+            },
-+        )
-+        .await;
-+    }
-+
-     #[tokio::test]
-     #[cfg(not(windows))]
-     async fn test_create_pnpm_native_shim_files() {

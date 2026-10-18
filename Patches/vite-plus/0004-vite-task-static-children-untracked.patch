@@ -1,7 +1,7 @@
 OHOS: run static programs untracked (no seccomp user-notification) and keep their task out of the cache.
 
 diff --git a/crates/fspy/src/unix/mod.rs b/crates/fspy/src/unix/mod.rs
-index 194cdd2..946b1b4 100644
+index 4a83971c..44628565 100644
 --- a/crates/fspy/src/unix/mod.rs
 +++ b/crates/fspy/src/unix/mod.rs
 @@ -4,6 +4,9 @@ mod syscall_handler;
@@ -11,10 +11,10 @@ index 194cdd2..946b1b4 100644
 +#[cfg(target_env = "ohos")]
 +mod untracked;
 +
- use std::{io, path::Path};
- 
  #[cfg(target_os = "linux")]
-@@ -125,6 +128,13 @@ impl SpyImpl {
+ use std::sync::Arc;
+ use std::{io, path::Path};
+@@ -133,6 +136,13 @@ impl SpyImpl {
              },
          )
          .map_err(|err| SpawnError::Injection(err.into()))?;
@@ -30,7 +30,7 @@ index 194cdd2..946b1b4 100644
  
 diff --git a/crates/fspy/src/unix/untracked.rs b/crates/fspy/src/unix/untracked.rs
 new file mode 100644
-index 0000000..fe41a6b
+index 00000000..fe41a6b4
 --- /dev/null
 +++ b/crates/fspy/src/unix/untracked.rs
 @@ -0,0 +1,29 @@
@@ -64,7 +64,7 @@ index 0000000..fe41a6b
 +    }
 +}
 diff --git a/crates/fspy_preload_unix/Cargo.toml b/crates/fspy_preload_unix/Cargo.toml
-index e74c0d6..39352de 100644
+index e74c0d63..39352dec 100644
 --- a/crates/fspy_preload_unix/Cargo.toml
 +++ b/crates/fspy_preload_unix/Cargo.toml
 @@ -18,6 +18,7 @@ fspy_nostd = { workspace = true }
@@ -76,7 +76,7 @@ index e74c0d6..39352de 100644
  [lints]
  workspace = true
 diff --git a/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs b/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
-index 0c05e32..69f4699 100644
+index 729162d0..2c80f866 100644
 --- a/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
 +++ b/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
 @@ -41,9 +41,14 @@ fn handle_exec(
@@ -95,10 +95,10 @@ index 0c05e32..69f4699 100644
              },
          )
 diff --git a/crates/fspy_preload_unix/src/lib.rs b/crates/fspy_preload_unix/src/lib.rs
-index eefa17b..416995a 100644
+index 6c4e10b3..b0379cc8 100644
 --- a/crates/fspy_preload_unix/src/lib.rs
 +++ b/crates/fspy_preload_unix/src/lib.rs
-@@ -5,6 +5,8 @@
+@@ -3,6 +3,8 @@
  
  #[cfg(all(unix, not(target_env = "musl")))]
  mod client;
@@ -109,7 +109,7 @@ index eefa17b..416995a 100644
  #[cfg(all(unix, not(target_env = "musl")))]
 diff --git a/crates/fspy_preload_unix/src/untracked.rs b/crates/fspy_preload_unix/src/untracked.rs
 new file mode 100644
-index 0000000..93863ea
+index 00000000..93863ea3
 --- /dev/null
 +++ b/crates/fspy_preload_unix/src/untracked.rs
 @@ -0,0 +1,38 @@

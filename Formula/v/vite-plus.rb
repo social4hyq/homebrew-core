@@ -1,15 +1,14 @@
 class VitePlus < Formula
   desc "Unified toolchain and entry point for web development"
   homepage "https://viteplus.dev"
-  url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.0.0.tar.gz"
-  sha256 "2ae9ff19a0c514e55ba76f4025cead2faff67c91da7dce152c60b71a040e5192"
+  url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.3.0.tar.gz"
+  sha256 "cbdeebe3348012d0c63220aa7b762004d9f8e2a7198642f61339541b009592ca"
   license "MIT"
-  revision 16
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.0.0-r23"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "31bb619431fd08987111455ea166ca887d8fdc7e0c092703545244441bcae366"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.3.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f494b8f31f0c0e695eec8a443cda8b8e1e59854bd74e7e94cc93385bee947c3e"
   end
 
   depends_on "cmake" => :build
@@ -22,8 +21,8 @@ class VitePlus < Formula
 
   resource "rolldown" do
     url "https://github.com/rolldown/rolldown.git",
-        revision: "8df421985114ecfaf52cce038d4a5a6ea8c05408"
-    version "8df421985114ecfaf52cce038d4a5a6ea8c05408"
+        revision: "c9a8cda42bc0fdd84c7b4b4e6d7f95ae83e8b5f7"
+    version "c9a8cda42bc0fdd84c7b4b4e6d7f95ae83e8b5f7"
 
     livecheck do
       url "https://raw.githubusercontent.com/voidzero-dev/vite-plus/refs/tags/v#{LATEST_VERSION}/packages/tools/.upstream-versions.json"
@@ -35,8 +34,8 @@ class VitePlus < Formula
 
   resource "vite" do
     url "https://github.com/vitejs/vite.git",
-        revision: "39ddf7ccf7e7469ff6a3ba37bca38c32ea804d6e"
-    version "39ddf7ccf7e7469ff6a3ba37bca38c32ea804d6e"
+        revision: "b6c20f6a8126d8561891e5fb9368e8fc9da37538"
+    version "b6c20f6a8126d8561891e5fb9368e8fc9da37538"
 
     livecheck do
       url "https://raw.githubusercontent.com/voidzero-dev/vite-plus/refs/tags/v#{LATEST_VERSION}/packages/tools/.upstream-versions.json"
@@ -52,8 +51,8 @@ class VitePlus < Formula
 
     resource "vite-task-src" do
       url "https://github.com/voidzero-dev/vite-task.git",
-          revision: "7d69d6577ecf6bd83deee32186de59918a712873"
-      version "7d69d6577ecf6bd83deee32186de59918a712873"
+          revision: "9ba4cc93379cf2d7a6c7e657285bb8a00e8339dc"
+      version "9ba4cc93379cf2d7a6c7e657285bb8a00e8339dc"
 
       patch :p1 do
         file "Patches/vite-plus/0003-vite-task-preload-ohos-build.patch"
@@ -77,6 +76,11 @@ class VitePlus < Formula
     resource "tar-linux-arm64-musl" do
       url "https://registry.npmjs.org/@napi-rs/tar-linux-arm64-musl/-/tar-linux-arm64-musl-1.1.0.tgz"
       sha256 "824ac914a4ef81cca48e97ddb2037dac318a3e0c563653c60ba2e6dfd7242f87"
+    end
+
+    resource "yuku-core-linux-arm64-musl" do
+      url "https://registry.npmjs.org/@yuku-core/binding-linux-arm64-musl/-/binding-linux-arm64-musl-0.19.0.tgz"
+      sha256 "2c4f5a7a987ee27bae94c6e6559391be9a1c157c2b53cc889ba546a71a436dc3"
     end
 
     patch :p1 do
@@ -126,6 +130,7 @@ class VitePlus < Formula
         "@napi-rs-wasm-tools-1.1.0" => ["wasm-tools.node", "wasm-tools-linux-arm64-musl"],
         "@napi-rs-lzma-1.4.5"       => ["lzma.node", "lzma-linux-arm64-musl"],
         "@napi-rs-tar-1.1.0"        => ["tar.node", "tar-linux-arm64-musl"],
+        "@yuku-core-binding-0.19.0" => ["yuku-core.node", "yuku-core-linux-arm64-musl"],
       }.each do |dir, (node_file, resource_name)|
         resource(resource_name).stage do
           node_src = Dir.glob("**/*.node").first
