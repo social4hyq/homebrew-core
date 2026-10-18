@@ -105,6 +105,102 @@ for line in "${CANDIDATES[@]}"; do
   # iterations, so a plain checkout is safe.
   docker exec "$CONTAINER" bash -lc "cd \"$TAP_IN_CONTAINER\" && git checkout -q main"
 
+  # vite-plus: a tag-tarball formula (bump-formula-pr-shaped url/sha256) that
+  # also carries version-locked git pins — rolldown/vite (from the tag's
+  # packages/tools/.upstream-versions.json, same source as their livecheck
+  # blocks) and vite-task-src (the `rev` of the tag's Cargo.toml vite-task git
+  # deps, which Patches/vite-plus/0003-0005 are generated against). The
+  # git-revision detection below would also match it (resource `revision:`
+  # lines), and bump-formula-pr would leave the pins stale, so sync everything
+  # here. A patch that no longer applies fails the pr-validate source build:
+  # no ci-passed, no automerge — the stuck PR is the signal to regenerate
+  # the patches by hand.
+  if [ "$FORMULA" = vite-plus ]; then
+    FORMULA_PATH=$(docker exec "$CONTAINER" bash -lc \
+      "ls \"$TAP_IN_CONTAINER\"/Formula/*/\"$FORMULA\".rb 2>/dev/null | head -1")
+    OLD_VERSION=$(docker exec "$CONTAINER" grep -oE 'refs/tags/v[0-9][^"]*\.tar\.gz' "$FORMULA_PATH" | head -1 | sed -E 's|refs/tags/v||; s|\.tar\.gz$||' || true)
+    if [ -z "$FORMULA_PATH" ] || [ -z "$OLD_VERSION" ]; then
+      echo "::error::$FORMULA: formula or tag-tarball url not found"
+      echo "- ❌ $FORMULA: formula/url not found" >> "$GITHUB_STEP_SUMMARY"
+      continue
+    fi
+    if [ "$OLD_VERSION" = "$LATEST" ]; then
+      echo "- ⏭️ $FORMULA: already at $LATEST" >> "$GITHUB_STEP_SUMMARY"
+      continue
+    fi
+    RAW="https://raw.githubusercontent.com/voidzero-dev/vite-plus/refs/tags/v$LATEST"
+    NEW_SHA256=$(curl -fsSL "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v$LATEST.tar.gz" 2>/dev/null | sha256sum | cut -d' ' -f1 || true)
+    UPSTREAM_JSON=$(curl -fsSL "$RAW/packages/tools/.upstream-versions.json" 2>/dev/null || true)
+    NEW_ROLLDOWN=$(jq -r '.rolldown.hash // empty' <<< "$UPSTREAM_JSON" 2>/dev/null || true)
+    NEW_VITE=$(jq -r '.vite.hash // empty' <<< "$UPSTREAM_JSON" 2>/dev/null || true)
+    NEW_TASK=$(curl -fsSL "$RAW/Cargo.toml" 2>/dev/null \
+      | grep -oE '^fspy = \{ git = "https://github.com/voidzero-dev/vite-task.git", rev = "[0-9a-f]{40}"' \
+      | grep -oE '[0-9a-f]{40}' | head -1 || true)
+    for v in "$NEW_SHA256" "$NEW_ROLLDOWN" "$NEW_VITE" "$NEW_TASK"; do
+      if ! [[ "$v" =~ ^[0-9a-f]{40}([0-9a-f]{24})?$ ]]; then
+        echo "::error::$FORMULA: could not resolve every pin for v$LATEST (sha256='$NEW_SHA256' rolldown='$NEW_ROLLDOWN' vite='$NEW_VITE' vite-task='$NEW_TASK')"
+        echo "- ❌ $FORMULA $LATEST: pin resolution failed" >> "$GITHUB_STEP_SUMMARY"
+        continue 2
+      fi
+    done
+    old_pin() {
+      docker exec "$CONTAINER" bash -lc "grep -A3 'resource \"$1\"' \"$FORMULA_PATH\" | grep -oE '[0-9a-f]{40}' | head -1"
+    }
+    OLD_SHA256=$(docker exec "$CONTAINER" grep -m1 -oE '^  sha256 "[0-9a-f]{64}"' "$FORMULA_PATH" | grep -oE '[0-9a-f]{64}')
+    OLD_ROLLDOWN=$(old_pin rolldown)
+    OLD_VITE=$(old_pin vite)
+    OLD_TASK=$(old_pin vite-task-src)
+    BRANCH="bump-${FORMULA}-${LATEST}"
+    echo "$FORMULA $OLD_VERSION -> $LATEST; rolldown $OLD_ROLLDOWN -> $NEW_ROLLDOWN; vite $OLD_VITE -> $NEW_VITE; vite-task $OLD_TASK -> $NEW_TASK"
+    if ! docker exec "$CONTAINER" bash -lc "
+      set -euo pipefail
+      sed -i 's|refs/tags/v$OLD_VERSION.tar.gz|refs/tags/v$LATEST.tar.gz|' \"$FORMULA_PATH\"
+      sed -i 's/$OLD_SHA256/$NEW_SHA256/' \"$FORMULA_PATH\"
+      sed -i 's/$OLD_ROLLDOWN/$NEW_ROLLDOWN/g; s/$OLD_VITE/$NEW_VITE/g; s/$OLD_TASK/$NEW_TASK/g' \"$FORMULA_PATH\"
+      sed -i '/^  revision [0-9][0-9]*\$/d' \"$FORMULA_PATH\"
+      grep -q 'refs/tags/v$LATEST.tar.gz' \"$FORMULA_PATH\"
+      grep -q '^  sha256 \"$NEW_SHA256\"' \"$FORMULA_PATH\"
+      grep -q '$NEW_ROLLDOWN' \"$FORMULA_PATH\"
+      grep -q '$NEW_VITE' \"$FORMULA_PATH\"
+      grep -q '$NEW_TASK' \"$FORMULA_PATH\"
+    "; then
+      echo "::error::$FORMULA: formula edit/verify failed"
+      echo "- ❌ $FORMULA: formula edit failed" >> "$GITHUB_STEP_SUMMARY"
+      continue
+    fi
+    set +e
+    OUT=$(timeout 120 docker exec "$CONTAINER" bash -lc "
+      cd \"$TAP_IN_CONTAINER\"
+      git checkout -b \"$BRANCH\" 2>&1 &&
+      git add \"$FORMULA_PATH\" 2>&1 &&
+      git commit -m \"$FORMULA: update to $LATEST\" 2>&1 &&
+      git push -u origin \"$BRANCH\" 2>&1
+    " 2>&1)
+    set -e
+    echo "$OUT"
+    if ! git ls-remote --exit-code --heads \
+         "https://x-access-token:${GITHUB_TOKEN}@github.com/social4hyq/homebrew-core.git" "$BRANCH" \
+         > /dev/null 2>&1; then
+      echo "::warning::$FORMULA didn't push $BRANCH — see log above"
+      echo "- ⚠️ $FORMULA $LATEST: no branch pushed, see job log" >> "$GITHUB_STEP_SUMMARY"
+      continue
+    fi
+    EXISTING=$(gh pr list --repo social4hyq/homebrew-core --head "$BRANCH" --state open --json url --jq '.[0].url // empty')
+    if [ -n "$EXISTING" ]; then
+      echo "- ⏭️ $FORMULA $LATEST: PR already open: $EXISTING" >> "$GITHUB_STEP_SUMMARY"
+      continue
+    fi
+    PR_URL=$(gh pr create --repo social4hyq/homebrew-core \
+      --head "$BRANCH" --base main \
+      --title "$FORMULA $LATEST" \
+      --body "Automated version bump ($FORMULA $LATEST). Custom autobump path: tag tarball url/sha256 plus the rolldown, vite and vite-task pins resolved from the tag's .upstream-versions.json and Cargo.toml; brew revision dropped. CI builds from source, so patches that no longer apply keep this PR from getting ci-passed.") \
+      || { echo "::error::$FORMULA: gh pr create failed after a successful push"; echo "- ❌ $FORMULA $LATEST: push OK, gh pr create failed" >> "$GITHUB_STEP_SUMMARY"; continue; }
+    PR_NUM="${PR_URL##*/}"
+    gh pr edit "$PR_NUM" --repo social4hyq/homebrew-core --add-label bump-formula-pr
+    echo "- ✅ $FORMULA $LATEST: $PR_URL" >> "$GITHUB_STEP_SUMMARY"
+    continue
+  fi
+
   # Git-revision formulae (stable url is a .git URL with a `revision:` pin,
   # bun.rb pattern) can't use bump-formula-pr: its version comparison
   # (bump-formula-pr.rb: 302-314) hard-rejects "new version == old version"
