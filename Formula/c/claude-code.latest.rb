@@ -4,7 +4,7 @@ class ClaudeCodeLatest < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.303.tgz"
   sha256 "2cb67cd847c0551660c79f8412f7a98209bf3ee92fee642aa379585277428f88"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 1
+  revision 2
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/latest"
@@ -16,10 +16,8 @@ class ClaudeCodeLatest < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "3fc948d1f9121804b948ffb0d209be20802c691089b5084390c37c56a6448dc0"
   end
 
-  depends_on "coreutils"
-  depends_on "curl"
   depends_on "glibc"
-  depends_on "gnu-tar"
+  depends_on "node"
   depends_on "ohos-selfsign"
   depends_on "patchelf"
 
@@ -29,6 +27,20 @@ class ClaudeCodeLatest < Formula
     rm_r buildpath.children # keep the official README/LICENSE out of the bottle
     (bin/"claude").write_env_script var/name/pkg_version/"claude",
                                   CLAUDE_CODE_TMPDIR: "${CLAUDE_CODE_TMPDIR:-/data/storage/el2/base/cache}"
+    package = "@anthropic-ai/claude-code-linux-arm64"
+    (libexec/"package.json").write JSON.generate({
+      private: true, dependencies: { package => version.to_s }
+    })
+    (libexec/"package-lock.json").write JSON.generate({
+      lockfileVersion: 3,
+      packages:        {
+        ""                        => { dependencies: { package => version.to_s } },
+        "node_modules/#{package}" => {
+          version: version.to_s, resolved: stable.url,
+          integrity: "sha256-#{[[stable.checksum.to_s].pack("H*")].pack("m0")}"
+        },
+      },
+    })
     (libexec/"install-claude.sh").write <<~SH
       set -eu
       prefix="$1"
@@ -38,12 +50,13 @@ class ClaudeCodeLatest < Formula
       trap 'rm -rf "$work"; [ -z "$pending" ] || rm -f "$pending"' EXIT
       trap 'exit 1' HUP INT TERM
       cd "$work"
-      "$prefix/opt/curl/bin/curl" --disable --insecure -fL --retry 3 --retry-all-errors --connect-timeout 30 --max-time 600 \
-        --proto '=https' --proto-redir '=https' -o archive.tgz #{stable.url.shellescape}
-      printf '%s  archive.tgz\\n' #{stable.checksum.to_s.shellescape} | "$prefix/opt/coreutils/bin/sha256sum" -c -
+      cp "$(dirname "$0")/package.json" "$(dirname "$0")/package-lock.json" .
+      PATH="$prefix/opt/node/bin:$PATH" "$prefix/opt/node/bin/npm" install \
+        --os=linux --cpu=arm64 --libc=glibc --ignore-scripts --no-audit --no-fund \
+        --strict-ssl=false --cache "$work/cache"
       mkdir -p "$target"
       pending=$(mktemp "$target/.claude.XXXXXX")
-      "$prefix/opt/gnu-tar/bin/tar" -xOf archive.tgz package/claude > "$pending"
+      cp node_modules/@anthropic-ai/claude-code-linux-arm64/claude "$pending"
       "$prefix/opt/patchelf/bin/patchelf" --set-interpreter "$prefix/opt/glibc/lib/ld-linux-aarch64.so.1" "$pending"
       "$prefix/opt/ohos-selfsign/bin/selfsign" "$pending"
       chmod +x "$pending"
