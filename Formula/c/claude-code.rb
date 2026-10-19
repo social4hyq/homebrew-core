@@ -4,7 +4,7 @@ class ClaudeCode < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.292.tgz"
   sha256 "763250852824215ac3b02a5985688a742a243899ef689dd66c5b99a01f270003"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 9
+  revision 10
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/stable"
@@ -12,8 +12,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.292-r11"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ab78fcd3f0c750e6e2cca071e380e98ca42c61843e84cd50e9695022a538769"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.292-r12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8937f2b436eb51bd78c32974e4d06807746ad7b736b929c664bc14128ed16c0e"
   end
 
   depends_on "glibc"
@@ -31,7 +31,7 @@ class ClaudeCode < Formula
     (libexec/"package.json").write JSON.generate({
       private: true, dependencies: { package => stable.url }
     })
-    (libexec/"pnpm-workspace.yaml").write "strictSsl: false\n"
+    (libexec/".npmrc").write "strict-ssl=false\n"
     (libexec/"pnpm-lock.yaml").write <<~YAML
       lockfileVersion: '9.0'
       settings:
@@ -62,7 +62,7 @@ class ClaudeCode < Formula
       trap 'rm -rf "$work"; [ -z "$pending" ] || rm -f "$pending"' EXIT
       trap 'exit 1' HUP INT TERM
       cd "$work"
-      cp "$(dirname "$0")/package.json" "$(dirname "$0")/pnpm-lock.yaml" "$(dirname "$0")/pnpm-workspace.yaml" .
+      cp "$(dirname "$0")/package.json" "$(dirname "$0")/pnpm-lock.yaml" "$(dirname "$0")/.npmrc" .
       "$prefix/opt/pnpm/bin/pnpm" install --frozen-lockfile \
         --os=linux --cpu=arm64 --libc=glibc --ignore-scripts \
         --store-dir "$work/store"
