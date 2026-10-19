@@ -4,7 +4,7 @@ class ClaudeCodeLatest < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.303.tgz"
   sha256 "2cb67cd847c0551660c79f8412f7a98209bf3ee92fee642aa379585277428f88"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 2
+  revision 3
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/latest"
@@ -18,9 +18,9 @@ class ClaudeCodeLatest < Formula
   end
 
   depends_on "glibc"
-  depends_on "node"
   depends_on "ohos-selfsign"
   depends_on "patchelf"
+  depends_on "pnpm"
 
   conflicts_with "claude-code", because: "both install the `claude` binary"
 
@@ -30,18 +30,30 @@ class ClaudeCodeLatest < Formula
                                   CLAUDE_CODE_TMPDIR: "${CLAUDE_CODE_TMPDIR:-/data/storage/el2/base/cache}"
     package = "@anthropic-ai/claude-code-linux-arm64"
     (libexec/"package.json").write JSON.generate({
-      private: true, dependencies: { package => version.to_s }
+      private: true, dependencies: { package => stable.url }
     })
-    (libexec/"package-lock.json").write JSON.generate({
-      lockfileVersion: 3,
-      packages:        {
-        ""                        => { dependencies: { package => version.to_s } },
-        "node_modules/#{package}" => {
-          version: version.to_s, resolved: stable.url,
-          integrity: "sha256-#{[[stable.checksum.to_s].pack("H*")].pack("m0")}"
-        },
-      },
-    })
+    (libexec/"pnpm-workspace.yaml").write "strictSsl: false\n"
+    (libexec/"pnpm-lock.yaml").write <<~YAML
+      lockfileVersion: '9.0'
+      settings:
+        autoInstallPeers: true
+        excludeLinksFromLockfile: false
+      importers:
+        .:
+          dependencies:
+            '#{package}':
+              specifier: #{stable.url}
+              version: #{stable.url}
+      packages:
+        '#{package}@#{stable.url}':
+          resolution:
+            integrity: sha256-#{[[stable.checksum.to_s].pack("H*")].pack("m0")}
+            tarball: #{stable.url}
+          name: '#{package}'
+          version: #{version}
+      snapshots:
+        '#{package}@#{stable.url}': {}
+    YAML
     (libexec/"install-claude.sh").write <<~SH
       set -eu
       prefix="$1"
@@ -51,10 +63,10 @@ class ClaudeCodeLatest < Formula
       trap 'rm -rf "$work"; [ -z "$pending" ] || rm -f "$pending"' EXIT
       trap 'exit 1' HUP INT TERM
       cd "$work"
-      cp "$(dirname "$0")/package.json" "$(dirname "$0")/package-lock.json" .
-      PATH="$prefix/opt/node/bin:$PATH" "$prefix/opt/node/bin/npm" install \
-        --os=linux --cpu=arm64 --libc=glibc --ignore-scripts --no-audit --no-fund \
-        --strict-ssl=false --cache "$work/cache"
+      cp "$(dirname "$0")/package.json" "$(dirname "$0")/pnpm-lock.yaml" "$(dirname "$0")/pnpm-workspace.yaml" .
+      "$prefix/opt/pnpm/bin/pnpm" install --frozen-lockfile \
+        --os=linux --cpu=arm64 --libc=glibc --ignore-scripts \
+        --store-dir "$work/store"
       mkdir -p "$target"
       pending=$(mktemp "$target/.claude.XXXXXX")
       cp node_modules/@anthropic-ai/claude-code-linux-arm64/claude "$pending"
