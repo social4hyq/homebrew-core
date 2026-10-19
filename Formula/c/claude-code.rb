@@ -4,7 +4,7 @@ class ClaudeCode < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.292.tgz"
   sha256 "763250852824215ac3b02a5985688a742a243899ef689dd66c5b99a01f270003"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 6
+  revision 7
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/stable"
@@ -38,7 +38,7 @@ class ClaudeCode < Formula
       trap 'rm -rf "$work"; [ -z "$pending" ] || rm -f "$pending"' EXIT
       trap 'exit 1' HUP INT TERM
       cd "$work"
-      "$prefix/opt/curl/bin/curl" -fL --retry 3 --retry-all-errors --connect-timeout 30 --max-time 600 \
+      "$prefix/opt/curl/bin/curl" --disable --insecure -fL --retry 3 --retry-all-errors --connect-timeout 30 --max-time 600 \
         --proto '=https' --proto-redir '=https' -o archive.tgz #{stable.url.shellescape}
       printf '%s  archive.tgz\\n' #{stable.checksum.to_s.shellescape} | "$prefix/opt/coreutils/bin/sha256sum" -c -
       mkdir -p "$target"
