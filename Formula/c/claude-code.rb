@@ -4,7 +4,7 @@ class ClaudeCode < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.292.tgz"
   sha256 "763250852824215ac3b02a5985688a742a243899ef689dd66c5b99a01f270003"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 6
+  revision 7
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/stable"
@@ -12,8 +12,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.292-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "123cc0c657e059ef86808167084c71cc120be1fcb5f4507250c78d01d99079fe"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.292-r9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "21b1d33e5ba079e17f5888083abd10f0d0a513c1a7a77e4b74b929c30c27dd1a"
   end
 
   depends_on "coreutils"
@@ -38,7 +38,7 @@ class ClaudeCode < Formula
       trap 'rm -rf "$work"; [ -z "$pending" ] || rm -f "$pending"' EXIT
       trap 'exit 1' HUP INT TERM
       cd "$work"
-      "$prefix/opt/curl/bin/curl" -fL --retry 3 --retry-all-errors --connect-timeout 30 --max-time 600 \
+      "$prefix/opt/curl/bin/curl" --disable --insecure -fL --retry 3 --retry-all-errors --connect-timeout 30 --max-time 600 \
         --proto '=https' --proto-redir '=https' -o archive.tgz #{stable.url.shellescape}
       printf '%s  archive.tgz\\n' #{stable.checksum.to_s.shellescape} | "$prefix/opt/coreutils/bin/sha256sum" -c -
       mkdir -p "$target"
