@@ -4,6 +4,7 @@ class ClaudeCodeLatest < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.306.tgz"
   sha256 "4287619b04cb084897d802746c1176771dad18c18c11038f136faaf859dc28d6"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
+  revision 1
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/latest"
@@ -11,8 +12,8 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.306-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0475b513d239d1affe0c65cbac6a586da8d0ccaaa135fa7f65b628f5c88de542"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.306-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f35241d83b9d152728f7389c554f0617f16dd3d55ba7e220b2b0379a52c973c"
   end
 
   depends_on "ohos-compat-shim"
@@ -26,7 +27,7 @@ class ClaudeCodeLatest < Formula
       #!/bin/sh
       set -eu
       export CLAUDE_CODE_TMPDIR="${CLAUDE_CODE_TMPDIR:-/data/storage/el2/base/cache}"
-      BIN="${HOMEBREW_CACHE:-$HOME/.cache/homebrew}/#{name}/#{pkg_version}/claude"
+      BIN="${HOMEBREW_CACHE:-$HOME/.cache/homebrew}/#{name}/#{version}/claude"
       if [ ! -x "$BIN" ]; then
         LOCK="${BIN%/*}.lock"
         HELD="" TMP=""
@@ -48,7 +49,11 @@ class ClaudeCodeLatest < Formula
           tar -xzf "$TMP/pkg.tgz" -C "$TMP"
           "$HOMEBREW_PREFIX/opt/ohos-selfsign/bin/selfsign" "$TMP/package/claude"
           chmod +x "$TMP/package/claude"
-          mkdir -p "${BIN%/*}" && mv "$TMP/package/claude" "$BIN.part" && mv "$BIN.part" "$BIN"
+          mkdir -p "${BIN%/*}"
+          cat "$TMP/package/claude" > "$BIN.part"
+          chmod +x "$BIN.part"
+          rm -f "$TMP/package/claude"
+          mv "$BIN.part" "$BIN"
         fi
         [ -z "$HELD" ] || rm -rf "$LOCK"
       fi
