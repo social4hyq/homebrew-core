@@ -1,8 +1,8 @@
 class ClaudeCodeLatest < Formula
   desc "Anthropic Claude Code CLI (latest release channel)"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.304.tgz"
-  sha256 "8982cb48232af63394a36332304db8767aeb83e7ae16ecd122a686b58fa5811e"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.305.tgz"
+  sha256 "504cd7707984d02b816f77232af1c1e4fe6ab32939df55f37807ecbb6cc958aa"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
 
   livecheck do
@@ -11,8 +11,8 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.304-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "54d203ce0add2c7c4b0c7b8ce4f427c877aaf4f7c948e243632a36f5b335ce4a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.305-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb2e41503be8466f12e4a473a1bbeed82a35b05e462efac2aebf0ee578a98d9c"
   end
 
   depends_on "glibc"
