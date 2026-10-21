@@ -1,9 +1,10 @@
 class ClaudeCodeLatest < Formula
   desc "Anthropic Claude Code CLI (latest release channel)"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.305.tgz"
-  sha256 "504cd7707984d02b816f77232af1c1e4fe6ab32939df55f37807ecbb6cc958aa"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.305.tgz"
+  sha256 "1553046168d5b60709bb23578737ed467575f1de067ef3fa26692549dc66841b"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
+  revision 1
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/latest"
@@ -11,78 +12,53 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.305-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fb2e41503be8466f12e4a473a1bbeed82a35b05e462efac2aebf0ee578a98d9c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.305-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bf1dc7f5722822a1076ce1c110c598b812a5e409856a0a93799749342b36a97e"
   end
 
-  depends_on "glibc"
+  depends_on "ohos-compat-shim"
   depends_on "ohos-selfsign"
-  depends_on "patchelf"
-  depends_on "pnpm"
 
   conflicts_with "claude-code", because: "both install the `claude` binary"
 
   def install
     rm_r buildpath.children # keep the official README/LICENSE out of the bottle
-    (bin/"claude").write_env_script var/name/pkg_version/"claude",
-                                  CLAUDE_CODE_TMPDIR: "${CLAUDE_CODE_TMPDIR:-/data/storage/el2/base/cache}"
-    package = "@anthropic-ai/claude-code-linux-arm64"
-    (libexec/"package.json").write JSON.generate({
-      private: true, dependencies: { package => stable.url }
-    })
-    (libexec/".npmrc").write "strict-ssl=false\n"
-    (libexec/"pnpm-lock.yaml").write <<~YAML
-      lockfileVersion: '9.0'
-      settings:
-        autoInstallPeers: true
-        excludeLinksFromLockfile: false
-      importers:
-        .:
-          dependencies:
-            '#{package}':
-              specifier: #{stable.url}
-              version: #{stable.url}
-      packages:
-        '#{package}@#{stable.url}':
-          resolution:
-            integrity: sha256-#{[[stable.checksum.to_s].pack("H*")].pack("m0")}
-            tarball: #{stable.url}
-          name: '#{package}'
-          version: #{version}
-      snapshots:
-        '#{package}@#{stable.url}': {}
-    YAML
-    (libexec/"install-claude.sh").write <<~SH
+    (bin/"claude").write <<~SH
+      #!/bin/sh
       set -eu
-      prefix="$1"
-      target="$prefix/var/#{name}/#{pkg_version}"
-      work=$(mktemp -d "$2/claude-install.XXXXXX")
-      pending=""
-      trap 'rm -rf "$work"; [ -z "$pending" ] || rm -f "$pending"' EXIT
-      trap 'exit 1' HUP INT TERM
-      cd "$work"
-      cp "$(dirname "$0")/package.json" "$(dirname "$0")/pnpm-lock.yaml" "$(dirname "$0")/.npmrc" .
-      "$prefix/opt/pnpm/bin/pnpm" install --frozen-lockfile \
-        --os=linux --cpu=arm64 --libc=glibc --ignore-scripts \
-        --store-dir "$work/store"
-      mkdir -p "$target"
-      pending=$(mktemp "$target/.claude.XXXXXX")
-      cp node_modules/@anthropic-ai/claude-code-linux-arm64/claude "$pending"
-      "$prefix/opt/patchelf/bin/patchelf" --set-interpreter "$prefix/opt/glibc/lib/ld-linux-aarch64.so.1" "$pending"
-      "$prefix/opt/ohos-selfsign/bin/selfsign" "$pending"
-      chmod +x "$pending"
-      mv -f "$pending" "$target/claude"
+      export CLAUDE_CODE_TMPDIR="${CLAUDE_CODE_TMPDIR:-/data/storage/el2/base/cache}"
+      BIN="${HOMEBREW_CACHE:-$HOME/.cache/homebrew}/#{name}/#{pkg_version}/claude"
+      if [ ! -x "$BIN" ]; then
+        LOCK="${BIN%/*}.lock"
+        HELD="" TMP=""
+        trap '[ -z "$HELD" ] || rm -rf "$LOCK"; [ -z "$TMP" ] || rm -rf "$TMP"' EXIT
+        mkdir -p "${LOCK%/*}"
+        [ ! -d "$LOCK" ] || echo "Another claude is installing #{version}, waiting..." >&2
+        until mkdir "$LOCK" 2>/dev/null && HELD=1; do
+          [ -x "$BIN" ] && break
+          OWNER="$(cat "$LOCK/pid" 2>/dev/null || true)"
+          if [ -n "$OWNER" ] && ! kill -0 "$OWNER" 2>/dev/null; then rm -rf "$LOCK"; fi
+          sleep 1
+        done
+        if [ -n "$HELD" ] && [ ! -x "$BIN" ]; then
+          echo $$ > "$LOCK/pid"
+          echo "First run: downloading Claude Code #{version} (~280 MB), one-time setup..." >&2
+          TMP="$(mktemp -d -p "$CLAUDE_CODE_TMPDIR")"
+          curl -fL# --retry 3 "#{stable.url}" -o "$TMP/pkg.tgz"
+          echo "#{stable.checksum}  $TMP/pkg.tgz" | sha256sum -c - >/dev/null
+          tar -xzf "$TMP/pkg.tgz" -C "$TMP"
+          "$HOMEBREW_PREFIX/opt/ohos-selfsign/bin/selfsign" "$TMP/package/claude"
+          chmod +x "$TMP/package/claude"
+          mkdir -p "${BIN%/*}" && mv "$TMP/package/claude" "$BIN.part" && mv "$BIN.part" "$BIN"
+        fi
+        [ -z "$HELD" ] || rm -rf "$LOCK"
+      fi
+      exec "$HOMEBREW_PREFIX/opt/ohos-compat-shim/bin/ohos-shim" "$BIN" "$@"
     SH
-  end
-
-  post_install_steps do
-    run "/usr/bin/sh",
-        args: ["{{libexec}}/install-claude.sh", "{{HOMEBREW_PREFIX}}", "{{temp}}"],
-        writable_paths: ["{{var}}/{{formula_name}}", "{{temp}}"], network_access: true
+    chmod 0755, bin/"claude"
   end
 
   test do
-    run_post_install_steps unless (var/name/pkg_version/"claude").executable?
     assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
   end
 end
