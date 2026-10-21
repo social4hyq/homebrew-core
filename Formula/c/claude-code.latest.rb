@@ -4,7 +4,7 @@ class ClaudeCodeLatest < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.306.tgz"
   sha256 "4287619b04cb084897d802746c1176771dad18c18c11038f136faaf859dc28d6"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 1
+  revision 2
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/latest"
@@ -12,12 +12,13 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.306-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f35241d83b9d152728f7389c554f0617f16dd3d55ba7e220b2b0379a52c973c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.306-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e4b9cba1b8462f0e8d2a63f61d8d3f6a8190524302df475b33c0fefb8ba1b8c5"
   end
 
   depends_on "ohos-compat-shim"
   depends_on "ohos-selfsign"
+  depends_on "pnpm"
 
   conflicts_with "claude-code", because: "both install the `claude` binary"
 
@@ -27,42 +28,73 @@ class ClaudeCodeLatest < Formula
       #!/bin/sh
       set -eu
       export CLAUDE_CODE_TMPDIR="${CLAUDE_CODE_TMPDIR:-/data/storage/el2/base/cache}"
-      BIN="${HOMEBREW_CACHE:-$HOME/.cache/homebrew}/#{name}/#{version}/claude"
-      if [ ! -x "$BIN" ]; then
-        LOCK="${BIN%/*}.lock"
-        HELD="" TMP=""
-        trap '[ -z "$HELD" ] || rm -rf "$LOCK"; [ -z "$TMP" ] || rm -rf "$TMP"' EXIT
-        mkdir -p "${LOCK%/*}"
-        [ ! -d "$LOCK" ] || echo "Another claude is installing #{version}, waiting..." >&2
-        until mkdir "$LOCK" 2>/dev/null && HELD=1; do
-          [ -x "$BIN" ] && break
-          OWNER="$(cat "$LOCK/pid" 2>/dev/null || true)"
-          if [ -n "$OWNER" ] && ! kill -0 "$OWNER" 2>/dev/null; then rm -rf "$LOCK"; fi
-          sleep 1
-        done
-        if [ -n "$HELD" ] && [ ! -x "$BIN" ]; then
-          echo $$ > "$LOCK/pid"
-          echo "First run: downloading Claude Code #{version} (~280 MB), one-time setup..." >&2
-          TMP="$(mktemp -d -p "$CLAUDE_CODE_TMPDIR")"
-          curl -fL# --retry 3 "#{stable.url}" -o "$TMP/pkg.tgz"
-          echo "#{stable.checksum}  $TMP/pkg.tgz" | sha256sum -c - >/dev/null
-          tar -xzf "$TMP/pkg.tgz" -C "$TMP"
-          "$HOMEBREW_PREFIX/opt/ohos-selfsign/bin/selfsign" "$TMP/package/claude"
-          chmod +x "$TMP/package/claude"
-          mkdir -p "${BIN%/*}"
-          cat "$TMP/package/claude" > "$BIN.part"
-          chmod +x "$BIN.part"
-          rm -f "$TMP/package/claude"
-          mv "$BIN.part" "$BIN"
-        fi
-        [ -z "$HELD" ] || rm -rf "$LOCK"
-      fi
-      exec "$HOMEBREW_PREFIX/opt/ohos-compat-shim/bin/ohos-shim" "$BIN" "$@"
+      exec "$HOMEBREW_PREFIX/opt/ohos-compat-shim/bin/ohos-shim" \
+        "$HOMEBREW_PREFIX/var/#{name}/#{pkg_version}/claude" "$@"
     SH
     chmod 0755, bin/"claude"
+
+    package = "@anthropic-ai/claude-code-linux-arm64-musl"
+    (libexec/"package.json").write JSON.generate({
+      private: true, dependencies: { package => version.to_s }
+    })
+    (libexec/"pnpm-lock.yaml").write <<~YAML
+      lockfileVersion: '9.0'
+
+      settings:
+        autoInstallPeers: true
+        excludeLinksFromLockfile: false
+
+      importers:
+        .:
+          dependencies:
+            '#{package}':
+              specifier: #{version}
+              version: #{version}
+
+      packages:
+        '#{package}@#{version}':
+          resolution: {integrity: sha256-#{[[stable.checksum.to_s].pack("H*")].pack("m0")}}
+          cpu: [arm64]
+          os: [linux]
+          libc: [musl]
+
+      snapshots:
+        '#{package}@#{version}': {}
+    YAML
+    (libexec/"pnpm-workspace.yaml").write <<~YAML
+      minimumReleaseAgeExclude:
+        - '#{package}@#{version}'
+    YAML
+    (libexec/"install-claude.sh").write <<~SH
+      set -eu
+      prefix="$1"
+      target="$prefix/var/#{name}/#{pkg_version}"
+      work=$(mktemp -d "$2/claude-install.XXXXXX")
+      pending=""
+      trap 'rm -rf "$work"; [ -z "$pending" ] || rm -f "$pending"' EXIT
+      trap 'exit 1' HUP INT TERM
+      cd "$work"
+      cp "$(dirname "$0")/package.json" "$(dirname "$0")/pnpm-lock.yaml" "$(dirname "$0")/pnpm-workspace.yaml" .
+      "$prefix/opt/pnpm/bin/pnpm" install --frozen-lockfile \
+        --os=linux --cpu=arm64 --libc=musl --ignore-scripts \
+        --store-dir "$work/store"
+      mkdir -p "$target"
+      pending=$(mktemp "$target/.claude.XXXXXX")
+      cp node_modules/#{package}/claude "$pending"
+      "$prefix/opt/ohos-selfsign/bin/selfsign" "$pending"
+      chmod +x "$pending"
+      mv -f "$pending" "$target/claude"
+    SH
+  end
+
+  post_install_steps do
+    run "/usr/bin/sh",
+        args: ["{{libexec}}/install-claude.sh", "{{HOMEBREW_PREFIX}}", "{{temp}}"],
+        writable_paths: ["{{var}}/{{formula_name}}", "{{temp}}"], network_access: true
   end
 
   test do
+    run_post_install_steps unless (var/name/pkg_version/"claude").executable?
     assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
   end
 end
