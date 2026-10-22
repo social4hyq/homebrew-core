@@ -4,7 +4,7 @@ class ClaudeCodeLatest < Formula
   url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.306.tgz"
   sha256 "4287619b04cb084897d802746c1176771dad18c18c11038f136faaf859dc28d6"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 2
+  revision 3
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/latest"
@@ -12,8 +12,8 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.306-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e4b9cba1b8462f0e8d2a63f61d8d3f6a8190524302df475b33c0fefb8ba1b8c5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.306-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a5ca19b800c718569302699403bb3a0e39949ef63cd6903a698a5844b3432fb"
   end
 
   depends_on "ohos-compat-shim"
@@ -65,6 +65,7 @@ class ClaudeCodeLatest < Formula
       minimumReleaseAgeExclude:
         - '#{package}@#{version}'
     YAML
+    (libexec/".npmrc").write "strict-ssl=false\n"
     (libexec/"install-claude.sh").write <<~SH
       set -eu
       prefix="$1"
@@ -74,7 +75,7 @@ class ClaudeCodeLatest < Formula
       trap 'rm -rf "$work"; [ -z "$pending" ] || rm -f "$pending"' EXIT
       trap 'exit 1' HUP INT TERM
       cd "$work"
-      cp "$(dirname "$0")/package.json" "$(dirname "$0")/pnpm-lock.yaml" "$(dirname "$0")/pnpm-workspace.yaml" .
+      cp "$(dirname "$0")/package.json" "$(dirname "$0")/pnpm-lock.yaml" "$(dirname "$0")/pnpm-workspace.yaml" "$(dirname "$0")/.npmrc" .
       "$prefix/opt/pnpm/bin/pnpm" install --frozen-lockfile \
         --os=linux --cpu=arm64 --libc=musl --ignore-scripts \
         --store-dir "$work/store"
