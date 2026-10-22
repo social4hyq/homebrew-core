@@ -1,10 +1,9 @@
 class ClaudeCodeLatest < Formula
   desc "Anthropic Claude Code CLI (latest release channel)"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.306.tgz"
-  sha256 "4287619b04cb084897d802746c1176771dad18c18c11038f136faaf859dc28d6"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.307.tgz"
+  sha256 "272a88f16ed7bac61702ff768347273c7c2be6c0fa8c308c721adcb29ce872b5"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 3
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/latest"
@@ -12,8 +11,8 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.306-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1a5ca19b800c718569302699403bb3a0e39949ef63cd6903a698a5844b3432fb"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.307-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab04d17513a2ababcd7e4d9e64dba24eec6c600cc148baadbe57ee460da68ee8"
   end
 
   depends_on "ohos-compat-shim"
