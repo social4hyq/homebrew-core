@@ -1,8 +1,8 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.306.tgz"
-  sha256 "3ae52d6b4fe4cd3e6c5efc47c0b9d970186fc8a1b152e32260d7f640bdf063d2"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.308.tgz"
+  sha256 "e939ff4445b9942fe04af0f2892e7052b48c09609b1b340ce7ac47c87db8619f"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
 
   livecheck do
