@@ -9,6 +9,11 @@ class OhosCompatShim < Formula
     skip "development tool, manually versioned"
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.8.4-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "625d4e06f208d42f9a8239ecd8d6cf1e390f13fe6820010ff8ee792e0463ac50"
+  end
+
   # HarmonyOS sandbox seccomp-filters close_range/fchmodat2 and returns unexpected
   # errno from getpwuid_r/tmpfile/splice. Shim intercepts at libc-symbol level,
   # falls back only on the documented symptom (safe no-op elsewhere).
