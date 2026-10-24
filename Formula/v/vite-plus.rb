@@ -1,14 +1,14 @@
 class VitePlus < Formula
   desc "Unified toolchain and entry point for web development"
   homepage "https://viteplus.dev"
-  url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.3.0.tar.gz"
-  sha256 "cbdeebe3348012d0c63220aa7b762004d9f8e2a7198642f61339541b009592ca"
+  url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.4.0.tar.gz"
+  sha256 "c1d15c0b059753878b47816329f275274dbf42f958a071e4ada79fa0f54c4152"
   license "MIT"
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.3.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f494b8f31f0c0e695eec8a443cda8b8e1e59854bd74e7e94cc93385bee947c3e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.4.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e4029dfb4992ee89b60a9ee6494454b517f3abb19771d25ecce2be5aa73c2a14"
   end
 
   depends_on "cmake" => :build
@@ -21,8 +21,8 @@ class VitePlus < Formula
 
   resource "rolldown" do
     url "https://github.com/rolldown/rolldown.git",
-        revision: "c9a8cda42bc0fdd84c7b4b4e6d7f95ae83e8b5f7"
-    version "c9a8cda42bc0fdd84c7b4b4e6d7f95ae83e8b5f7"
+        revision: "89d821ca07cf9ccd84dd92bd3f48af0f579ab21a"
+    version "89d821ca07cf9ccd84dd92bd3f48af0f579ab21a"
 
     livecheck do
       url "https://raw.githubusercontent.com/voidzero-dev/vite-plus/refs/tags/v#{LATEST_VERSION}/packages/tools/.upstream-versions.json"
@@ -34,13 +34,26 @@ class VitePlus < Formula
 
   resource "vite" do
     url "https://github.com/vitejs/vite.git",
-        revision: "b6c20f6a8126d8561891e5fb9368e8fc9da37538"
-    version "b6c20f6a8126d8561891e5fb9368e8fc9da37538"
+        revision: "981f07fa4580fb88b333c4450431e4715d2a0b82"
+    version "981f07fa4580fb88b333c4450431e4715d2a0b82"
 
     livecheck do
       url "https://raw.githubusercontent.com/voidzero-dev/vite-plus/refs/tags/v#{LATEST_VERSION}/packages/tools/.upstream-versions.json"
       strategy :json do |json|
         json.dig("vite", "hash")
+      end
+    end
+  end
+
+  resource "oxc-node" do
+    url "https://github.com/oxc-project/oxc-node.git",
+        revision: "4759cedbda87f67ca646d3277166884cfcd62f81"
+    version "4759cedbda87f67ca646d3277166884cfcd62f81"
+
+    livecheck do
+      url "https://raw.githubusercontent.com/voidzero-dev/vite-plus/refs/tags/v#{LATEST_VERSION}/packages/tools/.upstream-versions.json"
+      strategy :json do |json|
+        json.dig("oxc-node", "hash")
       end
     end
   end
@@ -51,8 +64,8 @@ class VitePlus < Formula
 
     resource "vite-task-src" do
       url "https://github.com/voidzero-dev/vite-task.git",
-          revision: "9ba4cc93379cf2d7a6c7e657285bb8a00e8339dc"
-      version "9ba4cc93379cf2d7a6c7e657285bb8a00e8339dc"
+          revision: "a3c087a771a116f7c60220fc72738703eb45ac2e"
+      version "a3c087a771a116f7c60220fc72738703eb45ac2e"
 
       patch :p1 do
         file "Patches/vite-plus/0003-vite-task-preload-ohos-build.patch"
@@ -107,6 +120,8 @@ class VitePlus < Formula
   def install
     resource("rolldown").stage buildpath/"rolldown"
     resource("vite").stage buildpath/"vite"
+    resource("oxc-node").stage buildpath/"oxc-node"
+    system "node", "packages/tools/src/patch-oxc-node.ts"
 
     # Any Node.js may load the binding, so on OHOS sqlite stays bundled in it
     ENV["LIBSQLITE3_SYS_USE_PKG_CONFIG"] = "1" unless OS.ohos?

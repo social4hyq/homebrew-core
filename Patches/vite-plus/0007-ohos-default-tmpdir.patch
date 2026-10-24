@@ -1,10 +1,10 @@
 OHOS: default TMPDIR/TMP when unset, since /tmp is read-only.
 
 diff --git a/crates/vp_global_cli/src/main.rs b/crates/vp_global_cli/src/main.rs
-index 441743a..9fde225 100644
+index 5259962..1576ecb 100644
 --- a/crates/vp_global_cli/src/main.rs
 +++ b/crates/vp_global_cli/src/main.rs
-@@ -390,6 +390,33 @@ fn dump_dirs_from_env_config() -> bool {
+@@ -310,6 +310,33 @@ fn dump_dirs_from_env_config() -> bool {
      true
  }
  
@@ -38,7 +38,7 @@ index 441743a..9fde225 100644
  #[tokio::main]
  async fn main() -> ExitCode {
      // Probe before tracing, directory resolution, or argument dispatch can emit output.
-@@ -405,6 +432,8 @@ async fn main() -> ExitCode {
+@@ -325,6 +352,8 @@ async fn main() -> ExitCode {
  
      vp_shared::ensure_blocking_stdio();
      vp_shared::ensure_windows_pathext();

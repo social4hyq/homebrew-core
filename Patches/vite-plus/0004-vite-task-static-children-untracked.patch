@@ -1,7 +1,7 @@
 OHOS: run static programs untracked (no seccomp user-notification) and keep their task out of the cache.
 
 diff --git a/crates/fspy/src/unix/mod.rs b/crates/fspy/src/unix/mod.rs
-index 4a83971c..44628565 100644
+index e5a8f70..24320c0 100644
 --- a/crates/fspy/src/unix/mod.rs
 +++ b/crates/fspy/src/unix/mod.rs
 @@ -4,6 +4,9 @@ mod syscall_handler;
@@ -30,7 +30,7 @@ index 4a83971c..44628565 100644
  
 diff --git a/crates/fspy/src/unix/untracked.rs b/crates/fspy/src/unix/untracked.rs
 new file mode 100644
-index 00000000..fe41a6b4
+index 0000000..fe41a6b
 --- /dev/null
 +++ b/crates/fspy/src/unix/untracked.rs
 @@ -0,0 +1,29 @@
@@ -64,7 +64,7 @@ index 00000000..fe41a6b4
 +    }
 +}
 diff --git a/crates/fspy_preload_unix/Cargo.toml b/crates/fspy_preload_unix/Cargo.toml
-index e74c0d63..39352dec 100644
+index 8c9a1dc..a218801 100644
 --- a/crates/fspy_preload_unix/Cargo.toml
 +++ b/crates/fspy_preload_unix/Cargo.toml
 @@ -18,6 +18,7 @@ fspy_nostd = { workspace = true }
@@ -73,10 +73,10 @@ index e74c0d63..39352dec 100644
  static_cell = { workspace = true }
 +wincode = { workspace = true }
  
- [lints]
- workspace = true
+ [target.'cfg(target_os = "linux")'.dependencies]
+ syscalls = { workspace = true }
 diff --git a/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs b/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
-index 729162d0..2c80f866 100644
+index fbdf229..4d74cd3 100644
 --- a/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
 +++ b/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
 @@ -41,9 +41,14 @@ fn handle_exec(
@@ -95,10 +95,10 @@ index 729162d0..2c80f866 100644
              },
          )
 diff --git a/crates/fspy_preload_unix/src/lib.rs b/crates/fspy_preload_unix/src/lib.rs
-index 6c4e10b3..b0379cc8 100644
+index eefa17b..416995a 100644
 --- a/crates/fspy_preload_unix/src/lib.rs
 +++ b/crates/fspy_preload_unix/src/lib.rs
-@@ -3,6 +3,8 @@
+@@ -5,6 +5,8 @@
  
  #[cfg(all(unix, not(target_env = "musl")))]
  mod client;
@@ -109,7 +109,7 @@ index 6c4e10b3..b0379cc8 100644
  #[cfg(all(unix, not(target_env = "musl")))]
 diff --git a/crates/fspy_preload_unix/src/untracked.rs b/crates/fspy_preload_unix/src/untracked.rs
 new file mode 100644
-index 00000000..93863ea3
+index 0000000..93863ea
 --- /dev/null
 +++ b/crates/fspy_preload_unix/src/untracked.rs
 @@ -0,0 +1,38 @@

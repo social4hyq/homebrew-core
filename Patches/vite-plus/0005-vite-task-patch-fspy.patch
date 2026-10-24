@@ -1,10 +1,10 @@
 OHOS: point fspy and fspy_preload_unix at ../vite-task; vt stays a git source for build.ts.
 
 diff --git a/Cargo.toml b/Cargo.toml
-index 45727b0..3f8452b 100644
+index 1cd3659..9ce2d1d 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -453,3 +453,7 @@ inherits = "release"
+@@ -462,3 +462,7 @@ inherits = "release"
  opt-level = 2
  lto = "thin"
  codegen-units = 256
