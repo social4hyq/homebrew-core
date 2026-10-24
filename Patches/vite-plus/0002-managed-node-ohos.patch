@@ -1,7 +1,7 @@
 OHOS: managed Node.js uses the openharmony-<arch> platform string and the ohos-node.com mirror by default.
 
 diff --git a/crates/vp_js_runtime/src/providers/node.rs b/crates/vp_js_runtime/src/providers/node.rs
-index abb9789..284a499 100644
+index 29688dc..bbbd6c0 100644
 --- a/crates/vp_js_runtime/src/providers/node.rs
 +++ b/crates/vp_js_runtime/src/providers/node.rs
 @@ -18,9 +18,13 @@ use crate::{
@@ -32,7 +32,7 @@ index abb9789..284a499 100644
          vt_str::format!("{os}-{arch}")
      }
  
-@@ -719,6 +729,15 @@ mod tests {
+@@ -747,6 +757,15 @@ mod tests {
              (Platform { os: Os::Windows, arch: Arch::X64 }, "win-x64"),
              (Platform { os: Os::Windows, arch: Arch::Arm64 }, "win-arm64"),
          ];
@@ -48,7 +48,7 @@ index abb9789..284a499 100644
  
          for (platform, expected) in cases {
              assert_eq!(provider.platform_string(platform), expected);
-@@ -737,7 +756,7 @@ mod tests {
+@@ -765,7 +784,7 @@ mod tests {
                  provider.get_download_info("22.13.1", platform)
              });
  
@@ -57,7 +57,7 @@ index abb9789..284a499 100644
          {
              assert_eq!(info.archive_filename, "node-v22.13.1-linux-x64.tar.gz");
              assert_eq!(
-@@ -754,6 +773,23 @@ mod tests {
+@@ -782,6 +801,23 @@ mod tests {
                  panic!("Expected ShasumsFile verification");
              }
          }
@@ -81,27 +81,27 @@ index abb9789..284a499 100644
          #[cfg(target_env = "musl")]
          {
              assert_eq!(info.archive_filename, "node-v22.13.1-linux-x64-musl.tar.gz");
-@@ -970,6 +1006,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
+@@ -998,6 +1034,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
      }
  
      #[tokio::test]
 +    #[cfg_attr(target_env = "ohos", ignore = "ohos-node.com has no v20")]
      async fn test_fetch_version_index() {
-         let vp_home = shared_vp_home();
-         vp_shared::EnvConfig::with_vars_async(
-@@ -1485,6 +1522,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
+         with_mock_index(|provider| async move {
+             let versions = provider.fetch_version_index().await.unwrap();
+@@ -1486,6 +1523,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
      }
  
      #[tokio::test]
 +    #[cfg_attr(target_env = "ohos", ignore = "ohos-node.com has no v20")]
      async fn test_resolve_lts_alias_codename_iron() {
-         let vp_home = shared_vp_home();
-         vp_shared::EnvConfig::with_vars_async(
-@@ -1519,6 +1557,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
+         with_mock_index(|provider| async move {
+             assert_eq!(&*provider.resolve_lts_alias("lts/iron").await.unwrap(), "20.19.0");
+@@ -1502,6 +1540,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
      }
  
      #[tokio::test]
 +    #[cfg_attr(target_env = "ohos", ignore = "ohos-node.com has no v20")]
      async fn test_resolve_lts_alias_codename_case_insensitive() {
-         let vp_home = shared_vp_home();
-         vp_shared::EnvConfig::with_vars_async(
+         with_mock_index(|provider| async move {
+             assert_eq!(&*provider.resolve_lts_alias("lts/Iron").await.unwrap(), "20.19.0");

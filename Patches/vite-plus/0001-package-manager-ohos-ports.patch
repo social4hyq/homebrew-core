@@ -1,10 +1,10 @@
 OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package names and `<upstream>-<N>` versions).
 
 diff --git a/crates/vp_pm_cli/src/package_manager.rs b/crates/vp_pm_cli/src/package_manager.rs
-index 43b78bd..9bc1085 100644
+index 4880a9c..efbe2e4 100644
 --- a/crates/vp_pm_cli/src/package_manager.rs
 +++ b/crates/vp_pm_cli/src/package_manager.rs
-@@ -1041,6 +1041,21 @@ async fn resolve_dist_tag(
+@@ -1039,6 +1039,21 @@ async fn resolve_dist_tag(
      tag: &str,
      npm_config: &NpmConfig,
  ) -> Result<Str, Error> {
@@ -26,7 +26,7 @@ index 43b78bd..9bc1085 100644
      let urls = dist_tag_packages(package_manager_type)
          .iter()
          .map(|package_name| npm_config.package_version_url(package_name, tag))
-@@ -1224,6 +1239,14 @@ async fn resolve_latest_satisfying_version(
+@@ -1222,6 +1237,14 @@ async fn resolve_latest_satisfying_version(
      if matches!(package_manager_type, PackageManagerType::Yarn) {
          versions.extend(fetch_registry_versions("@yarnpkg/cli-dist", npm_config).await?);
      }
@@ -41,7 +41,7 @@ index 43b78bd..9bc1085 100644
  
      let best = versions
          .iter()
-@@ -1658,13 +1681,102 @@ fn open_lock_file(lock_path: &Path) -> io::Result<File> {
+@@ -1653,13 +1676,102 @@ fn open_lock_file(lock_path: &Path) -> io::Result<File> {
      fs::OpenOptions::new().read(true).write(true).create(true).truncate(false).open(lock_path)
  }
  
@@ -145,7 +145,7 @@ index 43b78bd..9bc1085 100644
          ("linux", "aarch64") => "@oven/bun-linux-aarch64",
          #[cfg(target_env = "musl")]
          ("linux", "x86_64") => "@oven/bun-linux-x64-musl",
-@@ -1722,14 +1834,17 @@ async fn download_bun_package_manager(
+@@ -1735,14 +1847,17 @@ async fn download_bun_package_manager(
      let platform_package_name = get_bun_platform_package_name()?;
      // The declared hash never covers the platform tarball, so verify it
      // against the registry's `dist.integrity` for the platform package.
@@ -165,7 +165,7 @@ index 43b78bd..9bc1085 100644
      // Keep the TempDir guard alive so a failure path cleans up the temp dir.
      let tmp_dir = tempfile::tempdir_in(parent_dir)?;
      let target_dir_tmp = tmp_dir.path().to_path_buf();
-@@ -1820,7 +1935,9 @@ fn get_pnpm_platform_package_name() -> Result<&'static str, Error> {
+@@ -1833,7 +1948,9 @@ fn get_pnpm_platform_package_name() -> Result<&'static str, Error> {
          ("macos", "x86_64") => "@pnpm/exe.darwin-x64",
          #[cfg(target_env = "musl")]
          ("linux", "aarch64") => "@pnpm/exe.linux-arm64-musl",
@@ -176,7 +176,7 @@ index 43b78bd..9bc1085 100644
          ("linux", "aarch64") => "@pnpm/exe.linux-arm64",
          #[cfg(target_env = "musl")]
          ("linux", "x86_64") => "@pnpm/exe.linux-x64-musl",
-@@ -1929,14 +2046,17 @@ async fn download_pnpm_native_package_manager(
+@@ -1942,14 +2059,17 @@ async fn download_pnpm_native_package_manager(
  
      // The declared hash never covers the platform tarball, so verify it
      // against the registry's `dist.integrity` for the platform package.
@@ -196,45 +196,15 @@ index 43b78bd..9bc1085 100644
      // Keep the TempDir guard alive so a failure path cleans up the temp dir.
      let tmp_dir = tempfile::tempdir_in(parent_dir)?;
      let target_dir_tmp = tmp_dir.path().to_path_buf();
-@@ -4414,8 +4534,22 @@ mod tests {
-         vp_shared::EnvConfig::with_vars_async(
-             [(env_vars::VP_HOME, vp_home.as_os_str())],
-             |_| async move {
-+                // OHOS only has the versions ohos-npm-ports has ported: use the newest one
-+                #[cfg(target_env = "ohos")]
-+                let pnpm_version = fetch_ported_versions(
-+                    PackageManagerType::Pnpm,
-+                    &NpmConfig::load(),
-+                )
-+                .await
-+                .unwrap()
-+                .and_then(|versions| versions.into_iter().max())
-+                .expect("no pnpm version ported to OHOS")
-+                .to_string();
-+                #[cfg(not(target_env = "ohos"))]
-+                let pnpm_version = "12.0.0-beta.0".to_string();
-+                let pnpm_version = pnpm_version.as_str();
-                 let result =
--                    download_package_manager(PackageManagerType::Pnpm, "12.0.0-beta.0", None).await;
-+                    download_package_manager(PackageManagerType::Pnpm, pnpm_version, None).await;
-                 assert!(result.is_ok(), "{result:?}");
-                 let (target_dir, package_name, version) = result.unwrap();
-                 // native binary plus pnpm/pnpx shims, no JS entrypoint
-@@ -4426,11 +4560,11 @@ mod tests {
-                 assert!(is_exists_file(target_dir.join("bin/pnpm.cmd")).unwrap());
-                 assert!(is_exists_file(target_dir.join("bin/pnpx")).unwrap());
-                 assert_eq!(package_name, "pnpm");
--                assert_eq!(version, "12.0.0-beta.0");
-+                assert_eq!(version, pnpm_version);
+@@ -4103,6 +4223,7 @@ mod tests {
+     }
  
-                 // again should hit the completeness fast-path and skip download
-                 let result =
--                    download_package_manager(PackageManagerType::Pnpm, "12.0.0-beta.0", None).await;
-+                    download_package_manager(PackageManagerType::Pnpm, pnpm_version, None).await;
-                 assert!(result.is_ok(), "{result:?}");
-                 remove_dir_all_force(target_dir).await.unwrap();
-             },
-@@ -4984,6 +5118,9 @@ mod tests {
+     #[tokio::test]
++    #[cfg_attr(target_env = "ohos", ignore = "mocks the upstream @pnpm/exe package, not the OHOS port")]
+     async fn test_download_package_manager_pnpm_v12_native() {
+         use httpmock::prelude::*;
+         use sha2::Sha512;
+@@ -4620,6 +4741,9 @@ mod tests {
          let result = get_bun_platform_package_name();
          assert!(result.is_ok(), "Should return a platform package name");
          let name = result.unwrap();
@@ -244,7 +214,7 @@ index 43b78bd..9bc1085 100644
          assert!(
              name.starts_with("@oven/bun-"),
              "Package name should start with @oven/bun-, got: {name}"
-@@ -5039,6 +5176,9 @@ mod tests {
+@@ -4771,6 +4895,9 @@ mod tests {
          let result = get_pnpm_platform_package_name();
          assert!(result.is_ok(), "Should return a platform package name");
          let name = result.unwrap();
