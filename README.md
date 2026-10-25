@@ -11,8 +11,6 @@ brew trust social4hyq/core   # 显式信任第三方 tap
 brew install social4hyq/core/claude-code # 本 tap：Claude Code CLI
 brew install vite-plus                  # 本 tap：前端工具链（vp 命令）
 brew install hishell-font               # 本 tap：终端图标字体
-brew install opencode                   # 官方 core：AI 编码代理
-brew install starship                   # 官方 core：终端提示符（配合 hishell-font）
 ```
 
 `claude-code` 与 `claude-code.latest` 分别跟随 stable、latest 频道，两者不能同时安装。安装时可能需要联网下载官方程序，具体以对应 [Formula](Formula/c/) 为准。
