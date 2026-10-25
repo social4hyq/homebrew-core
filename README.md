@@ -31,24 +31,24 @@ timeline
 
 | Formula | 作用 | 上游 ⭐ | 状态 | PR |
 |---|---|---|---|---|
-| `lazygit` | Git 终端界面，在终端里用键盘完成暂存、提交、分支、rebase 等操作 | 83k | ✅ 已合入 | [!8586](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/8586) |
-| `cryptography` | Python 事实标准的加密库，SSH、TLS、证书、JWT 等大量 Python 库的底层依赖 | 7.8k | ✅ 已合入 | [!10480](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10480) |
-| `hermes-agent` | Nous Research 的自我进化 AI Agent，能从经验中沉淀出可复用的技能 | 251k | ✅ 已合入 | [!10485](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10485) |
-| `yazi` | Rust 编写、异步 I/O 的极速终端文件管理器，支持预览与插件 | 43k | ✅ 已合入 | [!10780](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10780) |
-| `uv` | Rust 编写的极速 Python 包安装器与解析器，可替代 pip、venv 等 | 90k | ✅ 已合入 | [!17130](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17130) |
-| `codegraph` | 面向 AI coding agent 的预索引代码知识图谱，全本地运行，让 agent 少读文件、省 token | 73k | ✅ 已合入 | [!17567](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17567) |
-| `zellij` | 可扩展的终端工作区，以终端复用器为基础，支持 WASM 插件 | 36k | ✅ 已合入 | [!17569](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17569)（[!18645](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18645)） |
-| `llvm@21` | 现代编译器基础设施（clang 等），C/C++ 等原生工具链的基础 | 41k | ✅ 已合入 | [!18194](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18194) |
-| `lld@21` | LLVM 的链接器，链接速度快 | 同上 | ✅ 已合入 | [!18536](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18536) |
-| `libsecret` | GNOME 的密钥存储库，不少 CLI 工具靠它安全保存密码和令牌 | — | ✅ 已合入 | [!18633](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18633) |
-| `herdr` | 住在终端里的 Agent 复用器，一个界面管理多个 coding agent 会话 | 42k | ✅ 已合入 | [!18651](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18651)（[!20617](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20617)、[!20719](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20719)） |
-| `starship` | 跨 shell 的极简、高度可定制的终端提示符 | 60k | ✅ 已合入 | [!18673](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18673)（[!18770](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18770)） |
-| `pnpm` | 快速、省磁盘的 Node 包管理器（v12 为 Rust 重写） | 37k | ✅ 已合入 | [!20806](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20806) |
-| `bun` | 集运行时、包管理、测试、打包于一体的极速 JavaScript 工具链 | 96k | ✅ 已合入 | [!21450](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21450) |
-| `opencode` | 开源的终端 AI 编程助手，自带 75+ 模型提供商接入（v2） | 211k | ✅ 已合入 | [!21455](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21455) |
-| `dtc` | 设备树工具链：编译、反编译 DTS/DTB，并提供 libfdt 与配套操作工具 | — | ✅ 已合入 | [!21461](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21461) |
-| `vde` | 用户态虚拟以太网交换与连接工具，可将虚拟机、进程和网络命名空间接入虚拟网络 | — | ✅ 已合入 | [!22650](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/22650) |
-| `qemu` | 通用机器模拟器与虚拟化器：可运行完整客户机系统或跨架构用户态程序，并提供磁盘镜像工具 | — | ✅ 已合入 | [!24240](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/24240) |
+| [`lazygit`](https://harmonybrew.atomgit.com/packages/#formula/lazygit) | Git 终端界面，在终端里用键盘完成暂存、提交、分支、rebase 等操作 | 83k | ✅ 已合入 | [!8586](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/8586) |
+| [`cryptography`](https://harmonybrew.atomgit.com/packages/#formula/cryptography) | Python 事实标准的加密库，SSH、TLS、证书、JWT 等大量 Python 库的底层依赖 | 7.8k | ✅ 已合入 | [!10480](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10480) |
+| [`hermes-agent`](https://harmonybrew.atomgit.com/packages/#formula/hermes-agent) | Nous Research 的自我进化 AI Agent，能从经验中沉淀出可复用的技能 | 251k | ✅ 已合入 | [!10485](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10485) |
+| [`yazi`](https://harmonybrew.atomgit.com/packages/#formula/yazi) | Rust 编写、异步 I/O 的极速终端文件管理器，支持预览与插件 | 43k | ✅ 已合入 | [!10780](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/10780) |
+| [`uv`](https://harmonybrew.atomgit.com/packages/#formula/uv) | Rust 编写的极速 Python 包安装器与解析器，可替代 pip、venv 等 | 90k | ✅ 已合入 | [!17130](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17130) |
+| [`codegraph`](https://harmonybrew.atomgit.com/packages/#formula/codegraph) | 面向 AI coding agent 的预索引代码知识图谱，全本地运行，让 agent 少读文件、省 token | 73k | ✅ 已合入 | [!17567](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17567) |
+| [`zellij`](https://harmonybrew.atomgit.com/packages/#formula/zellij) | 可扩展的终端工作区，以终端复用器为基础，支持 WASM 插件 | 36k | ✅ 已合入 | [!17569](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/17569)（[!18645](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18645)） |
+| [`llvm@21`](https://harmonybrew.atomgit.com/packages/#formula/llvm@21) | 现代编译器基础设施（clang 等），C/C++ 等原生工具链的基础 | 41k | ✅ 已合入 | [!18194](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18194) |
+| [`lld@21`](https://harmonybrew.atomgit.com/packages/#formula/lld@21) | LLVM 的链接器，链接速度快 | 同上 | ✅ 已合入 | [!18536](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18536) |
+| [`libsecret`](https://harmonybrew.atomgit.com/packages/#formula/libsecret) | GNOME 的密钥存储库，不少 CLI 工具靠它安全保存密码和令牌 | — | ✅ 已合入 | [!18633](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18633) |
+| [`herdr`](https://harmonybrew.atomgit.com/packages/#formula/herdr) | 住在终端里的 Agent 复用器，一个界面管理多个 coding agent 会话 | 42k | ✅ 已合入 | [!18651](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18651)（[!20617](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20617)、[!20719](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20719)） |
+| [`starship`](https://harmonybrew.atomgit.com/packages/#formula/starship) | 跨 shell 的极简、高度可定制的终端提示符 | 60k | ✅ 已合入 | [!18673](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18673)（[!18770](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/18770)） |
+| [`pnpm`](https://harmonybrew.atomgit.com/packages/#formula/pnpm) | 快速、省磁盘的 Node 包管理器（v12 为 Rust 重写） | 37k | ✅ 已合入 | [!20806](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/20806) |
+| [`bun`](https://harmonybrew.atomgit.com/packages/#formula/bun) | 集运行时、包管理、测试、打包于一体的极速 JavaScript 工具链 | 96k | ✅ 已合入 | [!21450](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21450) |
+| [`opencode`](https://harmonybrew.atomgit.com/packages/#formula/opencode) | 开源的终端 AI 编程助手，自带 75+ 模型提供商接入（v2） | 211k | ✅ 已合入 | [!21455](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21455) |
+| [`dtc`](https://harmonybrew.atomgit.com/packages/#formula/dtc) | 设备树工具链：编译、反编译 DTS/DTB，并提供 libfdt 与配套操作工具 | — | ✅ 已合入 | [!21461](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/21461) |
+| [`vde`](https://harmonybrew.atomgit.com/packages/#formula/vde) | 用户态虚拟以太网交换与连接工具，可将虚拟机、进程和网络命名空间接入虚拟网络 | — | ✅ 已合入 | [!22650](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/22650) |
+| [`qemu`](https://harmonybrew.atomgit.com/packages/#formula/qemu) | 通用机器模拟器与虚拟化器：可运行完整客户机系统或跨架构用户态程序，并提供磁盘镜像工具 | — | ✅ 已合入 | [!24240](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/24240) |
 | `vite-plus` | VoidZero 的 Web 统一工具链，一个 `vp` 命令覆盖创建、开发、检查、格式化、测试、构建 | 5.9k | 计划合入 | — |
 | `zcode` | AI 编程工作台，终端 agent（TUI）与 Web IDE 双形态 | 7.3k | 已下线（公开源码更新滞后于产品发布，维护投入与收益不匹配） | — |
 | `ohos-compat-shim` | 兜底鸿蒙与标准 Linux 底层差异的 LD_PRELOAD 兼容层，随 `claude-code` 自动安装 | — | 待定 | — |
