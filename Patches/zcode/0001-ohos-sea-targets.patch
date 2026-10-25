@@ -1,0 +1,28 @@
+--- a/apps/zcode-cli/packages/cli/scripts/sea-targets.mjs
++++ b/apps/zcode-cli/packages/cli/scripts/sea-targets.mjs
+@@ -1,13 +1,7 @@
+ import { resolve } from "node:path";
+
+-export const supportedTargets = Object.freeze([
+-  "darwin-arm64",
+-  "darwin-x64",
+-  "linux-arm64",
+-  "linux-x64",
+-  "win-arm64",
+-  "win-x64",
+-]);
++// Only stage the native runtime used by this OHOS bottle.
++export const supportedTargets = Object.freeze(["openharmony-arm64"]);
+
+ const supportedTargetSet = new Set(supportedTargets);
+
+--- a/apps/zcode-cli/packages/cli/scripts/sea-tui-assets.mjs
++++ b/apps/zcode-cli/packages/cli/scripts/sea-tui-assets.mjs
+@@ -19,6 +19,7 @@
+
+ export const opentuiNativePackageForTarget = (target) => {
+   const { arch, releasePlatform } = targetParts(target);
++  if (releasePlatform === "openharmony") return `@opentui/core-openharmony-${arch}`;
+   const packagePlatform = releasePlatform === "win" ? "win32" : releasePlatform;
+   return `@mbears/opentui-core-${packagePlatform}-${arch}`;
+ };

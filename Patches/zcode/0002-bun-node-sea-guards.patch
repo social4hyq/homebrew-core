@@ -1,0 +1,44 @@
+--- a/apps/zcode-cli/packages/cli/src/sea-playwright-runtime.ts
++++ b/apps/zcode-cli/packages/cli/src/sea-playwright-runtime.ts
+@@ -30,8 +30,9 @@
+ const PACKAGE_JSON_PATH = "node_modules/playwright-core/package.json";
+
+ export async function loadCliPlaywrightChromium(): Promise<PlaywrightChromiumModule> {
+-  const sea = await import("node:sea");
+-  if (!sea.isSea()) {
++  // Bun has no node:sea module; use the ordinary runtime path.
++  const sea = await import("node:sea").catch(() => undefined);
++  if (!sea?.isSea()) {
+     return (await import("playwright-core")) as PlaywrightChromiumModule;
+   }
+
+--- a/apps/zcode-cli/packages/cli/src/tui-runtime-loader.ts
++++ b/apps/zcode-cli/packages/cli/src/tui-runtime-loader.ts
+@@ -33,9 +33,10 @@
+ const manifestFileName = "manifest.json";
+
+ export const loadTuiRuntime = async (): Promise<TuiRuntimeModule> => {
+-  const sea = await import("node:sea");
++  // Bun has no node:sea module; use the ordinary runtime path.
++  const sea = await import("node:sea").catch(() => undefined);
+
+-  if (!sea.isSea()) {
++  if (!sea?.isSea()) {
+     return await import("@zcode/tui");
+   }
+
+--- a/apps/zcode-cli/packages/core/src/environment.ts
++++ b/apps/zcode-cli/packages/core/src/environment.ts
+@@ -1,4 +1,3 @@
+-import { isSea } from "node:sea";
+ import type { RuntimeInfo } from "@zcode/shared-types";
+
+ export { type RuntimeInfo };
+@@ -9,6 +8,6 @@
+   execPath: process.execPath,
+   node: process.version,
+   platform: process.platform,
+-  sea: isSea(),
++  sea: process.getBuiltinModule("node:sea")?.isSea() ?? false,
+   versions: process.versions,
+ });
