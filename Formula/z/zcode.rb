@@ -15,6 +15,11 @@ class Zcode < Formula
     end
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.16.2-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdd61f10a01456814008b72e98c5dbbf3608f0cd7912467b837e33d5e196e487"
+  end
+
   depends_on "node" => :build
   depends_on "pnpm" => :build
   depends_on "python@3.14" => :build
