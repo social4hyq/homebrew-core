@@ -15,19 +15,14 @@ brew install hishell-font               # 本 tap：终端图标字体
 
 `claude-code` 与 `claude-code.latest` 分别跟随 stable、latest 频道，两者不能同时安装。安装时可能需要联网下载官方程序，具体以对应 [Formula](Formula/c/) 为准。
 
-## 合入进度
+## 从本 tap 到官方 core
 
 formula 成熟后合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybrew/homebrew-core)，本 tap 随之下线自有版本。
 
-```mermaid
-timeline
-    title 合入 Harmonybrew 官方 core
-    2026-05 : lazygit
-    2026-06 : cryptography : hermes-agent : yazi
-    2026-08 : uv : codegraph : zellij
-    2026-09 : llvm@21 : lld@21 : libsecret : herdr : starship : pnpm
-    2026-10 : bun : opencode : dtc : vde : qemu
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/upstream-roadmap-dark.svg">
+  <img src="docs/images/upstream-roadmap-light.svg" alt="从本 tap 到官方 core：适配、构建、验证后合入，按月份展示 2026 年 5 月至 10 月的合入历程；详细包名与 MR 见下表。" width="960">
+</picture>
 
 | Formula | 作用 | 状态 | MR |
 |---|---|---|---|
