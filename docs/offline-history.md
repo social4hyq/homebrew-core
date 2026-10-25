@@ -1,6 +1,6 @@
 # 下线 / 改名历史
 
-本 tap 已下线 formula 与改名的存档。仍需用户操作的迁移（改由 Harmonybrew 官方 core 提供）见 [README 的「已迁移到官方 core」](../README.md#已迁移到-harmonybrew-官方-core)；本文只留历史记录，被删除的 formula 都保留在 tap git 历史中，可从历史恢复。
+本 tap 已下线 formula 与改名的存档。仍需用户操作的迁移（改由 Harmonybrew 官方 core 提供）见 [README 的「迁移说明」](../README.md#迁移说明)；本文只留历史记录，被删除的 formula 都保留在 tap git 历史中，可从历史恢复。
 
 ## 已下线（无官方替代）
 
