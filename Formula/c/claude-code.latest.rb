@@ -68,7 +68,7 @@ class ClaudeCodeLatest < Formula
     (libexec/"install-claude.sh").write <<~SH
       set -eu
       prefix="$1"
-      target="$prefix/var/#{name}/#{pkg_version}"
+      target="${3:-$prefix/var/#{name}/#{pkg_version}}"
       work=$(mktemp -d "$2/claude-install.XXXXXX")
       pending=""
       trap 'rm -rf "$work"; [ -z "$pending" ] || rm -f "$pending"' EXIT
@@ -94,7 +94,8 @@ class ClaudeCodeLatest < Formula
   end
 
   test do
-    run_post_install_steps unless (var/name/pkg_version/"claude").executable?
-    assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
+    system "/usr/bin/sh", libexec/"install-claude.sh", HOMEBREW_PREFIX, testpath, testpath/"runtime"
+    assert_match "#{version} (Claude Code)",
+                 shell_output("#{Formula["ohos-compat-shim"].opt_bin}/ohos-shim #{testpath}/runtime/claude --version")
   end
 end
