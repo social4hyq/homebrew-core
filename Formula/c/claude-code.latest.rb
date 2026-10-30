@@ -1,8 +1,8 @@
 class ClaudeCodeLatest < Formula
   desc "Anthropic Claude Code CLI (latest release channel)"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.312.tgz"
-  sha256 "5b1c91bb9bc85e3415acb0c137f642f8d5f82421b7d1e05298e80618a4f90ed2"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.314.tgz"
+  sha256 "f0639b67e5a7131cad261f442b2b75244635bf24916bdad6ddc6df0f84b4aed4"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
 
   livecheck do
@@ -11,8 +11,8 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.312-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0886e2f7f9b408b8c27e791aae9dad7a4bc25ed020dede926e6792955d8b7781"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.314-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc7305b2b877796748a3724ddab58e3935251c7c76f023393ba4536fca20d810"
   end
 
   depends_on "ohos-compat-shim"
@@ -68,7 +68,7 @@ class ClaudeCodeLatest < Formula
     (libexec/"install-claude.sh").write <<~SH
       set -eu
       prefix="$1"
-      target="$prefix/var/#{name}/#{pkg_version}"
+      target="${3:-$prefix/var/#{name}/#{pkg_version}}"
       work=$(mktemp -d "$2/claude-install.XXXXXX")
       pending=""
       trap 'rm -rf "$work"; [ -z "$pending" ] || rm -f "$pending"' EXIT
@@ -94,7 +94,8 @@ class ClaudeCodeLatest < Formula
   end
 
   test do
-    run_post_install_steps unless (var/name/pkg_version/"claude").executable?
-    assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
+    system "/usr/bin/sh", libexec/"install-claude.sh", HOMEBREW_PREFIX, testpath, testpath/"runtime"
+    assert_match "#{version} (Claude Code)",
+                 shell_output("#{formula_opt_bin("ohos-compat-shim")}/ohos-shim #{testpath}/runtime/claude --version")
   end
 end
