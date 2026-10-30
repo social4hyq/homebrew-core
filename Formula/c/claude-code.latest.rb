@@ -96,6 +96,6 @@ class ClaudeCodeLatest < Formula
   test do
     system "/usr/bin/sh", libexec/"install-claude.sh", HOMEBREW_PREFIX, testpath, testpath/"runtime"
     assert_match "#{version} (Claude Code)",
-                 shell_output("#{Formula["ohos-compat-shim"].opt_bin}/ohos-shim #{testpath}/runtime/claude --version")
+                 shell_output("#{formula_opt_bin("ohos-compat-shim")}/ohos-shim #{testpath}/runtime/claude --version")
   end
 end
