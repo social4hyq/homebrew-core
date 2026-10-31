@@ -5,8 +5,8 @@ class Zcode < Formula
   homepage "https://github.com/zai-org/ZCode"
   # Pin the public main snapshot; its version comes from package.json.
   url "https://github.com/zai-org/ZCode.git",
-      revision: "3c5b227649371507ddc4eb46ac5133afe6db1cab"
-  version "3.16.2"
+      revision: "a60ba6a7e5a06742270ca605f5d2cc2766afa7e1"
+  version "3.17.1"
   license "Apache-2.0"
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -16,8 +16,8 @@ class Zcode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.16.2-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdd61f10a01456814008b72e98c5dbbf3608f0cd7912467b837e33d5e196e487"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.17.1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d7c4d8ec79660397f8c198c8d677171c17166113bf901d1180121140abaa2bf"
   end
 
   depends_on "node" => :build
@@ -31,6 +31,10 @@ class Zcode < Formula
 
   patch do
     file "Patches/zcode/0002-bun-node-sea-guards.patch"
+  end
+
+  patch do
+    file "Patches/zcode/0003-ohos-skip-desktop-electron-runtime.patch"
   end
 
   deny_network_access! :test
