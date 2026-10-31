@@ -5,8 +5,8 @@ class Zcode < Formula
   homepage "https://github.com/zai-org/ZCode"
   # Pin the public main snapshot; its version comes from package.json.
   url "https://github.com/zai-org/ZCode.git",
-      revision: "3c5b227649371507ddc4eb46ac5133afe6db1cab"
-  version "3.16.2"
+      revision: "a60ba6a7e5a06742270ca605f5d2cc2766afa7e1"
+  version "3.17.1"
   license "Apache-2.0"
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -31,6 +31,10 @@ class Zcode < Formula
 
   patch do
     file "Patches/zcode/0002-bun-node-sea-guards.patch"
+  end
+
+  patch do
+    file "Patches/zcode/0003-ohos-skip-desktop-electron-runtime.patch"
   end
 
   deny_network_access! :test
