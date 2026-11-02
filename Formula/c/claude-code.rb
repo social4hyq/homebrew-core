@@ -1,8 +1,8 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.308.tgz"
-  sha256 "e939ff4445b9942fe04af0f2892e7052b48c09609b1b340ce7ac47c87db8619f"
+  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.309.tgz"
+  sha256 "3108f1bf04723cd654cf98269eb861827a15d9256db13ebf88a09d3b497926b2"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
 
   livecheck do
@@ -11,8 +11,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.308-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "16dc05a5e7584e887d9605eb3cf7a843eca0291a046dcec2059f27c77ce099e2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.309-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "782e1db41da9b494b9f1f2c834c7b6f21e1445c73c41f21def4172743410b836"
   end
 
   depends_on "glibc"
@@ -55,7 +55,7 @@ class ClaudeCode < Formula
     (libexec/"install-claude.sh").write <<~SH
       set -eu
       prefix="$1"
-      target="$prefix/var/#{name}/#{pkg_version}"
+      target="${3:-$prefix/var/#{name}/#{pkg_version}}"
       work=$(mktemp -d "$2/claude-install.XXXXXX")
       pending=""
       trap 'rm -rf "$work"; [ -z "$pending" ] || rm -f "$pending"' EXIT
@@ -82,7 +82,7 @@ class ClaudeCode < Formula
   end
 
   test do
-    run_post_install_steps unless (var/name/pkg_version/"claude").executable?
-    assert_match "#{version} (Claude Code)", shell_output("#{bin}/claude --version")
+    system "/usr/bin/sh", libexec/"install-claude.sh", HOMEBREW_PREFIX, testpath, testpath/"runtime"
+    assert_match "#{version} (Claude Code)", shell_output("#{testpath}/runtime/claude --version")
   end
 end
