@@ -11,8 +11,8 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.316-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "249df554894905f0e580467c35c5ed2dd2ee9b99094dd2a31fc06bcbc9b7b0ba"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.317-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f24ae283b484df125ffe96904f446968215589b5f540914697a8a352e647e988"
   end
 
   depends_on "ohos-compat-shim"
