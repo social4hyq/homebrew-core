@@ -5,8 +5,8 @@ class Zcode < Formula
   homepage "https://github.com/zai-org/ZCode"
   # Pin the public main snapshot; its version comes from package.json.
   url "https://github.com/zai-org/ZCode.git",
-      revision: "a60ba6a7e5a06742270ca605f5d2cc2766afa7e1"
-  version "3.17.1"
+      revision: "a9fe401eede6e6e5e01be9048679c206fe6f02d9"
+  version "3.17.2"
   license "Apache-2.0"
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -16,8 +16,8 @@ class Zcode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.17.1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d7c4d8ec79660397f8c198c8d677171c17166113bf901d1180121140abaa2bf"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.17.2-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c93a588f4b1d313e2177bda071b3c0176b0f5bda48d8427cd64699dc62f0025"
   end
 
   depends_on "node" => :build
