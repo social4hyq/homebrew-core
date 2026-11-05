@@ -76,29 +76,39 @@ index 8c9a1dc..a218801 100644
  [target.'cfg(target_os = "linux")'.dependencies]
  syscalls = { workspace = true }
 diff --git a/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs b/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
-index fbdf229..4d74cd3 100644
+index 08c8c20..80dd721 100644
 --- a/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
 +++ b/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
-@@ -41,9 +41,14 @@ fn handle_exec(
-             RawExec { prog, argv, envp },
-             allocator,
-             |raw_command, pre_exec| {
-+                #[cfg(not(target_env = "ohos"))]
-                 if let Some(pre_exec) = pre_exec {
-                     pre_exec.run()?;
-                 }
-+                #[cfg(target_env = "ohos")]
-+                if pre_exec.is_some() {
-+                    crate::untracked::mark_tracking_lost();
-+                }
-                 Ok(execve::original()(raw_command.prog, raw_command.argv, raw_command.envp))
-             },
-         )
+@@ -68,11 +68,19 @@ fn handle_exec(
+             return -1;
+         }
+     };
+-    if let Some(pre_exec) = pre_exec
+-        && let Err(errno) = pre_exec.run()
+-    {
+-        errno.set();
+-        return -1;
++    if let Some(pre_exec) = pre_exec {
++        // OHOS has no seccomp user-notification: a statically linked child cannot be
++        // tracked, so record the missing trace and execute it untracked instead.
++        #[cfg(target_env = "ohos")]
++        {
++            let _ = pre_exec;
++            crate::untracked::mark_tracking_lost();
++        }
++        #[cfg(not(target_env = "ohos"))]
++        if let Err(errno) = pre_exec.run() {
++            errno.set();
++            return -1;
++        }
+     }
+     // SAFETY: raw_command's strings and arrays live in `allocator`, which outlives the call
+     unsafe { execve::original()(raw_command.prog, raw_command.argv, raw_command.envp) }
 diff --git a/crates/fspy_preload_unix/src/lib.rs b/crates/fspy_preload_unix/src/lib.rs
-index eefa17b..416995a 100644
+index 6c4e10b..b0379cc 100644
 --- a/crates/fspy_preload_unix/src/lib.rs
 +++ b/crates/fspy_preload_unix/src/lib.rs
-@@ -5,6 +5,8 @@
+@@ -3,6 +3,8 @@
  
  #[cfg(all(unix, not(target_env = "musl")))]
  mod client;

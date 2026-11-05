@@ -1,7 +1,7 @@
 OHOS: managed Node.js uses the openharmony-<arch> platform string and the ohos-node.com mirror by default.
 
 diff --git a/crates/vp_js_runtime/src/providers/node.rs b/crates/vp_js_runtime/src/providers/node.rs
-index 29688dc..bbbd6c0 100644
+index 50bd8fd..404042c 100644
 --- a/crates/vp_js_runtime/src/providers/node.rs
 +++ b/crates/vp_js_runtime/src/providers/node.rs
 @@ -18,9 +18,13 @@ use crate::{
@@ -19,7 +19,7 @@ index 29688dc..bbbd6c0 100644
  /// Unofficial builds URL for musl (official nodejs.org only provides glibc binaries)
  #[cfg(target_env = "musl")]
  const DEFAULT_NODE_DIST_URL: &str = "https://unofficial-builds.nodejs.org/download/release";
-@@ -610,6 +614,12 @@ impl JsRuntimeProvider for NodeProvider {
+@@ -622,6 +626,12 @@ impl JsRuntimeProvider for NodeProvider {
          if platform.os == Os::Linux {
              return vt_str::format!("{os}-{arch}-musl");
          }
@@ -32,7 +32,7 @@ index 29688dc..bbbd6c0 100644
          vt_str::format!("{os}-{arch}")
      }
  
-@@ -747,6 +757,15 @@ mod tests {
+@@ -759,6 +769,15 @@ mod tests {
              (Platform { os: Os::Windows, arch: Arch::X64 }, "win-x64"),
              (Platform { os: Os::Windows, arch: Arch::Arm64 }, "win-arm64"),
          ];
@@ -48,16 +48,16 @@ index 29688dc..bbbd6c0 100644
  
          for (platform, expected) in cases {
              assert_eq!(provider.platform_string(platform), expected);
-@@ -765,7 +784,7 @@ mod tests {
-                 provider.get_download_info("22.13.1", platform)
-             });
+@@ -780,7 +799,7 @@ mod tests {
+             |_| provider.get_download_info("22.13.1", platform),
+         );
  
 -        #[cfg(not(target_env = "musl"))]
 +        #[cfg(all(not(target_env = "musl"), not(target_env = "ohos")))]
          {
              assert_eq!(info.archive_filename, "node-v22.13.1-linux-x64.tar.gz");
              assert_eq!(
-@@ -782,6 +801,23 @@ mod tests {
+@@ -797,6 +816,23 @@ mod tests {
                  panic!("Expected ShasumsFile verification");
              }
          }
@@ -81,7 +81,7 @@ index 29688dc..bbbd6c0 100644
          #[cfg(target_env = "musl")]
          {
              assert_eq!(info.archive_filename, "node-v22.13.1-linux-x64-musl.tar.gz");
-@@ -998,6 +1034,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
+@@ -1017,6 +1053,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
      }
  
      #[tokio::test]
@@ -89,7 +89,7 @@ index 29688dc..bbbd6c0 100644
      async fn test_fetch_version_index() {
          with_mock_index(|provider| async move {
              let versions = provider.fetch_version_index().await.unwrap();
-@@ -1486,6 +1523,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
+@@ -1536,6 +1573,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
      }
  
      #[tokio::test]
@@ -97,7 +97,7 @@ index 29688dc..bbbd6c0 100644
      async fn test_resolve_lts_alias_codename_iron() {
          with_mock_index(|provider| async move {
              assert_eq!(&*provider.resolve_lts_alias("lts/iron").await.unwrap(), "20.19.0");
-@@ -1502,6 +1540,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
+@@ -1552,6 +1590,7 @@ fedcba987654  node-v22.13.1-win-x64.zip";
      }
  
      #[tokio::test]
