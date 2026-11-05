@@ -10,7 +10,7 @@ brew trust social4hyq/core   # 显式信任第三方 tap
 
 brew install social4hyq/core/claude-code # 本 tap：Claude Code CLI
 brew install vite-plus                  # 本 tap：前端工具链（vp 命令）
-brew install zcode                      # 本 tap：AI 编程工作台
+brew install zcode                      # 本 tap：智谱 AI 编程工具
 brew install hishell-font               # 本 tap：终端图标字体
 ```
 
