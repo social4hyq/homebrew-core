@@ -10,6 +10,7 @@ brew trust social4hyq/core   # 显式信任第三方 tap
 
 brew install social4hyq/core/claude-code # 本 tap：Claude Code CLI
 brew install vite-plus                  # 本 tap：前端工具链（vp 命令）
+brew install zcode                      # 本 tap：AI 编程工作台
 brew install hishell-font               # 本 tap：终端图标字体
 ```
 
@@ -45,7 +46,7 @@ formula 成熟后合入 [Harmonybrew 官方 core](https://atomgit.com/Harmonybre
 | [`vde`](https://harmonybrew.atomgit.com/packages/#formula/vde) | 用户态虚拟以太网交换与连接工具，可将虚拟机、进程和网络命名空间接入虚拟网络 | ✅ 已合入 | [!22650](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/22650) |
 | [`qemu`](https://harmonybrew.atomgit.com/packages/#formula/qemu) | 通用机器模拟器与虚拟化器：可运行完整客户机系统或跨架构用户态程序，并提供磁盘镜像工具 | ✅ 已合入 | [!24240](https://gitcode.com/Harmonybrew/homebrew-core/merge_requests/24240) |
 | `vite-plus` | VoidZero 的 Web 统一工具链，一个 `vp` 命令覆盖创建、开发、检查、格式化、测试、构建 | 计划合入 | — |
-| `zcode` | AI 编程工作台，终端 agent（TUI）与 Web IDE 双形态 | 已下线（公开源码更新滞后于产品发布，维护投入与收益不匹配） | — |
+| `zcode` | AI 编程工作台，终端 agent（TUI）与 Web IDE 双形态 | 待定 | — |
 | `ohos-compat-shim` | 兜底鸿蒙与标准 Linux 底层差异的 LD_PRELOAD 兼容层，随 `claude-code.latest` 自动安装 | 待定 | — |
 | `claude-code` / `claude-code.latest` | Anthropic 官方 Claude Code 终端版（stable / latest 两个频道） | 无计划（闭源，只能拉取官方二进制） | — |
 | `sshport` | 把远程开发机的服务端口映射到本机同名端口 | 无计划（内部小工具） | — |
