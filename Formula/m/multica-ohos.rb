@@ -10,6 +10,11 @@ class MulticaOhos < Formula
     strategy :github_latest
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-ohos-v0.1.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "03b5a2b93a18ce378ad8d74757a311679c811971bc375ab680027443eec1ae50"
+  end
+
   def install
     pkgshare.install %w[patches scripts hap-work hap-branding electron-prebuilt minimality]
     pkgshare.install "BUILD-PIPELINE.md"
