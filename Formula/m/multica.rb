@@ -10,6 +10,11 @@ class Multica < Formula
     strategy :github_latest
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b4f9b8de06feaef100a94b4fe71e6d2673e5623b8b9c01743be48e79bb528064"
+  end
+
   depends_on "go" => :build
 
   def install
