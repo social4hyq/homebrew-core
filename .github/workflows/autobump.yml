@@ -12,7 +12,9 @@ name: autobump
 # shim deps) doesn't matter here — its formula-level url/version/sha256
 # shape (npmmirror tarball, version embedded in the URL) is a plain,
 # bump-formula-pr-compatible pattern; install() logic is version-independent
-# packaging that a version bump never touches. zcode is a git-revision formula
+# packaging that a version bump never touches. multica is a plain Go formula
+# in the same bump-clean shape (version embedded in the github tag URL,
+# sha256, install() consumes #{version} via ldflags). zcode is a git-revision formula
 # (url pins a branch tip via `revision:`) whose pin bump-formula-pr can't
 # rewrite, so autobump.sh has a custom bump path for it. opencode (v2) and
 # opencode-v1 were allowlisted until their 2026-10-02 removal — v2 is now provided
@@ -64,7 +66,7 @@ env:
   # regex-automata panic an earlier revision of this comment claimed.
   # vite-plus allowlisted too: tag tarball plus version-locked rolldown/vite/
   # vite-task git pins, synced by a custom path in autobump.sh.
-  ALLOWLIST: "claude-code claude-code.latest zcode vite-plus magpie"
+  ALLOWLIST: "claude-code claude-code.latest zcode vite-plus magpie multica"
   IMAGE: ${{ vars.OHOS_CI_IMAGE }} # unchanged mirror of the SWR ci-runner — see sync-ci-image.yml
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
