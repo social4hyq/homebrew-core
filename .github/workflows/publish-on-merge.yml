@@ -71,6 +71,7 @@ jobs:
       build: ${{ steps.diff.outputs.build }}
       changed: ${{ steps.diff.outputs.changed }}
       heavy: ${{ steps.diff.outputs.heavy }}
+      images: ${{ steps.images.outputs.images }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -81,6 +82,12 @@ jobs:
           BEFORE: ${{ github.event.before }}
           AFTER: ${{ github.sha }}
         run: .github/scripts/detect-changes.sh
+      - name: Resolve per-formula CI images
+        id: images
+        env:
+          BUILD_JSON: ${{ steps.diff.outputs.build }}
+          OVERRIDES: ${{ vars.OHOS_CI_IMAGE_OVERRIDES }}
+        run: python3 .github/scripts/resolve-ci-images.py
 
   light-check:
     needs: detect
@@ -97,10 +104,11 @@ jobs:
         run: .github/scripts/light-check.sh
 
   build:
-    # bottle-build declares contents:write, and a called workflow may not
-    # exceed the caller's permissions
+    # bottle-build declares contents:write + packages:read, and a called
+    # workflow may not exceed the caller's permissions
     permissions:
       contents: write
+      packages: read
     needs: [detect, light-check]
     if: needs.detect.outputs.build != '[]'
     strategy:
@@ -112,4 +120,7 @@ jobs:
     with:
       formula: ${{ matrix.formula }}
       upload: true
+      # Empty for formulae without an OHOS_CI_IMAGE_OVERRIDES entry;
+      # bottle-build then falls back to the default OHOS_CI_IMAGE.
+      image: ${{ fromJSON(needs.detect.outputs.images)[matrix.formula] }}
     secrets: inherit
