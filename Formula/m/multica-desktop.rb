@@ -11,6 +11,11 @@ class MulticaDesktop < Formula
     strategy :github_latest
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-desktop-v0.8.1-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb6087ff2434c5ef36f1ce0a5cbe99fdb6d98144d7ce0759aa2cd019c54501f8"
+  end
+
   depends_on "multica-ohos" => :build # OHOS patch assets: branding script, clean module.json5
   depends_on "node" => :build
 
