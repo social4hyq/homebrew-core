@@ -4,16 +4,11 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.8.1.tar.gz"
   sha256 "4d142f4d676f90576dcf71787d3b9d20f6ec5329e0f3a8db14364cdc90253ad2"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
     strategy :github_latest
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d62f99a9c4726c563acf97e5e1a8b8aeb53ac376cc0848b45f5efde740aa605"
   end
 
   depends_on "go" => :build
@@ -55,7 +50,7 @@ class Multica < Formula
     # (pnpm overrides to @ohos-npm-ports, scoped registry, signpost dev dep).
     ENV["CI"] = "true"
     system "npm", "exec", "--yes", "--", "pnpm@10.28.2", "install",
-           "--ignore-scripts", "--no-frozen-lockfile", "--reporter=append-only"
+           "--ignore-scripts", "--frozen-lockfile", "--reporter=append-only"
     if OS.ohos?
       # Sign .node bindings so electron-vite can dlopen them on device.
       system "npm", "exec", "--yes", "--", "pnpm@10.28.2", "run", "postinstall"
