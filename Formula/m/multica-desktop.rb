@@ -4,6 +4,7 @@ class MulticaDesktop < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.8.1.tar.gz"
   sha256 "4d142f4d676f90576dcf71787d3b9d20f6ec5329e0f3a8db14364cdc90253ad2"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
+  revision 1
 
   livecheck do
     url :stable
@@ -11,8 +12,8 @@ class MulticaDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-desktop-v0.8.1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a5045b286fc764399684bf8241a7c9749775b5f52404ab8d223e707f3a04e3cb"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-desktop-v0.8.1-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "006ea7a18b7b3c813e040988a7ac504fa71a1a60e6c30d0066c3ecd93f163bac"
   end
 
   depends_on "multica-ohos" => :build # OHOS patch assets: branding script, clean module.json5
@@ -65,14 +66,31 @@ class MulticaDesktop < Formula
     rm_r app/"out" if (app/"out").exist?
     cp_r buildpath/"apps/desktop/out", app/"out"
     rm_r app/"node_modules" if (app/"node_modules").exist?
-    # pnpm lays node_modules out with symlinks into the workspace store; the
-    # packaged payload must be self-contained, so copy with GNU tar -h, which
-    # dereferences every link against the still-intact build tree.
-    payload_nm = buildpath/"apps/desktop/payload-node_modules.tar"
-    system "tar", "-C", buildpath/"apps/desktop", "-chf", payload_nm, "node_modules"
-    system "tar", "-C", app, "-xf", payload_nm
-    rm payload_nm
-    cp buildpath/"apps/desktop/package.json", app/"package.json"
+    package = JSON.parse((buildpath/"apps/desktop/package.json").read)
+    package = package.slice("name", "productName", "version", "description", "main", "private", "type")
+    package["dependencies"] = %w[@electron-toolkit/utils electron-updater].to_h do |name|
+      dependency = JSON.parse((buildpath/"apps/desktop/node_modules"/name/"package.json").read)
+      [name, dependency.fetch("version")]
+    end
+    rm app/"package.json"
+    (app/"package.json").write JSON.generate(package)
+    cd app do
+      system "npm", "install", *std_npm_args(prefix: false), "--omit=dev"
+    end
+    system "node", "-e", <<~'JS', app.to_s
+      const fs = require("node:fs");
+      const { createRequire, builtinModules } = require("node:module");
+      const root = process.argv[1];
+      const runtime = createRequire(root + "/package.json");
+      for (const entry of ["main", "preload"]) {
+        const code = fs.readFileSync(root + "/out/" + entry + "/index.js", "utf8");
+        for (const match of code.matchAll(/require\(["']([^"']+)["']\)/g)) {
+          const name = match[1];
+          if (name === "electron" || name.startsWith("node:") || builtinModules.includes(name)) continue;
+          runtime.resolve(name);
+        }
+      }
+    JS
 
     # HAP shell build. CI runs in the private electron-ohos-ci image (the
     # generic Electron-on-OHOS build image, selected via the
@@ -131,5 +149,14 @@ class MulticaDesktop < Formula
     listing = shell_output("unzip -l #{hap}")
     assert_match "pack.info", listing
     assert_match "module.json", listing
+    assert_match "ets/modules.abc", listing
+    assert_match "libs/arm64-v8a/libelectron.so", listing
+    assert_match "resources/resfile/resources/app/out/main/index.js", listing
+    refute_match "node_modules/typescript/", listing
+    refute_match "node_modules/@multica/eslint-config/", listing
+    package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
+    assert_empty package.fetch("devDependencies", {})
+    assert_equal %w[@electron-toolkit/utils electron-updater], package.fetch("dependencies").keys.sort
+    system "unzip", "-tq", hap
   end
 end
