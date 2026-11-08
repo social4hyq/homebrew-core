@@ -2,6 +2,20 @@
 # Start the OHOS container and apply one-time config.
 source "$(dirname "$0")/lib.sh"
 
+# Private per-formula images (bottle-build's `image` input) are pulled from
+# ghcr with GITHUB_TOKEN (callers pass it as GHCR_TOKEN); public registries
+# never take this path.
+case "${IMAGE:-}" in
+  ghcr.io/*)
+    if [ -n "${GHCR_TOKEN:-}" ]; then
+      printf '%s' "$GHCR_TOKEN" | docker login ghcr.io \
+        -u "${GITHUB_ACTOR:-github-actions}" --password-stdin
+    else
+      echo "::warning::ghcr.io image and no GHCR_TOKEN; pulling unauthenticated (public images only)"
+    fi
+    ;;
+esac
+
 docker pull "$IMAGE"
 # seccomp=unconfined: default docker profile blocks io_uring_setup, killing bun
 docker run -d --name "$CONTAINER" --init \

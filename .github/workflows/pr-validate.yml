@@ -85,6 +85,7 @@ jobs:
       build: ${{ steps.diff.outputs.build }}
       changed: ${{ steps.diff.outputs.changed }}
       heavy: ${{ steps.diff.outputs.heavy }}
+      images: ${{ steps.images.outputs.images }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -95,6 +96,12 @@ jobs:
           BEFORE: ${{ github.event.pull_request.base.sha }}
           AFTER: ${{ github.event.pull_request.head.sha }}
         run: .github/scripts/detect-changes.sh
+      - name: Resolve per-formula CI images
+        id: images
+        env:
+          BUILD_JSON: ${{ steps.diff.outputs.build }}
+          OVERRIDES: ${{ vars.OHOS_CI_IMAGE_OVERRIDES }}
+        run: python3 .github/scripts/resolve-ci-images.py
 
   light-check:
     needs: detect
@@ -143,8 +150,12 @@ jobs:
     # startup_failure with zero jobs created, not a runtime failure —
     # verified via a throwaway debug branch). Needed for real now too:
     # upload=true pushes the bottle commit back to the PR branch.
+    # packages:read is for private per-formula CI images (bottle-build's
+    # `image` input): the called workflow's GITHUB_TOKEN can only pull them
+    # when the caller grants this scope.
     permissions:
       contents: write
+      packages: read
     needs: [detect, lint-commits]
     if: needs.detect.outputs.build != '[]' && needs.lint-commits.result == 'success'
     strategy:
@@ -157,6 +168,9 @@ jobs:
       formula: ${{ matrix.formula }}
       upload: true
       push_ref: ${{ github.event.pull_request.head.ref }}
+      # Empty for formulae without an OHOS_CI_IMAGE_OVERRIDES entry;
+      # bottle-build then falls back to the default OHOS_CI_IMAGE.
+      image: ${{ fromJSON(needs.detect.outputs.images)[matrix.formula] }}
     secrets: inherit
 
   upstream-diff:
