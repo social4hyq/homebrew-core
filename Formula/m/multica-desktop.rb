@@ -4,7 +4,7 @@ class MulticaDesktop < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.8.1.tar.gz"
   sha256 "4d142f4d676f90576dcf71787d3b9d20f6ec5329e0f3a8db14364cdc90253ad2"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class MulticaDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-desktop-v0.8.1-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "006ea7a18b7b3c813e040988a7ac504fa71a1a60e6c30d0066c3ecd93f163bac"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-desktop-v0.8.1-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb6087ff2434c5ef36f1ce0a5cbe99fdb6d98144d7ce0759aa2cd019c54501f8"
   end
 
   depends_on "multica-ohos" => :build # OHOS patch assets: branding script, clean module.json5
@@ -118,6 +118,16 @@ class MulticaDesktop < Formula
       Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
     end
 
+    system "node", "-e", <<~JS, (shell/"web_engine/src/main/module.json5").to_s, clt.to_s
+      const fs = require("node:fs");
+      const { parseJsonText } = require(process.argv[2] + "/hvigor/hvigor/node_modules/@ohos/hvigor-common");
+      const file = process.argv[1];
+      const profile = parseJsonText(fs.readFileSync(file, "utf8"));
+      const allowed = new Set(["ohos.permission.INTERNET", "ohos.permission.GET_NETWORK_INFO"]);
+      profile.module.requestPermissions = profile.module.requestPermissions.filter(p => allowed.has(p.name));
+      fs.writeFileSync(file, JSON.stringify(profile, null, 2));
+    JS
+
     cd shell do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
       system "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
@@ -156,6 +166,9 @@ class MulticaDesktop < Formula
     refute_match "node_modules/@multica/eslint-config/", listing
     package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
     assert_empty package.fetch("devDependencies", {})
+    profile = JSON.parse(shell_output("unzip -p #{hap} module.json"))
+    permissions = profile.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
+    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
     assert_equal %w[@electron-toolkit/utils electron-updater], package.fetch("dependencies").keys.sort
     system "unzip", "-tq", hap
   end
