@@ -130,9 +130,12 @@ jobs:
 
       - name: Start OHOS container
         env:
-          # setup-container.sh logs in to ghcr.io when IMAGE points there
-          # (private per-formula images); unused otherwise.
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # setup-container.sh logs in to ghcr.io when IMAGE points there.
+          # GHCR_PULL_TOKEN (a PAT with read:packages) is used when set:
+          # GITHUB_TOKEN alone cannot pull a user-scoped private package
+          # that isn't linked to a repo, and the packages API refuses to
+          # link it for classic PATs — so the token is the supported path.
+          GHCR_TOKEN: ${{ secrets.GHCR_PULL_TOKEN != '' && secrets.GHCR_PULL_TOKEN || secrets.GITHUB_TOKEN }}
         run: .github/scripts/setup-container.sh
 
       - name: Build from source
