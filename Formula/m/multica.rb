@@ -4,7 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.8.1.tar.gz"
   sha256 "4d142f4d676f90576dcf71787d3b9d20f6ec5329e0f3a8db14364cdc90253ad2"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -12,17 +12,12 @@ class Multica < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d4dd2ba4f35306ddc4997eaea8a8cd8af95dcf2bd6e193e0de35198c927f12f8"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1d62f99a9c4726c563acf97e5e1a8b8aeb53ac376cc0848b45f5efde740aa605"
   end
 
   depends_on "go" => :build
   depends_on "node" => :build
-
-  resource "ohos-assets" do
-    url "https://github.com/social4hyq/ohos-multica/archive/5ef1261acc31d88baa51e2beb521f5e5e78a7080.tar.gz"
-    sha256 "a1e086a8e27f2a0774f5816fe14d07edf829aaa4ceeb59e671fedaa7dd1ff2c8"
-  end
 
   # openharmony-sig/electron PC(2in1) prebuilt (CodeHub mirror hosted on this
   # tap's release; redistribution assumed by the tap owner, see release notes).
@@ -35,6 +30,17 @@ class Multica < Formula
     file "Patches/multica/0001-desktop-ohos.patch"
   end
 
+  patch :p1 do
+    file "Patches/multica/0002-hap-packaging.patch"
+  end
+
+  def patch
+    resource("electron-ohos").fetch
+    system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
+    system "tar", "-xzf", buildpath/"libelectron_132.tar.gz", "-C", buildpath
+    super
+  end
+
   def install
     cd "server" do
       ENV["CGO_ENABLED"] = "0"
@@ -42,14 +48,8 @@ class Multica < Formula
              "./cmd/multica"
     end
 
-    assets = buildpath/"ohos-assets"
-    resource("ohos-assets").stage assets
-    pkgshare.install assets/"scripts/install-hap.sh"
+    pkgshare.install "scripts/install-hap-ohos.sh" => "install-hap.sh"
     shell = buildpath/"libelectron/ohos_hap"
-
-    resource("electron-ohos").fetch
-    system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
-    system "tar", "-xzf", buildpath/"libelectron_132.tar.gz", "-C", buildpath
 
     # Desktop payload: the patch carried the OHOS dependency wiring
     # (pnpm overrides to @ohos-npm-ports, scoped registry, signpost dev dep).
@@ -68,12 +68,9 @@ class Multica < Formula
              'import {build} from "electron-vite"; await build({server:{host:"127.0.0.1"}})'
     end
 
-    # Assemble the HAP shell: brand it, pin the clean module profile
-    # (multica:// scheme, no bundled binaries), and drop the payload in.
-    system "python3", assets/"scripts/apply-branding.py", shell.to_s, buildpath.to_s
-    cp assets/"hap-work/module.clean.json5", shell/"electron/src/main/module.json5"
-    # No signingConfig: hvigor then produces the unsigned artifact only.
-    inreplace shell/"build-profile.json5", '"signingConfig": "default",', ""
+    %w[app_icon.png startIcon.png].each do |name|
+      cp buildpath/"apps/desktop/build/icon.png", shell/"AppScope/resources/base/media"/name
+    end
 
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app/"out" if (app/"out").exist?
@@ -131,16 +128,6 @@ class Multica < Formula
       Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
     end
 
-    system "node", "-e", <<~JS, (shell/"web_engine/src/main/module.json5").to_s, clt.to_s
-      const fs = require("node:fs");
-      const { parseJsonText } = require(process.argv[2] + "/hvigor/hvigor/node_modules/@ohos/hvigor-common");
-      const file = process.argv[1];
-      const profile = parseJsonText(fs.readFileSync(file, "utf8"));
-      const allowed = new Set(["ohos.permission.INTERNET", "ohos.permission.GET_NETWORK_INFO"]);
-      profile.module.requestPermissions = profile.module.requestPermissions.filter(p => allowed.has(p.name));
-      fs.writeFileSync(file, JSON.stringify(profile, null, 2));
-    JS
-
     cd shell do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
       system "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
@@ -187,6 +174,11 @@ class Multica < Formula
     package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
     assert_empty package.fetch("devDependencies", {})
     profile = JSON.parse(shell_output("unzip -p #{hap} module.json"))
+    assert profile.fetch("module").fetch("extractNativeLibs")
+    schemes = profile.fetch("module").fetch("abilities").flat_map do |ability|
+      ability.fetch("skills", []).flat_map { |skill| skill.fetch("uris", []).map { |uri| uri["scheme"] } }
+    end
+    assert_includes schemes, "multica"
     permissions = profile.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
     assert_equal %w[@electron-toolkit/utils electron-updater], package.fetch("dependencies").keys.sort
