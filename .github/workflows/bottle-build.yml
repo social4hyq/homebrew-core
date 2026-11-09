@@ -149,7 +149,7 @@ jobs:
         run: |
           echo "== brew logs =="
           docker exec "$CONTAINER" bash -lc \
-            'for f in /root/.cache/Homebrew/Logs/*/*; do echo "--- $f"; tail -30 "$f"; done' || true
+            'for f in /root/.cache/Homebrew/Logs/*/*; do [ -f "$f" ] || continue; echo "--- $f"; tail -30 "$f"; done; for f in /root/.cache/Homebrew/Logs/*/*/*; do [ -f "$f" ] || continue; echo "--- $f"; tail -60 "$f"; done' || true
 
       - name: Bottle
         id: bottle
