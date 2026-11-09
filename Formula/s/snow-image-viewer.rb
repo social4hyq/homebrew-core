@@ -116,11 +116,13 @@ class SnowImageViewer < Formula
     cd "hap-proj" do
       # Template devDeps (@ohos/hypium/hamock) are test-only frameworks the
       # build does not need; fetching them from the ohpm registry is flaky
-      # from CI runners, so drop them and let ohpm install be a no-op.
+      # from CI runners, so drop them. The remaining entry deps are file:-
+      # local typing stubs, and ohpm itself pings the registry even with no
+      # dependencies — so skip the install entirely and let hvigor work from
+      # the checked-in sources.
       inreplace "oh-package.json5", /"devDependencies": \{[^}]*\},?/, ""
-      system "node", clt/"ohpm/bin/pm-cli.js", "install"
       cd "entry" do
-        system "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
+        system "node", (clt/"hvigor/bin/hvigorw.js").to_s, "assembleHap",
                "--mode", "module", "-p", "product=default", "--no-daemon"
       end
     end
