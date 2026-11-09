@@ -122,10 +122,8 @@ class SnowImageViewer < Formula
       # dependencies — so skip the install entirely and let hvigor work from
       # the checked-in sources.
       inreplace "oh-package.json5", /"devDependencies": \{[^}]*\},?/, ""
-      cd "entry" do
-        system "node", (clt/"hvigor/bin/hvigorw.js").to_s, "assembleHap",
-               "--mode", "module", "-p", "product=default", "--no-daemon"
-      end
+      system "node", (clt/"hvigor/bin/hvigorw.js").to_s, "assembleHap",
+             "--mode", "module", "-p", "product=default", "--no-daemon"
     end
 
     libexec.install "hap-proj/entry/build/default/outputs/default/entry-default-unsigned.hap" =>
