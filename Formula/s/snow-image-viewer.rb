@@ -4,7 +4,7 @@ class SnowImageViewer < Formula
   url "https://github.com/mg-chao/snow-apps/archive/refs/tags/v1.5.2_snow-shot.tar.gz"
   sha256 "e2f3ebd5f19f25e7132255aa96fb1660d1009e98bf4e37c8e78bfaa1da78c39f"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -134,6 +134,10 @@ class SnowImageViewer < Formula
     system qt/"bin/harmonydeployqt", "--input", "hd.json",
            "--output", "hap-proj", "--no-build", "--verbose"
 
+    # harmonydeployqt assumes libz is a system library and skips it, but the
+    # HarmonyOS PC application namespace has no libz.so.1. freetype needs it.
+    cp "#{formula_opt_prefix("zlib")}/lib/libz.so.1", "hap-proj/entry/libs/arm64-v8a/"
+
     # No signingConfig: hvigor produces the unsigned artifact only.
     inreplace "hap-proj/build-profile.json5", '"signingConfig": "default",', ""
     cd "hap-proj" do
@@ -183,6 +187,7 @@ class SnowImageViewer < Formula
       libfontconfig.so.1
       libfreetype.so.6
       libintl.so.8
+      libz.so.1
       libzstd.so.1
     ].each { |name| assert_match name, listing }
     system "unzip", "-tq", hap
