@@ -4,7 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.8.1.tar.gz"
   sha256 "4d142f4d676f90576dcf71787d3b9d20f6ec5329e0f3a8db14364cdc90253ad2"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 5
+  revision 6
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class Multica < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r8"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c53d723168e1eb9bc4b6ce9c0a7e8c3b963422cdf65ecf2b21cd84637968352f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "33284fdc866c4109ffd1fdaffa359422ca66a3e4290af6a6e1dfca0e47cc0c9c"
   end
 
   depends_on "go" => :build
@@ -41,6 +41,10 @@ class Multica < Formula
 
   patch :p1 do
     file "Patches/multica/0004-install-desktop-command.patch"
+  end
+
+  patch :p1 do
+    file "Patches/multica/0005-default-signing-paths.patch"
   end
 
   def patch

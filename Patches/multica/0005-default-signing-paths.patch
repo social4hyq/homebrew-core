@@ -1,0 +1,17 @@
+OHOS: default local paths for signing project and signed HAP.
+
+diff --git a/scripts/install-desktop-ohos.sh b/scripts/install-desktop-ohos.sh
+index 760b31e..5e67d6d 100755
+--- a/scripts/install-desktop-ohos.sh
++++ b/scripts/install-desktop-ohos.sh
+@@ -18,8 +18,8 @@ if [[ $# -ne 0 ]]; then
+ fi
+ 
+ : "${MULTICA_UNSIGNED_HAP:?multica formula did not set the unsigned HAP path}"
+-: "${MULTICA_SIGNING_PROJECT:?multica formula did not set the signing project path}"
+-: "${MULTICA_SIGNED_HAP:?multica formula did not set the signed HAP path}"
++: "${MULTICA_SIGNING_PROJECT:=${HOME}/.multica/signing-project}"
++: "${MULTICA_SIGNED_HAP:=${HOME}/.multica/multica-desktop-signed.hap}"
+ : "${MULTICA_SIGNER:?multica formula did not set the HAP signer path}"
+ : "${MULTICA_INSTALLER:?multica formula did not set the HAP installer path}"
+ : "${COMMAND_LINE_TOOL_PATH:?multica formula did not set the DevEco CLI toolchain path}"
