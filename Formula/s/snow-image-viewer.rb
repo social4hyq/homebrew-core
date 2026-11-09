@@ -122,6 +122,11 @@ class SnowImageViewer < Formula
       # dependencies — so skip the install entirely and let hvigor work from
       # the checked-in sources.
       inreplace "oh-package.json5", /"devDependencies": \{[^}]*\},?/, ""
+      # The template's demo napi cpp (hello.cpp) is dead weight for the Qt
+      # shell, and its bisheng cmake toolchain file was stripped from the
+      # slim CLT; drop the native build option together with its buildOption
+      # wrapper (the closing brace belongs to that wrapper).
+      inreplace "entry/build-profile.json5", /^  "buildOption": \{.*?^  \},\n/m, ""
       system "node", (clt/"hvigor/bin/hvigorw.js").to_s, "assembleHap",
              "--mode", "module", "-p", "product=default", "--no-daemon"
     end
