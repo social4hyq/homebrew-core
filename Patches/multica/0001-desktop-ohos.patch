@@ -812,10 +812,10 @@ index 9a91cdf..77d95c1 100644
        postcss: 8.5.26
        rolldown: 1.0.0-rc.10(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)
 diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
-index 6b34e22..256265c 100644
+index 6b34e22..0b2dd50 100644
 --- a/pnpm-workspace.yaml
 +++ b/pnpm-workspace.yaml
-@@ -43,3 +43,36 @@ catalog:
+@@ -43,3 +43,31 @@ catalog:
    yaml: ^2.6.0
    zod: ^4.1.5
    zustand: ^5.0.0
@@ -836,11 +836,6 @@ index 6b34e22..256265c 100644
 +  "builder-util-runtime": "9.7.0"
 +patchedDependencies:
 +  "expo-modules-core@57.0.21": "apps/mobile/patches/expo-modules-core@57.0.21.patch"
-+
-+fetchRetries: 12
-+fetchRetryMintimeout: 1000
-+fetchRetryMaxtimeout: 5000
-+fetchTimeout: 15000
 +
 +minimumReleaseAgeExclude:
 +  - "@ohos-npm-ports/*"
