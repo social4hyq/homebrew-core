@@ -13,6 +13,8 @@ class SnowImageViewer < Formula
   depends_on "cmake" => :build
   depends_on "ninja" => :build
   depends_on "ohos-sdk" => :build
+  # Qt6Core links zstd (rcc compresses resources); the NDK sysroot has none.
+  depends_on "zstd" => :build
 
   # C++20 <stop_token>/jthread polyfill: the OHOS NDK libc++ predates them.
   # Header-only reference implementation by the std::jthread proposal author.
@@ -59,7 +61,8 @@ class SnowImageViewer < Formula
     # in the aarch64 container; hvigor additionally needs the CLT clang
     # runtimes and the libhilog stderr adapter.
     ld_path = "#{qt}/lib:#{clt}/lib:" \
-              "#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
+              "#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos:" \
+              "#{formula_opt_prefix("zstd")}/lib"
     ENV["LD_LIBRARY_PATH"] = ld_path
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
@@ -101,6 +104,11 @@ class SnowImageViewer < Formula
     JSON
     system qt/"bin/harmonydeployqt", "--input", "hd.json",
            "--output", "hap-proj", "--no-build"
+
+    # Qt6Core's zstd is not a Qt library, so harmonydeployqt does not collect
+    # it; the app library needs it at runtime on device.
+    (buildpath/"hap-proj/entry/libs/arm64-v8a").mkpath
+    cp "#{formula_opt_prefix("zstd")}/lib/libzstd.so.1", "hap-proj/entry/libs/arm64-v8a/"
 
     # No signingConfig: hvigor produces the unsigned artifact only.
     inreplace "hap-proj/build-profile.json5", '"signingConfig": "default",', ""
