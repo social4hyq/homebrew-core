@@ -4,6 +4,7 @@ class SnowImageViewer < Formula
   url "https://github.com/mg-chao/snow-apps/archive/refs/tags/v1.5.2_snow-shot.tar.gz"
   sha256 "e2f3ebd5f19f25e7132255aa96fb1660d1009e98bf4e37c8e78bfaa1da78c39f"
   license "GPL-3.0-or-later"
+  revision 1
 
   livecheck do
     url :stable
@@ -15,10 +16,19 @@ class SnowImageViewer < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "c434513089f1107a5bb18cd8b1c79a3b0a736c2d78a5718f342c276e50187e40"
   end
 
+  # These libraries are copied into the HAP after their ELF dependency graph
+  # is walked by harmonydeployqt; they are build-time-only tap dependencies.
+  depends_on "bzip2" => :build
   depends_on "cmake" => :build
+  depends_on "expat" => :build
+  depends_on "fontconfig" => :build
+  depends_on "freetype" => :build
+  depends_on "gettext" => :build
+  depends_on "libpng" => :build
   depends_on "ninja" => :build
   depends_on "node" => :build # hvigorw.js is a node script
   depends_on "ohos-sdk" => :build
+  depends_on "zlib" => :build
   # Qt6Core links zstd (rcc compresses resources); the NDK sysroot has none.
   depends_on "zstd" => :build
 
@@ -100,22 +110,29 @@ class SnowImageViewer < Formula
     chmod "+x", app_lib
 
     # harmonydeployqt collects the Qt libraries/plugins and generates the
-    # ArkUI shell project from the in-SDK template.
+    # ArkUI shell project from the in-SDK template. Explicit installation
+    # directories are required: without them the tool silently deploys only
+    # the app library. extra-libs-dirs also lets its llvm-readobj walk include
+    # the non-Qt runtime dependencies (fontconfig, freetype, zstd, ...).
+    runtime_lib_dirs = %w[zstd fontconfig freetype expat gettext libpng bzip2 zlib].map do |name|
+      (formula_opt_prefix(name)/"lib").to_s
+    end
     (buildpath/"hd.json").write <<~JSON
       {
         "application-binary": "#{app_lib}",
         "harmonyos-package-source-directory": "#{qt}/src/harmonyos/templates",
         "harmonyos-app-name": "snow-image-viewer",
-        "harmonyos-app-bundle-name": "com.social4hyq.snowimageviewer"
+        "harmonyos-app-bundle-name": "com.social4hyq.snowimageviewer",
+        "ndk-root": "#{ohos_sdk}/native",
+        "qtLibsDirectory": "#{qt}/lib",
+        "qtPluginsDirectory": "#{qt}/plugins",
+        "qtLibExecsDirectory": "#{qt}/libexec",
+        "qtHostDirectory": "#{qt}",
+        "extra-libs-dirs": #{JSON.generate(runtime_lib_dirs)}
       }
     JSON
     system qt/"bin/harmonydeployqt", "--input", "hd.json",
-           "--output", "hap-proj", "--no-build"
-
-    # Qt6Core's zstd is not a Qt library, so harmonydeployqt does not collect
-    # it; the app library needs it at runtime on device.
-    (buildpath/"hap-proj/entry/libs/arm64-v8a").mkpath
-    cp "#{formula_opt_prefix("zstd")}/lib/libzstd.so.1", "hap-proj/entry/libs/arm64-v8a/"
+           "--output", "hap-proj", "--no-build", "--verbose"
 
     # No signingConfig: hvigor produces the unsigned artifact only.
     inreplace "hap-proj/build-profile.json5", '"signingConfig": "default",', ""
@@ -156,6 +173,18 @@ class SnowImageViewer < Formula
     assert_path_exists hap
     listing = shell_output("unzip -l #{hap}")
     assert_match "module.json", listing
-    assert_match "libsnow_image_viewer.so", listing
+    %w[
+      libsnow_image_viewer.so
+      libqohos.so
+      libQt6Core.so.6
+      libQt6Gui.so.6
+      libQt6Widgets.so.6
+      libQt6Svg.so
+      libfontconfig.so.1
+      libfreetype.so.6
+      libintl.so.8
+      libzstd.so.1
+    ].each { |name| assert_match name, listing }
+    system "unzip", "-tq", hap
   end
 end
