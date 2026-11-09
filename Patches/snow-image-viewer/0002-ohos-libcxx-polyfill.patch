@@ -1,0 +1,309 @@
+diff --git a/ant_design_qt/packages/ant_design_qt/src/widgets/detail/window_surface_observer.h b/ant_design_qt/packages/ant_design_qt/src/widgets/detail/window_surface_observer.h
+index 93924bd..7dada3b 100644
+--- a/ant_design_qt/packages/ant_design_qt/src/widgets/detail/window_surface_observer.h
++++ b/ant_design_qt/packages/ant_design_qt/src/widgets/detail/window_surface_observer.h
+@@ -30,8 +30,8 @@ class WindowSurfaceObserver final : public QObject {
+   std::function<void()> changed_;
+   std::function<void()> retiring_;
+   bool widgetSource_ = true;
+-  void* nativeObservation_ = nullptr;
+-  quintptr nativeView_ = 0;
++  [[maybe_unused]] void* nativeObservation_ = nullptr;
++  [[maybe_unused]] quintptr nativeView_ = 0;
+   std::shared_ptr<bool> synchronizing_ = std::make_shared<bool>(false);
+ };
+ }  // namespace adqt::widgets::detail
+diff --git a/ant_design_qt/packages/ant_design_qt/src/widgets/image.cpp b/ant_design_qt/packages/ant_design_qt/src/widgets/image.cpp
+index 8725098..179b0d0 100644
+--- a/ant_design_qt/packages/ant_design_qt/src/widgets/image.cpp
++++ b/ant_design_qt/packages/ant_design_qt/src/widgets/image.cpp
+@@ -50,7 +50,7 @@
+ #include <memory>
+ #include <limits>
+ #include <new>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <string>
+ #include <utility>
+ #include <vector>
+diff --git a/snow_image/include/snow/image/codec.h b/snow_image/include/snow/image/codec.h
+index 064763a..45f0568 100644
+--- a/snow_image/include/snow/image/codec.h
++++ b/snow_image/include/snow/image/codec.h
+@@ -8,7 +8,7 @@
+ #include <cstdint>
+ #include <optional>
+ #include <span>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <string>
+ #include <string_view>
+ #include <vector>
+diff --git a/snow_image/include/snow/image/image.h b/snow_image/include/snow/image/image.h
+index fa1d15e..c27d568 100644
+--- a/snow_image/include/snow/image/image.h
++++ b/snow_image/include/snow/image/image.h
+@@ -7,7 +7,7 @@
+ #include <cstdint>
+ #include <memory>
+ #include <span>
+-#include <stop_token>
++#include "stop_token.hpp"
+ 
+ namespace snow::image {
+ 
+diff --git a/snow_image/include/snow/image/processing.h b/snow_image/include/snow/image/processing.h
+index 95f4f7b..5084701 100644
+--- a/snow_image/include/snow/image/processing.h
++++ b/snow_image/include/snow/image/processing.h
+@@ -9,7 +9,7 @@
+ #include <limits>
+ #include <memory>
+ #include <optional>
+-#include <stop_token>
++#include "stop_token.hpp"
+ 
+ namespace snow::image {
+ 
+diff --git a/snow_image/include/snow/image/raster.h b/snow_image/include/snow/image/raster.h
+index deaa409..7be7edd 100644
+--- a/snow_image/include/snow/image/raster.h
++++ b/snow_image/include/snow/image/raster.h
+@@ -11,7 +11,7 @@
+ #include <memory>
+ #include <optional>
+ #include <span>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <vector>
+ 
+ namespace snow::image {
+diff --git a/snow_image/include/snow/image/raster_conversion.h b/snow_image/include/snow/image/raster_conversion.h
+index 080215a..243af64 100644
+--- a/snow_image/include/snow/image/raster_conversion.h
++++ b/snow_image/include/snow/image/raster_conversion.h
+@@ -4,7 +4,7 @@
+ #include "snow/image/raster.h"
+ 
+ #include <cstdint>
+-#include <stop_token>
++#include "stop_token.hpp"
+ 
+ namespace snow::image {
+ 
+diff --git a/snow_image/include/snow/image/service.h b/snow_image/include/snow/image/service.h
+index 56edf1f..e4ff798 100644
+--- a/snow_image/include/snow/image/service.h
++++ b/snow_image/include/snow/image/service.h
+@@ -7,7 +7,7 @@
+ 
+ #include <memory>
+ #include <span>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <string_view>
+ 
+ namespace snow::image {
+diff --git a/snow_image/src/alpha_analysis.h b/snow_image/src/alpha_analysis.h
+index 8b93eb5..eaee2f3 100644
+--- a/snow_image/src/alpha_analysis.h
++++ b/snow_image/src/alpha_analysis.h
+@@ -1,3 +1,6 @@
++#include "condition_variable_any2.hpp"
++#include "condition_variable_any2.hpp"
++
+ #pragma once
+ 
+ #include <atomic>
+@@ -17,7 +20,7 @@ enum class AlphaAnalysisValue : std::uint8_t {
+ struct AlphaAnalysisState final {
+     std::atomic<AlphaAnalysisValue> value{AlphaAnalysisValue::unknown};
+     std::mutex mutex;
+-    std::condition_variable_any changed;
++    std::condition_variable_any2 changed;
+ };
+ 
+ } // namespace snow::image::detail
+diff --git a/snow_image/src/exif_orientation.h b/snow_image/src/exif_orientation.h
+index 4907ca8..620652c 100644
+--- a/snow_image/src/exif_orientation.h
++++ b/snow_image/src/exif_orientation.h
+@@ -5,7 +5,7 @@
+ 
+ #include <optional>
+ #include <span>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <vector>
+ 
+ namespace snow::image::internal {
+diff --git a/snow_image/src/planar_raster_io.h b/snow_image/src/planar_raster_io.h
+index 704c8cb..1a819fd 100644
+--- a/snow_image/src/planar_raster_io.h
++++ b/snow_image/src/planar_raster_io.h
+@@ -7,7 +7,7 @@
+ #include <cstdint>
+ #include <limits>
+ #include <span>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <string_view>
+ #include <vector>
+ 
+diff --git a/snow_image/src/processing.cpp b/snow_image/src/processing.cpp
+index 4bbbbb4..6749a66 100644
+--- a/snow_image/src/processing.cpp
++++ b/snow_image/src/processing.cpp
+@@ -1,3 +1,6 @@
++#include "condition_variable_any2.hpp"
++#include "jthread.hpp"
++
+ #include "snow/image/processing.h"
+ 
+ #include <snow/memory/pixel_array.h>
+diff --git a/snow_image/tests/animation_tests.cpp b/snow_image/tests/animation_tests.cpp
+index 6dbdfd9..5ecd504 100644
+--- a/snow_image/tests/animation_tests.cpp
++++ b/snow_image/tests/animation_tests.cpp
+@@ -1,3 +1,4 @@
++#include "jthread.hpp"
+ #include <snow/image/animation.h>
+ #include <snow/image/service.h>
+ 
+diff --git a/snow_image/tests/avif_encoding_tests.cpp b/snow_image/tests/avif_encoding_tests.cpp
+index 5950092..b27e0d2 100644
+--- a/snow_image/tests/avif_encoding_tests.cpp
++++ b/snow_image/tests/avif_encoding_tests.cpp
+@@ -1,3 +1,4 @@
++#include "jthread.hpp"
+ #include "snow/image/processing.h"
+ #include "snow/image/resource_estimate.h"
+ #include "snow/image/resource_plan.h"
+diff --git a/snow_image/tests/core_tests.cpp b/snow_image/tests/core_tests.cpp
+index fd5fc70..93ee9e8 100644
+--- a/snow_image/tests/core_tests.cpp
++++ b/snow_image/tests/core_tests.cpp
+@@ -1,3 +1,4 @@
++#include "jthread.hpp"
+ #include "../../test-support/virtualmemory.h"
+ #include "snow/image/service.h"
+ #include "snow/image/processing.h"
+diff --git a/snow_image/tests/raster_conversion_tests.cpp b/snow_image/tests/raster_conversion_tests.cpp
+index d6b636b..65279e8 100644
+--- a/snow_image/tests/raster_conversion_tests.cpp
++++ b/snow_image/tests/raster_conversion_tests.cpp
+@@ -16,7 +16,7 @@
+ #include <iostream>
+ #include <optional>
+ #include <span>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <vector>
+ 
+ namespace {
+diff --git a/snow_image/tests/raster_export_tests.cpp b/snow_image/tests/raster_export_tests.cpp
+index 6bacf43..0ee52da 100644
+--- a/snow_image/tests/raster_export_tests.cpp
++++ b/snow_image/tests/raster_export_tests.cpp
+@@ -1,3 +1,4 @@
++#include "jthread.hpp"
+ #include "snow/image/io.h"
+ #include "snow/image/processing.h"
+ #include "snow/image/service.h"
+diff --git a/snow_image/tests/tiff_tests.cpp b/snow_image/tests/tiff_tests.cpp
+index 2746f55..00b2aae 100644
+--- a/snow_image/tests/tiff_tests.cpp
++++ b/snow_image/tests/tiff_tests.cpp
+@@ -1,3 +1,4 @@
++#include "jthread.hpp"
+ #include "snow/image/resource_estimate.h"
+ #include "snow/image/resource_plan.h"
+ #include "snow/image/service.h"
+diff --git a/snow_image_viewer/src/decoding/image_decoder.h b/snow_image_viewer/src/decoding/image_decoder.h
+index 04c59ac..5c8a6c8 100644
+--- a/snow_image_viewer/src/decoding/image_decoder.h
++++ b/snow_image_viewer/src/decoding/image_decoder.h
+@@ -5,7 +5,7 @@
+ #include <QByteArray>
+ #include <QString>
+ 
+-#include <stop_token>
++#include "stop_token.hpp"
+ 
+ namespace snow::image_viewer {
+ 
+diff --git a/snow_image_viewer/src/editing/edit_pipeline_controller.cpp b/snow_image_viewer/src/editing/edit_pipeline_controller.cpp
+index 24726f5..bf1aadb 100644
+--- a/snow_image_viewer/src/editing/edit_pipeline_controller.cpp
++++ b/snow_image_viewer/src/editing/edit_pipeline_controller.cpp
+@@ -1,3 +1,4 @@
++#include "jthread.hpp"
+ #include "editing/edit_pipeline_controller.h"
+ 
+ #include "core/image_raster_store.h"
+diff --git a/snow_image_viewer/src/editing/edit_pipeline_controller.h b/snow_image_viewer/src/editing/edit_pipeline_controller.h
+index b5b35e5..6f816a8 100644
+--- a/snow_image_viewer/src/editing/edit_pipeline_controller.h
++++ b/snow_image_viewer/src/editing/edit_pipeline_controller.h
+@@ -15,7 +15,7 @@
+ #include <cstddef>
+ #include <memory>
+ #include <optional>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <tuple>
+ #include <utility>
+ #include <vector>
+diff --git a/snow_image_viewer/src/editing/worker_core.h b/snow_image_viewer/src/editing/worker_core.h
+index a5f7d81..2e25bfe 100644
+--- a/snow_image_viewer/src/editing/worker_core.h
++++ b/snow_image_viewer/src/editing/worker_core.h
+@@ -9,7 +9,7 @@
+ #include <QString>
+ #include <QJsonObject>
+ 
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <chrono>
+ #include <functional>
+ #include <optional>
+diff --git a/snow_image_viewer/src/editing/worker_main.cpp b/snow_image_viewer/src/editing/worker_main.cpp
+index 25977ea..d9e13a5 100644
+--- a/snow_image_viewer/src/editing/worker_main.cpp
++++ b/snow_image_viewer/src/editing/worker_main.cpp
+@@ -1,3 +1,4 @@
++#include "jthread.hpp"
+ #include "editing/worker_core.h"
+ #include "editing/worker_protocol.h"
+ 
+@@ -18,7 +19,7 @@
+ #include <iostream>
+ #include <limits>
+ #include <mutex>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <thread>
+ 
+ #if defined(Q_OS_WIN)
+diff --git a/snow_image_viewer/tests/viewer_tests.cpp b/snow_image_viewer/tests/viewer_tests.cpp
+index 97e5701..68b5a99 100644
+--- a/snow_image_viewer/tests/viewer_tests.cpp
++++ b/snow_image_viewer/tests/viewer_tests.cpp
+@@ -1,3 +1,4 @@
++#include "jthread.hpp"
+ #include "core/folder_sequence.h"
+ #include "core/image_raster_store.h"
+ #include "core/image_tile_store.h"
+diff --git a/snow_shot/src/image/snowimagecodecbackend.cpp b/snow_shot/src/image/snowimagecodecbackend.cpp
+index 0bf7b82..10a5b4f 100644
+--- a/snow_shot/src/image/snowimagecodecbackend.cpp
++++ b/snow_shot/src/image/snowimagecodecbackend.cpp
+@@ -18,7 +18,7 @@
+ #include <memory>
+ #include <new>
+ #include <span>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <string>
+ #include <string_view>
+ #include <vector>
