@@ -1,0 +1,68 @@
+OHOS: default local signing paths and bypass proxies for DevEco signing calls.
+
+diff --git a/scripts/install-desktop-ohos.sh b/scripts/install-desktop-ohos.sh
+index 760b31e..7082101 100755
+--- a/scripts/install-desktop-ohos.sh
++++ b/scripts/install-desktop-ohos.sh
+@@ -18,13 +18,22 @@ if [[ $# -ne 0 ]]; then
+ fi
+ 
+ : "${MULTICA_UNSIGNED_HAP:?multica formula did not set the unsigned HAP path}"
+-: "${MULTICA_SIGNING_PROJECT:?multica formula did not set the signing project path}"
+-: "${MULTICA_SIGNED_HAP:?multica formula did not set the signed HAP path}"
++: "${MULTICA_SIGNING_PROJECT:=${HOME}/.multica/signing-project}"
++: "${MULTICA_SIGNED_HAP:=${HOME}/.multica/multica-desktop-signed.hap}"
+ : "${MULTICA_SIGNER:?multica formula did not set the HAP signer path}"
+ : "${MULTICA_INSTALLER:?multica formula did not set the HAP installer path}"
+ : "${COMMAND_LINE_TOOL_PATH:?multica formula did not set the DevEco CLI toolchain path}"
+ : "${HAP_SIGN_TOOL:?multica formula did not set hap-sign-tool}"
+ 
++devecocli_direct() {
++  env \
++    -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY \
++    -u http_proxy -u https_proxy -u all_proxy \
++    -u GLOBAL_AGENT_HTTP_PROXY -u GLOBAL_AGENT_HTTPS_PROXY \
++    -u npm_config_proxy -u npm_config_https_proxy \
++    devecocli "$@"
++}
++
+ for executable in devecocli "$MULTICA_SIGNER" "$MULTICA_INSTALLER" "$HAP_SIGN_TOOL"; do
+   if ! command -v "$executable" >/dev/null 2>&1 && [[ ! -x "$executable" ]]; then
+     printf 'multica install-desktop: required command not found: %s\n' "$executable" >&2
+@@ -36,15 +45,15 @@ if [[ ! -f "$MULTICA_UNSIGNED_HAP" ]]; then
+   exit 1
+ fi
+ 
+-status_output=$(devecocli auth status 2>&1) || {
++status_output=$(devecocli_direct auth status 2>&1) || {
+   printf '%s\n' 'multica install-desktop: could not check Huawei Developer login status.' >&2
+   exit 1
+ }
+ case "$status_output" in
+   *"Not logged in"*|*"未登录"*)
+     printf '%s\n' 'A Huawei Developer account login is required; opening DevEco CLI login.'
+-    devecocli auth login
+-    status_output=$(devecocli auth status 2>&1) || {
++    devecocli_direct auth login
++    status_output=$(devecocli_direct auth status 2>&1) || {
+       printf '%s\n' 'multica install-desktop: could not verify Huawei Developer login.' >&2
+       exit 1
+     }
+@@ -63,7 +72,7 @@ if [[ ! -f "$MULTICA_SIGNING_PROJECT/AppScope/app.json5" ]]; then
+     exit 1
+   fi
+   mkdir -p "$(dirname "$MULTICA_SIGNING_PROJECT")"
+-  devecocli create \
++  devecocli_direct create \
+     --project-path "$MULTICA_SIGNING_PROJECT" \
+     --app-name MulticaSigning \
+     --bundle-name com.huawei.ohos_electron
+@@ -77,7 +86,7 @@ fi
+ printf '%s\n' 'Generating or refreshing the local debug profile for connected devices.'
+ (
+   cd "$MULTICA_SIGNING_PROJECT"
+-  devecocli signature generate --product default
++  devecocli_direct signature generate --product default
+ )
+ 
+ umask 077
