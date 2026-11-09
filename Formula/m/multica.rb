@@ -4,20 +4,16 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.8.1.tar.gz"
   sha256 "4d142f4d676f90576dcf71787d3b9d20f6ec5329e0f3a8db14364cdc90253ad2"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
     strategy :github_latest
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7884a073cc7874df829d5ac6b6e27819eaa7cb89b6fb65fdcb7e1fb1301114f9"
-  end
-
   depends_on "go" => :build
   depends_on "node"
+  depends_on "ohos-sdk-toolchains"
 
   # openharmony-sig/electron PC(2in1) prebuilt (CodeHub mirror hosted on this
   # tap's release; redistribution assumed by the tap owner, see release notes).
@@ -38,6 +34,10 @@ class Multica < Formula
     file "Patches/multica/0003-add-sign-hap-helper.patch"
   end
 
+  patch :p1 do
+    file "Patches/multica/0004-install-desktop-command.patch"
+  end
+
   def patch
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
@@ -46,16 +46,66 @@ class Multica < Formula
   end
 
   def install
+    cli_source = buildpath/"tools/deveco-cli"
+    system "npm", "ci", "--prefix", cli_source,
+           "--omit=dev", "--ignore-scripts", "--no-audit", "--no-fund"
+    libexec.install cli_source/"node_modules"
+    cli_js = libexec/"node_modules/@deveco/deveco-cli-openharmony-arm64/dist/cli.js"
+    chmod 0755, cli_js
+    bin.install_symlink libexec/"node_modules/.bin/devecocli" => "devecocli"
+
+    toolchain = libexec/"deveco-signing-toolchain"
+    toolchain.mkpath
+    toolchain_node = toolchain/"node/bin/node"
+    toolchain_node.dirname.mkpath
+    toolchain_node.write_env_script formula_opt_bin("node")/"node", {}
+    ohpm_entry = toolchain/"ohpm/bin/pm-cli.js"
+    ohpm_entry.dirname.mkpath
+    ohpm_entry.write <<~JS
+      console.error("This command-line toolchain adapter supports signing only.");
+      process.exit(1);
+    JS
+    hvigor_entry = toolchain/"hvigor/bin/hvigorw.js"
+    hvigor_entry.dirname.mkpath
+    hvigor_entry.write <<~JS
+      console.error("This command-line toolchain adapter supports signing only.");
+      process.exit(1);
+    JS
+    sdk = toolchain/"sdk/default/openharmony"
+    sdk_tools = formula_opt_prefix("ohos-sdk-toolchains")
+    sdk_metadata = sdk/"toolchains/oh-uni-package.json"
+    sdk_metadata.dirname.mkpath
+    cp sdk_tools/"oh-uni-package.json", sdk_metadata
+    cp sdk_metadata, toolchain/"sdk/default/sdk-pkg.json"
+    (sdk/"toolchains/hdc").write_env_script sdk_tools/"hdc", {}
+    signer = sdk/"toolchains/lib/hap-sign-tool"
+    signer.dirname.mkpath
+    signer.write_env_script sdk_tools/"lib/hap-sign-tool", {}
+
     cd "server" do
       ENV["CGO_ENABLED"] = "0"
-      system "go", "build", *std_go_args(output: bin/"multica", ldflags: "-s -w -X main.version=#{version}"),
+      system "go", "build", *std_go_args(output: libexec/"multica-cli", ldflags: "-s -w -X main.version=#{version}"),
              "./cmd/multica"
     end
 
     pkgshare.install "scripts/install-hap-ohos.sh" => "install-hap.sh"
+    pkgshare.install "scripts/install-desktop-ohos.sh" => "install-desktop.sh"
     pkgshare.install "scripts/sign-hap.cjs" => "multica-sign-hap"
+    chmod 0755, pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"multica-sign-hap"
     bin.install_symlink pkgshare/"multica-sign-hap" => "multica-sign-hap"
+    libexec.install "scripts/multica-dispatch-ohos.sh" => "multica-dispatch.sh"
+    chmod 0755, libexec/"multica-dispatch.sh"
+    (bin/"multica").write_env_script libexec/"multica-dispatch.sh",
+      COMMAND_LINE_TOOL_PATH:  toolchain,
+      DEVECO_CLI_JS:           cli_js,
+      HAP_SIGN_TOOL:           sdk_tools/"lib/hap-sign-tool",
+      MULTICA_INSTALL_DESKTOP: pkgshare/"install-desktop.sh",
+      MULTICA_INSTALLER:       pkgshare/"install-hap.sh",
+      MULTICA_REAL_CLI:        libexec/"multica-cli",
+      MULTICA_SIGNER:          pkgshare/"multica-sign-hap",
+      MULTICA_UNSIGNED_HAP:    libexec/"multica-desktop-unsigned.hap",
+      PATH:                    "#{formula_opt_bin("node")}:#{sdk_tools}:$PATH"
     shell = buildpath/"libelectron/ohos_hap"
 
     # Desktop payload: the patch carried the OHOS dependency wiring
@@ -151,21 +201,13 @@ class Multica < Formula
       The CLI and daemon are available as `multica`.
       The desktop HAP is at #{libexec}/multica-desktop-unsigned.hap.
 
-      The HAP is UNSIGNED: developer certificates bind to a device UDID, so
-      signing happens on your machine, not at bottling time.
-
-      Generate signing material on this machine with your Huawei account via
-      `devecocli auth login` and `devecocli signature generate` in a DevEco
-      project configured for bundle com.huawei.ohos_electron. Then sign with
-      that project's build-profile.json5:
-        multica-sign-hap --hap #{libexec}/multica-desktop-unsigned.hap --profile <build-profile.json5>
-      Install the official HarmonyOS command-line toolchain for `hap-sign-tool`;
-      if it is not on PATH, set HAP_SIGN_TOOL to its executable path. The helper
-      uses DevEco CLI's signing-material decoder and fails closed if it changes.
-      The signing tool receives decoded passwords in argv; same-user processes
-      may briefly be able to observe them.
-      Install the signed HAP:
-        bash #{opt_pkgshare}/install-hap.sh <signed>.hap --start
+      The HAP is unsigned in the bottle. Connect and unlock the target device,
+      then run `multica install-desktop`. On first use it opens DevEco CLI's
+      Huawei Developer account login, creates the signing project, generates
+      device-bound debug materials, signs the HAP, installs it, and starts it.
+      Private signing material stays in your home directory; it is not in the
+      bottle. The packaged DevEco CLI toolchain adapter is for signature
+      generation only; it does not provide general-purpose HAP builds.
 
       The full flow (signing config shape, daemon pairing, supervisor) is
       documented in the ohos-multica project: Build Pipeline and Distribution
@@ -177,7 +219,10 @@ class Multica < Formula
     ENV["HOME"] = testpath/"home"
     assert_match "multica #{version}", shell_output("#{bin}/multica --version")
     assert_match "CORE COMMANDS", shell_output("#{bin}/multica --help")
+    assert_match "Usage: multica install-desktop", shell_output("#{bin}/multica install-desktop --help")
+    assert_match "Authentication commands", shell_output("#{bin}/devecocli auth --help")
     assert_path_exists pkgshare/"install-hap.sh"
+    assert_path_exists pkgshare/"install-desktop.sh"
     assert_path_exists pkgshare/"multica-sign-hap"
     assert_match "Usage: sign-hap.cjs", shell_output("#{bin}/multica-sign-hap --help")
     hap = libexec/"multica-desktop-unsigned.hap"
