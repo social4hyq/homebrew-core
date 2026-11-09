@@ -1,0 +1,22 @@
+diff --git a/cmake/ProjectWarnings.cmake b/cmake/ProjectWarnings.cmake
+index a4fe0b7..fdc58b1 100644
+--- a/cmake/ProjectWarnings.cmake
++++ b/cmake/ProjectWarnings.cmake
+@@ -63,7 +63,7 @@ function(snow_apply_strict_warnings target)
+         endif()
+     elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+         target_compile_options("${target}" PRIVATE
+-            -Wall -Wextra -Wpedantic -Werror
++            -Wall -Wextra -Wpedantic 
+             -Wcast-align -Wcast-qual -Wconversion -Wdouble-promotion
+             -Wformat=2 -Wimplicit-fallthrough -Wmissing-declarations
+             -Wnon-virtual-dtor -Wnull-dereference -Wold-style-cast
+@@ -217,7 +217,7 @@ function(snow_enable_strict_warnings)
+         endif()
+     elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+         add_compile_options(
+-            -Wall -Wextra -Wpedantic -Werror
++            -Wall -Wextra -Wpedantic 
+             -Wcast-align -Wcast-qual -Wconversion -Wdouble-promotion
+             -Wformat=2 -Wimplicit-fallthrough -Wmissing-declarations
+             -Wnon-virtual-dtor -Wnull-dereference -Wold-style-cast

@@ -1,0 +1,29 @@
+diff --git a/snow_image_viewer/CMakeLists.txt b/snow_image_viewer/CMakeLists.txt
+index 7e007f9..2c9828b 100644
+--- a/snow_image_viewer/CMakeLists.txt
++++ b/snow_image_viewer/CMakeLists.txt
+@@ -156,10 +156,20 @@ target_link_libraries(
+         Qt6::GuiPrivate
+ )
+ 
+-add_executable(snow_image_viewer WIN32
+-    src/app/main.cpp
+-    resources/resources.qrc
+-)
++if(CMAKE_SYSTEM_NAME STREQUAL "OHOS")
++    # HarmonyOS hosts load Qt apps as a shared library via the qohos
++    # platform plugin, not as a spawned executable.
++    add_library(snow_image_viewer MODULE
++        src/app/main.cpp
++        resources/resources.qrc
++    )
++    set_target_properties(snow_image_viewer PROPERTIES PREFIX "lib" OUTPUT_NAME "snow_image_viewer")
++else()
++    add_executable(snow_image_viewer WIN32
++        src/app/main.cpp
++        resources/resources.qrc
++    )
++endif()
+ target_link_libraries(snow_image_viewer PRIVATE snow_image_viewer_lib)
+ 
+ add_executable(snow_image_edit_worker src/editing/worker_main.cpp)
