@@ -89,7 +89,8 @@ class SnowImageViewer < Formula
     sign_tool = clt/"sdk/default/openharmony/toolchains/lib/binary-sign-tool"
     system sign_tool, "sign", "-selfSign", "1", "-inFile", app_lib,
            "-outFile", buildpath/"libsnow_image_viewer.signed"
-    install buildpath/"libsnow_image_viewer.signed", app_lib
+    # NB: `install` here would recurse into Formula#install (arity 0).
+    cp buildpath/"libsnow_image_viewer.signed", app_lib
     chmod "+x", app_lib
 
     # harmonydeployqt collects the Qt libraries/plugins and generates the
