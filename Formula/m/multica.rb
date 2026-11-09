@@ -4,7 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.8.1.tar.gz"
   sha256 "4d142f4d676f90576dcf71787d3b9d20f6ec5329e0f3a8db14364cdc90253ad2"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -12,13 +12,12 @@ class Multica < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r6"
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8add461886d18109a6b5373ddcc2bff398932c431206ed4e78f1f76fe1ce2e0e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7884a073cc7874df829d5ac6b6e27819eaa7cb89b6fb65fdcb7e1fb1301114f9"
   end
 
   depends_on "go" => :build
-  depends_on "node" => :build
+  depends_on "node"
 
   # openharmony-sig/electron PC(2in1) prebuilt (CodeHub mirror hosted on this
   # tap's release; redistribution assumed by the tap owner, see release notes).
@@ -33,6 +32,10 @@ class Multica < Formula
 
   patch :p1 do
     file "Patches/multica/0002-hap-packaging.patch"
+  end
+
+  patch :p1 do
+    file "Patches/multica/0003-add-sign-hap-helper.patch"
   end
 
   def patch
@@ -50,6 +53,9 @@ class Multica < Formula
     end
 
     pkgshare.install "scripts/install-hap-ohos.sh" => "install-hap.sh"
+    pkgshare.install "scripts/sign-hap.cjs" => "multica-sign-hap"
+    chmod 0755, pkgshare/"multica-sign-hap"
+    bin.install_symlink pkgshare/"multica-sign-hap" => "multica-sign-hap"
     shell = buildpath/"libelectron/ohos_hap"
 
     # Desktop payload: the patch carried the OHOS dependency wiring
@@ -111,7 +117,8 @@ class Multica < Formula
     # ohos-multica project). The shell compiles no C++, so the NDK-less SDK
     # subset the image carries suffices.
     clt = Pathname.new("/opt/electron-ohos-clt")
-    odie "multica builds only in the electron-ohos-ci CI image" unless (clt/"hvigor/bin/hvigorw.js").exist?
+    odie "multica builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['multica']" unless
+      (clt/"hvigor/bin/hvigorw.js").exist?
 
     # brew's sanitized build env drops the container's LD_LIBRARY_PATH, but
     # ohos_packing_tool needs the SDK clang runtimes and the libhilog
@@ -147,8 +154,17 @@ class Multica < Formula
       The HAP is UNSIGNED: developer certificates bind to a device UDID, so
       signing happens on your machine, not at bottling time.
 
-      Sign and install with your own DevEco auto-sign materials (one-time
-      setup with DevEco Studio or deveco-cli), then install:
+      Generate signing material on this machine with your Huawei account via
+      `devecocli auth login` and `devecocli signature generate` in a DevEco
+      project configured for bundle com.huawei.ohos_electron. Then sign with
+      that project's build-profile.json5:
+        multica-sign-hap --hap #{libexec}/multica-desktop-unsigned.hap --profile <build-profile.json5>
+      Install the official HarmonyOS command-line toolchain for `hap-sign-tool`;
+      if it is not on PATH, set HAP_SIGN_TOOL to its executable path. The helper
+      uses DevEco CLI's signing-material decoder and fails closed if it changes.
+      The signing tool receives decoded passwords in argv; same-user processes
+      may briefly be able to observe them.
+      Install the signed HAP:
         bash #{opt_pkgshare}/install-hap.sh <signed>.hap --start
 
       The full flow (signing config shape, daemon pairing, supervisor) is
@@ -162,6 +178,8 @@ class Multica < Formula
     assert_match "multica #{version}", shell_output("#{bin}/multica --version")
     assert_match "CORE COMMANDS", shell_output("#{bin}/multica --help")
     assert_path_exists pkgshare/"install-hap.sh"
+    assert_path_exists pkgshare/"multica-sign-hap"
+    assert_match "Usage: sign-hap.cjs", shell_output("#{bin}/multica-sign-hap --help")
     hap = libexec/"multica-desktop-unsigned.hap"
     assert_path_exists hap
     listing = shell_output("unzip -l #{hap}")
