@@ -10,6 +10,11 @@ class SnowImageViewer < Formula
     strategy :github_latest
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-image-viewer-v1.5.2-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c434513089f1107a5bb18cd8b1c79a3b0a736c2d78a5718f342c276e50187e40"
+  end
+
   depends_on "cmake" => :build
   depends_on "ninja" => :build
   depends_on "node" => :build # hvigorw.js is a node script
