@@ -4,16 +4,11 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.8.1.tar.gz"
   sha256 "4d142f4d676f90576dcf71787d3b9d20f6ec5329e0f3a8db14364cdc90253ad2"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 7
+  revision 8
 
   livecheck do
     url :stable
     strategy :github_latest
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r10"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e5d2c9b0c9159b5dc1a5c4cfb207e3e83309af77f7475c097b1ebd27ca0117d9"
   end
 
   depends_on "go" => :build
@@ -58,6 +53,9 @@ class Multica < Formula
     cli_source = buildpath/"tools/deveco-cli"
     system "npm", "ci", "--prefix", cli_source,
            "--omit=dev", "--ignore-scripts", "--no-audit", "--no-fund"
+    inreplace cli_source/"node_modules/axios/lib/adapters/http.js",
+              "throw new AxiosError('Invalid proxy authorization', AxiosError.ERR_BAD_OPTION, { proxy });",
+              "proxyAuth = false;"
     libexec.install cli_source/"node_modules"
     cli_js = libexec/"node_modules/@deveco/deveco-cli-openharmony-arm64/dist/cli.js"
     chmod 0755, cli_js
@@ -239,6 +237,9 @@ class Multica < Formula
     assert_path_exists pkgshare/"install-desktop.sh"
     assert_path_exists pkgshare/"multica-sign-hap"
     assert_match "Usage: sign-hap.cjs", shell_output("#{bin}/multica-sign-hap --help")
+    axios = libexec/"node_modules/axios"
+    assert_match(/else if \(authIsObject\) \{\s+proxyAuth = false;/,
+                 (axios/"lib/adapters/http.js").read)
     hap = libexec/"multica-desktop-unsigned.hap"
     assert_path_exists hap
     listing = shell_output("unzip -l #{hap}")
