@@ -4,7 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.8.1.tar.gz"
   sha256 "4d142f4d676f90576dcf71787d3b9d20f6ec5329e0f3a8db14364cdc90253ad2"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 6
+  revision 7
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class Multica < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r9"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "33284fdc866c4109ffd1fdaffa359422ca66a3e4290af6a6e1dfca0e47cc0c9c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e5d2c9b0c9159b5dc1a5c4cfb207e3e83309af77f7475c097b1ebd27ca0117d9"
   end
 
   depends_on "go" => :build
@@ -85,7 +85,8 @@ class Multica < Formula
     sdk_metadata = sdk/"toolchains/oh-uni-package.json"
     sdk_metadata.dirname.mkpath
     cp sdk_tools/"oh-uni-package.json", sdk_metadata
-    cp sdk_metadata, toolchain/"sdk/default/sdk-pkg.json"
+    sdk_info = JSON.parse(sdk_metadata.read)
+    (toolchain/"sdk/default/sdk-pkg.json").write JSON.generate("data" => sdk_info)
     (sdk/"toolchains/hdc").write_env_script sdk_tools/"hdc", {}
     signer = sdk/"toolchains/lib/hap-sign-tool"
     signer.dirname.mkpath
@@ -100,6 +101,7 @@ class Multica < Formula
     pkgshare.install "scripts/install-hap-ohos.sh" => "install-hap.sh"
     pkgshare.install "scripts/install-desktop-ohos.sh" => "install-desktop.sh"
     pkgshare.install "scripts/sign-hap.cjs" => "multica-sign-hap"
+    chmod 0755, pkgshare/"install-hap.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"multica-sign-hap"
     bin.install_symlink pkgshare/"multica-sign-hap" => "multica-sign-hap"
@@ -231,6 +233,9 @@ class Multica < Formula
     assert_match "Usage: multica install-desktop", shell_output("#{bin}/multica install-desktop --help")
     assert_match "Authentication commands", shell_output("#{bin}/devecocli auth --help")
     assert_path_exists pkgshare/"install-hap.sh"
+    assert_predicate pkgshare/"install-hap.sh", :executable?
+    sdk_info = JSON.parse((libexec/"deveco-signing-toolchain/sdk/default/sdk-pkg.json").read)
+    assert_match(/\A\d+\z/, sdk_info.fetch("data").fetch("apiVersion").to_s)
     assert_path_exists pkgshare/"install-desktop.sh"
     assert_path_exists pkgshare/"multica-sign-hap"
     assert_match "Usage: sign-hap.cjs", shell_output("#{bin}/multica-sign-hap --help")
