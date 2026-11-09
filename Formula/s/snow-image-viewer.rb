@@ -4,7 +4,7 @@ class SnowImageViewer < Formula
   url "https://github.com/mg-chao/snow-apps/archive/refs/tags/v1.5.2_snow-shot.tar.gz"
   sha256 "e2f3ebd5f19f25e7132255aa96fb1660d1009e98bf4e37c8e78bfaa1da78c39f"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class SnowImageViewer < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-image-viewer-v1.5.2-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9efc7ff2e8b735ca275969382df564c689a10c6c560a692d49ad55b59eb73ae"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-image-viewer-v1.5.2-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ced53cc38b3681221ba17bc3bf40b56d941be21b21342015bd9b42e93d1598ce"
   end
 
   # These libraries are copied into the HAP after their ELF dependency graph
@@ -134,6 +134,10 @@ class SnowImageViewer < Formula
     system qt/"bin/harmonydeployqt", "--input", "hd.json",
            "--output", "hap-proj", "--no-build", "--verbose"
 
+    # harmonydeployqt assumes libz is a system library and skips it, but the
+    # HarmonyOS PC application namespace has no libz.so.1. freetype needs it.
+    cp "#{formula_opt_prefix("zlib")}/lib/libz.so.1", "hap-proj/entry/libs/arm64-v8a/"
+
     # No signingConfig: hvigor produces the unsigned artifact only.
     inreplace "hap-proj/build-profile.json5", '"signingConfig": "default",', ""
     cd "hap-proj" do
@@ -183,6 +187,7 @@ class SnowImageViewer < Formula
       libfontconfig.so.1
       libfreetype.so.6
       libintl.so.8
+      libz.so.1
       libzstd.so.1
     ].each { |name| assert_match name, listing }
     system "unzip", "-tq", hap
