@@ -4,16 +4,11 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.8.1.tar.gz"
   sha256 "4d142f4d676f90576dcf71787d3b9d20f6ec5329e0f3a8db14364cdc90253ad2"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 8
+  revision 9
 
   livecheck do
     url :stable
     strategy :github_latest
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r11"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ea06300aa380572ea72a83b98780f93aa06cff276cdb382036ac9baddee612a"
   end
 
   depends_on "go" => :build
@@ -119,7 +114,7 @@ class Multica < Formula
       MULTICA_REAL_CLI:        libexec/"multica-cli",
       MULTICA_SIGNER:          pkgshare/"multica-sign-hap",
       MULTICA_UNSIGNED_HAP:    libexec/"multica-desktop-unsigned.hap",
-      PATH:                    "#{formula_opt_bin("node")}:#{sdk_tools}:$PATH"
+      PATH:                    "#{formula_opt_bin("node")}:#{sdk}/toolchains:#{sdk_tools}:$PATH"
     shell = buildpath/"libelectron/ohos_hap"
 
     # Desktop payload: the patch carried the OHOS dependency wiring
@@ -235,6 +230,7 @@ class Multica < Formula
     assert_match "CORE COMMANDS", shell_output("#{bin}/multica --help")
     assert_match "Usage: multica install-desktop", shell_output("#{bin}/multica install-desktop --help")
     assert_match "Authentication commands", shell_output("#{bin}/devecocli auth --help")
+    assert_match "deveco-signing-toolchain/sdk/default/openharmony/toolchains", (bin/"multica").read
     assert_path_exists pkgshare/"install-hap.sh"
     assert_predicate pkgshare/"install-hap.sh", :executable?
     sdk_info = JSON.parse((libexec/"deveco-signing-toolchain/sdk/default/sdk-pkg.json").read)
