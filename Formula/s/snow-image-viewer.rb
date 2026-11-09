@@ -114,7 +114,14 @@ class SnowImageViewer < Formula
     # No signingConfig: hvigor produces the unsigned artifact only.
     inreplace "hap-proj/build-profile.json5", '"signingConfig": "default",', ""
     cd "hap-proj" do
-      system "node", clt/"ohpm/bin/pm-cli.js", "install"
+      # Template devDeps (@ohos/hypium/hamock) are test-only frameworks the
+    # build does not need; fetching them from the ohpm registry is flaky
+    # from CI runners, so drop them and let ohpm install be a no-op.
+    inreplace "hap-proj/oh-package.json5", /"devDependencies": \{[^}]*\},?/, ""
+    # NOTE: pass plain strings to system(); Pathname arguments trip the
+    # verbose-error JSON formatter (Invalid object crash) and swallow the
+    # real failure output.
+    system "node", clt/"ohpm/bin/pm-cli.js", "install"
       cd "entry" do
         system "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
                "--mode", "module", "-p", "product=default", "--no-daemon"
