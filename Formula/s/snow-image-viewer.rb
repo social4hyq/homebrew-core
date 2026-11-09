@@ -12,6 +12,7 @@ class SnowImageViewer < Formula
 
   depends_on "cmake" => :build
   depends_on "ninja" => :build
+  depends_on "node" => :build # hvigorw.js is a node script
   depends_on "ohos-sdk" => :build
   # Qt6Core links zstd (rcc compresses resources); the NDK sysroot has none.
   depends_on "zstd" => :build
