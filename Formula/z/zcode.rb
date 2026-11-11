@@ -5,8 +5,8 @@ class Zcode < Formula
   homepage "https://github.com/zai-org/ZCode"
   # Pin the public main snapshot; its version comes from package.json.
   url "https://github.com/zai-org/ZCode.git",
-      revision: "a9fe401eede6e6e5e01be9048679c206fe6f02d9"
-  version "3.17.2"
+      revision: "b95ebaffeab641907b38652f45c1502bd762972d"
+  version "3.18.0"
   license "Apache-2.0"
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -16,8 +16,8 @@ class Zcode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.17.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c93a588f4b1d313e2177bda071b3c0176b0f5bda48d8427cd64699dc62f0025"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.18.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "da0e070247e9292101d6164df95e9eae835410c2b886059c925faf02b7d55a8d"
   end
 
   depends_on "node" => :build
@@ -59,6 +59,8 @@ class Zcode < Formula
     # CUA capture is unavailable; allow the replacement PTY package to build.
     ws["allowBuilds"]["koffi"] = false
     ws["allowBuilds"]["@ohos-ports/node-pty"] = true
+    # core-js only prints a funding banner in postinstall; skip it on OHOS.
+    ws["allowBuilds"]["core-js"] = false
     File.write("pnpm-workspace.yaml", YAML.dump(ws))
 
     ENV["npm_config_manage_package_manager_versions"] = "false"
