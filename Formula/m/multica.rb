@@ -4,7 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.8.1.tar.gz"
   sha256 "4d142f4d676f90576dcf71787d3b9d20f6ec5329e0f3a8db14364cdc90253ad2"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 9
+  revision 10
 
   livecheck do
     url :stable
@@ -12,13 +12,13 @@ class Multica < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r12"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7b8f48a068042ea1ce180b40aebacdd1b27c783255f48dd3d36844b402a68e6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.1-r13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c44c3b2afa31b0adf2911984a177d261a372c2bddc78d0464b0b23365778e01e"
   end
 
   depends_on "go" => :build
-  depends_on "node"
-  depends_on "ohos-sdk-toolchains"
+  depends_on "node" => :build
+  depends_on "hap-installer"
 
   # openharmony-sig/electron PC(2in1) prebuilt (CodeHub mirror hosted on this
   # tap's release; redistribution assumed by the tap owner, see release notes).
@@ -36,15 +36,7 @@ class Multica < Formula
   end
 
   patch :p1 do
-    file "Patches/multica/0003-add-sign-hap-helper.patch"
-  end
-
-  patch :p1 do
     file "Patches/multica/0004-install-desktop-command.patch"
-  end
-
-  patch :p1 do
-    file "Patches/multica/0005-default-signing-paths.patch"
   end
 
   def patch
@@ -55,46 +47,6 @@ class Multica < Formula
   end
 
   def install
-    cli_source = buildpath/"tools/deveco-cli"
-    system "npm", "ci", "--prefix", cli_source,
-           "--omit=dev", "--ignore-scripts", "--no-audit", "--no-fund"
-    inreplace cli_source/"node_modules/axios/lib/adapters/http.js",
-              "throw new AxiosError('Invalid proxy authorization', AxiosError.ERR_BAD_OPTION, { proxy });",
-              "proxyAuth = false;"
-    libexec.install cli_source/"node_modules"
-    cli_js = libexec/"node_modules/@deveco/deveco-cli-openharmony-arm64/dist/cli.js"
-    chmod 0755, cli_js
-    bin.install_symlink libexec/"node_modules/.bin/devecocli" => "devecocli"
-
-    toolchain = libexec/"deveco-signing-toolchain"
-    toolchain.mkpath
-    toolchain_node = toolchain/"node/bin/node"
-    toolchain_node.dirname.mkpath
-    toolchain_node.write_env_script formula_opt_bin("node")/"node", {}
-    ohpm_entry = toolchain/"ohpm/bin/pm-cli.js"
-    ohpm_entry.dirname.mkpath
-    ohpm_entry.write <<~JS
-      console.error("This command-line toolchain adapter supports signing only.");
-      process.exit(1);
-    JS
-    hvigor_entry = toolchain/"hvigor/bin/hvigorw.js"
-    hvigor_entry.dirname.mkpath
-    hvigor_entry.write <<~JS
-      console.error("This command-line toolchain adapter supports signing only.");
-      process.exit(1);
-    JS
-    sdk = toolchain/"sdk/default/openharmony"
-    sdk_tools = formula_opt_prefix("ohos-sdk-toolchains")
-    sdk_metadata = sdk/"toolchains/oh-uni-package.json"
-    sdk_metadata.dirname.mkpath
-    cp sdk_tools/"oh-uni-package.json", sdk_metadata
-    sdk_info = JSON.parse(sdk_metadata.read)
-    (toolchain/"sdk/default/sdk-pkg.json").write JSON.generate("data" => sdk_info)
-    (sdk/"toolchains/hdc").write_env_script sdk_tools/"hdc", {}
-    signer = sdk/"toolchains/lib/hap-sign-tool"
-    signer.dirname.mkpath
-    signer.write_env_script sdk_tools/"lib/hap-sign-tool", {}
-
     cd "server" do
       ENV["CGO_ENABLED"] = "0"
       system "go", "build", *std_go_args(output: libexec/"multica-cli", ldflags: "-s -w -X main.version=#{version}"),
@@ -103,23 +55,15 @@ class Multica < Formula
 
     pkgshare.install "scripts/install-hap-ohos.sh" => "install-hap.sh"
     pkgshare.install "scripts/install-desktop-ohos.sh" => "install-desktop.sh"
-    pkgshare.install "scripts/sign-hap.cjs" => "multica-sign-hap"
     chmod 0755, pkgshare/"install-hap.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    chmod 0755, pkgshare/"multica-sign-hap"
-    bin.install_symlink pkgshare/"multica-sign-hap" => "multica-sign-hap"
     libexec.install "scripts/multica-dispatch-ohos.sh" => "multica-dispatch.sh"
     chmod 0755, libexec/"multica-dispatch.sh"
     (bin/"multica").write_env_script libexec/"multica-dispatch.sh",
-      COMMAND_LINE_TOOL_PATH:  toolchain,
-      DEVECO_CLI_JS:           cli_js,
-      HAP_SIGN_TOOL:           sdk_tools/"lib/hap-sign-tool",
       MULTICA_INSTALL_DESKTOP: pkgshare/"install-desktop.sh",
-      MULTICA_INSTALLER:       pkgshare/"install-hap.sh",
       MULTICA_REAL_CLI:        libexec/"multica-cli",
-      MULTICA_SIGNER:          pkgshare/"multica-sign-hap",
       MULTICA_UNSIGNED_HAP:    libexec/"multica-desktop-unsigned.hap",
-      PATH:                    "#{formula_opt_bin("node")}:#{sdk}/toolchains:#{sdk_tools}:$PATH"
+      PATH:                    "#{formula_opt_bin("node")}:$PATH"
     shell = buildpath/"libelectron/ohos_hap"
 
     # Desktop payload: the patch carried the OHOS dependency wiring
@@ -216,12 +160,10 @@ class Multica < Formula
       The desktop HAP is at #{libexec}/multica-desktop-unsigned.hap.
 
       The HAP is unsigned in the bottle. Connect and unlock the target device,
-      then run `multica install-desktop`. On first use it opens DevEco CLI's
-      Huawei Developer account login, creates the signing project, generates
-      device-bound debug materials, signs the HAP, installs it, and starts it.
-      Private signing material stays in your home directory; it is not in the
-      bottle. The packaged DevEco CLI toolchain adapter is for signature
-      generation only; it does not provide general-purpose HAP builds.
+      then run `multica install-desktop`. hap-installer handles Huawei Developer
+      login, signing-project creation, local debug profile generation, signing,
+      installation, and launch. Private signing material stays in your home
+      directory; it is not in the bottle.
 
       The full flow (signing config shape, daemon pairing, supervisor) is
       documented in the ohos-multica project: Build Pipeline and Distribution
@@ -234,18 +176,30 @@ class Multica < Formula
     assert_match "multica #{version}", shell_output("#{bin}/multica --version")
     assert_match "CORE COMMANDS", shell_output("#{bin}/multica --help")
     assert_match "Usage: multica install-desktop", shell_output("#{bin}/multica install-desktop --help")
-    assert_match "Authentication commands", shell_output("#{bin}/devecocli auth --help")
-    assert_match "deveco-signing-toolchain/sdk/default/openharmony/toolchains", (bin/"multica").read
+    desktop_installer = pkgshare/"install-desktop.sh"
+    assert_match "hap-installer", desktop_installer.read
+    refute_match "devecocli", desktop_installer.read
+    unsigned_hap = testpath/"desktop.hap"
+    unsigned_hap.write "unsigned"
+    fake_bin = testpath/"bin"
+    fake_bin.mkpath
+    installer_args = testpath/"hap-installer-args"
+    fake_installer = fake_bin/"hap-installer"
+    fake_installer.write <<~SH
+      #!/bin/sh
+      printf '%s\n' "$@" > #{installer_args}
+    SH
+    chmod 0755, fake_installer
+    ENV["MULTICA_UNSIGNED_HAP"] = unsigned_hap.to_s
+    ENV.prepend_path "PATH", fake_bin
+    shell_output(desktop_installer.to_s)
+    assert_equal ["--hap", unsigned_hap.to_s, "--bundle-id", "com.huawei.ohos_electron",
+                  "--app-name", "MulticaSigning", "--module", "electron",
+                  "--ability", "EntryAbility"], installer_args.read.lines(chomp: true)
+    refute_path_exists libexec/"node_modules"
     assert_path_exists pkgshare/"install-hap.sh"
     assert_predicate pkgshare/"install-hap.sh", :executable?
-    sdk_info = JSON.parse((libexec/"deveco-signing-toolchain/sdk/default/sdk-pkg.json").read)
-    assert_match(/\A\d+\z/, sdk_info.fetch("data").fetch("apiVersion").to_s)
     assert_path_exists pkgshare/"install-desktop.sh"
-    assert_path_exists pkgshare/"multica-sign-hap"
-    assert_match "Usage: sign-hap.cjs", shell_output("#{bin}/multica-sign-hap --help")
-    axios = libexec/"node_modules/axios"
-    assert_match(/else if \(authIsObject\) \{\s+proxyAuth = false;/,
-                 (axios/"lib/adapters/http.js").read)
     hap = libexec/"multica-desktop-unsigned.hap"
     assert_path_exists hap
     listing = shell_output("unzip -l #{hap}")
