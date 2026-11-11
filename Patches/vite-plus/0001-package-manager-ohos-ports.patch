@@ -1,13 +1,13 @@
 OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package names and `<upstream>-<N>` versions).
 
 diff --git a/crates/vp_pm_cli/src/package_manager.rs b/crates/vp_pm_cli/src/package_manager.rs
-index cdd9e26..328c04e 100644
+index 92e11cd..c12ec94 100644
 --- a/crates/vp_pm_cli/src/package_manager.rs
 +++ b/crates/vp_pm_cli/src/package_manager.rs
-@@ -1296,6 +1296,21 @@ async fn resolve_dist_tag(
-     tag: &str,
+@@ -1300,6 +1300,21 @@ async fn resolve_dist_tag(
      npm_config: &NpmConfig,
  ) -> Result<Str, Error> {
+     ensure_managed_package_manager_allowed(package_manager_type)?;
 +    // The registry's `latest` may not be ported to OHOS yet; use the newest ported version.
 +    #[cfg(target_env = "ohos")]
 +    if tag == "latest"
@@ -26,7 +26,7 @@ index cdd9e26..328c04e 100644
      let urls = dist_tag_packages(package_manager_type)
          .iter()
          .map(|package_name| npm_config.package_version_url(package_name, tag))
-@@ -1479,6 +1494,14 @@ async fn resolve_latest_satisfying_version(
+@@ -1485,6 +1500,14 @@ async fn resolve_latest_satisfying_version(
      if matches!(package_manager_type, PackageManagerType::Yarn) {
          versions.extend(fetch_registry_versions("@yarnpkg/cli-dist", npm_config).await?);
      }
@@ -41,7 +41,7 @@ index cdd9e26..328c04e 100644
  
      let best = versions
          .iter()
-@@ -1845,13 +1868,102 @@ fn open_lock_file(lock_path: &Path) -> io::Result<File> {
+@@ -1854,13 +1877,102 @@ fn open_lock_file(lock_path: &Path) -> io::Result<File> {
      fs::OpenOptions::new().read(true).write(true).create(true).truncate(false).open(lock_path)
  }
  
@@ -145,7 +145,7 @@ index cdd9e26..328c04e 100644
          ("linux", "aarch64") => "@oven/bun-linux-aarch64",
          #[cfg(target_env = "musl")]
          ("linux", "x86_64") => "@oven/bun-linux-x64-musl",
-@@ -1936,8 +2048,11 @@ async fn download_bun_package_manager(
+@@ -1945,8 +2057,11 @@ async fn download_bun_package_manager(
  
      // The declared hash never covers the platform tarball, so verify it
      // against the registry's `dist.integrity` for the platform package.
@@ -158,7 +158,7 @@ index cdd9e26..328c04e 100644
  
      // Stage the download in a temp directory beside the version directory, not
      // inside it, so a reader scanning key subdirectories never sees the staging
-@@ -1947,7 +2062,7 @@ async fn download_bun_package_manager(
+@@ -1956,7 +2071,7 @@ async fn download_bun_package_manager(
      tokio::fs::create_dir_all(manager_dir).await?;
  
      // Download the platform-specific package directly
@@ -167,7 +167,7 @@ index cdd9e26..328c04e 100644
      // Keep the TempDir guard alive so a failure path cleans up the temp dir.
      let tmp_dir = tempfile::tempdir_in(manager_dir)?;
      let target_dir_tmp = tmp_dir.path().to_path_buf();
-@@ -2028,7 +2143,9 @@ fn get_pnpm_platform_package_name() -> Result<&'static str, Error> {
+@@ -2037,7 +2152,9 @@ fn get_pnpm_platform_package_name() -> Result<&'static str, Error> {
          ("macos", "x86_64") => "@pnpm/exe.darwin-x64",
          #[cfg(target_env = "musl")]
          ("linux", "aarch64") => "@pnpm/exe.linux-arm64-musl",
@@ -178,7 +178,7 @@ index cdd9e26..328c04e 100644
          ("linux", "aarch64") => "@pnpm/exe.linux-arm64",
          #[cfg(target_env = "musl")]
          ("linux", "x86_64") => "@pnpm/exe.linux-x64-musl",
-@@ -2147,8 +2264,11 @@ async fn download_pnpm_native_package_manager(
+@@ -2156,8 +2273,11 @@ async fn download_pnpm_native_package_manager(
  
      // The declared hash never covers the platform tarball, so verify it
      // against the registry's `dist.integrity` for the platform package.
@@ -191,7 +191,7 @@ index cdd9e26..328c04e 100644
  
      // Stage the download in a temp directory beside the version directory, not
      // inside it, so a reader scanning key subdirectories never sees the staging
-@@ -2158,7 +2278,7 @@ async fn download_pnpm_native_package_manager(
+@@ -2167,7 +2287,7 @@ async fn download_pnpm_native_package_manager(
      tokio::fs::create_dir_all(manager_dir).await?;
  
      // Download the platform-specific package directly
@@ -200,7 +200,7 @@ index cdd9e26..328c04e 100644
      // Keep the TempDir guard alive so a failure path cleans up the temp dir.
      let tmp_dir = tempfile::tempdir_in(manager_dir)?;
      let target_dir_tmp = tmp_dir.path().to_path_buf();
-@@ -4548,6 +4668,7 @@ mod tests {
+@@ -4641,6 +4761,7 @@ mod tests {
      }
  
      #[tokio::test]
@@ -208,7 +208,7 @@ index cdd9e26..328c04e 100644
      async fn test_download_package_manager_pnpm_v12_native() {
          use httpmock::prelude::*;
          use sha2::Sha512;
-@@ -5102,6 +5223,9 @@ mod tests {
+@@ -5195,6 +5316,9 @@ mod tests {
          let result = get_bun_platform_package_name();
          assert!(result.is_ok(), "Should return a platform package name");
          let name = result.unwrap();
@@ -218,7 +218,7 @@ index cdd9e26..328c04e 100644
          assert!(
              name.starts_with("@oven/bun-"),
              "Package name should start with @oven/bun-, got: {name}"
-@@ -5456,6 +5580,9 @@ mod tests {
+@@ -5549,6 +5673,9 @@ mod tests {
          let result = get_pnpm_platform_package_name();
          assert!(result.is_ok(), "Should return a platform package name");
          let name = result.unwrap();

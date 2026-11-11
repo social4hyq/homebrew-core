@@ -1,8 +1,8 @@
 class VitePlus < Formula
   desc "Unified toolchain and entry point for web development"
   homepage "https://viteplus.dev"
-  url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.5.1.tar.gz"
-  sha256 "2ce42df9434fb3d76bde6cc7ed5b452a3da9356439e04f580dec5412da6fce55"
+  url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.6.0.tar.gz"
+  sha256 "8bb73c2ff33523675c66e9d87d8694754e4def7d7bbaff2ee95f274fb48de946"
   license "MIT"
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
@@ -64,8 +64,8 @@ class VitePlus < Formula
 
     resource "vite-task-src" do
       url "https://github.com/voidzero-dev/vite-task.git",
-          revision: "40cb9cac46bddbf8aa5ce5373df1a6a1980acc38"
-      version "40cb9cac46bddbf8aa5ce5373df1a6a1980acc38"
+          revision: "cb1ea8d214b26a0f3ca2b2ef3b6bc471b18ffacb"
+      version "cb1ea8d214b26a0f3ca2b2ef3b6bc471b18ffacb"
 
       patch :p1 do
         file "Patches/vite-plus/0003-vite-task-preload-ohos-build.patch"
@@ -121,7 +121,9 @@ class VitePlus < Formula
     resource("rolldown").stage buildpath/"rolldown"
     resource("vite").stage buildpath/"vite"
     resource("oxc-node").stage buildpath/"oxc-node"
-    system "node", "packages/tools/src/patch-oxc-node.ts"
+
+    # Apply Vite+'s branding and config patches to the staged Vite source, as upstream `sync-remote` does
+    system "node", "packages/tools/src/index.ts", "brand-vite"
 
     # Any Node.js may load the binding, so on OHOS sqlite stays bundled in it
     ENV["LIBSQLITE3_SYS_USE_PKG_CONFIG"] = "1" unless OS.ohos?
@@ -132,6 +134,9 @@ class VitePlus < Formula
       package_json = buildpath/file
       package_json.atomic_write(JSON.pretty_generate(JSON.parse(package_json.read).except("packageManager")))
     end
+
+    # Point the vendored oxc-node at the workspace's oxc version, as upstream CI does
+    system "node", "packages/tools/src/patch-oxc-node.ts"
 
     # Align the staged Vite's Vitest versions with the lockfile, as upstream CI does
     system "node", "packages/tools/src/vendored-vitest.ts"
@@ -159,9 +164,6 @@ class VitePlus < Formula
 
       # Patch 0005 points fspy at this checkout, at ../vite-task.
       resource("vite-task-src").stage buildpath.parent/"vite-task"
-
-      # Upstream CI brands the staged Vite before building it
-      system "pnpm", "exec", "tool", "brand-vite"
     end
 
     system "just", "build"
