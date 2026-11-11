@@ -4,6 +4,7 @@ class HapInstaller < Formula
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.10.tgz"
   sha256 "7fdee1bfb7393c151fa09b3714ecc4796e53d9876557e9933c5890319ffb4daa"
   license "MIT"
+  revision 1
 
   livecheck do
     url "https://registry.npmjs.org/@deveco%2Fdeveco-cli-openharmony-arm64"
@@ -11,8 +12,8 @@ class HapInstaller < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hap-installer-v1.3.10-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "430b8a38c729bec80d3400697868af088bc405420fd36dc31ecab7c5ae418ecd"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hap-installer-v1.3.10-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "70cdb5186c1c93401ff6d382c3289d8f8d5d5a14ff87b34ed05ab4e4a7e12066"
   end
 
   depends_on "node"
@@ -113,6 +114,8 @@ class HapInstaller < Formula
     assert_match "--bundle-id", shell_output("#{bin}/hap-installer --help")
     assert_match "Usage: sign-hap.cjs", shell_output("#{bin}/hap-installer-sign --help")
     assert_match "Authentication commands", shell_output("#{bin}/devecocli auth --help")
+    assert_match 'signed_hap="${signed_hap:-${TMPDIR:-$home/.cache}/hap-installer/signed/$bundle_id.hap}"',
+                 (libexec/"hap-installer.sh").read
     assert_match "hap-installer-toolchain/sdk/default/openharmony/toolchains", (bin/"hap-installer").read
     assert_path_exists libexec/"hap-installer-toolchain/sdk/default/openharmony/toolchains/hdc"
     refute_path_exists bin/"hdc"
