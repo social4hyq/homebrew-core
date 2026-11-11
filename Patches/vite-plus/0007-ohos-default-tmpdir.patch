@@ -1,10 +1,10 @@
 OHOS: default TMPDIR/TMP when unset, since /tmp is read-only.
 
 diff --git a/crates/vp_global_cli/src/main.rs b/crates/vp_global_cli/src/main.rs
-index 8ecd19e..b3644eb 100644
+index 3ab6c16..ef8860f 100644
 --- a/crates/vp_global_cli/src/main.rs
 +++ b/crates/vp_global_cli/src/main.rs
-@@ -329,6 +329,33 @@ fn is_homebrew_recovery_command(args: &[String]) -> bool {
+@@ -329,7 +329,37 @@ fn is_homebrew_recovery_command(args: &[String]) -> bool {
          )
  }
  
@@ -35,15 +35,10 @@ index 8ecd19e..b3644eb 100644
 +    }
 +}
 +
- #[tokio::main]
- async fn main() -> ExitCode {
-     // Probe before tracing, directory resolution, or argument dispatch can emit output.
-@@ -344,6 +371,8 @@ async fn main() -> ExitCode {
- 
-     vp_shared::ensure_blocking_stdio();
-     vp_shared::ensure_windows_pathext();
+ fn main() -> ExitCode {
 +    #[cfg(target_env = "ohos")]
 +    ensure_tmpdir();
++
+     let args: Vec<String> = std::env::args().collect();
  
-     // Initialize tracing
-     vp_shared::init_tracing();
+     // Inspect shim mode without clearing its environment markers: Homebrew
