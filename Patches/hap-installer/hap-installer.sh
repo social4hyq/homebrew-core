@@ -74,7 +74,7 @@ done
 home="${HOME:?HOME must be set}"
 app_name="${app_name:-${bundle_id##*.}}"
 project_dir="${project_dir:-$home/.hap-installer/projects/$bundle_id}"
-signed_hap="${signed_hap:-$home/.hap-installer/signed/$bundle_id.hap}"
+signed_hap="${signed_hap:-${TMPDIR:-$home/.cache}/hap-installer/signed/$bundle_id.hap}"
 profile="$project_dir/build-profile.json5"
 
 status_output=$(devecocli auth status 2>&1) || {
