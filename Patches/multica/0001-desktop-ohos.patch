@@ -1,3 +1,5 @@
+OHOS: adapt the desktop renderer and runtime for HarmonyOS.
+
 diff --git a/.npmrc b/.npmrc
 index bf2e764..1c98dd0 100644
 --- a/.npmrc
@@ -20,7 +22,7 @@ index 04b44b8..59ae820 100644
    preload: {
      // `@electron-toolkit/preload` must be bundled INTO the preload script:
 diff --git a/apps/desktop/src/main/daemon-manager.ts b/apps/desktop/src/main/daemon-manager.ts
-index db7a418..6e2ea59 100644
+index a29c2c8..8102bac 100644
 --- a/apps/desktop/src/main/daemon-manager.ts
 +++ b/apps/desktop/src/main/daemon-manager.ts
 @@ -1,4 +1,4 @@
@@ -29,7 +31,7 @@ index db7a418..6e2ea59 100644
  import { execFile } from "child_process";
  import {
    readFile,
-@@ -207,9 +207,11 @@ async function fetchHealthAtPort(
+@@ -208,9 +208,11 @@ async function fetchHealthAtPort(
    const controller = new AbortController();
    const timeout = setTimeout(() => controller.abort(), timeoutMs);
    try {
@@ -44,7 +46,7 @@ index db7a418..6e2ea59 100644
      if (!res.ok) return null;
      return (await res.json()) as HealthPayload;
    } catch {
-@@ -247,10 +249,16 @@ async function probeTokenValidity(profile: string): Promise<AuthProbeResult> {
+@@ -248,10 +250,16 @@ async function probeTokenValidity(profile: string): Promise<AuthProbeResult> {
    try {
      const controller = new AbortController();
      const timeout = setTimeout(() => controller.abort(), 4_000);
@@ -65,7 +67,7 @@ index db7a418..6e2ea59 100644
      clearTimeout(timeout);
      return classifyAuthProbe({ status: res.status });
    } catch {
-@@ -688,15 +696,25 @@ async function mintPat(jwt: string): Promise<string> {
+@@ -689,15 +697,25 @@ async function mintPat(jwt: string): Promise<string> {
      throw new Error("mint PAT: target API URL not set");
    }
    const url = `${targetApiBaseUrl.replace(/\/+$/, "")}/api/tokens`;
@@ -100,7 +102,7 @@ index db7a418..6e2ea59 100644
    if (!res.ok) {
      const body = await res.text().catch(() => "");
      // Attach the status so callers can tell a genuine auth rejection (401 — the
-@@ -1286,7 +1304,7 @@ function startPolling(): void {
+@@ -1287,7 +1305,7 @@ function startPolling(): void {
   */
  async function bootstrapCli(): Promise<void> {
    const bin = await resolveCliBinary();
@@ -110,7 +112,7 @@ index db7a418..6e2ea59 100644
      sendStatus({ state: "cli_not_found" });
      return;
 diff --git a/apps/desktop/src/main/index.ts b/apps/desktop/src/main/index.ts
-index 9a1d4ef..9c22611 100644
+index 3382ffd..42b8a1a 100644
 --- a/apps/desktop/src/main/index.ts
 +++ b/apps/desktop/src/main/index.ts
 @@ -10,6 +10,11 @@ import {
@@ -126,10 +128,10 @@ index 9a1d4ef..9c22611 100644
  import { electronApp, optimizer, is } from "@electron-toolkit/utils";
  import fixPath from "fix-path";
 diff --git a/package.json b/package.json
-index 81d8091..02078a3 100644
+index b7f1da8..6df7064 100644
 --- a/package.json
 +++ b/package.json
-@@ -30,7 +30,8 @@
+@@ -31,7 +31,8 @@
      "ui:add": "cd packages/ui && npx shadcn@latest add",
      "generate:brand": "node scripts/brand/generate.mjs",
      "generate:attachment-text-preview": "node scripts/generate-attachment-text-preview.mjs",
@@ -139,7 +141,7 @@ index 81d8091..02078a3 100644
    },
    "engines": {
      "node": ">=22"
-@@ -52,7 +53,9 @@
+@@ -53,7 +54,9 @@
        "minimatch@5>brace-expansion": "2.1.4",
        "minimatch@9>brace-expansion": "2.1.4",
        "minimatch@10>brace-expansion": "5.0.9",
@@ -150,7 +152,7 @@ index 81d8091..02078a3 100644
      },
      "patchedDependencies": {
        "expo-modules-core@57.0.21": "apps/mobile/patches/expo-modules-core@57.0.21.patch"
-@@ -65,6 +68,7 @@
+@@ -66,6 +69,7 @@
      "knip": "^6.32.2",
      "pg": "^8.20.0",
      "turbo": "^2.5.4",
@@ -160,26 +162,10 @@ index 81d8091..02078a3 100644
    }
  }
 diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
-index 9a91cdf..77d95c1 100644
+index 1880f98..ebb57c7 100644
 --- a/pnpm-lock.yaml
 +++ b/pnpm-lock.yaml
-@@ -60,12 +60,12 @@ catalogs:
-     mdast-util-from-markdown:
-       specifier: ^2.0.3
-       version: 2.0.3
--    micromark-util-sanitize-uri:
--      specifier: ^2.0.1
--      version: 2.0.1
-     mermaid:
-       specifier: ^11.14.0
-       version: 11.14.0
-+    micromark-util-sanitize-uri:
-+      specifier: ^2.0.1
-+      version: 2.0.1
-     posthog-js:
-       specifier: ^1.176.1
-       version: 1.369.3
-@@ -124,6 +124,8 @@ overrides:
+@@ -196,6 +196,8 @@ overrides:
    minimatch@9>brace-expansion: 2.1.4
    minimatch@10>brace-expansion: 5.0.9
    builder-util-runtime: 9.7.0
@@ -188,7 +174,7 @@ index 9a91cdf..77d95c1 100644
  
  patchedDependencies:
    expo-modules-core@57.0.21:
-@@ -146,6 +148,9 @@ importers:
+@@ -218,6 +220,9 @@ importers:
        knip:
          specifier: ^6.32.2
          version: 6.32.2
@@ -198,16 +184,16 @@ index 9a91cdf..77d95c1 100644
        pg:
          specifier: ^8.20.0
          version: 8.20.0
-@@ -650,7 +655,7 @@ importers:
+@@ -981,7 +986,7 @@ importers:
          version: '@typescript/typescript6@6.0.2'
        vitest:
          specifier: 'catalog:'
 -        version: 4.1.0(@opentelemetry/api@1.9.1)(@types/node@25.5.0)(jsdom@29.0.1(@noble/hashes@1.8.0))(msw@2.12.14(@types/node@25.5.0)(@typescript/typescript6@6.0.2))(vite@8.0.1(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.5.0)(esbuild@0.25.12)(jiti@2.7.0)(terser@5.47.1)(yaml@2.9.1))
 +        version: 4.1.0(@opentelemetry/api@1.9.1)(@types/node@25.5.0)(jsdom@29.0.1(@noble/hashes@1.8.0))(msw@2.12.14(@types/node@25.5.0)(@typescript/typescript6@6.0.2))(vite@8.0.1(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.5.0)(jiti@2.7.0)(terser@5.47.1)(yaml@2.9.0))
  
-   packages/core:
+   packages/views:
      dependencies:
-@@ -2801,6 +2806,20 @@ packages:
+@@ -2879,6 +2884,20 @@ packages:
        react: ^18 || ^19
        react-dom: ^18 || ^19
  
@@ -228,7 +214,7 @@ index 9a91cdf..77d95c1 100644
    '@open-draft/deferred-promise@2.2.0':
      resolution: {integrity: sha512-CecwLWx3rhxVQF6V4bAgPS5t+So2sTbPgAzafKkVizyi7tlwpcFpdFqq+wqF2OwNBmqFuu6tOyouTuxgpMfzmA==}
  
-@@ -4385,66 +4404,66 @@ packages:
+@@ -4453,66 +4472,66 @@ packages:
    '@tailwindcss/node@4.2.2':
      resolution: {integrity: sha512-pXS+wJ2gZpVXqFaUEjojq7jzMpTGf8rU6ipJz5ovJV6PUGmlJ+jvIwGrzdHdQ80Sg+wmQxUFuoW1UAAwHNEdFA==}
  
@@ -315,7 +301,7 @@ index 9a91cdf..77d95c1 100644
      engines: {node: '>=14.0.0'}
      cpu: [wasm32]
      bundledDependencies:
-@@ -4455,22 +4474,18 @@ packages:
+@@ -4523,22 +4542,18 @@ packages:
        - '@emnapi/wasi-threads'
        - tslib
  
@@ -342,7 +328,7 @@ index 9a91cdf..77d95c1 100644
    '@tailwindcss/postcss@4.2.2':
      resolution: {integrity: sha512-n4goKQbW8RVXIbNKRB/45LzyUqN451deQK0nzIeauVEqjlI49slUlgKYJM2QyUzap/PcpnS7kzSUmPb1sCRvYQ==}
  
-@@ -6520,11 +6535,6 @@ packages:
+@@ -6584,11 +6599,6 @@ packages:
      resolution: {integrity: sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg==}
      engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
  
@@ -354,7 +340,7 @@ index 9a91cdf..77d95c1 100644
    detect-libc@2.1.2:
      resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
      engines: {node: '>=8'}
-@@ -8444,61 +8454,30 @@ packages:
+@@ -8443,61 +8453,30 @@ packages:
      cpu: [arm64]
      os: [android]
  
@@ -416,7 +402,7 @@ index 9a91cdf..77d95c1 100644
    lightningcss-linux-arm64-gnu@1.32.0:
      resolution: {integrity: sha512-0nnMyoyOLRJXfbMOilaSRcLH3Jw5z9HDNGfT/gwCPgaDjnx0i8w7vBzFLFR1f6CMLKF8gVbebmkUN3fa/kQJpQ==}
      engines: {node: '>= 12.0.0'}
-@@ -8506,13 +8485,6 @@ packages:
+@@ -8505,13 +8484,6 @@ packages:
      os: [linux]
      libc: [glibc]
  
@@ -430,7 +416,7 @@ index 9a91cdf..77d95c1 100644
    lightningcss-linux-arm64-musl@1.32.0:
      resolution: {integrity: sha512-UpQkoenr4UJEzgVIYpI80lDFvRmPVg6oqboNHfoH4CQIfNA+HOrZ7Mo7KZP02dC6LjghPQJeBsvXhJod/wnIBg==}
      engines: {node: '>= 12.0.0'}
-@@ -8520,13 +8492,6 @@ packages:
+@@ -8519,13 +8491,6 @@ packages:
      os: [linux]
      libc: [musl]
  
@@ -444,7 +430,7 @@ index 9a91cdf..77d95c1 100644
    lightningcss-linux-x64-gnu@1.32.0:
      resolution: {integrity: sha512-V7Qr52IhZmdKPVr+Vtw8o+WLsQJYCTd8loIfpDaMRWGUZfBOYEJeyJIkqGIDMZPwPx24pUMfwSxxI8phr/MbOA==}
      engines: {node: '>= 12.0.0'}
-@@ -8534,13 +8499,6 @@ packages:
+@@ -8533,13 +8498,6 @@ packages:
      os: [linux]
      libc: [glibc]
  
@@ -458,7 +444,7 @@ index 9a91cdf..77d95c1 100644
    lightningcss-linux-x64-musl@1.32.0:
      resolution: {integrity: sha512-bYcLp+Vb0awsiXg/80uCRezCYHNg1/l3mt0gzHnWV9XP1W5sKa5/TCdGWaR/zBM2PeF/HbsQv/j2URNOiVuxWg==}
      engines: {node: '>= 12.0.0'}
-@@ -8548,38 +8506,18 @@ packages:
+@@ -8547,38 +8505,18 @@ packages:
      os: [linux]
      libc: [musl]
  
@@ -497,7 +483,7 @@ index 9a91cdf..77d95c1 100644
    lilconfig@3.1.3:
      resolution: {integrity: sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw==}
      engines: {node: '>=14'}
-@@ -9446,6 +9384,10 @@ packages:
+@@ -9441,6 +9379,10 @@ packages:
    obug@2.1.1:
      resolution: {integrity: sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==}
  
@@ -508,7 +494,7 @@ index 9a91cdf..77d95c1 100644
    on-finished@2.3.0:
      resolution: {integrity: sha512-ikqdkGAAyf/X/gPhXGvfgAytDZtDbr+bkNUJ0N9h5MI/dmdgCs3l6hoHrcUv41sRKew3jIwrp4qQDXiK99Utww==}
      engines: {node: '>= 0.8'}
-@@ -12954,7 +12896,7 @@ snapshots:
+@@ -12945,7 +12887,7 @@ snapshots:
        glob: 13.0.6
        hermes-parser: 0.36.1
        jsc-safe-url: 0.2.4
@@ -517,7 +503,7 @@ index 9a91cdf..77d95c1 100644
        picomatch: 4.0.5
        postcss: 8.5.26
        resolve-from: 5.0.0
-@@ -13541,6 +13483,41 @@ snapshots:
+@@ -13530,6 +13472,41 @@ snapshots:
        react: 19.2.3
        react-dom: 19.2.3(react@19.2.3)
  
@@ -559,7 +545,7 @@ index 9a91cdf..77d95c1 100644
    '@open-draft/deferred-promise@2.2.0': {}
  
    '@open-draft/logger@0.3.0':
-@@ -14647,7 +14624,9 @@ snapshots:
+@@ -14634,7 +14611,9 @@ snapshots:
        metro-runtime: 0.84.6
      transitivePeerDependencies:
        - '@babel/core'
@@ -569,7 +555,7 @@ index 9a91cdf..77d95c1 100644
  
    '@react-native/normalize-colors@0.74.89': {}
  
-@@ -15017,74 +14996,59 @@ snapshots:
+@@ -14990,74 +14969,59 @@ snapshots:
        '@jridgewell/remapping': 2.3.5
        enhanced-resolve: 5.20.1
        jiti: 2.6.1
@@ -659,7 +645,7 @@ index 9a91cdf..77d95c1 100644
        tailwindcss: 4.2.2
        vite: 8.0.1(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.5.0)(esbuild@0.25.12)(jiti@2.7.0)(terser@5.47.1)(yaml@2.9.1)
  
-@@ -17320,8 +17284,6 @@ snapshots:
+@@ -17289,8 +17253,6 @@ snapshots:
  
    destroy@1.2.0: {}
  
@@ -668,7 +654,7 @@ index 9a91cdf..77d95c1 100644
    detect-libc@2.1.2: {}
  
    detect-node-es@1.1.0: {}
-@@ -19742,97 +19704,36 @@ snapshots:
+@@ -19717,97 +19679,36 @@ snapshots:
    lightningcss-android-arm64@1.32.0:
      optional: true
  
@@ -766,7 +752,7 @@ index 9a91cdf..77d95c1 100644
    lilconfig@3.1.3: {}
  
    lines-and-columns@1.2.4: {}
-@@ -21261,6 +21162,8 @@ snapshots:
+@@ -21234,6 +21135,8 @@ snapshots:
  
    obug@2.1.1: {}
  
@@ -775,7 +761,7 @@ index 9a91cdf..77d95c1 100644
    on-finished@2.3.0:
      dependencies:
        ee-first: 1.1.1
-@@ -21935,7 +21838,7 @@ snapshots:
+@@ -21908,7 +21811,7 @@ snapshots:
        '@babel/traverse': 7.29.0
        '@babel/types': 7.29.0
        debug: 4.4.3
@@ -784,7 +770,7 @@ index 9a91cdf..77d95c1 100644
        react: 19.2.3
        react-native: 0.86.3(@babel/core@7.29.0)(@react-native/metro-config@0.86.3(@babel/core@7.29.0))(@types/react@19.2.14)(react@19.2.3)
        react-native-reanimated: 4.5.1(react-native-worklets@0.10.1(@babel/core@7.29.0)(@react-native/metro-config@0.86.3(@babel/core@7.29.0))(react-native@0.86.3(@babel/core@7.29.0)(@react-native/metro-config@0.86.3(@babel/core@7.29.0))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.0)(@react-native/metro-config@0.86.3(@babel/core@7.29.0))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3)
-@@ -23630,7 +23533,7 @@ snapshots:
+@@ -23601,7 +23504,7 @@ snapshots:
  
    vite@8.0.1(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.5.0)(esbuild@0.25.12)(jiti@2.7.0)(terser@5.47.1)(yaml@2.9.1):
      dependencies:
@@ -793,7 +779,7 @@ index 9a91cdf..77d95c1 100644
        picomatch: 4.0.7
        postcss: 8.5.26
        rolldown: 1.0.0-rc.10(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)
-@@ -23648,7 +23551,7 @@ snapshots:
+@@ -23619,7 +23522,7 @@ snapshots:
  
    vite@8.0.1(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.5.0)(jiti@1.21.7)(terser@5.47.1)(yaml@2.9.1):
      dependencies:
@@ -802,7 +788,7 @@ index 9a91cdf..77d95c1 100644
        picomatch: 4.0.7
        postcss: 8.5.26
        rolldown: 1.0.0-rc.10(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)
-@@ -23665,7 +23568,7 @@ snapshots:
+@@ -23636,7 +23539,7 @@ snapshots:
  
    vite@8.0.1(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.5.0)(jiti@2.7.0)(terser@5.47.1)(yaml@2.9.0):
      dependencies:
@@ -812,10 +798,10 @@ index 9a91cdf..77d95c1 100644
        postcss: 8.5.26
        rolldown: 1.0.0-rc.10(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)
 diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
-index 6b34e22..4d476df 100644
+index 88fea29..b9b82bb 100644
 --- a/pnpm-workspace.yaml
 +++ b/pnpm-workspace.yaml
-@@ -43,3 +43,14 @@ catalog:
+@@ -66,3 +66,14 @@ catalog:
    yaml: ^2.6.0
    zod: ^4.1.5
    zustand: ^5.0.0
