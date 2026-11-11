@@ -16,8 +16,8 @@ class Zcode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.17.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c93a588f4b1d313e2177bda071b3c0176b0f5bda48d8427cd64699dc62f0025"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.18.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "da0e070247e9292101d6164df95e9eae835410c2b886059c925faf02b7d55a8d"
   end
 
   depends_on "node" => :build
