@@ -5,6 +5,11 @@ class SnowShot < Formula
   sha256 "29190412a6dc9b41c0097fbf1313dc0f84412c9d23e1716260ed13acdcbd6c4e"
   license "GPL-3.0-or-later"
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.2-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a0c03dde2a67813fcbc00d843279b4f5ce6050950340c5068f5f05a0c13449b"
+  end
+
   depends_on "brotli" => :build
   depends_on "bzip2" => :build
   depends_on "cmake" => :build
