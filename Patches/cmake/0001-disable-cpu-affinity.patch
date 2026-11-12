@@ -1,0 +1,26 @@
+diff --git a/Source/cmAffinity.cxx b/Source/cmAffinity.cxx
+index 5be4758992..70c279ba08 100644
+--- a/Source/cmAffinity.cxx
++++ b/Source/cmAffinity.cxx
+@@ -8,7 +8,7 @@
+ #  ifdef _WIN32
+ #    define CM_HAVE_CPU_AFFINITY
+ #    include <windows.h>
+-#  elif (defined(__linux__) && !defined(__ANDROID__)) || defined(__FreeBSD__)
++#  elif (defined(__linux__) && !defined(__ANDROID__) && !defined(__OHOS__)) || defined(__FreeBSD__)
+ #    define CM_HAVE_CPU_AFFINITY
+ #    include <pthread.h>
+ #    include <sched.h>
+diff --git a/Utilities/cmlibuv/src/unix/process.c b/Utilities/cmlibuv/src/unix/process.c
+index 729a44b472..89f6f776da 100644
+--- a/Utilities/cmlibuv/src/unix/process.c
++++ b/Utilities/cmlibuv/src/unix/process.c
+@@ -411,7 +411,7 @@ static void uv__process_child_init(const uv_process_options_t* options,
+     uv__write_errno(error_fd);
+ 
+ #ifndef CMAKE_BOOTSTRAP
+-#if defined(__linux__) || defined(__FreeBSD__)
++#if (defined(__linux__) && !defined(__OHOS__)) || defined(__FreeBSD__)
+   if (options->cpumask != NULL) {
+     cpumask_size = uv_cpumask_size();
+     assert(options->cpumask_size >= (size_t)cpumask_size);
