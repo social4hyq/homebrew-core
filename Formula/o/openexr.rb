@@ -7,11 +7,8 @@ class Openexr < Formula
   compatibility_version 2
 
   bottle do
-    sha256 cellar: :any, arm64_golden_gate: "c50df52fc1d9e18f876f47872da09982ebacd7a5215d21e2a316f30eda6517b1"
-    sha256 cellar: :any, arm64_tahoe:       "492e8a795883eddaa56078a257bdb349b328d5c9e3c0d30e0b59eea09fab190e"
-    sha256 cellar: :any, arm64_sequoia:     "5b674285b4bc5afe8d2f8904fd600970ae461fd544f7819aaebf836f4b63ff34"
-    sha256 cellar: :any, arm64_linux:       "c8d5613feead8d9563a375cd68d31783086e9d3d467e9c0aa34e8ec225b9beda"
-    sha256 cellar: :any, x86_64_linux:      "2c488e44fdaf41db692107aa468aa10bcb429fe9bcee7e125aca72c7a56296fa"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/openexr-v3.5.4-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c530803eb77845f4f9ea3f9588b25bdd3c3e1ca88e1ae928d168632554f3add"
   end
 
   depends_on "cmake" => :build
