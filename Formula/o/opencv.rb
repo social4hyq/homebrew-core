@@ -2,6 +2,7 @@ class Opencv < Formula
   desc "Open source computer vision library"
   homepage "https://opencv.org/"
   license "Apache-2.0"
+  revision 1
   compatibility_version 3
 
   stable do
@@ -129,6 +130,7 @@ class Opencv < Formula
       -DWITH_GPHOTO2=OFF
       -DWITH_GSTREAMER=OFF
       -DWITH_JASPER=OFF
+      -DWITH_KLEIDICV=OFF
       -DWITH_OPENEXR=ON
       -DWITH_OPENGL=OFF
       -DWITH_OPENVINO=#{OS.ohos? ? "OFF" : "ON"}
@@ -160,9 +162,6 @@ class Opencv < Formula
         -DZLIB_LIBRARY=#{formula_opt_lib("zlib-ng-compat")}/libz.so
       ]
     end
-
-    # Ref: https://github.com/opencv/opencv/wiki/CPU-optimizations-build-options
-    ENV.runtime_cpu_detection
 
     system "cmake", "-S", ".", "-B", "build_shared", *args, *std_cmake_args
     inreplace "build_shared/modules/core/version_string.inc", "#{Superenv.shims_path}/", ""
