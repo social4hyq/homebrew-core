@@ -1,0 +1,24 @@
+diff --git a/src/runtime.rs b/src/runtime.rs
+index b7d145d..cdead00 100644
+--- a/src/runtime.rs
++++ b/src/runtime.rs
+@@ -1048,7 +1048,8 @@ impl CpuSession {
+     where
+         F: FnOnce(&mut [f32]) -> RuntimeResult<()>,
+     {
+-        if let Some(state) = &mut self.optimized {
++        if self.optimized.is_some() {
++            let state = self.optimized.as_mut().expect("optimized runtime exists");
+             state.fill(fill, self.compiled.backend, &self.cpu, self.threads)?;
+             self.cpu
+                 .install(|| state.execute(&self.compiled, &self.cpu, self.threads))?;
+@@ -1063,7 +1064,8 @@ impl CpuSession {
+     where
+         F: FnOnce(&mut [f32], bool) -> RuntimeResult<()>,
+     {
+-        if let Some(state) = &mut self.optimized {
++        if self.optimized.is_some() {
++            let state = self.optimized.as_mut().expect("optimized runtime exists");
+             state.fill_layout(fill)?;
+             self.cpu
+                 .install(|| state.execute(&self.compiled, &self.cpu, self.threads))?;
