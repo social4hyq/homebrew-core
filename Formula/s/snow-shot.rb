@@ -92,6 +92,9 @@ class SnowShot < Formula
 
   patch :p1 do
     file "Patches/snow-shot/0001-ohos-port.patch"
+  end
+
+  patch :p1 do
     file "Patches/snow-shot/0003-guard-lrelease-dependencies.patch"
   end
 
