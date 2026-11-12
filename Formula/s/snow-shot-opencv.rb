@@ -10,6 +10,11 @@ class SnowShotOpencv < Formula
     regex(/^v?(4(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-opencv-v4.14.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5fa2bb29c40bde6a8d631a6b969febe5844bfba14ff57dd12e538ab6f8f2b11"
+  end
+
   keg_only :versioned_formula
 
   depends_on "cmake" => :build
