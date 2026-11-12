@@ -15,6 +15,11 @@ class CmakeAT4 < Formula
     regex(/href=.*?cmake[._-]v?(4(?:\.\d+)+)\.t/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/cmake@4-v4.4.5-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "449514c1c69fa10cd6bcce8f251201e4db955f6b8bd46a0c2c3ca8c20fabd5dc"
+  end
+
   keg_only :versioned_formula
 
   uses_from_macos "ncurses"
