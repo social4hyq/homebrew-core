@@ -19,12 +19,23 @@ class Sshport < Formula
   # Pure TypeScript, zero runtime npm deps — bun build --target=bun produces a
   # single JS bundle with no native .so, so nothing to codesign.
   depends_on "bun"
+  depends_on "ccache" => :build
 
   def install
     ENV["BUN_INSTALL_CACHE_DIR"] = (HOMEBREW_CACHE/"bun-install-cache").to_s
     system "bun", "install", "--frozen-lockfile"
     system "bun", "build", "--target=bun", "--outfile", "sshport.js", "src/cli.ts"
     libexec.install "sshport.js"
+
+    # ccache probe (temporary): verify CCACHE_* passthrough through superenv and
+    # ccache hit rate. Objects are not installed; the artifact is unchanged.
+    ENV["CCACHE_DIR"] = (HOMEBREW_CACHE/"ccache-probe").to_s
+    ohai "ccache probe: CCACHE_* seen by install:"
+    system "sh", "-c", "env | grep '^CCACHE_' || echo '(no CCACHE_* vars)'"
+    (buildpath/"ccache_probe.c").write "int ccache_probe(void) { return 42; }\n"
+    system "ccache", ENV.cc, "-c", "-o", "probe1.o", "ccache_probe.c"
+    system "ccache", ENV.cc, "-c", "-o", "probe2.o", "ccache_probe.c"
+    system "ccache", "-s"
 
     (bin/"sshport").write_env_script(formula_opt_bin("bun")/"bun", opt_libexec/"sshport.js", {})
     chmod 0755, bin/"sshport"
