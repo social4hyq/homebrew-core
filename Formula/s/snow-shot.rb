@@ -361,11 +361,10 @@ class SnowShot < Formula
     # Let harmonydeployqt write to the build log directly. Redirecting it to a
     # file and reading that file back on failure hid the real error: the
     # redirect target was never created, so the failure path raised ENOENT.
-    # DIAGNOSTIC ONLY: report the exit status and the full harmonydeployqt output.
-    deployed = system qt_sdk/"bin/harmonydeployqt", "--input", buildpath/"hd.json",
-                      "--output", stage, "--no-build", "--verbose"
-    ohai "DIAG harmonydeployqt exit status: #{$?&.exitstatus.inspect} (deployed=#{deployed.inspect})"
-    odie "harmonydeployqt failed; see its output above" unless deployed
+    # Formula#system returns nil on success and raises BuildError on failure,
+    # so do not test its return value.
+    system qt_sdk/"bin/harmonydeployqt", "--input", buildpath/"hd.json",
+           "--output", stage, "--no-build", "--verbose"
 
     system "python3", payload/"support/scripts/stage-ohos-app-icon-assets.py",
            "--template", payload/"ohos-template", "--stage", stage

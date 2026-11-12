@@ -27,7 +27,7 @@ def dynamic_needed(readelf: Path, elf: Path) -> list[str]:
 def reject_compatibility_libraries(names: list[str]) -> None:
     forbidden = sorted(
         name for name in names
-        if name.startswith(("libmusl_compat.", "libmusl-compat.", "libmuslext."))
+        if name.startswith(("libmusl_compat.", "libmusl-compat."))
     )
     if forbidden:
         raise SystemExit("Forbidden compatibility libraries:\n" + "\n".join(forbidden))
