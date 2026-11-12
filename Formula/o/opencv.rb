@@ -24,11 +24,8 @@ class Opencv < Formula
   end
 
   bottle do
-    sha256 arm64_golden_gate: "fbe6cb5e9894afacdf203d4b710d0441405c93742b01789a2e7e19b222512d3a"
-    sha256 arm64_tahoe:       "3ce8326191d1c3aeeb03d36d61a42257f1c8df273445f7de4d6132ad8b6538d6"
-    sha256 arm64_sequoia:     "535155d4d81537ba87b2ff2e089d838277be113275c7e15402bd241cf04da467"
-    sha256 arm64_linux:       "617cc3ec176399456139ff48228a804130123de5b744b7a903c5d2a7edc63a43"
-    sha256 x86_64_linux:      "12cc90b224e058d20e29c5e473e31a6a1b1ae01c8e6c7d65b85ec3cb47bfd7fa"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencv-v5.1.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a1efe1794a6038ed25f3d9c4f27e2045e3f2c5a99e97b99adebecf12c46859b8"
   end
 
   head do
