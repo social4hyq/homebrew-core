@@ -19,8 +19,8 @@ class Sshport < Formula
   # Auto-forwards a remote dev server's ports to identical local ports.
   # Pure TypeScript, zero runtime npm deps — bun build --target=bun produces a
   # single JS bundle with no native .so, so nothing to codesign.
-  depends_on "bun"
   depends_on "ccache" => :build
+  depends_on "bun"
 
   def install
     ENV["BUN_INSTALL_CACHE_DIR"] = (HOMEBREW_CACHE/"bun-install-cache").to_s
