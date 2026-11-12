@@ -4,6 +4,7 @@ class SnowShotOpencv < Formula
   url "https://github.com/opencv/opencv/archive/refs/tags/4.14.0.tar.gz"
   sha256 "ee8fb9b30eb60850431b4656447080e3737b56e45719c92b67f245950609f86e"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
@@ -84,6 +85,7 @@ class SnowShotOpencv < Formula
       -DWITH_OPENCL=OFF
       -DWITH_OPENEXR=OFF
       -DWITH_OPENGL=OFF
+      -DWITH_KLEIDICV=OFF
       -DWITH_OPENVINO=OFF
       -DWITH_QT=OFF
       -DWITH_TBB=OFF
@@ -92,9 +94,6 @@ class SnowShotOpencv < Formula
       -DPROTOBUF_INCLUDE_DIR=#{formula_opt_include("protobuf")}
       -DPROTOBUF_PROTOC_EXECUTABLE=#{formula_opt_bin("protobuf")}/protoc
     ]
-
-    # Ref: https://github.com/opencv/opencv/wiki/CPU-optimizations-build-options
-    ENV.runtime_cpu_detection
 
     system "cmake", "-S", ".", "-B", "build_shared", *args, *std_cmake_args
     inreplace "build_shared/modules/core/version_string.inc", "#{Superenv.shims_path}/", ""
