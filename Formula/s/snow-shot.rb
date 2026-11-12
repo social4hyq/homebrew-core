@@ -358,15 +358,12 @@ class SnowShot < Formula
         "extra-libs-dirs": #{JSON.generate(runtime_lib_dirs)}
       }
     JSON
-    # Capture harmonydeployqt output so a failure reports its real cause
-    # instead of being masked by Homebrew's error-report serialization.
-    deploy_log = buildpath/"harmonydeployqt.log"
+    # Let harmonydeployqt write to the build log directly. Redirecting it to a
+    # file and reading that file back on failure hid the real error: the
+    # redirect target was never created, so the failure path raised ENOENT.
     deployed = system qt_sdk/"bin/harmonydeployqt", "--input", buildpath/"hd.json",
-                      "--output", stage, "--no-build", "--verbose",
-                      out: [deploy_log.to_s, "w"], err: [:child, :out]
-    unless deployed
-      odie "harmonydeployqt failed; last output:\n#{deploy_log.read.lines.last(80).join}"
-    end
+                      "--output", stage, "--no-build", "--verbose"
+    odie "harmonydeployqt failed; see its output above" unless deployed
 
     system "python3", payload/"support/scripts/stage-ohos-app-icon-assets.py",
            "--template", payload/"ohos-template", "--stage", stage
