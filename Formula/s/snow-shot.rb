@@ -91,10 +91,9 @@ class SnowShot < Formula
     sha256 "d3a20e0c1b2758c4545b0a97490afa2986e39c8b4387c3dba2007def742cbeb0"
   end
 
-  # One patch per changed file under Patches/snow-shot/ohos, applied in lexical order.
   patch_root = Pathname(__dir__).parent.parent
   Dir[(patch_root/"Patches/snow-shot/ohos/*.patch").to_s].each do |path|
-    patch :p1 do
+    patch do
       file Pathname(path).relative_path_from(patch_root).to_s
     end
   end
