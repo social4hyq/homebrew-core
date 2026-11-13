@@ -64,6 +64,10 @@ class SnowShot < Formula
   resource "snow-shot-ocr-rs" do
     url "https://github.com/mg-chao/simd-paddle-ocr-rs/archive/63d1c523da0581b731811d5c628723f320e527d0.tar.gz"
     sha256 "3e4f9bda41cf5598f0891b20f4acb35e9b4bfcd627d01367363c481e4df04b86"
+
+    patch do
+      file "Patches/snow-shot/ocr/src_runtime.rs.patch"
+    end
   end
 
   resource "qr-model-assets" do
@@ -122,19 +126,7 @@ class SnowShot < Formula
     mkdir_p ocr_crate
     payload = Pathname(__FILE__).parent.parent.parent/"Patches/snow-shot"
     resource("snow-shot-ocr-rs").stage do
-      source = if (Pathname.new(".")/"Cargo.toml").file?
-        Pathname.new(".")
-      else
-        Dir.children(".").map { |entry| Pathname.new(entry) }
-           .find { |entry| entry.directory? && (entry/"Cargo.toml").file? }
-      end
-      odie "could not find the OCR crate root" unless source
-      cd source do
-        Dir[(payload/"ocr/*.patch").to_s].each do |path|
-          system "patch", "-p1", "-i", path
-        end
-        cp_r ".", ocr_crate
-      end
+      cp_r ".", ocr_crate
     end
     %w[ocr-detection-model ocr-recognition-model ocr-dictionary].each do |name|
       resource(name).stage do
