@@ -11,6 +11,11 @@ class JpegXl < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/jpeg-xl-v0.12.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e362818038d1ec5c9023b3efa3ab9adc345cc72caf22d9398f45d6b6cc01c849"
+  end
+
   depends_on "asciidoc" => :build
   depends_on "cmake" => :build
   depends_on "docbook-xsl" => :build
