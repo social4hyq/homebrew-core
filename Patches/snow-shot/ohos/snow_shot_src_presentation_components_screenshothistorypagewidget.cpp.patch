@@ -1,0 +1,31 @@
+diff --git a/snow_shot/src/presentation/components/screenshothistorypagewidget.cpp b/snow_shot/src/presentation/components/screenshothistorypagewidget.cpp
+index 53a28c3..4a2304c 100644
+--- a/snow_shot/src/presentation/components/screenshothistorypagewidget.cpp
++++ b/snow_shot/src/presentation/components/screenshothistorypagewidget.cpp
+@@ -1393,6 +1393,8 @@ void ScreenshotHistoryPageWidget::rebuildEntries() {
+     });
+     const auto [firstIndex, lastIndex] =
+         history_page::pageRange(m_pagination, static_cast<int>(m_filteredRecords.size()));
++    const int pageFirstIndex = firstIndex;
++    const int pageLastIndex = lastIndex;
+     m_pageRecordIds.clear();
+     for (int index = firstIndex; index < lastIndex; ++index)
+         m_pageRecordIds.push_back(m_filteredRecords[index].id);
+@@ -1402,14 +1404,14 @@ void ScreenshotHistoryPageWidget::rebuildEntries() {
+             focusedRow = static_cast<int>(m_pageRecordIds.indexOf(it.key()));
+     const auto wantedRows = m_entryViewport->wantedRows(lastIndex - firstIndex, focusedRow);
+ 
+-    auto requestUnresolvedAssets = [this, firstIndex, lastIndex, &wantedRows]() {
++    auto requestUnresolvedAssets = [this, pageFirstIndex, pageLastIndex, &wantedRows]() {
+         if (m_dataSource == nullptr || !m_dataSource->supportsAsyncDisplayAssets() ||
+-            firstIndex >= lastIndex) {
++            pageFirstIndex >= pageLastIndex) {
+             return;
+         }
+         QVector<storage::CaptureHistoryRecord> unresolved;
+         for (int row : wantedRows) {
+-            const int index = firstIndex + row;
++            const int index = pageFirstIndex + row;
+             const storage::CaptureHistoryRecord& record = m_filteredRecords[index];
+             if (!m_resolvedAssets.contains(record.id)) {
+                 unresolved.push_back(record);

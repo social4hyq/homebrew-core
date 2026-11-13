@@ -1,0 +1,13 @@
+diff --git a/snow_image/include/snow/image/processing.h b/snow_image/include/snow/image/processing.h
+index 95f4f7b..5084701 100644
+--- a/snow_image/include/snow/image/processing.h
++++ b/snow_image/include/snow/image/processing.h
+@@ -9,7 +9,7 @@
+ #include <limits>
+ #include <memory>
+ #include <optional>
+-#include <stop_token>
++#include "stop_token.hpp"
+ 
+ namespace snow::image {
+ 

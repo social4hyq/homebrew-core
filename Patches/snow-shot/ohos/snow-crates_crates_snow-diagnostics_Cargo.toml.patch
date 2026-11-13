@@ -1,0 +1,9 @@
+diff --git a/snow-crates/crates/snow-diagnostics/Cargo.toml b/snow-crates/crates/snow-diagnostics/Cargo.toml
+index f71b749..5bc89c3 100644
+--- a/snow-crates/crates/snow-diagnostics/Cargo.toml
++++ b/snow-crates/crates/snow-diagnostics/Cargo.toml
+@@ -6,3 +6,4 @@ license.workspace = true
+ 
+ [lib]
+ path = "src/lib.rs"
++crate-type = ["rlib", "staticlib"]

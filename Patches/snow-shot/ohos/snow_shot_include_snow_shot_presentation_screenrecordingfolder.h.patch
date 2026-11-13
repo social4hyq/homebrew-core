@@ -1,0 +1,22 @@
+diff --git a/snow_shot/include/snow_shot/presentation/screenrecordingfolder.h b/snow_shot/include/snow_shot/presentation/screenrecordingfolder.h
+index 137f192..5c51d4d 100644
+--- a/snow_shot/include/snow_shot/presentation/screenrecordingfolder.h
++++ b/snow_shot/include/snow_shot/presentation/screenrecordingfolder.h
+@@ -8,11 +8,17 @@
+ 
+ namespace snow_shot::presentation::recording {
+ [[nodiscard]] QStringList
++screenRecordingFallbackDirectories(const QString& moviesDirectory,
++                                   const QString& documentsDirectory,
++                                   const QString& applicationDataDirectory = {});
++[[nodiscard]] QStringList
+ screenRecordingDirectories(const QDateTime& timestamp = QDateTime::currentDateTime(),
+                            const storage::ScreenshotWindowNames& names = {});
+ [[nodiscard]] QString
+ screenRecordingDirectory(const QDateTime& timestamp = QDateTime::currentDateTime(),
+                          const storage::ScreenshotWindowNames& names = {});
++[[nodiscard]] QString screenRecordingDirectoryProbePath(const QString& path);
++[[nodiscard]] bool screenRecordingDirectoryWritable(const QString& directory);
+ // The caller snapshots and expands the filename format before any worker handoff.
+ [[nodiscard]] QString screenRecordingOutputPath(const QStringList& directories,
+                                                 const QString& baseName, const QString& extension);

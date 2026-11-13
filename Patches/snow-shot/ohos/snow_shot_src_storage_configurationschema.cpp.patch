@@ -1,0 +1,22 @@
+diff --git a/snow_shot/src/storage/configurationschema.cpp b/snow_shot/src/storage/configurationschema.cpp
+index 7a76349..a83a873 100644
+--- a/snow_shot/src/storage/configurationschema.cpp
++++ b/snow_shot/src/storage/configurationschema.cpp
+@@ -506,9 +506,17 @@ constexpr SchemaAllowedValues kSchemaAllowed18 = {nullptr, 0,
+                                                   SchemaAllowedProvider::OcrPunctuation};
+ constexpr SchemaString kSchemaStrings19[] = {u"blur", u"background_fill"};
+ constexpr SchemaAllowedValues kSchemaAllowed19 = {kSchemaStrings19, std::size(kSchemaStrings19)};
++#ifdef Q_OS_HARMONY
++constexpr SchemaString kSchemaStrings20[] = {u"Ctrl+Alt+F1"};
++#else
+ constexpr SchemaString kSchemaStrings20[] = {u"F1"};
++#endif
+ constexpr SchemaString kSchemaStrings21[] = {u"Ctrl+F1"};
++#ifdef Q_OS_HARMONY
++constexpr SchemaString kSchemaStrings22[] = {u"Ctrl+Alt+F3"};
++#else
+ constexpr SchemaString kSchemaStrings22[] = {u"F3"};
++#endif
+ constexpr SchemaString kSchemaStrings23[] = {u"Ctrl+F3"};
+ constexpr SchemaString kSchemaStrings24[] = {u"all_windows", u"game_windows"};
+ constexpr SchemaAllowedValues kSchemaAllowed20 = {kSchemaStrings24, std::size(kSchemaStrings24)};

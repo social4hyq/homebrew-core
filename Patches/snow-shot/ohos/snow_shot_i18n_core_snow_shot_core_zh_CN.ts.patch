@@ -1,0 +1,92 @@
+diff --git a/snow_shot/i18n/core/snow_shot_core_zh_CN.ts b/snow_shot/i18n/core/snow_shot_core_zh_CN.ts
+index 9999184..cecfc94 100644
+--- a/snow_shot/i18n/core/snow_shot_core_zh_CN.ts
++++ b/snow_shot/i18n/core/snow_shot_core_zh_CN.ts
+@@ -262,6 +262,57 @@ so every moment on screen can be expressed clearly and shared easily</source>
+             <translation>当前已是最新版本</translation>
+         </message>
+     </context>
++    <context>
++        <name>ApplicationController</name>
++        <message>
++            <source>%1 %2 is available. Open About for update options</source>
++            <translation>%1 %2 已发布。请打开“关于”查看更新选项</translation>
++        </message>
++        <message>
++            <source>An update is ready. Open About to restart and update %1</source>
++            <translation>更新已就绪。请打开“关于”以重启并更新 %1</translation>
++        </message>
++        <message>
++            <source>An update is ready. Open About to restart and update Snow Shot</source>
++            <translation>更新已就绪。请打开“关于”以重启并更新 Snow Shot</translation>
++        </message>
++        <message>
++            <source>Could not open the selected file: %1</source>
++            <translation>无法打开所选文件：%1</translation>
++        </message>
++        <message>
++            <source>Could not pin selected files to screen</source>
++            <translation>无法将所选文件固定到屏幕</translation>
++        </message>
++        <message>
++            <source>Feature unavailable</source>
++            <translation>功能不可用</translation>
++        </message>
++        <message>
++            <source>Finish capturing, recording, exporting, recognizing text, or updating before changing storage</source>
++            <translation>更改存储位置前，请先完成截图、录屏、导出、文本识别或更新操作</translation>
++        </message>
++        <message>
++            <source>Finish capturing, recording, or exporting before updating</source>
++            <translation>开始更新前，请先完成截图、录屏或导出操作</translation>
++        </message>
++        <message>
++            <source>Restart failed</source>
++            <translation>重启失败</translation>
++        </message>
++        <message>
++            <source>Snow Shot %1 is available. Open About for update options</source>
++            <translation>Snow Shot %1 已发布。请打开“关于”查看更新选项</translation>
++        </message>
++        <message>
++            <source>The selected file path is invalid</source>
++            <translation>所选文件路径无效</translation>
++        </message>
++        <message>
++            <source>Your settings could not be saved. Please retry before updating</source>
++            <translation>无法保存设置。请重试保存后再进行更新</translation>
++        </message>
++    </context>
+     <context>
+         <name>ApplicationRestart</name>
+         <message>
+@@ -838,6 +889,14 @@ so every moment on screen can be expressed clearly and shared easily</source>
+     </context>
+     <context>
+         <name>SystemTrayController</name>
++        <message>
++            <source>Capture</source>
++            <translation>截图</translation>
++        </message>
++        <message>
++            <source>Choose a destination in Files to save the recording.</source>
++            <translation>选择文件保存位置以保存录屏。</translation>
++        </message>
+         <message>
+             <source>Delete empty groups</source>
+             <translation>删除空分组</translation>
+@@ -850,6 +909,14 @@ so every moment on screen can be expressed clearly and shared easily</source>
+             <source>New group</source>
+             <translation>新建分组</translation>
+         </message>
++        <message>
++            <source>Update</source>
++            <translation>更新</translation>
++        </message>
++        <message>
++            <source>Video export completed</source>
++            <translation>视频导出完成</translation>
++        </message>
+         <message>
+             <source>Window group: %1</source>
+             <translation>窗口分组：%1</translation>

@@ -1,0 +1,43 @@
+diff --git a/snow_shot/include/snow_shot/platform/ohos/recordingfileexport.h b/snow_shot/include/snow_shot/platform/ohos/recordingfileexport.h
+new file mode 100644
+index 0000000..929db19
+--- /dev/null
++++ b/snow_shot/include/snow_shot/platform/ohos/recordingfileexport.h
+@@ -0,0 +1,36 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++#ifndef SNOW_SHOT_PLATFORM_OHOS_RECORDINGFILEEXPORT_H
++#define SNOW_SHOT_PLATFORM_OHOS_RECORDINGFILEEXPORT_H
++
++#include <QObject>
++#include <QString>
++
++#include <functional>
++
++namespace snow_shot::platform::ohos {
++
++class RecordingFileExport final : public QObject {
++  public:
++    enum class Result { Succeeded, Cancelled, Failed };
++    using Completion = std::function<void(Result, QString)>;
++
++    explicit RecordingFileExport(QObject* parent = nullptr);
++    ~RecordingFileExport() override;
++
++    void setCompletion(Completion completion);
++    [[nodiscard]] bool start(const QString& sourcePath);
++    [[nodiscard]] bool active() const noexcept;
++
++  private:
++    void finish(Result result, QString error = {});
++
++    Completion m_completion;
++    quint64 m_pickerRequestId = 0;
++    quint64 m_exportRequestId = 0;
++    bool m_active = false;
++    bool m_destroying = false;
++};
++
++} // namespace snow_shot::platform::ohos
++
++#endif // SNOW_SHOT_PLATFORM_OHOS_RECORDINGFILEEXPORT_H
+

@@ -1,0 +1,12 @@
+diff --git a/snow_shot/include/snow_shot/presentation/screenshotocrrecognitionservice.h b/snow_shot/include/snow_shot/presentation/screenshotocrrecognitionservice.h
+index ea11b71..40f7567 100644
+--- a/snow_shot/include/snow_shot/presentation/screenshotocrrecognitionservice.h
++++ b/snow_shot/include/snow_shot/presentation/screenshotocrrecognitionservice.h
+@@ -128,6 +128,7 @@ class ScreenshotOcrRecognitionService final : public ScreenshotOcrRecognitionPor
+         // Packaged descriptor/offline payload and writable online component cache.
+         QString offlineRoot;
+         QString cacheRoot;
++        QString bundledRuntimeRoot;
+         // Resolved proxy URL for component downloads. Empty means direct access.
+         QString proxyUrl;
+         ScreenshotOcrModelType modelType = ScreenshotOcrModelType::Small;

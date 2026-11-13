@@ -1,0 +1,13 @@
+diff --git a/snow_shot/src/presentation/services/globalshortcutbackend.cpp b/snow_shot/src/presentation/services/globalshortcutbackend.cpp
+index 8e1deb0..94fdee4 100644
+--- a/snow_shot/src/presentation/services/globalshortcutbackend.cpp
++++ b/snow_shot/src/presentation/services/globalshortcutbackend.cpp
+@@ -37,6 +37,8 @@ std::unique_ptr<GlobalShortcutBackend> createPlatformGlobalShortcutBackend() {
+     return createWindowsGlobalShortcutBackend();
+ #elif defined(Q_OS_MACOS)
+     return createMacOSGlobalShortcutBackend();
++#elif defined(Q_OS_HARMONY)
++    return createOhosGlobalShortcutBackend();
+ #else
+     return std::make_unique<UnsupportedGlobalShortcutBackend>();
+ #endif

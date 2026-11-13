@@ -1,0 +1,10 @@
+diff --git a/snow-crates/crates/snow-ui-selector/src/lib.rs b/snow-crates/crates/snow-ui-selector/src/lib.rs
+index 7774bb6..9287911 100644
+--- a/snow-crates/crates/snow-ui-selector/src/lib.rs
++++ b/snow-crates/crates/snow-ui-selector/src/lib.rs
+@@ -1,4 +1,5 @@
+ //! Native window and accessibility selection. Provider objects never cross worker threads.
++#![cfg_attr(target_env = "ohos", allow(dead_code))]
+ mod query;
+ pub use query::{QueryControl, QueryResult, StopReason};
+ #[cfg(windows)]

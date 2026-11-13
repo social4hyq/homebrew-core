@@ -1,0 +1,22 @@
+diff --git a/snow_shot/tests/imageediting_tests.cpp b/snow_shot/tests/imageediting_tests.cpp
+index 4fdeb42..4a1b8be 100644
+--- a/snow_shot/tests/imageediting_tests.cpp
++++ b/snow_shot/tests/imageediting_tests.cpp
+@@ -810,6 +810,7 @@ void verifyEditingToolbar(snow_shot::presentation::ImageEditingWindow& window) {
+     for (const auto& [tool, label] :
+          {std::pair{Tool::Select, "Select elements"}, std::pair{Tool::Shape, "Shape"},
+           std::pair{Tool::Move, "Pan"}}) {
++        const auto selectedTool = tool;
+         adqt::widgets::AdButton* button = nullptr;
+         for (auto* candidate : palette->findChildren<adqt::widgets::AdButton*>()) {
+             if (candidate->accessibleName() == QLatin1String(label)) {
+@@ -822,7 +823,8 @@ void verifyEditingToolbar(snow_shot::presentation::ImageEditingWindow& window) {
+             palette->clearActiveTool();
+             const auto activate = [&] {
+                 if (shortcut)
+-                    require(palette->activateToolShortcut(tool), "editor tool shortcut activates");
++                    require(palette->activateToolShortcut(selectedTool),
++                            "editor tool shortcut activates");
+                 else
+                     button->click();
+             };

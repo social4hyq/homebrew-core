@@ -1,0 +1,19 @@
+diff --git a/snow_shot/include/snow_shot/app/distribution.h b/snow_shot/include/snow_shot/app/distribution.h
+index 567b5cc..b20ca0f 100644
+--- a/snow_shot/include/snow_shot/app/distribution.h
++++ b/snow_shot/include/snow_shot/app/distribution.h
+@@ -40,6 +40,14 @@ struct Policy {
+     return policy().managedByStore;
+ }
+ 
++[[nodiscard]] inline bool usesStandaloneUpdateHelper() {
++#if defined(Q_OS_MACOS) || defined(Q_OS_HARMONY)
++    return false;
++#else
++    return !isStoreManaged();
++#endif
++}
++
+ [[nodiscard]] inline QString packageFamilyName() {
+     return policy().packageFamily;
+ }

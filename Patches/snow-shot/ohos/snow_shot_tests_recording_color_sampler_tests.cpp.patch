@@ -1,0 +1,15 @@
+diff --git a/snow_shot/tests/recording_color_sampler_tests.cpp b/snow_shot/tests/recording_color_sampler_tests.cpp
+index ecbc890..c1965f3 100644
+--- a/snow_shot/tests/recording_color_sampler_tests.cpp
++++ b/snow_shot/tests/recording_color_sampler_tests.cpp
+@@ -55,6 +55,10 @@ void recordingColorSamplerInteractions() {
+     setRecordingToolbarAutoHideTestCursor(toolbar, outside);
+     auto* canvas = area.canvas();
+     auto* tools = toolbar.palette();
++    tools->setRecordingSession(ScreenshotToolPalette::RecordingSessionStatus::recording());
++    setRecordingToolbarAutoHideTestCursor(toolbar, outside);
++    require(retreat->isActive(),
++            "sampler fixture starts with an eligible docked toolbar retreat timer");
+     require(canvas->setCanvasTool(SnowCanvasTool::Shape), "activate shape canvas tool");
+     tools->setActiveTool(ScreenshotToolPalette::Tool::Shape);
+     tools->setStyleToolbarState(canvas->canvasStyleToolbarState());

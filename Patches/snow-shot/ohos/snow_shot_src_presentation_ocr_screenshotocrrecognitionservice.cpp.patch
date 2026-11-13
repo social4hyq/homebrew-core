@@ -1,0 +1,450 @@
+diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp b/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp
+index 96d4133..16ff8e6 100644
+--- a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp
++++ b/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp
+@@ -10,15 +10,20 @@
+ 
+ #include <QCoreApplication>
+ #include <QDebug>
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++#include "snow_ocr_inprocess.h"
++#endif
+ #include <QDir>
+ #include <QElapsedTimer>
+ #include <QFileInfo>
++#include <QJsonArray>
+ #include <QJsonDocument>
+ #include <QMetaObject>
+ #include <QProcess>
+ #include <QProcessEnvironment>
+ #include <QPointer>
+ #include <QRunnable>
++#include <QStandardPaths>
+ #include <QThreadPool>
+ #include <QThread>
+ #include <QTimer>
+@@ -53,6 +58,116 @@ qreal edgeLength(const QPointF& first, const QPointF& second) {
+     return std::hypot(second.x() - first.x(), second.y() - first.y());
+ }
+ 
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++void appendF32(QByteArray& bytes, float value) {
++    quint32 bits = 0;
++    std::memcpy(&bits, &value, sizeof(bits));
++    snow_shot::ocr::protocol::appendU32(bytes, bits);
++}
++
++QByteArray recognizeInProcess(SnowOcrHandle* handle, const QImage& source) {
++    QByteArray payload;
++    if (handle == nullptr || source.isNull() ||
++        !screenshotOcrImageWithinPixelLimit(source.size())) {
++        snow_shot::ocr::protocol::appendU8(payload, 0);
++        snow_shot::ocr::protocol::appendString(
++            payload, QStringLiteral("invalid in-process OCR image or engine"));
++        return payload;
++    }
++
++    const QImage bgr = source.convertToFormat(QImage::Format_BGR888);
++    if (bgr.isNull()) {
++        snow_shot::ocr::protocol::appendU8(payload, 0);
++        snow_shot::ocr::protocol::appendString(payload,
++                                               QStringLiteral("cannot convert OCR image to BGR24"));
++        return payload;
++    }
++    const qsizetype rowBytes = static_cast<qsizetype>(bgr.width()) * 3;
++    const qsizetype totalBytes = rowBytes * bgr.height();
++    QByteArray packed;
++    packed.resize(totalBytes);
++    for (int row = 0; row < bgr.height(); ++row) {
++        std::memcpy(packed.data() + static_cast<qsizetype>(row) * rowBytes, bgr.constScanLine(row),
++                    static_cast<size_t>(rowBytes));
++    }
++
++    char* resultRaw = nullptr;
++    char* errorRaw = nullptr;
++    const int code =
++        snow_ocr_recognize(handle, reinterpret_cast<const uint8_t*>(packed.constData()),
++                           static_cast<size_t>(packed.size()), static_cast<uint32_t>(bgr.width()),
++                           static_cast<uint32_t>(bgr.height()), &resultRaw, &errorRaw);
++    qInfo() << "SNOW_OCR_INPROCESS_RECOGNIZE_RETURN" << code << bgr.size() << (resultRaw != nullptr)
++            << (errorRaw != nullptr);
++    const auto freeString = [](char* value) { snow_ocr_string_free(value); };
++    const std::unique_ptr<char, decltype(freeString)> resultText(resultRaw, freeString);
++    const std::unique_ptr<char, decltype(freeString)> errorText(errorRaw, freeString);
++    if (code != 0 || resultText == nullptr) {
++        snow_shot::ocr::protocol::appendU8(payload, 0);
++        snow_shot::ocr::protocol::appendString(
++            payload, errorText != nullptr ? QString::fromUtf8(errorText.get())
++                                          : QStringLiteral("in-process OCR failed"));
++        return payload;
++    }
++
++    QJsonParseError parseError;
++    const QJsonDocument document =
++        QJsonDocument::fromJson(QByteArray(resultText.get()), &parseError);
++    if (parseError.error != QJsonParseError::NoError || !document.isArray() ||
++        document.array().size() > 100000) {
++        snow_shot::ocr::protocol::appendU8(payload, 0);
++        snow_shot::ocr::protocol::appendString(payload,
++                                               QStringLiteral("invalid in-process OCR response"));
++        return payload;
++    }
++
++    const QJsonArray lines = document.array();
++    qInfo() << "SNOW_OCR_INPROCESS_RESPONSE_LINES" << lines.size();
++    QByteArray encodedLines;
++    for (const QJsonValue& value : lines) {
++        const QJsonObject line = value.toObject();
++        const QJsonArray points = line.value(QStringLiteral("points")).toArray();
++        const QString text = line.value(QStringLiteral("text")).toString();
++        const double score = line.value(QStringLiteral("score")).toDouble(-1.0);
++        if (text.isEmpty() || points.size() != 4 || !std::isfinite(score)) {
++            payload.clear();
++            snow_shot::ocr::protocol::appendU8(payload, 0);
++            snow_shot::ocr::protocol::appendString(payload,
++                                                   QStringLiteral("invalid OCR line geometry"));
++            return payload;
++        }
++        snow_shot::ocr::protocol::appendString(encodedLines, text);
++        appendF32(encodedLines, static_cast<float>(score));
++        for (const QJsonValue& pointValue : points) {
++            const QJsonArray point = pointValue.toArray();
++            if (point.size() != 2 || !point.at(0).isDouble() || !point.at(1).isDouble()) {
++                payload.clear();
++                snow_shot::ocr::protocol::appendU8(payload, 0);
++                snow_shot::ocr::protocol::appendString(payload,
++                                                       QStringLiteral("invalid OCR point"));
++                return payload;
++            }
++            const double x = point.at(0).toDouble();
++            const double y = point.at(1).toDouble();
++            if (!std::isfinite(x) || !std::isfinite(y)) {
++                payload.clear();
++                snow_shot::ocr::protocol::appendU8(payload, 0);
++                snow_shot::ocr::protocol::appendString(payload,
++                                                       QStringLiteral("non-finite OCR point"));
++                return payload;
++            }
++            appendF32(encodedLines, static_cast<float>(x));
++            appendF32(encodedLines, static_cast<float>(y));
++        }
++    }
++    snow_shot::ocr::protocol::appendU8(payload, 1);
++    snow_shot::ocr::protocol::appendString(payload, QStringLiteral("cpu"));
++    snow_shot::ocr::protocol::appendU32(payload, static_cast<quint32>(lines.size()));
++    payload.append(encodedLines);
++    return payload;
++}
++#endif
++
+ ScreenshotOcrTextDirection textDirectionForQuad(const QPolygonF& quad) {
+     if (quad.size() != 4)
+         return ScreenshotOcrTextDirection::Horizontal;
+@@ -99,6 +214,9 @@ class ScreenshotOcrRecognitionService::Impl final {
+           m_shutdownTimeoutMilliseconds(std::max(1, options.shutdownTimeoutMilliseconds)),
+           m_retryTimeUnit(std::max(1, options.retryTimeUnitMilliseconds)),
+           m_beforeLocalRender(options.beforeLocalRender), m_modelType(options.modelType) {
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        qInfo() << "SNOW_OCR_INPROCESS_ABI" << snow_ocr_abi_version();
++#endif
+         m_configuration.modelType = options.modelType;
+         m_configuration.detectorResizePolicy = options.detectorResizePolicy;
+         m_configuration.textDetectionProcessing = options.textDetectionProcessing;
+@@ -123,10 +241,18 @@ class ScreenshotOcrRecognitionService::Impl final {
+                                             ? QDir(QCoreApplication::applicationDirPath())
+                                                   .filePath(QStringLiteral("assets/ocr"))
+                                             : options.offlineRoot;
+-            m_assetManager = std::make_unique<ScreenshotOcrAssets>(
+-                ScreenshotOcrAssets::Options{offlineRoot, options.cacheRoot, options.proxyUrl,
+-                                             options.modelType},
+-                owner);
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++            qInfo().noquote() << "SNOW_OCR_ASSET_ROOT" << offlineRoot << "filesDir"
++                              << QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
++                              << "runtimeRoot" << options.bundledRuntimeRoot;
++#endif
++            ScreenshotOcrAssets::Options assetOptions;
++            assetOptions.offlineRoot = offlineRoot;
++            assetOptions.cacheRoot = options.cacheRoot;
++            assetOptions.proxyUrl = options.proxyUrl;
++            assetOptions.modelType = options.modelType;
++            assetOptions.bundledRuntimeRoot = options.bundledRuntimeRoot;
++            m_assetManager = std::make_unique<ScreenshotOcrAssets>(assetOptions, owner);
+             connect(m_assetManager.get(), &ScreenshotOcrAssets::statusChanged, owner,
+                     [this](const ScreenshotOcrAssetStatus& status) { m_assetStatus = status; });
+             connect(m_assetManager.get(), &ScreenshotOcrAssets::ready, owner,
+@@ -279,6 +405,10 @@ class ScreenshotOcrRecognitionService::Impl final {
+             m_staged.reset();
+         }
+         if (job->processSubmitted) {
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++            // In-process inference cannot be interrupted safely; its completion
++            // observes the cancellation flag and releases the active slot.
++#else
+             sendFrame(makeFrame(kCancel, token));
+             if (!m_configuration.residentProcess && !job->residentSubmission && m_pending.empty()) {
+                 m_processState = ProcessState::Stopping;
+@@ -289,6 +419,7 @@ class ScreenshotOcrRecognitionService::Impl final {
+                 job->running = job->processSubmitted = false;
+                 stopTransport(true);
+             }
++#endif
+         }
+         QObject::disconnect(job->receiverDestroyed);
+         if (!job->request.renderOnly) {
+@@ -361,8 +492,10 @@ class ScreenshotOcrRecognitionService::Impl final {
+             (!configuration.modelHotStart || !configuration.residentProcess))
+             m_invalidateWarmSession = true;
+         m_configuration = configuration;
++#if !defined(Q_OS_OHOS) && !defined(Q_OS_HARMONY)
+         if (accelerationChanged && processReady())
+             configureAcceleration();
++#endif
+         if (!configuration.hardwareAcceleration)
+             m_accelerationReadyPending = false;
+         m_modelType = configuration.modelType;
+@@ -452,7 +585,12 @@ class ScreenshotOcrRecognitionService::Impl final {
+     }
+ 
+     bool ensureProcess() {
+-        if (!assetsReady() || m_stopping)
++        const bool ready = assetsReady();
++        qInfo() << "SNOW_OCR_ENSURE_PROCESS" << ready << m_stopping << m_assets.processPath;
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        return ensureInProcessEngine();
++#else
++        if (!ready || m_stopping)
+             return false;
+         if (m_transport != nullptr)
+             return !processStopping();
+@@ -553,6 +691,7 @@ class ScreenshotOcrRecognitionService::Impl final {
+                 processFailed("ready_timeout");
+         });
+         return true;
++#endif
+     }
+ 
+     void sendFrame(const QByteArray& frame) {
+@@ -643,6 +782,171 @@ class ScreenshotOcrRecognitionService::Impl final {
+     bool processStopping() const {
+         return m_processState == ProcessState::Stopping;
+     }
++
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    bool ensureInProcessEngine() {
++        qInfo() << "SNOW_OCR_INPROCESS_ENSURE" << assetsReady() << m_stopping
++                << (m_ocrInprocessHandle != nullptr) << m_ocrInprocessStarting << m_pending.size();
++        if (!assetsReady() || m_stopping)
++            return false;
++        if (m_ocrInprocessHandle != nullptr)
++            return true;
++        if (m_ocrInprocessStarting)
++            return true;
++        if (m_pending.empty() && !residentEffective())
++            return true;
++
++        m_ocrInprocessStarting = true;
++        m_processState = ProcessState::Starting;
++        m_sessionState = SessionState::Preparing;
++        const quint64 generation = ++m_processGeneration;
++        const QByteArray detector = m_assets.detectorModelPath.toUtf8();
++        const QByteArray recognizer = m_assets.recognizerModelPath.toUtf8();
++        const QByteArray dictionary = m_assets.dictionaryPath.toUtf8();
++        const quint64 configurationGeneration = m_configurationGeneration;
++        const uint8_t resizePolicy =
++            m_configuration.detectorResizePolicy == ScreenshotOcrDetectorResizePolicy::Min ? 1 : 0;
++        const uint8_t processing = m_configuration.textDetectionProcessing ==
++                                           ScreenshotOcrTextDetectionProcessing::SpeedFirst
++                                       ? 1
++                                       : 0;
++        const auto threadBudget =
++            static_cast<uint32_t>(std::clamp(QThread::idealThreadCount(), 1, 8));
++        const QPointer<ScreenshotOcrRecognitionService> service(m_owner);
++        const auto alive = m_alive;
++        m_localPool->start(QRunnable::create([service, alive, generation, configurationGeneration,
++                                              detector, recognizer, dictionary, resizePolicy,
++                                              processing, threadBudget]() {
++            qInfo() << "SNOW_OCR_INPROCESS_CREATE_BEGIN" << generation;
++            char* errorRaw = nullptr;
++            SnowOcrHandle* raw = snow_ocr_create(detector.constData(), recognizer.constData(),
++                                                 dictionary.constData(), threadBudget, resizePolicy,
++                                                 processing, &errorRaw);
++            const auto freeString = [](char* value) { snow_ocr_string_free(value); };
++            const std::unique_ptr<char, decltype(freeString)> errorText(errorRaw, freeString);
++            const QString error =
++                errorText != nullptr ? QString::fromUtf8(errorText.get()) : QString();
++            qInfo() << "SNOW_OCR_INPROCESS_CREATE_END" << generation << (raw != nullptr) << error;
++            const std::shared_ptr<SnowOcrHandle> handle(
++                raw, [](SnowOcrHandle* value) { snow_ocr_destroy(value); });
++            QMetaObject::invokeMethod(
++                service,
++                [service, alive, generation, configurationGeneration, handle, error]() {
++                    if (!alive->load(std::memory_order_acquire) || service == nullptr ||
++                        service->m_impl == nullptr ||
++                        generation != service->m_impl->m_processGeneration)
++                        return;
++                    auto* impl = service->m_impl.get();
++                    impl->m_ocrInprocessStarting = false;
++                    if (configurationGeneration != impl->m_configurationGeneration) {
++                        impl->m_processState = ProcessState::Absent;
++                        impl->m_sessionState = SessionState::Empty;
++                        impl->scheduleReconcile();
++                        return;
++                    }
++                    if (handle == nullptr) {
++                        qWarning().noquote() << "SNOW_OCR_INPROCESS_CREATE_FAILED" << error;
++                        impl->m_processState = ProcessState::Absent;
++                        impl->m_sessionState = SessionState::Failed;
++                        snow_shot::diagnostics::logEvent(
++                            QStringLiteral("snow_shot.ocr"),
++                            QStringLiteral("ocr.inprocess_engine_failed"),
++                            {{QStringLiteral("stage"), QStringLiteral("initialization")},
++                             {QStringLiteral("outcome"), QStringLiteral("failed")}},
++                            QtWarningMsg);
++                        const auto failed = impl->m_pending;
++                        for (const auto& job : failed) {
++                            job->result.emplace();
++                            job->result->error =
++                                error.isEmpty()
++                                    ? QStringLiteral("in-process OCR initialization failed")
++                                    : error;
++                            impl->m_pending.erase(
++                                std::remove(impl->m_pending.begin(), impl->m_pending.end(), job),
++                                impl->m_pending.end());
++                            impl->deliver(job, std::move(*job->result));
++                            job->result.reset();
++                        }
++                        if (impl->residentEffective())
++                            impl->scheduleRetry(1);
++                        return;
++                    }
++                    impl->m_ocrInprocessHandle = handle;
++                    qInfo() << "SNOW_OCR_INPROCESS_ENGINE_READY" << generation;
++                    impl->m_processState = ProcessState::Ready;
++                    impl->m_sessionState = SessionState::Ready;
++                    impl->m_sessionGeneration = impl->m_configurationGeneration;
++                    impl->m_sessionUsed = false;
++                    impl->m_sessionWarm = impl->m_pending.empty();
++                    impl->m_sessionIdleGeneration = impl->m_idleGeneration;
++                    snow_shot::diagnostics::logEvent(
++                        QStringLiteral("snow_shot.ocr"),
++                        QStringLiteral("ocr.inprocess_engine_ready"),
++                        {{QStringLiteral("backend"), QStringLiteral("cpu")},
++                         {QStringLiteral("outcome"), QStringLiteral("ready")}});
++                    impl->scheduleReconcile();
++                },
++                Qt::QueuedConnection);
++        }));
++        return true;
++    }
++
++    void reconcileInProcess() {
++        if (m_sessionState != SessionState::Ready || m_runningCount != 0)
++            return;
++        if (m_sessionGeneration != m_configurationGeneration) {
++            m_ocrInprocessHandle.reset();
++            m_processState = ProcessState::Absent;
++            m_sessionState = SessionState::Empty;
++            ensureInProcessEngine();
++            return;
++        }
++        if (m_pending.empty()) {
++            if (!residentEffective()) {
++                m_ocrInprocessHandle.reset();
++                m_processState = ProcessState::Absent;
++                m_sessionState = SessionState::Empty;
++            }
++            return;
++        }
++
++        const auto job = m_pending.front();
++        m_pending.erase(m_pending.begin());
++        if (job->cancelled.load(std::memory_order_acquire)) {
++            scheduleReconcile();
++            return;
++        }
++        m_active = job;
++        job->running = true;
++        job->processSubmitted = true;
++        job->residentSubmission = residentEffective();
++        job->submittedAt = job->elapsed.elapsed();
++        job->childPid = 0;
++        m_runningCount = 1;
++        m_sessionUsed = true;
++        m_sessionWarm = false;
++        const auto engine = m_ocrInprocessHandle;
++        const QImage image = job->request.image;
++        const auto token = job->token;
++        const QPointer<ScreenshotOcrRecognitionService> service(m_owner);
++        const auto alive = m_alive;
++        m_localPool->start(QRunnable::create([service, alive, engine, image, token]() {
++            qInfo() << "SNOW_OCR_INPROCESS_RECOGNIZE_BEGIN" << token << image.size();
++            snow_shot::platform::applyApplicationQoSToCurrentThread();
++            const QByteArray payload = recognizeInProcess(engine.get(), image);
++            QMetaObject::invokeMethod(
++                service,
++                [service, alive, token, payload]() {
++                    if (!alive->load(std::memory_order_acquire) || service == nullptr ||
++                        service->m_impl == nullptr)
++                        return;
++                    service->m_impl->handleComplete(token, payload);
++                },
++                Qt::QueuedConnection);
++        }));
++    }
++#endif
++
+     bool residentEffective() const {
+         return m_configuration.residentProcess && !m_residentSuspended;
+     }
+@@ -756,6 +1060,11 @@ class ScreenshotOcrRecognitionService::Impl final {
+                 m_processStopReason = ProcessStopReason::Shutdown;
+                 stopTransport(false);
+             }
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++            m_ocrInprocessHandle.reset();
++            m_processState = ProcessState::Absent;
++            m_sessionState = SessionState::Empty;
++#endif
+             return;
+         }
+         const bool undelivered =
+@@ -775,6 +1084,10 @@ class ScreenshotOcrRecognitionService::Impl final {
+         }
+         if (!ensureProcess() || !processReady())
+             return;
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        reconcileInProcess();
++        return;
++#endif
+ 
+         // Only one transfer may own the mapping, and only one copied image waits ahead.
+         std::shared_ptr<Job> nextImage;
+@@ -1206,6 +1519,7 @@ class ScreenshotOcrRecognitionService::Impl final {
+     }
+ 
+     void processFailed(const char* stage = "process_exit", const QString& error = {}) {
++        qWarning() << "SNOW_OCR_PROCESS_FAILED" << stage << error << m_assets.processPath;
+         if (m_transport == nullptr || m_stopping || processStopping())
+             return;
+         QJsonObject fields{{QStringLiteral("stage"), QString::fromLatin1(stage)},
+@@ -1369,6 +1683,10 @@ class ScreenshotOcrRecognitionService::Impl final {
+     QThread* m_transportThread = nullptr;
+     std::vector<QPointer<QThread>> m_transportThreads;
+     ScreenshotOcrTransport* m_transport = nullptr;
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    std::shared_ptr<SnowOcrHandle> m_ocrInprocessHandle;
++    bool m_ocrInprocessStarting = false;
++#endif
+     ProcessStopReason m_processStopReason = ProcessStopReason::None;
+     qsizetype m_slotBytes = 0;
+     int m_runningCount = 0, m_localRenderingCount = 0;
+@@ -1405,6 +1723,8 @@ ScreenshotOcrRecognitionService::~ScreenshotOcrRecognitionService() = default;
+ ScreenshotOcrRecognitionPort::RequestToken
+ ScreenshotOcrRecognitionService::recognize(ScreenshotOcrRequest request, QObject* receiver,
+                                            Completion completion) {
++    qInfo() << "SNOW_OCR_RECOGNIZE_REQUEST" << request.image.size() << request.canvasRect
++            << (receiver != nullptr) << static_cast<bool>(completion);
+     if (request.image.isNull() || !request.canvasRect.isValid() || request.canvasRect.isEmpty() ||
+         receiver == nullptr || !completion || m_impl == nullptr)
+         return 0;

@@ -1,0 +1,81 @@
+diff --git a/snow_image/CMakeLists.txt b/snow_image/CMakeLists.txt
+index 2005449..9b2cea2 100644
+--- a/snow_image/CMakeLists.txt
++++ b/snow_image/CMakeLists.txt
+@@ -104,6 +104,7 @@ set(SNOW_IMAGE_SOURCES
+ set(SNOW_IMAGE_PRIVATE_LIBRARIES)
+ set(SNOW_IMAGE_PRIVATE_DEFINITIONS)
+ set(SNOW_IMAGE_PRIVATE_INCLUDE_DIRS)
++set(SNOW_IMAGE_PRIVATE_SYSTEM_INCLUDE_DIRS)
+ 
+ set(SNOW_IMAGE_LIBYUV_AVAILABLE OFF)
+ find_package(libyuv CONFIG QUIET)
+@@ -263,9 +264,54 @@ if(SNOW_IMAGE_CODEC_EXR)
+ endif()
+ 
+ if(SNOW_IMAGE_CODEC_WEBP)
+-    find_package(WebP CONFIG REQUIRED)
+     list(APPEND SNOW_IMAGE_SOURCES src/codecs/webp_codec.cpp src/codecs/webp_codec.h)
+-    list(APPEND SNOW_IMAGE_PRIVATE_LIBRARIES WebP::webp WebP::webpdemux WebP::libwebpmux)
++    # Codec translation units use private anonymous-namespace helpers with
++    # intentionally local names; combining JPEG and WebP in a unity unit
++    # makes those names collide.
++    set_source_files_properties(src/codecs/webp_codec.cpp PROPERTIES
++        SKIP_UNITY_BUILD_INCLUSION ON
++    )
++    find_package(WebP CONFIG QUIET)
++    if(TARGET WebP::webp AND TARGET WebP::webpdemux AND TARGET WebP::libwebpmux)
++        list(APPEND SNOW_IMAGE_PRIVATE_LIBRARIES
++            WebP::webp
++            WebP::webpdemux
++            WebP::libwebpmux
++        )
++    else()
++        # Some package managers (including Homebrew) publish libwebp's
++        # development metadata through pkg-config but do not ship a CMake
++        # package config. Resolve the same libraries directly so cross-linkers
++        # receive absolute paths rather than host pkg-config -L/-l flags.
++        find_package(PkgConfig REQUIRED)
++        pkg_check_modules(WEBP REQUIRED libwebp libwebpdemux libwebpmux)
++        find_path(SNOW_IMAGE_WEBP_INCLUDE_DIR NAMES webp/decode.h
++            HINTS ${WEBP_INCLUDE_DIRS}
++            NO_CMAKE_FIND_ROOT_PATH
++            REQUIRED
++        )
++        find_library(SNOW_IMAGE_WEBP_LIBRARY NAMES webp
++            HINTS ${WEBP_LIBRARY_DIRS}
++            NO_CMAKE_FIND_ROOT_PATH
++            REQUIRED
++        )
++        find_library(SNOW_IMAGE_WEBP_DEMUX_LIBRARY NAMES webpdemux
++            HINTS ${WEBP_LIBRARY_DIRS}
++            NO_CMAKE_FIND_ROOT_PATH
++            REQUIRED
++        )
++        find_library(SNOW_IMAGE_WEBP_MUX_LIBRARY NAMES webpmux
++            HINTS ${WEBP_LIBRARY_DIRS}
++            NO_CMAKE_FIND_ROOT_PATH
++            REQUIRED
++        )
++        list(APPEND SNOW_IMAGE_PRIVATE_SYSTEM_INCLUDE_DIRS "${SNOW_IMAGE_WEBP_INCLUDE_DIR}")
++        list(APPEND SNOW_IMAGE_PRIVATE_LIBRARIES
++            "${SNOW_IMAGE_WEBP_LIBRARY}"
++            "${SNOW_IMAGE_WEBP_DEMUX_LIBRARY}"
++            "${SNOW_IMAGE_WEBP_MUX_LIBRARY}"
++        )
++    endif()
+     list(APPEND SNOW_IMAGE_PRIVATE_DEFINITIONS SNOW_IMAGE_HAS_WEBP=1)
+ endif()
+ 
+@@ -289,6 +335,11 @@ function(snow_image_configure_target target_name linkage)
+             ${CMAKE_CURRENT_SOURCE_DIR}/src
+             ${SNOW_IMAGE_PRIVATE_INCLUDE_DIRS}
+     )
++    if(SNOW_IMAGE_PRIVATE_SYSTEM_INCLUDE_DIRS)
++        target_include_directories(${target_name} SYSTEM PRIVATE
++            ${SNOW_IMAGE_PRIVATE_SYSTEM_INCLUDE_DIRS}
++        )
++    endif()
+     target_compile_definitions(${target_name}
+         PRIVATE
+             SNOW_IMAGE_BUILDING_LIBRARY=1

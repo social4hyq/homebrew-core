@@ -1,0 +1,15 @@
+diff --git a/snow-crates/crates/snow-diagnostics/src/lib.rs b/snow-crates/crates/snow-diagnostics/src/lib.rs
+index db0dbf7..4dcea9b 100644
+--- a/snow-crates/crates/snow-diagnostics/src/lib.rs
++++ b/snow-crates/crates/snow-diagnostics/src/lib.rs
+@@ -3,6 +3,10 @@ use std::fmt::{self, Write};
+ use std::sync::Once;
+ 
+ pub type PanicCallback = extern "C" fn(*const u8, usize);
++#[unsafe(no_mangle)]
++pub extern "C" fn snow_diagnostics_install_panic_hook(callback: PanicCallback) {
++    install_panic_hook(callback);
++}
+ static INSTALL: Once = Once::new();
+ 
+ struct LocationBuffer {

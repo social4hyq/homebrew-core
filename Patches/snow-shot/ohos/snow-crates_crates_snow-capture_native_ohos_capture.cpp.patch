@@ -1,0 +1,146 @@
+diff --git a/snow-crates/crates/snow-capture/native/ohos_capture.cpp b/snow-crates/crates/snow-capture/native/ohos_capture.cpp
+new file mode 100644
+index 0000000..d978906
+--- /dev/null
++++ b/snow-crates/crates/snow-capture/native/ohos_capture.cpp
+@@ -0,0 +1,139 @@
++#include <cstddef>
++#include <cstdint>
++#include <cstring>
++#include <limits>
++#include <memory>
++#include <new>
++
++#include <window_manager/oh_display_capture.h>
++#include <window_manager/oh_display_manager.h>
++
++struct SnowCaptureOhosDisplayInfo {
++    uint64_t display_id;
++    uint32_t width;
++    uint32_t height;
++    float virtual_pixel_ratio;
++};
++
++struct SnowCaptureOhosFrame {
++    size_t pixel_len;
++    uint32_t width;
++    uint32_t height;
++    uint32_t stride;
++    int32_t pixel_format;
++};
++
++constexpr int32_t SNOW_CAPTURE_BUFFER_TOO_SMALL = -1001;
++
++extern "C" int32_t snow_capture_ohos_display_info(SnowCaptureOhosDisplayInfo* output) {
++    if (output == nullptr) {
++        return DISPLAY_MANAGER_ERROR_INVALID_PARAM;
++    }
++    int32_t width = 0;
++    int32_t height = 0;
++    auto result = OH_NativeDisplayManager_GetDefaultDisplayId(&output->display_id);
++    if (result != DISPLAY_MANAGER_OK) {
++        return result;
++    }
++    result = OH_NativeDisplayManager_GetDefaultDisplayWidth(&width);
++    if (result != DISPLAY_MANAGER_OK) {
++        return result;
++    }
++    result = OH_NativeDisplayManager_GetDefaultDisplayHeight(&height);
++    if (result != DISPLAY_MANAGER_OK) {
++        return result;
++    }
++    if (width <= 0 || height <= 0) {
++        return DISPLAY_MANAGER_ERROR_SYSTEM_ABNORMAL;
++    }
++    output->width = static_cast<uint32_t>(width);
++    output->height = static_cast<uint32_t>(height);
++    output->virtual_pixel_ratio = 1.0F;
++    const auto ratioResult =
++        OH_NativeDisplayManager_GetDefaultDisplayVirtualPixelRatio(&output->virtual_pixel_ratio);
++    if (ratioResult != DISPLAY_MANAGER_OK || output->virtual_pixel_ratio <= 0.0F) {
++        output->virtual_pixel_ratio = 1.0F;
++    }
++    return DISPLAY_MANAGER_OK;
++}
++
++extern "C" int32_t snow_capture_ohos_capture(uint64_t display_id, uint8_t* pixels, size_t capacity,
++                                             SnowCaptureOhosFrame* output) {
++    if (output == nullptr || pixels == nullptr ||
++        display_id > std::numeric_limits<uint32_t>::max()) {
++        return DISPLAY_MANAGER_ERROR_INVALID_PARAM;
++    }
++    *output = {};
++    OH_PixelmapNative* pixelmap = nullptr;
++    const auto captureResult =
++        OH_NativeDisplayManager_CaptureScreenPixelmap(static_cast<uint32_t>(display_id), &pixelmap);
++    if (captureResult != DISPLAY_MANAGER_OK || pixelmap == nullptr) {
++        return captureResult;
++    }
++
++    OH_Pixelmap_ImageInfo* info = nullptr;
++    int32_t result = OH_PixelmapImageInfo_Create(&info);
++    if (result == IMAGE_SUCCESS) {
++        result = OH_PixelmapNative_GetImageInfo(pixelmap, info);
++    }
++    if (result == IMAGE_SUCCESS) {
++        result = OH_PixelmapImageInfo_GetWidth(info, &output->width);
++    }
++    if (result == IMAGE_SUCCESS) {
++        result = OH_PixelmapImageInfo_GetHeight(info, &output->height);
++    }
++    if (result == IMAGE_SUCCESS) {
++        result = OH_PixelmapImageInfo_GetRowStride(info, &output->stride);
++    }
++    if (result == IMAGE_SUCCESS) {
++        result = OH_PixelmapImageInfo_GetPixelFormat(info, &output->pixel_format);
++    }
++    if (info != nullptr) {
++        OH_PixelmapImageInfo_Release(info);
++    }
++    if (result != IMAGE_SUCCESS || output->width == 0 || output->height == 0 ||
++        output->stride < static_cast<size_t>(output->width) * 4 ||
++        (output->pixel_format != PIXEL_FORMAT_RGBA_8888 &&
++         output->pixel_format != PIXEL_FORMAT_BGRA_8888)) {
++        OH_PixelmapNative_Destroy(&pixelmap);
++        return DISPLAY_MANAGER_ERROR_SYSTEM_ABNORMAL;
++    }
++
++    const size_t rowBytes = static_cast<size_t>(output->width) * 4;
++    if (output->height > std::numeric_limits<size_t>::max() / rowBytes) {
++        OH_PixelmapNative_Destroy(&pixelmap);
++        return DISPLAY_MANAGER_ERROR_SYSTEM_ABNORMAL;
++    }
++    const size_t packedSize = rowBytes * output->height;
++    const size_t nativeSize = static_cast<size_t>(output->stride) * output->height;
++    output->pixel_len = nativeSize;
++    if (capacity < packedSize) {
++        OH_PixelmapNative_Destroy(&pixelmap);
++        return SNOW_CAPTURE_BUFFER_TOO_SMALL;
++    }
++    size_t readSize = nativeSize;
++    if (output->stride == rowBytes) {
++        result = OH_PixelmapNative_ReadPixels(pixelmap, pixels, &readSize);
++    } else {
++        auto nativePixels = std::unique_ptr<uint8_t[]>(new (std::nothrow) uint8_t[nativeSize]);
++        if (!nativePixels) {
++            OH_PixelmapNative_Destroy(&pixelmap);
++            return DISPLAY_MANAGER_ERROR_SYSTEM_ABNORMAL;
++        }
++        result = OH_PixelmapNative_ReadPixels(pixelmap, nativePixels.get(), &readSize);
++        if (result == IMAGE_SUCCESS && readSize == nativeSize) {
++            for (uint32_t row = 0; row < output->height; ++row) {
++                std::memcpy(pixels + static_cast<size_t>(row) * rowBytes,
++                            nativePixels.get() + static_cast<size_t>(row) * output->stride,
++                            rowBytes);
++            }
++        }
++    }
++    OH_PixelmapNative_Destroy(&pixelmap);
++    if (result != IMAGE_SUCCESS || readSize != nativeSize) {
++        *output = {};
++        return DISPLAY_MANAGER_ERROR_SYSTEM_ABNORMAL;
++    }
++    output->pixel_len = readSize;
++    return DISPLAY_MANAGER_OK;
++}
+

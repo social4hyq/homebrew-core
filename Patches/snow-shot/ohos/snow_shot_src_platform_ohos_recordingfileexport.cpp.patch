@@ -1,0 +1,119 @@
+diff --git a/snow_shot/src/platform/ohos/recordingfileexport.cpp b/snow_shot/src/platform/ohos/recordingfileexport.cpp
+new file mode 100644
+index 0000000..51ae263
+--- /dev/null
++++ b/snow_shot/src/platform/ohos/recordingfileexport.cpp
+@@ -0,0 +1,112 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++#include "snow_shot/platform/ohos/recordingfileexport.h"
++
++#include "snow_shot/platform/ohos/userfileexportqueue.h"
++
++#include <QFileInfo>
++#include <QMetaObject>
++#include <QPointer>
++#include <utility>
++
++namespace snow_shot::platform::ohos {
++
++RecordingFileExport::RecordingFileExport(QObject* parent) : QObject(parent) {}
++
++RecordingFileExport::~RecordingFileExport() {
++    m_destroying = true;
++    if (m_pickerRequestId != 0)
++        static_cast<void>(sharedUserFileSavePickerQueue().cancel(m_pickerRequestId));
++    if (m_exportRequestId != 0)
++        static_cast<void>(sharedUserFileExportQueue().cancel(m_exportRequestId));
++}
++
++void RecordingFileExport::setCompletion(Completion completion) {
++    m_completion = std::move(completion);
++}
++
++bool RecordingFileExport::start(const QString& sourcePath) {
++    if (m_active)
++        return false;
++    const QFileInfo source(sourcePath);
++    if (!source.isFile() || !source.isReadable()) {
++        finish(Result::Failed, QStringLiteral("The recording file is unavailable"));
++        return false;
++    }
++
++    m_active = true;
++    const QString suggestedName = source.completeBaseName() + QStringLiteral(".mp4");
++    const QPointer<RecordingFileExport> guard(this);
++    const quint64 id = sharedUserFileSavePickerQueue().enqueue(
++        suggestedName, {QStringLiteral("MP4|.mp4")},
++        [guard, sourcePath](QString uri, int, QString error) mutable {
++            if (!guard || guard->m_destroying)
++                return;
++            QMetaObject::invokeMethod(
++                guard.data(),
++                [guard, uri = std::move(uri), sourcePath, error = std::move(error)]() mutable {
++                    if (!guard || guard->m_destroying)
++                        return;
++                    guard->m_pickerRequestId = 0;
++                    if (uri.isEmpty()) {
++                        guard->finish(error.isEmpty() ? Result::Cancelled : Result::Failed,
++                                      std::move(error));
++                        return;
++                    }
++                    const QString normalizedUri =
++                        normalizedDocumentViewPickerUri(std::move(uri), QStringLiteral("mp4"));
++                    if (normalizedUri.isEmpty()) {
++                        guard->finish(Result::Failed,
++                                      QStringLiteral("The selected destination is not writable"));
++                        return;
++                    }
++                    const QPointer<RecordingFileExport> exportGuard(guard);
++                    const quint64 exportId = sharedUserFileExportQueue().enqueue(
++                        sourcePath, normalizedUri,
++                        [exportGuard](bool succeeded, QString exportError) mutable {
++                            if (!exportGuard || exportGuard->m_destroying)
++                                return;
++                            QMetaObject::invokeMethod(
++                                exportGuard.data(),
++                                [exportGuard, succeeded,
++                                 exportError = std::move(exportError)]() mutable {
++                                    if (!exportGuard || exportGuard->m_destroying)
++                                        return;
++                                    exportGuard->m_exportRequestId = 0;
++                                    exportGuard->finish(succeeded ? Result::Succeeded
++                                                                  : Result::Failed,
++                                                        std::move(exportError));
++                                },
++                                Qt::QueuedConnection);
++                        });
++                    if (exportId == 0) {
++                        guard->finish(Result::Failed,
++                                      QStringLiteral("The user-file export could not be queued"));
++                        return;
++                    }
++                    guard->m_exportRequestId = exportId;
++                },
++                Qt::QueuedConnection);
++        });
++    if (id == 0) {
++        finish(Result::Failed, QStringLiteral("The document picker could not be opened"));
++        return false;
++    }
++    m_pickerRequestId = id;
++    return true;
++}
++
++bool RecordingFileExport::active() const noexcept {
++    return m_active;
++}
++
++void RecordingFileExport::finish(Result result, QString error) {
++    if (!m_active && result != Result::Failed)
++        return;
++    m_active = false;
++    m_pickerRequestId = 0;
++    m_exportRequestId = 0;
++    if (m_completion)
++        m_completion(result, std::move(error));
++}
++
++} // namespace snow_shot::platform::ohos
+

@@ -1,0 +1,37 @@
+diff --git a/snow_shot/src/presentation/pinned/livewindowsource.cpp b/snow_shot/src/presentation/pinned/livewindowsource.cpp
+index 33e698b..5e16cf7 100644
+--- a/snow_shot/src/presentation/pinned/livewindowsource.cpp
++++ b/snow_shot/src/presentation/pinned/livewindowsource.cpp
+@@ -968,10 +968,31 @@ class CapturedLiveWindowSource final
+ 
+ std::shared_ptr<LiveWindowSource> createLiveWindowSource(const LiveWindowTarget& target,
+                                                          const QRect& selection) {
+-    if (!target.nativeId || target.processId <= 0 || selection.isEmpty())
++    if (!target.nativeId || selection.isEmpty())
+         return {};
++#if !defined(Q_OS_OHOS) && !defined(Q_OS_HARMONY)
++    if (target.processId <= 0)
++        return {};
++#endif
+     return std::make_shared<CapturedLiveWindowSource>(target, selection);
+ }
++#if !defined(Q_OS_WIN) && !defined(Q_OS_MACOS) && !defined(Q_OS_OHOS) && \
++    !defined(Q_OS_HARMONY)
++std::optional<LiveWindowTarget> liveWindowTargetAtPoint(const QPoint&, const QList<quintptr>&) {
++    return std::nullopt;
++}
++namespace live_window_detail {
++std::unique_ptr<NativeWindowCapture> createNativeWindowCapture(const LiveWindowTarget&) {
++    return {};
++}
++std::unique_ptr<NativeWindowMonitor> createNativeWindowMonitor(const LiveWindowTarget&) {
++    return {};
++}
++std::unique_ptr<NativeWindowPresentation> createNativeWindowPresentation(const LiveWindowTarget&) {
++    return {};
++}
++} // namespace live_window_detail
++#endif
+ } // namespace snow_shot::presentation
+ 
+ #include "livewindowsource.moc"

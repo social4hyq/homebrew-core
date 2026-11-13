@@ -1,0 +1,15 @@
+diff --git a/snow_rust_ffi/src/lib.rs b/snow_rust_ffi/src/lib.rs
+index 98c6016..e7a76f0 100644
+--- a/snow_rust_ffi/src/lib.rs
++++ b/snow_rust_ffi/src/lib.rs
+@@ -1,9 +1,6 @@
+ #![allow(clippy::missing_safety_doc)]
+ 
+-#[unsafe(no_mangle)]
+-pub extern "C" fn snow_diagnostics_install_panic_hook(callback: snow_diagnostics::PanicCallback) {
+-    snow_diagnostics::install_panic_hook(callback);
+-}
++pub use snow_diagnostics::snow_diagnostics_install_panic_hook;
+ 
+ // Public module re-exports keep shared C-ABI entry points reachable while Cargo
+ // packages the FFI crates and the Rust runtime into one static archive. Full

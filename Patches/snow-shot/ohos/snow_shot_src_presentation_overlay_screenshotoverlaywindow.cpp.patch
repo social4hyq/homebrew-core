@@ -1,0 +1,22 @@
+diff --git a/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp b/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp
+index ea06d01..a27c3c4 100644
+--- a/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp
++++ b/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp
+@@ -78,7 +78,16 @@ qint64 paintRegionArea(const QRegion& region) {
+ ScreenshotOverlayWindow::ScreenshotOverlayWindow(ScreenshotOverlayEventSink& eventSink,
+                                                  SnowCanvasWidget* canvas, QWidget* parent)
+     : QWidget(parent), m_eventSink(eventSink), m_canvas(canvas) {
+-    setWindowFlags(Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint);
++    Qt::WindowFlags flags = Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint;
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    // Qt's OHOS QPA maps Qt::Tool to a native subwindow, whose window-type
++    // updates are rejected for this app by the system window manager. Keep the
++    // capture surface an ordinary app window instead.
++    flags |= Qt::Window;
++#else
++    flags |= Qt::Tool;
++#endif
++    setWindowFlags(flags);
+ #ifdef Q_OS_MACOS
+     setWindowFlag(Qt::NoDropShadowWindowHint);
+ #endif

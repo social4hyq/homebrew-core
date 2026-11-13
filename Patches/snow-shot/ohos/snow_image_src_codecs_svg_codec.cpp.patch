@@ -1,0 +1,15 @@
+diff --git a/snow_image/src/codecs/svg_codec.cpp b/snow_image/src/codecs/svg_codec.cpp
+index 1656a3a..19836c1 100644
+--- a/snow_image/src/codecs/svg_codec.cpp
++++ b/snow_image/src/codecs/svg_codec.cpp
+@@ -1,6 +1,10 @@
+ #include "codecs/svg_codec.h"
+ 
++#if __has_include(<lunasvg/lunasvg.h>)
+ #include <lunasvg/lunasvg.h>
++#else
++#include <lunasvg.h>
++#endif
+ #include <zlib.h>
+ 
+ #include <algorithm>

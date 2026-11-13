@@ -1,0 +1,15 @@
+diff --git a/snow-crates/crates/snow-ocr-process/Cargo.toml b/snow-crates/crates/snow-ocr-process/Cargo.toml
+index 621b50f..258c7c7 100644
+--- a/snow-crates/crates/snow-ocr-process/Cargo.toml
++++ b/snow-crates/crates/snow-ocr-process/Cargo.toml
+@@ -8,6 +8,10 @@ license.workspace = true
+ name = "snow-ocr-process"
+ path = "src/main.rs"
+ 
++[lib]
++name = "snow_ocr_inprocess"
++crate-type = ["cdylib"]
++
+ [features]
+ crash-diagnostics = ["dep:snow-diagnostics"]
+ default = []

@@ -1,0 +1,15 @@
+diff --git a/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp b/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp
+index 57afeae..301eecb 100644
+--- a/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp
++++ b/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp
+@@ -55,6 +55,10 @@ constexpr QSize kToolbarWindowPresetSize(1242, 142);
+ ScreenshotFloatingToolPaletteWindow::ScreenshotFloatingToolPaletteWindow(
+     const ScreenshotToolPalette::Options& options, QWidget* parent)
+     : QWidget(parent, native::windowFlags()) {
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    // Keep the transient capture toolbar above the desktop application's window.
++    setProperty("_q_platform_ohos_floatWindow", false);
++#endif
+ #ifdef Q_OS_MACOS
+     snow_shot::platform::configureControlledWindowDragging(this);
+     // Qt's transient parent alone cannot keep equal-level Cocoa tools above

@@ -1,0 +1,195 @@
+diff --git a/snow_shot/i18n/capture/snow_shot_capture_zh_TW.ts b/snow_shot/i18n/capture/snow_shot_capture_zh_TW.ts
+index 5df6ffc..a17db43 100644
+--- a/snow_shot/i18n/capture/snow_shot_capture_zh_TW.ts
++++ b/snow_shot/i18n/capture/snow_shot_capture_zh_TW.ts
+@@ -3,10 +3,18 @@
+ <TS version="2.1" language="zh_TW" sourcelanguage="en_US">
+     <context>
+         <name>DirectCaptureController</name>
++        <message>
++            <source>Capture failed: %1</source>
++            <translation>截圖失敗：%1</translation>
++        </message>
+         <message>
+             <source>The capture operation could not be queued</source>
+             <translation>無法將擷取操作加入佇列</translation>
+         </message>
++        <message>
++            <source>The capture operation failed</source>
++            <translation>截圖操作失敗</translation>
++        </message>
+         <message>
+             <source>The capture returned an invalid image</source>
+             <translation>擷取傳回了無效影像</translation>
+@@ -19,6 +27,14 @@
+             <source>The captured window geometry is invalid</source>
+             <translation>擷取的視窗幾何資訊無效</translation>
+         </message>
++        <message>
++            <source>The clipboard write operation could not be queued</source>
++            <translation>無法將剪貼板寫入操作加入隊列</translation>
++        </message>
++        <message>
++            <source>The history write operation could not be queued</source>
++            <translation>無法將歷史記錄寫入操作加入隊列</translation>
++        </message>
+     </context>
+     <context>
+         <name>ScreenshotAutoFilterController</name>
+@@ -57,6 +73,10 @@
+             <source>Could not recapture the screen</source>
+             <translation>無法重新擷取螢幕</translation>
+         </message>
++        <message>
++            <source>Could not write the selected user file</source>
++            <translation>無法寫入所選用戶檔案</translation>
++        </message>
+         <message>
+             <source>Exit</source>
+             <translation>結束</translation>
+@@ -85,6 +105,14 @@
+             <source>No recognition result is available to copy</source>
+             <translation>沒有可複製的辨識結果</translation>
+         </message>
++        <message>
++            <source>No valid document was selected for the recognition result</source>
++            <translation>未為識別結果選擇有效文檔</translation>
++        </message>
++        <message>
++            <source>No valid document was selected for the screenshot</source>
++            <translation>未為截圖選擇有效文檔</translation>
++        </message>
+         <message>
+             <source>Preparing cloud upload...</source>
+             <translation>正在準備雲端上傳…</translation>
+@@ -133,6 +161,10 @@
+             <source>The clipboard pin queue is full</source>
+             <translation>將剪貼簿內容固定到螢幕的佇列已滿</translation>
+         </message>
++        <message>
++            <source>The document picker could not be opened</source>
++            <translation>無法打開文檔選擇器</translation>
++        </message>
+         <message>
+             <source>The dropped content could not be opened</source>
+             <translation>無法開啟拖放的內容</translation>
+@@ -149,10 +181,34 @@
+             <source>The pinned windows could not be hidden</source>
+             <translation>無法隱藏固定到螢幕視窗</translation>
+         </message>
++        <message>
++            <source>The primary result was saved, but its text companion could not be written: %1</source>
++            <translation>主要結果已儲存，但無法寫入其文本配套檔案：%1</translation>
++        </message>
++        <message>
++            <source>The primary result was saved, but its text companion picker could not be opened</source>
++            <translation>主要結果已儲存，但無法打開文本配套檔案的選擇器</translation>
++        </message>
++        <message>
++            <source>The primary result was saved, but its text companion was not selected</source>
++            <translation>主要結果已儲存，但未選擇其文本配套檔案</translation>
++        </message>
++        <message>
++            <source>The primary result was saved, but the text companion export queue is unavailable</source>
++            <translation>主要結果已儲存，但文本配套檔案導出隊列不可用</translation>
++        </message>
+         <message>
+             <source>The recognition result could not be saved: %1</source>
+             <translation>無法儲存辨識結果：%1</translation>
+         </message>
++        <message>
++            <source>The recognition result could not be staged for saving</source>
++            <translation>無法暫存識別結果以供儲存</translation>
++        </message>
++        <message>
++            <source>The recognition result could not be written to the selected document</source>
++            <translation>無法將識別結果寫入所選文檔</translation>
++        </message>
+         <message>
+             <source>The screenshot clipboard operation could not be started</source>
+             <translation>無法啟動截圖剪貼簿操作</translation>
+@@ -173,6 +229,14 @@
+             <source>The screenshot could not be saved: %1</source>
+             <translation>無法儲存截圖：%1</translation>
+         </message>
++        <message>
++            <source>The screenshot could not be staged for saving</source>
++            <translation>無法暫存截圖以供儲存</translation>
++        </message>
++        <message>
++            <source>The screenshot could not be written to the selected document</source>
++            <translation>無法將截圖寫入所選文檔</translation>
++        </message>
+         <message>
+             <source>The screenshot export queue is full</source>
+             <translation>截圖匯出佇列已滿</translation>
+@@ -189,6 +253,10 @@
+             <source>The scrolling screenshot could not be prepared</source>
+             <translation>無法準備捲動截圖</translation>
+         </message>
++        <message>
++            <source>The user-file export queue is unavailable</source>
++            <translation>用戶檔案導出隊列不可用</translation>
++        </message>
+         <message>
+             <source>This screenshot cannot be pinned</source>
+             <translation>此截圖無法固定到螢幕</translation>
+@@ -206,8 +274,58 @@
+             <translation>目前的截圖將被捨棄</translation>
+         </message>
+     </context>
++    <context>
++        <name>ScreenshotController::Impl</name>
++        <message>
++            <source>Allow Snow Shot to access Finder in System Settings &gt; Privacy &amp; Security &gt; Automation, then try again</source>
++            <translation>請在“系統設置”&gt;“隱私與安全性”&gt;“自動化”中允許 Snow Shot 訪問訪達，然後重試</translation>
++        </message>
++        <message>
++            <source>Could not read the selected files from Finder. Please try again</source>
++            <translation>無法從訪達讀取所選檔案，請重試</translation>
++        </message>
++        <message>
++            <source>Finder is unavailable. Open Finder and try again</source>
++            <translation>訪達不可用，請打開訪達後重試</translation>
++        </message>
++        <message>
++            <source>Finder took too long to return the selected files. Please try again</source>
++            <translation>訪達返回所選檔案超時，請重試</translation>
++        </message>
++        <message>
++            <source>The pinned window could not be restored</source>
++            <translation>無法恢復置頂窗口</translation>
++        </message>
++        <message>
++            <source>The pinned windows could not be hidden</source>
++            <translation>無法隱藏置頂窗口</translation>
++        </message>
++    </context>
+     <context>
+         <name>ScreenshotMcpServer</name>
++        <message>
++            <source>Another Snow Shot instance owns the MCP endpoint</source>
++            <translation>另一個 Snow Shot 實例正在使用 MCP 端點</translation>
++        </message>
++        <message>
++            <source>Could not open the local MCP endpoint</source>
++            <translation>無法打開本地 MCP 端點</translation>
++        </message>
++        <message>
++            <source>Could not secure the MCP runtime directory</source>
++            <translation>無法保護 MCP 運行時目錄</translation>
++        </message>
++        <message>
++            <source>Could not write the private MCP descriptor</source>
++            <translation>無法寫入 MCP 私有描述檔案</translation>
++        </message>
++        <message>
++            <source>MCP request failed (%1)</source>
++            <translation>MCP 請求失敗（%1）</translation>
++        </message>
++    </context>
++    <context>
++        <name>ScreenshotMcpSession</name>
+         <message>
+             <source>MCP request failed (%1)</source>
+             <translation>MCP 請求失敗（%1）</translation>

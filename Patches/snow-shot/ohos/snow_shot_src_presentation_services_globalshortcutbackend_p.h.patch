@@ -1,0 +1,14 @@
+diff --git a/snow_shot/src/presentation/services/globalshortcutbackend_p.h b/snow_shot/src/presentation/services/globalshortcutbackend_p.h
+index 6329e46..485b521 100644
+--- a/snow_shot/src/presentation/services/globalshortcutbackend_p.h
++++ b/snow_shot/src/presentation/services/globalshortcutbackend_p.h
+@@ -15,6 +15,9 @@ namespace snow_shot::presentation {
+ #ifdef Q_OS_MACOS
+ [[nodiscard]] std::unique_ptr<GlobalShortcutBackend> createMacOSGlobalShortcutBackend();
+ #endif
++#ifdef Q_OS_HARMONY
++[[nodiscard]] std::unique_ptr<GlobalShortcutBackend> createOhosGlobalShortcutBackend();
++#endif
+ 
+ } // namespace snow_shot::presentation
+ 

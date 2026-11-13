@@ -1,0 +1,335 @@
+diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
+--- a/snow_shot/CMakeLists.txt
++++ b/snow_shot/CMakeLists.txt
+@@ -104,6 +104,7 @@
+ option(SNOW_SHOT_SCROLLING_PERF_DETAIL "Compile detailed scrolling C++ and Rust timings." OFF)
+ option(SNOW_SHOT_RELEASE_STATIC "Prefer static Snow Shot release linkage." OFF)
+ option(SNOW_SHOT_QT_STATIC "Link Snow Shot against a static Qt build." OFF)
++option(SNOW_SHOT_DIAGNOSTIC_SKIP_OHOS_TRAY "Temporarily skip OHOS tray startup to test the main UI independently." OFF)
+ set(SNOW_SHOT_WEBSITE_URL "https://snowshot.top" CACHE STRING "Public Snow Shot website URL.")
+ set(SNOW_SHOT_PROJECT_URL "https://github.com/mg-chao/snow-apps" CACHE STRING
+     "Public Snow Shot source repository URL.")
+@@ -168,6 +169,8 @@
+     src/presentation/recording/recordingeffectssource.cpp
+     src/presentation/recording/recordingeffectssource.h)
+ target_link_libraries(snow_shot_recording_effects_source PUBLIC Qt6::Gui snow_recording_effects_c)
++target_include_directories(snow_shot_recording_effects_source PUBLIC
++    "${CMAKE_CURRENT_SOURCE_DIR}/../snow-crates/crates/snow-recording-effects-c/include")
+ if(APPLE)
+     add_library(snow_shot_macos_clipboard STATIC src/platform/macos/imageclipboard.mm)
+     target_link_libraries(snow_shot_macos_clipboard PUBLIC Qt6::Gui
+@@ -340,9 +343,19 @@
+ endif()
+ 
+ if(NOT TARGET snow_recording_c)
+-    snow_add_rust_static_library(snow_recording_c PACKAGE snow-recording-c
+-        MANIFEST_DIR "${SNOW_SHOT_CAPTURE_CRATES_DIR}" OUTPUT_NAME snow_recording_c
++    snow_add_rust_static_libraries(snow_recording_ffi
++        TARGETS snow_recording_c snow_recording_effects_c
++        PACKAGES snow-recording-c snow-recording-effects-c
++        OUTPUT_NAMES snow_recording_c snow_recording_effects_c
++        MANIFEST_DIR "${SNOW_SHOT_CAPTURE_CRATES_DIR}"
+         NO_DEFAULT_FEATURES)
++endif()
++
++if(NOT TARGET snow_recording_effects_c)
++    snow_add_rust_static_library(snow_recording_effects_c PACKAGE snow-recording-effects-c
++        MANIFEST_DIR "${SNOW_SHOT_CAPTURE_CRATES_DIR}" OUTPUT_NAME snow_recording_effects_c)
++    target_include_directories(snow_recording_effects_c INTERFACE
++        "${SNOW_SHOT_CAPTURE_CRATES_DIR}/crates/snow-recording-effects-c/include")
+ endif()
+ 
+ if(NOT TARGET snow_visual_region_detector_c)
+@@ -369,8 +382,10 @@
+ # recognition lives in the standalone OCR process. Pin the config package to
+ # the manifest-installed copy: the Rust OpenCV crates export a user-level
+ # OpenCV_DIR that would otherwise shadow it.
+-set(OpenCV_DIR "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/opencv4" CACHE PATH
+-    "OpenCV package configuration directory" FORCE)
++if(NOT OpenCV_DIR)
++    set(OpenCV_DIR "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/opencv4" CACHE PATH
++        "OpenCV package configuration directory" FORCE)
++endif()
+ find_package(OpenCV CONFIG REQUIRED)
+ include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake/FetchSnowShotQrModels.cmake")
+ snow_shot_fetch_qr_models(SNOW_SHOT_QR_MODELS_DIR)
+@@ -405,6 +420,53 @@
+     ENVIRONMENT ${SNOW_SHOT_OCR_PROCESS_ENVIRONMENT}
+ )
+ 
++# HarmonyOS restricts execve for app-bundled helper files. Keep the regular
++# worker for process-capable hosts, but also link the same engine in-process.
++if(OHOS)
++    find_program(CARGO_EXECUTABLE NAMES cargo REQUIRED)
++    if(NOT DEFINED SNOW_RUST_CARGO_TARGET_DIR OR SNOW_RUST_CARGO_TARGET_DIR STREQUAL "")
++        set(SNOW_RUST_CARGO_TARGET_DIR "${CMAKE_BINARY_DIR}/cargo" CACHE PATH
++            "Cargo target directory for the active CMake build tree.")
++    endif()
++    if(NOT DEFINED SNOW_RUST_RELEASE_PROFILE OR SNOW_RUST_RELEASE_PROFILE STREQUAL "")
++        set(SNOW_RUST_RELEASE_PROFILE release CACHE STRING
++            "Cargo profile used for non-Debug Rust builds.")
++    endif()
++    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
++        set(_snow_ocr_cargo_profile dev)
++    else()
++        set(_snow_ocr_cargo_profile "${SNOW_RUST_RELEASE_PROFILE}")
++    endif()
++    set(_snow_ocr_inprocess_shared
++        "${SNOW_RUST_CARGO_TARGET_DIR}/${SNOW_SHOT_RUST_TARGET}/${_snow_ocr_cargo_profile}/libsnow_ocr_inprocess.so")
++    add_custom_command(OUTPUT "${_snow_ocr_inprocess_shared}"
++        COMMAND "${CMAKE_COMMAND}" -E env
++            "CARGO_TARGET_DIR=${SNOW_RUST_CARGO_TARGET_DIR}"
++            "RUSTUP_TOOLCHAIN=${SNOW_SHOT_OCR_TOOLCHAIN}"
++            "RUSTC_BOOTSTRAP=1"
++            "SNOW_CAPTURE_OHOS_CXX=${CMAKE_CXX_COMPILER}"
++            "SNOW_CAPTURE_OHOS_SYSROOT=${CMAKE_SYSROOT}"
++            "${CARGO_EXECUTABLE}" build --locked --package snow-ocr-process
++                --target "${SNOW_SHOT_RUST_TARGET}" --profile "${_snow_ocr_cargo_profile}"
++        DEPENDS
++            "${SNOW_SHOT_CAPTURE_CRATES_DIR}/Cargo.lock"
++            "${SNOW_SHOT_CAPTURE_CRATES_DIR}/crates/snow-ocr-process/Cargo.toml"
++            "${SNOW_SHOT_CAPTURE_CRATES_DIR}/crates/snow-ocr-process/src/lib.rs"
++            "${SNOW_SHOT_CAPTURE_CRATES_DIR}/crates/snow-ocr-process/src/engine.rs"
++        WORKING_DIRECTORY "${SNOW_SHOT_CAPTURE_CRATES_DIR}"
++        COMMENT "Building in-process Snow OCR cdylib"
++        VERBATIM
++    )
++    add_custom_target(snow_ocr_inprocess_build DEPENDS "${_snow_ocr_inprocess_shared}")
++    add_library(snow_ocr_inprocess_cdylib SHARED IMPORTED GLOBAL)
++    set_target_properties(snow_ocr_inprocess_cdylib PROPERTIES
++        IMPORTED_LOCATION "${_snow_ocr_inprocess_shared}"
++        IMPORTED_NO_SONAME TRUE
++        INTERFACE_INCLUDE_DIRECTORIES
++            "${SNOW_SHOT_CAPTURE_CRATES_DIR}/crates/snow-ocr-process/include"
++    )
++endif()
++
+ # The MCP bridge is deliberately a small standalone process.  It only speaks
+ # MCP over stdio and connects to an already running Snow Shot instance through
+ # the per-user local endpoint published by the application.
+@@ -437,13 +499,13 @@
+     set(SNOW_IMAGE_BUILD_TESTS OFF CACHE BOOL "Build snow_image tests." FORCE)
+     set(SNOW_IMAGE_BUILD_SHARED OFF CACHE BOOL "Build the shared snow_image library." FORCE)
+     set(SNOW_IMAGE_BUILD_STATIC ON CACHE BOOL "Build the static snow_image library." FORCE)
+-    set(SNOW_IMAGE_CODEC_PNG ON CACHE BOOL "Enable the libpng codec." FORCE)
+-    set(SNOW_IMAGE_CODEC_JPEG ON CACHE BOOL "Enable the libjpeg-turbo codec." FORCE)
+-    set(SNOW_IMAGE_CODEC_GIF ON CACHE BOOL "Enable the giflib codec." FORCE)
+-    set(SNOW_IMAGE_CODEC_HEIF ON CACHE BOOL "Enable HEIF and AVIF codecs." FORCE)
+-    set(SNOW_IMAGE_CODEC_JXL ON CACHE BOOL "Enable JPEG XL codecs." FORCE)
+-    set(SNOW_IMAGE_CODEC_WEBP ON CACHE BOOL "Enable WebP codecs." FORCE)
+-    set(SNOW_IMAGE_CODEC_TIFF ON CACHE BOOL "Enable TIFF codecs." FORCE)
++    set(SNOW_IMAGE_CODEC_PNG ON CACHE BOOL "Enable the libpng codec.")
++    set(SNOW_IMAGE_CODEC_JPEG ON CACHE BOOL "Enable the libjpeg-turbo codec.")
++    set(SNOW_IMAGE_CODEC_GIF ON CACHE BOOL "Enable the giflib codec.")
++    set(SNOW_IMAGE_CODEC_HEIF ON CACHE BOOL "Enable HEIF and AVIF codecs.")
++    set(SNOW_IMAGE_CODEC_JXL ON CACHE BOOL "Enable JPEG XL codecs.")
++    set(SNOW_IMAGE_CODEC_WEBP ON CACHE BOOL "Enable WebP codecs.")
++    set(SNOW_IMAGE_CODEC_TIFF ON CACHE BOOL "Enable TIFF codecs.")
+     add_subdirectory("${SNOW_SHOT_SNOW_IMAGE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/snow_image")
+ endif()
+ if(NOT TARGET snow_image::snow_image_static)
+@@ -459,7 +521,7 @@
+     src/image/snowimagecodecbackend.cpp
+     src/image/snowimageanimationbackend.cpp
+ )
+-if(SNOW_SHOT_RELEASE_STATIC AND SNOW_SHOT_QT_STATIC)
++if((SNOW_SHOT_RELEASE_STATIC AND SNOW_SHOT_QT_STATIC) OR SNOW_SHOT_IMAGE_CODEC_BACKEND_STATIC)
+     set(SNOW_SHOT_IMAGE_CODEC_BACKEND_STATIC ON CACHE INTERNAL
+         "Link the Snow Shot image codec backend statically." FORCE)
+     set(_SNOW_SHOT_IMAGE_CODEC_BACKEND_TYPE STATIC)
+@@ -1014,6 +1076,7 @@
+     src/presentation/services/globalshortcutbackend.cpp
+     src/presentation/services/globalshortcutmanager.cpp
+     src/platform/focusedfullscreenwindow.cpp
++    include/snow_shot/platform/ohos/userfileexportqueue.h
+ )
+ if(WIN32)
+     list(APPEND SNOW_SHOT_GLOBAL_SHORTCUT_SOURCES
+@@ -1026,6 +1089,12 @@
+     list(APPEND SNOW_SHOT_GLOBAL_SHORTCUT_SOURCES
+         src/platform/macos/globalshortcutbackend.cpp
+         src/platform/macos/focusedfullscreenwindow.mm)
++elseif(OHOS)
++    list(APPEND SNOW_SHOT_GLOBAL_SHORTCUT_SOURCES
++        src/platform/ohos/globalshortcutbackend.cpp
++        src/platform/ohos/userfileexportqueue.cpp
++        src/platform/ohos/recordingfileexport.cpp
++        include/snow_shot/platform/ohos/recordingfileexport.h)
+ endif()
+ list(APPEND SNOW_SHOT_SETTINGS_SOURCES ${SNOW_SHOT_GLOBAL_SHORTCUT_SOURCES})
+ file(READ "${CMAKE_CURRENT_SOURCE_DIR}/src/presentation/components/screenshothistorypagewidget.cpp"
+@@ -1246,6 +1315,10 @@
+         "${SNOW_SHOT_CORE_GRAPHICS_FRAMEWORK}")
+ endif()
+ target_link_libraries(snow_shot_settings PRIVATE snow_shot_global_mouse)
++if(OHOS)
++    find_library(SNOW_SHOT_ACE_NAPI_LIBRARY NAMES ace_napi.z REQUIRED)
++    target_link_libraries(snow_shot_settings PRIVATE "${SNOW_SHOT_ACE_NAPI_LIBRARY}")
++endif()
+ snow_enable_unity_build(snow_shot_settings)
+ set_source_files_properties(
+     src/presentation/styles/thememanager.cpp
+@@ -2195,6 +2268,9 @@
+ target_compile_definitions(snow_shot PRIVATE
+     SNOW_SHOT_API_BASE_URL=\"${SNOW_SHOT_API_BASE_URL}\"
+ )
++if(OHOS AND SNOW_SHOT_DIAGNOSTIC_SKIP_OHOS_TRAY)
++    target_compile_definitions(snow_shot PRIVATE SNOW_SHOT_DIAGNOSTIC_SKIP_OHOS_TRAY=1)
++endif()
+ if(WIN32)
+     target_compile_definitions(snow_shot PRIVATE
+         SNOW_SHOT_CAMERA_SHUTTER_AUDIO_SOURCE=\"${SNOW_SHOT_CAMERA_SHUTTER_AUDIO_SOURCE}\"
+@@ -2210,6 +2286,19 @@
+     snow_shot_image_codec
+     MINIZIP::minizip-ng
+ )
++if(OHOS)
++    # Keep the OCR engine behind a shared-library boundary so its Rust runtime
++    # does not collide with the other Rust static archives in the app.
++    add_dependencies(snow_shot snow_ocr_inprocess_build)
++    target_link_libraries(snow_shot PRIVATE snow_ocr_inprocess_cdylib)
++    add_custom_command(TARGET snow_shot POST_BUILD
++        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
++            "${_snow_ocr_inprocess_shared}"
++            "$<TARGET_FILE_DIR:snow_shot>/libsnow_ocr_inprocess.so"
++        COMMENT "Staging in-process OCR cdylib"
++        VERBATIM
++    )
++endif()
+ include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake/SnowShotUpdates.cmake")
+ if(WIN32)
+     target_link_libraries(snow_shot PRIVATE ole32 oleaut32 shell32 uuid)
+@@ -2436,6 +2525,11 @@
+         ${SNOW_SHOT_GLOBAL_SHORTCUT_SOURCES}
+         src/presentation/capture/screenshotglobalmousedrag.cpp)
+     target_link_libraries(snow-shot-global-mouse-tests PRIVATE snow_shot_global_mouse Qt6::Widgets)
++    if(OHOS)
++        find_library(_SNOW_SHOT_GLOBAL_MOUSE_TEST_ACE_NAPI_LIBRARY NAMES ace_napi.z REQUIRED)
++        target_link_libraries(snow-shot-global-mouse-tests PRIVATE
++            "${_SNOW_SHOT_GLOBAL_MOUSE_TEST_ACE_NAPI_LIBRARY}")
++    endif()
+     if(APPLE)
+         target_link_libraries(snow-shot-global-mouse-tests PRIVATE
+             "${SNOW_SHOT_CARBON_FRAMEWORK}"
+@@ -2455,6 +2549,21 @@
+     set_tests_properties(snow-shot-global-mouse-tests PROPERTIES
+         LABELS "unit" TIMEOUT 60 ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+     snow_shot_import_offscreen_platform(snow-shot-global-mouse-tests)
++
++    add_executable(snow-shot-ohos-user-file-export-tests
++        tests/ohos_user_file_export_tests.cpp
++        src/platform/ohos/userfileexportqueue.cpp
++        src/platform/ohos/recordingfileexport.cpp
++        include/snow_shot/platform/ohos/userfileexportqueue.h
++        include/snow_shot/platform/ohos/recordingfileexport.h
++    )
++    target_include_directories(snow-shot-ohos-user-file-export-tests PRIVATE
++        "${CMAKE_CURRENT_SOURCE_DIR}/include")
++    target_link_libraries(snow-shot-ohos-user-file-export-tests PRIVATE Qt6::Core)
++    add_test(NAME snow-shot-ohos-user-file-export-tests
++        COMMAND snow-shot-ohos-user-file-export-tests)
++    set_tests_properties(snow-shot-ohos-user-file-export-tests PROPERTIES
++        TIMEOUT 30 LABELS "unit;ohos")
+     if(WIN32)
+         target_sources(snow-shot-global-mouse-tests PRIVATE tests/global_mouse_native_input_tests.cpp)
+         add_test(NAME snow-shot-global-mouse-native-smoke-tests
+@@ -2563,6 +2672,11 @@
+         tests/application_storage_tests.cpp
+     )
+     target_link_libraries(snow-shot-application-storage-tests PRIVATE snow_shot_storage Qt6::Core)
++    add_test(NAME snow-shot-shortcut-schema-defaults-tests
++        COMMAND snow-shot-application-storage-tests --shortcut-schema-defaults-only)
++    set_tests_properties(snow-shot-shortcut-schema-defaults-tests PROPERTIES LABELS "unit"
++        TIMEOUT 30
++        ENVIRONMENT_MODIFICATION "PATH=path_list_prepend:$<TARGET_FILE_DIR:Qt6::Core>")
+     add_test(NAME snow-shot-portable-system-integration-tests
+         COMMAND snow-shot-application-storage-tests --portable-system-integration-only)
+     set_tests_properties(snow-shot-portable-system-integration-tests PROPERTIES LABELS "unit"
+@@ -5920,15 +6034,21 @@
+         snow_shot_image_codec
+         Qt6::Gui
+     )
++    if(OHOS)
++        target_sources(snow-shot-screenshot-image-file-service-tests PRIVATE
++            src/platform/ohos/userfileexportqueue.cpp
++        )
++    endif()
+     add_test(
+         NAME snow-shot-screenshot-image-file-service-tests
+-        COMMAND snow-shot-screenshot-image-file-service-tests
++        COMMAND snow-shot-screenshot-image-file-service-tests -platform offscreen
+     )
+     set_tests_properties(snow-shot-screenshot-image-file-service-tests PROPERTIES
+         RUN_SERIAL TRUE
+         ENVIRONMENT_MODIFICATION
+             "PATH=path_list_prepend:$<TARGET_FILE_DIR:Qt6::Core>"
+     )
++    snow_shot_import_offscreen_platform(snow-shot-screenshot-image-file-service-tests)
+ 
+     add_executable(snow-shot-recognition-file-export-tests
+         tests/screenshot_recognition_file_export_tests.cpp
+@@ -7595,6 +7715,12 @@
+         src/presentation/recording/recordingaudiogainpopover.cpp
+         src/presentation/recording/recordingaudiogainpopover.h
+     )
++    if(OHOS)
++        target_sources(snow-shot-pinned-window-tests PRIVATE
++            src/platform/ohos/userfileexportqueue.cpp
++            include/snow_shot/platform/ohos/userfileexportqueue.h
++        )
++    endif()
+     snow_shot_link_macos_window_platform(snow-shot-screen-recording-shortcut-tests)
+     target_compile_definitions(snow-shot-screen-recording-shortcut-tests PRIVATE
+         SNOW_SHOT_TEST_HOOKS=1
+@@ -8858,7 +8984,8 @@
+         "${SNOW_SHOT_CAPTURE_CRATES_DIR}/crates/snow-recording-c/include")
+     target_link_libraries(snow-shot-screen-recording-controller-tests PRIVATE
+         adqt_icon_core ant_design_icons_qt ant_design_qt snow_draw_engine_qt_canvas
+-        snow_shot_storage snow_shot_image_codec snow_shot_window_shortcuts snow_shot_settings Qt6::Widgets snow_recording_effects_c snow_capture_c)
++        snow_shot_storage snow_shot_image_codec snow_shot_window_shortcuts snow_shot_settings Qt6::Widgets
++        snow_recording_c snow_recording_effects_c snow_capture_c)
+     if(APPLE)
+         target_sources(snow-shot-screen-recording-controller-tests PRIVATE
+             src/platform/macos/windowcaptureexclusion.mm
+@@ -10724,6 +10851,13 @@
+     "${SNOW_SHOT_CAPTURE_CRATES_DIR}/crates/snow-ui-selector-c/include"
+     "${SNOW_SHOT_CAPTURE_CRATES_DIR}/crates/snow-stitch-images-c/include"
+ )
++if(OHOS)
++    set_property(SOURCE src/diagnostics/ffmpegdiagnostics.cpp APPEND PROPERTY
++        INCLUDE_DIRECTORIES "${SNOW_FFMPEG_ROOT}/include")
++    target_link_directories(snow_shot PRIVATE "${SNOW_FFMPEG_ROOT}/lib")
++    target_link_libraries(snow_shot PRIVATE avcodec avformat avutil avfilter swscale swresample
++        native_display_manager pixelmap)
++endif()
+ target_precompile_headers(snow_shot PRIVATE
+     <algorithm>
+     <memory>
+@@ -13791,6 +13925,11 @@
+     target_link_libraries(snow_shot_live_window PRIVATE "-framework AppKit"
+         "-framework ApplicationServices" "-framework QuartzCore" "-framework CoreVideo"
+         "-framework IOSurface")
++elseif(OHOS)
++    target_sources(snow_shot_live_window PRIVATE
++        src/platform/ohos/livewindownative.cpp
++        src/platform/ohos/livewindowselection_p.h)
++    target_link_libraries(snow_shot_live_window PRIVATE native_window_manager pixelmap_ndk.z)
+ endif()
+ snow_shot_register_source_capability(live_window
+     FULL_TARGET snow_shot_live_window MINI_TARGET snow_shot_live_window)
+@@ -13873,6 +14012,15 @@
+     add_test(NAME snow-shot-live-window-geometry-tests COMMAND snow-shot-live-window-geometry-tests)
+     set_tests_properties(snow-shot-live-window-geometry-tests PROPERTIES LABELS unit TIMEOUT 30)
+ 
++    add_executable(snow-shot-live-window-ohos-selection-tests
++        tests/live_window_ohos_selection_tests.cpp)
++    target_include_directories(snow-shot-live-window-ohos-selection-tests PRIVATE include src)
++    target_link_libraries(snow-shot-live-window-ohos-selection-tests PRIVATE Qt6::Gui)
++    add_test(NAME snow-shot-live-window-ohos-selection-tests
++        COMMAND snow-shot-live-window-ohos-selection-tests)
++    set_tests_properties(snow-shot-live-window-ohos-selection-tests PROPERTIES
++        LABELS "unit;ohos" TIMEOUT 30)
++
+     add_executable(snow-shot-live-window-frame-rendering-tests
+         tests/live_window_frame_rendering_tests.cpp)
+     target_link_libraries(snow-shot-live-window-frame-rendering-tests PRIVATE Qt6::Gui)

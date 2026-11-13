@@ -1,0 +1,162 @@
+diff --git a/snow_shot/src/platform/ohos/userfileexportqueue.cpp b/snow_shot/src/platform/ohos/userfileexportqueue.cpp
+new file mode 100644
+index 0000000..0ed1985
+--- /dev/null
++++ b/snow_shot/src/platform/ohos/userfileexportqueue.cpp
+@@ -0,0 +1,155 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++#include "snow_shot/platform/ohos/userfileexportqueue.h"
++
++#include <algorithm>
++#include <QDir>
++#include <QDebug>
++#include <QUrl>
++#include <utility>
++
++namespace snow_shot::platform::ohos {
++
++bool isDocumentViewPickerUri(const QString& path) {
++    return path.startsWith(QStringLiteral("file://docs/"), Qt::CaseSensitive);
++}
++
++QString documentViewPickerUriFromLocalPath(const QString& path) {
++    static const QString userStorageRoot = QStringLiteral("/storage/Users/currentUser/");
++    if (!path.startsWith(userStorageRoot, Qt::CaseSensitive))
++        return {};
++    const QString normalized = QDir::cleanPath(path);
++    if (!normalized.startsWith(userStorageRoot, Qt::CaseSensitive))
++        return {};
++    const QByteArray encoded = QUrl::toPercentEncoding(normalized, QByteArray("/"));
++    return QStringLiteral("file://docs") + QString::fromLatin1(encoded);
++}
++
++QString normalizedDocumentViewPickerUri(QString uri, QString extension) {
++    if (!isDocumentViewPickerUri(uri) || extension.isEmpty() ||
++        extension.contains(QLatin1Char('/')) || extension.contains(QLatin1Char('\\')) ||
++        extension.startsWith(QLatin1Char('.')))
++        return {};
++    const qsizetype separator = uri.lastIndexOf(QLatin1Char('/'));
++    if (separator < 0 || separator + 1 >= uri.size())
++        return {};
++    const qsizetype dot = uri.lastIndexOf(QLatin1Char('.'));
++    if (dot > separator + 1)
++        uri.truncate(dot);
++    else if (uri.endsWith(QLatin1Char('.')))
++        uri.chop(1);
++    return uri + QLatin1Char('.') + extension;
++}
++
++UserFileExportQueue& sharedUserFileExportQueue() {
++    static UserFileExportQueue queue;
++    return queue;
++}
++
++UserFileSavePickerQueue& sharedUserFileSavePickerQueue() {
++    static UserFileSavePickerQueue queue;
++    return queue;
++}
++
++quint64 UserFileExportQueue::enqueue(QString sourcePath, QString uri, Completion completion) {
++    if (sourcePath.isEmpty() || uri.isEmpty() || !completion)
++        return 0;
++
++    std::lock_guard lock(m_mutex);
++    if (m_nextId == 0)
++        return 0;
++    const quint64 id = m_nextId++;
++    m_pending.push_back(id);
++    m_entries.push_back(
++        {UserFileExportRequest{id, std::move(sourcePath), std::move(uri)}, std::move(completion)});
++    qInfo() << "SNOW_USER_FILE_EXPORT_ENQUEUE" << id;
++    return id;
++}
++
++std::vector<UserFileExportRequest> UserFileExportQueue::takePending() {
++    std::lock_guard lock(m_mutex);
++    std::vector<UserFileExportRequest> result;
++    result.reserve(m_pending.size());
++    for (const quint64 id : m_pending) {
++        const auto entry =
++            std::find_if(m_entries.begin(), m_entries.end(),
++                         [id](const Entry& candidate) { return candidate.request.id == id; });
++        if (entry != m_entries.end())
++            result.push_back(entry->request);
++    }
++    m_pending.clear();
++    return result;
++}
++
++bool UserFileExportQueue::complete(quint64 id, bool succeeded, QString error) {
++    Completion completion;
++    {
++        std::lock_guard lock(m_mutex);
++        const auto entry =
++            std::find_if(m_entries.begin(), m_entries.end(),
++                         [id](const Entry& candidate) { return candidate.request.id == id; });
++        if (entry == m_entries.end())
++            return false;
++        completion = std::move(entry->completion);
++        m_entries.erase(entry);
++        std::erase(m_pending, id);
++    }
++    completion(succeeded, std::move(error));
++    return true;
++}
++
++bool UserFileExportQueue::cancel(quint64 id) {
++    return complete(id, false, QStringLiteral("The user-file export was cancelled"));
++}
++
++quint64 UserFileSavePickerQueue::enqueue(QString suggestedName, QStringList suffixChoices,
++                                         Completion completion) {
++    if (suggestedName.isEmpty() || suffixChoices.isEmpty() || !completion)
++        return 0;
++    std::lock_guard lock(m_mutex);
++    if (m_nextId == 0)
++        return 0;
++    const quint64 id = m_nextId++;
++    m_pending.push_back(id);
++    m_entries.push_back(
++        {UserFileSavePickerRequest{id, std::move(suggestedName), std::move(suffixChoices)},
++         std::move(completion)});
++    return id;
++}
++
++std::vector<UserFileSavePickerRequest> UserFileSavePickerQueue::takePending() {
++    std::lock_guard lock(m_mutex);
++    std::vector<UserFileSavePickerRequest> result;
++    result.reserve(m_pending.size());
++    for (const quint64 id : m_pending) {
++        const auto entry =
++            std::find_if(m_entries.begin(), m_entries.end(),
++                         [id](const Entry& candidate) { return candidate.request.id == id; });
++        if (entry != m_entries.end())
++            result.push_back(entry->request);
++    }
++    m_pending.clear();
++    return result;
++}
++
++bool UserFileSavePickerQueue::complete(quint64 id, QString uri, int suffixIndex, QString error) {
++    Completion completion;
++    {
++        std::lock_guard lock(m_mutex);
++        const auto entry =
++            std::find_if(m_entries.begin(), m_entries.end(),
++                         [id](const Entry& candidate) { return candidate.request.id == id; });
++        if (entry == m_entries.end())
++            return false;
++        completion = std::move(entry->completion);
++        m_entries.erase(entry);
++        std::erase(m_pending, id);
++    }
++    completion(std::move(uri), suffixIndex, std::move(error));
++    return true;
++}
++
++bool UserFileSavePickerQueue::cancel(quint64 id) {
++    return complete(id, {}, -1, QStringLiteral("The user-file save was cancelled"));
++}
++
++} // namespace snow_shot::platform::ohos
+

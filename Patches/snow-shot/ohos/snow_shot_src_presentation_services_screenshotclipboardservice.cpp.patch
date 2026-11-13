@@ -1,0 +1,13 @@
+diff --git a/snow_shot/src/presentation/services/screenshotclipboardservice.cpp b/snow_shot/src/presentation/services/screenshotclipboardservice.cpp
+index b346101..b07b945 100644
+--- a/snow_shot/src/presentation/services/screenshotclipboardservice.cpp
++++ b/snow_shot/src/presentation/services/screenshotclipboardservice.cpp
+@@ -221,7 +221,7 @@ class ClipboardCommitOperation final : public QObject {
+                                          : result.succeeded()   ? QStringLiteral("succeeded")
+                                                                 : QStringLiteral("failed")}},
+             cancelled || superseded || result.succeeded() ? QtInfoMsg : QtWarningMsg);
+-        auto completion = std::move(m_completion);
++        auto completion = std::exchange(m_completion, {});
+         if (notify && m_state->completionEnabled.load(std::memory_order_acquire) &&
+             !m_receiver.isNull() && completion) {
+             completion(result);

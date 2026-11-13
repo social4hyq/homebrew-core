@@ -1,0 +1,13 @@
+diff --git a/snow_image/include/snow/image/image.h b/snow_image/include/snow/image/image.h
+index fa1d15e..c27d568 100644
+--- a/snow_image/include/snow/image/image.h
++++ b/snow_image/include/snow/image/image.h
+@@ -7,7 +7,7 @@
+ #include <cstdint>
+ #include <memory>
+ #include <span>
+-#include <stop_token>
++#include "stop_token.hpp"
+ 
+ namespace snow::image {
+ 

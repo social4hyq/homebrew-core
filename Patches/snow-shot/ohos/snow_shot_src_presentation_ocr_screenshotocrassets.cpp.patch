@@ -1,0 +1,113 @@
+diff --git a/snow_shot/src/presentation/ocr/screenshotocrassets.cpp b/snow_shot/src/presentation/ocr/screenshotocrassets.cpp
+index cc169a2..b74cac1 100644
+--- a/snow_shot/src/presentation/ocr/screenshotocrassets.cpp
++++ b/snow_shot/src/presentation/ocr/screenshotocrassets.cpp
+@@ -12,6 +12,7 @@
+ #include <QEventLoop>
+ #include <QEvent>
+ #include <QFile>
++#include <QDebug>
+ #include <QFileInfo>
+ #include <QJsonArray>
+ #include <QJsonDocument>
+@@ -47,11 +48,18 @@ constexpr auto kManifestName = "asset-manifest.json";
+ constexpr auto kPlatform = "macos-arm64";
+ #elif defined(Q_OS_MACOS) && defined(Q_PROCESSOR_X86_64)
+ constexpr auto kPlatform = "macos-x64";
++#elif (defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)) && defined(Q_PROCESSOR_ARM_64)
++constexpr auto kPlatform = "openharmony-arm64";
+ #elif defined(Q_OS_WIN) && defined(Q_PROCESSOR_ARM_64)
+ constexpr auto kPlatform = "windows-arm64";
+ #else
+ constexpr auto kPlatform = "windows-x64";
+ #endif
++#if defined(Q_OS_MACOS) || defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++constexpr bool kBundledRuntime = true;
++#else
++constexpr bool kBundledRuntime = false;
++#endif
+ constexpr auto kInterruptedError = "OCR asset preparation was interrupted";
+ constexpr int kShutdownJoinTimeoutMs = 10'000;
+ 
+@@ -246,13 +254,20 @@ std::optional<Descriptor> loadDescriptor(const QString& root, QString* error) {
+     Descriptor result;
+     result.runtimeVersion = runtime.value(QStringLiteral("version")).toString();
+     result.platform = runtime.value(QStringLiteral("platform")).toString();
+-#ifdef Q_OS_MACOS
++#if defined(Q_OS_MACOS) || defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
+     result.bundled = true;
+ #endif
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    result.executable = result.bundled
++                            ? QStringLiteral("libsnow_ocr_process.so")
++                            : QStringLiteral("snow-ocr-process-%1-%2.exe")
++                                  .arg(result.runtimeVersion, QString::fromLatin1(kPlatform));
++#else
+     result.executable = result.bundled
+                             ? QStringLiteral("snow-ocr-process")
+                             : QStringLiteral("snow-ocr-process-%1-%2.exe")
+                                   .arg(result.runtimeVersion, QString::fromLatin1(kPlatform));
++#endif
+     const auto defaultModel =
+         parseModelType(rootObject.value(QStringLiteral("default_model")).toString());
+     if (rootObject.value(QStringLiteral("schema")).toInt() != (result.bundled ? 3 : 2) ||
+@@ -424,10 +439,16 @@ bool verifyComponentIntegrity(const QString& directory, const QList<FileDescript
+ bool validateBundledRuntime(const QString& directory, const Descriptor& descriptor,
+                             QString* error) {
+     if (!validateComponent(directory, descriptor.runtimeFiles, descriptor.runtimeVersion, false,
+-                           error) ||
+-        !QFileInfo(QDir(directory).filePath(descriptor.executable)).isExecutable()) {
++                           error)) {
+         return false;
+     }
++#if !defined(Q_OS_OHOS) && !defined(Q_OS_HARMONY)
++    if (!QFileInfo(QDir(directory).filePath(descriptor.executable)).isExecutable()) {
++        if (error != nullptr)
++            *error = QStringLiteral("bundled OCR worker is not executable");
++        return false;
++    }
++#endif
+ #ifdef Q_OS_MACOS
+     // Bundled runtimes use thin, little-endian Mach-O files matching the app.
+     // Check both binaries before launching, rather than relying on Rosetta or dyld.
+@@ -925,14 +946,21 @@ class ScreenshotOcrAssets::Impl final {
+         };
+         if (cancelled())
+             return false;
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        qWarning().noquote() << "SNOW_OCR_ASSET_ROOT" << options.offlineRoot;
++#endif
+         auto descriptor = loadDescriptor(options.offlineRoot, error);
+         const bool requireBundledRuntime =
+-            options.requireBundledRuntime || snow_shot::app::distribution::isStoreManaged();
++            kBundledRuntime || options.requireBundledRuntime ||
++            snow_shot::app::distribution::isStoreManaged();
+         if (!descriptor.has_value()) {
+             if (requireBundledRuntime)
+                 *error = QStringLiteral("store_runtime_invalid");
+ #ifdef Q_OS_MACOS
+             *error = QStringLiteral("bundled_runtime_invalid");
++#endif
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++            *error = QStringLiteral("bundled_runtime_invalid");
+ #endif
+             return false;
+         }
+@@ -959,7 +987,7 @@ class ScreenshotOcrAssets::Impl final {
+             (!offlineRuntime ||
+              !verifyComponentIntegrity(runtimeDirectory(offlineRuntimeRoot, *descriptor),
+                                        descriptor->runtimeFiles, &validationError))) {
+-            *error = QStringLiteral("store_runtime_invalid");
++            *error = QStringLiteral("store_runtime_invalid: %1").arg(validationError);
+             return false;
+         }
+         if (descriptor->bundled && !offlineRuntime) {
+@@ -968,7 +996,7 @@ class ScreenshotOcrAssets::Impl final {
+         }
+         const bool offlineModel =
+             validateComponent(modelDirectory(options.offlineRoot, *model), model->files, model->id,
+-                              true, &validationError);
++                              !descriptor->bundled, &validationError);
+         if (offlineRuntime && offlineModel) {
+             *assets = resolved(offlineRuntimeRoot, options.offlineRoot, *descriptor, *model, true);
+             return true;

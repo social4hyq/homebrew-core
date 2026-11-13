@@ -1,0 +1,13 @@
+diff --git a/snow_image/include/snow/image/codec.h b/snow_image/include/snow/image/codec.h
+index 064763a..45f0568 100644
+--- a/snow_image/include/snow/image/codec.h
++++ b/snow_image/include/snow/image/codec.h
+@@ -8,7 +8,7 @@
+ #include <cstdint>
+ #include <optional>
+ #include <span>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <string>
+ #include <string_view>
+ #include <vector>

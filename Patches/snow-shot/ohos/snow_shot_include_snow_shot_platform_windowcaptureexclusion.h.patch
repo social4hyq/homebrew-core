@@ -1,0 +1,22 @@
+diff --git a/snow_shot/include/snow_shot/platform/windowcaptureexclusion.h b/snow_shot/include/snow_shot/platform/windowcaptureexclusion.h
+index b74b7d6..66e4989 100644
+--- a/snow_shot/include/snow_shot/platform/windowcaptureexclusion.h
++++ b/snow_shot/include/snow_shot/platform/windowcaptureexclusion.h
+@@ -8,8 +8,17 @@
+ 
+ namespace snow_shot::platform {
+ 
++#if !defined(Q_OS_WIN) && !defined(Q_OS_MACOS)
++[[nodiscard]] inline bool setWindowExcludedFromCapture(QWidget*, bool) {
++    return false;
++}
++[[nodiscard]] inline std::optional<std::uint32_t> captureWindowId(QWidget*) {
++    return std::nullopt;
++}
++#else
+ [[nodiscard]] bool setWindowExcludedFromCapture(QWidget* window, bool excluded);
+ [[nodiscard]] std::optional<std::uint32_t> captureWindowId(QWidget* window);
++#endif
+ 
+ } // namespace snow_shot::platform
+ 

@@ -1,0 +1,13 @@
+diff --git a/snow_shot/src/presentation/mainwindow.cpp b/snow_shot/src/presentation/mainwindow.cpp
+index 0f5ae08..5408f26 100644
+--- a/snow_shot/src/presentation/mainwindow.cpp
++++ b/snow_shot/src/presentation/mainwindow.cpp
+@@ -80,6 +80,8 @@ MainWindow::MainWindow(const snow_shot::presentation::settings::SettingsRegistry
+ #ifdef Q_OS_MACOS
+     setWindowFlags(windowFlags() | Qt::ExpandedClientAreaHint | Qt::NoTitleBarBackgroundHint);
+     setAttribute(Qt::WA_LayoutOnEntireRect);
++#elif defined(Q_OS_HARMONY)
++    setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+ #endif
+     setObjectName(QStringLiteral("snowShotMainWindow"));
+     setAccessibleName(snow_shot::app::edition::isMini ? snow_shot::app::edition::productName()

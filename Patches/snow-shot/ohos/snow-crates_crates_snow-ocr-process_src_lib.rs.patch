@@ -1,0 +1,377 @@
+diff --git a/snow-crates/crates/snow-ocr-process/src/lib.rs b/snow-crates/crates/snow-ocr-process/src/lib.rs
+new file mode 100644
+index 0000000..a1c7933
+--- /dev/null
++++ b/snow-crates/crates/snow-ocr-process/src/lib.rs
+@@ -0,0 +1,370 @@
++//! In-process C ABI for hosts that cannot execute a bundled helper process.
++//!
++//! The standalone worker remains the preferred host integration where process
++//! creation is supported. This library exposes the same OCR engine to OHOS Qt
++//! without changing recognition semantics or moving model parsing into C++.
++
++mod acceleration {
++    #[cfg(feature = "gpu")]
++    pub type Context = simd_paddle_ocr_rs::runtime::gpu::GpuContext;
++    #[cfg(not(feature = "gpu"))]
++    pub struct Context;
++}
++#[allow(dead_code)]
++mod engine;
++
++use engine::{Engine, InputImage, OcrLine, make_engine_for_models};
++use snow_memory::RasterBuffer;
++use std::{
++    ffi::{CStr, CString, c_char},
++    path::{Path, PathBuf},
++    ptr,
++    sync::Mutex,
++};
++
++#[derive(Clone, PartialEq, Eq)]
++#[allow(dead_code)]
++struct Config {
++    detector_resize_policy: DetectorResizePolicy,
++    text_detection_processing: TextDetectionProcessing,
++    hardware_acceleration: bool,
++    detector_model: std::path::PathBuf,
++    recognizer_model: std::path::PathBuf,
++    dictionary: std::path::PathBuf,
++}
++
++#[derive(Debug, Clone, Copy, PartialEq, Eq)]
++enum DetectorResizePolicy {
++    Max,
++    Min,
++}
++
++#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
++enum TextDetectionProcessing {
++    #[default]
++    AccuracyFirst,
++    SpeedFirst,
++}
++
++impl TextDetectionProcessing {
++    fn recognition_width(self) -> usize {
++        match self {
++            Self::AccuracyFirst => 320,
++            Self::SpeedFirst => 48,
++        }
++    }
++}
++
++#[allow(dead_code)]
++fn worker_event(
++    event: &str,
++    id: u64,
++    stage: &str,
++    backend: &str,
++    outcome: &str,
++    elapsed: u128,
++    message: &str,
++) {
++    eprintln!(
++        "{}",
++        serde_json::json!({
++            "event": event, "message": message,
++            "fields": {"operation": id.to_string(), "stage": stage, "backend": backend,
++                       "outcome": outcome, "duration_ms": elapsed}
++        })
++    );
++}
++
++pub struct OcrHandle(Mutex<Engine>);
++
++/// Version of the stable C ABI used by native hosts.
++#[unsafe(no_mangle)]
++pub extern "C" fn snow_ocr_abi_version() -> u32 {
++    1
++}
++
++fn set_error(out: *mut *mut c_char, message: impl AsRef<str>) {
++    if out.is_null() {
++        return;
++    }
++    let sanitized = message.as_ref().replace('\0', "�");
++    // CString only fails if an interior NUL remains; replacement above prevents it.
++    let value = CString::new(sanitized).expect("sanitized error string");
++    // SAFETY: caller provides a writable output pointer by contract.
++    unsafe { *out = value.into_raw() };
++}
++
++unsafe fn path_from_c(value: *const c_char, name: &str) -> Result<PathBuf, String> {
++    if value.is_null() {
++        return Err(format!("{name} path is null"));
++    }
++    // SAFETY: non-null C strings are guaranteed to be NUL-terminated by the ABI caller.
++    let path = unsafe { CStr::from_ptr(value) }
++        .to_str()
++        .map_err(|_| format!("{name} path is not UTF-8"))?;
++    Ok(PathBuf::from(path))
++}
++
++/// Creates an OCR engine from already-installed local model files.
++///
++/// `resize_policy` is 0 for max/accuracy and 1 for min/speed. `processing` is
++/// 0 for accuracy-first recognition and 1 for speed-first. Returns null on
++/// failure and writes a caller-owned error string when `error_out` is non-null.
++///
++/// # Safety
++///
++/// Each non-null path pointer must reference a readable, NUL-terminated C string for the
++/// duration of the call. If `error_out` is non-null, it must point to a writable pointer slot.
++#[unsafe(no_mangle)]
++pub unsafe extern "C" fn snow_ocr_create(
++    detector: *const c_char,
++    recognizer: *const c_char,
++    dictionary: *const c_char,
++    thread_budget: u32,
++    resize_policy: u8,
++    processing: u8,
++    error_out: *mut *mut c_char,
++) -> *mut OcrHandle {
++    if !error_out.is_null() {
++        // SAFETY: caller provides a writable output pointer by contract.
++        unsafe { *error_out = ptr::null_mut() };
++    }
++    let result = (|| {
++        // SAFETY: each C string is validated and consumed synchronously.
++        let detector = unsafe { path_from_c(detector, "detector")? };
++        // SAFETY: each C string is validated and consumed synchronously.
++        let recognizer = unsafe { path_from_c(recognizer, "recognizer")? };
++        // SAFETY: each C string is validated and consumed synchronously.
++        let dictionary = unsafe { path_from_c(dictionary, "dictionary")? };
++        let policy = match resize_policy {
++            0 => DetectorResizePolicy::Max,
++            1 => DetectorResizePolicy::Min,
++            _ => return Err("invalid detector resize policy".to_owned()),
++        };
++        let processing = match processing {
++            0 => TextDetectionProcessing::AccuracyFirst,
++            1 => TextDetectionProcessing::SpeedFirst,
++            _ => return Err("invalid text detection processing mode".to_owned()),
++        };
++        let engine = make_engine_for_models(
++            Path::new(&detector),
++            Path::new(&recognizer),
++            Path::new(&dictionary),
++            thread_budget.max(1) as usize,
++            policy,
++            processing,
++            None,
++        )
++        .map_err(|error| error.to_string())?;
++        Ok(Box::into_raw(Box::new(OcrHandle(Mutex::new(engine)))))
++    })();
++    match result {
++        Ok(handle) => handle,
++        Err(error) => {
++            set_error(error_out, error);
++            ptr::null_mut()
++        }
++    }
++}
++
++/// Recognizes packed BGR24 pixels and returns a JSON array of text/score/quad.
++/// The returned string must be released with `snow_ocr_string_free`.
++///
++/// # Safety
++///
++/// `handle` must be null or a live handle returned by `snow_ocr_create` from this library.
++/// `pixels` must reference `length` readable bytes for the duration of the call. Each non-null
++/// output pointer must point to a writable pointer slot. The handle must not be destroyed until
++/// this call returns.
++#[unsafe(no_mangle)]
++pub unsafe extern "C" fn snow_ocr_recognize(
++    handle: *mut OcrHandle,
++    pixels: *const u8,
++    length: usize,
++    width: u32,
++    height: u32,
++    result_out: *mut *mut c_char,
++    error_out: *mut *mut c_char,
++) -> i32 {
++    if !result_out.is_null() {
++        // SAFETY: caller provides a writable output pointer by contract.
++        unsafe { *result_out = ptr::null_mut() };
++    }
++    if !error_out.is_null() {
++        // SAFETY: caller provides a writable output pointer by contract.
++        unsafe { *error_out = ptr::null_mut() };
++    }
++    if handle.is_null() || pixels.is_null() || result_out.is_null() {
++        set_error(error_out, "null OCR input or output pointer");
++        return 1;
++    }
++    let width = width as usize;
++    let height = height as usize;
++    let Some(required) = width
++        .checked_mul(height)
++        .and_then(|size| size.checked_mul(3))
++    else {
++        set_error(error_out, "OCR image size overflow");
++        return 1;
++    };
++    if width == 0 || height == 0 || width.saturating_mul(height) > 3840 * 2160 || length != required
++    {
++        set_error(error_out, "invalid packed BGR24 image dimensions");
++        return 1;
++    }
++    // SAFETY: caller promises `pixels` addresses `length` readable bytes.
++    let source = unsafe { std::slice::from_raw_parts(pixels, length) };
++    let image = InputImage {
++        width,
++        height,
++        pixels: RasterBuffer::from(source),
++    };
++    // SAFETY: non-null handle is created by this library and remains live for the call.
++    let engine = unsafe { &*handle };
++    let mut engine = engine
++        .0
++        .lock()
++        .unwrap_or_else(std::sync::PoisonError::into_inner);
++    match engine.run(&image) {
++        Ok(lines) => {
++            let json = serialize_lines(&lines);
++            match CString::new(json) {
++                Ok(value) => {
++                    // SAFETY: caller passed non-null output pointer.
++                    unsafe { *result_out = value.into_raw() };
++                    0
++                }
++                Err(error) => {
++                    set_error(error_out, error.to_string());
++                    2
++                }
++            }
++        }
++        Err(error) => {
++            set_error(error_out, error.to_string());
++            2
++        }
++    }
++}
++
++/// Destroys a handle returned by `snow_ocr_create`.
++///
++/// # Safety
++///
++/// `handle` must be null or a live handle returned by `snow_ocr_create` from this library, and
++/// no other thread may be using the handle while it is destroyed.
++#[unsafe(no_mangle)]
++pub unsafe extern "C" fn snow_ocr_destroy(handle: *mut OcrHandle) {
++    if !handle.is_null() {
++        // SAFETY: handle was allocated by snow_ocr_create and must be destroyed once.
++        drop(unsafe { Box::from_raw(handle) });
++    }
++}
++
++/// Releases a string returned by this ABI.
++///
++/// # Safety
++///
++/// `value` must be null or a pointer returned by this library from `snow_ocr_create`'s
++/// `error_out` or `snow_ocr_recognize`'s `result_out`/`error_out`, and it must not already have
++/// been released.
++#[unsafe(no_mangle)]
++pub unsafe extern "C" fn snow_ocr_string_free(value: *mut c_char) {
++    if !value.is_null() {
++        // SAFETY: value was allocated by CString::into_raw in this library.
++        drop(unsafe { CString::from_raw(value) });
++    }
++}
++
++fn serialize_lines(lines: &[OcrLine]) -> String {
++    serde_json::to_string(
++        &lines
++            .iter()
++            .map(|line| {
++                serde_json::json!({
++                    "text": line.text,
++                    "score": line.score,
++                    "points": line.points,
++                })
++            })
++            .collect::<Vec<_>>(),
++    )
++    .expect("OCR line values serialize to JSON")
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn serializes_recognition_lines_using_the_host_contract() {
++        let lines = [OcrLine {
++            text: "Snow".into(),
++            score: 0.875,
++            points: [[1., 2.], [3., 2.], [3., 4.], [1., 4.]],
++        }];
++        let value: serde_json::Value = serde_json::from_str(&serialize_lines(&lines)).unwrap();
++        assert_eq!(value[0]["text"], "Snow");
++        assert_eq!(value[0]["score"], 0.875);
++        assert_eq!(value[0]["points"][2][0], 3.0);
++    }
++
++    #[test]
++    fn exposes_expected_abi_version() {
++        assert_eq!(snow_ocr_abi_version(), 1);
++    }
++
++    #[test]
++    fn create_reports_invalid_policy_without_loading_model_files() {
++        let detector = CString::new("detector").unwrap();
++        let recognizer = CString::new("recognizer").unwrap();
++        let dictionary = CString::new("dictionary").unwrap();
++        let mut error = ptr::null_mut();
++        // SAFETY: pointers refer to live NUL-terminated strings and a writable output slot.
++        let handle = unsafe {
++            snow_ocr_create(
++                detector.as_ptr(),
++                recognizer.as_ptr(),
++                dictionary.as_ptr(),
++                1,
++                9,
++                0,
++                &mut error,
++            )
++        };
++        assert!(handle.is_null());
++        assert!(!error.is_null());
++        // SAFETY: error was allocated by this library and is freed exactly once.
++        let message = unsafe { CStr::from_ptr(error) }.to_str().unwrap();
++        assert_eq!(message, "invalid detector resize policy");
++        // SAFETY: error was allocated by this library.
++        unsafe { snow_ocr_string_free(error) };
++    }
++
++    #[test]
++    fn recognize_rejects_null_handle_and_returns_owned_error() {
++        let pixel = [0_u8; 3];
++        let mut result = ptr::null_mut();
++        let mut error = ptr::null_mut();
++        // SAFETY: output slots and pixel buffer are valid; null handle is intentionally rejected.
++        let code = unsafe {
++            snow_ocr_recognize(
++                ptr::null_mut(),
++                pixel.as_ptr(),
++                pixel.len(),
++                1,
++                1,
++                &mut result,
++                &mut error,
++            )
++        };
++        assert_eq!(code, 1);
++        assert!(result.is_null());
++        assert!(!error.is_null());
++        // SAFETY: error was allocated by this library and is freed exactly once.
++        let message = unsafe { CStr::from_ptr(error) }.to_str().unwrap();
++        assert_eq!(message, "null OCR input or output pointer");
++        // SAFETY: error was allocated by this library.
++        unsafe { snow_ocr_string_free(error) };
++    }
++}
+
