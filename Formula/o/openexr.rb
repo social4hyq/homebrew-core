@@ -6,6 +6,11 @@ class Openexr < Formula
   license "BSD-3-Clause"
   compatibility_version 2
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/openexr-v3.5.4-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b50cede6edd15bdfe9a2dd0592983442999263929d004af4c75066b993f9dd18"
+  end
+
   depends_on "cmake" => :build
   depends_on "pkgconf" => :build
 
