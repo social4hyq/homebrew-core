@@ -4,7 +4,7 @@ class SnowShot < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.2_snow-shot.tar.gz"
   sha256 "29190412a6dc9b41c0097fbf1313dc0f84412c9d23e1716260ed13acdcbd6c4e"
   license "GPL-3.0-or-later"
-  revision 3
+  revision 4
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.2-r5"
@@ -421,6 +421,7 @@ class SnowShot < Formula
     end
     hap = stage/"entry/build/default/outputs/default/entry-default-unsigned.hap"
     system "python3", (payload/"support/scripts/finalize-ohos-ocr-manifest.py").to_s, hap.to_s
+    system "python3", (payload/"support/scripts/add-ohos-module-permissions.py").to_s, hap.to_s
     sdk_lib_dir = native_sdk/"native/sysroot/usr/lib/aarch64-linux-ohos"
     clt_lib_dir = command_line_tools/"sdk/default/openharmony/native/sysroot/usr/lib/aarch64-linux-ohos"
     system "python3", payload/"support/scripts/test-snow-shot-hap-runtime-closure.py",
@@ -444,6 +445,8 @@ class SnowShot < Formula
     manifest = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     assert_equal "com.social4hyq.snowshot", manifest.dig("app", "bundleName")
     assert_equal "QAbility", manifest.dig("module", "abilities", 0, "name")
+    permissions = manifest.dig("module", "requestPermissions").map { |item| item["name"] }
+    assert_includes permissions, "ohos.permission.CUSTOM_SCREEN_CAPTURE"
     assert_equal "$media:app_icon", manifest.dig("module", "abilities", 0, "icon")
     system "unzip", "-q", hap, "resources/rawfile/ocr/asset-manifest.json",
            "libs/arm64-v8a/libsnow_ocr_process.so", "-d", testpath/"ocr-check"
