@@ -7,8 +7,9 @@ class SnowShot < Formula
   revision 1
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.2-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "28d98bd40c3841e4e097d66187f6ea2e3fa1733c485f26118757c0dcffd3902e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.2-r3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a492955c020d9f56d9de264656a743069b37c24817990fa85542dc1be3c23213"
   end
 
   depends_on "brotli" => :build
@@ -92,6 +93,10 @@ class SnowShot < Formula
 
   patch :p1 do
     file "Patches/snow-shot/0001-ohos-port.patch"
+  end
+
+  patch :p1 do
+    file "Patches/snow-shot/0003-guard-lrelease-dependencies.patch"
   end
 
   def install

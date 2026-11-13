@@ -1,0 +1,18 @@
+diff --git a/cmake/SnowShotTranslationRelease.cmake b/cmake/SnowShotTranslationRelease.cmake
+index 8fb9070..6c94b18 100644
+--- a/cmake/SnowShotTranslationRelease.cmake
++++ b/cmake/SnowShotTranslationRelease.cmake
+@@ -32,6 +32,12 @@ function(snow_shot_release_translation_catalogs target catalog_dir output_dir ou
+         QT_TRANSLATION_CATALOGS qtbase
+         OPTIONS -fail-on-unfinished)
+     add_custom_target(${target} ALL)
+-    add_dependencies(${target} ${target}_source_language ${target}_localized)
++    # Some Qt kits do not create the lrelease targets above; depend only on those that exist.
++    if(TARGET ${target}_source_language)
++        add_dependencies(${target} ${target}_source_language)
++    endif()
++    if(TARGET ${target}_localized)
++        add_dependencies(${target} ${target}_localized)
++    endif()
+     set(${output_variable} ${_source_qm_files} ${_localized_qm_files} PARENT_SCOPE)
+ endfunction()
