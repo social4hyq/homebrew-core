@@ -637,4 +637,3 @@ index 0000000..e81ec61
 +    return std::make_unique<OhosGlobalShortcutBackend>();
 +}
 +} // namespace snow_shot::presentation
-

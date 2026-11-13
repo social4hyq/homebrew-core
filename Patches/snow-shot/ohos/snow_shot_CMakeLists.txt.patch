@@ -1,7 +1,8 @@
 diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
+index f27b3ad..6f2ae52 100644
 --- a/snow_shot/CMakeLists.txt
 +++ b/snow_shot/CMakeLists.txt
-@@ -104,6 +104,7 @@
+@@ -104,6 +104,7 @@ option(SNOW_SHOT_ENABLE_MCP "Build and package the local Snow Shot MCP bridge."
  option(SNOW_SHOT_SCROLLING_PERF_DETAIL "Compile detailed scrolling C++ and Rust timings." OFF)
  option(SNOW_SHOT_RELEASE_STATIC "Prefer static Snow Shot release linkage." OFF)
  option(SNOW_SHOT_QT_STATIC "Link Snow Shot against a static Qt build." OFF)
@@ -9,7 +10,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
  set(SNOW_SHOT_WEBSITE_URL "https://snowshot.top" CACHE STRING "Public Snow Shot website URL.")
  set(SNOW_SHOT_PROJECT_URL "https://github.com/mg-chao/snow-apps" CACHE STRING
      "Public Snow Shot source repository URL.")
-@@ -168,6 +169,8 @@
+@@ -168,6 +169,8 @@ add_library(snow_shot_recording_effects_source STATIC
      src/presentation/recording/recordingeffectssource.cpp
      src/presentation/recording/recordingeffectssource.h)
  target_link_libraries(snow_shot_recording_effects_source PUBLIC Qt6::Gui snow_recording_effects_c)
@@ -18,7 +19,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
  if(APPLE)
      add_library(snow_shot_macos_clipboard STATIC src/platform/macos/imageclipboard.mm)
      target_link_libraries(snow_shot_macos_clipboard PUBLIC Qt6::Gui
-@@ -340,9 +343,19 @@
+@@ -340,11 +343,21 @@ if(APPLE)
  endif()
  
  if(NOT TARGET snow_recording_c)
@@ -30,17 +31,19 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
 +        OUTPUT_NAMES snow_recording_c snow_recording_effects_c
 +        MANIFEST_DIR "${SNOW_SHOT_CAPTURE_CRATES_DIR}"
          NO_DEFAULT_FEATURES)
-+endif()
-+
+ endif()
+ 
 +if(NOT TARGET snow_recording_effects_c)
 +    snow_add_rust_static_library(snow_recording_effects_c PACKAGE snow-recording-effects-c
 +        MANIFEST_DIR "${SNOW_SHOT_CAPTURE_CRATES_DIR}" OUTPUT_NAME snow_recording_effects_c)
 +    target_include_directories(snow_recording_effects_c INTERFACE
 +        "${SNOW_SHOT_CAPTURE_CRATES_DIR}/crates/snow-recording-effects-c/include")
- endif()
- 
++endif()
++
  if(NOT TARGET snow_visual_region_detector_c)
-@@ -369,8 +382,10 @@
+     snow_add_rust_static_library(snow_visual_region_detector_c PACKAGE snow-visual-region-detector-c MANIFEST_DIR "${SNOW_SHOT_CAPTURE_CRATES_DIR}" OUTPUT_NAME snow_visual_region_detector_c)
+ endif()
+@@ -369,8 +382,10 @@ endif()
  # recognition lives in the standalone OCR process. Pin the config package to
  # the manifest-installed copy: the Rust OpenCV crates export a user-level
  # OpenCV_DIR that would otherwise shadow it.
@@ -53,7 +56,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
  find_package(OpenCV CONFIG REQUIRED)
  include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake/FetchSnowShotQrModels.cmake")
  snow_shot_fetch_qr_models(SNOW_SHOT_QR_MODELS_DIR)
-@@ -405,6 +420,53 @@
+@@ -405,6 +420,53 @@ snow_add_rust_executable(snow_ocr_process
      ENVIRONMENT ${SNOW_SHOT_OCR_PROCESS_ENVIRONMENT}
  )
  
@@ -107,7 +110,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
  # The MCP bridge is deliberately a small standalone process.  It only speaks
  # MCP over stdio and connects to an already running Snow Shot instance through
  # the per-user local endpoint published by the application.
-@@ -437,13 +499,13 @@
+@@ -437,13 +499,13 @@ if(NOT TARGET snow_image::snow_image)
      set(SNOW_IMAGE_BUILD_TESTS OFF CACHE BOOL "Build snow_image tests." FORCE)
      set(SNOW_IMAGE_BUILD_SHARED OFF CACHE BOOL "Build the shared snow_image library." FORCE)
      set(SNOW_IMAGE_BUILD_STATIC ON CACHE BOOL "Build the static snow_image library." FORCE)
@@ -128,7 +131,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
      add_subdirectory("${SNOW_SHOT_SNOW_IMAGE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/snow_image")
  endif()
  if(NOT TARGET snow_image::snow_image_static)
-@@ -459,7 +521,7 @@
+@@ -459,7 +521,7 @@ set(SNOW_SHOT_IMAGE_CODEC_BACKEND_SOURCES
      src/image/snowimagecodecbackend.cpp
      src/image/snowimageanimationbackend.cpp
  )
@@ -137,7 +140,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
      set(SNOW_SHOT_IMAGE_CODEC_BACKEND_STATIC ON CACHE INTERNAL
          "Link the Snow Shot image codec backend statically." FORCE)
      set(_SNOW_SHOT_IMAGE_CODEC_BACKEND_TYPE STATIC)
-@@ -1014,6 +1076,7 @@
+@@ -1014,6 +1076,7 @@ set(SNOW_SHOT_GLOBAL_SHORTCUT_SOURCES
      src/presentation/services/globalshortcutbackend.cpp
      src/presentation/services/globalshortcutmanager.cpp
      src/platform/focusedfullscreenwindow.cpp
@@ -145,7 +148,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
  )
  if(WIN32)
      list(APPEND SNOW_SHOT_GLOBAL_SHORTCUT_SOURCES
-@@ -1026,6 +1089,12 @@
+@@ -1026,6 +1089,12 @@ elseif(APPLE)
      list(APPEND SNOW_SHOT_GLOBAL_SHORTCUT_SOURCES
          src/platform/macos/globalshortcutbackend.cpp
          src/platform/macos/focusedfullscreenwindow.mm)
@@ -158,7 +161,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
  endif()
  list(APPEND SNOW_SHOT_SETTINGS_SOURCES ${SNOW_SHOT_GLOBAL_SHORTCUT_SOURCES})
  file(READ "${CMAKE_CURRENT_SOURCE_DIR}/src/presentation/components/screenshothistorypagewidget.cpp"
-@@ -1246,6 +1315,10 @@
+@@ -1246,6 +1315,10 @@ if(APPLE)
          "${SNOW_SHOT_CORE_GRAPHICS_FRAMEWORK}")
  endif()
  target_link_libraries(snow_shot_settings PRIVATE snow_shot_global_mouse)
@@ -169,7 +172,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
  snow_enable_unity_build(snow_shot_settings)
  set_source_files_properties(
      src/presentation/styles/thememanager.cpp
-@@ -2195,6 +2268,9 @@
+@@ -2195,6 +2268,9 @@ endif()
  target_compile_definitions(snow_shot PRIVATE
      SNOW_SHOT_API_BASE_URL=\"${SNOW_SHOT_API_BASE_URL}\"
  )
@@ -179,7 +182,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
  if(WIN32)
      target_compile_definitions(snow_shot PRIVATE
          SNOW_SHOT_CAMERA_SHUTTER_AUDIO_SOURCE=\"${SNOW_SHOT_CAMERA_SHUTTER_AUDIO_SOURCE}\"
-@@ -2210,6 +2286,19 @@
+@@ -2210,6 +2286,19 @@ target_link_libraries(snow_shot PRIVATE
      snow_shot_image_codec
      MINIZIP::minizip-ng
  )
@@ -199,7 +202,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
  include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake/SnowShotUpdates.cmake")
  if(WIN32)
      target_link_libraries(snow_shot PRIVATE ole32 oleaut32 shell32 uuid)
-@@ -2436,6 +2525,11 @@
+@@ -2436,6 +2525,11 @@ if(SNOW_SHOT_BUILD_TESTS)
          ${SNOW_SHOT_GLOBAL_SHORTCUT_SOURCES}
          src/presentation/capture/screenshotglobalmousedrag.cpp)
      target_link_libraries(snow-shot-global-mouse-tests PRIVATE snow_shot_global_mouse Qt6::Widgets)
@@ -211,7 +214,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
      if(APPLE)
          target_link_libraries(snow-shot-global-mouse-tests PRIVATE
              "${SNOW_SHOT_CARBON_FRAMEWORK}"
-@@ -2455,6 +2549,21 @@
+@@ -2455,6 +2549,21 @@ if(SNOW_SHOT_BUILD_TESTS)
      set_tests_properties(snow-shot-global-mouse-tests PROPERTIES
          LABELS "unit" TIMEOUT 60 ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
      snow_shot_import_offscreen_platform(snow-shot-global-mouse-tests)
@@ -233,7 +236,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
      if(WIN32)
          target_sources(snow-shot-global-mouse-tests PRIVATE tests/global_mouse_native_input_tests.cpp)
          add_test(NAME snow-shot-global-mouse-native-smoke-tests
-@@ -2563,6 +2672,11 @@
+@@ -2563,6 +2672,11 @@ if(SNOW_SHOT_BUILD_TESTS)
          tests/application_storage_tests.cpp
      )
      target_link_libraries(snow-shot-application-storage-tests PRIVATE snow_shot_storage Qt6::Core)
@@ -245,7 +248,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
      add_test(NAME snow-shot-portable-system-integration-tests
          COMMAND snow-shot-application-storage-tests --portable-system-integration-only)
      set_tests_properties(snow-shot-portable-system-integration-tests PROPERTIES LABELS "unit"
-@@ -5920,15 +6034,21 @@
+@@ -5920,15 +6034,21 @@ if(SNOW_SHOT_BUILD_TESTS)
          snow_shot_image_codec
          Qt6::Gui
      )
@@ -268,7 +271,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
  
      add_executable(snow-shot-recognition-file-export-tests
          tests/screenshot_recognition_file_export_tests.cpp
-@@ -7595,6 +7715,12 @@
+@@ -7595,6 +7715,12 @@ if(SNOW_SHOT_BUILD_TESTS)
          src/presentation/recording/recordingaudiogainpopover.cpp
          src/presentation/recording/recordingaudiogainpopover.h
      )
@@ -281,7 +284,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
      snow_shot_link_macos_window_platform(snow-shot-screen-recording-shortcut-tests)
      target_compile_definitions(snow-shot-screen-recording-shortcut-tests PRIVATE
          SNOW_SHOT_TEST_HOOKS=1
-@@ -8858,7 +8984,8 @@
+@@ -8858,7 +8984,8 @@ if(SNOW_SHOT_BUILD_TESTS)
          "${SNOW_SHOT_CAPTURE_CRATES_DIR}/crates/snow-recording-c/include")
      target_link_libraries(snow-shot-screen-recording-controller-tests PRIVATE
          adqt_icon_core ant_design_icons_qt ant_design_qt snow_draw_engine_qt_canvas
@@ -291,7 +294,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
      if(APPLE)
          target_sources(snow-shot-screen-recording-controller-tests PRIVATE
              src/platform/macos/windowcaptureexclusion.mm
-@@ -10724,6 +10851,13 @@
+@@ -10724,6 +10851,13 @@ target_include_directories(snow_shot PRIVATE
      "${SNOW_SHOT_CAPTURE_CRATES_DIR}/crates/snow-ui-selector-c/include"
      "${SNOW_SHOT_CAPTURE_CRATES_DIR}/crates/snow-stitch-images-c/include"
  )
@@ -305,7 +308,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
  target_precompile_headers(snow_shot PRIVATE
      <algorithm>
      <memory>
-@@ -13791,6 +13925,11 @@
+@@ -13791,6 +13925,11 @@ elseif(APPLE)
      target_link_libraries(snow_shot_live_window PRIVATE "-framework AppKit"
          "-framework ApplicationServices" "-framework QuartzCore" "-framework CoreVideo"
          "-framework IOSurface")
@@ -317,7 +320,7 @@ diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
  endif()
  snow_shot_register_source_capability(live_window
      FULL_TARGET snow_shot_live_window MINI_TARGET snow_shot_live_window)
-@@ -13873,6 +14012,15 @@
+@@ -13873,6 +14012,15 @@ if(SNOW_SHOT_BUILD_TESTS)
      add_test(NAME snow-shot-live-window-geometry-tests COMMAND snow-shot-live-window-geometry-tests)
      set_tests_properties(snow-shot-live-window-geometry-tests PROPERTIES LABELS unit TIMEOUT 30)
  

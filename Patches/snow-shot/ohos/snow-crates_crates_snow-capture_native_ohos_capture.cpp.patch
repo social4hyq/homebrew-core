@@ -143,4 +143,3 @@ index 0000000..d978906
 +    output->pixel_len = readSize;
 +    return DISPLAY_MANAGER_OK;
 +}
-

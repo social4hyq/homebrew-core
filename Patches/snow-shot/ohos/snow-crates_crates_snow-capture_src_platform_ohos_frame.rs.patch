@@ -75,4 +75,3 @@ index 0000000..15fa990
 +        assert!(!super::valid_display_geometry(1920, 1080, f32::INFINITY));
 +    }
 +}
-
