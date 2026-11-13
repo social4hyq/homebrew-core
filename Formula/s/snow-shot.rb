@@ -91,20 +91,12 @@ class SnowShot < Formula
     sha256 "d3a20e0c1b2758c4545b0a97490afa2986e39c8b4387c3dba2007def742cbeb0"
   end
 
-  # One patch per file under Patches/snow-shot/ohos, applied in lexical order.
+  # One patch per changed file under Patches/snow-shot/ohos, applied in lexical order.
   patch_root = Pathname(__dir__).parent.parent
   Dir[(patch_root/"Patches/snow-shot/ohos/*.patch").to_s].each do |path|
     patch :p1 do
       file Pathname(path).relative_path_from(patch_root).to_s
     end
-  end
-
-  patch :p1 do
-    file "Patches/snow-shot/0003-guard-lrelease-dependencies.patch"
-  end
-
-  patch :p1 do
-    file "Patches/snow-shot/0004-skip-ohos-tray-startup.patch"
   end
 
   def install
@@ -139,7 +131,9 @@ class SnowShot < Formula
       end
       odie "could not find the OCR crate root" unless source
       cd source do
-        system "patch", "-p1", "-i", payload/"0002-ocr-submodule-ohos.patch"
+        Dir[(payload/"ocr/*.patch").to_s].each do |path|
+          system "patch", "-p1", "-i", path
+        end
         cp_r ".", ocr_crate
       end
     end

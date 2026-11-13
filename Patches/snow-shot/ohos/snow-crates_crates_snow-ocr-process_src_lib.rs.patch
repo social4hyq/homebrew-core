@@ -374,4 +374,3 @@ index 0000000..a1c7933
 +        unsafe { snow_ocr_string_free(error) };
 +    }
 +}
-

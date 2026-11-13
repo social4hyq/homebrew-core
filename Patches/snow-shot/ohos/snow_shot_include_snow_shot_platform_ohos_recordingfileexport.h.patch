@@ -40,4 +40,3 @@ index 0000000..929db19
 +} // namespace snow_shot::platform::ohos
 +
 +#endif // SNOW_SHOT_PLATFORM_OHOS_RECORDINGFILEEXPORT_H
-
