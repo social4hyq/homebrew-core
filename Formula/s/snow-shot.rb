@@ -4,7 +4,7 @@ class SnowShot < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.2_snow-shot.tar.gz"
   sha256 "29190412a6dc9b41c0097fbf1313dc0f84412c9d23e1716260ed13acdcbd6c4e"
   license "GPL-3.0-or-later"
-  revision 2
+  revision 3
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.2-r4"
@@ -96,6 +96,10 @@ class SnowShot < Formula
 
   patch :p1 do
     file "Patches/snow-shot/0003-guard-lrelease-dependencies.patch"
+  end
+
+  patch :p1 do
+    file "Patches/snow-shot/0004-skip-ohos-tray-startup.patch"
   end
 
   def install
