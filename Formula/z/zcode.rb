@@ -5,8 +5,8 @@ class Zcode < Formula
   homepage "https://github.com/zai-org/ZCode"
   # Pin the public main snapshot; its version comes from package.json.
   url "https://github.com/zai-org/ZCode.git",
-      revision: "b95ebaffeab641907b38652f45c1502bd762972d"
-  version "3.18.0"
+      revision: "c5904686ea8341826b3affe5d993d06a134fa779"
+  version "3.18.1"
   license "Apache-2.0"
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
