@@ -1,9 +1,0 @@
-diff --git a/snow_image/tests/avif_encoding_tests.cpp b/snow_image/tests/avif_encoding_tests.cpp
-index 5950092..b27e0d2 100644
---- a/snow_image/tests/avif_encoding_tests.cpp
-+++ b/snow_image/tests/avif_encoding_tests.cpp
-@@ -1,3 +1,4 @@
-+#include "jthread.hpp"
- #include "snow/image/processing.h"
- #include "snow/image/resource_estimate.h"
- #include "snow/image/resource_plan.h"
