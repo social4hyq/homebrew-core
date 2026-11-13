@@ -84,7 +84,7 @@ class ClaudeCodeLatest < Formula
       "$prefix/opt/ohos-selfsign/bin/selfsign" "$pending"
       chmod +x "$pending"
       mv -f "$pending" "$target/claude"
-      find "$prefix/var/#{name}" -mindepth 1 -maxdepth 1 -type d ! -name "#{pkg_version}" -exec rm -rf {} +
+      if [ -z "${3:-}" ]; then find "$prefix/var/#{name}" -mindepth 1 -maxdepth 1 -type d ! -name "#{pkg_version}" -exec rm -rf {} +; fi
     SH
   end
 
