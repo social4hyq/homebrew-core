@@ -24,7 +24,6 @@ class SnowShot < Formula
   depends_on "highway" => :build
   depends_on "imath" => :build
   depends_on "jpeg-turbo" => :build
-  depends_on "jpeg-xl" => :build
   depends_on "libheif" => :build
   depends_on "libpng" => :build
   depends_on "libtiff" => :build
@@ -39,6 +38,7 @@ class SnowShot < Formula
   depends_on "plutovg" => :build
   depends_on "rust" => :build
   depends_on "snow-shot-opencv" => :build
+  depends_on "social4hyq/core/jpeg-xl" => :build
   depends_on "social4hyq/core/openexr" => :build
   depends_on "tinyxml2" => :build
   depends_on "webp" => :build
