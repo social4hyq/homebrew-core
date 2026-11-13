@@ -1,0 +1,27 @@
+diff --git a/snow_shot/src/presentation/capture/directcapturecontroller.cpp b/snow_shot/src/presentation/capture/directcapturecontroller.cpp
+index d4daf91..9c7c6a4 100644
+--- a/snow_shot/src/presentation/capture/directcapturecontroller.cpp
++++ b/snow_shot/src/presentation/capture/directcapturecontroller.cpp
+@@ -27,6 +27,10 @@
+ #include <exception>
+ #include <utility>
+ 
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++#include <window_manager/oh_display_manager.h>
++#endif
++
+ #if defined(Q_OS_WIN)
+ #include <windows.h>
+ #endif
+@@ -302,6 +306,11 @@ void DirectCaptureController::captureCurrentMonitor() {
+     const quint32 id = platform::screenshotDisplayAtCursor();
+     if (id)
+         request.monitorName = QStringLiteral("display:%1").arg(id);
++#endif
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    uint64_t defaultDisplayId = 0;
++    if (OH_NativeDisplayManager_GetDefaultDisplayId(&defaultDisplayId) == DISPLAY_MANAGER_OK)
++        request.monitorName = QStringLiteral("display:%1").arg(defaultDisplayId);
+ #endif
+     m_impl->workflow.enqueue(std::move(request));
+ }
