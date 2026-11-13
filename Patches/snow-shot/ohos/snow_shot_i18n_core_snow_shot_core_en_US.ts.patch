@@ -1,0 +1,92 @@
+diff --git a/snow_shot/i18n/core/snow_shot_core_en_US.ts b/snow_shot/i18n/core/snow_shot_core_en_US.ts
+index ae80472..6d347ff 100644
+--- a/snow_shot/i18n/core/snow_shot_core_en_US.ts
++++ b/snow_shot/i18n/core/snow_shot_core_en_US.ts
+@@ -262,6 +262,57 @@ so every moment on screen can be expressed clearly and shared easily</translatio
+             <translation>You are up to date</translation>
+         </message>
+     </context>
++    <context>
++        <name>ApplicationController</name>
++        <message>
++            <source>%1 %2 is available. Open About for update options</source>
++            <translation>%1 %2 is available. Open About for update options</translation>
++        </message>
++        <message>
++            <source>An update is ready. Open About to restart and update %1</source>
++            <translation>An update is ready. Open About to restart and update %1</translation>
++        </message>
++        <message>
++            <source>An update is ready. Open About to restart and update Snow Shot</source>
++            <translation>An update is ready. Open About to restart and update Snow Shot</translation>
++        </message>
++        <message>
++            <source>Could not open the selected file: %1</source>
++            <translation>Could not open the selected file: %1</translation>
++        </message>
++        <message>
++            <source>Could not pin selected files to screen</source>
++            <translation>Could not pin selected files to screen</translation>
++        </message>
++        <message>
++            <source>Feature unavailable</source>
++            <translation>Feature unavailable</translation>
++        </message>
++        <message>
++            <source>Finish capturing, recording, exporting, recognizing text, or updating before changing storage</source>
++            <translation>Finish capturing, recording, exporting, recognizing text, or updating before changing storage</translation>
++        </message>
++        <message>
++            <source>Finish capturing, recording, or exporting before updating</source>
++            <translation>Finish capturing, recording, or exporting before updating</translation>
++        </message>
++        <message>
++            <source>Restart failed</source>
++            <translation>Restart failed</translation>
++        </message>
++        <message>
++            <source>Snow Shot %1 is available. Open About for update options</source>
++            <translation>Snow Shot %1 is available. Open About for update options</translation>
++        </message>
++        <message>
++            <source>The selected file path is invalid</source>
++            <translation>The selected file path is invalid</translation>
++        </message>
++        <message>
++            <source>Your settings could not be saved. Please retry before updating</source>
++            <translation>Your settings could not be saved. Please retry before updating</translation>
++        </message>
++    </context>
+     <context>
+         <name>ApplicationRestart</name>
+         <message>
+@@ -838,6 +889,14 @@ so every moment on screen can be expressed clearly and shared easily</translatio
+     </context>
+     <context>
+         <name>SystemTrayController</name>
++        <message>
++            <source>Capture</source>
++            <translation>Capture</translation>
++        </message>
++        <message>
++            <source>Choose a destination in Files to save the recording.</source>
++            <translation>Choose a destination in Files to save the recording.</translation>
++        </message>
+         <message>
+             <source>Delete empty groups</source>
+             <translation>Delete empty groups</translation>
+@@ -850,6 +909,14 @@ so every moment on screen can be expressed clearly and shared easily</translatio
+             <source>New group</source>
+             <translation>New group</translation>
+         </message>
++        <message>
++            <source>Update</source>
++            <translation>Update</translation>
++        </message>
++        <message>
++            <source>Video export completed</source>
++            <translation>Video export completed</translation>
++        </message>
+         <message>
+             <source>Window group: %1</source>
+             <translation>Window group: %1</translation>

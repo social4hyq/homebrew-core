@@ -1,0 +1,42 @@
+diff --git a/snow_shot/i18n/export/snow_shot_export_zh_TW.ts b/snow_shot/i18n/export/snow_shot_export_zh_TW.ts
+index 2b3c042..0b95c79 100644
+--- a/snow_shot/i18n/export/snow_shot_export_zh_TW.ts
++++ b/snow_shot/i18n/export/snow_shot_export_zh_TW.ts
+@@ -258,6 +258,22 @@
+             <source>The output directory could not be created</source>
+             <translation>無法建立輸出目錄</translation>
+         </message>
++        <message>
++            <source>The primary result was saved, but its text companion could not be written: %1</source>
++            <translation>主要結果已儲存，但無法寫入其文本配套檔案：%1</translation>
++        </message>
++        <message>
++            <source>The primary result was saved, but its text companion picker could not be opened</source>
++            <translation>主要結果已儲存，但無法打開文本配套檔案的選擇器</translation>
++        </message>
++        <message>
++            <source>The primary result was saved, but its text companion was not selected</source>
++            <translation>主要結果已儲存，但未選擇其文本配套檔案</translation>
++        </message>
++        <message>
++            <source>The primary result was saved, but the text companion export queue is unavailable</source>
++            <translation>主要結果已儲存，但文本配套檔案導出隊列不可用</translation>
++        </message>
+         <message>
+             <source>The result file could not be published</source>
+             <translation>無法寫入結果檔案</translation>
+@@ -565,6 +581,14 @@
+             <source>The screenshot pixels could not be read</source>
+             <translation>無法讀取截圖像素</translation>
+         </message>
++        <message>
++            <source>The temporary export file is unavailable</source>
++            <translation>臨時導出檔案不可用</translation>
++        </message>
++        <message>
++            <source>The user-file export could not be queued</source>
++            <translation>無法將用戶檔案導出任務加入隊列</translation>
++        </message>
+         <message>
+             <source>There is not enough temporary disk space for this export</source>
+             <translation>暫存磁碟空間不足，無法匯出</translation>

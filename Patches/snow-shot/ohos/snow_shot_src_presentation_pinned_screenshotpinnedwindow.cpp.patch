@@ -1,0 +1,463 @@
+diff --git a/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp b/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
+index 328b27b..7ae9b6d 100644
+--- a/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
++++ b/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
+@@ -59,6 +59,9 @@
+ #include "pinnedwindowplatform.h"
+ #include "screenshotpintoperfinstrumentation.h"
+ #include "snow_shot/platform/physicalcursor.h"
++#ifdef Q_OS_HARMONY
++#include "snow_shot/platform/ohos/userfileexportqueue.h"
++#endif
+ #include "snow_shot/presentation/components/icons/snowshoticons.h"
+ #include "snow_shot/presentation/screenshotcanvasrenderer.h"
+ #include "snow_shot/presentation/screenshotcanvastoolstyles.h"
+@@ -124,6 +127,7 @@
+ #include <QEnterEvent>
+ #include <QFrame>
+ #include <QFileDialog>
++#include <QFile>
+ #include <QFileInfo>
+ #include <QGuiApplication>
+ #include <QHBoxLayout>
+@@ -149,6 +153,7 @@
+ #include <QWheelEvent>
+ #include <QWindow>
+ #include <QUrl>
++#include <QStandardPaths>
+ #include <QUuid>
+ 
+ #include <algorithm>
+@@ -161,6 +166,17 @@
+ #include <limits>
+ 
+ namespace {
++#ifdef Q_OS_HARMONY
++QString stagedPinnedUserFilePath(const QString& extension) {
++    const QString directory = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
++    if (directory.isEmpty() || !QDir().mkpath(directory))
++        return {};
++    return QDir(directory).filePath(
++        QStringLiteral("snow-shot-pinned-export-%1.%2")
++            .arg(QUuid::createUuid().toString(QUuid::Id128), extension));
++}
++#endif
++
+ snow_shot::storage::PinnedWindowPlacement
+ decorationPlacement(snow_shot::storage::PinnedWindowPlacement placement, QScreen* fallback,
+                     bool outward) {
+@@ -7037,30 +7053,151 @@ void ScreenshotPinnedWindow::quickSave() {
+ #if SNOW_SHOT_ENABLE_IMAGE_CONVERSION || SNOW_SHOT_ENABLE_LATEX_RECOGNITION ||                     \
+     SNOW_SHOT_ENABLE_QR_RECOGNITION || SNOW_SHOT_ENABLE_TABLE_RECOGNITION
+ void ScreenshotPinnedWindow::saveRecognitionSnapshot(ScreenshotRecognitionFileSnapshot snapshot,
+-                                                     QString path, QString baseName,
+-                                                     bool automatic) {
++                                                     QString path, QString baseName, bool automatic,
++                                                     QString userFileUri) {
+     m_recognitionSaveJob.cancel();
+     const auto generation = ++m_recognitionSaveGeneration;
++    const auto recognitionKind = snapshot.kind;
+     m_recognitionSavePending = true;
+-    auto complete = [this, generation, automatic](ScreenshotExportTaskResult result) {
+-        if (m_closing || generation != m_recognitionSaveGeneration)
++    const QPointer<ScreenshotPinnedWindow> lifetime(this);
++    auto finish = [lifetime, generation, automatic,
++                   userFileUri](ScreenshotExportTaskResult result) mutable {
++        if (lifetime.isNull() || lifetime->m_closing ||
++            generation != lifetime->m_recognitionSaveGeneration)
+             return;
+-        m_recognitionSaveJob = {};
+-        m_recognitionSavePending = false;
++        lifetime->m_recognitionSaveJob = {};
++        lifetime->m_recognitionSavePending = false;
+         if (result.succeeded()) {
+-            if (!automatic)
++            if (!automatic && userFileUri.isEmpty())
+                 static_cast<void>(
+                     snow_shot::storage::ScreenshotSettings().setLastManualSaveDirectory(
+                         QFileInfo(result.savedPath).absolutePath()));
+         } else if (result.failureStage != ScreenshotExportFailureStage::Cancelled) {
+             showPinnedRecognitionMessage(
+-                this,
++                lifetime.data(),
+                 QCoreApplication::translate("ScreenshotController",
+                                             "The recognition result could not be saved: %1")
+                     .arg(result.error),
+                 true);
+         }
+     };
++    auto complete = [lifetime, generation, recognitionKind, userFileUri,
++                     finish](ScreenshotExportTaskResult result) mutable {
++        if (lifetime.isNull() || generation != lifetime->m_recognitionSaveGeneration) {
++            if (!userFileUri.isEmpty() && result.succeeded())
++                QFile::remove(result.savedPath);
++            return;
++        }
++        if (userFileUri.isEmpty() || !result.succeeded()) {
++            finish(std::move(result));
++            return;
++        }
++
++#ifdef Q_OS_HARMONY
++        auto stagingPaths = std::make_shared<QStringList>(
++            ScreenshotRecognitionFileExport::outputPaths(result.savedPath, recognitionKind));
++        auto finishPublication = [lifetime, generation, stagingPaths, finish](
++                                     bool succeeded, QString error, QString publishedUri) mutable {
++            for (const QString& stagingPath : *stagingPaths)
++                QFile::remove(stagingPath);
++            if (lifetime.isNull())
++                return;
++            ScreenshotExportTaskResult finalResult;
++            if (succeeded)
++                finalResult.savedPath = std::move(publishedUri);
++            else
++                finalResult = ScreenshotExportTaskResult::failure(
++                    ScreenshotExportFailureStage::File, std::move(error));
++            QMetaObject::invokeMethod(
++                lifetime.data(),
++                [lifetime, generation, finish, finalResult = std::move(finalResult)]() mutable {
++                    if (lifetime.isNull() || lifetime->m_closing ||
++                        generation != lifetime->m_recognitionSaveGeneration)
++                        return;
++                    finish(std::move(finalResult));
++                },
++                Qt::QueuedConnection);
++        };
++        const auto primaryRequestId =
++            snow_shot::platform::ohos::sharedUserFileExportQueue().enqueue(
++                stagingPaths->at(0), userFileUri,
++                [lifetime, stagingPaths, userFileUri, finishPublication](bool succeeded,
++                                                                         QString error) mutable {
++                    if (!succeeded) {
++                        finishPublication(false, std::move(error), {});
++                        return;
++                    }
++                    if (stagingPaths->size() < 2) {
++                        finishPublication(true, {}, userFileUri);
++                        return;
++                    }
++                    const QString companionName =
++                        QFileInfo(QUrl(userFileUri).fileName()).completeBaseName() +
++                        QStringLiteral(".txt");
++                    const quint64 pickerRequestId =
++                        snow_shot::platform::ohos::sharedUserFileSavePickerQueue().enqueue(
++                            companionName, {QStringLiteral("Text companion|.txt")},
++                            [lifetime, stagingPaths, finishPublication](QString companionUri, int,
++                                                                        QString) mutable {
++                                if (lifetime.isNull()) {
++                                    finishPublication(false, {}, {});
++                                    return;
++                                }
++                                if (!snow_shot::platform::ohos::isDocumentViewPickerUri(
++                                        companionUri)) {
++                                    finishPublication(
++                                        false,
++                                        QCoreApplication::translate(
++                                            "ScreenshotPinnedWindow",
++                                            "The primary result was saved, but its text companion "
++                                            "was not selected"),
++                                        {});
++                                    return;
++                                }
++                                const quint64 companionRequestId =
++                                    snow_shot::platform::ohos::sharedUserFileExportQueue().enqueue(
++                                        stagingPaths->at(1), std::move(companionUri),
++                                        [finishPublication](bool companionSaved,
++                                                            QString companionError) mutable {
++                                            if (!companionSaved)
++                                                companionError =
++                                                    QCoreApplication::translate(
++                                                        "ScreenshotPinnedWindow",
++                                                        "The primary result was saved, but its "
++                                                        "text "
++                                                        "companion could not be written: %1")
++                                                        .arg(companionError);
++                                            finishPublication(companionSaved,
++                                                              std::move(companionError), {});
++                                        });
++                                if (companionRequestId == 0)
++                                    finishPublication(
++                                        false,
++                                        QCoreApplication::translate(
++                                            "ScreenshotPinnedWindow",
++                                            "The primary result was saved, but the text companion "
++                                            "export queue is unavailable"),
++                                        {});
++                            });
++                    if (pickerRequestId == 0)
++                        finishPublication(
++                            false,
++                            QCoreApplication::translate(
++                                "ScreenshotPinnedWindow",
++                                "The primary result was saved, but its text companion picker "
++                                "could not be opened"),
++                            {});
++                });
++        if (primaryRequestId == 0)
++            finishPublication(
++                false,
++                QCoreApplication::translate("ScreenshotPinnedWindow",
++                                            "The user-file export queue is unavailable"),
++                {});
++#else
++        finish(std::move(result));
++#endif
++    };
+     // Table ZIP/XML expansion varies with cell text. Admit it exclusively until streaming
+     // workbook serialization provides a tighter bound; text exports have bounded UTF-8 copies.
+     const qint64 workingBytes =
+@@ -7879,6 +8016,78 @@ void ScreenshotPinnedWindow::saveAsFile() {
+                 QLatin1Char('.') + ScreenshotRecognitionFileExport::extension(fileSnapshot->kind)));
+         const QPointer<ScreenshotPinnedWindow> lifetime(this);
+         setProperty("saveDialogOpen", true);
++#ifdef Q_OS_HARMONY
++        QString selectedUri = std::exchange(m_pendingUserFileSaveUri, QString());
++        if (selectedUri.isEmpty()) {
++            const QString extension =
++                ScreenshotRecognitionFileExport::extension(fileSnapshot->kind);
++            const quint64 requestId =
++                snow_shot::platform::ohos::sharedUserFileSavePickerQueue().enqueue(
++                    QFileInfo(initialPath).fileName(),
++                    {QStringLiteral("Recognition result|.%1").arg(extension)},
++                    [lifetime](QString uri, int, QString error) mutable {
++                        if (lifetime.isNull())
++                            return;
++                        QMetaObject::invokeMethod(
++                            lifetime.data(),
++                            [lifetime, uri = std::move(uri), error = std::move(error)]() mutable {
++                                if (lifetime.isNull())
++                                    return;
++                                auto* window = lifetime.data();
++                                window->setProperty("saveDialogOpen", false);
++                                if (window->m_closing || uri.isEmpty())
++                                    return;
++                                if (!snow_shot::platform::ohos::isDocumentViewPickerUri(uri)) {
++                                    showPinnedRecognitionMessage(
++                                        window,
++                                        error.isEmpty()
++                                            ? QCoreApplication::translate(
++                                                  "ScreenshotController",
++                                                  "No valid document was selected for the "
++                                                  "recognition result")
++                                            : std::move(error),
++                                        true);
++                                    return;
++                                }
++                                window->m_pendingUserFileSaveUri = std::move(uri);
++                                window->saveAsFile();
++                            },
++                            Qt::QueuedConnection);
++                    });
++            if (requestId == 0) {
++                setProperty("saveDialogOpen", false);
++                showPinnedRecognitionMessage(
++                    this,
++                    QCoreApplication::translate("ScreenshotController",
++                                                "The document picker could not be opened"),
++                    true);
++            }
++            return;
++        }
++        setProperty("saveDialogOpen", false);
++        if (!snow_shot::platform::ohos::isDocumentViewPickerUri(selectedUri)) {
++            showPinnedRecognitionMessage(
++                this,
++                QCoreApplication::translate("ScreenshotController",
++                                            "No valid document was selected for the "
++                                            "recognition result"),
++                true);
++            return;
++        }
++        const QString stagingPath = stagedPinnedUserFilePath(
++            ScreenshotRecognitionFileExport::extension(fileSnapshot->kind));
++        if (stagingPath.isEmpty()) {
++            showPinnedRecognitionMessage(
++                this,
++                QCoreApplication::translate(
++                    "ScreenshotController",
++                    "The recognition result could not be staged for saving"),
++                true);
++            return;
++        }
++        saveRecognitionSnapshot(*fileSnapshot, stagingPath, {}, false, std::move(selectedUri));
++        return;
++#else
+         const QString selectedPath = QFileDialog::getSaveFileName(
+             this, translatePinnedText("Save as file"), initialPath,
+             ScreenshotRecognitionFileExport::dialogFilter(fileSnapshot->kind), nullptr,
+@@ -7896,6 +8105,7 @@ void ScreenshotPinnedWindow::saveAsFile() {
+             return;
+         saveRecognitionSnapshot(*fileSnapshot, primaryPath);
+         return;
++#endif
+     }
+ #endif
+     if (m_originalImage.isNull()) {
+@@ -7940,12 +8150,67 @@ void ScreenshotPinnedWindow::saveAsFile() {
+     QString selectedFilter = defaults.selectedFilter;
+     const QPointer<ScreenshotPinnedWindow> dialogLifetime(this);
+     setProperty("saveDialogOpen", true);
++#ifdef Q_OS_HARMONY
++    QString selectedPath = std::exchange(m_pendingUserFileSaveUri, QString());
++    if (selectedPath.isEmpty()) {
++        const QString suggestedName = QFileInfo(defaults.initialPath).fileName();
++        const QStringList suffixChoices{
++            QStringLiteral("PNG|.png"),   QStringLiteral("JPEG|.jpg"),
++            QStringLiteral("BMP|.bmp"),   QStringLiteral("WebP|.webp"),
++            QStringLiteral("TIFF|.tif"),  QStringLiteral("JPEG XL|.jxl"),
++            QStringLiteral("AVIF|.avif"), QStringLiteral("PDF|.pdf")};
++        const quint64 requestId =
++            snow_shot::platform::ohos::sharedUserFileSavePickerQueue().enqueue(
++                suggestedName, suffixChoices,
++                [dialogLifetime](QString uri, int, QString error) mutable {
++                    if (dialogLifetime.isNull())
++                        return;
++                    QMetaObject::invokeMethod(
++                        dialogLifetime.data(),
++                        [dialogLifetime, uri = std::move(uri), error = std::move(error)]() mutable {
++                            if (dialogLifetime.isNull())
++                                return;
++                            auto* window = dialogLifetime.data();
++                            window->setProperty("saveDialogOpen", false);
++                            if (window->m_closing)
++                                return;
++                            if (uri.isEmpty())
++                                return;
++                            if (!snow_shot::platform::ohos::isDocumentViewPickerUri(uri)) {
++                                showPinnedRecognitionMessage(
++                                    window,
++                                    error.isEmpty()
++                                        ? QCoreApplication::translate(
++                                              "ScreenshotController",
++                                              "No valid document was selected for the screenshot")
++                                        : std::move(error),
++                                    true);
++                                return;
++                            }
++                            window->m_pendingUserFileSaveUri = std::move(uri);
++                            window->saveAsFile();
++                        },
++                        Qt::QueuedConnection);
++                });
++        if (requestId == 0) {
++            setProperty("saveDialogOpen", false);
++            showPinnedRecognitionMessage(
++                this,
++                QCoreApplication::translate("ScreenshotController",
++                                            "The document picker could not be opened"),
++                true);
++        }
++        return;
++    }
++    selectedFilter.clear();
++#else
+     const QString selectedPath = QFileDialog::getSaveFileName(
+         this, translatePinnedText("Save as file"), defaults.initialPath,
+         ScreenshotImageFileService::saveDialogFilter(), &selectedFilter);
+     if (!dialogLifetime)
+         return;
+     setProperty("saveDialogOpen", false);
++#endif
+     if (m_closing)
+         return;
+     if (selectedPath.isEmpty()) {
+@@ -7956,21 +8221,86 @@ void ScreenshotPinnedWindow::saveAsFile() {
+         ScreenshotImageFileService::formatForDialogSelection(selectedPath, selectedFilter);
+     static_cast<void>(
+         outputSettings.setLastManualSaveFormat(ScreenshotImageFileService::formatKey(format)));
++#ifdef Q_OS_HARMONY
++    const bool publishToUserFile = snow_shot::platform::ohos::isDocumentViewPickerUri(selectedPath);
++    const QString stagingPath =
++        publishToUserFile ? stagedPinnedUserFilePath(ScreenshotImageFileService::extension(format))
++                          : QString();
++    const QString outputPath =
++        publishToUserFile ? stagingPath
++                          : ScreenshotImageFileService::normalizedPath(selectedPath, format);
++    if (publishToUserFile && stagingPath.isEmpty()) {
++        showPinnedRecognitionMessage(
++            this,
++            QCoreApplication::translate("ScreenshotController",
++                                        "The screenshot could not be staged for saving"),
++            true);
++        return;
++    }
++#else
+     const QString outputPath = ScreenshotImageFileService::normalizedPath(selectedPath, format);
++#endif
+     invalidatePendingCopy();
+     m_fileSaveJob.cancel();
+     m_fileSaveJob = {};
+     m_exportArtifact = artifact;
+     if (!artifact->requestSaveToPath(
+             this, outputPath, format, encoding,
+-            [this, artifact](ScreenshotExportTaskResult result) {
+-                if (m_closing || m_exportArtifact != artifact)
++            [this, artifact
++#ifdef Q_OS_HARMONY
++             ,
++             dialogLifetime, publishToUserFile, stagingPath, userFileUri = selectedPath
++#endif
++    ](ScreenshotExportTaskResult result) {
++                if (m_closing || m_exportArtifact != artifact) {
++#ifdef Q_OS_HARMONY
++                    if (publishToUserFile)
++                        QFile::remove(stagingPath);
++#endif
+                     return;
++                }
++#ifdef Q_OS_HARMONY
++                if (publishToUserFile && result.succeeded()) {
++                    const quint64 requestId =
++                        snow_shot::platform::ohos::sharedUserFileExportQueue().enqueue(
++                            stagingPath, userFileUri,
++                            [dialogLifetime, artifact, stagingPath](bool succeeded, QString error) {
++                                QFile::remove(stagingPath);
++                                if (dialogLifetime.isNull() ||
++                                    dialogLifetime->m_exportArtifact != artifact)
++                                    return;
++                                auto* window = dialogLifetime.data();
++                                window->m_exportArtifact.reset();
++                                if (window->m_closing)
++                                    return;
++                                if (!succeeded)
++                                    showPinnedRecognitionMessage(
++                                        window,
++                                        error.isEmpty()
++                                            ? QCoreApplication::translate(
++                                                  "ScreenshotController",
++                                                  "The screenshot could not be written to the "
++                                                  "selected document")
++                                            : std::move(error),
++                                        true);
++                            });
++                    if (requestId != 0)
++                        return;
++                    QFile::remove(stagingPath);
++                    result = ScreenshotExportTaskResult::failure(
++                        ScreenshotExportFailureStage::Queue,
++                        QStringLiteral("The user-file export queue is unavailable"));
++                } else if (publishToUserFile) {
++                    QFile::remove(stagingPath);
++                }
++#endif
+                 m_exportArtifact.reset();
+                 if (result.succeeded()) {
++#ifndef Q_OS_HARMONY
+                     static_cast<void>(
+                         snow_shot::storage::ScreenshotSettings().setLastManualSaveDirectory(
+                             QFileInfo(result.savedPath).absolutePath()));
++#endif
+                 } else if (result.failureStage != ScreenshotExportFailureStage::Cancelled) {
+                     showPinnedRecognitionMessage(
+                         this,
+@@ -7984,6 +8314,10 @@ void ScreenshotPinnedWindow::saveAsFile() {
+         if (m_exportArtifact == artifact) {
+             m_exportArtifact.reset();
+         }
++#ifdef Q_OS_HARMONY
++        if (publishToUserFile)
++            QFile::remove(stagingPath);
++#endif
+         showPinnedRecognitionMessage(
+             this, translatePinnedText("The pinned image save could not be started"), true);
+     }

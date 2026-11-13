@@ -1,0 +1,9 @@
+diff --git a/snow_image_viewer/src/editing/edit_pipeline_controller.cpp b/snow_image_viewer/src/editing/edit_pipeline_controller.cpp
+index 24726f5..bf1aadb 100644
+--- a/snow_image_viewer/src/editing/edit_pipeline_controller.cpp
++++ b/snow_image_viewer/src/editing/edit_pipeline_controller.cpp
+@@ -1,3 +1,4 @@
++#include "jthread.hpp"
+ #include "editing/edit_pipeline_controller.h"
+ 
+ #include "core/image_raster_store.h"

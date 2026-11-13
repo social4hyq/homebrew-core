@@ -1,0 +1,90 @@
+diff --git a/snow_shot/include/snow_shot/platform/ohos/userfileexportqueue.h b/snow_shot/include/snow_shot/platform/ohos/userfileexportqueue.h
+new file mode 100644
+index 0000000..ab3b809
+--- /dev/null
++++ b/snow_shot/include/snow_shot/platform/ohos/userfileexportqueue.h
+@@ -0,0 +1,83 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++#ifndef SNOW_SHOT_PLATFORM_OHOS_USERFILEEXPORTQUEUE_H
++#define SNOW_SHOT_PLATFORM_OHOS_USERFILEEXPORTQUEUE_H
++
++#include <QString>
++#include <QStringList>
++#include <QtGlobal>
++
++#include <functional>
++#include <mutex>
++#include <vector>
++
++namespace snow_shot::platform::ohos {
++
++class UserFileExportQueue;
++
++struct UserFileExportRequest final {
++    quint64 id = 0;
++    QString sourcePath;
++    QString uri;
++};
++
++[[nodiscard]] bool isDocumentViewPickerUri(const QString& path);
++[[nodiscard]] QString documentViewPickerUriFromLocalPath(const QString& path);
++[[nodiscard]] QString normalizedDocumentViewPickerUri(QString uri, QString extension);
++[[nodiscard]] UserFileExportQueue& sharedUserFileExportQueue();
++[[nodiscard]] class UserFileSavePickerQueue& sharedUserFileSavePickerQueue();
++
++// Thread-safe handoff between the Qt worker pipeline and UIAbility's URI-aware file API.
++class UserFileExportQueue final {
++  public:
++    using Completion = std::function<void(bool, QString)>;
++
++    [[nodiscard]] quint64 enqueue(QString sourcePath, QString uri, Completion completion);
++    [[nodiscard]] std::vector<UserFileExportRequest> takePending();
++    [[nodiscard]] bool complete(quint64 id, bool succeeded, QString error = {});
++    [[nodiscard]] bool cancel(quint64 id);
++
++  private:
++    struct Entry final {
++        UserFileExportRequest request;
++        Completion completion;
++    };
++
++    std::mutex m_mutex;
++    quint64 m_nextId = 1;
++    std::vector<quint64> m_pending;
++    std::vector<Entry> m_entries;
++};
++
++struct UserFileSavePickerRequest final {
++    quint64 id = 0;
++    QString suggestedName;
++    QStringList suffixChoices;
++};
++
++// UIAbility owns the HarmonyOS picker, so native UI code submits requests and
++// receives the authorized document URI asynchronously through this queue.
++class UserFileSavePickerQueue final {
++  public:
++    using Completion = std::function<void(QString, int, QString)>;
++
++    [[nodiscard]] quint64 enqueue(QString suggestedName, QStringList suffixChoices,
++                                  Completion completion);
++    [[nodiscard]] std::vector<UserFileSavePickerRequest> takePending();
++    [[nodiscard]] bool complete(quint64 id, QString uri, int suffixIndex, QString error = {});
++    [[nodiscard]] bool cancel(quint64 id);
++
++  private:
++    struct Entry final {
++        UserFileSavePickerRequest request;
++        Completion completion;
++    };
++
++    std::mutex m_mutex;
++    quint64 m_nextId = 1;
++    std::vector<quint64> m_pending;
++    std::vector<Entry> m_entries;
++};
++
++} // namespace snow_shot::platform::ohos
++
++#endif
+

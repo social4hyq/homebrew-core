@@ -1,0 +1,14 @@
+diff --git a/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp b/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp
+index 2683957..53dc25c 100644
+--- a/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp
++++ b/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp
+@@ -81,7 +81,8 @@ template <typename Layout> QRectF textLayoutInkBounds(const Layout& layout) {
+ }
+ 
+ bool glyphsUseCffOutlines(const QTextLayout& layout) {
+-    return std::ranges::any_of(layout.glyphRuns(), [](const QGlyphRun& run) {
++    const auto runs = layout.glyphRuns();
++    return std::any_of(runs.begin(), runs.end(), [](const QGlyphRun& run) {
+         const QRawFont font = run.rawFont();
+         return !font.fontTable("CFF ").isEmpty() || !font.fontTable("CFF2").isEmpty();
+     });

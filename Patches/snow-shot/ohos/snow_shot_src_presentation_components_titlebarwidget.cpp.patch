@@ -1,0 +1,13 @@
+diff --git a/snow_shot/src/presentation/components/titlebarwidget.cpp b/snow_shot/src/presentation/components/titlebarwidget.cpp
+index ac80ad0..b634b9c 100644
+--- a/snow_shot/src/presentation/components/titlebarwidget.cpp
++++ b/snow_shot/src/presentation/components/titlebarwidget.cpp
+@@ -289,7 +289,7 @@ void TitleBarWidget::changeEvent(QEvent* event) {
+ }
+ 
+ void TitleBarWidget::mousePressEvent(QMouseEvent* event) {
+-#ifdef Q_OS_MACOS
++#if defined(Q_OS_MACOS) || defined(Q_OS_HARMONY)
+     if (event->button() == Qt::LeftButton) {
+         QWidget* topLevelWindow = window();
+         if (topLevelWindow != nullptr && topLevelWindow->windowHandle() != nullptr &&

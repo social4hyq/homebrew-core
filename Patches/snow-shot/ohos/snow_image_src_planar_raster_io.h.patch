@@ -1,0 +1,13 @@
+diff --git a/snow_image/src/planar_raster_io.h b/snow_image/src/planar_raster_io.h
+index 704c8cb..1a819fd 100644
+--- a/snow_image/src/planar_raster_io.h
++++ b/snow_image/src/planar_raster_io.h
+@@ -7,7 +7,7 @@
+ #include <cstdint>
+ #include <limits>
+ #include <span>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <string_view>
+ #include <vector>
+ 

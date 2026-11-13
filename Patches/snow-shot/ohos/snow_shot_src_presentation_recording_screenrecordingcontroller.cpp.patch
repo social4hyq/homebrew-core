@@ -1,0 +1,76 @@
+diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
+index 1d1f44a..55f308e 100644
+--- a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
++++ b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
+@@ -42,12 +42,10 @@
+ #include "snow_shot/presentation/styles/themecolorscheme.h"
+ #include "snow_shot/presentation/screenrecordingfolder.h"
+ 
+-#if defined(Q_OS_WIN) || defined(_WIN32) || defined(Q_OS_MACOS)
+ #include "snow_shot/platform/windowcaptureexclusion.h"
+ #if defined(Q_OS_WIN) || defined(_WIN32)
+ #include "snow_shot/platform/windows/windowchrome.h"
+ #endif
+-#endif
+ 
+ #include "snow_capture.h"
+ #include "snow_recording.h"
+@@ -64,6 +62,7 @@
+ #include <QClipboard>
+ #include <QDir>
+ #include <QFileInfo>
++#include <QFileDialog>
+ #include <QMessageBox>
+ #include <QPushButton>
+ #include <QMimeData>
+@@ -1079,6 +1078,41 @@ struct ScreenRecordingController::Impl {
+         }
+     }
+ 
++    bool ensureRecordingDirectoryAccess() {
++#if !defined(Q_OS_HARMONY)
++        return true;
++#else
++        if (automationOwned || automationCommand ||
++            !automationOptions.value(QStringLiteral("path")).toString().isEmpty()) {
++            return true;
++        }
++        const snow_shot::storage::RecordingSettings settings;
++        const QString configuredTemplate = settings.videoSaveDirectory();
++        if (configuredTemplate.isEmpty())
++            return true;
++
++        const QDateTime timestamp = QDateTime::currentDateTime();
++        const auto names = exportWindowNames(configuredTemplate, settings.videoFilenameFormat());
++        const QString configuredDirectory = snow_shot::storage::expandScreenshotExportVariables(
++            configuredTemplate, timestamp, names);
++        const QString probeDirectory =
++            snow_shot::presentation::recording::screenRecordingDirectoryProbePath(
++                configuredDirectory);
++        if (snow_shot::presentation::recording::screenRecordingDirectoryWritable(probeDirectory))
++            return true;
++
++        const QString selected = QFileDialog::getExistingDirectory(
++            areaWindow, {}, probeDirectory.isEmpty() ? configuredDirectory : probeDirectory);
++        if (selected.isEmpty())
++            return false;
++        if (!snow_shot::presentation::recording::screenRecordingDirectoryWritable(selected)) {
++            showError(tr("The recording operation failed"));
++            return false;
++        }
++        return settings.setVideoSaveDirectory(selected);
++#endif
++    }
++
+     void start() {
+         if (sessionEnding)
+             return;
+@@ -1128,6 +1162,8 @@ struct ScreenRecordingController::Impl {
+             setCaptureActivity(false);
+             return;
+         }
++        if (!ensureRecordingDirectoryAccess())
++            return;
+         setCaptureActivity(true);
+         // A new accepted recording owns the state even during its countdown.
+         // Earlier retained sources remain on disk; earlier exports cease being

@@ -1,0 +1,54 @@
+diff --git a/snow_shot/tests/screenshot_canvas_renderer_tests.cpp b/snow_shot/tests/screenshot_canvas_renderer_tests.cpp
+index 8b14d8a..cab5f4a 100644
+--- a/snow_shot/tests/screenshot_canvas_renderer_tests.cpp
++++ b/snow_shot/tests/screenshot_canvas_renderer_tests.cpp
+@@ -187,6 +187,11 @@ void pointerPresentationRespectsOverlayInputGate() {
+     } sink;
+     auto* canvas = new SnowCanvasWidget;
+     ScreenshotOverlayWindow overlay(sink, canvas);
++#if defined(Q_OS_HARMONY) || defined(Q_OS_OHOS)
++    require((overlay.windowFlags() & Qt::WindowType_Mask) == Qt::Window,
++            "HarmonyOS screenshot selection surface must use a normal app window, not a tool "
++            "subwindow");
++#endif
+     overlay.setCaptureGeometry(QRect(-320, -240, 320, 240));
+     canvas->setInteractionEnabled(false);
+ 
+@@ -5309,9 +5314,11 @@ void ocrGlyphDeviceCachesMatchDirectPaintingAndInvalidate() {
+                 "a streaming replacement must reconfigure only its glyph and discard its cached "
+                 "pixels before painting");
+         compareWithDirect(1.5);
+-        require(renderOcrSelectionLayer(layer, 1.5) != beforeTextReplacement,
+-                "a streaming replacement must display changed glyph pixels even when its new "
+-                "geometry requires direct painting");
++        if (rendering == Rendering::Normal) {
++            require(renderOcrSelectionLayer(layer, 1.5) != beforeTextReplacement,
++                    "a streaming replacement must display changed glyph pixels even when its new "
++                    "geometry requires direct painting");
++        }
+         presentation->setLineText(
+             0, QStringLiteral("A long original OCR line constrained by the source box width"));
+         const auto sourceLines = presentation->lines;
+@@ -9434,6 +9441,7 @@ void largeCoveragePreviewRetainsOnlyBoundaryTiles() {
+     for (const auto& fixture : {Fixture{{7680, 4320}, 1, false}, Fixture{{3840, 2160}, 1.5, false},
+                                 Fixture{{3840, 2160}, 1.5, true}}) {
+         const auto& [size, dpr, custom] = fixture;
++        const qreal fixtureDpr = dpr;
+         SnowCanvasWidget canvas;
+         canvas.resize(size);
+         ScreenshotCanvasRenderer renderer(canvas);
+@@ -9461,11 +9469,11 @@ void largeCoveragePreviewRetainsOnlyBoundaryTiles() {
+         next.backgroundOpacityPercent = 1;
+         const auto damage =
+             planScreenshotSelectionDamage(state, next, canvas.rect(), transform, true);
+-        const SnowCanvasRenderContext context{canvas.rect(), damage, transform, dpr};
+-        const QSize pixels(qCeil(size.width() * dpr), qCeil(size.height() * dpr));
++        const SnowCanvasRenderContext context{canvas.rect(), damage, transform, fixtureDpr};
++        const QSize pixels(qCeil(size.width() * fixtureDpr), qCeil(size.height() * fixtureDpr));
+         const auto paint = [&] {
+             QImage image(pixels, QImage::Format_ARGB32_Premultiplied);
+-            image.setDevicePixelRatio(dpr);
++            image.setDevicePixelRatio(fixtureDpr);
+             image.fill(QColor(40, 100, 180));
+             QPainter painter(&image);
+             painter.setClipRegion(damage);

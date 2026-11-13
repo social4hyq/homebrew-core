@@ -1,0 +1,53 @@
+diff --git a/snow_shot/src/platform/ohos/livewindowselection_p.h b/snow_shot/src/platform/ohos/livewindowselection_p.h
+new file mode 100644
+index 0000000..96436cc
+--- /dev/null
++++ b/snow_shot/src/platform/ohos/livewindowselection_p.h
+@@ -0,0 +1,46 @@
++#ifndef SNOW_SHOT_PLATFORM_OHOS_LIVEWINDOWSELECTION_P_H
++#define SNOW_SHOT_PLATFORM_OHOS_LIVEWINDOWSELECTION_P_H
++
++#include "snow_shot/presentation/livewindowsource.h"
++
++namespace snow_shot::presentation::ohos_live_window_detail {
++
++enum class WindowLookupState { Visible, Hidden, Unavailable };
++
++inline LiveWindowState stateForWindowLookup(WindowLookupState state) {
++    switch (state) {
++    case WindowLookupState::Visible:
++        return LiveWindowState::Live;
++    case WindowLookupState::Hidden:
++        return LiveWindowState::Closed;
++    case WindowLookupState::Unavailable:
++        return LiveWindowState::Unavailable;
++    }
++    return LiveWindowState::Unavailable;
++}
++
++struct WindowCandidate {
++    quintptr nativeId = 0;
++    qint64 processId = 0;
++    QRect bounds;
++    QString title;
++    bool showing = false;
++};
++
++// The input order is the native stacking order (topmost first).
++inline std::optional<LiveWindowTarget> targetAtPoint(const QPoint& point,
++                                                     const QVector<quintptr>& excluded,
++                                                     const QVector<WindowCandidate>& candidates) {
++    for (const auto& candidate : candidates) {
++        if (!candidate.nativeId || !candidate.showing || candidate.bounds.isEmpty() ||
++            excluded.contains(candidate.nativeId) || !candidate.bounds.contains(point))
++            continue;
++        return LiveWindowTarget{candidate.nativeId, candidate.processId, candidate.bounds, point,
++                                candidate.title};
++    }
++    return std::nullopt;
++}
++
++} // namespace snow_shot::presentation::ohos_live_window_detail
++
++#endif
+

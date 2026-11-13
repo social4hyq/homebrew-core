@@ -1,0 +1,110 @@
+diff --git a/snow_shot/src/presentation/recording/recordingeffectpreview.cpp b/snow_shot/src/presentation/recording/recordingeffectpreview.cpp
+index 6139db8..1632ca0 100644
+--- a/snow_shot/src/presentation/recording/recordingeffectpreview.cpp
++++ b/snow_shot/src/presentation/recording/recordingeffectpreview.cpp
+@@ -9,6 +9,7 @@
+ #include "snow_draw_engine_qt/snow_canvas_widget.h"
+ #include <QApplication>
+ #include <QDialog>
++#include <QFontMetrics>
+ #include <QPainter>
+ #include "antd_icons.h"
+ #include <algorithm>
+@@ -17,6 +18,63 @@
+ #include <dwmapi.h>
+ #endif
+ 
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++namespace {
++std::shared_ptr<RecordingEffectsFrame> makeOhosPlaybackTimePreview(const QSize& output) {
++    if (output.isEmpty())
++        return {};
++
++    QFont font = QGuiApplication::font();
++    font.setPixelSize(24);
++    const QFontMetrics metrics(font);
++    const QString elapsed = QStringLiteral("00:00");
++    const QString total = QStringLiteral("00:00");
++    const QString separator = QStringLiteral(" / ");
++    constexpr int padding = 12;
++    constexpr int margin = 20;
++    const int elapsedWidth = metrics.horizontalAdvance(elapsed);
++    const int separatorWidth = metrics.horizontalAdvance(separator);
++    const int totalWidth = metrics.horizontalAdvance(total);
++    const int desiredWidth = elapsedWidth + separatorWidth + totalWidth + padding * 2;
++    const int badgeWidth = std::min(desiredWidth, output.width());
++    const int badgeHeight = std::min(std::max(metrics.height() + 16, 40), output.height());
++    const int marginX = std::min(margin, output.width() - badgeWidth);
++    const int marginY = std::min(margin, output.height() - badgeHeight);
++    const QRect bounds(output.width() - marginX - badgeWidth, marginY, badgeWidth, badgeHeight);
++    if (bounds.isEmpty())
++        return {};
++
++    QImage image(bounds.size(), QImage::Format_RGBA8888_Premultiplied);
++    image.fill(Qt::transparent);
++    {
++        QPainter painter(&image);
++        painter.setRenderHint(QPainter::Antialiasing);
++        const QRect localRect(QPoint(0, 0), bounds.size());
++        painter.setPen(QPen(QColor(255, 255, 255, 40), 1));
++        painter.setBrush(QColor(24, 27, 33, 216));
++        painter.drawRoundedRect(localRect.adjusted(0, 0, -1, -1), 8, 8);
++
++        painter.setFont(font);
++        painter.setPen(Qt::white);
++        const int textY = (badgeHeight - metrics.height()) / 2 + metrics.ascent();
++        int textX = padding;
++        painter.drawText(textX, textY, elapsed);
++        textX += elapsedWidth;
++        painter.setPen(QColor(255, 255, 255, 128));
++        painter.drawText(textX, textY, separator);
++        textX += separatorWidth;
++        painter.setPen(QColor(255, 255, 255, 180));
++        painter.drawText(textX, textY, total);
++    }
++
++    auto frame = std::make_shared<RecordingEffectsFrame>();
++    frame->output = output;
++    frame->tiles.push_back({bounds, std::move(image), output});
++    return frame;
++}
++} // namespace
++#endif
++
+ class RecordingStatusPrompt final : public QWidget {
+     Q_DECLARE_TR_FUNCTIONS(RecordingStatusPrompt)
+ 
+@@ -277,18 +335,24 @@ void RecordingEffectPreview::synchronize() {
+         clearPlaybackFrame();
+         m_playbackDirty = false;
+         if (m_playbackOverlay != 0) {
+-            const RecordingKeyboardFont font;
+-            m_playbackFrame = takeRecordingEffectsFrame(snow_recording_effects_playback_preview(
+-                static_cast<uint32_t>(m_capture.width()), static_cast<uint32_t>(m_capture.height()),
+-                canvasScale, m_playbackOverlay, rgba(m_progressBarColor), font.family.constData(),
+-                font.cjkFamily.constData(), font.weight));
+-            if (m_playbackFrame) {
+-                m_area.canvas()->update(frameRegion(*m_playbackFrame));
+-            } else {
+-                if (reportError) {
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++            if (m_playbackOverlay == SNOW_RECORDING_PLAYBACK_OVERLAY_PLAYBACK_TIME) {
++                m_playbackFrame = makeOhosPlaybackTimePreview(m_capture.size());
++            } else
++#endif
++            {
++                const RecordingKeyboardFont font;
++                m_playbackFrame = takeRecordingEffectsFrame(snow_recording_effects_playback_preview(
++                    static_cast<uint32_t>(m_capture.width()),
++                    static_cast<uint32_t>(m_capture.height()), canvasScale, m_playbackOverlay,
++                    rgba(m_progressBarColor), font.family.constData(), font.cjkFamily.constData(),
++                    font.weight));
++                if (!m_playbackFrame && reportError) {
+                     reportError(QString::fromUtf8(snow_recording_effects_last_error()));
+                 }
+             }
++            if (m_playbackFrame)
++                m_area.canvas()->update(frameRegion(*m_playbackFrame));
+         }
+     }
+     const bool motionEnabled = m_trail.alpha() != 0 || m_click.alpha() != 0 || m_keyboard ||

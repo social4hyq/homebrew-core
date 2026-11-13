@@ -1,0 +1,12 @@
+diff --git a/snow_shot/src/diagnostics/diagnostics.cpp b/snow_shot/src/diagnostics/diagnostics.cpp
+index 587e776..e932a91 100644
+--- a/snow_shot/src/diagnostics/diagnostics.cpp
++++ b/snow_shot/src/diagnostics/diagnostics.cpp
+@@ -382,6 +382,7 @@ struct DiagnosticsService::Impl {
+                                            QStringLiteral("working_directory_exists"),
+                                            QStringLiteral("exit_code"),
+                                            QStringLiteral("outcome"),
++                                           QStringLiteral("error"),
+                                            QStringLiteral("dump_id"),
+                                            QStringLiteral("dump_file"),
+                                            QStringLiteral("created"),

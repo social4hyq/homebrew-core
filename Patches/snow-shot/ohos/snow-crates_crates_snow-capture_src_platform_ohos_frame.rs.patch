@@ -1,0 +1,78 @@
+diff --git a/snow-crates/crates/snow-capture/src/platform/ohos_frame.rs b/snow-crates/crates/snow-capture/src/platform/ohos_frame.rs
+new file mode 100644
+index 0000000..15fa990
+--- /dev/null
++++ b/snow-crates/crates/snow-capture/src/platform/ohos_frame.rs
+@@ -0,0 +1,71 @@
++use crate::error::{CaptureError, CaptureResult};
++
++/// Validate the native pixelmap layout and return the packed destination size.
++pub(super) fn packed_layout(
++    width: u32,
++    height: u32,
++    stride: u32,
++    pixel_len: usize,
++) -> CaptureResult<usize> {
++    let row_bytes = (width as usize)
++        .checked_mul(4)
++        .ok_or(CaptureError::BufferOverflow)?;
++    let native_len = (stride as usize)
++        .checked_mul(height as usize)
++        .ok_or(CaptureError::BufferOverflow)?;
++    if width == 0 || height == 0 || (stride as usize) < row_bytes || pixel_len != native_len {
++        return Err(CaptureError::platform(anyhow::anyhow!(
++            "OHOS display capture returned invalid pixel storage"
++        )));
++    }
++    row_bytes
++        .checked_mul(height as usize)
++        .ok_or(CaptureError::BufferOverflow)
++}
++
++pub(super) fn dimensions_match(expected: (u32, u32), actual: (u32, u32)) -> bool {
++    expected == actual
++}
++
++pub(super) fn valid_display_geometry(width: u32, height: u32, pixel_ratio: f32) -> bool {
++    width > 0 && height > 0 && pixel_ratio.is_finite() && pixel_ratio > 0.0
++}
++
++#[cfg(test)]
++mod tests {
++    use super::packed_layout;
++
++    #[test]
++    fn accepts_packed_native_pixels() {
++        assert_eq!(packed_layout(3, 2, 12, 24).unwrap(), 24);
++    }
++
++    #[test]
++    fn accepts_padded_native_pixels_but_returns_packed_size() {
++        assert_eq!(packed_layout(3, 2, 16, 32).unwrap(), 24);
++    }
++
++    #[test]
++    fn rejects_invalid_dimensions_stride_and_native_length() {
++        assert!(packed_layout(0, 2, 0, 0).is_err());
++        assert!(packed_layout(3, 2, 11, 22).is_err());
++        assert!(packed_layout(3, 2, 16, 31).is_err());
++    }
++
++    #[test]
++    fn detects_pixelmap_geometry_changes() {
++        assert!(super::dimensions_match((1920, 1080), (1920, 1080)));
++        assert!(!super::dimensions_match((1920, 1080), (1080, 1920)));
++    }
++
++    #[test]
++    fn rejects_invalid_display_geometry_and_non_finite_pixel_ratios() {
++        assert!(super::valid_display_geometry(1920, 1080, 1.0));
++        assert!(!super::valid_display_geometry(0, 1080, 1.0));
++        assert!(!super::valid_display_geometry(1920, 0, 1.0));
++        assert!(!super::valid_display_geometry(1920, 1080, 0.0));
++        assert!(!super::valid_display_geometry(1920, 1080, -1.0));
++        assert!(!super::valid_display_geometry(1920, 1080, f32::NAN));
++        assert!(!super::valid_display_geometry(1920, 1080, f32::INFINITY));
++    }
++}
+

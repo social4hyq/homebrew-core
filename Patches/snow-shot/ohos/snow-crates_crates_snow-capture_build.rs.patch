@@ -1,0 +1,44 @@
+diff --git a/snow-crates/crates/snow-capture/build.rs b/snow-crates/crates/snow-capture/build.rs
+index 982b9a6..5599156 100644
+--- a/snow-crates/crates/snow-capture/build.rs
++++ b/snow-crates/crates/snow-capture/build.rs
+@@ -9,9 +9,14 @@ fn main() {
+     println!("cargo:rustc-check-cfg=cfg(has_precompiled_shader_1d)");
+     println!("cargo:rustc-check-cfg=cfg(has_precompiled_shader_f16)");
+     println!("cargo:rustc-check-cfg=cfg(has_precompiled_shader_f16_1d)");
++    println!("cargo:rustc-check-cfg=cfg(target_env, values(\"ohos\"))");
+     println!("cargo:rerun-if-env-changed=SNOW_CAPTURE_FXC_PATH");
+ 
+     let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
++    let target_env = env::var("CARGO_CFG_TARGET_ENV").unwrap_or_default();
++    if target_env == "ohos" {
++        compile_ohos_capture();
++    }
+     if target_os != "windows" {
+         return;
+     }
+@@ -103,6 +108,24 @@ fn main() {
+     }
+ }
+ 
++fn compile_ohos_capture() {
++    let compiler = env::var("SNOW_CAPTURE_OHOS_CXX").expect("OHOS C++ compiler not configured");
++    let sysroot = env::var("SNOW_CAPTURE_OHOS_SYSROOT").expect("OHOS sysroot not configured");
++    println!("cargo:rerun-if-changed=native/ohos_capture.cpp");
++    println!("cargo:rerun-if-env-changed=SNOW_CAPTURE_OHOS_CXX");
++    println!("cargo:rerun-if-env-changed=SNOW_CAPTURE_OHOS_SYSROOT");
++    cc::Build::new()
++        .cpp(true)
++        .std("c++20")
++        .compiler(compiler)
++        .flag(format!("--sysroot={sysroot}"))
++        .warnings_into_errors(true)
++        .file("native/ohos_capture.cpp")
++        .compile("snow_capture_ohos");
++    println!("cargo:rustc-link-lib=dylib=native_display_manager");
++    println!("cargo:rustc-link-lib=dylib=pixelmap");
++}
++
+ fn compile_wgc_interop() {
+     for source in [
+         "native/wgc_interop.h",

@@ -1,0 +1,283 @@
+diff --git a/snow_shot/tests/ohos_user_file_export_tests.cpp b/snow_shot/tests/ohos_user_file_export_tests.cpp
+new file mode 100644
+index 0000000..d6c2414
+--- /dev/null
++++ b/snow_shot/tests/ohos_user_file_export_tests.cpp
+@@ -0,0 +1,277 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++#include "snow_shot/platform/ohos/userfileexportqueue.h"
++#include "snow_shot/platform/ohos/recordingfileexport.h"
++
++#include <QCoreApplication>
++#include <QEventLoop>
++#include <QThread>
++#include <QTemporaryDir>
++#include <QFile>
++#include <cstdlib>
++#include <iostream>
++#include <vector>
++
++namespace {
++using snow_shot::platform::ohos::documentViewPickerUriFromLocalPath;
++using snow_shot::platform::ohos::isDocumentViewPickerUri;
++using snow_shot::platform::ohos::normalizedDocumentViewPickerUri;
++using snow_shot::platform::ohos::RecordingFileExport;
++using snow_shot::platform::ohos::UserFileExportQueue;
++using snow_shot::platform::ohos::UserFileSavePickerQueue;
++
++void require(bool condition, const char* message) {
++    if (!condition) {
++        std::cerr << message << '\n';
++        std::exit(1);
++    }
++}
++
++void requestsAreDeliveredExactlyOnceAndCompletionIsCorrelated() {
++    UserFileExportQueue queue;
++    bool completed = false;
++    bool succeeded = false;
++    QString error;
++    const auto id = queue.enqueue(QStringLiteral("/private/stage.png"),
++                                  QStringLiteral("file://docs/Documents/stage.png"),
++                                  [&](bool success, QString message) {
++                                      completed = true;
++                                      succeeded = success;
++                                      error = std::move(message);
++                                  });
++    require(id != 0, "enqueue must return a nonzero request id");
++    const auto pending = queue.takePending();
++    require(pending.size() == 1 && pending.front().id == id &&
++                pending.front().sourcePath == QStringLiteral("/private/stage.png") &&
++                pending.front().uri == QStringLiteral("file://docs/Documents/stage.png"),
++            "the native-to-ArkTS bridge must preserve the staging path and authorized URI");
++    require(queue.takePending().empty(), "a delivered request must not be delivered twice");
++    require(queue.complete(id, true), "the matching platform completion must be accepted");
++    require(completed && succeeded && error.isEmpty(),
++            "successful publication must complete the original callback successfully");
++    require(!queue.complete(id, false, QStringLiteral("late")),
++            "a terminal request must reject duplicate completion");
++}
++
++void failuresAndCancellationRemainObservable() {
++    UserFileExportQueue queue;
++    bool failed = false;
++    QString error;
++    const auto failureId =
++        queue.enqueue(QStringLiteral("/private/a"), QStringLiteral("file://docs/a"),
++                      [&](bool success, QString message) {
++                          failed = !success;
++                          error = std::move(message);
++                      });
++    require(queue.complete(failureId, false, QStringLiteral("permission denied")),
++            "platform write failures must complete their request");
++    require(failed && error == QStringLiteral("permission denied"),
++            "the user-facing layer must receive the platform write failure");
++
++    bool cancelled = false;
++    const auto cancelledId =
++        queue.enqueue(QStringLiteral("/private/b"), QStringLiteral("file://docs/b"),
++                      [&](bool success, QString) { cancelled = !success; });
++    require(queue.cancel(cancelledId), "an outstanding request must be cancellable");
++    require(cancelled, "cancellation must complete the request as a failure");
++    require(queue.takePending().empty(), "cancelled requests must not be handed to ArkTS later");
++}
++
++void pickerRequestsPreserveTheAuthorizedUriAndSuffixChoice() {
++    UserFileSavePickerQueue queue;
++    QString completedUri;
++    int selectedSuffix = -2;
++    QString error;
++    const quint64 id = queue.enqueue(QStringLiteral("capture.png"),
++                                     {QStringLiteral("PNG|.png"), QStringLiteral("JPEG|.jpg")},
++                                     [&](QString uri, int suffixIndex, QString message) {
++                                         completedUri = std::move(uri);
++                                         selectedSuffix = suffixIndex;
++                                         error = std::move(message);
++                                     });
++    const auto pending = queue.takePending();
++    require(id != 0 && pending.size() == 1 && pending.front().id == id &&
++                pending.front().suggestedName == QStringLiteral("capture.png") &&
++                pending.front().suffixChoices.size() == 2,
++            "UIAbility must receive the save name and suffix choices");
++    require(
++        queue.complete(
++            id, QStringLiteral("file://docs/storage/Users/currentUser/Documents/capture.jpg"), 1),
++        "the picker URI and suffix choice must return to native code");
++    require(completedUri ==
++                    QStringLiteral("file://docs/storage/Users/currentUser/Documents/capture.jpg") &&
++                selectedSuffix == 1 && error.isEmpty(),
++            "picker completion must preserve the authorized URI and chosen suffix");
++    require(!queue.complete(id, {}, -1), "picker completion must be accepted only once");
++}
++
++void onlyAuthorizedDocumentPickerUrisUseTheUserFileBridge() {
++    require(isDocumentViewPickerUri(
++                QStringLiteral("file://docs/storage/Users/currentUser/Documents/a.png")),
++            "DocumentViewPicker URI paths must be routed through URI-aware file IO");
++    require(documentViewPickerUriFromLocalPath(
++                QStringLiteral("/storage/Users/currentUser/Documents/a.png")) ==
++                QStringLiteral("file://docs/storage/Users/currentUser/Documents/a.png"),
++            "Qt's local-path form of a picker result must map back to its authorized URI");
++    require(documentViewPickerUriFromLocalPath(QStringLiteral("/data/storage/el2/base/files/a.png"))
++                .isEmpty(),
++            "only public user-file paths may map to DocumentViewPicker URIs");
++    require(!isDocumentViewPickerUri(QStringLiteral("/data/storage/el2/base/files/a.png")),
++            "ordinary sandbox paths must continue using native file IO");
++    require(!isDocumentViewPickerUri(QStringLiteral("file:///tmp/a.png")),
++            "ordinary file URLs must not be mistaken for authorized picker URIs");
++    require(!isDocumentViewPickerUri(QStringLiteral("file://media/Photo/123/a.png")),
++            "media-library URIs must not be routed through the document picker writer");
++    require(normalizedDocumentViewPickerUri(
++                QStringLiteral("file://docs/storage/Users/currentUser/Documents/a.jpg"),
++                QStringLiteral("png")) ==
++                QStringLiteral("file://docs/storage/Users/currentUser/Documents/a.png"),
++            "normalizing an export suffix must preserve the DocumentViewPicker URI scheme");
++    require(normalizedDocumentViewPickerUri(
++                QStringLiteral("file://docs/storage/Users/currentUser/Documents/a%20b"),
++                QStringLiteral("png")) ==
++                QStringLiteral("file://docs/storage/Users/currentUser/Documents/a%20b.png"),
++            "URI-escaped names must survive extension normalization unchanged");
++    require(
++        normalizedDocumentViewPickerUri(QStringLiteral("file:///tmp/a.png"), QStringLiteral("png"))
++            .isEmpty(),
++        "the helper must reject non-picker file URLs");
++}
++
++void completedRecordingsUsePickerThenAuthorizedUserFileExport() {
++    QTemporaryDir directory;
++    require(directory.isValid(), "recording export temp directory is available");
++    const QString sourcePath = directory.filePath(QStringLiteral("capture.mp4"));
++    QFile source(sourcePath);
++    require(source.open(QIODevice::WriteOnly) && source.write("video") == 5,
++            "recording source exists before export is requested");
++    source.close();
++
++    QObject owner;
++    RecordingFileExport exporter(&owner);
++    bool finished = false;
++    RecordingFileExport::Result result = RecordingFileExport::Result::Failed;
++    QString error;
++    exporter.setCompletion([&](RecordingFileExport::Result outcome, QString message) {
++        finished = true;
++        result = outcome;
++        error = std::move(message);
++    });
++    require(exporter.start(sourcePath), "existing MP4 recording starts user-file export");
++
++    auto& pickers = snow_shot::platform::ohos::sharedUserFileSavePickerQueue();
++    const auto pickerRequests = pickers.takePending();
++    require(pickerRequests.size() == 1 &&
++                pickerRequests.front().suggestedName == QStringLiteral("capture.mp4") &&
++                pickerRequests.front().suffixChoices == QStringList{QStringLiteral("MP4|.mp4")},
++            "recording export requests an authorized MP4 destination from the user");
++    require(pickers.complete(pickerRequests.front().id,
++                             QStringLiteral("file://docs/Documents/final-video"), 0),
++            "the DocumentViewPicker result is accepted");
++
++    std::vector<snow_shot::platform::ohos::UserFileExportRequest> exports;
++    for (int attempt = 0; attempt < 1000 && exports.empty(); ++attempt) {
++        QCoreApplication::processEvents(QEventLoop::AllEvents, 5);
++        exports = snow_shot::platform::ohos::sharedUserFileExportQueue().takePending();
++        QThread::msleep(1);
++    }
++    require(exports.size() == 1 && exports.front().sourcePath == sourcePath &&
++                exports.front().uri == QStringLiteral("file://docs/Documents/final-video.mp4"),
++            "the original recording is queued to the normalized user-selected URI");
++    require(
++        snow_shot::platform::ohos::sharedUserFileExportQueue().complete(exports.front().id, true),
++        "successful user-file publication is correlated to the export session");
++    for (int attempt = 0; attempt < 1000 && !finished; ++attempt) {
++        QCoreApplication::processEvents(QEventLoop::AllEvents, 5);
++        QThread::msleep(1);
++    }
++    require(finished && result == RecordingFileExport::Result::Succeeded && error.isEmpty() &&
++                !exporter.active(),
++            "export completion reports success and releases the active session");
++}
++
++void pickerCancellationDoesNotQueueAnExport() {
++    QTemporaryDir directory;
++    require(directory.isValid(), "recording export cancellation temp directory is available");
++    const QString sourcePath = directory.filePath(QStringLiteral("cancel.mp4"));
++    QFile source(sourcePath);
++    require(source.open(QIODevice::WriteOnly) && source.write("video") == 5,
++            "cancellation fixture exists");
++    source.close();
++
++    QObject owner;
++    RecordingFileExport exporter(&owner);
++    bool finished = false;
++    RecordingFileExport::Result result = RecordingFileExport::Result::Succeeded;
++    exporter.setCompletion([&](RecordingFileExport::Result outcome, QString) {
++        finished = true;
++        result = outcome;
++    });
++    require(exporter.start(sourcePath), "cancellable export starts");
++    const auto pending = snow_shot::platform::ohos::sharedUserFileSavePickerQueue().takePending();
++    require(pending.size() == 1, "the picker request is pending");
++    require(snow_shot::platform::ohos::sharedUserFileSavePickerQueue().complete(pending.front().id,
++                                                                                {}, -1),
++            "picker cancellation completes the pending request");
++    for (int attempt = 0; attempt < 1000 && !finished; ++attempt) {
++        QCoreApplication::processEvents(QEventLoop::AllEvents, 5);
++        QThread::msleep(1);
++    }
++    require(finished && result == RecordingFileExport::Result::Cancelled &&
++                snow_shot::platform::ohos::sharedUserFileExportQueue().takePending().empty(),
++            "cancelling the picker is terminal and does not enqueue a file write");
++}
++
++void untrustedPickerUrisAreRejectedAndPendingRequestsAreRetiredOnDestruction() {
++    QTemporaryDir directory;
++    require(directory.isValid(), "recording destination validation directory is available");
++    const QString sourcePath = directory.filePath(QStringLiteral("source.mp4"));
++    QFile source(sourcePath);
++    require(source.open(QIODevice::WriteOnly) && source.write("video") == 5,
++            "destination validation fixture exists");
++    source.close();
++
++    QObject owner;
++    RecordingFileExport exporter(&owner);
++    bool finished = false;
++    RecordingFileExport::Result result = RecordingFileExport::Result::Succeeded;
++    exporter.setCompletion([&](RecordingFileExport::Result outcome, QString) {
++        finished = true;
++        result = outcome;
++    });
++    require(exporter.start(sourcePath), "destination validation flow starts");
++    const auto pending = snow_shot::platform::ohos::sharedUserFileSavePickerQueue().takePending();
++    require(pending.size() == 1 &&
++                snow_shot::platform::ohos::sharedUserFileSavePickerQueue().complete(
++                    pending.front().id, QStringLiteral("file://internal/private/video"), 0),
++            "picker bridge returns an untrusted non-Documents URI");
++    for (int attempt = 0; attempt < 1000 && !finished; ++attempt) {
++        QCoreApplication::processEvents(QEventLoop::AllEvents, 5);
++        QThread::msleep(1);
++    }
++    require(finished && result == RecordingFileExport::Result::Failed &&
++                snow_shot::platform::ohos::sharedUserFileExportQueue().takePending().empty(),
++            "untrusted URIs are rejected before any file write is queued");
++
++    auto* pendingExporter = new RecordingFileExport(&owner);
++    require(pendingExporter->start(sourcePath), "pending exporter starts before destruction");
++    const auto pendingPicker =
++        snow_shot::platform::ohos::sharedUserFileSavePickerQueue().takePending();
++    require(pendingPicker.size() == 1, "picker request remains outstanding until destroyed");
++    delete pendingExporter;
++    require(!snow_shot::platform::ohos::sharedUserFileSavePickerQueue().complete(
++                pendingPicker.front().id, QStringLiteral("file://docs/Documents/orphan.mp4"), 0),
++            "destroying the owner cancels and retires its outstanding picker callback");
++}
++} // namespace
++
++int main(int argc, char** argv) {
++    QCoreApplication application(argc, argv);
++    requestsAreDeliveredExactlyOnceAndCompletionIsCorrelated();
++    failuresAndCancellationRemainObservable();
++    pickerRequestsPreserveTheAuthorizedUriAndSuffixChoice();
++    onlyAuthorizedDocumentPickerUrisUseTheUserFileBridge();
++    completedRecordingsUsePickerThenAuthorizedUserFileExport();
++    pickerCancellationDoesNotQueueAnExport();
++    untrustedPickerUrisAreRejectedAndPendingRequestsAreRetiredOnDestruction();
++    return 0;
++}

@@ -1,0 +1,71 @@
+diff --git a/snow_shot/tests/save_directory_time_variables_tests.cpp b/snow_shot/tests/save_directory_time_variables_tests.cpp
+index 4449af8..a4ba5c8 100644
+--- a/snow_shot/tests/save_directory_time_variables_tests.cpp
++++ b/snow_shot/tests/save_directory_time_variables_tests.cpp
+@@ -8,7 +8,7 @@
+ #include <QDir>
+ #include <QFile>
+ #include <QFileInfo>
+-#include <QGuiApplication>
++#include <QCoreApplication>
+ #include <QTemporaryDir>
+ #include <QTimeZone>
+ 
+@@ -98,9 +98,16 @@ void windowVariables(const QTemporaryDir& temporary) {
+     require(video == QDir(expandedVideo).filePath(QStringLiteral("文档_ A_B_12-34-56.mp4")) &&
+                 recording::screenRecordingDirectory(timestamp, names) == expandedVideo,
+             "recording export and folder resolution must create the same expanded directory");
++    require(recording::screenRecordingDirectoryProbePath(
++                QDir(expandedVideo).filePath(QStringLiteral("2026/11"))) == expandedVideo &&
++                recording::screenRecordingDirectoryWritable(expandedVideo),
++            "permission probes must use an existing ancestor and verify actual write access");
+     QFile collision(video);
+     require(collision.open(QIODevice::WriteOnly), "create a named recording collision");
+     collision.close();
++    require(recording::screenRecordingDirectoryProbePath(video) == expandedVideo &&
++                !recording::screenRecordingDirectoryWritable(video),
++            "a file path must probe its parent and must not be mistaken for a writable directory");
+     require(
+         recording::screenRecordingOutputPath(videoDirectories, videoBase, QStringLiteral("mp4")) ==
+             QDir(expandedVideo).filePath(QStringLiteral("文档_ A_B_12-34-56_1.mp4")),
+@@ -132,6 +139,23 @@ void windowVariables(const QTemporaryDir& temporary) {
+             "unusable named recording directories retain the output fallback");
+ }
+ 
++void recordingFallbackDirectories(const QTemporaryDir& temporary) {
++    const QString files = temporary.filePath(QStringLiteral("app-files"));
++    const QString movies = QDir(files).filePath(QStringLiteral("Movies"));
++    const QString documents = QDir(files).filePath(QStringLiteral("Documents"));
++    const auto fallback = recording::screenRecordingFallbackDirectories({}, {}, files);
++    require(fallback == QStringList{movies, documents},
++            "empty OHOS public locations must fall back to writable app Movies and Documents");
++    const QString output = recording::screenRecordingOutputPath(fallback, QStringLiteral("capture"),
++                                                                QStringLiteral("mp4"));
++    require(output == QDir(movies).filePath(QStringLiteral("capture.mp4")) &&
++                QFileInfo(movies).isDir(),
++            "the private Movies fallback must be created and selected for recording output");
++    require(recording::screenRecordingFallbackDirectories(movies, documents, files) ==
++                QStringList{movies, documents},
++            "existing public Movies and Documents locations must not be duplicated");
++}
++
+ void timeDirectories(const QTemporaryDir& temporary) {
+     const QDateTime before(QDate(2026, 12, 31), QTime(23, 59, 59), QTimeZone::UTC);
+     const QDateTime after = before.addSecs(1);
+@@ -298,7 +322,7 @@ void longWindowNames(const QTemporaryDir& temporary) {
+ } // namespace
+ 
+ int main(int argc, char** argv) {
+-    QGuiApplication application(argc, argv);
++    QCoreApplication application(argc, argv);
+     QTemporaryDir temporary;
+     auto& appStorage = storage::ApplicationStorage::instance();
+     require(temporary.isValid() &&
+@@ -306,6 +330,7 @@ int main(int argc, char** argv) {
+             "isolated settings must initialize");
+     timeDirectories(temporary);
+     windowVariables(temporary);
++    recordingFallbackDirectories(temporary);
+     longWindowNames(temporary);
+     appStorage.shutdown();
+     return EXIT_SUCCESS;

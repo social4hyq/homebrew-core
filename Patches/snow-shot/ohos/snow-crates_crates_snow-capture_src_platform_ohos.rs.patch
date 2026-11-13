@@ -1,0 +1,245 @@
+diff --git a/snow-crates/crates/snow-capture/src/platform/ohos.rs b/snow-crates/crates/snow-capture/src/platform/ohos.rs
+new file mode 100644
+index 0000000..bc91d56
+--- /dev/null
++++ b/snow-crates/crates/snow-capture/src/platform/ohos.rs
+@@ -0,0 +1,238 @@
++use super::ohos_frame::{dimensions_match, packed_layout, valid_display_geometry};
++use crate::backend::{CaptureBackend, MonitorCapturer};
++use crate::error::{CaptureError, CaptureResult};
++use crate::frame::{CapturePixelFormat, Frame};
++use crate::monitor::MonitorId;
++use crate::region::{MonitorGeometry, MonitorLayout};
++use crate::window::WindowId;
++
++#[repr(C)]
++#[derive(Clone, Copy, Debug, Default)]
++struct NativeDisplayInfo {
++    display_id: u64,
++    width: u32,
++    height: u32,
++    virtual_pixel_ratio: f32,
++}
++
++#[repr(C)]
++struct NativeFrame {
++    pixel_len: usize,
++    width: u32,
++    height: u32,
++    stride: u32,
++    pixel_format: i32,
++}
++
++unsafe extern "C" {
++    fn snow_capture_ohos_display_info(output: *mut NativeDisplayInfo) -> i32;
++    fn snow_capture_ohos_capture(
++        display_id: u64,
++        pixels: *mut u8,
++        capacity: usize,
++        output: *mut NativeFrame,
++    ) -> i32;
++}
++
++const NATIVE_BUFFER_TOO_SMALL: i32 = -1001;
++
++fn native_error(operation: &str, code: i32) -> CaptureError {
++    if code == 201 {
++        CaptureError::PermissionDenied
++    } else {
++        CaptureError::platform(anyhow::anyhow!("{operation} failed with OHOS error {code}"))
++    }
++}
++
++fn display_info() -> CaptureResult<NativeDisplayInfo> {
++    let mut info = NativeDisplayInfo::default();
++    let result = unsafe { snow_capture_ohos_display_info(&mut info) };
++    if result != 0 {
++        return Err(native_error("OHOS display enumeration", result));
++    }
++    if !valid_display_geometry(info.width, info.height, info.virtual_pixel_ratio) {
++        return Err(CaptureError::platform(anyhow::anyhow!(
++            "OHOS display enumeration returned invalid geometry"
++        )));
++    }
++    Ok(info)
++}
++
++fn monitor(info: NativeDisplayInfo) -> MonitorId {
++    MonitorId::from_parts(
++        0,
++        info.display_id,
++        info.display_id as isize,
++        format!("display:{}", info.display_id),
++        true,
++    )
++}
++
++pub(crate) fn layout(selected: Option<&[MonitorId]>) -> CaptureResult<MonitorLayout> {
++    let info = display_info()?;
++    if selected.is_some_and(|ids| {
++        ids.iter()
++            .all(|id| id.raw_handle() != info.display_id as isize)
++    }) {
++        return Err(CaptureError::NoPrimaryMonitor);
++    }
++    Ok(MonitorLayout {
++        monitors: vec![MonitorGeometry {
++            monitor: monitor(info),
++            x: 0,
++            y: 0,
++            width: info.width,
++            height: info.height,
++        }],
++        virtual_left: 0,
++        virtual_top: 0,
++        virtual_width: info.width,
++        virtual_height: info.height,
++    })
++}
++
++pub(crate) struct OhosBackend;
++
++impl CaptureBackend for OhosBackend {
++    fn enumerate_monitors(&self) -> CaptureResult<Vec<MonitorId>> {
++        Ok(vec![monitor(display_info()?)])
++    }
++
++    fn primary_monitor(&self) -> CaptureResult<MonitorId> {
++        Ok(monitor(display_info()?))
++    }
++
++    fn monitor_layout(&self) -> CaptureResult<MonitorLayout> {
++        layout(None)
++    }
++
++    fn create_monitor_capturer(
++        &self,
++        monitor: &MonitorId,
++    ) -> CaptureResult<Box<dyn MonitorCapturer>> {
++        let current = display_info()?;
++        if monitor.raw_handle() != current.display_id as isize {
++            return Err(CaptureError::MonitorLost);
++        }
++        Ok(Box::new(OhosCapturer {
++            display_id: current.display_id,
++            width: current.width,
++            height: current.height,
++            output_format: CapturePixelFormat::Rgba8,
++        }))
++    }
++
++    fn create_window_capturer(
++        &self,
++        _window: &WindowId,
++    ) -> CaptureResult<Box<dyn MonitorCapturer>> {
++        Err(CaptureError::BackendUnavailable(
++            "window capture is unavailable with the OHOS display capture API".into(),
++        ))
++    }
++}
++
++struct OhosCapturer {
++    display_id: u64,
++    width: u32,
++    height: u32,
++    output_format: CapturePixelFormat,
++}
++
++impl MonitorCapturer for OhosCapturer {
++    fn set_output_pixel_format(&mut self, format: CapturePixelFormat) -> CaptureResult<()> {
++        self.output_format = format;
++        Ok(())
++    }
++
++    fn capture(&mut self, reuse: Option<Frame>) -> CaptureResult<Frame> {
++        let mut frame = reuse.unwrap_or_else(Frame::empty);
++        frame.prepare_for_overwrite(self.width, self.height, self.output_format)?;
++
++        let mut native = NativeFrame {
++            pixel_len: 0,
++            width: 0,
++            height: 0,
++            stride: 0,
++            pixel_format: 0,
++        };
++        let mut result = unsafe {
++            snow_capture_ohos_capture(
++                self.display_id,
++                frame.as_mut_bytes().as_mut_ptr(),
++                frame.as_mut_bytes().len(),
++                &mut native,
++            )
++        };
++        if result == NATIVE_BUFFER_TOO_SMALL {
++            let packed_len =
++                packed_layout(native.width, native.height, native.stride, native.pixel_len)?;
++            frame.prepare_for_overwrite(native.width, native.height, self.output_format)?;
++            if frame.as_mut_bytes().len() < packed_len {
++                return Err(CaptureError::BufferOverflow);
++            }
++            result = unsafe {
++                snow_capture_ohos_capture(
++                    self.display_id,
++                    frame.as_mut_bytes().as_mut_ptr(),
++                    frame.as_mut_bytes().len(),
++                    &mut native,
++                )
++            };
++        }
++        if result != 0 {
++            return Err(native_error("OHOS display capture", result));
++        }
++        if !dimensions_match(
++            (frame.width(), frame.height()),
++            (native.width, native.height),
++        ) {
++            frame.prepare_for_overwrite(native.width, native.height, self.output_format)?;
++            native = NativeFrame {
++                pixel_len: 0,
++                width: 0,
++                height: 0,
++                stride: 0,
++                pixel_format: 0,
++            };
++            result = unsafe {
++                snow_capture_ohos_capture(
++                    self.display_id,
++                    frame.as_mut_bytes().as_mut_ptr(),
++                    frame.as_mut_bytes().len(),
++                    &mut native,
++                )
++            };
++            if result != 0 {
++                return Err(native_error(
++                    "OHOS display capture after geometry update",
++                    result,
++                ));
++            }
++            if !dimensions_match(
++                (frame.width(), frame.height()),
++                (native.width, native.height),
++            ) {
++                return Err(CaptureError::platform(anyhow::anyhow!(
++                    "OHOS display geometry changed during capture"
++                )));
++            }
++        }
++        packed_layout(native.width, native.height, native.stride, native.pixel_len)?;
++        self.width = native.width;
++        self.height = native.height;
++        let native_format = match native.pixel_format {
++            3 => CapturePixelFormat::Rgba8,
++            4 => CapturePixelFormat::Bgra8,
++            format => {
++                return Err(CaptureError::UnsupportedFormat(format!(
++                    "OHOS pixel format {format}"
++                )));
++            }
++        };
++        if native_format != self.output_format {
++            snow_media::convert::swap_red_blue(frame.as_mut_bytes());
++        }
++        Ok(frame)
++    }
++}
+

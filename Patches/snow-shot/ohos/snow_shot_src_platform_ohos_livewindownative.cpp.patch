@@ -1,0 +1,383 @@
+diff --git a/snow_shot/src/platform/ohos/livewindownative.cpp b/snow_shot/src/platform/ohos/livewindownative.cpp
+new file mode 100644
+index 0000000..b0c59c4
+--- /dev/null
++++ b/snow_shot/src/platform/ohos/livewindownative.cpp
+@@ -0,0 +1,376 @@
++#include "../../presentation/pinned/livewindownative_p.h"
++#include "livewindowselection_p.h"
++
++#include <QDebug>
++#include <window_manager/oh_window.h>
++#include <multimedia/image_framework/image/pixelmap_native.h>
++
++#include <algorithm>
++#include <atomic>
++#include <chrono>
++#include <limits>
++#include <memory>
++#include <thread>
++#include <vector>
++
++namespace snow_shot::presentation {
++namespace {
++
++QRect rect(const WindowManager_Rect& value) {
++    if (!value.width || !value.height ||
++        value.width > static_cast<uint32_t>(std::numeric_limits<int>::max()) ||
++        value.height > static_cast<uint32_t>(std::numeric_limits<int>::max()))
++        return {};
++    return {value.posX, value.posY, static_cast<int>(value.width), static_cast<int>(value.height)};
++}
++
++bool sameRect(const QRect& left, const QRect& right) {
++    return left == right;
++}
++
++class MainWindowList final {
++  public:
++    MainWindowList() {
++        m_result = OH_WindowManager_GetAllMainWindowInfo(&m_items, &m_size);
++    }
++    ~MainWindowList() {
++        if (m_items)
++            OH_WindowManager_ReleaseAllMainWindowInfo(m_items);
++    }
++    MainWindowList(const MainWindowList&) = delete;
++    MainWindowList& operator=(const MainWindowList&) = delete;
++    bool valid() const {
++        return m_result == 0 && m_items;
++    }
++    int32_t result() const {
++        return m_result;
++    }
++    size_t size() const {
++        return m_size;
++    }
++    const WindowManager_MainWindowInfo* begin() const {
++        return m_items;
++    }
++    const WindowManager_MainWindowInfo* end() const {
++        return m_items ? m_items + m_size : nullptr;
++    }
++
++  private:
++    WindowManager_MainWindowInfo* m_items = nullptr;
++    size_t m_size = 0;
++    int32_t m_result = -1;
++};
++
++ohos_live_window_detail::WindowLookupState windowLookup(int32_t windowId) {
++    MainWindowList windows;
++    if (!windows.valid()) {
++        qWarning() << "SNOW_OHOS_LIVE_WINDOW_ENUMERATION_FAILED" << windows.result()
++                   << windows.size();
++        return ohos_live_window_detail::WindowLookupState::Unavailable;
++    }
++    const bool visible =
++        std::any_of(windows.begin(), windows.end(), [windowId](const auto& window) {
++            return window.windowId == windowId && window.showing;
++        });
++    return visible ? ohos_live_window_detail::WindowLookupState::Visible
++                   : ohos_live_window_detail::WindowLookupState::Hidden;
++}
++
++bool windowBounds(int32_t windowId, QRect* bounds) {
++    if (!bounds)
++        return false;
++    WindowManager_WindowProperties properties{};
++    const int32_t result = OH_WindowManager_GetWindowProperties(windowId, &properties);
++    if (result != 0) {
++        qWarning() << "SNOW_OHOS_LIVE_WINDOW_PROPERTIES_FAILED" << windowId << result;
++        return false;
++    }
++    *bounds = rect(properties.windowRect);
++    return !bounds->isEmpty();
++}
++
++class OhosWindowMonitor final : public live_window_detail::NativeWindowMonitor {
++  public:
++    explicit OhosWindowMonitor(LiveWindowTarget target) : m_target(std::move(target)) {}
++
++    bool initialize(QString* error) override {
++        const auto current = inspect();
++        if (current.state == LiveWindowState::Live)
++            return true;
++        if (error)
++            *error = current.error.isEmpty()
++                         ? QStringLiteral("The selected window is no longer available")
++                         : current.error;
++        return false;
++    }
++
++    live_window_detail::NativeState inspect() override {
++        const auto windowId = static_cast<int32_t>(m_target.nativeId);
++        const auto lookup = windowLookup(windowId);
++        if (lookup == ohos_live_window_detail::WindowLookupState::Unavailable)
++            return {ohos_live_window_detail::stateForWindowLookup(lookup), {}, {}};
++        if (lookup == ohos_live_window_detail::WindowLookupState::Hidden)
++            return {LiveWindowState::Closed, {}, {}};
++        QRect bounds;
++        if (!windowBounds(windowId, &bounds))
++            return {LiveWindowState::Unavailable,
++                    {},
++                    QStringLiteral("The window content is temporarily unavailable. Retrying…")};
++        return {LiveWindowState::Live, bounds, {}};
++    }
++
++  private:
++    LiveWindowTarget m_target;
++};
++
++class OhosWindowFrame final : public live_window_detail::NativeWindowFrame {
++  public:
++    explicit OhosWindowFrame(QImage image) : m_image(std::move(image)) {}
++    QSize size() const override {
++        return m_image.size();
++    }
++    QImage image() const override {
++        return m_image;
++    }
++    const void* pixelBuffer() const override {
++        return m_image.constBits();
++    }
++
++  private:
++    QImage m_image;
++};
++
++struct PixelMapDeleter {
++    void operator()(OH_PixelmapNative* pixelmap) const noexcept {
++        if (pixelmap) {
++            static_cast<void>(OH_PixelmapNative_Release(pixelmap));
++            static_cast<void>(OH_PixelmapNative_Destroy(&pixelmap));
++        }
++    }
++};
++using PixelMap = std::unique_ptr<OH_PixelmapNative, PixelMapDeleter>;
++
++struct PixelMapOptionsDeleter {
++    void operator()(OH_Pixelmap_InitializationOptions* options) const noexcept {
++        if (options)
++            static_cast<void>(OH_PixelmapInitializationOptions_Release(options));
++    }
++};
++using PixelMapOptions = std::unique_ptr<OH_Pixelmap_InitializationOptions, PixelMapOptionsDeleter>;
++
++PixelMap makePixelMap(const QSize& size) {
++    if (size.isEmpty())
++        return {};
++    OH_Pixelmap_InitializationOptions* rawOptions = nullptr;
++    const auto createOptionsResult = OH_PixelmapInitializationOptions_Create(&rawOptions);
++    if (createOptionsResult != IMAGE_SUCCESS) {
++        qWarning() << "SNOW_OHOS_LIVE_WINDOW_PIXELMAP_OPTIONS_FAILED" << createOptionsResult;
++        return {};
++    }
++    PixelMapOptions options(rawOptions);
++    if (OH_PixelmapInitializationOptions_SetWidth(
++            options.get(), static_cast<uint32_t>(size.width())) != IMAGE_SUCCESS ||
++        OH_PixelmapInitializationOptions_SetHeight(
++            options.get(), static_cast<uint32_t>(size.height())) != IMAGE_SUCCESS ||
++        OH_PixelmapInitializationOptions_SetPixelFormat(options.get(), PIXEL_FORMAT_BGRA_8888) !=
++            IMAGE_SUCCESS ||
++        OH_PixelmapInitializationOptions_SetAlphaType(options.get(), PIXELMAP_ALPHA_TYPE_OPAQUE) !=
++            IMAGE_SUCCESS ||
++        OH_PixelmapInitializationOptions_SetEditable(options.get(), true) != IMAGE_SUCCESS)
++        return {};
++    OH_PixelmapNative* rawPixelmap = nullptr;
++    const auto createPixelMapResult =
++        OH_PixelmapNative_CreateEmptyPixelmap(options.get(), &rawPixelmap);
++    if (createPixelMapResult != IMAGE_SUCCESS) {
++        qWarning() << "SNOW_OHOS_LIVE_WINDOW_PIXELMAP_CREATE_FAILED" << createPixelMapResult;
++        return {};
++    }
++    return PixelMap(rawPixelmap);
++}
++
++QImage readPixelMap(OH_PixelmapNative* pixelmap) {
++    OH_Pixelmap_ImageInfo* rawInfo = nullptr;
++    if (!pixelmap || OH_PixelmapImageInfo_Create(&rawInfo) != IMAGE_SUCCESS)
++        return {};
++    std::unique_ptr<OH_Pixelmap_ImageInfo, decltype(&OH_PixelmapImageInfo_Release)> info(
++        rawInfo, OH_PixelmapImageInfo_Release);
++    uint32_t width = 0;
++    uint32_t height = 0;
++    uint32_t stride = 0;
++    int32_t format = PIXEL_FORMAT_UNKNOWN;
++    if (OH_PixelmapNative_GetImageInfo(pixelmap, info.get()) != IMAGE_SUCCESS ||
++        OH_PixelmapImageInfo_GetWidth(info.get(), &width) != IMAGE_SUCCESS ||
++        OH_PixelmapImageInfo_GetHeight(info.get(), &height) != IMAGE_SUCCESS ||
++        OH_PixelmapImageInfo_GetRowStride(info.get(), &stride) != IMAGE_SUCCESS ||
++        OH_PixelmapImageInfo_GetPixelFormat(info.get(), &format) != IMAGE_SUCCESS || !width ||
++        !height || width > static_cast<uint32_t>(std::numeric_limits<int>::max()) ||
++        height > static_cast<uint32_t>(std::numeric_limits<int>::max()))
++        return {};
++    QImage::Format qtFormat = QImage::Format_Invalid;
++    if (format == PIXEL_FORMAT_BGRA_8888)
++        qtFormat = QImage::Format_ARGB32;
++    else if (format == PIXEL_FORMAT_RGBA_8888)
++        qtFormat = QImage::Format_RGBA8888;
++    else if (format == PIXEL_FORMAT_RGB_888)
++        qtFormat = QImage::Format_RGB888;
++    const int bytesPerPixel = qtFormat == QImage::Format_RGB888 ? 3 : 4;
++    const auto minimumStride = static_cast<uint64_t>(width) * static_cast<uint64_t>(bytesPerPixel);
++    if (qtFormat == QImage::Format_Invalid || stride < minimumStride)
++        return {};
++    const size_t byteCount = static_cast<size_t>(stride) * height;
++    std::vector<uint8_t> bytes(byteCount);
++    size_t capacity = byteCount;
++    if (OH_PixelmapNative_ReadPixels(pixelmap, bytes.data(), &capacity) != IMAGE_SUCCESS ||
++        capacity < byteCount)
++        return {};
++    return QImage(bytes.data(), static_cast<int>(width), static_cast<int>(height),
++                  static_cast<int>(stride), qtFormat)
++        .copy();
++}
++
++class OhosWindowCapture final : public live_window_detail::NativeWindowCapture {
++  public:
++    explicit OhosWindowCapture(LiveWindowTarget target) : m_target(std::move(target)) {}
++
++    bool receive(live_window_detail::NativeCaptureFrame* frame) override {
++        if (!frame)
++            return false;
++        constexpr auto framePeriod = std::chrono::milliseconds(200);
++        const auto waitUntil = std::chrono::steady_clock::now() + framePeriod;
++        while (!m_cancelled.load() && std::chrono::steady_clock::now() < waitUntil)
++            std::this_thread::sleep_for(std::chrono::milliseconds(10));
++        if (m_cancelled.load())
++            return false;
++
++        const auto windowId = static_cast<int32_t>(m_target.nativeId);
++        QRect bounds;
++        const auto lookup = windowLookup(windowId);
++        if (lookup != ohos_live_window_detail::WindowLookupState::Visible) {
++            qWarning() << (lookup == ohos_live_window_detail::WindowLookupState::Unavailable
++                               ? "SNOW_OHOS_LIVE_WINDOW_LOOKUP_UNAVAILABLE"
++                               : "SNOW_OHOS_LIVE_WINDOW_NOT_SHOWING")
++                       << windowId;
++            return false;
++        }
++        if (!windowBounds(windowId, &bounds))
++            return false;
++        if (!m_pixelmap || m_pixelmapSize != bounds.size()) {
++            m_pixelmap = makePixelMap(bounds.size());
++            m_pixelmapSize = m_pixelmap ? bounds.size() : QSize();
++        }
++        if (!m_pixelmap) {
++            qWarning() << "SNOW_OHOS_LIVE_WINDOW_PIXELMAP_EMPTY" << windowId << bounds;
++            return false;
++        }
++        const int32_t snapshotResult = OH_WindowManager_Snapshot(windowId, m_pixelmap.get());
++        if (snapshotResult != 0) {
++            qWarning() << "SNOW_OHOS_LIVE_WINDOW_SNAPSHOT_FAILED" << windowId << snapshotResult
++                       << bounds;
++            return false;
++        }
++        auto image = readPixelMap(m_pixelmap.get());
++        if (image.isNull()) {
++            qWarning() << "SNOW_OHOS_LIVE_WINDOW_PIXELMAP_READ_FAILED" << windowId << bounds;
++            return false;
++        }
++        frame->pixels = std::make_shared<OhosWindowFrame>(std::move(image));
++        frame->desktopBounds = bounds;
++        frame->duplicate = false;
++        return true;
++    }
++
++    void cancel() override {
++        m_cancelled.store(true);
++    }
++
++  private:
++    LiveWindowTarget m_target;
++    std::atomic<bool> m_cancelled{false};
++    PixelMap m_pixelmap;
++    QSize m_pixelmapSize;
++};
++
++QVector<ohos_live_window_detail::WindowCandidate> candidatesAtDisplay(uint64_t displayId) {
++    WindowManager_Rect* rawLayout = nullptr;
++    size_t layoutSize = 0;
++    const int32_t result = OH_WindowManager_GetAllWindowLayoutInfoList(
++        static_cast<int64_t>(displayId), &rawLayout, &layoutSize);
++    if (result != 0 || !rawLayout) {
++        qWarning() << "SNOW_OHOS_LIVE_WINDOW_LAYOUT_FAILED" << displayId << result << layoutSize;
++        return {};
++    }
++    std::unique_ptr<WindowManager_Rect, decltype(&OH_WindowManager_ReleaseAllWindowLayoutInfoList)>
++        layout(rawLayout, OH_WindowManager_ReleaseAllWindowLayoutInfoList);
++    MainWindowList windows;
++    if (!windows.valid()) {
++        qWarning() << "SNOW_OHOS_LIVE_WINDOW_ENUMERATION_FAILED" << windows.result()
++                   << windows.size();
++        return {};
++    }
++
++    QVector<ohos_live_window_detail::WindowCandidate> candidates;
++    QVector<int32_t> matchedWindowIds;
++    for (size_t index = 0; index < layoutSize; ++index) {
++        const QRect stackedBounds = rect(layout.get()[index]);
++        if (stackedBounds.isEmpty())
++            continue;
++        for (const auto& window : windows) {
++            if (!window.showing || window.displayId != displayId || window.windowId <= 0 ||
++                matchedWindowIds.contains(window.windowId))
++                continue;
++            WindowManager_WindowProperties properties{};
++            if (OH_WindowManager_GetWindowProperties(window.windowId, &properties) != 0 ||
++                !sameRect(rect(properties.windowRect), stackedBounds))
++                continue;
++            const QString title = window.label ? QString::fromUtf8(window.label) : QString();
++            candidates.append(
++                {static_cast<quintptr>(window.windowId), 0, stackedBounds, title, true});
++            matchedWindowIds.append(window.windowId);
++            break;
++        }
++    }
++    return candidates;
++}
++
++} // namespace
++
++std::optional<LiveWindowTarget> liveWindowTargetAtPoint(const QPoint& point,
++                                                        const QVector<quintptr>& excluded) {
++    MainWindowList windows;
++    if (!windows.valid())
++        return std::nullopt;
++    QVector<uint64_t> visitedDisplays;
++    for (const auto& window : windows) {
++        if (!window.showing || window.windowId <= 0 || visitedDisplays.contains(window.displayId))
++            continue;
++        visitedDisplays.append(window.displayId);
++        auto candidates = candidatesAtDisplay(window.displayId);
++        qInfo() << "SNOW_OHOS_LIVE_WINDOW_CANDIDATES" << window.displayId << candidates.size()
++                << "point" << point;
++        if (auto target = ohos_live_window_detail::targetAtPoint(point, excluded, candidates))
++            return target;
++    }
++    qWarning() << "SNOW_OHOS_LIVE_WINDOW_NO_TARGET" << point << excluded;
++    return std::nullopt;
++}
++
++namespace live_window_detail {
++std::unique_ptr<NativeWindowCapture> createNativeWindowCapture(const LiveWindowTarget& target) {
++    if (!target.nativeId ||
++        target.nativeId > static_cast<quintptr>(std::numeric_limits<int32_t>::max()))
++        return {};
++    return std::make_unique<OhosWindowCapture>(target);
++}
++
++std::unique_ptr<NativeWindowMonitor> createNativeWindowMonitor(const LiveWindowTarget& target) {
++    if (!target.nativeId ||
++        target.nativeId > static_cast<quintptr>(std::numeric_limits<int32_t>::max()))
++        return {};
++    return std::make_unique<OhosWindowMonitor>(target);
++}
++
++std::unique_ptr<NativeWindowPresentation> createNativeWindowPresentation(const LiveWindowTarget&) {
++    return {};
++}
++} // namespace live_window_detail
++} // namespace snow_shot::presentation
+

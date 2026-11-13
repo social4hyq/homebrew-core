@@ -1,0 +1,14 @@
+diff --git a/snow_shot/src/presentation/capture/screenshotcaptureworker.cpp b/snow_shot/src/presentation/capture/screenshotcaptureworker.cpp
+index 3100bde..8632cbd 100644
+--- a/snow_shot/src/presentation/capture/screenshotcaptureworker.cpp
++++ b/snow_shot/src/presentation/capture/screenshotcaptureworker.cpp
+@@ -344,7 +344,8 @@ void ScreenshotCaptureWorker::postCaptureResult(
+          {QStringLiteral("count"), result.displays.size()},
+          {QStringLiteral("outcome"), result.succeeded       ? QStringLiteral("succeeded")
+                                      : coordinator.isNull() ? QStringLiteral("cancelled")
+-                                                            : QStringLiteral("failed")}},
++                                                            : QStringLiteral("failed")},
++         {QStringLiteral("error"), result.errorMessage}},
+         result.succeeded || coordinator.isNull() ? QtInfoMsg : QtWarningMsg);
+     if (coordinator.isNull()) {
+         return;

@@ -1,0 +1,20 @@
+diff --git a/snow_shot/tests/screenshot_clipboard_lifecycle_tests.cpp b/snow_shot/tests/screenshot_clipboard_lifecycle_tests.cpp
+index aaf48ac..e22884a 100644
+--- a/snow_shot/tests/screenshot_clipboard_lifecycle_tests.cpp
++++ b/snow_shot/tests/screenshot_clipboard_lifecycle_tests.cpp
+@@ -234,9 +234,12 @@ void scopedAbandonedAndRejectedCommitsReleaseOwnership() {
+                              [&, resource](ScreenshotClipboardCommitResult) { called = true; });
+     resource.reset();
+     delete receiver;
+-    require(scope.pendingCount() == 0 && handle.isFinished() && input.isNull() &&
+-                lifetime.expired(),
+-            "abandoned receivers must retire all scoped input and callback ownership immediately");
++    require(scope.pendingCount() == 0,
++            "abandoned receivers must leave no pending scoped publication");
++    require(handle.isFinished(), "abandoned receivers must finish their commit handles");
++    require(input.isNull(), "abandoned receivers must release their scoped MIME input immediately");
++    require(lifetime.expired(),
++            "abandoned receivers must release callback ownership immediately");
+     require(!called, "abandoned scoped commits must suppress callbacks");
+ 
+     mime = new QMimeData;

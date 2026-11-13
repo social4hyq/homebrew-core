@@ -1,0 +1,38 @@
+diff --git a/snow-crates/crates/snow-ocr-process/include/snow_ocr_inprocess.h b/snow-crates/crates/snow-ocr-process/include/snow_ocr_inprocess.h
+new file mode 100644
+index 0000000..2ceab2f
+--- /dev/null
++++ b/snow-crates/crates/snow-ocr-process/include/snow_ocr_inprocess.h
+@@ -0,0 +1,31 @@
++#ifndef SNOW_OCR_INPROCESS_H
++#define SNOW_OCR_INPROCESS_H
++
++#include <stddef.h>
++#include <stdint.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++typedef struct SnowOcrHandle SnowOcrHandle;
++
++uint32_t snow_ocr_abi_version(void);
++
++SnowOcrHandle* snow_ocr_create(const char* detector, const char* recognizer,
++                               const char* dictionary, uint32_t thread_budget,
++                               uint8_t resize_policy, uint8_t processing,
++                               char** error_out);
++
++int32_t snow_ocr_recognize(SnowOcrHandle* handle, const uint8_t* pixels, size_t length,
++                           uint32_t width, uint32_t height, char** result_out,
++                           char** error_out);
++
++void snow_ocr_destroy(SnowOcrHandle* handle);
++void snow_ocr_string_free(char* value);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+

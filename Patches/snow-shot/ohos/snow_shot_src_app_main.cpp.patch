@@ -1,0 +1,50 @@
+diff --git a/snow_shot/src/app/main.cpp b/snow_shot/src/app/main.cpp
+index c825c5f..0a9de4d 100644
+--- a/snow_shot/src/app/main.cpp
++++ b/snow_shot/src/app/main.cpp
+@@ -505,7 +505,7 @@ int main(int argc, char* argv[]) {
+ 
+ #ifndef Q_OS_MACOS
+     // macOS updates use a downloaded DMG, not the standalone transaction helper.
+-    if (!snow_shot::app::distribution::isStoreManaged()) {
++    if (snow_shot::app::distribution::usesStandaloneUpdateHelper()) {
+         QString executablePath = QString::fromLocal8Bit(argv[0]);
+ #ifdef Q_OS_WIN
+         wchar_t modulePath[32768]{};
+@@ -579,6 +579,10 @@ int main(int argc, char* argv[]) {
+     diagnosticsOptions.buildConfiguration = QStringLiteral(SNOW_DIAGNOSTICS_BUILD);
+     diagnosticsLifetime.started = true;
+     static_cast<void>(diagnostics.initialize(std::move(diagnosticsOptions)));
++    const auto startupPhase = [](const char* phase) {
++        snow_shot::diagnostics::logEvent(QStringLiteral("snow_shot.app"),
++            QStringLiteral("application.startup.") + QString::fromLatin1(phase));
++    };
+     snow_diagnostics_install_panic_hook(snow_diag_panic);
+     snow_shot::diagnostics::installFfmpegDiagnostics();
+ #ifdef Q_OS_MACOS
+@@ -654,11 +658,15 @@ int main(int argc, char* argv[]) {
+ #endif
+     QApplication::setQuitOnLastWindowClosed(false);
+ #ifndef Q_OS_MACOS
++    startupPhase("icon");
+     QApplication::setWindowIcon(
+         adqt::icons::makeIcon(snow_shot::presentation::icons::custom::app::ApplicationIcon()));
+ #endif
++    startupPhase("locale");
+     adqt::locale::LocaleManager::instance().applyTo(app);
++    startupPhase("language");
+     snow_shot::presentation::LanguageManager::instance().initialize();
++    startupPhase("theme");
+     snow_shot::presentation::styles::ThemeManager::instance().initialize(app);
+ #ifdef Q_OS_WIN
+     auto& applicationStorage = snow_shot::storage::ApplicationStorage::instance();
+@@ -719,7 +727,9 @@ int main(int argc, char* argv[]) {
+ #endif
+     adqt::widgets::AdTooltip::installApplicationTooltips();
+ 
++    startupPhase("controller.construct");
+     snow_shot::app::ApplicationController applicationController(app);
++    startupPhase("controller.start");
+     applicationController.start(launchArguments, [&] {
+         const auto startupSettings = snow_shot::storage::SystemSettings();
+ #ifdef Q_OS_WIN

@@ -1,0 +1,640 @@
+diff --git a/snow_shot/src/platform/ohos/globalshortcutbackend.cpp b/snow_shot/src/platform/ohos/globalshortcutbackend.cpp
+new file mode 100644
+index 0000000..e81ec61
+--- /dev/null
++++ b/snow_shot/src/platform/ohos/globalshortcutbackend.cpp
+@@ -0,0 +1,633 @@
++#include "snow_shot/presentation/globalshortcutmanager.h"
++#include "snow_shot/platform/ohos/userfileexportqueue.h"
++
++#include <QCoreApplication>
++#include <QDebug>
++#include <QKeySequence>
++#include <QMetaObject>
++#include <node_api.h>
++#include <multimodalinput/oh_key_code.h>
++#include <map>
++#include <mutex>
++#include <limits>
++#include <optional>
++#include <vector>
++
++namespace snow_shot::presentation {
++namespace {
++std::mutex callbackMutex;
++std::map<QString, std::pair<int, GlobalShortcutBackend::ActivationHandler>> registeredShortcuts;
++std::map<QString, int> rejectedShortcutErrors;
++GlobalShortcutBackend::AvailabilityChangedHandler availabilityChangedHandler;
++
++bool getStringProperty(napi_env env, napi_value object, const char* property, QString* value) {
++    napi_value item = nullptr;
++    if (napi_get_named_property(env, object, property, &item) != napi_ok)
++        return false;
++    size_t length = 0;
++    if (napi_get_value_string_utf8(env, item, nullptr, 0, &length) != napi_ok)
++        return false;
++    std::vector<char> buffer(length + 1);
++    if (napi_get_value_string_utf8(env, item, buffer.data(), buffer.size(), &length) != napi_ok)
++        return false;
++    *value = QString::fromUtf8(buffer.data(), static_cast<qsizetype>(length));
++    return true;
++}
++
++napi_value takePendingUserFileExports(napi_env env, napi_callback_info) {
++    const auto pending = platform::ohos::sharedUserFileExportQueue().takePending();
++    if (!pending.empty())
++        qInfo() << "SNOW_USER_FILE_EXPORT_DEQUEUE" << pending.size();
++    napi_value array = nullptr;
++    if (napi_create_array_with_length(env, pending.size(), &array) != napi_ok)
++        return nullptr;
++    for (size_t index = 0; index < pending.size(); ++index) {
++        const auto& request = pending[index];
++        const QByteArray source = request.sourcePath.toUtf8();
++        const QByteArray uri = request.uri.toUtf8();
++        napi_value item = nullptr;
++        napi_value id = nullptr;
++        napi_value sourcePath = nullptr;
++        napi_value targetUri = nullptr;
++        if (napi_create_object(env, &item) != napi_ok ||
++            napi_create_double(env, static_cast<double>(request.id), &id) != napi_ok ||
++            napi_create_string_utf8(env, source.constData(), static_cast<size_t>(source.size()),
++                                    &sourcePath) != napi_ok ||
++            napi_create_string_utf8(env, uri.constData(), static_cast<size_t>(uri.size()),
++                                    &targetUri) != napi_ok ||
++            napi_set_named_property(env, item, "id", id) != napi_ok ||
++            napi_set_named_property(env, item, "sourcePath", sourcePath) != napi_ok ||
++            napi_set_named_property(env, item, "uri", targetUri) != napi_ok ||
++            napi_set_element(env, array, index, item) != napi_ok)
++            return nullptr;
++    }
++    return array;
++}
++
++napi_value completeUserFileExport(napi_env env, napi_callback_info info) {
++    size_t argc = 3;
++    napi_value argv[3] = {nullptr, nullptr, nullptr};
++    if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok || argc < 2)
++        return nullptr;
++    double rawId = 0;
++    bool succeeded = false;
++    if (napi_get_value_double(env, argv[0], &rawId) != napi_ok || rawId <= 0 ||
++        rawId > static_cast<double>(std::numeric_limits<quint64>::max()) ||
++        napi_get_value_bool(env, argv[1], &succeeded) != napi_ok)
++        return nullptr;
++    QString error;
++    if (argc >= 3) {
++        size_t length = 0;
++        if (napi_get_value_string_utf8(env, argv[2], nullptr, 0, &length) == napi_ok) {
++            std::vector<char> buffer(length + 1);
++            if (napi_get_value_string_utf8(env, argv[2], buffer.data(), buffer.size(), &length) ==
++                napi_ok)
++                error = QString::fromUtf8(buffer.data(), static_cast<qsizetype>(length));
++        }
++    }
++    const bool completed = platform::ohos::sharedUserFileExportQueue().complete(
++        static_cast<quint64>(rawId), succeeded, std::move(error));
++    napi_value result = nullptr;
++    if (napi_get_boolean(env, completed, &result) != napi_ok)
++        return nullptr;
++    return result;
++}
++
++napi_value takePendingUserFileSavePickers(napi_env env, napi_callback_info) {
++    const auto pending = platform::ohos::sharedUserFileSavePickerQueue().takePending();
++    napi_value array = nullptr;
++    if (napi_create_array_with_length(env, pending.size(), &array) != napi_ok)
++        return nullptr;
++    for (size_t index = 0; index < pending.size(); ++index) {
++        const auto& request = pending[index];
++        const QByteArray name = request.suggestedName.toUtf8();
++        napi_value item = nullptr;
++        napi_value id = nullptr;
++        napi_value nameValue = nullptr;
++        napi_value suffixes = nullptr;
++        if (napi_create_object(env, &item) != napi_ok ||
++            napi_create_double(env, static_cast<double>(request.id), &id) != napi_ok ||
++            napi_create_string_utf8(env, name.constData(), static_cast<size_t>(name.size()),
++                                    &nameValue) != napi_ok ||
++            napi_create_array_with_length(env, request.suffixChoices.size(), &suffixes) != napi_ok)
++            return nullptr;
++        for (qsizetype suffixIndex = 0; suffixIndex < request.suffixChoices.size(); ++suffixIndex) {
++            const QByteArray suffix = request.suffixChoices[suffixIndex].toUtf8();
++            napi_value suffixValue = nullptr;
++            if (napi_create_string_utf8(env, suffix.constData(), static_cast<size_t>(suffix.size()),
++                                        &suffixValue) != napi_ok ||
++                napi_set_element(env, suffixes, static_cast<uint32_t>(suffixIndex), suffixValue) !=
++                    napi_ok)
++                return nullptr;
++        }
++        if (napi_set_named_property(env, item, "id", id) != napi_ok ||
++            napi_set_named_property(env, item, "suggestedName", nameValue) != napi_ok ||
++            napi_set_named_property(env, item, "suffixChoices", suffixes) != napi_ok ||
++            napi_set_element(env, array, index, item) != napi_ok)
++            return nullptr;
++    }
++    return array;
++}
++
++napi_value completeUserFileSavePicker(napi_env env, napi_callback_info info) {
++    size_t argc = 4;
++    napi_value argv[4] = {nullptr, nullptr, nullptr, nullptr};
++    if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok || argc < 3)
++        return nullptr;
++    double rawId = 0;
++    int32_t suffixIndex = -1;
++    QString uri;
++    QString error;
++    if (napi_get_value_double(env, argv[0], &rawId) != napi_ok || rawId <= 0 ||
++        napi_get_value_int32(env, argv[2], &suffixIndex) != napi_ok)
++        return nullptr;
++    size_t uriLength = 0;
++    if (napi_get_value_string_utf8(env, argv[1], nullptr, 0, &uriLength) != napi_ok)
++        return nullptr;
++    std::vector<char> uriBuffer(uriLength + 1);
++    if (napi_get_value_string_utf8(env, argv[1], uriBuffer.data(), uriBuffer.size(), &uriLength) !=
++        napi_ok)
++        return nullptr;
++    uri = QString::fromUtf8(uriBuffer.data(), static_cast<qsizetype>(uriLength));
++    if (argc >= 4) {
++        size_t errorLength = 0;
++        if (napi_get_value_string_utf8(env, argv[3], nullptr, 0, &errorLength) == napi_ok) {
++            std::vector<char> errorBuffer(errorLength + 1);
++            if (napi_get_value_string_utf8(env, argv[3], errorBuffer.data(), errorBuffer.size(),
++                                           &errorLength) == napi_ok)
++                error = QString::fromUtf8(errorBuffer.data(), static_cast<qsizetype>(errorLength));
++        }
++    }
++    const bool completed = platform::ohos::sharedUserFileSavePickerQueue().complete(
++        static_cast<quint64>(rawId), std::move(uri), suffixIndex, std::move(error));
++    napi_value result = nullptr;
++    if (napi_get_boolean(env, completed, &result) != napi_ok)
++        return nullptr;
++    return result;
++}
++
++std::optional<int32_t> nativeKey(Qt::Key key) {
++    if (key >= Qt::Key_A && key <= Qt::Key_Z)
++        return KEYCODE_A + static_cast<int>(key) - static_cast<int>(Qt::Key_A);
++    if (key >= Qt::Key_0 && key <= Qt::Key_9)
++        return KEYCODE_0 + static_cast<int>(key) - static_cast<int>(Qt::Key_0);
++    if (key >= Qt::Key_F1 && key <= Qt::Key_F12)
++        return KEYCODE_F1 + static_cast<int>(key) - static_cast<int>(Qt::Key_F1);
++    switch (key) {
++    case Qt::Key_Space:
++        return KEYCODE_SPACE;
++    case Qt::Key_Return:
++    case Qt::Key_Enter:
++        return KEYCODE_ENTER;
++    case Qt::Key_Escape:
++        return KEYCODE_ESCAPE;
++    case Qt::Key_Tab:
++        return KEYCODE_TAB;
++    case Qt::Key_Backspace:
++        return KEYCODE_DEL;
++    case Qt::Key_Delete:
++        return KEYCODE_FORWARD_DEL;
++    case Qt::Key_Left:
++        return KEYCODE_DPAD_LEFT;
++    case Qt::Key_Right:
++        return KEYCODE_DPAD_RIGHT;
++    case Qt::Key_Up:
++        return KEYCODE_DPAD_UP;
++    case Qt::Key_Down:
++        return KEYCODE_DPAD_DOWN;
++    case Qt::Key_Home:
++        return KEYCODE_MOVE_HOME;
++    case Qt::Key_End:
++        return KEYCODE_MOVE_END;
++    case Qt::Key_PageUp:
++        return KEYCODE_PAGE_UP;
++    case Qt::Key_PageDown:
++        return KEYCODE_PAGE_DOWN;
++    case Qt::Key_Comma:
++        return KEYCODE_COMMA;
++    case Qt::Key_Period:
++        return KEYCODE_PERIOD;
++    case Qt::Key_Minus:
++        return KEYCODE_MINUS;
++    case Qt::Key_Equal:
++        return KEYCODE_EQUALS;
++    case Qt::Key_BracketLeft:
++        return KEYCODE_LEFT_BRACKET;
++    case Qt::Key_BracketRight:
++        return KEYCODE_RIGHT_BRACKET;
++    case Qt::Key_Backslash:
++        return KEYCODE_BACKSLASH;
++    case Qt::Key_Semicolon:
++        return KEYCODE_SEMICOLON;
++    case Qt::Key_Apostrophe:
++        return KEYCODE_APOSTROPHE;
++    case Qt::Key_Slash:
++        return KEYCODE_SLASH;
++    case Qt::Key_QuoteLeft:
++        return KEYCODE_GRAVE;
++    default:
++        return std::nullopt;
++    }
++}
++
++struct NativeBinding {
++    int32_t key;
++    std::vector<int32_t> modifiers;
++};
++std::optional<NativeBinding> parse(const shortcuts::ShortcutBinding& binding) {
++    const QKeySequence sequence(binding.portableText);
++    if (sequence.count() != 1)
++        return std::nullopt;
++    const QKeyCombination combo = sequence[0];
++    const auto key = nativeKey(combo.key());
++    if (!key)
++        return std::nullopt;
++    NativeBinding result{*key, {}};
++    const auto modifiers = combo.keyboardModifiers();
++    if (modifiers.testFlag(Qt::ControlModifier))
++        result.modifiers.push_back(KEYCODE_CTRL_LEFT);
++    if (modifiers.testFlag(Qt::AltModifier))
++        result.modifiers.push_back(KEYCODE_ALT_LEFT);
++    if (modifiers.testFlag(Qt::ShiftModifier))
++        result.modifiers.push_back(KEYCODE_SHIFT_LEFT);
++    if (modifiers.testFlag(Qt::MetaModifier) || result.modifiers.empty() ||
++        result.modifiers.size() > 2)
++        return std::nullopt;
++    return result;
++}
++
++std::optional<NativeBinding> parsePortableTextForArkTs(const QString& portableText) {
++    const auto parts = portableText.split(u'+', Qt::SkipEmptyParts);
++    if (parts.size() < 2 || parts.size() > 3)
++        return std::nullopt;
++
++    Qt::KeyboardModifiers modifiers;
++    for (qsizetype index = 0; index < parts.size() - 1; ++index) {
++        const QString token = parts[index].trimmed().toLower();
++        if (token == QStringLiteral("ctrl") || token == QStringLiteral("control")) {
++            if (modifiers.testFlag(Qt::ControlModifier))
++                return std::nullopt;
++            modifiers |= Qt::ControlModifier;
++        } else if (token == QStringLiteral("alt")) {
++            if (modifiers.testFlag(Qt::AltModifier))
++                return std::nullopt;
++            modifiers |= Qt::AltModifier;
++        } else if (token == QStringLiteral("shift")) {
++            if (modifiers.testFlag(Qt::ShiftModifier))
++                return std::nullopt;
++            modifiers |= Qt::ShiftModifier;
++        } else {
++            return std::nullopt;
++        }
++    }
++
++    const QString token = parts.back().trimmed();
++    Qt::Key key = Qt::Key_unknown;
++    if (token.size() == 1 && token.front().isLetter()) {
++        const QChar upper = token.front().toUpper();
++        if (upper >= u'A' && upper <= u'Z')
++            key = static_cast<Qt::Key>(upper.unicode());
++    } else if (token.size() == 1 && token.front().isDigit()) {
++        key = static_cast<Qt::Key>(token.front().unicode());
++    } else {
++        const QString upper = token.toUpper();
++        if (upper.size() >= 2 && upper.front() == u'F') {
++            bool ok = false;
++            const int number = upper.mid(1).toInt(&ok);
++            if (ok && number >= 1 && number <= 12)
++                key = static_cast<Qt::Key>(static_cast<int>(Qt::Key_F1) + number - 1);
++        }
++        if (key == Qt::Key_unknown) {
++            const QString normalized = token.toLower();
++            if (normalized == QStringLiteral("space"))
++                key = Qt::Key_Space;
++            else if (normalized == QStringLiteral("return"))
++                key = Qt::Key_Return;
++            else if (normalized == QStringLiteral("enter"))
++                key = Qt::Key_Enter;
++            else if (normalized == QStringLiteral("esc") || normalized == QStringLiteral("escape"))
++                key = Qt::Key_Escape;
++            else if (normalized == QStringLiteral("tab"))
++                key = Qt::Key_Tab;
++            else if (normalized == QStringLiteral("backspace"))
++                key = Qt::Key_Backspace;
++            else if (normalized == QStringLiteral("delete") || normalized == QStringLiteral("del"))
++                key = Qt::Key_Delete;
++            else if (normalized == QStringLiteral("left"))
++                key = Qt::Key_Left;
++            else if (normalized == QStringLiteral("right"))
++                key = Qt::Key_Right;
++            else if (normalized == QStringLiteral("up"))
++                key = Qt::Key_Up;
++            else if (normalized == QStringLiteral("down"))
++                key = Qt::Key_Down;
++            else if (normalized == QStringLiteral("home"))
++                key = Qt::Key_Home;
++            else if (normalized == QStringLiteral("end"))
++                key = Qt::Key_End;
++            else if (normalized == QStringLiteral("pgup") || normalized == QStringLiteral("pageup"))
++                key = Qt::Key_PageUp;
++            else if (normalized == QStringLiteral("pgdown") ||
++                     normalized == QStringLiteral("pagedown"))
++                key = Qt::Key_PageDown;
++            else if (normalized == QStringLiteral("comma") || token == QStringLiteral(","))
++                key = Qt::Key_Comma;
++            else if (normalized == QStringLiteral("period") || token == QStringLiteral("."))
++                key = Qt::Key_Period;
++            else if (normalized == QStringLiteral("minus") || token == QStringLiteral("-"))
++                key = Qt::Key_Minus;
++            else if (normalized == QStringLiteral("equal") || token == QStringLiteral("="))
++                key = Qt::Key_Equal;
++            else if (normalized == QStringLiteral("bracketleft") || token == QStringLiteral("["))
++                key = Qt::Key_BracketLeft;
++            else if (normalized == QStringLiteral("bracketright") || token == QStringLiteral("]"))
++                key = Qt::Key_BracketRight;
++            else if (normalized == QStringLiteral("backslash") || token == QStringLiteral("\\"))
++                key = Qt::Key_Backslash;
++            else if (normalized == QStringLiteral("semicolon") || token == QStringLiteral(";"))
++                key = Qt::Key_Semicolon;
++            else if (normalized == QStringLiteral("apostrophe") || token == QStringLiteral("'"))
++                key = Qt::Key_Apostrophe;
++            else if (normalized == QStringLiteral("slash") || token == QStringLiteral("/"))
++                key = Qt::Key_Slash;
++            else if (normalized == QStringLiteral("quoteleft") || token == QStringLiteral("`"))
++                key = Qt::Key_QuoteLeft;
++        }
++    }
++
++    const auto finalKey = nativeKey(key);
++    if (!finalKey)
++        return std::nullopt;
++    NativeBinding result{*finalKey, {}};
++    if (modifiers.testFlag(Qt::ControlModifier))
++        result.modifiers.push_back(KEYCODE_CTRL_LEFT);
++    if (modifiers.testFlag(Qt::AltModifier))
++        result.modifiers.push_back(KEYCODE_ALT_LEFT);
++    if (modifiers.testFlag(Qt::ShiftModifier))
++        result.modifiers.push_back(KEYCODE_SHIFT_LEFT);
++    if (result.modifiers.empty() || result.modifiers.size() > 2)
++        return std::nullopt;
++    return result;
++}
++
++napi_value parseShortcutForArkTs(napi_env env, napi_callback_info info) {
++    size_t argc = 1;
++    napi_value argv[1] = {nullptr};
++    if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok || argc != 1)
++        return nullptr;
++    size_t length = 0;
++    if (napi_get_value_string_utf8(env, argv[0], nullptr, 0, &length) != napi_ok || length == 0)
++        return nullptr;
++    std::vector<char> buffer(length + 1);
++    if (napi_get_value_string_utf8(env, argv[0], buffer.data(), buffer.size(), &length) != napi_ok)
++        return nullptr;
++    const QString portableText = QString::fromUtf8(buffer.data(), static_cast<qsizetype>(length));
++    const auto native = parsePortableTextForArkTs(portableText);
++    if (!native)
++        return nullptr;
++
++    napi_value item = nullptr;
++    napi_value text = nullptr;
++    napi_value preKeys = nullptr;
++    napi_value finalKey = nullptr;
++    napi_create_object(env, &item);
++    const QByteArray utf8 = portableText.toUtf8();
++    napi_create_string_utf8(env, utf8.constData(), static_cast<size_t>(utf8.size()), &text);
++    napi_create_array_with_length(env, native->modifiers.size(), &preKeys);
++    for (size_t index = 0; index < native->modifiers.size(); ++index) {
++        napi_value key = nullptr;
++        napi_create_int32(env, native->modifiers[index], &key);
++        napi_set_element(env, preKeys, index, key);
++    }
++    napi_create_int32(env, native->key, &finalKey);
++    napi_set_named_property(env, item, "portableText", text);
++    napi_set_named_property(env, item, "preKeys", preKeys);
++    napi_set_named_property(env, item, "finalKey", finalKey);
++    return item;
++}
++
++napi_value rejectHotkeyRegistration(napi_env env, napi_callback_info info) {
++    size_t argc = 2;
++    napi_value argv[2] = {nullptr, nullptr};
++    if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok || argc != 2)
++        return nullptr;
++    size_t length = 0;
++    if (napi_get_value_string_utf8(env, argv[0], nullptr, 0, &length) != napi_ok || length == 0)
++        return nullptr;
++    std::vector<char> buffer(length + 1);
++    if (napi_get_value_string_utf8(env, argv[0], buffer.data(), buffer.size(), &length) != napi_ok)
++        return nullptr;
++    int32_t errorCode = 0;
++    if (napi_get_value_int32(env, argv[1], &errorCode) != napi_ok)
++        return nullptr;
++    const QString portableText = QString::fromUtf8(buffer.data(), static_cast<qsizetype>(length));
++    int registrationId = 0;
++    {
++        const std::lock_guard lock(callbackMutex);
++        rejectedShortcutErrors.insert_or_assign(portableText, errorCode);
++        const auto found = registeredShortcuts.find(portableText);
++        if (found != registeredShortcuts.end())
++            registrationId = found->second.first;
++    }
++    auto* app = QCoreApplication::instance();
++    if (registrationId != 0 && app != nullptr) {
++        QMetaObject::invokeMethod(
++            app,
++            [registrationId] {
++                GlobalShortcutBackend::AvailabilityChangedHandler handler;
++                {
++                    const std::lock_guard lock(callbackMutex);
++                    handler = availabilityChangedHandler;
++                }
++                if (handler)
++                    handler({registrationId});
++            },
++            Qt::QueuedConnection);
++    }
++    napi_value undefined = nullptr;
++    napi_get_undefined(env, &undefined);
++    return undefined;
++}
++
++napi_value getRegisteredHotkeys(napi_env env, napi_callback_info) {
++    std::vector<std::pair<QString, NativeBinding>> registrations;
++    {
++        const std::lock_guard lock(callbackMutex);
++        registrations.reserve(registeredShortcuts.size());
++        for (const auto& [text, registration] : registeredShortcuts) {
++            Q_UNUSED(registration);
++            if (const auto native = parse(shortcuts::ShortcutBinding(text)))
++                registrations.emplace_back(text, *native);
++        }
++    }
++    napi_value array = nullptr;
++    if (napi_create_array_with_length(env, registrations.size(), &array) != napi_ok)
++        return nullptr;
++    for (size_t index = 0; index < registrations.size(); ++index) {
++        napi_value item = nullptr;
++        napi_value text = nullptr;
++        napi_value preKeys = nullptr;
++        napi_value finalKey = nullptr;
++        napi_create_object(env, &item);
++        const auto& [portableText, native] = registrations[index];
++        const QByteArray utf8 = portableText.toUtf8();
++        napi_create_string_utf8(env, utf8.constData(), static_cast<size_t>(utf8.size()), &text);
++        napi_create_array_with_length(env, native.modifiers.size(), &preKeys);
++        for (size_t keyIndex = 0; keyIndex < native.modifiers.size(); ++keyIndex) {
++            napi_value key = nullptr;
++            napi_create_int32(env, native.modifiers[keyIndex], &key);
++            napi_set_element(env, preKeys, keyIndex, key);
++        }
++        napi_create_int32(env, native.key, &finalKey);
++        napi_set_named_property(env, item, "portableText", text);
++        napi_set_named_property(env, item, "preKeys", preKeys);
++        napi_set_named_property(env, item, "finalKey", finalKey);
++        napi_set_element(env, array, index, item);
++    }
++    return array;
++}
++
++napi_value activateRegisteredHotkey(napi_env env, napi_callback_info info) {
++    size_t argc = 1;
++    napi_value argv[1] = {nullptr};
++    if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok || argc != 1)
++        return nullptr;
++    size_t length = 0;
++    if (napi_get_value_string_utf8(env, argv[0], nullptr, 0, &length) != napi_ok || length == 0)
++        return nullptr;
++    std::vector<char> buffer(length + 1);
++    if (napi_get_value_string_utf8(env, argv[0], buffer.data(), buffer.size(), &length) != napi_ok)
++        return nullptr;
++    const QString shortcut = QString::fromUtf8(buffer.data(), static_cast<qsizetype>(length));
++    qInfo() << "SNOW_OHOS_HOTKEY_NAPI_RECEIVED" << shortcut;
++    GlobalShortcutBackend::ActivationHandler handler;
++    int id = 0;
++    {
++        const std::lock_guard lock(callbackMutex);
++        const auto it = registeredShortcuts.find(shortcut);
++        if (it != registeredShortcuts.end()) {
++            id = it->second.first;
++            handler = it->second.second;
++        }
++    }
++    auto* app = QCoreApplication::instance();
++    if (app != nullptr && handler) {
++        const bool queued = QMetaObject::invokeMethod(
++            app, [handler = std::move(handler), id] { handler(id); }, Qt::QueuedConnection);
++        qInfo() << "SNOW_OHOS_HOTKEY_DISPATCH" << shortcut << "id" << id << "queued" << queued;
++        if (!queued)
++            qWarning() << "Failed to queue OHOS shortcut activation" << shortcut;
++    } else {
++        qWarning() << "SNOW_OHOS_HOTKEY_UNREGISTERED" << shortcut << "app" << (app != nullptr)
++                   << "handler" << static_cast<bool>(handler);
++    }
++    napi_value undefined = nullptr;
++    napi_get_undefined(env, &undefined);
++    return undefined;
++}
++
++napi_value initializeNativeHotkeys(napi_env env, napi_value exports) {
++    napi_property_descriptor properties[] = {
++        {"getRegisteredHotkeys", nullptr, getRegisteredHotkeys, nullptr, nullptr, nullptr,
++         napi_default, nullptr},
++        {"activateHotkey", nullptr, activateRegisteredHotkey, nullptr, nullptr, nullptr,
++         napi_default, nullptr},
++        {"parseShortcut", nullptr, parseShortcutForArkTs, nullptr, nullptr, nullptr, napi_default,
++         nullptr},
++        {"rejectHotkeyRegistration", nullptr, rejectHotkeyRegistration, nullptr, nullptr, nullptr,
++         napi_default, nullptr},
++        {"takePendingUserFileExports", nullptr, takePendingUserFileExports, nullptr, nullptr,
++         nullptr, napi_default, nullptr},
++        {"completeUserFileExport", nullptr, completeUserFileExport, nullptr, nullptr, nullptr,
++         napi_default, nullptr},
++        {"takePendingUserFileSavePickers", nullptr, takePendingUserFileSavePickers, nullptr,
++         nullptr, nullptr, napi_default, nullptr},
++        {"completeUserFileSavePicker", nullptr, completeUserFileSavePicker, nullptr, nullptr,
++         nullptr, napi_default, nullptr},
++    };
++    napi_define_properties(env, exports, std::size(properties), properties);
++    return exports;
++}
++
++NAPI_MODULE(snow_shot, initializeNativeHotkeys)
++
++GlobalShortcutValidationResult validation(const shortcuts::ShortcutBinding& binding,
++                                          bool supported) {
++    return {binding.portableText, supported,
++            supported ? GlobalShortcutFailureReason::None
++                      : GlobalShortcutFailureReason::InvalidShortcut,
++            binding};
++}
++
++class OhosGlobalShortcutBackend final : public GlobalShortcutBackend {
++  public:
++    void setActivationHandler(ActivationHandler handler) override {
++        handler_ = std::move(handler);
++    }
++    void setAvailabilityChangedHandler(AvailabilityChangedHandler handler) override {
++        const std::lock_guard lock(callbackMutex);
++        availabilityChangedHandler = std::move(handler);
++    }
++    void refreshAvailability() override {
++        AvailabilityChangedHandler handler;
++        {
++            const std::lock_guard lock(callbackMutex);
++            rejectedShortcutErrors.clear();
++            handler = availabilityChangedHandler;
++        }
++        if (handler)
++            handler({});
++    }
++    GlobalShortcutValidationResult
++    validateShortcut(const shortcuts::ShortcutBinding& binding) const override {
++        return validation(binding, parse(binding).has_value());
++    }
++    GlobalShortcutBackendResult
++    registerShortcut(int id, const shortcuts::ShortcutBinding& binding) override {
++        if (!parse(binding))
++            return {false, GlobalShortcutFailureReason::InvalidShortcut, 0};
++        if (shortcutTexts_.contains(id))
++            unregisterShortcut(id);
++        {
++            const std::lock_guard lock(callbackMutex);
++            const auto rejected = rejectedShortcutErrors.find(binding.portableText);
++            if (rejected != rejectedShortcutErrors.end()) {
++                const bool occupied = rejected->second == 4200002 || rejected->second == 4200003;
++                return {false,
++                        occupied ? GlobalShortcutFailureReason::AlreadyInUse
++                                 : GlobalShortcutFailureReason::SystemError,
++                        static_cast<qint64>(rejected->second)};
++            }
++        }
++        shortcutTexts_.insert_or_assign(id, binding.portableText);
++        {
++            const std::lock_guard lock(callbackMutex);
++            registeredShortcuts.insert_or_assign(binding.portableText,
++                                                 std::make_pair(id, handler_));
++        }
++        // OH_Input_AddHotkeyMonitor reports success but does not deliver the
++        // callback on this device. ArkTS InputKit owns the OS subscription;
++        // this backend tracks logical registrations and dispatches NAPI events.
++        return {true, GlobalShortcutFailureReason::None, 0};
++    }
++    void unregisterShortcut(int id) override {
++        const auto text = shortcutTexts_.find(id);
++        if (text != shortcutTexts_.end()) {
++            const std::lock_guard lock(callbackMutex);
++            const auto registered = registeredShortcuts.find(text->second);
++            if (registered != registeredShortcuts.end() && registered->second.first == id)
++                registeredShortcuts.erase(registered);
++            shortcutTexts_.erase(text);
++        }
++    }
++
++  private:
++    ActivationHandler handler_;
++    std::map<int, QString> shortcutTexts_;
++};
++} // namespace
++
++std::unique_ptr<GlobalShortcutBackend> createOhosGlobalShortcutBackend() {
++    return std::make_unique<OhosGlobalShortcutBackend>();
++}
++} // namespace snow_shot::presentation
+

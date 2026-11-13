@@ -1,0 +1,42 @@
+diff --git a/snow_shot/i18n/export/snow_shot_export_en_US.ts b/snow_shot/i18n/export/snow_shot_export_en_US.ts
+index ecb9c0f..e0983ec 100644
+--- a/snow_shot/i18n/export/snow_shot_export_en_US.ts
++++ b/snow_shot/i18n/export/snow_shot_export_en_US.ts
+@@ -258,6 +258,22 @@
+             <source>The output directory could not be created</source>
+             <translation>The output directory could not be created</translation>
+         </message>
++        <message>
++            <source>The primary result was saved, but its text companion could not be written: %1</source>
++            <translation>The primary result was saved, but its text companion could not be written: %1</translation>
++        </message>
++        <message>
++            <source>The primary result was saved, but its text companion picker could not be opened</source>
++            <translation>The primary result was saved, but its text companion picker could not be opened</translation>
++        </message>
++        <message>
++            <source>The primary result was saved, but its text companion was not selected</source>
++            <translation>The primary result was saved, but its text companion was not selected</translation>
++        </message>
++        <message>
++            <source>The primary result was saved, but the text companion export queue is unavailable</source>
++            <translation>The primary result was saved, but the text companion export queue is unavailable</translation>
++        </message>
+         <message>
+             <source>The result file could not be published</source>
+             <translation>The result file could not be published</translation>
+@@ -565,6 +581,14 @@
+             <source>The screenshot pixels could not be read</source>
+             <translation>The screenshot pixels could not be read</translation>
+         </message>
++        <message>
++            <source>The temporary export file is unavailable</source>
++            <translation>The temporary export file is unavailable</translation>
++        </message>
++        <message>
++            <source>The user-file export could not be queued</source>
++            <translation>The user-file export could not be queued</translation>
++        </message>
+         <message>
+             <source>There is not enough temporary disk space for this export</source>
+             <translation>There is not enough temporary disk space for this export</translation>

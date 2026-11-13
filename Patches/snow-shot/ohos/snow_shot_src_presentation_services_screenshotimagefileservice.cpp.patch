@@ -1,0 +1,53 @@
+diff --git a/snow_shot/src/presentation/services/screenshotimagefileservice.cpp b/snow_shot/src/presentation/services/screenshotimagefileservice.cpp
+index 2142aa1..08a0be3 100644
+--- a/snow_shot/src/presentation/services/screenshotimagefileservice.cpp
++++ b/snow_shot/src/presentation/services/screenshotimagefileservice.cpp
+@@ -3,6 +3,9 @@
+ #include "snowimageqtcodec.h"
+ #include "snow_shot/storage/exportfilename.h"
+ #include "snow_shot/storage/timevariables.h"
++#ifdef Q_OS_HARMONY
++#include "snow_shot/platform/ohos/userfileexportqueue.h"
++#endif
+ 
+ #include <QClipboard>
+ #include <QCoreApplication>
+@@ -235,15 +238,17 @@ QString ScreenshotImageFileService::dialogFilter(ScreenshotImageFileFormat forma
+ }
+ 
+ QString ScreenshotImageFileService::saveDialogFilter() {
+-    return QStringList{filterForFormat(ScreenshotImageFileFormat::Png),
+-                       filterForFormat(ScreenshotImageFileFormat::Jpeg),
+-                       filterForFormat(ScreenshotImageFileFormat::Bmp),
+-                       filterForFormat(ScreenshotImageFileFormat::Webp),
+-                       filterForFormat(ScreenshotImageFileFormat::Jxl),
+-                       filterForFormat(ScreenshotImageFileFormat::Avif),
+-                       filterForFormat(ScreenshotImageFileFormat::Tiff),
+-                       filterForFormat(ScreenshotImageFileFormat::Pdf)}
+-        .join(QStringLiteral(";;"));
++    QStringList filters;
++    for (const ScreenshotImageFileFormat format :
++         {ScreenshotImageFileFormat::Png, ScreenshotImageFileFormat::Jpeg,
++          ScreenshotImageFileFormat::Bmp, ScreenshotImageFileFormat::Webp,
++          ScreenshotImageFileFormat::Jxl, ScreenshotImageFileFormat::Avif,
++          ScreenshotImageFileFormat::Tiff}) {
++        if (snow_shot::image_codec::encoderInfo(snowImageFormat(format)))
++            filters.push_back(filterForFormat(format));
++    }
++    filters.push_back(filterForFormat(ScreenshotImageFileFormat::Pdf));
++    return filters.join(QStringLiteral(";;"));
+ }
+ 
+ QStringList ScreenshotImageFileService::automaticDirectories() {
+@@ -349,6 +354,11 @@ QString ScreenshotImageFileService::formatKey(ScreenshotImageFileFormat format)
+ }
+ 
+ QString ScreenshotImageFileService::normalizedPath(QString path, ScreenshotImageFileFormat format) {
++#ifdef Q_OS_HARMONY
++    if (snow_shot::platform::ohos::isDocumentViewPickerUri(path))
++        return snow_shot::platform::ohos::normalizedDocumentViewPickerUri(std::move(path),
++                                                                          extension(format));
++#endif
+     path = QDir::cleanPath(path.trimmed());
+     if (path.isEmpty()) {
+         return {};

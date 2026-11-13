@@ -1,0 +1,28 @@
+diff --git a/snow_shot/src/image/snowimagecodecbackend.cpp b/snow_shot/src/image/snowimagecodecbackend.cpp
+index 0bf7b82..4fbddf8 100644
+--- a/snow_shot/src/image/snowimagecodecbackend.cpp
++++ b/snow_shot/src/image/snowimagecodecbackend.cpp
+@@ -1,3 +1,5 @@
++#include "condition_variable_any2.hpp"
++#include "jthread.hpp"
+ #include "snowimagecodecbridge.h"
+ #include "snowimageimportoptions.h"
+ #include <snow/memory/pixel_buffer.h>
+@@ -18,7 +20,7 @@
+ #include <memory>
+ #include <new>
+ #include <span>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <string>
+ #include <string_view>
+ #include <vector>
+@@ -1616,7 +1618,7 @@ class ExportStop final {
+   private:
+     std::stop_source m_stop;
+     std::mutex m_mutex;
+-    std::condition_variable_any m_condition;
++    std::condition_variable_any2 m_condition;
+     std::jthread m_poll;
+ };
+ 

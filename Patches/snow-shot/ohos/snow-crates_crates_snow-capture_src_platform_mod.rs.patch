@@ -1,0 +1,99 @@
+diff --git a/snow-crates/crates/snow-capture/src/platform/mod.rs b/snow-crates/crates/snow-capture/src/platform/mod.rs
+index 23c1697..f2e5546 100644
+--- a/snow-crates/crates/snow-capture/src/platform/mod.rs
++++ b/snow-crates/crates/snow-capture/src/platform/mod.rs
+@@ -1,30 +1,34 @@
+ use std::sync::Arc;
+ 
+-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
++#[cfg(not(any(target_os = "windows", target_os = "macos", target_env = "ohos")))]
+ use crate::backend::MonitorCapturer;
+ use crate::backend::{AutoBackendPolicy, CaptureBackend, CaptureBackendKind, CaptureMode};
+-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
++#[cfg(not(any(target_os = "windows", target_os = "macos", target_env = "ohos")))]
+ use crate::error::{CaptureError, CaptureResult};
+-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
++#[cfg(not(any(target_os = "windows", target_os = "macos", target_env = "ohos")))]
+ use crate::monitor::MonitorId;
+ use crate::region::MonitorLayout;
+-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
++#[cfg(not(any(target_os = "windows", target_os = "macos", target_env = "ohos")))]
+ use crate::window::WindowId;
+ 
++#[cfg(target_env = "ohos")]
++pub(crate) mod ohos;
++#[cfg(any(target_env = "ohos", test))]
++mod ohos_frame;
+ #[cfg(target_os = "windows")]
+ pub(crate) mod windows;
+ 
+-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
++#[cfg(not(any(target_os = "windows", target_os = "macos", target_env = "ohos")))]
+ fn unsupported_error() -> CaptureError {
+     CaptureError::platform(anyhow::anyhow!(
+         "screen capture is only supported on Windows"
+     ))
+ }
+ 
+-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
++#[cfg(not(any(target_os = "windows", target_os = "macos", target_env = "ohos")))]
+ struct UnsupportedBackend;
+ 
+-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
++#[cfg(not(any(target_os = "windows", target_os = "macos", target_env = "ohos")))]
+ impl CaptureBackend for UnsupportedBackend {
+     fn enumerate_monitors(&self) -> CaptureResult<Vec<MonitorId>> {
+         Err(unsupported_error())
+@@ -93,7 +97,33 @@ pub(crate) fn monitor_layout_from_monitors(
+     windows::monitor::snapshot_layout_from_monitors(monitors)
+ }
+ 
+-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
++#[cfg(target_env = "ohos")]
++pub(crate) fn build_backend(
++    _kind: CaptureBackendKind,
++    _auto_policy: AutoBackendPolicy,
++    _auto_policy_is_explicit: bool,
++) -> crate::error::CaptureResult<Arc<dyn CaptureBackend>> {
++    Ok(Arc::new(ohos::OhosBackend))
++}
++
++#[cfg(target_env = "ohos")]
++pub(crate) fn build_backend_for_mode(
++    kind: CaptureBackendKind,
++    policy: AutoBackendPolicy,
++    explicit: bool,
++    _mode: CaptureMode,
++) -> crate::error::CaptureResult<Arc<dyn CaptureBackend>> {
++    build_backend(kind, policy, explicit)
++}
++
++#[cfg(target_env = "ohos")]
++pub(crate) fn monitor_layout_from_monitors(
++    monitors: Vec<crate::monitor::MonitorId>,
++) -> crate::error::CaptureResult<MonitorLayout> {
++    ohos::layout(Some(&monitors))
++}
++
++#[cfg(not(any(target_os = "windows", target_os = "macos", target_env = "ohos")))]
+ pub(crate) fn build_backend(
+     _kind: CaptureBackendKind,
+     _auto_policy: AutoBackendPolicy,
+@@ -107,7 +137,7 @@ pub(crate) fn build_backend(
+     )
+ }
+ 
+-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
++#[cfg(not(any(target_os = "windows", target_os = "macos", target_env = "ohos")))]
+ pub(crate) fn build_backend_for_mode(
+     _kind: CaptureBackendKind,
+     _auto_policy: AutoBackendPolicy,
+@@ -117,7 +147,7 @@ pub(crate) fn build_backend_for_mode(
+     Ok(Arc::new(UnsupportedBackend))
+ }
+ 
+-#[cfg(not(any(target_os = "windows", target_os = "macos")))]
++#[cfg(not(any(target_os = "windows", target_os = "macos", target_env = "ohos")))]
+ pub(crate) fn monitor_layout_from_monitors(
+     _monitors: Vec<crate::monitor::MonitorId>,
+ ) -> crate::error::CaptureResult<MonitorLayout> {

@@ -1,0 +1,20 @@
+diff --git a/snow_shot/src/presentation/services/systemtraycontroller.cpp b/snow_shot/src/presentation/services/systemtraycontroller.cpp
+index 0fb3c4f..8eeda7d 100644
+--- a/snow_shot/src/presentation/services/systemtraycontroller.cpp
++++ b/snow_shot/src/presentation/services/systemtraycontroller.cpp
+@@ -991,8 +991,13 @@ void SystemTrayController::showRecordingExportMessage(const QString& path) {
+     if (path.isEmpty())
+         return;
+     const QString absolutePath = QFileInfo(path).absoluteFilePath();
+-    m_impl->showBalloon(tr("Video export completed"), QDir::toNativeSeparators(absolutePath),
+-                        QSystemTrayIcon::Information, BalloonKind::RecordingExport, absolutePath);
++#ifdef Q_OS_HARMONY
++    const QString message = tr("Choose a destination in Files to save the recording.");
++#else
++    const QString message = QDir::toNativeSeparators(absolutePath);
++#endif
++    m_impl->showBalloon(tr("Video export completed"), message, QSystemTrayIcon::Information,
++                        BalloonKind::RecordingExport, absolutePath);
+ }
+ 
+ void SystemTrayController::setEnabled(bool enabled) {

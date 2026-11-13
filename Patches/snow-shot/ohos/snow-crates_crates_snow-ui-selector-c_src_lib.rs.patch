@@ -1,0 +1,94 @@
+diff --git a/snow-crates/crates/snow-ui-selector-c/src/lib.rs b/snow-crates/crates/snow-ui-selector-c/src/lib.rs
+index 6dcf7c8..40ad8ca 100644
+--- a/snow-crates/crates/snow-ui-selector-c/src/lib.rs
++++ b/snow-crates/crates/snow-ui-selector-c/src/lib.rs
+@@ -1,8 +1,10 @@
+ //! Asynchronous selector boundary. Each worker owns all of its native state.
+ use snow_ui_selector::{
+-    AccessibilityBackend, ElementRegionService, HitTestMode, Point, QueryControl, QueryResult,
++    AccessibilityBackend, HitTestMode, Point, QueryControl, QueryResult,
+     SelectorResult, StopReason, WindowSnapshot,
+ };
++#[cfg(any(windows, target_os = "macos"))]
++use snow_ui_selector::ElementRegionService;
+ use std::collections::VecDeque;
+ use std::ffi::c_void;
+ use std::sync::{
+@@ -13,6 +15,77 @@ use std::sync::{
+ use std::thread;
+ use std::time::Instant;
+ 
++#[cfg(not(any(windows, target_os = "macos")))]
++struct ElementRegionService;
++
++#[cfg(not(any(windows, target_os = "macos")))]
++impl ElementRegionService {
++    fn unavailable<T>() -> SelectorResult<T> {
++        Err(std::io::Error::new(
++            std::io::ErrorKind::Unsupported,
++            "native window and accessibility selection is unavailable on this platform",
++        ).into())
++    }
++    fn with_backend_and_displays(
++        _backend: AccessibilityBackend,
++        _excluded: &[usize],
++        _displays: Option<&[snow_ui_selector::DisplayGeometry]>,
++    ) -> SelectorResult<Self> {
++        Self::unavailable()
++    }
++    fn with_backend_excluding_ids(
++        _backend: AccessibilityBackend,
++        _excluded: &[usize],
++    ) -> SelectorResult<Self> {
++        Self::unavailable()
++    }
++    fn refresh_with_displays(
++        &mut self,
++        _excluded: &[usize],
++        _displays: Option<&[snow_ui_selector::DisplayGeometry]>,
++    ) -> SelectorResult<()> {
++        Self::unavailable()
++    }
++    fn refresh_excluding_ids(&mut self, _excluded: &[usize]) -> SelectorResult<()> {
++        Self::unavailable()
++    }
++    fn backend(&self) -> AccessibilityBackend {
++        AccessibilityBackend::Accessibility
++    }
++    fn window_snapshot(&self) -> Option<WindowSnapshot> {
++        None
++    }
++    fn from_snapshot(_snapshot: &WindowSnapshot) -> SelectorResult<Self> {
++        Self::unavailable()
++    }
++    fn release_cache(&mut self) {}
++    fn query(
++        &mut self,
++        _point: Point,
++        _mode: HitTestMode,
++        _control: &QueryControl<'_>,
++        _progress: &mut dyn FnMut(&[snow_ui_selector::ElementRect]),
++    ) -> SelectorResult<QueryResult> {
++        Ok(empty(StopReason::ProviderFailure))
++    }
++}
++
++#[cfg(all(test, not(any(windows, target_os = "macos"))))]
++mod unsupported_provider_tests {
++    use super::*;
++
++    #[test]
++    fn unsupported_provider_never_reports_success() {
++        assert!(ElementRegionService::with_backend_and_displays(
++            AccessibilityBackend::Accessibility, &[], None,
++        ).is_err());
++        assert!(ElementRegionService::with_backend_excluding_ids(
++            AccessibilityBackend::Accessibility, &[],
++        ).is_err());
++        assert!(ElementRegionService::from_snapshot(&WindowSnapshot::default()).is_err());
++    }
++}
++
+ #[repr(C)]
+ #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+ pub enum SnowUiSelectorBackend {

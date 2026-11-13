@@ -1,0 +1,13 @@
+diff --git a/snow_image/include/snow/image/raster.h b/snow_image/include/snow/image/raster.h
+index deaa409..7be7edd 100644
+--- a/snow_image/include/snow/image/raster.h
++++ b/snow_image/include/snow/image/raster.h
+@@ -11,7 +11,7 @@
+ #include <memory>
+ #include <optional>
+ #include <span>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <vector>
+ 
+ namespace snow::image {

@@ -1,0 +1,50 @@
+diff --git a/snow_shot/tests/capture_history_repository_tests.cpp b/snow_shot/tests/capture_history_repository_tests.cpp
+index bbb30c5..e502239 100644
+--- a/snow_shot/tests/capture_history_repository_tests.cpp
++++ b/snow_shot/tests/capture_history_repository_tests.cpp
+@@ -23,6 +23,7 @@
+ #include <limits>
+ #include <mutex>
+ #include <thread>
++#include <utility>
+ 
+ namespace storage = snow_shot::storage;
+ 
+@@ -970,7 +971,7 @@ void openPayloadDoesNotPreventHistoryPublication() {
+     repository.reset();
+     auto reopened = storage::makeCaptureHistoryRepository(temporary.path());
+     const auto image = reopened->loadResultImage(result.record);
+-    require(reopened->records() == QVector{result.record} && image &&
++    require(reopened->records() == QVector<storage::CaptureHistoryRecord>{result.record} && image &&
+                 equalPixels(*image, *draft.resultImage),
+             "history published with an open reader was not recoverable");
+ }
+@@ -989,7 +990,8 @@ void failedCommitPreservesPublishedHistory() {
+     const auto revision = repository->recordsSnapshot().revision;
+     const auto draft = draftAt(QDateTime::currentDateTimeUtc());
+     const auto failed = repository->publish(draft).get();
+-    require(!failed.storage.success && repository->records() == QVector{first.record} &&
++    require(!failed.storage.success &&
++                repository->records() == QVector<storage::CaptureHistoryRecord>{first.record} &&
+                 repository->load(first.record).has_value(),
+             "failed commit evicted acknowledged history");
+     require(failed.storage.error.contains(QStringLiteral("index.json")) &&
+@@ -1001,7 +1003,7 @@ void failedCommitPreservesPublishedHistory() {
+     require(QDir().rmdir(index) && QFile::rename(saved, index), "failed to restore index");
+     repository.reset();
+     auto reopened = storage::makeCaptureHistoryRepository(temporary.path());
+-    require(reopened->records() == QVector{first.record},
++    require(reopened->records() == QVector<storage::CaptureHistoryRecord>{first.record},
+             "failed publication appeared after restart");
+ }
+ 
+@@ -1236,6 +1238,9 @@ void idleWorkersRetireAndRestartWithoutLosingHistory() {
+     };
+     struct ExitNotice {
+         std::shared_ptr<Lifecycle> lifecycle;
++
++        explicit ExitNotice(std::shared_ptr<Lifecycle> value) : lifecycle(std::move(value)) {}
++
+         ~ExitNotice() {
+             {
+                 const std::lock_guard lock(lifecycle->mutex);

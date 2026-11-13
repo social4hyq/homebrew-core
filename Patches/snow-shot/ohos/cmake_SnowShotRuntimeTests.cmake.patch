@@ -1,0 +1,16 @@
+diff --git a/cmake/SnowShotRuntimeTests.cmake b/cmake/SnowShotRuntimeTests.cmake
+index d585cd7..d238d85 100644
+--- a/cmake/SnowShotRuntimeTests.cmake
++++ b/cmake/SnowShotRuntimeTests.cmake
+@@ -128,6 +128,11 @@ function(snow_shot_add_ocr_runtime_tests)
+     set_tests_properties(snow-shot-ocr-process-lifecycle-tests PROPERTIES TIMEOUT 30
+         ENVIRONMENT_MODIFICATION "PATH=path_list_prepend:$<TARGET_FILE_DIR:Qt6::Core>")
+     add_dependencies(snow-shot-ocr-recognition-service-tests snow_ocr_process)
++    if(TARGET snow_ocr_inprocess_cdylib)
++        target_link_libraries(snow-shot-ocr-recognition-service-tests PRIVATE
++            snow_ocr_inprocess_cdylib)
++        add_dependencies(snow-shot-ocr-recognition-service-tests snow_ocr_inprocess_build)
++    endif()
+     if(NOT SNOW_SHOT_BUILD_TESTS)
+         snow_add_qt_test_cli_guard()
+         foreach(_runtime_test IN ITEMS snow-shot-ocr-recognition-service-tests

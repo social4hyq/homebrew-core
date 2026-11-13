@@ -1,0 +1,154 @@
+diff --git a/snow_shot/src/presentation/services/screenshotmanualsave.cpp b/snow_shot/src/presentation/services/screenshotmanualsave.cpp
+index 64216f8..0fe196a 100644
+--- a/snow_shot/src/presentation/services/screenshotmanualsave.cpp
++++ b/snow_shot/src/presentation/services/screenshotmanualsave.cpp
+@@ -4,15 +4,34 @@
+ #include "snow_shot/presentation/screenshotencodingsettings.h"
+ #include "snow_shot/presentation/screenshotexportartifact.h"
+ #include "snow_shot/runtime/runtimeactivitytracker.h"
++#ifdef Q_OS_HARMONY
++#include "snow_shot/platform/ohos/userfileexportqueue.h"
++#endif
+ 
+ #include <QCoreApplication>
++#include <QDebug>
+ #include <QEvent>
+ #include <QFileDialog>
++#include <QFile>
+ #include <QFileInfo>
++#include <QDir>
++#include <QStandardPaths>
+ #include <QThread>
++#include <QUuid>
+ #include <utility>
+ 
+ namespace {
++#ifdef Q_OS_HARMONY
++QString stagedUserFilePath() {
++    const QString cacheDirectory = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
++    if (cacheDirectory.isEmpty() || !QDir().mkpath(cacheDirectory))
++        return {};
++    return QDir(cacheDirectory)
++        .filePath(QStringLiteral("snow-shot-export-%1.tmp")
++                      .arg(QUuid::createUuid().toString(QUuid::Id128)));
++}
++#endif
++
+ class NativeSaveSession final : public QObject {
+   public:
+     NativeSaveSession(QObject* lifetime, QWidget* owner,
+@@ -55,6 +74,14 @@ class NativeSaveSession final : public QObject {
+         m_finished = true;
+         if (cancelSource && m_source)
+             m_source->cancel();
++#ifdef Q_OS_HARMONY
++        if (m_pendingUserFileExportId != 0) {
++            const quint64 id = std::exchange(m_pendingUserFileExportId, 0);
++            static_cast<void>(snow_shot::platform::ohos::sharedUserFileExportQueue().cancel(id));
++        }
++        if (!m_stagingPath.isEmpty())
++            static_cast<void>(QFile::remove(m_stagingPath));
++#endif
+         if (m_dialog) {
+             disconnect(m_dialog, nullptr, this, nullptr);
+             m_dialog->reject();
+@@ -102,16 +129,71 @@ class NativeSaveSession final : public QObject {
+         const auto destination =
+             screenshotManualSaveDestination(paths.first(), m_dialog->selectedNameFilter());
+         m_writing = true;
++        bool pickerUri = false;
++        QString outputPath = destination.path;
++#ifdef Q_OS_HARMONY
++        pickerUri = snow_shot::platform::ohos::isDocumentViewPickerUri(destination.path);
++        qInfo() << "SNOW_MANUAL_SAVE_PICKER_URI" << pickerUri;
++        outputPath = pickerUri ? stagedUserFilePath() : destination.path;
++        if (outputPath.isEmpty()) {
++            finish(ScreenshotExportTaskResult::failure(
++                ScreenshotExportFailureStage::File,
++                QCoreApplication::translate("ScreenshotSaveAsFileDialog",
++                                            "The temporary export file is unavailable")));
++            return;
++        }
++        if (pickerUri)
++            m_stagingPath = outputPath;
++#endif
+         const QPointer<NativeSaveSession> guard(this);
+         if (m_saving)
+             m_saving();
+         if (!guard || m_finished)
+             return;
+         if (!m_source->requestSaveToPath(
+-                this, destination.path, destination.format, m_encoding,
+-                [this](ScreenshotExportTaskResult result) {
++                this, outputPath, destination.format, m_encoding,
++                [this, guard, pickerUri,
++                 targetUri = destination.path](ScreenshotExportTaskResult result) {
+                     if (m_finished)
+                         return;
++#ifdef Q_OS_HARMONY
++                    if (result.succeeded() && pickerUri) {
++                        qInfo() << "SNOW_MANUAL_SAVE_STAGED" << !result.savedPath.isEmpty();
++                        const quint64 id =
++                            snow_shot::platform::ohos::sharedUserFileExportQueue().enqueue(
++                                result.savedPath, targetUri,
++                                [guard](bool succeeded, QString error) mutable {
++                                    if (!guard)
++                                        return;
++                                    QMetaObject::invokeMethod(
++                                        guard,
++                                        [guard, succeeded, error = std::move(error)]() mutable {
++                                            if (!guard || guard->m_finished)
++                                                return;
++                                            guard->m_pendingUserFileExportId = 0;
++                                            guard->finish(
++                                                succeeded ? ScreenshotExportTaskResult{}
++                                                          : ScreenshotExportTaskResult::failure(
++                                                                ScreenshotExportFailureStage::File,
++                                                                std::move(error)));
++                                        },
++                                        Qt::QueuedConnection);
++                                });
++                        if (id == 0) {
++                            finish(ScreenshotExportTaskResult::failure(
++                                ScreenshotExportFailureStage::Queue,
++                                QCoreApplication::translate(
++                                    "ScreenshotSaveAsFileDialog",
++                                    "The user-file export could not be queued")));
++                            return;
++                        }
++                        m_pendingUserFileExportId = id;
++                        return;
++                    }
++#else
++                    Q_UNUSED(pickerUri)
++                    Q_UNUSED(targetUri)
++#endif
+                     if (result.succeeded())
+                         static_cast<void>(
+                             snow_shot::storage::ScreenshotSettings().setLastManualSaveDirectory(
+@@ -130,6 +212,14 @@ class NativeSaveSession final : public QObject {
+         if (m_finished)
+             return;
+         m_finished = true;
++#ifdef Q_OS_HARMONY
++        if (m_pendingUserFileExportId != 0) {
++            const quint64 id = std::exchange(m_pendingUserFileExportId, 0);
++            static_cast<void>(snow_shot::platform::ohos::sharedUserFileExportQueue().cancel(id));
++        }
++        if (!m_stagingPath.isEmpty())
++            static_cast<void>(QFile::remove(m_stagingPath));
++#endif
+         const auto source = std::move(m_source);
+         Q_UNUSED(source);
+         auto completion = std::move(m_completion);
+@@ -156,6 +246,10 @@ class NativeSaveSession final : public QObject {
+     bool m_writing = false;
+     bool m_finished = false;
+     bool m_cancelling = false;
++#ifdef Q_OS_HARMONY
++    QString m_stagingPath;
++    quint64 m_pendingUserFileExportId = 0;
++#endif
+ };
+ } // namespace
+ 

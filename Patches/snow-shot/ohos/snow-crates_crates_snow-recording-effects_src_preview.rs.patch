@@ -1,0 +1,40 @@
+diff --git a/snow-crates/crates/snow-recording-effects/src/preview.rs b/snow-crates/crates/snow-recording-effects/src/preview.rs
+index 4c02605..69285ee 100644
+--- a/snow-crates/crates/snow-recording-effects/src/preview.rs
++++ b/snow-crates/crates/snow-recording-effects/src/preview.rs
+@@ -391,6 +391,7 @@ fn initialize(config: &PreviewConfig) -> Result<(Input, EffectsPreview), String>
+     let rasterizer = config
+         .keyboard
+         .as_ref()
++        .filter(|_| config.show_keyboard)
+         .map(crate::keyboard_rasterizer::create)
+         .transpose()?;
+     let keyboard = config
+@@ -822,6 +823,27 @@ mod tests {
+         }
+     }
+ 
++    #[test]
++    fn disabled_keyboard_preview_does_not_require_platform_rasterizer() {
++        let mut cfg = config();
++        cfg.show_keyboard = false;
++        cfg.trail = [0; 4];
++        cfg.click = [0; 4];
++        cfg.highlight = [0; 4];
++        cfg.keyboard = Some(crate::keyboard_overlay::KeyboardOverlayConfig {
++            font: None,
++            keycap_size: 64,
++            background_rgba: [0; 4],
++            text_rgba: [255; 4],
++            border_rgba: [0; 4],
++            labels: Default::default(),
++        });
++
++        let (input, _) =
++            initialize(&cfg).expect("a disabled keyboard preview must not initialize its renderer");
++        assert!(input.keyboard.is_none());
++    }
++
+     #[test]
+     fn scrolling_preview_matches_replay_and_unchanged_bursts_do_not_publish() {
+         use crate::recorded::RecordedEffects;

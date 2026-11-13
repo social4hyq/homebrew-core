@@ -1,0 +1,23 @@
+diff --git a/snow_shot/tests/global_mouse_tests.cpp b/snow_shot/tests/global_mouse_tests.cpp
+index b9d06e8..65be340 100644
+--- a/snow_shot/tests/global_mouse_tests.cpp
++++ b/snow_shot/tests/global_mouse_tests.cpp
+@@ -773,6 +773,18 @@ void managerPermissionCallbacksAreRestartSafe() {
+ 
+ int main(int argc, char** argv) {
+     QApplication app(argc, argv);
++#ifdef Q_OS_HARMONY
++    {
++        auto backend = createGlobalMouseBackend();
++        bool reportedFailure = false;
++        backend->start({}, [&reportedFailure](quint32) { reportedFailure = true; });
++        require(
++            backend->permissionState().status == GlobalMousePermissionState::Status::Unavailable &&
++                !reportedFailure,
++            "unsupported platform input must report unavailable state, not a spurious error code");
++        backend->stop();
++    }
++#endif
+     if (app.arguments().contains(QStringLiteral("--native-hook-smoke"))) {
+ #ifdef Q_OS_WIN
+         require(QGuiApplication::platformName() == QStringLiteral("windows"),
