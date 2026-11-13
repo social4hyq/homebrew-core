@@ -4,7 +4,7 @@ class SnowShot < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.2_snow-shot.tar.gz"
   sha256 "29190412a6dc9b41c0097fbf1313dc0f84412c9d23e1716260ed13acdcbd6c4e"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 2
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.2-r3"
@@ -34,12 +34,12 @@ class SnowShot < Formula
   depends_on "ninja" => :build
   depends_on "node" => :build
   depends_on "ohos-sdk" => :build
-  depends_on "openexr" => :build
   depends_on "openssl@4" => :build
   depends_on "pkgconf" => :build
   depends_on "plutovg" => :build
   depends_on "rust" => :build
   depends_on "snow-shot-opencv" => :build
+  depends_on "social4hyq/core/openexr" => :build
   depends_on "tinyxml2" => :build
   depends_on "webp" => :build
   depends_on "zlib-ng-compat" => :build
