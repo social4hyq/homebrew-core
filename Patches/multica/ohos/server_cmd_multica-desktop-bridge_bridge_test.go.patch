@@ -1,0 +1,366 @@
+OHOS: tests for the desktop bridge.
+
+diff --git a/server/cmd/multica-desktop-bridge/bridge_test.go b/server/cmd/multica-desktop-bridge/bridge_test.go
+new file mode 100644
+index 0000000..8e73a2a
+--- /dev/null
++++ b/server/cmd/multica-desktop-bridge/bridge_test.go
+@@ -0,0 +1,358 @@
++package main
++
++import (
++	"encoding/json"
++	"io"
++	"net"
++	"net/http"
++	"net/http/httptest"
++	"os"
++	"path/filepath"
++	"strings"
++	"testing"
++	"time"
++)
++
++const testSecret = "s3cret-token"
++
++// fakeCLI writes an executable that echoes its argv and exits with $FAKE_EXIT.
++func fakeCLI(t *testing.T, dir string) string {
++	t.Helper()
++	p := filepath.Join(dir, "fake-multica")
++	script := "#!/bin/sh\necho \"args:$*\"\necho err-line >&2\nexit ${FAKE_EXIT:-0}\n"
++	if err := os.WriteFile(p, []byte(script), 0o755); err != nil {
++		t.Fatal(err)
++	}
++	return p
++}
++
++func newServer(t *testing.T) (*httptest.Server, string) {
++	t.Helper()
++	home := t.TempDir()
++	cfg := Config{Secret: testSecret, MulticaHome: home, CLIPath: fakeCLI(t, t.TempDir()), Version: "9.9.9"}
++	srv := httptest.NewServer(NewHandler(cfg))
++	t.Cleanup(srv.Close)
++	return srv, home
++}
++
++func do(t *testing.T, method, url, body string, auth bool) (*http.Response, string) {
++	t.Helper()
++	req, err := http.NewRequest(method, url, strings.NewReader(body))
++	if err != nil {
++		t.Fatal(err)
++	}
++	if auth {
++		req.Header.Set("Authorization", "Bearer "+testSecret)
++	}
++	resp, err := http.DefaultClient.Do(req)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer resp.Body.Close()
++	b, _ := io.ReadAll(resp.Body)
++	return resp, string(b)
++}
++
++func TestHealthNeedsNoAuth(t *testing.T) {
++	srv, _ := newServer(t)
++	resp, body := do(t, "GET", srv.URL+"/health", "", false)
++	if resp.StatusCode != 200 || !strings.Contains(body, `"ok":true`) || !strings.Contains(body, "9.9.9") {
++		t.Fatalf("health = %d %s", resp.StatusCode, body)
++	}
++}
++
++func TestAuthRequired(t *testing.T) {
++	srv, _ := newServer(t)
++	for _, c := range [][2]string{
++		{"POST", "/exec"},
++		{"GET", "/profile/p1/config.json"},
++		{"PUT", "/profile/p1/config.json"},
++		{"DELETE", "/profile/p1/.desktop-user-id"},
++	} {
++		resp, _ := do(t, c[0], srv.URL+c[1], `{"args":["version","--output","json"]}`, false)
++		if resp.StatusCode != 401 {
++			t.Errorf("%s %s without auth = %d, want 401", c[0], c[1], resp.StatusCode)
++		}
++	}
++	req, _ := http.NewRequest("GET", srv.URL+"/profile/p1/config.json", nil)
++	req.Header.Set("Authorization", "Bearer wrong")
++	resp, _ := http.DefaultClient.Do(req)
++	if resp.StatusCode != 401 {
++		t.Errorf("wrong secret = %d, want 401", resp.StatusCode)
++	}
++}
++
++func execReq(t *testing.T, srv *httptest.Server, args []string) (*http.Response, map[string]any) {
++	t.Helper()
++	payload, _ := json.Marshal(map[string]any{"args": args})
++	resp, body := do(t, "POST", srv.URL+"/exec", string(payload), true)
++	out := map[string]any{}
++	_ = json.Unmarshal([]byte(body), &out)
++	return resp, out
++}
++
++func TestExecAllowedCommands(t *testing.T) {
++	srv, _ := newServer(t)
++	cases := [][]string{
++		{"version", "--output", "json"},
++		{"daemon", "start", "--profile", "desktop-api.multica.ai"},
++		{"daemon", "stop", "--profile", "desktop-api.multica.ai"},
++		{"daemon", "stop", "--force", "--profile", "desktop-api.multica.ai"},
++		{"daemon", "probe-runtimes", "--profile", "desktop-api.multica.ai"},
++	}
++	for _, args := range cases {
++		resp, out := execReq(t, srv, args)
++		if resp.StatusCode != 200 {
++			t.Errorf("%v status %d", args, resp.StatusCode)
++			continue
++		}
++		if out["code"].(float64) != 0 {
++			t.Errorf("%v code %v", args, out["code"])
++		}
++		if !strings.Contains(out["stdout"].(string), "args:"+strings.Join(args, " ")) {
++			t.Errorf("%v stdout %q", args, out["stdout"])
++		}
++		if !strings.Contains(out["stderr"].(string), "err-line") {
++			t.Errorf("%v stderr %q", args, out["stderr"])
++		}
++	}
++}
++
++func TestExecRejectsOtherCommands(t *testing.T) {
++	srv, _ := newServer(t)
++	cases := [][]string{
++		{},
++		{"login"},
++		{"daemon", "start"},
++		{"daemon", "start", "--profile"},
++		{"daemon", "start", "--profile", "../evil"},
++		{"daemon", "start", "--profile", "a/b"},
++		{"daemon", "start", "--profile", "p", "--extra"},
++		{"daemon", "restart", "--profile", "p"},
++		{"daemon", "stop", "--force", "--force", "--profile", "p"},
++		{"agent", "list"},
++		{"version"},
++		{"-c", "id"},
++	}
++	for _, args := range cases {
++		resp, _ := execReq(t, srv, args)
++		if resp.StatusCode != 400 {
++			t.Errorf("%v status %d, want 400", args, resp.StatusCode)
++		}
++	}
++}
++
++func TestExecPropagatesExitCode(t *testing.T) {
++	home := t.TempDir()
++	dir := t.TempDir()
++	p := filepath.Join(dir, "failcli")
++	if err := os.WriteFile(p, []byte("#!/bin/sh\necho boom >&2\nexit 3\n"), 0o755); err != nil {
++		t.Fatal(err)
++	}
++	srv := httptest.NewServer(NewHandler(Config{Secret: testSecret, MulticaHome: home, CLIPath: p, Version: "x"}))
++	defer srv.Close()
++	resp, out := execReq(t, srv, []string{"daemon", "start", "--profile", "p"})
++	if resp.StatusCode != 200 || out["code"].(float64) != 3 || !strings.Contains(out["stderr"].(string), "boom") {
++		t.Fatalf("got %d %v", resp.StatusCode, out)
++	}
++}
++
++func TestProfileFileRoundTrip(t *testing.T) {
++	srv, home := newServer(t)
++	url := srv.URL + "/profile/desktop-api.multica.ai/config.json"
++
++	if resp, _ := do(t, "GET", url, "", true); resp.StatusCode != 404 {
++		t.Fatalf("missing file = %d, want 404", resp.StatusCode)
++	}
++	if resp, _ := do(t, "PUT", url, `{"token":"mul_x"}`, true); resp.StatusCode != 204 {
++		t.Fatalf("PUT = %d", resp.StatusCode)
++	}
++	onDisk := filepath.Join(home, "profiles", "desktop-api.multica.ai", "config.json")
++	b, err := os.ReadFile(onDisk)
++	if err != nil || string(b) != `{"token":"mul_x"}` {
++		t.Fatalf("disk %q %v", b, err)
++	}
++	fi, _ := os.Stat(onDisk)
++	if fi.Mode().Perm() != 0o600 {
++		t.Errorf("mode %v, want 0600", fi.Mode().Perm())
++	}
++	if resp, body := do(t, "GET", url, "", true); resp.StatusCode != 200 || body != `{"token":"mul_x"}` {
++		t.Fatalf("GET = %d %q", resp.StatusCode, body)
++	}
++	if resp, _ := do(t, "DELETE", srv.URL+"/profile/desktop-api.multica.ai/.desktop-user-id", "", true); resp.StatusCode != 204 {
++		t.Fatalf("DELETE of missing file should be 204, got %d", resp.StatusCode)
++	}
++}
++
++func TestProfileRejectsBadNamesAndFiles(t *testing.T) {
++	srv, home := newServer(t)
++	bad := []string{
++		"/profile/../config.json",
++		"/profile/..%2Fx/config.json",
++		"/profile/.hidden/config.json",
++		"/profile/a%2Fb/config.json",
++		"/profile/p1/other.json",
++		"/profile/p1/..%2Fconfig.json",
++		"/profile/p1/config.json/extra",
++		"/profile//config.json",
++	}
++	for _, path := range bad {
++		resp, _ := do(t, "PUT", srv.URL+path, "x", true)
++		if resp.StatusCode != 400 && resp.StatusCode != 404 {
++			t.Errorf("PUT %s = %d, want 400/404", path, resp.StatusCode)
++		}
++	}
++	entries, _ := os.ReadDir(home)
++	if len(entries) != 0 {
++		t.Errorf("rejected requests created files in home: %v", entries)
++	}
++}
++
++func TestDaemonLogReadOnlyWithOffset(t *testing.T) {
++	srv, home := newServer(t)
++	dir := filepath.Join(home, "profiles", "p1")
++	if err := os.MkdirAll(dir, 0o700); err != nil {
++		t.Fatal(err)
++	}
++	if err := os.WriteFile(filepath.Join(dir, "daemon.log"), []byte("0123456789"), 0o600); err != nil {
++		t.Fatal(err)
++	}
++	url := srv.URL + "/profile/p1/daemon.log"
++	if resp, _ := do(t, "PUT", url, "x", true); resp.StatusCode != 405 {
++		t.Errorf("PUT log = %d, want 405", resp.StatusCode)
++	}
++	if resp, _ := do(t, "DELETE", url, "", true); resp.StatusCode != 405 {
++		t.Errorf("DELETE log = %d, want 405", resp.StatusCode)
++	}
++	resp, body := do(t, "GET", url+"?offset=4", "", true)
++	if resp.StatusCode != 200 || body != "456789" || resp.Header.Get("X-File-Size") != "10" {
++		t.Fatalf("offset read = %d %q size=%s", resp.StatusCode, body, resp.Header.Get("X-File-Size"))
++	}
++	resp, body = do(t, "GET", url+"?offset=10", "", true)
++	if resp.StatusCode != 200 || body != "" {
++		t.Fatalf("offset at EOF = %d %q", resp.StatusCode, body)
++	}
++	if resp, _ := do(t, "GET", url+"?offset=-1", "", true); resp.StatusCode != 400 {
++		t.Errorf("negative offset = %d, want 400", resp.StatusCode)
++	}
++}
++
++func TestLoadOrCreateConfig(t *testing.T) {
++	home := t.TempDir()
++	c1, err := LoadOrCreateConfig(home, 0)
++	if err != nil || len(c1.Secret) < 32 || c1.Port == 0 {
++		t.Fatalf("create: %+v %v", c1, err)
++	}
++	fi, err := os.Stat(filepath.Join(home, "desktop-bridge.json"))
++	if err != nil || fi.Mode().Perm() != 0o600 {
++		t.Fatalf("config file: %v %v", fi, err)
++	}
++	c2, err := LoadOrCreateConfig(home, 0)
++	if err != nil || c2.Secret != c1.Secret || c2.Port != c1.Port {
++		t.Fatalf("reload mismatch: %+v vs %+v (%v)", c2, c1, err)
++	}
++}
++
++func portOf(t *testing.T, srv *httptest.Server) int {
++	t.Helper()
++	return srv.Listener.Addr().(*net.TCPAddr).Port
++}
++
++func TestCheckHealth(t *testing.T) {
++	srv, _ := newServer(t)
++	if err := CheckHealth(portOf(t, srv), 2*time.Second); err != nil {
++		t.Fatalf("healthy bridge reported as down: %v", err)
++	}
++
++	bad := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		http.Error(w, "nope", http.StatusInternalServerError)
++	}))
++	defer bad.Close()
++	if err := CheckHealth(portOf(t, bad), 2*time.Second); err == nil {
++		t.Error("a 500 response must not count as healthy")
++	}
++
++	notJSON := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		_, _ = w.Write([]byte("hello"))
++	}))
++	defer notJSON.Close()
++	if err := CheckHealth(portOf(t, notJSON), 2*time.Second); err == nil {
++		t.Error("a non-JSON 200 must not count as healthy")
++	}
++
++	port := portOf(t, srv)
++	srv.Close()
++	if err := CheckHealth(port, 500*time.Millisecond); err == nil {
++		t.Error("a closed port must not count as healthy")
++	}
++}
++
++func healthOf(t *testing.T, cfg Config) (int, map[string]any) {
++	t.Helper()
++	srv := httptest.NewServer(NewHandler(cfg))
++	defer srv.Close()
++	resp, body := do(t, "GET", srv.URL+"/health", "", false)
++	out := map[string]any{}
++	if err := json.Unmarshal([]byte(body), &out); err != nil {
++		t.Fatalf("health body %q: %v", body, err)
++	}
++	return resp.StatusCode, out
++}
++
++func TestHealthReportsUsableCLI(t *testing.T) {
++	code, out := healthOf(t, Config{Secret: testSecret, MulticaHome: t.TempDir(), CLIPath: fakeCLI(t, t.TempDir()), Version: "1"})
++	if code != 200 || out["ok"] != true || out["cli_ok"] != true {
++		t.Fatalf("usable CLI: %d %v", code, out)
++	}
++}
++
++// After `brew upgrade` removes the keg the bridge was started from, the CLI
++// path it holds no longer exists. The bridge must say so instead of reporting
++// healthy while every /exec fails.
++func TestHealthReportsMissingCLI(t *testing.T) {
++	gone := filepath.Join(t.TempDir(), "removed-keg", "multica-cli")
++	code, out := healthOf(t, Config{Secret: testSecret, MulticaHome: t.TempDir(), CLIPath: gone, Version: "1"})
++	if code != http.StatusServiceUnavailable || out["ok"] != false || out["cli_ok"] != false {
++		t.Fatalf("missing CLI: %d %v", code, out)
++	}
++	if strings.Contains(toJSON(out), "removed-keg") {
++		t.Errorf("unauthenticated /health must not leak the CLI path: %v", out)
++	}
++}
++
++func TestHealthRejectsDirectoryAsCLI(t *testing.T) {
++	code, out := healthOf(t, Config{Secret: testSecret, MulticaHome: t.TempDir(), CLIPath: t.TempDir(), Version: "1"})
++	if code != http.StatusServiceUnavailable || out["cli_ok"] != false {
++		t.Fatalf("directory as CLI: %d %v", code, out)
++	}
++}
++
++func toJSON(v any) string {
++	b, _ := json.Marshal(v)
++	return string(b)
++}
++
++func TestCheckHealthRequiresUsableCLI(t *testing.T) {
++	// A bridge whose CLI path vanished is not healthy.
++	gone := httptest.NewServer(NewHandler(Config{Secret: testSecret, MulticaHome: t.TempDir(), CLIPath: filepath.Join(t.TempDir(), "gone"), Version: "1"}))
++	defer gone.Close()
++	if err := CheckHealth(portOf(t, gone), 2*time.Second); err == nil {
++		t.Error("a bridge with a missing CLI must not count as healthy")
++	}
++
++	// A bridge that predates the CLI check answers {"ok":true} with no cli_ok.
++	// It cannot vouch for its CLI, so the launcher must replace it once.
++	old := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		_, _ = w.Write([]byte(`{"ok":true,"version":"0.9.0"}` + "\n"))
++	}))
++	defer old.Close()
++	if err := CheckHealth(portOf(t, old), 2*time.Second); err == nil {
++		t.Error("a bridge without cli_ok (pre-fix bridge) must not count as healthy")
++	}
++
++	// And a good one still passes.
++	srv, _ := newServer(t)
++	if err := CheckHealth(portOf(t, srv), 2*time.Second); err != nil {
++		t.Errorf("healthy bridge reported as down: %v", err)
++	}
++}

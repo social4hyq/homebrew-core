@@ -1,0 +1,22 @@
+OHOS: ability name as multica instead of Electron (zh_CN).
+
+diff --git a/libelectron/ohos_hap/electron/src/main/resources/zh_CN/element/string.json b/libelectron/ohos_hap/electron/src/main/resources/zh_CN/element/string.json
+index 4307789..4d26e42 100644
+--- a/libelectron/ohos_hap/electron/src/main/resources/zh_CN/element/string.json
++++ b/libelectron/ohos_hap/electron/src/main/resources/zh_CN/element/string.json
+@@ -10,7 +10,7 @@
+     },
+     {
+       "name": "EntryAbility_label",
+-      "value": "Electron"
++      "value": "multica"
+     },
+     {
+       "name": "button_ok",
+@@ -33,4 +33,4 @@
+       "value": "打开新窗口"
+     }
+   ]
+-}
+\ No newline at end of file
++}

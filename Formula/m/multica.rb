@@ -12,8 +12,9 @@ class Multica < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.9.0-r11"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "98693150b90ff0d9119f9fa780c25d2bdff93641b2c8624719ea297e3d502788"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.9.0-r12"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e4b6cf75291320981a0141d3d44a41b1f72692ecdee5c2a4d227e95c7c14e62c"
   end
 
   depends_on "go" => :build
@@ -29,20 +30,11 @@ class Multica < Formula
     sha256 "599e97b3d8b1e5071a2387496104b443e58079a5f5c165b0114e65ffc601df3a"
   end
 
-  patch :p1 do
-    file "Patches/multica/0001-desktop-ohos.patch"
-  end
-
-  patch :p1 do
-    file "Patches/multica/0002-hap-packaging.patch"
-  end
-
-  patch :p1 do
-    file "Patches/multica/0004-install-desktop-command.patch"
-  end
-
-  patch :p1 do
-    file "Patches/multica/0005-desktop-host-bridge.patch"
+  patch_root = Pathname(__dir__).parent.parent
+  Dir[(patch_root/"Patches/multica/ohos/*.patch").to_s].each do |path|
+    patch do
+      file Pathname(path).relative_path_from(patch_root).to_s
+    end
   end
 
   def patch

@@ -1,0 +1,64 @@
+OHOS: entry point of the desktop bridge: pairing file creation (--init-only),
+health check (--check) and the listener.
+
+diff --git a/server/cmd/multica-desktop-bridge/main.go b/server/cmd/multica-desktop-bridge/main.go
+new file mode 100644
+index 0000000..9c9da91
+--- /dev/null
++++ b/server/cmd/multica-desktop-bridge/main.go
+@@ -0,0 +1,55 @@
++package main
++
++import (
++	"flag"
++	"fmt"
++	"log"
++	"net/http"
++	"os"
++	"path/filepath"
++	"time"
++)
++
++var version = "dev"
++
++func main() {
++	home := flag.String("home", "", "multica home directory (default ~/.multica)")
++	cli := flag.String("cli", os.Getenv("MULTICA_REAL_CLI"), "path of the multica CLI to drive")
++	initOnly := flag.Bool("init-only", false, "create the pairing file, print its path and exit")
++	check := flag.Bool("check", false, "exit 0 when a bridge answers /health on the paired port, 1 otherwise")
++	flag.Parse()
++
++	if *home == "" {
++		h, err := os.UserHomeDir()
++		if err != nil {
++			log.Fatal(err)
++		}
++		*home = filepath.Join(h, ".multica")
++	}
++	cfg, err := LoadOrCreateConfig(*home, 0)
++	if err != nil {
++		log.Fatal(err)
++	}
++	if *initOnly {
++		fmt.Println(filepath.Join(*home, configFileName))
++		return
++	}
++	if *check {
++		if err := CheckHealth(cfg.Port, 2*time.Second); err != nil {
++			os.Exit(1)
++		}
++		return
++	}
++	if *cli == "" {
++		log.Fatal("multica CLI path required: set --cli or MULTICA_REAL_CLI")
++	}
++	cfg.CLIPath, cfg.Version = *cli, version
++
++	srv := &http.Server{
++		Addr:              fmt.Sprintf("127.0.0.1:%d", cfg.Port),
++		Handler:           NewHandler(cfg),
++		ReadHeaderTimeout: 10 * time.Second,
++	}
++	log.Printf("multica-desktop-bridge %s listening on %s", version, srv.Addr)
++	log.Fatal(srv.ListenAndServe())
++}

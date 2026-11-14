@@ -1,0 +1,32 @@
+OHOS: map Node's openharmony platform to Go's linux GOOS. The Go daemon
+reports linux, so without this a native daemon is mistaken for a foreign
+(WSL2-style) one: start, stop and restart are hidden and crash recovery never
+runs.
+
+diff --git a/apps/desktop/src/main/daemon-os.ts b/apps/desktop/src/main/daemon-os.ts
+index 77135fb..0aa01ca 100644
+--- a/apps/desktop/src/main/daemon-os.ts
++++ b/apps/desktop/src/main/daemon-os.ts
+@@ -18,12 +18,18 @@
+ 
+ /**
+  * Normalize a Node `process.platform` value to the daemon's `runtime.GOOS`
+- * vocabulary so the two are directly comparable. Only `win32` -> `windows`
+- * actually differs across the platforms we ship (darwin/linux already match);
+- * any other value passes through unchanged.
++ * vocabulary so the two are directly comparable. `win32` -> `windows` and
++ * `openharmony` -> `linux` differ across the platforms we ship (darwin/linux
++ * already match); any other value passes through unchanged.
++ *
++ * OpenHarmony: Node reports `openharmony`, but Go targets it as `linux`, so
++ * the daemon's own `/health` says `linux`. Without this mapping a native
++ * daemon is mistaken for a foreign (WSL2-style) one.
+  */
+ export function normalizeHostOS(platform: NodeJS.Platform): string {
+-  return platform === "win32" ? "windows" : platform;
++  if (platform === "win32") return "windows";
++  if (platform === "openharmony") return "linux";
++  return platform;
+ }
+ 
+ /**

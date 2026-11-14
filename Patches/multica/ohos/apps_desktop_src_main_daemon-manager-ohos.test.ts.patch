@@ -1,0 +1,480 @@
+OHOS: tests for the daemon manager on OpenHarmony: CLI resolution through the
+bridge, host forwarding, the log panel, the automatic retry while the CLI is
+unavailable, and the daemon start after it recovers.
+
+diff --git a/apps/desktop/src/main/daemon-manager-ohos.test.ts b/apps/desktop/src/main/daemon-manager-ohos.test.ts
+new file mode 100644
+index 0000000..1fa9812
+--- /dev/null
++++ b/apps/desktop/src/main/daemon-manager-ohos.test.ts
+@@ -0,0 +1,470 @@
++// @vitest-environment node
++import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
++
++const ctx = vi.hoisted(() => ({
++  handlers: new Map<string, (...args: unknown[]) => unknown>(),
++  listeners: new Map<string, (...args: unknown[]) => unknown>(),
++  send: vi.fn(),
++  win: null as null | {
++    isDestroyed: () => boolean;
++    isVisible: () => boolean;
++    webContents: { send: (...a: unknown[]) => void };
++  },
++  host: {
++    readFile: vi.fn(),
++    writeFile: vi.fn(),
++    mkdir: vi.fn(),
++    rm: vi.fn(),
++    stat: vi.fn(),
++    readRange: vi.fn(),
++    execFile: vi.fn(),
++    hostCliAvailable: vi.fn(),
++  },
++  configureHost: vi.fn(),
++  install: vi.fn(),
++  watchFile: vi.fn(),
++  unwatchFile: vi.fn(),
++  exists: vi.fn(),
++  health: vi.fn(),
++}));
++
++vi.mock("electron", () => ({
++  app: {
++    getAppPath: () => "/hap/resources/app",
++    getPreferredSystemLanguages: () => ["en"],
++    on: vi.fn(),
++    quit: vi.fn(),
++    emit: vi.fn(),
++  },
++  dialog: { showMessageBox: vi.fn() },
++  shell: { openPath: vi.fn() },
++  net: { fetch: vi.fn() },
++  BrowserWindow: {
++    getAllWindows: () => (ctx.win ? [ctx.win] : []),
++    fromWebContents: () => ctx.win,
++  },
++  ipcMain: {
++    handle: (n: string, h: (...a: unknown[]) => unknown) => void ctx.handlers.set(n, h),
++    on: (n: string, h: (...a: unknown[]) => unknown) => void ctx.listeners.set(n, h),
++  },
++}));
++vi.mock("./ohos-host", () => ({
++  HOST_CLI: "multica-host",
++  host: ctx.host,
++  configureHost: ctx.configureHost,
++}));
++vi.mock("fs", async (orig) => ({
++  ...(await orig<typeof import("fs")>()),
++  existsSync: ctx.exists,
++  watchFile: ctx.watchFile,
++  unwatchFile: ctx.unwatchFile,
++}));
++vi.mock("./cli-bootstrap", () => ({
++  ensureManagedCli: ctx.install,
++  managedCliPath: () => "/test/managed/multica",
++}));
++vi.mock("./daemon-port", () => ({
++  probeProfileHealth: ctx.health,
++  readDaemonPortRecord: vi.fn(async () => null),
++}));
++
++const sender = {};
++const realPlatform = Object.getOwnPropertyDescriptor(process, "platform")!;
++
++async function boot() {
++  const { setupDaemonManager } = await import("./daemon-manager");
++  setupDaemonManager(() => null, () => (ctx.win ? [ctx.win as never] : []));
++  await ctx.handlers.get("daemon:set-target-api-url")!({}, "https://api.example.test");
++}
++
++const versionReply = (_bin: string, _args: string[], _o: unknown, cb: (...a: unknown[]) => void) =>
++  cb(null, JSON.stringify({ version: "0.9.0" }), "");
++
++beforeEach(() => {
++  vi.resetModules();
++  ctx.handlers.clear();
++  ctx.listeners.clear();
++  for (const f of Object.values(ctx.host)) f.mockReset();
++  ctx.send.mockReset();
++  ctx.configureHost.mockReset();
++  ctx.install.mockReset();
++  ctx.watchFile.mockReset();
++  ctx.health.mockReset().mockResolvedValue(null);
++  ctx.exists.mockReset().mockReturnValue(false);
++  ctx.win = {
++    isDestroyed: () => false,
++    isVisible: () => true,
++    webContents: { send: ctx.send },
++  };
++  Object.defineProperty(process, "platform", { value: "openharmony" });
++  ctx.host.readFile.mockImplementation(async (p: string) => {
++    if (p.endsWith("config.json")) return JSON.stringify({ server_url: "https://api.example.test" });
++    throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
++  });
++  ctx.host.writeFile.mockResolvedValue(undefined);
++  ctx.host.mkdir.mockResolvedValue(undefined);
++  ctx.host.execFile.mockImplementation(versionReply);
++});
++
++afterEach(() => {
++  Object.defineProperty(process, "platform", realPlatform);
++  vi.useRealTimers();
++});
++
++describe("daemon-manager on openharmony: CLI resolution", () => {
++  it("points the host module at the pairing file shipped in the app", async () => {
++    ctx.host.hostCliAvailable.mockResolvedValue(true);
++    await boot();
++    expect(ctx.configureHost).toHaveBeenCalledWith("/hap/resources/app/desktop-bridge.json");
++  });
++
++  it("uses the host CLI sentinel when the bridge answers, never the bundled/managed CLI", async () => {
++    ctx.host.hostCliAvailable.mockResolvedValue(true);
++    await boot();
++    expect(await ctx.handlers.get("daemon:is-cli-installed")!({})).toBe(true);
++    expect(ctx.host.execFile).toHaveBeenCalledWith(
++      "multica-host",
++      ["version", "--output", "json"],
++      expect.anything(),
++      expect.any(Function),
++    );
++    expect(ctx.install).not.toHaveBeenCalled();
++  });
++
++  it("reports cli_not_found when the bridge is down, and recovers without caching the failure", async () => {
++    ctx.host.hostCliAvailable.mockResolvedValue(false);
++    await boot();
++    await vi.waitFor(() =>
++      expect(ctx.send).toHaveBeenCalledWith("daemon:status", { state: "cli_not_found" }),
++    );
++    expect(await ctx.handlers.get("daemon:is-cli-installed")!({})).toBe(false);
++
++    ctx.host.hostCliAvailable.mockResolvedValue(true);
++    expect(await ctx.handlers.get("daemon:is-cli-installed")!({})).toBe(true);
++    await ctx.handlers.get("daemon:retry-install")!({});
++    expect(ctx.send).toHaveBeenCalledWith("daemon:status", { state: "stopped" });
++  });
++});
++
++describe("daemon-manager on openharmony: host forwarding", () => {
++  it("starts the daemon through the host CLI with the desktop profile", async () => {
++    ctx.host.hostCliAvailable.mockResolvedValue(true);
++    await boot();
++    ctx.host.execFile.mockClear();
++    ctx.host.execFile.mockImplementation((_b: string, _a: string[], _o: unknown, cb: (...x: unknown[]) => void) =>
++      cb(null, "", ""),
++    );
++    await ctx.handlers.get("daemon:start")!({});
++    const call = ctx.host.execFile.mock.calls.find((c) => c[1][0] === "daemon");
++    expect(call?.[0]).toBe("multica-host");
++    expect(call?.[1].slice(0, 3)).toEqual(["daemon", "start", "--profile"]);
++  });
++
++  it("writes the synced token into the host profile via the bridge", async () => {
++    ctx.host.hostCliAvailable.mockResolvedValue(true);
++    await boot();
++    ctx.host.writeFile.mockClear();
++    await ctx.handlers.get("daemon:sync-token")!({}, "mul_abc123", "user-1");
++    const written = ctx.host.writeFile.mock.calls.map((c) => [c[0] as string, c[1] as string]);
++    const cfg = written.find(([p]) => p.endsWith("/config.json"));
++    expect(cfg).toBeTruthy();
++    expect(JSON.parse(cfg![1]).token).toBe("mul_abc123");
++    expect(written.some(([p, d]) => p.endsWith("/.desktop-user-id") && d === "user-1")).toBe(true);
++  });
++});
++
++describe("daemon-manager on openharmony: log panel", () => {
++  async function startStream() {
++    ctx.host.hostCliAvailable.mockResolvedValue(true);
++    await boot();
++    ctx.listeners.get("daemon:start-log-stream")!({ sender });
++  }
++  const lines = () =>
++    ctx.send.mock.calls.filter((c) => c[0] === "daemon:log-line").map((c) => c[1]);
++
++  it("shows the tail, then polls by offset instead of watching a local file", async () => {
++    vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
++    ctx.host.stat.mockResolvedValue({ size: 6 });
++    ctx.host.readRange
++      .mockResolvedValueOnce({ text: "one\ntwo\n", size: 8 })
++      .mockResolvedValueOnce({ text: "three\n", size: 14 })
++      .mockResolvedValue({ text: "", size: 14 });
++    await startStream();
++    await vi.waitFor(() => expect(lines()).toEqual(["one", "two"]));
++
++    await vi.advanceTimersByTimeAsync(500);
++    await vi.waitFor(() => expect(lines()).toEqual(["one", "two", "three"]));
++    expect(ctx.host.readRange.mock.calls[1][1]).toBe(8);
++    expect(ctx.watchFile).not.toHaveBeenCalled();
++    expect(ctx.exists).not.toHaveBeenCalled();
++  });
++
++  it("restarts from the beginning when the log shrinks (rotation)", async () => {
++    vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
++    ctx.host.stat.mockResolvedValue({ size: 100 });
++    ctx.host.readRange
++      .mockResolvedValueOnce({ text: "old\n", size: 100 })
++      .mockResolvedValueOnce({ text: "", size: 5 })
++      .mockResolvedValueOnce({ text: "fresh\n", size: 6 })
++      .mockResolvedValue({ text: "", size: 6 });
++    await startStream();
++    await vi.waitFor(() => expect(lines()).toEqual(["old"]));
++    await vi.advanceTimersByTimeAsync(500);
++    await vi.waitFor(() => expect(lines()).toContain("fresh"));
++    const offsets = ctx.host.readRange.mock.calls.map((c) => c[1]);
++    expect(offsets).toContain(0);
++  });
++
++  it("stops polling when the stream is stopped", async () => {
++    vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
++    ctx.host.stat.mockResolvedValue({ size: 1 });
++    ctx.host.readRange.mockResolvedValue({ text: "x\n", size: 1 });
++    await startStream();
++    await vi.waitFor(() => expect(lines()).toEqual(["x"]));
++    ctx.listeners.get("daemon:stop-log-stream")!({ sender });
++    const before = ctx.host.readRange.mock.calls.length;
++    await vi.advanceTimersByTimeAsync(2000);
++    expect(ctx.host.readRange.mock.calls.length).toBe(before);
++  });
++});
++
++describe("daemon-manager on openharmony: cli_not_found auto-retry", () => {
++  const TIMERS = ["setTimeout", "clearTimeout", "setInterval", "clearInterval"] as const;
++  const states = () =>
++    ctx.send.mock.calls.filter((c) => c[0] === "daemon:status").map((c) => (c[1] as { state: string }).state);
++  const probes = () => ctx.host.hostCliAvailable.mock.calls.length;
++
++  async function bootWithoutBridge() {
++    vi.useFakeTimers({ toFake: [...TIMERS] });
++    ctx.host.hostCliAvailable.mockResolvedValue(false);
++    await boot();
++    await vi.advanceTimersByTimeAsync(0);
++    expect(states()).toContain("cli_not_found");
++  }
++
++  it("recovers by itself once the bridge answers, without pressing retry", async () => {
++    await bootWithoutBridge();
++    expect(states()).not.toContain("stopped");
++
++    ctx.host.hostCliAvailable.mockResolvedValue(true);
++    await vi.advanceTimersByTimeAsync(5_000);
++
++    expect(states().at(-1)).toBe("stopped");
++    expect(ctx.host.execFile).toHaveBeenCalledWith(
++      "multica-host",
++      ["version", "--output", "json"],
++      expect.anything(),
++      expect.any(Function),
++    );
++  });
++
++  it("keeps retrying every few seconds while the bridge is still down", async () => {
++    await bootWithoutBridge();
++    const before = probes();
++    await vi.advanceTimersByTimeAsync(15_000);
++    expect(probes()).toBeGreaterThanOrEqual(before + 2);
++    expect(states()).not.toContain("stopped");
++    expect(states().at(-1)).toBe("cli_not_found");
++  });
++
++  it("stops retrying once the CLI resolves", async () => {
++    await bootWithoutBridge();
++    ctx.host.hostCliAvailable.mockResolvedValue(true);
++    await vi.advanceTimersByTimeAsync(5_000);
++    expect(states().at(-1)).toBe("stopped");
++
++    const resolvedProbes = probes();
++    const notFoundCount = states().filter((st) => st === "cli_not_found").length;
++    await vi.advanceTimersByTimeAsync(60_000);
++    expect(probes()).toBe(resolvedProbes);
++    expect(states().filter((st) => st === "cli_not_found").length).toBe(notFoundCount);
++  });
++
++  it("a retry scheduled before a manual recovery does not clobber the state afterwards", async () => {
++    await bootWithoutBridge(); // the automatic retry is due at t=5s
++    await vi.advanceTimersByTimeAsync(3_000);
++
++    ctx.host.hostCliAvailable.mockResolvedValue(true);
++    ctx.health.mockResolvedValue({ status: "running", pid: 4242, os: "linux" });
++    await ctx.handlers.get("daemon:retry-install")!({}); // the user recovers it first, at t=3s
++    await vi.advanceTimersByTimeAsync(0);
++    expect(states().at(-1)).toBe("running");
++
++    await vi.advanceTimersByTimeAsync(3_000); // t=6s: the originally scheduled retry fires
++    expect(states().at(-1)).toBe("running"); // and must not bootstrap again and reset it to "stopped"
++  });
++
++  it("keeps retrying after an attempt was skipped because another operation held the gate", async () => {
++    await bootWithoutBridge();
++    // `daemon:start` holds the lifecycle gate while it waits on the bridge probe.
++    let release!: (available: boolean) => void;
++    ctx.host.hostCliAvailable.mockReturnValueOnce(new Promise<boolean>((resolve) => (release = resolve)));
++    const start = ctx.handlers.get("daemon:start")!({});
++
++    await vi.advanceTimersByTimeAsync(5_000); // the retry fires, finds the gate busy, is skipped
++    const whileBusy = probes();
++    release(false);
++    await start;
++
++    await vi.advanceTimersByTimeAsync(10_000);
++    expect(probes()).toBeGreaterThan(whileBusy);
++  });
++
++  it("does not retry on other platforms (upstream behaviour is unchanged)", async () => {
++    vi.useFakeTimers({ toFake: [...TIMERS] });
++    Object.defineProperty(process, "platform", { value: "linux" });
++    await boot();
++    await vi.advanceTimersByTimeAsync(0);
++    expect(states()).toContain("cli_not_found");
++    const installs = ctx.install.mock.calls.length;
++
++    await vi.advanceTimersByTimeAsync(60_000);
++    expect(ctx.install.mock.calls.length).toBe(installs);
++    expect(ctx.host.hostCliAvailable).not.toHaveBeenCalled();
++    expect(states().at(-1)).toBe("cli_not_found");
++  });
++  // The renderer signs the user in with `setTargetApiUrl -> syncToken ->
++  // autoStart`, awaited in that order. syncToken writes the host profile through
++  // the bridge, so while the bridge is down it fails and autoStart is never even
++  // requested. Once the CLI comes back, nothing asks for the daemon again: the
++  // main process has to do it by itself, for a user who has signed in before.
++  describe("daemon start after the CLI recovers", () => {
++    const startCalls = () =>
++      ctx.host.execFile.mock.calls.filter((c) => c[1][0] === "daemon" && c[1][1] === "start");
++
++    // A bridge that can be down (profile reads/writes are refused, like a closed
++    // port) or up (the host profile is served), with a given signed-in state.
++    function simulateBridge(opts: { token?: string; prefs?: { autoStart: boolean; autoStop: boolean } } = {}) {
++      const down = Object.assign(new Error("ECONNREFUSED 127.0.0.1:19800"), { code: "ECONNREFUSED" });
++      const state = { up: false };
++      const profile = JSON.stringify({
++        server_url: "https://api.example.test",
++        ...(opts.token ? { token: opts.token } : {}),
++      });
++      ctx.host.hostCliAvailable.mockImplementation(async () => state.up);
++      ctx.host.readFile.mockImplementation(async (p: string) => {
++        if (p.endsWith("desktop_prefs.json")) {
++          if (opts.prefs) return JSON.stringify(opts.prefs);
++          throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
++        }
++        if (!state.up) throw down;
++        if (p.endsWith("config.json")) return profile;
++        throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
++      });
++      ctx.host.writeFile.mockImplementation(async () => {
++        if (!state.up) throw down;
++      });
++      return { up: () => void (state.up = true) };
++    }
++
++    async function bootWithBridgeDown(opts: Parameters<typeof simulateBridge>[0] = {}) {
++      vi.useFakeTimers({ toFake: [...TIMERS] });
++      const bridge = simulateBridge(opts);
++      await boot(); // setTargetApiUrl succeeds: no profile access in the cli_not_found state
++      await vi.advanceTimersByTimeAsync(0);
++      expect(states()).toContain("cli_not_found");
++      // What the renderer's login sync runs into while the bridge is down: the
++      // token sync is refused, so the sequence stops before autoStart.
++      await expect(ctx.handlers.get("daemon:sync-token")!({}, "mul_fresh", "user-1")).rejects.toThrow(/ECONNREFUSED/);
++      return bridge;
++    }
++
++    const recover = async (bridge: { up: () => void }) => {
++      bridge.up();
++      await vi.advanceTimersByTimeAsync(5_000); // the automatic retry resolves the CLI
++      await vi.advanceTimersByTimeAsync(0);
++    };
++
++    it("starts the daemon for a signed-in user even though the login sync never reached auto-start", async () => {
++      const bridge = await bootWithBridgeDown({ token: "mul_saved" });
++      expect(startCalls()).toHaveLength(0);
++
++      await recover(bridge);
++
++      expect(startCalls()).toHaveLength(1);
++      expect(startCalls()[0][0]).toBe("multica-host");
++      expect(startCalls()[0][1]).toEqual(["daemon", "start", "--profile", expect.any(String)]);
++    });
++
++    it("does not start a daemon when nobody has signed in (no token in the host profile)", async () => {
++      const bridge = await bootWithBridgeDown({});
++      await recover(bridge);
++      expect(states().at(-1)).not.toBe("cli_not_found");
++      expect(startCalls()).toHaveLength(0);
++    });
++
++    it("respects a disabled auto-start preference", async () => {
++      const bridge = await bootWithBridgeDown({ token: "mul_saved", prefs: { autoStart: false, autoStop: false } });
++      await recover(bridge);
++      expect(startCalls()).toHaveLength(0);
++    });
++
++    it("does not start anything before the renderer has reported the API URL", async () => {
++      vi.useFakeTimers({ toFake: [...TIMERS] });
++      const bridge = simulateBridge({ token: "mul_saved" });
++      const { setupDaemonManager } = await import("./daemon-manager");
++      setupDaemonManager(() => null, () => (ctx.win ? [ctx.win as never] : []));
++      await vi.advanceTimersByTimeAsync(0);
++      expect(states()).toContain("cli_not_found");
++
++      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
++      await recover(bridge); // no target URL yet, so no profile and nothing to start
++      expect(startCalls()).toHaveLength(0);
++      // ...and that is a quiet "not signed in yet", not a failure that got swallowed.
++      expect(warn.mock.calls.filter((c) => String(c[0]).includes("after CLI recovery"))).toHaveLength(0);
++      warn.mockRestore();
++    });
++
++    it("leaves a daemon that is already running alone", async () => {
++      const bridge = await bootWithBridgeDown({ token: "mul_saved" });
++      ctx.health.mockResolvedValue({ status: "running", pid: 4242, os: "linux" });
++      await recover(bridge);
++      expect(startCalls()).toHaveLength(0);
++    });
++
++    it("does nothing after an ordinary start where the CLI was never unavailable", async () => {
++      vi.useFakeTimers({ toFake: [...TIMERS] });
++      const bridge = simulateBridge({ token: "mul_saved" });
++      bridge.up();
++      await boot();
++      await vi.advanceTimersByTimeAsync(30_000);
++      expect(startCalls()).toHaveLength(0); // starting at login stays the renderer's job
++    });
++
++    it("runs once per recovery, not again on a later manual retry", async () => {
++      const bridge = await bootWithBridgeDown({ token: "mul_saved" });
++      await recover(bridge);
++      expect(startCalls()).toHaveLength(1);
++
++      // (Not waiting any longer: the crash-recovery policy would legitimately retry
++      // a start that never became healthy, which is not what is under test here.)
++      await ctx.handlers.get("daemon:retry-install")!({});
++      await vi.advanceTimersByTimeAsync(0);
++      expect(startCalls()).toHaveLength(1);
++    });
++
++    it("also runs when the user recovers the CLI with the retry button", async () => {
++      const bridge = await bootWithBridgeDown({ token: "mul_saved" });
++      bridge.up();
++      await ctx.handlers.get("daemon:retry-install")!({});
++      await vi.advanceTimersByTimeAsync(0);
++      expect(startCalls()).toHaveLength(1);
++    });
++
++    it("leaves other platforms alone", async () => {
++      vi.useFakeTimers({ toFake: [...TIMERS] });
++      Object.defineProperty(process, "platform", { value: "linux" });
++      // A signed-in profile that is readable, so only the platform can stop the start.
++      simulateBridge({ token: "mul_saved" }).up();
++      await boot();
++      await vi.advanceTimersByTimeAsync(0);
++      expect(states()).toContain("cli_not_found");
++
++      ctx.exists.mockImplementation((p: string) => String(p).endsWith("resources/bin/multica"));
++      await ctx.handlers.get("daemon:retry-install")!({}); // the CLI now resolves
++      await vi.advanceTimersByTimeAsync(0);
++      expect(states().at(-1)).not.toBe("cli_not_found");
++      expect(startCalls()).toHaveLength(0);
++    });
++  });
++});

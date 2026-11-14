@@ -1,0 +1,192 @@
+OHOS: tests for the host access layer.
+
+diff --git a/apps/desktop/src/main/ohos-host.test.ts b/apps/desktop/src/main/ohos-host.test.ts
+new file mode 100644
+index 0000000..a489d2f
+--- /dev/null
++++ b/apps/desktop/src/main/ohos-host.test.ts
+@@ -0,0 +1,184 @@
++import { describe, expect, it, vi } from "vitest";
++import { HOST_CLI, createHost, type BridgeRequest } from "./ohos-host";
++
++const ROOT = "/home/u/.multica/profiles";
++const CONFIG = { port: 19700, secret: "sek" };
++
++function setup(platform = "openharmony") {
++  const calls: BridgeRequest[] = [];
++  let reply: { status: number; headers?: Record<string, string>; body?: string } = {
++    status: 200,
++    body: "",
++  };
++  const request = vi.fn(async (req: BridgeRequest) => {
++    calls.push(req);
++    return {
++      status: reply.status,
++      headers: reply.headers ?? {},
++      body: Buffer.from(reply.body ?? ""),
++    };
++  });
++  const local = {
++    readFile: vi.fn(async () => "local"),
++    writeFile: vi.fn(async () => undefined),
++    mkdir: vi.fn(async () => undefined),
++    rm: vi.fn(async () => undefined),
++    stat: vi.fn(async () => ({ size: 1 })),
++    execFile: vi.fn(),
++  };
++  const host = createHost({
++    platform,
++    profilesRoot: ROOT,
++    loadConfig: () => CONFIG,
++    request,
++    local: local as never,
++  });
++  return { host, calls, local, request, setReply: (r: typeof reply) => (reply = r) };
++}
++
++describe("ohos-host passthrough", () => {
++  it("delegates everything to local fs/exec off openharmony", async () => {
++    const { host, local, request } = setup("darwin");
++    await host.readFile(`${ROOT}/p/config.json`, "utf-8");
++    await host.writeFile(`${ROOT}/p/config.json`, "x", "utf-8");
++    await host.mkdir(`${ROOT}/p`, { recursive: true });
++    await host.rm(`${ROOT}/p/config.json`);
++    await host.stat(`${ROOT}/p/daemon.log`);
++    expect(local.readFile).toHaveBeenCalled();
++    expect(local.writeFile).toHaveBeenCalled();
++    expect(local.rm).toHaveBeenCalled();
++    expect(request).not.toHaveBeenCalled();
++  });
++
++  it("keeps paths outside the profiles root local on openharmony", async () => {
++    const { host, local, request } = setup();
++    await host.readFile("/home/u/.multica/desktop_prefs.json", "utf-8");
++    await host.writeFile("/data/storage/el2/base/files/x", "y", "utf-8");
++    expect(local.readFile).toHaveBeenCalledTimes(1);
++    expect(local.writeFile).toHaveBeenCalledTimes(1);
++    expect(request).not.toHaveBeenCalled();
++  });
++});
++
++describe("ohos-host profile file forwarding", () => {
++  it("readFile -> GET with bearer auth", async () => {
++    const { host, calls, setReply } = setup();
++    setReply({ status: 200, body: '{"a":1}' });
++    const out = await host.readFile(`${ROOT}/desktop-api.multica.ai/config.json`, "utf-8");
++    expect(out).toBe('{"a":1}');
++    expect(calls[0]).toMatchObject({
++      method: "GET",
++      port: 19700,
++      path: "/profile/desktop-api.multica.ai/config.json",
++    });
++    expect(calls[0].headers.Authorization).toBe("Bearer sek");
++  });
++
++  it("maps 404 to an ENOENT error", async () => {
++    const { host, setReply } = setup();
++    setReply({ status: 404 });
++    await expect(host.readFile(`${ROOT}/p/config.json`, "utf-8")).rejects.toMatchObject({
++      code: "ENOENT",
++    });
++  });
++
++  it("writeFile -> PUT with body, mkdir is a no-op, rm -> DELETE", async () => {
++    const { host, calls, setReply, local } = setup();
++    setReply({ status: 204 });
++    await host.writeFile(`${ROOT}/p/config.json`, '{"t":"mul_1"}', "utf-8");
++    await host.mkdir(`${ROOT}/p`, { recursive: true });
++    await host.rm(`${ROOT}/p/.desktop-user-id`);
++    expect(calls.map((c) => c.method)).toEqual(["PUT", "DELETE"]);
++    expect(calls[0].body?.toString()).toBe('{"t":"mul_1"}');
++    expect(local.mkdir).not.toHaveBeenCalled();
++  });
++
++  it("propagates server errors", async () => {
++    const { host, setReply } = setup();
++    setReply({ status: 500, body: "boom" });
++    await expect(host.writeFile(`${ROOT}/p/config.json`, "x", "utf-8")).rejects.toThrow(/500/);
++  });
++
++  it("stat reads X-File-Size via an out-of-range offset", async () => {
++    const { host, calls, setReply } = setup();
++    setReply({ status: 200, headers: { "x-file-size": "42" } });
++    const st = await host.stat(`${ROOT}/p/daemon.log`);
++    expect(st.size).toBe(42);
++    expect(calls[0].path).toContain("offset=");
++  });
++
++  it("readRange returns the bytes from offset", async () => {
++    const { host, calls, setReply } = setup();
++    setReply({ status: 200, body: "tail", headers: { "x-file-size": "14" } });
++    const r = await host.readRange(`${ROOT}/p/daemon.log`, 10);
++    expect(r).toEqual({ text: "tail", size: 14 });
++    expect(calls[0].path).toBe("/profile/p/daemon.log?offset=10");
++  });
++
++  it("refuses traversal in profile paths", async () => {
++    const { host, request } = setup();
++    await expect(host.readFile(`${ROOT}/../secret/config.json`, "utf-8")).rejects.toThrow();
++    await expect(host.readFile(`${ROOT}/p/sub/config.json`, "utf-8")).rejects.toThrow();
++    expect(request).not.toHaveBeenCalled();
++  });
++});
++
++describe("ohos-host CLI forwarding", () => {
++  it("execFile on the sentinel POSTs argv to /exec", async () => {
++    const { host, calls, setReply } = setup();
++    setReply({ status: 200, body: JSON.stringify({ code: 0, stdout: "ok", stderr: "" }) });
++    const cb = vi.fn();
++    host.execFile(HOST_CLI, ["daemon", "start", "--profile", "p"], { timeout: 7000 }, cb);
++    await vi.waitFor(() => expect(cb).toHaveBeenCalled());
++    expect(cb).toHaveBeenCalledWith(null, "ok", "");
++    expect(calls[0].path).toBe("/exec");
++    expect(JSON.parse(calls[0].body!.toString())).toMatchObject({
++      args: ["daemon", "start", "--profile", "p"],
++      timeout_ms: 7000,
++    });
++  });
++
++  it("surfaces non-zero exit as an Error with code and stderr", async () => {
++    const { host, setReply } = setup();
++    setReply({ status: 200, body: JSON.stringify({ code: 3, stdout: "", stderr: "nope" }) });
++    const cb = vi.fn();
++    host.execFile(HOST_CLI, ["daemon", "stop", "--profile", "p"], {}, cb);
++    await vi.waitFor(() => expect(cb).toHaveBeenCalled());
++    const [err, , stderr] = cb.mock.calls[0];
++    expect(err).toBeInstanceOf(Error);
++    expect(err.code).toBe(3);
++    expect(stderr).toBe("nope");
++  });
++
++  it("execFile of any other binary stays local", () => {
++    const { host, local, request } = setup();
++    const cb = vi.fn();
++    host.execFile("/usr/bin/true", [], {}, cb);
++    expect(local.execFile).toHaveBeenCalled();
++    expect(request).not.toHaveBeenCalled();
++  });
++});
++
++describe("ohos-host availability", () => {
++  it("hostCliAvailable is true when /health answers ok", async () => {
++    const { host, calls, setReply } = setup();
++    setReply({ status: 200, body: '{"ok":true,"version":"0.9.0"}' });
++    await expect(host.hostCliAvailable()).resolves.toBe(true);
++    expect(calls[0].path).toBe("/health");
++  });
++
++  it("is false when the bridge is down or config is missing", async () => {
++    const down = setup();
++    down.request.mockRejectedValueOnce(new Error("ECONNREFUSED"));
++    await expect(down.host.hostCliAvailable()).resolves.toBe(false);
++
++    const none = createHost({
++      platform: "openharmony",
++      profilesRoot: ROOT,
++      loadConfig: () => null,
++      request: vi.fn(),
++      local: {} as never,
++    });
++    await expect(none.hostCliAvailable()).resolves.toBe(false);
++  });
++});
