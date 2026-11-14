@@ -83,7 +83,7 @@ cexec "gem install bundler --no-document --force" \
 
 # atomgit CDN has transient 404s: retry once after 90s; brew reuses partial work
 for i in 1 2; do
-  if cexec "${ENV_PREFIX}${BREW_ENV} brew install --build-bottle --verbose $TAP/$FORMULA" 2>&1 | tee build.log; then
+  if cexec "${ENV_PREFIX}${BREW_ENV} brew install --build-bottle --verbose --debug $TAP/$FORMULA" 2>&1 | tee build.log; then
     break
   fi
   [ "$i" = 2 ] && exit 1
