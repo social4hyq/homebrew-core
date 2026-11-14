@@ -1,18 +1,22 @@
-OHOS: delegate the desktop signing and installation workflow to hap-installer.
+OHOS: add the desktop launcher and the device installer command.
 
 diff --git a/scripts/install-desktop-ohos.sh b/scripts/install-desktop-ohos.sh
 new file mode 100755
-index 0000000..decbefb
+index 0000000..64b19fe
 --- /dev/null
 +++ b/scripts/install-desktop-ohos.sh
-@@ -0,0 +1,34 @@
+@@ -0,0 +1,60 @@
 +#!/usr/bin/env bash
 +set -euo pipefail
++
++BUNDLE_ID="com.huawei.ohos_electron"
++HAP_ENTRY="resources/resfile/resources/app/desktop-bridge.json"
 +
 +usage() {
 +  printf '%s\n' 'Usage: multica install-desktop' '' \
 +    'Sign the bottled desktop HAP with your Huawei Developer account, install it' \
-+    'on a connected device, and start the application.'
++    'on a connected device, and start the application. The pairing key for the' \
++    'host bridge is written into the signed copy; the bottled HAP is not modified.'
 +}
 +
 +if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
@@ -25,33 +29,192 @@ index 0000000..decbefb
 +fi
 +
 +: "${MULTICA_UNSIGNED_HAP:?multica formula did not set the unsigned HAP path}"
++: "${MULTICA_DESKTOP_BRIDGE:?multica formula did not set the bridge path}"
++: "${MULTICA_DESKTOP:?multica formula did not set the desktop launcher path}"
++zip="${MULTICA_ZIP:-zip}"
++home="${MULTICA_HOME:-$HOME/.multica}"
++
 +if [[ ! -f "$MULTICA_UNSIGNED_HAP" ]]; then
 +  printf 'multica install-desktop: unsigned HAP not found: %s\n' "$MULTICA_UNSIGNED_HAP" >&2
 +  exit 1
 +fi
-+if ! command -v hap-installer >/dev/null 2>&1; then
++if ! command -v hap-installer > /dev/null 2>&1; then
 +  printf '%s\n' 'multica install-desktop: hap-installer is required; install it with brew install hap-installer.' >&2
 +  exit 1
 +fi
++if ! command -v "$zip" > /dev/null 2>&1; then
++  printf '%s\n' 'multica install-desktop: zip is required; install it with brew install zip.' >&2
++  exit 1
++fi
 +
-+exec hap-installer \
-+  --hap "$MULTICA_UNSIGNED_HAP" \
-+  --bundle-id com.huawei.ohos_electron \
++config="$("$MULTICA_DESKTOP_BRIDGE" --home "$home" --init-only)"
++
++stage="$(mktemp -d "${TMPDIR:-/tmp}/multica-desktop-inject.XXXXXX")"
++trap 'rm -rf "$stage"' EXIT
++injected="$stage/multica-desktop.hap"
++cp "$MULTICA_UNSIGNED_HAP" "$injected"
++mkdir -p "$stage/payload/$(dirname "$HAP_ENTRY")"
++cp "$config" "$stage/payload/$HAP_ENTRY"
++(cd "$stage/payload" && "$zip" -q "$injected" "$HAP_ENTRY")
++
++# The app reads its first status at launch; have the bridge up before it opens.
++"$MULTICA_DESKTOP" start --bridge-only
++
++hap-installer \
++  --hap "$injected" \
++  --bundle-id "$BUNDLE_ID" \
 +  --app-name MulticaSigning \
 +  --module electron \
 +  --ability EntryAbility
+diff --git a/scripts/multica-desktop-ohos.sh b/scripts/multica-desktop-ohos.sh
+new file mode 100755
+index 0000000..51b8485
+--- /dev/null
++++ b/scripts/multica-desktop-ohos.sh
+@@ -0,0 +1,125 @@
++#!/usr/bin/env bash
++# Run the host side of Multica Desktop: the loopback bridge that lets the
++# sandboxed app drive the multica CLI and read the daemon profile, then open
++# the app. The HAP sandbox can neither run binaries nor see ~/.multica.
++set -euo pipefail
++
++BUNDLE_ID="com.huawei.ohos_electron"
++MODULE="electron"
++ABILITY="EntryAbility"
++
++usage() {
++  printf '%s\n' 'Usage: multica desktop [start|stop|status] [--bridge-only]' '' \
++    '  start         ensure the desktop bridge is running, then open the app (default)' \
++    '  start --bridge-only' \
++    '                only ensure the bridge is running (for shell startup files)' \
++    '  stop          stop the bridge; the daemon keeps running' \
++    '  status        print the bridge state; exit 1 when stopped'
++}
++
++: "${MULTICA_DESKTOP_BRIDGE:?multica formula did not set the bridge path}"
++home="${MULTICA_HOME:-$HOME/.multica}"
++state="${MULTICA_DESKTOP_STATE:-/data/storage/el2/base/files/multica-desktop}"
++pidfile="$state/bridge.pid"
++logfile="$state/bridge.log"
++
++pairing_port() {
++  local config
++  config="$("$MULTICA_DESKTOP_BRIDGE" --home "$home" --init-only)"
++  sed -n 's/.*"port":\([0-9][0-9]*\).*/\1/p' "$config"
++}
++
++healthy() {
++  local port="$1"
++  if command -v curl > /dev/null 2>&1; then
++    curl -sf -m 2 "http://127.0.0.1:${port}/health" > /dev/null 2>&1
++  else
++    # bash's built-in TCP redirection; avoids a curl dependency.
++    (
++      exec 3<> "/dev/tcp/127.0.0.1/${port}" || exit 1
++      printf 'GET /health HTTP/1.0\r\n\r\n' >&3
++      # read, not grep: grep gets EAGAIN on a bash TCP fd.
++      while IFS= read -r -t 2 -u 3 line; do
++        case "$line" in *'"ok":true'*) exit 0 ;; esac
++      done
++      exit 1
++    ) 2> /dev/null
++  fi
++}
++
++start_bridge() {
++  local port i
++  port="$(pairing_port)"
++  if healthy "$port"; then
++    return 0
++  fi
++  : "${MULTICA_REAL_CLI:?multica formula did not set the CLI path}"
++  mkdir -p "$state"
++  setsid nohup "$MULTICA_DESKTOP_BRIDGE" --home "$home" --cli "$MULTICA_REAL_CLI" \
++    >> "$logfile" 2>&1 < /dev/null &
++  printf '%s\n' "$!" > "$pidfile"
++  for ((i = 0; i < 50; i++)); do
++    if healthy "$port"; then
++      return 0
++    fi
++    sleep 0.2
++  done
++  printf 'multica desktop: bridge did not come up on port %s; see %s\n' "$port" "$logfile" >&2
++  return 1
++}
++
++open_app() {
++  local hdc="${MULTICA_HDC:-hdc}" target="${MULTICA_DEVICE:-}"
++  if [[ -z "$target" ]]; then
++    target="$("$hdc" list targets 2> /dev/null | grep -v -F '[Empty]' | head -n 1 || true)"
++  fi
++  if [[ -z "$target" ]]; then
++    printf '%s\n' 'multica desktop: no connected device; connect one with hdc and retry.' >&2
++    return 1
++  fi
++  "$hdc" -t "$target" shell aa start -a "$ABILITY" -b "$BUNDLE_ID" -m "$MODULE"
++}
++
++cmd="${1:-start}"
++case "$cmd" in
++  -h | --help | help)
++    usage
++    ;;
++  start)
++    bridge_only=0
++    for arg in "${@:2}"; do
++      case "$arg" in
++        --bridge-only) bridge_only=1 ;;
++        *)
++          printf 'multica desktop: unknown option: %s\n' "$arg" >&2
++          usage >&2
++          exit 2
++          ;;
++      esac
++    done
++    start_bridge
++    if ((bridge_only == 0)); then
++      open_app
++    fi
++    ;;
++  stop)
++    if [[ -f "$pidfile" ]]; then
++      kill "$(cat "$pidfile")" 2> /dev/null || true
++      rm -f "$pidfile"
++    fi
++    ;;
++  status)
++    port="$(pairing_port)"
++    if healthy "$port"; then
++      printf 'bridge: running (port %s)\n' "$port"
++    else
++      printf 'bridge: stopped\n'
++      exit 1
++    fi
++    ;;
++  *)
++    printf 'multica desktop: unknown command: %s\n' "$cmd" >&2
++    usage >&2
++    exit 2
++    ;;
++esac
 diff --git a/scripts/multica-dispatch-ohos.sh b/scripts/multica-dispatch-ohos.sh
 new file mode 100755
-index 0000000..c99730f
+index 0000000..182617f
 --- /dev/null
 +++ b/scripts/multica-dispatch-ohos.sh
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,15 @@
 +#!/usr/bin/env bash
 +set -euo pipefail
 +
-+if [[ "${1:-}" == "install-desktop" ]]; then
-+  shift
-+  exec "$MULTICA_INSTALL_DESKTOP" "$@"
-+fi
++case "${1:-}" in
++  install-desktop)
++    shift
++    exec "$MULTICA_INSTALL_DESKTOP" "$@"
++    ;;
++  desktop)
++    shift
++    exec "$MULTICA_DESKTOP" "$@"
++    ;;
++esac
 +
 +exec "$MULTICA_REAL_CLI" "$@"
