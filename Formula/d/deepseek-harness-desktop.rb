@@ -92,7 +92,12 @@ class DeepseekHarnessDesktop < Formula
     node24 = (formula_opt_bin("node@24")/"node").to_s
     ENV["DSH_OHOS_NODE_BINARY"] = node24
 
-    system "pnpm", "install", "--frozen-lockfile", "--reporter=append-only"
+    # CI network is a flaky proxy: bound fetch stalls and retry instead of
+    # letting one hung connection eat the whole job budget.
+    ENV["npm_config_fetch_retries"] = "10"
+    ENV["npm_config_fetch_timeout"] = "300000"
+    ENV["npm_config_network_concurrency"] = "8"
+    system "timeout", "2700", "pnpm", "install", "--frozen-lockfile", "--reporter=append-only"
 
     # Complete-build record for the client artifacts (pack-local-packages
     # insists on a full build's public environment; profile "local").
