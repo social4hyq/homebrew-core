@@ -7,11 +7,39 @@ RecordingFileExport path. Trim/recovery exports also offer the picker.
 On OHOS, write trim-save output to the app sandbox first: the Qt file
 dialog returns a document URI that QSaveFile cannot write. The sandbox
 destination is chosen at publish time so it cannot collide with staging.
+Keep the recording area a Qt::Tool window (capture-friendly) and focus the
+recording toolbar for keyboard shortcuts.
 
 diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
 --- a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
 +++ b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
-@@ -1623,8 +1623,11 @@
+@@ -590,6 +590,19 @@
+     }
+ 
+     void showRecordingControls() {
++#ifdef Q_OS_HARMONY
++        // A Qt::Tool area cannot take keyboard focus reliably on OHOS. Keep
++        // the area as the capture-friendly tool window and let the focusable
++        // toolbar own the recording shortcuts. Retry after the window is
++        // mapped; the first activateWindow can arrive before the native
++        // surface is ready.
++        toolbarWindow->showAndActivate();
++        QTimer::singleShot(0, toolbarWindow,
++                           [window = QPointer<ScreenRecordingToolbarWindow>(toolbarWindow)]() {
++                               if (window != nullptr && window->isVisible())
++                                   window->showAndActivate();
++                           });
++#else
+         toolbarWindow->showWithoutActivating();
+         if (!areaWindow->activateInput()) {
+             toolbarWindow->showAndActivate();
+@@ -596,4 +609,5 @@
+         }
++#endif
+     }
+ 
+     bool isOpen() const {
+@@ -1623,8 +1637,11 @@
          trimSession = new RecordingTrimSession(areaWindow, toolbarWindow, &owner);
          trimSession->reportError = [this](const QString& error) { showError(error); };
          trimSession->exported = [this, session = trimSession](const QString& path) {
@@ -23,7 +51,7 @@ diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp 
              notifyExportCompleted(path);
          };
      }
-@@ -1784,6 +1787,10 @@
+@@ -1784,6 +1801,10 @@
          // Finalized observers can destroy the controller or start a new session.
          // Keep the original Copy intent and its path independent of that callback.
          const QPointer<ScreenRecordingController> guard(&owner);
@@ -34,7 +62,7 @@ diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp 
          notifyExportCompleted(completedPath);
          if (guard)
              emit guard->finalized();
-@@ -1791,6 +1798,16 @@
+@@ -1791,6 +1812,16 @@
              copyFileToClipboard(completedPath);
      }
  
@@ -51,7 +79,7 @@ diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp 
      void notifyExportCompleted(const QString& path) {
          if (snow_shot::storage::RecordingSettings().notifyAfterExportCompletes())
              emit owner.exportNotificationRequested(path);
-@@ -1894,6 +1911,7 @@
+@@ -1894,6 +1925,7 @@
                  trimSession->reportError = [this](const QString& error) { showError(error); };
                  trimSession->exported = [this, marker, record](const QString& path) {
                      static_cast<void>(clearRecovery(marker, record));
@@ -59,7 +87,7 @@ diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp 
                      notifyExportCompleted(path);
                  };
                  trimSession->open(record.sourcePath, pendingOutputPath, {}, true, false, {});
-@@ -2598,6 +2616,7 @@
+@@ -2598,6 +2630,7 @@
      }
  
      PermissionCheck permissionCheck;
@@ -67,7 +95,7 @@ diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp 
      bool sessionEnding = false;
      bool recoveryOffered = false;
      QJsonObject automationOptions;
-@@ -2768,6 +2787,10 @@
+@@ -2768,6 +2801,10 @@
      m_impl->permissionCheck = std::move(check);
  }
  
