@@ -1,0 +1,69 @@
+OHOS: recordings are staged in the app sandbox, and the system-tray
+notification used by other platforms is never shown on OHOS (the tray is
+intentionally disabled there), so the existing OpenRecording notification
+action is unreachable. Offer the DocumentViewPicker as soon as a recording
+is finalized, except for copy-only finishes, reusing the existing
+RecordingFileExport path.
+
+diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
+--- a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
++++ b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
+@@ -1784,7 +1784,9 @@
+         // Finalized observers can destroy the controller or start a new session.
+         // Keep the original Copy intent and its path independent of that callback.
+         const QPointer<ScreenRecordingController> guard(&owner);
+-        notifyExportCompleted(completedPath);
++        // A copy-only finish keeps the clipboard payload private; other finishes
++        // still offer the user a public destination below.
++        notifyExportCompleted(completedPath, !shouldCopy);
+         if (guard)
+             emit guard->finalized();
+         if (shouldCopy)
+@@ -1791,7 +1793,15 @@
+             copyFileToClipboard(completedPath);
+     }
+ 
+-    void notifyExportCompleted(const QString& path) {
++    void notifyExportCompleted(const QString& path, bool offerUserFile = true) {
++#ifdef Q_OS_HARMONY
++        // OHOS recordings are staged in the app sandbox and there is no usable
++        // tray notification, so offer the DocumentViewPicker directly.
++        if (offerUserFile)
++            emit owner.userFileExportRequested(path);
++#else
++        Q_UNUSED(offerUserFile);
++#endif
+         if (snow_shot::storage::RecordingSettings().notifyAfterExportCompletes())
+             emit owner.exportNotificationRequested(path);
+     }
+diff --git a/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h b/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h
+--- a/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h
++++ b/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h
+@@ -47,6 +47,7 @@
+     void captureActivityChanged(bool active);
+     void finalized();
+     void exportNotificationRequested(const QString& path);
++    void userFileExportRequested(const QString& path);
+ 
+   private:
+     struct Impl;
+diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow_shot/src/presentation/services/screenshotcontroller.cpp
+--- a/snow_shot/src/presentation/services/screenshotcontroller.cpp
++++ b/snow_shot/src/presentation/services/screenshotcontroller.cpp
+@@ -1448,7 +1448,16 @@
+     QObject::connect(m_screenRecordingController.get(),
+                      &ScreenRecordingController::exportNotificationRequested, &owner,
+                      &ScreenshotController::recordingExportNotificationRequested);
++#ifdef Q_OS_HARMONY
+     QObject::connect(m_screenRecordingController.get(),
++                     &ScreenRecordingController::userFileExportRequested, &owner,
++                     [this](const QString& path) {
++                         QTimer::singleShot(0, &owner, [this, path]() {
++                             owner.exportScreenRecordingToUserFile(path);
++                         });
++                     });
++#endif
++    QObject::connect(m_screenRecordingController.get(),
+                      &ScreenRecordingController::captureActivityChanged, &owner,
+                      [this](bool active) {
+                          emit owner.captureActivityChanged(QStringLiteral("recording"), active);
