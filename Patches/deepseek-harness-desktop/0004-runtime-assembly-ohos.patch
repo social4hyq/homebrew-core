@@ -1,0 +1,157 @@
+diff --git a/apps/desktop/scripts/prepare-dsh.ts b/apps/desktop/scripts/prepare-dsh.ts
+index a0698880..9ef4de10 100644
+--- a/apps/desktop/scripts/prepare-dsh.ts
++++ b/apps/desktop/scripts/prepare-dsh.ts
+@@ -4,7 +4,7 @@ import { resolveMacOSSignatureCacheDirectory } from './macos-signature-cache-dir
+ import { packagingStep } from './packaging-step.mjs'
+ import { spawn } from 'node:child_process'
+ import { createHash } from 'node:crypto'
+-import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
++import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+ import { tmpdir } from 'node:os'
+ import { delimiter, join, relative, resolve } from 'node:path'
+ import { desktopNodeEnvironment } from '../src/node-environment.ts'
+@@ -44,7 +44,8 @@ const STORE_ROOT = BUILD_PATHS.pnpmStore
+ const RUNTIME_ROOT = BUILD_PATHS.runtime
+ const PNPM_BUILD_STATE = BUILD_PATHS.dshPnpm
+ const PACKAGE_SET_ROOT = BUILD_PATHS.packageSet
+-const NODE = join(BUILD_PATHS.electron, process.platform === 'win32' ? 'electron.exe' : 'Electron.app/Contents/MacOS/Electron')
++// OHOS: no Electron 44 exists for openharmony; build/smoke with the host's own Node.
++const NODE = process.env.DSH_DESKTOP_NODE ?? join(BUILD_PATHS.electron, process.platform === 'win32' ? 'electron.exe' : 'Electron.app/Contents/MacOS/Electron')
+ const PNPM = join(RUNTIME_ROOT, 'primary-runtime', 'dependencies', 'pnpm', 'bin', 'pnpm.mjs')
+ 
+ function manifestVersion(path: string, subject: string): string {
+@@ -151,6 +152,45 @@ async function main(): Promise<void> {
+         filter: source => desktopRuntimeFileExclusion(relative(modules, source), target, officeEngine) === undefined,
+       })
+     })
++    // OHOS: npm 分发的 .node 与本地产出的 pty.node 均未签名，OHOS 拒载；统一就地签名。
++    await packagingStep(process.env.DSH_DESKTOP_PACKAGING_RUN_DIR, 'runtime:sign-native', async () => {
++      const { execFileSync: signExec } = await import('node:child_process')
++      const signTool = process.env.DSH_SIGN_TOOL ?? 'binary-sign-tool'
++      const pending: string[] = []
++      const walk = (dir: string): void => {
++        for (const entry of readdirSync(dir, { withFileTypes: true })) {
++          const full = join(dir, entry.name)
++          if (entry.isDirectory()) walk(full)
++          else if (entry.isFile() && entry.name.endsWith('.node')) pending.push(full)
++        }
++      }
++      walk(join(DSH_OUTPUT_ROOT, 'node_modules'))
++      for (const file of pending) {
++        // 只签 ELF（Mach-O/PE 的异平台 prebuild 跳过；异平台件由 file-policy 另行裁剪）。
++        const head = readFileSync(file).subarray(0, 4)
++        if (head.length < 4 || head[0] !== 0x7f || head[1] !== 0x45 || head[2] !== 0x4c || head[3] !== 0x46) continue
++        try {
++          signExec(signTool, ['sign', '-selfSign', '1', '-inFile', file, '-outFile', `${file}.signed`], { stdio: 'inherit' })
++          renameSync(`${file}.signed`, file)
++        } catch (error) {
++          throw new Error(`desktop runtime: signing ${file} failed: ${String(error)}`)
++        }
++      }
++      console.log(`desktop runtime: signed ${String(pending.length)} native module(s)`)
++    })
++    // OHOS: 注入本地构建的原生平台包（loader 按 <name>-openharmony-arm64 解析 optionalDep）。
++    // DSH_OHOS_NATIVE_PACKAGES：冒号分隔的包目录，每个含 package.json + 已签名 .node。
++    const ohosNative = process.env.DSH_OHOS_NATIVE_PACKAGES
++    if (ohosNative !== undefined && ohosNative !== '') {
++      await packagingStep(process.env.DSH_DESKTOP_PACKAGING_RUN_DIR, 'runtime:inject-ohos-native', async () => {
++        for (const dir of ohosNative.split(delimiter)) {
++          const name = (JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')) as { name?: string }).name
++          if (name === undefined) throw new Error(`desktop runtime: OHOS native package at ${dir} has no name`)
++          cpSync(dir, join(DSH_OUTPUT_ROOT, 'node_modules', ...name.split('/')), { recursive: true })
++          console.log(`desktop runtime: injected OHOS native package ${name}`)
++        }
++      })
++    }
+     writeFileSync(join(DSH_OUTPUT_ROOT, 'package.json'), `${JSON.stringify({
+       name: '@deepseek-ai/dsh-desktop-runtime', private: true, version: release.version, type: 'module',
+       dependencies: Object.fromEntries(packageSet.packages.map(entry => [entry.name, entry.version])),
+@@ -180,7 +220,8 @@ async function main(): Promise<void> {
+       await packagingStep(process.env.DSH_DESKTOP_PACKAGING_RUN_DIR, 'runtime:verify-after-smoke', () => verifyDesktopRuntime(DSH_OUTPUT_ROOT, release.version, target))
+     }
+   } catch (error) {
+-    rmSync(DSH_OUTPUT_ROOT, { recursive: true, force: true })
++    // OHOS 调试逃生门：DSH_DESKTOP_KEEP_FAILED_RUNTIME=1 时保留失败现场。
++    if (process.env.DSH_DESKTOP_KEEP_FAILED_RUNTIME !== '1') rmSync(DSH_OUTPUT_ROOT, { recursive: true, force: true })
+     throw error
+   } finally {
+     let cleaned = false
+diff --git a/apps/desktop/scripts/runtime-patch-policy.ts b/apps/desktop/scripts/runtime-patch-policy.ts
+index a56dc95e..8e62a3c4 100644
+--- a/apps/desktop/scripts/runtime-patch-policy.ts
++++ b/apps/desktop/scripts/runtime-patch-policy.ts
+@@ -20,6 +20,8 @@ export const DESKTOP_RUNTIME_PATCHES: Readonly<Record<string, DesktopRuntimePatc
+   'mdast-util-gfm-autolink-literal@2.0.1': { scope: 'workspace-only', reason: 'The patched Markdown parser is embedded in the client bundle.' },
+   'micromark-extension-gfm-autolink-literal@2.1.0': { scope: 'workspace-only', reason: 'The patched Markdown parser is embedded in the client bundle.' },
+   'node-pty@1.2.0-beta.15': { scope: 'shared', reason: 'Runtime terminals need helper resolution and Windows worker cleanup.' },
++  // OHOS: koffi 在 openharmony 从源码构建（cnoke），runtime 安装需要同一补丁。
++  'koffi@3.1.1': { scope: 'shared', reason: 'OHOS builds Koffi from source; the runtime install needs the same fix.' },
+ }
+ 
+ /** Reviewed Desktop dependency constraints, independent of patch selection. */
+diff --git a/apps/desktop/tests/fixtures/pnpm-smoke.mjs b/apps/desktop/tests/fixtures/pnpm-smoke.mjs
+index 5d16769a..68b6780d 100644
+--- a/apps/desktop/tests/fixtures/pnpm-smoke.mjs
++++ b/apps/desktop/tests/fixtures/pnpm-smoke.mjs
+@@ -13,7 +13,8 @@ import { delimiter, join } from 'node:path'
+  * @returns {Promise<void>} Resolves after execution and removal of the private installation.
+  */
+ export async function checkPnpm(resourcesRuntime) {
+-  assert.ok(process.versions.electron, 'Run the package-manager smoke with Electron Node mode')
++  // OHOS: 无 Electron 44；openharmony 下用 payload 自包含 Node 跑同一组检查。
++  assert.ok(process.versions.electron || process.platform === 'openharmony', 'Run the package-manager smoke with Electron Node mode')
+   assert.equal(existsSync(join(resourcesRuntime, 'pnpm')), false, 'Desktop must ship only primary-runtime pnpm')
+   const primary = join(resourcesRuntime, 'primary-runtime')
+   const pnpm = join(primary, 'dependencies', 'pnpm', 'bin', 'pnpm.mjs')
+@@ -36,7 +37,7 @@ export async function checkPnpm(resourcesRuntime) {
+ const assert = require('node:assert/strict')
+ assert.equal(require('desktop-pnpm-smoke-dependency').answer, 42)
+ assert.equal(process.execPath, ${JSON.stringify(process.execPath)})
+-assert.ok(process.versions.electron)
++if (process.platform !== 'openharmony') assert.ok(process.versions.electron)
+ assert.ok(process.execArgv.includes('--expose-internals'))
+ assert.equal(typeof require('internal/modules/esm/loader').getOrInitializeCascadedLoader, 'function')
+ console.log('desktop-node-script-ok')
+diff --git a/patches/koffi@3.1.1.patch b/patches/koffi@3.1.1.patch
+new file mode 100644
+index 00000000..4ca4ff7d
+--- /dev/null
++++ b/patches/koffi@3.1.1.patch
+@@ -0,0 +1,36 @@
++diff --git a/src/koffi/CMakeLists.txt b/src/koffi/CMakeLists.txt
++index 6afbfbb..e889c26 100644
++--- a/src/koffi/CMakeLists.txt
+++++ b/src/koffi/CMakeLists.txt
++@@ -9,11 +9,18 @@ if(NOT NODE_JS_INCLUDE_DIRS)
++ endif()
++ 
++ project(koffi C CXX ASM)
+++
+++# OHOS: cmake's host detection reports CMAKE_SYSTEM_PROCESSOR=unknown on
+++# HarmonyOS; fall back to `uname -m` so the aarch64 ABI assembly is selected.
+++if(CMAKE_SYSTEM_PROCESSOR STREQUAL "unknown" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "")
+++    execute_process(COMMAND uname -m OUTPUT_VARIABLE CMAKE_SYSTEM_PROCESSOR OUTPUT_STRIP_TRAILING_WHITESPACE)
+++endif()
++ find_package(CNoke)
++ 
++ include(CheckCXXCompilerFlag)
++ 
++ set(CMAKE_CXX_STANDARD 20)
+++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
++ if(MSVC)
++     set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded)
++     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus /Zc:preprocessor /Zc:twoPhase- /W4 /wd4200 /wd4201 /wd4127 /wd4458 /wd4706 /wd4702 /wd4324")
++diff --git a/lib/native/base/base.cc b/lib/native/base/base.cc
++index a157161..d1495e1 100644
++--- a/lib/native/base/base.cc
+++++ b/lib/native/base/base.cc
++@@ -2949,7 +2949,7 @@ static FileType FileModeToType(mode_t mode)
++ 
++ static StatResult StatAt(int fd, bool fd_is_directory, const char *filename, unsigned int flags, FileInfo *out_info)
++ {
++-#if defined(__linux__)
+++#if defined(__linux__) && defined(STATX_TYPE)
++     const char *pathname = filename;
++     int stat_flags = (flags & (int)StatFlag::FollowSymlink) ? 0 : AT_SYMLINK_NOFOLLOW;
++     int stat_mask = STATX_TYPE | STATX_MODE | STATX_MTIME | STATX_BTIME | STATX_SIZE;

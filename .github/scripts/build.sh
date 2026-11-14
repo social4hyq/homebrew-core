@@ -83,11 +83,13 @@ cexec "gem install bundler --no-document --force" \
 
 # atomgit CDN has transient 404s: retry once after 90s; brew reuses partial work
 for i in 1 2; do
-  if cexec "${ENV_PREFIX}${BREW_ENV} brew install --build-bottle --verbose $TAP/$FORMULA" 2>&1 | tee build.log; then
+  if cexec "${ENV_PREFIX}${BREW_ENV} brew install --build-bottle --verbose --debug $TAP/$FORMULA" 2>&1 | tee build.log; then
     break
   fi
   [ "$i" = 2 ] && exit 1
   echo "::warning::brew install attempt $i failed, retrying in 90s (atomgit transient 404)"
+  # 调试：重试前重新 trust（排除 trust 引用失效导致依赖加载被拒）
+  cexec "brew trust $TAP" || true
   sleep 90
 done
 
