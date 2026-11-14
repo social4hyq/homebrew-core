@@ -39,7 +39,7 @@ diff --git a/snow_shot/src/presentation/services/screenshotclipboardservice.cpp 
  #include <algorithm>
  #include <array>
  #include <cstring>
-@@ -34,6 +42,33 @@
+@@ -34,6 +42,40 @@
  #include <span>
  #include <utility>
  
@@ -48,6 +48,7 @@ diff --git a/snow_shot/src/presentation/services/screenshotclipboardservice.cpp 
 +QMutex g_latestClipboardPngMutex;
 +QByteArray g_latestClipboardPng;
 +std::uint32_t g_latestClipboardChangeCount = 0;
++quint64 g_latestClipboardPublishSerial = 0;
 +
 +std::uint32_t pasteboardChangeCount() {
 +    auto* pasteboard = OH_Pasteboard_Create();
@@ -63,9 +64,15 @@ diff --git a/snow_shot/src/presentation/services/screenshotclipboardservice.cpp 
 +    QMutexLocker locker(&g_latestClipboardPngMutex);
 +    if (g_latestClipboardPng.isEmpty())
 +        return std::nullopt;
++    const auto currentCount = pasteboardChangeCount();
 +    // Do not serve stale content after another process changed the clipboard.
-+    if (pasteboardChangeCount() != g_latestClipboardChangeCount)
++    if (currentCount != g_latestClipboardChangeCount) {
++        qWarning("SNOW_CLIP_CACHE stale current=%u recorded=%u", currentCount,
++                 g_latestClipboardChangeCount);
 +        return std::nullopt;
++    }
++    qWarning("SNOW_CLIP_CACHE hit count=%u bytes=%d", currentCount,
++             static_cast<int>(g_latestClipboardPng.size()));
 +    return g_latestClipboardPng;
 +}
 +#endif
@@ -73,16 +80,26 @@ diff --git a/snow_shot/src/presentation/services/screenshotclipboardservice.cpp 
  struct ScreenshotClipboardCommitState {
      std::atomic_bool cancelled{false};
      std::atomic_bool finished{false};
-@@ -98,6 +133,13 @@
+@@ -98,6 +140,23 @@
  #endif
      clipboard->setMimeData(new PngClipboardMimeData(png, placement, appearance, filePath),
                             QClipboard::Clipboard);
 +#if defined(Q_OS_HARMONY)
++    quint64 publishSerial = 0;
 +    {
 +        QMutexLocker locker(&g_latestClipboardPngMutex);
 +        g_latestClipboardPng = png;
-+        g_latestClipboardChangeCount = pasteboardChangeCount();
++        publishSerial = ++g_latestClipboardPublishSerial;
 +    }
++    // Qt's OHOS clipboard write crosses the JS thread; the pasteboard change
++    // counter can still describe the previous owner when setMimeData returns.
++    // Refresh it after the write settles, but never after a newer publication.
++    QTimer::singleShot(250, QCoreApplication::instance(), [publishSerial] {
++        QMutexLocker locker(&g_latestClipboardPngMutex);
++        if (publishSerial != g_latestClipboardPublishSerial)
++            return;
++        g_latestClipboardChangeCount = pasteboardChangeCount();
++    });
 +#endif
      return true;
  }
