@@ -1,0 +1,91 @@
+diff --git a/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp b/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp
+--- a/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp
++++ b/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp
+@@ -13,6 +13,11 @@
+ #include <QWheelEvent>
+ 
+ QCursor snowCanvasCornerRadiusCursor(qreal devicePixelRatio) {
++#if defined(Q_OS_HARMONY)
++    // Qt's OHOS QPA crashes in setCustomCursor when a pixmap cursor is set.
++    Q_UNUSED(devicePixelRatio);
++    return QCursor(Qt::SizeFDiagCursor);
++#else
+     constexpr int kCursorLogicalSize = 32;
+     constexpr QPoint kHotSpot(3, 3);
+     return adqt::icons::makeCursor(snow::draw_engine::icons::cursor::CornerRadius(),
+@@ -19,5 +24,6 @@
+                                    QSize(kCursorLogicalSize, kCursorLogicalSize), kHotSpot,
+                                    devicePixelRatio);
++#endif
+ }
+ 
+ namespace snow_canvas_input {
+@@ -24,6 +30,14 @@
+ 
+ QCursor strokeCursor(double diameter, const std::optional<QColor>& color, bool crosshair,
+                      qreal devicePixelRatio) {
++#if defined(Q_OS_HARMONY)
++    // Qt's OHOS QPA crashes in setCustomCursor when a pixmap cursor is set.
++    Q_UNUSED(diameter);
++    Q_UNUSED(color);
++    Q_UNUSED(crosshair);
++    Q_UNUSED(devicePixelRatio);
++    return QCursor(Qt::CrossCursor);
++#else
+     diameter = std::isfinite(diameter) ? std::clamp(diameter, 1.0, 1024.0) : 1.0;
+     const qreal dpr =
+         std::isfinite(devicePixelRatio) && devicePixelRatio > 0.0 ? devicePixelRatio : 1.0;
+@@ -57,6 +71,7 @@
+     }
+     painter.end();
+     return QCursor(pixmap, radius, radius);
++#endif
+ }
+ 
+ QCursor cursorForSnowCursor(SnowCursorStyle style, qreal devicePixelRatio) {
+diff --git a/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp b/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp
+--- a/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp
++++ b/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp
+@@ -568,6 +568,12 @@
+     if (canvas == nullptr)
+         return;
+     const qreal dpr = canvas->devicePixelRatioF();
++#if defined(Q_OS_HARMONY)
++    // Qt's OHOS QPA crashes in setCustomCursor when a pixmap cursor is set.
++    Q_UNUSED(handle);
++    Q_UNUSED(dpr);
++    canvas->setCursorForLayer(SnowCanvasCursorLayer::Host, QCursor(Qt::SizeFDiagCursor));
++#else
+     const QCursor cursor =
+         handle == ScreenshotSelectionEffectHandle::Width
+             ? adqt::icons::makeCursor(
+@@ -575,6 +581,7 @@
+                   QSize(32, 32), QPoint(3, 3), dpr)
+             : snowCanvasCornerRadiusCursor(dpr);
+     canvas->setCursorForLayer(SnowCanvasCursorLayer::Host, cursor);
++#endif
+ }
+ 
+ namespace {
+diff --git a/snow_shot/src/presentation/services/screenshotcanvascolorsamplerwindow.cpp b/snow_shot/src/presentation/services/screenshotcanvascolorsamplerwindow.cpp
+--- a/snow_shot/src/presentation/services/screenshotcanvascolorsamplerwindow.cpp
++++ b/snow_shot/src/presentation/services/screenshotcanvascolorsamplerwindow.cpp
+@@ -158,6 +158,10 @@
+ }
+ 
+ QCursor ScreenshotCanvasColorSamplerWindow::samplingCursor() {
++#if defined(Q_OS_HARMONY)
++    // Qt's OHOS QPA crashes in setCustomCursor when a pixmap cursor is set.
++    return QCursor(Qt::CrossCursor);
++#else
+     QScreen* cursorScreen = QGuiApplication::screenAt(QCursor::pos());
+     if (cursorScreen == nullptr) {
+         cursorScreen = QGuiApplication::primaryScreen();
+@@ -192,6 +196,7 @@
+     painter.end();
+ 
+     return QCursor(cursorPixmap, 5, 25);
++#endif
+ }
+ 
+ QSize ScreenshotCanvasColorSamplerWindow::sizeHint() const {
