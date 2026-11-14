@@ -2,10 +2,10 @@ OHOS: let the sandboxed desktop drive the host CLI and daemon profile through a 
 
 diff --git a/apps/desktop/src/main/daemon-manager-ohos.test.ts b/apps/desktop/src/main/daemon-manager-ohos.test.ts
 new file mode 100644
-index 0000000..7a88967
+index 0000000..86b916b
 --- /dev/null
 +++ b/apps/desktop/src/main/daemon-manager-ohos.test.ts
-@@ -0,0 +1,326 @@
+@@ -0,0 +1,416 @@
 +// @vitest-environment node
 +import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 +
@@ -331,9 +331,99 @@ index 0000000..7a88967
 +    expect(ctx.host.hostCliAvailable).not.toHaveBeenCalled();
 +    expect(states().at(-1)).toBe("cli_not_found");
 +  });
++  // The login auto-start is emitted once per session. If it arrives while the
++  // CLI is unavailable it does nothing, and the automatic retry that later
++  // restores the CLI must not leave the daemon down.
++  describe("deferred login auto-start", () => {
++    const startCalls = () =>
++      ctx.host.execFile.mock.calls.filter((c) => c[1][0] === "daemon" && c[1][1] === "start");
++    const withPrefs = (prefs: { autoStart: boolean; autoStop: boolean }) => {
++      const base = ctx.host.readFile.getMockImplementation()!;
++      ctx.host.readFile.mockImplementation(async (p: string, e: string) =>
++        p.endsWith("desktop_prefs.json") ? JSON.stringify(prefs) : base(p, e),
++      );
++    };
++
++    it("starts the daemon once the CLI recovers, if the login auto-start was dropped meanwhile", async () => {
++      await bootWithoutBridge();
++      await ctx.handlers.get("daemon:auto-start")!({}); // CLI unavailable: nothing starts
++      expect(startCalls()).toHaveLength(0);
++
++      ctx.host.hostCliAvailable.mockResolvedValue(true);
++      await vi.advanceTimersByTimeAsync(5_000); // the automatic retry recovers the CLI
++      await vi.advanceTimersByTimeAsync(0);
++
++      expect(startCalls()).toHaveLength(1);
++      expect(startCalls()[0][0]).toBe("multica-host");
++      expect(startCalls()[0][1]).toEqual(["daemon", "start", "--profile", expect.any(String)]);
++    });
++
++    it("respects a disabled auto-start preference", async () => {
++      withPrefs({ autoStart: false, autoStop: false });
++      await bootWithoutBridge();
++      await ctx.handlers.get("daemon:auto-start")!({});
++      ctx.host.hostCliAvailable.mockResolvedValue(true);
++      await vi.advanceTimersByTimeAsync(5_000);
++      await vi.advanceTimersByTimeAsync(0);
++
++      expect(states().at(-1)).not.toBe("cli_not_found");
++      expect(startCalls()).toHaveLength(0);
++    });
++
++    it("does not start a daemon before the renderer has asked for the login auto-start", async () => {
++      await bootWithoutBridge();
++      ctx.host.hostCliAvailable.mockResolvedValue(true);
++      await vi.advanceTimersByTimeAsync(5_000); // CLI recovers, but no login sync happened yet
++      await vi.advanceTimersByTimeAsync(0);
++      expect(startCalls()).toHaveLength(0);
++
++      await ctx.handlers.get("daemon:auto-start")!({}); // the normal login path still works
++      expect(startCalls()).toHaveLength(1);
++    });
++
++    it("runs the deferred auto-start only once", async () => {
++      await bootWithoutBridge();
++      await ctx.handlers.get("daemon:auto-start")!({});
++      ctx.host.hostCliAvailable.mockResolvedValue(true);
++      await vi.advanceTimersByTimeAsync(5_000);
++      await vi.advanceTimersByTimeAsync(0);
++      expect(startCalls()).toHaveLength(1);
++
++      // A later manual retry must not repeat it. (Not waiting any longer: the
++      // crash-recovery policy would legitimately retry a start that never
++      // became healthy, and that is not what is under test here.)
++      await ctx.handlers.get("daemon:retry-install")!({});
++      await vi.advanceTimersByTimeAsync(0);
++      expect(startCalls()).toHaveLength(1);
++    });
++
++    it("also runs it when the user recovers the CLI with the retry button", async () => {
++      await bootWithoutBridge();
++      await ctx.handlers.get("daemon:auto-start")!({});
++      ctx.host.hostCliAvailable.mockResolvedValue(true);
++      await ctx.handlers.get("daemon:retry-install")!({});
++      await vi.advanceTimersByTimeAsync(0);
++      expect(startCalls()).toHaveLength(1);
++    });
++
++    it("leaves other platforms alone", async () => {
++      vi.useFakeTimers({ toFake: [...TIMERS] });
++      Object.defineProperty(process, "platform", { value: "linux" });
++      await boot();
++      await vi.advanceTimersByTimeAsync(0);
++      expect(states()).toContain("cli_not_found");
++      await ctx.handlers.get("daemon:auto-start")!({}); // dropped: CLI missing
++
++      ctx.exists.mockImplementation((p: string) => String(p).endsWith("resources/bin/multica"));
++      await ctx.handlers.get("daemon:retry-install")!({}); // the CLI now resolves
++      await vi.advanceTimersByTimeAsync(0);
++      expect(states().at(-1)).not.toBe("cli_not_found");
++      expect(startCalls()).toHaveLength(0);
++    });
++  });
 +});
 diff --git a/apps/desktop/src/main/daemon-manager.ts b/apps/desktop/src/main/daemon-manager.ts
-index e0c6748..3534499 100644
+index e0c6748..5209584 100644
 --- a/apps/desktop/src/main/daemon-manager.ts
 +++ b/apps/desktop/src/main/daemon-manager.ts
 @@ -1,13 +1,5 @@
@@ -511,7 +601,56 @@ index e0c6748..3534499 100644
      const pid = parseDaemonPid(raw);
      if (pid === null) {
        console.warn(
-@@ -1324,6 +1337,7 @@ async function bootstrapCli(): Promise<void> {
+@@ -1319,11 +1332,56 @@ function startPolling(): void {
+  * stopped/running state machine. Called once at startup and again on
+  * user-triggered `daemon:retry-install`.
+  */
++// The login auto-start, emitted once per session by the renderer. If it arrives
++// while the CLI is unavailable it can only be dropped; on OpenHarmony the CLI
++// may come back later (the bridge was not running yet), so remember that and
++// run it again then. See resumeDeferredAutoStart.
++let autoStartDeferred = false;
++
++async function autoStartDaemon(): Promise<void> {
++  const prefs = await loadPrefs();
++  if (quitting || autoStartSuppressedAfterQuit) return;
++  setDesiredDaemonRunning(prefs.autoStart);
++  if (!prefs.autoStart) return;
++  // Login auto-start is emitted once per session. Queue it behind bootstrap
++  // instead of dropping it like a retryable poll operation.
++  await lifecycleOperations.runForeground(async () => {
++    if (quitting || autoStartSuppressedAfterQuit) return;
++    const bin = await resolveCliBinary();
++    if (!bin) {
++      if (process.platform === "openharmony") autoStartDeferred = true;
++      return;
++    }
++    const health = await fetchHealth();
++    if (quitting || autoStartSuppressedAfterQuit) return;
++    observeDaemonBoundary(health);
++    if (health.state === "running") {
++      // Daemon is up but may be running an older CLI than the one we just
++      // bundled. Restart it so the new binary actually takes effect.
++      await ensureRunningDaemonVersionMatches();
++      return;
++    }
++    await startDaemon();
++  });
++}
++
++// Called once a bootstrap attempt has finished, outside the lifecycle gate
++// (autoStartDaemon takes it itself). Only repeats an auto-start that was
++// actually requested and dropped: one that has not been requested yet is the
++// renderer's job after login, and starting a daemon before that has no token.
++function resumeDeferredAutoStart(): void {
++  if (!autoStartDeferred) return;
++  if (currentState === "cli_not_found" || currentState === "installing_cli") return;
++  autoStartDeferred = false;
++  void autoStartDaemon();
++}
++
+ async function bootstrapCli(): Promise<void> {
+   const bin = await resolveCliBinary();
    if (!bin) {
      currentState = "cli_not_found";
      sendStatus({ state: "cli_not_found" });
@@ -519,7 +658,7 @@ index e0c6748..3534499 100644
      return;
    }
    currentState = "stopped";
-@@ -1331,6 +1345,32 @@ async function bootstrapCli(): Promise<void> {
+@@ -1331,6 +1389,33 @@ async function bootstrapCli(): Promise<void> {
    startPolling();
  }
  
@@ -545,6 +684,7 @@ index e0c6748..3534499 100644
 +      .runBackground(() => bootstrapCli())
 +      .finally(() => {
 +        if (currentState === "cli_not_found") scheduleCliRetry();
++        else resumeDeferredAutoStart();
 +      });
 +  }, CLI_RETRY_MS);
 +}
@@ -552,7 +692,7 @@ index e0c6748..3534499 100644
  function stopPolling(): void {
    if (statusPollTimer) {
      clearInterval(statusPollTimer);
-@@ -1371,6 +1411,10 @@ function sendLines(win: BrowserWindow, text: string): void {
+@@ -1371,6 +1456,10 @@ function sendLines(win: BrowserWindow, text: string): void {
  // would silently fail on Windows.
  function startLogTail(win: BrowserWindow, retryCount = 0): void {
    stopLogTail();
@@ -563,7 +703,7 @@ index e0c6748..3534499 100644
  
    void ensureActiveProfile().then(async (active) => {
      // Before the renderer reports its apiUrl there is no Desktop-owned profile
-@@ -1386,7 +1430,7 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
+@@ -1386,7 +1475,7 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
  
      let position = 0;
      try {
@@ -572,7 +712,7 @@ index e0c6748..3534499 100644
        const windowBytes = Math.min(
          initialStats.size,
          LOG_TAIL_INITIAL_WINDOW_BYTES,
-@@ -1432,7 +1476,82 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
+@@ -1432,7 +1521,82 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
    });
  }
  
@@ -655,7 +795,7 @@ index e0c6748..3534499 100644
    if (logTailWatcher) {
      unwatchFile(logTailWatcher.path, logTailWatcher.listener);
      logTailWatcher = null;
-@@ -1487,6 +1606,7 @@ export function setupDaemonManager(
+@@ -1487,6 +1651,7 @@ export function setupDaemonManager(
  ): void {
    getMainWindow = windowGetter;
    getStatusWindows = statusWindowsGetter;
@@ -663,6 +803,45 @@ index e0c6748..3534499 100644
  
    ipcMain.handle("daemon:set-target-api-url", async (_e, url: string) => {
      const normalized = url || null;
+@@ -1559,6 +1724,7 @@ export function setupDaemonManager(
+     // cached version string so the next check re-reads the binary.
+     cachedCliBinaryVersion = undefined;
+     await lifecycleOperations.runForeground(() => bootstrapCli());
++    resumeDeferredAutoStart();
+   });
+   ipcMain.handle("daemon:get-prefs", () => loadPrefs());
+   ipcMain.handle(
+@@ -1572,29 +1738,7 @@ export function setupDaemonManager(
+         return savePrefs(merged).then(() => merged);
+       }),
+   );
+-  ipcMain.handle("daemon:auto-start", async () => {
+-    const prefs = await loadPrefs();
+-    if (quitting || autoStartSuppressedAfterQuit) return;
+-    setDesiredDaemonRunning(prefs.autoStart);
+-    if (!prefs.autoStart) return;
+-    // Login auto-start is emitted once per session. Queue it behind bootstrap
+-    // instead of dropping it like a retryable poll operation.
+-    await lifecycleOperations.runForeground(async () => {
+-      if (quitting || autoStartSuppressedAfterQuit) return;
+-      const bin = await resolveCliBinary();
+-      if (!bin) return;
+-      const health = await fetchHealth();
+-      if (quitting || autoStartSuppressedAfterQuit) return;
+-      observeDaemonBoundary(health);
+-      if (health.state === "running") {
+-        // Daemon is up but may be running an older CLI than the one we just
+-        // bundled. Restart it so the new binary actually takes effect.
+-        await ensureRunningDaemonVersionMatches();
+-        return;
+-      }
+-      await startDaemon();
+-    });
+-  });
++  ipcMain.handle("daemon:auto-start", () => autoStartDaemon());
+ 
+   // One tail at a time, streamed to the window that opened the log view
+   // last; a window closing its view does not stop another window's stream.
 diff --git a/apps/desktop/src/main/daemon-os.test.ts b/apps/desktop/src/main/daemon-os.test.ts
 index 12e37fc..dd9963d 100644
 --- a/apps/desktop/src/main/daemon-os.test.ts
