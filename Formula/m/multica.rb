@@ -4,7 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class Multica < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.9.0-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca6ddd95315644c030f783141673f1c5d2e43599fbbebb093e42125b50ffa800"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.9.0-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6f701781d8a4b9783ef7ce8550398128b0f30d1e35f16c2a23c765b8e63d911"
   end
 
   depends_on "go" => :build
