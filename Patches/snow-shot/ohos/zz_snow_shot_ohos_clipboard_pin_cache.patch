@@ -1,0 +1,133 @@
+diff --git a/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h b/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h
+--- a/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h
++++ b/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h
+@@ -15,6 +15,7 @@
+ #include <atomic>
+ #include <functional>
+ #include <memory>
++#include <optional>
+ #include <utility>
+ 
+ class QClipboard;
+@@ -181,4 +182,11 @@
+     std::shared_ptr<ScreenshotClipboardCommitScopeState> m_state;
+ };
+ 
++#if defined(Q_OS_HARMONY)
++// OHOS requires the restricted READ_PASTEBOARD permission to read the system
++// clipboard. When this process published the current clipboard image, reuse
++// that payload so copy -> pin still works without the permission.
++[[nodiscard]] std::optional<QByteArray> latestPublishedClipboardPng();
++#endif
++
+ #endif // SNOW_SHOT_PRESENTATION_SCREENSHOTCLIPBOARDSERVICE_H
+diff --git a/snow_shot/src/presentation/services/screenshotclipboardservice.cpp b/snow_shot/src/presentation/services/screenshotclipboardservice.cpp
+--- a/snow_shot/src/presentation/services/screenshotclipboardservice.cpp
++++ b/snow_shot/src/presentation/services/screenshotclipboardservice.cpp
+@@ -26,6 +26,14 @@
+ #include <QUrl>
+ #include <QtEndian>
+ 
++#if defined(Q_OS_HARMONY)
++#include <database/pasteboard/oh_pasteboard.h>
++
++#include <QMutex>
++#include <cstdint>
++#include <optional>
++#endif
++
+ #include <algorithm>
+ #include <array>
+ #include <cstring>
+@@ -34,6 +42,33 @@
+ #include <span>
+ #include <utility>
+ 
++#if defined(Q_OS_HARMONY)
++namespace {
++QMutex g_latestClipboardPngMutex;
++QByteArray g_latestClipboardPng;
++std::uint32_t g_latestClipboardChangeCount = 0;
++
++std::uint32_t pasteboardChangeCount() {
++    auto* pasteboard = OH_Pasteboard_Create();
++    if (pasteboard == nullptr)
++        return 0;
++    const auto count = OH_Pasteboard_GetChangeCount(pasteboard);
++    OH_Pasteboard_Destroy(pasteboard);
++    return count;
++}
++} // namespace
++
++std::optional<QByteArray> latestPublishedClipboardPng() {
++    QMutexLocker locker(&g_latestClipboardPngMutex);
++    if (g_latestClipboardPng.isEmpty())
++        return std::nullopt;
++    // Do not serve stale content after another process changed the clipboard.
++    if (pasteboardChangeCount() != g_latestClipboardChangeCount)
++        return std::nullopt;
++    return g_latestClipboardPng;
++}
++#endif
++
+ struct ScreenshotClipboardCommitState {
+     std::atomic_bool cancelled{false};
+     std::atomic_bool finished{false};
+@@ -98,6 +133,13 @@
+ #endif
+     clipboard->setMimeData(new PngClipboardMimeData(png, placement, appearance, filePath),
+                            QClipboard::Clipboard);
++#if defined(Q_OS_HARMONY)
++    {
++        QMutexLocker locker(&g_latestClipboardPngMutex);
++        g_latestClipboardPng = png;
++        g_latestClipboardChangeCount = pasteboardChangeCount();
++    }
++#endif
+     return true;
+ }
+ #endif
+diff --git a/snow_shot/src/presentation/services/screenshotclipboardcontent.cpp b/snow_shot/src/presentation/services/screenshotclipboardcontent.cpp
+--- a/snow_shot/src/presentation/services/screenshotclipboardcontent.cpp
++++ b/snow_shot/src/presentation/services/screenshotclipboardcontent.cpp
+@@ -1,4 +1,5 @@
+ #include "snow_draw_engine_qt/snow_canvas_image.h"
++#include "snow_shot/presentation/screenshotclipboardservice.h"
+ #include "snow_shot/platform/applicationqos.h"
+ #include "snow_shot/presentation/screenshotclipboardcontent.h"
+ #include "snow_shot/app/supportedpinfiles.h"
+@@ -1268,6 +1269,22 @@
+                 snapshot->detachedImage = value.value<QPixmap>().toImage();
+         }
+     }
++#if defined(Q_OS_HARMONY)
++    // Reading the system clipboard needs the restricted READ_PASTEBOARD
++    // permission. If the current image was published by this process, reuse it
++    // so copy -> pin remains functional in debug builds.
++    if (!snapshot.has_value()) {
++        if (const auto png = latestPublishedClipboardPng(); png.has_value()) {
++            QImage image = QImage::fromData(*png, "PNG");
++            if (!image.isNull()) {
++                snapshot.emplace();
++                snapshot->detachedImage = std::move(image);
++                snapshot->devicePixelRatio = devicePixelRatio;
++                snapshot->baseColor = baseColor;
++            }
++        }
++    }
++#endif
+     return !rejected && snapshot.has_value() && snapshot->isValid() ? snapshot : std::nullopt;
+ }
+ 
+diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
+--- a/snow_shot/CMakeLists.txt
++++ b/snow_shot/CMakeLists.txt
+@@ -1304,7 +1304,7 @@
+ target_link_libraries(snow_shot_settings PRIVATE snow_shot_global_mouse)
+ if(OHOS)
+     find_library(SNOW_SHOT_ACE_NAPI_LIBRARY NAMES ace_napi.z REQUIRED)
+-    target_link_libraries(snow_shot_settings PRIVATE "${SNOW_SHOT_ACE_NAPI_LIBRARY}")
++    target_link_libraries(snow_shot_settings PRIVATE "${SNOW_SHOT_ACE_NAPI_LIBRARY}" pasteboard)
+ endif()
+ snow_enable_unity_build(snow_shot_settings)
+ set_source_files_properties(
