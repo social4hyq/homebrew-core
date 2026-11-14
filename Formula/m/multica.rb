@@ -29,20 +29,11 @@ class Multica < Formula
     sha256 "599e97b3d8b1e5071a2387496104b443e58079a5f5c165b0114e65ffc601df3a"
   end
 
-  patch :p1 do
-    file "Patches/multica/0001-desktop-ohos.patch"
-  end
-
-  patch :p1 do
-    file "Patches/multica/0002-hap-packaging.patch"
-  end
-
-  patch :p1 do
-    file "Patches/multica/0004-install-desktop-command.patch"
-  end
-
-  patch :p1 do
-    file "Patches/multica/0005-desktop-host-bridge.patch"
+  patch_root = Pathname(__dir__).parent.parent
+  Dir[(patch_root/"Patches/multica/ohos/*.patch").to_s].each do |path|
+    patch do
+      file Pathname(path).relative_path_from(patch_root).to_s
+    end
   end
 
   def patch

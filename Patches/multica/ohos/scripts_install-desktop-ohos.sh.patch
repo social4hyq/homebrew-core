@@ -1,0 +1,117 @@
+OHOS: multica install-desktop. Sign the bottled desktop HAP with the user's
+Huawei developer account (or, with --acl-profile, a signing configuration that
+carries the ACL permissions), write the bridge pairing file into the signed
+copy, then install and start it.
+
+diff --git a/scripts/install-desktop-ohos.sh b/scripts/install-desktop-ohos.sh
+new file mode 100755
+index 0000000..ed8e7b2
+--- /dev/null
++++ b/scripts/install-desktop-ohos.sh
+@@ -0,0 +1,106 @@
++#!/usr/bin/env bash
++set -euo pipefail
++
++BUNDLE_ID="com.huawei.ohos_electron"
++HAP_ENTRY="resources/resfile/resources/app/desktop-bridge.json"
++
++usage() {
++  printf '%s\n' 'Usage: multica install-desktop [--acl-profile <build-profile.json5>]' '' \
++    'Sign the bottled desktop HAP with your Huawei Developer account, install it' \
++    'on a connected device, and start the application. The pairing key for the' \
++    'host bridge is written into the signed copy; the bottled HAP is not modified.' '' \
++    'The default HAP requests only INTERNET and GET_NETWORK_INFO, which the local' \
++    'automatic signing can grant. With --acl-profile the copy also requests' \
++    'CUSTOM_SANDBOX and READ_WRITE_USER_FILE and is signed with the given signing' \
++    'configuration (a build-profile.json5 whose profile carries those ACLs, e.g.' \
++    'from an AGC debug profile). Without such an ACL the device refuses to install it.'
++}
++
++acl_profile=
++while (($#)); do
++  case "$1" in
++    -h | --help)
++      usage
++      exit 0
++      ;;
++    --acl-profile)
++      if (($# < 2)) || [[ -z "$2" || "$2" == --* ]]; then
++        printf 'multica install-desktop: missing value for %s\n' "$1" >&2
++        usage >&2
++        exit 2
++      fi
++      acl_profile="$2"
++      shift 2
++      ;;
++    *)
++      printf 'multica install-desktop: unknown option: %s\n' "$1" >&2
++      usage >&2
++      exit 2
++      ;;
++  esac
++done
++
++: "${MULTICA_UNSIGNED_HAP:?multica formula did not set the unsigned HAP path}"
++: "${MULTICA_DESKTOP_BRIDGE:?multica formula did not set the bridge path}"
++: "${MULTICA_DESKTOP:?multica formula did not set the desktop launcher path}"
++zip="${MULTICA_ZIP:-zip}"
++home="${MULTICA_HOME:-$HOME/.multica}"
++
++if [[ ! -f "$MULTICA_UNSIGNED_HAP" ]]; then
++  printf 'multica install-desktop: unsigned HAP not found: %s\n' "$MULTICA_UNSIGNED_HAP" >&2
++  exit 1
++fi
++if ! command -v "$zip" > /dev/null 2>&1; then
++  printf '%s\n' 'multica install-desktop: zip is required; install it with brew install zip.' >&2
++  exit 1
++fi
++if [[ -n "$acl_profile" ]]; then
++  : "${MULTICA_MODULE_ACL:?multica formula did not set the ACL module.json path}"
++  : "${MULTICA_INSTALL_HAP:?multica formula did not set the HAP installer path}"
++  if [[ ! -f "$acl_profile" ]]; then
++    printf 'multica install-desktop: signing configuration not found: %s\n' "$acl_profile" >&2
++    exit 1
++  fi
++  if ! command -v hap-installer-sign > /dev/null 2>&1; then
++    printf '%s\n' 'multica install-desktop: hap-installer-sign is required; install it with brew install hap-installer.' >&2
++    exit 1
++  fi
++elif ! command -v hap-installer > /dev/null 2>&1; then
++  printf '%s\n' 'multica install-desktop: hap-installer is required; install it with brew install hap-installer.' >&2
++  exit 1
++fi
++
++config="$("$MULTICA_DESKTOP_BRIDGE" --home "$home" --init-only)"
++
++stage="$(mktemp -d "${TMPDIR:-/tmp}/multica-desktop-inject.XXXXXX")"
++trap 'rm -rf "$stage"' EXIT
++injected="$stage/multica-desktop.hap"
++cp "$MULTICA_UNSIGNED_HAP" "$injected"
++mkdir -p "$stage/payload/$(dirname "$HAP_ENTRY")"
++cp "$config" "$stage/payload/$HAP_ENTRY"
++entries=("$HAP_ENTRY")
++if [[ -n "$acl_profile" ]]; then
++  cp "$MULTICA_MODULE_ACL" "$stage/payload/module.json"
++  entries+=(module.json)
++fi
++(cd "$stage/payload" && "$zip" -q "$injected" "${entries[@]}")
++
++# The app reads its first status at launch; have the bridge up before it opens.
++"$MULTICA_DESKTOP" start --bridge-only
++
++if [[ -n "$acl_profile" ]]; then
++  signed="$stage/multica-desktop-signed.hap"
++  hap-installer-sign --hap "$injected" --profile "$acl_profile" --output "$signed"
++  # install-hap.sh drives a bare `hdc`; put the packaged one first on PATH.
++  if [[ -n "${MULTICA_HDC:-}" && "$MULTICA_HDC" == */* ]]; then
++    PATH="$(dirname "$MULTICA_HDC"):$PATH"
++  fi
++  "$MULTICA_INSTALL_HAP" "$signed" --start
++else
++  hap-installer \
++    --hap "$injected" \
++    --bundle-id "$BUNDLE_ID" \
++    --app-name MulticaSigning \
++    --module electron \
++    --ability EntryAbility
++fi

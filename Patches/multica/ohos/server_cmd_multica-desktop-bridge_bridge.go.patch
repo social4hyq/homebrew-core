@@ -1,0 +1,379 @@
+OHOS: loopback bridge between the sandboxed desktop and the host. An
+authenticated HTTP API: /exec runs an allow-listed set of CLI commands,
+/profile/<name>/<file> reads and writes the daemon profile files (the log
+read-only, with offsets), and /health reports whether the CLI is usable.
+
+diff --git a/server/cmd/multica-desktop-bridge/bridge.go b/server/cmd/multica-desktop-bridge/bridge.go
+new file mode 100644
+index 0000000..7226df7
+--- /dev/null
++++ b/server/cmd/multica-desktop-bridge/bridge.go
+@@ -0,0 +1,368 @@
++// Command multica-desktop-bridge lets the sandboxed OpenHarmony desktop app
++// reach the host: it exposes a small, authenticated loopback HTTP API for the
++// few things the desktop daemon manager needs (running the multica CLI for
++// daemon lifecycle, and reading/writing a profile's config files and log).
++package main
++
++import (
++	"bytes"
++	"context"
++	"crypto/rand"
++	"crypto/subtle"
++	"encoding/hex"
++	"encoding/json"
++	"errors"
++	"fmt"
++	"io"
++	"net"
++	"net/http"
++	"net/url"
++	"os"
++	"os/exec"
++	"path/filepath"
++	"regexp"
++	"strconv"
++	"strings"
++	"time"
++)
++
++const (
++	configFileName   = "desktop-bridge.json"
++	defaultPortBase  = 19800
++	portProbeCount   = 100
++	maxBodyBytes     = 1 << 20
++	maxReadBytes     = 4 << 20
++	defaultExecLimit = 60 * time.Second
++	maxExecLimit     = 120 * time.Second
++	execWaitDelay    = 2 * time.Second
++)
++
++// Config is both the bridge's runtime configuration and the on-disk pairing
++// file (only Port and Secret are persisted).
++type Config struct {
++	Port        int    `json:"port"`
++	Secret      string `json:"secret"`
++	MulticaHome string `json:"-"`
++	CLIPath     string `json:"-"`
++	Version     string `json:"-"`
++}
++
++var profileNameRE = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$`)
++
++func validProfileName(name string) bool {
++	return profileNameRE.MatchString(name) && !strings.Contains(name, "..")
++}
++
++// readable and writable files inside a profile directory. daemon.* are owned
++// by the CLI, so the bridge only reads them.
++var profileFiles = map[string]bool{ // value: writable
++	"config.json":      true,
++	".desktop-user-id": true,
++	"daemon.pid":       false,
++	"daemon.port":      false,
++	"daemon.log":       false,
++}
++
++// LoadOrCreateConfig returns the pairing config stored in home, creating it
++// (random secret, free port) when absent or invalid. port==0 picks a free port.
++func LoadOrCreateConfig(home string, port int) (Config, error) {
++	path := filepath.Join(home, configFileName)
++	if b, err := os.ReadFile(path); err == nil {
++		var c Config
++		if json.Unmarshal(b, &c) == nil && len(c.Secret) >= 32 && c.Port > 0 && c.Port < 65536 {
++			c.MulticaHome = home
++			return c, nil
++		}
++	}
++	if port == 0 {
++		var err error
++		if port, err = freePort(); err != nil {
++			return Config{}, err
++		}
++	}
++	raw := make([]byte, 32)
++	if _, err := rand.Read(raw); err != nil {
++		return Config{}, err
++	}
++	c := Config{Port: port, Secret: hex.EncodeToString(raw), MulticaHome: home}
++	if err := os.MkdirAll(home, 0o700); err != nil {
++		return Config{}, err
++	}
++	data, _ := json.Marshal(c)
++	if err := writeFileAtomic(path, data); err != nil {
++		return Config{}, err
++	}
++	return c, nil
++}
++
++func freePort() (int, error) {
++	for p := defaultPortBase; p < defaultPortBase+portProbeCount; p++ {
++		l, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", p))
++		if err == nil {
++			l.Close()
++			return p, nil
++		}
++	}
++	return 0, errors.New("no free port for desktop bridge")
++}
++
++func writeFileAtomic(path string, data []byte) error {
++	tmp, err := os.CreateTemp(filepath.Dir(path), ".bridge-*")
++	if err != nil {
++		return err
++	}
++	name := tmp.Name()
++	defer os.Remove(name)
++	if err := tmp.Chmod(0o600); err != nil {
++		tmp.Close()
++		return err
++	}
++	if _, err := tmp.Write(data); err != nil {
++		tmp.Close()
++		return err
++	}
++	if err := tmp.Close(); err != nil {
++		return err
++	}
++	return os.Rename(name, path)
++}
++
++// CheckHealth reports whether a bridge answers /health on the given loopback
++// port and can actually run its CLI. It exists so shell scripts need neither
++// curl nor bash's /dev/tcp, which is unreliable on OpenHarmony.
++//
++// A bridge that predates the CLI check answers {"ok":true} without "cli_ok".
++// It cannot vouch for its CLI, so it is reported unhealthy and the launcher
++// replaces it.
++func CheckHealth(port int, timeout time.Duration) error {
++	client := &http.Client{Timeout: timeout}
++	resp, err := client.Get(fmt.Sprintf("http://127.0.0.1:%d/health", port))
++	if err != nil {
++		return err
++	}
++	defer resp.Body.Close()
++	var body struct {
++		OK    bool  `json:"ok"`
++		CLIOK *bool `json:"cli_ok"`
++	}
++	if resp.StatusCode != http.StatusOK ||
++		json.NewDecoder(io.LimitReader(resp.Body, 4096)).Decode(&body) != nil || !body.OK {
++		return errors.New("unexpected /health response")
++	}
++	if body.CLIOK == nil {
++		return errors.New("bridge predates the CLI health check")
++	}
++	if !*body.CLIOK {
++		return errors.New("bridge CLI is not usable")
++	}
++	return nil
++}
++
++// NewHandler builds the bridge HTTP handler.
++func NewHandler(cfg Config) http.Handler {
++	b := &bridge{cfg: cfg}
++	return http.HandlerFunc(b.serve)
++}
++
++type bridge struct{ cfg Config }
++
++func (b *bridge) serve(w http.ResponseWriter, r *http.Request) {
++	if r.URL.Path == "/health" && r.Method == http.MethodGet {
++		// Report the CLI as a boolean only: /health needs no auth, so it must
++		// not reveal where the CLI lives.
++		cliOK := b.cliUsable()
++		status := http.StatusOK
++		if !cliOK {
++			status = http.StatusServiceUnavailable
++		}
++		writeJSON(w, status, map[string]any{"ok": cliOK, "cli_ok": cliOK, "version": b.cfg.Version})
++		return
++	}
++	if !b.authorized(r) {
++		http.Error(w, "unauthorized", http.StatusUnauthorized)
++		return
++	}
++	switch {
++	case r.URL.Path == "/exec":
++		b.handleExec(w, r)
++	case strings.HasPrefix(r.URL.EscapedPath(), "/profile/"):
++		b.handleProfile(w, r)
++	default:
++		http.NotFound(w, r)
++	}
++}
++
++// cliUsable reports whether the CLI the bridge was started with still exists.
++// `brew upgrade` removes the old keg, which leaves a bridge started from it
++// holding a path that no longer resolves.
++func (b *bridge) cliUsable() bool {
++	fi, err := os.Stat(b.cfg.CLIPath)
++	return err == nil && fi.Mode().IsRegular()
++}
++
++func (b *bridge) authorized(r *http.Request) bool {
++	got, ok := strings.CutPrefix(r.Header.Get("Authorization"), "Bearer ")
++	if !ok || b.cfg.Secret == "" {
++		return false
++	}
++	return subtle.ConstantTimeCompare([]byte(got), []byte(b.cfg.Secret)) == 1
++}
++
++func writeJSON(w http.ResponseWriter, status int, v any) {
++	w.Header().Set("Content-Type", "application/json")
++	w.WriteHeader(status)
++	_ = json.NewEncoder(w).Encode(v)
++}
++
++// allowedArgs accepts only the argv shapes the desktop daemon manager sends.
++func allowedArgs(a []string) bool {
++	switch {
++	case len(a) == 3 && a[0] == "version" && a[1] == "--output" && a[2] == "json":
++		return true
++	case len(a) == 4 && a[0] == "daemon" && (a[1] == "start" || a[1] == "stop" || a[1] == "probe-runtimes"):
++		return a[2] == "--profile" && validProfileName(a[3])
++	case len(a) == 5 && a[0] == "daemon" && a[1] == "stop" && a[2] == "--force":
++		return a[3] == "--profile" && validProfileName(a[4])
++	}
++	return false
++}
++
++type execRequest struct {
++	Args      []string `json:"args"`
++	TimeoutMS int64    `json:"timeout_ms"`
++}
++
++func (b *bridge) handleExec(w http.ResponseWriter, r *http.Request) {
++	if r.Method != http.MethodPost {
++		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
++		return
++	}
++	var req execRequest
++	if err := json.NewDecoder(io.LimitReader(r.Body, maxBodyBytes)).Decode(&req); err != nil {
++		http.Error(w, "bad request", http.StatusBadRequest)
++		return
++	}
++	if !allowedArgs(req.Args) {
++		http.Error(w, "command not allowed", http.StatusBadRequest)
++		return
++	}
++	limit := defaultExecLimit
++	if req.TimeoutMS > 0 {
++		limit = min(time.Duration(req.TimeoutMS)*time.Millisecond, maxExecLimit)
++	}
++	ctx, cancel := context.WithTimeout(r.Context(), limit)
++	defer cancel()
++	var stdout, stderr bytes.Buffer
++	cmd := exec.CommandContext(ctx, b.cfg.CLIPath, req.Args...)
++	cmd.Stdout, cmd.Stderr = &stdout, &stderr
++	// `daemon start` leaves a detached daemon holding our pipes; don't wait on them forever.
++	cmd.WaitDelay = execWaitDelay
++	code := 0
++	if err := cmd.Run(); err != nil {
++		var ee *exec.ExitError
++		switch {
++		case errors.As(err, &ee):
++			code = ee.ExitCode()
++		case errors.Is(err, exec.ErrWaitDelay):
++			code = 0
++		default:
++			code = -1
++			stderr.WriteString(err.Error())
++		}
++	}
++	writeJSON(w, http.StatusOK, map[string]any{"code": code, "stdout": stdout.String(), "stderr": stderr.String()})
++}
++
++func (b *bridge) handleProfile(w http.ResponseWriter, r *http.Request) {
++	rest := strings.TrimPrefix(r.URL.EscapedPath(), "/profile/")
++	parts := strings.Split(rest, "/")
++	if len(parts) != 2 {
++		http.Error(w, "bad path", http.StatusBadRequest)
++		return
++	}
++	name, err1 := url.PathUnescape(parts[0])
++	file, err2 := url.PathUnescape(parts[1])
++	if err1 != nil || err2 != nil || !validProfileName(name) {
++		http.Error(w, "bad profile name", http.StatusBadRequest)
++		return
++	}
++	writable, known := profileFiles[file]
++	if !known {
++		http.Error(w, "unknown file", http.StatusBadRequest)
++		return
++	}
++	dir := filepath.Join(b.cfg.MulticaHome, "profiles", name)
++	path := filepath.Join(dir, file)
++	switch r.Method {
++	case http.MethodGet:
++		serveFile(w, r, path)
++	case http.MethodPut:
++		if !writable {
++			http.Error(w, "read-only file", http.StatusMethodNotAllowed)
++			return
++		}
++		body, err := io.ReadAll(io.LimitReader(r.Body, maxBodyBytes+1))
++		if err != nil || len(body) > maxBodyBytes {
++			http.Error(w, "bad body", http.StatusBadRequest)
++			return
++		}
++		if err := os.MkdirAll(dir, 0o700); err != nil {
++			http.Error(w, err.Error(), http.StatusInternalServerError)
++			return
++		}
++		if err := writeFileAtomic(path, body); err != nil {
++			http.Error(w, err.Error(), http.StatusInternalServerError)
++			return
++		}
++		w.WriteHeader(http.StatusNoContent)
++	case http.MethodDelete:
++		if !writable {
++			http.Error(w, "read-only file", http.StatusMethodNotAllowed)
++			return
++		}
++		if err := os.Remove(path); err != nil && !errors.Is(err, os.ErrNotExist) {
++			http.Error(w, err.Error(), http.StatusInternalServerError)
++			return
++		}
++		w.WriteHeader(http.StatusNoContent)
++	default:
++		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
++	}
++}
++
++func serveFile(w http.ResponseWriter, r *http.Request, path string) {
++	var offset int64
++	if s := r.URL.Query().Get("offset"); s != "" {
++		v, err := strconv.ParseInt(s, 10, 64)
++		if err != nil || v < 0 {
++			http.Error(w, "bad offset", http.StatusBadRequest)
++			return
++		}
++		offset = v
++	}
++	f, err := os.Open(path)
++	if err != nil {
++		if errors.Is(err, os.ErrNotExist) {
++			http.Error(w, "not found", http.StatusNotFound)
++		} else {
++			http.Error(w, err.Error(), http.StatusInternalServerError)
++		}
++		return
++	}
++	defer f.Close()
++	fi, err := f.Stat()
++	if err != nil {
++		http.Error(w, err.Error(), http.StatusInternalServerError)
++		return
++	}
++	w.Header().Set("X-File-Size", strconv.FormatInt(fi.Size(), 10))
++	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
++	w.WriteHeader(http.StatusOK)
++	if offset >= fi.Size() {
++		return
++	}
++	if _, err := f.Seek(offset, io.SeekStart); err != nil {
++		return
++	}
++	_, _ = io.Copy(w, io.LimitReader(f, maxReadBytes))
++}

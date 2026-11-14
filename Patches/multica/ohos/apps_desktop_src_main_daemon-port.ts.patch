@@ -1,0 +1,22 @@
+OHOS: read the daemon port record through the host bridge. It lives in the
+host's profile directory, which the sandbox cannot read.
+
+diff --git a/apps/desktop/src/main/daemon-port.ts b/apps/desktop/src/main/daemon-port.ts
+index 7ad8b59..a8cf93a 100644
+--- a/apps/desktop/src/main/daemon-port.ts
++++ b/apps/desktop/src/main/daemon-port.ts
+@@ -1,4 +1,4 @@
+-import { readFile } from "fs/promises";
++import { host } from "./ohos-host";
+ import { healthPortForProfile, profilePortPath } from "./daemon-profile";
+ 
+ export interface DaemonPortRecord {
+@@ -28,7 +28,7 @@ export function parseDaemonPortRecord(raw: string): DaemonPortRecord | null {
+ 
+ export async function readDaemonPortRecord(profile: string): Promise<DaemonPortRecord | null> {
+   try {
+-    return parseDaemonPortRecord(await readFile(profilePortPath(profile), "utf-8"));
++    return parseDaemonPortRecord(await host.readFile(profilePortPath(profile), "utf-8"));
+   } catch {
+     return null;
+   }
