@@ -4,7 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 9
+  revision 10
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class Multica < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.9.0-r13"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a54bab1896753829e6612cd34b320c4c4308f5703c7b39a41997614bcc7e0110"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.9.0-r14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fa89e077b46c5258082b8d55cf0ff40eef79aa67ffdaf3447003fa0f314cb43"
   end
 
   depends_on "go" => :build
@@ -198,9 +198,11 @@ class Multica < Formula
       install-desktop` starts it and pairs it with the app; afterwards run
       `multica desktop` to start the bridge (if needed) and open the app. Logging
       in inside the desktop app then configures and starts the daemon. To start
-      only the bridge from a shell startup file, use
-      `multica desktop start --bridge-only`; `multica desktop stop` stops it and
-      leaves the daemon running.
+      only the bridge from a shell startup file, add
+      `"$HOME/.harmonybrew/bin/multica" desktop start --bridge-only`. Use the
+      absolute path: a startup file can run before Homebrew's bin is on PATH,
+      where a bare `multica` is not found and the line fails silently.
+      `multica desktop stop` stops the bridge and leaves the daemon running.
 
       The full flow (signing config shape, bridge pairing) is documented in the
       ohos-multica project: Build Pipeline and Distribution guides at
@@ -232,6 +234,11 @@ class Multica < Formula
                  shell_output("env -u MULTICA_AGENT_TEMP_BASE sh #{env_probe}")
     assert_match "MULTICA_AGENT_TEMP_BASE=#{testpath}/custom\n",
                  shell_output("MULTICA_AGENT_TEMP_BASE=#{testpath}/custom sh #{env_probe}")
+    # A shell startup file can run before Homebrew's bin is on PATH, so the
+    # line the caveats suggest for it has to use the absolute path.
+    assert_match "\"$HOME/.harmonybrew/bin/multica\" desktop start --bridge-only", caveats
+    assert_match "before Homebrew's bin is on PATH", caveats
+    refute_match "`multica desktop start --bridge-only`", caveats
     desktop_installer = pkgshare/"install-desktop.sh"
     assert_match "hap-installer", desktop_installer.read
     refute_match "devecocli", desktop_installer.read
