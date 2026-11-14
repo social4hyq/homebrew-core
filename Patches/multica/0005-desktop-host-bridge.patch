@@ -2,10 +2,10 @@ OHOS: let the sandboxed desktop drive the host CLI and daemon profile through a 
 
 diff --git a/apps/desktop/src/main/daemon-manager-ohos.test.ts b/apps/desktop/src/main/daemon-manager-ohos.test.ts
 new file mode 100644
-index 0000000..bb151af
+index 0000000..7a88967
 --- /dev/null
 +++ b/apps/desktop/src/main/daemon-manager-ohos.test.ts
-@@ -0,0 +1,229 @@
+@@ -0,0 +1,326 @@
 +// @vitest-environment node
 +import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 +
@@ -235,8 +235,105 @@ index 0000000..bb151af
 +    expect(ctx.host.readRange.mock.calls.length).toBe(before);
 +  });
 +});
++
++describe("daemon-manager on openharmony: cli_not_found auto-retry", () => {
++  const TIMERS = ["setTimeout", "clearTimeout", "setInterval", "clearInterval"] as const;
++  const states = () =>
++    ctx.send.mock.calls.filter((c) => c[0] === "daemon:status").map((c) => (c[1] as { state: string }).state);
++  const probes = () => ctx.host.hostCliAvailable.mock.calls.length;
++
++  async function bootWithoutBridge() {
++    vi.useFakeTimers({ toFake: [...TIMERS] });
++    ctx.host.hostCliAvailable.mockResolvedValue(false);
++    await boot();
++    await vi.advanceTimersByTimeAsync(0);
++    expect(states()).toContain("cli_not_found");
++  }
++
++  it("recovers by itself once the bridge answers, without pressing retry", async () => {
++    await bootWithoutBridge();
++    expect(states()).not.toContain("stopped");
++
++    ctx.host.hostCliAvailable.mockResolvedValue(true);
++    await vi.advanceTimersByTimeAsync(5_000);
++
++    expect(states().at(-1)).toBe("stopped");
++    expect(ctx.host.execFile).toHaveBeenCalledWith(
++      "multica-host",
++      ["version", "--output", "json"],
++      expect.anything(),
++      expect.any(Function),
++    );
++  });
++
++  it("keeps retrying every few seconds while the bridge is still down", async () => {
++    await bootWithoutBridge();
++    const before = probes();
++    await vi.advanceTimersByTimeAsync(15_000);
++    expect(probes()).toBeGreaterThanOrEqual(before + 2);
++    expect(states()).not.toContain("stopped");
++    expect(states().at(-1)).toBe("cli_not_found");
++  });
++
++  it("stops retrying once the CLI resolves", async () => {
++    await bootWithoutBridge();
++    ctx.host.hostCliAvailable.mockResolvedValue(true);
++    await vi.advanceTimersByTimeAsync(5_000);
++    expect(states().at(-1)).toBe("stopped");
++
++    const resolvedProbes = probes();
++    const notFoundCount = states().filter((st) => st === "cli_not_found").length;
++    await vi.advanceTimersByTimeAsync(60_000);
++    expect(probes()).toBe(resolvedProbes);
++    expect(states().filter((st) => st === "cli_not_found").length).toBe(notFoundCount);
++  });
++
++  it("a retry scheduled before a manual recovery does not clobber the state afterwards", async () => {
++    await bootWithoutBridge(); // the automatic retry is due at t=5s
++    await vi.advanceTimersByTimeAsync(3_000);
++
++    ctx.host.hostCliAvailable.mockResolvedValue(true);
++    ctx.health.mockResolvedValue({ status: "running", pid: 4242, os: "linux" });
++    await ctx.handlers.get("daemon:retry-install")!({}); // the user recovers it first, at t=3s
++    await vi.advanceTimersByTimeAsync(0);
++    expect(states().at(-1)).toBe("running");
++
++    await vi.advanceTimersByTimeAsync(3_000); // t=6s: the originally scheduled retry fires
++    expect(states().at(-1)).toBe("running"); // and must not bootstrap again and reset it to "stopped"
++  });
++
++  it("keeps retrying after an attempt was skipped because another operation held the gate", async () => {
++    await bootWithoutBridge();
++    // `daemon:start` holds the lifecycle gate while it waits on the bridge probe.
++    let release!: (available: boolean) => void;
++    ctx.host.hostCliAvailable.mockReturnValueOnce(new Promise<boolean>((resolve) => (release = resolve)));
++    const start = ctx.handlers.get("daemon:start")!({});
++
++    await vi.advanceTimersByTimeAsync(5_000); // the retry fires, finds the gate busy, is skipped
++    const whileBusy = probes();
++    release(false);
++    await start;
++
++    await vi.advanceTimersByTimeAsync(10_000);
++    expect(probes()).toBeGreaterThan(whileBusy);
++  });
++
++  it("does not retry on other platforms (upstream behaviour is unchanged)", async () => {
++    vi.useFakeTimers({ toFake: [...TIMERS] });
++    Object.defineProperty(process, "platform", { value: "linux" });
++    await boot();
++    await vi.advanceTimersByTimeAsync(0);
++    expect(states()).toContain("cli_not_found");
++    const installs = ctx.install.mock.calls.length;
++
++    await vi.advanceTimersByTimeAsync(60_000);
++    expect(ctx.install.mock.calls.length).toBe(installs);
++    expect(ctx.host.hostCliAvailable).not.toHaveBeenCalled();
++    expect(states().at(-1)).toBe("cli_not_found");
++  });
++});
 diff --git a/apps/desktop/src/main/daemon-manager.ts b/apps/desktop/src/main/daemon-manager.ts
-index e0c6748..16fe728 100644
+index e0c6748..3534499 100644
 --- a/apps/desktop/src/main/daemon-manager.ts
 +++ b/apps/desktop/src/main/daemon-manager.ts
 @@ -1,13 +1,5 @@
@@ -414,7 +511,48 @@ index e0c6748..16fe728 100644
      const pid = parseDaemonPid(raw);
      if (pid === null) {
        console.warn(
-@@ -1371,6 +1384,10 @@ function sendLines(win: BrowserWindow, text: string): void {
+@@ -1324,6 +1337,7 @@ async function bootstrapCli(): Promise<void> {
+   if (!bin) {
+     currentState = "cli_not_found";
+     sendStatus({ state: "cli_not_found" });
++    scheduleCliRetry();
+     return;
+   }
+   currentState = "stopped";
+@@ -1331,6 +1345,32 @@ async function bootstrapCli(): Promise<void> {
+   startPolling();
+ }
+ 
++// OpenHarmony: the CLI lives on the host and is reached through the desktop
++// bridge, which may simply not be running yet, or be replaced by
++// `multica desktop start` after an upgrade. Keep retrying while the CLI is
++// unavailable so the app recovers by itself instead of waiting for the user to
++// press "retry setup". Other platforms keep the upstream behaviour: the CLI is
++// downloaded or bundled, so a failure there needs the user's attention.
++const CLI_RETRY_MS = 5_000;
++let cliRetryTimer: ReturnType<typeof setTimeout> | null = null;
++
++function scheduleCliRetry(): void {
++  if (process.platform !== "openharmony" || cliRetryTimer) return;
++  cliRetryTimer = setTimeout(() => {
++    cliRetryTimer = null;
++    // Nothing to do once the CLI resolved (e.g. the user pressed retry first).
++    if (currentState !== "cli_not_found") return;
++    // runBackground declines to run while another daemon operation holds the
++    // gate; keep the loop alive in that case. (resolveCliBinary already ignores
++    // a quit in progress, and a cancelled quit simply resumes on the next tick.)
++    void lifecycleOperations
++      .runBackground(() => bootstrapCli())
++      .finally(() => {
++        if (currentState === "cli_not_found") scheduleCliRetry();
++      });
++  }, CLI_RETRY_MS);
++}
++
+ function stopPolling(): void {
+   if (statusPollTimer) {
+     clearInterval(statusPollTimer);
+@@ -1371,6 +1411,10 @@ function sendLines(win: BrowserWindow, text: string): void {
  // would silently fail on Windows.
  function startLogTail(win: BrowserWindow, retryCount = 0): void {
    stopLogTail();
@@ -425,7 +563,7 @@ index e0c6748..16fe728 100644
  
    void ensureActiveProfile().then(async (active) => {
      // Before the renderer reports its apiUrl there is no Desktop-owned profile
-@@ -1386,7 +1403,7 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
+@@ -1386,7 +1430,7 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
  
      let position = 0;
      try {
@@ -434,7 +572,7 @@ index e0c6748..16fe728 100644
        const windowBytes = Math.min(
          initialStats.size,
          LOG_TAIL_INITIAL_WINDOW_BYTES,
-@@ -1432,7 +1449,82 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
+@@ -1432,7 +1476,82 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
    });
  }
  
@@ -517,7 +655,7 @@ index e0c6748..16fe728 100644
    if (logTailWatcher) {
      unwatchFile(logTailWatcher.path, logTailWatcher.listener);
      logTailWatcher = null;
-@@ -1487,6 +1579,7 @@ export function setupDaemonManager(
+@@ -1487,6 +1606,7 @@ export function setupDaemonManager(
  ): void {
    getMainWindow = windowGetter;
    getStatusWindows = statusWindowsGetter;
