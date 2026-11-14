@@ -149,19 +149,22 @@ diff --git a/snow_shot/src/presentation/services/screenshotclipboardcontent.cpp 
  #include "snow_shot/platform/applicationqos.h"
  #include "snow_shot/presentation/screenshotclipboardcontent.h"
  #include "snow_shot/app/supportedpinfiles.h"
-@@ -1268,6 +1269,22 @@
+@@ -1268,6 +1269,25 @@
                  snapshot->detachedImage = value.value<QPixmap>().toImage();
          }
      }
 +#if defined(Q_OS_HARMONY)
 +    // Reading the system clipboard needs the restricted READ_PASTEBOARD
 +    // permission. If the current image was published by this process, reuse it
-+    // so copy -> pin remains functional in debug builds.
-+    if (!snapshot.has_value()) {
++    // so copy -> pin remains functional in debug builds. An empty placeholder
++    // snapshot is created above when the MIME data has no readable payload, so
++    // test validity rather than presence here.
++    if (!snapshot.has_value() || !snapshot->isValid()) {
 +        if (const auto png = latestPublishedClipboardPng(); png.has_value()) {
 +            QImage image = QImage::fromData(*png, "PNG");
 +            if (!image.isNull()) {
-+                snapshot.emplace();
++                if (!snapshot.has_value())
++                    snapshot.emplace();
 +                snapshot->detachedImage = std::move(image);
 +                snapshot->devicePixelRatio = devicePixelRatio;
 +                snapshot->baseColor = baseColor;
