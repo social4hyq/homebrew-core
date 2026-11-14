@@ -14,7 +14,6 @@ class DeepseekHarnessDesktop < Formula
 
   depends_on "cmake" => :build
   depends_on "git" => :build
-  depends_on "llvm" => :build
   depends_on "node" => :build
   depends_on "node@24" => :build
   depends_on "ohos-selfsign" => :build
@@ -91,9 +90,6 @@ class DeepseekHarnessDesktop < Formula
     ENV["DSH_SIGN_TOOL_MODE"] = "inplace"
     node24 = (formula_opt_bin("node@24")/"node").to_s
     ENV["DSH_OHOS_NODE_BINARY"] = node24
-    llvm_bin = formula_opt_bin("llvm")
-    ENV["CC"] = (llvm_bin/"clang").to_s
-    ENV["CXX"] = (llvm_bin/"clang++").to_s
 
     system "pnpm", "install", "--frozen-lockfile", "--reporter=append-only"
 
