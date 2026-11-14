@@ -1047,10 +1047,10 @@ index b5eaee4..00cffe2 100644
 +}
 diff --git a/server/cmd/multica-desktop-bridge/bridge.go b/server/cmd/multica-desktop-bridge/bridge.go
 new file mode 100644
-index 0000000..1319c6e
+index 0000000..5fabdb6
 --- /dev/null
 +++ b/server/cmd/multica-desktop-bridge/bridge.go
-@@ -0,0 +1,322 @@
+@@ -0,0 +1,342 @@
 +// Command multica-desktop-bridge lets the sandboxed OpenHarmony desktop app
 +// reach the host: it exposes a small, authenticated loopback HTTP API for the
 +// few things the desktop daemon manager needs (running the multica CLI for
@@ -1178,6 +1178,26 @@ index 0000000..1319c6e
 +		return err
 +	}
 +	return os.Rename(name, path)
++}
++
++// CheckHealth reports whether a bridge answers /health on the given loopback
++// port. It exists so shell scripts need neither curl nor bash's /dev/tcp,
++// which is unreliable on OpenHarmony.
++func CheckHealth(port int, timeout time.Duration) error {
++	client := &http.Client{Timeout: timeout}
++	resp, err := client.Get(fmt.Sprintf("http://127.0.0.1:%d/health", port))
++	if err != nil {
++		return err
++	}
++	defer resp.Body.Close()
++	var body struct {
++		OK bool `json:"ok"`
++	}
++	if resp.StatusCode != http.StatusOK ||
++		json.NewDecoder(io.LimitReader(resp.Body, 4096)).Decode(&body) != nil || !body.OK {
++		return errors.New("unexpected /health response")
++	}
++	return nil
 +}
 +
 +// NewHandler builds the bridge HTTP handler.
@@ -1375,21 +1395,23 @@ index 0000000..1319c6e
 +}
 diff --git a/server/cmd/multica-desktop-bridge/bridge_test.go b/server/cmd/multica-desktop-bridge/bridge_test.go
 new file mode 100644
-index 0000000..226fa2a
+index 0000000..6364f72
 --- /dev/null
 +++ b/server/cmd/multica-desktop-bridge/bridge_test.go
-@@ -0,0 +1,252 @@
+@@ -0,0 +1,288 @@
 +package main
 +
 +import (
 +	"encoding/json"
 +	"io"
++	"net"
 +	"net/http"
 +	"net/http/httptest"
 +	"os"
 +	"path/filepath"
 +	"strings"
 +	"testing"
++	"time"
 +)
 +
 +const testSecret = "s3cret-token"
@@ -1631,12 +1653,46 @@ index 0000000..226fa2a
 +		t.Fatalf("reload mismatch: %+v vs %+v (%v)", c2, c1, err)
 +	}
 +}
++
++func portOf(t *testing.T, srv *httptest.Server) int {
++	t.Helper()
++	return srv.Listener.Addr().(*net.TCPAddr).Port
++}
++
++func TestCheckHealth(t *testing.T) {
++	srv, _ := newServer(t)
++	if err := CheckHealth(portOf(t, srv), 2*time.Second); err != nil {
++		t.Fatalf("healthy bridge reported as down: %v", err)
++	}
++
++	bad := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		http.Error(w, "nope", http.StatusInternalServerError)
++	}))
++	defer bad.Close()
++	if err := CheckHealth(portOf(t, bad), 2*time.Second); err == nil {
++		t.Error("a 500 response must not count as healthy")
++	}
++
++	notJSON := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		_, _ = w.Write([]byte("hello"))
++	}))
++	defer notJSON.Close()
++	if err := CheckHealth(portOf(t, notJSON), 2*time.Second); err == nil {
++		t.Error("a non-JSON 200 must not count as healthy")
++	}
++
++	port := portOf(t, srv)
++	srv.Close()
++	if err := CheckHealth(port, 500*time.Millisecond); err == nil {
++		t.Error("a closed port must not count as healthy")
++	}
++}
 diff --git a/server/cmd/multica-desktop-bridge/main.go b/server/cmd/multica-desktop-bridge/main.go
 new file mode 100644
-index 0000000..0ad2bd8
+index 0000000..9c9da91
 --- /dev/null
 +++ b/server/cmd/multica-desktop-bridge/main.go
-@@ -0,0 +1,48 @@
+@@ -0,0 +1,55 @@
 +package main
 +
 +import (
@@ -1655,6 +1711,7 @@ index 0000000..0ad2bd8
 +	home := flag.String("home", "", "multica home directory (default ~/.multica)")
 +	cli := flag.String("cli", os.Getenv("MULTICA_REAL_CLI"), "path of the multica CLI to drive")
 +	initOnly := flag.Bool("init-only", false, "create the pairing file, print its path and exit")
++	check := flag.Bool("check", false, "exit 0 when a bridge answers /health on the paired port, 1 otherwise")
 +	flag.Parse()
 +
 +	if *home == "" {
@@ -1670,6 +1727,12 @@ index 0000000..0ad2bd8
 +	}
 +	if *initOnly {
 +		fmt.Println(filepath.Join(*home, configFileName))
++		return
++	}
++	if *check {
++		if err := CheckHealth(cfg.Port, 2*time.Second); err != nil {
++			os.Exit(1)
++		}
 +		return
 +	}
 +	if *cli == "" {

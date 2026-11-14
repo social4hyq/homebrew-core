@@ -118,10 +118,10 @@ index 4307789..4d26e42 100644
 \ No newline at end of file
 +}
 diff --git a/libelectron/ohos_hap/web_engine/src/main/module.json5 b/libelectron/ohos_hap/web_engine/src/main/module.json5
-index 6ce7ee5..058d964 100644
+index 6ce7ee5..b68c1a3 100644
 --- a/libelectron/ohos_hap/web_engine/src/main/module.json5
 +++ b/libelectron/ohos_hap/web_engine/src/main/module.json5
-@@ -7,168 +7,18 @@
+@@ -7,168 +7,12 @@
        "2in1"
      ],
      "requestPermissions": [
@@ -134,8 +134,8 @@ index 6ce7ee5..058d964 100644
        },
        {
          "name": "ohos.permission.GET_NETWORK_INFO"
-       },
-       {
+-      },
+-      {
 -        "name": "ohos.permission.ACCESS_CERT_MANAGER"
 -      },
 -      {
@@ -247,9 +247,8 @@ index 6ce7ee5..058d964 100644
 -          ],
 -          "when":"always"
 -        }
-+        "name": "ohos.permission.CUSTOM_SANDBOX"
-       },
-       {
+-      },
+-      {
 -        "name": "ohos.permission.CAMERA",
 -        "reason": "$string:camera",
 -        "usedScene": {
@@ -288,7 +287,6 @@ index 6ce7ee5..058d964 100644
 -      {
 -        "name": "ohos.permission.LOCK_WINDOW_CURSOR"
 -      },
-+        "name": "ohos.permission.READ_WRITE_USER_FILE"
 +      }
      ],
      "definePermissions": [
