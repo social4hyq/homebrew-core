@@ -1,13 +1,18 @@
-diff --git a/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp b/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp
-index 57afeae..301eecb 100644
+OHOS: explicitly clears Qt's OHOS `floatWindow` attribute to avoid
+triggering the restricted `SYSTEM_FLOAT_WINDOW` permission; device logs show
+`TYPE_FLOAT` being rejected and the capture tool palette becoming visible
+again once this attribute is cleared. The change is a plain always-on-top
+tool window, not a floating-window permission grant; a misleading source
+comment from an earlier revision is corrected without changing behavior.
+
 --- a/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp
 +++ b/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp
-@@ -55,6 +55,10 @@ constexpr QSize kToolbarWindowPresetSize(1242, 142);
+@@ -55,6 +55,10 @@
  ScreenshotFloatingToolPaletteWindow::ScreenshotFloatingToolPaletteWindow(
      const ScreenshotToolPalette::Options& options, QWidget* parent)
      : QWidget(parent, native::windowFlags()) {
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
-+    // Keep the transient capture toolbar above the desktop application's window.
++    // Use a normal app window without the restricted SYSTEM_FLOAT_WINDOW permission.
 +    setProperty("_q_platform_ohos_floatWindow", false);
 +#endif
  #ifdef Q_OS_MACOS

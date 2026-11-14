@@ -1,3 +1,7 @@
+OHOS: small size/stride/length validation helpers used directly by the OHOS
+capture backend above, guarding native row padding, geometry changes and
+invalid scale values; covered by unit tests in the same file.
+
 diff --git a/snow-crates/crates/snow-capture/src/platform/ohos_frame.rs b/snow-crates/crates/snow-capture/src/platform/ohos_frame.rs
 new file mode 100644
 index 0000000..15fa990

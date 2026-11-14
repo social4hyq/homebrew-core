@@ -1,3 +1,9 @@
+OHOS: the two-stage recording-save flow cannot just `QFile`-write an
+authorized document URI; it goes through the picker/export queue with
+explicit Cancelled/Failed states and destructor-time request cancellation.
+Exercised by real C++ tests covering both successful export and
+mid-operation teardown.
+
 diff --git a/snow_shot/src/platform/ohos/recordingfileexport.cpp b/snow_shot/src/platform/ohos/recordingfileexport.cpp
 new file mode 100644
 index 0000000..51ae263

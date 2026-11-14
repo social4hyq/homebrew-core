@@ -1,9 +1,12 @@
-diff --git a/snow_shot/src/presentation/pinned/livewindowsource.cpp b/snow_shot/src/presentation/pinned/livewindowsource.cpp
-index 33e698b..5e16cf7 100644
+OHOS: accept live-window targets without requiring `processId > 0`, since
+OHOS window queries do not expose that field; drop a fallback definition from
+an earlier revision that only compiles on neither OHOS nor Windows/macOS —
+this tap only ships OHOS, so there is no such configuration to support.
+
 --- a/snow_shot/src/presentation/pinned/livewindowsource.cpp
 +++ b/snow_shot/src/presentation/pinned/livewindowsource.cpp
-@@ -968,10 +968,31 @@ class CapturedLiveWindowSource final
- 
+@@ -968,8 +968,12 @@
+
  std::shared_ptr<LiveWindowSource> createLiveWindowSource(const LiveWindowTarget& target,
                                                           const QRect& selection) {
 -    if (!target.nativeId || target.processId <= 0 || selection.isEmpty())
@@ -15,23 +18,4 @@ index 33e698b..5e16cf7 100644
 +#endif
      return std::make_shared<CapturedLiveWindowSource>(target, selection);
  }
-+#if !defined(Q_OS_WIN) && !defined(Q_OS_MACOS) && !defined(Q_OS_OHOS) && \
-+    !defined(Q_OS_HARMONY)
-+std::optional<LiveWindowTarget> liveWindowTargetAtPoint(const QPoint&, const QList<quintptr>&) {
-+    return std::nullopt;
-+}
-+namespace live_window_detail {
-+std::unique_ptr<NativeWindowCapture> createNativeWindowCapture(const LiveWindowTarget&) {
-+    return {};
-+}
-+std::unique_ptr<NativeWindowMonitor> createNativeWindowMonitor(const LiveWindowTarget&) {
-+    return {};
-+}
-+std::unique_ptr<NativeWindowPresentation> createNativeWindowPresentation(const LiveWindowTarget&) {
-+    return {};
-+}
-+} // namespace live_window_detail
-+#endif
  } // namespace snow_shot::presentation
- 
- #include "livewindowsource.moc"

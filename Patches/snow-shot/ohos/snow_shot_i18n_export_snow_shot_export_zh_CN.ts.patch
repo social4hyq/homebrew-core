@@ -1,3 +1,13 @@
+OHOS: translate the text-companion export strings this port adds to
+ScreenshotRecognitionFileExport/ScreenshotSaveAsFileDialog.
+
+When an OCR result is exported alongside an HTML/Markdown file with a
+companion .txt file, OHOS needs a second document-picker authorization (see
+the imageeditingexportcontroller/screenshotpinnedwindow patches); these are
+the user-facing messages for that second authorization and for the
+temp-file-staging failure. All of them are new OHOS strings, so nothing in
+this catalog is dropped.
+
 diff --git a/snow_shot/i18n/export/snow_shot_export_zh_CN.ts b/snow_shot/i18n/export/snow_shot_export_zh_CN.ts
 index ed1b29e..0a9b48b 100644
 --- a/snow_shot/i18n/export/snow_shot_export_zh_CN.ts

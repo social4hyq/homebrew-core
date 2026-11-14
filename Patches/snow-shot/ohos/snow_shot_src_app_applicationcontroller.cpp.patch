@@ -1,5 +1,10 @@
-diff --git a/snow_shot/src/app/applicationcontroller.cpp b/snow_shot/src/app/applicationcontroller.cpp
-index 8242661..3fbfef5 100644
+OHOS: keep the recording-export entry point, the OHOS-specific
+`filesDir`-based OCR resource path, and the existing policy of disabling the
+system tray and showing the main window instead. Drop shortcut/startup trace
+logging, a tray-polling code path that cannot be reached on OHOS (and its
+dedicated header), and a duplicate assignment of the OCR bundled-runtime
+root.
+
 --- a/snow_shot/src/app/applicationcontroller.cpp
 +++ b/snow_shot/src/app/applicationcontroller.cpp
 @@ -1,3 +1,7 @@
@@ -10,16 +15,7 @@ index 8242661..3fbfef5 100644
  #include "snow_draw_engine_qt/snow_canvas_image.h"
  #include "snow_shot/app/edition.h"
  #include "snow_shot/app/applicationcontroller.h"
-@@ -88,6 +92,8 @@
- #include <QPointer>
- #include <QScreen>
- #include <QTimer>
-+#include <QWindow>
-+#include <QSystemTrayIcon>
- #include <QtMath>
- #include <QUuid>
- 
-@@ -221,11 +227,16 @@ class ApplicationController::Impl {
+@@ -221,11 +225,16 @@
                           [this]() { ensureMainWindow().showScreenshotSettings(); });
          QObject::connect(&systemTray, &presentation::SystemTrayController::openAboutRequested, &q,
                           [this]() { ensureMainWindow().showAbout(); });
@@ -40,21 +36,10 @@ index 8242661..3fbfef5 100644
          QObject::connect(&systemTray, &presentation::SystemTrayController::exitRequested, &q, []() {
              if (storage::ApplicationStorage::instance().directoryChanging())
                  return;
-@@ -268,6 +279,7 @@ class ApplicationController::Impl {
-             });
-         QObject::connect(&globalShortcutManager, &presentation::GlobalShortcutManager::activated,
-                          &q, [this](presentation::GlobalShortcutAction action) {
-+                             qInfo() << "SNOW_OHOS_APP_SHORTCUT_SIGNAL" << static_cast<int>(action);
-                              if (action != presentation::GlobalShortcutAction::SwitchWindowGroup)
-                                  dispatchQuickAction(action, QuickActionOrigin::GlobalShortcut);
-                          });
-@@ -359,6 +371,21 @@ class ApplicationController::Impl {
+@@ -359,6 +368,18 @@
          ScreenshotOcrRecognitionService::Options ocrOptions;
          ocrOptions.offlineRoot =
              QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("assets/ocr"));
-+#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
-+        ocrOptions.bundledRuntimeRoot = QCoreApplication::applicationDirPath();
-+#endif
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
 +        const QString ohosFilesDirectory =
 +            QOhosAppContext::getProperty(QOhosAppContext::Type::filesDir);
@@ -70,79 +55,15 @@ index 8242661..3fbfef5 100644
          if (applicationStorage.isInitialized() &&
              !applicationStorage.configurationDirectory().trimmed().isEmpty()) {
              ocrOptions.cacheRoot = QDir(applicationStorage.configurationDirectory())
-@@ -1523,10 +1550,45 @@ class ApplicationController::Impl {
+@@ -1523,7 +1544,11 @@
                           &permissions, &presentation::AppPermissionService::refresh);
          permissions.refresh();
  #endif
-+        qInfo("SNOW_STARTUP_TRAY_BEGIN");
 +#ifdef Q_OS_HARMONY
 +        showMainWindow();
-+#if 1 // OHOS: tray init disabled until the QOhosTaskPromise tray callbacks are fixed
-+        qWarning("SNOW_DIAGNOSTIC_TRAY_SKIPPED");
-+#else
-+        auto* trayStartup = new QTimer(&q);
-+        QObject::connect(trayStartup, &QTimer::timeout, &q, [this, trayStartup] {
-+            if (!mainWindow || !mainWindow->windowHandle() ||
-+                !mainWindow->windowHandle()->isExposed())
-+                return;
-+            trayStartup->stop();
-+            trayStartup->deleteLater();
-+            const bool trayAvailable = QSystemTrayIcon::isSystemTrayAvailable();
-+            qInfo("SNOW_STARTUP_TRAY_AVAILABLE %d", trayAvailable);
-+            if (!trayAvailable)
-+                return;
-+            qInfo("SNOW_STARTUP_TRAY_REQUEST");
-+            try {
-+                systemTray.show();
-+                qInfo("SNOW_STARTUP_TRAY_READY");
-+            } catch (const std::exception& error) {
-+                qWarning("OHOS system tray initialization failed: %s", error.what());
-+            } catch (...) {
-+                qWarning("OHOS system tray initialization failed with an unknown exception");
-+            }
-+        });
-+        trayStartup->start(50);
-+#endif
 +#else
          systemTray.show();
 +#endif
-+        qInfo("SNOW_STARTUP_SHORTCUTS_BEGIN");
          globalShortcutManager.initialize();
-+        qInfo("SNOW_STARTUP_CAPTURE_BEGIN");
          globalMouseManager.setCaptureAvailable(ensureScreenshotController()->captureAvailable());
-+        qInfo("SNOW_STARTUP_MOUSE_BEGIN");
          globalMouseManager.initialize();
-+        qInfo("SNOW_STARTUP_MOUSE_READY");
-         QObject::connect(&app, &QGuiApplication::applicationStateChanged, &globalMouseManager,
-                          [this](Qt::ApplicationState state) {
-                              if (state == Qt::ApplicationActive) {
-@@ -1910,13 +1972,19 @@ class ApplicationController::Impl {
- 
-     void dispatchQuickAction(presentation::GlobalShortcutAction action,
-                              QuickActionOrigin origin = QuickActionOrigin::Other) {
-+        qInfo() << "SNOW_OHOS_DISPATCH_QUICK_ACTION" << static_cast<int>(action)
-+                << static_cast<int>(origin);
-         runtime::RuntimeActivityTracker::shared().markActivity();
-         if (storage::ApplicationStorage::instance().directoryChanging() ||
--            (updates && updates->handoffPending()))
-+            (updates && updates->handoffPending())) {
-+            qWarning() << "SNOW_OHOS_QUICK_ACTION_BLOCKED_STORAGE_OR_UPDATE";
-             return;
-+        }
-         if (!allowPermissions(
--                presentation::requiredPermissions(action, permissions.microphoneEnabled())))
-+                presentation::requiredPermissions(action, permissions.microphoneEnabled()))) {
-+            qWarning() << "SNOW_OHOS_QUICK_ACTION_BLOCKED_PERMISSION" << static_cast<int>(action);
-             return;
-+        }
-         const std::optional<FeatureFamily> feature = featureFamilyFor(action);
-         if (feature && !featureRouter.dispatch(*feature, [this, action, origin]() {
-                 dispatchAvailableQuickAction(action, origin);
-@@ -1936,6 +2004,7 @@ class ApplicationController::Impl {
-         switch (action) {
-         case presentation::GlobalShortcutAction::Screenshot:
-             if (ScreenshotController* controller = ensureScreenshotController()) {
-+                qInfo() << "SNOW_OHOS_START_CAPTURE_CONTROLLER";
-                 controller->startCapture();
-             }
-             break;

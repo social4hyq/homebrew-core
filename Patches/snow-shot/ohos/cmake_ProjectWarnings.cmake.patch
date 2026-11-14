@@ -1,3 +1,9 @@
+OHOS: Snow Shot's own strict-warnings switch is overridden by the root
+SNOW_APPS_STRICT_COMPILE option, and snow_image/Ant Design/MicroTeX call the
+strict-warnings function independently of it. Keep the warnings themselves
+but stop promoting them to errors on OHOS, since the SDK's libc++ headers
+trigger warnings the upstream toolchains do not.
+
 diff --git a/cmake/ProjectWarnings.cmake b/cmake/ProjectWarnings.cmake
 index a4fe0b7..088024c 100644
 --- a/cmake/ProjectWarnings.cmake

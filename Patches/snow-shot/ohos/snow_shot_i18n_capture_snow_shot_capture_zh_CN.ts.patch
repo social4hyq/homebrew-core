@@ -1,42 +1,11 @@
+OHOS: translate the document-picker/file-export error strings this port adds to
+ScreenshotController.
+
 diff --git a/snow_shot/i18n/capture/snow_shot_capture_zh_CN.ts b/snow_shot/i18n/capture/snow_shot_capture_zh_CN.ts
-index c990985..d0026df 100644
+index c990985..9151794 100644
 --- a/snow_shot/i18n/capture/snow_shot_capture_zh_CN.ts
 +++ b/snow_shot/i18n/capture/snow_shot_capture_zh_CN.ts
-@@ -3,10 +3,18 @@
- <TS version="2.1" language="zh_CN" sourcelanguage="en_US">
-     <context>
-         <name>DirectCaptureController</name>
-+        <message>
-+            <source>Capture failed: %1</source>
-+            <translation>截图失败：%1</translation>
-+        </message>
-         <message>
-             <source>The capture operation could not be queued</source>
-             <translation>无法将捕获操作加入队列</translation>
-         </message>
-+        <message>
-+            <source>The capture operation failed</source>
-+            <translation>截图操作失败</translation>
-+        </message>
-         <message>
-             <source>The capture returned an invalid image</source>
-             <translation>捕获返回了无效图像</translation>
-@@ -19,6 +27,14 @@
-             <source>The captured window geometry is invalid</source>
-             <translation>捕获的窗口几何信息无效</translation>
-         </message>
-+        <message>
-+            <source>The clipboard write operation could not be queued</source>
-+            <translation>无法将剪贴板写入操作加入队列</translation>
-+        </message>
-+        <message>
-+            <source>The history write operation could not be queued</source>
-+            <translation>无法将历史记录写入操作加入队列</translation>
-+        </message>
-     </context>
-     <context>
-         <name>ScreenshotAutoFilterController</name>
-@@ -57,6 +73,10 @@
+@@ -57,6 +57,10 @@
              <source>Could not recapture the screen</source>
              <translation>无法重新截取屏幕</translation>
          </message>
@@ -47,7 +16,7 @@ index c990985..d0026df 100644
          <message>
              <source>Exit</source>
              <translation>退出</translation>
-@@ -85,6 +105,14 @@
+@@ -85,6 +89,14 @@
              <source>No recognition result is available to copy</source>
              <translation>没有可复制的识别结果</translation>
          </message>
@@ -62,7 +31,7 @@ index c990985..d0026df 100644
          <message>
              <source>Preparing cloud upload...</source>
              <translation>正在准备云上传…</translation>
-@@ -133,6 +161,10 @@
+@@ -133,6 +145,10 @@
              <source>The clipboard pin queue is full</source>
              <translation>将剪贴板内容固定到屏幕的队列已满</translation>
          </message>
@@ -73,7 +42,7 @@ index c990985..d0026df 100644
          <message>
              <source>The dropped content could not be opened</source>
              <translation>无法打开拖放的内容</translation>
-@@ -149,10 +181,34 @@
+@@ -149,10 +165,34 @@
              <source>The pinned windows could not be hidden</source>
              <translation>无法隐藏固定到屏幕窗口</translation>
          </message>
@@ -108,7 +77,7 @@ index c990985..d0026df 100644
          <message>
              <source>The screenshot clipboard operation could not be started</source>
              <translation>无法启动截图剪贴板操作</translation>
-@@ -173,6 +229,14 @@
+@@ -173,6 +213,14 @@
              <source>The screenshot could not be saved: %1</source>
              <translation>无法保存截图：%1</translation>
          </message>
@@ -123,7 +92,7 @@ index c990985..d0026df 100644
          <message>
              <source>The screenshot export queue is full</source>
              <translation>截图导出队列已满</translation>
-@@ -189,6 +253,10 @@
+@@ -189,6 +237,10 @@
              <source>The scrolling screenshot could not be prepared</source>
              <translation>无法准备滚动截图</translation>
          </message>
@@ -134,62 +103,3 @@ index c990985..d0026df 100644
          <message>
              <source>This screenshot cannot be pinned</source>
              <translation>此截图无法固定到屏幕</translation>
-@@ -206,8 +274,58 @@
-             <translation>当前截图将被丢弃</translation>
-         </message>
-     </context>
-+    <context>
-+        <name>ScreenshotController::Impl</name>
-+        <message>
-+            <source>Allow Snow Shot to access Finder in System Settings &gt; Privacy &amp; Security &gt; Automation, then try again</source>
-+            <translation>请在“系统设置”&gt;“隐私与安全性”&gt;“自动化”中允许 Snow Shot 访问访达，然后重试</translation>
-+        </message>
-+        <message>
-+            <source>Could not read the selected files from Finder. Please try again</source>
-+            <translation>无法从访达读取所选文件，请重试</translation>
-+        </message>
-+        <message>
-+            <source>Finder is unavailable. Open Finder and try again</source>
-+            <translation>访达不可用，请打开访达后重试</translation>
-+        </message>
-+        <message>
-+            <source>Finder took too long to return the selected files. Please try again</source>
-+            <translation>访达返回所选文件超时，请重试</translation>
-+        </message>
-+        <message>
-+            <source>The pinned window could not be restored</source>
-+            <translation>无法恢复置顶窗口</translation>
-+        </message>
-+        <message>
-+            <source>The pinned windows could not be hidden</source>
-+            <translation>无法隐藏置顶窗口</translation>
-+        </message>
-+    </context>
-     <context>
-         <name>ScreenshotMcpServer</name>
-+        <message>
-+            <source>Another Snow Shot instance owns the MCP endpoint</source>
-+            <translation>另一个 Snow Shot 实例正在使用 MCP 端点</translation>
-+        </message>
-+        <message>
-+            <source>Could not open the local MCP endpoint</source>
-+            <translation>无法打开本地 MCP 端点</translation>
-+        </message>
-+        <message>
-+            <source>Could not secure the MCP runtime directory</source>
-+            <translation>无法保护 MCP 运行时目录</translation>
-+        </message>
-+        <message>
-+            <source>Could not write the private MCP descriptor</source>
-+            <translation>无法写入 MCP 私有描述文件</translation>
-+        </message>
-+        <message>
-+            <source>MCP request failed (%1)</source>
-+            <translation>MCP 请求失败（%1）</translation>
-+        </message>
-+    </context>
-+    <context>
-+        <name>ScreenshotMcpSession</name>
-         <message>
-             <source>MCP request failed (%1)</source>
-             <translation>MCP 请求失败（%1）</translation>

@@ -1,3 +1,7 @@
+OHOS: the C ABI header for the in-process OCR bridge above — engine handle
+creation, image input, and paired string-allocation/release functions that
+the C++ side must call to free Rust-allocated results.
+
 diff --git a/snow-crates/crates/snow-ocr-process/include/snow_ocr_inprocess.h b/snow-crates/crates/snow-ocr-process/include/snow_ocr_inprocess.h
 new file mode 100644
 index 0000000..2ceab2f

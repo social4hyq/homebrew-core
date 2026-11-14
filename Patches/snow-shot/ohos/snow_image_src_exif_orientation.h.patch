@@ -1,3 +1,6 @@
+OHOS: same `std::stop_token` gap as codec.h, in the EXIF-orientation header
+that the shipped image pipeline compiles.
+
 diff --git a/snow_image/src/exif_orientation.h b/snow_image/src/exif_orientation.h
 index 4907ca8..620652c 100644
 --- a/snow_image/src/exif_orientation.h

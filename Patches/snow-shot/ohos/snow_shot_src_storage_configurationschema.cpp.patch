@@ -1,3 +1,9 @@
+OHOS: the OHOS hotkey parser rejects bindings with no modifier key, so the
+upstream bare F1/F3 shortcut defaults never register; change those two
+defaults to Ctrl+Alt+F1/F3 while keeping the Ctrl+F1/F3 fallback bindings and
+every other platform's defaults untouched. This only changes OHOS's
+first-run default, not a user's saved configuration.
+
 diff --git a/snow_shot/src/storage/configurationschema.cpp b/snow_shot/src/storage/configurationschema.cpp
 index 7a76349..a83a873 100644
 --- a/snow_shot/src/storage/configurationschema.cpp

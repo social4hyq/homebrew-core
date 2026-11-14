@@ -1,3 +1,8 @@
+OHOS: callers outside the Windows/macOS backends still link the
+capture-exclusion and window-id lookup symbols; provide a minimal inline
+fallback that honestly reports unsupported (`false`/`nullopt`) rather than
+silently pretending the feature works.
+
 diff --git a/snow_shot/include/snow_shot/platform/windowcaptureexclusion.h b/snow_shot/include/snow_shot/platform/windowcaptureexclusion.h
 index b74b7d6..66e4989 100644
 --- a/snow_shot/include/snow_shot/platform/windowcaptureexclusion.h

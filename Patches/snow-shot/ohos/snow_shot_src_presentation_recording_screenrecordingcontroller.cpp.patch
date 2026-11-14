@@ -1,3 +1,9 @@
+OHOS: uses the honest capture-exclusion fallback above, and expands/probes
+the user-chosen recording directory for actual write access before
+recording starts, prompting the user to re-pick rather than silently writing
+into an unauthorized shared directory. The explicit automation path keeps
+its existing path constraints unchanged.
+
 diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
 index 1d1f44a..55f308e 100644
 --- a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp

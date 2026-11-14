@@ -1,3 +1,6 @@
+OHOS: same `std::stop_token` gap as codec.h, in the planar-raster-io header
+that the shipped image pipeline compiles.
+
 diff --git a/snow_image/src/planar_raster_io.h b/snow_image/src/planar_raster_io.h
 index 704c8cb..1a819fd 100644
 --- a/snow_image/src/planar_raster_io.h

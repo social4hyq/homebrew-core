@@ -1,3 +1,6 @@
+OHOS: same `std::stop_token` gap as codec.h, in the service header that the
+shipped image pipeline compiles.
+
 diff --git a/snow_image/include/snow/image/service.h b/snow_image/include/snow/image/service.h
 index 56edf1f..e4ff798 100644
 --- a/snow_image/include/snow/image/service.h

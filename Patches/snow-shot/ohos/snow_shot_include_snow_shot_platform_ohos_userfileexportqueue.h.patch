@@ -1,6 +1,9 @@
-diff --git a/snow_shot/include/snow_shot/platform/ohos/userfileexportqueue.h b/snow_shot/include/snow_shot/platform/ohos/userfileexportqueue.h
-new file mode 100644
-index 0000000..ab3b809
+OHOS: declares the queue that hands off Qt worker threads to the async
+ArkTS document-URI API; has real screenshot/recording/editing/pin-window
+callers. Drop the extra per-pending-id vector from an earlier revision in
+favor of a single pending flag stored on each queue entry — same interface,
+one fewer parallel container to keep in sync.
+
 --- /dev/null
 +++ b/snow_shot/include/snow_shot/platform/ohos/userfileexportqueue.h
 @@ -0,0 +1,83 @@
@@ -46,11 +49,11 @@ index 0000000..ab3b809
 +    struct Entry final {
 +        UserFileExportRequest request;
 +        Completion completion;
++        bool pending = true;
 +    };
 +
 +    std::mutex m_mutex;
 +    quint64 m_nextId = 1;
-+    std::vector<quint64> m_pending;
 +    std::vector<Entry> m_entries;
 +};
 +
@@ -76,11 +79,11 @@ index 0000000..ab3b809
 +    struct Entry final {
 +        UserFileSavePickerRequest request;
 +        Completion completion;
++        bool pending = true;
 +    };
 +
 +    std::mutex m_mutex;
 +    quint64 m_nextId = 1;
-+    std::vector<quint64> m_pending;
 +    std::vector<Entry> m_entries;
 +};
 +

@@ -1,3 +1,8 @@
+OHOS: there is no OHOS branch in the upstream build script and no native
+screen-capture C ABI to link without it; wire up the CXX bridge and the OHOS
+sysroot/display/pixelmap libraries that the native capture implementation
+needs.
+
 diff --git a/snow-crates/crates/snow-capture/build.rs b/snow-crates/crates/snow-capture/build.rs
 index 982b9a6..5599156 100644
 --- a/snow-crates/crates/snow-capture/build.rs

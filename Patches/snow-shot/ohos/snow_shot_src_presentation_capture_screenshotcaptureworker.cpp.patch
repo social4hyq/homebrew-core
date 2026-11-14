@@ -1,3 +1,8 @@
+OHOS: attach the native failure text to the existing `capture.completed`
+event instead of adding new per-frame logging or a state machine, pairing
+with the diagnostics error-field allowlist above; lets a real capture-API
+error be told apart from an invalid frame.
+
 diff --git a/snow_shot/src/presentation/capture/screenshotcaptureworker.cpp b/snow_shot/src/presentation/capture/screenshotcaptureworker.cpp
 index 3100bde..8632cbd 100644
 --- a/snow_shot/src/presentation/capture/screenshotcaptureworker.cpp

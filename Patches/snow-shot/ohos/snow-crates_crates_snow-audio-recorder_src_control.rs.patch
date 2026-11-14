@@ -1,3 +1,7 @@
+OHOS: replace a deprecated `Atomic::fetch_update` call with `try_update`.
+Rust 1.99.1 turns the deprecation into a hard error under this crate's
+`-Dwarnings`, so the upstream call site no longer builds.
+
 diff --git a/snow-crates/crates/snow-audio-recorder/src/control.rs b/snow-crates/crates/snow-audio-recorder/src/control.rs
 index f80a290..4923838 100644
 --- a/snow-crates/crates/snow-audio-recorder/src/control.rs

@@ -1,9 +1,16 @@
-diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp b/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp
-index 96d4133..16ff8e6 100644
+OHOS: reuses the existing OCR dispatch/delivery protocol, adding
+thread-pool engine creation/recognition, generation-based invalidation on
+config change, and deferred cancellation when an in-flight inference cannot
+be safely interrupted. Drop eleven steady-state trace lines, an ABI-version
+print, and a duplicate assets-ready query kept only for logging; keep the
+real creation/inference failure warnings. A `shared_ptr` keeps an
+in-flight-inference engine alive past service teardown rather than forcing
+OCR onto the UI thread.
+
 --- a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp
 +++ b/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp
-@@ -10,15 +10,20 @@
- 
+@@ -10,9 +10,13 @@
+
  #include <QCoreApplication>
  #include <QDebug>
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
@@ -16,17 +23,11 @@ index 96d4133..16ff8e6 100644
  #include <QJsonDocument>
  #include <QMetaObject>
  #include <QProcess>
- #include <QProcessEnvironment>
- #include <QPointer>
- #include <QRunnable>
-+#include <QStandardPaths>
- #include <QThreadPool>
- #include <QThread>
- #include <QTimer>
-@@ -53,6 +58,116 @@ qreal edgeLength(const QPointF& first, const QPointF& second) {
+@@ -52,6 +56,113 @@
+ qreal edgeLength(const QPointF& first, const QPointF& second) {
      return std::hypot(second.x() - first.x(), second.y() - first.y());
  }
- 
++
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
 +void appendF32(QByteArray& bytes, float value) {
 +    quint32 bits = 0;
@@ -66,8 +67,6 @@ index 96d4133..16ff8e6 100644
 +        snow_ocr_recognize(handle, reinterpret_cast<const uint8_t*>(packed.constData()),
 +                           static_cast<size_t>(packed.size()), static_cast<uint32_t>(bgr.width()),
 +                           static_cast<uint32_t>(bgr.height()), &resultRaw, &errorRaw);
-+    qInfo() << "SNOW_OCR_INPROCESS_RECOGNIZE_RETURN" << code << bgr.size() << (resultRaw != nullptr)
-+            << (errorRaw != nullptr);
 +    const auto freeString = [](char* value) { snow_ocr_string_free(value); };
 +    const std::unique_ptr<char, decltype(freeString)> resultText(resultRaw, freeString);
 +    const std::unique_ptr<char, decltype(freeString)> errorText(errorRaw, freeString);
@@ -91,7 +90,6 @@ index 96d4133..16ff8e6 100644
 +    }
 +
 +    const QJsonArray lines = document.array();
-+    qInfo() << "SNOW_OCR_INPROCESS_RESPONSE_LINES" << lines.size();
 +    QByteArray encodedLines;
 +    for (const QJsonValue& value : lines) {
 +        const QJsonObject line = value.toObject();
@@ -136,21 +134,10 @@ index 96d4133..16ff8e6 100644
 +    return payload;
 +}
 +#endif
-+
+
  ScreenshotOcrTextDirection textDirectionForQuad(const QPolygonF& quad) {
      if (quad.size() != 4)
-         return ScreenshotOcrTextDirection::Horizontal;
-@@ -99,6 +214,9 @@ class ScreenshotOcrRecognitionService::Impl final {
-           m_shutdownTimeoutMilliseconds(std::max(1, options.shutdownTimeoutMilliseconds)),
-           m_retryTimeUnit(std::max(1, options.retryTimeUnitMilliseconds)),
-           m_beforeLocalRender(options.beforeLocalRender), m_modelType(options.modelType) {
-+#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
-+        qInfo() << "SNOW_OCR_INPROCESS_ABI" << snow_ocr_abi_version();
-+#endif
-         m_configuration.modelType = options.modelType;
-         m_configuration.detectorResizePolicy = options.detectorResizePolicy;
-         m_configuration.textDetectionProcessing = options.textDetectionProcessing;
-@@ -123,10 +241,18 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -123,10 +234,13 @@
                                              ? QDir(QCoreApplication::applicationDirPath())
                                                    .filePath(QStringLiteral("assets/ocr"))
                                              : options.offlineRoot;
@@ -158,11 +145,6 @@ index 96d4133..16ff8e6 100644
 -                ScreenshotOcrAssets::Options{offlineRoot, options.cacheRoot, options.proxyUrl,
 -                                             options.modelType},
 -                owner);
-+#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
-+            qInfo().noquote() << "SNOW_OCR_ASSET_ROOT" << offlineRoot << "filesDir"
-+                              << QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-+                              << "runtimeRoot" << options.bundledRuntimeRoot;
-+#endif
 +            ScreenshotOcrAssets::Options assetOptions;
 +            assetOptions.offlineRoot = offlineRoot;
 +            assetOptions.cacheRoot = options.cacheRoot;
@@ -173,7 +155,7 @@ index 96d4133..16ff8e6 100644
              connect(m_assetManager.get(), &ScreenshotOcrAssets::statusChanged, owner,
                      [this](const ScreenshotOcrAssetStatus& status) { m_assetStatus = status; });
              connect(m_assetManager.get(), &ScreenshotOcrAssets::ready, owner,
-@@ -279,6 +405,10 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -279,6 +393,10 @@
              m_staged.reset();
          }
          if (job->processSubmitted) {
@@ -184,7 +166,7 @@ index 96d4133..16ff8e6 100644
              sendFrame(makeFrame(kCancel, token));
              if (!m_configuration.residentProcess && !job->residentSubmission && m_pending.empty()) {
                  m_processState = ProcessState::Stopping;
-@@ -289,6 +419,7 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -289,6 +407,7 @@
                  job->running = job->processSubmitted = false;
                  stopTransport(true);
              }
@@ -192,7 +174,7 @@ index 96d4133..16ff8e6 100644
          }
          QObject::disconnect(job->receiverDestroyed);
          if (!job->request.renderOnly) {
-@@ -361,8 +492,10 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -361,8 +480,10 @@
              (!configuration.modelHotStart || !configuration.residentProcess))
              m_invalidateWarmSession = true;
          m_configuration = configuration;
@@ -203,37 +185,31 @@ index 96d4133..16ff8e6 100644
          if (!configuration.hardwareAcceleration)
              m_accelerationReadyPending = false;
          m_modelType = configuration.modelType;
-@@ -452,7 +585,12 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -452,6 +573,9 @@
      }
- 
+
      bool ensureProcess() {
--        if (!assetsReady() || m_stopping)
-+        const bool ready = assetsReady();
-+        qInfo() << "SNOW_OCR_ENSURE_PROCESS" << ready << m_stopping << m_assets.processPath;
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
 +        return ensureInProcessEngine();
 +#else
-+        if (!ready || m_stopping)
+         if (!assetsReady() || m_stopping)
              return false;
          if (m_transport != nullptr)
-             return !processStopping();
-@@ -553,6 +691,7 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -553,6 +677,7 @@
                  processFailed("ready_timeout");
          });
          return true;
 +#endif
      }
- 
+
      void sendFrame(const QByteArray& frame) {
-@@ -643,6 +782,171 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -643,6 +768,165 @@
      bool processStopping() const {
          return m_processState == ProcessState::Stopping;
      }
 +
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
 +    bool ensureInProcessEngine() {
-+        qInfo() << "SNOW_OCR_INPROCESS_ENSURE" << assetsReady() << m_stopping
-+                << (m_ocrInprocessHandle != nullptr) << m_ocrInprocessStarting << m_pending.size();
 +        if (!assetsReady() || m_stopping)
 +            return false;
 +        if (m_ocrInprocessHandle != nullptr)
@@ -264,7 +240,6 @@ index 96d4133..16ff8e6 100644
 +        m_localPool->start(QRunnable::create([service, alive, generation, configurationGeneration,
 +                                              detector, recognizer, dictionary, resizePolicy,
 +                                              processing, threadBudget]() {
-+            qInfo() << "SNOW_OCR_INPROCESS_CREATE_BEGIN" << generation;
 +            char* errorRaw = nullptr;
 +            SnowOcrHandle* raw = snow_ocr_create(detector.constData(), recognizer.constData(),
 +                                                 dictionary.constData(), threadBudget, resizePolicy,
@@ -273,7 +248,6 @@ index 96d4133..16ff8e6 100644
 +            const std::unique_ptr<char, decltype(freeString)> errorText(errorRaw, freeString);
 +            const QString error =
 +                errorText != nullptr ? QString::fromUtf8(errorText.get()) : QString();
-+            qInfo() << "SNOW_OCR_INPROCESS_CREATE_END" << generation << (raw != nullptr) << error;
 +            const std::shared_ptr<SnowOcrHandle> handle(
 +                raw, [](SnowOcrHandle* value) { snow_ocr_destroy(value); });
 +            QMetaObject::invokeMethod(
@@ -319,7 +293,6 @@ index 96d4133..16ff8e6 100644
 +                        return;
 +                    }
 +                    impl->m_ocrInprocessHandle = handle;
-+                    qInfo() << "SNOW_OCR_INPROCESS_ENGINE_READY" << generation;
 +                    impl->m_processState = ProcessState::Ready;
 +                    impl->m_sessionState = SessionState::Ready;
 +                    impl->m_sessionGeneration = impl->m_configurationGeneration;
@@ -378,7 +351,6 @@ index 96d4133..16ff8e6 100644
 +        const QPointer<ScreenshotOcrRecognitionService> service(m_owner);
 +        const auto alive = m_alive;
 +        m_localPool->start(QRunnable::create([service, alive, engine, image, token]() {
-+            qInfo() << "SNOW_OCR_INPROCESS_RECOGNIZE_BEGIN" << token << image.size();
 +            snow_shot::platform::applyApplicationQoSToCurrentThread();
 +            const QByteArray payload = recognizeInProcess(engine.get(), image);
 +            QMetaObject::invokeMethod(
@@ -397,7 +369,7 @@ index 96d4133..16ff8e6 100644
      bool residentEffective() const {
          return m_configuration.residentProcess && !m_residentSuspended;
      }
-@@ -756,6 +1060,11 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -756,6 +1040,11 @@
                  m_processStopReason = ProcessStopReason::Shutdown;
                  stopTransport(false);
              }
@@ -409,7 +381,7 @@ index 96d4133..16ff8e6 100644
              return;
          }
          const bool undelivered =
-@@ -775,6 +1084,10 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -775,6 +1064,10 @@
          }
          if (!ensureProcess() || !processReady())
              return;
@@ -417,18 +389,18 @@ index 96d4133..16ff8e6 100644
 +        reconcileInProcess();
 +        return;
 +#endif
- 
+
          // Only one transfer may own the mapping, and only one copied image waits ahead.
          std::shared_ptr<Job> nextImage;
-@@ -1206,6 +1519,7 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -1206,6 +1499,7 @@
      }
- 
+
      void processFailed(const char* stage = "process_exit", const QString& error = {}) {
 +        qWarning() << "SNOW_OCR_PROCESS_FAILED" << stage << error << m_assets.processPath;
          if (m_transport == nullptr || m_stopping || processStopping())
              return;
          QJsonObject fields{{QStringLiteral("stage"), QString::fromLatin1(stage)},
-@@ -1369,6 +1683,10 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -1369,6 +1663,10 @@
      QThread* m_transportThread = nullptr;
      std::vector<QPointer<QThread>> m_transportThreads;
      ScreenshotOcrTransport* m_transport = nullptr;
@@ -439,12 +411,3 @@ index 96d4133..16ff8e6 100644
      ProcessStopReason m_processStopReason = ProcessStopReason::None;
      qsizetype m_slotBytes = 0;
      int m_runningCount = 0, m_localRenderingCount = 0;
-@@ -1405,6 +1723,8 @@ ScreenshotOcrRecognitionService::~ScreenshotOcrRecognitionService() = default;
- ScreenshotOcrRecognitionPort::RequestToken
- ScreenshotOcrRecognitionService::recognize(ScreenshotOcrRequest request, QObject* receiver,
-                                            Completion completion) {
-+    qInfo() << "SNOW_OCR_RECOGNIZE_REQUEST" << request.image.size() << request.canvasRect
-+            << (receiver != nullptr) << static_cast<bool>(completion);
-     if (request.image.isNull() || !request.canvasRect.isValid() || request.canvasRect.isEmpty() ||
-         receiver == nullptr || !completion || m_impl == nullptr)
-         return 0;

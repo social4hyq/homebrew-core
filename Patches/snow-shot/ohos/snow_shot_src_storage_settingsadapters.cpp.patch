@@ -1,3 +1,11 @@
+OHOS: a static composite table mixed dynamic `QString`s with static
+`QStringList` references; repeated settings writes could leave a dangling
+`QString` behind it and segfault. Rebuild the table as plain values plus a
+Latin1 view and a list pointer, applied in one atomic update, which removes
+the invalid static-composite initialization rather than just tidying style;
+grouping policy, conflict detection and atomic write semantics are
+unchanged.
+
 diff --git a/snow_shot/src/storage/settingsadapters.cpp b/snow_shot/src/storage/settingsadapters.cpp
 index 79c554b..e910285 100644
 --- a/snow_shot/src/storage/settingsadapters.cpp

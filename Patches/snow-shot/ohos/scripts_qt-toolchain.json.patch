@@ -1,3 +1,7 @@
+OHOS: point SnowQt.cmake's `find_package(Qt6 EXACT)` at the Qt 6.13 kit this
+port builds against; the project is pinned to Qt 6.12 upstream and would fail
+to configure without this version bump.
+
 diff --git a/scripts/qt-toolchain.json b/scripts/qt-toolchain.json
 index 7d7ea27..0cee003 100644
 --- a/scripts/qt-toolchain.json

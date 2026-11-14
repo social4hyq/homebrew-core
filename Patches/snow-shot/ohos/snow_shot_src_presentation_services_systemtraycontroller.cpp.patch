@@ -1,3 +1,9 @@
+OHOS: `showRecordingExportMessage`'s notification delivery is independent of
+whether the tray icon is shown at all, and still has a real caller; on OHOS
+the user must be told to pick a destination through Files, so the wording
+changes to avoid implying the recording was already saved to some private
+app path. Only the message text changes, not the notification protocol.
+
 diff --git a/snow_shot/src/presentation/services/systemtraycontroller.cpp b/snow_shot/src/presentation/services/systemtraycontroller.cpp
 index 0fb3c4f..8eeda7d 100644
 --- a/snow_shot/src/presentation/services/systemtraycontroller.cpp

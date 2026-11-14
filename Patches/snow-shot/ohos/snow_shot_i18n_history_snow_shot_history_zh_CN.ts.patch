@@ -1,86 +1,17 @@
+OHOS: translate the document-picker/file-export error strings this port adds to
+ImageEditingWindow/ScreenshotPinnedWindow.
+
 diff --git a/snow_shot/i18n/history/snow_shot_history_zh_CN.ts b/snow_shot/i18n/history/snow_shot_history_zh_CN.ts
-index 3b35016..0f5a65a 100644
+index 3b35016..45a0a18 100644
 --- a/snow_shot/i18n/history/snow_shot_history_zh_CN.ts
 +++ b/snow_shot/i18n/history/snow_shot_history_zh_CN.ts
-@@ -152,18 +152,86 @@
-             <source>%1 px</source>
-             <translation>%1 像素</translation>
-         </message>
-+        <message>
-+            <source>Add images</source>
-+            <translation>添加图片</translation>
-+        </message>
-+        <message>
-+            <source>Add images to start image editing</source>
-+            <translation>添加图片以开始编辑</translation>
-+        </message>
-         <message>
-             <source>Allow Snow Shot to access Finder in System Settings &gt; Privacy &amp; Security &gt; Automation, then try again</source>
-             <translation>请在“系统设置 &gt; 隐私与安全性 &gt; 自动化”中允许 Snow Shot 访问访达，然后重试</translation>
-         </message>
-+        <message>
-+            <source>Continue editing</source>
-+            <translation>继续编辑</translation>
-+        </message>
-         <message>
-             <source>Could not read the selected image files. Please try again</source>
-             <translation>无法读取选中的图像文件，请重试</translation>
-         </message>
-+        <message>
-+            <source>Discard changes</source>
-+            <translation>放弃更改</translation>
-+        </message>
-+        <message>
-+            <source>Discard changes?</source>
-+            <translation>要放弃更改吗？</translation>
-+        </message>
-+        <message>
-+            <source>Drag image files here, or choose add images</source>
-+            <translation>将图片文件拖到此处，或选择“添加图片”</translation>
-+        </message>
-+        <message>
-+            <source>Drop images to edit</source>
-+            <translation>放开图片以进行编辑</translation>
-+        </message>
-+        <message>
-+            <source>Export completed</source>
-+            <translation>导出完成</translation>
-+        </message>
-+        <message>
-+            <source>Exporting…</source>
-+            <translation>正在导出…</translation>
-+        </message>
-+        <message>
-+            <source>Fit image to window</source>
-+            <translation>使图片适合窗口</translation>
-+        </message>
-+        <message>
-+            <source>Image editing</source>
-+            <translation>图片编辑</translation>
-+        </message>
-+        <message>
-+            <source>Images</source>
-+            <translation>图片</translation>
-+        </message>
-+        <message>
-+            <source>Loading image…</source>
-+            <translation>正在加载图片…</translation>
-+        </message>
-         <message>
+@@ -164,6 +164,14 @@
              <source>No available output filename was found</source>
              <translation>未找到可用的输出文件名</translation>
          </message>
 +        <message>
-+            <source>No recognition result is available to export</source>
-+            <translation>没有可导出的识别结果</translation>
-+        </message>
-+        <message>
 +            <source>No valid document was selected for the recognition result</source>
 +            <translation>未为识别结果选择有效文档</translation>
-+        </message>
-+        <message>
-+            <source>Open each image in its own window</source>
-+            <translation>在独立窗口中打开每张图片</translation>
 +        </message>
 +        <message>
 +            <source>The document picker could not be opened</source>
@@ -89,7 +20,7 @@ index 3b35016..0f5a65a 100644
          <message>
              <source>The editing content could not be prepared for export</source>
              <translation>无法准备要导出的编辑内容</translation>
-@@ -184,10 +252,26 @@
+@@ -184,10 +192,18 @@
              <source>The image is too large or there is not enough memory to load it</source>
              <translation>图像过大，或内存不足，无法加载</translation>
          </message>
@@ -105,146 +36,10 @@ index 3b35016..0f5a65a 100644
 +            <source>The user-file export queue is unavailable</source>
 +            <translation>用户文件导出队列不可用</translation>
 +        </message>
-+        <message>
-+            <source>This editing window has unsaved changes</source>
-+            <translation>此编辑窗口中有未保存的更改</translation>
-+        </message>
-+        <message>
-+            <source>View at actual size (100%)</source>
-+            <translation>按实际尺寸查看（100%）</translation>
-+        </message>
      </context>
      <context>
          <name>ImageSplitDocument</name>
-@@ -1527,6 +1611,77 @@ Files:
-             <translation>RGBA:</translation>
-         </message>
-     </context>
-+    <context>
-+        <name>PinnedWindowGroupManager</name>
-+        <message>
-+            <source>Add</source>
-+            <translation>添加</translation>
-+        </message>
-+        <message>
-+            <source>Cancel</source>
-+            <translation>取消</translation>
-+        </message>
-+        <message>
-+            <source>Clear default group</source>
-+            <translation>清空默认分组</translation>
-+        </message>
-+        <message>
-+            <source>Clear group</source>
-+            <translation>清空分组</translation>
-+        </message>
-+        <message>
-+            <source>Default</source>
-+            <translation>默认</translation>
-+        </message>
-+        <message>
-+            <source>Delete "%1" and all its pinned windows, including closed windows? This action cannot be undone</source>
-+            <translation>删除“%1”及其所有置顶窗口（包括已关闭的窗口）？此操作无法撤销。</translation>
-+        </message>
-+        <message>
-+            <source>Delete all pinned windows in "%1", including closed windows? The default group will remain. This action cannot be undone</source>
-+            <translation>删除“%1”中的所有置顶窗口（包括已关闭的窗口）？默认分组将保留。此操作无法撤销。</translation>
-+        </message>
-+        <message>
-+            <source>Delete empty groups</source>
-+            <translation>删除空分组</translation>
-+        </message>
-+        <message>
-+            <source>Delete every group with no pinned windows other than closed ones? Closed pinned windows saved in those groups will also be permanently deleted. This action cannot be undone</source>
-+            <translation>删除所有没有置顶窗口的分组？这些分组中已保存的已关闭置顶窗口也会被永久删除。此操作无法撤销。</translation>
-+        </message>
-+        <message>
-+            <source>Delete group</source>
-+            <translation>删除分组</translation>
-+        </message>
-+        <message>
-+            <source>Delete groups</source>
-+            <translation>删除分组</translation>
-+        </message>
-+        <message>
-+            <source>Group %1</source>
-+            <translation>分组 %1</translation>
-+        </message>
-+        <message>
-+            <source>Group name</source>
-+            <translation>分组名称</translation>
-+        </message>
-+        <message>
-+            <source>New group</source>
-+            <translation>新建分组</translation>
-+        </message>
-+        <message>
-+            <source>Please enter a group name</source>
-+            <translation>请输入分组名称</translation>
-+        </message>
-+        <message>
-+            <source>This group name is already in use</source>
-+            <translation>此分组名称已被使用</translation>
-+        </message>
-+        <message>
-+            <source>Unable to create the group or move the selected windows. Try again</source>
-+            <translation>无法创建分组或移动所选窗口，请重试</translation>
-+        </message>
-+    </context>
-     <context>
-         <name>PinnedWindowManagementPageWidget</name>
-         <message>
-@@ -1736,6 +1891,49 @@ Files:
-             <translation>此记录及其打开的窗口将被移除</translation>
-         </message>
-     </context>
-+    <context>
-+        <name>PinnedWindowSelectionController</name>
-+        <message numerus="yes">
-+            <source>%n selected window(s)</source>
-+            <translation><numerusform>%n 个已选窗口</numerusform></translation>
-+        </message>
-+        <message>
-+            <source>Cancel</source>
-+            <translation>取消</translation>
-+        </message>
-+        <message>
-+            <source>Destroy</source>
-+            <translation>销毁</translation>
-+        </message>
-+        <message numerus="yes">
-+            <source>Destroy %n displayed window(s)? This action cannot be undone</source>
-+            <translation><numerusform>要销毁 %n 个已显示窗口吗？此操作无法撤销。</numerusform></translation>
-+        </message>
-+        <message numerus="yes">
-+            <source>Destroy %n selected window(s)? This action cannot be undone</source>
-+            <translation><numerusform>要销毁 %n 个已选窗口吗？此操作无法撤销。</numerusform></translation>
-+        </message>
-+        <message>
-+            <source>Destroy displayed windows</source>
-+            <translation>销毁已显示的窗口</translation>
-+        </message>
-+        <message>
-+            <source>Destroy selected windows</source>
-+            <translation>销毁所选窗口</translation>
-+        </message>
-+        <message>
-+            <source>The displayed windows could not be destroyed</source>
-+            <translation>无法销毁已显示的窗口</translation>
-+        </message>
-+        <message>
-+            <source>The selected windows could not be destroyed</source>
-+            <translation>无法销毁所选窗口</translation>
-+        </message>
-+        <message>
-+            <source>The selected windows could not be moved to the group</source>
-+            <translation>无法将所选窗口移动到分组</translation>
-+        </message>
-+    </context>
-     <context>
-         <name>ScreenshotHistoryPageWidget</name>
-         <message>
-@@ -2305,6 +2503,26 @@ Files:
+@@ -2305,6 +2321,26 @@ Files:
              <source>The pinned image save could not be started</source>
              <translation>无法启动已固定到屏幕的图像的保存</translation>
          </message>
@@ -271,17 +66,3 @@ index 3b35016..0f5a65a 100644
          <message>
              <source>The window changed while preparing the image. Please try again</source>
              <translation>准备图像时窗口发生了变化，请重试</translation>
-@@ -2369,6 +2587,13 @@ Files:
-             <translation>窗口 · 未关闭 / 总数</translation>
-         </message>
-     </context>
-+    <context>
-+        <name>WindowGroupSwitcherController</name>
-+        <message>
-+            <source>Could not switch window group. Please try again</source>
-+            <translation>无法切换窗口分组，请重试</translation>
-+        </message>
-+    </context>
-     <context>
-         <name>snow_shot::presentation::ImageEditingWindow</name>
-         <message>

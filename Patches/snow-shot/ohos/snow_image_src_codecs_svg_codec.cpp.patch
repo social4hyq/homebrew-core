@@ -1,3 +1,7 @@
+OHOS: lunasvg is installed by this port's Homebrew formula with a flat
+`lunasvg.h` include layout; keep the upstream `__has_include` branch so other
+layouts still work, rather than hard-coding the include path for everyone.
+
 diff --git a/snow_image/src/codecs/svg_codec.cpp b/snow_image/src/codecs/svg_codec.cpp
 index 1656a3a..19836c1 100644
 --- a/snow_image/src/codecs/svg_codec.cpp

@@ -1,3 +1,8 @@
+OHOS: the only native screen-capture backend implementation for this
+platform. It validates the captured format/size, repacks native row-padded
+pixel data into packed rows, and releases capture resources; without it
+region/display capture has no OHOS implementation at all.
+
 diff --git a/snow-crates/crates/snow-capture/native/ohos_capture.cpp b/snow-crates/crates/snow-capture/native/ohos_capture.cpp
 new file mode 100644
 index 0000000..d978906

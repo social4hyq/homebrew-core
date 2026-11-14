@@ -1,3 +1,7 @@
+OHOS: separates the installed package's native-library root (passed to the
+OCR asset resolver) from the writable per-user model directory, since the
+two are different paths on OHOS and must not be collapsed into one field.
+
 diff --git a/snow_shot/include/snow_shot/presentation/screenshotocrrecognitionservice.h b/snow_shot/include/snow_shot/presentation/screenshotocrrecognitionservice.h
 index ea11b71..40f7567 100644
 --- a/snow_shot/include/snow_shot/presentation/screenshotocrrecognitionservice.h

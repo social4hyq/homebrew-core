@@ -1,3 +1,8 @@
+OHOS: link the existing runtime-test target against the OCR in-process C
+ABI; this test target already exists upstream and needs the new link
+dependency to configure on OHOS even though the shipped formula disables
+building tests.
+
 diff --git a/cmake/SnowShotRuntimeTests.cmake b/cmake/SnowShotRuntimeTests.cmake
 index d585cd7..d238d85 100644
 --- a/cmake/SnowShotRuntimeTests.cmake

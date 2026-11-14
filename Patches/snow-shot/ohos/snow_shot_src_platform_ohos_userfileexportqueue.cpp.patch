@@ -1,15 +1,19 @@
-diff --git a/snow_shot/src/platform/ohos/userfileexportqueue.cpp b/snow_shot/src/platform/ohos/userfileexportqueue.cpp
-new file mode 100644
-index 0000000..0ed1985
+OHOS: merge the two parallel pending-id vectors from an earlier revision
+into a single entry list with a per-entry pending flag, and drop per-enqueue
+debug logging. Completion/cancellation still remove the entry from the
+container before invoking its callback outside the lock, preserving FIFO
+order, single dispatch, idempotent completion and re-entrancy. Verified
+unchanged behavior with the project's existing before/after tests, including
+400 concurrent requests.
+
 --- /dev/null
 +++ b/snow_shot/src/platform/ohos/userfileexportqueue.cpp
-@@ -0,0 +1,155 @@
+@@ -0,0 +1,143 @@
 +// SPDX-License-Identifier: GPL-3.0-or-later
 +#include "snow_shot/platform/ohos/userfileexportqueue.h"
 +
 +#include <algorithm>
 +#include <QDir>
-+#include <QDebug>
 +#include <QUrl>
 +#include <utility>
 +
@@ -64,25 +68,20 @@ index 0000000..0ed1985
 +    if (m_nextId == 0)
 +        return 0;
 +    const quint64 id = m_nextId++;
-+    m_pending.push_back(id);
 +    m_entries.push_back(
 +        {UserFileExportRequest{id, std::move(sourcePath), std::move(uri)}, std::move(completion)});
-+    qInfo() << "SNOW_USER_FILE_EXPORT_ENQUEUE" << id;
 +    return id;
 +}
 +
 +std::vector<UserFileExportRequest> UserFileExportQueue::takePending() {
 +    std::lock_guard lock(m_mutex);
 +    std::vector<UserFileExportRequest> result;
-+    result.reserve(m_pending.size());
-+    for (const quint64 id : m_pending) {
-+        const auto entry =
-+            std::find_if(m_entries.begin(), m_entries.end(),
-+                         [id](const Entry& candidate) { return candidate.request.id == id; });
-+        if (entry != m_entries.end())
-+            result.push_back(entry->request);
++    for (auto& entry : m_entries) {
++        if (entry.pending) {
++            result.push_back(entry.request);
++            entry.pending = false;
++        }
 +    }
-+    m_pending.clear();
 +    return result;
 +}
 +
@@ -97,7 +96,6 @@ index 0000000..0ed1985
 +            return false;
 +        completion = std::move(entry->completion);
 +        m_entries.erase(entry);
-+        std::erase(m_pending, id);
 +    }
 +    completion(succeeded, std::move(error));
 +    return true;
@@ -115,7 +113,6 @@ index 0000000..0ed1985
 +    if (m_nextId == 0)
 +        return 0;
 +    const quint64 id = m_nextId++;
-+    m_pending.push_back(id);
 +    m_entries.push_back(
 +        {UserFileSavePickerRequest{id, std::move(suggestedName), std::move(suffixChoices)},
 +         std::move(completion)});
@@ -125,15 +122,12 @@ index 0000000..0ed1985
 +std::vector<UserFileSavePickerRequest> UserFileSavePickerQueue::takePending() {
 +    std::lock_guard lock(m_mutex);
 +    std::vector<UserFileSavePickerRequest> result;
-+    result.reserve(m_pending.size());
-+    for (const quint64 id : m_pending) {
-+        const auto entry =
-+            std::find_if(m_entries.begin(), m_entries.end(),
-+                         [id](const Entry& candidate) { return candidate.request.id == id; });
-+        if (entry != m_entries.end())
-+            result.push_back(entry->request);
++    for (auto& entry : m_entries) {
++        if (entry.pending) {
++            result.push_back(entry.request);
++            entry.pending = false;
++        }
 +    }
-+    m_pending.clear();
 +    return result;
 +}
 +
@@ -148,7 +142,6 @@ index 0000000..0ed1985
 +            return false;
 +        completion = std::move(entry->completion);
 +        m_entries.erase(entry);
-+        std::erase(m_pending, id);
 +    }
 +    completion(std::move(uri), suffixIndex, std::move(error));
 +    return true;

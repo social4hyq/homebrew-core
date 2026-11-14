@@ -1,3 +1,7 @@
+OHOS: declares the extra parameters and pending state that
+screenshotpinnedwindow.cpp needs to save a pinned window's image or
+recognition result through the async authorized-URI flow.
+
 diff --git a/snow_shot/include/snow_shot/presentation/screenshotpinnedwindow.h b/snow_shot/include/snow_shot/presentation/screenshotpinnedwindow.h
 index 0cfea67..8b9073e 100644
 --- a/snow_shot/include/snow_shot/presentation/screenshotpinnedwindow.h

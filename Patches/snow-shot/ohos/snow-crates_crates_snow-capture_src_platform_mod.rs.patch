@@ -1,3 +1,8 @@
+OHOS: route the OHOS platform to the real capture backend and its monitor
+layout instead of the generic UnsupportedBackend; without this, every
+capture request on OHOS fails immediately regardless of the native backend
+above.
+
 diff --git a/snow-crates/crates/snow-capture/src/platform/mod.rs b/snow-crates/crates/snow-capture/src/platform/mod.rs
 index 23c1697..f2e5546 100644
 --- a/snow-crates/crates/snow-capture/src/platform/mod.rs

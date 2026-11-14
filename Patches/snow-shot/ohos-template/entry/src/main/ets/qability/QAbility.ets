@@ -77,10 +77,6 @@ export default class QAbility extends UIAbility {
     new Array<NativeUserFileSavePickerRequest>();
 
   private async presentUserFileSavePicker(request: NativeUserFileSavePickerRequest): Promise<void> {
-    const abilityInstanceId: string =
-      this.launchWant.parameters?.['io.qt.private.abilityInstanceId']?.toString() ?? 'unknown';
-    hilog.info(LOG_DOMAIN, LOG_TAG, 'USER_FILE_SAVE_PICKER_PRESENTING ' + request.id +
-      ' abilityInstanceId ' + abilityInstanceId);
     let uri: string = '';
     let suffixIndex: number = -1;
     let errorMessage: string = '';
@@ -151,7 +147,6 @@ export default class QAbility extends UIAbility {
   }
 
   private async publishUserFileExport(request: NativeUserFileExport): Promise<void> {
-    hilog.info(LOG_DOMAIN, LOG_TAG, 'USER_FILE_EXPORT_BEGIN ' + request.id);
     let source: fileIo.File | undefined;
     let destination: fileIo.File | undefined;
     let succeeded: boolean = false;
@@ -175,7 +170,6 @@ export default class QAbility extends UIAbility {
         await new Promise<void>((resolve: () => void) => setTimeout(resolve, 0));
       }
       succeeded = true;
-      hilog.info(LOG_DOMAIN, LOG_TAG, 'USER_FILE_EXPORT_WRITE_SUCCEEDED ' + request.id);
     } catch (error) {
       const e = error as BusinessError;
       errorMessage = e.message;
@@ -305,7 +299,6 @@ export default class QAbility extends UIAbility {
         isRepeat: false
       };
       const callback = (_event: inputConsumer.HotkeyOptions): void => {
-        hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_BRIDGE_ACTIVATED ' + registration.portableText);
         if (this.snowShotNative !== null) {
           this.snowShotNative.activateHotkey(registration.portableText);
         } else {
@@ -315,7 +308,6 @@ export default class QAbility extends UIAbility {
       try {
         inputConsumer.on('hotkeyChange', options, callback);
         this.shortcutSubscriptions.set(registration.portableText, {options, callback});
-        hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_BRIDGE_SUBSCRIBED ' + registration.portableText);
       } catch (error) {
         const e = error as BusinessError;
         hilog.error(LOG_DOMAIN, LOG_TAG, 'HOTKEY_REGISTER_FAILED ' + registration.portableText + ' ' + e.code + ' ' + e.message);
@@ -354,13 +346,10 @@ export default class QAbility extends UIAbility {
           'SNOW_TRACE_EARLY_SHORTCUTS_NATIVE_TIMEOUT ' + this.earlyShortcutsRetryCount);
         return;
       }
-      hilog.info(LOG_DOMAIN, LOG_TAG,
-        'SNOW_TRACE_EARLY_SHORTCUTS_NATIVE_NOT_READY ' + this.earlyShortcutsRetryCount);
       setTimeout(() => this.registerEarlyDefaultShortcuts(), QAbility.earlyShortcutsRetryDelayMs);
       return;
     }
     this.earlyShortcutsRegistered = true;
-    hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_TRACE_EARLY_SHORTCUTS_BEGIN');
     const defaultTexts: Array<string> = ['Ctrl+Alt+F1', 'Ctrl+Alt+F3', 'Ctrl+F1', 'Ctrl+F3'];
     let configuredTexts: Set<string> = new Set<string>();
     try {
@@ -382,22 +371,17 @@ export default class QAbility extends UIAbility {
       hilog.warn(LOG_DOMAIN, LOG_TAG, 'EARLY_SHORTCUT_CONFIG_FALLBACK ' + this.context.filesDir +
         '/config.json ' + e.code + ' ' + e.message);
     }
-    hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_TRACE_EARLY_SHORTCUT_CONFIG_READ_DONE ' + configuredTexts.size);
     if (configuredTexts.size === 0) {
       configuredTexts = new Set<string>(defaultTexts);
     }
     configuredTexts.forEach((portableText: string) => {
-      hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_TRACE_EARLY_SHORTCUT_ITEM ' + portableText);
       if (this.shortcutSubscriptions.has(portableText)) {
         return;
       }
       if (this.snowShotNative == null) {
-        hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_TRACE_EARLY_SHORTCUT_NATIVE_UNAVAILABLE');
         return;
       }
-      hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_TRACE_PARSE_SHORTCUT_BEGIN ' + portableText);
       const registration = this.snowShotNative.parseShortcut(portableText) as NativeHotkeyRegistration | null;
-      hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_TRACE_PARSE_SHORTCUT_RETURN ' + portableText);
       if (registration === null || registration === undefined) {
         return;
       }
@@ -405,7 +389,6 @@ export default class QAbility extends UIAbility {
         preKeys: registration.preKeys, finalKey: registration.finalKey, isRepeat: false
       };
       const callback = (_event: inputConsumer.HotkeyOptions): void => {
-        hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_BRIDGE_ACTIVATED ' + registration.portableText);
         if (this.snowShotNative !== null) {
           this.snowShotNative.activateHotkey(registration.portableText);
         } else {
@@ -413,11 +396,8 @@ export default class QAbility extends UIAbility {
         }
       };
       try {
-        hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_TRACE_INPUT_CONSUMER_ON_BEGIN ' + portableText);
         inputConsumer.on('hotkeyChange', options, callback);
-        hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_TRACE_INPUT_CONSUMER_ON_RETURN ' + portableText);
         this.shortcutSubscriptions.set(registration.portableText, {options, callback});
-        hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_BRIDGE_EARLY_REGISTERED ' + registration.portableText);
       } catch (error) {
         const e = error as BusinessError;
         hilog.error(LOG_DOMAIN, LOG_TAG, 'SNOW_BRIDGE_EARLY_REGISTER_FAILED ' + registration.portableText + ' ' + e.code + ' ' + e.message);
@@ -466,17 +446,14 @@ export default class QAbility extends UIAbility {
         fileIo.closeSync(file.fd);
       }
     });
-    hilog.info(LOG_DOMAIN, LOG_TAG, 'OCR_ASSETS_INSTALLED ' + appFilesDir + '/assets (OCR + QR models)');
   }
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam) {
-    hilog.info(LOG_DOMAIN, LOG_TAG, 'QAbility::onCreate(): want.parameters: ' + JSON.stringify(want.parameters));
     QAbilityStage.initQtAppContextIfNeeded(this.context.getApplicationContext());
     const atManager = abilityAccessCtrl.createAtManager();
     this.permissionRequest = atManager.requestPermissionsFromUser(
       this.context, ['ohos.permission.CUSTOM_SCREEN_CAPTURE']
-    ).then(async (result) => {
-      hilog.info(LOG_DOMAIN, LOG_TAG, 'SCREEN_CAPTURE permission: ' + JSON.stringify(result));
+    ).then(async () => {
       qpa.handleAbilityOnCreate(this, want, launchParam);
       try {
         this.installOcrAssets();
@@ -497,35 +474,26 @@ export default class QAbility extends UIAbility {
   }
 
   onDestroy(): void | Promise<void> {
-    hilog.info(LOG_DOMAIN, LOG_TAG, 'QAbility::onDestroy()');
     QAbility.shortcutBridgeCandidates.delete(this);
     this.releaseGlobalShortcutBridge();
     return qpa.handleAbilityOnDestroy(this);
   }
 
   onPrepareToTerminate(): boolean {
-    hilog.info(LOG_DOMAIN, LOG_TAG, 'QAbility::onPrepareToTerminate()');
     return qpa.handleAbilityOnPrepareToTerminate(this);
   }
 
   onPrepareToTerminateAsync(): Promise<boolean> {
-    hilog.info(LOG_DOMAIN, LOG_TAG, 'QAbility::onPrepareToTerminateAsync()');
     return qpa.handleAbilityOnPrepareToTerminateAsync(this);
   }
 
   onWindowStageCreate(windowStage: Window.WindowStage) {
-    hilog.info(LOG_DOMAIN, LOG_TAG, 'QAbility::onWindowStageCreate(): this.launchWant.parameters: ' + JSON.stringify(this.launchWant.parameters));
     const continueStageCreate = (): void => {
-      hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_TRACE_STAGE_CONTINUE_ENTER');
       QAbility.shortcutBridgeCandidates.add(this);
       if (QAbility.shortcutBridgeOwner === null) {
         QAbility.shortcutBridgeOwner = this;
-      } else if (QAbility.shortcutBridgeOwner !== this) {
-        hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_BRIDGE_SHARED_OWNER');
       }
-      hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_TRACE_QPA_STAGE_ENTER');
       qpa.handleAbilityOnWindowStageCreate(this, windowStage);
-      hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_TRACE_QPA_STAGE_RETURN');
       this.startGlobalShortcutBridge();
       setTimeout(() => this.registerEarlyDefaultShortcuts(), 250);
     };
@@ -547,12 +515,10 @@ export default class QAbility extends UIAbility {
   }
 
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
-    hilog.info(LOG_DOMAIN, LOG_TAG, 'QAbility::onNewWant(): want.parameters: ' + JSON.stringify(want.parameters));
     qpa.handleAbilityOnNewWant(this, want, launchParam);
   }
 
   onForeground() {
-    hilog.info(LOG_DOMAIN, LOG_TAG, 'QAbility::onForeground()');
     QAbility.foregroundPickerAbility = this;
     this.startPendingUserFileSavePickers();
     this.startPendingUserFileExports();
@@ -560,7 +526,6 @@ export default class QAbility extends UIAbility {
   }
 
   onBackground() {
-    hilog.info(LOG_DOMAIN, LOG_TAG, 'QAbility::onBackground()');
     if (QAbility.foregroundPickerAbility === this) {
       QAbility.foregroundPickerAbility = null;
     }
@@ -568,7 +533,6 @@ export default class QAbility extends UIAbility {
   }
 
   onWindowStageDestroy() {
-    hilog.info(LOG_DOMAIN, LOG_TAG, 'QAbility::onStageDestroy()');
     QAbility.shortcutBridgeCandidates.delete(this);
     this.releaseGlobalShortcutBridge();
     qpa.handleAbilityOnWindowStageDestroy(this);

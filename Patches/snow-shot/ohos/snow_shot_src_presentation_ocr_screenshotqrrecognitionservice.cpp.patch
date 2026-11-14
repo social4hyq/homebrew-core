@@ -1,3 +1,8 @@
+OHOS: the available OpenCV WeChatQRCode interface here takes four model file
+paths rather than the in-memory buffers upstream constructs; switch to
+absolute paths into the already-unpacked `filesDir` models, keeping the
+existing readability check and exception handling.
+
 diff --git a/snow_shot/src/presentation/ocr/screenshotqrrecognitionservice.cpp b/snow_shot/src/presentation/ocr/screenshotqrrecognitionservice.cpp
 index 421cb95..2df64d7 100644
 --- a/snow_shot/src/presentation/ocr/screenshotqrrecognitionservice.cpp

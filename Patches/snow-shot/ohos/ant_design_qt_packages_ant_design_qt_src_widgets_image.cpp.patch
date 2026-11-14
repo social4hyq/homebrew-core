@@ -1,3 +1,7 @@
+OHOS: Ant Design's image.cpp uses a cancellation token type the OHOS SDK's
+Clang 15 libc++ does not ship (no C++20 `std::stop_token`); bridge to the
+same jthread/stop_token compatibility header used by snow_image.
+
 diff --git a/ant_design_qt/packages/ant_design_qt/src/widgets/image.cpp b/ant_design_qt/packages/ant_design_qt/src/widgets/image.cpp
 index 8725098..179b0d0 100644
 --- a/ant_design_qt/packages/ant_design_qt/src/widgets/image.cpp

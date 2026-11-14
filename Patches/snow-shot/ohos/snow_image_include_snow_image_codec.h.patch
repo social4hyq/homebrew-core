@@ -1,3 +1,7 @@
+OHOS: this header uses `std::stop_token` directly; the OHOS SDK's Clang 15
+libc++ has no C++20 `<stop_token>`, so snow_image's codec/raster pipeline
+needs a compatible header to compile at all on this platform.
+
 diff --git a/snow_image/include/snow/image/codec.h b/snow_image/include/snow/image/codec.h
 index 064763a..45f0568 100644
 --- a/snow_image/include/snow/image/codec.h

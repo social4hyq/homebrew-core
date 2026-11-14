@@ -1,3 +1,8 @@
+OHOS: the frameless main window needs to call `QWindow::startSystemMove`
+from its custom-drawn title bar, since OHOS has no native decoration to drag
+by; reuses the existing macOS code path rather than adding a new drag state
+machine.
+
 diff --git a/snow_shot/src/presentation/components/titlebarwidget.cpp b/snow_shot/src/presentation/components/titlebarwidget.cpp
 index ac80ad0..b634b9c 100644
 --- a/snow_shot/src/presentation/components/titlebarwidget.cpp

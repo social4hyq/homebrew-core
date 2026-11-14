@@ -1,9 +1,14 @@
-diff --git a/snow_shot/src/platform/ohos/livewindownative.cpp b/snow_shot/src/platform/ohos/livewindownative.cpp
-new file mode 100644
-index 0000000..b0c59c4
+OHOS: `GetAllMainWindowInfo` from `oh_window.h` only needs the ordinary
+`CUSTOM_SCREEN_CAPTURE` permission, not the more restricted permission an
+earlier focus-window experiment assumed — do not conflate the two. Keep
+matching rects to window ids by stacking order, the live-window snapshot
+path, tri-state monitoring, geometry/pixel validation, and RAII cleanup; drop
+a helper that only returned a `QRect==` comparison, candidate-count logging,
+and a warning for the normal no-target case.
+
 --- /dev/null
 +++ b/snow_shot/src/platform/ohos/livewindownative.cpp
-@@ -0,0 +1,376 @@
+@@ -0,0 +1,369 @@
 +#include "../../presentation/pinned/livewindownative_p.h"
 +#include "livewindowselection_p.h"
 +
@@ -28,10 +33,6 @@ index 0000000..b0c59c4
 +        value.height > static_cast<uint32_t>(std::numeric_limits<int>::max()))
 +        return {};
 +    return {value.posX, value.posY, static_cast<int>(value.width), static_cast<int>(value.height)};
-+}
-+
-+bool sameRect(const QRect& left, const QRect& right) {
-+    return left == right;
 +}
 +
 +class MainWindowList final {
@@ -326,7 +327,7 @@ index 0000000..b0c59c4
 +                continue;
 +            WindowManager_WindowProperties properties{};
 +            if (OH_WindowManager_GetWindowProperties(window.windowId, &properties) != 0 ||
-+                !sameRect(rect(properties.windowRect), stackedBounds))
++                rect(properties.windowRect) != stackedBounds)
 +                continue;
 +            const QString title = window.label ? QString::fromUtf8(window.label) : QString();
 +            candidates.append(
@@ -351,12 +352,9 @@ index 0000000..b0c59c4
 +            continue;
 +        visitedDisplays.append(window.displayId);
 +        auto candidates = candidatesAtDisplay(window.displayId);
-+        qInfo() << "SNOW_OHOS_LIVE_WINDOW_CANDIDATES" << window.displayId << candidates.size()
-+                << "point" << point;
 +        if (auto target = ohos_live_window_detail::targetAtPoint(point, excluded, candidates))
 +            return target;
 +    }
-+    qWarning() << "SNOW_OHOS_LIVE_WINDOW_NO_TARGET" << point << excluded;
 +    return std::nullopt;
 +}
 +
