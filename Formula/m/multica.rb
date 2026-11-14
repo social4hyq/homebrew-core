@@ -4,7 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
