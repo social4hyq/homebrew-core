@@ -6,15 +6,15 @@ class OpencodeDesktop < Formula
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
-  revision 1
+  revision 2
 
   livecheck do
     skip "Tap-hosted payload, versioned with the formula"
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.0-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c46848d39517646bb5e7f5ae7046eeb32b0f80610f9b85a40ee365ea0c73790"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.0-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2887e7cb49529089ab5e8f01547c15824d891c371df236d6abb01c5ec454bef"
   end
 
   depends_on "node" => :build
@@ -48,20 +48,21 @@ class OpencodeDesktop < Formula
     %w[app_icon.png startIcon.png].each do |name|
       cp buildpath/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
-    app_strings = shell/"AppScope/resources/base/element/string.json"
-    strings = JSON.parse(app_strings.read)
-    strings.fetch("string").each do |entry|
-      entry["value"] = "OpenCode" if entry["name"] == "app_name"
+    # App name and ability labels live in per-locale string resources: patching
+    # only the base file leaves the zh_CN/en_US overrides intact and the
+    # launcher keeps showing the template's "Electron" label, so glob every
+    # locale directory.
+    (shell.glob("AppScope/resources/*/element/string.json") +
+     shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
+      strings = JSON.parse(file.read)
+      strings.fetch("string").each do |entry|
+        case entry["name"]
+        when "app_name", "EntryAbility_label" then entry["value"] = "OpenCode"
+        end
+      end
+      rm file
+      file.write JSON.pretty_generate(strings) + "\n"
     end
-    rm app_strings
-    app_strings.write JSON.pretty_generate(strings) + "\n"
-    module_strings = shell/"electron/src/main/resources/base/element/string.json"
-    strings = JSON.parse(module_strings.read)
-    strings["string"].each do |entry|
-      entry["value"] = "OpenCode" if entry["name"] == "EntryAbility_label"
-    end
-    rm module_strings
-    module_strings.write JSON.pretty_generate(strings) + "\n"
 
     # CI's electron-ohos-ci CLT carries an NDK-less SDK subset (no llvm-strip);
     # mirror the multica packaging deltas that keep hvigor away from the strip
