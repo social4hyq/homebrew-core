@@ -4,7 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -75,6 +75,8 @@ class Multica < Formula
       MULTICA_DESKTOP_BRIDGE:  libexec/"multica-desktop-bridge",
       MULTICA_HDC:             formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
       MULTICA_INSTALL_DESKTOP: pkgshare/"install-desktop.sh",
+      MULTICA_INSTALL_HAP:     pkgshare/"install-hap.sh",
+      MULTICA_MODULE_ACL:      pkgshare/"module-acl.json",
       MULTICA_REAL_CLI:        libexec/"multica-cli",
       MULTICA_UNSIGNED_HAP:    libexec/"multica-desktop-unsigned.hap",
       MULTICA_ZIP:             formula_opt_bin("zip")/"zip",
@@ -167,6 +169,18 @@ class Multica < Formula
 
     libexec.install shell/"electron/build/default/outputs/default/electron-default-unsigned.hap" =>
                     "multica-desktop-unsigned.hap"
+
+    # The default HAP requests only what local automatic signing can grant.
+    # `multica install-desktop --acl-profile` swaps in this variant, which also
+    # requests the two ACL-gated permissions, for devices whose signing profile
+    # carries those ACLs.
+    hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"multica-desktop-unsigned.hap", "module.json")
+    module_json = JSON.parse(hap_module)
+    requested = module_json.fetch("module").fetch("requestPermissions")
+    %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE].each do |name|
+      requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
+    end
+    (pkgshare/"module-acl.json").write JSON.generate(module_json)
   end
 
   def caveats
@@ -179,6 +193,13 @@ class Multica < Formula
       login, signing-project creation, local debug profile generation, signing,
       installation, and launch. Private signing material stays in your home
       directory; it is not in the bottle.
+
+      The default HAP requests only INTERNET and GET_NETWORK_INFO, which local
+      automatic signing can grant. If your signing profile carries the
+      CUSTOM_SANDBOX and READ_WRITE_USER_FILE ACLs (for example an AGC debug
+      profile), run `multica install-desktop --acl-profile <build-profile.json5>`
+      to sign and install a copy that also requests them; without those ACLs the
+      device refuses to install it.
 
       The desktop app runs in an app sandbox that cannot execute the CLI or read
       ~/.multica, so a small loopback bridge runs on the host. `multica
@@ -235,6 +256,30 @@ class Multica < Formula
     ENV["MULTICA_REAL_CLI"] = (libexec/"multica-cli").to_s
     ENV["MULTICA_ZIP"] = zip.to_s
     ENV.prepend_path "PATH", fake_bin
+    signer_args = testpath/"signer-args"
+    signer_input = testpath/"signer-input.hap"
+    fake_signer = fake_bin/"hap-installer-sign"
+    fake_signer.write <<~SH
+      #!/bin/sh
+      printf '%s\n' "$*" > #{signer_args}
+      while [ $# -gt 0 ]; do
+        case "$1" in
+          --hap) hap_in="$2" ;;
+          --output) hap_out="$2" ;;
+        esac
+        shift
+      done
+      cp "$hap_in" #{signer_input}
+      cp "$hap_in" "$hap_out"
+    SH
+    chmod 0755, fake_signer
+    acl_install_args = testpath/"install-hap-args"
+    fake_hap_install = fake_bin/"install-hap"
+    fake_hap_install.write <<~SH
+      #!/bin/sh
+      printf '%s\n' "$@" > #{acl_install_args}
+    SH
+    chmod 0755, fake_hap_install
     begin
       shell_output(desktop_installer.to_s)
       args = installer_args.read.lines(chomp: true)
@@ -247,6 +292,23 @@ class Multica < Formula
       assert_equal pairing.read,
                    shell_output("unzip -p #{injected_hap} resources/resfile/resources/app/desktop-bridge.json")
       assert_match "bridge: running", shell_output("#{pkgshare}/desktop.sh status")
+      refute_path_exists signer_args
+      refute_match(/module\.json$/, shell_output("unzip -l #{injected_hap}"))
+
+      ENV["MULTICA_INSTALL_HAP"] = fake_hap_install.to_s
+      ENV["MULTICA_MODULE_ACL"] = (pkgshare/"module-acl.json").to_s
+      (testpath/"build-profile.json5").write "{}"
+      shell_output("#{desktop_installer} --acl-profile #{testpath}/build-profile.json5")
+      assert_match "--profile #{testpath}/build-profile.json5", signer_args.read
+      assert_equal ["--start"], acl_install_args.read.lines(chomp: true).drop(1)
+      signed_module = JSON.parse(shell_output("unzip -p #{signer_input} module.json"))
+      signed_permissions = signed_module.fetch("module").fetch("requestPermissions").map do |permission|
+        permission.fetch("name")
+      end
+      assert_includes signed_permissions, "ohos.permission.CUSTOM_SANDBOX"
+      assert_includes signed_permissions, "ohos.permission.READ_WRITE_USER_FILE"
+      assert_equal pairing.read,
+                   shell_output("unzip -p #{signer_input} resources/resfile/resources/app/desktop-bridge.json")
 
       paired = JSON.parse(pairing.read)
       base = URI("http://127.0.0.1:#{paired.fetch("port")}")
@@ -284,8 +346,15 @@ class Multica < Formula
     end
     assert_includes schemes, "multica"
     permissions = profile.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
+    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
+    acl_module = JSON.parse((pkgshare/"module-acl.json").read)
+    acl_permissions = acl_module.fetch("module").fetch("requestPermissions").map do |permission|
+      permission.fetch("name")
+    end
     assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
-                    ohos.permission.READ_WRITE_USER_FILE], permissions.sort
+                    ohos.permission.READ_WRITE_USER_FILE], acl_permissions.sort
+    assert_equal profile.fetch("module").except("requestPermissions"),
+                 acl_module.fetch("module").except("requestPermissions")
     assert_equal %w[@electron-toolkit/utils electron-updater], package.fetch("dependencies").keys.sort
     system "unzip", "-tq", hap
   end
