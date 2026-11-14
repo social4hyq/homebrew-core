@@ -88,6 +88,8 @@ for i in 1 2; do
   fi
   [ "$i" = 2 ] && exit 1
   echo "::warning::brew install attempt $i failed, retrying in 90s (atomgit transient 404)"
+  # 调试：重试前重新 trust（排除 trust 引用失效导致依赖加载被拒）
+  cexec "brew trust $TAP" || true
   sleep 90
 done
 
