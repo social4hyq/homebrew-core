@@ -2,10 +2,10 @@ OHOS: let the sandboxed desktop drive the host CLI and daemon profile through a 
 
 diff --git a/apps/desktop/src/main/daemon-manager-ohos.test.ts b/apps/desktop/src/main/daemon-manager-ohos.test.ts
 new file mode 100644
-index 0000000..86b916b
+index 0000000..1fa9812
 --- /dev/null
 +++ b/apps/desktop/src/main/daemon-manager-ohos.test.ts
-@@ -0,0 +1,416 @@
+@@ -0,0 +1,470 @@
 +// @vitest-environment node
 +import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 +
@@ -331,76 +331,129 @@ index 0000000..86b916b
 +    expect(ctx.host.hostCliAvailable).not.toHaveBeenCalled();
 +    expect(states().at(-1)).toBe("cli_not_found");
 +  });
-+  // The login auto-start is emitted once per session. If it arrives while the
-+  // CLI is unavailable it does nothing, and the automatic retry that later
-+  // restores the CLI must not leave the daemon down.
-+  describe("deferred login auto-start", () => {
++  // The renderer signs the user in with `setTargetApiUrl -> syncToken ->
++  // autoStart`, awaited in that order. syncToken writes the host profile through
++  // the bridge, so while the bridge is down it fails and autoStart is never even
++  // requested. Once the CLI comes back, nothing asks for the daemon again: the
++  // main process has to do it by itself, for a user who has signed in before.
++  describe("daemon start after the CLI recovers", () => {
 +    const startCalls = () =>
 +      ctx.host.execFile.mock.calls.filter((c) => c[1][0] === "daemon" && c[1][1] === "start");
-+    const withPrefs = (prefs: { autoStart: boolean; autoStop: boolean }) => {
-+      const base = ctx.host.readFile.getMockImplementation()!;
-+      ctx.host.readFile.mockImplementation(async (p: string, e: string) =>
-+        p.endsWith("desktop_prefs.json") ? JSON.stringify(prefs) : base(p, e),
-+      );
++
++    // A bridge that can be down (profile reads/writes are refused, like a closed
++    // port) or up (the host profile is served), with a given signed-in state.
++    function simulateBridge(opts: { token?: string; prefs?: { autoStart: boolean; autoStop: boolean } } = {}) {
++      const down = Object.assign(new Error("ECONNREFUSED 127.0.0.1:19800"), { code: "ECONNREFUSED" });
++      const state = { up: false };
++      const profile = JSON.stringify({
++        server_url: "https://api.example.test",
++        ...(opts.token ? { token: opts.token } : {}),
++      });
++      ctx.host.hostCliAvailable.mockImplementation(async () => state.up);
++      ctx.host.readFile.mockImplementation(async (p: string) => {
++        if (p.endsWith("desktop_prefs.json")) {
++          if (opts.prefs) return JSON.stringify(opts.prefs);
++          throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
++        }
++        if (!state.up) throw down;
++        if (p.endsWith("config.json")) return profile;
++        throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
++      });
++      ctx.host.writeFile.mockImplementation(async () => {
++        if (!state.up) throw down;
++      });
++      return { up: () => void (state.up = true) };
++    }
++
++    async function bootWithBridgeDown(opts: Parameters<typeof simulateBridge>[0] = {}) {
++      vi.useFakeTimers({ toFake: [...TIMERS] });
++      const bridge = simulateBridge(opts);
++      await boot(); // setTargetApiUrl succeeds: no profile access in the cli_not_found state
++      await vi.advanceTimersByTimeAsync(0);
++      expect(states()).toContain("cli_not_found");
++      // What the renderer's login sync runs into while the bridge is down: the
++      // token sync is refused, so the sequence stops before autoStart.
++      await expect(ctx.handlers.get("daemon:sync-token")!({}, "mul_fresh", "user-1")).rejects.toThrow(/ECONNREFUSED/);
++      return bridge;
++    }
++
++    const recover = async (bridge: { up: () => void }) => {
++      bridge.up();
++      await vi.advanceTimersByTimeAsync(5_000); // the automatic retry resolves the CLI
++      await vi.advanceTimersByTimeAsync(0);
 +    };
 +
-+    it("starts the daemon once the CLI recovers, if the login auto-start was dropped meanwhile", async () => {
-+      await bootWithoutBridge();
-+      await ctx.handlers.get("daemon:auto-start")!({}); // CLI unavailable: nothing starts
++    it("starts the daemon for a signed-in user even though the login sync never reached auto-start", async () => {
++      const bridge = await bootWithBridgeDown({ token: "mul_saved" });
 +      expect(startCalls()).toHaveLength(0);
 +
-+      ctx.host.hostCliAvailable.mockResolvedValue(true);
-+      await vi.advanceTimersByTimeAsync(5_000); // the automatic retry recovers the CLI
-+      await vi.advanceTimersByTimeAsync(0);
++      await recover(bridge);
 +
 +      expect(startCalls()).toHaveLength(1);
 +      expect(startCalls()[0][0]).toBe("multica-host");
 +      expect(startCalls()[0][1]).toEqual(["daemon", "start", "--profile", expect.any(String)]);
 +    });
 +
-+    it("respects a disabled auto-start preference", async () => {
-+      withPrefs({ autoStart: false, autoStop: false });
-+      await bootWithoutBridge();
-+      await ctx.handlers.get("daemon:auto-start")!({});
-+      ctx.host.hostCliAvailable.mockResolvedValue(true);
-+      await vi.advanceTimersByTimeAsync(5_000);
-+      await vi.advanceTimersByTimeAsync(0);
-+
++    it("does not start a daemon when nobody has signed in (no token in the host profile)", async () => {
++      const bridge = await bootWithBridgeDown({});
++      await recover(bridge);
 +      expect(states().at(-1)).not.toBe("cli_not_found");
 +      expect(startCalls()).toHaveLength(0);
 +    });
 +
-+    it("does not start a daemon before the renderer has asked for the login auto-start", async () => {
-+      await bootWithoutBridge();
-+      ctx.host.hostCliAvailable.mockResolvedValue(true);
-+      await vi.advanceTimersByTimeAsync(5_000); // CLI recovers, but no login sync happened yet
-+      await vi.advanceTimersByTimeAsync(0);
++    it("respects a disabled auto-start preference", async () => {
++      const bridge = await bootWithBridgeDown({ token: "mul_saved", prefs: { autoStart: false, autoStop: false } });
++      await recover(bridge);
 +      expect(startCalls()).toHaveLength(0);
-+
-+      await ctx.handlers.get("daemon:auto-start")!({}); // the normal login path still works
-+      expect(startCalls()).toHaveLength(1);
 +    });
 +
-+    it("runs the deferred auto-start only once", async () => {
-+      await bootWithoutBridge();
-+      await ctx.handlers.get("daemon:auto-start")!({});
-+      ctx.host.hostCliAvailable.mockResolvedValue(true);
-+      await vi.advanceTimersByTimeAsync(5_000);
++    it("does not start anything before the renderer has reported the API URL", async () => {
++      vi.useFakeTimers({ toFake: [...TIMERS] });
++      const bridge = simulateBridge({ token: "mul_saved" });
++      const { setupDaemonManager } = await import("./daemon-manager");
++      setupDaemonManager(() => null, () => (ctx.win ? [ctx.win as never] : []));
 +      await vi.advanceTimersByTimeAsync(0);
++      expect(states()).toContain("cli_not_found");
++
++      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
++      await recover(bridge); // no target URL yet, so no profile and nothing to start
++      expect(startCalls()).toHaveLength(0);
++      // ...and that is a quiet "not signed in yet", not a failure that got swallowed.
++      expect(warn.mock.calls.filter((c) => String(c[0]).includes("after CLI recovery"))).toHaveLength(0);
++      warn.mockRestore();
++    });
++
++    it("leaves a daemon that is already running alone", async () => {
++      const bridge = await bootWithBridgeDown({ token: "mul_saved" });
++      ctx.health.mockResolvedValue({ status: "running", pid: 4242, os: "linux" });
++      await recover(bridge);
++      expect(startCalls()).toHaveLength(0);
++    });
++
++    it("does nothing after an ordinary start where the CLI was never unavailable", async () => {
++      vi.useFakeTimers({ toFake: [...TIMERS] });
++      const bridge = simulateBridge({ token: "mul_saved" });
++      bridge.up();
++      await boot();
++      await vi.advanceTimersByTimeAsync(30_000);
++      expect(startCalls()).toHaveLength(0); // starting at login stays the renderer's job
++    });
++
++    it("runs once per recovery, not again on a later manual retry", async () => {
++      const bridge = await bootWithBridgeDown({ token: "mul_saved" });
++      await recover(bridge);
 +      expect(startCalls()).toHaveLength(1);
 +
-+      // A later manual retry must not repeat it. (Not waiting any longer: the
-+      // crash-recovery policy would legitimately retry a start that never
-+      // became healthy, and that is not what is under test here.)
++      // (Not waiting any longer: the crash-recovery policy would legitimately retry
++      // a start that never became healthy, which is not what is under test here.)
 +      await ctx.handlers.get("daemon:retry-install")!({});
 +      await vi.advanceTimersByTimeAsync(0);
 +      expect(startCalls()).toHaveLength(1);
 +    });
 +
-+    it("also runs it when the user recovers the CLI with the retry button", async () => {
-+      await bootWithoutBridge();
-+      await ctx.handlers.get("daemon:auto-start")!({});
-+      ctx.host.hostCliAvailable.mockResolvedValue(true);
++    it("also runs when the user recovers the CLI with the retry button", async () => {
++      const bridge = await bootWithBridgeDown({ token: "mul_saved" });
++      bridge.up();
 +      await ctx.handlers.get("daemon:retry-install")!({});
 +      await vi.advanceTimersByTimeAsync(0);
 +      expect(startCalls()).toHaveLength(1);
@@ -409,10 +462,11 @@ index 0000000..86b916b
 +    it("leaves other platforms alone", async () => {
 +      vi.useFakeTimers({ toFake: [...TIMERS] });
 +      Object.defineProperty(process, "platform", { value: "linux" });
++      // A signed-in profile that is readable, so only the platform can stop the start.
++      simulateBridge({ token: "mul_saved" }).up();
 +      await boot();
 +      await vi.advanceTimersByTimeAsync(0);
 +      expect(states()).toContain("cli_not_found");
-+      await ctx.handlers.get("daemon:auto-start")!({}); // dropped: CLI missing
 +
 +      ctx.exists.mockImplementation((p: string) => String(p).endsWith("resources/bin/multica"));
 +      await ctx.handlers.get("daemon:retry-install")!({}); // the CLI now resolves
@@ -423,7 +477,7 @@ index 0000000..86b916b
 +  });
 +});
 diff --git a/apps/desktop/src/main/daemon-manager.ts b/apps/desktop/src/main/daemon-manager.ts
-index e0c6748..5209584 100644
+index e0c6748..b7ff38d 100644
 --- a/apps/desktop/src/main/daemon-manager.ts
 +++ b/apps/desktop/src/main/daemon-manager.ts
 @@ -1,13 +1,5 @@
@@ -601,16 +655,11 @@ index e0c6748..5209584 100644
      const pid = parseDaemonPid(raw);
      if (pid === null) {
        console.warn(
-@@ -1319,11 +1332,56 @@ function startPolling(): void {
+@@ -1319,11 +1332,72 @@ function startPolling(): void {
   * stopped/running state machine. Called once at startup and again on
   * user-triggered `daemon:retry-install`.
   */
-+// The login auto-start, emitted once per session by the renderer. If it arrives
-+// while the CLI is unavailable it can only be dropped; on OpenHarmony the CLI
-+// may come back later (the bridge was not running yet), so remember that and
-+// run it again then. See resumeDeferredAutoStart.
-+let autoStartDeferred = false;
-+
++// The login auto-start, emitted once per session by the renderer.
 +async function autoStartDaemon(): Promise<void> {
 +  const prefs = await loadPrefs();
 +  if (quitting || autoStartSuppressedAfterQuit) return;
@@ -621,10 +670,7 @@ index e0c6748..5209584 100644
 +  await lifecycleOperations.runForeground(async () => {
 +    if (quitting || autoStartSuppressedAfterQuit) return;
 +    const bin = await resolveCliBinary();
-+    if (!bin) {
-+      if (process.platform === "openharmony") autoStartDeferred = true;
-+      return;
-+    }
++    if (!bin) return;
 +    const health = await fetchHealth();
 +    if (quitting || autoStartSuppressedAfterQuit) return;
 +    observeDaemonBoundary(health);
@@ -638,15 +684,38 @@ index e0c6748..5209584 100644
 +  });
 +}
 +
++// OpenHarmony: while the bridge is down the CLI is unavailable, and so is the
++// host profile (it is reached through the same bridge). The renderer signs the
++// user in with setTargetApiUrl -> syncToken -> autoStart, awaited in order;
++// syncToken fails without the bridge, so autoStart is never even requested, and
++// once the CLI comes back nothing asks for the daemon again. Do it here, for a
++// user who has signed in before.
++let cliRecoveryPending = false;
++
++// Starts the daemon the way the login auto-start would, but only for a user who
++// has signed in on this machine: there is a Desktop profile and it already holds
++// a token (signing out clears it). Without that, e.g. on a fresh install, a
++// daemon started here would have no credentials, and the renderer starts it
++// itself after login.
++async function autoStartDaemonIfSignedIn(): Promise<void> {
++  try {
++    const active = await ensureActiveProfile();
++    if (!active) return;
++    const config = await readProfileConfig(active.name);
++    if (typeof config.token !== "string" || config.token === "") return;
++    await autoStartDaemon();
++  } catch (err) {
++    console.warn("[daemon] auto-start after CLI recovery failed:", err);
++  }
++}
++
 +// Called once a bootstrap attempt has finished, outside the lifecycle gate
-+// (autoStartDaemon takes it itself). Only repeats an auto-start that was
-+// actually requested and dropped: one that has not been requested yet is the
-+// renderer's job after login, and starting a daemon before that has no token.
-+function resumeDeferredAutoStart(): void {
-+  if (!autoStartDeferred) return;
++// (autoStartDaemon takes it itself).
++function resumeAfterCliRecovery(): void {
++  if (!cliRecoveryPending) return;
 +  if (currentState === "cli_not_found" || currentState === "installing_cli") return;
-+  autoStartDeferred = false;
-+  void autoStartDaemon();
++  cliRecoveryPending = false;
++  void autoStartDaemonIfSignedIn();
 +}
 +
  async function bootstrapCli(): Promise<void> {
@@ -654,11 +723,12 @@ index e0c6748..5209584 100644
    if (!bin) {
      currentState = "cli_not_found";
      sendStatus({ state: "cli_not_found" });
++    if (process.platform === "openharmony") cliRecoveryPending = true;
 +    scheduleCliRetry();
      return;
    }
    currentState = "stopped";
-@@ -1331,6 +1389,33 @@ async function bootstrapCli(): Promise<void> {
+@@ -1331,6 +1405,33 @@ async function bootstrapCli(): Promise<void> {
    startPolling();
  }
  
@@ -684,7 +754,7 @@ index e0c6748..5209584 100644
 +      .runBackground(() => bootstrapCli())
 +      .finally(() => {
 +        if (currentState === "cli_not_found") scheduleCliRetry();
-+        else resumeDeferredAutoStart();
++        else resumeAfterCliRecovery();
 +      });
 +  }, CLI_RETRY_MS);
 +}
@@ -692,7 +762,7 @@ index e0c6748..5209584 100644
  function stopPolling(): void {
    if (statusPollTimer) {
      clearInterval(statusPollTimer);
-@@ -1371,6 +1456,10 @@ function sendLines(win: BrowserWindow, text: string): void {
+@@ -1371,6 +1472,10 @@ function sendLines(win: BrowserWindow, text: string): void {
  // would silently fail on Windows.
  function startLogTail(win: BrowserWindow, retryCount = 0): void {
    stopLogTail();
@@ -703,7 +773,7 @@ index e0c6748..5209584 100644
  
    void ensureActiveProfile().then(async (active) => {
      // Before the renderer reports its apiUrl there is no Desktop-owned profile
-@@ -1386,7 +1475,7 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
+@@ -1386,7 +1491,7 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
  
      let position = 0;
      try {
@@ -712,7 +782,7 @@ index e0c6748..5209584 100644
        const windowBytes = Math.min(
          initialStats.size,
          LOG_TAIL_INITIAL_WINDOW_BYTES,
-@@ -1432,7 +1521,82 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
+@@ -1432,7 +1537,82 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
    });
  }
  
@@ -795,7 +865,7 @@ index e0c6748..5209584 100644
    if (logTailWatcher) {
      unwatchFile(logTailWatcher.path, logTailWatcher.listener);
      logTailWatcher = null;
-@@ -1487,6 +1651,7 @@ export function setupDaemonManager(
+@@ -1487,6 +1667,7 @@ export function setupDaemonManager(
  ): void {
    getMainWindow = windowGetter;
    getStatusWindows = statusWindowsGetter;
@@ -803,15 +873,15 @@ index e0c6748..5209584 100644
  
    ipcMain.handle("daemon:set-target-api-url", async (_e, url: string) => {
      const normalized = url || null;
-@@ -1559,6 +1724,7 @@ export function setupDaemonManager(
+@@ -1559,6 +1740,7 @@ export function setupDaemonManager(
      // cached version string so the next check re-reads the binary.
      cachedCliBinaryVersion = undefined;
      await lifecycleOperations.runForeground(() => bootstrapCli());
-+    resumeDeferredAutoStart();
++    resumeAfterCliRecovery();
    });
    ipcMain.handle("daemon:get-prefs", () => loadPrefs());
    ipcMain.handle(
-@@ -1572,29 +1738,7 @@ export function setupDaemonManager(
+@@ -1572,29 +1754,7 @@ export function setupDaemonManager(
          return savePrefs(merged).then(() => merged);
        }),
    );
