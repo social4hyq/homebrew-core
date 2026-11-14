@@ -1,0 +1,516 @@
+OHOS: run the daemon manager against the host through the desktop bridge. The
+app sandbox can neither run the CLI nor see ~/.multica, so file and CLI access
+go through ohos-host; health and API calls use net.fetch, because the global
+fetch needs WebAssembly, which is missing; the log panel polls by offset; a
+missing CLI is retried every 5 s; and once the CLI recovers the daemon is
+started for a user who has signed in, since the renderer's login sync cannot
+reach auto-start while the bridge is down.
+
+diff --git a/apps/desktop/src/main/daemon-manager.ts b/apps/desktop/src/main/daemon-manager.ts
+index 4a6f6b9..b7ff38d 100644
+--- a/apps/desktop/src/main/daemon-manager.ts
++++ b/apps/desktop/src/main/daemon-manager.ts
+@@ -1,13 +1,5 @@
+-import { app, ipcMain, BrowserWindow, shell, dialog, type MessageBoxOptions } from "electron";
+-import { execFile } from "child_process";
+-import {
+-  readFile,
+-  writeFile,
+-  mkdir,
+-  rm,
+-  open,
+-  stat,
+-} from "fs/promises";
++import { app, ipcMain, BrowserWindow, shell, dialog, net, type MessageBoxOptions } from "electron";
++import { open } from "fs/promises";
+ import {
+   existsSync,
+   watchFile,
+@@ -15,6 +7,7 @@ import {
+   type StatsListener,
+ } from "fs";
+ import { join } from "path";
++import { HOST_CLI, configureHost, host } from "./ohos-host";
+ import { homedir, hostname } from "os";
+ import type {
+   DaemonStatus,
+@@ -92,6 +85,9 @@ interface ActiveProfile {
+ 
+ let statusPollTimer: ReturnType<typeof setInterval> | null = null;
+ let logTailWatcher: { path: string; listener: StatsListener } | null = null;
++let logTailTimer: ReturnType<typeof setInterval> | null = null;
++// Bumped by stopLogTail so an in-flight async start can tell it was superseded.
++let logTailGeneration = 0;
+ let logTailOwner: Electron.WebContents | null = null;
+ let currentState: DaemonStatus["state"] = "installing_cli";
+ let getMainWindow: () => BrowserWindow | null = () => null;
+@@ -139,7 +135,7 @@ let configWriteChain: Promise<void> = Promise.resolve();
+ 
+ async function readProfileUserId(profile: string): Promise<string | null> {
+   try {
+-    const raw = await readFile(profileUserIdPath(profile), "utf-8");
++    const raw = await host.readFile(profileUserIdPath(profile), "utf-8");
+     const trimmed = raw.trim();
+     return trimmed || null;
+   } catch {
+@@ -151,13 +147,13 @@ async function writeProfileUserId(
+   profile: string,
+   userId: string,
+ ): Promise<void> {
+-  await mkdir(profileDir(profile), { recursive: true });
+-  await writeFile(profileUserIdPath(profile), userId, "utf-8");
++  await host.mkdir(profileDir(profile), { recursive: true });
++  await host.writeFile(profileUserIdPath(profile), userId, "utf-8");
+ }
+ 
+ async function removeProfileUserId(profile: string): Promise<void> {
+   try {
+-    await rm(profileUserIdPath(profile));
++    await host.rm(profileUserIdPath(profile));
+   } catch {
+     // Already gone — nothing to do.
+   }
+@@ -209,9 +205,11 @@ async function fetchHealthAtPort(
+   const controller = new AbortController();
+   const timeout = setTimeout(() => controller.abort(), timeoutMs);
+   try {
+-    const res = await fetch(`http://127.0.0.1:${port}/health`, {
+-      signal: controller.signal,
+-    });
++    const url = `http://127.0.0.1:${port}/health`;
++    // OHOS Electron cannot initialize Node's WebAssembly-based fetch parser.
++    const res = await (process.platform === "openharmony"
++      ? net.fetch(url, { signal: controller.signal })
++      : fetch(url, { signal: controller.signal }));
+     if (!res.ok) return null;
+     return (await res.json()) as HealthPayload;
+   } catch {
+@@ -264,10 +262,16 @@ async function probeTokenValidity(profile: string): Promise<AuthProbeResult> {
+   try {
+     const controller = new AbortController();
+     const timeout = setTimeout(() => controller.abort(), 4_000);
+-    const res = await fetch(`${targetApiBaseUrl.replace(/\/+$/, "")}/api/me`, {
+-      headers: { Authorization: `Bearer ${token}` },
+-      signal: controller.signal,
+-    });
++    const url = `${targetApiBaseUrl.replace(/\/+$/, "")}/api/me`;
++    const res = await (process.platform === "openharmony"
++      ? net.fetch(url, {
++          headers: { Authorization: `Bearer ${token}` },
++          signal: controller.signal,
++        })
++      : fetch(url, {
++          headers: { Authorization: `Bearer ${token}` },
++          signal: controller.signal,
++        }));
+     clearTimeout(timeout);
+     return classifyAuthProbe({ status: res.status });
+   } catch {
+@@ -279,7 +283,7 @@ async function readProfileConfig(
+   profile: string,
+ ): Promise<Record<string, unknown>> {
+   try {
+-    const raw = await readFile(profileConfigPath(profile), "utf-8");
++    const raw = await host.readFile(profileConfigPath(profile), "utf-8");
+     const parsed = JSON.parse(raw);
+     return parsed && typeof parsed === "object" ? parsed : {};
+   } catch {
+@@ -292,8 +296,8 @@ async function writeProfileConfig(
+   cfg: Record<string, unknown>,
+ ): Promise<void> {
+   const op = async () => {
+-    await mkdir(profileDir(profile), { recursive: true });
+-    await writeFile(
++    await host.mkdir(profileDir(profile), { recursive: true });
++    await host.writeFile(
+       profileConfigPath(profile),
+       JSON.stringify(cfg, null, 2),
+       "utf-8",
+@@ -503,7 +507,7 @@ async function probeCliBinary(
+ ): Promise<string | null> {
+   try {
+     const stdout = await new Promise<string>((resolve, reject) => {
+-      execFile(
++      host.execFile(
+         bin,
+         ["version", "--output", "json"],
+         { timeout: 5_000 },
+@@ -527,6 +531,22 @@ async function probeCliBinary(
+   }
+ }
+ 
++/**
++ * OpenHarmony: the app sandbox cannot execute binaries, so the CLI lives on the
++ * host and is driven through the desktop bridge (see ohos-host.ts). Only a
++ * positive result is cached — the bridge may simply not be running yet, and the
++ * app must pick it up as soon as it is.
++ */
++async function resolveHostCli(): Promise<string | null> {
++  if (cachedCliBinary) return cachedCliBinary;
++  if (!(await host.hostCliAvailable())) return null;
++  const version = await probeCliBinary(HOST_CLI, "path");
++  if (!version) return null;
++  cachedCliBinary = HOST_CLI;
++  cachedCliBinaryVersion = version;
++  return HOST_CLI;
++}
++
+ /**
+  * Returns a usable `multica` binary path. Priority:
+  *   1. Cached result from a previous successful resolve.
+@@ -545,6 +565,7 @@ async function probeCliBinary(
+  */
+ async function resolveCliBinary(): Promise<string | null> {
+   if (quitting) return cachedCliBinary ?? null;
++  if (process.platform === "openharmony") return resolveHostCli();
+   if (cachedCliBinary !== undefined) return cachedCliBinary;
+   if (cliResolvePromise) return cliResolvePromise;
+ 
+@@ -705,15 +726,25 @@ async function mintPat(jwt: string): Promise<string> {
+     throw new Error("mint PAT: target API URL not set");
+   }
+   const url = `${targetApiBaseUrl.replace(/\/+$/, "")}/api/tokens`;
+-  const res = await fetch(url, {
+-    method: "POST",
+-    headers: {
+-      "Content-Type": "application/json",
+-      Authorization: `Bearer ${jwt}`,
+-    },
+-    // Omit expires_in_days → server treats as null → non-expiring PAT.
+-    body: JSON.stringify({ name: "Multica Desktop" }),
+-  });
++  const res = await (process.platform === "openharmony"
++    ? net.fetch(url, {
++        method: "POST",
++        headers: {
++          "Content-Type": "application/json",
++          Authorization: `Bearer ${jwt}`,
++        },
++        // Omit expires_in_days → server treats as null → non-expiring PAT.
++        body: JSON.stringify({ name: "Multica Desktop" }),
++      })
++    : fetch(url, {
++        method: "POST",
++        headers: {
++          "Content-Type": "application/json",
++          Authorization: `Bearer ${jwt}`,
++        },
++        // Omit expires_in_days → server treats as null → non-expiring PAT.
++        body: JSON.stringify({ name: "Multica Desktop" }),
++      }));
+   if (!res.ok) {
+     const body = await res.text().catch(() => "");
+     // Attach the status so callers can tell a genuine auth rejection (401 — the
+@@ -819,7 +850,7 @@ async function restartDaemonAfterUserSwitch(
+ 
+ async function loadPrefs(): Promise<DaemonPrefs> {
+   try {
+-    const raw = await readFile(PREFS_PATH, "utf-8");
++    const raw = await host.readFile(PREFS_PATH, "utf-8");
+     const parsed = JSON.parse(raw);
+     return { ...DEFAULT_PREFS, ...parsed };
+   } catch {
+@@ -829,8 +860,8 @@ async function loadPrefs(): Promise<DaemonPrefs> {
+ 
+ async function savePrefs(prefs: DaemonPrefs): Promise<void> {
+   const dir = join(homedir(), ".multica");
+-  await mkdir(dir, { recursive: true });
+-  await writeFile(PREFS_PATH, JSON.stringify(prefs, null, 2), "utf-8");
++  await host.mkdir(dir, { recursive: true });
++  await host.writeFile(PREFS_PATH, JSON.stringify(prefs, null, 2), "utf-8");
+ }
+ 
+ async function clearToken(): Promise<void> {
+@@ -928,7 +959,7 @@ async function probeLocalRuntimes(): Promise<LocalRuntimeProbe> {
+   const active = await ensureActiveProfile();
+   if (!active) return { probeResult: "error" };
+   return new Promise((resolve) => {
+-    execFile(
++    host.execFile(
+       bin,
+       ["daemon", "probe-runtimes", ...profileArgs(active.name)],
+       { timeout: 15_000, env: desktopSpawnEnv(), maxBuffer: 64 * 1024 },
+@@ -1054,7 +1085,7 @@ async function startDaemon(
+   const args = ["daemon", "start", ...profileArgs(active.name)];
+ 
+   return new Promise((resolve) => {
+-    execFile(
++    host.execFile(
+       bin,
+       args,
+       { timeout: DAEMON_START_EXEC_TIMEOUT_MS, env: desktopSpawnEnv() },
+@@ -1123,7 +1154,7 @@ async function stopDaemon(
+ 
+   return new Promise((resolve) => {
+     // The CLI's forced stop includes the existing 40s shutdown budget.
+-    execFile(bin, args, { timeout: options.force ? 55_000 : 15_000 }, (err) => {
++    host.execFile(bin, args, { timeout: options.force ? 55_000 : 15_000 }, (err) => {
+       if (err) {
+         resolve({ success: false, error: err.message });
+       } else {
+@@ -1150,7 +1181,7 @@ async function restartDaemon(): Promise<{ success: boolean; error?: string }> {
+ 
+ async function daemonPidIsConfirmedAbsent(profile: string): Promise<boolean> {
+   try {
+-    const raw = await readFile(profilePidPath(profile), "utf-8");
++    const raw = await host.readFile(profilePidPath(profile), "utf-8");
+     const pid = parseDaemonPid(raw);
+     if (pid === null) {
+       console.warn(
+@@ -1301,11 +1332,72 @@ function startPolling(): void {
+  * stopped/running state machine. Called once at startup and again on
+  * user-triggered `daemon:retry-install`.
+  */
++// The login auto-start, emitted once per session by the renderer.
++async function autoStartDaemon(): Promise<void> {
++  const prefs = await loadPrefs();
++  if (quitting || autoStartSuppressedAfterQuit) return;
++  setDesiredDaemonRunning(prefs.autoStart);
++  if (!prefs.autoStart) return;
++  // Login auto-start is emitted once per session. Queue it behind bootstrap
++  // instead of dropping it like a retryable poll operation.
++  await lifecycleOperations.runForeground(async () => {
++    if (quitting || autoStartSuppressedAfterQuit) return;
++    const bin = await resolveCliBinary();
++    if (!bin) return;
++    const health = await fetchHealth();
++    if (quitting || autoStartSuppressedAfterQuit) return;
++    observeDaemonBoundary(health);
++    if (health.state === "running") {
++      // Daemon is up but may be running an older CLI than the one we just
++      // bundled. Restart it so the new binary actually takes effect.
++      await ensureRunningDaemonVersionMatches();
++      return;
++    }
++    await startDaemon();
++  });
++}
++
++// OpenHarmony: while the bridge is down the CLI is unavailable, and so is the
++// host profile (it is reached through the same bridge). The renderer signs the
++// user in with setTargetApiUrl -> syncToken -> autoStart, awaited in order;
++// syncToken fails without the bridge, so autoStart is never even requested, and
++// once the CLI comes back nothing asks for the daemon again. Do it here, for a
++// user who has signed in before.
++let cliRecoveryPending = false;
++
++// Starts the daemon the way the login auto-start would, but only for a user who
++// has signed in on this machine: there is a Desktop profile and it already holds
++// a token (signing out clears it). Without that, e.g. on a fresh install, a
++// daemon started here would have no credentials, and the renderer starts it
++// itself after login.
++async function autoStartDaemonIfSignedIn(): Promise<void> {
++  try {
++    const active = await ensureActiveProfile();
++    if (!active) return;
++    const config = await readProfileConfig(active.name);
++    if (typeof config.token !== "string" || config.token === "") return;
++    await autoStartDaemon();
++  } catch (err) {
++    console.warn("[daemon] auto-start after CLI recovery failed:", err);
++  }
++}
++
++// Called once a bootstrap attempt has finished, outside the lifecycle gate
++// (autoStartDaemon takes it itself).
++function resumeAfterCliRecovery(): void {
++  if (!cliRecoveryPending) return;
++  if (currentState === "cli_not_found" || currentState === "installing_cli") return;
++  cliRecoveryPending = false;
++  void autoStartDaemonIfSignedIn();
++}
++
+ async function bootstrapCli(): Promise<void> {
+   const bin = await resolveCliBinary();
+   if (!bin) {
+     currentState = "cli_not_found";
+     sendStatus({ state: "cli_not_found" });
++    if (process.platform === "openharmony") cliRecoveryPending = true;
++    scheduleCliRetry();
+     return;
+   }
+   currentState = "stopped";
+@@ -1313,6 +1405,33 @@ async function bootstrapCli(): Promise<void> {
+   startPolling();
+ }
+ 
++// OpenHarmony: the CLI lives on the host and is reached through the desktop
++// bridge, which may simply not be running yet, or be replaced by
++// `multica desktop start` after an upgrade. Keep retrying while the CLI is
++// unavailable so the app recovers by itself instead of waiting for the user to
++// press "retry setup". Other platforms keep the upstream behaviour: the CLI is
++// downloaded or bundled, so a failure there needs the user's attention.
++const CLI_RETRY_MS = 5_000;
++let cliRetryTimer: ReturnType<typeof setTimeout> | null = null;
++
++function scheduleCliRetry(): void {
++  if (process.platform !== "openharmony" || cliRetryTimer) return;
++  cliRetryTimer = setTimeout(() => {
++    cliRetryTimer = null;
++    // Nothing to do once the CLI resolved (e.g. the user pressed retry first).
++    if (currentState !== "cli_not_found") return;
++    // runBackground declines to run while another daemon operation holds the
++    // gate; keep the loop alive in that case. (resolveCliBinary already ignores
++    // a quit in progress, and a cancelled quit simply resumes on the next tick.)
++    void lifecycleOperations
++      .runBackground(() => bootstrapCli())
++      .finally(() => {
++        if (currentState === "cli_not_found") scheduleCliRetry();
++        else resumeAfterCliRecovery();
++      });
++  }, CLI_RETRY_MS);
++}
++
+ function stopPolling(): void {
+   if (statusPollTimer) {
+     clearInterval(statusPollTimer);
+@@ -1353,6 +1472,10 @@ function sendLines(win: BrowserWindow, text: string): void {
+ // would silently fail on Windows.
+ function startLogTail(win: BrowserWindow, retryCount = 0): void {
+   stopLogTail();
++  if (process.platform === "openharmony") {
++    startRemoteLogTail(win, retryCount);
++    return;
++  }
+ 
+   void ensureActiveProfile().then(async (active) => {
+     // Before the renderer reports its apiUrl there is no Desktop-owned profile
+@@ -1368,7 +1491,7 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
+ 
+     let position = 0;
+     try {
+-      const initialStats = await stat(logPath);
++      const initialStats = await host.stat(logPath);
+       const windowBytes = Math.min(
+         initialStats.size,
+         LOG_TAIL_INITIAL_WINDOW_BYTES,
+@@ -1414,7 +1537,82 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
+   });
+ }
+ 
++// OpenHarmony: the log lives on the host, so there is no file to watch. Ask the
++// bridge for the bytes past the last known offset on the same interval.
++function startRemoteLogTail(win: BrowserWindow, retryCount: number): void {
++  const generation = logTailGeneration;
++  void ensureActiveProfile().then(async (active) => {
++    if (generation !== logTailGeneration) return;
++    const logPath = active ? profileLogPath(active.name) : null;
++    if (!logPath) {
++      if (retryCount < LOG_TAIL_MAX_RETRIES) {
++        setTimeout(() => startLogTail(win, retryCount + 1), LOG_TAIL_RETRY_MS);
++      }
++      return;
++    }
++
++    let position = 0;
++    try {
++      const size = (await host.stat(logPath)).size;
++      const startAt = size - Math.min(size, LOG_TAIL_INITIAL_WINDOW_BYTES);
++      const { text } = await host.readRange(logPath, startAt);
++      if (win.isDestroyed() || generation !== logTailGeneration) return;
++      const lines = text
++        .split("\n")
++        .filter((line) => line.length > 0)
++        .slice(-LOG_TAIL_INITIAL_LINES);
++      for (const line of lines) win.webContents.send("daemon:log-line", line);
++      position = startAt + Buffer.byteLength(text, "utf-8");
++    } catch (err) {
++      const code = (err as NodeJS.ErrnoException)?.code;
++      if (code === "ENOENT" && retryCount < LOG_TAIL_MAX_RETRIES) {
++        setTimeout(() => startLogTail(win, retryCount + 1), LOG_TAIL_RETRY_MS);
++      } else {
++        console.warn("[daemon] log tail initial read failed:", err);
++      }
++      return;
++    }
++
++    let polling = false;
++    const timer = setInterval(() => {
++      if (win.isDestroyed()) {
++        stopLogTail();
++        return;
++      }
++      if (polling) return;
++      polling = true;
++      void (async () => {
++        let { text, size } = await host.readRange(logPath, position);
++        // File rotated/truncated — restart from the new beginning.
++        if (size < position) {
++          position = 0;
++          ({ text, size } = await host.readRange(logPath, 0));
++        }
++        if (text.length > 0) {
++          position += Buffer.byteLength(text, "utf-8");
++          sendLines(win, text);
++        }
++      })()
++        .catch((err) => console.warn("[daemon] log tail read failed:", err))
++        .finally(() => {
++          polling = false;
++        });
++    }, LOG_TAIL_POLL_MS);
++    // stopLogTail() may have run while the initial read was in flight.
++    if (generation !== logTailGeneration) {
++      clearInterval(timer);
++      return;
++    }
++    logTailTimer = timer;
++  });
++}
++
+ function stopLogTail(): void {
++  logTailGeneration += 1;
++  if (logTailTimer) {
++    clearInterval(logTailTimer);
++    logTailTimer = null;
++  }
+   if (logTailWatcher) {
+     unwatchFile(logTailWatcher.path, logTailWatcher.listener);
+     logTailWatcher = null;
+@@ -1469,6 +1667,7 @@ export function setupDaemonManager(
+ ): void {
+   getMainWindow = windowGetter;
+   getStatusWindows = statusWindowsGetter;
++  configureHost(join(app.getAppPath(), "desktop-bridge.json"));
+ 
+   ipcMain.handle("daemon:set-target-api-url", async (_e, url: string) => {
+     const normalized = url || null;
+@@ -1541,6 +1740,7 @@ export function setupDaemonManager(
+     // cached version string so the next check re-reads the binary.
+     cachedCliBinaryVersion = undefined;
+     await lifecycleOperations.runForeground(() => bootstrapCli());
++    resumeAfterCliRecovery();
+   });
+   ipcMain.handle("daemon:get-prefs", () => loadPrefs());
+   ipcMain.handle(
+@@ -1554,29 +1754,7 @@ export function setupDaemonManager(
+         return savePrefs(merged).then(() => merged);
+       }),
+   );
+-  ipcMain.handle("daemon:auto-start", async () => {
+-    const prefs = await loadPrefs();
+-    if (quitting || autoStartSuppressedAfterQuit) return;
+-    setDesiredDaemonRunning(prefs.autoStart);
+-    if (!prefs.autoStart) return;
+-    // Login auto-start is emitted once per session. Queue it behind bootstrap
+-    // instead of dropping it like a retryable poll operation.
+-    await lifecycleOperations.runForeground(async () => {
+-      if (quitting || autoStartSuppressedAfterQuit) return;
+-      const bin = await resolveCliBinary();
+-      if (!bin) return;
+-      const health = await fetchHealth();
+-      if (quitting || autoStartSuppressedAfterQuit) return;
+-      observeDaemonBoundary(health);
+-      if (health.state === "running") {
+-        // Daemon is up but may be running an older CLI than the one we just
+-        // bundled. Restart it so the new binary actually takes effect.
+-        await ensureRunningDaemonVersionMatches();
+-        return;
+-      }
+-      await startDaemon();
+-    });
+-  });
++  ipcMain.handle("daemon:auto-start", () => autoStartDaemon());
+ 
+   // One tail at a time, streamed to the window that opened the log view
+   // last; a window closing its view does not stop another window's stream.

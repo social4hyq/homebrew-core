@@ -1,0 +1,300 @@
+OHOS: host access layer for the sandboxed desktop. Drop-in readFile,
+writeFile, mkdir, rm, stat and execFile that forward profile files and CLI
+calls to the desktop bridge on the host (loopback HTTP with a pairing secret),
+and pass everything else through to the local implementation.
+
+diff --git a/apps/desktop/src/main/ohos-host.ts b/apps/desktop/src/main/ohos-host.ts
+new file mode 100644
+index 0000000..2ac4e7e
+--- /dev/null
++++ b/apps/desktop/src/main/ohos-host.ts
+@@ -0,0 +1,289 @@
++// OpenHarmony host bridge client.
++//
++// The desktop app runs in an app sandbox that can neither see the user's
++// ~/.multica nor execute the multica CLI. `multica-desktop-bridge` runs on the
++// host and exposes both over authenticated loopback HTTP. This module gives
++// daemon-manager drop-in replacements for the fs/promises and execFile calls
++// it needs: on any other platform, or for paths outside the profiles root,
++// they are plain pass-throughs.
++import { execFile as nodeExecFile } from "child_process";
++import { readFileSync } from "fs";
++import * as fsp from "fs/promises";
++import { request as httpRequest } from "http";
++import { homedir } from "os";
++import { join } from "path";
++
++/** Sentinel "binary" that routes execFile through the bridge. */
++export const HOST_CLI = "multica-host";
++
++export interface BridgeConfig {
++  port: number;
++  secret: string;
++}
++
++export interface BridgeRequest {
++  method: string;
++  port: number;
++  path: string;
++  headers: Record<string, string>;
++  body?: Buffer;
++  timeoutMs?: number;
++}
++
++export interface BridgeResponse {
++  status: number;
++  headers: Record<string, string>;
++  body: Buffer;
++}
++
++type Local = {
++  readFile: (path: string, encoding: BufferEncoding) => Promise<string>;
++  writeFile: (path: string, data: string, encoding: BufferEncoding) => Promise<void>;
++  mkdir: (path: string, options?: { recursive?: boolean }) => Promise<unknown>;
++  rm: (path: string, options?: { force?: boolean; recursive?: boolean }) => Promise<void>;
++  stat: (path: string) => Promise<{ size: number }>;
++  execFile: (...args: unknown[]) => unknown;
++};
++
++export interface HostOptions {
++  platform: string;
++  /** Evaluated per call: HOME is rewritten by index.ts after modules load. */
++  profilesRoot: string | (() => string);
++  loadConfig: () => BridgeConfig | null;
++  request: (req: BridgeRequest) => Promise<BridgeResponse>;
++  local: Local;
++}
++
++type ExecCallback = (err: Error | null, stdout: string, stderr: string) => void;
++
++const MAX_OFFSET = Number.MAX_SAFE_INTEGER;
++
++function errnoError(code: string, message: string): NodeJS.ErrnoException {
++  return Object.assign(new Error(`${code}: ${message}`), { code });
++}
++
++export function createHost(opts: HostOptions) {
++  const remote = opts.platform === "openharmony";
++
++  /** Maps a path under the profiles root to {name, file}; null when elsewhere. */
++  function profileTarget(path: string): { name: string; file: string } | null {
++    if (!remote) return null;
++    const root = typeof opts.profilesRoot === "function" ? opts.profilesRoot() : opts.profilesRoot;
++    const prefix = root + "/";
++    if (!path.startsWith(prefix)) return null;
++    const parts = path.slice(prefix.length).split("/");
++    if (parts.length === 2 && parts.every((p) => p !== "" && p !== "." && p !== "..")) {
++      return { name: parts[0], file: parts[1] };
++    }
++    if (parts.length === 1 && parts[0] !== "" && parts[0] !== ".." && parts[0] !== ".") {
++      return { name: parts[0], file: "" }; // the profile directory itself
++    }
++    throw errnoError("EINVAL", `path not allowed through the host bridge: ${path}`);
++  }
++
++  async function call(
++    method: string,
++    path: string,
++    body?: Buffer,
++    timeoutMs?: number,
++  ): Promise<BridgeResponse> {
++    const config = opts.loadConfig();
++    if (!config) throw errnoError("EBRIDGE", "desktop bridge is not configured");
++    const res = await opts.request({
++      method,
++      port: config.port,
++      path,
++      headers: {
++        Authorization: `Bearer ${config.secret}`,
++        ...(body ? { "Content-Type": "application/octet-stream" } : {}),
++      },
++      body,
++      timeoutMs,
++    });
++    return res;
++  }
++
++  function fileUrl(t: { name: string; file: string }, query = ""): string {
++    return `/profile/${encodeURIComponent(t.name)}/${encodeURIComponent(t.file)}${query}`;
++  }
++
++  function check(res: BridgeResponse, path: string): void {
++    if (res.status === 404) throw errnoError("ENOENT", `no such file: ${path}`);
++    if (res.status < 200 || res.status >= 300) {
++      throw new Error(`host bridge ${res.status}: ${res.body.toString("utf-8").trim()}`);
++    }
++  }
++
++  const host = {
++    async readFile(path: string, encoding: BufferEncoding): Promise<string> {
++      const t = profileTarget(path);
++      if (!t) return opts.local.readFile(path, encoding);
++      const res = await call("GET", fileUrl(t));
++      check(res, path);
++      return res.body.toString(encoding);
++    },
++
++    async writeFile(path: string, data: string, encoding: BufferEncoding): Promise<void> {
++      const t = profileTarget(path);
++      if (!t) {
++        await opts.local.writeFile(path, data, encoding);
++        return;
++      }
++      const body = Buffer.from(data, encoding);
++      check(await call("PUT", fileUrl(t), body), path);
++    },
++
++    async mkdir(path: string, options?: { recursive?: boolean }): Promise<void> {
++      const t = profileTarget(path);
++      if (t) return; // the bridge creates profile directories on write
++      await opts.local.mkdir(path, options);
++    },
++
++    async rm(path: string, options?: { force?: boolean; recursive?: boolean }): Promise<void> {
++      const t = profileTarget(path);
++      if (!t) return opts.local.rm(path, options);
++      check(await call("DELETE", fileUrl(t)), path);
++    },
++
++    async stat(path: string): Promise<{ size: number }> {
++      const t = profileTarget(path);
++      if (!t) return opts.local.stat(path);
++      const res = await call("GET", fileUrl(t, `?offset=${MAX_OFFSET}`));
++      check(res, path);
++      return { size: Number(res.headers["x-file-size"] ?? 0) };
++    },
++
++    /** Bytes of a profile file from `offset`, with the file's current size. */
++    async readRange(path: string, offset: number): Promise<{ text: string; size: number }> {
++      const t = profileTarget(path);
++      if (!t) throw errnoError("EINVAL", `readRange is only for profile files: ${path}`);
++      const res = await call("GET", fileUrl(t, `?offset=${offset}`));
++      check(res, path);
++      return { text: res.body.toString("utf-8"), size: Number(res.headers["x-file-size"] ?? 0) };
++    },
++
++    execFile(
++      bin: string,
++      args: string[],
++      options: { timeout?: number } | ExecCallback,
++      callback?: ExecCallback,
++    ): unknown {
++      const execOpts = typeof options === "function" ? {} : options;
++      const cb = typeof options === "function" ? options : callback;
++      if (!remote || bin !== HOST_CLI) {
++        return opts.local.execFile(bin, args, options, callback);
++      }
++      const timeout = execOpts.timeout ?? 0;
++      call(
++        "POST",
++        "/exec",
++        Buffer.from(JSON.stringify({ args, timeout_ms: timeout })),
++        timeout > 0 ? timeout + 5_000 : undefined,
++      )
++        .then((res) => {
++          if (res.status !== 200) {
++            throw new Error(`host bridge ${res.status}: ${res.body.toString("utf-8").trim()}`);
++          }
++          const out = JSON.parse(res.body.toString("utf-8")) as {
++            code: number;
++            stdout: string;
++            stderr: string;
++          };
++          if (out.code === 0) {
++            cb?.(null, out.stdout, out.stderr);
++          } else {
++            const err = Object.assign(
++              new Error(`Command failed: multica ${args.join(" ")}\n${out.stderr}`),
++              { code: out.code },
++            );
++            cb?.(err, out.stdout, out.stderr);
++          }
++        })
++        .catch((err: Error) => cb?.(err, "", ""));
++      return undefined;
++    },
++
++    /** True when the bridge is configured and answering /health. */
++    async hostCliAvailable(): Promise<boolean> {
++      try {
++        if (!opts.loadConfig()) return false;
++        const res = await call("GET", "/health", undefined, 3_000);
++        if (res.status !== 200) return false;
++        return (JSON.parse(res.body.toString("utf-8")) as { ok?: boolean }).ok === true;
++      } catch {
++        return false;
++      }
++    },
++  };
++  return host;
++}
++
++function nodeHttpRequest(req: BridgeRequest): Promise<BridgeResponse> {
++  return new Promise((resolve, reject) => {
++    const r = httpRequest(
++      {
++        host: "127.0.0.1",
++        port: req.port,
++        path: req.path,
++        method: req.method,
++        headers: { ...req.headers, ...(req.body ? { "Content-Length": req.body.length } : {}) },
++        agent: false, // OHOS Electron: avoid the shared keep-alive agent
++        timeout: req.timeoutMs ?? 15_000,
++      },
++      (res) => {
++        const chunks: Buffer[] = [];
++        res.on("data", (c: Buffer) => chunks.push(c));
++        res.on("end", () =>
++          resolve({
++            status: res.statusCode ?? 0,
++            headers: Object.fromEntries(
++              Object.entries(res.headers).map(([k, v]) => [k, Array.isArray(v) ? v.join(",") : (v ?? "")]),
++            ),
++            body: Buffer.concat(chunks),
++          }),
++        );
++      },
++    );
++    r.on("timeout", () => r.destroy(new Error("host bridge request timed out")));
++    r.on("error", reject);
++    if (req.body) r.write(req.body);
++    r.end();
++  });
++}
++
++/** Reads the pairing file shipped inside the app (injected before signing). */
++export function loadBridgeConfigFile(path: string): BridgeConfig | null {
++  try {
++    const c = JSON.parse(readFileSync(path, "utf-8")) as Partial<BridgeConfig>;
++    if (typeof c.port === "number" && typeof c.secret === "string" && c.secret) {
++      return { port: c.port, secret: c.secret };
++    }
++  } catch {
++    /* not paired */
++  }
++  return null;
++}
++
++let configPath: string | null = null;
++
++/** Tells the production host where the pairing file lives (inside the app). */
++export function configureHost(path: string): void {
++  configPath = path;
++}
++
++/** Production host bound to the real platform, fs and node:http. */
++export const host = createHost({
++  platform: process.platform,
++  profilesRoot: () => join(homedir(), ".multica", "profiles"),
++  loadConfig: () => (configPath ? loadBridgeConfigFile(configPath) : null),
++  request: nodeHttpRequest,
++  // Late-bound so tests (and anything spying on fs) see the current functions.
++  local: {
++    readFile: (p, e) => fsp.readFile(p, e),
++    writeFile: (p, d, e) => fsp.writeFile(p, d, e),
++    mkdir: (p, o) => fsp.mkdir(p, o),
++    rm: (p, o) => fsp.rm(p, o),
++    stat: (p) => fsp.stat(p),
++    execFile: (...a) => (nodeExecFile as (...x: unknown[]) => unknown)(...a),
++  },
++});

@@ -1,0 +1,24 @@
+OHOS: route install-desktop and desktop to their scripts; everything else goes
+to the CLI.
+
+diff --git a/scripts/multica-dispatch-ohos.sh b/scripts/multica-dispatch-ohos.sh
+new file mode 100755
+index 0000000..182617f
+--- /dev/null
++++ b/scripts/multica-dispatch-ohos.sh
+@@ -0,0 +1,15 @@
++#!/usr/bin/env bash
++set -euo pipefail
++
++case "${1:-}" in
++  install-desktop)
++    shift
++    exec "$MULTICA_INSTALL_DESKTOP" "$@"
++    ;;
++  desktop)
++    shift
++    exec "$MULTICA_DESKTOP" "$@"
++    ;;
++esac
++
++exec "$MULTICA_REAL_CLI" "$@"

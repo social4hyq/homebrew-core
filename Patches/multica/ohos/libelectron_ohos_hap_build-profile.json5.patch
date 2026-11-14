@@ -1,0 +1,15 @@
+OHOS: drop the default signing configuration. The HAP is built unsigned and
+signed on the user's machine with their own developer material.
+
+diff --git a/libelectron/ohos_hap/build-profile.json5 b/libelectron/ohos_hap/build-profile.json5
+index 9f48e55..faf200a 100644
+--- a/libelectron/ohos_hap/build-profile.json5
++++ b/libelectron/ohos_hap/build-profile.json5
+@@ -3,7 +3,6 @@
+     "products": [
+       {
+         "name": "default",
+-        "signingConfig": "default",
+         "compatibleSdkVersion": "6.0.0(20)",
+         "compatibleSdkVersionStage": "release",
+         "runtimeOS": "HarmonyOS",

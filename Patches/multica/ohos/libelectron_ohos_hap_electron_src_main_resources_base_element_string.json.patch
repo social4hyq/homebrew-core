@@ -1,0 +1,22 @@
+OHOS: ability name as multica instead of Electron.
+
+diff --git a/libelectron/ohos_hap/electron/src/main/resources/base/element/string.json b/libelectron/ohos_hap/electron/src/main/resources/base/element/string.json
+index 9408ed5..4feaac7 100644
+--- a/libelectron/ohos_hap/electron/src/main/resources/base/element/string.json
++++ b/libelectron/ohos_hap/electron/src/main/resources/base/element/string.json
+@@ -10,7 +10,7 @@
+     },
+     {
+       "name": "EntryAbility_label",
+-      "value": "Electron"
++      "value": "multica"
+     },
+     {
+       "name": "BrowserAbility_desc",
+@@ -49,4 +49,4 @@
+       "value": "OpenNewWindow"
+     }
+   ]
+-}
+\ No newline at end of file
++}

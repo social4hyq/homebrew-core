@@ -1,0 +1,19 @@
+OHOS: point HOME at the app's writable files directory. os.homedir() resolves
+to the user's home, which the app sandbox cannot write.
+
+diff --git a/apps/desktop/src/main/index.ts b/apps/desktop/src/main/index.ts
+index 668f77d..970aa7e 100644
+--- a/apps/desktop/src/main/index.ts
++++ b/apps/desktop/src/main/index.ts
+@@ -10,6 +10,11 @@ import {
+ } from "electron";
+ import { homedir } from "os";
+ import { join } from "path";
++
++if (process.platform === "openharmony") {
++  process.env.HOME = "/data/storage/el2/base/files";
++}
++
+ import { pathToFileURL } from "url";
+ import { electronApp, optimizer, is } from "@electron-toolkit/utils";
+ import fixPath from "fix-path";

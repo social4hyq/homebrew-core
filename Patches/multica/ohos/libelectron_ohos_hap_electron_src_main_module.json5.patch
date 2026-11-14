@@ -1,0 +1,35 @@
+OHOS: extract native libraries on install and register the multica:// scheme
+for deep links.
+
+diff --git a/libelectron/ohos_hap/electron/src/main/module.json5 b/libelectron/ohos_hap/electron/src/main/module.json5
+index aac7a63..d095e92 100644
+--- a/libelectron/ohos_hap/electron/src/main/module.json5
++++ b/libelectron/ohos_hap/electron/src/main/module.json5
+@@ -5,6 +5,7 @@
+     "srcEntry": "./ets/Application/AbilityStage.ets",
+     "description": "$string:module_desc",
+     "mainElement": "EntryAbility",
++    "extractNativeLibs": true,
+     "deviceTypes": [
+       "2in1",
+       "tablet"
+@@ -52,6 +53,19 @@
+                 "scheme": "link"
+               }
+             ]
++          },
++          {
++            "entities": [
++              "entity.system.browsable"
++            ],
++            "actions": [
++              "ohos.want.action.viewData"
++            ],
++            "uris": [
++              {
++                "scheme": "multica"
++              }
++            ]
+           }
+         ],
+         "metadata": [
