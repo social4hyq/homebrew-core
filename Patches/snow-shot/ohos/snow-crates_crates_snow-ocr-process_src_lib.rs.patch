@@ -5,19 +5,22 @@ alloc/free discipline from the out-of-process implementation, and reuses the
 existing JSON result protocol rather than inventing a second one across the
 FFI boundary; includes the existing boundary unit tests.
 
-Drops a Config struct, a TextDetectionProcessing::recognition_width method
-and a worker_event structured-log helper that this in-process bridge copied
-in while adapting from the out-of-process worker: none of the three are ever
-constructed or called anywhere in this file (resize/processing policy is
-passed straight to make_engine_for_models instead), so they were dead code
-rather than behavior this bridge depends on.
+Drops only worker_event, a structured-log helper copied in from the
+out-of-process worker's acceleration.rs while adapting it to this in-process
+bridge: that file is not part of this bridge's module tree (it defines its
+own stub acceleration::Context instead), so worker_event has no caller here.
+Config and TextDetectionProcessing::recognition_width are NOT dropped even
+though lib.rs itself never constructs or calls them directly: engine.rs is
+pulled in via mod engine and still imports Config by name and calls
+recognition_width() inside make_engine_for_models, so both must keep
+compiling here, matching the upstream out-of-process worker's definitions.
 
 diff --git /dev/null b/snow-crates/crates/snow-ocr-process/src/lib.rs
 new file mode 100644
-index e69de29..3fa69d1 100644
+index e69de29..2312636 100644
 --- /dev/null
 +++ b/snow-crates/crates/snow-ocr-process/src/lib.rs
-@@ -0,0 +1,330 @@
+@@ -0,0 +1,350 @@
 +//! In-process C ABI for hosts that cannot execute a bundled helper process.
 +//!
 +//! The standalone worker remains the preferred host integration where process
@@ -42,6 +45,17 @@ index e69de29..3fa69d1 100644
 +    sync::Mutex,
 +};
 +
++#[derive(Clone, PartialEq, Eq)]
++#[allow(dead_code)]
++struct Config {
++    detector_resize_policy: DetectorResizePolicy,
++    text_detection_processing: TextDetectionProcessing,
++    hardware_acceleration: bool,
++    detector_model: PathBuf,
++    recognizer_model: PathBuf,
++    dictionary: PathBuf,
++}
++
 +#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 +enum DetectorResizePolicy {
 +    Max,
@@ -53,6 +67,15 @@ index e69de29..3fa69d1 100644
 +    #[default]
 +    AccuracyFirst,
 +    SpeedFirst,
++}
++
++impl TextDetectionProcessing {
++    fn recognition_width(self) -> usize {
++        match self {
++            Self::AccuracyFirst => 320,
++            Self::SpeedFirst => 48,
++        }
++    }
 +}
 +
 +pub struct OcrHandle(Mutex<Engine>);
