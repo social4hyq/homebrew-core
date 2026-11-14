@@ -4,6 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
+  revision 1
 
   livecheck do
     url :stable
@@ -218,7 +219,8 @@ class Multica < Formula
     end
     assert_includes schemes, "multica"
     permissions = profile.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
-    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
+    assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
+                    ohos.permission.READ_WRITE_USER_FILE], permissions.sort
     assert_equal %w[@electron-toolkit/utils electron-updater], package.fetch("dependencies").keys.sort
     system "unzip", "-tq", hap
   end
