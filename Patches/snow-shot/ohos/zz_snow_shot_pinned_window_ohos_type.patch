@@ -1,0 +1,28 @@
+OHOS: pinned windows were created as a top-level Qt::Tool window, which the
+OHOS QPA maps to a native TYPE_FLOAT window. Creating that window requires the
+restricted SYSTEM_FLOAT_WINDOW permission, so the pin was destroyed immediately
+after its first frame (SetWindowType: permission denied, invalid subwindow
+rect). Use an ordinary top-level Window on OHOS instead, keeping the frameless
+and always-on-top hints, matching the existing capture-overlay workaround.
+
+diff --git a/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp b/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
+--- a/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
++++ b/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
+@@ -955,7 +955,16 @@
+         reconcilePlatformEnvironment(layoutChanged);
+     };
+     livePinnedWindows().push_back(QPointer<ScreenshotPinnedWindow>(this));
+-    setWindowFlags(Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint);
++    Qt::WindowFlags flags = Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint;
++#if defined(Q_OS_HARMONY)
++    // Qt's OHOS QPA promotes a top-level Qt::Tool window to a native TYPE_FLOAT
++    // window, which requires the restricted SYSTEM_FLOAT_WINDOW permission. Use
++    // an ordinary top-level window instead, matching the capture overlay.
++    flags |= Qt::Window;
++#else
++    flags |= Qt::Tool;
++#endif
++    setWindowFlags(flags);
+     // Pins may overlap the macOS menu bar and notch band. Keep the layout-managed
+     // canvas aligned with the full-window border and image coordinates there.
+     setAttribute(Qt::WA_ContentsMarginsRespectsSafeArea, false);
