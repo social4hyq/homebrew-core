@@ -4,7 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 8
+  revision 9
 
   livecheck do
     url :stable
@@ -12,9 +12,8 @@ class Multica < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.9.0-r12"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e4b6cf75291320981a0141d3d44a41b1f72692ecdee5c2a4d227e95c7c14e62c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.9.0-r13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a54bab1896753829e6612cd34b320c4c4308f5703c7b39a41997614bcc7e0110"
   end
 
   depends_on "go" => :build
@@ -63,6 +62,7 @@ class Multica < Formula
     libexec.install "scripts/multica-dispatch-ohos.sh" => "multica-dispatch.sh"
     chmod 0755, libexec/"multica-dispatch.sh"
     (bin/"multica").write_env_script libexec/"multica-dispatch.sh",
+      MULTICA_AGENT_TEMP_BASE: "${MULTICA_AGENT_TEMP_BASE:-/data/storage/el2/base/cache}",
       MULTICA_DESKTOP:         pkgshare/"desktop.sh",
       MULTICA_DESKTOP_BRIDGE:  libexec/"multica-desktop-bridge",
       MULTICA_HDC:             formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
@@ -221,6 +221,17 @@ class Multica < Formula
     wrapper = (bin/"multica").read
     assert_match "#{opt_libexec}/multica-cli", wrapper
     refute_match "#{libexec}/multica-cli", wrapper
+    # The daemon locks its per-task temp dir with flock, which /tmp refuses on
+    # OHOS, so every CLI invocation (and the daemon the bridge starts) must
+    # carry a usable base. A value the user set explicitly still wins.
+    temp_base = "/data/storage/el2/base/cache"
+    assert_match "MULTICA_AGENT_TEMP_BASE=\"${MULTICA_AGENT_TEMP_BASE:-#{temp_base}}\"", wrapper
+    env_probe = testpath/"env-probe"
+    env_probe.write wrapper.sub(/exec "[^"]*multica-dispatch\.sh"/, "exec env")
+    assert_match "MULTICA_AGENT_TEMP_BASE=#{temp_base}\n",
+                 shell_output("env -u MULTICA_AGENT_TEMP_BASE sh #{env_probe}")
+    assert_match "MULTICA_AGENT_TEMP_BASE=#{testpath}/custom\n",
+                 shell_output("MULTICA_AGENT_TEMP_BASE=#{testpath}/custom sh #{env_probe}")
     desktop_installer = pkgshare/"install-desktop.sh"
     assert_match "hap-installer", desktop_installer.read
     refute_match "devecocli", desktop_installer.read
