@@ -14,6 +14,7 @@ class OpencodeDesktop < Formula
   depends_on "node" => :build
   depends_on "hap-installer"
   depends_on "opencode"
+  depends_on "zip"
 
   # openharmony-sig/electron PC(2in1) prebuilt (CodeHub mirror hosted on this
   # tap's release; redistribution assumed by the tap owner, see multica.rb).
