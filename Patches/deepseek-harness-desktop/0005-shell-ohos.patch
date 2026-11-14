@@ -1,0 +1,365 @@
+diff --git a/apps/desktop/src/file-actions.ts b/apps/desktop/src/file-actions.ts
+index 45c4a25f..3cefc036 100644
+--- a/apps/desktop/src/file-actions.ts
++++ b/apps/desktop/src/file-actions.ts
+@@ -1,5 +1,5 @@
+ /** Trusted-window Chromium downloads and clipboard fallback reads. */
+-import { app, ipcMain, session } from 'electron'
++import { app, ipcMain, net, session } from 'electron'
+ import type { BrowserWindow, IpcMainInvokeEvent } from 'electron'
+ import { closeSync, openSync, rmSync } from 'node:fs'
+ import { extname, join } from 'node:path'
+@@ -160,7 +160,9 @@ export function installFileActions(
+       const signal = AbortSignal.any([lifetime.signal, AbortSignal.timeout(timeoutMs)])
+       let response: Response
+       for (let redirects = 0; ; redirects++) {
+-        response = await fetch(url, { signal, redirect: 'manual', credentials: 'omit', referrerPolicy: 'no-referrer' })
++        // OHOS: 主进程无 WebAssembly，全局 fetch 报废；net.fetch 走 Chromium 网络栈。
++        const transport = (process.platform as string) === 'openharmony' ? net.fetch as unknown as typeof fetch : fetch
++        response = await transport(url, { signal, redirect: 'manual', credentials: 'omit', referrerPolicy: 'no-referrer' })
+         if (![301, 302, 303, 307, 308].includes(response.status)) break
+         await response.body?.cancel()
+         const location = response.headers.get('location')
+diff --git a/apps/desktop/src/host-process.ts b/apps/desktop/src/host-process.ts
+index b571b0d4..6517f9f9 100644
+--- a/apps/desktop/src/host-process.ts
++++ b/apps/desktop/src/host-process.ts
+@@ -1,6 +1,7 @@
+ /** Electron Node-mode child lifecycle for the shared Web application. */
+ 
+ import { spawn, type ChildProcess } from 'node:child_process'
++import { DesktopBridgeHostChannel } from './ohos-bridge-channel.ts'
+ import { DesktopParentAuthentication } from './parent-authentication.ts'
+ import { join } from 'node:path'
+ import { z } from 'zod'
+@@ -223,6 +224,14 @@ export class DesktopHostProcess {
+    */
+   async start(): Promise<DesktopHostReady> {
+     if (this.child !== undefined) return this.readyPromise
++    // OHOS: Host 跑在宿主侧（HAP 沙箱读不到宿主 workspace），由 dsh-desktop-bridge
++    // 经 loopback 中转原生 desktop-host IPC 协议；通道仿真 ChildProcess 的消费面子集。
++    const bridgePort = Number(process.env.DSH_DESKTOP_BRIDGE_PORT ?? ((process.platform as string) === 'openharmony' ? 3090 : 0))
++    if (bridgePort > 0) {
++      const channel = new DesktopBridgeHostChannel(bridgePort)
++      this.attachChannel(channel as unknown as ChildProcess)
++      return this.readyPromise
++    }
+     const entry = join(this.runtimeDir, 'node_modules', '@deepseek-ai', 'dsh-desktop-host', 'lib', 'index.js')
+     const child = spawn(this.node, [
+       '--expose-internals',
+@@ -238,6 +247,12 @@ export class DesktopHostProcess {
+       env: desktopNodeEnvironment(this.node, undefined, this.environment),
+       stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
+     })
++    this.attachChannel(child)
++    return this.readyPromise
++  }
++
++  /** Wire message/exit handling onto a spawned child or a bridge channel. */
++  private attachChannel(child: ChildProcess): void {
+     this.child = child
+     child.stderr?.setEncoding('utf8')
+     child.stderr?.on('data', (chunk: string) => { this.stderr = (this.stderr + chunk).slice(-MAX_HOST_DIAGNOSTIC_CHARS) })
+@@ -298,7 +313,6 @@ export class DesktopHostProcess {
+         resolve()
+       })
+     })
+-    return this.readyPromise
+   }
+ 
+   /**
+diff --git a/apps/desktop/src/main.ts b/apps/desktop/src/main.ts
+index 92327109..b7cc53ab 100644
+--- a/apps/desktop/src/main.ts
++++ b/apps/desktop/src/main.ts
+@@ -24,11 +24,11 @@ import {
+   session,
+   shell,
+   type IpcMainInvokeEvent,
+-  type MenuItemConstructorOptions,
+-} from 'electron'
++  type MenuItemConstructorOptions, net} from 'electron'
+ import { resolveDesktopPaths } from './paths.ts'
+ import { DesktopProjectManager } from './project-manager.ts'
+ import { DesktopHostFatalError, DesktopHostProcess, DesktopHostUncleanExitError } from './host-process.ts'
++import { createOhosUpdater } from './ohos-updater-stub.ts'
+ import { DesktopPlatformView, PLATFORM_IPC, platformBounds } from './platform-view.ts'
+ import { installDesktopFileDrag } from './file-drag.ts'
+ import { installDesktopDirectoryPicker } from './directory-picker.ts'
+@@ -186,6 +186,12 @@ function reportFatal(error: unknown, source: CrashReportSource): void {
+   })
+ }
+ 
++// OHOS 调试：CDP 端口（hdc fport 后可用 chrome-devtools 协议驱动壳内页面）。
++// （开发期默认 9333；正式 formula 构建可通过 DSH_DESKTOP_DEBUG_PORT=0 关闭。）
++if ((process.platform as string) === 'openharmony' && process.env.DSH_DESKTOP_DEBUG_PORT !== '0') {
++  app.commandLine.appendSwitch('remote-debugging-port', process.env.DSH_DESKTOP_DEBUG_PORT ?? '9333')
++}
++
+ protocol.registerSchemesAsPrivileged([{
+   scheme: SCHEME,
+   privileges: {
+@@ -206,7 +212,8 @@ interface RuntimeResources {
+ }
+ 
+ function runtimeResources(): RuntimeResources {
+-  const development = !app.isPackaged
++  // OHOS: HAP 无 asar，app.isPackaged 恒 false；本移植按 packaged 语义走（负载即产物）。
++  const development = !app.isPackaged && (process.platform as string) !== 'openharmony'
+   const node = process.execPath
+   const nodeBin = development ? join(app.getAppPath(), 'scripts', 'node-bin') : join(process.resourcesPath, 'runtime', 'bin')
+   const pnpm = (development ? process.env.DSH_DESKTOP_PNPM_ENTRY : undefined)
+@@ -385,7 +392,8 @@ async function main(): Promise<void> {
+   const updateJournal = journalDirectory === undefined ? undefined : new DesktopUpdateJournal(journalDirectory, app.getVersion())
+   const resources = runtimeResources()
+   const paths = resolveDesktopPaths()
+-  const development = !app.isPackaged
++  // OHOS: HAP 无 asar，app.isPackaged 恒 false；本移植按 packaged 语义走（负载即产物）。
++  const development = !app.isPackaged && (process.platform as string) !== 'openharmony'
+   const primaryRuntime = development
+     ? developmentPrimaryRuntime()
+     : join(process.resourcesPath, 'runtime', 'primary-runtime')
+@@ -552,7 +560,9 @@ async function main(): Promise<void> {
+           .catch((error: unknown) => { console.error('desktop: legacy Host cookie cleanup failed', error) })
+         if (ready.injections === undefined) throw new Error('Desktop Host did not provide boot injections')
+         injections = ready.injections
+-        welcomeBackend = connectDesktopWelcome(ready.url, cookie)
++        welcomeBackend = connectDesktopWelcome(ready.url, cookie,
++          // OHOS: 主进程无 WebAssembly，全局 fetch 报废；net.fetch 走 Chromium 网络栈。
++          (process.platform as string) === 'openharmony' ? net.fetch as unknown as typeof fetch : fetch)
+         analyticsEnabled = await welcomeBackend.analyticsEnabled().catch(() => false)
+         if (!reportedLaunch) { reportedLaunch = true; void track('desktop_app_launch', {}) }
+         stopAccount?.()
+@@ -702,6 +712,7 @@ async function main(): Promise<void> {
+     packagedChannel, changing: false,
+     ...(initialChannel.kind === 'error' ? { error: configurationFailure(initialChannel.error) } : {}) }
+   const updateChannel = initialChannel.kind === 'ready' ? initialChannel.channel : packagedChannel
++  const ohosUpdater = (process.platform as string) === 'openharmony' ? createOhosUpdater() : undefined
+   const updates = new DesktopUpdateCoordinator(
+     publishUpdate,
+     async () => {
+@@ -757,7 +768,10 @@ async function main(): Promise<void> {
+       }
+       return true
+     },
+-    undefined, undefined, undefined,
++    // OHOS: electron-updater 无 openharmony 目标；注入 noop updater 并禁用更新源（升级走 brew upgrade）。
++    ohosUpdater,
++    ohosUpdater === undefined ? undefined : () => false,
++    undefined,
+     (success, reason) => { void track('desktop_upgrade_download_result', { is_success: success, ...reason === undefined ? {} : { error_reason: reason } }) },
+     updateChannel,
+   )
+@@ -1208,7 +1222,17 @@ async function main(): Promise<void> {
+         click: () => { void showAbout().catch((error: unknown) => { console.error(error) }) } }
+       : { label: currentDesktopLocale().messages.aboutMenu, role: 'about' },
+     { type: 'separator' },
+-    { label: currentDesktopLocale().messages.checkUpdatesMenu, click: () => { void openUpdatePrompt(true) } },
++    { label: currentDesktopLocale().messages.checkUpdatesMenu, click: () => {
++      // OHOS: 无 electron-updater 通道；升级走 Harmonybrew。
++      if ((process.platform as string) === 'openharmony') {
++        void ordinaryMessageBox({ type: 'info', title: currentDesktopLocale().messages.checkUpdatesMenu,
++          message: 'OpenHarmony 版通过 Harmonybrew 升级',
++          detail: 'brew upgrade deepseek-harness-desktop', buttons: [currentDesktopLocale().messages.updateClose ?? 'OK'] })
++          .catch((error: unknown) => { console.error(error) })
++        return
++      }
++      void openUpdatePrompt(true)
++    } },
+     ...process.platform === 'darwin' || process.platform === 'win32'
+       ? [{ label: currentDesktopLocale().messages.cliCommandMenu, click: () => { void commandManager.show() } }] : [],
+     { type: 'separator' },
+diff --git a/apps/desktop/src/ohos-bridge-channel.ts b/apps/desktop/src/ohos-bridge-channel.ts
+new file mode 100644
+index 00000000..5f0f1081
+--- /dev/null
++++ b/apps/desktop/src/ohos-bridge-channel.ts
+@@ -0,0 +1,93 @@
++/**
++ * OHOS bridge-backed Host channel: the desktop Host runs on the host side
++ * (outside the HAP sandbox), relayed by dsh-desktop-bridge over loopback TCP.
++ * This class emulates the narrow ChildProcess surface that DesktopHostProcess
++ * consumes (see host-process.ts): send/on('message')/once('close','error')/
++ * kill/connected/exitCode/signalCode. stderr/stdout stay undefined — Host
++ * output lives in the bridge log on the host side.
++ *
++ * Activated when DSH_DESKTOP_BRIDGE_PORT is set; otherwise upstream spawn is
++ * used unchanged. Wire-in lives in host-process.ts (one call-site branch).
++ */
++
++import net from 'node:net'
++import { EventEmitter } from 'node:events'
++
++export class DesktopBridgeHostChannel {
++  private readonly socket: net.Socket
++  private readonly emitter = new EventEmitter()
++  private buffer = ''
++  /** Mirrors ChildProcess.connected: true while the channel can send. */
++  connected = false
++  exitCode: number | null = null
++  signalCode: NodeJS.Signals | null = null
++  readonly stderr = undefined
++  readonly stdout = undefined
++  /** Set when the local end initiated shutdown and the socket closed cleanly. */
++  private stopping = false
++
++  constructor(port: number) {
++    this.socket = net.createConnection(port, '127.0.0.1')
++    this.socket.on('connect', () => { this.connected = true })
++    this.socket.on('data', (chunk) => {
++      this.buffer += chunk.toString('utf8')
++      for (;;) {
++        const nl = this.buffer.indexOf('\n')
++        if (nl < 0) break
++        const line = this.buffer.slice(0, nl)
++        this.buffer = this.buffer.slice(nl + 1)
++        if (line.trim() === '') continue
++        try {
++          this.emitter.emit('message', JSON.parse(line))
++        } catch {
++          // 半截行/坏 JSON 不产生消息；协议错误由对端超时路径兜底。
++        }
++      }
++    })
++    this.socket.on('error', (error) => { this.emitter.emit('error', error) })
++    this.socket.on('close', () => {
++      this.connected = false
++      if (this.exitCode === null && this.signalCode === null) {
++        // 主动停机后的干净关闭按 exit 0 上报；意外断开按 null（上游据此报错）。
++        this.exitCode = this.stopping ? 0 : null
++      }
++      this.emitter.emit('close', this.exitCode, this.signalCode)
++    })
++  }
++
++  on(event: 'message', listener: (message: unknown) => void): this
++  on(event: string, listener: (...args: never[]) => void): this {
++    this.emitter.on(event, listener as (...args: unknown[]) => void)
++    return this
++  }
++
++  once(event: 'close', listener: (code: number | null, signal: NodeJS.Signals | null) => void): this
++  once(event: 'error', listener: (error: Error) => void): this
++  once(event: string, listener: (...args: never[]) => void): this {
++    this.emitter.once(event, listener as (...args: unknown[]) => void)
++    return this
++  }
++
++  send(message: unknown, callback?: (error: Error | null) => void): boolean {
++    if (!this.connected || this.socket.destroyed) {
++      const error = new Error('dsh desktop bridge channel is closed')
++      if (callback !== undefined) queueMicrotask(() => callback(error))
++      else this.emitter.emit('error', error)
++      return false
++    }
++    // 协议级 shutdown 之后的干净关闭按 exit 0 上报（对齐上游 stop() 语义）。
++    if ((message as { type?: unknown })?.type === 'shutdown') this.stopping = true
++    return this.socket.write(JSON.stringify(message) + '\n', () => callback?.(null))
++  }
++
++  kill(signal: NodeJS.Signals | number = 'SIGTERM'): boolean {
++    this.stopping = true
++    const sig = typeof signal === 'number' ? 'SIGTERM' : signal
++    // bridge 本地处理 bridge-* 消息；Host 不在时也无害。
++    if (this.connected && !this.socket.destroyed) {
++      this.socket.write(JSON.stringify({ type: 'bridge-kill', signal: sig }) + '\n')
++    }
++    this.socket.end()
++    return true
++  }
++}
+diff --git a/apps/desktop/src/ohos-updater-stub.ts b/apps/desktop/src/ohos-updater-stub.ts
+new file mode 100644
+index 00000000..674e08f3
+--- /dev/null
++++ b/apps/desktop/src/ohos-updater-stub.ts
+@@ -0,0 +1,37 @@
++/**
++ * OHOS no-op AppUpdater: electron-updater has no openharmony target and its
++ * module-level autoUpdater throws on unknown platforms. The desktop update UI
++ * stays wired upstream-style but is permanently idle; upgrades go through
++ * Harmonybrew (brew upgrade deepseek-harness-desktop).
++ */
++
++import { EventEmitter } from 'node:events'
++import type { AppUpdater } from 'electron-updater'
++
++export class DesktopOhosNoopUpdater extends EventEmitter {
++  autoDownload = false
++  autoInstallOnAppQuit = false
++  autoRunAppAfterInstall = false
++  allowPrerelease = false
++  allowDowngrade = false
++  fullChangelog = false
++  channel: string | null = null
++  logger = null
++
++  setFeedURL(_options: unknown): void {}
++  checkForUpdates(): null {
++    return null
++  }
++  downloadUpdate(): never {
++    throw new Error('desktop updates are not available on OpenHarmony; use brew upgrade')
++  }
++  quitAndInstall(): never {
++    throw new Error('desktop updates are not available on OpenHarmony; use brew upgrade')
++  }
++}
++
++export const isOhos = (process.platform as string) === 'openharmony'
++
++export function createOhosUpdater(): AppUpdater {
++  return new DesktopOhosNoopUpdater() as unknown as AppUpdater
++}
+diff --git a/apps/desktop/src/update-coordinator.ts b/apps/desktop/src/update-coordinator.ts
+index 475a5606..6b1c8c44 100644
+--- a/apps/desktop/src/update-coordinator.ts
++++ b/apps/desktop/src/update-coordinator.ts
+@@ -12,7 +12,11 @@ import type { DesktopUpdateChannel } from './update-channel.ts'
+ import { selectUpdateChannel } from './updates/electron-updater/channel.ts'
+ import { discardDesktopUpdate } from './updates/electron-updater/discard.ts'
+ 
+-const { autoUpdater } = electronUpdater
++// OHOS: electron-updater 无 openharmony 目标，autoUpdater 在未知平台取用时即抛；
++// main.ts 在 openharmony 上注入 ohos-updater-stub 的 noop 实现。
++const { autoUpdater } = (process.platform as string) === 'openharmony'
++  ? { autoUpdater: undefined as unknown as AppUpdater }
++  : electronUpdater
+ 
+ /** Owns one updater target until its download and installation settle. */
+ export class DesktopUpdateCoordinator {
+diff --git a/apps/desktop/src/web-document.ts b/apps/desktop/src/web-document.ts
+index 41bd08a7..4883f208 100644
+--- a/apps/desktop/src/web-document.ts
++++ b/apps/desktop/src/web-document.ts
+@@ -1,5 +1,8 @@
+ /** Local Web document and authenticated HTTP forwarding for the application window. */
+ import { readFile } from 'node:fs/promises'
++// OHOS: Electron 34 OHOS 移植的主进程没有 WebAssembly，undici 全局 fetch 必炸；
++// net.fetch 走 Chromium 网络栈（真机探针验证可用），语义与 Web fetch 一致。
++import { net } from 'electron'
+ import { extname, resolve, sep } from 'node:path'
+ 
+ const MIME: Readonly<Record<string, string>> = {
+@@ -91,7 +94,8 @@ export async function forwardWebRequest(request: Request, host: string, cookie:
+   for (const name of ['host', 'origin', 'cookie', 'sec-fetch-site']) headers.delete(name)
+   headers.set('cookie', cookie)
+   const init = { method: request.method, headers, body: request.body, signal: request.signal, duplex: 'half', redirect: 'manual' as const }
+-  const response = await fetch(target, init)
++  const transport = (process.platform as string) === 'openharmony' ? net.fetch as unknown as typeof fetch : fetch
++  const response = await transport(target, init)
+   const outgoing = new Headers(response.headers)
+   for (const name of WITHHELD_RESPONSE_HEADERS) outgoing.delete(name)
+   if (PLUGIN_BUNDLE_PATH.test(source.pathname)) outgoing.set('cache-control', 'no-store')
+diff --git a/apps/desktop/src/welcome-backend.ts b/apps/desktop/src/welcome-backend.ts
+index 1c8fd919..b8707f9e 100644
+--- a/apps/desktop/src/welcome-backend.ts
++++ b/apps/desktop/src/welcome-backend.ts
+@@ -64,6 +64,7 @@ export function connectDesktopWelcome(
+     const envelope: unknown = await response.json()
+     if (!record(envelope) || envelope.type !== 'server-response' || envelope.rpcId !== rpcId
+       || !record(envelope.result) || envelope.result.ok !== true) {
++      console.error('DSH_RPC: envelope mismatch', response.status, JSON.stringify(envelope).slice(0, 220))
+       throw new Error('desktop welcome: Web RPC failed')
+     }
+     return envelope.result.value

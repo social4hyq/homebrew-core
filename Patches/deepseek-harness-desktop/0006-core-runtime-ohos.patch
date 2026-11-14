@@ -1,0 +1,124 @@
+diff --git a/packages/credentials/credentials-local/src/index.ts b/packages/credentials/credentials-local/src/index.ts
+index c767adea..482c4b25 100644
+--- a/packages/credentials/credentials-local/src/index.ts
++++ b/packages/credentials/credentials-local/src/index.ts
+@@ -134,7 +134,7 @@ async function assertOwnerOnly(filename: string): Promise<void> {
+     return
+   }
+   /* v8 ignore next -- POSIX coverage cannot take the Windows peer; native Windows coverage does. */
+-  if (process.platform === 'win32') return
++  if (process.platform === 'win32' || String(process.platform) === 'openharmony') return
+   /* v8 ignore start -- Windows has no POSIX mode enforcement; POSIX behavior tests enforce this peer. */
+   const offending = mode & GROUP_OTHER_BITS
+   if (offending === 0) return
+diff --git a/packages/sandbox/sandbox-local/src/index.ts b/packages/sandbox/sandbox-local/src/index.ts
+index af8dae00..97388a2a 100644
+--- a/packages/sandbox/sandbox-local/src/index.ts
++++ b/packages/sandbox/sandbox-local/src/index.ts
+@@ -157,7 +157,7 @@ export interface SandboxInternals {
+ }
+ 
+ /** The chain's verdict: which runner confines, and how completely it enforces. */
+-type SelectedRunner = { runner: 'bwrap' | 'landlock' | 'seatbelt' | 'windows-acl'; enforcement: SandboxEnforcement }
++type SelectedRunner = { runner: 'bwrap' | 'landlock' | 'seatbelt' | 'windows-acl' | 'unconfined'; enforcement: SandboxEnforcement }
+ 
+ /** One live session/workspace pair's private temp directory and capability. */
+ interface AclTempCapability {
+@@ -182,6 +182,7 @@ const PLATFORM_CHAINS: Record<string, readonly SelectedRunner['runner'][]> = {
+   // a sole candidate, selected without a probe — its execution-time refusal
+   // fails closed through its stderr signature (windows-acl-run:) and exit 127.
+   win32: ['windows-acl'],
++  openharmony: ['unconfined'],
+ }
+ 
+ /**
+@@ -204,6 +205,7 @@ const STATIC_ENFORCEMENT: Record<SelectedRunner['runner'], SandboxEnforcement> =
+   // child: the backend enforces the remaining ACL-addressable surface but
+   // must not advertise the absolute promise.
+   'windows-acl': 'partial',
++  unconfined: 'partial',
+ }
+ 
+ /**
+@@ -224,6 +226,7 @@ function assertPositiveFinite(name: string, value: number): void {
+  */
+ const DENIAL_SIGNATURES = {
+   bwrap: ['read-only file system'],
++  unconfined: [] as const,
+   landlock: ['permission denied'],
+   seatbelt: ['operation not permitted'],
+   // pwsh/.NET: "Access to the path '...' is denied."; cmd: "Access is denied.";
+@@ -250,6 +253,7 @@ const WINDOWS_ACL_RUNNER_FAILURE_EXIT = 127
+  */
+ const RUNNER_FAILURE_RULES = {
+   bwrap: [{ fatalSignatures: ['bwrap: '] }],
++  unconfined: [],
+   landlock: [{
+     allowedExitCodes: [LAUNCHER_FAILURE_EXIT],
+     fatalSignatures: [`${LAUNCHER_BIN}: `],
+@@ -354,7 +358,7 @@ export class LocalSandboxProvider extends SandboxProvider {
+     const selected = this.selectRunner(policy.mode)
+     const runnerArgv = this.runnerArgv(selected.runner, policy)
+     return Promise.resolve<ConfinedArgv>({
+-      argv: [...runnerArgv, '--', ...argv],
++      argv: runnerArgv.length === 0 ? [...argv] : [...runnerArgv, '--', ...argv],
+       enforcement: selected.enforcement,
+       denialSignatures: DENIAL_SIGNATURES[selected.runner],
+       runnerFailureRules: RUNNER_FAILURE_RULES[selected.runner],
+@@ -368,6 +372,7 @@ export class LocalSandboxProvider extends SandboxProvider {
+       case 'landlock': return [this.landlockLauncher(), ...landlockProfileArgs(policy)]
+       case 'seatbelt': return [this.seatbeltExec(), ...seatbeltProfileArgs(policy)]
+       case 'windows-acl': return this.windowsAclRunnerArgv(policy)
++      case 'unconfined': return []
+       default: return assertNever(runner)
+     }
+   }
+@@ -589,6 +594,7 @@ export class LocalSandboxProvider extends SandboxProvider {
+           ?? (() => defaultProbeWindowsAcl(this.windowsAclRunnerInvocation(), this.probeTimeoutMs))
+         return probe() ? 'partial' : 'unusable'
+       }
++      case 'unconfined': return 'partial'
+       default: return assertNever(runner)
+     }
+   }
+diff --git a/packages/skill/tool-workspace-dependencies/src/index.ts b/packages/skill/tool-workspace-dependencies/src/index.ts
+index d98393b1..45c8b6ad 100644
+--- a/packages/skill/tool-workspace-dependencies/src/index.ts
++++ b/packages/skill/tool-workspace-dependencies/src/index.ts
+@@ -65,7 +65,7 @@ function invalidPayload(message: string, cause?: unknown): WorkspaceDependencyEr
+ }
+ 
+ const VERSION = /^\d+\.\d+\.\d+(?:[-+][\w.-]+)?$/u
+-const PLATFORMS = ['win32', 'darwin', 'linux']
++const PLATFORMS = ['win32', 'darwin', 'linux', 'openharmony']
+ 
+ function isVersion(value: unknown): value is string {
+   return typeof value === 'string' && VERSION.test(value)
+diff --git a/packages/util/ripgrep/src/index.ts b/packages/util/ripgrep/src/index.ts
+index e9ca71e6..8c86930b 100644
+--- a/packages/util/ripgrep/src/index.ts
++++ b/packages/util/ripgrep/src/index.ts
+@@ -1,6 +1,6 @@
+ /** Packaged ripgrep resolution and subprocess execution, independent of tool or Remote consumers. */
+ import { existsSync } from 'node:fs'
+-import { join, parse } from 'node:path'
++import { delimiter, join, parse } from 'node:path'
+ import type { SubprocessHandle, SubprocessOutcome, SubprocessRuntime, SubprocessSpawnSpec } from '@deepseek-ai/dsh-subprocess'
+ 
+ let rgPathPromise: Promise<string> | undefined
+@@ -18,6 +18,15 @@ export function resolveRgPath(): Promise<string> {
+       ? join(executable.dir, `${executable.name}-rg.exe`)
+       : `${process.execPath}-rg`
+     if ('pkg' in process && existsSync(executableSidecar)) return executableSidecar
++    // OHOS: @vscode/ripgrep 无 openharmony-arm64 平台包（import 即抛）。回退系统 rg——
++    // 必须在解析期钉成绝对路径：下游 execFileSync 的环境不带 PATH（smoke 是故意的，见 fixture）。
++    if ((process.platform as string) === 'openharmony') {
++      for (const dir of (process.env.PATH ?? '').split(delimiter)) {
++        const candidate = join(dir, 'rg')
++        if (dir !== '' && existsSync(candidate)) return candidate
++      }
++      return 'rg'
++    }
+     const dependency = (await import('@vscode/ripgrep')).rgPath
+     return process.versions.electron === undefined
+       ? dependency
