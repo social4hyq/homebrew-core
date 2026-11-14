@@ -1,19 +1,50 @@
 diff --git a/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h b/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h
 --- a/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h
 +++ b/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h
-@@ -15,6 +15,7 @@
+@@ -15,8 +15,14 @@
  #include <atomic>
  #include <functional>
  #include <memory>
 +#include <optional>
  #include <utility>
  
++#if defined(Q_OS_HARMONY)
++#include <QMutex>
++#include <cstdint>
++#endif
++
  class QClipboard;
-@@ -181,4 +182,11 @@
+ class QMimeData;
+ class QObject;
+@@ -181,4 +187,35 @@
      std::shared_ptr<ScreenshotClipboardCommitScopeState> m_state;
  };
  
 +#if defined(Q_OS_HARMONY)
++namespace snow_shot::presentation::clipboard_cache {
++// Header-local storage keeps the publisher and reader on the same instance
++// even when they are linked from different static libraries.
++[[nodiscard]] inline QMutex& mutex() {
++    static QMutex value;
++    return value;
++}
++
++[[nodiscard]] inline std::optional<QByteArray>& latestPng() {
++    static std::optional<QByteArray> value;
++    return value;
++}
++
++[[nodiscard]] inline std::uint32_t& recordedChangeCount() {
++    static std::uint32_t value = 0;
++    return value;
++}
++
++[[nodiscard]] inline quint64& publishSerial() {
++    static quint64 value = 0;
++    return value;
++}
++} // namespace snow_shot::presentation::clipboard_cache
++
 +// OHOS requires the restricted READ_PASTEBOARD permission to read the system
 +// clipboard. When this process published the current clipboard image, reuse
 +// that payload so copy -> pin still works without the permission.
@@ -39,17 +70,12 @@ diff --git a/snow_shot/src/presentation/services/screenshotclipboardservice.cpp 
  #include <algorithm>
  #include <array>
  #include <cstring>
-@@ -34,6 +42,40 @@
+@@ -34,6 +42,39 @@
  #include <span>
  #include <utility>
  
 +#if defined(Q_OS_HARMONY)
 +namespace {
-+QMutex g_latestClipboardPngMutex;
-+QByteArray g_latestClipboardPng;
-+std::uint32_t g_latestClipboardChangeCount = 0;
-+quint64 g_latestClipboardPublishSerial = 0;
-+
 +std::uint32_t pasteboardChangeCount() {
 +    auto* pasteboard = OH_Pasteboard_Create();
 +    if (pasteboard == nullptr)
@@ -61,45 +87,55 @@ diff --git a/snow_shot/src/presentation/services/screenshotclipboardservice.cpp 
 +} // namespace
 +
 +std::optional<QByteArray> latestPublishedClipboardPng() {
-+    QMutexLocker locker(&g_latestClipboardPngMutex);
-+    if (g_latestClipboardPng.isEmpty())
++    using namespace snow_shot::presentation::clipboard_cache;
++    QMutexLocker locker(&mutex());
++    const auto& png = latestPng();
++    qWarning("SNOW_CLIP_CACHE query present=%d bytes=%d", png.has_value(),
++             png.has_value() ? static_cast<int>(png->size()) : -1);
++    if (!png.has_value() || png->isEmpty())
 +        return std::nullopt;
 +    const auto currentCount = pasteboardChangeCount();
++    const auto recordedCount = recordedChangeCount();
 +    // Do not serve stale content after another process changed the clipboard.
-+    if (currentCount != g_latestClipboardChangeCount) {
-+        qWarning("SNOW_CLIP_CACHE stale current=%u recorded=%u", currentCount,
-+                 g_latestClipboardChangeCount);
++    if (currentCount != recordedCount) {
++        qWarning("SNOW_CLIP_CACHE stale current=%u recorded=%u", currentCount, recordedCount);
 +        return std::nullopt;
 +    }
 +    qWarning("SNOW_CLIP_CACHE hit count=%u bytes=%d", currentCount,
-+             static_cast<int>(g_latestClipboardPng.size()));
-+    return g_latestClipboardPng;
++             static_cast<int>(png->size()));
++    return *png;
 +}
 +#endif
 +
  struct ScreenshotClipboardCommitState {
      std::atomic_bool cancelled{false};
      std::atomic_bool finished{false};
-@@ -98,6 +140,23 @@
+@@ -98,6 +139,29 @@
  #endif
      clipboard->setMimeData(new PngClipboardMimeData(png, placement, appearance, filePath),
                             QClipboard::Clipboard);
 +#if defined(Q_OS_HARMONY)
-+    quint64 publishSerial = 0;
 +    {
-+        QMutexLocker locker(&g_latestClipboardPngMutex);
-+        g_latestClipboardPng = png;
-+        publishSerial = ++g_latestClipboardPublishSerial;
++        using namespace snow_shot::presentation::clipboard_cache;
++        QMutexLocker locker(&mutex());
++        latestPng() = png;
++        const auto serial = ++publishSerial();
++        qWarning("SNOW_CLIP_CACHE publish bytes=%d serial=%llu", static_cast<int>(png.size()),
++                 static_cast<unsigned long long>(serial));
++        // Qt's OHOS clipboard write crosses the JS thread; the pasteboard change
++        // counter can still describe the previous owner when setMimeData returns.
++        // Refresh it after the write settles, but never after a newer publication.
++        QTimer::singleShot(250, QCoreApplication::instance(), [serial] {
++            const auto count = pasteboardChangeCount();
++            using namespace snow_shot::presentation::clipboard_cache;
++            QMutexLocker locker(&mutex());
++            if (serial != publishSerial())
++                return;
++            recordedChangeCount() = count;
++            qWarning("SNOW_CLIP_CACHE stored count=%u serial=%llu", count,
++                     static_cast<unsigned long long>(serial));
++        });
 +    }
-+    // Qt's OHOS clipboard write crosses the JS thread; the pasteboard change
-+    // counter can still describe the previous owner when setMimeData returns.
-+    // Refresh it after the write settles, but never after a newer publication.
-+    QTimer::singleShot(250, QCoreApplication::instance(), [publishSerial] {
-+        QMutexLocker locker(&g_latestClipboardPngMutex);
-+        if (publishSerial != g_latestClipboardPublishSerial)
-+            return;
-+        g_latestClipboardChangeCount = pasteboardChangeCount();
-+    });
 +#endif
      return true;
  }
