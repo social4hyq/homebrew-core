@@ -1132,10 +1132,10 @@ index b5eaee4..00cffe2 100644
 +}
 diff --git a/server/cmd/multica-desktop-bridge/bridge.go b/server/cmd/multica-desktop-bridge/bridge.go
 new file mode 100644
-index 0000000..5fabdb6
+index 0000000..7226df7
 --- /dev/null
 +++ b/server/cmd/multica-desktop-bridge/bridge.go
-@@ -0,0 +1,342 @@
+@@ -0,0 +1,368 @@
 +// Command multica-desktop-bridge lets the sandboxed OpenHarmony desktop app
 +// reach the host: it exposes a small, authenticated loopback HTTP API for the
 +// few things the desktop daemon manager needs (running the multica CLI for
@@ -1266,8 +1266,12 @@ index 0000000..5fabdb6
 +}
 +
 +// CheckHealth reports whether a bridge answers /health on the given loopback
-+// port. It exists so shell scripts need neither curl nor bash's /dev/tcp,
-+// which is unreliable on OpenHarmony.
++// port and can actually run its CLI. It exists so shell scripts need neither
++// curl nor bash's /dev/tcp, which is unreliable on OpenHarmony.
++//
++// A bridge that predates the CLI check answers {"ok":true} without "cli_ok".
++// It cannot vouch for its CLI, so it is reported unhealthy and the launcher
++// replaces it.
 +func CheckHealth(port int, timeout time.Duration) error {
 +	client := &http.Client{Timeout: timeout}
 +	resp, err := client.Get(fmt.Sprintf("http://127.0.0.1:%d/health", port))
@@ -1276,11 +1280,18 @@ index 0000000..5fabdb6
 +	}
 +	defer resp.Body.Close()
 +	var body struct {
-+		OK bool `json:"ok"`
++		OK    bool  `json:"ok"`
++		CLIOK *bool `json:"cli_ok"`
 +	}
 +	if resp.StatusCode != http.StatusOK ||
 +		json.NewDecoder(io.LimitReader(resp.Body, 4096)).Decode(&body) != nil || !body.OK {
 +		return errors.New("unexpected /health response")
++	}
++	if body.CLIOK == nil {
++		return errors.New("bridge predates the CLI health check")
++	}
++	if !*body.CLIOK {
++		return errors.New("bridge CLI is not usable")
 +	}
 +	return nil
 +}
@@ -1295,7 +1306,14 @@ index 0000000..5fabdb6
 +
 +func (b *bridge) serve(w http.ResponseWriter, r *http.Request) {
 +	if r.URL.Path == "/health" && r.Method == http.MethodGet {
-+		writeJSON(w, http.StatusOK, map[string]any{"ok": true, "version": b.cfg.Version})
++		// Report the CLI as a boolean only: /health needs no auth, so it must
++		// not reveal where the CLI lives.
++		cliOK := b.cliUsable()
++		status := http.StatusOK
++		if !cliOK {
++			status = http.StatusServiceUnavailable
++		}
++		writeJSON(w, status, map[string]any{"ok": cliOK, "cli_ok": cliOK, "version": b.cfg.Version})
 +		return
 +	}
 +	if !b.authorized(r) {
@@ -1310,6 +1328,14 @@ index 0000000..5fabdb6
 +	default:
 +		http.NotFound(w, r)
 +	}
++}
++
++// cliUsable reports whether the CLI the bridge was started with still exists.
++// `brew upgrade` removes the old keg, which leaves a bridge started from it
++// holding a path that no longer resolves.
++func (b *bridge) cliUsable() bool {
++	fi, err := os.Stat(b.cfg.CLIPath)
++	return err == nil && fi.Mode().IsRegular()
 +}
 +
 +func (b *bridge) authorized(r *http.Request) bool {
@@ -1480,10 +1506,10 @@ index 0000000..5fabdb6
 +}
 diff --git a/server/cmd/multica-desktop-bridge/bridge_test.go b/server/cmd/multica-desktop-bridge/bridge_test.go
 new file mode 100644
-index 0000000..6364f72
+index 0000000..8e73a2a
 --- /dev/null
 +++ b/server/cmd/multica-desktop-bridge/bridge_test.go
-@@ -0,0 +1,288 @@
+@@ -0,0 +1,358 @@
 +package main
 +
 +import (
@@ -1770,6 +1796,76 @@ index 0000000..6364f72
 +	srv.Close()
 +	if err := CheckHealth(port, 500*time.Millisecond); err == nil {
 +		t.Error("a closed port must not count as healthy")
++	}
++}
++
++func healthOf(t *testing.T, cfg Config) (int, map[string]any) {
++	t.Helper()
++	srv := httptest.NewServer(NewHandler(cfg))
++	defer srv.Close()
++	resp, body := do(t, "GET", srv.URL+"/health", "", false)
++	out := map[string]any{}
++	if err := json.Unmarshal([]byte(body), &out); err != nil {
++		t.Fatalf("health body %q: %v", body, err)
++	}
++	return resp.StatusCode, out
++}
++
++func TestHealthReportsUsableCLI(t *testing.T) {
++	code, out := healthOf(t, Config{Secret: testSecret, MulticaHome: t.TempDir(), CLIPath: fakeCLI(t, t.TempDir()), Version: "1"})
++	if code != 200 || out["ok"] != true || out["cli_ok"] != true {
++		t.Fatalf("usable CLI: %d %v", code, out)
++	}
++}
++
++// After `brew upgrade` removes the keg the bridge was started from, the CLI
++// path it holds no longer exists. The bridge must say so instead of reporting
++// healthy while every /exec fails.
++func TestHealthReportsMissingCLI(t *testing.T) {
++	gone := filepath.Join(t.TempDir(), "removed-keg", "multica-cli")
++	code, out := healthOf(t, Config{Secret: testSecret, MulticaHome: t.TempDir(), CLIPath: gone, Version: "1"})
++	if code != http.StatusServiceUnavailable || out["ok"] != false || out["cli_ok"] != false {
++		t.Fatalf("missing CLI: %d %v", code, out)
++	}
++	if strings.Contains(toJSON(out), "removed-keg") {
++		t.Errorf("unauthenticated /health must not leak the CLI path: %v", out)
++	}
++}
++
++func TestHealthRejectsDirectoryAsCLI(t *testing.T) {
++	code, out := healthOf(t, Config{Secret: testSecret, MulticaHome: t.TempDir(), CLIPath: t.TempDir(), Version: "1"})
++	if code != http.StatusServiceUnavailable || out["cli_ok"] != false {
++		t.Fatalf("directory as CLI: %d %v", code, out)
++	}
++}
++
++func toJSON(v any) string {
++	b, _ := json.Marshal(v)
++	return string(b)
++}
++
++func TestCheckHealthRequiresUsableCLI(t *testing.T) {
++	// A bridge whose CLI path vanished is not healthy.
++	gone := httptest.NewServer(NewHandler(Config{Secret: testSecret, MulticaHome: t.TempDir(), CLIPath: filepath.Join(t.TempDir(), "gone"), Version: "1"}))
++	defer gone.Close()
++	if err := CheckHealth(portOf(t, gone), 2*time.Second); err == nil {
++		t.Error("a bridge with a missing CLI must not count as healthy")
++	}
++
++	// A bridge that predates the CLI check answers {"ok":true} with no cli_ok.
++	// It cannot vouch for its CLI, so the launcher must replace it once.
++	old := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		_, _ = w.Write([]byte(`{"ok":true,"version":"0.9.0"}` + "\n"))
++	}))
++	defer old.Close()
++	if err := CheckHealth(portOf(t, old), 2*time.Second); err == nil {
++		t.Error("a bridge without cli_ok (pre-fix bridge) must not count as healthy")
++	}
++
++	// And a good one still passes.
++	srv, _ := newServer(t)
++	if err := CheckHealth(portOf(t, srv), 2*time.Second); err != nil {
++		t.Errorf("healthy bridge reported as down: %v", err)
 +	}
 +}
 diff --git a/server/cmd/multica-desktop-bridge/main.go b/server/cmd/multica-desktop-bridge/main.go

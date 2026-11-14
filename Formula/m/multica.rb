@@ -4,7 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class Multica < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.9.0-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c6f701781d8a4b9783ef7ce8550398128b0f30d1e35f16c2a23c765b8e63d911"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.9.0-r8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8a2f26ae9e3f28ff442059575bcbacc87c6dd7f56f2d7ad6a4aaccdd90f50b7d"
   end
 
   depends_on "go" => :build
@@ -77,7 +77,7 @@ class Multica < Formula
       MULTICA_INSTALL_DESKTOP: pkgshare/"install-desktop.sh",
       MULTICA_INSTALL_HAP:     pkgshare/"install-hap.sh",
       MULTICA_MODULE_ACL:      pkgshare/"module-acl.json",
-      MULTICA_REAL_CLI:        libexec/"multica-cli",
+      MULTICA_REAL_CLI:        opt_libexec/"multica-cli",
       MULTICA_UNSIGNED_HAP:    libexec/"multica-desktop-unsigned.hap",
       MULTICA_ZIP:             formula_opt_bin("zip")/"zip",
       PATH:                    "#{formula_opt_bin("node")}:$PATH"
@@ -224,6 +224,11 @@ class Multica < Formula
     assert_match "CORE COMMANDS", shell_output("#{bin}/multica --help")
     assert_match "Usage: multica install-desktop", shell_output("#{bin}/multica install-desktop --help")
     assert_match "Usage: multica desktop", shell_output("#{bin}/multica desktop --help")
+    # The bridge outlives `brew upgrade`, so the CLI it is told to run must be
+    # the stable opt path, never this version's Cellar directory.
+    wrapper = (bin/"multica").read
+    assert_match "#{opt_libexec}/multica-cli", wrapper
+    refute_match "#{libexec}/multica-cli", wrapper
     desktop_installer = pkgshare/"install-desktop.sh"
     assert_match "hap-installer", desktop_installer.read
     refute_match "devecocli", desktop_installer.read
@@ -312,7 +317,8 @@ class Multica < Formula
 
       paired = JSON.parse(pairing.read)
       base = URI("http://127.0.0.1:#{paired.fetch("port")}")
-      assert_match '"ok":true', Net::HTTP.get(base + "/health")
+      health = JSON.parse(Net::HTTP.get(base + "/health"))
+      assert_equal [true, true], [health.fetch("ok"), health.fetch("cli_ok")]
       body = JSON.generate("args" => ["version", "--output", "json"])
       denied = Net::HTTP.post(base + "/exec", body, "Content-Type" => "application/json")
       assert_equal "401", denied.code
@@ -320,6 +326,25 @@ class Multica < Formula
                                                      "Authorization" => "Bearer #{paired.fetch("secret")}")
       assert_equal "200", allowed.code
       assert_match version.to_s, JSON.parse(allowed.body).fetch("stdout")
+
+      # A bridge started from a keg that later disappears (as `brew upgrade`
+      # does) must be reported stale and be replaced by `multica desktop start`.
+      old_keg = testpath/"old-keg"
+      old_keg.mkpath
+      ln_s libexec/"multica-cli", old_keg/"multica-cli"
+      system pkgshare/"desktop.sh", "stop"
+      ENV["MULTICA_REAL_CLI"] = (old_keg/"multica-cli").to_s
+      system pkgshare/"desktop.sh", "start", "--bridge-only"
+      assert_match "bridge: running", shell_output("#{pkgshare}/desktop.sh status")
+      rm_r old_keg
+      assert_match "bridge: stale", shell_output("#{pkgshare}/desktop.sh status", 1)
+      ENV["MULTICA_REAL_CLI"] = (libexec/"multica-cli").to_s
+      system pkgshare/"desktop.sh", "start", "--bridge-only"
+      assert_match "bridge: running", shell_output("#{pkgshare}/desktop.sh status")
+      replaced = Net::HTTP.post(base + "/exec", body, "Content-Type"  => "application/json",
+                                                      "Authorization" => "Bearer #{paired.fetch("secret")}")
+      assert_equal "200", replaced.code
+      assert_match version.to_s, JSON.parse(replaced.body).fetch("stdout")
     ensure
       system pkgshare/"desktop.sh", "stop"
     end
