@@ -114,10 +114,10 @@ index 0000000..ed8e7b2
 +fi
 diff --git a/scripts/multica-desktop-ohos.sh b/scripts/multica-desktop-ohos.sh
 new file mode 100755
-index 0000000..367bdba
+index 0000000..22f09bb
 --- /dev/null
 +++ b/scripts/multica-desktop-ohos.sh
-@@ -0,0 +1,111 @@
+@@ -0,0 +1,144 @@
 +#!/usr/bin/env bash
 +# Run the host side of Multica Desktop: the loopback bridge that lets the
 +# sandboxed app drive the multica CLI and read the daemon profile, then open
@@ -153,12 +153,45 @@ index 0000000..367bdba
 +  "$MULTICA_DESKTOP_BRIDGE" --home "$home" --check > /dev/null 2>&1
 +}
 +
++# The pid of the bridge this launcher started, if it is still alive and still a
++# bridge (a recycled pid must not be mistaken for it).
++bridge_pid() {
++  local pid
++  [[ -f "$pidfile" ]] || return 1
++  pid="$(cat "$pidfile")"
++  [[ "$pid" =~ ^[0-9]+$ ]] || return 1
++  ps -eo pid,args 2> /dev/null |
++    awk -v p="$pid" '$1 == p && /multica-desktop-bridge/ { found = 1 } END { exit !found }' || return 1
++  printf '%s\n' "$pid"
++}
++
++stop_bridge() {
++  local pid i
++  pid="$(bridge_pid)" || {
++    rm -f "$pidfile"
++    return 0
++  }
++  kill "$pid" 2> /dev/null || true
++  for ((i = 0; i < 25; i++)); do
++    bridge_pid > /dev/null || break
++    sleep 0.2
++  done
++  if bridge_pid > /dev/null; then
++    kill -9 "$pid" 2> /dev/null || true
++  fi
++  rm -f "$pidfile"
++}
++
 +start_bridge() {
 +  local port i
 +  port="$(pairing_port)"
 +  if healthy "$port"; then
 +    return 0
 +  fi
++  # Not healthy: either nothing is running, or the bridge we started earlier can
++  # no longer run its CLI (its keg was removed by `brew upgrade`) or predates
++  # that check. It still holds the port, so replace it.
++  stop_bridge
 +  : "${MULTICA_REAL_CLI:?multica formula did not set the CLI path}"
 +  mkdir -p "$state"
 +  setsid nohup "$MULTICA_DESKTOP_BRIDGE" --home "$home" --cli "$MULTICA_REAL_CLI" \
@@ -209,15 +242,15 @@ index 0000000..367bdba
 +    fi
 +    ;;
 +  stop)
-+    if [[ -f "$pidfile" ]]; then
-+      kill "$(cat "$pidfile")" 2> /dev/null || true
-+      rm -f "$pidfile"
-+    fi
++    stop_bridge
 +    ;;
 +  status)
 +    port="$(pairing_port)"
 +    if healthy "$port"; then
 +      printf 'bridge: running (port %s)\n' "$port"
++    elif bridge_pid > /dev/null; then
++      printf '%s\n' 'bridge: stale (its CLI is missing or it predates the CLI check); run multica desktop start to replace it'
++      exit 1
 +    else
 +      printf 'bridge: stopped\n'
 +      exit 1
