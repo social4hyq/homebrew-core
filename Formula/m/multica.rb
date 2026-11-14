@@ -4,7 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -19,6 +19,8 @@ class Multica < Formula
   depends_on "go" => :build
   depends_on "node" => :build
   depends_on "hap-installer"
+  depends_on "ohos-sdk-toolchains"
+  depends_on "zip"
 
   # openharmony-sig/electron PC(2in1) prebuilt (CodeHub mirror hosted on this
   # tap's release; redistribution assumed by the tap owner, see release notes).
@@ -39,6 +41,10 @@ class Multica < Formula
     file "Patches/multica/0004-install-desktop-command.patch"
   end
 
+  patch :p1 do
+    file "Patches/multica/0005-desktop-host-bridge.patch"
+  end
+
   def patch
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
@@ -51,18 +57,27 @@ class Multica < Formula
       ENV["CGO_ENABLED"] = "0"
       system "go", "build", *std_go_args(output: libexec/"multica-cli", ldflags: "-s -w -X main.version=#{version}"),
              "./cmd/multica"
+      system "go", "build",
+             *std_go_args(output: libexec/"multica-desktop-bridge", ldflags: "-s -w -X main.version=#{version}"),
+             "./cmd/multica-desktop-bridge"
     end
 
     pkgshare.install "scripts/install-hap-ohos.sh" => "install-hap.sh"
     pkgshare.install "scripts/install-desktop-ohos.sh" => "install-desktop.sh"
+    pkgshare.install "scripts/multica-desktop-ohos.sh" => "desktop.sh"
     chmod 0755, pkgshare/"install-hap.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
+    chmod 0755, pkgshare/"desktop.sh"
     libexec.install "scripts/multica-dispatch-ohos.sh" => "multica-dispatch.sh"
     chmod 0755, libexec/"multica-dispatch.sh"
     (bin/"multica").write_env_script libexec/"multica-dispatch.sh",
+      MULTICA_DESKTOP:         pkgshare/"desktop.sh",
+      MULTICA_DESKTOP_BRIDGE:  libexec/"multica-desktop-bridge",
+      MULTICA_HDC:             formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
       MULTICA_INSTALL_DESKTOP: pkgshare/"install-desktop.sh",
       MULTICA_REAL_CLI:        libexec/"multica-cli",
       MULTICA_UNSIGNED_HAP:    libexec/"multica-desktop-unsigned.hap",
+      MULTICA_ZIP:             formula_opt_bin("zip")/"zip",
       PATH:                    "#{formula_opt_bin("node")}:$PATH"
     shell = buildpath/"libelectron/ohos_hap"
 
@@ -165,37 +180,87 @@ class Multica < Formula
       installation, and launch. Private signing material stays in your home
       directory; it is not in the bottle.
 
-      The full flow (signing config shape, daemon pairing, supervisor) is
-      documented in the ohos-multica project: Build Pipeline and Distribution
-      guides at https://github.com/social4hyq/ohos-multica .
+      The desktop app runs in an app sandbox that cannot execute the CLI or read
+      ~/.multica, so a small loopback bridge runs on the host. `multica
+      install-desktop` starts it and pairs it with the app; afterwards run
+      `multica desktop` to start the bridge (if needed) and open the app. Logging
+      in inside the desktop app then configures and starts the daemon. To start
+      only the bridge from a shell startup file, use
+      `multica desktop start --bridge-only`; `multica desktop stop` stops it and
+      leaves the daemon running.
+
+      The full flow (signing config shape, bridge pairing) is documented in the
+      ohos-multica project: Build Pipeline and Distribution guides at
+      https://github.com/social4hyq/ohos-multica .
     EOS
   end
 
   test do
+    require "net/http"
+
     ENV["HOME"] = testpath/"home"
     assert_match "multica #{version}", shell_output("#{bin}/multica --version")
     assert_match "CORE COMMANDS", shell_output("#{bin}/multica --help")
     assert_match "Usage: multica install-desktop", shell_output("#{bin}/multica install-desktop --help")
+    assert_match "Usage: multica desktop", shell_output("#{bin}/multica desktop --help")
     desktop_installer = pkgshare/"install-desktop.sh"
     assert_match "hap-installer", desktop_installer.read
     refute_match "devecocli", desktop_installer.read
+    zip = formula_opt_bin("zip")/"zip"
     unsigned_hap = testpath/"desktop.hap"
-    unsigned_hap.write "unsigned"
+    app_dir = testpath/"hap/resources/resfile/resources/app"
+    app_dir.mkpath
+    (app_dir/"package.json").write "{}"
+    cd testpath/"hap" do
+      system zip, "-q", "-r", unsigned_hap, "resources"
+    end
     fake_bin = testpath/"bin"
     fake_bin.mkpath
     installer_args = testpath/"hap-installer-args"
+    injected_hap = testpath/"injected.hap"
     fake_installer = fake_bin/"hap-installer"
     fake_installer.write <<~SH
       #!/bin/sh
       printf '%s\n' "$@" > #{installer_args}
+      while [ $# -gt 0 ]; do
+        [ "$1" = --hap ] && cp "$2" #{injected_hap}
+        shift
+      done
     SH
     chmod 0755, fake_installer
     ENV["MULTICA_UNSIGNED_HAP"] = unsigned_hap.to_s
+    ENV["MULTICA_DESKTOP"] = (pkgshare/"desktop.sh").to_s
+    ENV["MULTICA_DESKTOP_BRIDGE"] = (libexec/"multica-desktop-bridge").to_s
+    ENV["MULTICA_DESKTOP_STATE"] = (testpath/"state").to_s
+    ENV["MULTICA_REAL_CLI"] = (libexec/"multica-cli").to_s
+    ENV["MULTICA_ZIP"] = zip.to_s
     ENV.prepend_path "PATH", fake_bin
-    shell_output(desktop_installer.to_s)
-    assert_equal ["--hap", unsigned_hap.to_s, "--bundle-id", "com.huawei.ohos_electron",
-                  "--app-name", "MulticaSigning", "--module", "electron",
-                  "--ability", "EntryAbility"], installer_args.read.lines(chomp: true)
+    begin
+      shell_output(desktop_installer.to_s)
+      args = installer_args.read.lines(chomp: true)
+      assert_equal "--hap", args.first
+      refute_equal unsigned_hap.to_s, args[1]
+      assert_equal ["--bundle-id", "com.huawei.ohos_electron", "--app-name", "MulticaSigning",
+                    "--module", "electron", "--ability", "EntryAbility"], args.drop(2)
+
+      pairing = testpath/"home/.multica/desktop-bridge.json"
+      assert_equal pairing.read,
+                   shell_output("unzip -p #{injected_hap} resources/resfile/resources/app/desktop-bridge.json")
+      assert_match "bridge: running", shell_output("#{pkgshare}/desktop.sh status")
+
+      paired = JSON.parse(pairing.read)
+      base = URI("http://127.0.0.1:#{paired.fetch("port")}")
+      assert_match '"ok":true', Net::HTTP.get(base + "/health")
+      body = JSON.generate("args" => ["version", "--output", "json"])
+      denied = Net::HTTP.post(base + "/exec", body, "Content-Type" => "application/json")
+      assert_equal "401", denied.code
+      allowed = Net::HTTP.post(base + "/exec", body, "Content-Type"  => "application/json",
+                                                     "Authorization" => "Bearer #{paired.fetch("secret")}")
+      assert_equal "200", allowed.code
+      assert_match version.to_s, JSON.parse(allowed.body).fetch("stdout")
+    ensure
+      system pkgshare/"desktop.sh", "stop"
+    end
     refute_path_exists libexec/"node_modules"
     assert_path_exists pkgshare/"install-hap.sh"
     assert_predicate pkgshare/"install-hap.sh", :executable?
