@@ -3,36 +3,61 @@ notification used by other platforms is never shown on OHOS (the tray is
 intentionally disabled there), so the existing OpenRecording notification
 action is unreachable. Offer the DocumentViewPicker as soon as a recording
 is finalized, except for copy-only finishes, reusing the existing
-RecordingFileExport path.
-
-OHOS: recordings are staged in the app sandbox, and the system-tray
-notification used by other platforms is never shown on OHOS (the tray is
-intentionally disabled there), so the existing OpenRecording notification
-action is unreachable. Offer the DocumentViewPicker as soon as a recording
-is finalized, except for copy-only finishes, reusing the existing
-RecordingFileExport path.
+RecordingFileExport path. Also offer the picker after trim/recovery exports,
+except when the trim session was a copy.
 
 diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
 --- a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
 +++ b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
-@@ -1784,6 +1784,16 @@
+@@ -1623,8 +1623,11 @@
+         trimSession = new RecordingTrimSession(areaWindow, toolbarWindow, &owner);
+         trimSession->reportError = [this](const QString& error) { showError(error); };
+         trimSession->exported = [this, session = trimSession](const QString& path) {
++            const bool copy = session->copyExport();
+             if (trimSession == session)
+                 autoExitAfterRecordingEnds();
++            if (!copy)
++                offerUserFileExport(path);
+             notifyExportCompleted(path);
+         };
+     }
+@@ -1784,6 +1787,10 @@
          // Finalized observers can destroy the controller or start a new session.
          // Keep the original Copy intent and its path independent of that callback.
          const QPointer<ScreenRecordingController> guard(&owner);
-+#ifdef Q_OS_HARMONY
-+        qWarning() << "SNOW_RECORDING_USER_FILE_NOTIFY" << shouldCopy
-+                   << static_cast<bool>(userFileExporter);
 +        // A copy-only finish keeps the clipboard payload private; other finishes
 +        // offer the user a public destination through the picker.
-+        if (!shouldCopy && userFileExporter) {
-+            qWarning() << "SNOW_RECORDING_USER_FILE_EXPORT_REQUEST" << completedPath;
-+            userFileExporter(completedPath);
-+        }
-+#endif
++        if (!shouldCopy)
++            offerUserFileExport(completedPath);
          notifyExportCompleted(completedPath);
          if (guard)
              emit guard->finalized();
-@@ -2598,6 +2608,7 @@
+@@ -1791,6 +1798,16 @@
+             copyFileToClipboard(completedPath);
+     }
+ 
++    void offerUserFileExport(const QString& path) {
++#ifdef Q_OS_HARMONY
++        if (!userFileExporter || automationOwned || automationCommand)
++            return;
++        userFileExporter(path);
++#else
++        Q_UNUSED(path);
++#endif
++    }
++
+     void notifyExportCompleted(const QString& path) {
+         if (snow_shot::storage::RecordingSettings().notifyAfterExportCompletes())
+             emit owner.exportNotificationRequested(path);
+@@ -1894,6 +1911,7 @@
+                 trimSession->reportError = [this](const QString& error) { showError(error); };
+                 trimSession->exported = [this, marker, record](const QString& path) {
+                     static_cast<void>(clearRecovery(marker, record));
++                    offerUserFileExport(path);
+                     notifyExportCompleted(path);
+                 };
+                 trimSession->open(record.sourcePath, pendingOutputPath, {}, true, false, {});
+@@ -2598,6 +2616,7 @@
      }
  
      PermissionCheck permissionCheck;
@@ -40,12 +65,11 @@ diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp 
      bool sessionEnding = false;
      bool recoveryOffered = false;
      QJsonObject automationOptions;
-@@ -2768,6 +2779,11 @@
+@@ -2768,6 +2787,10 @@
      m_impl->permissionCheck = std::move(check);
  }
  
 +void ScreenRecordingController::setUserFileExporter(UserFileExporter exporter) {
-+    qWarning() << "SNOW_RECORDING_USER_FILE_EXPORTER_SET" << static_cast<bool>(exporter);
 +    m_impl->userFileExporter = std::move(exporter);
 +}
 +
@@ -67,35 +91,25 @@ diff --git a/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.
 diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow_shot/src/presentation/services/screenshotcontroller.cpp
 --- a/snow_shot/src/presentation/services/screenshotcontroller.cpp
 +++ b/snow_shot/src/presentation/services/screenshotcontroller.cpp
-@@ -1448,6 +1448,12 @@
+@@ -1448,6 +1448,10 @@
      QObject::connect(m_screenRecordingController.get(),
                       &ScreenRecordingController::exportNotificationRequested, &owner,
                       &ScreenshotController::recordingExportNotificationRequested);
 +#ifdef Q_OS_HARMONY
-+    m_screenRecordingController->setUserFileExporter([this](const QString& path) {
-+        qWarning() << "SNOW_RECORDING_USER_FILE_EXPORT_REQUEST" << path;
-+        owner.exportScreenRecordingToUserFile(path);
-+    });
++    m_screenRecordingController->setUserFileExporter(
++        [this](const QString& path) { owner.exportScreenRecordingToUserFile(path); });
 +#endif
      QObject::connect(m_screenRecordingController.get(),
                       &ScreenRecordingController::captureActivityChanged, &owner,
                       [this](bool active) {
-diff --git a/snow_shot/src/platform/ohos/recordingfileexport.cpp b/snow_shot/src/platform/ohos/recordingfileexport.cpp
---- a/snow_shot/src/platform/ohos/recordingfileexport.cpp
-+++ b/snow_shot/src/platform/ohos/recordingfileexport.cpp
-@@ -3,6 +3,7 @@
- 
- #include "snow_shot/platform/ohos/userfileexportqueue.h"
- 
-+#include <QDebug>
- #include <QFileInfo>
- #include <QMetaObject>
- #include <QPointer>
-@@ -92,6 +93,7 @@
-         return false;
-     }
-     m_pickerRequestId = id;
-+    qWarning() << "SNOW_RECORDING_USER_FILE_PICKER_ENQUEUED" << id << suggestedName;
-     return true;
- }
+diff --git a/snow_shot/src/presentation/recording/recordingtrimsession.h b/snow_shot/src/presentation/recording/recordingtrimsession.h
+--- a/snow_shot/src/presentation/recording/recordingtrimsession.h
++++ b/snow_shot/src/presentation/recording/recordingtrimsession.h
+@@ -34,6 +34,7 @@
+     [[nodiscard]] QString outputPath() const;
+     [[nodiscard]] bool ready() const;
+     [[nodiscard]] QString phase() const;
++    [[nodiscard]] bool copyExport() const { return m_copy; }
+     std::function<void(const QString&)> reportError;
+     std::function<void(const QString&)> exported;
  
