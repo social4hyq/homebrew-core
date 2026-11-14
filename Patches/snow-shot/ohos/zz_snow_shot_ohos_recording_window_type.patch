@@ -1,0 +1,23 @@
+diff --git a/snow_shot/src/presentation/recording/screenrecordingareawindow.cpp b/snow_shot/src/presentation/recording/screenrecordingareawindow.cpp
+--- a/snow_shot/src/presentation/recording/screenrecordingareawindow.cpp
++++ b/snow_shot/src/presentation/recording/screenrecordingareawindow.cpp
+@@ -104,8 +104,17 @@
+ } // namespace
+ 
+ ScreenRecordingAreaWindow::ScreenRecordingAreaWindow(QWidget* parent)
+-    : QWidget(parent, Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint |
+-                          Qt::NoDropShadowWindowHint),
++    : QWidget(parent,
++#if defined(Q_OS_HARMONY)
++              // Qt::Tool is mapped by the OHOS QPA to a native child/float
++              // window, which breaks focus and toolbar anchoring; use a normal
++              // app window like the screenshot overlay and pinned windows.
++              Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint |
++                  Qt::NoDropShadowWindowHint),
++#else
++              Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint |
++                  Qt::NoDropShadowWindowHint),
++#endif
+       m_canvasRuntime(std::make_unique<SnowCanvasRuntime>(
+           SnowCanvasRuntimeConfig{snow_shot::presentation::screenshotCanvasToolStyleDefaults()})),
+       m_canvas(new SnowCanvasWidget(*m_canvasRuntime, this)) {
