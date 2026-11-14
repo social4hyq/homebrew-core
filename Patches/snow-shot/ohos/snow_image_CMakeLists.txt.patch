@@ -1,3 +1,9 @@
+OHOS: use the WebP/JPEG metadata this port's Homebrew formulas publish
+instead of CMake targets that are not guaranteed to exist, with absolute
+library paths to avoid accidentally cross-linking the host's libraries; also
+separates WebP's unity-build translation unit from JPEG's to avoid a symbol
+clash between their anonymous helpers.
+
 diff --git a/snow_image/CMakeLists.txt b/snow_image/CMakeLists.txt
 index 2005449..9b2cea2 100644
 --- a/snow_image/CMakeLists.txt

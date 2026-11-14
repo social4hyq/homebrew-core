@@ -1,3 +1,8 @@
+OHOS: this translation unit uses `std::jthread`, and the OHOS SDK's libc++
+has no C++20 implementation of it; pull in the jthread compatibility
+resource (declaration and implementation both) rather than only patching the
+public `std::stop_token` declaration used elsewhere.
+
 diff --git a/snow_image/src/processing.cpp b/snow_image/src/processing.cpp
 index 4bbbbb4..6749a66 100644
 --- a/snow_image/src/processing.cpp

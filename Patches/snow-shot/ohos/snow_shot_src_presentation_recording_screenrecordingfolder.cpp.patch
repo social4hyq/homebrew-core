@@ -1,3 +1,10 @@
+OHOS: standard Movies/Documents paths may sit outside the sandbox, so add an
+AppDataLocation fallback directory; a real temp-file create/close/delete
+probe is more reliable here than checking permission bits, and the probe
+walks up through not-yet-created subdirectories to find an authorizable
+parent rather than treating a future subdirectory that does not exist yet as
+proof the whole tree is unwritable.
+
 diff --git a/snow_shot/src/presentation/recording/screenrecordingfolder.cpp b/snow_shot/src/presentation/recording/screenrecordingfolder.cpp
 index 9d5d34c..6ef5614 100644
 --- a/snow_shot/src/presentation/recording/screenrecordingfolder.cpp

@@ -1,3 +1,8 @@
+OHOS: the SDK's libc++ has no `std::ranges::any_of`; use the equivalent
+iterator-based algorithm and store the temporary `glyphRuns` result in a
+local variable rather than mixing begin/end from two different temporary
+containers.
+
 diff --git a/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp b/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp
 index 2683957..53dc25c 100644
 --- a/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp

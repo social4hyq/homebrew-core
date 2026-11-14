@@ -1,3 +1,7 @@
+OHOS: declares the recording-export entry point that the application's
+tray/recording events call into; pairs with the OHOS implementation, it is
+not an unused public API.
+
 diff --git a/snow_shot/include/snow_shot/presentation/screenshotcontroller.h b/snow_shot/include/snow_shot/presentation/screenshotcontroller.h
 index ed61ff6..7bd4147 100644
 --- a/snow_shot/include/snow_shot/presentation/screenshotcontroller.h

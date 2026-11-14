@@ -1,3 +1,8 @@
+OHOS: declares the async two-stage recording-export flow — a document
+picker request followed by a URI copy — including the two request ids kept
+so the destructor can cancel in-flight requests, and a QPointer guarding
+callbacks that fire after the object is destroyed.
+
 diff --git a/snow_shot/include/snow_shot/platform/ohos/recordingfileexport.h b/snow_shot/include/snow_shot/platform/ohos/recordingfileexport.h
 new file mode 100644
 index 0000000..929db19

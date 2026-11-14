@@ -1,3 +1,8 @@
+OHOS: works around a real startup crash, not a style preference — a bare
+TLS array of `QString` was observed segfaulting on destruction. Keep the
+per-thread cache and the lambda that returns an array; removing it would
+reintroduce the startup crash.
+
 diff --git a/snow_shot/src/shortcuts/shortcutbinding.cpp b/snow_shot/src/shortcuts/shortcutbinding.cpp
 index b23a7bd..4f55eb2 100644
 --- a/snow_shot/src/shortcuts/shortcutbinding.cpp

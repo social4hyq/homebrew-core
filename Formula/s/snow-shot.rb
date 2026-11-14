@@ -4,7 +4,7 @@ class SnowShot < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.2_snow-shot.tar.gz"
   sha256 "29190412a6dc9b41c0097fbf1313dc0f84412c9d23e1716260ed13acdcbd6c4e"
   license "GPL-3.0-or-later"
-  revision 5
+  revision 6
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.2-r9"
@@ -294,11 +294,10 @@ class SnowShot < Formula
            "-DSNOW_SHOT_BUILD_TESTS=OFF",
            "-DSNOW_SHOT_ENABLE_MCP=OFF",
            "-DSNOW_SHOT_QT_STATIC=OFF",
-           "-DSNOW_SHOT_DIAGNOSTIC_SKIP_OHOS_TRAY=OFF",
            "-DSNOW_SHOT_OCR_ASSET_MANIFEST=#{buildpath}/snow_shot/packaging/snow-shot-ocr-asset-manifest-arm64.json",
            *std_cmake_args
     system "cmake", "--build", "build", "--target", "snow_shot",
-           "snow_ocr_inprocess_build", "snow_ocr_process_build", "--parallel"
+           "snow_ocr_inprocess_build", "--parallel"
 
     # The remainder packages the exact Qt and non-platform ELF closure into
     # the HAP. It runs only in the private Qt/CLT CI image, never on a device.
@@ -382,15 +381,11 @@ class SnowShot < Formula
     libs = stage/"entry/libs/arm64-v8a"
     cp buildpath/"build/snow_shot/libsnow_shot_image_codec_backend.so", libs
     cp formula_opt_prefix("zlib-ng-compat")/"lib/libz.so.1", libs/"libz.so.1"
-    %w[libsnow_ocr_inprocess.so snow-ocr-process].each do |name|
-      source = buildpath/"build/cargo/aarch64-unknown-linux-ohos/release"/name
-      destination = libs/((name == "snow-ocr-process") ? "libsnow_ocr_process.so" : name)
-      cp source, destination
-    end
+    cp buildpath/"build/cargo/aarch64-unknown-linux-ohos/release/libsnow_ocr_inprocess.so", libs
     ocr_output = stage/"entry/src/main/resources/rawfile/ocr"
     system "python3", payload/"support/scripts/stage-ohos-ocr-assets.py",
            "--source-manifest", buildpath/"snow_shot/packaging/snow-shot-ocr-asset-manifest-arm64.json",
-           "--worker", libs/"libsnow_ocr_process.so",
+           "--runtime", libs/"libsnow_ocr_inprocess.so",
            "--model-root", buildpath/"ocr-models",
            "--output-root", ocr_output
     qr_output = stage/"entry/src/main/resources/rawfile/qrcode"
@@ -431,6 +426,7 @@ class SnowShot < Formula
     ].each do |name|
       assert_match name, listing
     end
+    refute_match "libs/arm64-v8a/libsnow_ocr_process.so", listing
     manifest = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     assert_equal "com.social4hyq.snowshot", manifest.dig("app", "bundleName")
     assert_equal "QAbility", manifest.dig("module", "abilities", 0, "name")
@@ -438,12 +434,12 @@ class SnowShot < Formula
     assert_includes permissions, "ohos.permission.CUSTOM_SCREEN_CAPTURE"
     assert_equal "$media:app_icon", manifest.dig("module", "abilities", 0, "icon")
     system "unzip", "-q", hap, "resources/rawfile/ocr/asset-manifest.json",
-           "libs/arm64-v8a/libsnow_ocr_process.so", "-d", testpath/"ocr-check"
+           "libs/arm64-v8a/libsnow_ocr_inprocess.so", "-d", testpath/"ocr-check"
     ocr_manifest = JSON.parse((testpath/"ocr-check/resources/rawfile/ocr/asset-manifest.json").read)
-    worker = testpath/"ocr-check/libs/arm64-v8a/libsnow_ocr_process.so"
+    runtime = testpath/"ocr-check/libs/arm64-v8a/libsnow_ocr_inprocess.so"
     descriptor = ocr_manifest.fetch("runtime").fetch("files").fetch(0)
-    assert_equal descriptor.fetch("size"), worker.size
-    assert_equal descriptor.fetch("sha256"), Digest::SHA256.file(worker).hexdigest
+    assert_equal descriptor.fetch("size"), runtime.size
+    assert_equal descriptor.fetch("sha256"), Digest::SHA256.file(runtime).hexdigest
     system "unzip", "-tq", hap
   end
 end

@@ -1,3 +1,8 @@
+OHOS: work around a Rust 1.99.1 borrow-checker regression (E0499) in two
+functions that return a TensorView borrowed from an `if let` branch and then
+fall back to borrowing `self` again. Rewriting the control flow with
+`is_some`/`as_mut` avoids the double borrow without changing behavior.
+
 diff --git a/src/runtime.rs b/src/runtime.rs
 index b7d145d..cdead00 100644
 --- a/src/runtime.rs

@@ -1,9 +1,14 @@
-diff --git a/snow_shot/src/platform/ohos/globalshortcutbackend.cpp b/snow_shot/src/platform/ohos/globalshortcutbackend.cpp
-new file mode 100644
-index 0000000..e81ec61
+OHOS: logical hotkey registration, conflict feedback, and dispatch onto the
+Qt thread; actual system hotkeys are only delivered through ArkTS InputKit,
+which this backend bridges from. An early-startup QKeySequence parser cannot
+be swapped in directly (there is a measured startup stall before QApplication
+exists). Drop an unused `getStringProperty` accessor and per-dispatch/queue
+debug logging and the matching ArkTS lifecycle/subscription info traces;
+keep the failure diagnostics and the save-queue NAPI interface.
+
 --- /dev/null
 +++ b/snow_shot/src/platform/ohos/globalshortcutbackend.cpp
-@@ -0,0 +1,633 @@
+@@ -0,0 +1,615 @@
 +#include "snow_shot/presentation/globalshortcutmanager.h"
 +#include "snow_shot/platform/ohos/userfileexportqueue.h"
 +
@@ -26,24 +31,8 @@ index 0000000..e81ec61
 +std::map<QString, int> rejectedShortcutErrors;
 +GlobalShortcutBackend::AvailabilityChangedHandler availabilityChangedHandler;
 +
-+bool getStringProperty(napi_env env, napi_value object, const char* property, QString* value) {
-+    napi_value item = nullptr;
-+    if (napi_get_named_property(env, object, property, &item) != napi_ok)
-+        return false;
-+    size_t length = 0;
-+    if (napi_get_value_string_utf8(env, item, nullptr, 0, &length) != napi_ok)
-+        return false;
-+    std::vector<char> buffer(length + 1);
-+    if (napi_get_value_string_utf8(env, item, buffer.data(), buffer.size(), &length) != napi_ok)
-+        return false;
-+    *value = QString::fromUtf8(buffer.data(), static_cast<qsizetype>(length));
-+    return true;
-+}
-+
 +napi_value takePendingUserFileExports(napi_env env, napi_callback_info) {
 +    const auto pending = platform::ohos::sharedUserFileExportQueue().takePending();
-+    if (!pending.empty())
-+        qInfo() << "SNOW_USER_FILE_EXPORT_DEQUEUE" << pending.size();
 +    napi_value array = nullptr;
 +    if (napi_create_array_with_length(env, pending.size(), &array) != napi_ok)
 +        return nullptr;
@@ -505,7 +494,6 @@ index 0000000..e81ec61
 +    if (napi_get_value_string_utf8(env, argv[0], buffer.data(), buffer.size(), &length) != napi_ok)
 +        return nullptr;
 +    const QString shortcut = QString::fromUtf8(buffer.data(), static_cast<qsizetype>(length));
-+    qInfo() << "SNOW_OHOS_HOTKEY_NAPI_RECEIVED" << shortcut;
 +    GlobalShortcutBackend::ActivationHandler handler;
 +    int id = 0;
 +    {
@@ -520,7 +508,6 @@ index 0000000..e81ec61
 +    if (app != nullptr && handler) {
 +        const bool queued = QMetaObject::invokeMethod(
 +            app, [handler = std::move(handler), id] { handler(id); }, Qt::QueuedConnection);
-+        qInfo() << "SNOW_OHOS_HOTKEY_DISPATCH" << shortcut << "id" << id << "queued" << queued;
 +        if (!queued)
 +            qWarning() << "Failed to queue OHOS shortcut activation" << shortcut;
 +    } else {

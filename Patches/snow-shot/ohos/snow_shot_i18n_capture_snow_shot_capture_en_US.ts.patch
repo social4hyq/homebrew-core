@@ -1,42 +1,19 @@
+OHOS: translate the document-picker/file-export error strings this port adds to
+ScreenshotController.
+
+Screenshots and recognition results are saved through an OHOS document-picker
+authorization instead of a plain file path (see the userfileexportqueue and
+screenshotcontroller patches), so this adds translations for that flow's
+user-facing messages. The DirectCaptureController capture-failure strings, the
+Impl's Finder-automation prompts and the MCP endpoint messages that the
+unpatched catalog already carries are untouched: OHOS reuses those existing
+translations and does not build the MCP server or a Finder integration.
+
 diff --git a/snow_shot/i18n/capture/snow_shot_capture_en_US.ts b/snow_shot/i18n/capture/snow_shot_capture_en_US.ts
-index 1edb62f..620b656 100644
+index 1edb62f..8f93a0c 100644
 --- a/snow_shot/i18n/capture/snow_shot_capture_en_US.ts
 +++ b/snow_shot/i18n/capture/snow_shot_capture_en_US.ts
-@@ -3,10 +3,18 @@
- <TS version="2.1" language="en_US" sourcelanguage="en_US">
-     <context>
-         <name>DirectCaptureController</name>
-+        <message>
-+            <source>Capture failed: %1</source>
-+            <translation>Capture failed: %1</translation>
-+        </message>
-         <message>
-             <source>The capture operation could not be queued</source>
-             <translation>The capture operation could not be queued</translation>
-         </message>
-+        <message>
-+            <source>The capture operation failed</source>
-+            <translation>The capture operation failed</translation>
-+        </message>
-         <message>
-             <source>The capture returned an invalid image</source>
-             <translation>The capture returned an invalid image</translation>
-@@ -19,6 +27,14 @@
-             <source>The captured window geometry is invalid</source>
-             <translation>The captured window geometry is invalid</translation>
-         </message>
-+        <message>
-+            <source>The clipboard write operation could not be queued</source>
-+            <translation>The clipboard write operation could not be queued</translation>
-+        </message>
-+        <message>
-+            <source>The history write operation could not be queued</source>
-+            <translation>The history write operation could not be queued</translation>
-+        </message>
-     </context>
-     <context>
-         <name>ScreenshotAutoFilterController</name>
-@@ -57,6 +73,10 @@
+@@ -57,6 +57,10 @@
              <source>Could not recapture the screen</source>
              <translation>Could not recapture the screen</translation>
          </message>
@@ -47,7 +24,7 @@ index 1edb62f..620b656 100644
          <message>
              <source>Exit</source>
              <translation>Exit</translation>
-@@ -85,6 +105,14 @@
+@@ -85,6 +89,14 @@
              <source>No recognition result is available to copy</source>
              <translation>No recognition result is available to copy</translation>
          </message>
@@ -62,7 +39,7 @@ index 1edb62f..620b656 100644
          <message>
              <source>Preparing cloud upload...</source>
              <translation>Preparing cloud upload...</translation>
-@@ -133,6 +161,10 @@
+@@ -133,6 +145,10 @@
              <source>The clipboard pin queue is full</source>
              <translation>The clipboard pin queue is full</translation>
          </message>
@@ -73,7 +50,7 @@ index 1edb62f..620b656 100644
          <message>
              <source>The dropped content could not be opened</source>
              <translation>The dropped content could not be opened</translation>
-@@ -149,10 +181,34 @@
+@@ -149,10 +165,34 @@
              <source>The pinned windows could not be hidden</source>
              <translation>The pinned windows could not be hidden</translation>
          </message>
@@ -108,7 +85,7 @@ index 1edb62f..620b656 100644
          <message>
              <source>The screenshot clipboard operation could not be started</source>
              <translation>The screenshot clipboard operation could not be started</translation>
-@@ -173,6 +229,14 @@
+@@ -173,6 +213,14 @@
              <source>The screenshot could not be saved: %1</source>
              <translation>The screenshot could not be saved: %1</translation>
          </message>
@@ -123,7 +100,7 @@ index 1edb62f..620b656 100644
          <message>
              <source>The screenshot export queue is full</source>
              <translation>The screenshot export queue is full</translation>
-@@ -189,6 +253,10 @@
+@@ -189,6 +237,10 @@
              <source>The scrolling screenshot could not be prepared</source>
              <translation>The scrolling screenshot could not be prepared</translation>
          </message>
@@ -134,62 +111,3 @@ index 1edb62f..620b656 100644
          <message>
              <source>This screenshot cannot be pinned</source>
              <translation>This screenshot cannot be pinned</translation>
-@@ -206,8 +274,58 @@
-             <translation>Your current screenshot will be discarded</translation>
-         </message>
-     </context>
-+    <context>
-+        <name>ScreenshotController::Impl</name>
-+        <message>
-+            <source>Allow Snow Shot to access Finder in System Settings &gt; Privacy &amp; Security &gt; Automation, then try again</source>
-+            <translation>Allow Snow Shot to access Finder in System Settings &gt; Privacy &amp; Security &gt; Automation, then try again</translation>
-+        </message>
-+        <message>
-+            <source>Could not read the selected files from Finder. Please try again</source>
-+            <translation>Could not read the selected files from Finder. Please try again</translation>
-+        </message>
-+        <message>
-+            <source>Finder is unavailable. Open Finder and try again</source>
-+            <translation>Finder is unavailable. Open Finder and try again</translation>
-+        </message>
-+        <message>
-+            <source>Finder took too long to return the selected files. Please try again</source>
-+            <translation>Finder took too long to return the selected files. Please try again</translation>
-+        </message>
-+        <message>
-+            <source>The pinned window could not be restored</source>
-+            <translation>The pinned window could not be restored</translation>
-+        </message>
-+        <message>
-+            <source>The pinned windows could not be hidden</source>
-+            <translation>The pinned windows could not be hidden</translation>
-+        </message>
-+    </context>
-     <context>
-         <name>ScreenshotMcpServer</name>
-+        <message>
-+            <source>Another Snow Shot instance owns the MCP endpoint</source>
-+            <translation>Another Snow Shot instance owns the MCP endpoint</translation>
-+        </message>
-+        <message>
-+            <source>Could not open the local MCP endpoint</source>
-+            <translation>Could not open the local MCP endpoint</translation>
-+        </message>
-+        <message>
-+            <source>Could not secure the MCP runtime directory</source>
-+            <translation>Could not secure the MCP runtime directory</translation>
-+        </message>
-+        <message>
-+            <source>Could not write the private MCP descriptor</source>
-+            <translation>Could not write the private MCP descriptor</translation>
-+        </message>
-+        <message>
-+            <source>MCP request failed (%1)</source>
-+            <translation>MCP request failed (%1)</translation>
-+        </message>
-+    </context>
-+    <context>
-+        <name>ScreenshotMcpSession</name>
-         <message>
-             <source>MCP request failed (%1)</source>
-             <translation>MCP request failed (%1)</translation>

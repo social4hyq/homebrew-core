@@ -1,3 +1,12 @@
+OHOS: the editor has a dedicated recognition-result export entry point that
+cannot reuse plain screenshot-save, because an authorized document URI must
+be staged before the UIAbility copies it, and an HTML/Markdown export with a
+companion .txt file needs a second authorization or the companion is
+silently lost. Keeps its own cancellation id, QPointer and generation guards
+against a stale callback writing into a newer request; the nested-callback
+shape is this two-stage transaction's actual implementation, not incidental
+complexity to simplify away.
+
 diff --git a/snow_shot/src/presentation/imageediting/imageeditingexportcontroller.cpp b/snow_shot/src/presentation/imageediting/imageeditingexportcontroller.cpp
 index b03d543..1b7815c 100644
 --- a/snow_shot/src/presentation/imageediting/imageeditingexportcontroller.cpp

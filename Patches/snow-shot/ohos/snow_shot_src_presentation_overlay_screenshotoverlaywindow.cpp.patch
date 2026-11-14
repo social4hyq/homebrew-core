@@ -1,3 +1,9 @@
+OHOS: `Qt::Tool` is mapped by the OHOS QPA plugin to a native child window,
+and updating its window-type at runtime is rejected by this host; use a
+plain `Window` instead while keeping the frameless/always-on-top hints. This
+is a capture-overlay visibility fix, not an added floating-window
+permission.
+
 diff --git a/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp b/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp
 index ea06d01..a27c3c4 100644
 --- a/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp

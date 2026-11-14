@@ -1,3 +1,8 @@
+OHOS: a small private helper that picks the topmost visible window under
+the cursor by native stacking order, excluding the app's own window and
+windows with invalid bounds; `WindowLookupState` distinguishes "hidden" from
+"not queryable". Called directly by livewindownative.cpp above.
+
 diff --git a/snow_shot/src/platform/ohos/livewindowselection_p.h b/snow_shot/src/platform/ohos/livewindowselection_p.h
 new file mode 100644
 index 0000000..96436cc

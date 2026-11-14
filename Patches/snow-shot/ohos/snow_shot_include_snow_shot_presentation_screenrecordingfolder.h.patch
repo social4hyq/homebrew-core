@@ -1,3 +1,7 @@
+OHOS: declares the sandbox fallback-directory search, the nearest-existing
+parent probe, and the real write probe that screenrecordingfolder.cpp
+implements and the recording controller calls before a recording starts.
+
 diff --git a/snow_shot/include/snow_shot/presentation/screenrecordingfolder.h b/snow_shot/include/snow_shot/presentation/screenrecordingfolder.h
 index 137f192..5c51d4d 100644
 --- a/snow_shot/include/snow_shot/presentation/screenrecordingfolder.h

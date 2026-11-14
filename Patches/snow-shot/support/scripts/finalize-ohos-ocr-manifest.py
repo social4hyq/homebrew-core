@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bind the OCR manifest to the final worker bytes after HAP native stripping."""
+"""Bind the OCR manifest to the final runtime bytes after HAP native stripping."""
 import hashlib
 import json
 import os
@@ -12,11 +12,14 @@ def finalize(hap):
     hap = Path(hap)
     manifest_name = 'resources/rawfile/ocr/asset-manifest.json'
     with zipfile.ZipFile(hap) as source:
-        worker = source.read('libs/arm64-v8a/libsnow_ocr_process.so')
+        runtime = source.read('libs/arm64-v8a/libsnow_ocr_inprocess.so')
         manifest = json.loads(source.read(manifest_name))
         descriptor, = manifest['runtime']['files']
-        assert descriptor['name'] == 'libsnow_ocr_process.so'
-        descriptor.update(size=len(worker), sha256=hashlib.sha256(worker).hexdigest())
+        runtime_name = 'libsnow_ocr_inprocess.so'
+        if (descriptor['name'] != runtime_name or
+                manifest['runtime']['executable'] != runtime_name):
+            raise ValueError('OCR manifest does not describe the in-process runtime')
+        descriptor.update(size=len(runtime), sha256=hashlib.sha256(runtime).hexdigest())
         temporary = hap.with_suffix('.finalizing.hap')
         try:
             with zipfile.ZipFile(temporary, 'w') as target:

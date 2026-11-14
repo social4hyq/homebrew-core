@@ -1,3 +1,8 @@
+OHOS: fill in the default display id for "capture the current display"
+requests; native OHOS monitors are named `display:<id>`, and an empty name
+fails to resolve against the capture backend's `enumerate_monitors` naming
+contract.
+
 diff --git a/snow_shot/src/presentation/capture/directcapturecontroller.cpp b/snow_shot/src/presentation/capture/directcapturecontroller.cpp
 index d4daf91..9c7c6a4 100644
 --- a/snow_shot/src/presentation/capture/directcapturecontroller.cpp

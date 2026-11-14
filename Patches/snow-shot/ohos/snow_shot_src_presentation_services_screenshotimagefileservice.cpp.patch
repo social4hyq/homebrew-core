@@ -1,3 +1,8 @@
+OHOS: an authorized document URI must be recognized and have its extension
+applied before `QDir::cleanPath` runs over it, or the path gets mangled;
+filters are narrowed to only the encoders the backend actually supports,
+with a PDF special case kept.
+
 diff --git a/snow_shot/src/presentation/services/screenshotimagefileservice.cpp b/snow_shot/src/presentation/services/screenshotimagefileservice.cpp
 index 2142aa1..08a0be3 100644
 --- a/snow_shot/src/presentation/services/screenshotimagefileservice.cpp

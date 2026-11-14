@@ -1,3 +1,8 @@
+OHOS: the OHOS capture backend itself — monitor ids in `display:<N>` form,
+the native FFI calls, frame reuse and pixel-format conversion, and retry
+handling for both capacity growth and same-capacity geometry changes such as
+rotation.
+
 diff --git a/snow-crates/crates/snow-capture/src/platform/ohos.rs b/snow-crates/crates/snow-capture/src/platform/ohos.rs
 new file mode 100644
 index 0000000..bc91d56

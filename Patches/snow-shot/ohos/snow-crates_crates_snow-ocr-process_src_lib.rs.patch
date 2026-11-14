@@ -1,9 +1,23 @@
-diff --git a/snow-crates/crates/snow-ocr-process/src/lib.rs b/snow-crates/crates/snow-ocr-process/src/lib.rs
+OHOS: implement that C ABI by reusing the existing OCR engine code, since
+the HAP cannot exec the upstream out-of-process OCR worker. Keeps the
+thread-safe engine handle, size/pixel-count validation, and paired
+alloc/free discipline from the out-of-process implementation, and reuses the
+existing JSON result protocol rather than inventing a second one across the
+FFI boundary; includes the existing boundary unit tests.
+
+Drops a Config struct, a TextDetectionProcessing::recognition_width method
+and a worker_event structured-log helper that this in-process bridge copied
+in while adapting from the out-of-process worker: none of the three are ever
+constructed or called anywhere in this file (resize/processing policy is
+passed straight to make_engine_for_models instead), so they were dead code
+rather than behavior this bridge depends on.
+
+diff --git /dev/null b/snow-crates/crates/snow-ocr-process/src/lib.rs
 new file mode 100644
-index 0000000..a1c7933
+index e69de29..3fa69d1 100644
 --- /dev/null
 +++ b/snow-crates/crates/snow-ocr-process/src/lib.rs
-@@ -0,0 +1,370 @@
+@@ -0,0 +1,330 @@
 +//! In-process C ABI for hosts that cannot execute a bundled helper process.
 +//!
 +//! The standalone worker remains the preferred host integration where process
@@ -28,17 +42,6 @@ index 0000000..a1c7933
 +    sync::Mutex,
 +};
 +
-+#[derive(Clone, PartialEq, Eq)]
-+#[allow(dead_code)]
-+struct Config {
-+    detector_resize_policy: DetectorResizePolicy,
-+    text_detection_processing: TextDetectionProcessing,
-+    hardware_acceleration: bool,
-+    detector_model: std::path::PathBuf,
-+    recognizer_model: std::path::PathBuf,
-+    dictionary: std::path::PathBuf,
-+}
-+
 +#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 +enum DetectorResizePolicy {
 +    Max,
@@ -50,35 +53,6 @@ index 0000000..a1c7933
 +    #[default]
 +    AccuracyFirst,
 +    SpeedFirst,
-+}
-+
-+impl TextDetectionProcessing {
-+    fn recognition_width(self) -> usize {
-+        match self {
-+            Self::AccuracyFirst => 320,
-+            Self::SpeedFirst => 48,
-+        }
-+    }
-+}
-+
-+#[allow(dead_code)]
-+fn worker_event(
-+    event: &str,
-+    id: u64,
-+    stage: &str,
-+    backend: &str,
-+    outcome: &str,
-+    elapsed: u128,
-+    message: &str,
-+) {
-+    eprintln!(
-+        "{}",
-+        serde_json::json!({
-+            "event": event, "message": message,
-+            "fields": {"operation": id.to_string(), "stage": stage, "backend": backend,
-+                       "outcome": outcome, "duration_ms": elapsed}
-+        })
-+    );
 +}
 +
 +pub struct OcrHandle(Mutex<Engine>);

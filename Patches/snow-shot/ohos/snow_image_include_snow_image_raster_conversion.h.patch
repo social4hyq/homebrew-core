@@ -1,3 +1,6 @@
+OHOS: same `std::stop_token` gap as codec.h, in the raster-conversion header
+that the shipped image pipeline compiles.
+
 diff --git a/snow_image/include/snow/image/raster_conversion.h b/snow_image/include/snow/image/raster_conversion.h
 index 080215a..243af64 100644
 --- a/snow_image/include/snow/image/raster_conversion.h

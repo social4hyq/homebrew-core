@@ -1,17 +1,20 @@
-diff --git a/snow_shot/src/presentation/services/screenshotmanualsave.cpp b/snow_shot/src/presentation/services/screenshotmanualsave.cpp
-index 64216f8..0fe196a 100644
+OHOS: the native save dialog can still return a document URI that a plain
+`requestSaveToPath` cannot write; keep the staging, queue hand-off,
+cancellation and cleanup this needs. Drop `qInfo` logging of the
+URI/staging state and an unused `QDebug` include; the completion and error
+callbacks are unchanged.
+
 --- a/snow_shot/src/presentation/services/screenshotmanualsave.cpp
 +++ b/snow_shot/src/presentation/services/screenshotmanualsave.cpp
-@@ -4,15 +4,34 @@
+@@ -4,15 +4,33 @@
  #include "snow_shot/presentation/screenshotencodingsettings.h"
  #include "snow_shot/presentation/screenshotexportartifact.h"
  #include "snow_shot/runtime/runtimeactivitytracker.h"
 +#ifdef Q_OS_HARMONY
 +#include "snow_shot/platform/ohos/userfileexportqueue.h"
 +#endif
- 
+
  #include <QCoreApplication>
-+#include <QDebug>
  #include <QEvent>
  #include <QFileDialog>
 +#include <QFile>
@@ -21,7 +24,7 @@ index 64216f8..0fe196a 100644
  #include <QThread>
 +#include <QUuid>
  #include <utility>
- 
+
  namespace {
 +#ifdef Q_OS_HARMONY
 +QString stagedUserFilePath() {
@@ -37,7 +40,7 @@ index 64216f8..0fe196a 100644
  class NativeSaveSession final : public QObject {
    public:
      NativeSaveSession(QObject* lifetime, QWidget* owner,
-@@ -55,6 +74,14 @@ class NativeSaveSession final : public QObject {
+@@ -55,6 +73,14 @@
          m_finished = true;
          if (cancelSource && m_source)
              m_source->cancel();
@@ -52,7 +55,7 @@ index 64216f8..0fe196a 100644
          if (m_dialog) {
              disconnect(m_dialog, nullptr, this, nullptr);
              m_dialog->reject();
-@@ -102,16 +129,71 @@ class NativeSaveSession final : public QObject {
+@@ -102,16 +128,69 @@
          const auto destination =
              screenshotManualSaveDestination(paths.first(), m_dialog->selectedNameFilter());
          m_writing = true;
@@ -60,7 +63,6 @@ index 64216f8..0fe196a 100644
 +        QString outputPath = destination.path;
 +#ifdef Q_OS_HARMONY
 +        pickerUri = snow_shot::platform::ohos::isDocumentViewPickerUri(destination.path);
-+        qInfo() << "SNOW_MANUAL_SAVE_PICKER_URI" << pickerUri;
 +        outputPath = pickerUri ? stagedUserFilePath() : destination.path;
 +        if (outputPath.isEmpty()) {
 +            finish(ScreenshotExportTaskResult::failure(
@@ -87,7 +89,6 @@ index 64216f8..0fe196a 100644
                          return;
 +#ifdef Q_OS_HARMONY
 +                    if (result.succeeded() && pickerUri) {
-+                        qInfo() << "SNOW_MANUAL_SAVE_STAGED" << !result.savedPath.isEmpty();
 +                        const quint64 id =
 +                            snow_shot::platform::ohos::sharedUserFileExportQueue().enqueue(
 +                                result.savedPath, targetUri,
@@ -126,7 +127,7 @@ index 64216f8..0fe196a 100644
                      if (result.succeeded())
                          static_cast<void>(
                              snow_shot::storage::ScreenshotSettings().setLastManualSaveDirectory(
-@@ -130,6 +212,14 @@ class NativeSaveSession final : public QObject {
+@@ -130,6 +209,14 @@
          if (m_finished)
              return;
          m_finished = true;
@@ -141,7 +142,7 @@ index 64216f8..0fe196a 100644
          const auto source = std::move(m_source);
          Q_UNUSED(source);
          auto completion = std::move(m_completion);
-@@ -156,6 +246,10 @@ class NativeSaveSession final : public QObject {
+@@ -156,6 +243,10 @@
      bool m_writing = false;
      bool m_finished = false;
      bool m_cancelling = false;
@@ -151,4 +152,4 @@ index 64216f8..0fe196a 100644
 +#endif
  };
  } // namespace
- 
+

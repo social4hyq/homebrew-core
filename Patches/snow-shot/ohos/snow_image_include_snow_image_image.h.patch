@@ -1,3 +1,7 @@
+OHOS: same `std::stop_token` gap as codec.h — the OHOS SDK's libc++ has no
+C++20 `<stop_token>`, and this header is compiled as part of the shipped
+Snow Shot image pipeline.
+
 diff --git a/snow_image/include/snow/image/image.h b/snow_image/include/snow/image/image.h
 index fa1d15e..c27d568 100644
 --- a/snow_image/include/snow/image/image.h

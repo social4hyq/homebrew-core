@@ -1,3 +1,8 @@
+OHOS: skip creating the platform text renderer for keyboard-overlay preview
+when `show_keyboard` is false, since OHOS has no such renderer; otherwise a
+normal mouse-only preview fails just because keyboard effects were not
+requested. Includes a regression test for the skip.
+
 diff --git a/snow-crates/crates/snow-recording-effects/src/preview.rs b/snow-crates/crates/snow-recording-effects/src/preview.rs
 index 4c02605..69285ee 100644
 --- a/snow-crates/crates/snow-recording-effects/src/preview.rs
