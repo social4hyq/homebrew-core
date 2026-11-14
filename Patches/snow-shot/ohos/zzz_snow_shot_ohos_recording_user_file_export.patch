@@ -3,8 +3,10 @@ notification used by other platforms is never shown on OHOS (the tray is
 intentionally disabled there), so the existing OpenRecording notification
 action is unreachable. Offer the DocumentViewPicker as soon as a recording
 is finalized, except for copy-only finishes, reusing the existing
-RecordingFileExport path. Also offer the picker after trim/recovery exports,
-except when the trim session was a copy.
+RecordingFileExport path. Trim/recovery exports also offer the picker.
+On OHOS, write trim-save output to the app sandbox first: the Qt file
+dialog returns a document URI that QSaveFile cannot write. The sandbox
+destination is chosen at publish time so it cannot collide with staging.
 
 diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
 --- a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
@@ -113,3 +115,42 @@ diff --git a/snow_shot/src/presentation/recording/recordingtrimsession.h b/snow_
      std::function<void(const QString&)> reportError;
      std::function<void(const QString&)> exported;
  
+diff --git a/snow_shot/src/presentation/recording/recordingtrimsession.cpp b/snow_shot/src/presentation/recording/recordingtrimsession.cpp
+--- a/snow_shot/src/presentation/recording/recordingtrimsession.cpp
++++ b/snow_shot/src/presentation/recording/recordingtrimsession.cpp
+@@ -307,6 +307,11 @@
+     m_destination.clear();
+     m_copy = !save;
+     if (save) {
++#ifdef Q_OS_HARMONY
++        // The OHOS QFileDialog returns a document URI that QSaveFile cannot
++        // write. The sandbox destination is chosen at publish time, after the
++        // staging path exists, so the two names cannot collide.
++#else
+         const QString suffix = QFileInfo(m_outputPath).suffix();
+         const QString filter = QStringLiteral("%1 (*.%2)").arg(suffix.toUpper(), suffix);
+         QFileDialog dialog(m_area,
+@@ -328,6 +333,7 @@
+                     "Choose a different file to preserve the original recording")));
+             return;
+         }
++#endif
+     }
+     m_percent = 0;
+     m_phase = Phase::Exporting;
+@@ -368,6 +374,15 @@
+         finishExport(true, {});
+         return;
+     }
++#ifdef Q_OS_HARMONY
++    if (m_destination.isEmpty()) {
++        m_destination = nextOutput(m_outputPath, m_windowNames);
++        if (m_destination.isEmpty()) {
++            finishExport(false, QStringLiteral("No writable recording directory"));
++            return;
++        }
++    }
++#endif
+     const QString from = m_cachePath, to = m_destination;
+     m_publication = std::make_shared<Publication>();
+     m_publishFuture = std::async(
