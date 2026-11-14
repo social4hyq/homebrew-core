@@ -11,8 +11,8 @@ class Multica < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.8.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6bd48fc524cd695a4fe6484f47add7467c813821fc40ed7309b869b3394dc74b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.9.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "01a2a9fefc2937c8e1795683d4810218eb61d41b79943b00b6d6b12a31e41ae7"
   end
 
   depends_on "go" => :build
