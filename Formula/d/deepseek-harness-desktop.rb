@@ -76,6 +76,7 @@ class DeepseekHarnessDesktop < Formula
   end
 
   def install
+    system "sh", "-c", "echo DSH_INSTALL_START; pwd; ls"
     patches = Pathname(__dir__)/"Patches/deepseek-harness-desktop"
     clt = Pathname.new("/opt/electron-ohos-clt")
     odie "deepseek-harness-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES" unless
