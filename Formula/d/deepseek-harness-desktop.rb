@@ -26,7 +26,7 @@ class DeepseekHarnessDesktop < Formula
   # openharmony-sig/electron PC(2in1) prebuilt (CodeHub mirror hosted on this
   # tap's release; redistribution assumed by the tap owner, see ohos-multica).
   resource "electron-ohos" do
-    url "https://github.com/social4hyq/homebrew-core/releases/download/electron-ohos-v34.9.0-20261030.1/v34.9.0-20261030.1-release.zip"
+    url "https://atomgit.com/social4hyq/homebrew-core/releases/download/electron-ohos-v34.9.0-20261030.1/v34.9.0-20261030.1-release.zip"
     sha256 "599e97b3d8b1e5071a2387496104b443e58079a5f5c165b0114e65ffc601df3a"
   end
 
@@ -79,6 +79,21 @@ class DeepseekHarnessDesktop < Formula
     rm_r app if app.exist?
     app.mkpath
     %w[lib dsh node_modules package.json icon.png].each { |name| cp_r payload/name, app/name }
+
+    # The template requests 28 permissions, including restricted ones auto
+    # signing cannot grant (READ_PASTEBOARD first -> install fails 9568289).
+    # Keep the minimal pair the HAP actually needs.
+    permissions_json = shell/"web_engine/src/main/module.json5"
+    text = permissions_json.read
+    trimmed = text.sub(/"requestPermissions":\s*\[.*?\],/m, <<~PERMS)
+      "requestPermissions": [
+        { "name": "ohos.permission.INTERNET" },
+        { "name": "ohos.permission.GET_NETWORK_INFO" }
+      ],
+    PERMS
+    raise "permission trim failed (template changed?)" if trimmed == text
+
+    File.write(permissions_json.to_s, trimmed)
 
     clt = Pathname.new("/opt/electron-ohos-clt")
     odie "deepseek-harness-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES" unless
@@ -164,6 +179,8 @@ class DeepseekHarnessDesktop < Formula
     assert_match "resources/resfile/resources/app/dsh/node_modules/@deepseek-ai/dsh-web-frontend/dist", listing
     profile = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     assert_equal "com.social4hyq.deepseekharness", profile.fetch("app").fetch("bundleName")
+    permissions = profile.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }
+    assert_equal ["ohos.permission.INTERNET", "ohos.permission.GET_NETWORK_INFO"], permissions
     package_json = "resources/resfile/resources/app/package.json"
     package = JSON.parse(shell_output("unzip -p #{hap} #{package_json}"))
     assert_equal version.to_s, package.fetch("version")
