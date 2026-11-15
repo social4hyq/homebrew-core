@@ -91,8 +91,10 @@ class DeepseekHarnessDesktop < Formula
     Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd shell do
-      system "node", clt/"ohpm/bin/pm-cli.js", "install"
-      system "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
+      # Bounded so a stalled proxy surfaces at the right step instead of
+      # silently eating the job budget.
+      system "timeout", "900", "node", clt/"ohpm/bin/pm-cli.js", "install"
+      system "timeout", "1800", "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
              "--mode", "module", "-p", "product=default", "--no-daemon"
     end
 
