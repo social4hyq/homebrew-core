@@ -18,9 +18,9 @@ class ObsidianDesktop < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "6f77a1aef78b349bfa1c998bdee1e12958c0bff7ad4986885f197e5816cf5dff"
   end
 
-  depends_on "node"
   depends_on "curl"
   depends_on "hap-installer"
+  depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "zip"
 
