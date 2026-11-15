@@ -7,7 +7,8 @@ name: automerge-autobump
 # approval/label/mergeable state machine; this only ever looks at
 # bot-authored bump PRs, so the gate is just "both labels present and the
 # head branch matches the same allowlist autobump.yml uses" (keep the
-# BUMP_BRANCH_RE prefixes in sync with autobump.yml's ALLOWLIST — branch
+# BUMP_BRANCH_RE prefixes in sync with autobump.yml's ALLOWLIST, minus the
+# formulae named in BUMP_MANUAL_RE, which a person merges — branch
 # names are `bump-<formula>-<version>`, matched by prefix since formula/
 # version can both contain '-').
 #
@@ -93,12 +94,24 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           # Keep in sync with autobump.yml's ALLOWLIST (claude-code /
-          # claude-code.latest / zcode / vite-plus / magpie / multica, see the note there)
+          # claude-code.latest / zcode / vite-plus / magpie / multica, see the note there),
+          # except multica-desktop: autobump opens its bump PR, but it carries
+          # OHOS patches that a bump can apply with fuzz and still pass CI, so a
+          # person reviews and merges it. It is not in ALLOWLIST below. Because
+          # BUMP_BRANCH_RE matches by prefix and bump-multica-desktop-<version>
+          # starts with bump-multica-, it is also named in BUMP_MANUAL_RE, which
+          # wins over the allowlist. Its pr-validate run therefore stays parked
+          # action_required until someone approves it by hand.
           ALLOWLIST="claude-code claude-code.latest zcode vite-plus magpie multica"
           BUMP_BRANCH_RE="^bump-($(echo "$ALLOWLIST" | tr ' ' '|'))-"
+          BUMP_MANUAL_RE="^bump-(multica-desktop)-"
 
           merge_pr() {
             local ref="$1" PR LABELS
+            if grep -qE "$BUMP_MANUAL_RE" <<< "$ref"; then
+              echo "head branch $ref is a bump a person merges, skipping"
+              return 0
+            fi
             if ! grep -qE "$BUMP_BRANCH_RE" <<< "$ref"; then
               echo "head branch $ref not in the autobump allowlist, skipping"
               return 0
@@ -137,7 +150,8 @@ jobs:
             # its own since GitHub's hardening). Approving unblocks the
             # pipeline NOW; the enqueued --auto merge above fires as soon as
             # the run's required `label` job reports green.
-            # Branch filter is the SAME BUMP_BRANCH_RE allowlist as merge_pr:
+            # Branch filter is the SAME BUMP_BRANCH_RE allowlist as merge_pr,
+            # minus BUMP_MANUAL_RE (a person approves those runs):
             # stale action_required runs on human branches (add-uv-formula,
             # etc.) must stay parked — those are human review decisions.
             # label-formula-prs runs park the same way on bot PRs; approving
@@ -145,7 +159,7 @@ jobs:
             for wf in pr-validate.yml label-formula-prs.yml; do
               gh run list --repo "$REPO" --workflow "$wf" \
                 --status action_required --json databaseId,headBranch \
-                --jq '.[] | select(.headBranch | test("'"$BUMP_BRANCH_RE"'")) | .databaseId' |
+                --jq '.[] | select(.headBranch | test("'"$BUMP_BRANCH_RE"'")) | select(.headBranch | test("'"$BUMP_MANUAL_RE"'") | not) | .databaseId' |
                 while read -r run_id; do
                   [ -n "$run_id" ] || continue
                   echo "approving action_required $wf run $run_id"
