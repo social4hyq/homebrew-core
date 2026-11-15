@@ -6,7 +6,7 @@ class OpencodeDesktop < Formula
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
-  revision 2
+  revision 3
 
   livecheck do
     skip "Tap-hosted payload, versioned with the formula"
@@ -72,8 +72,8 @@ class OpencodeDesktop < Formula
               "    \"mainElement\": \"EntryAbility\",\n    \"extractNativeLibs\": true,\n"
 
     # Restricted permissions (pasteboard, location, ...) cannot be granted with
-    # local auto-signing; the shell only needs loopback HTTP (same trim as the
-    # ohos-multica probe proved installable).
+    # local auto-signing; the shell only needs loopback HTTP, and this trim
+    # installs under local auto-signing.
     inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\n    \],/m,
               <<~JSON5.chomp
                 "requestPermissions": [
@@ -86,9 +86,8 @@ class OpencodeDesktop < Formula
     # generic Electron-on-OHOS build image, selected via the
     # OHOS_CI_IMAGE_OVERRIDES repo variable), which bakes the HarmonyOS
     # command-line toolchain at /opt/electron-ohos-clt — repacked from a
-    # licensed system CLT install, not publicly redistributable (see the
-    # ohos-multica project). The shell compiles no C++, so the NDK-less SDK
-    # subset the image carries suffices.
+    # licensed system CLT install, not publicly redistributable. The shell
+    # compiles no C++, so the NDK-less SDK subset the image carries suffices.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "opencode-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['opencode-desktop']"
