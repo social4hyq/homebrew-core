@@ -6,7 +6,7 @@ class OpencodeDesktop < Formula
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
-  revision 2
+  revision 3
 
   livecheck do
     skip "Tap-hosted payload, versioned with the formula"
@@ -18,7 +18,9 @@ class OpencodeDesktop < Formula
   end
 
   depends_on "node" => :build
+  depends_on "curl"
   depends_on "hap-installer"
+  depends_on "ohos-sdk-toolchains"
   depends_on "opencode"
   depends_on "zip"
 
@@ -136,9 +138,10 @@ class OpencodeDesktop < Formula
       and launch.
 
       The shell displays the UI served by a local `opencode serve` instance
-      managed by the `opencode-desktop` command. Before launching the app,
-      run `opencode-desktop serve` (add it to your shell startup to keep the
-      backend running). Sessions are shared with the opencode TUI.
+      managed by the `opencode-desktop` command. Run `opencode-desktop start`
+      to ensure the backend and open the app, or add
+      `opencode-desktop start --serve-only` to your shell startup files to
+      keep the backend running. Sessions are shared with the opencode TUI.
     EOS
   end
 
@@ -152,25 +155,47 @@ class OpencodeDesktop < Formula
     assert_match "stopped", shell_output("#{bin}/opencode-desktop stop")
 
     # Install path: config injection is exercised with a fake hap-installer.
+    # The installer copies the injected HAP out of the script's mktemp
+    # staging dir before it disappears with the script's exit trap.
     fake_bin = testpath/"bin"
     fake_bin.mkpath
     installer_args = testpath/"hap-installer-args"
+    injected_copy = testpath/"injected.hap"
     fake_installer = fake_bin/"hap-installer"
     fake_installer.write <<~SH
       #!/bin/sh
       printf '%s\n' "$@" > #{installer_args}
+      while [ $# -gt 0 ]; do
+        if [ "$1" = "--hap" ]; then cp "$2" #{injected_copy}; fi
+        shift
+      done
     SH
     chmod 0755, fake_installer
     ENV.prepend_path "PATH", fake_bin
-    shell_output("#{bin}/opencode-desktop install")
+    # `install` brings the backend up first so the app opens straight into
+    # the UI instead of the waiting page.
+    assert_match "serving at", shell_output("#{bin}/opencode-desktop install")
     args = installer_args.read.lines(chomp: true)
-    injected = args[args.index("--hap") + 1]
     assert_equal "com.social4hyq.opencodedesktop", args[args.index("--bundle-id") + 1]
     assert_equal "electron", args[args.index("--module") + 1]
     assert_equal "EntryAbility", args[args.index("--ability") + 1]
-    config = JSON.parse(shell_output("unzip -p #{injected} resources/resfile/resources/app/config.json"))
+    config = JSON.parse(shell_output("unzip -p #{injected_copy} resources/resfile/resources/app/config.json"))
     assert_operator config.fetch("port"), :>, 0
     refute_empty config.fetch("password")
+
+    # `start` opens the app through hdc once the backend is healthy.
+    hdc_args = testpath/"hdc-args"
+    fake_hdc = fake_bin/"hdc"
+    fake_hdc.write <<~SH
+      #!/bin/sh
+      printf '%s\n' "$@" > #{hdc_args}
+    SH
+    chmod 0755, fake_hdc
+    assert_match "already healthy", shell_output("#{bin}/opencode-desktop start --serve-only")
+    assert_match "opened", shell_output("#{bin}/opencode-desktop start")
+    assert_equal %w[shell aa start -a EntryAbility -b com.social4hyq.opencodedesktop -m electron],
+                 hdc_args.read.lines(chomp: true)
+    assert_match "stopped", shell_output("#{bin}/opencode-desktop stop")
 
     hap = libexec/"opencode-desktop-unsigned.hap"
     assert_path_exists hap
