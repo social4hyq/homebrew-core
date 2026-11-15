@@ -1,19 +1,14 @@
 class OpencodeDesktop < Formula
   desc "Desktop shell for the OpenCode agent (Electron window on local opencode serve)"
   homepage "https://opencode.ai"
-  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.4/opencode-desktop-0.1.4.tar.gz"
-  sha256 "2da2025aa027c37588e791b60e6841d6f3e68a5303781342a01d55651da6d4d8"
+  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.6/opencode-desktop-0.1.6.tar.gz"
+  sha256 "95980448aaf559c07a3758622a4c934f8a7b3842042a3eacf2490d80be9247e6"
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
 
   livecheck do
     skip "Tap-hosted payload, versioned with the formula"
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.4-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "52f6a71531b8e60af10ec0ebb20d084e49b1c753011e590b83d667cd7ce2960d"
   end
 
   depends_on "node" => :build
@@ -141,6 +136,8 @@ class OpencodeDesktop < Formula
       OPENCODE_DESKTOP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
       OPENCODE_DESKTOP_MODULE_ACL:     pkgshare/"module-acl.json",
       OPENCODE_DESKTOP_OPENCODE_BIN:   formula_opt_bin("opencode")/"opencode",
+      OPENCODE_DESKTOP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
+      OPENCODE_DESKTOP_NODE_DEFAULT:   formula_opt_bin("node")/"node",
       PATH:                            "#{formula_opt_bin("opencode")}:$PATH"
   end
 
@@ -155,9 +152,11 @@ class OpencodeDesktop < Formula
       shares the sessions of the opencode TUI. This needs the weak-sandbox
       permissions CUSTOM_SANDBOX and READ_WRITE_USER_FILE, which are granted
       through a debug profile generated on the spot (no approval wait; the
-      release path still goes through AGC review). When the system command
-      line toolchain is missing, install falls back to the strong-sandbox HAP
-      and the shell then waits for `opencode-desktop serve`.
+      release path still goes through AGC review). The signing toolchain is
+      assembled from this formula's node and ohos-sdk-toolchains dependencies
+      (keg-only, addressed by absolute paths), so no system CLT is needed.
+      `--no-acl` installs the strong-sandbox HAP instead; the shell then waits
+      for `opencode-desktop serve`.
     EOS
   end
 
@@ -229,6 +228,7 @@ class OpencodeDesktop < Formula
 
     ENV.prepend_path "PATH", fake_bin
     ENV.prepend_path "PATH", formula_opt_bin("node").to_s
+    ENV["OPENCODE_DESKTOP_HDC"] = (fake_bin/"hdc").to_s
     ENV["OPENCODE_DESKTOP_CLT_CACHE"] = clt_cache.to_s
 
     assert_match "installed and started", shell_output("#{bin}/opencode-desktop install")
