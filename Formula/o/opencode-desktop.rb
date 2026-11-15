@@ -1,19 +1,14 @@
 class OpencodeDesktop < Formula
   desc "Desktop shell for the OpenCode agent (Electron window on local opencode serve)"
   homepage "https://opencode.ai"
-  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.7/opencode-desktop-0.1.7.tar.gz"
-  sha256 "5ddd4e7dda50fb25ec54debad482121ac81b2bcb1af93d484d554ce6a2d0f708"
+  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.8/opencode-desktop-0.1.8.tar.gz"
+  sha256 "787976d4c132d649bb8dbcf3bb9261ca106b0163541d5e7d3ca4020bdd550f49"
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
 
   livecheck do
     skip "Tap-hosted payload, versioned with the formula"
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.7-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "295efc4bdf1c37ba0ed481556ad7265f7780bfa0a950991dcfb507ea0091793f"
   end
 
   depends_on "node" => :build
