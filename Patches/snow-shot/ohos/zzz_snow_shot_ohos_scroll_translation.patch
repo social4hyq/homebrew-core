@@ -3,9 +3,7 @@ OHOS package did not define the free-translation endpoint, so the built-in
 "Free translation" model had an empty base URL. Provide the same public
 endpoints as the desktop presets. For scrolling screenshots, inject the
 wheel step through OH_Input_InjectMouseEventGlobal and request the
-user-authorized injection permission on the first step. Hide the main
-window while freezing a selection capture so the app's own non-scrollable
-settings UI cannot become the scrolling target.
+user-authorized injection permission on the first step.
 
 diff --git a/snow_shot/include/snow_shot/platform/screenshotnative.h b/snow_shot/include/snow_shot/platform/screenshotnative.h
 --- a/snow_shot/include/snow_shot/platform/screenshotnative.h
@@ -22,47 +20,6 @@ diff --git a/snow_shot/include/snow_shot/platform/screenshotnative.h b/snow_shot
  #else
  inline bool screenshotScrollPermission() {
      return true;
-diff --git a/snow_shot/src/app/applicationcontroller.cpp b/snow_shot/src/app/applicationcontroller.cpp
---- a/snow_shot/src/app/applicationcontroller.cpp
-+++ b/snow_shot/src/app/applicationcontroller.cpp
-@@ -1622,6 +1622,27 @@
-             QObject::connect(screenshotController.get(),
-                              &ScreenshotController::captureActivityChanged, &floatingToolbar,
-                              &presentation::FloatingToolbarController::setCaptureActive);
-+#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
-+            // A normal OHOS HAP has no tray, so the main window is the only app
-+            // surface the user can leave open. Hide it while a selection capture
-+            // is being frozen; otherwise the frozen frame (and a scrolling
-+            // capture of it) contains Snow Shot's own non-scrollable settings UI.
-+            QObject::connect(
-+                screenshotController.get(), &ScreenshotController::captureActivityChanged, &q,
-+                [this](const QString& source, bool active) {
-+                    if (source != QStringLiteral("selection"))
-+                        return;
-+                    if (active) {
-+                        mainWindowVisibleBeforeCapture =
-+                            mainWindow != nullptr && mainWindow->isVisible();
-+                        if (mainWindowVisibleBeforeCapture)
-+                            mainWindow->hide();
-+                    } else if (mainWindowVisibleBeforeCapture) {
-+                        mainWindowVisibleBeforeCapture = false;
-+                        showMainWindow();
-+                    }
-+                });
-+#endif
- #ifdef Q_OS_MACOS
-             screenshotController->setRecordingPermissionCheck([this](bool microphone, bool input,
-                                                                      bool notify) {
-@@ -2367,6 +2388,9 @@
-         selectedTextTranslationCoordinator;
- #endif
-     QPointer<MainWindow> mainWindow;
-+#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
-+    bool mainWindowVisibleBeforeCapture = false;
-+#endif
- #ifdef Q_OS_MACOS
-     std::unique_ptr<platform::macos::ApplicationReopenHandler> reopenHandler;
- #endif
 diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
 --- a/snow_shot/CMakeLists.txt
 +++ b/snow_shot/CMakeLists.txt
