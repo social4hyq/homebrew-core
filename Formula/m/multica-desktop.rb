@@ -135,8 +135,9 @@ class MulticaDesktop < Formula
     # licensed system CLT install, not publicly redistributable. The shell
     # compiles no C++, so the NDK-less SDK subset the image carries suffices.
     clt = Pathname.new("/opt/electron-ohos-clt")
-    odie "multica builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['multica']" unless
-      (clt/"hvigor/bin/hvigorw.js").exist?
+    unless (clt/"hvigor/bin/hvigorw.js").exist?
+      odie "multica-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['multica-desktop']"
+    end
 
     # brew's sanitized build env drops the container's LD_LIBRARY_PATH, but
     # ohos_packing_tool needs the SDK clang runtimes and the libhilog
@@ -164,7 +165,7 @@ class MulticaDesktop < Formula
                     "multica-desktop-unsigned.hap"
 
     # The default HAP requests only what local automatic signing can grant.
-    # `multica install-desktop --acl-profile` swaps in this variant, which also
+    # `multica-desktop install --acl-profile` swaps in this variant, which also
     # requests the two ACL-gated permissions, for devices whose signing profile
     # carries those ACLs.
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"multica-desktop-unsigned.hap", "module.json")
