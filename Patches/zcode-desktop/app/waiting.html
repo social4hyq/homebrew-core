@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ZCode</title>
+    <style>
+      :root { color-scheme: dark; }
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: flex; align-items: center; justify-content: center;
+        background: #161616; color: #e6e6e6;
+        font: 14px/1.6 system-ui, -apple-system, "HarmonyOS Sans SC", sans-serif;
+      }
+      main { max-width: 560px; padding: 32px; }
+      h1 { margin: 0 0 8px; font-size: 20px; font-weight: 600; }
+      p { margin: 0 0 12px; color: #a8a8a8; }
+      code {
+        display: inline-block; padding: 2px 6px; border-radius: 4px;
+        background: #242424; color: #e6e6e6; font-family: ui-monospace, Menlo, monospace;
+      }
+      .state { display: none; }
+      .state.active { display: block; }
+      .dot {
+        display: inline-block; width: 8px; height: 8px; margin-right: 8px;
+        border-radius: 50%; background: #f5a623; animation: pulse 1.6s ease-in-out infinite;
+      }
+      @keyframes pulse { 0%, 100% { opacity: .35 } 50% { opacity: 1 } }
+      .meta { margin-top: 20px; color: #6f6f6f; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>ZCode</h1>
+
+      <section class="state" id="waiting">
+        <p><span class="dot"></span>正在等待本机的 ZCode 服务…</p>
+        <p>桌面壳会连接到宿主上的 <code>zcode --web</code>。若长时间停留在这里，请在终端执行：</p>
+        <p><code>zcode-desktop serve</code></p>
+      </section>
+
+      <section class="state" id="not-configured">
+        <p>这个应用还没有配置连接参数。</p>
+        <p>请在终端执行 <code>zcode-desktop install</code> 重新注入配置并安装。</p>
+      </section>
+
+      <div class="meta" id="meta"></div>
+    </main>
+    <script>
+      const params = new URLSearchParams(location.search);
+      const state = params.get('state') || 'waiting';
+      const origin = params.get('origin') || '';
+      const workspace = params.get('workspace') || '';
+      document.getElementById('waiting').classList.toggle('active', state === 'waiting');
+      document.getElementById('not-configured').classList.toggle('active', state === 'not-configured');
+      const parts = [];
+      if (origin) parts.push('服务：' + origin);
+      if (workspace) parts.push('项目：' + workspace);
+      document.getElementById('meta').textContent = parts.join(' · ');
+    </script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "name": "zcode-desktop-shell",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ZCode desktop shell for OpenHarmony (loads a local zcode --web instance)",
+  "main": "main.cjs"
+}
