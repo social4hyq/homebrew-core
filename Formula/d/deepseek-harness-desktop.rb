@@ -66,12 +66,12 @@ class DeepseekHarnessDesktop < Formula
       manifest["string"].each do |entry|
         entry["value"] = "DeepSeek Harness" if label_keys.include?(entry["name"])
       end
-      path.write JSON.pretty_generate(manifest)
+      File.write(path.to_s, JSON.pretty_generate(manifest))
     end
     app_scope = shell/"AppScope/resources/base/element/string.json"
     scope = JSON.parse(app_scope.read)
     scope["string"].each { |entry| entry["value"] = "DeepSeek Harness" if entry["name"] == "app_name" }
-    app_scope.write JSON.pretty_generate(scope)
+    File.write(app_scope.to_s, JSON.pretty_generate(scope))
 
     # Prebuilt shell payload (Electron main bundle, renderer dist, dependency
     # closure) replaces the shell project's app resources.
