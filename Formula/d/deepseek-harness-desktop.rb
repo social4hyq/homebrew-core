@@ -1,25 +1,27 @@
 class DeepseekHarnessDesktop < Formula
   desc "Agent desktop shell with a host-side runtime bridge for OpenHarmony"
   homepage "https://github.com/deepseek-ai/deepseek-harness"
-  url "https://github.com/deepseek-ai/deepseek-harness/archive/39163dd30f703a79079e2d2446545cff3c453738.tar.gz"
+  url "https://github.com/social4hyq/homebrew-core/releases/download/deepseek-harness-desktop-v0.2.2-rc.3/dsh-desktop-shell-0.2.2-rc.3.tar.gz"
   version "0.2.2-rc.3"
-  sha256 "f77ad662bf7d6875f01e34f69c9e1c5f4f306a4dd5265e663c2093fdf9957cc0"
+  sha256 "88258f42185620890d067cce6b4eb48b759138b4370d5f76388700e2ad22b480"
   license "MIT"
 
   livecheck do
-    url :stable
-    regex(/^dsh-v?(\d+(?:\.\d+)+(?:-rc\.\d+)?)$/i)
-    strategy :github_latest
+    skip "Tap-hosted payload, versioned with the formula"
   end
 
-  depends_on "cmake" => :build
-  depends_on "git" => :build
-  depends_on "node" => :build
-  depends_on "node@24" => :build
-  depends_on "ohos-selfsign" => :build
-  depends_on "pnpm" => :build
   depends_on "hap-installer"
   depends_on "ripgrep"
+  depends_on "zip"
+
+  # Host-side dsh runtime tree: desktop-host plus its full production closure,
+  # built from the pinned upstream commit with the OHOS patch set (koffi and
+  # node-addon-require-builtin from source, sharp wasm32 fallback, signed
+  # .node files, payload Node 24.22.3). See ohos-dsh-desktop/patches.
+  resource "runtime" do
+    url "https://github.com/social4hyq/homebrew-core/releases/download/deepseek-harness-desktop-v0.2.2-rc.3/dsh-desktop-runtime-0.2.2-rc.3.tar.gz"
+    sha256 "3ed036a5ca5babfc22c2c0c42350dee97eb3d5cd0eea28605264cbfcd6fafd1f"
+  end
 
   # openharmony-sig/electron PC(2in1) prebuilt (CodeHub mirror hosted on this
   # tap's release; redistribution assumed by the tap owner, see ohos-multica).
@@ -28,159 +30,9 @@ class DeepseekHarnessDesktop < Formula
     sha256 "599e97b3d8b1e5071a2387496104b443e58079a5f5c165b0114e65ffc601df3a"
   end
 
-  # DeepSeek's runtime-internals addon (HMR/app-boot). npm has no openharmony
-  # variant; the NAPI v9 addon builds from source with the tree's own gyp file.
-  resource "require-builtin" do
-    url "https://github.com/deepseek-ai/dsh-node-addon-require-builtin/archive/a58d3599a2e551d7d706d1ff796c9fd4bbaff63c.tar.gz"
-    sha256 "286616f15e4f12013988e45ad27a69b4968a9f059c8bd351e412505230577948"
-  end
-
-  # sharp's wasm fallback and its two runtime dependencies (no OHOS prebuilts).
-  resource "sharp-wasm32" do
-    url "https://registry.npmjs.org/@img/sharp-wasm32/-/sharp-wasm32-0.35.5.tgz"
-    sha256 "c68abdf53e1ad2d7b27b53385a3862e16d4bde02ce6d121892ee36f0bfe5bb38"
-  end
-
-  resource "emnapi-runtime" do
-    url "https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.11.3.tgz"
-    sha256 "e6eb8913a08b551436d65f9a5cfbdcc8006f58e6798226d24e695c25679b5e49"
-  end
-
-  resource "tslib" do
-    url "https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz"
-    sha256 "66f635d5eeabae44807534976913a102cf615b9a045368359c9f79ae6ee2119e"
-  end
-
-  patch :p1 do
-    file "Patches/deepseek-harness-desktop/0001-pnpm-workspace-ohos.patch"
-  end
-
-  patch :p1 do
-    file "Patches/deepseek-harness-desktop/0002-desktop-ohos-target.patch"
-  end
-
-  patch :p1 do
-    file "Patches/deepseek-harness-desktop/0003-primary-runtime-ohos.patch"
-  end
-
-  patch :p1 do
-    file "Patches/deepseek-harness-desktop/0004-runtime-assembly-ohos.patch"
-  end
-
-  patch :p1 do
-    file "Patches/deepseek-harness-desktop/0005-shell-ohos.patch"
-  end
-
-  patch :p1 do
-    file "Patches/deepseek-harness-desktop/0006-core-runtime-ohos.patch"
-  end
-
   def install
-    system "sh", "-c", "echo DSH_INSTALL_START; pwd; ls"
     patches = Pathname(__dir__)/"Patches/deepseek-harness-desktop"
-    clt = Pathname.new("/opt/electron-ohos-clt")
-    odie "deepseek-harness-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES" unless
-      (clt/"hvigor/bin/hvigorw.js").exist?
 
-    target = "apps/desktop/.desktop-build/targets/openharmony-arm64"
-
-    ENV["ELECTRON_SKIP_BINARY_DOWNLOAD"] = "1"
-    ENV["CI"] = "true"
-    ENV["DSH_DESKTOP_TARGET_PLATFORM"] = "openharmony"
-    ENV["DSH_SIGN_TOOL"] = (formula_opt_bin("ohos-selfsign")/"selfsign").to_s
-    ENV["DSH_SIGN_TOOL_MODE"] = "inplace"
-    node24 = (formula_opt_bin("node@24")/"node").to_s
-    ENV["DSH_OHOS_NODE_BINARY"] = node24
-
-    # CI network is a flaky proxy: bound fetch stalls and retry instead of
-    # letting one hung connection eat the whole job budget.
-    ENV["npm_config_fetch_retries"] = "10"
-    ENV["npm_config_fetch_timeout"] = "300000"
-    ENV["npm_config_network_concurrency"] = "8"
-    system "timeout", "2700", "pnpm", "install", "--frozen-lockfile", "--reporter=append-only"
-
-    # Complete-build record for the client artifacts (pack-local-packages
-    # insists on a full build's public environment; profile "local").
-    system "pnpm", "exec", "tsx", "-e", <<~JS
-      import { writeClientBuildRecord, repositoryClientBuildEnvironment, resolveClientBuildEnvironment } from "./scripts/client-build-environment.ts"
-      const env = resolveClientBuildEnvironment(repositoryClientBuildEnvironment(process.cwd(), process.env), "local")
-      writeClientBuildRecord(process.cwd(), env)
-    JS
-
-    system "pnpm", "run", "build:lib:host"
-    system "pnpm", "run", "build:lib:client"
-    system "pnpm", "run", "build:web"
-
-    # Runtime package set: every workspace package plus the private Host entry.
-    build = buildpath/target
-    system "pnpm", "exec", "tsx", "apps/desktop/scripts/pack-local-packages.ts", "--out", build/"packed/dsh"
-    system "pnpm", "--dir", "apps/desktop-host", "pack", "--pack-destination", build/"packed/dsh"
-    system "pnpm", "run", "release:pack", "--family", "vendor", "--out", build/"packed/vendor"
-    (build/"packed/landlock").mkpath
-    system "pnpm", "--dir", "native/system", "run", "build:ts"
-    system "pnpm", "--dir", "native/system/packages/entry", "pack",
-           "--pack-destination", build/"packed/landlock"
-
-    # OHOS-native packages injected into the runtime tree (loader resolves
-    # "<name>-openharmony-arm64" first, then their local build paths).
-    natives = buildpath/"ohos-native"
-    natives.mkpath
-    resource("require-builtin").stage do
-      require_builtin = natives/"node-addon-require-builtin-openharmony-arm64"
-      (require_builtin/"lib").mkpath
-      (require_builtin/"index.js").write <<~JS
-        'use strict';
-        const { loadPrebuild } = require('node-addon-native-custom-loader');
-        module.exports = loadPrebuild(__dirname);
-      JS
-      (require_builtin/"package.json").write <<~JSON
-        {
-          "name": "node-addon-require-builtin-openharmony-arm64",
-          "version": "0.1.9",
-          "main": "./index.js",
-          "os": ["openharmony"],
-          "cpu": ["arm64"],
-          "engines": { "node": ">=20" },
-          "files": ["index.js", "prebuilds.json", "prebuilt/"],
-          "dependencies": { "node-addon-native-custom-loader": "0.1.9" },
-          "license": "MIT"
-        }
-      JSON
-      (require_builtin/"prebuilds.json").write <<~JSON
-        {
-          "platform": "openharmony-arm64",
-          "binaries": [
-            { "backend": "napi", "abi": "napi-v9", "binaryTag": "napi-v9", "node": ">=20",
-              "path": "prebuilt/openharmony-arm64-napi-v9.node" }
-          ]
-        }
-      JSON
-      # node-addon-api for the gyp include path (isolated install, not the tree's).
-      system "npm", "install", *std_npm_args(prefix: false), "--no-save", "node-addon-api@8"
-      cd "packages/native" do
-        system "npm", "exec", "--yes", "--", "node-gyp@11", "rebuild", "--", "-Dnarb_product=require-builtin"
-        (require_builtin/"prebuilt").mkpath
-        cp "build/Release/require_builtin.node", require_builtin/"prebuilt/openharmony-arm64-napi-v9.node"
-      end
-      loader = Pathname("node_modules/node-addon-native-custom-loader")
-      (require_builtin/"node_modules").mkpath
-      cp_r loader, require_builtin/"node_modules/node-addon-native-custom-loader"
-    end
-    { "sharp-wasm32" => "@img/sharp-wasm32", "emnapi-runtime" => "@emnapi/runtime", "tslib" => "tslib" }
-      .each do |name, package_name|
-      destination = natives/package_name
-      destination.dirname.mkpath
-      resource(name).stage { cp_r ".", destination.to_s }
-    end
-    ENV["DSH_OHOS_NATIVE_PACKAGES"] = [natives/"node-addon-require-builtin-openharmony-arm64",
-                                       natives/"@img/sharp-wasm32", natives/"@emnapi/runtime",
-                                       natives/"tslib"].join(":")
-
-    system "pnpm", "--dir", "apps/desktop", "run", "prepare:runtime"
-    system "pnpm", "--dir", "apps/desktop", "run", "prepare:packages"
-    system "pnpm", "--dir", "apps/desktop", "run", "prepare:dsh", "--", "--defer-runtime-smoke"
-
-    # ----- HAP shell (unsigned; hvigor runs in the private CI image) -----
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath/"electron-prebuilt"
     system "tar", "-xzf", buildpath/"electron-prebuilt/libelectron_132.tar.gz",
@@ -188,7 +40,8 @@ class DeepseekHarnessDesktop < Formula
     shell = buildpath/"electron-prebuilt/libelectron/ohos_hap"
 
     # Branding: upstream icon + product name.
-    icon = buildpath/"apps/desktop/resources/icon-macos.png"
+    icon = buildpath/"app/icon.png"
+    odie "desktop payload carries no app/icon.png" unless icon.exist?
     %w[app_icon.png startIcon.png].each { |name| cp icon, shell/"AppScope/resources/base/media"/name }
     label_keys = %w[EntryAbility_label StatusBarEntryAbility_label]
     %w[base en_US zh_CN].each do |locale|
@@ -204,8 +57,15 @@ class DeepseekHarnessDesktop < Formula
     scope["string"].each { |entry| entry["value"] = "DeepSeek Harness" if entry["name"] == "app_name" }
     app_scope.write JSON.pretty_generate(scope)
 
-    payload = shell/"web_engine/src/main/resources/resfile/resources"
-    system "sh", patches/"assemble-payload.sh", buildpath.to_s, payload.to_s
+    # Prebuilt shell payload (Electron main bundle, renderer dist, dependency
+    # closure) replaces the shell project's app resources.
+    app = shell/"web_engine/src/main/resources/resfile/resources/app"
+    rm_r app if app.exist?
+    cp_r buildpath/"app", app
+
+    clt = Pathname.new("/opt/electron-ohos-clt")
+    odie "deepseek-harness-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES" unless
+      (clt/"hvigor/bin/hvigorw.js").exist?
 
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
@@ -221,21 +81,18 @@ class DeepseekHarnessDesktop < Formula
              "--mode", "module", "-p", "product=default", "--no-daemon"
     end
 
-    # ----- install -----
-    runtime = buildpath/target/"dsh"
-    resources = buildpath/target/"runtime"
-    (libexec/"runtime").mkpath
-    libexec.install runtime => "runtime/dsh"
-    libexec.install resources/"primary-runtime" => "runtime/primary-runtime"
-    libexec.install resources/"bin" => "runtime/bin"
-    libexec.install resources/"versions.json" => "runtime/versions.json"
-    libexec.install resources/"cli" => "runtime/cli"
-    libexec.install "bridge/dsh-desktop-bridge.mjs"
+    # Host-side runtime tree (dsh + primary-runtime + launchers), prebuilt.
+    resource("runtime").stage do
+      (libexec/"runtime").install Dir["runtime/*"]
+    end
+    libexec.install patches/"dsh-desktop-bridge.mjs"
     (libexec/"bridge-wrapper.sh").write((patches/"bridge-wrapper.sh").read)
     chmod 0755, libexec/"bridge-wrapper.sh"
     (bin/"dsh-desktop-bridge").write_env_script libexec/"bridge-wrapper.sh",
-      DSH_DESKTOP_BRIDGE_JS: libexec/"dsh-desktop-bridge.mjs",
-      DSH_BRIDGE_NODE:       libexec/"runtime/primary-runtime/dependencies/node/bin/node"
+      DSH_DESKTOP_BRIDGE_JS:       libexec/"dsh-desktop-bridge.mjs",
+      DSH_BRIDGE_NODE:             libexec/"runtime/primary-runtime/dependencies/node/bin/node",
+      DSH_DESKTOP_RUNTIME_DIR:     libexec/"runtime/dsh",
+      DSH_DESKTOP_PRIMARY_RUNTIME: libexec/"runtime/primary-runtime"
     (pkgshare/"install-desktop.sh").write((patches/"install-desktop.sh").read)
     chmod 0755, pkgshare/"install-desktop.sh"
     (bin/"dsh-install-desktop").write_env_script pkgshare/"install-desktop.sh",
@@ -258,19 +115,19 @@ class DeepseekHarnessDesktop < Formula
   end
 
   test do
-    assert_path_exists libexec/"dsh-desktop-unsigned.hap"
-    (testpath/"home").mkpath
-    ENV["HOME"] = testpath/"home"
-    ENV["DSH_BRIDGE_STATE_DIR"] = testpath/"state"
-    assert_path_exists libexec/"dsh-desktop-bridge.mjs"
-    assert_path_exists libexec/"runtime/primary-runtime/dependencies/node/bin/node"
     assert_path_exists libexec/"runtime/dsh/desktop-runtime.json"
+    assert_path_exists libexec/"runtime/primary-runtime/dependencies/node/bin/node"
+    assert_path_exists libexec/"dsh-desktop-bridge.mjs"
+    assert_path_exists libexec/"dsh-desktop-unsigned.hap"
+    descriptor = JSON.parse((libexec/"runtime/dsh/desktop-runtime.json").read)
+    assert_equal "openharmony", descriptor.fetch("platform")
+    assert_equal version.to_s, descriptor.fetch("release").fetch("version")
     listing = shell_output("unzip -l #{libexec}/dsh-desktop-unsigned.hap")
     assert_match "module.json", listing
     assert_match "resources/resfile/resources/app/lib/main.js", listing
     assert_match "resources/resfile/resources/app/dsh/node_modules/@deepseek-ai/dsh-web-frontend/dist", listing
     package_json = "resources/resfile/resources/app/package.json"
     package = JSON.parse(shell_output("unzip -p #{libexec}/dsh-desktop-unsigned.hap #{package_json}"))
-    assert_equal "0.2.2-rc.3", package.fetch("version")
+    assert_equal version.to_s, package.fetch("version")
   end
 end
