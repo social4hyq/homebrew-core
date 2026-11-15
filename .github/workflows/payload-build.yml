@@ -79,7 +79,7 @@ jobs:
           . out/manifest.env
           tag="deepseek-harness-desktop-v$VERSION"
           if gh release view "$tag" > /dev/null 2>&1; then
-            gh release upload "$tag" "out/$RUNTIME_ASSET" "out/$SHELL_ASSET"
+            gh release upload "$tag" "out/$RUNTIME_ASSET" "out/$SHELL_ASSET" "out/payload-provenance.json"
           else
             gh release create "$tag" \
               --title "deepseek-harness-desktop v$VERSION payloads" \
@@ -89,7 +89,7 @@ jobs:
           - runtime: host-side dsh runtime tree (desktop-host + full production closure)
 
           Built from upstream \`${{ inputs.ref }}\` on the self-hosted runner; the OHOS patch set is under .github/desktop-patches." \
-              "out/$RUNTIME_ASSET" "out/$SHELL_ASSET"
+              "out/$RUNTIME_ASSET" "out/$SHELL_ASSET" "out/payload-provenance.json"
           fi
           {
             echo "### Payload release: $tag"

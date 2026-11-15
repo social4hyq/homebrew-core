@@ -157,6 +157,23 @@ SSHA=$(sha256sum "$WORK/shell.tar.gz" | cut -d' ' -f1)
 mv "$WORK/runtime.tar.gz" "$OUT/dsh-desktop-runtime-$VERSION-${RSHA:0:8}.tar.gz"
 mv "$WORK/shell.tar.gz" "$OUT/dsh-desktop-shell-$VERSION-${SSHA:0:8}.tar.gz"
 
+cat > "$OUT/payload-provenance.json" <<JSON
+{
+  "upstream_ref": "$REF",
+  "version": "$VERSION",
+  "tap_commit": "${GITHUB_SHA:-local}",
+  "patch_set": "$(sha256sum "$TAP"/.github/desktop-patches/000*.patch | sha256sum | cut -d' ' -f1)",
+  "node": "$("$NODE24" --version)",
+  "pnpm": "$(pnpm --version)",
+  "sharp_wasm32": "0.35.5",
+  "emnapi_runtime": "1.11.3",
+  "tslib": "2.8.1",
+  "require_builtin_commit": "$NARB_COMMIT",
+  "shell_sha256": "$SSHA",
+  "runtime_sha256": "$RSHA"
+}
+JSON
+
 {
   echo "VERSION=$VERSION"
   echo "RUNTIME_ASSET=dsh-desktop-runtime-$VERSION-${RSHA:0:8}.tar.gz"

@@ -32,9 +32,9 @@ cp -r welcome "$OUT/app/lib/"
 cd - > /dev/null
 
 # --- 清单（版本与上游 desktop 包一致） ---
-python3 - "$OUT/app/package.json" <<'EOF'
+python3 - "$OUT/app/package.json" "$MONOREPO" <<'EOF'
 import json, sys
-src = json.load(open("/data/storage/el2/base/cache/dsh-desktop-analysis/monorepo/apps/desktop/package.json"))
+src = json.load(open(sys.argv[2] + "/apps/desktop/package.json"))
 out = {
     "name": "@deepseek-ai/dsh-desktop-ohos",
     "version": src["version"],
@@ -44,6 +44,9 @@ out = {
 }
 json.dump(out, open(sys.argv[1], "w"), indent=2)
 EOF
+
+# --- brand icon (the formula brands the HAP from this file) ---
+cp "$MONOREPO/apps/desktop/resources/icon-macos.png" "$OUT/app/icon.png"
 
 # --- runtime descriptor + renderer dist ---
 cp "$RUNTIME_TREE/desktop-runtime.json" "$OUT/app/dsh/"

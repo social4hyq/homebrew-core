@@ -3,7 +3,7 @@ class DeepseekHarnessDesktop < Formula
   homepage "https://github.com/deepseek-ai/deepseek-harness"
   url "https://github.com/social4hyq/homebrew-core/releases/download/deepseek-harness-desktop-v0.2.2-rc.3/dsh-desktop-shell-0.2.2-rc.3-88258f42.tar.gz"
   sha256 "88258f42185620890d067cce6b4eb48b759138b4370d5f76388700e2ad22b480"
-  license "MIT"
+  license :cannot_represent # MIT payload; bundles Electron (BSD-style) and other third-party components
 
   livecheck do
     skip "Tap-hosted payload, versioned with the formula"
@@ -11,7 +11,6 @@ class DeepseekHarnessDesktop < Formula
 
   depends_on "hap-installer"
   depends_on "ripgrep"
-  depends_on "zip"
 
   # Host-side dsh runtime tree: desktop-host plus its full production closure,
   # built from the pinned upstream commit with the OHOS patch set (koffi and
@@ -30,7 +29,9 @@ class DeepseekHarnessDesktop < Formula
   end
 
   def install
-    patches = Pathname(__dir__)/"Patches/deepseek-harness-desktop"
+    # __dir__ 是 Formula/d/；Patches 在 tap 根。MUST use the file ancestry here.
+    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
+    patches = tap_root/"Patches/deepseek-harness-desktop"
 
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath/"electron-prebuilt"
@@ -46,6 +47,15 @@ class DeepseekHarnessDesktop < Formula
     icon = payload/"icon.png"
     odie "desktop payload carries no icon.png" unless icon.exist?
     %w[app_icon.png startIcon.png].each { |name| cp icon, shell/"AppScope/resources/base/media"/name }
+    # Own bundle id: the shared template id collides with every other HAP built
+    # from the same electron-ohos shell project.
+    inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
+                                            '"bundleName": "com.social4hyq.deepseekharness"'
+    inreplace shell/"AppScope/app.json5", '"vendor": "example"', '"vendor": "social4hyq"'
+    if shell/"web_engine/src/main/module.json5".exist?
+      inreplace shell/"web_engine/src/main/module.json5",
+                '"name": "com.huawei.ohos_electron"', '"name": "com.social4hyq.deepseekharness"'
+    end
     label_keys = %w[EntryAbility_label StatusBarEntryAbility_label]
     %w[base en_US zh_CN].each do |locale|
       path = shell/"electron/src/main/resources"/locale/"element/string.json"
@@ -87,20 +97,27 @@ class DeepseekHarnessDesktop < Formula
 
     # Host-side runtime tree (dsh + primary-runtime + launchers), prebuilt.
     resource("runtime").stage do
-      (libexec/"runtime").install Dir["runtime/*"]
+      # Homebrew strips a tarball's single top-level directory; tolerate both.
+      root = Pathname("runtime").directory? ? Pathname("runtime") : Pathname(".")
+      %w[dsh/desktop-runtime.json primary-runtime/dependencies/node/bin/node].each do |probe|
+        raise "runtime payload is missing #{probe}" unless (root/probe).exist?
+      end
+      (libexec/"runtime").install Dir[root/"*"]
     end
     libexec.install patches/"dsh-desktop-bridge.mjs"
     (libexec/"bridge-wrapper.sh").write((patches/"bridge-wrapper.sh").read)
     chmod 0755, libexec/"bridge-wrapper.sh"
-    (bin/"dsh-desktop-bridge").write_env_script libexec/"bridge-wrapper.sh",
-      DSH_DESKTOP_BRIDGE_JS:       libexec/"dsh-desktop-bridge.mjs",
-      DSH_BRIDGE_NODE:             libexec/"runtime/primary-runtime/dependencies/node/bin/node",
-      DSH_DESKTOP_RUNTIME_DIR:     libexec/"runtime/dsh",
-      DSH_DESKTOP_PRIMARY_RUNTIME: libexec/"runtime/primary-runtime"
+    # opt_ paths: a bridge started from an old keg must resolve the currently
+    # linked version after `brew upgrade`.
+    (bin/"dsh-desktop-bridge").write_env_script opt_libexec/"bridge-wrapper.sh",
+      DSH_DESKTOP_BRIDGE_JS:       opt_libexec/"dsh-desktop-bridge.mjs",
+      DSH_BRIDGE_NODE:             opt_libexec/"runtime/primary-runtime/dependencies/node/bin/node",
+      DSH_DESKTOP_RUNTIME_DIR:     opt_libexec/"runtime/dsh",
+      DSH_DESKTOP_PRIMARY_RUNTIME: opt_libexec/"runtime/primary-runtime"
     (pkgshare/"install-desktop.sh").write((patches/"install-desktop.sh").read)
     chmod 0755, pkgshare/"install-desktop.sh"
     (bin/"dsh-install-desktop").write_env_script pkgshare/"install-desktop.sh",
-      DSH_DESKTOP_UNSIGNED_HAP: libexec/"dsh-desktop-unsigned.hap"
+      DSH_DESKTOP_UNSIGNED_HAP: opt_libexec/"dsh-desktop-unsigned.hap"
     libexec.install shell/"electron/build/default/outputs/default/electron-default-unsigned.hap" =>
                      "dsh-desktop-unsigned.hap"
   end
@@ -114,24 +131,51 @@ class DeepseekHarnessDesktop < Formula
         dsh-install-desktop         # sign + install + launch through hap-installer
 
       Signing material stays under your home directory; it is not in the bottle.
+      Note: the bridge listens on 127.0.0.1:3090 without its own authentication;
+      any local process running as this user can start or drive a Harness Host.
+      That is the same privilege boundary as running `dsh` directly.
       Upgrades go through Harmonybrew (`brew upgrade deepseek-harness-desktop`).
     EOS
   end
 
   test do
     assert_path_exists libexec/"runtime/dsh/desktop-runtime.json"
-    assert_path_exists libexec/"runtime/primary-runtime/dependencies/node/bin/node"
+    node = libexec/"runtime/primary-runtime/dependencies/node/bin/node"
+    assert_path_exists node
+    assert_match "v24.", shell_output("#{node} --version")
     assert_path_exists libexec/"dsh-desktop-bridge.mjs"
     assert_path_exists libexec/"dsh-desktop-unsigned.hap"
     descriptor = JSON.parse((libexec/"runtime/dsh/desktop-runtime.json").read)
     assert_equal "openharmony", descriptor.fetch("platform")
     assert_equal version.to_s, descriptor.fetch("release").fetch("version")
-    listing = shell_output("unzip -l #{libexec}/dsh-desktop-unsigned.hap")
+    hap = libexec/"dsh-desktop-unsigned.hap"
+    system "unzip", "-tq", hap
+    listing = shell_output("unzip -l #{hap}")
     assert_match "module.json", listing
     assert_match "resources/resfile/resources/app/lib/main.js", listing
     assert_match "resources/resfile/resources/app/dsh/node_modules/@deepseek-ai/dsh-web-frontend/dist", listing
+    profile = JSON.parse(shell_output("unzip -p #{hap} module.json"))
+    assert_equal "com.social4hyq.deepseekharness", profile.fetch("app").fetch("bundleName")
     package_json = "resources/resfile/resources/app/package.json"
-    package = JSON.parse(shell_output("unzip -p #{libexec}/dsh-desktop-unsigned.hap #{package_json}"))
+    package = JSON.parse(shell_output("unzip -p #{hap} #{package_json}"))
     assert_equal version.to_s, package.fetch("version")
+
+    # The installer must pass the generated HAP and matching identifiers on.
+    fake_bin = testpath/"bin"
+    fake_bin.mkpath
+    args_file = testpath/"hap-installer-args"
+    fake = fake_bin/"hap-installer"
+    fake.write <<~SH
+      #!/bin/sh
+      printf '%s\n' "$@" > #{args_file}
+    SH
+    chmod 0755, fake
+    ENV.prepend_path "PATH", fake_bin
+    ENV["DSH_DESKTOP_UNSIGNED_HAP"] = hap.to_s
+    system pkgshare/"install-desktop.sh"
+    args = args_file.read.lines(chomp: true)
+    assert_equal ["--hap", hap.to_s, "--bundle-id", "com.social4hyq.deepseekharness",
+                  "--app-name", "DeepSeekHarnessSigning", "--module", "electron",
+                  "--ability", "EntryAbility"], args
   end
 end

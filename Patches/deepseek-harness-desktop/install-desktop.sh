@@ -5,7 +5,7 @@ set -eu
 
 HAP="${DSH_DESKTOP_UNSIGNED_HAP:?DSH_DESKTOP_UNSIGNED_HAP is required}"
 exec hap-installer --hap "$HAP" \
-  --bundle-id com.huawei.ohos_electron \
+  --bundle-id com.social4hyq.deepseekharness \
   --app-name DeepSeekHarnessSigning \
   --module electron \
   --ability EntryAbility
