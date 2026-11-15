@@ -25,15 +25,16 @@ class OpencodeDesktop < Formula
 
   # openharmony-sig/electron PC(2in1) prebuilt (CodeHub mirror hosted on this
   # tap's release; redistribution assumed by the tap owner, see multica.rb).
+  # PROBE ONLY: v37.2.1 (Chromium 138) instead of v34.9.0 (Chromium 132).
   resource "electron-ohos" do
-    url "https://github.com/social4hyq/homebrew-core/releases/download/electron-ohos-v34.9.0-20261030.1/v34.9.0-20261030.1-release.zip"
-    sha256 "599e97b3d8b1e5071a2387496104b443e58079a5f5c165b0114e65ffc601df3a"
+    url "https://github.com/social4hyq/homebrew-core/releases/download/electron-ohos-v37.2.1-20260429.5/v37.2.1-openharmony-arm64.zip"
+    sha256 "2a1421f6219ac760092aecb4a82bf5ab49b19918f23edec5a9420d1b41eea9e8"
   end
 
   def install
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
-    system "tar", "-xzf", buildpath/"libelectron_132.tar.gz", "-C", buildpath
+    system "tar", "-xzf", buildpath/"libelectron_138.tar.gz", "-C", buildpath
     shell = buildpath/"libelectron/ohos_hap"
 
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
@@ -68,7 +69,19 @@ class OpencodeDesktop < Formula
     # CI's electron-ohos-ci CLT carries an NDK-less SDK subset (no llvm-strip);
     # mirror the multica packaging deltas that keep hvigor away from the strip
     # task and from signing material the container does not have.
-    inreplace shell/"build-profile.json5", "        \"signingConfig\": \"default\",\n", ""
+    # electron-ohos 37's template embeds a signingConfigs block pointing at the
+    # vendor's own certificate paths; drop it and the product signingConfig so
+    # hvigor produces an unsigned HAP (the installer signs it). The template
+    # also targets 5.0.5(17); pin the version this image is known to build.
+    build_profile = JSON.parse((shell/"build-profile.json5").read)
+    build_profile.fetch("app").fetch("products").each do |product|
+      product.delete("signingConfig")
+      product["compatibleSdkVersion"] = "6.0.0(20)"
+    end
+    build_profile.fetch("app").delete("signingConfigs")
+    profile_file = shell/"build-profile.json5"
+    rm profile_file
+    profile_file.write JSON.pretty_generate(build_profile) + "\n"
     inreplace shell/"electron/src/main/module.json5", "    \"mainElement\": \"EntryAbility\",\n",
               "    \"mainElement\": \"EntryAbility\",\n    \"extractNativeLibs\": true,\n"
 
