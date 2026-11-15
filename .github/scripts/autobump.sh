@@ -442,6 +442,24 @@ for line in "${CANDIDATES[@]}"; do
     continue
   fi
 
+  if [ "$FORMULA" = deepseek-harness-desktop ]; then
+    # brew test requires the shell package version to match the formula.
+    PACKAGE_JSON="$TAP_IN_CONTAINER/Patches/deepseek-harness-desktop/app/package.json"
+    if ! docker exec "$CONTAINER" bash -lc "
+      set -euo pipefail
+      cd \"$TAP_IN_CONTAINER\"
+      git checkout -q \"$BRANCH\"
+      python3 -c 'import json,os,sys; p=sys.argv[1]; d=json.load(open(p)); d[\"version\"]=sys.argv[2]; t=p+\".tmp\"; open(t,\"w\").write(json.dumps(d,indent=2)+\"\\n\"); os.replace(t,p); assert json.load(open(p))[\"version\"] == sys.argv[2]' \"$PACKAGE_JSON\" \"$LATEST\"
+      git add \"$PACKAGE_JSON\"
+      git commit --amend --no-edit
+      git push --force-with-lease origin \"$BRANCH\"
+    "; then
+      echo "::error::$FORMULA: failed to synchronize the shell package version"
+      echo "- ❌ $FORMULA $LATEST: shell version sync failed" >> "$GITHUB_STEP_SUMMARY"
+      continue
+    fi
+  fi
+
   PR_URL=$(gh pr create --repo social4hyq/homebrew-core \
     --head "$BRANCH" --base main \
     --title "$FORMULA $LATEST" \

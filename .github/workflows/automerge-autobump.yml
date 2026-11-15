@@ -105,10 +105,11 @@ jobs:
           # the same manual case, one level earlier: it isn't in ALLOWLIST below,
           # so its bump PR is never auto-approved or auto-merged — brew test
           # installs from a synthetic --asar, so a person runs
-          #  against the real release before merging.
+          #  against the real release before merging. deepseek-harness-desktop
+          # is also manual: its HAP and CLI version pairing need human review.
           ALLOWLIST="claude-code claude-code.latest zcode vite-plus magpie multica"
           BUMP_BRANCH_RE="^bump-($(echo "$ALLOWLIST" | tr ' ' '|'))-"
-          BUMP_MANUAL_RE="^bump-(multica-desktop)-"
+          BUMP_MANUAL_RE="^bump-(multica-desktop|deepseek-harness-desktop)-"
 
           merge_pr() {
             local ref="$1" PR LABELS
