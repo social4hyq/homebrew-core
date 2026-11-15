@@ -4,7 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 10
+  revision 11
 
   livecheck do
     url :stable
@@ -203,10 +203,6 @@ class Multica < Formula
       absolute path: a startup file can run before Homebrew's bin is on PATH,
       where a bare `multica` is not found and the line fails silently.
       `multica desktop stop` stops the bridge and leaves the daemon running.
-
-      The full flow (signing config shape, bridge pairing) is documented in the
-      ohos-multica project: Build Pipeline and Distribution guides at
-      https://github.com/social4hyq/ohos-multica .
     EOS
   end
 
@@ -239,6 +235,9 @@ class Multica < Formula
     assert_match "\"$HOME/.harmonybrew/bin/multica\" desktop start --bridge-only", caveats
     assert_match "before Homebrew's bin is on PATH", caveats
     refute_match "`multica desktop start --bridge-only`", caveats
+    # The caveats must not point at a separate project repository.
+    refute_match "ohos-multica", caveats
+    refute_match "github.com/social4hyq", caveats
     desktop_installer = pkgshare/"install-desktop.sh"
     assert_match "hap-installer", desktop_installer.read
     refute_match "devecocli", desktop_installer.read
