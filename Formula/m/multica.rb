@@ -4,7 +4,7 @@ class Multica < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 11
+  revision 12
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class Multica < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.9.0-r15"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a8e2e162154dc8bc64b037d045e22a0e2c27fcbbaf42fc0c7bba61a0648dc92"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.9.0-r17"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "194d7bf8b8d349b7fd250dc03f26c24775ccf9f45ec54005475809b5799dd96b"
   end
 
   depends_on "go" => :build
@@ -130,9 +130,8 @@ class Multica < Formula
     # generic Electron-on-OHOS build image, selected via the
     # OHOS_CI_IMAGE_OVERRIDES repo variable), which bakes the HarmonyOS
     # command-line toolchain at /opt/electron-ohos-clt — repacked from a
-    # licensed system CLT install, not publicly redistributable (see the
-    # ohos-multica project). The shell compiles no C++, so the NDK-less SDK
-    # subset the image carries suffices.
+    # licensed system CLT install, not publicly redistributable. The shell
+    # compiles no C++, so the NDK-less SDK subset the image carries suffices.
     clt = Pathname.new("/opt/electron-ohos-clt")
     odie "multica builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['multica']" unless
       (clt/"hvigor/bin/hvigorw.js").exist?
