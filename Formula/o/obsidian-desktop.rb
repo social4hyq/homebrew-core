@@ -1,8 +1,8 @@
 class ObsidianDesktop < Formula
   desc "Notes desktop for HarmonyOS PC running the official Obsidian package"
   homepage "https://obsidian.md"
-  url "https://github.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.1/obsidian-desktop-0.1.1.tar.gz"
-  sha256 "213c9d8713e69e32c4b9d77c6251974e6ea23cc241e846e08e5d00c10839de4d"
+  url "https://github.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.2/obsidian-desktop-0.1.2.tar.gz"
+  sha256 "1cb04e8cc316e35e1ff8024dfd8d987d1bcdc52ea811b5d912a3e6a6031bc820"
   # Tap-authored host/scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt. Obsidian itself is proprietary and is never redistributed here:
   # the official Linux arm64 package is fetched on the user's machine at
@@ -13,14 +13,9 @@ class ObsidianDesktop < Formula
     skip "Tap-hosted payload, versioned with the formula"
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fcb374e605d315e21936e188ae8b95fc2a4838a1bf6703584f3d3a9397a4e89c"
-  end
-
-  depends_on "node"
   depends_on "curl"
   depends_on "hap-installer"
+  depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "zip"
 
