@@ -1,19 +1,14 @@
 class OpencodeDesktop < Formula
   desc "Desktop shell for the OpenCode agent (Electron window on local opencode serve)"
   homepage "https://opencode.ai"
-  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.2/opencode-desktop-0.1.2.tar.gz"
-  sha256 "7bb612adc710e0c8d9442f8c3772f1933491ab63ecdcd1fc5c3cb3786449ccf3"
+  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.3/opencode-desktop-0.1.3.tar.gz"
+  sha256 "662d2636c88ec63a105bcce3b044f2c720ef5750ce7d60e431e95badbe328ea1"
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
 
   livecheck do
     skip "Tap-hosted payload, versioned with the formula"
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c92c55536b2bd7c3869d79e7930bb91ada5f7ad3bb108f8a0f0b9722b69df16a"
   end
 
   depends_on "node" => :build
@@ -165,15 +160,11 @@ class OpencodeDesktop < Formula
     ENV["HOME"] = testpath/"home"
     assert_match "Usage: opencode-desktop", shell_output("#{bin}/opencode-desktop --help")
 
-    # Server orchestration against the real opencode binary.
-    assert_match "serving at", shell_output("#{bin}/opencode-desktop serve")
-    assert_match "healthy", shell_output("#{bin}/opencode-desktop status")
-    assert_match "stopped", shell_output("#{bin}/opencode-desktop stop")
-
-    # Install path: config/ACL injection, signing-project patching, signing
-    # and chunked hdc installation are exercised with fake devecocli /
-    # hap-installer-sign / hdc and a minimal CLT source. The fake signer
-    # writes a tiny result; the script's own trap then removes the staging.
+    # Install runs first on a fresh HOME (it must create config.json itself)
+    # and exercises config/ACL injection, signing-project patching, signing
+    # and chunked hdc installation with fake devecocli / hap-installer-sign /
+    # hdc and a minimal CLT source. The fake signer writes a tiny result; the
+    # script's own trap then removes the staging.
     fake_bin = testpath/"bin"
     fake_bin.mkpath
     injected_copy = testpath/"injected.hap"
@@ -263,6 +254,12 @@ class OpencodeDesktop < Formula
     signer = signer_args.read.lines(chomp: true)
     assert_equal (project_dir/"build-profile.json5").to_s, signer[signer.index("--profile") + 1]
     assert_match "aa start -a EntryAbility -b com.social4hyq.opencodedesktop -m electron", hdc_log.read
+
+    # Server orchestration against the real opencode binary (config already
+    # exists from the install above).
+    assert_match "serving at", shell_output("#{bin}/opencode-desktop serve")
+    assert_match "healthy", shell_output("#{bin}/opencode-desktop status")
+    assert_match "stopped", shell_output("#{bin}/opencode-desktop stop")
 
     # `start --serve-only` keeps a CLI backend; `start` just opens the app.
     serve_only_args = testpath/"hdc-start-args"
