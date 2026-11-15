@@ -103,11 +103,3 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Keep tarballs as artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: desktop-payloads-${{ inputs.ref }}
-          path: out/*.tar.gz
-          retention-days: 14
-          if-no-files-found: error
