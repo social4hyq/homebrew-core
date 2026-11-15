@@ -11,6 +11,11 @@ class OpencodeDesktop < Formula
     skip "Tap-hosted payload, versioned with the formula"
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.4-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "52f6a71531b8e60af10ec0ebb20d084e49b1c753011e590b83d667cd7ce2960d"
+  end
+
   depends_on "node" => :build
   depends_on "curl"
   depends_on "hap-installer"
