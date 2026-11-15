@@ -106,19 +106,16 @@ class DeepseekHarnessDesktop < Formula
       (libexec/"runtime").install Dir[root/"*"]
     end
     libexec.install patches/"dsh-desktop-bridge.mjs"
-    (libexec/"bridge-wrapper.sh").write((patches/"bridge-wrapper.sh").read)
-    chmod 0755, libexec/"bridge-wrapper.sh"
+    (libexec/"dsh-desktop.sh").write((patches/"dsh-desktop.sh").read)
+    chmod 0755, libexec/"dsh-desktop.sh"
     # opt_ paths: a bridge started from an old keg must resolve the currently
-    # linked version after `brew upgrade`.
-    (bin/"dsh-desktop-bridge").write_env_script opt_libexec/"bridge-wrapper.sh",
+    # linked version after `brew upgrade`; start replaces a stale process.
+    (bin/"deepseek-harness-desktop").write_env_script opt_libexec/"dsh-desktop.sh",
       DSH_DESKTOP_BRIDGE_JS:       opt_libexec/"dsh-desktop-bridge.mjs",
       DSH_BRIDGE_NODE:             opt_libexec/"runtime/primary-runtime/dependencies/node/bin/node",
       DSH_DESKTOP_RUNTIME_DIR:     opt_libexec/"runtime/dsh",
-      DSH_DESKTOP_PRIMARY_RUNTIME: opt_libexec/"runtime/primary-runtime"
-    (pkgshare/"install-desktop.sh").write((patches/"install-desktop.sh").read)
-    chmod 0755, pkgshare/"install-desktop.sh"
-    (bin/"dsh-install-desktop").write_env_script pkgshare/"install-desktop.sh",
-      DSH_DESKTOP_UNSIGNED_HAP: opt_libexec/"dsh-desktop-unsigned.hap"
+      DSH_DESKTOP_PRIMARY_RUNTIME: opt_libexec/"runtime/primary-runtime",
+      DSH_DESKTOP_UNSIGNED_HAP:    opt_libexec/"dsh-desktop-unsigned.hap"
     libexec.install shell/"electron/build/default/outputs/default/electron-default-unsigned.hap" =>
                      "dsh-desktop-unsigned.hap"
   end
@@ -128,8 +125,14 @@ class DeepseekHarnessDesktop < Formula
       The desktop HAP is unsigned in the bottle: #{opt_libexec}/dsh-desktop-unsigned.hap
       Connect and unlock the device, then run:
 
-        dsh-desktop-bridge          # host-side runtime bridge (also: add to ~/.shellrc)
-        dsh-install-desktop         # sign + install + launch through hap-installer
+        #{opt_bin}/deepseek-harness-desktop install   # sign + install + launch
+        #{opt_bin}/deepseek-harness-desktop start     # host-side runtime bridge
+
+      Put the absolute path in your shell startup file (bin/ is often not on
+      PATH yet when those files run, and a bare command fails silently):
+
+        "$HOME/.harmonybrew/bin/deepseek-harness-desktop" start --bridge-only
+
 
       Signing material stays under your home directory; it is not in the bottle.
       Note: the bridge listens on 127.0.0.1:3090 without its own authentication;
@@ -161,7 +164,12 @@ class DeepseekHarnessDesktop < Formula
     package = JSON.parse(shell_output("unzip -p #{hap} #{package_json}"))
     assert_equal version.to_s, package.fetch("version")
 
-    # The installer must pass the generated HAP and matching identifiers on.
+    # The CLI wrapper must use the stable opt paths.
+    wrapper = (bin/"deepseek-harness-desktop").read
+    assert_match "opt/deepseek-harness-desktop/libexec/dsh-desktop.sh", wrapper
+    assert_match "opt/deepseek-harness-desktop/libexec/runtime/primary-runtime", wrapper
+
+    # install must hand the generated HAP and matching identifiers to hap-installer.
     fake_bin = testpath/"bin"
     fake_bin.mkpath
     args_file = testpath/"hap-installer-args"
@@ -172,11 +180,16 @@ class DeepseekHarnessDesktop < Formula
     SH
     chmod 0755, fake
     ENV.prepend_path "PATH", fake_bin
-    ENV["DSH_DESKTOP_UNSIGNED_HAP"] = hap.to_s
-    system pkgshare/"install-desktop.sh"
+    ENV["DSH_BRIDGE_STATE_DIR"] = testpath/"state"
+    system bin/"deepseek-harness-desktop", "install"
     args = args_file.read.lines(chomp: true)
     assert_equal ["--hap", hap.to_s, "--bundle-id", "com.social4hyq.deepseekharness",
                   "--app-name", "DeepSeekHarnessSigning", "--module", "electron",
                   "--ability", "EntryAbility"], args
+
+    # status works without a running bridge and reports the payload version.
+    status = shell_output("#{bin}/deepseek-harness-desktop status")
+    assert_match(/bridge: (not running|running)/, status)
+    assert_match "runtime: #{version}", status
   end
 end
