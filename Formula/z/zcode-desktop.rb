@@ -227,8 +227,10 @@ class ZcodeDesktop < Formula
       "module" => fake_module,
     )
     (hap_tree/"resources/resfile/resources/app/config.json").write '{"port":0}'
-    system "zip", "-q", "-X", fake_hap.to_s, "module.json",
-           "resources/resfile/resources/app/config.json", chdir: hap_tree
+    cd hap_tree do
+      system "zip", "-q", "-X", fake_hap.to_s, "module.json",
+             "resources/resfile/resources/app/config.json"
+    end
 
     fake_bin = testpath/"bin"
     fake_bin.mkpath
