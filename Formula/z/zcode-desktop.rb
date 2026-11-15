@@ -7,6 +7,7 @@ class ZcodeDesktop < Formula
   url "https://github.com/zai-org/ZCode.git",
       revision: "fec975905a2abd4c07e35c40d51fa097a2258ec9"
   version "3.18.2"
+  revision 1
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
@@ -16,11 +17,6 @@ class ZcodeDesktop < Formula
     strategy :json do |json|
       json["version"]
     end
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v3.18.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "06c18c3a5a025a1c2234d5d84d206e457a45048c8c4e05890de42cc939b6af92"
   end
 
   depends_on "node" => :build

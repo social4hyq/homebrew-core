@@ -195,7 +195,18 @@ cmd_serve() {
 
 cmd_start() {
   device
-  "$HDC" shell aa start -a EntryAbility -b "$BUNDLE_ID" -m electron >/dev/null
+  local out
+  if ! out="$("$HDC" shell aa start -a EntryAbility -b "$BUNDLE_ID" -m electron 2>&1)"; then
+    printf '%s\n' "$out" >&2
+    die "could not start $BUNDLE_ID (unlock the device and retry)"
+  fi
+  case "$out" in
+    *"start ability successfully"*) ;;
+    *)
+      printf '%s\n' "$out" >&2
+      die "the device did not confirm the start (unlock the device and retry)"
+      ;;
+  esac
   printf 'zcode-desktop: opened %s\n' "$BUNDLE_ID"
 }
 
