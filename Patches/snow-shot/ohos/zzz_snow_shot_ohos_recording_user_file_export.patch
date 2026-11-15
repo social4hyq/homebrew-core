@@ -8,7 +8,9 @@ On OHOS, write trim-save output to the app sandbox first: the Qt file
 dialog returns a document URI that QSaveFile cannot write. The sandbox
 destination is chosen at publish time so it cannot collide with staging.
 Keep the recording area a Qt::Tool window (capture-friendly) and focus the
-recording toolbar for keyboard shortcuts.
+recording toolbar for keyboard shortcuts. Leave trim mode and show the main
+window before presenting the picker, and replace a stuck picker request.
+Suppress the unsupported global-mouse startup popup on OHOS.
 
 diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
 --- a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
@@ -39,19 +41,28 @@ diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp 
      }
  
      bool isOpen() const {
-@@ -1623,8 +1637,11 @@
+@@ -1623,8 +1637,20 @@
          trimSession = new RecordingTrimSession(areaWindow, toolbarWindow, &owner);
          trimSession->reportError = [this](const QString& error) { showError(error); };
          trimSession->exported = [this, session = trimSession](const QString& path) {
 +            const bool copy = session->copyExport();
              if (trimSession == session)
                  autoExitAfterRecordingEnds();
-+            if (!copy)
-+                offerUserFileExport(path);
++            if (!copy) {
++                // Leave trim mode before presenting the system picker. The
++                // recording surfaces are always-on-top tool windows and can
++                // otherwise hide the picker from the user.
++                QTimer::singleShot(0, &owner, [this, path]() {
++                    if (uiSession != nullptr)
++                        destroyUi();
++                    emit owner.showMainWindowRequested();
++                    offerUserFileExport(path);
++                });
++            }
              notifyExportCompleted(path);
          };
      }
-@@ -1784,6 +1801,10 @@
+@@ -1784,6 +1810,10 @@
          // Finalized observers can destroy the controller or start a new session.
          // Keep the original Copy intent and its path independent of that callback.
          const QPointer<ScreenRecordingController> guard(&owner);
@@ -62,14 +73,19 @@ diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp 
          notifyExportCompleted(completedPath);
          if (guard)
              emit guard->finalized();
-@@ -1791,6 +1812,16 @@
+@@ -1791,6 +1821,21 @@
              copyFileToClipboard(completedPath);
      }
  
 +    void offerUserFileExport(const QString& path) {
 +#ifdef Q_OS_HARMONY
-+        if (!userFileExporter || automationOwned || automationCommand)
++        if (!userFileExporter || automationOwned || automationCommand) {
++            qWarning() << "SNOW_RECORDING_USER_FILE_EXPORT_SKIPPED" << path
++                       << static_cast<bool>(userFileExporter) << automationOwned
++                       << automationCommand;
 +            return;
++        }
++        qWarning() << "SNOW_RECORDING_USER_FILE_EXPORT_REQUEST" << path;
 +        userFileExporter(path);
 +#else
 +        Q_UNUSED(path);
@@ -79,15 +95,20 @@ diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp 
      void notifyExportCompleted(const QString& path) {
          if (snow_shot::storage::RecordingSettings().notifyAfterExportCompletes())
              emit owner.exportNotificationRequested(path);
-@@ -1894,6 +1925,7 @@
+@@ -1894,6 +1939,12 @@
                  trimSession->reportError = [this](const QString& error) { showError(error); };
                  trimSession->exported = [this, marker, record](const QString& path) {
                      static_cast<void>(clearRecovery(marker, record));
-+                    offerUserFileExport(path);
++                    QTimer::singleShot(0, &owner, [this, path]() {
++                        if (uiSession != nullptr)
++                            destroyUi();
++                        emit owner.showMainWindowRequested();
++                        offerUserFileExport(path);
++                    });
                      notifyExportCompleted(path);
                  };
                  trimSession->open(record.sourcePath, pendingOutputPath, {}, true, false, {});
-@@ -2598,6 +2630,7 @@
+@@ -2598,6 +2649,7 @@
      }
  
      PermissionCheck permissionCheck;
@@ -95,7 +116,7 @@ diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp 
      bool sessionEnding = false;
      bool recoveryOffered = false;
      QJsonObject automationOptions;
-@@ -2768,6 +2801,10 @@
+@@ -2768,6 +2820,10 @@
      m_impl->permissionCheck = std::move(check);
  }
  
@@ -118,20 +139,66 @@ diff --git a/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.
      bool isOpen() const;
      bool isRecording() const;
      [[nodiscard]] bool blocksMemoryTrimming() const;
+@@ -47,6 +49,7 @@
+     void captureActivityChanged(bool active);
+     void finalized();
+     void exportNotificationRequested(const QString& path);
++    void showMainWindowRequested();
+ 
+   private:
+     struct Impl;
 diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow_shot/src/presentation/services/screenshotcontroller.cpp
 --- a/snow_shot/src/presentation/services/screenshotcontroller.cpp
 +++ b/snow_shot/src/presentation/services/screenshotcontroller.cpp
-@@ -1448,6 +1448,10 @@
-     QObject::connect(m_screenRecordingController.get(),
+@@ -1449,6 +1449,13 @@
                       &ScreenRecordingController::exportNotificationRequested, &owner,
                       &ScreenshotController::recordingExportNotificationRequested);
+     QObject::connect(m_screenRecordingController.get(),
++                     &ScreenRecordingController::showMainWindowRequested, &owner,
++                     &ScreenshotController::showMainWindowRequested);
 +#ifdef Q_OS_HARMONY
 +    m_screenRecordingController->setUserFileExporter(
 +        [this](const QString& path) { owner.exportScreenRecordingToUserFile(path); });
 +#endif
-     QObject::connect(m_screenRecordingController.get(),
++    QObject::connect(m_screenRecordingController.get(),
                       &ScreenRecordingController::captureActivityChanged, &owner,
                       [this](bool active) {
+                          emit owner.captureActivityChanged(QStringLiteral("recording"), active);
+@@ -7291,9 +7298,13 @@
+ 
+ #ifdef Q_OS_HARMONY
+ void ScreenshotController::exportScreenRecordingToUserFile(const QString& path) {
+-    if (path.isEmpty() ||
+-        (m_impl->m_recordingFileExport && m_impl->m_recordingFileExport->active()))
++    if (path.isEmpty())
+         return;
++    if (m_impl->m_recordingFileExport && m_impl->m_recordingFileExport->active()) {
++        qWarning() << "SNOW_RECORDING_USER_FILE_EXPORT_REPLACE";
++        delete m_impl->m_recordingFileExport;
++        m_impl->m_recordingFileExport = nullptr;
++    }
+ 
+     auto* exportSession = new snow_shot::platform::ohos::RecordingFileExport(this);
+     m_impl->m_recordingFileExport = exportSession;
+@@ -7300,6 +7311,8 @@
+     const QPointer<ScreenshotController> receiver(this);
++    const QPointer<snow_shot::platform::ohos::RecordingFileExport> session(exportSession);
+     exportSession->setCompletion(
+-        [receiver](snow_shot::platform::ohos::RecordingFileExport::Result result, QString error) {
++        [receiver, session](snow_shot::platform::ohos::RecordingFileExport::Result result,
++                            QString error) {
+             if (!receiver || receiver->m_impl == nullptr)
+                 return;
+             if (result == snow_shot::platform::ohos::RecordingFileExport::Result::Failed) {
+@@ -7309,7 +7322,7 @@
+                     QCoreApplication::translate("ScreenshotController",
+                                                 "Could not write the selected user file"));
+             }
+-            if (receiver->m_impl->m_recordingFileExport)
++            if (session && receiver->m_impl->m_recordingFileExport == session)
+                 receiver->m_impl->m_recordingFileExport->deleteLater();
+         });
+     static_cast<void>(exportSession->start(path));
 diff --git a/snow_shot/src/presentation/recording/recordingtrimsession.h b/snow_shot/src/presentation/recording/recordingtrimsession.h
 --- a/snow_shot/src/presentation/recording/recordingtrimsession.h
 +++ b/snow_shot/src/presentation/recording/recordingtrimsession.h
@@ -182,3 +249,42 @@ diff --git a/snow_shot/src/presentation/recording/recordingtrimsession.cpp b/sno
      const QString from = m_cachePath, to = m_destination;
      m_publication = std::make_shared<Publication>();
      m_publishFuture = std::async(
+diff --git a/snow_shot/src/platform/ohos/recordingfileexport.cpp b/snow_shot/src/platform/ohos/recordingfileexport.cpp
+--- a/snow_shot/src/platform/ohos/recordingfileexport.cpp
++++ b/snow_shot/src/platform/ohos/recordingfileexport.cpp
+@@ -3,6 +3,7 @@
+ 
+ #include "snow_shot/platform/ohos/userfileexportqueue.h"
+ 
++#include <QDebug>
+ #include <QFileInfo>
+ #include <QMetaObject>
+ #include <QPointer>
+@@ -92,6 +93,7 @@
+         return false;
+     }
+     m_pickerRequestId = id;
++    qWarning() << "SNOW_RECORDING_USER_FILE_PICKER_ENQUEUED" << id << suggestedName;
+     return true;
+ }
+ 
+diff --git a/snow_shot/src/platform/globalmousebackend.cpp b/snow_shot/src/platform/globalmousebackend.cpp
+--- a/snow_shot/src/platform/globalmousebackend.cpp
++++ b/snow_shot/src/platform/globalmousebackend.cpp
+@@ -13,6 +13,11 @@
+ class UnsupportedGlobalMouseBackend final : public GlobalMouseBackend {
+   public:
+     void start(Handler, FailureHandler failure) override {
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        // Global mouse gestures are intentionally unsupported on OHOS. Keep
++        // the backend unavailable without showing a startup failure popup.
++        Q_UNUSED(failure);
++#else
+         if (failure) {
+             failure(0);
+         }
+@@ -19,3 +24,4 @@
++#endif
+     }
+     void stop() override {}
+     void configure(const GlobalMouseConfiguration&) override {}
