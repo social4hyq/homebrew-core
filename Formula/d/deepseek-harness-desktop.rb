@@ -52,8 +52,7 @@ class DeepseekHarnessDesktop < Formula
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                             '"bundleName": "com.social4hyq.deepseekharness"'
     inreplace shell/"AppScope/app.json5", '"vendor": "example"', '"vendor": "social4hyq"'
-    if shell/"web_engine/src/main/module.json5".exist?
-      module_json = shell/"web_engine/src/main/module.json5"
+    module_json = shell/"web_engine/src/main/module.json5"
     if module_json.exist? && module_json.read.include?("com.huawei.ohos_electron")
       inreplace module_json, '"name": "com.huawei.ohos_electron"',
                 '"name": "com.social4hyq.deepseekharness"'
