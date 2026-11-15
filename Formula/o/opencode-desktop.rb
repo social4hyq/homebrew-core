@@ -1,19 +1,14 @@
 class OpencodeDesktop < Formula
   desc "Desktop shell for the OpenCode agent (Electron window on local opencode serve)"
   homepage "https://opencode.ai"
-  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.1/opencode-desktop-0.1.1.tar.gz"
-  sha256 "6e2afe1b4f061db91c5dbf917506653211869d66f4d41adfde637ef96398ed1d"
+  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.2/opencode-desktop-0.1.2.tar.gz"
+  sha256 "7bb612adc710e0c8d9442f8c3772f1933491ab63ecdcd1fc5c3cb3786449ccf3"
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
 
   livecheck do
     skip "Tap-hosted payload, versioned with the formula"
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "19feff2de674387a4d0560826ab283417518bb8b17eeb084a56f9b6181517a61"
   end
 
   depends_on "node" => :build
@@ -170,56 +165,83 @@ class OpencodeDesktop < Formula
     assert_match "healthy", shell_output("#{bin}/opencode-desktop status")
     assert_match "stopped", shell_output("#{bin}/opencode-desktop stop")
 
-    # Install path: config/ACL injection and signing-project patching are
-    # exercised with a fake hap-installer/devecocli and a minimal CLT source;
-    # the fake installer copies the HAP out of the script's mktemp staging dir
-    # before the script's exit trap removes it.
+    # Install path: config/ACL injection, signing-project patching, signing
+    # and chunked hdc installation are exercised with fake devecocli /
+    # hap-installer-sign / hdc and a minimal CLT source. The fake signer
+    # writes a tiny result; the script's own trap then removes the staging.
     fake_bin = testpath/"bin"
     fake_bin.mkpath
-    installer_args = testpath/"hap-installer-args"
     injected_copy = testpath/"injected.hap"
+    signer_args = testpath/"hap-installer-sign-args"
+    hdc_log = testpath/"hdc-log"
     clt_env = testpath/"clt-env"
-    fake_installer = fake_bin/"hap-installer"
-    fake_installer.write <<~SH
-      #!/bin/sh
-      printf '%s\n' "$@" > #{installer_args}
-      printf '%s\n' "${COMMAND_LINE_TOOL_PATH:-}" > #{clt_env}
-      while [ $# -gt 0 ]; do
-        if [ "$1" = "--hap" ]; then cp "$2" #{injected_copy}; fi
-        shift
-      done
-    SH
-    chmod 0755, fake_installer
 
     fake_devecocli = fake_bin/"devecocli"
     fake_devecocli.write <<~SH
       #!/bin/sh
-      while [ $# -gt 0 ]; do
-        if [ "$1" = "--project-path" ]; then project="$2"; fi
-        shift
-      done
-      mkdir -p "$project/entry/src/main"
-      printf '{\\n  "module": {\\n    "name": "entry",\\n    "type": "entry"\\n  }\\n}\\n' > "$project/entry/src/main/module.json5"
-      printf '{"app":{"signingConfigs":[]}}\\n' > "$project/build-profile.json5"
+      case "$1" in
+        auth|signature) exit 0 ;;
+        create)
+          while [ $# -gt 0 ]; do
+            if [ "$1" = "--project-path" ]; then project="$2"; fi
+            shift
+          done
+          mkdir -p "$project/entry/src/main"
+          printf '{\\n  "module": {\\n    "name": "entry",\\n    "type": "entry"\\n  }\\n}\\n' > "$project/entry/src/main/module.json5"
+          printf '{"app":{"signingConfigs":[]}}\\n' > "$project/build-profile.json5"
+          ;;
+      esac
     SH
     chmod 0755, fake_devecocli
+
+    fake_signer = fake_bin/"hap-installer-sign"
+    fake_signer.write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$@" > #{signer_args}
+      printf '%s\\n' "${COMMAND_LINE_TOOL_PATH:-}" > #{clt_env}
+      out=""
+      while [ $# -gt 0 ]; do
+        case "$1" in
+          --hap) cp "$2" #{injected_copy}; shift 2 ;;
+          --output) out="$2"; shift 2 ;;
+          *) shift ;;
+        esac
+      done
+      printf 'signed' > "$out"
+    SH
+    chmod 0755, fake_signer
+
+    fake_hdc = fake_bin/"hdc"
+    fake_hdc.write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$@" >> #{hdc_log}
+      case "$*" in
+        *"bm install"*) printf '%s\\n' "install bundle successfully" ;;
+      esac
+    SH
+    chmod 0755, fake_hdc
 
     clt_src = testpath/"clt-src"
     (clt_src/"sdk/default/openharmony/toolchains/lib").mkpath
     (clt_src/"sdk/default/openharmony/toolchains/hdc").write "#!/bin/sh\nexit 0\n"
     (clt_src/"sdk/default/openharmony/toolchains/lib/PermissionDefinitions.json").write "{}"
+    (clt_src/"sdk/default/openharmony/toolchains/lib/hap-sign-tool").write "#!/bin/sh\nexit 0\n"
+    (clt_src/"sdk/default/hms").mkpath
+    (clt_src/"sdk/default/hms/uni-package.json").write "{}"
+    (clt_src/"hvigor/bin").mkpath
+    (clt_src/"hvigor/bin/hvigorw.js").write ""
+    (clt_src/"ohpm/bin").mkpath
+    (clt_src/"ohpm/bin/pm-cli.js").write ""
+    (clt_src/"node/bin").mkpath
+    (clt_src/"node/bin/node").write "#!/bin/sh\nexit 0\n"
+    (clt_src/"sdk/default/sdk-pkg.json").write "{}"
     clt_cache = testpath/"clt-cache"
 
     ENV.prepend_path "PATH", fake_bin
     ENV["OPENCODE_DESKTOP_CLT"] = clt_src.to_s
     ENV["OPENCODE_DESKTOP_CLT_CACHE"] = clt_cache.to_s
 
-    shell_output("#{bin}/opencode-desktop install")
-    args = installer_args.read.lines(chomp: true)
-    assert_equal "com.social4hyq.opencodedesktop", args[args.index("--bundle-id") + 1]
-    assert_equal "electron", args[args.index("--module") + 1]
-    assert_equal "EntryAbility", args[args.index("--ability") + 1]
-    assert_equal clt_cache.to_s, clt_env.read.strip
+    assert_match "installed and started", shell_output("#{bin}/opencode-desktop install")
     config = JSON.parse(shell_output("unzip -p #{injected_copy} resources/resfile/resources/app/config.json"))
     assert_operator config.fetch("port"), :>, 0
     refute_empty config.fetch("password")
@@ -233,19 +255,22 @@ class OpencodeDesktop < Formula
                  acl_permissions.sort
     project_dir = Pathname.new(Dir.home)/".hap-installer/projects/com.social4hyq.opencodedesktop"
     assert_match "CUSTOM_SANDBOX", (project_dir/"entry/src/main/module.json5").read
+    signer = signer_args.read.lines(chomp: true)
+    assert_equal (project_dir/"build-profile.json5").to_s, signer[signer.index("--profile") + 1]
+    assert_match "aa start -a EntryAbility -b com.social4hyq.opencodedesktop -m electron", hdc_log.read
 
-    # `start` opens the app through hdc; --serve-only keeps a CLI backend.
-    hdc_args = testpath/"hdc-args"
-    fake_hdc = fake_bin/"hdc"
+    # `start --serve-only` keeps a CLI backend; `start` just opens the app.
+    serve_only_args = testpath/"hdc-start-args"
+    fake_hdc.delete if fake_hdc.exist?
     fake_hdc.write <<~SH
       #!/bin/sh
-      printf '%s\n' "$@" > #{hdc_args}
+      printf '%s\\n' "$@" > #{serve_only_args}
     SH
     chmod 0755, fake_hdc
     assert_match "serving at", shell_output("#{bin}/opencode-desktop start --serve-only")
     assert_match "opened", shell_output("#{bin}/opencode-desktop start")
     assert_equal %w[shell aa start -a EntryAbility -b com.social4hyq.opencodedesktop -m electron],
-                 hdc_args.read.lines(chomp: true)
+                 serve_only_args.read.lines(chomp: true)
     assert_match "stopped", shell_output("#{bin}/opencode-desktop stop")
 
     hap = libexec/"opencode-desktop-unsigned.hap"
