@@ -4,16 +4,11 @@ class HapInstaller < Formula
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.10.tgz"
   sha256 "7fdee1bfb7393c151fa09b3714ecc4796e53d9876557e9933c5890319ffb4daa"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://registry.npmjs.org/@deveco%2Fdeveco-cli-openharmony-arm64"
     strategy :npm
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hap-installer-v1.3.10-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "70cdb5186c1c93401ff6d382c3289d8f8d5d5a14ff87b34ed05ab4e4a7e12066"
   end
 
   depends_on "node"
@@ -82,6 +77,14 @@ class HapInstaller < Formula
     signer = sdk/"toolchains/lib/hap-sign-tool"
     signer.dirname.mkpath
     signer.write_env_script sdk_tools/"lib/hap-sign-tool", {}
+    # `devecocli signature generate` consults the SDK permission definitions to
+    # decide which restricted permissions go into the local debug profile. The
+    # bundled toolchain had none, so profiles were silently generated without
+    # ACLs and any HAP requesting CUSTOM_SANDBOX / READ_PASTEBOARD failed to
+    # install with 9568289. Ship both spellings: the CLI reads the lowercase one
+    # on case-sensitive filesystems, and copying twice is harmless on macOS.
+    cp sdk_tools/"lib/PermissionDefinitions.json", sdk/"toolchains/lib/PermissionDefinitions.json"
+    cp sdk_tools/"lib/PermissionDefinitions.json", sdk/"toolchains/lib/permissionDefinitions.json"
 
     cp payload/"hap-installer.sh", libexec/"hap-installer.sh"
     cp payload/"sign-hap.cjs", libexec/"sign-hap.cjs"
@@ -118,6 +121,9 @@ class HapInstaller < Formula
                  (libexec/"hap-installer.sh").read
     assert_match "hap-installer-toolchain/sdk/default/openharmony/toolchains", (bin/"hap-installer").read
     assert_path_exists libexec/"hap-installer-toolchain/sdk/default/openharmony/toolchains/hdc"
+    %w[PermissionDefinitions.json permissionDefinitions.json].each do |name|
+      assert_path_exists libexec/"hap-installer-toolchain/sdk/default/openharmony/toolchains/lib"/name
+    end
     refute_path_exists bin/"hdc"
     assert_match(/else if \(authIsObject\) \{\s+proxyAuth = false;/,
                  (libexec/"node_modules/axios/lib/adapters/http.js").read)
