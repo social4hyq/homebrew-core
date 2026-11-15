@@ -1,0 +1,60 @@
+OHOS: cover the openharmony to linux mapping.
+
+diff --git a/apps/desktop/src/main/daemon-os.test.ts b/apps/desktop/src/main/daemon-os.test.ts
+index 12e37fc..dd9963d 100644
+--- a/apps/desktop/src/main/daemon-os.test.ts
++++ b/apps/desktop/src/main/daemon-os.test.ts
+@@ -16,6 +16,12 @@ describe("normalizeHostOS", () => {
+     expect(normalizeHostOS("darwin")).toBe("darwin");
+     expect(normalizeHostOS("linux")).toBe("linux");
+   });
++
++  // Node on OpenHarmony reports process.platform "openharmony", but the Go
++  // daemon built for it reports runtime.GOOS "linux" on /health.
++  it("maps openharmony to the GOOS spelling 'linux'", () => {
++    expect(normalizeHostOS("openharmony")).toBe("linux");
++  });
+ });
+ 
+ describe("isDaemonExternallyManaged", () => {
+@@ -45,6 +51,24 @@ describe("isDaemonExternallyManaged", () => {
+     );
+   });
+ 
++  // OpenHarmony: the daemon is the host's own native process, even though
++  // Node and Go spell the OS differently. Flagging it hides the start/stop/
++  // restart controls and disables crash recovery.
++  it("does NOT flag a native OpenHarmony daemon (GOOS linux) under an OpenHarmony desktop", () => {
++    expect(
++      isDaemonExternallyManaged("linux", normalizeHostOS("openharmony")),
++    ).toBe(false);
++  });
++
++  it("still flags a genuinely foreign daemon under an OpenHarmony desktop", () => {
++    expect(
++      isDaemonExternallyManaged("windows", normalizeHostOS("openharmony")),
++    ).toBe(true);
++    expect(
++      isDaemonExternallyManaged("darwin", normalizeHostOS("openharmony")),
++    ).toBe(true);
++  });
++
+   // Fail safe: an older daemon that predates the `os` field reports nothing.
+   // Hiding a toggle on a guess would 误伤, so unknown OS = treat as manageable.
+   it("fails safe to false when the daemon reports no OS", () => {
+@@ -73,6 +97,15 @@ describe("daemonLifecycleUnreachable", () => {
+     ).toBe(false);
+   });
+ 
++  it("does not block lifecycle ops for a native OpenHarmony daemon", async () => {
++    expect(
++      await daemonLifecycleUnreachable(
++        async () => "linux",
++        normalizeHostOS("openharmony"),
++      ),
++    ).toBe(false);
++  });
++
+   it("fails safe to false when the live OS is unknown (older daemon / none running)", async () => {
+     expect(
+       await daemonLifecycleUnreachable(async () => undefined, "windows"),

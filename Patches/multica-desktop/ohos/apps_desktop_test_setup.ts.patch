@@ -1,0 +1,21 @@
+OHOS: Node on OpenHarmony reports process.platform as openharmony, which
+routes the daemon manager through the bridge. The existing suites model the
+upstream CI platforms, so present as linux; the suites for the OHOS path set
+the platform themselves.
+
+diff --git a/apps/desktop/test/setup.ts b/apps/desktop/test/setup.ts
+index b5eaee4..00cffe2 100644
+--- a/apps/desktop/test/setup.ts
++++ b/apps/desktop/test/setup.ts
+@@ -32,3 +32,11 @@ if (typeof window !== "undefined") {
+     } as unknown as typeof ResizeObserver;
+   }
+ }
++
++// Node on OpenHarmony reports process.platform === "openharmony", which routes
++// daemon-manager through the host bridge (ohos-host.ts). These suites model the
++// upstream CI platforms, so present as linux; suites exercising the OHOS path
++// (daemon-manager-ohos.test.ts) set the platform themselves.
++if (process.platform === "openharmony") {
++  Object.defineProperty(process, "platform", { value: "linux", configurable: true });
++}

@@ -1,0 +1,16 @@
+OHOS: bundle fix-path into the main process. It is ESM-only, and the Electron
+shipped for OHOS runs Node 20, which cannot require() an ES module.
+
+diff --git a/apps/desktop/electron.vite.config.ts b/apps/desktop/electron.vite.config.ts
+index 04b44b8..59ae820 100644
+--- a/apps/desktop/electron.vite.config.ts
++++ b/apps/desktop/electron.vite.config.ts
+@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
+ 
+ export default defineConfig({
+   main: {
+-    plugins: [externalizeDepsPlugin()],
++    plugins: [externalizeDepsPlugin({ exclude: ["fix-path"] })],
+   },
+   preload: {
+     // `@electron-toolkit/preload` must be bundled INTO the preload script:
