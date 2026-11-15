@@ -38,9 +38,13 @@ class DeepseekHarnessDesktop < Formula
            "-C", buildpath/"electron-prebuilt"
     shell = buildpath/"electron-prebuilt/libelectron/ohos_hap"
 
+    # Homebrew strips the archive's single top-level directory on unpack, so
+    # the payload files sit directly in buildpath; tolerate both layouts.
+    payload = (buildpath/"app").directory? ? buildpath/"app" : buildpath
+
     # Branding: upstream icon + product name.
-    icon = buildpath/"app/icon.png"
-    odie "desktop payload carries no app/icon.png" unless icon.exist?
+    icon = payload/"icon.png"
+    odie "desktop payload carries no icon.png" unless icon.exist?
     %w[app_icon.png startIcon.png].each { |name| cp icon, shell/"AppScope/resources/base/media"/name }
     label_keys = %w[EntryAbility_label StatusBarEntryAbility_label]
     %w[base en_US zh_CN].each do |locale|
@@ -60,7 +64,8 @@ class DeepseekHarnessDesktop < Formula
     # closure) replaces the shell project's app resources.
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
-    cp_r buildpath/"app", app
+    app.mkpath
+    %w[lib dsh node_modules package.json icon.png].each { |name| cp_r payload/name, app/name }
 
     clt = Pathname.new("/opt/electron-ohos-clt")
     odie "deepseek-harness-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES" unless
