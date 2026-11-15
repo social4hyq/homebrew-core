@@ -19,6 +19,11 @@ class ZcodeDesktop < Formula
     end
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v3.18.2-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f04563d49c9d3bfbf9e203751b5966312e3d663a399c12daec53c3b8f7c6c86"
+  end
+
   depends_on "node" => :build
   depends_on "bun"
   depends_on "curl"
