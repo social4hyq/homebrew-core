@@ -164,9 +164,12 @@ class ZcodeDesktop < Formula
     end
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
-    pkgshare.install source_root/"scripts/install-desktop.sh"
+    # cp, not install: Pathname#install moves the source, and the tap checkout
+    # is a read-only host mount inside the CI container.
+    pkgshare.mkpath
+    cp source_root/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    libexec.install source_root/"scripts/zcode-desktop.sh"
+    cp source_root/"scripts/zcode-desktop.sh", libexec/"zcode-desktop.sh"
     chmod 0755, libexec/"zcode-desktop.sh"
     (bin/"zcode-desktop").write_env_script libexec/"zcode-desktop.sh",
       ZCODE_DESKTOP_UNSIGNED_HAP:   libexec/"zcode-desktop-unsigned.hap",
