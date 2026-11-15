@@ -1,8 +1,8 @@
 class ObsidianDesktop < Formula
   desc "Notes desktop for HarmonyOS PC running the official Obsidian package"
   homepage "https://obsidian.md"
-  url "https://github.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.3/obsidian-desktop-0.1.3.tar.gz"
-  sha256 "4d7f8d63c4847d94097c15ad25ed1356ea894a55af249b0a4dd10a95da1ae15d"
+  url "https://github.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.4/obsidian-desktop-0.1.4.tar.gz"
+  sha256 "8932f0227b2b2ca570dce3ece1aa24eb8a66f7a5f98ec195013177b7c846b066"
   # Tap-authored host/scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt. Obsidian itself is proprietary and is never redistributed here:
   # the official Linux arm64 package is fetched on the user's machine at
@@ -13,14 +13,9 @@ class ObsidianDesktop < Formula
     skip "Tap-hosted payload, versioned with the formula"
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.3-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6f77a1aef78b349bfa1c998bdee1e12958c0bff7ad4986885f197e5816cf5dff"
-  end
-
-  depends_on "node"
   depends_on "curl"
   depends_on "hap-installer"
+  depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "zip"
 
@@ -87,6 +82,67 @@ class ObsidianDesktop < Formula
     inreplace shell/"build-profile.json5", "        \"signingConfig\": \"default\",\n", ""
     inreplace shell/"electron/src/main/module.json5", "    \"mainElement\": \"EntryAbility\",\n",
               "    \"mainElement\": \"EntryAbility\",\n    \"extractNativeLibs\": true,\n"
+
+    # Deep links: register obsidian:// and persist a cold-start launch uri.
+    module_file = shell/"electron/src/main/module.json5"
+    module_text = module_file.read
+    link_skill = [
+      "          {",
+      "            \"actions\": [",
+      "              \"ohos.want.action.viewData\"",
+      "            ],",
+      "            \"uris\": [",
+      "              {",
+      "                \"scheme\": \"link\"",
+      "              }",
+      "            ]",
+      "          }",
+    ].join("\n")
+    obsidian_skill = link_skill.sub("\"scheme\": \"link\"", "\"scheme\": \"obsidian\"")
+    needle = link_skill + "\n        ],"
+    unless module_text.include?(needle)
+      raise "obsidian-desktop: cannot find the link skill in module.json5"
+    end
+
+    module_file.atomic_write(module_text.sub(needle, link_skill + ",\n" + obsidian_skill + "\n        ],"))
+
+    entry_ability = shell/"electron/src/main/ets/entryability/EntryAbility.ets"
+    entry_text = entry_ability.read
+    unless entry_text.sub!("import Want from '@ohos.app.ability.Want';",
+                           "import fs from '@ohos.file.fs';\nimport Want from '@ohos.app.ability.Want';")
+      raise "obsidian-desktop: cannot find the Want import in EntryAbility.ets"
+    end
+
+    old_method = [
+      "  onCreate(want: Want, launchParam: AbilityConstant.LaunchParam) {",
+      "    super.onCreate(want, launchParam);",
+      "  }",
+    ].join("\n")
+    new_method = [
+      "  onCreate(want: Want, launchParam: AbilityConstant.LaunchParam) {",
+      "    // Cold-start deep link: the runtime does not expose want.uri to Electron",
+      "    // on the first launch, so persist it for the HAP host to replay.",
+      "    const launchUri = want ? (want['uri'] as string) : undefined;",
+      "    if (typeof launchUri === 'string' && launchUri.includes('://') &&",
+      "      !launchUri.startsWith('file://')) {",
+      "      try {",
+      "        const appFilesDir = this.context.getApplicationContext().filesDir;",
+      "        const file = fs.openSync(appFilesDir + '/incoming-uris.txt',",
+      "          fs.OpenMode.CREATE | fs.OpenMode.APPEND | fs.OpenMode.WRITE_ONLY);",
+      "        fs.writeSync(file.fd, launchUri + '\\n');",
+      "        fs.closeSync(file);",
+      "      } catch (error) {",
+      "        console.error('failed to record launch uri: ' + JSON.stringify(error));",
+      "      }",
+      "    }",
+      "    super.onCreate(want, launchParam);",
+      "  }",
+    ].join("\n")
+    unless entry_text.sub!(old_method, new_method)
+      raise "obsidian-desktop: cannot find EntryAbility.onCreate"
+    end
+
+    entry_ability.atomic_write(entry_text)
 
     # Restricted permissions cannot be granted with local auto-signing. The
     # strong-sandbox shell only needs network access; vaults live in the app
