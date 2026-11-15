@@ -1,19 +1,14 @@
 class OpencodeDesktop < Formula
   desc "Desktop shell for the OpenCode agent (Electron window on local opencode serve)"
   homepage "https://opencode.ai"
-  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.8/opencode-desktop-0.1.8.tar.gz"
-  sha256 "787976d4c132d649bb8dbcf3bb9261ca106b0163541d5e7d3ca4020bdd550f49"
+  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.9/opencode-desktop-0.1.9.tar.gz"
+  sha256 "55a78ba752f10a9fc0d3fdded6bccdf5818bf8baa731450a873003d002b8ef34"
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
 
   livecheck do
     skip "Tap-hosted payload, versioned with the formula"
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.8-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1b17cce5fc9baf15a999d4dba89a8b39888675ba6ca8d8153091f14013372e45"
   end
 
   depends_on "node" => :build
@@ -183,6 +178,7 @@ class OpencodeDesktop < Formula
     injected_copy = testpath/"injected.hap"
     signer_args = testpath/"hap-installer-sign-args"
     hdc_log = testpath/"hdc-log"
+    hdc_state = testpath/"hdc-state"
     clt_env = testpath/"clt-env"
 
     fake_devecocli = fake_bin/"devecocli"
@@ -225,11 +221,18 @@ class OpencodeDesktop < Formula
       #!/bin/sh
       printf '%s\\n' "$@" >> #{hdc_log}
       case "$*" in
-        *"list targets"*) printf '%s\\n' "127.0.0.1:34561" ;;
+        *"list targets"*) cat #{hdc_state} ;;
+        *"tconn"*) printf '127.0.0.1:41637\\t\\tTCP\\tConnected\\tlocalhost\\thdc\\n' > #{hdc_state} ;;
         *"bm install"*) printf '%s\\n' "install bundle successfully" ;;
       esac
     SH
     chmod 0755, fake_hdc
+    # The local target starts Offline, as after a dropped link: install must
+    # reattach it with the advertised persist.hdc.port instead of treating a
+    # listed target as connected.
+    hdc_state.write "127.0.0.1:34561\t\tTCP\tOffline\tlocalhost\thdc\n"
+    (fake_bin/"param").write "#!/bin/sh\necho 41637\n"
+    chmod 0755, fake_bin/"param"
 
     # The ACL toolchain is built from the brew-installed node / hdc /
     # hap-sign-tool (formula dependencies), so no external CLT is needed.
@@ -259,6 +262,7 @@ class OpencodeDesktop < Formula
     signer = signer_args.read.lines(chomp: true)
     assert_equal (project_dir/"build-profile.json5").to_s, signer[signer.index("--profile") + 1]
     assert_match "aa start -a EntryAbility -b com.social4hyq.opencodedesktop -m electron", hdc_log.read
+    assert_match "tconn\n127.0.0.1:41637\n", hdc_log.read
 
     # Server orchestration against the real opencode binary (config already
     # exists from the install above).
