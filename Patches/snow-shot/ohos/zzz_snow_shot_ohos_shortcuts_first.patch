@@ -1,0 +1,103 @@
+OHOS: make the first-run experience keyboard-first. The platform only allows
+a normal app to register global mouse monitors while it is actively capturing
+the screen with AVScreenCapture, so hide the global mouse settings page, its
+navigation entry and its related link on OHOS instead of showing rows stuck in
+the Failed state. Add screen-recording defaults (Ctrl+Alt+F2 / Ctrl+F2)
+alongside the existing screenshot pair (Ctrl+Alt+F1 / Ctrl+F1).
+
+diff --git a/snow_shot/src/presentation/settings/settingscatalog.cpp b/snow_shot/src/presentation/settings/settingscatalog.cpp
+--- a/snow_shot/src/presentation/settings/settingscatalog.cpp
++++ b/snow_shot/src/presentation/settings/settingscatalog.cpp
+@@ -38,7 +38,9 @@
+ }
+ 
+ constexpr auto GLOBAL_SHORTCUTS_PAGE_ID = "global-hotkeys";
++#if !defined(Q_OS_HARMONY) && !defined(Q_OS_OHOS)
+ constexpr auto GLOBAL_MOUSE_PAGE_ID = "global-mouse";
++#endif
+ constexpr auto PINNED_PAGE_ID = "pin-to-screen-management";
+ constexpr auto HISTORY_PAGE_ID = "screenshot-history";
+ 
+@@ -4725,6 +4727,7 @@
+      u"global-hotkeys",
+      {},
+      {}},
++#if !defined(Q_OS_HARMONY) && !defined(Q_OS_OHOS)
+     {settingsText(QT_TRANSLATE_NOOP("SettingsCatalog", "Global mouse gestures")),
+      u"global-mouse",
+      {},
+@@ -4731,4 +4734,5 @@
+      {}},
++#endif
+ };
+ 
+ constexpr TranslatableText catalogPageShortcutsMouseAliases[] = {
+@@ -5048,6 +5052,7 @@
+         .links = {},
+         .aliases = {},
+     },
++#if !defined(Q_OS_HARMONY) && !defined(Q_OS_OHOS)
+     {
+         .id = u"global-mouse",
+         .route = u"/global-mouse",
+@@ -5059,6 +5064,7 @@
+         .links = {},
+         .aliases = {},
+     },
++#endif
+ #if SNOW_SHOT_ENABLE_TEXT_TRANSLATION
+     {
+         .id = u"translation",
+@@ -5330,6 +5336,7 @@
+     globalShortcuts.pageId = QString::fromLatin1(GLOBAL_SHORTCUTS_PAGE_ID);
+     globalShortcuts.iconFactory = []() { return outlined_icons::Thunderbolt(); };
+ 
++#if !defined(Q_OS_HARMONY) && !defined(Q_OS_OHOS)
+     SettingsNavigationPageDefinition globalMouse;
+     globalMouse.id = QStringLiteral("nav.global-mouse");
+     globalMouse.pageId = QString::fromLatin1(GLOBAL_MOUSE_PAGE_ID);
+@@ -5336,5 +5343,6 @@
+     globalMouse.iconFactory = []() { return custom_outlined_icons::WheelMouse(); };
+ 
++#endif
+     SettingsNavigationPageDefinition history;
+     history.id = QStringLiteral("nav.screenshot-history");
+     history.pageId = QString::fromLatin1(HISTORY_PAGE_ID);
+@@ -5388,7 +5396,11 @@
+     pinned.id = QStringLiteral("nav.pin-to-screen-management");
+     pinned.pageId = QString::fromLatin1(PINNED_PAGE_ID);
+     pinned.iconFactory = []() { return custom_outlined_icons::PinToScreenManagement(); };
+-    return {globalShortcuts, globalMouse, history, pinned,
++    return {globalShortcuts,
++#if !defined(Q_OS_HARMONY) && !defined(Q_OS_OHOS)
++            globalMouse,
++#endif
++            history, pinned,
+ #if SNOW_SHOT_ENABLE_TEXT_TRANSLATION
+             translation,
+ #endif
+diff --git a/snow_shot/src/storage/configurationschema.cpp b/snow_shot/src/storage/configurationschema.cpp
+--- a/snow_shot/src/storage/configurationschema.cpp
++++ b/snow_shot/src/storage/configurationschema.cpp
+@@ -1873,6 +1873,21 @@
+     replaceDefault(QStringLiteral("global_shortcuts/pin_clipboard_content"),
+                    macGlobalShortcutDefault(QStringLiteral("Meta+3"), 20));
+ #endif
++#if defined(Q_OS_HARMONY) || defined(Q_OS_OHOS)
++    const auto replaceOhosDefault = [&result](const QString& key, const QJsonArray& value) {
++        const auto found = std::find_if(result.begin(), result.end(),
++                                        [&key](const auto& entry) { return entry.key == key; });
++        if (found != result.end()) {
++            found->defaultValue = shortcutDefaults(key, value);
++        }
++    };
++    // Keep recording defaults parallel to the OHOS screenshot pair
++    // (Ctrl+Alt+F1 / Ctrl+F1), so the first-run experience is keyboard-first.
++    replaceOhosDefault(QStringLiteral("global_shortcuts/screen_record"),
++                       QJsonArray{QStringLiteral("Ctrl+Alt+F2")});
++    replaceOhosDefault(QStringLiteral("global_shortcuts/screen_record_copy"),
++                       QJsonArray{QStringLiteral("Ctrl+F2")});
++#endif
+     result.removeIf([](const ConfigurationSchemaEntry& entry) {
+         return !app::editionConfigurationKeyAvailable(entry.key);
+     });
