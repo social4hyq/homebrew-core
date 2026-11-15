@@ -5,10 +5,10 @@ into an unauthorized shared directory. The explicit automation path keeps
 its existing path constraints unchanged.
 
 diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
-index 1d1f44a..55f308e 100644
+index 0e9dd42..c663a32 100644
 --- a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
 +++ b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
-@@ -42,12 +42,10 @@
+@@ -45,12 +45,10 @@
  #include "snow_shot/presentation/styles/themecolorscheme.h"
  #include "snow_shot/presentation/screenrecordingfolder.h"
  
@@ -21,7 +21,7 @@ index 1d1f44a..55f308e 100644
  
  #include "snow_capture.h"
  #include "snow_recording.h"
-@@ -64,6 +62,7 @@
+@@ -67,6 +65,7 @@
  #include <QClipboard>
  #include <QDir>
  #include <QFileInfo>
@@ -29,7 +29,7 @@ index 1d1f44a..55f308e 100644
  #include <QMessageBox>
  #include <QPushButton>
  #include <QMimeData>
-@@ -1079,6 +1078,41 @@ struct ScreenRecordingController::Impl {
+@@ -1324,6 +1323,41 @@ struct ScreenRecordingController::Impl {
          }
      }
  
@@ -71,7 +71,7 @@ index 1d1f44a..55f308e 100644
      void start() {
          if (sessionEnding)
              return;
-@@ -1128,6 +1162,8 @@ struct ScreenRecordingController::Impl {
+@@ -1376,6 +1410,8 @@ struct ScreenRecordingController::Impl {
              setCaptureActivity(false);
              return;
          }

@@ -10,7 +10,7 @@ ImageEditingWindow's own UI text that the unpatched catalog already carries
 have no OHOS-specific behavior change, so this port does not translate them.
 
 diff --git a/snow_shot/i18n/history/snow_shot_history_en_US.ts b/snow_shot/i18n/history/snow_shot_history_en_US.ts
-index f416776..e9834b8 100644
+index 4f4f68d..0623503 100644
 --- a/snow_shot/i18n/history/snow_shot_history_en_US.ts
 +++ b/snow_shot/i18n/history/snow_shot_history_en_US.ts
 @@ -164,6 +164,14 @@
@@ -47,7 +47,7 @@ index f416776..e9834b8 100644
      </context>
      <context>
          <name>ImageSplitDocument</name>
-@@ -2314,6 +2330,26 @@ Files:
+@@ -2318,6 +2334,26 @@ Files:
              <source>The pinned image save could not be started</source>
              <translation>The pinned image save could not be started</translation>
          </message>

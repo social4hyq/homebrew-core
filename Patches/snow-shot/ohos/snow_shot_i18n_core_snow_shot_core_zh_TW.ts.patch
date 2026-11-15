@@ -2,10 +2,10 @@ OHOS: translate the one new recording-save prompt this port adds to
 SystemTrayController.
 
 diff --git a/snow_shot/i18n/core/snow_shot_core_zh_TW.ts b/snow_shot/i18n/core/snow_shot_core_zh_TW.ts
-index 001983f..6740c72 100644
+index 5c4180a..c5bde2e 100644
 --- a/snow_shot/i18n/core/snow_shot_core_zh_TW.ts
 +++ b/snow_shot/i18n/core/snow_shot_core_zh_TW.ts
-@@ -838,6 +838,10 @@ so every moment on screen can be expressed clearly and shared easily</source>
+@@ -886,6 +886,10 @@ so every moment on screen can be expressed clearly and shared easily</source>
      </context>
      <context>
          <name>SystemTrayController</name>

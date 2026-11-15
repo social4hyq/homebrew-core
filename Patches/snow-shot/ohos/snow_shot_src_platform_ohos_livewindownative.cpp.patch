@@ -6,6 +6,9 @@ path, tri-state monitoring, geometry/pixel validation, and RAII cleanup; drop
 a helper that only returned a `QRect==` comparison, candidate-count logging,
 and a warning for the normal no-target case.
 
+diff --git a/snow_shot/src/platform/ohos/livewindownative.cpp b/snow_shot/src/platform/ohos/livewindownative.cpp
+new file mode 100644
+index 0000000..65c14aa
 --- /dev/null
 +++ b/snow_shot/src/platform/ohos/livewindownative.cpp
 @@ -0,0 +1,369 @@

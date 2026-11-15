@@ -3,12 +3,14 @@ way it is already skipped on macOS, via the existing preprocessor guard,
 rather than adding a new public API for it. Drop the startup-stage diagnostic
 lambda and its call sites.
 
+diff --git a/snow_shot/src/app/main.cpp b/snow_shot/src/app/main.cpp
+index f2151e3..1b1af39 100644
 --- a/snow_shot/src/app/main.cpp
 +++ b/snow_shot/src/app/main.cpp
-@@ -503,8 +503,8 @@
+@@ -495,8 +495,8 @@ int main(int argc, char* argv[]) {
      QObject::connect(&app, &QCoreApplication::aboutToQuit, &singleInstance,
                       [&singleInstance] { singleInstance.stopAcceptingLaunchRequests(); });
-
+ 
 -#ifndef Q_OS_MACOS
 -    // macOS updates use a downloaded DMG, not the standalone transaction helper.
 +#if !defined(Q_OS_MACOS) && !defined(Q_OS_HARMONY)

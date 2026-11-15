@@ -5,6 +5,8 @@ logging, a tray-polling code path that cannot be reached on OHOS (and its
 dedicated header), and a duplicate assignment of the OCR bundled-runtime
 root.
 
+diff --git a/snow_shot/src/app/applicationcontroller.cpp b/snow_shot/src/app/applicationcontroller.cpp
+index 46076e4..3d0cdd3 100644
 --- a/snow_shot/src/app/applicationcontroller.cpp
 +++ b/snow_shot/src/app/applicationcontroller.cpp
 @@ -1,3 +1,7 @@
@@ -12,10 +14,10 @@ root.
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
 +#include <QtCore/private/qohosappcontext_p.h>
 +#endif
- #include "snow_draw_engine_qt/snow_canvas_image.h"
  #include "snow_shot/app/edition.h"
  #include "snow_shot/app/applicationcontroller.h"
-@@ -221,11 +225,16 @@
+ #include "snow_shot/app/distribution.h"
+@@ -201,11 +205,16 @@ class ApplicationController::Impl {
                           [this]() { ensureMainWindow().showScreenshotSettings(); });
          QObject::connect(&systemTray, &presentation::SystemTrayController::openAboutRequested, &q,
                           [this]() { ensureMainWindow().showAbout(); });
@@ -36,7 +38,7 @@ root.
          QObject::connect(&systemTray, &presentation::SystemTrayController::exitRequested, &q, []() {
              if (storage::ApplicationStorage::instance().directoryChanging())
                  return;
-@@ -359,6 +368,18 @@
+@@ -348,6 +357,18 @@ class ApplicationController::Impl {
          ScreenshotOcrRecognitionService::Options ocrOptions;
          ocrOptions.offlineRoot =
              QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("assets/ocr"));
@@ -55,7 +57,7 @@ root.
          if (applicationStorage.isInitialized() &&
              !applicationStorage.configurationDirectory().trimmed().isEmpty()) {
              ocrOptions.cacheRoot = QDir(applicationStorage.configurationDirectory())
-@@ -1523,7 +1544,11 @@
+@@ -1288,7 +1309,11 @@ class ApplicationController::Impl {
                           &permissions, &presentation::AppPermissionService::refresh);
          permissions.refresh();
  #endif

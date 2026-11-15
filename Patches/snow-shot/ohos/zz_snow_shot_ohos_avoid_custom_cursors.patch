@@ -1,7 +1,8 @@
 diff --git a/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp b/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp
+index 90c65b6..64712ef 100644
 --- a/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp
 +++ b/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp
-@@ -13,6 +13,11 @@
+@@ -17,11 +17,17 @@
  #include <QWheelEvent>
  
  QCursor snowCanvasCornerRadiusCursor(qreal devicePixelRatio) {
@@ -13,14 +14,13 @@ diff --git a/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp b/snow_d
      constexpr int kCursorLogicalSize = 32;
      constexpr QPoint kHotSpot(3, 3);
      return adqt::icons::makeCursor(snow::draw_engine::icons::cursor::CornerRadius(),
-@@ -19,5 +24,6 @@
                                     QSize(kCursorLogicalSize, kCursorLogicalSize), kHotSpot,
                                     devicePixelRatio);
 +#endif
  }
  
  namespace snow_canvas_input {
-@@ -24,6 +30,14 @@
+@@ -92,6 +98,14 @@ QCursor serialNumberCursor(const SnowCanvasSceneItem& preview, const QFont& font
  
  QCursor strokeCursor(double diameter, const std::optional<QColor>& color, bool crosshair,
                       qreal devicePixelRatio) {
@@ -35,7 +35,7 @@ diff --git a/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp b/snow_d
      diameter = std::isfinite(diameter) ? std::clamp(diameter, 1.0, 1024.0) : 1.0;
      const qreal dpr =
          std::isfinite(devicePixelRatio) && devicePixelRatio > 0.0 ? devicePixelRatio : 1.0;
-@@ -57,6 +71,7 @@
+@@ -125,6 +139,7 @@ QCursor strokeCursor(double diameter, const std::optional<QColor>& color, bool c
      }
      painter.end();
      return QCursor(pixmap, radius, radius);
@@ -44,9 +44,10 @@ diff --git a/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp b/snow_d
  
  QCursor cursorForSnowCursor(SnowCursorStyle style, qreal devicePixelRatio) {
 diff --git a/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp b/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp
+index 4cb4d21..f8a5aaa 100644
 --- a/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp
 +++ b/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp
-@@ -568,6 +568,12 @@
+@@ -568,6 +568,12 @@ void ScreenshotOverlayCanvasPresenter::setOverlayEffectCursor(
      if (canvas == nullptr)
          return;
      const qreal dpr = canvas->devicePixelRatioF();
@@ -59,7 +60,7 @@ diff --git a/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter
      const QCursor cursor =
          handle == ScreenshotSelectionEffectHandle::Width
              ? adqt::icons::makeCursor(
-@@ -575,6 +581,7 @@
+@@ -575,6 +581,7 @@ void ScreenshotOverlayCanvasPresenter::setOverlayEffectCursor(
                    QSize(32, 32), QPoint(3, 3), dpr)
              : snowCanvasCornerRadiusCursor(dpr);
      canvas->setCursorForLayer(SnowCanvasCursorLayer::Host, cursor);
@@ -68,9 +69,10 @@ diff --git a/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter
  
  namespace {
 diff --git a/snow_shot/src/presentation/services/screenshotcanvascolorsamplerwindow.cpp b/snow_shot/src/presentation/services/screenshotcanvascolorsamplerwindow.cpp
+index 100a3e0..df040ff 100644
 --- a/snow_shot/src/presentation/services/screenshotcanvascolorsamplerwindow.cpp
 +++ b/snow_shot/src/presentation/services/screenshotcanvascolorsamplerwindow.cpp
-@@ -158,6 +158,10 @@
+@@ -158,6 +158,10 @@ bool ScreenshotCanvasColorSamplerWindow::nativeEvent(const QByteArray& eventType
  }
  
  QCursor ScreenshotCanvasColorSamplerWindow::samplingCursor() {
@@ -81,7 +83,7 @@ diff --git a/snow_shot/src/presentation/services/screenshotcanvascolorsamplerwin
      QScreen* cursorScreen = QGuiApplication::screenAt(QCursor::pos());
      if (cursorScreen == nullptr) {
          cursorScreen = QGuiApplication::primaryScreen();
-@@ -192,6 +196,7 @@
+@@ -192,6 +196,7 @@ QCursor ScreenshotCanvasColorSamplerWindow::samplingCursor() {
      painter.end();
  
      return QCursor(cursorPixmap, 5, 25);

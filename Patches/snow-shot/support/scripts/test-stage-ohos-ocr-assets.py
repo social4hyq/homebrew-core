@@ -84,7 +84,7 @@ class StageOhosOcrAssetsTests(unittest.TestCase):
         manifest = {
             "schema": 2,
             "default_model": "small",
-            "runtime": {"version": "1.2.1", "platform": "windows-arm64"},
+            "runtime": {"version": "1.2.2", "platform": "windows-arm64"},
             "models": model_descriptors,
         }
         self.source_manifest.write_text(json.dumps(manifest), encoding="utf-8")

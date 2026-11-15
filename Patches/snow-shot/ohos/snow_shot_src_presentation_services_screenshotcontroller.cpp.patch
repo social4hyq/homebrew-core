@@ -7,9 +7,11 @@ constructed; merge them into one `saveSourceToFile` helper, removing about
 100 duplicated lines while keeping error handling, thread hand-off, cleanup
 and history-completion behavior byte-for-byte the same.
 
+diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow_shot/src/presentation/services/screenshotcontroller.cpp
+index 345ce83..8050621 100644
 --- a/snow_shot/src/presentation/services/screenshotcontroller.cpp
 +++ b/snow_shot/src/presentation/services/screenshotcontroller.cpp
-@@ -29,7 +29,12 @@
+@@ -31,7 +31,12 @@
  #include "snow_shot/app/mcp/screenshotmcpselection.h"
  #include "snow_shot/app/mcp/mcpstylepatch.h"
  #include "snow_shot/platform/screenshotnative.h"
@@ -22,8 +24,8 @@ and history-completion behavior byte-for-byte the same.
  #include <QThread>
  #include <QSysInfo>
  #include <cmath>
-@@ -72,6 +77,10 @@
- #include "snow_shot/presentation/screenshotexportartifact.h"
+@@ -78,6 +83,10 @@
+ #include "snow_shot/presentation/screenshothidpiimagescaling.h"
  #include "snow_shot/presentation/screenshotclouduploadservice.h"
  #include "snow_shot/presentation/screenshotexportcoordinator.h"
 +#ifdef Q_OS_HARMONY
@@ -33,7 +35,7 @@ and history-completion behavior byte-for-byte the same.
  #include "snow_shot/presentation/screenshotimagefileservice.h"
  #include "snow_shot/presentation/screenshotrecognitionfileexport.h"
  #include "snow_shot/presentation/screenshotsaveasfiledialog.h"
-@@ -126,10 +135,12 @@
+@@ -132,10 +141,12 @@
  #include <QApplication>
  #include <QClipboard>
  #include <QCoreApplication>
@@ -46,17 +48,17 @@ and history-completion behavior byte-for-byte the same.
  #include <QFileInfo>
  #include <QGuiApplication>
  #include <QProcessEnvironment>
-@@ -142,6 +153,7 @@
+@@ -148,6 +159,7 @@
  #include <QUrl>
  #include <QMimeData>
  #include <QTimer>
 +#include <QUuid>
  #include <QWindow>
-
+ 
  #include <algorithm>
-@@ -160,6 +172,22 @@
+@@ -167,6 +179,22 @@
  #endif
-
+ 
  namespace {
 +#ifdef Q_OS_HARMONY
 +QString stagedUserFilePath(QString extension) {
@@ -77,20 +79,22 @@ and history-completion behavior byte-for-byte the same.
  constexpr auto kCopyMessageKey = "screenshot-copy";
  constexpr auto kSaveMessageKey = "screenshot-save";
  constexpr auto kPinClipboardMessageKey = "screenshot-pin-clipboard";
-@@ -490,16 +518,11 @@
-     QPointer<ScreenshotCloudUploadJob> m_cloudUploadJob;
+@@ -503,18 +531,11 @@ struct ScreenshotController::Impl final : public ScreenshotToolbarCommandSink,
      bool m_cloudUploadPreparing = false;
      quint64 m_cloudUploadGeneration = 0;
+     [[nodiscard]] qreal imageExportScale() const;
 -    void saveImageToFile(QImage image, const QString& outputPath, ScreenshotImageFileFormat format,
 -                         ScreenshotPdfOptions pdf, ScreenshotImageEncodingOptions encoding,
 -                         quint64 generation,
 -                         std::shared_ptr<std::optional<ScreenshotHistoryEntry>> historyCandidate,
--                         snow_shot::storage::CaptureHistorySource historySource);
+-                         snow_shot::storage::CaptureHistorySource historySource,
+-                         qreal outputScale = 1.0);
 -    void saveSnapshotToFile(ScreenshotScrollingSnapshot snapshot, const QString& outputPath,
 -                            ScreenshotImageFileFormat format, ScreenshotPdfOptions pdf,
 -                            ScreenshotImageEncodingOptions encoding, quint64 generation,
 -                            std::shared_ptr<std::optional<ScreenshotHistoryEntry>> historyCandidate,
--                            snow_shot::storage::CaptureHistorySource historySource);
+-                            snow_shot::storage::CaptureHistorySource historySource,
+-                            qreal outputScale = 1.0);
 +    void saveSourceToFile(ScreenshotExportSource source, const QString& outputPath,
 +                          ScreenshotImageFileFormat format, ScreenshotPdfOptions pdf,
 +                          ScreenshotImageEncodingOptions encoding, quint64 generation,
@@ -99,7 +103,7 @@ and history-completion behavior byte-for-byte the same.
      void completeFileSave(ScreenshotExportTaskResult result, quint64 generation,
                            std::shared_ptr<std::optional<ScreenshotHistoryEntry>> historyCandidate,
                            snow_shot::storage::CaptureHistorySource historySource,
-@@ -671,6 +694,7 @@
+@@ -693,6 +714,7 @@ struct ScreenshotController::Impl final : public ScreenshotToolbarCommandSink,
      quint64 m_captureEpoch = 0;
      ScreenshotExportJobHandle m_exportJob;
      std::vector<std::weak_ptr<ScreenshotExportArtifact>> m_saveArtifacts;
@@ -107,7 +111,7 @@ and history-completion behavior byte-for-byte the same.
      std::vector<ScreenshotExportJobHandle> m_exportJobs;
      ScreenshotClipboardCommitScope m_clipboardScope;
      ScreenshotExportJobHandle m_clipboardPinJob;
-@@ -715,6 +739,9 @@
+@@ -738,6 +760,9 @@ struct ScreenshotController::Impl final : public ScreenshotToolbarCommandSink,
      ScreenshotGuideVisibilityState m_guideVisibility;
      std::function<bool(bool, bool, bool)> m_recordingPermissionCheck;
      std::unique_ptr<ScreenRecordingController> m_screenRecordingController;
@@ -117,7 +121,7 @@ and history-completion behavior byte-for-byte the same.
      bool m_constructingRecognitionFeature = false;
      bool m_constructingScrollingFeature = false;
      bool m_constructingRecordingFeature = false;
-@@ -1249,6 +1276,18 @@
+@@ -1296,6 +1321,18 @@ bool ScreenshotController::Impl::ensureRecognitionFeature() {
              .toString());
      ocrOptions.offlineRoot =
          QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("assets/ocr"));
@@ -136,7 +140,7 @@ and history-completion behavior byte-for-byte the same.
      if (applicationStorage.isInitialized() &&
          !applicationStorage.configurationDirectory().trimmed().isEmpty()) {
          ocrOptions.cacheRoot = QDir(applicationStorage.configurationDirectory())
-@@ -1264,7 +1303,22 @@
+@@ -1311,8 +1348,23 @@ bool ScreenshotController::Impl::ensureRecognitionFeature() {
      }
  #if SNOW_SHOT_ENABLE_QR_RECOGNITION
      if (!m_qrRecognition)
@@ -155,11 +159,12 @@ and history-completion behavior byte-for-byte the same.
 +                .filePath(QStringLiteral("assets/qrcode")));
 +#else
          m_qrRecognition = std::make_unique<ScreenshotQrRecognitionService>(&owner);
-+#endif
  #endif
++#endif
  #if SNOW_SHOT_ENABLE_TABLE_RECOGNITION || SNOW_SHOT_ENABLE_LATEX_RECOGNITION ||                    \
      SNOW_SHOT_ENABLE_IMAGE_CONVERSION || SNOW_SHOT_ENABLE_TEXT_TRANSLATION
-@@ -4873,8 +4927,14 @@
+     if (m_tableRecognition == nullptr) {
+@@ -4989,8 +5041,14 @@ void ScreenshotController::Impl::saveSelectionToFile() {
          return;
      }
  #endif
@@ -176,7 +181,7 @@ and history-completion behavior byte-for-byte the same.
          saveSelectionWithSnowDialog();
          return;
      }
-@@ -4896,9 +4956,61 @@
+@@ -5012,9 +5070,61 @@ void ScreenshotController::Impl::saveSelectionToFile() {
                                           outputSettings.manualSaveFilenameFormat());
      const auto defaults = screenshotManualSaveDefaults(QDateTime::currentDateTime(), names);
      QString selectedFilter = defaults.selectedFilter;
@@ -238,32 +243,32 @@ and history-completion behavior byte-for-byte the same.
      if (selectedPath.isEmpty()) {
          return;
      }
-@@ -4933,8 +5045,9 @@
+@@ -5050,8 +5160,9 @@ void ScreenshotController::Impl::saveSelectionToFile() {
              !receiver->m_impl->imageExportCurrent(generation)) {
              return;
          }
 -        receiver->m_impl->saveImageToFile(std::move(image), outputPath, format, pdf, encoding,
--                                          generation, historyCandidate, historySource);
+-                                          generation, historyCandidate, historySource, outputScale);
 +        receiver->m_impl->saveSourceToFile(
-+            ScreenshotExportSource::fromImage(std::move(image)), outputPath, format, pdf, encoding,
++            ScreenshotExportSource::fromImage(std::move(image)).withOutputScale(outputScale), outputPath, format, pdf, encoding,
 +            generation, historyCandidate, historySource);
      };
-
+ 
      bool scheduled = false;
-@@ -4953,9 +5066,9 @@
+@@ -5070,9 +5181,9 @@ void ScreenshotController::Impl::saveSelectionToFile() {
                      !receiver->m_impl->imageExportCurrent(generation)) {
                      return;
                  }
 -                receiver->m_impl->saveSnapshotToFile(std::move(snapshot), outputPath, format, pdf,
 -                                                     encoding, generation, historyCandidate,
--                                                     historySource);
+-                                                     historySource, outputScale);
 +                receiver->m_impl->saveSourceToFile(
-+                    ScreenshotExportSource::fromScrollingSnapshot(std::move(snapshot)), outputPath,
++                    ScreenshotExportSource::fromScrollingSnapshot(std::move(snapshot)).withOutputScale(outputScale), outputPath,
 +                    format, pdf, encoding, generation, historyCandidate, historySource);
              });
      } else if (m_selection.hasPixelSelection() && m_exportService != nullptr) {
          const ScreenshotResultStyle style = m_selection.resultStyle();
-@@ -5010,6 +5123,187 @@
+@@ -5127,6 +5238,187 @@ void ScreenshotController::Impl::saveRecognitionResultWithSystemDialog(
          ScreenshotImageFileService::suggestedBaseName(settings.manualSaveFilenameFormat(),
                                                        timestamp, names),
          QLatin1Char('.') + ScreenshotRecognitionFileExport::extension(snapshot.kind)));
@@ -451,7 +456,7 @@ and history-completion behavior byte-for-byte the same.
      const QString selectedPath = QFileDialog::getSaveFileName(
          dialogOwner.data(),
          QCoreApplication::translate("ScreenshotController", "Save recognition result"), initialPath,
-@@ -5035,6 +5329,7 @@
+@@ -5152,6 +5444,7 @@ void ScreenshotController::Impl::saveRecognitionResultWithSystemDialog(
      static_cast<void>(settings.setLastManualSaveDirectory(QFileInfo(result.path).absolutePath()));
      detachCaptureForExport(ExportDetachMode::Immediate,
                             ScreenshotCaptureFocusDisposition::RestorePrevious);
@@ -459,18 +464,39 @@ and history-completion behavior byte-for-byte the same.
  #else
      Q_UNUSED(snapshot)
  #endif
-@@ -5153,20 +5448,93 @@
+@@ -5273,52 +5566,93 @@ void ScreenshotController::Impl::saveSelectionWithSnowDialog() {
          finished(false);
  }
-
+ 
 -void ScreenshotController::Impl::saveImageToFile(
 -    QImage image, const QString& outputPath, ScreenshotImageFileFormat format,
 +void ScreenshotController::Impl::saveSourceToFile(
 +    ScreenshotExportSource source, const QString& outputPath, ScreenshotImageFileFormat format,
      ScreenshotPdfOptions pdf, ScreenshotImageEncodingOptions encoding, quint64 generation,
      std::shared_ptr<std::optional<ScreenshotHistoryEntry>> historyCandidate,
-     snow_shot::storage::CaptureHistorySource historySource) {
+-    snow_shot::storage::CaptureHistorySource historySource, qreal outputScale) {
++    snow_shot::storage::CaptureHistorySource historySource) {
      const QPointer<ScreenshotController> receiver(&owner);
+-    auto artifact = std::make_shared<ScreenshotExportArtifact>(
+-        ScreenshotExportSource::fromImage(std::move(image)).withOutputScale(outputScale),
+-        encoding.compressionLevel);
+-    std::erase_if(m_saveArtifacts, [](const auto& weak) { return weak.expired(); });
+-    m_saveArtifacts.push_back(artifact);
+-    const bool started = artifact->requestSaveToPath(
+-        &owner, outputPath, format, encoding,
+-        [receiver, generation, historyCandidate, historySource,
+-         artifact](ScreenshotExportTaskResult result) mutable {
+-            if (!receiver.isNull() && receiver->m_impl != nullptr) {
+-                receiver->m_impl->completeFileSave(std::move(result), generation, historyCandidate,
+-                                                   historySource, artifact);
+-            }
+-        },
+-        pdf);
+-    if (!started) {
+-        completeFileSave(ScreenshotExportTaskResult::failure(
+-                             ScreenshotExportFailureStage::Queue,
+-                             QStringLiteral("The screenshot export queue is full")),
+-                         generation, std::move(historyCandidate), historySource, artifact);
 +#ifdef Q_OS_HARMONY
 +    const QString userFileUri =
 +        snow_shot::platform::ohos::isDocumentViewPickerUri(outputPath)
@@ -488,12 +514,23 @@ and history-completion behavior byte-for-byte the same.
 +                QStringLiteral("Could not create a staging path for the selected file")),
 +            generation, std::move(historyCandidate), historySource);
 +        return;
-+    }
+     }
+-}
+-
+-void ScreenshotController::Impl::saveSnapshotToFile(
+-    ScreenshotScrollingSnapshot snapshot, const QString& outputPath,
+-    ScreenshotImageFileFormat format, ScreenshotPdfOptions pdf,
+-    ScreenshotImageEncodingOptions encoding, quint64 generation,
+-    std::shared_ptr<std::optional<ScreenshotHistoryEntry>> historyCandidate,
+-    snow_shot::storage::CaptureHistorySource historySource, qreal outputScale) {
+-    const QPointer<ScreenshotController> receiver(&owner);
 +#else
 +    const QString nativeOutputPath = outputPath;
 +#endif
      auto artifact = std::make_shared<ScreenshotExportArtifact>(
--        ScreenshotExportSource::fromImage(std::move(image)), encoding.compressionLevel);
+-        ScreenshotExportSource::fromScrollingSnapshot(std::move(snapshot))
+-            .withOutputScale(outputScale),
+-        encoding.compressionLevel);
 +        std::move(source), encoding.compressionLevel);
      std::erase_if(m_saveArtifacts, [](const auto& weak) { return weak.expired(); });
      m_saveArtifacts.push_back(artifact);
@@ -559,44 +596,7 @@ and history-completion behavior byte-for-byte the same.
              if (!receiver.isNull() && receiver->m_impl != nullptr) {
                  receiver->m_impl->completeFileSave(std::move(result), generation, historyCandidate,
                                                     historySource, artifact);
-@@ -5181,36 +5549,6 @@
-     }
- }
-
--void ScreenshotController::Impl::saveSnapshotToFile(
--    ScreenshotScrollingSnapshot snapshot, const QString& outputPath,
--    ScreenshotImageFileFormat format, ScreenshotPdfOptions pdf,
--    ScreenshotImageEncodingOptions encoding, quint64 generation,
--    std::shared_ptr<std::optional<ScreenshotHistoryEntry>> historyCandidate,
--    snow_shot::storage::CaptureHistorySource historySource) {
--    const QPointer<ScreenshotController> receiver(&owner);
--    auto artifact = std::make_shared<ScreenshotExportArtifact>(
--        ScreenshotExportSource::fromScrollingSnapshot(std::move(snapshot)),
--        encoding.compressionLevel);
--    std::erase_if(m_saveArtifacts, [](const auto& weak) { return weak.expired(); });
--    m_saveArtifacts.push_back(artifact);
--    const bool started = artifact->requestSaveToPath(
--        &owner, outputPath, format, encoding,
--        [receiver, generation, historyCandidate, historySource,
--         artifact](ScreenshotExportTaskResult result) mutable {
--            if (!receiver.isNull() && receiver->m_impl != nullptr) {
--                receiver->m_impl->completeFileSave(std::move(result), generation, historyCandidate,
--                                                   historySource, artifact);
--            }
--        },
--        pdf);
--    if (!started) {
--        completeFileSave(ScreenshotExportTaskResult::failure(
--                             ScreenshotExportFailureStage::Queue,
--                             QStringLiteral("The screenshot export queue is full")),
--                         generation, std::move(historyCandidate), historySource, artifact);
--    }
--}
--
- void ScreenshotController::Impl::completeFileSave(
-     ScreenshotExportTaskResult result, quint64 generation,
-     std::shared_ptr<std::optional<ScreenshotHistoryEntry>> historyCandidate,
-@@ -5234,9 +5572,17 @@
+@@ -5356,9 +5690,17 @@ void ScreenshotController::Impl::completeFileSave(
      }
      if (result.succeeded()) {
          const snow_shot::storage::ScreenshotSettings settings;
@@ -617,7 +617,7 @@ and history-completion behavior byte-for-byte the same.
          publishHistoryResult(std::move(historyCandidate), historySource, std::move(artifact));
      }
  }
-@@ -6344,7 +6690,22 @@
+@@ -6507,7 +6849,22 @@ void ScreenshotController::Impl::startAutomaticQrRecognition() {
          m_selection.regionOperationActive() || m_selection.constructionActive() || m_recaptureBusy)
          return;
      if (!m_qrRecognition)
@@ -640,11 +640,10 @@ and history-completion behavior byte-for-byte the same.
      if (!m_qrController) {
          m_qrController = std::make_unique<ScreenshotQrController>(
              *m_qrRecognition, ScreenshotQrController::Actions{{}, [this] { cancelCapture(); }},
-@@ -6927,6 +7288,33 @@
-         m_impl->m_screenRecordingController->openRecordingFolder();
+@@ -7084,6 +7441,33 @@ void ScreenshotController::openScreenRecordingFolder() {
      }
  }
-+
+ 
 +#ifdef Q_OS_HARMONY
 +void ScreenshotController::exportScreenRecordingToUserFile(const QString& path) {
 +    if (path.isEmpty() ||
@@ -671,6 +670,7 @@ and history-completion behavior byte-for-byte the same.
 +    static_cast<void>(exportSession->start(path));
 +}
 +#endif
-
++
  void ScreenshotController::editHistoryRecord(const QString& recordId) {
      ++m_impl->m_captureEpoch;
+     m_impl->startHistoryEdit(recordId);

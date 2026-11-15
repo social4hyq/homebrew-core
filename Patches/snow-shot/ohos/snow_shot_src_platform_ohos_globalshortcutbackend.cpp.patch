@@ -6,6 +6,9 @@ exists). Drop an unused `getStringProperty` accessor and per-dispatch/queue
 debug logging and the matching ArkTS lifecycle/subscription info traces;
 keep the failure diagnostics and the save-queue NAPI interface.
 
+diff --git a/snow_shot/src/platform/ohos/globalshortcutbackend.cpp b/snow_shot/src/platform/ohos/globalshortcutbackend.cpp
+new file mode 100644
+index 0000000..f09a112
 --- /dev/null
 +++ b/snow_shot/src/platform/ohos/globalshortcutbackend.cpp
 @@ -0,0 +1,615 @@
@@ -544,7 +547,7 @@ keep the failure diagnostics and the save-queue NAPI interface.
 +
 +NAPI_MODULE(snow_shot, initializeNativeHotkeys)
 +
-+GlobalShortcutValidationResult validation(const shortcuts::ShortcutBinding& binding,
++GlobalShortcutValidationResult ohosValidation(const shortcuts::ShortcutBinding& binding,
 +                                          bool supported) {
 +    return {binding.portableText, supported,
 +            supported ? GlobalShortcutFailureReason::None
@@ -573,7 +576,7 @@ keep the failure diagnostics and the save-queue NAPI interface.
 +    }
 +    GlobalShortcutValidationResult
 +    validateShortcut(const shortcuts::ShortcutBinding& binding) const override {
-+        return validation(binding, parse(binding).has_value());
++        return ohosValidation(binding, parse(binding).has_value());
 +    }
 +    GlobalShortcutBackendResult
 +    registerShortcut(int id, const shortcuts::ShortcutBinding& binding) override {
