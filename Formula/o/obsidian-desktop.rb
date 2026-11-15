@@ -1,8 +1,8 @@
 class ObsidianDesktop < Formula
   desc "Notes desktop for HarmonyOS PC running the official Obsidian package"
   homepage "https://obsidian.md"
-  url "https://github.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.0/obsidian-desktop-0.1.0.tar.gz"
-  sha256 "3a9b494710eac84b00f6fbef28bf7ec40b5899c780e5ac5c0ca4739133a4b114"
+  url "https://github.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.1/obsidian-desktop-0.1.1.tar.gz"
+  sha256 "213c9d8713e69e32c4b9d77c6251974e6ea23cc241e846e08e5d00c10839de4d"
   # Tap-authored host/scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt. Obsidian itself is proprietary and is never redistributed here:
   # the official Linux arm64 package is fetched on the user's machine at
@@ -13,12 +13,7 @@ class ObsidianDesktop < Formula
     skip "Tap-hosted payload, versioned with the formula"
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "936501aa5d90c987f2da9389b3e71708f2aaaf198248bde6db5b74fe586b7c3d"
-  end
-
-  depends_on "node" => :build
+  depends_on "node"
   depends_on "curl"
   depends_on "hap-installer"
   depends_on "ohos-sdk-toolchains"
@@ -146,10 +141,14 @@ class ObsidianDesktop < Formula
     chmod 0755, pkgshare/"install-desktop.sh"
     libexec.install buildpath/"scripts/obsidian-desktop.sh"
     chmod 0755, libexec/"obsidian-desktop.sh"
+    libexec.install buildpath/"scripts/obsidian-cli.cjs"
+    chmod 0755, libexec/"obsidian-cli.cjs"
     (bin/"obsidian-desktop").write_env_script libexec/"obsidian-desktop.sh",
       OBSIDIAN_DESKTOP_UNSIGNED_HAP:   libexec/"obsidian-desktop-unsigned.hap",
       OBSIDIAN_DESKTOP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
       OBSIDIAN_DESKTOP_MODULE_ACL:     pkgshare/"module-acl.json",
+      OBSIDIAN_DESKTOP_CLI:            libexec/"obsidian-cli.cjs",
+      OBSIDIAN_DESKTOP_NODE:           formula_opt_bin("node")/"node",
       OBSIDIAN_DESKTOP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
       OBSIDIAN_ASAR_URL:               OBSIDIAN_ASAR_URL,
       OBSIDIAN_ASAR_SHA256:            OBSIDIAN_ASAR_SHA256
@@ -180,6 +179,13 @@ class ObsidianDesktop < Formula
       rejects the install with 9568289. `--no-acl` installs the strong-sandbox
       variant instead (vaults in the app sandbox, no paste, no JIT).
 
+      Command line interface: enable Settings -> General -> Command line
+      interface once, then use `obsidian-desktop cli <command>` (same commands
+      as Obsidian's own `obsidian` CLI: try `obsidian-desktop cli help`). The
+      app listens on a UNIX socket inside its sandbox; the host process bridges
+      it to loopback TCP with a token stored in
+      ~/.cache/obsidian-desktop/cli.json.
+
       Desktop self-update is disabled; upgrading is `brew upgrade` plus
       `obsidian-desktop install`. Bumping Obsidian means bumping
       OBSIDIAN_VERSION, OBSIDIAN_ASAR_URL and OBSIDIAN_ASAR_SHA256.
@@ -191,6 +197,8 @@ class ObsidianDesktop < Formula
     home.mkpath
     ENV["HOME"] = home
     assert_match "Usage: obsidian-desktop", shell_output("#{bin}/obsidian-desktop --help")
+    assert_match "cli ...", shell_output("#{bin}/obsidian-desktop --help")
+    assert_path_exists libexec/"obsidian-cli.cjs"
 
     hap = libexec/"obsidian-desktop-unsigned.hap"
     assert_path_exists hap
