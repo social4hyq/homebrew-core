@@ -31,6 +31,15 @@ class DeepseekHarnessDesktop < Formula
   end
 
   def install
+    # DIAG (branch-only): progress markers + tightened step bounds. Stripped
+    # before this change reaches the PR branch.
+    diag_t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    mark = lambda do |label|
+      puts "dsh-diag #{(Process.clock_gettime(Process::CLOCK_MONOTONIC) - diag_t0).round}s: #{label}"
+      $stdout.flush
+    end
+    mark.call("install start")
+
     # __dir__ 是 Formula/d/；Patches 在 tap 根。MUST use the file ancestry here.
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     patches = tap_root/"Patches/deepseek-harness-desktop"
@@ -40,6 +49,7 @@ class DeepseekHarnessDesktop < Formula
     system "tar", "-xzf", buildpath/"electron-prebuilt/libelectron_132.tar.gz",
            "-C", buildpath/"electron-prebuilt"
     shell = buildpath/"electron-prebuilt/libelectron/ohos_hap"
+    mark.call("electron prebuilt unpacked")
 
     # Homebrew strips the archive's single top-level directory on unpack, so
     # the payload files sit directly in buildpath; tolerate both layouts.
@@ -72,6 +82,7 @@ class DeepseekHarnessDesktop < Formula
     scope = JSON.parse(app_scope.read)
     scope["string"].each { |entry| entry["value"] = "DeepSeek Harness" if entry["name"] == "app_name" }
     app_scope.write JSON.pretty_generate(scope)
+    mark.call("branding done")
 
     # Prebuilt shell payload (Electron main bundle, renderer dist, dependency
     # closure) replaces the shell project's app resources.
@@ -79,6 +90,7 @@ class DeepseekHarnessDesktop < Formula
     rm_r app if app.exist?
     app.mkpath
     %w[lib dsh node_modules package.json icon.png].each { |name| cp_r payload/name, app/name }
+    mark.call("payload copied into shell project")
 
     clt = Pathname.new("/opt/electron-ohos-clt")
     odie "deepseek-harness-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES" unless
@@ -95,9 +107,13 @@ class DeepseekHarnessDesktop < Formula
     cd shell do
       # Bounded so a stalled proxy surfaces at the right step instead of
       # silently eating the job budget.
-      system "timeout", "900", "node", clt/"ohpm/bin/pm-cli.js", "install"
-      system "timeout", "1800", "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
+      mark.call("ohpm install start")
+      system "timeout", "600", "node", clt/"ohpm/bin/pm-cli.js", "install"
+      mark.call("ohpm install done")
+      mark.call("hvigor assembleHap start")
+      system "timeout", "1200", "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
              "--mode", "module", "-p", "product=default", "--no-daemon"
+      mark.call("hvigor assembleHap done")
     end
 
     # Host-side runtime tree (dsh + primary-runtime + launchers), prebuilt.
@@ -108,6 +124,7 @@ class DeepseekHarnessDesktop < Formula
         raise "runtime payload is missing #{probe}" unless (root/probe).exist?
       end
       (libexec/"runtime").install Dir[root/"*"]
+      mark.call("runtime staged into libexec")
     end
     libexec.install patches/"dsh-desktop-bridge.mjs"
     (libexec/"dsh-desktop.sh").write((patches/"dsh-desktop.sh").read)
@@ -122,6 +139,7 @@ class DeepseekHarnessDesktop < Formula
       DSH_DESKTOP_UNSIGNED_HAP:    opt_libexec/"dsh-desktop-unsigned.hap"
     libexec.install shell/"electron/build/default/outputs/default/electron-default-unsigned.hap" =>
                      "dsh-desktop-unsigned.hap"
+    mark.call("hap installed into libexec")
   end
 
   def caveats
