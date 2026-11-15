@@ -1,7 +1,7 @@
 class DeepseekHarnessDesktop < Formula
   desc "Agent desktop shell with a host-side runtime bridge for OpenHarmony"
   homepage "https://github.com/deepseek-ai/deepseek-harness"
-  url "https://github.com/social4hyq/homebrew-core/releases/download/deepseek-harness-desktop-v0.2.2-rc.3/dsh-desktop-shell-0.2.2-rc.3.tar.gz"
+  url "https://github.com/social4hyq/homebrew-core/releases/download/deepseek-harness-desktop-v0.2.2-rc.3/dsh-desktop-shell-0.2.2-rc.3-88258f42.tar.gz"
   sha256 "88258f42185620890d067cce6b4eb48b759138b4370d5f76388700e2ad22b480"
   license "MIT"
 
