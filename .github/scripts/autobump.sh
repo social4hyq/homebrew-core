@@ -444,6 +444,8 @@ for line in "${CANDIDATES[@]}"; do
 
   if [ "$FORMULA" = deepseek-harness-desktop ]; then
     # brew test requires the shell package version to match the formula.
+    # bump-formula-pr pushes by URL, so origin's remote-tracking ref may not
+    # exist; take the lease expectation from the branch actually on GitHub.
     PACKAGE_JSON="$TAP_IN_CONTAINER/Patches/deepseek-harness-desktop/app/package.json"
     if ! docker exec "$CONTAINER" bash -lc "
       set -euo pipefail
@@ -452,7 +454,9 @@ for line in "${CANDIDATES[@]}"; do
       python3 -c 'import json,os,sys; p=sys.argv[1]; d=json.load(open(p)); d[\"version\"]=sys.argv[2]; t=p+\".tmp\"; open(t,\"w\").write(json.dumps(d,indent=2)+\"\\n\"); os.replace(t,p); assert json.load(open(p))[\"version\"] == sys.argv[2]' \"$PACKAGE_JSON\" \"$LATEST\"
       git add \"$PACKAGE_JSON\"
       git commit --amend --no-edit
-      git push --force-with-lease origin \"$BRANCH\"
+      REMOTE_SHA=\$(git ls-remote origin \"refs/heads/$BRANCH\" | cut -f1)
+      [[ \"\$REMOTE_SHA\" =~ ^[0-9a-f]{40}\$ ]]
+      git push --force-with-lease=\"refs/heads/$BRANCH:\$REMOTE_SHA\" origin \"$BRANCH\"
     "; then
       echo "::error::$FORMULA: failed to synchronize the shell package version"
       echo "- ❌ $FORMULA $LATEST: shell version sync failed" >> "$GITHUB_STEP_SUMMARY"
