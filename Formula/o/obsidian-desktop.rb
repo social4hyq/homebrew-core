@@ -13,6 +13,11 @@ class ObsidianDesktop < Formula
     skip "Tap-hosted payload, versioned with the formula"
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "936501aa5d90c987f2da9389b3e71708f2aaaf198248bde6db5b74fe586b7c3d"
+  end
+
   depends_on "node" => :build
   depends_on "curl"
   depends_on "hap-installer"
