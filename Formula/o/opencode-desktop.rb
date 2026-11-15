@@ -1,24 +1,20 @@
 class OpencodeDesktop < Formula
   desc "Desktop shell for the OpenCode agent (Electron window on local opencode serve)"
   homepage "https://opencode.ai"
-  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.0/opencode-desktop-0.1.0.tar.gz"
-  sha256 "fbe67b2bd3cdc2ed7889bed9b6f252eab827dc3237ddc7ccd368a34345dbc0bd"
+  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.1/opencode-desktop-0.1.1.tar.gz"
+  sha256 "6e2afe1b4f061db91c5dbf917506653211869d66f4d41adfde637ef96398ed1d"
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
-  revision 3
 
   livecheck do
     skip "Tap-hosted payload, versioned with the formula"
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.0-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "425524ce26bd23b17cbb550b0e0c0d79b2c43f8cddc31459f87ab43d190bcd90"
-  end
-
   depends_on "node" => :build
+  depends_on "curl"
   depends_on "hap-installer"
+  depends_on "ohos-sdk-toolchains"
   depends_on "opencode"
   depends_on "zip"
 
@@ -117,6 +113,20 @@ class OpencodeDesktop < Formula
 
     libexec.install shell/"electron/build/default/outputs/default/electron-default-unsigned.hap" =>
                     "opencode-desktop-unsigned.hap"
+
+    # The default HAP requests only what local automatic signing can grant
+    # without ACLs. `opencode-desktop install` swaps in this variant (which
+    # also requests the two ACL-gated permissions) when it can prepare an
+    # ACL-capable signing profile, so the shell may start `opencode serve`
+    # itself and reach the host user files.
+    hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"opencode-desktop-unsigned.hap", "module.json")
+    module_json = JSON.parse(hap_module)
+    requested = module_json.fetch("module").fetch("requestPermissions")
+    %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE].each do |name|
+      requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
+    end
+    (pkgshare/"module-acl.json").write JSON.generate(module_json)
+
     pkgshare.install buildpath/"scripts/install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
     libexec.install buildpath/"scripts/opencode-desktop.sh"
@@ -124,6 +134,8 @@ class OpencodeDesktop < Formula
     (bin/"opencode-desktop").write_env_script libexec/"opencode-desktop.sh",
       OPENCODE_DESKTOP_UNSIGNED_HAP:   libexec/"opencode-desktop-unsigned.hap",
       OPENCODE_DESKTOP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
+      OPENCODE_DESKTOP_MODULE_ACL:     pkgshare/"module-acl.json",
+      OPENCODE_DESKTOP_OPENCODE_BIN:   formula_opt_bin("opencode")/"opencode",
       PATH:                            "#{formula_opt_bin("opencode")}:$PATH"
   end
 
@@ -134,10 +146,13 @@ class OpencodeDesktop < Formula
       Developer login, local debug profile generation, signing, installation,
       and launch.
 
-      The shell displays the UI served by a local `opencode serve` instance
-      managed by the `opencode-desktop` command. Before launching the app,
-      run `opencode-desktop serve` (add it to your shell startup to keep the
-      backend running). Sessions are shared with the opencode TUI.
+      The shell starts its local `opencode serve` instance itself on launch and
+      shares the sessions of the opencode TUI. This needs the weak-sandbox
+      permissions CUSTOM_SANDBOX and READ_WRITE_USER_FILE, which are granted
+      through a debug profile generated on the spot (no approval wait; the
+      release path still goes through AGC review). When the system command
+      line toolchain is missing, install falls back to the strong-sandbox HAP
+      and the shell then waits for `opencode-desktop serve`.
     EOS
   end
 
@@ -150,29 +165,87 @@ class OpencodeDesktop < Formula
     assert_match "healthy", shell_output("#{bin}/opencode-desktop status")
     assert_match "stopped", shell_output("#{bin}/opencode-desktop stop")
 
-    # Install path: config injection is exercised with a fake hap-installer.
+    # Install path: config/ACL injection and signing-project patching are
+    # exercised with a fake hap-installer/devecocli and a minimal CLT source;
+    # the fake installer copies the HAP out of the script's mktemp staging dir
+    # before the script's exit trap removes it.
     fake_bin = testpath/"bin"
     fake_bin.mkpath
     installer_args = testpath/"hap-installer-args"
+    injected_copy = testpath/"injected.hap"
+    clt_env = testpath/"clt-env"
     fake_installer = fake_bin/"hap-installer"
     fake_installer.write <<~SH
       #!/bin/sh
       printf '%s\n' "$@" > #{installer_args}
+      printf '%s\n' "${COMMAND_LINE_TOOL_PATH:-}" > #{clt_env}
+      while [ $# -gt 0 ]; do
+        if [ "$1" = "--hap" ]; then cp "$2" #{injected_copy}; fi
+        shift
+      done
     SH
     chmod 0755, fake_installer
+
+    fake_devecocli = fake_bin/"devecocli"
+    fake_devecocli.write <<~SH
+      #!/bin/sh
+      while [ $# -gt 0 ]; do
+        if [ "$1" = "--project-path" ]; then project="$2"; fi
+        shift
+      done
+      mkdir -p "$project/entry/src/main"
+      printf '{\\n  "module": {\\n    "name": "entry",\\n    "type": "entry"\\n  }\\n}\\n' > "$project/entry/src/main/module.json5"
+      printf '{"app":{"signingConfigs":[]}}\\n' > "$project/build-profile.json5"
+    SH
+    chmod 0755, fake_devecocli
+
+    clt_src = testpath/"clt-src"
+    (clt_src/"sdk/default/openharmony/toolchains/lib").mkpath
+    (clt_src/"sdk/default/openharmony/toolchains/hdc").write "#!/bin/sh\nexit 0\n"
+    (clt_src/"sdk/default/openharmony/toolchains/lib/PermissionDefinitions.json").write "{}"
+    clt_cache = testpath/"clt-cache"
+
     ENV.prepend_path "PATH", fake_bin
+    ENV["OPENCODE_DESKTOP_CLT"] = clt_src.to_s
+    ENV["OPENCODE_DESKTOP_CLT_CACHE"] = clt_cache.to_s
+
     shell_output("#{bin}/opencode-desktop install")
     args = installer_args.read.lines(chomp: true)
-    injected = args[args.index("--hap") + 1]
     assert_equal "com.social4hyq.opencodedesktop", args[args.index("--bundle-id") + 1]
     assert_equal "electron", args[args.index("--module") + 1]
     assert_equal "EntryAbility", args[args.index("--ability") + 1]
-    config = JSON.parse(shell_output("unzip -p #{injected} resources/resfile/resources/app/config.json"))
+    assert_equal clt_cache.to_s, clt_env.read.strip
+    config = JSON.parse(shell_output("unzip -p #{injected_copy} resources/resfile/resources/app/config.json"))
     assert_operator config.fetch("port"), :>, 0
     refute_empty config.fetch("password")
+    refute_empty config.fetch("opencode")
+    assert_equal Dir.home, config.dig("host", "home")
+    acl_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
+    acl_requested = acl_module.fetch("module").fetch("requestPermissions")
+    acl_permissions = acl_requested.map { |permission| permission.fetch("name") }
+    assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO
+                    ohos.permission.INTERNET ohos.permission.READ_WRITE_USER_FILE],
+                 acl_permissions.sort
+    project_dir = Pathname.new(Dir.home)/".hap-installer/projects/com.social4hyq.opencodedesktop"
+    assert_match "CUSTOM_SANDBOX", (project_dir/"entry/src/main/module.json5").read
+
+    # `start` opens the app through hdc; --serve-only keeps a CLI backend.
+    hdc_args = testpath/"hdc-args"
+    fake_hdc = fake_bin/"hdc"
+    fake_hdc.write <<~SH
+      #!/bin/sh
+      printf '%s\n' "$@" > #{hdc_args}
+    SH
+    chmod 0755, fake_hdc
+    assert_match "serving at", shell_output("#{bin}/opencode-desktop start --serve-only")
+    assert_match "opened", shell_output("#{bin}/opencode-desktop start")
+    assert_equal %w[shell aa start -a EntryAbility -b com.social4hyq.opencodedesktop -m electron],
+                 hdc_args.read.lines(chomp: true)
+    assert_match "stopped", shell_output("#{bin}/opencode-desktop stop")
 
     hap = libexec/"opencode-desktop-unsigned.hap"
     assert_path_exists hap
+    assert_path_exists pkgshare/"module-acl.json"
     listing = shell_output("unzip -l #{hap}")
     assert_match "pack.info", listing
     assert_match "libs/arm64-v8a/libelectron.so", listing
