@@ -4,11 +4,10 @@ class SnowShot < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.2_snow-shot.tar.gz"
   sha256 "29190412a6dc9b41c0097fbf1313dc0f84412c9d23e1716260ed13acdcbd6c4e"
   license "GPL-3.0-or-later"
-  revision 20
+  revision 21
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.2-r24"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4182f3151169d78cb4ec79910a3307554758a1f8fa5e5bce24dbbc02411f834e"
   end
 
   depends_on "brotli" => :build
@@ -44,6 +43,7 @@ class SnowShot < Formula
   depends_on "zlib-ng-compat" => :build
   depends_on "zstd" => :build
   depends_on "hap-installer"
+  depends_on "ohos-sdk-toolchains"
 
   resource "ocr-detection-model" do
     url "https://www.modelscope.cn/models/mgchao/SnowShotOCR/resolve/master/PP-OCRv6/small/PP-OCRv6_det_small.onnx"
@@ -307,7 +307,8 @@ class SnowShot < Formula
     (libexec/"snow-shot-install").write (payload/"snow-shot-install.sh").read
     chmod 0555, libexec/"snow-shot-install"
     (bin/"snow-shot").write_env_script libexec/"snow-shot-install",
-      SNOW_SHOT_HAP: libexec/"snow-shot-unsigned.hap"
+      SNOW_SHOT_HAP: libexec/"snow-shot-unsigned.hap",
+      SNOW_SHOT_HDC: formula_opt_prefix("ohos-sdk-toolchains")/"hdc"
   end
 
   def package_hap(qt_sdk, command_line_tools, native_sdk)
