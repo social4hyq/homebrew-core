@@ -4,6 +4,7 @@ class SnowShot < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.7_snow-shot.tar.gz"
   sha256 "6d9de662710ccf406dea312c0322e77a3f473bc6121096ec82df713d30f4273c"
   license "GPL-3.0-or-later"
+  revision 2
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.7-r1"
@@ -32,6 +33,7 @@ class SnowShot < Formula
   depends_on "node" => :build
   depends_on "ohos-sdk" => :build
   depends_on "openssl@4" => :build
+  depends_on "patchelf" => :build
   depends_on "pkgconf" => :build
   depends_on "plutovg" => :build
   depends_on "rust" => :build
@@ -92,6 +94,21 @@ class SnowShot < Formula
   resource "jthread" do
     url "https://github.com/josuttis/jthread/archive/0fa8d394254886c555d6faccd0a3de819b7d47f8.tar.gz"
     sha256 "d3a20e0c1b2758c4545b0a97490afa2986e39c8b4387c3dba2007def742cbeb0"
+  end
+
+  # The Qt SDK ships a QtNetwork configured with -no-openssl, so QSslSocket does
+  # not exist at all and every https request fails. Rebuild the same qtbase
+  # snapshot with the runtime OpenSSL backend and ship the replacement library
+  # together with its TLS plugin.
+  resource "qtbase" do
+    url "https://github.com/qt/qtbase/archive/45a213e8d07f3823148ee59481e2fe3d7f4ef2df.tar.gz"
+    sha256 "b2c167f8f32e5b0ae5347ff368ad2a39edf45a7d72162ac6baf4a4554d3afad3"
+  end
+
+  # QtCore/Network need the NAPI headers of the OpenHarmony platform layer.
+  resource "node-addon-api" do
+    url "https://github.com/nodejs/node-addon-api/archive/refs/tags/v8.9.2.tar.gz"
+    sha256 "762e7b50e05b21017776add0811b8bca184276332a7716ad631fea6d3421e269"
   end
 
   patch_root = Pathname(__dir__).parent.parent
@@ -174,6 +191,12 @@ class SnowShot < Formula
         cp qr_source/filename, qr_root/filename
       end
     end
+
+    # Rebuild QtNetwork with OpenSSL before the application build and keep only
+    # its two payload files; the application itself keeps linking against the
+    # SSL-less SDK copy. Building it first also frees the Qt build tree before
+    # the much larger application build needs the disk.
+    qt_tls = build_qt_tls(qt, ohos_sdk)
 
     zlib_ng = formula_opt_prefix("zlib-ng-compat")
     qt_module_path = buildpath/"cmake/qt-modules"
@@ -303,7 +326,7 @@ class SnowShot < Formula
 
     # The remainder packages the exact Qt and non-platform ELF closure into
     # the HAP. It runs only in the private Qt/CLT CI image, never on a device.
-    package_hap(qt, clt, ohos_sdk)
+    package_hap(qt, clt, ohos_sdk, qt_tls)
     unsigned_hap = "hap-proj/entry/build/default/outputs/default/entry-default-unsigned.hap"
     libexec.install unsigned_hap => "snow-shot-unsigned.hap"
     (libexec/"snow-shot-install").write (payload/"snow-shot-install.sh").read
@@ -313,7 +336,109 @@ class SnowShot < Formula
       SNOW_SHOT_HDC: formula_opt_prefix("ohos-sdk-toolchains")/"hdc"
   end
 
-  def package_hap(qt_sdk, command_line_tools, native_sdk)
+  def build_qt_tls(qt_sdk, native_sdk)
+    source = buildpath/"qtbase-source"
+    mkdir_p source
+    resource("qtbase").stage do
+      root = Pathname.new(".")
+      unless (root/"src/corelib").directory?
+        entries = Dir.children(".").map { |entry| Pathname.new(entry) }
+        root = entries.find { |entry| (entry/"src/corelib").directory? }
+      end
+      odie "could not find the qtbase source root" unless root
+      cp_r root.children, source
+    end
+    node_addon_api = buildpath/"qt-node-modules/node-addon-api"
+    mkdir_p node_addon_api
+    resource("node-addon-api").stage do
+      root = Pathname.new(".")
+      unless (root/"napi.h").file?
+        entries = Dir.children(".").map { |entry| Pathname.new(entry) }
+        root = entries.find { |entry| (entry/"napi.h").file? }
+      end
+      odie "could not find the node-addon-api headers" unless root
+      cp_r root.children, node_addon_api
+    end
+    sdk_root = buildpath/"qt-ohos-sdk-root"
+    mkdir_p sdk_root
+    ln_sf native_sdk/"native", sdk_root/"native"
+    openssl = formula_opt_prefix("openssl@4")
+    build_dir = buildpath/"qtbase-build"
+    mkdir_p build_dir
+    configure = source/"configure"
+    cd build_dir do
+      # Keep Homebrew's build flags and search paths from leaking into the
+      # SDK-only Qt build.
+      with_env(CFLAGS: "", CXXFLAGS: "", CPPFLAGS: "", LDFLAGS: "",
+               CMAKE_PREFIX_PATH: nil, PKG_CONFIG_PATH: nil,
+               OHOS_SDK_ROOT: sdk_root.to_s, OHOS_ARCH: "arm64-v8a",
+               QT_HOST_PATH: qt_sdk.to_s) do
+        system configure,
+               "-release", "-shared", "-openssl-runtime", "-platform", "ohos-clang",
+               "-qt-host-path", qt_sdk.to_s,
+               "-prefix", (build_dir/"qt-install").to_s,
+               "-extprefix", (build_dir/"qt-install").to_s,
+               "-nomake", "examples", "-nomake", "tests",
+               "-no-gui", "-no-widgets", "-no-dbus",
+               "--",
+               "-DCMAKE_BUILD_TYPE=Release",
+               "-DOPENSSL_ROOT_DIR=#{openssl}",
+               "-DOPENSSL_INCLUDE_DIR=#{openssl}/include",
+               "-DNODE_ADDON_API_ROOT=#{node_addon_api.parent}",
+               "-DNodeAddonApi_INCLUDE_DIR=#{node_addon_api}",
+               "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH"
+        system "ninja", "-j#{ENV.make_jobs}", "Core", "Network", "QTlsBackendOpenSSLPlugin"
+      end
+    end
+    library = build_dir/"lib/libQt6Network.so"
+    plugin = build_dir/"plugins/tls/libqopensslbackend.so"
+    odie "the QtNetwork rebuild did not produce libQt6Network.so" unless library.file?
+    odie "the QtNetwork rebuild did not produce the OpenSSL TLS plugin" unless plugin.file?
+    payload = buildpath/"qt-tls-payload"
+    mkdir_p payload
+    cp library, payload/"libQt6Network.so"
+    cp plugin, payload/"libqopensslbackend.so"
+    rm_r source
+    rm_r build_dir
+    rm_r node_addon_api.parent
+    rm_r sdk_root
+    [payload/"libQt6Network.so", payload/"libqopensslbackend.so"]
+  end
+
+  def package_qt_tls(qt_tls, stage, command_line_tools, native_sdk)
+    library, plugin = qt_tls
+    patchelf = formula_opt_prefix("patchelf")/"bin/patchelf"
+    network = buildpath/"libQt6Network.so.6"
+    cp library, network
+    system patchelf, "--set-soname", "libQt6Network.so.6",
+           "--replace-needed", "libQt6Core.so", "libQt6Core.so.6",
+           "--replace-needed", "libz.so", "libz.so.1",
+           "--force-rpath", "--set-rpath", "$ORIGIN", network
+    tls_plugin = buildpath/"libqopensslbackend.so"
+    cp plugin, tls_plugin
+    system patchelf, "--replace-needed", "libQt6Network.so", "libQt6Network.so.6",
+           "--replace-needed", "libQt6Core.so", "libQt6Core.so.6",
+           "--force-rpath", "--set-rpath", "$ORIGIN:$ORIGIN/..", tls_plugin
+    sign_tool = command_line_tools/"sdk/default/openharmony/toolchains/lib/binary-sign-tool"
+    odie "binary-sign-tool is missing from the Qt/CLT CI image" unless sign_tool.executable?
+    # The OHOS compiler already writes a .codesign section; it makes
+    # binary-sign-tool reject the file, so drop it before signing.
+    objcopy = native_sdk/"native/llvm/bin/llvm-objcopy"
+    odie "llvm-objcopy is missing from the OHOS SDK" unless objcopy.executable?
+    [network, tls_plugin].each do |binary|
+      system objcopy, "--remove-section=.codesign", binary
+      signed = Pathname("#{binary}.signed")
+      system sign_tool, "sign", "-selfSign", "1", "-inFile", binary, "-outFile", signed
+      mv signed, binary
+      chmod 0755, binary
+    end
+    libs = stage/"entry/libs/arm64-v8a"
+    cp network, libs/"libQt6Network.so.6"
+    mkdir_p libs/"tls"
+    cp tls_plugin, libs/"tls/libqopensslbackend.so"
+  end
+
+  def package_hap(qt_sdk, command_line_tools, native_sdk, qt_tls)
     sdk_overlay = buildpath/"hap-sdk/default/openharmony"
     mkdir_p sdk_overlay
     (command_line_tools/"sdk/default").children.each do |entry|
@@ -385,6 +510,7 @@ class SnowShot < Formula
     cp buildpath/"build/snow_shot/libsnow_shot_image_codec_backend.so", libs
     cp formula_opt_prefix("zlib-ng-compat")/"lib/libz.so.1", libs/"libz.so.1"
     cp buildpath/"build/cargo/aarch64-unknown-linux-ohos/release/libsnow_ocr_inprocess.so", libs
+    package_qt_tls(qt_tls, stage, command_line_tools, native_sdk)
     ocr_output = stage/"entry/src/main/resources/rawfile/ocr"
     system "python3", payload/"support/scripts/stage-ohos-ocr-assets.py",
            "--source-manifest", buildpath/"snow_shot/packaging/snow-shot-ocr-asset-manifest-arm64.json",
@@ -459,11 +585,17 @@ class SnowShot < Formula
       assert_match name, listing
     end
     refute_match "libs/arm64-v8a/libsnow_ocr_process.so", listing
+    assert_match "libs/arm64-v8a/tls/libqopensslbackend.so", listing
+    assert_match "libs/arm64-v8a/libQt6Network.so.6", listing
+    system "sh", "-c",
+           "unzip -p #{hap} libs/arm64-v8a/libQt6Network.so.6 | grep -q QSslSocket"
     manifest = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     assert_equal "com.social4hyq.snowshot", manifest.dig("app", "bundleName")
     assert_equal "QAbility", manifest.dig("module", "abilities", 0, "name")
     permissions = manifest.dig("module", "requestPermissions").map { |item| item["name"] }
     assert_includes permissions, "ohos.permission.CUSTOM_SCREEN_CAPTURE"
+    assert_includes permissions, "ohos.permission.INTERNET"
+    assert_includes permissions, "ohos.permission.GET_NETWORK_INFO"
     assert_equal "$media:app_icon", manifest.dig("module", "abilities", 0, "icon")
     system "unzip", "-q", hap, "resources/rawfile/ocr/asset-manifest.json",
            "libs/arm64-v8a/libsnow_ocr_inprocess.so", "-d", testpath/"ocr-check"

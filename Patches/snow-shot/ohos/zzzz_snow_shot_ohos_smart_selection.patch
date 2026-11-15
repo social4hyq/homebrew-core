@@ -1,0 +1,420 @@
+OHOS: resolve the window under the pointer from the window manager layout so
+capture keeps the desktop smart-selection behaviour. The OHOS backend uses
+physical-pixel stacking order, consumes each owned overlay rectangle only once,
+and treats native display id zero as valid. Sub-element requests fall back to
+the containing whole window. Deterministic tests cover display zero, owned
+rectangle matching and topmost-window hit testing.
+
+diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
+index 1489ebc..91e8a35 100644
+--- a/snow_shot/CMakeLists.txt
++++ b/snow_shot/CMakeLists.txt
+@@ -3925,6 +3925,17 @@ if(SNOW_SHOT_BUILD_TESTS)
+             "PATH=path_list_prepend:$<TARGET_FILE_DIR:Qt6::Core>"
+     )
+ 
++    add_executable(snow-shot-ohos-selector-tests tests/ohos_selector_tests.cpp)
++    target_include_directories(snow-shot-ohos-selector-tests PRIVATE
++        "${CMAKE_CURRENT_SOURCE_DIR}/include"
++        "${CMAKE_CURRENT_SOURCE_DIR}/src/presentation/selector"
++    )
++    target_link_libraries(snow-shot-ohos-selector-tests PRIVATE Qt6::Gui)
++    add_test(NAME snow-shot-ohos-selector-tests COMMAND snow-shot-ohos-selector-tests)
++    set_tests_properties(snow-shot-ohos-selector-tests PROPERTIES
++        ENVIRONMENT_MODIFICATION "PATH=path_list_prepend:$<TARGET_FILE_DIR:Qt6::Core>"
++    )
++
+     add_executable(snow-shot-window-element-api-tests
+         tests/window_element_api_tests.cpp
+         include/snow_shot/presentation/screenshotselectorcoordinator.h
+diff --git a/snow_shot/src/presentation/selector/screenshotselectorohos.h b/snow_shot/src/presentation/selector/screenshotselectorohos.h
+new file mode 100644
+index 0000000..7671029
+--- /dev/null
++++ b/snow_shot/src/presentation/selector/screenshotselectorohos.h
+@@ -0,0 +1,65 @@
++#ifndef SNOW_SHOT_PRESENTATION_SCREENSHOTSELECTOROHOS_H
++#define SNOW_SHOT_PRESENTATION_SCREENSHOTSELECTOROHOS_H
++
++#include "snow_shot/presentation/screenshottypes.h"
++
++#include <QRect>
++#include <QVector>
++
++#include <optional>
++
++namespace snow_shot::presentation::ohos_selector_detail {
++
++inline QVector<qint64> displayIdsForLookup(const QVector<CapturedDisplayModel>& displays,
++                                           std::optional<qint64> defaultDisplayId) {
++    QVector<qint64> displayIds;
++    if (displays.isEmpty()) {
++        if (defaultDisplayId)
++            displayIds.push_back(*defaultDisplayId);
++        return displayIds;
++    }
++    displayIds.reserve(displays.size());
++    for (const CapturedDisplayModel& display : displays)
++        displayIds.push_back(static_cast<qint64>(display.nativeDisplayId));
++    return displayIds;
++}
++
++inline bool sameRect(const QRect& left, const QRect& right) {
++    return !left.isEmpty() && !right.isEmpty() && qAbs(left.x() - right.x()) <= 2 &&
++           qAbs(left.y() - right.y()) <= 2 && qAbs(left.width() - right.width()) <= 2 &&
++           qAbs(left.height() - right.height()) <= 2;
++}
++
++inline QVector<QRect> withoutOwnWindows(const QVector<QRect>& candidates,
++                                        const QVector<QRect>& own) {
++    QVector<bool> used(own.size(), false);
++    QVector<QRect> rects;
++    rects.reserve(candidates.size());
++    for (const QRect& candidate : candidates) {
++        qsizetype matched = -1;
++        for (qsizetype index = 0; index < own.size(); ++index) {
++            if (!used.at(index) && sameRect(own.at(index), candidate)) {
++                matched = index;
++                break;
++            }
++        }
++        if (matched >= 0) {
++            used[matched] = true;
++            continue;
++        }
++        rects.push_back(candidate);
++    }
++    return rects;
++}
++
++inline std::optional<QRect> windowAtPoint(const QPoint& point, const QVector<QRect>& candidates) {
++    for (const QRect& candidate : candidates) {
++        if (candidate.contains(point))
++            return candidate;
++    }
++    return std::nullopt;
++}
++
++} // namespace snow_shot::presentation::ohos_selector_detail
++
++#endif // SNOW_SHOT_PRESENTATION_SCREENSHOTSELECTOROHOS_H
+diff --git a/snow_shot/src/presentation/selector/screenshotselectorserviceclient.cpp b/snow_shot/src/presentation/selector/screenshotselectorserviceclient.cpp
+index 1c3a0b8..e366577 100644
+--- a/snow_shot/src/presentation/selector/screenshotselectorserviceclient.cpp
++++ b/snow_shot/src/presentation/selector/screenshotselectorserviceclient.cpp
+@@ -289,6 +289,235 @@ void ScreenshotSelectorServiceClient::resultCallback(const SnowUiSelectorEvent*
+         Qt::QueuedConnection);
+ }
+ 
++#elif defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++
++#include "screenshotselectorohos.h"
++
++#include <QDebug>
++#include <QGuiApplication>
++#include <QScreen>
++#include <QWindow>
++
++#include <window_manager/oh_display_manager.h>
++#include <window_manager/oh_window.h>
++
++#include <algorithm>
++#include <utility>
++
++namespace ohos_selector_detail = snow_shot::presentation::ohos_selector_detail;
++
++// OHOS PC has no UI-automation selector service for a normal HAP, but the
++// window manager publishes the visible window layout in stacking order without
++// requiring a system signature. Element-level hit testing stays out of reach,
++// so a pointer hit resolves to the topmost whole window under the cursor.
++namespace {
++std::optional<qint64> defaultDisplayId() {
++    uint64_t displayId = 0;
++    if (OH_NativeDisplayManager_GetDefaultDisplayId(&displayId) != DISPLAY_MANAGER_OK)
++        return std::nullopt;
++    return static_cast<qint64>(displayId);
++}
++
++class WindowLayoutList final {
++  public:
++    explicit WindowLayoutList(qint64 displayId) {
++        m_result = OH_WindowManager_GetAllWindowLayoutInfoList(displayId, &m_items, &m_size);
++    }
++    ~WindowLayoutList() {
++        if (m_items != nullptr)
++            OH_WindowManager_ReleaseAllWindowLayoutInfoList(m_items);
++    }
++    WindowLayoutList(const WindowLayoutList&) = delete;
++    WindowLayoutList& operator=(const WindowLayoutList&) = delete;
++
++    [[nodiscard]] bool valid() const { return m_result == 0 && m_items != nullptr; }
++    [[nodiscard]] int32_t result() const { return m_result; }
++    [[nodiscard]] const WindowManager_Rect* begin() const { return m_items; }
++    [[nodiscard]] const WindowManager_Rect* end() const {
++        return m_items != nullptr ? m_items + m_size : nullptr;
++    }
++
++  private:
++    WindowManager_Rect* m_items = nullptr;
++    size_t m_size = 0;
++    int32_t m_result = -1;
++};
++
++// The capture session and the window manager both describe the default display
++// in desktop pixels whose origin is (0, 0); only the Qt logical geometry needs
++// the display pixel ratio applied.
++QRect physicalDesktopRect(const QRect& logical, QScreen* screen) {
++    if (screen == nullptr)
++        screen = QGuiApplication::primaryScreen();
++    if (screen == nullptr)
++        return logical;
++    const qreal devicePixelRatio = screen->devicePixelRatio() > 0.0
++                                       ? screen->devicePixelRatio()
++                                       : 1.0;
++    const QRect screenGeometry = screen->geometry();
++    return QRect(QPoint(qRound((logical.x() - screenGeometry.x()) * devicePixelRatio),
++                        qRound((logical.y() - screenGeometry.y()) * devicePixelRatio)),
++                 QSize(qRound(logical.width() * devicePixelRatio),
++                       qRound(logical.height() * devicePixelRatio)));
++}
++
++QVector<QRect> ownWindowRects() {
++    QVector<QRect> own;
++    const QWindowList windows = QGuiApplication::topLevelWindows();
++    for (QWindow* window : windows) {
++        if (window != nullptr && window->isVisible())
++            own.push_back(physicalDesktopRect(window->geometry(), window->screen()));
++    }
++    return own;
++}
++
++// Older or restricted window managers may refuse the layout list; the main
++// window enum only needs the CUSTOM_SCREEN_CAPTURE permission this app holds.
++bool enumerateMainWindows(QVector<QRect>* rects) {
++    WindowManager_MainWindowInfo* infos = nullptr;
++    size_t count = 0;
++    if (OH_WindowManager_GetAllMainWindowInfo(&infos, &count) != 0 || infos == nullptr) {
++        qWarning() << "SNOW_OHOS_SELECTOR_MAIN_WINDOW_ENUMERATION_FAILED";
++        return false;
++    }
++    for (size_t index = 0; index < count; ++index) {
++        if (!infos[index].showing)
++            continue;
++        WindowManager_WindowProperties properties{};
++        if (OH_WindowManager_GetWindowProperties(infos[index].windowId, &properties) != 0)
++            continue;
++        if (properties.windowRect.width == 0 || properties.windowRect.height == 0)
++            continue;
++        rects->push_back(QRect(properties.windowRect.posX, properties.windowRect.posY,
++                               static_cast<int>(properties.windowRect.width),
++                               static_cast<int>(properties.windowRect.height)));
++    }
++    OH_WindowManager_ReleaseAllMainWindowInfo(infos);
++    return !rects->isEmpty();
++}
++
++QVector<QRect> enumeratedWindowRects(const QVector<CapturedDisplayModel>& displays) {
++    const auto displayIds = ohos_selector_detail::displayIdsForLookup(displays, defaultDisplayId());
++    QVector<QRect> candidates;
++    for (const qint64 displayId : std::as_const(displayIds)) {
++        WindowLayoutList windows(displayId);
++        if (!windows.valid()) {
++            qWarning() << "SNOW_OHOS_SELECTOR_LAYOUT_FAILED" << displayId << windows.result();
++            continue;
++        }
++        for (const WindowManager_Rect* item = windows.begin(); item != windows.end(); ++item) {
++            if (item->width == 0 || item->height == 0)
++                continue;
++            candidates.push_back(QRect(item->posX, item->posY, static_cast<int>(item->width),
++                                       static_cast<int>(item->height)));
++        }
++    }
++    if (candidates.isEmpty() && !enumerateMainWindows(&candidates))
++        return {};
++
++    // Drop the capture overlay, toolbar and color picker. Consume one owned rect
++    // per matching candidate instead of removing every equal rect: a maximized
++    // application window can share the overlay's full-display geometry and must
++    // stay selectable after the overlay itself has been skipped.
++    return ohos_selector_detail::withoutOwnWindows(candidates, ownWindowRects());
++}
++} // namespace
++
++struct ScreenshotSelectorServiceClient::CallbackBridge {};
++
++ScreenshotSelectorServiceClient::ScreenshotSelectorServiceClient(
++    ScreenshotSelectorServiceClientCallbacks callbacks, QObject* parent)
++    : QObject(parent), m_bridge(std::make_unique<CallbackBridge>()),
++      m_callbacks(std::move(callbacks)) {}
++
++ScreenshotSelectorServiceClient::~ScreenshotSelectorServiceClient() = default;
++
++bool ScreenshotSelectorServiceClient::hasService() const {
++    return true;
++}
++
++bool ScreenshotSelectorServiceClient::ensureService() {
++    return true;
++}
++
++bool ScreenshotSelectorServiceClient::releaseCache() {
++    m_ohosWindowRects.clear();
++    m_ohosDisplays.clear();
++    return true;
++}
++
++void ScreenshotSelectorServiceClient::destroyService() {
++    static_cast<void>(releaseCache());
++}
++
++bool ScreenshotSelectorServiceClient::startRefresh(quint64 requestId,
++                                                   const QVector<std::uintptr_t>& excludedHwnds) {
++    Q_UNUSED(excludedHwnds);
++    m_ohosDisplays.clear();
++    m_ohosWindowRects = enumeratedWindowRects(m_ohosDisplays);
++    qInfo() << "SNOW_OHOS_SELECTOR_REFRESH" << requestId << m_ohosWindowRects.size();
++    QMetaObject::invokeMethod(
++        this,
++        snow_shot::runtime::trackRuntimeWork([client = this, requestId]() {
++            if (client->m_callbacks.refreshFinished)
++                client->m_callbacks.refreshFinished(requestId, true);
++        }),
++        Qt::QueuedConnection);
++    return true;
++}
++
++bool ScreenshotSelectorServiceClient::startRefreshWithDisplays(
++    quint64 requestId, const QVector<std::uintptr_t>& excludedHwnds,
++    const QVector<CapturedDisplayModel>& displays) {
++    Q_UNUSED(excludedHwnds);
++    m_ohosDisplays = displays;
++    m_ohosWindowRects = enumeratedWindowRects(m_ohosDisplays);
++    qInfo() << "SNOW_OHOS_SELECTOR_REFRESH" << requestId << m_ohosWindowRects.size()
++            << m_ohosDisplays.size();
++    QMetaObject::invokeMethod(
++        this,
++        snow_shot::runtime::trackRuntimeWork([client = this, requestId]() {
++            if (client->m_callbacks.refreshFinished)
++                client->m_callbacks.refreshFinished(requestId, true);
++        }),
++        Qt::QueuedConnection);
++    return true;
++}
++
++bool ScreenshotSelectorServiceClient::startHitTest(quint64 epoch, quint64 requestId,
++                                                   quint64 generation, const QPoint& point,
++                                                   ScreenshotSelectorHitTestMode mode,
++                                                   quint32 displayId) {
++    ScreenshotSelectorResult result;
++    result.epoch = epoch;
++    result.requestId = requestId;
++    result.generation = generation;
++    result.point = point;
++    result.mode = mode;
++    result.phase = ScreenshotSelectorResultPhase::Initial;
++    result.stopReason = ScreenshotSelectorStopReason::Complete;
++    result.displayId = displayId != 0
++                           ? displayId
++                           : static_cast<quint32>(defaultDisplayId().value_or(0));
++    if (const auto rect = ohos_selector_detail::windowAtPoint(point, m_ohosWindowRects))
++        result.rects.push_back(QRectF(*rect));
++    result.ok = !result.rects.isEmpty();
++    QMetaObject::invokeMethod(
++        this,
++        snow_shot::runtime::trackRuntimeWork([client = this, result]() {
++            if (client->m_callbacks.resultReady)
++                client->m_callbacks.resultReady(result);
++        }),
++        Qt::QueuedConnection);
++    return true;
++}
++
++bool ScreenshotSelectorServiceClient::startRefinement(const ScreenshotSelectorResult&) {
++    return false;
++}
++
++void ScreenshotSelectorServiceClient::invalidateRefinement() {}
++
+ #else
+ // Native selector unavailable on unsupported platforms.
+ struct ScreenshotSelectorServiceClient::CallbackBridge {};
+diff --git a/snow_shot/src/presentation/selector/screenshotselectorserviceclient.h b/snow_shot/src/presentation/selector/screenshotselectorserviceclient.h
+index e5b83f7..a97fb07 100644
+--- a/snow_shot/src/presentation/selector/screenshotselectorserviceclient.h
++++ b/snow_shot/src/presentation/selector/screenshotselectorserviceclient.h
+@@ -8,6 +8,7 @@
+ #include <QObject>
+ #include <QHash>
+ #include <QPoint>
++#include <QRect>
+ #include <QRectF>
+ #include <QVector>
+ 
+@@ -60,6 +61,12 @@ class ScreenshotSelectorServiceClient final : public QObject {
+     QVector<std::uintptr_t> m_excludedWindowIds;
+     QVector<CapturedDisplayModel> m_displays;
+ #endif
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    // The OHOS selector is in-process: the window layout snapshot taken at
++    // refresh time is reused for every pointer hit test until the next refresh.
++    QVector<QRect> m_ohosWindowRects;
++    QVector<CapturedDisplayModel> m_ohosDisplays;
++#endif
+ };
+ 
+ #endif // SNOW_SHOT_PRESENTATION_SCREENSHOTSELECTORSERVICECLIENT_H
+diff --git a/snow_shot/tests/ohos_selector_tests.cpp b/snow_shot/tests/ohos_selector_tests.cpp
+new file mode 100644
+index 0000000..1790338
+--- /dev/null
++++ b/snow_shot/tests/ohos_selector_tests.cpp
+@@ -0,0 +1,49 @@
++#include "screenshotselectorohos.h"
++
++#include <cstdlib>
++#include <iostream>
++
++namespace {
++using namespace snow_shot::presentation::ohos_selector_detail;
++
++void require(bool condition, const char* message) {
++    if (!condition) {
++        std::cerr << message << '\n';
++        std::exit(1);
++    }
++}
++
++void zeroIsAValidDefaultDisplayId() {
++    require(displayIdsForLookup({}, 0) == QVector<qint64>{0},
++            "default display zero must still be enumerated");
++}
++
++void capturedDisplayZeroIsNotDiscarded() {
++    CapturedDisplayModel display;
++    display.nativeDisplayId = 0;
++    require(displayIdsForLookup({display}, 7) == QVector<qint64>{0},
++            "a captured display with native id zero must be enumerated");
++}
++
++void ownWindowsAreConsumedOnceInStackingOrder() {
++    const QRect fullScreen(0, 0, 3120, 2080);
++    const QRect toolbar(100, 100, 600, 80);
++    const QRect browser(40, 60, 1200, 900);
++    const auto filtered = withoutOwnWindows({fullScreen, fullScreen, toolbar, browser},
++                                            {fullScreen, toolbar});
++    require(filtered == QVector<QRect>({fullScreen, browser}),
++            "only the overlay and toolbar instances may be removed, not a maximized app");
++    const auto hit = windowAtPoint(QPoint(500, 500), filtered);
++    require(hit == fullScreen, "the topmost remaining window under the pointer must be selected");
++    require(windowAtPoint(QPoint(10, 10), {browser}) == std::nullopt,
++            "a point outside every candidate must not produce a selection");
++}
++} // namespace
++
++int main() {
++    zeroIsAValidDefaultDisplayId();
++    capturedDisplayZeroIsNotDiscarded();
++    ownWindowsAreConsumedOnceInStackingOrder();
++    std::cout << "OHOS selector tests passed\n";
++    return 0;
++}
