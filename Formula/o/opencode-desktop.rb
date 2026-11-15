@@ -1,19 +1,14 @@
 class OpencodeDesktop < Formula
   desc "Desktop shell for the OpenCode agent (Electron window on local opencode serve)"
   homepage "https://opencode.ai"
-  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.6/opencode-desktop-0.1.6.tar.gz"
-  sha256 "95980448aaf559c07a3758622a4c934f8a7b3842042a3eacf2490d80be9247e6"
+  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.7/opencode-desktop-0.1.7.tar.gz"
+  sha256 "5ddd4e7dda50fb25ec54debad482121ac81b2bcb1af93d484d554ce6a2d0f708"
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
 
   livecheck do
     skip "Tap-hosted payload, versioned with the formula"
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.6-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "33a61d59a176e2571395bb087d4751edc4401314f2a324c169d8e66ddd63d7e5"
   end
 
   depends_on "node" => :build
@@ -127,7 +122,9 @@ class OpencodeDesktop < Formula
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"opencode-desktop-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
-    %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE].each do |name|
+    %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE
+       ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
+       ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].each do |name|
       requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
     end
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
@@ -159,7 +156,9 @@ class OpencodeDesktop < Formula
       through a debug profile generated on the spot (no approval wait; the
       release path still goes through AGC review). The signing toolchain is
       assembled from this formula's node and ohos-sdk-toolchains dependencies
-      (keg-only, addressed by absolute paths), so no system CLT is needed.
+      (keg-only, addressed by absolute paths), so no system CLT is needed. The
+      two kernel ACLs enable JIT/WebAssembly for the renderer; without them
+      markdown rendering fails with "WebAssembly is not defined".
       `--no-acl` installs the strong-sandbox HAP instead; the shell then waits
       for `opencode-desktop serve`.
     EOS
@@ -246,7 +245,9 @@ class OpencodeDesktop < Formula
     acl_requested = acl_module.fetch("module").fetch("requestPermissions")
     acl_permissions = acl_requested.map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO
-                    ohos.permission.INTERNET ohos.permission.READ_WRITE_USER_FILE],
+                    ohos.permission.INTERNET ohos.permission.READ_WRITE_USER_FILE
+                    ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
+                    ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
                  acl_permissions.sort
     project_dir = Pathname.new(Dir.home)/".hap-installer/projects/com.social4hyq.opencodedesktop"
     assert_match "CUSTOM_SANDBOX", (project_dir/"entry/src/main/module.json5").read
