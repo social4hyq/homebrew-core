@@ -1,0 +1,113 @@
+name: Desktop payload build
+
+# Builds the deepseek-harness-desktop prebuilt payloads (shell + host runtime)
+# for the current source and publishes them to a tap release. Mirrors
+# ohos-dsh-desktop/docs/PAYLOAD-UPDATE.md but runs on the self-hosted runner,
+# so updates no longer require a device-local build.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Upstream ref (commit sha or tag, e.g. dsh-v0.2.2-rc.3)
+        required: true
+        type: string
+
+concurrency:
+  group: desktop-payload-${{ inputs.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  payload:
+    # Same self-hosted aarch64 runner the bottle builds use; the ci-runner
+    # image supplies brew and runs OHOS binaries (its own CI tests do).
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 300
+    env:
+      CONTAINER: dsh-payload
+      IMAGE: ghcr.io/social4hyq/ci-runner@sha256:aa7d7757862edda5da56ee2da7498198e30f82503147247eee77652246a433e3
+      TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+      CACHE_DIR: /var/tmp/dsh-payload-cache
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Start OHOS container
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_PULL_TOKEN != '' && secrets.GHCR_PULL_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "${GHCR_TOKEN:-}" ]; then
+            printf '%s' "$GHCR_TOKEN" | docker login ghcr.io \
+              -u "${GITHUB_ACTOR:-github-actions}" --password-stdin
+          fi
+          docker pull "$IMAGE"
+          docker rm -f "$CONTAINER" || true
+          mkdir -p "$CACHE_DIR/pnpm-store"
+          # Workspace is mounted at the container's tap path (same layout the
+          # CI container sees); the cache volume keeps the pnpm store warm
+          # across payload builds on this runner.
+          docker run -d --name "$CONTAINER" --init \
+            --security-opt seccomp=unconfined \
+            -v "$GITHUB_WORKSPACE:$TAP_IN_CONTAINER" \
+            -v "$CACHE_DIR:/cache" \
+            "$IMAGE" sleep infinity
+
+      - name: Install payload toolchain
+        run: |
+          docker exec "$CONTAINER" bash -lc '
+            set -euo pipefail
+            export HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_ENV_HINTS=1
+            brew install node node@24 pnpm cmake git ripgrep ohos-selfsign
+          '
+
+      - name: Build payloads
+        run: |
+          docker exec -e GITHUB_WORKSPACE="$TAP_IN_CONTAINER" -e DSH_PAYLOAD_CACHE=/cache \
+            "$CONTAINER" bash -lc "
+              set -euo pipefail
+              cd '$TAP_IN_CONTAINER'
+              bash .github/scripts/build-desktop-payloads.sh '${{ inputs.ref }}'
+            "
+
+      - name: Publish release assets
+        run: |
+          set -euo pipefail
+          . out/manifest.env
+          tag="deepseek-harness-desktop-v$VERSION"
+          if gh release view "$tag" > /dev/null 2>&1; then
+            gh release upload "$tag" "out/$RUNTIME_ASSET" "out/$SHELL_ASSET"
+          else
+            gh release create "$tag" \
+              --title "deepseek-harness-desktop v$VERSION payloads" \
+              --notes "Prebuilt desktop payloads for the DeepSeek Harness OpenHarmony port,
+
+          - shell: Electron main bundle + renderer dist + main-process dependency closure
+          - runtime: host-side dsh runtime tree (desktop-host + full production closure)
+
+          Built from upstream \`${{ inputs.ref }}\` on the self-hosted runner; the OHOS patch set is under .github/desktop-patches." \
+              "out/$RUNTIME_ASSET" "out/$SHELL_ASSET"
+          fi
+          {
+            echo "### Payload release: $tag"
+            echo ""
+            echo "| asset | sha256 |"
+            echo "|---|---|"
+            echo "| $SHELL_ASSET | $SHELL_SHA |"
+            echo "| $RUNTIME_ASSET | $RUNTIME_SHA |"
+            echo ""
+            echo "Update Formula/d/deepseek-harness-desktop.rb with these URLs + sha256."
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Keep tarballs as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-payloads-${{ inputs.ref }}
+          path: out/*.tar.gz
+          retention-days: 14
+          if-no-files-found: error

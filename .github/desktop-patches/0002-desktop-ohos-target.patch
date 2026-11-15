@@ -1,0 +1,22 @@
+diff --git a/apps/desktop/scripts/desktop-build-paths.mjs b/apps/desktop/scripts/desktop-build-paths.mjs
+index edfd9cdf..bc500717 100644
+--- a/apps/desktop/scripts/desktop-build-paths.mjs
++++ b/apps/desktop/scripts/desktop-build-paths.mjs
+@@ -4,7 +4,7 @@ import { isAbsolute, join, resolve } from 'node:path'
+ 
+ const APP_ROOT = resolve(import.meta.dirname, '..')
+ const BUILD_ROOT = join(APP_ROOT, '.desktop-build')
+-const SUPPORTED_TARGETS = new Set(['mac-arm64', 'mac-x64', 'win-x64'])
++const SUPPORTED_TARGETS = new Set(['mac-arm64', 'mac-x64', 'win-x64', 'openharmony-arm64'])
+ 
+ /**
+  * Resolve the fixed build target selected by a packaging environment.
+@@ -77,6 +77,8 @@ export function desktopTargetPlatform(target) {
+   assertSupportedTarget(target)
+   const targets = /** @type {const} */ ({
+     'mac-arm64': { platform: 'darwin', arch: 'arm64' },
++    // OHOS: desktop shell runs on the OHOS Electron 34 prebuilt; the Host side is brew node.
++    'openharmony-arm64': { platform: 'openharmony', arch: 'arm64' },
+     'mac-x64': { platform: 'darwin', arch: 'x64' },
+     'win-x64': { platform: 'win32', arch: 'x64' },
+   })

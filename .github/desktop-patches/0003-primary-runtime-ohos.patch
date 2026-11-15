@@ -1,0 +1,232 @@
+diff --git a/apps/desktop/scripts/prepare-primary-runtime-ohos.d.mts b/apps/desktop/scripts/prepare-primary-runtime-ohos.d.mts
+new file mode 100644
+index 00000000..f2bf2809
+--- /dev/null
++++ b/apps/desktop/scripts/prepare-primary-runtime-ohos.d.mts
+@@ -0,0 +1,6 @@
++/** OHOS primary-runtime payload assembly; see the .mjs implementation. */
++export function preparePrimaryRuntimeOhos(options: {
++  readonly output: string
++  readonly version: string
++  readonly nodeBinary?: string
++}): Promise<string>
+diff --git a/apps/desktop/scripts/prepare-primary-runtime-ohos.mjs b/apps/desktop/scripts/prepare-primary-runtime-ohos.mjs
+new file mode 100644
+index 00000000..5f717a03
+--- /dev/null
++++ b/apps/desktop/scripts/prepare-primary-runtime-ohos.mjs
+@@ -0,0 +1,80 @@
++/**
++ * OHOS primary-runtime payload assembly (replaces the Electron-download +
++ * python-build-standalone flow for the openharmony-arm64 target):
++ * - Node: the Harmonybrew node@24 binary (NEEDED only libc.so — verified
++ *   self-contained; official core bottle, pre-signed), copied into the payload.
++ * - pnpm: copied from this checkout's installed pnpm, foreign native packages
++ *   pruned with the upstream helper.
++ * - Python: NOT shipped (no OHOS python-build-standalone); the manifest keeps
++ *   the locked version string but pythonPackages is empty — agent Python
++ *   skills degrade at use time (v1 scope cut, see docs/M1-host-build.md).
++ *
++ * Layout is byte-compatible with preparePrimaryRuntime's output contract
++ * (primary-runtime/{dependencies/{node,pnpm}, runtime.json}).
++ */
++
++import { execFileSync } from 'node:child_process'
++import { chmodSync, cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
++import { createRequire } from 'node:module'
++import { dirname, join, resolve } from 'node:path'
++import { fileURLToPath } from 'node:url'
++
++const APP_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
++const MONOREPO_ROOT = resolve(APP_ROOT, '..', '..')
++
++// 复用上游的 pnpm 裁剪助手（不重复造逻辑）。
++const { prunePnpmForeignNativePackages } = await import(
++  join(MONOREPO_ROOT, 'scripts', 'primary-runtime', 'prepare.ts'))
++
++/**
++ * @param {object} options
++ * @param {string} options.output - Desktop runtime resource directory (runtime/).
++ * @param {string} options.version - Carrier desktop release version.
++ * @param {string} [options.nodeBinary] - Self-contained Node executable to embed.
++ * @returns {Promise<string>} The embedded Node version (for versions.json).
++ */
++export async function preparePrimaryRuntimeOhos({ output, version, nodeBinary }) {
++  const node = nodeBinary
++    ?? execFileSync('brew', ['--prefix', 'node@24'], { encoding: 'utf8' }).trim() + '/bin/node'
++  const nodeVersion = execFileSync(node, ['-p', 'process.version'], { encoding: 'utf8' }).trim().replace(/^v/, '')
++
++  const destination = join(resolve(output), 'primary-runtime')
++  rmSync(destination, { recursive: true, force: true })
++  const dependencies = join(destination, 'dependencies')
++  mkdirSync(dependencies, { recursive: true })
++
++  // Node 组件（上游契约：bin/node + LICENSE + node_modules/README.txt）
++  const nodeDir = join(dependencies, 'node')
++  mkdirSync(join(nodeDir, 'bin'), { recursive: true })
++  cpSync(node, join(nodeDir, 'bin', 'node'))
++  chmodSync(join(nodeDir, 'bin', 'node'), 0o755)
++  writeFileSync(join(nodeDir, 'LICENSE'), `Bundled Node.js, from the Harmonybrew official-core node@24 bottle (self-contained: NEEDED libc.so only).\nUpstream license: https://github.com/nodejs/node/blob/main/LICENSE\n`)
++  mkdirSync(join(nodeDir, 'node_modules'))
++  writeFileSync(join(nodeDir, 'node_modules', 'README.txt'), 'Reserved for bundled Node packages. pnpm uses its default installation directories.\n')
++
++  // pnpm 组件（与上游非 archive 路径相同：复制当前 checkout 装好的 pnpm）
++  // 注意 pnpm 的 exports 不放行 './package.json' 子路径，直接定位 node_modules 实体。
++  const pnpmDir = join(APP_ROOT, 'node_modules', 'pnpm')
++  const pnpmVersion = JSON.parse(readFileSync(join(pnpmDir, 'package.json'), 'utf8')).version
++  cpSync(pnpmDir, join(dependencies, 'pnpm'), { recursive: true, dereference: true })
++  prunePnpmForeignNativePackages(join(dependencies, 'pnpm'), 'openharmony', 'arm64')
++
++  const manifest = {
++    desktopVersion: version,
++    platform: 'openharmony',
++    arch: 'arm64',
++    python: '3.12.14',
++    node: nodeVersion,
++    pnpm: pnpmVersion,
++    pythonPackages: {},
++  }
++  writeFileSync(join(destination, 'runtime.json'), `${JSON.stringify(manifest, undefined, 2)}\n`)
++  console.log(`primary-runtime (openharmony): node ${nodeVersion}, pnpm ${pnpmVersion}, python omitted`)
++  return nodeVersion
++}
++
++if (import.meta.main) {
++  const paths = (await import('./desktop-build-paths.mjs')).resolveDesktopTargetBuildPaths()
++  const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
++  await preparePrimaryRuntimeOhos({ output: paths.runtime, version })
++}
+diff --git a/apps/desktop/scripts/prepare-primary-runtime.ts b/apps/desktop/scripts/prepare-primary-runtime.ts
+index 44484bae..222139c2 100644
+--- a/apps/desktop/scripts/prepare-primary-runtime.ts
++++ b/apps/desktop/scripts/prepare-primary-runtime.ts
+@@ -26,7 +26,8 @@ export async function preparePrimaryRuntime(options: { deferSmoke?: boolean } =
+ export function smokePrimaryRuntime(root: string): void {
+   const manifest = parsePrimaryRuntime(JSON.parse(readFileSync(join(root, 'runtime.json'), 'utf8')))
+   if (manifest.platform !== process.platform || manifest.arch !== process.arch) return
+-  if (Object.keys(manifest.pythonPackages).length === 0) throw new Error('primary runtime: missing Python distribution versions; prepare the payload before running its smoke checks.')
++  // OHOS: v1 payload ships no bundled Python (no OHOS python-build-standalone); Python skills degrade at use time.
++  if (Object.keys(manifest.pythonPackages).length === 0 && manifest.platform !== ('openharmony' as NodeJS.Platform)) throw new Error('primary runtime: missing Python distribution versions; prepare the payload before running its smoke checks.')
+   const entries = workspaceDependencyPaths(root, manifest)
+   if (entries.node === undefined || entries.pnpm === undefined) throw new Error('primary runtime: the Desktop payload must declare node and pnpm components.')
+   smokePayload(root, scrubWindowsSigningEnvironment(process.env))
+diff --git a/apps/desktop/scripts/prepare-runtime.ts b/apps/desktop/scripts/prepare-runtime.ts
+index 4e338532..9d9a655e 100644
+--- a/apps/desktop/scripts/prepare-runtime.ts
++++ b/apps/desktop/scripts/prepare-runtime.ts
+@@ -1,7 +1,7 @@
+ /** Prepare Desktop resources and publish their versions after every preparation stage succeeds. */
+ 
+ import { execFileSync } from 'node:child_process'
+-import { chmodSync, cpSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
++import { chmodSync, cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+ import { createRequire } from 'node:module'
+ import { join } from 'node:path'
+ import { parseArgs } from 'node:util'
+@@ -18,6 +18,8 @@ const BUILD_PATHS = resolveDesktopTargetBuildPaths()
+ const RUNTIME_ROOT = BUILD_PATHS.runtime
+ 
+ type DesktopTarget = ReturnType<typeof desktopTargetPlatform>
++  // OHOS: 共享 .d.mts 保持窄类型（不污染 upload/publish 链路），本地别名里并上 openharmony。
++  | { readonly platform: 'openharmony'; readonly arch: 'arm64' }
+ 
+ /** Extract the target Electron distribution and return its embedded Node version. */
+ async function prepareElectron({ platform, arch }: DesktopTarget): Promise<string> {
+@@ -37,7 +39,26 @@ function prepareCli({ platform, arch }: DesktopTarget): void {
+   cpSync(join(import.meta.dirname, 'node-bin'), join(RUNTIME_ROOT, 'bin'), { recursive: true })
+   chmodSync(join(RUNTIME_ROOT, 'bin', 'node'), 0o755)
+   const cli = join(RUNTIME_ROOT, 'cli')
+-  prepareDesktopCli(cli, platform)
++  prepareDesktopCli(cli, platform === 'openharmony' ? 'darwin' : platform)
++  if (platform === 'openharmony') {
++    // OHOS: 没有可执行的 Electron 44；dsh 启动器改用 payload 内自包含 Node（brew node@24 副本）。
++    writeFileSync(join(cli, 'bin', 'dsh'), `#!/bin/sh
++# Run the installed CLI without changing the invoking shell or working directory. (OHOS variant)
++set -e
++launcher=$0
++while [ -L "$launcher" ]; do
++  directory=$(CDPATH= cd -- "$(dirname -- "$launcher")" && pwd -P)
++  target=$(readlink "$launcher")
++  case "$target" in
++    /*) launcher=$target ;;
++    *) launcher=$directory/$target ;;
++  esac
++done
++resources=$(CDPATH= cd -- "$(dirname -- "$launcher")/../../.." && pwd -P)
++exec "$resources/runtime/primary-runtime/dependencies/node/bin/node" --expose-internals "$resources/app/dsh/node_modules/@deepseek-ai/dsh-desktop-host/lib/cli.js" "$@"
++`)
++    chmodSync(join(cli, 'bin', 'dsh'), 0o755)
++  }
+   if (platform === 'darwin') {
+     const minimumVersion = execFileSync('/usr/libexec/PlistBuddy', [
+       '-c', 'Print LSMinimumSystemVersion', join(BUILD_PATHS.electron, 'Electron.app', 'Contents', 'Info.plist'),
+@@ -50,13 +71,22 @@ function prepareCli({ platform, arch }: DesktopTarget): void {
+ 
+ async function main(): Promise<void> {
+   const { values } = parseArgs({ options: { 'defer-primary-runtime-smoke': { type: 'boolean', default: false } } })
+-  const target = desktopTargetPlatform(resolveDesktopBuildTarget())
++  const target = desktopTargetPlatform(resolveDesktopBuildTarget()) as DesktopTarget
+   rmSync(RUNTIME_ROOT, { recursive: true, force: true })
+   mkdirSync(RUNTIME_ROOT, { recursive: true })
+   const preparePrimary = () => packagingStep(process.env.DSH_DESKTOP_PACKAGING_RUN_DIR, 'prepare:primary-runtime',
+     () => preparePrimaryRuntime({ deferSmoke: values['defer-primary-runtime-smoke'] }))
+   let nodeVersion: string
+-  if (target.platform === 'win32') {
++  if (target.platform === 'openharmony') {
++    // OHOS: 没有 Electron 44 可下载执行；payload 由 OHOS 专用脚本组装（brew node@24 + pnpm，无 Python）。
++    nodeVersion = await packagingStep(process.env.DSH_DESKTOP_PACKAGING_RUN_DIR, 'prepare:primary-runtime',
++      async () => (await import('./prepare-primary-runtime-ohos.mjs')).preparePrimaryRuntimeOhos({
++        output: RUNTIME_ROOT,
++        version: JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version as string,
++        // exactOptionalPropertyTypes: 未设置时整个键缺省。
++        ...(process.env.DSH_OHOS_NODE_BINARY === undefined ? {} : { nodeBinary: process.env.DSH_OHOS_NODE_BINARY }),
++      }))
++  } else if (target.platform === 'win32') {
+     const [electron, primary] = await Promise.allSettled([prepareElectron(target), preparePrimary()])
+     if (electron.status === 'rejected') throw electron.reason
+     if (primary.status === 'rejected') throw primary.reason
+diff --git a/scripts/primary-runtime/prepare.ts b/scripts/primary-runtime/prepare.ts
+index 006f7627..ba56fce3 100644
+--- a/scripts/primary-runtime/prepare.ts
++++ b/scripts/primary-runtime/prepare.ts
+@@ -258,23 +258,27 @@ export function smokePrimaryRuntime(root: string, environment: NodeJS.ProcessEnv
+ )): void {
+   const manifest = parsePrimaryRuntime(JSON.parse(readFileSync(join(root, 'runtime.json'), 'utf8')))
+   if (manifest.platform !== process.platform || manifest.arch !== process.arch) return
+-  if (Object.keys(manifest.pythonPackages).length === 0) throw new Error('primary runtime: missing Python distribution versions; prepare the payload before running its smoke checks.')
++  // OHOS: v1 payload ships no bundled Python (no OHOS python-build-standalone); Python skills degrade at use time.
++  if (Object.keys(manifest.pythonPackages).length === 0 && (manifest.platform as string) !== 'openharmony') throw new Error('primary runtime: missing Python distribution versions; prepare the payload before running its smoke checks.')
+   const entries = workspaceDependencyPaths(root, manifest)
+-  if (manifest.platform !== 'win32') {
+-    const interpreter = `python${manifest.python.split('.').slice(0, 2).join('.')}`
+-    for (const name of ['python', 'python3']) {
+-      const path = join(dirname(entries.python), name)
+-      if (!lstatSync(path).isSymbolicLink() || readlinkSync(path) !== interpreter) {
+-        throw new Error(`primary runtime: Python commands must be relative aliases of ${interpreter}`)
++  const options = { stdio: 'inherit', timeout: 120_000, env: environment } as const
++  // OHOS: 无内嵌 Python——symlink/解释器/pip smoke 全跳过；node/pnpm 校验保留。
++  if ((manifest.platform as string) !== 'openharmony') {
++    if (manifest.platform !== 'win32') {
++      const interpreter = `python${manifest.python.split('.').slice(0, 2).join('.')}`
++      for (const name of ['python', 'python3']) {
++        const path = join(dirname(entries.python), name)
++        if (!lstatSync(path).isSymbolicLink() || readlinkSync(path) !== interpreter) {
++          throw new Error(`primary runtime: Python commands must be relative aliases of ${interpreter}`)
++        }
+       }
++      if (!lstatSync(join(dirname(entries.python), interpreter)).isFile()) throw new Error('primary runtime: versioned Python must be a regular file')
+     }
+-    if (!lstatSync(join(dirname(entries.python), interpreter)).isFile()) throw new Error('primary runtime: versioned Python must be a regular file')
++    execFileSync(entries.python, ['-I', '-B', '-c', 'import decimal, xml.parsers.expat, lzma, uuid, numpy, pandas; assert numpy.arange(4).sum() == 6; assert pandas.DataFrame({"n": [1, 2]}).n.sum() == 3'], options)
++    execFileSync(entries.python, ['-I', '-B', join(import.meta.dirname, 'smoke.py'), JSON.stringify(manifest.pythonPackages),
++      manifest.python], options)
++    execFileSync(entries.python, ['-I', '-B', '-m', 'pip', 'check'], options)
+   }
+-  const options = { stdio: 'inherit', timeout: 120_000, env: environment } as const
+-  execFileSync(entries.python, ['-I', '-B', '-c', 'import decimal, xml.parsers.expat, lzma, uuid, numpy, pandas; assert numpy.arange(4).sum() == 6; assert pandas.DataFrame({"n": [1, 2]}).n.sum() == 3'], options)
+-  execFileSync(entries.python, ['-I', '-B', join(import.meta.dirname, 'smoke.py'), JSON.stringify(manifest.pythonPackages),
+-    manifest.python], options)
+-  execFileSync(entries.python, ['-I', '-B', '-m', 'pip', 'check'], options)
+   if (entries.node !== undefined) execFileSync(entries.node, ['-e', `if (process.versions.node !== ${JSON.stringify(manifest.node)}) process.exit(1)`], options)
+   if (entries.pnpm !== undefined && entries.node !== undefined) execFileSync(entries.node, [entries.pnpm, '--version'], options)
+ }
