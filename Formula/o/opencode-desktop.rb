@@ -1,19 +1,18 @@
 class OpencodeDesktop < Formula
   desc "Desktop shell for the OpenCode agent (Electron window on local opencode serve)"
   homepage "https://opencode.ai"
-  url "https://github.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.9/opencode-desktop-0.1.9.tar.gz"
-  sha256 "55a78ba752f10a9fc0d3fdded6bccdf5818bf8baa731450a873003d002b8ef34"
-  # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
+  # Version follows the upstream opencode tag: this shell wraps that release,
+  # and the OHOS shell sources live in Patches/opencode-desktop.
+  url "https://github.com/anomalyco/opencode/archive/refs/tags/v2.3.0.tar.gz"
+  sha256 "48b0ab7c4732d693c59e0ad7d73656a2965b2def78cef3c6319e444b7e6c0300"
+  # Tap-authored shell sources (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
 
   livecheck do
-    skip "Tap-hosted payload, versioned with the formula"
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.9-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "06cb9946a2a2158a97337b6d873b728354849e6bff3440a45c800f8e542ff97f"
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    throttle days: 1
   end
 
   depends_on "node" => :build
@@ -31,6 +30,8 @@ class OpencodeDesktop < Formula
   end
 
   def install
+    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
+    payload = tap_root/"Patches/opencode-desktop"
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
     system "tar", "-xzf", buildpath/"libelectron_132.tar.gz", "-C", buildpath
@@ -40,14 +41,14 @@ class OpencodeDesktop < Formula
     rm_r app if app.exist?
     app.mkpath
     %w[main.cjs package.json config.json waiting.html].each do |name|
-      cp buildpath/"app"/name, app/name
+      cp payload/"app"/name, app/name
     end
 
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.opencodedesktop"'
     inreplace shell/"AppScope/app.json5", '"vendor": "example"', '"vendor": "social4hyq"'
     %w[app_icon.png startIcon.png].each do |name|
-      cp buildpath/"assets/icon.png", shell/"AppScope/resources/base/media"/name
+      cp payload/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
     # App name and ability labels live in per-locale string resources: patching
     # only the base file leaves the zh_CN/en_US overrides intact and the
@@ -134,9 +135,13 @@ class OpencodeDesktop < Formula
     end
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
-    pkgshare.install buildpath/"scripts/install-desktop.sh"
+    (pkgshare/"install-desktop.sh").write(
+      (payload/"scripts/install-desktop.sh").read,
+    )
     chmod 0755, pkgshare/"install-desktop.sh"
-    libexec.install buildpath/"scripts/opencode-desktop.sh"
+    (libexec/"opencode-desktop.sh").write(
+      (payload/"scripts/opencode-desktop.sh").read,
+    )
     chmod 0755, libexec/"opencode-desktop.sh"
     (bin/"opencode-desktop").write_env_script libexec/"opencode-desktop.sh",
       OPENCODE_DESKTOP_UNSIGNED_HAP:   libexec/"opencode-desktop-unsigned.hap",
@@ -299,6 +304,8 @@ class OpencodeDesktop < Formula
     assert_match "resources/resfile/resources/app/waiting.html", listing
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
     assert_equal 0, placeholder.fetch("port")
+    package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
+    assert_equal version.to_s, package.fetch("version")
     profile = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     permissions = profile.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
