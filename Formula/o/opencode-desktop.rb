@@ -6,15 +6,15 @@ class OpencodeDesktop < Formula
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
-  revision 2
+  revision 3
 
   livecheck do
     skip "Tap-hosted payload, versioned with the formula"
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.0-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2887e7cb49529089ab5e8f01547c15824d891c371df236d6abb01c5ec454bef"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v0.1.0-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "425524ce26bd23b17cbb550b0e0c0d79b2c43f8cddc31459f87ab43d190bcd90"
   end
 
   depends_on "node" => :build
@@ -72,8 +72,8 @@ class OpencodeDesktop < Formula
               "    \"mainElement\": \"EntryAbility\",\n    \"extractNativeLibs\": true,\n"
 
     # Restricted permissions (pasteboard, location, ...) cannot be granted with
-    # local auto-signing; the shell only needs loopback HTTP (same trim as the
-    # ohos-multica probe proved installable).
+    # local auto-signing; the shell only needs loopback HTTP, and this trim
+    # installs under local auto-signing.
     inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\n    \],/m,
               <<~JSON5.chomp
                 "requestPermissions": [
@@ -86,9 +86,8 @@ class OpencodeDesktop < Formula
     # generic Electron-on-OHOS build image, selected via the
     # OHOS_CI_IMAGE_OVERRIDES repo variable), which bakes the HarmonyOS
     # command-line toolchain at /opt/electron-ohos-clt — repacked from a
-    # licensed system CLT install, not publicly redistributable (see the
-    # ohos-multica project). The shell compiles no C++, so the NDK-less SDK
-    # subset the image carries suffices.
+    # licensed system CLT install, not publicly redistributable. The shell
+    # compiles no C++, so the NDK-less SDK subset the image carries suffices.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "opencode-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['opencode-desktop']"
