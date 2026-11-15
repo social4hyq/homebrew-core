@@ -82,18 +82,32 @@ class DeepseekHarnessDesktop < Formula
 
     # The template requests 28 permissions, including restricted ones auto
     # signing cannot grant (READ_PASTEBOARD first -> install fails 9568289).
-    # Keep the minimal pair the HAP actually needs.
+    # Replace the whole array by bracket depth; a regex would stop at the
+    # first "],"-looking close inside an entry's abilities list.
     permissions_json = shell/"web_engine/src/main/module.json5"
-    text = permissions_json.read
-    trimmed = text.sub(/"requestPermissions":\s*\[.*?\],/m, <<~PERMS)
-      "requestPermissions": [
-        { "name": "ohos.permission.INTERNET" },
-        { "name": "ohos.permission.GET_NETWORK_INFO" }
-      ],
-    PERMS
-    raise "permission trim failed (template changed?)" if trimmed == text
+    lines = permissions_json.read.lines
+    start = lines.index { |line| line.include?('"requestPermissions": [') }
+    raise "permission block not found (template changed?)" if start.nil?
 
-    File.write(permissions_json.to_s, trimmed)
+    indent = lines[start][/^\s*/] || ""
+    depth = 0
+    finish = nil
+    (start...lines.length).each do |index|
+      depth += lines[index].count("[") - lines[index].count("]")
+      next if index <= start || !depth.zero?
+
+      finish = index
+      break
+    end
+    raise "permission block is not closed" if finish.nil?
+
+    lines[start..finish] = [
+      "#{indent}\"requestPermissions\": [\n",
+      "#{indent}  { \"name\": \"ohos.permission.INTERNET\" },\n",
+      "#{indent}  { \"name\": \"ohos.permission.GET_NETWORK_INFO\" }\n",
+      "#{indent}],\n",
+    ]
+    File.write(permissions_json.to_s, lines.join)
 
     clt = Pathname.new("/opt/electron-ohos-clt")
     odie "deepseek-harness-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES" unless
