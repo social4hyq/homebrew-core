@@ -93,8 +93,8 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           # Keep in sync with autobump.yml's ALLOWLIST (claude-code /
-          # claude-code.latest / zcode / vite-plus / magpie, see the note there)
-          ALLOWLIST="claude-code claude-code.latest zcode vite-plus magpie"
+          # claude-code.latest / zcode / vite-plus / magpie / multica, see the note there)
+          ALLOWLIST="claude-code claude-code.latest zcode vite-plus magpie multica"
           BUMP_BRANCH_RE="^bump-($(echo "$ALLOWLIST" | tr ' ' '|'))-"
 
           merge_pr() {
