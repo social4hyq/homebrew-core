@@ -10,7 +10,9 @@ destination is chosen at publish time so it cannot collide with staging.
 Keep the recording area a Qt::Tool window (capture-friendly) and focus the
 recording toolbar for keyboard shortcuts. Leave trim mode and show the main
 window before presenting the picker, and replace a stuck picker request.
-Suppress the unsupported global-mouse startup popup on OHOS.
+Suppress the unsupported global-mouse startup popup on OHOS when the ACL
+permission is absent, and add the OHOS input-monitor backend for HAPs signed
+with the INPUT_MONITORING ACL.
 
 diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
 --- a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
@@ -271,8 +273,17 @@ diff --git a/snow_shot/src/platform/ohos/recordingfileexport.cpp b/snow_shot/src
 diff --git a/snow_shot/src/platform/globalmousebackend.cpp b/snow_shot/src/platform/globalmousebackend.cpp
 --- a/snow_shot/src/platform/globalmousebackend.cpp
 +++ b/snow_shot/src/platform/globalmousebackend.cpp
-@@ -13,6 +13,11 @@
+@@ -8,6 +8,9 @@
+ #ifdef Q_OS_MACOS
+ std::unique_ptr<GlobalMouseBackend> createMacOSGlobalMouseBackend();
+ #endif
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++std::unique_ptr<GlobalMouseBackend> createOhosGlobalMouseBackend();
++#endif
+ 
+ namespace {
  class UnsupportedGlobalMouseBackend final : public GlobalMouseBackend {
+@@ -14,5 +17,10 @@
    public:
      void start(Handler, FailureHandler failure) override {
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
@@ -283,8 +294,261 @@ diff --git a/snow_shot/src/platform/globalmousebackend.cpp b/snow_shot/src/platf
          if (failure) {
              failure(0);
          }
-@@ -19,3 +24,4 @@
+@@ -19,3 +27,4 @@
 +#endif
      }
      void stop() override {}
      void configure(const GlobalMouseConfiguration&) override {}
+@@ -32,6 +41,8 @@
+     return createWindowsGlobalMouseBackend();
+ #elif defined(Q_OS_MACOS)
+     return createMacOSGlobalMouseBackend();
++#elif defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    return createOhosGlobalMouseBackend();
+ #else
+     return std::make_unique<UnsupportedGlobalMouseBackend>();
+ #endif
+diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
+--- a/snow_shot/CMakeLists.txt
++++ b/snow_shot/CMakeLists.txt
+@@ -1301,6 +1301,11 @@
+         "${SNOW_SHOT_APPKIT_FRAMEWORK}"
+         "${SNOW_SHOT_CORE_GRAPHICS_FRAMEWORK}")
+ endif()
++if(OHOS)
++    target_sources(snow_shot_global_mouse PRIVATE
++        src/platform/ohos/globalmousebackend.cpp)
++    target_link_libraries(snow_shot_global_mouse PRIVATE ohinput)
++endif()
+ target_link_libraries(snow_shot_settings PRIVATE snow_shot_global_mouse)
+ if(OHOS)
+     find_library(SNOW_SHOT_ACE_NAPI_LIBRARY NAMES ace_napi.z REQUIRED)
+diff --git a/snow_shot/src/platform/ohos/globalmousebackend.cpp b/snow_shot/src/platform/ohos/globalmousebackend.cpp
+new file mode 100644
+--- /dev/null
++++ b/snow_shot/src/platform/ohos/globalmousebackend.cpp
+@@ -0,0 +1,224 @@
++#include "snow_shot/presentation/globalmousemanager.h"
++
++#include <QMutex>
++#include <QMutexLocker>
++#include <QPointF>
++#include <Qt>
++
++#include <atomic>
++#include <memory>
++#include <utility>
++
++#include <multimodalinput/oh_input_manager.h>
++#include <multimodalinput/oh_key_code.h>
++
++namespace snow_shot::presentation {
++namespace {
++
++// OH_Input_AddMouseEventMonitor/OH_Input_AddKeyEventMonitor expose only one
++// process-wide callback each, so the backend must be the sole owner.
++class OhosGlobalMouseBackend final : public GlobalMouseBackend {
++  public:
++    ~OhosGlobalMouseBackend() override { stop(); }
++
++    void start(Handler handler, FailureHandler failure) override {
++        QMutexLocker lock(&mutex);
++        if (running)
++            return;
++        onEvent = std::move(handler);
++        onFailure = std::move(failure);
++        instance.store(this, std::memory_order_release);
++        running = true;
++
++        const Input_Result mouseResult = OH_Input_AddMouseEventMonitor(&mouseCallback);
++        if (mouseResult != INPUT_SUCCESS) {
++            running = false;
++            instance.store(nullptr, std::memory_order_release);
++            // The default OHOS HAP does not request the ACL-gated
++            // INPUT_MONITORING permission. Keep the feature unavailable
++            // without a startup popup; other failures still surface.
++            if (mouseResult != INPUT_PERMISSION_DENIED && onFailure)
++                onFailure(mouseResult);
++            return;
++        }
++        const Input_Result keyResult = OH_Input_AddKeyEventMonitor(&keyCallback);
++        if (keyResult != INPUT_SUCCESS) {
++            OH_Input_RemoveMouseEventMonitor(&mouseCallback);
++            running = false;
++            instance.store(nullptr, std::memory_order_release);
++            if (keyResult != INPUT_PERMISSION_DENIED && onFailure)
++                onFailure(keyResult);
++            return;
++        }
++
++        permission = {GlobalMousePermissionState::Status::Ready, true, true, true};
++        if (stateHandler)
++            stateHandler(permission);
++    }
++
++    void stop() override {
++        QMutexLocker lock(&mutex);
++        if (!running)
++            return;
++        running = false;
++        OH_Input_RemoveKeyEventMonitor(&keyCallback);
++        OH_Input_RemoveMouseEventMonitor(&mouseCallback);
++        instance.store(nullptr, std::memory_order_release);
++        onEvent = {};
++        onFailure = {};
++        gesture.reset();
++        heldButtons = Qt::NoButton;
++        modifiers = {};
++    }
++
++    void configure(const GlobalMouseConfiguration& value) override {
++        QMutexLocker lock(&mutex);
++        configuration = value;
++    }
++
++    void cancel(quint64 id) override {
++        QMutexLocker lock(&mutex);
++        gesture.cancel(id);
++    }
++
++    void beginButtonDrag(settings::SettingsGlobalMouseAction action) override {
++        QMutexLocker lock(&mutex);
++        if (!running || !configuration.captureAvailable)
++            return;
++        const auto result = gesture.beginButtonDrag(action, lastPosition);
++        if (result.event && onEvent)
++            onEvent(*result.event);
++    }
++
++    GlobalMousePermissionState permissionState() const override {
++        QMutexLocker lock(&mutex);
++        return permission;
++    }
++
++    void setStateHandler(StateHandler handler) override {
++        QMutexLocker lock(&mutex);
++        stateHandler = std::move(handler);
++    }
++
++  private:
++    static void mouseCallback(const Input_MouseEvent* event) {
++        OhosGlobalMouseBackend* backend = instance.load(std::memory_order_acquire);
++        if (backend != nullptr && event != nullptr)
++            backend->handleMouse(event);
++    }
++
++    static void keyCallback(const Input_KeyEvent* event) {
++        OhosGlobalMouseBackend* backend = instance.load(std::memory_order_acquire);
++        if (backend != nullptr && event != nullptr)
++            backend->handleKey(event);
++    }
++
++    void handleMouse(const Input_MouseEvent* event) {
++        QMutexLocker lock(&mutex);
++        if (!running)
++            return;
++        const int32_t action = OH_Input_GetMouseEventAction(event);
++        const int32_t button = OH_Input_GetMouseEventButton(event);
++        GlobalMouseInput input;
++        input.position = QPointF(OH_Input_GetMouseEventGlobalX(event),
++                                 OH_Input_GetMouseEventGlobalY(event));
++        lastPosition = input.position;
++        switch (action) {
++        case MOUSE_ACTION_MOVE:
++            input.kind = GlobalMouseInput::Kind::Move;
++            break;
++        case MOUSE_ACTION_BUTTON_DOWN:
++            input.kind = GlobalMouseInput::Kind::Press;
++            input.button = mapButton(button);
++            break;
++        case MOUSE_ACTION_BUTTON_UP:
++            input.kind = GlobalMouseInput::Kind::Release;
++            input.button = mapButton(button);
++            break;
++        case MOUSE_ACTION_CANCEL:
++            input.kind = GlobalMouseInput::Kind::Cancel;
++            break;
++        default:
++            return;
++        }
++        input.modifiers = modifiers;
++        input.heldButtons = heldButtons;
++        const auto result = gesture.handle(input, configuration);
++        if (result.event && onEvent)
++            onEvent(*result.event);
++        if (input.kind == GlobalMouseInput::Kind::Press && input.button != Qt::NoButton)
++            heldButtons |= input.button;
++        else if (input.kind == GlobalMouseInput::Kind::Release)
++            heldButtons &= ~Qt::MouseButtons(input.button);
++        else if (input.kind == GlobalMouseInput::Kind::Cancel)
++            heldButtons = Qt::NoButton;
++    }
++
++    void handleKey(const Input_KeyEvent* event) {
++        QMutexLocker lock(&mutex);
++        if (!running)
++            return;
++        const int32_t action = OH_Input_GetKeyEventAction(event);
++        if (action != KEY_ACTION_DOWN && action != KEY_ACTION_UP)
++            return;
++        const bool down = action == KEY_ACTION_DOWN;
++        switch (OH_Input_GetKeyEventKeyCode(event)) {
++        case KEYCODE_CTRL_LEFT:
++        case KEYCODE_CTRL_RIGHT:
++            modifiers.setFlag(GlobalMouseModifier::Control, down);
++            break;
++        case KEYCODE_SHIFT_LEFT:
++        case KEYCODE_SHIFT_RIGHT:
++            modifiers.setFlag(GlobalMouseModifier::Shift, down);
++            break;
++        case KEYCODE_ALT_LEFT:
++        case KEYCODE_ALT_RIGHT:
++            modifiers.setFlag(GlobalMouseModifier::Alt, down);
++            break;
++        case KEYCODE_META_LEFT:
++        case KEYCODE_META_RIGHT:
++            modifiers.setFlag(GlobalMouseModifier::Super, down);
++            break;
++        default:
++            break;
++        }
++    }
++
++    static Qt::MouseButton mapButton(int32_t button) {
++        switch (button) {
++        case MOUSE_BUTTON_LEFT:
++            return Qt::LeftButton;
++        case MOUSE_BUTTON_RIGHT:
++            return Qt::RightButton;
++        case MOUSE_BUTTON_MIDDLE:
++            return Qt::MiddleButton;
++        case MOUSE_BUTTON_FORWARD:
++            return Qt::ForwardButton;
++        case MOUSE_BUTTON_BACK:
++            return Qt::BackButton;
++        default:
++            return Qt::NoButton;
++        }
++    }
++
++    mutable QMutex mutex;
++    Handler onEvent;
++    FailureHandler onFailure;
++    StateHandler stateHandler;
++    GlobalMouseConfiguration configuration;
++    GlobalMouseGesture gesture;
++    GlobalMouseModifiers modifiers;
++    Qt::MouseButtons heldButtons;
++    QPointF lastPosition;
++    GlobalMousePermissionState permission{GlobalMousePermissionState::Status::Unavailable};
++    bool running = false;
++    static inline std::atomic<OhosGlobalMouseBackend*> instance{nullptr};
++};
++
++} // namespace
++
++std::unique_ptr<GlobalMouseBackend> createOhosGlobalMouseBackend() {
++    return std::make_unique<OhosGlobalMouseBackend>();
++}
++
++} // namespace snow_shot::presentation

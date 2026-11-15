@@ -12,6 +12,17 @@ for option in "$@"; do
   esac
 done
 
+# HarmonyOS PC hdc servers can start without connecting to their own local
+# device. Use the bundled hdc and the advertised persist.hdc.port to attach
+# it before hap-installer asks the DevEco CLI for connected devices.
+hdc="${SNOW_SHOT_HDC:-hdc}"
+if ! "$hdc" list targets 2>/dev/null | grep -q '127\.0\.0\.1:'; then
+  port="$(param get persist.hdc.port 2>/dev/null | tr -d '[:space:]' || true)"
+  if [ -n "$port" ]; then
+    "$hdc" tconn "127.0.0.1:$port" >/dev/null 2>&1 || true
+  fi
+fi
+
 exec hap-installer \
   --hap "$SNOW_SHOT_HAP" \
   --bundle-id com.social4hyq.snowshot \
