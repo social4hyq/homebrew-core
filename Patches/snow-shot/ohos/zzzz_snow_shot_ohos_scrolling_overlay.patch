@@ -1,0 +1,187 @@
+OHOS: keep the scrolled application visible while a scrolling screenshot runs.
+The compositor keeps this full-screen main window opaque, so the transparent
+presentation that upstream uses for the scrolling hole cannot work and the
+stitched frames only contained the frozen overlay. Hide the overlay for the
+duration of the capture instead: the toolbar and the stitched-preview
+thumbnail stay on screen, the pipeline sees the live window, and the wheel
+reaches the application directly. The thumbnail becomes a parentless top-level
+window on this platform so it survives the overlay hiding, and the first frame
+is captured only after the window manager had a frame to remove the overlay.
+
+diff --git a/snow_shot/include/snow_shot/presentation/screenshotoverlaywindow.h b/snow_shot/include/snow_shot/presentation/screenshotoverlaywindow.h
+index 7e4ca6f..14d1cde 100644
+--- a/snow_shot/include/snow_shot/presentation/screenshotoverlaywindow.h
++++ b/snow_shot/include/snow_shot/presentation/screenshotoverlaywindow.h
+@@ -105,6 +105,10 @@ class ScreenshotOverlayWindow final : public QWidget {
+     void setCanvasClearBackgroundEnabled(bool enabled);
+     [[nodiscard]] QJsonObject scrollingDiagnostics() const;
+     void setScrollingCaptureMode(bool enabled);
++    // OHOS cannot composite a transparent full-screen main window, so scrolling
++    // capture hides the frozen overlay instead of relying on a see-through hole.
++    // The toolbar and the stitched-preview thumbnail stay on screen.
++    void setScrollingCaptureOverlayHidden(bool hidden);
+     void beginScrollingThumbnail(
+         const QRect& localSelection,
+         ScreenshotScrollingRecognitionMode mode = ScreenshotScrollingRecognitionMode::Vertical,
+@@ -197,6 +201,7 @@ class ScreenshotOverlayWindow final : public QWidget {
+     ScreenshotScrollingRecognitionMode m_scrollingThumbnailMode =
+         ScreenshotScrollingRecognitionMode::Vertical;
+     bool m_scrollingCaptureMode = false;
++    bool m_scrollingCaptureOverlayHidden = false;
+     bool m_canvasContentWasVisible = true;
+     bool m_canvasClearBackgroundWasEnabled = true;
+     bool m_canvasInteractionWasEnabled = true;
+diff --git a/snow_shot/include/snow_shot/presentation/screenshotscrollingthumbnailwidget.h b/snow_shot/include/snow_shot/presentation/screenshotscrollingthumbnailwidget.h
+index bfe9fbc..f763d81 100644
+--- a/snow_shot/include/snow_shot/presentation/screenshotscrollingthumbnailwidget.h
++++ b/snow_shot/include/snow_shot/presentation/screenshotscrollingthumbnailwidget.h
+@@ -26,6 +26,9 @@ class ScreenshotScrollingThumbnailWidget final : public QWidget {
+     Q_OBJECT
+ 
+   public:
++    // A parentless thumbnail is a top-level window; OHOS uses it so the preview
++    // survives while the full-screen scrolling overlay hides itself.
++    ScreenshotScrollingThumbnailWidget();
+     explicit ScreenshotScrollingThumbnailWidget(QWidget& parent);
+ 
+     void reset();
+@@ -54,6 +57,9 @@ class ScreenshotScrollingThumbnailWidget final : public QWidget {
+   signals:
+     void hoverSourceRectChanged(const QRect& sourceRect, bool cropping);
+ 
++  private:
++    void initialize();
++
+   protected:
+     bool event(QEvent* event) override;
+     bool eventFilter(QObject* watched, QEvent* event) override;
+diff --git a/snow_shot/src/presentation/capture/screenshotscrollingcapturecontroller.cpp b/snow_shot/src/presentation/capture/screenshotscrollingcapturecontroller.cpp
+index aa949f1..9eda831 100644
+--- a/snow_shot/src/presentation/capture/screenshotscrollingcapturecontroller.cpp
++++ b/snow_shot/src/presentation/capture/screenshotscrollingcapturecontroller.cpp
+@@ -224,13 +224,29 @@ struct ScreenshotScrollingCaptureController::Impl {
+         pipelineInitialized = false;
+ 
+         context.overlayCoordinator.setScrollingCaptureMode(context.displaySession, true);
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        // The OHOS compositor keeps a full-screen main window opaque, so the frozen
++        // overlay would both hide the scrolled application and become the subject of
++        // the stitched frames. Hide it; the toolbar and preview thumbnail stay on top.
++        anchorOverlay->setScrollingCaptureOverlayHidden(true);
++#endif
+ 
+         logPreparation();
+         logScrollingEvent("scrolling.prepared", generation);
+         const QRect requestPhysicalSelection =
+             canvasSelection.translated(context.geometry.canvasOrigin());
+         autoScroller.start(requestPhysicalSelection, mode);
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        // Give the window manager one frame to remove the overlay before the first
++        // frame is captured, otherwise frame zero is the frozen overlay itself.
++        const quint64 presentationSession = generation;
++        QTimer::singleShot(120, &owner, [this, presentationSession] {
++            if (active && generation == presentationSession && !pipelineInitialized)
++                beginPipelineAfterPresentationClear();
++        });
++#else
+         beginPipelineAfterPresentationClear();
++#endif
+         refreshHoverEligibility();
+         return true;
+     }
+@@ -329,6 +345,8 @@ struct ScreenshotScrollingCaptureController::Impl {
+         if (wasActive) {
+             context.overlayCoordinator.setScrollingCaptureMode(context.displaySession, false);
+             if (restoreScreenshotPresentation) {
++                if (thumbnailHost != nullptr)
++                    thumbnailHost->setScrollingCaptureOverlayHidden(false);
+                 context.overlayCoordinator.applyDisplayModels(context.displaySession);
+             }
+         } else if (thumbnailHost != nullptr) {
+diff --git a/snow_shot/src/presentation/capture/screenshotscrollingthumbnailwidget.cpp b/snow_shot/src/presentation/capture/screenshotscrollingthumbnailwidget.cpp
+index 196fe43..c2fa65c 100644
+--- a/snow_shot/src/presentation/capture/screenshotscrollingthumbnailwidget.cpp
++++ b/snow_shot/src/presentation/capture/screenshotscrollingthumbnailwidget.cpp
+@@ -63,8 +63,16 @@ void copyPreviewSpan(const QImage& source, int sourceStart, QImage& destination,
+ }
+ } // namespace
+ 
++ScreenshotScrollingThumbnailWidget::ScreenshotScrollingThumbnailWidget() : QWidget(nullptr) {
++    initialize();
++}
++
+ ScreenshotScrollingThumbnailWidget::ScreenshotScrollingThumbnailWidget(QWidget& parent)
+     : QWidget(&parent) {
++    initialize();
++}
++
++void ScreenshotScrollingThumbnailWidget::initialize() {
+     setObjectName(QStringLiteral("screenshot-scrolling-thumbnail"));
+ #ifdef Q_OS_WIN
+     snow_shot::platform::windows::detail::enableCaptureExclusionCompositionFallback(this);
+diff --git a/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp b/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp
+index 68d0610..503f7a0 100644
+--- a/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp
++++ b/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp
+@@ -435,17 +435,47 @@ void ScreenshotOverlayWindow::setScrollingCaptureMode(bool enabled) {
+     }
+ }
+ 
++void ScreenshotOverlayWindow::setScrollingCaptureOverlayHidden(bool hidden) {
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    if (m_scrollingCaptureOverlayHidden == hidden)
++        return;
++    m_scrollingCaptureOverlayHidden = hidden;
++    if (hidden) {
++        // The frozen overlay is opaque on OHOS: leaving it on screen would hide
++        // the application being captured and make the captured frames a copy of
++        // the overlay itself. Hiding it exposes the live window to both the user
++        // and the capture pipeline while the toolbar and thumbnail keep running.
++        hide();
++        return;
++    }
++    show();
++    raise();
++#else
++    Q_UNUSED(hidden);
++#endif
++}
++
+ void ScreenshotOverlayWindow::beginScrollingThumbnail(const QRect& localSelection,
+                                                       ScreenshotScrollingRecognitionMode mode,
+                                                       const QSize& captureViewportSize) {
+     clearScrollingResultPreview();
+     if (m_scrollingThumbnail == nullptr) {
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        // The scrolling overlay hides itself on OHOS, so the preview cannot be a
++        // child window of it. Use a top-level frameless window instead: the OHOS
++        // QPA promotes it to its own top-most window that survives the overlay.
++        m_scrollingThumbnail = new ScreenshotScrollingThumbnailWidget();
++        m_scrollingThumbnail->setWindowFlags(Qt::Window | Qt::FramelessWindowHint |
++                                             Qt::WindowStaysOnTopHint |
++                                             Qt::WindowDoesNotAcceptFocus);
++#else
+         m_scrollingThumbnail = new ScreenshotScrollingThumbnailWidget(*this);
+         // Configure once, before creating the native surface. Reparenting or changing
+         // QWidget window flags during capture would hide/recreate visible windows.
+         m_scrollingThumbnail->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint |
+                                              Qt::WindowStaysOnTopHint |
+                                              Qt::WindowDoesNotAcceptFocus);
++#endif
+         m_scrollingThumbnail->setAttribute(Qt::WA_ShowWithoutActivating);
+         m_scrollingThumbnail->setAttribute(Qt::WA_TranslucentBackground);
+         m_scrollingThumbnail->hide();
+@@ -474,7 +504,12 @@ void ScreenshotOverlayWindow::updateScrollingThumbnail(const QImage& previewImag
+     m_scrollingThumbnail->setStitchedImage(previewImage, sourceSize, change, addedRows,
+                                            replacePreview, replacedPreviewRows);
+     layoutScrollingThumbnail();
+-    if (isVisible() && !m_scrollingThumbnail->isVisible()) {
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    const bool canPresentThumbnail = m_scrollingCaptureOverlayHidden || isVisible();
++#else
++    const bool canPresentThumbnail = isVisible();
++#endif
++    if (canPresentThumbnail && !m_scrollingThumbnail->isVisible()) {
+ #ifdef Q_OS_MACOS
+         snow_shot::platform::configureScreenshotToolbarWindow(m_scrollingThumbnail);
+ #endif
