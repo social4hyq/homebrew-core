@@ -1,10 +1,9 @@
 class SnowShot < Formula
   desc "Screenshot and annotation utility from Snow Apps, unsigned OHOS HAP"
   homepage "https://github.com/mg-chao/snow-shot"
-  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.2_snow-shot.tar.gz"
-  sha256 "29190412a6dc9b41c0097fbf1313dc0f84412c9d23e1716260ed13acdcbd6c4e"
+  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.7_snow-shot.tar.gz"
+  sha256 "6d9de662710ccf406dea312c0322e77a3f473bc6121096ec82df713d30f4273c"
   license "GPL-3.0-or-later"
-  revision 24
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.2-r28"
@@ -62,8 +61,8 @@ class SnowShot < Formula
   end
 
   resource "snow-shot-ocr-rs" do
-    url "https://github.com/mg-chao/simd-paddle-ocr-rs/archive/63d1c523da0581b731811d5c628723f320e527d0.tar.gz"
-    sha256 "3e4f9bda41cf5598f0891b20f4acb35e9b4bfcd627d01367363c481e4df04b86"
+    url "https://github.com/mg-chao/simd-paddle-ocr-rs/archive/43aba513b661e48eacb04d19f1ff071649116ddf.tar.gz"
+    sha256 "73072343793760861059d363f24596ee72c47e46dcfe2adf8e1004f3a2b4f1f0"
 
     patch do
       file "Patches/snow-shot/ocr/src_runtime.rs.patch"
@@ -417,10 +416,39 @@ class SnowShot < Formula
            "--system-lib-dir", sdk_lib_dir, "--system-lib-dir", clt_lib_dir
   end
 
+  def caveats
+    <<~EOS
+      The HAP is unsigned in the bottle. Connect and unlock the device, then run
+      `snow-shot install`: hap-installer handles Huawei Developer login, local
+      debug profile generation, signing, installation, and launch.
+    EOS
+  end
+
   test do
     hap = libexec/"snow-shot-unsigned.hap"
     assert_path_exists hap
-    assert_match "Usage: hap-installer", shell_output("#{bin}/snow-shot --help")
+    assert_match "Usage: snow-shot <command>", shell_output("#{bin}/snow-shot --help")
+    assert_match "Usage: snow-shot <command>", shell_output("#{bin}/snow-shot")
+    assert_match "unknown command: bogus", shell_output("#{bin}/snow-shot bogus 2>&1", 2)
+    fake_bin = testpath/"bin"
+    fake_bin.mkpath
+    installer_args = testpath/"hap-installer-args"
+    (fake_bin/"hap-installer").write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$@" > #{installer_args}
+    SH
+    chmod 0755, fake_bin/"hap-installer"
+    (fake_bin/"hdc").write "#!/bin/sh\necho 127.0.0.1:1\n"
+    chmod 0755, fake_bin/"hdc"
+    with_env(PATH: "#{fake_bin}:#{ENV["PATH"]}", SNOW_SHOT_HDC: (fake_bin/"hdc").to_s) do
+      shell_output("#{bin}/snow-shot")
+      refute_path_exists installer_args
+      shell_output("#{bin}/snow-shot install --no-start")
+    end
+    args = installer_args.read.lines(chomp: true)
+    assert_equal ["--hap", hap.to_s], args.first(2)
+    assert_equal %w[--bundle-id com.social4hyq.snowshot --app-name SnowShot --module entry
+                    --ability QAbility --no-start], args.drop(2)
     listing = shell_output("unzip -l #{hap}")
     %w[
       libsnow_shot.so libqohos.so libQt6Widgets.so.6

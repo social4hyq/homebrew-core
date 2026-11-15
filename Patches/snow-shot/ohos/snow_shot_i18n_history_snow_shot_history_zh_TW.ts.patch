@@ -2,7 +2,7 @@ OHOS: translate the document-picker/file-export error strings this port adds to
 ImageEditingWindow/ScreenshotPinnedWindow.
 
 diff --git a/snow_shot/i18n/history/snow_shot_history_zh_TW.ts b/snow_shot/i18n/history/snow_shot_history_zh_TW.ts
-index 44284fa..833e737 100644
+index 9f2c09d..0b9b1fa 100644
 --- a/snow_shot/i18n/history/snow_shot_history_zh_TW.ts
 +++ b/snow_shot/i18n/history/snow_shot_history_zh_TW.ts
 @@ -164,6 +164,14 @@
@@ -39,7 +39,7 @@ index 44284fa..833e737 100644
      </context>
      <context>
          <name>ImageSplitDocument</name>
-@@ -2305,6 +2321,26 @@ Files:
+@@ -2309,6 +2325,26 @@ Files:
              <source>The pinned image save could not be started</source>
              <translation>無法開始儲存已固定到螢幕的影像</translation>
          </message>

@@ -11,7 +11,7 @@ import struct
 from pathlib import Path
 from typing import Any
 
-RUNTIME_VERSION = "1.2.1"
+RUNTIME_VERSION = "1.2.2"
 RUNTIME_PROTOCOL = 7
 PLATFORM = "openharmony-arm64"
 RUNTIME_NAME = "libsnow_ocr_inprocess.so"

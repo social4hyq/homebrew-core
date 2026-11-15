@@ -3,9 +3,11 @@ lambda; rewrite as `firstIndex = firstIndex` / `lastIndex = lastIndex`
 init-captures instead, dropping the extra intermediate variables and renames
 an earlier revision introduced for the same workaround.
 
+diff --git a/snow_shot/src/presentation/components/screenshothistorypagewidget.cpp b/snow_shot/src/presentation/components/screenshothistorypagewidget.cpp
+index 53a28c3..355ff77 100644
 --- a/snow_shot/src/presentation/components/screenshothistorypagewidget.cpp
 +++ b/snow_shot/src/presentation/components/screenshothistorypagewidget.cpp
-@@ -1402,7 +1402,7 @@
+@@ -1402,7 +1402,7 @@ void ScreenshotHistoryPageWidget::rebuildEntries() {
              focusedRow = static_cast<int>(m_pageRecordIds.indexOf(it.key()));
      const auto wantedRows = m_entryViewport->wantedRows(lastIndex - firstIndex, focusedRow);
  

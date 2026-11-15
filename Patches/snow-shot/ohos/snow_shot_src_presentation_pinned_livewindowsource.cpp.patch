@@ -3,10 +3,12 @@ OHOS window queries do not expose that field; drop a fallback definition from
 an earlier revision that only compiles on neither OHOS nor Windows/macOS —
 this tap only ships OHOS, so there is no such configuration to support.
 
+diff --git a/snow_shot/src/presentation/pinned/livewindowsource.cpp b/snow_shot/src/presentation/pinned/livewindowsource.cpp
+index 33e698b..2dd6296 100644
 --- a/snow_shot/src/presentation/pinned/livewindowsource.cpp
 +++ b/snow_shot/src/presentation/pinned/livewindowsource.cpp
-@@ -968,8 +968,12 @@
-
+@@ -968,8 +968,12 @@ class CapturedLiveWindowSource final
+ 
  std::shared_ptr<LiveWindowSource> createLiveWindowSource(const LiveWindowTarget& target,
                                                           const QRect& selection) {
 -    if (!target.nativeId || target.processId <= 0 || selection.isEmpty())

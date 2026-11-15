@@ -4,10 +4,10 @@ local variable rather than mixing begin/end from two different temporary
 containers.
 
 diff --git a/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp b/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp
-index 2683957..53dc25c 100644
+index 956c02a..28a81ee 100644
 --- a/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp
 +++ b/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp
-@@ -81,7 +81,8 @@ template <typename Layout> QRectF textLayoutInkBounds(const Layout& layout) {
+@@ -79,7 +79,8 @@ template <typename Layout> QRectF textLayoutInkBounds(const Layout& layout) {
  }
  
  bool glyphsUseCffOutlines(const QTextLayout& layout) {

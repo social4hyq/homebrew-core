@@ -7,7 +7,7 @@ completion callback from firing after the window closed or a new save
 started.
 
 diff --git a/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp b/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
-index 328b27b..7ae9b6d 100644
+index 546a920..e5b71cd 100644
 --- a/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
 +++ b/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
 @@ -59,6 +59,9 @@
@@ -214,7 +214,7 @@ index 328b27b..7ae9b6d 100644
      // Table ZIP/XML expansion varies with cell text. Admit it exclusively until streaming
      // workbook serialization provides a tighter bound; text exports have bounded UTF-8 copies.
      const qint64 workingBytes =
-@@ -7879,6 +8016,78 @@ void ScreenshotPinnedWindow::saveAsFile() {
+@@ -7928,6 +8065,78 @@ void ScreenshotPinnedWindow::saveAsFile() {
                  QLatin1Char('.') + ScreenshotRecognitionFileExport::extension(fileSnapshot->kind)));
          const QPointer<ScreenshotPinnedWindow> lifetime(this);
          setProperty("saveDialogOpen", true);
@@ -293,7 +293,7 @@ index 328b27b..7ae9b6d 100644
          const QString selectedPath = QFileDialog::getSaveFileName(
              this, translatePinnedText("Save as file"), initialPath,
              ScreenshotRecognitionFileExport::dialogFilter(fileSnapshot->kind), nullptr,
-@@ -7896,6 +8105,7 @@ void ScreenshotPinnedWindow::saveAsFile() {
+@@ -7945,6 +8154,7 @@ void ScreenshotPinnedWindow::saveAsFile() {
              return;
          saveRecognitionSnapshot(*fileSnapshot, primaryPath);
          return;
@@ -301,7 +301,7 @@ index 328b27b..7ae9b6d 100644
      }
  #endif
      if (m_originalImage.isNull()) {
-@@ -7940,12 +8150,67 @@ void ScreenshotPinnedWindow::saveAsFile() {
+@@ -7989,12 +8199,67 @@ void ScreenshotPinnedWindow::saveAsFile() {
      QString selectedFilter = defaults.selectedFilter;
      const QPointer<ScreenshotPinnedWindow> dialogLifetime(this);
      setProperty("saveDialogOpen", true);
@@ -369,7 +369,7 @@ index 328b27b..7ae9b6d 100644
      if (m_closing)
          return;
      if (selectedPath.isEmpty()) {
-@@ -7956,21 +8221,86 @@ void ScreenshotPinnedWindow::saveAsFile() {
+@@ -8005,21 +8270,86 @@ void ScreenshotPinnedWindow::saveAsFile() {
          ScreenshotImageFileService::formatForDialogSelection(selectedPath, selectedFilter);
      static_cast<void>(
          outputSettings.setLastManualSaveFormat(ScreenshotImageFileService::formatKey(format)));
@@ -458,7 +458,7 @@ index 328b27b..7ae9b6d 100644
                  } else if (result.failureStage != ScreenshotExportFailureStage::Cancelled) {
                      showPinnedRecognitionMessage(
                          this,
-@@ -7984,6 +8314,10 @@ void ScreenshotPinnedWindow::saveAsFile() {
+@@ -8033,6 +8363,10 @@ void ScreenshotPinnedWindow::saveAsFile() {
          if (m_exportArtifact == artifact) {
              m_exportArtifact.reset();
          }

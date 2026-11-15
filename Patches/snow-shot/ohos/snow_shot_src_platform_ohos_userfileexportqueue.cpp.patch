@@ -6,6 +6,9 @@ order, single dispatch, idempotent completion and re-entrancy. Verified
 unchanged behavior with the project's existing before/after tests, including
 400 concurrent requests.
 
+diff --git a/snow_shot/src/platform/ohos/userfileexportqueue.cpp b/snow_shot/src/platform/ohos/userfileexportqueue.cpp
+new file mode 100644
+index 0000000..a252847
 --- /dev/null
 +++ b/snow_shot/src/platform/ohos/userfileexportqueue.cpp
 @@ -0,0 +1,143 @@

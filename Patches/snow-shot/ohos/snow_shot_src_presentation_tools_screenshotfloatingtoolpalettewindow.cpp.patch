@@ -5,9 +5,11 @@ again once this attribute is cleared. The change is a plain always-on-top
 tool window, not a floating-window permission grant; a misleading source
 comment from an earlier revision is corrected without changing behavior.
 
+diff --git a/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp b/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp
+index cc9be0c..faa70b8 100644
 --- a/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp
 +++ b/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp
-@@ -55,6 +55,10 @@
+@@ -55,6 +55,10 @@ constexpr QSize kToolbarWindowPresetSize(1242, 142);
  ScreenshotFloatingToolPaletteWindow::ScreenshotFloatingToolPaletteWindow(
      const ScreenshotToolPalette::Options& options, QWidget* parent)
      : QWidget(parent, native::windowFlags()) {

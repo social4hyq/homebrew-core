@@ -5,10 +5,25 @@ endpoints as the desktop presets. For scrolling screenshots, inject the
 wheel step through OH_Input_InjectMouseEventGlobal and request the
 user-authorized injection permission on the first step.
 
+diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
+index 31000e2..1489ebc 100644
+--- a/snow_shot/CMakeLists.txt
++++ b/snow_shot/CMakeLists.txt
+@@ -1357,7 +1357,8 @@ if(APPLE)
+ endif()
+ if(OHOS)
+     target_sources(snow_shot_global_mouse PRIVATE
+-        src/platform/ohos/globalmousebackend.cpp)
++        src/platform/ohos/globalmousebackend.cpp
++        src/platform/ohos/scrollinput.cpp)
+     target_link_libraries(snow_shot_global_mouse PRIVATE ohinput)
+ endif()
+ target_link_libraries(snow_shot_settings PRIVATE snow_shot_global_mouse)
 diff --git a/snow_shot/include/snow_shot/platform/screenshotnative.h b/snow_shot/include/snow_shot/platform/screenshotnative.h
+index 4125dce..1a6f871 100644
 --- a/snow_shot/include/snow_shot/platform/screenshotnative.h
 +++ b/snow_shot/include/snow_shot/platform/screenshotnative.h
-@@ -31,6 +31,11 @@
+@@ -31,6 +31,11 @@ quint32 screenshotFocusedWindow();
  QRectF screenshotFocusedWindowBounds();
  bool screenshotScrollPermission();
  ScrollInputResult sendScreenshotScroll(const QRect& desktopSelection, const QPoint& delta);
@@ -20,21 +35,9 @@ diff --git a/snow_shot/include/snow_shot/platform/screenshotnative.h b/snow_shot
  #else
  inline bool screenshotScrollPermission() {
      return true;
-diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
---- a/snow_shot/CMakeLists.txt
-+++ b/snow_shot/CMakeLists.txt
-@@ -1303,7 +1303,8 @@
- endif()
- if(OHOS)
-     target_sources(snow_shot_global_mouse PRIVATE
--        src/platform/ohos/globalmousebackend.cpp)
-+        src/platform/ohos/globalmousebackend.cpp
-+        src/platform/ohos/scrollinput.cpp)
-     target_link_libraries(snow_shot_global_mouse PRIVATE ohinput)
- endif()
- target_link_libraries(snow_shot_settings PRIVATE snow_shot_global_mouse)
 diff --git a/snow_shot/src/platform/ohos/scrollinput.cpp b/snow_shot/src/platform/ohos/scrollinput.cpp
 new file mode 100644
+index 0000000..23c7652
 --- /dev/null
 +++ b/snow_shot/src/platform/ohos/scrollinput.cpp
 @@ -0,0 +1,95 @@

@@ -7,7 +7,7 @@ grouping policy, conflict detection and atomic write semantics are
 unchanged.
 
 diff --git a/snow_shot/src/storage/settingsadapters.cpp b/snow_shot/src/storage/settingsadapters.cpp
-index 79c554b..e910285 100644
+index b4ffffc..31eb38b 100644
 --- a/snow_shot/src/storage/settingsadapters.cpp
 +++ b/snow_shot/src/storage/settingsadapters.cpp
 @@ -16,6 +16,7 @@
@@ -62,7 +62,7 @@ index 79c554b..e910285 100644
  }
  
  bool setAllLocalShortcutsAtomic(const QString& prefix, const QStringList& ids,
-@@ -1494,11 +1483,16 @@ bool ScreenshotShortcutSettings::isReservedShortcutAllowed(
+@@ -1569,11 +1558,16 @@ bool ScreenshotShortcutSettings::isReservedShortcutAllowed(
  bool setLocalShortcutValuesAtomic(const QMap<QString, QJsonValue>& values) {
      auto& configuration = cache();
      return configuration.mutateIfRevision(configuration.revision(), [&configuration, &values]() {
@@ -82,7 +82,7 @@ index 79c554b..e910285 100644
                  return false;
              }
              const auto normalized = ConfigurationSchema::normalize(it.key(), it.value());
-@@ -1506,17 +1500,17 @@ bool setLocalShortcutValuesAtomic(const QMap<QString, QJsonValue>& values) {
+@@ -1581,17 +1575,17 @@ bool setLocalShortcutValuesAtomic(const QMap<QString, QJsonValue>& values) {
                  return false;
              }
              normalizedValues.insert(it.key(), normalized.value);
@@ -105,7 +105,7 @@ index 79c554b..e910285 100644
                  const auto value = normalizedValues.contains(key) ? normalizedValues.value(key)
                                                                    : current.value(key);
                  const auto bindings = shortcuts::shortcutBindingsFromJson(
-@@ -1539,7 +1533,7 @@ bool setLocalShortcutValuesAtomic(const QMap<QString, QJsonValue>& values) {
+@@ -1614,7 +1608,7 @@ bool setLocalShortcutValuesAtomic(const QMap<QString, QJsonValue>& values) {
                                                  shortcuts::screenshotShortcutActionsMayConflict(
                                                      existing.first, id)) &&
                                                 (group.prefix !=

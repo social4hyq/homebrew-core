@@ -9,10 +9,10 @@ catalog already carries are upstream strings with no OHOS-specific behavior
 change, so they are left untranslated by this port.
 
 diff --git a/snow_shot/i18n/core/snow_shot_core_en_US.ts b/snow_shot/i18n/core/snow_shot_core_en_US.ts
-index ae80472..056e59a 100644
+index f17bcdd..15ed73a 100644
 --- a/snow_shot/i18n/core/snow_shot_core_en_US.ts
 +++ b/snow_shot/i18n/core/snow_shot_core_en_US.ts
-@@ -838,6 +838,10 @@ so every moment on screen can be expressed clearly and shared easily</translatio
+@@ -886,6 +886,10 @@ so every moment on screen can be expressed clearly and shared easily</translatio
      </context>
      <context>
          <name>SystemTrayController</name>

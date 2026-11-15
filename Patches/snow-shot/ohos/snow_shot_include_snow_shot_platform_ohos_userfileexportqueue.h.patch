@@ -4,6 +4,9 @@ callers. Drop the extra per-pending-id vector from an earlier revision in
 favor of a single pending flag stored on each queue entry — same interface,
 one fewer parallel container to keep in sync.
 
+diff --git a/snow_shot/include/snow_shot/platform/ohos/userfileexportqueue.h b/snow_shot/include/snow_shot/platform/ohos/userfileexportqueue.h
+new file mode 100644
+index 0000000..5327a34
 --- /dev/null
 +++ b/snow_shot/include/snow_shot/platform/ohos/userfileexportqueue.h
 @@ -0,0 +1,83 @@

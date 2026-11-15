@@ -3,7 +3,7 @@ OCR worker process, so the OHOS Qt service links this crate in-process
 instead through a C ABI, which still needs its own crate-type.
 
 diff --git a/snow-crates/crates/snow-ocr-process/Cargo.toml b/snow-crates/crates/snow-ocr-process/Cargo.toml
-index 621b50f..258c7c7 100644
+index 1728612..7e95c44 100644
 --- a/snow-crates/crates/snow-ocr-process/Cargo.toml
 +++ b/snow-crates/crates/snow-ocr-process/Cargo.toml
 @@ -8,6 +8,10 @@ license.workspace = true

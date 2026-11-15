@@ -3,10 +3,10 @@ tray/recording events call into; pairs with the OHOS implementation, it is
 not an unused public API.
 
 diff --git a/snow_shot/include/snow_shot/presentation/screenshotcontroller.h b/snow_shot/include/snow_shot/presentation/screenshotcontroller.h
-index ed61ff6..7bd4147 100644
+index 48a756e..6272d7b 100644
 --- a/snow_shot/include/snow_shot/presentation/screenshotcontroller.h
 +++ b/snow_shot/include/snow_shot/presentation/screenshotcontroller.h
-@@ -129,6 +129,9 @@ class ScreenshotController : public QObject {
+@@ -138,6 +138,9 @@ class ScreenshotController : public QObject {
      void captureAndStartScreenRecording();
      void startOrStopScreenRecordingAndCopy();
      void openScreenRecordingFolder();

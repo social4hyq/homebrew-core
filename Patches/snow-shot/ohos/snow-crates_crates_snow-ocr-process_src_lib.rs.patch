@@ -15,9 +15,9 @@ pulled in via mod engine and still imports Config by name and calls
 recognition_width() inside make_engine_for_models, so both must keep
 compiling here, matching the upstream out-of-process worker's definitions.
 
-diff --git /dev/null b/snow-crates/crates/snow-ocr-process/src/lib.rs
+diff --git a/snow-crates/crates/snow-ocr-process/src/lib.rs b/snow-crates/crates/snow-ocr-process/src/lib.rs
 new file mode 100644
-index e69de29..2312636 100644
+index 0000000..2312636
 --- /dev/null
 +++ b/snow-crates/crates/snow-ocr-process/src/lib.rs
 @@ -0,0 +1,350 @@

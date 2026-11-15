@@ -5,10 +5,10 @@ every other platform's defaults untouched. This only changes OHOS's
 first-run default, not a user's saved configuration.
 
 diff --git a/snow_shot/src/storage/configurationschema.cpp b/snow_shot/src/storage/configurationschema.cpp
-index 7a76349..a83a873 100644
+index 7f35cd1..2deaa17 100644
 --- a/snow_shot/src/storage/configurationschema.cpp
 +++ b/snow_shot/src/storage/configurationschema.cpp
-@@ -506,9 +506,17 @@ constexpr SchemaAllowedValues kSchemaAllowed18 = {nullptr, 0,
+@@ -508,9 +508,17 @@ constexpr SchemaAllowedValues kSchemaAllowed18 = {nullptr, 0,
                                                    SchemaAllowedProvider::OcrPunctuation};
  constexpr SchemaString kSchemaStrings19[] = {u"blur", u"background_fill"};
  constexpr SchemaAllowedValues kSchemaAllowed19 = {kSchemaStrings19, std::size(kSchemaStrings19)};
