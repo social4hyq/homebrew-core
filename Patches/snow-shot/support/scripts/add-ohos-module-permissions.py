@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Declare the screen-capture permission in the HAP's module.json.
+"""Declare the screen-capture and network permissions in the HAP's module.json.
 
-QAbility requests ohos.permission.CUSTOM_SCREEN_CAPTURE at runtime, but the
-Qt template's module.json leaves requestPermissions empty, so the system has
-nothing to grant and every capture fails with PermissionDenied.
+QAbility requests ohos.permission.CUSTOM_SCREEN_CAPTURE at runtime, and QtNetwork
+needs INTERNET for translation requests. The Qt template leaves requestPermissions
+empty, so capture fails with PermissionDenied and HTTPS requests cannot resolve
+their hosts. GET_NETWORK_INFO lets the app inspect connectivity before requests.
 """
 import json
 import os
@@ -11,7 +12,12 @@ from pathlib import Path
 import sys
 import zipfile
 
-PERMISSION = 'ohos.permission.CUSTOM_SCREEN_CAPTURE'
+PERMISSIONS = (
+    ('ohos.permission.CUSTOM_SCREEN_CAPTURE',
+     'Capture the screen for screenshots and annotations'),
+    ('ohos.permission.INTERNET', 'Send text translation requests'),
+    ('ohos.permission.GET_NETWORK_INFO', 'Check network availability for translation'),
+)
 MODULE_NAME = 'module.json'
 
 
@@ -21,12 +27,13 @@ def add_permission(hap):
         manifest = json.loads(source.read(MODULE_NAME))
         module = manifest['module']
         permissions = module.setdefault('requestPermissions', [])
-        if not any(item.get('name') == PERMISSION for item in permissions):
-            permissions.append({
-                'name': PERMISSION,
-                'reason': 'Capture the screen for screenshots and annotations',
-                'usedScene': {'abilities': ['QAbility'], 'when': 'inuse'},
-            })
+        for permission, reason in PERMISSIONS:
+            if not any(item.get('name') == permission for item in permissions):
+                permissions.append({
+                    'name': permission,
+                    'reason': reason,
+                    'usedScene': {'abilities': ['QAbility'], 'when': 'inuse'},
+                })
         data = json.dumps(manifest, ensure_ascii=False, separators=(',', ':')).encode()
         temporary = hap.with_suffix('.permissions.hap')
         try:
