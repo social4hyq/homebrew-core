@@ -171,4 +171,8 @@ if [ "$KEEP" = "1" ]; then
   cp "$signed" "$keep"
   log "signed HAP kept at $keep"
 fi
-log "installed and started ($BUNDLE_ID, $([ "$ACL" = "1" ] && echo ACL || echo strong-sandbox))"
+variant="strong-sandbox"
+if [ "$ACL" = "1" ]; then variant="ACL"; fi
+# The result line goes to stdout: callers (and `brew test`) read the command's
+# stdout, while progress/diagnostics stay on stderr.
+printf 'installed and started (%s, %s)\n' "$BUNDLE_ID" "$variant"
