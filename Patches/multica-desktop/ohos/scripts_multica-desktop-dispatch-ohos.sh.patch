@@ -1,0 +1,57 @@
+OHOS: route the multica-desktop commands (install, start, stop, status) to
+their scripts, and warn when the multica CLI is of another version than this
+desktop.
+
+diff --git a/scripts/multica-desktop-dispatch-ohos.sh b/scripts/multica-desktop-dispatch-ohos.sh
+new file mode 100755
+index 0000000..4433910
+--- /dev/null
++++ b/scripts/multica-desktop-dispatch-ohos.sh
+@@ -0,0 +1,47 @@
++#!/usr/bin/env bash
++set -euo pipefail
++
++usage() {
++  printf '%s\n' 'Usage: multica-desktop <command> [options]' '' \
++    '  install [--acl-profile <build-profile.json5>]' \
++    '                sign the bottled desktop HAP, install it on a connected device' \
++    '                and start it' \
++    '  start [--bridge-only]' \
++    '                ensure the host bridge is running, then open the app (default)' \
++    '  stop          stop the bridge; the daemon keeps running' \
++    '  status        print the bridge state; exit 1 when it is stopped'
++}
++
++# The desktop reaches the CLI through the bridge, so a CLI of another version
++# is worth a warning rather than a refusal.
++check_cli_version() {
++  local cli_version
++  cli_version="$("$MULTICA_REAL_CLI" version 2> /dev/null | sed -n '1s/^multica \([^ ]*\).*/\1/p')" || true
++  if [[ -n "$cli_version" && -n "${MULTICA_DESKTOP_VERSION:-}" && "$cli_version" != "$MULTICA_DESKTOP_VERSION" ]]; then
++    printf 'multica-desktop: warning: the multica CLI is %s but this desktop is %s; upgrade both to the same version.\n' \
++      "$cli_version" "$MULTICA_DESKTOP_VERSION" >&2
++  fi
++}
++
++cmd="${1:-start}"
++case "$cmd" in
++  -h | --help | help)
++    usage
++    ;;
++  install)
++    shift
++    check_cli_version
++    exec "$MULTICA_INSTALL_DESKTOP" "$@"
++    ;;
++  start | stop | status | -*)
++    # `multica-desktop --bridge-only` means `start --bridge-only`.
++    if [[ "$cmd" == -* ]]; then cmd=start; elif [[ $# -gt 0 ]]; then shift; fi
++    [[ "$cmd" == status ]] || check_cli_version
++    exec "$MULTICA_DESKTOP" "$cmd" "$@"
++    ;;
++  *)
++    printf 'multica-desktop: unknown command: %s\n' "$cmd" >&2
++    usage >&2
++    exit 2
++    ;;
++esac
