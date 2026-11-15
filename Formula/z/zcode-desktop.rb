@@ -313,7 +313,7 @@ class ZcodeDesktop < Formula
     assert_equal %w[ohos.permission.INTERNET], strong_permissions
 
     assert_match "no managed server running", shell_output("#{bin}/zcode-desktop stop")
-    assert_match "not healthy", shell_output("#{bin}/zcode-desktop status", 1)
+    assert_match "not healthy", shell_output("#{bin}/zcode-desktop status 2>&1", 1)
 
     # The real bottle HAP.
     hap = libexec/"zcode-desktop-unsigned.hap"
