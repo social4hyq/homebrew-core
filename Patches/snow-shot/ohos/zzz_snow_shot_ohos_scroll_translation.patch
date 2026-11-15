@@ -1,0 +1,178 @@
+OHOS: make text translation usable and restore automatic scrolling. The
+OHOS package did not define the free-translation endpoint, so the built-in
+"Free translation" model had an empty base URL. Provide the same public
+endpoints as the desktop presets. For scrolling screenshots, inject the
+wheel step through OH_Input_InjectMouseEventGlobal and request the
+user-authorized injection permission on the first step. Hide the main
+window while freezing a selection capture so the app's own non-scrollable
+settings UI cannot become the scrolling target.
+
+diff --git a/snow_shot/include/snow_shot/platform/screenshotnative.h b/snow_shot/include/snow_shot/platform/screenshotnative.h
+--- a/snow_shot/include/snow_shot/platform/screenshotnative.h
++++ b/snow_shot/include/snow_shot/platform/screenshotnative.h
+@@ -31,6 +31,11 @@
+ QRectF screenshotFocusedWindowBounds();
+ bool screenshotScrollPermission();
+ ScrollInputResult sendScreenshotScroll(const QRect& desktopSelection, const QPoint& delta);
++#elif defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++// OHOS PC exposes user-authorized global mouse injection. The first scroll step
++// requests the system consent dialog; later steps reuse the authorization.
++bool screenshotScrollPermission();
++ScrollInputResult sendScreenshotScroll(const QRect& desktopSelection, const QPoint& delta);
+ #else
+ inline bool screenshotScrollPermission() {
+     return true;
+diff --git a/snow_shot/src/app/applicationcontroller.cpp b/snow_shot/src/app/applicationcontroller.cpp
+--- a/snow_shot/src/app/applicationcontroller.cpp
++++ b/snow_shot/src/app/applicationcontroller.cpp
+@@ -1622,6 +1622,27 @@
+             QObject::connect(screenshotController.get(),
+                              &ScreenshotController::captureActivityChanged, &floatingToolbar,
+                              &presentation::FloatingToolbarController::setCaptureActive);
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++            // A normal OHOS HAP has no tray, so the main window is the only app
++            // surface the user can leave open. Hide it while a selection capture
++            // is being frozen; otherwise the frozen frame (and a scrolling
++            // capture of it) contains Snow Shot's own non-scrollable settings UI.
++            QObject::connect(
++                screenshotController.get(), &ScreenshotController::captureActivityChanged, &q,
++                [this](const QString& source, bool active) {
++                    if (source != QStringLiteral("selection"))
++                        return;
++                    if (active) {
++                        mainWindowVisibleBeforeCapture =
++                            mainWindow != nullptr && mainWindow->isVisible();
++                        if (mainWindowVisibleBeforeCapture)
++                            mainWindow->hide();
++                    } else if (mainWindowVisibleBeforeCapture) {
++                        mainWindowVisibleBeforeCapture = false;
++                        showMainWindow();
++                    }
++                });
++#endif
+ #ifdef Q_OS_MACOS
+             screenshotController->setRecordingPermissionCheck([this](bool microphone, bool input,
+                                                                      bool notify) {
+@@ -2367,6 +2388,9 @@
+         selectedTextTranslationCoordinator;
+ #endif
+     QPointer<MainWindow> mainWindow;
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    bool mainWindowVisibleBeforeCapture = false;
++#endif
+ #ifdef Q_OS_MACOS
+     std::unique_ptr<platform::macos::ApplicationReopenHandler> reopenHandler;
+ #endif
+diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
+--- a/snow_shot/CMakeLists.txt
++++ b/snow_shot/CMakeLists.txt
+@@ -1303,7 +1303,8 @@
+ endif()
+ if(OHOS)
+     target_sources(snow_shot_global_mouse PRIVATE
+-        src/platform/ohos/globalmousebackend.cpp)
++        src/platform/ohos/globalmousebackend.cpp
++        src/platform/ohos/scrollinput.cpp)
+     target_link_libraries(snow_shot_global_mouse PRIVATE ohinput)
+ endif()
+ target_link_libraries(snow_shot_settings PRIVATE snow_shot_global_mouse)
+diff --git a/snow_shot/src/platform/ohos/scrollinput.cpp b/snow_shot/src/platform/ohos/scrollinput.cpp
+new file mode 100644
+--- /dev/null
++++ b/snow_shot/src/platform/ohos/scrollinput.cpp
+@@ -0,0 +1,95 @@
++#include <QRectF>
++
++#include "snow_shot/platform/screenshotnative.h"
++
++#include <multimodalinput/oh_input_manager.h>
++
++#include <atomic>
++
++// The injection-permission entry points are present in libohinput on OHOS PC
++// but are not declared by every SDK header revision. Declare the stable C
++// signatures here so the scrolling controller can request user authorization.
++extern "C" {
++Input_Result OH_Input_RequestInjection(Input_InjectAuthorizeCallback callback);
++Input_Result OH_Input_QueryAuthorizedStatus(Input_InjectionStatus* status);
++}
++
++namespace snow_shot::platform {
++namespace {
++std::atomic_bool injectionRequestInFlight{false};
++std::atomic_bool injectionDenied{false};
++
++void onInjectionAuthorized(Input_InjectionStatus status) {
++    if (status == UNAUTHORIZED)
++        injectionDenied.store(true, std::memory_order_release);
++    injectionRequestInFlight.store(false, std::memory_order_release);
++}
++
++bool ensureInjectionAuthorized() {
++    Input_InjectionStatus status = UNAUTHORIZED;
++    if (OH_Input_QueryAuthorizedStatus(&status) == INPUT_SUCCESS) {
++        if (status == AUTHORIZED)
++            return true;
++        if (status == AUTHORIZING)
++            return false;
++    }
++    if (injectionDenied.load(std::memory_order_acquire) ||
++        injectionRequestInFlight.exchange(true, std::memory_order_acq_rel))
++        return false;
++    const Input_Result result = OH_Input_RequestInjection(&onInjectionAuthorized);
++    if (result == INPUT_INJECTION_AUTHORIZED) {
++        injectionRequestInFlight.store(false, std::memory_order_release);
++        return true;
++    }
++    if (result != INPUT_SUCCESS && result != INPUT_INJECTION_AUTHORIZING) {
++        injectionRequestInFlight.store(false, std::memory_order_release);
++        injectionDenied.store(true, std::memory_order_release);
++    }
++    return false;
++}
++
++ScrollInputResult injectScrollStep(const QRect& selection, const QPoint& delta) {
++    struct Input_MouseEvent* event = OH_Input_CreateMouseEvent();
++    if (event == nullptr)
++        return {ScrollInputResult::Status::PostFailed, 0};
++    const QPoint center = selection.center();
++    const bool horizontal = delta.x() != 0;
++    OH_Input_SetMouseEventAction(event, MOUSE_ACTION_AXIS_UPDATE);
++    OH_Input_SetMouseEventDisplayId(event, 0);
++    OH_Input_SetMouseEventDisplayX(event, center.x());
++    OH_Input_SetMouseEventDisplayY(event, center.y());
++    OH_Input_SetMouseEventGlobalX(event, center.x());
++    OH_Input_SetMouseEventGlobalY(event, center.y());
++    OH_Input_SetMouseEventAxisType(event, horizontal ? MOUSE_AXIS_SCROLL_HORIZONTAL
++                                                     : MOUSE_AXIS_SCROLL_VERTICAL);
++    OH_Input_SetMouseEventAxisValue(event,
++                                    static_cast<float>(horizontal ? delta.x() : delta.y()));
++    const int32_t result = OH_Input_InjectMouseEventGlobal(event);
++    OH_Input_DestroyMouseEvent(&event);
++    switch (result) {
++    case INPUT_SUCCESS:
++        return {ScrollInputResult::Status::Posted, 0};
++    case INPUT_DEVICE_NOT_SUPPORTED:
++        return {ScrollInputResult::Status::Unsupported, 0};
++    case INPUT_PARAMETER_ERROR:
++        return {ScrollInputResult::Status::InvalidRequest, 0};
++    default:
++        return {ScrollInputResult::Status::PostFailed, static_cast<quint32>(result)};
++    }
++}
++} // namespace
++
++bool screenshotScrollPermission() {
++    // The auto-scroller must keep calling us: the first call opens the system
++    // injection-consent dialog, and later calls succeed after user approval.
++    return true;
++}
++
++ScrollInputResult sendScreenshotScroll(const QRect& selection, const QPoint& delta) {
++    if (selection.isEmpty() || delta.isNull())
++        return {ScrollInputResult::Status::InvalidRequest, 0};
++    if (!ensureInjectionAuthorized())
++        return {ScrollInputResult::Status::PostFailed, 0};
++    return injectScrollStep(selection, delta);
++}
++} // namespace snow_shot::platform
