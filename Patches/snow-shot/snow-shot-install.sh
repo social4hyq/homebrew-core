@@ -25,10 +25,12 @@ install_hap() {
   done
 
   # HarmonyOS PC hdc servers can start without connecting to their own local
-  # device. Use the bundled hdc and the advertised persist.hdc.port to attach
-  # it before hap-installer asks the DevEco CLI for connected devices.
+  # device, and a dropped link leaves the target listed as Offline. Unless the
+  # loopback target is Connected, use the bundled hdc and the advertised
+  # persist.hdc.port (it changes between boots, so it is read every time) to
+  # attach it before hap-installer asks the DevEco CLI for connected devices.
   hdc="${SNOW_SHOT_HDC:-hdc}"
-  if ! "$hdc" list targets 2>/dev/null | grep -q '127\.0\.0\.1:'; then
+  if ! "$hdc" list targets -v 2>/dev/null | grep -qE '^127\.0\.0\.1:[0-9]+[[:space:]]+TCP[[:space:]]+Connected'; then
     port="$(param get persist.hdc.port 2>/dev/null | tr -d '[:space:]' || true)"
     if [ -n "$port" ]; then
       "$hdc" tconn "127.0.0.1:$port" >/dev/null 2>&1 || true

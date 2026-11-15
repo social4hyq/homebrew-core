@@ -4,6 +4,7 @@ class SnowShot < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.7_snow-shot.tar.gz"
   sha256 "6d9de662710ccf406dea312c0322e77a3f473bc6121096ec82df713d30f4273c"
   license "GPL-3.0-or-later"
+  revision 1
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.7-r1"
@@ -438,12 +439,37 @@ class SnowShot < Formula
       printf '%s\\n' "$@" > #{installer_args}
     SH
     chmod 0755, fake_bin/"hap-installer"
-    (fake_bin/"hdc").write "#!/bin/sh\necho 127.0.0.1:1\n"
+    hdc_log = testpath/"hdc-log"
+    hdc_state = testpath/"hdc-state"
+    (fake_bin/"hdc").write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$*" >> #{hdc_log}
+      case "$*" in
+        "list targets -v") cat #{hdc_state} ;;
+      esac
+    SH
     chmod 0755, fake_bin/"hdc"
-    with_env(PATH: "#{fake_bin}:#{ENV["PATH"]}", SNOW_SHOT_HDC: (fake_bin/"hdc").to_s) do
+    # A synthetic port, so the assertion shows tconn uses whatever
+    # persist.hdc.port reports rather than a fixed value.
+    fake_port = "45678"
+    (fake_bin/"param").write "#!/bin/sh\necho #{fake_port}\n"
+    chmod 0755, fake_bin/"param"
+    # The bin wrapper pins SNOW_SHOT_HDC to the real hdc, so drive the installed
+    # script directly to inject the fake one.
+    installer = libexec/"snow-shot-install"
+    with_env(PATH: "#{fake_bin}:#{ENV["PATH"]}", SNOW_SHOT_HAP: hap.to_s,
+             SNOW_SHOT_HDC: (fake_bin/"hdc").to_s) do
       shell_output("#{bin}/snow-shot")
       refute_path_exists installer_args
-      shell_output("#{bin}/snow-shot install --no-start")
+      # A loopback target that is listed but Offline must be reattached with the
+      # advertised port; a Connected one must be left alone.
+      hdc_state.write "127.0.0.1:#{fake_port}\t\tTCP\tOffline\tlocalhost\thdc\n"
+      shell_output("#{installer} install --no-start")
+      assert_match "tconn 127.0.0.1:#{fake_port}", hdc_log.read
+      hdc_log.delete
+      hdc_state.write "127.0.0.1:#{fake_port}\t\tTCP\tConnected\tlocalhost\thdc\n"
+      shell_output("#{installer} install --no-start")
+      refute_match "tconn", hdc_log.read
     end
     args = installer_args.read.lines(chomp: true)
     assert_equal ["--hap", hap.to_s], args.first(2)
