@@ -1,0 +1,7 @@
+{
+  "name": "deepseek-harness-desktop-shell",
+  "version": "0.2.2-rc.2",
+  "private": true,
+  "description": "DeepSeek Harness desktop shell for OpenHarmony (loads dsh web)",
+  "main": "main.cjs"
+}
