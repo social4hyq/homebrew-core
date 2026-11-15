@@ -69,7 +69,9 @@ app.whenReady().then(() => {
     autoHideMenuBar: true,
     webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false },
   });
-  win.setWindowButtonVisibility(true);
+  // electron-ohos 37 aborts the browser process on setWindowButtonVisibility
+  // (SIGABRT in CrBrowserMain); the v37 shell shows the system window buttons
+  // on its own, so the v34-era call is not needed.
   // Links the workbench opens in a new window: loopback stays in the shell,
   // external URLs go to the system browser (the shell has no second window).
   win.webContents.setWindowOpenHandler(({ url }) => {
