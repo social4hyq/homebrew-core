@@ -70,7 +70,14 @@ env:
   # regex-automata panic an earlier revision of this comment claimed.
   # vite-plus allowlisted too: tag tarball plus version-locked rolldown/vite/
   # vite-task git pins, synced by a custom path in autobump.sh.
-  ALLOWLIST: "claude-code claude-code.latest zcode vite-plus magpie multica multica-desktop"
+  # obsidian-desktop allowlisted: its stable url is the vendor asar
+  # (obsidian-<ver>.asar.gz, version embedded in the URL) and sha256 is that
+  # file's digest, so bump-formula-pr rewrites it cleanly; the tap host payload
+  # is a separate "host" resource with a fixed url/sha256 and needs no bump.
+  # Kept out of automerge-autobump.yml: brew test installs the app from a
+  # synthetic --asar, so it cannot tell whether a real vendor release still
+  # boots; a person runs obsidian-desktop install before merging.
+  ALLOWLIST: "claude-code claude-code.latest zcode vite-plus magpie multica multica-desktop obsidian-desktop"
   IMAGE: ${{ vars.OHOS_CI_IMAGE }} # unchanged mirror of the SWR ci-runner — see sync-ci-image.yml
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core

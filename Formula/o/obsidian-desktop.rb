@@ -1,21 +1,25 @@
 class ObsidianDesktop < Formula
   desc "Notes desktop for HarmonyOS PC running the official Obsidian package"
   homepage "https://obsidian.md"
-  url "https://github.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.4/obsidian-desktop-0.1.4.tar.gz"
-  sha256 "8932f0227b2b2ca570dce3ece1aa24eb8a66f7a5f98ec195013177b7c846b066"
-  # Tap-authored host/scripts (MIT) packaging the openharmony-sig Electron
-  # prebuilt. Obsidian itself is proprietary and is never redistributed here:
-  # the official Linux arm64 package is fetched on the user's machine at
-  # install time; see obsidian.md terms and multica.rb.
+  url "https://github.com/obsidianmd/obsidian-releases/releases/download/v1.15.1/obsidian-1.15.1.asar.gz"
+  sha256 "3f6808c14204063349d5a7a59b9f2f637958063fa85eeebe767e13e06d314c0f"
+  # The stable url is the vendor app package, so `version`, `brew bump-formula-pr`
+  # and autobump all follow Obsidian itself. The tap-authored host payload lives
+  # in the "host" resource below and stays version-independent. Obsidian is
+  # proprietary and is never redistributed here: the asar is fetched from
+  # Obsidian's own release at install time (never copied into the bottle); see
+  # obsidian.md terms and multica.rb.
   license :cannot_represent
 
+  # Upstream is the vendor app, not the tap-hosted host payload: the formula
+  # version tracks Obsidian so `brew upgrade` follows new releases, while the
+  # host payload stays version-independent. desktop-releases.json carries the
+  # latest desktop version together with the asar URL and its sha256.
   livecheck do
-    skip "Tap-hosted payload, versioned with the formula"
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.4-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ac68d92f88f35b0465cf337845d17afbb4b526f7b294270debdddee8aa4eea60"
+    url "https://raw.githubusercontent.com/obsidianmd/obsidian-releases/master/desktop-releases.json"
+    strategy :json do |json|
+      json["latestVersion"]
+    end
   end
 
   depends_on "curl"
@@ -24,13 +28,13 @@ class ObsidianDesktop < Formula
   depends_on "ohos-sdk-toolchains"
   depends_on "zip"
 
-  # Version of the vendor app package this formula's host was verified against.
-  # Bump together with the asar URL/digest; the host contract (app:// scheme,
-  # @electron/remote, documents redirect) has been stable across 1.12 through
-  # 1.15.
-  OBSIDIAN_VERSION = "1.15.1".freeze
-  OBSIDIAN_ASAR_URL = "https://github.com/obsidianmd/obsidian-releases/releases/download/v1.15.1/obsidian-1.15.1.asar.gz".freeze
-  OBSIDIAN_ASAR_SHA256 = "3f6808c14204063349d5a7a59b9f2f637958063fa85eeebe767e13e06d314c0f".freeze
+  # Tap-authored host payload (bootstrap host, CLI client, installer scripts),
+  # versioned independently of Obsidian. Bumping it needs a new payload release
+  # and only the url/sha256 here.
+  resource "host" do
+    url "https://github.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.4/obsidian-desktop-0.1.4.tar.gz"
+    sha256 "8932f0227b2b2ca570dce3ece1aa24eb8a66f7a5f98ec195013177b7c846b066"
+  end
 
   # openharmony-sig/electron PC(2in1) prebuilt (CodeHub mirror hosted on this
   # tap's release; redistribution assumed by the tap owner, see multica.rb).
@@ -40,6 +44,11 @@ class ObsidianDesktop < Formula
   end
 
   def install
+    resource("host").fetch
+    system "tar", "-xzf", resource("host").cached_download, "-C", buildpath
+    host = Pathname.glob((buildpath/"obsidian-desktop-*").to_s).max
+    odie "host payload missing" if host.nil?
+
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
     system "tar", "-xzf", buildpath/"libelectron_132.tar.gz", "-C", buildpath
@@ -51,9 +60,9 @@ class ObsidianDesktop < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    cp buildpath/"app/bootstrap.cjs", app/"bootstrap.cjs"
-    cp buildpath/"app/package.json", app/"package.json"
-    cp_r buildpath/"app/node_modules", app/"node_modules"
+    cp host/"app/bootstrap.cjs", app/"bootstrap.cjs"
+    cp host/"app/package.json", app/"package.json"
+    cp_r host/"app/node_modules", app/"node_modules"
 
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.obsidiandesktop"'
@@ -77,9 +86,9 @@ class ObsidianDesktop < Formula
     # still had the OpenCode icon, so brand from the vendor package's own icon
     # (assets/ comes from the official tarball's resources/icon.png).
     %w[app_icon.png startIcon.png].each do |name|
-      cp buildpath/"assets/icon.png", shell/"AppScope/resources/base/media"/name
+      cp host/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
-    cp buildpath/"assets/icon32.png", shell/"AppScope/resources/base/media/product_logo_32.png"
+    cp host/"assets/icon32.png", shell/"AppScope/resources/base/media/product_logo_32.png"
 
     # CI's electron-ohos-ci CLT carries an NDK-less SDK subset (no llvm-strip);
     # mirror the multica/opencode packaging deltas that keep hvigor away from
@@ -203,11 +212,11 @@ class ObsidianDesktop < Formula
     end
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
-    pkgshare.install buildpath/"scripts/install-desktop.sh"
+    pkgshare.install host/"scripts/install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    libexec.install buildpath/"scripts/obsidian-desktop.sh"
+    libexec.install host/"scripts/obsidian-desktop.sh"
     chmod 0755, libexec/"obsidian-desktop.sh"
-    libexec.install buildpath/"scripts/obsidian-cli.cjs"
+    libexec.install host/"scripts/obsidian-cli.cjs"
     chmod 0755, libexec/"obsidian-cli.cjs"
     (bin/"obsidian-desktop").write_env_script libexec/"obsidian-desktop.sh",
       OBSIDIAN_DESKTOP_UNSIGNED_HAP:   libexec/"obsidian-desktop-unsigned.hap",
@@ -216,8 +225,8 @@ class ObsidianDesktop < Formula
       OBSIDIAN_DESKTOP_CLI:            libexec/"obsidian-cli.cjs",
       OBSIDIAN_DESKTOP_NODE:           formula_opt_bin("node")/"node",
       OBSIDIAN_DESKTOP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
-      OBSIDIAN_ASAR_URL:               OBSIDIAN_ASAR_URL,
-      OBSIDIAN_ASAR_SHA256:            OBSIDIAN_ASAR_SHA256
+      OBSIDIAN_ASAR_URL:               stable.url.to_s,
+      OBSIDIAN_ASAR_SHA256:            stable.checksum.hexdigest
   end
 
   def caveats
@@ -227,7 +236,7 @@ class ObsidianDesktop < Formula
 
         obsidian-desktop install
 
-      It downloads Obsidian #{OBSIDIAN_VERSION} from Obsidian's official release,
+      It downloads Obsidian #{version} from Obsidian's official release,
       checks the pinned sha256, injects the app package into the HAP, signs with
       a locally generated debug profile, installs and starts it. Use
       `obsidian-desktop install --asar PATH` to install from a local copy
@@ -253,8 +262,9 @@ class ObsidianDesktop < Formula
       ~/.cache/obsidian-desktop/cli.json.
 
       Desktop self-update is disabled; upgrading is `brew upgrade` plus
-      `obsidian-desktop install`. Bumping Obsidian means bumping
-      OBSIDIAN_VERSION, OBSIDIAN_ASAR_URL and OBSIDIAN_ASAR_SHA256.
+      `obsidian-desktop install`. The formula version follows Obsidian's
+      releases, so `brew bump-formula-pr` / autobump handles a new version
+      without touching the host payload.
     EOS
   end
 

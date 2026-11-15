@@ -101,7 +101,11 @@ jobs:
           # BUMP_BRANCH_RE matches by prefix and bump-multica-desktop-<version>
           # starts with bump-multica-, it is also named in BUMP_MANUAL_RE, which
           # wins over the allowlist. Its pr-validate run therefore stays parked
-          # action_required until someone approves it by hand.
+          # action_required until someone approves it by hand. obsidian-desktop is
+          # the same manual case, one level earlier: it isn't in ALLOWLIST below,
+          # so its bump PR is never auto-approved or auto-merged — brew test
+          # installs from a synthetic --asar, so a person runs
+          #  against the real release before merging.
           ALLOWLIST="claude-code claude-code.latest zcode vite-plus magpie multica"
           BUMP_BRANCH_RE="^bump-($(echo "$ALLOWLIST" | tr ' ' '|'))-"
           BUMP_MANUAL_RE="^bump-(multica-desktop)-"
