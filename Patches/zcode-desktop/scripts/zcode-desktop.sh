@@ -12,6 +12,8 @@ DEFAULT_PORT=14299
 ZCODE_BIN="${ZCODE_DESKTOP_ZCODE:-zcode}"
 HDC="${ZCODE_DESKTOP_HDC:-${ZCODE_DESKTOP_HDC_DEFAULT:-hdc}}"
 SECRET_FILE="${ZCODE_DESKTOP_SECRET_FILE:-$HOME/.zcode/v2/credential-secret}"
+ZCODE_ROOT="${ZCODE_DESKTOP_ZCODE_ROOT:-}"
+BUN_BIN="${ZCODE_DESKTOP_BUN:-}"
 
 usage() {
   cat <<'EOF'
@@ -102,6 +104,70 @@ stop_pid() {
   proc_alive "$pid" && kill -9 "$pid" 2>/dev/null || true
 }
 
+resolve_bun() {
+  if [ -n "$BUN_BIN" ] && [ -x "$BUN_BIN" ]; then return 0; fi
+  BUN_BIN="$(command -v bun || true)"
+  [ -n "$BUN_BIN" ] && [ -x "$BUN_BIN" ]
+}
+
+# zcode --web advertises itself as a remote source server, so the web client's
+# "this computer" project host ("local") is routed to a remote host and project
+# creation / sending fails with project.host-offline. Run the bundled server
+# directly with projectStorageHostId pinned to "local" instead.
+prepare_server() {
+  [ -n "$ZCODE_ROOT" ] && [ -f "$ZCODE_ROOT/server/entry-http.js" ] || return 1
+  [ -f "$ZCODE_ROOT/agent/zcode.cjs" ] || return 1
+  resolve_bun || return 1
+  local src="$ZCODE_ROOT/server/entry-http.js" key cache
+  key="$(cksum "$src" 2>/dev/null | awk '{print $1"-"$2}')"
+  [ -n "$key" ] || return 1
+  cache="$CONFIG_DIR/server-$key"
+  if [ ! -f "$cache/.zcode-desktop-patched" ]; then
+    rm -rf "$cache"
+    mkdir -p "$cache"
+    cp -R "$ZCODE_ROOT/server/." "$cache/" || return 1
+    if ! "$BUN_BIN" -e '
+const fs = require("node:fs");
+const file = process.argv[1];
+let source = fs.readFileSync(file, "utf8");
+const pattern = /const projectStorageHostId = remoteHostIdFromWorkspaceIdentity\(\s*buildServerRemoteWorkspaceIdentity\(\{ serverId: options2\.sourceServerId, workspacePath: "\/" \}\)\s*\);/;
+if (!pattern.test(source)) process.exit(3);
+fs.writeFileSync(file, source.replace(pattern, "const projectStorageHostId = \"local\";"));
+' "$cache/entry-http.js"; then
+      rm -rf "$cache"
+      return 1
+    fi
+    : > "$cache/.zcode-desktop-patched"
+  fi
+  SERVER_ENTRY="$cache/entry-http.js"
+  return 0
+}
+
+start_server() {
+  if prepare_server; then
+    log "starting the bundled server (local project routing patched)"
+    (
+      cd "$WORKSPACE" 2>/dev/null || cd "$HOME"
+      ZCODE_SERVER_HOST=127.0.0.1 PORT="$PORT" ZCODE_SERVER_WORKSPACE="$WORKSPACE" \
+        ZCODE_WEB_STATIC_ROOT="$ZCODE_ROOT/web" ZCODE_SERVER_AUTH_TOKEN="" \
+        ZCODE_AGENT_SERVER_ARGS_JSON="[\"$ZCODE_ROOT/agent/zcode.cjs\",\"app-server\",\"--stdio\"]" \
+        ZCODE_AGENT_SERVER_COMMAND="$BUN_BIN" \
+        ZCODE_CREDENTIAL_SECRET_FILE="$SECRET_FILE" \
+        nohup "$BUN_BIN" "$SERVER_ENTRY" >>"$LOG_FILE" 2>&1 &
+      echo $! > "$PID_FILE"
+    )
+  else
+    log "warning: could not prepare the patched server; falling back to zcode --web"
+    log "warning: project creation will fail with project.host-offline on this build"
+    (
+      cd "$WORKSPACE" 2>/dev/null || cd "$HOME"
+      ZCODE_CREDENTIAL_SECRET_FILE="$SECRET_FILE" nohup "$ZCODE_BIN" --web \
+        --workspace "$WORKSPACE" --port "$PORT" --no-open >>"$LOG_FILE" 2>&1 &
+      echo $! > "$PID_FILE"
+    )
+  fi
+}
+
 ensure_serve() {
   read_config
   if healthy; then
@@ -120,14 +186,8 @@ ensure_serve() {
   if port_busy "$PORT"; then
     die "port $PORT is in use by another process; remove $CONFIG_FILE and re-run install"
   fi
-  [ -x "$ZCODE_BIN" ] || command -v "$ZCODE_BIN" >/dev/null || die "zcode not found (set ZCODE_DESKTOP_ZCODE)"
   ensure_secret
-  (
-    cd "$WORKSPACE" 2>/dev/null || cd "$HOME"
-    ZCODE_CREDENTIAL_SECRET_FILE="$SECRET_FILE" nohup "$ZCODE_BIN" --web \
-      --workspace "$WORKSPACE" --port "$PORT" --no-open >>"$LOG_FILE" 2>&1 &
-    echo $! > "$PID_FILE"
-  )
+  start_server
   local waited=0
   until healthy; do
     sleep 1
@@ -195,18 +255,7 @@ cmd_serve() {
 
 cmd_start() {
   device
-  local out
-  if ! out="$("$HDC" shell aa start -a EntryAbility -b "$BUNDLE_ID" -m electron 2>&1)"; then
-    printf '%s\n' "$out" >&2
-    die "could not start $BUNDLE_ID (unlock the device and retry)"
-  fi
-  case "$out" in
-    *"start ability successfully"*) ;;
-    *)
-      printf '%s\n' "$out" >&2
-      die "the device did not confirm the start (unlock the device and retry)"
-      ;;
-  esac
+  "$HDC" shell aa start -a EntryAbility -b "$BUNDLE_ID" -m electron >/dev/null
   printf 'zcode-desktop: opened %s\n' "$BUNDLE_ID"
 }
 

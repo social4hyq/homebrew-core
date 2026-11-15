@@ -10,7 +10,7 @@ class ZcodeDesktop < Formula
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
-  revision 1
+  revision 2
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -19,12 +19,8 @@ class ZcodeDesktop < Formula
     end
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v3.18.2-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "16acc96e34d9955baea52ff3d3a7ba95776e41bd75d7dab0f7478608f4f58f6c"
-  end
-
   depends_on "node" => :build
+  depends_on "bun"
   depends_on "curl"
   depends_on "hap-installer"
   depends_on "ohos-sdk-toolchains"
@@ -182,6 +178,8 @@ class ZcodeDesktop < Formula
       ZCODE_DESKTOP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
       ZCODE_DESKTOP_MODULE_ACL:     pkgshare/"module-acl.json",
       ZCODE_DESKTOP_ZCODE:          formula_opt_bin("zcode")/"zcode",
+      ZCODE_DESKTOP_ZCODE_ROOT:     formula_opt_prefix("zcode")/"libexec/zcode",
+      ZCODE_DESKTOP_BUN:            formula_opt_bin("bun")/"bun",
       ZCODE_DESKTOP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc"
   end
 
@@ -206,6 +204,16 @@ class ZcodeDesktop < Formula
       ZCODE_CREDENTIAL_SECRET_FILE. ZCode 3.18.2 refuses to start without a
       credential secret and HarmonyOS has no Secret Service, so the file is
       required even when no Z.ai account is used.
+
+      Project routing: 3.18.2's `zcode --web` advertises itself as a remote
+      source server, so the browser workbench's "this computer" projects are
+      routed to a remote host and creating one fails with project.host-offline.
+      `serve` therefore runs the bundled server from a per-version copy with
+      projectStorageHostId pinned to "local". If that copy cannot be prepared it
+      falls back to `zcode --web` and logs the warning. Browser (Z.AI) login
+      does not complete in the HAP: the OAuth callback expects the desktop
+      client. Use "API key" -> "skip for now", or sign in from the TUI
+      (`zcode login`) and skip the web prompt.
 
       The default install carries the two kernel ACLs (JIT/WebAssembly for the
       renderer) and READ_PASTEBOARD; `zcode-desktop install --no-acl` installs
