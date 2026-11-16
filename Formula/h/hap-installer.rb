@@ -4,7 +4,7 @@ class HapInstaller < Formula
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.10.tgz"
   sha256 "7fdee1bfb7393c151fa09b3714ecc4796e53d9876557e9933c5890319ffb4daa"
   license "MIT"
-  revision 4
+  revision 5
 
   livecheck do
     url "https://registry.npmjs.org/@deveco%2Fdeveco-cli-openharmony-arm64"
@@ -18,6 +18,7 @@ class HapInstaller < Formula
 
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
+  depends_on "unzip"
 
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
@@ -93,6 +94,8 @@ class HapInstaller < Formula
 
     cp payload/"hap-installer.sh", libexec/"hap-installer.sh"
     cp payload/"sign-hap.cjs", libexec/"sign-hap.cjs"
+    cp payload/"prepare-profile.cjs", libexec/"prepare-profile.cjs"
+    cp payload/"test-install.cjs", libexec/"test-install.cjs"
     chmod 0755, libexec/"hap-installer.sh"
     chmod 0755, libexec/"sign-hap.cjs"
     cli_wrapper = libexec/"devecocli.sh"
@@ -136,6 +139,8 @@ class HapInstaller < Formula
     %w[PermissionDefinitions.json permissionDefinitions.json].each do |name|
       assert_path_exists libexec/"hap-installer-toolchain/sdk/default/openharmony/toolchains/lib"/name
     end
+    ENV["DEVECO_CLI_JS"] = (libexec/"node_modules/@deveco/deveco-cli-openharmony-arm64/dist/cli.js").to_s
+    system formula_opt_bin("node")/"node", "--test", libexec/"test-install.cjs"
     refute_path_exists bin/"hdc"
     assert_match(/else if \(authIsObject\) \{\s+proxyAuth = false;/,
                  (libexec/"node_modules/axios/lib/adapters/http.js").read)
