@@ -12,7 +12,7 @@ index 0000000..4433910
 +set -euo pipefail
 +
 +usage() {
-+  printf '%s\n' 'Usage: multica-desktop <command> [options]' '' \
++  printf '%s\n' 'Usage: multica-app <command> [options]' '' \
 +    '  install [--acl-profile <build-profile.json5>]' \
 +    '                sign the bottled desktop HAP, install it on a connected device' \
 +    '                and start it' \

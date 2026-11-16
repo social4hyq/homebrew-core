@@ -3,5 +3,6 @@
   "opencode-desktop": "opencode-app",
   "zcode-desktop": "zcode-app",
   "obsidian-desktop": "obsidian-app",
-  "deepseek-harness-desktop": "deepseek-harness-app"
+  "deepseek-harness-desktop": "deepseek-harness-app",
+  "multica-desktop": "multica-app"
 }
