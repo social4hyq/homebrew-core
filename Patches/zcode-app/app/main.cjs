@@ -7,6 +7,7 @@ const { app, BrowserWindow, shell } = require('electron');
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
+const tray = require('./tray.cjs');
 
 let config = { port: 0, workspace: '' };
 try {
@@ -17,10 +18,21 @@ try {
 const configured = Number.isInteger(config.port) && config.port > 0;
 const origin = configured ? `http://127.0.0.1:${config.port}` : null;
 
+// ZCODE_DESKTOP_NO_TRAY=1 (or "tray": false in config.json) restores the old
+// behaviour where closing the window quits the shell.
+const useTray = process.env.ZCODE_DESKTOP_NO_TRAY !== '1' && config.tray !== false;
+let trayReady = false;
+let shellWindow = null;
+let driving = false;
+
 // zcode://oauth/callback comes back from the browser after a successful login.
 // The web client finishes the login through the server poll; the handoff only
 // has to reach the app, so bring the shell forward when it is delivered.
 function focusShellWindow() {
+  if (trayReady) {
+    tray.showWindow();
+    return;
+  }
   const target = BrowserWindow.getAllWindows()[0];
   if (!target || target.isDestroyed()) return;
   if (target.isMinimized()) target.restore();
@@ -82,8 +94,32 @@ async function drive(win) {
   }
 }
 
+// Only one drive loop at a time.
+function startDrive() {
+  if (driving || !shellWindow || shellWindow.isDestroyed()) return;
+  driving = true;
+  drive(shellWindow)
+    .catch((error) => console.error('ZCODE_DESKTOP drive failed: ' + String(error)))
+    .finally(() => { driving = false; });
+}
+
 app.whenReady().then(() => {
-  const win = new BrowserWindow({
+  // The status bar item has to exist before the first window: electron-ohos
+  // attaches every BrowserWindow UIAbility to it, and hideAbility() only keeps
+  // the process alive while the item exists.
+  if (useTray) {
+    try {
+      tray.create({
+        tooltip: 'ZCode',
+        iconPath: path.join(__dirname, 'tray-icon.png'),
+      });
+      trayReady = true;
+    } catch (error) {
+      console.error('ZCODE_DESKTOP tray unavailable: ' + String(error));
+    }
+  }
+
+  shellWindow = new BrowserWindow({
     backgroundColor: "#11141b",
     width: 1280,
     height: 800,
@@ -93,20 +129,36 @@ app.whenReady().then(() => {
   // The OHOS shell provides the system window buttons itself.
   // Links the workbench opens in a new window: loopback stays in the shell,
   // external URLs go to the system browser (the shell has no second window).
-  win.webContents.setWindowOpenHandler(({ url }) => {
+  shellWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (origin && url.startsWith(origin + '/')) {
-      win.loadURL(url).catch(() => {});
+      shellWindow.loadURL(url).catch(() => {});
     } else if (/^https?:/i.test(url)) {
       shell.openExternal(url).catch(() => {});
     }
     return { action: 'deny' };
   });
-  win.webContents.on('render-process-gone', (_event, details) => {
+  shellWindow.webContents.on('render-process-gone', (_event, details) => {
     console.error('ZCODE_DESKTOP_RENDER_EXIT ' + JSON.stringify(details));
   });
-  drive(win).catch((error) => console.error('ZCODE_DESKTOP drive failed: ' + String(error)));
+  if (trayReady) tray.attach(shellWindow);
+  startDrive();
 }).catch((error) => {
   console.error(error);
   app.exit(1);
 });
-app.on('window-all-closed', () => app.quit());
+
+app.on('before-quit', (event) => {
+  // A system-level close request (dock "close", session end) reaches Electron
+  // as before-quit; veto it and hide to the tray instead of exiting. The host
+  // `zcode --web` service this shell talks to is not affected either way.
+  if (trayReady && !tray.isQuitting()) {
+    event.preventDefault();
+    if (shellWindow && !shellWindow.isDestroyed()) shellWindow.hide();
+  }
+});
+
+app.on('window-all-closed', () => {
+  // With a tray the window is only hidden, never closed.
+  if (trayReady) return;
+  app.quit();
+});
