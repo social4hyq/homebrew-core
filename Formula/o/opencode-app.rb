@@ -1,14 +1,14 @@
-class OpencodeDesktop < Formula
+class OpencodeApp < Formula
   desc "Desktop shell for the OpenCode agent (Electron window on local opencode serve)"
   homepage "https://opencode.ai"
   # Version follows the upstream opencode tag: this shell wraps that release,
-  # and the OHOS shell sources live in Patches/opencode-desktop.
+  # and the OHOS shell sources live in Patches/opencode-app.
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v2.3.0.tar.gz"
   sha256 "48b0ab7c4732d693c59e0ad7d73656a2965b2def78cef3c6319e444b7e6c0300"
   # Tap-authored shell sources (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -17,12 +17,12 @@ class OpencodeDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v2.3.0-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c775fb2889bd5c7e915603d4ba004a77d2cc1798f56957ade5c9c59be326c586"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5590dbed77eb511d2430d105829aa414d5d6f35e6613b510b13c425de11f64f"
   end
 
+  depends_on "app-installer"
   depends_on "curl"
-  depends_on "hap-installer"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "opencode"
@@ -35,7 +35,7 @@ class OpencodeDesktop < Formula
 
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    payload = tap_root/"Patches/opencode-desktop"
+    payload = tap_root/"Patches/opencode-app"
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
     system "tar", "-xzf", buildpath/"libelectron_144.tar.gz", "-C", buildpath
@@ -47,6 +47,8 @@ class OpencodeDesktop < Formula
     %w[main.cjs package.json config.json waiting.html].each do |name|
       cp payload/"app"/name, app/name
     end
+
+    cp payload/"assets/icon.png", app/"app-icon.png"
 
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.opencodedesktop"'
@@ -96,7 +98,7 @@ class OpencodeDesktop < Formula
     # compiles no C++, so the NDK-less SDK subset the image carries suffices.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "opencode-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['opencode-desktop']"
+      odie "opencode-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['opencode-app']"
     end
 
     # brew's sanitized build env drops the container's LD_LIBRARY_PATH, but
@@ -125,7 +127,7 @@ class OpencodeDesktop < Formula
                     "opencode-desktop-unsigned.hap"
 
     # The default HAP requests only what local automatic signing can grant
-    # without ACLs. `opencode-desktop install` swaps in this variant (which
+    # without ACLs. `opencode-app install` swaps in this variant (which
     # also requests the two ACL-gated permissions) when it can prepare an
     # ACL-capable signing profile, so the shell may start `opencode serve`
     # itself and reach the host user files.
@@ -147,19 +149,20 @@ class OpencodeDesktop < Formula
       (payload/"scripts/opencode-desktop.sh").read,
     )
     chmod 0755, libexec/"opencode-desktop.sh"
-    (bin/"opencode-desktop").write_env_script libexec/"opencode-desktop.sh",
+    (bin/"opencode-app").write_env_script libexec/"opencode-desktop.sh",
       OPENCODE_DESKTOP_UNSIGNED_HAP:   libexec/"opencode-desktop-unsigned.hap",
       OPENCODE_DESKTOP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
       OPENCODE_DESKTOP_MODULE_ACL:     pkgshare/"module-acl.json",
       OPENCODE_DESKTOP_OPENCODE_BIN:   formula_opt_bin("opencode")/"opencode",
       OPENCODE_DESKTOP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
       PATH:                            "#{formula_opt_bin("node")}:#{formula_opt_bin("opencode")}:$PATH"
+    bin.install_symlink bin/"opencode-app" => "opencode-desktop"
   end
 
   def caveats
     <<~EOS
       The desktop HAP is unsigned in the bottle. Connect and unlock the device,
-      then run `opencode-desktop install`. hap-installer handles Huawei
+      then run `opencode-app install`. app-installer handles Huawei
       Developer login, local debug profile generation, signing, installation,
       and launch.
 
@@ -173,13 +176,14 @@ class OpencodeDesktop < Formula
       two kernel ACLs enable JIT/WebAssembly for the renderer; without them
       markdown rendering fails with "WebAssembly is not defined".
       `--no-acl` installs the strong-sandbox HAP instead; the shell then waits
-      for `opencode-desktop serve`.
+      for `opencode-app serve`.
     EOS
   end
 
   test do
     ENV["HOME"] = testpath/"home"
-    assert_match "Usage: opencode-desktop", shell_output("#{bin}/opencode-desktop --help")
+    assert_match "Usage: opencode-app", shell_output("#{bin}/opencode-desktop --help")
+    assert_match "Usage: opencode-app", shell_output("#{bin}/opencode-app --help")
 
     # The application only stages its config and permission variant. Device
     # operations and signing-project management belong to hap-installer.
@@ -190,7 +194,7 @@ class OpencodeDesktop < Formula
 
     (fake_bin/"devecocli").write "#!/bin/sh\nexit 99\n"
     chmod 0755, fake_bin/"devecocli"
-    fake_installer = fake_bin/"hap-installer"
+    fake_installer = fake_bin/"app-installer"
     fake_installer.write <<~SH
       #!/bin/sh
       printf '%s\\n' "$@" > #{installer_args}
@@ -210,7 +214,7 @@ class OpencodeDesktop < Formula
     ENV.prepend_path "PATH", formula_opt_bin("node").to_s
     ENV["OPENCODE_DESKTOP_HDC"] = (fake_bin/"hdc").to_s
 
-    assert_match "installed", shell_output("#{bin}/opencode-desktop install")
+    assert_match "installed", shell_output("#{bin}/opencode-app install")
     config = JSON.parse(shell_output("unzip -p #{injected_copy} resources/resfile/resources/app/config.json"))
     assert_operator config.fetch("port"), :>, 0
     refute_empty config.fetch("password")
@@ -229,14 +233,14 @@ class OpencodeDesktop < Formula
     assert_equal "electron", installer[installer.index("--module") + 1]
     assert_equal (fake_bin/"hdc").to_s, installer[installer.index("--hdc") + 1]
     refute_path_exists Pathname.new(Dir.home)/".hap-installer"
-    assert_match "installed", shell_output("#{bin}/opencode-desktop install --no-acl")
+    assert_match "installed", shell_output("#{bin}/opencode-app install --no-acl")
     strong = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
                  strong.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }.sort
 
-    assert_match "serving at", shell_output("#{bin}/opencode-desktop serve")
-    assert_match "healthy", shell_output("#{bin}/opencode-desktop status")
-    assert_match "stopped", shell_output("#{bin}/opencode-desktop stop")
+    assert_match "serving at", shell_output("#{bin}/opencode-app serve")
+    assert_match "healthy", shell_output("#{bin}/opencode-app status")
+    assert_match "stopped", shell_output("#{bin}/opencode-app stop")
 
     # `start --serve-only` keeps a CLI backend; `start` just opens the app.
     serve_only_args = testpath/"hdc-start-args"
@@ -246,11 +250,11 @@ class OpencodeDesktop < Formula
       printf '%s\\n' "$@" > #{serve_only_args}
     SH
     chmod 0755, fake_hdc
-    assert_match "serving at", shell_output("#{bin}/opencode-desktop start --serve-only")
-    assert_match "opened", shell_output("#{bin}/opencode-desktop start")
+    assert_match "serving at", shell_output("#{bin}/opencode-app start --serve-only")
+    assert_match "opened", shell_output("#{bin}/opencode-app start")
     assert_equal %w[shell aa start -a EntryAbility -b com.social4hyq.opencodedesktop -m electron],
                  serve_only_args.read.lines(chomp: true)
-    assert_match "stopped", shell_output("#{bin}/opencode-desktop stop")
+    assert_match "stopped", shell_output("#{bin}/opencode-app stop")
 
     hap = libexec/"opencode-desktop-unsigned.hap"
     assert_path_exists hap
