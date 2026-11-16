@@ -5,6 +5,8 @@ class DeepseekHarnessDesktop < Formula
   sha256 "bf6d668e52a26edf98aa2ef7960e240c8d9afcefbad2b09887a2cb1e14001dd5"
   license :cannot_represent
 
+  revision 1
+
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
     regex(/^dsh-v(\d+\.\d+\.\d+(?:-(?:alpha|rc)\.\d+)?)$/i)
@@ -23,15 +25,15 @@ class DeepseekHarnessDesktop < Formula
   depends_on "zip"
 
   resource "electron-ohos" do
-    url "https://atomgit.com/social4hyq/homebrew-core/releases/download/electron-ohos-v34.9.0-20261030.1/v34.9.0-20261030.1-release.zip"
-    sha256 "599e97b3d8b1e5071a2387496104b443e58079a5f5c165b0114e65ffc601df3a"
+    url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
+    sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
   end
 
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
-    system "tar", "-xzf", buildpath/"libelectron_132.tar.gz", "-C", buildpath
+    system "tar", "-xzf", buildpath/"libelectron_144.tar.gz", "-C", buildpath
     shell = buildpath/"libelectron/ohos_hap"
 
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
@@ -59,10 +61,10 @@ class DeepseekHarnessDesktop < Formula
       File.write(file.to_s, JSON.pretty_generate(strings) + "\n")
     end
 
-    inreplace shell/"build-profile.json5", "        \"signingConfig\": \"default\",\n", ""
-    inreplace shell/"electron/src/main/module.json5", "    \"mainElement\": \"EntryAbility\",\n",
-              "    \"mainElement\": \"EntryAbility\",\n    \"extractNativeLibs\": true,\n"
-    inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\n    \],/m,
+    inreplace shell/"build-profile.json5", /[ \t]*"signingConfig": "default",[ \t]*\r?\n/, ""
+    inreplace shell/"electron/src/main/module.json5", '"mainElement": "EntryAbility",',
+              '"mainElement": "EntryAbility", "extractNativeLibs": true,'
+    inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\r?\n    \],/m,
               <<~JSON5.chomp
                 "requestPermissions": [
                       { "name": "ohos.permission.INTERNET" },
