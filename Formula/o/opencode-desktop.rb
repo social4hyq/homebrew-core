@@ -8,7 +8,7 @@ class OpencodeDesktop < Formula
   # Tap-authored shell sources (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 1
+  revision 2
 
   livecheck do
     url :stable

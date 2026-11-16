@@ -9,26 +9,29 @@ APP_NAME="OpenCodeDesktop"
 HAP_CONFIG="resources/resfile/resources/app/config.json"
 
 usage() {
-  printf '%s\n' 'Usage: install-desktop.sh --hap <unsigned.hap> --config <config.json> [--no-acl]' \
+  printf '%s\n' 'Usage: install-desktop.sh --hap <unsigned.hap> --config <config.json> [--no-acl] [--device <key>]' \
     '' 'Injects the connection config and host environment into the HAP, adds' \
     'CUSTOM_SANDBOX/READ_WRITE_USER_FILE (weak sandbox) so the shell can start' \
     'opencode serve itself, signs with a local debug profile, installs it on' \
     'the connected device, and starts it.' \
-    '--no-acl installs the strong-sandbox variant (no auto-start).'
+    '--no-acl installs the strong-sandbox variant (no auto-start).' \
+    '--device selects the hdc target when more than one is connected.'
 }
 
 hap=
 config=
 want_acl=1
+device=
 while (($#)); do
   case "$1" in
-    --hap|--config)
+    --hap|--config|--device)
       if (($# < 2)) || [[ -z "$2" || "$2" == --* ]]; then
         printf 'install-desktop: missing value for %s\n' "$1" >&2; usage >&2; exit 2
       fi
       case "$1" in
         --hap) hap="$2" ;;
         --config) config="$2" ;;
+        --device) device="$2" ;;
       esac
       shift 2
       ;;
@@ -219,6 +222,26 @@ ensure_hdc_target() {
   fi
 }
 
+# Without -t, hdc cannot choose between connected targets, and the file-send and
+# shell steps below then fail silently. One connected device is used
+# automatically; several must be named with --device.
+resolve_device() {
+  local connected count
+  connected="$("$HDC" list targets -v 2>/dev/null | awk '/[[:space:]]Connected([[:space:]]|$)/ {print $1}')"
+  if [[ -n "$device" ]]; then return 0; fi
+  count="$(printf '%s\n' "$connected" | awk 'NF' | wc -l | tr -d ' ')"
+  if ((count > 1)); then
+    printf 'install-desktop: %s connected hdc targets; pass --device <connect-key>:\n' "$count" >&2
+    printf '%s\n' "$connected" | sed 's/^/  /' >&2
+    return 1
+  fi
+  device="$(printf '%s\n' "$connected" | awk 'NF {print; exit}')"
+}
+
+hdc_cmd() {
+  if [[ -n "$device" ]]; then "$HDC" -t "$device" "$@"; else "$HDC" "$@"; fi
+}
+
 # --- Patch the hap-installer signing project so its `devecocli signature
 # generate` asks AGC for the two restricted permissions; the debug profile is
 # issued on the spot (no approval wait), but the release path still needs the
@@ -261,6 +284,7 @@ PERMS
   # without ACLs. Drive the same steps here with the prepared CLT:
   # login check -> signature generate -> sign -> chunked hdc install.
   ensure_hdc_target
+  resolve_device
   status_output="$(devecocli auth status 2>&1)" || {
     printf 'install-desktop: could not check Huawei Developer login status\n' >&2
     exit 1
@@ -283,30 +307,39 @@ PERMS
   remote="opencode-desktop-$$"
   mkdir -p "$stage/parts"
   split -b 10000000 "$signed" "$stage/parts/part-"
-  "$HDC" shell "rm -f /data/local/tmp/$remote-part-*" >/dev/null 2>&1 || true
+  hdc_cmd shell "rm -f /data/local/tmp/$remote-part-*" >/dev/null 2>&1 || true
+  remote_parts=()
   for part in "$stage/parts"/part-*; do
-    "$HDC" file send "$part" "/data/local/tmp/$remote-$(basename "$part")" >/dev/null
+    name="$remote-$(basename "$part")"
+    hdc_cmd file send "$part" "/data/local/tmp/$name" >/dev/null
+    remote_parts+=("/data/local/tmp/$name")
   done
-  "$HDC" shell "cat /data/local/tmp/$remote-part-* > /data/local/tmp/$remote.hap"
-  "$HDC" shell "aa force-stop $BUNDLE_ID" >/dev/null 2>&1 || true
-  if ! install_output="$("$HDC" shell "bm install -p /data/local/tmp/$remote.hap" 2>&1)"; then
-    printf '%s\n' "$install_output" >&2
+  # Explicit part names: a glob that matches nothing makes the device cat read stdin.
+  hdc_cmd shell "cat ${remote_parts[*]} > /data/local/tmp/$remote.hap"
+  hdc_cmd shell "aa force-stop $BUNDLE_ID" >/dev/null 2>&1 || true
+  # Stream bm install output live; keep a copy for the success check.
+  install_log="$stage/bm-install.log"
+  if ! hdc_cmd shell "bm install -p /data/local/tmp/$remote.hap" 2>&1 | tee "$install_log"; then
+    printf 'install-desktop: bm install failed\n' >&2
     exit 1
   fi
-  printf '%s\n' "$install_output"
-  if ! printf '%s\n' "$install_output" | grep -qiE 'install bundle successfully|^success'; then
+  if ! grep -qiE 'install bundle successfully|^success' "$install_log"; then
     printf 'install-desktop: device did not report successful installation\n' >&2
     exit 1
   fi
-  "$HDC" shell "rm -f /data/local/tmp/$remote-part-* /data/local/tmp/$remote.hap" >/dev/null 2>&1 || true
-  "$HDC" shell "aa start -a EntryAbility -b $BUNDLE_ID -m electron" >/dev/null
+  hdc_cmd shell "rm -f /data/local/tmp/$remote-part-* /data/local/tmp/$remote.hap" >/dev/null 2>&1 || true
+  hdc_cmd shell "aa start -a EntryAbility -b $BUNDLE_ID -m electron" >/dev/null
   printf 'install-desktop: installed and started %s\n' "$BUNDLE_ID"
 else
   ensure_hdc_target
+  resolve_device
+  device_args=()
+  if [[ -n "$device" ]]; then device_args=(--device "$device"); fi
   hap-installer \
     --hap "$injected" \
     --bundle-id "$BUNDLE_ID" \
     --app-name "$APP_NAME" \
     --module electron \
-    --ability EntryAbility
+    --ability EntryAbility \
+    ${device_args[@]+"${device_args[@]}"}
 fi
