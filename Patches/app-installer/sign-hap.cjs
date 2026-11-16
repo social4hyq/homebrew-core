@@ -11,7 +11,7 @@ const vm = require("node:vm");
 const { spawnSync } = require("node:child_process");
 
 function fail(message) {
-  process.stderr.write(`hap-installer-sign: ${message}\n`);
+  process.stderr.write(`app-installer-sign: ${message}\n`);
   process.exit(1);
 }
 

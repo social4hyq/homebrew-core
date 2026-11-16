@@ -30,6 +30,6 @@ try {
     }
   }
 } catch (error) {
-  console.error(`hap-installer: ${error.message}`);
+  console.error(`app-installer: ${error.message}`);
   process.exitCode = 1;
 }
