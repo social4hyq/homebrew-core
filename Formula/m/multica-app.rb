@@ -11,6 +11,11 @@ class MulticaApp < Formula
     strategy :github_latest
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.9.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1013a7e0c98a24754052281143847f5b86d794efad4088718166adbb283b5ad"
+  end
+
   depends_on "go" => :build
   depends_on "node" => :build
   depends_on "app-installer"
