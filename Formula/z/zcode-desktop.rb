@@ -311,7 +311,7 @@ class ZcodeDesktop < Formula
     ENV["ZCODE_DESKTOP_HDC"] = (fake_bin/"hdc").to_s
 
     # Default install: config injection, ACL module and signing project.
-    assert_match "installed and started", shell_output("#{bin}/zcode-desktop install --hap #{fake_hap}")
+    assert_match "installed and started", shell_output("#{bin}/zcode-desktop install --hap #{fake_hap} --no-serve")
     host_config = JSON.parse((testpath/"home/.config/zcode-desktop/config.json").read)
     assert_operator host_config.fetch("port"), :>, 0
     assert_equal Dir.home, host_config.fetch("workspace")
@@ -338,7 +338,7 @@ class ZcodeDesktop < Formula
 
     # --no-acl keeps the HAP's own permission list.
     assert_match "installed and started",
-                 shell_output("#{bin}/zcode-desktop install --hap #{fake_hap} --no-acl")
+                 shell_output("#{bin}/zcode-desktop install --hap #{fake_hap} --no-acl --no-serve")
     strong_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     strong_requests = strong_module.dig("module", "requestPermissions")
     strong_permissions = strong_requests.map { |permission| permission.fetch("name") }
