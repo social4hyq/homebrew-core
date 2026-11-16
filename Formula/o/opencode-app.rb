@@ -16,6 +16,11 @@ class OpencodeApp < Formula
     throttle days: 1
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5590dbed77eb511d2430d105829aa414d5d6f35e6613b510b13c425de11f64f"
+  end
+
   depends_on "app-installer"
   depends_on "curl"
   depends_on "node"
