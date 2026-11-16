@@ -139,7 +139,7 @@ ensure_serve() {
   fi
   if port_busy "$PORT"; then
     printf 'dsh-app: port %s is in use by another process; edit %s to pick another port\n' "$PORT" "$CONFIG_FILE" >&2
-    exit 1
+    return 1
   fi
   "$(dsh_bin)" web --host 127.0.0.1 --no-open --port "$PORT" >"$LOG_FILE" 2>&1 &
   echo $! > "$PID_FILE"
@@ -149,7 +149,7 @@ ensure_serve() {
     waited=$((waited + 1))
     if ((waited > 30)); then
       printf 'dsh-app: server did not become healthy; see %s\n' "$LOG_FILE" >&2
-      exit 1
+      return 1
     fi
   done
   printf 'dsh-app: serving at http://127.0.0.1:%s (log: %s)\n' "$PORT" "$LOG_FILE"
@@ -180,6 +180,13 @@ cmd_start() {
     return 0
   fi
   warn_version_mismatch
+  # Prefer a CLI-managed backend: it outlives the shell, so closing the window
+  # (or the shell being killed) never interrupts a running agent. A failure
+  # here is not fatal -- the shell starts its own backend when it can reach
+  # none.
+  if ! ensure_serve; then
+    printf 'dsh-app: warning: host backend unavailable; the shell will start its own\n' >&2
+  fi
   local hdc="${DSH_DESKTOP_HDC:-${DSH_DESKTOP_HDC_DEFAULT:-}}"
   if [[ -z "$hdc" ]]; then hdc="$(command -v hdc || true)"; fi
   if [[ -z "$hdc" || ! -x "$hdc" ]]; then
