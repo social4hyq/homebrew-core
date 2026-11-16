@@ -5,10 +5,10 @@ copy, then install and start it.
 
 diff --git a/scripts/install-desktop-ohos.sh b/scripts/install-desktop-ohos.sh
 new file mode 100755
-index 0000000..a1b3455
+index 0000000..f4e6727
 --- /dev/null
 +++ b/scripts/install-desktop-ohos.sh
-@@ -0,0 +1,106 @@
+@@ -0,0 +1,100 @@
 +#!/usr/bin/env bash
 +set -euo pipefail
 +
@@ -67,16 +67,12 @@ index 0000000..a1b3455
 +fi
 +if [[ -n "$acl_profile" ]]; then
 +  : "${MULTICA_MODULE_ACL:?multica formula did not set the ACL module.json path}"
-+  : "${MULTICA_INSTALL_HAP:?multica formula did not set the HAP installer path}"
 +  if [[ ! -f "$acl_profile" ]]; then
 +    printf 'multica-desktop install: signing configuration not found: %s\n' "$acl_profile" >&2
 +    exit 1
 +  fi
-+  if ! command -v hap-installer-sign > /dev/null 2>&1; then
-+    printf '%s\n' 'multica-desktop install: hap-installer-sign is required; install it with brew install hap-installer.' >&2
-+    exit 1
-+  fi
-+elif ! command -v hap-installer > /dev/null 2>&1; then
++fi
++if ! command -v hap-installer > /dev/null 2>&1; then
 +  printf '%s\n' 'multica-desktop install: hap-installer is required; install it with brew install hap-installer.' >&2
 +  exit 1
 +fi
@@ -99,19 +95,17 @@ index 0000000..a1b3455
 +# The app reads its first status at launch; have the bridge up before it opens.
 +"$MULTICA_DESKTOP" start --bridge-only
 +
++# One installer for both variants: hap-installer handles the hdc target
++# (--device), streams its output and starts the app. With --acl-profile it
++# signs with the given profile instead of generating an auto-signed one.
++installer_args=(
++  --hap "$injected"
++  --bundle-id "$BUNDLE_ID"
++  --app-name MulticaSigning
++  --module electron
++  --ability EntryAbility
++)
 +if [[ -n "$acl_profile" ]]; then
-+  signed="$stage/multica-desktop-signed.hap"
-+  hap-installer-sign --hap "$injected" --profile "$acl_profile" --output "$signed"
-+  # install-hap.sh drives a bare `hdc`; put the packaged one first on PATH.
-+  if [[ -n "${MULTICA_HDC:-}" && "$MULTICA_HDC" == */* ]]; then
-+    PATH="$(dirname "$MULTICA_HDC"):$PATH"
-+  fi
-+  "$MULTICA_INSTALL_HAP" "$signed" --start
-+else
-+  hap-installer \
-+    --hap "$injected" \
-+    --bundle-id "$BUNDLE_ID" \
-+    --app-name MulticaSigning \
-+    --module electron \
-+    --ability EntryAbility
++  installer_args+=(--profile "$acl_profile")
 +fi
++hap-installer "${installer_args[@]}"

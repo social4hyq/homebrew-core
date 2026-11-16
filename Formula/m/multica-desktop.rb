@@ -4,7 +4,7 @@ class MulticaDesktop < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -67,10 +67,8 @@ class MulticaDesktop < Formula
              "./cmd/multica-desktop-bridge"
     end
 
-    pkgshare.install "scripts/install-hap-ohos.sh" => "install-hap.sh"
     pkgshare.install "scripts/install-desktop-ohos.sh" => "install-desktop.sh"
     pkgshare.install "scripts/multica-desktop-ohos.sh" => "desktop.sh"
-    chmod 0755, pkgshare/"install-hap.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"desktop.sh"
     libexec.install "scripts/multica-desktop-dispatch-ohos.sh" => "multica-desktop-dispatch.sh"
@@ -84,7 +82,6 @@ class MulticaDesktop < Formula
       MULTICA_DESKTOP_VERSION: version.to_s,
       MULTICA_HDC:             formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
       MULTICA_INSTALL_DESKTOP: pkgshare/"install-desktop.sh",
-      MULTICA_INSTALL_HAP:     pkgshare/"install-hap.sh",
       MULTICA_MODULE_ACL:      pkgshare/"module-acl.json",
       MULTICA_REAL_CLI:        formula_opt_prefix("multica")/"libexec/multica-cli",
       MULTICA_UNSIGNED_HAP:    libexec/"multica-desktop-unsigned.hap",
@@ -331,13 +328,6 @@ class MulticaDesktop < Formula
       cp "$hap_in" "$hap_out"
     SH
     chmod 0755, fake_signer
-    acl_install_args = testpath/"install-hap-args"
-    fake_hap_install = fake_bin/"install-hap"
-    fake_hap_install.write <<~SH
-      #!/bin/sh
-      printf '%s\n' "$@" > #{acl_install_args}
-    SH
-    chmod 0755, fake_hap_install
     begin
       shell_output(desktop_installer.to_s)
       args = installer_args.read.lines(chomp: true)
@@ -353,20 +343,20 @@ class MulticaDesktop < Formula
       refute_path_exists signer_args
       refute_match(/module\.json$/, shell_output("unzip -l #{injected_hap}"))
 
-      ENV["MULTICA_INSTALL_HAP"] = fake_hap_install.to_s
       ENV["MULTICA_MODULE_ACL"] = (pkgshare/"module-acl.json").to_s
       (testpath/"build-profile.json5").write "{}"
       shell_output("#{desktop_installer} --acl-profile #{testpath}/build-profile.json5")
-      assert_match "--profile #{testpath}/build-profile.json5", signer_args.read
-      assert_equal ["--start"], acl_install_args.read.lines(chomp: true).drop(1)
-      signed_module = JSON.parse(shell_output("unzip -p #{signer_input} module.json"))
+      # The ACL variant goes through hap-installer too, with the given profile.
+      assert_match "--profile #{testpath}/build-profile.json5", installer_args.read
+      refute_path_exists signer_args
+      signed_module = JSON.parse(shell_output("unzip -p #{injected_hap} module.json"))
       signed_permissions = signed_module.fetch("module").fetch("requestPermissions").map do |permission|
         permission.fetch("name")
       end
       assert_includes signed_permissions, "ohos.permission.CUSTOM_SANDBOX"
       assert_includes signed_permissions, "ohos.permission.READ_WRITE_USER_FILE"
       assert_equal pairing.read,
-                   shell_output("unzip -p #{signer_input} resources/resfile/resources/app/desktop-bridge.json")
+                   shell_output("unzip -p #{injected_hap} resources/resfile/resources/app/desktop-bridge.json")
 
       paired = JSON.parse(pairing.read)
       base = URI("http://127.0.0.1:#{paired.fetch("port")}")
@@ -403,8 +393,6 @@ class MulticaDesktop < Formula
     end
     refute_path_exists libexec/"node_modules"
     refute_path_exists libexec/"multica-cli"
-    assert_path_exists pkgshare/"install-hap.sh"
-    assert_predicate pkgshare/"install-hap.sh", :executable?
     assert_path_exists pkgshare/"install-desktop.sh"
     hap = libexec/"multica-desktop-unsigned.hap"
     assert_path_exists hap
