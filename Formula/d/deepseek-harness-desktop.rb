@@ -5,7 +5,7 @@ class DeepseekHarnessDesktop < Formula
   sha256 "bf6d668e52a26edf98aa2ef7960e240c8d9afcefbad2b09887a2cb1e14001dd5"
   license :cannot_represent
 
-  revision 1
+  revision 2
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
