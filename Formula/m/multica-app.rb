@@ -4,7 +4,7 @@ class MulticaApp < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 5
+  revision 6
 
   livecheck do
     url :stable
@@ -100,6 +100,33 @@ class MulticaApp < Formula
               '"bundleName": "com.huawei.ohos_electron"',
               '"bundleName": "com.social4hyq.multica"'
 
+    # The caption close button never reaches Electron's BrowserWindow close
+    # event, and this runtime cannot cancel the close: the window UIAbility is
+    # torn down whatever windowStageClose returns. Calling hideAbility() before
+    # that teardown keeps the app (and the host daemon bridge it runs) alive --
+    # the platform recreates the shell as a hidden instance whose tray restores
+    # the window. Hiding after the teardown instead makes the app exit, so the
+    # call stays synchronous. The tray's quit item calls app.exit() because a
+    # normal quit would be prevented by the shell's own close handler.
+    close_handler = [
+      "    super.onWindowStageCreate(windowStage);",
+      "    try {",
+      "      windowStage.on('windowStageClose', () => {",
+      "        if (CheckEmptyUtils.isEmpty(this.xcomponentId)) {",
+      "          return false;",
+      "        }",
+      "        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));",
+      "        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
+      "        return false;",
+      "      });",
+      "    } catch (exception) {",
+      "      LogUtil.error(TAG, 'Failed to register window close handler: ' + JSON.stringify(exception));",
+      "    }",
+      "",
+    ].join("\n")
+    inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
+              "    super.onWindowStageCreate(windowStage);\n", close_handler
+
     # Desktop payload: the patch carried the OHOS dependency wiring
     # (pnpm overrides to @ohos-npm-ports, scoped registry, signpost dev dep).
     ENV["CI"] = "true"
@@ -124,6 +151,7 @@ class MulticaApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app/"out" if (app/"out").exist?
     cp_r buildpath/"apps/desktop/out", app/"out"
+    cp Pathname(__dir__).parent.parent/"Patches/multica-app/assets/tray-icon.png", app/"out/main/tray-icon.png"
     rm_r app/"node_modules" if (app/"node_modules").exist?
     package = JSON.parse((buildpath/"apps/desktop/package.json").read)
     package = package.slice("name", "productName", "version", "description", "main", "private", "type")
