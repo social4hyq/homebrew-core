@@ -1,4 +1,5 @@
 {
   "hap-installer": "app-installer",
-  "opencode-desktop": "opencode-app"
+  "opencode-desktop": "opencode-app",
+  "zcode-desktop": "zcode-app"
 }

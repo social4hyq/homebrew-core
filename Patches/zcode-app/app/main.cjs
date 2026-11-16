@@ -1,7 +1,7 @@
 'use strict';
 // ZCode desktop shell for OpenHarmony.
 // Loads the host `zcode --web` instance (loopback HTTP) in an Electron window.
-// Connection parameters are baked into config.json by `zcode-desktop install`
+// Connection parameters are baked into config.json by `zcode-app install`
 // before HAP signing; the bottle HAP only carries a placeholder.
 const { app, BrowserWindow, shell } = require('electron');
 const fs = require('node:fs');
@@ -84,6 +84,7 @@ async function drive(win) {
 
 app.whenReady().then(() => {
   const win = new BrowserWindow({
+    backgroundColor: "#11141b",
     width: 1280,
     height: 800,
     autoHideMenuBar: true,

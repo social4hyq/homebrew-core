@@ -17,7 +17,7 @@ BUN_BIN="${ZCODE_DESKTOP_BUN:-}"
 
 usage() {
   cat <<'EOF'
-Usage: zcode-desktop <command>
+Usage: zcode-app <command>
 
   install [--no-acl] [--hap PATH] [--no-serve]
                       Inject the host connection config, sign and install the

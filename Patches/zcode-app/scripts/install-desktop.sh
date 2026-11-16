@@ -4,7 +4,7 @@
 # The bottle HAP is unsigned and carries only a placeholder config.json; this
 # script writes the real connection settings (the host `zcode --web` port and
 # the initial workspace) into a copy of the HAP, adds the ACL module.json and
-# signs it with a locally generated debug profile through hap-installer.
+# signs it with a locally generated debug profile through app-installer.
 #
 # Default variant is the ACL one (the two kernel JIT ACLs keep WebAssembly
 # available in the renderer, READ_PASTEBOARD makes paste work). --no-acl
@@ -23,9 +23,9 @@ KEEP=0
 
 usage() {
   cat <<'EOF'
-Usage: zcode-desktop install --config PATH [--no-acl] [--keep]
+Usage: zcode-app install --config PATH [--no-acl] [--keep]
 
-  --config PATH  Host config written by `zcode-desktop serve` (port, workspace).
+  --config PATH  Host config written by `zcode-app serve` (port, workspace).
   --no-acl       Install the strong-sandbox variant (no JIT, no paste).
   --keep         Keep the signed HAP (path printed on success).
 
@@ -52,7 +52,7 @@ done
 [ -f "$SHELL_HAP" ] || die "shell HAP not found: $SHELL_HAP"
 command -v node >/dev/null || die "node not found"
 command -v zip >/dev/null || die "zip not found"
-command -v hap-installer >/dev/null || die "hap-installer not found"
+command -v app-installer >/dev/null || die "app-installer not found"
 
 ACL=0
 if [ "$WANT_ACL" = "1" ] && [ -n "$MODULE_ACL" ] && [ -f "$MODULE_ACL" ]; then
@@ -92,10 +92,10 @@ else
   (cd "$stage/tree" && zip -q -X "$injected" "$HAP_CONFIG")
 fi
 
-# Stream hap-installer's output instead of capturing it: the Huawei login URL
+# Stream app-installer's output instead of capturing it: the Huawei login URL
 # and progress lines must reach the terminal while the command is still running.
 log "signing and installing; a first-time Huawei Developer login prints a URL below"
-if ! hap-installer --hap "$injected" --bundle-id "$BUNDLE_ID" \
+if ! app-installer --hap "$injected" --bundle-id "$BUNDLE_ID" \
     --app-name "$APP_NAME" --module electron --ability EntryAbility \
     --signed-hap "$signed" --hdc "$HDC" 2>&1 | sed '/^FileTransfer/d' >&2; then
   die "installation failed"
