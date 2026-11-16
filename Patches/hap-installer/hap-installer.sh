@@ -71,6 +71,23 @@ for tool in devecocli hdc "$HAP_INSTALLER_SIGNER" "$HAP_SIGN_TOOL"; do
   fi
 done
 
+# Without -t, hdc refuses to pick between attached targets, and the later
+# file-send/shell steps then fail silently ("device did not report successful
+# installation"). Resolve the target here: one device is used, several must be
+# named explicitly with --device.
+targets="$(hdc list targets 2>/dev/null | awk 'NF && $1 !~ /^\[/ {print $1}' || true)"
+if [[ -z "$device" ]]; then
+  count=$(printf '%s\n' "$targets" | awk 'NF' | wc -l | tr -d ' ')
+  if ((count == 0)); then
+    printf '%s\n' 'hap-installer: no hdc target; connect and unlock the device, or pass --device.' >&2; exit 1
+  elif ((count > 1)); then
+    printf 'hap-installer: %s hdc targets attached; pass --device <connect-key>:\n' "$count" >&2
+    printf '%s\n' "$targets" | sed 's/^/  /' >&2
+    exit 2
+  fi
+  device=$(printf '%s\n' "$targets" | awk 'NF {print; exit}')
+fi
+
 home="${HOME:?HOME must be set}"
 app_name="${app_name:-${bundle_id##*.}}"
 project_dir="${project_dir:-$home/.hap-installer/projects/$bundle_id}"
@@ -100,10 +117,12 @@ if [[ ! -f "$profile" ]]; then printf 'hap-installer: missing signing profile: %
 
 printf '%s\n' 'Generating or refreshing the local debug profile for connected devices.'
 (cd "$project_dir" && devecocli signature generate --product default)
-umask 077
 mkdir -p "$(dirname "$signed_hap")"
 rm -f "$signed_hap"
-"$HAP_INSTALLER_SIGNER" --hap "$hap" --profile "$profile" --output "$signed_hap"
+# Only the signed output is private: scope 077 to the signer so the chunking
+# below (split + hdc file send) runs under the normal umask. A global 077 made
+# split fail with "Permission denied" on hmdfs-backed cache directories.
+(umask 077; "$HAP_INSTALLER_SIGNER" --hap "$hap" --profile "$profile" --output "$signed_hap")
 
 hdc_cmd() {
   if [[ -n "$device" ]]; then hdc -t "$device" "$@"; else hdc "$@"; fi
@@ -114,10 +133,19 @@ parts=$(mktemp -d "$tmp_parent/hap-installer.XXXXXX")
 remote="hap-installer-$$"
 trap 'rm -rf "$parts"' EXIT
 split -b 10000000 "$signed_hap" "$parts/part-"
+printf 'Uploading %s to %s\n' "$(basename "$signed_hap")" "$device"
 hdc_cmd shell "rm -f /data/local/tmp/$remote-part-*"
-for part in "$parts"/part-*; do hdc_cmd file send "$part" "/data/local/tmp/$remote-$(basename "$part")"; done
-hdc_cmd shell "cat /data/local/tmp/$remote-part-* > /data/local/tmp/$remote.hap"
+remote_parts=()
+for part in "$parts"/part-*; do
+  name="$remote-$(basename "$part")"
+  hdc_cmd file send "$part" "/data/local/tmp/$name"
+  remote_parts+=("/data/local/tmp/$name")
+done
+# Concatenate the parts we just sent by explicit name. A glob that matches
+# nothing makes the device's cat read stdin and fail with "cat: -: Broken pipe".
+hdc_cmd shell "cat ${remote_parts[*]} > /data/local/tmp/$remote.hap"
 hdc_cmd shell "aa force-stop $bundle_id" || true
+printf '%s\n' 'Installing the signed HAP on the device.'
 if ! install_output=$(hdc_cmd shell "bm install -p /data/local/tmp/$remote.hap" 2>&1); then
   printf '%s\n' "$install_output" >&2; exit 1
 fi

@@ -4,7 +4,7 @@ class HapInstaller < Formula
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.10.tgz"
   sha256 "7fdee1bfb7393c151fa09b3714ecc4796e53d9876557e9933c5890319ffb4daa"
   license "MIT"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://registry.npmjs.org/@deveco%2Fdeveco-cli-openharmony-arm64"
@@ -12,8 +12,8 @@ class HapInstaller < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hap-installer-v1.3.10-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1cd8f109eb540a82ce13666ed440dcae56747977a6bde14c06637c68307b444b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hap-installer-v1.3.10-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f434ab98607dfdeb42509fdc3b289df79188c52428ed0a355da64d33edd9a63"
   end
 
   depends_on "node"
@@ -101,9 +101,14 @@ class HapInstaller < Formula
       exec node "$DEVECO_CLI_JS" "$@"
     SH
     chmod 0755, cli_wrapper
+    # Bare `devecocli` (used by the desktop install scripts for `create` and
+    # `auth`) must see the bundled toolchain too: without COMMAND_LINE_TOOL_PATH
+    # its ToolProvider throws "No toolchain found" on machines that lack the
+    # system CLT under /data/service.
     (bin/"devecocli").write_env_script cli_wrapper,
-      DEVECO_CLI_JS: cli_js,
-      PATH:          "#{formula_opt_bin("node")}:$PATH"
+      COMMAND_LINE_TOOL_PATH: toolchain,
+      DEVECO_CLI_JS:          cli_js,
+      PATH:                   "#{formula_opt_bin("node")}:$PATH"
     (bin/"hap-installer-sign").write_env_script libexec/"sign-hap.cjs",
       DEVECO_CLI_JS: cli_js,
       HAP_SIGN_TOOL: sdk_tools/"lib/hap-sign-tool",
@@ -122,6 +127,7 @@ class HapInstaller < Formula
     assert_match "--bundle-id", shell_output("#{bin}/hap-installer --help")
     assert_match "Usage: sign-hap.cjs", shell_output("#{bin}/hap-installer-sign --help")
     assert_match "Authentication commands", shell_output("#{bin}/devecocli auth --help")
+    assert_match "COMMAND_LINE_TOOL_PATH=", (bin/"devecocli").read
     assert_match 'signed_hap="${signed_hap:-${TMPDIR:-$home/.cache}/hap-installer/signed/$bundle_id.hap}"',
                  (libexec/"hap-installer.sh").read
     assert_match "hap-installer-toolchain/sdk/default/openharmony/toolchains", (bin/"hap-installer").read
