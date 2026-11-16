@@ -3,7 +3,7 @@ PATH probe, and create the status bar item before the first window so closing
 it hides to the tray instead of exiting.
 
 diff --git a/apps/desktop/src/main/index.ts b/apps/desktop/src/main/index.ts
-index 668f77d..96946d7 100644
+index 668f77d..c688e88 100644
 --- a/apps/desktop/src/main/index.ts
 +++ b/apps/desktop/src/main/index.ts
 @@ -10,6 +10,11 @@ import {
@@ -46,7 +46,7 @@ index 668f77d..96946d7 100644
  const issueWindows = new Set<BrowserWindow>();
  const authSessionCoordinator = new AuthSessionCoordinator<BrowserWindow>(
    (window) => {
-@@ -1068,6 +1078,21 @@ if (!gotTheLock) {
+@@ -1068,6 +1078,25 @@ if (!gotTheLock) {
        applyUnreadBadge();
      });
  
@@ -57,7 +57,11 @@ index 668f77d..96946d7 100644
 +      iconPath: join(__dirname, "tray-icon.png"),
 +      tooltip: "Multica",
 +      showWindow: () => {
-+        const target = mainWindows.mostRecent();
++        // After the platform recreates the shell (close -> hidden instance) the
++        // window can be created by the shell's external-instance path, which
++        // never goes through createMainWindow and so is missing from the
++        // registry; fall back to whatever BrowserWindow exists.
++        const target = mainWindows.mostRecent() ?? BrowserWindow.getAllWindows()[0] ?? null;
 +        if (!target || target.isDestroyed()) return;
 +        if (target.isMinimized()) target.restore();
 +        target.show();
@@ -68,7 +72,7 @@ index 668f77d..96946d7 100644
      desktopInitialized = true;
      for (const saved of loadWindowSession(windowStateFile())) {
        createMainWindow(saved);
-@@ -1115,5 +1140,17 @@ if (!gotTheLock) {
+@@ -1115,5 +1144,17 @@ if (!gotTheLock) {
  }
  
  app.on("window-all-closed", () => {
