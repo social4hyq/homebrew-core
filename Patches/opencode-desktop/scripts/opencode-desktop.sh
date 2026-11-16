@@ -196,7 +196,7 @@ cmd_install() {
   ensure_config
   exec bash "$OPENCODE_DESKTOP_INSTALL_SCRIPT" \
     --hap "$OPENCODE_DESKTOP_UNSIGNED_HAP" \
-    --config "$CONFIG_FILE"
+    --config "$CONFIG_FILE" "$@"
 }
 
 case "${1:-}" in
