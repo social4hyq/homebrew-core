@@ -7,8 +7,9 @@ class SnowShot < Formula
   revision 9
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.7-r10"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0ec832568321f60cd53ee38ce918d5a41a6f6184e871a61ebcc9a56a59591ab6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.7-r11"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5cf8285651b036c6e98217334b04732f8a6faac609cd1317441d1c8fabd02e20"
   end
 
   depends_on "brotli" => :build
@@ -44,7 +45,7 @@ class SnowShot < Formula
   depends_on "webp" => :build
   depends_on "zlib-ng-compat" => :build
   depends_on "zstd" => :build
-  depends_on "hap-installer"
+  depends_on "app-installer"
   depends_on "ohos-sdk-toolchains"
 
   resource "ocr-detection-model" do
@@ -545,7 +546,7 @@ class SnowShot < Formula
   def caveats
     <<~EOS
       The HAP is unsigned in the bottle. Connect and unlock the device, then run
-      `snow-shot install`: hap-installer handles Huawei Developer login, local
+      `snow-shot install`: app-installer handles Huawei Developer login, local
       debug profile generation, signing, installation, and launch.
     EOS
   end
