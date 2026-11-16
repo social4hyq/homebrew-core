@@ -12,8 +12,8 @@ class HapInstaller < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hap-installer-v1.3.10-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f434ab98607dfdeb42509fdc3b289df79188c52428ed0a355da64d33edd9a63"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hap-installer-v1.3.10-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "96be16eb053c80b03d3f8750dcb91a59707e681f6194fd502345ab057660f65f"
   end
 
   depends_on "node"
