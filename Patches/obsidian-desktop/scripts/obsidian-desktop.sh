@@ -33,7 +33,6 @@ device() {
 case "${1:-}" in
   install)
     shift
-    device
     "${OBSIDIAN_DESKTOP_INSTALL_SCRIPT:?missing install script}" "$@"
     ;;
   start)
