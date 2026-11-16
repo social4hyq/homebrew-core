@@ -20,7 +20,7 @@ index 0000000..97ac1d8
 +ABILITY="EntryAbility"
 +
 +usage() {
-+  printf '%s\n' 'Usage: multica-desktop [start|stop|status] [--bridge-only]' '' \
++  printf '%s\n' 'Usage: multica-app [start|stop|status] [--bridge-only]' '' \
 +    '  start         ensure the desktop bridge is running, then open the app (default)' \
 +    '  start --bridge-only' \
 +    '                only ensure the bridge is running (for shell startup files)' \
@@ -140,7 +140,7 @@ index 0000000..97ac1d8
 +    if healthy "$port"; then
 +      printf 'bridge: running (port %s)\n' "$port"
 +    elif bridge_pid > /dev/null; then
-+      printf '%s\n' 'bridge: stale (its CLI is missing or it predates the CLI check); run multica-desktop start to replace it'
++      printf '%s\n' 'bridge: stale (its CLI is missing or it predates the CLI check); run multica-app start to replace it'
 +      exit 1
 +    else
 +      printf 'bridge: stopped\n'

@@ -16,7 +16,7 @@ index 0000000..f4e6727
 +HAP_ENTRY="resources/resfile/resources/app/desktop-bridge.json"
 +
 +usage() {
-+  printf '%s\n' 'Usage: multica-desktop install [--acl-profile <build-profile.json5>]' '' \
++  printf '%s\n' 'Usage: multica-app install [--acl-profile <build-profile.json5>]' '' \
 +    'Sign the bottled desktop HAP with your Huawei Developer account, install it' \
 +    'on a connected device, and start the application. The pairing key for the' \
 +    'host bridge is written into the signed copy; the bottled HAP is not modified.' '' \
@@ -36,7 +36,7 @@ index 0000000..f4e6727
 +      ;;
 +    --acl-profile)
 +      if (($# < 2)) || [[ -z "$2" || "$2" == --* ]]; then
-+        printf 'multica-desktop install: missing value for %s\n' "$1" >&2
++        printf 'multica-app install: missing value for %s\n' "$1" >&2
 +        usage >&2
 +        exit 2
 +      fi
@@ -44,7 +44,7 @@ index 0000000..f4e6727
 +      shift 2
 +      ;;
 +    *)
-+      printf 'multica-desktop install: unknown option: %s\n' "$1" >&2
++      printf 'multica-app install: unknown option: %s\n' "$1" >&2
 +      usage >&2
 +      exit 2
 +      ;;
@@ -58,22 +58,22 @@ index 0000000..f4e6727
 +home="${MULTICA_HOME:-$HOME/.multica}"
 +
 +if [[ ! -f "$MULTICA_UNSIGNED_HAP" ]]; then
-+  printf 'multica-desktop install: unsigned HAP not found: %s\n' "$MULTICA_UNSIGNED_HAP" >&2
++  printf 'multica-app install: unsigned HAP not found: %s\n' "$MULTICA_UNSIGNED_HAP" >&2
 +  exit 1
 +fi
 +if ! command -v "$zip" > /dev/null 2>&1; then
-+  printf '%s\n' 'multica-desktop install: zip is required; install it with brew install zip.' >&2
++  printf '%s\n' 'multica-app install: zip is required; install it with brew install zip.' >&2
 +  exit 1
 +fi
 +if [[ -n "$acl_profile" ]]; then
 +  : "${MULTICA_MODULE_ACL:?multica formula did not set the ACL module.json path}"
 +  if [[ ! -f "$acl_profile" ]]; then
-+    printf 'multica-desktop install: signing configuration not found: %s\n' "$acl_profile" >&2
++    printf 'multica-app install: signing configuration not found: %s\n' "$acl_profile" >&2
 +    exit 1
 +  fi
 +fi
-+if ! command -v hap-installer > /dev/null 2>&1; then
-+  printf '%s\n' 'multica-desktop install: hap-installer is required; install it with brew install hap-installer.' >&2
++if ! command -v app-installer > /dev/null 2>&1; then
++  printf '%s\n' 'multica-app install: app-installer is required; install it with brew install app-installer.' >&2
 +  exit 1
 +fi
 +
@@ -95,7 +95,7 @@ index 0000000..f4e6727
 +# The app reads its first status at launch; have the bridge up before it opens.
 +"$MULTICA_DESKTOP" start --bridge-only
 +
-+# One installer for both variants: hap-installer handles the hdc target
++# One installer for both variants: app-installer handles the hdc target
 +# (--device), streams its output and starts the app. With --acl-profile it
 +# signs with the given profile instead of generating an auto-signed one.
 +installer_args=(
@@ -108,4 +108,4 @@ index 0000000..f4e6727
 +if [[ -n "$acl_profile" ]]; then
 +  installer_args+=(--profile "$acl_profile")
 +fi
-+hap-installer "${installer_args[@]}"
++app-installer "${installer_args[@]}"
