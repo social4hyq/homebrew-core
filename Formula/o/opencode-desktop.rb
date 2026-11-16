@@ -5,9 +5,10 @@ class OpencodeDesktop < Formula
   # and the OHOS shell sources live in Patches/opencode-desktop.
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v2.3.0.tar.gz"
   sha256 "48b0ab7c4732d693c59e0ad7d73656a2965b2def78cef3c6319e444b7e6c0300"
-  # Tap-authored shell sources (MIT) packaging the openharmony-sig Electron
-  # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
+  # Tap-authored shell sources (MIT) packaging the CPF-Electron runtime
+  # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
+  revision 1
 
   livecheck do
     url :stable
@@ -27,11 +28,9 @@ class OpencodeDesktop < Formula
   depends_on "opencode"
   depends_on "zip"
 
-  # openharmony-sig/electron PC(2in1) prebuilt (CodeHub mirror hosted on this
-  # tap's release; redistribution assumed by the tap owner, see multica.rb).
   resource "electron-ohos" do
-    url "https://github.com/social4hyq/homebrew-core/releases/download/electron-ohos-v34.9.0-20261030.1/v34.9.0-20261030.1-release.zip"
-    sha256 "599e97b3d8b1e5071a2387496104b443e58079a5f5c165b0114e65ffc601df3a"
+    url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
+    sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
   end
 
   def install
@@ -39,7 +38,7 @@ class OpencodeDesktop < Formula
     payload = tap_root/"Patches/opencode-desktop"
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
-    system "tar", "-xzf", buildpath/"libelectron_132.tar.gz", "-C", buildpath
+    system "tar", "-xzf", buildpath/"libelectron_144.tar.gz", "-C", buildpath
     shell = buildpath/"libelectron/ohos_hap"
 
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
@@ -74,14 +73,14 @@ class OpencodeDesktop < Formula
     # CI's electron-ohos-ci CLT carries an NDK-less SDK subset (no llvm-strip);
     # mirror the multica packaging deltas that keep hvigor away from the strip
     # task and from signing material the container does not have.
-    inreplace shell/"build-profile.json5", "        \"signingConfig\": \"default\",\n", ""
-    inreplace shell/"electron/src/main/module.json5", "    \"mainElement\": \"EntryAbility\",\n",
-              "    \"mainElement\": \"EntryAbility\",\n    \"extractNativeLibs\": true,\n"
+    inreplace shell/"build-profile.json5", /^[ \t]*"signingConfig": "default",\r?\n/, ""
+    inreplace shell/"electron/src/main/module.json5", '"mainElement": "EntryAbility",',
+              '"mainElement": "EntryAbility", "extractNativeLibs": true,'
 
     # Restricted permissions (pasteboard, location, ...) cannot be granted with
     # local auto-signing; the shell only needs loopback HTTP, and this trim
     # installs under local auto-signing.
-    inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\n    \],/m,
+    inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\r?\n    \],/m,
               <<~JSON5.chomp
                 "requestPermissions": [
                       { "name": "ohos.permission.INTERNET" },
