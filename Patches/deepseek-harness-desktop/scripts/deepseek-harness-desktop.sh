@@ -218,7 +218,7 @@ cmd_install() {
   : "${DSH_DESKTOP_INSTALL_SCRIPT:?formula did not set the install script path}"
   ensure_config
   warn_version_mismatch
-  exec bash "$DSH_DESKTOP_INSTALL_SCRIPT" --hap "$DSH_DESKTOP_UNSIGNED_HAP" --config "$CONFIG_FILE"
+  exec bash "$DSH_DESKTOP_INSTALL_SCRIPT" --hap "$DSH_DESKTOP_UNSIGNED_HAP" --config "$CONFIG_FILE" "$@"
 }
 
 case "${1:-}" in
