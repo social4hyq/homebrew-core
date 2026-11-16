@@ -8,16 +8,12 @@ class Zcode < Formula
       revision: "fec975905a2abd4c07e35c40d51fa097a2258ec9"
   version "3.18.2"
   license "Apache-2.0"
+  revision 1
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
     strategy :json do |json|
       json["version"]
     end
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.18.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e89b6195e7b2f52b94e27901a2be379dfe08575093efaa74143cd551c8303346"
   end
 
   depends_on "node" => :build
@@ -35,6 +31,10 @@ class Zcode < Formula
 
   patch do
     file "Patches/zcode/0003-ohos-skip-desktop-electron-runtime.patch"
+  end
+
+  patch do
+    file "Patches/zcode/0004-web-login-server-oauth.patch"
   end
 
   deny_network_access! :test
