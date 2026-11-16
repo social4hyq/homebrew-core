@@ -1,12 +1,11 @@
 OHOS: keep the scrolled application and its controls visible during capture.
-The compositor keeps the full-screen overlay opaque, so hide it during capture
-instead of relying on a transparent hole. Create the toolbar as an independent
-app window from the start: changing Qt::Tool to Qt::Window after native surface
-creation does not map a new OHOS window. Detach it for the scrolling session and
-raise it again after the window manager restores the settings window. Keep the
-stitched preview alive as a parentless top-level window and delay the first frame
-until the overlay has been removed. Qt widget regressions cover the original and
-detached window surfaces, deferred presentation, and preview owner hiding.
+Hide the opaque full-screen overlay so the live page remains visible. Create the
+toolbar as an independent app window and use the visible stitched-preview window
+as its owner during scrolling, so the auto-scroll controls share the preview's
+lifetime instead of the hidden overlay's. Raise the toolbar again after the window
+manager restores the settings window and delay the first frame until the overlay
+has been removed. Restore the ordinary overlay owner on exit. Qt widget tests
+cover the preview owner, deferred presentation, and both window surfaces.
 
 diff --git a/snow_shot/include/snow_shot/presentation/screenshotoverlaywindow.h b/snow_shot/include/snow_shot/presentation/screenshotoverlaywindow.h
 index 7e4ca6f..14d1cde 100644
@@ -56,22 +55,22 @@ index bfe9fbc..f763d81 100644
      bool event(QEvent* event) override;
      bool eventFilter(QObject* watched, QEvent* event) override;
 diff --git a/snow_shot/include/snow_shot/presentation/screenshottoolbarwindow.h b/snow_shot/include/snow_shot/presentation/screenshottoolbarwindow.h
-index f3ec6be..b0b76f2 100644
+index f3ec6be..ebe1771 100644
 --- a/snow_shot/include/snow_shot/presentation/screenshottoolbarwindow.h
 +++ b/snow_shot/include/snow_shot/presentation/screenshottoolbarwindow.h
 @@ -23,6 +23,7 @@ class ScreenshotToolbarWindow final : public ScreenshotFloatingToolPaletteWindow
      void setToolbarLayout(const snow_shot::storage::ScreenshotToolbarLayout& layout);
      void setActionToolsLayout(const snow_shot::storage::ScreenshotToolbarLayout& layout);
      void setScrollingScreenshotMode(bool enabled);
-+    void presentForScrollingCapture();
++    void presentForScrollingCapture(QWidget* previewOwner);
      void setActiveTool(ScreenshotToolPalette::Tool tool);
      void setScreenshotRegionType(ScreenshotRegionType type);
      void setSelectionBackgroundOpacityState(int percent, bool available);
 diff --git a/snow_shot/src/presentation/capture/screenshotscrollingcapturecontroller.cpp b/snow_shot/src/presentation/capture/screenshotscrollingcapturecontroller.cpp
-index aa949f1..9c18809 100644
+index aa949f1..8b197a6 100644
 --- a/snow_shot/src/presentation/capture/screenshotscrollingcapturecontroller.cpp
 +++ b/snow_shot/src/presentation/capture/screenshotscrollingcapturecontroller.cpp
-@@ -224,13 +224,36 @@ struct ScreenshotScrollingCaptureController::Impl {
+@@ -224,13 +224,34 @@ struct ScreenshotScrollingCaptureController::Impl {
          pipelineInitialized = false;
 
          context.overlayCoordinator.setScrollingCaptureMode(context.displaySession, true);
@@ -81,11 +80,9 @@ index aa949f1..9c18809 100644
 +        // the stitched frames. Hide it; the toolbar and preview thumbnail stay on top.
 +        anchorOverlay->setScrollingCaptureOverlayHidden(true);
 +        if (ScreenshotToolbarWindow* toolbar = context.overlayCoordinator.toolbar()) {
-+            // A transient child follows its owner when the overlay hides. Detach it
-+            // for the scrolling session so its auto-scroll button remains reachable;
-+            // stop() reattaches it when the overlay is restored.
-+            toolbar->setOwnerWindow(nullptr);
-+            toolbar->presentForScrollingCapture();
++            // Use the independent preview as the visible owner so the auto-scroll
++            // button survives hiding the frozen overlay; stop() restores the overlay.
++            toolbar->presentForScrollingCapture(anchorOverlay->scrollingThumbnailWindow());
 +        }
 +#endif
 
@@ -108,7 +105,7 @@ index aa949f1..9c18809 100644
          refreshHoverEligibility();
          return true;
      }
-@@ -329,6 +352,13 @@ struct ScreenshotScrollingCaptureController::Impl {
+@@ -329,6 +350,13 @@ struct ScreenshotScrollingCaptureController::Impl {
          if (wasActive) {
              context.overlayCoordinator.setScrollingCaptureMode(context.displaySession, false);
              if (restoreScreenshotPresentation) {
@@ -210,7 +207,7 @@ index 9657522..32dcfa7 100644
          snow_shot::platform::configureScreenshotToolbarWindow(m_scrollingThumbnail);
  #endif
 diff --git a/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp b/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp
-index 4463690..afe5aa6 100644
+index 4463690..41048fb 100644
 --- a/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp
 +++ b/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp
 @@ -16,8 +16,11 @@
@@ -225,11 +222,16 @@ index 4463690..afe5aa6 100644
  ScreenshotToolPalette::Options screenshotToolbarOptions() {
      ScreenshotToolPalette::Options options;
      options.showDragHandle = true;
-@@ -595,6 +598,20 @@ void ScreenshotToolbarWindow::setScrollingScreenshotMode(bool enabled) {
+@@ -595,6 +598,25 @@ void ScreenshotToolbarWindow::setScrollingScreenshotMode(bool enabled) {
      }
  }
 
-+void ScreenshotToolbarWindow::presentForScrollingCapture() {
++void ScreenshotToolbarWindow::presentForScrollingCapture(QWidget* previewOwner) {
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    setOwnerWindow(previewOwner);
++#else
++    Q_UNUSED(previewOwner);
++#endif
 +    const auto present = [this] {
 +        ScreenshotToolPaletteHost* host = paletteHost();
 +        if (host == nullptr || host->palette() == nullptr ||
@@ -265,7 +267,7 @@ index 59f3104..7835b94 100644
  #if !defined(Q_OS_MACOS)
      flags |= Qt::NoDropShadowWindowHint;
 diff --git a/snow_shot/tests/screenshot_toolbar_remembered_tool_tests.cpp b/snow_shot/tests/screenshot_toolbar_remembered_tool_tests.cpp
-index a7b5bd5..dec6097 100644
+index a7b5bd5..6ad3932 100644
 --- a/snow_shot/tests/screenshot_toolbar_remembered_tool_tests.cpp
 +++ b/snow_shot/tests/screenshot_toolbar_remembered_tool_tests.cpp
 @@ -27,10 +27,12 @@
@@ -281,7 +283,7 @@ index a7b5bd5..dec6097 100644
  #include <QWindow>
 
  #include <cstdlib>
-@@ -751,6 +753,65 @@ void speechBubbleReachesScreenshotCommands() {
+@@ -751,6 +753,66 @@ void speechBubbleReachesScreenshotCommands() {
      require(palette->activeTool() == ScreenshotToolPalette::Tool::SpeechBubble,
              "screenshot tool synchronization recognizes Speech Bubble");
  }
@@ -317,12 +319,13 @@ index a7b5bd5..dec6097 100644
 +    require((toolbar.windowFlags() & Qt::WindowType_Mask) == Qt::Window,
 +            "OHOS must create the toolbar as an independent app window from the start");
 +#endif
-+    toolbar.setOwnerWindow(nullptr);
 +    toolbar.setScrollingScreenshotMode(true);
-+    toolbar.presentForScrollingCapture();
++    toolbar.presentForScrollingCapture(&settings);
++    require(toolbar.parentWidget() == &settings,
++            "the scrolling toolbar must use the visible preview as its OHOS owner");
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
 +    require((toolbar.windowFlags() & Qt::WindowType_Mask) == Qt::Window,
-+            "OHOS scrolling must promote the toolbar to an independent app window");
++            "OHOS scrolling must preserve the independent app window surface");
 +#endif
 +
 +    settings.show();
@@ -347,7 +350,7 @@ index a7b5bd5..dec6097 100644
  #ifdef Q_OS_WIN
  void scrollingCompositionPreservesVisibleToolbar() {
      // Match main.cpp: native toolbars must not materialize every sibling widget.
-@@ -882,6 +943,12 @@ int main(int argc, char** argv) {
+@@ -882,6 +944,12 @@ int main(int argc, char** argv) {
          applicationStorage.shutdown();
          return 0;
      }
