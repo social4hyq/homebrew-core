@@ -14,7 +14,7 @@ ABILITY="EntryAbility"
 
 usage() {
   cat <<'EOF'
-Usage: deepseek-harness-desktop <command>
+Usage: dsh-app <command>
 
 Commands:
   start     Open the desktop app (it starts dsh web itself)
@@ -41,12 +41,12 @@ ensure_config() {
       port=$((port + 1))
       tries=$((tries + 1))
       if ((tries > 30)); then
-        printf 'deepseek-harness-desktop: no free loopback port near %s\n' "$DEFAULT_PORT" >&2
+        printf 'dsh-app: no free loopback port near %s\n' "$DEFAULT_PORT" >&2
         exit 1
       fi
     done
     (umask 077; printf '{"port":%s}\n' "$port" > "$CONFIG_FILE")
-    printf 'deepseek-harness-desktop: wrote %s (port %s)\n' "$CONFIG_FILE" "$port" >&2
+    printf 'dsh-app: wrote %s (port %s)\n' "$CONFIG_FILE" "$port" >&2
   fi
 }
 
@@ -54,7 +54,7 @@ read_config() {
   ensure_config
   PORT="$(sed -n 's/.*"port":\([0-9][0-9]*\).*/\1/p' "$CONFIG_FILE")"
   if [[ -z "$PORT" ]]; then
-    printf 'deepseek-harness-desktop: cannot parse %s\n' "$CONFIG_FILE" >&2
+    printf 'dsh-app: cannot parse %s\n' "$CONFIG_FILE" >&2
     exit 1
   fi
 }
@@ -123,7 +123,7 @@ save_printed_url() {
 ensure_serve() {
   read_config
   if healthy; then
-    printf 'deepseek-harness-desktop: server already healthy at http://127.0.0.1:%s\n' "$PORT"
+    printf 'dsh-app: server already healthy at http://127.0.0.1:%s\n' "$PORT"
     return 0
   fi
   rm -f "$URL_FILE"
@@ -131,14 +131,14 @@ ensure_serve() {
     local stale_pid
     stale_pid="$(cat "$PID_FILE" 2>/dev/null || true)"
     if is_managed_serve "$stale_pid"; then
-      printf 'deepseek-harness-desktop: stale server process (pid %s) is not responding; stopping it\n' "$stale_pid" >&2
+      printf 'dsh-app: stale server process (pid %s) is not responding; stopping it\n' "$stale_pid" >&2
       kill "$stale_pid" 2>/dev/null || true
       wait_gone "$stale_pid"
     fi
     rm -f "$PID_FILE"
   fi
   if port_busy "$PORT"; then
-    printf 'deepseek-harness-desktop: port %s is in use by another process; edit %s to pick another port\n' "$PORT" "$CONFIG_FILE" >&2
+    printf 'dsh-app: port %s is in use by another process; edit %s to pick another port\n' "$PORT" "$CONFIG_FILE" >&2
     exit 1
   fi
   "$(dsh_bin)" web --host 127.0.0.1 --no-open --port "$PORT" >"$LOG_FILE" 2>&1 &
@@ -148,11 +148,11 @@ ensure_serve() {
     sleep 1
     waited=$((waited + 1))
     if ((waited > 30)); then
-      printf 'deepseek-harness-desktop: server did not become healthy; see %s\n' "$LOG_FILE" >&2
+      printf 'dsh-app: server did not become healthy; see %s\n' "$LOG_FILE" >&2
       exit 1
     fi
   done
-  printf 'deepseek-harness-desktop: serving at http://127.0.0.1:%s (log: %s)\n' "$PORT" "$LOG_FILE"
+  printf 'dsh-app: serving at http://127.0.0.1:%s (log: %s)\n' "$PORT" "$LOG_FILE"
 }
 
 warn_version_mismatch() {
@@ -160,7 +160,7 @@ warn_version_mismatch() {
   local actual
   actual="$("$(dsh_bin)" --version 2>/dev/null || true)"
   if [[ -n "$actual" && "$actual" != "$DSH_DESKTOP_VERSION" ]]; then
-    printf 'deepseek-harness-desktop: warning: desktop %s with CLI %s; matching upstream versions are recommended\n' \
+    printf 'dsh-app: warning: desktop %s with CLI %s; matching upstream versions are recommended\n' \
       "$DSH_DESKTOP_VERSION" "$actual" >&2
   fi
 }
@@ -171,7 +171,7 @@ cmd_start() {
     case "$1" in
       --serve-only) serve_only=1 ;;
       -h|--help) usage; exit 0 ;;
-      *) printf 'deepseek-harness-desktop: unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
+      *) printf 'dsh-app: unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
     esac
     shift
   done
@@ -183,11 +183,11 @@ cmd_start() {
   local hdc="${DSH_DESKTOP_HDC:-${DSH_DESKTOP_HDC_DEFAULT:-}}"
   if [[ -z "$hdc" ]]; then hdc="$(command -v hdc || true)"; fi
   if [[ -z "$hdc" || ! -x "$hdc" ]]; then
-    printf 'deepseek-harness-desktop: hdc not found; install ohos-sdk-toolchains\n' >&2
+    printf 'dsh-app: hdc not found; install ohos-sdk-toolchains\n' >&2
     exit 1
   fi
   "$hdc" shell aa start -a "$ABILITY" -b "$BUNDLE_ID" -m "$MODULE" >/dev/null
-  printf 'deepseek-harness-desktop: opened %s\n' "$BUNDLE_ID"
+  printf 'dsh-app: opened %s\n' "$BUNDLE_ID"
 }
 
 cmd_stop() {
@@ -196,9 +196,9 @@ cmd_stop() {
   if is_managed_serve "$pid"; then
     kill "$pid" 2>/dev/null || true
     wait_gone "$pid"
-    printf 'deepseek-harness-desktop: stopped\n'
+    printf 'dsh-app: stopped\n'
   else
-    printf 'deepseek-harness-desktop: no managed server running\n'
+    printf 'dsh-app: no managed server running\n'
   fi
   rm -f "$PID_FILE" "$URL_FILE"
 }
@@ -206,9 +206,9 @@ cmd_stop() {
 cmd_status() {
   read_config
   if healthy; then
-    printf 'deepseek-harness-desktop: healthy at http://127.0.0.1:%s\n' "$PORT"
+    printf 'dsh-app: healthy at http://127.0.0.1:%s\n' "$PORT"
   else
-    printf 'deepseek-harness-desktop: server not healthy at http://127.0.0.1:%s\n' "$PORT" >&2
+    printf 'dsh-app: server not healthy at http://127.0.0.1:%s\n' "$PORT" >&2
     exit 1
   fi
 }
@@ -229,5 +229,5 @@ case "${1:-}" in
   install) shift; cmd_install "$@" ;;
   -h|--help|help) usage ;;
   "") usage >&2; exit 2 ;;
-  *) printf 'deepseek-harness-desktop: unknown command: %s\n' "$1" >&2; usage >&2; exit 2 ;;
+  *) printf 'dsh-app: unknown command: %s\n' "$1" >&2; usage >&2; exit 2 ;;
 esac

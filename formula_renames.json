@@ -2,5 +2,6 @@
   "hap-installer": "app-installer",
   "opencode-desktop": "opencode-app",
   "zcode-desktop": "zcode-app",
-  "obsidian-desktop": "obsidian-app"
+  "obsidian-desktop": "obsidian-app",
+  "deepseek-harness-desktop": "deepseek-harness-app"
 }
