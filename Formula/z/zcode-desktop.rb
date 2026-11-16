@@ -10,7 +10,7 @@ class ZcodeDesktop < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 7
+  revision 8
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
