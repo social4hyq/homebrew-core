@@ -19,10 +19,11 @@ usage() {
   cat <<'EOF'
 Usage: zcode-desktop <command>
 
-  install [--no-acl] [--hap PATH]
+  install [--no-acl] [--hap PATH] [--no-serve]
                       Inject the host connection config, sign and install the
-                      shell HAP on the connected device (--hap overrides the
-                      bundled unsigned HAP; used by tests and local builds).
+                      shell HAP on the connected device, then start the backing
+                      service (--hap overrides the bundled unsigned HAP; used by
+                      tests and local builds; --no-serve skips the start).
   serve [--workspace DIR]
                       Start the host `zcode --web` instance (background) if it
                       is not already healthy; with --workspace, switch the
@@ -217,10 +218,11 @@ device() {
 }
 
 cmd_install() {
-  local extra=() hap=""
+  local extra=() hap="" serve=1
   while [ $# -gt 0 ]; do
     case "$1" in
       --no-acl) extra+=("--no-acl"); shift ;;
+      --no-serve) serve=0; shift ;;
       --hap)
         [ $# -ge 2 ] || die "--hap needs a path"
         hap="$2"; shift 2 ;;
@@ -229,9 +231,18 @@ cmd_install() {
   done
   ensure_config
   ensure_secret
-  exec "${ZCODE_DESKTOP_INSTALL_SCRIPT:?missing install script}" \
+  "${ZCODE_DESKTOP_INSTALL_SCRIPT:?missing install script}" \
     --hap "${hap:-${ZCODE_DESKTOP_UNSIGNED_HAP:?missing unsigned HAP}}" \
     --config "$CONFIG_FILE" "${extra[@]+"${extra[@]}"}"
+  [ "$serve" = 1 ] || return 0
+  # The shell connects to the host instance; start it right away so the app
+  # icon opens the workbench instead of the "waiting for the service" page.
+  read_config
+  if healthy; then
+    printf 'zcode-desktop: service already healthy at http://127.0.0.1:%s\n' "$PORT"
+  else
+    ensure_serve
+  fi
 }
 
 cmd_serve() {

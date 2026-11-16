@@ -10,7 +10,7 @@ class ZcodeDesktop < Formula
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
-  revision 5
+  revision 6
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -20,8 +20,8 @@ class ZcodeDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v3.18.2-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0b10a9c47b1165d4e28a49e3e26478c4f291f88fc5511dfc485c6bd8bba601d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v3.18.2-r8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d75332a0212d5ceb52bb18f3c8b44d463896306bef536a1f06465498c3ee32c7"
   end
 
   depends_on "node" => :build
@@ -210,8 +210,9 @@ class ZcodeDesktop < Formula
       hap-installer generates a local debug profile (the first run asks for a
       Huawei Developer login), signs the HAP and installs it.
 
-      The shell connects to the host `zcode --web` instance and never starts
-      it itself:
+      `zcode-desktop install` also starts the backing `zcode --web` instance,
+      so the app icon opens the workbench directly. The shell never starts the
+      service itself; after a reboot start it again:
 
         zcode-desktop serve      # start it (the shell waits for it otherwise)
         zcode-desktop status
@@ -315,7 +316,7 @@ class ZcodeDesktop < Formula
     ENV["ZCODE_DESKTOP_HDC"] = (fake_bin/"hdc").to_s
 
     # Default install: config injection, ACL module and signing project.
-    assert_match "installed and started", shell_output("#{bin}/zcode-desktop install --hap #{fake_hap}")
+    assert_match "installed and started", shell_output("#{bin}/zcode-desktop install --hap #{fake_hap} --no-serve")
     host_config = JSON.parse((testpath/"home/.config/zcode-desktop/config.json").read)
     assert_operator host_config.fetch("port"), :>, 0
     assert_equal Dir.home, host_config.fetch("workspace")
@@ -342,7 +343,7 @@ class ZcodeDesktop < Formula
 
     # --no-acl keeps the HAP's own permission list.
     assert_match "installed and started",
-                 shell_output("#{bin}/zcode-desktop install --hap #{fake_hap} --no-acl")
+                 shell_output("#{bin}/zcode-desktop install --hap #{fake_hap} --no-acl --no-serve")
     strong_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     strong_requests = strong_module.dig("module", "requestPermissions")
     strong_permissions = strong_requests.map { |permission| permission.fetch("name") }
