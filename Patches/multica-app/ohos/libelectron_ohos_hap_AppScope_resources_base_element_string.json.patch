@@ -1,4 +1,4 @@
-OHOS: name the app multica instead of Electron.
+OHOS: name the app Multica instead of Electron.
 
 diff --git a/libelectron/ohos_hap/AppScope/resources/base/element/string.json b/libelectron/ohos_hap/AppScope/resources/base/element/string.json
 index 839b2a3..b48d268 100644
@@ -9,7 +9,7 @@ index 839b2a3..b48d268 100644
      {
        "name": "app_name",
 -      "value": "Electron"
-+      "value": "multica"
++      "value": "Multica"
      }
    ]
  }

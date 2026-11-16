@@ -1,4 +1,4 @@
-OHOS: label the Electron ability as multica (base).
+OHOS: label the Electron ability as Multica (base).
 
 --- a/libelectron/ohos_hap/electron/src/main/resources/base/element/string.json
 +++ b/libelectron/ohos_hap/electron/src/main/resources/base/element/string.json
@@ -7,7 +7,7 @@ OHOS: label the Electron ability as multica (base).
      {
        "name": "EntryAbility_label",
 -      "value": "Electron"
-+      "value": "multica"
++      "value": "Multica"
      },
      {
        "name": "BrowserAbility_desc",

@@ -4,7 +4,7 @@ class MulticaApp < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class MulticaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.9.0-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7e6ea9d59616a97cd8a1d4aab7284d2e9889cfdba91ab80c6e4b67ba4db5a3f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.9.0-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1578a9f9b77786c096bcf40c3cad6bc733f4eabf1cbbdef0f1d779e150331e2b"
   end
 
   depends_on "go" => :build
@@ -442,6 +442,12 @@ class MulticaApp < Formula
     # hvigor reformats the JSON (tabs instead of spaces), so match loosely.
     assert_match(/"bundleName":\s*"com\.social4hyq\.multica"/,
                  shell_output("unzip -p #{hap} resources/base/profile/shortcuts_config.json"))
+    # The launcher label comes from the app_name / EntryAbility_label resource
+    # values, not from the web app's productName; keep the capital M there.
+    resource_index = Utils.safe_popen_read("unzip", "-p", hap, "resources.index")
+    resource_index = resource_index.force_encoding(Encoding::BINARY)
+    assert_includes resource_index, "Multica"
+    refute_includes resource_index, "multica"
     assert profile.fetch("module").fetch("extractNativeLibs")
     schemes = profile.fetch("module").fetch("abilities").flat_map do |ability|
       ability.fetch("skills", []).flat_map { |skill| skill.fetch("uris", []).map { |uri| uri["scheme"] } }
