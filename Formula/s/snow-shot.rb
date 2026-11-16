@@ -7,9 +7,9 @@ class SnowShot < Formula
   revision 9
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.7-r11"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5cf8285651b036c6e98217334b04732f8a6faac609cd1317441d1c8fabd02e20"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.7-r12"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "78e8d0c7bed51c400a3e955b94b442decd36b0599557b30188e8e1855005b2a1"
   end
 
   depends_on "brotli" => :build
@@ -588,8 +588,9 @@ class SnowShot < Formula
     refute_match "libs/arm64-v8a/libsnow_ocr_process.so", listing
     assert_match "libs/arm64-v8a/tls/libqopensslbackend.so", listing
     assert_match "libs/arm64-v8a/libQt6Network.so.6", listing
-    system "sh", "-c",
-           "unzip -p #{hap} libs/arm64-v8a/libQt6Network.so.6 | grep -q QSslSocket"
+    network = Utils.safe_popen_read("unzip", "-p", hap,
+                                   "libs/arm64-v8a/libQt6Network.so.6").b
+    assert_includes network, "QSslSocket".b
     manifest = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     assert_equal "com.social4hyq.snowshot", manifest.dig("app", "bundleName")
     assert_equal "QAbility", manifest.dig("module", "abilities", 0, "name")
