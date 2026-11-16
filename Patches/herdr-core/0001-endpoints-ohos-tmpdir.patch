@@ -1,0 +1,23 @@
+diff --git a/crates/herdr-core/src/platform/unix.rs b/crates/herdr-core/src/platform/unix.rs
+index 3fa93db..b49a4a7 100644
+--- a/crates/herdr-core/src/platform/unix.rs
++++ b/crates/herdr-core/src/platform/unix.rs
+@@ -128,9 +128,16 @@ pub const MAX_SOCKET_PATH: usize = {
+ };
+ 
+ pub fn endpoints(state: &Path) -> (PathBuf, String) {
+-    let run = std::env::var_os("XDG_RUNTIME_DIR")
++    let mut run = std::env::var_os("XDG_RUNTIME_DIR")
+         .filter(|v| !v.is_empty())
+-        .map(PathBuf::from)
++        .map(PathBuf::from);
++    // OHOS: the user-storage mount holding $HOME refuses socket nodes, and there
++    // is no /run/user/<uid>; $TMPDIR is an app data dir that accepts them.
++    #[cfg(target_env = "ohos")]
++    if run.is_none() {
++        run = std::env::var_os("TMPDIR").filter(|v| !v.is_empty()).map(PathBuf::from);
++    }
++    let run = run
+         // Logins without XDG_RUNTIME_DIR (some ssh setups) must still find the core.
+         .or_else(|| Some(PathBuf::from(format!("/run/user/{}", unsafe { libc::getuid() }))).filter(|p| p.is_dir()));
+     (run.map_or_else(|| state.to_path_buf(), |run| run.join("herdr-core")), String::new())
