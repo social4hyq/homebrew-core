@@ -34,7 +34,23 @@ function create(options = {}) {
     items.push({ label: options.restartLabel || '重新启动后端', click: options.onRestartBackend });
   }
   items.push({ type: 'separator' });
-  items.push({ label: options.quitLabel || '退出', click: () => { quitting = true; app.quit(); } });
+  items.push({
+    label: options.quitLabel || '退出',
+    click: () => {
+      quitting = true;
+      if (typeof options.onQuit === 'function') {
+        try {
+          options.onQuit();
+        } catch (error) {
+          console.error('TRAY_QUIT_HOOK_FAILED ' + String(error));
+        }
+      }
+      // The shell's ArkTS windowStageClose handler refuses to close the window
+      // so the app stays resident, so a regular app.quit() would be vetoed.
+      // Exit the process directly instead.
+      app.exit(0);
+    },
+  });
   tray.setContextMenu(Menu.buildFromTemplate(items));
   return tray;
 }
