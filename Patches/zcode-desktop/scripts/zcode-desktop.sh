@@ -30,6 +30,10 @@ Usage: zcode-desktop <command>
   start               Bring the installed app to the foreground.
   status              Show whether the backing service is healthy.
   stop                Stop the CLI-managed backing service.
+  login [zai|bigmodel]
+                      Sign in through the browser (server-side OAuth, the same
+                      flow `zcode login` uses). The account is stored in the
+                      shared data root and the managed server is restarted.
 EOF
 }
 
@@ -253,6 +257,35 @@ cmd_serve() {
   ensure_serve
 }
 
+restart_serve_if_running() {
+  local pid=""
+  [ -f "$PID_FILE" ] && pid="$(cat "$PID_FILE" 2>/dev/null || true)"
+  if proc_alive "$pid"; then
+    stop_pid "$pid"
+    rm -f "$PID_FILE"
+    ensure_serve
+  fi
+}
+
+cmd_login() {
+  local provider="${1:-}"
+  case "$provider" in
+    ""|zai|bigmodel) ;;
+    *) die "unknown provider: $provider (expected zai or bigmodel)" ;;
+  esac
+  [ -x "$ZCODE_BIN" ] || command -v "$ZCODE_BIN" >/dev/null || die "zcode not found (set ZCODE_DESKTOP_ZCODE)"
+  ensure_secret
+  log "starting the browser login; if no browser opens, open the URL printed above"
+  if ! ZCODE_CREDENTIAL_SECRET_FILE="$SECRET_FILE" "$ZCODE_BIN" login ${provider:+"$provider"}; then
+    die "login failed"
+  fi
+  printf 'zcode-desktop: login completed\n'
+  # The account lives in the shared data root; restart a running managed server
+  # so the workbench picks it up without a manual bounce.
+  read_config
+  restart_serve_if_running
+}
+
 cmd_start() {
   device
   "$HDC" shell aa start -a EntryAbility -b "$BUNDLE_ID" -m electron >/dev/null
@@ -288,6 +321,7 @@ case "${1:-}" in
   start) shift; cmd_start "$@" ;;
   status) shift; cmd_status "$@" ;;
   stop) shift; cmd_stop "$@" ;;
+  login) shift; cmd_login "$@" ;;
   -h|--help|help) usage ;;
   "") usage >&2; exit 2 ;;
   *) printf 'zcode-desktop: unknown command: %s\n' "$1" >&2; usage >&2; exit 2 ;;

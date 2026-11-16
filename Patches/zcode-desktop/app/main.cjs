@@ -74,8 +74,20 @@ app.whenReady().then(() => {
   // on its own, so the v34-era call is not needed.
   // Links the workbench opens in a new window: loopback stays in the shell,
   // external URLs go to the system browser (the shell has no second window).
+  // OAuth (Z.ai / BigModel) has to run in this window: the login callback
+  // returns to the app origin and the pending-login state lives in this
+  // window's storage, so handing it to the system browser breaks the flow.
+  const authHost = /(^|\.)(z\.ai|bigmodel\.cn)$/i;
   win.webContents.setWindowOpenHandler(({ url }) => {
+    let target;
+    try {
+      target = new URL(url);
+    } catch {
+      return { action: 'deny' };
+    }
     if (origin && url.startsWith(origin + '/')) {
+      win.loadURL(url).catch(() => {});
+    } else if (authHost.test(target.hostname)) {
       win.loadURL(url).catch(() => {});
     } else if (/^https?:/i.test(url)) {
       shell.openExternal(url).catch(() => {});
