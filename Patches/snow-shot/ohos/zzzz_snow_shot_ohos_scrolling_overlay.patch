@@ -1,11 +1,9 @@
 OHOS: keep the scrolled application and its controls visible during capture.
-Hide the opaque full-screen overlay and use the visible stitched preview as the
-scrolling toolbar's owner. Present the toolbar when previewShown arrives. A
-scrolling-presentation flag, rather than the palette's mode, gates show requests:
-the palette can still be in its previous mode when presentation begins, which
-left the native toolbar hidden even though it had valid geometry. Clear the flag
-on exit so deferred presentation cannot resurrect the toolbar. Qt tests cover
-both showing the toolbar and suppressing it after scrolling ends.
+Hide the opaque full-screen overlay, use the visible stitched preview as the
+scrolling toolbar's owner, and present the toolbar for previewShown. A dedicated
+scrolling-presentation flag allows show requests before the palette changes mode
+and cancels them on exit. Add SNOW_OHOS_TOOLBAR_BEFORE/AFTER and
+SNOW_OHOS_PREVIEW_SHOWN diagnostics to compare widget and native visibility.
 
 diff --git a/snow_shot/include/snow_shot/presentation/screenshotoverlaywindow.h b/snow_shot/include/snow_shot/presentation/screenshotoverlaywindow.h
 index 7e4ca6f..14d1cde 100644
@@ -155,18 +153,21 @@ index aa949f1..2e02032 100644
              }
          } else if (thumbnailHost != nullptr) {
 diff --git a/snow_shot/src/presentation/capture/screenshotscrollingthumbnailwidget.cpp b/snow_shot/src/presentation/capture/screenshotscrollingthumbnailwidget.cpp
-index 196fe43..d20e67f 100644
+index 196fe43..6f51270 100644
 --- a/snow_shot/src/presentation/capture/screenshotscrollingthumbnailwidget.cpp
 +++ b/snow_shot/src/presentation/capture/screenshotscrollingthumbnailwidget.cpp
-@@ -14,6 +14,7 @@
+@@ -14,8 +14,10 @@
  #include <QResizeEvent>
  #include <QScrollBar>
  #include <QScopedValueRollback>
 +#include <QShowEvent>
  #include <QSignalBlocker>
  #include <QWheelEvent>
++#include <QWindow>
  #include <QtMath>
-@@ -63,8 +64,16 @@ void copyPreviewSpan(const QImage& source, int sourceStart, QImage& destination,
+
+ #include <algorithm>
+@@ -63,8 +65,16 @@ void copyPreviewSpan(const QImage& source, int sourceStart, QImage& destination,
  }
  } // namespace
 
@@ -183,12 +184,16 @@ index 196fe43..d20e67f 100644
      setObjectName(QStringLiteral("screenshot-scrolling-thumbnail"));
  #ifdef Q_OS_WIN
      snow_shot::platform::windows::detail::enableCaptureExclusionCompositionFallback(this);
-@@ -122,6 +131,11 @@ void ScreenshotScrollingThumbnailWidget::reset() {
+@@ -122,6 +132,15 @@ void ScreenshotScrollingThumbnailWidget::reset() {
      update();
  }
 
 +void ScreenshotScrollingThumbnailWidget::showEvent(QShowEvent* event) {
 +    QWidget::showEvent(event);
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    qInfo() << "SNOW_OHOS_PREVIEW_SHOWN" << isVisible()
++            << (windowHandle() != nullptr && windowHandle()->isExposed());
++#endif
 +    emit previewShown();
 +}
 +
@@ -262,14 +267,15 @@ index 9657522..32dcfa7 100644
          snow_shot::platform::configureScreenshotToolbarWindow(m_scrollingThumbnail);
  #endif
 diff --git a/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp b/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp
-index 4463690..947cd33 100644
+index 4463690..3754dd9 100644
 --- a/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp
 +++ b/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp
-@@ -16,8 +16,11 @@
+@@ -16,8 +16,12 @@
  #include <QJsonValue>
  #include <QScreen>
  #include <QSignalBlocker>
 +#include <QTimer>
++#include <QWindow>
 
  namespace {
 +constexpr int kScrollingToolbarRaiseDelayMs = 120;
@@ -277,7 +283,7 @@ index 4463690..947cd33 100644
  ScreenshotToolPalette::Options screenshotToolbarOptions() {
      ScreenshotToolPalette::Options options;
      options.showDragHandle = true;
-@@ -577,6 +580,9 @@ void ScreenshotToolbarWindow::resetForNewCapture() {
+@@ -577,6 +581,9 @@ void ScreenshotToolbarWindow::resetForNewCapture() {
  }
 
  void ScreenshotToolbarWindow::setScrollingScreenshotMode(bool enabled) {
@@ -287,7 +293,7 @@ index 4463690..947cd33 100644
      ScreenshotToolPaletteHost* host = paletteHost();
      if (host == nullptr || host->palette() == nullptr) {
          return;
-@@ -595,6 +601,24 @@ void ScreenshotToolbarWindow::setScrollingScreenshotMode(bool enabled) {
+@@ -595,6 +602,34 @@ void ScreenshotToolbarWindow::setScrollingScreenshotMode(bool enabled) {
      }
  }
 
@@ -302,8 +308,18 @@ index 4463690..947cd33 100644
 +        if (!m_scrollingPresentationActive) {
 +            return;
 +        }
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        qInfo() << "SNOW_OHOS_TOOLBAR_BEFORE" << isVisible()
++                << (windowHandle() != nullptr && windowHandle()->isExposed())
++                << (parentWidget() != nullptr && parentWidget()->isVisible());
++#endif
 +        show();
 +        raise();
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        qInfo() << "SNOW_OHOS_TOOLBAR_AFTER" << isVisible()
++                << (windowHandle() != nullptr && windowHandle()->isExposed())
++                << (parentWidget() != nullptr && parentWidget()->isVisible());
++#endif
 +    };
 +    present();
 +    QTimer::singleShot(kScrollingToolbarRaiseDelayMs, this, present);
