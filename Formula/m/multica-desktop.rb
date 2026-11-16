@@ -4,6 +4,7 @@ class MulticaDesktop < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
+  revision 1
 
   livecheck do
     url :stable
@@ -11,9 +12,8 @@ class MulticaDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-desktop-v0.9.0-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a575b9b2900fe37797d493232f3b909d49670cd7a9767fa4dbf008d91e80c146"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-desktop-v0.9.0-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d1245cb5a990e7c1b74698bb65d9e263766cbd437a5857e075fee4b5b91827f3"
   end
 
   depends_on "go" => :build
@@ -23,11 +23,10 @@ class MulticaDesktop < Formula
   depends_on "ohos-sdk-toolchains"
   depends_on "zip"
 
-  # openharmony-sig/electron PC(2in1) prebuilt (CodeHub mirror hosted on this
-  # tap's release; redistribution assumed by the tap owner, see release notes).
+  # CPF-Electron Electron OHOS PC (2in1) runtime, published on GitCode.
   resource "electron-ohos" do
-    url "https://github.com/social4hyq/homebrew-core/releases/download/electron-ohos-v34.9.0-20261030.1/v34.9.0-20261030.1-release.zip"
-    sha256 "599e97b3d8b1e5071a2387496104b443e58079a5f5c165b0114e65ffc601df3a"
+    url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
+    sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
   end
 
   patch_root = Pathname(__dir__).parent.parent
@@ -40,7 +39,23 @@ class MulticaDesktop < Formula
   def patch
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
-    system "tar", "-xzf", buildpath/"libelectron_132.tar.gz", "-C", buildpath
+    system "tar", "-xzf", buildpath/"libelectron_144.tar.gz", "-C", buildpath
+
+    # The vendor templates mix CRLF and LF. Normalize files patched below so
+    # Homebrew's patch utility can match the mainElement, signingConfig, and
+    # requestPermissions lines consistently.
+    %w[
+      libelectron/ohos_hap/build-profile.json5
+      libelectron/ohos_hap/electron/src/main/module.json5
+      libelectron/ohos_hap/electron/src/main/resources/base/element/string.json
+      libelectron/ohos_hap/electron/src/main/resources/en_US/element/string.json
+      libelectron/ohos_hap/electron/src/main/resources/zh_CN/element/string.json
+      libelectron/ohos_hap/web_engine/src/main/module.json5
+    ].each do |relative_path|
+      path = buildpath/relative_path
+      path.binwrite(path.binread.gsub("\r\n", "\n")) if path.exist?
+    end
+
     super
   end
 

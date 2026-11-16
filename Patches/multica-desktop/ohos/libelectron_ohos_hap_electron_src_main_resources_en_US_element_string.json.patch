@@ -1,7 +1,5 @@
-OHOS: ability name as multica instead of Electron (en_US).
+OHOS: label the Electron ability as multica (en_US).
 
-diff --git a/libelectron/ohos_hap/electron/src/main/resources/en_US/element/string.json b/libelectron/ohos_hap/electron/src/main/resources/en_US/element/string.json
-index e8bd1d2..4643c29 100644
 --- a/libelectron/ohos_hap/electron/src/main/resources/en_US/element/string.json
 +++ b/libelectron/ohos_hap/electron/src/main/resources/en_US/element/string.json
 @@ -10,7 +10,7 @@
@@ -12,8 +10,8 @@ index e8bd1d2..4643c29 100644
 +      "value": "multica"
      },
      {
-       "name": "button_ok",
-@@ -33,4 +33,4 @@
+       "name": "OpenNewWindow_label",
+@@ -17,4 +17,4 @@
        "value": "OpenNewWindow"
      }
    ]

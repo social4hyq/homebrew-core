@@ -1,100 +1,39 @@
-OHOS: request only the permissions local automatic signing can grant (INTERNET
-and GET_NETWORK_INFO); drop the restricted ones from the stock Electron shell.
+OHOS: request only permissions granted by local automatic signing.
 
-diff --git a/libelectron/ohos_hap/web_engine/src/main/module.json5 b/libelectron/ohos_hap/web_engine/src/main/module.json5
-index 6ce7ee5..b68c1a3 100644
 --- a/libelectron/ohos_hap/web_engine/src/main/module.json5
 +++ b/libelectron/ohos_hap/web_engine/src/main/module.json5
-@@ -7,168 +7,12 @@
-       "2in1"
-     ],
-     "requestPermissions": [
--      {
--        "name": "ohos.permission.DISTRIBUTED_DATASYNC",
--        "reason": "$string:distributed_datasync"
--      },
-       {
-         "name": "ohos.permission.INTERNET"
+@@ -12,119 +12,6 @@
        },
        {
          "name": "ohos.permission.GET_NETWORK_INFO"
 -      },
 -      {
--        "name": "ohos.permission.ACCESS_CERT_MANAGER"
--      },
--      {
--        "name": "ohos.permission.RUNNING_LOCK"
--      },
--      {
--        "name": "ohos.permission.PRINT"
--      },
--      {
--        "name": "ohos.permission.PREPARE_APP_TERMINATE"
--      },
--      {
--        "name": "ohos.permission.ACCESS_BIOMETRIC"
--      },
--      {
--        "name": "ohos.permission.FILE_ACCESS_PERSIST"
--      },
--      {
--        "name": "ohos.permission.PRIVACY_WINDOW"
--      },
--      {
--        "name": "ohos.permission.SET_WINDOW_TRANSPARENT"
--      },
--      {
--        "name": "ohos.permission.WINDOW_TOPMOST"
--      },
--      {
--        "name": "ohos.permission.GYROSCOPE"
--      },
--      {
--        "name": "ohos.permission.ACCELEROMETER"
--      },
--      {
--        "name": "ohos.permission.READ_PASTEBOARD",
--        "reason": "$string:access_pasteboard",
--        "usedScene": {
--          "abilities": [
--            "FormAbility"
--          ],
--          "when":"always"
--        }
--      },
--      {
 -        "name": "ohos.permission.READ_WRITE_DOWNLOAD_DIRECTORY",
--        "reason": "$string:download_dir",
+-        "reason": "$string:reason",
 -        "usedScene": {
--          "abilities": [
--            "FormAbility"
--          ],
--          "when":"always"
+-          "abilities": ["FormAbility"],
+-          "when": "always"
 -        }
 -      },
 -      {
 -        "name": "ohos.permission.READ_WRITE_DOCUMENTS_DIRECTORY",
--        "reason": "$string:documents_dir",
+-        "reason": "$string:reason",
 -        "usedScene": {
--          "abilities": [
--            "FormAbility"
--          ],
--          "when":"always"
+-          "abilities": ["FormAbility"],
+-          "when": "always"
 -        }
 -      },
 -      {
 -        "name": "ohos.permission.READ_WRITE_DESKTOP_DIRECTORY",
--        "reason": "$string:desktop_dir",
+-        "reason": "$string:reason",
 -        "usedScene": {
--          "abilities": [
--            "FormAbility"
--          ],
--          "when":"always"
+-          "abilities": ["FormAbility"],
+-          "when": "always"
 -        }
 -      },
 -      {
 -        "name": "ohos.permission.LOCATION",
--        "reason": "$string:location",
+-        "reason": "$string:reason",
 -        "usedScene": {
 -          "abilities": [
 -            "FormAbility"
@@ -104,7 +43,7 @@ index 6ce7ee5..b68c1a3 100644
 -      },
 -      {
 -        "name": "ohos.permission.APPROXIMATELY_LOCATION",
--        "reason": "$string:location",
+-        "reason": "$string:reason",
 -        "usedScene": {
 -          "abilities": [
 -            "FormAbility"
@@ -113,34 +52,32 @@ index 6ce7ee5..b68c1a3 100644
 -        }
 -      },
 -      {
--        "name": "ohos.permission.LOCATION_IN_BACKGROUND",
--        "reason": "$string:location",
--        "usedScene": {
--          "abilities": [
--            "FormAbility"
--          ],
--          "when":"always"
--        }
+-        "name": "ohos.permission.ACCESS_CERT_MANAGER"
 -      },
 -      {
 -        "name": "ohos.permission.MICROPHONE",
 -        "reason": "$string:microphone",
--        "usedScene": {
--          "abilities": [
--            "FormAbility"
--          ],
--          "when":"always"
--        }
 -      },
 -      {
 -        "name": "ohos.permission.CAMERA",
 -        "reason": "$string:camera",
--        "usedScene": {
--          "abilities": [
--            "FormAbility"
--          ],
--          "when":"always"
--        }
+-      },
+-      {
+-        "name": "ohos.permission.PRINT"
+-      },
+-      {
+-        "name": "ohos.permission.READ_PASTEBOARD",
+-        "reason": "$string:access_pasteboard",
+-      },
+-      {
+-        "name": "ohos.permission.ACCESS_BIOMETRIC"
+-      },
+-      {
+-        "name": "ohos.permission.SYSTEM_FLOAT_WINDOW"
+-      },
+-      {
+-        "name": "ohos.permission.DISTRIBUTED_DATASYNC",
+-        "reason": "$string:distributed_datasync"
 -      },
 -      {
 -        "name": "ohos.permission.ACCESS_BLUETOOTH",
@@ -153,14 +90,16 @@ index 6ce7ee5..b68c1a3 100644
 -        }
 -      },
 -      {
--        "name": "ohos.permission.CUSTOM_SCREEN_CAPTURE",
--        "reason": "$string:screen_capture",
--        "usedScene": {
--          "abilities": [
--            "FormAbility"
--          ],
--          "when":"always"
--        }
+-        "name": "ohos.permission.FILE_ACCESS_PERSIST"
+-      },
+-      {
+-        "name": "ohos.permission.PREPARE_APP_TERMINATE"
+-      },
+-      {
+-        "name": "ohos.permission.GYROSCOPE"
+-      },
+-      {
+-        "name": "ohos.permission.ACCELEROMETER"
 -      },
 -      {
 -        "name": "ohos.permission.SET_ABILITY_INSTANCE_INFO"
@@ -169,9 +108,17 @@ index 6ce7ee5..b68c1a3 100644
 -        "name": "ohos.permission.GET_FILE_ICON"
 -      },
 -      {
--        "name": "ohos.permission.LOCK_WINDOW_CURSOR"
+-        "name": "ohos.permission.PRIVACY_WINDOW"
 -      },
-+      }
+-      {
+-        "name": "ohos.permission.SET_WINDOW_TRANSPARENT"
+-      },
+-      {
+-        "name": "ohos.permission.CUSTOM_SCREEN_CAPTURE",
+-        "reason": "$string:screenshot"
+-      },
+-      {
+-        "name": "ohos.permission.LOCK_WINDOW_CURSOR"
+       }
      ],
      "definePermissions": [
-       {
