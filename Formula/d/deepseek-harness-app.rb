@@ -5,7 +5,7 @@ class DeepseekHarnessApp < Formula
   sha256 "bf6d668e52a26edf98aa2ef7960e240c8d9afcefbad2b09887a2cb1e14001dd5"
   license :cannot_represent
 
-  revision 7
+  revision 8
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -13,8 +13,8 @@ class DeepseekHarnessApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.3-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "10a17c8d1f276d6e3f75f3bb91dbe0d96790304ba5513ab7eb4a79eb1088fbeb"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.3-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1b6f83de80bfb505294faff246b8cc3c1b6c5d4923edf5393637787b525db1af"
   end
 
   depends_on "app-installer"
@@ -78,11 +78,13 @@ class DeepseekHarnessApp < Formula
               JSON5
 
     # The caption close button never reaches Electron's BrowserWindow close
-    # event: electron-ohos tears down the window UIAbility first, and the
-    # Electron process (with the dsh web backend it started) follows. Register a
-    # windowStageClose handler that hides the ability and cancels the close, so
-    # closing the window only sends it to the tray. The tray's quit item calls
-    # app.exit() because a normal quit would be cancelled by this handler.
+    # event, and this runtime cannot cancel the close either: the window
+    # UIAbility is torn down whatever windowStageClose returns. What keeps the
+    # shell (and the dsh web backend it may have started) alive is calling
+    # hideAbility() before that teardown -- the platform then recreates the
+    # shell as a hidden instance whose tray restores the window. Hiding after
+    # the teardown instead makes the app exit, so the call stays synchronous.
+    # The tray's quit item calls app.exit() for the same reason.
     close_handler = [
       "    super.onWindowStageCreate(windowStage);",
       "    try {",
@@ -91,12 +93,7 @@ class DeepseekHarnessApp < Formula
       "          return false;",
       "        }",
       "        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));",
-      "        // Hide on the next tick: hiding while the close is still being",
-      "        // processed makes the framework tear the ability down and relaunch",
-      "        // the app (new pid) instead of just hiding it.",
-      "        setTimeout(() => {",
-      "          Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
-      "        }, 50);",
+      "        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
       "        return false;",
       "      });",
       "    } catch (exception) {",
