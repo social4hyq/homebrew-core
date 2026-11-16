@@ -1,4 +1,4 @@
-class ZcodeDesktop < Formula
+class ZcodeApp < Formula
   desc "Desktop shell for the ZCode agent (Electron window on a local zcode --web)"
   homepage "https://zcode.z.ai"
   # Same upstream pin as `zcode`: the shell only provides the window, the web
@@ -10,7 +10,7 @@ class ZcodeDesktop < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 9
+  revision 10
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -19,14 +19,9 @@ class ZcodeDesktop < Formula
     end
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v3.18.2-r11"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "63fd2494daf57b2822c4b01b71088246849f8e036bb96e39761c50e870e5d75c"
-  end
-
+  depends_on "app-installer"
   depends_on "bun"
   depends_on "curl"
-  depends_on "hap-installer"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "unzip"
@@ -37,13 +32,13 @@ class ZcodeDesktop < Formula
   # opaque release payload is involved. Every path is listed literally: the
   # weekly remove-unused-patches job keeps files referenced from Formula/.
   SHELL_FILES = %w[
-    Patches/zcode-desktop/app/config.json
-    Patches/zcode-desktop/app/main.cjs
-    Patches/zcode-desktop/app/package.json
-    Patches/zcode-desktop/app/waiting.html
-    Patches/zcode-desktop/assets/icon.png
-    Patches/zcode-desktop/scripts/install-desktop.sh
-    Patches/zcode-desktop/scripts/zcode-desktop.sh
+    Patches/zcode-app/app/config.json
+    Patches/zcode-app/app/main.cjs
+    Patches/zcode-app/app/package.json
+    Patches/zcode-app/app/waiting.html
+    Patches/zcode-app/assets/icon.png
+    Patches/zcode-app/scripts/install-desktop.sh
+    Patches/zcode-app/scripts/zcode-desktop.sh
   ].freeze
 
   resource "electron-ohos" do
@@ -53,7 +48,7 @@ class ZcodeDesktop < Formula
 
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    source_root = tap_root/"Patches/zcode-desktop"
+    source_root = tap_root/"Patches/zcode-app"
     SHELL_FILES.each do |file|
       raise "#{file} is missing from the tap" unless (tap_root/file).exist?
     end
@@ -69,6 +64,8 @@ class ZcodeDesktop < Formula
     %w[main.cjs package.json config.json waiting.html].each do |name|
       cp source_root/"app"/name, app/name
     end
+
+    cp source_root/"assets/icon.png", app/"app-icon.png"
 
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.zcodedesktop"'
@@ -124,7 +121,7 @@ class ZcodeDesktop < Formula
     # compiles no C++, so the NDK-less SDK subset the image carries suffices.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "zcode-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['zcode-desktop']"
+      odie "zcode-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['zcode-app']"
     end
 
     # brew's sanitized build env drops the container's LD_LIBRARY_PATH, but
@@ -185,7 +182,7 @@ class ZcodeDesktop < Formula
     chmod 0755, pkgshare/"install-desktop.sh"
     cp source_root/"scripts/zcode-desktop.sh", libexec/"zcode-desktop.sh"
     chmod 0755, libexec/"zcode-desktop.sh"
-    (bin/"zcode-desktop").write_env_script libexec/"zcode-desktop.sh",
+    (bin/"zcode-app").write_env_script libexec/"zcode-desktop.sh",
       ZCODE_DESKTOP_UNSIGNED_HAP:   libexec/"zcode-desktop-unsigned.hap",
       ZCODE_DESKTOP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
       ZCODE_DESKTOP_MODULE_ACL:     pkgshare/"module-acl.json",
@@ -194,6 +191,7 @@ class ZcodeDesktop < Formula
       ZCODE_DESKTOP_BUN:            formula_opt_bin("bun")/"bun",
       ZCODE_DESKTOP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
       PATH:                         "#{formula_opt_bin("node")}:$PATH"
+    bin.install_symlink bin/"zcode-app" => "zcode-desktop"
   end
 
   def caveats
@@ -201,18 +199,18 @@ class ZcodeDesktop < Formula
       The desktop HAP is unsigned in the bottle. Connect and unlock the device,
       then run:
 
-        zcode-desktop install
+        zcode-app install
 
-      hap-installer generates a local debug profile (the first run asks for a
+      app-installer generates a local debug profile (the first run asks for a
       Huawei Developer login), signs the HAP and installs it.
 
-      `zcode-desktop install` also starts the backing `zcode --web` instance,
+      `zcode-app install` also starts the backing `zcode --web` instance,
       so the app icon opens the workbench directly. The shell never starts the
       service itself; after a reboot start it again:
 
-        zcode-desktop serve      # start it (the shell waits for it otherwise)
-        zcode-desktop status
-        zcode-desktop stop
+        zcode-app serve      # start it (the shell waits for it otherwise)
+        zcode-app status
+        zcode-app stop
 
       `serve` also creates ~/.zcode/v2/credential-secret and exports
       ZCODE_CREDENTIAL_SECRET_FILE. ZCode 3.18.2 refuses to start without a
@@ -229,13 +227,13 @@ class ZcodeDesktop < Formula
       Account login: the workbench served on loopback signs in through the
       server-side OAuth flow (patched zcode): the login dialog's "browser
       authorization" button opens the authorize URL in the system browser and
-      the server polls for the token. `zcode-desktop login [zai|bigmodel]` runs
+      the server polls for the token. `zcode-app login [zai|bigmodel]` runs
       the same flow from the terminal and restarts the managed server. The HAP
       registers the zcode:// scheme so a browser handoff launches the shell
       instead of OHOS's "no application can open this" dialog.
 
       The default install carries the two kernel ACLs (JIT/WebAssembly for the
-      renderer) and READ_PASTEBOARD; `zcode-desktop install --no-acl` installs
+      renderer) and READ_PASTEBOARD; `zcode-app install --no-acl` installs
       the strong-sandbox variant instead (no JIT, no paste). 坚盾守护模式
       disables JIT regardless of the ACLs. The workbench's embedded terminal is
       unavailable because node-pty cannot spawn child processes under bun on
@@ -245,8 +243,9 @@ class ZcodeDesktop < Formula
 
   test do
     ENV["HOME"] = testpath/"home"
+    assert_match "Usage: zcode-app", shell_output("#{bin}/zcode-desktop --help")
     ENV.delete("XDG_CONFIG_HOME")
-    assert_match "Usage: zcode-desktop", shell_output("#{bin}/zcode-desktop --help")
+    assert_match "Usage: zcode-app", shell_output("#{bin}/zcode-app --help")
 
     # A minimal stand-in for the shell HAP: the installer only rewrites
     # config.json (and swaps module.json for the ACL variant), so the 200 MB
@@ -280,7 +279,7 @@ class ZcodeDesktop < Formula
     SH
     chmod 0755, fake_bin/"hdc"
 
-    (fake_bin/"hap-installer").write <<~SH
+    (fake_bin/"app-installer").write <<~SH
       #!/bin/sh
       printf '%s\n' "$@" > #{installer_args}
       while [ $# -gt 0 ]; do
@@ -290,7 +289,7 @@ class ZcodeDesktop < Formula
         esac
       done
     SH
-    chmod 0755, fake_bin/"hap-installer"
+    chmod 0755, fake_bin/"app-installer"
 
     (fake_bin/"devecocli").write "#!/bin/sh\nexit 99\n"
     chmod 0755, fake_bin/"devecocli"
@@ -299,7 +298,7 @@ class ZcodeDesktop < Formula
     ENV["ZCODE_DESKTOP_HDC"] = (fake_bin/"hdc").to_s
 
     # Default install: config injection, ACL module and signing project.
-    assert_match "installed", shell_output("#{bin}/zcode-desktop install --hap #{fake_hap} --no-serve")
+    assert_match "installed", shell_output("#{bin}/zcode-app install --hap #{fake_hap} --no-serve")
     host_config = JSON.parse((testpath/"home/.config/zcode-desktop/config.json").read)
     assert_operator host_config.fetch("port"), :>, 0
     assert_equal Dir.home, host_config.fetch("workspace")
@@ -326,14 +325,14 @@ class ZcodeDesktop < Formula
 
     # --no-acl keeps the HAP's own permission list.
     assert_match "installed",
-                 shell_output("#{bin}/zcode-desktop install --hap #{fake_hap} --no-acl --no-serve")
+                 shell_output("#{bin}/zcode-app install --hap #{fake_hap} --no-acl --no-serve")
     strong_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     strong_requests = strong_module.dig("module", "requestPermissions")
     strong_permissions = strong_requests.map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.INTERNET], strong_permissions
 
-    assert_match "no managed server running", shell_output("#{bin}/zcode-desktop stop")
-    assert_match "not healthy", shell_output("#{bin}/zcode-desktop status 2>&1", 1)
+    assert_match "no managed server running", shell_output("#{bin}/zcode-app stop")
+    assert_match "not healthy", shell_output("#{bin}/zcode-app status 2>&1", 1)
 
     # The real bottle HAP.
     hap = libexec/"zcode-desktop-unsigned.hap"
