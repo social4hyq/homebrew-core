@@ -8,7 +8,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
@@ -44,11 +44,12 @@ class OpencodeApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs package.json config.json waiting.html].each do |name|
+    %w[main.cjs package.json config.json waiting.html tray.cjs].each do |name|
       cp payload/"app"/name, app/name
     end
 
     cp payload/"assets/icon.png", app/"app-icon.png"
+    cp payload/"assets/tray-icon.png", app/"tray-icon.png"
 
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.opencodedesktop"'
@@ -89,6 +90,31 @@ class OpencodeApp < Formula
                       { "name": "ohos.permission.GET_NETWORK_INFO" }
                     ],
               JSON5
+
+    # The caption close button never reaches Electron's BrowserWindow close
+    # event: electron-ohos tears down the window UIAbility first, and the
+    # Electron process (with the opencode serve backend it started) follows.
+    # Register a windowStageClose handler that hides the ability and cancels the
+    # close, so closing the window only sends it to the tray. The tray's quit
+    # item calls app.exit() because a normal quit would be cancelled here.
+    close_handler = [
+      "    super.onWindowStageCreate(windowStage);",
+      "    try {",
+      "      windowStage.on('windowStageClose', () => {",
+      "        if (CheckEmptyUtils.isEmpty(this.xcomponentId)) {",
+      "          return false;",
+      "        }",
+      "        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));",
+      "        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
+      "        return false;",
+      "      });",
+      "    } catch (exception) {",
+      "      LogUtil.error(TAG, 'Failed to register window close handler: ' + JSON.stringify(exception));",
+      "    }",
+      "",
+    ].join("\n")
+    inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
+              "    super.onWindowStageCreate(windowStage);\n", close_handler
 
     # HAP shell build. CI runs in the private electron-ohos-ci image (the
     # generic Electron-on-OHOS build image, selected via the
@@ -263,7 +289,15 @@ class OpencodeApp < Formula
     assert_match "pack.info", listing
     assert_match "libs/arm64-v8a/libelectron.so", listing
     assert_match "resources/resfile/resources/app/main.cjs", listing
+    assert_match "resources/resfile/resources/app/tray.cjs", listing
+    assert_match "resources/resfile/resources/app/tray-icon.png", listing
     assert_match "resources/resfile/resources/app/waiting.html", listing
+    tray_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/tray.cjs")
+    assert_match "new Tray(", tray_source
+    assert_match "app.exit(0)", tray_source
+    window_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/main.cjs")
+    assert_match "tray.create(", window_source
+    assert_match "OPENCODE_DESKTOP_NO_TRAY", window_source
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
     assert_equal 0, placeholder.fetch("port")
     package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
