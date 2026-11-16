@@ -1,10 +1,10 @@
-class HapInstaller < Formula
+class AppInstaller < Formula
   desc "Sign and install OpenHarmony HAP packages"
   homepage "https://www.npmjs.com/package/@deveco/deveco-cli-openharmony-arm64"
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.10.tgz"
   sha256 "7fdee1bfb7393c151fa09b3714ecc4796e53d9876557e9933c5890319ffb4daa"
   license "MIT"
-  revision 5
+  revision 6
 
   livecheck do
     url "https://registry.npmjs.org/@deveco%2Fdeveco-cli-openharmony-arm64"
@@ -12,8 +12,8 @@ class HapInstaller < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/hap-installer-v1.3.10-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8fc8fb7ed494922d8802493446c1b3f0611b68309ed4288173146b7f0b6ee315"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.10-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "64f18f718c8236b8097745a56e42d07f090790ce27274766e2ed7292089089b0"
   end
 
   depends_on "node"
@@ -22,12 +22,12 @@ class HapInstaller < Formula
 
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    payload = tap_root/"Patches/hap-installer"
+    payload = tap_root/"Patches/app-installer"
     cli_source = buildpath.parent/"deveco-cli-runtime"
     cli_source.mkpath
     cli_package = buildpath
     cli_package_info = JSON.parse((cli_package/"package.json").read)
-    package_name = "hap-installer-deveco-cli-runtime"
+    package_name = "app-installer-deveco-cli-runtime"
     (cli_source/"package.json").write JSON.pretty_generate(
       "name"                 => package_name,
       "private"              => true,
@@ -56,7 +56,7 @@ class HapInstaller < Formula
     cli_js = libexec/"node_modules/@deveco/deveco-cli-openharmony-arm64/dist/cli.js"
     chmod 0755, cli_js
 
-    toolchain = libexec/"hap-installer-toolchain"
+    toolchain = libexec/"app-installer-toolchain"
     toolchain_node = toolchain/"node/bin/node"
     toolchain_node.dirname.mkpath
     toolchain_node.write_env_script formula_opt_bin("node")/"node", {}
@@ -92,11 +92,11 @@ class HapInstaller < Formula
     cp sdk_tools/"lib/PermissionDefinitions.json", sdk/"toolchains/lib/PermissionDefinitions.json"
     cp sdk_tools/"lib/PermissionDefinitions.json", sdk/"toolchains/lib/permissionDefinitions.json"
 
-    cp payload/"hap-installer.sh", libexec/"hap-installer.sh"
+    cp payload/"app-installer.sh", libexec/"app-installer.sh"
     cp payload/"sign-hap.cjs", libexec/"sign-hap.cjs"
     cp payload/"prepare-profile.cjs", libexec/"prepare-profile.cjs"
     cp payload/"test-install.cjs", libexec/"test-install.cjs"
-    chmod 0755, libexec/"hap-installer.sh"
+    chmod 0755, libexec/"app-installer.sh"
     chmod 0755, libexec/"sign-hap.cjs"
     cli_wrapper = libexec/"devecocli.sh"
     cli_wrapper.write <<~SH
@@ -112,38 +112,42 @@ class HapInstaller < Formula
       COMMAND_LINE_TOOL_PATH: toolchain,
       DEVECO_CLI_JS:          cli_js,
       PATH:                   "#{formula_opt_bin("node")}:$PATH"
-    (bin/"hap-installer-sign").write_env_script libexec/"sign-hap.cjs",
+    (bin/"app-installer-sign").write_env_script libexec/"sign-hap.cjs",
       DEVECO_CLI_JS: cli_js,
       HAP_SIGN_TOOL: sdk_tools/"lib/hap-sign-tool",
       PATH:          "#{formula_opt_bin("node")}:$PATH"
-    (bin/"hap-installer").write_env_script libexec/"hap-installer.sh",
+    (bin/"app-installer").write_env_script libexec/"app-installer.sh",
       COMMAND_LINE_TOOL_PATH: toolchain,
       DEVECO_CLI_JS:          cli_js,
       HAP_INSTALLER_SIGNER:   libexec/"sign-hap.cjs",
       HAP_SIGN_TOOL:          sdk_tools/"lib/hap-sign-tool",
       PATH:                   "#{formula_opt_bin("node")}:#{sdk}/toolchains:#{sdk_tools}:$PATH"
+    bin.install_symlink bin/"app-installer" => "hap-installer"
+    bin.install_symlink bin/"app-installer-sign" => "hap-installer-sign"
   end
 
   test do
     ENV["HOME"] = testpath/"home"
-    assert_match "Usage: hap-installer", shell_output("#{bin}/hap-installer --help")
-    assert_match "--bundle-id", shell_output("#{bin}/hap-installer --help")
+    assert_match "Usage: app-installer", shell_output("#{bin}/hap-installer --help")
     assert_match "Usage: sign-hap.cjs", shell_output("#{bin}/hap-installer-sign --help")
+    assert_match "Usage: app-installer", shell_output("#{bin}/app-installer --help")
+    assert_match "--bundle-id", shell_output("#{bin}/app-installer --help")
+    assert_match "Usage: sign-hap.cjs", shell_output("#{bin}/app-installer-sign --help")
     assert_match "Authentication commands", shell_output("#{bin}/devecocli auth --help")
     assert_match "COMMAND_LINE_TOOL_PATH=", (bin/"devecocli").read
-    assert_match "--profile <path>", shell_output("#{bin}/hap-installer --help")
-    assert_match 'signed_hap="${signed_hap:-${TMPDIR:-$home/.cache}/hap-installer/signed/$bundle_id.hap}"',
-                 (libexec/"hap-installer.sh").read
-    assert_match "hap-installer-toolchain/sdk/default/openharmony/toolchains", (bin/"hap-installer").read
-    assert_path_exists libexec/"hap-installer-toolchain/sdk/default/openharmony/toolchains/hdc"
+    assert_match "--profile <path>", shell_output("#{bin}/app-installer --help")
+    assert_match 'signed_hap="${signed_hap:-${TMPDIR:-$home/.cache}/app-installer/signed/$bundle_id.hap}"',
+                 (libexec/"app-installer.sh").read
+    assert_match "app-installer-toolchain/sdk/default/openharmony/toolchains", (bin/"app-installer").read
+    assert_path_exists libexec/"app-installer-toolchain/sdk/default/openharmony/toolchains/hdc"
     %w[PermissionDefinitions.json permissionDefinitions.json].each do |name|
-      assert_path_exists libexec/"hap-installer-toolchain/sdk/default/openharmony/toolchains/lib"/name
+      assert_path_exists libexec/"app-installer-toolchain/sdk/default/openharmony/toolchains/lib"/name
     end
     ENV["DEVECO_CLI_JS"] = (libexec/"node_modules/@deveco/deveco-cli-openharmony-arm64/dist/cli.js").to_s
     system formula_opt_bin("node")/"node", "--test", libexec/"test-install.cjs"
     refute_path_exists bin/"hdc"
     assert_match(/else if \(authIsObject\) \{\s+proxyAuth = false;/,
                  (libexec/"node_modules/axios/lib/adapters/http.js").read)
-    assert_match "Usage: hap-installer", shell_output("#{bin}/hap-installer 2>&1", 2)
+    assert_match "Usage: app-installer", shell_output("#{bin}/app-installer 2>&1", 2)
   end
 end

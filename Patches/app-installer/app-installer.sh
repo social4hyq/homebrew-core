@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: hap-installer --hap <unsigned.hap> --bundle-id <id> [options]
+Usage: app-installer --hap <unsigned.hap> --bundle-id <id> [options]
 
 Sign an existing HAP with a local DevEco debug profile, install it over hdc,
 and start its main ability unless --no-start is given.
@@ -43,7 +43,7 @@ while (($#)); do
   case "$1" in
     --hap|--bundle-id|--app-name|--module|--ability|--project-dir|--signed-hap|--device|--profile|--hdc)
       if (($# < 2)) || [[ -z "$2" || "$2" == --* ]]; then
-        printf 'hap-installer: missing value for %s\n' "$1" >&2; usage >&2; exit 2
+        printf 'app-installer: missing value for %s\n' "$1" >&2; usage >&2; exit 2
       fi
       key="$1"; value="$2"; shift 2
       case "$key" in
@@ -61,21 +61,21 @@ while (($#)); do
       ;;
     --no-start) start_app=0; ability=; shift ;;
     -h|--help) usage; exit 0 ;;
-    *) printf 'hap-installer: unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
+    *) printf 'app-installer: unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
   esac
 done
 
 if [[ -z "$hap" || -z "$bundle_id" ]]; then usage >&2; exit 2; fi
 if [[ ! "$bundle_id" =~ ^[A-Za-z][A-Za-z0-9_.]*$ || ! "$module" =~ ^[A-Za-z][A-Za-z0-9_.-]*$ ]]; then
-  printf '%s\n' 'hap-installer: invalid bundle ID or module name' >&2; exit 2
+  printf '%s\n' 'app-installer: invalid bundle ID or module name' >&2; exit 2
 fi
 if [[ -n "$ability" && ! "$ability" =~ ^[A-Za-z][A-Za-z0-9_.-]*$ ]]; then
-  printf '%s\n' 'hap-installer: invalid ability name' >&2; exit 2
+  printf '%s\n' 'app-installer: invalid ability name' >&2; exit 2
 fi
-if [[ ! -f "$hap" ]]; then printf 'hap-installer: HAP not found: %s\n' "$hap" >&2; exit 1; fi
+if [[ ! -f "$hap" ]]; then printf 'app-installer: HAP not found: %s\n' "$hap" >&2; exit 1; fi
 for tool in node unzip "$hdc_bin" "$HAP_INSTALLER_SIGNER" "$HAP_SIGN_TOOL"; do
   if ! command -v "$tool" >/dev/null 2>&1 && [[ ! -x "$tool" ]]; then
-    printf 'hap-installer: required command not found: %s\n' "$tool" >&2; exit 1
+    printf 'app-installer: required command not found: %s\n' "$tool" >&2; exit 1
   fi
 done
 
@@ -96,9 +96,9 @@ if [[ -z "$device" ]]; then
   fi
   count=$(printf '%s\n' "$targets" | awk 'NF' | wc -l | tr -d ' ')
   if ((count == 0)); then
-    printf '%s\n' 'hap-installer: no connected hdc target; connect and unlock the device, or pass --device.' >&2; exit 1
+    printf '%s\n' 'app-installer: no connected hdc target; connect and unlock the device, or pass --device.' >&2; exit 1
   elif ((count > 1)); then
-    printf 'hap-installer: %s hdc targets attached; pass --device <connect-key>:\n' "$count" >&2
+    printf 'app-installer: %s hdc targets attached; pass --device <connect-key>:\n' "$count" >&2
     printf '%s\n' "$targets" | sed 's/^/  /' >&2
     exit 2
   fi
@@ -108,38 +108,38 @@ fi
 home="${HOME:?HOME must be set}"
 app_name="${app_name:-${bundle_id##*.}}"
 project_dir="${project_dir:-$home/.hap-installer/projects/$bundle_id}"
-signed_hap="${signed_hap:-${TMPDIR:-$home/.cache}/hap-installer/signed/$bundle_id.hap}"
+signed_hap="${signed_hap:-${TMPDIR:-$home/.cache}/app-installer/signed/$bundle_id.hap}"
 profile="${profile_arg:-$project_dir/build-profile.json5}"
 if [[ "$hap" -ef "$signed_hap" ]]; then
-  printf '%s\n' 'hap-installer: input and output HAP paths must differ.' >&2; exit 2
+  printf '%s\n' 'app-installer: input and output HAP paths must differ.' >&2; exit 2
 fi
 
 if [[ -n "$profile_arg" ]]; then
   # A caller-supplied profile (e.g. one carrying ACLs) is used as is: running
   # `signature generate` here would replace it with an auto-signed profile
   # that lacks those permissions.
-  if [[ ! -f "$profile" ]]; then printf 'hap-installer: signing profile not found: %s\n' "$profile" >&2; exit 1; fi
+  if [[ ! -f "$profile" ]]; then printf 'app-installer: signing profile not found: %s\n' "$profile" >&2; exit 1; fi
   printf '%s\n' "Signing with the given profile: $profile"
 else
   status_output=$(devecocli auth status 2>&1) || {
-    printf '%s\n' 'hap-installer: could not check Huawei Developer login status.' >&2; exit 1
+    printf '%s\n' 'app-installer: could not check Huawei Developer login status.' >&2; exit 1
   }
   case "$status_output" in
     *'Not logged in'*|*'未登录'*)
       printf '%s\n' 'A Huawei Developer account login is required; opening DevEco CLI login.'
       devecocli auth login
       status_output=$(devecocli auth status 2>&1) || {
-        printf '%s\n' 'hap-installer: could not verify Huawei Developer login.' >&2; exit 1
+        printf '%s\n' 'app-installer: could not verify Huawei Developer login.' >&2; exit 1
       }
-      case "$status_output" in *'Not logged in'*|*'未登录'*) printf '%s\n' 'hap-installer: login was not completed.' >&2; exit 1 ;; esac
+      case "$status_output" in *'Not logged in'*|*'未登录'*) printf '%s\n' 'app-installer: login was not completed.' >&2; exit 1 ;; esac
       ;;
   esac
   if [[ ! -f "$project_dir/AppScope/app.json5" ]]; then
-    if [[ -e "$project_dir" ]]; then printf 'hap-installer: incomplete signing project: %s\n' "$project_dir" >&2; exit 1; fi
+    if [[ -e "$project_dir" ]]; then printf 'app-installer: incomplete signing project: %s\n' "$project_dir" >&2; exit 1; fi
     mkdir -p "$(dirname "$project_dir")"
     devecocli create --project-path "$project_dir" --app-name "$app_name" --bundle-name "$bundle_id"
   fi
-  if [[ ! -f "$profile" ]]; then printf 'hap-installer: missing signing profile: %s\n' "$profile" >&2; exit 1; fi
+  if [[ ! -f "$profile" ]]; then printf 'app-installer: missing signing profile: %s\n' "$profile" >&2; exit 1; fi
 
   node "$prepare" "$hap" "$bundle_id" "$project_dir"
 
@@ -158,8 +158,8 @@ hdc_cmd() {
 }
 tmp_parent="${TMPDIR:-$home/.cache}"
 mkdir -p "$tmp_parent"
-parts=$(mktemp -d "$tmp_parent/hap-installer.XXXXXX")
-remote="hap-installer-$$"
+parts=$(mktemp -d "$tmp_parent/app-installer.XXXXXX")
+remote="app-installer-$$"
 cleanup() {
   hdc_cmd shell "rm -f /data/local/tmp/$remote-part-* /data/local/tmp/$remote.hap" >/dev/null 2>&1 || true
   rm -rf "$parts"
@@ -184,7 +184,7 @@ if ! install_output=$(hdc_cmd shell "bm install -p /data/local/tmp/$remote.hap" 
 fi
 printf '%s\n' "$install_output"
 if ! printf '%s\n' "$install_output" | grep -qiE 'install bundle successfully|^success'; then
-  printf '%s\n' 'hap-installer: device did not report successful installation.' >&2; exit 1
+  printf '%s\n' 'app-installer: device did not report successful installation.' >&2; exit 1
 fi
 if ((start_app)); then
   start_output=$(hdc_cmd shell "aa start -a $ability -b $bundle_id -m $module" 2>&1) || {
