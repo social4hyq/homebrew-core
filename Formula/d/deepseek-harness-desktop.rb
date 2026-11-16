@@ -5,7 +5,7 @@ class DeepseekHarnessDesktop < Formula
   sha256 "bf6d668e52a26edf98aa2ef7960e240c8d9afcefbad2b09887a2cb1e14001dd5"
   license :cannot_represent
 
-  revision 2
+  revision 3
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -17,10 +17,10 @@ class DeepseekHarnessDesktop < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "243f69fd70892a992e456bcaae99f1a816b365d4b8412fa94772fe7b5b379218"
   end
 
-  depends_on "node" => :build
   depends_on "curl"
   depends_on "deepseek-harness"
   depends_on "hap-installer"
+  depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "zip"
 
@@ -120,9 +120,8 @@ class DeepseekHarnessDesktop < Formula
       DSH_DESKTOP_MODULE_ACL:     opt_pkgshare/"module-acl.json",
       DSH_DESKTOP_DSH_BIN:        formula_opt_bin("deepseek-harness")/"dsh",
       DSH_DESKTOP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
-      DSH_DESKTOP_NODE_DEFAULT:   formula_opt_bin("node")/"node",
       DSH_DESKTOP_VERSION:        version.to_s,
-      PATH:                       "#{formula_opt_bin("deepseek-harness")}:$PATH"
+      PATH:                       "#{formula_opt_bin("node")}:#{formula_opt_bin("deepseek-harness")}:$PATH"
   end
 
   def caveats
@@ -148,60 +147,31 @@ class DeepseekHarnessDesktop < Formula
     fake_bin = testpath/"bin"
     fake_bin.mkpath
     injected_copy = testpath/"injected.hap"
-    signer_args = testpath/"hap-installer-sign-args"
-    hdc_log = testpath/"hdc-log"
+    installer_args = testpath/"hap-installer-args"
 
-    fake_devecocli = fake_bin/"devecocli"
-    fake_devecocli.write <<~SH
+    (fake_bin/"devecocli").write "#!/bin/sh\nexit 99\n"
+    chmod 0755, fake_bin/"devecocli"
+    fake_installer = fake_bin/"hap-installer"
+    fake_installer.write <<~SH
       #!/bin/sh
-      case "$1" in
-        auth|signature) exit 0 ;;
-        create)
-          while [ $# -gt 0 ]; do
-            if [ "$1" = "--project-path" ]; then project="$2"; fi
-            shift
-          done
-          mkdir -p "$project/entry/src/main"
-          printf '{\\n  "module": {\\n    "name": "entry",\\n    "type": "entry"\\n  }\\n}\\n' > "$project/entry/src/main/module.json5"
-          printf '{"app":{"signingConfigs":[]}}\\n' > "$project/build-profile.json5"
-          ;;
-      esac
-    SH
-    chmod 0755, fake_devecocli
-
-    fake_signer = fake_bin/"hap-installer-sign"
-    fake_signer.write <<~SH
-      #!/bin/sh
-      printf '%s\\n' "$@" > #{signer_args}
-      out=""
+      printf '%s\\n' "$@" > #{installer_args}
       while [ $# -gt 0 ]; do
         case "$1" in
           --hap) cp "$2" #{injected_copy}; shift 2 ;;
-          --output) out="$2"; shift 2 ;;
           *) shift ;;
         esac
       done
-      printf 'signed' > "$out"
     SH
-    chmod 0755, fake_signer
-
+    chmod 0755, fake_installer
     fake_hdc = fake_bin/"hdc"
-    fake_hdc.write <<~SH
-      #!/bin/sh
-      printf '%s\\n' "$@" >> #{hdc_log}
-      case "$*" in
-        *"list targets"*) printf '%s\\n' "127.0.0.1:34561 Connected" ;;
-        *"bm install"*) printf '%s\\n' "install bundle successfully" ;;
-      esac
-    SH
+    fake_hdc.write "#!/bin/sh\nexit 99\n"
     chmod 0755, fake_hdc
 
     ENV.prepend_path "PATH", fake_bin
     ENV.prepend_path "PATH", formula_opt_bin("node").to_s
     ENV["DSH_DESKTOP_HDC"] = (fake_bin/"hdc").to_s
-    ENV["DSH_DESKTOP_CLT_CACHE"] = (testpath/"clt-cache").to_s
 
-    assert_match "installed and started", shell_output("#{bin}/deepseek-harness-desktop install")
+    assert_match "installed", shell_output("#{bin}/deepseek-harness-desktop install")
     config = JSON.parse(shell_output("unzip -p #{injected_copy} resources/resfile/resources/app/config.json"))
     assert_operator config.fetch("port"), :>, 0
     refute_empty config.fetch("dsh")
@@ -213,11 +183,14 @@ class DeepseekHarnessDesktop < Formula
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
                  acl_permissions.sort
-    project_dir = Pathname.new(Dir.home)/".hap-installer/projects/com.social4hyq.deepseekharness"
-    assert_match "CUSTOM_SANDBOX", (project_dir/"entry/src/main/module.json5").read
-    signer = signer_args.read.lines(chomp: true)
-    assert_equal (project_dir/"build-profile.json5").to_s, signer[signer.index("--profile") + 1]
-    assert_match "aa start -a EntryAbility -b com.social4hyq.deepseekharness -m electron", hdc_log.read
+    installer = installer_args.read.lines(chomp: true)
+    assert_equal "com.social4hyq.deepseekharness", installer[installer.index("--bundle-id") + 1]
+    assert_equal "electron", installer[installer.index("--module") + 1]
+    assert_equal (fake_bin/"hdc").to_s, installer[installer.index("--hdc") + 1]
+    refute_path_exists Pathname.new(Dir.home)/".hap-installer"
+    assert_match "installed", shell_output("#{bin}/deepseek-harness-desktop install --device chosen")
+    installer = installer_args.read.lines(chomp: true)
+    assert_equal "chosen", installer[installer.index("--device") + 1]
 
     assert_match "serving at", shell_output("#{bin}/deepseek-harness-desktop serve")
     assert_match "healthy", shell_output("#{bin}/deepseek-harness-desktop status")
