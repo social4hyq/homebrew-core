@@ -5,7 +5,7 @@ class DeepseekHarnessApp < Formula
   sha256 "bf6d668e52a26edf98aa2ef7960e240c8d9afcefbad2b09887a2cb1e14001dd5"
   license :cannot_represent
 
-  revision 6
+  revision 7
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -13,8 +13,8 @@ class DeepseekHarnessApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.3-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a66e92efd7f277eeb09f092015e730fb1abab60a4ebe69e75f954a95d7a2844b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.3-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "10a17c8d1f276d6e3f75f3bb91dbe0d96790304ba5513ab7eb4a79eb1088fbeb"
   end
 
   depends_on "app-installer"
@@ -91,7 +91,12 @@ class DeepseekHarnessApp < Formula
       "          return false;",
       "        }",
       "        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));",
-      "        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
+      "        // Hide on the next tick: hiding while the close is still being",
+      "        // processed makes the framework tear the ability down and relaunch",
+      "        // the app (new pid) instead of just hiding it.",
+      "        setTimeout(() => {",
+      "          Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
+      "        }, 50);",
       "        return false;",
       "      });",
       "    } catch (exception) {",
