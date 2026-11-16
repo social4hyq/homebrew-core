@@ -5,6 +5,7 @@ const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
+const { isServerUrl, createUrlCollector } = require('./startup.cjs');
 
 let config = { port: 0 };
 try {
@@ -26,14 +27,7 @@ let serveSpawnError = '';
 let serverUrl = '';
 
 function validServerUrl(value) {
-  if (typeof value !== 'string' || value.length === 0) return false;
-  try {
-    const url = new URL(value);
-    return url.protocol === 'http:' && url.hostname === '127.0.0.1' &&
-      Number(url.port) === config.port && url.searchParams.has('token');
-  } catch {
-    return false;
-  }
+  return isServerUrl(value, config.port);
 }
 
 function readServerUrl() {
@@ -93,6 +87,9 @@ function spawnServer() {
     else delete env[envKey];
   }
   env.TMPDIR = app.getPath('temp');
+  if (!env.NODE_COMPILE_CACHE && !env.NODE_DISABLE_COMPILE_CACHE) {
+    env.NODE_COMPILE_CACHE = path.join(app.getPath('userData'), 'node-compile-cache');
+  }
 
   let logFd;
   const logPath = serveLogPath();
@@ -109,21 +106,25 @@ function spawnServer() {
     serveChild = spawn(config.dsh, ['web', '--host', '127.0.0.1', '--no-open', '--port', String(config.port)], {
       env,
       cwd: typeof host.home === 'string' && host.home.length > 0 ? host.home : undefined,
-      stdio: ['ignore', 'pipe', logFd === undefined ? 'ignore' : logFd],
+      stdio: ['ignore', 'pipe', 'pipe'],
     });
   } catch (error) {
+    if (logFd !== undefined) { fs.closeSync(logFd); logFd = undefined; }
     serveSpawnError = String(error);
     console.error('DSH_DESKTOP spawn failed: ' + serveSpawnError);
     return;
   }
 
-  let output = '';
-  serveChild.stdout.on('data', (chunk) => {
-    const text = chunk.toString();
-    if (logFd !== undefined) fs.writeSync(logFd, text);
-    output = (output + text).slice(-16384);
-    const match = output.match(/https?:\/\/\S+/);
-    if (match && validServerUrl(match[0])) rememberServerUrl(match[0]);
+  const stdoutUrls = createUrlCollector(config.port, rememberServerUrl);
+  const stderrUrls = createUrlCollector(config.port, rememberServerUrl);
+  for (const [stream, collect] of [[serveChild.stdout, stdoutUrls], [serveChild.stderr, stderrUrls]]) {
+    stream.on('data', (chunk) => {
+      if (logFd !== undefined) fs.writeSync(logFd, chunk);
+      collect(chunk);
+    });
+  }
+  serveChild.once('close', () => {
+    if (logFd !== undefined) { fs.closeSync(logFd); logFd = undefined; }
   });
   serveChild.on('error', (error) => {
     serveSpawnError = String(error);
@@ -170,6 +171,7 @@ async function drive(win) {
 
 app.whenReady().then(() => {
   const win = new BrowserWindow({
+    backgroundColor: "#11141b",
     width: 1280,
     height: 800,
     autoHideMenuBar: true,

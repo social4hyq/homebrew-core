@@ -1,11 +1,11 @@
-class DeepseekHarnessDesktop < Formula
+class DeepseekHarnessApp < Formula
   desc "Desktop shell for the DeepSeek Harness agent (Electron window on local dsh web)"
   homepage "https://github.com/deepseek-ai/deepseek-harness"
   url "https://github.com/deepseek-ai/deepseek-harness/archive/refs/tags/dsh-v0.2.2-rc.3.tar.gz"
   sha256 "bf6d668e52a26edf98aa2ef7960e240c8d9afcefbad2b09887a2cb1e14001dd5"
   license :cannot_represent
 
-  revision 3
+  revision 4
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -13,13 +13,13 @@ class DeepseekHarnessDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-desktop-v0.2.2-rc.3-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "53dc2c4da9098e2b619ca8b8a6fef6e3b7d5b78fd30ba4ea5152cfac93383a55"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.3-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6030d62f4b580b2e983f740e10d6014c4a672d5a604e8f2f263053fa6140b7a9"
   end
 
+  depends_on "app-installer"
   depends_on "curl"
   depends_on "deepseek-harness"
-  depends_on "hap-installer"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "zip"
@@ -39,16 +39,19 @@ class DeepseekHarnessDesktop < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    cp tap_root/"Patches/deepseek-harness-desktop/app/main.cjs", app
-    cp tap_root/"Patches/deepseek-harness-desktop/app/package.json", app
-    cp tap_root/"Patches/deepseek-harness-desktop/app/config.json", app
-    cp tap_root/"Patches/deepseek-harness-desktop/app/waiting.html", app
+    cp tap_root/"Patches/deepseek-harness-app/app/main.cjs", app
+    cp tap_root/"Patches/deepseek-harness-app/app/startup.cjs", app
+    cp tap_root/"Patches/deepseek-harness-app/app/package.json", app
+    cp tap_root/"Patches/deepseek-harness-app/app/config.json", app
+    cp tap_root/"Patches/deepseek-harness-app/app/waiting.html", app
+
+    cp tap_root/"Patches/deepseek-harness-app/assets/icon.png", app/"app-icon.png"
 
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.deepseekharness"'
     inreplace shell/"AppScope/app.json5", '"vendor": "example"', '"vendor": "social4hyq"'
     %w[app_icon.png startIcon.png].each do |name|
-      cp tap_root/"Patches/deepseek-harness-desktop/assets/icon.png", shell/"AppScope/resources/base/media"/name
+      cp tap_root/"Patches/deepseek-harness-app/assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
     (shell.glob("AppScope/resources/*/element/string.json") +
      shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
@@ -74,7 +77,7 @@ class DeepseekHarnessDesktop < Formula
 
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "deepseek-harness-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES"
+      odie "deepseek-harness-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES"
     end
 
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
@@ -107,14 +110,14 @@ class DeepseekHarnessDesktop < Formula
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
     (pkgshare/"install-desktop.sh").write(
-      (tap_root/"Patches/deepseek-harness-desktop/scripts/install-desktop.sh").read,
+      (tap_root/"Patches/deepseek-harness-app/scripts/install-desktop.sh").read,
     )
     chmod 0755, pkgshare/"install-desktop.sh"
     (libexec/"deepseek-harness-desktop.sh").write(
-      (tap_root/"Patches/deepseek-harness-desktop/scripts/deepseek-harness-desktop.sh").read,
+      (tap_root/"Patches/deepseek-harness-app/scripts/deepseek-harness-desktop.sh").read,
     )
     chmod 0755, libexec/"deepseek-harness-desktop.sh"
-    (bin/"deepseek-harness-desktop").write_env_script opt_libexec/"deepseek-harness-desktop.sh",
+    (bin/"dsh-app").write_env_script opt_libexec/"deepseek-harness-desktop.sh",
       DSH_DESKTOP_UNSIGNED_HAP:   opt_libexec/"deepseek-harness-desktop-unsigned.hap",
       DSH_DESKTOP_INSTALL_SCRIPT: opt_pkgshare/"install-desktop.sh",
       DSH_DESKTOP_MODULE_ACL:     opt_pkgshare/"module-acl.json",
@@ -122,17 +125,20 @@ class DeepseekHarnessDesktop < Formula
       DSH_DESKTOP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
       DSH_DESKTOP_VERSION:        version.to_s,
       PATH:                       "#{formula_opt_bin("node")}:#{formula_opt_bin("deepseek-harness")}:$PATH"
+    pkgshare.mkpath
+    cp tap_root/"Patches/deepseek-harness-app/tests/test-startup.cjs", pkgshare/"test-startup.cjs"
+    bin.install_symlink bin/"dsh-app" => "deepseek-harness-desktop"
   end
 
   def caveats
     <<~EOS
       The desktop HAP is unsigned in the bottle. Connect and unlock the device,
-      then run `deepseek-harness-desktop install`.
+      then run `dsh-app install`.
 
       The shell starts `dsh web` itself and loads the authenticated URL printed
       by that process. This needs weak-sandbox ACLs, granted through a local
-      debug profile generated by hap-installer. Closing the shell stops only
-      the backend it started; a CLI-managed `deepseek-harness-desktop serve`
+      debug profile generated by app-installer. Closing the shell stops only
+      the backend it started; a CLI-managed `dsh-app serve`
       instance remains available to other clients.
 
       The formula follows the deepseek-harness upstream version. If the CLI and
@@ -142,7 +148,8 @@ class DeepseekHarnessDesktop < Formula
 
   test do
     ENV["HOME"] = testpath/"home"
-    assert_match "Usage: deepseek-harness-desktop", shell_output("#{bin}/deepseek-harness-desktop --help")
+    assert_match "Usage: dsh-app", shell_output("#{bin}/deepseek-harness-desktop --help")
+    assert_match "Usage: dsh-app", shell_output("#{bin}/dsh-app --help")
 
     fake_bin = testpath/"bin"
     fake_bin.mkpath
@@ -151,7 +158,7 @@ class DeepseekHarnessDesktop < Formula
 
     (fake_bin/"devecocli").write "#!/bin/sh\nexit 99\n"
     chmod 0755, fake_bin/"devecocli"
-    fake_installer = fake_bin/"hap-installer"
+    fake_installer = fake_bin/"app-installer"
     fake_installer.write <<~SH
       #!/bin/sh
       printf '%s\\n' "$@" > #{installer_args}
@@ -171,7 +178,7 @@ class DeepseekHarnessDesktop < Formula
     ENV.prepend_path "PATH", formula_opt_bin("node").to_s
     ENV["DSH_DESKTOP_HDC"] = (fake_bin/"hdc").to_s
 
-    assert_match "installed", shell_output("#{bin}/deepseek-harness-desktop install")
+    assert_match "installed", shell_output("#{bin}/dsh-app install")
     config = JSON.parse(shell_output("unzip -p #{injected_copy} resources/resfile/resources/app/config.json"))
     assert_operator config.fetch("port"), :>, 0
     refute_empty config.fetch("dsh")
@@ -188,13 +195,13 @@ class DeepseekHarnessDesktop < Formula
     assert_equal "electron", installer[installer.index("--module") + 1]
     assert_equal (fake_bin/"hdc").to_s, installer[installer.index("--hdc") + 1]
     refute_path_exists Pathname.new(Dir.home)/".hap-installer"
-    assert_match "installed", shell_output("#{bin}/deepseek-harness-desktop install --device chosen")
+    assert_match "installed", shell_output("#{bin}/dsh-app install --device chosen")
     installer = installer_args.read.lines(chomp: true)
     assert_equal "chosen", installer[installer.index("--device") + 1]
 
-    assert_match "serving at", shell_output("#{bin}/deepseek-harness-desktop serve")
-    assert_match "healthy", shell_output("#{bin}/deepseek-harness-desktop status")
-    assert_match "stopped", shell_output("#{bin}/deepseek-harness-desktop stop")
+    assert_match "serving at", shell_output("#{bin}/dsh-app serve")
+    assert_match "healthy", shell_output("#{bin}/dsh-app status")
+    assert_match "stopped", shell_output("#{bin}/dsh-app stop")
 
     serve_only_args = testpath/"hdc-start-args"
     fake_hdc.delete
@@ -203,11 +210,11 @@ class DeepseekHarnessDesktop < Formula
       printf '%s\\n' "$@" > #{serve_only_args}
     SH
     chmod 0755, fake_hdc
-    assert_match "serving at", shell_output("#{bin}/deepseek-harness-desktop start --serve-only")
-    assert_match "opened", shell_output("#{bin}/deepseek-harness-desktop start")
+    assert_match "serving at", shell_output("#{bin}/dsh-app start --serve-only")
+    assert_match "opened", shell_output("#{bin}/dsh-app start")
     assert_equal %w[shell aa start -a EntryAbility -b com.social4hyq.deepseekharness -m electron],
                  serve_only_args.read.lines(chomp: true)
-    assert_match "stopped", shell_output("#{bin}/deepseek-harness-desktop stop")
+    assert_match "stopped", shell_output("#{bin}/dsh-app stop")
 
     hap = libexec/"deepseek-harness-desktop-unsigned.hap"
     assert_path_exists hap
@@ -217,6 +224,10 @@ class DeepseekHarnessDesktop < Formula
     assert_match "libs/arm64-v8a/libelectron.so", listing
     assert_match "resources/resfile/resources/app/main.cjs", listing
     assert_match "resources/resfile/resources/app/waiting.html", listing
+    helper = testpath/"startup.cjs"
+    helper.write shell_output("unzip -p #{hap} resources/resfile/resources/app/startup.cjs")
+    ENV["DSH_APP_STARTUP_HELPER"] = helper
+    system "node", "--test", pkgshare/"test-startup.cjs"
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
     assert_equal 0, placeholder.fetch("port")
     package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))

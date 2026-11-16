@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Stage application-specific config; hap-installer owns signing and deployment.
+# Stage application-specific config; app-installer owns signing and deployment.
 set -euo pipefail
 
 usage() {
@@ -26,7 +26,7 @@ while (($#)); do
   esac
 done
 [[ -f "$hap" && -f "$config" ]] || { usage >&2; exit 2; }
-for tool in node zip hap-installer; do
+for tool in node zip app-installer; do
   command -v "$tool" >/dev/null || { printf 'install-desktop: command not found: %s\n' "$tool" >&2; exit 1; }
 done
 hdc="${DSH_DESKTOP_HDC:-${DSH_DESKTOP_HDC_DEFAULT:-hdc}}"
@@ -63,5 +63,5 @@ fi
 (cd "$stage" && zip -q -X "$injected" "${entries[@]}")
 args=(--hap "$injected" --bundle-id com.social4hyq.deepseekharness --app-name DeepSeekHarnessDesktop --module electron --ability EntryAbility --hdc "$hdc")
 if [[ -n "$device" ]]; then args+=(--device "$device"); fi
-hap-installer "${args[@]}"
+app-installer "${args[@]}"
 printf 'installed com.social4hyq.deepseekharness\n'
