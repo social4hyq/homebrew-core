@@ -10,18 +10,13 @@ class ZcodeDesktop < Formula
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
-  revision 4
+  revision 5
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
     strategy :json do |json|
       json["version"]
     end
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v3.18.2-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0dc8e93b1f93436a54ee3e8d2e8ad7609a8968ce1464955f81cc4dcdb2e82bd2"
   end
 
   depends_on "node" => :build
@@ -229,17 +224,13 @@ class ZcodeDesktop < Formula
       projectStorageHostId pinned to "local". If that copy cannot be prepared it
       falls back to `zcode --web` and logs the warning.
 
-      Account login: the dialog's "browser authorization" button uses the
-      account web-remote callback, which rejects loopback origins (Z.AI answers
-      "登录回调地址无效，请重新从 ZCode 桌面端发起登录"). Sign in with
-      `zcode-desktop login` instead: it runs the server-side OAuth flow (the
-      same one `zcode login` uses), prints the authorize URL to open, stores
-      the account in ~/.zcode/v2 and restarts the managed server. Afterwards
-      use "API key" -> "skip for now" in the dialog. OAuth pages for z.ai and
-      bigmodel.cn are kept in the app window instead of the system browser,
-      and the HAP registers the zcode:// scheme so the browser's OAuth handoff
-      launches the shell instead of OHOS's "no application can open this"
-      dialog.
+      Account login: the workbench served on loopback signs in through the
+      server-side OAuth flow (patched zcode): the login dialog's "browser
+      authorization" button opens the authorize URL in the system browser and
+      the server polls for the token. `zcode-desktop login [zai|bigmodel]` runs
+      the same flow from the terminal and restarts the managed server. The HAP
+      registers the zcode:// scheme so a browser handoff launches the shell
+      instead of OHOS's "no application can open this" dialog.
 
       The default install carries the two kernel ACLs (JIT/WebAssembly for the
       renderer) and READ_PASTEBOARD; `zcode-desktop install --no-acl` installs
