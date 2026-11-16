@@ -66,6 +66,7 @@ async function drive(win) {
     return;
   }
   let waiting = false;
+  const fastPollUntil = Date.now() + 30000;
   for (;;) {
     if (win.isDestroyed()) return;
     if (await serverUp(2000)) {
@@ -76,7 +77,8 @@ async function drive(win) {
       waiting = true;
       await showWaiting(win, 'waiting');
     }
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    // Detect startup promptly, then back off if the host service stays down.
+    await new Promise((resolve) => setTimeout(resolve, Date.now() < fastPollUntil ? 250 : 3000));
   }
 }
 
@@ -87,9 +89,7 @@ app.whenReady().then(() => {
     autoHideMenuBar: true,
     webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false },
   });
-  // electron-ohos 37 aborts the browser process on setWindowButtonVisibility
-  // (SIGABRT in CrBrowserMain); the v37 shell shows the system window buttons
-  // on its own, so the v34-era call is not needed.
+  // The OHOS shell provides the system window buttons itself.
   // Links the workbench opens in a new window: loopback stays in the shell,
   // external URLs go to the system browser (the shell has no second window).
   win.webContents.setWindowOpenHandler(({ url }) => {

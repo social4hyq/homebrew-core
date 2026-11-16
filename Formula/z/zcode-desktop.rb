@@ -7,10 +7,10 @@ class ZcodeDesktop < Formula
   url "https://github.com/zai-org/ZCode.git",
       revision: "fec975905a2abd4c07e35c40d51fa097a2258ec9"
   version "3.18.2"
-  # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
-  # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
+  # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
+  # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 6
+  revision 7
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -20,8 +20,8 @@ class ZcodeDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v3.18.2-r8"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d75332a0212d5ceb52bb18f3c8b44d463896306bef536a1f06465498c3ee32c7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v3.18.2-r9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1ecf923edac51326e754b394ac6fafbf479fcbb2d93b55ead956247dab53c927"
   end
 
   depends_on "node" => :build
@@ -47,11 +47,9 @@ class ZcodeDesktop < Formula
     Patches/zcode-desktop/scripts/zcode-desktop.sh
   ].freeze
 
-  # openharmony-sig/electron PC(2in1) prebuilt, v37 line (Chromium 138); see
-  # multica.rb for the mirror/provenance notes.
   resource "electron-ohos" do
-    url "https://github.com/social4hyq/homebrew-core/releases/download/electron-ohos-v37.2.1-20260429.5/v37.2.1-openharmony-arm64.zip"
-    sha256 "2a1421f6219ac760092aecb4a82bf5ab49b19918f23edec5a9420d1b41eea9e8"
+    url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
+    sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
   end
 
   def install
@@ -63,7 +61,7 @@ class ZcodeDesktop < Formula
 
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
-    system "tar", "-xzf", buildpath/"libelectron_138.tar.gz", "-C", buildpath
+    system "tar", "-xzf", buildpath/"libelectron_144.tar.gz", "-C", buildpath
     shell = buildpath/"libelectron/ohos_hap"
 
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
@@ -94,10 +92,8 @@ class ZcodeDesktop < Formula
       file.write JSON.pretty_generate(strings) + "\n"
     end
 
-    # The v37 template embeds a signingConfigs block pointing at the vendor's
-    # own certificate paths and targets 5.0.5(17); drop the signing material and
-    # pin the target to the version this build image is known to build. The
-    # file is strict JSON in this version, so rewrite it instead of inreplace.
+    # Remove template signing settings and select the SDK supported by the
+    # shared HAP build toolchain. This profile is strict JSON.
     profile = JSON.parse((shell/"build-profile.json5").read)
     profile.fetch("app").fetch("products").each do |product|
       product.delete("signingConfig")
@@ -107,13 +103,13 @@ class ZcodeDesktop < Formula
     profile_file = shell/"build-profile.json5"
     rm profile_file
     profile_file.write JSON.pretty_generate(profile) + "\n"
-    inreplace shell/"electron/src/main/module.json5", "    \"mainElement\": \"EntryAbility\",\n",
-              "    \"mainElement\": \"EntryAbility\",\n    \"extractNativeLibs\": true,\n"
+    inreplace shell/"electron/src/main/module.json5", '"mainElement": "EntryAbility",',
+              '"mainElement": "EntryAbility", "extractNativeLibs": true,'
 
     # The shell only talks to the host service over loopback. Restricted
     # permissions (JIT, pasteboard) are added to the install-time ACL variant
     # instead of every install; see module-acl.json below.
-    inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\n    \],/m,
+    inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\r?\n    \],/m,
               <<~JSON5.chomp
                 "requestPermissions": [
                       { "name": "ohos.permission.INTERNET" },
