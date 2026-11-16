@@ -347,7 +347,9 @@ class MulticaDesktop < Formula
       (testpath/"build-profile.json5").write "{}"
       shell_output("#{desktop_installer} --acl-profile #{testpath}/build-profile.json5")
       # The ACL variant goes through hap-installer too, with the given profile.
-      assert_match "--profile #{testpath}/build-profile.json5", installer_args.read
+      # installer_args holds one argument per line.
+      acl_args = installer_args.read.lines(chomp: true)
+      assert_equal "#{testpath}/build-profile.json5", acl_args[acl_args.index("--profile") + 1]
       refute_path_exists signer_args
       signed_module = JSON.parse(shell_output("unzip -p #{injected_hap} module.json"))
       signed_permissions = signed_module.fetch("module").fetch("requestPermissions").map do |permission|
