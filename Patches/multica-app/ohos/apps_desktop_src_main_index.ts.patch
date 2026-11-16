@@ -1,10 +1,9 @@
-OHOS: point HOME at the app's writable files directory, and skip the login-shell
-PATH probe. os.homedir() resolves to the user's home, which the app sandbox
-cannot write; fix-path forks the login shell from the Node main thread, which
-deadlocks libuv on OHOS before the first window is created.
+OHOS: point HOME at the app writable files directory, skip the login-shell
+PATH probe, and create the status bar item before the first window so closing
+it hides to the tray instead of exiting.
 
 diff --git a/apps/desktop/src/main/index.ts b/apps/desktop/src/main/index.ts
-index 668f77d..2d56046 100644
+index 668f77d..96946d7 100644
 --- a/apps/desktop/src/main/index.ts
 +++ b/apps/desktop/src/main/index.ts
 @@ -10,6 +10,11 @@ import {
@@ -19,7 +18,15 @@ index 668f77d..2d56046 100644
  import { pathToFileURL } from "url";
  import { electronApp, optimizer, is } from "@electron-toolkit/utils";
  import fixPath from "fix-path";
-@@ -138,7 +143,9 @@ const BUNDLED_ICON_PATH = join(__dirname, "../../resources/icon.png").replace(
+@@ -30,6 +35,7 @@ import { installNavigationGestures } from "./navigation-gestures";
+ import { installNavigationGuard } from "./navigation-guard";
+ import { installWindowForegroundEvents, windowForeground } from "./window-foreground";
+ import { createRendererWebPreferences } from "./renderer-web-preferences";
++import { isTrayQuitting, setupOhosTray } from "./ohos-tray";
+ import { getAppVersion } from "./app-version";
+ import { loadRuntimeConfig } from "./runtime-config-loader";
+ import type { RuntimeConfigResult } from "../shared/runtime-config";
+@@ -138,7 +144,9 @@ const BUNDLED_ICON_PATH = join(__dirname, "../../resources/icon.png").replace(
  // before any child_process.spawn / execFile call in the main process —
  // ES module imports are hoisted, so this block executes before createMainWindow
  // or any daemon-manager spawn.
@@ -30,3 +37,52 @@ index 668f77d..2d56046 100644
    fixPath();
    // Fallback: ensure common install locations are on PATH when fix-path came
    // up short (broken shell rc, non-interactive $SHELL, missing entries).
+@@ -164,6 +172,8 @@ function freezeBreadcrumbPath(): string {
+ }
+ 
+ const mainWindows = new MainWindowRegistry<BrowserWindow>();
++// Kept in step with setupOhosTray(): true only when the status bar item exists.
++let trayReady = false;
+ const issueWindows = new Set<BrowserWindow>();
+ const authSessionCoordinator = new AuthSessionCoordinator<BrowserWindow>(
+   (window) => {
+@@ -1068,6 +1078,21 @@ if (!gotTheLock) {
+       applyUnreadBadge();
+     });
+ 
++    // The status bar item must exist before the first BrowserWindow: the shell
++    // attaches every window UIAbility to it and only hides (instead of
++    // exiting) while it is there.
++    trayReady = setupOhosTray({
++      iconPath: join(__dirname, "tray-icon.png"),
++      tooltip: "Multica",
++      showWindow: () => {
++        const target = mainWindows.mostRecent();
++        if (!target || target.isDestroyed()) return;
++        if (target.isMinimized()) target.restore();
++        target.show();
++        target.focus();
++      },
++    });
++
+     desktopInitialized = true;
+     for (const saved of loadWindowSession(windowStateFile())) {
+       createMainWindow(saved);
+@@ -1115,5 +1140,17 @@ if (!gotTheLock) {
+ }
+ 
+ app.on("window-all-closed", () => {
++  // With a tray the window only hides; the shell and the host daemon stay up.
++  if (trayReady && !isTrayQuitting()) return;
+   if (process.platform !== "darwin") app.quit();
+ });
++
++app.on("before-quit", (event) => {
++  // A system-level close (dock "close", session end) reaches Electron as
++  // before-quit; hide to the tray instead of exiting.
++  if (trayReady && !isTrayQuitting()) {
++    event.preventDefault();
++    const target = mainWindows.mostRecent();
++    if (target && !target.isDestroyed()) target.hide();
++  }
++});

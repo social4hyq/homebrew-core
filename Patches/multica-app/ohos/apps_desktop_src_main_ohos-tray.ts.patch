@@ -1,0 +1,66 @@
+OHOS: run a status bar item so closing the window keeps the app and the
+host daemon bridge alive, and so the tray can restore the window.
+
+diff --git a/apps/desktop/src/main/ohos-tray.ts b/apps/desktop/src/main/ohos-tray.ts
+new file mode 100644
+index 0000000..7373375
+--- /dev/null
++++ b/apps/desktop/src/main/ohos-tray.ts
+@@ -0,0 +1,57 @@
++// OHOS-only tray residency. Closing the window on HarmonyOS tears the window
++// UIAbility down; the shell recreation and the host daemon bridge only stay
++// alive because a status bar item exists and the shell hides the window before
++// the teardown (see the tap's WebAbility.ets patch). This module creates that
++// item and keeps a quit request explicit.
++import { app, Menu, Tray, nativeImage } from "electron";
++
++let tray: Tray | null = null;
++let quitting = false;
++
++export interface OhosTrayOptions {
++  iconPath: string;
++  tooltip: string;
++  showWindow: () => void;
++}
++
++export function setupOhosTray(options: OhosTrayOptions): boolean {
++  if (process.platform !== "openharmony") return false;
++  if (process.env.MULTICA_DESKTOP_NO_TRAY === "1") return false;
++  try {
++    const image = nativeImage.createFromPath(options.iconPath);
++    if (image.isEmpty()) {
++      console.error("MULTICA_TRAY_ICON_UNREADABLE " + options.iconPath);
++    }
++    tray = new Tray(image);
++    tray.setToolTip(options.tooltip);
++    tray.on("click", options.showWindow);
++    tray.setContextMenu(
++      Menu.buildFromTemplate([
++        { label: "显示窗口", click: options.showWindow },
++        { type: "separator" },
++        {
++          label: "退出应用",
++          click: () => {
++            quitting = true;
++            // app.quit() would be vetoed by the shell's windowStageClose
++            // handler, which exists to keep the app resident.
++            app.exit(0);
++          },
++        },
++      ]),
++    );
++    return true;
++  } catch (error) {
++    console.error("MULTICA_TRAY_UNAVAILABLE " + String(error));
++    tray = null;
++    return false;
++  }
++}
++
++export function isTrayReady(): boolean {
++  return tray !== null;
++}
++
++export function isTrayQuitting(): boolean {
++  return quitting;
++}
