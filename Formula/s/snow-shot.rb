@@ -44,7 +44,7 @@ class SnowShot < Formula
   depends_on "webp" => :build
   depends_on "zlib-ng-compat" => :build
   depends_on "zstd" => :build
-  depends_on "hap-installer"
+  depends_on "app-installer"
   depends_on "ohos-sdk-toolchains"
 
   resource "ocr-detection-model" do
@@ -545,7 +545,7 @@ class SnowShot < Formula
   def caveats
     <<~EOS
       The HAP is unsigned in the bottle. Connect and unlock the device, then run
-      `snow-shot install`: hap-installer handles Huawei Developer login, local
+      `snow-shot install`: app-installer handles Huawei Developer login, local
       debug profile generation, signing, installation, and launch.
     EOS
   end
