@@ -1,4 +1,4 @@
-OHOS: label the Electron ability as multica (zh_CN).
+OHOS: label the Electron ability as Multica (zh_CN).
 
 --- a/libelectron/ohos_hap/electron/src/main/resources/zh_CN/element/string.json
 +++ b/libelectron/ohos_hap/electron/src/main/resources/zh_CN/element/string.json
@@ -7,7 +7,7 @@ OHOS: label the Electron ability as multica (zh_CN).
      {
        "name": "EntryAbility_label",
 -      "value": "Electron"
-+      "value": "multica"
++      "value": "Multica"
      },
      {
        "name": "OpenNewWindow_label",
