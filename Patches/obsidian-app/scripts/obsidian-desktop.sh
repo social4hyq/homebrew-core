@@ -7,7 +7,7 @@ HDC="${OBSIDIAN_DESKTOP_HDC:-${OBSIDIAN_DESKTOP_HDC_DEFAULT:-hdc}}"
 
 usage() {
   cat <<'EOF'
-Usage: obsidian-desktop <command>
+Usage: obsidian-app <command>
 
   install   Inject the official Obsidian app package into the shell HAP,
             sign it and install it on the connected device.
