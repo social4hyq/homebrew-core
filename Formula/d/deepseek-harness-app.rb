@@ -12,6 +12,11 @@ class DeepseekHarnessApp < Formula
     regex(/^dsh-v(\d+\.\d+\.\d+(?:-(?:alpha|rc)\.\d+)?)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.3-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6030d62f4b580b2e983f740e10d6014c4a672d5a604e8f2f263053fa6140b7a9"
+  end
+
   depends_on "app-installer"
   depends_on "curl"
   depends_on "deepseek-harness"
