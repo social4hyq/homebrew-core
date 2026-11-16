@@ -35,7 +35,7 @@ function create(options = {}) {
   }
   items.push({ type: 'separator' });
   items.push({
-    label: options.quitLabel || '退出',
+    label: options.quitLabel || '退出应用',
     click: () => {
       quitting = true;
       if (typeof options.onQuit === 'function') {
