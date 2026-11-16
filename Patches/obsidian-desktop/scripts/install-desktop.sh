@@ -55,23 +55,10 @@ while [ $# -gt 0 ]; do
 done
 
 [ -f "$SHELL_HAP" ] || die "shell HAP not found: $SHELL_HAP"
+command -v node >/dev/null || die "node not found"
 command -v zip >/dev/null || die "zip not found"
 command -v sha256sum >/dev/null || die "sha256sum not found"
 command -v hap-installer >/dev/null || die "hap-installer not found"
-
-ensure_hdc_target() {
-  local targets port
-  targets="$("$HDC" list targets 2>/dev/null || true)"
-  if [ -z "$targets" ] || [ "$targets" = "[Empty]" ]; then
-    port="$("$HDC" shell param get persist.hdc.port 2>/dev/null | tr -d ' \n' || true)"
-    port="${port:-34561}"
-    "$HDC" tconn "127.0.0.1:$port" >/dev/null 2>&1 || true
-    targets="$("$HDC" list targets 2>/dev/null || true)"
-    if [ -z "$targets" ] || [ "$targets" = "[Empty]" ]; then
-      die "no hdc target; enable developer options on this PC, unlock it, then retry (tried 127.0.0.1:$port)"
-    fi
-  fi
-}
 
 # --- app package: official download or a local copy ------------------------
 if [ -z "$ASAR_PATH" ]; then
@@ -138,34 +125,19 @@ if [ "$WANT_ACL" = "1" ]; then
   fi
 fi
 
-# ACL profiles are only complete when the signing CLI can read the SDK's
-# permission definitions. Warn early instead of letting the device answer with
-# a bare 9568289 after a 200 MB upload.
-if [ "$ACL" = "1" ]; then
-  installer_path="$(command -v hap-installer)"
-  toolchain="$(sed -n 's/^COMMAND_LINE_TOOL_PATH="\([^"]*\)".*/\1/p' "$installer_path" | head -1)"
-  if [ -n "$toolchain" ] &&
-     [ ! -f "$toolchain/sdk/default/openharmony/toolchains/lib/PermissionDefinitions.json" ] &&
-     [ ! -f "$toolchain/sdk/default/openharmony/toolchains/lib/permissionDefinitions.json" ]; then
-    log "warning: hap-installer's toolchain has no PermissionDefinitions.json;"
-    log "the generated profile will miss ACLs and installation will fail with"
-    log "9568289. Upgrade hap-installer to the tap build that ships it."
-  fi
-fi
-
 # The ACL module.json replaces the HAP's own module.json. If it was generated
 # for a different bundle the signature check fails with 9568329 on the device,
 # which is hard to read back; catch it here.
 if [ "$ACL" = "1" ]; then
-  hap_bundle="$(unzip -p "$SHELL_HAP" module.json | sed -n 's/.*"bundleName": *"\([^"]*\)".*/\1/p' | head -1)"
-  acl_bundle="$(sed -n 's/.*"bundleName": *"\([^"]*\)".*/\1/p' "$MODULE_ACL" | head -1)"
+  hap_bundle="$(unzip -p "$SHELL_HAP" module.json | node -e 'let s=""; process.stdin.on("data",c=>s+=c).on("end",()=>process.stdout.write(JSON.parse(s).app.bundleName))')"
+  acl_bundle="$(node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8")).app.bundleName)' "$MODULE_ACL")"
   if [ "$hap_bundle" != "$acl_bundle" ]; then
     die "module-acl.json targets $acl_bundle but the HAP is $hap_bundle; regenerate module-acl.json"
   fi
 fi
 
 # --- stage: inject the app package (and the ACL module.json) ----------------
-stage="$(mktemp -d)"
+stage="$(mktemp -d "${TMPDIR:-$HOME/.cache}/obsidian-desktop-inject.XXXXXX")"
 trap 'rm -rf "$stage"' EXIT
 injected="$stage/obsidian-desktop-injected.hap"
 signed="$stage/obsidian-desktop-signed.hap"
@@ -180,55 +152,12 @@ else
   (cd "$stage/tree" && zip -q -X "$injected" resources/resfile/resources/app/obsidian.asar)
 fi
 
-# --- signing project: request the same ACLs the HAP declares ----------------
-# hap-installer generates the debug profile from this project with the bundled
-# DevEco CLI, so the permissions have to be here as well as in the HAP.
-if [ "$ACL" = "1" ]; then
-  command -v devecocli >/dev/null || die "devecocli not found"
-  sign_project="${HOME}/.hap-installer/projects/${BUNDLE_ID}"
-  if [ ! -f "$sign_project/build-profile.json5" ]; then
-    mkdir -p "$(dirname "$sign_project")"
-    devecocli create --project-path "$sign_project" --app-name "$APP_NAME" \
-      --bundle-name "$BUNDLE_ID" >/dev/null
-  fi
-  module_json5="$sign_project/entry/src/main/module.json5"
-  if [ -f "$module_json5" ]; then
-    perms_tmp="$stage/signing-permissions.json5"
-    cat > "$perms_tmp" <<'PERMS'
-    "requestPermissions": [
-      { "name": "ohos.permission.INTERNET" },
-      { "name": "ohos.permission.GET_NETWORK_INFO" },
-      { "name": "ohos.permission.CUSTOM_SANDBOX" },
-      { "name": "ohos.permission.READ_WRITE_USER_FILE" },
-      { "name": "ohos.permission.READ_PASTEBOARD" },
-      { "name": "ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY" },
-      { "name": "ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION" }
-    ],
-PERMS
-    if grep -q '"requestPermissions"' "$module_json5"; then
-      sed -i '/"requestPermissions": \[/,/^[[:space:]]*\],/d' "$module_json5"
-    fi
-    sed -i '/"module": {/r '"$perms_tmp" "$module_json5"
-  fi
-fi
-
-# --- sign, install, start ---------------------------------------------------
-ensure_hdc_target
 # Stream hap-installer's output instead of capturing it: the Huawei login URL
 # and progress lines must reach the terminal while the command is still running.
-# The copy in $log_file is only for the error hints below.
-log_file="$stage/hap-installer.log"
 log "signing and installing; a first-time Huawei Developer login prints a URL below"
 if ! hap-installer --hap "$injected" --bundle-id "$BUNDLE_ID" \
     --app-name "$APP_NAME" --module electron --ability EntryAbility \
-    --signed-hap "$signed" 2>&1 | sed '/^FileTransfer/d' | tee "$log_file" >&2; then
-  case "$(cat "$log_file")" in
-    *9568289*)
-      log "hint: 9568289 means the device refused the restricted ACLs (CUSTOM_SANDBOX,"
-      log "READ_WRITE_USER_FILE) in the generated debug profile. Retry with --no-acl"
-      log "for the strong-sandbox build, or sign with an AGC-provisioned ACL profile."
-      ;;
-  esac
+    --signed-hap "$signed" --hdc "$HDC" 2>&1 | sed '/^FileTransfer/d' >&2; then
   die "installation failed"
 fi
 
@@ -237,4 +166,4 @@ if [ "$KEEP" = "1" ]; then
   cp "$signed" "$keep"
   log "signed HAP kept at $keep"
 fi
-log "installed and started ($BUNDLE_ID, $([ "$ACL" = "1" ] && echo ACL || echo strong-sandbox))"
+log "installed ($BUNDLE_ID, $([ "$ACL" = "1" ] && echo ACL || echo strong-sandbox))"

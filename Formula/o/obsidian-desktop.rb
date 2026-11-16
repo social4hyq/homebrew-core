@@ -10,7 +10,7 @@ class ObsidianDesktop < Formula
   # Obsidian's own release at install time (never copied into the bottle); see
   # obsidian.md terms and multica.rb.
   license :cannot_represent
-  revision 3
+  revision 4
 
   # Upstream is the vendor app, not the tap-authored host payload: the formula
   # version tracks Obsidian so `brew upgrade` follows new releases, while the
@@ -381,38 +381,28 @@ class ObsidianDesktop < Formula
     chmod 0755, fake_hdc
     ENV["OBSIDIAN_DESKTOP_HDC"] = fake_hdc.to_s
 
-    fake_devecocli = fake_bin/"devecocli"
-    fake_devecocli.write <<~SH
-      #!/bin/sh
-      case "$1" in
-        create)
-          project=""
-          while [ $# -gt 0 ]; do
-            if [ "$1" = "--project-path" ]; then project="$2"; shift; fi
-            shift
-          done
-          mkdir -p "$project/entry/src/main"
-          printf '{\n  "module": {\n    "name": "entry",\n    "type": "entry"\n  }\n}\n' > "$project/entry/src/main/module.json5"
-          printf '{"app":{"signingConfigs":[]}}\n' > "$project/build-profile.json5"
-          ;;
-      esac
-    SH
-    chmod 0755, fake_devecocli
+    (fake_bin/"devecocli").write "#!/bin/sh\nexit 99\n"
+    chmod 0755, fake_bin/"devecocli"
 
     asar = testpath/"obsidian.asar"
     asar.binwrite([4, 16, 12].pack("V3") + '{"files":{}}')
     ENV.prepend_path "PATH", fake_bin
 
     # progress messages go to stderr, keep them in the captured output
-    assert_match "installed and started",
+    assert_match "installed",
                  shell_output("#{bin}/obsidian-desktop install --asar #{asar} 2>&1")
     assert_match "--bundle-id", installer_args.read
     assert_match "resources/resfile/resources/app/obsidian.asar", shell_output("unzip -l #{injected}")
     injected_module = JSON.parse(shell_output("unzip -p #{injected} module.json"))
     injected_permissions = injected_module.fetch("module").fetch("requestPermissions").map { |p| p.fetch("name") }
     assert_equal acl_permissions.sort, injected_permissions.sort
-    signing_project = home/".hap-installer/projects/com.social4hyq.obsidiandesktop"
-    assert_match "READ_PASTEBOARD", (signing_project/"entry/src/main/module.json5").read
+    refute_path_exists home/".hap-installer"
+    installer = installer_args.read.lines(chomp: true)
+    assert_equal fake_hdc.to_s, installer[installer.index("--hdc") + 1]
+    assert_match "installed", shell_output("#{bin}/obsidian-desktop install --asar #{asar} --no-acl 2>&1")
+    strong = JSON.parse(shell_output("unzip -p #{injected} module.json"))
+    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
+                 strong.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }.sort
     system "unzip", "-tq", injected
   end
 end
