@@ -142,7 +142,8 @@ async function drive(win) {
       waiting = true;
       await win.loadFile(path.join(__dirname, 'waiting.html'), { hash: serveSpawnError ? 'spawn-failed' : 'waiting' });
     }
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    // Poll frequently while our server starts; keep failed-start retries slow.
+    await new Promise((resolve) => setTimeout(resolve, serveChild ? 250 : 3000));
   }
 }
 
