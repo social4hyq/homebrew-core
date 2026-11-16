@@ -10,6 +10,7 @@ const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
+const tray = require('./tray.cjs');
 
 let config = { port: 0, password: '' };
 try {
@@ -24,6 +25,12 @@ const canAutoStart = configured && typeof config.opencode === 'string' && config
 
 let serveChild = null;
 let serveSpawnError = '';
+// DSH-style switch: OPENCODE_DESKTOP_NO_TRAY=1 (or "tray": false in config.json)
+// restores the old behaviour where closing the window quits the shell.
+const useTray = process.env.OPENCODE_DESKTOP_NO_TRAY !== '1' && config.tray !== false;
+let trayReady = false;
+let shellWindow = null;
+let driving = false;
 
 function serverUp(timeoutMs) {
   return new Promise((resolve) => {
@@ -147,25 +154,69 @@ async function drive(win) {
   }
 }
 
+// Only one drive loop at a time: the tray's restart action re-enters it.
+function startDrive() {
+  if (driving || !shellWindow || shellWindow.isDestroyed()) return;
+  driving = true;
+  drive(shellWindow)
+    .catch((error) => console.error('OPENCODE_DESKTOP drive failed: ' + String(error)))
+    .finally(() => { driving = false; });
+}
+
 app.whenReady().then(() => {
-  const win = new BrowserWindow({
+  // The status bar item has to exist before the first window: electron-ohos
+  // attaches every BrowserWindow UIAbility to it, and hideAbility() only keeps
+  // the process alive while the item exists.
+  if (useTray) {
+    try {
+      tray.create({
+        tooltip: 'OpenCode',
+        iconPath: path.join(__dirname, 'tray-icon.png'),
+        onQuit: stopServer,
+        onRestartBackend: () => {
+          stopServer();
+          startDrive();
+        },
+      });
+      trayReady = true;
+    } catch (error) {
+      console.error('OPENCODE_DESKTOP tray unavailable: ' + String(error));
+    }
+  }
+
+  shellWindow = new BrowserWindow({
     backgroundColor: "#11141b",
     width: 1280,
     height: 800,
     autoHideMenuBar: true,
     webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false },
   });
-  win.setWindowButtonVisibility(true);
-  win.webContents.on('render-process-gone', (_event, details) => {
+  shellWindow.setWindowButtonVisibility(true);
+  shellWindow.webContents.on('render-process-gone', (_event, details) => {
     console.error('OPENCODE_DESKTOP_RENDER_EXIT ' + JSON.stringify(details));
   });
-  drive(win).catch((error) => console.error('OPENCODE_DESKTOP drive failed: ' + String(error)));
+  if (trayReady) tray.attach(shellWindow);
+  startDrive();
 }).catch((error) => {
   console.error(error);
   app.exit(1);
 });
-app.on('before-quit', stopServer);
+
+app.on('before-quit', (event) => {
+  // A system-level close request (dock "close", session end) reaches Electron
+  // as before-quit; veto it and hide to the tray instead of exiting.
+  if (trayReady && !tray.isQuitting()) {
+    event.preventDefault();
+    if (shellWindow && !shellWindow.isDestroyed()) shellWindow.hide();
+    return;
+  }
+  stopServer();
+});
+
 app.on('window-all-closed', () => {
+  // With a tray the window is only hidden, never closed; keep the process (and
+  // the backend it started) alive. Without a tray, keep the old behaviour.
+  if (trayReady) return;
   stopServer();
   app.quit();
 });
