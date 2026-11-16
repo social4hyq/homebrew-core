@@ -17,6 +17,8 @@ Options:
   --ability <name>      Ability to start (default: EntryAbility)
   --project-dir <path>  Signing project directory
   --signed-hap <path>   Signed HAP output path
+  --profile <path>      Sign with this build-profile.json5 instead of generating
+                        a debug profile (e.g. an AGC profile carrying ACLs)
   --device <id>         hdc target serial (default: first connected device)
   --no-start            Install without starting the app
   -h, --help            Show this help
@@ -31,11 +33,12 @@ ability=EntryAbility
 project_dir=
 signed_hap=
 device=
+profile_arg=
 start_app=1
 
 while (($#)); do
   case "$1" in
-    --hap|--bundle-id|--app-name|--module|--ability|--project-dir|--signed-hap|--device)
+    --hap|--bundle-id|--app-name|--module|--ability|--project-dir|--signed-hap|--device|--profile)
       if (($# < 2)) || [[ -z "$2" || "$2" == --* ]]; then
         printf 'hap-installer: missing value for %s\n' "$1" >&2; usage >&2; exit 2
       fi
@@ -49,6 +52,7 @@ while (($#)); do
         --project-dir) project_dir="$value" ;;
         --signed-hap) signed_hap="$value" ;;
         --device) device="$value" ;;
+        --profile) profile_arg="$value" ;;
       esac
       ;;
     --no-start) start_app=0; ability=; shift ;;
@@ -92,7 +96,7 @@ home="${HOME:?HOME must be set}"
 app_name="${app_name:-${bundle_id##*.}}"
 project_dir="${project_dir:-$home/.hap-installer/projects/$bundle_id}"
 signed_hap="${signed_hap:-${TMPDIR:-$home/.cache}/hap-installer/signed/$bundle_id.hap}"
-profile="$project_dir/build-profile.json5"
+profile="${profile_arg:-$project_dir/build-profile.json5}"
 
 status_output=$(devecocli auth status 2>&1) || {
   printf '%s\n' 'hap-installer: could not check Huawei Developer login status.' >&2; exit 1
@@ -108,15 +112,23 @@ case "$status_output" in
     ;;
 esac
 
-if [[ ! -f "$project_dir/AppScope/app.json5" ]]; then
-  if [[ -e "$project_dir" ]]; then printf 'hap-installer: incomplete signing project: %s\n' "$project_dir" >&2; exit 1; fi
-  mkdir -p "$(dirname "$project_dir")"
-  devecocli create --project-path "$project_dir" --app-name "$app_name" --bundle-name "$bundle_id"
-fi
-if [[ ! -f "$profile" ]]; then printf 'hap-installer: missing signing profile: %s\n' "$profile" >&2; exit 1; fi
+if [[ -n "$profile_arg" ]]; then
+  # A caller-supplied profile (e.g. one carrying ACLs) is used as is: running
+  # `signature generate` here would replace it with an auto-signed profile
+  # that lacks those permissions.
+  if [[ ! -f "$profile" ]]; then printf 'hap-installer: signing profile not found: %s\n' "$profile" >&2; exit 1; fi
+  printf '%s\n' "Signing with the given profile: $profile"
+else
+  if [[ ! -f "$project_dir/AppScope/app.json5" ]]; then
+    if [[ -e "$project_dir" ]]; then printf 'hap-installer: incomplete signing project: %s\n' "$project_dir" >&2; exit 1; fi
+    mkdir -p "$(dirname "$project_dir")"
+    devecocli create --project-path "$project_dir" --app-name "$app_name" --bundle-name "$bundle_id"
+  fi
+  if [[ ! -f "$profile" ]]; then printf 'hap-installer: missing signing profile: %s\n' "$profile" >&2; exit 1; fi
 
-printf '%s\n' 'Generating or refreshing the local debug profile for connected devices.'
-(cd "$project_dir" && devecocli signature generate --product default)
+  printf '%s\n' 'Generating or refreshing the local debug profile for connected devices.'
+  (cd "$project_dir" && devecocli signature generate --product default)
+fi
 mkdir -p "$(dirname "$signed_hap")"
 rm -f "$signed_hap"
 # Only the signed output is private: scope 077 to the signer so the chunking
