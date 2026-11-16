@@ -1,13 +1,12 @@
-OHOS: enable the system tray when the main window first appears. The Qt
-OHOS tray is otherwise only switched on from the pause/resume path, so a fresh
-launch never requests a status bar item and the app becomes unreachable once
-its window is gone.
+OHOS: enable the system tray when the main window appears, with temporary
+diagnostics. The Qt OHOS tray is otherwise only switched on from the
+pause/resume path, so a fresh launch never requests a status bar item.
 
 diff --git a/snow_shot/src/app/applicationcontroller.cpp b/snow_shot/src/app/applicationcontroller.cpp
-index 46076e4..acd26aa 100644
+index 46076e4..262140c 100644
 --- a/snow_shot/src/app/applicationcontroller.cpp
 +++ b/snow_shot/src/app/applicationcontroller.cpp
-@@ -1973,6 +1973,16 @@ class ApplicationController::Impl {
+@@ -1973,6 +1973,21 @@ class ApplicationController::Impl {
          if (storage::ApplicationStorage::instance().directoryChanging())
              return;
          ensureMainWindow().showAndActivate();
@@ -15,11 +14,16 @@ index 46076e4..acd26aa 100644
 +        // Qt on OHOS only enables the tray from the pause/resume path, so at
 +        // startup no status bar item is ever requested and the app cannot be
 +        // reached once its window is hidden. Enable it when the main window
-+        // first appears; setEnabled() is idempotent.
-+        systemTray.setEnabled(storage::ApplicationStorage::instance()
-+                                  .configuration()
-+                                  .value(kTrayEnabledKey)
-+                                  .toBool());
++        // first appears; setEnabled() is idempotent. The qInfo lines are
++        // temporary diagnostics for the OHOS tray bring-up.
++        const bool trayEnabled = storage::ApplicationStorage::instance()
++                                     .configuration()
++                                     .value(kTrayEnabledKey)
++                                     .toBool();
++        qInfo("SNOW_TRAY config=%d before=%d", trayEnabled ? 1 : 0,
++              systemTray.isEnabled() ? 1 : 0);
++        systemTray.setEnabled(trayEnabled);
++        qInfo("SNOW_TRAY after=%d", systemTray.isEnabled() ? 1 : 0);
 +#endif
      }
  
