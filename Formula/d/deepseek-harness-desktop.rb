@@ -1,8 +1,8 @@
 class DeepseekHarnessDesktop < Formula
   desc "Desktop shell for the DeepSeek Harness agent (Electron window on local dsh web)"
   homepage "https://github.com/deepseek-ai/deepseek-harness"
-  url "https://github.com/deepseek-ai/deepseek-harness/archive/refs/tags/dsh-v0.2.2-rc.2.tar.gz"
-  sha256 "d376fe64ec4b7c9b5837fb1155ed3a48e7e0e5f5b0aae0b91d9fb836daa8c20e"
+  url "https://github.com/deepseek-ai/deepseek-harness/archive/refs/tags/dsh-v0.2.2-rc.3.tar.gz"
+  sha256 "bf6d668e52a26edf98aa2ef7960e240c8d9afcefbad2b09887a2cb1e14001dd5"
   license :cannot_represent
 
   livecheck do
@@ -11,8 +11,8 @@ class DeepseekHarnessDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-desktop-v0.2.2-rc.2-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fc5f0189db7e51cb718393dfc405edae9d2c7cd93b41358fb126e7f1e140ac18"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-desktop-v0.2.2-rc.3-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "45b298e9da87126232a0c5e1ef185e9e29a22787bf7e97a4f05cb9a0b18bfee7"
   end
 
   depends_on "node" => :build
