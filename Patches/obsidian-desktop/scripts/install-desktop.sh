@@ -214,20 +214,23 @@ fi
 
 # --- sign, install, start ---------------------------------------------------
 ensure_hdc_target
-if ! install_output="$(hap-installer --hap "$injected" --bundle-id "$BUNDLE_ID" \
+# Stream hap-installer's output instead of capturing it: the Huawei login URL
+# and progress lines must reach the terminal while the command is still running.
+# The copy in $log_file is only for the error hints below.
+log_file="$stage/hap-installer.log"
+log "signing and installing; a first-time Huawei Developer login prints a URL below"
+if ! hap-installer --hap "$injected" --bundle-id "$BUNDLE_ID" \
     --app-name "$APP_NAME" --module electron --ability EntryAbility \
-    --signed-hap "$signed" 2>&1)"; then
-  printf '%s\n' "$install_output" | grep -v '^FileTransfer' >&2
-  case "$install_output" in
+    --signed-hap "$signed" 2>&1 | sed '/^FileTransfer/d' | tee "$log_file" >&2; then
+  case "$(cat "$log_file")" in
     *9568289*)
-      log "hint: 9568289 means the debug profile carries no ACLs. hap-installer's"
-      log "toolchain must ship PermissionDefinitions.json (tap hap-installer r3+)."
-      log "check: ls \$(brew --prefix hap-installer)/libexec/hap-installer-toolchain/sdk/default/openharmony/toolchains/lib"
+      log "hint: 9568289 means the device refused the restricted ACLs (CUSTOM_SANDBOX,"
+      log "READ_WRITE_USER_FILE) in the generated debug profile. Retry with --no-acl"
+      log "for the strong-sandbox build, or sign with an AGC-provisioned ACL profile."
       ;;
   esac
   die "installation failed"
 fi
-printf '%s\n' "$install_output" | grep -v '^FileTransfer' >&2
 
 if [ "$KEEP" = "1" ]; then
   keep="${TMPDIR:-/tmp}/obsidian-desktop-signed.hap"
