@@ -588,8 +588,9 @@ class SnowShot < Formula
     refute_match "libs/arm64-v8a/libsnow_ocr_process.so", listing
     assert_match "libs/arm64-v8a/tls/libqopensslbackend.so", listing
     assert_match "libs/arm64-v8a/libQt6Network.so.6", listing
-    system "sh", "-c",
-           "unzip -p #{hap} libs/arm64-v8a/libQt6Network.so.6 | grep -q QSslSocket"
+    network = Utils.safe_popen_read("unzip", "-p", hap,
+                                   "libs/arm64-v8a/libQt6Network.so.6").b
+    assert_includes network, "QSslSocket".b
     manifest = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     assert_equal "com.social4hyq.snowshot", manifest.dig("app", "bundleName")
     assert_equal "QAbility", manifest.dig("module", "abilities", 0, "name")
