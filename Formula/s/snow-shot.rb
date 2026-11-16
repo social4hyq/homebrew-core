@@ -4,7 +4,7 @@ class SnowShot < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.7_snow-shot.tar.gz"
   sha256 "6d9de662710ccf406dea312c0322e77a3f473bc6121096ec82df713d30f4273c"
   license "GPL-3.0-or-later"
-  revision 9
+  revision 10
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.7-r12"
@@ -503,6 +503,33 @@ class SnowShot < Formula
            "--template", payload/"ohos-template", "--stage", stage
     cp payload/"ohos-template/entry/src/main/ets/qability/QAbility.ets",
        stage/"entry/src/main/ets/qability/QAbility.ets"
+    # The Qt HAP template has no statusBarView extension, and the Qt OHOS tray
+    # plugin registers its icon through @kit.StatusBarExtensionKit, which needs
+    # one. Ship a minimal extension plus the page the quick panel loads, and
+    # declare both in the generated project.
+    mkdir_p stage/"entry/src/main/ets/statusbar"
+    %w[StatusBarAbility.ets StatusBarPage.ets].each do |name|
+      cp payload/"ohos-template/entry/src/main/ets/statusbar"/name,
+         stage/"entry/src/main/ets/statusbar"/name
+    end
+    inreplace stage/"entry/src/main/resources/base/profile/main_pages.json",
+              %(    "pages/UiExtensionNativeNode"\n),
+              %(    "pages/UiExtensionNativeNode",\n    "statusbar/StatusBarPage"\n)
+    # Anchor on the prefix only: harmonydeployqt may already have filled the
+    # %%INSERT_PERMISSIONS%% placeholder by the time this runs.
+    inreplace stage/"entry/src/main/module.json5",
+              %(    "requestPermissions": [),
+              [
+                %(    "extensionAbilities": [),
+                %(      {),
+                %(        "name": "StatusBarExtensionAbility",),
+                %(        "srcEntry": "./ets/statusbar/StatusBarAbility.ets",),
+                %(        "type": "statusBarView",),
+                %(        "exported": false),
+                %(      }),
+                %(    ],),
+                %(    "requestPermissions": [),
+              ].join("\n")
     mkdir_p stage/"entry/src/main/cpp/types/libsnow_shot"
     cp payload/"ohos-template/entry/src/main/cpp/types/libsnow_shot/index.d.ts",
        stage/"entry/src/main/cpp/types/libsnow_shot/index.d.ts"
