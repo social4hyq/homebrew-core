@@ -23,6 +23,11 @@ class ObsidianDesktop < Formula
     end
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v1.15.1-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ff6707e09501fec9bfbd76f5a35154534080988d33edf4c318ad246e9782efde"
+  end
+
   depends_on "curl"
   depends_on "hap-installer"
   depends_on "node"
