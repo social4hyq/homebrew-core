@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Stage the shell app and ZCode branding into the local ohos_hap project.
-# Mirrors what the tap formula does at build time (electron-ohos 37 template).
+# Mirrors what the tap formula does at build time (Electron OHOS 40 template).
 set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -10,8 +10,8 @@ BUNDLE_NAME="com.social4hyq.zcodedesktop"
 APP_NAME="ZCode"
 
 [ -d "$SHELL_DIR" ] || {
-  printf 'missing %s; unpack the electron-ohos 37 prebuilt first:\n' "$SHELL_DIR" >&2
-  printf '  unzip -d . v37.2.1-openharmony-arm64.zip && tar -xzf libelectron_138.tar.gz\n' >&2
+  printf 'missing %s; unpack the Electron OHOS 40 prebuilt first:\n' "$SHELL_DIR" >&2
+  printf '  unzip -d . v40.0.1.20261028.2-release.zip && tar -xzf libelectron_144.tar.gz\n' >&2
   exit 1
 }
 
@@ -44,7 +44,7 @@ for path in glob.glob(f"{shell}/AppScope/resources/*/element/string.json") + \
         json.dump(strings, fh, indent=2, ensure_ascii=False)
         fh.write("\n")
 
-# electron-ohos 37 template: drop the product signingConfig and the embedded
+# Electron OHOS 40 template: drop the product signingConfig and the embedded
 # signingConfigs block, and pin the SDK target the build toolchain supports.
 profile = json.load(open(f"{shell}/build-profile.json5"))
 for product in profile["app"]["products"]:
