@@ -4,7 +4,7 @@ class MulticaApp < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
   sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -89,6 +89,16 @@ class MulticaApp < Formula
       PATH:                    "#{formula_opt_bin("node")}:$PATH"
 
     shell = buildpath/"libelectron/ohos_hap"
+
+    # Every HAP built from the vendor template ships the template's bundle name,
+    # so two Electron apps installed from it displace each other and share one
+    # app sandbox (and its data). Give this one its own identity.
+    inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
+                                          '"bundleName": "com.social4hyq.multica"'
+    inreplace shell/"AppScope/app.json5", '"vendor": "example"', '"vendor": "social4hyq"'
+    inreplace shell/"electron/src/main/resources/base/profile/shortcuts_config.json",
+              '"bundleName": "com.huawei.ohos_electron"',
+              '"bundleName": "com.social4hyq.multica"'
 
     # Desktop payload: the patch carried the OHOS dependency wiring
     # (pnpm overrides to @ohos-npm-ports, scoped registry, signpost dev dep).
@@ -201,6 +211,12 @@ class MulticaApp < Formula
       login, signing-project creation, local debug profile generation, signing,
       installation, and launch. Private signing material stays in your home
       directory; it is not in the bottle.
+
+      Earlier revisions installed the desktop under `com.huawei.ohos_electron`,
+      the bundle name every HAP built from the vendor template carries. It is
+      now `com.social4hyq.multica`, so it no longer shares an identity with
+      other Electron apps. An old copy installed under the previous name is
+      left in place and can be uninstalled by hand.
 
       The default HAP requests only INTERNET and GET_NETWORK_INFO, which local
       automatic signing can grant. If your signing profile carries the
@@ -335,7 +351,7 @@ class MulticaApp < Formula
       args = installer_args.read.lines(chomp: true)
       assert_equal "--hap", args.first
       refute_equal unsigned_hap.to_s, args[1]
-      assert_equal ["--bundle-id", "com.huawei.ohos_electron", "--app-name", "MulticaSigning",
+      assert_equal ["--bundle-id", "com.social4hyq.multica", "--app-name", "MulticaSigning",
                     "--module", "electron", "--ability", "EntryAbility"], args.drop(2)
 
       pairing = testpath/"home/.multica/desktop-bridge.json"
@@ -411,6 +427,21 @@ class MulticaApp < Formula
     package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
     assert_empty package.fetch("devDependencies", {})
     profile = JSON.parse(shell_output("unzip -p #{hap} module.json"))
+    # The vendor template's bundle name is shared by every Electron app built
+    # from it; installing this desktop under it would displace another app.
+    assert_equal "com.social4hyq.multica", profile.fetch("app").fetch("bundleName")
+    assert_equal "social4hyq", profile.fetch("app").fetch("vendor")
+    # The installer and the launcher act on this id, so both must match the HAP.
+    assert_match 'BUNDLE_ID="com.social4hyq.multica"', desktop_installer.read
+    assert_match 'BUNDLE_ID="com.social4hyq.multica"', (pkgshare/"desktop.sh").read
+    # ArkTS record names embed the bundle name, so a HAP renamed only in
+    # module.json cannot resolve its entry point. The compiled payload and the
+    # manifest must carry the same identity.
+    bytecode = Utils.safe_popen_read("unzip", "-p", hap, "ets/modules.abc")
+    assert_includes bytecode.force_encoding(Encoding::BINARY), "com.social4hyq.multica"
+    # hvigor reformats the JSON (tabs instead of spaces), so match loosely.
+    assert_match(/"bundleName":\s*"com\.social4hyq\.multica"/,
+                 shell_output("unzip -p #{hap} resources/base/profile/shortcuts_config.json"))
     assert profile.fetch("module").fetch("extractNativeLibs")
     schemes = profile.fetch("module").fetch("abilities").flat_map do |ability|
       ability.fetch("skills", []).flat_map { |skill| skill.fetch("uris", []).map { |uri| uri["scheme"] } }

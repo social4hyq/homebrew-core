@@ -1,8 +1,10 @@
-OHOS: point HOME at the app's writable files directory. os.homedir() resolves
-to the user's home, which the app sandbox cannot write.
+OHOS: point HOME at the app's writable files directory, and skip the login-shell
+PATH probe. os.homedir() resolves to the user's home, which the app sandbox
+cannot write; fix-path forks the login shell from the Node main thread, which
+deadlocks libuv on OHOS before the first window is created.
 
 diff --git a/apps/desktop/src/main/index.ts b/apps/desktop/src/main/index.ts
-index 668f77d..970aa7e 100644
+index 668f77d..2d56046 100644
 --- a/apps/desktop/src/main/index.ts
 +++ b/apps/desktop/src/main/index.ts
 @@ -10,6 +10,11 @@ import {
@@ -17,3 +19,14 @@ index 668f77d..970aa7e 100644
  import { pathToFileURL } from "url";
  import { electronApp, optimizer, is } from "@electron-toolkit/utils";
  import fixPath from "fix-path";
+@@ -138,7 +143,9 @@ const BUNDLED_ICON_PATH = join(__dirname, "../../resources/icon.png").replace(
+ // before any child_process.spawn / execFile call in the main process —
+ // ES module imports are hoisted, so this block executes before createMainWindow
+ // or any daemon-manager spawn.
+-if (process.platform !== "win32") {
++// OHOS: the sandbox has no login shell, and forking the shell from the Node
++// main thread deadlocks libuv before the first window is created.
++if (process.platform !== "win32" && process.platform !== "openharmony") {
+   fixPath();
+   // Fallback: ensure common install locations are on PATH when fix-path came
+   // up short (broken shell rc, non-interactive $SHELL, missing entries).
