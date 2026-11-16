@@ -5,7 +5,7 @@ class DeepseekHarnessApp < Formula
   sha256 "bf6d668e52a26edf98aa2ef7960e240c8d9afcefbad2b09887a2cb1e14001dd5"
   license :cannot_represent
 
-  revision 5
+  revision 6
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -13,8 +13,8 @@ class DeepseekHarnessApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.3-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "01e70acffc3c676986e3a00a992b29ccf9629fdd4eaa490186026c98c2eeef78"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.3-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a66e92efd7f277eeb09f092015e730fb1abab60a4ebe69e75f954a95d7a2844b"
   end
 
   depends_on "app-installer"
@@ -76,6 +76,31 @@ class DeepseekHarnessApp < Formula
                       { "name": "ohos.permission.GET_NETWORK_INFO" }
                     ],
               JSON5
+
+    # The caption close button never reaches Electron's BrowserWindow close
+    # event: electron-ohos tears down the window UIAbility first, and the
+    # Electron process (with the dsh web backend it started) follows. Register a
+    # windowStageClose handler that hides the ability and cancels the close, so
+    # closing the window only sends it to the tray. The tray's quit item calls
+    # app.exit() because a normal quit would be cancelled by this handler.
+    close_handler = [
+      "    super.onWindowStageCreate(windowStage);",
+      "    try {",
+      "      windowStage.on('windowStageClose', () => {",
+      "        if (CheckEmptyUtils.isEmpty(this.xcomponentId)) {",
+      "          return false;",
+      "        }",
+      "        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));",
+      "        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
+      "        return false;",
+      "      });",
+      "    } catch (exception) {",
+      "      LogUtil.error(TAG, 'Failed to register window close handler: ' + JSON.stringify(exception));",
+      "    }",
+      "",
+    ].join("\n")
+    inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
+              "    super.onWindowStageCreate(windowStage);\n", close_handler
 
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?

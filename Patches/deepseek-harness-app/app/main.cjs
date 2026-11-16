@@ -194,6 +194,7 @@ app.whenReady().then(() => {
       tray.create({
         tooltip: 'DeepSeek Harness',
         iconPath: path.join(__dirname, 'tray-icon.png'),
+        onQuit: stopServer,
         onRestartBackend: () => {
           stopServer();
           serverUrl = '';
