@@ -1,0 +1,7 @@
+{
+  "name": "obsidian-ohos-test",
+  "version": "1.15.1",
+  "private": true,
+  "description": "Minimal test: load Obsidian's unmodified app.asar on the HarmonyOS Electron runtime",
+  "main": "bootstrap.cjs"
+}

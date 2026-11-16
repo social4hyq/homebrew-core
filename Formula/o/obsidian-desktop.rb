@@ -5,17 +5,17 @@ class ObsidianDesktop < Formula
   sha256 "3f6808c14204063349d5a7a59b9f2f637958063fa85eeebe767e13e06d314c0f"
   # The stable url is the vendor app package, so `version`, `brew bump-formula-pr`
   # and autobump all follow Obsidian itself. The tap-authored host payload lives
-  # in the "host" resource below and stays version-independent. Obsidian is
+  # under Patches/obsidian-desktop and stays version-independent. Obsidian is
   # proprietary and is never redistributed here: the asar is fetched from
   # Obsidian's own release at install time (never copied into the bottle); see
   # obsidian.md terms and multica.rb.
   license :cannot_represent
-  revision 1
+  revision 2
 
-  # Upstream is the vendor app, not the tap-hosted host payload: the formula
+  # Upstream is the vendor app, not the tap-authored host payload: the formula
   # version tracks Obsidian so `brew upgrade` follows new releases, while the
-  # host payload stays version-independent. desktop-releases.json carries the
-  # latest desktop version together with the asar URL and its sha256.
+  # payload stays version-independent. desktop-releases.json carries the latest
+  # desktop version together with the asar URL and its sha256.
   livecheck do
     url "https://raw.githubusercontent.com/obsidianmd/obsidian-releases/master/desktop-releases.json"
     strategy :json do |json|
@@ -24,8 +24,8 @@ class ObsidianDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v1.15.1-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ff6707e09501fec9bfbd76f5a35154534080988d33edf4c318ad246e9782efde"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v1.15.1-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "51fc7bd568dfa6d4153a99b978d6773ce7d1760b45a969363b204893c9ac1cd2"
   end
 
   depends_on "curl"
@@ -35,30 +35,62 @@ class ObsidianDesktop < Formula
   depends_on "unzip"
   depends_on "zip"
 
-  # Tap-authored host payload (bootstrap host, CLI client, installer scripts),
-  # versioned independently of Obsidian. Bumping it needs a new payload release
-  # and only the url/sha256 here.
-  resource "host" do
-    url "https://github.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.5/obsidian-desktop-0.1.5.tar.gz"
-    sha256 "99cab62860350af278e44febdbf6216a4f81c6c89a26067e544758aff3d5d0c4"
-  end
+  # The payload is copied from the tap's read-only checkout during CI. Keep all
+  # source files literal here so remove-unused-patches preserves the directory.
+  PAYLOAD_FILES = %w[
+    Patches/obsidian-desktop/app/bootstrap.cjs
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/LICENSE
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/README.md
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/get-electron-binding.d.ts
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/get-electron-binding.js
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/ipc-messages.d.ts
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/ipc-messages.js
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/module-names.d.ts
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/module-names.js
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/type-utils.d.ts
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/type-utils.js
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/main/index.d.ts
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/main/index.js
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/main/objects-registry.d.ts
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/main/objects-registry.js
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/main/server.d.ts
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/main/server.js
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/renderer/callbacks-registry.d.ts
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/renderer/callbacks-registry.js
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/renderer/index.d.ts
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/renderer/index.js
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/renderer/remote.d.ts
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/renderer/remote.js
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/index.d.ts
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/main/index.d.ts
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/main/index.js
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/package.json
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/renderer/index.d.ts
+    Patches/obsidian-desktop/app/node_modules/@electron/remote/renderer/index.js
+    Patches/obsidian-desktop/app/package.json
+    Patches/obsidian-desktop/assets/icon.png
+    Patches/obsidian-desktop/assets/icon32.png
+    Patches/obsidian-desktop/scripts/install-desktop.sh
+    Patches/obsidian-desktop/scripts/obsidian-cli.cjs
+    Patches/obsidian-desktop/scripts/obsidian-desktop.sh
+  ].freeze
 
-  # openharmony-sig/electron PC(2in1) prebuilt (CodeHub mirror hosted on this
-  # tap's release; redistribution assumed by the tap owner, see multica.rb).
+  # CPF-Electron's OpenHarmony desktop build, downloaded directly from GitCode.
   resource "electron-ohos" do
-    url "https://github.com/social4hyq/homebrew-core/releases/download/electron-ohos-v34.9.0-20261030.1/v34.9.0-20261030.1-release.zip"
-    sha256 "599e97b3d8b1e5071a2387496104b443e58079a5f5c165b0114e65ffc601df3a"
+    url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
+    sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
   end
 
   def install
-    resource("host").fetch
-    system "tar", "-xzf", resource("host").cached_download, "-C", buildpath
-    host = Pathname.glob((buildpath/"obsidian-desktop-*").to_s).max
-    odie "host payload missing" if host.nil?
+    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
+    payload = tap_root/"Patches/obsidian-desktop"
+    PAYLOAD_FILES.each do |path|
+      odie "missing tap payload: #{path}" unless (tap_root/path).exist?
+    end
 
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
-    system "tar", "-xzf", buildpath/"libelectron_132.tar.gz", "-C", buildpath
+    system "tar", "-xzf", buildpath/"libelectron_144.tar.gz", "-C", buildpath
     shell = buildpath/"libelectron/ohos_hap"
 
     # Host payload only: bootstrap + @electron/remote. The vendor app package
@@ -67,9 +99,9 @@ class ObsidianDesktop < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    cp host/"app/bootstrap.cjs", app/"bootstrap.cjs"
-    cp host/"app/package.json", app/"package.json"
-    cp_r host/"app/node_modules", app/"node_modules"
+    cp payload/"app/bootstrap.cjs", app/"bootstrap.cjs"
+    cp payload/"app/package.json", app/"package.json"
+    cp_r payload/"app/node_modules", app/"node_modules"
 
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.obsidiandesktop"'
@@ -93,9 +125,21 @@ class ObsidianDesktop < Formula
     # still had the OpenCode icon, so brand from the vendor package's own icon
     # (assets/ comes from the official tarball's resources/icon.png).
     %w[app_icon.png startIcon.png].each do |name|
-      cp host/"assets/icon.png", shell/"AppScope/resources/base/media"/name
+      cp payload/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
-    cp host/"assets/icon32.png", shell/"AppScope/resources/base/media/product_logo_32.png"
+    cp payload/"assets/icon32.png", shell/"AppScope/resources/base/media/product_logo_32.png"
+
+    # The Electron template ships CRLF in files patched below; normalize them so
+    # exact replacements and the deep-link insertion work across release builds.
+    [
+      shell/"build-profile.json5",
+      shell/"electron/src/main/module.json5",
+      shell/"electron/src/main/ets/entryability/EntryAbility.ets",
+      shell/"web_engine/src/main/module.json5",
+    ].each do |file|
+      text = file.read
+      file.atomic_write(text.gsub("\r\n", "\n")) if text.include?("\r\n")
+    end
 
     # CI's electron-ohos-ci CLT carries an NDK-less SDK subset (no llvm-strip);
     # mirror the multica/opencode packaging deltas that keep hvigor away from
@@ -217,13 +261,15 @@ class ObsidianDesktop < Formula
        ohos.permission.READ_PASTEBOARD].each do |name|
       requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
     end
+    # The tap checkout is a read-only host mount in CI; install would move files.
+    pkgshare.mkpath
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
-    pkgshare.install host/"scripts/install-desktop.sh"
+    cp payload/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    libexec.install host/"scripts/obsidian-desktop.sh"
+    cp payload/"scripts/obsidian-desktop.sh", libexec/"obsidian-desktop.sh"
     chmod 0755, libexec/"obsidian-desktop.sh"
-    libexec.install host/"scripts/obsidian-cli.cjs"
+    cp payload/"scripts/obsidian-cli.cjs", libexec/"obsidian-cli.cjs"
     chmod 0755, libexec/"obsidian-cli.cjs"
     (bin/"obsidian-desktop").write_env_script libexec/"obsidian-desktop.sh",
       OBSIDIAN_DESKTOP_UNSIGNED_HAP:   libexec/"obsidian-desktop-unsigned.hap",
