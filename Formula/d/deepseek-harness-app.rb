@@ -5,7 +5,7 @@ class DeepseekHarnessApp < Formula
   sha256 "bf6d668e52a26edf98aa2ef7960e240c8d9afcefbad2b09887a2cb1e14001dd5"
   license :cannot_represent
 
-  revision 6
+  revision 7
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -91,7 +91,12 @@ class DeepseekHarnessApp < Formula
       "          return false;",
       "        }",
       "        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));",
-      "        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
+      "        // Hide on the next tick: hiding while the close is still being",
+      "        // processed makes the framework tear the ability down and relaunch",
+      "        // the app (new pid) instead of just hiding it.",
+      "        setTimeout(() => {",
+      "          Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
+      "        }, 50);",
       "        return false;",
       "      });",
       "    } catch (exception) {",
