@@ -24,8 +24,8 @@ class ObsidianDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v1.15.1-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ff6707e09501fec9bfbd76f5a35154534080988d33edf4c318ad246e9782efde"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v1.15.1-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "51fc7bd568dfa6d4153a99b978d6773ce7d1760b45a969363b204893c9ac1cd2"
   end
 
   depends_on "curl"
