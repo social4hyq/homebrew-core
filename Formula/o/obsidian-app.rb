@@ -1,16 +1,16 @@
-class ObsidianDesktop < Formula
+class ObsidianApp < Formula
   desc "Notes desktop for HarmonyOS PC running the official Obsidian package"
   homepage "https://obsidian.md"
   url "https://github.com/obsidianmd/obsidian-releases/releases/download/v1.15.1/obsidian-1.15.1.asar.gz"
   sha256 "3f6808c14204063349d5a7a59b9f2f637958063fa85eeebe767e13e06d314c0f"
   # The stable url is the vendor app package, so `version`, `brew bump-formula-pr`
   # and autobump all follow Obsidian itself. The tap-authored host payload lives
-  # under Patches/obsidian-desktop and stays version-independent. Obsidian is
+  # under Patches/obsidian-app and stays version-independent. Obsidian is
   # proprietary and is never redistributed here: the asar is fetched from
   # Obsidian's own release at install time (never copied into the bottle); see
   # obsidian.md terms and multica.rb.
   license :cannot_represent
-  revision 4
+  revision 5
 
   # Upstream is the vendor app, not the tap-authored host payload: the formula
   # version tracks Obsidian so `brew upgrade` follows new releases, while the
@@ -24,12 +24,12 @@ class ObsidianDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v1.15.1-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0caba4addd6062f01ec648b462f4440df98d6cd73813fb8db6ffcd6bd352255d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "44abb2da82d5d0982d37b277b84fd027680e29716b1991b33b7c5aefa885506a"
   end
 
+  depends_on "app-installer"
   depends_on "curl"
-  depends_on "hap-installer"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "unzip"
@@ -38,41 +38,41 @@ class ObsidianDesktop < Formula
   # The payload is copied from the tap's read-only checkout during CI. Keep all
   # source files literal here so remove-unused-patches preserves the directory.
   PAYLOAD_FILES = %w[
-    Patches/obsidian-desktop/app/bootstrap.cjs
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/LICENSE
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/README.md
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/get-electron-binding.d.ts
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/get-electron-binding.js
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/ipc-messages.d.ts
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/ipc-messages.js
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/module-names.d.ts
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/module-names.js
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/type-utils.d.ts
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/common/type-utils.js
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/main/index.d.ts
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/main/index.js
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/main/objects-registry.d.ts
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/main/objects-registry.js
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/main/server.d.ts
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/main/server.js
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/renderer/callbacks-registry.d.ts
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/renderer/callbacks-registry.js
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/renderer/index.d.ts
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/renderer/index.js
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/renderer/remote.d.ts
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/dist/src/renderer/remote.js
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/index.d.ts
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/main/index.d.ts
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/main/index.js
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/package.json
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/renderer/index.d.ts
-    Patches/obsidian-desktop/app/node_modules/@electron/remote/renderer/index.js
-    Patches/obsidian-desktop/app/package.json
-    Patches/obsidian-desktop/assets/icon.png
-    Patches/obsidian-desktop/assets/icon32.png
-    Patches/obsidian-desktop/scripts/install-desktop.sh
-    Patches/obsidian-desktop/scripts/obsidian-cli.cjs
-    Patches/obsidian-desktop/scripts/obsidian-desktop.sh
+    Patches/obsidian-app/app/bootstrap.cjs
+    Patches/obsidian-app/app/node_modules/@electron/remote/LICENSE
+    Patches/obsidian-app/app/node_modules/@electron/remote/README.md
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/get-electron-binding.d.ts
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/get-electron-binding.js
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/ipc-messages.d.ts
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/ipc-messages.js
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/module-names.d.ts
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/module-names.js
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/type-utils.d.ts
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/type-utils.js
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/main/index.d.ts
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/main/index.js
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/main/objects-registry.d.ts
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/main/objects-registry.js
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/main/server.d.ts
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/main/server.js
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/callbacks-registry.d.ts
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/callbacks-registry.js
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/index.d.ts
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/index.js
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/remote.d.ts
+    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/remote.js
+    Patches/obsidian-app/app/node_modules/@electron/remote/index.d.ts
+    Patches/obsidian-app/app/node_modules/@electron/remote/main/index.d.ts
+    Patches/obsidian-app/app/node_modules/@electron/remote/main/index.js
+    Patches/obsidian-app/app/node_modules/@electron/remote/package.json
+    Patches/obsidian-app/app/node_modules/@electron/remote/renderer/index.d.ts
+    Patches/obsidian-app/app/node_modules/@electron/remote/renderer/index.js
+    Patches/obsidian-app/app/package.json
+    Patches/obsidian-app/assets/icon.png
+    Patches/obsidian-app/assets/icon32.png
+    Patches/obsidian-app/scripts/install-desktop.sh
+    Patches/obsidian-app/scripts/obsidian-cli.cjs
+    Patches/obsidian-app/scripts/obsidian-desktop.sh
   ].freeze
 
   # CPF-Electron's OpenHarmony desktop build, downloaded directly from GitCode.
@@ -83,7 +83,7 @@ class ObsidianDesktop < Formula
 
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    payload = tap_root/"Patches/obsidian-desktop"
+    payload = tap_root/"Patches/obsidian-app"
     PAYLOAD_FILES.each do |path|
       odie "missing tap payload: #{path}" unless (tap_root/path).exist?
     end
@@ -94,7 +94,7 @@ class ObsidianDesktop < Formula
     shell = buildpath/"libelectron/ohos_hap"
 
     # Host payload only: bootstrap + @electron/remote. The vendor app package
-    # (obsidian.asar) is injected by `obsidian-desktop install`, so this HAP
+    # (obsidian.asar) is injected by `obsidian-app install`, so this HAP
     # stays free of closed-source bytes.
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
@@ -222,7 +222,7 @@ class ObsidianDesktop < Formula
 
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "obsidian-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['obsidian-desktop']"
+      odie "obsidian-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['obsidian-app']"
     end
 
     # brew's sanitized build env drops the container's LD_LIBRARY_PATH, but
@@ -249,7 +249,7 @@ class ObsidianDesktop < Formula
                     "obsidian-desktop-unsigned.hap"
 
     # ACL variant of module.json: sandbox/file access, pasteboard reads and the
-    # two kernel JIT ACLs. `obsidian-desktop install` swaps it into the HAP copy
+    # two kernel JIT ACLs. `obsidian-app install` swaps it into the HAP copy
     # and points the signing project at the same permissions, so hap-installer's
     # locally generated debug profile carries them (no AGC profile needed).
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"obsidian-desktop-unsigned.hap", "module.json")
@@ -271,7 +271,7 @@ class ObsidianDesktop < Formula
     chmod 0755, libexec/"obsidian-desktop.sh"
     cp payload/"scripts/obsidian-cli.cjs", libexec/"obsidian-cli.cjs"
     chmod 0755, libexec/"obsidian-cli.cjs"
-    (bin/"obsidian-desktop").write_env_script libexec/"obsidian-desktop.sh",
+    (bin/"obsidian-app").write_env_script libexec/"obsidian-desktop.sh",
       OBSIDIAN_DESKTOP_UNSIGNED_HAP:   libexec/"obsidian-desktop-unsigned.hap",
       OBSIDIAN_DESKTOP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
       OBSIDIAN_DESKTOP_MODULE_ACL:     pkgshare/"module-acl.json",
@@ -280,6 +280,7 @@ class ObsidianDesktop < Formula
       OBSIDIAN_DESKTOP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
       OBSIDIAN_ASAR_URL:               stable.url.to_s,
       OBSIDIAN_ASAR_SHA256:            stable.checksum.hexdigest
+    bin.install_symlink bin/"obsidian-app" => "obsidian-desktop"
   end
 
   def caveats
@@ -287,35 +288,35 @@ class ObsidianDesktop < Formula
       The desktop HAP is unsigned in the bottle and contains no Obsidian code.
       Connect and unlock the device, then run:
 
-        obsidian-desktop install
+        obsidian-app install
 
       It downloads Obsidian #{version} from Obsidian's official release,
       checks the pinned sha256, injects the app package into the HAP, signs with
       a locally generated debug profile, installs and starts it. Use
-      `obsidian-desktop install --asar PATH` to install from a local copy
+      `obsidian-app install --asar PATH` to install from a local copy
       instead (offline devices).
 
       The HAP requests the weak-sandbox ACLs (CUSTOM_SANDBOX,
       READ_WRITE_USER_FILE, READ_PASTEBOARD) and the two kernel JIT ACLs, and
-      `install` points the signing project at the same list. hap-installer
+      `install` points the signing project at the same list. app-installer
       generates the matching local debug profile, so vaults live in your home
       directory (default ~/Obsidian/Obsidian Vault), image paste works, and the
       renderer keeps WebAssembly. The first install asks for a Huawei Developer
-      login to create the profile. ACL profiles need a hap-installer whose
-      toolchain ships the SDK permission definitions (tap hap-installer r3+);
+      login to create the profile. ACL profiles need a app-installer whose
+      toolchain ships the SDK permission definitions (tap app-installer r3+);
       an older one silently generates a profile without ACLs and the device
       rejects the install with 9568289. `--no-acl` installs the strong-sandbox
       variant instead (vaults in the app sandbox, no paste, no JIT).
 
       Command line interface: enable Settings -> General -> Command line
-      interface once, then use `obsidian-desktop cli <command>` (same commands
-      as Obsidian's own `obsidian` CLI: try `obsidian-desktop cli help`). The
+      interface once, then use `obsidian-app cli <command>` (same commands
+      as Obsidian's own `obsidian` CLI: try `obsidian-app cli help`). The
       app listens on a UNIX socket inside its sandbox; the host process bridges
       it to loopback TCP with a token stored in
-      ~/.cache/obsidian-desktop/cli.json.
+      ~/.cache/obsidian-app/cli.json.
 
       Desktop self-update is disabled; upgrading is `brew upgrade` plus
-      `obsidian-desktop install`. The formula version follows Obsidian's
+      `obsidian-app install`. The formula version follows Obsidian's
       releases, so `brew bump-formula-pr` / autobump handles a new version
       without touching the host payload.
     EOS
@@ -325,8 +326,8 @@ class ObsidianDesktop < Formula
     home = testpath/"home"
     home.mkpath
     ENV["HOME"] = home
-    assert_match "Usage: obsidian-desktop", shell_output("#{bin}/obsidian-desktop --help")
-    assert_match "cli ...", shell_output("#{bin}/obsidian-desktop --help")
+    assert_match "Usage: obsidian-app", shell_output("#{bin}/obsidian-app --help")
+    assert_match "cli ...", shell_output("#{bin}/obsidian-app --help")
     assert_path_exists libexec/"obsidian-cli.cjs"
 
     hap = libexec/"obsidian-desktop-unsigned.hap"
@@ -354,7 +355,7 @@ class ObsidianDesktop < Formula
     fake_bin.mkpath
     injected = testpath/"injected.hap"
     installer_args = testpath/"installer-args"
-    fake_installer = fake_bin/"hap-installer"
+    fake_installer = fake_bin/"app-installer"
     fake_installer.write <<~SH
       #!/bin/sh
       printf '%s\n' "$@" > #{installer_args}
@@ -390,7 +391,7 @@ class ObsidianDesktop < Formula
 
     # progress messages go to stderr, keep them in the captured output
     assert_match "installed",
-                 shell_output("#{bin}/obsidian-desktop install --asar #{asar} 2>&1")
+                 shell_output("#{bin}/obsidian-app install --asar #{asar} 2>&1")
     assert_match "--bundle-id", installer_args.read
     assert_match "resources/resfile/resources/app/obsidian.asar", shell_output("unzip -l #{injected}")
     injected_module = JSON.parse(shell_output("unzip -p #{injected} module.json"))
@@ -399,7 +400,7 @@ class ObsidianDesktop < Formula
     refute_path_exists home/".hap-installer"
     installer = installer_args.read.lines(chomp: true)
     assert_equal fake_hdc.to_s, installer[installer.index("--hdc") + 1]
-    assert_match "installed", shell_output("#{bin}/obsidian-desktop install --asar #{asar} --no-acl 2>&1")
+    assert_match "installed", shell_output("#{bin}/obsidian-app install --asar #{asar} --no-acl 2>&1")
     strong = JSON.parse(shell_output("unzip -p #{injected} module.json"))
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
                  strong.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }.sort

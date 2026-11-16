@@ -1,5 +1,6 @@
 {
   "hap-installer": "app-installer",
   "opencode-desktop": "opencode-app",
-  "zcode-desktop": "zcode-app"
+  "zcode-desktop": "zcode-app",
+  "obsidian-desktop": "obsidian-app"
 }

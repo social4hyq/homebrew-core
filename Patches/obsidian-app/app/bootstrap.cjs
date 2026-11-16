@@ -259,7 +259,7 @@ try {
 }
 
 // Bridge Obsidian's CLI socket (sandbox-only) to loopback TCP with a token, so
-// the host-side `obsidian-desktop cli` can drive the running app.
+// the host-side `obsidian-app cli` can drive the running app.
 let cliConfigPath = null;
 function startCliBridge() {
   try {

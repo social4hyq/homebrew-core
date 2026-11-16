@@ -9,7 +9,7 @@
 #
 # The default variant is the weak sandbox: the HAP requests CUSTOM_SANDBOX,
 # READ_WRITE_USER_FILE, READ_PASTEBOARD and the two kernel JIT ACLs, and the
-# tap's hap-installer generates the matching local debug profile (it drives
+# tap's app-installer generates the matching local debug profile (it drives
 # `devecocli signature generate` itself, so no separate toolchain is needed).
 # `--no-acl` falls back to the strong sandbox for debugging.
 set -euo pipefail
@@ -28,7 +28,7 @@ KEEP=0
 
 usage() {
   cat <<'EOF'
-Usage: obsidian-desktop install [--asar PATH] [--no-acl] [--keep]
+Usage: obsidian-app install [--asar PATH] [--no-acl] [--keep]
 
   --asar PATH   Use a local obsidian.asar instead of downloading the pinned
                 official release.
@@ -58,7 +58,7 @@ done
 command -v node >/dev/null || die "node not found"
 command -v zip >/dev/null || die "zip not found"
 command -v sha256sum >/dev/null || die "sha256sum not found"
-command -v hap-installer >/dev/null || die "hap-installer not found"
+command -v app-installer >/dev/null || die "app-installer not found"
 
 # --- app package: official download or a local copy ------------------------
 if [ -z "$ASAR_PATH" ]; then
@@ -152,10 +152,10 @@ else
   (cd "$stage/tree" && zip -q -X "$injected" resources/resfile/resources/app/obsidian.asar)
 fi
 
-# Stream hap-installer's output instead of capturing it: the Huawei login URL
+# Stream app-installer's output instead of capturing it: the Huawei login URL
 # and progress lines must reach the terminal while the command is still running.
 log "signing and installing; a first-time Huawei Developer login prints a URL below"
-if ! hap-installer --hap "$injected" --bundle-id "$BUNDLE_ID" \
+if ! app-installer --hap "$injected" --bundle-id "$BUNDLE_ID" \
     --app-name "$APP_NAME" --module electron --ability EntryAbility \
     --signed-hap "$signed" --hdc "$HDC" 2>&1 | sed '/^FileTransfer/d' >&2; then
   die "installation failed"
