@@ -10,7 +10,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 11
+  revision 12
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
