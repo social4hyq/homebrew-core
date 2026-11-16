@@ -11,6 +11,11 @@ class HerdrCore < Formula
     strategy :github_latest
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-core-v0.1.21-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ff40411f1afe44e6b185a6a1423a3a938d216c9dff56816ab70882324e8a301b"
+  end
+
   depends_on "rust" => :build
   depends_on "zig@0.16" => :build
 
