@@ -10,7 +10,7 @@ class ObsidianDesktop < Formula
   # Obsidian's own release at install time (never copied into the bottle); see
   # obsidian.md terms and multica.rb.
   license :cannot_represent
-  revision 2
+  revision 3
 
   # Upstream is the vendor app, not the tap-authored host payload: the formula
   # version tracks Obsidian so `brew upgrade` follows new releases, while the
@@ -24,8 +24,8 @@ class ObsidianDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v1.15.1-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "51fc7bd568dfa6d4153a99b978d6773ce7d1760b45a969363b204893c9ac1cd2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v1.15.1-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "53f8ef209dfeae53fa7d42b51482a3b4f292377e91b398de7e1cfeddb230f5c0"
   end
 
   depends_on "curl"
