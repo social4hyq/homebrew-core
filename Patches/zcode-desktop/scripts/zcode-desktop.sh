@@ -21,8 +21,9 @@ Usage: zcode-desktop <command>
 
   install [--no-acl] [--hap PATH]
                       Inject the host connection config, sign and install the
-                      shell HAP on the connected device (--hap overrides the
-                      bundled unsigned HAP; used by tests and local builds).
+                      shell HAP on the connected device, then start the backing
+                      service (--hap overrides the bundled unsigned HAP; used by
+                      tests and local builds).
   serve [--workspace DIR]
                       Start the host `zcode --web` instance (background) if it
                       is not already healthy; with --workspace, switch the
@@ -229,9 +230,17 @@ cmd_install() {
   done
   ensure_config
   ensure_secret
-  exec "${ZCODE_DESKTOP_INSTALL_SCRIPT:?missing install script}" \
+  "${ZCODE_DESKTOP_INSTALL_SCRIPT:?missing install script}" \
     --hap "${hap:-${ZCODE_DESKTOP_UNSIGNED_HAP:?missing unsigned HAP}}" \
     --config "$CONFIG_FILE" "${extra[@]+"${extra[@]}"}"
+  # The shell connects to the host instance; start it right away so the app
+  # icon opens the workbench instead of the "waiting for the service" page.
+  read_config
+  if healthy; then
+    printf 'zcode-desktop: service already healthy at http://127.0.0.1:%s\n' "$PORT"
+  else
+    ensure_serve
+  fi
 }
 
 cmd_serve() {

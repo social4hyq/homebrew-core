@@ -10,18 +10,13 @@ class ZcodeDesktop < Formula
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
-  revision 5
+  revision 6
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
     strategy :json do |json|
       json["version"]
     end
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v3.18.2-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0b10a9c47b1165d4e28a49e3e26478c4f291f88fc5511dfc485c6bd8bba601d"
   end
 
   depends_on "node" => :build
@@ -210,8 +205,9 @@ class ZcodeDesktop < Formula
       hap-installer generates a local debug profile (the first run asks for a
       Huawei Developer login), signs the HAP and installs it.
 
-      The shell connects to the host `zcode --web` instance and never starts
-      it itself:
+      `zcode-desktop install` also starts the backing `zcode --web` instance,
+      so the app icon opens the workbench directly. The shell never starts the
+      service itself; after a reboot start it again:
 
         zcode-desktop serve      # start it (the shell waits for it otherwise)
         zcode-desktop status
