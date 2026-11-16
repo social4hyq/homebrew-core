@@ -11,6 +11,11 @@ class AppInstaller < Formula
     strategy :npm
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.10-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "64f18f718c8236b8097745a56e42d07f090790ce27274766e2ed7292089089b0"
+  end
+
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "unzip"
