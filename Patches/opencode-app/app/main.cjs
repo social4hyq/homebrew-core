@@ -2,7 +2,7 @@
 // OpenCode desktop shell for OpenHarmony.
 // Loads a local `opencode serve` instance and injects HTTP basic auth for its
 // origin. Connection parameters and the host environment needed to spawn the
-// server are baked into config.json by `opencode-desktop install` before HAP
+// server are baked into config.json by `opencode-app install` before HAP
 // signing. On launch the shell starts the server itself when it is not
 // already running (requires the CUSTOM_SANDBOX / READ_WRITE_USER_FILE ACLs).
 const { app, BrowserWindow } = require('electron');
@@ -149,6 +149,7 @@ async function drive(win) {
 
 app.whenReady().then(() => {
   const win = new BrowserWindow({
+    backgroundColor: "#11141b",
     width: 1280,
     height: 800,
     autoHideMenuBar: true,

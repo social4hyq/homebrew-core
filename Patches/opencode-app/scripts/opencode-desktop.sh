@@ -14,7 +14,7 @@ ABILITY="EntryAbility"
 
 usage() {
   cat <<'EOF'
-Usage: opencode-desktop <command>
+Usage: opencode-app <command>
 
 Commands:
   start     Open the desktop app (it starts the backend itself when installed
