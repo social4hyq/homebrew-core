@@ -15,7 +15,7 @@ index 0000000..97ac1d8
 +# the app. The HAP sandbox can neither run binaries nor see ~/.multica.
 +set -euo pipefail
 +
-+BUNDLE_ID="com.huawei.ohos_electron"
++BUNDLE_ID="com.social4hyq.multica"
 +MODULE="electron"
 +ABILITY="EntryAbility"
 +

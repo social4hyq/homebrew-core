@@ -12,7 +12,7 @@ index 0000000..f4e6727
 +#!/usr/bin/env bash
 +set -euo pipefail
 +
-+BUNDLE_ID="com.huawei.ohos_electron"
++BUNDLE_ID="com.social4hyq.multica"
 +HAP_ENTRY="resources/resfile/resources/app/desktop-bridge.json"
 +
 +usage() {
