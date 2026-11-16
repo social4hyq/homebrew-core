@@ -10,7 +10,7 @@ class ZcodeDesktop < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 8
+  revision 9
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -20,15 +20,16 @@ class ZcodeDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v3.18.2-r10"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2af56d1c0ba376d79e2163f43b48d356c9ada2c2308705027a7e6042cd750f47"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v3.18.2-r11"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "63fd2494daf57b2822c4b01b71088246849f8e036bb96e39761c50e870e5d75c"
   end
 
-  depends_on "node" => :build
   depends_on "bun"
   depends_on "curl"
   depends_on "hap-installer"
+  depends_on "node"
   depends_on "ohos-sdk-toolchains"
+  depends_on "unzip"
   depends_on "zcode"
   depends_on "zip"
 
@@ -41,9 +42,7 @@ class ZcodeDesktop < Formula
     Patches/zcode-desktop/app/package.json
     Patches/zcode-desktop/app/waiting.html
     Patches/zcode-desktop/assets/icon.png
-    Patches/zcode-desktop/scripts/build-hap.sh
     Patches/zcode-desktop/scripts/install-desktop.sh
-    Patches/zcode-desktop/scripts/stage-app.sh
     Patches/zcode-desktop/scripts/zcode-desktop.sh
   ].freeze
 
@@ -193,7 +192,8 @@ class ZcodeDesktop < Formula
       ZCODE_DESKTOP_ZCODE:          formula_opt_bin("zcode")/"zcode",
       ZCODE_DESKTOP_ZCODE_ROOT:     formula_opt_prefix("zcode")/"libexec/zcode",
       ZCODE_DESKTOP_BUN:            formula_opt_bin("bun")/"bun",
-      ZCODE_DESKTOP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc"
+      ZCODE_DESKTOP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
+      PATH:                         "#{formula_opt_bin("node")}:$PATH"
   end
 
   def caveats
@@ -292,27 +292,14 @@ class ZcodeDesktop < Formula
     SH
     chmod 0755, fake_bin/"hap-installer"
 
-    (fake_bin/"devecocli").write <<~SH
-      #!/bin/sh
-      case "$1" in
-        create)
-          while [ $# -gt 0 ]; do
-            if [ "$1" = "--project-path" ]; then project="$2"; fi
-            shift
-          done
-          mkdir -p "$project/entry/src/main"
-          printf '{\n  "module": {\n    "name": "entry",\n    "type": "entry"\n  }\n}\n' > "$project/entry/src/main/module.json5"
-          printf '{"app":{"signingConfigs":[]}}\n' > "$project/build-profile.json5"
-          ;;
-      esac
-    SH
+    (fake_bin/"devecocli").write "#!/bin/sh\nexit 99\n"
     chmod 0755, fake_bin/"devecocli"
 
     ENV.prepend_path "PATH", fake_bin
     ENV["ZCODE_DESKTOP_HDC"] = (fake_bin/"hdc").to_s
 
     # Default install: config injection, ACL module and signing project.
-    assert_match "installed and started", shell_output("#{bin}/zcode-desktop install --hap #{fake_hap} --no-serve")
+    assert_match "installed", shell_output("#{bin}/zcode-desktop install --hap #{fake_hap} --no-serve")
     host_config = JSON.parse((testpath/"home/.config/zcode-desktop/config.json").read)
     assert_operator host_config.fetch("port"), :>, 0
     assert_equal Dir.home, host_config.fetch("workspace")
@@ -329,16 +316,16 @@ class ZcodeDesktop < Formula
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
                  acl_permissions.sort
-    project_dir = Pathname.new(Dir.home)/".hap-installer/projects/com.social4hyq.zcodedesktop"
-    assert_match "READ_PASTEBOARD", (project_dir/"entry/src/main/module.json5").read
+    refute_path_exists Pathname.new(Dir.home)/".hap-installer"
     installer = installer_args.read.lines(chomp: true)
     assert_equal "com.social4hyq.zcodedesktop", installer[installer.index("--bundle-id") + 1]
     assert_equal "ZCode", installer[installer.index("--app-name") + 1]
     assert_equal "electron", installer[installer.index("--module") + 1]
     assert_equal "EntryAbility", installer[installer.index("--ability") + 1]
+    assert_equal (fake_bin/"hdc").to_s, installer[installer.index("--hdc") + 1]
 
     # --no-acl keeps the HAP's own permission list.
-    assert_match "installed and started",
+    assert_match "installed",
                  shell_output("#{bin}/zcode-desktop install --hap #{fake_hap} --no-acl --no-serve")
     strong_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     strong_requests = strong_module.dig("module", "requestPermissions")

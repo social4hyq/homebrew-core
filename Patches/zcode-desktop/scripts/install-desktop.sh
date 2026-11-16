@@ -50,12 +50,9 @@ done
 
 [ -n "$CONFIG" ] && [ -f "$CONFIG" ] || die "host config not found: ${CONFIG:-<unset>}"
 [ -f "$SHELL_HAP" ] || die "shell HAP not found: $SHELL_HAP"
+command -v node >/dev/null || die "node not found"
 command -v zip >/dev/null || die "zip not found"
 command -v hap-installer >/dev/null || die "hap-installer not found"
-
-port="$(sed -n 's/.*"port"[[:space:]]*:[[:space:]]*\([0-9][0-9]*\).*/\1/p' "$CONFIG" | head -1)"
-workspace="$(sed -n 's/.*"workspace"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$CONFIG" | head -1)"
-[ -n "$port" ] && [ "$port" -gt 0 ] || die "cannot read the web port from $CONFIG"
 
 ACL=0
 if [ "$WANT_ACL" = "1" ] && [ -n "$MODULE_ACL" ] && [ -f "$MODULE_ACL" ]; then
@@ -64,56 +61,29 @@ elif [ "$WANT_ACL" = "1" ]; then
   log "warning: ACL module.json missing; falling back to the strong-sandbox HAP"
 fi
 
-# The signing CLI can only issue a complete ACL profile when it can read the
-# SDK's permission definitions. Warn early instead of failing after the upload
-# with a bare 9568289.
-if [ "$ACL" = "1" ]; then
-  installer_path="$(command -v hap-installer)"
-  toolchain="$(sed -n 's/^COMMAND_LINE_TOOL_PATH="\([^"]*\)".*/\1/p' "$installer_path" | head -1)"
-  if [ -n "$toolchain" ] &&
-     [ ! -f "$toolchain/sdk/default/openharmony/toolchains/lib/PermissionDefinitions.json" ] &&
-     [ ! -f "$toolchain/sdk/default/openharmony/toolchains/lib/permissionDefinitions.json" ]; then
-    log "warning: hap-installer's toolchain has no PermissionDefinitions.json;"
-    log "the generated profile will miss ACLs and installation will fail with 9568289."
-  fi
-fi
-
 # The ACL module.json replaces the HAP's own module.json; a bundle mismatch
 # surfaces as an unreadable 9568329 on the device, so catch it here.
 if [ "$ACL" = "1" ]; then
-  hap_bundle="$(unzip -p "$SHELL_HAP" module.json | sed -n 's/.*"bundleName": *"\([^"]*\)".*/\1/p' | head -1)"
-  acl_bundle="$(sed -n 's/.*"bundleName": *"\([^"]*\)".*/\1/p' "$MODULE_ACL" | head -1)"
+  hap_bundle="$(unzip -p "$SHELL_HAP" module.json | node -e 'let s=""; process.stdin.on("data",c=>s+=c).on("end",()=>process.stdout.write(JSON.parse(s).app.bundleName))')"
+  acl_bundle="$(node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8")).app.bundleName)' "$MODULE_ACL")"
   [ "$hap_bundle" = "$acl_bundle" ] || die "module-acl.json targets $acl_bundle but the HAP is $hap_bundle"
 fi
 
-ensure_hdc_target() {
-  local connected port hint
-  connected() { "$HDC" list targets -v 2>/dev/null | grep -qE '[[:space:]]Connected([[:space:]]|$)'; }
-  if connected; then return 0; fi
-  port=""
-  if command -v param >/dev/null 2>&1; then
-    port="$(param get persist.hdc.port 2>/dev/null | tr -d ' \n' || true)"
-  fi
-  if [ -n "$port" ]; then
-    "$HDC" tconn "127.0.0.1:$port" >/dev/null 2>&1 || true
-    hint="tried \`hdc tconn 127.0.0.1:$port\`"
-  else
-    hint="persist.hdc.port could not be read"
-  fi
-  if ! connected; then
-    die "no connected hdc target; enable developer options on this PC, unlock it, then retry ($hint)"
-  fi
-}
-
-stage="$(mktemp -d)"
+stage="$(mktemp -d "${TMPDIR:-$HOME/.cache}/zcode-desktop-inject.XXXXXX")"
 trap 'rm -rf "$stage"' EXIT
 injected="$stage/zcode-desktop-injected.hap"
 signed="$stage/zcode-desktop-signed.hap"
 cp "$SHELL_HAP" "$injected"
 
 mkdir -p "$stage/tree/$(dirname "$HAP_CONFIG")"
-printf '{"port":%s,"workspace":"%s"}\n' "$port" "$workspace" > "$stage/tree/$HAP_CONFIG"
-log "injecting port $port${workspace:+ (workspace $workspace)}"
+node - "$CONFIG" "$stage/tree/$HAP_CONFIG" <<'JS'
+const fs = require("node:fs");
+const [source, destination] = process.argv.slice(2);
+const config = JSON.parse(fs.readFileSync(source, "utf8"));
+if (!Number.isInteger(config.port) || config.port < 1 || config.port > 65535) throw new Error("invalid web port");
+if (typeof config.workspace !== "string") throw new Error("invalid workspace");
+fs.writeFileSync(destination, JSON.stringify({port: config.port, workspace: config.workspace}) + "\n");
+JS
 
 if [ "$ACL" = "1" ]; then
   cp "$MODULE_ACL" "$stage/tree/module.json"
@@ -122,50 +92,12 @@ else
   (cd "$stage/tree" && zip -q -X "$injected" "$HAP_CONFIG")
 fi
 
-# The signing project must request the same ACLs the HAP declares, because
-# hap-installer generates the debug profile from this project.
-if [ "$ACL" = "1" ]; then
-  command -v devecocli >/dev/null || die "devecocli not found"
-  sign_project="${HOME}/.hap-installer/projects/${BUNDLE_ID}"
-  if [ ! -f "$sign_project/build-profile.json5" ]; then
-    mkdir -p "$(dirname "$sign_project")"
-    devecocli create --project-path "$sign_project" --app-name "$APP_NAME" \
-      --bundle-name "$BUNDLE_ID" >/dev/null
-  fi
-  module_json5="$sign_project/entry/src/main/module.json5"
-  if [ -f "$module_json5" ]; then
-    perms_tmp="$stage/signing-permissions.json5"
-    cat > "$perms_tmp" <<'PERMS'
-    "requestPermissions": [
-      { "name": "ohos.permission.INTERNET" },
-      { "name": "ohos.permission.GET_NETWORK_INFO" },
-      { "name": "ohos.permission.READ_PASTEBOARD" },
-      { "name": "ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY" },
-      { "name": "ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION" }
-    ],
-PERMS
-    if grep -q '"requestPermissions"' "$module_json5"; then
-      sed -i '/"requestPermissions": \[/,/^[[:space:]]*\],/d' "$module_json5"
-    fi
-    sed -i '/"module": {/r '"$perms_tmp" "$module_json5"
-  fi
-fi
-
-ensure_hdc_target
 # Stream hap-installer's output instead of capturing it: the Huawei login URL
 # and progress lines must reach the terminal while the command is still running.
-log_file="$stage/hap-installer.log"
 log "signing and installing; a first-time Huawei Developer login prints a URL below"
 if ! hap-installer --hap "$injected" --bundle-id "$BUNDLE_ID" \
     --app-name "$APP_NAME" --module electron --ability EntryAbility \
-    --signed-hap "$signed" 2>&1 | sed '/^FileTransfer/d' | tee "$log_file" >&2; then
-  case "$(cat "$log_file")" in
-    *9568289*)
-      log "hint: 9568289 means the device refused the restricted ACLs (CUSTOM_SANDBOX,"
-      log "READ_WRITE_USER_FILE) in the generated debug profile. Retry with --no-acl"
-      log "for the strong-sandbox build, or sign with an AGC-provisioned ACL profile."
-      ;;
-  esac
+    --signed-hap "$signed" --hdc "$HDC" 2>&1 | sed '/^FileTransfer/d' >&2; then
   die "installation failed"
 fi
 
@@ -178,4 +110,4 @@ variant="strong-sandbox"
 if [ "$ACL" = "1" ]; then variant="ACL"; fi
 # The result line goes to stdout: callers (and `brew test`) read the command's
 # stdout, while progress/diagnostics stay on stderr.
-printf 'installed and started (%s, %s)\n' "$BUNDLE_ID" "$variant"
+printf 'installed (%s, %s)\n' "$BUNDLE_ID" "$variant"
