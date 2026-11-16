@@ -10,6 +10,7 @@ class ObsidianDesktop < Formula
   # Obsidian's own release at install time (never copied into the bottle); see
   # obsidian.md terms and multica.rb.
   license :cannot_represent
+  revision 1
 
   # Upstream is the vendor app, not the tap-hosted host payload: the formula
   # version tracks Obsidian so `brew upgrade` follows new releases, while the
@@ -22,23 +23,19 @@ class ObsidianDesktop < Formula
     end
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v1.15.1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fc6dec36417dddd76d91b80d2b9614c32b3df3664ade4a9014b02af5598e3a0a"
-  end
-
   depends_on "curl"
   depends_on "hap-installer"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
+  depends_on "unzip"
   depends_on "zip"
 
   # Tap-authored host payload (bootstrap host, CLI client, installer scripts),
   # versioned independently of Obsidian. Bumping it needs a new payload release
   # and only the url/sha256 here.
   resource "host" do
-    url "https://github.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.4/obsidian-desktop-0.1.4.tar.gz"
-    sha256 "8932f0227b2b2ca570dce3ece1aa24eb8a66f7a5f98ec195013177b7c846b066"
+    url "https://github.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v0.1.5/obsidian-desktop-0.1.5.tar.gz"
+    sha256 "99cab62860350af278e44febdbf6216a4f81c6c89a26067e544758aff3d5d0c4"
   end
 
   # openharmony-sig/electron PC(2in1) prebuilt (CodeHub mirror hosted on this
