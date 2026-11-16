@@ -1,0 +1,50 @@
+--- a/packages/web/src/main.tsx	2026-11-16 08:51:43.033844844 +0800
++++ b/packages/web/src/main.tsx	2026-11-16 08:51:43.077847187 +0800
+@@ -388,8 +388,22 @@
+ 
+ function renderWebLoginPage(): void {
+   document.title = "ZCode - Web Remote Control Sign In";
++  // A page served by a loopback `zcode --web` must use the server-side OAuth
++  // flow (init + poll), the same one the desktop app and `zcode login` use.
++  // The account web-remote callback rejects loopback origins, so the browser
++  // login button can never complete for a locally served page.
++  const useServerLogin =
++    window.location.hostname === "127.0.0.1" ||
++    window.location.hostname === "localhost" ||
++    window.location.hostname === "[::1]";
+   root.render(
+-    <WebLoginPage onLogin={(provider, signal) => remoteEntry.startLogin(provider, signal)} />,
++    <WebLoginPage
++      onLogin={(provider, signal) =>
++        useServerLogin
++          ? startLocalServerLogin(provider, signal)
++          : remoteEntry.startLogin(provider, signal)
++      }
++    />,
+   );
+ }
+ 
+@@ -396,3 +410,23 @@
++async function startLocalServerLogin(provider: string, signal?: AbortSignal): Promise<void> {
++  const bootstrap = await resolveWebBootstrap();
++  const services: any = await connectViaWebSocket(bootstrap.wsUrl, { onClose: () => {} });
++  const started = await services.oauthService.startOAuthWithPolling(provider);
++  window.open(started.authorizeUrl, "_blank", "noopener,noreferrer");
++  for (;;) {
++    if (signal?.aborted) return;
++    try {
++      const polled = await services.oauthService.pollPendingOAuth();
++      if (polled && polled.kind === "session") {
++        window.location.reload();
++        return;
++      }
++    } catch {
++      // transient poll failures before the browser completes the flow
++    }
++    await new Promise((resolve) => setTimeout(resolve, 1500));
++  }
++}
++
+ // 访问 window.localStorage 本身在部分浏览器会抛错，统一包在方法里交给调用方兜底。
+ const webRemoteControlStorage: Pick<Storage, "getItem" | "setItem"> = {
+   getItem: (key) => window.localStorage.getItem(key),
