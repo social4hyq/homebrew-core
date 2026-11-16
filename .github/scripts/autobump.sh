@@ -442,11 +442,11 @@ for line in "${CANDIDATES[@]}"; do
     continue
   fi
 
-  if [ "$FORMULA" = deepseek-harness-desktop ]; then
+  if [[ "$FORMULA" == deepseek-harness-desktop || "$FORMULA" == deepseek-harness-app ]]; then
     # brew test requires the shell package version to match the formula.
     # bump-formula-pr pushes by URL, so origin's remote-tracking ref may not
     # exist; take the lease expectation from the branch actually on GitHub.
-    PACKAGE_JSON="$TAP_IN_CONTAINER/Patches/deepseek-harness-desktop/app/package.json"
+    PACKAGE_JSON="$TAP_IN_CONTAINER/Patches/$FORMULA/app/package.json"
     if ! docker exec "$CONTAINER" bash -lc "
       set -euo pipefail
       cd \"$TAP_IN_CONTAINER\"
