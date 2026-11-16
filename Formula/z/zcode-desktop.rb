@@ -10,18 +10,13 @@ class ZcodeDesktop < Formula
   # Tap-authored shell scripts (MIT) packaging the openharmony-sig Electron
   # prebuilt (Chromium/Electron, mixed MIT/BSD/LGPL); see multica.rb.
   license :cannot_represent
-  revision 3
+  revision 4
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
     strategy :json do |json|
       json["version"]
     end
-  end
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v3.18.2-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d566f18ac75ff3ba489d17388eee98a9eed7dc48cd90088a92748185d213e48"
   end
 
   depends_on "node" => :build
@@ -169,6 +164,18 @@ class ZcodeDesktop < Formula
        ohos.permission.READ_PASTEBOARD].each do |name|
       requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
     end
+    # Register zcode://<host>/callback so the browser's OAuth handoff opens the
+    # shell instead of OHOS's "no application can open this" dialog. The web
+    # client finishes the login through the server poll; the handoff only has
+    # to reach the app.
+    entry = module_json.fetch("module").fetch("abilities").find { |ability| ability["name"] == "EntryAbility" }
+    skills = entry["skills"] ||= []
+    unless skills.any? { |skill| Array(skill["uris"]).any? { |uri| uri["scheme"] == "zcode" } }
+      skills << {
+        "actions" => ["ohos.want.action.viewData"],
+        "uris"    => [{ "scheme" => "zcode" }],
+      }
+    end
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
     # cp, not install: Pathname#install moves the source, and the tap checkout
@@ -224,7 +231,10 @@ class ZcodeDesktop < Formula
       same one `zcode login` uses), prints the authorize URL to open, stores
       the account in ~/.zcode/v2 and restarts the managed server. Afterwards
       use "API key" -> "skip for now" in the dialog. OAuth pages for z.ai and
-      bigmodel.cn are kept in the app window instead of the system browser.
+      bigmodel.cn are kept in the app window instead of the system browser,
+      and the HAP registers the zcode:// scheme so the browser's OAuth handoff
+      launches the shell instead of OHOS's "no application can open this"
+      dialog.
 
       The default install carries the two kernel ACLs (JIT/WebAssembly for the
       renderer) and READ_PASTEBOARD; `zcode-desktop install --no-acl` installs

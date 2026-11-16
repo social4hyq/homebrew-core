@@ -17,6 +17,24 @@ try {
 const configured = Number.isInteger(config.port) && config.port > 0;
 const origin = configured ? `http://127.0.0.1:${config.port}` : null;
 
+// zcode://oauth/callback comes back from the browser after a successful login.
+// The web client finishes the login through the server poll; the handoff only
+// has to reach the app, so bring the shell forward when it is delivered.
+function focusShellWindow() {
+  const target = BrowserWindow.getAllWindows()[0];
+  if (!target || target.isDestroyed()) return;
+  if (target.isMinimized()) target.restore();
+  target.show();
+  target.focus();
+}
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  if (/^zcode:\/\//i.test(url)) focusShellWindow();
+});
+for (const arg of process.argv.slice(1)) {
+  if (/^zcode:\/\//i.test(arg)) app.whenReady().then(focusShellWindow);
+}
+
 function serverUp(timeoutMs) {
   return new Promise((resolve) => {
     if (!configured) return resolve(false);
