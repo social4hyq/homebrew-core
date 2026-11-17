@@ -10,6 +10,11 @@ class Orca < Formula
     strategy :github_latest
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-v1.4.261-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d241762cd3ceb015100d0757527ae3dadb24c5d51b7127d629e97a47615b312e"
+  end
+
   depends_on "bun" => :build
   depends_on "ohos-sdk-native" => :build
   depends_on "pnpm" => :build
