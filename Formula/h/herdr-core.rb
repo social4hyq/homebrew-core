@@ -14,9 +14,8 @@ class HerdrCore < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-core-v0.1.21-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db7ba6271bd1e2cea58893a91f71e5c0b434868d14e98395ef25627df17cc02a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-core-v0.1.21-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "427d9b105d34186c33b3f3b33e50df2665181ef3b0af2583361c84cf6ee260b3"
   end
 
   depends_on "rust" => :build
