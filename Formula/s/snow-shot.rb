@@ -4,11 +4,11 @@ class SnowShot < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.7_snow-shot.tar.gz"
   sha256 "6d9de662710ccf406dea312c0322e77a3f473bc6121096ec82df713d30f4273c"
   license "GPL-3.0-or-later"
-  revision 14
+  revision 15
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.7-r17"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7dc79877a4b9df3a5360fec4b3eabc094e86be2c91ec2c034bc4ecff5fcfd445"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.7-r18"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d0a9c89dae729796cbea25ce4b5e8d5b7ce6914aec0ebfbd6f2aa396183b1641"
   end
 
   depends_on "brotli" => :build
