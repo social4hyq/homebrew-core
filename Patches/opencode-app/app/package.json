@@ -1,7 +1,0 @@
-{
-  "name": "opencode-desktop-shell",
-  "version": "2.3.0",
-  "private": true,
-  "description": "OpenCode desktop shell for OpenHarmony (loads a local opencode serve instance)",
-  "main": "main.cjs"
-}
