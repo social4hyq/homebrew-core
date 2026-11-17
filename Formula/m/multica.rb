@@ -1,10 +1,9 @@
 class Multica < Formula
   desc "CLI and local daemon for the Multica AI agent workspace"
   homepage "https://multica.ai"
-  url "https://github.com/multica-ai/multica/archive/refs/tags/v0.9.0.tar.gz"
-  sha256 "c52ffa09412bfc0f6cd6bed0900a66252b1c30f355f257f991a62a88e121eac8"
+  url "https://github.com/multica-ai/multica/archive/refs/tags/v0.10.0.tar.gz"
+  sha256 "4f0092e840fc07014b80b5a7fa9bf11e96425a4dd1879e86485df8511b7be999"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 14
 
   livecheck do
     url :stable
@@ -12,9 +11,8 @@ class Multica < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.9.0-r20"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f916c37ded99d0b3b7488290ad05f6db67c1c2b3627414b48f35c33c73ea195"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.10.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "adf4b9ea09c9dcc02883189921f51b0fa728ed8be4a9b3046045de3a078ecaed"
   end
 
   depends_on "go" => :build
