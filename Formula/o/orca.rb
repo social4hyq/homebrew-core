@@ -4,7 +4,7 @@ class Orca < Formula
   url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.261.tar.gz"
   sha256 "5b8a21bb9cde62a1dd7ca3c0ffd2f684faf168ea401191068777a8a9e7466909"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class Orca < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-v1.4.261-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "707816cd522c8e69b052930631caeca81bb958803e753bd35a11574c189abe60"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-v1.4.261-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7cd55d4ce1d7e5aa881c267f50f1694a2cb9e764b3b1d3e294c928951055f47a"
   end
 
   depends_on "bun" => :build
