@@ -7,7 +7,7 @@ class HerdrCore < Formula
   head "https://github.com/herdrdev/herdr-core.git", branch: "master"
 
   livecheck do
-    url "https://github.com/herdrdev/herdr-core.git"
+    url :head
     regex(/^v?(\d+(?:\.\d+)+)$/i)
     strategy :git
   end
