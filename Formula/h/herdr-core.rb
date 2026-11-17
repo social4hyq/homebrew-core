@@ -4,7 +4,7 @@ class HerdrCore < Formula
   url "https://github.com/herdrdev/herdr-core/archive/refs/tags/v0.1.21.tar.gz"
   sha256 "28bffdc1eecd5526e93590f20c8e78d3ebc2a11b19a39821beddc74e8988edd9"
   license "Apache-2.0"
-  revision 1
+  revision 2
   head "https://github.com/herdrdev/herdr-core.git", branch: "master"
 
   livecheck do
@@ -46,6 +46,14 @@ class HerdrCore < Formula
   # TUIs drawing for the old size. Signal the foreground group after resizing.
   patch do
     file "Patches/herdr-core/0003-pty-resize-notify-winch.patch"
+  end
+
+  # OHOS: the kernel's edge-triggered epoll can drop a socket's readable event,
+  # so tokio stops reading a client: a viewer's CREDIT frames go unread and its
+  # output stream stalls for good after a burst of terminal output. Read client
+  # sockets on a thread that waits with poll(2) instead.
+  patch do
+    file "Patches/herdr-core/0004-client-read-without-epoll-edge.patch"
   end
 
   def install
