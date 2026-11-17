@@ -2,14 +2,20 @@
 # Inject the host connection config into the shell HAP, sign it and install it.
 #
 # The bottle HAP is unsigned and carries only a placeholder config.json; this
-# script writes the real connection settings (the loopback port and the web
-# client URL with its pairing code) into a copy of the HAP, optionally swaps in
-# the ACL module.json, and signs it with a locally generated debug profile
-# through app-installer.
+# script writes the real connection settings (the loopback port, the host
+# `orca` binary the shell spawns, and the host environment that binary needs)
+# into a copy of the HAP, optionally swaps in the ACL module.json, and signs it
+# with a locally generated debug profile through app-installer.
 #
-# Default variant is the ACL one (the two kernel JIT ACLs keep WebAssembly
-# available in the renderer, READ_PASTEBOARD makes paste work). --no-acl
-# installs the strong-sandbox variant for debugging.
+# The shell starts the runtime server itself, so no pairing URL is baked in: the
+# runtime mints a single-use link on each start and the shell reads it from the
+# server log.
+#
+# Default variant is the ACL one (CUSTOM_SANDBOX and READ_WRITE_USER_FILE let the
+# shell spawn the host binary and reach the host profile; the two kernel JIT ACLs
+# keep WebAssembly available in the renderer, READ_PASTEBOARD makes paste work).
+# --no-acl installs the strong-sandbox variant, which then waits for a host
+# `orca-app serve`.
 set -euo pipefail
 
 BUNDLE_ID="${ORCA_DESKTOP_BUNDLE:-com.social4hyq.orca}"
@@ -26,7 +32,7 @@ usage() {
   cat <<'EOF'
 Usage: orca-app install --config PATH [--no-acl] [--keep]
 
-  --config PATH  Host config written by `orca-app serve` (port, web client URL).
+  --config PATH  Host config written by `orca-app install` (port, orca binary, host env).
   --no-acl       Install the strong-sandbox variant (no JIT, no paste).
   --keep         Keep the signed HAP (path printed on success).
 
@@ -82,10 +88,24 @@ const fs = require("node:fs");
 const [source, destination] = process.argv.slice(2);
 const config = JSON.parse(fs.readFileSync(source, "utf8"));
 if (!Number.isInteger(config.port) || config.port < 1 || config.port > 65535) throw new Error("invalid server port");
-if (typeof config.url !== "string" || !config.url.startsWith("http://127.0.0.1:" + config.port + "/")) {
-  throw new Error("invalid web client URL");
+if (typeof config.orca !== "string" || !config.orca.startsWith("/")) throw new Error("invalid orca binary path");
+const host = config.host;
+if (!host || typeof host !== "object" || typeof host.home !== "string" || !host.home.startsWith("/")) {
+  throw new Error("invalid host environment");
 }
-fs.writeFileSync(destination, JSON.stringify({ port: config.port, url: config.url }) + "\n");
+const pick = (value) => (typeof value === "string" ? value : "");
+fs.writeFileSync(destination, JSON.stringify({
+  port: config.port,
+  orca: config.orca,
+  host: {
+    home: host.home,
+    path: pick(host.path),
+    xdgConfig: pick(host.xdgConfig),
+    xdgData: pick(host.xdgData),
+    xdgState: pick(host.xdgState),
+  },
+  tray: config.tray !== false,
+}) + "\n");
 JS
 
 if [ "$ACL" = "1" ]; then
