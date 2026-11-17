@@ -7,7 +7,7 @@ class AppInstaller < Formula
   revision 6
 
   livecheck do
-    url "https://registry.npmjs.org/@deveco%2Fdeveco-cli-openharmony-arm64"
+    url :stable
     strategy :npm
   end
 
