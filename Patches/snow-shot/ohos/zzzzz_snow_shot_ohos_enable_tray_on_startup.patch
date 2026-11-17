@@ -1,29 +1,20 @@
-OHOS: create the status bar tray item when the main window appears.
-SystemTrayController starts enabled, so setEnabled(true) is a no-op and the
-Qt tray icon is never created; call show() explicitly instead. Keeps the
-temporary SNOW_TRAY diagnostics for one more round.
+OHOS: retain tray configuration without creating the broken platform tray item.
 
 diff --git a/snow_shot/src/app/applicationcontroller.cpp b/snow_shot/src/app/applicationcontroller.cpp
 index 46076e4..49a2c3a 100644
 --- a/snow_shot/src/app/applicationcontroller.cpp
 +++ b/snow_shot/src/app/applicationcontroller.cpp
-@@ -1973,6 +1973,20 @@ class ApplicationController::Impl {
+@@ -1973,6 +1973,14 @@ class ApplicationController::Impl {
          if (storage::ApplicationStorage::instance().directoryChanging())
              return;
          ensureMainWindow().showAndActivate();
 +#ifdef Q_OS_HARMONY
-+        // The controller starts out enabled, so setEnabled(true) early-returns
-+        // and the platform tray icon is never created; ask for it explicitly.
-+        // The qInfo lines are temporary diagnostics for the OHOS tray bring-up.
++        // Creating the OHOS tray item currently aborts in the Qt platform plugin.
 +        const bool trayEnabled = storage::ApplicationStorage::instance()
 +                                     .configuration()
 +                                     .value(kTrayEnabledKey)
 +                                     .toBool();
 +        systemTray.setEnabled(trayEnabled);
-+        if (trayEnabled)
-+            systemTray.show();
-+        qInfo("SNOW_TRAY config=%d enabled=%d", trayEnabled ? 1 : 0,
-+              systemTray.isEnabled() ? 1 : 0);
 +#endif
      }
  
