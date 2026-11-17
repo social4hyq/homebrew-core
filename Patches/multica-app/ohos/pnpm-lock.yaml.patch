@@ -339,7 +339,7 @@ index 8e06a54..3bafce6 100644
        jsc-safe-url: 0.2.4
 -      lightningcss: 1.32.0
 +      lightningcss: '@ohos-npm-ports/lightningcss@1.32.0-4'
-       picomatch: 4.0.5
+       picomatch: 4.0.7
        postcss: 8.5.26
        resolve-from: 5.0.0
 @@ -13539,6 +13481,41 @@ snapshots:
