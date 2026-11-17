@@ -38,6 +38,10 @@ const entry = await import(
 const jsoncParserEsm = join(ROOT, 'node_modules', 'jsonc-parser', 'lib', 'esm', 'main.js')
 const banner = 'var __orcadModuleUrl = require("node:url").pathToFileURL(__filename).href;'
 
+// Bundling one entry takes seconds; a WASM shim that wedges must not stall the
+// whole build, so each attempt is bounded and every step is logged.
+const ENTRY_TIMEOUT_MS = 5 * 60 * 1000
+
 async function bundle(entryPoint, outfile) {
   const args = [
     esbuild,
@@ -57,15 +61,20 @@ async function bundle(entryPoint, outfile) {
     `--banner:js=${banner}`,
     `--alias:jsonc-parser=${jsoncParserEsm}`,
   ]
+  const label = entryPoint.slice(ROOT.length + 1)
   for (let attempt = 1; attempt <= 2; attempt += 1) {
-    const result = spawnSync(process.execPath, args, { stdio: 'inherit' })
+    const started = Date.now()
+    console.log(`bundling ${label} (attempt ${attempt})`)
+    const result = spawnSync(process.execPath, args, { stdio: 'inherit', timeout: ENTRY_TIMEOUT_MS })
+    const seconds = ((Date.now() - started) / 1000).toFixed(1)
     if (result.status === 0 && existsSync(outfile)) {
+      console.log(`bundled ${label} in ${seconds}s`)
       return
     }
     if (attempt === 2) {
       throw new Error(`esbuild failed for ${entryPoint} (exit ${result.status ?? result.signal})`)
     }
-    console.warn(`esbuild crashed for ${entryPoint}; retrying with a fresh process`)
+    console.warn(`esbuild did not finish ${label} in ${seconds}s; retrying with a fresh process`)
   }
 }
 

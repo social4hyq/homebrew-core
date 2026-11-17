@@ -19,6 +19,45 @@ index 1ade6cc5..d2e7c18b 100644
  }
  
  function isFileExistsError(error: unknown): boolean {
+diff --git a/src/main/daemon/endpoint/publication/daemon-socket-endpoint-path.ts b/src/main/daemon/endpoint/publication/daemon-socket-endpoint-path.ts
+index 1cf86f6b..546f27c3 100644
+--- a/src/main/daemon/endpoint/publication/daemon-socket-endpoint-path.ts
++++ b/src/main/daemon/endpoint/publication/daemon-socket-endpoint-path.ts
+@@ -2,12 +2,23 @@
+ import { createHash } from 'node:crypto'
+ import { lstatSync, mkdirSync } from 'node:fs'
+ import { posix } from 'node:path'
++import { isOpenHarmony } from '../../../../shared/file-write/publish-staged-file'
+ import { unixSocketPathFits } from '../../../../shared/unix-socket-path-limit'
+ import { errnoCodeOrUnknown } from '../../../../shared/errors/errno-code'
+ import { PRIVATE_DIR_MODE } from './daemon-private-file-modes'
+ 
+ // Keep the fallback path independent of user-directory length.
+-export const SHORT_DAEMON_SOCKET_DIR_PREFIX = '/tmp/.orca-daemon-'
++// HarmonyOS allows no Unix sockets on the shared home mount and keeps /tmp
++// read-only for apps, so its relocated sockets live in the app runtime dir.
++function shortDaemonSocketDirPrefix(): string {
++  if (!isOpenHarmony()) {
++    return '/tmp/.orca-daemon-'
++  }
++  const runtimeDir = process.env.TMPDIR ?? process.env.XDG_RUNTIME_DIR ?? '/tmp'
++  return `${runtimeDir.replace(/\/+$/, '')}/.orca-daemon-`
++}
++
++export const SHORT_DAEMON_SOCKET_DIR_PREFIX = shortDaemonSocketDirPrefix()
+ 
+ export function shortDaemonSocketDir(runtimeDir: string, uid: number): string {
+   const runtimeHash = createHash('sha256').update(runtimeDir).digest('hex').slice(0, 12)
+@@ -21,6 +32,9 @@ export function resolveDaemonUnixSocketPath(
+   uid: number | undefined = process.getuid?.()
+ ): string {
+   const preferred = posix.join(runtimeDir, socketName)
++  if ((platform as string) === 'openharmony' && uid !== undefined) {
++    return posix.join(shortDaemonSocketDir(runtimeDir, uid), socketName)
++  }
+   if (
+     uid === undefined ||
+     unixSocketPathFits(preferred, platform === 'darwin' ? 'darwin' : 'linux')
 diff --git a/src/main/filesystem/atomic-file-publication.ts b/src/main/filesystem/atomic-file-publication.ts
 index 4c5d1b1d..38894cdc 100644
 --- a/src/main/filesystem/atomic-file-publication.ts
@@ -62,16 +101,19 @@ index fdc1620c..c905f209 100644
        if (!(error instanceof Error && 'code' in error && error.code === 'EEXIST')) {
          throw error
 diff --git a/src/main/orcad/credentials/orcad-secret-key-record.ts b/src/main/orcad/credentials/orcad-secret-key-record.ts
-index 6082457e..4bb24a91 100644
+index 6082457e..01372c3a 100644
 --- a/src/main/orcad/credentials/orcad-secret-key-record.ts
 +++ b/src/main/orcad/credentials/orcad-secret-key-record.ts
-@@ -1,4 +1,5 @@
+@@ -1,4 +1,8 @@
  import { createHash, randomBytes } from 'node:crypto'
-+import { publishStagedFileExclusively } from '../../../shared/file-write/publish-staged-file'
++import {
++  isOpenHarmony,
++  publishStagedFileExclusively
++} from '../../../shared/file-write/publish-staged-file'
  import {
    linkSync,
    lstatSync,
-@@ -148,7 +149,7 @@ export function publishRecordExclusively(path: string, record: StoredKeyState):
+@@ -148,7 +152,7 @@ export function publishRecordExclusively(path: string, record: StoredKeyState):
        return `its key record ${path} could not be restricted to this user`
      }
      try {
@@ -80,6 +122,19 @@ index 6082457e..4bb24a91 100644
      } catch (error) {
        if (hasErrorCode(error, 'EEXIST')) {
          return 'exists'
+@@ -227,6 +231,12 @@ export async function restrictExistingRecord(path: string): Promise<boolean> {
+       return await restrictWindowsFile(path)
+     }
+     hardenExistingSecureFile(path)
++    // The HarmonyOS shared home mount ignores chmod and reports the platform's
++    // group-readable mode on every file there, so require a private mode only
++    // where the platform can represent one.
++    if (isOpenHarmony()) {
++      return statSync(path).isFile()
++    }
+     return (statSync(path).mode & 0o077) === 0
+   } catch {
+     return false
 diff --git a/src/main/orcad/host-lifecycle/managed-stop/orcad-managed-stop-decision.ts b/src/main/orcad/host-lifecycle/managed-stop/orcad-managed-stop-decision.ts
 index 59bcbcba..a60b6744 100644
 --- a/src/main/orcad/host-lifecycle/managed-stop/orcad-managed-stop-decision.ts
@@ -102,7 +157,7 @@ index 59bcbcba..a60b6744 100644
    } catch (error) {
      if (!hasErrorCode(error, 'EEXIST')) {
 diff --git a/src/main/orcad/instance-lock/orcad-data-root-privacy.ts b/src/main/orcad/instance-lock/orcad-data-root-privacy.ts
-index 412ad854..df22d3cd 100644
+index 412ad854..6692ae56 100644
 --- a/src/main/orcad/instance-lock/orcad-data-root-privacy.ts
 +++ b/src/main/orcad/instance-lock/orcad-data-root-privacy.ts
 @@ -1,6 +1,7 @@
@@ -126,6 +181,19 @@ index 412ad854..df22d3cd 100644
      throw new OrcadInstanceLockError(
        'orcad_data_root_wrong_owner',
        `The orcad data root ${dataRoot} is owned by uid ${stats.uid}, not by uid ${uid} running ` +
+@@ -81,6 +86,12 @@ export function assertOrcadDataRootIsPrivate(
+     )
+   }
+   if ((mode & 0o077) !== 0) {
++    // The HarmonyOS shared home mount reports a fixed account owner and treats
++    // chmod as a no-op, so its 2771 home layout cannot be tightened; that layout
++    // is how the OS exposes the home directory, not a sharing mistake.
++    if (isOpenHarmony()) {
++      return
++    }
+     throw new OrcadInstanceLockError(
+       'orcad_data_root_shared',
+       `The orcad data root ${dataRoot} is accessible to other users (mode ` +
 diff --git a/src/main/orcad/instance-lock/orcad-instance-lock.ts b/src/main/orcad/instance-lock/orcad-instance-lock.ts
 index fb377439..3ce6dd69 100644
 --- a/src/main/orcad/instance-lock/orcad-instance-lock.ts
