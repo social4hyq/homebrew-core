@@ -1,0 +1,139 @@
+--- a/crates/herdr-core/src/platform/unix.rs
++++ b/crates/herdr-core/src/platform/unix.rs
+@@ -64,8 +64,126 @@
+     Listener::bind(path)
+ }
+ 
+-pub type AsyncWrite = tokio::net::unix::OwnedWriteHalf;
++/// A client connection's write side.
++///
++/// Like the read side (`AsyncRead`), it must not wait on an epoll edge: when a viewer reads slowly the socket
++/// fills, tokio waits for a writable event, this kernel can drop it, and the core never writes to that viewer
++/// again (a slow reader stalled for good). Writes go straight to the socket; only when it is full does a thread
++/// wait for room with `poll(2)` and wake the task. Nothing is queued here, so backpressure is unchanged.
++pub struct AsyncWrite {
++    /// Keeps the socket open, and shuts its write side down when dropped, as before.
++    half: tokio::net::unix::OwnedWriteHalf,
++    room: std::sync::Arc<Room>,
++}
+ 
++/// The waiting task, handed from `poll_write` to the thread that watches for room.
++#[derive(Default)]
++struct Room {
++    waiting: std::sync::Mutex<RoomState>,
++    changed: std::sync::Condvar,
++}
++
++#[derive(Default)]
++struct RoomState {
++    waker: Option<std::task::Waker>,
++    closed: bool,
++}
++
++impl AsyncWrite {
++    fn new(half: tokio::net::unix::OwnedWriteHalf) -> io::Result<AsyncWrite> {
++        let fd = unsafe { libc::dup(half.as_ref().as_raw_fd()) };
++        if fd < 0 {
++            return Err(io::Error::last_os_error());
++        }
++        let room = std::sync::Arc::new(Room::default());
++        let watcher = room.clone();
++        std::thread::Builder::new().name("hc-write".into()).spawn(move || {
++            loop {
++                let waker = {
++                    let mut state = watcher.waiting.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
++                    while state.waker.is_none() && !state.closed {
++                        state = watcher.changed.wait(state).unwrap_or_else(std::sync::PoisonError::into_inner);
++                    }
++                    if state.closed {
++                        break;
++                    }
++                    state.waker.take()
++                };
++                // Wait until there is room (or the peer is gone), then let the task retry its write. The
++                // timeout bounds a missed wakeup: this kernel has also been seen to miss poll wakeups.
++                loop {
++                    let mut p = libc::pollfd { fd, events: libc::POLLOUT, revents: 0 };
++                    let ready = unsafe { libc::poll(&mut p, 1, 100) };
++                    if ready != 0 {
++                        break;
++                    }
++                    if watcher.waiting.lock().unwrap_or_else(std::sync::PoisonError::into_inner).closed {
++                        break;
++                    }
++                }
++                if let Some(waker) = waker {
++                    waker.wake();
++                }
++            }
++            unsafe { libc::close(fd) };
++        })?;
++        Ok(AsyncWrite { half, room })
++    }
++}
++
++impl Drop for AsyncWrite {
++    fn drop(&mut self) {
++        let mut state = self.room.waiting.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
++        state.closed = true;
++        state.waker = None;
++        self.room.changed.notify_one();
++    }
++}
++
++impl tokio::io::AsyncWrite for AsyncWrite {
++    fn poll_write(
++        self: std::pin::Pin<&mut Self>,
++        cx: &mut std::task::Context<'_>,
++        buf: &[u8],
++    ) -> std::task::Poll<io::Result<usize>> {
++        use std::task::Poll;
++        let fd = self.half.as_ref().as_raw_fd();
++        loop {
++            let n = unsafe { libc::send(fd, buf.as_ptr().cast(), buf.len(), libc::MSG_DONTWAIT | libc::MSG_NOSIGNAL) };
++            if n >= 0 {
++                return Poll::Ready(Ok(n as usize));
++            }
++            let e = io::Error::last_os_error();
++            match e.kind() {
++                io::ErrorKind::Interrupted => continue,
++                io::ErrorKind::WouldBlock => {
++                    let mut state = self.room.waiting.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
++                    state.waker = Some(cx.waker().clone());
++                    self.room.changed.notify_one();
++                    return Poll::Pending;
++                }
++                _ => return Poll::Ready(Err(e)),
++            }
++        }
++    }
++
++    fn poll_flush(
++        self: std::pin::Pin<&mut Self>,
++        _: &mut std::task::Context<'_>,
++    ) -> std::task::Poll<io::Result<()>> {
++        std::task::Poll::Ready(Ok(()))
++    }
++
++    fn poll_shutdown(
++        self: std::pin::Pin<&mut Self>,
++        _: &mut std::task::Context<'_>,
++    ) -> std::task::Poll<io::Result<()>> {
++        let fd = self.half.as_ref().as_raw_fd();
++        unsafe { libc::shutdown(fd, libc::SHUT_WR) };
++        std::task::Poll::Ready(Ok(()))
++    }
++}
++
+ /// A client connection's read side.
+ ///
+ /// tokio reads a socket when epoll reports it readable, once per change (edge-triggered). On HarmonyOS a
+@@ -203,7 +321,7 @@
+     pub async fn accept(&mut self) -> io::Result<(AsyncRead, AsyncWrite)> {
+         let (stream, _) = self.0.accept().await?;
+         let (read, write) = stream.into_split();
+-        Ok((AsyncRead::new(read)?, write))
++        Ok((AsyncRead::new(read)?, AsyncWrite::new(write)?))
+     }
+ }
+ 
