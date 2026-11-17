@@ -1,0 +1,22 @@
+diff --git a/crates/herdr-core/src/platform/unix.rs b/crates/herdr-core/src/platform/unix.rs
+index b49a4a7..83d2425 100644
+--- a/crates/herdr-core/src/platform/unix.rs
++++ b/crates/herdr-core/src/platform/unix.rs
+@@ -747,6 +747,17 @@ impl Pty {
+     pub fn resize(&self, cols: u16, rows: u16) {
+         let size = libc::winsize { ws_row: rows, ws_col: cols, ws_xpixel: 0, ws_ypixel: 0 };
+         unsafe { libc::ioctl(self.master.as_raw_fd(), libc::TIOCSWINSZ as _, &size) };
++        // OHOS: TIOCSWINSZ succeeds but the kernel never delivers SIGWINCH to the
++        // foreground process group, so programs (Node, Python, TUIs) keep drawing
++        // for the old size. Notify the foreground group ourselves, as tmux does;
++        // a kernel that also delivers one only sends the handler a second signal.
++        #[cfg(target_env = "ohos")]
++        unsafe {
++            let fg = libc::tcgetpgrp(self.master.as_raw_fd());
++            if fg > 0 {
++                libc::killpg(fg, libc::SIGWINCH);
++            }
++        }
+     }
+ 
+     /// The process group in the foreground (a shell's job), or -1.
