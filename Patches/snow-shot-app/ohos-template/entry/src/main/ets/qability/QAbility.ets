@@ -1,3 +1,6 @@
+import { image } from '@kit.ImageKit';
+import { statusBarManager } from '@kit.StatusBarExtensionKit';
+import { emitter } from '@kit.BasicServicesKit';
 import { BusinessError } from '@ohos.base';
 import { inputConsumer } from '@kit.InputKit';
 import { fileIo, picker } from '@kit.CoreFileKit';
@@ -12,6 +15,12 @@ import qpa from 'libqohos.so';
 import {LOG_DOMAIN, LOG_TAG} from '../common/QtAppConstants';
 
 interface SnowShotNativeModule {
+  registerNativeWindow(id: number, present: boolean): void;
+  getTrayEnabled(): boolean;
+  setTrayAvailable(available: boolean): void;
+  restoreMainWindow(): void;
+  quitFromTray(): void;
+  hideMainWindowForHotkey(): void;
   rejectHotkeyRegistration(portableText: string, errorCode: number): void;
   takePendingUserFileExports(): Array<NativeUserFileExport>;
   completeUserFileExport(id: number, succeeded: boolean, error?: string): boolean;
@@ -55,9 +64,91 @@ interface PersistedShortcutConfig {
 
 export default class QAbility extends UIAbility {
 
+  private static localTrayReady: boolean = false;
+  private localTrayIcon?: image.PixelMap;
+  private trayRetryAfter: number = 0;
+
+  private syncOhosTray(): void {
+    if (QAbility.shortcutBridgeOwner !== this || this.snowShotNative == null) {
+      return;
+    }
+    if (this.snowShotNative.getTrayEnabled()) {
+      this.setupOhosTray();
+    } else if (QAbility.localTrayReady) {
+      try {
+        statusBarManager.removeFromStatusBar(this.context);
+        statusBarManager.off('statusBarIconClick');
+        statusBarManager.off('rightMenuClick');
+        QAbility.localTrayReady = false;
+        this.localTrayIcon?.release();
+        this.localTrayIcon = undefined;
+      } catch (error) {
+        hilog.error(LOG_DOMAIN, LOG_TAG, 'Tray removal failed: %{public}s', JSON.stringify(error));
+      }
+    }
+    this.snowShotNative.setTrayAvailable(QAbility.localTrayReady);
+  }
+
+  private setupOhosTray(): void {
+    if (QAbility.localTrayReady || QAbility.shortcutBridgeOwner !== this || Date.now() < this.trayRetryAfter) {
+      return;
+    }
+    try {
+      const bytes = this.context.resourceManager.getMediaContentSync($r('app.media.app_icon').id);
+      const source = image.createImageSource(bytes.buffer as ArrayBuffer);
+      try {
+        this.localTrayIcon = source.createPixelMapSync({ desiredSize: { width: 48, height: 48 } });
+      } finally {
+        source.release();
+      }
+      const item: statusBarManager.StatusBarItem = {
+        icons: { white: this.localTrayIcon, black: this.localTrayIcon },
+        quickOperation: { title: 'SnowShot', height: 80, abilityName: '' },
+        statusBarGroupMenu: [[
+          { title: '显示主窗口', menuCode: 'show', menuAction: { abilityName: '', notifyOnly: true } }
+        ]], hoverTips: 'SnowShot'
+      };
+      statusBarManager.on('statusBarIconClick', (event: emitter.EventData) => {
+        if (event.data && event.data['iconClickType'] === 'leftClick') {
+          this.context.showAbility().then(() => {
+            this.snowShotNative?.restoreMainWindow();
+          }).catch((error: BusinessError) => {
+            hilog.error(LOG_DOMAIN, LOG_TAG, 'SNOW_OHOS_TRAY_RESTORE_FAILED %{public}s', JSON.stringify(error));
+          });
+        }
+      });
+      statusBarManager.on('rightMenuClick', (event: emitter.EventData) => {
+        const code: string = event.data?.['menuCode'] as string;
+        if (code === 'show') {
+          this.context.showAbility().then(() => this.snowShotNative?.restoreMainWindow())
+            .catch((error: BusinessError) => {
+              hilog.error(LOG_DOMAIN, LOG_TAG, 'Tray restore failed: %{public}s', JSON.stringify(error));
+            });
+        }
+      });
+      statusBarManager.addToStatusBar(this.context, item);
+      QAbility.localTrayReady = true;
+      hilog.info(LOG_DOMAIN, LOG_TAG, 'SNOW_OHOS_TRAY_REGISTERED');
+    } catch (error) {
+      this.trayRetryAfter = Date.now() + 5000;
+      statusBarManager.off('statusBarIconClick');
+      statusBarManager.off('rightMenuClick');
+      this.localTrayIcon?.release();
+      this.localTrayIcon = undefined;
+      hilog.error(LOG_DOMAIN, LOG_TAG, 'SNOW_OHOS_TRAY_REGISTER_FAILED %{public}s', JSON.stringify(error));
+    }
+  }
+
   private static shortcutBridgeOwner: QAbility | null = null;
   private static shortcutBridgeCandidates: Set<QAbility> = new Set<QAbility>();
   private static foregroundPickerAbility: QAbility | null = null;
+
+  private nativeWindowId?: number;
+
+  private registerWindowStage(windowStage: Window.WindowStage): void {
+    this.nativeWindowId = windowStage.getMainWindowSync().getWindowProperties().id;
+    this.snowShotNative?.registerNativeWindow(this.nativeWindowId, true);
+  }
 
   private localStorage: LocalStorage | null = null;
   private permissionRequest?: Promise<void>;
@@ -249,6 +340,7 @@ export default class QAbility extends UIAbility {
     if (QAbility.shortcutBridgeOwner !== this) {
       return;
     }
+    this.syncOhosTray();
     let registrations: Array<NativeHotkeyRegistration>;
     try {
       if (this.snowShotNative === null) {
@@ -299,11 +391,7 @@ export default class QAbility extends UIAbility {
         isRepeat: false
       };
       const callback = (_event: inputConsumer.HotkeyOptions): void => {
-        if (this.snowShotNative !== null) {
-          this.snowShotNative.activateHotkey(registration.portableText);
-        } else {
-          this.pendingHotkeyActivations.add(registration.portableText);
-        }
+        this.requestGlobalHotkey(registration.portableText);
       };
       try {
         inputConsumer.on('hotkeyChange', options, callback);
@@ -389,11 +477,7 @@ export default class QAbility extends UIAbility {
         preKeys: registration.preKeys, finalKey: registration.finalKey, isRepeat: false
       };
       const callback = (_event: inputConsumer.HotkeyOptions): void => {
-        if (this.snowShotNative !== null) {
-          this.snowShotNative.activateHotkey(registration.portableText);
-        } else {
-          this.pendingHotkeyActivations.add(registration.portableText);
-        }
+        this.requestGlobalHotkey(registration.portableText);
       };
       try {
         inputConsumer.on('hotkeyChange', options, callback);
@@ -415,6 +499,61 @@ export default class QAbility extends UIAbility {
         throw new Error(e.message);
       }
     }
+  }
+
+  private hotkeyForegroundRequestPending: boolean = false;
+
+  private flushForegroundHotkeys(): void {
+    if (QAbility.foregroundPickerAbility === null || this.snowShotNative === null) {
+      return;
+    }
+    const activations: Array<string> = Array.from(this.pendingHotkeyActivations);
+    this.pendingHotkeyActivations.clear();
+    activations.forEach((portableText: string) => {
+      this.snowShotNative?.activateHotkey(portableText);
+    });
+    if (activations.length > 0) {
+      // Foregrounding the temporary screenshot ability can make QPA rematerialize
+      // the top-level window after the pre-capture hide. Keep it hidden once the
+      // ability transition settles; the snapshot itself was already taken while
+      // the main window was hidden.
+      setTimeout(() => {
+        this.snowShotNative?.hideMainWindowForHotkey();
+      }, 300);
+    }
+  }
+
+  private hideMainWindowForPendingHotkeys(): void {
+    if (this.pendingHotkeyActivations.size > 0) {
+      this.snowShotNative?.hideMainWindowForHotkey();
+    }
+  }
+
+  private requestGlobalHotkey(portableText: string): void {
+    this.pendingHotkeyActivations.add(portableText);
+    if (QAbility.foregroundPickerAbility !== null) {
+      this.flushForegroundHotkeys();
+      return;
+    }
+    if (this.hotkeyForegroundRequestPending) {
+      return;
+    }
+    // A hidden UIAbility must be foregrounded before Qt can deliver its action,
+    // but QPA may briefly expose the main window during that transition. Hide
+    // it synchronously on the Qt thread before asking the system to foreground
+    // the ability so the capture snapshot cannot include SnowShot itself.
+    this.snowShotNative?.hideMainWindowForHotkey();
+    this.hotkeyForegroundRequestPending = true;
+    // Let Qt process the queued hide before the platform recreates the foreground surface.
+    setTimeout(() => this.context.showAbility().then(() => {
+      this.flushForegroundHotkeys();
+    }).catch((error: BusinessError) => {
+      this.pendingHotkeyActivations.clear();
+      hilog.error(LOG_DOMAIN, LOG_TAG,
+        'SNOW_OHOS_HOTKEY_FOREGROUND_FAILED %{public}s', JSON.stringify(error));
+    }).finally(() => {
+      this.hotkeyForegroundRequestPending = false;
+    }), 50);
   }
 
   private installOcrAssets(): void {
@@ -459,10 +598,10 @@ export default class QAbility extends UIAbility {
         this.installOcrAssets();
         const nativeModule: ESObject = await import('libsnow_shot.so');
         this.snowShotNative = nativeModule.default as SnowShotNativeModule;
-        this.pendingHotkeyActivations.forEach((portableText: string) => {
-          this.snowShotNative?.activateHotkey(portableText);
-        });
-        this.pendingHotkeyActivations.clear();
+        if (this.nativeWindowId !== undefined) {
+          this.snowShotNative.registerNativeWindow(this.nativeWindowId, true);
+        }
+        this.flushForegroundHotkeys();
         this.failedShortcutTexts.forEach((errorCode: number, portableText: string) => {
           this.reportHotkeyRegistrationFailure(portableText, errorCode);
         });
@@ -476,6 +615,12 @@ export default class QAbility extends UIAbility {
   onDestroy(): void | Promise<void> {
     QAbility.shortcutBridgeCandidates.delete(this);
     this.releaseGlobalShortcutBridge();
+    if (QAbility.shortcutBridgeCandidates.size === 0) {
+      this.snowShotNative?.quitFromTray();
+      QAbility.localTrayReady = false;
+      statusBarManager.off('statusBarIconClick');
+      statusBarManager.off('rightMenuClick');
+    }
     return qpa.handleAbilityOnDestroy(this);
   }
 
@@ -493,7 +638,9 @@ export default class QAbility extends UIAbility {
       if (QAbility.shortcutBridgeOwner === null) {
         QAbility.shortcutBridgeOwner = this;
       }
+      this.registerWindowStage(windowStage);
       qpa.handleAbilityOnWindowStageCreate(this, windowStage);
+      this.syncOhosTray();
       this.startGlobalShortcutBridge();
       setTimeout(() => this.registerEarlyDefaultShortcuts(), 250);
     };
@@ -511,11 +658,16 @@ export default class QAbility extends UIAbility {
       this.registerEarlyDefaultShortcuts();
       this.startGlobalShortcutBridge();
     }
+    this.registerWindowStage(windowStage);
     qpa.handleAbilityOnWindowStageRestore(this, windowStage);
   }
 
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     qpa.handleAbilityOnNewWant(this, want, launchParam);
+    const owner = QAbility.shortcutBridgeOwner;
+    if (owner == null || (!owner.hotkeyForegroundRequestPending && owner.pendingHotkeyActivations.size === 0)) {
+      this.snowShotNative?.restoreMainWindow();
+    }
   }
 
   onForeground() {
@@ -523,6 +675,8 @@ export default class QAbility extends UIAbility {
     this.startPendingUserFileSavePickers();
     this.startPendingUserFileExports();
     qpa.handleAbilityOnForeground(this);
+    QAbility.shortcutBridgeOwner?.hideMainWindowForPendingHotkeys();
+    QAbility.shortcutBridgeOwner?.flushForegroundHotkeys();
   }
 
   onBackground() {
@@ -533,9 +687,33 @@ export default class QAbility extends UIAbility {
   }
 
   onWindowStageDestroy() {
+    if (this.nativeWindowId !== undefined) {
+      this.snowShotNative?.registerNativeWindow(this.nativeWindowId, false);
+      this.nativeWindowId = undefined;
+    }
     QAbility.shortcutBridgeCandidates.delete(this);
     this.releaseGlobalShortcutBridge();
+    const owner = QAbility.shortcutBridgeOwner;
+    if (owner !== null && owner !== this) {
+      owner.refreshGlobalShortcutSubscriptions();
+    }
     qpa.handleAbilityOnWindowStageDestroy(this);
+  }
+
+  private refreshGlobalShortcutSubscriptions(): void {
+    if (QAbility.shortcutBridgeOwner !== this) {
+      return;
+    }
+    this.shortcutSubscriptions.forEach((subscription: ArkHotkeySubscription, portableText: string) => {
+      try {
+        // Re-arm the global listener after the temporary screenshot ability exits.
+        inputConsumer.off('hotkeyChange', subscription.options);
+        inputConsumer.on('hotkeyChange', subscription.options, subscription.callback);
+      } catch (error) {
+        const e = error as BusinessError;
+        hilog.error(LOG_DOMAIN, LOG_TAG, 'HOTKEY_REFRESH_FAILED ' + portableText + ' ' + e.code + ' ' + e.message);
+      }
+    });
   }
 
   private releaseGlobalShortcutBridge(): void {
