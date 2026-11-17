@@ -156,6 +156,21 @@ index 59bcbcba..a60b6744 100644
      return decision
    } catch (error) {
      if (!hasErrorCode(error, 'EEXIST')) {
+diff --git a/src/main/orcad/instance-lock/orcad-data-root-locality.ts b/src/main/orcad/instance-lock/orcad-data-root-locality.ts
+index 0d797ecd..c196dd78 100644
+--- a/src/main/orcad/instance-lock/orcad-data-root-locality.ts
++++ b/src/main/orcad/instance-lock/orcad-data-root-locality.ts
+@@ -46,7 +46,9 @@ export function filesystemTypeIsLocalDisk(
+   type: number,
+   rootType: () => number | null
+ ): boolean {
+-  if (platform === 'linux') {
++  // HarmonyOS runs the same Linux filesystems (f2fs in app storage); its
++  // distributed home mount reports a type that is deliberately not listed here.
++  if (platform === 'linux' || platform === 'openharmony') {
+     return LINUX_LOCAL_FILESYSTEM_MAGICS.has(type)
+   }
+   // macOS assigns type numbers per loaded driver; match the local boot volume’s type.
 diff --git a/src/main/orcad/instance-lock/orcad-data-root-privacy.ts b/src/main/orcad/instance-lock/orcad-data-root-privacy.ts
 index 412ad854..6692ae56 100644
 --- a/src/main/orcad/instance-lock/orcad-data-root-privacy.ts

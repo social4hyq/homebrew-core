@@ -4,7 +4,7 @@ class Orca < Formula
   url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.261.tar.gz"
   sha256 "5b8a21bb9cde62a1dd7ca3c0ffd2f684faf168ea401191068777a8a9e7466909"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
