@@ -1,0 +1,99 @@
+diff --git a/src/hc.rs b/src/hc.rs
+index 41668be..22233c1 100644
+--- a/src/hc.rs
++++ b/src/hc.rs
+@@ -270,7 +270,7 @@ pub struct Core {
+     writer: mpsc::Sender<Vec<u8>>,
+     routes: Arc<Mutex<Routes>>,
+     next_id: AtomicU64,
+-    child: Mutex<Child>,
++    child: Mutex<Option<Child>>,
+     /// Closes when the connection to the core drops.
+     lost: async_channel::Receiver<()>,
+ }
+@@ -323,6 +323,9 @@ fn connect_error(stderr: &str) -> Option<ConnectError> {
+ impl Core {
+     /// Connects to the user's core (starting it if needed) and switches to framed mode.
+     pub fn connect() -> Result<Arc<Core>> {
++        if let Some(endpoint) = std::env::var_os("HERDR_CORE_TCP") {
++            return Self::connect_bridge(&endpoint.to_string_lossy());
++        }
+         let mut child = crate::spawn::command(crate::core_bin::path())
+             .arg("connect")
+             .stdin(Stdio::piped())
+@@ -363,6 +366,35 @@ impl Core {
+             bail!("core refused hello: {err}");
+         }
+ 
++        Self::finish_connect(hello, reader, stdin, Some(child))
++    }
++
++    /// Connects to a core bridge: a host-side proxy that owns `hc connect` and
++    /// forwards its stdio over TCP. The OHOS sandbox cannot spawn the host binary.
++    pub fn connect_bridge(endpoint: &str) -> Result<Arc<Core>> {
++        let stream = std::net::TcpStream::connect(endpoint)
++            .with_context(|| format!("cannot reach the core bridge at {endpoint}"))?;
++        stream.set_nodelay(true).ok();
++        let mut reader = BufReader::new(stream.try_clone()?);
++        let mut stdin = stream;
++        stdin.write_all(b"{\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"hello\",\"params\":{\"framed\":true}}\n")?;
++        stdin.flush()?;
++        let mut line = String::new();
++        reader.read_line(&mut line)?;
++        let hello: Value = serde_json::from_str(&line).context("bad hello reply from core bridge")?;
++        if let Some(err) = hello.get("error") {
++            bail!("core refused hello: {err}");
++        }
++        Self::finish_connect(hello, reader, stdin, None)
++    }
++
++    /// Shared tail of both transports: writer/reader threads over the connection.
++    fn finish_connect(
++        hello: Value,
++        mut reader: impl Read + Send + 'static,
++        mut stdin: impl Write + Send + 'static,
++        child: Option<Child>,
++    ) -> Result<Arc<Core>> {
+         let (writer, frames) = mpsc::channel::<Vec<u8>>();
+         std::thread::Builder::new().name("hc-writer".into()).spawn(move || {
+             while let Ok(frame) = frames.recv() {
+@@ -555,8 +587,10 @@ impl Core {
+ impl Drop for Core {
+     fn drop(&mut self) {
+         if let Ok(mut child) = self.child.lock() {
+-            let _ = child.kill();
+-            let _ = child.wait();
++            if let Some(child) = child.as_mut() {
++                let _ = child.kill();
++                let _ = child.wait();
++            }
+         }
+     }
+ }
+@@ -575,7 +609,7 @@ pub fn offline() -> Arc<Core> {
+         writer,
+         routes: Arc::new(Mutex::new(Routes { closed: true, ..Default::default() })),
+         next_id: AtomicU64::new(1),
+-        child: Mutex::new(child),
++        child: Mutex::new(Some(child)),
+         lost,
+     })
+ }
+@@ -716,7 +750,7 @@ mod tests {
+         let child = std::process::Command::new(std::env::current_exe().unwrap()).arg("--help").stdout(Stdio::null()).stderr(Stdio::null()).spawn().unwrap();
+         let core = Core {
+             hello: Value::Null, writer, routes: Arc::new(Mutex::new(Routes::default())),
+-            next_id: AtomicU64::new(1), child: Mutex::new(child), lost,
++            next_id: AtomicU64::new(1), child: Mutex::new(Some(child)), lost,
+         };
+         let routes = core.routes.clone();
+         let display = json!({"fg": "#25272c", "bg": "#ffffff", "cursor": "#25272c", "cell": [9, 18]});
+@@ -741,7 +775,7 @@ mod tests {
+         let child = std::process::Command::new(std::env::current_exe().unwrap()).arg("--help").stdout(Stdio::null()).stderr(Stdio::null()).spawn().unwrap();
+         let core = Core {
+             hello: Value::Null, writer, routes: Arc::new(Mutex::new(Routes::default())),
+-            next_id: AtomicU64::new(1), child: Mutex::new(child), lost,
++            next_id: AtomicU64::new(1), child: Mutex::new(Some(child)), lost,
+         };
+         core.routes.lock().unwrap().automatic_input.insert(7);
+         core.automatic_input(7, b"\x1b");

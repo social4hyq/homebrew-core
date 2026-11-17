@@ -1,0 +1,39 @@
+diff --git a/src/terminal.rs b/src/terminal.rs
+index d480e5d..2810b22 100644
+--- a/src/terminal.rs
++++ b/src/terminal.rs
+@@ -136,6 +136,10 @@ struct Grid {
+     /// The cursor's cell in window coordinates, from the last paint: where the
+     /// input method puts its candidate window.
+     cursor_at: Option<Bounds<Pixels>>,
++    /// The cursor bounds last pushed to the platform input method. Platforms that
++    /// pull them on demand (macOS) don't need this; HarmonyOS only learns where the
++    /// cursor is when told, or shows its candidate window at a default spot.
++    ime_cursor_reported: Option<Bounds<Pixels>>,
+     /// The scroll thumb's grabbable lane from the last paint, in window
+     /// coordinates (wider than the few px drawn).
+     thumb: Option<Bounds<Pixels>>,
+@@ -329,6 +333,7 @@ impl TerminalView {
+                 link_spans: Vec::new(),
+                 marked: None,
+                 cursor_at: None,
++                ime_cursor_reported: None,
+                 thumb: None,
+                 track: None,
+                 painted: Vec::new(),
+@@ -2307,6 +2312,15 @@ fn paint_grid(bounds: Bounds<Pixels>, grid: &Rc<RefCell<Grid>>, focused: bool, w
+     {
+         let mut g = grid.borrow_mut();
+         g.cursor_at = frame.cursor_cell.map(|(x, y)| Bounds::new(at(x as usize, y as usize), cell));
++        // Tell the input method when the cursor moves (or focus returns), so its
++        // candidate window follows the cursor. Only on change: it costs a frame.
++        let report = if focused { g.cursor_at } else { None };
++        if report != g.ime_cursor_reported {
++            g.ime_cursor_reported = report;
++            if report.is_some() {
++                window.invalidate_character_coordinates();
++            }
++        }
+         // As in Herdr, hide on the alternate screen and below five columns.
+         g.thumb = None;
+         g.track = None;

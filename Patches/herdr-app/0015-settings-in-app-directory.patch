@@ -1,0 +1,30 @@
+diff --git a/src/ohos_entry.rs b/src/ohos_entry.rs
+index 433526b..ae3385d 100644
+--- a/src/ohos_entry.rs
++++ b/src/ohos_entry.rs
+@@ -68,6 +68,13 @@ fn openharmony_app(app: OpenHarmonyApp) {
+     // handling the ArkTS runtime does not provide). Route tracing into hilog instead.
+     let _ = tracing_log::LogTracer::init();
+ 
++    // The HAP inherits the host HOME, which is outside the sandbox and read-only.
++    // Point every Herdr config/mod path at the app's own files directory. First,
++    // before anything reads settings (their path is under it) or starts a thread.
++    if std::env::var_os("HERDR_APP_HOME").is_none() {
++        unsafe { std::env::set_var("HERDR_APP_HOME", "/data/storage/el2/base/haps/entry/files/herdr-app") };
++    }
++
+     let fresh = !crate::settings::path().exists();
+     let person = crate::settings::load_person();
+     // The HAP sandbox cannot spawn the host's `hc`, so the core is reached through
+@@ -85,11 +92,6 @@ fn openharmony_app(app: OpenHarmonyApp) {
+     crate::update::start();
+     crate::telemetry::start(crate::settings::telemetry_setting(&person));
+     crate::bench::start();
+-    // The HAP inherits the host HOME, which is outside the sandbox and read-only.
+-    // Point every Herdr config/mod path at the app's own files directory.
+-    if std::env::var_os("HERDR_APP_HOME").is_none() {
+-        unsafe { std::env::set_var("HERDR_APP_HOME", "/data/storage/el2/base/haps/entry/files/herdr-app") };
+-    }
+     if let Err(error) = crate::mods::write_workspace() {
+         tracing::warn!("cannot write {}: {error}", crate::mods::app_dir().display());
+     }

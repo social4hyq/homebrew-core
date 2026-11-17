@@ -1,0 +1,19 @@
+diff --git a/src/place.rs b/src/place.rs
+index 32bfbfa..939de45 100644
+--- a/src/place.rs
++++ b/src/place.rs
+@@ -59,7 +59,13 @@ pub fn initial(cx: &App) -> (WindowBounds, Option<DisplayId>) {
+     };
+     let [x, y, w, h] = p.bounds;
+     let (w, h) = (w.max(480.0), h.max(320.0));
+-    let display = p.display.as_deref().and_then(|want| cx.displays().into_iter().find(|d| uuid(d.as_ref()).as_deref() == Some(want)));
++    // OHOS has one main window, bound to the default display: naming a display makes `open_window`
++    // fail ("already bound to the default display") and the app aborts at start.
++    let display = if cfg!(all(target_os = "linux", target_env = "ohos")) {
++        None
++    } else {
++        p.display.as_deref().and_then(|want| cx.displays().into_iter().find(|d| uuid(d.as_ref()).as_deref() == Some(want)))
++    };
+     let at = point(px(x), px(y));
+     let bounds = match &display {
+         Some(d) if !cfg!(target_os = "linux") && d.bounds().contains(&at) => Bounds::new(at, size(px(w), px(h))),

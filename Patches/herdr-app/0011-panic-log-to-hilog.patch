@@ -1,0 +1,33 @@
+diff --git a/src/ohos_entry.rs b/src/ohos_entry.rs
+index 7595ee6..3a79104 100644
+--- a/src/ohos_entry.rs
++++ b/src/ohos_entry.rs
+@@ -42,10 +42,28 @@ mod sigsys {
+ }
+ 
+ 
++/// A panic in the entry crosses the napi boundary and aborts the app, and stderr goes nowhere in a
++/// HAP, so write the panic message to hilog. Straight to OH_LOG_Print: the `log` crate's default
++/// level hides errors in this build.
++mod panic_log {
++    use std::os::raw::{c_char, c_int};
++    unsafe extern "C" {
++        fn OH_LOG_Print(ty: i32, level: i32, domain: u32, tag: *const c_char, fmt: *const c_char, ...) -> c_int;
++    }
++    pub fn install() {
++        std::panic::set_hook(Box::new(|info| {
++            if let Ok(text) = std::ffi::CString::new(format!("herdr-app panic: {info}")) {
++                unsafe { OH_LOG_Print(0, 6, 0, c"herdr-panic".as_ptr(), c"%{public}s".as_ptr(), text.as_ptr()) };
++            }
++        }));
++    }
++}
++
+ #[openharmony_ability_derive::ability]
+ fn openharmony_app(app: OpenHarmonyApp) {
+     sigsys::install();
+     ohos_hilog_binding::log::init_once(ohos_hilog_binding::log::Config::default());
++    panic_log::install();
+     // `tracing_subscriber::fmt` aborts inside the HAP sandbox (it touches terminal
+     // handling the ArkTS runtime does not provide). Route tracing into hilog instead.
+     let _ = tracing_log::LogTracer::init();

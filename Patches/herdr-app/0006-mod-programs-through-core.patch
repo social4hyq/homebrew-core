@@ -1,0 +1,100 @@
+diff --git a/src/lib.rs b/src/lib.rs
+index 7ab4aef..fb06582 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -42,6 +42,8 @@ pub mod win32_keys;
+ pub mod window;
+ #[cfg(all(target_os = "linux", target_env = "ohos"))]
+ pub mod ohos_entry;
++#[cfg(all(target_os = "linux", target_env = "ohos"))]
++pub mod ohos_exec;
+ 
+ use gpui::*;
+ 
+diff --git a/src/mods.rs b/src/mods.rs
+index 03a518c..a35ae53 100644
+--- a/src/mods.rs
++++ b/src/mods.rs
+@@ -845,6 +845,13 @@ fn exec_limit(options: Option<&HostValue>) -> Result<Duration, HostError> {
+ }
+ 
+ pub(crate) fn run_blocking(command: &str, args: &[String], cwd: Option<String>, limit: Duration) -> Result<(i32, String, String), String> {
++    // The HAP sandbox may not spawn processes: run it on the host through the core.
++    #[cfg(all(target_os = "linux", target_env = "ohos"))]
++    {
++        let cwd = Some(cwd.unwrap_or_else(|| home().to_string_lossy().into_owned()));
++        return crate::ohos_exec::exec(command, args, cwd, limit)
++            .map(|(code, out, err)| (code, String::from_utf8_lossy(&out).into_owned(), String::from_utf8_lossy(&err).into_owned()));
++    }
+     use std::io::Read;
+     // The core may have no `hc` link beside it (a Windows zip has only herdr-core.exe).
+     let program = if command == "hc" { crate::core_bin::path() } else { PathBuf::from(command) };
+diff --git a/src/ohos_exec.rs b/src/ohos_exec.rs
+new file mode 100644
+index 0000000..d6e12b3
+--- /dev/null
++++ b/src/ohos_exec.rs
+@@ -0,0 +1,63 @@
++//! Running programs from inside the HarmonyOS HAP.
++//!
++//! The app sandbox may not spawn processes (`cannot run sh: Permission denied`),
++//! so mods' `herdr.exec` / `herdr.hc` run on the host through the core's
++//! `machine.exec` RPC instead. The core runs as the person, with their PATH and
++//! files, which is what a desktop build's local spawn would have seen.
++//!
++//! This keeps its own bridge connection (lazily, reconnecting when lost) so it
++//! does not depend on which `Core` the windows currently hold.
++
++use std::sync::{Arc, Mutex};
++use std::time::Duration;
++
++use base64::Engine;
++use serde_json::{Value, json};
++
++use crate::hc::Core;
++
++static CORE: Mutex<Option<Arc<Core>>> = Mutex::new(None);
++
++fn endpoint() -> String {
++    std::env::var("HERDR_CORE_TCP").unwrap_or_else(|_| "127.0.0.1:8765".to_string())
++}
++
++fn core(fresh: bool) -> Result<Arc<Core>, String> {
++    let mut slot = CORE.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
++    if fresh {
++        *slot = None;
++    }
++    if let Some(core) = slot.as_ref() {
++        return Ok(core.clone());
++    }
++    let core = Core::connect_bridge(&endpoint()).map_err(|e| format!("{e:#}"))?;
++    *slot = Some(core.clone());
++    Ok(core)
++}
++
++/// `command args` on the host through the core: (exit code, stdout, stderr).
++/// Errors and timeouts read like the local spawn's, so mods see the same shapes.
++pub fn exec(command: &str, args: &[String], cwd: Option<String>, limit: Duration) -> Result<(i32, Vec<u8>, Vec<u8>), String> {
++    let mut argv = vec![command.to_owned()];
++    argv.extend(args.iter().cloned());
++    let mut params = json!({ "argv": argv, "timeout": limit.as_secs_f64().ceil().max(1.0) as u64 });
++    if let Some(cwd) = cwd {
++        params["cwd"] = Value::String(cwd);
++    }
++    // Leave the core time to end the program and report before giving up on it.
++    let wait = limit + Duration::from_secs(5);
++    let reply = match core(false)?.call_timeout("machine.exec", params.clone(), wait) {
++        Err(e) if e.to_string().contains("lost the core") => core(true)?.call_timeout("machine.exec", params, wait),
++        r => r,
++    };
++    let v = reply.map_err(|e| {
++        let text = format!("{e:#}");
++        if text.contains("spawn_failed") { format!("cannot run {command}: {text}") } else { text }
++    })?;
++    if v.get("timed_out").and_then(Value::as_bool) == Some(true) {
++        return Err(format!("{command} took longer than {} s and was stopped", limit.as_secs_f64()));
++    }
++    let bytes = |k: &str| base64::engine::general_purpose::STANDARD.decode(v.get(k).and_then(Value::as_str).unwrap_or_default()).map_err(|e| e.to_string());
++    let code = v.get("code").and_then(Value::as_i64).map_or(-1, |c| c as i32);
++    Ok((code, bytes("stdout")?, bytes("stderr")?))
++}

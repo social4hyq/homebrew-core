@@ -1,0 +1,45 @@
+diff --git a/src/hc.rs b/src/hc.rs
+index 22233c1..362fc90 100644
+--- a/src/hc.rs
++++ b/src/hc.rs
+@@ -322,7 +322,13 @@ fn connect_error(stderr: &str) -> Option<ConnectError> {
+ 
+ impl Core {
+     /// Connects to the user's core (starting it if needed) and switches to framed mode.
++    #[cfg_attr(all(target_os = "linux", target_env = "ohos"), allow(unreachable_code))]
+     pub fn connect() -> Result<Arc<Core>> {
++        // The HAP sandbox cannot start `hc`, so every connection, including the reconnect after a
++        // core restart, goes through the host bridge (HERDR_CORE_TCP is not set inside a HAP).
++        #[cfg(all(target_os = "linux", target_env = "ohos"))]
++        return Self::connect_bridge(&crate::ohos_exec::endpoint());
++        #[cfg(not(all(target_os = "linux", target_env = "ohos")))]
+         if let Some(endpoint) = std::env::var_os("HERDR_CORE_TCP") {
+             return Self::connect_bridge(&endpoint.to_string_lossy());
+         }
+diff --git a/src/ohos_entry.rs b/src/ohos_entry.rs
+index 3d77e3e..7595ee6 100644
+--- a/src/ohos_entry.rs
++++ b/src/ohos_entry.rs
+@@ -54,7 +54,7 @@ fn openharmony_app(app: OpenHarmonyApp) {
+     let person = crate::settings::load_person();
+     // The HAP sandbox cannot spawn the host's `hc`, so the core is reached through
+     // a TCP bridge that owns `hc connect` (see herdr-bridge.py on the host).
+-    let bridge = std::env::var("HERDR_CORE_TCP").unwrap_or_else(|_| "127.0.0.1:8765".to_string());
++    let bridge = crate::ohos_exec::endpoint();
+     let core: Result<std::sync::Arc<crate::hc::Core>, crate::setup::Need> =
+         match crate::hc::Core::connect_bridge(&bridge) {
+             Ok(core) => crate::hc::check(&core.hello).map(|()| core).map_err(crate::setup::Need::Fix),
+diff --git a/src/ohos_exec.rs b/src/ohos_exec.rs
+index d6e12b3..77d06d1 100644
+--- a/src/ohos_exec.rs
++++ b/src/ohos_exec.rs
+@@ -18,7 +18,8 @@ use crate::hc::Core;
+ 
+ static CORE: Mutex<Option<Arc<Core>>> = Mutex::new(None);
+ 
+-fn endpoint() -> String {
++/// The core bridge on the host: `HERDR_CORE_TCP`, else the default `herdr-bridge.py` listens on.
++pub(crate) fn endpoint() -> String {
+     std::env::var("HERDR_CORE_TCP").unwrap_or_else(|_| "127.0.0.1:8765".to_string())
+ }
+ 

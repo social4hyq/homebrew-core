@@ -1,0 +1,65 @@
+diff --git a/src/ohos_entry.rs b/src/ohos_entry.rs
+index ae3385d..4bdedac 100644
+--- a/src/ohos_entry.rs
++++ b/src/ohos_entry.rs
+@@ -77,27 +77,53 @@ fn openharmony_app(app: OpenHarmonyApp) {
+ 
+     let fresh = !crate::settings::path().exists();
+     let person = crate::settings::load_person();
++    // This runs inside ArkTS's onCreate: the window and the XComponent come only after it
++    // returns. Reaching the core and writing the mods workspace (~50 ms) are needed only
++    // when the first window opens, ~100 ms later, so they run beside ArkTS instead of before it.
+     // The HAP sandbox cannot spawn the host's `hc`, so the core is reached through
+     // a TCP bridge that owns `hc connect` (see herdr-bridge.py on the host).
+-    let bridge = crate::ohos_exec::endpoint();
+-    let core: Result<std::sync::Arc<crate::hc::Core>, crate::setup::Need> =
++    let connecting = std::thread::Builder::new().name("hc-connect".into()).spawn(|| {
++        let bridge = crate::ohos_exec::endpoint();
+         match crate::hc::Core::connect_bridge(&bridge) {
+             Ok(core) => crate::hc::check(&core.hello).map(|()| core).map_err(crate::setup::Need::Fix),
+             Err(error) => {
+                 tracing::warn!("herdr-app: {error:#}");
+                 Err(crate::setup::Need::Connect(crate::ohos_exec::unreachable_message(&error)))
+             }
+-        };
++        }
++    });
++    let writing = std::thread::Builder::new().name("mods-workspace".into()).spawn(|| {
++        if let Err(error) = crate::mods::write_workspace() {
++            tracing::warn!("cannot write {}: {error}", crate::mods::app_dir().display());
++        }
++    });
+ 
+     crate::update::start();
+     crate::telemetry::start(crate::settings::telemetry_setting(&person));
+     crate::bench::start();
+-    if let Err(error) = crate::mods::write_workspace() {
+-        tracing::warn!("cannot write {}: {error}", crate::mods::app_dir().display());
+-    }
+     let application = Application::with_platform(gpui_ohos::current_platform(app, false))
+         .with_assets(gpui_shell::AppAssets::new(crate::mods::app_dir()).following_links());
+-    let handle = application.run_embedded(move |cx| crate::app_started(cx, core, fresh));
++    let handle = application.run_embedded(move |cx| {
++        // Mods load from the workspace, and the first window needs the core.
++        match writing {
++            Ok(writing) => {
++                let _ = writing.join();
++            }
++            Err(error) => {
++                tracing::warn!("cannot start the mods workspace thread: {error}; writing it here");
++                if let Err(error) = crate::mods::write_workspace() {
++                    tracing::warn!("cannot write {}: {error}", crate::mods::app_dir().display());
++                }
++            }
++        }
++        let core = match connecting.map_err(|e| anyhow::anyhow!("cannot start the core connection: {e}")) {
++            Ok(connecting) => connecting
++                .join()
++                .unwrap_or_else(|_| Err(crate::setup::Need::Connect(crate::ohos_exec::unreachable_message(&anyhow::anyhow!("the core connection panicked"))))),
++            Err(error) => Err(crate::setup::Need::Connect(crate::ohos_exec::unreachable_message(&error))),
++        };
++        crate::app_started(cx, core, fresh)
++    });
+     APPLICATION.with(|slot| {
+         *slot.borrow_mut() = Some(handle);
+     });
