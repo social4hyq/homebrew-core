@@ -1,14 +1,14 @@
-class SnowShot < Formula
+class SnowShotApp < Formula
   desc "Screenshot and annotation utility from Snow Apps, unsigned OHOS HAP"
   homepage "https://github.com/mg-chao/snow-shot"
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.7_snow-shot.tar.gz"
   sha256 "6d9de662710ccf406dea312c0322e77a3f473bc6121096ec82df713d30f4273c"
   license "GPL-3.0-or-later"
-  revision 15
+  revision 16
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-v1.5.7-r18"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d0a9c89dae729796cbea25ce4b5e8d5b7ce6914aec0ebfbd6f2aa396183b1641"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2f2002e9f803bf8b4ed7e333de704b5d76b50fce74321be244a2c80760080509"
   end
 
   depends_on "brotli" => :build
@@ -67,7 +67,7 @@ class SnowShot < Formula
     sha256 "73072343793760861059d363f24596ee72c47e46dcfe2adf8e1004f3a2b4f1f0"
 
     patch do
-      file "Patches/snow-shot/ocr/src_runtime.rs.patch"
+      file "Patches/snow-shot-app/ocr/src_runtime.rs.patch"
     end
   end
 
@@ -112,7 +112,7 @@ class SnowShot < Formula
   end
 
   patch_root = Pathname(__dir__).parent.parent
-  Dir[(patch_root/"Patches/snow-shot/ohos/*.patch").to_s].each do |path|
+  Dir[(patch_root/"Patches/snow-shot-app/ohos/*.patch").to_s].each do |path|
     patch do
       file Pathname(path).relative_path_from(patch_root).to_s
     end
@@ -140,7 +140,7 @@ class SnowShot < Formula
     ocr_crate = buildpath/"snow-crates/crates/simd-paddle-ocr-rs"
     resource("jthread").stage buildpath/"jthread"
     mkdir_p ocr_crate
-    payload = Pathname(__FILE__).parent.parent.parent/"Patches/snow-shot"
+    payload = Pathname(__FILE__).parent.parent.parent/"Patches/snow-shot-app"
     resource("snow-shot-ocr-rs").stage do
       cp_r ".", ocr_crate
     end
@@ -331,9 +331,10 @@ class SnowShot < Formula
     libexec.install unsigned_hap => "snow-shot-unsigned.hap"
     (libexec/"snow-shot-install").write (payload/"snow-shot-install.sh").read
     chmod 0555, libexec/"snow-shot-install"
-    (bin/"snow-shot").write_env_script libexec/"snow-shot-install",
+    (bin/"snow-shot-app").write_env_script libexec/"snow-shot-install",
       SNOW_SHOT_HAP: libexec/"snow-shot-unsigned.hap",
       SNOW_SHOT_HDC: formula_opt_prefix("ohos-sdk-toolchains")/"hdc"
+    bin.install_symlink "snow-shot-app" => "snow-shot"
   end
 
   def build_qt_tls(qt_sdk, native_sdk)
@@ -467,7 +468,7 @@ class SnowShot < Formula
     end
     ENV["DEVECO_SDK_HOME"] = (buildpath/"hap-sdk").to_s
     ENV["HOS_SDK_HOME"] = (buildpath/"hap-sdk").to_s
-    payload = Pathname(__FILE__).parent.parent.parent/"Patches/snow-shot"
+    payload = Pathname(__FILE__).parent.parent.parent/"Patches/snow-shot-app"
     stage = buildpath/"hap-proj"
     app_lib = buildpath/"build/snow_shot/libsnow_shot.so"
     runtime_lib_dirs = [app_lib.dirname.to_s] + recursive_dependencies.filter_map do |dependency|
@@ -572,7 +573,7 @@ class SnowShot < Formula
   def caveats
     <<~EOS
       The HAP is unsigned in the bottle. Connect and unlock the device, then run
-      `snow-shot install`: app-installer handles Huawei Developer login, local
+      `snow-shot-app install`: app-installer handles Huawei Developer login, local
       debug profile generation, signing, installation, and launch.
     EOS
   end
@@ -580,9 +581,11 @@ class SnowShot < Formula
   test do
     hap = libexec/"snow-shot-unsigned.hap"
     assert_path_exists hap
-    assert_match "Usage: snow-shot <command>", shell_output("#{bin}/snow-shot --help")
-    assert_match "Usage: snow-shot <command>", shell_output("#{bin}/snow-shot")
-    assert_match "unknown command: bogus", shell_output("#{bin}/snow-shot bogus 2>&1", 2)
+    assert_predicate bin/"snow-shot", :symlink?
+    assert_match "Usage: snow-shot-app <command>", shell_output("#{bin}/snow-shot --help")
+    assert_match "Usage: snow-shot-app <command>", shell_output("#{bin}/snow-shot-app --help")
+    assert_match "Usage: snow-shot-app <command>", shell_output("#{bin}/snow-shot-app")
+    assert_match "unknown command: bogus", shell_output("#{bin}/snow-shot-app bogus 2>&1", 2)
     fake_bin = testpath/"bin"
     fake_bin.mkpath
     installer_args = testpath/"hap-installer-args"
@@ -594,9 +597,9 @@ class SnowShot < Formula
     (fake_bin/"hdc").write "#!/bin/sh\necho 127.0.0.1:1\n"
     chmod 0755, fake_bin/"hdc"
     with_env(PATH: "#{fake_bin}:#{ENV["PATH"]}", SNOW_SHOT_HDC: (fake_bin/"hdc").to_s) do
-      shell_output("#{bin}/snow-shot")
+      shell_output("#{bin}/snow-shot-app")
       refute_path_exists installer_args
-      shell_output("#{bin}/snow-shot install --no-start")
+      shell_output("#{bin}/snow-shot-app install --no-start")
     end
     args = installer_args.read.lines(chomp: true)
     assert_equal ["--hap", hap.to_s], args.first(2)

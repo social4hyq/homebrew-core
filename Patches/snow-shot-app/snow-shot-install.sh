@@ -1,11 +1,11 @@
 #!/bin/sh
 set -eu
 
-: "${SNOW_SHOT_HAP:?snow-shot: SNOW_SHOT_HAP is not configured}"
+: "${SNOW_SHOT_HAP:?snow-shot-app: SNOW_SHOT_HAP is not configured}"
 
 usage() {
   cat <<'EOF'
-Usage: snow-shot <command> [options]
+Usage: snow-shot-app <command> [options]
 
   install [--no-start] [--device <id>] [--project-dir <path>] [--signed-hap <path>]
                 sign the bottled HAP with a local debug profile, install it on
@@ -18,7 +18,7 @@ install_hap() {
   for option in "$@"; do
     case "$option" in
       --hap|--hap=*|--bundle-id|--bundle-id=*|--app-name|--app-name=*|--module|--module=*|--ability|--ability=*)
-        printf 'snow-shot: %s is fixed by this formula\n' "$option" >&2
+        printf 'snow-shot-app: %s is fixed by this formula\n' "$option" >&2
         exit 2
         ;;
     esac
@@ -53,7 +53,7 @@ case "${1:-help}" in
     install_hap "$@"
     ;;
   *)
-    printf 'snow-shot: unknown command: %s\n' "$1" >&2
+    printf 'snow-shot-app: unknown command: %s\n' "$1" >&2
     usage >&2
     exit 2
     ;;
