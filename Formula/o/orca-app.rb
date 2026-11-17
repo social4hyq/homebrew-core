@@ -1,0 +1,349 @@
+class OrcaApp < Formula
+  desc "Desktop shell for the Orca agent runtime (Electron window on its web client)"
+  homepage "https://github.com/stablyai/orca"
+  # Version follows the Orca release the tap-authored shell is built against;
+  # the shell sources live in Patches/orca-app and the host runtime comes from
+  # the `orca` formula, so both formulae track the same upstream tag.
+  url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.261.tar.gz"
+  sha256 "5b8a21bb9cde62a1dd7ca3c0ffd2f684faf168ea401191068777a8a9e7466909"
+  # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
+  # (Chromium/Electron, mixed MIT/BSD/LGPL).
+  license :cannot_represent
+
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6256b9a85153646d004597406a7cf948c8863dae81ad757832fccd7594f3a7e7"
+  end
+
+  depends_on "app-installer"
+  depends_on "node"
+  depends_on "ohos-sdk-toolchains"
+  depends_on "orca"
+  depends_on "unzip"
+  depends_on "zip"
+
+  # Shell sources live in the tap so they are reviewable in the PR and no
+  # opaque release payload is involved. Every path is listed literally: the
+  # weekly remove-unused-patches job keeps files referenced from Formula/.
+  SHELL_FILES = %w[
+    Patches/orca-app/app/config.json
+    Patches/orca-app/app/main.cjs
+    Patches/orca-app/app/package.json
+    Patches/orca-app/app/tray.cjs
+    Patches/orca-app/app/waiting.html
+    Patches/orca-app/assets/icon.png
+    Patches/orca-app/assets/tray-icon.png
+    Patches/orca-app/scripts/install-desktop.sh
+    Patches/orca-app/scripts/orca-desktop.sh
+  ].freeze
+
+  resource "electron-ohos" do
+    url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
+    sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
+  end
+
+  def install
+    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
+    source_root = tap_root/"Patches/orca-app"
+    SHELL_FILES.each do |file|
+      raise "#{file} is missing from the tap" unless (tap_root/file).exist?
+    end
+
+    resource("electron-ohos").fetch
+    system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
+    system "tar", "-xzf", buildpath/"libelectron_144.tar.gz", "-C", buildpath
+    shell = buildpath/"libelectron/ohos_hap"
+
+    app = shell/"web_engine/src/main/resources/resfile/resources/app"
+    rm_r app if app.exist?
+    app.mkpath
+    %w[main.cjs package.json config.json waiting.html tray.cjs].each do |name|
+      cp source_root/"app"/name, app/name
+    end
+
+    cp source_root/"assets/icon.png", app/"app-icon.png"
+    cp source_root/"assets/tray-icon.png", app/"tray-icon.png"
+
+    inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
+                                          '"bundleName": "com.social4hyq.orca"'
+    inreplace shell/"AppScope/app.json5", '"vendor": "example"', '"vendor": "social4hyq"'
+    %w[app_icon.png startIcon.png].each do |name|
+      cp source_root/"assets/icon.png", shell/"AppScope/resources/base/media"/name
+    end
+    # App name and ability labels live in per-locale string resources: patching
+    # only the base file leaves the zh_CN/en_US overrides intact and the
+    # launcher keeps showing the template's "Electron" label.
+    (shell.glob("AppScope/resources/*/element/string.json") +
+     shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
+      strings = JSON.parse(file.read)
+      strings.fetch("string").each do |entry|
+        case entry["name"]
+        when "app_name", "EntryAbility_label" then entry["value"] = "Orca"
+        end
+      end
+      rm file
+      file.write JSON.pretty_generate(strings) + "\n"
+    end
+
+    # Remove template signing settings and select the SDK supported by the
+    # shared HAP build toolchain. This profile is strict JSON.
+    profile = JSON.parse((shell/"build-profile.json5").read)
+    profile.fetch("app").fetch("products").each do |product|
+      product.delete("signingConfig")
+      product["compatibleSdkVersion"] = "6.0.0(20)"
+    end
+    profile.fetch("app").delete("signingConfigs")
+    profile_file = shell/"build-profile.json5"
+    rm profile_file
+    profile_file.write JSON.pretty_generate(profile) + "\n"
+    inreplace shell/"electron/src/main/module.json5", '"mainElement": "EntryAbility",',
+              '"mainElement": "EntryAbility", "extractNativeLibs": true,'
+
+    # The shell only talks to the host server over loopback. Restricted
+    # permissions (JIT, pasteboard) are added to the install-time ACL variant
+    # instead of every install; see module-acl.json below.
+    inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\r?\n    \],/m,
+              <<~JSON5.chomp
+                "requestPermissions": [
+                      { "name": "ohos.permission.INTERNET" },
+                      { "name": "ohos.permission.GET_NETWORK_INFO" }
+                    ],
+              JSON5
+
+    # The caption close button never reaches Electron's BrowserWindow close
+    # event: electron-ohos tears down the window UIAbility first and the shell
+    # exits with it. Register a windowStageClose handler that hides the ability
+    # and cancels the close, so closing the window only sends it to the tray.
+    # The tray's quit item calls app.exit() because a normal quit would be
+    # cancelled here.
+    close_handler = [
+      "    super.onWindowStageCreate(windowStage);",
+      "    try {",
+      "      windowStage.on('windowStageClose', () => {",
+      "        if (CheckEmptyUtils.isEmpty(this.xcomponentId)) {",
+      "          return false;",
+      "        }",
+      "        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));",
+      "        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
+      "        return false;",
+      "      });",
+      "    } catch (exception) {",
+      "      LogUtil.error(TAG, 'Failed to register window close handler: ' + JSON.stringify(exception));",
+      "    }",
+      "",
+    ].join("\n")
+    inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
+              "    super.onWindowStageCreate(windowStage);\n", close_handler
+
+    # HAP shell build. CI runs in the private electron-ohos-ci image (the
+    # generic Electron-on-OHOS build image, selected via the
+    # OHOS_CI_IMAGE_OVERRIDES repo variable), which bakes the HarmonyOS
+    # command-line toolchain at /opt/electron-ohos-clt — repacked from a
+    # licensed system CLT install, not publicly redistributable. The shell
+    # compiles no C++, so the NDK-less SDK subset the image carries suffices.
+    clt = Pathname.new("/opt/electron-ohos-clt")
+    unless (clt/"hvigor/bin/hvigorw.js").exist?
+      odie "orca-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['orca-app']"
+    end
+
+    # brew's sanitized build env drops the container's LD_LIBRARY_PATH, but
+    # ohos_packing_tool needs the SDK clang runtimes and the libhilog stderr
+    # adapter baked into the image.
+    ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
+    ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
+    ENV["LD_LIBRARY_PATH"] =
+      "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
+    ENV.delete("NODE_OPTIONS")
+    # A container inheriting RLIMIT_NOFILE near 1e9 drives the musl FD-table
+    # sizing into a refused mapping; cap it for the hvigor process tree
+    # (only ever lowering — never raise an environment's existing limit).
+    soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
+    if hard_cap > 65_536
+      Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
+    end
+
+    cd shell do
+      system "node", clt/"ohpm/bin/pm-cli.js", "install"
+      system "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
+             "--mode", "module", "-p", "product=default", "--no-daemon"
+    end
+
+    libexec.install shell/"electron/build/default/outputs/default/electron-default-unsigned.hap" =>
+                    "orca-app-unsigned.hap"
+
+    # The default install swaps in this module.json: the two kernel ACLs keep
+    # the renderer out of --jitless (WebAssembly) and READ_PASTEBOARD makes
+    # paste work. Everything else stays out of the HAP so a local debug profile
+    # can grant it.
+    hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"orca-app-unsigned.hap", "module.json")
+    module_json = JSON.parse(hap_module)
+    requested = module_json.fetch("module").fetch("requestPermissions")
+    %w[ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
+       ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION
+       ohos.permission.READ_PASTEBOARD].each do |name|
+      requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
+    end
+    pkgshare.mkpath
+    (pkgshare/"module-acl.json").write JSON.generate(module_json)
+
+    # cp, not install: Pathname#install moves the source, and the tap checkout
+    # is a read-only host mount inside the CI container.
+    cp source_root/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
+    chmod 0755, pkgshare/"install-desktop.sh"
+    cp source_root/"scripts/orca-desktop.sh", libexec/"orca-desktop.sh"
+    chmod 0755, libexec/"orca-desktop.sh"
+    tool_path = [formula_opt_bin("node"), formula_opt_bin("zip"), formula_opt_bin("unzip"), "$PATH"].join(":")
+    (bin/"orca-app").write_env_script libexec/"orca-desktop.sh",
+      ORCA_DESKTOP_ROOT:           formula_opt_prefix("orca")/"libexec",
+      ORCA_DESKTOP_UNSIGNED_HAP:   libexec/"orca-app-unsigned.hap",
+      ORCA_DESKTOP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
+      ORCA_DESKTOP_MODULE_ACL:     pkgshare/"module-acl.json",
+      ORCA_DESKTOP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
+      PATH:                        tool_path
+  end
+
+  def caveats
+    <<~EOS
+      The desktop HAP is unsigned in the bottle. Connect and unlock the device,
+      then run:
+
+        orca-app install
+
+      app-installer generates a local debug profile (the first run asks for a
+      Huawei Developer login), signs the HAP and installs it. `orca-app install`
+      also starts the backing `orca serve` instance, so the app icon opens the
+      workbench directly. After a reboot start it again:
+
+        orca-app serve      # start the runtime server (the shell waits for it)
+        orca-app status
+        orca-app stop
+
+      The shell loads the web client from 127.0.0.1 and never starts the server
+      itself: the HAP cannot execute host binaries or read host files, so every
+      workspace operation runs in the host `orca` runtime server.
+
+      The default install carries the two kernel ACLs (JIT/WebAssembly for the
+      renderer) and READ_PASTEBOARD; `orca-app install --no-acl` installs the
+      strong-sandbox variant instead (no JIT, no paste).
+    EOS
+  end
+
+  test do
+    ENV["HOME"] = testpath/"home"
+    assert_match "Usage: orca-app", shell_output("#{bin}/orca-app --help")
+
+    # A minimal stand-in for the shell HAP: the installer only rewrites
+    # config.json (and swaps module.json for the ACL variant), so the 200 MB
+    # artifact does not need to be copied around in the test.
+    fake_hap = testpath/"shell.hap"
+    hap_tree = testpath/"hap-tree"
+    (hap_tree/"resources/resfile/resources/app").mkpath
+    fake_module = { "name" => "electron", "requestPermissions" => [{ "name" => "ohos.permission.INTERNET" }] }
+    (hap_tree/"module.json").write JSON.generate(
+      "app"    => { "bundleName" => "com.social4hyq.orca" },
+      "module" => fake_module,
+    )
+    (hap_tree/"resources/resfile/resources/app/config.json").write '{"port":0,"url":""}'
+    cd hap_tree do
+      system "zip", "-q", "-X", fake_hap.to_s, "module.json",
+             "resources/resfile/resources/app/config.json"
+    end
+
+    fake_bin = testpath/"bin"
+    fake_bin.mkpath
+    installer_args = testpath/"hap-installer-args"
+    injected_copy = testpath/"injected.hap"
+    hdc_log = testpath/"hdc-log"
+
+    (fake_bin/"hdc").write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$*" >> #{hdc_log}
+      case "$*" in
+        *"list targets -v"*) printf '%s\\n' "127.0.0.1:34561  Connected" ;;
+      esac
+    SH
+    chmod 0755, fake_bin/"hdc"
+
+    (fake_bin/"app-installer").write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$@" > #{installer_args}
+      while [ $# -gt 0 ]; do
+        case "$1" in
+          --hap) cp "$2" #{injected_copy}; shift 2 ;;
+          *) shift ;;
+        esac
+      done
+    SH
+    chmod 0755, fake_bin/"app-installer"
+
+    ENV.prepend_path "PATH", fake_bin
+
+    # Default install: config injection, ACL module and signing project.
+    host_config = testpath/"host-config.json"
+    host_config.write JSON.generate("port" => 6799, "url" => "http://127.0.0.1:6799/web-index.html#pairing=test")
+    assert_match "installed",
+                 shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --no-serve")
+    injected_config = JSON.parse(
+      shell_output("unzip -p #{injected_copy} resources/resfile/resources/app/config.json"),
+    )
+    assert_equal 6799, injected_config.fetch("port")
+    assert_equal "http://127.0.0.1:6799/web-index.html#pairing=test", injected_config.fetch("url")
+    acl_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
+    acl_permissions = acl_module.dig("module", "requestPermissions").map { |permission| permission.fetch("name") }
+    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
+                    ohos.permission.READ_PASTEBOARD
+                    ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
+                    ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
+                 acl_permissions.sort
+    refute_path_exists Pathname.new(Dir.home)/".hap-installer"
+    installer = installer_args.read.lines(chomp: true)
+    assert_equal "com.social4hyq.orca", installer[installer.index("--bundle-id") + 1]
+    assert_equal "Orca", installer[installer.index("--app-name") + 1]
+    assert_equal "electron", installer[installer.index("--module") + 1]
+    assert_equal "EntryAbility", installer[installer.index("--ability") + 1]
+
+    # --no-acl keeps the HAP's own permission list.
+    assert_match "installed",
+                 shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --no-acl --no-serve")
+    strong_permissions = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
+                             .dig("module", "requestPermissions").map { |permission| permission.fetch("name") }
+    assert_equal %w[ohos.permission.INTERNET], strong_permissions
+
+    assert_match "no managed server running", shell_output("#{bin}/orca-app stop")
+    assert_match "not healthy", shell_output("#{bin}/orca-app status 2>&1", 1)
+
+    # The real bottle HAP.
+    hap = libexec/"orca-app-unsigned.hap"
+    assert_path_exists hap
+    listing = shell_output("unzip -l #{hap}")
+    assert_match "pack.info", listing
+    assert_match "libs/arm64-v8a/libelectron.so", listing
+    assert_match "resources/resfile/resources/app/main.cjs", listing
+    assert_match "resources/resfile/resources/app/tray.cjs", listing
+    assert_match "resources/resfile/resources/app/tray-icon.png", listing
+    assert_match "resources/resfile/resources/app/waiting.html", listing
+    tray_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/tray.cjs")
+    assert_match "new Tray(", tray_source
+    window_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/main.cjs")
+    assert_match "tray.create(", window_source
+    assert_match "ORCA_DESKTOP_NO_TRAY", window_source
+    placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
+    assert_equal 0, placeholder.fetch("port")
+    permissions = JSON.parse(shell_output("unzip -p #{hap} module.json"))
+                      .fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
+    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
+    acl = JSON.parse((pkgshare/"module-acl.json").read)
+    acl_requested = acl.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
+    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
+                    ohos.permission.READ_PASTEBOARD
+                    ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
+                    ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
+                 acl_requested.sort
+    system "unzip", "-tq", hap
+  end
+end

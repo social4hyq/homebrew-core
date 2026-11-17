@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>Orca</title>
+<style>
+:root{color-scheme:light dark;--bg:#f6f7f9;--surface:#fff;--ink:#1b2030;--muted:#6f7889;--line:#e3e7ee;--accent:#4d6bfe;--wash:#e8ecff;--shadow:0 18px 46px #18243c0c}
+*{box-sizing:border-box}html,body{min-height:100%;margin:0}body{font:14px/1.6 "HarmonyOS Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 39%,var(--wash),transparent 56%);opacity:.65}
+.header{position:absolute;top:32px;left:40px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;letter-spacing:.01em}.header img{width:24px;height:24px;border-radius:6px}
+main{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:108px 28px 88px}.launch{width:440px;max-width:100%;text-align:center;animation:appear .5s ease both}
+.emblem{width:96px;height:96px;display:grid;place-items:center;margin:0 auto 30px;background:var(--surface);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);position:relative}.emblem::after{content:"";position:absolute;inset:-9px;border:1px solid var(--line);border-radius:34px;opacity:.45}.emblem img{width:64px;height:64px;object-fit:contain;border-radius:14px}
+h1{font-size:32px;font-weight:650;line-height:1.25;letter-spacing:-1px;margin:0 0 12px}.subtitle{color:var(--muted);font-size:15px;margin:0 0 34px}.connection{width:260px;max-width:100%;margin:0 auto}.track{height:3px;border-radius:3px;overflow:hidden;background:var(--line)}.track::after{content:"";display:block;width:36%;height:100%;border-radius:inherit;background:var(--accent);animation:travel 1.8s cubic-bezier(.45,0,.55,1) infinite}.status{margin:15px 0 0;font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:7px}.indicator{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.help{margin-top:30px;text-align:left;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}.help[hidden]{display:none}.help summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted)}.help summary::-webkit-details-marker{display:none}.help summary::after{content:"+";font-size:16px}.help[open] summary::after{content:"−"}.help p{margin:12px 0 9px;color:var(--muted);font-size:12px}.command{display:flex;align-items:center;gap:10px;padding:9px 10px;background:var(--bg);border:1px solid var(--line);border-radius:7px}.command code{flex:1;overflow-wrap:anywhere;font:11px/1.6 ui-monospace,"SFMono-Regular",Consolas,monospace}.command button{border:0;background:transparent;color:var(--accent);font:inherit;font-size:11px;cursor:pointer;padding:3px 0;white-space:nowrap}.error-note{margin:18px 0 0;color:var(--muted);font-size:12px}
+.footer{position:absolute;bottom:27px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--muted);font-size:11px;letter-spacing:.03em}.footer span+span::before{content:"·";padding-right:10px;opacity:.5}
+body[data-state="not-configured"] .track::after{width:100%;animation:none;background:#cf8a45}body[data-state="not-configured"] .indicator{background:#cf8a45}
+@keyframes travel{0%{transform:translateX(-110%)}100%{transform:translateX(390%)}}@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1115;--surface:#181b22;--ink:#edf0f5;--muted:#8b95a9;--line:#2b3140;--wash:#1d2643;--shadow:0 22px 60px #0004}.emblem{border-color:#343b4b}}
+@media(max-width:480px){.header{top:22px;left:24px}h1{font-size:27px}.emblem{width:84px;height:84px;margin-bottom:26px}.emblem img{width:56px;height:56px}.subtitle{font-size:14px}.footer{bottom:20px}.help{padding:14px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.track::after{width:45%;transform:translateX(62%)}}
+</style>
+</head>
+<body data-state="waiting">
+<header class="header"><img src="app-icon.png" alt="" aria-hidden="true"><span>Orca</span></header>
+<main><section class="launch" aria-label="Orca startup">
+<div class="emblem"><img src="app-icon.png" alt="Orca"></div>
+<h1 id="heading">Orca</h1>
+<p class="subtitle" id="description">Getting your workspaces ready.</p>
+<div class="connection"><div class="track" aria-hidden="true"></div><p class="status" role="status" aria-live="polite"><span class="indicator" aria-hidden="true"></span><span id="status-text">Connecting to the local server</span></p></div>
+<details class="help" id="help" hidden><summary>Need a hand?<span aria-hidden="true"></span></summary><p id="help-text">This opens by itself once the server is up. You can also check from a terminal:</p><div class="command"><code id="command">orca-app status</code><button id="copy" type="button" aria-label="Copy command">Copy</button></div><p id="extra">If it is not running yet, start it with <code>orca-app serve</code>.</p></details>
+<p class="error-note" id="note" hidden></p>
+</section></main>
+<footer class="footer"><span>Orca</span><span>Local connection</span></footer>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+let slowTimer;
+function renderState() {
+  clearTimeout(slowTimer);
+  const requested = location.hash.slice(1) || params.get('state') || 'waiting';
+  const state = requested === 'not-configured' ? 'not-configured' : 'waiting';
+  document.body.dataset.state = state;
+  const missing = state === 'not-configured';
+  $('heading').textContent = missing ? 'One step left' : 'Orca';
+  $('description').textContent = missing
+    ? 'Finish the host configuration, then open the app again.'
+    : 'Getting your workspaces ready.';
+  $('status-text').textContent = missing ? 'Waiting for configuration' : 'Connecting to the local server';
+  $('command').textContent = missing ? 'orca-app install' : 'orca-app status';
+  $('help-text').textContent = missing
+    ? 'Run this in a terminal to configure and install:'
+    : 'This opens by itself once the server is up. You can also check from a terminal:';
+  $('extra').hidden = missing;
+  $('help').hidden = !missing;
+  $('help').open = missing;
+  $('note').hidden = true;
+  if (!missing) slowTimer = setTimeout(() => {
+    $('help').hidden = false;
+    $('status-text').textContent = 'Still getting ready';
+    $('note').textContent = 'The first start can take a little longer.';
+    $('note').hidden = false;
+  }, 12000);
+}
+window.addEventListener('hashchange', renderState);
+$('copy').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText($('command').textContent);
+    $('copy').textContent = 'Copied';
+    setTimeout(() => { $('copy').textContent = 'Copy'; }, 1800);
+  } catch {
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents($('command'));
+    selection.removeAllRanges(); selection.addRange(range);
+    $('copy').textContent = 'Select to copy';
+  }
+});
+renderState();
+</script>
+</body>
+</html>
