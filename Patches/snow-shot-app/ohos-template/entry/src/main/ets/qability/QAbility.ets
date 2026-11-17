@@ -684,6 +684,9 @@ export default class QAbility extends UIAbility {
       QAbility.foregroundPickerAbility = null;
     }
     qpa.handleAbilityOnBackground(this);
+    if (QAbility.shortcutBridgeOwner === this) {
+      this.refreshGlobalShortcutSubscriptions();
+    }
   }
 
   onWindowStageDestroy() {
@@ -707,7 +710,7 @@ export default class QAbility extends UIAbility {
     this.shortcutSubscriptions.forEach((subscription: ArkHotkeySubscription, portableText: string) => {
       try {
         // Re-arm the global listener after the temporary screenshot ability exits.
-        inputConsumer.off('hotkeyChange', subscription.options);
+        inputConsumer.off('hotkeyChange', subscription.options, subscription.callback);
         inputConsumer.on('hotkeyChange', subscription.options, subscription.callback);
       } catch (error) {
         const e = error as BusinessError;

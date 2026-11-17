@@ -4,11 +4,11 @@ class SnowShotApp < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.7_snow-shot.tar.gz"
   sha256 "6d9de662710ccf406dea312c0322e77a3f473bc6121096ec82df713d30f4273c"
   license "GPL-3.0-or-later"
-  revision 17
+  revision 18
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "96d8c50f5dd61a0aa865ec692542ee6448953ce5ac2e735ecc096e45f9763181"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e74e9176d1ca3dd334a7e65a1d759da8d22e1aecf21ac77ddfe96ab4474f9d2"
   end
 
   depends_on "brotli" => :build
@@ -584,7 +584,7 @@ class SnowShotApp < Formula
     assert_predicate bin/"snow-shot", :symlink?
     assert_match "Usage: snow-shot-app <command>", shell_output("#{bin}/snow-shot --help")
     assert_match "Usage: snow-shot-app <command>", shell_output("#{bin}/snow-shot-app --help")
-    assert_match "Usage: snow-shot-app <command>", shell_output("#{bin}/snow-shot-app")
+    assert_match "Usage: snow-shot-app <command>", shell_output(bin/"snow-shot-app")
     assert_match "unknown command: bogus", shell_output("#{bin}/snow-shot-app bogus 2>&1", 2)
     fake_bin = testpath/"bin"
     fake_bin.mkpath
@@ -597,7 +597,7 @@ class SnowShotApp < Formula
     (fake_bin/"hdc").write "#!/bin/sh\necho 127.0.0.1:1\n"
     chmod 0755, fake_bin/"hdc"
     with_env(PATH: "#{fake_bin}:#{ENV["PATH"]}", SNOW_SHOT_HDC: (fake_bin/"hdc").to_s) do
-      shell_output("#{bin}/snow-shot-app")
+      shell_output(bin/"snow-shot-app")
       refute_path_exists installer_args
       shell_output("#{bin}/snow-shot-app install --no-start")
     end
