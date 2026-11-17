@@ -1,0 +1,201 @@
+diff --git a/src/main/daemon/endpoint/publication/daemon-endpoint-ownership.ts b/src/main/daemon/endpoint/publication/daemon-endpoint-ownership.ts
+index 1ade6cc5..d2e7c18b 100644
+--- a/src/main/daemon/endpoint/publication/daemon-endpoint-ownership.ts
++++ b/src/main/daemon/endpoint/publication/daemon-endpoint-ownership.ts
+@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto'
+ import { linkSync, lstatSync, renameSync, statSync, unlinkSync } from 'node:fs'
+ import { dirname, join } from 'node:path'
+ import { endpointIsProvenDead, type SocketProbeOutcome } from './daemon-endpoint-probe'
++import { linkIsUnsupported } from '../../../../shared/file-write/publish-staged-file'
+ 
+ // Retried only when another publisher demonstrably took the name, so a small bound suffices.
+ const PUBLISH_ATTEMPTS = 3
+@@ -187,7 +188,7 @@ function isLinkUnsupportedError(error: unknown): boolean {
+     return false
+   }
+   const code = (error as NodeJS.ErrnoException).code
+-  return code === 'EPERM' || code === 'EOPNOTSUPP' || code === 'ENOTSUP' || code === 'ENOSYS'
++  return code === 'EPERM' || code === 'EOPNOTSUPP' || code === 'ENOTSUP' || code === 'ENOSYS' || linkIsUnsupported(error)
+ }
+ 
+ function isFileExistsError(error: unknown): boolean {
+diff --git a/src/main/filesystem/atomic-file-publication.ts b/src/main/filesystem/atomic-file-publication.ts
+index 4c5d1b1d..38894cdc 100644
+--- a/src/main/filesystem/atomic-file-publication.ts
++++ b/src/main/filesystem/atomic-file-publication.ts
+@@ -10,6 +10,7 @@ import { grantDirAcl } from '../windows/windows-directory-acl'
+ import { isPermissionError } from './permission-errors'
+ import { nodeFileContentsEqualSync } from '../../shared/file-content/node-file-content-equality'
+ import { renameFileWithWindowsRetry } from '../../shared/file-write/windows-retry-file-operations'
++import { publishStagedFileExclusively } from '../../shared/file-write/publish-staged-file'
+ 
+ export function writeFileAtomically(
+   targetPath: string,
+@@ -177,7 +178,7 @@ function assertHardLinkPublicationSupported(sourcePath: string, targetPath: stri
+ 
+ export function publishFileWithoutOverwrite(sourcePath: string, targetPath: string): boolean {
+   try {
+-    linkSync(sourcePath, targetPath)
++    publishStagedFileExclusively(sourcePath, targetPath)
+     return true
+   } catch (error) {
+     if ((error as NodeJS.ErrnoException).code === 'EEXIST') {
+diff --git a/src/main/native-chat/agent-session-journal/database/journal-domain-database.ts b/src/main/native-chat/agent-session-journal/database/journal-domain-database.ts
+index fdc1620c..c905f209 100644
+--- a/src/main/native-chat/agent-session-journal/database/journal-domain-database.ts
++++ b/src/main/native-chat/agent-session-journal/database/journal-domain-database.ts
+@@ -1,5 +1,6 @@
+ import { ensurePRWatchTables } from '../../../github/pr-watch/pr-watch-tables'
+-import { existsSync, linkSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs'
++import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs'
++import { publishStagedFileExclusively } from '../../../../shared/file-write/publish-staged-file'
+ import { join } from 'node:path'
+ import Database from '../../../sqlite/sync-database'
+ import { hardenSqliteDatabaseFiles } from '../../../sqlite/harden-database-files'
+@@ -71,7 +72,7 @@ export async function initializeJournalDomainDatabase(stateDirectory: string): P
+     }
+     try {
+       // Publish complete metadata without replacing another initializer's result.
+-      linkSync(filename, destination)
++      publishStagedFileExclusively(filename, destination)
+     } catch (error) {
+       if (!(error instanceof Error && 'code' in error && error.code === 'EEXIST')) {
+         throw error
+diff --git a/src/main/orcad/credentials/orcad-secret-key-record.ts b/src/main/orcad/credentials/orcad-secret-key-record.ts
+index 6082457e..4bb24a91 100644
+--- a/src/main/orcad/credentials/orcad-secret-key-record.ts
++++ b/src/main/orcad/credentials/orcad-secret-key-record.ts
+@@ -1,4 +1,5 @@
+ import { createHash, randomBytes } from 'node:crypto'
++import { publishStagedFileExclusively } from '../../../shared/file-write/publish-staged-file'
+ import {
+   linkSync,
+   lstatSync,
+@@ -148,7 +149,7 @@ export function publishRecordExclusively(path: string, record: StoredKeyState):
+       return `its key record ${path} could not be restricted to this user`
+     }
+     try {
+-      linkSync(staging, path)
++      publishStagedFileExclusively(staging, path)
+     } catch (error) {
+       if (hasErrorCode(error, 'EEXIST')) {
+         return 'exists'
+diff --git a/src/main/orcad/host-lifecycle/managed-stop/orcad-managed-stop-decision.ts b/src/main/orcad/host-lifecycle/managed-stop/orcad-managed-stop-decision.ts
+index 59bcbcba..a60b6744 100644
+--- a/src/main/orcad/host-lifecycle/managed-stop/orcad-managed-stop-decision.ts
++++ b/src/main/orcad/host-lifecycle/managed-stop/orcad-managed-stop-decision.ts
+@@ -1,5 +1,6 @@
+ // Exclusive hard links arbitrate stop versus cancel; cancel cannot succeed once dispatch wins.
+-import { linkSync, rmSync } from 'node:fs'
++import { rmSync } from 'node:fs'
++import { publishStagedFileExclusively } from '../../../../shared/file-write/publish-staged-file'
+ import { randomUUID } from 'node:crypto'
+ import { writeDurableSecureJsonFile } from '../../../../shared/secure-storage/secure-file'
+ import {
+@@ -37,7 +38,7 @@ export function claimOrcadManagedStopDecision(
+     throw new Error('orcad_managed_stop_decision_permissions_unconfirmed')
+   }
+   try {
+-    linkSync(staged, path)
++    publishStagedFileExclusively(staged, path)
+     return decision
+   } catch (error) {
+     if (!hasErrorCode(error, 'EEXIST')) {
+diff --git a/src/main/orcad/instance-lock/orcad-data-root-privacy.ts b/src/main/orcad/instance-lock/orcad-data-root-privacy.ts
+index 412ad854..df22d3cd 100644
+--- a/src/main/orcad/instance-lock/orcad-data-root-privacy.ts
++++ b/src/main/orcad/instance-lock/orcad-data-root-privacy.ts
+@@ -1,6 +1,7 @@
+ import { chmodSync, statSync } from 'node:fs'
+ import process from 'node:process'
+ import { restrictWindowsPathSync } from '../../../shared/secure-storage/secure-path-windows-acl'
++import { isOpenHarmony } from '../../../shared/file-write/publish-staged-file'
+ 
+ type OrcadInstanceLockCode =
+   | 'orcad_data_root_unusable'
+@@ -56,7 +57,11 @@ export function assertOrcadDataRootIsPrivate(
+     )
+   }
+   const uid = process.getuid?.()
+-  if (uid !== undefined && stats.uid !== uid) {
++  // HarmonyOS reports the shared home mount's owner as a fixed account uid that
++  // never equals the app-sandbox uid getuid() returns, so the equality check
++  // refuses every home directory there. The 0700 tightening below still applies.
++  const uidComparable = !isOpenHarmony()
++  if (uidComparable && uid !== undefined && stats.uid !== uid) {
+     throw new OrcadInstanceLockError(
+       'orcad_data_root_wrong_owner',
+       `The orcad data root ${dataRoot} is owned by uid ${stats.uid}, not by uid ${uid} running ` +
+diff --git a/src/main/orcad/instance-lock/orcad-instance-lock.ts b/src/main/orcad/instance-lock/orcad-instance-lock.ts
+index fb377439..3ce6dd69 100644
+--- a/src/main/orcad/instance-lock/orcad-instance-lock.ts
++++ b/src/main/orcad/instance-lock/orcad-instance-lock.ts
+@@ -1,7 +1,7 @@
+ // Lock before profile load to prevent concurrent writers; terminal daemons own separate endpoints
+ // and deliberately survive runtime lock release and restart.
+ import { randomUUID } from 'node:crypto'
+-import { linkSync, mkdirSync, statSync, writeFileSync } from 'node:fs'
++import { mkdirSync, statSync, writeFileSync } from 'node:fs'
+ import { hostname, userInfo } from 'node:os'
+ import { join } from 'node:path'
+ import process from 'node:process'
+@@ -26,6 +26,7 @@ import { profileStateAccessMachineIdentity } from '../../persistence/profile-sta
+ import { orcadDataRootIsOnLocalDisk } from './orcad-data-root-locality'
+ import type { OrcadReclaimHintRuntime } from '../../../shared/remote-runtime/orcad-lifecycle/orcad-stale-lock-reclaim'
+ import { reclaimedUnexpectedExit } from '../host-lifecycle/orcad-unexpected-exit'
++import { publishStagedFileExclusively } from '../../../shared/file-write/publish-staged-file'
+ import type { OrcadUnexpectedExit } from '../../../shared/remote-runtime/orcad-lifecycle/orcad-unexpected-exit'
+ import {
+   orcadLockHolderLocality,
+@@ -143,7 +144,7 @@ export function acquireOrcadInstanceLock(
+     const staged = `${lockPath}.staged-${process.pid}-${randomUUID()}`
+     try {
+       writeFileSync(staged, contents, { flag: 'wx', mode: 0o600 })
+-      linkSync(staged, lockPath)
++      publishStagedFileExclusively(staged, lockPath)
+       return true
+     } catch (error) {
+       if (hasErrorCode(error, 'EEXIST')) {
+diff --git a/src/shared/file-write/publish-staged-file.ts b/src/shared/file-write/publish-staged-file.ts
+new file mode 100644
+index 00000000..b4f88e96
+--- /dev/null
++++ b/src/shared/file-write/publish-staged-file.ts
+@@ -0,0 +1,37 @@
++import { constants, copyFileSync, linkSync } from 'node:fs'
++
++/** Node on OpenHarmony reports a platform string the NodeJS.Platform union lacks. */
++export function isOpenHarmony(): boolean {
++  return (process.platform as string) === 'openharmony'
++}
++
++/** A hard link is the atomic "publish unless already present" primitive. FUSE-style
++ * userdata filesystems — OpenHarmony's hmfs among them — support sockets and rename
++ * but reject hard links, and hmfs reports that as EACCES rather than EPERM. */
++export function linkIsUnsupported(error: unknown): boolean {
++  if (typeof error !== 'object' || error === null || !('code' in error)) {
++    return false
++  }
++  const code = (error as NodeJS.ErrnoException).code
++  if (code === 'EPERM' || code === 'EOPNOTSUPP' || code === 'ENOTSUP' || code === 'ENOSYS') {
++    return true
++  }
++  return isOpenHarmony() && code === 'EACCES'
++}
++
++/** Publish a staged file at `targetPath` without replacing an entry that already
++ * exists. Callers keep treating EEXIST as "someone else published first". Without
++ * hard links the exclusive copy is not atomic, so a crash can leave a damaged
++ * target; readers already reject those records and reclaim them.
++ */
++export function publishStagedFileExclusively(stagingPath: string, targetPath: string): void {
++  try {
++    linkSync(stagingPath, targetPath)
++    return
++  } catch (error) {
++    if (!linkIsUnsupported(error)) {
++      throw error
++    }
++  }
++  copyFileSync(stagingPath, targetPath, constants.COPYFILE_EXCL)
++}
