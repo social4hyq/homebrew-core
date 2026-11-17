@@ -1,14 +1,37 @@
-OHOS: `showRecordingExportMessage`'s notification delivery is independent of
-whether the tray icon is shown at all, and still has a real caller; on OHOS
-the user must be told to pick a destination through Files, so the wording
-changes to avoid implying the recording was already saved to some private
-app path. Only the message text changes, not the notification protocol.
+OHOS: keep the hover tip away from the tray icon. Its update path ends in
+QOhosTaskPromise being destroyed without notifying the caller, which aborts the
+process when the status bar item is created.
 
 diff --git a/snow_shot/src/presentation/services/systemtraycontroller.cpp b/snow_shot/src/presentation/services/systemtraycontroller.cpp
-index 0fb3c4f..8eeda7d 100644
+index 0fb3c4f..1988920 100644
 --- a/snow_shot/src/presentation/services/systemtraycontroller.cpp
 +++ b/snow_shot/src/presentation/services/systemtraycontroller.cpp
-@@ -991,8 +991,13 @@ void SystemTrayController::showRecordingExportMessage(const QString& path) {
+@@ -416,8 +416,13 @@ class SystemTrayController::Impl {
+         }
+         q.setObjectName(QStringLiteral("systemTrayController"));
+         trayIcon->setObjectName(QStringLiteral("snowShotSystemTrayIcon"));
++#ifndef Q_OS_HARMONY
++        // updateStatusBarHoverTips() on OHOS ends in QOhosTaskPromise being
++        // destroyed without notifying the caller and aborts the process, so the
++        // tray icon is created without a hover tip there.
+         trayIcon->setToolTip(app::edition::isMini ? app::edition::productName()
+                                                   : QStringLiteral("SnowShot"));
++#endif
+ #ifdef Q_OS_MACOS
+         notifications = std::make_unique<platform::macos::SystemNotificationService>(&q);
+         using NotificationService = platform::macos::SystemNotificationService;
+@@ -762,8 +767,10 @@ class SystemTrayController::Impl {
+     }
+ 
+     void retranslateUi() {
++#ifndef Q_OS_HARMONY
+         if (app::edition::isMini)
+             trayIcon->setToolTip(app::edition::productName());
++#endif
+         for (const settings::SettingsTrayMenuGroupDefinition& group : groups) {
+             for (const settings::SettingsTrayMenuOptionDefinition& option : group.options) {
+                 if (QAction* action = actions.value(option.id)) {
+@@ -991,8 +998,13 @@ void SystemTrayController::showRecordingExportMessage(const QString& path) {
      if (path.isEmpty())
          return;
      const QString absolutePath = QFileInfo(path).absoluteFilePath();
