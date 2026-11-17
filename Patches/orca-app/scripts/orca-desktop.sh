@@ -9,6 +9,10 @@ CONFIG_FILE="$CONFIG_DIR/config.json"
 PID_FILE="$CONFIG_DIR/server.pid"
 READY_FILE="$CONFIG_DIR/server.ready.json"
 LOG_FILE="$CONFIG_DIR/server.log"
+# Pairing links are single use, so a restart mints a new one; remember which one
+# the installed HAP carries to know when it must be refreshed.
+INSTALLED_URL_FILE="$CONFIG_DIR/installed.url"
+INSTALLED_MODE_FILE="$CONFIG_DIR/installed.mode"
 DEFAULT_PORT=6768
 ORCA_ROOT="${ORCA_DESKTOP_ROOT:?missing ORCA_DESKTOP_ROOT}"
 NODE_BIN="${ORCA_DESKTOP_NODE:-node}"
@@ -28,7 +32,9 @@ Usage: orca-app <command>
                       not already healthy and print its browser URL.
   status              Show whether the local server is healthy.
   stop                Stop the managed local server.
-  start               Bring the installed app to the foreground.
+  start               Start the server when needed, refresh the shell's pairing
+                      link when the server minted a new one, then bring the app
+                      to the foreground.
   pair                Print the browser URL of the running server again.
 EOF
 }
@@ -95,6 +101,16 @@ for (const line of text.split("\n")) {
 }
 process.exit(1);
 ' "$READY_FILE"
+}
+
+config_url() {
+  "$NODE_BIN" -e '
+const fs = require("node:fs");
+try {
+  const config = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+  if (typeof config.url === "string") process.stdout.write(config.url);
+} catch {}
+' "$1"
 }
 
 start_server() {
@@ -200,6 +216,15 @@ cmd_install() {
   "${ORCA_DESKTOP_INSTALL_SCRIPT:?missing install script}" \
     --hap "${hap:-${ORCA_DESKTOP_UNSIGNED_HAP:?missing unsigned HAP}}" \
     --config "$config" "${extra[@]+"${extra[@]}"}"
+  mkdir -p "$CONFIG_DIR"
+  local installed_url=""
+  installed_url="$(config_url "$config")"
+  printf '%s\n' "$installed_url" > "$INSTALLED_URL_FILE"
+  if [ "${#extra[@]}" -gt 0 ]; then
+    printf 'no-acl\n' > "$INSTALLED_MODE_FILE"
+  else
+    printf 'acl\n' > "$INSTALLED_MODE_FILE"
+  fi
   [ "$serve" = 1 ] || return 0
   device
   cmd_start
@@ -230,8 +255,30 @@ cmd_serve() {
   ensure_serve
 }
 
+# The HAP loads a pairing link captured when it was installed, and the runtime
+# mints a single-use link per server start; without this every restart (a reboot
+# included) would show "Orca refused this browser" in the window.
+refresh_install_if_stale() {
+  local url="" installed="" mode="" extra=()
+  url="$(read_web_client_url)" || die "no pairing URL yet; start the server with orca-app serve"
+  [ -f "$INSTALLED_URL_FILE" ] && installed="$(cat "$INSTALLED_URL_FILE" 2>/dev/null || true)"
+  if [ -n "$installed" ] && [ "$url" = "$installed" ]; then
+    return 0
+  fi
+  [ -f "$INSTALLED_MODE_FILE" ] && mode="$(cat "$INSTALLED_MODE_FILE" 2>/dev/null || true)"
+  [ "$mode" = "no-acl" ] && extra+=(--no-acl)
+  log "the server's pairing link changed; re-signing the shell"
+  "${ORCA_DESKTOP_INSTALL_SCRIPT:?missing install script}" \
+    --hap "${ORCA_DESKTOP_UNSIGNED_HAP:?missing unsigned HAP}" \
+    --config "$CONFIG_FILE" "${extra[@]+"${extra[@]}"}"
+  mkdir -p "$CONFIG_DIR"
+  printf '%s\n' "$url" > "$INSTALLED_URL_FILE"
+}
+
 cmd_start() {
   device
+  ensure_serve
+  refresh_install_if_stale
   "$HDC" shell aa start -a EntryAbility -b "$BUNDLE_ID" -m electron >/dev/null
   printf 'orca-app: opened %s\n' "$BUNDLE_ID"
 }

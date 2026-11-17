@@ -9,6 +9,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
+  revision 1
 
   livecheck do
     url :stable
@@ -217,9 +218,11 @@ class OrcaApp < Formula
       app-installer generates a local debug profile (the first run asks for a
       Huawei Developer login), signs the HAP and installs it. `orca-app install`
       also starts the backing `orca serve` instance, so the app icon opens the
-      workbench directly. After a reboot start it again:
+      workbench directly. After a reboot, `orca-app start` starts the server,
+      re-signs the shell with the server's new single-use pairing link and opens
+      the window:
 
-        orca-app serve      # start the runtime server (the shell waits for it)
+        orca-app start      # server, refreshed pairing link, window
         orca-app status
         orca-app stop
 
@@ -234,7 +237,10 @@ class OrcaApp < Formula
   end
 
   test do
+    # The scripts follow XDG_CONFIG_HOME (the app sandbox on a device), so keep
+    # their server and pairing state inside the test sandbox as well.
     ENV["HOME"] = testpath/"home"
+    ENV["XDG_CONFIG_HOME"] = testpath/"home/.config"
     assert_match "Usage: orca-app", shell_output("#{bin}/orca-app --help")
 
     # A minimal stand-in for the shell HAP: the installer only rewrites
@@ -306,6 +312,8 @@ class OrcaApp < Formula
     assert_equal "Orca", installer[installer.index("--app-name") + 1]
     assert_equal "electron", installer[installer.index("--module") + 1]
     assert_equal "EntryAbility", installer[installer.index("--ability") + 1]
+    installed_url = (testpath/"home/.config/orca-app/installed.url").read.chomp
+    assert_equal "http://127.0.0.1:6799/web-index.html#pairing=test", installed_url
 
     # --no-acl keeps the HAP's own permission list.
     assert_match "installed",
@@ -313,6 +321,11 @@ class OrcaApp < Formula
     strong_permissions = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
                              .dig("module", "requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.INTERNET], strong_permissions
+
+    # status/stop read the port from the state file, so pin it to a port this
+    # machine cannot have an Orca server on.
+    (testpath/"home/.config/orca-app").mkpath
+    (testpath/"home/.config/orca-app/config.json").write JSON.generate("port" => free_port)
 
     assert_match "no managed server running", shell_output("#{bin}/orca-app stop")
     assert_match "not healthy", shell_output("#{bin}/orca-app status 2>&1", 1)
