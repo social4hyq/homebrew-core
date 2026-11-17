@@ -4,7 +4,7 @@ class HerdrCore < Formula
   url "https://github.com/herdrdev/herdr-core/archive/refs/tags/v0.1.21.tar.gz"
   sha256 "28bffdc1eecd5526e93590f20c8e78d3ebc2a11b19a39821beddc74e8988edd9"
   license "Apache-2.0"
-  revision 2
+  revision 3
   head "https://github.com/herdrdev/herdr-core.git", branch: "master"
 
   livecheck do
@@ -54,6 +54,14 @@ class HerdrCore < Formula
   # sockets on a thread that waits with poll(2) instead.
   patch do
     file "Patches/herdr-core/0004-client-read-without-epoll-edge.patch"
+  end
+
+  # OHOS: the same edge-triggered epoll can drop a socket's writable event, so
+  # a write to a viewer that reads slower than the core sends waits forever
+  # once the socket fills, and that viewer's output stream stops. Write client
+  # sockets directly and wait for room with poll(2) on a thread instead.
+  patch do
+    file "Patches/herdr-core/0005-client-write-without-epoll-edge.patch"
   end
 
   def install
