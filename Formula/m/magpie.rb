@@ -1,8 +1,8 @@
 class Magpie < Formula
   desc "Pick the model each AI coding agent on your machine uses"
   homepage "https://github.com/yetone/magpie"
-  url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4284.tar.gz"
-  sha256 "6a11f5cceb729c2a0b6baee5679a229c849fc1a98dbc5b231108a8cf23f8cd6c"
+  url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4344.tar.gz"
+  sha256 "4ab7d78169aad7bfce177c569349565cb4f4e9b4efa47666bc10251c2ae9ba9a"
   license "MIT"
 
   livecheck do
