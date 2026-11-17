@@ -1,0 +1,7 @@
+{
+  "name": "orca-desktop-shell",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Orca desktop shell for OpenHarmony (loads a local orca runtime server)",
+  "main": "main.cjs"
+}
