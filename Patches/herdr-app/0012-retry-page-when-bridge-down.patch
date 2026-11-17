@@ -1,0 +1,53 @@
+diff --git a/src/ohos_entry.rs b/src/ohos_entry.rs
+index 3a79104..433526b 100644
+--- a/src/ohos_entry.rs
++++ b/src/ohos_entry.rs
+@@ -78,9 +78,7 @@ fn openharmony_app(app: OpenHarmonyApp) {
+             Ok(core) => crate::hc::check(&core.hello).map(|()| core).map_err(crate::setup::Need::Fix),
+             Err(error) => {
+                 tracing::warn!("herdr-app: {error:#}");
+-                Err(crate::setup::Need::Connect(format!(
+-                    "Herdr reaches herdr-core through herdr-bridge on the host ({bridge}). Start it there, then press Retry.\n\n{error:#}"
+-                )))
++                Err(crate::setup::Need::Connect(crate::ohos_exec::unreachable_message(&error)))
+             }
+         };
+ 
+diff --git a/src/ohos_exec.rs b/src/ohos_exec.rs
+index 77d06d1..6309d77 100644
+--- a/src/ohos_exec.rs
++++ b/src/ohos_exec.rs
+@@ -23,6 +23,12 @@ pub(crate) fn endpoint() -> String {
+     std::env::var("HERDR_CORE_TCP").unwrap_or_else(|_| "127.0.0.1:8765".to_string())
+ }
+ 
++/// What the setup page says when the bridge cannot be reached. There is no installing a core from
++/// inside a HAP, so this is always a "start the bridge, then Retry" page, never "Install it for me".
++pub(crate) fn unreachable_message(error: &anyhow::Error) -> String {
++    format!("Herdr reaches herdr-core through herdr-bridge on the host ({}). Start it there, then press Retry.\n\n{error:#}", endpoint())
++}
++
+ fn core(fresh: bool) -> Result<Arc<Core>, String> {
+     let mut slot = CORE.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+     if fresh {
+diff --git a/src/setup.rs b/src/setup.rs
+index 1ae9ed5..b877c97 100644
+--- a/src/setup.rs
++++ b/src/setup.rs
+@@ -104,7 +104,15 @@ impl Setup {
+                 }
+             },
+             Err(e) => {
+-                self.need = Need::connection(e);
++                // On OHOS a failed connection is the bridge being down: never offer to install a core.
++                #[cfg(all(target_os = "linux", target_env = "ohos"))]
++                {
++                    self.need = Need::Connect(crate::ohos_exec::unreachable_message(&e));
++                }
++                #[cfg(not(all(target_os = "linux", target_env = "ohos")))]
++                {
++                    self.need = Need::connection(e);
++                }
+                 self.state = State::Ready;
+             }
+         }

@@ -1,0 +1,17 @@
+{
+  "apiType": "stageMode",
+  "targets": [
+    {
+      "name": "default"
+    }
+  ],
+  "buildOption": {
+    "arkOptions": {
+      "runtimeOnly": {
+        "packages": [
+          "libopenharmony_ability.so"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+diff --git a/pkg/simdutf/build.zig b/pkg/simdutf/build.zig
+index 3efc082..6d332df 100644
+--- a/pkg/simdutf/build.zig
++++ b/pkg/simdutf/build.zig
+@@ -72,6 +72,7 @@ pub fn build(b: *std.Build) !void {
+     }
+ 
+     if (target.result.os.tag == .freebsd or
++        target.result.abi == .ohos or
+         target.result.abi == .musl or
+         target.result.abi == .android or
+         target.result.abi == .androideabi)

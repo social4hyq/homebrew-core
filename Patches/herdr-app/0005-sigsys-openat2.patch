@@ -1,0 +1,45 @@
+diff --git a/src/ohos_entry.rs b/src/ohos_entry.rs
+index 39b4810..3d77e3e 100644
+--- a/src/ohos_entry.rs
++++ b/src/ohos_entry.rs
+@@ -11,8 +11,40 @@ thread_local! {
+     static APPLICATION: std::cell::RefCell<Option<gpui::ApplicationHandle>> = const { std::cell::RefCell::new(None) };
+ }
+ 
++/// The app sandbox's seccomp filter traps some syscalls (`openat2`, used by
++/// cap-std through rustix) with `SECCOMP_RET_TRAP`: SIGSYS, which kills the
++/// process unless handled.
++mod sigsys {
++    use std::os::raw::{c_int, c_void};
++
++    extern "C" fn handler(_sig: c_int, _info: *mut libc::siginfo_t, uc: *mut c_void) {
++        // SECCOMP_RET_TRAP skips the syscall but does NOT set a return value: on
++        // aarch64 x0 still holds the first argument. For `openat2(dirfd, ...)` the
++        // caller would see `dirfd` as the "new" fd, own it twice and close it twice
++        // (std's IO-safety check aborts). Return -ENOSYS so rustix/cap-std fall back
++        // to plain `openat`. Nothing else here: logging is not async-signal-safe.
++        if !uc.is_null() {
++            let uc = uc.cast::<libc::ucontext_t>();
++            unsafe { (*uc).uc_mcontext.regs[0] = (-(libc::ENOSYS as i64)) as libc::c_ulong };
++        }
++    }
++
++    pub fn install() {
++        unsafe {
++            // SA_SIGINFO so the handler gets a ucontext to patch x0.
++            let mut sa: libc::sigaction = std::mem::zeroed();
++            sa.sa_sigaction = handler as *const () as usize;
++            sa.sa_flags = libc::SA_SIGINFO;
++            libc::sigemptyset(&mut sa.sa_mask);
++            libc::sigaction(libc::SIGSYS, &sa, std::ptr::null_mut());
++        }
++    }
++}
++
++
+ #[openharmony_ability_derive::ability]
+ fn openharmony_app(app: OpenHarmonyApp) {
++    sigsys::install();
+     ohos_hilog_binding::log::init_once(ohos_hilog_binding::log::Config::default());
+     // `tracing_subscriber::fmt` aborts inside the HAP sandbox (it touches terminal
+     // handling the ArkTS runtime does not provide). Route tracing into hilog instead.

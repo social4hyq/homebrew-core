@@ -1,0 +1,56 @@
+{
+  "module": {
+    "name": "entry",
+    "extractNativeLibs": true,
+    "type": "entry",
+    "mainElement": "EntryAbility",
+    "deviceTypes": [
+      "2in1"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:main_pages",
+    "requestPermissions": [
+      { "name": "ohos.permission.INTERNET" },
+      {
+        "name": "ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY",
+        "reason": "$string:reason_writable_code",
+        "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" }
+      }
+    ],
+    "abilities": [
+      {
+        "name": "EntryAbility",
+        "srcEntry": "./ets/entryability/EntryAbility.ets",
+        "icon": "$media:example_icon",
+        "label": "$string:app_name",
+        "startWindowIcon": "$media:example_icon",
+        "startWindowBackground": "$color:start_window_background",
+        "exported": true,
+        "skills": [
+          {
+            "entities": [
+              "entity.system.home"
+            ],
+            "actions": [
+              "ohos.want.action.home"
+            ]
+          },
+          {
+            "entities": [
+              "entity.system.browsable"
+            ],
+            "actions": [
+              "ohos.want.action.viewData"
+            ],
+            "uris": [
+              {
+                "scheme": "gpui-demo"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

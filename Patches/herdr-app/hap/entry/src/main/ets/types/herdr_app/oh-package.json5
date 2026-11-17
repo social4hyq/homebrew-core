@@ -1,0 +1,5 @@
+{
+  "name": "libopenharmony_ability.so",
+  "version": "0.1.0",
+  "types": "./Index.d.ts"
+}

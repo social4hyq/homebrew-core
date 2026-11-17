@@ -1,0 +1,28 @@
+diff --git a/vendor/gpui-pre/src/svg_renderer.rs b/vendor/gpui-pre/src/svg_renderer.rs
+index 798fb2a..efd2e93 100644
+--- a/vendor/gpui-pre/src/svg_renderer.rs
++++ b/vendor/gpui-pre/src/svg_renderer.rs
+@@ -282,11 +282,21 @@ fn rasterize_tree(tree: &usvg::Tree, size: SvgSize) -> Result<Pixmap, usvg::Erro
+         SvgSize::ScaleFactor(scale) => (svg_size.width() * scale, svg_size.height() * scale),
+     };
+ 
++    // The warning alone left the oversized allocation in place; on a memory-limited
++    // HAP that aborts the process. Clamp (and reject non-finite sizes from SVGs with
++    // a zero or missing intrinsic size) before allocating.
++    if !width.is_finite() || !height.is_finite() {
++        log::warn!("SVG has a non-finite raster size ({width}x{height}); using MAX_SIZE");
++        width = MAX_SIZE;
++        height = MAX_SIZE;
++    }
+     if width > MAX_SIZE {
+-        log::warn!("Attempted to render pixmap where width ({width}) > MAX_SIZE ({MAX_SIZE})");
++        log::warn!("Attempted to render pixmap where width ({width}) > MAX_SIZE ({MAX_SIZE}); clamping");
++        width = MAX_SIZE;
+     }
+     if height > MAX_SIZE {
+-        log::warn!("Attempted to render pixmap where height ({height}) > MAX_SIZE ({MAX_SIZE})");
++        log::warn!("Attempted to render pixmap where height ({height}) > MAX_SIZE ({MAX_SIZE}); clamping");
++        height = MAX_SIZE;
+     }
+     let scale = (MAX_SIZE / width).min(MAX_SIZE / height).min(1.0);
+     width *= scale;
