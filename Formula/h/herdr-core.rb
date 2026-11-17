@@ -4,6 +4,7 @@ class HerdrCore < Formula
   url "https://github.com/herdrdev/herdr-core/archive/refs/tags/v0.1.21.tar.gz"
   sha256 "28bffdc1eecd5526e93590f20c8e78d3ebc2a11b19a39821beddc74e8988edd9"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/herdrdev/herdr-core.git", branch: "master"
 
   livecheck do
@@ -13,9 +14,8 @@ class HerdrCore < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-core-v0.1.21-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db7ba6271bd1e2cea58893a91f71e5c0b434868d14e98395ef25627df17cc02a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-core-v0.1.21-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "427d9b105d34186c33b3f3b33e50df2665181ef3b0af2583361c84cf6ee260b3"
   end
 
   depends_on "rust" => :build
@@ -39,6 +39,13 @@ class HerdrCore < Formula
   # to $TMPDIR (an app data dir).
   patch do
     file "Patches/herdr-core/0001-endpoints-ohos-tmpdir.patch"
+  end
+
+  # OHOS: the kernel accepts TIOCSWINSZ but never delivers SIGWINCH to the
+  # foreground process group, so a pane resize leaves Node/Python programs and
+  # TUIs drawing for the old size. Signal the foreground group after resizing.
+  patch do
+    file "Patches/herdr-core/0003-pty-resize-notify-winch.patch"
   end
 
   def install
