@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# orca-app: manage the host Orca runtime server that backs the desktop shell
-# HAP, sign and install the shell, and bring it to the foreground.
+# orca-app: sign and install the Orca desktop shell HAP, and manage the optional
+# host-side Orca runtime server (the shell starts its own instance on launch).
 set -euo pipefail
 
 BUNDLE_ID="${ORCA_DESKTOP_BUNDLE:-com.social4hyq.orca}"
@@ -9,12 +9,11 @@ CONFIG_FILE="$CONFIG_DIR/config.json"
 PID_FILE="$CONFIG_DIR/server.pid"
 READY_FILE="$CONFIG_DIR/server.ready.json"
 LOG_FILE="$CONFIG_DIR/server.log"
-# Pairing links are single use, so a restart mints a new one; remember which one
-# the installed HAP carries to know when it must be refreshed.
-INSTALLED_URL_FILE="$CONFIG_DIR/installed.url"
+# Which permission variant the shell was installed with (only used to report).
 INSTALLED_MODE_FILE="$CONFIG_DIR/installed.mode"
 DEFAULT_PORT=6768
 ORCA_ROOT="${ORCA_DESKTOP_ROOT:?missing ORCA_DESKTOP_ROOT}"
+ORCA_BIN="${ORCA_DESKTOP_ORCA_BIN:-$(command -v orca || true)}"
 NODE_BIN="${ORCA_DESKTOP_NODE:-node}"
 HDC="${ORCA_DESKTOP_HDC:-${ORCA_DESKTOP_HDC_DEFAULT:-hdc}}"
 DATA_ROOT="${ORCA_DESKTOP_DATA:-$HOME/.orca}"
@@ -23,19 +22,19 @@ usage() {
   cat <<'EOF'
 Usage: orca-app <command>
 
-  install [--no-acl] [--hap PATH] [--config PATH] [--no-serve]
+  install [--port N] [--no-acl] [--hap PATH] [--config PATH] [--no-serve]
                       Write the host connection into the shell HAP, sign and
-                      install it on the connected device, then start the local
-                      server (--hap overrides the bundled unsigned HAP; --no-serve
-                      skips the start, --no-acl installs the strong-sandbox variant).
-  serve [--port N]    Start the local Orca runtime server (background) if it is
-                      not already healthy and print its browser URL.
-  status              Show whether the local server is healthy.
-  stop                Stop the managed local server.
-  start               Start the server when needed, refresh the shell's pairing
-                      link when the server minted a new one, then bring the app
-                      to the foreground.
-  pair                Print the browser URL of the running server again.
+                      install it on the connected device, then open the app
+                      (--hap overrides the bundled unsigned HAP, --config reuses
+                      a pre-written host config, --no-serve only installs, and
+                      --no-acl installs the strong-sandbox variant).
+  start               Open the installed app; it starts the runtime server
+                      itself when none is running.
+  serve [--port N]    Start a host-side runtime server for browser/CLI use (the
+                      app does not need it) and print its browser URL.
+  status              Show whether the host-side runtime server is healthy.
+  stop                Stop the host-side server.
+  pair                Print the host-side server's browser URL again.
 EOF
 }
 
@@ -76,10 +75,15 @@ read_config() {
 write_config() {
   local port="$1" url="$2"
   mkdir -p "$CONFIG_DIR"
+  # The same file carries the install-time spawn settings; keep them.
   "$NODE_BIN" -e '
 const fs = require("node:fs");
 const [port, url, out] = process.argv.slice(1);
-fs.writeFileSync(out, JSON.stringify({ port: Number(port), url }) + "\n");
+let config = {};
+try { config = JSON.parse(fs.readFileSync(out, "utf8")); } catch {}
+config.port = Number(port);
+config.url = url;
+fs.writeFileSync(out, JSON.stringify(config) + "\n");
 ' "$port" "$url" "$CONFIG_FILE"
 }
 
@@ -103,14 +107,39 @@ process.exit(1);
 ' "$READY_FILE"
 }
 
-config_url() {
-  "$NODE_BIN" -e '
+# Free port near the default: the shell's runtime binds it on this same host.
+choose_port() {
+  local requested="$1" offset=0 candidate
+  while [ "$offset" -lt 50 ]; do
+    candidate=$((requested + offset))
+    [ "$candidate" -le 65535 ] || break
+    port_busy "$candidate" || { printf '%s' "$candidate"; return 0; }
+    offset=$((offset + 1))
+  done
+  die "no free port near $requested"
+}
+
+write_install_config() {
+  local port="$1"
+  mkdir -p "$CONFIG_DIR"
+  # No data root: the shell keeps the runtime's state in its own sandbox, where
+  # a force-stop can always reclaim the instance lock.
+  "$NODE_BIN" - "$port" "$ORCA_BIN" "$CONFIG_FILE" <<'JS'
 const fs = require("node:fs");
-try {
-  const config = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
-  if (typeof config.url === "string") process.stdout.write(config.url);
-} catch {}
-' "$1"
+const [port, orca, out] = process.argv.slice(2);
+const env = (name) => (typeof process.env[name] === "string" ? process.env[name] : "");
+fs.writeFileSync(out, JSON.stringify({
+  port: Number(port),
+  orca,
+  host: {
+    home: env("HOME"),
+    path: env("PATH"),
+    xdgConfig: env("XDG_CONFIG_HOME"),
+    xdgData: env("XDG_DATA_HOME"),
+    xdgState: env("XDG_STATE_HOME"),
+  },
+}, null, 2) + "\n");
+JS
 }
 
 start_server() {
@@ -190,11 +219,14 @@ device() {
 }
 
 cmd_install() {
-  local extra=() hap="" serve=1 config=""
+  local extra=() hap="" start=1 config="" port=""
   while [ $# -gt 0 ]; do
     case "$1" in
       --no-acl) extra+=("--no-acl"); shift ;;
-      --no-serve) serve=0; shift ;;
+      --no-serve) start=0; shift ;;
+      --port)
+        [ $# -ge 2 ] || die "--port needs a number"
+        port="$2"; shift 2 ;;
       --config)
         [ $# -ge 2 ] || die "--config needs a path"
         config="$2"; shift 2 ;;
@@ -204,28 +236,28 @@ cmd_install() {
       *) die "unknown install option: $1" ;;
     esac
   done
-  # --config names an already-written host config (used by tests and by a caller
-  # that started the server itself); otherwise start the managed server so the
-  # HAP is signed with a live port and pairing code.
-  if [ -n "$config" ]; then
-    [ -f "$config" ] || die "host config not found: $config"
-  else
-    ensure_serve
+  case "${port:-$DEFAULT_PORT}" in
+    ""|*[!0-9]*) die "--port needs a number" ;;
+  esac
+  # The shell starts the runtime itself, so the HAP only needs the port it
+  # should bind and the host environment to spawn it in; no live server (and no
+  # single-use pairing link) is involved at install time.
+  if [ -z "$config" ]; then
+    [ -n "$ORCA_BIN" ] && [ -x "$ORCA_BIN" ] || die "orca binary not found; set ORCA_DESKTOP_ORCA_BIN"
     config="$CONFIG_FILE"
+    write_install_config "$(choose_port "${port:-$DEFAULT_PORT}")"
   fi
+  [ -f "$config" ] || die "host config not found: $config"
   "${ORCA_DESKTOP_INSTALL_SCRIPT:?missing install script}" \
     --hap "${hap:-${ORCA_DESKTOP_UNSIGNED_HAP:?missing unsigned HAP}}" \
     --config "$config" "${extra[@]+"${extra[@]}"}"
   mkdir -p "$CONFIG_DIR"
-  local installed_url=""
-  installed_url="$(config_url "$config")"
-  printf '%s\n' "$installed_url" > "$INSTALLED_URL_FILE"
   if [ "${#extra[@]}" -gt 0 ]; then
     printf 'no-acl\n' > "$INSTALLED_MODE_FILE"
   else
     printf 'acl\n' > "$INSTALLED_MODE_FILE"
   fi
-  [ "$serve" = 1 ] || return 0
+  [ "$start" = 1 ] || return 0
   device
   cmd_start
 }
@@ -255,30 +287,10 @@ cmd_serve() {
   ensure_serve
 }
 
-# The HAP loads a pairing link captured when it was installed, and the runtime
-# mints a single-use link per server start; without this every restart (a reboot
-# included) would show "Orca refused this browser" in the window.
-refresh_install_if_stale() {
-  local url="" installed="" mode="" extra=()
-  url="$(read_web_client_url)" || die "no pairing URL yet; start the server with orca-app serve"
-  [ -f "$INSTALLED_URL_FILE" ] && installed="$(cat "$INSTALLED_URL_FILE" 2>/dev/null || true)"
-  if [ -n "$installed" ] && [ "$url" = "$installed" ]; then
-    return 0
-  fi
-  [ -f "$INSTALLED_MODE_FILE" ] && mode="$(cat "$INSTALLED_MODE_FILE" 2>/dev/null || true)"
-  [ "$mode" = "no-acl" ] && extra+=(--no-acl)
-  log "the server's pairing link changed; re-signing the shell"
-  "${ORCA_DESKTOP_INSTALL_SCRIPT:?missing install script}" \
-    --hap "${ORCA_DESKTOP_UNSIGNED_HAP:?missing unsigned HAP}" \
-    --config "$CONFIG_FILE" "${extra[@]+"${extra[@]}"}"
-  mkdir -p "$CONFIG_DIR"
-  printf '%s\n' "$url" > "$INSTALLED_URL_FILE"
-}
-
 cmd_start() {
   device
-  ensure_serve
-  refresh_install_if_stale
+  # The shell spawns the runtime server on launch; the host-side serve/status
+  # commands are only for using Orca from a browser or the CLI.
   "$HDC" shell aa start -a EntryAbility -b "$BUNDLE_ID" -m electron >/dev/null
   printf 'orca-app: opened %s\n' "$BUNDLE_ID"
 }

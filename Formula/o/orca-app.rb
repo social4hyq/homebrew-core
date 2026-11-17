@@ -9,7 +9,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -17,8 +17,8 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8664fed4f763b58e1e97120d0a51fa2f23fd74558510a5cff8c2f38dc5a929d0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b8d6a068985f82fe857eb299bca63670d649731574b0fbc06cc0c121b588c559"
   end
 
   depends_on "app-installer"
@@ -105,9 +105,9 @@ class OrcaApp < Formula
     inreplace shell/"electron/src/main/module.json5", '"mainElement": "EntryAbility",',
               '"mainElement": "EntryAbility", "extractNativeLibs": true,'
 
-    # The shell only talks to the host server over loopback. Restricted
-    # permissions (JIT, pasteboard) are added to the install-time ACL variant
-    # instead of every install; see module-acl.json below.
+    # The shell only talks to the runtime server over loopback. Restricted
+    # permissions (weak sandbox, host files, JIT, pasteboard) are added to the
+    # install-time ACL variant instead of every install; see module-acl.json.
     inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\r?\n    \],/m,
               <<~JSON5.chomp
                 "requestPermissions": [
@@ -177,14 +177,17 @@ class OrcaApp < Formula
     libexec.install shell/"electron/build/default/outputs/default/electron-default-unsigned.hap" =>
                     "orca-app-unsigned.hap"
 
-    # The default install swaps in this module.json: the two kernel ACLs keep
-    # the renderer out of --jitless (WebAssembly) and READ_PASTEBOARD makes
-    # paste work. Everything else stays out of the HAP so a local debug profile
-    # can grant it.
+    # The default install swaps in this module.json: CUSTOM_SANDBOX and
+    # READ_WRITE_USER_FILE let the shell spawn the host `orca` runtime and read
+    # the host profile, the two kernel ACLs keep the renderer out of --jitless
+    # (WebAssembly) and READ_PASTEBOARD makes paste work. Everything else stays
+    # out of the HAP so a local debug profile can grant it.
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"orca-app-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
-    %w[ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
+    %w[ohos.permission.CUSTOM_SANDBOX
+       ohos.permission.READ_WRITE_USER_FILE
+       ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
        ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION
        ohos.permission.READ_PASTEBOARD].each do |name|
       requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
@@ -201,6 +204,7 @@ class OrcaApp < Formula
     tool_path = [formula_opt_bin("node"), formula_opt_bin("zip"), formula_opt_bin("unzip"), "$PATH"].join(":")
     (bin/"orca-app").write_env_script libexec/"orca-desktop.sh",
       ORCA_DESKTOP_ROOT:           formula_opt_prefix("orca")/"libexec",
+      ORCA_DESKTOP_ORCA_BIN:       formula_opt_bin("orca")/"orca",
       ORCA_DESKTOP_UNSIGNED_HAP:   libexec/"orca-app-unsigned.hap",
       ORCA_DESKTOP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
       ORCA_DESKTOP_MODULE_ACL:     pkgshare/"module-acl.json",
@@ -216,23 +220,26 @@ class OrcaApp < Formula
         orca-app install
 
       app-installer generates a local debug profile (the first run asks for a
-      Huawei Developer login), signs the HAP and installs it. `orca-app install`
-      also starts the backing `orca serve` instance, so the app icon opens the
-      workbench directly. After a reboot, `orca-app start` starts the server,
-      re-signs the shell with the server's new single-use pairing link and opens
-      the window:
+      Huawei Developer login), signs the HAP and installs it, and the app opens
+      directly. The shell starts the host `orca serve` runtime itself on every
+      launch and reads the single-use pairing link that runtime prints, so the
+      app icon always opens a working workbench:
 
-        orca-app start      # server, refreshed pairing link, window
-        orca-app status
+        orca-app start      # open the app (it starts the runtime itself)
+        orca-app status     # host-side runtime started by `orca-app serve`
         orca-app stop
 
-      The shell loads the web client from 127.0.0.1 and never starts the server
-      itself: the HAP cannot execute host binaries or read host files, so every
-      workspace operation runs in the host `orca` runtime server.
+      Opening the app needs the weak-sandbox permissions CUSTOM_SANDBOX and
+      READ_WRITE_USER_FILE so the shell may spawn the host `orca` binary; a local
+      debug profile grants them without an approval wait. The shell keeps its
+      runtime state in the app sandbox (so a force-stop can always reclaim its
+      instance lock); `orca-app serve` runs a separate host-side runtime in
+      ~/.orca for browser or CLI use.
 
-      The default install carries the two kernel ACLs (JIT/WebAssembly for the
-      renderer) and READ_PASTEBOARD; `orca-app install --no-acl` installs the
-      strong-sandbox variant instead (no JIT, no paste).
+      The default install also carries the two kernel ACLs (JIT/WebAssembly for
+      the renderer) and READ_PASTEBOARD; `orca-app install --no-acl` installs the
+      strong-sandbox variant, which cannot spawn the runtime and waits for
+      `orca-app serve` instead (no JIT, no paste).
     EOS
   end
 
@@ -254,7 +261,7 @@ class OrcaApp < Formula
       "app"    => { "bundleName" => "com.social4hyq.orca" },
       "module" => fake_module,
     )
-    (hap_tree/"resources/resfile/resources/app/config.json").write '{"port":0,"url":""}'
+    (hap_tree/"resources/resfile/resources/app/config.json").write '{"port":0,"orca":"","host":{}}'
     cd hap_tree do
       system "zip", "-q", "-X", fake_hap.to_s, "module.json",
              "resources/resfile/resources/app/config.json"
@@ -289,32 +296,41 @@ class OrcaApp < Formula
 
     ENV.prepend_path "PATH", fake_bin
 
-    # Default install: config injection, ACL module and signing project.
+    # Default install: spawn settings, ACL module and signing project.
     host_config = testpath/"host-config.json"
-    host_config.write JSON.generate("port" => 6799, "url" => "http://127.0.0.1:6799/web-index.html#pairing=test")
+    host_config.write JSON.generate(
+      "port" => 6799,
+      "orca" => "/opt/homebrew/bin/orca",
+      "host" => {
+        "home" => "/home/tester",
+        "path" => "/opt/homebrew/bin:/usr/bin:/bin",
+      },
+    )
     assert_match "installed",
                  shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --no-serve")
     injected_config = JSON.parse(
       shell_output("unzip -p #{injected_copy} resources/resfile/resources/app/config.json"),
     )
     assert_equal 6799, injected_config.fetch("port")
-    assert_equal "http://127.0.0.1:6799/web-index.html#pairing=test", injected_config.fetch("url")
-    acl_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
-    acl_permissions = acl_module.dig("module", "requestPermissions").map { |permission| permission.fetch("name") }
-    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
-                    ohos.permission.READ_PASTEBOARD
+    assert_equal "/opt/homebrew/bin/orca", injected_config.fetch("orca")
+    assert_equal "/home/tester", injected_config.dig("host", "home")
+    refute injected_config.fetch("host").key?("dataRoot")
+    refute injected_config.key?("url")
+
+    module_json = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
+    acl_permissions = module_json.dig("module", "requestPermissions").map { |permission| permission.fetch("name") }
+    assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
+                    ohos.permission.READ_PASTEBOARD ohos.permission.READ_WRITE_USER_FILE
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
                  acl_permissions.sort
+    assert_equal "acl\n", (testpath/"home/.config/orca-app/installed.mode").read
     refute_path_exists Pathname.new(Dir.home)/".hap-installer"
     installer = installer_args.read.lines(chomp: true)
     assert_equal "com.social4hyq.orca", installer[installer.index("--bundle-id") + 1]
     assert_equal "Orca", installer[installer.index("--app-name") + 1]
     assert_equal "electron", installer[installer.index("--module") + 1]
     assert_equal "EntryAbility", installer[installer.index("--ability") + 1]
-    installed_url = (testpath/"home/.config/orca-app/installed.url").read.chomp
-    assert_equal "http://127.0.0.1:6799/web-index.html#pairing=test", installed_url
-
     # --no-acl keeps the HAP's own permission list.
     assert_match "installed",
                  shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --no-acl --no-serve")
@@ -347,16 +363,20 @@ class OrcaApp < Formula
     assert_match "ORCA_DESKTOP_NO_TRAY", window_source
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
     assert_equal 0, placeholder.fetch("port")
+    refute placeholder.key?("url")
     permissions = JSON.parse(shell_output("unzip -p #{hap} module.json"))
                       .fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
     acl = JSON.parse((pkgshare/"module-acl.json").read)
     acl_requested = acl.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
-    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
-                    ohos.permission.READ_PASTEBOARD
+    assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
+                    ohos.permission.READ_PASTEBOARD ohos.permission.READ_WRITE_USER_FILE
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
                  acl_requested.sort
+    shell_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/main.cjs")
+    assert_match "spawn(", shell_source
+    assert_match "orca_server_ready", shell_source
     system "unzip", "-tq", hap
   end
 end
