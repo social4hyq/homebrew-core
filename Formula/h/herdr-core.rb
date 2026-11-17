@@ -4,7 +4,7 @@ class HerdrCore < Formula
   url "https://github.com/herdrdev/herdr-core/archive/refs/tags/v0.1.21.tar.gz"
   sha256 "28bffdc1eecd5526e93590f20c8e78d3ebc2a11b19a39821beddc74e8988edd9"
   license "Apache-2.0"
-  revision 1
+  revision 2
   head "https://github.com/herdrdev/herdr-core.git", branch: "master"
 
   livecheck do
@@ -14,8 +14,8 @@ class HerdrCore < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-core-v0.1.21-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "427d9b105d34186c33b3f3b33e50df2665181ef3b0af2583361c84cf6ee260b3"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-core-v0.1.21-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8178e8434bb155e2723db9ec8a37539b4333d372a769fed03a77c0a3f0f88878"
   end
 
   depends_on "rust" => :build
@@ -46,6 +46,14 @@ class HerdrCore < Formula
   # TUIs drawing for the old size. Signal the foreground group after resizing.
   patch do
     file "Patches/herdr-core/0003-pty-resize-notify-winch.patch"
+  end
+
+  # OHOS: the kernel's edge-triggered epoll can drop a socket's readable event,
+  # so tokio stops reading a client: a viewer's CREDIT frames go unread and its
+  # output stream stalls for good after a burst of terminal output. Read client
+  # sockets on a thread that waits with poll(2) instead.
+  patch do
+    file "Patches/herdr-core/0004-client-read-without-epoll-edge.patch"
   end
 
   def install
