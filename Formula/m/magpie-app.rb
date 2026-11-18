@@ -4,7 +4,7 @@ class MagpieApp < Formula
   url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4402.tar.gz"
   sha256 "a23a2867fe4aa3ae33ee83d5a554ba8283b9052d01c20c02c6bd2941bed47dcd"
   license :cannot_represent
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -12,15 +12,15 @@ class MagpieApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4402-r3"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ed554873725eb7245970a3e2d77b8a4a46de14749ebdfd8e13d982e2e4de2d1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4402-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "404954aff348db95c1e50a1f629b4561ff3f96c8082a4f2f2c324eaf96b191f1"
   end
 
   depends_on "app-installer"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "social4hyq/core/magpie"
+  depends_on "unzip"
   depends_on "zip"
 
   resource "electron-ohos" do
@@ -32,10 +32,12 @@ class MagpieApp < Formula
   # is listed literally: the weekly remove-unused-patches job keeps a
   # Resources/ directory only while a formula names it.
   RESOURCE_FILES = %w[
+    Resources/_shared/hap-app/install-lib.sh
     Resources/magpie-app/app/config.json
     Resources/magpie-app/app/connect.html
     Resources/magpie-app/app/main.cjs
     Resources/magpie-app/app/package.json
+    Resources/magpie-app/scripts/install-desktop.sh
     Resources/magpie-app/scripts/magpie-app.sh
   ].freeze
 
@@ -173,12 +175,20 @@ class MagpieApp < Formula
 
     cp res/"scripts/magpie-app.sh", libexec/"magpie-app.sh"
     chmod 0755, libexec/"magpie-app.sh"
+    # `magpie-app install` runs this script, which sources the install flow
+    # shared by the HAP apps from the same directory. cp, not install: the tap
+    # checkout is a read-only host mount inside the CI container.
+    cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
+    chmod 0755, pkgshare/"install-desktop.sh"
+    cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
+    chmod 0755, pkgshare/"hap-app-install-lib.sh"
     (bin/"magpie-app").write_env_script libexec/"magpie-app.sh",
-      MAGPIE_APP_HAP:         libexec/"magpie-desktop-unsigned.hap",
-      MAGPIE_APP_MODULE_ACL:  pkgshare/"module-acl.json",
-      MAGPIE_APP_BIN:         formula_opt_bin("social4hyq/core/magpie")/"magpie",
-      MAGPIE_APP_HDC_DEFAULT: formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
-      PATH:                   "#{formula_opt_bin("node")}:$PATH"
+      MAGPIE_APP_UNSIGNED_HAP:   libexec/"magpie-desktop-unsigned.hap",
+      MAGPIE_APP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
+      MAGPIE_APP_MODULE_ACL:     pkgshare/"module-acl.json",
+      MAGPIE_APP_BIN:            formula_opt_bin("social4hyq/core/magpie")/"magpie",
+      MAGPIE_APP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
+      PATH:                      "#{formula_opt_bin("node")}:$PATH"
   end
 
   def caveats
@@ -209,7 +219,13 @@ class MagpieApp < Formula
     fake = testpath/"app-installer"
     fake.write <<~SH
       #!/bin/sh
-      test "$1" = --hap && cp "$2" #{testpath}/staged.hap
+      while [ $# -gt 0 ]; do
+        case "$1" in
+          --hap) cp "$2" #{testpath}/staged.hap; shift 2 ;;
+          --signed-hap) echo signed > "$2"; shift 2 ;;
+          *) shift ;;
+        esac
+      done
     SH
     chmod 0755, fake
     ENV.prepend_path "PATH", testpath
@@ -227,9 +243,18 @@ class MagpieApp < Formula
     assert_includes permissions, "ohos.permission.CUSTOM_SANDBOX"
 
     system bin/"magpie-app", "install", "--no-acl"
-    assert_equal "{}", shell_output("unzip -p #{staged} #{entry}/config.json").strip
+    # The strong-sandbox HAP carries the same settings as the ACL one (it used to
+    # keep the placeholder); only the permissions differ.
+    assert_equal config, JSON.parse(shell_output("unzip -p #{staged} #{entry}/config.json"))
     plain = JSON.parse(shell_output("unzip -p #{staged} module.json"))
     permissions = plain.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
+
+    # --keep leaves the signed HAP next to the other temporary files and the
+    # result line names the variant that was installed.
+    kept_output = shell_output("#{bin}/magpie-app install --keep 2>&1")
+    assert_match "installed (com.social4hyq.magpiedesktop, ACL)", kept_output
+    assert_match "signed HAP kept", kept_output
+    assert_path_exists Pathname(ENV.fetch("TMPDIR", "/tmp"))/"magpie-app-signed.hap"
   end
 end
