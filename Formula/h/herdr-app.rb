@@ -4,6 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -22,6 +23,7 @@ class HerdrApp < Formula
   depends_on "zig@0.16" => :build
   depends_on "app-installer"
   depends_on "ohos-sdk-toolchains"
+  depends_on "python@3.15"
   depends_on "social4hyq/core/herdr-core"
 
   # The terminal engine builds libghostty-vt from the ghostty submodule, which
@@ -141,10 +143,14 @@ class HerdrApp < Formula
                     "herdr-app-unsigned.hap"
 
     cp payload/"scripts/herdr-app.sh", libexec/"herdr-app.sh"
-    chmod 0755, libexec/"herdr-app.sh"
+    cp payload/"scripts/herdr-bridge.py", libexec/"herdr-bridge.py"
+    chmod 0755, [libexec/"herdr-app.sh", libexec/"herdr-bridge.py"]
     (bin/"herdr-app").write_env_script libexec/"herdr-app.sh",
       HERDR_APP_HAP:         libexec/"herdr-app-unsigned.hap",
-      HERDR_APP_HDC_DEFAULT: formula_opt_prefix("ohos-sdk-toolchains")/"hdc"
+      HERDR_APP_HDC_DEFAULT: formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
+      HERDR_APP_BRIDGE:      libexec/"herdr-bridge.py",
+      HERDR_APP_HC:          formula_opt_bin("herdr-core")/"hc",
+      HERDR_APP_PYTHON:      formula_opt_bin("python@3.15")/"python3"
   end
 
   def caveats
@@ -154,10 +160,13 @@ class HerdrApp < Formula
       debug profile generation, signing, installation, and launch. Later, open
       the app with `herdr-app start`.
 
-      The app reaches the herdr-core on this machine through a TCP bridge on
-      127.0.0.1:8765, because an app cannot start the host's `hc` itself. This
-      formula does not ship that bridge yet, so without one the app shows its
-      "can't connect to herdr-core" page.
+      The app cannot start the host's `hc`, so it reaches herdr-core through a
+      bridge that `herdr-app install` and `herdr-app start` run for you
+      (`herdr-app bridge status|stop|restart`). The bridge listens on 127.0.0.1
+      only and answers only a connection that starts with a token. The token is
+      made at install time, kept in $XDG_CONFIG_HOME/herdr-app/bridge.conf (mode
+      600) and baked into the installed app. `herdr-app install --new-token`
+      replaces it.
     EOS
   end
 
@@ -172,5 +181,64 @@ class HerdrApp < Formula
     assert_equal "com.social4hyq.herdrapp", manifest.dig("app", "bundleName")
 
     assert_match "Usage: herdr-app", shell_output("#{bin}/herdr-app --help")
+    wrapper = (bin/"herdr-app").read
+    assert_match "HERDR_APP_BRIDGE=\"#{libexec}/herdr-bridge.py\"", wrapper
+    assert_match "HERDR_APP_PYTHON=", wrapper
+    assert_match "HERDR_APP_HC=", wrapper
+
+    # The bridge and the install flow, run from the script itself (the wrapper above exports its own hc and
+    # python) with a stand-in for hc and for app-installer: the token ends up in the HAP that would be signed,
+    # the bridge answers it and nothing else.
+    port = free_port
+    (testpath/"tmp").mkpath
+    (testpath/"bin").mkpath
+    (testpath/"hc").write "#!/bin/sh\nexec cat\n"
+    (testpath/"bin/app-installer").write <<~SH
+      #!/bin/sh
+      while [ "$#" -gt 0 ]; do
+        [ "$1" = "--hap" ] && cp "$2" "#{testpath}/injected.hap"
+        shift
+      done
+    SH
+    chmod 0755, [testpath/"hc", testpath/"bin/app-installer"]
+    python = formula_opt_bin("python@3.15")/"python3"
+    env = {
+      "HERDR_APP_STATE"  => (testpath/"state").to_s,
+      "HERDR_APP_PORT"   => port.to_s,
+      "HERDR_APP_HC"     => (testpath/"hc").to_s,
+      "HERDR_APP_BRIDGE" => (libexec/"herdr-bridge.py").to_s,
+      "HERDR_APP_PYTHON" => python.to_s,
+      "HERDR_APP_HAP"    => hap.to_s,
+      "TMPDIR"           => (testpath/"tmp").to_s,
+      "PATH"             => "#{testpath}/bin:#{ENV["PATH"]}",
+    }
+    script = libexec/"herdr-app.sh"
+    begin
+      with_env(env) do
+        system script, "install"
+        assert_match "token:          accepted", shell_output("#{script} bridge status")
+      end
+      conf = (testpath/"state/bridge.conf").read
+      token = conf[/^token=(\h{64})$/, 1]
+      refute_nil token
+      assert_match "addr=127.0.0.1:#{port}", conf
+      assert_equal conf, shell_output("unzip -p #{testpath}/injected.hap resources/rawfile/bridge.conf")
+      assert_empty Dir[testpath/"tmp/*"], "the staged HAP that holds the token was not removed"
+
+      check = <<~'PY'
+        import socket, sys
+        port, token = int(sys.argv[1]), sys.argv[2].encode()
+        def first_reply(line):
+            with socket.create_connection(("127.0.0.1", port), timeout=5) as conn:
+                conn.sendall(line)
+                return conn.makefile("rb").readline()
+        assert first_reply(b"HERDR-AUTH " + token + b"\n") == b"OK\n"
+        assert first_reply(b"HERDR-AUTH " + b"0" * 64 + b"\n") == b"DENIED\n"
+        assert first_reply(b'{"jsonrpc":"2.0","id":0,"method":"hello"}\n') == b"DENIED\n"
+      PY
+      system python, "-c", check, port.to_s, token
+    ensure
+      with_env(env) { quiet_system script, "bridge", "stop" }
+    end
   end
 end

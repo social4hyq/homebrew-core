@@ -1,0 +1,274 @@
+diff --git a/src/bridge_auth.rs b/src/bridge_auth.rs
+new file mode 100644
+index 0000000..02ab5c9
+--- /dev/null
++++ b/src/bridge_auth.rs
+@@ -0,0 +1,185 @@
++//! Where the core bridge is and the token it wants, as `herdr-app install` baked them into the HAP.
++//!
++//! A HAP cannot start the host's `hc`, so it reaches herdr-core through a bridge on the host (see
++//! `connect_bridge`). The bridge only answers a connection that starts with `HERDR-AUTH <token>`.
++//! The installer puts a `bridge.conf` (`addr=` and `token=` lines) in the HAP; the ArkTS entry copies
++//! it into the app's files directory at start-up, and this reads it from there.
++//!
++//! `HERDR_CORE_TCP` and `HERDR_CORE_TOKEN` override the file (development outside a HAP). Without
++//! either, the address is the default and no token is sent, which an authenticating bridge refuses.
++//!
++//! Std only, so the tests can be built on their own: `rustc --edition 2024 --test src/bridge_auth.rs`.
++
++use std::path::Path;
++
++pub const DEFAULT_ADDR: &str = "127.0.0.1:8765";
++pub const FILE: &str = "bridge.conf";
++
++#[derive(Debug, Default, Clone, PartialEq, Eq)]
++pub struct Config {
++    pub addr: Option<String>,
++    pub token: Option<String>,
++}
++
++/// A token goes on a line by itself, so it may not hold anything that could end or split that line.
++fn plausible_token(token: &str) -> bool {
++    !token.is_empty() && token.chars().all(|c| !c.is_whitespace() && !c.is_control())
++}
++
++pub fn parse(text: &str) -> Config {
++    let mut config = Config::default();
++    for line in text.lines() {
++        let line = line.trim();
++        if line.is_empty() || line.starts_with('#') {
++            continue;
++        }
++        let Some((key, value)) = line.split_once('=') else { continue };
++        let value = value.trim();
++        match key.trim() {
++            "addr" if !value.is_empty() => config.addr = Some(value.to_owned()),
++            "token" if plausible_token(value) => config.token = Some(value.to_owned()),
++            _ => {}
++        }
++    }
++    config
++}
++
++/// `bridge.conf` in `dir`, or nothing when it is not there or cannot be read.
++pub fn read(dir: &Path) -> Config {
++    std::fs::read_to_string(dir.join(FILE)).map(|text| parse(&text)).unwrap_or_default()
++}
++
++/// The environment wins over the file, the file over the defaults.
++pub fn resolve(env_addr: Option<String>, env_token: Option<String>, file: Config) -> (String, Option<String>) {
++    let addr = env_addr.filter(|a| !a.is_empty()).or(file.addr).unwrap_or_else(|| DEFAULT_ADDR.to_owned());
++    let token = env_token.filter(|t| plausible_token(t)).or(file.token);
++    (addr, token)
++}
++
++fn resolved(dir: &Path) -> (String, Option<String>) {
++    resolve(std::env::var("HERDR_CORE_TCP").ok(), std::env::var("HERDR_CORE_TOKEN").ok(), read(dir))
++}
++
++pub fn address(dir: &Path) -> String {
++    resolved(dir).0
++}
++
++pub fn token(dir: &Path) -> Option<String> {
++    resolved(dir).1
++}
++
++/// The first line of a connection.
++pub fn auth_line(token: &str) -> String {
++    format!("HERDR-AUTH {token}\n")
++}
++
++#[derive(Debug, PartialEq, Eq)]
++pub enum Reply {
++    Accepted,
++    /// Wrong or missing token. The bridge says nothing more on purpose.
++    Refused,
++    Busy,
++    /// The bridge took the token but could not start `hc`.
++    NoCore,
++    Other(String),
++}
++
++pub fn classify(line: &str) -> Reply {
++    match line.trim() {
++        "OK" => Reply::Accepted,
++        "DENIED" => Reply::Refused,
++        "BUSY" => Reply::Busy,
++        "ERR" => Reply::NoCore,
++        other => Reply::Other(other.chars().take(60).collect()),
++    }
++}
++
++/// What to tell the person for a reply that is not `OK`.
++pub fn explain(reply: &Reply) -> String {
++    match reply {
++        Reply::Accepted => String::new(),
++        Reply::Refused => "the core bridge refused this app's token: run `herdr-app install` again so the app and the bridge share one".into(),
++        Reply::Busy => "the core bridge has too many connections open".into(),
++        Reply::NoCore => "the core bridge could not start herdr-core's `hc`".into(),
++        Reply::Other(text) => format!("the core bridge answered {text:?}, which is not what herdr-bridge says"),
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn parses_the_two_keys_and_ignores_the_rest() {
++        let c = parse("# written by herdr-app install\naddr = 127.0.0.1:9001\n\ntoken=abc123\nother=1\nnoequals\n");
++        assert_eq!(c, Config { addr: Some("127.0.0.1:9001".into()), token: Some("abc123".into()) });
++    }
++
++    #[test]
++    fn crlf_and_padding_are_tolerated() {
++        let c = parse("addr=127.0.0.1:1\r\ntoken=  t0k3n  \r\n");
++        assert_eq!(c.addr.as_deref(), Some("127.0.0.1:1"));
++        assert_eq!(c.token.as_deref(), Some("t0k3n"));
++    }
++
++    #[test]
++    fn an_empty_or_unusable_value_is_not_a_value() {
++        assert_eq!(parse("addr=\ntoken=\n"), Config::default());
++        assert_eq!(parse("token=has space\n").token, None);
++        assert_eq!(parse("token=a\tb\n").token, None);
++        assert_eq!(parse(""), Config::default());
++    }
++
++    #[test]
++    fn the_last_value_for_a_key_wins() {
++        assert_eq!(parse("token=one\ntoken=two\n").token.as_deref(), Some("two"));
++    }
++
++    #[test]
++    fn a_token_cannot_carry_a_second_line() {
++        // Both halves would be separate lines to `lines()`; the token is only what is left of the first.
++        let c = parse("token=abc\nHERDR-AUTH evil\n");
++        assert_eq!(c.token.as_deref(), Some("abc"));
++        assert!(!plausible_token("abc\nHERDR-AUTH x"));
++        assert!(!plausible_token("abc\r"));
++        assert!(!plausible_token("a\u{0}b"));
++        assert_eq!(auth_line("abc"), "HERDR-AUTH abc\n");
++    }
++
++    #[test]
++    fn the_environment_beats_the_file_and_the_file_beats_the_default() {
++        let file = Config { addr: Some("127.0.0.1:9001".into()), token: Some("filetoken".into()) };
++        assert_eq!(resolve(None, None, file.clone()), ("127.0.0.1:9001".into(), Some("filetoken".into())));
++        assert_eq!(resolve(Some("127.0.0.1:7".into()), Some("envtoken".into()), file.clone()), ("127.0.0.1:7".into(), Some("envtoken".into())));
++        assert_eq!(resolve(None, None, Config::default()), (DEFAULT_ADDR.into(), None));
++        assert_eq!(resolve(Some(String::new()), Some("bad token".into()), file), ("127.0.0.1:9001".into(), Some("filetoken".into())));
++    }
++
++    #[test]
++    fn reads_the_file_from_a_directory() {
++        let dir = std::env::temp_dir().join(format!("bridge-auth-test-{}", std::process::id()));
++        std::fs::create_dir_all(&dir).unwrap();
++        assert_eq!(read(&dir), Config::default(), "no file yet");
++        std::fs::write(dir.join(FILE), "addr=127.0.0.1:4242\ntoken=deadbeef\n").unwrap();
++        assert_eq!(read(&dir), Config { addr: Some("127.0.0.1:4242".into()), token: Some("deadbeef".into()) });
++        std::fs::remove_dir_all(&dir).unwrap();
++    }
++
++    #[test]
++    fn classifies_what_the_bridge_says() {
++        assert_eq!(classify("OK\n"), Reply::Accepted);
++        assert_eq!(classify("DENIED\n"), Reply::Refused);
++        assert_eq!(classify("BUSY\r\n"), Reply::Busy);
++        assert_eq!(classify("ERR\n"), Reply::NoCore);
++        assert!(matches!(classify("{\"jsonrpc\":\"2.0\"}\n"), Reply::Other(_)));
++        assert!(matches!(classify(""), Reply::Other(_)));
++        assert!(explain(&Reply::Refused).contains("herdr-app install"));
++        assert!(explain(&Reply::Accepted).is_empty());
++    }
++
++    #[test]
++    fn an_unrecognised_reply_is_cut_short_in_the_message() {
++        let Reply::Other(text) = classify(&"x".repeat(500)) else { panic!("not Other") };
++        assert_eq!(text.len(), 60);
++    }
++}
+diff --git a/src/hc.rs b/src/hc.rs
+index f9bd535..a52c533 100644
+--- a/src/hc.rs
++++ b/src/hc.rs
+@@ -377,20 +377,41 @@ impl Core {
+ 
+     /// Connects to a core bridge: a host-side proxy that owns `hc connect` and
+     /// forwards its stdio over TCP. The OHOS sandbox cannot spawn the host binary.
++    ///
++    /// The bridge only answers a connection that opens with `HERDR-AUTH <token>`; the token comes from
++    /// `bridge_auth` (the file `herdr-app install` baked into the HAP, or `HERDR_CORE_TOKEN`).
+     pub fn connect_bridge(endpoint: &str) -> Result<Arc<Core>> {
++        use crate::bridge_auth::{self, Reply};
+         let stream = std::net::TcpStream::connect(endpoint)
+             .with_context(|| format!("cannot reach the core bridge at {endpoint}"))?;
+         stream.set_nodelay(true).ok();
++        // Whatever listens on that port may not be a bridge: no step of the handshake waits forever.
++        stream.set_read_timeout(Some(std::time::Duration::from_secs(10))).ok();
+         let mut reader = BufReader::new(stream.try_clone()?);
+         let mut stdin = stream;
++        if let Some(token) = bridge_auth::token(&crate::mods::app_dir()) {
++            stdin.write_all(bridge_auth::auth_line(&token).as_bytes())?;
++            stdin.flush()?;
++            let mut reply = String::new();
++            reader.read_line(&mut reply).context("the core bridge did not answer the token")?;
++            match bridge_auth::classify(&reply) {
++                Reply::Accepted => {}
++                other => bail!("{}", bridge_auth::explain(&other)),
++            }
++        }
+         stdin.write_all(b"{\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"hello\",\"params\":{\"framed\":true}}\n")?;
+         stdin.flush()?;
+         let mut line = String::new();
+-        reader.read_line(&mut line)?;
++        reader.read_line(&mut line).context("the core bridge did not answer hello")?;
++        if line.trim() == "DENIED" {
++            // No token was sent, and this bridge wants one.
++            bail!("{}", bridge_auth::explain(&Reply::Refused));
++        }
+         let hello: Value = serde_json::from_str(&line).context("bad hello reply from core bridge")?;
+         if let Some(err) = hello.get("error") {
+             bail!("core refused hello: {err}");
+         }
++        stdin.set_read_timeout(None).ok();
+         Self::finish_connect(hello, reader, stdin, None)
+     }
+ 
+diff --git a/src/lib.rs b/src/lib.rs
+index fb06582..b113ab0 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -2,6 +2,7 @@
+ #![cfg_attr(all(windows, not(test)), windows_subsystem = "windows")]
+ 
+ pub mod badge;
++pub mod bridge_auth;
+ pub mod bench;
+ pub mod commands;
+ pub mod control;
+diff --git a/src/ohos_exec.rs b/src/ohos_exec.rs
+index 6309d77..c85c1a3 100644
+--- a/src/ohos_exec.rs
++++ b/src/ohos_exec.rs
+@@ -18,15 +18,16 @@ use crate::hc::Core;
+ 
+ static CORE: Mutex<Option<Arc<Core>>> = Mutex::new(None);
+ 
+-/// The core bridge on the host: `HERDR_CORE_TCP`, else the default `herdr-bridge.py` listens on.
++/// The core bridge on the host: `HERDR_CORE_TCP`, else the address `herdr-app install` put in the HAP
++/// (`bridge.conf` in the app's files directory), else the default the bridge listens on.
+ pub(crate) fn endpoint() -> String {
+-    std::env::var("HERDR_CORE_TCP").unwrap_or_else(|_| "127.0.0.1:8765".to_string())
++    crate::bridge_auth::address(&crate::mods::app_dir())
+ }
+ 
+ /// What the setup page says when the bridge cannot be reached. There is no installing a core from
+ /// inside a HAP, so this is always a "start the bridge, then Retry" page, never "Install it for me".
+ pub(crate) fn unreachable_message(error: &anyhow::Error) -> String {
+-    format!("Herdr reaches herdr-core through herdr-bridge on the host ({}). Start it there, then press Retry.\n\n{error:#}", endpoint())
++    format!("Herdr reaches herdr-core through herdr-bridge on the host ({}). Run `herdr-app bridge start` there, then press Retry.\n\n{error:#}", endpoint())
+ }
+ 
+ fn core(fresh: bool) -> Result<Arc<Core>, String> {
