@@ -1,46 +1,38 @@
 #!/usr/bin/env bash
-# Stage application-specific config; app-installer owns signing and deployment.
+# Stage the host config for the OpenCode shell HAP, sign it and install it.
+#
+# The bottle HAP is unsigned and carries only a placeholder config.json; this
+# script writes the real connection settings (the loopback port, the server
+# password, the host `opencode` binary the shell spawns and the host environment
+# that binary needs) into a copy of the HAP, optionally swaps in the ACL
+# module.json, and lets app-installer sign and deploy it. The flow itself is
+# shared by the HAP apps of this tap (hap-app-install-lib.sh, installed next to
+# this script); only what is specific to OpenCode is written here.
+#
+# The default variant is the ACL one (CUSTOM_SANDBOX and READ_WRITE_USER_FILE let
+# the shell spawn the host binary and reach the host profile). --no-acl installs
+# the strong-sandbox variant.
 set -euo pipefail
 
-usage() {
-  printf '%s\n' 'Usage: install-desktop.sh --hap <unsigned.hap> --config <config.json> [--device <key>] [--no-acl]'
-}
-hap=
-config=
-device=
-want_acl=1
-while (($#)); do
-  case "$1" in
-    --hap|--config|--device)
-      if (($# < 2)) || [[ -z "$2" || "$2" == --* ]]; then
-        printf 'install-desktop: missing value for %s\n' "$1" >&2; exit 2
-      fi
-      case "$1" in
-        --hap) hap="$2" ;;
-        --config) config="$2" ;;
-        --device) device="$2" ;;
-      esac
-      shift 2 ;;
-    --no-acl) want_acl=0; shift ;;
-    -h|--help) usage; exit 0 ;;
-    *) usage >&2; exit 2 ;;
-  esac
-done
-[[ -f "$hap" && -f "$config" ]] || { usage >&2; exit 2; }
-for tool in node zip app-installer; do
-  command -v "$tool" >/dev/null || { printf 'install-desktop: command not found: %s\n' "$tool" >&2; exit 1; }
-done
-hdc="${OPENCODE_DESKTOP_HDC:-${OPENCODE_DESKTOP_HDC_DEFAULT:-hdc}}"
-backend="${OPENCODE_DESKTOP_OPENCODE_BIN:-$(command -v opencode || true)}"
-[[ -n "$backend" && -x "$backend" ]] || { printf 'install-desktop: opencode not found\n' >&2; exit 1; }
+APP_CMD=opencode-app
+ENV_PREFIX=OPENCODE_DESKTOP
+BUNDLE_ID_DEFAULT=com.social4hyq.opencodedesktop
+APP_NAME_DEFAULT=OpenCodeDesktop
 
-stage="$(mktemp -d "${TMPDIR:-$HOME/.cache}/opencode-desktop-inject.XXXXXX")"
-trap 'rm -rf "$stage"' EXIT
-injected="$stage/opencode-desktop.hap"
-entry="resources/resfile/resources/app/config.json"
-cp "$hap" "$injected"
-mkdir -p "$stage/$(dirname "$entry")"
-node - "$config" "$backend" "$stage/$entry" <<'JS'
+BACKEND=""
+
+# The shell spawns this binary, so it has to exist on the host.
+app_prepare() {
+  BACKEND="${OPENCODE_DESKTOP_OPENCODE_BIN:-$(command -v opencode || true)}"
+  [[ -n "$BACKEND" && -x "$BACKEND" ]] || die "opencode not found"
+}
+
+# Write the per-host config into the HAP tree: $1 is the host config written by
+# `opencode-app install`, $2 the root of the tree that is added to the HAP.
+stage_tree() {
+  local dest="$2/resources/resfile/resources/app/config.json"
+  mkdir -p "$(dirname "$dest")"
+  node - "$1" "$BACKEND" "$dest" <<'JS'
 const fs = require("node:fs");
 const [source, backend, destination] = process.argv.slice(2);
 const config = JSON.parse(fs.readFileSync(source, "utf8"));
@@ -55,15 +47,8 @@ fs.writeFileSync(destination, JSON.stringify({port: config.port, password: confi
   host: {home, path: process.env.PATH, xdgConfig: xdg("XDG_CONFIG_HOME"),
     xdgData: xdg("XDG_DATA_HOME"), xdgState: xdg("XDG_STATE_HOME")}}) + "\n");
 JS
-entries=("$entry")
-if ((want_acl)); then
-  module="${OPENCODE_DESKTOP_MODULE_ACL:?formula did not set the ACL module path}"
-  [[ -f "$module" ]] || { printf 'install-desktop: ACL module missing: %s\n' "$module" >&2; exit 1; }
-  cp "$module" "$stage/module.json"
-  entries+=(module.json)
-fi
-(cd "$stage" && zip -q -X "$injected" "${entries[@]}")
-args=(--hap "$injected" --bundle-id com.social4hyq.opencodedesktop --app-name OpenCodeDesktop --module electron --ability EntryAbility --hdc "$hdc")
-if [[ -n "$device" ]]; then args+=(--device "$device"); fi
-app-installer "${args[@]}"
-printf 'installed com.social4hyq.opencodedesktop\n'
+}
+
+# shellcheck source-path=SCRIPTDIR
+# shellcheck source=../../_shared/hap-app/install-lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/hap-app-install-lib.sh"
