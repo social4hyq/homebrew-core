@@ -20,9 +20,9 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r6"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f00a2e4d6f13ef54b63e8bc8a6f9e0b12d123b95e7ff547ea5eb2456d384d1a0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r7"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6db27af6adc460063cf2ba631af26e8bde161afea276d1fca3cb3cdc8193ecfb"
   end
 
   depends_on "app-installer"
@@ -41,10 +41,12 @@ class ZcodeApp < Formula
   RESOURCE_FILES = %w[
     Resources/_shared/electron-shell/tray.cjs
     Resources/_shared/hap-app/install-lib.sh
+    Resources/_shared/waiting-page/render-waiting.cjs
+    Resources/_shared/waiting-page/waiting.html.in
     Resources/zcode-app/app/config.json
     Resources/zcode-app/app/main.cjs
     Resources/zcode-app/app/package.json
-    Resources/zcode-app/app/waiting.html
+    Resources/zcode-app/app/waiting.json
     Resources/zcode-app/assets/icon.png
     Resources/zcode-app/assets/tray-icon.png
     Resources/zcode-app/scripts/install-desktop.sh
@@ -71,10 +73,16 @@ class ZcodeApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs package.json config.json waiting.html].each do |name|
+    %w[main.cjs package.json config.json].each do |name|
       cp res/"app"/name, app/name
     end
     cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
+    # waiting.html is rendered from the page template shared by the HAP apps and
+    # this app's strings. The result is byte for byte the page that used to be
+    # kept here; Resources/_shared/waiting-page/expected.sha256 pins it.
+    system "node", tap_root/"Resources/_shared/waiting-page/render-waiting.cjs",
+           tap_root/"Resources/_shared/waiting-page/waiting.html.in",
+           res/"app/waiting.json", app/"waiting.html"
 
     cp res/"assets/icon.png", app/"app-icon.png"
     cp res/"assets/tray-icon.png", app/"tray-icon.png"
@@ -385,6 +393,9 @@ class ZcodeApp < Formula
     assert_match "resources/resfile/resources/app/tray.cjs", listing
     assert_match "resources/resfile/resources/app/tray-icon.png", listing
     assert_match "resources/resfile/resources/app/waiting.html", listing
+    waiting_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/waiting.html")
+    assert_match "zcode-app status", waiting_source
+    refute_match "{{", waiting_source
     tray_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/tray.cjs")
     assert_match "new Tray(", tray_source
     assert_match "app.exit(0)", tray_source
