@@ -37,6 +37,8 @@ class DeepseekHarnessApp < Formula
   # Resources/ directory only while a formula names it.
   RESOURCE_FILES = %w[
     Resources/_shared/hap-app/install-lib.sh
+    Resources/_shared/waiting-page/render-waiting.cjs
+    Resources/_shared/waiting-page/waiting.html.in
     Resources/deepseek-harness-app/app/config.json
     Resources/deepseek-harness-app/app/main.cjs
     Resources/deepseek-harness-app/app/package.json
@@ -44,7 +46,7 @@ class DeepseekHarnessApp < Formula
     Resources/deepseek-harness-app/app/proxy.cjs
     Resources/deepseek-harness-app/app/startup.cjs
     Resources/deepseek-harness-app/app/tray.cjs
-    Resources/deepseek-harness-app/app/waiting.html
+    Resources/deepseek-harness-app/app/waiting.json
     Resources/deepseek-harness-app/assets/icon.png
     Resources/deepseek-harness-app/assets/tray-icon.png
     Resources/deepseek-harness-app/scripts/deepseek-harness-desktop.sh
@@ -76,7 +78,12 @@ class DeepseekHarnessApp < Formula
     cp res/"app/tray.cjs", app
     cp res/"app/package.json", app
     cp res/"app/config.json", app
-    cp res/"app/waiting.html", app
+    # waiting.html is rendered from the page template shared by the HAP apps and
+    # this app's strings. The result is byte for byte the page that used to be
+    # kept here; Resources/_shared/waiting-page/expected.sha256 pins it.
+    system "node", tap_root/"Resources/_shared/waiting-page/render-waiting.cjs",
+           tap_root/"Resources/_shared/waiting-page/waiting.html.in",
+           res/"app/waiting.json", app/"waiting.html"
 
     cp res/"assets/icon.png", app/"app-icon.png"
     cp res/"assets/tray-icon.png", app/"tray-icon.png"
@@ -316,6 +323,9 @@ class DeepseekHarnessApp < Formula
     assert_match "resources/resfile/resources/app/tray.cjs", listing
     assert_match "resources/resfile/resources/app/tray-icon.png", listing
     assert_match "resources/resfile/resources/app/waiting.html", listing
+    waiting_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/waiting.html")
+    assert_match "dsh-app status", waiting_source
+    refute_match "{{", waiting_source
     tray_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/tray.cjs")
     assert_match "new Tray(", tray_source
     assert_match "preventDefault", tray_source
