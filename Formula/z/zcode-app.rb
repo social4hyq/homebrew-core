@@ -10,7 +10,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 12
+  revision 13
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -20,9 +20,8 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r4"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "62965bd6f91a803b9c6cbb76c25f8ff13fcc207e3988d6b1d9ee9e076cf457cf"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0bd60a95307a606a7580cd416b7298768b168f3c207cd135939d3e0157a1357"
   end
 
   depends_on "app-installer"
@@ -40,6 +39,7 @@ class ZcodeApp < Formula
   # formula names it.
   RESOURCE_FILES = %w[
     Resources/_shared/electron-shell/tray.cjs
+    Resources/_shared/hap-app/install-lib.sh
     Resources/zcode-app/app/config.json
     Resources/zcode-app/app/main.cjs
     Resources/zcode-app/app/package.json
@@ -216,6 +216,10 @@ class ZcodeApp < Formula
     pkgshare.mkpath
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
+    # install-desktop.sh sources the install flow shared by the HAP apps from
+    # the same directory.
+    cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
+    chmod 0755, pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/zcode-desktop.sh", libexec/"zcode-desktop.sh"
     chmod 0755, libexec/"zcode-desktop.sh"
     (bin/"zcode-app").write_env_script libexec/"zcode-desktop.sh",
