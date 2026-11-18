@@ -35,6 +35,14 @@ class MulticaApp < Formula
     end
   end
 
+  # Tap-authored files that are copied into the build but are not patches, so
+  # they live in Resources/ rather than Patches/. Every path is listed
+  # literally: the weekly remove-unused-patches job keeps a Resources/
+  # directory only while a formula names it.
+  RESOURCE_FILES = %w[
+    Resources/multica-app/assets/tray-icon.png
+  ].freeze
+
   def patch
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
@@ -59,6 +67,11 @@ class MulticaApp < Formula
   end
 
   def install
+    tap_root = Pathname(__dir__).parent.parent
+    RESOURCE_FILES.each do |file|
+      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
+    end
+
     cd "server" do
       ENV["CGO_ENABLED"] = "0"
       system "go", "build",
@@ -150,7 +163,7 @@ class MulticaApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app/"out" if (app/"out").exist?
     cp_r buildpath/"apps/desktop/out", app/"out"
-    cp Pathname(__dir__).parent.parent/"Patches/multica-app/assets/tray-icon.png", app/"out/main/tray-icon.png"
+    cp tap_root/"Resources/multica-app/assets/tray-icon.png", app/"out/main/tray-icon.png"
     rm_r app/"node_modules" if (app/"node_modules").exist?
     package = JSON.parse((buildpath/"apps/desktop/package.json").read)
     package = package.slice("name", "productName", "version", "description", "main", "private", "type")
