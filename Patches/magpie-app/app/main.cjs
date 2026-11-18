@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell } = require("electron");
+const { app, BrowserWindow, Menu, Tray, nativeImage, shell } = require("electron");
 const { spawn } = require("node:child_process");
 const { randomBytes } = require("node:crypto");
 const { readFileSync } = require("node:fs");
@@ -10,6 +10,18 @@ const config = JSON.parse(readFileSync(join(__dirname, "config.json"), "utf8"));
 const connect = pathToFileURL(join(__dirname, "connect.html")).href;
 let backend;
 let origin;
+let tray;
+
+function showWindow(win) {
+  if (!win || win.isDestroyed()) return;
+  if (win.isMinimized()) win.restore();
+  win.show();
+  win.focus();
+}
+
+function stopBackend() {
+  backend?.kill();
+}
 
 function readyLink(line, key) {
   const match = /magpie web on (http:\/\/127\.0\.0\.1:[1-9]\d{0,4}\/\?k=[a-f0-9]{64})\s*$/.exec(
@@ -75,18 +87,33 @@ if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
   let win;
-  app.on("second-instance", () => {
-    if (win && !win.isDestroyed()) {
-      win.show();
-      win.focus();
-    }
-  });
+  app.on("second-instance", () => showWindow(win));
   app.whenReady().then(() => {
+    Menu.setApplicationMenu(null);
+    // OHOS needs a status-bar item before creating the first window to hide its ability.
+    try {
+      tray = new Tray(nativeImage.createFromPath(join(__dirname, "tray-icon.png")));
+      tray.setToolTip("Magpie");
+      tray.on("click", () => showWindow(win));
+      tray.setContextMenu(Menu.buildFromTemplate([
+        { label: "显示窗口", click: () => showWindow(win) },
+        { label: "退出应用", click: () => { stopBackend(); app.exit(0); } },
+      ]));
+    } catch (error) {
+      tray?.destroy();
+      tray = undefined;
+      console.error("Magpie tray unavailable:", error.message);
+    }
     win = new BrowserWindow({
       title: "Magpie",
       width: 1100,
       height: 760,
       webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true },
+    });
+    win.on("close", event => {
+      if (!tray) return;
+      event.preventDefault();
+      win.hide();
     });
     const session = win.webContents.session;
     session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
@@ -112,5 +139,5 @@ if (!app.requestSingleInstanceLock()) {
     start(win);
   });
   app.on("window-all-closed", () => app.quit());
-  app.on("before-quit", () => backend?.kill());
+  app.on("before-quit", stopBackend);
 }
