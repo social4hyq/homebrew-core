@@ -5,6 +5,8 @@ class Magpie < Formula
   sha256 "a23a2867fe4aa3ae33ee83d5a554ba8283b9052d01c20c02c6bd2941bed47dcd"
   license "MIT"
 
+  revision 1
+
   livecheck do
     url :stable
     strategy :github_latest
