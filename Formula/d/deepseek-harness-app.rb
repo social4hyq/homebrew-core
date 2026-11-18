@@ -31,8 +31,34 @@ class DeepseekHarnessApp < Formula
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
   end
 
+  # Shell sources live in the tap so they are reviewable in the PR. Every path
+  # is listed literally: the weekly remove-unused-patches job keeps a
+  # Resources/ directory only while a formula names it.
+  RESOURCE_FILES = %w[
+    Resources/deepseek-harness-app/app/config.json
+    Resources/deepseek-harness-app/app/main.cjs
+    Resources/deepseek-harness-app/app/package.json
+    Resources/deepseek-harness-app/app/proxy-preload.cjs
+    Resources/deepseek-harness-app/app/proxy.cjs
+    Resources/deepseek-harness-app/app/startup.cjs
+    Resources/deepseek-harness-app/app/tray.cjs
+    Resources/deepseek-harness-app/app/waiting.html
+    Resources/deepseek-harness-app/assets/icon.png
+    Resources/deepseek-harness-app/assets/tray-icon.png
+    Resources/deepseek-harness-app/scripts/deepseek-harness-desktop.sh
+    Resources/deepseek-harness-app/scripts/install-desktop.sh
+    Resources/deepseek-harness-app/tests/test-proxy.cjs
+    Resources/deepseek-harness-app/tests/test-server-detach.rb
+    Resources/deepseek-harness-app/tests/test-startup.cjs
+  ].freeze
+
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
+    res = tap_root/"Resources/deepseek-harness-app"
+    RESOURCE_FILES.each do |file|
+      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
+    end
+
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
     system "tar", "-xzf", buildpath/"libelectron_144.tar.gz", "-C", buildpath
@@ -41,23 +67,23 @@ class DeepseekHarnessApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    cp tap_root/"Patches/deepseek-harness-app/app/main.cjs", app
-    cp tap_root/"Patches/deepseek-harness-app/app/proxy-preload.cjs", app
-    cp tap_root/"Patches/deepseek-harness-app/app/proxy.cjs", app
-    cp tap_root/"Patches/deepseek-harness-app/app/startup.cjs", app
-    cp tap_root/"Patches/deepseek-harness-app/app/tray.cjs", app
-    cp tap_root/"Patches/deepseek-harness-app/app/package.json", app
-    cp tap_root/"Patches/deepseek-harness-app/app/config.json", app
-    cp tap_root/"Patches/deepseek-harness-app/app/waiting.html", app
+    cp res/"app/main.cjs", app
+    cp res/"app/proxy-preload.cjs", app
+    cp res/"app/proxy.cjs", app
+    cp res/"app/startup.cjs", app
+    cp res/"app/tray.cjs", app
+    cp res/"app/package.json", app
+    cp res/"app/config.json", app
+    cp res/"app/waiting.html", app
 
-    cp tap_root/"Patches/deepseek-harness-app/assets/icon.png", app/"app-icon.png"
-    cp tap_root/"Patches/deepseek-harness-app/assets/tray-icon.png", app/"tray-icon.png"
+    cp res/"assets/icon.png", app/"app-icon.png"
+    cp res/"assets/tray-icon.png", app/"tray-icon.png"
 
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.deepseekharness"'
     inreplace shell/"AppScope/app.json5", '"vendor": "example"', '"vendor": "social4hyq"'
     %w[app_icon.png startIcon.png].each do |name|
-      cp tap_root/"Patches/deepseek-harness-app/assets/icon.png", shell/"AppScope/resources/base/media"/name
+      cp res/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
     (shell.glob("AppScope/resources/*/element/string.json") +
      shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
@@ -143,11 +169,11 @@ class DeepseekHarnessApp < Formula
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
     (pkgshare/"install-desktop.sh").write(
-      (tap_root/"Patches/deepseek-harness-app/scripts/install-desktop.sh").read,
+      (res/"scripts/install-desktop.sh").read,
     )
     chmod 0755, pkgshare/"install-desktop.sh"
     (libexec/"deepseek-harness-desktop.sh").write(
-      (tap_root/"Patches/deepseek-harness-app/scripts/deepseek-harness-desktop.sh").read,
+      (res/"scripts/deepseek-harness-desktop.sh").read,
     )
     chmod 0755, libexec/"deepseek-harness-desktop.sh"
     (bin/"dsh-app").write_env_script opt_libexec/"deepseek-harness-desktop.sh",
@@ -159,9 +185,9 @@ class DeepseekHarnessApp < Formula
       DSH_DESKTOP_VERSION:        version.to_s,
       PATH:                       "#{formula_opt_bin("node")}:#{formula_opt_bin("deepseek-harness")}:$PATH"
     pkgshare.mkpath
-    cp tap_root/"Patches/deepseek-harness-app/tests/test-startup.cjs", pkgshare/"test-startup.cjs"
-    cp tap_root/"Patches/deepseek-harness-app/tests/test-proxy.cjs", pkgshare/"test-proxy.cjs"
-    cp tap_root/"Patches/deepseek-harness-app/tests/test-server-detach.rb", pkgshare/"test-server-detach.rb"
+    cp res/"tests/test-startup.cjs", pkgshare/"test-startup.cjs"
+    cp res/"tests/test-proxy.cjs", pkgshare/"test-proxy.cjs"
+    cp res/"tests/test-server-detach.rb", pkgshare/"test-server-detach.rb"
     bin.install_symlink bin/"dsh-app" => "deepseek-harness-desktop"
   end
 
