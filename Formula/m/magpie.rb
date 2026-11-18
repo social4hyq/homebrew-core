@@ -18,6 +18,10 @@ class Magpie < Formula
   depends_on "go" => :build
   depends_on "bun"
 
+  patch do
+    file "Patches/magpie/0001-open-browser-on-openharmony.patch"
+  end
+
   def install
     ENV["CGO_ENABLED"] = "0"
     system "go", "build", *std_go_args(output: libexec/"bin/magpie", ldflags: "-s -w -X main.version=#{version}"),
