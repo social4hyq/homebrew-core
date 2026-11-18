@@ -141,7 +141,7 @@ ensure_serve() {
     printf 'dsh-app: port %s is in use by another process; edit %s to pick another port\n' "$PORT" "$CONFIG_FILE" >&2
     return 1
   fi
-  "$(dsh_bin)" web --host 127.0.0.1 --no-open --port "$PORT" >"$LOG_FILE" 2>&1 &
+  setsid nohup "$(dsh_bin)" web --host 127.0.0.1 --no-open --port "$PORT" >"$LOG_FILE" 2>&1 </dev/null &
   echo $! > "$PID_FILE"
   local waited=0
   until save_printed_url && healthy; do
@@ -225,6 +225,7 @@ cmd_install() {
   : "${DSH_DESKTOP_INSTALL_SCRIPT:?formula did not set the install script path}"
   ensure_config
   warn_version_mismatch
+  ensure_serve
   exec bash "$DSH_DESKTOP_INSTALL_SCRIPT" --hap "$DSH_DESKTOP_UNSIGNED_HAP" --config "$CONFIG_FILE" "$@"
 }
 
