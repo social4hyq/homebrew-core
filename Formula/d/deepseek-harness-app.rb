@@ -1,11 +1,9 @@
 class DeepseekHarnessApp < Formula
   desc "Desktop shell for the DeepSeek Harness agent (Electron window on local dsh web)"
   homepage "https://github.com/deepseek-ai/deepseek-harness"
-  url "https://github.com/deepseek-ai/deepseek-harness/archive/refs/tags/dsh-v0.2.2-rc.3.tar.gz"
-  sha256 "bf6d668e52a26edf98aa2ef7960e240c8d9afcefbad2b09887a2cb1e14001dd5"
+  url "https://github.com/deepseek-ai/deepseek-harness/archive/refs/tags/dsh-v0.2.2-rc.4.tar.gz"
+  sha256 "4668e9b8a5f836693c731a808214445f5fce6cfa2956cf47f473e9b6e023f4b3"
   license :cannot_represent
-
-  revision 8
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
