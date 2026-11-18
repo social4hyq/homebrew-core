@@ -12,8 +12,9 @@ class MagpieApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4402-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1bf6cba244f4f6f931d930cee98405e5aedd0e36e78ad64b3d6eb4e841b03c6e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4402-r3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ed554873725eb7245970a3e2d77b8a4a46de14749ebdfd8e13d982e2e4de2d1"
   end
 
   depends_on "app-installer"
@@ -27,9 +28,24 @@ class MagpieApp < Formula
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
   end
 
+  # Shell sources live in the tap so they are reviewable in the PR. Every path
+  # is listed literally: the weekly remove-unused-patches job keeps a
+  # Resources/ directory only while a formula names it.
+  RESOURCE_FILES = %w[
+    Resources/magpie-app/app/config.json
+    Resources/magpie-app/app/connect.html
+    Resources/magpie-app/app/main.cjs
+    Resources/magpie-app/app/package.json
+    Resources/magpie-app/scripts/magpie-app.sh
+  ].freeze
+
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    payload = tap_root/"Patches/magpie-app"
+    res = tap_root/"Resources/magpie-app"
+    RESOURCE_FILES.each do |file|
+      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
+    end
+
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
     system "tar", "-xzf", buildpath/"libelectron_144.tar.gz", "-C", buildpath
@@ -39,7 +55,7 @@ class MagpieApp < Formula
     rm_r app if app.exist?
     app.mkpath
     %w[main.cjs package.json config.json connect.html].each do |name|
-      cp payload/"app"/name, app/name
+      cp res/"app"/name, app/name
     end
 
     icon = buildpath/"internal/gui/icon-256.png"
@@ -155,7 +171,7 @@ class MagpieApp < Formula
     end
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
-    cp payload/"scripts/magpie-app.sh", libexec/"magpie-app.sh"
+    cp res/"scripts/magpie-app.sh", libexec/"magpie-app.sh"
     chmod 0755, libexec/"magpie-app.sh"
     (bin/"magpie-app").write_env_script libexec/"magpie-app.sh",
       MAGPIE_APP_HAP:         libexec/"magpie-desktop-unsigned.hap",
