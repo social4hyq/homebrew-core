@@ -10,7 +10,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 13
+  revision 14
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -20,9 +20,8 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r8"
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e5fd7e696c56b36efc09b54dbbf0bfcd67061ab466a4c3cdf7a07ba783357f1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c27d10235de2674e48dad465c0af4b00ab5e95e915c390243c1f11c441d57489"
   end
 
   depends_on "app-installer"
@@ -334,6 +333,7 @@ class ZcodeApp < Formula
       while [ $# -gt 0 ]; do
         case "$1" in
           --hap) cp "$2" #{injected_copy}; shift 2 ;;
+          --signed-hap) printf 'signed-by-fake' > "$2"; shift 2 ;;
           *) shift ;;
         esac
       done
@@ -379,6 +379,18 @@ class ZcodeApp < Formula
     strong_requests = strong_module.dig("module", "requestPermissions")
     strong_permissions = strong_requests.map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.INTERNET], strong_permissions
+
+    # --keep is passed through to the install script, which copies the signed
+    # HAP out and says where.
+    keep_tmp = testpath/"keep-tmp"
+    keep_tmp.mkpath
+    ENV["TMPDIR"] = keep_tmp.to_s
+    keep_output = shell_output("#{bin}/zcode-app install --hap #{fake_hap} --keep --no-serve 2>&1")
+    assert_match "signed HAP kept at #{keep_tmp}/zcode-desktop-signed.hap", keep_output
+    assert_match "installed", keep_output
+    assert_equal "signed-by-fake", (keep_tmp/"zcode-desktop-signed.hap").read
+    refute_match "signed HAP kept",
+                 shell_output("#{bin}/zcode-app install --hap #{fake_hap} --no-serve 2>&1")
 
     assert_match "no managed server running", shell_output("#{bin}/zcode-app stop")
     assert_match "not healthy", shell_output("#{bin}/zcode-app status 2>&1", 1)
