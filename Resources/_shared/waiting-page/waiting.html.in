@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
-<title>OpenCode</title>
+<title>{{name}}</title>
 <style>
-:root{color-scheme:light dark;--bg:#f7f8fa;--surface:#fff;--ink:#1c2230;--muted:#737d8f;--line:#e4e8ef;--accent:#6c77d7;--wash:#e9ecff;--shadow:0 18px 46px #18243c0c}
+:root{color-scheme:light dark;--bg:#f7f8fa;--surface:#fff;--ink:#1c2230;--muted:#737d8f;--line:#e4e8ef;--accent:#{{accent}};--wash:#{{wash}};--shadow:0 18px 46px #18243c0c}
 *{box-sizing:border-box}html,body{min-height:100%;margin:0}body{font:14px/1.6 "HarmonyOS Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 39%,var(--wash),transparent 56%);opacity:.65}
 .header{position:absolute;top:32px;left:40px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;letter-spacing:.01em}.header img{width:24px;height:24px;border-radius:6px}
@@ -17,22 +17,22 @@ h1{font-size:32px;font-weight:650;line-height:1.25;letter-spacing:-1px;margin:0 
 .footer{position:absolute;bottom:27px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--muted);font-size:11px;letter-spacing:.03em}.footer span+span::before{content:"·";padding-right:10px;opacity:.5}
 body[data-state="spawn-failed"] .track::after,body[data-state="not-configured"] .track::after{width:100%;animation:none;background:#cf8a45}body[data-state="spawn-failed"] .indicator,body[data-state="not-configured"] .indicator{background:#cf8a45}
 @keyframes travel{0%{transform:translateX(-110%)}100%{transform:translateX(390%)}}@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@media(prefers-color-scheme:dark){:root{--bg:#11141b;--surface:#1a1e28;--ink:#edf0f5;--muted:#8b95a9;--line:#2b3140;--wash:#202844;--shadow:0 22px 60px #0004}.emblem{border-color:#343b4b}}
+@media(prefers-color-scheme:dark){:root{--bg:#11141b;--surface:#1a1e28;--ink:#edf0f5;--muted:#8b95a9;--line:#2b3140;--wash:#{{washDark}};--shadow:0 22px 60px #0004}.emblem{border-color:#343b4b}}
 @media(max-width:480px){.header{top:22px;left:24px}h1{font-size:27px}.emblem{width:84px;height:84px;margin-bottom:26px}.emblem img{width:56px;height:56px}.subtitle{font-size:14px}.footer{bottom:20px}.help{padding:14px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.track::after{width:45%;transform:translateX(62%)}}
 </style>
 </head>
 <body data-state="waiting">
-<header class="header"><img src="app-icon.png" alt="" aria-hidden="true"><span>OpenCode</span></header>
-<main><section class="launch" aria-label="OpenCode 启动状态">
-<div class="emblem"><img src="app-icon.png" alt="OpenCode 图标"></div>
-<h1 id="heading">OpenCode</h1>
-<p class="subtitle" id="description">让想法，继续成为作品。</p>
+<header class="header"><img src="app-icon.png" alt="" aria-hidden="true"><span>{{name}}</span></header>
+<main><section class="launch" aria-label="{{name}} 启动状态">
+<div class="emblem"><img src="app-icon.png" alt="{{name}} 图标"></div>
+<h1 id="heading">{{name}}</h1>
+<p class="subtitle" id="description">{{subtitle}}</p>
 <div class="connection"><div class="track" aria-hidden="true"></div><p class="status" role="status" aria-live="polite"><span class="indicator" aria-hidden="true"></span><span id="status-text">正在连接本地服务</span></p></div>
-<details class="help" id="help" hidden><summary>启动遇到问题？<span aria-hidden="true"></span></summary><p id="help-text">服务就绪后会自动进入。也可以在终端检查状态：</p><div class="command"><code id="command">opencode-app status</code><button id="copy" type="button" aria-label="复制诊断命令">复制</button></div><p id="extra">若服务尚未启动，运行 <code>opencode-app serve</code>。</p></details>
+<details class="help" id="help" hidden><summary>启动遇到问题？<span aria-hidden="true"></span></summary><p id="help-text">服务就绪后会自动进入。也可以在终端检查状态：</p><div class="command"><code id="command">{{command}} status</code><button id="copy" type="button" aria-label="复制诊断命令">复制</button></div><p id="extra">若服务尚未启动，运行 <code>{{command}} serve</code>。</p></details>
 <p class="error-note" id="note" hidden></p>
 </section></main>
-<footer class="footer"><span>OpenCode</span><span>本机连接</span></footer>
+<footer class="footer"><span>{{name}}</span><span>本机连接</span></footer>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
@@ -45,10 +45,10 @@ function renderState() {
   document.body.dataset.state = state;
   const failed = state === 'spawn-failed';
   const missing = state === 'not-configured';
-  $('heading').textContent = missing ? '还差一步，就能开始' : failed ? '暂时无法启动' : 'OpenCode';
-  $('description').textContent = missing ? '请完成本机应用配置，再重新打开。' : failed ? '本地服务启动失败，已有数据不会被更改。' : '让想法，继续成为作品。';
+  $('heading').textContent = missing ? '还差一步，就能开始' : failed ? '暂时无法启动' : '{{name}}';
+  $('description').textContent = missing ? '请完成本机应用配置，再重新打开。' : failed ? '本地服务启动失败，已有数据不会被更改。' : '{{subtitle}}';
   $('status-text').textContent = missing ? '等待完成配置' : failed ? '需要检查启动环境' : '正在连接本地服务';
-  $('command').textContent = missing ? 'opencode-app install' : 'opencode-app status';
+  $('command').textContent = missing ? '{{command}} install' : '{{command}} status';
   $('help-text').textContent = missing ? '在终端执行以下命令，完成配置和安装：' : '服务就绪后会自动进入。也可以在终端检查状态：';
   $('extra').hidden = missing;
   $('help').hidden = state === 'waiting';

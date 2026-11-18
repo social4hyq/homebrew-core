@@ -17,8 +17,9 @@ class OpencodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.0-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "de409c713c97d8284eb0a0ed74d761b35412ba0c14932f86a59d01f7d00d0652"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.0-r8"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a79a7418a7c499258f6f1382c89a7e164c155e090cbf13e07a758cb8fb48404d"
   end
 
   depends_on "app-installer"
@@ -35,10 +36,12 @@ class OpencodeApp < Formula
   RESOURCE_FILES = %w[
     Resources/_shared/electron-shell/tray.cjs
     Resources/_shared/hap-app/install-lib.sh
+    Resources/_shared/waiting-page/render-waiting.cjs
+    Resources/_shared/waiting-page/waiting.html.in
     Resources/opencode-app/app/config.json
     Resources/opencode-app/app/main.cjs
     Resources/opencode-app/app/package.json
-    Resources/opencode-app/app/waiting.html
+    Resources/opencode-app/app/waiting.json
     Resources/opencode-app/assets/icon.png
     Resources/opencode-app/assets/tray-icon.png
     Resources/opencode-app/scripts/install-desktop.sh
@@ -65,10 +68,16 @@ class OpencodeApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs package.json config.json waiting.html].each do |name|
+    %w[main.cjs package.json config.json].each do |name|
       cp res/"app"/name, app/name
     end
     cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
+    # waiting.html is rendered from the page template shared by the HAP apps and
+    # this app's strings. The result is byte for byte the page that used to be
+    # kept here; Resources/_shared/waiting-page/expected.sha256 pins it.
+    system "node", tap_root/"Resources/_shared/waiting-page/render-waiting.cjs",
+           tap_root/"Resources/_shared/waiting-page/waiting.html.in",
+           res/"app/waiting.json", app/"waiting.html"
 
     cp res/"assets/icon.png", app/"app-icon.png"
     cp res/"assets/tray-icon.png", app/"tray-icon.png"
@@ -324,6 +333,9 @@ class OpencodeApp < Formula
     assert_match "resources/resfile/resources/app/tray.cjs", listing
     assert_match "resources/resfile/resources/app/tray-icon.png", listing
     assert_match "resources/resfile/resources/app/waiting.html", listing
+    waiting_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/waiting.html")
+    assert_match "opencode-app status", waiting_source
+    refute_match "{{", waiting_source
     tray_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/tray.cjs")
     assert_match "new Tray(", tray_source
     assert_match "app.exit(0)", tray_source

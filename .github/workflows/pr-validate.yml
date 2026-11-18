@@ -32,7 +32,8 @@ on:
     branches: [main]
     paths: ['Formula/**', 'Patches/**', 'Resources/**',
             '.github/scripts/check-hap-formulae.py', '.github/scripts/test-hap-install-lib.sh',
-            '.github/scripts/detect-changes.sh', '.github/scripts/test-detect-changes.sh']
+            '.github/scripts/detect-changes.sh', '.github/scripts/test-detect-changes.sh',
+            '.github/scripts/test-waiting-page.sh']
 
 defaults:
   run:
@@ -95,6 +96,8 @@ jobs:
         run: .github/scripts/test-hap-install-lib.sh
       - name: Test change detection
         run: .github/scripts/test-detect-changes.sh
+      - name: Test the shared waiting page
+        run: .github/scripts/test-waiting-page.sh
 
   detect:
     runs-on: ubuntu-latest
