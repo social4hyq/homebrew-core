@@ -30,6 +30,7 @@ function create(options = {}) {
   tray.on('click', showWindow);
 
   const items = [{ label: options.showLabel || '显示窗口', click: showWindow }];
+  if (typeof options.onNetworkSettings === 'function') items.push({ label: '网络代理设置…', click: options.onNetworkSettings });
   if (typeof options.onRestartBackend === 'function') {
     items.push({ label: options.restartLabel || '重新启动后端', click: options.onRestartBackend });
   }

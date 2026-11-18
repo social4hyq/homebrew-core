@@ -1,11 +1,12 @@
 'use strict';
 
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, session } = require('electron');
 const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
 const { isServerUrl, createUrlCollector } = require('./startup.cjs');
+const { normalizeProxySettings, toElectronProxyConfig } = require('./proxy.cjs');
 const tray = require('./tray.cjs');
 
 let config = { port: 0 };
@@ -32,6 +33,7 @@ const useTray = process.env.DSH_DESKTOP_NO_TRAY !== '1' && config.tray !== false
 let trayReady = false;
 let shellWindow = null;
 let driving = false;
+let settingsWindow = null;
 
 function validServerUrl(value) {
   return isServerUrl(value, config.port);
@@ -160,7 +162,7 @@ async function drive(win) {
   for (;;) {
     if (win.isDestroyed()) return;
     const url = readServerUrl();
-    if (await serverUp(url, 2000)) {
+    if (await serverUp(url, 500)) {
       await win.loadURL(url);
       return;
     }
@@ -172,7 +174,7 @@ async function drive(win) {
       waiting = true;
       await win.loadFile(path.join(__dirname, 'waiting.html'), { hash: serveSpawnError ? 'spawn-failed' : 'waiting' });
     }
-    await new Promise((resolve) => setTimeout(resolve, 250));
+    await new Promise((resolve) => setTimeout(resolve, 100));
   }
 }
 
@@ -185,7 +187,36 @@ function startDrive() {
     .finally(() => { driving = false; });
 }
 
-app.whenReady().then(() => {
+async function applyProxySettings() {
+  let prefs = { mode: 'system', url: '' };
+  try { prefs = Object.assign(prefs, JSON.parse(fs.readFileSync(path.join(app.getPath('userData'), 'network.json'), 'utf8'))); } catch {}
+  let settings;
+  try { settings = normalizeProxySettings(prefs); } catch { settings = { mode: 'system', url: '' }; }
+  await session.defaultSession.setProxy(toElectronProxyConfig(settings));
+}
+
+function openNetworkSettings() {
+  if (settingsWindow && !settingsWindow.isDestroyed()) { settingsWindow.focus(); return; }
+  const html = `<!doctype html><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'"><title>网络代理</title><style>body{font:15px sans-serif;padding:24px;background:#11141b;color:#eee}label{display:block;margin:12px 0}input{width:100%;padding:9px;box-sizing:border-box}button{padding:9px 20px}</style><h2>网络代理</h2><label><input type="radio" name="mode" value="direct"> 直接连接</label><label><input type="radio" name="mode" value="system"> 跟随系统</label><label><input type="radio" name="mode" value="manual"> 手动配置</label><input id="url" placeholder="http://127.0.0.1:7890"><p><button id="save">保存并应用</button></p><script>window.proxySettings.read().then(v=>{document.querySelector('[value="'+v.mode+'"]').checked=true;document.querySelector('#url').value=v.url||''});document.querySelector('#save').onclick=()=>window.proxySettings.save({mode:document.querySelector('[name=mode]:checked').value,url:document.querySelector('#url').value}).then(()=>window.close()).catch(e=>alert(e.message))</script>`;
+  settingsWindow = new BrowserWindow({ width: 420, height: 390, autoHideMenuBar: true, webPreferences: { preload: path.join(__dirname, 'proxy-preload.cjs'), contextIsolation: true, sandbox: true, nodeIntegration: false } });
+  settingsWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
+  settingsWindow.on('closed', () => { settingsWindow = null; });
+}
+
+const { ipcMain } = require('electron');
+ipcMain.handle('proxy:read', () => {
+  try { return JSON.parse(fs.readFileSync(path.join(app.getPath('userData'), 'network.json'), 'utf8')); }
+  catch { return { mode: 'system', url: '' }; }
+});
+ipcMain.handle('proxy:save', async (_event, value) => {
+  const settings = normalizeProxySettings(value);
+  const file = path.join(app.getPath('userData'), 'network.json');
+  fs.writeFileSync(file, JSON.stringify(settings), { mode: 0o600 });
+  await applyProxySettings();
+});
+
+app.whenReady().then(async () => {
+  await applyProxySettings();
   // The status bar item has to exist before the first window: electron-ohos
   // attaches every BrowserWindow UIAbility to it, and hideAbility() only keeps
   // the process alive while the item exists.
@@ -194,12 +225,12 @@ app.whenReady().then(() => {
       tray.create({
         tooltip: 'DeepSeek Harness',
         iconPath: path.join(__dirname, 'tray-icon.png'),
-        onQuit: stopServer,
         onRestartBackend: () => {
           stopServer();
           serverUrl = '';
           startDrive();
         },
+        onNetworkSettings: () => openNetworkSettings(),
       });
       trayReady = true;
     } catch (error) {
