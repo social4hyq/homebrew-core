@@ -10,7 +10,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 12
+  revision 13
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -40,6 +40,7 @@ class ZcodeApp < Formula
   # formula names it.
   RESOURCE_FILES = %w[
     Resources/_shared/electron-shell/tray.cjs
+    Resources/_shared/hap-app/install-lib.sh
     Resources/zcode-app/app/config.json
     Resources/zcode-app/app/main.cjs
     Resources/zcode-app/app/package.json
@@ -216,6 +217,10 @@ class ZcodeApp < Formula
     pkgshare.mkpath
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
+    # install-desktop.sh sources the install flow shared by the HAP apps from
+    # the same directory.
+    cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
+    chmod 0755, pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/zcode-desktop.sh", libexec/"zcode-desktop.sh"
     chmod 0755, libexec/"zcode-desktop.sh"
     (bin/"zcode-app").write_env_script libexec/"zcode-desktop.sh",
