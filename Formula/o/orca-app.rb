@@ -17,8 +17,9 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b8d6a068985f82fe857eb299bca63670d649731574b0fbc06cc0c121b588c559"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r4"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "36b163e562915928ac67f6681247157fbd75aae29b4556d9db1213fba3cb7f6b"
   end
 
   depends_on "app-installer"
