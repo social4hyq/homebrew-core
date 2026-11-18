@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -179,6 +179,16 @@ class HerdrApp < Formula
     permissions = manifest.dig("module", "requestPermissions").map { |permission| permission["name"] }
     assert_includes permissions, "ohos.permission.INTERNET"
     assert_equal "com.social4hyq.herdrapp", manifest.dig("app", "bundleName")
+
+    # The launcher icon is the one herdr-app ships (assets/icons/herdr-ui-icon-clean.png), not the template's.
+    system "unzip", "-o", hap, "resources/base/media/example_icon.png", "-d", testpath/"icon"
+    assert_equal "66be46ebed8e540bb023dbf71db04c758b2de14b64b643d7cafbcc31268fbd4c",
+                 (testpath/"icon/resources/base/media/example_icon.png").sha256
+
+    # The app's name is Herdr, not the template's "GPUI OHOS Example".
+    index = shell_output("unzip -p #{hap} resources.index").b
+    refute_includes index, "GPUI OHOS Example".b
+    assert_includes index, "Herdr".b
 
     assert_match "Usage: herdr-app", shell_output("#{bin}/herdr-app --help")
     wrapper = (bin/"herdr-app").read
