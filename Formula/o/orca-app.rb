@@ -352,7 +352,9 @@ class OrcaApp < Formula
     keep_tmp = testpath/"keep-tmp"
     keep_tmp.mkpath
     ENV["TMPDIR"] = keep_tmp.to_s
-    keep_output = shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --keep --no-serve 2>&1")
+    keep_output = shell_output(
+      "#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --keep --no-serve 2>&1",
+    )
     assert_match "signed HAP kept at #{keep_tmp}/orca-app-signed.hap", keep_output
     assert_match "installed", keep_output
     assert_equal "signed-by-fake", (keep_tmp/"orca-app-signed.hap").read
