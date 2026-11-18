@@ -5,7 +5,7 @@ class DeepseekHarnessApp < Formula
   sha256 "4668e9b8a5f836693c731a808214445f5fce6cfa2956cf47f473e9b6e023f4b3"
   license :cannot_represent
 
-  revision 2
+  revision 3
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -36,6 +36,7 @@ class DeepseekHarnessApp < Formula
   # is listed literally: the weekly remove-unused-patches job keeps a
   # Resources/ directory only while a formula names it.
   RESOURCE_FILES = %w[
+    Resources/_shared/hap-app/install-lib.sh
     Resources/deepseek-harness-app/app/config.json
     Resources/deepseek-harness-app/app/main.cjs
     Resources/deepseek-harness-app/app/package.json
@@ -173,6 +174,11 @@ class DeepseekHarnessApp < Formula
       (res/"scripts/install-desktop.sh").read,
     )
     chmod 0755, pkgshare/"install-desktop.sh"
+    # install-desktop.sh sources the install flow shared by the HAP apps from
+    # the same directory. cp, not install: the tap checkout is a read-only host
+    # mount inside the CI container.
+    cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
+    chmod 0755, pkgshare/"hap-app-install-lib.sh"
     (libexec/"deepseek-harness-desktop.sh").write(
       (res/"scripts/deepseek-harness-desktop.sh").read,
     )
@@ -229,6 +235,7 @@ class DeepseekHarnessApp < Formula
       while [ $# -gt 0 ]; do
         case "$1" in
           --hap) cp "$2" #{injected_copy}; shift 2 ;;
+          --signed-hap) echo signed > "$2"; shift 2 ;;
           *) shift ;;
         esac
       done
@@ -262,6 +269,17 @@ class DeepseekHarnessApp < Formula
     assert_match "installed", shell_output("#{bin}/dsh-app install --device chosen")
     installer = installer_args.read.lines(chomp: true)
     assert_equal "chosen", installer[installer.index("--device") + 1]
+    # --no-acl installs the strong-sandbox variant (the HAP's own permissions).
+    assert_match "strong-sandbox", shell_output("#{bin}/dsh-app install --no-acl")
+    strong = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
+    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
+                 strong.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }.sort
+    # --keep leaves the signed HAP next to the other temporary files and the
+    # result line names the variant that was installed.
+    kept_output = shell_output("#{bin}/dsh-app install --keep 2>&1")
+    assert_match "installed (com.social4hyq.deepseekharness, ACL)", kept_output
+    assert_match "signed HAP kept", kept_output
+    assert_path_exists Pathname(ENV.fetch("TMPDIR", "/tmp"))/"deepseek-harness-app-signed.hap"
 
     assert_match(/serving at|already healthy/, shell_output("#{bin}/dsh-app serve"))
     assert_match "healthy", shell_output("#{bin}/dsh-app status")
