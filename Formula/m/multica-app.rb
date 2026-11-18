@@ -11,8 +11,9 @@ class MulticaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.10.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "510fd782dca3c088bdb5da29d5c7b8f87e6dbec96015a16742e398ca9a24712e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.10.0-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "351087b8d22836823fe645c7c22cfea2fd9d7f3e505f7825b6ac5145df1230a7"
   end
 
   depends_on "go" => :build
@@ -34,6 +35,14 @@ class MulticaApp < Formula
       file Pathname(path).relative_path_from(patch_root).to_s
     end
   end
+
+  # Tap-authored files that are copied into the build but are not patches, so
+  # they live in Resources/ rather than Patches/. Every path is listed
+  # literally: the weekly remove-unused-patches job keeps a Resources/
+  # directory only while a formula names it.
+  RESOURCE_FILES = %w[
+    Resources/multica-app/assets/tray-icon.png
+  ].freeze
 
   def patch
     resource("electron-ohos").fetch
@@ -59,6 +68,11 @@ class MulticaApp < Formula
   end
 
   def install
+    tap_root = Pathname(__dir__).parent.parent
+    RESOURCE_FILES.each do |file|
+      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
+    end
+
     cd "server" do
       ENV["CGO_ENABLED"] = "0"
       system "go", "build",
@@ -150,7 +164,7 @@ class MulticaApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app/"out" if (app/"out").exist?
     cp_r buildpath/"apps/desktop/out", app/"out"
-    cp Pathname(__dir__).parent.parent/"Patches/multica-app/assets/tray-icon.png", app/"out/main/tray-icon.png"
+    cp tap_root/"Resources/multica-app/assets/tray-icon.png", app/"out/main/tray-icon.png"
     rm_r app/"node_modules" if (app/"node_modules").exist?
     package = JSON.parse((buildpath/"apps/desktop/package.json").read)
     package = package.slice("name", "productName", "version", "description", "main", "private", "type")
