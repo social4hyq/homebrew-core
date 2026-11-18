@@ -11,8 +11,8 @@ class Magpie < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-v0.1.4402-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0fddcc2f93c9dbc4ae47d40b7685cc1b868aa289bf74e1506aefc976263fd5a0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-v0.1.4408-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a5c72bece083eee49afe1a162fb82b0737a0354cce7805aa5e95aff628eb8fc"
   end
 
   depends_on "go" => :build
