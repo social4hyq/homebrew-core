@@ -22,12 +22,13 @@ usage() {
   cat <<'EOF'
 Usage: orca-app <command>
 
-  install [--port N] [--no-acl] [--hap PATH] [--config PATH] [--no-serve]
+  install [--port N] [--no-acl] [--keep] [--hap PATH] [--config PATH] [--no-serve]
                       Write the host connection into the shell HAP, sign and
                       install it on the connected device, then open the app
                       (--hap overrides the bundled unsigned HAP, --config reuses
-                      a pre-written host config, --no-serve only installs, and
-                      --no-acl installs the strong-sandbox variant).
+                      a pre-written host config, --no-serve only installs,
+                      --no-acl installs the strong-sandbox variant, and --keep
+                      keeps the signed HAP and prints where).
   start               Open the installed app; it starts the runtime server
                       itself when none is running.
   serve [--port N]    Start a host-side runtime server for browser/CLI use (the
@@ -219,10 +220,13 @@ device() {
 }
 
 cmd_install() {
-  local extra=() hap="" start=1 config="" port=""
+  # extra is also what decides the installed mode below, so --keep, which does
+  # not change the variant, gets its own array.
+  local extra=() keep=() hap="" start=1 config="" port=""
   while [ $# -gt 0 ]; do
     case "$1" in
       --no-acl) extra+=("--no-acl"); shift ;;
+      --keep) keep+=("--keep"); shift ;;
       --no-serve) start=0; shift ;;
       --port)
         [ $# -ge 2 ] || die "--port needs a number"
@@ -250,7 +254,7 @@ cmd_install() {
   [ -f "$config" ] || die "host config not found: $config"
   "${ORCA_DESKTOP_INSTALL_SCRIPT:?missing install script}" \
     --hap "${hap:-${ORCA_DESKTOP_UNSIGNED_HAP:?missing unsigned HAP}}" \
-    --config "$config" "${extra[@]+"${extra[@]}"}"
+    --config "$config" "${extra[@]+"${extra[@]}"}" "${keep[@]+"${keep[@]}"}"
   mkdir -p "$CONFIG_DIR"
   if [ "${#extra[@]}" -gt 0 ]; then
     printf 'no-acl\n' > "$INSTALLED_MODE_FILE"

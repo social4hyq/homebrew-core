@@ -9,7 +9,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -17,8 +17,8 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f89d614d88d4da19312eeabbe45e604e35a66e7f89e7efa59ba6d75add953cac"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ae88a2be70c2c03f986831bb31804ba53f3606a3b0c24ee82f71588333b2dad"
   end
 
   depends_on "app-installer"
@@ -295,6 +295,7 @@ class OrcaApp < Formula
       while [ $# -gt 0 ]; do
         case "$1" in
           --hap) cp "$2" #{injected_copy}; shift 2 ;;
+          --signed-hap) printf 'signed-by-fake' > "$2"; shift 2 ;;
           *) shift ;;
         esac
       done
@@ -344,6 +345,20 @@ class OrcaApp < Formula
     strong_permissions = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
                              .dig("module", "requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.INTERNET], strong_permissions
+
+    # --keep is passed through to the install script, which copies the signed
+    # HAP out and says where. It does not change the variant, so the installed
+    # mode stays acl.
+    keep_tmp = testpath/"keep-tmp"
+    keep_tmp.mkpath
+    ENV["TMPDIR"] = keep_tmp.to_s
+    keep_output = shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --keep --no-serve 2>&1")
+    assert_match "signed HAP kept at #{keep_tmp}/orca-app-signed.hap", keep_output
+    assert_match "installed", keep_output
+    assert_equal "signed-by-fake", (keep_tmp/"orca-app-signed.hap").read
+    assert_equal "acl\n", (testpath/"home/.config/orca-app/installed.mode").read
+    refute_match "signed HAP kept",
+                 shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --no-serve 2>&1")
 
     # status/stop read the port from the state file, so pin it to a port this
     # machine cannot have an Orca server on.
