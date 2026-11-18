@@ -5,7 +5,7 @@ class DeepseekHarnessApp < Formula
   sha256 "4668e9b8a5f836693c731a808214445f5fce6cfa2956cf47f473e9b6e023f4b3"
   license :cannot_represent
 
-  revision 3
+  revision 4
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -13,9 +13,8 @@ class DeepseekHarnessApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.4-r6"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a1d69dc80b89ec17c512737d648ef237543e38711b53c343c41e1aa707badf8"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.4-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e7c34e21b01f76a02b8918ff9c9b31613204eaed2962454b88e2f8f82f6abfc3"
   end
 
   depends_on "app-installer"
@@ -24,6 +23,7 @@ class DeepseekHarnessApp < Formula
   depends_on "deepseek-harness"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
+  depends_on "unzip"
   depends_on "util-linux"
   depends_on "zip"
 
