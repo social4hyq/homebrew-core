@@ -2,7 +2,7 @@ class OpencodeApp < Formula
   desc "Desktop shell for the OpenCode agent (Electron window on local opencode serve)"
   homepage "https://opencode.ai"
   # Version follows the upstream opencode tag: this shell wraps that release,
-  # and the OHOS shell sources live in Patches/opencode-app.
+  # and the OHOS shell sources live in Resources/opencode-app.
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v2.3.0.tar.gz"
   sha256 "48b0ab7c4732d693c59e0ad7d73656a2965b2def78cef3c6319e444b7e6c0300"
   # Tap-authored shell sources (MIT) packaging the CPF-Electron runtime
@@ -28,6 +28,21 @@ class OpencodeApp < Formula
   depends_on "opencode"
   depends_on "zip"
 
+  # Shell sources live in the tap so they are reviewable in the PR. Every path
+  # is listed literally: the weekly remove-unused-patches job keeps a
+  # Resources/ directory only while a formula names it.
+  RESOURCE_FILES = %w[
+    Resources/_shared/electron-shell/tray.cjs
+    Resources/opencode-app/app/config.json
+    Resources/opencode-app/app/main.cjs
+    Resources/opencode-app/app/package.json
+    Resources/opencode-app/app/waiting.html
+    Resources/opencode-app/assets/icon.png
+    Resources/opencode-app/assets/tray-icon.png
+    Resources/opencode-app/scripts/install-desktop.sh
+    Resources/opencode-app/scripts/opencode-desktop.sh
+  ].freeze
+
   resource "electron-ohos" do
     url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
@@ -35,7 +50,11 @@ class OpencodeApp < Formula
 
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    payload = tap_root/"Patches/opencode-app"
+    res = tap_root/"Resources/opencode-app"
+    RESOURCE_FILES.each do |file|
+      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
+    end
+
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
     system "tar", "-xzf", buildpath/"libelectron_144.tar.gz", "-C", buildpath
@@ -44,18 +63,19 @@ class OpencodeApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs package.json config.json waiting.html tray.cjs].each do |name|
-      cp payload/"app"/name, app/name
+    %w[main.cjs package.json config.json waiting.html].each do |name|
+      cp res/"app"/name, app/name
     end
+    cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
 
-    cp payload/"assets/icon.png", app/"app-icon.png"
-    cp payload/"assets/tray-icon.png", app/"tray-icon.png"
+    cp res/"assets/icon.png", app/"app-icon.png"
+    cp res/"assets/tray-icon.png", app/"tray-icon.png"
 
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.opencodedesktop"'
     inreplace shell/"AppScope/app.json5", '"vendor": "example"', '"vendor": "social4hyq"'
     %w[app_icon.png startIcon.png].each do |name|
-      cp payload/"assets/icon.png", shell/"AppScope/resources/base/media"/name
+      cp res/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
     # App name and ability labels live in per-locale string resources: patching
     # only the base file leaves the zh_CN/en_US overrides intact and the
@@ -167,13 +187,12 @@ class OpencodeApp < Formula
     end
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
-    (pkgshare/"install-desktop.sh").write(
-      (payload/"scripts/install-desktop.sh").read,
-    )
+    # cp, not install: Pathname#install moves the source, and the tap checkout
+    # is a read-only host mount inside the CI container.
+    pkgshare.mkpath
+    cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    (libexec/"opencode-desktop.sh").write(
-      (payload/"scripts/opencode-desktop.sh").read,
-    )
+    cp res/"scripts/opencode-desktop.sh", libexec/"opencode-desktop.sh"
     chmod 0755, libexec/"opencode-desktop.sh"
     (bin/"opencode-app").write_env_script libexec/"opencode-desktop.sh",
       OPENCODE_DESKTOP_UNSIGNED_HAP:   libexec/"opencode-desktop-unsigned.hap",
