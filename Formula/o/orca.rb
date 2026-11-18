@@ -63,12 +63,26 @@ class Orca < Formula
     sha256 "266866c1b0efd7ca5307fe312411e4f1895b997086fb76f392ec5b60aadf31c8"
   end
 
+  # Tap-authored files that are copied into the build or the keg but are not
+  # patches, so they live in Resources/ rather than Patches/. Every path is
+  # listed literally: the weekly remove-unused-patches job keeps a Resources/
+  # directory only while a formula names it. The one patch stays in Patches/.
+  RESOURCE_FILES = %w[
+    Resources/orca/build-orcad-server.mjs
+    Resources/orca/orca.sh
+  ].freeze
+
   def node_output(code)
     Utils.safe_popen_read("node", "-p", code).chomp
   end
 
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
+    res = tap_root/"Resources/orca"
+    RESOURCE_FILES.each do |file|
+      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
+    end
+
     sdk = formula_opt_prefix("ohos-sdk-native")
     toolchain = sdk/"llvm/bin/aarch64-unknown-linux-ohos-clang"
     odie "the OpenHarmony native SDK toolchain is missing" unless toolchain.exist?
@@ -140,12 +154,12 @@ class Orca < Formula
     # The OpenHarmony esbuild package is a WASM shim; a larger heap target keeps
     # its Go GC from growing into the mark-assertion that killed one bundle.
     ENV["GOGC"] = "400"
-    system "node", tap_root/"Patches/orca/build-orcad-server.mjs"
+    system "node", res/"build-orcad-server.mjs"
 
     libexec.install "orcad"
     # cp, not install: Pathname#install moves the source, and the tap checkout
     # is a read-only host mount inside the CI container.
-    cp tap_root/"Patches/orca/orca.sh", libexec/"orca.sh"
+    cp res/"orca.sh", libexec/"orca.sh"
     chmod 0755, libexec/"orca.sh"
     path = "#{formula_opt_bin("node")}:#{formula_opt_bin("ripgrep")}:$PATH"
     (bin/"orca").write_env_script libexec/"orca.sh", { ORCA_ROOT: libexec, PATH: path }
