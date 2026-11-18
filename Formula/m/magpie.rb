@@ -11,12 +11,17 @@ class Magpie < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-v0.1.4402-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cf2ae52e717a232989584419722a4635f8dc12a8403d6210fed367bbd701e8a9"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-v0.1.4402-r3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d2db05169e96162c07996c4adde7d5f95cdb711c5222033527acaf4fafd4e66"
   end
 
   depends_on "go" => :build
   depends_on "bun"
+
+  patch do
+    file "Patches/magpie/0001-open-browser-on-openharmony.patch"
+  end
 
   def install
     ENV["CGO_ENABLED"] = "0"

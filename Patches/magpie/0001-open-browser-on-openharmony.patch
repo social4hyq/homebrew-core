@@ -1,0 +1,14 @@
+--- a/internal/proc/browser.go
++++ b/internal/proc/browser.go
+@@ -41,6 +41,11 @@
+ 		return exe, []string{"url.dll,FileProtocolHandler", url}
+ 	case "android":
+ 		return "termux-open-url", []string{url}
++	case "openharmony":
++		if _, err := exec.LookPath("aa"); err == nil {
++			return "aa", []string{"start", "-b", "com.huawei.hmos.browser", "-a", "MainAbility", "-U", url}
++		}
++		return "open", []string{url}
+ 	default:
+ 		return "xdg-open", []string{url}
+ 	}
