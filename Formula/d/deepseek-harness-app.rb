@@ -5,7 +5,7 @@ class DeepseekHarnessApp < Formula
   sha256 "4668e9b8a5f836693c731a808214445f5fce6cfa2956cf47f473e9b6e023f4b3"
   license :cannot_represent
 
-  revision 3
+  revision 4
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -24,6 +24,7 @@ class DeepseekHarnessApp < Formula
   depends_on "deepseek-harness"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
+  depends_on "unzip"
   depends_on "util-linux"
   depends_on "zip"
 
