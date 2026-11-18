@@ -5,8 +5,8 @@
  		return "termux-open-url", []string{url}
  	default:
 +		if goos == "linux" || goos == "openharmony" {
-+			if _, err := exec.LookPath("aa"); err == nil {
-+				return "aa", []string{"start", "-b", "com.huawei.hmos.browser", "-a", "MainAbility", "-U", url}
++			if _, err := exec.LookPath("/bin/aa"); err == nil {
++				return "/bin/aa", []string{"start", "-b", "com.huawei.hmos.browser", "-a", "MainAbility", "-U", url}
 +			}
 +		}
  		return "xdg-open", []string{url}
