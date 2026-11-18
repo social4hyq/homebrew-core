@@ -10,7 +10,7 @@ class ObsidianApp < Formula
   # Obsidian's own release at install time (never copied into the bottle); see
   # obsidian.md terms and multica.rb.
   license :cannot_represent
-  revision 5
+  revision 6
 
   # Upstream is the vendor app, not the tap-authored host payload: the formula
   # version tracks Obsidian so `brew upgrade` follows new releases, while the
@@ -24,9 +24,8 @@ class ObsidianApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "909084aaf22ff0685d29835dea35b961713fd7e40b2f48fc6c36bc3a0a999294"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c0c9edea7bba054f2c52b1c6e32bce433fa440dd802aea3d05163ff07a30b2f8"
   end
 
   depends_on "app-installer"
@@ -40,6 +39,7 @@ class ObsidianApp < Formula
   # source files literal here: the weekly remove-unused-patches job keeps a
   # Resources/ directory only while a formula names it.
   RESOURCE_FILES = %w[
+    Resources/_shared/hap-app/install-lib.sh
     Resources/obsidian-app/app/bootstrap.cjs
     Resources/obsidian-app/app/node_modules/@electron/remote/LICENSE
     Resources/obsidian-app/app/node_modules/@electron/remote/README.md
@@ -269,6 +269,10 @@ class ObsidianApp < Formula
 
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
+    # install-desktop.sh sources the install flow shared by the HAP apps from
+    # the same directory.
+    cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
+    chmod 0755, pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/obsidian-desktop.sh", libexec/"obsidian-desktop.sh"
     chmod 0755, libexec/"obsidian-desktop.sh"
     cp res/"scripts/obsidian-cli.cjs", libexec/"obsidian-cli.cjs"
