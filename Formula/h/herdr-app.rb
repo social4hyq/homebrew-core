@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -13,8 +13,8 @@ class HerdrApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "60c50dd2cbfb477916776d9c891588aa55f3cefbaeac955b5e2b081de94928c1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d90eb814ec14756677d8586ecffc5453683d2e6c3541e334edf45e194692202e"
   end
 
   depends_on "node" => :build
@@ -29,13 +29,19 @@ class HerdrApp < Formula
   # The terminal engine builds libghostty-vt from the ghostty submodule, which
   # GitHub archives leave out. Its simdutf package only requests PIC for
   # musl/android/freebsd, so the OHOS ABI fails to link with R_AARCH64_ABS64
-  # relocation errors.
+  # relocation errors. Its translate_c package is only published on
+  # codeberg.org, which the CI container could not always resolve, so the second
+  # patch fetches the same package (same zig hash) from a release of this tap.
   resource "ghostty" do
     url "https://github.com/ghostty-org/ghostty/archive/291fd050b9e9c293c8adb6a140742649b7e42d3a.tar.gz"
     sha256 "f35b464f1aee22ffda9f6359038b9ad18a784342b4a4fa1cb97a79fb9ade79a4"
 
     patch do
       file "Patches/herdr-app/ghostty/0001-simdutf-pic-ohos.patch"
+    end
+
+    patch do
+      file "Patches/herdr-app/ghostty/0002-translate-c-mirror.patch"
     end
   end
 
@@ -179,6 +185,20 @@ class HerdrApp < Formula
     permissions = manifest.dig("module", "requestPermissions").map { |permission| permission["name"] }
     assert_includes permissions, "ohos.permission.INTERNET"
     assert_equal "com.social4hyq.herdrapp", manifest.dig("app", "bundleName")
+
+    # The launcher icon is the one herdr-app ships (assets/icons/herdr-ui-icon-clean.png), not the template's.
+    system "unzip", "-o", hap, "resources/base/media/example_icon.png", "-d", testpath/"icon"
+    assert_equal "66be46ebed8e540bb023dbf71db04c758b2de14b64b643d7cafbcc31268fbd4c",
+                 (testpath/"icon/resources/base/media/example_icon.png").sha256
+
+    # The app's name is Herdr, not the template's "GPUI OHOS Example".
+    index = shell_output("unzip -p #{hap} resources.index").b
+    refute_includes index, "GPUI OHOS Example".b
+    assert_includes index, "Herdr".b
+
+    # A link clicked in the terminal opens the system browser through the host's aa, so the library names it.
+    library = shell_output("unzip -p #{hap} libs/arm64-v8a/libopenharmony_ability.so").b
+    assert_includes library, "com.huawei.hmos.browser".b
 
     assert_match "Usage: herdr-app", shell_output("#{bin}/herdr-app --help")
     wrapper = (bin/"herdr-app").read
