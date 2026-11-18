@@ -4,12 +4,7 @@ class SnowShotApp < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.7_snow-shot.tar.gz"
   sha256 "6d9de662710ccf406dea312c0322e77a3f473bc6121096ec82df713d30f4273c"
   license "GPL-3.0-or-later"
-  revision 18
-
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7e74e9176d1ca3dd334a7e65a1d759da8d22e1aecf21ac77ddfe96ab4474f9d2"
-  end
+  revision 19
 
   depends_on "brotli" => :build
   depends_on "bzip2" => :build
@@ -23,6 +18,7 @@ class SnowShotApp < Formula
   depends_on "highway" => :build
   depends_on "imath" => :build
   depends_on "jpeg-turbo" => :build
+  depends_on "jpeg-xl" => :build
   depends_on "libheif" => :build
   depends_on "libpng" => :build
   depends_on "libtiff" => :build
@@ -32,14 +28,13 @@ class SnowShotApp < Formula
   depends_on "ninja" => :build
   depends_on "node" => :build
   depends_on "ohos-sdk" => :build
+  depends_on "openexr" => :build
   depends_on "openssl@4" => :build
   depends_on "patchelf" => :build
   depends_on "pkgconf" => :build
   depends_on "plutovg" => :build
   depends_on "rust" => :build
   depends_on "snow-shot-opencv" => :build
-  depends_on "social4hyq/core/jpeg-xl" => :build
-  depends_on "social4hyq/core/openexr" => :build
   depends_on "tinyxml2" => :build
   depends_on "webp" => :build
   depends_on "zlib-ng-compat" => :build
