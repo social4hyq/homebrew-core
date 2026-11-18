@@ -5,6 +5,8 @@ class DeepseekHarnessApp < Formula
   sha256 "4668e9b8a5f836693c731a808214445f5fce6cfa2956cf47f473e9b6e023f4b3"
   license :cannot_represent
 
+  revision 1
+
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
     regex(/^dsh-v(\d+\.\d+\.\d+(?:-(?:alpha|rc)\.\d+)?)$/i)
@@ -38,6 +40,8 @@ class DeepseekHarnessApp < Formula
     rm_r app if app.exist?
     app.mkpath
     cp tap_root/"Patches/deepseek-harness-app/app/main.cjs", app
+    cp tap_root/"Patches/deepseek-harness-app/app/proxy-preload.cjs", app
+    cp tap_root/"Patches/deepseek-harness-app/app/proxy.cjs", app
     cp tap_root/"Patches/deepseek-harness-app/app/startup.cjs", app
     cp tap_root/"Patches/deepseek-harness-app/app/tray.cjs", app
     cp tap_root/"Patches/deepseek-harness-app/app/package.json", app
@@ -154,6 +158,7 @@ class DeepseekHarnessApp < Formula
       PATH:                       "#{formula_opt_bin("node")}:#{formula_opt_bin("deepseek-harness")}:$PATH"
     pkgshare.mkpath
     cp tap_root/"Patches/deepseek-harness-app/tests/test-startup.cjs", pkgshare/"test-startup.cjs"
+    cp tap_root/"Patches/deepseek-harness-app/tests/test-proxy.cjs", pkgshare/"test-proxy.cjs"
     bin.install_symlink bin/"dsh-app" => "deepseek-harness-desktop"
   end
 
@@ -259,6 +264,8 @@ class DeepseekHarnessApp < Formula
     assert_match "pack.info", listing
     assert_match "libs/arm64-v8a/libelectron.so", listing
     assert_match "resources/resfile/resources/app/main.cjs", listing
+    assert_match "resources/resfile/resources/app/proxy.cjs", listing
+    assert_match "resources/resfile/resources/app/proxy-preload.cjs", listing
     assert_match "resources/resfile/resources/app/tray.cjs", listing
     assert_match "resources/resfile/resources/app/tray-icon.png", listing
     assert_match "resources/resfile/resources/app/waiting.html", listing
@@ -272,6 +279,10 @@ class DeepseekHarnessApp < Formula
     helper.write shell_output("unzip -p #{hap} resources/resfile/resources/app/startup.cjs")
     ENV["DSH_APP_STARTUP_HELPER"] = helper
     system "node", "--test", pkgshare/"test-startup.cjs"
+    proxy_helper = testpath/"proxy.cjs"
+    proxy_helper.write shell_output("unzip -p #{hap} resources/resfile/resources/app/proxy.cjs")
+    ENV["DSH_APP_PROXY_HELPER"] = proxy_helper
+    system "node", "--test", pkgshare/"test-proxy.cjs"
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
     assert_equal 0, placeholder.fetch("port")
     package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
