@@ -30,7 +30,7 @@ name: pr-validate
 on:
   pull_request:
     branches: [main]
-    paths: ['Formula/**']
+    paths: ['Formula/**', 'Patches/**', 'Resources/**']
 
 defaults:
   run:

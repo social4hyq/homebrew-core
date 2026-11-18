@@ -190,6 +190,7 @@ def build_prompt(formula, subdir, report_dir):
   /status.json
   /Formula/{subdir}/{formula}
   /Patches/{formula}
+  /Resources/{formula}
 
 status.json 的格式：
 成功：{{"status": "success"}}
@@ -202,7 +203,8 @@ status.json 的格式：
    - Harmonybrew 官方（若存在同名 formula）：https://gitcode.com/Harmonybrew/homebrew-core/blob/main/Formula/{subdir}/{formula}.rb
 2. 升级过程不要抛弃掉原有的鸿蒙适配补丁或者鸿蒙适配的构建参数（部分软件包可能有，不是每个软件包都一定有）
 3. 如果需要制作补丁或新增补丁，请参考本 tap 的现有写法：Patches/<formula>/ 编号补丁文件 + formula 内 `patch do file` 挂载（可参考 bun、herdr、opencode 的现有补丁）
-4. 只允许修改 Formula/ 与 Patches/ 下的内容，不要动仓库里其他任何文件（包括 .github/）
+   tap 自写的非补丁文件（Electron 壳源码、图标、启动/安装脚本、HAP 模板）放 Resources/<formula>/，不要放进 Patches/
+4. 只允许修改 Formula/、Patches/ 与 Resources/ 下的内容，不要动仓库里其他任何文件（包括 .github/）
 5. 这个报告用来展示在 PR 评论区，因此不宜过长
 6. report.md 会被嵌套在评论已有的一级标题之下，因此不要写总标题，也不要使用一级标题（#），正文直接从二级标题（##）开始分节，例如按 `## 现象`、`## 根因`、`## 修复`、`## 验证` 组织
 """
@@ -370,6 +372,13 @@ def push_fix(report_host, formula, subdir, head_branch):
         shutil.rmtree(os.path.join(repo_dir, "Patches", formula), ignore_errors=True)
         os.makedirs(os.path.join(repo_dir, "Patches"), exist_ok=True)
         shutil.copytree(src_patches, os.path.join(repo_dir, "Patches", formula))
+
+    # Resources/ 同理：AI 产出了才覆盖
+    src_resources = os.path.join(report_host, "Resources", formula)
+    if os.path.isdir(src_resources):
+        shutil.rmtree(os.path.join(repo_dir, "Resources", formula), ignore_errors=True)
+        os.makedirs(os.path.join(repo_dir, "Resources"), exist_ok=True)
+        shutil.copytree(src_resources, os.path.join(repo_dir, "Resources", formula))
 
     run(["git", "add", "-A"], cwd=repo_dir)
     res = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=repo_dir)

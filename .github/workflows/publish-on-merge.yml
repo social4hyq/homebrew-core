@@ -27,7 +27,7 @@ name: publish-on-merge
 on:
   push:
     branches: [main]
-    paths: ['Formula/**']
+    paths: ['Formula/**', 'Patches/**', 'Resources/**']
 
 defaults:
   run:

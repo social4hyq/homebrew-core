@@ -82,6 +82,10 @@ brew install bun
 
 `ohos-compat-shim` 只处理部分已知的系统调用与运行库差异，并非所有工具都会自动加载。需要诊断时可运行 `ohos-shim check`，兼容层的使用方式见其[项目说明](https://github.com/social4hyq/ohos-compat-shim)。历史限制与排查线索见 [docs/known-limitations.md](docs/known-limitations.md)；具体表现以当前系统和工具版本为准。
 
+## HAP 应用 formula
+
+`*-app` 类 formula 的目录布局（`Patches/` 与 `Resources/`）、标准骨架和命名约定见 [docs/hap-app-formulae.md](docs/hap-app-formulae.md)。
+
 ## 反馈与仓库
 
 问题请到 [GitHub Issues](https://github.com/social4hyq/homebrew-core/issues) 反馈，附 HarmonyOS 版本、`<工具> --version`、复现命令。本仓库以 GitHub 为唯一源头；[atomgit 同名仓库](https://atomgit.com/social4hyq/homebrew-core) 是单向镜像，只为国内更快下载 bottle，请勿向其推送或开 PR。
