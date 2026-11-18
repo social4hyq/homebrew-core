@@ -1,0 +1,12 @@
+diff --git a/pkg/translate-c/build.zig.zon b/pkg/translate-c/build.zig.zon
+--- a/pkg/translate-c/build.zig.zon
++++ b/pkg/translate-c/build.zig.zon
+@@ -12,7 +12,7 @@
+             .path = "../apple-sdk",
+         },
+         .translate_c = .{
+-            .url = "https://codeberg.org/vancluever/translate-c/archive/4e879eb8aba615de112eabd1231ea6e01920cead.tar.gz",
++            .url = "https://github.com/social4hyq/homebrew-core/releases/download/herdr-app-deps-translate-c-4e879eb8/translate_c-0.0.0-Q_BUWhVNBwDOEcIqub4VFPJPB6D9dgwzUMHTX5KWr8Xr.tar.gz",
+             .hash = "translate_c-0.0.0-Q_BUWhVNBwDOEcIqub4VFPJPB6D9dgwzUMHTX5KWr8Xr",
+         },
+     },

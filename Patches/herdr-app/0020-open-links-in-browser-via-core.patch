@@ -1,0 +1,70 @@
+diff --git a/src/links.rs b/src/links.rs
+index 65999da..36291e8 100644
+--- a/src/links.rs
++++ b/src/links.rs
+@@ -182,7 +182,38 @@ fn open_system(arg: &std::ffi::OsStr) {
+     });
+ }
+ 
+-#[cfg(not(windows))]
++/// The system browser's own ability, started the way `aa start -b com.huawei.hmos.browser -a MainAbility
++/// -U <url>` does in a shell. Only web links: the browser would take a `file:` or `hwbrowser:` link too,
++/// but nothing else a terminal link can hold (`ssh:`, `tel:`, `magnet:`, ...) is for it.
++#[cfg(any(all(target_os = "linux", target_env = "ohos"), test))]
++fn browser_args(url: &str) -> Option<Vec<String>> {
++    let host_and_path = url.strip_prefix("https://").or_else(|| url.strip_prefix("http://"))?;
++    if host_and_path.is_empty() || url.chars().any(|c| c.is_whitespace() || c.is_control()) {
++        return None;
++    }
++    Some(["start", "-b", "com.huawei.hmos.browser", "-a", "MainAbility", "-U", url].map(str::to_owned).to_vec())
++}
++
++/// The HAP sandbox cannot run a program (there is no `xdg-open` to spawn anyway), so the host's `aa` starts
++/// the browser through the core, like the mods' `herdr.exec`. `/usr/bin/aa` is only a stub: the program is
++/// `/bin/aa`, and the core does not run a shell to find it.
++#[cfg(all(target_os = "linux", target_env = "ohos"))]
++fn open_system(arg: &std::ffi::OsStr) {
++    let Some(args) = arg.to_str().and_then(browser_args) else {
++        tracing::warn!("cannot open {arg:?} from the HarmonyOS app: only http and https links go to the browser");
++        return;
++    };
++    // The call waits for the core: never on the UI thread.
++    std::thread::spawn(move || match crate::ohos_exec::exec("/bin/aa", &args, None, std::time::Duration::from_secs(15)) {
++        Ok((0, out, _)) if String::from_utf8_lossy(&out).contains("successfully") => {}
++        Ok((code, out, err)) => {
++            tracing::warn!("cannot open link: aa exited {code}: {} {}", String::from_utf8_lossy(&out).trim(), String::from_utf8_lossy(&err).trim())
++        }
++        Err(e) => tracing::warn!("cannot open link: {e}"),
++    });
++}
++
++#[cfg(all(not(windows), not(all(target_os = "linux", target_env = "ohos"))))]
+ fn open_system(arg: &std::ffi::OsStr) {
+     let opener = if cfg!(target_os = "macos") { "open" } else { "xdg-open" };
+     let spawned = std::process::Command::new(opener)
+@@ -202,6 +233,25 @@ fn open_system(arg: &std::ffi::OsStr) {
+ mod tests {
+     use super::*;
+ 
++    #[test]
++    fn web_links_become_an_aa_start_of_the_system_browser() {
++        let args = browser_args("https://example.com/a?b=1&c=2#d").unwrap();
++        assert_eq!(args, ["start", "-b", "com.huawei.hmos.browser", "-a", "MainAbility", "-U", "https://example.com/a?b=1&c=2#d"]);
++        assert_eq!(browser_args("http://localhost:8080/").unwrap().last().unwrap(), "http://localhost:8080/");
++    }
++
++    #[test]
++    fn nothing_but_web_links_goes_to_the_browser() {
++        for url in ["mailto:a@b.c", "ssh://host", "tel:+123", "magnet:?xt=urn:x", "file:///etc/passwd", "hwbrowser://x", "ftp://h/f", "-U", "", "https://", "http://"] {
++            assert_eq!(browser_args(url), None, "{url}");
++        }
++        // The URL is one argument of the program, never a shell line, but a link with a break or a control
++        // character in it is not one the pattern can match either.
++        for url in ["https://a b", "https://a\nb", "https://a\tb", "https://a\u{0}b"] {
++            assert_eq!(browser_args(url), None, "{url:?}");
++        }
++    }
++
+     fn first(text: &str) -> Option<&str> {
+         PATTERN.find(text).unwrap().map(|m| m.as_str())
+     }
