@@ -30,7 +30,8 @@ name: pr-validate
 on:
   pull_request:
     branches: [main]
-    paths: ['Formula/**', 'Patches/**', 'Resources/**']
+    paths: ['Formula/**', 'Patches/**', 'Resources/**',
+            '.github/scripts/check-hap-formulae.py', '.github/scripts/test-hap-install-lib.sh']
 
 defaults:
   run:
@@ -77,6 +78,19 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha }}
           HEAD: ${{ github.event.pull_request.head.sha }}
         run: .github/scripts/lint-commit-messages.sh
+
+  hap-checks:
+    # Independent of detect, like lint-commits: cheap static checks of the HAP
+    # app formulae and a standalone test of the shared install library, so a
+    # mistake fails in seconds instead of after a 20-minute build.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check HAP app formulae
+        run: python3 .github/scripts/check-hap-formulae.py
+      - name: Test the shared install library
+        run: .github/scripts/test-hap-install-lib.sh
 
   detect:
     runs-on: ubuntu-latest
@@ -156,8 +170,8 @@ jobs:
     permissions:
       contents: write
       packages: read
-    needs: [detect, lint-commits]
-    if: needs.detect.outputs.build != '[]' && needs.lint-commits.result == 'success'
+    needs: [detect, lint-commits, hap-checks]
+    if: needs.detect.outputs.build != '[]' && needs.lint-commits.result == 'success' && needs.hap-checks.result == 'success'
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -202,7 +216,7 @@ jobs:
         run: .github/scripts/upstream-diff-comment.sh
 
   label:
-    needs: [lint-commits, detect, light-check, build]
+    needs: [lint-commits, hap-checks, detect, light-check, build]
     # light-check/build are conditionally skipped when their input list is
     # empty; treat skipped as pass so a PR that only touches one category
     # (e.g. light-check-only heavy formula) still gets labeled. lint-commits
@@ -210,6 +224,7 @@ jobs:
     if: |
       always() &&
       needs.lint-commits.result == 'success' &&
+      needs.hap-checks.result == 'success' &&
       (needs.light-check.result == 'success' || needs.light-check.result == 'skipped') &&
       (needs.build.result == 'success' || needs.build.result == 'skipped')
     runs-on: ubuntu-latest
