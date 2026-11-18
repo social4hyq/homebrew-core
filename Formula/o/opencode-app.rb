@@ -8,7 +8,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 6
+  revision 7
 
   livecheck do
     url :stable
@@ -34,6 +34,7 @@ class OpencodeApp < Formula
   # Resources/ directory only while a formula names it.
   RESOURCE_FILES = %w[
     Resources/_shared/electron-shell/tray.cjs
+    Resources/_shared/hap-app/install-lib.sh
     Resources/opencode-app/app/config.json
     Resources/opencode-app/app/main.cjs
     Resources/opencode-app/app/package.json
@@ -193,6 +194,10 @@ class OpencodeApp < Formula
     pkgshare.mkpath
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
+    # install-desktop.sh sources the install flow shared by the HAP apps from
+    # the same directory.
+    cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
+    chmod 0755, pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/opencode-desktop.sh", libexec/"opencode-desktop.sh"
     chmod 0755, libexec/"opencode-desktop.sh"
     (bin/"opencode-app").write_env_script libexec/"opencode-desktop.sh",
@@ -247,6 +252,7 @@ class OpencodeApp < Formula
       while [ $# -gt 0 ]; do
         case "$1" in
           --hap) cp "$2" #{injected_copy}; shift 2 ;;
+          --signed-hap) echo signed > "$2"; shift 2 ;;
           *) shift ;;
         esac
       done
@@ -283,6 +289,12 @@ class OpencodeApp < Formula
     strong = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
                  strong.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }.sort
+    # --keep leaves the signed HAP next to the other temporary files and the
+    # result line names the variant that was installed.
+    kept_output = shell_output("#{bin}/opencode-app install --keep 2>&1")
+    assert_match "installed (com.social4hyq.opencodedesktop, ACL)", kept_output
+    assert_match "signed HAP kept", kept_output
+    assert_path_exists Pathname(ENV.fetch("TMPDIR", "/tmp"))/"opencode-app-signed.hap"
 
     assert_match "serving at", shell_output("#{bin}/opencode-app serve")
     assert_match "healthy", shell_output("#{bin}/opencode-app status")
