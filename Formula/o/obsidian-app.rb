@@ -5,7 +5,7 @@ class ObsidianApp < Formula
   sha256 "3f6808c14204063349d5a7a59b9f2f637958063fa85eeebe767e13e06d314c0f"
   # The stable url is the vendor app package, so `version`, `brew bump-formula-pr`
   # and autobump all follow Obsidian itself. The tap-authored host payload lives
-  # under Patches/obsidian-app and stays version-independent. Obsidian is
+  # under Resources/obsidian-app and stays version-independent. Obsidian is
   # proprietary and is never redistributed here: the asar is fetched from
   # Obsidian's own release at install time (never copied into the bottle); see
   # obsidian.md terms and multica.rb.
@@ -24,8 +24,9 @@ class ObsidianApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "44abb2da82d5d0982d37b277b84fd027680e29716b1991b33b7c5aefa885506a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "909084aaf22ff0685d29835dea35b961713fd7e40b2f48fc6c36bc3a0a999294"
   end
 
   depends_on "app-installer"
@@ -36,43 +37,44 @@ class ObsidianApp < Formula
   depends_on "zip"
 
   # The payload is copied from the tap's read-only checkout during CI. Keep all
-  # source files literal here so remove-unused-patches preserves the directory.
-  PAYLOAD_FILES = %w[
-    Patches/obsidian-app/app/bootstrap.cjs
-    Patches/obsidian-app/app/node_modules/@electron/remote/LICENSE
-    Patches/obsidian-app/app/node_modules/@electron/remote/README.md
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/get-electron-binding.d.ts
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/get-electron-binding.js
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/ipc-messages.d.ts
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/ipc-messages.js
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/module-names.d.ts
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/module-names.js
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/type-utils.d.ts
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/common/type-utils.js
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/main/index.d.ts
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/main/index.js
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/main/objects-registry.d.ts
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/main/objects-registry.js
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/main/server.d.ts
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/main/server.js
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/callbacks-registry.d.ts
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/callbacks-registry.js
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/index.d.ts
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/index.js
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/remote.d.ts
-    Patches/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/remote.js
-    Patches/obsidian-app/app/node_modules/@electron/remote/index.d.ts
-    Patches/obsidian-app/app/node_modules/@electron/remote/main/index.d.ts
-    Patches/obsidian-app/app/node_modules/@electron/remote/main/index.js
-    Patches/obsidian-app/app/node_modules/@electron/remote/package.json
-    Patches/obsidian-app/app/node_modules/@electron/remote/renderer/index.d.ts
-    Patches/obsidian-app/app/node_modules/@electron/remote/renderer/index.js
-    Patches/obsidian-app/app/package.json
-    Patches/obsidian-app/assets/icon.png
-    Patches/obsidian-app/assets/icon32.png
-    Patches/obsidian-app/scripts/install-desktop.sh
-    Patches/obsidian-app/scripts/obsidian-cli.cjs
-    Patches/obsidian-app/scripts/obsidian-desktop.sh
+  # source files literal here: the weekly remove-unused-patches job keeps a
+  # Resources/ directory only while a formula names it.
+  RESOURCE_FILES = %w[
+    Resources/obsidian-app/app/bootstrap.cjs
+    Resources/obsidian-app/app/node_modules/@electron/remote/LICENSE
+    Resources/obsidian-app/app/node_modules/@electron/remote/README.md
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/common/get-electron-binding.d.ts
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/common/get-electron-binding.js
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/common/ipc-messages.d.ts
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/common/ipc-messages.js
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/common/module-names.d.ts
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/common/module-names.js
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/common/type-utils.d.ts
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/common/type-utils.js
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/main/index.d.ts
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/main/index.js
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/main/objects-registry.d.ts
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/main/objects-registry.js
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/main/server.d.ts
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/main/server.js
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/callbacks-registry.d.ts
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/callbacks-registry.js
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/index.d.ts
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/index.js
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/remote.d.ts
+    Resources/obsidian-app/app/node_modules/@electron/remote/dist/src/renderer/remote.js
+    Resources/obsidian-app/app/node_modules/@electron/remote/index.d.ts
+    Resources/obsidian-app/app/node_modules/@electron/remote/main/index.d.ts
+    Resources/obsidian-app/app/node_modules/@electron/remote/main/index.js
+    Resources/obsidian-app/app/node_modules/@electron/remote/package.json
+    Resources/obsidian-app/app/node_modules/@electron/remote/renderer/index.d.ts
+    Resources/obsidian-app/app/node_modules/@electron/remote/renderer/index.js
+    Resources/obsidian-app/app/package.json
+    Resources/obsidian-app/assets/icon.png
+    Resources/obsidian-app/assets/icon32.png
+    Resources/obsidian-app/scripts/install-desktop.sh
+    Resources/obsidian-app/scripts/obsidian-cli.cjs
+    Resources/obsidian-app/scripts/obsidian-desktop.sh
   ].freeze
 
   # CPF-Electron's OpenHarmony desktop build, downloaded directly from GitCode.
@@ -83,9 +85,9 @@ class ObsidianApp < Formula
 
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    payload = tap_root/"Patches/obsidian-app"
-    PAYLOAD_FILES.each do |path|
-      odie "missing tap payload: #{path}" unless (tap_root/path).exist?
+    res = tap_root/"Resources/obsidian-app"
+    RESOURCE_FILES.each do |file|
+      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
     end
 
     resource("electron-ohos").fetch
@@ -99,9 +101,9 @@ class ObsidianApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    cp payload/"app/bootstrap.cjs", app/"bootstrap.cjs"
-    cp payload/"app/package.json", app/"package.json"
-    cp_r payload/"app/node_modules", app/"node_modules"
+    cp res/"app/bootstrap.cjs", app/"bootstrap.cjs"
+    cp res/"app/package.json", app/"package.json"
+    cp_r res/"app/node_modules", app/"node_modules"
 
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.obsidiandesktop"'
@@ -125,9 +127,9 @@ class ObsidianApp < Formula
     # still had the OpenCode icon, so brand from the vendor package's own icon
     # (assets/ comes from the official tarball's resources/icon.png).
     %w[app_icon.png startIcon.png].each do |name|
-      cp payload/"assets/icon.png", shell/"AppScope/resources/base/media"/name
+      cp res/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
-    cp payload/"assets/icon32.png", shell/"AppScope/resources/base/media/product_logo_32.png"
+    cp res/"assets/icon32.png", shell/"AppScope/resources/base/media/product_logo_32.png"
 
     # The Electron template ships CRLF in files patched below; normalize them so
     # exact replacements and the deep-link insertion work across release builds.
@@ -265,11 +267,11 @@ class ObsidianApp < Formula
     pkgshare.mkpath
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
-    cp payload/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
+    cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    cp payload/"scripts/obsidian-desktop.sh", libexec/"obsidian-desktop.sh"
+    cp res/"scripts/obsidian-desktop.sh", libexec/"obsidian-desktop.sh"
     chmod 0755, libexec/"obsidian-desktop.sh"
-    cp payload/"scripts/obsidian-cli.cjs", libexec/"obsidian-cli.cjs"
+    cp res/"scripts/obsidian-cli.cjs", libexec/"obsidian-cli.cjs"
     chmod 0755, libexec/"obsidian-cli.cjs"
     (bin/"obsidian-app").write_env_script libexec/"obsidian-desktop.sh",
       OBSIDIAN_DESKTOP_UNSIGNED_HAP:   libexec/"obsidian-desktop-unsigned.hap",
