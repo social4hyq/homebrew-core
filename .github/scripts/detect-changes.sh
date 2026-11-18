@@ -9,6 +9,18 @@ if [[ "$BEFORE" =~ ^0+$ ]] || ! git cat-file -e "$BEFORE" 2>/dev/null; then
   BEFORE=$(git rev-parse "$AFTER^")
 fi
 
+# On a pull request $BEFORE is the tip of the base branch, which can be ahead
+# of the point the PR branch was forked from. Diffing against it would list
+# everything that landed on the base branch since as reverted by the PR, and
+# rebuild those formulae from the branch's stale copy (and push a stale bottle
+# to the PR branch). Start from the merge base so only the PR's own changes
+# count. For a push $BEFORE is an ancestor of $AFTER and stays as it is.
+if MERGE_BASE=$(git merge-base "$BEFORE" "$AFTER" 2>/dev/null) && [ -n "$MERGE_BASE" ] \
+   && [ "$MERGE_BASE" != "$BEFORE" ]; then
+  echo "::notice::$BEFORE is not an ancestor of $AFTER (branch behind its base): comparing from the merge base $MERGE_BASE"
+  BEFORE="$MERGE_BASE"
+fi
+
 # Skip entirely when $AFTER is our own bottle write-back commit
 # (`brew bottle --write` commits as "<formula>: add/update <ver> bottle.").
 # Reads the actual commit message rather than the triggering event's payload

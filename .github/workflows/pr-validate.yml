@@ -31,7 +31,8 @@ on:
   pull_request:
     branches: [main]
     paths: ['Formula/**', 'Patches/**', 'Resources/**',
-            '.github/scripts/check-hap-formulae.py', '.github/scripts/test-hap-install-lib.sh']
+            '.github/scripts/check-hap-formulae.py', '.github/scripts/test-hap-install-lib.sh',
+            '.github/scripts/detect-changes.sh', '.github/scripts/test-detect-changes.sh']
 
 defaults:
   run:
@@ -81,8 +82,9 @@ jobs:
 
   hap-checks:
     # Independent of detect, like lint-commits: cheap static checks of the HAP
-    # app formulae and a standalone test of the shared install library, so a
-    # mistake fails in seconds instead of after a 20-minute build.
+    # app formulae, a standalone test of the shared install library and a test
+    # of change detection itself, so a mistake fails in seconds instead of
+    # after a 20-minute build.
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -91,6 +93,8 @@ jobs:
         run: python3 .github/scripts/check-hap-formulae.py
       - name: Test the shared install library
         run: .github/scripts/test-hap-install-lib.sh
+      - name: Test change detection
+        run: .github/scripts/test-detect-changes.sh
 
   detect:
     runs-on: ubuntu-latest
