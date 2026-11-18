@@ -17,8 +17,9 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5ae88a2be70c2c03f986831bb31804ba53f3606a3b0c24ee82f71588333b2dad"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r8"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cfac61896d30ecb1046346cb660fa6e4a1ef1ff8edf3952fe870194492f10436"
   end
 
   depends_on "app-installer"
@@ -352,7 +353,9 @@ class OrcaApp < Formula
     keep_tmp = testpath/"keep-tmp"
     keep_tmp.mkpath
     ENV["TMPDIR"] = keep_tmp.to_s
-    keep_output = shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --keep --no-serve 2>&1")
+    keep_output = shell_output(
+      "#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --keep --no-serve 2>&1",
+    )
     assert_match "signed HAP kept at #{keep_tmp}/orca-app-signed.hap", keep_output
     assert_match "installed", keep_output
     assert_equal "signed-by-fake", (keep_tmp/"orca-app-signed.hap").read
