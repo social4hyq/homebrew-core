@@ -35,17 +35,18 @@ class ZcodeApp < Formula
 
   # Shell sources live in the tap so they are reviewable in the PR and no
   # opaque release payload is involved. Every path is listed literally: the
-  # weekly remove-unused-patches job keeps files referenced from Formula/.
-  SHELL_FILES = %w[
-    Patches/zcode-app/app/config.json
-    Patches/zcode-app/app/main.cjs
-    Patches/zcode-app/app/tray.cjs
-    Patches/zcode-app/app/package.json
-    Patches/zcode-app/app/waiting.html
-    Patches/zcode-app/assets/icon.png
-    Patches/zcode-app/assets/tray-icon.png
-    Patches/zcode-app/scripts/install-desktop.sh
-    Patches/zcode-app/scripts/zcode-desktop.sh
+  # weekly remove-unused-patches job keeps a Resources/ directory only while a
+  # formula names it.
+  RESOURCE_FILES = %w[
+    Resources/_shared/electron-shell/tray.cjs
+    Resources/zcode-app/app/config.json
+    Resources/zcode-app/app/main.cjs
+    Resources/zcode-app/app/package.json
+    Resources/zcode-app/app/waiting.html
+    Resources/zcode-app/assets/icon.png
+    Resources/zcode-app/assets/tray-icon.png
+    Resources/zcode-app/scripts/install-desktop.sh
+    Resources/zcode-app/scripts/zcode-desktop.sh
   ].freeze
 
   resource "electron-ohos" do
@@ -55,9 +56,9 @@ class ZcodeApp < Formula
 
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    source_root = tap_root/"Patches/zcode-app"
-    SHELL_FILES.each do |file|
-      raise "#{file} is missing from the tap" unless (tap_root/file).exist?
+    res = tap_root/"Resources/zcode-app"
+    RESOURCE_FILES.each do |file|
+      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
     end
 
     resource("electron-ohos").fetch
@@ -68,18 +69,19 @@ class ZcodeApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs package.json config.json waiting.html tray.cjs].each do |name|
-      cp source_root/"app"/name, app/name
+    %w[main.cjs package.json config.json waiting.html].each do |name|
+      cp res/"app"/name, app/name
     end
+    cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
 
-    cp source_root/"assets/icon.png", app/"app-icon.png"
-    cp source_root/"assets/tray-icon.png", app/"tray-icon.png"
+    cp res/"assets/icon.png", app/"app-icon.png"
+    cp res/"assets/tray-icon.png", app/"tray-icon.png"
 
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.zcodedesktop"'
     inreplace shell/"AppScope/app.json5", '"vendor": "example"', '"vendor": "social4hyq"'
     %w[app_icon.png startIcon.png].each do |name|
-      cp source_root/"assets/icon.png", shell/"AppScope/resources/base/media"/name
+      cp res/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
     # App name and ability labels live in per-locale string resources: patching
     # only the base file leaves the zh_CN/en_US overrides intact and the
@@ -211,9 +213,9 @@ class ZcodeApp < Formula
     # cp, not install: Pathname#install moves the source, and the tap checkout
     # is a read-only host mount inside the CI container.
     pkgshare.mkpath
-    cp source_root/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
+    cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    cp source_root/"scripts/zcode-desktop.sh", libexec/"zcode-desktop.sh"
+    cp res/"scripts/zcode-desktop.sh", libexec/"zcode-desktop.sh"
     chmod 0755, libexec/"zcode-desktop.sh"
     (bin/"zcode-app").write_env_script libexec/"zcode-desktop.sh",
       ZCODE_DESKTOP_UNSIGNED_HAP:   libexec/"zcode-desktop-unsigned.hap",
