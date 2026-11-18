@@ -67,6 +67,36 @@ class HerdrApp < Formula
     end
   end
 
+  # Tap-authored HAP project template and launcher scripts. They are not
+  # patches, so they live in Resources/ rather than Patches/. Every path is
+  # listed literally: the weekly remove-unused-patches job keeps a Resources/
+  # directory only while a formula names it.
+  RESOURCE_FILES = %w[
+    Resources/herdr-app/hap/AppScope/app.json5
+    Resources/herdr-app/hap/AppScope/resources/base/element/string.json
+    Resources/herdr-app/hap/AppScope/resources/base/media/example_icon.png
+    Resources/herdr-app/hap/build-profile.json5
+    Resources/herdr-app/hap/entry/build-profile.json5
+    Resources/herdr-app/hap/entry/hvigorfile.ts
+    Resources/herdr-app/hap/entry/oh-package-lock.json5
+    Resources/herdr-app/hap/entry/oh-package.json5
+    Resources/herdr-app/hap/entry/src/main/ets/entryability/EntryAbility.ets
+    Resources/herdr-app/hap/entry/src/main/ets/pages/Index.ets
+    Resources/herdr-app/hap/entry/src/main/ets/types/herdr_app/Index.d.ts
+    Resources/herdr-app/hap/entry/src/main/ets/types/herdr_app/oh-package.json5
+    Resources/herdr-app/hap/entry/src/main/module.json5
+    Resources/herdr-app/hap/entry/src/main/resources/base/element/color.json
+    Resources/herdr-app/hap/entry/src/main/resources/base/element/string.json
+    Resources/herdr-app/hap/entry/src/main/resources/base/media/example_icon.png
+    Resources/herdr-app/hap/entry/src/main/resources/base/profile/main_pages.json
+    Resources/herdr-app/hap/hvigor/hvigor-config.json5
+    Resources/herdr-app/hap/hvigorfile.ts
+    Resources/herdr-app/hap/oh-package-lock.json5
+    Resources/herdr-app/hap/oh-package.json5
+    Resources/herdr-app/scripts/herdr-app.sh
+    Resources/herdr-app/scripts/herdr-bridge.py
+  ].freeze
+
   # The cargo build runs `zig build`, which fetches its packages, and ohpm
   # fetches the ArkTS packages. Both servers now and then answer 5xx or a
   # broken response, which is not worth a 30 minute build: retry the step.
@@ -84,6 +114,12 @@ class HerdrApp < Formula
   end
 
   def install
+    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
+    res = tap_root/"Resources/herdr-app"
+    RESOURCE_FILES.each do |file|
+      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
+    end
+
     # HAP packaging. CI runs in the private electron-ohos-ci image (selected
     # via the OHOS_CI_IMAGE_OVERRIDES repo variable), which bakes the
     # HarmonyOS command-line toolchain at /opt/electron-ohos-clt, repacked
@@ -115,10 +151,8 @@ class HerdrApp < Formula
       system "cargo", "build", "--lib", "--release", "--locked", "--target", "aarch64-unknown-linux-ohos"
     end
 
-    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    payload = tap_root/"Patches/herdr-app"
     hap = buildpath/"hap"
-    cp_r payload/"hap", hap
+    cp_r res/"hap", hap
     libs = hap/"entry/libs/arm64-v8a"
     libs.mkpath
     cp "target/aarch64-unknown-linux-ohos/release/libherdr_app.so", libs/"libopenharmony_ability.so"
@@ -148,8 +182,8 @@ class HerdrApp < Formula
     libexec.install hap/"entry/build/default/outputs/default/entry-default-unsigned.hap" =>
                     "herdr-app-unsigned.hap"
 
-    cp payload/"scripts/herdr-app.sh", libexec/"herdr-app.sh"
-    cp payload/"scripts/herdr-bridge.py", libexec/"herdr-bridge.py"
+    cp res/"scripts/herdr-app.sh", libexec/"herdr-app.sh"
+    cp res/"scripts/herdr-bridge.py", libexec/"herdr-bridge.py"
     chmod 0755, [libexec/"herdr-app.sh", libexec/"herdr-bridge.py"]
     (bin/"herdr-app").write_env_script libexec/"herdr-app.sh",
       HERDR_APP_HAP:         libexec/"herdr-app-unsigned.hap",
