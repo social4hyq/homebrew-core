@@ -21,9 +21,25 @@ class AppInstaller < Formula
   depends_on "ohos-sdk-toolchains"
   depends_on "unzip"
 
+  # Launcher scripts and the npm lockfile live in the tap so they are
+  # reviewable in the PR. Every path is listed literally: the weekly
+  # remove-unused-patches job keeps a Resources/ directory only while a
+  # formula names it.
+  RESOURCE_FILES = %w[
+    Resources/app-installer/app-installer.sh
+    Resources/app-installer/package-lock.json
+    Resources/app-installer/prepare-profile.cjs
+    Resources/app-installer/sign-hap.cjs
+    Resources/app-installer/test-install.cjs
+  ].freeze
+
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    payload = tap_root/"Patches/app-installer"
+    res = tap_root/"Resources/app-installer"
+    RESOURCE_FILES.each do |file|
+      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
+    end
+
     cli_source = buildpath.parent/"deveco-cli-runtime"
     cli_source.mkpath
     cli_package = buildpath
@@ -35,7 +51,7 @@ class AppInstaller < Formula
       "dependencies"         => cli_package_info.fetch("dependencies"),
       "optionalDependencies" => cli_package_info.fetch("optionalDependencies", {}),
     )
-    lock = JSON.parse((payload/"package-lock.json").read)
+    lock = JSON.parse((res/"package-lock.json").read)
     lock["name"] = package_name
     lock_root = lock.fetch("packages").fetch("")
     lock_root["name"] = package_name
@@ -93,10 +109,10 @@ class AppInstaller < Formula
     cp sdk_tools/"lib/PermissionDefinitions.json", sdk/"toolchains/lib/PermissionDefinitions.json"
     cp sdk_tools/"lib/PermissionDefinitions.json", sdk/"toolchains/lib/permissionDefinitions.json"
 
-    cp payload/"app-installer.sh", libexec/"app-installer.sh"
-    cp payload/"sign-hap.cjs", libexec/"sign-hap.cjs"
-    cp payload/"prepare-profile.cjs", libexec/"prepare-profile.cjs"
-    cp payload/"test-install.cjs", libexec/"test-install.cjs"
+    cp res/"app-installer.sh", libexec/"app-installer.sh"
+    cp res/"sign-hap.cjs", libexec/"sign-hap.cjs"
+    cp res/"prepare-profile.cjs", libexec/"prepare-profile.cjs"
+    cp res/"test-install.cjs", libexec/"test-install.cjs"
     chmod 0755, libexec/"app-installer.sh"
     chmod 0755, libexec/"sign-hap.cjs"
     cli_wrapper = libexec/"devecocli.sh"
