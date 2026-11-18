@@ -65,12 +65,23 @@ wrapper（`write_env_script`）的环境变量统一用 `<PREFIX>_` 加这些后
 
 注意：`Resources/_shared/hap-app/` 的任何改动会让所有引用它的 formula 重建，所以库要少改。
 
+## 共享的等待页（`waiting.html`）
+
+Electron 壳启动时先显示的等待页，各 app 之前各存一份，现在由一份模板加每个 app 的文案在构建时生成：
+
+- `Resources/_shared/waiting-page/waiting.html.in`：模板，占位符 `{{name}}`、`{{command}}`、`{{subtitle}}`、`{{accent}}`、`{{wash}}`、`{{washDark}}`。
+- `Resources/_shared/waiting-page/render-waiting.cjs`：渲染器（node）。它是严格的：占位符缺值、值没被用到、值里带 `< > & ' " \` 或换行或 `{{`、占位符格式不对，都是错误。
+- `Resources/<app>/app/waiting.json`：每个 app 的文案（名字、命令、副标题、三个颜色）。
+- formula 在 `install` 里调用渲染器，输出到 HAP 的 `app/waiting.html`，并把渲染器、模板和 `waiting.json` 列进 `RESOURCE_FILES`。
+- `Resources/_shared/waiting-page/expected.sha256` 固定每个 app 渲染结果的 sha256（迁移时等于被替换的原页面）。要有意改某个页面，就在同一个 PR 里更新这里的哈希；`test-waiting-page.sh` 会在 `hap-checks` 里检查，所以页面不会被悄悄改掉。
+
 ## CI 检查
 
 `pr-validate` 里的 `hap-checks` job 不依赖 `detect`，在构建之前几秒内跑完，失败时不会进入构建：
 
 - `.github/scripts/check-hap-formulae.py`：有 `Resources/<name>/` 的 formula 必须有字面 `RESOURCE_FILES`，清单与目录里的文件逐项一致，清单里的路径都存在，并有 `odie "missing tap resource"` 检查；所有 formula 的 `electron-ohos` 版本（url 与 sha256）一致；从 tap 取文件不能用 `.install`（只能 `cp`）。
 - `.github/scripts/test-hap-install-lib.sh`：用假的 `app-installer` 和现做的最小 HAP 测共享安装库。
+- `.github/scripts/test-waiting-page.sh`：渲染每个用到共享等待页的 app，结果必须等于 `expected.sha256` 里固定的哈希，并检查渲染器的严格性。
 
 本机运行：`python3 .github/scripts/check-hap-formulae.py`、`.github/scripts/test-hap-install-lib.sh`（需要 bash、node、zip、unzip）。
 
