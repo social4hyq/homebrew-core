@@ -20,9 +20,9 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r6"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f00a2e4d6f13ef54b63e8bc8a6f9e0b12d123b95e7ff547ea5eb2456d384d1a0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r7"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6db27af6adc460063cf2ba631af26e8bde161afea276d1fca3cb3cdc8193ecfb"
   end
 
   depends_on "app-installer"
