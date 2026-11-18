@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Magpie Desktop</title>
+<h1>Magpie Desktop</h1>
+<p id="status">Starting Magpie…</p>
+<section hidden id="manual">
+  <p>Run <code>magpie web --addr 127.0.0.1:3430 --no-open</code> on this device.
+     Paste the key (the value after <code>?k=</code>) from its output.</p>
+  <form action="http://127.0.0.1:3430/">
+    <label>Web key <input name="k" type="password" required autocomplete="off"></label>
+    <button>Connect</button>
+  </form>
+</section>
+<script>
+  const mode = location.hash.slice(1);
+  if (mode === 'manual') {
+    document.getElementById('status').textContent = 'Connect to the host CLI';
+    document.getElementById('manual').hidden = false;
+  } else if (mode === 'failed') {
+    document.getElementById('status').textContent =
+      'Could not start Magpie. Check the CLI and reinstall the desktop app, or install with --no-acl.';
+  }
+</script>
+</html>
