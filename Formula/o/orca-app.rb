@@ -9,7 +9,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -35,6 +35,7 @@ class OrcaApp < Formula
   # formula names it.
   RESOURCE_FILES = %w[
     Resources/_shared/electron-shell/tray.cjs
+    Resources/_shared/hap-app/install-lib.sh
     Resources/orca-app/app/config.json
     Resources/orca-app/app/main.cjs
     Resources/orca-app/app/package.json
@@ -202,6 +203,10 @@ class OrcaApp < Formula
     # is a read-only host mount inside the CI container.
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
+    # install-desktop.sh sources the install flow shared by the HAP apps from
+    # the same directory.
+    cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
+    chmod 0755, pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/orca-desktop.sh", libexec/"orca-desktop.sh"
     chmod 0755, libexec/"orca-desktop.sh"
     tool_path = [formula_opt_bin("node"), formula_opt_bin("zip"), formula_opt_bin("unzip"), "$PATH"].join(":")
