@@ -133,6 +133,39 @@ for f in "${FILES[@]}"; do
   fi
 done
 
+# Changes under Patches/<f>/ or Resources/<f>/ alter the bottle of formula <f>
+# even when Formula/**/<f>.rb is untouched, and Resources/_shared/<x>/ alters
+# every formula whose source mentions "Resources/_shared/<x>". The bottle-only /
+# comment-only skips above judge the .rb text alone, so these formulae are
+# added here, after them, and always build.
+mapfile -t ASSET_FILES < <(git diff --name-only --no-renames "$BEFORE" "$AFTER" -- Patches/ Resources/)
+declare -A ASSET_FORMULAE=()
+for f in "${ASSET_FILES[@]}"; do
+  IFS=/ read -r top first second _ <<< "$f"
+  if [[ "$top" == Resources && "$first" == _shared && -n "$second" ]]; then
+    while IFS= read -r rb; do
+      ASSET_FORMULAE[$(basename "$rb" .rb)]=1
+    done < <(grep -rlF "\"Resources/_shared/$second" Formula/ 2>/dev/null || true)
+  elif [[ -n "$first" && "$first" != _shared ]]; then
+    for rb in Formula/*/"$first".rb; do
+      [ -f "$rb" ] && ASSET_FORMULAE[$first]=1
+    done
+  fi
+done
+for name in "${!ASSET_FORMULAE[@]}"; do
+  [[ "$name" =~ ^[A-Za-z0-9@+._-]+$ ]] \
+    || { echo "::error::invalid formula name: $name"; exit 1; }
+  # `git diff` against a formula already built above would duplicate it.
+  if ! printf '%s\n' "${CHANGED[@]:-}" | grep -qx "$name"; then CHANGED+=("$name"); fi
+  if printf '%s\n' "${BUILD[@]:-}" "${HEAVY[@]:-}" | grep -qx "$name"; then continue; fi
+  echo "::notice::$name: Patches/Resources changed, rebuilding"
+  if tr ' ' '\n' <<< "$HEAVY_FORMULAS" | grep -qx "$name"; then
+    HEAVY+=("$name")
+  else
+    BUILD+=("$name")
+  fi
+done
+
 {
   echo "build=$(jq -cn '$ARGS.positional' --args "${BUILD[@]}")"
   echo "changed=$(jq -cn '$ARGS.positional' --args "${CHANGED[@]}")"

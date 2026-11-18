@@ -446,13 +446,19 @@ for line in "${CANDIDATES[@]}"; do
     # brew test requires the shell package version to match the formula.
     # bump-formula-pr pushes by URL, so origin's remote-tracking ref may not
     # exist; take the lease expectation from the branch actually on GitHub.
-    PACKAGE_JSON="$TAP_IN_CONTAINER/Patches/$FORMULA/app/package.json"
+    # Shell sources moved from Patches/ to Resources/; accept either layout
+    # until every app formula has migrated.
+    # The path is evaluated inside the container (after the branch checkout).
+    PACKAGE_JSON="$TAP_IN_CONTAINER/Resources/$FORMULA/app/package.json"
+    LEGACY_PACKAGE_JSON="$TAP_IN_CONTAINER/Patches/$FORMULA/app/package.json"
     if ! docker exec "$CONTAINER" bash -lc "
       set -euo pipefail
       cd \"$TAP_IN_CONTAINER\"
       git checkout -q \"$BRANCH\"
-      python3 -c 'import json,os,sys; p=sys.argv[1]; d=json.load(open(p)); d[\"version\"]=sys.argv[2]; t=p+\".tmp\"; open(t,\"w\").write(json.dumps(d,indent=2)+\"\\n\"); os.replace(t,p); assert json.load(open(p))[\"version\"] == sys.argv[2]' \"$PACKAGE_JSON\" \"$LATEST\"
-      git add \"$PACKAGE_JSON\"
+      PKG=\"$PACKAGE_JSON\"
+      [ -f \"\$PKG\" ] || PKG=\"$LEGACY_PACKAGE_JSON\"
+      python3 -c 'import json,os,sys; p=sys.argv[1]; d=json.load(open(p)); d[\"version\"]=sys.argv[2]; t=p+\".tmp\"; open(t,\"w\").write(json.dumps(d,indent=2)+\"\\n\"); os.replace(t,p); assert json.load(open(p))[\"version\"] == sys.argv[2]' \"\$PKG\" \"$LATEST\"
+      git add \"\$PKG\"
       git commit --amend --no-edit
       REMOTE_SHA=\$(git ls-remote origin \"refs/heads/$BRANCH\" | cut -f1)
       [[ \"\$REMOTE_SHA\" =~ ^[0-9a-f]{40}\$ ]]

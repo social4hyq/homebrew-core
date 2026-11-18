@@ -1,6 +1,6 @@
 #!/bin/bash
-# Find files under Patches/ that no Formula/**/*.rb references and open a PR
-# removing them. Most formulae name each patch literally, but a formula may
+# Find files under Patches/ that no Formula/**/*.rb references (and orphaned
+# Resources/ directories, see below) and open a PR removing them. Most formulae name each patch literally, but a formula may
 # apply a generated list through a dynamic path such as
 # `file "Patches/bun-legacy/#{p}.patch"`, or glob a directory at load time
 # such as `Dir[patch_root/"Patches/bun/*.patch"].each { patch { file
@@ -52,6 +52,29 @@ while IFS= read -r -d '' patch; do
     UNUSED+=("$rel")
   fi
 done < <(find Patches -type f -print0 | sort -z)
+
+# Resources/ holds tap-authored non-patch files (shell sources, icons, scripts,
+# HAP templates). They are copied by directory or by computed name, so they are
+# kept per directory, not per file: Resources/<formula>/ stays while
+# Formula/*/<formula>.rb exists and mentions the literal "Resources/<formula>";
+# Resources/_shared/<name>/ stays while any formula mentions
+# "Resources/_shared/<name>". Anything else is an orphan.
+if [ -d Resources ]; then
+  while IFS= read -r -d '' dir; do
+    name="${dir#Resources/}"
+    if [ "$name" = "_shared" ]; then
+      while IFS= read -r -d '' sub; do
+        if ! grep -rqF "\"$sub" Formula/ 2>/dev/null; then
+          while IFS= read -r -d '' f; do UNUSED+=("$f"); done < <(find "$sub" -type f -print0 | sort -z)
+        fi
+      done < <(find "$dir" -mindepth 1 -maxdepth 1 -type d -print0 | sort -z)
+      continue
+    fi
+    if ! grep -qF "\"$dir" Formula/*/"$name".rb 2>/dev/null; then
+      while IFS= read -r -d '' f; do UNUSED+=("$f"); done < <(find "$dir" -type f -print0 | sort -z)
+    fi
+  done < <(find Resources -mindepth 1 -maxdepth 1 -type d -print0 | sort -z)
+fi
 
 echo "### remove-unused-patches" >> "$GITHUB_STEP_SUMMARY"
 
