@@ -7,8 +7,9 @@ class SnowShotApp < Formula
   revision 20
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e8cfee970ee9c2b79dd0e6f1671ee191061df79ab13de6b5de728c81422315d1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r7"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "73201417666e10f1f508fece6b51787c61ac7ff800c98ec3922806af6fc1e0be"
   end
 
   depends_on "brotli" => :build
@@ -118,6 +119,34 @@ class SnowShotApp < Formula
     end
   end
 
+  # Tap-authored HAP template, staging scripts and launcher. They are not
+  # patches, so they live in Resources/ rather than Patches/. Every path is
+  # listed literally: the weekly remove-unused-patches job keeps a Resources/
+  # directory only while a formula names it.
+  RESOURCE_FILES = %w[
+    Resources/snow-shot-app/ohos-template/AppScope/resources/base/media/app_icon.png
+    Resources/snow-shot-app/ohos-template/assets/README.md
+    Resources/snow-shot-app/ohos-template/assets/app-icon.svg
+    Resources/snow-shot-app/ohos-template/assets/app-labels.json
+    Resources/snow-shot-app/ohos-template/entry/src/main/cpp/types/libsnow_shot/index.d.ts
+    Resources/snow-shot-app/ohos-template/entry/src/main/ets/qability/QAbility.ets
+    Resources/snow-shot-app/ohos-template/entry/src/main/ets/statusbar/StatusBarAbility.ets
+    Resources/snow-shot-app/ohos-template/entry/src/main/ets/statusbar/StatusBarPage.ets
+    Resources/snow-shot-app/ohos-template/entry/src/main/resources/base/media/background.png
+    Resources/snow-shot-app/ohos-template/entry/src/main/resources/base/media/foreground.png
+    Resources/snow-shot-app/ohos-template/entry/src/main/resources/base/media/startIcon.png
+    Resources/snow-shot-app/snow-shot-install.sh
+    Resources/snow-shot-app/support/scripts/add-ohos-module-permissions.py
+    Resources/snow-shot-app/support/scripts/finalize-ohos-ocr-manifest.py
+    Resources/snow-shot-app/support/scripts/stage-ohos-app-icon-assets.py
+    Resources/snow-shot-app/support/scripts/stage-ohos-app-label-assets.py
+    Resources/snow-shot-app/support/scripts/stage-ohos-ocr-assets.py
+    Resources/snow-shot-app/support/scripts/test-add-ohos-module-permissions.py
+    Resources/snow-shot-app/support/scripts/test-finalize-ohos-ocr-manifest.py
+    Resources/snow-shot-app/support/scripts/test-snow-shot-hap-runtime-closure.py
+    Resources/snow-shot-app/support/scripts/test-stage-ohos-ocr-assets.py
+  ].freeze
+
   def install
     qt = Pathname.new("/opt/qt-ohos/qt-6.13.0-dev")
     clt = Pathname.new("/opt/electron-ohos-clt")
@@ -140,7 +169,11 @@ class SnowShotApp < Formula
     ocr_crate = buildpath/"snow-crates/crates/simd-paddle-ocr-rs"
     resource("jthread").stage buildpath/"jthread"
     mkdir_p ocr_crate
-    payload = Pathname(__FILE__).parent.parent.parent/"Patches/snow-shot-app"
+    tap_root = Pathname(__FILE__).parent.parent.parent
+    res = tap_root/"Resources/snow-shot-app"
+    RESOURCE_FILES.each do |file|
+      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
+    end
     resource("snow-shot-ocr-rs").stage do
       cp_r ".", ocr_crate
     end
@@ -329,7 +362,7 @@ class SnowShotApp < Formula
     package_hap(qt, clt, ohos_sdk, qt_tls)
     unsigned_hap = "hap-proj/entry/build/default/outputs/default/entry-default-unsigned.hap"
     libexec.install unsigned_hap => "snow-shot-unsigned.hap"
-    (libexec/"snow-shot-install").write (payload/"snow-shot-install.sh").read
+    (libexec/"snow-shot-install").write (res/"snow-shot-install.sh").read
     chmod 0555, libexec/"snow-shot-install"
     (bin/"snow-shot-app").write_env_script libexec/"snow-shot-install",
       SNOW_SHOT_HAP: libexec/"snow-shot-unsigned.hap",
@@ -468,7 +501,7 @@ class SnowShotApp < Formula
     end
     ENV["DEVECO_SDK_HOME"] = (buildpath/"hap-sdk").to_s
     ENV["HOS_SDK_HOME"] = (buildpath/"hap-sdk").to_s
-    payload = Pathname(__FILE__).parent.parent.parent/"Patches/snow-shot-app"
+    res = Pathname(__FILE__).parent.parent.parent/"Resources/snow-shot-app"
     stage = buildpath/"hap-proj"
     app_lib = buildpath/"build/snow_shot/libsnow_shot.so"
     runtime_lib_dirs = [app_lib.dirname.to_s] + recursive_dependencies.filter_map do |dependency|
@@ -497,11 +530,11 @@ class SnowShotApp < Formula
     system qt_sdk/"bin/harmonydeployqt", "--input", buildpath/"hd.json",
            "--output", stage, "--no-build", "--verbose"
 
-    system "python3", payload/"support/scripts/stage-ohos-app-icon-assets.py",
-           "--template", payload/"ohos-template", "--stage", stage
-    system "python3", payload/"support/scripts/stage-ohos-app-label-assets.py",
-           "--template", payload/"ohos-template", "--stage", stage
-    cp payload/"ohos-template/entry/src/main/ets/qability/QAbility.ets",
+    system "python3", res/"support/scripts/stage-ohos-app-icon-assets.py",
+           "--template", res/"ohos-template", "--stage", stage
+    system "python3", res/"support/scripts/stage-ohos-app-label-assets.py",
+           "--template", res/"ohos-template", "--stage", stage
+    cp res/"ohos-template/entry/src/main/ets/qability/QAbility.ets",
        stage/"entry/src/main/ets/qability/QAbility.ets"
     # The Qt HAP template has no statusBarView extension, and the Qt OHOS tray
     # plugin registers its icon through @kit.StatusBarExtensionKit, which needs
@@ -509,7 +542,7 @@ class SnowShotApp < Formula
     # declare both in the generated project.
     mkdir_p stage/"entry/src/main/ets/statusbar"
     %w[StatusBarAbility.ets StatusBarPage.ets].each do |name|
-      cp payload/"ohos-template/entry/src/main/ets/statusbar"/name,
+      cp res/"ohos-template/entry/src/main/ets/statusbar"/name,
          stage/"entry/src/main/ets/statusbar"/name
     end
     inreplace stage/"entry/src/main/resources/base/profile/main_pages.json",
@@ -531,7 +564,7 @@ class SnowShotApp < Formula
     inreplace stage/"entry/src/main/module.json5",
               "    \"requestPermissions\": [", extension_declaration
     mkdir_p stage/"entry/src/main/cpp/types/libsnow_shot"
-    cp payload/"ohos-template/entry/src/main/cpp/types/libsnow_shot/index.d.ts",
+    cp res/"ohos-template/entry/src/main/cpp/types/libsnow_shot/index.d.ts",
        stage/"entry/src/main/cpp/types/libsnow_shot/index.d.ts"
 
     libs = stage/"entry/libs/arm64-v8a"
@@ -540,7 +573,7 @@ class SnowShotApp < Formula
     cp buildpath/"build/cargo/aarch64-unknown-linux-ohos/release/libsnow_ocr_inprocess.so", libs
     package_qt_tls(qt_tls, stage, command_line_tools, native_sdk)
     ocr_output = stage/"entry/src/main/resources/rawfile/ocr"
-    system "python3", payload/"support/scripts/stage-ohos-ocr-assets.py",
+    system "python3", res/"support/scripts/stage-ohos-ocr-assets.py",
            "--source-manifest", buildpath/"snow_shot/packaging/snow-shot-ocr-asset-manifest-arm64.json",
            "--runtime", libs/"libsnow_ocr_inprocess.so",
            "--model-root", buildpath/"ocr-models",
@@ -561,11 +594,11 @@ class SnowShotApp < Formula
              "--mode", "module", "-p", "product=default", "--no-daemon"
     end
     hap = stage/"entry/build/default/outputs/default/entry-default-unsigned.hap"
-    system "python3", (payload/"support/scripts/finalize-ohos-ocr-manifest.py").to_s, hap.to_s
-    system "python3", (payload/"support/scripts/add-ohos-module-permissions.py").to_s, hap.to_s
+    system "python3", (res/"support/scripts/finalize-ohos-ocr-manifest.py").to_s, hap.to_s
+    system "python3", (res/"support/scripts/add-ohos-module-permissions.py").to_s, hap.to_s
     sdk_lib_dir = native_sdk/"native/sysroot/usr/lib/aarch64-linux-ohos"
     clt_lib_dir = command_line_tools/"sdk/default/openharmony/native/sysroot/usr/lib/aarch64-linux-ohos"
-    system "python3", payload/"support/scripts/test-snow-shot-hap-runtime-closure.py",
+    system "python3", res/"support/scripts/test-snow-shot-hap-runtime-closure.py",
            hap, "--readelf", native_sdk/"native/llvm/bin/llvm-readelf",
            "--system-lib-dir", sdk_lib_dir, "--system-lib-dir", clt_lib_dir
   end
