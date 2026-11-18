@@ -8,7 +8,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 7
+  revision 8
 
   livecheck do
     url :stable
@@ -17,8 +17,8 @@ class OpencodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.0-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "964b3e795ff0acfd736bf77b7fed3393ad2b9958c8c6291f778236fe59e6f483"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.0-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "de409c713c97d8284eb0a0ed74d761b35412ba0c14932f86a59d01f7d00d0652"
   end
 
   depends_on "app-installer"
@@ -26,6 +26,7 @@ class OpencodeApp < Formula
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "opencode"
+  depends_on "unzip"
   depends_on "zip"
 
   # Shell sources live in the tap so they are reviewable in the PR. Every path
