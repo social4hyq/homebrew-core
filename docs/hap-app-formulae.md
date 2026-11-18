@@ -43,6 +43,37 @@
 
 `multica-app`、`herdr-app`、`snow-shot-app` 的构建路径不同，只遵守目录约定和 `RESOURCE_FILES` 清单。
 
+## CLI 约定
+
+每个桌面 app 的命令是 `<name>-app`（已发布的 app 同时保留 `<name>-desktop` 符号链接），子命令：
+
+| 子命令 | 作用 |
+|---|---|
+| `install` | 往 HAP 的副本里注入本机配置，签名并安装 |
+| `start` / `stop` / `status` | 打开应用、停止、查看状态（有宿主后端的 app 同时管理后端） |
+| `serve` | 只启动宿主后端（浏览器或 CLI 使用） |
+
+`install` 的选项：`--hap PATH`、`--config PATH`、`--device ID`、`--no-acl`、`--keep`。约定：结果行（`installed (<bundle>, <variant>)`）写 stdout，进度和错误写 stderr，这样 `brew test` 和调用方可以只读 stdout。
+
+wrapper（`write_env_script`）的环境变量统一用 `<PREFIX>_` 加这些后缀：`UNSIGNED_HAP`、`INSTALL_SCRIPT`、`MODULE_ACL`、`HDC_DEFAULT`、`<BACKEND>_BIN`，另有可覆盖的 `BUNDLE`、`APP_NAME`、`HDC`。前缀见下面的历史例外表。
+
+## 共享安装库
+
+`Resources/_shared/hap-app/install-lib.sh` 是 Electron 壳 app 共用的安装流程：解析参数、检查工具、ACL 的 `module.json` 与 HAP 的 bundle 一致性预检、暂存目录、把要注入的文件加进 HAP 副本、流式调用 `app-installer`、`--keep`、结果行。formula 把它 `cp` 到 `pkgshare/"hap-app-install-lib.sh"`，与每个 app 自己的薄脚本 `install-desktop.sh` 放在同一目录，薄脚本 `source` 它。
+
+薄脚本设置 `APP_CMD`、`ENV_PREFIX`、`BUNDLE_ID_DEFAULT`、`APP_NAME_DEFAULT`，并定义 `stage_tree CONFIG TREE`（把要放进 HAP 的文件写到 `TREE` 下，路径与 HAP 根一致）；可选的 `NEED_CONFIG`、`EXTRA_TOOLS`、`KEEP_BASENAME`、`MODULE`、`ABILITY`、`app_usage_extra`、`app_parse_option`、`app_prepare` 见库文件头部的注释。库的行为由 `.github/scripts/test-hap-install-lib.sh` 独立测试，改库前先跑它。
+
+注意：`Resources/_shared/hap-app/` 的任何改动会让所有引用它的 formula 重建，所以库要少改。
+
+## CI 检查
+
+`pr-validate` 里的 `hap-checks` job 不依赖 `detect`，在构建之前几秒内跑完，失败时不会进入构建：
+
+- `.github/scripts/check-hap-formulae.py`：有 `Resources/<name>/` 的 formula 必须有字面 `RESOURCE_FILES`，清单与目录里的文件逐项一致，清单里的路径都存在，并有 `odie "missing tap resource"` 检查；所有 formula 的 `electron-ohos` 版本（url 与 sha256）一致；从 tap 取文件不能用 `.install`（只能 `cp`）。
+- `.github/scripts/test-hap-install-lib.sh`：用假的 `app-installer` 和现做的最小 HAP 测共享安装库。
+
+本机运行：`python3 .github/scripts/check-hap-formulae.py`、`.github/scripts/test-hap-install-lib.sh`（需要 bash、node、zip、unzip）。
+
 ## 标识命名与历史例外
 
 新 app 使用：bundle ID `com.social4hyq.<name>`，命令 `<name>-app`，环境变量前缀 `<NAME>_DESKTOP_`，状态目录 `~/.config/<name>-app`。
