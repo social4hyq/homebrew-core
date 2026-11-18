@@ -1,18 +1,30 @@
 #!/usr/bin/env bash
-# herdr-app: sign and install the Herdr desktop HAP, and open it.
+# herdr-app: sign and install the Herdr desktop HAP, run the core bridge it talks to, and open it.
 set -euo pipefail
 
 BUNDLE_ID="com.social4hyq.herdrapp"
 ABILITY="EntryAbility"
+DEFAULT_PORT="${HERDR_APP_PORT:-8765}"
+STATE="${HERDR_APP_STATE:-${XDG_CONFIG_HOME:-$HOME/.config}/herdr-app}"
+CONF="$STATE/bridge.conf"
+PIDFILE="$STATE/bridge.pid"
+LOGFILE="$STATE/bridge.log"
 
 usage() {
   cat <<'EOF'
-Usage: herdr-app <command> [--device <hdc serial>]
+Usage: herdr-app <command> [options]
 
 Commands:
-  install   Sign the HAP with a local debug profile, install it over hdc and
-            open it (needs hdc and an unlocked device)
-  start     Open the installed app
+  install [--device <hdc serial>] [--new-token]
+            Make sure the core bridge and its token exist and the bridge is running, put the
+            bridge's address and token into the HAP, sign it with a local debug profile, install
+            it over hdc and open it (needs hdc and an unlocked device). --new-token replaces the
+            token, so an app installed earlier stops being accepted until it is installed again.
+  start [--device <hdc serial>]
+            Make sure the bridge is running, then open the installed app
+  bridge start|stop|restart|status
+            Run the core bridge by itself. It listens on 127.0.0.1 only and answers only the
+            app that carries the token.
   -h, --help  Show this help
 EOF
 }
@@ -22,20 +34,174 @@ die() {
   exit "${2:-1}"
 }
 
+port_busy() {
+  (exec 3<>"/dev/tcp/127.0.0.1/$1") 2>/dev/null && { exec 3>&- 3<&-; return 0; } || return 1
+}
+
+conf_value() { # conf_value <key>
+  sed -n "s/^$1=//p" "$CONF" 2>/dev/null | tail -n 1
+}
+
+conf_ok() {
+  [[ -f "$CONF" && "$(conf_value addr)" == 127.0.0.1:* && "$(conf_value token)" =~ ^[0-9a-f]{32,}$ ]]
+}
+
+# Write bridge.conf: the address the bridge listens on and the token the app must show.
+make_conf() { # make_conf <keep the port 1|0>
+  mkdir -p "$STATE"
+  chmod 700 "$STATE" 2>/dev/null || true
+  local port
+  if [[ "$1" == 1 ]] && conf_ok; then
+    port="$(conf_value addr)"; port="${port##*:}"
+  else
+    port="$DEFAULT_PORT"
+    local tries=0
+    while port_busy "$port"; do
+      port=$((port + 1))
+      tries=$((tries + 1))
+      ((tries < 30)) || die "no free loopback port near $DEFAULT_PORT"
+    done
+  fi
+  local token tmp
+  token="$(head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n')"
+  tmp="$STATE/.bridge.conf.$$"
+  (umask 077; printf 'addr=127.0.0.1:%s\ntoken=%s\n' "$port" "$token" > "$tmp")
+  mv -f "$tmp" "$CONF"
+  chmod 600 "$CONF" 2>/dev/null || true
+}
+
+ensure_conf() {
+  conf_ok || make_conf 0
+}
+
+bridge_pid() { # prints the pid of our running bridge, or nothing
+  [[ -f "$PIDFILE" ]] || return 0
+  local pid; pid="$(cat "$PIDFILE" 2>/dev/null || true)"
+  if [[ "$pid" =~ ^[0-9]+$ ]] && kill -0 "$pid" 2>/dev/null && ps -p "$pid" -o args= 2>/dev/null | grep -q 'herdr-bridge'; then
+    printf '%s\n' "$pid"
+  fi
+}
+
+bridge_check() {
+  "${HERDR_APP_PYTHON:-python3}" "${HERDR_APP_BRIDGE:?formula did not set the bridge path}" --check --config "$CONF" 2>/dev/null
+}
+
+bridge_start() {
+  ensure_conf
+  if [[ -n "$(bridge_pid)" ]]; then
+    bridge_check || die "the bridge is running (pid $(bridge_pid)) but does not accept this token; run: herdr-app bridge restart"
+    return 0
+  fi
+  local hc="${HERDR_APP_HC:-hc}"
+  : > "$LOGFILE"
+  chmod 600 "$LOGFILE" 2>/dev/null || true
+  # Its own session when setsid exists, so closing the terminal that ran this does not end the bridge.
+  local detach=(nohup)
+  command -v setsid >/dev/null 2>&1 && detach=(setsid nohup)
+  HC_BIN="$hc" "${detach[@]}" "${HERDR_APP_PYTHON:-python3}" "${HERDR_APP_BRIDGE:?formula did not set the bridge path}" --config "$CONF" >> "$LOGFILE" 2>&1 < /dev/null &
+  local started=$!
+  printf '%s\n' "$started" > "$PIDFILE"
+  local i
+  for i in $(seq 1 50); do
+    if bridge_check; then
+      printf 'herdr-app: bridge listening on %s\n' "$(conf_value addr)" >&2
+      return 0
+    fi
+    kill -0 "$started" 2>/dev/null || break
+    sleep 0.1
+  done
+  rm -f "$PIDFILE"
+  die "the bridge did not start ($(tail -n 3 "$LOGFILE" 2>/dev/null | tr '\n' ' ')); is something else using $(conf_value addr)?"
+}
+
+bridge_stop() {
+  local pid; pid="$(bridge_pid)"
+  [[ -n "$pid" ]] || { rm -f "$PIDFILE"; printf 'herdr-app: the bridge is not running\n' >&2; return 0; }
+  kill "$pid" 2>/dev/null || true
+  local i
+  for i in $(seq 1 30); do kill -0 "$pid" 2>/dev/null || break; sleep 0.1; done
+  if kill -0 "$pid" 2>/dev/null; then kill -9 "$pid" 2>/dev/null || true; fi
+  rm -f "$PIDFILE"
+  printf 'herdr-app: the bridge is stopped\n' >&2
+}
+
+bridge_status() {
+  if ! conf_ok; then
+    printf 'bridge: not set up (no usable %s); run `herdr-app install`\n' "$CONF"
+    return 1
+  fi
+  printf 'bridge address: %s\n' "$(conf_value addr)"
+  printf 'config:         %s\n' "$CONF"
+  local pid; pid="$(bridge_pid)"
+  if [[ -z "$pid" ]]; then
+    printf 'bridge:         not running\n'
+    return 1
+  fi
+  printf 'bridge:         running (pid %s)\n' "$pid"
+  if bridge_check; then
+    printf 'token:          accepted\n'
+  else
+    printf 'token:          NOT accepted by the running bridge; run `herdr-app bridge restart`\n'
+    return 1
+  fi
+}
+
+# Copy the HAP and add the bridge's address and token as rawfile/bridge.conf; the app reads it at start-up.
+inject_conf() { # inject_conf <unsigned hap> <output hap>
+  "${HERDR_APP_PYTHON:-python3}" - "$1" "$2" "$CONF" <<'PY'
+import shutil, sys, zipfile
+src, dst, conf = sys.argv[1:4]
+values = {}
+with open(conf) as handle:
+    for line in handle:
+        key, _, value = line.strip().partition("=")
+        if key in ("addr", "token"):
+            values[key] = value
+if not values.get("addr", "").startswith("127.0.0.1:") or len(values.get("token", "")) < 32:
+    sys.exit("herdr-app: bridge.conf is incomplete")
+shutil.copyfile(src, dst)
+name = "resources/rawfile/bridge.conf"
+with zipfile.ZipFile(dst, "a") as hap:
+    if name in hap.namelist():
+        sys.exit("herdr-app: the HAP already carries a bridge.conf")
+    info = zipfile.ZipInfo(name, date_time=(2020, 1, 1, 0, 0, 0))
+    info.compress_type = zipfile.ZIP_STORED
+    hap.writestr(info, f"addr={values['addr']}\ntoken={values['token']}\n")
+PY
+}
+
 command_name="${1:-}"
 case "$command_name" in
   -h|--help|help|"") usage; [[ -n "$command_name" ]] || exit 2; exit 0 ;;
-  install|start) shift ;;
+  install|start|bridge) shift ;;
   *) usage >&2; exit 2 ;;
 esac
 
+if [[ "$command_name" == bridge ]]; then
+  action="${1:-}"
+  (($# <= 1)) || { usage >&2; exit 2; }
+  case "$action" in
+    start) bridge_start ;;
+    stop) bridge_stop ;;
+    restart) bridge_stop; bridge_start ;;
+    status) bridge_status ;;
+    *) usage >&2; exit 2 ;;
+  esac
+  exit
+fi
+
 device=
+new_token=0
 while (($#)); do
   case "$1" in
     --device)
       (($# >= 2)) && [[ -n "$2" && "$2" != --* ]] || die "missing value for --device" 2
       device="$2"
       shift 2 ;;
+    --new-token)
+      [[ "$command_name" == install ]] || { usage >&2; exit 2; }
+      new_token=1
+      shift ;;
     *) usage >&2; exit 2 ;;
   esac
 done
@@ -49,11 +215,22 @@ case "$command_name" in
     hap="${HERDR_APP_HAP:?formula did not set the HAP path}"
     [[ -f "$hap" ]] || die "HAP not found: $hap"
     command -v app-installer >/dev/null || die "command not found: app-installer"
-    install_args=(--hap "$hap" --bundle-id "$BUNDLE_ID" --app-name Herdr --module entry --ability "$ABILITY" --hdc "$hdc")
+    if ((new_token)); then
+      bridge_stop
+      make_conf 1
+    fi
+    bridge_start
+    stage="$(umask 077; mktemp -d "${TMPDIR:-$HOME/.cache}/herdr-app-inject.XXXXXX")"
+    trap 'rm -rf "$stage"' EXIT
+    inject_conf "$hap" "$stage/herdr-app.hap"
+    install_args=(--hap "$stage/herdr-app.hap" --signed-hap "$stage/signed.hap" --bundle-id "$BUNDLE_ID" --app-name Herdr --module entry --ability "$ABILITY" --hdc "$hdc")
     [[ -z "$device" ]] || install_args+=(--device "$device")
     app-installer "${install_args[@]}"
+    printf 'herdr-app: installed with a bridge token; the token is in %s (mode 600) and inside the app\n' "$CONF" >&2
     ;;
   start)
+    conf_ok || die "no bridge set up yet; run: herdr-app install"
+    bridge_start
     "$hdc" ${hdc_args[@]+"${hdc_args[@]}"} shell aa start -b "$BUNDLE_ID" -a "$ABILITY"
     ;;
 esac
