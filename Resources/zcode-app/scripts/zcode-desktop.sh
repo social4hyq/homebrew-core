@@ -19,11 +19,12 @@ usage() {
   cat <<'EOF'
 Usage: zcode-app <command>
 
-  install [--no-acl] [--hap PATH] [--no-serve]
+  install [--no-acl] [--keep] [--hap PATH] [--no-serve]
                       Inject the host connection config, sign and install the
                       shell HAP on the connected device, then start the backing
                       service (--hap overrides the bundled unsigned HAP; used by
-                      tests and local builds; --no-serve skips the start).
+                      tests and local builds; --no-serve skips the start;
+                      --keep keeps the signed HAP and prints where).
   serve [--workspace DIR]
                       Start the host `zcode --web` instance (background) if it
                       is not already healthy; with --workspace, switch the
@@ -218,10 +219,11 @@ device() {
 }
 
 cmd_install() {
-  local extra=() hap="" serve=1
+  local extra=() keep=() hap="" serve=1
   while [ $# -gt 0 ]; do
     case "$1" in
       --no-acl) extra+=("--no-acl"); shift ;;
+      --keep) keep+=("--keep"); shift ;;
       --no-serve) serve=0; shift ;;
       --hap)
         [ $# -ge 2 ] || die "--hap needs a path"
@@ -233,7 +235,7 @@ cmd_install() {
   ensure_secret
   "${ZCODE_DESKTOP_INSTALL_SCRIPT:?missing install script}" \
     --hap "${hap:-${ZCODE_DESKTOP_UNSIGNED_HAP:?missing unsigned HAP}}" \
-    --config "$CONFIG_FILE" "${extra[@]+"${extra[@]}"}"
+    --config "$CONFIG_FILE" "${extra[@]+"${extra[@]}"}" "${keep[@]+"${keep[@]}"}"
   [ "$serve" = 1 ] || return 0
   # The shell connects to the host instance; start it right away so the app
   # icon opens the workbench instead of the "waiting for the service" page.
