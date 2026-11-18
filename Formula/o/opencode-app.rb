@@ -8,7 +8,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 7
+  revision 8
 
   livecheck do
     url :stable
@@ -26,6 +26,7 @@ class OpencodeApp < Formula
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "opencode"
+  depends_on "unzip"
   depends_on "zip"
 
   # Shell sources live in the tap so they are reviewable in the PR. Every path
