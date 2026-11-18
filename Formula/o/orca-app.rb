@@ -2,7 +2,7 @@ class OrcaApp < Formula
   desc "Desktop shell for the Orca agent runtime (Electron window on its web client)"
   homepage "https://github.com/stablyai/orca"
   # Version follows the Orca release the tap-authored shell is built against;
-  # the shell sources live in Patches/orca-app and the host runtime comes from
+  # the shell sources live in Resources/orca-app and the host runtime comes from
   # the `orca` formula, so both formulae track the same upstream tag.
   url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.261.tar.gz"
   sha256 "5b8a21bb9cde62a1dd7ca3c0ffd2f684faf168ea401191068777a8a9e7466909"
@@ -30,17 +30,18 @@ class OrcaApp < Formula
 
   # Shell sources live in the tap so they are reviewable in the PR and no
   # opaque release payload is involved. Every path is listed literally: the
-  # weekly remove-unused-patches job keeps files referenced from Formula/.
-  SHELL_FILES = %w[
-    Patches/orca-app/app/config.json
-    Patches/orca-app/app/main.cjs
-    Patches/orca-app/app/package.json
-    Patches/orca-app/app/tray.cjs
-    Patches/orca-app/app/waiting.html
-    Patches/orca-app/assets/icon.png
-    Patches/orca-app/assets/tray-icon.png
-    Patches/orca-app/scripts/install-desktop.sh
-    Patches/orca-app/scripts/orca-desktop.sh
+  # weekly remove-unused-patches job keeps a Resources/ directory only while a
+  # formula names it.
+  RESOURCE_FILES = %w[
+    Resources/_shared/electron-shell/tray.cjs
+    Resources/orca-app/app/config.json
+    Resources/orca-app/app/main.cjs
+    Resources/orca-app/app/package.json
+    Resources/orca-app/app/waiting.html
+    Resources/orca-app/assets/icon.png
+    Resources/orca-app/assets/tray-icon.png
+    Resources/orca-app/scripts/install-desktop.sh
+    Resources/orca-app/scripts/orca-desktop.sh
   ].freeze
 
   resource "electron-ohos" do
@@ -50,9 +51,9 @@ class OrcaApp < Formula
 
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    source_root = tap_root/"Patches/orca-app"
-    SHELL_FILES.each do |file|
-      raise "#{file} is missing from the tap" unless (tap_root/file).exist?
+    res = tap_root/"Resources/orca-app"
+    RESOURCE_FILES.each do |file|
+      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
     end
 
     resource("electron-ohos").fetch
@@ -63,18 +64,19 @@ class OrcaApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs package.json config.json waiting.html tray.cjs].each do |name|
-      cp source_root/"app"/name, app/name
+    %w[main.cjs package.json config.json waiting.html].each do |name|
+      cp res/"app"/name, app/name
     end
+    cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
 
-    cp source_root/"assets/icon.png", app/"app-icon.png"
-    cp source_root/"assets/tray-icon.png", app/"tray-icon.png"
+    cp res/"assets/icon.png", app/"app-icon.png"
+    cp res/"assets/tray-icon.png", app/"tray-icon.png"
 
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.orca"'
     inreplace shell/"AppScope/app.json5", '"vendor": "example"', '"vendor": "social4hyq"'
     %w[app_icon.png startIcon.png].each do |name|
-      cp source_root/"assets/icon.png", shell/"AppScope/resources/base/media"/name
+      cp res/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
     # App name and ability labels live in per-locale string resources: patching
     # only the base file leaves the zh_CN/en_US overrides intact and the
@@ -197,9 +199,9 @@ class OrcaApp < Formula
 
     # cp, not install: Pathname#install moves the source, and the tap checkout
     # is a read-only host mount inside the CI container.
-    cp source_root/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
+    cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    cp source_root/"scripts/orca-desktop.sh", libexec/"orca-desktop.sh"
+    cp res/"scripts/orca-desktop.sh", libexec/"orca-desktop.sh"
     chmod 0755, libexec/"orca-desktop.sh"
     tool_path = [formula_opt_bin("node"), formula_opt_bin("zip"), formula_opt_bin("unzip"), "$PATH"].join(":")
     (bin/"orca-app").write_env_script libexec/"orca-desktop.sh",
