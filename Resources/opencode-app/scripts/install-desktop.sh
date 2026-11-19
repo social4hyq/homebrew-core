@@ -39,10 +39,13 @@ const config = JSON.parse(fs.readFileSync(source, "utf8"));
 if (!Number.isInteger(config.port) || config.port < 1 || config.port > 65535) throw new Error("invalid port");
 if (typeof config.password !== "string" || !config.password) throw new Error("missing password");
 const home = process.env.HOME;
-const xdg = key => {
-  const value = process.env[key] || "";
-  return value.startsWith(home + "/") || value.startsWith("/storage/") ? value : "";
-};
+// Pass the XDG values through as they are: the shell restores them for the
+// server it spawns, so the server reads the same configuration directory as
+// `opencode` run from this terminal. An unset variable becomes "" (the shell
+// then drops the sandbox's own value). Filtering them here used to hide the
+// terminal's XDG_CONFIG_HOME, so the shell's server read ~/.config/opencode
+// while the terminal read another directory.
+const xdg = key => process.env[key] || "";
 fs.writeFileSync(destination, JSON.stringify({port: config.port, password: config.password, opencode: backend,
   host: {home, path: process.env.PATH, xdgConfig: xdg("XDG_CONFIG_HOME"),
     xdgData: xdg("XDG_DATA_HOME"), xdgState: xdg("XDG_STATE_HOME")}}) + "\n");
