@@ -9,14 +9,14 @@ class GenofficeApp < Formula
   # Apache-2.0 upstream with tap-authored packaging scripts, on the CPF-Electron
   # runtime (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 4
+  revision 5
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5b45245dce73ca247967063f86749114f220db92c18287f27077cefb8d33559b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a6d4d51eec13f02b21593c410e501ca22808b4cea6cf6a750e45d990b9b99d7"
   end
 
-  depends_on "rust" => :build
+  depends_on "genoffice" => :build
   depends_on "app-installer"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
@@ -51,14 +51,21 @@ class GenofficeApp < Formula
       odie "missing tap resource: #{file}" unless (tap_root/file).exist?
     end
 
+    # The xlsx sidecar comes from the genoffice formula (same upstream release,
+    # see below), so the two must not drift apart.
+    genoffice_version = Formula["genoffice"].version.to_s
+    if genoffice_version != version.to_s
+      odie "genoffice #{genoffice_version} does not match genoffice-app #{version}"
+    end
+
     # Build the way `npm run build:all` does, with two differences: the root
     # postinstall (which would download an Electron binary) is skipped, and the
-    # xlsx sidecar is built once with cargo instead of through the sheets
-    # build script. electron-vite only reads the major version of the installed
-    # electron package, and the major versions 40 and 43 take the same fallback
-    # target in electron-vite 5.0.0, so the output is the same for either.
+    # sheets build script is replaced by a plain electron-vite build, because
+    # the xlsx sidecar is not built here. electron-vite only reads the major
+    # version of the installed electron package, and the major versions 40 and
+    # 43 take the same fallback target in electron-vite 5.0.0, so the output is
+    # the same for either.
     system "npm", "ci", "--ignore-scripts"
-    system "cargo", "install", *std_cargo_args(root: buildpath/"sidecar", path: "apps/sheets/native/xlsx-engine")
     # without this the bundled CLI reports the CLI package version (0.10.0)
     ENV["GENOFFICE_APP_VERSION"] = version.to_s
     %w[docs slides pdf markdown html cli].each do |name|
@@ -123,8 +130,12 @@ class GenofficeApp < Formula
     # The xlsx sidecar. An executable inside the HAP takes the .bin suffix: a
     # bare name or .so goes through the packer's native library pipeline and
     # breaks the pre-signed .codesign (the shell is patched to look for it).
+    # It is copied from the genoffice keg, not built here: the pipeline signs
+    # the ELF files of a keg, but not one inside the HAP (a zip), and an
+    # unsigned executable fails to spawn on a device with EACCES. The copy keeps
+    # the signature of the keg's file.
     (resources/"native").mkpath
-    cp buildpath/"sidecar/bin/xlsx-sidecar", resources/"native/xlsx-sidecar.bin"
+    cp formula_opt_prefix("genoffice")/"libexec/native/xlsx-sidecar", resources/"native/xlsx-sidecar.bin"
     chmod 0755, resources/"native/xlsx-sidecar.bin"
 
     %w[LICENSE LICENSE-UNICODE.txt NOTICE].each do |name|
@@ -277,6 +288,13 @@ class GenofficeApp < Formula
     package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
     assert_equal "out/main/index.js", package["main"]
     assert_equal version.to_s, package["version"]
+
+    # an unsigned sidecar cannot be spawned on a device (EACCES); the signed
+    # file of the genoffice keg carries a code signature section, a fresh build
+    # does not
+    sidecar_signature = shell_output("unzip -p #{hap} resources/resfile/resources/native/xlsx-sidecar.bin | " \
+                                     "grep -a -c -i codesign")
+    assert_operator sidecar_signature.to_i, :>, 0
 
     # the temporary diagnostics patch must have reached the shell's main bundle
     diag_lines = shell_output("unzip -p #{hap} 'resources/resfile/resources/app/out/main/*' | " \
