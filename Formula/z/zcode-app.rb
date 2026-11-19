@@ -10,7 +10,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 17
+  revision 18
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -20,9 +20,8 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r17"
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e8595cff09b04d674b85c717e1187adb2824413e8c6a82bb7492e561870f813"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r18"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "29fde4f436b5f8f8c5767828cf30234bba6e7187177e6821919978a01f798711"
   end
 
   depends_on "app-installer"
@@ -257,11 +256,10 @@ class ZcodeApp < Formula
       app-installer generates a local debug profile (the first run asks for a
       Huawei Developer login), signs the HAP and installs it.
 
-      `zcode-app install` also starts the backing `zcode --web` instance,
-      so the app icon opens the workbench directly. When the service is not
-      running (after a reboot, for example) the shell starts it itself by
-      running `zcode-app serve`, and `zcode-app start` does the same before it
-      opens the app. This needs the weak-sandbox permissions CUSTOM_SANDBOX and
+      `zcode-app install` does not start the backing `zcode --web` instance.
+      When the app icon is opened and the service is not running, the shell
+      starts it itself by running `zcode-app serve`, and `zcode-app start`
+      does the same before it opens the app. This needs the weak-sandbox permissions CUSTOM_SANDBOX and
       READ_WRITE_USER_FILE, which are granted through a debug profile generated
       on the spot (no approval wait; the release path still goes through AGC
       review). The service the shell starts belongs to the app: it runs as the
@@ -419,6 +417,13 @@ class ZcodeApp < Formula
     assert_equal "signed-by-fake", (keep_tmp/"zcode-desktop-signed.hap").read
     refute_match "signed HAP kept",
                  shell_output("#{bin}/zcode-app install --hap #{fake_hap} --no-serve 2>&1")
+
+    # install never starts the service (the app or `start` does): no start
+    # message and no pid file after a plain install.
+    plain_output = shell_output("#{bin}/zcode-app install --hap #{fake_hap} 2>&1")
+    assert_match "installed", plain_output
+    refute_match "bundled server", plain_output
+    refute_path_exists testpath/"home/.config/zcode-desktop/web.pid"
 
     # start opens the app; --no-serve skips starting the service first, and an
     # unknown option is rejected.
