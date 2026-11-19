@@ -4,7 +4,14 @@
 set -euo pipefail
 
 BUNDLE_ID="${ZCODE_DESKTOP_BUNDLE:-com.social4hyq.zcodedesktop}"
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zcode-desktop"
+# The state (config.json, pid file, log, patched server copies) lives under
+# $HOME, not under XDG_CONFIG_HOME: the desktop shell runs `zcode-app serve`
+# from its own app sandbox, where the terminal's XDG path (a directory inside
+# the terminal app's sandbox) is a different place, so the shell and the CLI
+# would end up with two configs, two ports and two pid files.
+CONFIG_DIR="${ZCODE_DESKTOP_CONFIG_DIR:-$HOME/.config/zcode-desktop}"
+# Older versions kept the state in ${XDG_CONFIG_HOME:-$HOME/.config}/zcode-desktop.
+LEGACY_CONFIG_DIR="${XDG_CONFIG_HOME:+$XDG_CONFIG_HOME/zcode-desktop}"
 CONFIG_FILE="$CONFIG_DIR/config.json"
 PID_FILE="$CONFIG_DIR/web.pid"
 LOG_FILE="$CONFIG_DIR/web.log"
@@ -99,6 +106,29 @@ server_version() {
 
 proc_alive() {
   [ -n "${1:-}" ] && kill -0 "$1" 2>/dev/null
+}
+
+# Move the state of an older version over once. The old directory is the one the
+# CLI (and its running service) used, so its config.json wins over whatever is
+# already in the new directory; its pid file only comes along while that
+# process is still alive.
+migrate_legacy_config() {
+  [ -z "${ZCODE_DESKTOP_CONFIG_DIR:-}" ] || return 0
+  [ -n "$LEGACY_CONFIG_DIR" ] && [ "$LEGACY_CONFIG_DIR" != "$CONFIG_DIR" ] || return 0
+  [ -f "$LEGACY_CONFIG_DIR/config.json" ] || return 0
+  mkdir -p "$CONFIG_DIR"
+  chmod 700 "$CONFIG_DIR" 2>/dev/null || true
+  cp "$LEGACY_CONFIG_DIR/config.json" "$CONFIG_DIR/config.json"
+  mv "$LEGACY_CONFIG_DIR/config.json" "$LEGACY_CONFIG_DIR/config.json.migrated"
+  if [ -f "$LEGACY_CONFIG_DIR/web.pid" ]; then
+    local pid
+    pid="$(cat "$LEGACY_CONFIG_DIR/web.pid" 2>/dev/null || true)"
+    if proc_alive "$pid"; then
+      cp "$LEGACY_CONFIG_DIR/web.pid" "$CONFIG_DIR/web.pid"
+    fi
+    rm -f "$LEGACY_CONFIG_DIR/web.pid"
+  fi
+  log "moved the service state from $LEGACY_CONFIG_DIR to $CONFIG_DIR"
 }
 
 stop_pid() {
@@ -344,6 +374,11 @@ cmd_stop() {
     printf 'zcode-desktop: no managed server running\n'
   fi
 }
+
+case "${1:-}" in
+  -h|--help|help|"") ;;
+  *) migrate_legacy_config ;;
+esac
 
 case "${1:-}" in
   install) shift; cmd_install "$@" ;;

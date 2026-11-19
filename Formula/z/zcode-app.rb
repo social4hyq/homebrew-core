@@ -10,7 +10,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 15
+  revision 16
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -20,9 +20,8 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r11"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "13fd278c23fbfee8c02751e240ff07366cc8991f03bf877abe7c32bcc35cb9b6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "807f34c9d7c28cab526bb6bb5502da50375c122e81d60398a99abab256c81445"
   end
 
   depends_on "app-installer"
@@ -271,6 +270,12 @@ class ZcodeApp < Formula
         zcode-app status
         zcode-app stop
 
+      The service state (config.json, web.pid, web.log and the patched server
+      copy) lives in ~/.config/zcode-desktop, so the shell and the terminal see
+      the same files, port and process. Older versions kept it under
+      $XDG_CONFIG_HOME, which is a different directory inside the shell's app
+      sandbox; the first `zcode-app` command moves it over.
+
       `serve` also creates ~/.zcode/v2/credential-secret and exports
       ZCODE_CREDENTIAL_SECRET_FILE. ZCode 3.18.2 refuses to start without a
       credential secret and HarmonyOS has no Secret Service, so the file is
@@ -418,6 +423,19 @@ class ZcodeApp < Formula
 
     assert_match "no managed server running", shell_output("#{bin}/zcode-app stop")
     assert_match "not healthy", shell_output("#{bin}/zcode-app status 2>&1", 1)
+
+    # The state lives under $HOME. What an older version kept under
+    # XDG_CONFIG_HOME is moved over by the first command, once.
+    legacy = testpath/"xdg/zcode-desktop"
+    legacy.mkpath
+    (legacy/"config.json").write JSON.generate("port" => 14_777, "workspace" => "/legacy")
+    moved = shell_output("XDG_CONFIG_HOME=#{testpath}/xdg #{bin}/zcode-app status 2>&1", 1)
+    assert_match "moved the service state", moved
+    assert_match "http://127.0.0.1:14777", moved
+    assert_equal 14_777, JSON.parse((testpath/"home/.config/zcode-desktop/config.json").read).fetch("port")
+    assert_path_exists legacy/"config.json.migrated"
+    refute_path_exists legacy/"config.json"
+    refute_match "moved the service state", shell_output("#{bin}/zcode-app status 2>&1", 1)
 
     # The real bottle HAP.
     hap = libexec/"zcode-desktop-unsigned.hap"
