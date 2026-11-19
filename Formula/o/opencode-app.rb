@@ -8,7 +8,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 9
+  revision 10
 
   livecheck do
     url :stable
@@ -279,12 +279,20 @@ class OpencodeApp < Formula
     ENV.prepend_path "PATH", formula_opt_bin("node").to_s
     ENV["OPENCODE_DESKTOP_HDC"] = (fake_bin/"hdc").to_s
 
+    ENV["XDG_CONFIG_HOME"] = "/opencode-xdg-test/config"
+    ENV["XDG_DATA_HOME"] = "/opencode-xdg-test/data"
+    ENV.delete("XDG_STATE_HOME")
     assert_match "installed", shell_output("#{bin}/opencode-app install")
     config = JSON.parse(shell_output("unzip -p #{injected_copy} resources/resfile/resources/app/config.json"))
     assert_operator config.fetch("port"), :>, 0
     refute_empty config.fetch("password")
     refute_empty config.fetch("opencode")
     assert_equal Dir.home, config.dig("host", "home")
+    # XDG values reach the shell unchanged, whatever the path, so the server it
+    # spawns reads the same configuration as the terminal; an unset one is "".
+    assert_equal "/opencode-xdg-test/config", config.dig("host", "xdgConfig")
+    assert_equal "/opencode-xdg-test/data", config.dig("host", "xdgData")
+    assert_equal "", config.dig("host", "xdgState")
     acl_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     acl_requested = acl_module.fetch("module").fetch("requestPermissions")
     acl_permissions = acl_requested.map { |permission| permission.fetch("name") }
