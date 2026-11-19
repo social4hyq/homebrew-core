@@ -46,23 +46,179 @@ sudo sysctl -q -w net.core.default_qdisc=fq net.ipv4.tcp_congestion_control=bbr 
 DEFROUTE=$(ip route show default 2>/dev/null)
 [ -n "$DEFROUTE" ] && { sudo ip route change $DEFROUTE initcwnd 64 initrwnd 64 2>/dev/null || true; }
 
-# 3. presigned upload URL (file_name required), then PUT to OBS object storage.
-#    GHA-to-OBS bandwidth can sink to ~15-18KB/s on a bad trans-Pacific
-#    window (measured 2026-07-19/20) even with the tuning above applied
-#    (e.g. no CAP_NET_ADMIN), so a hard -m 300 kills viable-but-slow
-#    uploads. Use low-speed detection instead: <1KB/s sustained for 120s =
-#    genuinely stalled; -m 7200 caps a 71MB llvm-sized bottle even at the
-#    observed worst-case rate. --tcp-nodelay + empty Expect: header were
-#    part of the validated fast configuration, keep them alongside the
-#    sysctl tuning above.
+# 3. presigned upload URL (file_name required), then hedged PUT to OBS.
+#    The PUT lands on file.gitcode.com (one A record in front of a Huawei
+#    Cloud bucket), so every connection crosses the same long fat path and
+#    per-connection throughput is a lottery. 2026-11-19 bench (throwaway
+#    workflow runs, 6 uploads per config, same VM and edge IP):
+#      - one connection: 43 KiB/s .. 1.3 MiB/s back-to-back (3 of 6 landed
+#        above 850 KiB/s, 3 below 130) — that is how a 199 MiB bottle spent
+#        29m36s on a single PUT while the same bytes reach GitHub in 8s
+#      - 4 concurrent PUTs of the SAME object: the fastest finished a 64 MiB
+#        blob in 22.2s (3.03 MiB/s), 26x the single-connection rate, with
+#        the stored object byte-identical and exactly one attachment
+#      - BBR/initcwnd below is confirmed applied (cc=bbr, sysctls rc=0),
+#        x86 runners are no faster, the host speaks HTTP/1.1 only and has no
+#        multipart API — concurrency is the only lever that moves this.
+#    So race N PUTs of the same bytes and keep the first 2xx. Whole-object
+#    PUTs commit only when the body is fully received, so killing the losers
+#    cannot corrupt what the winner wrote.
+#    Two details came out of the first live attempt (run 44552723437):
+#      - duplicate uploads of an object that is already stored answer 203
+#        (Non-Authoritative Information), not 200 — accept any 2xx, or a good
+#        upload gets reported as a failure;
+#      - a per-connection --speed-limit is wrong here: K connections share one
+#        thin pipe, so every one of them can sit under the floor and curl
+#        aborts the whole hedge. Only the wall-clock deadline applies now, and
+#        a connection that dies is simply replaced (up to
+#        BOTTLE_UPLOAD_MAX_ATTEMPTS) instead of taking the step down with it.
 RESP=$(ag "$API/releases/$TAG/upload_url?file_name=$FILENAME")
-echo
-curl -sS --fail-with-body --tcp-nodelay -H "Expect:" --speed-limit 1024 --speed-time 120 -m 7200 -X PUT "$(echo "$RESP" | jq -r .url)" \
-  -H "x-obs-meta-project-id: $(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')" \
-  -H "x-obs-acl: $(echo "$RESP" | jq -r '.headers["x-obs-acl"]')" \
-  -H "x-obs-callback: $(echo "$RESP" | jq -r '.headers["x-obs-callback"]')" \
-  -H "Content-Type: application/octet-stream" \
-  --data-binary "@$BOTTLE" -w "\nHTTP=%{http_code}\n"
+UPLOAD_URL=$(echo "$RESP" | jq -r .url)
+HDR_META=$(echo "$RESP" | jq -r '.headers["x-obs-meta-project-id"]')
+HDR_ACL=$(echo "$RESP" | jq -r '.headers["x-obs-acl"]')
+HDR_CB=$(echo "$RESP" | jq -r '.headers["x-obs-callback"]')
+SIZE=$(stat -c%s "$BOTTLE")
+
+HEDGE=${BOTTLE_UPLOAD_HEDGE:-4}                  # connections in the first wave
+HEDGE_MAX=${BOTTLE_UPLOAD_MAX:-12}               # hard cap on concurrency
+HEDGE_ATTEMPTS=${BOTTLE_UPLOAD_MAX_ATTEMPTS:-24} # total connections across replacements
+WAVE_DELAY=${BOTTLE_UPLOAD_WAVE_DELAY:-120}      # widen the hedge after this long
+UPLOAD_TIMEOUT=${BOTTLE_UPLOAD_TIMEOUT:-7200}    # wall-clock cap, matches the old per-PUT -m
+TARGET=$HEDGE
+UPLOAD_DIR=$(mktemp -d)
+PIDS=()
+LAUNCHED=0
+
+# One whole-object PUT. `exec` makes the subshell become curl, so $! is
+# curl's own pid and killing it really closes the upload (a killed subshell
+# would leave curl orphaned and still writing). `-w` output lands in
+# $UPLOAD_DIR/<n>.code as "<http code> <seconds> <bytes> <bytes/s>".
+start_wave() { # $1 = how many connections to add
+  local n=$1 i
+  [ "$n" -gt 0 ] || return 0
+  for i in $(seq 1 "$n"); do
+    LAUNCHED=$((LAUNCHED + 1))
+    ( exec curl -sS --fail-with-body --tcp-nodelay -H "Expect:" \
+        -m "$UPLOAD_TIMEOUT" -X PUT "$UPLOAD_URL" \
+        -H "x-obs-meta-project-id: $HDR_META" \
+        -H "x-obs-acl: $HDR_ACL" \
+        -H "x-obs-callback: $HDR_CB" \
+        -H "Content-Type: application/octet-stream" \
+        -o /dev/null --data-binary "@$BOTTLE" \
+        -w '%{http_code} %{time_total} %{size_upload} %{speed_upload}' \
+        >"$UPLOAD_DIR/$LAUNCHED.code" 2>"$UPLOAD_DIR/$LAUNCHED.err" ) &
+    PIDS+=("$!")
+  done
+  echo "== hedged PUT $FILENAME ($SIZE B): connections $((LAUNCHED - n + 1))-$LAUNCHED =="
+}
+
+# `jobs` is unusable here: inside the $(...) command substitution that reads
+# it, a subshell reports no jobs of its own, so every curl looked "finished"
+# and the hedge kept spawning replacements while the first wave was still
+# uploading (caught by a local mock before the second live run). Track the
+# pids we launched instead; exec means each pid IS curl.
+count_alive() {
+  local n=0 i
+  for i in $(seq 1 "$LAUNCHED"); do
+    [ -s "$UPLOAD_DIR/$i.code" ] && continue
+    kill -0 "${PIDS[$((i - 1))]}" 2>/dev/null && n=$((n + 1))
+  done
+  echo "$n"
+}
+
+report_conns() {
+  local f
+  for f in "$UPLOAD_DIR"/*.code; do
+    [ -e "$f" ] || continue
+    echo "  conn $(basename "$f" .code): [$(cat "$f" 2>/dev/null)] err=[$(tr '\r' '\n' <"${f%.code}.err" 2>/dev/null | grep -vE '^[[:space:]]*$' | tail -1)]"
+  done
+}
+
+WINNER=""
+start_wave "$TARGET"
+WAVE_AT=$SECONDS
+DEADLINE=$((SECONDS + UPLOAD_TIMEOUT))
+while :; do
+  for f in "$UPLOAD_DIR"/*.code; do
+    [ -s "$f" ] || continue
+    # curl's -w output has no trailing newline, so `read` returns EOF (non-zero)
+    # while still filling the variable — read the code with awk instead of
+    # gating on read's exit status.
+    code=$(awk 'NR==1{print $1; exit}' "$f" 2>/dev/null || true)
+    case "$code" in
+      2[0-9][0-9])
+        WINNER=$f
+        break 2
+        ;;
+    esac
+  done
+  ALIVE=$(count_alive)
+  # An unlucky start should not be waited out: widen before replacing, so the
+  # replacements below fill the new target.
+  if [ "$TARGET" -lt "$HEDGE_MAX" ] && [ $((SECONDS - WAVE_AT)) -ge "$WAVE_DELAY" ]; then
+    TARGET=$((TARGET + HEDGE))
+    [ "$TARGET" -gt "$HEDGE_MAX" ] && TARGET=$HEDGE_MAX
+    WAVE_AT=$SECONDS
+    echo "::notice::no completion after $((SECONDS))s; widening the hedge to $TARGET connections"
+  fi
+  if [ "$ALIVE" -lt "$TARGET" ] && [ "$LAUNCHED" -lt "$HEDGE_ATTEMPTS" ]; then
+    BATCH=$((TARGET - ALIVE))
+    [ $((LAUNCHED + BATCH)) -gt "$HEDGE_ATTEMPTS" ] && BATCH=$((HEDGE_ATTEMPTS - LAUNCHED))
+    echo "::notice::$ALIVE of $TARGET connections still running; starting $BATCH replacements"
+    start_wave "$BATCH"
+  fi
+  if [ "$ALIVE" -eq 0 ] && [ "$LAUNCHED" -ge "$HEDGE_ATTEMPTS" ]; then
+    echo "::error::all $LAUNCHED hedged upload connections failed"
+    report_conns
+    break
+  fi
+  if [ "$SECONDS" -ge "$DEADLINE" ]; then
+    echo "::error::hedged bottle upload did not finish within ${UPLOAD_TIMEOUT}s"
+    report_conns
+    break
+  fi
+  sleep 2
+done
+
+kill "${PIDS[@]}" 2>/dev/null || true
+wait 2>/dev/null || true
+[ -n "$WINNER" ] || { rm -rf "$UPLOAD_DIR"; exit 1; }
+echo "::notice::hedged upload won by connection $(basename "$WINNER" .code): $(cat "$WINNER")"
+report_conns
+
+# The asset only becomes downloadable once the OBS callback registers it, and
+# that can lag the PUT by a few seconds, so poll the byte count instead of
+# trusting the 2xx alone. A mismatch means a truncated object: fail here,
+# before the bottle commit is pushed.
+ACTUAL=""
+for _ in $(seq 1 20); do
+  # `|| true` matters: lib.sh sets pipefail, and a transient CDN error here
+  # must not abort a publish whose upload already succeeded.
+  ACTUAL=$(curl -sSL -m 60 -r 0-0 -o /dev/null -D - \
+    "https://atomgit.com/social4hyq/homebrew-core/releases/download/$TAG/$FILENAME" 2>/dev/null \
+    | tr -d '\r' | awk 'tolower($1)=="content-range:"{print $3}' | cut -d/ -f2 || true)
+  [ "$ACTUAL" = "$SIZE" ] && break
+  sleep 3
+done
+[ "$ACTUAL" = "$SIZE" ] || {
+  echo "::error::published asset is ${ACTUAL:-nothing} bytes, expected $SIZE; refusing to push the bottle commit"
+  rm -rf "$UPLOAD_DIR"
+  exit 1
+}
+echo "published asset size verified: $ACTUAL bytes"
+
+# Losers are killed within ~2s of the winner, but two near-tied connections
+# can both complete and atomgit then lists the same attachment name twice.
+# Both carry identical bytes; this only keeps the release tidy.
+ATTACH_IDS=$(ag "$API/releases/tags/$TAG" | jq -r --arg n "$FILENAME" '.assets[]?|select(.name==$n)|.id' || true)
+ATTACH_COUNT=$(grep -c . <<<"$ATTACH_IDS" || true)
+if [ "${ATTACH_COUNT:-0}" -gt 1 ]; then
+  echo "::warning::$ATTACH_COUNT attachments named $FILENAME; removing all but the last"
+  for id in $(head -n $((ATTACH_COUNT - 1)) <<<"$ATTACH_IDS"); do
+    ag -X DELETE "$API/releases/$TAG/attach_files/$id" || true
+  done
+fi
+rm -rf "$UPLOAD_DIR"
 
 # 4. merge bottle block back (--merge takes the json file, not the formula name)
 docker exec -w "$TAP_IN_CONTAINER/bottle-out" "$CONTAINER" bash -lc \
