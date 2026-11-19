@@ -12,6 +12,15 @@ BUNDLE_ID="${ZCODE_DESKTOP_BUNDLE:-com.social4hyq.zcodedesktop}"
 CONFIG_DIR="${ZCODE_DESKTOP_CONFIG_DIR:-$HOME/.config/zcode-desktop}"
 # Older versions kept the state in ${XDG_CONFIG_HOME:-$HOME/.config}/zcode-desktop.
 LEGACY_CONFIG_DIR="${XDG_CONFIG_HOME:+$XDG_CONFIG_HOME/zcode-desktop}"
+# Permissions of this directory. The device keeps $HOME on its shared hmdfs
+# mount, where chmod is a no-op: it returns 0 and changes nothing, so the
+# `chmod 700` calls below only take effect on ordinary file systems. Do not try
+# to make the directory private by creating it under `umask 077`: that gives
+# mode 2700, and on hmdfs nobody can write to a 2700 directory, neither the
+# user who created it nor the app's own uid, so install, serve, the pid file and
+# the log would all fail with EACCES. Files are different: a file created under
+# `umask 077` (mode 600) in the usual 2771 directory is read and written
+# normally by the terminal and by the app.
 CONFIG_FILE="$CONFIG_DIR/config.json"
 PID_FILE="$CONFIG_DIR/web.pid"
 LOG_FILE="$CONFIG_DIR/web.log"
@@ -61,6 +70,7 @@ ensure_secret() {
   local dir
   dir="$(dirname "$SECRET_FILE")"
   mkdir -p "$dir"
+  # No-op on hmdfs, see the note above CONFIG_FILE; kept for ordinary file systems.
   chmod 700 "$dir" 2>/dev/null || true
   if [ ! -s "$SECRET_FILE" ] || [ "$(wc -c < "$SECRET_FILE")" -lt 32 ]; then
     (umask 077; head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n' > "$SECRET_FILE")
@@ -74,6 +84,7 @@ json_escape() {
 
 ensure_config() {
   mkdir -p "$CONFIG_DIR"
+  # No-op on hmdfs, see the note above CONFIG_FILE; kept for ordinary file systems.
   chmod 700 "$CONFIG_DIR" 2>/dev/null || true
   if [ ! -f "$CONFIG_FILE" ]; then
     local port="$DEFAULT_PORT" tries=0
@@ -134,6 +145,7 @@ migrate_legacy_config() {
   [ -n "$LEGACY_CONFIG_DIR" ] && [ "$LEGACY_CONFIG_DIR" != "$CONFIG_DIR" ] || return 0
   [ -f "$LEGACY_CONFIG_DIR/config.json" ] || return 0
   mkdir -p "$CONFIG_DIR"
+  # No-op on hmdfs, see the note above CONFIG_FILE; kept for ordinary file systems.
   chmod 700 "$CONFIG_DIR" 2>/dev/null || true
   cp "$LEGACY_CONFIG_DIR/config.json" "$CONFIG_DIR/config.json"
   mv "$LEGACY_CONFIG_DIR/config.json" "$LEGACY_CONFIG_DIR/config.json.migrated"
