@@ -264,8 +264,12 @@ class ZcodeApp < Formula
       opens the app. This needs the weak-sandbox permissions CUSTOM_SANDBOX and
       READ_WRITE_USER_FILE, which are granted through a debug profile generated
       on the spot (no approval wait; the release path still goes through AGC
-      review). The service stays CLI-managed and keeps running when the shell
-      exits. To manage it by hand:
+      review). The service the shell starts belongs to the app: it runs as the
+      app's user and goes away when the app exits (tray menu: Quit), so the next
+      launch starts it again. A service you start yourself with
+      `zcode-app serve` belongs to your terminal user and keeps running after the
+      app exits; only that one can be stopped with `zcode-app stop`. To stop a
+      service the shell started, quit the app. To manage it by hand:
 
         zcode-app serve
         zcode-app status
