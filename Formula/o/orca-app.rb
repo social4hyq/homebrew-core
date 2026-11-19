@@ -374,8 +374,9 @@ class OrcaApp < Formula
     # A healthy server without a pairing file (as the shell's own runtime) is
     # reported as healthy with exit status 0.
     up_port = free_port
+    (testpath/"home/.config/orca-app/config.json").delete
     (testpath/"home/.config/orca-app/config.json").write JSON.generate("port" => up_port)
-    web = spawn("node", "-e",
+    web = spawn(formula_opt_bin("node")/"node", "-e",
                 "require('http').createServer((q, r) => { r.statusCode = q.url === '/web-index.html' ? 200 : 404; " \
                 "r.end('ok'); }).listen(#{up_port}, '127.0.0.1')",
                 [:out, :err] => File::NULL)
