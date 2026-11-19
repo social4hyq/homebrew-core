@@ -10,8 +10,8 @@
 # this script); only what is specific to OpenCode is written here.
 #
 # The default variant is the ACL one (CUSTOM_SANDBOX and READ_WRITE_USER_FILE let
-# the shell spawn the host binary and reach the host profile). --no-acl installs
-# the strong-sandbox variant.
+# the shell spawn the host binary and reach the host profile, READ_PASTEBOARD
+# makes paste work). --no-acl installs the strong-sandbox variant.
 set -euo pipefail
 
 APP_CMD=opencode-app
