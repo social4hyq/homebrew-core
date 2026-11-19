@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# Sign and install the GenOffice runtime probe HAP.
+# Sign and install the GenOffice desktop HAP.
 #
-# The probe takes no host configuration; the flow itself is shared by the HAP
-# apps of this tap (hap-app-install-lib.sh, installed next to this script). The
-# only per-install file is a stamp inside the app directory, which tells the
-# probe report which signed copy is running.
+# GenOffice takes no host configuration: the shell runs everything inside the
+# HAP. The flow itself is shared by the HAP apps of this tap
+# (hap-app-install-lib.sh, installed next to this script). The shared flow adds
+# the files staged here to a copy of the HAP and fails on an empty tree, so a
+# stamp with the install time is staged; it also tells which signed copy is
+# installed.
 set -euo pipefail
 
 APP_CMD=genoffice-app

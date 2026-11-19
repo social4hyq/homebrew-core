@@ -1,34 +1,33 @@
 class GenofficeApp < Formula
-  desc "Runtime probe for the GenOffice desktop shell on electron-ohos (experimental)"
+  desc "GenOffice AI office suite (docs, sheets, slides, PDF, Markdown, HTML) as a HAP"
   homepage "https://github.com/genspark-ai/genoffice"
-  # Version follows the upstream GenOffice tag. This experiment builds no
-  # upstream code; it only borrows the app icon from the release tarball.
+  # Version follows the upstream GenOffice tag: this packages that release's
+  # shell on the CPF-Electron runtime, and the OHOS packaging sources live in
+  # Resources/genoffice-app and Patches/genoffice-app.
   url "https://github.com/genspark-ai/genoffice/archive/refs/tags/v0.13.18.tar.gz"
   sha256 "156528d8fa1e6878d6c61d3576d6d6b093eda4abbef223e7fbc4bd4855c9cb08"
-  # Tap-authored probe sources packaging the CPF-Electron runtime
-  # (Chromium/Electron, mixed MIT/BSD/LGPL) and the Apache-2.0 upstream icon.
+  # Apache-2.0 upstream with tap-authored packaging scripts, on the CPF-Electron
+  # runtime (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
+  revision 1
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r1"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "6da0a59bb8c371d70c09ab2ce1500e1c7a158cbbd06356ae4acfbe55d917587d"
   end
 
+  depends_on "rust" => :build
   depends_on "app-installer"
-  depends_on "genoffice"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "unzip"
   depends_on "zip"
 
-  # Probe sources live in the tap so they are reviewable in the PR. Every path
-  # is listed literally: the weekly remove-unused-patches job keeps a
-  # Resources/ directory only while a formula names it.
+  # Tap-authored packaging scripts live in the tap so they are reviewable in
+  # the PR. Every path is listed literally: the weekly remove-unused-patches
+  # job keeps a Resources/ directory only while a formula names it.
   RESOURCE_FILES = %w[
     Resources/_shared/hap-app/install-lib.sh
-    Resources/genoffice-app/app/index.html
-    Resources/genoffice-app/app/main.cjs
-    Resources/genoffice-app/app/package.json
     Resources/genoffice-app/scripts/genoffice-app.sh
     Resources/genoffice-app/scripts/install-desktop.sh
   ].freeze
@@ -38,6 +37,13 @@ class GenofficeApp < Formula
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
   end
 
+  patch_root = Pathname(__dir__).parent.parent
+  Dir[(patch_root/"Patches/genoffice-app/ohos/*.patch").to_s].each do |path|
+    patch do
+      file Pathname(path).relative_path_from(patch_root).to_s
+    end
+  end
+
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     res = tap_root/"Resources/genoffice-app"
@@ -45,30 +51,85 @@ class GenofficeApp < Formula
       odie "missing tap resource: #{file}" unless (tap_root/file).exist?
     end
 
+    # Build the way `npm run build:all` does, with two differences: the root
+    # postinstall (which would download an Electron binary) is skipped, and the
+    # xlsx sidecar is built once with cargo instead of through the sheets
+    # build script. electron-vite only reads the major version of the installed
+    # electron package, and the major versions 40 and 43 take the same fallback
+    # target in electron-vite 5.0.0, so the output is the same for either.
+    system "npm", "ci", "--ignore-scripts"
+    system "cargo", "install", *std_cargo_args(root: buildpath/"sidecar", path: "apps/sheets/native/xlsx-engine")
+    # without this the bundled CLI reports the CLI package version (0.10.0)
+    ENV["GENOFFICE_APP_VERSION"] = version.to_s
+    %w[docs slides pdf markdown html cli].each do |name|
+      system "npm", "run", "build", "-w", "@genoffice/#{name}"
+    end
+    cd "apps/sheets" do
+      system buildpath/"node_modules/.bin/electron-vite", "build"
+    end
+    system "npm", "run", "build", "-w", "@genoffice/shell"
+
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
     system "tar", "-xzf", buildpath/"libelectron_144.tar.gz", "-C", buildpath
     shell = buildpath/"libelectron/ohos_hap"
 
-    # Layout under test: the app directory next to a native/ directory and a
-    # marker file, the way the GenOffice shell expects process.resourcesPath to
-    # look. The probe reports which directory electron-ohos really calls
-    # resourcesPath, and whether the embedded executable can be spawned. The
-    # executable is the sidecar of the genoffice formula; it takes the .bin
-    # suffix because a file without an extension (or a .so) goes through the
-    # hvigor native library pipeline and breaks the pre-signed .codesign.
+    # The layout of the packaged upstream app (apps/shell/electron-builder.cjs):
+    # the shell itself in app/, everything it reads through process.resourcesPath
+    # next to it. Measured under electron-ohos: process.resourcesPath is the
+    # HAP's resfile/resources, and app.getAppPath() is its app/ directory.
     resources = shell/"web_engine/src/main/resources/resfile/resources"
     app = resources/"app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs index.html package.json].each do |name|
-      cp res/"app"/name, app/name
+    cp_r buildpath/"apps/shell/out", app/"out"
+    package = JSON.parse((buildpath/"apps/shell/package.json").read)
+    package = package.slice("name", "productName", "version", "description", "main", "license", "homepage", "author")
+    package["version"] = version.to_s
+    (app/"package.json").write JSON.generate(package)
+
+    (resources/"modules").mkpath
+    %w[docs sheets slides pdf markdown html].each do |name|
+      cp_r buildpath/"apps"/name/"out", resources/"modules"/name
     end
-    (resources/"probe-marker.txt").write "resources\n"
-    (app/"probe-marker.txt").write "app\n"
+
+    # PDF text editing and .hwp import engines, resolved under resources/wasm
+    (resources/"wasm").mkpath
+    cp buildpath/"node_modules/@embedpdf/pdfium/dist/pdfium.wasm", resources/"wasm/pdfium.wasm"
+    cp buildpath/"apps/pdf/node_modules/harfbuzzjs/hb-subset.wasm", resources/"wasm/hb-subset.wasm"
+    cp buildpath/"node_modules/@rhwp/core/rhwp_bg.wasm", resources/"wasm/rhwp_bg.wasm"
+
+    # The genoffice command line the shell runs on its own Node runtime, with
+    # the layout packages/cli/src/resources.ts expects.
+    cli = resources/"cli"
+    cli.mkpath
+    cp buildpath/"packages/cli/dist/genoffice.cjs", cli/"genoffice.cjs"
+    cp buildpath/"packages/cli/bin/genoffice", cli/"genoffice"
+    cp buildpath/"packages/cli/package.json", cli/"package.json"
+    cp_r buildpath/"packages/cli/dist/node_modules", cli/"node_modules"
+    (cli/"skills/genoffice").mkpath
+    cp buildpath/"skills/genoffice/SKILL.md", cli/"skills/genoffice/SKILL.md"
+    cp_r buildpath/"skills/recommended", cli/"skills/recommended"
+
+    # The Genspark login CLI (cloud projects). The symlinks npm leaves inside
+    # the packages (.bin links) are dropped so no link ends up inside the HAP.
+    gsk = resources/"gsk/node_modules"
+    (gsk/"@genspark").mkpath
+    cp_r buildpath/"node_modules/@genspark/cli", gsk/"@genspark/cli"
+    cp_r buildpath/"node_modules/@genspark/cli/node_modules/commander", gsk/"commander"
+    cp_r buildpath/"node_modules/ws", gsk/"ws"
+    gsk.find { |path| path.unlink if path.symlink? }
+
+    # The xlsx sidecar. An executable inside the HAP takes the .bin suffix: a
+    # bare name or .so goes through the packer's native library pipeline and
+    # breaks the pre-signed .codesign (the shell is patched to look for it).
     (resources/"native").mkpath
-    cp formula_opt_prefix("genoffice")/"libexec/native/xlsx-sidecar", resources/"native/xlsx-sidecar.bin"
+    cp buildpath/"sidecar/bin/xlsx-sidecar", resources/"native/xlsx-sidecar.bin"
     chmod 0755, resources/"native/xlsx-sidecar.bin"
+
+    %w[LICENSE LICENSE-UNICODE.txt NOTICE].each do |name|
+      cp buildpath/name, resources/name
+    end
 
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.genoffice"'
@@ -99,8 +160,9 @@ class GenofficeApp < Formula
     inreplace shell/"electron/src/main/module.json5", '"mainElement": "EntryAbility",',
               '"mainElement": "EntryAbility", "extractNativeLibs": true,'
 
-    # The probe only needs loopback HTTP; this trim installs under local
-    # auto-signing.
+    # Restricted permissions (pasteboard, user files, ...) cannot be granted
+    # with local auto-signing; this trim installs under it and the ACL variant
+    # below adds the rest.
     inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\r?\n    \],/m,
               <<~JSON5.chomp
                 "requestPermissions": [
@@ -147,13 +209,14 @@ class GenofficeApp < Formula
 
     # The default HAP requests only what local automatic signing can grant.
     # `genoffice-app install` swaps in this variant, which also requests the
-    # two ACL-gated permissions (weak sandbox) and the two kernel ACLs that let
-    # the renderer use WebAssembly, for devices whose signing profile carries
-    # them. The probe's report shows what the default variant can already do.
+    # ACL-gated permissions (host user files, pasteboard) and the two kernel
+    # ACLs that let the renderer use WebAssembly (pdfium, rhwp), for devices
+    # whose signing profile carries them.
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"genoffice-desktop-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
     %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE
+       ohos.permission.READ_PASTEBOARD
        ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
        ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].each do |name|
       requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
@@ -181,17 +244,18 @@ class GenofficeApp < Formula
 
   def caveats
     <<~EOS
-      This is an experiment, not the GenOffice desktop app: the HAP only reports
-      what electron-ohos exposes to an app (app.isPackaged, process.resourcesPath,
-      whether an embedded executable can be spawned, the file systems under the
-      app state) so the real shell can be laid out for it.
+      The desktop HAP is unsigned in the bottle. Connect and unlock the device,
+      then run `genoffice-app install`. app-installer handles Huawei Developer
+      login, local debug profile generation, signing, installation, and launch;
+      `genoffice-app start` opens it again.
 
-      Connect and unlock the device, then:
-        genoffice-app probe     # in one terminal: listens for the report
-        genoffice-app install   # signs and installs the unsigned HAP
-        genoffice-app start
-
-      The report is printed by `probe` and kept under ~/.config/genoffice-app.
+      The app runs entirely inside its own sandbox. The weak-sandbox permissions
+      CUSTOM_SANDBOX and READ_WRITE_USER_FILE (host user files) and
+      READ_PASTEBOARD (paste) are granted through a debug profile generated on
+      the spot, and the two kernel ACLs enable WebAssembly for the renderer.
+      The `genoffice` command line of the `genoffice` formula is a separate
+      tool: it cannot reach the app's sandbox, so `genoffice open` does not
+      control this app.
     EOS
   end
 
@@ -201,10 +265,18 @@ class GenofficeApp < Formula
     hap = libexec/"genoffice-desktop-unsigned.hap"
     listing = shell_output("unzip -l #{hap}")
     %w[
-      resources/resfile/resources/app/main.cjs
+      resources/resfile/resources/app/package.json
+      resources/resfile/resources/app/out/main/index.js
+      resources/resfile/resources/modules/sheets/renderer/index.html
+      resources/resfile/resources/modules/sheets/preload/index.js
+      resources/resfile/resources/wasm/pdfium.wasm
+      resources/resfile/resources/cli/genoffice.cjs
       resources/resfile/resources/native/xlsx-sidecar.bin
-      resources/resfile/resources/probe-marker.txt
     ].each { |entry| assert_match entry, listing }
+
+    package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
+    assert_equal "out/main/index.js", package["main"]
+    assert_equal version.to_s, package["version"]
 
     module_json = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
@@ -212,7 +284,9 @@ class GenofficeApp < Formula
 
     acl_module = JSON.parse((pkgshare/"module-acl.json").read)
     acl_permissions = acl_module.dig("module", "requestPermissions").map { |permission| permission["name"] }
-    assert_includes acl_permissions, "ohos.permission.CUSTOM_SANDBOX"
-    assert_includes acl_permissions, "ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY"
+    %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE ohos.permission.READ_PASTEBOARD
+       ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY].each do |permission|
+      assert_includes acl_permissions, permission
+    end
   end
 end
