@@ -1,8 +1,0 @@
-{
-  "name": "genoffice-probe",
-  "productName": "GenOffice",
-  "version": "0.0.0",
-  "description": "Runtime probe for the GenOffice desktop shell on electron-ohos",
-  "main": "main.cjs",
-  "private": true
-}

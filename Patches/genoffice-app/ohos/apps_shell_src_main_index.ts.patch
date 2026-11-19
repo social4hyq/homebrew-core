@@ -1,0 +1,23 @@
+OHOS: name the xlsx sidecar xlsx-sidecar.bin. An executable inside the HAP
+needs the .bin suffix: a bare name or .so goes through the packer's native
+library pipeline and breaks the pre-signed code signature. process.platform is
+"openharmony" under electron-ohos.
+
+diff --git a/apps/shell/src/main/index.ts b/apps/shell/src/main/index.ts
+index 43a588a..ac1dd7a 100644
+--- a/apps/shell/src/main/index.ts
++++ b/apps/shell/src/main/index.ts
+@@ -492,7 +492,12 @@ if (app.isPackaged) {
+ // module build outputs: packaged builds carry them as extraResources
+ // (resources/modules/*, resources/native/*); dev/unpacked resolves them
+ // relative to apps/shell in the monorepo layout.
+-const SIDECAR_EXE = process.platform === 'win32' ? 'xlsx-sidecar.exe' : 'xlsx-sidecar'
++const SIDECAR_EXE =
++  process.platform === 'win32'
++    ? 'xlsx-sidecar.exe'
++    : (process.platform as string) === 'openharmony'
++      ? 'xlsx-sidecar.bin'
++      : 'xlsx-sidecar'
+ const APPS_ROOT = join(app.getAppPath(), '..')
+ const DOCS_OUT = app.isPackaged
+   ? join(process.resourcesPath, 'modules', 'docs')
