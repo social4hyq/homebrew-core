@@ -9,11 +9,11 @@ class GenofficeApp < Formula
   # Apache-2.0 upstream with tap-authored packaging scripts, on the CPF-Electron
   # runtime (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 5
+  revision 6
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a6d4d51eec13f02b21593c410e501ca22808b4cea6cf6a750e45d990b9b99d7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2df5486ca326a0593bc3b48d97a4a684d76f00cd6219be69f9b2bd186fcf4a41"
   end
 
   depends_on "genoffice" => :build
@@ -173,12 +173,17 @@ class GenofficeApp < Formula
 
     # Restricted permissions (pasteboard, user files, ...) cannot be granted
     # with local auto-signing; this trim installs under it and the ACL variant
-    # below adds the rest.
+    # below adds the rest. FILE_ACCESS_PERSIST is a normal, system-granted
+    # permission: without it electron-ohos' dialog adapter cannot persist the
+    # access to a file picked in the save dialog ("DialogAdapter
+    # FileAccessPersist failed, ret=13900011" in hilog) and the path stays
+    # unusable for the app.
     inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\r?\n    \],/m,
               <<~JSON5.chomp
                 "requestPermissions": [
                       { "name": "ohos.permission.INTERNET" },
-                      { "name": "ohos.permission.GET_NETWORK_INFO" }
+                      { "name": "ohos.permission.GET_NETWORK_INFO" },
+                      { "name": "ohos.permission.FILE_ACCESS_PERSIST" }
                     ],
               JSON5
 
@@ -300,15 +305,18 @@ class GenofficeApp < Formula
     diag_lines = shell_output("unzip -p #{hap} 'resources/resfile/resources/app/out/main/*' | " \
                               "grep -c -F '[diag] main started'")
     assert_operator diag_lines.to_i, :>, 0
+    save_probe_lines = shell_output("unzip -p #{hap} 'resources/resfile/resources/app/out/main/*' | " \
+                                    "grep -c -F '[diag-save] dialog.showSaveDialog is wrapped'")
+    assert_operator save_probe_lines.to_i, :>, 0
 
     module_json = JSON.parse(shell_output("unzip -p #{hap} module.json"))
-    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
+    assert_equal %w[ohos.permission.FILE_ACCESS_PERSIST ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
                  module_json.dig("module", "requestPermissions").map { |permission| permission["name"] }.sort
 
     acl_module = JSON.parse((pkgshare/"module-acl.json").read)
     acl_permissions = acl_module.dig("module", "requestPermissions").map { |permission| permission["name"] }
     %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE ohos.permission.READ_PASTEBOARD
-       ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY].each do |permission|
+       ohos.permission.FILE_ACCESS_PERSIST ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY].each do |permission|
       assert_includes acl_permissions, permission
     end
   end
