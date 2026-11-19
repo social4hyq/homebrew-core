@@ -8,7 +8,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 8
+  revision 9
 
   livecheck do
     url :stable
@@ -17,9 +17,8 @@ class OpencodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.0-r9"
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f7532ba0df37bc89c5b0b65e5b333d95ea47becef9d39ef84e2ce2ce4a0ab483"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.0-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a8ba654cc1963d3a331e998dfffab1eabd2652160f7ce76f780c6cac1d4cd29"
   end
 
   depends_on "app-installer"
@@ -191,7 +190,10 @@ class OpencodeApp < Formula
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"opencode-desktop-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
+    # READ_PASTEBOARD makes paste work in the shell; without it pasting into the
+    # window does nothing.
     %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE
+       ohos.permission.READ_PASTEBOARD
        ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
        ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].each do |name|
       requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
@@ -235,6 +237,8 @@ class OpencodeApp < Formula
       (keg-only, addressed by absolute paths), so no system CLT is needed. The
       two kernel ACLs enable JIT/WebAssembly for the renderer; without them
       markdown rendering fails with "WebAssembly is not defined".
+      READ_PASTEBOARD lets the shell read the system pasteboard; without it
+      pasting into the window does not work.
       `--no-acl` installs the strong-sandbox HAP instead; the shell then waits
       for `opencode-app serve`.
     EOS
@@ -285,7 +289,8 @@ class OpencodeApp < Formula
     acl_requested = acl_module.fetch("module").fetch("requestPermissions")
     acl_permissions = acl_requested.map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO
-                    ohos.permission.INTERNET ohos.permission.READ_WRITE_USER_FILE
+                    ohos.permission.INTERNET ohos.permission.READ_PASTEBOARD
+                    ohos.permission.READ_WRITE_USER_FILE
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
                  acl_permissions.sort
