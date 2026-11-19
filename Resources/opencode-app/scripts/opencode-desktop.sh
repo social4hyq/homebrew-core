@@ -4,6 +4,15 @@
 set -euo pipefail
 
 CONFIG_DIR="${HOME:?HOME must be set}/.config/opencode-desktop"
+# Permissions of this directory. The device keeps $HOME on its shared hmdfs
+# mount, where chmod is a no-op: it returns 0 and changes nothing, so the
+# `chmod 700` calls below only take effect on ordinary file systems. Do not try
+# to make the directory private by creating it under `umask 077`: that gives
+# mode 2700, and on hmdfs nobody can write to a 2700 directory, neither the
+# user who created it nor the app's own uid, so install, serve, the pid file and
+# the log would all fail with EACCES. Files are different: a file created under
+# `umask 077` (mode 600) in the usual 2771 directory is read and written
+# normally by the terminal and by the app.
 CONFIG_FILE="$CONFIG_DIR/config.json"
 PID_FILE="$CONFIG_DIR/serve.pid"
 LOG_FILE="$CONFIG_DIR/serve.log"
@@ -34,6 +43,7 @@ port_busy() {
 
 ensure_config() {
   mkdir -p "$CONFIG_DIR"
+  # No-op on hmdfs, see the note above CONFIG_FILE; kept for ordinary file systems.
   chmod 700 "$CONFIG_DIR" 2>/dev/null || true
   if [[ ! -f "$CONFIG_FILE" ]]; then
     local port="$DEFAULT_PORT"
