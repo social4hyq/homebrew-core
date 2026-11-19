@@ -10,9 +10,10 @@
 # specific to Magpie is written here.
 #
 # The default variant is the ACL one (CUSTOM_SANDBOX and READ_WRITE_USER_FILE let
-# the shell start the host binary and reach the host profile). --no-acl installs
-# the strong-sandbox variant, which cannot start the binary and waits for a
-# `magpie web` started by hand; it carries the same config.json.
+# the shell start the host binary and reach the host profile, READ_PASTEBOARD
+# makes paste work). --no-acl installs the strong-sandbox variant, which cannot
+# start the binary and waits for a `magpie web` started by hand; it carries the
+# same config.json.
 set -euo pipefail
 
 APP_CMD=magpie-app

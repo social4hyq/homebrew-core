@@ -4,7 +4,7 @@ class MagpieApp < Formula
   url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4402.tar.gz"
   sha256 "a23a2867fe4aa3ae33ee83d5a554ba8283b9052d01c20c02c6bd2941bed47dcd"
   license :cannot_represent
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -167,7 +167,10 @@ class MagpieApp < Formula
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"magpie-desktop-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
+    # READ_PASTEBOARD makes paste work in the shell; without it pasting into the
+    # window does nothing.
     %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE
+       ohos.permission.READ_PASTEBOARD
        ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
        ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].each do |name|
       requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
@@ -198,6 +201,8 @@ class MagpieApp < Formula
       By default it starts the installed Magpie CLI and shares that CLI's
       settings. The web interface listens on loopback and requires a fresh key
       for each launch. Installing this variant needs a developer debug profile.
+      The profile grants READ_PASTEBOARD, without which pasting into the window
+      does not work.
 
       If the ACL profile is unavailable, run `magpie-app install --no-acl`
       and start `magpie web --addr 127.0.0.1:3430 --no-open` separately.
@@ -241,7 +246,12 @@ class MagpieApp < Formula
     acl = JSON.parse(shell_output("unzip -p #{staged} module.json"))
     assert_equal "com.social4hyq.magpiedesktop", acl.fetch("app").fetch("bundleName")
     permissions = acl.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
-    assert_includes permissions, "ohos.permission.CUSTOM_SANDBOX"
+    assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO
+                    ohos.permission.INTERNET ohos.permission.READ_PASTEBOARD
+                    ohos.permission.READ_WRITE_USER_FILE
+                    ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
+                    ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
+                 permissions.sort
 
     system bin/"magpie-app", "install", "--no-acl"
     # The strong-sandbox HAP carries the same settings as the ACL one (it used to
