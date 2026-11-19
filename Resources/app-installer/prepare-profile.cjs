@@ -6,6 +6,30 @@ const path = require("node:path");
 const { execFileSync } = require("node:child_process");
 const { createRequire } = require("node:module");
 
+// `--expiry <build-profile.json5>` prints the whole days left on the local debug
+// profile and nothing when it cannot be determined (the caller treats that as
+// "unknown", never as an error).
+function profileDaysLeft(buildProfile) {
+  try {
+    const json5 = createRequire(process.env.DEVECO_CLI_JS)("json5");
+    const config = json5.parse(fs.readFileSync(buildProfile, "utf8"));
+    const signing = config.app?.signingConfigs?.find(item => item.name === "default") || config.app?.signingConfigs?.[0];
+    const file = signing?.material?.profile;
+    if (!file) return null;
+    const p7b = fs.readFileSync(path.resolve(path.dirname(buildProfile), file), "latin1");
+    const notAfter = /"not-after"\s*:\s*(\d+)/.exec(p7b);
+    return notAfter ? Math.floor((Number(notAfter[1]) * 1000 - Date.now()) / 86400000) : null;
+  } catch {
+    return null;
+  }
+}
+
+if (process.argv[2] === "--expiry") {
+  const days = profileDaysLeft(process.argv[3] ?? "");
+  if (days !== null) console.log(days);
+  process.exit(0);
+}
+
 try {
   const [hap, bundle, project] = process.argv.slice(2);
   const manifest = JSON.parse(execFileSync("unzip", ["-p", hap, "module.json"], { encoding: "utf8" }));
