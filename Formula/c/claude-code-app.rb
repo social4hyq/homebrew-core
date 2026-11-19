@@ -7,6 +7,11 @@ class ClaudeCodeApp < Formula
   sha256 "fe6cd8a70f96b96eb4e6b647300cfaee6aaff4ce133a0fbbe11c2cdb775f5a6a"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "10b55e8b267d9df76f989f29eff9f41ad877f545ad3b59b30be460185d7509fc"
+  end
+
   depends_on "binutils" => :build
   depends_on "app-installer"
   depends_on "claude-code.latest"
