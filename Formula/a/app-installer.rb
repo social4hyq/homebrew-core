@@ -4,7 +4,7 @@ class AppInstaller < Formula
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.10.tgz"
   sha256 "7fdee1bfb7393c151fa09b3714ecc4796e53d9876557e9933c5890319ffb4daa"
   license "MIT"
-  revision 6
+  revision 7
 
   livecheck do
     url :stable
@@ -143,6 +143,22 @@ class AppInstaller < Formula
     bin.install_symlink bin/"app-installer-sign" => "hap-installer-sign"
   end
 
+  def caveats
+    <<~EOS
+      The debug profile app-installer signs with is tied to this device and
+      expires. Run `app-installer doctor` to see how many days are left and
+      whether hdc and the Huawei Developer login are ready.
+
+      The first login to the Huawei Developer account opens the login page in
+      your default browser through `aa start`; pass `--no-browser` to open the
+      printed link yourself.
+
+      `app-installer --sign-only` writes a signed HAP without needing a device,
+      and `--keystore` signs with your own certificate instead of logging in.
+      System sideloading is not used yet: installs go through hdc.
+    EOS
+  end
+
   test do
     ENV["HOME"] = testpath/"home"
     assert_match "Usage: app-installer", shell_output("#{bin}/hap-installer --help")
@@ -153,6 +169,10 @@ class AppInstaller < Formula
     assert_match "Authentication commands", shell_output("#{bin}/devecocli auth --help")
     assert_match "COMMAND_LINE_TOOL_PATH=", (bin/"devecocli").read
     assert_match "--profile <path>", shell_output("#{bin}/app-installer --help")
+    %w[--sign-only --method --keystore --no-browser uninstall doctor].each do |option|
+      assert_match option, shell_output("#{bin}/app-installer --help")
+    end
+    assert_match "--keystore <p12>", shell_output("#{bin}/app-installer-sign --help")
     assert_match 'signed_hap="${signed_hap:-${TMPDIR:-$home/.cache}/app-installer/signed/$bundle_id.hap}"',
                  (libexec/"app-installer.sh").read
     assert_match "app-installer-toolchain/sdk/default/openharmony/toolchains", (bin/"app-installer").read
