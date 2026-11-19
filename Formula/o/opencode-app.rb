@@ -279,6 +279,7 @@ class OpencodeApp < Formula
     ENV.prepend_path "PATH", formula_opt_bin("node").to_s
     ENV["OPENCODE_DESKTOP_HDC"] = (fake_bin/"hdc").to_s
 
+    saved_xdg = %w[XDG_CONFIG_HOME XDG_DATA_HOME XDG_STATE_HOME].to_h { |key| [key, ENV.fetch(key, nil)] }
     ENV["XDG_CONFIG_HOME"] = "/opencode-xdg-test/config"
     ENV["XDG_DATA_HOME"] = "/opencode-xdg-test/data"
     ENV.delete("XDG_STATE_HOME")
@@ -293,6 +294,9 @@ class OpencodeApp < Formula
     assert_equal "/opencode-xdg-test/config", config.dig("host", "xdgConfig")
     assert_equal "/opencode-xdg-test/data", config.dig("host", "xdgData")
     assert_equal "", config.dig("host", "xdgState")
+    # Only this install runs with the made-up XDG paths; the service started
+    # below must see the test's own environment.
+    saved_xdg.each { |key, value| ENV[key] = value }
     acl_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     acl_requested = acl_module.fetch("module").fetch("requestPermissions")
     acl_permissions = acl_requested.map { |permission| permission.fetch("name") }
