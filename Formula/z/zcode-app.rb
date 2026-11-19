@@ -10,7 +10,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 16
+  revision 17
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -421,6 +421,15 @@ class ZcodeApp < Formula
     assert_match "opened com.social4hyq.zcodedesktop", shell_output("#{bin}/zcode-app start --no-serve")
     assert_match "aa start -a EntryAbility -b com.social4hyq.zcodedesktop -m electron", hdc_log.read
     assert_match "unknown start option: --bogus", shell_output("#{bin}/zcode-app start --bogus 2>&1", 1)
+
+    # stop signals a live process of its own: a stand-in service is stopped and
+    # its pid file removed.
+    sleeper = spawn("sleep", "60")
+    pid_file = testpath/"home/.config/zcode-desktop/web.pid"
+    pid_file.write sleeper.to_s
+    assert_match "zcode-desktop: stopped", shell_output("#{bin}/zcode-app stop")
+    Process.wait(sleeper)
+    refute_path_exists pid_file
 
     assert_match "no managed server running", shell_output("#{bin}/zcode-app stop")
     assert_match "not healthy", shell_output("#{bin}/zcode-app status 2>&1", 1)

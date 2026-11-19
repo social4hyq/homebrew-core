@@ -104,8 +104,23 @@ server_version() {
     sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1
 }
 
+# True when the process exists. kill -0 also fails (EPERM) for a live process
+# that belongs to another user, e.g. the service the desktop shell started,
+# which runs as the app's user; that process exists too, so ask /proc.
 proc_alive() {
-  [ -n "${1:-}" ] && kill -0 "$1" 2>/dev/null
+  [ -n "${1:-}" ] || return 1
+  kill -0 "$1" 2>/dev/null && return 0
+  [ -d "/proc/$1" ]
+}
+
+# A live process this user may not signal.
+proc_foreign() {
+  proc_alive "${1:-}" && ! kill -0 "$1" 2>/dev/null
+}
+
+foreign_note() {
+  log "the managed server (pid $1) belongs to the desktop app's user, so it cannot be stopped from here"
+  log "quit the app from its tray menu, or run: hdc shell aa force-stop $BUNDLE_ID"
 }
 
 # Move the state of an older version over once. The old directory is the one the
@@ -131,9 +146,11 @@ migrate_legacy_config() {
   log "moved the service state from $LEGACY_CONFIG_DIR to $CONFIG_DIR"
 }
 
+# Returns 1 for a live process of another user (nothing is signalled).
 stop_pid() {
   local pid="$1" n=0
   proc_alive "$pid" || return 0
+  proc_foreign "$pid" && return 1
   kill "$pid" 2>/dev/null || true
   while proc_alive "$pid" && [ "$n" -lt 25 ]; do
     sleep 0.2
@@ -215,7 +232,15 @@ ensure_serve() {
   if [ -f "$PID_FILE" ]; then
     local stale
     stale="$(cat "$PID_FILE" 2>/dev/null || true)"
-    if proc_alive "$stale"; then
+    if proc_foreign "$stale"; then
+      # Another user's process is the service only while it listens on the port;
+      # otherwise the pid file is stale and the pid was reused.
+      if port_busy "$PORT"; then
+        foreign_note "$stale"
+        exit 1
+      fi
+      log "ignoring the pid file: pid $stale belongs to another user and serves nothing on port $PORT"
+    elif proc_alive "$stale"; then
       log "stale server process (pid $stale) is not responding; stopping it"
       stop_pid "$stale"
     fi
@@ -295,7 +320,14 @@ cmd_serve() {
     printf '{"port":%s,"workspace":"%s"}\n' "$PORT" "$(json_escape "$workspace")" > "$CONFIG_FILE"
     log "workspace set to $workspace"
     if [ -f "$PID_FILE" ]; then
-      stop_pid "$(cat "$PID_FILE" 2>/dev/null || true)"
+      local old
+      old="$(cat "$PID_FILE" 2>/dev/null || true)"
+      if proc_foreign "$old" && port_busy "$PORT"; then
+        foreign_note "$old"
+        log "the new workspace is saved and applies the next time the service starts"
+        exit 1
+      fi
+      stop_pid "$old" || true
       rm -f "$PID_FILE"
     fi
   fi
@@ -305,6 +337,15 @@ cmd_serve() {
 restart_serve_if_running() {
   local pid=""
   [ -f "$PID_FILE" ] && pid="$(cat "$PID_FILE" 2>/dev/null || true)"
+  if proc_foreign "$pid"; then
+    if port_busy "$PORT"; then
+      foreign_note "$pid"
+      log "restart the app to pick up the new login"
+    else
+      rm -f "$PID_FILE"
+    fi
+    return 0
+  fi
   if proc_alive "$pid"; then
     stop_pid "$pid"
     rm -f "$PID_FILE"
@@ -365,7 +406,17 @@ cmd_status() {
 cmd_stop() {
   local pid=""
   [ -f "$PID_FILE" ] && pid="$(cat "$PID_FILE" 2>/dev/null || true)"
-  if proc_alive "$pid"; then
+  if proc_foreign "$pid"; then
+    read_config
+    if port_busy "$PORT"; then
+      # Started by the desktop shell: it runs as the app's user and ends with the app.
+      foreign_note "$pid"
+      exit 1
+    fi
+    log "ignoring the pid file: pid $pid belongs to another user and serves nothing on port $PORT"
+    rm -f "$PID_FILE"
+    printf 'zcode-desktop: no managed server running\n'
+  elif proc_alive "$pid"; then
     stop_pid "$pid"
     rm -f "$PID_FILE"
     printf 'zcode-desktop: stopped\n'
