@@ -9,7 +9,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
@@ -252,8 +252,8 @@ class OrcaApp < Formula
   end
 
   test do
-    # The scripts follow XDG_CONFIG_HOME (the app sandbox on a device), so keep
-    # their server and pairing state inside the test sandbox as well.
+    # The launcher keeps its state in ~/.config/orca-app whatever XDG_CONFIG_HOME
+    # says; HOME is the test sandbox, so server and pairing state stay inside it.
     ENV["HOME"] = testpath/"home"
     ENV["XDG_CONFIG_HOME"] = testpath/"home/.config"
     assert_match "Usage: orca-app", shell_output("#{bin}/orca-app --help")
@@ -370,6 +370,61 @@ class OrcaApp < Formula
 
     assert_match "no managed server running", shell_output("#{bin}/orca-app stop")
     assert_match "not healthy", shell_output("#{bin}/orca-app status 2>&1", 1)
+
+    # A healthy server without a pairing file (as the shell's own runtime) is
+    # reported as healthy with exit status 0.
+    up_port = free_port
+    (testpath/"home/.config/orca-app/config.json").write JSON.generate("port" => up_port)
+    web = spawn("node", "-e",
+                "require('http').createServer((q, r) => { r.statusCode = q.url === '/web-index.html' ? 200 : 404; " \
+                "r.end('ok'); }).listen(#{up_port}, '127.0.0.1')",
+                [:out, :err] => File::NULL)
+    begin
+      60.times do
+        TCPSocket.new("127.0.0.1", up_port).close
+        break
+      rescue Errno::ECONNREFUSED
+        sleep 0.25
+      end
+      assert_match "healthy at http://127.0.0.1:#{up_port}", shell_output("#{bin}/orca-app status 2>&1")
+    ensure
+      Process.kill("TERM", web)
+      Process.wait(web)
+    end
+
+    # State an older launcher kept under XDG_CONFIG_HOME is moved to
+    # ~/.config/orca-app once, whatever XDG_CONFIG_HOME is later on.
+    saved_home = Dir.home
+    saved_xdg = ENV.fetch("XDG_CONFIG_HOME", nil)
+    ENV["HOME"] = (testpath/"home2").to_s
+    ENV["XDG_CONFIG_HOME"] = (testpath/"xdg2").to_s
+    old_port = free_port
+    (testpath/"xdg2/orca-app").mkpath
+    (testpath/"xdg2/orca-app/config.json").write JSON.generate("port" => old_port)
+    (testpath/"xdg2/orca-app/installed.mode").write "no-acl\n"
+    moved = shell_output("#{bin}/orca-app status 2>&1", 1)
+    assert_match "moved the state from #{testpath}/xdg2/orca-app to #{testpath}/home2/.config/orca-app", moved
+    assert_match "not healthy at http://127.0.0.1:#{old_port}", moved
+    assert_equal old_port, JSON.parse((testpath/"home2/.config/orca-app/config.json").read).fetch("port")
+    assert_equal "no-acl\n", (testpath/"home2/.config/orca-app/installed.mode").read
+    refute_path_exists testpath/"xdg2/orca-app/config.json"
+    assert_path_exists testpath/"xdg2/orca-app/config.json.migrated"
+    # A terminal without XDG_CONFIG_HOME now finds it, and nothing is moved again.
+    ENV.delete("XDG_CONFIG_HOME")
+    found = shell_output("#{bin}/orca-app status 2>&1", 1)
+    assert_match "not healthy at http://127.0.0.1:#{old_port}", found
+    refute_match "moved the state", found
+    # An old config next to an existing one is ignored: renamed, one notice.
+    ENV["XDG_CONFIG_HOME"] = (testpath/"xdg2").to_s
+    (testpath/"xdg2/orca-app/config.json").write JSON.generate("port" => free_port)
+    ignored = shell_output("#{bin}/orca-app status 2>&1", 1)
+    assert_match "already has a config", ignored
+    assert_match "not healthy at http://127.0.0.1:#{old_port}", ignored
+    assert_path_exists testpath/"xdg2/orca-app/config.json.superseded"
+    refute_path_exists testpath/"xdg2/orca-app/config.json"
+    refute_match "already has a config", shell_output("#{bin}/orca-app status 2>&1", 1)
+    ENV["HOME"] = saved_home
+    ENV["XDG_CONFIG_HOME"] = saved_xdg
 
     # The real bottle HAP.
     hap = libexec/"orca-app-unsigned.hap"

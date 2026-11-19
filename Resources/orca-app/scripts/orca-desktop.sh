@@ -4,7 +4,13 @@
 set -euo pipefail
 
 BUNDLE_ID="${ORCA_DESKTOP_BUNDLE:-com.social4hyq.orca}"
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/orca-app"
+# Fixed under HOME: every terminal, and the shell's install, must find the same
+# state whatever XDG_CONFIG_HOME is (on a device it is the terminal app's own
+# sandbox, and a terminal without it would not find the config, the port or the
+# pid file). State an older launcher kept under $XDG_CONFIG_HOME/orca-app is
+# moved here once, see migrate_legacy_config.
+CONFIG_DIR="${ORCA_DESKTOP_CONFIG_DIR:-$HOME/.config/orca-app}"
+LEGACY_CONFIG_DIR="${XDG_CONFIG_HOME:+$XDG_CONFIG_HOME/orca-app}"
 CONFIG_FILE="$CONFIG_DIR/config.json"
 PID_FILE="$CONFIG_DIR/server.pid"
 READY_FILE="$CONFIG_DIR/server.ready.json"
@@ -305,7 +311,11 @@ cmd_status() {
     local url=""
     url="$(read_web_client_url || true)"
     printf 'orca-app: healthy at http://127.0.0.1:%s\n' "$PORT"
-    [ -n "$url" ] && printf 'orca-app: browser URL %s\n' "$url"
+    # A healthy server without a pairing file (the one the shell starts has
+    # none) is still healthy: do not let a failed test end the function with 1.
+    if [ -n "$url" ]; then
+      printf 'orca-app: browser URL %s\n' "$url"
+    fi
   else
     printf 'orca-app: server not healthy at http://127.0.0.1:%s\n' "$PORT" >&2
     exit 1
@@ -334,6 +344,45 @@ cmd_pair() {
   fi
   die "no pairing URL yet; start the server with orca-app serve"
 }
+
+# Move the state an older launcher kept under $XDG_CONFIG_HOME/orca-app to
+# $CONFIG_DIR, once. config.json decides: the old one is renamed afterwards, so
+# nothing is repeated. If $CONFIG_DIR already has a config, that one wins and the
+# old one is renamed to config.json.superseded, with a single notice. A pid file
+# and the pairing file only come along when that server is still running.
+migrate_legacy_config() {
+  [ -z "${ORCA_DESKTOP_CONFIG_DIR:-}" ] || return 0
+  [ -n "$LEGACY_CONFIG_DIR" ] && [ "$LEGACY_CONFIG_DIR" != "$CONFIG_DIR" ] || return 0
+  [ -f "$LEGACY_CONFIG_DIR/config.json" ] || return 0
+  if [ -f "$CONFIG_FILE" ]; then
+    mv "$LEGACY_CONFIG_DIR/config.json" "$LEGACY_CONFIG_DIR/config.json.superseded"
+    log "$CONFIG_DIR already has a config; the old one in $LEGACY_CONFIG_DIR is ignored (renamed to config.json.superseded)"
+    return 0
+  fi
+  mkdir -p "$CONFIG_DIR"
+  chmod 700 "$CONFIG_DIR" 2>/dev/null || true
+  cp "$LEGACY_CONFIG_DIR/config.json" "$CONFIG_FILE"
+  if [ -f "$LEGACY_CONFIG_DIR/installed.mode" ]; then
+    cp "$LEGACY_CONFIG_DIR/installed.mode" "$INSTALLED_MODE_FILE"
+  fi
+  mv "$LEGACY_CONFIG_DIR/config.json" "$LEGACY_CONFIG_DIR/config.json.migrated"
+  if [ -f "$LEGACY_CONFIG_DIR/server.pid" ]; then
+    local pid
+    pid="$(cat "$LEGACY_CONFIG_DIR/server.pid" 2>/dev/null || true)"
+    if proc_alive "$pid"; then
+      cp "$LEGACY_CONFIG_DIR/server.pid" "$PID_FILE"
+      if [ -f "$LEGACY_CONFIG_DIR/server.ready.json" ]; then
+        cp "$LEGACY_CONFIG_DIR/server.ready.json" "$READY_FILE"
+      fi
+    fi
+    rm -f "$LEGACY_CONFIG_DIR/server.pid"
+  fi
+  log "moved the state from $LEGACY_CONFIG_DIR to $CONFIG_DIR"
+}
+case "${1:-}" in
+  -h|--help|help|"") ;;
+  *) migrate_legacy_config ;;
+esac
 
 case "${1:-}" in
   install) shift; cmd_install "$@" ;;
