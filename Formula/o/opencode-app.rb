@@ -8,7 +8,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 11
+  revision 12
 
   livecheck do
     url :stable
