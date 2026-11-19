@@ -9,7 +9,7 @@ class GenofficeApp < Formula
   # Apache-2.0 upstream with tap-authored packaging scripts, on the CPF-Electron
   # runtime (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 1
+  revision 2
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r2"
@@ -277,6 +277,11 @@ class GenofficeApp < Formula
     package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
     assert_equal "out/main/index.js", package["main"]
     assert_equal version.to_s, package["version"]
+
+    # the temporary diagnostics patch must have reached the shell's main bundle
+    diag_lines = shell_output("unzip -p #{hap} 'resources/resfile/resources/app/out/main/*' | " \
+                              "grep -c -F '[diag] main started'")
+    assert_operator diag_lines.to_i, :>, 0
 
     module_json = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
