@@ -6,10 +6,11 @@ class ClaudeCodeApp < Formula
   version "5.11492.5"
   sha256 "fe6cd8a70f96b96eb4e6b647300cfaee6aaff4ce133a0fbbe11c2cdb775f5a6a"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
+  revision 1
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "10b55e8b267d9df76f989f29eff9f41ad877f545ad3b59b30be460185d7509fc"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "332f525c93cd2ac2ebeee0cee61f81b04508f9093f9bdacd65dbcaeb7660c062"
   end
 
   depends_on "binutils" => :build
@@ -115,6 +116,15 @@ class ClaudeCodeApp < Formula
     libexec.install final_hap => "claude-code-desktop-unsigned.hap"
     pkgshare.mkpath
     cp res/"scripts/install-claude-code-desktop.sh", pkgshare/"install-desktop.sh"
+    %w[
+      patch-code-runtime-hap.py
+      claude-bootstrap.cjs
+      claude-code-platform-patch.cjs
+      claude-launch-bridge.cjs
+      claude-ohos-config.cjs
+    ].each do |file|
+      cp support/file, pkgshare/file
+    end
     cp res/"scripts/claude-code-app.sh", libexec/"claude-code-app.sh"
     chmod 0755, [pkgshare/"install-desktop.sh", libexec/"claude-code-app.sh"]
 
@@ -152,6 +162,15 @@ class ClaudeCodeApp < Formula
     hap = libexec/"claude-code-desktop-unsigned.hap"
     assert_path_exists hap
     assert_match "Usage: claude-code-app", shell_output("#{bin}/claude-code-app --help")
+    %w[
+      patch-code-runtime-hap.py
+      claude-bootstrap.cjs
+      claude-code-platform-patch.cjs
+      claude-launch-bridge.cjs
+      claude-ohos-config.cjs
+    ].each { |file| assert_path_exists pkgshare/file }
+    assert_match "input_hap output_hap",
+                 shell_output("python3 #{pkgshare}/patch-code-runtime-hap.py --help")
 
     test_sources = testpath/"claude-code-app-tests"
     test_sources.mkpath
