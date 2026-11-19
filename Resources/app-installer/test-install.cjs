@@ -60,7 +60,7 @@ function fixture(t) {
   `);
   tool("param", `console.log('45678');`);
   tool("aa", prelude + `if (process.env.AA_FAIL) process.exit(1);`);
-  const signer = tool("signer", prelude + `fs.copyFileSync(args[args.indexOf('--hap')+1], args[args.indexOf('--output')+1]);`);
+  const signer = tool("signer", prelude + `if (process.env.SIGN_FAIL) process.exit(3); fs.copyFileSync(args[args.indexOf('--hap')+1], args[args.indexOf('--output')+1]);`);
   const hap = path.join(root, "input.hap");
   function manifest(permissions, id = bundle) {
     const zip = new AdmZip();
@@ -241,4 +241,53 @@ test('info fails when the device reports the bundle is not installed', t => {
   const r=spawnSync('bash',[script,'info','--bundle-id',bundle,'--hdc',f.hdc,'--device','chosen'],{env:{...f.env,DUMP_FAIL:'1'},encoding:'utf8'});
   assert.equal(r.status,1,r.stdout+r.stderr); assert.match(r.stderr,/failed to get information/); assert.match(r.stderr,/is it installed/);
   assert.doesNotMatch(r.stdout,/debug profile days left/);
+});
+
+function hapWithDirectories(f, comment) {
+  const zip = new AdmZip();
+  zip.addFile('module.json', Buffer.from(JSON.stringify({app:{bundleName:bundle}, module:{name:'electron', requestPermissions:basic}})));
+  zip.addFile('libs/', Buffer.alloc(0));
+  zip.addFile('libs/arm64-v8a/', Buffer.alloc(0));
+  zip.addFile('libs/arm64-v8a/libdemo.so', Buffer.from('\x7fELF-demo-'.repeat(500)));
+  zip.addFile('resources/', Buffer.alloc(0));
+  zip.addFile('resources/index.txt', Buffer.from('index'));
+  if (comment) zip.addZipComment(comment);
+  zip.writeZip(f.hap);
+}
+const names = file => spawnSync('unzip', ['-Z1', file], {encoding:'utf8'}).stdout.split('\n').filter(Boolean);
+test('directory entries are removed before signing, everything else is kept byte for byte', t => {
+  const f=fixture(t); hapWithDirectories(f, 'a trailing comment'); const out=path.join(f.root,'out','signed.hap');
+  assert.equal(names(f.hap).filter(n=>n.endsWith('/')).length,3);
+  const r=f.run(['--sign-only','--output',out]); assert.equal(r.status,0,r.stdout+r.stderr);
+  assert.match(r.stdout,/Removed 3 directory entries/);
+  assert.deepEqual(names(out).sort(),['libs/arm64-v8a/libdemo.so','module.json','resources/index.txt']);
+  assert.equal(spawnSync('unzip',['-tq',out]).status,0);
+  const before=new AdmZip(f.hap), after=new AdmZip(out);
+  for (const n of names(out)) assert.ok(before.readFile(n).equals(after.readFile(n)),n);
+  assert.equal(after.getZipComment(),'a trailing comment');
+  assert.deepEqual(fs.readdirSync(path.dirname(out)),['signed.hap']);
+});
+test('a HAP without directory entries is signed unchanged and not mentioned', t => {
+  const f=fixture(t); const out=path.join(f.root,'signed.hap');
+  const r=f.run(['--sign-only','--output',out]); assert.equal(r.status,0,r.stdout+r.stderr);
+  assert.doesNotMatch(r.stdout,/directory entries/);
+  assert.ok(fs.readFileSync(out).equals(fs.readFileSync(f.hap)));
+});
+test('a HAP that cannot be checked for directory entries is signed as it is, with a warning', t => {
+  const f=fixture(t); hapWithDirectories(f); const out=path.join(f.root,'signed.hap');
+  const wrapper=path.join(f.root,'prepare-wrapper.cjs');
+  fs.writeFileSync(wrapper,`if (process.argv[2]==='--strip-dirs') process.exit(1); require(${JSON.stringify(path.join(__dirname,'prepare-profile.cjs'))});`);
+  const r=f.run(['--sign-only','--output',out],{HAP_INSTALLER_PREPARE:wrapper}); assert.equal(r.status,0,r.stdout+r.stderr);
+  assert.match(r.stderr,/could not check the HAP for directory entries/);
+  assert.ok(fs.readFileSync(out).equals(fs.readFileSync(f.hap)));
+});
+test('a failing signer leaves no temporary HAP behind and its exit status is kept', t => {
+  const f=fixture(t); hapWithDirectories(f); const out=path.join(f.root,'out','signed.hap');
+  const r=f.run(['--sign-only','--output',out],{SIGN_FAIL:'1'}); assert.equal(r.status,3,r.stdout+r.stderr);
+  assert.deepEqual(fs.readdirSync(path.dirname(out)),[]);
+});
+test('the HAP given to hdc installation is the one without directory entries', t => {
+  const f=fixture(t); hapWithDirectories(f); const r=f.run(); assert.equal(r.status,0,r.stdout+r.stderr);
+  const signerCall=f.calls().find(c=>c[0]==='signer'); const input=signerCall[signerCall.indexOf('--hap')+1];
+  assert.match(input,/\.nodirs\.hap$/); assert.ok(!fs.existsSync(input));
 });

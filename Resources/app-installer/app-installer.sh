@@ -13,6 +13,9 @@ Sign an existing HAP with a local DevEco debug profile, install it over hdc,
 and start its main ability unless --no-start is given. `install` is the default
 command.
 
+Zip directory entries in the HAP are removed before signing: the device rejects
+a HAP that has them (9568393). Nothing else in the HAP is changed.
+
 Required (install):
   --hap <path>          Unsigned HAP to install
   --bundle-id <id>      HAP bundle identifier
@@ -368,7 +371,7 @@ if [[ "$hap" -ef "$signed_hap" ]]; then
   printf '%s\n' 'app-installer: input and output HAP paths must differ.' >&2; exit 2
 fi
 
-sign_args=(--hap "$hap" --output "$signed_hap")
+sign_args=(--output "$signed_hap")
 if [[ -n "$keystore" ]]; then
   # The caller's own material: no DevEco account, project or profile generation.
   printf '%s\n' "Signing with the given keystore: $keystore"
@@ -415,7 +418,27 @@ rm -f "$signed_hap"
 # in install_via_hdc (split + hdc file send) runs under the normal umask. A
 # global 077 made split fail with "Permission denied" on hmdfs-backed cache
 # directories.
-(umask 077; "$HAP_INSTALLER_SIGNER" "${sign_args[@]}")
+
+# Directory entries in the zip make the device reject the HAP (9568393, see
+# prepare-profile.cjs), so sign a copy without them. A copy that cannot be
+# made is not fatal: sign the HAP as it is.
+sign_input="$hap"
+# The copy must keep a .hap extension: hap-sign-tool signed a differently named
+# copy without error, but the device then found no native-library signatures.
+stripped="$signed_hap.nodirs.hap"
+if removed="$(node "$prepare" --strip-dirs "$hap" "$stripped" 2>/dev/null)"; then
+  if [[ "$removed" =~ ^[1-9][0-9]*$ ]]; then
+    printf 'Removed %s directory entries from the HAP before signing.\n' "$removed"
+    sign_input="$stripped"
+  fi
+else
+  rm -f "$stripped"
+  printf '%s\n' 'app-installer: WARN: could not check the HAP for directory entries; signing it as it is.' >&2
+fi
+sign_rc=0
+(umask 077; "$HAP_INSTALLER_SIGNER" --hap "$sign_input" "${sign_args[@]}") || sign_rc=$?
+rm -f "$stripped"
+if ((sign_rc)); then exit "$sign_rc"; fi
 
 if ((sign_only)); then
   printf 'Signed HAP: %s\n' "$signed_hap"
