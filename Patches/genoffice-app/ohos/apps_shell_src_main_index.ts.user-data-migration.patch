@@ -1,0 +1,19 @@
+OHOS: skip the one-time "AI Office" user data migration. It runs at module
+scope when the app is packaged and calls app.getPath('appData'), which
+electron-ohos does not provide ("Failed to get 'appData' path"). The exception
+aborts the main process while the bundle loads, so the window stays blank.
+Nothing is lost: an app installed on OpenHarmony has no pre-rename profile.
+
+diff --git a/apps/shell/src/main/index.ts b/apps/shell/src/main/index.ts
+index 43a588a..a7bb12e 100644
+--- a/apps/shell/src/main/index.ts
++++ b/apps/shell/src/main/index.ts
+@@ -482,7 +482,7 @@ if (headlessArgv.kind !== 'none') {
+ }
+ 
+ // The product rename from "AI Office" to GenOffice changed the userData path; migrate old user data once
+-if (app.isPackaged) {
++if (app.isPackaged && (process.platform as string) !== 'openharmony') {
+   const oldDir = join(app.getPath('appData'), 'AI Office')
+   const newDir = app.getPath('userData')
+   const newEmpty = !existsSync(newDir) || readdirSync(newDir).length === 0
