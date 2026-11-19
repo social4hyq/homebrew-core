@@ -4,14 +4,19 @@
 # The bottle HAP is unsigned and carries only a placeholder config.json; this
 # script writes the real connection settings (the host `zcode --web` port and
 # the initial workspace) into a copy of the HAP, adds the ACL module.json and
-# signs it with a locally generated debug profile through app-installer. The
+# signs it with a locally generated debug profile through app-installer. When
+# the wrapper sets ZCODE_DESKTOP_LAUNCHER it also bakes in the host `zcode-app`
+# path and this shell's HOME/PATH/XDG values, which the shell needs to start
+# the service itself. The
 # flow itself is shared by the HAP apps of this tap (hap-app-install-lib.sh,
 # installed next to this script); only what is specific to ZCode is written
 # here.
 #
-# Default variant is the ACL one (the two kernel JIT ACLs keep WebAssembly
-# available in the renderer, READ_PASTEBOARD makes paste work). --no-acl
-# installs the strong-sandbox variant for debugging.
+# Default variant is the ACL one (CUSTOM_SANDBOX and READ_WRITE_USER_FILE let
+# the shell run the host zcode-app to start the service, the two kernel JIT ACLs
+# keep WebAssembly available in the renderer, READ_PASTEBOARD makes paste work).
+# --no-acl installs the strong-sandbox variant, which cannot start the service
+# and waits for `zcode-app serve`.
 set -euo pipefail
 
 APP_CMD=zcode-app
@@ -32,7 +37,22 @@ const [source, destination] = process.argv.slice(2);
 const config = JSON.parse(fs.readFileSync(source, "utf8"));
 if (!Number.isInteger(config.port) || config.port < 1 || config.port > 65535) throw new Error("invalid web port");
 if (typeof config.workspace !== "string") throw new Error("invalid workspace");
-fs.writeFileSync(destination, JSON.stringify({port: config.port, workspace: config.workspace}) + "\n");
+const out = {port: config.port, workspace: config.workspace};
+const launcher = process.env.ZCODE_DESKTOP_LAUNCHER || "";
+if (launcher) {
+  // The shell runs `<launcher> serve` with the host environment captured here.
+  if (!launcher.startsWith("/")) throw new Error("invalid launcher path");
+  const home = process.env.HOME;
+  if (!home || !home.startsWith("/")) throw new Error("HOME is not set");
+  const xdg = key => {
+    const value = process.env[key] || "";
+    return value.startsWith(home + "/") || value.startsWith("/storage/") ? value : "";
+  };
+  out.launcher = launcher;
+  out.host = {home, path: process.env.PATH, xdgConfig: xdg("XDG_CONFIG_HOME"),
+    xdgData: xdg("XDG_DATA_HOME"), xdgState: xdg("XDG_STATE_HOME")};
+}
+fs.writeFileSync(destination, JSON.stringify(out) + "\n");
 JS
 }
 

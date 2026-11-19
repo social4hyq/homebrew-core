@@ -29,7 +29,9 @@ Usage: zcode-app <command>
                       Start the host `zcode --web` instance (background) if it
                       is not already healthy; with --workspace, switch the
                       workspace and restart the instance.
-  start               Bring the installed app to the foreground.
+  start [--no-serve]  Bring the installed app to the foreground; start the
+                      backing service first when it is not healthy
+                      (--no-serve skips that).
   status              Show whether the backing service is healthy.
   stop                Stop the CLI-managed backing service.
   login [zai|bigmodel]
@@ -300,6 +302,21 @@ cmd_login() {
 }
 
 cmd_start() {
+  local serve=1
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --no-serve) serve=0; shift ;;
+      *) die "unknown start option: $1" ;;
+    esac
+  done
+  if [ "$serve" = 1 ]; then
+    read_config
+    # A failed start must not keep the window from opening: the shell retries
+    # on its own and shows the failure on its waiting page.
+    if ! healthy; then
+      ( ensure_serve ) || log "warning: the service did not start; the app will wait for it"
+    fi
+  fi
   device
   "$HDC" shell aa start -a EntryAbility -b "$BUNDLE_ID" -m electron >/dev/null
   printf 'zcode-desktop: opened %s\n' "$BUNDLE_ID"

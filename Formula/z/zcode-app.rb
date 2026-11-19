@@ -10,7 +10,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 14
+  revision 15
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -193,14 +193,17 @@ class ZcodeApp < Formula
     libexec.install shell/"electron/build/default/outputs/default/electron-default-unsigned.hap" =>
                     "zcode-desktop-unsigned.hap"
 
-    # The default install swaps in this module.json: the two kernel ACLs keep
-    # the renderer out of --jitless (WebAssembly, so document previews and the
-    # diff worker work) and READ_PASTEBOARD makes paste work. Everything else
-    # stays out of the HAP so a local debug profile can grant it.
+    # The default install swaps in this module.json: CUSTOM_SANDBOX and
+    # READ_WRITE_USER_FILE let the shell run the host zcode-app to start the
+    # service on launch, the two kernel ACLs keep the renderer out of --jitless
+    # (WebAssembly, so document previews and the diff worker work) and
+    # READ_PASTEBOARD makes paste work. Everything else stays out of the HAP so
+    # a local debug profile can grant it.
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"zcode-desktop-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
-    %w[ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
+    %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE
+       ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
        ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION
        ohos.permission.READ_PASTEBOARD].each do |name|
       requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
@@ -233,6 +236,7 @@ class ZcodeApp < Formula
     (bin/"zcode-app").write_env_script libexec/"zcode-desktop.sh",
       ZCODE_DESKTOP_UNSIGNED_HAP:   libexec/"zcode-desktop-unsigned.hap",
       ZCODE_DESKTOP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
+      ZCODE_DESKTOP_LAUNCHER:       opt_bin/"zcode-app",
       ZCODE_DESKTOP_MODULE_ACL:     pkgshare/"module-acl.json",
       ZCODE_DESKTOP_ZCODE:          formula_opt_bin("zcode")/"zcode",
       ZCODE_DESKTOP_ZCODE_ROOT:     formula_opt_prefix("zcode")/"libexec/zcode",
@@ -253,10 +257,16 @@ class ZcodeApp < Formula
       Huawei Developer login), signs the HAP and installs it.
 
       `zcode-app install` also starts the backing `zcode --web` instance,
-      so the app icon opens the workbench directly. The shell never starts the
-      service itself; after a reboot start it again:
+      so the app icon opens the workbench directly. When the service is not
+      running (after a reboot, for example) the shell starts it itself by
+      running `zcode-app serve`, and `zcode-app start` does the same before it
+      opens the app. This needs the weak-sandbox permissions CUSTOM_SANDBOX and
+      READ_WRITE_USER_FILE, which are granted through a debug profile generated
+      on the spot (no approval wait; the release path still goes through AGC
+      review). The service stays CLI-managed and keeps running when the shell
+      exits. To manage it by hand:
 
-        zcode-app serve      # start it (the shell waits for it otherwise)
+        zcode-app serve
         zcode-app status
         zcode-app stop
 
@@ -282,7 +292,8 @@ class ZcodeApp < Formula
 
       The default install carries the two kernel ACLs (JIT/WebAssembly for the
       renderer) and READ_PASTEBOARD; `zcode-app install --no-acl` installs
-      the strong-sandbox variant instead (no JIT, no paste). 坚盾守护模式
+      the strong-sandbox variant instead (no JIT, no paste, and the shell cannot
+      start the service: run `zcode-app serve` yourself). 坚盾守护模式
       disables JIT regardless of the ACLs. The workbench's embedded terminal is
       unavailable because node-pty cannot spawn child processes under bun on
       HarmonyOS.
@@ -357,10 +368,16 @@ class ZcodeApp < Formula
     )
     assert_equal host_config.fetch("port"), injected_config.fetch("port")
     assert_equal Dir.home, injected_config.fetch("workspace")
+    # The shell starts the service by running the host zcode-app with this
+    # environment.
+    assert_equal (opt_bin/"zcode-app").to_s, injected_config.fetch("launcher")
+    assert_equal Dir.home, injected_config.dig("host", "home")
+    assert_includes injected_config.dig("host", "path"), fake_bin.to_s
     acl_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     acl_permissions = acl_module.dig("module", "requestPermissions").map { |permission| permission.fetch("name") }
-    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
-                    ohos.permission.READ_PASTEBOARD
+    assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO
+                    ohos.permission.INTERNET ohos.permission.READ_PASTEBOARD
+                    ohos.permission.READ_WRITE_USER_FILE
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
                  acl_permissions.sort
@@ -392,6 +409,12 @@ class ZcodeApp < Formula
     refute_match "signed HAP kept",
                  shell_output("#{bin}/zcode-app install --hap #{fake_hap} --no-serve 2>&1")
 
+    # start opens the app; --no-serve skips starting the service first, and an
+    # unknown option is rejected.
+    assert_match "opened com.social4hyq.zcodedesktop", shell_output("#{bin}/zcode-app start --no-serve")
+    assert_match "aa start -a EntryAbility -b com.social4hyq.zcodedesktop -m electron", hdc_log.read
+    assert_match "unknown start option: --bogus", shell_output("#{bin}/zcode-app start --bogus 2>&1", 1)
+
     assert_match "no managed server running", shell_output("#{bin}/zcode-app stop")
     assert_match "not healthy", shell_output("#{bin}/zcode-app status 2>&1", 1)
 
@@ -414,6 +437,8 @@ class ZcodeApp < Formula
     window_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/main.cjs")
     assert_match "tray.create(", window_source
     assert_match "ZCODE_DESKTOP_NO_TRAY", window_source
+    assert_match "spawnService(", window_source
+    assert_match "config.launcher", window_source
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
     assert_equal 0, placeholder.fetch("port")
     permissions = JSON.parse(shell_output("unzip -p #{hap} module.json"))
@@ -421,8 +446,9 @@ class ZcodeApp < Formula
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
     acl = JSON.parse((pkgshare/"module-acl.json").read)
     acl_requested = acl.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
-    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
-                    ohos.permission.READ_PASTEBOARD
+    assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO
+                    ohos.permission.INTERNET ohos.permission.READ_PASTEBOARD
+                    ohos.permission.READ_WRITE_USER_FILE
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
                  acl_requested.sort
