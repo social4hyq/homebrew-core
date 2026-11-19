@@ -1,0 +1,24 @@
+OHOS: keep the default save folder inside the app sandbox. The fallback is
+app.getPath('documents')/GenOffice, which on a device is the shared
+/storage/Users/<user>/Documents (owner another uid, mode drwxrws--x): the folder
+is reported as not usable for the app, resolveDefaultSaveDir throws "default
+save dir not usable", and the home view's home:folder-roots call fails. Under OpenHarmony
+use userData/Documents/GenOffice instead, which is on the app's own file system.
+Every module gets its default folder from this function.
+
+diff --git a/packages/electron-utils/src/default-save-dir.ts b/packages/electron-utils/src/default-save-dir.ts
+index 6dc98c9..7606c34 100644
+--- a/packages/electron-utils/src/default-save-dir.ts
++++ b/packages/electron-utils/src/default-save-dir.ts
+@@ -77,6 +77,10 @@ export function resolveDefaultSaveDir(configured: string | null, fallbackDir: st
+ /** convenience for the Electron mains: settings lookup + fallback in one call */
+ export function configuredDefaultSaveDir(app: PathProvider): string {
+   const settingsPath = join(app.getPath('userData'), 'app-settings.json')
+-  const fallback = join(app.getPath('documents'), 'GenOffice')
++  const documents =
++    (process.platform as string) === 'openharmony'
++      ? join(app.getPath('userData'), 'Documents')
++      : app.getPath('documents')
++  const fallback = join(documents, 'GenOffice')
+   return resolveDefaultSaveDir(readDefaultSaveDirSetting(settingsPath), fallback)
+ }
