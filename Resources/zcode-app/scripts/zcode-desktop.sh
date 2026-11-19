@@ -14,12 +14,17 @@ CONFIG_DIR="${ZCODE_DESKTOP_CONFIG_DIR:-$HOME/.config/zcode-desktop}"
 LEGACY_CONFIG_DIR="${XDG_CONFIG_HOME:+$XDG_CONFIG_HOME/zcode-desktop}"
 # Permissions of this directory. The device keeps $HOME on its shared hmdfs
 # mount, where chmod is a no-op: it returns 0 and changes nothing, so the
-# `chmod 700` calls below only take effect on ordinary file systems. Do not try
-# to make the directory private by creating it under `umask 077`: that gives
-# mode 2700, and on hmdfs nobody can write to a 2700 directory, neither the
-# user who created it nor the app's own uid, so install, serve, the pid file and
-# the log would all fail with EACCES. Files are different: a file created under
-# `umask 077` (mode 600) in the usual 2771 directory is read and written
+# `chmod 700` calls below only take effect on ordinary file systems. hmdfs also
+# ignores the mode a program asks for: a new directory is 2771 (a file 660)
+# minus the umask, and it takes its owner from the parent directory. Do not try
+# to make this directory private by creating it under `umask 077`. Under a
+# directory owned by the synthetic uid 20001006 (HOME, ~/.config, ~/.tmp) that
+# gives mode 2700 owned by 20001006, and nobody can write to it: not the user
+# who created it and not the app's own uid, so install, serve, the pid file and
+# the log would all fail with EACCES. (Under a directory owned by the creating
+# user's own uid, such as ~/.cache on this device, a 2700 directory is usable by
+# its owner and closed to every other uid.) Files are different: a file created
+# under `umask 077` (mode 600) in the usual 2771 directory is read and written
 # normally by the terminal and by the app.
 CONFIG_FILE="$CONFIG_DIR/config.json"
 PID_FILE="$CONFIG_DIR/web.pid"
