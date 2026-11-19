@@ -11,14 +11,22 @@ const HOST_HOME = '/storage/Users/currentUser';
 const BREW_PREFIX = `${HOST_HOME}/.harmonybrew`;
 const HOST_CLAUDE = `${BREW_PREFIX}/opt/claude-code.latest/bin/claude`;
 
-function runLaunch(api = 'spawn', { exitCode = 0, stderrText = '', denyWorkspace = false, keepOpen = false, preflightCli = false } = {}) {
+function runLaunch(api = 'spawn', {
+  exitCode = 0, stderrText = '', denyWorkspace = false, keepOpen = false,
+  preflightCli = false, secondChildActive = false,
+} = {}) {
   const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'claude-bootstrap-test-'));
   const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'claude-host-workspace-'));
-  const child = new EventEmitter();
-  child.stderr = new EventEmitter();
-  child.exitCode = null;
-  child.signalCode = null;
-  child.kill = signal => { child.signalCode = signal; };
+  const makeChild = () => {
+    const result = new EventEmitter();
+    result.stderr = new EventEmitter();
+    result.exitCode = null;
+    result.signalCode = null;
+    result.kill = signal => { result.signalCode = signal; };
+    return result;
+  };
+  const child = makeChild();
+  const secondChild = makeChild();
   const warnings = [];
   const diagnostics = [];
   const calls = [];
@@ -40,8 +48,9 @@ function runLaunch(api = 'spawn', { exitCode = 0, stderrText = '', denyWorkspace
       });
       return probe;
     }
+    const index = calls.filter(call => !call.probe).length;
     calls.push({ command, args });
-    return child;
+    return index === 0 ? child : secondChild;
   }
   const childProcess = { spawn: baseSpawn, execFile: baseSpawn, fork: baseSpawn };
   const electron = { app, dialog: { showMessageBox: async options => { warnings.push(options); return { response: 0 }; } } };
@@ -79,6 +88,9 @@ function runLaunch(api = 'spawn', { exitCode = 0, stderrText = '', denyWorkspace
     if (name === path.join('/app/vendor.asar', 'package.json')) return { main: 'main.cjs' };
     if (name === path.join('/app/vendor.asar', 'main.cjs')) {
       childProcess[api](HOST_CLAUDE, ['--print', 'NEVER_LOG_THIS_PROMPT'], { cwd: workspace, env: { KEEP_ME: 'yes' } });
+      if (secondChildActive) {
+        childProcess[api](HOST_CLAUDE, ['--print', 'SECOND_PROMPT'], { cwd: workspace });
+      }
       if (stderrText) child.stderr.emit('data', Buffer.from(stderrText));
       if (!keepOpen) {
         child.exitCode = exitCode;
@@ -99,7 +111,7 @@ function runLaunch(api = 'spawn', { exitCode = 0, stderrText = '', denyWorkspace
     setTimeout,
     clearTimeout,
   }, { filename: 'claude-bootstrap.cjs' });
-  return { userData, workspace, warnings, diagnostics, calls, processStub, app, child };
+  return { userData, workspace, warnings, diagnostics, calls, processStub, app, child, secondChild };
 }
 
 for (const api of ['spawn', 'execFile', 'fork']) {
@@ -138,6 +150,23 @@ test('keeps the chosen workspace and never falls back to token pairing when ACL 
   assert.doesNotMatch(log, /NEVER_LOG_THIS_PROMPT|TOKEN|39173/);
   fs.rmSync(userData, { recursive: true, force: true });
   fs.rmSync(workspace, { recursive: true, force: true });
+});
+
+test('does not show a fatal dialog for exit 143 while a replacement Claude child remains active', async () => {
+  const state = runLaunch('spawn', { exitCode: 143, secondChildActive: true });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(state.warnings.length, 0);
+  assert.equal(state.secondChild.exitCode, null);
+  fs.rmSync(state.userData, { recursive: true, force: true });
+  fs.rmSync(state.workspace, { recursive: true, force: true });
+});
+
+test('still shows a fatal dialog for exit 143 when no replacement Claude child is active', async () => {
+  const state = runLaunch('spawn', { exitCode: 143 });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(state.warnings.length, 1);
+  fs.rmSync(state.userData, { recursive: true, force: true });
+  fs.rmSync(state.workspace, { recursive: true, force: true });
 });
 
 test('terminates active host CLI children when the shell quits', () => {

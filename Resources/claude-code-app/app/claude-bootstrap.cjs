@@ -154,7 +154,14 @@ function monitorChild(child, command, args) {
   child.once('close', (code, signal) => {
     activeChildren.delete(child);
     writeDiagnostic(`process-close code=${code === null ? 'null' : code} signal=${signal || 'none'} stderr=${stderrKind}`);
-    if (code !== 0) showFailure(`command=${label}, exit=${code === null ? 'unknown' : code}, signal=${signal || 'none'}, stderr=${stderrKind}, ${cwdState}`);
+    // The OHOS compatibility shim can translate a terminated child into exit
+    // code 143 instead of exposing SIGTERM. Claude Desktop starts replacement
+    // CLI children during session initialization; don't show a fatal startup
+    // dialog when another host CLI child is still running successfully.
+    const replacedByActiveChild = code === 143 && !signal && activeChildren.size > 0;
+    if (code !== 0 && !replacedByActiveChild) {
+      showFailure(`command=${label}, exit=${code === null ? 'unknown' : code}, signal=${signal || 'none'}, stderr=${stderrKind}, ${cwdState}`);
+    }
   });
   return child;
 }
