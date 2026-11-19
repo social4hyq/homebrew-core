@@ -54,7 +54,8 @@ function fixture(t) {
       if (cmd.includes('bm install')) { console.log(process.env.INSTALL_FAIL ? 'error: failed' : 'install bundle successfully'); }
       if (cmd.includes('aa start')) { console.log(process.env.START_FAIL ? 'screen locked' : 'start ability successfully'); }
       if (cmd.includes('bm uninstall')) { console.log(process.env.UNINSTALL_FAIL ? 'error: bundle not found' : 'uninstall bundle successfully.'); }
-      if (cmd.includes('bm dump')) { console.log('{\\n  "bundleName": "' + cmd.split(' ').pop() + '",\\n  "versionName": "1.2.3",\\n  "irrelevant": 1\\n}'); }
+      if (cmd.includes('bm dump') && process.env.DUMP_FAIL) { console.log('error: failed to get information and the parameters may be wrong.'); }
+      else if (cmd.includes('bm dump')) { console.log('{\\n  "bundleName": "' + cmd.split(' ').pop() + '",\\n  "versionName": "1.2.3",\\n  "irrelevant": 1\\n}'); }
     }
   `);
   tool("param", `console.log('45678');`);
@@ -234,4 +235,10 @@ test('a failed login stops before any project or signing work', t => {
   const f=fixture(t); const r=f.run([],{NEED_LOGIN:'1',LOGIN_FAIL:'1'}); assert.notEqual(r.status,0);
   assert.ok(!f.calls().some(c=>c[0]==='devecocli'&&(c[1]==='create'||c[1]==='signature')));
   assert.ok(!f.calls().some(c=>c.includes('send')));
+});
+test('info fails when the device reports the bundle is not installed', t => {
+  const f=fixture(t);
+  const r=spawnSync('bash',[script,'info','--bundle-id',bundle,'--hdc',f.hdc,'--device','chosen'],{env:{...f.env,DUMP_FAIL:'1'},encoding:'utf8'});
+  assert.equal(r.status,1,r.stdout+r.stderr); assert.match(r.stderr,/failed to get information/); assert.match(r.stderr,/is it installed/);
+  assert.doesNotMatch(r.stdout,/debug profile days left/);
 });

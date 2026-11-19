@@ -283,6 +283,12 @@ case "$cmd" in
         die 'device did not report successful uninstallation.'
     else
       out=$(hdc_cmd shell "bm dump -n $bundle_id" 2>&1) || { printf '%s\n' "$out" >&2; exit 1; }
+      # hdc shell does not pass the device command's exit status through, so a
+      # missing bundle only shows up as an "error:" line in the output.
+      if printf '%s\n' "$out" | grep -qE '^error:'; then
+        printf '%s\n' "$out" >&2
+        die "could not get information for $bundle_id; is it installed?"
+      fi
       printf '%s\n' "$out" | grep -E '"(bundleName|versionName|vendor|installTime|updateTime|appDistributionType|appProvisionType)"' ||
         printf '%s\n' "$out"
       days="$(profile_days_left "$projects_root/$bundle_id")"
