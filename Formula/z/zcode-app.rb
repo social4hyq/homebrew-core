@@ -20,9 +20,9 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r16"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "11375f10b702fb522a4b21531c81b3d713c83ac5dfc5b6d133105d9946a47f03"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r17"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1e8595cff09b04d674b85c717e1187adb2824413e8c6a82bb7492e561870f813"
   end
 
   depends_on "app-installer"
@@ -264,8 +264,12 @@ class ZcodeApp < Formula
       opens the app. This needs the weak-sandbox permissions CUSTOM_SANDBOX and
       READ_WRITE_USER_FILE, which are granted through a debug profile generated
       on the spot (no approval wait; the release path still goes through AGC
-      review). The service stays CLI-managed and keeps running when the shell
-      exits. To manage it by hand:
+      review). The service the shell starts belongs to the app: it runs as the
+      app's user and goes away when the app exits (tray menu: Quit), so the next
+      launch starts it again. A service you start yourself with
+      `zcode-app serve` belongs to your terminal user and keeps running after the
+      app exits; only that one can be stopped with `zcode-app stop`. To stop a
+      service the shell started, quit the app. To manage it by hand:
 
         zcode-app serve
         zcode-app status
