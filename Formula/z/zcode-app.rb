@@ -10,7 +10,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 16
+  revision 17
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -20,9 +20,8 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r13"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "77a0b382351da48fa96c359c6bf8dd47f043ff373118752b5188192806458562"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc4dd9904ba6c802ec65a5d5d3d5be0207d3411d3eb1f22f347c8d10f1d85932"
   end
 
   depends_on "app-installer"
@@ -421,6 +420,15 @@ class ZcodeApp < Formula
     assert_match "opened com.social4hyq.zcodedesktop", shell_output("#{bin}/zcode-app start --no-serve")
     assert_match "aa start -a EntryAbility -b com.social4hyq.zcodedesktop -m electron", hdc_log.read
     assert_match "unknown start option: --bogus", shell_output("#{bin}/zcode-app start --bogus 2>&1", 1)
+
+    # stop signals a live process of its own: a stand-in service is stopped and
+    # its pid file removed.
+    sleeper = spawn("sleep", "60")
+    pid_file = testpath/"home/.config/zcode-desktop/web.pid"
+    pid_file.write sleeper.to_s
+    assert_match "zcode-desktop: stopped", shell_output("#{bin}/zcode-app stop")
+    Process.wait(sleeper)
+    refute_path_exists pid_file
 
     assert_match "no managed server running", shell_output("#{bin}/zcode-app stop")
     assert_match "not healthy", shell_output("#{bin}/zcode-app status 2>&1", 1)
