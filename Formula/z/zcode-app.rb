@@ -10,7 +10,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 18
+  revision 19
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -20,8 +20,8 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r18"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "29fde4f436b5f8f8c5767828cf30234bba6e7187177e6821919978a01f798711"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r20"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d076b498d6d414cf22b4e0b93b2f1aad6789aec3eeafeee563df8c5a375512c"
   end
 
   depends_on "app-installer"
