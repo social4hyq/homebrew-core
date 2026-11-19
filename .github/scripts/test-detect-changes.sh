@@ -123,5 +123,82 @@ commit "docs: note"
 PR_DOCS=$(git rev-parse HEAD)
 expect "a PR behind its base that touches no formula builds nothing" "" "$(detect "$PUSH_BOTTLE" "$PR_DOCS")"
 
+# 6. A merged PR whose branch already carries the bottle write-back. The PR
+#    changed the formula and Resources/<formula>/, pr-validate built it and
+#    pushed the write-back onto the branch, so the post-merge push must not
+#    rebuild it (that rebuild used to publish a second bottle and open a bot PR
+#    that conflicted with every open PR on the same formula).
+merge_pr() { # merge_pr BRANCH -> merges it into main with a merge commit
+  git checkout -q main && git merge -q --no-ff -m "Merge pull request from $1" "$1"
+}
+git checkout -q main
+MAIN6=$(git rev-parse HEAD)
+git checkout -q -b pr-merged "$MAIN6"
+formula beta-app 8 r5
+echo built > Resources/beta-app/run.sh
+commit "beta-app: change (revision 8)"
+formula beta-app 8 r6
+commit "beta-app: update 1.0_8 bottle."
+merge_pr pr-merged
+expect "a merged PR whose write-back already contains its Resources change builds nothing" \
+  "" "$(detect "$MAIN6" "$(git rev-parse HEAD)")"
+
+# 7. Resources changed after the write-back: that change is not in the bottle.
+MAIN7=$(git rev-parse HEAD)
+git checkout -q -b pr-late "$MAIN7"
+formula beta-app 9 r6
+echo built > Resources/beta-app/run.sh
+commit "beta-app: change (revision 9)"
+formula beta-app 9 r7
+commit "beta-app: update 1.0_9 bottle."
+echo later > Resources/beta-app/run.sh
+commit "beta-app: edit the launcher after the build"
+merge_pr pr-late
+expect "Resources changed after the write-back still rebuilds" \
+  "beta-app" "$(detect "$MAIN7" "$(git rev-parse HEAD)")"
+
+# 8. A Resources-only PR on a formula whose last .rb commit is an old write-back.
+git checkout -q main
+MAIN8=$(git rev-parse HEAD)
+git checkout -q -b pr-res-only "$MAIN8"
+echo only > Resources/beta-app/run.sh
+commit "beta-app: tweak the launcher again"
+expect "a Resources-only change after an old write-back rebuilds" \
+  "beta-app" "$(detect "$MAIN8" "$(git rev-parse HEAD)")"
+
+# 9. A change under Resources/_shared/<x>/ maps to the formulae that use it,
+#    and gets the same treatment.
+git checkout -q main
+mkdir -p Formula/g Resources/_shared/lib
+cat > Formula/g/gamma-app.rb <<'EOF'
+class Foo < Formula
+  revision 1
+  bottle do
+    root_url "https://example.invalid/gamma-app-r1"
+  end
+  def install
+    cp "Resources/_shared/lib/x.sh", pkgshare
+  end
+end
+EOF
+echo old > Resources/_shared/lib/x.sh
+commit "gamma-app: add"
+MAIN9=$(git rev-parse HEAD)
+git checkout -q -b pr-shared "$MAIN9"
+sed -i 's/revision 1/revision 2/' Formula/g/gamma-app.rb
+echo new > Resources/_shared/lib/x.sh
+commit "gamma-app: change (revision 2)"
+sed -i 's/gamma-app-r1/gamma-app-r2/' Formula/g/gamma-app.rb
+commit "gamma-app: update 1.0_2 bottle."
+merge_pr pr-shared
+expect "a shared Resources change already in the write-back builds nothing" \
+  "" "$(detect "$MAIN9" "$(git rev-parse HEAD)")"
+MAIN9B=$(git rev-parse HEAD)
+git checkout -q -b pr-shared-late "$MAIN9B"
+echo newer > Resources/_shared/lib/x.sh
+commit "shared: edit lib"
+expect "a shared Resources change after the write-back rebuilds the formula using it" \
+  "gamma-app" "$(detect "$MAIN9B" "$(git rev-parse HEAD)")"
+
 printf '\n%s passed, %s failed\n' "$PASS" "$FAILED"
 [ "$FAILED" -eq 0 ]
