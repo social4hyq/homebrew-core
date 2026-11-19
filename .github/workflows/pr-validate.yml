@@ -33,7 +33,7 @@ on:
     paths: ['Formula/**', 'Patches/**', 'Resources/**',
             '.github/scripts/check-hap-formulae.py', '.github/scripts/test-hap-install-lib.sh',
             '.github/scripts/detect-changes.sh', '.github/scripts/test-detect-changes.sh',
-            '.github/scripts/test-waiting-page.sh']
+            '.github/scripts/test-waiting-page.sh', '.github/scripts/publish.sh']
 
 defaults:
   run:
