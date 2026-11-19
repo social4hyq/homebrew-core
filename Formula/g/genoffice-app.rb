@@ -9,6 +9,11 @@ class GenofficeApp < Formula
   # (Chromium/Electron, mixed MIT/BSD/LGPL) and the Apache-2.0 upstream icon.
   license :cannot_represent
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6da0a59bb8c371d70c09ab2ce1500e1c7a158cbbd06356ae4acfbe55d917587d"
+  end
+
   depends_on "app-installer"
   depends_on "genoffice"
   depends_on "node"
