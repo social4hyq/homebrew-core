@@ -1,0 +1,149 @@
+--- a/web_engine/src/main/ets/ability/WebAbility.ets
++++ b/web_engine/src/main/ets/ability/WebAbility.ets
+@@ -24,6 +24,7 @@
+ import { BusinessError } from '@kit.BasicServicesKit';
+ import lazy { GlobalThisHelper } from '../utils/GlobalThisHelper';
+ import { CmdArgsHelper } from '../utils/CmdArgsHelper';
++import { ClaudeLaunchQueue } from '../utils/ClaudeLaunchQueue';
+ 
+ const TAG: string = 'WebAbility';
+ 
+@@ -56,6 +57,9 @@
+   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam) {
+     LogUtil.info(TAG, '[ohoswindow] in WebAbility onCreate.');
+     super.onCreate(want, launchParam);
++    if (ClaudeLaunchQueue.capture(want?.uri)) {
++      this.startUri = "";
++    }
+     this.contextAdapter = Inject.get(ContextAdapter);
+     const hiddenWindowId = this.contextAdapter.getHiddenWindowId();
+     if (this.electronManagedWindow) {
+@@ -423,8 +427,11 @@
+   }
+ 
+   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+-    LogUtil.info(TAG, `[ohoswindow] in WebAbility onNewWant, want is ${JSON.stringify(want)}, param is ${JSON.stringify(launchParam)}.`);
++    LogUtil.info(TAG, "[ohoswindow] in WebAbility onNewWant");
+     super.onNewWant(want, launchParam);
++    if (ClaudeLaunchQueue.capture(want?.uri)) {
++      return;
++    }
+     this.handleContinueRestore(want, launchParam);
+     let uriNotNull = want["uri"] !== undefined && want["uri"] !== '';
+     if(want!== undefined && want !== null) {
+@@ -436,7 +443,6 @@
+         ', type: ' + JSON.stringify(want.type) +
+         ', flags: ' + JSON.stringify(want.flags) +
+         ', action: ' + JSON.stringify(want.action) +
+-        ', parameters: ' + JSON.stringify(want.parameters) +
+         ', entities: ' + JSON.stringify(want.entities) +
+         ', moduleName: ' + JSON.stringify(want.moduleName) +
+         ', LaunchParam: ' + JSON.stringify(launchParam));
+@@ -470,7 +476,7 @@
+       } else if (uri.startsWith("file:///")) {
+         this.openNewWindow(uri);
+       } else {
+-        LogUtil.debug(TAG, `Trigger open-url event. uri = ${uri}`);
++        LogUtil.debug(TAG, "Trigger open-url event");
+         this.openURL(uri);
+       }
+     }
+@@ -504,7 +510,7 @@
+       payload.additionalData = additionalData;
+     }
+ 
+-    LogUtil.info(TAG, '[ohoswindow] emitSecondInstance payload=' + JSON.stringify(payload));
++    LogUtil.info(TAG, '[ohoswindow] emitSecondInstance');
+     this.nativeContext.ExecuteCommand(CommandType.kSecondInstance, {
+       user_data: JSON.stringify(payload)
+     });
+@@ -581,7 +587,7 @@
+   }
+ 
+   private openURL(url: string) {
+-    LogUtil.debug(TAG, 'openURL is called, url: ' + url);
++    LogUtil.debug(TAG, 'openURL is called');
+     this.nativeContext.ExecuteCommand(CommandType.kOpenURL, { url: url });
+   }
+ 
+--- a/web_engine/src/main/ets/application/WebAbilityStage.ets
++++ b/web_engine/src/main/ets/application/WebAbilityStage.ets
+@@ -30,9 +30,8 @@
+     this.runTaskAsync();
+   }
+ 
+-  @LogMethod
+   onAcceptWant(want: Want): string {
+-    LogUtil.info(TAG, '[ohoswindow] in WebAbilityStage onAcceptWant, want is ' + JSON.stringify(want));
++    LogUtil.info(TAG, '[ohoswindow] in WebAbilityStage onAcceptWant');
+     let instanceKey = want.parameters?.instanceKey;
+     if (typeof instanceKey === 'string' && /^browser\d+$/.test(instanceKey)) {
+       return AbilityIdController.cacheUniqueId(instanceKey);
+--- a/web_engine/src/main/ets/utils/LaunchHelper.ets
++++ b/web_engine/src/main/ets/utils/LaunchHelper.ets
+@@ -18,7 +18,7 @@
+       let context = uiContext as common.UIAbilityContext ||
+         uiContext as common.UIExtensionContext;
+       if (!context) {
+-        LogUtil.error(TAG, `[ohoswindow] excute failed, want: ${JSON.stringify(want)}, options:  ${JSON.stringify(options)}`);
++        LogUtil.error(TAG, "[ohoswindow] launch failed");
+         return false;
+       }
+       context.startAbility(want, options)
+@@ -62,7 +62,7 @@
+       let context = uiContext as common.UIAbilityContext ||
+         uiContext as common.UIExtensionContext;
+       if (!context) {
+-        LogUtil.error(TAG, `excute failed, want: ${JSON.stringify(want)}, options:  ${JSON.stringify(options)}`);
++        LogUtil.error(TAG, "launch failed");
+         return false;
+       }
+       await context.startAbility(want, options);
+--- a/web_engine/src/main/ets/jsbindings/EtsBridgeAdapterBind.ets
++++ b/web_engine/src/main/ets/jsbindings/EtsBridgeAdapterBind.ets
+@@ -20,7 +20,13 @@
+ 
+ import JsBindingUtils from '../utils/JsBindingUtils';
+ import Inject from "../common/InjectModule";
+-import lazy { EtsBridgeAdapter } from '../adapter/EtsBridgeAdapter';
++import { ClaudeLaunchQueue } from '../utils/ClaudeLaunchQueue';
++import lazy { EtsBridgeAdapter } from "../adapter/EtsBridgeAdapter";
++
++function drainClaudeLaunchUris(): string[] {
++    return ClaudeLaunchQueue.take();
++}
++
+ 
+ /** Get or create EtsBridgeAdapter singleton */
+ function implEtsBridgeAdapter(): EtsBridgeAdapter {
+@@ -189,6 +195,7 @@
+ 
+ export class EtsBridgeAdapterBind {
+   static bind() {
++    JsBindingUtils.bindFunction("EtsBridge.DrainClaudeLaunchUris", drainClaudeLaunchUris);
+     // Section 1: No params + various return types
+     JsBindingUtils.bindFunction("EtsBridge.TestReturnArrayString", testReturnArrayString);
+     JsBindingUtils.bindFunction("EtsBridge.TestReturnArrayNumber", testReturnArrayNumber);
+--- /dev/null
++++ b/web_engine/src/main/ets/utils/ClaudeLaunchQueue.ets
+@@ -0,0 +1,20 @@
++// Process-local handoff: never persist or log authentication links.
++export class ClaudeLaunchQueue {
++  private static pending: string[] = [];
++
++  static capture(uri: string | undefined): boolean {
++    if (typeof uri !== 'string' || !uri.toLowerCase().startsWith('claude://')) {
++      return false;
++    }
++    if (uri.length <= 8192 && ClaudeLaunchQueue.pending.length < 8) {
++      ClaudeLaunchQueue.pending.push(uri);
++    }
++    return true;
++  }
++
++  static take(): string[] {
++    const result = ClaudeLaunchQueue.pending;
++    ClaudeLaunchQueue.pending = [];
++    return result;
++  }
++}
