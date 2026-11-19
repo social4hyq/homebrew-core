@@ -5,6 +5,11 @@ class Genoffice < Formula
   sha256 "156528d8fa1e6878d6c61d3576d6d6b093eda4abbef223e7fbc4bd4855c9cb08"
   license "Apache-2.0"
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-v0.13.18-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a15cdb6754af7bf82ebde8b14a66154698967e1610d66608f22210505521fa32"
+  end
+
   depends_on "node" => :build
   depends_on "rust" => :build
   depends_on "node"
