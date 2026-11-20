@@ -1,8 +1,8 @@
 class MulticaApp < Formula
   desc "Desktop shell for the Multica AI agent workspace (Electron HAP for OpenHarmony)"
   homepage "https://multica.ai"
-  url "https://github.com/multica-ai/multica/archive/refs/tags/v0.10.0.tar.gz"
-  sha256 "4f0092e840fc07014b80b5a7fa9bf11e96425a4dd1879e86485df8511b7be999"
+  url "https://github.com/multica-ai/multica/archive/refs/tags/v0.11.1.tar.gz"
+  sha256 "8a8f2149447dfd0c178fca332f88b539560fa57a5075d67c6e440958de8d49fc"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
 
   livecheck do
@@ -11,9 +11,8 @@ class MulticaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.10.0-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "351087b8d22836823fe645c7c22cfea2fd9d7f3e505f7825b6ac5145df1230a7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.11.1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fc0783f55544487880c1b901697390a838e36d4d5f45647d40bd3a15faed0dec"
   end
 
   depends_on "go" => :build
