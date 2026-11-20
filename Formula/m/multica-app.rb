@@ -244,9 +244,12 @@ class MulticaApp < Formula
 
       The CLI and daemon come from the `multica` formula; keep both versions equal
       (`multica-app` warns when they differ). The desktop runs in its sandbox, so a
-      loopback bridge runs on the host: `multica-app` starts it and opens the app,
-      `multica-app start --bridge-only` starts only the bridge (use the absolute path
-      in login scripts), `multica-app stop` stops it.
+      loopback bridge runs on the host: `multica-app` starts it and opens the app;
+      `multica-app start` with `--bridge-only` starts only the bridge; `multica-app
+      stop` stops it. A startup file can run before Homebrew's bin is on PATH,
+      so use the absolute path there:
+
+        "$HOME/.harmonybrew/bin/multica-app" start --bridge-only
 
       The default HAP requests INTERNET and GET_NETWORK_INFO only; with an AGC
       profile carrying CUSTOM_SANDBOX/READ_WRITE_USER_FILE use
