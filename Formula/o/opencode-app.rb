@@ -8,7 +8,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 13
+  revision 14
 
   livecheck do
     url :stable
@@ -222,7 +222,7 @@ class OpencodeApp < Formula
   end
 
   post_install_steps do
-    run "{HOMEBREW_PREFIX}/bin/hap-app",
+    run "{{HOMEBREW_PREFIX}}/bin/hap-app",
         args: ["auto-install", "opencode-app", "com.social4hyq.opencodedesktop"],
         must_succeed: false, print_stdout: true, network_access: true
   end
