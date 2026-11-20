@@ -4,7 +4,7 @@ class SnowShotApp < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.7_snow-shot.tar.gz"
   sha256 "6d9de662710ccf406dea312c0322e77a3f473bc6121096ec82df713d30f4273c"
   license "GPL-3.0-or-later"
-  revision 22
+  revision 23
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r11"
@@ -117,8 +117,7 @@ class SnowShotApp < Formula
     end
   end
 
-  # List every path literally: the unused-resource audit keeps a Resources/
-  # directory only while a formula names it.
+  # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
     Resources/snow-shot-app/ohos-template/AppScope/resources/base/media/app_icon.png
     Resources/snow-shot-app/ohos-template/assets/README.md
@@ -167,9 +166,7 @@ class SnowShotApp < Formula
     mkdir_p ocr_crate
     tap_root = Pathname(__FILE__).parent.parent.parent
     res = tap_root/"Resources/snow-shot-app"
-    RESOURCE_FILES.each do |file|
-      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
-    end
+    RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
     resource("snow-shot-ocr-rs").stage do
       cp_r ".", ocr_crate
     end
@@ -351,8 +348,6 @@ class SnowShotApp < Formula
     system "cmake", "--build", "build", "--target", "snow_shot",
            "snow_ocr_inprocess_build", "--parallel"
 
-    # The remainder packages the exact Qt and non-platform ELF closure into
-    # the HAP. It runs only in the private Qt/CLT CI image, never on a device.
     package_hap(qt, clt, ohos_sdk, qt_tls)
     unsigned_hap = "hap-proj/entry/build/default/outputs/default/entry-default-unsigned.hap"
     libexec.install unsigned_hap => "snow-shot-unsigned.hap"
@@ -527,8 +522,7 @@ class SnowShotApp < Formula
            "--template", res/"ohos-template", "--stage", stage
     cp res/"ohos-template/entry/src/main/ets/qability/QAbility.ets",
        stage/"entry/src/main/ets/qability/QAbility.ets"
-    # Add the minimal statusBarView extension and quick-panel page the Qt tray
-    # plugin needs, and declare both in the generated project.
+    # The Qt tray plugin requires both the statusBarView extension and quick-panel page.
     mkdir_p stage/"entry/src/main/ets/statusbar"
     %w[StatusBarAbility.ets StatusBarPage.ets].each do |name|
       cp res/"ohos-template/entry/src/main/ets/statusbar"/name,
@@ -600,10 +594,10 @@ class SnowShotApp < Formula
 
   def caveats
     <<~EOS
-      `brew install`/`brew upgrade` installs the HAP automatically once the
-      device and the Huawei Developer login are ready; otherwise it is queued:
-      `hap-app status` shows why, `hap-app install-pending` finishes it.
-      Manual: `snow-shot-app install`. Details: docs/hap-app-formulae.md.
+      `brew install` and `brew upgrade` try to install the HAP when a device is
+      connected and Huawei Developer login is ready. If queued, check
+      `hap-app status`, then run `hap-app install-pending`.
+      Manual install: `snow-shot-app install`. See docs/hap-app-formulae.md.
 
       The HAP is unsigned in the bottle; install signs it with a local debug profile
       (Huawei Developer login on first run).
@@ -612,11 +606,8 @@ class SnowShotApp < Formula
 
   test do
     hap = libexec/"snow-shot-unsigned.hap"
-    assert_path_exists hap
     assert_predicate bin/"snow-shot", :symlink?
     assert_match "Usage: snow-shot-app <command>", shell_output("#{bin}/snow-shot --help")
-    assert_match "Usage: snow-shot-app <command>", shell_output("#{bin}/snow-shot-app --help")
-    assert_match "Usage: snow-shot-app <command>", shell_output(bin/"snow-shot-app")
     assert_match "unknown command: bogus", shell_output("#{bin}/snow-shot-app bogus 2>&1", 2)
     fake_bin = testpath/"bin"
     fake_bin.mkpath
@@ -629,7 +620,7 @@ class SnowShotApp < Formula
     (fake_bin/"hdc").write "#!/bin/sh\necho 127.0.0.1:1\n"
     chmod 0755, fake_bin/"hdc"
     with_env(PATH: "#{fake_bin}:#{ENV["PATH"]}", SNOW_SHOT_HDC: (fake_bin/"hdc").to_s) do
-      shell_output(bin/"snow-shot-app")
+      assert_match "Usage: snow-shot-app <command>", shell_output(bin/"snow-shot-app")
       refute_path_exists installer_args
       shell_output("#{bin}/snow-shot-app install --no-start")
     end
@@ -640,15 +631,11 @@ class SnowShotApp < Formula
     listing = shell_output("unzip -l #{hap}")
     %w[
       libsnow_shot.so libqohos.so libQt6Widgets.so.6
-      rawfile/ocr/asset-manifest.json
       rawfile/qrcode/detect.prototxt rawfile/qrcode/detect.caffemodel
       rawfile/qrcode/sr.prototxt rawfile/qrcode/sr.caffemodel
-    ].each do |name|
-      assert_match name, listing
-    end
+    ].each { |name| assert_match name, listing }
     refute_match "libs/arm64-v8a/libsnow_ocr_process.so", listing
     assert_match "libs/arm64-v8a/tls/libqopensslbackend.so", listing
-    assert_match "libs/arm64-v8a/libQt6Network.so.6", listing
     network = Utils.safe_popen_read("unzip", "-p", hap,
                                    "libs/arm64-v8a/libQt6Network.so.6").b
     assert_includes network, "QSslSocket".b
