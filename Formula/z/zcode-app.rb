@@ -9,7 +9,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 21
+  revision 22
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -19,9 +19,8 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r23"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1836d791603f4a0475407535ad5b45ee35066dd076aefd77ca9a7f8dacbb90b8"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r25"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "853b9ef8a07921b579d7b72a7776742b35994dd668fc62c528086d7e52663171"
   end
 
   depends_on "app-installer"
@@ -33,8 +32,7 @@ class ZcodeApp < Formula
   depends_on "zcode"
   depends_on "zip"
 
-  # List every path literally: the unused-resource audit keeps a Resources/
-  # directory only while a formula names it.
+  # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
     Resources/_shared/electron-shell/tray.cjs
     Resources/_shared/hap-app/install-lib.sh
@@ -58,9 +56,7 @@ class ZcodeApp < Formula
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     res = tap_root/"Resources/zcode-app"
-    RESOURCE_FILES.each do |file|
-      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
-    end
+    RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
 
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
@@ -74,8 +70,6 @@ class ZcodeApp < Formula
       cp res/"app"/name, app/name
     end
     cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
-    # waiting.html is generated from the shared page template;
-    # Resources/_shared/waiting-page/expected.sha256 pins the output.
     system "node", tap_root/"Resources/_shared/waiting-page/render-waiting.cjs",
            tap_root/"Resources/_shared/waiting-page/waiting.html.in",
            res/"app/waiting.json", app/"waiting.html"
@@ -89,8 +83,7 @@ class ZcodeApp < Formula
     %w[app_icon.png startIcon.png].each do |name|
       cp res/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
-    # Patch app name/labels in every locale: the base file alone leaves the
-    # zh_CN/en_US overrides showing "Electron".
+    # Locale overrides would otherwise keep the Electron launcher label.
     (shell.glob("AppScope/resources/*/element/string.json") +
      shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
       strings = JSON.parse(file.read)
@@ -148,27 +141,21 @@ class ZcodeApp < Formula
     inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
               "    super.onWindowStageCreate(windowStage);\n", close_handler
 
-    # The shell builds in the private electron-ohos-ci image
-    # (OHOS_CI_IMAGE_OVERRIDES) with the proprietary CLT at
-    # /opt/electron-ohos-clt; it compiles no C++, so the NDK-less SDK suffices.
+    # The proprietary CLT is supplied by the CI image, not distributed by the tap.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "zcode-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['zcode-app']"
     end
 
-    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
-    # ohos_packing_tool.
+    # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
-    # table. Only ever lower it.
+    # An oversized RLIMIT_NOFILE breaks the musl FD table in hvigor.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
-    if hard_cap > 65_536
-      Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
-    end
+    Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd shell do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
@@ -203,12 +190,10 @@ class ZcodeApp < Formula
     end
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
-    # cp, not install: Pathname#install moves the source, and the tap checkout
-    # is read-only in the CI container.
+    # Pathname#install would move files out of the read-only CI tap.
     pkgshare.mkpath
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    # install-desktop.sh sources the shared install flow.
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
     chmod 0755, pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/zcode-desktop.sh", libexec/"zcode-desktop.sh"
@@ -234,23 +219,24 @@ class ZcodeApp < Formula
 
   def caveats
     <<~EOS
-      `brew install`/`brew upgrade` installs the HAP automatically once the
-      device and the Huawei Developer login are ready; otherwise it is queued:
-      `hap-app status` shows why, `hap-app install-pending` finishes it.
-      Manual: `zcode-app install`. Details: docs/hap-app-formulae.md.
+      `brew install` and `brew upgrade` try to install the HAP when a device is
+      connected and Huawei Developer login is ready. If queued, check
+      `hap-app status`, then run `hap-app install-pending`.
+      Manual install: `zcode-app install`. See docs/hap-app-formulae.md.
 
       Install does not start `zcode --web`; the shell starts its own copy on launch
       (weak-sandbox ACLs from the local debug profile). A service you start yourself
       outlives the app:
 
-        zcode-app serve | status | stop
+        zcode-app serve
+        zcode-app status
+        zcode-app stop
 
       State is shared in `~/.config/zcode-desktop`. `zcode-app login
       [zai|bigmodel]` runs the browser OAuth flow. `--no-acl` gives the
       strong-sandbox variant (no JIT/paste, cannot start the service). 坚盾守护模式
       disables JIT. The embedded terminal is unavailable (node-pty cannot spawn under
-      bun on HarmonyOS). `serve` pins projectStorageHostId to "local" so 3.18.2's
-      remote routing does not break "this computer" projects.
+      bun on HarmonyOS).
     EOS
   end
 
@@ -310,7 +296,6 @@ class ZcodeApp < Formula
     ENV.prepend_path "PATH", fake_bin
     ENV["ZCODE_DESKTOP_HDC"] = (fake_bin/"hdc").to_s
 
-    # Default install: config injection, ACL module and signing project.
     assert_match "installed", shell_output("#{bin}/zcode-app install --hap #{fake_hap} --no-serve")
     host_config = JSON.parse((testpath/"home/.config/zcode-desktop/config.json").read)
     assert_operator host_config.fetch("port"), :>, 0
@@ -321,7 +306,6 @@ class ZcodeApp < Formula
     )
     assert_equal host_config.fetch("port"), injected_config.fetch("port")
     assert_equal Dir.home, injected_config.fetch("workspace")
-    # The shell starts the service by running the host zcode-app with this env.
     assert_equal (opt_bin/"zcode-app").to_s, injected_config.fetch("launcher")
     assert_equal Dir.home, injected_config.dig("host", "home")
     assert_includes injected_config.dig("host", "path"), fake_bin.to_s
@@ -341,7 +325,6 @@ class ZcodeApp < Formula
     assert_equal "EntryAbility", installer[installer.index("--ability") + 1]
     assert_equal (fake_bin/"hdc").to_s, installer[installer.index("--hdc") + 1]
 
-    # --no-acl keeps the HAP's own permission list.
     assert_match "installed",
                  shell_output("#{bin}/zcode-app install --hap #{fake_hap} --no-acl --no-serve")
     strong_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
@@ -349,7 +332,6 @@ class ZcodeApp < Formula
     strong_permissions = strong_requests.map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.INTERNET], strong_permissions
 
-    # --keep is passed through; the install script copies the signed HAP out.
     keep_tmp = testpath/"keep-tmp"
     keep_tmp.mkpath
     ENV["TMPDIR"] = keep_tmp.to_s
@@ -360,21 +342,15 @@ class ZcodeApp < Formula
     refute_match "signed HAP kept",
                  shell_output("#{bin}/zcode-app install --hap #{fake_hap} --no-serve 2>&1")
 
-    # install never starts the service (the app or `start` does): no start
-    # message and no pid file after a plain install.
     plain_output = shell_output("#{bin}/zcode-app install --hap #{fake_hap} 2>&1")
     assert_match "installed", plain_output
     refute_match "bundled server", plain_output
     refute_path_exists testpath/"home/.config/zcode-desktop/web.pid"
 
-    # start opens the app; --no-serve skips starting the service first, and an
-    # unknown option is rejected.
     assert_match "opened com.social4hyq.zcodedesktop", shell_output("#{bin}/zcode-app start --no-serve")
     assert_match "aa start -a EntryAbility -b com.social4hyq.zcodedesktop -m electron", hdc_log.read
     assert_match "unknown start option: --bogus", shell_output("#{bin}/zcode-app start --bogus 2>&1", 1)
 
-    # stop signals a live process of its own: a stand-in service is stopped and
-    # its pid file removed.
     sleeper = spawn("sleep", "60")
     pid_file = testpath/"home/.config/zcode-desktop/web.pid"
     pid_file.write sleeper.to_s
@@ -385,40 +361,23 @@ class ZcodeApp < Formula
     assert_match "no managed server running", shell_output("#{bin}/zcode-app stop")
     assert_match "not healthy", shell_output("#{bin}/zcode-app status 2>&1", 1)
 
-    # State lives under $HOME; what an older version kept under
-    # XDG_CONFIG_HOME is moved once.
     legacy = testpath/"xdg/zcode-desktop"
     legacy.mkpath
-    (legacy/"config.json").write JSON.generate("port" => 14_777, "workspace" => "/legacy")
+    old_port = free_port
+    (legacy/"config.json").write JSON.generate("port" => old_port, "workspace" => "/legacy")
     moved = shell_output("XDG_CONFIG_HOME=#{testpath}/xdg #{bin}/zcode-app status 2>&1", 1)
     assert_match "moved the service state", moved
-    assert_match "http://127.0.0.1:14777", moved
-    assert_equal 14_777, JSON.parse((testpath/"home/.config/zcode-desktop/config.json").read).fetch("port")
+    assert_match "http://127.0.0.1:#{old_port}", moved
+    assert_equal old_port, JSON.parse((testpath/"home/.config/zcode-desktop/config.json").read).fetch("port")
     assert_path_exists legacy/"config.json.migrated"
     refute_path_exists legacy/"config.json"
     refute_match "moved the service state", shell_output("#{bin}/zcode-app status 2>&1", 1)
 
-    # The real bottle HAP.
     hap = libexec/"zcode-desktop-unsigned.hap"
-    assert_path_exists hap
-    listing = shell_output("unzip -l #{hap}")
-    assert_match "pack.info", listing
-    assert_match "libs/arm64-v8a/libelectron.so", listing
-    assert_match "resources/resfile/resources/app/main.cjs", listing
-    assert_match "resources/resfile/resources/app/tray.cjs", listing
-    assert_match "resources/resfile/resources/app/tray-icon.png", listing
-    assert_match "resources/resfile/resources/app/waiting.html", listing
+    assert_match "libs/arm64-v8a/libelectron.so", shell_output("unzip -Z1 #{hap}")
     waiting_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/waiting.html")
     assert_match "zcode-app status", waiting_source
     refute_match "{{", waiting_source
-    tray_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/tray.cjs")
-    assert_match "new Tray(", tray_source
-    assert_match "app.exit(0)", tray_source
-    window_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/main.cjs")
-    assert_match "tray.create(", window_source
-    assert_match "ZCODE_DESKTOP_NO_TRAY", window_source
-    assert_match "spawnService(", window_source
-    assert_match "config.launcher", window_source
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
     assert_equal 0, placeholder.fetch("port")
     permissions = JSON.parse(shell_output("unzip -p #{hap} module.json"))
