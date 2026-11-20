@@ -28,6 +28,10 @@ def main():
         script = support / ASSEMBLER.name
         shutil.copy2(ASSEMBLER, script)
         shutil.copy2(BOOTSTRAP, support / BOOTSTRAP.name)
+        shims = sorted(BOOTSTRAP.parent.glob("owl-*.cjs"))
+        assert shims, "missing Owl compatibility shims"
+        for shim in shims:
+            shutil.copy2(shim, support / shim.name)
         assembler = load_module(script)
 
         payload_root = root / "payload"
@@ -60,6 +64,8 @@ def main():
             assert archive.testzip() is None
             assert assembler.APP_ROOT + "template-placeholder" not in archive.namelist()
             assert archive.read(assembler.APP_ROOT + "chatgpt-bootstrap.cjs") == BOOTSTRAP.read_bytes()
+            for shim in shims:
+                assert archive.read(assembler.APP_ROOT + shim.name) == shim.read_bytes()
             assert archive.read(assembler.APP_ROOT + "vendor.asar") == b"app.asar"
             assert archive.read(assembler.APP_ROOT + "package.json") == json.dumps({
                 "name": "chatgpt-ohos-shell",

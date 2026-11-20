@@ -134,6 +134,8 @@ def assemble(shell, deb, output):
                 }
                 target.writestr(APP_ROOT + "package.json", json.dumps(wrapper))
                 target.write(WORK / "chatgpt-bootstrap.cjs", APP_ROOT + "chatgpt-bootstrap.cjs")
+                for shim in sorted(WORK.glob("owl-*.cjs")):
+                    target.write(shim, APP_ROOT + shim.name)
 
                 for name, (payload, mode) in selected.items():
                     if name == "@root/owl-shell-runtime.json":

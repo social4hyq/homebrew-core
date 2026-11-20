@@ -4,6 +4,11 @@
 const path = require('node:path');
 const fs = require('node:fs');
 const { app } = require('electron');
+
+// The official build refuses stock Electron unless Owl-only runtime APIs exist;
+// owl-compat.cjs supplies them (and the node:sqlite, host-spawn and terminal
+// shims) before the vendor entry point is loaded.
+require('./owl-compat.cjs');
 const hostConfigPath = path.join(__dirname, 'chatgpt-host-config.json');
 
 // The OHOS Electron shell exposes appData as an unsupported path. The

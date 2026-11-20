@@ -22,6 +22,7 @@ function boot(packageVersion = '26.1117.31558') {
   const state = {
     appPath: null,
     loaded: null,
+    compatLoaded: false,
     name: null,
     paths: {},
     madeDirs: [],
@@ -52,6 +53,7 @@ function boot(packageVersion = '26.1117.31558') {
     }
     if (id === 'node:child_process') return childProcess;
     if (id === 'electron') return { app };
+    if (id === './owl-compat.cjs') { state.compatLoaded = true; return {}; }
     if (id === vendor) return {};
     if (id === path.join(vendor, 'package.json')) {
       return { version: packageVersion, main: '.vite/build/early-bootstrap.js' };
@@ -77,6 +79,7 @@ test('loads the official app and configures the supported host Codex CLI overrid
   assert.equal(state.madeDirs[0][1].mode, 0o700);
   assert.equal(state.loaded, path.join(vendor, '.vite/build/early-bootstrap.js'));
   assert.equal(state.process.env.CODEX_CLI_PATH, hostConfig.codexCli);
+  assert.equal(state.compatLoaded, true);
 });
 
 test('launches Codex with host HOME, CODEX_HOME and PATH while preserving workspace cwd', () => {
