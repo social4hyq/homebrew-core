@@ -1,0 +1,49 @@
+OHOS: write the picked file in place when the save dialog's grant refuses a
+sibling temp file. docs, slides and pdf save through this helper; the dialog
+grants this app access to the picked file only, so the sibling temp file is
+refused with EPERM and atomicWriteFile/atomicWriteVia threw before the target
+was written. Opening the picked file for writing is allowed, so fall back to an
+in-place write there. Gated on OpenHarmony, so every other platform keeps the
+untouched-on-failure contract.
+
+diff --git a/packages/electron-utils/src/atomic-write.ts b/packages/electron-utils/src/atomic-write.ts
+index fc12bd0..1b7d150 100644
+--- a/packages/electron-utils/src/atomic-write.ts
++++ b/packages/electron-utils/src/atomic-write.ts
+@@ -23,6 +23,14 @@ const RENAME_RETRY_DELAYS_MS = [50, 100, 200, 400]
+ const TOLERATED_SYNC_CODES = new Set(['EPERM', 'EACCES', 'EBUSY', 'EINVAL', 'ENOSYS', 'ENOTSUP'])
+ 
+ const errorCode = (error: unknown) => (error as NodeJS.ErrnoException).code ?? ''
++
++/// OpenHarmony's save dialog grants this app access to the picked file only:
++/// a temp file next to it is refused with EPERM, so the atomic path cannot run
++/// for a picked path at all. Writing the picked file in place is the one write
++/// the grant allows, and the caller picked that path explicitly.
++const pickedPathRefusesSibling = (error: unknown) =>
++  (process.platform as string) === 'openharmony' &&
++  (errorCode(error) === 'EPERM' || errorCode(error) === 'EACCES')
+ const isRetryableRename = (error: unknown) => RETRYABLE_RENAME_CODES.has(errorCode(error))
+ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+ const sleepSync = (ms: number) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms)
+@@ -121,7 +129,9 @@ export async function atomicWriteFile(filePath: string, data: Buffer): Promise<v
+     await syncFileBestEffort(tmp)
+   } catch (error) {
+     await unlink(tmp).catch(() => {})
+-    throw error
++    if (!pickedPathRefusesSibling(error)) throw error
++    await writeFile(filePath, data)
++    return
+   }
+   try {
+     await renameWithRetry(tmp, filePath)
+@@ -204,7 +214,9 @@ export async function atomicWriteVia(
+     await syncFileBestEffort(tmp)
+   } catch (error) {
+     await unlink(tmp).catch(() => {})
+-    throw error
++    if (!pickedPathRefusesSibling(error)) throw error
++    await write(filePath)
++    return
+   }
+   try {
+     await renameWithRetry(tmp, filePath)
