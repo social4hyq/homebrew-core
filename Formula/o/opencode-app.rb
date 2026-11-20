@@ -229,26 +229,16 @@ class OpencodeApp < Formula
 
   def caveats
     <<~EOS
-      The desktop HAP is unsigned in the bottle. `brew install` runs
-      `opencode-app install` automatically once the device is connected and the
-      Huawei Developer login is done; otherwise it is queued: `hap-app
-      install-pending` finishes it. To install by hand, run `opencode-app install`.
-      app-installer handles Huawei Developer login, local debug profile
-      generation, signing, installation, and launch.
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `opencode-app install`. Details: docs/hap-app-formulae.md.
 
-      The shell starts its local `opencode serve` instance itself on launch and
-      shares the sessions of the opencode TUI. This needs the weak-sandbox
-      permissions CUSTOM_SANDBOX and READ_WRITE_USER_FILE, which are granted
-      through a debug profile generated on the spot (no approval wait; the
-      release path still goes through AGC review). The signing toolchain is
-      assembled from this formula's node and ohos-sdk-toolchains dependencies
-      (keg-only, addressed by absolute paths), so no system CLT is needed. The
-      two kernel ACLs enable JIT/WebAssembly for the renderer; without them
-      markdown rendering fails with "WebAssembly is not defined".
-      READ_PASTEBOARD lets the shell read the system pasteboard; without it
-      pasting into the window does not work.
-      `--no-acl` installs the strong-sandbox HAP instead; the shell then waits
-      for `opencode-app serve`.
+      The shell starts its own `opencode serve` on launch and shares the TUI
+      sessions; the weak-sandbox ACLs (CUSTOM_SANDBOX, READ_WRITE_USER_FILE) come
+      from the local debug profile. READ_PASTEBOARD enables paste and the kernel ACLs
+      keep WebAssembly/markdown rendering. `--no-acl` installs the strong-sandbox HAP
+      and waits for `opencode-app serve`.
     EOS
   end
 
