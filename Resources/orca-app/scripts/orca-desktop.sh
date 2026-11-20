@@ -260,6 +260,10 @@ cmd_install() {
       *) die "unknown install option: $1" ;;
     esac
   done
+  # The tap's automatic install (hap-app in a formula's post_install_steps)
+  # exports this so an install never opens the window; a manual install without
+  # it keeps the old behaviour of opening the app.
+  if [ "${HAP_INSTALLER_NO_START:-0}" != "0" ]; then start=0; fi
   case "${port:-$DEFAULT_PORT}" in
     ""|*[!0-9]*) die "--port needs a number" ;;
   esac

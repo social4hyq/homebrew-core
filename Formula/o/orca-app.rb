@@ -9,7 +9,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 8
+  revision 9
 
   livecheck do
     url :stable
@@ -17,8 +17,8 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r13"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8db86b4d94d08de270592c5421bc2c0852dc18085f386d7e68b2c785458f48e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "150ba45be5b6b7baa8bfb1b9f7965114af36bf070ef30178e243b05a5943f5fc"
   end
 
   depends_on "app-installer"
@@ -369,6 +369,14 @@ class OrcaApp < Formula
     assert_equal "acl\n", (testpath/"home/.config/orca-app/installed.mode").read
     refute_match "signed HAP kept",
                  shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --no-serve 2>&1")
+
+    # The automatic install path exports HAP_INSTALLER_NO_START; an install must
+    # then leave the window closed even without --no-serve.
+    (testpath/"hdc-log").write("")
+    with_env("HAP_INSTALLER_NO_START" => "1") do
+      shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config}")
+    end
+    refute_match(/aa start/, (testpath/"hdc-log").read)
 
     # status/stop read the port from the state file, so pin it to a port this
     # machine cannot have an Orca server on.

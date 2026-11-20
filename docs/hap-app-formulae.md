@@ -81,7 +81,9 @@ end
 - 设备没连、多个设备、没登录、装机失败、权限未授予：不报错、不阻塞 brew，
   把 `<command>` 登记到 `~/.cache/hap-app/pending/<command>.json`，
   提示运行 `hap-app install-pending`；登录只做一次。
-- 自动路径**不启动** app（`HAP_INSTALLER_NO_START=1` 传给 app-installer），
+- 自动路径**不启动** app：`hap-app` 导出 `HAP_INSTALLER_NO_START=1`，app-installer
+  据此不 `aa start`；app 自己的 `install` 脚本如果会打开窗口（目前只有 `orca-app`），
+  也必须遵守这个变量（非 0 时只安装、不打开），不要把这种例外塞进共享的 `hap-app`。
   也不弹登录（除非 `HAP_APP_AUTO_LOGIN=1`，最多等 120s，每次 brew 进程只试一次）。
 - 手动 `<app>-app install` 行为不变：仍会启动 app、仍会阻塞登录。
 - 权限：自动路径永远用默认 ACL 变体，不传 `--no-acl`；`hap-app` 从 app wrapper
