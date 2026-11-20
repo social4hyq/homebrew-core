@@ -6,7 +6,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 15
+  revision 16
 
   livecheck do
     url :stable
@@ -61,9 +61,11 @@ class OpencodeApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs package.json config.json].each do |name|
+    %w[main.cjs config.json].each do |name|
       cp res/"app"/name, app/name
     end
+    package = JSON.parse((res/"app/package.json").read)
+    (app/"package.json").write JSON.generate(package.merge("version" => version.to_s))
     cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
     system "node", tap_root/"Resources/_shared/waiting-page/render-waiting.cjs",
            tap_root/"Resources/_shared/waiting-page/waiting.html.in",
