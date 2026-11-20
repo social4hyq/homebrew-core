@@ -6,10 +6,11 @@ class CodexApp < Formula
   version "26.1117.31558"
   sha256 "81670501c6b7d784ef2b9a62b32da031e81a0eac0f50ebd933d0a9956d7bec77"
   license :cannot_represent # OpenAI service and software terms
+  revision 1
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db14c79aeab62108fd4a39aa1e27bae77ac563dec4a6efe753a2fdfea4b4f95f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "27dc798137be0a7564e65b3ba77c98a4bce8361f28117cc0edcb0c23f777a784"
   end
 
   depends_on "binutils" => :build
@@ -139,7 +140,7 @@ class CodexApp < Formula
   end
 
   post_install_steps do
-    run "{HOMEBREW_PREFIX}/bin/hap-app",
+    run "{{HOMEBREW_PREFIX}}/bin/hap-app",
         args: ["auto-install", "codex-app", "com.social4hyq.chatgpt"],
         must_succeed: false, print_stdout: true, network_access: true
   end

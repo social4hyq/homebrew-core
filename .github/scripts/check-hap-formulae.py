@@ -80,6 +80,20 @@ def check_resources(root, name, rel, text):
             fail(rel, f"{path} is not listed in RESOURCE_FILES")
 
 
+SINGLE_BRACE_HOOK = re.compile(r"(?<!\{)\{HOMEBREW_PREFIX\}")
+HOOK = re.compile(r'run "\{\{HOMEBREW_PREFIX\}\}/bin/hap-app"')
+
+
+def check_post_install_hook(rel, text):
+    """HAP apps must install themselves through hap-app after `brew install`."""
+    if 'depends_on "app-installer"' not in text:
+        return
+    if not HOOK.search(text):
+        fail(rel, 'missing the post_install_steps hook: run "{{HOMEBREW_PREFIX}}/bin/hap-app"')
+    elif SINGLE_BRACE_HOOK.search(text):
+        fail(rel, "single-brace {HOMEBREW_PREFIX} is not expanded; use {{HOMEBREW_PREFIX}}")
+
+
 def check_tap_install(rel, text):
     for number, line in enumerate(text.splitlines(), 1):
         if line.strip().startswith("#"):
@@ -126,6 +140,7 @@ def main():
         text = open(os.path.join(root, rel), encoding="utf-8").read()
         check_resources(root, name, rel, text)
         check_tap_install(rel, text)
+        check_post_install_hook(rel, text)
         checked += 1
     pins = check_pins(root, formulae)
 

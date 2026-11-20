@@ -4,11 +4,11 @@ class SnowShotApp < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.7_snow-shot.tar.gz"
   sha256 "6d9de662710ccf406dea312c0322e77a3f473bc6121096ec82df713d30f4273c"
   license "GPL-3.0-or-later"
-  revision 21
+  revision 22
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r9"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8ec266d30f2c9b2fa30fd24b37390a9e7a5d5ca6fb493561a26ff23925b0e922"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9481382d7c86d6086414faa2d43b7316fbb6eb32cdc6d4297ccabc335db0f3d"
   end
 
   depends_on "brotli" => :build
@@ -603,7 +603,7 @@ class SnowShotApp < Formula
   end
 
   post_install_steps do
-    run "{HOMEBREW_PREFIX}/bin/hap-app",
+    run "{{HOMEBREW_PREFIX}}/bin/hap-app",
         args: ["auto-install", "snow-shot-app", "com.social4hyq.snowshot"],
         must_succeed: false, print_stdout: true, network_access: true
   end

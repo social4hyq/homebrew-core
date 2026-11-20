@@ -9,7 +9,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 7
+  revision 8
 
   livecheck do
     url :stable
@@ -17,8 +17,8 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r12"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "de4a43d507ff4f0ff2013aaec04d779f13fe22b27bb2bb0ea098a6f90a493442"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8db86b4d94d08de270592c5421bc2c0852dc18085f386d7e68b2c785458f48e"
   end
 
   depends_on "app-installer"
@@ -220,7 +220,7 @@ class OrcaApp < Formula
   end
 
   post_install_steps do
-    run "{HOMEBREW_PREFIX}/bin/hap-app",
+    run "{{HOMEBREW_PREFIX}}/bin/hap-app",
         args: ["auto-install", "orca-app", "com.social4hyq.orca"],
         must_succeed: false, print_stdout: true, network_access: true
   end

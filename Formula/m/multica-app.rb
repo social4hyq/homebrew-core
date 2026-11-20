@@ -4,7 +4,7 @@ class MulticaApp < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.11.1.tar.gz"
   sha256 "8a8f2149447dfd0c178fca332f88b539560fa57a5075d67c6e440958de8d49fc"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class MulticaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.11.1-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "92f4d78f94655b506c31cf109889ff919f7ffc58c8f6f6b9ab6b43f651f97085"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.11.1-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9fb7f1cd6d7ebc130eeb6dd4dc573f209722bc1afacd5a2da0c5b5fb7a1b331e"
   end
 
   depends_on "go" => :build
@@ -243,7 +243,7 @@ class MulticaApp < Formula
   end
 
   post_install_steps do
-    run "{HOMEBREW_PREFIX}/bin/hap-app",
+    run "{{HOMEBREW_PREFIX}}/bin/hap-app",
         args: ["auto-install", "multica-app", "com.social4hyq.multica"],
         must_succeed: false, print_stdout: true, network_access: true
   end
