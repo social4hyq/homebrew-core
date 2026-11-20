@@ -201,6 +201,40 @@ for line in "${CANDIDATES[@]}"; do
     continue
   fi
 
+  case "$FORMULA" in
+    app-installer)
+      # npm ci can reuse the checked-in runtime lock only with the same direct dependencies.
+      LOCK_PACKAGE='node_modules/@deveco/deveco-cli-openharmony-arm64'
+      DEPENDENCIES='def deps: {dependencies: (.dependencies // {}), optionalDependencies: (.optionalDependencies // {})};'
+      LOCKED=$(jq -ceS --arg package "$LOCK_PACKAGE" "$DEPENDENCIES .packages[\$package] | select(. != null) | deps" \
+        Resources/app-installer/package-lock.json || true)
+      UPSTREAM=$(curl -fsSL --max-time 30 "https://registry.npmjs.org/@deveco%2fdeveco-cli-openharmony-arm64/$LATEST" \
+        | jq -ceS --arg version "$LATEST" "$DEPENDENCIES select(.version == \$version) | deps" || true)
+      if [[ -z "$LOCKED" || "$LOCKED" != "$UPSTREAM" ]]; then
+        echo "- ⏭️ $FORMULA $LATEST: could not verify the runtime lock against upstream; review dependencies manually" >> "$GITHUB_STEP_SUMMARY"
+        continue
+      fi
+      ;;
+    herdr-app|herdr-core)
+      # The Ghostty resource and its patch are tied to the upstream submodule commit.
+      GHOSTTY=$(gh api "repos/herdrdev/$FORMULA/git/trees/v$LATEST?recursive=1" \
+        --jq '.tree[] | select(.path == "vendor/ghostty" and .mode == "160000") | .sha' || true)
+      if [[ ! "$GHOSTTY" =~ ^[a-f0-9]{40}$ ]] || ! docker exec "$CONTAINER" grep -Fq \
+        "https://github.com/ghostty-org/ghostty/archive/$GHOSTTY.tar.gz" "$TAP_IN_CONTAINER/Formula/h/$FORMULA.rb"; then
+        echo "- ⏭️ $FORMULA $LATEST: update the Ghostty submodule pin and patch manually" >> "$GITHUB_STEP_SUMMARY"
+        continue
+      fi
+      ;;
+  esac
+
+  # The app copies the signed sidecar from the matching CLI bottle.
+  if [[ "$FORMULA" == genoffice-app ]] && ! docker exec "$CONTAINER" grep -Fxq \
+    "  url \"https://github.com/genspark-ai/genoffice/archive/refs/tags/v$LATEST.tar.gz\"" \
+    "$TAP_IN_CONTAINER/Formula/g/genoffice.rb"; then
+    echo "- ⏭️ $FORMULA $LATEST: waiting for the matching genoffice formula" >> "$GITHUB_STEP_SUMMARY"
+    continue
+  fi
+
   # Git-revision formulae (stable url is a .git URL with a `revision:` pin,
   # bun.rb pattern) can't use bump-formula-pr: its version comparison
   # (bump-formula-pr.rb: 302-314) hard-rejects "new version == old version"
@@ -277,7 +311,7 @@ for line in "${CANDIDATES[@]}"; do
       GIT_REF=""
       GIT_VERSION_FILE=""
       case "$FORMULA" in
-        zcode)
+        zcode|zcode-app)
           GIT_REPO="zai-org/ZCode"
           GIT_REF="refs/heads/main"
           GIT_VERSION_FILE="package.json"
