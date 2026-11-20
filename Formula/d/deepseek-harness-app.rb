@@ -11,9 +11,8 @@ class DeepseekHarnessApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.4-r10"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "53776163746f01c7af731f67f0f805990bd630d57d7eda72e28a5eee7862e14a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.5-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61b05291afffd90b5294e8e8d442c051a70bba974e3296c70f035cd79c144da6"
   end
 
   depends_on "app-installer"
