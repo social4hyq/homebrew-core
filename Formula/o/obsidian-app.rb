@@ -10,7 +10,7 @@ class ObsidianApp < Formula
   # Obsidian's own release at install time (never copied into the bottle); see
   # obsidian.md terms and multica.rb.
   license :cannot_represent
-  revision 6
+  revision 7
 
   # Upstream is the vendor app, not the tap-authored host payload: the formula
   # version tracks Obsidian so `brew upgrade` follows new releases, while the
@@ -24,9 +24,8 @@ class ObsidianApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r4"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a644af13c200c84c39e2136b13abf91375994d50b1917029789feb82a9916a9b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b581e63704bbf8d15f106cebf97f7f59a036378766227d9281274457b621bc45"
   end
 
   depends_on "app-installer"
@@ -290,10 +289,18 @@ class ObsidianApp < Formula
     bin.install_symlink bin/"obsidian-app" => "obsidian-desktop"
   end
 
+  post_install_steps do
+    run "{HOMEBREW_PREFIX}/bin/hap-app",
+        args: ["auto-install", "obsidian-app", "com.social4hyq.obsidiandesktop"],
+        must_succeed: false, print_stdout: true, network_access: true
+  end
+
   def caveats
     <<~EOS
       The desktop HAP is unsigned in the bottle and contains no Obsidian code.
-      Connect and unlock the device, then run:
+      `brew install` runs `obsidian-app install` automatically once the device
+      is connected and the Huawei Developer login is done; otherwise it is
+      queued: `hap-app install-pending` finishes it. To install by hand, run:
 
         obsidian-app install
 

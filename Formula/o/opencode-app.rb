@@ -8,7 +8,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 12
+  revision 13
 
   livecheck do
     url :stable
@@ -17,8 +17,8 @@ class OpencodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.0-r13"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7939b3c7cb77dfc894356ffb31fea66dc4b1cd45c9d85f8411297474197d59a0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.0-r14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2479848ad7aab5ea267272926616bf666f0819f5495bef2897fb711139fa727d"
   end
 
   depends_on "app-installer"
@@ -221,12 +221,20 @@ class OpencodeApp < Formula
     bin.install_symlink bin/"opencode-app" => "opencode-desktop"
   end
 
+  post_install_steps do
+    run "{HOMEBREW_PREFIX}/bin/hap-app",
+        args: ["auto-install", "opencode-app", "com.social4hyq.opencodedesktop"],
+        must_succeed: false, print_stdout: true, network_access: true
+  end
+
   def caveats
     <<~EOS
-      The desktop HAP is unsigned in the bottle. Connect and unlock the device,
-      then run `opencode-app install`. app-installer handles Huawei
-      Developer login, local debug profile generation, signing, installation,
-      and launch.
+      The desktop HAP is unsigned in the bottle. `brew install` runs
+      `opencode-app install` automatically once the device is connected and the
+      Huawei Developer login is done; otherwise it is queued: `hap-app
+      install-pending` finishes it. To install by hand, run `opencode-app install`.
+      app-installer handles Huawei Developer login, local debug profile
+      generation, signing, installation, and launch.
 
       The shell starts its local `opencode serve` instance itself on launch and
       shares the sessions of the opencode TUI. This needs the weak-sandbox

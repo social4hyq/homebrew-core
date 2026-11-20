@@ -9,7 +9,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 6
+  revision 7
 
   livecheck do
     url :stable
@@ -17,8 +17,8 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r11"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4b48c348b3a3a8ce1f9c22eab35c44cbc9f8f8cb7f2d58a09136527788535d13"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "de4a43d507ff4f0ff2013aaec04d779f13fe22b27bb2bb0ea098a6f90a493442"
   end
 
   depends_on "app-installer"
@@ -219,10 +219,18 @@ class OrcaApp < Formula
       PATH:                        tool_path
   end
 
+  post_install_steps do
+    run "{HOMEBREW_PREFIX}/bin/hap-app",
+        args: ["auto-install", "orca-app", "com.social4hyq.orca"],
+        must_succeed: false, print_stdout: true, network_access: true
+  end
+
   def caveats
     <<~EOS
-      The desktop HAP is unsigned in the bottle. Connect and unlock the device,
-      then run:
+      The desktop HAP is unsigned in the bottle. `brew install` runs
+      `orca-app install` automatically once the device is connected and the
+      Huawei Developer login is done; otherwise it is queued: `hap-app
+      install-pending` finishes it. To install by hand, run:
 
         orca-app install
 

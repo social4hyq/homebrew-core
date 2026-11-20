@@ -10,7 +10,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 19
+  revision 20
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -20,8 +20,8 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r20"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2d076b498d6d414cf22b4e0b93b2f1aad6789aec3eeafeee563df8c5a375512c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r21"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3fc0c743025a27083de7025bbe901d57d51bd02a6094e5b7c891ecb68cedf482"
   end
 
   depends_on "app-installer"
@@ -246,10 +246,18 @@ class ZcodeApp < Formula
     bin.install_symlink bin/"zcode-app" => "zcode-desktop"
   end
 
+  post_install_steps do
+    run "{HOMEBREW_PREFIX}/bin/hap-app",
+        args: ["auto-install", "zcode-app", "com.social4hyq.zcodedesktop"],
+        must_succeed: false, print_stdout: true, network_access: true
+  end
+
   def caveats
     <<~EOS
-      The desktop HAP is unsigned in the bottle. Connect and unlock the device,
-      then run:
+      The desktop HAP is unsigned in the bottle. `brew install` runs
+      `zcode-app install` automatically once the device is connected and the
+      Huawei Developer login is done; otherwise it is queued: `hap-app
+      install-pending` finishes it. To install by hand, run:
 
         zcode-app install
 
