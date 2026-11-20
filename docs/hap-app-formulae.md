@@ -79,7 +79,7 @@ end
 - 设备已连接、华为开发者已登录：立刻签名安装，装完用 `bm dump` 校验权限；
   stdout 一行结果，stderr 是进度。
 - 设备没连、多个设备、没登录、装机失败、权限未授予：不报错、不阻塞 brew，
-  把 `<command>` 登记到 `$XDG_CONFIG_HOME/hap-app/pending/<command>.json`，
+  把 `<command>` 登记到 `~/.cache/hap-app/pending/<command>.json`，
   提示运行 `hap-app install-pending`；登录只做一次。
 - 自动路径**不启动** app（`HAP_INSTALLER_NO_START=1` 传给 app-installer），
   也不弹登录（除非 `HAP_APP_AUTO_LOGIN=1`，最多等 120s，每次 brew 进程只试一次）。
@@ -88,9 +88,19 @@ end
   的 `*_MODULE_ACL` 取 ACL 清单传给 `app-installer permissions --expect-acl`，
   既确认装的是 ACL 变体，也只要求 `system_grant`（安装时授予）的权限为 granted；
   `user_grant` 权限（粘贴、截屏等）装机后是 -1，只报告不判失败。
-- CI、root、`HAP_APP_AUTO_INSTALL=0`（或配置文件
-  `$XDG_CONFIG_HOME/hap-app/config` 里 `auto_install=0`）下静默 no-op。
+- CI、root、`HAP_APP_AUTO_INSTALL=0`（或配置文件 `~/.config/hap-app/config`
+  里 `auto_install=0`）下静默 no-op。
 - 逃生口：`brew install --skip-post-install`；补跑用 `brew postinstall <app>`。
+
+Homebrew 的 `post_install` 不在用户的 shell 环境里跑：它把 `HOME` 换成
+`$TMPDIR/<formula>-postinstall-*`、清掉大多数环境变量，`/proc/<pid>/environ`
+也读不到，所以 `hdc`（`~/.harmony` 的鉴权密钥、`~/.HDCServer.pid`）、
+`devecocli`（登录态）和 `app-installer`（`~/.hap-installer/projects`）都找不到
+用户会话。`hap-app` 因此先按「prefix 的父目录 + 家目录标记（`.HDCServer.pid`、
+`.harmony`、`.hap-installer`、`.app-installer`）」恢复真实 `HOME`
+（本 tap 约定装在 `~/.harmonybrew`，可用 `HAP_APP_USER_HOME` 覆盖），再调用
+`app-installer`；恢复失败就只登记待装。状态目录跟真实 `HOME` 走
+（`~/.cache/hap-app`、`~/.config/hap-app`），保证 post_install 与用户 shell 看到同一份。
 
 `hap-app` 子命令：`auto-install`（formula 用）、`install-pending`、`status`、
 `forget`。`app-installer` 另有 `ready`（无副作用预检，输出 `ok <device>` /

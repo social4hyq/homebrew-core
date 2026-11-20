@@ -66,6 +66,8 @@ function fixture(t) {
     HAP_APP_NODE: process.execPath,
     HAP_APP_INSTALL_TIMEOUT: "60",
     HAP_APP_ALLOW_ROOT: "1",
+    HOMEBREW_PREFIX: path.join(root, ".harmonybrew"),
+    HAP_APP_USER_HOME: "",
     CI: "",
     GITHUB_ACTIONS: "",
     HOMEBREW_GITHUB_ACTIONS: "",
@@ -77,10 +79,11 @@ function fixture(t) {
   const calls = () => fs.existsSync(log)
     ? fs.readFileSync(log, "utf8").trim().split("\n").filter(Boolean).map(JSON.parse)
     : [];
-  const queueDir = path.join(env.XDG_CONFIG_HOME, "hap-app", "pending");
+  const queueDir = path.join(root, ".cache", "hap-app", "pending");
+  const configDir = path.join(root, ".config", "hap-app");
   const queued = () => fs.existsSync(queueDir) ? fs.readdirSync(queueDir).sort() : [];
   const queuedEntry = name => JSON.parse(fs.readFileSync(path.join(queueDir, `${name}.json`), "utf8"));
-  return { root, bin, acl, env, run, calls, queued, queuedEntry };
+  return { root, bin, acl, env, run, calls, queued, queuedEntry, configDir };
 }
 
 test('auto-install signs, installs and verifies permissions without starting the app', t => {
@@ -189,5 +192,30 @@ test('status lists the queue and forget removes one entry', t => {
   assert.match(r.stdout, /^orca-app\tcom\.example\.desktop\tdevice\t/m);
   r = f.run(["forget", "orca-app"]);
   assert.equal(r.status, 0);
+  assert.deepEqual(f.queued(), []);
+});
+
+test('recovers the real home from HOMEBREW_PREFIX when brew isolates HOME', t => {
+  const f = fixture(t);
+  const isolated = path.join(f.root, "herdr-postinstall-isolated");
+  fs.mkdirSync(isolated);
+  fs.mkdirSync(path.join(f.root, ".harmony"));
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"], {
+    HOME: isolated,
+    HOMEBREW_PREFIX: path.join(f.root, ".harmonybrew"),
+  });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /已装机/);
+  assert.deepEqual(f.queued(), [], "the queue must use the recovered home");
+});
+
+test('the config file can switch automatic installs off', t => {
+  const f = fixture(t);
+  fs.mkdirSync(f.configDir, { recursive: true });
+  fs.writeFileSync(path.join(f.configDir, "config"), "auto_install=0\n");
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"]);
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stderr, /自动装机已关闭/);
+  assert.deepEqual(f.calls(), []);
   assert.deepEqual(f.queued(), []);
 });
