@@ -164,25 +164,17 @@ class CodexApp < Formula
 
   def caveats
     <<~EOS
-      `brew install` runs `codex-app install` automatically once the device is
-      connected and the Huawei Developer login is done; otherwise it is queued:
-      `hap-app install-pending` finishes it. To install by hand, run
-      `codex-app install` to create a local debug signing profile, sign the HAP,
-      and install ChatGPT. A connected, unlocked OpenHarmony PC device is
-      required. The app starts the stable Homebrew `codex` CLI when
-      opened. Installation injects host paths into a private signed HAP copy
-      and requests ACL permissions for host project access. A Huawei Developer
-      login is required for the first ACL-capable signing. Use
-      `codex-app install --no-acl` to install a strong-sandbox variant; host
-      Codex features will not work in that variant.
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `codex-app install`. Details: docs/hap-app-formulae.md.
 
-      The installer also prepares two host settings for the app: it sets
-      `[desktop] projectlessWorkspaceRoot` in `$CODEX_HOME/config.toml` (the
-      app cannot create folders under ~/Documents; the original file is kept
-      as `config.toml.pre-owl`), and, when the file does not exist yet, writes
-      the proxy variables of the current shell to `~/.config/codex-app/env.json`
-      for the Codex CLI, the cloud connection and the in-app terminal. An
-      existing `env.json` is never overwritten; edit it when the proxy changes.
+      The app starts the Homebrew `codex` CLI; install injects host paths into a
+      private signed HAP (ACLs are needed to reach host projects). `--no-acl` gives a
+      strong-sandbox variant without host Codex features. Install keeps
+      `[desktop] projectlessWorkspaceRoot` in `$CODEX_HOME/config.toml` (original
+      saved as `config.toml.pre-owl`) and, when missing, writes the shell's proxy
+      variables to `~/.config/codex-app/env.json` (never overwritten).
     EOS
   end
 
